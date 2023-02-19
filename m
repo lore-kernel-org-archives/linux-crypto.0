@@ -2,57 +2,57 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C65C05027
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Feb 2023 17:28:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 574CAC05027
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Feb 2023 17:28:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbjBSR2E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 Feb 2023 12:28:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52766 "EHLO
+        id S231143AbjBSR2P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 19 Feb 2023 12:28:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231143AbjBSR2D (ORCPT
+        with ESMTP id S230124AbjBSR2O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Feb 2023 12:28:03 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB59D509
-        for <linux-crypto@vger.kernel.org>; Sun, 19 Feb 2023 09:28:02 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id c65so3479688edf.11
-        for <linux-crypto@vger.kernel.org>; Sun, 19 Feb 2023 09:28:01 -0800 (PST)
+        Sun, 19 Feb 2023 12:28:14 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69736BDF2
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Feb 2023 09:28:13 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id s24so3659100edw.2
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Feb 2023 09:28:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=googlemail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uceSLfTcrpp2TxT0t+zM3u/1SNJQwihc1mRmxGjh/SY=;
-        b=JNVWymAHxpqHkh7RLIUhXRV9m0Mz/kRVeTx2aURgVxnkF5gnikUKbhHziRVkde/M3O
-         gIQZZuGjc9O8YDbGlriq0QBD/1uyAc/Fyqj41Tqi8pjaPIBWnfB4Ve+cXEC/3arzK3Dm
-         01TUYmdN03WXyzqQ6gPdexuKg+OrBSuF8Tt2m8IQgkau+006R71G55Ursrv4/p8LgLkx
-         Z1LKCwBDaSuY5IYhiVbV9V5MaLtznKVMGCgNCl9IPIyKS9zK5ma/Hg6+5HRXjmcmL0D/
-         QqnjPlreXzTxNsckXwQ/K0q0arqwoiqIclZdKoOIV2lLljUjwjJK0qnkdm52fhrIuJ0m
-         tXlQ==
+        bh=M6+Yhi5HmzEaYR1Acp/Tiu9ai7miZvMW3BFnNCGbcK4=;
+        b=DUffLC6/PkfvC5KK7qPuoyZfR4td2wDofuSGnAXnqS5FmtiVogvk3EMDWqnMNHysLI
+         ysIg2jOM7yHguOWZwd46Gm8uGpMUsP5mTYQPiQ345DJCNcizxrNd3sSg6RRsGj5MsD67
+         qBB3S6pNTILI1s+rc2CGjmpKvrN9VjOFZl7t+vTuwUynUgEtyFKayhHldGfsVHpC4FRO
+         WDF3XXdVIwNmD+/NMDhOUf4+qzAeLk1EqYeZBf7wQN0s5UjtFptWcISIrwZmfSO/cZvF
+         elcWmmyCkbTspJwPmSrzWBGvh0nZiNZwjwVz+vSpY2ArSLoHha59Ab5t1oF+24u6XxC6
+         ovTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uceSLfTcrpp2TxT0t+zM3u/1SNJQwihc1mRmxGjh/SY=;
-        b=hSnB3dlBnGsGHuDs61gLGJ+trC5TJCQhYJlxt3LdIPuB9ZI6sZ+oG4CW5xnfxHXza4
-         a2xuC2u0GfpXQOpC7rwqhcvO9gCyTmZAwPsNl/ISFSCv57eC9pbV2tdPGj6yJDSWwQ5C
-         HaAXP4wVcTiJV3d/7s2y5pjd4FL7Tu64WQ9BAKZVtq2+AhDmSfyoJ1YNjoHhrKQ9GZaa
-         vlCs0ec1u0G957ZcvayAITK+DWcWEC0X4sSpoVU3QG5KjKqWatGopYGcbAjB6MOaQdG+
-         DGFXlWpSzP7kp/OECucKF0uzMIYrie/qVZ6VqA51cH8HONZ10do4KMszriFWeVdCjZwP
-         9lhg==
-X-Gm-Message-State: AO0yUKVRecob3eQAkyvnNeo95aQItl1pYq8Y48OEueqo2RYaJWKDAUUM
-        vjMACiRkcL+Z60xCajvelk1LLJWyLM31VVGJ1PM=
-X-Google-Smtp-Source: AK7set8zR7Cd9va+awR8PhxfSuqRAd8HKCi0xciYlAGKLxP71ZvO0916KwyJz2bydQ1QrP6ZyoF8peOQbYYBvGSGYpc=
-X-Received: by 2002:a17:907:2be6:b0:8b1:3cdf:29cd with SMTP id
- gv38-20020a1709072be600b008b13cdf29cdmr2852937ejc.6.1676827680101; Sun, 19
- Feb 2023 09:28:00 -0800 (PST)
+        bh=M6+Yhi5HmzEaYR1Acp/Tiu9ai7miZvMW3BFnNCGbcK4=;
+        b=eCAdZ+cx27SvflYD4+KwkSG4FV7o7iqp49sDW3O4nOYGvGYUqxHMo3sHOfpGBAJtJB
+         YpT+COBltsUCmQtzLbB3tP3oWU7D0PfoBrHlI1l/2b9hOs//vZpr0PFu/c93QIx2PWSU
+         aNiHt52gGR0oK2NIBmYAE9H2AyVXyUtPIsJGYsjOmdRpgXjxktKrJJP7f9AD8B27wZNc
+         lcrIGfVr/lG9xPQGNBsQ7P80+4hFDBgQ3WDsVBh0WNrqxNFGzPQVnrbhkswKSIkUpqSn
+         WvyWATGehIzuy0ESoHLjs1KaUp2MDarRKHw0njZx9x+mi914DzSsmz1v8hDSwUOsAqns
+         pzBg==
+X-Gm-Message-State: AO0yUKVaRoAhccXAIcExlVLksjQEmbieT2pbagvsMXblGKz1VBDYafhy
+        5UTBZTDm3f2YehDm+41/roBaU6ArfHKGHf6VAwU=
+X-Google-Smtp-Source: AK7set9VhggQuyGk7wz7IT3ufc2D81c5/+i5d+bwf3B1FoqxAjUyKmwz22UJUEaE+wpg5oRmnnQWN/aGG5VAMrRXxwo=
+X-Received: by 2002:a17:907:2b09:b0:8b1:cd2e:177a with SMTP id
+ gc9-20020a1709072b0900b008b1cd2e177amr3898709ejc.6.1676827691866; Sun, 19 Feb
+ 2023 09:28:11 -0800 (PST)
 MIME-Version: 1.0
-References: <26216f60-d9b9-f40c-2c2a-95b3fde6c3bc@gmail.com> <abd9a2ce-5b9b-c6bd-d3bf-8791d4005231@gmail.com>
-In-Reply-To: <abd9a2ce-5b9b-c6bd-d3bf-8791d4005231@gmail.com>
+References: <26216f60-d9b9-f40c-2c2a-95b3fde6c3bc@gmail.com> <7d1fc713-850d-d9cd-3fe2-60fd690f406a@gmail.com>
+In-Reply-To: <7d1fc713-850d-d9cd-3fe2-60fd690f406a@gmail.com>
 From:   Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Date:   Sun, 19 Feb 2023 18:27:49 +0100
-Message-ID: <CAFBinCApc0-_BWaUmtiBuFEN+=BVDVoo9boaxnYPsjfktvC_Cg@mail.gmail.com>
-Subject: Re: [PATCH 2/5] hwrng: meson: use devm_clk_get_optional_enabled
+Date:   Sun, 19 Feb 2023 18:28:01 +0100
+Message-ID: <CAFBinCBGxectv891GreHtYLvk7mS7F9DZx8_dVA=qht6Beiz3g@mail.gmail.com>
+Subject: Re: [PATCH 3/5] hwrng: meson: remove not needed call to platform_set_drvdata
 To:     Heiner Kallweit <hkallweit1@gmail.com>
 Cc:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -70,7 +70,7 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Sat, Feb 18, 2023 at 9:59 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
 >
-> Use devm_clk_get_optional_enabled() to simplify the code.
+> drvdata isn't used, therefore remove this call.
 >
 > Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
