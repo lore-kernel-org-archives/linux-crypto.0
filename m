@@ -2,682 +2,322 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43309C6379F
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 20:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B1EC677F1
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 20:42:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232947AbjBTUmv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 15:42:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33454 "EHLO
+        id S232229AbjBTUmw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 15:42:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232877AbjBTUmr (ORCPT
+        with ESMTP id S232874AbjBTUmu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 15:42:47 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ECB61F49A;
-        Mon, 20 Feb 2023 12:42:44 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31KIoCmu001552;
-        Mon, 20 Feb 2023 20:42:38 GMT
+        Mon, 20 Feb 2023 15:42:50 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE05211CE;
+        Mon, 20 Feb 2023 12:42:46 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31KHJaZR018149;
+        Mon, 20 Feb 2023 20:42:40 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=q2sRlkufa3bIZdUCXvmGmQAPqGsdWaVIMG/eH9asV/U=;
- b=sArABLznO60edBrrbxdWgl/PidfHyFRxYlzTRBENDShxiTzUm7d8W7gbl1Bs6dlMuySL
- 7JJgUBASwH2ovaHl6jbXXzgh/kWMKUozDQ6487k6TsaYiQlRlow/vWgQ5+kAB8UGQVBU
- s1cBIuPY6cB4tyc3f1Wq5FD7WwgIdbZzUARq6CM1rQgju72J1hmEV5tjiEDGeT0F+zY2
- Fn3a9sGDrVY2B/bJo83ypJ346xrL9YR67UJHDB1oHPykhmzZ5AXI371/PEFiY9vFZcVc
- gxtduBbXluFDNp7JCE1Dkm0NTj77FRx0PTbXuCinqzHwtmxdQ0PTl81eFc27yzIKOLcJ Dw== 
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvc92n3qu-1
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=J4E37CBbGAXXSsT9zVTThxpL7c5Xv4PRkiuxD6bWjas=;
+ b=Ar2GcomEVUilyfCUahjoWwiAJLmfSvnohLzy44fjlMAqxCL2ThA0YIUCv5NwBzgQtVBl
+ QHsGodcFiXA73YlssQeg1WSQUDn/+9CnBvX13YNUGfw63zNyPYz+t2ZQN7YXHHhFIkRZ
+ p9JaR0XroZuK55rK1s2l+iaLup25bxxal1mjyHoItBweg+BnQfqKNf2QPay3Fs/gojSY
+ v1fRKwoG7q2poEJeOjSPb2KUYVRe0wN74tFcLz1P+SYKMfLTFoJR9qCTf6DXDphCP2eP
+ 0+IeELCngfQaq+aCE1vDyM4oLTxOozMwSjzh8NO1CiN5PVT++t6emuf2IUjO3rFrnVbH hA== 
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvckvmgvg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Feb 2023 20:42:37 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31KIEZFV019841;
-        Mon, 20 Feb 2023 20:42:36 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3ntpa72t38-1
+        Mon, 20 Feb 2023 20:42:40 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31KIE0sp005266;
+        Mon, 20 Feb 2023 20:42:39 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([9.208.130.102])
+        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3ntpa6tubb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Feb 2023 20:42:36 +0000
+        Mon, 20 Feb 2023 20:42:39 +0000
 Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31KKgZ0929294898
+        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31KKgbEt6029908
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Feb 2023 20:42:35 GMT
+        Mon, 20 Feb 2023 20:42:37 GMT
 Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5BE655803F;
-        Mon, 20 Feb 2023 20:42:35 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AD03F5803F;
+        Mon, 20 Feb 2023 20:42:37 +0000 (GMT)
 Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CBC75805A;
-        Mon, 20 Feb 2023 20:42:35 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 74BBB58061;
+        Mon, 20 Feb 2023 20:42:37 +0000 (GMT)
 Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
         by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Feb 2023 20:42:35 +0000 (GMT)
+        Mon, 20 Feb 2023 20:42:37 +0000 (GMT)
 From:   Danny Tsen <dtsen@linux.ibm.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
         nayna@linux.ibm.com, appro@cryptogams.org,
         linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
         dtsen@us.ibm.com, Danny Tsen <dtsen@linux.ibm.com>
-Subject: [PATCH v4 4/6] Supporting functions for AES.
-Date:   Mon, 20 Feb 2023 15:42:22 -0500
-Message-Id: <20230220204224.4907-5-dtsen@linux.ibm.com>
+Subject: [PATCH v4 6/6] A perl script to process PowerPC assembler source.
+Date:   Mon, 20 Feb 2023 15:42:24 -0500
+Message-Id: <20230220204224.4907-7-dtsen@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230220204224.4907-1-dtsen@linux.ibm.com>
 References: <20230220204224.4907-1-dtsen@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -YZfpeWvuDTb59bY4kAhQtrQbToi57gN
-X-Proofpoint-ORIG-GUID: -YZfpeWvuDTb59bY4kAhQtrQbToi57gN
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: X2ZKv5_7Gejvj_E9WoPxd4w0ZY9jwMo0
+X-Proofpoint-GUID: X2ZKv5_7Gejvj_E9WoPxd4w0ZY9jwMo0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
  definitions=2023-02-20_17,2023-02-20_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- phishscore=0 clxscore=1015 impostorscore=0 suspectscore=0 spamscore=0
- priorityscore=1501 malwarescore=0 adultscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ lowpriorityscore=0 mlxlogscore=999 impostorscore=0 bulkscore=0
+ malwarescore=0 priorityscore=1501 adultscore=0 phishscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2212070000 definitions=main-2302200190
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This code is taken from CRYPTOGAMs[1].  The following functions are used,
-aes_p8_set_encrypt_key is used to generate AES round keys and aes_p8_encrypt is used
-to encrypt single block.
-
 Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 ---
- arch/powerpc/crypto/aesp8-ppc.pl | 585 +++++++++++++++++++++++++++++++
- 1 file changed, 585 insertions(+)
- create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
+ arch/powerpc/crypto/ppc-xlate.pl | 229 +++++++++++++++++++++++++++++++
+ 1 file changed, 229 insertions(+)
+ create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
 
-diff --git a/arch/powerpc/crypto/aesp8-ppc.pl b/arch/powerpc/crypto/aesp8-ppc.pl
+diff --git a/arch/powerpc/crypto/ppc-xlate.pl b/arch/powerpc/crypto/ppc-xlate.pl
 new file mode 100644
-index 000000000000..1f22aec27d79
+index 000000000000..36db2ef09e5b
 --- /dev/null
-+++ b/arch/powerpc/crypto/aesp8-ppc.pl
-@@ -0,0 +1,585 @@
-+#! /usr/bin/env perl
++++ b/arch/powerpc/crypto/ppc-xlate.pl
+@@ -0,0 +1,229 @@
++#!/usr/bin/env perl
 +# SPDX-License-Identifier: GPL-2.0
 +
-+# This code is taken from CRYPTOGAMs[1] and is included here using the option
-+# in the license to distribute the code under the GPL. Therefore this program
-+# is free software; you can redistribute it and/or modify it under the terms of
-+# the GNU General Public License version 2 as published by the Free Software
-+# Foundation.
-+#
-+# [1] https://www.openssl.org/~appro/cryptogams/
++# PowerPC assembler distiller by <appro>.
 +
-+# Copyright (c) 2006-2017, CRYPTOGAMS by <appro@openssl.org>
-+# All rights reserved.
-+#
-+# Redistribution and use in source and binary forms, with or without
-+# modification, are permitted provided that the following conditions
-+# are met:
-+#
-+#       * Redistributions of source code must retain copyright notices,
-+#         this list of conditions and the following disclaimer.
-+#
-+#       * Redistributions in binary form must reproduce the above
-+#         copyright notice, this list of conditions and the following
-+#         disclaimer in the documentation and/or other materials
-+#         provided with the distribution.
-+#
-+#       * Neither the name of the CRYPTOGAMS nor the names of its
-+#         copyright holder and contributors may be used to endorse or
-+#         promote products derived from this software without specific
-+#         prior written permission.
-+#
-+# ALTERNATIVELY, provided that this notice is retained in full, this
-+# product may be distributed under the terms of the GNU General Public
-+# License (GPL), in which case the provisions of the GPL apply INSTEAD OF
-+# those given above.
-+#
-+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
-+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++my $flavour = shift;
++my $output = shift;
++open STDOUT,">$output" || die "can't open $output: $!";
 +
-+# ====================================================================
-+# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-+# project. The module is, however, dual licensed under OpenSSL and
-+# CRYPTOGAMS licenses depending on where you obtain it. For further
-+# details see https://www.openssl.org/~appro/cryptogams/.
-+# ====================================================================
-+#
-+# This module implements support for AES instructions as per PowerISA
-+# specification version 2.07, first implemented by POWER8 processor.
-+# The module is endian-agnostic in sense that it supports both big-
-+# and little-endian cases. Data alignment in parallelizable modes is
-+# handled with VSX loads and stores, which implies MSR.VSX flag being
-+# set. It should also be noted that ISA specification doesn't prohibit
-+# alignment exceptions for these instructions on page boundaries.
-+# Initially alignment was handled in pure AltiVec/VMX way [when data
-+# is aligned programmatically, which in turn guarantees exception-
-+# free execution], but it turned to hamper performance when vcipher
-+# instructions are interleaved. It's reckoned that eventual
-+# misalignment penalties at page boundaries are in average lower
-+# than additional overhead in pure AltiVec approach.
-+#
-+# May 2016
-+#
-+# Add XTS subroutine, 9x on little- and 12x improvement on big-endian
-+# systems were measured.
-+#
-+######################################################################
-+# Current large-block performance in cycles per byte processed with
-+# 128-bit key (less is better).
-+#
-+#		CBC en-/decrypt	CTR	XTS
-+# POWER8[le]	3.96/0.72	0.74	1.1
-+# POWER8[be]	3.75/0.65	0.66	1.0
++my %GLOBALS;
++my $dotinlocallabels=($flavour=~/linux/)?1:0;
 +
-+$flavour = shift;
++################################################################
++# directives which need special treatment on different platforms
++################################################################
++my $globl = sub {
++    my $junk = shift;
++    my $name = shift;
++    my $global = \$GLOBALS{$name};
++    my $ret;
 +
-+if ($flavour =~ /64/) {
-+	$SIZE_T	=8;
-+	$LRSAVE	=2*$SIZE_T;
-+	$STU	="stdu";
-+	$POP	="ld";
-+	$PUSH	="std";
-+	$UCMP	="cmpld";
-+	$SHL	="sldi";
-+} elsif ($flavour =~ /32/) {
-+	$SIZE_T	=4;
-+	$LRSAVE	=$SIZE_T;
-+	$STU	="stwu";
-+	$POP	="lwz";
-+	$PUSH	="stw";
-+	$UCMP	="cmplw";
-+	$SHL	="slwi";
-+} else { die "nonsense $flavour"; }
++    $name =~ s|^[\.\_]||;
++ 
++    SWITCH: for ($flavour) {
++	/aix/		&& do { $name = ".$name";
++				last;
++			      };
++	/osx/		&& do { $name = "_$name";
++				last;
++			      };
++	/linux/
++			&& do {	$ret = "_GLOBAL($name)";
++				last;
++			      };
++    }
 +
-+$LITTLE_ENDIAN = ($flavour=~/le$/) ? $SIZE_T : 0;
++    $ret = ".globl	$name\nalign 5\n$name:" if (!$ret);
++    $$global = $name;
++    $ret;
++};
++my $text = sub {
++    my $ret = ($flavour =~ /aix/) ? ".csect\t.text[PR],7" : ".text";
++    $ret = ".abiversion	2\n".$ret	if ($flavour =~ /linux.*64le/);
++    $ret;
++};
++my $machine = sub {
++    my $junk = shift;
++    my $arch = shift;
++    if ($flavour =~ /osx/)
++    {	$arch =~ s/\"//g;
++	$arch = ($flavour=~/64/) ? "ppc970-64" : "ppc970" if ($arch eq "any");
++    }
++    ".machine	$arch";
++};
++my $size = sub {
++    if ($flavour =~ /linux/)
++    {	shift;
++	my $name = shift; $name =~ s|^[\.\_]||;
++	my $ret  = ".size	$name,.-".($flavour=~/64$/?".":"").$name;
++	$ret .= "\n.size	.$name,.-.$name" if ($flavour=~/64$/);
++	$ret;
++    }
++    else
++    {	"";	}
++};
++my $asciz = sub {
++    shift;
++    my $line = join(",",@_);
++    if ($line =~ /^"(.*)"$/)
++    {	".byte	" . join(",",unpack("C*",$1),0) . "\n.align	2";	}
++    else
++    {	"";	}
++};
++my $quad = sub {
++    shift;
++    my @ret;
++    my ($hi,$lo);
++    for (@_) {
++	if (/^0x([0-9a-f]*?)([0-9a-f]{1,8})$/io)
++	{  $hi=$1?"0x$1":"0"; $lo="0x$2";  }
++	elsif (/^([0-9]+)$/o)
++	{  $hi=$1>>32; $lo=$1&0xffffffff;  } # error-prone with 32-bit perl
++	else
++	{  $hi=undef; $lo=$_; }
 +
-+$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-+( $xlate="${dir}ppc-xlate.pl" and -f $xlate ) or
-+( $xlate="${dir}../../perlasm/ppc-xlate.pl" and -f $xlate) or
-+die "can't locate ppc-xlate.pl";
++	if (defined($hi))
++	{  push(@ret,$flavour=~/le$/o?".long\t$lo,$hi":".long\t$hi,$lo");  }
++	else
++	{  push(@ret,".quad	$lo");  }
++    }
++    join("\n",@ret);
++};
 +
-+open STDOUT,"| $^X $xlate $flavour ".shift || die "can't call $xlate: $!";
++################################################################
++# simplified mnemonics not handled by at least one assembler
++################################################################
++my $cmplw = sub {
++    my $f = shift;
++    my $cr = 0; $cr = shift if ($#_>1);
++    # Some out-of-date 32-bit GNU assembler just can't handle cmplw...
++    ($flavour =~ /linux.*32/) ?
++	"	.long	".sprintf "0x%x",31<<26|$cr<<23|$_[0]<<16|$_[1]<<11|64 :
++	"	cmplw	".join(',',$cr,@_);
++};
++my $bdnz = sub {
++    my $f = shift;
++    my $bo = $f=~/[\+\-]/ ? 16+9 : 16;	# optional "to be taken" hint
++    "	bc	$bo,0,".shift;
++} if ($flavour!~/linux/);
++my $bltlr = sub {
++    my $f = shift;
++    my $bo = $f=~/\-/ ? 12+2 : 12;	# optional "not to be taken" hint
++    ($flavour =~ /linux/) ?		# GNU as doesn't allow most recent hints
++	"	.long	".sprintf "0x%x",19<<26|$bo<<21|16<<1 :
++	"	bclr	$bo,0";
++};
++my $bnelr = sub {
++    my $f = shift;
++    my $bo = $f=~/\-/ ? 4+2 : 4;	# optional "not to be taken" hint
++    ($flavour =~ /linux/) ?		# GNU as doesn't allow most recent hints
++	"	.long	".sprintf "0x%x",19<<26|$bo<<21|2<<16|16<<1 :
++	"	bclr	$bo,2";
++};
++my $beqlr = sub {
++    my $f = shift;
++    my $bo = $f=~/-/ ? 12+2 : 12;	# optional "not to be taken" hint
++    ($flavour =~ /linux/) ?		# GNU as doesn't allow most recent hints
++	"	.long	".sprintf "0x%X",19<<26|$bo<<21|2<<16|16<<1 :
++	"	bclr	$bo,2";
++};
++# GNU assembler can't handle extrdi rA,rS,16,48, or when sum of last two
++# arguments is 64, with "operand out of range" error.
++my $extrdi = sub {
++    my ($f,$ra,$rs,$n,$b) = @_;
++    $b = ($b+$n)&63; $n = 64-$n;
++    "	rldicl	$ra,$rs,$b,$n";
++};
++my $vmr = sub {
++    my ($f,$vx,$vy) = @_;
++    "	vor	$vx,$vy,$vy";
++};
 +
-+$FRAME=8*$SIZE_T;
-+$prefix="aes_p8";
++# Some ABIs specify vrsave, special-purpose register #256, as reserved
++# for system use.
++my $no_vrsave = ($flavour =~ /linux-ppc64le/);
++my $mtspr = sub {
++    my ($f,$idx,$ra) = @_;
++    if ($idx == 256 && $no_vrsave) {
++	"	or	$ra,$ra,$ra";
++    } else {
++	"	mtspr	$idx,$ra";
++    }
++};
++my $mfspr = sub {
++    my ($f,$rd,$idx) = @_;
++    if ($idx == 256 && $no_vrsave) {
++	"	li	$rd,-1";
++    } else {
++	"	mfspr	$rd,$idx";
++    }
++};
 +
-+$sp="r1";
-+$vrsave="r12";
-+
-+#########################################################################
-+{{{	# Key setup procedures						#
-+my ($inp,$bits,$out,$ptr,$cnt,$rounds)=map("r$_",(3..8));
-+my ($zero,$in0,$in1,$key,$rcon,$mask,$tmp)=map("v$_",(0..6));
-+my ($stage,$outperm,$outmask,$outhead,$outtail)=map("v$_",(7..11));
-+
-+$code.=<<___;
-+.machine	"any"
-+
-+.text
-+
-+.align	7
-+rcon:
-+.long	0x01000000, 0x01000000, 0x01000000, 0x01000000	?rev
-+.long	0x1b000000, 0x1b000000, 0x1b000000, 0x1b000000	?rev
-+.long	0x0d0e0f0c, 0x0d0e0f0c, 0x0d0e0f0c, 0x0d0e0f0c	?rev
-+.long	0,0,0,0						?asis
-+Lconsts:
-+	mflr	r0
-+	bcl	20,31,\$+4
-+	mflr	$ptr	 #vvvvv "distance between . and rcon
-+	addi	$ptr,$ptr,-0x48
-+	mtlr	r0
-+	blr
-+	.long	0
-+	.byte	0,12,0x14,0,0,0,0,0
-+.asciz	"AES for PowerISA 2.07, CRYPTOGAMS by <appro\@openssl.org>"
-+
-+.globl	.${prefix}_set_encrypt_key
-+Lset_encrypt_key:
-+	mflr		r11
-+	$PUSH		r11,$LRSAVE($sp)
-+
-+	li		$ptr,-1
-+	${UCMP}i	$inp,0
-+	beq-		Lenc_key_abort		# if ($inp==0) return -1;
-+	${UCMP}i	$out,0
-+	beq-		Lenc_key_abort		# if ($out==0) return -1;
-+	li		$ptr,-2
-+	cmpwi		$bits,128
-+	blt-		Lenc_key_abort
-+	cmpwi		$bits,256
-+	bgt-		Lenc_key_abort
-+	andi.		r0,$bits,0x3f
-+	bne-		Lenc_key_abort
-+
-+	lis		r0,0xfff0
-+	mfspr		$vrsave,256
-+	mtspr		256,r0
-+
-+	bl		Lconsts
-+	mtlr		r11
-+
-+	neg		r9,$inp
-+	lvx		$in0,0,$inp
-+	addi		$inp,$inp,15		# 15 is not typo
-+	lvsr		$key,0,r9		# borrow $key
-+	li		r8,0x20
-+	cmpwi		$bits,192
-+	lvx		$in1,0,$inp
-+	le?vspltisb	$mask,0x0f		# borrow $mask
-+	lvx		$rcon,0,$ptr
-+	le?vxor		$key,$key,$mask		# adjust for byte swap
-+	lvx		$mask,r8,$ptr
-+	addi		$ptr,$ptr,0x10
-+	vperm		$in0,$in0,$in1,$key	# align [and byte swap in LE]
-+	li		$cnt,8
-+	vxor		$zero,$zero,$zero
-+	mtctr		$cnt
-+
-+	?lvsr		$outperm,0,$out
-+	vspltisb	$outmask,-1
-+	lvx		$outhead,0,$out
-+	?vperm		$outmask,$zero,$outmask,$outperm
-+
-+	blt		Loop128
-+	addi		$inp,$inp,8
-+	beq		L192
-+	addi		$inp,$inp,8
-+	b		L256
-+
-+.align	4
-+Loop128:
-+	vperm		$key,$in0,$in0,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in0,$in0,$key
-+	bdnz		Loop128
-+
-+	lvx		$rcon,0,$ptr		# last two round keys
-+
-+	vperm		$key,$in0,$in0,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in0,$in0,$key
-+
-+	vperm		$key,$in0,$in0,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vxor		$in0,$in0,$key
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+
-+	addi		$inp,$out,15		# 15 is not typo
-+	addi		$out,$out,0x50
-+
-+	li		$rounds,10
-+	b		Ldone
-+
-+.align	4
-+L192:
-+	lvx		$tmp,0,$inp
-+	li		$cnt,4
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+	vperm		$in1,$in1,$tmp,$key	# align [and byte swap in LE]
-+	vspltisb	$key,8			# borrow $key
-+	mtctr		$cnt
-+	vsububm		$mask,$mask,$key	# adjust the mask
-+
-+Loop192:
-+	vperm		$key,$in1,$in1,$mask	# roate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	vcipherlast	$key,$key,$rcon
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+
-+	 vsldoi		$stage,$zero,$in1,8
-+	vspltw		$tmp,$in0,3
-+	vxor		$tmp,$tmp,$in1
-+	vsldoi		$in1,$zero,$in1,12	# >>32
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in1,$in1,$tmp
-+	vxor		$in0,$in0,$key
-+	vxor		$in1,$in1,$key
-+	 vsldoi		$stage,$stage,$in0,8
-+
-+	vperm		$key,$in1,$in1,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$stage,$stage,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	 vsldoi		$stage,$in0,$in1,8
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	 vperm		$outtail,$stage,$stage,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vspltw		$tmp,$in0,3
-+	vxor		$tmp,$tmp,$in1
-+	vsldoi		$in1,$zero,$in1,12	# >>32
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in1,$in1,$tmp
-+	vxor		$in0,$in0,$key
-+	vxor		$in1,$in1,$key
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$inp,$out,15		# 15 is not typo
-+	 addi		$out,$out,16
-+	bdnz		Loop192
-+
-+	li		$rounds,12
-+	addi		$out,$out,0x20
-+	b		Ldone
-+
-+.align	4
-+L256:
-+	lvx		$tmp,0,$inp
-+	li		$cnt,7
-+	li		$rounds,14
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+	vperm		$in1,$in1,$tmp,$key	# align [and byte swap in LE]
-+	mtctr		$cnt
-+
-+Loop256:
-+	vperm		$key,$in1,$in1,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in1,$in1,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in0,$in0,$key
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$inp,$out,15		# 15 is not typo
-+	 addi		$out,$out,16
-+	bdz		Ldone
-+
-+	vspltw		$key,$in0,3		# just splat
-+	vsldoi		$tmp,$zero,$in1,12	# >>32
-+	vsbox		$key,$key
-+
-+	vxor		$in1,$in1,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in1,$in1,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in1,$in1,$tmp
-+
-+	vxor		$in1,$in1,$key
-+	b		Loop256
-+
-+.align	4
-+Ldone:
-+	lvx		$in1,0,$inp		# redundant in aligned case
-+	vsel		$in1,$outhead,$in1,$outmask
-+	stvx		$in1,0,$inp
-+	li		$ptr,0
-+	mtspr		256,$vrsave
-+	stw		$rounds,0($out)
-+
-+Lenc_key_abort:
-+	mr		r3,$ptr
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,1,0,0,3,0
-+	.long		0
-+.size	.${prefix}_set_encrypt_key,.-.${prefix}_set_encrypt_key
-+
-+.globl	.${prefix}_set_decrypt_key
-+	$STU		$sp,-$FRAME($sp)
-+	mflr		r10
-+	$PUSH		r10,$FRAME+$LRSAVE($sp)
-+	bl		Lset_encrypt_key
-+	mtlr		r10
-+
-+	cmpwi		r3,0
-+	bne-		Ldec_key_abort
-+
-+	slwi		$cnt,$rounds,4
-+	subi		$inp,$out,240		# first round key
-+	srwi		$rounds,$rounds,1
-+	add		$out,$inp,$cnt		# last round key
-+	mtctr		$rounds
-+
-+Ldeckey:
-+	lwz		r0, 0($inp)
-+	lwz		r6, 4($inp)
-+	lwz		r7, 8($inp)
-+	lwz		r8, 12($inp)
-+	addi		$inp,$inp,16
-+	lwz		r9, 0($out)
-+	lwz		r10,4($out)
-+	lwz		r11,8($out)
-+	lwz		r12,12($out)
-+	stw		r0, 0($out)
-+	stw		r6, 4($out)
-+	stw		r7, 8($out)
-+	stw		r8, 12($out)
-+	subi		$out,$out,16
-+	stw		r9, -16($inp)
-+	stw		r10,-12($inp)
-+	stw		r11,-8($inp)
-+	stw		r12,-4($inp)
-+	bdnz		Ldeckey
-+
-+	xor		r3,r3,r3		# return value
-+Ldec_key_abort:
-+	addi		$sp,$sp,$FRAME
-+	blr
-+	.long		0
-+	.byte		0,12,4,1,0x80,0,3,0
-+	.long		0
-+.size	.${prefix}_set_decrypt_key,.-.${prefix}_set_decrypt_key
-+___
-+}}}
-+#########################################################################
-+{{{	# Single block en- and decrypt procedures			#
-+sub gen_block () {
-+my $dir = shift;
-+my $n   = $dir eq "de" ? "n" : "";
-+my ($inp,$out,$key,$rounds,$idx)=map("r$_",(3..7));
-+
-+$code.=<<___;
-+.globl	.${prefix}_${dir}crypt
-+	lwz		$rounds,240($key)
-+	lis		r0,0xfc00
-+	mfspr		$vrsave,256
-+	li		$idx,15			# 15 is not typo
-+	mtspr		256,r0
-+
-+	lvx		v0,0,$inp
-+	neg		r11,$out
-+	lvx		v1,$idx,$inp
-+	lvsl		v2,0,$inp		# inpperm
-+	le?vspltisb	v4,0x0f
-+	?lvsl		v3,0,r11		# outperm
-+	le?vxor		v2,v2,v4
-+	li		$idx,16
-+	vperm		v0,v0,v1,v2		# align [and byte swap in LE]
-+	lvx		v1,0,$key
-+	?lvsl		v5,0,$key		# keyperm
-+	srwi		$rounds,$rounds,1
-+	lvx		v2,$idx,$key
-+	addi		$idx,$idx,16
-+	subi		$rounds,$rounds,1
-+	?vperm		v1,v1,v2,v5		# align round key
-+
-+	vxor		v0,v0,v1
-+	lvx		v1,$idx,$key
-+	addi		$idx,$idx,16
-+	mtctr		$rounds
-+
-+Loop_${dir}c:
-+	?vperm		v2,v2,v1,v5
-+	v${n}cipher	v0,v0,v2
-+	lvx		v2,$idx,$key
-+	addi		$idx,$idx,16
-+	?vperm		v1,v1,v2,v5
-+	v${n}cipher	v0,v0,v1
-+	lvx		v1,$idx,$key
-+	addi		$idx,$idx,16
-+	bdnz		Loop_${dir}c
-+
-+	?vperm		v2,v2,v1,v5
-+	v${n}cipher	v0,v0,v2
-+	lvx		v2,$idx,$key
-+	?vperm		v1,v1,v2,v5
-+	v${n}cipherlast	v0,v0,v1
-+
-+	vspltisb	v2,-1
-+	vxor		v1,v1,v1
-+	li		$idx,15			# 15 is not typo
-+	?vperm		v2,v1,v2,v3		# outmask
-+	le?vxor		v3,v3,v4
-+	lvx		v1,0,$out		# outhead
-+	vperm		v0,v0,v0,v3		# rotate [and byte swap in LE]
-+	vsel		v1,v1,v0,v2
-+	lvx		v4,$idx,$out
-+	stvx		v1,0,$out
-+	vsel		v0,v0,v4,v2
-+	stvx		v0,$idx,$out
-+
-+	mtspr		256,$vrsave
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,0,0,0,3,0
-+	.long		0
-+.size	.${prefix}_${dir}crypt,.-.${prefix}_${dir}crypt
-+___
++# PowerISA 2.06 stuff
++sub vsxmem_op {
++    my ($f, $vrt, $ra, $rb, $op) = @_;
++    "	.long	".sprintf "0x%X",(31<<26)|($vrt<<21)|($ra<<16)|($rb<<11)|($op*2+1);
 +}
-+&gen_block("en");
-+&gen_block("de");
-+}}}
++# made-up unaligned memory reference AltiVec/VMX instructions
++my $lvx_u	= sub {	vsxmem_op(@_, 844); };	# lxvd2x
++my $stvx_u	= sub {	vsxmem_op(@_, 972); };	# stxvd2x
++my $lvdx_u	= sub {	vsxmem_op(@_, 588); };	# lxsdx
++my $stvdx_u	= sub {	vsxmem_op(@_, 716); };	# stxsdx
++my $lvx_4w	= sub { vsxmem_op(@_, 780); };	# lxvw4x
++my $stvx_4w	= sub { vsxmem_op(@_, 908); };	# stxvw4x
 +
-+my $consts=1;
-+foreach(split("\n",$code)) {
-+        s/\`([^\`]*)\`/eval($1)/geo;
++# PowerISA 2.07 stuff
++sub vcrypto_op {
++    my ($f, $vrt, $vra, $vrb, $op) = @_;
++    "	.long	".sprintf "0x%X",(4<<26)|($vrt<<21)|($vra<<16)|($vrb<<11)|$op;
++}
++my $vcipher	= sub { vcrypto_op(@_, 1288); };
++my $vcipherlast	= sub { vcrypto_op(@_, 1289); };
++my $vncipher	= sub { vcrypto_op(@_, 1352); };
++my $vncipherlast= sub { vcrypto_op(@_, 1353); };
++my $vsbox	= sub { vcrypto_op(@_, 0, 1480); };
++my $vshasigmad	= sub { my ($st,$six)=splice(@_,-2); vcrypto_op(@_, $st<<4|$six, 1730); };
++my $vshasigmaw	= sub { my ($st,$six)=splice(@_,-2); vcrypto_op(@_, $st<<4|$six, 1666); };
++my $vpmsumb	= sub { vcrypto_op(@_, 1032); };
++my $vpmsumd	= sub { vcrypto_op(@_, 1224); };
++my $vpmsubh	= sub { vcrypto_op(@_, 1096); };
++my $vpmsumw	= sub { vcrypto_op(@_, 1160); };
++my $vaddudm	= sub { vcrypto_op(@_, 192);  };
++my $vadduqm	= sub { vcrypto_op(@_, 256);  };
 +
-+	# constants table endian-specific conversion
-+	if ($consts && m/\.(long|byte)\s+(.+)\s+(\?[a-z]*)$/o) {
-+	    my $conv=$3;
-+	    my @bytes=();
++my $mtsle	= sub {
++    my ($f, $arg) = @_;
++    "	.long	".sprintf "0x%X",(31<<26)|($arg<<21)|(147*2);
++};
 +
-+	    # convert to endian-agnostic format
-+	    if ($1 eq "long") {
-+	      foreach (split(/,\s*/,$2)) {
-+		my $l = /^0/?oct:int;
-+		push @bytes,($l>>24)&0xff,($l>>16)&0xff,($l>>8)&0xff,$l&0xff;
-+	      }
-+	    } else {
-+		@bytes = map(/^0/?oct:int,split(/,\s*/,$2));
-+	    }
++print "#include <asm/ppc_asm.h>\n" if $flavour =~ /linux/;
 +
-+	    # little-endian conversion
-+	    if ($flavour =~ /le$/o) {
-+		SWITCH: for($conv)  {
-+		    /\?inv/ && do   { @bytes=map($_^0xf,@bytes); last; };
-+		    /\?rev/ && do   { @bytes=reverse(@bytes);    last; };
-+		}
-+	    }
++while($line=<>) {
 +
-+	    #emit
-+	    print ".byte\t",join(',',map (sprintf("0x%02x",$_),@bytes)),"\n";
-+	    next;
-+	}
-+	$consts=0 if (m/Lconsts:/o);	# end of table
++    $line =~ s|[#!;].*$||;	# get rid of asm-style comments...
++    $line =~ s|/\*.*\*/||;	# ... and C-style comments...
++    $line =~ s|^\s+||;		# ... and skip white spaces in beginning...
++    $line =~ s|\s+$||;		# ... and at the end
 +
-+	# instructions prefixed with '?' are endian-specific and need
-+	# to be adjusted accordingly...
-+	if ($flavour =~ /le$/o) {	# little-endian
-+	    s/le\?//o		or
-+	    s/be\?/#be#/o	or
-+	    s/\?lvsr/lvsl/o	or
-+	    s/\?lvsl/lvsr/o	or
-+	    s/\?(vperm\s+v[0-9]+,\s*)(v[0-9]+,\s*)(v[0-9]+,\s*)(v[0-9]+)/$1$3$2$4/o or
-+	    s/\?(vsldoi\s+v[0-9]+,\s*)(v[0-9]+,)\s*(v[0-9]+,\s*)([0-9]+)/$1$3$2 16-$4/o or
-+	    s/\?(vspltw\s+v[0-9]+,\s*)(v[0-9]+,)\s*([0-9])/$1$2 3-$3/o;
-+	} else {			# big-endian
-+	    s/le\?/#le#/o	or
-+	    s/be\?//o		or
-+	    s/\?([a-z]+)/$1/o;
-+	}
++    {
++	$line =~ s|\b\.L(\w+)|L$1|g;	# common denominator for Locallabel
++	$line =~ s|\bL(\w+)|\.L$1|g	if ($dotinlocallabels);
++    }
 +
-+        print $_,"\n";
++    {
++	$line =~ s|^\s*(\.?)(\w+)([\.\+\-]?)\s*||;
++	my $c = $1; $c = "\t" if ($c eq "");
++	my $mnemonic = $2;
++	my $f = $3;
++	my $opcode = eval("\$$mnemonic");
++	$line =~ s/\b(c?[rf]|v|vs)([0-9]+)\b/$2/g if ($c ne "." and $flavour !~ /osx/);
++	if (ref($opcode) eq 'CODE') { $line = &$opcode($f,split(',',$line)); }
++	elsif ($mnemonic)           { $line = $c.$mnemonic.$f."\t".$line; }
++    }
++
++    print $line if ($line);
++    print "\n";
 +}
 +
 +close STDOUT;
