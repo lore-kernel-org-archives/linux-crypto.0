@@ -2,181 +2,134 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02FE4C6379F
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 21:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46618C61DA3
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 23:58:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231625AbjBTVhP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 16:37:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
+        id S232324AbjBTX6P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 18:58:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230265AbjBTVhO (ORCPT
+        with ESMTP id S231350AbjBTX6P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 16:37:14 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5773421950;
-        Mon, 20 Feb 2023 13:37:13 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id a10so2503470ljq.1;
-        Mon, 20 Feb 2023 13:37:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ntTegXxHE2C6Lp8xdtMzn8aIclw1LjjCN5pS0JeaA8A=;
-        b=K8zGSFBNI3bdU6J5gbrSYZcfL5sYsQjVxJTFkpIjhAqxR1Xxr817nUsCsnvL/JrUMp
-         qoPWnoDVVtnpBTvblsnDdqASG0UQ7WxtCHGWIaD8xXMKvw5xxrEYv2zRrGw6EEzNHKUj
-         UvEzax+npqRsxhJ8JA5VL57mkKzv9SPf0eqWr2PQ9wgxyXnOW9NxfdumExqueZbw8FsP
-         wisNc6cs8i8MKfQZbkfwjawdBzTETXo+kIWV3oi/vN1tHuW82XTJjBjtLNQC8BQNNasi
-         WK8w/uHuMYgkSPwZ4AYAG3k6i5mpyxrTtxYMwhqKcy7nCMpQ5pEsrC1o/nSFiQWyHmA1
-         CWng==
+        Mon, 20 Feb 2023 18:58:15 -0500
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F21976F;
+        Mon, 20 Feb 2023 15:58:13 -0800 (PST)
+Received: by mail-ot1-f43.google.com with SMTP id c2-20020a9d6842000000b0068bc93e7e34so492346oto.4;
+        Mon, 20 Feb 2023 15:58:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ntTegXxHE2C6Lp8xdtMzn8aIclw1LjjCN5pS0JeaA8A=;
-        b=s86O6DVA+j36TewuTjirw4ij08QE4aNeKj504Ccn6pER2jgO7BtjTYO0ukKzTA2fS+
-         +AxOztBbX7XYBr35em0BG1OqFfbCVwQ6Y7h5tRQ83KraHEKJ084UyC3vAQZKOx12CWFN
-         FS6wBVQixbJzsisScHkKvL2QGconoYgjATGW5Dkjr/9zEfphVogbBD0Eg7oBe3+19qVt
-         jVJksFLWAE2QHJAiDUA0qLy6/CQyse2DGN1KSiXa7a+t/aDivoChoV279en9u69jB7+s
-         ylXrTN2L6WO7Vp1vHmr+pvME1WjSz9/e9fgsAum9uSMA0s9rJfhURY6GZ/aFDC8h7bPs
-         JEsQ==
-X-Gm-Message-State: AO0yUKUCqR72wuO2l/Qe4p+GMec/EOfW6VkOSzCNXWRU5rG0kx5IQnWU
-        DODvHPM6b6TMCH/TKutxEaQ=
-X-Google-Smtp-Source: AK7set9ere6899+uPRGjAaNY74PLHi6orKNOrPSws3NLJTJtiICDHHa4uvOj8GLhs/n/V591Itkx1Q==
-X-Received: by 2002:a05:651c:210f:b0:293:52a4:9717 with SMTP id a15-20020a05651c210f00b0029352a49717mr1528073ljq.4.1676929031468;
-        Mon, 20 Feb 2023 13:37:11 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id y2-20020a2e3202000000b002934ff9c817sm401104ljy.107.2023.02.20.13.37.10
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sCgRQJTBlWi1Yd4fnNx2Zag8znO/0MFpz2KultT2Nms=;
+        b=Pr5oi2cZ5IhzT4qHrwCN6FjL3FQOpq2W1TMBC7TM4YOTwNfmK1Za7eOdvHdFIExqRD
+         7/scO9OCk1zTLK64nM8QcHklNaEx/JU4O/xw6ZrGJ/o7UsYaEsw/+lPtO89gYsyE3OIN
+         wjsjF9hrhvcQuYTNUTDzxpXGnZ1dQUhltFBIQmvoBCehDgiL7LFgU/kB+0snyjCxtX0T
+         jDJZui03c8QSj9jUQKsK0SEH/EXipWSue0qejOZcKdUS3J4Bbh2WCDbS8EaUDnjkVqgr
+         bE12knN/0Aes3AELrMMWd5bbtY9c61TF/eIlQiMOFFIL0DIz+3wm9QbA0nrGDsjEvAos
+         vMHQ==
+X-Gm-Message-State: AO0yUKVJ0vKvTTla+lPBAv2dq2hfHhZr0PH4ClUr74RLmlFQKN5x4Xhc
+        P4OZxiXmuARrchLvYSU1pg==
+X-Google-Smtp-Source: AK7set/ebZ6kCRAGQAD+8rbgMi+1rZ7DLJecjwosBYMsBWpui1bnG4ZpMGNH6QRcvJB8UsnAjVoalA==
+X-Received: by 2002:a05:6830:34a:b0:690:d50a:9b48 with SMTP id h10-20020a056830034a00b00690d50a9b48mr1156987ote.11.1676937492989;
+        Mon, 20 Feb 2023 15:58:12 -0800 (PST)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id q19-20020a9d6313000000b0068bcd200247sm5380338otk.75.2023.02.20.15.58.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Feb 2023 13:37:11 -0800 (PST)
-Date:   Mon, 20 Feb 2023 23:37:09 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH RFC v8 04/56] KVM: Add HVA range operator
-Message-ID: <20230220233709.00006dfc@gmail.com>
-In-Reply-To: <20230220183847.59159-5-michael.roth@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-5-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Mon, 20 Feb 2023 15:58:12 -0800 (PST)
+Received: (nullmailer pid 637656 invoked by uid 1000);
+        Mon, 20 Feb 2023 23:58:11 -0000
+Date:   Mon, 20 Feb 2023 17:58:11 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Matthias Brugger <matthias.bgg@gmail.com>
+Cc:     AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Mingming Su <Mingming.Su@mediatek.com>,
+        linux-crypto@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] hwrng: add driver for MediaTek TRNG SMC
+Message-ID: <20230220235811.GA618419-robh@kernel.org>
+References: <89865515728cb937b6591160ad9c30b4bcc8dd41.1676467500.git.daniel@makrotopia.org>
+ <84de90f5-da77-d3f2-c14a-d2e5c53bbf1c@collabora.com>
+ <0d5d5d00-8569-a642-cca7-798c8d24a986@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0d5d5d00-8569-a642-cca7-798c8d24a986@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:37:55 -0600
-Michael Roth <michael.roth@amd.com> wrote:
-
-> From: Vishal Annapurve <vannapurve@google.com>
+On Thu, Feb 16, 2023 at 12:32:10PM +0100, Matthias Brugger wrote:
 > 
-> Introduce HVA range operator so that other KVM subsystems
-> can operate on HVA range.
 > 
-> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> [mdr: minor checkpatch alignment fixups]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  include/linux/kvm_host.h |  6 +++++
->  virt/kvm/kvm_main.c      | 48 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 54 insertions(+)
+> On 16/02/2023 11:03, AngeloGioacchino Del Regno wrote:
+> > Il 15/02/23 14:27, Daniel Golle ha scritto:
+> > > Add driver providing kernel-side support for the Random Number
+> > > Generator hardware found on Mediatek SoCs which have a driver in ARM
+> > > TrustedFirmware-A allowing Linux to read random numbers using a
+> > > non-standard vendor-defined Secure Monitor Call.
+> > > 
+> > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > 
+> > Hello Daniel,
+> > 
+> > incidentally, I've also done some research on this one some months ago, when
+> > I was deep in adding support for the Helio X10 SoC (MT6795) on Xperia M5.
+> > 
+> > The rng-v2 is simply the same rng but hypervised by the TF-A... and the only
+> > difference is, well, as you're also pointing out, that we're using secure
+> > monitor calls instead of direct MMIO handling.
+> > 
+> > There's also not much more than what you've implemented here and the only kind
+> > of addition that we will ever see on this one will be about changing the SIP
+> > command (as some older SoCs use a different one)... so...
+> > 
+> > ...I don't think that adding an entirely new driver is worth the noise, hence
+> > I propose to simply add handling for the Secure RNG to mtk-rng.c instead: it's
+> > shorter and we would only need to address one if branch on that probe function
+> > to set a different callback.
+> > 
+> > The clock should then be optional for *some* of those "v2 handling" devices,
+> > as if I recall correctly, some do need the clock to be handled from Linux
+> > anyway... otherwise this v2 driver will be "soon" looking bloody similar to
+> > the "v1", adding a bit of code duplication around.
+> > 
+> > What do you think?
+> > 
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 4d542060cd93..c615650ed256 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1402,6 +1402,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
->  void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
->  void kvm_mmu_invalidate_end(struct kvm *kvm);
->  
-> +typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
-> +				struct kvm_gfn_range *range, void *data);
-> +
-> +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-> +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
-> +
->  long kvm_arch_dev_ioctl(struct file *filp,
->  			unsigned int ioctl, unsigned long arg);
->  long kvm_arch_vcpu_ioctl(struct file *filp,
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f7e00593cc5d..4ccd655dd5af 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -642,6 +642,54 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
->  	return (int)ret;
->  }
->  
+> That was exactly what I was thinking as well when I had a look at the
+> driver. I propose to add it to mtk-rng.c. I don't see any value having a
+> second driver for this.
 
-Below function seems a reduced duplicate of __kvm_handle_hva_range()
-in virt/kvm/kvm_main.c. It would be nice to factor __kvm_handle_hva_range().
+Or fix the firmware to use the already defined SMC TRNG interface...
 
-> +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-> +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
-> +{
-> +	int ret = 0;
-> +	struct kvm_gfn_range gfn_range;
-> +	struct kvm_memory_slot *slot;
-> +	struct kvm_memslots *slots;
-> +	int i, idx;
-> +
-> +	if (WARN_ON_ONCE(hva_end <= hva_start))
-> +		return -EINVAL;
-> +
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +
-> +	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-> +		struct interval_tree_node *node;
-> +
-> +		slots = __kvm_memslots(kvm, i);
-> +		kvm_for_each_memslot_in_hva_range(node, slots,
-> +						  hva_start, hva_end - 1) {
-> +			unsigned long start, end;
-> +
-> +			slot = container_of(node, struct kvm_memory_slot,
-> +					    hva_node[slots->node_idx]);
-> +			start = max(hva_start, slot->userspace_addr);
-> +			end = min(hva_end, slot->userspace_addr +
-> +						  (slot->npages << PAGE_SHIFT));
-> +
-> +			/*
-> +			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
-> +			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
-> +			 */
-> +			gfn_range.start = hva_to_gfn_memslot(start, slot);
-> +			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
-> +			gfn_range.slot = slot;
-> +
-> +			ret = handler(kvm, &gfn_range, data);
-> +			if (ret)
-> +				goto e_ret;
-> +		}
-> +	}
-> +
-> +e_ret:
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +
-> +	return ret;
-> +}
-> +
->  static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
->  						unsigned long start,
->  						unsigned long end,
+In any case, like the SMC TRNG, you don't need a DT binding. The 
+firmware interface is discoverable. Try the SMC call and if it succeeds, 
+you have a TRNG.
 
+Rob
+
+> 
+> Regards,
+> Matthias
+> 
+> > Regards,
+> > Angelo
+> > 
+> > > ---
+> > >   MAINTAINERS                         |  1 +
+> > >   drivers/char/hw_random/Kconfig      | 16 +++++++
+> > >   drivers/char/hw_random/Makefile     |  1 +
+> > >   drivers/char/hw_random/mtk-rng-v2.c | 74 +++++++++++++++++++++++++++++
+> > >   4 files changed, 92 insertions(+)
+> > >   create mode 100644 drivers/char/hw_random/mtk-rng-v2.c
+> > > 
+> > 
