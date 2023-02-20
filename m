@@ -2,186 +2,286 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC68C05027
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 14:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DB0C636D6
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 16:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231548AbjBTOuF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 09:50:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40786 "EHLO
+        id S232234AbjBTQlk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 11:41:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbjBTOuE (ORCPT
+        with ESMTP id S232370AbjBTQl3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 09:50:04 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2043.outbound.protection.outlook.com [40.107.101.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C908D1C7C3;
-        Mon, 20 Feb 2023 06:50:02 -0800 (PST)
+        Mon, 20 Feb 2023 11:41:29 -0500
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9676206AB;
+        Mon, 20 Feb 2023 08:41:18 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ieeyOYBwoUseVJi2HYQ2dmJXzykucfLeD17RrvwPz7DDVastwYsnCxzTup1NpzGgE8tmfOWDH17nrv/uJfXl0mC8WAliuIlmwUf9DVi1/ehLMAEUJ7/Y1UGZvn2wQ+9JPgkA3ZAeHlzyeA9b8iY9XCMAxBnJkiKSLyZHRY+i7TD1DcEhae/aHaPC8cR1o545JaIdJztOkmoLeDp+Gy3vQPCfAZEgZRgI5LvQKGGVgR9UlOnoOBpJ7x0TGHXGrhny5jZOPO8e9DLdnNn/BaNo8l7iOpfaykWQECOVqCz3j0H7Sr2Jx+w8zNm+E4re/TjYOwO2W7qY2i91b3iLZOYqIA==
+ b=D6USKytXKZLfOSxuOyBGl4SlkJOOpDtJ+15DBLKVxCpWrFD4KrXwKzQMnIa6xNbo/GDBKgYxPcuEDXGEoqNny0Tid6lqW4wdywF3wpVFDB5ciHqWqEiapFMmtKtauLHv3WO7Q/uyxdpiSOVHzgLm4Fovv9PcyZQ+STaUef0LMsGv4P0xfECjVdbmd7jlv/gBUX/4VDsqmoqv3GgfpegZ3R1HkduXx04Pow57fR6KidmYlGcKNSz6chvmxiutgMNR9Sx6YP1oNHzAkf5ApuggQNe2ptKnFGuZ+mH6mjXzRqreL/brG7vMsuvRcaRm6Q//sMqrIsKrlf3YQYP7kKrHLA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ooFdnt1C/VA9BW6g06M9/VmtxUZs6qAn3R/gtvAHtvM=;
- b=Ropw9F+z03aKOc63M8o8Q0g/4NWB/w9Zgonoxl52lr3yhs51ASQUvnD+DgDG/A/IAI+92KnGEaG4hHnwc1/tHSz2IDqG9lVrS3Y5SZg1sMKrqRfU4uKrHEl0vn9dk8gIpc247s+Rp50hY5a88ypgnmWdNUEr3vMD1fwVr11BZ/Rx9/Dz4Lzs8B6Aj9SXIa3cbJ6EkAOyBPMKJOtYAX23XcMMwBplXc9XnPDb2VnKr4Yzfvcpg40E0NnsHqv04F4QpygF6IKx8m1KzVHH+/zp+77VBWjR2lr+0/xpo4/z/qlt6kqn9VqMTjvAMgbPHUGjyyE/lQnjEie/TRTUspfH1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=CXcfaW3dWUbugSefHUtpb/s4DncZt1qaRcxfgd64UDA=;
+ b=eoZU274HplIlRrdVUMXupVP6PPU6BPo7EyTx6PV7JLP3v571AJY1JQoaaoxDN3PygwhCbI4a2GwFs4h2uSPR7toTGtR7i66eLVb6hnDLM6dqu/ajRqXnH4FBIT201n4w0FZABdaNK27wDuP2QxH+sordFiu8S9nv0huTKlbQWhcco8IPMKZs9VNP6PDzA9d42sORx21DgBfS8FlXMLF9V4ozHh60ZC5jN783gl8yPUxle2bhRfbCyCiiz5wXWhqvKM7IEl36nX4O3or4qcVxDIyURvLOvWaNYKLYc9y75tovmMRFWZKn9g9KGhbU/rTlbpqkCGMVKGh0IyzBmTv+3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ooFdnt1C/VA9BW6g06M9/VmtxUZs6qAn3R/gtvAHtvM=;
- b=TrEePeZmJ9J/dXWH6Kve64v6M90s6sRdTrml63o/F8zd7RlznpaYG6sccNg7kv1OeOZs1u+PDUoIc66mxRFBdQEGvIQ8EBbo62ej3iIgWKdujZaRPVQgcIc4maNKuyD0jcaIsgKJmRjpAG6MrL1+AEKYs3t95A/cjRgXFuv0eLQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by IA1PR12MB6332.namprd12.prod.outlook.com (2603:10b6:208:3e2::13) with
+ bh=CXcfaW3dWUbugSefHUtpb/s4DncZt1qaRcxfgd64UDA=;
+ b=3yNZeBhBLEqNN2wRpF3uZjuHkWKeejd0339LHvc6919JBrUXCsQWsgAhmH08P77m295+2qesaIr6MwLFESzER8UQIn6uN9YgMcOIhCArR4OSqG2XW5YfCm2QfYy+UezFsSSvpIs5xGwJu8xbfsTTN1/93rNP9KPBtx+ndNOS54E=
+Received: from BN9PR03CA0070.namprd03.prod.outlook.com (2603:10b6:408:fc::15)
+ by MW4PR12MB7438.namprd12.prod.outlook.com (2603:10b6:303:219::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.18; Mon, 20 Feb
- 2023 14:50:00 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::6cc0:9c7a:bd00:441c]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::6cc0:9c7a:bd00:441c%6]) with mapi id 15.20.6111.020; Mon, 20 Feb 2023
- 14:50:00 +0000
-Message-ID: <f1675b6e-fb57-0331-7c39-ebf14f1d0f16@amd.com>
-Date:   Mon, 20 Feb 2023 08:49:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v2 0/8] Support ACPI PSP on Hyper-V
-Content-Language: en-US
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        "Kalra, Ashish" <ashish.kalra@amd.com>,
-        linux-crypto@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-References: <20230213092429.1167812-1-jpiotrowski@linux.microsoft.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20230213092429.1167812-1-jpiotrowski@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR03CA0017.namprd03.prod.outlook.com
- (2603:10b6:610:59::27) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
+ 2023 16:41:16 +0000
+Received: from BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:fc:cafe::da) by BN9PR03CA0070.outlook.office365.com
+ (2603:10b6:408:fc::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
+ Transport; Mon, 20 Feb 2023 16:41:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT082.mail.protection.outlook.com (10.13.176.94) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6111.20 via Frontend Transport; Mon, 20 Feb 2023 16:41:15 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
+ 2023 10:41:14 -0600
+Date:   Mon, 20 Feb 2023 10:18:42 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+CC:     Borislav Petkov <bp@alien8.de>, <kvm@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
+        <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>,
+        <ashish.kalra@amd.com>, <harald@profian.com>,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        <chao.p.peng@linux.intel.com>
+Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
+ to KVM
+Message-ID: <20230220161842.ou73dqulryed3k75@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-4-michael.roth@amd.com>
+ <Y6Xd0ruz3kMij/5F@zn.tnic>
+ <20230105021419.rs23nfq44rv64tsd@amd.com>
+ <Y8sFnsk2GvnUCVFI@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Y8sFnsk2GvnUCVFI@kernel.org>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|IA1PR12MB6332:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb4fac27-4664-43a8-287e-08db1351bda5
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT082:EE_|MW4PR12MB7438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7be97b1f-4a5b-41c9-739e-08db1361486d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bowjyIsTfrfkNu1uenOKsyvdkw+bz2YKoyTyqoLvK1GPgdpN1ZNGpfBYKmHizwyQQK3btOz24SFUdxytx6MJYEk/wgkiqVe1mTuiF0i5esvFTPSvB71i56/tNbDsFE0Dh/Pc2fi7ClL2nJLVs5RrQnkngeds18G0nSta3MiP5Z6KD/7XSchuWzt/DjsjrF1G1MoWLMoV+bQK4d4EEzBunaZcQKUBGpU+l9pvvfR0y7YD7+LZ7Qieg7D8YzTTnS/rP/EWrWH1ZM0rbdRJycPlDW5/kFoz75vNMPJv6oI2oTOkUQhZkCpoRurCr8hWfllCB32TnpXdrIOPp2TctZEzpUOen8Glj7i4emXTIl9c91nVdUo5JdlZlgSfhW5dqtTk5NKBhM44Plv774RF9E7TRaa/0IBy7RG/TE7HzhXpq9AIf6IlPRUXBxXghOX7PKLhfjaS+VHOo3tygsdE+olEc6bVJAQkXjAXJxLwFxLRy/xLUbv670p+3foxkHtfHHj/+USi3zzwv9/+7swWSvs08cBwDA3SWusUR2p30+b7zOuflA48rVwyiTvpUkVNMWaxkYvbMeJYkuf7jE5/7GX2DXJxwPGvpdvNNw4THo784wefQwQ0hWhf97Q98F6W9jgfM0n8G8ewYACyhdyuyVdIZNDTsKm4EdguvDF89bRxW+w1VBixCPunvqa6u+4q0MTVJwpRWQ3zLtv8BRnwWCLUbxxvJ6Rc4jCGEueTQHMj7Dc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(396003)(39860400002)(366004)(346002)(136003)(451199018)(31696002)(6486002)(31686004)(54906003)(316002)(6666004)(86362001)(26005)(66476007)(66556008)(8676002)(66946007)(6506007)(6512007)(478600001)(4326008)(186003)(53546011)(41300700001)(7416002)(8936002)(5660300002)(2616005)(83380400001)(2906002)(38100700002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZHFveU9tZ21WaFV5TEExL3lVVDAya0ZOZEZ6d0owZHdZMGsrSjJ2VDJJNGxk?=
- =?utf-8?B?V1RLamUyU0Zyc0pjdkcwSXZqU3ZzdnRJTzR6RlNjajFFUWQwMmZ5Y3RUMVcy?=
- =?utf-8?B?UTFLNTZnVWRKMjhRVHN4cXJkS0h6b1R4RTYvaUNNZlJGRS9KVnJDbjlGaHdL?=
- =?utf-8?B?M0Voa0pqakVvdEdoWm1mb2ptQ2pGMFFPaURxRUxnNHg0enZENUcwaDdhMGl4?=
- =?utf-8?B?dWhxcWEwaXJxVUVMdU9heVRkelZXSGZmcXlObFhvbTY0L0dzVndmRTlRUk04?=
- =?utf-8?B?YUF4MFlxcGtMK0dWRjdETy9uNGpxS0JlS3dRTjNCT2lHYitEbExzS0ZyeFVV?=
- =?utf-8?B?Ymp1Qit3Z2RyYlo3Mm1McVJEcW5XeXZlKy84NGhFejZOZVpDWkZZZW1tbHFl?=
- =?utf-8?B?MG9XRk12ckFDSDF5d2hUYmNsVjNoaDF2aldDUlZRZXN1ZzI3QXdIZWF1LzBM?=
- =?utf-8?B?cWd3MXVWbTdpZGU5RjFOSWM3YmpBOFZyY1NKWkdFMnNUeUZBK1FCMDd1QURq?=
- =?utf-8?B?VE8yb21uRjBraEEyMGtzTzNVV2hpaWZFOXdOTzNKc2RZYXE0RFFTTzFaV1ZN?=
- =?utf-8?B?MThrSm15UVAvZWlyb1l3N1RQT0h4SFJFOVRCbzFhUDF2Mmo4V1RyeUNsa3Vt?=
- =?utf-8?B?cG1kd25uU3hmLzBKV0sxU1NSc3VONXlFcTJDeFVtYUoyOHllbk5Cc2twejZK?=
- =?utf-8?B?cW8yMmNxSUY1enNUbHpDSW13VGlLV0tXVUc2dmhCZlMzbnpJY040ODhxc3Fx?=
- =?utf-8?B?eTVlN3VOdWx3SHRkQ2dXTTJ3eWFMS3FoMDZTR2F4MTB2akdyeE0zdTJSR1pj?=
- =?utf-8?B?QmtRSmtuV2kzc2ZFNGswNU1kZHFySDZwMGNJZE53SlhSKzk0bkY1Z1ZYUkVO?=
- =?utf-8?B?SU8xaHNYdThsOGNkR0JkekRiYk10eXQ4M1hEdGFRbE8zZ0NyMWxaOG1FN21a?=
- =?utf-8?B?dFpDc3ZHQ21Pbm1nMHNaZFlrY3RZR3dLTzJYSDY0RzlsRDluSWVjVjkySC9s?=
- =?utf-8?B?TmVhbkE5eVZITW9GdEJnYWxxZGNNVWxzbHdZUXgzTXpnaHRpWnNIUzVhWjda?=
- =?utf-8?B?Q0xRMjMxTHJMd3VJSXp5V2J6SGp0WVZUNzFrZEVoSXNDa3ZMRTc3T1lJNmJH?=
- =?utf-8?B?Yi8wbDA1L1gxYWdIQWJOQmw5UHZiNks4VDEwZVJmOG5Md2hjc0Q4MjBDbE1X?=
- =?utf-8?B?SjRsTHJnckNxUU5uTTZybkdBZFQwaDR0aGlIOGFVSXFmNGVnRVJSQ1hmckJB?=
- =?utf-8?B?YS90M09uNVR1UGRSQ1Rhc2QyMEhHRzZGaGVtZ1FyWko1aTdzRzRMNVEwNGtM?=
- =?utf-8?B?UWZuWUZnNHZoQmY1cUFzUW5xaklFUWdaV0tnUzMrWUtlcW9QZitPQnJCMFBW?=
- =?utf-8?B?L0dhSVd6WnJpRnhZMW5GYTQ1V01GZWtwN2NsUjcvL0JkRjkwenFCZFRET2hV?=
- =?utf-8?B?NFpMNnpKUHkvcDRuTU83blRpMmhSa3E3NnhEbnN2RDhjZmQ0YzN4c1lPcThU?=
- =?utf-8?B?TVlZT2lDZGltd1orcEoxRGFSWGVuL1VDVFdKbEVxd25sSk5uTTd6SUhoZHN3?=
- =?utf-8?B?Tlh6bTdmU0VVUlVyTS9PVUU5RzBKSGJrSUgxaFh5RjV6Nk1FaTRnZUNZSkt6?=
- =?utf-8?B?cXZHV1NCeC9KRk5ieEp2c1pRTXlacWhYUjNIR09aU0JxZFp5WGtjb2tHcXRz?=
- =?utf-8?B?MGJvOEZOZCtwVEJMYUJ2Q01jSzJKY2p0YTVSaFpaTGE1ejZDMHpoNDUwYVJn?=
- =?utf-8?B?MGRDVEg4YmR3dTRGQ0hkcVZhOEdJTVpITUpUYkJ0NjFIcFNPZmxaQ2l2RVVo?=
- =?utf-8?B?blJSS1lRREJOa2svcUlYSDNhbmxIN2FxY2J4bTVxcm9YZHVKUlJYcmVhM0xK?=
- =?utf-8?B?a0lwRDM3Z0hyWGtRTXFUNTBGYVZldUNjczlJdEhEOHkrU05VTVNRTm1Kei9n?=
- =?utf-8?B?WEx0S2xSbHZzUFJpZkpCaS85M1YrbnIzOXBQNXorQ1B0Uk5pUU5kMFZmNFNm?=
- =?utf-8?B?NkF0ZTgxa0czQkRZVTNnNEtFcnI2RkZnZWorZ1ZOb0lWODJhMG9IOEdUL3FJ?=
- =?utf-8?B?MjdPaldPZjRobWJaS1c2eW1hS1BlTTZ6a0VNOC9VWHNDTk5PVnZsb1VaZm9T?=
- =?utf-8?Q?Nr4KrBWbA0TDFzXZV7BohW/9Z?=
+X-Microsoft-Antispam-Message-Info: S3AtAncVSVRoe8/daDhhirQecZhqEvjg99rERb4jH6F7V/Qx+0HN5IduQaj4WTs6UhW7Xyfp3eMXlELE7EPqduV95lGqX9NOrrjK+V8tQ5WvCLrVOhTXyZOcX68QKrg9BQw79cPSbcpp6C+x6TQydfTWUanKpcL1Gq6sLm0sRgo/hWyvW7qZQMp986spLG1BzvXeqHvEq2qwhOAVRhnxMpzQN8/CiEeNszFTSBiv1BriXrUBkh07WWulVMiBwX6r4yzHeevA7kFZ1rBJepm8ztc5KrqYXMpWhveZKUm5d1HQ8YWtxNtM7u4QGpEa0eEil0NHa7IWidowFyfw+GDEGDmqctG1KzNs9FUlAnRQWunVWyW1ulmpg5zpDY7VY4izeJlbcS7Xd2KX1CZkTOlAsog2hEmk+mCsM/KMmRHIkZcKWClk/Yd4ScnG1U+PFE/QFqItbk2+EEt6awn98PAwkbLh26hBFUpuF5W8oMsLVimqTZBmOQIQusG4rx2w3IJVyiX4q7lxl3TYob6PmkMQP9FWRxNwc+wZNYdFMP+0kWxrLkjed9soracPcl+l6yZpA5VoCBPTk5tvzYIkZjfOJRFY3lsp2R0vjbrGCwsEYJ2sUVc8SEix6u2GjCX7vq8VPjbYtcn/WMfRy4VgoHSlUTRR4Vo7He4DHM9DXWzl4MGmGzcWn6oyqIFbA7kTs3TEEauWwamhoegUt27kj3spuSH42ev9uKfybdbIswfIBTU=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(346002)(396003)(136003)(451199018)(36840700001)(46966006)(40470700004)(8936002)(2616005)(7406005)(7416002)(36860700001)(5660300002)(336012)(6916009)(4326008)(82310400005)(8676002)(70206006)(86362001)(70586007)(36756003)(83380400001)(54906003)(45080400002)(426003)(40480700001)(47076005)(316002)(478600001)(966005)(40460700003)(41300700001)(26005)(186003)(16526019)(82740400003)(356005)(2906002)(81166007)(1076003)(66899018)(6666004)(44832011)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb4fac27-4664-43a8-287e-08db1351bda5
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 14:50:00.2116
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 16:41:15.0320
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7be97b1f-4a5b-41c9-739e-08db1361486d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hFaPAmRMQAYOSQxMiAl3vjJlvT/X2lr/x6NIyHl0AEUiPfhxQ1570oABe3Dvj06wPi3OSPzTXIIciWv87b/Krg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6332
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7438
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/13/23 03:24, Jeremi Piotrowski wrote:
-> This patch series introduces support for discovering AMD's PSP from an ACPI
-> table and extends the CCP driver to allow binding to that device on x86. This
-> method of PSP discovery is used on Hyper-V when SNP isolation support is
-> exposed to the guest. There is no ACPI node associated with this PSP, so after
-> parsing the ASPT it is registered with the system as a platform_device.
+On Fri, Jan 20, 2023 at 09:20:30PM +0000, Jarkko Sakkinen wrote:
+> On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
+> > On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
+> > > On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
+> > > > +       bool (*private_mem_enabled)(struct kvm *kvm);
+> > > 
+> > > This looks like a function returning boolean to me. IOW, you can
+> > > simplify this to:
+> > 
+> > The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
+> > impression it needed to return an integer value, since by default if a
+> > platform doesn't implement the op it would "return 0", and so could
+> > still be called unconditionally.
+> > 
+> > Maybe that's not actually enforced, by it seems awkward to try to use a
+> > bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
+> > 
+> > However, we could just use KVM_X86_OP() to declare it so we can cleanly
+> > use a function that returns bool, and then we just need to do:
+> > 
+> >   bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >   {
+> >           if (kvm_x86_ops.private_mem_enabled)
+> >                   return static_call(kvm_x86_private_mem_enabled)(kvm);
 > 
-> I thought about putting psp.c in arch/x86/coco, but that directory is meant for
-> the (confidential) guest side of CoCo, not the supporting host side code.
-> It was kept in arch/x86/kernel because configuring the irq for the PSP through
-> the ACPI interface requires poking at bits from the architectural vector
-> domain.
+> I guess this is missing:
 > 
-> This series is a prerequisite for nested SNP-host support on Hyper-V but is
-> independent of the SNP-host support patch set. Hyper-V only supports nested
-> SEV-SNP (not SEV or SEV-ES) so the PSP only supports a subset of the full PSP
-> command set. Without SNP-host support (which is not upstream yet), the only
-> PSP command that will succeed is SEV_PLATFORM_STATUS.
+>         return false;
 > 
+> >   }
+> >     
+> > instead of relying on default return value. So I'll take that approach
+> > and adopt your other suggested changes.
+> > 
+> > ...
+> > 
+> > On a separate topic though, at a high level, this hook is basically a way
+> > for platform-specific code to tell generic KVM code that private memslots
+> > are supported by overriding the kvm_arch_has_private_mem() weak
+> > reference. In this case the AMD platform is using using kvm->arch.upm_mode
+> > flag to convey that, which is in turn set by the
+> > KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
+> > 
+> > But if, as I suggested in response to your PATCH 2 comments, we drop
+> > KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
+> > KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
+> > code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
+> > in-part relies on kvm_arch_has_private_mem() to determine what flags are
+> > supported, whereas SEV/SNP code would be using what was set by
+> > KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
+> > kvm_arch_has_private_mem().
+> 
+> Does this mean that internal calls to  kvm_vm_set_region_attr() will
+> cease to exist, and it will rely for user space to use the ioctl
+> properly instead?
 
-For the series:
+Patches 1-3 are no longer needed and have been dropped for v8, instead
+"UPM mode" is set via KVM_VM_CREATE vm_type arg, and SEV/SNP can simply
+call kvm_arch_has_private_mem() to query whether userspace has enabled
+UPM mode or not.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+But even still, we call kvm_vm_set_region_attr() in
+sev_launch_update_data() and snp_launch_update() after copying initial
+payload into private memory.
 
-Probably want Boris to weigh in on whether he wants the new psp.c file 
-located in arch/x86/kernel, though.
+I don't think there's much worth in having userspace have to do it via
+KVM_SET_MEMORY_ATTRIBUTES afterward. It could be done that way I suppose,
+but generally RMP update from shared->private happens as part of
+KVM_SET_MEMORY_ATTRIBUTES, whereas in this case it would necessarily
+happen *after* the RMP updates, since SNP_LAUNCH_UPDATE expects the pages
+to be marked private beforehand.
 
-> Changes since v1:
-> * move platform_device_add_data() call to commit that introduces psp device
-> * change psp dependency from CONFIG_AMD_MEM_ENCRYPT to CONFIG_KVM_AMD_SEV
-> * add blank lines, s/plat/platform/, remove variable initializers before first
->    use, remove masking/shifting where not needed
-> * dynamically allocate sev_vdata/psp_vdata structs instead of overwriting static
->    variables
+Just seems like more corner cases to deal with and more boilerplate code
+for userspace, which already needed to operate under the assumption that
+pages will be private after SNP_LAUNCH_UPDATE, so seems to make sense to
+just have the memory attributes also updated accordingly.
+
+-Mike
 > 
-> Jeremi Piotrowski (8):
->    include/acpi: add definition of ASPT table
->    ACPI: ASPT: Add helper to parse table
->    x86/psp: Register PSP platform device when ASP table is present
->    x86/psp: Add IRQ support
->    crypto: cpp - Bind to psp platform device on x86
->    crypto: ccp - Add vdata for platform device
->    crypto: ccp - Skip DMA coherency check for platform psp
->    crypto: ccp - Allow platform device to be psp master device
+> > So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
+> > on something else. Maybe the logic can just be:
+> > 
+> >   bool svm_private_mem_enabled(struct kvm *kvm)
+> >   {
+> >     return sev_enabled(kvm) || sev_snp_enabled(kvm)
+> >   }
+> > 
+> > (at least in the context of this patchset where UPM support is added for
+> > both SEV and SNP).
+> > 
+> > So I'll plan to make that change as well.
+> > 
+> > -Mike
+> > 
+> > > 
+> > > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > > index 82ba4a564e58..4449aeff0dff 100644
+> > > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > > @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
+> > >  KVM_X86_OP(complete_emulated_msr)
+> > >  KVM_X86_OP(vcpu_deliver_sipi_vector)
+> > >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> > > +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
+> > >  
+> > >  #undef KVM_X86_OP
+> > >  #undef KVM_X86_OP_OPTIONAL
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index 1da0474edb2d..1b4b89ddeb55 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
+> > >  
+> > >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> > >  			     int root_level);
+> > > +	bool (*private_mem_enabled)(struct kvm *kvm);
+> > >  
+> > >  	bool (*has_wbinvd_exit)(void);
+> > >  
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index ce362e88a567..73b780fa4653 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +static bool svm_private_mem_enabled(struct kvm *kvm)
+> > > +{
+> > > +	if (sev_guest(kvm))
+> > > +		return kvm->arch.upm_mode;
+> > > +
+> > > +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
+> > > +}
+> > > +
+> > >  static struct kvm_x86_ops svm_x86_ops __initdata = {
+> > >  	.name = "kvm_amd",
+> > >  
+> > > @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+> > >  
+> > >  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+> > >  
+> > > +	.private_mem_enabled = svm_private_mem_enabled,
+> > > +
+> > >  	.has_wbinvd_exit = svm_has_wbinvd_exit,
+> > >  
+> > >  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index 823646d601db..9a1ca59d36a4 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
+> > >  
+> > > +bool kvm_arch_has_private_mem(struct kvm *kvm)
+> > > +{
+> > > +	return static_call(kvm_x86_private_mem_enabled)(kvm);
+> > > +}
+> > > +
+> > >  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
+> > >  {
+> > >  	kvm_mmu_pre_destroy_vm(kvm);
+> > > 
+> > > -- 
+> > > Regards/Gruss,
+> > >     Boris.
+> > > 
+> > > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
 > 
->   arch/x86/kernel/Makefile          |   1 +
->   arch/x86/kernel/psp.c             | 219 ++++++++++++++++++++++++++++++
->   drivers/acpi/Makefile             |   1 +
->   drivers/acpi/aspt.c               | 104 ++++++++++++++
->   drivers/crypto/ccp/sp-dev.c       |  66 +++++++++
->   drivers/crypto/ccp/sp-dev.h       |   4 +
->   drivers/crypto/ccp/sp-pci.c       |  48 -------
->   drivers/crypto/ccp/sp-platform.c  |  76 ++++++++++-
->   include/acpi/actbl1.h             |  46 +++++++
->   include/linux/platform_data/psp.h |  32 +++++
->   10 files changed, 548 insertions(+), 49 deletions(-)
->   create mode 100644 arch/x86/kernel/psp.c
->   create mode 100644 drivers/acpi/aspt.c
->   create mode 100644 include/linux/platform_data/psp.h
-> 
+> BR, Jarkko
