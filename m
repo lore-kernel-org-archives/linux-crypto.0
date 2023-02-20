@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52582C636D6
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 19:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6980AC27C7C
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 19:04:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233045AbjBTTDl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 14:03:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51614 "EHLO
+        id S231722AbjBTTEP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 14:04:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233034AbjBTTDf (ORCPT
+        with ESMTP id S232721AbjBTTEO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 14:03:35 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on20618.outbound.protection.outlook.com [IPv6:2a01:111:f400:7ea9::618])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E6E22027;
-        Mon, 20 Feb 2023 11:03:03 -0800 (PST)
+        Mon, 20 Feb 2023 14:04:14 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2082.outbound.protection.outlook.com [40.107.102.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE6632201D;
+        Mon, 20 Feb 2023 11:03:45 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Us5oc+c0EjiEBa80509rTHcthGEwyqHLk6lKfA2CmCm+GF3bdAP9GqimCNw5w1N1k4zMVzU1cFFebw4+rNahCo8HdNdN/IgcyOXurp3QuK28DcHQDx4i+YHLEyPAFCeudbE1R5ziSIHpzyj0YUYHpzVN3b/zzS8WySYn7h1cZAISEsyoQtfZTWnLWWe9zMKeMRLKnqIIQ0zNybc2gyJZjIqgEqvAediOPXuFAYHL4qadkeWEYAHakr3ZP726NNb70R2T4O1tedOaoCL9uPoLnRXECYptcDKLBroSM+Gx+46DG4tsAaLVJnv1RmzGfNTSqms0LW/JQrllebH3BZFw+g==
+ b=DLDu94Nqnh9/vD1yUqt8QADAm08mbhkWREprrsfNLwl9tzkufTtVpAKG0/VVtxi0Eqw49eyQViT8tVrvYcHIyiP+DYTTd32g/nMcSUu6zp0x7G+0hj0WwhZG++MjMcicRDFOegv6veIdLgNS9nq6q7S0GJGru+UOofZIjetqHRtIbQZ3OsZmqpyZORRVejRuKFrjCJKqc5gcpJCd9cP5qsewj8JmXzptQetb5/XkEmtBIK+6LFBYnmOLLLxU3yJ9tJMH7H813NS6aEVGzTqmb9NP5GIC71GmSuQBkLRQsvVnvt7AXplMpmKfUOrdLfXSvX+RgWgVsoL066wnACvdXg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LopXYiYyykv0LOA+8gvAgfurQClPV2ZL2OUbKE6L/Ic=;
- b=CFPbLXvZBN/tZM5QZI2AoleBlb70IloHefT7SMzI34JMaNhitFmsDAPcosRc13mSAXidsOjdccTb/R9wd2HfyLNmpnCG++ORDbgd6x6g84VYGfxLGA1432/ZagWhwbWzSEDPIFpC47UHsKm5S2t2FvJ+0guDPKZxWCTIjZPVEywuEkPQWNIredhw+oyTW6yU9Q7ax89N7ARneeDA18Hi/2xuGOJ11W2SyVWAVHBYaBnY2Vs7wAPcnOlcaJKEgd8vdIDnAUWNJDmb6li1xXo+XYlTuMnjvFhA0I+zLwWAg/gyGNmsJw6gMqEqlNEXq7uk09qWBd5cB+TMM09OWzESXQ==
+ bh=bhdLB+9fGVwgfwLdW0pGauuauXN7czdXY6hjutnQW1g=;
+ b=Zr+Bi4jFXsFxOQ4Hz5nZRBzJx3f7wEIR/b59kp27uG2n7MZPwo0e5XNeVxw5JMyyGSp2QeBc/F7NFbZKYojJ3cigJQgk4y+PBXRP0uccqbLjbfFHnW95oMb3J75HKKqbSB9zS+S/sdQK9pVsZvTgYM0bEjXiB0w8LMB1T/1YZcTbJRYgGuMHMl1smvaXPAYr3pJ+bpP9S8Tv0sUR0MzT1B3ixvBLeAvuxZT21KRJQt6csA+iuVTseZ1sUDiF3S7lZ/69RQYK7VILnZpTNJyoQCV1rlaYmQ2BLwkiuF1yB1tBLlAoFsIerIyYi9FsFXnJFzUbRONJIbkJGnG0jGL5mw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LopXYiYyykv0LOA+8gvAgfurQClPV2ZL2OUbKE6L/Ic=;
- b=sH3qZDr5v+nqc6H9IC9VmZRpvGVel9X7mvS7ym8dKX683tsrVnY33yMVNyrw/Ze1CYEPsQIjrHjv2jMeuCzOAAX4deq3kDlcqNOKs5XMrniEaaFGJkyNjtpbjOkAaMbJDhlpmuZOpisaGUMYkya4yvQWJFghPegUYxVK+dd/caU=
-Received: from MW2PR16CA0049.namprd16.prod.outlook.com (2603:10b6:907:1::26)
- by SA1PR12MB8642.namprd12.prod.outlook.com (2603:10b6:806:383::11) with
+ bh=bhdLB+9fGVwgfwLdW0pGauuauXN7czdXY6hjutnQW1g=;
+ b=DtUz3FYMKqlsy4VdJNvf6rrjZ5X0RkEy5lOJSTU2T3awTQh3xKom3q/bh2slCozG0aet3xBiCz2ZJ4+zkBMXfo7CxH2CvzzbHXbFWV/m+HBbbTOwWzQS+UkF/cIekSBWSFROPKSylAxjXYWGHvtG3KQ49VvRBIum+9UFdp4uW+Q=
+Received: from MW4P222CA0023.NAMP222.PROD.OUTLOOK.COM (2603:10b6:303:114::28)
+ by SN7PR12MB7810.namprd12.prod.outlook.com (2603:10b6:806:34c::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19; Mon, 20 Feb
- 2023 19:00:20 +0000
-Received: from CO1NAM11FT036.eop-nam11.prod.protection.outlook.com
- (2603:10b6:907:1:cafe::b) by MW2PR16CA0049.outlook.office365.com
- (2603:10b6:907:1::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
- Transport; Mon, 20 Feb 2023 19:00:20 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
+ 2023 19:01:02 +0000
+Received: from CO1NAM11FT018.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:114:cafe::64) by MW4P222CA0023.outlook.office365.com
+ (2603:10b6:303:114::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19 via Frontend
+ Transport; Mon, 20 Feb 2023 19:01:02 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT036.mail.protection.outlook.com (10.13.174.124) with Microsoft SMTP
+ CO1NAM11FT018.mail.protection.outlook.com (10.13.175.16) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6111.21 via Frontend Transport; Mon, 20 Feb 2023 19:00:20 +0000
+ 15.20.6111.21 via Frontend Transport; Mon, 20 Feb 2023 19:01:02 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 13:00:19 -0600
+ 2023 13:01:01 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -70,10 +70,12 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
-Subject: [PATCH RFC v8 53/56] KVM: SVM: Make VMSAVE target area memory allocation SNP safe
-Date:   Mon, 20 Feb 2023 12:38:44 -0600
-Message-ID: <20230220183847.59159-54-michael.roth@amd.com>
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        "Thomas Lendacky" <Thomas.Lendacky@amd.com>
+Subject: [PATCH RFC v8 55/56] x86/sev: Document KVM_SEV_SNP_{G,S}ET_CERTS
+Date:   Mon, 20 Feb 2023 12:38:46 -0600
+Message-ID: <20230220183847.59159-56-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
@@ -85,64 +87,97 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT036:EE_|SA1PR12MB8642:EE_
-X-MS-Office365-Filtering-Correlation-Id: b711566e-bba1-4401-6bce-08db1374b6b0
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT018:EE_|SN7PR12MB7810:EE_
+X-MS-Office365-Filtering-Correlation-Id: f41b3fd6-8231-470a-4532-08db1374cfb3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wBDpVUHt03FwxxTaPXUM5WKI/7ajoFeBvmHUw9lALTFPQmWsVobxRpfWFo4S7EgzDgI3GZgh3SQQ7FviTTEMzeIzlCNjAhuunbV4efECxzlvdj1OBp1PebjOC1lopUUjDc4hNUO7u0gqMFAUcFyCp43wz/Ag2M9T0bRSclGLODiXn2m+QWcj0M4EHoGj/qeCXA2tOA567v07/WME+lkXKLT8/1ZxSJHf+sn0ZT36cGQeiDbp8Ed8FHwkpziQZsafGRIp0FO6Uy2T5aFLYnCTJnj5RuI3NT/YO7JCXxA8XpFJjJRuLOV9fYCd5jk0ZVG9ea3Q8Y0LcOVTXNQ6Mv18U9M4hoT0WInFdBQ9rq1U6mVAG6w7EkTfegh1syBDJX9zzJIuC/UY4rkEoHUM2A0EqGm+xANSipgo4ldprikIHOYpDyUWxtnlogjyYMOrjhjcPqK2mrBB+78KTY3luBKh1koJZyOwz3dimqXxtvQoRNuWlSPAfMskVu31KTIrqeq+iXq+xdGlvg270aUHWUt/+udj8wJ2hTX2PuH3wC6p1XkGQRSVHzeCJ6vMCiG3Jg7qsqyQ7bO483ir2QxShrILUCVNlpmRL/h/QWdIlm2TajAyHCN2Oa5Xbg6zWljvroaE2nUbgRAXe3WFGeCVZGXYqpPy0gUpDa+87l8G9j6MqzhZLYOdtAEKFEO9raC+GgfbbD2KsPJzBrbH0d1mqf/DTcF1W7stFSWvhr8SXNlij10=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(376002)(346002)(136003)(451199018)(40470700004)(36840700001)(46966006)(40460700003)(54906003)(70206006)(70586007)(316002)(83380400001)(8936002)(8676002)(41300700001)(6666004)(6916009)(4326008)(2616005)(1076003)(186003)(426003)(16526019)(26005)(47076005)(356005)(478600001)(336012)(40480700001)(36756003)(82310400005)(86362001)(2906002)(82740400003)(7416002)(7406005)(5660300002)(36860700001)(44832011)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: e65c5ls0TTnpXU4cZJQW4nNcRpTjRarYf1eErEGrO6OXnOWPpla+eNKBdyqaSpWOEyCDvWA/4W9lhsYdoF7yvLyEwIeo/PR9dTxUFXEK14QMWGj+MVV8obywmfNFFKd9Z81/EP4GC7HWy0ZUF5YC1gN4pst9KV3h4RzGR5FX41gbwISznl6G2zrzaVqllQuKWuI389zL1Q8R9/HKPOmeuTQvurAO8mw4KJCWZEpylcY6AVeqCYpHuFy8Cax9b8VUO5zMiujQ8k78cZGi6oKyNW3wgDev/5NHv0xPL/APoYRRyqmczau6DOGW3y7dQW/gcyTZSWDDYaL+Jnm72OH7jnSHw0klAkFCU+I+ozTGslmwSvalE8O51aJpIzu9/SI4VWcQNhwmc8rRdmwhb9yLPb5QjBY3S61h2qkyV8xXY68agEXdbKIpz3WC6250dw6HzY9Agqwo5e6n4QIfMgN1D45dEa1pNNXGZgWsfUixOGnfza7LU8FMUt9ynJzVejswFNZd8I9RryxTrrTBhaYhDpa3LxGyZ2LcTH8giMugPKAlyPaXXbVhyLwawpLPbMJxXnFkmWgFK4cGKJ++3YYGNyhPwzyyiBsSfYZGk+lcsjq2JGnl7VWH2TdPWGWdo/2OSsq5SEETJXplsYDltAAJ4QBZAtJnHE3BRBNGIsWbhub+u9EXpKs+g66eM3mScwBMKRvh3aXatC2X4TIKdE4G8D67Px5dNj3dAi4x8lJSHqE=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(376002)(136003)(39860400002)(451199018)(36840700001)(46966006)(40470700004)(2906002)(26005)(186003)(16526019)(41300700001)(356005)(82740400003)(44832011)(6666004)(1076003)(81166007)(2616005)(7416002)(5660300002)(36860700001)(7406005)(8936002)(478600001)(316002)(40460700003)(86362001)(70206006)(70586007)(6916009)(8676002)(4326008)(336012)(82310400005)(47076005)(40480700001)(426003)(36756003)(83380400001)(54906003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 19:00:20.3644
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 19:01:02.3104
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b711566e-bba1-4401-6bce-08db1374b6b0
+X-MS-Exchange-CrossTenant-Network-Message-Id: f41b3fd6-8231-470a-4532-08db1374cfb3
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT036.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT018.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8642
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7810
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Dionna Glaze <dionnaglaze@google.com>
 
-Implement a workaround for an SNP erratum where the CPU will incorrectly
-signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
-RMP entry of the VMSAVE target page.
+Update the KVM_MEMORY_ENCRYPT_OP documentation to include the new
+commands for overriding the host certificates that the guest receives
+from an extended guest request.
 
-When SEV-SNP is globally enabled, the CPU marks the VMSAVE target page
-as "InUse" while the VMSAVE instruction is executing. If another
-CPU writes to a different page in the same 2MB region while the VMSAVE
-is executing, the CPU will throw an RMP violation #PF.
+Cc: Thomas Lendacky <Thomas.Lendacky@amd.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Use the snp safe generic allocator for allocating the VMSA target
-page which will ensure that the page returned is not a hugepage, as it
-is already being used for the allocating the VMCB, VMSA and AVIC backing
-page.
-
-Co-developed-by: Marc Orr <marcorr@google.com>
-Signed-off-by: Marc Orr <marcorr@google.com>
-Reported-by: Alper Gun <alpergun@google.com>
+Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../virt/kvm/x86/amd-memory-encryption.rst    | 44 +++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3fe5f13b5f3a..8bda31a61757 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -665,7 +665,7 @@ static int svm_cpu_init(int cpu)
- 	int ret = -ENOMEM;
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index dafb0c9984f1..153003ff2c51 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -537,6 +537,50 @@ Returns: 0 on success, -negative on error
  
- 	memset(sd, 0, sizeof(struct svm_cpu_data));
--	sd->save_area = alloc_page(GFP_KERNEL | __GFP_ZERO);
-+	sd->save_area = snp_safe_alloc_page(NULL);
- 	if (!sd->save_area)
- 		return ret;
+ See SEV-SNP specification for further details on launch finish input parameters.
+ 
++22. KVM_SEV_SNP_GET_CERTS
++-------------------------
++
++After the SNP guest launch flow has started, the KVM_SEV_SNP_GET_CERTS command
++can be issued to request the data that has been installed with the
++KVM_SEV_SNP_SET_CERTS command.
++
++Parameters (in/out): struct kvm_sev_snp_get_certs
++
++Returns: 0 on success, -negative on error
++
++::
++
++	struct kvm_sev_snp_get_certs {
++		__u64 certs_uaddr;
++		__u64 certs_len
++	};
++
++If no certs have been installed, then the return value is -ENOENT.
++If the buffer specified in the struct is too small, the certs_len field will be
++overwritten with the required bytes to receive all the certificate bytes and the
++return value will be -EINVAL.
++
++23. KVM_SEV_SNP_SET_CERTS
++-------------------------
++
++After the SNP guest launch flow has started, the KVM_SEV_SNP_SET_CERTS command
++can be issued to override the /dev/sev certs data that is returned when a
++guest issues an extended guest request. This is useful for instance-specific
++extensions to the host certificates.
++
++Parameters (in/out): struct kvm_sev_snp_set_certs
++
++Returns: 0 on success, -negative on error
++
++::
++
++	struct kvm_sev_snp_set_certs {
++		__u64 certs_uaddr;
++		__u64 certs_len
++	};
++
++The certs_len field may not exceed SEV_FW_BLOB_MAX_SIZE.
++
+ References
+ ==========
  
 -- 
 2.25.1
