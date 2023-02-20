@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DB0C636D6
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 16:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B173C64EC4
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 16:42:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232234AbjBTQlk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 11:41:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51982 "EHLO
+        id S232317AbjBTQmV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 11:42:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232370AbjBTQl3 (ORCPT
+        with ESMTP id S232339AbjBTQmT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 11:41:29 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9676206AB;
-        Mon, 20 Feb 2023 08:41:18 -0800 (PST)
+        Mon, 20 Feb 2023 11:42:19 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2055.outbound.protection.outlook.com [40.107.93.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DC41E5EC;
+        Mon, 20 Feb 2023 08:41:39 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D6USKytXKZLfOSxuOyBGl4SlkJOOpDtJ+15DBLKVxCpWrFD4KrXwKzQMnIa6xNbo/GDBKgYxPcuEDXGEoqNny0Tid6lqW4wdywF3wpVFDB5ciHqWqEiapFMmtKtauLHv3WO7Q/uyxdpiSOVHzgLm4Fovv9PcyZQ+STaUef0LMsGv4P0xfECjVdbmd7jlv/gBUX/4VDsqmoqv3GgfpegZ3R1HkduXx04Pow57fR6KidmYlGcKNSz6chvmxiutgMNR9Sx6YP1oNHzAkf5ApuggQNe2ptKnFGuZ+mH6mjXzRqreL/brG7vMsuvRcaRm6Q//sMqrIsKrlf3YQYP7kKrHLA==
+ b=O5L7DJf4LmtelcC9wBjZcNgb6+ELX7sAhrS3RViOZPq7ukAQkZHDHLuhnso/3TetGMUP0tzuyGdNjxUXhEKZt5KGyKSc1OW179SkGTQC1E2m36Ifs2TFx8hct5QD8HOBpZmUCcr0u+W5C2nTgeaz6Djq01KGTE7SnWGGeaBH1dvUe7jfpyi+3f6/cMLcAHi3MoI90C/GTR3nWK4klRGWDbt0+sUfulyxamJVEMzqCm+DVQeENv0BLAUYUAhgq1yFYmGIe7B+dluN7ybZNEvCbWrKGORbMcqEmH+ka5Lk9Lx7p4cwtLleUQ7iHCa873oa09VyOwUKvzhGTi73BaLckQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CXcfaW3dWUbugSefHUtpb/s4DncZt1qaRcxfgd64UDA=;
- b=eoZU274HplIlRrdVUMXupVP6PPU6BPo7EyTx6PV7JLP3v571AJY1JQoaaoxDN3PygwhCbI4a2GwFs4h2uSPR7toTGtR7i66eLVb6hnDLM6dqu/ajRqXnH4FBIT201n4w0FZABdaNK27wDuP2QxH+sordFiu8S9nv0huTKlbQWhcco8IPMKZs9VNP6PDzA9d42sORx21DgBfS8FlXMLF9V4ozHh60ZC5jN783gl8yPUxle2bhRfbCyCiiz5wXWhqvKM7IEl36nX4O3or4qcVxDIyURvLOvWaNYKLYc9y75tovmMRFWZKn9g9KGhbU/rTlbpqkCGMVKGh0IyzBmTv+3g==
+ bh=MYG2F/Kz+L66kuyTglO+w54eANn764HnkaGxzcD/lIo=;
+ b=ja+wRfDFx66hQVuYY4e0ZVuKvF9bXwOHuCJGXkcrs4OG5CweokyzdeeBjvTKaYM6EIEFhb7EncSkB/evZs0Hm1HcuNjRKb+TNgn0AVY+iLEc5/oiJMuho0hvkBd8QpLeZuz4fzOUTQJuIJOGTGX04Sk5QjZj+EcOiexmLJPTKjf5Dd1wyEpAkep4BMjFT0HYhSqlwKGpn4zAqaBYbvDR4qWaUSCKvU+tKoo0oDHlI3OmvyxoIc05PRvQdSaEYjhE7vJ3FZkkqsQGTlLjGdWWaM/59+lD+sh4n86b9x+sKydefJKLNwJBtTy4Pqvqit6mmowuttZwxrnak49ncsfnvA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CXcfaW3dWUbugSefHUtpb/s4DncZt1qaRcxfgd64UDA=;
- b=3yNZeBhBLEqNN2wRpF3uZjuHkWKeejd0339LHvc6919JBrUXCsQWsgAhmH08P77m295+2qesaIr6MwLFESzER8UQIn6uN9YgMcOIhCArR4OSqG2XW5YfCm2QfYy+UezFsSSvpIs5xGwJu8xbfsTTN1/93rNP9KPBtx+ndNOS54E=
-Received: from BN9PR03CA0070.namprd03.prod.outlook.com (2603:10b6:408:fc::15)
- by MW4PR12MB7438.namprd12.prod.outlook.com (2603:10b6:303:219::18) with
+ bh=MYG2F/Kz+L66kuyTglO+w54eANn764HnkaGxzcD/lIo=;
+ b=b+hRllSZL33xnPNb455ex0qZG3NS8LcxVtfkdSzJu8WEVabrhLx4tm1ZSWrsKmHcYB6ltIrv8KdA4zdOzFiedtVH4jNTuZIyNh1mL/Qct/aSrGdjEUt+SkqzZc0zMk0Zuyg/Bph/+VMbv3ll6EEwi+mnLMAdbOWszLzPKTwBDpQ=
+Received: from BN9PR03CA0085.namprd03.prod.outlook.com (2603:10b6:408:fc::30)
+ by IA1PR12MB6233.namprd12.prod.outlook.com (2603:10b6:208:3e7::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
- 2023 16:41:16 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19; Mon, 20 Feb
+ 2023 16:41:36 +0000
 Received: from BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:fc:cafe::da) by BN9PR03CA0070.outlook.office365.com
- (2603:10b6:408:fc::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
- Transport; Mon, 20 Feb 2023 16:41:15 +0000
+ (2603:10b6:408:fc:cafe::3e) by BN9PR03CA0085.outlook.office365.com
+ (2603:10b6:408:fc::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19 via Frontend
+ Transport; Mon, 20 Feb 2023 16:41:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -49,22 +49,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BN8NAM11FT082.mail.protection.outlook.com (10.13.176.94) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6111.20 via Frontend Transport; Mon, 20 Feb 2023 16:41:15 +0000
+ 15.20.6111.20 via Frontend Transport; Mon, 20 Feb 2023 16:41:36 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 10:41:14 -0600
-Date:   Mon, 20 Feb 2023 10:18:42 -0600
+ 2023 10:41:35 -0600
+Date:   Mon, 20 Feb 2023 10:22:10 -0600
 From:   Michael Roth <michael.roth@amd.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
 CC:     Borislav Petkov <bp@alien8.de>, <kvm@vger.kernel.org>,
         <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
         <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
         <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
         <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <vkuznets@redhat.com>, <wanpengli@tencent.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
         <dave.hansen@linux.intel.com>, <slp@redhat.com>,
         <pgonda@google.com>, <peterz@infradead.org>,
         <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
@@ -72,216 +72,120 @@ CC:     Borislav Petkov <bp@alien8.de>, <kvm@vger.kernel.org>,
         <kirill@shutemov.name>, <ak@linux.intel.com>,
         <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <20230220161842.ou73dqulryed3k75@amd.com>
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <harald@profian.com>
+Subject: Re: [PATCH RFC v7 04/64] KVM: x86: Add 'fault_is_private' x86 op
+Message-ID: <20230220162210.42rjdgbdwbjiextz@amd.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
- <Y6Xd0ruz3kMij/5F@zn.tnic>
- <20230105021419.rs23nfq44rv64tsd@amd.com>
- <Y8sFnsk2GvnUCVFI@kernel.org>
+ <20221214194056.161492-5-michael.roth@amd.com>
+ <Y628y6hQK38+IAev@zn.tnic>
+ <20230105024256.ptujtjgzcdmpakoa@amd.com>
+ <Y8Fr/F1RV0B8CHq5@zn.tnic>
+ <Y8F9a2pmh13aIQZL@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Y8sFnsk2GvnUCVFI@kernel.org>
+In-Reply-To: <Y8F9a2pmh13aIQZL@google.com>
 X-Originating-IP: [10.180.168.240]
 X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT082:EE_|MW4PR12MB7438:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7be97b1f-4a5b-41c9-739e-08db1361486d
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT082:EE_|IA1PR12MB6233:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6c2e143-74b1-423a-2241-08db1361556b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: S3AtAncVSVRoe8/daDhhirQecZhqEvjg99rERb4jH6F7V/Qx+0HN5IduQaj4WTs6UhW7Xyfp3eMXlELE7EPqduV95lGqX9NOrrjK+V8tQ5WvCLrVOhTXyZOcX68QKrg9BQw79cPSbcpp6C+x6TQydfTWUanKpcL1Gq6sLm0sRgo/hWyvW7qZQMp986spLG1BzvXeqHvEq2qwhOAVRhnxMpzQN8/CiEeNszFTSBiv1BriXrUBkh07WWulVMiBwX6r4yzHeevA7kFZ1rBJepm8ztc5KrqYXMpWhveZKUm5d1HQ8YWtxNtM7u4QGpEa0eEil0NHa7IWidowFyfw+GDEGDmqctG1KzNs9FUlAnRQWunVWyW1ulmpg5zpDY7VY4izeJlbcS7Xd2KX1CZkTOlAsog2hEmk+mCsM/KMmRHIkZcKWClk/Yd4ScnG1U+PFE/QFqItbk2+EEt6awn98PAwkbLh26hBFUpuF5W8oMsLVimqTZBmOQIQusG4rx2w3IJVyiX4q7lxl3TYob6PmkMQP9FWRxNwc+wZNYdFMP+0kWxrLkjed9soracPcl+l6yZpA5VoCBPTk5tvzYIkZjfOJRFY3lsp2R0vjbrGCwsEYJ2sUVc8SEix6u2GjCX7vq8VPjbYtcn/WMfRy4VgoHSlUTRR4Vo7He4DHM9DXWzl4MGmGzcWn6oyqIFbA7kTs3TEEauWwamhoegUt27kj3spuSH42ev9uKfybdbIswfIBTU=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(346002)(396003)(136003)(451199018)(36840700001)(46966006)(40470700004)(8936002)(2616005)(7406005)(7416002)(36860700001)(5660300002)(336012)(6916009)(4326008)(82310400005)(8676002)(70206006)(86362001)(70586007)(36756003)(83380400001)(54906003)(45080400002)(426003)(40480700001)(47076005)(316002)(478600001)(966005)(40460700003)(41300700001)(26005)(186003)(16526019)(82740400003)(356005)(2906002)(81166007)(1076003)(66899018)(6666004)(44832011)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: cP6+xIqw9Siwm1AsQbGq3lUcyP+SuryfSqfArKD40Dzj2bvBy2ZCoKtQKi+zao/5bZErIalPmMMpkPRKVO3QnbFAQI6pXPmnVHRtnnJEIiuUeUW/QFTifxvF5s7Xt9VULWiDxJwSL+UwIVG7cu2GrKvFGPttm3Cqhzl6R5NOFBw7Z8CVPhMdt+IdSRBrhoEXizRYsXBP8m9XXDMfJwa3glbqBF/4veEwFv5YAmi0f+nT7cp5Ls5xsrFStI7WpqLpCtz+GrBGCA+rXjwlVSsdf2S4QidMIA/xgza4Hhzbi+883+tK5lwhE/JF5sVbCRiPrEnxv0QAY9Np0cE3Hp37XNU8EuSCU2Bg3WgPZ2rDyi2Ss8IV8dQWvVpkww/grOlHIorV4b7r4EcU2wxVZuK9tsNIvNE4t2RQPVnrniZG8H2HbwiReDt4FnkijeVBa/YHZey4edIiE4oiYRECf+zhxcnB9Uosi+/+REpy3ERkR5ycAL6KKIbK9MOtUl/yRnaV+IqMEBKyR3FNoCdwUFYGBYRX3N5fUa/K12cechZBA+DtwWUQb1gBKvpAjJsWvFTGAxSUJfeYcq5n9xs9n1xoqnA4JNPww9u2LvRH9DgnhHJKTCSQ+GWBRym5Bhvy5AF/x/PzVA44J2iIXkQQ9MupVFIAvuEIsNIsUTz+4Tj+F2Nr7iyEqz1jANyQhoYwKq4iiM3F/utOaFOOiZCEod4ujQOXekpczbxcHn3erXcXibA=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(346002)(136003)(396003)(39860400002)(451199018)(46966006)(40470700004)(36840700001)(66899018)(8676002)(70206006)(70586007)(6916009)(4326008)(316002)(7406005)(54906003)(7416002)(44832011)(8936002)(5660300002)(41300700001)(40460700003)(36756003)(86362001)(356005)(478600001)(16526019)(6666004)(26005)(186003)(1076003)(2616005)(336012)(47076005)(426003)(2906002)(82310400005)(40480700001)(81166007)(36860700001)(82740400003)(83380400001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 16:41:15.0320
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 16:41:36.7959
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7be97b1f-4a5b-41c9-739e-08db1361486d
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6c2e143-74b1-423a-2241-08db1361556b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT082.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7438
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6233
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 20, 2023 at 09:20:30PM +0000, Jarkko Sakkinen wrote:
-> On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
-> > On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
-> > > On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
-> > > > +       bool (*private_mem_enabled)(struct kvm *kvm);
-> > > 
-> > > This looks like a function returning boolean to me. IOW, you can
-> > > simplify this to:
+On Fri, Jan 13, 2023 at 03:48:59PM +0000, Sean Christopherson wrote:
+> On Fri, Jan 13, 2023, Borislav Petkov wrote:
+> > On Wed, Jan 04, 2023 at 08:42:56PM -0600, Michael Roth wrote:
+> > > Obviously I need to add some proper documentation for this, but a 1
+> > > return basically means 'private_fault' pass-by-ref arg has been set
+> > > with the appropriate value, whereas 0 means "there's no platform-specific
+> > > handling for this, so if you have some generic way to determine this
+> > > then use that instead".
 > > 
-> > The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
-> > impression it needed to return an integer value, since by default if a
-> > platform doesn't implement the op it would "return 0", and so could
-> > still be called unconditionally.
+> > Still binary, tho, and can be bool, right?
 > > 
-> > Maybe that's not actually enforced, by it seems awkward to try to use a
-> > bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
+> > I.e., you can just as well do:
 > > 
-> > However, we could just use KVM_X86_OP() to declare it so we can cleanly
-> > use a function that returns bool, and then we just need to do:
+> >         if (static_call(kvm_x86_fault_is_private)(kvm, gpa, err, &private_fault))
+> >                 goto out;
 > > 
-> >   bool kvm_arch_has_private_mem(struct kvm *kvm)
-> >   {
-> >           if (kvm_x86_ops.private_mem_enabled)
-> >                   return static_call(kvm_x86_private_mem_enabled)(kvm);
+> > at the call site.
 > 
-> I guess this is missing:
+> Ya.  Don't spend too much time trying to make this look super pretty though, there
+> are subtle bugs inherited from the base UPM series that need to be sorted out and
+> will impact this code.  E.g. invoking kvm_mem_is_private() outside of the protection
+> of mmu_invalidate_seq means changes to the attributes may not be reflected in the
+> page tables.
 > 
->         return false;
+> I'm also hoping we can avoid a callback entirely, though that may prove to be
+> more pain than gain.  I'm poking at the UPM and testing series right now, will
+> circle back to this and TDX in a few weeks to see if there's a sane way to communicate
+> shared vs. private without having to resort to a callback, and without having
+> races between page faults, KVM_SET_MEMORY_ATTRIBUTES, and KVM_SET_USER_MEMORY_REGION2.
+
+Can circle back on this, but for v8 at least I've kept the callback, but
+simplified SVM implementation of it so that it's only needed for SNP. For
+protected-SEV it will fall through to the same generic handling used by UPM
+self-tests.
+
+It seems like it's safe to have a callback of that sort here for TDX/SNP (or
+whatever we end up replacing the callback with), since the #NPF flags
+themselves won't change based on attribute updates, and the subsequent
+comparison to kvm_mem_is_private() will happen after mmu_invalidate_seq
+is logged.
+
+But for protected-SEV and UPM selftests the initial kvm_mem_is_private()
+can become stale vs. the one in __kvm_faultin_pfn(), but it seems like ATM
+it would only lead to a spurious KVM_EXIT_MEMORY_FAULT, which SEV at least
+should treat at an implicit page-state change and be able to recover from.
+But yah, not ideal, and maybe for self-tests that makes it difficult to tell
+if things are working as expected or not.
+
+Maybe we should just skip setting fault->is_private here in the
+non-TDX/non-SNP cases, and just have some other indicator so it's
+initialized/ignored in kvm_mem_is_private() later. I think some iterations
+of UPM did it this way prior to 'is_private' becoming const.
+
 > 
-> >   }
-> >     
-> > instead of relying on default return value. So I'll take that approach
-> > and adopt your other suggested changes.
+> > > This is mainly to handle CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING, which
+> > > just parrots whatever kvm_mem_is_private() returns to support running
+> > > KVM selftests without needed hardware/platform support. If we don't
+> > > take care to skip this check where the above fault_is_private() hook
+> > > returns 1, then it ends up breaking SNP in cases where the kernel has
+> > > been compiled with CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING, since SNP
+> > > relies on the page fault flags to make this determination, not
+> > > kvm_mem_is_private(), which normally only tracks the memory attributes
+> > > set by userspace via KVM_SET_MEMORY_ATTRIBUTES ioctl.
 > > 
-> > ...
-> > 
-> > On a separate topic though, at a high level, this hook is basically a way
-> > for platform-specific code to tell generic KVM code that private memslots
-> > are supported by overriding the kvm_arch_has_private_mem() weak
-> > reference. In this case the AMD platform is using using kvm->arch.upm_mode
-> > flag to convey that, which is in turn set by the
-> > KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
-> > 
-> > But if, as I suggested in response to your PATCH 2 comments, we drop
-> > KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
-> > KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
-> > code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
-> > in-part relies on kvm_arch_has_private_mem() to determine what flags are
-> > supported, whereas SEV/SNP code would be using what was set by
-> > KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
-> > kvm_arch_has_private_mem().
+> > Some of that explanation belongs into the commit message, which is a bit
+> > lacking...
 > 
-> Does this mean that internal calls to  kvm_vm_set_region_attr() will
-> cease to exist, and it will rely for user space to use the ioctl
-> properly instead?
+> I'll circle back to this too when I give this series (and TDX) a proper look,
+> there's got too be a better way to handle this.
+> 
 
-Patches 1-3 are no longer needed and have been dropped for v8, instead
-"UPM mode" is set via KVM_VM_CREATE vm_type arg, and SEV/SNP can simply
-call kvm_arch_has_private_mem() to query whether userspace has enabled
-UPM mode or not.
-
-But even still, we call kvm_vm_set_region_attr() in
-sev_launch_update_data() and snp_launch_update() after copying initial
-payload into private memory.
-
-I don't think there's much worth in having userspace have to do it via
-KVM_SET_MEMORY_ATTRIBUTES afterward. It could be done that way I suppose,
-but generally RMP update from shared->private happens as part of
-KVM_SET_MEMORY_ATTRIBUTES, whereas in this case it would necessarily
-happen *after* the RMP updates, since SNP_LAUNCH_UPDATE expects the pages
-to be marked private beforehand.
-
-Just seems like more corner cases to deal with and more boilerplate code
-for userspace, which already needed to operate under the assumption that
-pages will be private after SNP_LAUNCH_UPDATE, so seems to make sense to
-just have the memory attributes also updated accordingly.
+It seems like for SNP/TDX we just need to register the shared/encrypted
+bits with KVM MMU and let it handle checking the #NPF flags, but can
+iterate on that for the next spin when we have a better idea what it
+should look like.
 
 -Mike
-> 
-> > So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
-> > on something else. Maybe the logic can just be:
-> > 
-> >   bool svm_private_mem_enabled(struct kvm *kvm)
-> >   {
-> >     return sev_enabled(kvm) || sev_snp_enabled(kvm)
-> >   }
-> > 
-> > (at least in the context of this patchset where UPM support is added for
-> > both SEV and SNP).
-> > 
-> > So I'll plan to make that change as well.
-> > 
-> > -Mike
-> > 
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > > index 82ba4a564e58..4449aeff0dff 100644
-> > > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > > @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
-> > >  KVM_X86_OP(complete_emulated_msr)
-> > >  KVM_X86_OP(vcpu_deliver_sipi_vector)
-> > >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> > > +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
-> > >  
-> > >  #undef KVM_X86_OP
-> > >  #undef KVM_X86_OP_OPTIONAL
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 1da0474edb2d..1b4b89ddeb55 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
-> > >  
-> > >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
-> > >  			     int root_level);
-> > > +	bool (*private_mem_enabled)(struct kvm *kvm);
-> > >  
-> > >  	bool (*has_wbinvd_exit)(void);
-> > >  
-> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > index ce362e88a567..73b780fa4653 100644
-> > > --- a/arch/x86/kvm/svm/svm.c
-> > > +++ b/arch/x86/kvm/svm/svm.c
-> > > @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +static bool svm_private_mem_enabled(struct kvm *kvm)
-> > > +{
-> > > +	if (sev_guest(kvm))
-> > > +		return kvm->arch.upm_mode;
-> > > +
-> > > +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
-> > > +}
-> > > +
-> > >  static struct kvm_x86_ops svm_x86_ops __initdata = {
-> > >  	.name = "kvm_amd",
-> > >  
-> > > @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> > >  
-> > >  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
-> > >  
-> > > +	.private_mem_enabled = svm_private_mem_enabled,
-> > > +
-> > >  	.has_wbinvd_exit = svm_has_wbinvd_exit,
-> > >  
-> > >  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 823646d601db..9a1ca59d36a4 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
-> > >  
-> > > +bool kvm_arch_has_private_mem(struct kvm *kvm)
-> > > +{
-> > > +	return static_call(kvm_x86_private_mem_enabled)(kvm);
-> > > +}
-> > > +
-> > >  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
-> > >  {
-> > >  	kvm_mmu_pre_destroy_vm(kvm);
-> > > 
-> > > -- 
-> > > Regards/Gruss,
-> > >     Boris.
-> > > 
-> > > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
-> 
-> BR, Jarkko
