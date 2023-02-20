@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DC5C6379F
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 19:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C018C64EC7
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 19:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233011AbjBTTBX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 14:01:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
+        id S232966AbjBTTCN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 14:02:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233050AbjBTTBM (ORCPT
+        with ESMTP id S232897AbjBTTCM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 14:01:12 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on20608.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8c::608])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 955A02203B;
-        Mon, 20 Feb 2023 11:00:44 -0800 (PST)
+        Mon, 20 Feb 2023 14:02:12 -0500
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on20628.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8d::628])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 451C41E29E;
+        Mon, 20 Feb 2023 11:01:38 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YPitQX6gDSmqWlWvXdX2eJFfC+6cQ5XhdkL0cbdcgmS9tWyaWEFMGHICcnyFqhJ5GWUZqICPF58gIPFLQhtFaBJqryygL3H7myLsk2ZwtaaeMqs4+Q5YsNmKzN/OxNUwnbm5rBKp5CE8QtW1Rl27SUzxovUnOTWEuCqIRdkM8U7K22289tQfGIcIT+RF7ZwjZMGklhIu6CwHwZHrdGtcvZcC6s7b6CUGKitbcUq52gyhsIp3yRIS5PfMRfF4XCDTpoj0ButGgBS9YWd/TQW6WstY73KJ1FOsNZ8NeWHAtj4rwSrKL4fhmiXPzI2ynuCndPjTYPh9k53zpabX6Py3Xg==
+ b=KFixzlaHQRPn/4tJOZdLKyRN3pn9JFfZc5aRJDLzcyP28sysiegffJfMu5ggOhz8+ZrvHMuLNyqBJATz5KN4Paly8WNgrsG6R3oG/z7QQJG9GSa9tv6nxutG39BdKghNg1tBMEENPKxuJ0mU0uyGJwpSgs9CyUjjASVwyKuCjoc+evs0aSaiai5XH4bv/z7JFJgHYsA5vZNRhtkDoxNXBZ0Q1Y35PdQjTmtv8QRcOt/B6sF3k0ptV1ueA/UrJtrp4SW6pHATj7mj3pYQYDoehxK6w5/+S+xHZNKa6Pk/3KVS54ZmoXi+2ZBSoc7iZ8VBKqWdHQG1p2ZBYTOY1b+dCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6t/7MChFwUyyN5VUBnMXSkXPBAhKTwfDsPWfcTbxIpk=;
- b=oH85ROPDiZpiMMEQj1UjAroCMmHzxxcQ5PjE/CvArFQgqreMZTKjxYyn4AeAZuedzo2pZ+iG9nT9E0cRwprsw1gxTm7a6lIhdcm/qfO8mNKgwjKKuwW6c7u2fg7QFgXyWpf44ZGQAV0x3P7qlcufNLWt6UXb+7hfb84XjN+887KamBcZSXQs5efLunQZQJEI9tgyubwtsfKFpCluWAZuQv5lWhhNYdSJGXYT4JkivIwIQ7ST/YhBfTWwZ/32bed0N92f6H1fz8yRqy0ZnFKVf37YqpgkVRK9Gi0v/aGotUihGHnLRzM2RslK36Zq9VY0qAfc8qvCQ3oUcpwWh5kDuQ==
+ bh=kRUxSUaNWiRvHuEScxe5r3QlLNMXENAPIQKIYkpvNqE=;
+ b=cb4y0Fz6oWSuC5zBEGtZk4J5IEPj5lA4EMBKrWpSKY8sAwSmzUHkiL4wKc4jqxe4K6sSz192gi/nNZOfERml8OsnxgRW5P0USzYbfXCKo+dC6wfqLzN4XYNp+bqzPnzXlrqPEJ12uEE9Y+qEKL2/pgPigfY+AOFu8ish7GX2xc33i+A0ZBASNZ6cBwNAVb/spSzBHhajbvIoBUufGLeqrPHM0AD80Rd0PaeJTk5t8qIpjRmdqeHSDP9UtuGBIn7M//bUjN59isHl0J8IsWOdWzcj+GInZLj2k1hzqtSe0CXFzHeWijGDg3XsrMFHpKY38Se4gkhH+xT+nBxKfGhAuw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6t/7MChFwUyyN5VUBnMXSkXPBAhKTwfDsPWfcTbxIpk=;
- b=E4/m7VpOW/Y7wDCHcV89YgAv/D9G8DparRV5J+1NqjbiFxvjOeRnRavQFrwFe6d54kDjmKUoWzQrBnU/znqEC6y2Us+wRJpb/hL29mAwnc99TJ/dx9CMT/Pda0owReCzryZvVtwer0wjFiEmE4W5+2J6Rqgq4oEUA17br1dNN88=
-Received: from MW4PR03CA0277.namprd03.prod.outlook.com (2603:10b6:303:b5::12)
- by DM4PR12MB5376.namprd12.prod.outlook.com (2603:10b6:5:39f::11) with
+ bh=kRUxSUaNWiRvHuEScxe5r3QlLNMXENAPIQKIYkpvNqE=;
+ b=d++de2GhzQ7DGgzYFkDuNI7LnoQ2Qb9ilJJiUFHZEwLqsQ1vJydUL2zsj/wZlM4FBNKKhv61VIE0e/Sf/mlgpE0pF1CgIqTTS/06FjVOw6TfAJcBb2TJ66DvQll92JXN5Aojh58cKLTXYTf8cgIW671PsPCl3ah25DQTkllvZso=
+Received: from BL0PR01CA0032.prod.exchangelabs.com (2603:10b6:208:71::45) by
+ IA1PR12MB6138.namprd12.prod.outlook.com (2603:10b6:208:3ea::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
- 2023 18:59:17 +0000
-Received: from CO1NAM11FT080.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b5:cafe::1e) by MW4PR03CA0277.outlook.office365.com
- (2603:10b6:303:b5::12) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 19:00:00 +0000
+Received: from BL02EPF000108EA.namprd05.prod.outlook.com
+ (2603:10b6:208:71:cafe::71) by BL0PR01CA0032.outlook.office365.com
+ (2603:10b6:208:71::45) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
- Transport; Mon, 20 Feb 2023 18:59:17 +0000
+ Transport; Mon, 20 Feb 2023 19:00:00 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT080.mail.protection.outlook.com (10.13.174.99) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6111.19 via Frontend Transport; Mon, 20 Feb 2023 18:59:17 +0000
+ BL02EPF000108EA.mail.protection.outlook.com (10.167.241.203) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:59:59 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 12:59:16 -0600
+ 2023 12:59:58 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,10 +71,10 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH RFC v8 04/56] KVM: Add HVA range operator
-Date:   Mon, 20 Feb 2023 12:37:55 -0600
-Message-ID: <20230220183847.59159-5-michael.roth@amd.com>
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH RFC v8 52/56] ccp: Add support to decrypt the page
+Date:   Mon, 20 Feb 2023 12:38:43 -0600
+Message-ID: <20230220183847.59159-53-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
@@ -86,116 +86,137 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT080:EE_|DM4PR12MB5376:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c479bb9-eb77-4ba0-f8c2-08db13749115
+X-MS-TrafficTypeDiagnostic: BL02EPF000108EA:EE_|IA1PR12MB6138:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71a72801-7bda-466e-4307-08db1374aadc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hETg4WBeDpvBCTOlLB3Sjxsx0OINKjiUCj/grgUiBMpB3ZSzcgCuSSXjU7gNJv3G36sA3gEWsqvZhKYbuaiO1tK/lsZQe2hmab9rsWR0MM2gCA/cTM5+dYrAbRCUTH+qRCkQJ5R8IIq7dLlMf3lKPzL/lZmfZIAQv6faQ0aYDMdOhjBds+4aIe7dQALDb5Ge8k9iypWjYBpfNNNFIsxTpfLCKpt5MkssniaoHFmf/FeD5ePuC2hw1AOwGnOLgonWfOf/op+HswbS4Rt7V1xfrr3I5eCH9BvPE0+oN5Y2F39O315MGWYU6ljKgSDKgEm7LUc/lNeRG4ZRiltPabOfz9pnNZSZq8h7qrFoSVktXKVCHvjdP2DBOmNuJXf56kNxpfdkT1NYlczGsD+ksO1K2V2/+cYrunxlzp3o4VmgQAtZOsGPNBz/Yb8AVa+QY7fhxOCblpGG2BGmXU5FR+Z03sxPcm3RbHa+ObdHi5uGGejCg946K0OFNlxiyEqiMzjgMexmJfgGKOsealqB0pR7+5xakXODUU2+jHKeOaNSLLnUxiIkBzlPgXBsYJk0TLWwMf5xmakuz8lQ4Cd37/MsYTGkuv1y9fBEjMCPLKNjO3kJ37ngH+7UtEwwos7T9YvS8AGIJ3WbsRuZSOiV40cuWN/M5d2KJunCjJgsrtE4qw7dClIUWD0P9K1CTD7Mq2TxFtKi7/YgQUd1WEp2RjQC2RyZ7EpdyZ+EdWRB87sLsFA=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(136003)(346002)(39860400002)(376002)(451199018)(40470700004)(46966006)(36840700001)(36860700001)(356005)(82740400003)(86362001)(36756003)(81166007)(7406005)(7416002)(5660300002)(6916009)(2906002)(4326008)(8936002)(8676002)(70586007)(70206006)(40480700001)(41300700001)(1076003)(82310400005)(2616005)(186003)(26005)(83380400001)(16526019)(336012)(47076005)(426003)(40460700003)(54906003)(316002)(44832011)(478600001)(6666004)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: khXlFckNrLOpwfl8dDBBL4I2gjhAv1HO81ff3sUWr9lKzhkrtrVoyVxNJvLiivKvcfMp6k2RnxcNfgY4QxktVmiQvOA8N8RNz8g43+s1t2zgtM9n5I/7RwqPtBG7qe55C/L50vzOmp1MORm5Uuk+3J/s7rjAQRsQSRcv8a9oy6WXJEcnuDdxF8ejEjNOpuEbhrFq0m4pyI96yayaMjNbJVakdXNLwnY2ZxKpNVOAcvwNNKAR9Dhc2qpJyW6cfE9HX82LmwYkOjdh7EWXfu08vNSwcCDNaBuk4xpWKv3jxkFlnMf1rwi3canX7TmnkfsNbgWDk5HFsRTuVgRVvN8UKMYpTrmOGDRm1JsTewxlvROO0sCBzqbbr0SrnKMHa+JOC68PmFwEFLt3GokQ5+1oah9hkwiX2nZaBZrPdpIvsGQM83KxFP/gY8+Ly+KpPzroScHK8IxKG/0bky5QJ/prChzDyW7aipXcyLxIZl47siUsg2Skc7SAHRMohf5r5gmivgzvY+XGSsZG/R8pnwTGY5nYQMteEAGq8GenDo+YgUd3HTexFbo4Yfg79YV0RBdCDqaWYVgnnpXhAIrgsXTi4Sdx12B45MVBm3U81wk4rvotnNhCZy5X+Jjxm9P6gpj3w07wbvqYeUzKkYOutoI0fXdJecJWDfqpe/qdZsjsdcAcQ238aXXhbF6BLGG4iYEyS5PK/KAh95PsC1/qEpbGez3AL184ZvoHALJn1fbtapJgsyKObK9TJg9Ddaaaol/fTUdiA7dsFrefeHQT7mzrvw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(39860400002)(136003)(376002)(451199018)(40470700004)(36840700001)(46966006)(86362001)(2616005)(426003)(40460700003)(336012)(47076005)(83380400001)(7406005)(478600001)(6666004)(1076003)(186003)(26005)(2906002)(16526019)(70206006)(70586007)(44832011)(41300700001)(82310400005)(6916009)(36756003)(8676002)(5660300002)(4326008)(316002)(54906003)(8936002)(7416002)(40480700001)(36860700001)(82740400003)(81166007)(356005)(36900700001)(134885004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:59:17.2608
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:59:59.5815
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c479bb9-eb77-4ba0-f8c2-08db13749115
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71a72801-7bda-466e-4307-08db1374aadc
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT080.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108EA.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5376
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6138
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Vishal Annapurve <vannapurve@google.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-Introduce HVA range operator so that other KVM subsystems
-can operate on HVA range.
+Add support to decrypt guest encrypted memory. These API interfaces can
+be used for example to dump VMCBs on SNP guest exit.
 
-Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-[mdr: minor checkpatch alignment fixups]
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+[mdr: minor commit fixups]
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- include/linux/kvm_host.h |  6 +++++
- virt/kvm/kvm_main.c      | 48 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ drivers/crypto/ccp/sev-dev.c | 32 ++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 22 ++++++++++++++++++++--
+ 2 files changed, 52 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4d542060cd93..c615650ed256 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1402,6 +1402,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
- void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
- void kvm_mmu_invalidate_end(struct kvm *kvm);
- 
-+typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
-+				struct kvm_gfn_range *range, void *data);
-+
-+int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-+			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
-+
- long kvm_arch_dev_ioctl(struct file *filp,
- 			unsigned int ioctl, unsigned long arg);
- long kvm_arch_vcpu_ioctl(struct file *filp,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index f7e00593cc5d..4ccd655dd5af 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -642,6 +642,54 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 	return (int)ret;
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index e65563bc8298..bf5167b2acfc 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -2017,6 +2017,38 @@ int sev_guest_df_flush(int *error)
  }
+ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
  
-+int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
-+			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
 +{
-+	int ret = 0;
-+	struct kvm_gfn_range gfn_range;
-+	struct kvm_memory_slot *slot;
-+	struct kvm_memslots *slots;
-+	int i, idx;
++	struct sev_data_snp_dbg data = {0};
++	struct sev_device *sev;
++	int ret;
 +
-+	if (WARN_ON_ONCE(hva_end <= hva_start))
++	if (!psp_master || !psp_master->sev_data)
++		return -ENODEV;
++
++	sev = psp_master->sev_data;
++
++	if (!sev->snp_initialized)
 +		return -EINVAL;
 +
-+	idx = srcu_read_lock(&kvm->srcu);
++	data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
++	data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
++	data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
 +
-+	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-+		struct interval_tree_node *node;
++	/* The destination page must be in the firmware state. */
++	if (rmp_mark_pages_firmware(data.dst_addr, 1, false))
++		return -EIO;
 +
-+		slots = __kvm_memslots(kvm, i);
-+		kvm_for_each_memslot_in_hva_range(node, slots,
-+						  hva_start, hva_end - 1) {
-+			unsigned long start, end;
++	ret = sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, &data, error);
 +
-+			slot = container_of(node, struct kvm_memory_slot,
-+					    hva_node[slots->node_idx]);
-+			start = max(hva_start, slot->userspace_addr);
-+			end = min(hva_end, slot->userspace_addr +
-+						  (slot->npages << PAGE_SHIFT));
-+
-+			/*
-+			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
-+			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
-+			 */
-+			gfn_range.start = hva_to_gfn_memslot(start, slot);
-+			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
-+			gfn_range.slot = slot;
-+
-+			ret = handler(kvm, &gfn_range, data);
-+			if (ret)
-+				goto e_ret;
-+		}
-+	}
-+
-+e_ret:
-+	srcu_read_unlock(&kvm->srcu, idx);
++	/* Restore the page state */
++	if (snp_reclaim_pages(data.dst_addr, 1, false))
++		ret = -EIO;
 +
 +	return ret;
 +}
++EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt_page);
 +
- static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 						unsigned long start,
- 						unsigned long end,
+ int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+ 				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
+ {
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 81bafc049eca..92116e2b74fd 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -710,7 +710,6 @@ struct sev_data_snp_dbg {
+ 	u64 gctx_paddr;				/* In */
+ 	u64 src_addr;				/* In */
+ 	u64 dst_addr;				/* In */
+-	u32 len;				/* In */
+ } __packed;
+ 
+ /**
+@@ -913,13 +912,27 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
+  * @error: SEV command return code
+  *
+  * Returns:
++ * 0 if the sev successfully processed the command
++ * -%ENODEV    if the sev device is not available
++ * -%ENOTSUPP  if the sev does not support SEV
++ * -%ETIMEDOUT if the sev command timed out
++ * -%EIO       if the sev returned a non-zero return code
++ */
++int sev_do_cmd(int cmd, void *data, int *psp_ret);
++
++/**
++ * snp_guest_dbg_decrypt_page - perform SEV SNP_DBG_DECRYPT command
++ *
++ * @sev_ret: sev command return code
++ *
++ * Returns:
+  * 0 if the SEV successfully processed the command
+  * -%ENODEV    if the SEV device is not available
+  * -%ENOTSUPP  if the SEV does not support SEV
+  * -%ETIMEDOUT if the SEV command timed out
+  * -%EIO       if the SEV returned a non-zero return code
+  */
+-int sev_do_cmd(int cmd, void *data, int *psp_ret);
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error);
+ 
+ void *psp_copy_user_blob(u64 uaddr, u32 len);
+ void *snp_alloc_firmware_page(gfp_t mask);
+@@ -987,6 +1000,11 @@ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_P
+ 
+ void snp_mark_pages_offline(unsigned long pfn, unsigned int npages) {}
+ 
++static inline int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
++{
++	return -ENODEV;
++}
++
+ static inline void *snp_alloc_firmware_page(gfp_t mask)
+ {
+ 	return NULL;
 -- 
 2.25.1
 
