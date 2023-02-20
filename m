@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A50BC636D6
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 18:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C35C6379F
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Feb 2023 18:49:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232259AbjBTSsY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 13:48:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58232 "EHLO
+        id S231514AbjBTSs6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 13:48:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230384AbjBTSsX (ORCPT
+        with ESMTP id S232636AbjBTSsp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 13:48:23 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061a.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5b::61a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70AB212A6;
-        Mon, 20 Feb 2023 10:47:46 -0800 (PST)
+        Mon, 20 Feb 2023 13:48:45 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on20611.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::611])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7621E1E0;
+        Mon, 20 Feb 2023 10:48:04 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T+JJla0olOxnhbHBPL9D0pNGBGWu1/JtPM5ULIJvnxosIgI+PsaY0sBfAECsQlOItmjckcQj/4J/RvLxcteje2yIRkm8ji51iCINmNDnvBrvTFstw5EmmthEhlF50z3LikmJj5fheDds56ktxFNfwffliO635E+EC6utPy7vvjOS4tnDOammBEdy3boVa0JKwXKqT99Lgr7EBnx2G3qbc0eXKlzfb3rI449bYrEdusa0hChjhbEGuI8PehWUyzLmK6XdLjpM9qLvoFnejypIKmOI2RtppazTBZgOY8b4bTq8qS7U+9hos4hqM3RvinOu4LMna/6uzVdRC1r798CJJw==
+ b=VMX2wOGkJlySpYru0yrtc8ipW4M9U7j+pjwE6eN/rBBf7XxyU7S73TZPZmNjrsxMDhrfiembiR6ENAzdQXh7OdTxR5HyQ4f72hcN7k7J84EJl/xNLW3sm5og8wN+DRJGXWjC0wp2CBtbswJ2AO650a+6KivuwdRm+Yh627mfwpIIYjunykMD0ixftOyGOYEqQOVl9n7AZmWKcDmo17Z7SpgI5fDqJheN8t5DgO4TiNpLcaWmyXfF0WWbSs5jeoGeeJPdqktj0WB1PD/cNeOc0rv0v+e7GCW2l9Vin2h4MAPwmoM1XQIv1VaAiNBk2Asn04MaBRa6K8BvzaJsfwcoww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8hQgEt4zfuohLaU4xMAC3aVGdlY7+WMaFzYsllKiGIY=;
- b=iiILRzl3Ym+bS05JBKW/wnLSDUav0w5nogKzyyUdsbgvGyU8ZX48NOwBRBfo4PuUSPHjls6LkV3hdNr+tyTq7EnfyJp0AYSDut776EyfxymKyCfhMYsTdK2ARYZsBcF2X0IkYeDQ8haUNPa/sx4XbwzQx2pQhPiQxIS2/s7HS9e39L++l+6k/jFuclLgeqHm9P4MqwluH6r4HikaRppF8p/a8onSma48XSyHbWSXPEzLs1Pbnq7ZwMc0R8J8JBX1c7PcjwfaV1cg2BjNsQBu3nNyUBv4tyRrU0JXsxdSB12BlXJZAxu7CZzKB02xwcHBlKZJhtRfpeOhcuPYsHj4Iw==
+ bh=rrQnaVQh2mcS503DV65lMv6uDTUoE4QTksfruqEgVic=;
+ b=PCoRF+bGEfwx+c9JYKmCWUZOZKsN3Nx1nn479TbMXSYoT7E/J0tlE2UNqlxai+u7CXYYp0AoQE81yhKNZlk+p33nhZQQXRqTCIhjfxJURPVixt/G7bVA//KIKNSNzhDP09f7CHgPmG3l6F+dwucaUgYk10rlQzEXaL27xBW7UvUzYhQ1HRdfYEcPvbXm2zV107Nu6/B/aY54WxCW8LsaXb7RHrqysW7SiOZV6MlJkmavVSDukrQpj3/tjXBLASkRWNys6m98UrKsFqy8wbdqxvMk1MGocfCjyhM+lTbn1AXno3T4f/Ci97IyJloYklFZT0s2ZWkbRyf31vVVga+2pw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8hQgEt4zfuohLaU4xMAC3aVGdlY7+WMaFzYsllKiGIY=;
- b=gp6doT3dHJYY8E9gGKjumXpv5LdwdRcCoDckGMKReqljFOVTP3JiwfebMQX3jO2NMN5BiDt3al+TESvoYWnNjDsOIaAlp1Fd8HH7zSL/oq+ORf20SGMSOpQD8b2V0KCd7dzQToUWz5ablhXhuCxKaD6JGTUSARyoDAqkGInk/ho=
-Received: from CY5P221CA0113.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:1f::6) by
- MN6PR12MB8513.namprd12.prod.outlook.com (2603:10b6:208:472::13) with
+ bh=rrQnaVQh2mcS503DV65lMv6uDTUoE4QTksfruqEgVic=;
+ b=o8OBNomizSWbxJ9cYw29Pe3QA2JSH1JVHiLDYBPK1XGHnsAbPHglnKY2+jTwJbWc835BIpYqSSJ3TAffDjwH7QkUs5g6+/uR4pt3EYXIugwpkxZGXzrFwg1XQLisPP5vBLOKw+Ecj/knJsD1b3Axw4r31cN/Q4pU4RPClVLaOII=
+Received: from CY5PR15CA0044.namprd15.prod.outlook.com (2603:10b6:930:1b::27)
+ by MW3PR12MB4361.namprd12.prod.outlook.com (2603:10b6:303:5a::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19; Mon, 20 Feb
- 2023 18:47:02 +0000
-Received: from CY4PEPF0000C96A.namprd02.prod.outlook.com
- (2603:10b6:930:1f:cafe::20) by CY5P221CA0113.outlook.office365.com
- (2603:10b6:930:1f::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20 via Frontend
- Transport; Mon, 20 Feb 2023 18:47:02 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Mon, 20 Feb
+ 2023 18:47:44 +0000
+Received: from CY4PEPF0000C966.namprd02.prod.outlook.com
+ (2603:10b6:930:1b:cafe::fc) by CY5PR15CA0044.outlook.office365.com
+ (2603:10b6:930:1b::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.19 via Frontend
+ Transport; Mon, 20 Feb 2023 18:47:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000C96A.mail.protection.outlook.com (10.167.241.74) with Microsoft
+ CY4PEPF0000C966.mail.protection.outlook.com (10.167.241.70) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:47:02 +0000
+ 15.20.6134.14 via Frontend Transport; Mon, 20 Feb 2023 18:47:44 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 20 Feb
- 2023 12:47:01 -0600
+ 2023 12:47:43 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,9 +71,9 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
-Subject: [PATCH RFC v8 19/56] x86/fault: Return pfn from dump_pagetable() for SEV-specific fault handling.
-Date:   Mon, 20 Feb 2023 12:38:10 -0600
-Message-ID: <20230220183847.59159-20-michael.roth@amd.com>
+Subject: [PATCH RFC v8 01/56] KVM: x86: Add 'fault_is_private' x86 op
+Date:   Mon, 20 Feb 2023 12:37:52 -0600
+Message-ID: <20230220183847.59159-2-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
@@ -85,116 +85,146 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000C96A:EE_|MN6PR12MB8513:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b2c1e85-2006-460b-f2d6-08db1372db01
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000C966:EE_|MW3PR12MB4361:EE_
+X-MS-Office365-Filtering-Correlation-Id: bb36044f-08b9-4aa1-a24d-08db1372f426
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sfiaFB4QrkAGuUpc9aYDo8hy7b2Tra5UUhwn+OhNIo53ij4AQLAHfrvoMTux2P8/TEa8mMsfxRPpaMAdDbhsmA2oY3zmSWPe7hoRDNc01R170JClPW8A9Vpueas1m5YaiIw4CLbIQ3TW8Gte5awLrk45nEoifCkvnB5kagH75Mufqoc282vTTg+B/co7YwTC1ndv/BYlMrqeH+ljhxR3/o1kvqfV4AiT3Ec+MDZleuIIEeACB7i/dN045+g3Y2FFkTNK89akTy17AiapDBaeh9D0e+6tcwe9B0MnDJQHM4ROMgBZt+nA5bNU/38u6mEd7uj6Jd/4LtdgSpE4LzwNUGQIQJsQ/W1S1o3m5wyxkfj6ddDT0eUyHjjK+TZ4S6pJ3xyP/7hoPmJwZjlYtFqLbl0fvylazK7KFMcY2cSHUES/9Zd3lu+Tq6lnKohZ3GNsekdMKH7Xzwl/7/Tr/FyLSp8IGD0lqfgOkHNp4NRlk5p5ZME/pn3eoTaKi5GZHWBO6oP/8tptiTd0Ai1c/Pe5ZCV/6ftdrUCPc7/QOwCWo3djpvf32B215zUnroMc3AV4Ym7e/0AZkUgf6fMeAryU3VGAiXQkbDIygQtQK1V9PPcS24nnXjwpyI9kfW++ZUlucZSFDzOevOrrB+bpa7+3iXkk5/Opds9GtI1cURI+V63FwX/YZdg7NXh1WlaSQahLWajjE1NSAOIlfH9dDh7KKC3JcoXYCsd6efT9Bd8c1LA=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(136003)(346002)(376002)(396003)(39860400002)(451199018)(40470700004)(36840700001)(46966006)(6666004)(47076005)(478600001)(426003)(4326008)(6916009)(83380400001)(2616005)(336012)(70206006)(1076003)(16526019)(70586007)(8676002)(41300700001)(7416002)(5660300002)(7406005)(8936002)(36860700001)(44832011)(2906002)(82740400003)(81166007)(40480700001)(356005)(26005)(54906003)(316002)(186003)(36756003)(82310400005)(86362001)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: uYMAuGPQWb5w8UiI1X/BvhHTugnqZR7o/1jUDsOuXiX2wANlUfgr/UgE9wpIh4TJR1hewWn9bZo39BmfP3BAZVmBUmIaoRguyx+rQyda6D2xGzdFcPLvCq7Q6C7OTk8ZCbw0ZsdvjinM+R4SzRHfAXjsfesv1q++w7S5BSa6IrsRxMn3jngvH78xUWX4VU4/0ju+GpAEjhDPchN+uBpOU8rSqfborH9d3z0zSugLZatBns8V6T0JSmWCDehM/9cTF90EH831AbFz26OZOhBXV13ZTacIfS5kQNB7f9NK0i94Y86BEtQT5UNsXyS9dSJ8N21tmAYWzUTMjpzYXwddnDIGixi8KUA2AwlDBTzdzSEb6Nz95wOpg7GvDAiW8G5phUb7kmS85NMYMKaUdjpQMRPjvaftqrKJLop2VwuQtmmxpHjNAdoKLHPS0U+jVWoMRQ43Z5JWFop6Z5v8U8lJzXMjRkzYiNBKIVFZ8EghY79NzRWv4XH2jWdTBZN1f1YQneojfq6pi8B7iYU4zS7AgdgyQgshPlNZ9m9Uj7fx47lyuUJklkdeHjw2rjgwHw/BqIvPb/9PxIEHY4dmNTNw+y27EDpLhx16PsEmviSrk4EE9oGRyMmH8yEMHujnFbaBZmx+urJmasLkavCuT4CNW4S8cSdiU8Ee4XqeROmpLF7/6MTK9qB/6bKwpdmkm1FNDzEvLoUbx9Ua9ZiklQtRUrfxOjlc29Q4xP2W18aiSYg=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(346002)(136003)(39860400002)(451199018)(46966006)(36840700001)(40470700004)(5660300002)(8936002)(426003)(47076005)(36860700001)(83380400001)(40480700001)(40460700003)(86362001)(82740400003)(186003)(356005)(81166007)(336012)(316002)(82310400005)(54906003)(478600001)(4326008)(8676002)(41300700001)(70586007)(6916009)(2616005)(16526019)(1076003)(36756003)(6666004)(26005)(70206006)(2906002)(7416002)(7406005)(44832011)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:47:02.3500
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2023 18:47:44.5335
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b2c1e85-2006-460b-f2d6-08db1372db01
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb36044f-08b9-4aa1-a24d-08db1372f426
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C96A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000C966.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8513
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4361
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+This callback is used by the KVM MMU to check whether a #NPF was for a
+private GPA or not.
 
-Return pfn from dump_pagetable() to do SEV-specific
-fault handling. Used for handling SNP RMP page fault.
+In some cases the full 64-bit error code for the #NPF will be needed to
+make this determination, so also update kvm_mmu_do_page_fault() to
+accept the full 64-bit value so it can be plumbed through to the
+callback.
 
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/mm/fault.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  1 +
+ arch/x86/kvm/mmu/mmu.c             |  3 +--
+ arch/x86/kvm/mmu/mmu_internal.h    | 37 +++++++++++++++++++++++++++---
+ 4 files changed, 37 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-index afd4cde17001..f2b16dcfbd9a 100644
---- a/arch/x86/mm/fault.c
-+++ b/arch/x86/mm/fault.c
-@@ -311,7 +311,7 @@ static bool low_pfn(unsigned long pfn)
- 	return pfn < max_low_pfn;
- }
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 8dc345cc6318..72183da010b8 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -131,6 +131,7 @@ KVM_X86_OP(msr_filter_changed)
+ KVM_X86_OP(complete_emulated_msr)
+ KVM_X86_OP(vcpu_deliver_sipi_vector)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
++KVM_X86_OP_OPTIONAL_RET0(fault_is_private);
  
--static void dump_pagetable(unsigned long address)
-+static unsigned long dump_pagetable(unsigned long address)
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_OPTIONAL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e552374f2357..f856d689dda0 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1643,6 +1643,7 @@ struct kvm_x86_ops {
+ 
+ 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+ 			     int root_level);
++	bool (*fault_is_private)(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *private_fault);
+ 
+ 	bool (*has_wbinvd_exit)(void);
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index eda615f3951c..fb3f34b7391c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5724,8 +5724,7 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ 	}
+ 
+ 	if (r == RET_PF_INVALID) {
+-		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa,
+-					  lower_32_bits(error_code), false);
++		r = kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, error_code, false);
+ 		if (KVM_BUG_ON(r == RET_PF_INVALID, vcpu->kvm))
+ 			return -EIO;
+ 	}
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index e642d431df4b..557a001210df 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -231,6 +231,37 @@ struct kvm_page_fault {
+ 
+ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+ 
++static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
++{
++	struct kvm_memory_slot *slot;
++	bool private_fault = false;
++	gfn_t gfn = gpa_to_gfn(gpa);
++
++	slot = gfn_to_memslot(kvm, gfn);
++	if (!slot) {
++		pr_debug("%s: no slot, GFN: 0x%llx\n", __func__, gfn);
++		goto out;
++	}
++
++	if (!kvm_slot_can_be_private(slot)) {
++		pr_debug("%s: slot is not private, GFN: 0x%llx\n", __func__, gfn);
++		goto out;
++	}
++
++	if (static_call(kvm_x86_fault_is_private)(kvm, gpa, err, &private_fault))
++		goto out;
++
++	/*
++	 * Handling below is for UPM self-tests and guests that treat userspace
++	 * as the authority on whether a fault should be private or not.
++	 */
++	private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
++
++out:
++	pr_debug("%s: GFN: 0x%llx, private: %d\n", __func__, gfn, private_fault);
++	return private_fault;
++}
++
+ /*
+  * Return values of handle_mmio_page_fault(), mmu.page_fault(), fast_page_fault(),
+  * and of course kvm_mmu_do_page_fault().
+@@ -262,11 +293,11 @@ enum {
+ };
+ 
+ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+-					u32 err, bool prefetch)
++					u64 err, bool prefetch)
  {
- 	pgd_t *base = __va(read_cr3_pa());
- 	pgd_t *pgd = &base[pgd_index(address)];
-@@ -345,8 +345,10 @@ static void dump_pagetable(unsigned long address)
+ 	struct kvm_page_fault fault = {
+ 		.addr = cr2_or_gpa,
+-		.error_code = err,
++		.error_code = lower_32_bits(err),
+ 		.exec = err & PFERR_FETCH_MASK,
+ 		.write = err & PFERR_WRITE_MASK,
+ 		.present = err & PFERR_PRESENT_MASK,
+@@ -280,7 +311,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
+ 		.req_level = PG_LEVEL_4K,
+ 		.goal_level = PG_LEVEL_4K,
+-		.is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
++		.is_private = kvm_mmu_fault_is_private(vcpu->kvm, cr2_or_gpa, err),
+ 	};
+ 	int r;
  
- 	pte = pte_offset_kernel(pmd, address);
- 	pr_cont("*pte = %0*Lx ", sizeof(*pte) * 2, (u64)pte_val(*pte));
-+	return 0;
- out:
- 	pr_cont("\n");
-+	return 0;
- }
- 
- #else /* CONFIG_X86_64: */
-@@ -367,10 +369,11 @@ static int bad_address(void *p)
- 	return get_kernel_nofault(dummy, (unsigned long *)p);
- }
- 
--static void dump_pagetable(unsigned long address)
-+static unsigned long dump_pagetable(unsigned long address)
- {
- 	pgd_t *base = __va(read_cr3_pa());
- 	pgd_t *pgd = base + pgd_index(address);
-+	unsigned long pfn;
- 	p4d_t *p4d;
- 	pud_t *pud;
- 	pmd_t *pmd;
-@@ -388,6 +391,7 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(p4d))
- 		goto bad;
- 
-+	pfn = p4d_pfn(*p4d);
- 	pr_cont("P4D %lx ", p4d_val(*p4d));
- 	if (!p4d_present(*p4d) || p4d_large(*p4d))
- 		goto out;
-@@ -396,6 +400,7 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(pud))
- 		goto bad;
- 
-+	pfn = pud_pfn(*pud);
- 	pr_cont("PUD %lx ", pud_val(*pud));
- 	if (!pud_present(*pud) || pud_large(*pud))
- 		goto out;
-@@ -404,6 +409,7 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(pmd))
- 		goto bad;
- 
-+	pfn = pmd_pfn(*pmd);
- 	pr_cont("PMD %lx ", pmd_val(*pmd));
- 	if (!pmd_present(*pmd) || pmd_large(*pmd))
- 		goto out;
-@@ -412,13 +418,14 @@ static void dump_pagetable(unsigned long address)
- 	if (bad_address(pte))
- 		goto bad;
- 
-+	pfn = pte_pfn(*pte);
- 	pr_cont("PTE %lx", pte_val(*pte));
- out:
- 	pr_cont("\n");
--
--	return;
-+	return pfn;
- bad:
- 	pr_info("BAD\n");
-+	return -1;
- }
- 
- #endif /* CONFIG_X86_64 */
 -- 
 2.25.1
 
