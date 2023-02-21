@@ -2,379 +2,360 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0187C64EC7
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 09:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D68BC6379F
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 12:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233383AbjBUJ2a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Feb 2023 04:28:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
+        id S234315AbjBUMlv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Feb 2023 07:41:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233215AbjBUJ23 (ORCPT
+        with ESMTP id S234798AbjBUMln (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2023 04:28:29 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CE8B443;
-        Tue, 21 Feb 2023 01:28:27 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id y44so3760293ljq.7;
-        Tue, 21 Feb 2023 01:28:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7cMvEWx93T+DKuH/EfNzVMzxjU3ZfkiKTGej0rtS7XU=;
-        b=h/MKpwswKXFMPyFd7oBDdGwT1y9EKS9WAjFXU+U9BdYQN554vMrvq7yaIJ2bISdl5q
-         68rK/XqSK0ZTzubookOAKlQiRkh/Qb+Y8NhBvjuVdNePw8caYBX8chcYUBHO+Txivp94
-         styxcRkySeYlHXAer1Fcb1AVJGRFD8XAwBVbdMhmVttT+M1PksmkX6OnEr+7/MJxcciD
-         sdGiFEPtgOoRpI9UQnVRKTdt7WL8TCV/H0zeJTdw3HvdESLUNxvHPOInJrwl6qHi9tcH
-         Ks92c0JaxDH8N94zNzsfA/+AuA3X+OhIFaa51UecB9hENAWk21HAG3e29iK6ok7jWNio
-         Fi+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7cMvEWx93T+DKuH/EfNzVMzxjU3ZfkiKTGej0rtS7XU=;
-        b=7xW7yq8zHv0lAC78SI0VDzfbXrZNO+AaJi4vhiewGaTRwasK9fVmj9pKkFgUH1e5Ka
-         ONWEZM5I6aQmzAMj3af1mCOYZhZGQ6vQCTDRH4fFAAvvmOOn3jauomDsNFU0Gq3ijfbL
-         izIhmeDFGtim28Q0QIoXf25uWlUpqIz0hqQPEGpa716coCCTCyEkHzj7IAhXJyHoCfer
-         ZMNs0toS7lNoIYb0ogR0BFD0wxbpuds89d0BZJcldxGyMRKFZUymBl4nWQbBHbpZTDJD
-         ReraNKJhM1vRtmsSXsYU/LYCS5zWPow6DA0mwfY60/jQJUawKPMexKbbuJPTHHlbDrmT
-         MDGg==
-X-Gm-Message-State: AO0yUKVfLVTVluJ/9WXIH01Nn4TbS8bPLkRLgWlzgUSDgPSj2DVetw5o
-        jI9gv0A4hNDsnLokq0g30ZA=
-X-Google-Smtp-Source: AK7set84dqJj7wcs9uzj2n8kT//QPqBDPmWF+AwkpmwrrrE3ZAh41j4XgidURaSXeFVF8sErCcmqqw==
-X-Received: by 2002:a05:651c:897:b0:295:90b2:da6b with SMTP id d23-20020a05651c089700b0029590b2da6bmr206314ljq.0.1676971705705;
-        Tue, 21 Feb 2023 01:28:25 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id o16-20020a2e9b50000000b002958bb2deacsm123022ljj.46.2023.02.21.01.28.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Feb 2023 01:28:25 -0800 (PST)
-Date:   Tue, 21 Feb 2023 11:28:23 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 24/56] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <20230221112823.000063e4@gmail.com>
-In-Reply-To: <20230220183847.59159-25-michael.roth@amd.com>
+        Tue, 21 Feb 2023 07:41:43 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1687D26853;
+        Tue, 21 Feb 2023 04:41:21 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31LBUrG6007035;
+        Tue, 21 Feb 2023 12:40:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=DtcPa1deaHe9WjwD+eJN66LKxf6T5OcN86NGAmtJUgc=;
+ b=WK+uTj4nX2mwFnL2NrMD7tcoLlhhlJDVHSgWJrgGl6emBMH26xqSQcNr72fNok7XU3xB
+ sNWj2f3kYGHKNd8gLak8tmBN0RMelckKaMQnKJr11yEi5HVh38cT+vLCZXafTp6/N+Fn
+ TemTVkMWEvLHWNbVXw0r357MzdqMysXutULQzAG3E3D/qidvzRVya/bpcS56oXjQoZWp
+ l/r3mf5ulCsKJWsRACxznBi8h7pHLP9Z5OlAFItbsENMUzaSVI/5bt1uRaOhloigSzxk
+ 3mXbazkDXFjCD0RHbX92Xq2NVxXr5llXHXtk9TsiNxfECt1u57Y3CAlyZmpHAVLbSQ8I ZQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvh4fsqdp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Feb 2023 12:40:32 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31LCBIjF011033;
+        Tue, 21 Feb 2023 12:40:32 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvh4fsqcr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Feb 2023 12:40:32 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31L9u7SE011387;
+        Tue, 21 Feb 2023 12:40:30 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3ntpa7f98w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Feb 2023 12:40:30 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31LCeSwt1573484
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Feb 2023 12:40:28 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BE8458043;
+        Tue, 21 Feb 2023 12:40:28 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD17858055;
+        Tue, 21 Feb 2023 12:40:18 +0000 (GMT)
+Received: from [9.160.173.144] (unknown [9.160.173.144])
+        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 21 Feb 2023 12:40:18 +0000 (GMT)
+Message-ID: <ea3cbb15-99e1-827c-9602-f53f74f7e543@linux.ibm.com>
+Date:   Tue, 21 Feb 2023 14:40:17 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH RFC v8 54/56] x86/sev: Add KVM commands for instance certs
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-25-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+ <20230220183847.59159-55-michael.roth@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <20230220183847.59159-55-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9knr3ZYypeuFlhnNPJpBvrWYo4mzWRWd
+X-Proofpoint-GUID: b2MI_pUmnvqYKbcoJs3VcNLV8-inLHC1
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-21_07,2023-02-20_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 clxscore=1011 mlxscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 malwarescore=0 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302210106
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:15 -0600
-Michael Roth <michael.roth@amd.com> wrote:
+Hi Mike,
 
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On 20/02/2023 20:38, Michael Roth wrote:
+> From: Dionna Glaze <dionnaglaze@google.com>
 > 
-> The behavior and requirement for the SEV-legacy command is altered when
-> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-> for more details.
+> The /dev/sev device has the ability to store host-wide certificates for
+> the key used by the AMD-SP for SEV-SNP attestation report signing,
+> but for hosts that want to specify additional certificates that are
+> specific to the image launched in a VM, a different way is needed to
+> communicate those certificates.
 > 
-> Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
-> when SNP is enabled to satisfy new requirements for the SNP. Continue
-> allocating a 1mb region for !SNP configuration.
+> Add two new KVM ioctl to handle this: KVM_SEV_SNP_{GET,SET}_CERTS
 > 
-> While at it, provide API that can be used by others to allocate a page
-> that can be used by the firmware. The immediate user for this API will
-> be the KVM driver. The KVM driver to need to allocate a firmware context
-> page during the guest creation. The context page need to be updated
-> by the firmware. See the SEV-SNP specification for further details.
+> The certificates that are set with this command are expected to follow
+> the same format as the host certificates, but that format is opaque
+> to the kernel.
 > 
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> The new behavior for custom certificates is that the extended guest
+> request command will now return the overridden certificates if they
+> were installed for the instance. The error condition for a too small
+> data buffer is changed to return the overridden certificate data size
+> if there is an overridden certificate set installed.
+> 
+> Setting a 0 length certificate returns the system state to only return
+> the host certificates on an extended guest request.
+> 
+> Also increase the SEV_FW_BLOB_MAX_SIZE another 4K page to allow space
+> for an extra certificate.
+> 
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> [mdr: remove used of "we" and "this patch" in commit log]
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  drivers/crypto/ccp/sev-dev.c | 148 +++++++++++++++++++++++++++++++++--
->  include/linux/psp-sev.h      |   9 +++
->  2 files changed, 149 insertions(+), 8 deletions(-)
+>  arch/x86/kvm/svm/sev.c   | 111 ++++++++++++++++++++++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.h   |   1 +
+>  include/linux/psp-sev.h  |   2 +-
+>  include/uapi/linux/kvm.h |  12 +++++
+>  4 files changed, 123 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index eca4e59b0f44..4c12e98a1219 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -94,6 +94,13 @@ static void *sev_init_ex_buffer;
->   */
->  struct sev_data_range_list *snp_range_list;
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 70d5650d8d95..18b64b7005e7 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2089,6 +2089,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  		goto e_free;
 >  
-> +/* When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB size. */
-> +#define SEV_SNP_ES_TMR_SIZE	(2 * 1024 * 1024)
-
-It would be better to re-use the kernel size definition macros. E.g. SZ_2MB.
-
-> +
-> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
-> +
-> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
-> +
->  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->  {
->  	struct sev_device *sev = psp_master->sev_data;
-> @@ -216,11 +223,134 @@ void snp_mark_pages_offline(unsigned long pfn, unsigned int npages)
+>  	sev->snp_certs_data = certs_data;
+> +	sev->snp_certs_len = 0;
+>  
+>  	return context;
+>  
+> @@ -2404,6 +2405,86 @@ static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
 >  }
->  EXPORT_SYMBOL_GPL(snp_mark_pages_offline);
 >  
-> +static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
+> +static int snp_get_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
 > +{
-> +	/* Cbit maybe set in the paddr */
-
-This is confusing.
-
-I suppose C-bit is treated as a attribute of PTE in the kernel not part of the
-PA. It means only a PTE might carry a C-bit. 
-
-The paddr is from __pa(page_address()). It is not extracted from a PTE. Thus, the
-return from them should never have a C-bit.
-
-BTW: Wouldn't it be better to have pfn as input param instead of paddr?
-
-The caller has struct page, calling snp_reclaim_pages(page_to_pfn(page), xxxxx)
-would be much clearer than the current conversion:
-page_address() (struct page is converted to VA), __pa() (VA is converted to PA)
-in the caller and then PA is converted to pfn here.
-
-> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
-> +	int ret, err, i, n = 0;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct kvm_sev_snp_get_certs params;
 > +
-
-should be unsigned int i, n; as the input param npage is unsigned int.
-
-> +	if (!pfn_valid(pfn)) {
-> +		pr_err("%s: Invalid PFN %lx\n", __func__, pfn);
+> +	if (!sev_snp_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (!sev->snp_context)
+> +		return -EINVAL;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> +			   sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	/* No instance certs set. */
+> +	if (!sev->snp_certs_len)
+> +		return -ENOENT;
+> +
+> +	if (params.certs_len < sev->snp_certs_len) {
+> +		/* Output buffer too small. Return the required size. */
+> +		params.certs_len = sev->snp_certs_len;
+> +
+> +		if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
+> +				 sizeof(params)))
+> +			return -EFAULT;
+> +
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (copy_to_user((void __user *)(uintptr_t)params.certs_uaddr,
+> +			 sev->snp_certs_data, sev->snp_certs_len))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static int snp_set_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	unsigned long length = SEV_FW_BLOB_MAX_SIZE;
+> +	void *to_certs = sev->snp_certs_data;
+> +	struct kvm_sev_snp_set_certs params;
+> +
+> +	if (!sev_snp_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (!sev->snp_context)
+> +		return -EINVAL;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
+> +			   sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	if (params.certs_len > SEV_FW_BLOB_MAX_SIZE)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * Setting a length of 0 is the same as "uninstalling" instance-
+> +	 * specific certificates.
+> +	 */
+> +	if (params.certs_len == 0) {
+> +		sev->snp_certs_len = 0;
 > +		return 0;
 > +	}
 > +
-> +	for (i = 0; i < npages; i++, pfn++, n++) {
-> +		paddr = pfn << PAGE_SHIFT;
+> +	/* Page-align the length */
+> +	length = (params.certs_len + PAGE_SIZE - 1) & PAGE_MASK;
 > +
-> +		if (locked)
-> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
-> +		else
-> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
-> +
-> +		if (ret)
-> +			goto cleanup;
-> +
-> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
-> +		if (ret)
-> +			goto cleanup;
+
+In comments on v7 [1] Dionna agreed adding cleanup here:
+
+  /* The size could shrink and leave garbage at the end. */
+  memset(sev->snp_certs_data, 0, SEV_FW_BLOB_MAX_SIZE);
+
+(we can use 'to_certs' in the first argument)
+
+but it wasn't added in v8.
+
+-Dov
+
+[1] https://lore.kernel.org/linux-coco/CAAH4kHYOtzgqSTZQFcRiZwPLCkLAThjsCMdjUCdsBTiP=W0Vxw@mail.gmail.com/
+
+
+> +	if (copy_from_user(to_certs,
+> +			   (void __user *)(uintptr_t)params.certs_uaddr,
+> +			   params.certs_len)) {
+> +		return -EFAULT;
 > +	}
 > +
-> +	return 0;
-> +
-> +cleanup:
-> +	/*
-> +	 * If failed to reclaim the page then page is no longer safe to
-> +	 * be release back to the system, leak it.
-> +	 */
-> +	snp_mark_pages_offline(pfn, npages - n);
-> +	return ret;
-> +}
-> +
-> +static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
-
-The same comment as above. Better take pfn or page instead of paddr with
-redundant conversions.
-
-> +{
-> +	/* Cbit maybe set in the paddr */
-> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
-> +	int rc, n = 0, i;
-> +
-> +	for (i = 0; i < npages; i++, n++, pfn++) {
-> +		rc = rmp_make_private(pfn, 0, PG_LEVEL_4K, 0, true);
-> +		if (rc)
-> +			goto cleanup;
-> +	}
+> +	sev->snp_certs_len = length;
 > +
 > +	return 0;
-> +
-> +cleanup:
-> +	/*
-> +	 * Try unrolling the firmware state changes by
-> +	 * reclaiming the pages which were already changed to the
-> +	 * firmware state.
-> +	 */
-> +	snp_reclaim_pages(paddr, n, locked);
-> +
-> +	return rc;
 > +}
 > +
-> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
-> +{
-> +	unsigned long npages = 1ul << order, paddr;
-> +	struct sev_device *sev;
-> +	struct page *page;
-> +
-> +	if (!psp_master || !psp_master->sev_data)
-> +		return NULL;
-> +
-> +	page = alloc_pages(gfp_mask, order);
-> +	if (!page)
-> +		return NULL;
-> +
-> +	/* If SEV-SNP is initialized then add the page in RMP table. */
-> +	sev = psp_master->sev_data;
-> +	if (!sev->snp_initialized)
-> +		return page;
-> +
-> +	paddr = __pa((unsigned long)page_address(page));
-> +	if (rmp_mark_pages_firmware(paddr, npages, locked))
-> +		return NULL;
-> +
-> +	return page;
-> +}
-> +
-> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
-> +{
-> +	struct page *page;
-> +
-> +	page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
-> +
-> +	return page ? page_address(page) : NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
-> +
-> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
-> +{
-> +	struct sev_device *sev = psp_master->sev_data;
-> +	unsigned long paddr, npages = 1ul << order;
-> +
-> +	if (!page)
-> +		return;
-> +
-> +	paddr = __pa((unsigned long)page_address(page));
-> +	if (sev->snp_initialized &&
-> +	    snp_reclaim_pages(paddr, npages, locked))
-> +		return;
-> +
-> +	__free_pages(page, order);
-> +}
-> +
-> +void snp_free_firmware_page(void *addr)
-> +{
-> +	if (!addr)
-> +		return;
-> +
-> +	__snp_free_firmware_pages(virt_to_page(addr), 0, false);
-> +}
-> +EXPORT_SYMBOL_GPL(snp_free_firmware_page);
-> +
->  static void *sev_fw_alloc(unsigned long len)
+>  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
 >  {
->  	struct page *page;
+>  	struct kvm_sev_cmd sev_cmd;
+> @@ -2503,6 +2584,12 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	case KVM_SEV_SNP_LAUNCH_FINISH:
+>  		r = snp_launch_finish(kvm, &sev_cmd);
+>  		break;
+> +	case KVM_SEV_SNP_GET_CERTS:
+> +		r = snp_get_instance_certs(kvm, &sev_cmd);
+> +		break;
+> +	case KVM_SEV_SNP_SET_CERTS:
+> +		r = snp_set_instance_certs(kvm, &sev_cmd);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		goto out;
+> @@ -3550,8 +3637,28 @@ static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gp
+>  	if (rc)
+>  		goto unlock;
 >  
-> -	page = alloc_pages(GFP_KERNEL, get_order(len));
-> +	page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len), false);
->  	if (!page)
->  		return NULL;
->  
-> @@ -468,7 +598,7 @@ static int __sev_init_locked(int *error)
->  		data.tmr_address = __pa(sev_es_tmr);
->  
->  		data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> -		data.tmr_len = SEV_ES_TMR_SIZE;
-> +		data.tmr_len = sev_es_tmr_size;
->  	}
->  
->  	return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> @@ -491,7 +621,7 @@ static int __sev_init_ex_locked(int *error)
->  		data.tmr_address = __pa(sev_es_tmr);
->  
->  		data.flags |= SEV_INIT_FLAGS_SEV_ES;
-> -		data.tmr_len = SEV_ES_TMR_SIZE;
-> +		data.tmr_len = sev_es_tmr_size;
->  	}
->  
->  	return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
-> @@ -982,6 +1112,8 @@ static int __sev_snp_init_locked(int *error)
->  	sev->snp_initialized = true;
->  	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
->  
-> +	sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
+> -	rc = snp_guest_ext_guest_request(&req, (unsigned long)sev->snp_certs_data,
+> -					 &data_npages, &err);
+> +	/*
+> +	 * If the VMM has overridden the certs, then change the error message
+> +	 * if the size is inappropriate for the override. Otherwise, use a
+> +	 * regular guest request and copy back the instance certs.
+> +	 */
+> +	if (sev->snp_certs_len) {
+> +		if ((data_npages << PAGE_SHIFT) < sev->snp_certs_len) {
+> +			rc = -EINVAL;
+> +			err = SNP_GUEST_REQ_INVALID_LEN;
+> +			goto datalen;
+> +		}
+> +		rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &req,
+> +				   (int *)&err);
+> +	} else {
+> +		rc = snp_guest_ext_guest_request(&req,
+> +						 (unsigned long)sev->snp_certs_data,
+> +						 &data_npages, &err);
+> +	}
+> +datalen:
+> +	if (sev->snp_certs_len)
+> +		data_npages = sev->snp_certs_len >> PAGE_SHIFT;
 > +
->  	return rc;
->  }
+>  	if (rc) {
+>  		/*
+>  		 * If buffer length is small then return the expected
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 221b38d3c845..dced46559508 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -94,6 +94,7 @@ struct kvm_sev_info {
+>  	u64 snp_init_flags;
+>  	void *snp_context;      /* SNP guest context page */
+>  	void *snp_certs_data;
+> +	unsigned int snp_certs_len; /* Size of instance override for certs */
+>  	struct mutex guest_req_lock; /* Lock for guest request handling */
 >  
-> @@ -1499,8 +1631,9 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->  		/* The TMR area was encrypted, flush it from the cache */
->  		wbinvd_on_all_cpus();
->  
-> -		free_pages((unsigned long)sev_es_tmr,
-> -			   get_order(SEV_ES_TMR_SIZE));
-> +		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +					  get_order(sev_es_tmr_size),
-> +					  false);
->  		sev_es_tmr = NULL;
->  	}
->  
-> @@ -1511,8 +1644,7 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->  	}
->  
->  	if (snp_range_list) {
-> -		free_pages((unsigned long)snp_range_list,
-> -			   get_order(PAGE_SIZE));
-> +		snp_free_firmware_page(snp_range_list);
->  		snp_range_list = NULL;
->  	}
->  
-> @@ -1593,7 +1725,7 @@ void sev_pci_init(void)
->  	}
->  
->  	/* Obtain the TMR memory area for SEV-ES use */
-> -	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
-> +	sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
->  	if (!sev_es_tmr)
->  		dev_warn(sev->dev,
->  			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+>  	u64 sev_features;	/* Features set at VMSA creation */
 > diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 8edf5c548fbf..d19744807471 100644
+> index 92116e2b74fd..3b28b78938f6 100644
 > --- a/include/linux/psp-sev.h
 > +++ b/include/linux/psp-sev.h
-> @@ -922,6 +922,8 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
->  int sev_do_cmd(int cmd, void *data, int *psp_ret);
+> @@ -22,7 +22,7 @@
+>  #define __psp_pa(x)	__pa(x)
+>  #endif
 >  
->  void *psp_copy_user_blob(u64 uaddr, u32 len);
-> +void *snp_alloc_firmware_page(gfp_t mask);
-> +void snp_free_firmware_page(void *addr);
+> -#define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
+> +#define SEV_FW_BLOB_MAX_SIZE	0x5000	/* 20KB */
 >  
 >  /**
->   * sev_mark_pages_offline - insert non-reclaimed firmware/guest pages
-> @@ -959,6 +961,13 @@ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_P
+>   * SEV platform state
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 6e684bf5f723..ad7e24e43547 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1928,6 +1928,8 @@ enum sev_cmd_id {
+>  	KVM_SEV_SNP_LAUNCH_START,
+>  	KVM_SEV_SNP_LAUNCH_UPDATE,
+>  	KVM_SEV_SNP_LAUNCH_FINISH,
+> +	KVM_SEV_SNP_GET_CERTS,
+> +	KVM_SEV_SNP_SET_CERTS,
 >  
->  void snp_mark_pages_offline(unsigned long pfn, unsigned int npages) {}
+>  	KVM_SEV_NR_MAX,
+>  };
+> @@ -2075,6 +2077,16 @@ struct kvm_sev_snp_launch_finish {
+>  	__u8 pad[6];
+>  };
 >  
-> +static inline void *snp_alloc_firmware_page(gfp_t mask)
-> +{
-> +	return NULL;
-> +}
+> +struct kvm_sev_snp_get_certs {
+> +	__u64 certs_uaddr;
+> +	__u64 certs_len;
+> +};
 > +
-> +static inline void snp_free_firmware_page(void *addr) { }
+> +struct kvm_sev_snp_set_certs {
+> +	__u64 certs_uaddr;
+> +	__u64 certs_len;
+> +};
 > +
->  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
->  
->  #endif	/* __PSP_SEV_H__ */
-
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
