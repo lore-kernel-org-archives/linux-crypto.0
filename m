@@ -2,360 +2,234 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D68BC6379F
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 12:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4EEC636D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 15:31:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234315AbjBUMlv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Feb 2023 07:41:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37760 "EHLO
+        id S233686AbjBUPbd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Feb 2023 10:31:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234798AbjBUMln (ORCPT
+        with ESMTP id S234089AbjBUPbb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2023 07:41:43 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1687D26853;
-        Tue, 21 Feb 2023 04:41:21 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31LBUrG6007035;
-        Tue, 21 Feb 2023 12:40:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=DtcPa1deaHe9WjwD+eJN66LKxf6T5OcN86NGAmtJUgc=;
- b=WK+uTj4nX2mwFnL2NrMD7tcoLlhhlJDVHSgWJrgGl6emBMH26xqSQcNr72fNok7XU3xB
- sNWj2f3kYGHKNd8gLak8tmBN0RMelckKaMQnKJr11yEi5HVh38cT+vLCZXafTp6/N+Fn
- TemTVkMWEvLHWNbVXw0r357MzdqMysXutULQzAG3E3D/qidvzRVya/bpcS56oXjQoZWp
- l/r3mf5ulCsKJWsRACxznBi8h7pHLP9Z5OlAFItbsENMUzaSVI/5bt1uRaOhloigSzxk
- 3mXbazkDXFjCD0RHbX92Xq2NVxXr5llXHXtk9TsiNxfECt1u57Y3CAlyZmpHAVLbSQ8I ZQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvh4fsqdp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 12:40:32 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 31LCBIjF011033;
-        Tue, 21 Feb 2023 12:40:32 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvh4fsqcr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 12:40:32 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31L9u7SE011387;
-        Tue, 21 Feb 2023 12:40:30 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3ntpa7f98w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 12:40:30 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31LCeSwt1573484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Feb 2023 12:40:28 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2BE8458043;
-        Tue, 21 Feb 2023 12:40:28 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD17858055;
-        Tue, 21 Feb 2023 12:40:18 +0000 (GMT)
-Received: from [9.160.173.144] (unknown [9.160.173.144])
-        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Feb 2023 12:40:18 +0000 (GMT)
-Message-ID: <ea3cbb15-99e1-827c-9602-f53f74f7e543@linux.ibm.com>
-Date:   Tue, 21 Feb 2023 14:40:17 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH RFC v8 54/56] x86/sev: Add KVM commands for instance certs
+        Tue, 21 Feb 2023 10:31:31 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2083.outbound.protection.outlook.com [40.107.237.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CC82BF1A;
+        Tue, 21 Feb 2023 07:31:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QmvH8gBSAJi90u7MKDAU4NInAWGzdg99XuWGRzPy6+rEJcXGRnKCUgvjh2NVczP5uZn1Vd7poNbQyLHlRJ7XOwWEWH/X3zPLPVIvh+Y2oIC2Chp5XGzLUMAK0ztcDCeTpwTp8IOkESmYaqkyNa1A/1lKGh9Ogh4ATMnOCJz6s+mfhD3qo6bmdx2FlVRWMSp+GyTY4wWjOgY3Anv22UuDbZN0TCTLm903qPFZGkVpMofPT5b9gnGzuFoWPGFpyMfItmdCH0xVl6I8KqNilR50fdXrUrumpZhy8Wwg3kC81ufY7T2JYphxHdWwp3cMtGUfOMy0qbU5ms9duPNgo+sIzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KBPITLK/70/JdBXu5gXUM9tvTU9wC2Ljvmkz4rQtwRk=;
+ b=QjHCUalgncsSg0NWUoCPLyuFffZGo14RSKk/EIsVZ1lIeHqejFuop9jS2lJOI4E0aTpMVjFXLBv+DMVMu67sOvLkcVihsD6epRsw1Uks85AyMcbg2fH8Xg+UIf+aAvhv8vY5Pk30plHdzwvd0nVCdts3BqRWof1NidNlJ+Sstx1b0tdxpWeQJp6jk6q3YLvXayk0aww1URhypaycIUIN+Rud0Kj/sWREcCpaBCFJa8kWDWY9ex6h+PVEWE0dZu/qSDOTuVDnm48k5tUDNlUTDfBLpNpomdemVmE9QsHEUMNC66cxOE6J7ykOQlxJtLTbOQ/v5uk1ZA6XYlu0RDxpNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KBPITLK/70/JdBXu5gXUM9tvTU9wC2Ljvmkz4rQtwRk=;
+ b=fPQeVmzNa6kf1BhTLHis7bRCw5Q2KM5Bj8qAEMkT9n5xgYuoPWFrekeKbM6VDyoNK98LEDenmx5tU5/E34WePRViVBw4P7G9q/Y4Km/xWZ7gXUIa7gPtMDeXLbFih9WmupENsvESBTTZq5DTdVxB+uU+S3USBn2yUFlO/aY7Hfk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.20; Tue, 21 Feb
+ 2023 15:31:08 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc5d:6248:1c13:4a3]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc5d:6248:1c13:4a3%7]) with mapi id 15.20.6111.019; Tue, 21 Feb 2023
+ 15:31:08 +0000
+Message-ID: <f70a2398-bd78-24aa-b0ae-9171465d50ff@amd.com>
+Date:   Tue, 21 Feb 2023 09:31:01 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH RFC v8 24/56] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
 Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
+To:     Zhi Wang <zhi.wang.linux@gmail.com>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
         jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
         ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
         vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
         dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
         peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, nikunj.dadhania@amd.com,
+        Brijesh Singh <brijesh.singh@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-55-michael.roth@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <20230220183847.59159-55-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9knr3ZYypeuFlhnNPJpBvrWYo4mzWRWd
-X-Proofpoint-GUID: b2MI_pUmnvqYKbcoJs3VcNLV8-inLHC1
+ <20230220183847.59159-25-michael.roth@amd.com>
+ <20230221112823.000063e4@gmail.com>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <20230221112823.000063e4@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+X-ClientProxiedBy: CH0P220CA0012.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:610:ef::18) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-21_07,2023-02-20_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 clxscore=1011 mlxscore=0 adultscore=0
- mlxlogscore=999 spamscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302210106
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|BL1PR12MB5304:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4ad02c0-1f07-438d-5ff4-08db1420a703
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OyNB53AH8o1+sr+8Og5SvStDh0UAurp3MjBj2B5rM/KLOi4wSXqjO6RYsmBSDlJJBYQmn1JHjPxYBsjaKJovNrTCnSXaCpVskh+25eZZsT8OJHD5Mg5cikUZ5CoEd4jqIpTkZJq9bmfc5AtujnVUFA01wAdDOF8kJsTP+CLSEcLuvayE1LcR859sQbsyrs7Yw4MHCy9cW7uUnuG5Dx59H8Atcrbf1uIsEVOfii3nDb83BfLS6E+2pgAqlQALelXP1WGx9wLEhGE8Iq+BoiUp0XsH32r3kGhAxlf1gKjdf81Lluv9U/FWY5dIa+7Zn8jja4wfi9Wa1c09liK2niahrjxxM/LL4JCAdiFbm3GhdDY71b+14vXRPOrCEjnBQ4VJGCKLzLGVnjc2rAbtVojefJpgEl8xlR9Gcx2HxhstVQ8PNunWCASEryXQGmf6reiFixfznqeoBRFLRHjH1LBSOF92w4CtJFPNQYt1NophZVV2qm9MR/C/wfID+SFWUM/QvjZQzbGBufEwZHxcAu78UaS221jdQ7YaRcTkerT92il/17mmu750iGh3c205V9JVwuClHDUaqDl8GyiT2l4ZB6SDXpjSv6bmcg1CAl4WZg6WoJFc8n2MXjkZf+TX/zGL4aFVDiPojJNwB5onU0okdI9l8jsNso9FUFsNjYDXJDMTBpwHZGWzpHpz841iu/UcI3QcaYdbV/owtwRVWidC4RIfTEbd0TFqMIS7EUylqZs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(376002)(366004)(39860400002)(136003)(451199018)(8936002)(2616005)(7406005)(5660300002)(7416002)(31696002)(478600001)(8676002)(83380400001)(66476007)(66556008)(66946007)(4326008)(6636002)(110136005)(36756003)(86362001)(6486002)(316002)(41300700001)(31686004)(186003)(26005)(6512007)(2906002)(6666004)(6506007)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VFEzYU5DR2pmQlkzNGdXN1EyanNONklPRGxsRUpBYmYvUUdRcEJVc3Z6UFpS?=
+ =?utf-8?B?QkJLTVduMVVpNFQ4azZkd2dwUzRhNnQyY3ZJM3Q5ak5wTXF0ajRTNURIVzJ0?=
+ =?utf-8?B?WWtqQzdwaDhpTytOVjVvam04TjF5QkFXanF0Y21rQjZZNjJ2MXh5OVJMaVdD?=
+ =?utf-8?B?L1hBMTBhUUltNVhHYjVjcG8rcDY5SVptUGx6MGs3ZGI3ZDdyNEdzU0ZhZmly?=
+ =?utf-8?B?L1c0cUxEeVF0cUZKMzlLSFpjOUhLSGl0Rlg3cXl3VmU0RXA1cllIUTN4d1Vw?=
+ =?utf-8?B?ZlBGWjBnVlVhaUsyZWNzd1Z3L1ZwNFU0VW81NGZSUDhyVkFiYW5vWkxwTTRv?=
+ =?utf-8?B?SFBweEU1ZGNHazIvUCtsRUR6MktQcVVPYnN5akZCNWpqcmVMRGxGVi93eGtm?=
+ =?utf-8?B?SHBnZ3l2VnZBbGljTjIzSno1M0ROUlhVSE5ibVJUTVJxaGY1Rjc4ZnNaUE5o?=
+ =?utf-8?B?bnZCZGRUdjQxbitlWlRoMlE0dkE1cnJXREdxc0ZzOG9SMCtYL29YdWdyc3gy?=
+ =?utf-8?B?Ukp0czduRm1FUFMwVld6YmVNd1VFMkt0TnU4dktCQkRTOFRWMjlMb0k2NnJF?=
+ =?utf-8?B?T0Rpc2JYd1ZsSHEvWW02N3NUUHp5d0p0ZUZjdE9FWkN3RE1yTWlLdDhHOVZj?=
+ =?utf-8?B?RmFGZDZjbmFBbHo2dFVBYjlPUzFzQ3JrNUFlclp5cEdwaG9vVjhJR1FqMWtY?=
+ =?utf-8?B?OUpGWThRTzZ5c2dwN3ppcTF6aVVETGNLVG9GRnpVclJUYWREYTU4RVpZK200?=
+ =?utf-8?B?eG1NM3lUbTNTREhmMitVZ0RkWkR1eEllUEVia2Nqa0xUZVE1TEswZ0pSSGxZ?=
+ =?utf-8?B?Tm1jMzdDQ1NWVm9kaHBoV0VGUXFyczZJREV6cGVMR0gxU1NYaFkxNzI3dVNw?=
+ =?utf-8?B?NVRYTEpsRGxkSTFxLzNSbHdpQ2NZdjRobXRucXhkZ1kvVHk5M0VnUWVpNERW?=
+ =?utf-8?B?c2d3alhVZWpFaUhKNjkxNEJRcTN6SFFyVVhZZm5ReFc1WFR4ajlRMWZ2eHY1?=
+ =?utf-8?B?YW0wS1I5eUJML2VRSUtSKzhIOGpVd3BlNkRzSlVUWERmSWVyQWZyd09DT2tJ?=
+ =?utf-8?B?NUQ1RHVMTGhjdWZVeUdZL1dEa09oR0Y3VFZFek5zOVRtTTBQV3A4bEhlQllX?=
+ =?utf-8?B?SzNEWXJTVWlWaFQ0MVMrQXc3WU1PbU15SFFPV3I4OE1FZEVYc2RZRHBkUzd1?=
+ =?utf-8?B?S25ab0cvdkNpRW5PM3FnUmtNcTM2NWl0VSt2MGxWUEJwbDFuTzdZdUY1NFdS?=
+ =?utf-8?B?QXBLZnA3YWk2TTdvM2w0Ymk5WXJKTUdEY0xMeEY4dlZ5UHNkRUN1UXdmcndq?=
+ =?utf-8?B?NVhYejZnN0RkdDVkU2NDL1dtTDFoNUxNNTA2V0kwVXZUNXlEMEZ4WFQ4Wlhq?=
+ =?utf-8?B?UFlya3MwZllaNzZIY2kyYlUrbnQ3SHdDTDNYTTcxM2ZWOW9vVTdEQU1ZYmlr?=
+ =?utf-8?B?c2svRFdlQ0ZJOFFIMThrTVcweWZLSC9wbWZGWHhNMWRJdXN1RW1zbndEbGpE?=
+ =?utf-8?B?c3pPckJud001V0ZvV25Xem5wdzNiUTBWRmpsdVllbFBIczFac2w4cFF0aW44?=
+ =?utf-8?B?Zk9VTFhrUXNJWE5hd0pKaTFuK0Y4ZTFkYng5bDZPcE5hR2tCMnBwdCtDaE14?=
+ =?utf-8?B?S1dUWjlpT0wwTlpBS0xMYk5FRlI4dENIeURHc2JDTE5ibW1yVm5TVS9RazZo?=
+ =?utf-8?B?RHJ1V3Y3citGT0g0WlFOdHpvd0dseHJDQjEwTkxSdXcycVlnK0ZJTlJYZERH?=
+ =?utf-8?B?LzNMc3Vtblc2c0RodFhBUnlZSjdDQlR3ZjYzUVV5SDBUcVVBSEVBUENtU0Nh?=
+ =?utf-8?B?MXp3RlV5b2M0Q011Tlkzb2ZpY2J4citWTWlOME1jeWxtOE5UeExFeCtBMSty?=
+ =?utf-8?B?K2pqWDZIZ0xaZkx1dkxSb2U1cU44KzhqVyt0NDdKU0FrMFBPbWJ3bjc1S0Rm?=
+ =?utf-8?B?a3lKbmRjNE5kb1pmZDcvcFV3ck9yUW95elJHUFR5MG1FNituM0RKelZHdm9S?=
+ =?utf-8?B?TWJMcDhUeGw0elF4ZnV4aWZ2a3o2WEs4ZnY2QmpXYll1eG9heUNYVWUycnVI?=
+ =?utf-8?B?QStGaTIzL3V6Vkt0Tld1N25FaHh5eG43bEZVbjljVGlrbVpFdXJpUkQ1cXNz?=
+ =?utf-8?Q?i4c81313bDvtrdWPkF4nLnhLO?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4ad02c0-1f07-438d-5ff4-08db1420a703
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2023 15:31:07.9550
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FfLmBQv6r6krbYJuKdZHUnbnGYYvsl/8EPXXAAk6oyCZVB/RH1PdiPH5YOwQzzwcGnftVTxrkWjHnsD4670eQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5304
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mike,
+>> +static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
+>> +{
+>> +	/* Cbit maybe set in the paddr */
+> 
+> This is confusing.
+> 
+> I suppose C-bit is treated as a attribute of PTE in the kernel not part of the
+> PA. It means only a PTE might carry a C-bit.
+> 
 
-On 20/02/2023 20:38, Michael Roth wrote:
-> From: Dionna Glaze <dionnaglaze@google.com>
-> 
-> The /dev/sev device has the ability to store host-wide certificates for
-> the key used by the AMD-SP for SEV-SNP attestation report signing,
-> but for hosts that want to specify additional certificates that are
-> specific to the image launched in a VM, a different way is needed to
-> communicate those certificates.
-> 
-> Add two new KVM ioctl to handle this: KVM_SEV_SNP_{GET,SET}_CERTS
-> 
-> The certificates that are set with this command are expected to follow
-> the same format as the host certificates, but that format is opaque
-> to the kernel.
-> 
-> The new behavior for custom certificates is that the extended guest
-> request command will now return the overridden certificates if they
-> were installed for the instance. The error condition for a too small
-> data buffer is changed to return the overridden certificate data size
-> if there is an overridden certificate set installed.
-> 
-> Setting a 0 length certificate returns the system state to only return
-> the host certificates on an extended guest request.
-> 
-> Also increase the SEV_FW_BLOB_MAX_SIZE another 4K page to allow space
-> for an extra certificate.
-> 
-> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: remove used of "we" and "this patch" in commit log]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c   | 111 ++++++++++++++++++++++++++++++++++++++-
->  arch/x86/kvm/svm/svm.h   |   1 +
->  include/linux/psp-sev.h  |   2 +-
->  include/uapi/linux/kvm.h |  12 +++++
->  4 files changed, 123 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 70d5650d8d95..18b64b7005e7 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2089,6 +2089,7 @@ static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  		goto e_free;
->  
->  	sev->snp_certs_data = certs_data;
-> +	sev->snp_certs_len = 0;
->  
->  	return context;
->  
-> @@ -2404,6 +2405,86 @@ static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  	return ret;
->  }
->  
-> +static int snp_get_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	struct kvm_sev_snp_get_certs params;
-> +
-> +	if (!sev_snp_guest(kvm))
-> +		return -ENOTTY;
-> +
-> +	if (!sev->snp_context)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> +			   sizeof(params)))
-> +		return -EFAULT;
-> +
-> +	/* No instance certs set. */
-> +	if (!sev->snp_certs_len)
-> +		return -ENOENT;
-> +
-> +	if (params.certs_len < sev->snp_certs_len) {
-> +		/* Output buffer too small. Return the required size. */
-> +		params.certs_len = sev->snp_certs_len;
-> +
-> +		if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
-> +				 sizeof(params)))
-> +			return -EFAULT;
-> +
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (copy_to_user((void __user *)(uintptr_t)params.certs_uaddr,
-> +			 sev->snp_certs_data, sev->snp_certs_len))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +static int snp_set_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	unsigned long length = SEV_FW_BLOB_MAX_SIZE;
-> +	void *to_certs = sev->snp_certs_data;
-> +	struct kvm_sev_snp_set_certs params;
-> +
-> +	if (!sev_snp_guest(kvm))
-> +		return -ENOTTY;
-> +
-> +	if (!sev->snp_context)
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
-> +			   sizeof(params)))
-> +		return -EFAULT;
-> +
-> +	if (params.certs_len > SEV_FW_BLOB_MAX_SIZE)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Setting a length of 0 is the same as "uninstalling" instance-
-> +	 * specific certificates.
-> +	 */
-> +	if (params.certs_len == 0) {
-> +		sev->snp_certs_len = 0;
-> +		return 0;
-> +	}
-> +
-> +	/* Page-align the length */
-> +	length = (params.certs_len + PAGE_SIZE - 1) & PAGE_MASK;
-> +
-
-In comments on v7 [1] Dionna agreed adding cleanup here:
-
-  /* The size could shrink and leave garbage at the end. */
-  memset(sev->snp_certs_data, 0, SEV_FW_BLOB_MAX_SIZE);
-
-(we can use 'to_certs' in the first argument)
-
-but it wasn't added in v8.
-
--Dov
-
-[1] https://lore.kernel.org/linux-coco/CAAH4kHYOtzgqSTZQFcRiZwPLCkLAThjsCMdjUCdsBTiP=W0Vxw@mail.gmail.com/
+snp_reclaim_pages() is also called for reclaiming guest memory, in which 
+case the (guest) paddr will have the C-bit set. Hence this C-bit 
+handling is done within snp_reclaim_pages() so that the callers don't 
+need to handle it explicitly.
 
 
-> +	if (copy_from_user(to_certs,
-> +			   (void __user *)(uintptr_t)params.certs_uaddr,
-> +			   params.certs_len)) {
-> +		return -EFAULT;
-> +	}
-> +
-> +	sev->snp_certs_len = length;
-> +
-> +	return 0;
-> +}
-> +
->  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->  {
->  	struct kvm_sev_cmd sev_cmd;
-> @@ -2503,6 +2584,12 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->  	case KVM_SEV_SNP_LAUNCH_FINISH:
->  		r = snp_launch_finish(kvm, &sev_cmd);
->  		break;
-> +	case KVM_SEV_SNP_GET_CERTS:
-> +		r = snp_get_instance_certs(kvm, &sev_cmd);
-> +		break;
-> +	case KVM_SEV_SNP_SET_CERTS:
-> +		r = snp_set_instance_certs(kvm, &sev_cmd);
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		goto out;
-> @@ -3550,8 +3637,28 @@ static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gp
->  	if (rc)
->  		goto unlock;
->  
-> -	rc = snp_guest_ext_guest_request(&req, (unsigned long)sev->snp_certs_data,
-> -					 &data_npages, &err);
-> +	/*
-> +	 * If the VMM has overridden the certs, then change the error message
-> +	 * if the size is inappropriate for the override. Otherwise, use a
-> +	 * regular guest request and copy back the instance certs.
-> +	 */
-> +	if (sev->snp_certs_len) {
-> +		if ((data_npages << PAGE_SHIFT) < sev->snp_certs_len) {
-> +			rc = -EINVAL;
-> +			err = SNP_GUEST_REQ_INVALID_LEN;
-> +			goto datalen;
-> +		}
-> +		rc = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &req,
-> +				   (int *)&err);
-> +	} else {
-> +		rc = snp_guest_ext_guest_request(&req,
-> +						 (unsigned long)sev->snp_certs_data,
-> +						 &data_npages, &err);
-> +	}
-> +datalen:
-> +	if (sev->snp_certs_len)
-> +		data_npages = sev->snp_certs_len >> PAGE_SHIFT;
-> +
->  	if (rc) {
->  		/*
->  		 * If buffer length is small then return the expected
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 221b38d3c845..dced46559508 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -94,6 +94,7 @@ struct kvm_sev_info {
->  	u64 snp_init_flags;
->  	void *snp_context;      /* SNP guest context page */
->  	void *snp_certs_data;
-> +	unsigned int snp_certs_len; /* Size of instance override for certs */
->  	struct mutex guest_req_lock; /* Lock for guest request handling */
->  
->  	u64 sev_features;	/* Features set at VMSA creation */
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 92116e2b74fd..3b28b78938f6 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -22,7 +22,7 @@
->  #define __psp_pa(x)	__pa(x)
->  #endif
->  
-> -#define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
-> +#define SEV_FW_BLOB_MAX_SIZE	0x5000	/* 20KB */
->  
->  /**
->   * SEV platform state
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 6e684bf5f723..ad7e24e43547 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1928,6 +1928,8 @@ enum sev_cmd_id {
->  	KVM_SEV_SNP_LAUNCH_START,
->  	KVM_SEV_SNP_LAUNCH_UPDATE,
->  	KVM_SEV_SNP_LAUNCH_FINISH,
-> +	KVM_SEV_SNP_GET_CERTS,
-> +	KVM_SEV_SNP_SET_CERTS,
->  
->  	KVM_SEV_NR_MAX,
->  };
-> @@ -2075,6 +2077,16 @@ struct kvm_sev_snp_launch_finish {
->  	__u8 pad[6];
->  };
->  
-> +struct kvm_sev_snp_get_certs {
-> +	__u64 certs_uaddr;
-> +	__u64 certs_len;
-> +};
-> +
-> +struct kvm_sev_snp_set_certs {
-> +	__u64 certs_uaddr;
-> +	__u64 certs_len;
-> +};
-> +
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
->  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+> The paddr is from __pa(page_address()). It is not extracted from a PTE. Thus, the
+> return from them should never have a C-bit.
+> 
+> BTW: Wouldn't it be better to have pfn as input param instead of paddr?
+> 
+> The caller has struct page, calling snp_reclaim_pages(page_to_pfn(page), xxxxx)
+> would be much clearer than the current conversion:
+> page_address() (struct page is converted to VA), __pa() (VA is converted to PA)
+> in the caller and then PA is converted to pfn here.
+> 
+>> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+>> +	int ret, err, i, n = 0;
+>> +
+> 
+> should be unsigned int i, n; as the input param npage is unsigned int.
+> 
+>> +	if (!pfn_valid(pfn)) {
+>> +		pr_err("%s: Invalid PFN %lx\n", __func__, pfn);
+>> +		return 0;
+>> +	}
+>> +
+>> +	for (i = 0; i < npages; i++, pfn++, n++) {
+>> +		paddr = pfn << PAGE_SHIFT;
+>> +
+>> +		if (locked)
+>> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
+>> +		else
+>> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
+>> +
+>> +		if (ret)
+>> +			goto cleanup;
+>> +
+>> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
+>> +		if (ret)
+>> +			goto cleanup;
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +cleanup:
+>> +	/*
+>> +	 * If failed to reclaim the page then page is no longer safe to
+>> +	 * be release back to the system, leak it.
+>> +	 */
+>> +	snp_mark_pages_offline(pfn, npages - n);
+>> +	return ret;
+>> +}
+>> +
+>> +static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
+> 
+> The same comment as above. Better take pfn or page instead of paddr with
+> redundant conversions.
+> 
+
+Again, the paddr can point to guest memory so it can have C-bit set.
+
+Thanks,
+Ashish
+
+>> +{
+>> +	/* Cbit maybe set in the paddr */
+>> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+>> +	int rc, n = 0, i;
+>> +
+>> +	for (i = 0; i < npages; i++, n++, pfn++) {
+>> +		rc = rmp_make_private(pfn, 0, PG_LEVEL_4K, 0, true);
+>> +		if (rc)
+>> +			goto cleanup;
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +cleanup:
+>> +	/*
+>> +	 * Try unrolling the firmware state changes by
+>> +	 * reclaiming the pages which were already changed to the
+>> +	 * firmware state.
+>> +	 */
+>> +	snp_reclaim_pages(paddr, n, locked);
+>> +
+>> +	return rc;
+>> +}
+>> +
