@@ -2,152 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BC7C636D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 17:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F682C64EC7
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 19:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234488AbjBURd0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Feb 2023 12:33:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49066 "EHLO
+        id S229719AbjBUT0Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Feb 2023 14:26:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233278AbjBURdY (ORCPT
+        with ESMTP id S229639AbjBUT0X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2023 12:33:24 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41646CA01;
-        Tue, 21 Feb 2023 09:33:20 -0800 (PST)
-Received: from [192.168.4.137] (cpe-70-95-196-11.san.res.rr.com [70.95.196.11])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 8E66220B9C3D;
-        Tue, 21 Feb 2023 09:33:18 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8E66220B9C3D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1677000799;
-        bh=kKi0N4EszwVCj0VywnzfrWO8zvwdXe+htSOdeZZnwps=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=ssdiSMnzNZ2muyfYqtaQuCdWg4MFQsUi/eVle/aVUyxi86XudHkyISr7UXAXHgfT4
-         tywFkY3/FSfYSR0fzmXvxF+8/mRJsWjDfkA5mGQz1Fg1lzevXtZsl32WLahM0FCOh6
-         4dQlyDrEKQHIiVfLZomFKlqgSkVi3XOM17HgUTx4=
-Message-ID: <9f33c874-17ef-ddd8-041c-e1f9995385fa@linux.microsoft.com>
-Date:   Tue, 21 Feb 2023 09:33:14 -0800
+        Tue, 21 Feb 2023 14:26:23 -0500
+X-Greylist: delayed 1800 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 21 Feb 2023 11:26:21 PST
+Received: from tartarus.angband.pl (tartarus.angband.pl [51.83.246.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E63F30299;
+        Tue, 21 Feb 2023 11:26:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=angband.pl;
+        s=tartarus; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
+        Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=i9+A1nQzdmuXy3hp3w92VyMJn5gV+HrIvYVOE27Ezgk=; b=v9OvMN6EYOa84tupTkGKC8LNTb
+        O8cZA9v/aEP93UpM2cWoSAA0oX8pLL7SVJPPEydvivoImtvY1ht5xDHZCSeIMOGJeXvKA8AXpiTEu
+        8vqp+xGMu/nT/RipU/HLa8FZwk/UB7Mhv51wQB76DCj/7SByWuUOUz1Rp2zW7f2UyC3g=;
+Received: from localhost ([127.0.0.1] helo=valinor.angband.pl)
+        by tartarus.angband.pl with smtp (Exim 4.96)
+        (envelope-from <kilobyte@valinor.angband.pl>)
+        id 1pUWIa-001Rcn-2z;
+        Tue, 21 Feb 2023 18:19:28 +0100
+Received: (nullmailer pid 55815 invoked by uid 1000);
+        Tue, 21 Feb 2023 17:19:28 -0000
+From:   Adam Borowski <kilobyte@angband.pl>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Adam Borowski <kilobyte@angband.pl>
+Subject: [PATCH v2] certs: fips test: fix build failure with PKCS7_MESSAGE_PARSER=m
+Date:   Tue, 21 Feb 2023 18:19:19 +0100
+Message-Id: <20230221171919.55714-1-kilobyte@angband.pl>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] drivers: crypto: caam: jr: Allow quiesce when quiesced
-Content-Language: en-US
-To:     meenakshi.aggarwal@nxp.com, horia.geanta@nxp.com, V.sethi@nxp.com,
-        pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        franck.lenormand@nxp.com
-Cc:     code@tyhicks.com
-References: <20230220105033.1449263-1-meenakshi.aggarwal@nxp.com>
- <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
-From:   Vijay Balakrishna <vijayb@linux.microsoft.com>
-In-Reply-To: <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 127.0.0.1
+X-SA-Exim-Mail-From: kilobyte@valinor.angband.pl
+X-SA-Exim-Scanned: No (on tartarus.angband.pl); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+ld: crypto/asymmetric_keys/selftest.o: in function `fips_signature_selftest':
+selftest.c:(.init.text+0xcd): undefined reference to `pkcs7_parse_message'
+ld: selftest.c:(.init.text+0x103): undefined reference to `pkcs7_supply_detached_data'
+ld: selftest.c:(.init.text+0x10d): undefined reference to `pkcs7_verify'
+ld: selftest.c:(.init.text+0x135): undefined reference to `pkcs7_validate_trust'
+ld: selftest.c:(.init.text+0x157): undefined reference to `pkcs7_free_message'
 
+Fixes: 3cde3174eb91 ("certs: Add FIPS selftests")
+Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+---
+This fail still happens on randconfig runs.
 
-On 2/20/2023 9:42 PM, meenakshi.aggarwal@nxp.com wrote:
-> From: Horia Geanta <horia.geanta@nxp.com>
-> 
-> Issues:
-> - Job ring device is busy when do kexec reboot
-> - Failed to flush job ring when do system suspend-resume
-> 
-> Fix:
-> Flush the job ring to stop the running jobs.
-> 
-> Signed-off-by: Horia Geanta <horia.geanta@nxp.com>
-> Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
+v2: expanded the Fixes tag to include that commit's subject
 
-Tested-by: Vijay Balakrishna <vijayb@linux.microsoft.com>
+ crypto/asymmetric_keys/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Vijay
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 3df3fe4ed95f..fe007db96c69 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -83,6 +83,6 @@ config FIPS_SIGNATURE_SELFTEST
+ 	  for FIPS.
+ 	depends on KEYS
+ 	depends on ASYMMETRIC_KEY_TYPE
+-	depends on PKCS7_MESSAGE_PARSER
++	depends on PKCS7_MESSAGE_PARSER=y
+ 
+ endif # ASYMMETRIC_KEY_TYPE
+-- 
+2.39.2
 
-
-> ---
->   drivers/crypto/caam/jr.c | 53 +++++++++++++++++++++++++++++++++-------
->   1 file changed, 44 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> index 724fdec18bf9..8745fe3cb575 100644
-> --- a/drivers/crypto/caam/jr.c
-> +++ b/drivers/crypto/caam/jr.c
-> @@ -72,19 +72,27 @@ static void caam_jr_crypto_engine_exit(void *data)
->   	crypto_engine_exit(jrpriv->engine);
->   }
->   
-> -static int caam_reset_hw_jr(struct device *dev)
-> +/*
-> + * Put the CAAM in quiesce, ie stop
-> + *
-> + * Must be called with itr disabled
-> + */
-> +static int caam_jr_stop_processing(struct device *dev, u32 jrcr_bits)
->   {
->   	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
->   	unsigned int timeout = 100000;
->   
-> -	/*
-> -	 * mask interrupts since we are going to poll
-> -	 * for reset completion status
-> -	 */
-> -	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
-> +	/* Check the current status */
-> +	if (rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_INPROGRESS)
-> +		goto wait_quiesce_completion;
->   
-> -	/* initiate flush (required prior to reset) */
-> -	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
-> +	/* Reset the field */
-> +	clrsetbits_32(&jrp->rregs->jrintstatus, JRINT_ERR_HALT_MASK, 0);
-> +
-> +	/* initiate flush / park (required prior to reset) */
-> +	wr_reg32(&jrp->rregs->jrcommand, jrcr_bits);
-> +
-> +wait_quiesce_completion:
->   	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
->   		JRINT_ERR_HALT_INPROGRESS) && --timeout)
->   		cpu_relax();
-> @@ -95,8 +103,35 @@ static int caam_reset_hw_jr(struct device *dev)
->   		return -EIO;
->   	}
->   
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Flush the job ring, so the jobs running will be stopped, jobs queued will be
-> + * invalidated and the CAAM will no longer fetch fron input ring.
-> + *
-> + * Must be called with itr disabled
-> + */
-> +static int caam_jr_flush(struct device *dev)
-> +{
-> +	return caam_jr_stop_processing(dev, JRCR_RESET);
-> +}
-> +
-> +static int caam_reset_hw_jr(struct device *dev)
-> +{
-> +	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
-> +	unsigned int timeout = 100000;
-> +	int err;
-> +	/*
-> +	 * mask interrupts since we are going to poll
-> +	 * for reset completion status
-> +	 */
-> +	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
-> +	err = caam_jr_flush(dev);
-> +	if (err)
-> +		return err;
-> +
->   	/* initiate reset */
-> -	timeout = 100000;
->   	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
->   	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
->   		cpu_relax();
