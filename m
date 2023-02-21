@@ -2,206 +2,379 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39EBC61DA3
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 05:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0187C64EC7
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 09:28:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232637AbjBUFmr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Feb 2023 00:42:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50062 "EHLO
+        id S233383AbjBUJ2a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Feb 2023 04:28:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232324AbjBUFmq (ORCPT
+        with ESMTP id S233215AbjBUJ23 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2023 00:42:46 -0500
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2076.outbound.protection.outlook.com [40.107.6.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434B01D93C;
-        Mon, 20 Feb 2023 21:42:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KHSsvWtrwf+XzOf/1cVhYJfpCM0NpfhXgdaQsOfURreQ9kBJDMqZDt/kPawz5Gari+iUBZcrJeXiXAQ3zYRwzLBoFF9MalMsdt4W7cZ/o3FY7RNxtyBbqs9sJjZET8eFrRrttoYur9zorVxK7h/2Skngs0+8S/7rUkMPAQTYCBfKrwtY09WYjSxeREXGNN8yWuGQqokefL3EHbvdOMyMF+4vkO7lRvGf1u5/JbE+DcOIsBu6SN59Qg+3O83Q0RvVWDLHKjd/lEVN77OxAoygfGBIktD1GtwIcQsYuH1lG9pAL6tHlVbiuWs8f09ZMdZFU8Znl05OOOgb1ws2yv/0Ug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4iw3bARIXB9Ci0V10LB5HCq4NgPDxUJAqpA8Y4ZkJIA=;
- b=mvBw9gw2Ymgp5RW6AJXOUbmppxxAuef+K5Q+myCUL0e3+Z0qi7+QzSiJUK4O2mBmbyQINRYqySdVHFp7FQEM76/I3GlsAFcncas7PJ6xKY7ZDKc+0y12YReD35jmtGBtwQpYbFkFD96gXOvNTVE9/y5iN9PTXRooSIQ/8khVVYnWnYq1sIOQqqlkvRzkvfdF5sJu8EcF3yHFSIgb+83MAJurNnzYbn5U1B3BFRImyxSzAbb0UDAr6e8/wJ1ymXEQV97n+EIm2Xha+qWihp8fWWEXvJBb+2+8qDsVq+AUEdhCYAgqw4p4QntY54absHAd1Fo1LtRDdbhfKdx5mXf2+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4iw3bARIXB9Ci0V10LB5HCq4NgPDxUJAqpA8Y4ZkJIA=;
- b=c/u502TmUrl5Q4gB7pm5YCvhxx706b2ozo+GSncv7ymE4j17pj168ArdrokiA1HUyMLqF21OlwPSgoA6YDTlkK6+Wx2hf//67TN+SvGUhcxx6Uyv3ZAg8Hen0b4ZMDGkFudb9jZzPmu//9h/qEivP583PDLbvwR9RuGJoAdpr5I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by AS8PR04MB8577.eurprd04.prod.outlook.com (2603:10a6:20b:424::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.21; Tue, 21 Feb
- 2023 05:42:43 +0000
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::a518:512c:4af1:276e]) by DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::a518:512c:4af1:276e%5]) with mapi id 15.20.6111.021; Tue, 21 Feb 2023
- 05:42:43 +0000
-From:   meenakshi.aggarwal@nxp.com
-To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
-        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, franck.lenormand@nxp.com
-Cc:     vijayb@linux.microsoft.com, code@tyhicks.com
-Subject: [PATCH] drivers: crypto: caam: jr: Allow quiesce when quiesced
-Date:   Tue, 21 Feb 2023 11:12:19 +0530
-Message-Id: <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230220105033.1449263-1-meenakshi.aggarwal@nxp.com>
-References: <20230220105033.1449263-1-meenakshi.aggarwal@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2P153CA0030.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::15) To DU0PR04MB9563.eurprd04.prod.outlook.com
- (2603:10a6:10:314::7)
+        Tue, 21 Feb 2023 04:28:29 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CE8B443;
+        Tue, 21 Feb 2023 01:28:27 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id y44so3760293ljq.7;
+        Tue, 21 Feb 2023 01:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7cMvEWx93T+DKuH/EfNzVMzxjU3ZfkiKTGej0rtS7XU=;
+        b=h/MKpwswKXFMPyFd7oBDdGwT1y9EKS9WAjFXU+U9BdYQN554vMrvq7yaIJ2bISdl5q
+         68rK/XqSK0ZTzubookOAKlQiRkh/Qb+Y8NhBvjuVdNePw8caYBX8chcYUBHO+Txivp94
+         styxcRkySeYlHXAer1Fcb1AVJGRFD8XAwBVbdMhmVttT+M1PksmkX6OnEr+7/MJxcciD
+         sdGiFEPtgOoRpI9UQnVRKTdt7WL8TCV/H0zeJTdw3HvdESLUNxvHPOInJrwl6qHi9tcH
+         Ks92c0JaxDH8N94zNzsfA/+AuA3X+OhIFaa51UecB9hENAWk21HAG3e29iK6ok7jWNio
+         Fi+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7cMvEWx93T+DKuH/EfNzVMzxjU3ZfkiKTGej0rtS7XU=;
+        b=7xW7yq8zHv0lAC78SI0VDzfbXrZNO+AaJi4vhiewGaTRwasK9fVmj9pKkFgUH1e5Ka
+         ONWEZM5I6aQmzAMj3af1mCOYZhZGQ6vQCTDRH4fFAAvvmOOn3jauomDsNFU0Gq3ijfbL
+         izIhmeDFGtim28Q0QIoXf25uWlUpqIz0hqQPEGpa716coCCTCyEkHzj7IAhXJyHoCfer
+         ZMNs0toS7lNoIYb0ogR0BFD0wxbpuds89d0BZJcldxGyMRKFZUymBl4nWQbBHbpZTDJD
+         ReraNKJhM1vRtmsSXsYU/LYCS5zWPow6DA0mwfY60/jQJUawKPMexKbbuJPTHHlbDrmT
+         MDGg==
+X-Gm-Message-State: AO0yUKVfLVTVluJ/9WXIH01Nn4TbS8bPLkRLgWlzgUSDgPSj2DVetw5o
+        jI9gv0A4hNDsnLokq0g30ZA=
+X-Google-Smtp-Source: AK7set84dqJj7wcs9uzj2n8kT//QPqBDPmWF+AwkpmwrrrE3ZAh41j4XgidURaSXeFVF8sErCcmqqw==
+X-Received: by 2002:a05:651c:897:b0:295:90b2:da6b with SMTP id d23-20020a05651c089700b0029590b2da6bmr206314ljq.0.1676971705705;
+        Tue, 21 Feb 2023 01:28:25 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id o16-20020a2e9b50000000b002958bb2deacsm123022ljj.46.2023.02.21.01.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Feb 2023 01:28:25 -0800 (PST)
+Date:   Tue, 21 Feb 2023 11:28:23 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v8 24/56] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+Message-ID: <20230221112823.000063e4@gmail.com>
+In-Reply-To: <20230220183847.59159-25-michael.roth@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-25-michael.roth@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS8PR04MB8577:EE_
-X-MS-Office365-Filtering-Correlation-Id: ed3689e2-60c4-49fa-590e-08db13ce73b2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BJJRHnB1Sl8V4phE3CCG+BZAa4DED7leGX5u5Yl36pIzjXuyJZgBUkN0eiX124ke/5/35SgeOs0qhsgK4BbalsUsSxb07hFdo0AbVd79Pn3krtDSaJY7WuMvFtqlb31BCMRZZxCcbV/nIZsrZmtA7H7Gq2lIIRCMP8B8m7WYHhxsOTHdsWuhuCbMkX0PfkruU9qoIfSoXBaSCmzdT8cbVDxfnfxKNZQejPZQUbcRJQo029CIMTc7sj1j2BfPaSGeCg39zVWUEPbtw/CAfc8O1fM1p5wt7erP8xu7jY7lIZudhYD6hJXz/8MsxNX3R/WEMkpPWOt7dYPk6+ho8Q/+6pHboKoGiRIK9NG0vGxREKlJrfd8VCqatUmboNnFTDZe2P4lqpMexOCz79z6Uu+RHFJww/yV5Y40U2omaQfBZQ9qu5snTkFSY+Tu3YNTFHMrKJTdR5/47RrWjqQhn5wQ9yZNxTNNPaWZQA40jnOiVS4P3SIwttOmIuYUwP/RXAAeJqoQ7FhyFQqzuORsp0vlOh6Ip/Z3JoIWvXNNRECKjqw7t8Avn0DG7j5HOuPmtzxVM5T25fWw1fOtclEIJVgLn+qy71JYHiTvuhiMB2TFAiDxXlQaUecQyfFyzM/DChBVLt5V26knypGioug7dkpVh3k2cPeyQxH/dCWxGkjwdIVndOa5gpDcpK+z0Tku7Qli93HwNOY59T92iZMYCgs5sg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(376002)(136003)(39860400002)(396003)(451199018)(38100700002)(38350700002)(2906002)(8936002)(5660300002)(6512007)(26005)(9686003)(186003)(41300700001)(83380400001)(2616005)(36756003)(8676002)(66476007)(66556008)(66946007)(4326008)(6486002)(52116002)(86362001)(6506007)(478600001)(6666004)(316002)(1076003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZzNdzTvhUfVEOSuE4yTmtW51IqOnVqxvXAb6aI6hNfhl93E+IvLwkbxTzlol?=
- =?us-ascii?Q?UyWTKBBBEkLyYJoZdwApzhZXrlgw48nPZ2h33mn4hAGSjfBUTNN3fSOFO9Xb?=
- =?us-ascii?Q?vB/PSZ2sAZwS1ZhjbdcKkhooQbYY9Mss72gMMytDW7BW1NJcTbigpgcNG186?=
- =?us-ascii?Q?IQIqVEzC7KHLRek/U4FMamnE6h780EeEmusrLl+YRqhbaeTRcqejKSN2NmYX?=
- =?us-ascii?Q?iIWmPhFaduhJ5SfqidjFXOyl3WLiNOiBT/1wPVmIC6LUkctpurLJJiA4jSrz?=
- =?us-ascii?Q?IqG2PgnoECMDBqZHqRNMRgTPrW2WgDPonu3DxyyRaIK/Qm0EuEtvfqitxy8t?=
- =?us-ascii?Q?zsvYN8jFzav6srGeL9hMHSSy3NeJ20KNiLRH+Uxk8MBowAeEzeR2PQ+zQYSN?=
- =?us-ascii?Q?95EPjJYsDHFzS4fXVrKdKl7+Oo3RWr22n6V5lUiw8gVdvZ7Cbb2R27DsTrd3?=
- =?us-ascii?Q?UCBLn8AmzWopGYQzZX7LCQ2EEI3WKChqAup0qGJmc1wB33mfLQ1tGWf3pVp0?=
- =?us-ascii?Q?V4IGYCK3Ui6vaAKaQbSk8pElESqqQc2+MlKeNpS2h2J0zXu/12tN9hjIMNCr?=
- =?us-ascii?Q?8Qv3Zh4RMEozbLKLBIdMzZgQyTQUg8EpDwfbY5uQqqQ2pmomO2FaonOT3Esl?=
- =?us-ascii?Q?gNNb1kLHnk3yal7XgAO4HfIpzllIthkphzer66j6Z9qK4pI0yoNJxvjsLQMx?=
- =?us-ascii?Q?2QOZub3C7RW97aUXiqNRlOPMANf82skLDHegYFU+YEdQmZ8oKBtQMExNGGQU?=
- =?us-ascii?Q?l8ZaWdRAEfI++X6y0rI96elGqA2C1jQzi8OFygn6iTe6I+12xHsxhvJ2ahc8?=
- =?us-ascii?Q?ndO8RBbgl/8enn2eGkH+nx8kHgkIuonZZBkI57/BK36sruqOVticGf7+8sSn?=
- =?us-ascii?Q?FKwnK8tN8aIEBB3L6WLvANqnRwfhma5CmYGI86tZP/C0/OpYvTIJ5BKp8F0w?=
- =?us-ascii?Q?On/qEE6FSUcz0OnVH/ZjHJOEgPLb2OaSGH/zJeZ61nFN6TD1HqoEqRWDiwSg?=
- =?us-ascii?Q?abbR60//dNyJa3bOedV53pDVxRXDBfNYQ5YIRI4a6yUf1LqRcZQYURcABCDQ?=
- =?us-ascii?Q?f7kgkxZomTPXPPlxqqur1H0w3y8Rl75Nkqs8EDp2s4zJSEZccjkV9Fj7jzWs?=
- =?us-ascii?Q?CgAlSQMSDt6J66EI5aMMGTf+dnyNH/68w/27hyU6O3RsHxFo4oTweaR/Gu8j?=
- =?us-ascii?Q?3zemXD8TwjXbT0mvHKdtS6L+arUDRnV//djcrvTvhdELYzs386sE6y76mAS9?=
- =?us-ascii?Q?9EWm+aYHgJwT7X9THYp376/TFEVY+IYRm20igzzLzMWqxbfOTYKBd8f9KnHI?=
- =?us-ascii?Q?HbYTyB2risyEPtTPjqc/7v3OXXvUe46vjeIG24zm9ls2OwojU+g2MVTmKvBF?=
- =?us-ascii?Q?sVK6zvq2HICYhReiQoc+a3oe16JdgN/rB+N/vxbIG0EibJsF1SVbUJvKAkfv?=
- =?us-ascii?Q?oeUlIhUADxgaDuuVKGggBagrP3Dy3+r3swypw+5W9Ncp9v63a8Ss9F/C+geD?=
- =?us-ascii?Q?GvBv2qQAvHK3ich4VTegTBkWJIc/OKCF7kMfszIB3enpFq/jadipWK4n/xc9?=
- =?us-ascii?Q?VJIVf5UeWzPLgrvEH4QEYlWLV6ajFcyA8Cda7KHG6Zkmu+PQN51ss5wa6JYp?=
- =?us-ascii?Q?qA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ed3689e2-60c4-49fa-590e-08db13ce73b2
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2023 05:42:42.9721
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lgagWgsk09e5Q763S4/0J4Tuh8Fv1DiBYW1fdWNr2VkApbfc+7qGxTNg5R7alwNbrfSlCvABYfOvYvGYIc7CdW5zh6WnXZT7W9fQmG0lAVs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8577
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Horia Geanta <horia.geanta@nxp.com>
+On Mon, 20 Feb 2023 12:38:15 -0600
+Michael Roth <michael.roth@amd.com> wrote:
 
-Issues:
-- Job ring device is busy when do kexec reboot
-- Failed to flush job ring when do system suspend-resume
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The behavior and requirement for the SEV-legacy command is altered when
+> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
+> for more details.
+> 
+> Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
+> when SNP is enabled to satisfy new requirements for the SNP. Continue
+> allocating a 1mb region for !SNP configuration.
+> 
+> While at it, provide API that can be used by others to allocate a page
+> that can be used by the firmware. The immediate user for this API will
+> be the KVM driver. The KVM driver to need to allocate a firmware context
+> page during the guest creation. The context page need to be updated
+> by the firmware. See the SEV-SNP specification for further details.
+> 
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 148 +++++++++++++++++++++++++++++++++--
+>  include/linux/psp-sev.h      |   9 +++
+>  2 files changed, 149 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index eca4e59b0f44..4c12e98a1219 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -94,6 +94,13 @@ static void *sev_init_ex_buffer;
+>   */
+>  struct sev_data_range_list *snp_range_list;
+>  
+> +/* When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB size. */
+> +#define SEV_SNP_ES_TMR_SIZE	(2 * 1024 * 1024)
 
-Fix:
-Flush the job ring to stop the running jobs.
+It would be better to re-use the kernel size definition macros. E.g. SZ_2MB.
 
-Signed-off-by: Horia Geanta <horia.geanta@nxp.com>
-Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
----
- drivers/crypto/caam/jr.c | 53 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 44 insertions(+), 9 deletions(-)
+> +
+> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
+> +
+> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
+> +
+>  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+>  {
+>  	struct sev_device *sev = psp_master->sev_data;
+> @@ -216,11 +223,134 @@ void snp_mark_pages_offline(unsigned long pfn, unsigned int npages)
+>  }
+>  EXPORT_SYMBOL_GPL(snp_mark_pages_offline);
+>  
+> +static int snp_reclaim_pages(unsigned long paddr, unsigned int npages, bool locked)
+> +{
+> +	/* Cbit maybe set in the paddr */
 
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 724fdec18bf9..8745fe3cb575 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -72,19 +72,27 @@ static void caam_jr_crypto_engine_exit(void *data)
- 	crypto_engine_exit(jrpriv->engine);
- }
- 
--static int caam_reset_hw_jr(struct device *dev)
-+/*
-+ * Put the CAAM in quiesce, ie stop
-+ *
-+ * Must be called with itr disabled
-+ */
-+static int caam_jr_stop_processing(struct device *dev, u32 jrcr_bits)
- {
- 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
- 	unsigned int timeout = 100000;
- 
--	/*
--	 * mask interrupts since we are going to poll
--	 * for reset completion status
--	 */
--	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
-+	/* Check the current status */
-+	if (rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_INPROGRESS)
-+		goto wait_quiesce_completion;
- 
--	/* initiate flush (required prior to reset) */
--	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
-+	/* Reset the field */
-+	clrsetbits_32(&jrp->rregs->jrintstatus, JRINT_ERR_HALT_MASK, 0);
-+
-+	/* initiate flush / park (required prior to reset) */
-+	wr_reg32(&jrp->rregs->jrcommand, jrcr_bits);
-+
-+wait_quiesce_completion:
- 	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
- 		JRINT_ERR_HALT_INPROGRESS) && --timeout)
- 		cpu_relax();
-@@ -95,8 +103,35 @@ static int caam_reset_hw_jr(struct device *dev)
- 		return -EIO;
- 	}
- 
-+	return 0;
-+}
-+
-+/*
-+ * Flush the job ring, so the jobs running will be stopped, jobs queued will be
-+ * invalidated and the CAAM will no longer fetch fron input ring.
-+ *
-+ * Must be called with itr disabled
-+ */
-+static int caam_jr_flush(struct device *dev)
-+{
-+	return caam_jr_stop_processing(dev, JRCR_RESET);
-+}
-+
-+static int caam_reset_hw_jr(struct device *dev)
-+{
-+	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
-+	unsigned int timeout = 100000;
-+	int err;
-+	/*
-+	 * mask interrupts since we are going to poll
-+	 * for reset completion status
-+	 */
-+	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
-+	err = caam_jr_flush(dev);
-+	if (err)
-+		return err;
-+
- 	/* initiate reset */
--	timeout = 100000;
- 	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
- 	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
- 		cpu_relax();
--- 
-2.25.1
+This is confusing.
+
+I suppose C-bit is treated as a attribute of PTE in the kernel not part of the
+PA. It means only a PTE might carry a C-bit. 
+
+The paddr is from __pa(page_address()). It is not extracted from a PTE. Thus, the
+return from them should never have a C-bit.
+
+BTW: Wouldn't it be better to have pfn as input param instead of paddr?
+
+The caller has struct page, calling snp_reclaim_pages(page_to_pfn(page), xxxxx)
+would be much clearer than the current conversion:
+page_address() (struct page is converted to VA), __pa() (VA is converted to PA)
+in the caller and then PA is converted to pfn here.
+
+> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+> +	int ret, err, i, n = 0;
+> +
+
+should be unsigned int i, n; as the input param npage is unsigned int.
+
+> +	if (!pfn_valid(pfn)) {
+> +		pr_err("%s: Invalid PFN %lx\n", __func__, pfn);
+> +		return 0;
+> +	}
+> +
+> +	for (i = 0; i < npages; i++, pfn++, n++) {
+> +		paddr = pfn << PAGE_SHIFT;
+> +
+> +		if (locked)
+> +			ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
+> +		else
+> +			ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &paddr, &err);
+> +
+> +		if (ret)
+> +			goto cleanup;
+> +
+> +		ret = rmp_make_shared(pfn, PG_LEVEL_4K);
+> +		if (ret)
+> +			goto cleanup;
+> +	}
+> +
+> +	return 0;
+> +
+> +cleanup:
+> +	/*
+> +	 * If failed to reclaim the page then page is no longer safe to
+> +	 * be release back to the system, leak it.
+> +	 */
+> +	snp_mark_pages_offline(pfn, npages - n);
+> +	return ret;
+> +}
+> +
+> +static int rmp_mark_pages_firmware(unsigned long paddr, unsigned int npages, bool locked)
+
+The same comment as above. Better take pfn or page instead of paddr with
+redundant conversions.
+
+> +{
+> +	/* Cbit maybe set in the paddr */
+> +	unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT;
+> +	int rc, n = 0, i;
+> +
+> +	for (i = 0; i < npages; i++, n++, pfn++) {
+> +		rc = rmp_make_private(pfn, 0, PG_LEVEL_4K, 0, true);
+> +		if (rc)
+> +			goto cleanup;
+> +	}
+> +
+> +	return 0;
+> +
+> +cleanup:
+> +	/*
+> +	 * Try unrolling the firmware state changes by
+> +	 * reclaiming the pages which were already changed to the
+> +	 * firmware state.
+> +	 */
+> +	snp_reclaim_pages(paddr, n, locked);
+> +
+> +	return rc;
+> +}
+> +
+> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
+> +{
+> +	unsigned long npages = 1ul << order, paddr;
+> +	struct sev_device *sev;
+> +	struct page *page;
+> +
+> +	if (!psp_master || !psp_master->sev_data)
+> +		return NULL;
+> +
+> +	page = alloc_pages(gfp_mask, order);
+> +	if (!page)
+> +		return NULL;
+> +
+> +	/* If SEV-SNP is initialized then add the page in RMP table. */
+> +	sev = psp_master->sev_data;
+> +	if (!sev->snp_initialized)
+> +		return page;
+> +
+> +	paddr = __pa((unsigned long)page_address(page));
+> +	if (rmp_mark_pages_firmware(paddr, npages, locked))
+> +		return NULL;
+> +
+> +	return page;
+> +}
+> +
+> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
+> +{
+> +	struct page *page;
+> +
+> +	page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
+> +
+> +	return page ? page_address(page) : NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
+> +
+> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
+> +{
+> +	struct sev_device *sev = psp_master->sev_data;
+> +	unsigned long paddr, npages = 1ul << order;
+> +
+> +	if (!page)
+> +		return;
+> +
+> +	paddr = __pa((unsigned long)page_address(page));
+> +	if (sev->snp_initialized &&
+> +	    snp_reclaim_pages(paddr, npages, locked))
+> +		return;
+> +
+> +	__free_pages(page, order);
+> +}
+> +
+> +void snp_free_firmware_page(void *addr)
+> +{
+> +	if (!addr)
+> +		return;
+> +
+> +	__snp_free_firmware_pages(virt_to_page(addr), 0, false);
+> +}
+> +EXPORT_SYMBOL_GPL(snp_free_firmware_page);
+> +
+>  static void *sev_fw_alloc(unsigned long len)
+>  {
+>  	struct page *page;
+>  
+> -	page = alloc_pages(GFP_KERNEL, get_order(len));
+> +	page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(len), false);
+>  	if (!page)
+>  		return NULL;
+>  
+> @@ -468,7 +598,7 @@ static int __sev_init_locked(int *error)
+>  		data.tmr_address = __pa(sev_es_tmr);
+>  
+>  		data.flags |= SEV_INIT_FLAGS_SEV_ES;
+> -		data.tmr_len = SEV_ES_TMR_SIZE;
+> +		data.tmr_len = sev_es_tmr_size;
+>  	}
+>  
+>  	return __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
+> @@ -491,7 +621,7 @@ static int __sev_init_ex_locked(int *error)
+>  		data.tmr_address = __pa(sev_es_tmr);
+>  
+>  		data.flags |= SEV_INIT_FLAGS_SEV_ES;
+> -		data.tmr_len = SEV_ES_TMR_SIZE;
+> +		data.tmr_len = sev_es_tmr_size;
+>  	}
+>  
+>  	return __sev_do_cmd_locked(SEV_CMD_INIT_EX, &data, error);
+> @@ -982,6 +1112,8 @@ static int __sev_snp_init_locked(int *error)
+>  	sev->snp_initialized = true;
+>  	dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
+>  
+> +	sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
+> +
+>  	return rc;
+>  }
+>  
+> @@ -1499,8 +1631,9 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>  		/* The TMR area was encrypted, flush it from the cache */
+>  		wbinvd_on_all_cpus();
+>  
+> -		free_pages((unsigned long)sev_es_tmr,
+> -			   get_order(SEV_ES_TMR_SIZE));
+> +		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
+> +					  get_order(sev_es_tmr_size),
+> +					  false);
+>  		sev_es_tmr = NULL;
+>  	}
+>  
+> @@ -1511,8 +1644,7 @@ static void sev_firmware_shutdown(struct sev_device *sev)
+>  	}
+>  
+>  	if (snp_range_list) {
+> -		free_pages((unsigned long)snp_range_list,
+> -			   get_order(PAGE_SIZE));
+> +		snp_free_firmware_page(snp_range_list);
+>  		snp_range_list = NULL;
+>  	}
+>  
+> @@ -1593,7 +1725,7 @@ void sev_pci_init(void)
+>  	}
+>  
+>  	/* Obtain the TMR memory area for SEV-ES use */
+> -	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+> +	sev_es_tmr = sev_fw_alloc(sev_es_tmr_size);
+>  	if (!sev_es_tmr)
+>  		dev_warn(sev->dev,
+>  			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 8edf5c548fbf..d19744807471 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -922,6 +922,8 @@ int sev_guest_decommission(struct sev_data_decommission *data, int *error);
+>  int sev_do_cmd(int cmd, void *data, int *psp_ret);
+>  
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+> +void *snp_alloc_firmware_page(gfp_t mask);
+> +void snp_free_firmware_page(void *addr);
+>  
+>  /**
+>   * sev_mark_pages_offline - insert non-reclaimed firmware/guest pages
+> @@ -959,6 +961,13 @@ static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_P
+>  
+>  void snp_mark_pages_offline(unsigned long pfn, unsigned int npages) {}
+>  
+> +static inline void *snp_alloc_firmware_page(gfp_t mask)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static inline void snp_free_firmware_page(void *addr) { }
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
 
