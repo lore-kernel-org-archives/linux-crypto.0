@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9669C636D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 17:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BC7C636D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 17:33:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233989AbjBURcU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Feb 2023 12:32:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47706 "EHLO
+        id S234488AbjBURd0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Feb 2023 12:33:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233278AbjBURcU (ORCPT
+        with ESMTP id S233278AbjBURdY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2023 12:32:20 -0500
+        Tue, 21 Feb 2023 12:33:24 -0500
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F1982C671;
-        Tue, 21 Feb 2023 09:32:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41646CA01;
+        Tue, 21 Feb 2023 09:33:20 -0800 (PST)
 Received: from [192.168.4.137] (cpe-70-95-196-11.san.res.rr.com [70.95.196.11])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 1FFC8209A932;
-        Tue, 21 Feb 2023 09:32:18 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1FFC8209A932
+        by linux.microsoft.com (Postfix) with ESMTPSA id 8E66220B9C3D;
+        Tue, 21 Feb 2023 09:33:18 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8E66220B9C3D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1677000738;
-        bh=UrXErgl/q/ax1SVIKnwoa08TmyMJOtQDMok5VA/M6Sw=;
+        s=default; t=1677000799;
+        bh=kKi0N4EszwVCj0VywnzfrWO8zvwdXe+htSOdeZZnwps=;
         h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=k3pTi8NX9wO5r4pzZxU0++ohEaAlrEyi+Muy3e25ptfm6aZes6nq80+rWGybnaLbS
-         pEe0Aotu2C/gLZLqZYLy1buuEueITuqEywXTyJQXHHFefo1tng13mfTCQQlz+2Fpat
-         7JfhndNPP4okBGY1zaNrEoLyhNVQxI2TUIX8xhqA=
-Message-ID: <d253d5ba-8e57-dc20-dfb4-08aac9e92a4c@linux.microsoft.com>
-Date:   Tue, 21 Feb 2023 09:32:13 -0800
+        b=ssdiSMnzNZ2muyfYqtaQuCdWg4MFQsUi/eVle/aVUyxi86XudHkyISr7UXAXHgfT4
+         tywFkY3/FSfYSR0fzmXvxF+8/mRJsWjDfkA5mGQz1Fg1lzevXtZsl32WLahM0FCOh6
+         4dQlyDrEKQHIiVfLZomFKlqgSkVi3XOM17HgUTx4=
+Message-ID: <9f33c874-17ef-ddd8-041c-e1f9995385fa@linux.microsoft.com>
+Date:   Tue, 21 Feb 2023 09:33:14 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH] drivers: crypto: caam: jr: add .shutdown hook
+Subject: Re: [PATCH] drivers: crypto: caam: jr: Allow quiesce when quiesced
 Content-Language: en-US
 To:     meenakshi.aggarwal@nxp.com, horia.geanta@nxp.com, V.sethi@nxp.com,
         pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
@@ -40,9 +40,9 @@ To:     meenakshi.aggarwal@nxp.com, horia.geanta@nxp.com, V.sethi@nxp.com,
         franck.lenormand@nxp.com
 Cc:     code@tyhicks.com
 References: <20230220105033.1449263-1-meenakshi.aggarwal@nxp.com>
- <20230221054047.2140558-1-meenakshi.aggarwal@nxp.com>
+ <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
 From:   Vijay Balakrishna <vijayb@linux.microsoft.com>
-In-Reply-To: <20230221054047.2140558-1-meenakshi.aggarwal@nxp.com>
+In-Reply-To: <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -51,43 +51,103 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 2/20/2023 9:40 PM, meenakshi.aggarwal@nxp.com wrote:
-> From: Gaurav Jain <gaurav.jain@nxp.com>
+On 2/20/2023 9:42 PM, meenakshi.aggarwal@nxp.com wrote:
+> From: Horia Geanta <horia.geanta@nxp.com>
 > 
-> add .shutdown hook in caam_jr driver to support kexec boot
+> Issues:
+> - Job ring device is busy when do kexec reboot
+> - Failed to flush job ring when do system suspend-resume
 > 
-> Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
+> Fix:
+> Flush the job ring to stop the running jobs.
+> 
+> Signed-off-by: Horia Geanta <horia.geanta@nxp.com>
+> Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
 
 Tested-by: Vijay Balakrishna <vijayb@linux.microsoft.com>
 
 Thanks,
 Vijay
 
+
 > ---
->   drivers/crypto/caam/jr.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+>   drivers/crypto/caam/jr.c | 53 +++++++++++++++++++++++++++++++++-------
+>   1 file changed, 44 insertions(+), 9 deletions(-)
 > 
 > diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> index 8745fe3cb575..a2a99d09b4ad 100644
+> index 724fdec18bf9..8745fe3cb575 100644
 > --- a/drivers/crypto/caam/jr.c
 > +++ b/drivers/crypto/caam/jr.c
-> @@ -198,6 +198,11 @@ static int caam_jr_remove(struct platform_device *pdev)
->   	return ret;
+> @@ -72,19 +72,27 @@ static void caam_jr_crypto_engine_exit(void *data)
+>   	crypto_engine_exit(jrpriv->engine);
 >   }
 >   
-> +static void caam_jr_platform_shutdown(struct platform_device *pdev)
-> +{
-> +	caam_jr_remove(pdev);
+> -static int caam_reset_hw_jr(struct device *dev)
+> +/*
+> + * Put the CAAM in quiesce, ie stop
+> + *
+> + * Must be called with itr disabled
+> + */
+> +static int caam_jr_stop_processing(struct device *dev, u32 jrcr_bits)
+>   {
+>   	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+>   	unsigned int timeout = 100000;
+>   
+> -	/*
+> -	 * mask interrupts since we are going to poll
+> -	 * for reset completion status
+> -	 */
+> -	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
+> +	/* Check the current status */
+> +	if (rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_INPROGRESS)
+> +		goto wait_quiesce_completion;
+>   
+> -	/* initiate flush (required prior to reset) */
+> -	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
+> +	/* Reset the field */
+> +	clrsetbits_32(&jrp->rregs->jrintstatus, JRINT_ERR_HALT_MASK, 0);
+> +
+> +	/* initiate flush / park (required prior to reset) */
+> +	wr_reg32(&jrp->rregs->jrcommand, jrcr_bits);
+> +
+> +wait_quiesce_completion:
+>   	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
+>   		JRINT_ERR_HALT_INPROGRESS) && --timeout)
+>   		cpu_relax();
+> @@ -95,8 +103,35 @@ static int caam_reset_hw_jr(struct device *dev)
+>   		return -EIO;
+>   	}
+>   
+> +	return 0;
 > +}
 > +
->   /* Main per-ring interrupt handler */
->   static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
->   {
-> @@ -653,6 +658,7 @@ static struct platform_driver caam_jr_driver = {
->   	},
->   	.probe       = caam_jr_probe,
->   	.remove      = caam_jr_remove,
-> +	.shutdown = caam_jr_platform_shutdown,
->   };
->   
->   static int __init jr_driver_init(void)
+> +/*
+> + * Flush the job ring, so the jobs running will be stopped, jobs queued will be
+> + * invalidated and the CAAM will no longer fetch fron input ring.
+> + *
+> + * Must be called with itr disabled
+> + */
+> +static int caam_jr_flush(struct device *dev)
+> +{
+> +	return caam_jr_stop_processing(dev, JRCR_RESET);
+> +}
+> +
+> +static int caam_reset_hw_jr(struct device *dev)
+> +{
+> +	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+> +	unsigned int timeout = 100000;
+> +	int err;
+> +	/*
+> +	 * mask interrupts since we are going to poll
+> +	 * for reset completion status
+> +	 */
+> +	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
+> +	err = caam_jr_flush(dev);
+> +	if (err)
+> +		return err;
+> +
+>   	/* initiate reset */
+> -	timeout = 100000;
+>   	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
+>   	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
+>   		cpu_relax();
