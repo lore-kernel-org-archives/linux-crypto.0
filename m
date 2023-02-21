@@ -2,685 +2,147 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C04D8C678DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 03:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3030C61DA3
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 05:41:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232697AbjBUDkx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 22:40:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35706 "EHLO
+        id S232956AbjBUFlU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Feb 2023 00:41:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233512AbjBUDkt (ORCPT
+        with ESMTP id S232324AbjBUFlT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 22:40:49 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD54E2413A;
-        Mon, 20 Feb 2023 19:40:37 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31L2wsC1003730;
-        Tue, 21 Feb 2023 03:40:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=q2sRlkufa3bIZdUCXvmGmQAPqGsdWaVIMG/eH9asV/U=;
- b=QlFzJHI0eBGL5PWMuT8UltikQBPHGLqxN7m0gEVEkLVSXvzxPPNjB9v7dtKCFMPFV8/+
- C/2dUWrlP3lFivjDfgVQvc3tgPr2q2xirAucfQZGc5KGva2i/2sYuul1B4yZT5p39Vsr
- QnoMKUFYXPW5t5xawKfZ+ffEZT6jOIW8axbjxnRX7UMXgJugG0Y8MKbXG6uX1QCttuQq
- 5QQkv9qQk7ORj4WVPTyZnyu3iBDjztKbaWBdZCxKyDPRsyxC8koshNe/rd6q3GUjY/RK
- SN+L8qyhP7JeYHDk5dv08aSp/2ZvSUDYo4iElGWAWMChA89plyf27fRylt1cvHP7TSxq 1g== 
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nvnn98qha-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 03:40:30 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 31L2txRP016332;
-        Tue, 21 Feb 2023 03:40:29 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
-        by ppma02wdc.us.ibm.com (PPS) with ESMTPS id 3ntpa78nu0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 03:40:29 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 31L3eRxl30474924
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 Feb 2023 03:40:27 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0F99B5805D;
-        Tue, 21 Feb 2023 03:40:27 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C946258059;
-        Tue, 21 Feb 2023 03:40:26 +0000 (GMT)
-Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
-        by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 21 Feb 2023 03:40:26 +0000 (GMT)
-From:   Danny Tsen <dtsen@linux.ibm.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
-        dtsen@us.ibm.com, Danny Tsen <dtsen@linux.ibm.com>
-Subject: [RESEND PATCH v4 3/6] Supporting functions for AES.
-Date:   Mon, 20 Feb 2023 22:40:18 -0500
-Message-Id: <20230221034021.15121-4-dtsen@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230221034021.15121-1-dtsen@linux.ibm.com>
-References: <20230221034021.15121-1-dtsen@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: wfncQbJ-S2DOK4uwMPlTSpJBOad6Pv39
-X-Proofpoint-GUID: wfncQbJ-S2DOK4uwMPlTSpJBOad6Pv39
+        Tue, 21 Feb 2023 00:41:19 -0500
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2088.outbound.protection.outlook.com [40.107.20.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68851D93C;
+        Mon, 20 Feb 2023 21:41:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LHvDTJveeyR1ESbhsQ7qbj/B8zMw6SlgO11K3DWydcLaBHXFahTMGZ2kyxAByjUcvjdrjPJzianOh4dga57ZduPiQENutTP5XsDNlMydmULubO1yP/C1ke2XP4YfYa06FwyfPAP69YTh1Q4cRrBD3oESaMPHsaAXi6TcG/aUDF3ROSnvnCl9mkksOUGP61guodvi3JtnOsdHyscvu0/vqjijFRhQ92dLLgZqXzn8eYHxvxTEiJJlXvyMUP87BizQW79nx5lOaNbgx2FMFPwNFjvCdsz/bljHdVJd0KEf6Mrz0mdTvWUfYbZitRtzxYqs90DJSTEscMQkhZCaXDRkiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=h7jBEZCklkP/XzXteWJEE6Cz47LBC6NYxQELvdV7c7c=;
+ b=C1tfio1uEBxXaA8YflvXojow8xhS01b2yThbOB1BS3HVc0Ai/gDZx1dhgLmGgKDcACHKzS7EN5pnYg1CABqSJNlxbv8k+af1gtOgS0sk8v+jppgkCHb3MoBivicwbTDePdEEs9aXMzWKRWTvhB6/asBdj57CQEMft7LffxT/kpL3dCp4B8DNtKTNm7XQQTvFgyk57w29MBq7zy2tNhdjDwkLjf4xxWycRNcD58CFCwLbmciw1wYjy6XXwetPDc9Oz0p3E8PfL7FlNb1z1lp4WQtVlrw7gITnvLXXnjXwz3sqtjNpS1TuPiLctxw2yTwcJg+ngt78alO8WQbXuc26jA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=h7jBEZCklkP/XzXteWJEE6Cz47LBC6NYxQELvdV7c7c=;
+ b=d8oMQry5LBUIcR2KvPf5/jHfX73w5yxQGiDxG1i1QmL2WWdn9yAgKleOsNTQuhz/QeMyGP1nVlPsFthvonSMGDjo+Fxg1wELb7fdRHMtGRM+QToqbJdsf6qcAqznuaTt9GHkTNW1NbYELUBHKb3Vs4nlt7Fx68gilDAYVtaQqgc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
+ by AS8PR04MB8577.eurprd04.prod.outlook.com (2603:10a6:20b:424::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6111.21; Tue, 21 Feb
+ 2023 05:41:15 +0000
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::a518:512c:4af1:276e]) by DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::a518:512c:4af1:276e%5]) with mapi id 15.20.6111.021; Tue, 21 Feb 2023
+ 05:41:15 +0000
+From:   meenakshi.aggarwal@nxp.com
+To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, franck.lenormand@nxp.com
+Cc:     vijayb@linux.microsoft.com, code@tyhicks.com
+Subject: [PATCH] drivers: crypto: caam: jr: add .shutdown hook
+Date:   Tue, 21 Feb 2023 11:10:47 +0530
+Message-Id: <20230221054047.2140558-1-meenakshi.aggarwal@nxp.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230220105033.1449263-1-meenakshi.aggarwal@nxp.com>
+References: <20230220105033.1449263-1-meenakshi.aggarwal@nxp.com>
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR02CA0032.apcprd02.prod.outlook.com
+ (2603:1096:4:195::12) To DU0PR04MB9563.eurprd04.prod.outlook.com
+ (2603:10a6:10:314::7)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-20_19,2023-02-20_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 impostorscore=0 adultscore=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 bulkscore=0 clxscore=1015 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302210030
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS8PR04MB8577:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5ee0cfab-15e1-49f8-3db6-08db13ce3f5a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: t+7UVPuyrnO+Yptn49OzoOgzPh7fJNKKqWg3Zg8crIRth6bYVg8aSSXGQtnuri/aGXWbiKsFm1Nn3A3DpkqhwVPC0Qf62VI3im3vDjzHzdSxd2ZF4MVSU2vTn/oSuCxntXLWsPGOnIKy3q/YAI079Ly0ZmolWDksjUK2fnYHmwlowCsBqgpDKOoVf0lOeTT3DepqeND6ORiRFQbv/g6rz23/yWnHq1axJtYoFw/UcF8nofBxbgFhcIXvL1U8oW9OyFp5vkCAM4SPwUa5l1R8VnjzmiYVI5gl79ptVug/JIApJAviHQWgpWw6aAsLKgWzicAoa6DNi039zm6qk0HnUlxonFhILT1xyWumi6r0l4VZLcaOITiFizbRRg3IE1nSlrCjjnlzwD8M+XcMEekLmuvhKEsttPpVsyKmI09wlkUVQoyLumInjba61LqfWISpasjNWCaKxqtR6DtYv6RwHQyXXkUGDY0RACP9F6o3v0fIFzK5p04GGhqAha4A2zLE9q16BWO3y5e+ygzn507UL5XvgC/JRyMzeuHkCeE8u7xGUCH15yj2GWxYVEpwG07v/yPIS6FQViG1FPH8bSbGn3ykvctX1Cq1RG9TWsjyT4Ixw2LLGz4+5PeyjmSB6wkXZaXxbNeWzidGIxVSneMg9TVQ+tEQkg8dDi3EoflDVzeuM2OIUAEY2Fbnm83Mrf2pHxHWrmx04f1q5w3tsXYRoCFgtlBI06YHTAY4dsF/v24=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(376002)(136003)(39860400002)(396003)(451199018)(38100700002)(38350700002)(2906002)(8936002)(5660300002)(4744005)(6512007)(26005)(9686003)(186003)(41300700001)(2616005)(36756003)(8676002)(66476007)(66556008)(66946007)(4326008)(6486002)(52116002)(86362001)(6506007)(478600001)(6666004)(316002)(1076003)(142923001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?30Leq90Zle+MeIiwfqfyf38aXb7l10EmGJbvNhqDRKa0OZeACbkHIm+nxW6E?=
+ =?us-ascii?Q?lrlJbCF0JSjeF71/SaG2DnSQ9Q8AoUgyj8fv7225AW3wcw1GwXBjXXQ69edO?=
+ =?us-ascii?Q?PPFfzYxRZiLXqJd0aImIs/wGhJJZN8KPKr+aDETtQ1IvVUZ6YtPVEuGI9QZu?=
+ =?us-ascii?Q?WFkOlNdNppdarLno83+HrZvWF43ozrzTJ6GO9MNHctoCgLD1mGmswbVcHUQO?=
+ =?us-ascii?Q?APpKw+aJLXwNHbm9203ZlCPDZ+d7GAum6OCVXeqwxIfqH4HO7aL+c1uNOVUT?=
+ =?us-ascii?Q?Cqe4a9uSNcRDAxsipkzDPYA+DeHZ3bHFQgSSH3xWLDASiOEjL1qhHdf3g9z8?=
+ =?us-ascii?Q?XAfNcPV6tD746a+e62TIPt/6E3djMSoiUWyWebsT1Joz4lF0fdxTVXovt3Si?=
+ =?us-ascii?Q?xLusb2pJMB5zWRvn+PU0R8hk6PdvG050rliDsIoq8+zAlbtJiX4JAq8aFPZa?=
+ =?us-ascii?Q?HGEulRQ00SEyy7kjYcRTAVp7PeUwyBb1hha+pecWIuXufvhzdZLiqo7CvtmX?=
+ =?us-ascii?Q?9I5WlVColpQAzqJldWAv4q5kzeh999GB6acD6aBuLh7h6SERJzwiIEEaIoXD?=
+ =?us-ascii?Q?ELvbujEb72A/7XeycRIw/8u6Im04veBpJNCtsZVklIJje7BAWc/dqbwbTUMG?=
+ =?us-ascii?Q?B/iZT7rVrIlGoJjfalKZU96+M+5nSxNuSznoPkxYiy05fBEvYNqVgkCGdqQZ?=
+ =?us-ascii?Q?BhR1DVoCtz6faIap7VtFF211hNJJTea/hbcqn2Y6tcK3WzsdFhg7HWKxQ1as?=
+ =?us-ascii?Q?AeXgtv5rEmp8O2b8ZiXzCrCNwDpBUJbKnEb4ZU8/GSHj0Q0DUPAnnb+JtFdc?=
+ =?us-ascii?Q?oT3+taXiqV/+eSCj/kOCsTlUJ3OQLkX86Cd/L470zYPiuswyfF5W3GfMHK5o?=
+ =?us-ascii?Q?Us6J+mBjtOvLUas1YunJPF0lMHcFMxEeXOUSam4otXTtIPK6Om+zdcWS7lHF?=
+ =?us-ascii?Q?IXlR30EQRW2pGj2fIhFEinvhFhJzh7aAB98gXYJUTKn5A7cTZIUZYNsnLaCG?=
+ =?us-ascii?Q?W6anPlD9CHmHZBw1w+85n0aejrjoyfTpPVlOh1PxYf1l713A9PxqU1WsZdIr?=
+ =?us-ascii?Q?fyIYjPfzwu1HNRmdzs/kN/ceeaF1AvVUsnjtA0WY/a8VKvB8aNfSHYud8Yeb?=
+ =?us-ascii?Q?RQXjTysXKKuo28ZvULHGcqVWc4rjqy6lSWqoamrghZ9FTxd4bN7yhEz0vpUU?=
+ =?us-ascii?Q?yn3VMHpCvcNMZRg0kcIUjWVimD9T1YvqE2Wnphg9QUgX+hDb/HY1MB1qJJPF?=
+ =?us-ascii?Q?K7JjHoi4oPlv5KwetV8vRZU8UFQwX/dMRs0yPTVwWOQPd5ZZFLfamVyo1bcR?=
+ =?us-ascii?Q?PK4yhIwt/jbrdC1VotlYRn8p5ssky4oBUXpMEs8U86cm5y1jG8PzXTQBKyMs?=
+ =?us-ascii?Q?Sj5wIt0vBup932Mt1shdR+/bSlEBfPegX3N6jyzaSQjwalDG1zhx0FgrhMnt?=
+ =?us-ascii?Q?4iFL8n1Wn1Nd/TuUHYk7noowwelBng/TIvxR2f82utTVg1OVy6ABXpfL3+a0?=
+ =?us-ascii?Q?k+YVFmP0y/Wh404XoZKMG3CkkoGzWOFxetuws5ukDKz8dJqxhc9Tm1VgOy05?=
+ =?us-ascii?Q?f8GuuQhCpRcFKyE6EIHYEgqXKwc8l1IwLSI6oN6K/XTY+Mra7A3MgJ5Ytf6n?=
+ =?us-ascii?Q?ow=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ee0cfab-15e1-49f8-3db6-08db13ce3f5a
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2023 05:41:15.3875
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3eZogWMf3FlLt9istdMM98N6WgqvBmrvoWSZhaRj+YLyrWYYqfWLoss5zOiJ1OkY78USLH7kP5iYhNZgy43pBGX5kKsNrE6rtVcpngZPMNI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8577
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This code is taken from CRYPTOGAMs[1].  The following functions are used,
-aes_p8_set_encrypt_key is used to generate AES round keys and aes_p8_encrypt is used
-to encrypt single block.
+From: Gaurav Jain <gaurav.jain@nxp.com>
 
-Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+add .shutdown hook in caam_jr driver to support kexec boot
+
+Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
 ---
- arch/powerpc/crypto/aesp8-ppc.pl | 585 +++++++++++++++++++++++++++++++
- 1 file changed, 585 insertions(+)
- create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
+ drivers/crypto/caam/jr.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/powerpc/crypto/aesp8-ppc.pl b/arch/powerpc/crypto/aesp8-ppc.pl
-new file mode 100644
-index 000000000000..1f22aec27d79
---- /dev/null
-+++ b/arch/powerpc/crypto/aesp8-ppc.pl
-@@ -0,0 +1,585 @@
-+#! /usr/bin/env perl
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This code is taken from CRYPTOGAMs[1] and is included here using the option
-+# in the license to distribute the code under the GPL. Therefore this program
-+# is free software; you can redistribute it and/or modify it under the terms of
-+# the GNU General Public License version 2 as published by the Free Software
-+# Foundation.
-+#
-+# [1] https://www.openssl.org/~appro/cryptogams/
-+
-+# Copyright (c) 2006-2017, CRYPTOGAMS by <appro@openssl.org>
-+# All rights reserved.
-+#
-+# Redistribution and use in source and binary forms, with or without
-+# modification, are permitted provided that the following conditions
-+# are met:
-+#
-+#       * Redistributions of source code must retain copyright notices,
-+#         this list of conditions and the following disclaimer.
-+#
-+#       * Redistributions in binary form must reproduce the above
-+#         copyright notice, this list of conditions and the following
-+#         disclaimer in the documentation and/or other materials
-+#         provided with the distribution.
-+#
-+#       * Neither the name of the CRYPTOGAMS nor the names of its
-+#         copyright holder and contributors may be used to endorse or
-+#         promote products derived from this software without specific
-+#         prior written permission.
-+#
-+# ALTERNATIVELY, provided that this notice is retained in full, this
-+# product may be distributed under the terms of the GNU General Public
-+# License (GPL), in which case the provisions of the GPL apply INSTEAD OF
-+# those given above.
-+#
-+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS
-+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-+
-+# ====================================================================
-+# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-+# project. The module is, however, dual licensed under OpenSSL and
-+# CRYPTOGAMS licenses depending on where you obtain it. For further
-+# details see https://www.openssl.org/~appro/cryptogams/.
-+# ====================================================================
-+#
-+# This module implements support for AES instructions as per PowerISA
-+# specification version 2.07, first implemented by POWER8 processor.
-+# The module is endian-agnostic in sense that it supports both big-
-+# and little-endian cases. Data alignment in parallelizable modes is
-+# handled with VSX loads and stores, which implies MSR.VSX flag being
-+# set. It should also be noted that ISA specification doesn't prohibit
-+# alignment exceptions for these instructions on page boundaries.
-+# Initially alignment was handled in pure AltiVec/VMX way [when data
-+# is aligned programmatically, which in turn guarantees exception-
-+# free execution], but it turned to hamper performance when vcipher
-+# instructions are interleaved. It's reckoned that eventual
-+# misalignment penalties at page boundaries are in average lower
-+# than additional overhead in pure AltiVec approach.
-+#
-+# May 2016
-+#
-+# Add XTS subroutine, 9x on little- and 12x improvement on big-endian
-+# systems were measured.
-+#
-+######################################################################
-+# Current large-block performance in cycles per byte processed with
-+# 128-bit key (less is better).
-+#
-+#		CBC en-/decrypt	CTR	XTS
-+# POWER8[le]	3.96/0.72	0.74	1.1
-+# POWER8[be]	3.75/0.65	0.66	1.0
-+
-+$flavour = shift;
-+
-+if ($flavour =~ /64/) {
-+	$SIZE_T	=8;
-+	$LRSAVE	=2*$SIZE_T;
-+	$STU	="stdu";
-+	$POP	="ld";
-+	$PUSH	="std";
-+	$UCMP	="cmpld";
-+	$SHL	="sldi";
-+} elsif ($flavour =~ /32/) {
-+	$SIZE_T	=4;
-+	$LRSAVE	=$SIZE_T;
-+	$STU	="stwu";
-+	$POP	="lwz";
-+	$PUSH	="stw";
-+	$UCMP	="cmplw";
-+	$SHL	="slwi";
-+} else { die "nonsense $flavour"; }
-+
-+$LITTLE_ENDIAN = ($flavour=~/le$/) ? $SIZE_T : 0;
-+
-+$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-+( $xlate="${dir}ppc-xlate.pl" and -f $xlate ) or
-+( $xlate="${dir}../../perlasm/ppc-xlate.pl" and -f $xlate) or
-+die "can't locate ppc-xlate.pl";
-+
-+open STDOUT,"| $^X $xlate $flavour ".shift || die "can't call $xlate: $!";
-+
-+$FRAME=8*$SIZE_T;
-+$prefix="aes_p8";
-+
-+$sp="r1";
-+$vrsave="r12";
-+
-+#########################################################################
-+{{{	# Key setup procedures						#
-+my ($inp,$bits,$out,$ptr,$cnt,$rounds)=map("r$_",(3..8));
-+my ($zero,$in0,$in1,$key,$rcon,$mask,$tmp)=map("v$_",(0..6));
-+my ($stage,$outperm,$outmask,$outhead,$outtail)=map("v$_",(7..11));
-+
-+$code.=<<___;
-+.machine	"any"
-+
-+.text
-+
-+.align	7
-+rcon:
-+.long	0x01000000, 0x01000000, 0x01000000, 0x01000000	?rev
-+.long	0x1b000000, 0x1b000000, 0x1b000000, 0x1b000000	?rev
-+.long	0x0d0e0f0c, 0x0d0e0f0c, 0x0d0e0f0c, 0x0d0e0f0c	?rev
-+.long	0,0,0,0						?asis
-+Lconsts:
-+	mflr	r0
-+	bcl	20,31,\$+4
-+	mflr	$ptr	 #vvvvv "distance between . and rcon
-+	addi	$ptr,$ptr,-0x48
-+	mtlr	r0
-+	blr
-+	.long	0
-+	.byte	0,12,0x14,0,0,0,0,0
-+.asciz	"AES for PowerISA 2.07, CRYPTOGAMS by <appro\@openssl.org>"
-+
-+.globl	.${prefix}_set_encrypt_key
-+Lset_encrypt_key:
-+	mflr		r11
-+	$PUSH		r11,$LRSAVE($sp)
-+
-+	li		$ptr,-1
-+	${UCMP}i	$inp,0
-+	beq-		Lenc_key_abort		# if ($inp==0) return -1;
-+	${UCMP}i	$out,0
-+	beq-		Lenc_key_abort		# if ($out==0) return -1;
-+	li		$ptr,-2
-+	cmpwi		$bits,128
-+	blt-		Lenc_key_abort
-+	cmpwi		$bits,256
-+	bgt-		Lenc_key_abort
-+	andi.		r0,$bits,0x3f
-+	bne-		Lenc_key_abort
-+
-+	lis		r0,0xfff0
-+	mfspr		$vrsave,256
-+	mtspr		256,r0
-+
-+	bl		Lconsts
-+	mtlr		r11
-+
-+	neg		r9,$inp
-+	lvx		$in0,0,$inp
-+	addi		$inp,$inp,15		# 15 is not typo
-+	lvsr		$key,0,r9		# borrow $key
-+	li		r8,0x20
-+	cmpwi		$bits,192
-+	lvx		$in1,0,$inp
-+	le?vspltisb	$mask,0x0f		# borrow $mask
-+	lvx		$rcon,0,$ptr
-+	le?vxor		$key,$key,$mask		# adjust for byte swap
-+	lvx		$mask,r8,$ptr
-+	addi		$ptr,$ptr,0x10
-+	vperm		$in0,$in0,$in1,$key	# align [and byte swap in LE]
-+	li		$cnt,8
-+	vxor		$zero,$zero,$zero
-+	mtctr		$cnt
-+
-+	?lvsr		$outperm,0,$out
-+	vspltisb	$outmask,-1
-+	lvx		$outhead,0,$out
-+	?vperm		$outmask,$zero,$outmask,$outperm
-+
-+	blt		Loop128
-+	addi		$inp,$inp,8
-+	beq		L192
-+	addi		$inp,$inp,8
-+	b		L256
-+
-+.align	4
-+Loop128:
-+	vperm		$key,$in0,$in0,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in0,$in0,$key
-+	bdnz		Loop128
-+
-+	lvx		$rcon,0,$ptr		# last two round keys
-+
-+	vperm		$key,$in0,$in0,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in0,$in0,$key
-+
-+	vperm		$key,$in0,$in0,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vxor		$in0,$in0,$key
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+
-+	addi		$inp,$out,15		# 15 is not typo
-+	addi		$out,$out,0x50
-+
-+	li		$rounds,10
-+	b		Ldone
-+
-+.align	4
-+L192:
-+	lvx		$tmp,0,$inp
-+	li		$cnt,4
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+	vperm		$in1,$in1,$tmp,$key	# align [and byte swap in LE]
-+	vspltisb	$key,8			# borrow $key
-+	mtctr		$cnt
-+	vsububm		$mask,$mask,$key	# adjust the mask
-+
-+Loop192:
-+	vperm		$key,$in1,$in1,$mask	# roate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	vcipherlast	$key,$key,$rcon
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+
-+	 vsldoi		$stage,$zero,$in1,8
-+	vspltw		$tmp,$in0,3
-+	vxor		$tmp,$tmp,$in1
-+	vsldoi		$in1,$zero,$in1,12	# >>32
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in1,$in1,$tmp
-+	vxor		$in0,$in0,$key
-+	vxor		$in1,$in1,$key
-+	 vsldoi		$stage,$stage,$in0,8
-+
-+	vperm		$key,$in1,$in1,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$stage,$stage,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	 vsldoi		$stage,$in0,$in1,8
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	 vperm		$outtail,$stage,$stage,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vspltw		$tmp,$in0,3
-+	vxor		$tmp,$tmp,$in1
-+	vsldoi		$in1,$zero,$in1,12	# >>32
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in1,$in1,$tmp
-+	vxor		$in0,$in0,$key
-+	vxor		$in1,$in1,$key
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$inp,$out,15		# 15 is not typo
-+	 addi		$out,$out,16
-+	bdnz		Loop192
-+
-+	li		$rounds,12
-+	addi		$out,$out,0x20
-+	b		Ldone
-+
-+.align	4
-+L256:
-+	lvx		$tmp,0,$inp
-+	li		$cnt,7
-+	li		$rounds,14
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+	vperm		$in1,$in1,$tmp,$key	# align [and byte swap in LE]
-+	mtctr		$cnt
-+
-+Loop256:
-+	vperm		$key,$in1,$in1,$mask	# rotate-n-splat
-+	vsldoi		$tmp,$zero,$in0,12	# >>32
-+	 vperm		$outtail,$in1,$in1,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	vcipherlast	$key,$key,$rcon
-+	 stvx		$stage,0,$out
-+	 addi		$out,$out,16
-+
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in0,$in0,$tmp
-+	 vadduwm	$rcon,$rcon,$rcon
-+	vxor		$in0,$in0,$key
-+	 vperm		$outtail,$in0,$in0,$outperm	# rotate
-+	 vsel		$stage,$outhead,$outtail,$outmask
-+	 vmr		$outhead,$outtail
-+	 stvx		$stage,0,$out
-+	 addi		$inp,$out,15		# 15 is not typo
-+	 addi		$out,$out,16
-+	bdz		Ldone
-+
-+	vspltw		$key,$in0,3		# just splat
-+	vsldoi		$tmp,$zero,$in1,12	# >>32
-+	vsbox		$key,$key
-+
-+	vxor		$in1,$in1,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in1,$in1,$tmp
-+	vsldoi		$tmp,$zero,$tmp,12	# >>32
-+	vxor		$in1,$in1,$tmp
-+
-+	vxor		$in1,$in1,$key
-+	b		Loop256
-+
-+.align	4
-+Ldone:
-+	lvx		$in1,0,$inp		# redundant in aligned case
-+	vsel		$in1,$outhead,$in1,$outmask
-+	stvx		$in1,0,$inp
-+	li		$ptr,0
-+	mtspr		256,$vrsave
-+	stw		$rounds,0($out)
-+
-+Lenc_key_abort:
-+	mr		r3,$ptr
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,1,0,0,3,0
-+	.long		0
-+.size	.${prefix}_set_encrypt_key,.-.${prefix}_set_encrypt_key
-+
-+.globl	.${prefix}_set_decrypt_key
-+	$STU		$sp,-$FRAME($sp)
-+	mflr		r10
-+	$PUSH		r10,$FRAME+$LRSAVE($sp)
-+	bl		Lset_encrypt_key
-+	mtlr		r10
-+
-+	cmpwi		r3,0
-+	bne-		Ldec_key_abort
-+
-+	slwi		$cnt,$rounds,4
-+	subi		$inp,$out,240		# first round key
-+	srwi		$rounds,$rounds,1
-+	add		$out,$inp,$cnt		# last round key
-+	mtctr		$rounds
-+
-+Ldeckey:
-+	lwz		r0, 0($inp)
-+	lwz		r6, 4($inp)
-+	lwz		r7, 8($inp)
-+	lwz		r8, 12($inp)
-+	addi		$inp,$inp,16
-+	lwz		r9, 0($out)
-+	lwz		r10,4($out)
-+	lwz		r11,8($out)
-+	lwz		r12,12($out)
-+	stw		r0, 0($out)
-+	stw		r6, 4($out)
-+	stw		r7, 8($out)
-+	stw		r8, 12($out)
-+	subi		$out,$out,16
-+	stw		r9, -16($inp)
-+	stw		r10,-12($inp)
-+	stw		r11,-8($inp)
-+	stw		r12,-4($inp)
-+	bdnz		Ldeckey
-+
-+	xor		r3,r3,r3		# return value
-+Ldec_key_abort:
-+	addi		$sp,$sp,$FRAME
-+	blr
-+	.long		0
-+	.byte		0,12,4,1,0x80,0,3,0
-+	.long		0
-+.size	.${prefix}_set_decrypt_key,.-.${prefix}_set_decrypt_key
-+___
-+}}}
-+#########################################################################
-+{{{	# Single block en- and decrypt procedures			#
-+sub gen_block () {
-+my $dir = shift;
-+my $n   = $dir eq "de" ? "n" : "";
-+my ($inp,$out,$key,$rounds,$idx)=map("r$_",(3..7));
-+
-+$code.=<<___;
-+.globl	.${prefix}_${dir}crypt
-+	lwz		$rounds,240($key)
-+	lis		r0,0xfc00
-+	mfspr		$vrsave,256
-+	li		$idx,15			# 15 is not typo
-+	mtspr		256,r0
-+
-+	lvx		v0,0,$inp
-+	neg		r11,$out
-+	lvx		v1,$idx,$inp
-+	lvsl		v2,0,$inp		# inpperm
-+	le?vspltisb	v4,0x0f
-+	?lvsl		v3,0,r11		# outperm
-+	le?vxor		v2,v2,v4
-+	li		$idx,16
-+	vperm		v0,v0,v1,v2		# align [and byte swap in LE]
-+	lvx		v1,0,$key
-+	?lvsl		v5,0,$key		# keyperm
-+	srwi		$rounds,$rounds,1
-+	lvx		v2,$idx,$key
-+	addi		$idx,$idx,16
-+	subi		$rounds,$rounds,1
-+	?vperm		v1,v1,v2,v5		# align round key
-+
-+	vxor		v0,v0,v1
-+	lvx		v1,$idx,$key
-+	addi		$idx,$idx,16
-+	mtctr		$rounds
-+
-+Loop_${dir}c:
-+	?vperm		v2,v2,v1,v5
-+	v${n}cipher	v0,v0,v2
-+	lvx		v2,$idx,$key
-+	addi		$idx,$idx,16
-+	?vperm		v1,v1,v2,v5
-+	v${n}cipher	v0,v0,v1
-+	lvx		v1,$idx,$key
-+	addi		$idx,$idx,16
-+	bdnz		Loop_${dir}c
-+
-+	?vperm		v2,v2,v1,v5
-+	v${n}cipher	v0,v0,v2
-+	lvx		v2,$idx,$key
-+	?vperm		v1,v1,v2,v5
-+	v${n}cipherlast	v0,v0,v1
-+
-+	vspltisb	v2,-1
-+	vxor		v1,v1,v1
-+	li		$idx,15			# 15 is not typo
-+	?vperm		v2,v1,v2,v3		# outmask
-+	le?vxor		v3,v3,v4
-+	lvx		v1,0,$out		# outhead
-+	vperm		v0,v0,v0,v3		# rotate [and byte swap in LE]
-+	vsel		v1,v1,v0,v2
-+	lvx		v4,$idx,$out
-+	stvx		v1,0,$out
-+	vsel		v0,v0,v4,v2
-+	stvx		v0,$idx,$out
-+
-+	mtspr		256,$vrsave
-+	blr
-+	.long		0
-+	.byte		0,12,0x14,0,0,0,3,0
-+	.long		0
-+.size	.${prefix}_${dir}crypt,.-.${prefix}_${dir}crypt
-+___
-+}
-+&gen_block("en");
-+&gen_block("de");
-+}}}
-+
-+my $consts=1;
-+foreach(split("\n",$code)) {
-+        s/\`([^\`]*)\`/eval($1)/geo;
-+
-+	# constants table endian-specific conversion
-+	if ($consts && m/\.(long|byte)\s+(.+)\s+(\?[a-z]*)$/o) {
-+	    my $conv=$3;
-+	    my @bytes=();
-+
-+	    # convert to endian-agnostic format
-+	    if ($1 eq "long") {
-+	      foreach (split(/,\s*/,$2)) {
-+		my $l = /^0/?oct:int;
-+		push @bytes,($l>>24)&0xff,($l>>16)&0xff,($l>>8)&0xff,$l&0xff;
-+	      }
-+	    } else {
-+		@bytes = map(/^0/?oct:int,split(/,\s*/,$2));
-+	    }
-+
-+	    # little-endian conversion
-+	    if ($flavour =~ /le$/o) {
-+		SWITCH: for($conv)  {
-+		    /\?inv/ && do   { @bytes=map($_^0xf,@bytes); last; };
-+		    /\?rev/ && do   { @bytes=reverse(@bytes);    last; };
-+		}
-+	    }
-+
-+	    #emit
-+	    print ".byte\t",join(',',map (sprintf("0x%02x",$_),@bytes)),"\n";
-+	    next;
-+	}
-+	$consts=0 if (m/Lconsts:/o);	# end of table
-+
-+	# instructions prefixed with '?' are endian-specific and need
-+	# to be adjusted accordingly...
-+	if ($flavour =~ /le$/o) {	# little-endian
-+	    s/le\?//o		or
-+	    s/be\?/#be#/o	or
-+	    s/\?lvsr/lvsl/o	or
-+	    s/\?lvsl/lvsr/o	or
-+	    s/\?(vperm\s+v[0-9]+,\s*)(v[0-9]+,\s*)(v[0-9]+,\s*)(v[0-9]+)/$1$3$2$4/o or
-+	    s/\?(vsldoi\s+v[0-9]+,\s*)(v[0-9]+,)\s*(v[0-9]+,\s*)([0-9]+)/$1$3$2 16-$4/o or
-+	    s/\?(vspltw\s+v[0-9]+,\s*)(v[0-9]+,)\s*([0-9])/$1$2 3-$3/o;
-+	} else {			# big-endian
-+	    s/le\?/#le#/o	or
-+	    s/be\?//o		or
-+	    s/\?([a-z]+)/$1/o;
-+	}
-+
-+        print $_,"\n";
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 8745fe3cb575..a2a99d09b4ad 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -198,6 +198,11 @@ static int caam_jr_remove(struct platform_device *pdev)
+ 	return ret;
+ }
+ 
++static void caam_jr_platform_shutdown(struct platform_device *pdev)
++{
++	caam_jr_remove(pdev);
 +}
 +
-+close STDOUT;
+ /* Main per-ring interrupt handler */
+ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ {
+@@ -653,6 +658,7 @@ static struct platform_driver caam_jr_driver = {
+ 	},
+ 	.probe       = caam_jr_probe,
+ 	.remove      = caam_jr_remove,
++	.shutdown = caam_jr_platform_shutdown,
+ };
+ 
+ static int __init jr_driver_init(void)
 -- 
-2.31.1
+2.25.1
 
