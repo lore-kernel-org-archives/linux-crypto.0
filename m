@@ -2,63 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 958F9C636D6
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 01:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD6BC636D6
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Feb 2023 02:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232113AbjBUBeV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Feb 2023 20:34:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58778 "EHLO
+        id S233166AbjBUCpz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Feb 2023 21:45:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231976AbjBUBeU (ORCPT
+        with ESMTP id S233182AbjBUCpy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Feb 2023 20:34:20 -0500
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42B6911EA3;
-        Mon, 20 Feb 2023 17:34:18 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0Vc9haOH_1676943255;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0Vc9haOH_1676943255)
-          by smtp.aliyun-inc.com;
-          Tue, 21 Feb 2023 09:34:16 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     davem@davemloft.net
-Cc:     gilad@benyossef.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH -next] crypto: Use devm_platform_get_and_ioremap_resource()
-Date:   Tue, 21 Feb 2023 09:34:14 +0800
-Message-Id: <20230221013414.86856-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Mon, 20 Feb 2023 21:45:54 -0500
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA0D2387D;
+        Mon, 20 Feb 2023 18:45:53 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pUIev-00DlJB-3A; Tue, 21 Feb 2023 10:45:38 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 Feb 2023 10:45:37 +0800
+Date:   Tue, 21 Feb 2023 10:45:37 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Danny Tsen <dtsen@linux.ibm.com>
+Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
+        dtsen@us.ibm.com
+Subject: Re: [PATCH v4 1/6] Update Kconfig and Makefile.
+Message-ID: <Y/QwUWVhaUZ8fjO7@gondor.apana.org.au>
+References: <20230220204224.4907-1-dtsen@linux.ibm.com>
+ <20230220204224.4907-2-dtsen@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230220204224.4907-2-dtsen@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert platform_get_resource(), devm_ioremap_resource() to a single
-call to devm_platform_get_and_ioremap_resource(), as this is exactly
-what this function does.
+On Mon, Feb 20, 2023 at 03:42:19PM -0500, Danny Tsen wrote:
+> Defined CRYPTO_AES_GCM_P10 in Kconfig to support AES/GCM
+> stitched implementation for Power10 or later CPU.
+> 
+> Added a new module driver aes-gcm-p10-crypto.
+> 
+> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+> ---
+>  arch/powerpc/crypto/Kconfig  | 17 +++++++++++++++++
+>  arch/powerpc/crypto/Makefile | 13 +++++++++++++
+>  2 files changed, 30 insertions(+)
 
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- drivers/crypto/ccree/cc_driver.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Stephen mentioned this before, your patches must compile one-by-one.
+This patch doesn't build by itself so you should fix it.
 
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index d489c6f80892..c57f929805d5 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -350,9 +350,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 
- 	/* Get device resources */
- 	/* First CC registers space */
--	req_mem_cc_regs = platform_get_resource(plat_dev, IORESOURCE_MEM, 0);
- 	/* Map registers space */
--	new_drvdata->cc_base = devm_ioremap_resource(dev, req_mem_cc_regs);
-+	new_drvdata->cc_base = devm_platform_get_and_ioremap_resource(plat_dev,
-+								      0, &req_mem_cc_regs);
- 	if (IS_ERR(new_drvdata->cc_base))
- 		return PTR_ERR(new_drvdata->cc_base);
- 
+Thanks,
 -- 
-2.20.1.7.g153144c
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
