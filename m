@@ -2,368 +2,194 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76134C636D6
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 12:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA86C61DA4
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 13:33:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232107AbjBVMcY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Feb 2023 07:32:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58860 "EHLO
+        id S230440AbjBVNde (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Feb 2023 08:33:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjBVMcX (ORCPT
+        with ESMTP id S229887AbjBVNdc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2023 07:32:23 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04A33A849;
-        Wed, 22 Feb 2023 04:32:11 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id f16so7556852ljq.10;
-        Wed, 22 Feb 2023 04:32:11 -0800 (PST)
+        Wed, 22 Feb 2023 08:33:32 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C05818A83;
+        Wed, 22 Feb 2023 05:33:01 -0800 (PST)
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31M8xZnp014963;
+        Wed, 22 Feb 2023 12:16:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
+ bh=NTVuEbOZde+p/jgqvcg8eYJr95Mho3xzZ2JnVLOF9ic=;
+ b=XrOhMx3ey0pqzD7mVhK2yrNGu1u78iECLdsYvNFzufX/w02j9weGtYrO7QZEcM4RRr4q
+ 5j5J2u8YZVHS5FW18QgTqmEq47blwJxp3yWHs+meZzSfeWjAzxDJXkRVjeJJnKO4Hk8y
+ TgIhUvA+dsqGFnL4sAQwyhKl8R5gtwLS5cNcM+VbanTYmW79Q+Ewxt4i5FGKszrwuzRX
+ jecMWHkHVeQksc7cT6rj1vhQmkFkz7CxJaNkQnmGXcpCytJIewZDeiEn9C57H5nfomIl
+ a2wO2MMnrQ4QND0rhpEEi4c/KCtjfLMd8ZrUztZz8nO9ITVyXaILKaqPD94owkaUAkSX og== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ntnkbqntg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Feb 2023 12:16:19 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 31MBuiRk023484;
+        Wed, 22 Feb 2023 12:16:17 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3ntn46j55f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Feb 2023 12:16:17 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m92oiAKE+asw6ZpZp3kGxouY1gAklNfAhJ7QwN7GCRoTWi4XWfzzXtOcQbOrFKp7A9Vs1tigj6E85h1RIbFxquoZLU5lxEOgh7Ah9zyzAQWyo3SKvEoFAlzyzqpDMW/qMpRn7ogWBOTivwA6lf4bC+Yv6JULMB6tCPhivw+4fL8oheKzZ/AiQd3Iigkv5bA3ipiub0yehrmDJBQF2aZb5axVwW8XmwCxP3c8U74Aek7olhp0ltZvjgFxKYDyhdIhQ8Ca/wjQ+VjTjmLEX0mi+xZE/67Q5l5mMCgEz1TAMZpLctJixbErhqwTx1JQYl3F0sUAeNF9okTscZCdvWuVXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NTVuEbOZde+p/jgqvcg8eYJr95Mho3xzZ2JnVLOF9ic=;
+ b=TbuXSCOhPyVCT2QmyNUn5TxZ7U3wHyrxz/yy78IXlY+p6X5FleyiSDcSdD0grgyGD+fyqJUusMZDoKrqzFhqw0rMSZdzhi5c8Zlr6JcuUkknocRbY+jnWvV/wmRSJwRb6P5RDVDfxeGl8gvq7bI+SC0sjBdtJ10Uzzvn5R0gl+hofMBbf5IrQttBcMvNAL1uJNhf9vJLsw5jX2pVjjtBtElF4Oys0wVayVfCABEQFDNorsgfdiO6R/0jS06mNSxSzibO9v7vk7wHL4ey1BfTwuFVcTg8H04EActf3KZ0QAOAUAVzLloTSdxxujj95R/xvgERrH9520BG2RiNiE+ZVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677069130;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RyVpU31pGYL3hxPsk3WstIM/y2F79bUZeHHwWlTuPok=;
-        b=i5CokvbD5k4JtMJKI1HL6SznirWdNw7nvi/OtYQ8HTQkDyzsBgVTh4acYuHYa31Mgi
-         wuBrIaD8Hn1B96mrxbhRx+4n4JwiZjGhLbBO0wakqEVxXej7zJ2qZ922FKBjpUm+7xkL
-         LouG0oUfsVvYE5z8GhK1ueJMdwOb7WSdSVIlp/dSRSTFvz1h+kyegE5EPbqCSiBgskSD
-         +c55wkbx9xRC1gRjs7QPJJ+rDpV1MZR3Z7XO4lSDpc8HaoY0pfRbPxhqpxjrcBn651G0
-         5FQGGa7XSelN3Xz4Ki3RkWdXEHHvY2/oBgxs+l2bYz+ozGBog8pWXha7mT377fO5ZOsn
-         nOEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677069130;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RyVpU31pGYL3hxPsk3WstIM/y2F79bUZeHHwWlTuPok=;
-        b=DGpVx1AqATQGvW1u3uOCL5xPCDhwkyFh0sLmMgd5TBFE/rF7KrmDce4kYXcGjn4Vbe
-         V0acSuEA+CGrCWNaLFrIaf7gzpFMNc/5ezh7VImao7GfWEqiG80tvbz3zJKj9QIC5buv
-         Mf0li8fkSGEoWdF0qOHP5KlMGq7RWLM3QzE2Og91umthssmElWNframOxTrA1ehzug67
-         Ow3bpyVLGX6c6mlUrGxo8p6WzgKNG8GlHdpi83TIRm2YxnOlzu/p3h25TNMxLdoUQDPe
-         sY3eCSsm6LhDhBVA5waHPlAGmCSTgIi0ZcbKqXtxu9sMMA3jBvOvzTjmylW+Qudop+lp
-         60AQ==
-X-Gm-Message-State: AO0yUKW03yJ9i1SEPbt+08d/qEu8llft76lzpngHYmpy2jDh1j5Qf/U3
-        N+1QliaGCClRofK9cv1SEss=
-X-Google-Smtp-Source: AK7set8L/s7Y4MyMogprcSJqyYvW/jhg8Y2UPbMYOLxDa0cCPc6SZjWzN8Q3ARFPBYMui0KZq/hvVQ==
-X-Received: by 2002:a05:651c:220e:b0:295:9c3f:e30c with SMTP id y14-20020a05651c220e00b002959c3fe30cmr201590ljq.1.1677069129921;
-        Wed, 22 Feb 2023 04:32:09 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id f4-20020a19ae04000000b004cb43c9bf9asm1127438lfc.208.2023.02.22.04.32.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Feb 2023 04:32:09 -0800 (PST)
-Date:   Wed, 22 Feb 2023 14:32:05 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 27/56] crypto: ccp: Add the
- SNP_{SET,GET}_EXT_CONFIG command
-Message-ID: <20230222143205.00007635@gmail.com>
-In-Reply-To: <20230220183847.59159-28-michael.roth@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-28-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NTVuEbOZde+p/jgqvcg8eYJr95Mho3xzZ2JnVLOF9ic=;
+ b=wzqoolyJuPn2V3Y7dtdUhNGIL32FZ9q8Nl5mITeBXpYmXU9tbT5rQc1rWD6Avqh21Y3eoEgjp8cLRDZBjeSUKE3qdvrly5xlqhsjlMwRKsqLyGsEQzKFYwQPwlWnp4eSRSA69xJC7Q2Nbc/Ujdi+tx3cC+4YJbClIP3/PZ5/PCE=
+Received: from DS0PR10MB6798.namprd10.prod.outlook.com (2603:10b6:8:13c::20)
+ by IA1PR10MB6805.namprd10.prod.outlook.com (2603:10b6:208:42b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.15; Wed, 22 Feb
+ 2023 12:16:16 +0000
+Received: from DS0PR10MB6798.namprd10.prod.outlook.com
+ ([fe80::d0f7:e4fd:bd4:b760]) by DS0PR10MB6798.namprd10.prod.outlook.com
+ ([fe80::d0f7:e4fd:bd4:b760%3]) with mapi id 15.20.6134.019; Wed, 22 Feb 2023
+ 12:16:16 +0000
+From:   Nick Alcock <nick.alcock@oracle.com>
+To:     mcgrof@kernel.org
+Cc:     linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hitomi Hasegawa <hasegawa-hitomi@fujitsu.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 16/27] kbuild, crypto: remove MODULE_LICENSE in non-modules
+Date:   Wed, 22 Feb 2023 12:14:42 +0000
+Message-Id: <20230222121453.91915-17-nick.alcock@oracle.com>
+X-Mailer: git-send-email 2.39.1.268.g9de2f9a303
+In-Reply-To: <20230222121453.91915-1-nick.alcock@oracle.com>
+References: <20230222121453.91915-1-nick.alcock@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO4P123CA0318.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:197::17) To DS0PR10MB6798.namprd10.prod.outlook.com
+ (2603:10b6:8:13c::20)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR10MB6798:EE_|IA1PR10MB6805:EE_
+X-MS-Office365-Filtering-Correlation-Id: 786ef094-136a-4964-744b-08db14ce98af
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ClxuefDHLoiFcPV4xGEV1niakI493lbvcUzq944q4aLTYQDECyCgd/2QEytKjtJJH1OJE4rNAl+JreKKTNslRiw4CN73yZffxwjSGRLOdZ8ZyKgfCKJaoQrneM2XljOfnK+XZdLQk/badEF1chG69NGX1n3VKGJtxJwyBbUppnQBCyRBFBPtdLMFjbn6NAl6wfGBrNSr4o4CkIz7MVmRk51+iIyKxbcYjrXjFuh32HBtluFfANFe+UQp67zHQqUST7qjHR+JlHTb5nUK5DIvfqQERBntbC40A5cJvL3zIQQHOaDtxFALnBRssNgoaRWdA8y3uQi8EywBGac4M1uAi5+W/okwnV/w2pX7i3zeDpaew0vAifbwtJbkX1rBnoiCQbAPnsp2wNImJ4KawZWcBhSfGTMhRc6lvgFs+aBXxaPoh5TBuy4KgLO4QC5fE1s0/IOiFs5tgcDbrJWT/EyqrcM3HvzU2CPHHHJKtDdeADf/OOrH4hrHfiBy0ezN1VKns9Lre5EanfliveuAho3TeByZ2BlN06c4MllTdYhltmrLvOu8Iam1Gtpv3uyLPawO2kmNrzR42eaLm/G5I5Waop7t4Fm//8Buv11BUw2rQ4XYjXhwaebJNeAXXffCydT4XyoC7TbcxDIDXkuKYIHPCA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB6798.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(346002)(376002)(396003)(366004)(136003)(451199018)(36756003)(5660300002)(44832011)(83380400001)(2616005)(6512007)(478600001)(6486002)(6666004)(6506007)(186003)(6916009)(66476007)(8936002)(66556008)(4326008)(66946007)(86362001)(41300700001)(8676002)(54906003)(1076003)(38100700002)(2906002)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?1Qhv/igHSNoy/McfdyrHsc1qKtzUws3jMqbmHQe9B3F2TLvg0ODYWJ744eJz?=
+ =?us-ascii?Q?DVt4z2CgkAt3QElx5fpC+g6ou9TRFZEfx5r425X3+3a40rsxMfujyOJAKIQK?=
+ =?us-ascii?Q?URQqMBwx0VH9SDWLN/LNXcASPQc6Gf3pglxzfzFcpvJiIHFv6DcV1Gn+DfOD?=
+ =?us-ascii?Q?eG9cHknx/J//fIB3i/FE9Zk5Uaq+gKXwgrVGXo2EW211lNIL8zf0V/HYUHUu?=
+ =?us-ascii?Q?0ClTE0mjx9lQDlImVffPfgV3opsToF1ad4AOFFx5tHmoVzPacT42ccihhdVu?=
+ =?us-ascii?Q?xV/1Vn0Yjn7cyL5LVFfZszGqE/HTdNCi0PyLl0IV07bkNAxUjGygm6cYvk2+?=
+ =?us-ascii?Q?WDRv06iHGRm0m5IppMqedJfKYEnAzMQAWFj8bPYeFnsbLV0uQ6n6TsU5T+7J?=
+ =?us-ascii?Q?BihZEL6atT4zCJu4ygDTjCj5y+ONuE71aSpO64ZFS71H0YPS7vD2IoVQLngj?=
+ =?us-ascii?Q?OGodaE8TgbZ2TqTqHkbjzUUIzOwp0OvwNUc3yqjsDmL0RGvbqL/yc0B63sIq?=
+ =?us-ascii?Q?JK1NWn782hJeAjmTIQZiEg4cZM8HoDK203KLg+sg6/yzI6D9KMhlbMTIdzvn?=
+ =?us-ascii?Q?gN4ME+w135xlHHWc816UoknEoISAXECvER0+dM2+Ckq3u5MrotDQ+HJ2NKLI?=
+ =?us-ascii?Q?5qaIydzsu0dYCnp6+t4MbeXYyAAlHvjk1ZBodBSbGCzONX4+HpZRs/g1yYwe?=
+ =?us-ascii?Q?zufLjsji0b5SIKzHrWZ0kijsZ8i/jFOhtFhE8HgXCC0164Oqu/N3zLPdByxk?=
+ =?us-ascii?Q?f8AWcT9fyJfC9Yams73xuRqShNlwuOe6Uy9pDgkf8m5sgVSUZaIKpJ3+RCjJ?=
+ =?us-ascii?Q?15Xv6Te8QSstgQ146+EoFIMLvX+f2gKgRw6lb7091+kWcrJfayStHfhxwLoJ?=
+ =?us-ascii?Q?gbgvd/91hOAo1jnthArCmGdRS/FXs7LbQxOVbz+xRezdmoLlJA6Iru5WK5Aa?=
+ =?us-ascii?Q?l0Vd21lFirZpbM5dsQOarjKI02bjzUZdwEemYbVHgXWc+uSMK8SXpbQuqHvp?=
+ =?us-ascii?Q?E5I835Vn5yMHxSm/Buuo+4pyoqlphqYrHl1uSsNbUtg9sko94m9jmlMBaqTS?=
+ =?us-ascii?Q?owUYpW+nf2U2bzPDykJOG1VEqU7MjsLpKOGweZ8oiR7tYtedlhh4T7mW0ml9?=
+ =?us-ascii?Q?D0FhBwa4Mc+O3RVn0ZDC1+Xk4fo5LZ/fYnQS++5eyB0lEzt6mQzO8hqG+nN2?=
+ =?us-ascii?Q?SzjIQPlQrjtqz+xcI8k4co3qLJdsCrbq6lXE5HceQGK43K9l3TagYgTyKsOP?=
+ =?us-ascii?Q?tN2T8PPqBsaIoHSCWgAntkm3xQ5fMOU8eyzLO2pFcjOuUhv/c0lnu3Q2QRjI?=
+ =?us-ascii?Q?kb6Y+aH+AQwGJ3WkrcQ5e1lyeSTp4FB9kTr4cByzHfaK+ILk/Y8bnOBv1Bb9?=
+ =?us-ascii?Q?dGHOcQ+LH4LDeKSMRJCx1qqhajPawD1D2ZCBlmvMIXYzdsQN43qSAN75cXOo?=
+ =?us-ascii?Q?nN1KBomg+I04qS1yUTRFlI5zcxRCTgUBu3fC4YPG37UuA8a9ltweggATTbHv?=
+ =?us-ascii?Q?vFun9WjJMUAej3ub7p4QxN8MTMHGEg/m53rBG0bJbXgFBd5bMclh+DctqV7B?=
+ =?us-ascii?Q?Ekqe3H+mvG0GxkkDqulGWns9WgcvaqeJ7WR3Ahej0i3mWKyytdKak6uZcr/R?=
+ =?us-ascii?Q?T23rgym+PHGbCK6XZUFPCoI=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: +2aC7NRZhkft5VToiWHsFXdgUUA/vY4mFifIaCbv/Qs/yNL8Mj2J4iSNEmAOOH+NUPFjEsOJT8FYmesSmDFVPJ0lHNIChWAv4qsg4oJlZeMXlEEi9FxGUeSAkU1s3j5nFvzsjQS9dx8MjvSAHTctF+5yoetu5oHgR2DDOBW3Qh2kgQtdq2vvY2UYRoE/UmxO3i1YyOJwec8X7slAzM2IViC+hPM4SoFJXltucCw212rOW+DeS3DS2ZH9wgPbkHrelWzT01qUa//8tk1tefoShaQXDewouf8CIAMnLfr8X59bKnyLY9pQ64UpcQq194AIxkFMZRO92BtSSoa9xoBnGudwmzAoytcIscpoKgpL2xy9M90pVYVapPVf7slrg16bA3OdJ0SF1Zsc9gjddRCKJrpMkqsCuJljOKiPZ6hB1pAZ6cCxm7crt9wfadqETWCKUyFXx2KOLUW9g1wayEntgm/76ofBIBrav7/orccxuCg6o+CFmUw7ciszi88jVXBwu4er1qZAGb4zXDH84NyReF6GFnJEtWzO4smEXi21IwOssS+UZVp/FMR2REN/vBAQBHvH8y/yGVLckOro3UJ/VqL+767MgpD7+e9iDIyWtbNTbOFzg6I9e29egCUXQtAMoX6mxO9PumfLv1VP11Zb70U4phtCvkhC38V8EzBQi7H9+NbqK2RdsvF7XAyc1Uel1alZH6tzEdOsWqKtxRHtAgk6SMdf9ifR/2w0lNjtZ+VtPy2eDTj4xI/N2k4EFM8Kf7K43AKAk0zncRGKbpmfaUS0y0YREJAs4ewmi/Nlx7L830lhBPpR0OGWffmTb9BOnLymj3gq9/m2KGW7b+QpCIw4jGvgsUodhJvAHN+LF197q/SMgvtqfRw6ASr+kqTc7L6O2S6NXyfeM895uwnJExcx+f3zeeLQYgg4NXPzihs=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 786ef094-136a-4964-744b-08db14ce98af
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB6798.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2023 12:16:16.1761
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZwjCFNSFUZSSKgM4pN32Zizx2G7KfEHohYN0lkMvKxSyYObcF5hQrDfMZMj5MYzyPlNpCG1ogWAfu+4qORP/JA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB6805
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-22_05,2023-02-22_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
+ malwarescore=0 mlxscore=0 spamscore=0 adultscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302220108
+X-Proofpoint-GUID: 7SoA89snVqvccuRruo5nybOtdW4UxxZ4
+X-Proofpoint-ORIG-GUID: 7SoA89snVqvccuRruo5nybOtdW4UxxZ4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:18 -0600
-Michael Roth <michael.roth@amd.com> wrote:
+Since commit 8b41fc4454e ("kbuild: create modules.builtin without
+Makefile.modbuiltin or tristate.conf"), MODULE_LICENSE declarations
+are used to identify modules. As a consequence, uses of the macro
+in non-modules will cause modprobe to misidentify their containing
+object file as a module when it is not (false positives), and modprobe
+might succeed rather than failing with a suitable error message.
 
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The SEV-SNP firmware provides the SNP_CONFIG command used to set the
-> system-wide configuration value for SNP guests. The information includes
-> the TCB version string to be reported in guest attestation reports.
-> 
-> Version 2 of the GHCB specification adds an NAE (SNP extended guest
-> request) that a guest can use to query the reports that include additional
-> certificates.
-> 
-> In both cases, userspace provided additional data is included in the
-> attestation reports. The userspace will use the SNP_SET_EXT_CONFIG
-> command to give the certificate blob and the reported TCB version string
-> at once. Note that the specification defines certificate blob with a
-> specific GUID format; the userspace is responsible for building the
-> proper certificate blob. The ioctl treats it an opaque blob.
-> 
-> While it is not defined in the spec, but let's add SNP_GET_EXT_CONFIG
-> command that can be used to obtain the data programmed through the
-> SNP_SET_EXT_CONFIG.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  Documentation/virt/coco/sev-guest.rst |  27 ++++++
->  drivers/crypto/ccp/sev-dev.c          | 123 ++++++++++++++++++++++++++
->  drivers/crypto/ccp/sev-dev.h          |   4 +
->  include/uapi/linux/psp-sev.h          |  17 ++++
->  4 files changed, 171 insertions(+)
-> 
-> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-> index 11ea67c944df..6cad4226c348 100644
-> --- a/Documentation/virt/coco/sev-guest.rst
-> +++ b/Documentation/virt/coco/sev-guest.rst
-> @@ -145,6 +145,33 @@ The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
->  status includes API major, minor version and more. See the SEV-SNP
->  specification for further details.
->  
-> +2.5 SNP_SET_EXT_CONFIG
-> +----------------------
-> +:Technology: sev-snp
-> +:Type: hypervisor ioctl cmd
-> +:Parameters (in): struct sev_data_snp_ext_config
-> +:Returns (out): 0 on success, -negative on error
-> +
-> +The SNP_SET_EXT_CONFIG is used to set the system-wide configuration such as
-> +reported TCB version in the attestation report. The command is similar to
-> +SNP_CONFIG command defined in the SEV-SNP spec. The main difference is the
-> +command also accepts an additional certificate blob defined in the GHCB
-> +specification.
-> +
-> +If the certs_address is zero, then the previous certificate blob will deleted.
-> +For more information on the certificate blob layout, see the GHCB spec
-> +(extended guest request message).
-> +
-> +2.6 SNP_GET_EXT_CONFIG
-> +----------------------
-> +:Technology: sev-snp
-> +:Type: hypervisor ioctl cmd
-> +:Parameters (in): struct sev_data_snp_ext_config
-> +:Returns (out): 0 on success, -negative on error
-> +
-> +The SNP_GET_EXT_CONFIG is used to query the system-wide configuration set
-> +through the SNP_SET_EXT_CONFIG.
-> +
->  3. SEV-SNP CPUID Enforcement
->  ============================
->  
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 65e13a562f3b..b56b00ca2cd4 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1481,6 +1481,10 @@ static int __sev_snp_shutdown_locked(int *error)
->  	data.length = sizeof(data);
->  	data.iommu_snp_shutdown = 1;
->  
-> +	/* Free the memory used for caching the certificate data */
-> +	kfree(sev->snp_certs_data);
-> +	sev->snp_certs_data = NULL;
-> +
->  	wbinvd_on_all_cpus();
->  
->  retry:
-> @@ -1793,6 +1797,118 @@ static int sev_ioctl_snp_platform_status(struct sev_issue_cmd *argp)
->  	return ret;
->  }
->  
-> +static int sev_ioctl_snp_get_config(struct sev_issue_cmd *argp)
-> +{
-> +	struct sev_device *sev = psp_master->sev_data;
-> +	struct sev_user_data_ext_snp_config input;
-> +	int ret;
-> +
-> +	if (!sev->snp_initialized || !argp->data)
-> +		return -EINVAL;
-> +
-> +	memset(&input, 0, sizeof(input));
-> +
-> +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
-> +		return -EFAULT;
-> +
-> +	/* Copy the TCB version programmed through the SET_CONFIG to userspace */
-> +	if (input.config_address) {
-> +		if (copy_to_user((void * __user)input.config_address,
-> +				 &sev->snp_config, sizeof(struct sev_user_data_snp_config)))
-> +			return -EFAULT;
-> +	}
-> +
-> +	/* Copy the extended certs programmed through the SNP_SET_CONFIG */
-> +	if (input.certs_address && sev->snp_certs_data) {
-> +		if (input.certs_len < sev->snp_certs_len) {
-> +			/* Return the certs length to userspace */
-> +			input.certs_len = sev->snp_certs_len;
-> +
-> +			ret = -ENOSR;
-> +			goto e_done;
-> +		}
-> +
+So remove it in the files in this commit, none of which can be built as
+modules.
 
-What about if input.certs_len > sev->snp_certs_len? Is it possbile for the
-userspace to know the length of data in the buffer? (I guess it might be able
-to know the certs len through the blob data, but a comment here would be nice)
+Signed-off-by: Nick Alcock <nick.alcock@oracle.com>
+Suggested-by: Luis Chamberlain <mcgrof@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>
+Cc: linux-modules@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Hitomi Hasegawa <hasegawa-hitomi@fujitsu.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ lib/crypto/blake2s-generic.c | 1 -
+ lib/crypto/blake2s.c         | 1 -
+ 2 files changed, 2 deletions(-)
 
-> +		if (copy_to_user((void * __user)input.certs_address,
-> +				 sev->snp_certs_data, sev->snp_certs_len))
-> +			return -EFAULT;
-> +	}
-> +
-> +	ret = 0;
-> +
-> +e_done:
-> +	if (copy_to_user((void __user *)argp->data, &input, sizeof(input)))
-> +		ret = -EFAULT;
-> +
-> +	return ret;
-> +}
-> +
-> +static int sev_ioctl_snp_set_config(struct sev_issue_cmd *argp, bool writable)
-> +{
-> +	struct sev_device *sev = psp_master->sev_data;
-> +	struct sev_user_data_ext_snp_config input;
-> +	struct sev_user_data_snp_config config;
-> +	void *certs = NULL;
-> +	int ret = 0;
-> +
-> +	if (!sev->snp_initialized || !argp->data)
-> +		return -EINVAL;
-> +
-> +	if (!writable)
-> +		return -EPERM;
-> +
-> +	memset(&input, 0, sizeof(input));
-> +
-> +	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
-> +		return -EFAULT;
-> +
-> +	/* Copy the certs from userspace */
-> +	if (input.certs_address) {
-> +		if (!input.certs_len || !IS_ALIGNED(input.certs_len, PAGE_SIZE))
-> +			return -EINVAL;
-> +
-> +		certs = psp_copy_user_blob(input.certs_address, input.certs_len);
-> +		if (IS_ERR(certs))
-> +			return PTR_ERR(certs);
-> +	}
-> +
-> +	/* Issue the PSP command to update the TCB version using the SNP_CONFIG. */
-> +	if (input.config_address) {
-> +		memset(&config, 0, sizeof(config));
-> +		if (copy_from_user(&config,
-> +				   (void __user *)input.config_address, sizeof(config))) {
-> +			ret = -EFAULT;
-> +			goto e_free;
-> +		}
-> +
-> +		ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
-> +		if (ret)
-> +			goto e_free;
-> +
-> +		memcpy(&sev->snp_config, &config, sizeof(config));
-> +	}
-> +
-> +	/*
-> +	 * If the new certs are passed then cache it else free the old certs.
-> +	 */
-> +	mutex_lock(&sev->snp_certs_lock);
-> +	if (certs) {
-> +		kfree(sev->snp_certs_data);
-> +		sev->snp_certs_data = certs;
-> +		sev->snp_certs_len = input.certs_len;
-> +	} else {
-> +		kfree(sev->snp_certs_data);
-> +		sev->snp_certs_data = NULL;
-> +		sev->snp_certs_len = 0;
-> +	}
-> +	mutex_unlock(&sev->snp_certs_lock);
-> +
-> +	return 0;
-> +
-> +e_free:
-> +	kfree(certs);
-> +	return ret;
-> +}
-> +
->  static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
->  {
->  	void __user *argp = (void __user *)arg;
-> @@ -1847,6 +1963,12 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
->  	case SNP_PLATFORM_STATUS:
->  		ret = sev_ioctl_snp_platform_status(&input);
->  		break;
-> +	case SNP_SET_EXT_CONFIG:
-> +		ret = sev_ioctl_snp_set_config(&input, writable);
-> +		break;
-> +	case SNP_GET_EXT_CONFIG:
-> +		ret = sev_ioctl_snp_get_config(&input);
-> +		break;
->  	default:
->  		ret = -EINVAL;
->  		goto out;
-> @@ -1962,6 +2084,7 @@ int sev_dev_init(struct psp_device *psp)
->  		goto e_sev;
->  
->  	sev->cmd_buf_backup = (uint8_t *)sev->cmd_buf + PAGE_SIZE;
-> +	mutex_init(&sev->snp_certs_lock);
->  
->  	psp->sev_data = sev;
->  
-> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-> index 19d79f9d4212..41d5353d5bab 100644
-> --- a/drivers/crypto/ccp/sev-dev.h
-> +++ b/drivers/crypto/ccp/sev-dev.h
-> @@ -66,6 +66,10 @@ struct sev_device {
->  
->  	bool snp_initialized;
->  	struct snp_host_map snp_host_map[MAX_SNP_HOST_MAP_BUFS];
-> +	void *snp_certs_data;
-> +	u32 snp_certs_len;
-> +	struct mutex snp_certs_lock;
-> +	struct sev_user_data_snp_config snp_config;
->  };
->  
->  int sev_dev_init(struct psp_device *psp);
-> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-> index 5adfaea7df97..c20d37586d21 100644
-> --- a/include/uapi/linux/psp-sev.h
-> +++ b/include/uapi/linux/psp-sev.h
-> @@ -29,6 +29,8 @@ enum {
->  	SEV_GET_ID,	/* This command is deprecated, use SEV_GET_ID2 */
->  	SEV_GET_ID2,
->  	SNP_PLATFORM_STATUS,
-> +	SNP_SET_EXT_CONFIG,
-> +	SNP_GET_EXT_CONFIG,
->  
->  	SEV_MAX,
->  };
-> @@ -192,6 +194,21 @@ struct sev_user_data_snp_config {
->  	__u8 rsvd1[52];
->  } __packed;
->  
-> +/**
-> + * struct sev_data_snp_ext_config - system wide configuration value for SNP.
-> + *
-> + * @config_address: address of the struct sev_user_data_snp_config or 0 when
-> + *		reported_tcb does not need to be updated.
-> + * @certs_address: address of extended guest request certificate chain or
-> + *              0 when previous certificate should be removed on SNP_SET_EXT_CONFIG.
-> + * @certs_len: length of the certs
-> + */
-> +struct sev_user_data_ext_snp_config {
-> +	__u64 config_address;		/* In */
-> +	__u64 certs_address;		/* In */
-> +	__u32 certs_len;		/* In */
-> +};
-> +
->  /**
->   * struct sev_issue_cmd - SEV ioctl parameters
->   *
+diff --git a/lib/crypto/blake2s-generic.c b/lib/crypto/blake2s-generic.c
+index 75ccb3e633e6..4ffe3d927920 100644
+--- a/lib/crypto/blake2s-generic.c
++++ b/lib/crypto/blake2s-generic.c
+@@ -110,6 +110,5 @@ void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+ 
+ EXPORT_SYMBOL(blake2s_compress_generic);
+ 
+-MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("BLAKE2s hash function");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+index 98e688c6d891..71a316552cc5 100644
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
+@@ -67,6 +67,5 @@ static int __init blake2s_mod_init(void)
+ }
+ 
+ module_init(blake2s_mod_init);
+-MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("BLAKE2s hash function");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+-- 
+2.39.1.268.g9de2f9a303
 
