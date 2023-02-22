@@ -2,55 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD65C636D6
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 20:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 879C5C61DA4
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 20:43:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbjBVUY2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Feb 2023 15:24:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36338 "EHLO
+        id S232761AbjBVUnE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Feb 2023 15:43:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbjBVUY1 (ORCPT
+        with ESMTP id S232774AbjBVUnD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2023 15:24:27 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062172A99E;
-        Wed, 22 Feb 2023 12:24:26 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id m6so11705868lfq.5;
-        Wed, 22 Feb 2023 12:24:25 -0800 (PST)
+        Wed, 22 Feb 2023 15:43:03 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528D67A9C;
+        Wed, 22 Feb 2023 12:42:57 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id bp25so11840252lfb.0;
+        Wed, 22 Feb 2023 12:42:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677097464;
+        d=gmail.com; s=20210112; t=1677098576;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c+88bH++uusEhsdCC8mbBZL+IqsNGdL/GWZjkaswK2g=;
-        b=TJefIB0qefiV0E0Eh1hvJ3Ok+jvjjbxXtGzunNbw3xbB0mLj8aZB6Xz6/dfJEWmZLV
-         dIRe6mkVqEYCmWm5sjhsgpaI5Sir+3QpDea40ZLSjncBq3UgEsDDr14oiw2YB6vGI66C
-         CQkmGMi/QtXDGjllQwOWjDCshZdYumOJCoFGCVxGD5jYNpf1df9b4o1NKn+jrtR+cZ4B
-         L3v35eXWzc6k5T42Pjk9J3br4ElN/hd0mUS4uRDs2sTjuhnTYEJv2C63Of1b7m149Vfc
-         Zpg6vGjONgTyHKz2nSnMiYpCmr34O1+LUNOC5YbxUmkNgEPvhMY1V6M923H2cVZ0WFFI
-         R10g==
+        bh=3pLghbOMnh1AF6uxDquwPbjxAIvGIgrI59/gCPI5GL8=;
+        b=LoYZQSVZum4vtB0QbV6sETXieLV8c6vvsXwrHI1vh+AGuUKZMBsz8L7mM6LfJKELKI
+         QfvgfhQg+sZ/gniTDFx3ZAy9/xXY55xBIwFP9lZhRlKUk17axgFRUh5vGc8iR+XCl/cx
+         jqyyglRPUmn8fEwbDuoZApjPmcKsSiGfD7uz8HQShxJ3mXr1pDKtTKyRlT6NUz6kIiKm
+         Rxn5eWJkMDTN7uV4ofHLWtRNGeDVouEKAZuSMJvw94LX3zOwxeJHH2B0U8532rh8gNFl
+         CFCAjb80p3am8S6nfeiqM3ZtA5Mnc47up8bpowWhniLnBjT1i6Zkq6FDLT/qd9SBCY/2
+         Hh8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677097464;
+        d=1e100.net; s=20210112; t=1677098576;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c+88bH++uusEhsdCC8mbBZL+IqsNGdL/GWZjkaswK2g=;
-        b=XPZPyRj+3N26ZdrB9GnXFOTk8ufnLjclTg4T8oj55cCjV1YD0viaK4qwdElAvStcBE
-         1yPzJAnTBEUkOEA+FNtJvVWzUFcfbMnm+lFaK4Eu3uIMArPkF55x6vhhEmlHBHtfkGM5
-         3RVIsLQWsz0aREAE/TIF5df3RCwnNqJFAXhKa4FF5Opnobsvr5mu7OnQcDOekQzexTy4
-         DJva1yKBNX91whK/p9f/guHmV+VxBK/QMe8PFHA9NCf3IrY1pnAQ6MS1AdXsyG2iwoJ/
-         Ike5dMvSBqeLCXTzErPZQF9JTRSYk50JIkPp7qCb46oF9x9NGVZH0J/Lb1GH+/Nx6snG
-         N9YQ==
-X-Gm-Message-State: AO0yUKWk11TD0uIAQ8ouFD45JZh39FhKv2jXCnod0WqWWEmjVFqvaQqH
-        YB7HBihvtdGLIWc0QoSDdaM=
-X-Google-Smtp-Source: AK7set/Whf/6LlbBrRRKoUl5FBXbdlxpDW9V7S/fwraxQrmyav/hzmWIjYBVbXE8NNuUhPQcghsbwg==
-X-Received: by 2002:ac2:5470:0:b0:4d2:a03b:2840 with SMTP id e16-20020ac25470000000b004d2a03b2840mr3520811lfn.4.1677097463919;
-        Wed, 22 Feb 2023 12:24:23 -0800 (PST)
+        bh=3pLghbOMnh1AF6uxDquwPbjxAIvGIgrI59/gCPI5GL8=;
+        b=FYfOBrAk8+ZV5jOGWQ6YIMK3mn+nAC5ruGWy3zOVbtbSoxsp9a0784qK/+hrkY2PNE
+         ssMkV9YUL0PO3XL5vnRPN5+D4OdWqOdeG2NKtvg4UVeFThhZFwXihPNSfZ8pZPADyHAS
+         Al6D4fv32zg28RLEOcx23s4LMDQd6kg5Esqx8VA44qVOyjF5OBMt9PQlTcmxPSLq7uxz
+         YFvCozmv7e35S56rCgzQT5mrXfBTE4tMaZqu188W+/kVhdf0tGWwqFTE/murbBOCNnOx
+         CbMfON2hGiSqhcYuBazDRd+3MCrSEKcIFApbthR8ojpA67IX7yUKgheQVoOXNhXpIIQR
+         QWHQ==
+X-Gm-Message-State: AO0yUKXY/YK3Thk8Y34HOgfniRZ3Ta/hjjdHgtwFUdYsoUi6QW36I/x3
+        LVcRGZUzEfg5OizLQkNubf0=
+X-Google-Smtp-Source: AK7set8rAA9AhpMbKSjj7YzXz1bfeSjIQsdkFqAlsea9eIRT6FzIZoaOkh8a/2uc/4oVhXEb/Qh2bw==
+X-Received: by 2002:a05:6512:7b:b0:4dd:a025:d87 with SMTP id i27-20020a056512007b00b004dda0250d87mr426608lfo.0.1677098576019;
+        Wed, 22 Feb 2023 12:42:56 -0800 (PST)
 Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id a8-20020a056512020800b004cb1de3f487sm1031840lfo.104.2023.02.22.12.24.23
+        by smtp.gmail.com with ESMTPSA id a28-20020ac2521c000000b004d34238ca44sm1135378lfl.214.2023.02.22.12.42.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Feb 2023 12:24:23 -0800 (PST)
-Date:   Wed, 22 Feb 2023 22:24:21 +0200
+        Wed, 22 Feb 2023 12:42:55 -0800 (PST)
+Date:   Wed, 22 Feb 2023 22:42:53 +0200
 From:   Zhi Wang <zhi.wang.linux@gmail.com>
 To:     Michael Roth <michael.roth@amd.com>
 Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -70,12 +70,12 @@ Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 28/56] crypto: ccp: Provide APIs to query
- extended attestation report
-Message-ID: <20230222222421.00001a62@gmail.com>
-In-Reply-To: <20230220183847.59159-29-michael.roth@amd.com>
+Subject: Re: [PATCH RFC v8 31/56] KVM: SVM: Make AVIC backing, VMSA and VMCB
+ memory allocation SNP safe
+Message-ID: <20230222224253.00002740@gmail.com>
+In-Reply-To: <20230220183847.59159-32-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-29-michael.roth@amd.com>
+        <20230220183847.59159-32-michael.roth@amd.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -84,141 +84,195 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:19 -0600
+On Mon, 20 Feb 2023 12:38:22 -0600
 Michael Roth <michael.roth@amd.com> wrote:
-
-It seems in the discussion:
-https://lore.kernel.org/lkml/f18fae8b-a928-cd82-e0b3-eac62ad3e106@amd.com/,
-this API is going to be removed. Will that fix land in this patch series or not?
-If not, It would be better to mention it in the comment message of this one
-or patch 45.
-If yes, I guess this patch is not needed.
 
 > From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Version 2 of the GHCB specification defines VMGEXIT that is used to get
-> the extended attestation report. The extended attestation report includes
-> the certificate blobs provided through the SNP_SET_EXT_CONFIG.
+> Implement a workaround for an SNP erratum where the CPU will incorrectly
+> signal an RMP violation #PF if a hugepage (2mb or 1gb) collides with the
+> RMP entry of a VMCB, VMSA or AVIC backing page.
 > 
-> The snp_guest_ext_guest_request() will be used by the hypervisor to get
-> the extended attestation report. See the GHCB specification for more
-> details.
+> When SEV-SNP is globally enabled, the CPU marks the VMCB, VMSA, and AVIC
+> backing   pages as "in-use" in the RMP after a successful VMRUN.  This
+
+Is this "in-use" bit part of an RMP entry? If yes, better list its name 
+in APM.
+
+> is done for _all_ VMs, not just SNP-Active VMs.
+_All_ VMs? Do you mean SEV VMs and SEVSNP VMs? I guess legacy VM is not
+affected, right?
+>
+> If the hypervisor accesses an in-use page through a writable
+> translation, the CPU will throw an RMP violation #PF. On early SNP
+> hardware, if an in-use page is 2mb aligned and software accesses any
+> part of the associated 2mb region with a hupage, the CPU will
+                                            ^hugepage
+> incorrectly treat the entire 2mb region as in-use and signal a spurious
+> RMP violation #PF.
 > 
+> The recommended is to not use the hugepage for the VMCB, VMSA or
+> AVIC backing page. Add a generic allocator that will ensure that the
+> page returns is not hugepage (2mb or 1gb) and is safe to be used when
+> SEV-SNP is enabled.
+> 
+> Co-developed-by: Marc Orr <marcorr@google.com>
+> Signed-off-by: Marc Orr <marcorr@google.com>
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  drivers/crypto/ccp/sev-dev.c | 47 ++++++++++++++++++++++++++++++++++++
->  include/linux/psp-sev.h      | 33 +++++++++++++++++++++++++
->  2 files changed, 80 insertions(+)
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  2 ++
+>  arch/x86/kvm/lapic.c               |  5 ++++-
+>  arch/x86/kvm/svm/sev.c             | 33 ++++++++++++++++++++++++++++++
+>  arch/x86/kvm/svm/svm.c             | 15 ++++++++++++--
+>  arch/x86/kvm/svm/svm.h             |  1 +
+>  6 files changed, 54 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index b56b00ca2cd4..e65563bc8298 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -2017,6 +2017,53 @@ int sev_guest_df_flush(int *error)
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 6a885f024a00..e116405cbb5f 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -131,6 +131,7 @@ KVM_X86_OP(msr_filter_changed)
+>  KVM_X86_OP(complete_emulated_msr)
+>  KVM_X86_OP(vcpu_deliver_sipi_vector)
+>  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> +KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
+>  KVM_X86_OP_OPTIONAL_RET0(fault_is_private);
+>  KVM_X86_OP_OPTIONAL_RET0(update_mem_attr)
+>  KVM_X86_OP_OPTIONAL(invalidate_restricted_mem)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 37c92412035f..a9363a6f779d 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1729,6 +1729,8 @@ struct kvm_x86_ops {
+>  	 * Returns vCPU specific APICv inhibit reasons
+>  	 */
+>  	unsigned long (*vcpu_get_apicv_inhibit_reasons)(struct kvm_vcpu *vcpu);
+> +
+> +	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 80f92cbc4029..72e46d5b4201 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2740,7 +2740,10 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+>  
+>  	vcpu->arch.apic = apic;
+>  
+> -	apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+> +	if (kvm_x86_ops.alloc_apic_backing_page)
+> +		apic->regs = static_call(kvm_x86_alloc_apic_backing_page)(vcpu);
+> +	else
+> +		apic->regs = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
+>  	if (!apic->regs) {
+>  		printk(KERN_ERR "malloc apic regs error for vcpu %x\n",
+>  		       vcpu->vcpu_id);
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index c1f0d4898ce3..9e9efb42a766 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3241,3 +3241,36 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+>  		break;
+>  	}
 >  }
->  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
->  
-> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> +				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
+> +
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
 > +{
-> +	unsigned long expected_npages;
-> +	struct sev_device *sev;
-> +	int rc;
+> +	unsigned long pfn;
+> +	struct page *p;
 > +
-> +	if (!psp_master || !psp_master->sev_data)
-> +		return -ENODEV;
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
 > +
-> +	sev = psp_master->sev_data;
-> +
-> +	if (!sev->snp_initialized)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&sev->snp_certs_lock);
 > +	/*
-> +	 * Check if there is enough space to copy the certificate chain. Otherwise
-> +	 * return ERROR code defined in the GHCB specification.
+> +	 * Allocate an SNP safe page to workaround the SNP erratum where
+> +	 * the CPU will incorrectly signal an RMP violation  #PF if a
+> +	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
+> +	 * or AVIC backing page. The recommeded workaround is to not use the
+> +	 * hugepage.
+> +	 *
+> +	 * Allocate one extra page, use a page which is not 2mb aligned
+> +	 * and free the other.
 > +	 */
-> +	expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
-> +	if (*npages < expected_npages) {
-> +		*npages = expected_npages;
-> +		*fw_err = SNP_GUEST_REQ_INVALID_LEN;
-> +		mutex_unlock(&sev->snp_certs_lock);
-> +		return -EINVAL;
-> +	}
+> +	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+> +	if (!p)
+> +		return NULL;
 > +
-> +	rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)fw_err);
-> +	if (rc) {
-> +		mutex_unlock(&sev->snp_certs_lock);
-> +		return rc;
-> +	}
+> +	split_page(p, 1);
 > +
-> +	/* Copy the certificate blob */
-> +	if (sev->snp_certs_data) {
-> +		*npages = expected_npages;
-> +		memcpy((void *)vaddr, sev->snp_certs_data, *npages << PAGE_SHIFT);
-> +	} else {
-> +		*npages = 0;
-> +	}
+> +	pfn = page_to_pfn(p);
+> +	if (IS_ALIGNED(pfn, PTRS_PER_PMD))
+> +		__free_page(p++);
+> +	else
+> +		__free_page(p + 1);
 > +
-> +	mutex_unlock(&sev->snp_certs_lock);
-> +	return rc;
+> +	return p;
 > +}
-> +EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
-> +
->  static void sev_exit(struct kref *ref)
->  {
->  	misc_deregister(&misc_dev->misc);
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index d19744807471..81bafc049eca 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -931,6 +931,32 @@ void snp_free_firmware_page(void *addr);
->   */
->  void snp_mark_pages_offline(unsigned long pfn, unsigned int npages);
+
+The duplicate allocation routine in snp_alloc_vmsa_page() in sev.c can
+be replaced with snp_safe_alloc_page().
+
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 213593dbd7a1..1061aaf66f0a 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1372,7 +1372,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>  	svm = to_svm(vcpu);
 >  
-> +/**
-> + * snp_guest_ext_guest_request - perform the SNP extended guest request command
-> + *  defined in the GHCB specification.
-> + *
-> + * @data: the input guest request structure
-> + * @vaddr: address where the certificate blob need to be copied.
-> + * @npages: number of pages for the certificate blob.
-> + *    If the specified page count is less than the certificate blob size, then the
-> + *    required page count is returned with error code defined in the GHCB spec.
-> + *    If the specified page count is more than the certificate blob size, then
-> + *    page count is updated to reflect the amount of valid data copied in the
-> + *    vaddr.
-> + *
-> + * @sev_ret: sev command return code
-> + *
-> + * Returns:
-> + * 0 if the sev successfully processed the command
-> + * -%ENODEV    if the sev device is not available
-> + * -%ENOTSUPP  if the sev does not support SEV
-> + * -%ETIMEDOUT if the sev command timed out
-> + * -%EIO       if the sev returned a non-zero return code
-> + */
-> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> +				unsigned long vaddr, unsigned long *npages,
-> +				unsigned long *error);
-> +
->  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+>  	err = -ENOMEM;
+> -	vmcb01_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	vmcb01_page = snp_safe_alloc_page(vcpu);
+>  	if (!vmcb01_page)
+>  		goto out;
 >  
->  static inline int
-> @@ -968,6 +994,13 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
+> @@ -1381,7 +1381,7 @@ static int svm_vcpu_create(struct kvm_vcpu *vcpu)
+>  		 * SEV-ES guests require a separate VMSA page used to contain
+>  		 * the encrypted register state of the guest.
+>  		 */
+> -		vmsa_page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +		vmsa_page = snp_safe_alloc_page(vcpu);
+>  		if (!vmsa_page)
+>  			goto error_free_vmcb_page;
 >  
->  static inline void snp_free_firmware_page(void *addr) { }
+> @@ -4696,6 +4696,16 @@ static int svm_vm_init(struct kvm *kvm)
+>  	return 0;
+>  }
 >  
-> +static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
-> +					      unsigned long vaddr, unsigned long *n,
-> +					      unsigned long *error)
+> +static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
 > +{
-> +	return -ENODEV;
+> +	struct page *page = snp_safe_alloc_page(vcpu);
+> +
+> +	if (!page)
+> +		return NULL;
+> +
+> +	return page_address(page);
 > +}
 > +
->  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
 >  
->  #endif	/* __PSP_SEV_H__ */
+> @@ -4824,6 +4834,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  
+>  	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+>  	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
+> +	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
+>  };
+>  
+>  /*
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index c249c360fe36..5efcf036ccad 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -692,6 +692,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
+>  void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+>  void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+>  void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+> +struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
+>  
+>  /* vmenter.S */
+>  
 
