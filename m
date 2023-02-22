@@ -2,79 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 864A8C64EC7
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 02:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B36C61DA4
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 09:15:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232263AbjBVCwt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Feb 2023 21:52:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43336 "EHLO
+        id S231652AbjBVJPu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Feb 2023 04:15:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232249AbjBVCwq (ORCPT
+        with ESMTP id S229865AbjBVJPt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Feb 2023 21:52:46 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E47667AAA;
-        Tue, 21 Feb 2023 18:52:41 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 36F1761582;
-        Wed, 22 Feb 2023 02:50:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F0A5C4339C;
-        Wed, 22 Feb 2023 02:50:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677034206;
-        bh=nK4SAWCVc7vxYAkTE50oDgdZG8lwOJ7kaFvRBHki0r0=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Riey0Fu5QOP8DNg5xbMrPn6qANS0mKjE1hqzE4MJIe4UbkJ4BuF9sezAPJutzXq5s
-         6za/BeG1ucc3Akcn6IXo4aSxbtm9GalQ+h1MSNowSAo9gBBorHaDfHS3c6ec+oi9Ke
-         DTV1QoPnWbV9nItx1PmTP0/zfanwj/s97eSLUcz/HkiHB7va35qxKPo2HPv5EIRRpJ
-         o9frG5G+EsvaDCrqq1/Q/UqGVTl+/G/+nF33v9OGp15E5rmAqi1wHYCpGm2tHLwFK0
-         nNX/VVJ2Y9dvoNtgsAVjOKeUbO4bcjUA6R37KuWcNj82//mRmNoP0qNnm9QhyOxEfC
-         xqwQOiJ5zwNiw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F112DC43159;
-        Wed, 22 Feb 2023 02:50:05 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Update for 6.3
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
-References: <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
- <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
- <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au> <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p1
-X-PR-Tracked-Commit-Id: 8b84475318641c2b89320859332544cf187e1cbd
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 36289a03bcd3aabdf66de75cb6d1b4ee15726438
-Message-Id: <167703420598.17986.884909835086952555.pr-tracker-bot@kernel.org>
-Date:   Wed, 22 Feb 2023 02:50:05 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Wed, 22 Feb 2023 04:15:49 -0500
+Received: from mail.corrib.pl (mail.corrib.pl [185.58.226.145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734AB36466
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2023 01:15:48 -0800 (PST)
+Received: by mail.corrib.pl (Postfix, from userid 1001)
+        id 6FD85A3B07; Wed, 22 Feb 2023 09:15:45 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=corrib.pl; s=mail;
+        t=1677057352; bh=X6IEpSISwJiYlJ3uA866lskXve3r+4o2hf4z7VM6m5o=;
+        h=Date:From:To:Subject:From;
+        b=E6zSfYBn30qcJv5xOe406NDJDOygnPBnpKlN+m2rMg3wlwHpkwlWZOaIy/Y/58/oJ
+         w96fe1s0MNuZ8efvSu9RZTM6rfVLq/4KzwEVcInGd92FTNUP6tZKEbvs9OAwyz/CCm
+         DidR3F9bJ07AQy1K/6J+HR7zffW6Mg2SASpzs42PswRssM+eFBbCn5Y9WV6wOEGlG1
+         NBhMWE3HDQ3M47UMevtLtdbKSPuO2pXlYUEngsx94y7ifKwk9GoLnBK8b40hOvNzwy
+         qc2i30OorfTvEj5Knu0rkY5DzL9n7a9eisA81bv+ClFfy+ZtZ6TEmsRFj5gFg36Cl5
+         QHuMjvrTBn+ng==
+Received: by mail.corrib.pl for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2023 09:15:44 GMT
+Message-ID: <20230222074502-0.1.5n.hd9f.0.h0k2ga71jh@corrib.pl>
+Date:   Wed, 22 Feb 2023 09:15:44 GMT
+From:   =?UTF-8?Q? "Szczepan_Kie=C5=82basa" ?= 
+        <szczepan.kielbasa@corrib.pl>
+To:     <linux-crypto@vger.kernel.org>
+Subject: Faktoring
+X-Mailer: mail.corrib.pl
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Mon, 20 Feb 2023 13:22:32 +0800:
+Dzie=C5=84 dobry,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p1
+rozwa=C5=BCali Pa=C5=84stwo wyb=C3=B3r finansowania, kt=C3=B3re spe=C5=82=
+ni potrzeby firmy, zapewniaj=C4=85c natychmiastowy dost=C4=99p do got=C3=B3=
+wki, bez zb=C4=99dnych przestoj=C3=B3w?=20
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/36289a03bcd3aabdf66de75cb6d1b4ee15726438
+Przygotowali=C5=9Bmy rozwi=C4=85zania faktoringowe dopasowane do Pa=C5=84=
+stwa bran=C5=BCy i wielko=C5=9Bci firmy, dzi=C4=99ki kt=C3=B3rym, nie mus=
+z=C4=85 Pa=C5=84stwo martwi=C4=87 si=C4=99 o niewyp=C5=82acalno=C5=9B=C4=87=
+ kontrahent=C3=B3w, poniewa=C5=BC transakcje s=C4=85 zabezpieczone i posi=
+adaj=C4=85 gwarancj=C4=99 sp=C5=82aty.=20
+Chc=C4=85 Pa=C5=84stwo przeanalizowa=C4=87 dost=C4=99pne opcje?
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Pozdrawiam
+Szczepan Kie=C5=82basa
