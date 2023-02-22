@@ -2,116 +2,223 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E36ACC64EC7
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 18:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD65C636D6
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Feb 2023 20:24:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232212AbjBVS1z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Feb 2023 13:27:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
+        id S232476AbjBVUY2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Feb 2023 15:24:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232303AbjBVS1s (ORCPT
+        with ESMTP id S232377AbjBVUY1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Feb 2023 13:27:48 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409203C796
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2023 10:27:46 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id g8so7518898lfj.2
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Feb 2023 10:27:46 -0800 (PST)
+        Wed, 22 Feb 2023 15:24:27 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062172A99E;
+        Wed, 22 Feb 2023 12:24:26 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id m6so11705868lfq.5;
+        Wed, 22 Feb 2023 12:24:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1677090464;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yhC/1G7/U4NfbpQ099CYTdbkKgQWiiedngLMds7AUj4=;
-        b=gg3rmKkXYFo4OccDD+m9aZehc77Awfn85YOU0zE/MKaNhpLx74aRaQRua9M1lbctiF
-         KfZV/GSaCa2ZFH0DBuoHOgWGuxGL/kM+f8AkqT9rc8lBHQO5BG4/wKR7SfF7f8kV8+Mk
-         jmWc59GyyLEA/PnX4Eaxbw+FYHpF/mkCh5nrVGJuBpGH9jcSzo8TatnNTJxedM3YzAtV
-         vRxQXqEdkb37eJ3OeJ+6bPvFuZgzSb/sjaLl29FdEwl6/g9Qb2Ld+Hj1s1v4+YtVwJEo
-         8sMc1w2V/1JpZX4zZPJtBJxmMj6IHpvtb/W9/fBmaiCKTYie64qa+Y8Yy95JP7/Wy+qR
-         yyxw==
+        d=gmail.com; s=20210112; t=1677097464;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c+88bH++uusEhsdCC8mbBZL+IqsNGdL/GWZjkaswK2g=;
+        b=TJefIB0qefiV0E0Eh1hvJ3Ok+jvjjbxXtGzunNbw3xbB0mLj8aZB6Xz6/dfJEWmZLV
+         dIRe6mkVqEYCmWm5sjhsgpaI5Sir+3QpDea40ZLSjncBq3UgEsDDr14oiw2YB6vGI66C
+         CQkmGMi/QtXDGjllQwOWjDCshZdYumOJCoFGCVxGD5jYNpf1df9b4o1NKn+jrtR+cZ4B
+         L3v35eXWzc6k5T42Pjk9J3br4ElN/hd0mUS4uRDs2sTjuhnTYEJv2C63Of1b7m149Vfc
+         Zpg6vGjONgTyHKz2nSnMiYpCmr34O1+LUNOC5YbxUmkNgEPvhMY1V6M923H2cVZ0WFFI
+         R10g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677090464;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yhC/1G7/U4NfbpQ099CYTdbkKgQWiiedngLMds7AUj4=;
-        b=E2DdysL3zhMyr6yFVtiFB9chh6r9rnhQKiPBOwXcvl0Q0424ZD78PZvo/XEsoqwd3S
-         CtClDHf2OCp0kLvdjay3gs/iBwia9SAuCNMs+rC6Y8u5jz/lpweQj2OKYYk315V27FJy
-         hLvaNgVxkWFdGBxiOL6LTBIXbq8RLNMz5MrRdO1G8IlvZshPhWU9x9j8ymU/Xz2fX2Db
-         Cjrq16kTWj6fGlBPuIE6UfAKmkz6OjE1k8Bx99SCxEjqMcnevvBhvFMMjxHu9devZwZS
-         jIDXD+/avooc1+H9wgCUpjtR/mN3SvDAnAyBzkSZhvA5Q2hOJZHe3eSPyfgMR+MdmYwu
-         0jig==
-X-Gm-Message-State: AO0yUKVqkYcKz0V29eQJavFg43KkTkpTY+8buHCQsvYcp+JbRJWOFllj
-        HujnVeKwwabQRUCSDH3KwjPhIw==
-X-Google-Smtp-Source: AK7set8v+KInbVZqzQunon5Tq0Q6FaxLc4fVXlo31GQDC4NWbpBpKJh6gQPUSKGLWKKiRkdITPJGjw==
-X-Received: by 2002:a19:f00e:0:b0:4a4:68b9:26c with SMTP id p14-20020a19f00e000000b004a468b9026cmr2817622lfc.6.1677090464484;
-        Wed, 22 Feb 2023 10:27:44 -0800 (PST)
-Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi. [88.112.131.206])
-        by smtp.gmail.com with ESMTPSA id m6-20020ac24ac6000000b004cafe65883dsm40789lfp.122.2023.02.22.10.27.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Feb 2023 10:27:43 -0800 (PST)
-Message-ID: <44f99635-69b0-4ab1-aa58-417824aae8d6@linaro.org>
-Date:   Wed, 22 Feb 2023 20:27:36 +0200
+        d=1e100.net; s=20210112; t=1677097464;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c+88bH++uusEhsdCC8mbBZL+IqsNGdL/GWZjkaswK2g=;
+        b=XPZPyRj+3N26ZdrB9GnXFOTk8ufnLjclTg4T8oj55cCjV1YD0viaK4qwdElAvStcBE
+         1yPzJAnTBEUkOEA+FNtJvVWzUFcfbMnm+lFaK4Eu3uIMArPkF55x6vhhEmlHBHtfkGM5
+         3RVIsLQWsz0aREAE/TIF5df3RCwnNqJFAXhKa4FF5Opnobsvr5mu7OnQcDOekQzexTy4
+         DJva1yKBNX91whK/p9f/guHmV+VxBK/QMe8PFHA9NCf3IrY1pnAQ6MS1AdXsyG2iwoJ/
+         Ike5dMvSBqeLCXTzErPZQF9JTRSYk50JIkPp7qCb46oF9x9NGVZH0J/Lb1GH+/Nx6snG
+         N9YQ==
+X-Gm-Message-State: AO0yUKWk11TD0uIAQ8ouFD45JZh39FhKv2jXCnod0WqWWEmjVFqvaQqH
+        YB7HBihvtdGLIWc0QoSDdaM=
+X-Google-Smtp-Source: AK7set/Whf/6LlbBrRRKoUl5FBXbdlxpDW9V7S/fwraxQrmyav/hzmWIjYBVbXE8NNuUhPQcghsbwg==
+X-Received: by 2002:ac2:5470:0:b0:4d2:a03b:2840 with SMTP id e16-20020ac25470000000b004d2a03b2840mr3520811lfn.4.1677097463919;
+        Wed, 22 Feb 2023 12:24:23 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id a8-20020a056512020800b004cb1de3f487sm1031840lfo.104.2023.02.22.12.24.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Feb 2023 12:24:23 -0800 (PST)
+Date:   Wed, 22 Feb 2023 22:24:21 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v8 28/56] crypto: ccp: Provide APIs to query
+ extended attestation report
+Message-ID: <20230222222421.00001a62@gmail.com>
+In-Reply-To: <20230220183847.59159-29-michael.roth@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-29-michael.roth@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH v11 09/10] crypto: qce: core: Make clocks optional
-Content-Language: en-US
-To:     Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     Rob Herring <robh+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Jordan Crouse <jorcrous@amazon.com>
-References: <20230222172240.3235972-1-vladimir.zapolskiy@linaro.org>
- <20230222172240.3235972-10-vladimir.zapolskiy@linaro.org>
- <cdc87c95-a845-904b-1a57-0895b9f93d9f@linaro.org>
-From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-In-Reply-To: <cdc87c95-a845-904b-1a57-0895b9f93d9f@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Konrad,
+On Mon, 20 Feb 2023 12:38:19 -0600
+Michael Roth <michael.roth@amd.com> wrote:
 
-On 2/22/23 19:33, Konrad Dybcio wrote:
+It seems in the discussion:
+https://lore.kernel.org/lkml/f18fae8b-a928-cd82-e0b3-eac62ad3e106@amd.com/,
+this API is going to be removed. Will that fix land in this patch series or not?
+If not, It would be better to mention it in the comment message of this one
+or patch 45.
+If yes, I guess this patch is not needed.
+
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
+> Version 2 of the GHCB specification defines VMGEXIT that is used to get
+> the extended attestation report. The extended attestation report includes
+> the certificate blobs provided through the SNP_SET_EXT_CONFIG.
 > 
-> On 22.02.2023 18:22, Vladimir Zapolskiy wrote:
->> From: Thara Gopinath <thara.gopinath@gmail.com>
->>
->> On certain Snapdragon processors, the crypto engine clocks are enabled by
->> default by security firmware and the driver should not handle the clocks.
->> Make acquiring of all the clocks optional in crypto engine driver, so that
->> the driver initializes properly even if no clocks are specified in the dt.
->>
->> Tested-by: Jordan Crouse <jorcrous@amazon.com>
->> Signed-off-by: Thara Gopinath <thara.gopinath@gmail.com>
->> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
->> [Bhupesh: Massage the commit log]
->> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
->> ---
-> I'm not sure which is the preferred approach, but generally I'd
-> stick with keeping them non-optional for the SoCs that need them..
-> So perhaps introducing a flag in of_match_data for qcom,sm8150-qce
-> (which was created solely to take care of the no-HLOS-clocks cases)
-> and then skipping the clock operations based on that would be a
-> good idea.
+> The snp_guest_ext_guest_request() will be used by the hypervisor to get
+> the extended attestation report. See the GHCB specification for more
+> details.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 47 ++++++++++++++++++++++++++++++++++++
+>  include/linux/psp-sev.h      | 33 +++++++++++++++++++++++++
+>  2 files changed, 80 insertions(+)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index b56b00ca2cd4..e65563bc8298 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -2017,6 +2017,53 @@ int sev_guest_df_flush(int *error)
+>  }
+>  EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>  
+> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+> +				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
+> +{
+> +	unsigned long expected_npages;
+> +	struct sev_device *sev;
+> +	int rc;
+> +
+> +	if (!psp_master || !psp_master->sev_data)
+> +		return -ENODEV;
+> +
+> +	sev = psp_master->sev_data;
+> +
+> +	if (!sev->snp_initialized)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&sev->snp_certs_lock);
+> +	/*
+> +	 * Check if there is enough space to copy the certificate chain. Otherwise
+> +	 * return ERROR code defined in the GHCB specification.
+> +	 */
+> +	expected_npages = sev->snp_certs_len >> PAGE_SHIFT;
+> +	if (*npages < expected_npages) {
+> +		*npages = expected_npages;
+> +		*fw_err = SNP_GUEST_REQ_INVALID_LEN;
+> +		mutex_unlock(&sev->snp_certs_lock);
+> +		return -EINVAL;
+> +	}
+> +
+> +	rc = sev_do_cmd(SEV_CMD_SNP_GUEST_REQUEST, data, (int *)fw_err);
+> +	if (rc) {
+> +		mutex_unlock(&sev->snp_certs_lock);
+> +		return rc;
+> +	}
+> +
+> +	/* Copy the certificate blob */
+> +	if (sev->snp_certs_data) {
+> +		*npages = expected_npages;
+> +		memcpy((void *)vaddr, sev->snp_certs_data, *npages << PAGE_SHIFT);
+> +	} else {
+> +		*npages = 0;
+> +	}
+> +
+> +	mutex_unlock(&sev->snp_certs_lock);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(snp_guest_ext_guest_request);
+> +
+>  static void sev_exit(struct kref *ref)
+>  {
+>  	misc_deregister(&misc_dev->misc);
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index d19744807471..81bafc049eca 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -931,6 +931,32 @@ void snp_free_firmware_page(void *addr);
+>   */
+>  void snp_mark_pages_offline(unsigned long pfn, unsigned int npages);
+>  
+> +/**
+> + * snp_guest_ext_guest_request - perform the SNP extended guest request command
+> + *  defined in the GHCB specification.
+> + *
+> + * @data: the input guest request structure
+> + * @vaddr: address where the certificate blob need to be copied.
+> + * @npages: number of pages for the certificate blob.
+> + *    If the specified page count is less than the certificate blob size, then the
+> + *    required page count is returned with error code defined in the GHCB spec.
+> + *    If the specified page count is more than the certificate blob size, then
+> + *    page count is updated to reflect the amount of valid data copied in the
+> + *    vaddr.
+> + *
+> + * @sev_ret: sev command return code
+> + *
+> + * Returns:
+> + * 0 if the sev successfully processed the command
+> + * -%ENODEV    if the sev device is not available
+> + * -%ENOTSUPP  if the sev does not support SEV
+> + * -%ETIMEDOUT if the sev command timed out
+> + * -%EIO       if the sev returned a non-zero return code
+> + */
+> +int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+> +				unsigned long vaddr, unsigned long *npages,
+> +				unsigned long *error);
+> +
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  static inline int
+> @@ -968,6 +994,13 @@ static inline void *snp_alloc_firmware_page(gfp_t mask)
+>  
+>  static inline void snp_free_firmware_page(void *addr) { }
+>  
+> +static inline int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+> +					      unsigned long vaddr, unsigned long *n,
+> +					      unsigned long *error)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
 
-thank you for review. As you can get it from 06/10 the task to distinguish
-IPs with clocks and without clocks is offloaded to dtb. I believe a better
-support of two cases should be added to the driver on the basis of QCE IP
-versions obtained in runtime, or, alternatively and like you propose, it
-can be taken from a compatible. IMHO the latter one is a weak improvement,
-since it can be considered as a workaround in the driver to a known to be
-broken device tree node.
-
---
-Best wishes,
-Vladimir
