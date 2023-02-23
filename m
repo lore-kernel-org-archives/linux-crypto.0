@@ -2,151 +2,181 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90672C636D6
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Feb 2023 17:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA54EC6379F
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Feb 2023 17:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbjBWRZd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Feb 2023 12:25:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45160 "EHLO
+        id S230202AbjBWRqG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Feb 2023 12:46:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbjBWRZc (ORCPT
+        with ESMTP id S229480AbjBWRqF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Feb 2023 12:25:32 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A5C18A8A
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Feb 2023 09:25:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677173131; x=1708709131;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ufodHtTcfUNobuHjY+/eatMlOmTZO/2vG9TlZi72cj8=;
-  b=XRngI0Mex+CdI0eYW1nv9Pjp6buSAVGNmdbxb/2G2L2buFxxa+IEdoTs
-   bA3SYC7GDX3fOttRgjwsx257SV75POIBjO8/AC31lKDuyjwBggN912Kf7
-   kRZ6YpH0tA8U+7UOcD10lY5u6nUQDbqD4F4cUjJ0mi5I/TNielK5po7eP
-   /upOl034vmmS33rq9A6p4U/LUPi9wwa6fxjrWbd5SNtQF9XAa5zP2RfTh
-   M/HFIF1kCdQNws89nqXIdCFpsZXGAF5xkfeieBaPcmtJfmx5TFPJ/DLsK
-   4TOrr6Ym/3LZWD7hq1lySo0PPR+LmaWa8W/MlT1pXfCMctSr2Jp6IOGH5
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="397996033"
-X-IronPort-AV: E=Sophos;i="5.97,322,1669104000"; 
-   d="scan'208";a="397996033"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2023 09:25:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="781994577"
-X-IronPort-AV: E=Sophos;i="5.97,322,1669104000"; 
-   d="scan'208";a="781994577"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP; 23 Feb 2023 09:25:20 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 23 Feb 2023 09:25:20 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Thu, 23 Feb 2023 09:25:20 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Thu, 23 Feb 2023 09:25:19 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a/kt0DUBAgQ47PA5AmZHEvvFHo2exsJeT4nBgm8eEs8ruyDZ1LTk6c+/uYvpLlxHO2nJuhePjXWFTTOkJ9KYlzXrmLlrP3aEcKFkSmhEfGQsw8iUBhx9PjB3g+Bkl+Y28u4UoceLPqzYVQfS8esUalRtd+fAxNeeXl0YKP0BojUmxomJNVeK8urhbDLtPkymCKOE1osrxB2HRwjcT8Y/HWO3f0UWS+bqxv+yRyQxsoanrm/jDzjNw7Q8lV8rhs6+X5Rdu//WTgK/whxLWrAkNxuYSBWaUK4fQgPtGyxCtUY9sI82K7zfNubBAoTrCwajoXr5ApjV50urlFSeb9sZlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W521smpjByioaBVEscZ6azK6Av7YVY/z8+Wjt9Udi4U=;
- b=C6jGbzOwUmUphMMgSZG5+cYy5/vP9lOhUu7hR76Kpbow26lYjjYf197+GIzAMMDNPQCuCGuInPwrharEdl82wiYb+IFceMcXn+U0irUMbgE0M8KdgOaEsjjw7HUXRL/RCOhKH2u7T/gAbhWIOADlJeuUyySDSr9xphDGEeIhYdQSLFnULBRVXM+HyZ8BPnOU95xs6ugqEtsS9//rOGMoJbpATRnVNLBkCdCV7KlrLqeVFd/ghXN8vL+TX8Yevm2aRwA8sV1hHftNYtsDchmENYsVWpc3uycgp8VUA1bau00r+BdF/O4CzirGoO/hvTBkm3HHQ7DQEpUl8FpvzET2VQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by MN2PR11MB4677.namprd11.prod.outlook.com (2603:10b6:208:24e::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.21; Thu, 23 Feb
- 2023 17:25:18 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::af76:f08d:dc47:8f8d]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::af76:f08d:dc47:8f8d%3]) with mapi id 15.20.6134.019; Thu, 23 Feb 2023
- 17:25:17 +0000
-Date:   Thu, 23 Feb 2023 17:25:12 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        <qat-linux@intel.com>
-Subject: Re: [PATCH] crypto: qat - Include algapi.h for low-level Crypto API
-Message-ID: <Y/eheB9yHWbfAHEt@gcabiddu-mobl1.ger.corp.intel.com>
-References: <Y+yZHiWPKyyR6fLw@gondor.apana.org.au>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Y+yZHiWPKyyR6fLw@gondor.apana.org.au>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: LO4P123CA0128.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:193::7) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+        Thu, 23 Feb 2023 12:46:05 -0500
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B58D4FCAD;
+        Thu, 23 Feb 2023 09:46:04 -0800 (PST)
+Received: by mail-lf1-x12a.google.com with SMTP id m7so14647604lfj.8;
+        Thu, 23 Feb 2023 09:46:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677174362;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gYIq09mCIdt8L8URFfe+pag31rri9xn6YRZUfSTQ4cQ=;
+        b=H/MKnTDnvFdWxcQfGw3ysDrqU8kxVqbL6vEJjW7HtOr4msWrzCGUY1PDxLUYdKo3PM
+         YLiEhEfthAIfkhDAArA4Ip+CysYZj3Ioym0g5zEOeTAbR+I2gMGXTUzHHV7bH2DWWNjl
+         xaSi8T4miZA00aVNpols7SD8/uKpin4Fz6UzJK/FMK4U5osorpRZc+UEgpJUbyK12qiE
+         UJdqkl2EYvKLRNn5+Vj0qVUk+ldaRk4W3GITriXGJDuD2OUgJwdNZS1jTj4dNe5gK7Vs
+         jplpcMZp/JSF/7m0eWlLZD+JHHGcUCVmkq8Cb1F2fTQCoIcyQGMYpYZ9oT9RF9y3UeUN
+         OuVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677174362;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gYIq09mCIdt8L8URFfe+pag31rri9xn6YRZUfSTQ4cQ=;
+        b=HKl+TpbOdb45pCN1VGmeiqec/J+nyF3QR+5aWD9lNEYe2Ze8+4kVW0r6+npERJVLa1
+         R5Tl0aWe+EBSdbD5+mcaaNCKp7COZVJHU6yFEZFWNEIKFPJZTGEB0p9rgDMuokFl499d
+         4nGCg6BaEhFYWf4szZoTqc8bHgTIGsSneHcOZPV90ZgU8U4737JUM9kPjCB/B4+8fqRh
+         PYVMbvjy7HQEE7s8rSdYdNBm5WgTW6kL/SddccFqkdWX0Cegdo7x86hstL/mGtvTTbWu
+         ErCBOrHxgleX4EGsrV4ZOMukA6f2rMy87KfrK46e2H8HfN22FkWGB4VJzJdUyoK1kza8
+         lxVg==
+X-Gm-Message-State: AO0yUKU/7M//cCpakjF2x3tlFXEo0nmyrqb2c9VgaeQhZz7ZLmH3K/jE
+        3qXIkrn+BhsxlDR6FoSOjW0=
+X-Google-Smtp-Source: AK7set/HWDu0Z1JwR4f2MLULVfhlz20LZD27Q64dW7aOz28mIbVbVwBH7uH3dA7q/4XucNCFko4n6A==
+X-Received: by 2002:ac2:5496:0:b0:4d7:bda4:e6ae with SMTP id t22-20020ac25496000000b004d7bda4e6aemr4409072lfk.3.1677174362080;
+        Thu, 23 Feb 2023 09:46:02 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id v6-20020ac25606000000b004b550c26949sm1025697lfd.290.2023.02.23.09.46.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Feb 2023 09:46:01 -0800 (PST)
+Date:   Thu, 23 Feb 2023 19:46:00 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v8 32/56] KVM: SVM: Add initial SEV-SNP support
+Message-ID: <20230223194600.000018ac@gmail.com>
+In-Reply-To: <20230220183847.59159-33-michael.roth@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-33-michael.roth@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|MN2PR11MB4677:EE_
-X-MS-Office365-Filtering-Correlation-Id: 06bfaa18-05d8-4704-f328-08db15c2eea5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: u1zOFH+MHqCv11dTClXDAkrdKgSfLobf0uFiVdOvGmSES2I1PAlHn2nZlqg75m+pff3HmyezlzTEq7zv4CFywUd49QFy3HRPV38LwG2Dy6yDZm+8btTvfWDRJnknkkCoclhh709sQKWQ7F5BVOfFsVjXtzDPwKShQytzEDFrs4c/KPeJBBNWUMNUx8uchCWO3qNd4N+kaqN4Km9L+1dMSDHenWcMJ+49POKLuPQOrLg/4U0U3kI+ZXtCAbXmBQaVv+CRT1kd3WDLZZjjZq4mnxyqNIzRgLAk6Jul/WbLJytI/3hLbWk30jnr9F+P+el/j/9tRrZ4uTeAdhjqEDQx30i4akIlLH8FQUx96KKqzVcG96cftYZlrLxBWvbCciUbeYqHiGPCx9Z94jcC638UV7jQmv1k2ARUFbfkGQr+h/tX4J55WXJTZ4rA1mtJ/Tc5FvL+p2Of+NpMjcPaUlwOJHQOAx+PHQ6+0sYjYbxrdUvocbUIme7pWWoJP1qoLkRiHnTdm18w613iFsWzEF5nNxfDxXZOlAD6L0Z+PJ2gp87QDeGhZcfZCQ2+psPpCad43hth/FTzCsi+GyIgdLA1E88LPDev0CIZNBHKrZfJyWPtC/GyKsUhOYnojhNJh6rlrFk3Y8IgIuYS+ikkolbK2Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(346002)(376002)(366004)(136003)(39860400002)(396003)(451199018)(41300700001)(5660300002)(44832011)(478600001)(186003)(26005)(8936002)(86362001)(38100700002)(8676002)(4744005)(6916009)(4326008)(66946007)(6506007)(6512007)(36916002)(82960400001)(6486002)(316002)(66556008)(66476007)(2906002)(6666004)(107886003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nh8ULwWod8BqaXb0dPV9a4Y7c793izI8aMCUWKWKPSQdStKZy7j2UgfqO6W8?=
- =?us-ascii?Q?EB1iPPvXK27BH693cqzbaFwaeDM9/Wf7lAObWFGHGElLZRFiW1v1ui5xDX9W?=
- =?us-ascii?Q?QmB642rh5fp1LsnfOlTq+FG9oT1u6WR1QYj6eVnUd5HxHgO1S7twA4jSbtLD?=
- =?us-ascii?Q?wMd5eiBW/hUALdKFUIEtrJS5OJb15lmTY7hmG2WX8uu0AV1csatXHi720sGU?=
- =?us-ascii?Q?RsA5H/qy0ptI88u2Z9/eZEx43OdUKSvyV9a6S0Og/Wcof5IQMlBydY65w2RA?=
- =?us-ascii?Q?kmaqeNYlHp9Rg/ZluEFURUnMji3/0Xwn46wsaTc1WQWWnuZQ49XyFyOuBUgq?=
- =?us-ascii?Q?djf84R6pTJAdySHPrsnYid/bMIXeefhVQaQPRBCLmWK4J/rnoTI23JFPJz6g?=
- =?us-ascii?Q?esI/pLMPJmNorr9Bt8eWMjYf4KWBjgpeArO90qXe5j9bVTUQYO360C4np75F?=
- =?us-ascii?Q?V0GNKaTFhz7ikO1fWT6ORLLoO3MiIg5Dfk1U/rd6o1wX07uWTB9v/G5amyR8?=
- =?us-ascii?Q?jZLC//UflFADzMcxjmYmcpa/NnoFTw7cMnze6wZbocdYgaLTkt1sDZN+vHEa?=
- =?us-ascii?Q?POzdM0vVlBc7uNpZosU31PeOCEv/5rAVo8xYafgY+LM7rsCTP2C7Hkig4Rma?=
- =?us-ascii?Q?pWRi1J7OjEu0pWiEkcf7N2a4oy4h3mR7FAYVgWcQCnEHJdoxeaaHRXjAIVra?=
- =?us-ascii?Q?CpQs2Iie5Yl1MQkoSCZaQXCqchGkttCQScvG6AzpRB0iz0MByZdpG6kWSc0Y?=
- =?us-ascii?Q?SN9G2mlS4mQWpE/2ACahLyvZdU+90ack0D1S2Y9orPCYTHk/UNTvbg/q656s?=
- =?us-ascii?Q?ux7O4lfsx4IWhUdmMBaGTJ0OKG9TsoUCwi4Z8YPfnACqs5Y5ylvfETr854Y2?=
- =?us-ascii?Q?R/N+C22ChA9dFQNUqcS7nzmzPX0cqUDh8dGvZ4/wTuQXvPPHd/a2o4ti0O5l?=
- =?us-ascii?Q?uckwcU3eHSVeaI9vYLArGyFyqCepsnhROyXRrvPz3fKnT8WY9s5eCQYmkwCw?=
- =?us-ascii?Q?nzEvC9gGkzMrP2JhLLQVeTq3ZuvHuq8C3mBq/+YbKzjdJ19CR5xVcvUcS8MF?=
- =?us-ascii?Q?yfx1+xy3q3TqVFTVtipEo16exlDXOuTCsp5OjyAbBwMT3LVDU3Nuo5LS1viV?=
- =?us-ascii?Q?rr6LDaVvLTPnFPJtARsgv4DfIXxqs1dLWT6K1YeZch2/zm4gx+x4XidbagxB?=
- =?us-ascii?Q?A+FDHtsm9uzRpNqWYzskmNp1Otg/RsGpy2nOCe7uLs3JaNEWJ8k7D5YQQ9vX?=
- =?us-ascii?Q?bQxIZWvrRx/Pi7KQba/wNMHn0Mkg8CA/FDTRXwq7+QkaqVIK7+ghKzUkbCLP?=
- =?us-ascii?Q?QW4gufoLxNlrRmf+SHll45UECNYmbae6EvuhxGGn1cgRr/3aBtdCzQaQ5m5u?=
- =?us-ascii?Q?VrzENMTpDGr78C52sjsJ5GaXRBHJNnEmN0OKJx6Z0kek7dQuvx0wiY7x6ZK5?=
- =?us-ascii?Q?bhXGi1jTG+20pFo3eaeoFE126jQcV3c4voyVGq7pubvmUhMQs+YYvi2k/FIC?=
- =?us-ascii?Q?LRgRro+xHpdX2xLxFsHyH0IrHhfEuDS9SYBXU4w/KtnP8sshmIfuayYpfXij?=
- =?us-ascii?Q?ycQIkRKpbhTCFbFkDqyatguAD2LraS/pNh8Xs94JDbBTwRBkYU8osyDzRXHa?=
- =?us-ascii?Q?tQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06bfaa18-05d8-4704-f328-08db15c2eea5
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2023 17:25:17.6779
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Cp0sBhehdDQOiXFe3ZQWqCUwZT7adtvg3lMBBiz990B6y0+nUjjgWWCfSdOziAAMsePaP0zIvTVhpI/mkbE8/UJGFD6/pZjzheCJ89Pjkgo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4677
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 15, 2023 at 04:34:38PM +0800, Herbert Xu wrote:
-> Include crypto/algapi.h instead of linux/crypto.h in adf_ctl_drv.c
-> as this is using the low-level Crypto API.  It just happens to work
-> currently because MODULE_ALIAS_CRYPTO was mistakenly added to
-> linux/crypto.h.
+On Mon, 20 Feb 2023 12:38:23 -0600
+Michael Roth <michael.roth@amd.com> wrote:
+
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> The next generation of SEV is called SEV-SNP (Secure Nested Paging).
+> SEV-SNP builds upon existing SEV and SEV-ES functionality  while adding new
+> hardware based security protection. SEV-SNP adds strong memory encryption
+> integrity protection to help prevent malicious hypervisor-based attacks
+> such as data replay, memory re-mapping, and more, to create an isolated
+> execution environment.
+> 
+> The SNP feature is added incrementally, the later patches adds a new module
+> parameters that can be used to enabled SEV-SNP in the KVM.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 10 +++++++++-
+>  arch/x86/kvm/svm/svm.h |  8 ++++++++
+>  2 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 9e9efb42a766..51db01b282eb 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -58,6 +58,9 @@ module_param_named(sev_es, sev_es_enabled, bool, 0444);
+>  #define sev_es_enabled false
+>  #endif /* CONFIG_KVM_AMD_SEV */
+>  
+> +/* enable/disable SEV-SNP support */
+> +static bool sev_snp_enabled;
+> +
+>  #define AP_RESET_HOLD_NONE		0
+>  #define AP_RESET_HOLD_NAE_EVENT		1
+>  #define AP_RESET_HOLD_MSR_PROTO		2
+> @@ -2306,6 +2309,7 @@ void __init sev_hardware_setup(void)
+>  {
+>  #ifdef CONFIG_KVM_AMD_SEV
+>  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+> +	bool sev_snp_supported = false;
+>  	bool sev_es_supported = false;
+>  	bool sev_supported = false;
+>  
+> @@ -2385,12 +2389,16 @@ void __init sev_hardware_setup(void)
+>  	if (misc_cg_set_capacity(MISC_CG_RES_SEV_ES, sev_es_asid_count))
+>  		goto out;
+>  
+> -	pr_info("SEV-ES supported: %u ASIDs\n", sev_es_asid_count);
+>  	sev_es_supported = true;
+> +	sev_snp_supported = sev_snp_enabled && cpu_feature_enabled(X86_FEATURE_SEV_SNP);
+> +
+> +	pr_info("SEV-ES %ssupported: %u ASIDs\n",
+> +		sev_snp_supported ? "and SEV-SNP " : "", sev_es_asid_count);
+>  
+>  out:
+>  	sev_enabled = sev_supported;
+>  	sev_es_enabled = sev_es_supported;
+> +	sev_snp_enabled = sev_snp_supported;
+>  #endif
+>  }
+>  
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 5efcf036ccad..8eb1b51e92f5 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -76,6 +76,7 @@ enum {
+>  struct kvm_sev_info {
+>  	bool active;		/* SEV enabled guest */
+>  	bool es_active;		/* SEV-ES enabled guest */
+> +	bool snp_active;	/* SEV-SNP enabled guest */
+>  	unsigned int asid;	/* ASID used for this guest */
+>  	unsigned int handle;	/* SEV firmware handle */
+>  	int fd;			/* SEV device fd */
+> @@ -323,6 +324,13 @@ static __always_inline bool sev_es_guest(struct kvm *kvm)
+>  #endif
+>  }
+>  
+> +static inline bool sev_snp_guest(struct kvm *kvm)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +	return sev_es_guest(kvm) && sev->snp_active;
+> +}
+> +
+
+Maybe also use __always_inline like sev_es_guest() above?
+
+It seems solved some warnings before:
+
+https://lore.kernel.org/all/20210624095147.880513802@infradead.org/
+
+>  static inline void vmcb_mark_all_dirty(struct vmcb *vmcb)
+>  {
+>  	vmcb->control.clean = 0;
 
