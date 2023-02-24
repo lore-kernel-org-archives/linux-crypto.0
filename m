@@ -2,77 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F42C61DA4
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Feb 2023 02:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D0FC61DA3
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Feb 2023 05:08:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229379AbjBXCGx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Feb 2023 21:06:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34442 "EHLO
+        id S229584AbjBXFIp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Feb 2023 00:08:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjBXCGw (ORCPT
+        with ESMTP id S229477AbjBXFIo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Feb 2023 21:06:52 -0500
-Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E3B3B23E
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Feb 2023 18:06:34 -0800 (PST)
-Received: from mail.aspeedtech.com ([192.168.0.24])
-        by twspam01.aspeedtech.com with ESMTP id 31O1qK9V007233;
-        Fri, 24 Feb 2023 09:52:20 +0800 (GMT-8)
-        (envelope-from neal_liu@aspeedtech.com)
-Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
- (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 24 Feb
- 2023 10:05:24 +0800
-From:   Neal Liu <neal_liu@aspeedtech.com>
-To:     Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>,
-        Neal Liu <neal_liu@aspeedtech.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-Subject: [PATCH v2] crypto: aspeed: add error handling if dmam_alloc_coherent() failed
-Date:   Fri, 24 Feb 2023 10:05:21 +0800
-Message-ID: <20230224020521.3158285-1-neal_liu@aspeedtech.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 24 Feb 2023 00:08:44 -0500
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0616C367D5
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Feb 2023 21:08:40 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pVQJv-00F7Zc-9h; Fri, 24 Feb 2023 13:08:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 24 Feb 2023 13:08:35 +0800
+Date:   Fri, 24 Feb 2023 13:08:35 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
+Subject: [PATCH] crypto: stm32 - Fix empty message checks
+Message-ID: <Y/hGU7r56Phsz3wN@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [192.168.10.10]
-X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
- (192.168.0.24)
-X-DNSRBL: 
-X-MAIL: twspam01.aspeedtech.com 31O1qK9V007233
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since the acry_dev->buf_addr may be NULL, add error handling to
-prevent any additional access to avoid potential issues.
+The empty message checks may trigger on non-empty messages split
+over an update operation followed by a final operation (where
+req->nbytes can/should be set to zero).
 
-Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
----
-Change since v1: remove memzero_explicit() as dmam_alloc_coherent()
-returns memory that's already zeroed.
+Fixes: b56403a25af7 ("crypto: stm32/hash - Support Ux500 hash")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
- drivers/crypto/aspeed/aspeed-acry.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/aspeed-acry.c
-index 1f77ebd73489..eb30649ea7b3 100644
---- a/drivers/crypto/aspeed/aspeed-acry.c
-+++ b/drivers/crypto/aspeed/aspeed-acry.c
-@@ -782,7 +782,10 @@ static int aspeed_acry_probe(struct platform_device *pdev)
- 	acry_dev->buf_addr = dmam_alloc_coherent(dev, ASPEED_ACRY_BUFF_SIZE,
- 						 &acry_dev->buf_dma_addr,
- 						 GFP_KERNEL);
--	memzero_explicit(acry_dev->buf_addr, ASPEED_ACRY_BUFF_SIZE);
-+	if (!acry_dev->buf_addr) {
-+		rc = -ENOMEM;
-+		goto err_engine_rsa_start;
-+	}
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index 7bf805563ac2..acf8bfc8de4b 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -148,6 +148,7 @@ struct stm32_hash_request_ctx {
+ 	int			nents;
  
- 	aspeed_acry_register(acry_dev);
+ 	u8			data_type;
++	bool			nonempty;
+ 
+ 	u8 buffer[HASH_BUFLEN] __aligned(sizeof(u32));
+ 
+@@ -310,7 +311,7 @@ static void stm32_hash_write_ctrl(struct stm32_hash_dev *hdev, int bufcnt)
+ 		 * On the Ux500 we need to set a special flag to indicate that
+ 		 * the message is zero length.
+ 		 */
+-		if (hdev->pdata->ux500 && bufcnt == 0)
++		if (hdev->pdata->ux500 && !rctx->nonempty)
+ 			reg |= HASH_CR_UX500_EMPTYMSG;
+ 
+ 		if (!hdev->polled)
+@@ -754,6 +755,7 @@ static int stm32_hash_init(struct ahash_request *req)
+ 	rctx->total = 0;
+ 	rctx->offset = 0;
+ 	rctx->data_type = HASH_DATA_8_BITS;
++	rctx->nonempty = false;
+ 
+ 	memset(rctx->buffer, 0, HASH_BUFLEN);
+ 
+@@ -832,7 +834,7 @@ static void stm32_hash_copy_hash(struct ahash_request *req)
+ 	__be32 *hash = (void *)rctx->digest;
+ 	unsigned int i, hashsize;
+ 
+-	if (hdev->pdata->broken_emptymsg && !req->nbytes)
++	if (hdev->pdata->broken_emptymsg && !rctx->nonempty)
+ 		return stm32_hash_emptymsg_fallback(req);
+ 
+ 	switch (rctx->flags & HASH_FLAGS_ALGO_MASK) {
+@@ -986,6 +988,8 @@ static int stm32_hash_update(struct ahash_request *req)
+ {
+ 	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
+ 
++	rctx->nonempty = !!req->nbytes;
++
+ 	if (!req->nbytes || !(rctx->flags & HASH_FLAGS_CPU))
+ 		return 0;
  
 -- 
-2.25.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
