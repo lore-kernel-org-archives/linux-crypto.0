@@ -2,102 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A20C64ED8
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Feb 2023 02:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB55FC7EE2D
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 Feb 2023 23:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbjBYC1L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Feb 2023 21:27:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42626 "EHLO
+        id S229530AbjBYXPl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 25 Feb 2023 18:15:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbjBYC07 (ORCPT
+        with ESMTP id S229489AbjBYXPk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Feb 2023 21:26:59 -0500
-Received: from mail.nfschina.com (unknown [42.101.60.237])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B111D703B5;
-        Fri, 24 Feb 2023 18:26:49 -0800 (PST)
-Received: from localhost (unknown [127.0.0.1])
-        by mail.nfschina.com (Postfix) with ESMTP id 4D51F1A00AB6;
-        Sat, 25 Feb 2023 10:27:29 +0800 (CST)
-X-Virus-Scanned: amavisd-new at nfschina.com
-Received: from mail.nfschina.com ([127.0.0.1])
-        by localhost (localhost.localdomain [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id f2tf31PPdTLl; Sat, 25 Feb 2023 10:27:28 +0800 (CST)
-Received: from localhost.localdomain (unknown [111.193.131.207])
-        (Authenticated sender: kunyu@nfschina.com)
-        by mail.nfschina.com (Postfix) with ESMTPA id 3BD691A00AB3;
-        Sat, 25 Feb 2023 10:27:28 +0800 (CST)
-From:   Li kunyu <kunyu@nfschina.com>
-To:     linus.walleij@linaro.org
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        kunyu@nfschina.com, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        lionel.debieve@foss.st.com, mcoquelin.stm32@gmail.com
-Subject: Re: [v2 PATCH] crypto: stm32 - Save and restore between each request
-Date:   Sat, 25 Feb 2023 10:26:26 +0800
-Message-Id: <20230225022627.8275-1-kunyu@nfschina.com>
-X-Mailer: git-send-email 2.18.2
-In-Reply-To: <CACRpkdZe3cMMxJesD0mpqHTwvuWHjSGVHsiFUQQyuA+VWknMTQ@mail.gmail.com>
-References: <CACRpkdZe3cMMxJesD0mpqHTwvuWHjSGVHsiFUQQyuA+VWknMTQ@mail.gmail.com>
+        Sat, 25 Feb 2023 18:15:40 -0500
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C35F940
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Feb 2023 15:15:39 -0800 (PST)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-536cd8f6034so78913827b3.10
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Feb 2023 15:15:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=SJmSfEEN4ER+rrwr2AAo+0NwW5TiTbnjxiFoVH+2l9g=;
+        b=lJuA91aU+Z6dTyfnGMZiVv3hrjIkUarjSMsX4//t7Svg2+BqrGDoGH0GjaPHAdBO4u
+         G3blhCZrGSY7lPwfnaKaW39TqZjA/tz4w6Vv1c+0JaDZS2srvRmFlfxteeK3UpfVBreJ
+         5F8qqdMVrlED+IGO+nY37MbRA7IKvEt4wWuVcgZAA84RtrzqTpYeSsqH2SMeL6gpX0lE
+         +n9MzpJR4CBJEDStxxjecE5wzyZK8v8sgZwd7sYVY4RtLz7ZEul2g8HJPy7fggXDL3xB
+         8gWG3WGEGYMnEs1sowTXxetmnWh9yN9AfLCCjOiKo0CniLKCUTCTXaz+sgbee/E0TQGH
+         XHIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SJmSfEEN4ER+rrwr2AAo+0NwW5TiTbnjxiFoVH+2l9g=;
+        b=M7R0s4xiartT6nh65AFam+7SByAuhx0/JyumcuU3MlmDF1z0xJYG03MUdw8TBPlyXp
+         G9d9eqE5N1Rh9gpAQaik3pGRXYncjjfmDEChFD6A9ryyRDXTwLZb4kf+cHs8FE8Lsgpa
+         non0nwAJJl5e7iCXEHnBz3Eb1pMFgnhx7lilmmHKBbKkgSkH0iu69DZC9VHQjijuUTXy
+         My+wk3L0tvhYJ84Xcg4TGWTYez/x1EC8WgbVERTWpt0PdWhecw53aFHhenYzDihr3rgv
+         tUAetZKyziwUW9g0I7CJLMeUjLQQygrpBj1L49vCKAHf2LAJ0vFP4sXKhHGfdOFmXp/o
+         rm2g==
+X-Gm-Message-State: AO0yUKXP2vUeaemPsiE2oxcDRzctk/LXEcIaUjIhF2iekAqGrpn7uWPI
+        o90l4PX387B7FIbcfnKP8uIL87JHyF+Sd4HtdB3REtZEWc4dyfAo
+X-Google-Smtp-Source: AK7set81k6a7OARPbG8rGRSwKMm+X+pUCEQjYElVtITGMi8kMV0p1mfBo4QFoFXB6q5yGAxkalHBm6shkJcbwLjHKLw=
+X-Received: by 2002:a81:af5d:0:b0:52e:cea7:f6e3 with SMTP id
+ x29-20020a81af5d000000b0052ecea7f6e3mr7373343ywj.10.1677366938879; Sat, 25
+ Feb 2023 15:15:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <Y/cBB+q0Ono9j2Jy@gondor.apana.org.au> <20230224231430.2948-1-kunyu@nfschina.com>
+ <Y/cy5wUtk10OahpO@gondor.apana.org.au> <CACRpkdYyB=-UnE1bmdVszSSB5ReECZ0fUoWJX6XtYbKHEe52tA@mail.gmail.com>
+ <Y/c7iVW67Xhhdu8e@gondor.apana.org.au> <Y/hQdzsKMYgkIfMY@gondor.apana.org.au> <CACRpkdZe3cMMxJesD0mpqHTwvuWHjSGVHsiFUQQyuA+VWknMTQ@mail.gmail.com>
+In-Reply-To: <CACRpkdZe3cMMxJesD0mpqHTwvuWHjSGVHsiFUQQyuA+VWknMTQ@mail.gmail.com>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Sun, 26 Feb 2023 00:15:27 +0100
+Message-ID: <CACRpkdY7V=x9+oWsbPtmjc-WBz6v2aSr9RVD1pJ4SGu+Dxejvw@mail.gmail.com>
+Subject: Re: [v2 PATCH] crypto: stm32 - Save and restore between each request
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sat, Feb 25, 2023 at 1:01 AM Linus Walleij <linus.walleij@linaro.org> wrote:
 
-hello senior:
-    I understand the new patch and probably know where to add these two functions.
- 
-> +static int stm32_hash_one_request(struct crypto_engine *engine, void *areq)
+> I tested this on the Ux500 and sadly this happens
+> already in probe():
+(...)
+> [    2.828815] stm32-hash a03c2000.hash: Algo 0 : 0 failed
+> [    2.834144] stm32-hash: probe of a03c2000.hash failed with error -22
 
-+	if (rctx->flags & HASH_FLAGS_INIT) {
-+		u32 *preg = rctx->hw_context;
-+		u32 reg;
-+		int i;
-+
-+		if (!hdev->pdata->ux500)
-+			stm32_hash_write(hdev, HASH_IMR, *preg++);
-+		stm32_hash_write(hdev, HASH_STR, *preg++);
-+		stm32_hash_write(hdev, HASH_CR, *preg);
-+		reg = *preg++ | HASH_CR_INIT;
-+		stm32_hash_write(hdev, HASH_CR, reg);
-+
-+		for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
-+			stm32_hash_write(hdev, HASH_CSR(i), *preg++);
-+
-+		hdev->flags |= HASH_FLAGS_INIT;
--------------------------------------------------------------
-Add functions:
-		pm_runtime_mark_last_busy(hdev->dev);
-        	pm_runtime_put_autosuspend(hdev->dev);
--------------------------------------------------------------
-+	}
-+
+It turns out that this is because this:
 
-There is another place:
+-       /* Export Context */
+-       u32                     *hw_context;
++       /* hash state */
++       u32                     hw_context[3 + HASH_CSR_REGISTER_NUMBER];
 
-> @@ -442,6 +441,18 @@ static int stm32_hash_update_cpu(struct stm32_hash_dev *hdev)
- 			hdev->flags |= HASH_FLAGS_OUTPUT_READY;
- 			err = 0;
- 		}
-+	} else {
-+		u32 *preg = rctx->hw_context;
-+		int i;
-+
-+		if (!hdev->pdata->ux500)
-+			*preg++ = stm32_hash_read(hdev, HASH_IMR);
-+		*preg++ = stm32_hash_read(hdev, HASH_STR);
-+		*preg++ = stm32_hash_read(hdev, HASH_CR);
-+		for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
-+			*preg++ = stm32_hash_read(hdev, HASH_CSR(i));
-+
-+		rctx->flags |= HASH_FLAGS_INIT;
--------------------------------------------------------------
-Add functions:
-		pm_runtime_mark_last_busy(hdev->dev);
-        	pm_runtime_put_autosuspend(hdev->dev);
--------------------------------------------------------------
- 	}
+Makes struct stm32_hash_request_ctx 580 bytes
+and that fails sanity check in ahash.c because
+HASH_MAX_STATESIZE is 512.
 
+I don't know the story behind why HASH_MAX_STATESIZE
+is 512, the stm32 hash state contains a buffer of 256 bytes
+so I guess either that buffer is a bit big or
+HASH_MAX_STATESIZE is a bit small?
+
+I'm happy to try to change either to make this fit.
+
+Yours,
+Linus Walleij
