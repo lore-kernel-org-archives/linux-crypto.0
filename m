@@ -2,95 +2,99 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB55FC7EE2D
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Feb 2023 23:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80841C7EE30
+	for <linux-crypto@archiver.kernel.org>; Sun, 26 Feb 2023 14:47:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229530AbjBYXPl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 25 Feb 2023 18:15:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
+        id S229865AbjBZOre (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 26 Feb 2023 09:47:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjBYXPk (ORCPT
+        with ESMTP id S229797AbjBZOra (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 Feb 2023 18:15:40 -0500
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C35F940
-        for <linux-crypto@vger.kernel.org>; Sat, 25 Feb 2023 15:15:39 -0800 (PST)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-536cd8f6034so78913827b3.10
-        for <linux-crypto@vger.kernel.org>; Sat, 25 Feb 2023 15:15:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJmSfEEN4ER+rrwr2AAo+0NwW5TiTbnjxiFoVH+2l9g=;
-        b=lJuA91aU+Z6dTyfnGMZiVv3hrjIkUarjSMsX4//t7Svg2+BqrGDoGH0GjaPHAdBO4u
-         G3blhCZrGSY7lPwfnaKaW39TqZjA/tz4w6Vv1c+0JaDZS2srvRmFlfxteeK3UpfVBreJ
-         5F8qqdMVrlED+IGO+nY37MbRA7IKvEt4wWuVcgZAA84RtrzqTpYeSsqH2SMeL6gpX0lE
-         +n9MzpJR4CBJEDStxxjecE5wzyZK8v8sgZwd7sYVY4RtLz7ZEul2g8HJPy7fggXDL3xB
-         8gWG3WGEGYMnEs1sowTXxetmnWh9yN9AfLCCjOiKo0CniLKCUTCTXaz+sgbee/E0TQGH
-         XHIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SJmSfEEN4ER+rrwr2AAo+0NwW5TiTbnjxiFoVH+2l9g=;
-        b=M7R0s4xiartT6nh65AFam+7SByAuhx0/JyumcuU3MlmDF1z0xJYG03MUdw8TBPlyXp
-         G9d9eqE5N1Rh9gpAQaik3pGRXYncjjfmDEChFD6A9ryyRDXTwLZb4kf+cHs8FE8Lsgpa
-         non0nwAJJl5e7iCXEHnBz3Eb1pMFgnhx7lilmmHKBbKkgSkH0iu69DZC9VHQjijuUTXy
-         My+wk3L0tvhYJ84Xcg4TGWTYez/x1EC8WgbVERTWpt0PdWhecw53aFHhenYzDihr3rgv
-         tUAetZKyziwUW9g0I7CJLMeUjLQQygrpBj1L49vCKAHf2LAJ0vFP4sXKhHGfdOFmXp/o
-         rm2g==
-X-Gm-Message-State: AO0yUKXP2vUeaemPsiE2oxcDRzctk/LXEcIaUjIhF2iekAqGrpn7uWPI
-        o90l4PX387B7FIbcfnKP8uIL87JHyF+Sd4HtdB3REtZEWc4dyfAo
-X-Google-Smtp-Source: AK7set81k6a7OARPbG8rGRSwKMm+X+pUCEQjYElVtITGMi8kMV0p1mfBo4QFoFXB6q5yGAxkalHBm6shkJcbwLjHKLw=
-X-Received: by 2002:a81:af5d:0:b0:52e:cea7:f6e3 with SMTP id
- x29-20020a81af5d000000b0052ecea7f6e3mr7373343ywj.10.1677366938879; Sat, 25
- Feb 2023 15:15:38 -0800 (PST)
+        Sun, 26 Feb 2023 09:47:30 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC4C13D43;
+        Sun, 26 Feb 2023 06:46:52 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1EDB7B8068F;
+        Sun, 26 Feb 2023 14:45:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0846C4339B;
+        Sun, 26 Feb 2023 14:45:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677422748;
+        bh=uWz/X985SxdYJil3gvKDScsqPZntTshRERdo9etL7+Y=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SzlSi3rd+J6825ysLsaOLZ57dMq+Lp964BXW3SrfiuFVtti+3ENGvrA4bb7NsjwqH
+         bruDOsHHB5+ijx/Aj2inMIEmXLZZdb60r7pefx6/4yFReX86L1fx3akfq/XadX9KLE
+         SkAr7dQA7pMsYQAa0YGS5GZ+wkTYLKzJQa2gwA9d8xAAmUx6DpPYYnU82tFQDS+vqR
+         tlPcInMrfuSHtKKNVib7owM72EUnlAu7QGebXDJCs4tmpj52sRnLc4A3yj2CiryjdP
+         VAkY5TDaupq+RE8A5OHO/56R+D2tO+Kd1KdjjsUnikiwBw/dVgCVxB6fpJqnd/l5O3
+         6sOYDHF8PX8Ag==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
+        ndesaulniers@google.com, llvm@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.2 25/53] crypto: hisilicon: Wipe entire pool on error
+Date:   Sun, 26 Feb 2023 09:44:17 -0500
+Message-Id: <20230226144446.824580-25-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230226144446.824580-1-sashal@kernel.org>
+References: <20230226144446.824580-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <Y/cBB+q0Ono9j2Jy@gondor.apana.org.au> <20230224231430.2948-1-kunyu@nfschina.com>
- <Y/cy5wUtk10OahpO@gondor.apana.org.au> <CACRpkdYyB=-UnE1bmdVszSSB5ReECZ0fUoWJX6XtYbKHEe52tA@mail.gmail.com>
- <Y/c7iVW67Xhhdu8e@gondor.apana.org.au> <Y/hQdzsKMYgkIfMY@gondor.apana.org.au> <CACRpkdZe3cMMxJesD0mpqHTwvuWHjSGVHsiFUQQyuA+VWknMTQ@mail.gmail.com>
-In-Reply-To: <CACRpkdZe3cMMxJesD0mpqHTwvuWHjSGVHsiFUQQyuA+VWknMTQ@mail.gmail.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Sun, 26 Feb 2023 00:15:27 +0100
-Message-ID: <CACRpkdY7V=x9+oWsbPtmjc-WBz6v2aSr9RVD1pJ4SGu+Dxejvw@mail.gmail.com>
-Subject: Re: [v2 PATCH] crypto: stm32 - Save and restore between each request
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 25, 2023 at 1:01 AM Linus Walleij <linus.walleij@linaro.org> wrote:
+From: Kees Cook <keescook@chromium.org>
 
-> I tested this on the Ux500 and sadly this happens
-> already in probe():
-(...)
-> [    2.828815] stm32-hash a03c2000.hash: Algo 0 : 0 failed
-> [    2.834144] stm32-hash: probe of a03c2000.hash failed with error -22
+[ Upstream commit aa85923a954e7704bc9d3847dabeb8540aa98d13 ]
 
-It turns out that this is because this:
+To work around a Clang __builtin_object_size bug that shows up under
+CONFIG_FORTIFY_SOURCE and UBSAN_BOUNDS, move the per-loop-iteration
+mem_block wipe into a single wipe of the entire pool structure after
+the loop.
 
--       /* Export Context */
--       u32                     *hw_context;
-+       /* hash state */
-+       u32                     hw_context[3 + HASH_CSR_REGISTER_NUMBER];
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Link: https://github.com/ClangBuiltLinux/linux/issues/1780
+Cc: Weili Qian <qianweili@huawei.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Tested-by: Nathan Chancellor <nathan@kernel.org> # build
+Link: https://lore.kernel.org/r/20230106041945.never.831-kees@kernel.org
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/hisilicon/sgl.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Makes struct stm32_hash_request_ctx 580 bytes
-and that fails sanity check in ahash.c because
-HASH_MAX_STATESIZE is 512.
+diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+index 2b6f2281cfd6c..0974b00414050 100644
+--- a/drivers/crypto/hisilicon/sgl.c
++++ b/drivers/crypto/hisilicon/sgl.c
+@@ -124,9 +124,8 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
+ 	for (j = 0; j < i; j++) {
+ 		dma_free_coherent(dev, block_size, block[j].sgl,
+ 				  block[j].sgl_dma);
+-		memset(block + j, 0, sizeof(*block));
+ 	}
+-	kfree(pool);
++	kfree_sensitive(pool);
+ 	return ERR_PTR(-ENOMEM);
+ }
+ EXPORT_SYMBOL_GPL(hisi_acc_create_sgl_pool);
+-- 
+2.39.0
 
-I don't know the story behind why HASH_MAX_STATESIZE
-is 512, the stm32 hash state contains a buffer of 256 bytes
-so I guess either that buffer is a bit big or
-HASH_MAX_STATESIZE is a bit small?
-
-I'm happy to try to change either to make this fit.
-
-Yours,
-Linus Walleij
