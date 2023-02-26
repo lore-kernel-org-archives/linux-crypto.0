@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7609C7EE36
-	for <linux-crypto@archiver.kernel.org>; Sun, 26 Feb 2023 14:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94109C6FA8E
+	for <linux-crypto@archiver.kernel.org>; Sun, 26 Feb 2023 15:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbjBZO4I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 26 Feb 2023 09:56:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55258 "EHLO
+        id S231622AbjBZPGp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 26 Feb 2023 10:06:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231283AbjBZOzP (ORCPT
+        with ESMTP id S232047AbjBZPFS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 26 Feb 2023 09:55:15 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAC9F15887;
-        Sun, 26 Feb 2023 06:50:59 -0800 (PST)
+        Sun, 26 Feb 2023 10:05:18 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4732B1BAEA;
+        Sun, 26 Feb 2023 06:56:08 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 367F060C49;
-        Sun, 26 Feb 2023 14:50:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FF3AC433A0;
-        Sun, 26 Feb 2023 14:50:53 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EBCDEB80BAA;
+        Sun, 26 Feb 2023 14:49:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DE50C433D2;
+        Sun, 26 Feb 2023 14:49:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677423054;
-        bh=r+KOjwwc9UaFDXuIkKlXzP5eA2B5FpFDXbCIlVGldCA=;
+        s=k20201202; t=1677422972;
+        bh=7Bc3iO8TG1DS9g7AMkTNU9+OVM8V9J21a4MnxY6Xc2M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NMBBT7dJB0u71CDVuhN/RZeY9JoL0POhnPfdcbCv9nLMQfU3331nas74s8ItyuKfF
-         OUE3VkB6hTbDdY/1ZqWbk/Wuz2W52KO9kAivW8NRwcgqQUz4IqKChQyhC5S6w9ZWk+
-         1O334O9AMX0X+mSOI02Td09LqOM47L0mDbMei5+PtLLKRwjsuxRln4ay7AeB4QHtEl
-         vqcaep66AYGv5I8nnDaAjtQKB29uSRtGY0qvoJdcv+2oVqNlpuoqu6Ij55abbEIVa7
-         G1duByZG7l8JAKwzOAnxKmkhBglq5dsgfiyJCxezrW6TrcsoiSsDgR7QHsh+qgXOKT
-         lCirVqk0k5aaw==
+        b=qwq7OE9NgoDMr22scTJAJP+lQhG7+agTV+5tI6+t1GMEjiO8tT1OtxWZw79imX3GY
+         b82HlZVIBhwj7rhjfuN7SM4kG1Tjz9fAKFh0xu+uq0yX1zQAVvE89usXnfk0YfKqEo
+         KOgDe+a3xxDs93vQitswIdliSMulMqPbEbLxjvkdru+LjngNTQag8LcF94BNXx1goa
+         xQif20yJXyIoJW7vUyMEur/YjYiIhaCaUtGqEE6Lbe9BiBZL8KoVTh8DcgYWCt0mp6
+         5GCwYBrjzWC1PdDllawtBd0mXqJcqi11ZtjFkllxx2GVCg3PfKmqkoqbxY8nD5gXCQ
+         S0HSSxMjoA/0Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -42,12 +42,12 @@ Cc:     Kees Cook <keescook@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>,
         ndesaulniers@google.com, llvm@lists.linux.dev
-Subject: [PATCH AUTOSEL 5.10 16/27] crypto: hisilicon: Wipe entire pool on error
-Date:   Sun, 26 Feb 2023 09:50:03 -0500
-Message-Id: <20230226145014.828855-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 18/36] crypto: hisilicon: Wipe entire pool on error
+Date:   Sun, 26 Feb 2023 09:48:26 -0500
+Message-Id: <20230226144845.827893-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226145014.828855-1-sashal@kernel.org>
-References: <20230226145014.828855-1-sashal@kernel.org>
+In-Reply-To: <20230226144845.827893-1-sashal@kernel.org>
+References: <20230226144845.827893-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -81,10 +81,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
-index 725a739800b0a..ce77826c7fb05 100644
+index 057273769f264..3dbe5405d17bc 100644
 --- a/drivers/crypto/hisilicon/sgl.c
 +++ b/drivers/crypto/hisilicon/sgl.c
-@@ -113,9 +113,8 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
+@@ -122,9 +122,8 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
  	for (j = 0; j < i; j++) {
  		dma_free_coherent(dev, block_size, block[j].sgl,
  				  block[j].sgl_dma);
