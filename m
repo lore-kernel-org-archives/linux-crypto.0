@@ -2,115 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECAB0C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 08:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B63C64ED8
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 08:49:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbjB0IVA convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Feb 2023 03:21:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52466 "EHLO
+        id S229839AbjB0ItD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Feb 2023 03:49:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbjB0IVA (ORCPT
+        with ESMTP id S229681AbjB0Is2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Feb 2023 03:21:00 -0500
-X-Greylist: delayed 431 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 27 Feb 2023 00:20:54 PST
-Received: from ouvsmtp1.octopuce.fr (ouvsmtp1.octopuce.fr [194.36.166.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0461B337;
-        Mon, 27 Feb 2023 00:20:54 -0800 (PST)
-Received: from panel.vitry.ouvaton.coop (unknown [194.36.166.20])
-        by ouvsmtp1.octopuce.fr (Postfix) with ESMTPS id A80431647;
-        Mon, 27 Feb 2023 09:13:41 +0100 (CET)
-Received: from sm.ouvaton.coop (ouvadm.octopuce.fr [194.36.166.2])
-        by panel.vitry.ouvaton.coop (Postfix) with ESMTPSA id 751185E1520;
-        Mon, 27 Feb 2023 09:13:41 +0100 (CET)
+        Mon, 27 Feb 2023 03:48:28 -0500
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C767120699
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Feb 2023 00:40:55 -0800 (PST)
+Received: by mail-ed1-f49.google.com with SMTP id o15so19926991edr.13
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Feb 2023 00:40:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CH6ZpU+JOFCafQhSsbHQ0xgVRdIPci60OVF8oWU+Tfc=;
+        b=T/pef4aQhpHKVXdjEoStsvQDncMiQZ78J8GsUOpjLcFNNAgYA6i3hXoQhn+6dPp+T2
+         txgQ5E/uAtEXWxyXTjzhItOlpX7ux9sCS+EWmdHbnIJTwO75aZ+XsPJLSF6dMZnTtOET
+         k5BUloRtinJVwCJeBO57hUuZ1U/J2fnNpDuAkkbTc5LNyVnN34NI0JaLohx1qcLeBXJV
+         NzQ2hYeH9dqj4cPqXFtZ2i8JEKSKU8v+WF90Jl3Gh8eEQZGqchF5hJAn/vXfh0jz1+AV
+         zfLQaMoBFUFOWKcHb/48tQPIFYnakC1cCtsH9ygQnu2dMhSfjvvAQdGlyElfgODA5bC2
+         sa5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CH6ZpU+JOFCafQhSsbHQ0xgVRdIPci60OVF8oWU+Tfc=;
+        b=VC3LsKClj2ZtI7LxFJDUI2+J+elvOuIfXGy9tRsiTngr3mvV+l4nhkd2xejyWdDodK
+         unHaNJj0/GnLSpRWUZTaJ6GEoF92FlZoEooHeYcsn2eLMOZ+m9jBXI7OUhyBfCVViM96
+         IWbQBjyYpE7Om/5HfFQhTZBy3CDdnJrv2Z+ua7xI6QK1+6RYI1rc5JoH4n9+uoCJv2KK
+         4eW+MXQdvW8cxhQMKe7SV/gbJHTJgmfpbwhK8uUOZO1ZOENFi6JOgho4CGhu0Vbb1Ara
+         uQMQ5KsJaDRZnvt4+haY1rvYt7IRup/B5ZnAFA20umolpjfMENoCK8JLsqcLE2ycjq0i
+         /Jww==
+X-Gm-Message-State: AO0yUKXCLtWM9lrhcoIcnrRsCqXIO5e5Frr7gxat0lxT8Dwjnl4Jfbjq
+        N6jMoVknfw/ov09WBVbgsC0AG4IDKG5R9Sjo
+X-Google-Smtp-Source: AK7set/XHFbsiCWEKMN5AeluxjBJDiNmFSbdklmpDlrCTPFxXBb6ozXrUsXvjirmXJjqO7SbPtCbDQ==
+X-Received: by 2002:a5d:6782:0:b0:2ca:19c1:1d4b with SMTP id v2-20020a5d6782000000b002ca19c11d4bmr3928716wru.54.1677486411314;
+        Mon, 27 Feb 2023 00:26:51 -0800 (PST)
+Received: from [192.168.7.111] (679773502.box.freepro.com. [212.114.21.58])
+        by smtp.gmail.com with ESMTPSA id p2-20020adfe602000000b002c561805a4csm6482320wrm.45.2023.02.27.00.26.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Feb 2023 00:26:50 -0800 (PST)
+Message-ID: <45737a29-8279-cb40-8d22-6a5052361061@linaro.org>
+Date:   Mon, 27 Feb 2023 09:26:50 +0100
 MIME-Version: 1.0
-Date:   Mon, 27 Feb 2023 08:13:41 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-From:   "Yann Droneaud" <ydroneaud@opteya.com>
-Message-ID: <c18250f8126b92478e31817c4162286a31983f51@opteya.com>
-Subject: Re: [PATCH] crypto: testmgr - fix RNG performance in fuzz tests
-To:     "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-        "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20230227055018.1713117-1-ebiggers@kernel.org>
-References: <20230227055018.1713117-1-ebiggers@kernel.org>
-X-Originating-IP: 10.0.20.16
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH v11 07/10] arm64: dts: qcom: sm8550: add QCE IP family
+ compatible values
+Content-Language: en-US
+To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20230222172240.3235972-1-vladimir.zapolskiy@linaro.org>
+ <20230222172240.3235972-8-vladimir.zapolskiy@linaro.org>
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Organization: Linaro Developer Services
+In-Reply-To: <20230222172240.3235972-8-vladimir.zapolskiy@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-27 février 2023 à 06:52 "Eric Biggers" <ebiggers@kernel.org> a écrit:
+On 22/02/2023 18:22, Vladimir Zapolskiy wrote:
+> Add a family compatible for QCE IP on SM8550 SoC, which is equal to QCE IP
+> found on SM8150 SoC and described in the recently updated device tree
+> bindings documentation, as well add a generic QCE IP family compatible.
 > 
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The performance of the crypto fuzz tests has greatly regressed since
-> v5.18. When booting a kernel on an arm64 dev board with all software
-> crypto algorithms and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled, the
-> fuzz tests now take about 200 seconds to run, or about 325 seconds with
-> lockdep enabled, compared to about 5 seconds before.
-> 
-> The root cause is that the random number generation has become much
-> slower due to commit d4150779e60f ("random32: use real rng for
-> non-deterministic randomness"). On my same arm64 dev board, at the time
-> the fuzz tests are run, get_random_u8() is about 345x slower than
-> prandom_u32_state(), or about 469x if lockdep is enabled.
-> 
-> Lockdep makes a big difference, but much of the rest comes from the
-> get_random_*() functions taking a *very* slow path when the CRNG is not
-> yet initialized. Since the crypto self-tests run early during boot,
-> even having a hardware RNG driver enabled (CONFIG_CRYPTO_DEV_QCOM_RNG in
-> my case) doesn't prevent this. x86 systems don't have this issue, but
-> they still see a significant regression if lockdep is enabled.
-> 
-> Converting the "Fully random bytes" case in generate_random_bytes() to
-> use get_random_bytes() helps significantly, improving the test time to
-> about 27 seconds. But that's still over 5x slower than before.
-> 
-> This is all a bit silly, though, since the fuzz tests don't actually
-> need cryptographically secure random numbers. So let's just make them
-> use a non-cryptographically-secure RNG as they did before. The original
-> prandom_u32() is gone now, so let's use prandom_u32_state() instead,
-> with an explicitly managed state, like various other self-tests in the
-> kernel source tree (rbtree_test.c, test_scanf.c, etc.) already do. This
-> also has the benefit that no locking is required anymore, so performance
-> should be even better than the original version that used prandom_u32().
-> 
-> Fixes: d4150779e60f ("random32: use real rng for non-deterministic randomness")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
 > ---
->  crypto/testmgr.c | 268 ++++++++++++++++++++++++++++++-----------------
->  1 file changed, 171 insertions(+), 97 deletions(-)
+>   arch/arm64/boot/dts/qcom/sm8550.dtsi | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index c91e93ece20b..2cbd2f8ce3c3 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -860,12 +860,52 @@ static int prepare_keybuf(const u8 *key, unsigned int ksize,
->  
->  #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
->  
-> +/*
-> + * The fuzz tests use prandom instead of the normal Linux RNG since they don't
-> + * need cryptographically secure random numbers. This greatly improves the
-> + * performance of these tests, especially if they are run before the Linux RNG
-> + * has been initialized or if they are run on a lockdep-enabled kernel.
-> + */
-> +
-> +static inline void init_rnd_state(struct rnd_state *rng)
-> +{
-> + static atomic64_t next_seed;
-> +
-> + prandom_seed_state(rng, atomic64_inc_return(&next_seed));
+> diff --git a/arch/arm64/boot/dts/qcom/sm8550.dtsi b/arch/arm64/boot/dts/qcom/sm8550.dtsi
+> index ff4d342c0725..05ab0d5014c6 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8550.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8550.dtsi
+> @@ -1861,7 +1861,7 @@ cryptobam: dma-controller@1dc4000 {
+>   		};
+>   
+>   		crypto: crypto@1de0000 {
+> -			compatible = "qcom,sm8550-qce";
+> +			compatible = "qcom,sm8550-qce", "qcom,sm8150-qce", "qcom,qce";
+>   			reg = <0x0 0x01dfa000 0x0 0x6000>;
+>   			dmas = <&cryptobam 4>, <&cryptobam 5>;
+>   			dma-names = "rx", "tx";
 
-Isn't making this deterministic defeating the purpose of fuzzing ?
-
-Regards.
-
--- 
-Yann Droneaud
-OPTEYA
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
