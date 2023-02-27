@@ -2,403 +2,760 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F12A6C64ED8
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 05:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60499C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 05:52:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjB0FUj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Feb 2023 00:20:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54508 "EHLO
+        id S229616AbjB0Fwe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Feb 2023 00:52:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjB0FUi (ORCPT
+        with ESMTP id S229486AbjB0Fwd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Feb 2023 00:20:38 -0500
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2049.outbound.protection.outlook.com [40.107.21.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102721116D
-        for <linux-crypto@vger.kernel.org>; Sun, 26 Feb 2023 21:20:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e9hXEWOP9QywzP17kg+PAxVSZEKI0sP/qOosJKuA+2aFpjdvOtTAX+mG9Bjj9XPaGmsiiTsg+Zsu5JIskwwBc5upbC7LRcZeMxoiILuKgrUVXO4ijNNLWfJExVh5MCpVhqtxAx2fQJ+1TNDo3IvM2+ZSee+pkqKgBMrnh0Wzm3IokPzKPgoLYjajjD/rcJ1pQgkp8ZR809stEmXtGeCnwKHaSH1uB9NNUvU2251iy4coq7UismS6/YMTLm+x4v/TAbMfD4kOeuC9hE7xnzqdKJAvhDaCamoo4cvEvlcnU/bCn+P/jf388hsWXAbgLyWuyYQk/6Re5n+GYYI18LnNFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BLFcrLqUK8KthkbcO5/n2k7hIkh+COVpiUVA9Uj/ATs=;
- b=ntUqHns1azPWcXpDNBGRBRWbcdkK5FKYLFAPfRdJ3Oh5e+FN0Ukj5YSxUsEkWouiD8jThNezbnbKMAtPOK5rHURHEm6iIyKGoacOdo/N2pWAZa0EASRY+hJ6Y64Ar2Sk2GK8faf12Ymk/EeZIVm8+64vjaLJfSuAk9FmhqfzzAZiyxVNb99w9QPhsSYnUAJ/QmP8PyZm3UFSMYe8KlMYiJhl1WPu58/P7QH0FLDkBy1tuJHsqrIfc0qj0X8iJ4ONMo2txJD8m+gSmypj+MEgomY2fUdQZLemUXy5KSgDfrI1BnbIkS7ABUrE1wNxBj2Q9OoMWMOtC25INXWzYLj9Nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BLFcrLqUK8KthkbcO5/n2k7hIkh+COVpiUVA9Uj/ATs=;
- b=pTcseAu81XlO4F2vP9id/PpqVzVucjp7Jok/hZOf98S9NN/yfCKppHwSiNG/pYedntQ423FJ0pbNFKcJF8uREGg0iytS6vptgn1yFGnTJFoWZ6ul9dmss63NKJTAxGYNFLAeSPcldGaVbkr4kudT3bpkcFr0+qgWRGvDCR6nICI=
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by AS4PR04MB9458.eurprd04.prod.outlook.com (2603:10a6:20b:4ea::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.27; Mon, 27 Feb
- 2023 05:20:33 +0000
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::a518:512c:4af1:276e]) by DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::a518:512c:4af1:276e%4]) with mapi id 15.20.6134.026; Mon, 27 Feb 2023
- 05:20:32 +0000
-From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>
-Subject: RE: [PATCH] crypto: caam - Fix edesc/iv ordering mixup
-Thread-Topic: [PATCH] crypto: caam - Fix edesc/iv ordering mixup
-Thread-Index: AQHZSDlSYbMeKe5lF0K+qHGPz5S9xq7iRZrQ
-Date:   Mon, 27 Feb 2023 05:20:32 +0000
-Message-ID: <DU0PR04MB9563F6D1EFBC6165087D51EF8EAF9@DU0PR04MB9563.eurprd04.prod.outlook.com>
-References: <Y4nDL50nToBbi4DS@gondor.apana.org.au>
- <Y4xpGNNsfbucyUlt@infradead.org> <Y47BgCuZsYLX61A9@gondor.apana.org.au>
- <Y47g7qO8dsRdxCgf@infradead.org> <Y47+gxbdKR03EYCj@gondor.apana.org.au>
- <Y61WrVAjjtAMAvSh@gondor.apana.org.au> <Y651YoR58cCg3adj@gondor.apana.org.au>
- <DU0PR04MB95635D72885111458C50DB6F8EA89@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <Y/iO3+HbrK0TnDln@gondor.apana.org.au>
-In-Reply-To: <Y/iO3+HbrK0TnDln@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU0PR04MB9563:EE_|AS4PR04MB9458:EE_
-x-ms-office365-filtering-correlation-id: 82ec9b7c-a703-4dcc-06ab-08db18825946
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: wLMSJGAqeWyqT+o2rSSaJWffWvtY5MrTlBb4D9VAgNH1OQHjt+Y7IeQHJG8z4QI4DLzAJbX/u6iyNMELEw298wFVY+3A+a8kmIgtQrsJVRzAv26GnpGIu1ULtc8skAWppzPBApQISv9gna5gR0134MsB16yYtW/Oec6dmJ0w0nwXosUQ11IyS/GDCS+ExApXOXoKKQI9D8wmhldxVd8XQhqpoIgDF/SL3j/UrPJxWmf86R1utxn2p5xcllhIm5dzGjKUUn1NA3WZcOfOFbuPKwxVhxjBIa35NsRcM/N8s5fv8zQg7uZji6e2wO5LyIrERRBdZG8qA3Jwo2JR/1AFAbSWpiUGfGPUxwxFZrEQFrB0t4vthie5Hxrtwvy2A6KC9Hx1R6ipbU5lv/W9nGzQTjFw50WVgyCy1tF6W7q97KRTkjNRF1S2MdAJlTpTMMGzDhQ/F4pZKtirNSM+vqLuu+ibw8rWq7/Xnl05nzJIDlCYogIh6vwxXI4+Dun3m5FjOgYC/wNA4T5rAzLeA8bAel8SbHptpNqFToShiWxxqtProSW7oG6HgT4xfA+Xu01QYECMYgi2+YVoo0tpUUO6FwfT65dreStohP1i7LPYtoG8UIEML/leGx/aATYaOGgqW4+Lznb2JBIY5LK+et/gAjjt0MhGKtFFNC7zAOU5rrmZIMuuSpjg7J8AqZvLGPWtTkAi8C41ydMVpkUpbqkLtSDc66bI5c194hoJVDFJATk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(366004)(346002)(376002)(396003)(451199018)(83380400001)(2906002)(44832011)(52536014)(5660300002)(122000001)(55016003)(38070700005)(41300700001)(76116006)(64756008)(66446008)(66476007)(66556008)(66946007)(8676002)(38100700002)(8936002)(4326008)(6916009)(7696005)(966005)(45080400002)(86362001)(53546011)(9686003)(186003)(26005)(6506007)(71200400001)(478600001)(33656002)(316002)(54906003)(505234007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?US3IA+f2NdWNnzX02VOdQmMpR8fa7wks2mL0gQrloIhe3GU4HrsbOHEFzbVJ?=
- =?us-ascii?Q?Dhr4EAKdsA4cJRFPzEtaZAS4+MCFs6AWgW71GQOVKHsTlpzPY77IaTspPzb/?=
- =?us-ascii?Q?luOJ9z9V1n5XOBx0O6SLngWAA32+wmCqjYwckMXxg09W+UFfxT2caYoix9RJ?=
- =?us-ascii?Q?Nc9Hd5mXMOqN/u38bGbh4x9iHq5aXF0BoqGrh6AP44DqZK0CziUfSFZQ/Oz0?=
- =?us-ascii?Q?ZB0Y2HCIKDwKLrMx6n7guX8EDx0dFTWyUuNybpO+kStfwwyzcSSq6UFy6irF?=
- =?us-ascii?Q?SHE0nOkt0dm7x8GlojcEW1gs+dEKcey65X5Mjnl1jNdIsc5/v5otcHqtWJaB?=
- =?us-ascii?Q?KmEYsCbRh8X5gXOHldjMT132Iy/4r2lLhYO2WM6/+Mlx7c1kej6odnq78n0f?=
- =?us-ascii?Q?XOXHxJ0K9ubFpFbgWW/aIy/dTpwt1oEw3g9xZAORckKDg14y/xgozpAKZtC7?=
- =?us-ascii?Q?PY8RagIfd13h+pc5Mi8Qd/CDQZ+qR392kD5+KaA3DEThN4n8VbY3ZR7f/HkC?=
- =?us-ascii?Q?ZU7c1RvNmBQg17A1zeBsSQ+xwu5AW6NgiLp032fyEPapmCBKuiVTEZdgKme1?=
- =?us-ascii?Q?gIjfLd51Z5dWLqZNB392uMGKfrqGj9KGRR0mQa6X+tIC7kLo/iAlkGmIEkzm?=
- =?us-ascii?Q?UdGuO4cbTVTQx6Q1gzFNMm+hVGqdC83ZJxVhW4+stloeIM+T7FGNfqF0XF6E?=
- =?us-ascii?Q?vTLpqf7cxiEjsHsLcqkijqqsQyQ4akg2PMNHPhFDtbIkG8GLpWZ7W91JUhPj?=
- =?us-ascii?Q?6eUrwJPHIYYXuNj8a/dxbP30fBDk/LjZvMMOU8MkvqOdIsxXsf2iV+jZokCZ?=
- =?us-ascii?Q?S8oihQ615HhL0tN+JVDPGhejqlVpu7ThFQCXRQ0YrdyRGq1MyYVDEer9/Pdr?=
- =?us-ascii?Q?3pYmfWc3rUrvSW02w2CR6PEIilSYw1ZubsVef3Fznji33VnCNsDtRin/6LlW?=
- =?us-ascii?Q?ESDqcE9ZTD8QHnB42K+W9eHp7ibMkul+03PL5RL7cVjEvbxBVxqWAXZ56zpq?=
- =?us-ascii?Q?BnYgT/69hmDx+rmWGyBScNsgzJFY2PlWqDKMt5BLfszZoQZZtylFOEF/2WeW?=
- =?us-ascii?Q?D/qyKdXmNsxGzO6FyyJadI8tCnDPfeGS8CuztaIlRZuU4Gy4e5SjPKKWYBw0?=
- =?us-ascii?Q?qAmNAw31aPuudmhlQTEbkvMgNH2J/N7DREoLFs+gByk5zIwOSUzc5oWalcb6?=
- =?us-ascii?Q?ZqCYWHM35ruy+CdvEakpd2ENFUFS3CCb3Y8VBYpMuy6d0cmTz0QZdDdkJ6f6?=
- =?us-ascii?Q?1o2hhVXSrSB4PXHJ0yhkLGCBmZk4TKsC9T1aYD6IfD3oo8JJen8OKhjMQ1Tl?=
- =?us-ascii?Q?ILV1iCZpnsBgrlFK5oawASCxxbg+B6E5U0STRqEdfKnJTOBBRW31LXx1am5x?=
- =?us-ascii?Q?G+kdXPhy64KTFchCuxumbtPKBVXCjukodZxyMqjzAXbC2O0Ibs4ck2FvinUC?=
- =?us-ascii?Q?tMP/pUVD7TbUEx1G0rlirWvgl4uibAnFZqJkpDYyezl4BzKxHDhBdSMDX6Zd?=
- =?us-ascii?Q?AvJpCKKTwXQiDhVx13Czp8VKp38ikq+agZZlj3L8NkD0HKc74yGCIhbLMZeS?=
- =?us-ascii?Q?0TL0GH05YF4NNMt6DDUA7HI7eXQ1WMr9urHCz43fSz+NkXOrz1zv7Zd53lEj?=
- =?us-ascii?Q?Bw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 27 Feb 2023 00:52:33 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3221B1A670;
+        Sun, 26 Feb 2023 21:52:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9F153B80C9D;
+        Mon, 27 Feb 2023 05:52:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 146F2C433D2;
+        Mon, 27 Feb 2023 05:52:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677477147;
+        bh=aPo5WaY/XIMwJW9JZdOvrAHioUQEA/ViC9rIR/eViNg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fnJZG/8KUuth7N0BAxvtAytckxCWUy0NR7uAuKYWSnGSwgFkZcFiFTl//k02yw8ye
+         EBGn/ePNDVygTiQZ4Xy2EhD1gTbnFDT9tQ81DaDaQgJSV4XjTM1CJiwZ4ecJYHzjm8
+         jOiAtjteuOUZ6wQ//immxhgbwpdpnZrQMURWJnS6buzLq94Cwji9rmW7cX40I0qpEb
+         l+fng8Zyz1cBrzpyJSSaQv1HM1Msm3eVC5WM9smEZws9IPYWwKM6Ro23wV0sXPPR0y
+         VUXjWK2zOfdmzqPuHr4Srwy8T88XCwU0kD5XrtOz8Tu7fZ2nECW/ULNlyqAAQVv5nC
+         KqJU57H1cWEUg==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "Jason A . Donenfeld " <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: [PATCH] crypto: testmgr - fix RNG performance in fuzz tests
+Date:   Sun, 26 Feb 2023 21:50:18 -0800
+Message-Id: <20230227055018.1713117-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82ec9b7c-a703-4dcc-06ab-08db18825946
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2023 05:20:32.5009
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4Za3YZO3y4FVrLHZYUJ8ZJqwwDsIdSDzHzpTjLUq/EQjmtXj1OqKf16QvMw4LOAueKXpj28k63P0n8f/ijPSF4JzqShgIoKwnx4MOKNGnQw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9458
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+From: Eric Biggers <ebiggers@google.com>
 
-I have tested your changes, not facing a kernel crash now but still kernel =
-warning messages are coming:
+The performance of the crypto fuzz tests has greatly regressed since
+v5.18.  When booting a kernel on an arm64 dev board with all software
+crypto algorithms and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled, the
+fuzz tests now take about 200 seconds to run, or about 325 seconds with
+lockdep enabled, compared to about 5 seconds before.
 
-[    6.359772] alg: skcipher: ctr-aes-caam encryption test failed (wrong ou=
-tput IV) on test vector 0, cfg=3D"in-place (one sglist)"
-[    6.371179] 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-[    6.377645] alg: self-tests for ctr(aes) using ctr-aes-caam failed (rc=
-=3D-22)
-[    6.377649] ------------[ cut here ]------------
-[    6.389248] alg: self-tests for ctr(aes) using ctr-aes-caam failed (rc=
-=3D-22)
-[    6.389269] WARNING: CPU: 0 PID: 246 at crypto/testmgr.c:6101 alg_test.p=
-art.0+0x3c8/0x3d0
-[    6.404400] Modules linked in:
-[    6.407446] CPU: 0 PID: 246 Comm: cryptomgr_test Not tainted 6.2.0-rc4-n=
-ext-20230119-04770-gb8b0d08d8447 #3
-[    6.417181] Hardware name: LS1046A RDB Board (DT)
-[    6.421876] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[    6.428833] pc : alg_test.part.0+0x3c8/0x3d0
-[    6.433095] lr : alg_test.part.0+0x3c8/0x3d0
-[    6.437358] sp : ffff80000a51bd40
-[    6.440662] x29: ffff80000a51bd40 x28: 0000000000000000 x27: 00000000000=
-00000
-[    6.447795] x26: 00000000ffffffff x25: 0000000000000400 x24: ffff125a1d7=
-ad280
-[    6.454926] x23: ffff125a1d7ad200 x22: ffff125a1e24d100 x21: 00000000000=
-11085
-[    6.462057] x20: 00000000ffffffea x19: ffffb57461018490 x18: 00000000000=
-00001
-[    6.469188] x17: 74757074756f2067 x16: 6e6f727728206465 x15: ffff125a1e2=
-4d568
-[    6.476319] x14: 0000000000000000 x13: ffffb57462e8e300 x12: 00000000fff=
-fefff
-[    6.483450] x11: 0000000000000003 x10: ffffb5746298ecd8 x9 : ffffb5745f9=
-02b34
-[    6.490581] x8 : 0000000000017fe8 x7 : c0000000ffffefff x6 : 00000000000=
-0bff4
-[    6.497712] x5 : 0000000000057fa8 x4 : 0000000000000000 x3 : ffff80000a5=
-1bb08
-[    6.504842] x2 : ffffb57462936a60 x1 : 78bd64a75e317900 x0 : 00000000000=
-00000
-[    6.511973] Call trace:
-[    6.514409]  alg_test.part.0+0x3c8/0x3d0
-[    6.518325]  alg_test+0x24/0x68
-[    6.521458]  cryptomgr_test+0x28/0x48
-[    6.525112]  kthread+0x114/0x120
-[    6.528334]  ret_from_fork+0x10/0x20
-[    6.531903] ---[ end trace 0000000000000000 ]---
-[    6.536608] alg: skcipher: cbc-des-caam encryption test failed (wrong ou=
-tput IV) on test vector 0, cfg=3D"in-place (one sglist)"
-[    6.548010] 00000000: 00 00 00 00 00 00 00 00
-[    6.552370] alg: self-tests for cbc(des) using cbc-des-caam failed (rc=
-=3D-22)
+The root cause is that the random number generation has become much
+slower due to commit d4150779e60f ("random32: use real rng for
+non-deterministic randomness").  On my same arm64 dev board, at the time
+the fuzz tests are run, get_random_u8() is about 345x slower than
+prandom_u32_state(), or about 469x if lockdep is enabled.
 
+Lockdep makes a big difference, but much of the rest comes from the
+get_random_*() functions taking a *very* slow path when the CRNG is not
+yet initialized.  Since the crypto self-tests run early during boot,
+even having a hardware RNG driver enabled (CONFIG_CRYPTO_DEV_QCOM_RNG in
+my case) doesn't prevent this.  x86 systems don't have this issue, but
+they still see a significant regression if lockdep is enabled.
 
-Thanks,
-Meenakshi
+Converting the "Fully random bytes" case in generate_random_bytes() to
+use get_random_bytes() helps significantly, improving the test time to
+about 27 seconds.  But that's still over 5x slower than before.
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Friday, February 24, 2023 3:48 PM
-> To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>; Christoph H=
-ellwig
-> <hch@infradead.org>; Horia Geanta <horia.geanta@nxp.com>; Pankaj Gupta
-> <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>
-> Subject: [PATCH] crypto: caam - Fix edesc/iv ordering mixup
->=20
-> Hi Meenakshi:
->=20
-> On Fri, Feb 24, 2023 at 06:23:15AM +0000, Meenakshi Aggarwal wrote:
-> >
-> > with this change, edesc is following IV but we need IV to follow edesc.
-> > Also, we are freeing edesc pointer in function, returning edesc
-> > pointer and calling function also free edesc pointer but you have alloc=
-ated IV .
-> So we are facing kernel crash.
-> >
-> > We need to fix this, please share why are you allocating IV in place of=
- edesc ?
->=20
-> Sorry, my patch was completely broken.  I was trying to place the IV at t=
-he front
-> in a vain effort to reduce the total allocation size.
->=20
-> Anyhow, please let me know if this patch fixes the problem, and I will pu=
-sh it to
-> Linus.
->=20
-> BTW, should we add you to the list of maintainers for caam? Perhaps next =
-time
-> we can spot the problem earlier.  Thanks!
->=20
-> ---8<---
-> The attempt to add DMA alignment padding by moving IV to the front of ede=
-sc
-> was completely broken as it didn't change the places where edesc was free=
-d.
->=20
-> It's also wrong as the IV may still share a cache-line with the edesc.
->=20
-> Fix this by restoring the original layout and simply reserving enough mem=
-mory
-> so that the IV is on a DMA cache-line by itself.
->=20
-> Reported-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Fixes: 199354d7fb6e ("crypto: caam - Remove GFP_DMA and add DMA
-> alignment padding")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->=20
-> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
-c
-> index 4a9b998a8d26..c71955ac2252 100644
-> --- a/drivers/crypto/caam/caamalg.c
-> +++ b/drivers/crypto/caam/caamalg.c
-> @@ -60,7 +60,11 @@
->  #include <crypto/xts.h>
->  #include <asm/unaligned.h>
->  #include <linux/dma-mapping.h>
-> +#include <linux/device.h>
-> +#include <linux/err.h>
->  #include <linux/kernel.h>
-> +#include <linux/slab.h>
-> +#include <linux/string.h>
->=20
->  /*
->   * crypto alg
-> @@ -1683,18 +1687,19 @@ static struct skcipher_edesc
-> *skcipher_edesc_alloc(struct skcipher_request *req,
->  	/*
->  	 * allocate space for base edesc and hw desc commands, link tables, IV
->  	 */
-> -	aligned_size =3D ALIGN(ivsize, __alignof__(*edesc));
-> -	aligned_size +=3D sizeof(*edesc) + desc_bytes + sec4_sg_bytes;
-> +	aligned_size =3D sizeof(*edesc) + desc_bytes + sec4_sg_bytes;
->  	aligned_size =3D ALIGN(aligned_size, dma_get_cache_alignment());
-> -	iv =3D kzalloc(aligned_size, flags);
-> -	if (!iv) {
-> +	aligned_size +=3D ~(ARCH_KMALLOC_MINALIGN - 1) &
-> +			(dma_get_cache_alignment() - 1);
-> +	aligned_size +=3D ALIGN(ivsize, dma_get_cache_alignment());
-> +	edesc =3D kzalloc(aligned_size, flags);
-> +	if (!edesc) {
->  		dev_err(jrdev, "could not allocate extended descriptor\n");
->  		caam_unmap(jrdev, req->src, req->dst, src_nents, dst_nents, 0,
->  			   0, 0, 0);
->  		return ERR_PTR(-ENOMEM);
->  	}
->=20
-> -	edesc =3D (void *)(iv + ALIGN(ivsize, __alignof__(*edesc)));
->  	edesc->src_nents =3D src_nents;
->  	edesc->dst_nents =3D dst_nents;
->  	edesc->mapped_src_nents =3D mapped_src_nents; @@ -1706,6 +1711,8
-> @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_req=
-uest
-> *req,
->=20
->  	/* Make sure IV is located in a DMAable area */
->  	if (ivsize) {
-> +		iv =3D (u8 *)edesc->sec4_sg + sec4_sg_bytes;
-> +		iv =3D PTR_ALIGN(iv, dma_get_cache_alignment());
->  		memcpy(iv, req->iv, ivsize);
->=20
->  		iv_dma =3D dma_map_single(jrdev, iv, ivsize,
-> DMA_BIDIRECTIONAL); diff --git a/drivers/crypto/caam/caamalg_qi.c
-> b/drivers/crypto/caam/caamalg_qi.c
-> index 5e218bf20d5b..5d17f5862b93 100644
-> --- a/drivers/crypto/caam/caamalg_qi.c
-> +++ b/drivers/crypto/caam/caamalg_qi.c
-> @@ -20,8 +20,11 @@
->  #include "caamalg_desc.h"
->  #include <crypto/xts.h>
->  #include <asm/unaligned.h>
-> +#include <linux/device.h>
-> +#include <linux/err.h>
->  #include <linux/dma-mapping.h>
->  #include <linux/kernel.h>
-> +#include <linux/string.h>
->=20
->  /*
->   * crypto alg
-> @@ -1259,6 +1262,7 @@ static struct skcipher_edesc
-> *skcipher_edesc_alloc(struct skcipher_request *req,
->  	int dst_sg_idx, qm_sg_ents, qm_sg_bytes;
->  	struct qm_sg_entry *sg_table, *fd_sgt;
->  	struct caam_drv_ctx *drv_ctx;
-> +	unsigned int len;
->=20
->  	drv_ctx =3D get_drv_ctx(ctx, encrypt ? ENCRYPT : DECRYPT);
->  	if (IS_ERR(drv_ctx))
-> @@ -1319,9 +1323,12 @@ static struct skcipher_edesc
-> *skcipher_edesc_alloc(struct skcipher_request *req,
->  		qm_sg_ents =3D 1 + pad_sg_nents(qm_sg_ents);
->=20
->  	qm_sg_bytes =3D qm_sg_ents * sizeof(struct qm_sg_entry);
-> -	if (unlikely(ALIGN(ivsize, __alignof__(*edesc)) +
-> -		     offsetof(struct skcipher_edesc, sgt) + qm_sg_bytes >
-> -		     CAAM_QI_MEMCACHE_SIZE)) {
-> +
-> +	len =3D offsetof(struct skcipher_edesc, sgt) + qm_sg_bytes;
-> +	len =3D ALIGN(len, dma_get_cache_alignment());
-> +	len +=3D ivsize;
-> +
-> +	if (unlikely(len > CAAM_QI_MEMCACHE_SIZE)) {
->  		dev_err(qidev, "No space for %d S/G entries and/or %dB IV\n",
->  			qm_sg_ents, ivsize);
->  		caam_unmap(qidev, req->src, req->dst, src_nents, dst_nents, 0,
-> @@ -1330,18 +1337,18 @@ static struct skcipher_edesc
-> *skcipher_edesc_alloc(struct skcipher_request *req,
->  	}
->=20
->  	/* allocate space for base edesc, link tables and IV */
-> -	iv =3D qi_cache_alloc(flags);
-> -	if (unlikely(!iv)) {
-> +	edesc =3D qi_cache_alloc(flags);
-> +	if (unlikely(!edesc)) {
->  		dev_err(qidev, "could not allocate extended descriptor\n");
->  		caam_unmap(qidev, req->src, req->dst, src_nents, dst_nents, 0,
->  			   0, DMA_NONE, 0, 0);
->  		return ERR_PTR(-ENOMEM);
->  	}
->=20
-> -	edesc =3D (void *)(iv + ALIGN(ivsize, __alignof__(*edesc)));
-> -
->  	/* Make sure IV is located in a DMAable area */
->  	sg_table =3D &edesc->sgt[0];
-> +	iv =3D (u8 *)(sg_table + qm_sg_ents);
-> +	iv =3D PTR_ALIGN(iv, dma_get_cache_alignment());
->  	memcpy(iv, req->iv, ivsize);
->=20
->  	iv_dma =3D dma_map_single(qidev, iv, ivsize, DMA_BIDIRECTIONAL); diff -
-> -git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c index
-> 4c52c9365558..2ad2c1035856 100644
-> --- a/drivers/crypto/caam/qi.c
-> +++ b/drivers/crypto/caam/qi.c
-> @@ -8,7 +8,13 @@
->   */
->=20
->  #include <linux/cpumask.h>
-> +#include <linux/device.h>
-> +#include <linux/dma-mapping.h>
-> +#include <linux/kernel.h>
->  #include <linux/kthread.h>
-> +#include <linux/netdevice.h>
-> +#include <linux/slab.h>
-> +#include <linux/string.h>
->  #include <soc/fsl/qman.h>
->=20
->  #include "debugfs.h"
-> @@ -755,8 +761,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
->  		napi_enable(irqtask);
->  	}
->=20
-> -	qi_cache =3D kmem_cache_create("caamqicache",
-> CAAM_QI_MEMCACHE_SIZE, 0,
-> -				     0, NULL);
-> +	qi_cache =3D kmem_cache_create("caamqicache",
-> CAAM_QI_MEMCACHE_SIZE,
-> +				     dma_get_cache_alignment(), 0, NULL);
->  	if (!qi_cache) {
->  		dev_err(qidev, "Can't allocate CAAM cache\n");
->  		free_rsp_fqs();
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fgondor=
-.ap
-> ana.org.au%2F~herbert%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.co
-> m%7C02a5c1fbb5f54a893c0a08db165073cb%7C686ea1d3bc2b4c6fa92cd99c5c
-> 301635%7C0%7C0%7C638128307024161720%7CUnknown%7CTWFpbGZsb3d8e
-> yJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7
-> C3000%7C%7C%7C&sdata=3D51qldsOV%2FNUO5VEMSd4kKbQdqIOJdEWF99Us%2
-> FR01sUA%3D&reserved=3D0
-> PGP Key:
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fgondor=
-.ap
-> ana.org.au%2F~herbert%2Fpubkey.txt&data=3D05%7C01%7Cmeenakshi.aggarwal
-> %40nxp.com%7C02a5c1fbb5f54a893c0a08db165073cb%7C686ea1d3bc2b4c6fa
-> 92cd99c5c301635%7C0%7C0%7C638128307024161720%7CUnknown%7CTWFp
-> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
-> Mn0%3D%7C3000%7C%7C%7C&sdata=3DME%2BROVEsFMovZ1P4Y3KOONWHwA
-> ezgFgxOOe0y5fToCA%3D&reserved=3D0
+This is all a bit silly, though, since the fuzz tests don't actually
+need cryptographically secure random numbers.  So let's just make them
+use a non-cryptographically-secure RNG as they did before.  The original
+prandom_u32() is gone now, so let's use prandom_u32_state() instead,
+with an explicitly managed state, like various other self-tests in the
+kernel source tree (rbtree_test.c, test_scanf.c, etc.) already do.  This
+also has the benefit that no locking is required anymore, so performance
+should be even better than the original version that used prandom_u32().
+
+Fixes: d4150779e60f ("random32: use real rng for non-deterministic randomness")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/testmgr.c | 268 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 171 insertions(+), 97 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c91e93ece20b..2cbd2f8ce3c3 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -860,12 +860,52 @@ static int prepare_keybuf(const u8 *key, unsigned int ksize,
+ 
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ 
++/*
++ * The fuzz tests use prandom instead of the normal Linux RNG since they don't
++ * need cryptographically secure random numbers.  This greatly improves the
++ * performance of these tests, especially if they are run before the Linux RNG
++ * has been initialized or if they are run on a lockdep-enabled kernel.
++ */
++
++static inline void init_rnd_state(struct rnd_state *rng)
++{
++	static atomic64_t next_seed;
++
++	prandom_seed_state(rng, atomic64_inc_return(&next_seed));
++}
++
++static inline u8 prandom_u8(struct rnd_state *rng)
++{
++	return prandom_u32_state(rng);
++}
++
++static inline u32 prandom_u32_below(struct rnd_state *rng, u32 n)
++{
++	/*
++	 * This is slightly biased for non-power-of-2 values of n, but this
++	 * isn't important here.
++	 */
++	return prandom_u32_state(rng) % n;
++}
++
++static inline bool prandom_bool(struct rnd_state *rng)
++{
++	return prandom_u32_below(rng, 2);
++}
++
++static inline u32 prandom_u32_inclusive(struct rnd_state *rng,
++					u32 floor, u32 ceil)
++{
++	return floor + prandom_u32_below(rng, ceil - floor + 1);
++}
++
+ /* Generate a random length in range [0, max_len], but prefer smaller values */
+-static unsigned int generate_random_length(unsigned int max_len)
++static unsigned int generate_random_length(struct rnd_state *rng,
++					   unsigned int max_len)
+ {
+-	unsigned int len = get_random_u32_below(max_len + 1);
++	unsigned int len = prandom_u32_below(rng, max_len + 1);
+ 
+-	switch (get_random_u32_below(4)) {
++	switch (prandom_u32_below(rng, 4)) {
+ 	case 0:
+ 		return len % 64;
+ 	case 1:
+@@ -878,43 +918,44 @@ static unsigned int generate_random_length(unsigned int max_len)
+ }
+ 
+ /* Flip a random bit in the given nonempty data buffer */
+-static void flip_random_bit(u8 *buf, size_t size)
++static void flip_random_bit(struct rnd_state *rng, u8 *buf, size_t size)
+ {
+ 	size_t bitpos;
+ 
+-	bitpos = get_random_u32_below(size * 8);
++	bitpos = prandom_u32_below(rng, size * 8);
+ 	buf[bitpos / 8] ^= 1 << (bitpos % 8);
+ }
+ 
+ /* Flip a random byte in the given nonempty data buffer */
+-static void flip_random_byte(u8 *buf, size_t size)
++static void flip_random_byte(struct rnd_state *rng, u8 *buf, size_t size)
+ {
+-	buf[get_random_u32_below(size)] ^= 0xff;
++	buf[prandom_u32_below(rng, size)] ^= 0xff;
+ }
+ 
+ /* Sometimes make some random changes to the given nonempty data buffer */
+-static void mutate_buffer(u8 *buf, size_t size)
++static void mutate_buffer(struct rnd_state *rng, u8 *buf, size_t size)
+ {
+ 	size_t num_flips;
+ 	size_t i;
+ 
+ 	/* Sometimes flip some bits */
+-	if (get_random_u32_below(4) == 0) {
+-		num_flips = min_t(size_t, 1 << get_random_u32_below(8), size * 8);
++	if (prandom_u32_below(rng, 4) == 0) {
++		num_flips = min_t(size_t, 1 << prandom_u32_below(rng, 8),
++				  size * 8);
+ 		for (i = 0; i < num_flips; i++)
+-			flip_random_bit(buf, size);
++			flip_random_bit(rng, buf, size);
+ 	}
+ 
+ 	/* Sometimes flip some bytes */
+-	if (get_random_u32_below(4) == 0) {
+-		num_flips = min_t(size_t, 1 << get_random_u32_below(8), size);
++	if (prandom_u32_below(rng, 4) == 0) {
++		num_flips = min_t(size_t, 1 << prandom_u32_below(rng, 8), size);
+ 		for (i = 0; i < num_flips; i++)
+-			flip_random_byte(buf, size);
++			flip_random_byte(rng, buf, size);
+ 	}
+ }
+ 
+ /* Randomly generate 'count' bytes, but sometimes make them "interesting" */
+-static void generate_random_bytes(u8 *buf, size_t count)
++static void generate_random_bytes(struct rnd_state *rng, u8 *buf, size_t count)
+ {
+ 	u8 b;
+ 	u8 increment;
+@@ -923,11 +964,11 @@ static void generate_random_bytes(u8 *buf, size_t count)
+ 	if (count == 0)
+ 		return;
+ 
+-	switch (get_random_u32_below(8)) { /* Choose a generation strategy */
++	switch (prandom_u32_below(rng, 8)) { /* Choose a generation strategy */
+ 	case 0:
+ 	case 1:
+ 		/* All the same byte, plus optional mutations */
+-		switch (get_random_u32_below(4)) {
++		switch (prandom_u32_below(rng, 4)) {
+ 		case 0:
+ 			b = 0x00;
+ 			break;
+@@ -935,28 +976,28 @@ static void generate_random_bytes(u8 *buf, size_t count)
+ 			b = 0xff;
+ 			break;
+ 		default:
+-			b = get_random_u8();
++			b = prandom_u8(rng);
+ 			break;
+ 		}
+ 		memset(buf, b, count);
+-		mutate_buffer(buf, count);
++		mutate_buffer(rng, buf, count);
+ 		break;
+ 	case 2:
+ 		/* Ascending or descending bytes, plus optional mutations */
+-		increment = get_random_u8();
+-		b = get_random_u8();
++		increment = prandom_u8(rng);
++		b = prandom_u8(rng);
+ 		for (i = 0; i < count; i++, b += increment)
+ 			buf[i] = b;
+-		mutate_buffer(buf, count);
++		mutate_buffer(rng, buf, count);
+ 		break;
+ 	default:
+ 		/* Fully random bytes */
+-		for (i = 0; i < count; i++)
+-			buf[i] = get_random_u8();
++		prandom_bytes_state(rng, buf, count);
+ 	}
+ }
+ 
+-static char *generate_random_sgl_divisions(struct test_sg_division *divs,
++static char *generate_random_sgl_divisions(struct rnd_state *rng,
++					   struct test_sg_division *divs,
+ 					   size_t max_divs, char *p, char *end,
+ 					   bool gen_flushes, u32 req_flags)
+ {
+@@ -967,24 +1008,26 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
+ 		unsigned int this_len;
+ 		const char *flushtype_str;
+ 
+-		if (div == &divs[max_divs - 1] || get_random_u32_below(2) == 0)
++		if (div == &divs[max_divs - 1] || prandom_bool(rng))
+ 			this_len = remaining;
+ 		else
+-			this_len = get_random_u32_inclusive(1, remaining);
++			this_len = prandom_u32_inclusive(rng, 1, remaining);
+ 		div->proportion_of_total = this_len;
+ 
+-		if (get_random_u32_below(4) == 0)
+-			div->offset = get_random_u32_inclusive(PAGE_SIZE - 128, PAGE_SIZE - 1);
+-		else if (get_random_u32_below(2) == 0)
+-			div->offset = get_random_u32_below(32);
++		if (prandom_u32_below(rng, 4) == 0)
++			div->offset = prandom_u32_inclusive(rng,
++							    PAGE_SIZE - 128,
++							    PAGE_SIZE - 1);
++		else if (prandom_bool(rng))
++			div->offset = prandom_u32_below(rng, 32);
+ 		else
+-			div->offset = get_random_u32_below(PAGE_SIZE);
+-		if (get_random_u32_below(8) == 0)
++			div->offset = prandom_u32_below(rng, PAGE_SIZE);
++		if (prandom_u32_below(rng, 8) == 0)
+ 			div->offset_relative_to_alignmask = true;
+ 
+ 		div->flush_type = FLUSH_TYPE_NONE;
+ 		if (gen_flushes) {
+-			switch (get_random_u32_below(4)) {
++			switch (prandom_u32_below(rng, 4)) {
+ 			case 0:
+ 				div->flush_type = FLUSH_TYPE_REIMPORT;
+ 				break;
+@@ -996,7 +1039,7 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
+ 
+ 		if (div->flush_type != FLUSH_TYPE_NONE &&
+ 		    !(req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) &&
+-		    get_random_u32_below(2) == 0)
++		    prandom_bool(rng))
+ 			div->nosimd = true;
+ 
+ 		switch (div->flush_type) {
+@@ -1031,7 +1074,8 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
+ }
+ 
+ /* Generate a random testvec_config for fuzz testing */
+-static void generate_random_testvec_config(struct testvec_config *cfg,
++static void generate_random_testvec_config(struct rnd_state *rng,
++					   struct testvec_config *cfg,
+ 					   char *name, size_t max_namelen)
+ {
+ 	char *p = name;
+@@ -1043,7 +1087,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 
+ 	p += scnprintf(p, end - p, "random:");
+ 
+-	switch (get_random_u32_below(4)) {
++	switch (prandom_u32_below(rng, 4)) {
+ 	case 0:
+ 	case 1:
+ 		cfg->inplace_mode = OUT_OF_PLACE;
+@@ -1058,12 +1102,12 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 		break;
+ 	}
+ 
+-	if (get_random_u32_below(2) == 0) {
++	if (prandom_bool(rng)) {
+ 		cfg->req_flags |= CRYPTO_TFM_REQ_MAY_SLEEP;
+ 		p += scnprintf(p, end - p, " may_sleep");
+ 	}
+ 
+-	switch (get_random_u32_below(4)) {
++	switch (prandom_u32_below(rng, 4)) {
+ 	case 0:
+ 		cfg->finalization_type = FINALIZATION_TYPE_FINAL;
+ 		p += scnprintf(p, end - p, " use_final");
+@@ -1078,36 +1122,37 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 		break;
+ 	}
+ 
+-	if (!(cfg->req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) &&
+-	    get_random_u32_below(2) == 0) {
++	if (!(cfg->req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) && prandom_bool(rng)) {
+ 		cfg->nosimd = true;
+ 		p += scnprintf(p, end - p, " nosimd");
+ 	}
+ 
+ 	p += scnprintf(p, end - p, " src_divs=[");
+-	p = generate_random_sgl_divisions(cfg->src_divs,
++	p = generate_random_sgl_divisions(rng, cfg->src_divs,
+ 					  ARRAY_SIZE(cfg->src_divs), p, end,
+ 					  (cfg->finalization_type !=
+ 					   FINALIZATION_TYPE_DIGEST),
+ 					  cfg->req_flags);
+ 	p += scnprintf(p, end - p, "]");
+ 
+-	if (cfg->inplace_mode == OUT_OF_PLACE && get_random_u32_below(2) == 0) {
++	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_bool(rng)) {
+ 		p += scnprintf(p, end - p, " dst_divs=[");
+-		p = generate_random_sgl_divisions(cfg->dst_divs,
++		p = generate_random_sgl_divisions(rng, cfg->dst_divs,
+ 						  ARRAY_SIZE(cfg->dst_divs),
+ 						  p, end, false,
+ 						  cfg->req_flags);
+ 		p += scnprintf(p, end - p, "]");
+ 	}
+ 
+-	if (get_random_u32_below(2) == 0) {
+-		cfg->iv_offset = get_random_u32_inclusive(1, MAX_ALGAPI_ALIGNMASK);
++	if (prandom_bool(rng)) {
++		cfg->iv_offset = prandom_u32_inclusive(rng, 1,
++						       MAX_ALGAPI_ALIGNMASK);
+ 		p += scnprintf(p, end - p, " iv_offset=%u", cfg->iv_offset);
+ 	}
+ 
+-	if (get_random_u32_below(2) == 0) {
+-		cfg->key_offset = get_random_u32_inclusive(1, MAX_ALGAPI_ALIGNMASK);
++	if (prandom_bool(rng)) {
++		cfg->key_offset = prandom_u32_inclusive(rng, 1,
++							MAX_ALGAPI_ALIGNMASK);
+ 		p += scnprintf(p, end - p, " key_offset=%u", cfg->key_offset);
+ 	}
+ 
+@@ -1620,11 +1665,14 @@ static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
+ 
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ 	if (!noextratests) {
++		struct rnd_state rng;
+ 		struct testvec_config cfg;
+ 		char cfgname[TESTVEC_CONFIG_NAMELEN];
+ 
++		init_rnd_state(&rng);
++
+ 		for (i = 0; i < fuzz_iterations; i++) {
+-			generate_random_testvec_config(&cfg, cfgname,
++			generate_random_testvec_config(&rng, &cfg, cfgname,
+ 						       sizeof(cfgname));
+ 			err = test_hash_vec_cfg(vec, vec_name, &cfg,
+ 						req, desc, tsgl, hashstate);
+@@ -1642,15 +1690,16 @@ static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
+  * Generate a hash test vector from the given implementation.
+  * Assumes the buffers in 'vec' were already allocated.
+  */
+-static void generate_random_hash_testvec(struct shash_desc *desc,
++static void generate_random_hash_testvec(struct rnd_state *rng,
++					 struct shash_desc *desc,
+ 					 struct hash_testvec *vec,
+ 					 unsigned int maxkeysize,
+ 					 unsigned int maxdatasize,
+ 					 char *name, size_t max_namelen)
+ {
+ 	/* Data */
+-	vec->psize = generate_random_length(maxdatasize);
+-	generate_random_bytes((u8 *)vec->plaintext, vec->psize);
++	vec->psize = generate_random_length(rng, maxdatasize);
++	generate_random_bytes(rng, (u8 *)vec->plaintext, vec->psize);
+ 
+ 	/*
+ 	 * Key: length in range [1, maxkeysize], but usually choose maxkeysize.
+@@ -1660,9 +1709,9 @@ static void generate_random_hash_testvec(struct shash_desc *desc,
+ 	vec->ksize = 0;
+ 	if (maxkeysize) {
+ 		vec->ksize = maxkeysize;
+-		if (get_random_u32_below(4) == 0)
+-			vec->ksize = get_random_u32_inclusive(1, maxkeysize);
+-		generate_random_bytes((u8 *)vec->key, vec->ksize);
++		if (prandom_u32_below(rng, 4) == 0)
++			vec->ksize = prandom_u32_inclusive(rng, 1, maxkeysize);
++		generate_random_bytes(rng, (u8 *)vec->key, vec->ksize);
+ 
+ 		vec->setkey_error = crypto_shash_setkey(desc->tfm, vec->key,
+ 							vec->ksize);
+@@ -1696,6 +1745,7 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
+ 	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
+ 	const char *algname = crypto_hash_alg_common(tfm)->base.cra_name;
+ 	const char *driver = crypto_ahash_driver_name(tfm);
++	struct rnd_state rng;
+ 	char _generic_driver[CRYPTO_MAX_ALG_NAME];
+ 	struct crypto_shash *generic_tfm = NULL;
+ 	struct shash_desc *generic_desc = NULL;
+@@ -1709,6 +1759,8 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
+ 	if (noextratests)
+ 		return 0;
+ 
++	init_rnd_state(&rng);
++
+ 	if (!generic_driver) { /* Use default naming convention? */
+ 		err = build_generic_driver_name(algname, _generic_driver);
+ 		if (err)
+@@ -1777,10 +1829,11 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
+ 	}
+ 
+ 	for (i = 0; i < fuzz_iterations * 8; i++) {
+-		generate_random_hash_testvec(generic_desc, &vec,
++		generate_random_hash_testvec(&rng, generic_desc, &vec,
+ 					     maxkeysize, maxdatasize,
+ 					     vec_name, sizeof(vec_name));
+-		generate_random_testvec_config(cfg, cfgname, sizeof(cfgname));
++		generate_random_testvec_config(&rng, cfg, cfgname,
++					       sizeof(cfgname));
+ 
+ 		err = test_hash_vec_cfg(&vec, vec_name, cfg,
+ 					req, desc, tsgl, hashstate);
+@@ -2182,11 +2235,14 @@ static int test_aead_vec(int enc, const struct aead_testvec *vec,
+ 
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ 	if (!noextratests) {
++		struct rnd_state rng;
+ 		struct testvec_config cfg;
+ 		char cfgname[TESTVEC_CONFIG_NAMELEN];
+ 
++		init_rnd_state(&rng);
++
+ 		for (i = 0; i < fuzz_iterations; i++) {
+-			generate_random_testvec_config(&cfg, cfgname,
++			generate_random_testvec_config(&rng, &cfg, cfgname,
+ 						       sizeof(cfgname));
+ 			err = test_aead_vec_cfg(enc, vec, vec_name,
+ 						&cfg, req, tsgls);
+@@ -2202,6 +2258,7 @@ static int test_aead_vec(int enc, const struct aead_testvec *vec,
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ 
+ struct aead_extra_tests_ctx {
++	struct rnd_state rng;
+ 	struct aead_request *req;
+ 	struct crypto_aead *tfm;
+ 	const struct alg_test_desc *test_desc;
+@@ -2220,24 +2277,26 @@ struct aead_extra_tests_ctx {
+  * here means the full ciphertext including the authentication tag.  The
+  * authentication tag (and hence also the ciphertext) is assumed to be nonempty.
+  */
+-static void mutate_aead_message(struct aead_testvec *vec, bool aad_iv,
++static void mutate_aead_message(struct rnd_state *rng,
++				struct aead_testvec *vec, bool aad_iv,
+ 				unsigned int ivsize)
+ {
+ 	const unsigned int aad_tail_size = aad_iv ? ivsize : 0;
+ 	const unsigned int authsize = vec->clen - vec->plen;
+ 
+-	if (get_random_u32_below(2) == 0 && vec->alen > aad_tail_size) {
++	if (prandom_bool(rng) && vec->alen > aad_tail_size) {
+ 		 /* Mutate the AAD */
+-		flip_random_bit((u8 *)vec->assoc, vec->alen - aad_tail_size);
+-		if (get_random_u32_below(2) == 0)
++		flip_random_bit(rng, (u8 *)vec->assoc,
++				vec->alen - aad_tail_size);
++		if (prandom_bool(rng))
+ 			return;
+ 	}
+-	if (get_random_u32_below(2) == 0) {
++	if (prandom_bool(rng)) {
+ 		/* Mutate auth tag (assuming it's at the end of ciphertext) */
+-		flip_random_bit((u8 *)vec->ctext + vec->plen, authsize);
++		flip_random_bit(rng, (u8 *)vec->ctext + vec->plen, authsize);
+ 	} else {
+ 		/* Mutate any part of the ciphertext */
+-		flip_random_bit((u8 *)vec->ctext, vec->clen);
++		flip_random_bit(rng, (u8 *)vec->ctext, vec->clen);
+ 	}
+ }
+ 
+@@ -2248,7 +2307,8 @@ static void mutate_aead_message(struct aead_testvec *vec, bool aad_iv,
+  */
+ #define MIN_COLLISION_FREE_AUTHSIZE 8
+ 
+-static void generate_aead_message(struct aead_request *req,
++static void generate_aead_message(struct rnd_state *rng,
++				  struct aead_request *req,
+ 				  const struct aead_test_suite *suite,
+ 				  struct aead_testvec *vec,
+ 				  bool prefer_inauthentic)
+@@ -2257,17 +2317,18 @@ static void generate_aead_message(struct aead_request *req,
+ 	const unsigned int ivsize = crypto_aead_ivsize(tfm);
+ 	const unsigned int authsize = vec->clen - vec->plen;
+ 	const bool inauthentic = (authsize >= MIN_COLLISION_FREE_AUTHSIZE) &&
+-				 (prefer_inauthentic || get_random_u32_below(4) == 0);
++				 (prefer_inauthentic ||
++				  prandom_u32_below(rng, 4) == 0);
+ 
+ 	/* Generate the AAD. */
+-	generate_random_bytes((u8 *)vec->assoc, vec->alen);
++	generate_random_bytes(rng, (u8 *)vec->assoc, vec->alen);
+ 	if (suite->aad_iv && vec->alen >= ivsize)
+ 		/* Avoid implementation-defined behavior. */
+ 		memcpy((u8 *)vec->assoc + vec->alen - ivsize, vec->iv, ivsize);
+ 
+-	if (inauthentic && get_random_u32_below(2) == 0) {
++	if (inauthentic && prandom_bool(rng)) {
+ 		/* Generate a random ciphertext. */
+-		generate_random_bytes((u8 *)vec->ctext, vec->clen);
++		generate_random_bytes(rng, (u8 *)vec->ctext, vec->clen);
+ 	} else {
+ 		int i = 0;
+ 		struct scatterlist src[2], dst;
+@@ -2279,7 +2340,7 @@ static void generate_aead_message(struct aead_request *req,
+ 		if (vec->alen)
+ 			sg_set_buf(&src[i++], vec->assoc, vec->alen);
+ 		if (vec->plen) {
+-			generate_random_bytes((u8 *)vec->ptext, vec->plen);
++			generate_random_bytes(rng, (u8 *)vec->ptext, vec->plen);
+ 			sg_set_buf(&src[i++], vec->ptext, vec->plen);
+ 		}
+ 		sg_init_one(&dst, vec->ctext, vec->alen + vec->clen);
+@@ -2299,7 +2360,7 @@ static void generate_aead_message(struct aead_request *req,
+ 		 * Mutate the authentic (ciphertext, AAD) pair to get an
+ 		 * inauthentic one.
+ 		 */
+-		mutate_aead_message(vec, suite->aad_iv, ivsize);
++		mutate_aead_message(rng, vec, suite->aad_iv, ivsize);
+ 	}
+ 	vec->novrfy = 1;
+ 	if (suite->einval_allowed)
+@@ -2313,7 +2374,8 @@ static void generate_aead_message(struct aead_request *req,
+  * If 'prefer_inauthentic' is true, then this function will generate inauthentic
+  * test vectors (i.e. vectors with 'vec->novrfy=1') more often.
+  */
+-static void generate_random_aead_testvec(struct aead_request *req,
++static void generate_random_aead_testvec(struct rnd_state *rng,
++					 struct aead_request *req,
+ 					 struct aead_testvec *vec,
+ 					 const struct aead_test_suite *suite,
+ 					 unsigned int maxkeysize,
+@@ -2329,18 +2391,18 @@ static void generate_random_aead_testvec(struct aead_request *req,
+ 
+ 	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
+ 	vec->klen = maxkeysize;
+-	if (get_random_u32_below(4) == 0)
+-		vec->klen = get_random_u32_below(maxkeysize + 1);
+-	generate_random_bytes((u8 *)vec->key, vec->klen);
++	if (prandom_u32_below(rng, 4) == 0)
++		vec->klen = prandom_u32_below(rng, maxkeysize + 1);
++	generate_random_bytes(rng, (u8 *)vec->key, vec->klen);
+ 	vec->setkey_error = crypto_aead_setkey(tfm, vec->key, vec->klen);
+ 
+ 	/* IV */
+-	generate_random_bytes((u8 *)vec->iv, ivsize);
++	generate_random_bytes(rng, (u8 *)vec->iv, ivsize);
+ 
+ 	/* Tag length: in [0, maxauthsize], but usually choose maxauthsize */
+ 	authsize = maxauthsize;
+-	if (get_random_u32_below(4) == 0)
+-		authsize = get_random_u32_below(maxauthsize + 1);
++	if (prandom_u32_below(rng, 4) == 0)
++		authsize = prandom_u32_below(rng, maxauthsize + 1);
+ 	if (prefer_inauthentic && authsize < MIN_COLLISION_FREE_AUTHSIZE)
+ 		authsize = MIN_COLLISION_FREE_AUTHSIZE;
+ 	if (WARN_ON(authsize > maxdatasize))
+@@ -2349,11 +2411,11 @@ static void generate_random_aead_testvec(struct aead_request *req,
+ 	vec->setauthsize_error = crypto_aead_setauthsize(tfm, authsize);
+ 
+ 	/* AAD, plaintext, and ciphertext lengths */
+-	total_len = generate_random_length(maxdatasize);
+-	if (get_random_u32_below(4) == 0)
++	total_len = generate_random_length(rng, maxdatasize);
++	if (prandom_u32_below(rng, 4) == 0)
+ 		vec->alen = 0;
+ 	else
+-		vec->alen = generate_random_length(total_len);
++		vec->alen = generate_random_length(rng, total_len);
+ 	vec->plen = total_len - vec->alen;
+ 	vec->clen = vec->plen + authsize;
+ 
+@@ -2364,7 +2426,7 @@ static void generate_random_aead_testvec(struct aead_request *req,
+ 	vec->novrfy = 0;
+ 	vec->crypt_error = 0;
+ 	if (vec->setkey_error == 0 && vec->setauthsize_error == 0)
+-		generate_aead_message(req, suite, vec, prefer_inauthentic);
++		generate_aead_message(rng, req, suite, vec, prefer_inauthentic);
+ 	snprintf(name, max_namelen,
+ 		 "\"random: alen=%u plen=%u authsize=%u klen=%u novrfy=%d\"",
+ 		 vec->alen, vec->plen, authsize, vec->klen, vec->novrfy);
+@@ -2376,7 +2438,7 @@ static void try_to_generate_inauthentic_testvec(
+ 	int i;
+ 
+ 	for (i = 0; i < 10; i++) {
+-		generate_random_aead_testvec(ctx->req, &ctx->vec,
++		generate_random_aead_testvec(&ctx->rng, ctx->req, &ctx->vec,
+ 					     &ctx->test_desc->suite.aead,
+ 					     ctx->maxkeysize, ctx->maxdatasize,
+ 					     ctx->vec_name,
+@@ -2407,7 +2469,8 @@ static int test_aead_inauthentic_inputs(struct aead_extra_tests_ctx *ctx)
+ 		 */
+ 		try_to_generate_inauthentic_testvec(ctx);
+ 		if (ctx->vec.novrfy) {
+-			generate_random_testvec_config(&ctx->cfg, ctx->cfgname,
++			generate_random_testvec_config(&ctx->rng, &ctx->cfg,
++						       ctx->cfgname,
+ 						       sizeof(ctx->cfgname));
+ 			err = test_aead_vec_cfg(DECRYPT, &ctx->vec,
+ 						ctx->vec_name, &ctx->cfg,
+@@ -2497,12 +2560,13 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
+ 	 * the other implementation against them.
+ 	 */
+ 	for (i = 0; i < fuzz_iterations * 8; i++) {
+-		generate_random_aead_testvec(generic_req, &ctx->vec,
++		generate_random_aead_testvec(&ctx->rng, generic_req, &ctx->vec,
+ 					     &ctx->test_desc->suite.aead,
+ 					     ctx->maxkeysize, ctx->maxdatasize,
+ 					     ctx->vec_name,
+ 					     sizeof(ctx->vec_name), false);
+-		generate_random_testvec_config(&ctx->cfg, ctx->cfgname,
++		generate_random_testvec_config(&ctx->rng, &ctx->cfg,
++					       ctx->cfgname,
+ 					       sizeof(ctx->cfgname));
+ 		if (!ctx->vec.novrfy) {
+ 			err = test_aead_vec_cfg(ENCRYPT, &ctx->vec,
+@@ -2541,6 +2605,7 @@ static int test_aead_extra(const struct alg_test_desc *test_desc,
+ 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
++	init_rnd_state(&ctx->rng);
+ 	ctx->req = req;
+ 	ctx->tfm = crypto_aead_reqtfm(req);
+ 	ctx->test_desc = test_desc;
+@@ -2930,11 +2995,14 @@ static int test_skcipher_vec(int enc, const struct cipher_testvec *vec,
+ 
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ 	if (!noextratests) {
++		struct rnd_state rng;
+ 		struct testvec_config cfg;
+ 		char cfgname[TESTVEC_CONFIG_NAMELEN];
+ 
++		init_rnd_state(&rng);
++
+ 		for (i = 0; i < fuzz_iterations; i++) {
+-			generate_random_testvec_config(&cfg, cfgname,
++			generate_random_testvec_config(&rng, &cfg, cfgname,
+ 						       sizeof(cfgname));
+ 			err = test_skcipher_vec_cfg(enc, vec, vec_name,
+ 						    &cfg, req, tsgls);
+@@ -2952,7 +3020,8 @@ static int test_skcipher_vec(int enc, const struct cipher_testvec *vec,
+  * Generate a symmetric cipher test vector from the given implementation.
+  * Assumes the buffers in 'vec' were already allocated.
+  */
+-static void generate_random_cipher_testvec(struct skcipher_request *req,
++static void generate_random_cipher_testvec(struct rnd_state *rng,
++					   struct skcipher_request *req,
+ 					   struct cipher_testvec *vec,
+ 					   unsigned int maxdatasize,
+ 					   char *name, size_t max_namelen)
+@@ -2966,17 +3035,17 @@ static void generate_random_cipher_testvec(struct skcipher_request *req,
+ 
+ 	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
+ 	vec->klen = maxkeysize;
+-	if (get_random_u32_below(4) == 0)
+-		vec->klen = get_random_u32_below(maxkeysize + 1);
+-	generate_random_bytes((u8 *)vec->key, vec->klen);
++	if (prandom_u32_below(rng, 4) == 0)
++		vec->klen = prandom_u32_below(rng, maxkeysize + 1);
++	generate_random_bytes(rng, (u8 *)vec->key, vec->klen);
+ 	vec->setkey_error = crypto_skcipher_setkey(tfm, vec->key, vec->klen);
+ 
+ 	/* IV */
+-	generate_random_bytes((u8 *)vec->iv, ivsize);
++	generate_random_bytes(rng, (u8 *)vec->iv, ivsize);
+ 
+ 	/* Plaintext */
+-	vec->len = generate_random_length(maxdatasize);
+-	generate_random_bytes((u8 *)vec->ptext, vec->len);
++	vec->len = generate_random_length(rng, maxdatasize);
++	generate_random_bytes(rng, (u8 *)vec->ptext, vec->len);
+ 
+ 	/* If the key couldn't be set, no need to continue to encrypt. */
+ 	if (vec->setkey_error)
+@@ -3018,6 +3087,7 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
+ 	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
+ 	const char *algname = crypto_skcipher_alg(tfm)->base.cra_name;
+ 	const char *driver = crypto_skcipher_driver_name(tfm);
++	struct rnd_state rng;
+ 	char _generic_driver[CRYPTO_MAX_ALG_NAME];
+ 	struct crypto_skcipher *generic_tfm = NULL;
+ 	struct skcipher_request *generic_req = NULL;
+@@ -3035,6 +3105,8 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
+ 	if (strncmp(algname, "kw(", 3) == 0)
+ 		return 0;
+ 
++	init_rnd_state(&rng);
++
+ 	if (!generic_driver) { /* Use default naming convention? */
+ 		err = build_generic_driver_name(algname, _generic_driver);
+ 		if (err)
+@@ -3119,9 +3191,11 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
+ 	}
+ 
+ 	for (i = 0; i < fuzz_iterations * 8; i++) {
+-		generate_random_cipher_testvec(generic_req, &vec, maxdatasize,
++		generate_random_cipher_testvec(&rng, generic_req, &vec,
++					       maxdatasize,
+ 					       vec_name, sizeof(vec_name));
+-		generate_random_testvec_config(cfg, cfgname, sizeof(cfgname));
++		generate_random_testvec_config(&rng, cfg, cfgname,
++					       sizeof(cfgname));
+ 
+ 		err = test_skcipher_vec_cfg(ENCRYPT, &vec, vec_name,
+ 					    cfg, req, tsgls);
+
+base-commit: 2fcd07b7ccd5fd10b2120d298363e4e6c53ccf9c
+-- 
+2.39.2
+
