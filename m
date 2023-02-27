@@ -2,124 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDA8C64ED6
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 07:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECAB0C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 08:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbjB0H7V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Feb 2023 02:59:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35308 "EHLO
+        id S230037AbjB0IVA convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Feb 2023 03:21:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbjB0H7U (ORCPT
+        with ESMTP id S229587AbjB0IVA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Feb 2023 02:59:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92573903B;
-        Sun, 26 Feb 2023 23:59:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4DDA5B80C6D;
-        Mon, 27 Feb 2023 07:59:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D609C4339C;
-        Mon, 27 Feb 2023 07:59:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677484757;
-        bh=r3JtwbSt9hd0ieyjiNYdehHR5ZIFOt8rUWtB2lFMujA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=c1ooVtnqBuVyjobk14sUytCgwmrgVwXhwu5KcnijgDhKHp4qPTT5hza8dQLuBhi40
-         g7n9VgT6P9SQxPj560pXMhhzWPAxHOMotThzFtEbWXGTg/pK7hMDUWAv4EsZWsIJnT
-         vTvC71Mnn4TpMHRm99T1wvL3TtMSLwjXr7HWMgOSM9Iz0u4x9SOkpUQw3sAueNWsdR
-         kT6bVwmgJFNJ+gjy3F0fMkOT9pxGlcpHASZfqR7Uf/x1DPxF06nSVP62bTzpScKczS
-         +NXkCLq2GXBZdnAMJkXpUauC0xN3VbbtcFBKoKwlL1OkjapHuEeRc09S+3hQLkkPg1
-         jgB/UMCJLCfTw==
-Received: by mail-lj1-f173.google.com with SMTP id a10so5503500ljq.1;
-        Sun, 26 Feb 2023 23:59:16 -0800 (PST)
-X-Gm-Message-State: AO0yUKXqYzIF8y1vS/J++ksK6Ef0wxjR1tBbZeZR33YjTRbQTjvWdlBu
-        qikJD5yHKkT8wWzD6eTQIYIovsW6EArQPpNAz4o=
-X-Google-Smtp-Source: AK7set/OkBqCfPXZgBNSBX5Tge6wgHozfcCEGYqgntOmQMtk7ri6lQCxZFAkDy7QQhnKruTFniglKWuTvqsF+hQwpHU=
-X-Received: by 2002:a2e:bc16:0:b0:295:acea:5875 with SMTP id
- b22-20020a2ebc16000000b00295acea5875mr2466101ljf.2.1677484755054; Sun, 26 Feb
- 2023 23:59:15 -0800 (PST)
+        Mon, 27 Feb 2023 03:21:00 -0500
+X-Greylist: delayed 431 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 27 Feb 2023 00:20:54 PST
+Received: from ouvsmtp1.octopuce.fr (ouvsmtp1.octopuce.fr [194.36.166.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C0461B337;
+        Mon, 27 Feb 2023 00:20:54 -0800 (PST)
+Received: from panel.vitry.ouvaton.coop (unknown [194.36.166.20])
+        by ouvsmtp1.octopuce.fr (Postfix) with ESMTPS id A80431647;
+        Mon, 27 Feb 2023 09:13:41 +0100 (CET)
+Received: from sm.ouvaton.coop (ouvadm.octopuce.fr [194.36.166.2])
+        by panel.vitry.ouvaton.coop (Postfix) with ESMTPSA id 751185E1520;
+        Mon, 27 Feb 2023 09:13:41 +0100 (CET)
 MIME-Version: 1.0
-References: <20230227063223.1829703-1-ebiggers@kernel.org>
-In-Reply-To: <20230227063223.1829703-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 27 Feb 2023 08:59:04 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFbUuH1_vp=+sAFDorFSaFFUsaLjzjHFPbv_OZ_VAPK=w@mail.gmail.com>
-Message-ID: <CAMj1kXFbUuH1_vp=+sAFDorFSaFFUsaLjzjHFPbv_OZ_VAPK=w@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm64/aes-neonbs - fix crash with CFI enabled
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Sami Tolvanen <samitolvanen@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Date:   Mon, 27 Feb 2023 08:13:41 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+From:   "Yann Droneaud" <ydroneaud@opteya.com>
+Message-ID: <c18250f8126b92478e31817c4162286a31983f51@opteya.com>
+Subject: Re: [PATCH] crypto: testmgr - fix RNG performance in fuzz tests
+To:     "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+        "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20230227055018.1713117-1-ebiggers@kernel.org>
+References: <20230227055018.1713117-1-ebiggers@kernel.org>
+X-Originating-IP: 10.0.20.16
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 27 Feb 2023 at 07:33, Eric Biggers <ebiggers@kernel.org> wrote:
->
+Hi,
+
+27 février 2023 à 06:52 "Eric Biggers" <ebiggers@kernel.org> a écrit:
+> 
 > From: Eric Biggers <ebiggers@google.com>
->
-> aesbs_ecb_encrypt(), aesbs_ecb_decrypt(), aesbs_xts_encrypt(), and
-> aesbs_xts_decrypt() are called via indirect function calls.  Therefore
-> they need to use SYM_TYPED_FUNC_START instead of SYM_FUNC_START to cause
-> their type hashes to be emitted when the kernel is built with
-> CONFIG_CFI_CLANG=y.  Otherwise, the code crashes with a CFI failure if
-> the compiler doesn't happen to optimize out the indirect calls.
->
-> Fixes: c50d32859e70 ("arm64: Add types to indirect called assembly functions")
+> 
+> The performance of the crypto fuzz tests has greatly regressed since
+> v5.18. When booting a kernel on an arm64 dev board with all software
+> crypto algorithms and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled, the
+> fuzz tests now take about 200 seconds to run, or about 325 seconds with
+> lockdep enabled, compared to about 5 seconds before.
+> 
+> The root cause is that the random number generation has become much
+> slower due to commit d4150779e60f ("random32: use real rng for
+> non-deterministic randomness"). On my same arm64 dev board, at the time
+> the fuzz tests are run, get_random_u8() is about 345x slower than
+> prandom_u32_state(), or about 469x if lockdep is enabled.
+> 
+> Lockdep makes a big difference, but much of the rest comes from the
+> get_random_*() functions taking a *very* slow path when the CRNG is not
+> yet initialized. Since the crypto self-tests run early during boot,
+> even having a hardware RNG driver enabled (CONFIG_CRYPTO_DEV_QCOM_RNG in
+> my case) doesn't prevent this. x86 systems don't have this issue, but
+> they still see a significant regression if lockdep is enabled.
+> 
+> Converting the "Fully random bytes" case in generate_random_bytes() to
+> use get_random_bytes() helps significantly, improving the test time to
+> about 27 seconds. But that's still over 5x slower than before.
+> 
+> This is all a bit silly, though, since the fuzz tests don't actually
+> need cryptographically secure random numbers. So let's just make them
+> use a non-cryptographically-secure RNG as they did before. The original
+> prandom_u32() is gone now, so let's use prandom_u32_state() instead,
+> with an explicitly managed state, like various other self-tests in the
+> kernel source tree (rbtree_test.c, test_scanf.c, etc.) already do. This
+> also has the benefit that no locking is required anymore, so performance
+> should be even better than the original version that used prandom_u32().
+> 
+> Fixes: d4150779e60f ("random32: use real rng for non-deterministic randomness")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
-
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-
 > ---
->  arch/arm64/crypto/aes-neonbs-core.S | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
-> index 7278a37c2d5c..baf450717b24 100644
-> --- a/arch/arm64/crypto/aes-neonbs-core.S
-> +++ b/arch/arm64/crypto/aes-neonbs-core.S
-> @@ -15,6 +15,7 @@
->   */
->
->  #include <linux/linkage.h>
-> +#include <linux/cfi_types.h>
->  #include <asm/assembler.h>
->
->         .text
-> @@ -620,12 +621,12 @@ SYM_FUNC_END(aesbs_decrypt8)
->         .endm
->
->         .align          4
-> -SYM_FUNC_START(aesbs_ecb_encrypt)
-> +SYM_TYPED_FUNC_START(aesbs_ecb_encrypt)
->         __ecb_crypt     aesbs_encrypt8, v0, v1, v4, v6, v3, v7, v2, v5
->  SYM_FUNC_END(aesbs_ecb_encrypt)
->
->         .align          4
-> -SYM_FUNC_START(aesbs_ecb_decrypt)
-> +SYM_TYPED_FUNC_START(aesbs_ecb_decrypt)
->         __ecb_crypt     aesbs_decrypt8, v0, v1, v6, v4, v2, v7, v3, v5
->  SYM_FUNC_END(aesbs_ecb_decrypt)
->
-> @@ -799,11 +800,11 @@ SYM_FUNC_END(__xts_crypt8)
->         ret
->         .endm
->
-> -SYM_FUNC_START(aesbs_xts_encrypt)
-> +SYM_TYPED_FUNC_START(aesbs_xts_encrypt)
->         __xts_crypt     aesbs_encrypt8, v0, v1, v4, v6, v3, v7, v2, v5
->  SYM_FUNC_END(aesbs_xts_encrypt)
->
-> -SYM_FUNC_START(aesbs_xts_decrypt)
-> +SYM_TYPED_FUNC_START(aesbs_xts_decrypt)
->         __xts_crypt     aesbs_decrypt8, v0, v1, v6, v4, v2, v7, v3, v5
->  SYM_FUNC_END(aesbs_xts_decrypt)
->
->
-> base-commit: f3a2439f20d918930cc4ae8f76fe1c1afd26958f
-> --
-> 2.39.2
->
+>  crypto/testmgr.c | 268 ++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 171 insertions(+), 97 deletions(-)
+> 
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index c91e93ece20b..2cbd2f8ce3c3 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -860,12 +860,52 @@ static int prepare_keybuf(const u8 *key, unsigned int ksize,
+>  
+>  #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+>  
+> +/*
+> + * The fuzz tests use prandom instead of the normal Linux RNG since they don't
+> + * need cryptographically secure random numbers. This greatly improves the
+> + * performance of these tests, especially if they are run before the Linux RNG
+> + * has been initialized or if they are run on a lockdep-enabled kernel.
+> + */
+> +
+> +static inline void init_rnd_state(struct rnd_state *rng)
+> +{
+> + static atomic64_t next_seed;
+> +
+> + prandom_seed_state(rng, atomic64_inc_return(&next_seed));
+
+Isn't making this deterministic defeating the purpose of fuzzing ?
+
+Regards.
+
+-- 
+Yann Droneaud
+OPTEYA
