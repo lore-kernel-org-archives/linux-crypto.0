@@ -2,125 +2,81 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6D4C64ED8
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 15:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A26A4C64ED8
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Feb 2023 18:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbjB0Ppo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Feb 2023 10:45:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59454 "EHLO
+        id S230379AbjB0SUA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Feb 2023 13:20:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjB0Pph (ORCPT
+        with ESMTP id S230387AbjB0ST7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Feb 2023 10:45:37 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52ADD1165C
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Feb 2023 07:44:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677512698; x=1709048698;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=mtfoIDnH0Q8yi+sYUEm4Z/EhGI4QDDiRP+fp8GfNyhE=;
-  b=LuHYc2OK5SklZ0fK9ytA4WoLrXcL7savs+t43aCVJ6VpfoGDpGL7P9Zb
-   8HxXU3sPJQPaNLmvLmOgt8+6ZyQzTUW/G4ls9PzFuDdJrHVsyYgXmbwZq
-   sjLLD0z6MktBTh+IBERc8z8NxTHzquIELJsL/uvJGQ3a1YnAJC2kMXp2A
-   3ChxBQ9EUO9ybOwSmXHv3I+P0eHGVpY/kFGtkBUY0KbDs8VNPWnhFTGVp
-   GN1BB1xYY9/QyI0mt1Fhh/eZ+BN6fw4dxmC2KzMv+USo3cRVlQ3Spm1N5
-   idzLy+qymBUogOhKUfHxFVOYVl1ufbIv/7Q7cMuFgpevYQHofFQUgbMp4
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="336166230"
-X-IronPort-AV: E=Sophos;i="5.98,219,1673942400"; 
-   d="scan'208";a="336166230"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2023 07:44:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10634"; a="919392272"
-X-IronPort-AV: E=Sophos;i="5.98,219,1673942400"; 
-   d="scan'208";a="919392272"
-Received: from linux-gr8q.igk.intel.com ([10.102.16.18])
-  by fmsmga006.fm.intel.com with ESMTP; 27 Feb 2023 07:44:19 -0800
-From:   Shashank Gupta <shashank.gupta@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Shashank Gupta <shashank.gupta@intel.com>
-Subject: [PATCH 4/5] crypto: qat - refactor device restart logic
-Date:   Mon, 27 Feb 2023 15:55:44 -0500
-Message-Id: <20230227205545.5796-5-shashank.gupta@intel.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20230227205545.5796-1-shashank.gupta@intel.com>
-References: <20230227205545.5796-1-shashank.gupta@intel.com>
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+        Mon, 27 Feb 2023 13:19:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA20CE078;
+        Mon, 27 Feb 2023 10:19:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4603B60DEA;
+        Mon, 27 Feb 2023 18:19:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BE64C4339C;
+        Mon, 27 Feb 2023 18:19:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677521997;
+        bh=MdVd1A1n9fbYRjjUTOn4iwg1RDnWWorsLDZ3ptrlFcU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=p6gYBlCJoDJv1TvVWmV2HycVsYhOWTw0PZsHwYSRSW7undoqby12kYYEBsqTgNsLo
+         +UeZ6nSdnEXG+yvDYIUqqEebqYqMwYpUdjElHe4f5wEQQiNm8DCj5l2lGUq1gSSMJ3
+         m3eGLG3vd0ZzkJElrRuCBt0QaZHp5NQeRNZf8wBNjPVSe71ukT7wg8RLRNVfJJz6bR
+         PacbhP2xbQ7V+j0W3sk/m5K92p7JN5Tej53EstVDk7vVIfrrg7RyEmER4z6AFfG2qD
+         AV+0CLDOj/wDGSbcxeuMZinVM2qaWX3+2Hcnbn/b5sxcmg3/P0ejnjibISdrna4IhW
+         O5z8C4FlMux9A==
+Date:   Mon, 27 Feb 2023 10:19:55 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Yann Droneaud <ydroneaud@opteya.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: testmgr - fix RNG performance in fuzz tests
+Message-ID: <Y/z0S7u01VRM1Z6e@sol.localdomain>
+References: <20230227055018.1713117-1-ebiggers@kernel.org>
+ <c18250f8126b92478e31817c4162286a31983f51@opteya.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c18250f8126b92478e31817c4162286a31983f51@opteya.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Refactor the restart logic by moving it into the function
-adf_dev_restart() which uses the safe function adf_dev_up() and
-adf_dev_down().
+On Mon, Feb 27, 2023 at 08:13:41AM +0000, Yann Droneaud wrote:
+> > +/*
+> > + * The fuzz tests use prandom instead of the normal Linux RNG since they don't
+> > + * need cryptographically secure random numbers. This greatly improves the
+> > + * performance of these tests, especially if they are run before the Linux RNG
+> > + * has been initialized or if they are run on a lockdep-enabled kernel.
+> > + */
+> > +
+> > +static inline void init_rnd_state(struct rnd_state *rng)
+> > +{
+> > + static atomic64_t next_seed;
+> > +
+> > + prandom_seed_state(rng, atomic64_inc_return(&next_seed));
+> 
+> Isn't making this deterministic defeating the purpose of fuzzing ?
+> 
+> Regards.
 
-This commit does not implement any functional change.
+No, it's still fuzzing.  It just means that you'll no longer get different test
+cases each individual time you boot the kernel.  Which seems like mostly a good
+thing, since it makes test failures reproducible.
 
-Signed-off-by: Shashank Gupta <shashank.gupta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/adf_aer.c        |  4 +---
- drivers/crypto/qat/qat_common/adf_common_drv.h |  1 +
- drivers/crypto/qat/qat_common/adf_init.c       | 18 ++++++++++++++++++
- 3 files changed, 20 insertions(+), 3 deletions(-)
+This seemed like the obvious thing to do now that we're not using an API that
+doesn't provide this option.  Though now that you draw attention to it, there is
+indeed a tradeoff that rare bugs will be harder to find.  I suppose that making
+it deterministic ought to be a separate patch so that this one isn't doing two
+different things.  I'll make this patch use get_random_u64() here instead.
 
-diff --git a/drivers/crypto/qat/qat_common/adf_aer.c b/drivers/crypto/qat/qat_common/adf_aer.c
-index fe9bb2f3536a..9fa76c527051 100644
---- a/drivers/crypto/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/qat/qat_common/adf_aer.c
-@@ -90,9 +90,7 @@ static void adf_device_reset_worker(struct work_struct *work)
- 	struct adf_accel_dev *accel_dev = reset_data->accel_dev;
- 
- 	adf_dev_restarting_notify(accel_dev);
--	adf_dev_stop(accel_dev);
--	adf_dev_shutdown(accel_dev);
--	if (adf_dev_init(accel_dev) || adf_dev_start(accel_dev)) {
-+	if (adf_dev_restart(accel_dev)) {
- 		/* The device hanged and we can't restart it so stop here */
- 		dev_err(&GET_DEV(accel_dev), "Restart device failed\n");
- 		kfree(reset_data);
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 4bf1fceb7052..3666109b6320 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -60,6 +60,7 @@ int adf_dev_shutdown_cache_cfg(struct adf_accel_dev *accel_dev);
- 
- int adf_dev_up(struct adf_accel_dev *accel_dev, bool init_config);
- int adf_dev_down(struct adf_accel_dev *accel_dev, bool cache_config);
-+int adf_dev_restart(struct adf_accel_dev *accel_dev);
- 
- void adf_devmgr_update_class_index(struct adf_hw_device_data *hw_data);
- void adf_clean_vf_map(bool);
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 988cffd0b833..11ade5d8e4a0 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -464,3 +464,21 @@ int adf_dev_up(struct adf_accel_dev *accel_dev, bool config)
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(adf_dev_up);
-+
-+int adf_dev_restart(struct adf_accel_dev *accel_dev)
-+{
-+	int ret = 0;
-+
-+	if (!accel_dev)
-+		return -EFAULT;
-+
-+	adf_dev_down(accel_dev, false);
-+
-+	ret = adf_dev_up(accel_dev, false);
-+	/* if device is already up return success*/
-+	if (ret == -EALREADY)
-+		return 0;
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(adf_dev_restart);
--- 
-2.16.4
-
+- Eric
