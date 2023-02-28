@@ -2,152 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2E1C7EE31
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Feb 2023 10:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B2EC64ED6
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Feb 2023 16:17:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbjB1KzY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Feb 2023 05:55:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42514 "EHLO
+        id S229515AbjB1QRV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Feb 2023 11:17:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231406AbjB1Kyf (ORCPT
+        with ESMTP id S229509AbjB1QRU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Feb 2023 05:54:35 -0500
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7DE02E82E;
-        Tue, 28 Feb 2023 02:53:56 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R711e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=wuzongyong@linux.alibaba.com;NM=1;PH=DS;RN=39;SR=0;TI=SMTPD_---0Vcj3mWh_1677581630;
-Received: from localhost(mailfrom:wuzongyong@linux.alibaba.com fp:SMTPD_---0Vcj3mWh_1677581630)
-          by smtp.aliyun-inc.com;
-          Tue, 28 Feb 2023 18:53:51 +0800
-Date:   Tue, 28 Feb 2023 18:53:50 +0800
-From:   Wu Zongyong <wuzongyong@linux.alibaba.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, wutu.xq2@linux.alibaba.com
-Subject: Re: [PATCH RFC v8 19/56] x86/fault: Return pfn from dump_pagetable()
- for SEV-specific fault handling.
-Message-ID: <20230228105350.GA15593@L-PF27918B-1352.localdomain>
-Reply-To: Wu Zongyong <wuzongyong@linux.alibaba.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-20-michael.roth@amd.com>
+        Tue, 28 Feb 2023 11:17:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E902B613;
+        Tue, 28 Feb 2023 08:17:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D4F96115D;
+        Tue, 28 Feb 2023 16:17:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5051BC433EF;
+        Tue, 28 Feb 2023 16:17:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677601038;
+        bh=SdiaPWkoz1Wlu+wvf5yCwuvk9Us7VxrRsrTMSHhg2Vo=;
+        h=Date:From:To:Cc:Subject:From;
+        b=cJrT2mSLpkUuf+5idWfdfRNffhCFS5HyC0kpAiD+NZZFe8OG/az9+G3msDTmqgraj
+         XO3A4SWM2vcw/usBwX3zWf+Ce9wriiKv+1kbgLiolGwF7VA683i+KjQ+Mi7mhQXuQs
+         NzuDRXEm+YzAdQvEoTcLKg0j35ZQ96xVYuO/adlhd797IV/n3j/V8Wpwc5k188S3oc
+         Etdlpo9+2H8JhiOcQOwqqRZsxEd/KR0QBleq9j6VijgOmtMCe52fGBT10bDSbZGCYY
+         9GGZnAHF+iBBUSMaBn7M+x7VJI/eGuCcNgOkVOLOSdIVqVZQiee62m/mh09qqhwm1n
+         3OQku2HugiR0w==
+Date:   Tue, 28 Feb 2023 09:17:16 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sasha Levin <sashal@kernel.org>
+Cc:     stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Please apply 4e4a08868f15897ca236528771c3733fded42c62 to linux-6.2.y
+Message-ID: <Y/4pDMRFfQLyijQq@dev-arch.thelio-3990X>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230220183847.59159-20-michael.roth@amd.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 12:38:10PM -0600, Michael Roth wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Return pfn from dump_pagetable() to do SEV-specific
-> fault handling. Used for handling SNP RMP page fault.
-> 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/mm/fault.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> index afd4cde17001..f2b16dcfbd9a 100644
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -311,7 +311,7 @@ static bool low_pfn(unsigned long pfn)
->  	return pfn < max_low_pfn;
->  }
->  
-> -static void dump_pagetable(unsigned long address)
-> +static unsigned long dump_pagetable(unsigned long address)
->  {
->  	pgd_t *base = __va(read_cr3_pa());
->  	pgd_t *pgd = &base[pgd_index(address)];
-> @@ -345,8 +345,10 @@ static void dump_pagetable(unsigned long address)
->  
->  	pte = pte_offset_kernel(pmd, address);
->  	pr_cont("*pte = %0*Lx ", sizeof(*pte) * 2, (u64)pte_val(*pte));
-> +	return 0;
->  out:
->  	pr_cont("\n");
-> +	return 0;
->  }
->  
->  #else /* CONFIG_X86_64: */
-> @@ -367,10 +369,11 @@ static int bad_address(void *p)
->  	return get_kernel_nofault(dummy, (unsigned long *)p);
->  }
->  
-> -static void dump_pagetable(unsigned long address)
-> +static unsigned long dump_pagetable(unsigned long address)
->  {
->  	pgd_t *base = __va(read_cr3_pa());
->  	pgd_t *pgd = base + pgd_index(address);
-> +	unsigned long pfn;
+Hi Greg and Sasha,
 
-pfn should be initialized otherwise this function may return an
-uninitialized value.
+Please apply commit 4e4a08868f15 ("crypto: arm64/sm4-gcm - Fix possible crash
+in GCM cryption") to 6.2, as it fixes a crash that I see when booting Arch
+Linux ARM's aarch64 configuration [1] in QEMU:
 
->  	p4d_t *p4d;
->  	pud_t *pud;
->  	pmd_t *pmd;
-> @@ -388,6 +391,7 @@ static void dump_pagetable(unsigned long address)
->  	if (bad_address(p4d))
->  		goto bad;
->  
-> +	pfn = p4d_pfn(*p4d);
->  	pr_cont("P4D %lx ", p4d_val(*p4d));
->  	if (!p4d_present(*p4d) || p4d_large(*p4d))
->  		goto out;
-> @@ -396,6 +400,7 @@ static void dump_pagetable(unsigned long address)
->  	if (bad_address(pud))
->  		goto bad;
->  
-> +	pfn = pud_pfn(*pud);
->  	pr_cont("PUD %lx ", pud_val(*pud));
->  	if (!pud_present(*pud) || pud_large(*pud))
->  		goto out;
-> @@ -404,6 +409,7 @@ static void dump_pagetable(unsigned long address)
->  	if (bad_address(pmd))
->  		goto bad;
->  
-> +	pfn = pmd_pfn(*pmd);
->  	pr_cont("PMD %lx ", pmd_val(*pmd));
->  	if (!pmd_present(*pmd) || pmd_large(*pmd))
->  		goto out;
-> @@ -412,13 +418,14 @@ static void dump_pagetable(unsigned long address)
->  	if (bad_address(pte))
->  		goto bad;
->  
-> +	pfn = pte_pfn(*pte);
->  	pr_cont("PTE %lx", pte_val(*pte));
->  out:
->  	pr_cont("\n");
-> -
-> -	return;
-> +	return pfn;
->  bad:
->  	pr_info("BAD\n");
-> +	return -1;
->  }
->  
->  #endif /* CONFIG_X86_64 */
-> -- 
-> 2.25.1
-> 
-> 
-> 
-> 
+[    1.512110] Unable to handle kernel paging request at virtual address fffffe000024d588
+[    1.512357] Mem abort info:
+[    1.512542]   ESR = 0x0000000097c38004
+[    1.512695]   EC = 0x25: DABT (current EL), IL = 32 bits
+[    1.512863]   SET = 0, FnV = 0
+[    1.512967]   EA = 0, S1PTW = 0
+[    1.513075]   FSC = 0x04: level 0 translation fault
+[    1.513236] Data abort info:
+[    1.513343]   Access size = 8 byte(s)
+[    1.513618]   SSE = 0, SRT = 3
+[    1.513721]   SF = 1, AR = 0
+[    1.513824]   CM = 0, WnR = 0
+[    1.513964] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041ef8000
+[    1.514162] [fffffe000024d588] pgd=0000000000000000, p4d=0000000000000000
+[    1.514932] Internal error: Oops: 0000000097c38004 [#1] PREEMPT SMP
+[    1.515206] Modules linked in:
+[    1.515477] CPU: 0 PID: 113 Comm: cryptomgr_test Not tainted 6.2.1-ARCH #1
+[    1.515755] Hardware name: linux,dummy-virt (DT)
+[    1.516029] pstate: a1400009 (NzCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+[    1.516277] pc : kfree+0x30/0xb0
+[    1.516766] lr : skcipher_walk_done+0x198/0x2b0
+[    1.516934] sp : ffff80000ace3820
+[    1.517042] x29: ffff80000ace3820 x28: 0000000000000000 x27: 0000000000000400
+[    1.517316] x26: ffff80000937d880 x25: ffff0000034d0400 x24: ffff0000036efe00
+[    1.517557] x23: ffff800008088730 x22: ffff0000036efd00 x21: ffff80000ace3998
+[    1.517791] x20: 0000000000000000 x19: ffff80000ace3900 x18: ffffffffffffffff
+[    1.518022] x17: 0000000000000000 x16: 0000000000000000 x15: ffffffffffffffff
+[    1.518263] x14: ffff80008ace3ce7 x13: 0000000000000000 x12: 0000000000000000
+[    1.518510] x11: ffff80000ace38c8 x10: ffff80000ace38d0 x9 : 0000000000000001
+[    1.518757] x8 : 0000000000000000 x7 : ffff80000ace38a8 x6 : 0000000000000001
+[    1.518993] x5 : ffff80000ace3998 x4 : fffffc0000000000 x3 : ffff80000ace3b00
+[    1.519242] x2 : 000002000024d580 x1 : ffff800009356218 x0 : fffffe000024d580
+[    1.519549] Call trace:
+[    1.519654]  kfree+0x30/0xb0
+[    1.519785]  skcipher_walk_done+0x198/0x2b0
+[    1.519931]  gcm_crypt+0xd8/0x170
+[    1.520047]  gcm_encrypt+0x90/0xbc
+[    1.520153]  crypto_aead_encrypt+0x24/0x40
+[    1.520285]  test_aead_vec_cfg+0x21c/0x770
+[    1.520422]  test_aead+0xb4/0x140
+[    1.520538]  alg_test_aead+0x94/0x190
+[    1.520662]  alg_test+0x34c/0x520
+[    1.520770]  cryptomgr_test+0x24/0x44
+[    1.520889]  kthread+0xe4/0xf0
+[    1.520993]  ret_from_fork+0x10/0x20
+[    1.521300] Code: b25657e4 d34cfc42 d37ae442 8b040040 (f9400403)
+[    1.521691] ---[ end trace 0000000000000000 ]---
+
+[1]: https://github.com/archlinuxarm/PKGBUILDs/raw/master/core/linux-aarch64/config
+
+Cheers,
+Nathan
