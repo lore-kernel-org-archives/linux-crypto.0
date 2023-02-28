@@ -2,203 +2,216 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F21FC64EC7
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Feb 2023 18:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73138C64ED6
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Feb 2023 18:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229651AbjB1S3R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Feb 2023 13:29:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
+        id S229809AbjB1Sia (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Feb 2023 13:38:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbjB1S3Q (ORCPT
+        with ESMTP id S229486AbjB1Si3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Feb 2023 13:29:16 -0500
-Received: from the.earth.li (the.earth.li [IPv6:2a00:1098:86:4d:c0ff:ee:15:900d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D1EE3344B;
-        Tue, 28 Feb 2023 10:29:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
-        s=the; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject:
-        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=ECH1deKx+z2SM1iXhh3cdnB9YsWa9ZMdhAGEfXckaJk=; b=k9SBVVXa9t2tvPvU/Arvj2qbzU
-        hil9SInUdqiUiy4MqEmRuKnvY36d9MSNu1+KFcJYV/+lDWevfE0s/mMTZXrRgTStVYUAnmdoSvvKg
-        73f+kqqwZSPo1V6mCczxehP6p5wvIMWhhONKtsDz16iGQ95BmppodQzU7eWPkwwPj4KxXfF5eFeF0
-        1lg52gCdHycdvwLGcm+Yi5Wh1gg1IOTN2G3VnAeOj7pVLHETPt2QmQ8BpGMxmUL3gsYJ6N87xLHmP
-        RLIHUheupaDUPWOe7xqa1LecCnAf9C4C2SEoR7tz+/R33ATXzDotHmriHZVD5T0jmFRj3vqau4ZIf
-        HU+7Xt+g==;
-Received: from [2001:4d48:ad59:1403::17ca] (helo=earth.li)
-        by the.earth.li with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <noodles@earth.li>)
-        id 1pX4ik-008oSf-Us; Tue, 28 Feb 2023 18:29:03 +0000
-Date:   Tue, 28 Feb 2023 18:28:58 +0000
-From:   Jonathan McDowell <noodles@earth.li>
-To:     Antoine Tenart <atenart@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] crypto: inside-secure - Cleanup ring IRQ workqueues
- on load failure
-Message-ID: <7b3dbe21c21e547252ed6d292cf0be1fede9d487.1677608527.git.noodles@earth.li>
-References: <Y/fkOF31BTQVocSe@sevai.o362.us>
- <cover.1677608527.git.noodles@earth.li>
+        Tue, 28 Feb 2023 13:38:29 -0500
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2048.outbound.protection.outlook.com [40.107.104.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B10AFA255;
+        Tue, 28 Feb 2023 10:38:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U56saKib9QqFiLwWOZAFLTY1WwZIXE83ap4YKudYmda5fsqYAAMFGJSMsAXpFfxo7uE+Kr1g9IytW/Km4Ce+osEInCMrdPVfY66z7HrD5coSKvC9MKveOOyFcAUqEmDAnw+Vypmiw6IVHpZj9pbdrg74rVVAVuMthBOltE0Xr9g+vfeI19C+8rvfedeibvks6U4zvIYgwLrOqfqs7evp9xTZW8P5aPMQ2occSKwzpgmvYJqlCg8FQPZo3xGdSE1AONeNJZ0GSLyKIb+TH/3derQwlHJZ7b10BNUZDPz4Y7TB5mmYsW/4wfEEQUvF0//rQq5SiCVhStWNgR0eEHl5Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kNM47IEniWCWEAiAKvbOGdXd/Nno1636Zy33ydv5j2A=;
+ b=a6okuWYjBsUUfFRpsjJnfiwNPPrdeougCiCdjRvUYV13Z9sqnVfZW+7WvE7mL917cc6bT77a+8CEqTsCCFkbBOSOr/RGRtC+b1XICDj27Wdw12UfJO/lh1VZCBI68udTFeesgS2/QO0qDCVJsUlh14Lm2rVGkWm9X3zkNzcegxBshyhysfx/31hPpBYKpUSqr2npP9XPEuAQe1Zo2r/WYx3Ugdyuxi9HgBSRInApCk41dwqdgcsjfmN70st5nGGh8KSRZ8McKWusOPSGYsCWueTfBuWsbK1/rXr8ZK1SvmzC44a/00WIVUdf6Na/F6248YtQIn/Hjt7x7dbsxJjFiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kNM47IEniWCWEAiAKvbOGdXd/Nno1636Zy33ydv5j2A=;
+ b=nVXMKkDzkmWgIDBVur+c7Xc15xupOSl/ZH+lW2NkrHYaMgYbWplujFSMb6TKmlwMyDzZD70RsWXUqHJIkAJ8dWjdxqZeozVOmPF09K7m7qx3919Azt0mVdPLnlbe6clybCJTSJ7RUN527VVvkVfdVi+5idxkNlTYFgURqGMlHhE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
+ by AS8PR04MB8213.eurprd04.prod.outlook.com (2603:10a6:20b:3f3::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.30; Tue, 28 Feb
+ 2023 18:38:25 +0000
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::a518:512c:4af1:276e]) by DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::a518:512c:4af1:276e%4]) with mapi id 15.20.6134.026; Tue, 28 Feb 2023
+ 18:38:25 +0000
+From:   meenakshi.aggarwal@nxp.com
+To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, franck.lenormand@nxp.com
+Cc:     vijayb@linux.microsoft.com, code@tyhicks.com
+Subject: [PATCH] drivers: crypto: caam: jr: Allow quiesce when quiesced
+Date:   Wed,  1 Mar 2023 00:07:58 +0530
+Message-Id: <20230228183758.448396-1-meenakshi.aggarwal@nxp.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
+References: <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR01CA0028.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::21) To DU0PR04MB9563.eurprd04.prod.outlook.com
+ (2603:10a6:10:314::7)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1677608527.git.noodles@earth.li>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS8PR04MB8213:EE_
+X-MS-Office365-Filtering-Correlation-Id: 50c7d6be-1e33-4710-7e14-08db19baf9ce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tXKBN8yXyytI+duPA5CW10nIDx2iU4kRKr+EaYKc7Kytg/oVtyVnXOFHSOWlZtbapXeiuDTpWY1+GPlYHKZqgxMpLtoMCBy+thNMg/ltimHFMk8AATlakNHvdBZK3WOtx3lnnWh/+h8Uz4gyNigr8ZY5njeyPxO+aGBV8J/4YlNQdc0hG0gNM6/w/xuidJP7p5hqovw+d5vpMfWSTb4phHD6DdNjoFo1Q+xM1VeHso3bD+wYqg3kR95C4ECzYyX8xlA+bJmujB81/LziaWaML5uKBU6TOHVl+gZacv5j2zjUEKUWira1Gm8a5DuFeay4uN9+HsOlrbEB0obtNakHvfu9iGTD1CuxGN/phj0OFTy26rB+0sx2OndCsoTkk4gFpm8kEnMu3+IFg70l6JXih5otVyCF/tFwX5+7GjAJO/LlBkpJ9WBjn7QjjpMpb0EDXVIOXtGplkLjrXmXj7J5BpxNIilAVn/WS3AQ2jF8V2I4tmOteljA2KxRvsymo+npGBMxQYwFGh6Yh+MM8mnTsiyiw+Mw2tqXYhlppPvNQp0Vknza/iXfmmZXNlpyLNzWWOYT3d01tsc10W2wiP6GGln928GHfDlOZYkJJ1CNhzYiOzXlfOAGXJ7Nj7X+a0TDW/TkQBY0LzEDYYJ+bEWc6wB9cQBtdz4aYClCDdTvH9sI539+N9sQ7kxBEJRcntRo7STCW3AJPQjNm8eZhYUpOQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(136003)(346002)(366004)(396003)(39860400002)(451199018)(83380400001)(36756003)(478600001)(316002)(2616005)(41300700001)(26005)(6486002)(9686003)(186003)(1076003)(52116002)(6506007)(6666004)(6512007)(38350700002)(38100700002)(8936002)(5660300002)(86362001)(66946007)(66556008)(2906002)(66476007)(8676002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MdRetrs5R2pbaQEC3+Gjl5U7MROgc9r9hV+HMC06S/WljlVrT1F5dj8S2YAb?=
+ =?us-ascii?Q?3QwERQ7Hb2Y0F1uvahKHkBGa5Ln0vptP2aN0wAJHqkNst5J3w0lnQCgsfpD8?=
+ =?us-ascii?Q?3uN6NGJeqWIsOG8vt9Fhg3wFcpgIVCAVnblz/B8U4R3NwTBNipPbm5DnSecu?=
+ =?us-ascii?Q?uKwjLjlS+k9Wp639YqlYsg/RPPZ6ywdmjgbeHoJj2xUYoQe+mjSLG7zpVyNb?=
+ =?us-ascii?Q?lRsX3bSCT7ELGxHVxYPO28YaVNm/4qCvqhJRoV50HpC6yQaB3KeV/GXkafPb?=
+ =?us-ascii?Q?gHLVMLvTAcfeWhE/Eyz5QUXkZ+lT3P0bA4bGRcLKdru+ibsq/AhyknjOVknV?=
+ =?us-ascii?Q?q+4lnSL3JnqVXz+eQO5OZp5lLTxKMyDNk0ciQsci66BgxaAm0xJDGmCZaTMt?=
+ =?us-ascii?Q?9ygqICW7kldZyJcp/ZEvJzFPGlqPabQd0tUqnghWpntOjR5PKiXyZxbPtg+9?=
+ =?us-ascii?Q?oriwKxSJ1YgIUodxWmZdE2vH0tVytDTZqZOcDvfwvXgopi3vRM4tE2BRTZDx?=
+ =?us-ascii?Q?qamuqkDnq0SxBJbZG7o42yAgOo9L8/xxQsVI5lEkrIaRSbEQ0miY+nhYwo0K?=
+ =?us-ascii?Q?Tgk+AJG8QSf+4l6vZY217878nStL0A8FOs+q6V6LBLlM0s9KQTH3W1DBopUd?=
+ =?us-ascii?Q?YWxmfrcIQ1MdtI8S02gOoe2KY2lE4omUBQ/658NVGW5+/1G1XAL9zdLheqiE?=
+ =?us-ascii?Q?HeGXspNl3ea1oUvD4qZ6c3n5UnEwTqw/DQZ7t8dJ1PYI+x5N+YCD+l0C8uOE?=
+ =?us-ascii?Q?4L2+i8H4VglIVjcXgLGXMfUarKYvv8j/3YmiCdoY2Q5jxYRuouyoLUJnAnga?=
+ =?us-ascii?Q?4P3VITgzFOF67s6vPk/dChBwDS45fzhQJanS0CniC4DInP0vrPnIU5vHZfBb?=
+ =?us-ascii?Q?L+nrvDg9n9PPC7B2Yd6pjGMf7qIr1PRj6WmQTtP6g3NN8QyRAS3Ze4dbGg3K?=
+ =?us-ascii?Q?JMw5+/eK7aB9IVM5pTqTokOtLP/JzJlmCDZ2SixX5o5csXEAgrKAkvpp3qfl?=
+ =?us-ascii?Q?fZehfO6E5HIUq7zFQGYgtcmacoOAzoc7e61gORpIyBcs2VaBheBEyqSr/tb2?=
+ =?us-ascii?Q?TkbNu4An9wtGe542Fs4jo+6IShzC+KHHW64+DhvpGvG/Zx4/2XPfj054sfSq?=
+ =?us-ascii?Q?7jgS3IRASCPiJOcUOYkH7oXX6plu8EBphrRw6xHPDQEmhoooBQwDbdCmCjDH?=
+ =?us-ascii?Q?eTvCSK5rRQZySVJh6l7X96nQ78EvakHYMPY+eBaNdqNhY11Hqb/thl01eC4f?=
+ =?us-ascii?Q?3GjAPA7cAWvF1BPGoE8AsxzRY9Wfk+uRmwI3DCYsfLXLRZN/JxqlsGqWfrf4?=
+ =?us-ascii?Q?BbUu4HMtYzImrWqD7h9T7ryRGIbKvamWEPiRbz5idvvpIL5HvqBmPmPGA9Fg?=
+ =?us-ascii?Q?3rlHDIn5iK94J7mFcGMnsxdjcyTdOgya29QFEbGYVQM1ZY+/UXMfxPpxwusM?=
+ =?us-ascii?Q?GjOw5HR3xuRw5s/ODQF7nCSgVDQuxutqbfS+zIbgmj4mOId7oR3M2ViXNp7y?=
+ =?us-ascii?Q?lUBNlZ4zv2KxVEQwEP+OGx3mIGUbu6wjruy1B4kBCmEMAdQjsj3ugSWmdpvF?=
+ =?us-ascii?Q?ajUEIEh2D89Ywb9P0UawPjqVE5btznJKDOFQkMBzs74MaKnf/96j6ORyfvBq?=
+ =?us-ascii?Q?OQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50c7d6be-1e33-4710-7e14-08db19baf9ce
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2023 18:38:25.0915
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nOFW/iQ5wBG2L4AGGQn8/8aOTvCtexwaLRKiUsu50LH5b6CkXiOPJGZmWI5i++C5qcw55Kmx8O0RzESyVtDG/owaQphWyvbS1CPVwJmVncs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8213
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A failure loading the safexcel driver results in the following warning
-on boot, because the IRQ affinity has not been correctly cleaned up.
-Ensure we clean up the affinity and workqueues on a failure to load the
-driver.
+From: Horia Geanta <horia.geanta@nxp.com>
 
-crypto-safexcel: probe of f2800000.crypto failed with error -2
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 232 at kernel/irq/manage.c:1913 free_irq+0x300/0x340
-Modules linked in: hwmon mdio_i2c crypto_safexcel(+) md5 sha256_generic libsha256 authenc libdes omap_rng rng_core nft_masq nft_nat nft_chain_nat nf_nat nft_ct nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables libcrc32c nfnetlink fuse autofs4
-CPU: 1 PID: 232 Comm: systemd-udevd Tainted: G        W          6.1.6-00002-g9d4898824677 #3
-Hardware name: MikroTik RB5009 (DT)
-pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : free_irq+0x300/0x340
-lr : free_irq+0x2e0/0x340
-sp : ffff800008fa3890
-x29: ffff800008fa3890 x28: 0000000000000000 x27: 0000000000000000
-x26: ffff8000008e6dc0 x25: ffff000009034cac x24: ffff000009034d50
-x23: 0000000000000000 x22: 000000000000004a x21: ffff0000093e0d80
-x20: ffff000009034c00 x19: ffff00000615fc00 x18: 0000000000000000
-x17: 0000000000000000 x16: 0000000000000000 x15: 000075f5c1584c5e
-x14: 0000000000000017 x13: 0000000000000000 x12: 0000000000000040
-x11: ffff000000579b60 x10: ffff000000579b62 x9 : ffff800008bbe370
-x8 : ffff000000579dd0 x7 : 0000000000000000 x6 : ffff000000579e18
-x5 : ffff000000579da8 x4 : ffff800008ca0000 x3 : ffff800008ca0188
-x2 : 0000000013033204 x1 : ffff000009034c00 x0 : ffff8000087eadf0
-Call trace:
- free_irq+0x300/0x340
- devm_irq_release+0x14/0x20
- devres_release_all+0xa0/0x100
- device_unbind_cleanup+0x14/0x60
- really_probe+0x198/0x2d4
- __driver_probe_device+0x74/0xdc
- driver_probe_device+0x3c/0x110
- __driver_attach+0x8c/0x190
- bus_for_each_dev+0x6c/0xc0
- driver_attach+0x20/0x30
- bus_add_driver+0x148/0x1fc
- driver_register+0x74/0x120
- __platform_driver_register+0x24/0x30
- safexcel_init+0x48/0x1000 [crypto_safexcel]
- do_one_initcall+0x4c/0x1b0
- do_init_module+0x44/0x1cc
- load_module+0x1724/0x1be4
- __do_sys_finit_module+0xbc/0x110
- __arm64_sys_finit_module+0x1c/0x24
- invoke_syscall+0x44/0x110
- el0_svc_common.constprop.0+0xc0/0xe0
- do_el0_svc+0x20/0x80
- el0_svc+0x14/0x4c
- el0t_64_sync_handler+0xb0/0xb4
- el0t_64_sync+0x148/0x14c
----[ end trace 0000000000000000 ]---
+Issues:
+- Job ring device is busy when do kexec reboot
+- Failed to flush job ring when do system suspend-resume
 
-Fixes: 1b44c5a60c13 ("inside-secure - add SafeXcel EIP197 crypto engine driver")
-Signed-off-by: Jonathan McDowell <noodles@earth.li>
-Cc: stable@vger.kernel.org
+Fix:
+Flush the job ring to stop the running jobs.
+
+Signed-off-by: Horia Geanta <horia.geanta@nxp.com>
+Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
+Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
 ---
-v2:
- - Expand error clean up to cover ring initialisation failures
----
- drivers/crypto/inside-secure/safexcel.c | 37 ++++++++++++++++++-------
- 1 file changed, 27 insertions(+), 10 deletions(-)
+ drivers/crypto/caam/jr.c | 55 ++++++++++++++++++++++++++++++++--------
+ 1 file changed, 45 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 5e10ab24be3b..9ff02b5abc4a 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1628,19 +1628,23 @@ static int safexcel_probe_generic(void *pdev,
- 						     &priv->ring[i].rdr);
- 		if (ret) {
- 			dev_err(dev, "Failed to initialize rings\n");
--			return ret;
-+			goto err_cleanup_rings;
- 		}
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 724fdec18bf9..eb3b9a7e9a35 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -4,7 +4,7 @@
+  * JobR backend functionality
+  *
+  * Copyright 2008-2012 Freescale Semiconductor, Inc.
+- * Copyright 2019 NXP
++ * Copyright 2019, 2023 NXP
+  */
  
- 		priv->ring[i].rdr_req = devm_kcalloc(dev,
- 			EIP197_DEFAULT_RING_SIZE,
- 			sizeof(*priv->ring[i].rdr_req),
- 			GFP_KERNEL);
--		if (!priv->ring[i].rdr_req)
--			return -ENOMEM;
-+		if (!priv->ring[i].rdr_req) {
-+			ret = -ENOMEM;
-+			goto err_cleanup_rings;
-+		}
- 
- 		ring_irq = devm_kzalloc(dev, sizeof(*ring_irq), GFP_KERNEL);
--		if (!ring_irq)
--			return -ENOMEM;
-+		if (!ring_irq) {
-+			ret = -ENOMEM;
-+			goto err_cleanup_rings;
-+		}
- 
- 		ring_irq->priv = priv;
- 		ring_irq->ring = i;
-@@ -1654,7 +1658,8 @@ static int safexcel_probe_generic(void *pdev,
- 						ring_irq);
- 		if (irq < 0) {
- 			dev_err(dev, "Failed to get IRQ ID for ring %d\n", i);
--			return irq;
-+			ret = irq;
-+			goto err_cleanup_rings;
- 		}
- 
- 		priv->ring[i].irq = irq;
-@@ -1666,8 +1671,10 @@ static int safexcel_probe_generic(void *pdev,
- 		snprintf(wq_name, 9, "wq_ring%d", i);
- 		priv->ring[i].workqueue =
- 			create_singlethread_workqueue(wq_name);
--		if (!priv->ring[i].workqueue)
--			return -ENOMEM;
-+		if (!priv->ring[i].workqueue) {
-+			ret = -ENOMEM;
-+			goto err_cleanup_rings;
-+		}
- 
- 		priv->ring[i].requests = 0;
- 		priv->ring[i].busy = false;
-@@ -1684,16 +1691,26 @@ static int safexcel_probe_generic(void *pdev,
- 	ret = safexcel_hw_init(priv);
- 	if (ret) {
- 		dev_err(dev, "HW init failed (%d)\n", ret);
--		return ret;
-+		goto err_cleanup_rings;
- 	}
- 
- 	ret = safexcel_register_algorithms(priv);
- 	if (ret) {
- 		dev_err(dev, "Failed to register algorithms (%d)\n", ret);
--		return ret;
-+		goto err_cleanup_rings;
- 	}
- 
- 	return 0;
-+
-+err_cleanup_rings:
-+	for (i = 0; i < priv->config.rings; i++) {
-+		if (priv->ring[i].irq)
-+			irq_set_affinity_hint(priv->ring[i].irq, NULL);
-+		if (priv->ring[i].workqueue)
-+			destroy_workqueue(priv->ring[i].workqueue);
-+	}
-+
-+	return ret;
+ #include <linux/of_irq.h>
+@@ -72,19 +72,27 @@ static void caam_jr_crypto_engine_exit(void *data)
+ 	crypto_engine_exit(jrpriv->engine);
  }
  
- static void safexcel_hw_reset_rings(struct safexcel_crypto_priv *priv)
+-static int caam_reset_hw_jr(struct device *dev)
++/*
++ * Put the CAAM in quiesce, ie stop
++ *
++ * Must be called with itr disabled
++ */
++static int caam_jr_stop_processing(struct device *dev, u32 jrcr_bits)
+ {
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+ 	unsigned int timeout = 100000;
+ 
+-	/*
+-	 * mask interrupts since we are going to poll
+-	 * for reset completion status
+-	 */
+-	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
++	/* Check the current status */
++	if (rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_INPROGRESS)
++		goto wait_quiesce_completion;
+ 
+-	/* initiate flush (required prior to reset) */
+-	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
++	/* Reset the field */
++	clrsetbits_32(&jrp->rregs->jrintstatus, JRINT_ERR_HALT_MASK, 0);
++
++	/* initiate flush / park (required prior to reset) */
++	wr_reg32(&jrp->rregs->jrcommand, jrcr_bits);
++
++wait_quiesce_completion:
+ 	while (((rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_MASK) ==
+ 		JRINT_ERR_HALT_INPROGRESS) && --timeout)
+ 		cpu_relax();
+@@ -95,8 +103,35 @@ static int caam_reset_hw_jr(struct device *dev)
+ 		return -EIO;
+ 	}
+ 
++	return 0;
++}
++
++/*
++ * Flush the job ring, so the jobs running will be stopped, jobs queued will be
++ * invalidated and the CAAM will no longer fetch fron input ring.
++ *
++ * Must be called with itr disabled
++ */
++static int caam_jr_flush(struct device *dev)
++{
++	return caam_jr_stop_processing(dev, JRCR_RESET);
++}
++
++static int caam_reset_hw_jr(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	unsigned int timeout = 100000;
++	int err;
++	/*
++	 * mask interrupts since we are going to poll
++	 * for reset completion status
++	 */
++	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JRCFG_IMSK);
++	err = caam_jr_flush(dev);
++	if (err)
++		return err;
++
+ 	/* initiate reset */
+-	timeout = 100000;
+ 	wr_reg32(&jrp->rregs->jrcommand, JRCR_RESET);
+ 	while ((rd_reg32(&jrp->rregs->jrcommand) & JRCR_RESET) && --timeout)
+ 		cpu_relax();
 -- 
-2.39.2
+2.25.1
 
