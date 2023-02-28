@@ -2,322 +2,250 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2610CC64EC4
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Feb 2023 20:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC19C64EC7
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Feb 2023 20:51:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbjB1Urh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Feb 2023 15:47:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36114 "EHLO
+        id S229896AbjB1UvR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Feb 2023 15:51:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjB1Urg (ORCPT
+        with ESMTP id S229891AbjB1UvQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Feb 2023 15:47:36 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2AF34C0E;
-        Tue, 28 Feb 2023 12:47:34 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id bi9so14935139lfb.2;
-        Tue, 28 Feb 2023 12:47:34 -0800 (PST)
+        Tue, 28 Feb 2023 15:51:16 -0500
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89529E382
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Feb 2023 12:51:08 -0800 (PST)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-536bbe5f888so308942447b3.8
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Feb 2023 12:51:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677617253;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3L1QLt7UDDPEkqiycna07teZMPhk4C+uHRwLWaiwTyc=;
-        b=EF6ipXncGR87Hyi7yuIkIWlrhtTuMv9ZwhTzqku5AcU+7xbIZO6LNpXbphdVN/4YTC
-         3gHjUpjN3/gvCJa92kzGi7UJiihYkqSxEOEztuC4Y+aG2M6yb9V+VeovWBmIA1OsuUAb
-         3SK9TUvY500zI+99tIz5zFv9ukjRv5jeS7Q+4SxyqCUbE9dNb5JsB13QfKf3u29XDdMj
-         O8/KtllWWAK6CVQanDx1FYpD3YBdhau9KiGWWEGFqMhalWLx3YIm5tJahqV6ilqqMelD
-         VRorG8yZYlbEENSGAReaYvRaH26bYF5QJd3SkU7U14t1Vi8qX9W/UJSnKrIzGThs+lL/
-         0FAA==
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wtTqwj+D3jwps+3QoXdwgydtBnQr2/Gk4zbwXxgg29Q=;
+        b=L5KZNYW7qHsWkjdPhZ6TanqjcxdyG+lFCPjAGGAgZ/GYJgivhxC0HiJ621wgsw0XE8
+         rRC/neOY7eRtCzl6jhhdcfDr2AUXcJoYHQC5+wvUly53UbPDB3u+mxlZJddRzl1MIEHn
+         ydJQT2oQdKvwtqOWbjjkM3DDVnfKH6nfVyfnxh/a1FvbGLH0JyzcCYIGu7nuptCfYTZE
+         Tbvhc8AzmXw7cddrkRlFWbcH8B3xfhYixu/jv0NU2/uWL2mdNTSWvM9lGaRn/akBdoKV
+         JE0Oa2k1RfsAEOXqv6Zpj0KLOY1MaGoxYn4L/0dohyZoYkpELZATVX4rBnn4VC/P2xtB
+         5GWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677617253;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3L1QLt7UDDPEkqiycna07teZMPhk4C+uHRwLWaiwTyc=;
-        b=uuc1+r4Zxf2je8aL2IT5bERjRQzOVtBwfiSAVG6ql/FcK8eKcdXY1w3TflmzSz6+Gj
-         7GOn4C448gQPz7WrGWed1PZqbLF+zH7aOjHoAktc1NezjoGwF44ZG5FfizMCdhQRrlHu
-         mini6Ky7q5G+BMpjAwseDrQdYMhxAb4WU+m8caLoVbRJyllt+2jOv9ilqyzLMfTMyAe+
-         HZIddV16KQElTOv5yUD0Isj1xnW52XG5pDcEBqCcj2aXVMVjwuqrt8fAY2pzWwgKVBSR
-         xuLorx5+4sbJO/o4oYtjRkHdOIYy3BsaPeaSfEDZq1UtKgTei152Kh4SelBdk0Gt++o5
-         JKSg==
-X-Gm-Message-State: AO0yUKVLSPdw18WkPxtG6Sp4rcG/N1XcLIAJGugtaSG+xhYUnPziaKkF
-        bDIypRJe0+43P9JQ0jH5hF4=
-X-Google-Smtp-Source: AK7set8v7E0yifOxFvbZFDxajwr0/Pny5hwCohRYpmE+xovY8y4YPAZGRDqcnWw/eas+nkSXmzpyLg==
-X-Received: by 2002:ac2:4c21:0:b0:4b5:a7c7:9dc4 with SMTP id u1-20020ac24c21000000b004b5a7c79dc4mr805829lfq.3.1677617252760;
-        Tue, 28 Feb 2023 12:47:32 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id t4-20020ac25484000000b004b592043413sm1478655lfk.12.2023.02.28.12.47.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 12:47:32 -0800 (PST)
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
-Date:   Tue, 28 Feb 2023 22:47:30 +0200
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
-        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 47/56] KVM: SVM: Support SEV-SNP AP Creation NAE
- event
-Message-ID: <20230228224730.00007d21@intel.com>
-In-Reply-To: <09696af0-b72d-29e7-862b-22ae4a630299@amazon.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-48-michael.roth@amd.com>
-        <09696af0-b72d-29e7-862b-22ae4a630299@amazon.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wtTqwj+D3jwps+3QoXdwgydtBnQr2/Gk4zbwXxgg29Q=;
+        b=PD3jkWFVYz1SHY7utmefEr0C2b8OmY74FAS+kt3lLJzaIW06HA72r5qwjGai1NL5Yv
+         MKHQlGfRufxdEYa14oq2GSjes9h8eL1drINd4KcxEGIDnlgmfBbCH8j49FpNUFUGXGsP
+         gL4ONpQoK892LDu5ybfMgJ02Pgn02uql+Me5DIBHp9dB79IJz+NpdpuMKtQGRyNaoINx
+         1auJhgU6KLLjcgFFesc1bxUwl+OjWnmF0lylZvWZJ+QzAAlVgQPZtbs8IMiDUGz/zeMX
+         9Ozlm9A0vjimt3i9txsKZQn/O3M48DSvztFyUFaxUFsPz35fpgdtu7POTQAq94hD2eP2
+         fXQA==
+X-Gm-Message-State: AO0yUKWpE9vXy42G+/PfalhOx3uqiXZFv0+MT6dB4Le4CV7UXr+lY/od
+        Nc3ycQQ3pw73Zv54x/6k4ZWerCUvJQXzfTHauXs7DA==
+X-Google-Smtp-Source: AK7set9XZhbPRnpNk3LHyPWKqLU1EdXohqOA1vByAEMUPDHg9Vi4AWB6jaKLAb6zwZPk7goq8rB6OBW1VgL6AKuX/Aw=
+X-Received: by 2002:a05:6902:4d1:b0:ab8:1ed9:cfd2 with SMTP id
+ v17-20020a05690204d100b00ab81ed9cfd2mr1268507ybs.5.1677617467634; Tue, 28 Feb
+ 2023 12:51:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <Y/cBB+q0Ono9j2Jy@gondor.apana.org.au> <20230224231430.2948-1-kunyu@nfschina.com>
+ <Y/cy5wUtk10OahpO@gondor.apana.org.au> <CACRpkdYyB=-UnE1bmdVszSSB5ReECZ0fUoWJX6XtYbKHEe52tA@mail.gmail.com>
+ <Y/c7iVW67Xhhdu8e@gondor.apana.org.au> <Y/hQdzsKMYgkIfMY@gondor.apana.org.au>
+ <Y/yIbPBVCPx9K/0s@gondor.apana.org.au> <CACRpkdZC4z2Xng4=k94rmM=AFzNzTdXkvtkArMnK7afouz=7VA@mail.gmail.com>
+ <Y/3FYZJeLE7DVPBf@gondor.apana.org.au> <Y/3IA4OjmUmjMgh1@gondor.apana.org.au> <Y/3N6zFOZeehJQ/p@gondor.apana.org.au>
+In-Reply-To: <Y/3N6zFOZeehJQ/p@gondor.apana.org.au>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Tue, 28 Feb 2023 21:50:55 +0100
+Message-ID: <CACRpkdZ3rCsOWqooNkPL6m7vZ2Z2Frh2sdxruKhrS0t3QHcSKw@mail.gmail.com>
+Subject: Re: [v4 PATCH] crypto: stm32 - Save and restore between each request
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 24 Feb 2023 13:37:48 +0100
-Alexander Graf <graf@amazon.com> wrote:
+On Tue, Feb 28, 2023 at 10:48 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-> 
-> On 20.02.23 19:38, Michael Roth wrote:
-> > From: Tom Lendacky <thomas.lendacky@amd.com>
-> >
-> > Add support for the SEV-SNP AP Creation NAE event. This allows SEV-SNP
-> > guests to alter the register state of the APs on their own. This allows
-> > the guest a way of simulating INIT-SIPI.
-> >
-> > A new event, KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, is created and used
-> > so as to avoid updating the VMSA pointer while the vCPU is running.
-> >
-> > For CREATE
-> >    The guest supplies the GPA of the VMSA to be used for the vCPU with
-> >    the specified APIC ID. The GPA is saved in the svm struct of the
-> >    target vCPU, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added
-> >    to the vCPU and then the vCPU is kicked.
-> >
-> > For CREATE_ON_INIT:
-> >    The guest supplies the GPA of the VMSA to be used for the vCPU with
-> >    the specified APIC ID the next time an INIT is performed. The GPA is
-> >    saved in the svm struct of the target vCPU.
-> >
-> > For DESTROY:
-> >    The guest indicates it wishes to stop the vCPU. The GPA is cleared
-> >    from the svm struct, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is
-> >    added to vCPU and then the vCPU is kicked.
-> >
-> > The KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event handler will be invoked
-> > as a result of the event or as a result of an INIT. The handler sets the
-> > vCPU to the KVM_MP_STATE_UNINITIALIZED state, so that any errors will
-> > leave the vCPU as not runnable. Any previous VMSA pages that were
-> > installed as part of an SEV-SNP AP Creation NAE event are un-pinned. If
-> > a new VMSA is to be installed, the VMSA guest page is pinned and set as
-> > the VMSA in the vCPU VMCB and the vCPU state is set to
-> > KVM_MP_STATE_RUNNABLE. If a new VMSA is not to be installed, the VMSA is
-> > cleared in the vCPU VMCB and the vCPU state is left as
-> > KVM_MP_STATE_UNINITIALIZED to prevent it from being run.
-> >
-> > Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > [mdr: add handling for restrictedmem]
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> 
-> 
-> What is the intended boot sequence for SEV-SNP guests? FWIW with this 
-> interface in place, guests will typically use in-guest VMSA pages to 
-> hold secondary vcpu state. But that means we're now allocating 4kb of 
-> memory for every vcpu that we create that will be for most of the 
-> guest's lifetime superfluous.
-> 
-> Wouldn't it make more sense to have a model where we only allocate the 
-> VMSA for the boot CPU and leave secondary allocation to the guest? We 
-> already need firmware changes for SEV-SNP - may as well make this one more.
-> 
-> [...]
-> 
-> > +
-> > +static int sev_snp_ap_creation(struct vcpu_svm *svm)
-> > +{
-> > +       struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
-> > +       struct kvm_vcpu *vcpu = &svm->vcpu;
-> > +       struct kvm_vcpu *target_vcpu;
-> > +       struct vcpu_svm *target_svm;
-> > +       unsigned int request;
-> > +       unsigned int apic_id;
-> > +       bool kick;
-> > +       int ret;
-> > +
-> > +       request = lower_32_bits(svm->vmcb->control.exit_info_1);
-> > +       apic_id = upper_32_bits(svm->vmcb->control.exit_info_1);
-> > +
-> > +       /* Validate the APIC ID */
-> > +       target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, apic_id);
-> 
-> 
-> Out of curiosity: The target CPU can be my own vCPU, right?
-> 
-> 
-> > +       if (!target_vcpu) {
-> > +               vcpu_unimpl(vcpu, "vmgexit: invalid AP APIC ID [%#x] from guest\n",
-> > +                           apic_id);
-> > +               return -EINVAL;
-> > +       }
-> > +
-> > +       ret = 0;
-> > +
-> > +       target_svm = to_svm(target_vcpu);
-> > +
-> > +       /*
-> > +        * The target vCPU is valid, so the vCPU will be kicked unless the
-> > +        * request is for CREATE_ON_INIT. For any errors at this stage, the
-> > +        * kick will place the vCPU in an non-runnable state.
-> > +        */
-> > +       kick = true;
-> > +
-> > +       mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
-> > +
-> > +       target_svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
-> > +       target_svm->sev_es.snp_ap_create = true;
-> > +
-> > +       /* Interrupt injection mode shouldn't change for AP creation */
-> > +       if (request < SVM_VMGEXIT_AP_DESTROY) {
-> > +               u64 sev_features;
-> > +
-> > +               sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
-> > +               sev_features ^= sev->sev_features;
-> > +               if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
-> > +                       vcpu_unimpl(vcpu, "vmgexit: invalid AP injection mode [%#lx] from guest\n",
-> > +                                   vcpu->arch.regs[VCPU_REGS_RAX]);
-> > +                       ret = -EINVAL;
-> > +                       goto out;
-> > +               }
-> > +       }
-> > +
-> > +       switch (request) {
-> > +       case SVM_VMGEXIT_AP_CREATE_ON_INIT:
-> > +               kick = false;
-> > +               fallthrough;
-> > +       case SVM_VMGEXIT_AP_CREATE:
-> > +               if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
-> > +                       vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
-> > +                                   svm->vmcb->control.exit_info_2);
-> > +                       ret = -EINVAL;
-> > +                       goto out;
-> > +               }
-> > +
-> > +               /*
-> > +                * Malicious guest can RMPADJUST a large page into VMSA which
-> > +                * will hit the SNP erratum where the CPU will incorrectly signal
-> > +                * an RMP violation #PF if a hugepage collides with the RMP entry
-> > +                * of VMSA page, reject the AP CREATE request if VMSA address from
-> > +                * guest is 2M aligned.
-> 
-> 
-> This will break genuine current Linux kernels that just happen to 
-> allocate a guest page, no? In fact, given enough vCPUs you're almost 
-> guaranteed to hit an aligned structure somewhere. What is the guest 
-> supposed to do in that situation?
-> 
-> 
-> > +                */
-> > +               if (IS_ALIGNED(svm->vmcb->control.exit_info_2, PMD_SIZE)) {
-> > +                       vcpu_unimpl(vcpu,
-> > +                                   "vmgexit: AP VMSA address [%llx] from guest is unsafe as it is 2M aligned\n",
-> > +                                   svm->vmcb->control.exit_info_2);
-> > +                       ret = -EINVAL;
-> > +                       goto out;
-> > +               }
-> > +
-> > +               target_svm->sev_es.snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
-> > +               break;
-> > +       case SVM_VMGEXIT_AP_DESTROY:
-> 
-> 
-> I don't understand the destroy path. Why does this case destroy anything?
-> 
-> 
-> > +               break;
-> > +       default:
-> > +               vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
-> > +                           request);
-> > +               ret = -EINVAL;
-> > +               break;
-> > +       }
-> > +
-> > +out:
-> > +       if (kick) {
-> > +               if (target_vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)
-> > +                       target_vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> 
-> 
-> What if the guest AP goes through a create -> destroy -> create cycle? 
-> Will it stay runnable while destroyed?
+> v4 fixes hmac to not reload the key over and over again causing
+> the hash state to be corrupted.
 
-The code is not very straightforward.
+OK I tested this, sadly the same results.
 
-1) target_svm->sev_es.snp_vmsa_gpa is set as INVALID_PAGE in the beginning of this function.
+Notice though: the HMAC versions fail on test vector 0 and
+the non-MAC:ed fail on vector 1, so I guess that means test
+vector 0 works with those?
 
-2) If a DESTROY is hit in this function, target_svm->sev_es.snp_vmsa_gpa will be
-left as INVALID_PAGE.
+Here is the complete log:
 
-3) At the end of this function, it calls kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE).
+[    2.997312] alg: extra crypto tests enabled.  This is intended for
+developer use only.
+[   15.203609] Key type encrypted registered
+[   22.553791] stm32-hash a03c2000.hash: allocated hmac(sha256) fallback
+[   22.561976] alg: ahash: stm32-hmac-sha256 test failed (wrong
+result) on test vector 0, cfg="init+update+final aligned buffer"
+[   22.573387] Expected:
+[   22.575674] 00000000: a2 1b 1f 5d 4c f4 f7 3a 4d d9 39 75 0f 7a 06 6a
+[   22.582160] 00000010: 7f 98 cc 13 1c b1 6a 66 92 75 90 21 cf ab 81 81
+[   22.588613] Obtained:
+[   22.590917] 00000000: 46 24 76 a8 97 dd fd bd 40 d1 42 0e 08 a5 bc fe
+[   22.597368] 00000010: eb 25 c3 e2 ad e6 a0 a9 08 3b 32 7b 9e f9 fc a1
+[   22.603865] alg: self-tests for hmac(sha256) using
+stm32-hmac-sha256 failed (rc=-22)
+[   22.603887] ------------[ cut here ]------------
+[   22.616297] WARNING: CPU: 1 PID: 75 at crypto/testmgr.c:5864
+alg_test.part.0+0x4d0/0x4dc
+[   22.624437] alg: self-tests for hmac(sha256) using
+stm32-hmac-sha256 failed (rc=-22)
+[   22.624448] Modules linked in:
+[   22.635258] CPU: 1 PID: 75 Comm: cryptomgr_test Not tainted
+6.2.0-12020-g1c3e1a0051be #67
+[   22.643437] Hardware name: ST-Ericsson Ux5x0 platform (Device Tree Support)
+[   22.650405]  unwind_backtrace from show_stack+0x10/0x14
+[   22.655650]  show_stack from dump_stack_lvl+0x40/0x4c
+[   22.660724]  dump_stack_lvl from __warn+0x94/0xc0
+[   22.665447]  __warn from warn_slowpath_fmt+0x118/0x164
+[   22.670601]  warn_slowpath_fmt from alg_test.part.0+0x4d0/0x4dc
+[   22.676537]  alg_test.part.0 from cryptomgr_test+0x18/0x38
+[   22.682037]  cryptomgr_test from kthread+0xc0/0xc4
+[   22.686843]  kthread from ret_from_fork+0x14/0x2c
+[   22.691553] Exception stack(0xf0f45fb0 to 0xf0f45ff8)
+[   22.696604] 5fa0:                                     00000000
+00000000 00000000 00000000
+[   22.704779] 5fc0: 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000
+[   22.712953] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   22.719596] ---[ end trace 0000000000000000 ]---
+[   22.724494] stm32-hash a03c2000.hash: allocated sha256 fallback
+[   22.769732] alg: ahash: stm32-sha256 test failed (wrong result) on
+test vector 1, cfg="init+update+final aligned buffer"
+[   22.780648] Expected:
+[   22.782952] 00000000: ba 78 16 bf 8f 01 cf ea 41 41 40 de 5d ae 22 23
+[   22.789392] 00000010: b0 03 61 a3 96 17 7a 9c b4 10 ff 61 f2 00 15 ad
+[   22.795874] Obtained:
+[   22.798147] 00000000: e3 b0 c4 42 98 fc 1c 14 9a fb f4 c8 99 6f b9 24
+[   22.804607] 00000010: 27 ae 41 e4 64 9b 93 4c a4 95 99 1b 78 52 b8 55
+[   22.811074] alg: self-tests for sha256 using stm32-sha256 failed (rc=-22)
+[   22.811083] ------------[ cut here ]------------
+[   22.822480] WARNING: CPU: 1 PID: 85 at crypto/testmgr.c:5864
+alg_test.part.0+0x4d0/0x4dc
+[   22.830607] alg: self-tests for sha256 using stm32-sha256 failed (rc=-22)
+[   22.830615] Modules linked in:
+[   22.840457] CPU: 1 PID: 85 Comm: cryptomgr_test Tainted: G        W
+         6.2.0-12020-g1c3e1a0051be #67
+[   22.850109] Hardware name: ST-Ericsson Ux5x0 platform (Device Tree Support)
+[   22.857069]  unwind_backtrace from show_stack+0x10/0x14
+[   22.862307]  show_stack from dump_stack_lvl+0x40/0x4c
+[   22.867373]  dump_stack_lvl from __warn+0x94/0xc0
+[   22.872090]  __warn from warn_slowpath_fmt+0x118/0x164
+[   22.877237]  warn_slowpath_fmt from alg_test.part.0+0x4d0/0x4dc
+[   22.883167]  alg_test.part.0 from cryptomgr_test+0x18/0x38
+[   22.888662]  cryptomgr_test from kthread+0xc0/0xc4
+[   22.893462]  kthread from ret_from_fork+0x14/0x2c
+[   22.898169] Exception stack(0xf0f6dfb0 to 0xf0f6dff8)
+[   22.903216] dfa0:                                     00000000
+00000000 00000000 00000000
+[   22.911388] dfc0: 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000
+[   22.919559] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   22.926182] ---[ end trace 0000000000000000 ]---
+[   36.677933] stm32-hash a03c2000.hash: allocated hmac(sha1) fallback
+[   36.686991] alg: ahash: stm32-hmac-sha1 test failed (wrong result)
+on test vector 0, cfg="init+update+final aligned buffer"
+[   36.698242] Expected:
+[   36.700547] 00000000: b6 17 31 86 55 05 72 64 e2 8b c0 b6 fb 37 8c 8e
+[   36.707002] 00000010: f1 46 be 00
+[   36.710345] Obtained:
+[   36.712624] 00000000: 12 3f d7 8b da 01 00 78 6a e8 6b 76 f5 0f 01 bd
+[   36.719072] 00000010: 18 e4 77 f3
+[   36.722450] alg: self-tests for hmac(sha1) using stm32-hmac-sha1
+failed (rc=-22)
+[   36.722472] ------------[ cut here ]------------
+[   36.734495] WARNING: CPU: 1 PID: 88 at crypto/testmgr.c:5864
+alg_test.part.0+0x4d0/0x4dc
+[   36.742628] alg: self-tests for hmac(sha1) using stm32-hmac-sha1
+failed (rc=-22)
+[   36.742637] Modules linked in:
+[   36.753097] CPU: 1 PID: 88 Comm: cryptomgr_test Tainted: G        W
+         6.2.0-12020-g1c3e1a0051be #67
+[   36.762754] Hardware name: ST-Ericsson Ux5x0 platform (Device Tree Support)
+[   36.769719]  unwind_backtrace from show_stack+0x10/0x14
+[   36.774963]  show_stack from dump_stack_lvl+0x40/0x4c
+[   36.780036]  dump_stack_lvl from __warn+0x94/0xc0
+[   36.784759]  __warn from warn_slowpath_fmt+0x118/0x164
+[   36.789912]  warn_slowpath_fmt from alg_test.part.0+0x4d0/0x4dc
+[   36.795847]  alg_test.part.0 from cryptomgr_test+0x18/0x38
+[   36.801347]  cryptomgr_test from kthread+0xc0/0xc4
+[   36.806153]  kthread from ret_from_fork+0x14/0x2c
+[   36.810862] Exception stack(0xf0f79fb0 to 0xf0f79ff8)
+[   36.815912] 9fa0:                                     00000000
+00000000 00000000 00000000
+[   36.824087] 9fc0: 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000
+[   36.832261] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   36.838902] ---[ end trace 0000000000000000 ]---
+[   36.843762] stm32-hash a03c2000.hash: allocated sha1 fallback
+[   36.889782] alg: ahash: stm32-sha1 test failed (wrong result) on
+test vector 1, cfg="init+update+final aligned buffer"
+[   36.900507] Expected:
+[   36.902786] 00000000: a9 99 3e 36 47 06 81 6a ba 3e 25 71 78 50 c2 6c
+[   36.909225] 00000010: 9c d0 d8 9d
+[   36.912564] Obtained:
+[   36.914834] 00000000: da 39 a3 ee 5e 6b 4b 0d 32 55 bf ef 95 60 18 90
+[   36.921296] 00000010: af d8 07 09
+[   36.924627] alg: self-tests for sha1 using stm32-sha1 failed (rc=-22)
+[   36.924635] ------------[ cut here ]------------
+[   36.935687] WARNING: CPU: 1 PID: 100 at crypto/testmgr.c:5864
+alg_test.part.0+0x4d0/0x4dc
+[   36.943902] alg: self-tests for sha1 using stm32-sha1 failed (rc=-22)
+[   36.943909] Modules linked in:
+[   36.953406] CPU: 1 PID: 100 Comm: cryptomgr_test Tainted: G
+W          6.2.0-12020-g1c3e1a0051be #67
+[   36.963144] Hardware name: ST-Ericsson Ux5x0 platform (Device Tree Support)
+[   36.970103]  unwind_backtrace from show_stack+0x10/0x14
+[   36.975340]  show_stack from dump_stack_lvl+0x40/0x4c
+[   36.980404]  dump_stack_lvl from __warn+0x94/0xc0
+[   36.985120]  __warn from warn_slowpath_fmt+0x118/0x164
+[   36.990266]  warn_slowpath_fmt from alg_test.part.0+0x4d0/0x4dc
+[   36.996195]  alg_test.part.0 from cryptomgr_test+0x18/0x38
+[   37.001689]  cryptomgr_test from kthread+0xc0/0xc4
+[   37.006488]  kthread from ret_from_fork+0x14/0x2c
+[   37.011193] Exception stack(0xf0f8dfb0 to 0xf0f8dff8)
+[   37.016240] dfa0:                                     00000000
+00000000 00000000 00000000
+[   37.024411] dfc0: 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000
+[   37.032581] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[   37.039222] ---[ end trace 0000000000000000 ]---
 
-4) In the vcpu_enter_guest(), the kvm_vcpu_reset()->sev_snp_init_protected_guest_state()
-->__sev_snp_init_protected_guest_state() is called.
+Here I have applied a patch like this to see the failing vectors:
 
-5) The mp_state is set to KVM_MP_STATE_STOPPED by default and the runtime VMSA is
-cleared. Then the it will be initialized according to the guest's
-configuration.
+commit 1c3e1a0051be234ef109e97075783c28e3b07452 (HEAD ->
+ux500-fixup-stm32-cryp-herbert-v4)
+Author: Linus Walleij <linus.walleij@linaro.org>
+Date:   Mon Dec 26 09:53:10 2022 +0100
 
-6) As the snp_vmsa_gpa is set as INVALID_PAGE in 1, the mp_state will be left as
-KVM_MP_STATE_STOPPED.
+    test hacks
 
-7) With this code piece:
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c91e93ece20b..db511293933b 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1203,6 +1203,10 @@ static int check_hash_result(const char *type,
+        if (memcmp(result, vec->digest, digestsize) != 0) {
+                pr_err("alg: %s: %s test failed (wrong result) on test
+vector %s, cfg=\"%s\"\n",
+                       type, driver, vec_name, cfg->name);
++               pr_err("Expected:\n");
++               hexdump(vec->digest, digestsize);
++               pr_err("Obtained:\n");
++               hexdump(result, digestsize);
+                return -EINVAL;
 
-+			kvm_vcpu_reset(vcpu, true);
-+			if (vcpu->arch.mp_state != KVM_MP_STATE_RUNNABLE)
-+				goto out;
+I'm a bit lost on what to try next :/
 
-vcpu_enter_guest() bails out.
-
-> 
-> 
-> Alex
-> 
-> > +
-> > +               kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
-> > +               kvm_vcpu_kick(target_vcpu);
-> > +       }
-> > +
-> > +       mutex_unlock(&target_svm->sev_es.snp_vmsa_mutex);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> >   static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
-> >   {
-> >          struct vmcb_control_area *control = &svm->vmcb->control;
-> 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
-
+Yours,
+Linus Walleij
