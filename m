@@ -2,49 +2,49 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC87C64ED6
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 16:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1600C6FA9D
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 16:56:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbjCAQVX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Mar 2023 11:21:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40692 "EHLO
+        id S229685AbjCAQ4V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Mar 2023 11:56:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjCAQVW (ORCPT
+        with ESMTP id S229621AbjCAQ4V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Mar 2023 11:21:22 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BEE305FD;
-        Wed,  1 Mar 2023 08:21:20 -0800 (PST)
+        Wed, 1 Mar 2023 11:56:21 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD023C79B;
+        Wed,  1 Mar 2023 08:56:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677687680; x=1709223680;
+  t=1677689778; x=1709225778;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=99e5KN1R/O+8i5rO5OW9FmQOG2BY+kuQaZF2MSYyEdI=;
-  b=kSTQ+90Gyh7lYHXDEcCtJqRnWelh8frjSm3LXip4dMLQ5ztkNjIIcQwr
-   e9xAYMcQGpNkQx6bGM/mg9ZNZreDH/5SVbBuv+Hu+27KSJvqDvBPd0Tuw
-   gQvhN3NNSy+VymZE1TL8TBtwHIBxbFZR9AourJ64yegi4lnL/W6p8wDTo
-   EBMeBXXdKAMh2nPd4eomeAIQgYMzHvz+kgIrBLm6jppzJm2iKqx038XjJ
-   bYyf3xFLQqpnMusG4d4SlGoja1r29T/F8EfIev/A1JG15hV6jlVhD6q2A
-   JsyIx0IE6lum2ECsiQyH6BkTOSRqdQGjFytPNv6TMT8BSzr68KDX9In+w
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="335942692"
+  bh=8NEWTaD5RnYbcKDVZrq2Ew/2DFfHh2dyMO/xAIfd+2Q=;
+  b=EP37rrPt80qPF9xzYZsfwsYu0f3YnL2SyOuBG52Nhu2Ws3aGYSJWYMH0
+   6s5d4yR7e3q6Y2heNX401vI4t3vItsjD3HMixW807cXMVlt06wQj4xZxK
+   Zpq6mf1vRRjfe14XZTRW87nzlBTUnWdXzFMkR7mDDaTZsaZeu20QC96Ea
+   Dx1uJ7cvn49RG5keoPaOvSMjL6uQpZkPckfBIbMbunNyP7KTirATOMetX
+   EZfVodjcIxFiWlZKH+6wd4b0jsAbHxrPImqeVGcaHFrWA2uHoZV5xqVLM
+   9HEvdUX5m/gJtQj1hGXFTQuDq6qCGckkyFiz/Y0Srzk8wnJofF+280yRJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="314881610"
 X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="335942692"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 08:21:19 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="674623570"
+   d="scan'208";a="314881610"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 08:56:08 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="738700170"
 X-IronPort-AV: E=Sophos;i="5.98,225,1673942400"; 
-   d="scan'208";a="674623570"
+   d="scan'208";a="738700170"
 Received: from asaha3-mobl1.amr.corp.intel.com (HELO [10.251.12.67]) ([10.251.12.67])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 08:21:18 -0800
-Message-ID: <a15fc9a5-c136-47f7-e15e-776a511f3cdb@intel.com>
-Date:   Wed, 1 Mar 2023 08:21:17 -0800
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2023 08:56:06 -0800
+Message-ID: <f2c904f6-996a-e903-5d56-662781567578@intel.com>
+Date:   Wed, 1 Mar 2023 08:56:05 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
-Subject: Re: [PATCH RFC v8 17/56] x86/fault: Add support to handle the RMP
- fault for user address
+Subject: Re: [PATCH RFC v8 00/56] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
 Content-Language: en-US
 To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -60,36 +60,25 @@ Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
         ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
         dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@profian.com>
+        nikunj.dadhania@amd.com
 References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-18-michael.roth@amd.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230220183847.59159-18-michael.roth@amd.com>
+In-Reply-To: <20230220183847.59159-1-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/20/23 10:38, Michael Roth wrote:
-> +static int handle_split_page_fault(struct vm_fault *vmf)
-> +{
-> +	__split_huge_pmd(vmf->vma, vmf->pmd, vmf->address, false, NULL);
-> +	return 0;
-> +}
-> +
->  /*
->   * By the time we get here, we already hold the mm semaphore
->   *
-> @@ -5078,6 +5084,10 @@ static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,
->  				pmd_migration_entry_wait(mm, vmf.pmd);
->  			return 0;
->  		}
-> +
-> +		if (flags & FAULT_FLAG_PAGE_SPLIT)
-> +			return handle_split_page_fault(&vmf);
+On 2/20/23 10:37, Michael Roth wrote:
+> The RMP check is enforced as soon as SEV-SNP is enabled. Not every memory
+> access requires an RMP check. In particular, the read accesses from the
+> hypervisor do not require RMP checks because the data confidentiality is
+> already protected via memory encryption. When hardware encounters an RMP
+> checks failure, it raises a page-fault exception. If RMP check failure
+> is due to the page-size mismatch, then split the large page to resolve
+> the fault.
 
-I asked this long ago, but how do you prevent these faults from
-occurring on hugetlbfs mappings that can't be split?
+What does this all _mean_?
 
+When does the kernel need to care about a "page-size mismatch"?
