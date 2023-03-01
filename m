@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B41C64EC7
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 01:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBE5C64EC4
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 01:54:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbjCABxg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Feb 2023 20:53:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
+        id S229544AbjCAByA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Feb 2023 20:54:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229779AbjCABxd (ORCPT
+        with ESMTP id S229562AbjCABx7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Feb 2023 20:53:33 -0500
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2089.outbound.protection.outlook.com [40.107.14.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E65134312;
-        Tue, 28 Feb 2023 17:53:04 -0800 (PST)
+        Tue, 28 Feb 2023 20:53:59 -0500
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2051.outbound.protection.outlook.com [40.107.14.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E472637B6D;
+        Tue, 28 Feb 2023 17:53:23 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bWcBmZLifuT2wAp/QONwvIRIq20Wgp2EUm1elNlusqDXjrD2g3a3oNeNTSNjdfLPmHaNBu0CW04muOQ0qDleaUHRSPm+ny4v5Urvw7pYi6XhoFtT6P6Zim7su4EEVGpGdw4bH9CpFYnc9l6jsG93zfCM0rduTEHu66qIMKsZ3hLsgeDdFDhVg/g82jdtkUXnSnAfIGHE3n8Af/EkZZAPyVQb5K7U7Ti6lwoc9E/HyH8WG0D9323S+PIRe4ZmGBlEK/qR7Rjw5JqB3TV//5ooH1ugRh856NpsFmLvUQ7evXBt9iRiv9PYJLOWGcJ8RRmk7/u+vvQcuiH0cUN8ZWqaHQ==
+ b=O0cr63iXZwCaxB4DzcMcQFaHEmQ3bw00Ulr6ZIN49wWbBal12yQ0rfUHlACH7VwvOeRSqJrHmfJM4UAOeu4Wg/ourfaSGhaUWan2m5Ef4FSYJFtZwqI/V8HbpZPrzzW77ZfDmn1DsvNZ5UEbfvbWUgrFMMXu5aSJq791/YFrFVy8L6pBmGlJ0kvPa7oqObaiYIeEfi29uXFbrSV/PpGewCh+OdPFZZbk3/oxcofeKg0vME9EC6Ofo5LGP1oVDtIiRy4dLjpsvTyvBGojig/T1oknNGEl1vqYaGslF+yyRuT/Ba7W10XZJORTpoXQsgKMElMNeFFs+zQnv2OrJQzN+Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mvoOt9p44kYGu9tXFYS8VqHm4CcSOwbaqkx2i09Heew=;
- b=R/ZS7dedjzIoEay6PefWWCRyWJabAKRL5uQx0Xo/ykiD9vWAOVWmtaPkmRC7JdPpkCSwep0MC9WXedrMJAJHz23x/ysyG523NExtka4A4trTjkCRW5ijdg+iDztzwx880trocVXFiUm9aEEjtRX/9ofETgoxBk+uoWyUUtcdF5YtO+DQdYnlgsqVcXoNRDQQpz15A8iiZWNVIODZb5wQ9Be/vf4p+P96O0ZXU/qsYJ0oj8dFJqvSKjJFDIDaFdbyYfHMXZgLasJv2Bu4p+Y5WJT1SHVvzuujPAKZfNuZYMuXtwb2TxheE6wxialvF4OhiFIHRvzVSwN42XMYmPyrnA==
+ bh=Jym4EvnACGNSmzPJ1X/gQd6mlIFivlsGIFiOegtOlMA=;
+ b=UouTHznYowHf5EZecWGO12Rv7Ry7D9RC/NH+LSimiQrlZd7ZZ70z6ga4FlNTWSkyIRYvVK8FaDUzmpZEqEZ10rgIstrscPN587rQ2NzNaojmhTQ/dDgOIPsrIVSNLIpLjTH/Q5fabVL7FReRo12ba0tYNUoBFEo89atON5gLej5HO5MlHO3M1cNSlgSvV12s6ChLSd8iGrZVQxvqFywV0fU24zxDIlQccxusbXIIujOkTDZBOS9YQMrLSZrEMO9nl1Yx3Xhf/AZNDC6VX3ObH76d+dDnHHxfAuTfVIScsw6YNgj5D4smvHPU1vZW1OtDLa+AheyDZVf0FnLufLrYXQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
  dkim=pass header.d=oss.nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
  s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mvoOt9p44kYGu9tXFYS8VqHm4CcSOwbaqkx2i09Heew=;
- b=I7k4NiMSVWaluXC2eXYzut0UESYPIXaCaGEmZx3LKINm0ipGvbxXNYOozmUfB6LYXM7OMbGokWh78BDAFrD7Xa+WBsDlY8H2oyutnssZ2z1Ak/WzYKyl9MhV85LNhG+2yDfJfeIzgVpPQtSUQUp7YIB2Mh+RXauzjevfAPqEwNo=
+ bh=Jym4EvnACGNSmzPJ1X/gQd6mlIFivlsGIFiOegtOlMA=;
+ b=ZeDxlocV3dgPg04L9YpYtYreVk/CcqNFehaUnxwkt27HE9JsNw1JB85ZfG6gX94Cc8GjKkPprKiJZnLwrDzMOEMapFnTqlriYDKOY6D1b39vO++CkuwzHrxKdLbrha8N7IV0DcLLEHuGfTO4SyxRwXz8GZ2xdFJN6MQn3dMblrQ=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=oss.nxp.com;
 Received: from DU0PR04MB9417.eurprd04.prod.outlook.com (2603:10a6:10:358::11)
  by DBBPR04MB7546.eurprd04.prod.outlook.com (2603:10a6:10:1f7::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.30; Wed, 1 Mar
- 2023 01:52:16 +0000
+ 2023 01:52:26 +0000
 Received: from DU0PR04MB9417.eurprd04.prod.outlook.com
  ([fe80::f55a:cf12:da08:6d2a]) by DU0PR04MB9417.eurprd04.prod.outlook.com
  ([fe80::f55a:cf12:da08:6d2a%3]) with mapi id 15.20.6134.027; Wed, 1 Mar 2023
- 01:52:16 +0000
+ 01:52:26 +0000
 From:   "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
@@ -50,9 +50,9 @@ Cc:     kernel@pengutronix.de, stefan@agner.ch,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         Peng Fan <peng.fan@nxp.com>
-Subject: [PATCH 4/9] dt-bindings: crypto: add fsl-sec4-snvs DT schema
-Date:   Wed,  1 Mar 2023 09:56:57 +0800
-Message-Id: <20230301015702.3388458-5-peng.fan@oss.nxp.com>
+Subject: [PATCH 6/9] dt-bindings: crypto: fsl-sec4-snvs: add fsl sec 5.x compatible
+Date:   Wed,  1 Mar 2023 09:56:59 +0800
+Message-Id: <20230301015702.3388458-7-peng.fan@oss.nxp.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20230301015702.3388458-1-peng.fan@oss.nxp.com>
 References: <20230301015702.3388458-1-peng.fan@oss.nxp.com>
@@ -65,51 +65,51 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DU0PR04MB9417:EE_|DBBPR04MB7546:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9e135365-3ce7-4fb2-10dc-08db19f795ce
+X-MS-Office365-Filtering-Correlation-Id: 52c98d88-7d7c-4e58-1b99-08db19f79b8d
 X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Vd9hhwsKqOSMUYVMq7aunk8/otJwTdolnPGw/80h2YhHUvLJy2otum8t4QjadW0IWSQIJlO/ESmsxBkQJoQaCdTbjQLqTyJqZfSHBv4t61tC11IE830BSa3jB7un7JtHUPp1w7DVynJrm2R7hYsIskRw/oMVu8TEwPlc0SXnH7aNsDlwQEF58zpvndCpTvYGdGHayA6Dc7oJMQDjkg0cFPM6EWAJ/FtbY66Imzcrofk2MpBds7uHYu/0sSvkVy5EtDS7w2zhBq/y5H1r2xdcFMTmg6dqRxNLddqDFT4EEHRUk7rna19olFVCj8w4JYBSD1ieIY7/fM+JVdRap9F6TNcho2crlHYeSeSYibLYctIwy2i7T3lg7KzAJeO0aLESrZGilngwkoD2LYlBGTakrSIMoOM8BUN1op0JM/OMyvsyr2j0Gny+HYNSfRkQpDj602ywg5Q2VnB3EzHz5OsgDn7TNRsNaCtpjGUdIExeWtUlppJXHnAjM12lXeaE1UgyZSW2f8vYL8rkXAVTJHTzMfNNmKN+7x/r1F1mL5bZbs6S3YdG4ACOKun6ruQ5T6VYXepe85JZOnH+IhgnV0aVlAsRFRotKdzfq2ydrYjqmSFhsPSLoGdPh9wYNTgtZ57MRUtI9LGaZ8MqgeCHBd+D01ieo7tNImUnROJu3llIQbJhn+u2g8bTi7yyzHLE4tO8gZn918jl9xSvqYyiZN885Y4INSbyaKE41vZKV1e+jNg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9417.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(136003)(396003)(346002)(39860400002)(366004)(451199018)(83380400001)(316002)(6666004)(2906002)(6486002)(966005)(6506007)(478600001)(1076003)(2616005)(52116002)(26005)(186003)(6512007)(86362001)(8936002)(7416002)(41300700001)(66556008)(5660300002)(66946007)(66476007)(8676002)(38100700002)(4326008)(38350700002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: pCQKaCyvcfwS1zGHFzUO+jedAUNqOq1tgdII7pkF9sW3O/YS2zvBWBeMHqPJhw3lkrIt0GR+w7CFFoVh0/QWeuCqBwdFlMLP6sPtQtKA0lvkufR7dzyfxN9fh4YDrvApUxY0Al9V+lpAyhL9EIYYb935ZfbXclIfxAmFBI9+CrJ8BwZ4Dyaqx4cLotQenFUWWnXQOu6BJnJI9/A7Ey71GWykBHki+L1Yf3cCtMzBpy51ODgbd/b51XUtQq6NYWkH0T+4haKCU8eca7e4zVAOFLy1yKbuHyRfkOugqo7jcSDHYU0cD944PIh098qHYH/YcitLwWW+4lfc48kM1epVLM7q28n1RdN6dZukeyW9zuTO4Tu+XFTRiBjgZI9kmFbjTgQ23VufHFi1GoJJuW5bXUySHwB6bicopwL6t95hVPPPemSAKU6C2KtDUlQp1uZ8Xnb9UDNNqBaU8vTw+2/LRPeIdeeFaKJoTUVM+zlRcA/SPTr3foHnvIbLtRtxpNOgCRLaIcT5tXrlnztyi3is+yQML1KWQcco9QkBvX7wfHTJk2pmEovcG0LG5CfrPk3lAfB4XT9vSx/k1K43AnWfkmDV6UNvPmn6AmYa1wWf/q3zqscwrMA4JVwtFkrk6l3w+PvGuJkzse+CJZOUWLRIJL/u1ETgA7fkJ3nEydNhuL3cyKVDLvHj44M69lhivinybOFtzANlifUvO1mi/6lWFw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9417.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(136003)(396003)(346002)(39860400002)(366004)(451199018)(316002)(6666004)(2906002)(6486002)(6506007)(478600001)(1076003)(2616005)(52116002)(26005)(186003)(6512007)(86362001)(8936002)(7416002)(41300700001)(66556008)(5660300002)(4744005)(66946007)(66476007)(8676002)(38100700002)(4326008)(38350700002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yj8jaPVpijChcXoVob5I9XmtLP+w10j4x/G8rj8AP/TInBiFTaSk8sNw+Ml7?=
- =?us-ascii?Q?Tg5ULygQVxE4hXp8JVwfiZHhd4eEaMl6r5CtbbZMNUXAY2fvGeQ3GOL6Y06+?=
- =?us-ascii?Q?OwVpXC0pomuxsxHYHtjD803H4vUQYCq5/ot+27BWBL4lJNtcrPU7qu1TQLj2?=
- =?us-ascii?Q?L4/WEz/0BA5VYPsZfvBhi8H5p3gkicPYgsCAsBbpxiMMnzAGUWpBjUR5lp1A?=
- =?us-ascii?Q?SMdrkjLw/idS2xPRFBn9Ojak9meEZwXCtBfObaTtfL/Qu5x79LJFLxPg6raY?=
- =?us-ascii?Q?H1VNRXFV/CaiBDE+LcZP+UErrEfJcCKJjyMxa4vM4AxvABQKf72qAaIpKr/1?=
- =?us-ascii?Q?XNzrMdpsFbpwS+2qEq8VUm4GsmVlzKmopdLBk5emhOsJkIknsJ9AHe8mEUib?=
- =?us-ascii?Q?j/2bt4lbOrg442WZPOqdCLfeQq/Flucmx/UQiCC5T+VPLnjN9hJltwSQtCXW?=
- =?us-ascii?Q?VSjUNjfrrfPX5H9H9mc/HYQEGjhq5Yx5PGUsYT/IsZKwca/93goK1zs1vy5O?=
- =?us-ascii?Q?XNbkg4Xgp5rccDz2+Ms8LvOglbM1EZC5h2WudzrrLRrlCeL74EMIjVUydYZQ?=
- =?us-ascii?Q?LqThjCSVq/ezHpjAg4IdMlG07kkvnU7ADwaX2+mrPZMs+RALd+QJco9lsxAG?=
- =?us-ascii?Q?7yW8pbdzrjoyHqsQTbl7x2fDMabKVobVo2dFc68I2OImSXnKmCrq00Piosp6?=
- =?us-ascii?Q?gpMbK3+/Jbsvzo5rUkAoCvnY8ngyKwVg0hu4UGFrOV3oICovMs1csfLxza0E?=
- =?us-ascii?Q?GIqs/d9Y4LnMSvEnpbBGCkmI85LxwcpU2YoJD1auTPbG2svvc9TgIPQ7iGNG?=
- =?us-ascii?Q?YBK5UQxUYpReqvp7iMhL2vPMczISTb8llyNyzdJfQ06gqz4HCPNTDDG1CP7X?=
- =?us-ascii?Q?1m1IApSgEGhzJ/gBG9Qyw31rkE7hgs4xtIg5C+UXf1pslFFBxwR7SrdGPyZ+?=
- =?us-ascii?Q?KaL0jW9RhYtcD2ZbGC928ou2YA2ZC3V9C1asE5wg5ZBlqQPCfRVA9iihiIZ6?=
- =?us-ascii?Q?kgW+kQ6Ca6J546qoZgMtRoKzN3haFT9jZEFB9Wlhh5vF14w1zv4pWV4d35tC?=
- =?us-ascii?Q?RIVzQE27lkzdKwEOkmVf5VBUEia1mxw67zKv+WopLrR5Q1+H/ubN96qxRP/6?=
- =?us-ascii?Q?4g9BfbftGUteEGa2IsOV6EX1Hc1w02QeNKvQxPgTxKlQ8/ZgY95bDpRO097m?=
- =?us-ascii?Q?93zEiUMQFNfuJxjm1cNM/wLgXwy42zFJtK2p7jq7Z9K8RKIx/lPivrQuzIf5?=
- =?us-ascii?Q?KSDVgfhMgkpMnkds37rUBdolKQte13rVef4F8xkqvID6sj9f+micdowFyjK1?=
- =?us-ascii?Q?e7K6FHsM+4QEBl/Srm3ZERcv0elwGQ/gK4koU3pRNAfPcxU4oGiEewXCSCT0?=
- =?us-ascii?Q?4CgSY4K9Eii0r4P0zrPGvs1fgCIvEiG6RWA+vSq8BwshwcXMdQhlLa7OGxhQ?=
- =?us-ascii?Q?30JCBRkByvAX5OyBBOAEMmz6yGQDtSxrU1V9L5zG98eLglwInuluKF9QE5a7?=
- =?us-ascii?Q?MR90/bDdXt8GGfek5NiMytAYF6jqpOsni+tYjquMX8/79u6C0YDbF+mI99gn?=
- =?us-ascii?Q?4oZ56qbIvgKTeyvyiCu6+FPrykVD5Xz1QJOl4rvJ?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bxh+kF+2tJ5T/ojn6PwjInKwtzHchhNoZSquh8hWxpNnCqHICknV+8TcklLx?=
+ =?us-ascii?Q?X8RjyYi6Kgf/EScwpaJ/xXOtY3vdR/aET93BqE2N71P3BniGnjrgtASUpXbj?=
+ =?us-ascii?Q?jFP7VxkPLpmIAjYYlhhIcSdzJ/WhXrYl5N2MevXotIN1NBla7on4J7fZWPtl?=
+ =?us-ascii?Q?m5wOym4xuhwFUdlSv0oMexyDBGioV/dPms28jDqz8iYncgb8Kc+c2lf5pxWK?=
+ =?us-ascii?Q?G3OtvA9gF8MdXQIz13vX9Wv0cxasdRZ4YOogZxOskNp1xoM080B/ZyDFuDLW?=
+ =?us-ascii?Q?sBxEhNhSaxDLAeNCgzJ6Q1YkD8zZ9UmBfcJYAHG48xwySYKanl9wDTLy4p+9?=
+ =?us-ascii?Q?9uk8uj7iqnnDw+s4cAvMc+1MI0a7mXXYc9Csjc4o9onxVlDHzwHCZdM/t2ys?=
+ =?us-ascii?Q?/8HMuQizGY2U3FwhwVdotJig1uKBqKZp34GrQD3Qlv+QJ4KwW5hD0LApyq3/?=
+ =?us-ascii?Q?Wzdg1C2p6nX6YbjSJfLWP/pYSkGFtpySF8mBqUQmpuXG4Quk/7YcePLE7LCZ?=
+ =?us-ascii?Q?US3eJn8mSCBpJ5RnadGS5fnmj3NEnieUvApA6yAbllJrYWP6OvizuEt+sHay?=
+ =?us-ascii?Q?UQR4cc9mcSgl6TGgFFy1OnukcX+J5pL0KAyiW3auzwtWMVeKHHBuRn9mRRY8?=
+ =?us-ascii?Q?PXVMhfLYqIjzK44LRFlUt1V+YXc6o3oIWG/ID+rDmkavvrVPYLuzuPn209Z+?=
+ =?us-ascii?Q?mH4epvnqEO3j214AsL60PMJoOhJVL+TpTgV8cDyw6KGx75ManEIomoQKJrLU?=
+ =?us-ascii?Q?l0+wH4CZ1zqLaSosknl3778BDAKTUHNc4n0Jy8SPr7z9pCSDdMV09PHZMb//?=
+ =?us-ascii?Q?GT5fs6oSsjQ3bxvZ4Ljeo6RFVH4gU10OQFWhU5WLtoKK3uHTZqeQstE5kaUd?=
+ =?us-ascii?Q?Oed2UVA355l+KXC5haa0K9YLXb2PceBP2D1rrG/cXf0kNz4hdmcfq1d12ff6?=
+ =?us-ascii?Q?4Uzp7bfJRqtTRM3upeknMxEeVWaZWB/Y+f8JyjuswlX/o3dU08mz1KZbVfuB?=
+ =?us-ascii?Q?BgQaYePxFjgEStLWp11TDzNvtWuAhTvF+VyQisAKddUTjSclrD2hFF41dDl8?=
+ =?us-ascii?Q?bfkknSSFJGu8ltaljW9zBSaZiVCWj68qWmze1pfkBql4r1pxMWJGu34OZn8W?=
+ =?us-ascii?Q?GxWl9J+cAOhaz4L3/vLqOw/rxpWahaHOrHcqq/cKkfnYZ1b8/P9N4thW+/7r?=
+ =?us-ascii?Q?DIY+BnInrFVTXuxO9Mi32twtGXbcIb+k2/KgWAgoh3JD2hegTD90BvObo0mK?=
+ =?us-ascii?Q?sBXV0oh3n0yI7Ft0bGQOI9IqynzyOIMtiVrONFyyh57bgr+DEPaP1sPHNDa1?=
+ =?us-ascii?Q?D1A186elVhz7tHKsWtGI4xXhb4rJq9CNxaaFk7+vR48Z6Jnwah48mUrN0CEa?=
+ =?us-ascii?Q?LuREfoY8KQjJDZt2sdVziQw1ST3Fxfh5AXsFVlHw//MB2IOF264XbO6gmiwF?=
+ =?us-ascii?Q?/5Xb5XVgp4zCQL0EzOlU2eO2hzncY1CH5ufabG+mOO10mlRPVSbyggcDIvEs?=
+ =?us-ascii?Q?SW3eTI0lCooDaTQdNqXEimsKpk4rtbuWGDf3Fn2vgFo0QfSWXgjEXsND3lFS?=
+ =?us-ascii?Q?6swTXJoHMq/W7N3UQ0fBIv9QjQXCJugnCQ+I3k7H?=
 X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e135365-3ce7-4fb2-10dc-08db19f795ce
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52c98d88-7d7c-4e58-1b99-08db19f79b8d
 X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9417.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2023 01:52:16.6483
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2023 01:52:26.5076
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0suuqZKcMawEXm6dcft+S+CGC5Z/6DQgWmkxY1NDW7hUTJuR/0fVHT+ryDNJPy1uuUONAPHxQDGnAFQF2mA/MA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: cb6SpP8OjA1CA3bCVR9L2WJMzaICCA+sj0eaXyF5X5keByiBc7jixlMH4Xr+uooHFIHemF+SJRmodOTUWEOTPw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7546
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -117,173 +117,28 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Peng Fan <peng.fan@nxp.com>
 
-Convert fsl-sec4.txt SNVS RTC and PowerKey to DT schema
+Add fsl sec 5.x compatible, which is used by layerscape SoCs.
 
 Signed-off-by: Peng Fan <peng.fan@nxp.com>
 ---
- .../bindings/crypto/fsl-sec4-snvs.yaml        | 153 ++++++++++++++++++
- 1 file changed, 153 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
+ Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml b/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
-new file mode 100644
-index 000000000000..633e70f9b303
---- /dev/null
+index 6878ae8127ec..1a4b4975e1d9 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
 +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
-@@ -0,0 +1,153 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/fsl-sec4-snvs.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: NXP SEC4 SNVS Binding
-+
-+description:
-+  CONTENTS
-+    -Secure Non-Volatile Storage (SNVS) Node
-+    -Secure Non-Volatile Storage (SNVS) Low Power (LP) RTC Node
-+
-+  Node defines address range and the associated interrupt for the SNVS
-+  function.  This function monitors security state information & reports
-+  security violations. This also included rtc, system power off and ON/OFF
-+  key.
-+
-+  For more information on SEC4, ref fsl-sec4-crypto.yaml
-+
-+maintainers:
-+  - Peng Fan <peng.fan@nxp.com>
-+
-+properties:
-+  compatible:
-+    oneOf:
+@@ -24,6 +24,10 @@ maintainers:
+ properties:
+   compatible:
+     oneOf:
 +      - items:
++          - const: fsl,sec-v5.4-mon
++          - const: fsl,sec-v5.0-mon
 +          - const: fsl,sec-v4.0-mon
-+          - const: syscon
-+
-+  reg:
-+    maxItems: 1
-+
-+  "#address-cells":
-+    const: 1
-+
-+  "#size-cells":
-+    const: 1
-+
-+  ranges:
-+    description:
-+      A standard property. Specifies the physical address range of the SNVS
-+      register space.  A triplet that includes the child address, parent
-+      address, & length.
-+
-+  interrupts:
-+    description:
-+      Specifies the interrupts generated by this device.  The value of the
-+      interrupts property consists of one interrupt specifier. The format
-+      of the specifier is defined by the binding document describing the
-+      node's interrupt parent.
-+    minItems: 1
-+    maxItems: 2
-+
-+  snvs-rtc-lp:
-+    type: object
-+    description:
-+      Secure Non-Volatile Storage (SNVS) Low Power (LP) RTC Node. A SNVS
-+      child node that defines SNVS LP RTC.
-+
-+    properties:
-+      compatible:
-+        enum:
-+          - fsl,sec-v4.0-mon-rtc-lp
-+
-+      interrupts:
-+        minItems: 1
-+        maxItems: 2
-+
-+      regmap:
-+        description: This is phandle to the register map node.
-+        $ref: /schemas/types.yaml#/definitions/phandle
-+
-+      offset:
-+        description: LP register offset. default it is 0x34.
-+        $ref: /schemas/types.yaml#/definitions/uint32
-+
-+      clocks:
-+        maxItems: 1
-+
-+      clock-names:
-+        items:
-+          - const: snvs-rtc
-+
-+    required:
-+      - compatible
-+      - interrupts
-+      - regmap
-+
-+  snvs-powerkey:
-+    type: object
-+    description:
-+      The snvs-pwrkey is designed to enable POWER key function which
-+      controlled by SNVS ONOFF, the driver can report the status of POWER
-+      key and wakeup system if pressed after system suspend.
-+
-+    properties:
-+      compatible:
-+        enum:
-+          - fsl,sec-v4.0-pwrkey
-+
-+      interrupts:
-+        description: The SNVS ON/OFF interrupt number to the CPU(s).
-+        maxItems: 1
-+
-+      linux,keycode:
-+        description: Keycode to emit, KEY_POWER by default.
-+        $ref: /schemas/types.yaml#/definitions/int32
-+
-+      regmap:
-+        description: This is phandle to the register map node.
-+        $ref: /schemas/types.yaml#/definitions/phandle
-+
-+      wakeup-source:
-+        description: Button can wake-up the system.
-+        type: boolean
-+
-+    required:
-+      - compatible
-+      - interrupts
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/imx7d-clock.h>
-+    sec_mon: sec_mon@314000 {
-+        compatible = "fsl,sec-v4.0-mon", "syscon";
-+        reg = <0x314000 0x1000>;
-+
-+        snvs-rtc-lp {
-+            compatible = "fsl,sec-v4.0-mon-rtc-lp";
-+            regmap = <&sec_mon>;
-+            offset = <0x34>;
-+            interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>,
-+                         <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
-+            clocks = <&clks IMX7D_SNVS_CLK>;
-+            clock-names = "snvs-rtc";
-+        };
-+
-+        snvs-powerkey {
-+            compatible = "fsl,sec-v4.0-pwrkey";
-+            regmap = <&sec_mon>;
-+            interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
-+            linux,keycode = <116>; /* KEY_POWER */
-+            wakeup-source;
-+        };
-+    };
+       - items:
+           - const: fsl,sec-v4.0-mon
+           - const: syscon
 -- 
 2.37.1
 
