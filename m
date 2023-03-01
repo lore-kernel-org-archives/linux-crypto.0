@@ -2,200 +2,86 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6045BC64EC7
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 12:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA1DC64EC7
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 12:22:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbjCAMJL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Mar 2023 07:09:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
+        id S229835AbjCAMWf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Mar 2023 07:22:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbjCAMJJ (ORCPT
+        with ESMTP id S229841AbjCAMW2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Mar 2023 07:09:09 -0500
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E997D9B;
-        Wed,  1 Mar 2023 04:09:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-        t=1677672476; i=erbse.13@gmx.de;
-        bh=jW9QqbNiXOx9cSB+L+BuNqUp884nAnRhvACcY0amjgY=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=Tb5LO9l1Y3HYnpzuLYsuCG63NhqCbi3sA+tRcO2vCiYIPN6laSjLD0NiLX93T2pFg
-         K2eVPQeZJ5y49yPGgtQnZYwvuctg9Jj1MhWCWL2JKFMolG69d5YPlhGQyPnxvTpv7J
-         RFcGw1y6222RDmLkNqhZn3RunlK5Mjr7thpnnynN7ZbkYONdFaFuPL8lG15qj187ex
-         NxAAjA9yRUhS8ZNZEuTlSFnNAdphzpc5RnyewkF5xKtchnJZIwHI5/a5q7z7SCksGi
-         mXshF9eYo79WPYnBmSZ9Id35VkznJP7uPVhs/i7cu0AGuVEXMoTGocCe91x7TFQx/N
-         MbgUeus/LfVsw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost ([134.147.116.198]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MORAa-1p7SOg1pde-00Pxza; Wed, 01
- Mar 2023 13:07:56 +0100
-Date:   Wed, 1 Mar 2023 13:07:47 +0100
-From:   Tom Dohrmann <erbse.13@gmx.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 15/56] x86/sev: Invalidate pages from the direct
- map when adding them to the RMP table
-Message-ID: <Y/9AEyiMLKfj+/mK@notebook>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-16-michael.roth@amd.com>
+        Wed, 1 Mar 2023 07:22:28 -0500
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102D33CE02
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Mar 2023 04:22:27 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id x12so103752ybt.7
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Mar 2023 04:22:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=l8Nz7GHrjsKkrFAhlS/NkKdyC63Tn/KzsoBmeKFSXCw=;
+        b=w+EvywvXa3hPR1XRdg3fT9+2+j3fg01b9pb8YjCHXKBafIgJSWWztnhMRN78aDH1Gl
+         tIeHLL3AoQD9YS0rnC3Aier7ZvdJU+ue3uDqfCYSye3KgmjuM/ws69r9wlmAQaReSTX3
+         NElMSx/U74nuneh6v1fjqAVQeC0wPYvKtaMBRWpF+L4TMLK7WYs65RM5vWaPAtuTt+Kr
+         ypXDt+vTfG8L73u0jM6oN5/3R9TgvRBMmSEKL0gUiJU2UOX/EqKdHgRjEi8pCu6A9TmN
+         uU4ER6e0X5mDuDbr9vmHJy4JhNb/OXaJjONAEFZ35cJpmmzKjdFofE9FJ0L0MZ61wWQM
+         M2pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l8Nz7GHrjsKkrFAhlS/NkKdyC63Tn/KzsoBmeKFSXCw=;
+        b=N17VxycH9JjhcobZzVu2wXIafVQHMHc/Yrr3k0gcEj+FUfrzhnlVjs/61vXpkYRrPT
+         nX2x4Rjj1JTrJCq8RXW+GN6fenvkGRggN9y6hcVm36osoHlZ32MrkTw/b5fgDRzJp0U/
+         y1Jy+hfX4KxuwmclTLCzOfk7on6gDRdGNtZos+he0syc3sr9UyX4Up1MwjGKvfzK4zuK
+         bpv+j9ovleEkRqvT2d952XvbfEmk9xmFN7AOzb/29vlh+Myfv/YF51I2HOCKGCo/PEI3
+         STINHugicWfxsqxbYhFmrR8lvR20UbmnLdn86QB8f5hGGUSolHGMTMbQLtZ4k/NdnWg9
+         lF/g==
+X-Gm-Message-State: AO0yUKWWKJWJW5GzdM4RjfA7Q4vkjrsznWvL37zDLOPlnQFNZqpKS6MN
+        9BhgZ+vSIZAz9BBLGw0l2QmlxUgfGlAcVU3yeozTIA==
+X-Google-Smtp-Source: AK7set/3PSECcYx5SDkKwfxXxVfKsTGwUn5f13PiuIuMv3U3cT7CDjiLP8yKUH8w5up+OiziuGYjkVabAyYxu7cUyWk=
+X-Received: by 2002:a05:6902:4d1:b0:ab8:1ed9:cfd6 with SMTP id
+ v17-20020a05690204d100b00ab81ed9cfd6mr2429104ybs.5.1677673346062; Wed, 01 Mar
+ 2023 04:22:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230220183847.59159-16-michael.roth@amd.com>
-X-Provags-ID: V03:K1:QAZfbcKAW91F2JHdCAu5cRq7q3g4qY9Nr1ls991Uxd34cj28wu4
- gFgR+oTH8ZbPRHLZpBhl4NYmMW8WX2lBFowFZhD5+jFThO3mMnNTgmEBNRiYbYonDMhOz+R
- zjLWYNL6TgjNmzKfnzwCu+728YITrxzAsF4A1hUmwF6jjASlkSwhevasq+/XUPFeziAS9iA
- lCQJWTRgA4V/DccUsgqTQ==
-UI-OutboundReport: notjunk:1;M01:P0:1Jgywx4vEhk=;2NZfYQAX5/O0Apb5Etjyh5/d2qh
- eoZenyL9fVz4LLWYn1aL6JAUcleXQbzD+mOwwVtCG+S25b4ODoMeXnKTCJwyr5AawnOintaUY
- 3eOl3NoC9v9Loic97MjO5ALcja6B+siNBQs+3FAbNfGYjT9IGhdFKXwpic6nW/HPEb1Wf80Rx
- GZuP5Nhwpp5EcJcdrhCFe0yJFUQRh5mBOILWXiNLqI3VIdhaF1cRCKRAUm9zttvfiklJfELAJ
- g/ccPpWbfxd8fvZtWHGjAQ5bDY3YMnumdeK/klor4tDCjYUxXtAU8SGV4peI9JDW8ApKwpNot
- /D/jvOrh5uC+Dbyjw5TDtmrl9MRrzonWkVlnyi9CD/vt/IX5K2caSov+eUinh9QJolwJngSBY
- YuM2FoYztSiTU/cetwl0vlGctwwdeY+H0E7mG7cTjCkrgRwPrTGj4e3Hf5JbBGw/eFOZdHovG
- 9c7tW/eIn+kBZA1tNK1KXXOSgFnyov3ZiH7Qbmjl0QCtcVapnDBwJYzuVSK4PBFit+ZCYggO5
- OBDhItKwjvKj/t6OD1xwRvr+pxRm3zHL5o3+PB7WcU19ImxJ6V+vkjTmsUMN52M+QsDQk4eFi
- 3C2KMwlC7Xfk/ypUcAWyFQS/iuWhx52WdKnxJL/OfEsqLiHhVrx0cB6jOp5d9ckbFhw4yfCZn
- y26KcJ6psULQkv1vhyCt+xsBsEdtoD/YGZtssqQeuHOwaC6mN9gPLDno/aMIv+3kxkYOJMeGg
- EXeyUze3ZSF0P6gyvpvFSIZvesTGINW83Z2EV6a3M2S9eb5AUYRcZ1Zc12Pm5UG/+r8IMohPP
- ykUXcdbRW7eapvjEGlKeqGEOdrxcL/F7iN7DYoLyyG4agX00F/MhT8cQvPy7iAbSbKehuoSZQ
- wWlBDcl+8bI+Hv+v54K2msu5Tn7jADDoaLZqOQx29HKGdYL1Xi7SGEKh+CnJGHzr8kt+D2gm3
- eOolEjxJ36f6NoUOuJNRQvUe3Co=
-Content-Transfer-Encoding: quoted-printable
+References: <Y/cy5wUtk10OahpO@gondor.apana.org.au> <CACRpkdYyB=-UnE1bmdVszSSB5ReECZ0fUoWJX6XtYbKHEe52tA@mail.gmail.com>
+ <Y/c7iVW67Xhhdu8e@gondor.apana.org.au> <Y/hQdzsKMYgkIfMY@gondor.apana.org.au>
+ <Y/yIbPBVCPx9K/0s@gondor.apana.org.au> <CACRpkdZC4z2Xng4=k94rmM=AFzNzTdXkvtkArMnK7afouz=7VA@mail.gmail.com>
+ <Y/3FYZJeLE7DVPBf@gondor.apana.org.au> <Y/3IA4OjmUmjMgh1@gondor.apana.org.au>
+ <Y/3N6zFOZeehJQ/p@gondor.apana.org.au> <CACRpkdZ3rCsOWqooNkPL6m7vZ2Z2Frh2sdxruKhrS0t3QHcSKw@mail.gmail.com>
+ <Y/6sCC2nH0FcD6kJ@gondor.apana.org.au>
+In-Reply-To: <Y/6sCC2nH0FcD6kJ@gondor.apana.org.au>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Wed, 1 Mar 2023 13:22:13 +0100
+Message-ID: <CACRpkdYN-SDfxXKLt3HWGVkWb3V1rABwvWuytwDrzfTqm81fNA@mail.gmail.com>
+Subject: Re: [v4 PATCH] crypto: stm32 - Save and restore between each request
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 12:38:06PM -0600, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
->
-> The integrity guarantee of SEV-SNP is enforced through the RMP table.
-> The RMP is used with standard x86 and IOMMU page tables to enforce
-> memory restrictions and page access rights. The RMP check is enforced as
-> soon as SEV-SNP is enabled globally in the system. When hardware
-> encounters an RMP-check failure, it raises a page-fault exception.
->
-> The rmp_make_private() and rmp_make_shared() helpers are used to add
-> or remove the pages from the RMP table. Improve the rmp_make_private()
-> to invalidate state so that pages cannot be used in the direct-map after
-> they are added the RMP table, and restored to their default valid
-> permission after the pages are removed from the RMP table.
->
-> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kernel/sev.c | 57 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 57 insertions(+)
->
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index a49f30c10dc1..3e5ff5934e83 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -2595,6 +2595,37 @@ int psmash(u64 pfn)
->  }
->  EXPORT_SYMBOL_GPL(psmash);
->
-> +static int restore_direct_map(u64 pfn, int npages)
-> +{
-> +	int i, ret =3D 0;
-> +
-> +	for (i =3D 0; i < npages; i++) {
-> +		ret =3D set_direct_map_default_noflush(pfn_to_page(pfn + i));
-> +		if (ret)
-> +			goto cleanup;
-> +	}
-> +
-> +cleanup:
-> +	WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i=
-);
-> +	return ret;
-> +}
-> +
-> +static int invalidate_direct_map(u64 pfn, int npages)
-> +{
-> +	int i, ret =3D 0;
-> +
-> +	for (i =3D 0; i < npages; i++) {
-> +		ret =3D set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
-> +		if (ret)
-> +			goto cleanup;
-> +	}
-> +
-> +cleanup:
-> +	WARN(ret > 0, "Failed to invalidate direct map for pfn 0x%llx\n", pfn =
-+ i);
-> +	restore_direct_map(pfn, i);
+On Wed, Mar 1, 2023 at 2:36 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-This immediately restores the direct map after invalidating it. It
-probably needs to put behind if(ret).
+> The failing vector is the first one where we save the state from
+> the hardware and then try to restore it.
 
-Regards, Tom
+Yeah that's typical :/
 
-> +	return ret;
-> +}
-> +
->  static int rmpupdate(u64 pfn, struct rmp_state *val)
->  {
->  	int max_attempts =3D 4 * num_present_cpus();
-> @@ -2605,6 +2636,21 @@ static int rmpupdate(u64 pfn, struct rmp_state *v=
-al)
->  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
->  		return -ENXIO;
->
-> +	level =3D RMP_TO_X86_PG_LEVEL(val->pagesize);
-> +	npages =3D page_level_size(level) / PAGE_SIZE;
-> +
-> +	/*
-> +	 * If page is getting assigned in the RMP table then unmap it from the
-> +	 * direct map.
-> +	 */
-> +	if (val->assigned) {
-> +		if (invalidate_direct_map(pfn, npages)) {
-> +			pr_err("Failed to unmap %d pages at pfn 0x%llx from the direct_map\n=
-",
-> +			       npages, pfn);
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
->  	do {
->  		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
->  		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
-> @@ -2630,6 +2676,17 @@ static int rmpupdate(u64 pfn, struct rmp_state *v=
-al)
->  			 attempts, val->asid, ret, pfn, npages);
->  	}
->
-> +	/*
-> +	 * Restore the direct map after the page is removed from the RMP table=
-.
-> +	 */
-> +	if (!val->assigned) {
-> +		if (restore_direct_map(pfn, npages)) {
-> +			pr_err("Failed to map %d pages at pfn 0x%llx into the direct_map\n",
-> +			       npages, pfn);
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
->  	return 0;
->  }
->
-> --
-> 2.25.1
->
+> Is your device ux500 or stm32? Perhaps state saving/restoring is
+> simply broken on ux500 (as the original ux500 driver didn't support
+> export/import and always used a fallback)?
+
+It's Ux500 but I had no problem with import/export before,
+and yeah it has state save/restore in HW.
+
+Yours,
+Linus Walleij
