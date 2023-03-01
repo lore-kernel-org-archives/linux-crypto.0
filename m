@@ -2,147 +2,200 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF72C64EC7
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 10:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6045BC64EC7
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 12:09:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjCAKpV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Mar 2023 05:45:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59916 "EHLO
+        id S229591AbjCAMJL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Mar 2023 07:09:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbjCAKpU (ORCPT
+        with ESMTP id S229561AbjCAMJJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Mar 2023 05:45:20 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C280302AB;
-        Wed,  1 Mar 2023 02:45:19 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id r27so17008903lfe.10;
-        Wed, 01 Mar 2023 02:45:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677667518;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HgQQZanRv5/alvxkVET4D6uB4QZkFnK7oJuTnwO/hEE=;
-        b=P7SSTk6sznBU59W8FIBilggNoPneO/753Y91fiXGPLcnZo+7vSp688RM2AEYDH7KHS
-         Oe6Ac54VLqQqTSg9I80HwktZ3FG0ggZw80CfLRhkgsqAsu52TYikxNSjooJzTFicW5sH
-         vwKPsN3AjYT+NcKd4RsE3ndx3CMxhQnu9JSc4it/+kxEwrpOrbfsnxRqNHKzgVeCjnB7
-         zDkHqnFloq2501FJaTMMlXxulgv8DLgS6APspZ30Pcw4+tXEcrJKn+NK83RWNJxXk3Fj
-         9fICn88zqCxqTvwKFaz5Vnv0SqDmkTZFcpqRA5y5uidc8eWLrUwwKEzOm92C5g5/tnIp
-         24Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677667518;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HgQQZanRv5/alvxkVET4D6uB4QZkFnK7oJuTnwO/hEE=;
-        b=CWTHhttSxbdl6xWGD6kz+alZeDel20pxi79JVR7ywUXVpA1nY4y4slvH58AhgvQVw2
-         Fh1XDuKc/Em9NdRYajuTxTfxeb6//C5mSDqyi9k5/+brbxRw6mGMdGWJeVOQLbMyVlOO
-         amtIj2AK/nEEd8gWfd+tjNwhDSxC+HnyWvdrCkYMI6J7xwkpb0gSk+vIPXgi6uN7EHE3
-         YgU40KRaCr6CHwgtVrXg3HrN+RCXSYQDZ89OKwz4EAYLMVjzHsKAdUjyCuwQhZECADNa
-         +H2LD8I3TYIEZ22Ri9vHg/BQCWePZJ32XicCyZQ8ZgC1uv+oAnDS9NVjjexVl0YW+sAY
-         wzEA==
-X-Gm-Message-State: AO0yUKUvBRBOmbw7JfKqsiC2aNToUOXwacLvpsduAd7DljFdI58U4WLf
-        8qSMazddDB3uo0e6Vp1KzGo=
-X-Google-Smtp-Source: AK7set+HFf00M+CzlupT1bQM2ZRdW6de/txyzQjH6FxzfeDTmSWjvROAUCh9HT5dCKqG75TdwtvY2A==
-X-Received: by 2002:ac2:44a9:0:b0:4d2:c70a:fe0a with SMTP id c9-20020ac244a9000000b004d2c70afe0amr1344986lfm.2.1677667517726;
-        Wed, 01 Mar 2023 02:45:17 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id r1-20020a19ac41000000b004dc4bb2f4bcsm1663800lfc.276.2023.03.01.02.45.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Mar 2023 02:45:17 -0800 (PST)
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
-Date:   Wed, 1 Mar 2023 12:45:16 +0200
+        Wed, 1 Mar 2023 07:09:09 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E997D9B;
+        Wed,  1 Mar 2023 04:09:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
+        t=1677672476; i=erbse.13@gmx.de;
+        bh=jW9QqbNiXOx9cSB+L+BuNqUp884nAnRhvACcY0amjgY=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=Tb5LO9l1Y3HYnpzuLYsuCG63NhqCbi3sA+tRcO2vCiYIPN6laSjLD0NiLX93T2pFg
+         K2eVPQeZJ5y49yPGgtQnZYwvuctg9Jj1MhWCWL2JKFMolG69d5YPlhGQyPnxvTpv7J
+         RFcGw1y6222RDmLkNqhZn3RunlK5Mjr7thpnnynN7ZbkYONdFaFuPL8lG15qj187ex
+         NxAAjA9yRUhS8ZNZEuTlSFnNAdphzpc5RnyewkF5xKtchnJZIwHI5/a5q7z7SCksGi
+         mXshF9eYo79WPYnBmSZ9Id35VkznJP7uPVhs/i7cu0AGuVEXMoTGocCe91x7TFQx/N
+         MbgUeus/LfVsw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([134.147.116.198]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MORAa-1p7SOg1pde-00Pxza; Wed, 01
+ Mar 2023 13:07:56 +0100
+Date:   Wed, 1 Mar 2023 13:07:47 +0100
+From:   Tom Dohrmann <erbse.13@gmx.de>
 To:     Michael Roth <michael.roth@amd.com>
-Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 51/56] KVM: SVM: Add module parameter to enable
- the SEV-SNP
-Message-ID: <20230301124516.000048f5@intel.com>
-In-Reply-To: <20230220183847.59159-52-michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v8 15/56] x86/sev: Invalidate pages from the direct
+ map when adding them to the RMP table
+Message-ID: <Y/9AEyiMLKfj+/mK@notebook>
 References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-52-michael.roth@amd.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+ <20230220183847.59159-16-michael.roth@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230220183847.59159-16-michael.roth@amd.com>
+X-Provags-ID: V03:K1:QAZfbcKAW91F2JHdCAu5cRq7q3g4qY9Nr1ls991Uxd34cj28wu4
+ gFgR+oTH8ZbPRHLZpBhl4NYmMW8WX2lBFowFZhD5+jFThO3mMnNTgmEBNRiYbYonDMhOz+R
+ zjLWYNL6TgjNmzKfnzwCu+728YITrxzAsF4A1hUmwF6jjASlkSwhevasq+/XUPFeziAS9iA
+ lCQJWTRgA4V/DccUsgqTQ==
+UI-OutboundReport: notjunk:1;M01:P0:1Jgywx4vEhk=;2NZfYQAX5/O0Apb5Etjyh5/d2qh
+ eoZenyL9fVz4LLWYn1aL6JAUcleXQbzD+mOwwVtCG+S25b4ODoMeXnKTCJwyr5AawnOintaUY
+ 3eOl3NoC9v9Loic97MjO5ALcja6B+siNBQs+3FAbNfGYjT9IGhdFKXwpic6nW/HPEb1Wf80Rx
+ GZuP5Nhwpp5EcJcdrhCFe0yJFUQRh5mBOILWXiNLqI3VIdhaF1cRCKRAUm9zttvfiklJfELAJ
+ g/ccPpWbfxd8fvZtWHGjAQ5bDY3YMnumdeK/klor4tDCjYUxXtAU8SGV4peI9JDW8ApKwpNot
+ /D/jvOrh5uC+Dbyjw5TDtmrl9MRrzonWkVlnyi9CD/vt/IX5K2caSov+eUinh9QJolwJngSBY
+ YuM2FoYztSiTU/cetwl0vlGctwwdeY+H0E7mG7cTjCkrgRwPrTGj4e3Hf5JbBGw/eFOZdHovG
+ 9c7tW/eIn+kBZA1tNK1KXXOSgFnyov3ZiH7Qbmjl0QCtcVapnDBwJYzuVSK4PBFit+ZCYggO5
+ OBDhItKwjvKj/t6OD1xwRvr+pxRm3zHL5o3+PB7WcU19ImxJ6V+vkjTmsUMN52M+QsDQk4eFi
+ 3C2KMwlC7Xfk/ypUcAWyFQS/iuWhx52WdKnxJL/OfEsqLiHhVrx0cB6jOp5d9ckbFhw4yfCZn
+ y26KcJ6psULQkv1vhyCt+xsBsEdtoD/YGZtssqQeuHOwaC6mN9gPLDno/aMIv+3kxkYOJMeGg
+ EXeyUze3ZSF0P6gyvpvFSIZvesTGINW83Z2EV6a3M2S9eb5AUYRcZ1Zc12Pm5UG/+r8IMohPP
+ ykUXcdbRW7eapvjEGlKeqGEOdrxcL/F7iN7DYoLyyG4agX00F/MhT8cQvPy7iAbSbKehuoSZQ
+ wWlBDcl+8bI+Hv+v54K2msu5Tn7jADDoaLZqOQx29HKGdYL1Xi7SGEKh+CnJGHzr8kt+D2gm3
+ eOolEjxJ36f6NoUOuJNRQvUe3Co=
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:42 -0600
-Michael Roth <michael.roth@amd.com> wrote:
-
+On Mon, Feb 20, 2023 at 12:38:06PM -0600, Michael Roth wrote:
 > From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> Add a module parameter than can be used to enable or disable the SEV-SNP
-> feature. Now that KVM contains the support for the SNP set the GHCB
-> hypervisor feature flag to indicate that SNP is supported.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The integrity guarantee of SEV-SNP is enforced through the RMP table.
+> The RMP is used with standard x86 and IOMMU page tables to enforce
+> memory restrictions and page access rights. The RMP check is enforced as
+> soon as SEV-SNP is enabled globally in the system. When hardware
+> encounters an RMP-check failure, it raises a page-fault exception.
+>
+> The rmp_make_private() and rmp_make_shared() helpers are used to add
+> or remove the pages from the RMP table. Improve the rmp_make_private()
+> to invalidate state so that pages cannot be used in the direct-map after
+> they are added the RMP table, and restored to their default valid
+> permission after the pages are removed from the RMP table.
+>
+> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
 > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 7 ++++---
->  arch/x86/kvm/svm/svm.h | 2 +-
->  2 files changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index bedec90d034f..70d5650d8d95 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -55,14 +55,15 @@ module_param_named(sev, sev_enabled, bool, 0444);
->  /* enable/disable SEV-ES support */
->  static bool sev_es_enabled = true;
->  module_param_named(sev_es, sev_es_enabled, bool, 0444);
+>  arch/x86/kernel/sev.c | 57 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 57 insertions(+)
+>
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index a49f30c10dc1..3e5ff5934e83 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2595,6 +2595,37 @@ int psmash(u64 pfn)
+>  }
+>  EXPORT_SYMBOL_GPL(psmash);
+>
+> +static int restore_direct_map(u64 pfn, int npages)
+> +{
+> +	int i, ret =3D 0;
 > +
-> +/* enable/disable SEV-SNP support */
-> +static bool sev_snp_enabled = true;
-> +module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
->  #else
->  #define sev_enabled false
->  #define sev_es_enabled false
+> +	for (i =3D 0; i < npages; i++) {
+> +		ret =3D set_direct_map_default_noflush(pfn_to_page(pfn + i));
+> +		if (ret)
+> +			goto cleanup;
+> +	}
+> +
+> +cleanup:
+> +	WARN(ret > 0, "Failed to restore direct map for pfn 0x%llx\n", pfn + i=
+);
+> +	return ret;
+> +}
+> +
+> +static int invalidate_direct_map(u64 pfn, int npages)
+> +{
+> +	int i, ret =3D 0;
+> +
+> +	for (i =3D 0; i < npages; i++) {
+> +		ret =3D set_direct_map_invalid_noflush(pfn_to_page(pfn + i));
+> +		if (ret)
+> +			goto cleanup;
+> +	}
+> +
+> +cleanup:
+> +	WARN(ret > 0, "Failed to invalidate direct map for pfn 0x%llx\n", pfn =
++ i);
+> +	restore_direct_map(pfn, i);
 
-Guess we also need #define sev_snp_enabled false.
+This immediately restores the direct map after invalidating it. It
+probably needs to put behind if(ret).
 
->  #endif /* CONFIG_KVM_AMD_SEV */
->  
-> -/* enable/disable SEV-SNP support */
-> -static bool sev_snp_enabled;
-> -
->  #define AP_RESET_HOLD_NONE		0
->  #define AP_RESET_HOLD_NAE_EVENT		1
->  #define AP_RESET_HOLD_MSR_PROTO		2
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 857b674e68f0..221b38d3c845 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -694,7 +694,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
->  #define GHCB_VERSION_MAX	2ULL
->  #define GHCB_VERSION_MIN	1ULL
->  
-> -#define GHCB_HV_FT_SUPPORTED	0
-> +#define GHCB_HV_FT_SUPPORTED	(GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
+Regards, Tom
 
-This is not related to the topic of this patch, should be merged into related
-patches.
-
->  
->  extern unsigned int max_sev_asid;
->  
-
+> +	return ret;
+> +}
+> +
+>  static int rmpupdate(u64 pfn, struct rmp_state *val)
+>  {
+>  	int max_attempts =3D 4 * num_present_cpus();
+> @@ -2605,6 +2636,21 @@ static int rmpupdate(u64 pfn, struct rmp_state *v=
+al)
+>  	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+>  		return -ENXIO;
+>
+> +	level =3D RMP_TO_X86_PG_LEVEL(val->pagesize);
+> +	npages =3D page_level_size(level) / PAGE_SIZE;
+> +
+> +	/*
+> +	 * If page is getting assigned in the RMP table then unmap it from the
+> +	 * direct map.
+> +	 */
+> +	if (val->assigned) {
+> +		if (invalidate_direct_map(pfn, npages)) {
+> +			pr_err("Failed to unmap %d pages at pfn 0x%llx from the direct_map\n=
+",
+> +			       npages, pfn);
+> +			return -EFAULT;
+> +		}
+> +	}
+> +
+>  	do {
+>  		/* Binutils version 2.36 supports the RMPUPDATE mnemonic. */
+>  		asm volatile(".byte 0xF2, 0x0F, 0x01, 0xFE"
+> @@ -2630,6 +2676,17 @@ static int rmpupdate(u64 pfn, struct rmp_state *v=
+al)
+>  			 attempts, val->asid, ret, pfn, npages);
+>  	}
+>
+> +	/*
+> +	 * Restore the direct map after the page is removed from the RMP table=
+.
+> +	 */
+> +	if (!val->assigned) {
+> +		if (restore_direct_map(pfn, npages)) {
+> +			pr_err("Failed to map %d pages at pfn 0x%llx into the direct_map\n",
+> +			       npages, pfn);
+> +			return -EFAULT;
+> +		}
+> +	}
+> +
+>  	return 0;
+>  }
+>
+> --
+> 2.25.1
+>
