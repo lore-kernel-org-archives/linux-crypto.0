@@ -2,57 +2,57 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D28C3C7EE2D
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 10:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF72C64EC7
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Mar 2023 10:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbjCAKlo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Mar 2023 05:41:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56946 "EHLO
+        id S229747AbjCAKpV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Mar 2023 05:45:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjCAKlo (ORCPT
+        with ESMTP id S229600AbjCAKpU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Mar 2023 05:41:44 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F07E7270F;
-        Wed,  1 Mar 2023 02:41:42 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id m6so17032917lfq.5;
-        Wed, 01 Mar 2023 02:41:42 -0800 (PST)
+        Wed, 1 Mar 2023 05:45:20 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C280302AB;
+        Wed,  1 Mar 2023 02:45:19 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id r27so17008903lfe.10;
+        Wed, 01 Mar 2023 02:45:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677667301;
+        d=gmail.com; s=20210112; t=1677667518;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:date:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i+lwdyMLWrNCUvP02r0csUXgwLUgh7w7WbrI0pmUfWw=;
-        b=EPL5WVS3tFSDOLTSWnexGJFkVlGLQr63rDlUGz4KbfG1CDAdaTmo2PQBTQq6KzrjbW
-         Posj+feIgGObc/hvqjhm1JUTYHxypeB5N1OocI79dOg5jSq2bv+sk4pb2HdmvxOOmmd7
-         kRl1TGZgBle2bjJAoLH+sDKyB64RouLB6PL2gxNmqlYD0ypElu5VxW2EX+l9tByHslig
-         Y1z7C71RRCU/s/K3kV/UwHdMnBsKUCm9n3NLTbj+q8Hjdrkivc2LYA3SvekePOb1fwS3
-         LJe7wJqdjJRYBglMYo5q3AqhBRYqB9AgwFqATK7wS1TQR+nWogVw2Qa2+FLynzqPSsVq
-         5huA==
+        bh=HgQQZanRv5/alvxkVET4D6uB4QZkFnK7oJuTnwO/hEE=;
+        b=P7SSTk6sznBU59W8FIBilggNoPneO/753Y91fiXGPLcnZo+7vSp688RM2AEYDH7KHS
+         Oe6Ac54VLqQqTSg9I80HwktZ3FG0ggZw80CfLRhkgsqAsu52TYikxNSjooJzTFicW5sH
+         vwKPsN3AjYT+NcKd4RsE3ndx3CMxhQnu9JSc4it/+kxEwrpOrbfsnxRqNHKzgVeCjnB7
+         zDkHqnFloq2501FJaTMMlXxulgv8DLgS6APspZ30Pcw4+tXEcrJKn+NK83RWNJxXk3Fj
+         9fICn88zqCxqTvwKFaz5Vnv0SqDmkTZFcpqRA5y5uidc8eWLrUwwKEzOm92C5g5/tnIp
+         24Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677667301;
+        d=1e100.net; s=20210112; t=1677667518;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i+lwdyMLWrNCUvP02r0csUXgwLUgh7w7WbrI0pmUfWw=;
-        b=PlgJ1QE0+5rgSSQTiAjMFJsu1JEDanFE9/VXZLUsECIBMG2AeCW6eUJ0iHq81p8TD9
-         Zz4shZG8gk3iPutUWnJV/UVPbncj3M/6ld7ValNzalVzuQOevJ62vbJQEjuURdJcUAfv
-         6FzvANSHcj6urA2sd6pQnggifKEKG1fIX2XR5+Il2MemtMMCmbU8uOj5vs1cGuLJg+Gt
-         POiBsgu2fEWTbs/lU7dUV/K6oPar25deBVMGyeA1cZA4PXE641Y4bQT6lGIE/WX8k+aK
-         feUNPFmM2IekbNnKZ/MAzPqYzyVH4H5uX4mOBdVkvJjdPegioeFfZtiucVakb5th6nwJ
-         1ADw==
-X-Gm-Message-State: AO0yUKWs+pqZOVN+e8e/0X44EH6P1Ywaxbi/OT8dKLEF7qaa1NmZu4rJ
-        zL0yBcDL3i0VdDMEo9I5Tlg=
-X-Google-Smtp-Source: AK7set+11Iny2EdWmD9hXw83EgIIV1mL8orIaUR+ppxy5FtPa7r6ToSfgxtS+0dWKUJcZtFHIvc0pg==
-X-Received: by 2002:ac2:5197:0:b0:4b5:3e6e:382e with SMTP id u23-20020ac25197000000b004b53e6e382emr1459043lfi.4.1677667300743;
-        Wed, 01 Mar 2023 02:41:40 -0800 (PST)
+        bh=HgQQZanRv5/alvxkVET4D6uB4QZkFnK7oJuTnwO/hEE=;
+        b=CWTHhttSxbdl6xWGD6kz+alZeDel20pxi79JVR7ywUXVpA1nY4y4slvH58AhgvQVw2
+         Fh1XDuKc/Em9NdRYajuTxTfxeb6//C5mSDqyi9k5/+brbxRw6mGMdGWJeVOQLbMyVlOO
+         amtIj2AK/nEEd8gWfd+tjNwhDSxC+HnyWvdrCkYMI6J7xwkpb0gSk+vIPXgi6uN7EHE3
+         YgU40KRaCr6CHwgtVrXg3HrN+RCXSYQDZ89OKwz4EAYLMVjzHsKAdUjyCuwQhZECADNa
+         +H2LD8I3TYIEZ22Ri9vHg/BQCWePZJ32XicCyZQ8ZgC1uv+oAnDS9NVjjexVl0YW+sAY
+         wzEA==
+X-Gm-Message-State: AO0yUKUvBRBOmbw7JfKqsiC2aNToUOXwacLvpsduAd7DljFdI58U4WLf
+        8qSMazddDB3uo0e6Vp1KzGo=
+X-Google-Smtp-Source: AK7set+HFf00M+CzlupT1bQM2ZRdW6de/txyzQjH6FxzfeDTmSWjvROAUCh9HT5dCKqG75TdwtvY2A==
+X-Received: by 2002:ac2:44a9:0:b0:4d2:c70a:fe0a with SMTP id c9-20020ac244a9000000b004d2c70afe0amr1344986lfm.2.1677667517726;
+        Wed, 01 Mar 2023 02:45:17 -0800 (PST)
 Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id h5-20020a05651211c500b004dc48d91061sm1680896lfr.304.2023.03.01.02.41.40
+        by smtp.gmail.com with ESMTPSA id r1-20020a19ac41000000b004dc4bb2f4bcsm1663800lfc.276.2023.03.01.02.45.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Mar 2023 02:41:40 -0800 (PST)
+        Wed, 01 Mar 2023 02:45:17 -0800 (PST)
 From:   Zhi Wang <zhi.wang.linux@gmail.com>
 X-Google-Original-From: Zhi Wang <zhi.wang.linux@intel.com>
-Date:   Wed, 1 Mar 2023 12:41:38 +0200
+Date:   Wed, 1 Mar 2023 12:45:16 +0200
 To:     Michael Roth <michael.roth@amd.com>
 Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
         <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
@@ -69,13 +69,14 @@ Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
         <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
-Subject: Re: [PATCH RFC v8 50/56] KVM: SEV: Handle restricted memory
- invalidations for SNP
-Message-ID: <20230301124138.000004f9@intel.com>
-In-Reply-To: <20230220183847.59159-51-michael.roth@amd.com>
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v8 51/56] KVM: SVM: Add module parameter to enable
+ the SEV-SNP
+Message-ID: <20230301124516.000048f5@intel.com>
+In-Reply-To: <20230220183847.59159-52-michael.roth@amd.com>
 References: <20230220183847.59159-1-michael.roth@amd.com>
-        <20230220183847.59159-51-michael.roth@amd.com>
+        <20230220183847.59159-52-michael.roth@amd.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -84,116 +85,64 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 20 Feb 2023 12:38:41 -0600
+On Mon, 20 Feb 2023 12:38:42 -0600
 Michael Roth <michael.roth@amd.com> wrote:
 
-> Implement a platform hook to do the work of restoring the direct map
-> entries and cleaning up RMP table entries for restricted memory that is
-> being freed back to the host.
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
+> Add a module parameter than can be used to enable or disable the SEV-SNP
+> feature. Now that KVM contains the support for the SNP set the GHCB
+> hypervisor feature flag to indicate that SNP is supported.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 62 ++++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/svm/svm.c |  1 +
->  arch/x86/kvm/svm/svm.h |  1 +
->  3 files changed, 64 insertions(+)
+>  arch/x86/kvm/svm/sev.c | 7 ++++---
+>  arch/x86/kvm/svm/svm.h | 2 +-
+>  2 files changed, 5 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 7a74a92cb39a..bedec90d034f 100644
+> index bedec90d034f..70d5650d8d95 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -4509,3 +4509,65 @@ bool sev_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *priv
->  
->  	return true;
->  }
+> @@ -55,14 +55,15 @@ module_param_named(sev, sev_enabled, bool, 0444);
+>  /* enable/disable SEV-ES support */
+>  static bool sev_es_enabled = true;
+>  module_param_named(sev_es, sev_es_enabled, bool, 0444);
 > +
-> +void sev_invalidate_private_range(struct kvm_memory_slot *slot, gfn_t start, gfn_t end)
-> +{
-> +	gfn_t gfn = start;
-> +
-> +	if (!sev_snp_guest(slot->kvm))
-> +		return;
-> +
-> +	if (!kvm_slot_can_be_private(slot)) {
-> +		pr_warn_ratelimited("SEV: Memslot for GFN: 0x%llx is not private.\n",
-> +				    gfn);
-> +		return;
-> +	}
-> +
+> +/* enable/disable SEV-SNP support */
+> +static bool sev_snp_enabled = true;
+> +module_param_named(sev_snp, sev_snp_enabled, bool, 0444);
+>  #else
+>  #define sev_enabled false
+>  #define sev_es_enabled false
 
-This is a generic check for both SNP and TDX, it should be moved to
-kvm_restrictedmem_invalidate_begin().
+Guess we also need #define sev_snp_enabled false.
 
-> +	while (gfn <= end) {
-> +		gpa_t gpa = gfn_to_gpa(gfn);
-> +		int level = PG_LEVEL_4K;
-> +		int order, rc;
-> +		kvm_pfn_t pfn;
-> +
-> +		rc = kvm_restrictedmem_get_pfn(slot, gfn, &pfn, &order);
-> +		if (rc) {
-> +			pr_warn_ratelimited("SEV: Failed to retrieve restricted PFN for GFN 0x%llx, rc: %d\n",
-> +					    gfn, rc);
-> +			gfn++;
-> +			continue;
-> +		}
-> +
-> +		if (order) {
-> +			int rmp_level;
-> +
-> +			if (IS_ALIGNED(gpa, page_level_size(PG_LEVEL_2M)) &&
-> +			    gpa + page_level_size(PG_LEVEL_2M) <= gfn_to_gpa(end))
-> +				level = PG_LEVEL_2M;
-> +			else
-> +				pr_debug("%s: GPA 0x%llx is not aligned to 2M, skipping 2M directmap restoration\n",
-> +					 __func__, gpa);
-> +
-> +			/*
-> +			 * TODO: It may still be possible to restore 2M mapping here,
-> +			 * but keep it simple for now.
-> +			 */
-> +			if (level == PG_LEVEL_2M &&
-> +			    (!snp_lookup_rmpentry(pfn, &rmp_level) || rmp_level == PG_LEVEL_4K)) {
-> +				pr_debug("%s: PFN 0x%llx is not mapped as 2M private range, skipping 2M directmap restoration\n",
-> +					 __func__, pfn);
-> +				level = PG_LEVEL_4K;
-> +			}
-> +		}
-> +
-> +		pr_debug("%s: GPA %llx PFN %llx order %d level %d\n",
-> +			 __func__, gpa, pfn, order, level);
-> +		rc = snp_make_page_shared(slot->kvm, gpa, pfn, level);
-> +		if (rc)
-> +			pr_err("SEV: Failed to restore page to shared, GPA: 0x%llx PFN: 0x%llx order: %d rc: %d\n",
-> +			       gpa, pfn, order, rc);
-> +
-> +		gfn += page_level_size(level) >> PAGE_SHIFT;
-> +		put_page(pfn_to_page(pfn));
-> +		cond_resched();
-> +	}
-> +}
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 18e4a6c17d11..3fe5f13b5f3a 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4862,6 +4862,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.adjust_mapping_level = sev_adjust_mapping_level,
->  	.update_mem_attr = sev_update_mem_attr,
->  	.fault_is_private = sev_fault_is_private,
-> +	.invalidate_restricted_mem = sev_invalidate_private_range,
->  };
+>  #endif /* CONFIG_KVM_AMD_SEV */
 >  
->  /*
+> -/* enable/disable SEV-SNP support */
+> -static bool sev_snp_enabled;
+> -
+>  #define AP_RESET_HOLD_NONE		0
+>  #define AP_RESET_HOLD_NAE_EVENT		1
+>  #define AP_RESET_HOLD_MSR_PROTO		2
 > diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 97038afa8020..857b674e68f0 100644
+> index 857b674e68f0..221b38d3c845 100644
 > --- a/arch/x86/kvm/svm/svm.h
 > +++ b/arch/x86/kvm/svm/svm.h
-> @@ -727,6 +727,7 @@ void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
->  void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
->  int sev_update_mem_attr(struct kvm_memory_slot *slot, unsigned int attr,
->  			gfn_t start, gfn_t end);
-> +void sev_invalidate_private_range(struct kvm_memory_slot *slot, gfn_t start, gfn_t end);
+> @@ -694,7 +694,7 @@ void avic_refresh_virtual_apic_mode(struct kvm_vcpu *vcpu);
+>  #define GHCB_VERSION_MAX	2ULL
+>  #define GHCB_VERSION_MIN	1ULL
 >  
->  bool sev_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 error_code, bool *private_fault);
+> -#define GHCB_HV_FT_SUPPORTED	0
+> +#define GHCB_HV_FT_SUPPORTED	(GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
+
+This is not related to the topic of this patch, should be merged into related
+patches.
+
+>  
+>  extern unsigned int max_sev_asid;
 >  
 
