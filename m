@@ -2,169 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3F6C7EE30
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Mar 2023 11:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BB1C678D4
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Mar 2023 13:26:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229494AbjCBLfT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Mar 2023 06:35:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55584 "EHLO
+        id S229560AbjCBN0V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 2 Mar 2023 08:26:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjCBLfS (ORCPT
+        with ESMTP id S229449AbjCBN0V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2023 06:35:18 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA5D1B541;
-        Thu,  2 Mar 2023 03:35:16 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 322AiLsB030357;
-        Thu, 2 Mar 2023 11:34:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=dOAo4yP20BN2tMvLNTdTUQ9lWV9N88XXslr4sX2EaiY=;
- b=NOy3uKXatHZhVjhlYrjt7dk9peFQ+ghLo3nhedJCxpLkT91i7tygH4K+wODyfBkGsFq+
- +tydf3Q7mSMslJrrFP1RKERe0KWqkEZbaEcB+ZMov/jO9P7bKLQHMryatbYsH2IEFGJM
- IVx1PX44rxqUvo7KWoHHVHEbUR1+OzSbmxSx+Sa+CkM2XbI6e0MTVyFBHCpyehGjsHcP
- MZXRMI9gSZE+Z+p8ELs29MS3qFRtqfxWFCY96cw1dBk2RMPxG8NGyoVXjLjMDmhMiZg5
- XB3mJ2Zp9YNUW99CvpjbE/6sgje4ZoOadttLjicyrupsB7PUMLHG4ZF8cWjaOkgBavLH rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p2tag996v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Mar 2023 11:34:39 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 322BPU3D010598;
-        Thu, 2 Mar 2023 11:34:38 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3p2tag996d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Mar 2023 11:34:38 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3229qNok024547;
-        Thu, 2 Mar 2023 11:34:37 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([9.208.129.117])
-        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3nybe9vkru-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Mar 2023 11:34:37 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 322BYZi44260488
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Mar 2023 11:34:35 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90FD95805E;
-        Thu,  2 Mar 2023 11:34:35 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83B3F5805B;
-        Thu,  2 Mar 2023 11:34:26 +0000 (GMT)
-Received: from [9.65.199.252] (unknown [9.65.199.252])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Mar 2023 11:34:26 +0000 (GMT)
-Message-ID: <7bb7de5b-8650-d632-5d8d-13e961092514@linux.ibm.com>
-Date:   Thu, 2 Mar 2023 13:34:24 +0200
+        Thu, 2 Mar 2023 08:26:21 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0A518B1F;
+        Thu,  2 Mar 2023 05:26:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677763579; x=1709299579;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RzKZOO3pMAqixUGQg3dAVwPRKWwUHbpqsY29JJ0g2mY=;
+  b=CzqzGO4iJzyySqK8AbNxoMOgsqGgkGm7nLbf5JM1wTg6f+Quw4y7tHdh
+   fDUwSqYmfhHuA5Hsr1AvCxiNesml69rPxH4u4DZdwjVvhjwKtlUXRBXQt
+   g8RgdoQGLRPklZ0JFuxvYoWnx9Z7SxmLU/SO87y1M6f3CSoUmSkqK2l2g
+   zqcgLHigTz8wbBRG5RkdjIYKRJ2AiDefUpXw6+8JVJw9w6ncZgV2ZwoXF
+   alWjcbdt+MCyBh56s0wpRwsykpi1i0L1G9sgsvwPaa+r4Z0Dw0ZeC0pRz
+   Jy30kRhS8iP7eYpv+UCE2VhdAhouBL2v56yjI71iqRL2J+noLtk5mY09s
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="332200106"
+X-IronPort-AV: E=Sophos;i="5.98,227,1673942400"; 
+   d="scan'208";a="332200106"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2023 05:26:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10636"; a="674952833"
+X-IronPort-AV: E=Sophos;i="5.98,227,1673942400"; 
+   d="scan'208";a="674952833"
+Received: from lkp-server01.sh.intel.com (HELO 776573491cc5) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 02 Mar 2023 05:26:14 -0800
+Received: from kbuild by 776573491cc5 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pXiwo-0000UZ-0P;
+        Thu, 02 Mar 2023 13:26:14 +0000
+Date:   Thu, 2 Mar 2023 21:26:09 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     "Peng Fan (OSS)" <peng.fan@oss.nxp.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+        shawnguo@kernel.org, s.hauer@pengutronix.de
+Cc:     oe-kbuild-all@lists.linux.dev, kernel@pengutronix.de,
+        stefan@agner.ch, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, Peng Fan <peng.fan@nxp.com>
+Subject: Re: [PATCH 7/9] dt-bindings: crypto: drop fsl-sec4 txt binding
+Message-ID: <202303022114.lkxW64dk-lkp@intel.com>
+References: <20230301015702.3388458-8-peng.fan@oss.nxp.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH RFC v8 54/56] x86/sev: Add KVM commands for instance certs
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, nikunj.dadhania@amd.com,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-55-michael.roth@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <20230220183847.59159-55-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sW6S_sH2skBR2gF5i0T43zjzYupGR-JF
-X-Proofpoint-GUID: wwIKig-YXQZM25e08VegcV-Ep_P_1img
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-02_06,2023-03-02_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- impostorscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- clxscore=1015 bulkscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303020101
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230301015702.3388458-8-peng.fan@oss.nxp.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Peng,
 
+Thank you for the patch! Perhaps something to improve:
 
-On 20/02/2023 20:38, Michael Roth wrote:
-> From: Dionna Glaze <dionnaglaze@google.com>
-> 
-> The /dev/sev device has the ability to store host-wide certificates for
-> the key used by the AMD-SP for SEV-SNP attestation report signing,
-> but for hosts that want to specify additional certificates that are
-> specific to the image launched in a VM, a different way is needed to
-> communicate those certificates.
-> 
-> Add two new KVM ioctl to handle this: KVM_SEV_SNP_{GET,SET}_CERTS
-> 
-> The certificates that are set with this command are expected to follow
-> the same format as the host certificates, but that format is opaque
-> to the kernel.
-> 
-> The new behavior for custom certificates is that the extended guest
-> request command will now return the overridden certificates if they
-> were installed for the instance. The error condition for a too small
-> data buffer is changed to return the overridden certificate data size
-> if there is an overridden certificate set installed.
-> 
-> Setting a 0 length certificate returns the system state to only return
-> the host certificates on an extended guest request.
-> 
-> Also increase the SEV_FW_BLOB_MAX_SIZE another 4K page to allow space
-> for an extra certificate.
-> 
-> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: remove used of "we" and "this patch" in commit log]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c   | 111 ++++++++++++++++++++++++++++++++++++++-
->  arch/x86/kvm/svm/svm.h   |   1 +
->  include/linux/psp-sev.h  |   2 +-
->  include/uapi/linux/kvm.h |  12 +++++
->  4 files changed, 123 insertions(+), 3 deletions(-)
-> 
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master shawnguo/for-next linus/master v6.2 next-20230302]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-[...]
+url:    https://github.com/intel-lab-lkp/linux/commits/Peng-Fan-OSS/ARM-dts-vfxxx-drop-the-number-after-jr/20230301-095526
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20230301015702.3388458-8-peng.fan%40oss.nxp.com
+patch subject: [PATCH 7/9] dt-bindings: crypto: drop fsl-sec4 txt binding
+reproduce:
+        # https://github.com/intel-lab-lkp/linux/commit/be7a2d4765563d62ace0128d9497c0fbef9ffd1b
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Peng-Fan-OSS/ARM-dts-vfxxx-drop-the-number-after-jr/20230301-095526
+        git checkout be7a2d4765563d62ace0128d9497c0fbef9ffd1b
+        make menuconfig
+        # enable CONFIG_COMPILE_TEST, CONFIG_WARN_MISSING_DOCUMENTS, CONFIG_WARN_ABI_ERRORS
+        make htmldocs
 
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index 92116e2b74fd..3b28b78938f6 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -22,7 +22,7 @@
->  #define __psp_pa(x)	__pa(x)
->  #endif
->  
-> -#define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
-> +#define SEV_FW_BLOB_MAX_SIZE	0x5000	/* 20KB */
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303022114.lkxW64dk-lkp@intel.com/
 
-This change should be removed (it was also discussed in v7).  If I
-understand correctly, 16KB is a limit of the PSP.
+All warnings (new ones prefixed by >>):
 
--Dov
+>> Warning: Documentation/devicetree/bindings/input/snvs-pwrkey.txt references a file that doesn't exist: Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+>> Warning: Documentation/devicetree/bindings/rtc/snvs-rtc.txt references a file that doesn't exist: Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+>> Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/crypto/fsl-sec4.txt
 
-
->  
->  /**
->   * SEV platform state
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
