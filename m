@@ -2,60 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01127C7EE2D
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 15:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E220C7EE2D
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 15:54:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231459AbjCCPcD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Mar 2023 10:32:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47236 "EHLO
+        id S231336AbjCCPyh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Mar 2023 10:54:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231134AbjCCPcC (ORCPT
+        with ESMTP id S231277AbjCCPyg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Mar 2023 10:32:02 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A1D2312A;
-        Fri,  3 Mar 2023 07:32:01 -0800 (PST)
+        Fri, 3 Mar 2023 10:54:36 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6431A97D;
+        Fri,  3 Mar 2023 07:54:34 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 26E9422CB2;
-        Fri,  3 Mar 2023 15:32:00 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1FDA82052F;
+        Fri,  3 Mar 2023 15:54:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1677857520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1677858873; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DSoHdPcyObvsTluGoWuHF5NVQ3++ls8GhPdaBUb6qDE=;
-        b=xWKYoPkqeefli/1vYLhDI4s8HE7WrAvJpUa3qKXByCEZB6657JSzIKaxlVCTW/8kZuoLii
-        S8vtssyaz4Cv5eJzA7ckOZU4vZG4TBrQQuvzc8XsTpsXhaP2u2O37sjpuw7l/bO+rN+DBH
-        10NeHu/nlMf5DdX3e7AWZ28RF7kWBvU=
+        bh=OX0Zk32MxB1SguOJCebjGzfeq9YQ/kNosNxS6sooeUo=;
+        b=YFSJtO8U5aF5USp1qkar0ddcOveTlTvcnxa4rifI37EyJbdz/878UzFCplMOx2DVEGu49x
+        jdDbxoF+HircpHnXUCGKozAu+NchrWC7iGKUZjLaoa4+h9bkeLNnOcqGM1nuAuYQ6RYOeG
+        mNi4paflRft0fZP9SLKZBM7zGZxXUb8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1677857520;
+        s=susede2_ed25519; t=1677858873;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DSoHdPcyObvsTluGoWuHF5NVQ3++ls8GhPdaBUb6qDE=;
-        b=jL0MqPH3l6f4U3fs78svw5HTblwFbZKZKsjF1NQaUTOrXQ2TB7WIdX78CV4QCpze5UHsCr
-        Q6XNqBFBN8/TksCg==
+        bh=OX0Zk32MxB1SguOJCebjGzfeq9YQ/kNosNxS6sooeUo=;
+        b=VamsRLAwn96KJo2H0gpwvGwTmBzd958veUi4ZII21ILNcW2KQ/Kh09Btzewxn0B/GCf5jK
+        XZ6SYNliBwRObfDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8B3CA139D3;
-        Fri,  3 Mar 2023 15:31:59 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 894881329E;
+        Fri,  3 Mar 2023 15:54:32 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 5xRJIe8SAmT3PAAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Fri, 03 Mar 2023 15:31:59 +0000
-Message-ID: <846ff1ae-ba1e-8c57-f727-511c09ac0807@suse.cz>
-Date:   Fri, 3 Mar 2023 16:31:59 +0100
+        id b/O0IDgYAmQhSQAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 03 Mar 2023 15:54:32 +0000
+Message-ID: <4846fdcd-3e13-548b-dc2c-a47dc163885f@suse.cz>
+Date:   Fri, 3 Mar 2023 16:54:32 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [PATCH RFC v8 17/56] x86/fault: Add support to handle the RMP
- fault for user address
+Subject: Re: [PATCH RFC v8 23/56] crypto: ccp: Introduce snp leaked pages list
 Content-Language: en-US
 To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
 Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
@@ -71,12 +70,11 @@ Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
         tony.luck@intel.com, marcorr@google.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
         dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@profian.com>
+        nikunj.dadhania@amd.com
 References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-18-michael.roth@amd.com>
+ <20230220183847.59159-24-michael.roth@amd.com>
 From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20230220183847.59159-18-michael.roth@amd.com>
+In-Reply-To: <20230220183847.59159-24-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -84,73 +82,95 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 2/20/23 19:38, Michael Roth wrote:
-> +static int handle_user_rmp_page_fault(struct pt_regs *regs, unsigned long error_code,
-> +				      unsigned long address)
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> Pages are unsafe to be released back to the page-allocator, if they
+> have been transitioned to firmware/guest state and can't be reclaimed
+> or transitioned back to hypervisor/shared state. In this case add
+> them to an internal leaked pages list to ensure that they are not freed
+> or touched/accessed to cause fatal page faults.
+> 
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 28 ++++++++++++++++++++++++++++
+>  include/linux/psp-sev.h      |  8 ++++++++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 35f605936f1b..eca4e59b0f44 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -42,6 +42,12 @@
+>  static DEFINE_MUTEX(sev_cmd_mutex);
+>  static struct sev_misc_dev *misc_dev;
+>  
+> +/* list of pages which are leaked and cannot be reclaimed */
+> +static LIST_HEAD(snp_leaked_pages_list);
+> +static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
+> +
+> +static atomic_long_t snp_nr_leaked_pages = ATOMIC_LONG_INIT(0);
+> +
+>  static int psp_cmd_timeout = 100;
+>  module_param(psp_cmd_timeout, int, 0644);
+>  MODULE_PARM_DESC(psp_cmd_timeout, " default timeout value, in seconds, for PSP commands");
+> @@ -188,6 +194,28 @@ static int sev_cmd_buffer_len(int cmd)
+>  	return 0;
+>  }
+>  
+> +void snp_mark_pages_offline(unsigned long pfn, unsigned int npages)
+
+Why call it offline which has usually a memory hotplug-related meaning? What
+about e.g. snp_leak_bad_pages() ?
+
 > +{
-> +	int rmp_level, level;
-> +	pgd_t *pgd;
-> +	pte_t *pte;
-> +	u64 pfn;
+> +	struct page *page = pfn_to_page(pfn);
 > +
-> +	pgd = __va(read_cr3_pa());
-> +	pgd += pgd_index(address);
+> +	WARN(1, "psc failed, pfn 0x%lx pages %d (marked offline)\n", pfn, npages);
 > +
-> +	pte = lookup_address_in_pgd(pgd, address, &level);
-> +
-> +	/*
-> +	 * It can happen if there was a race between an unmap event and
-> +	 * the RMP fault delivery.
-> +	 */
-> +	if (!pte || !pte_present(*pte))
-> +		return RMP_PF_UNMAP;
-> +
-> +	/*
-> +	 * RMP page fault handler follows this algorithm:
-> +	 * 1. Compute the pfn for the 4kb page being accessed
-> +	 * 2. Read that RMP entry -- If it is assigned then kill the process
-> +	 * 3. Otherwise, check the level from the host page table
-> +	 *    If level=PG_LEVEL_4K then the page is already smashed
-> +	 *    so just retry the instruction
-> +	 * 4. If level=PG_LEVEL_2M/1G, then the host page needs to be split
-> +	 */
-> +
-> +	pfn = pte_pfn(*pte);
-> +
-> +	/* If its large page then calculte the fault pfn */
-> +	if (level > PG_LEVEL_4K)
-> +		pfn = pfn | PFN_DOWN(address & (page_level_size(level) - 1));
-> +
-> +	/*
-> +	 * If its a guest private page, then the fault cannot be resolved.
-> +	 * Send a SIGBUS to terminate the process.
-> +	 *
-> +	 * As documented in APM vol3 pseudo-code for RMPUPDATE, when the 2M range
-> +	 * is covered by a valid (Assigned=1) 2M entry, the middle 511 4k entries
-> +	 * also have Assigned=1. This means that if there is an access to a page
-> +	 * which happens to lie within an Assigned 2M entry, the 4k RMP entry
-> +	 * will also have Assigned=1. Therefore, the kernel should see that
-> +	 * the page is not a valid page and the fault cannot be resolved.
-> +	 */
-> +	if (snp_lookup_rmpentry(pfn, &rmp_level)) {
-> +		pr_info("Fatal RMP page fault, terminating process, entry assigned for pfn 0x%llx\n",
-> +			pfn);
-> +		do_sigbus(regs, error_code, address, VM_FAULT_SIGBUS);
-> +		return RMP_PF_RETRY;
+> +	spin_lock(&snp_leaked_pages_list_lock);
+> +	while (npages--) {
+> +		/*
+> +		 * Reuse the page's buddy list for chaining into the leaked
+> +		 * pages list. This page should not be on a free list currently
+> +		 * and is also unsafe to be added to a free list.
+> +		 */
+> +		list_add_tail(&page->buddy_list, &snp_leaked_pages_list);
+> +		sev_dump_rmpentry(pfn);
+> +		pfn++;
 > +	}
-
-WRT my reply to 12/56, for example here it might be useful to distinguish
-the rmp being assigned from an error of snp_lookup_rmpentry()?
-
-> +
-> +	/*
-> +	 * The backing page level is higher than the RMP page level, request
-> +	 * to split the page.
-> +	 */
-> +	if (level > rmp_level)
-> +		return RMP_PF_SPLIT;
-> +
-> +	return RMP_PF_RETRY;
+> +	spin_unlock(&snp_leaked_pages_list_lock);
+> +	atomic_long_inc(&snp_nr_leaked_pages);
 > +}
+> +EXPORT_SYMBOL_GPL(snp_mark_pages_offline);
 > +
->  /*
+>  static void *sev_fw_alloc(unsigned long len)
+>  {
+>  	struct page *page;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 46f61e3ae33b..8edf5c548fbf 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -923,6 +923,12 @@ int sev_do_cmd(int cmd, void *data, int *psp_ret);
+>  
+>  void *psp_copy_user_blob(u64 uaddr, u32 len);
+>  
+> +/**
+> + * sev_mark_pages_offline - insert non-reclaimed firmware/guest pages
+> + * into a leaked pages list.
+> + */
+> +void snp_mark_pages_offline(unsigned long pfn, unsigned int npages);
+> +
+>  #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  static inline int
+> @@ -951,6 +957,8 @@ sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int
+>  
+>  static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
+>  
+> +void snp_mark_pages_offline(unsigned long pfn, unsigned int npages) {}
+> +
+>  #endif	/* CONFIG_CRYPTO_DEV_SP_PSP */
+>  
+>  #endif	/* __PSP_SEV_H__ */
 
