@@ -2,106 +2,99 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B544C64EC4
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 11:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3EDC64EC4
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 14:00:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230137AbjCCL5V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Mar 2023 06:57:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45932 "EHLO
+        id S231166AbjCCOAt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Mar 2023 09:00:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbjCCL5T (ORCPT
+        with ESMTP id S229957AbjCCOAs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Mar 2023 06:57:19 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF1695D773
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Mar 2023 03:57:18 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id u3-20020a4ad0c3000000b0052541ef0bafso380116oor.5
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Mar 2023 03:57:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf.com; s=google; t=1677844638;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u98Ss8tAQ9VElZRSWV8UR9Qk7Tg0zOIdLlJYmBxynas=;
-        b=jfL95YA8y5itMCDnzJGik1tLz4XYXJDoXuO5pQtehMGKZ2jUFgb+NlH6uzjYBp1PRX
-         hFsixDIBN3GnQigvDm0SDiLKwgxuOJyjA0yL3OLNgrbzeF+o3yd65/dqb+P0vKGFHOpk
-         jSQT1Jt1Qij/vdNSVVk8icAJ3b4Rvpp93zvmwq4u25nty7YgAXFSccAziyweSc2L04Cu
-         PeuSWuDz7/y+Z693rZ9f2Rncy7hkyFqvqTtz/LeEfMItArQMTztY/2UcFdHx/QtGLQtJ
-         4BXJL1+4Ky7Aas3cJHsSXeU2a7d3usPf7H10ysSl5h4e8Hv2gImt9YE6BENLhdX/wp0T
-         6u/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677844638;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u98Ss8tAQ9VElZRSWV8UR9Qk7Tg0zOIdLlJYmBxynas=;
-        b=DB18HrP4LnBj2YJdKOrY3KGezx8ZUyBrRUiEHHBsz0GjSBEGl3sK3IvxMun8sPlbd5
-         D6vfNEMRerkrO570jLjelCnnPOitOT+qrCRLxX5JkWqmaCZDIe/p0v3CG4BGSxamrIO4
-         lwtNK+8l1jW1ECA5qzxOhVcSeWVMumXdjQrOu8pQlgRQYkDsISp+1xkoP7UTNifUIwp0
-         lj+bbQpG4zcsy0ncfh42o1lakhTjCIoRxexj/TGXxO02u2lX4HVRopeVOXrRDVWEHHy/
-         Yn4rFjnCUHaWs1Ez2dG2OcOvzPxdiu7xPvMvGJDSW2BiAQaAJwzReOhWBd2eTxYOvzXF
-         WR2Q==
-X-Gm-Message-State: AO0yUKVxj4rsPBhVma2o6GcTzbcvrICAqXyqGKbwwruVb8x7BN52GKpG
-        ofUUNAI3PL4YCqhLw3bwK9frpYchxrUiPv3mGM58Ww==
-X-Google-Smtp-Source: AK7set/ocFw0ey8rwseexbbsGXOfwjdJL9k1kiPCAdmMzUuQuD6Nbal/wBc8frB2SvM2qL80fR9lqbDFGzp81gS72VA=
-X-Received: by 2002:a4a:956e:0:b0:525:6065:95c9 with SMTP id
- n43-20020a4a956e000000b00525606595c9mr653680ooi.0.1677844638088; Fri, 03 Mar
- 2023 03:57:18 -0800 (PST)
+        Fri, 3 Mar 2023 09:00:48 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81EBE6151E;
+        Fri,  3 Mar 2023 06:00:46 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D62402052E;
+        Fri,  3 Mar 2023 14:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1677852044; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wxV+vqRqP5FA17gWzru5WaqMedSYhLnPR0idRcduX0g=;
+        b=mGmx8NKmZojc13Vh+SoX62xVgQwefRgdcp9BblO5KfAFLL6taXUCrIP1i+Q6fSjo56vaQV
+        ioQvf+LNpmkhBAl3kw7hNZQTIX0WYJ9jqNKoQZGx3K2O/T5t2qIgR7sQN5OrFb11xozY+I
+        ugzz2FCwcnOVP6Ydqi1Uy0UDOSh8Vjw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1677852044;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wxV+vqRqP5FA17gWzru5WaqMedSYhLnPR0idRcduX0g=;
+        b=TLAgG9NwjxbPa5h72UbYo83Q/SnmtX0VCXL9B8AUov5zk8kSBDzwc5rtAF7zbGyc6AT+qY
+        KpQFcjqya9sSrOBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 519EA1329E;
+        Fri,  3 Mar 2023 14:00:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Yw8/E4z9AWSfCgAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 03 Mar 2023 14:00:44 +0000
+Message-ID: <86906f29-9853-6e18-6e03-7b689088ed5d@suse.cz>
+Date:   Fri, 3 Mar 2023 15:00:43 +0100
 MIME-Version: 1.0
-References: <20230302194235.1724-1-mario.limonciello@amd.com> <20230302194235.1724-10-mario.limonciello@amd.com>
-In-Reply-To: <20230302194235.1724-10-mario.limonciello@amd.com>
-From:   Grzegorz Bernacki <gjb@semihalf.com>
-Date:   Fri, 3 Mar 2023 12:57:07 +0100
-Message-ID: <CAA2Cew7emsVMmKk1jz+XYnYKJasZ3w35jh-+8TFTG5UCD88eHA@mail.gmail.com>
-Subject: Re: [PATCH v2 9/9] crypto: ccp: Add doorbell register offset
-To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     =?UTF-8?B?SmFuIETEhWJyb8Wb?= <jsd@semihalf.com>,
-        Rijo-john.Thomas@amd.com, Thomas.Lendacky@amd.com,
-        herbert@gondor.apana.org.au, John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH RFC v8 08/56] KVM: SEV: Rename sev_{pin,unpin}_memory
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, Nikunj A Dadhania <nikunj@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-9-michael.roth@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20230220183847.59159-9-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mario,
+On 2/20/23 19:37, Michael Roth wrote:
+> From: Nikunj A Dadhania <nikunj@amd.com>
+> 
+> Rename sev_{pin|unpin}_memory to sev_memory_{get|put}_pages. Apart
+> from pinning the pages, sev_pin_memory also populates the pages array
+> which is used by its callers. SEV guest using restricted memfd do not
+> to pin the memory but will require the pages array to be populated.
 
-It won't work as expected since the Skyrim device has a different
-offset of cmdresp_reg, which is 0x10a40 and doorbell is actually
-0x10a24. I apologize for giving you the wrong values.
-thanks,
-greg
+  ^need to?
 
-czw., 2 mar 2023 o 20:43 Mario Limonciello <mario.limonciello@amd.com>
-napisa=C5=82(a):
->
-> The PSP in Skyrim uses i2c arbitration with a doorbell.
-> Add this offset so that the communication can work.
->
-> Link: Link: https://lore.kernel.org/linux-i2c/20220916131854.687371-3-jsd=
-@semihalf.com/
-> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-> ---
-> v1->v2:
->  * New patch
-> ---
->  drivers/crypto/ccp/sp-pci.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-> index 18aa902eb5ce..a4efcaee43d8 100644
-> --- a/drivers/crypto/ccp/sp-pci.c
-> +++ b/drivers/crypto/ccp/sp-pci.c
-> @@ -365,6 +365,7 @@ static const struct platform_access_vdata pa_v1 =3D {
->         .cmdresp_reg            =3D 0x10570,      /* C2PMSG_28 */
->         .cmdbuff_addr_lo_reg    =3D 0x10574,      /* C2PMSG_29 */
->         .cmdbuff_addr_hi_reg    =3D 0x10578,      /* C2PMSG_30 */
-> +       .doorbell_reg           =3D 0x10a40,      /* C2PMSG_80 */
->  };
->
->  static const struct psp_vdata pspv1 =3D {
-> --
-> 2.34.1
->
+> Rename the function appropriately.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+
