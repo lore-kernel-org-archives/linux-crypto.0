@@ -2,215 +2,231 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 976A0C678D4
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 03:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E02EC678D4
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 09:54:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbjCCDcr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Mar 2023 22:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48174 "EHLO
+        id S230316AbjCCJx6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Mar 2023 04:53:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjCCDcr (ORCPT
+        with ESMTP id S230319AbjCCJx5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Mar 2023 22:32:47 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56ED3E08D
-        for <linux-crypto@vger.kernel.org>; Thu,  2 Mar 2023 19:32:45 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id ay18so778782pfb.2
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Mar 2023 19:32:45 -0800 (PST)
+        Fri, 3 Mar 2023 04:53:57 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69FDD30EB5
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Mar 2023 01:53:50 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id u9so8079121edd.2
+        for <linux-crypto@vger.kernel.org>; Fri, 03 Mar 2023 01:53:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1677814365;
-        h=to:references:message-id:cc:date:in-reply-to:from:subject
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lemNha6CdZ03DdpY+DGIXxDoAzjAR/JIIRXioSxiGsY=;
-        b=nPmT3nZCj8Ifn2vQPaoKgqZzHSFQzBpt3Y0naZPvrxsnd4IFQkNEtxStcDwHXC/UKA
-         VP2wySlPhbG0fTgOAM+EUnU7of9TZ6elMhaEpp5H9B/zkqYTR4Dxn859YjamZh8zTlLg
-         HbBxm4GJW8xcBohqHiv5cj66bNfgyL6KgTbNg=
+        d=linaro.org; s=google; t=1677837229;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BfU2QZq8o37GwsmSTNlf3DbhxAQM4goNkdilqnhVkSA=;
+        b=wJ5ey+Ulbdj8SdrY4Gy+p6B6hTrl+rpsR7YCGlZyStFEePOt8zLUNACHVy1hQ0RkR1
+         56saZMavOtLnGEpLoIX3Auwl+uV42CRMo8rpneFLh8Fv5sYKMEptMeZSSR6t/cfbqXNw
+         /iBrt553A1QIWFeOEYyN43bMDo2HRVQKxhSZ2FrAU+XMl6yJCPbOWmV1aR7bOOakhA2+
+         91KV7KjimjMvzQppvtjk+OkIuqKrAHtZl0QTSFsvEgbHe+fotO+wnYcBmusXaHQwS6+J
+         i/kTYtNHHwqTF7sCVdxXio/DAoSu5UN10FVdnXhMCeb+bY45PIwt5Dano2J7oPXFigWB
+         cfGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677814365;
-        h=to:references:message-id:cc:date:in-reply-to:from:subject
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lemNha6CdZ03DdpY+DGIXxDoAzjAR/JIIRXioSxiGsY=;
-        b=WqRc4PKoHjt5TAI7XwwZNO/Vjc6loAChYPVGcjV42OCo9smC5zcG/cvZOslcPd6dXH
-         smbvFXD+mau6nhvtSJWtX6AmVcbBbYg/Y0DR5diDwjZPujba01UWgbBt/M1sVL7l+7ps
-         tKbZGyQ8m57+NnS6oOrKizJhNdAxmQ/rD84lGyPlRdprRVJQZ6FTeqWqJuz32C+dwaTE
-         aBesBk3IrZ6xDiasrkhhlXlZV10D4/DFT2a6DGpsNs58PPAxgEy+ZqyY0SfahZ8bYr6k
-         qiStGqHh2pA9FYIBQE/hc12sdVOtWsiVoyRt+wpuKt2t27Sojn6p7279DZsy8IToJujy
-         S/BA==
-X-Gm-Message-State: AO0yUKXKVD6AfRVIvx3/Tz+WtnbZJEIWvYChm525GWaGwyZcdsdDY4VA
-        pQvq1AOiUXybHlCHwzLb9kHhxg==
-X-Google-Smtp-Source: AK7set/YExY2J9v1FwHxhkrx+vpSlKbYcmsaKdoSGDfyWSmgRomqp7Dmt2eZvX56Dfa+ysW+AOAu0g==
-X-Received: by 2002:a62:6185:0:b0:5a9:d4fa:d3c7 with SMTP id v127-20020a626185000000b005a9d4fad3c7mr762211pfb.7.1677814364987;
-        Thu, 02 Mar 2023 19:32:44 -0800 (PST)
-Received: from smtpclient.apple ([2601:200:c001:9ec0:45cf:6564:e2d8:9372])
-        by smtp.gmail.com with ESMTPSA id z23-20020aa785d7000000b005d6cb790c35sm421449pfn.119.2023.03.02.19.32.42
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 Mar 2023 19:32:44 -0800 (PST)
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_2F6FE8AF-033C-4E1C-86E1-66A770DB9386";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.2\))
-Subject: Re: [PATCH] x86: enable Data Operand Independent Timing Mode
-From:   Roxana Bradescu <roxabee@chromium.org>
-In-Reply-To: <fbf8d93e-2426-67f7-33c6-fe7d1a1a15b2@intel.com>
-Date:   Thu, 2 Mar 2023 19:32:41 -0800
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Adam Langley <agl@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Pawan Kumar Gupta <pawan.kumar.gupta@intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>
-Message-Id: <29D41476-1617-4F6C-9046-82FBE70E01C9@chromium.org>
-References: <20230125012801.362496-1-ebiggers@kernel.org>
- <fbf8d93e-2426-67f7-33c6-fe7d1a1a15b2@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.2)
+        d=1e100.net; s=20210112; t=1677837229;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BfU2QZq8o37GwsmSTNlf3DbhxAQM4goNkdilqnhVkSA=;
+        b=tT4pxphptwyBYAWmW2AlQwmf3JL4/m8EzhhBESxaCEaYZPK33HM8OM4TG39bfllywp
+         GzmyVkBvbBLSiFNgIMeB2wcbmDLsis2WFRgsbVQRHSX0wk+YIuTtpjRP62XhS/w+Et+Q
+         mKFwSlkBP9q2Gvajcb4iHeezdwYDfyeow5dfh7w6eHjaledxGq0VorNgoN95Xc4HznN8
+         K7BClmOvC0u4fSs6wqcbAlIgCAZq0M/apw9dY1LeWvE91w85dWose4y4xaGJ8l9K6hzg
+         IRW8aog80KIwsROM+qo7KO/TltdGE/NlL8Zdqt2hkiZHY1aJrbRZk5JEeJBYRTLYVmHK
+         l9qg==
+X-Gm-Message-State: AO0yUKWonW43JuTzLW7GjrF52svKIZjp5hO5hvVQFvSrAKr3Gceg19lo
+        0xsu5rggv3IWXzG8ZlfDCaqE8A==
+X-Google-Smtp-Source: AK7set9ms3eH4TFT9YSRaBfnqAIhfsByskCFp1zzaguP8QY7uaqTji5lFW0iLhT0rBmNZjVAvDMYRg==
+X-Received: by 2002:a05:6402:784:b0:4ab:554:37e9 with SMTP id d4-20020a056402078400b004ab055437e9mr1168393edy.41.1677837228873;
+        Fri, 03 Mar 2023 01:53:48 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id b30-20020a509f21000000b004a21263bbaasm759095edf.49.2023.03.03.01.53.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Mar 2023 01:53:48 -0800 (PST)
+Message-ID: <5d10fa17-364c-9d90-c083-f338957631a6@linaro.org>
+Date:   Fri, 3 Mar 2023 10:53:46 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 2/9] dt-bindings: crypto: fsl-sec4: convert to DT schema
+Content-Language: en-US
+To:     "Peng Fan (OSS)" <peng.fan@oss.nxp.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+        shawnguo@kernel.org, s.hauer@pengutronix.de
+Cc:     kernel@pengutronix.de, stefan@agner.ch,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Peng Fan <peng.fan@nxp.com>
+References: <20230301015702.3388458-1-peng.fan@oss.nxp.com>
+ <20230301015702.3388458-3-peng.fan@oss.nxp.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230301015702.3388458-3-peng.fan@oss.nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 01/03/2023 02:56, Peng Fan (OSS) wrote:
+> From: Peng Fan <peng.fan@nxp.com>
+> 
+> Convert the fsl-sec4 binding to DT schema
 
---Apple-Mail=_2F6FE8AF-033C-4E1C-86E1-66A770DB9386
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+I don't see the removal part of conversion.
+
+> 
+> Signed-off-by: Peng Fan <peng.fan@nxp.com>
+> ---
+>  .../devicetree/bindings/crypto/fsl-sec4.yaml  | 324 ++++++++++++++++++
+>  1 file changed, 324 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
+
+Filename matching compatible.
+
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml b/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
+> new file mode 100644
+> index 000000000000..678c8389ef49
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
+> @@ -0,0 +1,324 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/fsl-sec4.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NXP SEC4 Crypto Binding
+
+Drop "Binding"
+
+> +
+> +description:
+> +  CONTENTS
+> +    -Overview
+> +    -SEC 4 Node
+> +    -Job Ring Node
+> +    -Run Time Integrity Check (RTIC) Node
+> +    -Run Time Integrity Check (RTIC) Memory Node
+
+????
+
+> +  NOTE, the SEC 4 is also known as Freescale's Cryptographic Accelerator
+> +  Accelerator and Assurance Module (CAAM).
+> +  For information on SEC4 SNVS, ref fsl-sec4-snvs.yaml
+> +
+> +  =====================================================================
+> +  Overview
+> +
+> +  DESCRIPTION
+
+Reformat it to look like normal text. Drop "====", fix title case.
+
+> +
+> +  SEC 4 h/w can process requests from 2 types of sources.
+> +  1. DPAA Queue Interface (HW interface between Queue Manager & SEC 4).
+> +  2. Job Rings (HW interface between cores & SEC 4 registers).
+> +
+> +  High Speed Data Path Configuration,
+> +
+> +  HW interface between QM & SEC 4 and also BM & SEC 4, on DPAA-enabled parts
+> +  such as the P4080.  The number of simultaneous dequeues the QI can make is
+> +  equal to the number of Descriptor Controller (DECO) engines in a particular
+> +  SEC version.  E.g., the SEC 4.0 in the P4080 has 5 DECOs and can thus
+> +  dequeue from 5 subportals simultaneously.
+> +
+> +  Job Ring Data Path Configuration,
+> +
+> +  Each JR is located on a separate 4k page, they may (or may not) be made visible
+> +  in the memory partition devoted to a particular core.  The P4080 has 4 JRs, so
+> +  up to 4 JRs can be configured; and all 4 JRs process requests in parallel.
+> +
+> +maintainers:
+> +  - Peng Fan <peng.fan@nxp.com>
+
+Keep the order of properties like in example-schema.
+
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - fsl,sec-v4.0
+> +
+> +  "#address-cells":
+> +    const: 1
+> +
+> +  "#size-cells":
+> +    const: 1
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  ranges:
+> +    description:
+> +      A standard property. Specifies the physical address range of the SEC
+> +      4.0 register space (-SNVS not included).  A triplet that includes the
+> +      child address, parent address, & length.
+> +
+> +  interrupts:
+> +    description:
+> +      Specifies the interrupts generated by this device.  The value of the
+> +      interrupts property consists of one interrupt specifier. The format
+> +      of the specifier is defined by the binding document describing the
+> +      node's interrupt parent.
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    minItems: 1
+> +    maxItems: 4
+> +
+> +  clock-names:
+> +    oneOf:
+> +      - items:
+> +          - const: mem
+> +          - const: aclk
+> +          - const: ipg
+> +          - const: emi_slow
+> +      - items:
+> +          - const: aclk
+> +          - const: ipg
+> +      - items:
+> +          - const: ipg
+> +          - const: aclk
+> +          - const: mem
+> +
+> +  fsl,sec-era:
+> +    description:
+> +      Optional. A standard property. Define the 'ERA' of the SEC device.
+
+Drop redundant, free form text - optional.
+
+What is a "standard property"? So all others are non-standard? They
+violate standard? What does it mean?
+
+I will actually skip the review as I really do not know if this is new
+binding all conversion.
+
+(...)
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +unevaluatedProperties: false
+
+additionalProperties instead
 
 
+Best regards,
+Krzysztof
 
-> On Feb 3, 2023, at 10:25 AM, Dave Hansen <dave.hansen@intel.com> =
-wrote:
->=20
-> BTW, I'm basically moving forward assuming that we're going to apply
-> this patch in _some_ form.  I'm going to make some changes, but I'll
-> discuss them in this thread to make sure we're all on the same page =
-first.
-
-Just checking in on the changes mentioned here.
-
-> On 1/24/23 17:28, Eric Biggers wrote:
->> +Affected CPUs
->> +-------------
->> +
->> +This vulnerability affects Intel Core family processors based on the =
-Ice Lake
->> +and later microarchitectures, and Intel Atom family processors based =
-on the
->> +Gracemont and later microarchitectures.  For more information, see =
-Intel's
->> +documentation [1]_.
->=20
-> I had a hard time following the docs in this area.
->=20
-> But I'm not sure this statement is correct.  The docs actually say:
->=20
-> 	For Intel=C2=AE Core=E2=84=A2 family processors based on =
-microarchitectures
-> 	before Ice Lake and Intel Atom=C2=AE family processors based on
-> 	microarchitectures before Gracemont that do not enumerate
-> 	IA32_UARCH_MISC_CTL, developers may assume that the instructions
-> 	listed here operate as if DOITM is enabled.
-
-Have we been able to clarify if this assumption is guaranteed?
-
->=20
-> A processor needs to be before "Ice Lake" and friends *AND* not
-> enumerate IA32_UARCH_MISC_CTL to be unaffected.
->=20
-> There's also another tweak that's needed because:
->=20
-> 	Processors that do not enumerate IA32_ARCH_CAPABILITIES[DOITM]
-> 	when the latest microcode is applied do not need to set
-> 	IA32_UARCH_MISC_CTL [DOITM] in order to have the behavior
-> 	described in this document...
->=20
-> First, we need to mention the "latest microcode" thing in the kernel
-> docs.  I also _think_ the whole "microarchitectures before" stuff is
-> rather irrelevant and we can simplify this down to:
->=20
-> 	This vulnerability affects all Intel processors that support
-> 	MSR_IA32_ARCH_CAPABILITIES and set =
-MSR_IA32_ARCH_CAPABILITIES[DOITM]
-> 	when the latest microcode is applied.
->=20
-
-Certainly a lot cleaner. Would be great if the Intel docs reflected =
-this.
-
-=E2=80=94
-Regards, Roxana
-
-
-> Which reminds me.  This:
->=20
->> +void update_doitm_msr(void)
->> +{
->> +	u64 msr;
->> +
->> +	if (doitm_off)
->> +		return;
->> +
->> +	rdmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
->> +	wrmsrl(MSR_IA32_UARCH_MISC_CTL, msr | UARCH_MISC_DOITM);
->> +}
->=20
-> should probably be:
->=20
-> void update_doitm_msr(void)
-> {
-> 	u64 msr;
->=20
-> 	/*
-> 	 * All processors that enumerate support for DOIT
-> 	 * are affected *and* have the mitigation available.
-> 	 */
-> 	if (!boot_cpu_has_bug(X86_BUG_DODT))
-> 		return;
->=20
-> 	rdmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
-> 	if (doitm_off)
-> 		msr &=3D ~UARCH_MISC_DOITM;
-> 	else
-> 		msr |=3D UARCH_MISC_DOITM;
-> 	wrmsrl(MSR_IA32_UARCH_MISC_CTL, msr);
-> }
->=20
-> in case the CPU isn't actually coming out of reset, like if kexec() =
-left
-> DOITM=3D1.
->=20
-
-
---Apple-Mail=_2F6FE8AF-033C-4E1C-86E1-66A770DB9386
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEgZzAKV63cJrecgABXEIiv89pXdUFAmQBalkACgkQXEIiv89p
-XdVLvA//fTFy+1BHiMaqGNYoPma392WQGm3Y/qzx/bVE9r1fwhMrqk/yZ2GPw+L0
-C8JprobKgy9/4xHx5AEaw9zASJVg7beTfsyqZ8bqpx5uA4Ct2G/nzljOl/NEWXFE
-pGRCzeluyG17qBrARsQXM6/sXhHHSPeFTgl80DkW+CJgy9PjjPxvp2oURyOx8bLr
-Y1bgyFMHJhHuMpXHNyneqSMnngSFybB084YcYkLhsLmL7YMT1IEOYdEkPWB+F/ta
-9KYI7HMA1PKRsFtSDmGahujFLXT3QrQ8UpODp1+leUxEjwDe5F6crZmWbzTMu0xj
-jqUgTbG2QHcD895trUSBU499PIeCOU4CUJoCBFoXe0O/5oa911teyfwjTHxRXAri
-42KX1nlh6nwfDrKHVEuJXxn03MyzSXpxTQtzM7MKrejXcZTuH0HOjB0kCpo9sSR7
-774y2nFhSRTxpl6eldK4Gq5wy7dszfsHe9PV0n1+AwqO3x8Azj1MO5tfAld0Y/y9
-fpL7XHrS4sEc6rnR9USkYy2P5kaPx7v3WxtRuc57beGAo3xwqUOKmQ6SglOQI8u3
-51TWfAhmzZBSVa4S7NiAeGCvKLSX0IoAuExNbWq5oOQCQ0EAkMSv+LendkwIFIaB
-P/deUgANTrk5/kCM69USslq7H0HAxH+ltu3cyawgirILwS5NICk=
-=8hd8
------END PGP SIGNATURE-----
-
---Apple-Mail=_2F6FE8AF-033C-4E1C-86E1-66A770DB9386--
