@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B862C7EE2F
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 16:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4CDC7EE2F
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Mar 2023 16:52:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbjCCQvu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Mar 2023 11:51:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33666 "EHLO
+        id S231485AbjCCQwE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 3 Mar 2023 11:52:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231334AbjCCQvo (ORCPT
+        with ESMTP id S231408AbjCCQvp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Mar 2023 11:51:44 -0500
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2072.outbound.protection.outlook.com [40.107.101.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E046112848;
-        Fri,  3 Mar 2023 08:51:13 -0800 (PST)
+        Fri, 3 Mar 2023 11:51:45 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D1715D751;
+        Fri,  3 Mar 2023 08:51:17 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EM5uJPzMnZVWAvgzVPcmbSnMCHXp2NDaM31ktJYyrTHaeN9h3KN9khKT7jw/vGn3DfrL9EttYeG21DxAvERo1WmBjyPYWGQmSn5iXRqD5uZFUfkQKRMkWjxFi5drnTPQa+ZjVewthA8W5JlnARwFToV3HdtfPMrSloTNzPNNZfabYi0SEE6DQiOMBkTCyyPw9hjW1tOSBBCjbunI/2IjQDxKKTqq3yFzp76+jxdmvVODFWDT3Zd7T15fukR9Zei/gR651GMlAMypF/8bg9Kk4O2iyKZI4JIhxUXGlSi30Op+aJANY8Z7xPz1r0WQH5JIin789Cni9eeWNC5zI2FjVw==
+ b=DB2irz+zjOMxAwh9Qh931gQk3UBHOYQ+nXQ+T7pJNJrtxczcRIiLWUBYmarxlOm6Gpw63WAq8jJ12Zc/qPsJX1cj3WnWmaAnwNKaUpGFhaQHFtOHFeTTN7ce5oURrXHY1iSnje5f6Q/tvXpHsgPgGDSd5KcyMA444SYoJkY7Nw9QKjDX2aQGEONCb0hUVefzVa+GTIZeOm+mGFv79S0McPeo2UhZg/iIdS/1k+622hHxdRa6m1Pn4epLAJ/3sPYunOgTfC7vOmynY+Pg2D70+ENyvLwoa546uyK1uB1CDdXtQOMg94ScL6X9xTTc7Wa+QGSxTbpPmRIGGU2vp4Uu1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kfflMQlRqlfc0MTGimRe5sWiBTQCZl0arRarSLe/4/Y=;
- b=BvjE3wfA8FbYvGGkVMqAfeCUqVrLW2U6LA3jKXn0fT6g5F2SGJjbDe2lN2Xe4viEIOzBVei4L+ewH0nJL8iqwiArPcox/j7L4IYsR5uFTLGAvrAlhqL2AIHXguil95Q1G71z41Maz7dwBS4B20RaiZzwU0anGF5eFnxn1ImmGkssZr7iatMtPKslEGoq7WPnKLxbKds0HxtPiIIPBa02gQ4didcC+aPwgtW19VwupYNCREK7uuBvatKcVzvkx8IYr8S8fExQ83YI9Kv8Kyup1bgWR0085OTsz/njJheiB7oJVoSacGrV1IGyR9UTHruGjuMV7OPbiBTqaZjkcdJXjQ==
+ bh=miIKd2uqEYODxld1Xk6KNcz1a3s+EFrV/93HLXFqcRk=;
+ b=eYpHZUAWCxCpUx62dmH1+8RBZB2TPQ0ZunP7IZKmEgvCLDi2KTnnif3+bcoAqTjnTwpsYNqIg6frQOknH6E3tQ7rmrS4+MubZfceY987InNCxPAbvSQmkMX5ggMoGTRB4W/Cm/o4F+EgzvOwbXVJSv5lIQeFtwNrusOGcAxWRfVy5LtqjZH2Q2B+i0J3HUJgR0gIS6U5+kSblSMv/s10fEyBNFGcNJqsIeKMeUEbshA9+SazH5AJrz1wTlStf86xkKZkBsVjEUm4+3bFdiWFo/iPvHCHmOJ8OCYS1OfDcAcuwwB98b8bbAFjbOO8cYdneYQgfVq7DADYkTQfjRI90g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=semihalf.com smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kfflMQlRqlfc0MTGimRe5sWiBTQCZl0arRarSLe/4/Y=;
- b=Od69w66uCzYPz8IK0BInEbEiigjpPIDsAuNWMWHYfmQJ21jEXsApTTU1Bn/Nh6SC8SKo1gGBG3fuDYwkxrSrOV3L9Wct15TYDQIgJJSAPt7ZfOv9nzGdyPs60M+6oLlAoD/OPKn4MfGeslSrz52GldkBzlfr4mW9snhbD939tZQ=
-Received: from MW4PR04CA0159.namprd04.prod.outlook.com (2603:10b6:303:85::14)
- by CO6PR12MB5491.namprd12.prod.outlook.com (2603:10b6:303:13b::8) with
+ bh=miIKd2uqEYODxld1Xk6KNcz1a3s+EFrV/93HLXFqcRk=;
+ b=MS8SfrmzSrmfRiNXXGxtRwf7jgXtLJtHP50Rqmhpu2lB2AVvUU/h+HxMBUzikki9rlfwr935CcXhBx73qrvfdmrwAcr3lsrmSgsU/+DT8j999xilTVpzxh4cJyNakAIRpp51SFYka1orJyEgRmoYpuVSL//fyyBrrXO2KXlMS60=
+Received: from MW4PR04CA0168.namprd04.prod.outlook.com (2603:10b6:303:85::23)
+ by IA1PR12MB6188.namprd12.prod.outlook.com (2603:10b6:208:3e4::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.22; Fri, 3 Mar
- 2023 16:51:11 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.19; Fri, 3 Mar
+ 2023 16:51:15 +0000
 Received: from CO1NAM11FT054.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:85:cafe::e8) by MW4PR04CA0159.outlook.office365.com
- (2603:10b6:303:85::14) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:303:85:cafe::90) by MW4PR04CA0168.outlook.office365.com
+ (2603:10b6:303:85::23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.22 via Frontend
- Transport; Fri, 3 Mar 2023 16:51:11 +0000
+ Transport; Fri, 3 Mar 2023 16:51:15 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -49,29 +49,24 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CO1NAM11FT054.mail.protection.outlook.com (10.13.174.70) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6156.22 via Frontend Transport; Fri, 3 Mar 2023 16:51:10 +0000
+ 15.20.6156.22 via Frontend Transport; Fri, 3 Mar 2023 16:51:15 +0000
 Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 3 Mar
- 2023 10:51:08 -0600
+ 2023 10:51:12 -0600
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     =?UTF-8?q?Jan=20D=C4=85bro=C5=9B?= <jsd@semihalf.com>,
         Grzegorz Bernacki <gjb@semihalf.com>,
         <Rijo-john.Thomas@amd.com>, <Thomas.Lendacky@amd.com>,
         <herbert@gondor.apana.org.au>,
         Tom Lendacky <thomas.lendacky@amd.com>,
-        "John Allen" <john.allen@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "Jarkko Nikula" <jarkko.nikula@linux.intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>
+        "John Allen" <john.allen@amd.com>
 CC:     Mario Limonciello <mario.limonciello@amd.com>,
         "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>
-Subject: [PATCH v3 3/9] crypto: ccp: Move some PSP mailbox bit definitions into common header
-Date:   Fri, 3 Mar 2023 10:50:41 -0600
-Message-ID: <20230303165050.2918-4-mario.limonciello@amd.com>
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3 5/9] crypto: ccp: Enable platform access interface on client PSP parts
+Date:   Fri, 3 Mar 2023 10:50:43 -0600
+Message-ID: <20230303165050.2918-6-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230303165050.2918-1-mario.limonciello@amd.com>
 References: <20230303165050.2918-1-mario.limonciello@amd.com>
@@ -83,247 +78,61 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT054:EE_|CO6PR12MB5491:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a7907b1-0920-4917-c843-08db1c077e0b
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT054:EE_|IA1PR12MB6188:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0827aafe-f93f-4609-d725-08db1c0780b0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qRUYT6FH2KC7DKCZv0nzyNXmjuYskV9nM5VIiE59eNxlBDFBWQF1oxZYe3aabmCTf1uJpVNmQCFI7sfz2NzhmXX5Dx4z0B4hJlk4YliACVolHOrnOUN/E6JN7skuHQjLzb/ekbjScwt9Eo8om3ocvDdZIytEfAsBLUj/YdUlxzqxDgcTEs34ZkyL8c7z98mbeacjCj+iR7Qv9nE37wZmqtZPte4xP0TEYaSHTX3kqLbsPQn7vcvg8abC2Iemo9/UTa0ddwq4I1n56gwpN+E2rKCS4rC7wBf6DZxX5bjg2pU8NkMdegjKaJBYW4hb4SAKLPp/qyULPmVlPKiMWSiWH9oaHJb5XwBfMPPlizPQJyqhOavIchxoFB7Asmr5dDl1I1q8Vr6E1xONRbQ6a7g+vIkmdxBR5q+AvFYLerkFRte0mBjaBhYpUsVyinF7sA0C4VYo1dS3pU/skFK4O8MLd+v3/305SmqYXiSqTNlfeYgi04xBlP8RPphjPn0SNh5VfHXytOxCeAgI2gFcUDnnz4il050XBd2tL7puqIGYgEnzoU7/rLnU1gYqoyoCuXh/tsP9tFKI3KdgdWwWAU02QgJb3UmvtU6cOWZeAysZLL1evnvIicZwt2nBO4oz8fS4HpxiSff5aHiLwBKzF4QW3ZanvdUkNYEdQugkR97BFripP8DKZ7QNImxhHDDw2hne/ehRPoXz8LsuJ9nbIbXExZwgU+DibGTlNRVmL9yW0fnkOWw3x7RnqwO//I69QQPs
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(136003)(396003)(39860400002)(346002)(451199018)(40470700004)(36840700001)(46966006)(83380400001)(426003)(36860700001)(47076005)(36756003)(40460700003)(6666004)(82740400003)(8936002)(7416002)(5660300002)(81166007)(478600001)(2906002)(921005)(356005)(40480700001)(86362001)(82310400005)(2616005)(16526019)(186003)(336012)(26005)(1076003)(4326008)(70586007)(8676002)(70206006)(7696005)(44832011)(15650500001)(316002)(54906003)(110136005)(41300700001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: oTMZ+H8zcbbeTvIbpClFs1nODM/Pm/LE8RbctVzjMQ6pC1ZtpMXXR1FJ4UyMlsdmm0qgarRrf3II41TBTWkR91GCWkB/K1HA3XE9BnB2C6rks302GEwRtLq1vFie82bwTuwqvM3j+PXNTR0c+xanXbu770O9Bond9i1pez2YzWxUtwFPpygcgJzD3OILqqaCfOxsMWue3UMebNLxLpgtCke4QrqLVrqpmJWO6ZpQTbAQXdW1l6UWpA4loVN75UC2qX1muiZDCKoUdN+jALZTTRjBAsVHPAfr9/MSIv0H0WYwhR14LdxP4w5RpQbU9mV8tCMCLZkEuIUkdnxV+PdWV+ckIxECnKTNcGzxJ/ldd8+m690Xzw1OCfUXgZg22K6kgJrVIutvVtFQs66OsAQDGQLDCflMTdIcU8fhgP8xadTGz1uyafq/D3L4sv07r+iChm6Z0FDf6AiphqYCRcQ/xh4+aCOZ2FRuh1/yAIzqWSgJqHccYRU+bsG+TcRmaf3miFIESSdJ/pC+wdu7gq6Qrz0sFJEyBWBy4bKscXMm4x3TfK3PyRyBaqM8s+rUb2h/KJ/diYgsfujWctlUUUJWY1AgxnDdJGDQUXAi/0gfI0YLexm6tcflifNaamRc0FNM81al5W/K0z5B7TI2OZbt0J5Z0dx99bAsBvPAu44T17FBn6e3cf5wsRMic9fDeeQkLQ5HNaCtrYdVJStThBoYGvxnWbzKGMpA/MmUoDFFw3Q=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(376002)(396003)(136003)(346002)(451199018)(40470700004)(46966006)(36840700001)(86362001)(36756003)(82310400005)(8676002)(40460700003)(40480700001)(4326008)(70206006)(186003)(70586007)(336012)(41300700001)(8936002)(2616005)(16526019)(6636002)(54906003)(316002)(110136005)(478600001)(7696005)(6666004)(1076003)(26005)(5660300002)(82740400003)(356005)(81166007)(83380400001)(47076005)(426003)(36860700001)(44832011)(2906002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2023 16:51:10.6544
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2023 16:51:15.0916
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a7907b1-0920-4917-c843-08db1c077e0b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0827aafe-f93f-4609-d725-08db1c0780b0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT054.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5491
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6188
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some of the bits and fields used for mailboxes communicating with the
-PSP are common across all mailbox implementations (SEV, TEE, etc).
+Client PSP parts support the platform access interface. Add
+the register offsets so that client parts will initialize this
+interface.
 
-Move these bits into the common `linux/psp.h` so they don't need to
-be re-defined for each implementation.
-
-Acked-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
-v2->v3:
- * Pick up tags
-v1->v2:
- * Update comment to indicate it's PSP response not PSP ready
----
- drivers/crypto/ccp/psp-dev.h               |  3 ---
- drivers/crypto/ccp/sev-dev.c               | 15 +++++++--------
- drivers/crypto/ccp/sev-dev.h               |  2 +-
- drivers/crypto/ccp/tee-dev.c               | 15 ++++++++-------
- drivers/i2c/busses/i2c-designware-amdpsp.c | 16 +++++-----------
- include/linux/psp.h                        | 12 ++++++++++++
- 6 files changed, 33 insertions(+), 30 deletions(-)
+ drivers/crypto/ccp/sp-pci.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index 06e1f317216d..55f54bb2b3fb 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -17,9 +17,6 @@
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index cde33b2ac71b..18aa902eb5ce 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -361,6 +361,12 @@ static const struct tee_vdata teev1 = {
+ 	.ring_rptr_reg          = 0x10554,	/* C2PMSG_21 */
+ };
  
- #include "sp-dev.h"
- 
--#define PSP_CMDRESP_RESP		BIT(31)
--#define PSP_CMDRESP_ERR_MASK		0xffff
--
- #define MAX_PSP_NAME_LEN		16
- 
- extern struct psp_device *psp_master;
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 28945ca7c856..6440d35dfa4e 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -7,6 +7,7 @@
-  * Author: Brijesh Singh <brijesh.singh@amd.com>
-  */
- 
-+#include <linux/bitfield.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/kthread.h>
-@@ -103,7 +104,7 @@ static void sev_irq_handler(int irq, void *data, unsigned int status)
- 
- 	/* Check if it is SEV command completion: */
- 	reg = ioread32(sev->io_regs + sev->vdata->cmdresp_reg);
--	if (reg & PSP_CMDRESP_RESP) {
-+	if (FIELD_GET(PSP_CMDRESP_RESP, reg)) {
- 		sev->int_rcvd = 1;
- 		wake_up(&sev->int_queue);
- 	}
-@@ -347,9 +348,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 
- 	sev->int_rcvd = 0;
- 
--	reg = cmd;
--	reg <<= SEV_CMDRESP_CMD_SHIFT;
--	reg |= SEV_CMDRESP_IOC;
-+	reg = FIELD_PREP(SEV_CMDRESP_CMD, cmd) | SEV_CMDRESP_IOC;
- 	iowrite32(reg, sev->io_regs + sev->vdata->cmdresp_reg);
- 
- 	/* wait for command completion */
-@@ -367,11 +366,11 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	psp_timeout = psp_cmd_timeout;
- 
- 	if (psp_ret)
--		*psp_ret = reg & PSP_CMDRESP_ERR_MASK;
-+		*psp_ret = FIELD_GET(PSP_CMDRESP_STS, reg);
- 
--	if (reg & PSP_CMDRESP_ERR_MASK) {
--		dev_dbg(sev->dev, "sev command %#x failed (%#010x)\n",
--			cmd, reg & PSP_CMDRESP_ERR_MASK);
-+	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
-+		dev_dbg(sev->dev, "sev command %#x failed (%#010lx)\n",
-+			cmd, FIELD_GET(PSP_CMDRESP_STS, reg));
- 		ret = -EIO;
- 	} else {
- 		ret = sev_write_init_ex_file_if_required(cmd);
-diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-index 666c21eb81ab..778c95155e74 100644
---- a/drivers/crypto/ccp/sev-dev.h
-+++ b/drivers/crypto/ccp/sev-dev.h
-@@ -25,8 +25,8 @@
- #include <linux/miscdevice.h>
- #include <linux/capability.h>
- 
-+#define SEV_CMDRESP_CMD			GENMASK(26, 16)
- #define SEV_CMD_COMPLETE		BIT(1)
--#define SEV_CMDRESP_CMD_SHIFT		16
- #define SEV_CMDRESP_IOC			BIT(0)
- 
- struct sev_misc_dev {
-diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-index f24fc953718a..5560bf8329a1 100644
---- a/drivers/crypto/ccp/tee-dev.c
-+++ b/drivers/crypto/ccp/tee-dev.c
-@@ -8,6 +8,7 @@
-  * Copyright (C) 2019,2021 Advanced Micro Devices, Inc.
-  */
- 
-+#include <linux/bitfield.h>
- #include <linux/types.h>
- #include <linux/mutex.h>
- #include <linux/delay.h>
-@@ -69,7 +70,7 @@ static int tee_wait_cmd_poll(struct psp_tee_device *tee, unsigned int timeout,
- 
- 	while (--nloop) {
- 		*reg = ioread32(tee->io_regs + tee->vdata->cmdresp_reg);
--		if (*reg & PSP_CMDRESP_RESP)
-+		if (FIELD_GET(PSP_CMDRESP_RESP, *reg))
- 			return 0;
- 
- 		usleep_range(10000, 10100);
-@@ -149,9 +150,9 @@ static int tee_init_ring(struct psp_tee_device *tee)
- 		goto free_buf;
- 	}
- 
--	if (reg & PSP_CMDRESP_ERR_MASK) {
--		dev_err(tee->dev, "tee: ring init command failed (%#010x)\n",
--			reg & PSP_CMDRESP_ERR_MASK);
-+	if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
-+		dev_err(tee->dev, "tee: ring init command failed (%#010lx)\n",
-+			FIELD_GET(PSP_CMDRESP_STS, reg));
- 		tee_free_ring(tee);
- 		ret = -EIO;
- 	}
-@@ -179,9 +180,9 @@ static void tee_destroy_ring(struct psp_tee_device *tee)
- 	ret = tee_wait_cmd_poll(tee, TEE_DEFAULT_TIMEOUT, &reg);
- 	if (ret) {
- 		dev_err(tee->dev, "tee: ring destroy command timed out\n");
--	} else if (reg & PSP_CMDRESP_ERR_MASK) {
--		dev_err(tee->dev, "tee: ring destroy command failed (%#010x)\n",
--			reg & PSP_CMDRESP_ERR_MASK);
-+	} else if (FIELD_GET(PSP_CMDRESP_STS, reg)) {
-+		dev_err(tee->dev, "tee: ring destroy command failed (%#010lx)\n",
-+			FIELD_GET(PSP_CMDRESP_STS, reg));
- 	}
- 
- free_ring:
-diff --git a/drivers/i2c/busses/i2c-designware-amdpsp.c b/drivers/i2c/busses/i2c-designware-amdpsp.c
-index 80f28a1bbbef..652e6b64bd5f 100644
---- a/drivers/i2c/busses/i2c-designware-amdpsp.c
-+++ b/drivers/i2c/busses/i2c-designware-amdpsp.c
-@@ -25,12 +25,6 @@
- #define PSP_I2C_REQ_STS_BUS_BUSY	0x1
- #define PSP_I2C_REQ_STS_INV_PARAM	0x3
- 
--#define PSP_MBOX_FIELDS_STS		GENMASK(15, 0)
--#define PSP_MBOX_FIELDS_CMD		GENMASK(23, 16)
--#define PSP_MBOX_FIELDS_RESERVED	GENMASK(29, 24)
--#define PSP_MBOX_FIELDS_RECOVERY	BIT(30)
--#define PSP_MBOX_FIELDS_READY		BIT(31)
--
- struct psp_req_buffer_hdr {
- 	u32 total_size;
- 	u32 status;
-@@ -99,15 +93,15 @@ static int psp_check_mbox_recovery(struct psp_mbox __iomem *mbox)
- 
- 	tmp = readl(&mbox->cmd_fields);
- 
--	return FIELD_GET(PSP_MBOX_FIELDS_RECOVERY, tmp);
-+	return FIELD_GET(PSP_CMDRESP_RECOVERY, tmp);
- }
- 
- static int psp_wait_cmd(struct psp_mbox __iomem *mbox)
- {
- 	u32 tmp, expected;
- 
--	/* Expect mbox_cmd to be cleared and ready bit to be set by PSP */
--	expected = FIELD_PREP(PSP_MBOX_FIELDS_READY, 1);
-+	/* Expect mbox_cmd to be cleared and the response bit to be set by PSP */
-+	expected = FIELD_PREP(PSP_CMDRESP_RESP, 1);
- 
- 	/*
- 	 * Check for readiness of PSP mailbox in a tight loop in order to
-@@ -124,7 +118,7 @@ static u32 psp_check_mbox_sts(struct psp_mbox __iomem *mbox)
- 
- 	cmd_reg = readl(&mbox->cmd_fields);
- 
--	return FIELD_GET(PSP_MBOX_FIELDS_STS, cmd_reg);
-+	return FIELD_GET(PSP_CMDRESP_STS, cmd_reg);
- }
- 
- static int psp_send_cmd(struct psp_i2c_req *req)
-@@ -148,7 +142,7 @@ static int psp_send_cmd(struct psp_i2c_req *req)
- 	writeq(req_addr, &mbox->i2c_req_addr);
- 
- 	/* Write command register to trigger processing */
--	cmd_reg = FIELD_PREP(PSP_MBOX_FIELDS_CMD, PSP_I2C_REQ_BUS_CMD);
-+	cmd_reg = FIELD_PREP(PSP_CMDRESP_CMD, PSP_I2C_REQ_BUS_CMD);
- 	writel(cmd_reg, &mbox->cmd_fields);
- 
- 	if (psp_wait_cmd(mbox))
-diff --git a/include/linux/psp.h b/include/linux/psp.h
-index 202162487ec3..d3424790a70e 100644
---- a/include/linux/psp.h
-+++ b/include/linux/psp.h
-@@ -11,4 +11,16 @@
- #define __psp_pa(x)	__pa(x)
- #endif
- 
-+/*
-+ * Fields and bits used by most PSP mailboxes
-+ *
-+ * Note: Some mailboxes (such as SEV) have extra bits or different meanings
-+ * and should include an appropriate local definition in their source file.
-+ */
-+#define PSP_CMDRESP_STS		GENMASK(15, 0)
-+#define PSP_CMDRESP_CMD		GENMASK(23, 16)
-+#define PSP_CMDRESP_RESERVED	GENMASK(29, 24)
-+#define PSP_CMDRESP_RECOVERY	BIT(30)
-+#define PSP_CMDRESP_RESP	BIT(31)
++static const struct platform_access_vdata pa_v1 = {
++	.cmdresp_reg		= 0x10570,	/* C2PMSG_28 */
++	.cmdbuff_addr_lo_reg	= 0x10574,	/* C2PMSG_29 */
++	.cmdbuff_addr_hi_reg	= 0x10578,	/* C2PMSG_30 */
++};
 +
- #endif /* __PSP_H */
+ static const struct psp_vdata pspv1 = {
+ 	.sev			= &sevv1,
+ 	.feature_reg		= 0x105fc,	/* C2PMSG_63 */
+@@ -377,6 +383,7 @@ static const struct psp_vdata pspv2 = {
+ 
+ static const struct psp_vdata pspv3 = {
+ 	.tee			= &teev1,
++	.platform_access	= &pa_v1,
+ 	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
+ 	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
+ 	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
 -- 
 2.34.1
 
