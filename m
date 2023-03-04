@@ -2,397 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D436C64EC4
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Mar 2023 09:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0D9C6FD19
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Mar 2023 20:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbjCDJiC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Mar 2023 04:38:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57772 "EHLO
+        id S229678AbjCDUPB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 4 Mar 2023 15:15:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbjCDJhs (ORCPT
+        with ESMTP id S229484AbjCDUPA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Mar 2023 04:37:48 -0500
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9520424C9C;
-        Sat,  4 Mar 2023 01:37:39 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pYOKQ-000GZs-8d; Sat, 04 Mar 2023 17:37:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 04 Mar 2023 17:37:22 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Sat, 04 Mar 2023 17:37:22 +0800
-Subject: [v5 PATCH 7/7] crypto: stm32 - Save and restore between each request
-References: <ZAMQjOdi8GfqDUQI@gondor.apana.org.au>
-To:     Linus Walleij <linus.walleij@linaro.org>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
-Message-Id: <E1pYOKQ-000GZs-8d@formenos.hmeau.com>
+        Sat, 4 Mar 2023 15:15:00 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E9C18169;
+        Sat,  4 Mar 2023 12:14:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 08C8EB808D0;
+        Sat,  4 Mar 2023 20:14:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21BEFC433EF;
+        Sat,  4 Mar 2023 20:14:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677960896;
+        bh=3r578BL7TwpWHlpQ0on74A4ds7yYrKerlhknBqHE0IQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Of74lGgrQfr/3MT85Mry+dk98AnwqBx/+IKkV8dz7hpunpG/juil6jblXMxLIcXBH
+         otDFXzf26WX1vIQfjtEdOfRcHdWgRJ6boGHh/XsJsH/L1/dtv7Z5jnzlaj2op2B4o4
+         nGMfOtYx0YzF4FQmz+EBu9ckLQPtV3mUYeJDCdB5elK/H55dP2tJpt/pvCT6I8ESZS
+         EYIJw0pgzfvvru+19Oo2drthgeVkF5beApFrnmEAqghgBqsbpzQmm5hoht9HFoxh3N
+         3kN6/VWB+pginmwR+OoqxqA0Q70T/VI0WywY3cn/oA7H6RmGx2NYH+NcaRO0HJUqAa
+         NE+vFF1/bWCDg==
+Date:   Sat, 4 Mar 2023 20:14:53 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Clark <robdclark@gmail.com>,
+        Abhinav Kumar <quic_abhinavk@quicinc.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Sean Paul <sean@poorly.run>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Kishon Vijay Abraham I <kishon@kernel.org>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-phy@lists.infradead.org, linux-gpio@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-riscv@lists.infradead.org,
+        linux-spi@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: yamllint: Require a space after a comment
+ '#'
+Message-ID: <ZAOmvQMn+7R9KcVx@sirena.org.uk>
+References: <20230303214223.49451-1-robh@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="DpC9JxmBtx/VM1Dr"
+Content-Disposition: inline
+In-Reply-To: <20230303214223.49451-1-robh@kernel.org>
+X-Cookie: Single tasking: Just Say No.
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Crypto API hashing paradigm requires the hardware state to
-be exported between *each* request because multiple unrelated
-hashes may be processed concurrently.
 
-The stm32 hardware is capable of producing the hardware hashing
-state but it was only doing it in the export function.  This is
-not only broken for export as you can't export a kernel pointer
-and reimport it, but it also means that concurrent hashing was
-fundamentally broken.
+--DpC9JxmBtx/VM1Dr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Fix this by moving the saving and restoring of hardware hash
-state between each and every hashing request.
+On Fri, Mar 03, 2023 at 03:42:23PM -0600, Rob Herring wrote:
+> Enable yamllint to check the prefered commenting style of requiring a
+> space after a comment character '#'. Fix the cases in the tree which
+> have a warning with this enabled. Most cases just need a space after the
+> '#'. A couple of cases with comments which were not intended to be
+> comments are revealed. Those were in ti,sa2ul.yaml, ti,cal.yaml, and
+> brcm,bcmgenet.yaml.
 
-Also change the emptymsg check in stm32_hash_copy_hash to rely
-on whether we have any existing hash state, rather than whether
-this particular update request is empty.  
+Acked-by: Mark Brown <broonie@kernel.org>
 
-Fixes: 8a1012d3f2ab ("crypto: stm32 - Support for STM32 HASH module")
-Reported-by: Li kunyu <kunyu@nfschina.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+--DpC9JxmBtx/VM1Dr
+Content-Type: application/pgp-signature; name="signature.asc"
 
- drivers/crypto/stm32/stm32-hash.c |  172 +++++++++++++-------------------------
- 1 file changed, 62 insertions(+), 110 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index fd9189472235..85da2aa93017 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -95,6 +95,7 @@
- #define HASH_FLAGS_SHA1			BIT(19)
- #define HASH_FLAGS_SHA224		BIT(20)
- #define HASH_FLAGS_SHA256		BIT(21)
-+#define HASH_FLAGS_EMPTY		BIT(22)
- #define HASH_FLAGS_HMAC			BIT(23)
- 
- #define HASH_OP_UPDATE			1
-@@ -134,7 +135,7 @@ struct stm32_hash_state {
- 	u8 buffer[HASH_BUFLEN] __aligned(4);
- 
- 	/* hash state */
--	u32			*hw_context;
-+	u32			hw_context[3 + HASH_CSR_REGISTER_NUMBER];
- };
- 
- struct stm32_hash_request_ctx {
-@@ -314,8 +315,11 @@ static void stm32_hash_write_ctrl(struct stm32_hash_dev *hdev, int bufcnt)
- 		 * On the Ux500 we need to set a special flag to indicate that
- 		 * the message is zero length.
- 		 */
--		if (hdev->pdata->ux500 && bufcnt == 0)
-+		if (hdev->pdata->ux500 && bufcnt == 0 &&
-+		    (state->flags & HASH_FLAGS_FINAL)) {
- 			reg |= HASH_CR_UX500_EMPTYMSG;
-+			state->flags |= HASH_FLAGS_EMPTY;
-+		}
- 
- 		if (!hdev->polled)
- 			stm32_hash_write(hdev, HASH_IMR, HASH_DCIE);
-@@ -419,7 +423,9 @@ static int stm32_hash_update_cpu(struct stm32_hash_dev *hdev)
- {
- 	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(hdev->req);
- 	struct stm32_hash_state *state = &rctx->state;
-+	u32 *preg = state->hw_context;
- 	int bufcnt, err = 0, final;
-+	int i;
- 
- 	dev_dbg(hdev->dev, "%s flags %x\n", __func__, state->flags);
- 
-@@ -440,9 +446,24 @@ static int stm32_hash_update_cpu(struct stm32_hash_dev *hdev)
- 	if (final) {
- 		bufcnt = state->bufcnt;
- 		state->bufcnt = 0;
--		err = stm32_hash_xmit_cpu(hdev, state->buffer, bufcnt, 1);
-+		return stm32_hash_xmit_cpu(hdev, state->buffer, bufcnt, 1);
- 	}
- 
-+	if (!(hdev->flags & HASH_FLAGS_INIT))
-+		return 0;
-+
-+	if (stm32_hash_wait_busy(hdev))
-+		return -ETIMEDOUT;
-+
-+	if (!hdev->pdata->ux500)
-+		*preg++ = stm32_hash_read(hdev, HASH_IMR);
-+	*preg++ = stm32_hash_read(hdev, HASH_STR);
-+	*preg++ = stm32_hash_read(hdev, HASH_CR);
-+	for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
-+		*preg++ = stm32_hash_read(hdev, HASH_CSR(i));
-+
-+	state->flags |= HASH_FLAGS_INIT;
-+
- 	return err;
- }
- 
-@@ -824,7 +845,7 @@ static void stm32_hash_copy_hash(struct ahash_request *req)
- 	__be32 *hash = (void *)rctx->digest;
- 	unsigned int i, hashsize;
- 
--	if (hdev->pdata->broken_emptymsg && !req->nbytes)
-+	if (hdev->pdata->broken_emptymsg && (state->flags & HASH_FLAGS_EMPTY))
- 		return stm32_hash_emptymsg_fallback(req);
- 
- 	switch (state->flags & HASH_FLAGS_ALGO_MASK) {
-@@ -874,11 +895,6 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
- 	if (!err && (HASH_FLAGS_FINAL & hdev->flags)) {
- 		stm32_hash_copy_hash(req);
- 		err = stm32_hash_finish(req);
--		hdev->flags &= ~(HASH_FLAGS_FINAL | HASH_FLAGS_CPU |
--				 HASH_FLAGS_INIT | HASH_FLAGS_DMA_READY |
--				 HASH_FLAGS_OUTPUT_READY | HASH_FLAGS_HMAC |
--				 HASH_FLAGS_HMAC_INIT | HASH_FLAGS_HMAC_FINAL |
--				 HASH_FLAGS_HMAC_KEY);
- 	}
- 
- 	pm_runtime_mark_last_busy(hdev->dev);
-@@ -887,66 +903,54 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
- 	crypto_finalize_hash_request(hdev->engine, req, err);
- }
- 
--static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
--			      struct stm32_hash_request_ctx *rctx)
--{
--	pm_runtime_get_sync(hdev->dev);
--
--	if (!(HASH_FLAGS_INIT & hdev->flags)) {
--		stm32_hash_write(hdev, HASH_CR, HASH_CR_INIT);
--		stm32_hash_write(hdev, HASH_STR, 0);
--		stm32_hash_write(hdev, HASH_DIN, 0);
--		stm32_hash_write(hdev, HASH_IMR, 0);
--	}
--
--	return 0;
--}
--
--static int stm32_hash_one_request(struct crypto_engine *engine, void *areq);
--static int stm32_hash_prepare_req(struct crypto_engine *engine, void *areq);
--
- static int stm32_hash_handle_queue(struct stm32_hash_dev *hdev,
- 				   struct ahash_request *req)
- {
- 	return crypto_transfer_hash_request_to_engine(hdev->engine, req);
- }
- 
--static int stm32_hash_prepare_req(struct crypto_engine *engine, void *areq)
-+static int stm32_hash_one_request(struct crypto_engine *engine, void *areq)
- {
- 	struct ahash_request *req = container_of(areq, struct ahash_request,
- 						 base);
- 	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
-+	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
- 	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
--	struct stm32_hash_request_ctx *rctx;
-+	struct stm32_hash_state *state = &rctx->state;
-+	int err = 0;
- 
- 	if (!hdev)
- 		return -ENODEV;
- 
--	hdev->req = req;
--
--	rctx = ahash_request_ctx(req);
--
- 	dev_dbg(hdev->dev, "processing new req, op: %lu, nbytes %d\n",
- 		rctx->op, req->nbytes);
- 
--	return stm32_hash_hw_init(hdev, rctx);
--}
-+	pm_runtime_get_sync(hdev->dev);
- 
--static int stm32_hash_one_request(struct crypto_engine *engine, void *areq)
--{
--	struct ahash_request *req = container_of(areq, struct ahash_request,
--						 base);
--	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
--	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
--	struct stm32_hash_request_ctx *rctx;
--	int err = 0;
-+	hdev->req = req;
-+	hdev->flags = 0;
-+
-+	if (state->flags & HASH_FLAGS_INIT) {
-+		u32 *preg = rctx->state.hw_context;
-+		u32 reg;
-+		int i;
-+
-+		if (!hdev->pdata->ux500)
-+			stm32_hash_write(hdev, HASH_IMR, *preg++);
-+		stm32_hash_write(hdev, HASH_STR, *preg++);
-+		stm32_hash_write(hdev, HASH_CR, *preg);
-+		reg = *preg++ | HASH_CR_INIT;
-+		stm32_hash_write(hdev, HASH_CR, reg);
- 
--	if (!hdev)
--		return -ENODEV;
-+		for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
-+			stm32_hash_write(hdev, HASH_CSR(i), *preg++);
- 
--	hdev->req = req;
-+		hdev->flags |= HASH_FLAGS_INIT;
- 
--	rctx = ahash_request_ctx(req);
-+		if (state->flags & HASH_FLAGS_HMAC)
-+			hdev->flags |= HASH_FLAGS_HMAC |
-+				       HASH_FLAGS_HMAC_KEY;
-+	}
- 
- 	if (rctx->op == HASH_OP_UPDATE)
- 		err = stm32_hash_update_req(hdev);
-@@ -1034,34 +1038,8 @@ static int stm32_hash_digest(struct ahash_request *req)
- static int stm32_hash_export(struct ahash_request *req, void *out)
- {
- 	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
--	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
--	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
--	struct stm32_hash_state *state = &rctx->state;
--	u32 *preg;
--	unsigned int i;
--	int ret;
--
--	pm_runtime_get_sync(hdev->dev);
--
--	ret = stm32_hash_wait_busy(hdev);
--	if (ret)
--		return ret;
--
--	state->hw_context = kmalloc_array(3 + HASH_CSR_REGISTER_NUMBER,
--					  sizeof(u32), GFP_KERNEL);
--	preg = state->hw_context;
- 
--	if (!hdev->pdata->ux500)
--		*preg++ = stm32_hash_read(hdev, HASH_IMR);
--	*preg++ = stm32_hash_read(hdev, HASH_STR);
--	*preg++ = stm32_hash_read(hdev, HASH_CR);
--	for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
--		*preg++ = stm32_hash_read(hdev, HASH_CSR(i));
--
--	pm_runtime_mark_last_busy(hdev->dev);
--	pm_runtime_put_autosuspend(hdev->dev);
--
--	memcpy(out, rctx, sizeof(*rctx));
-+	memcpy(out, &rctx->state, sizeof(rctx->state));
- 
- 	return 0;
- }
-@@ -1069,33 +1047,9 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
- static int stm32_hash_import(struct ahash_request *req, const void *in)
- {
- 	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
--	struct stm32_hash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(req));
--	struct stm32_hash_dev *hdev = stm32_hash_find_dev(ctx);
--	struct stm32_hash_state *state = &rctx->state;
--	const u32 *preg = in;
--	u32 reg;
--	unsigned int i;
--
--	memcpy(rctx, in, sizeof(*rctx));
--
--	preg = state->hw_context;
--
--	pm_runtime_get_sync(hdev->dev);
--
--	if (!hdev->pdata->ux500)
--		stm32_hash_write(hdev, HASH_IMR, *preg++);
--	stm32_hash_write(hdev, HASH_STR, *preg++);
--	stm32_hash_write(hdev, HASH_CR, *preg);
--	reg = *preg++ | HASH_CR_INIT;
--	stm32_hash_write(hdev, HASH_CR, reg);
--
--	for (i = 0; i < HASH_CSR_REGISTER_NUMBER; i++)
--		stm32_hash_write(hdev, HASH_CSR(i), *preg++);
--
--	pm_runtime_mark_last_busy(hdev->dev);
--	pm_runtime_put_autosuspend(hdev->dev);
- 
--	kfree(state->hw_context);
-+	stm32_hash_init(req);
-+	memcpy(&rctx->state, in, sizeof(rctx->state));
- 
- 	return 0;
- }
-@@ -1152,8 +1106,6 @@ static int stm32_hash_cra_init_algs(struct crypto_tfm *tfm,
- 		ctx->flags |= HASH_FLAGS_HMAC;
- 
- 	ctx->enginectx.op.do_one_request = stm32_hash_one_request;
--	ctx->enginectx.op.prepare_request = stm32_hash_prepare_req;
--	ctx->enginectx.op.unprepare_request = NULL;
- 
- 	return stm32_hash_init_fallback(tfm);
- }
-@@ -1245,7 +1197,7 @@ static struct ahash_alg algs_md5[] = {
- 		.import = stm32_hash_import,
- 		.halg = {
- 			.digestsize = MD5_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "md5",
- 				.cra_driver_name = "stm32-md5",
-@@ -1272,7 +1224,7 @@ static struct ahash_alg algs_md5[] = {
- 		.setkey = stm32_hash_setkey,
- 		.halg = {
- 			.digestsize = MD5_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(md5)",
- 				.cra_driver_name = "stm32-hmac-md5",
-@@ -1301,7 +1253,7 @@ static struct ahash_alg algs_sha1[] = {
- 		.import = stm32_hash_import,
- 		.halg = {
- 			.digestsize = SHA1_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha1",
- 				.cra_driver_name = "stm32-sha1",
-@@ -1328,7 +1280,7 @@ static struct ahash_alg algs_sha1[] = {
- 		.setkey = stm32_hash_setkey,
- 		.halg = {
- 			.digestsize = SHA1_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha1)",
- 				.cra_driver_name = "stm32-hmac-sha1",
-@@ -1357,7 +1309,7 @@ static struct ahash_alg algs_sha224[] = {
- 		.import = stm32_hash_import,
- 		.halg = {
- 			.digestsize = SHA224_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha224",
- 				.cra_driver_name = "stm32-sha224",
-@@ -1384,7 +1336,7 @@ static struct ahash_alg algs_sha224[] = {
- 		.import = stm32_hash_import,
- 		.halg = {
- 			.digestsize = SHA224_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha224)",
- 				.cra_driver_name = "stm32-hmac-sha224",
-@@ -1413,7 +1365,7 @@ static struct ahash_alg algs_sha256[] = {
- 		.import = stm32_hash_import,
- 		.halg = {
- 			.digestsize = SHA256_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "sha256",
- 				.cra_driver_name = "stm32-sha256",
-@@ -1440,7 +1392,7 @@ static struct ahash_alg algs_sha256[] = {
- 		.setkey = stm32_hash_setkey,
- 		.halg = {
- 			.digestsize = SHA256_DIGEST_SIZE,
--			.statesize = sizeof(struct stm32_hash_request_ctx),
-+			.statesize = sizeof(struct stm32_hash_state),
- 			.base = {
- 				.cra_name = "hmac(sha256)",
- 				.cra_driver_name = "stm32-hmac-sha256",
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmQDprwACgkQJNaLcl1U
+h9AqEQf+Ki9N0115CHG31rvFs9RFMaV3z2FBkTIO1Zs9u9jJ0UFONa8aS8bq8aPQ
+gm3UuhyofZ4p+tqg6Y6nKHVWZalcU4N95+sNm/ZzjCvDKR66x0O+uPlCXd8pfREU
+kNoKd5CFtP+fjtXf0oEscR6C4Pu/I20EuDWUyrfNii3oFMAuDeVS2wgXadAxOJ6d
+fSPFcja3GW9gJ4EE0LacuhUM5ZUtW25HeTc7vmBynRd7tTqjc4FQgPSyt8tvUe0Y
+VodxCsoIvcS9vx94nDyo1USMh/HFKAtRlJNuuWj1+kWcrRUfBuJVlSSzZt6o9M+k
+6cA73SE3SJ8RJIFe8Bz9r6ULWYSY6A==
+=/n6h
+-----END PGP SIGNATURE-----
+
+--DpC9JxmBtx/VM1Dr--
