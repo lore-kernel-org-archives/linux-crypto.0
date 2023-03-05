@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C7FC61DA4
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 23:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B08A4C678DB
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 23:05:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229854AbjCEXAG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Mar 2023 18:00:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39758 "EHLO
+        id S229457AbjCEXFB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Mar 2023 18:05:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229875AbjCEW7w (ORCPT
+        with ESMTP id S229437AbjCEXFA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Mar 2023 17:59:52 -0500
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4654BEB60;
-        Sun,  5 Mar 2023 14:59:51 -0800 (PST)
+        Sun, 5 Mar 2023 18:05:00 -0500
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D25510A9E;
+        Sun,  5 Mar 2023 15:04:59 -0800 (PST)
 Received: from stefanw-SCHENKER ([37.4.248.41]) by mrelayeu.kundenserver.de
  (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1Mk0BK-1qJJdv0vRw-00kRl7; Sun, 05 Mar 2023 23:59:35 +0100
+ 1MiakT-1qBqJG1Owp-00fkew; Sun, 05 Mar 2023 23:59:33 +0100
 From:   Stefan Wahren <stefan.wahren@i2se.com>
 To:     Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -28,72 +28,69 @@ Cc:     linux-imx@nxp.com, Marek Vasut <marex@denx.de>,
         Alexander Stein <alexander.stein@ew.tq-group.com>,
         linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        Jacky Bai <ping.bai@nxp.com>
-Subject: [PATCH 6/6] ARM: dts: imx6ul: Add clock and PGC node to GDC
-Date:   Sun,  5 Mar 2023 23:59:00 +0100
-Message-Id: <20230305225901.7119-7-stefan.wahren@i2se.com>
+        Stefan Wahren <stefan.wahren@i2se.com>
+Subject: [PATCH 2/6] dt-bindings: imx-thermal: add imx6sll and imx6ul compatible
+Date:   Sun,  5 Mar 2023 23:58:56 +0100
+Message-Id: <20230305225901.7119-3-stefan.wahren@i2se.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230305225901.7119-1-stefan.wahren@i2se.com>
 References: <20230305225901.7119-1-stefan.wahren@i2se.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:NJNkRYg9OEO39KB+kz0xQwZi8gmdaBzK6GliDzYEcMK4rDbBEh9
- iYU+haJJArV4sTupFoZVHpCqWff8PrFD4FEpkSmp51+s1HKozaVBd6BoD0uU/FVVaey0c0Q
- pxvNZwSoXI9p6za7fLAL3hXv+MOCkSUpYJDNw4n0qXR8lJWqaYpkD8SDaplfiGidPBMyCUb
- B09GDUaikOjFVbOspbigA==
-UI-OutboundReport: notjunk:1;M01:P0:Ha7rwpkNLZ0=;umHxw3Nmac2GL4jtjlHSMwvlP97
- b4nfil2FM7hRpwl1XEGkysDYghsHTHnuWxmHGsg7zroazY8QfSaK7luep6pZX0Aal8xD02dtn
- sbh67fcQpD9IJr+sBaT6oJakbPIVX/75VtxeK68xEYMn2yoWAbdmWf//BgLsFk2s0h6yQZmu8
- rfUVxCdvztzPdj3hvrT/QY5cPXYWUnJz2QTqicLxghcjM219lmt9Nv5gakmuKeipB44oAHi/q
- jnM5shBbzfc1TT9vcnDh9tJVHaTNl7avk4vt2udktVCBuAVzjwahyxijzjVFT24vNkl6DoBfb
- J7+WmIX94c28KYyjtTLQlIdfX48/3f9sXUqJ1V8o0MIfRfcfEGO4nQl/pA7TaZmRa9LrTdrk2
- l3jgtVZFytXI0t8nLA9Fu/C896IXXdSYQkTwpfT3waU0CEFEh+NcVE0TdQIo70ZRiAvybXwnU
- aOyx6Ej2WoPRF7TUpqOfpischP25kybueKBuZQ1gAOHEjzAK3WLMdYl38+06/aoJHXUxNkOHy
- DKTFa5VaRCi9pumlhTsvqLEBcGj2bUei9kjBLD0txAlTFoCDzJbRRSCQ7hQKOC3zcO/dwLCQ8
- W9pYlMJyB5amjgtMTU0Z58AfJ1SEEA13OissqNYFDold98gXSzQZ41j2kCd9YqlHsF2knsZry
- YTLZeLEEhj6b6xvyPGdBcEyD+gppUn1Pfbe37uhyug==
+X-Provags-ID: V03:K1:LdkJIDMurn45BWkJDT8GjmvZOHqCuFwYE3c40poDEbgFl1hLAai
+ VnpbdQ9+AcVlza7RRLsnv4zWpRz20lcVMY1p8dsP1reQrXo/km+i+DVrxmkkXxrGblWY2mP
+ qCLroqJ54TAS82MZenlXCngD6Umi/3UEQ9Ljpn9ILclxq028VAaK8YBgETQF4DexxcwzYQZ
+ wciU4MESNx1HbcHBpyadA==
+UI-OutboundReport: notjunk:1;M01:P0:ByKym6MCWmQ=;5vkKvvntfHM3zPp6qaFNx1Tx74c
+ xiKUNZjIwt47MP1HEqxbyqK92RlFFadJXXhzBIVpBhIGHvEji9QSyQ8AAEgDAsYQAp+R+JXTE
+ q+76ompcW6IJfr7Q7pWv5OKrABt87ILTZGm9yz4Elem2Npyy/CgyaOrmgQCX0sJFihfRMYD4T
+ sfRyQ6WvUs9nubMqA9Te1jgMHYIuHYTV2v10BI3XGCC2lhdos9EMIreabmlBwtrLhaJclspPi
+ NAlZJ3SVB7Qn8YG5b3TXJq5jsifVyWNvfpWcubK72fezvs1jWmean+02rG2ZIcOcwaIJHUWyr
+ hAkrhmrUYsJyU28j/6g+M3bYJNGZMaZRPmyYNkDBthu16lwPAGRamFFrPKVHQEqR+5pgOFRjM
+ Z9Z7Bh8B4H6rZJ8ltJ8C1cMiKyRz2+FMQf0ha4LOs9HN2BHfJ86bX2TrRTMhKsvKjbNtZjeXR
+ ewZ0Zs4utMCCxL9/BpdF3K1KUHzvgmxegMe4dRrIaK0oRnbzsY1nWpxl3CCPYLE5czpxPAkxB
+ 3Lm2Dxd9M7/KMBZZbkLgmMVBZ2rafEfgqJzJv/gMmSMBK07KX15hkuNoc3UR7d/R/4XV2ngaO
+ K4HBJYSRdmM3PvN+Wyp/cFVV1OvjyCNwSYp51U1I/cBf9xNZg8dvWDcFw7pIo58vUKh2Y2Yik
+ 9k54JjMPnADV4DvMC7Fno2q9ubBupH17tSzgDhGIKQ==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-According to fsl,imx-gpc.yaml the General Power Control requires
-a ipg clock and a Power Gating Control node. So add them to fix
-the dtbs_check warnings on i.MX6UL boards:
+Currently the dtbs_check for imx6 generates warnings like this:
 
-gpc@20dc000: 'clocks' is a required property
-gpc@20dc000: 'clock-names' is a required property
-gpc@20dc000: 'pgc' is a required property
+['fsl,imx6sll-tempmon', 'fsl,imx6sx-tempmon'] is too long
 
-Suggested-by: Jacky Bai <ping.bai@nxp.com>
+So add them to the devicetree binding.
+
 Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 ---
- arch/arm/boot/dts/imx6ul.dtsi | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ .../devicetree/bindings/thermal/imx-thermal.yaml    | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/boot/dts/imx6ul.dtsi b/arch/arm/boot/dts/imx6ul.dtsi
-index 412baa848837..fd6c064fa032 100644
---- a/arch/arm/boot/dts/imx6ul.dtsi
-+++ b/arch/arm/boot/dts/imx6ul.dtsi
-@@ -720,6 +720,18 @@ gpc: gpc@20dc000 {
- 				#interrupt-cells = <3>;
- 				interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
- 				interrupt-parent = <&intc>;
-+				clocks = <&clks IMX6UL_CLK_IPG>;
-+				clock-names = "ipg";
-+
-+				pgc {
-+						#address-cells = <1>;
-+						#size-cells = <0>;
-+
-+						power-domain@0 {
-+							reg = <0>;
-+							#power-domain-cells = <0>;
-+						};
-+				};
- 			};
+diff --git a/Documentation/devicetree/bindings/thermal/imx-thermal.yaml b/Documentation/devicetree/bindings/thermal/imx-thermal.yaml
+index b22c8b59d5c7..9a20c5d74617 100644
+--- a/Documentation/devicetree/bindings/thermal/imx-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/imx-thermal.yaml
+@@ -12,10 +12,15 @@ maintainers:
  
- 			iomuxc: pinctrl@20e0000 {
+ properties:
+   compatible:
+-    enum:
+-      - fsl,imx6q-tempmon
+-      - fsl,imx6sx-tempmon
+-      - fsl,imx7d-tempmon
++    oneOf:
++      - const: fsl,imx6q-tempmon
++      - const: fsl,imx6sx-tempmon
++      - items:
++          - enum:
++              - fsl,imx6sll-tempmon
++              - fsl,imx6ul-tempmon
++          - const: fsl,imx6sx-tempmon
++      - const: fsl,imx7d-tempmon
+ 
+   interrupts:
+     description: |
 -- 
 2.34.1
 
