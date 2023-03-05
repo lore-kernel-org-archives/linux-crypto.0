@@ -2,79 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43862C6FA8E
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 19:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F3EC6FA8E
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 21:48:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbjCEThU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Mar 2023 14:37:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35132 "EHLO
+        id S229643AbjCEVsU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Mar 2023 16:48:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbjCEThU (ORCPT
+        with ESMTP id S229565AbjCEVsT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Mar 2023 14:37:20 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF79FF25;
-        Sun,  5 Mar 2023 11:37:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DECBB60B54;
-        Sun,  5 Mar 2023 19:37:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CBA4C433EF;
-        Sun,  5 Mar 2023 19:37:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678045038;
-        bh=R11WY1CFSMMzf+fziJywudIzTwyCMsUuneDOj5AF0jY=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=J3tYoZMD8DPwh4uIzrEjenGbrQZ68/B7bvNFPGpWQc5HxnckMkHU/9lQOXlZck+/+
-         2WGtBj6fbIbrAfzxrPXmQ8d3bd2c992HtwoQzTnDK3uQr05PSYqS0s9+SQrIv7NBkp
-         TaIuJ5CL/qxgCg8Gw+UnG0RKWYmGmZLje0iHyfI+eoHrN/oGCzF56om8mKF2Z/6ryG
-         gaDsy6I+1LZIE7dMWRE3v1/KMPBFOO8UrQDS6pyOmxYC2HHDu//hrecK6cAqlwFbhL
-         2MFvsj0EouwM6NijKU6kfH+sKFODBIlO1Yie5zTYJHrKz5kwa5ukwOuVNVhZH9K4Fq
-         l3F5t7WgW36gA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B81EE68D22;
-        Sun,  5 Mar 2023 19:37:18 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.3
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ZARrt99wJb7IhoY4@gondor.apana.org.au>
-References: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au> <ZARrt99wJb7IhoY4@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZARrt99wJb7IhoY4@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p2
-X-PR-Tracked-Commit-Id: 660ca9470f9c613fa2c71a123a9469c80a697ee4
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f915322fe014c5c515119381e886faf07b3c9d31
-Message-Id: <167804503823.1860.745945862604336880.pr-tracker-bot@kernel.org>
-Date:   Sun, 05 Mar 2023 19:37:18 +0000
+        Sun, 5 Mar 2023 16:48:19 -0500
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4775DEB60
+        for <linux-crypto@vger.kernel.org>; Sun,  5 Mar 2023 13:48:18 -0800 (PST)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-536c02eea4dso150430807b3.4
+        for <linux-crypto@vger.kernel.org>; Sun, 05 Mar 2023 13:48:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QLT9596esNn9+ZcDd3rcdHbsJUKw8b1aHwiveWbhaq4=;
+        b=z8VAIRkfAxemi/FtNcAurB8B2D6jDvXRySFM6h+xAQyuToi6WuFeJY1DcnkWkDln4B
+         nK0Hkwwq4ZNcB9OpZhT8qq76gu9rv0NWrg89giWkop6p+o3dcPg5T0/VsDc54iolxtEJ
+         LTPZuI8c6nNCHC0IyUrbZvR5NdsIoJEOWL+11zsCe2Qu3NH7ng9qB/h8o8Z0YTyDzvFV
+         qW1zS1pNW6fsn9UN9F9d+W70tNZFaFDPCTvp3nnu3hHrDXi1qLXirJzWC3nNNcGeVqDF
+         J1aAjvlIGTN0R/Rcj+HBn4PQkVuw4CB4pAqjn3+sQXmn/cdZZO9QNH2EKCosQOn+u+Xi
+         065Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QLT9596esNn9+ZcDd3rcdHbsJUKw8b1aHwiveWbhaq4=;
+        b=EAv8ZJ7TMptI5d8dZ+uJan747/LEeOY9H/Jzemp0xt9YaXhsrIkmoNV+zTXWNYd2yN
+         bUE/uh4kn3OhUOJ8iwlMIwBX4AGiUnsligUwkHnITowA84hgZcJO3ciZuxvE/3vCIZkH
+         w0El3HcaHpwdCclGx9iWw/I6VdBK9esVKX1zbM0RNHI7evCXGByA24yn9CcHmKzupZ+k
+         3CmBxvgiOaDTopN3HWoCnSOSMQ0Ko9FUPa+DBsYLvs7jIHuejoDVFfGmJ936EQU0j4Mt
+         jEhk+Dko1g0arSuzMNyGteEd9KFWdB1Jzd6yYrq0M/4KzhzBdAodyrOYVuGkrPbwI+Rh
+         /8Gg==
+X-Gm-Message-State: AO0yUKUarhypLtApNyiclQ/EupOggvcg7TCXv3uDXDCaffvD+SuNGjZR
+        fOYUtGzI5m+tAI3n2GvXl3fnvfQUoJ9GFBUO0PDPiA==
+X-Google-Smtp-Source: AK7set9PwbP37M+qcdmd1OrmePnuWQ5cf/oim9FxyxWYN5ZTGhjFStopLAhPM2VM1sBwIOJyAtQgfJUn/9eHK0O0pGA=
+X-Received: by 2002:a81:431e:0:b0:533:8080:16ee with SMTP id
+ q30-20020a81431e000000b00533808016eemr5437131ywa.10.1678052897405; Sun, 05
+ Mar 2023 13:48:17 -0800 (PST)
+MIME-Version: 1.0
+References: <ZAMQjOdi8GfqDUQI@gondor.apana.org.au> <E1pYOKD-000GYe-HX@formenos.hmeau.com>
+In-Reply-To: <E1pYOKD-000GYe-HX@formenos.hmeau.com>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Sun, 5 Mar 2023 22:48:05 +0100
+Message-ID: <CACRpkdYcGx_=GufsRwtRm_tCeZFvYFM+R0CGK521=DSRo+WXXw@mail.gmail.com>
+Subject: Re: [v5 PATCH 1/7] crypto: stm32 - Save 54 CSR registers
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Sun, 5 Mar 2023 18:15:19 +0800:
+On Sat, Mar 4, 2023 at 10:37=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p2
+> The CSR registers go from 0 to 53.  So the number of registers
+> should be 54.
+>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f915322fe014c5c515119381e886faf07b3c9d31
+Hm I don't know where this misunderstanding comes from.
+I think it's this tendency by some engineers to use index 1 :/
 
-Thank you!
+The datasheet for U8500 says:
+0xF8            HASH_CSFULL      HASH context full register
+0xFC            HASH_CSDATAIN    HASH context swap data input register
+0x100           HASH_CSR0        HASH context swap register 0
+0x104 to 0x1CC  HASH_CSR1 to 51  HASH context swap register 1 to 51
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+0xf8, 0xfc, 0x100 =3D 3 registers
+0x104 to 0x1cc =3D 51 registers
+
+Indeed 54.
+
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Tested-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
