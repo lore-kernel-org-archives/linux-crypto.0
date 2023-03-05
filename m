@@ -2,31 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2046EC61DA4
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 10:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43862C6FA8E
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 19:37:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229551AbjCEKPe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Mar 2023 05:15:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57132 "EHLO
+        id S229607AbjCEThU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Mar 2023 14:37:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjCEKPe (ORCPT
+        with ESMTP id S229507AbjCEThU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Mar 2023 05:15:34 -0500
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21451E3A8;
-        Sun,  5 Mar 2023 02:15:31 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pYlOh-000SfT-J0; Sun, 05 Mar 2023 18:15:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Mar 2023 18:15:19 +0800
-Date:   Sun, 5 Mar 2023 18:15:19 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.3
-Message-ID: <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+        Sun, 5 Mar 2023 14:37:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF79FF25;
+        Sun,  5 Mar 2023 11:37:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DECBB60B54;
+        Sun,  5 Mar 2023 19:37:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CBA4C433EF;
+        Sun,  5 Mar 2023 19:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678045038;
+        bh=R11WY1CFSMMzf+fziJywudIzTwyCMsUuneDOj5AF0jY=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=J3tYoZMD8DPwh4uIzrEjenGbrQZ68/B7bvNFPGpWQc5HxnckMkHU/9lQOXlZck+/+
+         2WGtBj6fbIbrAfzxrPXmQ8d3bd2c992HtwoQzTnDK3uQr05PSYqS0s9+SQrIv7NBkp
+         TaIuJ5CL/qxgCg8Gw+UnG0RKWYmGmZLje0iHyfI+eoHrN/oGCzF56om8mKF2Z/6ryG
+         gaDsy6I+1LZIE7dMWRE3v1/KMPBFOO8UrQDS6pyOmxYC2HHDu//hrecK6cAqlwFbhL
+         2MFvsj0EouwM6NijKU6kfH+sKFODBIlO1Yie5zTYJHrKz5kwa5ukwOuVNVhZH9K4Fq
+         l3F5t7WgW36gA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B81EE68D22;
+        Sun,  5 Mar 2023 19:37:18 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.3
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <ZARrt99wJb7IhoY4@gondor.apana.org.au>
 References: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
  <YgMn+1qQPQId50hO@gondor.apana.org.au>
  <YjE5yThYIzih2kM6@gondor.apana.org.au>
@@ -36,43 +47,34 @@ References: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
  <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
  <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
  <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
+ <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au> <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p2
+X-PR-Tracked-Commit-Id: 660ca9470f9c613fa2c71a123a9469c80a697ee4
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: f915322fe014c5c515119381e886faf07b3c9d31
+Message-Id: <167804503823.1860.745945862604336880.pr-tracker-bot@kernel.org>
+Date:   Sun, 05 Mar 2023 19:37:18 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+The pull request you sent on Sun, 5 Mar 2023 18:15:19 +0800:
 
-The following changes since commit 8b84475318641c2b89320859332544cf187e1cbd:
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p2
 
-  crypto: x86/aria-avx - Do not use avx2 instructions (2023-02-14 13:39:33 +0800)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/f915322fe014c5c515119381e886faf07b3c9d31
 
-are available in the Git repository at:
+Thank you!
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.3-p2 
-
-for you to fetch changes up to 660ca9470f9c613fa2c71a123a9469c80a697ee4:
-
-  crypto: caam - Fix edesc/iv ordering mixup (2023-02-28 16:30:58 +0800)
-
-----------------------------------------------------------------
-This push fixes a regression in the caam driver.
-----------------------------------------------------------------
-
-Herbert Xu (1):
-      crypto: caam - Fix edesc/iv ordering mixup
-
- drivers/crypto/caam/caamalg.c    | 26 +++++++++++++++++++-------
- drivers/crypto/caam/caamalg_qi.c | 40 ++++++++++++++++++++++++++--------------
- drivers/crypto/caam/qi.c         | 10 ++++++++--
- 3 files changed, 53 insertions(+), 23 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
