@@ -2,85 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DA6C678DB
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Mar 2023 23:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB744C6FA9E
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Mar 2023 01:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbjCEXMs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Mar 2023 18:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44920 "EHLO
+        id S229605AbjCFB4S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Mar 2023 20:56:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCEXMs (ORCPT
+        with ESMTP id S229540AbjCFB4R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Mar 2023 18:12:48 -0500
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEBA2CA0D;
-        Sun,  5 Mar 2023 15:12:46 -0800 (PST)
-Received: from stefanw-SCHENKER ([37.4.248.41]) by mrelayeu.kundenserver.de
- (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MEFrX-1pgPaK3LWf-00AHWq; Sun, 05 Mar 2023 23:59:33 +0100
-From:   Stefan Wahren <stefan.wahren@i2se.com>
-To:     Rob Herring <robh+dt@kernel.org>,
+        Sun, 5 Mar 2023 20:56:17 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E713D126F6;
+        Sun,  5 Mar 2023 17:56:16 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id v11so8640326plz.8;
+        Sun, 05 Mar 2023 17:56:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678067776;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hzPp0T0Iz2OCH/ssErWbnD+a0LZ1Z5/2YbBIw3913po=;
+        b=WwkALN05TjToh6nSJ4CciRYpf3PSAflvOdqZmXvTAbQTMRscXWckSjlC5YaBfRN49a
+         THEU4UITS3BtiHtLyo63xORXuvAlOe9Bn7EBYlLi6DT6PP5B7lxWLbm62BU34M+rI/a8
+         0ooZ8EF+X9BYaIGpqx9wJekHg1cumBWqQEivZvVBlEPU+uBMZKeGU5HMH0yh3d27AVDy
+         DbAGfdOmV50VOF1yuxQeKZgE2Df+n3VjAc94fS7kkmpPAl/PnLeBxUfWId0Bcy6pXs4n
+         WG7sT7CNQrp9IAJ2riRBB+coogymaTWhbYTOjyGWzoJ+aBeXvaMxqYeI5Vn/1ysCNfbY
+         vQSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678067776;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hzPp0T0Iz2OCH/ssErWbnD+a0LZ1Z5/2YbBIw3913po=;
+        b=A82SR37Qig6TWBVoIsmptj+4kvDPeMNefswPcQMnvFbH90yrxx64pkEHGIZSjSLQcD
+         w5QOwH4EVk7GSoTJo/Iu/i45RUVPtgV27coqOupxYiWjSS56syIqO/LQfCspqsVbERkM
+         C7SQehSBXYBvPcA124Deb+9oWDQdafrsXXkvrTxy+3OLOwz0nbdOzZfMEQXb74zTcgDP
+         9M6xEYwM7ZooU32IWO9dscHJd9cTC/kcqoH7YEbR7Z7orxhUpu6vMBl9C9WY8PD7rLnP
+         G6D4FdjFSCxzOtcFp0UdkhxRmEGjFB2TaqcmMI26tiv4AGP5Xv233BUnFfTajKSmKpQg
+         Ahsw==
+X-Gm-Message-State: AO0yUKUpZ4OCvgZXYkEdCfwD4Qg/T4pfFnrtL/k/0qw6+//fmtHx7Eo8
+        LSxDHOLRfTk+cjGMF1VgnfOBdSqr2f4XkomsPlM=
+X-Google-Smtp-Source: AK7set8bcrK7zoQ779HZIb3j07XzbrJVZvaY//JUHmj7tqiw7fteVc0fuGgfVTFkD5UsuvbYn3fYNw4GXvfkZ6Kw/Hw=
+X-Received: by 2002:a17:902:ab0f:b0:19a:64f6:e147 with SMTP id
+ ik15-20020a170902ab0f00b0019a64f6e147mr3768180plb.2.1678067776377; Sun, 05
+ Mar 2023 17:56:16 -0800 (PST)
+MIME-Version: 1.0
+References: <20230305225901.7119-1-stefan.wahren@i2se.com> <20230305225901.7119-7-stefan.wahren@i2se.com>
+In-Reply-To: <20230305225901.7119-7-stefan.wahren@i2se.com>
+From:   Fabio Estevam <festevam@gmail.com>
+Date:   Sun, 5 Mar 2023 22:56:05 -0300
+Message-ID: <CAOMZO5B1-FKNtKrJz6+TD9GJRixXO_Ca+kk53f3zYeDne4NhkA@mail.gmail.com>
+Subject: Re: [PATCH 6/6] ARM: dts: imx6ul: Add clock and PGC node to GDC
+To:     Stefan Wahren <stefan.wahren@i2se.com>
+Cc:     Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>
-Cc:     linux-imx@nxp.com, Marek Vasut <marex@denx.de>,
+        Sascha Hauer <s.hauer@pengutronix.de>, linux-imx@nxp.com,
+        Marek Vasut <marex@denx.de>,
         Alexander Stein <alexander.stein@ew.tq-group.com>,
         linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH 3/6] dt-bindings: imxgpt: add imx6ul compatible
-Date:   Sun,  5 Mar 2023 23:58:57 +0100
-Message-Id: <20230305225901.7119-4-stefan.wahren@i2se.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230305225901.7119-1-stefan.wahren@i2se.com>
-References: <20230305225901.7119-1-stefan.wahren@i2se.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:IwT96KuCYihTleCJc6GGzhJZA3kr03QgpvJytzu99LqgSXUcPYZ
- VxEvLQhHH3dkX33xf0KM+M9Z2xOLi8NrW0HXSIM3gw/6KjCFRitXD0XYTldg1dbnfbBKxJK
- Gux3W1XIhXnVeLzubA830PmRA9jdiGZNCuBZc1PcbiDquCtMIqV58NRsJXKhxH1iRyDaISg
- KX+NIOQcC5Jfo3UzDGjeA==
-UI-OutboundReport: notjunk:1;M01:P0:9lR6X1DOui4=;XJK/c3uioJtI7hxFroeFkIPRxoz
- fpNHKajRI3qGWJMBUj2RKCfUzM/APfpBNhD3ZwftOSMyFO4/rbzpaP6doK3zlDV8tJAa4vZ8I
- lS/mD+NFCW5t/d3Cj11pAFjUBCs2zryfKl5/pEiNzOhUVAGkjcvnZrPrSu7MPGWMYgLPwhef4
- Jh7E+vW8p808kpots4hsCz7f+WScLeh/BsrST1OHQ37EDNoBVpNB909hNreyjMYgslzZx8yXO
- 9+blpetgafO7Hf+ksJmiqu1KVp1evBdOcSqwkc3pNXd0jpKvpAtkwXZwy0IFgEPEckGTXHnfa
- NASx1vPg6MXzExGGU2jPbtRMgEbICtlFbG5PCysTBQ4khicNAt2xY04vjljsbcNL+1mvy14hc
- /7Iwd2EYwsETppCcN9IbyYNzSuzUzBeZWb4FiW7z9YggOIpg+loMVYPezqbA2oMANh9OJlra2
- Mdjc5deEb2OhDTbsEmwzlvKD87hGmURIXsMrgLQIpwkunCkMhD5NzFwYCmSKlReQOthhpLYkC
- fEc/b+AhM/GVON+CyZYuspen8F6LQblXbpVei+GYovHkE9wm9O9laS7V0nDWj1R++x+MNXikQ
- ibpZxYl9PIL7Hk658tB5VmEipNQoxj+LwcSvHs0OGnftAi8IPG2ytrNfzqMEhuUkWOIiuHqfz
- gcjhd1K6Hx9+5Ap10dixaet/ha3VmtluytouQ2MuJw==
+        Jacky Bai <ping.bai@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the dtbs_check for imx6ul generates warnings like this:
+Hi Stefan,
 
-['fsl,imx6ul-gpt', 'fsl,imx6sx-gpt'] is too long
+On Sun, Mar 5, 2023 at 7:59=E2=80=AFPM Stefan Wahren <stefan.wahren@i2se.co=
+m> wrote:
+>
+> According to fsl,imx-gpc.yaml the General Power Control requires
+> a ipg clock and a Power Gating Control node. So add them to fix
+> the dtbs_check warnings on i.MX6UL boards:
+>
+> gpc@20dc000: 'clocks' is a required property
+> gpc@20dc000: 'clock-names' is a required property
+> gpc@20dc000: 'pgc' is a required property
 
-Since the imx6ul GPT IP is compatible to imx6dl, add the compatible
-to the enum. The mentioned warning also needs adjustment of the
-affected DTS, but this should be done in a different patch.
-
-Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
----
- Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
-index 716c6afcca1f..8d9e8c1b7dcf 100644
---- a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
-+++ b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
-@@ -31,6 +31,7 @@ properties:
-           - enum:
-               - fsl,imx6sl-gpt
-               - fsl,imx6sx-gpt
-+              - fsl,imx6ul-gpt
-               - fsl,imxrt1050-gpt
-               - fsl,imxrt1170-gpt
-           - const: fsl,imx6dl-gpt
--- 
-2.34.1
-
+There is a typo in the Subject: s/GDC/GPC.
