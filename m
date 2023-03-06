@@ -2,151 +2,286 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0083C6FD19
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Mar 2023 11:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B63C6FD1A
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Mar 2023 18:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbjCFLEI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Mar 2023 06:04:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47380 "EHLO
+        id S230284AbjCFSwi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Mar 2023 13:52:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjCFLEF (ORCPT
+        with ESMTP id S229958AbjCFSwh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Mar 2023 06:04:05 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2040.outbound.protection.outlook.com [40.107.100.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B6F900C;
-        Mon,  6 Mar 2023 03:04:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hFGcX8TKOmIVpjjGkPzJpaiFQkICGJ3jzGRI/OEzT071TorDAr2R2Y4gwD9KkK0V/+Wj/pSEqEHDYHpSIMvq5BL/J49e3wzE6UXNvkrGK0ui8GzT4n0NgKgzod5bzhbaZEm79nq8Lwq7nO4wUOZLZ82kNtdUDOaRg37VoWI81jvilFvuOi8s7jR9o5LYnWGlveUrKcIeId7ewfVSPBtGR/hBGMv7dihNgMpLWER6w3bFtjbWIUxQ1mrkusRqtAzLrKYJ6iamU+gdThofDj0P8iDJ9a6XHaYEDcM1Zk4s77G5zzFtUTl3A3XLMDEGk3Z2AJk3p1j0n4/RMl9x21nWiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EQ1BgrwE2pWCx6jHyKUwuP4k6T2Gnvkdz8tkHS7df9g=;
- b=JIZ+xPIkmZ/jFJgD4J256/R/cMO4gB4dTFvnTENnQg3A/9yM0rE493lf66w5VXGBwmuHcp65uqQOpUsCiIGO3mnbkfjeOOR8HMT4tdcPHV+YJIZkmS6Dayef0/TnNh4TapZkeWqb3GSEd8fEy1JACugbLvZrfsDzBLqxu9iOR7fSUFl2fuuLWDGOimJQU+C3zGxZFVJc1WydjfRGlXAy+SfKpI4x6BKGJeFGOOs7zYT8woZTUigNlx8PIlDwJFq4xm2D+Lunv9k2X3+jq6LqwdU5JfL2nyAtp8r3saEbzM0iJ3y6IJwNARN5URCfGWWxpkLd5CxNGezXsf0rAI4JTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EQ1BgrwE2pWCx6jHyKUwuP4k6T2Gnvkdz8tkHS7df9g=;
- b=sbLeq7ZY3bSipJA7EhLxo589NjHv6z1y58yaeZiipnOcWglJWrv6HO60ce1wM2/zaPx8f7855eB5VXXTc+PZboyaH3288V2lRQBR8MrPd2rtmJ8vDbfRACENS+254ON8fR6NWNa3ny4CibJsnf0BUT5rrJucDtvuOdKMlNb88pY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- BL3PR12MB6378.namprd12.prod.outlook.com (2603:10b6:208:3b1::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6156.27; Mon, 6 Mar 2023 11:04:01 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::6c34:2aaf:bf7:c349]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::6c34:2aaf:bf7:c349%8]) with mapi id 15.20.6156.027; Mon, 6 Mar 2023
- 11:04:01 +0000
-Message-ID: <d85c1028-0fd9-52e6-1c3e-a8e50ffb57ed@amd.com>
-Date:   Mon, 6 Mar 2023 16:33:34 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC v8 09/56] KVM: SEV: Handle memory backed by restricted
- memfd
-Content-Language: en-US
-To:     Vlastimil Babka <vbabka@suse.cz>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-10-michael.roth@amd.com>
- <8670a645-f48f-1d64-e5a5-291f2593643a@suse.cz>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <8670a645-f48f-1d64-e5a5-291f2593643a@suse.cz>
+        Mon, 6 Mar 2023 13:52:37 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC824AFC5;
+        Mon,  6 Mar 2023 10:52:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678128755; x=1709664755;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=b3/J//9BRvy9p0fhsU2LeJiaZAgIJk+YU5NTytqT8ko=;
+  b=G0ZJj+TR8g+j+X/8lENhYABvL3SRi4yvGSF8nRkG6NXyNJQMiiIdd9us
+   mwT4NsOfFUS8B4jzgdiXi9XJjKhQ+6BwYZ0VNER4WCXIwiPvpAVPq55CA
+   4s+tm/u5ukmUWAnRLAQH6rlFLqMbFK0ZkhTXnh+jlYBlUlZ1StU61swuu
+   SG/5yftWom5n0AyMyJTGSEGcLf0PtR+M2PCtB1OZ/PPt4TGf4O/ES6SQj
+   sNQSpP7xdvezMH9VxrnAJoKVItpqxCCr3DVENKX8DO09hXABAw/JLNJok
+   CsVMAmfo2Fni7K6y50cN02Ugq2ovrbB42Ywz9O76D7yaaknf6gaaitOdJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="398227644"
+X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
+   d="scan'208";a="398227644"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 10:52:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10641"; a="626255713"
+X-IronPort-AV: E=Sophos;i="5.98,238,1673942400"; 
+   d="scan'208";a="626255713"
+Received: from jeblanco-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.hsd1.il.comcast.net) ([10.212.118.26])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2023 10:52:29 -0800
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        fenghua.yu@intel.com, vkoul@kernel.org
+Cc:     dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: [PATCH 00/16] crypto: Add Intel Analytics Accelerator (IAA) crypto compression driver
+Date:   Mon,  6 Mar 2023 12:52:10 -0600
+Message-Id: <20230306185226.26483-1-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PN2PR01CA0236.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:eb::20) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|BL3PR12MB6378:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee236e83-16e2-4dc0-b311-08db1e327d7c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4OJCLTYZx1iBm5RfIQu9GjTURhAJaFm+151yBWlgYCJNUcXwJuLR47xWbvPmIY/wleZR3N6FZk4O7mx5hlri1BDu3zf1yhIejzdYG1R22CWUFqguZPWs6fnk0ijqKhrWM6lxB9jCdiTDncUaK5tPEGDyCYZlaepcJl0Yg4Nvtf30P57+SAubGYxJ8jYStKlVjXC6K9Os1AZtp/gl/DrLQpmScanLGTToSpBuKX5YJyQY3r2mY517XRttSfludLOV4qA0VkvbdZyY4JbFSWim1+kJqXynJVNyx3Iqn8ayhcuGhOnTjAsRBEXcG2j9R2fgDnxQgmCmY4Q3DCw17NHy+ESA9C5tJrMCDiZ+SH91rNSBpmsqy3PU2cZg8juXiyVVoG6bvU+kOianssYDzv+2xJMr96t1Ct0McNz38peiF4fp2TFjpW8nHpOcDMcdEP++vu6L+tjrBRP/ORwocpTBwJK/oO8a6VTNAoTT+IysRVjixeT4b5ShMz9//fvzw7xHQIpJsJU67q2xuFHt1okZ/M5QLY96iBDCRdEeUqo/5Oz9cwrYaYPjusFv37wpksMvPy8Hq8qLsG1sTtwkDxKYb8E9uc/XJo7oSiOau5qiMhDgrjwxxiv3zDCl5pGcRtXgg/Ue7ETly41xEWHG9FxzYXAV5iVnw/s+TwoYqL+y5l9Ctlkz+bLLQOirkxmVVPCiNYnTrmw35fUpUJEPEVG/4ilYLSdUM5qbY57CFZTgv0Y=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(39860400002)(346002)(396003)(376002)(366004)(451199018)(4744005)(7416002)(7406005)(5660300002)(41300700001)(8936002)(2616005)(2906002)(478600001)(6486002)(110136005)(186003)(66476007)(26005)(316002)(6512007)(66946007)(6506007)(6666004)(8676002)(53546011)(66556008)(4326008)(38100700002)(36756003)(31696002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YlVRa3l0QWhwemNOZ3NJS21tZlpTbURmTy9jc3M1bmNwaXVIdFVFd1N0NSs2?=
- =?utf-8?B?L0tQTmpmN21hRkRVaGZKYlpRd2EwR1E5dXl3ZEFEU1BNQjhHbHdPNEw4K2pS?=
- =?utf-8?B?OVhRNmZKVnNlbUpOZGlObEI5NU5HU0VxaUxwZHlLWWxWYVlIUDVVdEQ2a2No?=
- =?utf-8?B?b2VrTnppdVpNN0M3T0kzeE1tYXpJUGpmSHdXcnl0aU5oTmZBcmVzNjZPbXg1?=
- =?utf-8?B?NEdXazJHcHhLWUZSSiszN3FYcnQyR1RkNng5SW1tVm4yZ09tWjZaY1Z6TmRU?=
- =?utf-8?B?Z1h5R2tDbU01aXQydFdnblgyb0l1RVFHeitRY1ZZZUdkZk5tUDBNeVhMOC9C?=
- =?utf-8?B?YkFkTkgrWVI3WUNUVTJ5RnVtRFBreTBxYkhST2ZoWXE0WXJtbUdXN0tjbk82?=
- =?utf-8?B?cjZheWZQaEE2WGJ4OGk3ZW85aXcxQU5SRWI5M1F3Vnd6c2NmeCtLRTFiR2ZQ?=
- =?utf-8?B?ckpORWoxWkVtclZTcEh5elUrYmR4ZENuMnRrd2I4OW11dEJBeU9oK1dFQnJB?=
- =?utf-8?B?OG9tbXlyK3B0WVNVQlJyY2lnYVBTZzE5RzlDc3dDVTczR0FFS2srNjJuYVhz?=
- =?utf-8?B?YVhCcHhDb2tnL2NLZWkra0t3b2V1ekZEZjlkNCtTalhHT3dkZkgyWGlYVDg4?=
- =?utf-8?B?Wit0KzhkRHNpbFc2K2l2Y0puY0JxUVhlejJpc3prVjQveFF6OVBmMnBUR3Za?=
- =?utf-8?B?T1FBOHNTanBkVVhQM3pjd005cFQ5eGltRHFSTzg0VnpTWUczUDAxYmduNWl3?=
- =?utf-8?B?Sm0xb1dJUU1wRklaaGxBV3NNbGVBWHVaMmppMDIxamJENmFVMkdOWDRYbWFm?=
- =?utf-8?B?YU1KRjNDc0taM2xaSXBSYzNsbGdmK3BpNk1ZbDI3Tk5QR3FXY1hPNjEyOS81?=
- =?utf-8?B?cDBZQndWcnNQWVN0UnFnVmtocm9YY1A4NTI2dG0xeHYrSDg3SG5raHByM0J4?=
- =?utf-8?B?R1lwUDhpbTBQM01nSEZBTkxoUGJCRmF0bjA2V3ZOdEZ1RGs5bHFzYStFQ1d0?=
- =?utf-8?B?MmNNVHcwWjNvZ2pKT09VeGZXcjY2SnJ1VElmT0d2ZlE2RlV4eDVDYU9jb1Zy?=
- =?utf-8?B?SzlLNlFnUmpZcmpKN2IvYTVVOE9RWHBsRWFhYWdFUi9PSXkzTkNNNC8ybXp4?=
- =?utf-8?B?aE9Pc2ROUUVyMXJXZWJHR1dlc3ZJd3NnWEdXdUZFZmpiYkdSeDI2WDJmNXA4?=
- =?utf-8?B?SkVGa0hCRytTYnpIZFFWWk9WaG13eVJmL3A5ZzdqWENka2JGeU00TjQ4Ympv?=
- =?utf-8?B?ZGgvV29LZmZ0NlpkQ3MzZ2hqYzhPc1FHdzN5dGZqbzMyUi9vWHdTbEZPWWww?=
- =?utf-8?B?c09XaGhpNVJIeDVmV1JXeWROMllrRmRPeGw3cWpObFJxckdsaDFYc2x6aUFm?=
- =?utf-8?B?UXAwbytXNFBtTkdTUHRkVVczdlZ4VTlrem96UXdmckVRUjJmRjNKdGtGWm1j?=
- =?utf-8?B?alpTZEdJOC9kZmRFb1RERXEzSjY1Y2plOFU2Y2ovRWxyR3l2cGVvTjR1UjFB?=
- =?utf-8?B?TnY0dXlqRkxmWEE0Ri9wZm92ZFNsMDFZY3RyV0pVNFF1WU1STGNwVkRGNWla?=
- =?utf-8?B?VmJ5MkpBRmxHbU81aHc0MVdPazRiTWJ2RklpZ0lhK2hoT3E1TWpSblZJcnN6?=
- =?utf-8?B?OGtuMkNoRmVTdHdMaUZvNmdkdXpzNjV2WHIvZ3ZSdmVHaUFVcWZHcCt3YW5k?=
- =?utf-8?B?QlhjaXNNVUxEM2dZSStkU2NzbmVEMFBXNXI5QldGU2ZvSmZobTkvY0FINEZs?=
- =?utf-8?B?NkpkTGhtTjZRSGxMTlBpUWJDL1A5VVZLcUtSSXp2a29qQUpQUVE2RUIzYktH?=
- =?utf-8?B?aHlPMVdyVGNDK202VjRseGtuTlpFeGZET1ppd2RWNkJiWlVWU2ZHZlUwU2JU?=
- =?utf-8?B?V0xtVm5GZ2hlbjJrZmt6d3JsZ2poc1VyTFNXODZXaWZTQWpvNHdzaFBpclNX?=
- =?utf-8?B?bExETmJXeTNjMlNrV1A0L1RvOCt6bWNKOXYxWGZld1FHUGpmUHpiT1M4S096?=
- =?utf-8?B?VmNSQ21mVjR4TVFyT09WbGY1eTNrWU5sTkQxdGEvRHNqcWplVzdxMXE5Sk9i?=
- =?utf-8?B?R1BmWUxkSDJDNmFFckdFT2VqbWUrZXNPaUFPZ3RQRE1SQ1FCSWVOaGRlcjdE?=
- =?utf-8?Q?BsPc+SeYWaTU/45unUNq8StEq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee236e83-16e2-4dc0-b311-08db1e327d7c
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2023 11:04:01.0433
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: US74AHVma9tjXAlNWwMWSiNZbjX6J9OdHFQExLbLvpyUYNOlEeGMgFAX0kwhCGa/IIzJZqBpfoMAFVBnXAZRnw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6378
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This series adds Linux crypto algorithm support for Intel® In-memory
+Analytics Accelerator (Intel IAA) [1] hardware compression and
+decompression, which is available on Sapphire Rapids systems.
+
+The IAA crypto support is implemented as an IDXD sub-driver.  The IDXD
+driver already present in the kernel provides discovery and management
+of the IAA devices on a system, as well as all the functionality
+needed to manage, submit, and wait for completion of work executed on
+them.  The first 7 patches (patches starting with dmaengine:) add
+small bits of underlying IDXD plumbing needed to allow external
+sub-drivers to take advantage of this support and claim ownership of
+specific IAA devices and workqueues.
+
+The remaining patches add the main support for this feature via the
+crypto API, making it transparently accessible to kernel features that
+can make use of it such as zswap and zram (patches starting with
+crypto – iaa:).
+
+These include both sync/async support for the deflate algorithm
+implemented by the IAA hardware, as well as an additional option for
+driver statistics and Documentation.
+
+Patch 8 ('[PATCH 08/16] crypto: iaa - Add IAA Compression Accelerator
+Documentation') describes the IAA crypto driver in detail; the
+following is just a high-level synopsis meant to aid the following
+discussion.
+
+The IAA hardware is fairly complex and generally requires a
+knowledgeable administrator with sufficiently detailed understanding
+of the hardware to set it up before it can be used.  As mentioned in
+the Documentation, this typically requires using a special tool called
+accel-config to enumerate and configure IAA workqueues, engines, etc,
+although this can also be done using only sysfs files.
+
+The operation of the driver mirrors this requirement and only allows
+the hardware to be accessed via the crypto layer once the hardware has
+been configured and bound to the the IAA crypto driver.  As an IDXD
+sub-driver, the IAA crypto driver essentially takes ownership of the
+hardware until it is given up explicitly by the administrator.  This
+occurs automatically when the administrator enables the first IAA
+workqueue or disables the last one; the iaa_crypto (sync and async)
+algorithms are registered when the first workqueue is enabled, and
+deregistered when the last one is disabled.
+
+The normal sequence of operations would normally be: 
+
+  < configure the hardware using accel-config or sysfs > 
+
+  < configure the iaa crypto driver (see below) > 
+
+  < configure the subsystem e.g. zswap/zram to use the iaa_crypto algo >  
+
+  < run the workload > 
+
+There are a small number of iaa_crypto driver attributes that the
+administrator can configure, and which also need to be configured
+before the algorithm is enabled:
+
+compression_mode: 
+
+  The IAA crypto driver supports an extensible interface supporting
+  any number of different compression modes that can be tailored to
+  specific types of workloads.  These are implemented as tables and
+  given arbitrary names describing their intent.
+
+  There are currently only 2 compression modes, “canned” and “fixed”.
+  In order to set a compression mode, echo the mode’s name to the
+  compression_mode driver attribute:
+ 
+    echo "canned" > /sys/bus/dsa/drivers/crypto/compression_mode
+
+There are a few other available iaa_crypto driver attributes (see
+Documentation for details) but the main one we want to consider in
+detail for now is the ‘sync_mode’ attribute.
+
+The ‘sync_mode’ attribute has 3 possible settings: ‘sync’, ‘async’,
+and ‘async_irq’.
+
+The context for these different modes is that although the iaa_crypto
+driver implements the asynchronous crypto interface, the async
+interface is currently only used in a synchronous way by facilities
+like zswap that make use of it.
+
+This is fine for software compress/decompress algorithms, since
+there’s no real benefit in being able to use a truly asynchronous
+interface with them.  This isn’t the case, though, for hardware
+compress/decompress engines such as IAA, where truly asynchronous
+behavior is beneficial if not completely necessary to make optimal use
+of the hardware.
+
+The IAA crypto driver ‘sync_mode’ support should allow facilities such
+as zswap to ‘support async (de)compression in some way [2]’ once
+they are modified to actually make use of it.
+
+When the ‘async_irq’ sync_mode is specified, the driver sets the bits
+in the IAA work descriptor to generate an irq when the work completes.
+So for every compression or decompression, the IAA acomp_alg
+implementations called by crypto_acomp_compress/decompress() simply
+set up the descriptor, turn on the 'request irq' bit and return
+immediately with -EINPROGRESS.  When the work completes, the irq fires
+and the IDXD driver’s irq thread for that irq invokes the callback the
+iaa_crypto module registered with IDXD.  When the irq thread gets
+scheduled, it wakes up the caller, which could be for instance zswap,
+waiting synchronously via crypto_wait_req().
+
+Using the simple madvise test program in '[PATCH 09/17] crypto: iaa -
+Add IAA Compression Accelerator Documentation' along with a set of
+pages from the spec17 benchmark and tracepoint instrumentation
+measuring the time taken between the start and end of each compress
+and decompress, this case, async_irq, takes on average 6,847 ns for
+compression and 5,840 ns for decompression. (See Table 1 below for a
+summary of all the tests.)
+
+When sync_mode is set to ‘sync’, the interrupt bit is not set and the
+work descriptor is submitted in the same way it was for the previous
+case.  In this case the call doesn’t return but rather loops around
+waiting in the iaa_crypto driver’s check_completion() function which
+continually checks the descriptor’s completion bit until it finds it
+set to ‘completed’.  It then returns to the caller, again for example
+zswap waiting in crypto_wait_req().  From the standpoint of zswap,
+this case is exactly the same as the previous case, the difference
+seen only in the crypto layer and the iaa_crypto driver internally;
+from its standpoint they’re both synchronous calls.  There is however
+a large performance difference: an average of 3,177 ns for compress
+and 2,235 ns for decompress.
+
+The final sync_mode is ‘async’.  In this case also the interrupt bit
+is not set and the work descriptor is submitted, returning immediately
+to the caller with -EINPROGRESS.  Because there’s no interrupt set to
+notify anyone when the work completes, the caller needs to somehow
+check for work completion.  Because core code like zswap can’t do this
+directly by for example calling iaa_crypto’s check_completion(), there
+would need to be some changes made to code like zswap and the crypto
+layer in order to take advantage of this mode.  As such, there are no
+numbers to share for this mode.
+
+Finally, just a quick discussion of the remaining numbers in Table 1,
+those comparing the iaa_crypto sync and async irq cases to software
+deflate.  Software deflate took average of 108,978 ns for compress and
+14,485 ns for decompress.
+
+As can be seen from Table 1, the numbers using the iaa_crypto driver
+for deflate as compared to software are so much better that merging it
+would seem to make sense on its own merits.  The 'async' sync_mode
+described above, however, offers the possibility of even greater gains
+to be had against higher-performing algorithms such as lzo, via
+parallelization, once the calling facilities are modified to take
+advantage of it.  Follow-up patchsets to this one will demonstrate
+concretely how that might be accomplished.
+
+Thanks, 
+
+Tom  
 
 
-On 03/03/23 19:35, Vlastimil Babka wrote:
-> On 2/20/23 19:38, Michael Roth wrote:
->> From: Nikunj A Dadhania <nikunj@amd.com>
->>
->> Do not pin the guest memory backed by a restrictedmem backend, as
->> pages in the restrictedmem are already pinned. Instead, populate the
->> pages array for these guests using the already-pinned pages provided by
-> 
-> IIUC the "already pinned" became "effectively unmovable and unevictable"
-> since the earlier versions, so that would be more accurate now?
+  Table 1. Zswap latency and compression numbers (in ns): 
 
-Yes, that makes sense.
+  Algorithm                    compress      decompress
+  ----------------------------------------------------------
+  iaa sync			3,177		2,235
+  iaa async irq   		6,847		5,840
+  software deflate	      108,978	       14,485
 
-Regards
-Nikunj
+[1] https://cdrdv2.intel.com/v1/dl/getContent/721858
+
+[2] https://lore.kernel.org/lkml/20201107065332.26992-1-song.bao.hua@hisilicon.com/
+
+Dave Jiang (2):
+  dmaengine: idxd: add wq driver name support for accel-config user tool
+  dmaengine: idxd: add external module driver support for dsa_bus_type
+
+Tom Zanussi (14):
+  dmaengine: idxd: Export drv_enable/disable and related functions
+  dmaengine: idxd: Export descriptor management functions
+  dmaengine: idxd: Export wq resource management functions
+  dmaengine: idxd: Add private_data to struct idxd_wq
+  dmaengine: idxd: add callback support for iaa crypto
+  crypto: iaa - Add IAA Compression Accelerator Documentation
+  crypto: iaa - Add Intel IAA Compression Accelerator crypto driver core
+  crypto: iaa - Add per-cpu workqueue table with rebalancing
+  crypto: iaa - Add compression mode management along with fixed mode
+  crypto: iaa - Add support for iaa_crypto deflate compression algorithm
+  crypto: iaa - Add support for default IAA 'canned' compression mode
+  crypto: iaa - Add support for iaa_crypto async deflate compression
+    algorithm
+  crypto: iaa - Add irq support for the crypto async interface
+  crypto: iaa - Add IAA Compression Accelerator stats
+
+ .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
+ .../driver-api/crypto/iaa/iaa-crypto.rst      |  743 ++++++
+ Documentation/driver-api/crypto/iaa/index.rst |   20 +
+ Documentation/driver-api/crypto/index.rst     |   20 +
+ Documentation/driver-api/index.rst            |    1 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/iaa/Kconfig                    |   19 +
+ drivers/crypto/iaa/Makefile                   |   12 +
+ drivers/crypto/iaa/iaa_crypto.h               |  171 ++
+ drivers/crypto/iaa/iaa_crypto_comp_canned.c   |  110 +
+ drivers/crypto/iaa/iaa_crypto_comp_fixed.c    |   92 +
+ drivers/crypto/iaa/iaa_crypto_main.c          | 2086 +++++++++++++++++
+ drivers/crypto/iaa/iaa_crypto_stats.c         |  271 +++
+ drivers/crypto/iaa/iaa_crypto_stats.h         |   58 +
+ drivers/dma/idxd/bus.c                        |    6 +
+ drivers/dma/idxd/cdev.c                       |    8 +
+ drivers/dma/idxd/device.c                     |    9 +-
+ drivers/dma/idxd/dma.c                        |    9 +-
+ drivers/dma/idxd/idxd.h                       |   74 +-
+ drivers/dma/idxd/irq.c                        |   12 +-
+ drivers/dma/idxd/submit.c                     |    9 +-
+ drivers/dma/idxd/sysfs.c                      |   28 +
+ include/uapi/linux/idxd.h                     |    1 +
+ 24 files changed, 3747 insertions(+), 20 deletions(-)
+ create mode 100644 Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+ create mode 100644 Documentation/driver-api/crypto/iaa/index.rst
+ create mode 100644 Documentation/driver-api/crypto/index.rst
+ create mode 100644 drivers/crypto/iaa/Kconfig
+ create mode 100644 drivers/crypto/iaa/Makefile
+ create mode 100644 drivers/crypto/iaa/iaa_crypto.h
+ create mode 100644 drivers/crypto/iaa/iaa_crypto_comp_canned.c
+ create mode 100644 drivers/crypto/iaa/iaa_crypto_comp_fixed.c
+ create mode 100644 drivers/crypto/iaa/iaa_crypto_main.c
+ create mode 100644 drivers/crypto/iaa/iaa_crypto_stats.c
+ create mode 100644 drivers/crypto/iaa/iaa_crypto_stats.h
+
+-- 
+2.34.1
+
