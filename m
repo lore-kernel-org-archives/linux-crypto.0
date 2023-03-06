@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A66BEC61DA3
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Mar 2023 04:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B81C61DA4
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Mar 2023 04:42:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbjCFEmQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Mar 2023 23:42:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35868 "EHLO
+        id S229818AbjCFEmX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 5 Mar 2023 23:42:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjCFEmQ (ORCPT
+        with ESMTP id S229816AbjCFEmT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Mar 2023 23:42:16 -0500
+        Sun, 5 Mar 2023 23:42:19 -0500
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2119C11670;
-        Sun,  5 Mar 2023 20:42:15 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D2411162;
+        Sun,  5 Mar 2023 20:42:17 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pZ2ff-000e0r-EU; Mon, 06 Mar 2023 12:42:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Mar 2023 12:41:59 +0800
+        id 1pZ2fh-000e10-Hz; Mon, 06 Mar 2023 12:42:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Mar 2023 12:42:01 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Mar 2023 12:41:59 +0800
-Subject: [v5 PATCH 1/7] crypto: stm32 - Save 54 CSR registers
+Date:   Mon, 06 Mar 2023 12:42:01 +0800
+Subject: [v5 PATCH 2/7] crypto: stm32 - Move polling into do_one_request
 References: <ZAVu/XHbL9IR5D3h@gondor.apana.org.au>
 To:     Linus Walleij <linus.walleij@linaro.org>,
         Lionel Debieve <lionel.debieve@foss.st.com>,
@@ -29,32 +29,83 @@ To:     Linus Walleij <linus.walleij@linaro.org>,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
-Message-Id: <E1pZ2ff-000e0r-EU@formenos.hmeau.com>
+Message-Id: <E1pZ2fh-000e10-Hz@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CSR registers go from 0 to 53.  So the number of registers
-should be 54.
+There is no need to poll separate for update and final.  We could
+merge them into do_one_request.
+
+Also fix the error handling so that we don't poll (and overwrite
+the error) when an error has already occurred.
 
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 Tested-by: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/stm32/stm32-hash.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/stm32/stm32-hash.c |   29 ++++++++++++-----------------
+ 1 file changed, 12 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index 7bf805563ac2..bde2b40a6a32 100644
+index bde2b40a6a32..298cabd29e36 100644
 --- a/drivers/crypto/stm32/stm32-hash.c
 +++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -68,7 +68,7 @@
- #define HASH_MASK_DATA_INPUT		BIT(1)
+@@ -425,6 +425,8 @@ static int stm32_hash_update_cpu(struct stm32_hash_dev *hdev)
+ 		bufcnt = rctx->bufcnt;
+ 		rctx->bufcnt = 0;
+ 		err = stm32_hash_xmit_cpu(hdev, rctx->buffer, bufcnt, 0);
++		if (err)
++			return err;
+ 	}
  
- /* Context swap register */
--#define HASH_CSR_REGISTER_NUMBER	53
-+#define HASH_CSR_REGISTER_NUMBER	54
+ 	stm32_hash_append_sg(rctx);
+@@ -433,14 +435,6 @@ static int stm32_hash_update_cpu(struct stm32_hash_dev *hdev)
+ 		bufcnt = rctx->bufcnt;
+ 		rctx->bufcnt = 0;
+ 		err = stm32_hash_xmit_cpu(hdev, rctx->buffer, bufcnt, 1);
+-
+-		/* If we have an IRQ, wait for that, else poll for completion */
+-		if (hdev->polled) {
+-			if (stm32_hash_wait_busy(hdev))
+-				return -ETIMEDOUT;
+-			hdev->flags |= HASH_FLAGS_OUTPUT_READY;
+-			err = 0;
+-		}
+ 	}
  
- /* Status Flags */
- #define HASH_SR_DATA_INPUT_READY	BIT(0)
+ 	return err;
+@@ -784,15 +778,6 @@ static int stm32_hash_final_req(struct stm32_hash_dev *hdev)
+ 	else
+ 		err = stm32_hash_xmit_cpu(hdev, rctx->buffer, buflen, 1);
+ 
+-	/* If we have an IRQ, wait for that, else poll for completion */
+-	if (hdev->polled) {
+-		if (stm32_hash_wait_busy(hdev))
+-			return -ETIMEDOUT;
+-		hdev->flags |= HASH_FLAGS_OUTPUT_READY;
+-		/* Caller will call stm32_hash_finish_req() */
+-		err = 0;
+-	}
+-
+ 	return err;
+ }
+ 
+@@ -964,6 +949,16 @@ static int stm32_hash_one_request(struct crypto_engine *engine, void *areq)
+ 	else if (rctx->op == HASH_OP_FINAL)
+ 		err = stm32_hash_final_req(hdev);
+ 
++	/* If we have an IRQ, wait for that, else poll for completion */
++	if (err == -EINPROGRESS && hdev->polled) {
++		if (stm32_hash_wait_busy(hdev))
++			err = -ETIMEDOUT;
++		else {
++			hdev->flags |= HASH_FLAGS_OUTPUT_READY;
++			err = 0;
++		}
++	}
++
+ 	if (err != -EINPROGRESS)
+ 	/* done task will not finish it, so do it here */
+ 		stm32_hash_finish_req(req, err);
