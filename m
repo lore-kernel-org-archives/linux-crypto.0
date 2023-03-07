@@ -2,44 +2,45 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF20C678D5
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Mar 2023 06:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A51AC678D5
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Mar 2023 06:59:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231220AbjCGG6H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Mar 2023 01:58:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59070 "EHLO
+        id S231156AbjCGG73 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Mar 2023 01:59:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbjCGG5l (ORCPT
+        with ESMTP id S231154AbjCGG7I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Mar 2023 01:57:41 -0500
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2055.outbound.protection.outlook.com [40.107.6.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BF286DE8;
-        Mon,  6 Mar 2023 22:57:03 -0800 (PST)
+        Tue, 7 Mar 2023 01:59:08 -0500
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on0616.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe02::616])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C69B4457EA;
+        Mon,  6 Mar 2023 22:58:24 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i8Y4ObDE9fyx8njJW7y1TtCe4cEiP0HVTt7L7CsojNlFHBPWOzmAOleIsmTlGF4CteuO4zFDojaDMp+GikCR6OOmdXWZF+iO5m5eSnx+vJYjDIjiK5SSK3thgrG2740xgXGjmutojLKONY8jt5ybkbcT09+PPf+LrncFuegVR4CAcJswOZQ9gW9p7VZaH064tMdqoFIv+hi9zbzP5wtL5+aXSIO6m+q1A9IDTL7q6QErPIgIY/XBJlcTCdTd2x/48gjmwqHNDG07wPpMzh17jEhg8DaoABmXvznFf1cxZEmPfzEHfqlDYSlPzw0b6pysYim+b1lQUfE49QwJe3/Mnw==
+ b=K2vMe+2+P86UcE5qjV7g/OXOIlBKXnklhu+RyIsh5Cdnf7edZAiG45W9HG6fkgIgv45qlTPw1dB7/5ou6aLa9X6TCloxv5vRoxnhjXB+Y8Go0THcNWYpLn6xFuTLqk+mqz3iyB4fl5CYKWyedt/9MHI0GdY/+yDJBsQbiUphZ6DT/S8dXnZQPE8ArF50OJ5qYjlZ1v1+Hx8WeaZEPcat0kp4vVFmo21uBB2Uy0p2B9KZunfrvO603eu19wiLZDHKuFbr1aPe5oCIw9qR2MhnlXHoLmduVKgWGUlSCJqNLSgi+88CQDlXNNRRJRMWohkHxH7CguYUPu3bq1I6BV0p9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ifnEcR0gg6/i6egyW+jFqSLmaBp2jxDM6BfNqDKkXYM=;
- b=l7amRPq/189iZ0a6UDwjdEa2ISOhzliWxBHJDrMaqF9Krg+58dZfmmFuw+3IBTmE0ryg0inqzR9E7bfciBBUWdUX6h58yYwy7ZS3KBw74rBIBQyDxwXt9CxHMFgsy30RNOp+M0AbHmD8qPcDdeEEcLNlWRRaKrMSPhHI5Px5DOS8AmsaEU+WsvRSbhQFOmdm3lOIOa1Mxvo69X6thie5UYpiq+imUK6Jme8exK+7MmQYadH7LW2ObG+dJZOZZ1wHKxlZm6x0J2DnMywPqqbrJSrxhFiWtSNF9uKpXR2q4H78DgGp23/SYCRWusM6kFu2rMDMFtX/a9FGA4c+M4x7Bg==
+ bh=PEKTvT57IaUqU+7ZziTyQ2O57OYqcXjNZdBdQYHFT4c=;
+ b=gC0vadS3BUrM6JX+v6dDY9iWlEgDyfJh1k/+BbUZlA89XEnXkzrSh5c7cClLojtJtV8C0VYn9SToRtBMziQ0WoeBtQ8n7B6+Ys61azhFF+MPnUDZKEwfgccR/UwK1l+yQ/e928kh/PHH+b4dhno0nmsb1n7QEkkcFs0nyLEaZeK3extR9aa5pne+rofoGQXZN/EwJ3QURm03H75ZsXpDe6wHgw8ftRamSmpMPNrAv0eFSKQ5nT30NhsVSWGqEz26u9viNVJ0qOewFHmhcPc22LqTbuq3+IYd/PFw0yRZ7l4em2KDRLr2kbmz6YDKzD175e1IS35arczLQfuiPNf5dw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ifnEcR0gg6/i6egyW+jFqSLmaBp2jxDM6BfNqDKkXYM=;
- b=WNuddC95olwfTl05GFhVGowxg5vuoLO9gSifZw9Rmb2cs/LB20JWPjor4BGib84le3bVtSKrRR1wXIw4hHgxGGL0tYVAyuTO25L3nLJmQHjJMdb+8/+lCE3i8LcPVdeRLEidAj1XcbqGDts3UziuWm3yO75iAZtIZyc2ImSefFY=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by PAXPR04MB8765.eurprd04.prod.outlook.com (2603:10a6:102:20c::15) with
+ bh=PEKTvT57IaUqU+7ZziTyQ2O57OYqcXjNZdBdQYHFT4c=;
+ b=QN099/jNAhycy70mxdRZaEJVGtjyyMaKnu/xsISIaBXuHA2UHyidhYeP++msvSzmmNzR6m6Djl+lJgj92aVl/YOST8WDic/s4G2cwjeywlvqQE1lisN9jn46QOPnheCS7V/ZuB+/pyX09oVr/I50OQWzVZruUDCiJa7aZqxr2mI=
+Received: from DU0PR04MB9417.eurprd04.prod.outlook.com (2603:10a6:10:358::11)
+ by PAWPR04MB9986.eurprd04.prod.outlook.com (2603:10a6:102:380::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.29; Tue, 7 Mar
- 2023 06:56:00 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::c2c7:5798:7033:5f87]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::c2c7:5798:7033:5f87%7]) with mapi id 15.20.6156.028; Tue, 7 Mar 2023
- 06:56:00 +0000
-From:   Gaurav Jain <gaurav.jain@nxp.com>
-To:     "Peng Fan (OSS)" <peng.fan@oss.nxp.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.28; Tue, 7 Mar
+ 2023 06:58:08 +0000
+Received: from DU0PR04MB9417.eurprd04.prod.outlook.com
+ ([fe80::f55a:cf12:da08:6d2a]) by DU0PR04MB9417.eurprd04.prod.outlook.com
+ ([fe80::f55a:cf12:da08:6d2a%3]) with mapi id 15.20.6156.028; Tue, 7 Mar 2023
+ 06:58:08 +0000
+From:   Peng Fan <peng.fan@nxp.com>
+To:     Gaurav Jain <gaurav.jain@nxp.com>,
+        "Peng Fan (OSS)" <peng.fan@oss.nxp.com>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "robh+dt@kernel.org" <robh+dt@kernel.org>,
@@ -55,17 +56,18 @@ CC:     "kernel@pengutronix.de" <kernel@pengutronix.de>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>, Peng Fan <peng.fan@nxp.com>
-Subject: RE: [PATCH 3/9] dt-bindings: crypto: fsl-sec4: support sec5.4/0 and
- i.MX6UL
-Thread-Topic: [PATCH 3/9] dt-bindings: crypto: fsl-sec4: support sec5.4/0 and
- i.MX6UL
-Thread-Index: AQHZS+Bx+SvbzTgzy0SagwQvcdZdWa7u618Q
-Date:   Tue, 7 Mar 2023 06:56:00 +0000
-Message-ID: <AM0PR04MB60045D52CF83EE802F23BD19E7B79@AM0PR04MB6004.eurprd04.prod.outlook.com>
+        <linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH 6/9] dt-bindings: crypto: fsl-sec4-snvs: add fsl sec 5.x
+ compatible
+Thread-Topic: [PATCH 6/9] dt-bindings: crypto: fsl-sec4-snvs: add fsl sec 5.x
+ compatible
+Thread-Index: AQHZS+B5WTsB3C0yXU6n91MXqRivpK7u6bOAgAACWNA=
+Date:   Tue, 7 Mar 2023 06:58:08 +0000
+Message-ID: <DU0PR04MB941725532887782FA4596F3988B79@DU0PR04MB9417.eurprd04.prod.outlook.com>
 References: <20230301015702.3388458-1-peng.fan@oss.nxp.com>
- <20230301015702.3388458-4-peng.fan@oss.nxp.com>
-In-Reply-To: <20230301015702.3388458-4-peng.fan@oss.nxp.com>
+ <20230301015702.3388458-7-peng.fan@oss.nxp.com>
+ <AM0PR04MB6004756C673A5141BA0529B6E7B79@AM0PR04MB6004.eurprd04.prod.outlook.com>
+In-Reply-To: <AM0PR04MB6004756C673A5141BA0529B6E7B79@AM0PR04MB6004.eurprd04.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -73,197 +75,120 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|PAXPR04MB8765:EE_
-x-ms-office365-filtering-correlation-id: 6056fdd3-6a53-4a41-9fce-08db1ed902e0
+x-ms-traffictypediagnostic: DU0PR04MB9417:EE_|PAWPR04MB9986:EE_
+x-ms-office365-filtering-correlation-id: 459fb5d6-5291-43ab-c83d-08db1ed94ebc
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: v4UUo/G9iuLeAgGjVUvz05T1xXvaORUwl9hXCkPgACWgyeEGyuS+1gunKQ8X9UwNr6hK9OZYYY/6/CGn71BrTWygiNkIS54LSLK9tn5fYPKgJ9DzIQ9ik+NwH/Amrn7cvOVMPZgrb/8TZF8rhp8f+Wk1ivqVUSbz9MV+By3jq1feWlQ7Mus9nYQxQl1pqL/D5Emgh0heA3S4KbhoKbK247gxrFJPePFlPWo6aJG0zekJ8YfkO81BBYKoQHN8feGxDC8jl01xJ5K+Ayi1Z1vPV/ThMDmoYr37ZgcBJs3sNlRbRDdnLTZwDkQg0cD4ijQFz5iOqMko5UsxJwoRQntjOU6M2zlLdfYvSG+bFtxZ1ejgO/n/1K6RYTZs+iHLGq8H8ktp+9fYgDWBJXTdqpC/zuKBFFKBZvrbj6yqBrT1avg1V8laXkOT6QwTpwvX2t+1MrGaxzdX3cBQ/CxpUh96Nj8wlFlXAV3CUVBH+SyCIjF5yC8gd/RKXIeK/L1OWdU9iNUsk76KvNEx9EOmC9bNbA8hnWcoxdOQsjigqeLvary9mjI/EepAye1jWslpnpP9ElCa7D1rW/9ACMVps5Ze2sSxx49MNqJHKTNQhuyL7fPrgNkMxAc4VyRio3T3LhO8mgnYb/YcEaap81fU1x0vSHHyFgDTy5znk7O6R0rrm8xmlpXZfikOqx/iN3EqOBx/xO6ElV4t4mAezsREPo3AJA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(366004)(39860400002)(376002)(136003)(451199018)(38100700002)(122000001)(33656002)(86362001)(38070700005)(2906002)(7416002)(44832011)(5660300002)(4326008)(76116006)(66446008)(64756008)(8676002)(66476007)(66556008)(66946007)(41300700001)(8936002)(52536014)(55236004)(53546011)(9686003)(186003)(83380400001)(110136005)(316002)(478600001)(54906003)(55016003)(6506007)(26005)(7696005)(71200400001);DIR:OUT;SFP:1101;
+x-microsoft-antispam-message-info: 9NqqVh1RoDZ+grXjh5W2jqAk1FgVbMl6oSZkVXxfXnbUINMXfTOG/osqZGtY0sEnCIrxo9zfeMywqs9sRTJ8rJVnxOZiWM8TlVSjGcWJ4bVj+/FxPFW9f2/8VR+3NbmJlTjs2qcpn6/vYAags9QGijcGBHXL1VnE7Mmwv1zCEWccNvOISf/8NrlIR9hCDoAjvnPsmMKDNJilD+sFOPV+3En9QjCMedKjO0zq+aXa59KRGSPYwmv4YgN0l+a/H/crFYNtrAfv57jRgezGmrDCGMYd28N5+PIlD7vu5n+cqK3iZ6eoTV6aPRa1fe5lH65ldZgWaudElWyyEsxuEoArOEmmlzmZoKopEMV6VSJLMYQvHHtQh6AZMqTTBzP8pS7kiAOaWGYxjPQRDLpLZ4i3RepwE3jlXb/JYcO4D0nNZikN4JGuY6ZfCQyp4OZ4e1afZNKn5TP06mehoJaTDhOyeN0R/8IpW6wcACmBPept/54uYbRioiZokZRDKoSfS0yJxwjLLmAXytNiQoX43hMsXQyYSrwCjDNFNEd76XxvRc/rjIwDM7cB2W8ppPAGkuYE2Q7HIacHlT5KvZMSjFna0XDTdMmOuBmHYzO2Rteh87HGTHu6SvPU9lKlqM4FsVzaGOLN6GeWMvUxS1qdg+JSic6Un1WYsO1TUN9aTaHoDDXnFzaqBnrAdnBnesBqxiv/qXpujSVxbjR5E3J1qxny8A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9417.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(396003)(346002)(366004)(136003)(451199018)(921005)(33656002)(66446008)(7416002)(41300700001)(66556008)(4326008)(8676002)(8936002)(64756008)(44832011)(76116006)(2906002)(5660300002)(66946007)(71200400001)(38070700005)(86362001)(122000001)(66476007)(38100700002)(7696005)(966005)(55016003)(316002)(110136005)(54906003)(478600001)(52536014)(83380400001)(6506007)(186003)(9686003)(53546011)(26005);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lskdi9dUOtxoMFqRJrp1h7Yhv5lPz8Txz5jlIRYO0kQgmZcPMwTh2xMBhMXt?=
- =?us-ascii?Q?8qA4SySG16TYpgK75x/9gu3oANWG1M3DaYvzHdDP5Gtas6jFweTMeZn9NUVj?=
- =?us-ascii?Q?dSG6L2NTwMIi8AWb3osN0PE3ws8RrkHWh1kQr34nhX2LdC9V1tKoh45Xz/sW?=
- =?us-ascii?Q?wHeCofWAXQmt9V9uV3s2ZXLFJMr3AsaW5hngIiXsZiob4RXq3LqcZ1ZNzOhq?=
- =?us-ascii?Q?DPYMqF3iDe1HzkBIQ0k4cjGyL4xJfTUimMBSKRyw7s65ZYEIfhyt1Jx/U8tP?=
- =?us-ascii?Q?3XuHCAaYzuZaknOQ4O4MkBS7TAByrSzgtcp1FXBB02ZVaonIIH0WlrJtmoi/?=
- =?us-ascii?Q?yU0hd/i8OdUFV15by5rNKjIeoCSOcLDnS8v/ve8moS/Szu68+2HV68hi3snf?=
- =?us-ascii?Q?J7H6qu1BM/vnzcifG7i+nRiRmPH7uTfjwO4GYfdd5StzQNOpNHYEgqAeCLIm?=
- =?us-ascii?Q?oSU1ftRprvjYfkk1Lqc9XES57c9LRck0xQNBDabgBJp3Cjg/uvo7i1j0CcFI?=
- =?us-ascii?Q?yIzdyRXjz1j/w8dLB3AtgSpArQb4uKRnDizTls/w+NZfKEC8qgF9JayK11XK?=
- =?us-ascii?Q?Yzf8H2bJq8PjxSG/GWQMvXE4s9KogXNz3Z4E1a4aeqw7PIrtibdUrF1Lb03P?=
- =?us-ascii?Q?X1Bz9fDGXZu71YaQ5LhfsYKABqS6ezzvkO8+M0EsGkWbj0RyJgtgnZ22psid?=
- =?us-ascii?Q?vnmLBp1mMpeT2Ex0P0lhmKENFLE5ubdsaAYnjjp/77FC4fJxwKfjvT+0VymU?=
- =?us-ascii?Q?+spUQ00ZuBCXvF1N3jaehfauzY58KW5uAWCfjmhHgWKBK5hC0jYRqmLyRAK0?=
- =?us-ascii?Q?vd4REeplnSKVHtfJewa7+5YSke4H4vQILZe3hVaf3oTOI30B64bDXqTB6rGB?=
- =?us-ascii?Q?Lx1GsckA0Gj0eITL5tisc0YOHPm8J7J/hhmpMjzwwUeLR0xa60WGkEVTKooK?=
- =?us-ascii?Q?q7ezxDXGYSRHtmkOyJp7xSTgcyBzRvJi5jW8Yy74OJOnl0NsoijjK0ReAeBc?=
- =?us-ascii?Q?OGvGxe6kiOl0uzejdWGkRfH7leW1+SKZHkY8pcA1QAyCQ5o+6+AaUqHIQmXq?=
- =?us-ascii?Q?bMsmZCKHN0QQckCD9MGfRiYx36FMgGyM/PLEoIpRWqS3PIzn0HNKBMSJeSHO?=
- =?us-ascii?Q?YevrB7XRsRns5pdywL7nxLcF8jltmf1VQXS5J0/kWTJYJP2H5bloRjXdpeSG?=
- =?us-ascii?Q?fGsMC27bkYJhpd8sRq932PQYuiOpgio5sTynmUcUyIiPIpVvRC5tCDnKsowg?=
- =?us-ascii?Q?sO1kzz/GagsgYoi2Nwm2Ll1E7k1pSMWBRLW11ICXKxFfQwRANKonZMd5ICnv?=
- =?us-ascii?Q?y7cHW6QSbAX66TC2NUKO0SWy+d29x8Fyml6TuZkto7HC59jJbpMA5R9+6S8L?=
- =?us-ascii?Q?aR4ww03Dvrn0iUxGHVQXANiBSsagq448SX+YhzxGkJ9IK+LXt+16fgW+l2Gr?=
- =?us-ascii?Q?Er9jB7np+6iTkgyvy2/ZYzEUXJqNEhacWXZTAq2+zLbFX4wOFdbi3piVQIbg?=
- =?us-ascii?Q?WMfbzCQfTUwiij1aUtdQbyj3rFxXJEuJ4AEcszsGSxUr97XENivh2nsTdwLR?=
- =?us-ascii?Q?IdujOkBDWNV/fUC43JJLCQfR8YbromJYYRIKRUGg?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?28B3xnlB9JnWflFPpWPg7HuegM047J4FxiRL0o5FeTPgmwgdeVOV8uTfvjtw?=
+ =?us-ascii?Q?coeGkP/w1UbrIsKNbFnIs1NlbSJqZrCw8GMtromHDBdbJfR20FPHGW9rQGkO?=
+ =?us-ascii?Q?2utPMVCWrllvKXbEi4e/AfwD8IB2d5AiGhc/l6KoHdPJu00zOkrqAa929QSO?=
+ =?us-ascii?Q?2yz2sf+t+owxxCZEK+36z86hhxaLdaXdfVZxohaqjIe9izwOcrUYrH31DU7b?=
+ =?us-ascii?Q?qQMbi6EXf+q/0ORoJJu+7J8j5VRwpGpvQuZErAbMZX13e3OUiuH/nPcdUio/?=
+ =?us-ascii?Q?WANqQUkM77kMANVcPviN+Zi+c4sbOrgalUCsRwHomkhDVh3aMz5Lq8cJCJ8i?=
+ =?us-ascii?Q?tbgs1JZ3SjAfe8P+EP/Ewg/Nmh8e6rXnx1B2+UyW4/xP4byu6AprbtEbQdj3?=
+ =?us-ascii?Q?qbxEInju/aF9LzIzoE420mw7aLD9VppEVzTzTR4Dz7s0Teg5OzjW1qPnG7ib?=
+ =?us-ascii?Q?d5tK66BmAwWzNC6OZgJ7PtVHQBekVw9AQYyI7ZgEbFuQPeewEDyE+c+UzLRj?=
+ =?us-ascii?Q?fReRFVO5of6HScpHbSVzVyITfXBFKee9SWggWcKJQG7N0PaSVO29jfQ7BLTa?=
+ =?us-ascii?Q?TeAe2fqIeQLt4xdXF/p2jgmhUIEr7E4jBUFi6NYKBdsDmG6UUSgFgVY0x5li?=
+ =?us-ascii?Q?ymoABF7xeNixhyaywhqH6ifDwXQ7S2paVe7SwjVHCSaaUz91q4eu/r1/qtK0?=
+ =?us-ascii?Q?k1auxA6zgq5qEDML1pwSnmxMv/ye+TJv3eYXfOsqz0oggVPgTbsLEmMBY+Uz?=
+ =?us-ascii?Q?sJKITUmJo9vBaOJrbrKsOl/h/PYxAQA18DvK16qHwM6gP512wl6A/hgc2XnH?=
+ =?us-ascii?Q?2Nf2DtAikkEjD8YK2OFi0gmGru3CGTYEqUoAKMgpEt43h7bgGs7vkjudoWtW?=
+ =?us-ascii?Q?IfDb1K+PIx30f9Y24bO0GPf7tRIJ3ArfmR5PBZZWU8EmYxfOAZxfTg5SSDcs?=
+ =?us-ascii?Q?qjqAtzE2GIAc2EiQQW6gl169PKsONnbjBH58FxwDdHx/z3kGC4A15dtiesKP?=
+ =?us-ascii?Q?RlbmkVguHJFNhiWFgCC1Uzx3YbjuV6H7rIFLG5CZMGGS9Irdhyq1jmKbaBw5?=
+ =?us-ascii?Q?D68wyjno6OzuCQ2kudGenJE0rjDpXMew//gw3GD/q6WRBW8txCDP2zl/db4I?=
+ =?us-ascii?Q?eCFeFzsluhRTOCKW4wakoa8gefLRJB2VZDdsG9lGPitvWCqYNEGKpDaW/n1T?=
+ =?us-ascii?Q?hvFP52U1Bfk0jJGkYyoLUkmuA4kMbx8It32r2dBhrtn14yh5kwFymXbs/oJa?=
+ =?us-ascii?Q?dk55++RqsS0u0LtRdwT0Sqbhw7r0kSx9aj0dZO1Qf0pMbP9TtjHD9O15jQOz?=
+ =?us-ascii?Q?KZUCHLXUfWECss95zdvYbx0rhPO6SL+FAw3+iKUF83JTqNxaJBY/rRmQEiec?=
+ =?us-ascii?Q?T3zuaUF03cfRj93F4vhFjJPGRoDxIurj81WbzgnO3IQwjS5zc05vxIxilxos?=
+ =?us-ascii?Q?ye9/vA0lWPPeqrK2eeJnR2rZMwqh6PNIM7meysgTX10o4RklkGGr4QKa2dci?=
+ =?us-ascii?Q?9eQuHhxmEc6Yhq/1zs5UY8fEfi3tZ1mRCKJo+d4kM030n2C/HHUYHvggxwlJ?=
+ =?us-ascii?Q?h/7YixjSHZ7jCTdHP+c=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6056fdd3-6a53-4a41-9fce-08db1ed902e0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2023 06:56:00.7912
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9417.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 459fb5d6-5291-43ab-c83d-08db1ed94ebc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2023 06:58:08.0163
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4TWw/j1Ff8TtWXhbBlbyg61yxuhQ/a4cDfDgod5/56rATwb/bMMXFCXCKe6VT1xO+VmzEhDIEmU13wEKXGcQ2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8765
+X-MS-Exchange-CrossTenant-userprincipalname: +Rw2d/ZCaMwSlmKuZtS8uHlHte7ltAwpZ/L/UN7ThTYoCGsKILmIingXv6q/67pxUwu4M53Hr9VOTPBE5IaOZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB9986
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+> Subject: RE: [PATCH 6/9] dt-bindings: crypto: fsl-sec4-snvs: add fsl sec =
+5.x
+> compatible
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: Peng Fan (OSS) <peng.fan@oss.nxp.com>
+> > Sent: Wednesday, March 1, 2023 7:27 AM
+> > To: herbert@gondor.apana.org.au; davem@davemloft.net;
+> > robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org; Horia Geanta
+> > <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>;
+> Gaurav
+> > Jain <gaurav.jain@nxp.com>; shawnguo@kernel.org;
+> > s.hauer@pengutronix.de
+> > Cc: kernel@pengutronix.de; stefan@agner.ch;
+> > linux-crypto@vger.kernel.org; devicetree@vger.kernel.org;
+> > linux-kernel@vger.kernel.org; linux-arm- kernel@lists.infradead.org;
+> > Peng Fan <peng.fan@nxp.com>
+> > Subject: [PATCH 6/9] dt-bindings: crypto: fsl-sec4-snvs: add fsl sec
+> > 5.x compatible
+> >
+> > From: Peng Fan <peng.fan@nxp.com>
+> >
+> > Add fsl sec 5.x compatible, which is used by layerscape SoCs.
+> I can see sec-v5.2-mon, sec-v5.3-mon for Qoriq.
 
-> -----Original Message-----
-> From: Peng Fan (OSS) <peng.fan@oss.nxp.com>
-> Sent: Wednesday, March 1, 2023 7:27 AM
-> To: herbert@gondor.apana.org.au; davem@davemloft.net;
-> robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org; Horia Geanta
-> <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Gaurav Jain
-> <gaurav.jain@nxp.com>; shawnguo@kernel.org; s.hauer@pengutronix.de
-> Cc: kernel@pengutronix.de; stefan@agner.ch; linux-crypto@vger.kernel.org;
-> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
-> kernel@lists.infradead.org; Peng Fan <peng.fan@nxp.com>
-> Subject: [PATCH 3/9] dt-bindings: crypto: fsl-sec4: support sec5.4/0 and =
-i.MX6UL
->=20
-> From: Peng Fan <peng.fan@nxp.com>
->=20
-> Add i.MX6UL, SEC 5.0 and SEC 5.4 support.
->=20
-> Signed-off-by: Peng Fan <peng.fan@nxp.com>
-> ---
->  .../devicetree/bindings/crypto/fsl-sec4.yaml  | 58 ++++++++++++++++---
->  1 file changed, 50 insertions(+), 8 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
-> b/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
-> index 678c8389ef49..1b801ae5ab51 100644
-> --- a/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.yaml
-> @@ -45,8 +45,18 @@ maintainers:
->=20
->  properties:
->    compatible:
-> -    enum:
-> -      - fsl,sec-v4.0
-> +    oneOf:
-> +      - enum:
-> +          - fsl,sec-v4.0
-> +      - items:
-> +          - enum:
-> +              - fsl,imx6ul-caam
-> +              - fsl,sec-v5.0
-> +          - const: fsl,sec-v4.0
-> +      - items:
-> +          - const: fsl,sec-v5.4
-> +          - const: fsl,sec-v5.0
-> +          - const: fsl,sec-v4.0
+Please go with Rob's patch which is earlier than my patchset.
 
-fsl,sec-v5.2, fsl,sec-v5.3, fsl,sec-v6.0 also used in Qoriq
+https://lore.kernel.org/lkml/d4c76900-1985-428b-4050-26fd4a0daaf8@oss.nxp.c=
+om/T/
 
-regards
-Gaurav=20
+Thanks,
+Peng.
+
 >=20
->    "#address-cells":
->      const: 1
-> @@ -77,6 +87,8 @@ properties:
->=20
->    clock-names:
->      oneOf:
-> +      - items:
-> +          - const: ipg
->        - items:
->            - const: mem
->            - const: aclk
-> @@ -85,11 +97,17 @@ properties:
->        - items:
->            - const: aclk
->            - const: ipg
-> +      - items:
-> +          - const: ipg
-> +          - const: aclk
->        - items:
->            - const: ipg
->            - const: aclk
->            - const: mem
->=20
-> +  dma-coherent:
-> +    type: boolean
-> +
->    fsl,sec-era:
->      description:
->        Optional. A standard property. Define the 'ERA' of the SEC device.
-> @@ -108,8 +126,16 @@ patternProperties:
->=20
->      properties:
->        compatible:
-> -        enum:
-> -          - fsl,sec-v4.0-job-ring
-> +        oneOf:
-> +          - enum:
-> +              - fsl,sec-v4.0-job-ring
-> +          - items:
-> +              - const: fsl,sec-v5.0-job-ring
-> +              - const: fsl,sec-v4.0-job-ring
-> +          - items:
-> +              - const: fsl,sec-v5.4-job-ring
-> +              - const: fsl,sec-v5.0-job-ring
-> +              - const: fsl,sec-v4.0-job-ring
->=20
->        reg:
->          maxItems: 1
-> @@ -148,8 +174,16 @@ patternProperties:
->=20
->      properties:
->        compatible:
-> -        enum:
-> -          - fsl,sec-v4.0-rtic
-> +        oneOf:
-> +          - enum:
-> +              - fsl,sec-v4.0-rtic
-> +          - items:
-> +              - const: fsl,sec-v5.0-rtic
-> +              - const: fsl,sec-v4.0-rtic
-> +          - items:
-> +              - const: fsl,sec-v5.4-rtic
-> +              - const: fsl,sec-v5.0-rtic
-> +              - const: fsl,sec-v4.0-rtic
->=20
->        "#address-cells":
->          const: 1
-> @@ -187,8 +221,16 @@ patternProperties:
->=20
->          properties:
->            compatible:
-> -            enum:
-> -              - fsl,sec-v4.0-rtic-memory
-> +            oneOf:
-> +              - enum:
-> +                  - fsl,sec-v4.0-rtic-memory
-> +              - items:
-> +                  - const: fsl,sec-v5.0-rtic-memory
-> +                  - const: fsl,sec-v4.0-rtic-memory
-> +              - items:
-> +                  - const: fsl,sec-v5.4-rtic-memory
-> +                  - const: fsl,sec-v5.0-rtic-memory
-> +                  - const: fsl,sec-v4.0-rtic-memory
->=20
->            reg:
->              minItems: 1
-> --
-> 2.37.1
+> Regards
+> Gaurav
+> >
+> > Signed-off-by: Peng Fan <peng.fan@nxp.com>
+> > ---
+> >  Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git
+> > a/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
+> > b/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
+> > index 6878ae8127ec..1a4b4975e1d9 100644
+> > --- a/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
+> > +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4-snvs.yaml
+> > @@ -24,6 +24,10 @@ maintainers:
+> >  properties:
+> >    compatible:
+> >      oneOf:
+> > +      - items:
+> > +          - const: fsl,sec-v5.4-mon
+> > +          - const: fsl,sec-v5.0-mon
+> > +          - const: fsl,sec-v4.0-mon
+> >        - items:
+> >            - const: fsl,sec-v4.0-mon
+> >            - const: syscon
+> > --
+> > 2.37.1
 
