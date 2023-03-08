@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB57DC678D5
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Mar 2023 03:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7065FC6FA99
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Mar 2023 03:40:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229938AbjCHDXv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Mar 2023 22:23:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53750 "EHLO
+        id S229701AbjCHDkY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Mar 2023 22:40:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbjCHDXu (ORCPT
+        with ESMTP id S229627AbjCHDkX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Mar 2023 22:23:50 -0500
+        Tue, 7 Mar 2023 22:40:23 -0500
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73BD29DE30;
-        Tue,  7 Mar 2023 19:23:47 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC4793E3F;
+        Tue,  7 Mar 2023 19:40:21 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pZkOi-001Y2T-EU; Wed, 08 Mar 2023 11:23:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Mar 2023 11:23:24 +0800
-Date:   Wed, 8 Mar 2023 11:23:24 +0800
+        id 1pZkeo-001YNx-FH; Wed, 08 Mar 2023 11:40:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Mar 2023 11:40:02 +0800
+Date:   Wed, 8 Mar 2023 11:40:02 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linus Walleij <linus.walleij@linaro.org>
 Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
@@ -29,29 +29,39 @@ Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
         linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
 Subject: Re: [v5 PATCH 7/7] crypto: stm32 - Save and restore between each
  request
-Message-ID: <ZAf/rAbc3bMIwBcr@gondor.apana.org.au>
+Message-ID: <ZAgDku9htWcetafb@gondor.apana.org.au>
 References: <ZAVu/XHbL9IR5D3h@gondor.apana.org.au>
  <E1pZ2fs-000e27-4H@formenos.hmeau.com>
  <CACRpkdY8iN_ga0VuQ-z=8KUWaJ6=5rh2vZEwcp+oNgcBuPFk=g@mail.gmail.com>
  <ZAcNhtm/+mik1N2m@gondor.apana.org.au>
  <CACRpkdbcrCa9v82xVWtixWdDPvCu6E6Rkw-3Vg3APisdvYGwqQ@mail.gmail.com>
+ <ZAf/rAbc3bMIwBcr@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACRpkdbcrCa9v82xVWtixWdDPvCu6E6Rkw-3Vg3APisdvYGwqQ@mail.gmail.com>
+In-Reply-To: <ZAf/rAbc3bMIwBcr@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 04:31:44PM +0100, Linus Walleij wrote:
+On Wed, Mar 08, 2023 at 11:23:24AM +0800, Herbert Xu wrote:
 >
-> Sadly this doesn't work.
+> Nevermind, I know why it doesn't work.  It's specific to ux500
+> where you're polling the DCAL bit.  But the DCAL bit only works
+> for the final hash, it doesn't work for the intermediate state.
+> 
+> Let me check how the old ux500 handled this case.
 
-Nevermind, I know why it doesn't work.  It's specific to ux500
-where you're polling the DCAL bit.  But the DCAL bit only works
-for the final hash, it doesn't work for the intermediate state.
+Hmm, it seems to use the same bit.  I guess the meaning must be
+different with ux500.
 
-Let me check how the old ux500 handled this case.
+Could you check for me which wait_busy() call is actually failing?
+Is it the one I added right before we save the state, or is it
+something else?
+
+If it's something perhaps we aren't restoring the state in the
+right way, because the stm32 state restoring code is quite different
+compared to the ux500 code.
 
 Thanks,
 -- 
