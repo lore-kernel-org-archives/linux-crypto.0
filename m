@@ -2,116 +2,157 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B738C64EC4
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Mar 2023 17:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67B4C678D5
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Mar 2023 18:12:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229551AbjCHRFI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Mar 2023 12:05:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33550 "EHLO
+        id S230020AbjCHSL6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Mar 2023 13:11:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbjCHREz (ORCPT
+        with ESMTP id S229626AbjCHSL5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Mar 2023 12:04:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B075D8A6
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Mar 2023 09:03:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678295015;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=+bV6MJeZtqLU80fZFFPU6YZTkzQK1mAwlHMg0ipvOFY=;
-        b=ancj2w4WNa3SfYrPLoRJYXTjm0NaNjg+2xskgRBs834bMpj2Les7J3x26ZAgEEkSxwOm7g
-        Js6ZzCsi22gZHAAx4A00FI4k1z8Ckoz3doxqqvJfOWYoj2aG9QUeW7jE7Z2obtmZvzueR3
-        DVTLoFKMEE/f0TPE/PZVDAtyZg10R/Q=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-352-7xreSsEqMGCNlXMwQinL-g-1; Wed, 08 Mar 2023 12:03:31 -0500
-X-MC-Unique: 7xreSsEqMGCNlXMwQinL-g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6294E85CCE7;
-        Wed,  8 Mar 2023 17:03:30 +0000 (UTC)
-Received: from rules.brq.redhat.com (unknown [10.45.242.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D86818EC7;
-        Wed,  8 Mar 2023 17:03:28 +0000 (UTC)
-From:   Vladis Dronov <vdronov@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Stephan Mueller <smueller@chronox.de>
-Cc:     Nicolai Stange <nstange@suse.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>
-Subject: [PATCH] crypto: jitter - panic on runtime health test failures in FIPS mode
-Date:   Wed,  8 Mar 2023 18:02:33 +0100
-Message-Id: <20230308170233.19475-1-vdronov@redhat.com>
+        Wed, 8 Mar 2023 13:11:57 -0500
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09410CE96E;
+        Wed,  8 Mar 2023 10:11:55 -0800 (PST)
+Received: by mail-ot1-f50.google.com with SMTP id e9-20020a056830200900b00694651d19f6so6569443otp.12;
+        Wed, 08 Mar 2023 10:11:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678299114;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SIxmU/QtppDrzLwRQM4/EQwwRkPiWGOq6+7u8fs1B9E=;
+        b=KIyuip82zCUZ3tJBEAdGR5DkYNQRqUvHETB03T4NSIDff0TZ7j0LLeGC0ZvsCHkVpO
+         GvJBnpLTNwMq83/0Q97eqj8cKhHM56QS0P0UioJdqeeP+QGVB5kYlysDCyJFGIt3nUwy
+         z2738obH1ONby9hp1Otqi1fpQ2KBm3e0H0urqmMVazligMQ3uvPXn/V1/aJ7+mUK/4dY
+         k65T2FaU0RXHLHK8n1XaZB2aRHy5vps0STG3Uz6Zwr1T4O9fveR5EP90SCuKbes3iNml
+         qRG2tZyapqo0fXYb9KWkbO5bvs/NmqQ+2N46pX0TPL/p0jYemuIQctyUhEkRfUNars3r
+         b0Fg==
+X-Gm-Message-State: AO0yUKWdmfc/jHC+sH+MEv0+HxemLfU3fdDt9d60yiayCrAmbZPoXboo
+        yHCHE95J7hfCY9PXMsrGmQ==
+X-Google-Smtp-Source: AK7set9H8k0goZQjGPEgNkkixy3gs3vd/sHKzFTM0Gx4xSIKWRHwsc1ffnNsJ1R+prua9m2CbtMAgg==
+X-Received: by 2002:a9d:7103:0:b0:690:d498:56d2 with SMTP id n3-20020a9d7103000000b00690d49856d2mr7763163otj.4.1678299114187;
+        Wed, 08 Mar 2023 10:11:54 -0800 (PST)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id d1-20020a056830138100b0068bb73bd95esm6636451otq.58.2023.03.08.10.11.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Mar 2023 10:11:53 -0800 (PST)
+Received: (nullmailer pid 3526245 invoked by uid 1000);
+        Wed, 08 Mar 2023 18:11:52 -0000
+Date:   Wed, 8 Mar 2023 12:11:52 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Rob Clark <robdclark@gmail.com>,
+        linux-riscv@lists.infradead.org,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Eric Dumazet <edumazet@google.com>,
+        freedreno@lists.freedesktop.org, Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Abhinav Kumar <quic_abhinavk@quicinc.com>,
+        linux-gpio@vger.kernel.org, linux-media@vger.kernel.org,
+        Andrew Lunn <andrew@lunn.ch>, Stephen Boyd <sboyd@kernel.org>,
+        Mark Brown <broonie@kernel.org>, Sean Paul <sean@poorly.run>,
+        netdev@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Kishon Vijay Abraham I <kishon@kernel.org>,
+        linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-spi@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-arm-kernel@lists.infradead.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, dri-devel@lists.freedesktop.org,
+        alsa-devel@alsa-project.org,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-clk@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        devicetree@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: yamllint: Require a space after a comment
+ '#'
+Message-ID: <167828471597.2730705.13533520056770041535.robh@kernel.org>
+References: <20230303214223.49451-1-robh@kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230303214223.49451-1-robh@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A FIPS certification lab has noted that the kernel doesn't go to error
-state upon failure of the RCT and APT health tests. Add a panic() call
-in FIPS mode to jent_kcapi_random().
 
-Revert b454fb702515 ("crypto: jitter - don't limit ->health_failure
-check to FIPS mode") for this partially.
+On Fri, 03 Mar 2023 15:42:23 -0600, Rob Herring wrote:
+> Enable yamllint to check the prefered commenting style of requiring a
+> space after a comment character '#'. Fix the cases in the tree which
+> have a warning with this enabled. Most cases just need a space after the
+> '#'. A couple of cases with comments which were not intended to be
+> comments are revealed. Those were in ti,sa2ul.yaml, ti,cal.yaml, and
+> brcm,bcmgenet.yaml.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Rob Clark <robdclark@gmail.com>
+> Cc: Abhinav Kumar <quic_abhinavk@quicinc.com>
+> Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> Cc: Sean Paul <sean@poorly.run>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: Kishon Vijay Abraham I <kishon@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Conor Dooley <conor.dooley@microchip.com>
+> Cc: linux-clk@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: freedreno@lists.freedesktop.org
+> Cc: linux-media@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-phy@lists.infradead.org
+> Cc: linux-gpio@vger.kernel.org
+> Cc: alsa-devel@alsa-project.org
+> Cc: linux-riscv@lists.infradead.org
+> Cc: linux-spi@vger.kernel.org
+> ---
+>  Documentation/devicetree/bindings/.yamllint   |  2 +-
+>  .../bindings/clock/qcom,a53pll.yaml           |  4 ++--
+>  .../devicetree/bindings/crypto/ti,sa2ul.yaml  |  4 ++--
+>  .../bindings/display/msm/qcom,mdp5.yaml       |  2 +-
+>  .../interrupt-controller/arm,gic.yaml         |  4 ++--
+>  .../loongson,pch-msi.yaml                     |  2 +-
+>  .../bindings/media/renesas,vin.yaml           |  4 ++--
+>  .../devicetree/bindings/media/ti,cal.yaml     |  4 ++--
+>  .../bindings/net/brcm,bcmgenet.yaml           |  2 --
+>  .../bindings/net/cortina,gemini-ethernet.yaml |  6 ++---
+>  .../devicetree/bindings/net/mdio-gpio.yaml    |  4 ++--
+>  .../phy/marvell,armada-cp110-utmi-phy.yaml    |  2 +-
+>  .../bindings/phy/phy-stm32-usbphyc.yaml       |  2 +-
+>  .../phy/qcom,sc7180-qmp-usb3-dp-phy.yaml      |  2 +-
+>  .../bindings/pinctrl/pinctrl-mt8192.yaml      |  2 +-
+>  .../regulator/nxp,pca9450-regulator.yaml      |  8 +++----
+>  .../regulator/rohm,bd71828-regulator.yaml     | 20 ++++++++--------
+>  .../regulator/rohm,bd71837-regulator.yaml     |  6 ++---
+>  .../regulator/rohm,bd71847-regulator.yaml     |  6 ++---
+>  .../bindings/soc/renesas/renesas.yaml         |  2 +-
+>  .../devicetree/bindings/soc/ti/ti,pruss.yaml  |  2 +-
+>  .../bindings/sound/amlogic,axg-tdm-iface.yaml |  2 +-
+>  .../bindings/sound/qcom,lpass-rx-macro.yaml   |  4 ++--
+>  .../bindings/sound/qcom,lpass-tx-macro.yaml   |  4 ++--
+>  .../bindings/sound/qcom,lpass-va-macro.yaml   |  4 ++--
+>  .../sound/qcom,q6dsp-lpass-ports.yaml         |  2 +-
+>  .../bindings/sound/simple-card.yaml           | 24 +++++++++----------
+>  .../bindings/spi/microchip,mpfs-spi.yaml      |  2 +-
+>  28 files changed, 65 insertions(+), 67 deletions(-)
+> 
 
-Signed-off-by: Vladis Dronov <vdronov@redhat.com>
----
- crypto/jitterentropy-kcapi.c | 8 ++++++++
- crypto/jitterentropy.h       | 1 +
- 2 files changed, 9 insertions(+)
-
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index 2d115bec15ae..9c692119d926 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -37,6 +37,7 @@
-  * DAMAGE.
-  */
- 
-+#include <linux/fips.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/slab.h>
-@@ -59,6 +60,11 @@ void jent_zfree(void *ptr)
- 	kfree_sensitive(ptr);
- }
- 
-+int jent_fips_enabled(void)
-+{
-+	return fips_enabled;
-+}
-+
- void jent_panic(char *s)
- {
- 	panic("%s", s);
-@@ -140,6 +146,8 @@ static int jent_kcapi_random(struct crypto_rng *tfm,
- 
- 	/* Return a permanent error in case we had too many resets in a row. */
- 	if (rng->reset_cnt > (1<<10)) {
-+		if (jent_fips_enabled())
-+			jent_panic("jitterentropy: Too many RCT/APT health test failures\n");
- 		ret = -EFAULT;
- 		goto out;
- 	}
-diff --git a/crypto/jitterentropy.h b/crypto/jitterentropy.h
-index b7397b617ef0..c83fff32d130 100644
---- a/crypto/jitterentropy.h
-+++ b/crypto/jitterentropy.h
-@@ -2,6 +2,7 @@
- 
- extern void *jent_zalloc(unsigned int len);
- extern void jent_zfree(void *ptr);
-+extern int jent_fips_enabled(void);
- extern void jent_panic(char *s);
- extern void jent_memcpy(void *dest, const void *src, unsigned int n);
- extern void jent_get_nstime(__u64 *out);
--- 
-2.39.2
+Applied, thanks!
 
