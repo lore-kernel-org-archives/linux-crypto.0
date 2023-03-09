@@ -2,61 +2,52 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AD5C61DA4
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Mar 2023 10:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFCD1C64EC4
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Mar 2023 10:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbjCIKAQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Mar 2023 05:00:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60948 "EHLO
+        id S231359AbjCIKQ3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Mar 2023 05:16:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbjCIKAP (ORCPT
+        with ESMTP id S231279AbjCIKPr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Mar 2023 05:00:15 -0500
+        Thu, 9 Mar 2023 05:15:47 -0500
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EF680E17;
-        Thu,  9 Mar 2023 02:00:13 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192D35DCA1;
+        Thu,  9 Mar 2023 02:15:20 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1paD3u-0024l4-Cj; Thu, 09 Mar 2023 17:59:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Mar 2023 17:59:50 +0800
-Date:   Thu, 9 Mar 2023 17:59:50 +0800
+        id 1paDIH-00250t-OJ; Thu, 09 Mar 2023 18:14:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Mar 2023 18:14:41 +0800
+Date:   Thu, 9 Mar 2023 18:14:41 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        Li kunyu <kunyu@nfschina.com>, davem@davemloft.net,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
-Subject: Re: [v5 PATCH 7/7] crypto: stm32 - Save and restore between each
- request
-Message-ID: <ZAmuFhOXo9ag5F8e@gondor.apana.org.au>
-References: <ZAcNhtm/+mik1N2m@gondor.apana.org.au>
- <CACRpkdbcrCa9v82xVWtixWdDPvCu6E6Rkw-3Vg3APisdvYGwqQ@mail.gmail.com>
- <ZAf/rAbc3bMIwBcr@gondor.apana.org.au>
- <ZAgDku9htWcetafb@gondor.apana.org.au>
- <CACRpkdZ-zPZG4jK-AF2YF0wUFb8qrKBeoa4feb1qJ9SPusjv+Q@mail.gmail.com>
- <ZAhfBmlNHUpGEwW3@gondor.apana.org.au>
- <ZAhhGch6TtI8LA6x@gondor.apana.org.au>
- <CACRpkdabjrpsiVgm=EyGrTK7PGXth6FdvxSp=QULA+LyqtdBgg@mail.gmail.com>
- <ZAl1gGCv51FKOXtm@gondor.apana.org.au>
- <CACRpkdY4gAT7RUtL6ctcsqxEX2_rZMyjMktPta7e4UB19OyGow@mail.gmail.com>
+To:     Dave Jiang <dave.jiang@intel.com>
+Cc:     Tom Zanussi <tom.zanussi@linux.intel.com>, davem@davemloft.net,
+        fenghua.yu@intel.com, vkoul@kernel.org, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH 00/16] crypto: Add Intel Analytics Accelerator (IAA)
+ crypto compression driver
+Message-ID: <ZAmxkd7yMz8hiCxR@gondor.apana.org.au>
+References: <20230306185226.26483-1-tom.zanussi@linux.intel.com>
+ <ZAa7lS/eS1wWuXYp@gondor.apana.org.au>
+ <3a39812e-62da-377c-f430-dd6c1eb473e2@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACRpkdY4gAT7RUtL6ctcsqxEX2_rZMyjMktPta7e4UB19OyGow@mail.gmail.com>
+In-Reply-To: <3a39812e-62da-377c-f430-dd6c1eb473e2@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 08:35:21AM +0100, Linus Walleij wrote:
+On Tue, Mar 07, 2023 at 08:54:03AM -0700, Dave Jiang wrote:
 >
-> The way I interpret it is that if you write 64 bytes (16 32bit words)
-> the AHB bus will simply
-> stall until the data is processed, so the writel() hangs there and
-> then 66/82 bus cycles
-> later it will continue.
+> Hi Herbert, does this mean drivers/crypto/qat should now move to
+> drivers/crypto/intel/qat?
 
-You're right.  I'll respin the patches with your updates in it.
+Yes we should move qat as well.  Oh and there's also ixp4xx and
+keembay.
 
 Thanks,
 -- 
