@@ -2,100 +2,109 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E65C6FA99
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 22:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A03C6FA99
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 22:42:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232076AbjCJWc2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Mar 2023 17:32:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45126 "EHLO
+        id S231833AbjCJWmw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Mar 2023 17:42:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbjCJWcC (ORCPT
+        with ESMTP id S231678AbjCJWm0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2023 17:32:02 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE009148B6B
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 14:30:39 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id a25so26673882edb.0
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 14:30:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678487430;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=268bZ1TBueiybyhkcpErcA+C9yqfqKZytn9F0qROzMs=;
-        b=WbmdjplXq98Xewg+y118GdddG0T2GZpR2Lv2/E3ifF6exl4IYQoLFQYyyIwWCZ4GLt
-         NTNzbH8KnPh15cZHw6H6IVh5m5DxVU0eX787ZT9b2lCpn7vRtwZDMn/StenHYkx2lhEd
-         aA+MSGLK6E8xpijpR590AwNAaT+xiFblPrDnPajvvjz+7yNfYb7YmfKf5p391xtV75iF
-         FluPgocmtnvggbxFVGHtgUUeUAuY5jm0BqAymCoYnUMuW+HzzEML7aR2B7AtTzTOwXIx
-         WpsN/IX7ihA+QtjwDwgoIkeDLgwFSGGhtqcfAJlhGXn3mz9dfZ/Sl/UVB2h20Qv3HN1y
-         fibw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678487430;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=268bZ1TBueiybyhkcpErcA+C9yqfqKZytn9F0qROzMs=;
-        b=qYRfsU51YsqMAUfkplxk5s2M9eX3o+qXEy6DrzHP6lqFprgwebbWFnsl6ljvL0U8EU
-         e4FZwuZn8tOSoYxOGs7ohHxpUl3cBXiL6NkomMu0X2AwnGWglTMEMiqnQDv1eyAVjR7X
-         a0i/rGNK96F1rFB/M53SXVXtnaZtwcEDdUS4J1+lbxMcrNLBRitYQ9d0pzmj4XgdONzS
-         dPP2us+UEHUA7mu3urMmA3IFOKt/5J7QBv/bTH8c1xewRzM8d+9/0Hdka8FuYlOTiD4R
-         gzYej3Gc8UUk4Ev1Z1wyJAELl6YnC7tTCY4vDZkLXYdxx3dNKqITdeCA1qh1RPaiIJ74
-         IFGw==
-X-Gm-Message-State: AO0yUKURc3MEXMEjWqWbZmEvjUPhTCeR9HXwJLEgrY7UV72VoXSP8cNK
-        6QvkwBdqNTBR0w1uDDi1L4wyaA==
-X-Google-Smtp-Source: AK7set+39I2qc56oSch7xhdvqbptNHo5xMzdm85sdCUofyZHp7Ij1rQzQcSllFkME3nFWMD70VBWYA==
-X-Received: by 2002:a17:907:6ea6:b0:8b1:7dea:cc40 with SMTP id sh38-20020a1709076ea600b008b17deacc40mr33181747ejc.9.1678487430083;
-        Fri, 10 Mar 2023 14:30:30 -0800 (PST)
-Received: from krzk-bin.. ([2a02:810d:15c0:828:34:52e3:a77e:cac5])
-        by smtp.gmail.com with ESMTPSA id l23-20020a170906939700b008c5075f5331sm360279ejx.165.2023.03.10.14.30.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 14:30:29 -0800 (PST)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Fri, 10 Mar 2023 17:42:26 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B84312DDEB
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 14:42:06 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1palQh-0002d9-AB; Fri, 10 Mar 2023 23:41:39 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1palQe-003GqF-FD; Fri, 10 Mar 2023 23:41:36 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1palQd-003uES-O4; Fri, 10 Mar 2023 23:41:35 +0100
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Roy Pledge <Roy.Pledge@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+        =?utf-8?q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 2/2] crypto - img-hash: Drop of_match_ptr for ID table
-Date:   Fri, 10 Mar 2023 23:30:27 +0100
-Message-Id: <20230310223027.315954-2-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230310223027.315954-1-krzysztof.kozlowski@linaro.org>
-References: <20230310223027.315954-1-krzysztof.kozlowski@linaro.org>
+        Vinod Koul <vkoul@kernel.org>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Yangbo Lu <yangbo.lu@nxp.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH 0/6] bus: fsl-mc: Make remove function return void
+Date:   Fri, 10 Mar 2023 23:41:22 +0100
+Message-Id: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1698; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=9JhTrjmQKjtQFlUasQrySTFuLZLu/NtOD5qmM4eufeE=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBkC7H+eh7sOlGHBG4L1QyBTw+rzQkNoN+qxvPCW eOgwZqzcbSJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCZAux/gAKCRDB/BR4rcrs CbK0B/0cW9Eel9XtT+/ciaqOL8Ou4+Z2zYziEPD7ScbF4q+swN4VVcdYcsxqOOR5SiCfeGux/vG nfJ22a6m2IawQ7zblHVSfehklr+v3pYyUgmnGpbO5okqmN/5jUpGzX065Jj5HYNwZAslY6DAflI D5Ck9zcwuJo37fBXnMh2xpLh7KcYnpLZ5pqRB7J21MV8GIG74zP6OK4PeYlRknsbM0JK4bxYke/ tM6VZ35AX9hYDbmv+HLyVdwO4NLT3cOwA+5Jq4gUz+86LDPobXlAeUjXFOBmILtaEfOPHG8f9+Y 3mUfL1lOujCuuV9tHfDxz2xosDkMqNZKtFI0Gu2kAo5I3Wig
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The driver can match only via the DT table so the table should be always
-used and the of_match_ptr does not have any sense (this also allows ACPI
-matching via PRP0001, even though it is not relevant here).
+Hello,
 
-  drivers/crypto/img-hash.c:930:34: error: ‘img_hash_match’ defined but not used [-Werror=unused-const-variable=]
+many bus remove functions return an integer which is a historic
+misdesign that makes driver authors assume that there is some kind of
+error handling in the upper layers. This is wrong however and returning
+and error code only yields an error message.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/crypto/img-hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series improves the fsl-mc bus by changing the remove callback to
+return no value instead. As a preparation all drivers are changed to
+return zero before so that they don't trigger the error message.
 
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index fe93d19e3044..4e9a6660d791 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -1106,7 +1106,7 @@ static struct platform_driver img_hash_driver = {
- 	.driver		= {
- 		.name	= "img-hash-accelerator",
- 		.pm	= &img_hash_pm_ops,
--		.of_match_table	= of_match_ptr(img_hash_match),
-+		.of_match_table	= img_hash_match,
- 	}
- };
- module_platform_driver(img_hash_driver);
+Best regards
+Uwe
+
+Uwe Kleine-König (6):
+  bus: fsl-mc: Only warn once about errors on device unbind
+  bus: fsl-mc: dprc: Push down error message from fsl_mc_driver_remove()
+  bus: fsl-mc: fsl-mc-allocator: Drop if block with always wrong
+    condition
+  bus: fsl-mc: fsl-mc-allocator: Improve error reporting
+  soc: fsl: dpio: Suppress duplicated error reporting on device remove
+  bus: fsl-mc: Make remove function return void
+
+ drivers/bus/fsl-mc/dprc-driver.c              | 12 ++++-----
+ drivers/bus/fsl-mc/fsl-mc-allocator.c         | 27 ++++++++++---------
+ drivers/bus/fsl-mc/fsl-mc-bus.c               |  7 +----
+ drivers/crypto/caam/caamalg_qi2.c             |  4 +--
+ drivers/dma/fsl-dpaa2-qdma/dpaa2-qdma.c       |  4 +--
+ .../net/ethernet/freescale/dpaa2/dpaa2-eth.c  |  4 +--
+ .../net/ethernet/freescale/dpaa2/dpaa2-ptp.c  |  4 +--
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   |  4 +--
+ drivers/soc/fsl/dpio/dpio-driver.c            |  8 +-----
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c             |  3 +--
+ include/linux/fsl/mc.h                        |  2 +-
+ 11 files changed, 28 insertions(+), 51 deletions(-)
+
+
+base-commit: fe15c26ee26efa11741a7b632e9f23b01aca4cc6
 -- 
-2.34.1
+2.39.1
 
