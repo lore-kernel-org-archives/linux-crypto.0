@@ -2,47 +2,49 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9DAC64EC4
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 09:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE70C6FD1C
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 09:15:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbjCJJOg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Mar 2023 04:14:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55354 "EHLO
+        id S229774AbjCJJPO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Mar 2023 04:15:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230199AbjCJJNt (ORCPT
+        with ESMTP id S231386AbjCJJO2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2023 04:13:49 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54107D08D4;
-        Fri, 10 Mar 2023 01:09:10 -0800 (PST)
+        Fri, 10 Mar 2023 04:14:28 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A205F6D1;
+        Fri, 10 Mar 2023 01:09:58 -0800 (PST)
 Received: from kwepemm600005.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4PY0XV0Xrmz16NnJ;
-        Fri, 10 Mar 2023 17:06:18 +0800 (CST)
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4PY0Y5565nzSkdQ;
+        Fri, 10 Mar 2023 17:06:49 +0800 (CST)
 Received: from [10.67.103.158] (10.67.103.158) by
  kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 10 Mar 2023 17:09:08 +0800
-Subject: Re: [PATCH 5/6] crypto: hisilicon/sec - remove unnecessary aer.h
+ 15.1.2507.21; Fri, 10 Mar 2023 17:09:56 +0800
+Subject: Re: [PATCH 6/6] crypto: hisilicon/zip - remove unnecessary aer.h
  include
 To:     Bjorn Helgaas <helgaas@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Bjorn Helgaas <bhelgaas@google.com>,
-        Kai Ye <yekai13@huawei.com>
+        Yang Shen <shenyang39@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Nick Terrell <terrelln@fb.com>
 References: <20230307161947.857491-1-helgaas@kernel.org>
- <20230307161947.857491-6-helgaas@kernel.org>
+ <20230307161947.857491-7-helgaas@kernel.org>
 From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <81f6d9c2-8fac-034e-5d65-f60370577907@huawei.com>
-Date:   Fri, 10 Mar 2023 17:09:07 +0800
+Message-ID: <9291eaab-30c7-49c0-ae1f-62719510322a@huawei.com>
+Date:   Fri, 10 Mar 2023 17:09:56 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20230307161947.857491-6-helgaas@kernel.org>
+In-Reply-To: <20230307161947.857491-7-helgaas@kernel.org>
 Content-Type: text/plain; charset="gbk"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.67.103.158]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemm600005.china.huawei.com (7.193.23.191)
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -55,19 +57,20 @@ On 2023/3/8 0:19, Bjorn Helgaas wrote:
 > <linux/aer.h> is unused, so remove it.
 > 
 > Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
-> Cc: Kai Ye <yekai13@huawei.com>
-> Cc: Longfang Liu <liulongfang@huawei.com>
+> Cc: Yang Shen <shenyang39@huawei.com>
+> Cc: Zhou Wang <wangzhou1@hisilicon.com>
+> Cc: Nick Terrell <terrelln@fb.com>
 > ---
->  drivers/crypto/hisilicon/sec2/sec_main.c | 1 -
+>  drivers/crypto/hisilicon/zip/zip_main.c | 1 -
 >  1 file changed, 1 deletion(-)
 > 
-> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-> index 93572c0d4faa..77f9f131b850 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> @@ -2,7 +2,6 @@
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 1549bec3aea5..f3ce34198775 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -1,7 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0
 >  /* Copyright (c) 2019 HiSilicon Limited. */
->  
 >  #include <linux/acpi.h>
 > -#include <linux/aer.h>
 >  #include <linux/bitops.h>
