@@ -2,118 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A24C64EC4
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 13:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4302CC742A7
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 14:54:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbjCJNiv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Mar 2023 08:38:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59382 "EHLO
+        id S233475AbjCJOyI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Mar 2023 09:54:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbjCJNiu (ORCPT
+        with ESMTP id S233481AbjCJOxi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2023 08:38:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96EEC132CD
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 05:38:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678455481;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fQBGbJjgaLk8frNmhF457eNNSWcksiHp6zG+s8bL6ks=;
-        b=ikxknUjvZcqZO0TvoEKXOhbQ+q1MHiwftvvQZeT6E6u5BNJgQkYg7gtUuWUwaQrWQC+0mP
-        q3xNBcK3kUqfPn4h92g6Ksj65TFKDBDF7tHzOEUzILGGb6p68/LMN+RA4WzYKnojvtxiVl
-        g2fMgaUiMuGHev4HWnlzyIP1bqjamIE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-RGrQUy1aPqG0s0ZphR1hfw-1; Fri, 10 Mar 2023 08:38:00 -0500
-X-MC-Unique: RGrQUy1aPqG0s0ZphR1hfw-1
-Received: by mail-ed1-f72.google.com with SMTP id ev6-20020a056402540600b004bc2358ac04so7814213edb.21
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 05:38:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678455479;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fQBGbJjgaLk8frNmhF457eNNSWcksiHp6zG+s8bL6ks=;
-        b=ghhjdYesXmlvK8lIWl/dweqgBXbn3hoaOR9qnjQM3SoQlWjF/xXT9guEibJ+J+D5AZ
-         QZ5WXb3O/sZ2UvdTPTRwaSt+fkrFBvffTkKf3MtaIHYsxQ74qlq5PUgnh36LXIa4pWA0
-         AV8HrbfYDwww7ZqdZzwepeGmiDCpJw1U14qMCv3xviYXwnAkAuNNdTTxYsYb411QKgtG
-         9K9og6GUw8JJdjQzEuSl+MuXUVmMia91S0jejbssiNwEk0hw2a6/d7wnohTRUkKrxJQP
-         aEQFQhUV8q3e39dJYswsf2dDk/FO0BIRqHmQk+2Te4jVV1QddLj0wVzY8j5j7PD1j4uK
-         +WhQ==
-X-Gm-Message-State: AO0yUKVfQ84WU9EV4/l9XC3CygJP24mnieEKKB+fjRnRXPzsr/aPHla1
-        34Y4sc4KIeaIshhLrBRrObxQKiYHQmV3fSs9itI+IGyUpAHNLvkBXQBSHBpFNyFae6E54E3fMuV
-        T09dZubA4/m45+Phvy1Mb+QUo
-X-Received: by 2002:a17:907:6c16:b0:8b1:7fe8:1c38 with SMTP id rl22-20020a1709076c1600b008b17fe81c38mr26117283ejc.43.1678455479309;
-        Fri, 10 Mar 2023 05:37:59 -0800 (PST)
-X-Google-Smtp-Source: AK7set/8005G0zE0HYXEMHFoB55pYZJ1/lEZ4gvFFcjQE9JUKB8Ab8YRXy+T1UG0le3hLHZOAWPDpA==
-X-Received: by 2002:a17:907:6c16:b0:8b1:7fe8:1c38 with SMTP id rl22-20020a1709076c1600b008b17fe81c38mr26117257ejc.43.1678455478975;
-        Fri, 10 Mar 2023 05:37:58 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id b13-20020a170906d10d00b008be5b97ca49sm966738ejz.150.2023.03.10.05.37.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 05:37:58 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-        id 8C2EF9E263E; Fri, 10 Mar 2023 14:37:57 +0100 (CET)
-From:   Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Mathew McBride <matt@traverse.com.au>,
-        linux-crypto@vger.kernel.org
-Subject: Re: Hitting BUG_ON in crypto_unregister_alg() on reboot with
- caamalg_qi2 driver
-In-Reply-To: <ZAqwTqw3lR+dnImO@gondor.apana.org.au>
-References: <87r0tyq8ph.fsf@toke.dk> <ZAqwTqw3lR+dnImO@gondor.apana.org.au>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date:   Fri, 10 Mar 2023 14:37:57 +0100
-Message-ID: <87ilf8rakq.fsf@toke.dk>
+        Fri, 10 Mar 2023 09:53:38 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33362123DC9;
+        Fri, 10 Mar 2023 06:49:34 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C52ABB822F6;
+        Fri, 10 Mar 2023 14:49:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9C93C4339B;
+        Fri, 10 Mar 2023 14:49:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1678459772;
+        bh=7cV37WX5fhX5n94WfRto4O9PuxBVxADgFaMZPcBzxqE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=NLiooeUWb6e5aMEG9Ynfty4wPipTIkvYCf+o7ZLReOQnRSMqIoOco0JImYk9EmnnE
+         03QbMccVcjSkXAIURZBLRVnzpeQGY878bsoYu8RaJR78bw0Kuq64vDdnM5+eM3kXtL
+         mKLiJ2k2Wkp2h0yNTzpnbZj+77Zl5/XJ32jIGdIQ=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Peter Gonda <pgonda@google.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.10 113/529] crypto: ccp - Refactor out sev_fw_alloc()
+Date:   Fri, 10 Mar 2023 14:34:16 +0100
+Message-Id: <20230310133810.229873777@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230310133804.978589368@linuxfoundation.org>
+References: <20230310133804.978589368@linuxfoundation.org>
+User-Agent: quilt/0.67
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+From: Peter Gonda <pgonda@google.com>
 
-> On Thu, Mar 09, 2023 at 03:51:22PM +0100, Toke H=C3=B8iland-J=C3=B8rgense=
-n wrote:
->> Hi folks
->>=20
->> I'm hitting what appears to be a deliberate BUG_ON() in
->> crypto_unregister_alg() when rebooting my traverse ten64 device on a
->> 6.2.2 kernel (using the Arch linux-aarch64 build, which is basically an
->> upstream kernel).
->>=20
->> Any idea what might be causing this? It does not appear on an older
->> (5.17, which is the newest kernel that works reliably, for unrelated
->> reasons).
->
-> On the face of it this looks like a generic issue with drivers
-> and the Crypto API.  Historically crypto modules weren't meant
-> to be removed/unregistered until the last user has freed the tfm.
->
-> Obviously with drivers that start unregistering the algorithms when
-> the hardware goes away this paradigm breaks.  What should happen is
-> that the driver continues to hold onto the crypto algorithm registration
-> even when the hardware has gone away.
->
-> Some work has to be done in the driver to actually make this safe
-> (all the drivers I've looked at are broken in this way).
+[ Upstream commit cc17982d58d1e67eab831e7023ede999dda56173 ]
 
-Hmm, okay; any idea why this started happening with the newer kernel
-version? I don't see any changes to the driver that could have caused
-this; so is it some core-kernel change that has changed the
-order of driver removal on shutdown or something?
+Create a helper function sev_fw_alloc() which can be used to allocate
+aligned memory regions for use by the PSP firmware. Currently only used
+for the SEV-ES TMR region but will be used for the SEV_INIT_EX NV memory
+region.
 
-Also, absent of a fixed driver (which doesn't sound like it's a trivial
-fix?), how do I prevent the system from crashing on shutdown? The
-BUG_ON() seems a bit heavy-handed, could it be replaced with a WARN_ON?
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
+Acked-by: David Rientjes <rientjes@google.com>
+Acked-by: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Joerg Roedel <jroedel@suse.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: David Rientjes <rientjes@google.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Stable-dep-of: 46a334a98f58 ("crypto: ccp - Flush the SEV-ES TMR memory before giving it to firmware")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/ccp/sev-dev.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
--Toke
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index e70ae98de1189..8a900226d73a3 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -138,6 +138,17 @@ static int sev_cmd_buffer_len(int cmd)
+ 	return 0;
+ }
+ 
++static void *sev_fw_alloc(unsigned long len)
++{
++	struct page *page;
++
++	page = alloc_pages(GFP_KERNEL, get_order(len));
++	if (!page)
++		return NULL;
++
++	return page_address(page);
++}
++
+ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ {
+ 	struct psp_device *psp = psp_master;
+@@ -1040,7 +1051,6 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+ void sev_pci_init(void)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+-	struct page *tmr_page;
+ 	int error, rc;
+ 
+ 	if (!sev)
+@@ -1056,14 +1066,10 @@ void sev_pci_init(void)
+ 		sev_get_api_version();
+ 
+ 	/* Obtain the TMR memory area for SEV-ES use */
+-	tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
+-	if (tmr_page) {
+-		sev_es_tmr = page_address(tmr_page);
+-	} else {
+-		sev_es_tmr = NULL;
++	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
++	if (!sev_es_tmr)
+ 		dev_warn(sev->dev,
+ 			 "SEV: TMR allocation failed, SEV-ES support unavailable\n");
+-	}
+ 
+ 	/* Initialize the platform */
+ 	rc = sev_platform_init(&error);
+-- 
+2.39.2
+
+
 
