@@ -2,87 +2,154 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E861C64EC4
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 16:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA24C6FD19
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 21:22:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231535AbjCJQWx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Mar 2023 11:22:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34090 "EHLO
+        id S230150AbjCJVW1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Mar 2023 16:22:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231522AbjCJQW0 (ORCPT
+        with ESMTP id S229874AbjCJVW0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:22:26 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7DB09EC8
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 08:18:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 937CAB82294
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 16:18:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 551D9C433D2
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 16:18:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678465098;
-        bh=+h2abdH7n7pFyTCttEwmQkQnxL7n4vcNDy0esZY4iVU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=MjZ/Wq7Az9MYEpFE5IgsJsIdQUx2jmbzp7dqOw194AS3z8+6oKdv5HjOTizqHtitz
-         dmBj7QyKemvI/+0nX82Y8aFWPLbPU4L8Obr0FqEtLjPO0c+VJ8JVSInt7V7zeFHYJU
-         YXj6GkGSMaKZXv1ITjCTmXiiSZvNU/FXJXhOK17pckQLXKiZK2RHZi+Q2szCqIBpuh
-         7Z+mwl+nL51//z0spwm0W0R1gi4DXQddS8jfqea5Pok4igsr/FjvtDQIT4VrhBinHI
-         GGnBwOh2Pky9EmXM8ZzkBU97Oe5fKB+/k70dw+VM0Hv5dFsLtJ7Z4Yjl2MnjGzfcdc
-         bZZ+/lAVZmWag==
-Received: by mail-lj1-f175.google.com with SMTP id z42so5806730ljq.13
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Mar 2023 08:18:18 -0800 (PST)
-X-Gm-Message-State: AO0yUKUIyR+YQRDem56ekLAd9q+ZU+XHcE5/VzZmwyI1KYIEAzPazTww
-        zqmTGFxyLaULPZ+PdCJrZ32fLerqCORlSpjOrO4=
-X-Google-Smtp-Source: AK7set9skecbzGMncFJHW2kGi9GEz2iyrrh1tYvEBj0wDr8KRoeTxH2cQl0qUZVcTa1wHEwpn/UOkIzFBZ2QN/FCJKM=
-X-Received: by 2002:a2e:a228:0:b0:295:8918:9d77 with SMTP id
- i8-20020a2ea228000000b0029589189d77mr8195640ljm.2.1678465096419; Fri, 10 Mar
- 2023 08:18:16 -0800 (PST)
+        Fri, 10 Mar 2023 16:22:26 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2086.outbound.protection.outlook.com [40.107.223.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D3D12B3DF;
+        Fri, 10 Mar 2023 13:22:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W88ueTW8sPptkz9bqzG3fug1cKivz0bweyyqNYLsWuDqVJLBa9enfADCoBnkGsS+QZUU4wpjLSMWdPxp2cRXNQG4T71HOqK5dZMoc2vhK7callgL8YMJpinhDlHI53YbzJawPpoZOzmuF2JFjgsuGMgE25LJ18cTe4YYs0L8CVWdqKYUdWyFrUCPFCQU3nEFYwvZuwlIr360Iwue12Uk3XAGF0b3Nvvx0X4BhKyhtpqHMLsudzCPfgOmdYG00zMSZLfbZL8BiR7jJ3R/d/sn2yupure1KcrJ88UKMhvzBttHvm09S5p9VWs5O7CIe+2yJWKuNVskOuznmdBG8yJlgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sXQOOOkZHN/lzg9JlehClQAwocn0/y40NL28WfTopQY=;
+ b=CxLwfdPMp8uLYivooBWw5ASG8EsG0rAmyqWQaOzeR0t2aDtCdpMOyQ8y1gdgqV+OnFccr9/XNdxXqgZudLHkdK3pDoHKiyUnSntOTBMsfn3KBnFLYqQqOJw4AVgIF4s2PwVIMyuY6nvNWVIaZn80ymdAGhBhRrii1AxC4TPMiqR1CxYrBCRa5t1ObyoHe0TpYkYz8jaW63j7Jwu6pqzsys6oqg7fUOlSldimbUqRpUpajLDSzotls0Hldz64bdBXKrPifKxit2BfhX8ewZOauTrrptyzeKkcM8A/H1hkakCB5tpzS3Ri4zXtxqsGm0phyZjBLLtisf8o6LnC7KGVvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=semihalf.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sXQOOOkZHN/lzg9JlehClQAwocn0/y40NL28WfTopQY=;
+ b=w/0m5735MclCmCFz9jOb/B/wKUhRwIIkQBMtzjveCNn8l9UM3s46Q0CpkCHrpWWfs4f7BkhYNU63jDWecMZ4bONVTzO0/stmb5inwG4XhSstYIK/uM+4jZ4mgyPzm3oHTNTLUqhDTS7bWmUIHDlWR5moW+2gzlNH6HXVOniPi7c=
+Received: from DS7PR03CA0163.namprd03.prod.outlook.com (2603:10b6:5:3b2::18)
+ by PH0PR12MB8150.namprd12.prod.outlook.com (2603:10b6:510:293::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.20; Fri, 10 Mar
+ 2023 21:22:22 +0000
+Received: from DM6NAM11FT021.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3b2:cafe::e6) by DS7PR03CA0163.outlook.office365.com
+ (2603:10b6:5:3b2::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.20 via Frontend
+ Transport; Fri, 10 Mar 2023 21:22:22 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT021.mail.protection.outlook.com (10.13.173.76) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6178.20 via Frontend Transport; Fri, 10 Mar 2023 21:22:22 +0000
+Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 10 Mar
+ 2023 15:22:20 -0600
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     =?UTF-8?q?Jan=20D=C4=85bro=C5=9B?= <jsd@semihalf.com>,
+        Grzegorz Bernacki <gjb@semihalf.com>,
+        <Rijo-john.Thomas@amd.com>, <Thomas.Lendacky@amd.com>,
+        <herbert@gondor.apana.org.au>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>
+CC:     <Felix.Held@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        <linux-kernel@vger.kernel.org>, <op-tee@lists.trustedfirmware.org>
+Subject: [PATCH v4 0/8] Export platform features from ccp driver
+Date:   Fri, 10 Mar 2023 15:19:43 -0600
+Message-ID: <20230310211954.2490-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20230217144348.1537615-1-ardb@kernel.org> <Y/L6rSGDidhhWq2v@gondor.apana.org.au>
- <CAMj1kXE8ZjVh=hLVgnRGr8cJpkqzRHsVxuq3dm1P=Aqc1QpcXg@mail.gmail.com> <ZAsDT00Jgs2p6luL@gondor.apana.org.au>
-In-Reply-To: <ZAsDT00Jgs2p6luL@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 10 Mar 2023 17:18:05 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHhF7CyeGV2QHu6MRVQNKo1EHFkshewOfptEOdJ5znJDA@mail.gmail.com>
-Message-ID: <CAMj1kXHhF7CyeGV2QHu6MRVQNKo1EHFkshewOfptEOdJ5znJDA@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: lib - implement library version of AES in CFB mode
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT021:EE_|PH0PR12MB8150:EE_
+X-MS-Office365-Filtering-Correlation-Id: aa5d29bd-42e8-48fe-aaf5-08db21ad8978
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GjB+onl2UDR5p+U3VxJXsVx3nsaEAFdARNf5VPOmJksBZLCADYrR7maHmSFOpmsd65a5ULMypHYTJs427UBhSaxMupobdjGpSAVb2mdfzYXP+hf2eQhjY4TB9A9CUP13V80x5TNVnUJF+s/hhUqKkJJnGc2RnCwUtWvgonN7Qog+/l2hmuFGkVnle5E5XZf77lH8IZ2fRq38UZFpZ0bOZoiiGx/TVQe0P4nFwnCRjn3NKqO7HKbPBFVRdWbSiGtk9oBD3O0jlpVzEB6iIG9yVLhp4SBgpap67NCya7acJideTnpl9IT3m+WvS7gzBrOQAXzf8e8Xg22WuQ7T3pbjIjDuv1fPYPBqTkfJcOB0VB/r49R+XAW5SYzLrK0Fa/z8e4Y93tkRZUQF911EKxGWLdcjJ498dTxk+d6BpgjklJgnF9xqtGMhCZJWCRdXHbCFW3LNs2s5DfVpf9e3i3YD4xtFibEJ6fNQAAAHZr/Zz1z4vop0f9HLv/5Ii4zGLrNrtK3+4zrzNA7lui515Awf1lrk41PnTK59OzUxuCDEVCJ88flBL1j94fwIRXqymK/F25J8dMj6DP1mtMlzURJxTzhEHFa1aqdP2TO+5BUBsuSIOUJQgt3i3Fdcx71fUi/73CgUb5gdP6eBYnO4soFjDA0HB18vTQfOQwcMc1jBDFGtSTVct2YWnm54SPPaaPFEylewh4mEK+1jxzzakmtNfA3yGDzoenpHbGO+o3aNNPsjpYMbJirzwA8/VzN1fmHA
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(346002)(376002)(136003)(396003)(451199018)(40470700004)(36840700001)(46966006)(82310400005)(36860700001)(6666004)(82740400003)(83380400001)(426003)(47076005)(36756003)(478600001)(40480700001)(356005)(110136005)(54906003)(921005)(81166007)(316002)(336012)(2616005)(40460700003)(7696005)(186003)(1076003)(26005)(16526019)(7416002)(2906002)(5660300002)(44832011)(70206006)(70586007)(8936002)(8676002)(86362001)(41300700001)(4326008)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 21:22:22.1565
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa5d29bd-42e8-48fe-aaf5-08db21ad8978
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT021.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8150
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 10 Mar 2023 at 11:15, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Mon, Feb 20, 2023 at 08:28:05AM +0100, Ard Biesheuvel wrote:
-> >
-> > We would still not have any in-tree users of cfb(aes) or any other
-> > cfb(*), so in that sense, yes.
-> >
-> > However, skciphers can be called from user space, and we also rely on
-> > this template for the extended testing of the various cfb() hardware
-> > implementations that we have in the tree.
-> >
-> > So the answer is no, I suppose. I would like to simplify it a bit,
-> > though - it is a bit more complicated than it needs to be.
->
-> Could we hold onto this for a little bit? I'd like to finally
-> remove crypto_cipher, and in doing so I will add a virtual address
-> interface (i.e., not sg) to skcipher like we do with scomp and shash.
->
+The i2c-designware-amdpsp driver communicates with a platform
+features mailbox provided by the PSP.  The address used for
+communication is discovered via a non-architecturally
+guaranteed mechanism.
 
-Does that mean you are bringing back blkcipher? I think that would the
-right thing to do tbh, although it might make sense to enhance
-skcipher (and aead) to support this.
+To better scale, export a feature for communication with platform
+features directly from the ccp driver.
 
-Could we perhaps update struct skcipher_request so it can describe
-virtually mapped address ranges, but permit this only for synchronous
-implementations? Then, we could update the skcipher walker code to
-produce a single walk step covering the entire range, and just use the
-provided virtual addresses directly, rather than going through a
-mapping interface?
+v3->v4
+ Drop the ACPI ID as result of confirmation with internal team.
+ Future platforms should use doorbell, so will treat Cezanne as quirk
+ and assume doorbell going forward.
+
+Mario Limonciello (8):
+  crypto: ccp: Drop TEE support for IRQ handler
+  crypto: ccp: Add a header for multiple drivers to use `__psp_pa`
+  crypto: ccp: Move some PSP mailbox bit definitions into common header
+  crypto: ccp: Add support for an interface for platform features
+  crypto: ccp: Enable platform access interface on client PSP parts
+  i2c: designware: Use PCI PSP driver for communication
+  crypto: ccp: Add support for ringing a platform doorbell
+  i2c: designware: Add doorbell support for Skyrim
+
+ arch/x86/kvm/svm/sev.c                      |   1 +
+ drivers/crypto/ccp/Makefile                 |   3 +-
+ drivers/crypto/ccp/platform-access.c        | 232 ++++++++++++++++++++
+ drivers/crypto/ccp/platform-access.h        |  35 +++
+ drivers/crypto/ccp/psp-dev.c                |  32 +--
+ drivers/crypto/ccp/psp-dev.h                |  11 +-
+ drivers/crypto/ccp/sev-dev.c                |  16 +-
+ drivers/crypto/ccp/sev-dev.h                |   2 +-
+ drivers/crypto/ccp/sp-dev.h                 |  10 +
+ drivers/crypto/ccp/sp-pci.c                 |   9 +
+ drivers/crypto/ccp/tee-dev.c                |  17 +-
+ drivers/i2c/busses/Kconfig                  |   2 +-
+ drivers/i2c/busses/i2c-designware-amdpsp.c  | 188 ++++------------
+ drivers/i2c/busses/i2c-designware-core.h    |   1 -
+ drivers/i2c/busses/i2c-designware-platdrv.c |   1 -
+ drivers/tee/amdtee/call.c                   |   2 +-
+ drivers/tee/amdtee/shm_pool.c               |   2 +-
+ include/linux/psp-platform-access.h         |  65 ++++++
+ include/linux/psp-sev.h                     |   8 -
+ include/linux/psp.h                         |  29 +++
+ 20 files changed, 461 insertions(+), 205 deletions(-)
+ create mode 100644 drivers/crypto/ccp/platform-access.c
+ create mode 100644 drivers/crypto/ccp/platform-access.h
+ create mode 100644 include/linux/psp-platform-access.h
+ create mode 100644 include/linux/psp.h
+
+-- 
+2.34.1
+
