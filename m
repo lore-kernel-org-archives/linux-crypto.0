@@ -2,65 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 711CDC6FA99
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 11:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD0B8C6FA99
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 11:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229891AbjCJLcE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Mar 2023 06:32:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52848 "EHLO
+        id S230247AbjCJLcW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Mar 2023 06:32:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbjCJLcD (ORCPT
+        with ESMTP id S230301AbjCJLcS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2023 06:32:03 -0500
+        Fri, 10 Mar 2023 06:32:18 -0500
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C2ADB9515;
-        Fri, 10 Mar 2023 03:32:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997D41091EC;
+        Fri, 10 Mar 2023 03:32:16 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1paayU-002Y9V-85; Fri, 10 Mar 2023 19:31:51 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Mar 2023 19:31:50 +0800
-Date:   Fri, 10 Mar 2023 19:31:50 +0800
+        id 1paayo-002YAO-QS; Fri, 10 Mar 2023 19:32:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Mar 2023 19:32:10 +0800
+Date:   Fri, 10 Mar 2023 19:32:10 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jonathan McDowell <noodles@earth.li>
-Cc:     Antoine Tenart <atenart@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/2] crypto: inside-secure: Handle load errors better
-Message-ID: <ZAsVJjmvefrfTHwr@gondor.apana.org.au>
-References: <Y/fkOF31BTQVocSe@sevai.o362.us>
- <cover.1677608527.git.noodles@earth.li>
+To:     meenakshi.aggarwal@nxp.com
+Cc:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        franck.lenormand@nxp.com, vijayb@linux.microsoft.com,
+        code@tyhicks.com
+Subject: Re: [PATCH] drivers: crypto: caam: jr: Allow quiesce when quiesced
+Message-ID: <ZAsVOtJcwqc1qe62@gondor.apana.org.au>
+References: <20230221054219.2142012-1-meenakshi.aggarwal@nxp.com>
+ <20230228183758.448396-1-meenakshi.aggarwal@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1677608527.git.noodles@earth.li>
+In-Reply-To: <20230228183758.448396-1-meenakshi.aggarwal@nxp.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 28, 2023 at 06:28:23PM +0000, Jonathan McDowell wrote:
-> 2 minor patches to improve the error handling of the safexcel driver
-> when it fails to load.
+On Wed, Mar 01, 2023 at 12:07:58AM +0530, meenakshi.aggarwal@nxp.com wrote:
+> From: Horia Geanta <horia.geanta@nxp.com>
 > 
-> Firstly, make it clear when the reason for a load failure is because the
-> firmware is not available.
+> Issues:
+> - Job ring device is busy when do kexec reboot
+> - Failed to flush job ring when do system suspend-resume
 > 
-> Secondly, ensure we clean up the ring workqueues / IRQ affinity settings
-> to avoid a kernel warning when the driver fails to load.
+> Fix:
+> Flush the job ring to stop the running jobs.
 > 
-> v2:
->  - Expand error clean up to cover ring initialisation failures
-> 
-> Jonathan McDowell (2):
->   crypto: inside-secure: Raise firmware load failure message to error
->   crypto: inside-secure - Cleanup ring IRQ workqueues on load failure
-> 
->  drivers/crypto/inside-secure/safexcel.c | 39 ++++++++++++++++++-------
->  1 file changed, 28 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.39.2
+> Signed-off-by: Horia Geanta <horia.geanta@nxp.com>
+> Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
+> Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> ---
+>  drivers/crypto/caam/jr.c | 55 ++++++++++++++++++++++++++++++++--------
+>  1 file changed, 45 insertions(+), 10 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
