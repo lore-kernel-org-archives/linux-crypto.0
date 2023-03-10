@@ -2,90 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 194AAC64EC4
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Mar 2023 22:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49333C64EC4
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 04:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230281AbjCIWVW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Mar 2023 17:21:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60184 "EHLO
+        id S230417AbjCJEWF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Mar 2023 23:22:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230511AbjCIWVT (ORCPT
+        with ESMTP id S230423AbjCJEVW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Mar 2023 17:21:19 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E691DBB5
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Mar 2023 14:20:50 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-16-mytVSe0nOmGLnDgiSo5IHA-1; Thu, 09 Mar 2023 22:19:46 +0000
-X-MC-Unique: mytVSe0nOmGLnDgiSo5IHA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.47; Thu, 9 Mar
- 2023 22:19:44 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.047; Thu, 9 Mar 2023 22:19:44 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Linus Walleij' <linus.walleij@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        Li kunyu <kunyu@nfschina.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com" 
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>
-Subject: RE: [v5 PATCH 7/7] crypto: stm32 - Save and restore between each
- request
-Thread-Topic: [v5 PATCH 7/7] crypto: stm32 - Save and restore between each
- request
-Thread-Index: AQHZUlnVfe29z1dm7kSSXyVRszx6pK7zBGDQ
-Date:   Thu, 9 Mar 2023 22:19:44 +0000
-Message-ID: <dac62e9452a5417e9de00546d1aae1f4@AcuMS.aculab.com>
-References: <E1pZ2fs-000e27-4H@formenos.hmeau.com>
- <CACRpkdY8iN_ga0VuQ-z=8KUWaJ6=5rh2vZEwcp+oNgcBuPFk=g@mail.gmail.com>
- <ZAcNhtm/+mik1N2m@gondor.apana.org.au>
- <CACRpkdbcrCa9v82xVWtixWdDPvCu6E6Rkw-3Vg3APisdvYGwqQ@mail.gmail.com>
- <ZAf/rAbc3bMIwBcr@gondor.apana.org.au> <ZAgDku9htWcetafb@gondor.apana.org.au>
- <CACRpkdZ-zPZG4jK-AF2YF0wUFb8qrKBeoa4feb1qJ9SPusjv+Q@mail.gmail.com>
- <ZAhfBmlNHUpGEwW3@gondor.apana.org.au> <ZAhhGch6TtI8LA6x@gondor.apana.org.au>
- <CACRpkdabjrpsiVgm=EyGrTK7PGXth6FdvxSp=QULA+LyqtdBgg@mail.gmail.com>
- <ZAl1gGCv51FKOXtm@gondor.apana.org.au>
- <CACRpkdY4gAT7RUtL6ctcsqxEX2_rZMyjMktPta7e4UB19OyGow@mail.gmail.com>
-In-Reply-To: <CACRpkdY4gAT7RUtL6ctcsqxEX2_rZMyjMktPta7e4UB19OyGow@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 9 Mar 2023 23:21:22 -0500
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5A449D3
+        for <linux-crypto@vger.kernel.org>; Thu,  9 Mar 2023 20:17:19 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1paUBt-002Ofp-CE; Fri, 10 Mar 2023 12:17:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Mar 2023 12:17:13 +0800
+Date:   Fri, 10 Mar 2023 12:17:13 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     Meadhbh Fitzpatrick <meadhbh.fitzpatrick@intel.com>,
+        linux-crypto@vger.kernel.org,
+        Damian Muszynski <damian.muszynski@intel.com>
+Subject: Re: [PATCH] crypto: qat - change size of status variable
+Message-ID: <ZAqvSeXLDG26E8+O@gondor.apana.org.au>
+References: <20230309113306.4008-1-meadhbh.fitzpatrick@intel.com>
+ <ZAm3cSjNderM7gzn@gondor.apana.org.au>
+ <ZAm9MpyFnU1q2pmc@gcabiddu-mobl1.ger.corp.intel.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZAm9MpyFnU1q2pmc@gcabiddu-mobl1.ger.corp.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogTGludXMgV2FsbGVpag0KPiBTZW50OiAwOSBNYXJjaCAyMDIzIDA3OjM1DQouLi4NCj4g
-QnV0IGFjdHVhbGx5IEkgdGhpbmsgdGhlIGJ1ZyB3aWxsIG5ldmVyIHRyaWdnZXIsIGJlY2F1c2Ug
-dGhlIGRhdGFzaGVldA0KPiBmb3IgdGhlIERCODUwMCAoVXg1MDApIHNheXMgdGhpczoNCj4gDQo+
-ICJUaGVuIHRoZSBtZXNzYWdlIGNhbiBiZSBzZW50LCBieSB3cml0aW5nIGl0IHdvcmQgcGVyIHdv
-cmQgaW50byB0aGUNCj4gSEFTSF9ESU4gcmVnaXN0ZXIuDQo+IFdoZW4gYSBibG9jayBvZiA1MTIg
-Yml0cywgaS5lLiAxNiB3b3JkcyBoYXZlIGJlZW4gd3JpdHRlbiwgYSBwYXJ0aWFsDQo+IGRpZ2Vz
-dCBjb21wdXRhdGlvbiB3aWxsDQo+IHN0YXJ0IHVwb24gd3JpdGluZyB0aGUgZmlyc3QgZGF0YSBv
-ZiB0aGUgbmV4dCBibG9jay4gVGhlIEFIQiBidXMgd2lsbA0KPiBiZSBidXN5IGZvciA4MiBjeWNs
-ZXMgZm9yDQo+IFNIQS0xIGFsZ29yaXRobSAoNjYgY3ljbGVzIGZvciBTSEEtMjU2IGFsZ29yaXRo
-bSkuIg0KDQpXaGF0IHNwZWVkIGNsb2NrIGlzIHRoYXQ/DQoNCjQgb3IgNSBleHRyYSBjbG9ja3Mv
-d29yZCBtYXkgKG9yIG1heSBub3QpIGJlIHNpZ25pZmljYW50Lg0KDQpJbiB0ZXJtcyBvZiBsYXRl
-bmN5IGl0IG1heSBiZSBub2lzZSBjb21wYXJlZCB0byBzb21lIFBDSWUNCnJlYWRzIGRvbmUgYnkg
-aGFyZHdhcmUgaW50ZXJydXB0IGhhbmRsZXJzLg0KU29tZSBzbG93IFBDSWUgdGFyZ2V0cyAobGlr
-ZSB0aGUgZnBnYSBvbmUgd2UgdXNlKSBwcmV0dHkNCm11Y2ggdGFrZSAxdXMgdG8gaGFuZGxlIGEg
-cmVhZCBjeWNsZS4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwg
-QnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVn
-aXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+On Thu, Mar 09, 2023 at 11:04:18AM +0000, Giovanni Cabiddu wrote:
+>
+> You are right. Thanks for spotting this.
+> When reviewing it I mixed up the cmp_err and xlt_err with the status which
+> is a u8.
 
+In general s8/u8 should only be used when you are directly reading
+or writing from hardware.  Once the value has entered your driver,
+you should use int/unsigned int to deal with them.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
