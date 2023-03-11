@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 685EFC61DA4
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Mar 2023 09:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D300C74A44
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Mar 2023 09:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230257AbjCKJmY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S230271AbjCKJmY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 11 Mar 2023 04:42:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54644 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbjCKJmJ (ORCPT
+        with ESMTP id S230146AbjCKJmN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Mar 2023 04:42:09 -0500
+        Sat, 11 Mar 2023 04:42:13 -0500
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E5513F544;
-        Sat, 11 Mar 2023 01:42:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEEBB13F56F;
+        Sat, 11 Mar 2023 01:42:09 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pavE9-002xbB-Cx; Sat, 11 Mar 2023 17:09:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 11 Mar 2023 17:09:21 +0800
+        id 1pavE5-002xai-8B; Sat, 11 Mar 2023 17:09:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 11 Mar 2023 17:09:17 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Sat, 11 Mar 2023 17:09:21 +0800
-Subject: [v7 PATCH 6/8] crypto: stm32 - Remove unused HASH_FLAGS_ERRORS
+Date:   Sat, 11 Mar 2023 17:09:17 +0800
+Subject: [v7 PATCH 4/8] crypto: stm32 - Remove unused hdev->err field
 References: <ZAxFBR3TdA7jUAgJ@gondor.apana.org.au>
 To:     Linus Walleij <linus.walleij@linaro.org>,
         Lionel Debieve <lionel.debieve@foss.st.com>,
@@ -29,47 +29,48 @@ To:     Linus Walleij <linus.walleij@linaro.org>,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com
-Message-Id: <E1pavE9-002xbB-Cx@formenos.hmeau.com>
+Message-Id: <E1pavE5-002xai-8B@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The bit HASH_FLAGS_ERRORS was never used.  Remove it.
+The variable hdev->err is never read so it can be removed.
+
+Also remove a spurious inclusion of linux/crypto.h.
 
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 Tested-by: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/stm32/stm32-hash.c |    4 ----
- 1 file changed, 4 deletions(-)
+ drivers/crypto/stm32/stm32-hash.c |    3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index c836163a9fd4..478822fc7a4e 100644
+index e16f9aaec6bf..e35fee945371 100644
 --- a/drivers/crypto/stm32/stm32-hash.c
 +++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -95,7 +95,6 @@
- #define HASH_FLAGS_SHA1			BIT(19)
- #define HASH_FLAGS_SHA224		BIT(20)
- #define HASH_FLAGS_SHA256		BIT(21)
--#define HASH_FLAGS_ERRORS		BIT(22)
- #define HASH_FLAGS_HMAC			BIT(23)
+@@ -7,7 +7,6 @@
+  */
  
- #define HASH_OP_UPDATE			1
-@@ -873,7 +872,6 @@ static int stm32_hash_finish(struct ahash_request *req)
- static void stm32_hash_finish_req(struct ahash_request *req, int err)
- {
- 	struct stm32_hash_request_ctx *rctx = ahash_request_ctx(req);
--	struct stm32_hash_state *state = &rctx->state;
- 	struct stm32_hash_dev *hdev = rctx->hdev;
+ #include <linux/clk.h>
+-#include <linux/crypto.h>
+ #include <linux/delay.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/dmaengine.h>
+@@ -183,7 +182,6 @@ struct stm32_hash_dev {
+ 	struct ahash_request	*req;
+ 	struct crypto_engine	*engine;
  
- 	if (!err && (HASH_FLAGS_FINAL & hdev->flags)) {
-@@ -884,8 +882,6 @@ static void stm32_hash_finish_req(struct ahash_request *req, int err)
- 				 HASH_FLAGS_OUTPUT_READY | HASH_FLAGS_HMAC |
- 				 HASH_FLAGS_HMAC_INIT | HASH_FLAGS_HMAC_FINAL |
- 				 HASH_FLAGS_HMAC_KEY);
--	} else {
--		state->flags |= HASH_FLAGS_ERRORS;
+-	int			err;
+ 	unsigned long		flags;
+ 
+ 	struct dma_chan		*dma_lch;
+@@ -894,7 +892,6 @@ static int stm32_hash_hw_init(struct stm32_hash_dev *hdev,
+ 		stm32_hash_write(hdev, HASH_STR, 0);
+ 		stm32_hash_write(hdev, HASH_DIN, 0);
+ 		stm32_hash_write(hdev, HASH_IMR, 0);
+-		hdev->err = 0;
  	}
  
- 	pm_runtime_mark_last_busy(hdev->dev);
+ 	return 0;
