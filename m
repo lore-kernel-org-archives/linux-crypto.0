@@ -2,92 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32090C6FA99
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Mar 2023 23:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FDDBC74A44
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Mar 2023 08:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbjCJXWJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Mar 2023 18:22:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50158 "EHLO
+        id S229729AbjCKIEQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 11 Mar 2023 03:04:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231618AbjCJXWA (ORCPT
+        with ESMTP id S229827AbjCKIEO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Mar 2023 18:22:00 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239A5115656;
-        Fri, 10 Mar 2023 15:21:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=Vl75lOivwxRd2Gq7JNUD53sjLJaqgVHzQJHDdO+38Jc=; b=fSLTvqIpq4dw1JrHrXBJ7039LX
-        4ywebvj4dFbVA3TjRRJuPgWV9StjK8zXQ+a33IdDsS2fX/Q4QMGirL1WDRqizNZaVxL5GOW/eEKcH
-        knTkNc3fPmnsodNzCJSQadU7ceRhoWNXvAXAs42kFHGQFUWyqoveZ9fBzX/NNfX8HVOjxC8jM3sha
-        Fh4x1QLHlaygVz3C8Z86xLsrXpJTorZ9XEO5EPD694G1HxD2WxvbNUGi6mI9cGTPiwWzuF97RmKfc
-        dOJl8U0pKM/8OMtSaGldSYx7rtCmXJF6/pjxFkUfmKc4VNxBgosIrj9LkAOyJaDzbbf5sArUfdQ7w
-        taZI1tcQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pam3b-00GbRI-Jz; Fri, 10 Mar 2023 23:21:51 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     ebiederm@xmission.com, linux-crypto@vger.kernel.org,
-        keescook@chromium.org, yzaikin@google.com, j.granados@samsung.com,
-        patches@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH] crypto: simplify one-level sysctl registration for crypto_sysctl_table
-Date:   Fri, 10 Mar 2023 15:21:50 -0800
-Message-Id: <20230310232150.3957148-1-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.37.1
+        Sat, 11 Mar 2023 03:04:14 -0500
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718FF116BBD
+        for <linux-crypto@vger.kernel.org>; Sat, 11 Mar 2023 00:04:06 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pauCn-002wiP-3X; Sat, 11 Mar 2023 16:03:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 11 Mar 2023 16:03:53 +0800
+Date:   Sat, 11 Mar 2023 16:03:53 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Mathew McBride <matt@traverse.com.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: Hitting BUG_ON in crypto_unregister_alg() on reboot with
+ caamalg_qi2 driver
+Message-ID: <ZAw16S7OQyYCAK90@gondor.apana.org.au>
+References: <87r0tyq8ph.fsf@toke.dk>
+ <ZAqwTqw3lR+dnImO@gondor.apana.org.au>
+ <87ilf8rakq.fsf@toke.dk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <87ilf8rakq.fsf@toke.dk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is no need to declare an extra tables to just create directory,
-this can be easily be done with a prefix path with register_sysctl().
+On Fri, Mar 10, 2023 at 02:37:57PM +0100, Toke Høiland-Jørgensen wrote:
+>
+> Also, absent of a fixed driver (which doesn't sound like it's a trivial
+> fix?), how do I prevent the system from crashing on shutdown? The
+> BUG_ON() seems a bit heavy-handed, could it be replaced with a WARN_ON?
 
-Simplify this registration.
+Yes I think that's probably OK.  Could you please send a patch?
 
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
-
-If not clear, see this new doc:
-
-https://lore.kernel.org/all/20230310223947.3917711-1-mcgrof@kernel.org/T/#u     
-
-But the skinny is we can deprecate long term APIs from sysctl that
-uses recursion.
-
- crypto/fips.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
-
-diff --git a/crypto/fips.c b/crypto/fips.c
-index b05d3c7b3ca5..92fd506abb21 100644
---- a/crypto/fips.c
-+++ b/crypto/fips.c
-@@ -66,20 +66,11 @@ static struct ctl_table crypto_sysctl_table[] = {
- 	{}
- };
- 
--static struct ctl_table crypto_dir_table[] = {
--	{
--		.procname       = "crypto",
--		.mode           = 0555,
--		.child          = crypto_sysctl_table
--	},
--	{}
--};
--
- static struct ctl_table_header *crypto_sysctls;
- 
- static void crypto_proc_fips_init(void)
- {
--	crypto_sysctls = register_sysctl_table(crypto_dir_table);
-+	crypto_sysctls = register_sysctl("crypto", crypto_sysctl_table);
- }
- 
- static void crypto_proc_fips_exit(void)
+Thanks,
 -- 
-2.39.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
