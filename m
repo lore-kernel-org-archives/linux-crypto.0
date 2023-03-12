@@ -2,152 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22810C74A5B
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Mar 2023 22:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0044DC6FD1F
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Mar 2023 07:27:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbjCKWKQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Mar 2023 17:10:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39570 "EHLO
+        id S229643AbjCLH1a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 12 Mar 2023 03:27:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229839AbjCKWKP (ORCPT
+        with ESMTP id S229437AbjCLH13 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Mar 2023 17:10:15 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B542C657;
-        Sat, 11 Mar 2023 14:10:14 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4191260E88;
-        Sat, 11 Mar 2023 22:10:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F8D5C433EF;
-        Sat, 11 Mar 2023 22:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678572613;
-        bh=D9dLzCfeqWuXouu3aKrlHiE1Tazt/6/b97r6ngWPJaQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IcT1ljkO4RsToJDNXqRwIOVoh9Tb36Q+04t6fC7zd0cfP8TRMGf5bMbwtfK87hzFK
-         sQm8pjQdlYqZVP1Xk6R7jqXhEcOtvME3a8cuAzgfG/v0HtPpxOnTx2AQ/cE/5+Ro3G
-         6pTPNO7m5fiMXrv3NowItD4nghj/opIfSPIE7sO/k1B7DWPYdI2efez+g2VBIRZAOc
-         YFBPZIXZbkrH4KJ/EQ/rnAG1BVFQLrd30B1w/j2GNFr/5Vc4w2GnwecKIIK48ByelG
-         WqR2W3F1vGR2IUedndTYh8iSYqzB3bff/PyXf2CUPRZMPhnG9vFWarhsTAi96BkTmG
-         vLaq+x9s2AIHQ==
-Date:   Sun, 12 Mar 2023 00:10:10 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, pvorel@suse.cz, kanth.ghatraju@oracle.com,
-        konrad.wilk@oracle.com, erpalmer@linux.vnet.ibm.com,
-        coxu@redhat.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v5 5/6] KEYS: CA link restriction
-Message-ID: <ZAz8QlynTSMD7kuE@kernel.org>
-References: <20230302164652.83571-1-eric.snowberg@oracle.com>
- <20230302164652.83571-6-eric.snowberg@oracle.com>
+        Sun, 12 Mar 2023 03:27:29 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE05F574C2;
+        Sat, 11 Mar 2023 23:27:26 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pbG6o-003DeW-Er; Sun, 12 Mar 2023 15:27:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 12 Mar 2023 15:27:10 +0800
+Date:   Sun, 12 Mar 2023 15:27:10 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Mathew McBride <matt@traverse.com.au>, stable@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: Demote BUG_ON() in crypto_unregister_alg() to a
+ WARN_ON()
+Message-ID: <ZA1+zr0NapJlsKk9@gondor.apana.org.au>
+References: <20230311162513.6746-1-toke@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230302164652.83571-6-eric.snowberg@oracle.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230311162513.6746-1-toke@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 02, 2023 at 11:46:51AM -0500, Eric Snowberg wrote:
-> Add a new link restriction.  Restrict the addition of keys in a keyring
-> based on the key to be added being a CA.
-> 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-> ---
->  crypto/asymmetric_keys/restrict.c | 38 +++++++++++++++++++++++++++++++
->  include/crypto/public_key.h       | 15 ++++++++++++
->  2 files changed, 53 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-> index 6b1ac5f5896a..48457c6f33f9 100644
-> --- a/crypto/asymmetric_keys/restrict.c
-> +++ b/crypto/asymmetric_keys/restrict.c
-> @@ -108,6 +108,44 @@ int restrict_link_by_signature(struct key *dest_keyring,
->  	return ret;
->  }
+On Sat, Mar 11, 2023 at 05:25:12PM +0100, Toke Høiland-Jørgensen wrote:
+>
+> diff --git a/crypto/algapi.c b/crypto/algapi.c
+> index d08f864f08be..e9954fcb61be 100644
+> --- a/crypto/algapi.c
+> +++ b/crypto/algapi.c
+> @@ -493,7 +493,7 @@ void crypto_unregister_alg(struct crypto_alg *alg)
+>  	if (WARN(ret, "Algorithm %s is not registered", alg->cra_driver_name))
+>  		return;
 >  
-> +/**
-> + * restrict_link_by_ca - Restrict additions to a ring of CA keys
-> + * @dest_keyring: Keyring being linked to.
-> + * @type: The type of key being added.
-> + * @payload: The payload of the new key.
-> + * @trust_keyring: Unused.
-> + *
-> + * Check if the new certificate is a CA. If it is a CA, then mark the new
-> + * certificate as being ok to link.
-> + *
-> + * Returns 0 if the new certificate was accepted, -ENOKEY if the
-> + * certificate is not a CA. -ENOPKG if the signature uses unsupported
-> + * crypto, or some other error if there is a matching certificate but
-> + * the signature check cannot be performed.
-> + */
-> +int restrict_link_by_ca(struct key *dest_keyring,
-> +			const struct key_type *type,
-> +			const union key_payload *payload,
-> +			struct key *trust_keyring)
-> +{
-> +	const struct public_key *pkey;
-> +
-> +	if (type != &key_type_asymmetric)
-> +		return -EOPNOTSUPP;
-> +
-> +	pkey = payload->data[asym_crypto];
-> +	if (!pkey)
-> +		return -ENOPKG;
-> +	if (!test_bit(KEY_EFLAG_CA, &pkey->key_eflags))
-> +		return -ENOKEY;
-> +	if (!test_bit(KEY_EFLAG_KEYCERTSIGN, &pkey->key_eflags))
-> +		return -ENOKEY;
-> +	if (test_bit(KEY_EFLAG_DIGITALSIG, &pkey->key_eflags))
-> +		return -ENOKEY;
+> -	BUG_ON(refcount_read(&alg->cra_refcnt) != 1);
+> +	WARN_ON(refcount_read(&alg->cra_refcnt) != 1);
 
-nit: would be more readable, if conditions were separated by
-empty lines.
+I think we should return here instead of continuing to destroy
+the algorithm since we know that it's still in use.
 
-> +
-> +	return 0;
-> +}
-> +
->  static bool match_either_id(const struct asymmetric_key_id **pair,
->  			    const struct asymmetric_key_id *single)
->  {
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index 03c3fb990d59..653992a6e941 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -75,6 +75,21 @@ extern int restrict_link_by_key_or_keyring_chain(struct key *trust_keyring,
->  						 const union key_payload *payload,
->  						 struct key *trusted);
->  
-> +#if IS_REACHABLE(CONFIG_ASYMMETRIC_KEY_TYPE)
-> +extern int restrict_link_by_ca(struct key *dest_keyring,
-> +			       const struct key_type *type,
-> +			       const union key_payload *payload,
-> +			       struct key *trust_keyring);
-> +#else
-> +static inline int restrict_link_by_ca(struct key *dest_keyring,
-> +				      const struct key_type *type,
-> +				      const union key_payload *payload,
-> +				      struct key *trust_keyring)
-> +{
-> +	return 0;
-> +}
-> +#endif
-> +
->  extern int query_asymmetric_key(const struct kernel_pkey_params *,
->  				struct kernel_pkey_query *);
->  
-> -- 
-> 2.27.0
-> 
-
-BR, Jarkko
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
