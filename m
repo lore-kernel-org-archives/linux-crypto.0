@@ -2,36 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 347B2C6FD1F
-	for <linux-crypto@archiver.kernel.org>; Sun, 12 Mar 2023 11:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA17C6FD1F
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 01:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbjCLLKs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 12 Mar 2023 07:10:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40536 "EHLO
+        id S229681AbjCMBI7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 12 Mar 2023 21:08:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjCLLKq (ORCPT
+        with ESMTP id S229641AbjCMBI6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Mar 2023 07:10:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2BEE5070B;
-        Sun, 12 Mar 2023 04:10:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 35A16B80B8A;
-        Sun, 12 Mar 2023 11:10:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96BF3C433D2;
-        Sun, 12 Mar 2023 11:10:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1678619441;
-        bh=taUXFp8kL6ktHNtSBeh4ZjQygRdXFiExttVdf1EL9WM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bcebVzU2yWibvgkLCn3oigLPiisHP/qFgPFjMRlAsX7oQDCs1HPwjpf7UYpvI0fCy
-         aBiyVMcZZB8CAq+cviud6lwhxx4VvGJU+HgMXcMu+jGO2lHBOXwv7uZjuvm+bE2yK1
-         cTQnGhfBvHTTnRUxJQCIeGVHMhrwiL0y7ovZJ+54=
-Date:   Sun, 12 Mar 2023 12:10:38 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        Sun, 12 Mar 2023 21:08:58 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2161330B11;
+        Sun, 12 Mar 2023 18:08:56 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pbWg0-003Qr4-9P; Mon, 13 Mar 2023 09:08:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Mar 2023 09:08:36 +0800
+Date:   Mon, 13 Mar 2023 09:08:36 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Greg KH <gregkh@linuxfoundation.org>
 Cc:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
@@ -41,38 +31,33 @@ Cc:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
         linux-crypto@vger.kernel.org
 Subject: Re: [PATCH] crypto: Demote BUG_ON() in crypto_unregister_alg() to a
  WARN_ON()
-Message-ID: <ZA2zLtqrI4aeLSTj@kroah.com>
+Message-ID: <ZA53lHkyWcTTCWXF@gondor.apana.org.au>
 References: <20230311162513.6746-1-toke@redhat.com>
  <ZA1+zr0NapJlsKk9@gondor.apana.org.au>
+ <ZA2zLtqrI4aeLSTj@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZA1+zr0NapJlsKk9@gondor.apana.org.au>
+In-Reply-To: <ZA2zLtqrI4aeLSTj@kroah.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 12, 2023 at 03:27:10PM +0800, Herbert Xu wrote:
-> On Sat, Mar 11, 2023 at 05:25:12PM +0100, Toke Høiland-Jørgensen wrote:
-> >
-> > diff --git a/crypto/algapi.c b/crypto/algapi.c
-> > index d08f864f08be..e9954fcb61be 100644
-> > --- a/crypto/algapi.c
-> > +++ b/crypto/algapi.c
-> > @@ -493,7 +493,7 @@ void crypto_unregister_alg(struct crypto_alg *alg)
-> >  	if (WARN(ret, "Algorithm %s is not registered", alg->cra_driver_name))
-> >  		return;
-> >  
-> > -	BUG_ON(refcount_read(&alg->cra_refcnt) != 1);
-> > +	WARN_ON(refcount_read(&alg->cra_refcnt) != 1);
-> 
-> I think we should return here instead of continuing to destroy
-> the algorithm since we know that it's still in use.
+On Sun, Mar 12, 2023 at 12:10:38PM +0100, Greg KH wrote:
+>
+> Also, this still panics a box with panic-on-warn enabled, so if this can
+> be handled, returning an error is good.
 
-Also, this still panics a box with panic-on-warn enabled, so if this can
-be handled, returning an error is good.
+Well it can't really be handled because the driver is trying
+to unregister an in-use algorithm so it's going to die one way
+or another.
 
-thanks,
+But returning here at least means that if this is happening
+through shutdown then the system at least gets a chance to
+reboot.
 
-greg k-h
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
