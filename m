@@ -2,141 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E032C6FD19
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 18:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCDEC6FD19
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 18:29:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbjCMSFr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 14:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42480 "EHLO
+        id S229782AbjCMS33 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 14:29:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjCMSFq (ORCPT
+        with ESMTP id S229712AbjCMS32 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 14:05:46 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01AB12194C;
-        Mon, 13 Mar 2023 11:05:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Transfer-Encoding
-        :Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
-        Reply-To:Cc:Content-ID:Content-Description;
-        bh=G/ko5TGzuHEcgDJnamjpPEj0WHGMkQQVi8DJaI/SzYg=; b=QWADTLVQC188kv7oMbz4BHRYWc
-        71WvmVgDBgXZR0ElQENg9v47nhT0sb7lTKLwph5P7XyH2GLBtfqGT+RNX6GsXSMSfD13TnQ5aPrRG
-        CjXvEN34naTsP+EDdHO+a5mJJmUlcnG3I0FF4FYUiGBtNpG50K2RuWqC2BdUmWCKZxzleT6f2Cbd9
-        dEvgDXovnxWdgy8/pk0byGAokVdVA7chwUS0yYjmvc6kr4JGIGtY2FwLMY+NzAnJyKhfngyRzRAQP
-        zbyV4QKaoEUWvfq2FFU4TF4mVDG+yktLc0HGO4rbG3G528Yn5bQhz1cSw0jsrIP23K+7Rp8aWaan9
-        HWFCgBlQ==;
-Received: from [54.239.6.189] (helo=[192.168.11.210])
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pbmXp-001Tlb-1s;
-        Mon, 13 Mar 2023 18:05:13 +0000
-Message-ID: <5441d09dc213998042a337b7f411bd1662b604bc.camel@infradead.org>
-Subject: Re: [PATCH v2 0/2] [RFC] virtio-rng entropy leak reporting feature
-From:   Amit Shah <amit@infradead.org>
-To:     bchalios@amazon.es, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Olivia Mackall <olivia@selenic.com>,
+        Mon, 13 Mar 2023 14:29:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F37B882A92;
+        Mon, 13 Mar 2023 11:28:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D13661468;
+        Mon, 13 Mar 2023 18:27:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01344C433D2;
+        Mon, 13 Mar 2023 18:27:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678732060;
+        bh=/UptELta1fbfIVlSU3lW1JfbEsBBjNSMIYGDMc0a6Bc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VvvKyry0IHRmRY/4zqVRDhYa1hlwWP5XO8DPtmSV86lG3jJNM7uxAeqCM3/hMjEnS
+         /4fGZINOj3BbOFj7VtuSn5/zADgew9/AhucSrWiCDWCAvWqK46vpsQ6ipb+6neCHzX
+         D26bSYYK00ZZp7wS/PyFzdSBom5Fc1YvU4I2sz/4csGzme6PYNmreJ9TJMdSLn2pJ3
+         cgxXHKzmvZ0aDqUoSafiMpZKQIjdbzRSu92/wVYzEbmBwzFm5rb1KpTZ9Ix5kcdW8E
+         IH7F21aKBHvZjZ0vyXFvDpM4UNcMSFajBrFy3LzzWeznIYwqpqWY/2y3YL9Y5Kytyi
+         kj7t2/qKpgCbw==
+Date:   Mon, 13 Mar 2023 11:27:38 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, sgarzare@redhat.com,
-        amit@kernel.org, graf@amazon.de, xmarcalx@amazon.co.uk
-Date:   Mon, 13 Mar 2023 19:05:11 +0100
-In-Reply-To: <e1c03136-b873-1f1d-8b06-d9186566fc0c@amazon.es>
-References: <20230131145543.86369-1-bchalios@amazon.es>
-         <Y9lBeymca9eFaJ33@zx2c4.com>
-         <65d872db2e1be29bb03b43ed606e7cc9e74ec08d.camel@infradead.org>
-         <e1c03136-b873-1f1d-8b06-d9186566fc0c@amazon.es>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        "David S . Miller" <davem@davemloft.net>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [RFC PATCH v3 2/7] dt-bindings: mmc: sdhci-msm: Add ICE phandle
+ and drop core clock
+Message-ID: <ZA9rGihWeLhUYMdA@sol.localdomain>
+References: <20230313115202.3960700-1-abel.vesa@linaro.org>
+ <20230313115202.3960700-3-abel.vesa@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230313115202.3960700-3-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Herbert / Jason / crypto maintainers,
+On Mon, Mar 13, 2023 at 01:51:57PM +0200, Abel Vesa wrote:
+> Subject: Re: [RFC PATCH v3 2/7] dt-bindings: mmc: sdhci-msm: Add ICE phandle
+> and drop core clock
 
+"and drop core clock" should be removed from the subject now, right?  Same for
+patch 3.
 
-On Mon, 2023-03-13 at 11:42 +0100, bchalios@amazon.es wrote:
-> Hi Amit,
->=20
-> Thanks for taking the time to look into this.
->=20
-> On 3/2/23 5:55 PM, Amit Shah <amit@infradead.org> wrote:
-> > CAUTION: This email originated from outside of the organization. Do not=
- click links or open attachments unless you can confirm the sender and know=
- the content is safe.
-> >=20
-> >=20
-> >=20
-> > Hey all,
-> >=20
-> > On Tue, 2023-01-31 at 17:27 +0100, Jason A. Donenfeld wrote:
-> > > You sent a v2, but I'm not back until the 11th to provide comments on
-> > > v1. I still think this isn't the right direction, as this needs tie-i=
-ns
-> > > to the rng to actually be useful. Please stop posting new versions of
-> > > this for now, so that somebody doesn't accidentally merge it; that'd =
-be
-> > > a big mistake. I'll paste what I wrote you prior:
-> >=20
-> > I sat down to review the patchset but looks like there's some
-> > background I'm not aware of.
-> >=20
-> > It looks like Babis has implemented the guest side here according to
-> > the spec change that Michael has posted.
-> >=20
-> > Jason, do you have an alternative in mind?  In that case, we should
-> > pick this up in the spec update thread instead.
->=20
-> I am not sure what Jason meant here by "This needs to be integrated more =
-closely with random.c itself, similar to how vmgenid works",
-> but here's my take on this.
->=20
-> The point of the patchset is to provide an implementation of Michael's sp=
-ec on which we can discuss. It implements the HW API and it has
-> some hooks showing how this API could be used. It is mainly directed towa=
-rds the user-space where we did not have a proper API to consume
-> VMGENID-like functionality. With regards to the random.c components it do=
-es exactly what VMGENID does currently, i.e. whenever an entropy-leak
-> is detected it uses the new random bytes provided by the virtio-rng devic=
-e as entropy. This is as racy as VMGENID, as I mention in the cover
-> letter of the patchset.
-
-Yea, this does solve the race condition from the userspace pov, so does
-look better.  Thanks for the details!
-
-Not sure if Jason's back yet - but Herbert, or other crypto
-maintainers, can you chime in from the crypto/rng perspective if this
-looks sane?
-
-Jason has previously NACKed the patch without follow-up, and I don't
-want the patch to linger without a path to merging, especially when
-it's not clear what Jason meant.
-
-> However, the new spec does allow us to do things _correctly_, i.e. not re=
-ly on asynchronous handling of events to re-seed the kernel. For example, w=
-e
-> could achieve something like that by making use of the "copy-on-leak" ope=
-ration, so that a flag changes value before vCPUs get resumed, so we know
-> when a leak has happened when needed, e.g. before returning random bytes =
-to user-space. At least, that's what I remember us discussing during LPC.
-> Jason, Michael, Alex, please keep me honest here :)
->=20
-> Unfortunately, I am not very familiar with the random.c code and did not =
-want to do something there that would most certainly be wrong, hence I post=
-ed
-> this as an RFC, asking for input on how we could achieve this better inte=
-gration. Hopefully, when Jason is back from his vacation he can share his t=
-houghts
-> on this, but if yourself (or anyone else interested) have any ideas on ho=
-w we could design this properly, I 'm happy to discuss!
-
-Let's wait a couple more days for responses, otherwise I suggest you
-resubmit to kickstart a new discussion, with the note that Jason had
-something else in mind - so that it doesn't appear as though we're
-trying to override that.
-
-Thanks for the patience,
-
-		Amit
+- Eric
