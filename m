@@ -2,132 +2,126 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87004C6FD19
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 11:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD55C61DA4
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 13:00:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230331AbjCMLxz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 07:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45316 "EHLO
+        id S229846AbjCMNAQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 09:00:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230146AbjCMLxD (ORCPT
+        with ESMTP id S230131AbjCMNAO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 07:53:03 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2349565456
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Mar 2023 04:52:26 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id p26so7749694wmc.4
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Mar 2023 04:52:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678708340;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GOM0wU6k8YL6zyefl9B75iw3o3Fd7bxtMEc8BcltPP0=;
-        b=Yo1hi2naG0TMf+Cn9+92jHE5y5ZQeGL2G+B5oUkfpmybCcARGI/7I1AXzrsFQjcWiV
-         8AVEXZfwN4N2infnF2YabGPFC6jZgqHR6KaSHDTnN2J9G7qlq1z4GJUGWILm4ND9cEmS
-         i5GOo7xxBxsRM5Vxd6FIrU3YSoFTjHRGDlE27R5p5iRPAoB8HYfjvIPE+Aeolt+QTUgm
-         kULNFWKJPUWPph19SJfjPntRxFYdOUuopzvkEVaH93E2WcphTJGOWDCX8Is5Cx558V/a
-         haVkS8SWk6LJSshrTPtyaLryB3HegkrM/YwRTJtl3cwOAIyQWLT8oNOVg+HE2gR+Cafc
-         tn+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678708340;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GOM0wU6k8YL6zyefl9B75iw3o3Fd7bxtMEc8BcltPP0=;
-        b=rJXBvSq8vpRYh9kOZc9OpKOMMA7wUTstEqpIBgaAwoswyhqwnXShzrxxjJL7CGh+7D
-         AA3xvjdaRXXPbgQjRVV9xj5V9/2DsgBe4MLulqSsJNzHYqkjG1P5b52vk8qmGuIi9xs+
-         DewQrKl/Z1Z3ZZUyThUR733f0ONbrrz/s3iL8Ah8LpGIX/njCNZLhZduTiei1D9HjaH/
-         /65aQ8Vgp7xvqCZtRF7qehUCHFWxFFWZUPpvP5JLntmFB4KmvTREPVp3MXz2ZA1eVGr7
-         Ipiln12zJ958d1zhRyAVUVxvo20RGkOUvxZ6s3Q0GpE3ukOa+vHIV7b0NkBPoUlCMrlP
-         XCkA==
-X-Gm-Message-State: AO0yUKWYXtArYzD0OYgw6QWBqnrhs2hDSta0ZZLJB3PSifbM2Z3eyr/X
-        9rqRLzXnTeGFCaksR0nsuHxjqQ==
-X-Google-Smtp-Source: AK7set/Kw84B38cC6AtJ9OlHXUgfEIZvrnDse4SJG4dI+SPVu9lcD061f0fGRffAQAAHmggiK8UiRg==
-X-Received: by 2002:a05:600c:3b04:b0:3df:d431:cf64 with SMTP id m4-20020a05600c3b0400b003dfd431cf64mr10835575wms.39.1678708340264;
-        Mon, 13 Mar 2023 04:52:20 -0700 (PDT)
-Received: from localhost.localdomain ([94.52.112.99])
-        by smtp.gmail.com with ESMTPSA id u15-20020a05600c440f00b003e21dcccf9fsm8801090wmn.16.2023.03.13.04.52.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 04:52:19 -0700 (PDT)
-From:   Abel Vesa <abel.vesa@linaro.org>
-To:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: [RFC PATCH v3 7/7] arm64: dts: qcom: sm8550: Add the Inline Crypto Engine node
-Date:   Mon, 13 Mar 2023 13:52:02 +0200
-Message-Id: <20230313115202.3960700-8-abel.vesa@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230313115202.3960700-1-abel.vesa@linaro.org>
-References: <20230313115202.3960700-1-abel.vesa@linaro.org>
+        Mon, 13 Mar 2023 09:00:14 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC4464234;
+        Mon, 13 Mar 2023 05:59:52 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32DC17h5001687;
+        Mon, 13 Mar 2023 12:59:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=p/uBGT7CPg8tBHDJ7eVXHXW6FWUluHA2VNiNAc55PD4=;
+ b=lakHdwYYL3kYSl8Zp734Lkz6FrB7DUICNNIQ6Ss6w0l8cT4wlVS6d1QuMH6NSMWDvdKL
+ u8W9CRduhGrOP0eJpWldzu21k92T8Cm3K5pd2/PYgPUvK7JpAqdqfVLvoPI6VDDDBkYK
+ 0XBVB6Subt+9QDKG4Ck6i0oHM3G0RGiqVD/XRNJLZdVOg7ggfj+xj0M5XQo1PVNmt5zY
+ 8LKpA1G/YtwFmKGrHs7S5LeSrvBRKjq/0aR0d2pJPKQIUATRViDvwij9rCYV0DaJ+L+r
+ Q9s0/ctkzG+6A9+NAaADw8wcvrvDJZOy5EQC+O/BooIBhaS0AZp7OBZKTF+x8JaB9zvC uA== 
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pa3ffsmtf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Mar 2023 12:59:17 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32DBjl7u004928;
+        Mon, 13 Mar 2023 12:59:16 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
+        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3p8h97h539-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Mar 2023 12:59:16 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32DCxEos6816348
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Mar 2023 12:59:14 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 61F7F58052;
+        Mon, 13 Mar 2023 12:59:14 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F12F58045;
+        Mon, 13 Mar 2023 12:59:13 +0000 (GMT)
+Received: from [9.160.124.22] (unknown [9.160.124.22])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Mar 2023 12:59:13 +0000 (GMT)
+Message-ID: <1cf97806-300d-d79e-4c4c-3b7cccba7312@linux.ibm.com>
+Date:   Mon, 13 Mar 2023 07:59:12 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.8.0
+Subject: Re: [RESEND PATCH v4 0/6] crypto: Accelerated AES/GCM stitched
+ implementation
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, ltcgcw@linux.vnet.ibm.com,
+        dtsen@us.ibm.com
+References: <20230221034021.15121-1-dtsen@linux.ibm.com>
+ <ZAsUV4Nn6qrwA2am@gondor.apana.org.au>
+From:   Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <ZAsUV4Nn6qrwA2am@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vs_ATB29RtpnMaJhexFX4MtjxJIZvHME
+X-Proofpoint-ORIG-GUID: vs_ATB29RtpnMaJhexFX4MtjxJIZvHME
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-13_05,2023-03-13_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ suspectscore=0 impostorscore=0 phishscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 mlxlogscore=842 lowpriorityscore=0
+ bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2303130102
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for UFS ICE by adding the qcom,ice property and the
-ICE dedicated devicetree node. While at it, add the reg-name property
-to the UFS HC node to be in line with older platforms.
+Thanks Hubert.
 
-Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
----
+-Danny
 
-Changes since v2:
- * dropped all changes for the older platforms
- * added the suppor for ICE with the new approach to the SM8550
-
- arch/arm64/boot/dts/qcom/sm8550.dtsi | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/sm8550.dtsi b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-index ec45f13e55c9..ac7bf1e1a2ab 100644
---- a/arch/arm64/boot/dts/qcom/sm8550.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-@@ -1882,6 +1882,7 @@ ufs_mem_hc: ufs@1d84000 {
- 			compatible = "qcom,sm8550-ufshc", "qcom,ufshc",
- 				     "jedec,ufs-2.0";
- 			reg = <0x0 0x01d84000 0x0 0x3000>;
-+			reg-names = "std";
- 			interrupts = <GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>;
- 			phys = <&ufs_mem_phy>;
- 			phy-names = "ufsphy";
-@@ -1924,9 +1925,18 @@ ufs_mem_hc: ufs@1d84000 {
- 				<0 0>,
- 				<0 0>,
- 				<0 0>;
-+			qcom,ice = <&ice>;
-+
- 			status = "disabled";
- 		};
- 
-+		ice: crypto@1d88000 {
-+			compatible = "qcom,sm8550-inline-crypto-engine",
-+				     "qcom,inline-crypto-engine";
-+			reg = <0 0x01d88000 0 0x8000>;
-+			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-+		};
-+
- 		tcsr_mutex: hwlock@1f40000 {
- 			compatible = "qcom,tcsr-mutex";
- 			reg = <0 0x01f40000 0 0x20000>;
--- 
-2.34.1
-
+On 3/10/23 5:28 AM, Herbert Xu wrote:
+> On Mon, Feb 20, 2023 at 10:40:15PM -0500, Danny Tsen wrote:
+>> This patch series enable an accelerated AES/GCM stitched implementation
+>> for Power10 or later CPU(ppc64le).  This module supports AEAD algorithm.
+>> The stitched implementation provides 3.5X+ better performance than the
+>> baseline.
+>>
+>> This patch has been tested with the kernel crypto module tcrypt.ko and
+>> has passed the selftest.  The patch is also tested with
+>> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
+>>
+>> Danny Tsen (6):
+>>    Glue code for AES/GCM stitched implementation.
+>>    An accelerated AES/GCM stitched implementation.
+>>    Supporting functions for AES.
+>>    Supporting functions for ghash.
+>>    A perl script to process PowerPC assembler source.
+>>    Update Kconfig and Makefile.
+>>
+>>   arch/powerpc/crypto/aes-gcm-p10-glue.c |  345 ++++++
+>>   arch/powerpc/crypto/aes-gcm-p10.S      | 1521 ++++++++++++++++++++++++
+>>   arch/powerpc/crypto/aesp8-ppc.pl       |  585 +++++++++
+>>   arch/powerpc/crypto/ghashp8-ppc.pl     |  370 ++++++
+>>   arch/powerpc/crypto/ppc-xlate.pl       |  229 ++++
+>>   arch/powerpc/crypto/Kconfig            |   17 +
+>>   arch/powerpc/crypto/Makefile           |   13 +
+>>   7 files changed, 3080 insertions(+)
+>>   create mode 100644 arch/powerpc/crypto/aes-gcm-p10-glue.c
+>>   create mode 100644 arch/powerpc/crypto/aes-gcm-p10.S
+>>   create mode 100644 arch/powerpc/crypto/aesp8-ppc.pl
+>>   create mode 100644 arch/powerpc/crypto/ghashp8-ppc.pl
+>>   create mode 100644 arch/powerpc/crypto/ppc-xlate.pl
+>>
+>> -- 
+>> 2.31.1
+> All applied.  Thanks.
