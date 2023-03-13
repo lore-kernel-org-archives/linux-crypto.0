@@ -2,89 +2,245 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC966C74A5B
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 18:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9858C6FD19
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 18:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231433AbjCMScj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 14:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34610 "EHLO
+        id S231408AbjCMSqF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 14:46:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231164AbjCMScD (ORCPT
+        with ESMTP id S231147AbjCMSqA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 14:32:03 -0400
+        Mon, 13 Mar 2023 14:46:00 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF97280E2C;
-        Mon, 13 Mar 2023 11:31:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C6128D34;
+        Mon, 13 Mar 2023 11:45:24 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 28AB661365;
-        Mon, 13 Mar 2023 18:30:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38018C433D2;
-        Mon, 13 Mar 2023 18:30:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1678732251;
-        bh=akchBNDul5kGQ4bbsIzqd3Wkn40724BLCL8j8t0kerc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=2SJ8103HKr4PjUlRjoNwdWxY4QSChA0Dk/7hva88/LA8GHYXMB8IgF/YEsYBqr+vs
-         gCkkVmofymj5bAKAEru2Vmoo+ZVILdNd8f3XVaOVgXwXnz+xAa9cj9TGJ1FMgAsRq8
-         fwX+Gz8OgKIeU7d53oSMYt7MCRVpkyQGNP0GlA7Q=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E81E061477;
+        Mon, 13 Mar 2023 18:44:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B84FC433D2;
+        Mon, 13 Mar 2023 18:44:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678733080;
+        bh=dSwjc6VrZyuKRs3FcaS0zc1QaXTsOptD0AFwcVyG0TE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QUAVNamWky1dVxT9NHY5JfDqMATEh4vR38zN2/zYgXqZq16+e1apMBeGMi6OasDKA
+         Tl3R5o90cdFuLE7UsxczfCVUYGRXK/zoJ6G5MJAqKXffWY/4U0dpOAPvIEmh8aw87A
+         LJnaOExIMOgSdLbZzHxEe1ztgvZ1Vlsiyr0rB2br2S5KBQhheIPI5/ZpF39XENlwwq
+         6DkIzAXK1WW5i7BiWi+y3bPwK1AQRxZPjWjdW2PvuiKmMJF3FelN7yntJ+ac9QRwra
+         TDFstxdo3jwFyx9A2V/9jO5xDBmFpxvn7DH00kBnukVhJhavQ2rGWf16fbh2dy9E2U
+         6iepRZj96D/lg==
+Date:   Mon, 13 Mar 2023 11:44:37 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 29/36] crypto: hisilicon/qm - make struct bus_type * const
-Date:   Mon, 13 Mar 2023 19:29:11 +0100
-Message-Id: <20230313182918.1312597-29-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
-References: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
+        "David S . Miller" <davem@davemloft.net>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [RFC PATCH v3 4/7] soc: qcom: Make the Qualcomm UFS/SDCC ICE a
+ dedicated driver
+Message-ID: <ZA9vFcjLMoifqcsE@sol.localdomain>
+References: <20230313115202.3960700-1-abel.vesa@linaro.org>
+ <20230313115202.3960700-5-abel.vesa@linaro.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1534; i=gregkh@linuxfoundation.org; h=from:subject; bh=akchBNDul5kGQ4bbsIzqd3Wkn40724BLCL8j8t0kerc=; b=owGbwMvMwCRo6H6F97bub03G02pJDCn82dXSruqi1/y0HkotvSXhxmX3ft6cbz25eoLbzpoxH 69heZrYEcvCIMjEICumyPJlG8/R/RWHFL0MbU/DzGFlAhnCwMUpABNR280wz/zjnVbzmU4HznI9 bXQ9/edf9BXehwwL1gstPiSTGlNWepzxOtuTnxffXLDbDAA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230313115202.3960700-5-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In the function, qm_get_qos_value(), a struct bus_type * is used, but it
-really should be a const pointer as it is not modified anywhere in the
-function, and the driver core function it is used in expects a constant
-pointer.
+On Mon, Mar 13, 2023 at 01:51:59PM +0200, Abel Vesa wrote:
+> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
+> new file mode 100644
+> index 000000000000..d664dd598791
+> --- /dev/null
+> +++ b/drivers/soc/qcom/ice.c
+> @@ -0,0 +1,347 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Qualcomm ICE (Inline Crypto Engine) support.
+> + *
+> + * Copyright (c) 2013-2019, The Linux Foundation. All rights reserved.
+> + * Copyright (c) 2019, Google LLC
+> + * Copyright (c) 2023, Linaro Limited
+> + */
+> +
+> +#include <linux/bitfield.h>
+> +#include <linux/clk.h>
+> +#include <linux/delay.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/of_platform.h>
+> +
+> +#include <linux/firmware/qcom/qcom_scm.h>
+> +
+> +#include <soc/qcom/ice.h>
+> +
+> +#define AES_256_XTS_KEY_SIZE			64
+> +
+> +/* QCOM ICE registers */
+> +#define QCOM_ICE_REG_VERSION			0x0008
+> +#define QCOM_ICE_REG_FUSE_SETTING		0x0010
+> +
+> +/* QCOM ICE v2.X only */
+> +
+> +#define QCOM_ICE_REG_BIST_STATUS		0x0070
+> +#define QCOM_ICE_REG_ADVANCED_CONTROL		0x1000
 
-Cc: Weili Qian <qianweili@huawei.com>
-Cc: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-Note, this is a patch that is a prepatory cleanup as part of a larger
-series of patches that is working on resolving some old driver core
-design mistakes.  It will build and apply cleanly on top of 6.3-rc2 on
-its own, but I'd prefer if I could take it through my driver-core tree
-so that the driver core changes can be taken through there for 6.4-rc1.
+The "/* QCOM ICE v2.X only */" comment should be removed, as it's misleading.
+This driver only supports v3.  I think this comment also originally described
+registers that have now been removed from the file.
 
- drivers/crypto/hisilicon/qm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +/* BIST ("built-in self-test"?) status flags */
+> +#define QCOM_ICE_BIST_STATUS_MASK		GENMASK(31, 28)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index e4c84433a88a..fd1a38ee55f8 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3691,7 +3691,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
- 			       unsigned long *val,
- 			       unsigned int *fun_index)
- {
--	struct bus_type *bus_type = qm->pdev->dev.bus;
-+	const struct bus_type *bus_type = qm->pdev->dev.bus;
- 	char tbuf_bdf[QM_DBG_READ_LEN] = {0};
- 	char val_buf[QM_DBG_READ_LEN] = {0};
- 	struct pci_dev *pdev;
--- 
-2.39.2
+I think we're confident enough in what "BIST" stands for now that the question
+mark can be removed.
 
+> +/* Only one ICE instance is currently supported by HW */
+> +static bool qcom_ice_check_supported(struct qcom_ice *ice)
+
+I don't see how the comment relates to the function it documents.
+
+> +static int __qcom_ice_enable(struct qcom_ice *ice, bool enable)
+> +{
+> +	struct device *dev = ice->dev;
+> +	int err;
+> +
+> +	err = clk_prepare_enable(ice->core_clk);
+> +	if (err) {
+> +		dev_err(dev, "failed to enable core clock (%d)\n",
+> +			err);
+> +		return err;
+> +	}
+> +
+> +	if (enable) {
+> +		qcom_ice_low_power_mode_enable(ice);
+> +		qcom_ice_optimization_enable(ice);
+> +	}
+> +
+> +	err = qcom_ice_wait_bist_status(ice);
+> +	if (err) {
+> +		dev_err(dev, "BIST status error (%d)\n", err);
+> +		return err;
+> +	}
+> +
+> +	return 0;
+> +}
+
+The 'enable' parameter is confusing.  Maybe call it 'enable_optimizations'?
+
+> +
+> +int qcom_ice_program_key(struct qcom_ice *ice, u8 crypto_cap_idx,
+> +			 u8 algorithm_id, u8 key_size,
+> +			 const u8 crypto_key[], u8 data_unit_size,
+> +			 int slot)
+> +{
+> +	struct device *dev;
+> +	union {
+> +		u8 bytes[AES_256_XTS_KEY_SIZE];
+> +		u32 words[AES_256_XTS_KEY_SIZE / sizeof(u32)];
+> +	} key;
+> +	int i;
+> +	int err;
+> +
+> +	dev = ice->dev;
+
+Nit: declare and initialize 'dev' on the same line.
+
+> +static struct qcom_ice *qcom_ice_create(struct platform_device *pdev, void __iomem *base)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct device_node *np = dev->of_node;
+> +	struct qcom_ice *engine;
+> +
+> +	if (!qcom_scm_is_available())
+> +		return ERR_PTR(-EPROBE_DEFER);
+> +
+> +	if (!qcom_scm_ice_available()) {
+> +		dev_warn(dev, "ICE SCM interface not found\n");
+> +		return NULL;
+> +	}
+> +
+> +	engine = devm_kzalloc(dev, sizeof(*engine), GFP_KERNEL);
+> +	if (!engine)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	engine->dev = &pdev->dev;
+> +	engine->np = np;
+> +	engine->base = base;
+> +
+> +	engine->core_clk = devm_clk_get(dev, NULL);
+> +	if (IS_ERR(engine->core_clk))
+> +		return ERR_CAST(engine->core_clk);
+> +
+> +	if (!qcom_ice_check_supported(engine))
+> +		return ERR_PTR(-EOPNOTSUPP);
+> +
+> +	dev_info(dev, "Registered Qualcomm Inline Crypto Engine\n");
+> +
+> +	return engine;
+
+Shouldn't the !qcom_scm_is_available() and !qcom_ice_check_supported() cases
+have the same return value?  Both mean not supported, right?
+
+And shouldn't it be NULL, not ERR_PTR(-EOPNOTSUPP), so that the caller doesn't
+fail to probe the host controller just because ICE is not supported?
+
+> diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
+> new file mode 100644
+> index 000000000000..d4644c9f1bcd
+> --- /dev/null
+> +++ b/include/soc/qcom/ice.h
+> @@ -0,0 +1,39 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c) 2023, Linaro Limited
+> + */
+> +
+> +#ifndef __QCOM_ICE_H__
+> +#define __QCOM_ICE_H__
+> +
+> +#include <linux/err.h>
+
+<linux/types.h> would be more appropriate here, I think.
+
+> +
+> +#if IS_ENABLED(CONFIG_QCOM_INLINE_CRYPTO_ENGINE)
+
+This #if does not appear to be necessary.
+
+> +int qcom_ice_enable(struct qcom_ice *ice);
+> +int qcom_ice_resume(struct qcom_ice *ice);
+> +int qcom_ice_suspend(struct qcom_ice *ice);
+> +struct qcom_ice *of_qcom_ice_get(struct device *dev);
+> +int qcom_ice_program_key(struct qcom_ice *ice, u8 crypto_cap_idx,
+> +			 u8 algorithm_id, u8 key_size,
+> +			 const u8 crypto_key[], u8 data_unit_size,
+> +			 int slot);
+
+The crypto_cap_idx parameter is unused and should be removed.
+
+> +int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
+
+Nit: these declarations are in a slightly different order from the definitions
+in the .c file.
+
+- Eric
