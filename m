@@ -2,126 +2,129 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C76C6FD19
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 10:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15589C6FD1C
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 11:52:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230057AbjCMKnA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 06:43:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        id S230019AbjCMLwW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 07:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbjCMKm7 (ORCPT
+        with ESMTP id S231268AbjCMLwT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 06:42:59 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7149226A5;
-        Mon, 13 Mar 2023 03:42:56 -0700 (PDT)
+        Mon, 13 Mar 2023 07:52:19 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1182B5FA43
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Mar 2023 04:52:10 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id j19-20020a05600c191300b003eb3e1eb0caso10732328wmq.1
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Mar 2023 04:52:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
-  t=1678704177; x=1710240177;
-  h=message-id:date:mime-version:from:to:references:
-   in-reply-to:content-transfer-encoding:subject;
-  bh=j01tB2R5nN7QLXsxRjmxkVqXlMC3tx8wTni3C5bEYL0=;
-  b=qwlsB3P1inDMDRnaZhkxJ2Gj44YmneaLPzV1j0b5mY3swuqXpU0fCdf8
-   Kj8TtRgEnENrVSzbq72VBWSOzvZY/FIzs3etQvBIsYmX1QLUOBqqhpTxj
-   JdMOrV6EmNr0B1g0P4LW4YuSpR2tP8N/xQVrhRZ/6d7bwjmKVMGAYiy4z
-   g=;
-X-IronPort-AV: E=Sophos;i="5.98,256,1673913600"; 
-   d="scan'208";a="192622017"
-Subject: Re: [PATCH v2 0/2] [RFC] virtio-rng entropy leak reporting feature
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fad5e78e.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 10:42:54 +0000
-Received: from EX19D018EUA004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2c-m6i4x-fad5e78e.us-west-2.amazon.com (Postfix) with ESMTPS id 59BD5A01BB;
-        Mon, 13 Mar 2023 10:42:52 +0000 (UTC)
-Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
- EX19D018EUA004.ant.amazon.com (10.252.50.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.24; Mon, 13 Mar 2023 10:42:51 +0000
-Received: from [192.168.8.58] (10.1.212.12) by EX19D037EUB003.ant.amazon.com
- (10.252.61.119) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.24; Mon, 13 Mar
- 2023 10:42:45 +0000
-Message-ID: <e1c03136-b873-1f1d-8b06-d9186566fc0c@amazon.es>
-Date:   Mon, 13 Mar 2023 11:42:40 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.8.0
-From:   <bchalios@amazon.es>
-To:     Amit Shah <amit@infradead.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Olivia Mackall <olivia@selenic.com>,
+        d=linaro.org; s=google; t=1678708328;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=o5gykfX2bmfwMlcyaSUJHUuynXbdEn2Jn2hMntaBdA8=;
+        b=jTPVoMmYB82d+INXPTCISg1Ni/0nJkR1rU6+eaE7FcvtlCNWJT/Mlsc+FjBMCr1Vlt
+         3bs1xgcdwKd1WYS4l/cW0AxBXFRi/mXoDN5xEzUNIsIOrOlAdBvBm5NP6JBMC/1akx7G
+         KSbPa+1uzWgMjNjo4rArzyeAZSjJ2YWXbB16br78OsG6ycjc6z/4245XPpkKPSsXeD+G
+         DWfluqUrOriW991v1pUiTdBN3QQ6/P/ixTJ8cU23wnjIVcLQCQmXuahDekfNMWYLbS9b
+         UlWL+0S7YYUY5AokG9VIrL1D4vdiuTAkN+XDgPj0uPIjUj5w2Rl4zHVRZ+k+tuzFFT0o
+         3kgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678708328;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o5gykfX2bmfwMlcyaSUJHUuynXbdEn2Jn2hMntaBdA8=;
+        b=kOojAES2s02ra2OKp+8OF6yTbYvGtnBQ8ZAVNcu9gj4xR+VGvUNRXCJJV4RHHCFiGt
+         E4ZtVnLFGBh5MTZ9nvbESz6xoT9OlKRG96xVeAxOb7zXWD/PDrDwEF0U52WFiKfm5PjU
+         YZEvfzERg/E91Pbr3P1+ZZ88IQjSnaPzfuDTJJjEEZAZMZATBq8hjjdl7JgyKwBR1QjT
+         tehsdwPwcVscLMqwvHYqwuthsD9L77Y37akp0XzmxmDj+FVECZup8TWpTnJ5AOEdyZzE
+         qo8YOnPB03Q2xjdeQKuDMPCaaNGubYlfiF122jK4LbMg4mgKWKgtVL+wI4gyhaa1gs4t
+         Dwiw==
+X-Gm-Message-State: AO0yUKUN3+3+n7DoA4vi9iqier+AYvBuorSR9fW0HY/9AJVuvZu8+E7H
+        LnmfZfrXOvBM9iRRJk9ilAzhJw==
+X-Google-Smtp-Source: AK7set9uAdyrBT0fMJ/+4ExIf42UZdHhoPSYbzui/SAELuql13PVvWwSgyB6mJmYoXS75woY9Wll/w==
+X-Received: by 2002:a05:600c:c10:b0:3eb:248f:a13e with SMTP id fm16-20020a05600c0c1000b003eb248fa13emr10803608wmb.22.1678708328527;
+        Mon, 13 Mar 2023 04:52:08 -0700 (PDT)
+Received: from localhost.localdomain ([94.52.112.99])
+        by smtp.gmail.com with ESMTPSA id u15-20020a05600c440f00b003e21dcccf9fsm8801090wmn.16.2023.03.13.04.52.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 04:52:08 -0700 (PDT)
+From:   Abel Vesa <abel.vesa@linaro.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Jason Wang" <jasowang@redhat.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>, <sgarzare@redhat.com>,
-        <amit@kernel.org>, <graf@amazon.de>, <xmarcalx@amazon.co.uk>
-References: <20230131145543.86369-1-bchalios@amazon.es>
- <Y9lBeymca9eFaJ33@zx2c4.com>
- <65d872db2e1be29bb03b43ed606e7cc9e74ec08d.camel@infradead.org>
-In-Reply-To: <65d872db2e1be29bb03b43ed606e7cc9e74ec08d.camel@infradead.org>
-X-Originating-IP: [10.1.212.12]
-X-ClientProxiedBy: EX19D039UWA004.ant.amazon.com (10.13.139.68) To
- EX19D037EUB003.ant.amazon.com (10.252.61.119)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: [RFC PATCH v3 0/7] Add dedicated Qcom ICE driver
+Date:   Mon, 13 Mar 2023 13:51:55 +0200
+Message-Id: <20230313115202.3960700-1-abel.vesa@linaro.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgQW1pdCwKClRoYW5rcyBmb3IgdGFraW5nIHRoZSB0aW1lIHRvIGxvb2sgaW50byB0aGlzLgoK
-T24gMy8yLzIzIDU6NTUgUE0sIEFtaXQgU2hhaCA8YW1pdEBpbmZyYWRlYWQub3JnPiB3cm90ZToK
-PiBDQVVUSU9OOiBUaGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIG9mIHRoZSBvcmdh
-bml6YXRpb24uIERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5
-b3UgY2FuIGNvbmZpcm0gdGhlIHNlbmRlciBhbmQga25vdyB0aGUgY29udGVudCBpcyBzYWZlLgo+
-IAo+IAo+IAo+IEhleSBhbGwsCj4gCj4gT24gVHVlLCAyMDIzLTAxLTMxIGF0IDE3OjI3ICswMTAw
-LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gPiBZb3Ugc2VudCBhIHYyLCBidXQgSSdtIG5v
-dCBiYWNrIHVudGlsIHRoZSAxMXRoIHRvIHByb3ZpZGUgY29tbWVudHMgb24KPiA+IHYxLiBJIHN0
-aWxsIHRoaW5rIHRoaXMgaXNuJ3QgdGhlIHJpZ2h0IGRpcmVjdGlvbiwgYXMgdGhpcyBuZWVkcyB0
-aWUtaW5zCj4gPiB0byB0aGUgcm5nIHRvIGFjdHVhbGx5IGJlIHVzZWZ1bC4gUGxlYXNlIHN0b3Ag
-cG9zdGluZyBuZXcgdmVyc2lvbnMgb2YKPiA+IHRoaXMgZm9yIG5vdywgc28gdGhhdCBzb21lYm9k
-eSBkb2Vzbid0IGFjY2lkZW50YWxseSBtZXJnZSBpdDsgdGhhdCdkIGJlCj4gPiBhIGJpZyBtaXN0
-YWtlLiBJJ2xsIHBhc3RlIHdoYXQgSSB3cm90ZSB5b3UgcHJpb3I6Cj4gCj4gSSBzYXQgZG93biB0
-byByZXZpZXcgdGhlIHBhdGNoc2V0IGJ1dCBsb29rcyBsaWtlIHRoZXJlJ3Mgc29tZQo+IGJhY2tn
-cm91bmQgSSdtIG5vdCBhd2FyZSBvZi4KPiAKPiBJdCBsb29rcyBsaWtlIEJhYmlzIGhhcyBpbXBs
-ZW1lbnRlZCB0aGUgZ3Vlc3Qgc2lkZSBoZXJlIGFjY29yZGluZyB0bwo+IHRoZSBzcGVjIGNoYW5n
-ZSB0aGF0IE1pY2hhZWwgaGFzIHBvc3RlZC4KPiAKPiBKYXNvbiwgZG8geW91IGhhdmUgYW4gYWx0
-ZXJuYXRpdmUgaW4gbWluZD8gIEluIHRoYXQgY2FzZSwgd2Ugc2hvdWxkCj4gcGljayB0aGlzIHVw
-IGluIHRoZSBzcGVjIHVwZGF0ZSB0aHJlYWQgaW5zdGVhZC4KCkkgYW0gbm90IHN1cmUgd2hhdCBK
-YXNvbiBtZWFudCBoZXJlIGJ5ICJUaGlzIG5lZWRzIHRvIGJlIGludGVncmF0ZWQgbW9yZSBjbG9z
-ZWx5IHdpdGggcmFuZG9tLmMgaXRzZWxmLCBzaW1pbGFyIHRvIGhvdyB2bWdlbmlkIHdvcmtzIiwK
-YnV0IGhlcmUncyBteSB0YWtlIG9uIHRoaXMuCgpUaGUgcG9pbnQgb2YgdGhlIHBhdGNoc2V0IGlz
-IHRvIHByb3ZpZGUgYW4gaW1wbGVtZW50YXRpb24gb2YgTWljaGFlbCdzIHNwZWMgb24gd2hpY2gg
-d2UgY2FuIGRpc2N1c3MuIEl0IGltcGxlbWVudHMgdGhlIEhXIEFQSSBhbmQgaXQgaGFzCnNvbWUg
-aG9va3Mgc2hvd2luZyBob3cgdGhpcyBBUEkgY291bGQgYmUgdXNlZC4gSXQgaXMgbWFpbmx5IGRp
-cmVjdGVkIHRvd2FyZHMgdGhlIHVzZXItc3BhY2Ugd2hlcmUgd2UgZGlkIG5vdCBoYXZlIGEgcHJv
-cGVyIEFQSSB0byBjb25zdW1lClZNR0VOSUQtbGlrZSBmdW5jdGlvbmFsaXR5LiBXaXRoIHJlZ2Fy
-ZHMgdG8gdGhlIHJhbmRvbS5jIGNvbXBvbmVudHMgaXQgZG9lcyBleGFjdGx5IHdoYXQgVk1HRU5J
-RCBkb2VzIGN1cnJlbnRseSwgaS5lLiB3aGVuZXZlciBhbiBlbnRyb3B5LWxlYWsKaXMgZGV0ZWN0
-ZWQgaXQgdXNlcyB0aGUgbmV3IHJhbmRvbSBieXRlcyBwcm92aWRlZCBieSB0aGUgdmlydGlvLXJu
-ZyBkZXZpY2UgYXMgZW50cm9weS4gVGhpcyBpcyBhcyByYWN5IGFzIFZNR0VOSUQsIGFzIEkgbWVu
-dGlvbiBpbiB0aGUgY292ZXIKbGV0dGVyIG9mIHRoZSBwYXRjaHNldC4KCkhvd2V2ZXIsIHRoZSBu
-ZXcgc3BlYyBkb2VzIGFsbG93IHVzIHRvIGRvIHRoaW5ncyBfY29ycmVjdGx5XywgaS5lLiBub3Qg
-cmVseSBvbiBhc3luY2hyb25vdXMgaGFuZGxpbmcgb2YgZXZlbnRzIHRvIHJlLXNlZWQgdGhlIGtl
-cm5lbC4gRm9yIGV4YW1wbGUsIHdlCmNvdWxkIGFjaGlldmUgc29tZXRoaW5nIGxpa2UgdGhhdCBi
-eSBtYWtpbmcgdXNlIG9mIHRoZSAiY29weS1vbi1sZWFrIiBvcGVyYXRpb24sIHNvIHRoYXQgYSBm
-bGFnIGNoYW5nZXMgdmFsdWUgYmVmb3JlIHZDUFVzIGdldCByZXN1bWVkLCBzbyB3ZSBrbm93Cndo
-ZW4gYSBsZWFrIGhhcyBoYXBwZW5lZCB3aGVuIG5lZWRlZCwgZS5nLiBiZWZvcmUgcmV0dXJuaW5n
-IHJhbmRvbSBieXRlcyB0byB1c2VyLXNwYWNlLiBBdCBsZWFzdCwgdGhhdCdzIHdoYXQgSSByZW1l
-bWJlciB1cyBkaXNjdXNzaW5nIGR1cmluZyBMUEMuCkphc29uLCBNaWNoYWVsLCBBbGV4LCBwbGVh
-c2Uga2VlcCBtZSBob25lc3QgaGVyZSA6KQoKVW5mb3J0dW5hdGVseSwgSSBhbSBub3QgdmVyeSBm
-YW1pbGlhciB3aXRoIHRoZSByYW5kb20uYyBjb2RlIGFuZCBkaWQgbm90IHdhbnQgdG8gZG8gc29t
-ZXRoaW5nIHRoZXJlIHRoYXQgd291bGQgbW9zdCBjZXJ0YWlubHkgYmUgd3JvbmcsIGhlbmNlIEkg
-cG9zdGVkCnRoaXMgYXMgYW4gUkZDLCBhc2tpbmcgZm9yIGlucHV0IG9uIGhvdyB3ZSBjb3VsZCBh
-Y2hpZXZlIHRoaXMgYmV0dGVyIGludGVncmF0aW9uLiBIb3BlZnVsbHksIHdoZW4gSmFzb24gaXMg
-YmFjayBmcm9tIGhpcyB2YWNhdGlvbiBoZSBjYW4gc2hhcmUgaGlzIHRob3VnaHRzCm9uIHRoaXMs
-IGJ1dCBpZiB5b3Vyc2VsZiAob3IgYW55b25lIGVsc2UgaW50ZXJlc3RlZCkgaGF2ZSBhbnkgaWRl
-YXMgb24gaG93IHdlIGNvdWxkIGRlc2lnbiB0aGlzIHByb3Blcmx5LCBJICdtIGhhcHB5IHRvIGRp
-c2N1c3MhCgoKPiAKPiBTb21laG93IGl0IGZlZWxzIGxpa2UgSSBkb24ndCBoYXZlIHRoZSBjb21w
-bGV0ZSBzdG9yeSBmb3IgdGhpcyBmZWF0dXJlCj4gc2V0LCBoYXZpbmcgbWlzc2VkIHRoZSBkaXNj
-dXNzaW9uIGR1cmluZyBMUEMuCj4gCj4gICAgICAgICAgQW1pdAo+IAoKCkNoZWVycywKQmFiaXMK
-QW1hem9uIFNwYWluIFNlcnZpY2VzIHNvY2llZGFkIGxpbWl0YWRhIHVuaXBlcnNvbmFsLCBDYWxs
-ZSBSYW1pcmV6IGRlIFByYWRvIDUsIDI4MDQ1IE1hZHJpZC4gUmVnaXN0cm8gTWVyY2FudGlsIGRl
-IE1hZHJpZCAuIFRvbW8gMjI0NTggLiBGb2xpbyAxMDIgLiBIb2phIE0tNDAxMjM0IC4gQ0lGIEI4
-NDU3MDkzNgo=
+As both SDCC and UFS drivers use the ICE with duplicated implementation,
+while none of the currently supported platforms make use concomitantly
+of the same ICE IP block instance, the new SM8550 allows both UFS and
+SDCC to do so. In order to support such scenario, there is a need for
+a unified implementation and a devicetree node to be shared between
+both types of storage devices. So lets drop the duplicate implementation
+of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
+Also, switch all UFS and SDCC devicetree nodes to use the new ICE
+approach.
+
+See each individual patch for changelogs.
+
+The v2 is here:
+https://lore.kernel.org/all/20230308155838.1094920-1-abel.vesa@linaro.org/
+
+Abel Vesa (7):
+  dt-bindings: crypto: Add Qualcomm Inline Crypto Engine
+  dt-bindings: mmc: sdhci-msm: Add ICE phandle and drop core clock
+  dt-bindings: ufs: qcom: Add ICE phandle and drop core clock
+  soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver
+  scsi: ufs: ufs-qcom: Switch to the new ICE API
+  mmc: sdhci-msm: Switch to the new ICE API
+  arm64: dts: qcom: sm8550: Add the Inline Crypto Engine node
+
+ .../crypto/qcom,inline-crypto-engine.yaml     |  42 +++
+ .../devicetree/bindings/mmc/sdhci-msm.yaml    |   4 +
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     |   4 +
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |  10 +
+ drivers/mmc/host/Kconfig                      |   2 +-
+ drivers/mmc/host/sdhci-msm.c                  | 215 ++---------
+ drivers/soc/qcom/Kconfig                      |   4 +
+ drivers/soc/qcom/Makefile                     |   1 +
+ drivers/soc/qcom/ice.c                        | 347 ++++++++++++++++++
+ drivers/ufs/host/Kconfig                      |   2 +-
+ drivers/ufs/host/Makefile                     |   1 -
+ drivers/ufs/host/ufs-qcom-ice.c               | 244 ------------
+ drivers/ufs/host/ufs-qcom.c                   |  83 ++++-
+ drivers/ufs/host/ufs-qcom.h                   |  32 +-
+ include/soc/qcom/ice.h                        |  39 ++
+ 15 files changed, 575 insertions(+), 455 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+ create mode 100644 drivers/soc/qcom/ice.c
+ delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+ create mode 100644 include/soc/qcom/ice.h
+
+-- 
+2.34.1
 
