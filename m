@@ -2,117 +2,169 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E07C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 14:33:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205CDC61DA4
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 15:47:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231462AbjCMOdL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 10:33:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44810 "EHLO
+        id S229711AbjCMPra (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 11:47:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231466AbjCMOdG (ORCPT
+        with ESMTP id S229524AbjCMPr3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 10:33:06 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30201BBB7;
-        Mon, 13 Mar 2023 07:33:02 -0700 (PDT)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32DDw8fL020315;
-        Mon, 13 Mar 2023 14:27:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=EB0cwcFCZq1QLZZYrEEn68+CuFIz0tlLaFF5ULkdTrk=;
- b=f21UmAlv7MrKkKkvYFQWyRSm+St/EO8iiq0Sv7VRtq5QYNWajhG1TENN2hPgxZR64Hfv
- rQ4pCLqiiOapWqbo4GkUxKlp2Spkz9CU2KyjLHiUsOqaOb1j++jEvqc+a52V/AALd60a
- 9GIbberPbVQklB6jvPQtReFHHzowO0pd3naWhp/4jLJO4NHGLS4KmStwvypfnzJ63anr
- CbZZ9vqWP2mceT0f8RJjrn01xGng0SOysxSLU9ubaM4YM/ElViacKZM3Ul9e3eq+Hla1
- 7+W5F5liGaCuviypPNac/vjP+vGfPCs6wjthgmvfYz0wo4qMpuwmSzCJKWfGc00zA/LA SQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pa3sbupxs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Mar 2023 14:27:03 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32DCMJdB020816;
-        Mon, 13 Mar 2023 14:27:02 GMT
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3pa3sbupx8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Mar 2023 14:27:02 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32DDwa9Z008599;
-        Mon, 13 Mar 2023 14:27:01 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
-        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3p8h96x5d0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Mar 2023 14:27:01 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32DER01f37355910
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Mar 2023 14:27:00 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 84B9C5805C;
-        Mon, 13 Mar 2023 14:27:00 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1A26A5805A;
-        Mon, 13 Mar 2023 14:26:59 +0000 (GMT)
-Received: from sig-9-77-159-147.ibm.com (unknown [9.77.159.147])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Mar 2023 14:26:59 +0000 (GMT)
-Message-ID: <32ec16c9c3caa731c3de69371de6318da7f7ea91.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 6/6] integrity: machine keyring CA configuration
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, jarkko@kernel.org,
-        dhowells@redhat.com, dwmw2@infradead.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, pvorel@suse.cz, kanth.ghatraju@oracle.com,
-        konrad.wilk@oracle.com, erpalmer@linux.vnet.ibm.com,
-        coxu@redhat.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Mon, 13 Mar 2023 10:26:47 -0400
-In-Reply-To: <20230302164652.83571-7-eric.snowberg@oracle.com>
-References: <20230302164652.83571-1-eric.snowberg@oracle.com>
-         <20230302164652.83571-7-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AVn6e_N1RxRLy5krPqhqwYoTOHO05acB
-X-Proofpoint-GUID: Ns97NCTx73M2atYukwJYoFiNIAEjPIeb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-13_06,2023-03-13_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- adultscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
- impostorscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 clxscore=1011
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2303130112
+        Mon, 13 Mar 2023 11:47:29 -0400
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2084.outbound.protection.outlook.com [40.107.14.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004935D45D;
+        Mon, 13 Mar 2023 08:47:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nYDushW11yKM3lEXJ5dmKg38CqH68eXQyQyVK/0aP9L1b7ISd9wieqeuoJ27vdTQdIsHY92fdULserWrizcU6fz8s6txXj2/3qQDU/o8dUhiyf7Lkn+tT8etS0/YoCjtBi45YBZrv+LjOFDhh9n0w+WMyV8rJWq55QB8cTNDNf13Dvf57NWWJFiojTEzCph4E5x/U9pUTxoXq3xpgD9xqNfTdzBADYS4nMYeHyWlylvBAIhO4PNvnzC0vH5LeYqjg+bFowqBWZ+oyKr27QE4tcDKFArvwWTzb9euZFX+E0taTOfnEZ6sO7fSYrB2h76eBvTM39KUrfHZiIBGNmpQLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=29QtUbAOrZ06TQ0+MtSyDA1MjCf2l3qVoC5CcOKIEjE=;
+ b=ToH7Ogl5TS8HoDPWNE5AS3SuHG/UoIK4YJ28DRg/q9r35E+jntaQfKqI30qkfQ+thB0qXoG6khqI5gCu5XLEi0sKf3a+mJ7vbh/SPylbRHqBku7TPYmg+w1Qi7KD5d4AIIqyClsYKAU5kkbClOGmoPdB6VibPpReUp7XCA0Rrme+NX6dLsGHFbHEZqRjFOHHgiMz3FQK6B0PO1Fy/LM3yBuhwldOZ/AvEv4/4Y0Onwh2tWdNdeS/+ASvaVMPmu72emwaTLGQgaRWSyqRXvHgwmoJcgiDckAbsMSERwU3MkUg8XW/WiAil0gPEDdlNtbKDL7uBHcGxSYUyp79HtaBDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=29QtUbAOrZ06TQ0+MtSyDA1MjCf2l3qVoC5CcOKIEjE=;
+ b=V//ggHCcuA73lZpLz1GCRdcBWOB/dDkBquUyD63IOpHvzDFBNENyOJU3VVeQYDNeuMapEYGqMMNQULgUIbcQ7V2QFQec70szNSoWcxdYpK9agSiP1SvdNf8QbYN5s9w/wl+CMzIOD3xjxGk9x0sMWoKuJd+LzDEw+yqjDaH+Kg0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR0402MB3405.eurprd04.prod.outlook.com (2603:10a6:803:3::26)
+ by PAXPR04MB8405.eurprd04.prod.outlook.com (2603:10a6:102:1c2::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Mon, 13 Mar
+ 2023 15:47:25 +0000
+Received: from VI1PR0402MB3405.eurprd04.prod.outlook.com
+ ([fe80::f469:ba5b:88ad:3fa0]) by VI1PR0402MB3405.eurprd04.prod.outlook.com
+ ([fe80::f469:ba5b:88ad:3fa0%7]) with mapi id 15.20.6178.024; Mon, 13 Mar 2023
+ 15:47:25 +0000
+Message-ID: <b12d1fb1-1ca6-5f9c-c8b9-97c451734923@nxp.com>
+Date:   Mon, 13 Mar 2023 17:47:18 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
+Content-Language: en-CA
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Roy Pledge <Roy.Pledge@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vinod Koul <vkoul@kernel.org>,
+        Ioana Ciornei <ioana.ciornei@nxp.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Yangbo Lu <yangbo.lu@nxp.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc:     kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+From:   Laurentiu Tudor <laurentiu.tudor@nxp.com>
+In-Reply-To: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM9P192CA0024.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21d::29) To VI1PR0402MB3405.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::26)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3405:EE_|PAXPR04MB8405:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b99d424-b6ae-4b79-127b-08db23da3d3c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zgO2AseiaSvkGMtZ7axDFoGaT8xZaaKFuW+7dN35XmGxxosu/aXRJ/j2Ac6GsQRvIqkm/f8cCMB27HJrVtVbrcJYLyE4MfosrsKj9O3gNTceve6r08WmGUJReBDfwkKv9ah6303Vo4IfmTkWItLhR/wIF2LqfG3z4VS5bzNMe1ajqm6iPM1YrVVI9WDpkvRoYPWhl/sBY27PYIfZV6m6iErtjTNwQWbFUo83CzlR6GE9qF9M6jY0ei7uECBLwCdRyPiZVAjziOCk8QPon9D9wltD5eAmY98fgHY6CU6t4yOsJd9mdonskugWPd3wbiID347P5KouC1JCrC5rjL3Z0w5yf50uQHxtLcGl7PrpytNxj+VmDTnb55MO7qeN5l3+xbeQzObygnPPA6oHELGkS1KNrZkXdGQX5kt7smG2uUAFwJfjDdPZhmFWj6UWeU7Y8sSlBg6gB9JF5Uhx9D4DneVXpOqGc29zQl2DdnBfx8RjWFceCb7HyKeIyZktxv0kbFDnpzggXqwc5stcuvAf2UvIp5WNnhc87Aqo0p1uTJQdfGg0G6K4Qaxnk1amCXIYfv4OplgiXPdy0sSF3y9NikA8dVF0juZ/diRhQA3pGPTWLswWGso4xd0FIHopgLpWJZgW1xcItUwDp2lY4pt1wnhNY5WO2+DII+Vf0A+UeJtQ9haEMAV1lcSBsaPT/R8HPzA3+pXYzsx/ztodWdX8Mp04BMDtTLbp/bQyRGg50xDdnHy+F6LkckQUA+9l1ZApsc6msXtT6DqLcI2b7o1MS/0kE0MVor2+wRDVUtsscss=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3405.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(376002)(346002)(366004)(136003)(396003)(451199018)(2906002)(31686004)(83380400001)(7416002)(5660300002)(36756003)(44832011)(66946007)(66556008)(8936002)(41300700001)(921005)(4326008)(38100700002)(31696002)(38350700002)(66476007)(86362001)(110136005)(316002)(8676002)(478600001)(66574015)(186003)(2616005)(53546011)(52116002)(6506007)(26005)(6666004)(6512007)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aU5GdHc5QWZtUVk4YVZCSzFuVFVzbjdEM3B1dlZITnZBTitTVDFCTDRKK1E4?=
+ =?utf-8?B?Zk0xWFFnUTRRU2RNTUtpZFNaQUU2VmpPZzhPWVN5MkQ2SlhvZXVlQUphYlFL?=
+ =?utf-8?B?dUVGRlR6SVI4cjUyNmtBWFIvc0poS2R6VEl1S1FYL016SGUxdGhlMWQ0Ymdo?=
+ =?utf-8?B?V085MHlVdGVNaUZ0RVd3WmVma21PMWJyT0pYWS9VbFUzMlRIN3VweEc5MDh5?=
+ =?utf-8?B?REhBcitwbFVuSFBkblBHNkdxeGJIL05scEZhLzlLZU1ETkdqWjB1OVJwaGhF?=
+ =?utf-8?B?cFlrVGNqUjZtbFd2eFZhcHZrdmhEeE1Zalp1VG9BWkVxdFNFa09QVkZpdkJo?=
+ =?utf-8?B?dGZxWlR2U2I3ZVA5YWNvYWlvZHhVTnMzTlozS0JZRy8wYmRoczdNR0FEalQw?=
+ =?utf-8?B?YjF6Sm1CTjdmYXJHWVY1VUdBMnlSbVRnNU1xZlhMWjFlV3IxSzk5eGxGaGNC?=
+ =?utf-8?B?N3BjczR6YnBVWFc5QkV5SWtkbVJxRjFhelZJTzQ0Y1NIajQ2TDVpQ3V3VGh1?=
+ =?utf-8?B?emlwbW5BTWd2NFc1TFBBMVh0RWVMSGljc0lqKy84UkF5eUw0bVhMUGxVOElH?=
+ =?utf-8?B?TW8xV3BrOFFTWjQwVnZFS29HNHZTdkhMRnJEanh6Sm1YZHFKZVRvMjJzT1NE?=
+ =?utf-8?B?LzlqcmxZNEpYQjhMcUZuRE94enQzZTBIdkxqMEdhZnAybHhLWHd1Z3lKdmZZ?=
+ =?utf-8?B?RTVIT2RpWlNIcVJmU3NMY0o1SlZYVHFTdnRqYzdXTHZlR0pYb28xMVVPemVn?=
+ =?utf-8?B?cVd0UUJoMm4xM25hS0tDemlKRG94elc2cXNmd3kvK3dZbmxxbGJWSTVXTWR3?=
+ =?utf-8?B?R3ExOUVYbUZuVnVxY0xqUjVVQytFenpZY3BBcjYxTEk0anNxeTYwbjdPRWJ6?=
+ =?utf-8?B?aUtVNFYwL2w5a0E5d0dZa0ZZUFVwcVF6MG8rT25MQXFyUDJRaC9veXZzdzI4?=
+ =?utf-8?B?Ky9BL284UFMvT3AxeVdiMm9iL0ZpSERQQjM5a2pMcmtPTE1OV0dXL0RRTkxp?=
+ =?utf-8?B?dzRjcTV4TjNtbEpGTFZ4dmJkT0wvZHU5N3Y2VjFmbHhmZkJ6TVlURnZkaEYw?=
+ =?utf-8?B?dmcranZ6OEFaV2JHYWRVYkZNQUd5T0NNMjlHS0ZDMEpYZ0VVYkhCeXhUMW5H?=
+ =?utf-8?B?Ky85REM2SnpZbGJvM2o3MHRtMTJrMlNBbnVibTVzR3d4dmZEd0VJRndTVkh5?=
+ =?utf-8?B?bWNUMlpzU3hLWit1RTBxNkJadGM1eUdjTmNzR2U3Ni9nRFg1ci94Vlp5UTlP?=
+ =?utf-8?B?bDdvUFRvQkdjK2Mzb0Jwb2RFV0lxRVREU0VRK2Z1NlNrNUJ0QXZGTFR0cFBI?=
+ =?utf-8?B?bm5wdmZaVm9MNmYvaXAzSTlLYVpYRXhVMndEMG9hY2hvcXJBWnQzSFRJb2dK?=
+ =?utf-8?B?T1JueVJMcWFCNktSVzJOc0FvbGpxdWtGczJ6cVVGZ0p5K3pjdWNmbjNoMENQ?=
+ =?utf-8?B?eFhneFNSZHk5enJKYmJrdVVsU1NSdkxjRzFLZHlhTGEvNjVKeloyZHNqaWdQ?=
+ =?utf-8?B?TkVwOFEwZ3RGaitWeWp6ZjFWRXRIMjdwNjFFWEcxQXkrZkovUTJ3TXlpU0o4?=
+ =?utf-8?B?d1FBR0ZQZmJGamlMTkZlRmpKOXpmY0ZMWjhoMEhTNng3b3ZPVjRXUktNUEQy?=
+ =?utf-8?B?bmZDWG5PbzhNcmI5QkxTMzdjSlIyaUxsUVBrOEZiNktQU0JDNWZjOXV5eGYz?=
+ =?utf-8?B?L1ovUTczSWhWd2ZoOU5wVVFPVy9YL0RzNXE5L0ZQQUN2b2dFRTBwVTIwOUVX?=
+ =?utf-8?B?dzZNbkJHSVljUVRQb2tReEdBNmZ1c2JlVm03M0RnTzQ0SmwwQ3dLN0psRXpF?=
+ =?utf-8?B?WDV3bHVMSTdkREo2RlMyeFpla3hnNlVjRytoVzFEREZ6LzJWL0lUZ3V5T2s0?=
+ =?utf-8?B?eVN0ZkhXRHlVNHFVbGYraklIM2pTdkNjY3BSWkYwNjZYYklSUHV4bnExMFdV?=
+ =?utf-8?B?aGdGem1zWUJOK1hsbzdyVDNMRDg3bzVxeUVoS1JyRGJGc3VualJhUjdiUEFW?=
+ =?utf-8?B?R3lZZE9sSWNUaDAzOFI5cmt2UjY0WFZub2NlcUVWM2ZBY2JsaUJuM2J6YklQ?=
+ =?utf-8?B?VndiZ25IMG1nOGpFTjY4b2RGZkc2KzBOL3RnYlpqTGJ3cHlXYVpzdExPenAz?=
+ =?utf-8?B?ZnRjT2EzejdXK2I5WWtaRTFSODdCbStMS2JNUjY2NklqZ20vbXh3RmxZZjUw?=
+ =?utf-8?B?dVE9PQ==?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b99d424-b6ae-4b79-127b-08db23da3d3c
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3405.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2023 15:47:24.7590
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rXQ+O3+JIgti9inFtMhQpc6SNR6z2HuYDd3+hQORenDdXaovJX4rnpBh2cJqWHbYQ68vXdUHUpTMI9JvjwW5Hg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8405
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 2023-03-02 at 11:46 -0500, Eric Snowberg wrote:
-> Add machine keyring CA restriction options to control the type of
-> keys that may be added to it. The motivation is separation of
-> certificate signing from code signing keys. Subsquent work will
-> limit certificates being loaded into the IMA keyring to code
-> signing keys used for signature verification.
-> 
-> When no restrictions are selected, all Machine Owner Keys (MOK) are added
-> to the machine keyring.  When CONFIG_INTEGRITY_CA_MACHINE_KEYRING is
-> selected, the CA bit must be true.  Also the key usage must contain
-> keyCertSign, any other usage field may be set as well.
-> 
-> When CONFIG_INTEGRITY_CA_MACHINE_KEYRING_MAX is selected, the CA bit must
-> be true. Also the key usage must contain keyCertSign and the
-> digitialSignature usage may not be set.
-> 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 
-Thanks, Eric.
 
-Acked-by: Mimi Zohar <zohar@linux.ibm.com>
+On 3/11/2023 12:41 AM, Uwe Kleine-König wrote:
+> Hello,
+> 
+> many bus remove functions return an integer which is a historic
+> misdesign that makes driver authors assume that there is some kind of
+> error handling in the upper layers. This is wrong however and returning
+> and error code only yields an error message.
+> 
+> This series improves the fsl-mc bus by changing the remove callback to
+> return no value instead. As a preparation all drivers are changed to
+> return zero before so that they don't trigger the error message.
+> 
+> Best regards
+> Uwe
+> 
+> Uwe Kleine-König (6):
+>    bus: fsl-mc: Only warn once about errors on device unbind
+>    bus: fsl-mc: dprc: Push down error message from fsl_mc_driver_remove()
+>    bus: fsl-mc: fsl-mc-allocator: Drop if block with always wrong
+>      condition
+>    bus: fsl-mc: fsl-mc-allocator: Improve error reporting
+>    soc: fsl: dpio: Suppress duplicated error reporting on device remove
+>    bus: fsl-mc: Make remove function return void
+> 
 
+Thanks for the series, Uwe. Did a quick boot test with ACPI, so:
+
+Reviewed-by: Laurentiu Tudor <laurentiu.tudor@nxp.com>
+Tested-by: Laurentiu Tudor <laurentiu.tudor@nxp.com>
