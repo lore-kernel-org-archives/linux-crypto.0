@@ -2,76 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCDEC6FD19
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 18:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC966C74A5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Mar 2023 18:32:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbjCMS33 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 14:29:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60646 "EHLO
+        id S231433AbjCMScj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 14:32:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbjCMS32 (ORCPT
+        with ESMTP id S231164AbjCMScD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 14:29:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F37B882A92;
-        Mon, 13 Mar 2023 11:28:47 -0700 (PDT)
+        Mon, 13 Mar 2023 14:32:03 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF97280E2C;
+        Mon, 13 Mar 2023 11:31:11 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D13661468;
-        Mon, 13 Mar 2023 18:27:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01344C433D2;
-        Mon, 13 Mar 2023 18:27:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678732060;
-        bh=/UptELta1fbfIVlSU3lW1JfbEsBBjNSMIYGDMc0a6Bc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VvvKyry0IHRmRY/4zqVRDhYa1hlwWP5XO8DPtmSV86lG3jJNM7uxAeqCM3/hMjEnS
-         /4fGZINOj3BbOFj7VtuSn5/zADgew9/AhucSrWiCDWCAvWqK46vpsQ6ipb+6neCHzX
-         D26bSYYK00ZZp7wS/PyFzdSBom5Fc1YvU4I2sz/4csGzme6PYNmreJ9TJMdSLn2pJ3
-         cgxXHKzmvZ0aDqUoSafiMpZKQIjdbzRSu92/wVYzEbmBwzFm5rb1KpTZ9Ix5kcdW8E
-         IH7F21aKBHvZjZ0vyXFvDpM4UNcMSFajBrFy3LzzWeznIYwqpqWY/2y3YL9Y5Kytyi
-         kj7t2/qKpgCbw==
-Date:   Mon, 13 Mar 2023 11:27:38 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Abel Vesa <abel.vesa@linaro.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 28AB661365;
+        Mon, 13 Mar 2023 18:30:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38018C433D2;
+        Mon, 13 Mar 2023 18:30:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1678732251;
+        bh=akchBNDul5kGQ4bbsIzqd3Wkn40724BLCL8j8t0kerc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=2SJ8103HKr4PjUlRjoNwdWxY4QSChA0Dk/7hva88/LA8GHYXMB8IgF/YEsYBqr+vs
+         gCkkVmofymj5bAKAEru2Vmoo+ZVILdNd8f3XVaOVgXwXnz+xAa9cj9TGJ1FMgAsRq8
+         fwX+Gz8OgKIeU7d53oSMYt7MCRVpkyQGNP0GlA7Q=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [RFC PATCH v3 2/7] dt-bindings: mmc: sdhci-msm: Add ICE phandle
- and drop core clock
-Message-ID: <ZA9rGihWeLhUYMdA@sol.localdomain>
-References: <20230313115202.3960700-1-abel.vesa@linaro.org>
- <20230313115202.3960700-3-abel.vesa@linaro.org>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 29/36] crypto: hisilicon/qm - make struct bus_type * const
+Date:   Mon, 13 Mar 2023 19:29:11 +0100
+Message-Id: <20230313182918.1312597-29-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
+References: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230313115202.3960700-3-abel.vesa@linaro.org>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1534; i=gregkh@linuxfoundation.org; h=from:subject; bh=akchBNDul5kGQ4bbsIzqd3Wkn40724BLCL8j8t0kerc=; b=owGbwMvMwCRo6H6F97bub03G02pJDCn82dXSruqi1/y0HkotvSXhxmX3ft6cbz25eoLbzpoxH 69heZrYEcvCIMjEICumyPJlG8/R/RWHFL0MbU/DzGFlAhnCwMUpABNR280wz/zjnVbzmU4HznI9 bXQ9/edf9BXehwwL1gstPiSTGlNWepzxOtuTnxffXLDbDAA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 13, 2023 at 01:51:57PM +0200, Abel Vesa wrote:
-> Subject: Re: [RFC PATCH v3 2/7] dt-bindings: mmc: sdhci-msm: Add ICE phandle
-> and drop core clock
+In the function, qm_get_qos_value(), a struct bus_type * is used, but it
+really should be a const pointer as it is not modified anywhere in the
+function, and the driver core function it is used in expects a constant
+pointer.
 
-"and drop core clock" should be removed from the subject now, right?  Same for
-patch 3.
+Cc: Weili Qian <qianweili@huawei.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+Note, this is a patch that is a prepatory cleanup as part of a larger
+series of patches that is working on resolving some old driver core
+design mistakes.  It will build and apply cleanly on top of 6.3-rc2 on
+its own, but I'd prefer if I could take it through my driver-core tree
+so that the driver core changes can be taken through there for 6.4-rc1.
 
-- Eric
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index e4c84433a88a..fd1a38ee55f8 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3691,7 +3691,7 @@ static ssize_t qm_get_qos_value(struct hisi_qm *qm, const char *buf,
+ 			       unsigned long *val,
+ 			       unsigned int *fun_index)
+ {
+-	struct bus_type *bus_type = qm->pdev->dev.bus;
++	const struct bus_type *bus_type = qm->pdev->dev.bus;
+ 	char tbuf_bdf[QM_DBG_READ_LEN] = {0};
+ 	char val_buf[QM_DBG_READ_LEN] = {0};
+ 	struct pci_dev *pdev;
+-- 
+2.39.2
+
