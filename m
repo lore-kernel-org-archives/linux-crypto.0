@@ -2,64 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDF6C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 06:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F82C6FD1F
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 08:25:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbjCNGcY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Mar 2023 02:32:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
+        id S230512AbjCNIZc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Mar 2023 04:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjCNGcX (ORCPT
+        with ESMTP id S231279AbjCNIYw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Mar 2023 02:32:23 -0400
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D91C98F525;
-        Mon, 13 Mar 2023 23:32:21 -0700 (PDT)
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VdqyGsC_1678775538)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Mar 2023 14:32:18 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, mcoquelin.stm32@gmail.com,
-        alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>
-Subject: [PATCH -next] crypto: stm32-hash - Use devm_platform_get_and_ioremap_resource()
-Date:   Tue, 14 Mar 2023 14:32:16 +0800
-Message-Id: <20230314063216.21470-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Tue, 14 Mar 2023 04:24:52 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45C3F7AA1;
+        Tue, 14 Mar 2023 01:23:28 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pbzvP-0042Ge-By; Tue, 14 Mar 2023 16:22:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Mar 2023 16:22:27 +0800
+Date:   Tue, 14 Mar 2023 16:22:27 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-kernel@vger.kernel.org, rafael@kernel.org,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 29/36] crypto: hisilicon/qm - make struct bus_type * const
+Message-ID: <ZBAuw8X8DeViP1yH@gondor.apana.org.au>
+References: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
+ <20230313182918.1312597-29-gregkh@linuxfoundation.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230313182918.1312597-29-gregkh@linuxfoundation.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-According to commit 890cc39a8799 ("drivers: provide
-devm_platform_get_and_ioremap_resource()"), convert
-platform_get_resource(), devm_ioremap_resource() to a single
-call to devm_platform_get_and_ioremap_resource(), as this is exactly
-what this function does.
+On Mon, Mar 13, 2023 at 07:29:11PM +0100, Greg Kroah-Hartman wrote:
+> In the function, qm_get_qos_value(), a struct bus_type * is used, but it
+> really should be a const pointer as it is not modified anywhere in the
+> function, and the driver core function it is used in expects a constant
+> pointer.
+> 
+> Cc: Weili Qian <qianweili@huawei.com>
+> Cc: Zhou Wang <wangzhou1@hisilicon.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+> Note, this is a patch that is a prepatory cleanup as part of a larger
+> series of patches that is working on resolving some old driver core
+> design mistakes.  It will build and apply cleanly on top of 6.3-rc2 on
+> its own, but I'd prefer if I could take it through my driver-core tree
+> so that the driver core changes can be taken through there for 6.4-rc1.
+> 
+>  drivers/crypto/hisilicon/qm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- drivers/crypto/stm32/stm32-hash.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index 7bf805563ac2..1422d609824b 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -1616,8 +1616,7 @@ static int stm32_hash_probe(struct platform_device *pdev)
- 	if (!hdev)
- 		return -ENOMEM;
- 
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	hdev->io_base = devm_ioremap_resource(dev, res);
-+	hdev->io_base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
- 	if (IS_ERR(hdev->io_base))
- 		return PTR_ERR(hdev->io_base);
- 
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
-2.20.1.7.g153144c
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
