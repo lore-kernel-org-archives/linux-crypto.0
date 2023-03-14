@@ -2,81 +2,91 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3690AC05027
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 18:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB21C74A44
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 20:35:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbjCNSXx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Mar 2023 14:23:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53270 "EHLO
+        id S229836AbjCNUfg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Mar 2023 16:35:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbjCNSXw (ORCPT
+        with ESMTP id S229636AbjCNUff (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Mar 2023 14:23:52 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BD61A0F16
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Mar 2023 11:23:51 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pc9JI-000434-DW; Tue, 14 Mar 2023 19:23:44 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pc9JG-0048Ri-RQ; Tue, 14 Mar 2023 19:23:42 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pc9JF-004sp8-RQ; Tue, 14 Mar 2023 19:23:41 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Tue, 14 Mar 2023 16:35:35 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC00C1A67F;
+        Tue, 14 Mar 2023 13:35:34 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id ek18so36028492edb.6;
+        Tue, 14 Mar 2023 13:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678826133;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NxwSO/LBuR46CmjoeXSfo+IWSWZ/3pwKZV8PIGQHNrk=;
+        b=C4ylx+Vos6HtqYmeSZulI1EuEc8EaPUOfBPDLOFgvFEAqZLFPDAkR6+t48XM7KjrYy
+         zb86bFi+M5cyq1+JMrW2h0gT/X5utpQaCzusAngPMCnM1ifzrAotuCOzP/XF2+yaaQkh
+         7dycbEN4zQhpe/z3hawHy56L8Mu2SmKPZNduTRDRE9PItjeYDi083Kobx7bAVbOwKDA0
+         A2qZSTNk0Tppr/6w8gVt3C/4wcT3zMJ/BrSSRvvphwOlWddyRC7NugFJAPfGKSicHAdv
+         7DbnUk5173ijub6f/juCxDAMNr6Lk7toO8ii1/g1bvDzySxLQxbd9D2NpqNGcChRsxEH
+         KvCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678826133;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NxwSO/LBuR46CmjoeXSfo+IWSWZ/3pwKZV8PIGQHNrk=;
+        b=a9pEpTOdM6Z+eQj17D4xIU/zGHXntXPrncqj5zrYB0cCp0X9U1IBORj7E+cSO741lp
+         AzDt+uhCNrr7fO8RvOIP59WDs6+EAuTXtkP+M8n2ZQaDoCyiZKNE3MvbKpua6dSydEPH
+         w/xjVHQiE4IiJnwIH6xLMMAwzI9Fpgl7gXndaPvo7ibhjR7aOokk30K7+cU5Vj01fXMt
+         yBPskLTH6L4xUToserWrxNYUsLxv9j8y4mOwhS1lww1jjQSp7/t1W4sRXOL7CnwOIK+8
+         yDRWQKynOO+TW9SIYbxBSJN/tuyTjylByZWyrwd1x/UPRRcFP8/sx7jtkFC6TMgAjRVX
+         ZlzQ==
+X-Gm-Message-State: AO0yUKUm8k23kLHTkGkv3uJ+tcuSQ+06XMHJtGXMZkUC+ENnx7U4JDNM
+        ZSwIQWngwSJPj5/M+OSZrV0=
+X-Google-Smtp-Source: AK7set8qAKElSfLk862Fb1U9iBFSLCsZ8OOml5T1pwcqPd2vA6HdnOUeXnTHL6GcYsNrzwpY2GGN4w==
+X-Received: by 2002:a17:906:2512:b0:87d:f29:3a16 with SMTP id i18-20020a170906251200b0087d0f293a16mr4278916ejb.34.1678826133362;
+        Tue, 14 Mar 2023 13:35:33 -0700 (PDT)
+Received: from jernej-laptop.localnet (82-149-1-233.dynamic.telemach.net. [82.149.1.233])
+        by smtp.gmail.com with ESMTPSA id go37-20020a1709070da500b00927b85e48b0sm1539379ejc.111.2023.03.14.13.35.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Mar 2023 13:35:32 -0700 (PDT)
+From:   Jernej =?utf-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, kernel@pengutronix.de
-Subject: [PATCH] crypto: keembay-ocs-aes: Drop if with an always false condition
-Date:   Tue, 14 Mar 2023 19:23:38 +0100
-Message-Id: <20230314182338.2869452-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+        "David S . Miller" <davem@davemloft.net>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Samuel Holland <samuel@sholland.org>
+Cc:     Samuel Holland <samuel@sholland.org>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH v2 3/3] riscv: dts: allwinner: d1: Add crypto engine node
+Date:   Tue, 14 Mar 2023 21:35:31 +0100
+Message-ID: <3544095.R56niFO833@jernej-laptop>
+In-Reply-To: <20221231220146.646-4-samuel@sholland.org>
+References: <20221231220146.646-1-samuel@sholland.org>
+ <20221231220146.646-4-samuel@sholland.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1027; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=fx+2I/+SMdGKFsrzEnui61yOOSC/vB9ODzv8JgWN5X0=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBkELunfBfvK/yK0RBpZx9CfficoYgm5v6i2GVUR z00m1b3vZeJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCZBC7pwAKCRDB/BR4rcrs CR5cB/9javJWtVD/4SM9g7xesBaHEUJjYL6Jnc1bRfQPidu7117eN9JPlRrwgX6hAD7c7pd4yf9 AG/Kf8HaaEl+092BFm+EeKbiQ83FzSYgFuqkZ+bQzvo7RZpelZqCjNJTU6rrfa1VYiHSwWRd7JB LoU/JFZ5TLioOh2vFd3qvpLl3NrmS6ju6MR7ijtfyXhqCPb/rPbnCHINF/6fDcFs60pH6/a/pzW 3OfUnBvmg8RzX2pWUgWdcyrM+WdpARu0fhkGxZwmHFVM8mAnQxvquDD+YT7qz5Dx/rr1K3H8PhO 3yljs17SEA5m1dt7QUxE5H63/WYikv0mMmtm6IDhcCBNniFu
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A platform device's remove callback is only ever called after the probe
-callback returned success.
+Dne sobota, 31. december 2022 ob 23:01:45 CET je Samuel Holland napisal(a):
+> D1 contains a crypto engine which is supported by the sun8i-ce driver.
+> 
+> Signed-off-by: Samuel Holland <samuel@sholland.org>
 
-In the case of kmb_ocs_aes_remove() this means that kmb_ocs_aes_probe()
-succeeded before and so platform_set_drvdata() was called with a
-non-zero argument and platform_get_drvdata() returns non-NULL.
+Applied patch 3, thanks!
 
-This prepares making remove callbacks return void.
+Best regards,
+Jernej
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/crypto/keembay/keembay-ocs-aes-core.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/crypto/keembay/keembay-ocs-aes-core.c b/drivers/crypto/keembay/keembay-ocs-aes-core.c
-index 9953f5590ac4..ae31be00357a 100644
---- a/drivers/crypto/keembay/keembay-ocs-aes-core.c
-+++ b/drivers/crypto/keembay/keembay-ocs-aes-core.c
-@@ -1580,8 +1580,6 @@ static int kmb_ocs_aes_remove(struct platform_device *pdev)
- 	struct ocs_aes_dev *aes_dev;
- 
- 	aes_dev = platform_get_drvdata(pdev);
--	if (!aes_dev)
--		return -ENODEV;
- 
- 	unregister_aes_algs(aes_dev);
- 
--- 
-2.39.2
 
