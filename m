@@ -2,94 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB814C6FD1F
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 05:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C87DEC6FD1C
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 06:25:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbjCNFCu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Mar 2023 01:02:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60388 "EHLO
+        id S229497AbjCNGZi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Mar 2023 02:25:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjCNFCt (ORCPT
+        with ESMTP id S229468AbjCNGZh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Mar 2023 01:02:49 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F90B6F4A2;
-        Mon, 13 Mar 2023 22:02:46 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pbwo3-003zBJ-Lv; Tue, 14 Mar 2023 13:02:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Mar 2023 13:02:39 +0800
-Date:   Tue, 14 Mar 2023 13:02:39 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: [PATCH] crypto: hash - Fix kdoc errors about HASH_ALG_COMMON
-Message-ID: <ZA//781k0UXRIKdW@gondor.apana.org.au>
-References: <20230314141947.18574ae8@canb.auug.org.au>
+        Tue, 14 Mar 2023 02:25:37 -0400
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F8727EA26;
+        Mon, 13 Mar 2023 23:25:36 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0Vdqz0m0_1678775133;
+Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0Vdqz0m0_1678775133)
+          by smtp.aliyun-inc.com;
+          Tue, 14 Mar 2023 14:25:33 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>
+Subject: [PATCH -next] crypto: img-hash - Use devm_platform_get_and_ioremap_resource()
+Date:   Tue, 14 Mar 2023 14:25:32 +0800
+Message-Id: <20230314062532.12047-1-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230314141947.18574ae8@canb.auug.org.au>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 02:19:47PM +1100, Stephen Rothwell wrote:
-> Hi all,
-> 
-> After merging the crypto tree, today's linux-next build (htmldocs)
-> produced these warnings:
-> 
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:245: warning: Function parameter or member 'HASH_ALG_COMMON' not described in 'shash_alg'
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> include/crypto/hash.h:69: error: Cannot parse struct or union!
-> 
-> Introduced by commit
-> 
->   0e4e6d7094df ("crypto: hash - Count error stats differently")
+According to commit 890cc39a8799 ("drivers: provide
+devm_platform_get_and_ioremap_resource()"), convert
+platform_get_resource(), devm_ioremap_resource() to a single
+call to devm_platform_get_and_ioremap_resource(), as this is exactly
+what this function does.
 
-Thanks for the report Stephen.  I hope this patch makes them go
-away:
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ drivers/crypto/img-hash.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
----8<---
-The HASH_ALG_COMMON macro cannot be parsed by kdoc so mark it as
-a normal comment instead of kdoc.  Also add HASH_ALG_COMMON as a
-structure member of shash_alg.
-
-Fixes: 0e4e6d7094df ("crypto: hash - Count error stats differently")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 2aa61e7679db..1ed674ba8429 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -41,7 +41,7 @@ struct crypto_istat_hash {
- #define HASH_ALG_COMMON_STAT
- #endif
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index fe93d19e3044..70d23ef362e0 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -966,8 +966,7 @@ static int img_hash_probe(struct platform_device *pdev)
+ 	}
  
--/**
-+/*
-  * struct hash_alg_common - define properties of message digest
-  * @stat: Statistics for hash algorithm.
-  * @digestsize: Size of the result of the transformation. A buffer of this size
-@@ -219,6 +219,7 @@ struct shash_desc {
-  * @stat: Statistics for hash algorithm.
-  * @base: internally used
-  * @halg: see struct hash_alg_common
-+ * @HASH_ALG_COMMON: see struct hash_alg_common
-  */
- struct shash_alg {
- 	int (*init)(struct shash_desc *desc);
+ 	/* Write port (DMA or CPU) */
+-	hash_res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+-	hdev->cpu_addr = devm_ioremap_resource(dev, hash_res);
++	hdev->cpu_addr = devm_platform_get_and_ioremap_resource(pdev, 1, &hash_res);
+ 	if (IS_ERR(hdev->cpu_addr)) {
+ 		err = PTR_ERR(hdev->cpu_addr);
+ 		goto res_err;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.20.1.7.g153144c
+
