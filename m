@@ -2,67 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F82C6FD1F
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 08:25:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64BA0C6FD1F
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 08:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbjCNIZc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Mar 2023 04:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39574 "EHLO
+        id S229612AbjCNIcD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Mar 2023 04:32:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231279AbjCNIYw (ORCPT
+        with ESMTP id S229869AbjCNIcC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Mar 2023 04:24:52 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45C3F7AA1;
-        Tue, 14 Mar 2023 01:23:28 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pbzvP-0042Ge-By; Tue, 14 Mar 2023 16:22:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Mar 2023 16:22:27 +0800
-Date:   Tue, 14 Mar 2023 16:22:27 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, rafael@kernel.org,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 29/36] crypto: hisilicon/qm - make struct bus_type * const
-Message-ID: <ZBAuw8X8DeViP1yH@gondor.apana.org.au>
-References: <20230313182918.1312597-1-gregkh@linuxfoundation.org>
- <20230313182918.1312597-29-gregkh@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230313182918.1312597-29-gregkh@linuxfoundation.org>
+        Tue, 14 Mar 2023 04:32:02 -0400
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A735BDB3;
+        Tue, 14 Mar 2023 01:31:58 -0700 (PDT)
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mxhk.zte.com.cn (FangMail) with ESMTPS id 4PbRb06HTlz8R040;
+        Tue, 14 Mar 2023 16:31:56 +0800 (CST)
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+        by mse-fl2.zte.com.cn with SMTP id 32E8VmVB046544;
+        Tue, 14 Mar 2023 16:31:49 +0800 (+08)
+        (envelope-from ye.xingchen@zte.com.cn)
+Received: from mapi (xaxapp01[null])
+        by mapi (Zmail) with MAPI id mid31;
+        Tue, 14 Mar 2023 16:31:51 +0800 (CST)
+Date:   Tue, 14 Mar 2023 16:31:51 +0800 (CST)
+X-Zmail-TransId: 2af9641030f7ffffffff9c4-ca210
+X-Mailer: Zmail v1.0
+Message-ID: <202303141631511535639@zte.com.cn>
+Mime-Version: 1.0
+From:   <ye.xingchen@zte.com.cn>
+To:     <herbert@gondor.apana.org.au>
+Cc:     <davem@davemloft.net>, <mpe@ellerman.id.au>, <npiggin@gmail.com>,
+        <christophe.leroy@csgroup.eu>, <linux-crypto@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?B?W1BBVENIXSBjcnlwdG86IHAxMC1hZXMtZ2NtIC0gcmVtb3ZlIGR1cGxpY2F0ZSBpbmNsdWRlIGhlYWRlcg==?=
+Content-Type: text/plain;
+        charset="UTF-8"
+X-MAIL: mse-fl2.zte.com.cn 32E8VmVB046544
+X-Fangmail-Gw-Spam-Type: 0
+X-FangMail-Miltered: at cgslv5.04-192.168.250.137.novalocal with ID 641030FC.000 by FangMail milter!
+X-FangMail-Envelope: 1678782716/4PbRb06HTlz8R040/641030FC.000/10.5.228.133/[10.5.228.133]/mse-fl2.zte.com.cn/<ye.xingchen@zte.com.cn>
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 641030FC.000/4PbRb06HTlz8R040
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 13, 2023 at 07:29:11PM +0100, Greg Kroah-Hartman wrote:
-> In the function, qm_get_qos_value(), a struct bus_type * is used, but it
-> really should be a const pointer as it is not modified anywhere in the
-> function, and the driver core function it is used in expects a constant
-> pointer.
-> 
-> Cc: Weili Qian <qianweili@huawei.com>
-> Cc: Zhou Wang <wangzhou1@hisilicon.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
-> Note, this is a patch that is a prepatory cleanup as part of a larger
-> series of patches that is working on resolving some old driver core
-> design mistakes.  It will build and apply cleanly on top of 6.3-rc2 on
-> its own, but I'd prefer if I could take it through my driver-core tree
-> so that the driver core changes can be taken through there for 6.4-rc1.
-> 
->  drivers/crypto/hisilicon/qm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+From: Ye Xingchen <ye.xingchen@zte.com.cn>
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+crypto/algapi.h is included more than once.
+
+Signed-off-by: Ye Xingchen <ye.xingchen@zte.com.cn>
+---
+ arch/powerpc/crypto/aes-gcm-p10-glue.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+index c95f5b7cc456..1533c8cdd26f 100644
+--- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
++++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+@@ -8,7 +8,6 @@
+ #include <asm/unaligned.h>
+ #include <asm/simd.h>
+ #include <asm/switch_to.h>
+-#include <crypto/algapi.h>
+ #include <crypto/aes.h>
+ #include <crypto/algapi.h>
+ #include <crypto/b128ops.h>
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
