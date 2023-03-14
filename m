@@ -2,92 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B56C6FD1F
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 03:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB814C6FD1F
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 05:02:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbjCNDTy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 23:19:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39326 "EHLO
+        id S229460AbjCNFCu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Mar 2023 01:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjCNDTv (ORCPT
+        with ESMTP id S229486AbjCNFCt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 23:19:51 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAADA65C4F;
-        Mon, 13 Mar 2023 20:19:49 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PbJfq6XyGz4x1d;
-        Tue, 14 Mar 2023 14:19:47 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1678763988;
-        bh=A42uzgmqy6kdHFRu9vEVBB0TC3eb2uJkHBMlhnDQMZk=;
-        h=Date:From:To:Cc:Subject:From;
-        b=QRoEQlgP+DDOtFnWQQ865M7Yh/rS2nGS7ALvO2KwyPmxXX+gKk7UZysdGpFyoEL/X
-         5X0dKtCqsq3kvj0On+Ga/rnmT0UsnCoGy3aRuV3SZ7RJ8hICaa3Z5WMlFstRqMIgNZ
-         /K5JnBNF8w4NmAuZM9idDr6ri6lBTfqgvAv5b8+WY9Kq3Ky0J2UwRcmuZi1eOVOFIL
-         vPdDf4n8L03w+KoFCsQyJnTfaTVUTSfWA40Vpwujp3janbtYim0mmattOYsTRNKGF4
-         Xz2h0E9vX6W1mSp2L929dJf36r8++hKUHkEvmBDsaX2vNmJ4gNXYupU1plUfEqY8m1
-         MnDlfO67+8HQg==
-Date:   Tue, 14 Mar 2023 14:19:47 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        Tue, 14 Mar 2023 01:02:49 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F90B6F4A2;
+        Mon, 13 Mar 2023 22:02:46 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pbwo3-003zBJ-Lv; Tue, 14 Mar 2023 13:02:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Mar 2023 13:02:39 +0800
+Date:   Tue, 14 Mar 2023 13:02:39 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
 Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build warnings after merge of the crypto tree
-Message-ID: <20230314141947.18574ae8@canb.auug.org.au>
+Subject: [PATCH] crypto: hash - Fix kdoc errors about HASH_ALG_COMMON
+Message-ID: <ZA//781k0UXRIKdW@gondor.apana.org.au>
+References: <20230314141947.18574ae8@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230314141947.18574ae8@canb.auug.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Mar 14, 2023 at 02:19:47PM +1100, Stephen Rothwell wrote:
+> Hi all,
+> 
+> After merging the crypto tree, today's linux-next build (htmldocs)
+> produced these warnings:
+> 
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:245: warning: Function parameter or member 'HASH_ALG_COMMON' not described in 'shash_alg'
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> include/crypto/hash.h:69: error: Cannot parse struct or union!
+> 
+> Introduced by commit
+> 
+>   0e4e6d7094df ("crypto: hash - Count error stats differently")
 
-Hi all,
+Thanks for the report Stephen.  I hope this patch makes them go
+away:
 
-After merging the crypto tree, today's linux-next build (htmldocs)
-produced these warnings:
+---8<---
+The HASH_ALG_COMMON macro cannot be parsed by kdoc so mark it as
+a normal comment instead of kdoc.  Also add HASH_ALG_COMMON as a
+structure member of shash_alg.
 
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:245: warning: Function parameter or member 'HASH_ALG_=
-COMMON' not described in 'shash_alg'
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:69: error: Cannot parse struct or union!
-include/crypto/hash.h:69: error: Cannot parse struct or union!
+Fixes: 0e4e6d7094df ("crypto: hash - Count error stats differently")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Introduced by commit
-
-  0e4e6d7094df ("crypto: hash - Count error stats differently")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmQP59MACgkQAVBC80lX
-0GxFdwf9EiO9SQzRixlV3sRNrWyTgA5kpucZSlgavTDesdpsGlJnZ79TZYyV33yJ
-kwH0ufWVjOAKK9e4ibyf73TeNLQmv9iGZdvAl6Ptk/XtCH02jnQXBnRhX7ADVSEu
-/XOjQNXGITXEYrTcgMkwRjKK4P9cZSHbaFXkwDtVRoxJjHKzA9j//7ZUPFHDx4gl
-FZIAc2bsW3MFop8gXRnKPdZYlgwKLxlz8tSay+i1s8bnfyz3VkG6I7wJI9gzmRna
-7vuYuCQWEc8IiJ/WdUPXOV40pFN3tzcIKQqEof3nTIJnXHe5bb41dewqEDRganLy
-4fmFkj8LPz0yUR4D1ZE+ViPqolk1rA==
-=zMRe
------END PGP SIGNATURE-----
-
---Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io--
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 2aa61e7679db..1ed674ba8429 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -41,7 +41,7 @@ struct crypto_istat_hash {
+ #define HASH_ALG_COMMON_STAT
+ #endif
+ 
+-/**
++/*
+  * struct hash_alg_common - define properties of message digest
+  * @stat: Statistics for hash algorithm.
+  * @digestsize: Size of the result of the transformation. A buffer of this size
+@@ -219,6 +219,7 @@ struct shash_desc {
+  * @stat: Statistics for hash algorithm.
+  * @base: internally used
+  * @halg: see struct hash_alg_common
++ * @HASH_ALG_COMMON: see struct hash_alg_common
+  */
+ struct shash_alg {
+ 	int (*init)(struct shash_desc *desc);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
