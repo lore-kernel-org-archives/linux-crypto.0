@@ -2,137 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9787FC6FD19
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 02:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B56C6FD1F
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Mar 2023 03:19:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbjCNCrj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Mar 2023 22:47:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53648 "EHLO
+        id S229646AbjCNDTy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Mar 2023 23:19:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbjCNCri (ORCPT
+        with ESMTP id S229483AbjCNDTv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Mar 2023 22:47:38 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8958E3C5;
-        Mon, 13 Mar 2023 19:47:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=7XPPL7nwlO9qfQsOrR7OZiZJkx7m8TBAeAeafc1B5Is=; b=Twv/ZWYHldNJldvrOpN5Nmz6Ov
-        0yJ9tqJ1KPkgHHS1pb+xmqd08SWiHgPZFkitvPCzx9kF9GTtVgMeRNQklSdMaZIELRQYDihcG3yXC
-        ua8GxZ9+yWlcNlauCKZp58UbIb4svY8dTrAtPHGgntITPXItcaMbTLGm8/bvD2mJ2605I2LEGuw6r
-        kn3x/7GvC0l10L02XzicXcDXGBEgT0P7O/l3pPOwraVPd7rAP+M1jsId34i+886gHlmPUe0WEH3E4
-        mNKnEYGqTmYamvU0DnU1Bbi3qw5eI1T54ALHo1JdSOQ1t+787OL6Z1F1QtFW25nW4/turgOkBm7pZ
-        oJmb9vDw==;
-Received: from [2601:1c2:980:9ec0::df2f] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pbuhL-008ke9-0R; Tue, 14 Mar 2023 02:47:35 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v2] async_tx: fix kernel-doc notation warnings
-Date:   Mon, 13 Mar 2023 19:47:34 -0700
-Message-Id: <20230314024734.9066-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.39.2
+        Mon, 13 Mar 2023 23:19:51 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAADA65C4F;
+        Mon, 13 Mar 2023 20:19:49 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PbJfq6XyGz4x1d;
+        Tue, 14 Mar 2023 14:19:47 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1678763988;
+        bh=A42uzgmqy6kdHFRu9vEVBB0TC3eb2uJkHBMlhnDQMZk=;
+        h=Date:From:To:Cc:Subject:From;
+        b=QRoEQlgP+DDOtFnWQQ865M7Yh/rS2nGS7ALvO2KwyPmxXX+gKk7UZysdGpFyoEL/X
+         5X0dKtCqsq3kvj0On+Ga/rnmT0UsnCoGy3aRuV3SZ7RJ8hICaa3Z5WMlFstRqMIgNZ
+         /K5JnBNF8w4NmAuZM9idDr6ri6lBTfqgvAv5b8+WY9Kq3Ky0J2UwRcmuZi1eOVOFIL
+         vPdDf4n8L03w+KoFCsQyJnTfaTVUTSfWA40Vpwujp3janbtYim0mmattOYsTRNKGF4
+         Xz2h0E9vX6W1mSp2L929dJf36r8++hKUHkEvmBDsaX2vNmJ4gNXYupU1plUfEqY8m1
+         MnDlfO67+8HQg==
+Date:   Tue, 14 Mar 2023 14:19:47 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build warnings after merge of the crypto tree
+Message-ID: <20230314141947.18574ae8@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix kernel-doc warnings by adding "struct" keyword or "enum" keyword.
-Also fix 2 function parameter descriptions.
-Change some functions and structs from kernel-doc /** notation
-to regular /* comment notation.
+--Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-async_pq.c:18: warning: cannot understand function prototype: 'struct page *pq_scribble_page; '
-async_pq.c:18: error: Cannot parse struct or union!
-async_pq.c:40: warning: No description found for return value of 'do_async_gen_syndrome'
-async_pq.c:109: warning: Function parameter or member 'blocks' not described in 'do_sync_gen_syndrome'
-async_pq.c:109: warning: Function parameter or member 'offsets' not described in 'do_sync_gen_syndrome'
-async_pq.c:109: warning: Function parameter or member 'disks' not described in 'do_sync_gen_syndrome'
-async_pq.c:109: warning: Function parameter or member 'len' not described in 'do_sync_gen_syndrome'
-async_pq.c:109: warning: Function parameter or member 'submit' not described in 'do_sync_gen_syndrome'
+Hi all,
 
-async_tx.c:136: warning: cannot understand function prototype: 'enum submit_disposition '
-async_tx.c:264: warning: Function parameter or member 'tx' not described in 'async_tx_quiesce'
+After merging the crypto tree, today's linux-next build (htmldocs)
+produced these warnings:
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
-v2: fix more warnings
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:245: warning: Function parameter or member 'HASH_ALG_=
+COMMON' not described in 'shash_alg'
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:69: error: Cannot parse struct or union!
+include/crypto/hash.h:69: error: Cannot parse struct or union!
 
- crypto/async_tx/async_pq.c |   10 +++++-----
- crypto/async_tx/async_tx.c |    4 ++--
- 2 files changed, 7 insertions(+), 7 deletions(-)
+Introduced by commit
 
-diff -- a/crypto/async_tx/async_pq.c b/crypto/async_tx/async_pq.c
---- a/crypto/async_tx/async_pq.c
-+++ b/crypto/async_tx/async_pq.c
-@@ -11,8 +11,8 @@
- #include <linux/async_tx.h>
- #include <linux/gfp.h>
- 
--/**
-- * pq_scribble_page - space to hold throwaway P or Q buffer for
-+/*
-+ * struct pq_scribble_page - space to hold throwaway P or Q buffer for
-  * synchronous gen_syndrome
-  */
- static struct page *pq_scribble_page;
-@@ -28,7 +28,7 @@ static struct page *pq_scribble_page;
- 
- #define MAX_DISKS 255
- 
--/**
-+/*
-  * do_async_gen_syndrome - asynchronously calculate P and/or Q
-  */
- static __async_inline struct dma_async_tx_descriptor *
-@@ -100,7 +100,7 @@ do_async_gen_syndrome(struct dma_chan *c
- 	return tx;
- }
- 
--/**
-+/*
-  * do_sync_gen_syndrome - synchronously calculate a raid6 syndrome
-  */
- static void
-@@ -281,7 +281,7 @@ pq_val_chan(struct async_submit_ctl *sub
- /**
-  * async_syndrome_val - asynchronously validate a raid6 syndrome
-  * @blocks: source blocks from idx 0..disks-3, P @ disks-2 and Q @ disks-1
-- * @offset: common offset into each block (src and dest) to start transaction
-+ * @offsets: common offset into each block (src and dest) to start transaction
-  * @disks: number of blocks (including missing P or Q, see below)
-  * @len: length of operation in bytes
-  * @pqres: on val failure SUM_CHECK_P_RESULT and/or SUM_CHECK_Q_RESULT are set
-diff -- a/crypto/async_tx/async_tx.c b/crypto/async_tx/async_tx.c
---- a/crypto/async_tx/async_tx.c
-+++ b/crypto/async_tx/async_tx.c
-@@ -124,7 +124,7 @@ async_tx_channel_switch(struct dma_async
- 
- 
- /**
-- * submit_disposition - flags for routing an incoming operation
-+ * enum submit_disposition - flags for routing an incoming operation
-  * @ASYNC_TX_SUBMITTED: we were able to append the new operation under the lock
-  * @ASYNC_TX_CHANNEL_SWITCH: when the lock is dropped schedule a channel switch
-  * @ASYNC_TX_DIRECT_SUBMIT: when the lock is dropped submit directly
-@@ -258,7 +258,7 @@ EXPORT_SYMBOL_GPL(async_trigger_callback
- 
- /**
-  * async_tx_quiesce - ensure tx is complete and freeable upon return
-- * @tx - transaction to quiesce
-+ * @tx: transaction to quiesce
-  */
- void async_tx_quiesce(struct dma_async_tx_descriptor **tx)
- {
+  0e4e6d7094df ("crypto: hash - Count error stats differently")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmQP59MACgkQAVBC80lX
+0GxFdwf9EiO9SQzRixlV3sRNrWyTgA5kpucZSlgavTDesdpsGlJnZ79TZYyV33yJ
+kwH0ufWVjOAKK9e4ibyf73TeNLQmv9iGZdvAl6Ptk/XtCH02jnQXBnRhX7ADVSEu
+/XOjQNXGITXEYrTcgMkwRjKK4P9cZSHbaFXkwDtVRoxJjHKzA9j//7ZUPFHDx4gl
+FZIAc2bsW3MFop8gXRnKPdZYlgwKLxlz8tSay+i1s8bnfyz3VkG6I7wJI9gzmRna
+7vuYuCQWEc8IiJ/WdUPXOV40pFN3tzcIKQqEof3nTIJnXHe5bb41dewqEDRganLy
+4fmFkj8LPz0yUR4D1ZE+ViPqolk1rA==
+=zMRe
+-----END PGP SIGNATURE-----
+
+--Sig_/Wd6y3Eb3fJm.eyoHW7xA6Io--
