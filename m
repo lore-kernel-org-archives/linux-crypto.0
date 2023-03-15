@@ -2,60 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B56C61DA4
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Mar 2023 05:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC26C61DA4
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Mar 2023 09:01:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbjCOFGN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Mar 2023 01:06:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36830 "EHLO
+        id S231909AbjCOJBt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Mar 2023 05:01:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjCOFGN (ORCPT
+        with ESMTP id S231851AbjCOJBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Mar 2023 01:06:13 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C20921947;
-        Tue, 14 Mar 2023 22:06:10 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pcJKt-004VpK-Dp; Wed, 15 Mar 2023 13:06:04 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 15 Mar 2023 13:06:03 +0800
-Date:   Wed, 15 Mar 2023 13:06:03 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Harsha, Harsha" <harsha.harsha@amd.com>
-Cc:     "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "michals@xilinx.com" <michals@xilinx.com>,
-        "saratcha@xilinx.com" <saratcha@xilinx.com>,
-        "git (AMD-Xilinx)" <git@amd.com>,
-        "Shah, Dhaval (CPG-PSAV)" <dhaval.r.shah@amd.com>
-Subject: Re: [PATCH 3/4] crypto: xilinx: Add ZynqMP RSA driver
-Message-ID: <ZBFSO8WMLC7/5S8q@gondor.apana.org.au>
-References: <20230218053809.1780-1-harsha.harsha@amd.com>
- <20230218053809.1780-4-harsha.harsha@amd.com>
- <ZAsHHOOpEzXVY23I@gondor.apana.org.au>
- <MN2PR12MB460728BD61F5B2D7C06FFEF2F3BF9@MN2PR12MB4607.namprd12.prod.outlook.com>
+        Wed, 15 Mar 2023 05:01:40 -0400
+Received: from mail.corrib.pl (mail.corrib.pl [185.58.226.145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5423976F72
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Mar 2023 02:01:12 -0700 (PDT)
+Received: by mail.corrib.pl (Postfix, from userid 1001)
+        id E7ADBA3D79; Wed, 15 Mar 2023 09:00:55 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=corrib.pl; s=mail;
+        t=1678870876; bh=X6IEpSISwJiYlJ3uA866lskXve3r+4o2hf4z7VM6m5o=;
+        h=Date:From:To:Subject:From;
+        b=i8HS0SjW1TeOvvCrDwsDdCEWBdDm2FUhn0D06APUWGV11viTLigSsQPjDnmXBdSgS
+         UVdyeQX/t4yEacaO+7tty8yhGw0fFc8A8dWD4dIU3SzrynbKJkVozrcP9rlMXbWXHh
+         WJacWLb7GR3aixMMD8YLQuVMArRIqNEtRBei30HPXKFlinjBHnrcUBovl0erotEJa/
+         cHbTKHCpPJkizkqiinbKaF6T6CghjzLJe9ZlyH/+cmpaFYMMom2xV+6tf0+ER1e8JJ
+         laJkbRLAz3OLtrN2thrJYPeUcZgfY3lk3qyCbNUcd1h/W3KXUl6MTTOlgj/lGy/c50
+         e8k4qAhdEdS7Q==
+Received: by mail.corrib.pl for <linux-crypto@vger.kernel.org>; Wed, 15 Mar 2023 09:00:35 GMT
+Message-ID: <20230315074501-0.1.62.iwbh.0.puvjcly28n@corrib.pl>
+Date:   Wed, 15 Mar 2023 09:00:35 GMT
+From:   =?UTF-8?Q? "Szczepan_Kie=C5=82basa" ?= 
+        <szczepan.kielbasa@corrib.pl>
+To:     <linux-crypto@vger.kernel.org>
+Subject: Faktoring
+X-Mailer: mail.corrib.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MN2PR12MB460728BD61F5B2D7C06FFEF2F3BF9@MN2PR12MB4607.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 05:02:39AM +0000, Harsha, Harsha wrote:
->
-> To perform the operation, the request goes to the RSA HW engine. Once the operation is done, the response is sent back
-> via firmware and ATF to the linux driver. Meanwhile the API in the linux driver waits until the operation is complete.
-> This is why the driver is synchronous and therefore the CRYPTO_ALG_ASYNC flag is not set.
+Dzie=C5=84 dobry,
 
-But you use crypto_engine, right? That is always async regardless
-of what your driver does.
+rozwa=C5=BCali Pa=C5=84stwo wyb=C3=B3r finansowania, kt=C3=B3re spe=C5=82=
+ni potrzeby firmy, zapewniaj=C4=85c natychmiastowy dost=C4=99p do got=C3=B3=
+wki, bez zb=C4=99dnych przestoj=C3=B3w?=20
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Przygotowali=C5=9Bmy rozwi=C4=85zania faktoringowe dopasowane do Pa=C5=84=
+stwa bran=C5=BCy i wielko=C5=9Bci firmy, dzi=C4=99ki kt=C3=B3rym, nie mus=
+z=C4=85 Pa=C5=84stwo martwi=C4=87 si=C4=99 o niewyp=C5=82acalno=C5=9B=C4=87=
+ kontrahent=C3=B3w, poniewa=C5=BC transakcje s=C4=85 zabezpieczone i posi=
+adaj=C4=85 gwarancj=C4=99 sp=C5=82aty.=20
+Chc=C4=85 Pa=C5=84stwo przeanalizowa=C4=87 dost=C4=99pne opcje?
+
+
+Pozdrawiam
+Szczepan Kie=C5=82basa
