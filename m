@@ -2,38 +2,39 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC26C61DA4
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Mar 2023 09:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C86C7618B
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Mar 2023 09:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231909AbjCOJBt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Mar 2023 05:01:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45864 "EHLO
+        id S231853AbjCOJkx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Mar 2023 05:40:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231851AbjCOJBk (ORCPT
+        with ESMTP id S232078AbjCOJkt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Mar 2023 05:01:40 -0400
-Received: from mail.corrib.pl (mail.corrib.pl [185.58.226.145])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5423976F72
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Mar 2023 02:01:12 -0700 (PDT)
-Received: by mail.corrib.pl (Postfix, from userid 1001)
-        id E7ADBA3D79; Wed, 15 Mar 2023 09:00:55 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=corrib.pl; s=mail;
-        t=1678870876; bh=X6IEpSISwJiYlJ3uA866lskXve3r+4o2hf4z7VM6m5o=;
+        Wed, 15 Mar 2023 05:40:49 -0400
+X-Greylist: delayed 1344 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Mar 2023 02:40:48 PDT
+Received: from mail.docworker.pl (mail.docworker.pl [94.177.230.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D1C2659C
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Mar 2023 02:40:48 -0700 (PDT)
+Received: by mail.docworker.pl (Postfix, from userid 1002)
+        id B40D1856E6; Wed, 15 Mar 2023 10:16:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=docworker.pl; s=mail;
+        t=1678871836; bh=F9Uuk9o83BVy7SpscM/nJos6FHfnp2pKrNUqPErj3yg=;
         h=Date:From:To:Subject:From;
-        b=i8HS0SjW1TeOvvCrDwsDdCEWBdDm2FUhn0D06APUWGV11viTLigSsQPjDnmXBdSgS
-         UVdyeQX/t4yEacaO+7tty8yhGw0fFc8A8dWD4dIU3SzrynbKJkVozrcP9rlMXbWXHh
-         WJacWLb7GR3aixMMD8YLQuVMArRIqNEtRBei30HPXKFlinjBHnrcUBovl0erotEJa/
-         cHbTKHCpPJkizkqiinbKaF6T6CghjzLJe9ZlyH/+cmpaFYMMom2xV+6tf0+ER1e8JJ
-         laJkbRLAz3OLtrN2thrJYPeUcZgfY3lk3qyCbNUcd1h/W3KXUl6MTTOlgj/lGy/c50
-         e8k4qAhdEdS7Q==
-Received: by mail.corrib.pl for <linux-crypto@vger.kernel.org>; Wed, 15 Mar 2023 09:00:35 GMT
-Message-ID: <20230315074501-0.1.62.iwbh.0.puvjcly28n@corrib.pl>
-Date:   Wed, 15 Mar 2023 09:00:35 GMT
-From:   =?UTF-8?Q? "Szczepan_Kie=C5=82basa" ?= 
-        <szczepan.kielbasa@corrib.pl>
+        b=kq7ciYw1S9DOkrIrW4JzRUbJ2DqCbtaoFF23tr/vgNxnOrVbpbq70oOZXmsX9KL0l
+         4/3J49GZy17dSd/u2cEi/XxyTUbcUkKwV41fLmjT2JSTDaKe9Y9qHlwkwzn6+ykEFF
+         3NRXG2rUw6e7dgQJMgc5ruE4jxTsScZUdOhwHSKKhR0LJLWJg1w/sqLtUXGvHUPP0z
+         N639RX687M3OcMrlzwEA1PNWGFU/tDOpHUMDiEq7W6Ea53Y0XiSmed7PrOp8wNhZkY
+         SFH5Hxg3zV/p4u0sMr3NDDCYYCGzsbU1hwl7CYAAJS0cMqQGcl0F4Q1xbDrgq9nQWc
+         pn/LmxqCLP5mg==
+Received: by mail.docworker.pl for <linux-crypto@vger.kernel.org>; Wed, 15 Mar 2023 09:16:08 GMT
+Message-ID: <20230315084500-0.1.g.1mwr.0.1xqx0zosg0@docworker.pl>
+Date:   Wed, 15 Mar 2023 09:16:08 GMT
+From:   =?UTF-8?Q? "Mi=C5=82osz_G=C3=B3recki" ?= 
+        <milosz.gorecki@docworker.pl>
 To:     <linux-crypto@vger.kernel.org>
-Subject: Faktoring
-X-Mailer: mail.corrib.pl
+Subject: Zapytanie ofertowe 
+X-Mailer: mail.docworker.pl
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -41,19 +42,18 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Szanowni Pa=C5=84stwo,
 
-rozwa=C5=BCali Pa=C5=84stwo wyb=C3=B3r finansowania, kt=C3=B3re spe=C5=82=
-ni potrzeby firmy, zapewniaj=C4=85c natychmiastowy dost=C4=99p do got=C3=B3=
-wki, bez zb=C4=99dnych przestoj=C3=B3w?=20
+Od blisko 8 lat skutecznie wspieramy naszych partner=C3=B3w w pozyskiwani=
+u klient=C3=B3w. =C5=9Awiadczymy us=C5=82ug=C4=99 generowania lead=C3=B3w=
+ z kilkoma unikalnymi cechami jak gwarancja realnego uruchomienia rozm=C3=
+=B3w lub wymiana kontaktu. Nadmieni=C4=99 tak=C5=BCe, i=C5=BC kontakty pr=
+zekazywane s=C4=85 na wy=C5=82=C4=85czno=C5=9B=C4=87.
 
-Przygotowali=C5=9Bmy rozwi=C4=85zania faktoringowe dopasowane do Pa=C5=84=
-stwa bran=C5=BCy i wielko=C5=9Bci firmy, dzi=C4=99ki kt=C3=B3rym, nie mus=
-z=C4=85 Pa=C5=84stwo martwi=C4=87 si=C4=99 o niewyp=C5=82acalno=C5=9B=C4=87=
- kontrahent=C3=B3w, poniewa=C5=BC transakcje s=C4=85 zabezpieczone i posi=
-adaj=C4=85 gwarancj=C4=99 sp=C5=82aty.=20
-Chc=C4=85 Pa=C5=84stwo przeanalizowa=C4=87 dost=C4=99pne opcje?
+Je=C5=9Bli w chwili obecnej poszukujecie Pa=C5=84stwo nowych zapyta=C5=84=
+ i lead=C3=B3w sprzeda=C5=BCowych prosz=C4=99 o kontakt lub wskazanie ter=
+minu rozmowy.
 
 
-Pozdrawiam
-Szczepan Kie=C5=82basa
+Pozdrawiam serdecznie
+Mi=C5=82osz G=C3=B3recki
