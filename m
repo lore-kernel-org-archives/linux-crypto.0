@@ -2,113 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A499C6FD19
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Mar 2023 15:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A49DC6FD1F
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Mar 2023 19:58:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbjCPP6z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Mar 2023 11:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36602 "EHLO
+        id S230009AbjCPT6L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Mar 2023 15:58:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231594AbjCPP6w (ORCPT
+        with ESMTP id S230011AbjCPT6H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2023 11:58:52 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC49E24BE2
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2023 08:58:50 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mkl@pengutronix.de>)
-        id 1pcpzT-0001Wg-0O; Thu, 16 Mar 2023 16:58:07 +0100
-Received: from pengutronix.de (unknown [IPv6:2a00:20:3043:e035:5ae3:9609:678c:e1fb])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        (Authenticated sender: mkl-all@blackshift.org)
-        by smtp.blackshift.org (Postfix) with ESMTPSA id EEF27194E2F;
-        Thu, 16 Mar 2023 15:57:59 +0000 (UTC)
-Date:   Thu, 16 Mar 2023 16:57:58 +0100
-From:   Marc Kleine-Budde <mkl@pengutronix.de>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
+        Thu, 16 Mar 2023 15:58:07 -0400
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3C3BD4E4;
+        Thu, 16 Mar 2023 12:57:23 -0700 (PDT)
+Received: by mail-il1-f170.google.com with SMTP id 4so1631986ilz.6;
+        Thu, 16 Mar 2023 12:57:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678996611;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jQMHjPaeXjRCbmwReybTxCj3piy1a1zt9f0lIOYUeaM=;
+        b=gSwrMa3UF8042FXu+ojBw5H3t3lOxPuslFr8ZEFxZDrqb4ivVgccw/TWtlfaaXaaF4
+         leCDoj0bNkzyLi6m/1R1b4YuFqicDQE6soDLhGSZ9XYQ7c7V6NmLLJVUkDdezD6VE4YN
+         hzWwTRxH2OMAey6RY3hcLT6MXBPO8Ctgo18DH3aD9rls9gXdBkHfbO4gnE9Quulyl3fY
+         1CiKApWSfyXiP7IuGMba7i8IjvOvMdciRqjKMsWGvm7ODLTWdhkSeIRITTfzeBTHItUm
+         UeK833vVE7f+K7gq6Exnk7Y7PC7f8rJboQm80zoxqtnGiYU5so2JHCXp7Ft8d5Wd/iW8
+         eH5g==
+X-Gm-Message-State: AO0yUKXbrRhq4//nkjyDi0IjSDiwc6bEUHcVh90TFg+JsalMu9JbXeOv
+        1chOkkW//yNLDpVGDl+aHNX2aMw4JA==
+X-Google-Smtp-Source: AK7set/xRgAPFMSNNxoPPmiqrGXjmP7KYb/XlTkpq5V1/UNgry6o/5bHXBqkyYiFFZ0XwssSf1mXbg==
+X-Received: by 2002:a92:c10f:0:b0:311:13c1:abd4 with SMTP id p15-20020a92c10f000000b0031113c1abd4mr7365041ile.24.1678996611038;
+        Thu, 16 Mar 2023 12:56:51 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.249])
+        by smtp.gmail.com with ESMTPSA id r17-20020a92ac11000000b00312f2936087sm61266ilh.63.2023.03.16.12.56.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 12:56:50 -0700 (PDT)
+Received: (nullmailer pid 3780293 invoked by uid 1000);
+        Thu, 16 Mar 2023 19:56:48 -0000
+Date:   Thu, 16 Mar 2023 14:56:48 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        devicetree@vger.kernel.org, Pankaj Gupta <pankaj.gupta@nxp.com>,
+        linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, dccp@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
-        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
-        tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [RFC PATCH 28/28] sock: Remove ->sendpage*() in favour of
- sendmsg(MSG_SPLICE_PAGES)
-Message-ID: <20230316155758.5ylpybqjma7x4lbs@pengutronix.de>
-References: <20230316152618.711970-1-dhowells@redhat.com>
- <20230316152618.711970-29-dhowells@redhat.com>
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] dt-bindings: crypto: fsl,sec-v4.0: Convert to DT schema
+Message-ID: <167899646621.3777210.10339304142738109858.robh@kernel.org>
+References: <20230220213334.353779-1-robh@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="km5oeoth2y26yqyc"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230316152618.711970-29-dhowells@redhat.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+In-Reply-To: <20230220213334.353779-1-robh@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---km5oeoth2y26yqyc
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 20 Feb 2023 15:33:33 -0600, Rob Herring wrote:
+> Convert Freescale CAAM/SEC4 binding to DT schema format. The
+> 'fsl,sec-v4.0' and 'fsl,sec-v4.0-mon' parts are independent, so split
+> them into separate schema files.
+> 
+> Add a bunch of missing compatibles for v5.0, v5.4, etc. Drop unused
+> 'ranges', '#address-cells', and '#size-cells' from fsl,sec-v4.0-mon nodes.
+> 
+> There's one DTB warning for LS1012a which has a 2nd 'reg' entry for
+> 'fsl,sec-v4.0-rtic'. Leaving that as there is no clue as to what it is for.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>  .../bindings/crypto/fsl,sec-v4.0-mon.yaml     | 150 +++++
+>  .../bindings/crypto/fsl,sec-v4.0.yaml         | 266 +++++++++
+>  .../devicetree/bindings/crypto/fsl-sec4.txt   | 553 ------------------
+>  3 files changed, 416 insertions(+), 553 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
+>  create mode 100644 Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+> 
 
-On 16.03.2023 15:26:18, David Howells wrote:
-> [!] Note: This is a work in progress.  At the moment, some things won't
->     build if this patch is applied.  nvme, kcm, smc, tls.
->=20
-> Remove ->sendpage() and ->sendpage_locked().  sendmsg() with
-> MSG_SPLICE_PAGES should be used instead.  This allows multiple pages and
-> multipage folios to be passed through.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
+Applied, thanks!
 
-> cc: linux-can@vger.kernel.org
-
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde           |
-Embedded Linux                   | https://www.pengutronix.de  |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
-
---km5oeoth2y26yqyc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmQTPIMACgkQvlAcSiqK
-BOj6JAgAtfBV5yq+uNvtDfdNTDCgUnr0pkrsEqo0Ygt0A84TUlJF1K9QFkFTlvFo
-NEtegJFeDvbE8EmvRgOnpoTRcMQwDClaw5c7O7TquCr3SEAcXECesFYUVLWR7hsf
-Mk3DzSWUNIqMeSUOAEPBPfWNGGQWdjut5IQHdhuIs2/irjgsb5GZJ27rYyV9F/+l
-daE1Ac6RGnKq9zV/UszZ7AbfKA7bI9TVioWBVmIFCQZeWJprHq5rD0LTH6+QjdyQ
-5AdUTjTbZ/YRTjr4KQQkISfoq8oMC/zVENiagYZ89SGTbciIaCeqBpvdgUVKTob6
-2Uoo/o+yUY90Dy8JPw9/gLSsthDGaw==
-=IhKV
------END PGP SIGNATURE-----
-
---km5oeoth2y26yqyc--
