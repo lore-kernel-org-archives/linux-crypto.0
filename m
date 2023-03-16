@@ -2,39 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90980C6FD1F
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Mar 2023 08:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDD7C7618B
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Mar 2023 08:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbjCPIf7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Mar 2023 04:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50130 "EHLO
+        id S229873AbjCPIlj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Mar 2023 04:41:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbjCPIf5 (ORCPT
+        with ESMTP id S230437AbjCPIle (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2023 04:35:57 -0400
-Received: from mail.surechiers.com (mail.surechiers.com [80.211.239.236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB81825BAE
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2023 01:35:55 -0700 (PDT)
-Received: by mail.surechiers.com (Postfix, from userid 1002)
-        id 58B7082DE5; Thu, 16 Mar 2023 09:35:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=surechiers.com;
-        s=mail; t=1678955754;
-        bh=xg3VVY9SU+I+f+ynMyY8e0Lum0EY/KrTvpy5BYTg7yw=;
+        Thu, 16 Mar 2023 04:41:34 -0400
+Received: from mail.paretdee.com (mail.paretdee.com [141.95.17.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C26733BC
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2023 01:41:30 -0700 (PDT)
+Received: by mail.paretdee.com (Postfix, from userid 1002)
+        id 7CCD2A2AB4; Thu, 16 Mar 2023 08:40:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=paretdee.com; s=mail;
+        t=1678956075; bh=FLMIyM7qOCOVEMp1o/ltkgnLeuU0ZBlT9xWiZMBZ7Ag=;
         h=Date:From:To:Subject:From;
-        b=IrnUPEnEanNqUtl9Y6y+FG7gUUkQG+MUdZHQ5+Hz53zWlelNThLL4tGbl7mF53MhS
-         bSU6xbvWDVuLO8aSPLoKZP+BlqHfYXgHKJvvd9nDxbjTic5MeU18TU0AfK9LJgWpfk
-         4oRn5Ne2UaRxzDZP16gS66hymoX9U8cvR8WJuWun7JLJfufUiZfOSr6G5nTFeNxxwJ
-         leWJ7Qw5RTtI6tpy3UDIUCPZ/VLG8/dAvf7rhecI8SlG1NQ3gyUAIQN3KyD43hc3TO
-         I5VoC9ofna90SHR+ExDHiQGZBrxQpQAjqmw6OWsTq87pbJCmDg4PVTdumqmRrkUeRW
-         GBIbO+DGIB2XQ==
-Received: by mail.surechiers.com for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2023 08:35:49 GMT
-Message-ID: <20230316084500-0.1.q.1izf.0.wz2i0c4gi1@surechiers.com>
-Date:   Thu, 16 Mar 2023 08:35:49 GMT
-From:   =?UTF-8?Q? "J=C3=A1chym_Zdr=C3=A1hal" ?= 
-        <jachym.zdrahal@surechiers.com>
+        b=c7FDW6B5MYN06Is6P7pKmQc+wn7Fdq4UgDDnV25e1goi6bJAS8l8ZJWoJT8vxJNEW
+         Plp/H0+wwIAAXHT4OEHvwN9AG4iE1JjbUKEohAhETOyn5c7AJCkrwClRGG8KiALvIy
+         Q+qsLkauhwCMXAQSEfnbg503GHsEVdR89e1J1Pj3lD8zvcVaRo7gMpM7FqAoWPnNbM
+         08zSV7eldei2nlxfsSHi1SZs2yo7OePQsQD5fd22qU1NEKj9o8p5gaWLflEOUgarEn
+         RKJD27vSJHtZbc1lH5U+YN1b5V2WoJ5+V5+VqNj6fDhEBJmlxYhkDxEhUowNLTIQ1C
+         M2lmlkXkYbYTQ==
+Received: by mail.paretdee.com for <linux-crypto@vger.kernel.org>; Thu, 16 Mar 2023 08:40:33 GMT
+Message-ID: <20230316074500-0.1.5h.cm2x.0.kkoug4ks02@paretdee.com>
+Date:   Thu, 16 Mar 2023 08:40:33 GMT
+From:   "Zbynek Spacek" <zbynek.spacek@paretdee.com>
 To:     <linux-crypto@vger.kernel.org>
-Subject: Renovace podlahy
-X-Mailer: mail.surechiers.com
+Subject: Rubber Molded
+X-Mailer: mail.paretdee.com
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -42,22 +40,16 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dobr=C3=A9 r=C3=A1no,
+Good morning,
 
-m=C4=9Bli byste z=C3=A1jem o beze=C5=A1v=C3=A9, chemicky, n=C3=A1razu a o=
-t=C4=9Bru odoln=C3=A9 podlahy?
+we can offer unbeatable conditions for the supply of various silicone com=
+pounds and rubbers, liquid silicone rubber (LSR).
 
-Zaji=C5=A1=C5=A5uj=C3=AD spolehlivost bez ohledu na to, zda je pou=C5=BE=C3=
-=ADv=C3=A1te v n=C3=A1ro=C4=8Dn=C3=BDch v=C3=BDrobn=C3=ADch prostorech, s=
-kladech, komunika=C4=8Dn=C3=ADch tras=C3=A1ch nebo komer=C4=8Dn=C3=ADch p=
-rostor=C3=A1ch.
+In our assortment you will also find cross-linking agents, stabilizers, d=
+yes and individual silicone mixtures that we will develop for your needs.
 
-Navrhli jsme snadno =C4=8Distiteln=C3=A9, hygienick=C3=A9 a protiskluzov=C3=
-=A9 podlahy pro pr=C5=AFmyslov=C3=A9 i komer=C4=8Dn=C3=AD pou=C5=BEit=C3=AD=
-=2E
-
-Mohu nab=C3=ADdnout bezplatn=C3=BD audit va=C5=A1ich podlah spolu s kompl=
-exn=C3=AD anal=C3=BDzou podkladu. Mohu o tomhle zavolat?
+Do you want to know what we can offer you?
 
 
-J=C3=A1chym Zdr=C3=A1hal
+Best regards
+Zbynek Spacek
