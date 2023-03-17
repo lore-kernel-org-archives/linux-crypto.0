@@ -2,88 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A49DC6FD1F
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Mar 2023 19:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48907C74A5B
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Mar 2023 02:41:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230009AbjCPT6L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Mar 2023 15:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41814 "EHLO
+        id S229589AbjCQCl4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Mar 2023 22:41:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbjCPT6H (ORCPT
+        with ESMTP id S229482AbjCQClz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Mar 2023 15:58:07 -0400
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3C3BD4E4;
-        Thu, 16 Mar 2023 12:57:23 -0700 (PDT)
-Received: by mail-il1-f170.google.com with SMTP id 4so1631986ilz.6;
-        Thu, 16 Mar 2023 12:57:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678996611;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jQMHjPaeXjRCbmwReybTxCj3piy1a1zt9f0lIOYUeaM=;
-        b=gSwrMa3UF8042FXu+ojBw5H3t3lOxPuslFr8ZEFxZDrqb4ivVgccw/TWtlfaaXaaF4
-         leCDoj0bNkzyLi6m/1R1b4YuFqicDQE6soDLhGSZ9XYQ7c7V6NmLLJVUkDdezD6VE4YN
-         hzWwTRxH2OMAey6RY3hcLT6MXBPO8Ctgo18DH3aD9rls9gXdBkHfbO4gnE9Quulyl3fY
-         1CiKApWSfyXiP7IuGMba7i8IjvOvMdciRqjKMsWGvm7ODLTWdhkSeIRITTfzeBTHItUm
-         UeK833vVE7f+K7gq6Exnk7Y7PC7f8rJboQm80zoxqtnGiYU5so2JHCXp7Ft8d5Wd/iW8
-         eH5g==
-X-Gm-Message-State: AO0yUKXbrRhq4//nkjyDi0IjSDiwc6bEUHcVh90TFg+JsalMu9JbXeOv
-        1chOkkW//yNLDpVGDl+aHNX2aMw4JA==
-X-Google-Smtp-Source: AK7set/xRgAPFMSNNxoPPmiqrGXjmP7KYb/XlTkpq5V1/UNgry6o/5bHXBqkyYiFFZ0XwssSf1mXbg==
-X-Received: by 2002:a92:c10f:0:b0:311:13c1:abd4 with SMTP id p15-20020a92c10f000000b0031113c1abd4mr7365041ile.24.1678996611038;
-        Thu, 16 Mar 2023 12:56:51 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.249])
-        by smtp.gmail.com with ESMTPSA id r17-20020a92ac11000000b00312f2936087sm61266ilh.63.2023.03.16.12.56.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 12:56:50 -0700 (PDT)
-Received: (nullmailer pid 3780293 invoked by uid 1000);
-        Thu, 16 Mar 2023 19:56:48 -0000
-Date:   Thu, 16 Mar 2023 14:56:48 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Rob Herring <robh@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        devicetree@vger.kernel.org, Pankaj Gupta <pankaj.gupta@nxp.com>,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] dt-bindings: crypto: fsl,sec-v4.0: Convert to DT schema
-Message-ID: <167899646621.3777210.10339304142738109858.robh@kernel.org>
-References: <20230220213334.353779-1-robh@kernel.org>
+        Thu, 16 Mar 2023 22:41:55 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCC7457E2;
+        Thu, 16 Mar 2023 19:41:19 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pd00p-005aCC-Pa; Fri, 17 Mar 2023 10:40:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Mar 2023 10:40:11 +0800
+Date:   Fri, 17 Mar 2023 10:40:11 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     willy@infradead.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, dhowells@redhat.com,
+        viro@zeniv.linux.org.uk, hch@infradead.org, axboe@kernel.dk,
+        jlayton@kernel.org, brauner@kernel.org,
+        torvalds@linux-foundation.org, netdev@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org
+Subject: Re: [RFC PATCH 23/28] algif: Remove hash_sendpage*()
+Message-ID: <ZBPTC9WPYQGhFI30@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230220213334.353779-1-robh@kernel.org>
+In-Reply-To: <20230316152618.711970-24-dhowells@redhat.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.netdev
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+David Howells <dhowells@redhat.com> wrote:
+> Remove hash_sendpage*() and use hash_sendmsg() as the latter seems to just
+> use the source pages directly anyway.
 
-On Mon, 20 Feb 2023 15:33:33 -0600, Rob Herring wrote:
-> Convert Freescale CAAM/SEC4 binding to DT schema format. The
-> 'fsl,sec-v4.0' and 'fsl,sec-v4.0-mon' parts are independent, so split
-> them into separate schema files.
-> 
-> Add a bunch of missing compatibles for v5.0, v5.4, etc. Drop unused
-> 'ranges', '#address-cells', and '#size-cells' from fsl,sec-v4.0-mon nodes.
-> 
-> There's one DTB warning for LS1012a which has a 2nd 'reg' entry for
-> 'fsl,sec-v4.0-rtic'. Leaving that as there is no clue as to what it is for.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
->  .../bindings/crypto/fsl,sec-v4.0-mon.yaml     | 150 +++++
->  .../bindings/crypto/fsl,sec-v4.0.yaml         | 266 +++++++++
->  .../devicetree/bindings/crypto/fsl-sec4.txt   | 553 ------------------
->  3 files changed, 416 insertions(+), 553 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
->  create mode 100644 Documentation/devicetree/bindings/crypto/fsl,sec-v4.0.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> 
+...
 
-Applied, thanks!
+> -       if (!(flags & MSG_MORE)) {
+> -               if (ctx->more)
+> -                       err = crypto_ahash_finup(&ctx->req);
+> -               else
+> -                       err = crypto_ahash_digest(&ctx->req);
 
+You've just removed the optimised path from user-space to
+finup/digest.  You need to add them back to sendmsg if you
+want to eliminate sendpage.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
