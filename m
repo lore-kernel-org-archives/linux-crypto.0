@@ -2,112 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1BCC74A5B
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Mar 2023 09:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E26C6FD1D
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Mar 2023 15:23:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231146AbjCQJWL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Mar 2023 05:22:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59596 "EHLO
+        id S229658AbjCQPXa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Mar 2023 11:23:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbjCQJWK (ORCPT
+        with ESMTP id S229959AbjCQPXP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Mar 2023 05:22:10 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0CE6B421E
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Mar 2023 02:22:08 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id eg48so17690594edb.13
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Mar 2023 02:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1679044927;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nsHFbM31p4aG2NzU6pYJrvN8mc9wOJaxONeK5EJ0yBk=;
-        b=NZFKWGNHrB/onuIrzQib8AmrVjFUNprwpo1xdl/8hS0tnGtLfqpa3t+tpA5DqfYzAF
-         RE73ioNVxXmBqQvisjhlkEdcLm0dbDZgYQWmn8dPR8xgLcCaDMhuTP7gBf1RToz3TdHk
-         cKDWIEEXf3BF/wAcdNbY0tAZk0Ls7R3xI2qUrBie+P2vtFN+WB3g1ec+btKjR9RmbQVG
-         TnJHGCf1XHV9TVyLwmg/k1FC37PhmdZU7HbipyclPw2YNZJXL2gYcpHtNCnkjuCM7ChR
-         iVoyW/UY8c585YsXeAS8rR4eaK1DrmF5hrq0oLs+jVPtZr0uTustud0tp7bdSeReCs4w
-         R17g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679044927;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nsHFbM31p4aG2NzU6pYJrvN8mc9wOJaxONeK5EJ0yBk=;
-        b=rT1ALc5KhsVpJu+elSYTjlLrQY+ikVxQWw/fIrQylVRqG1le07q1TNN+GvZPU26Rk5
-         XGxpzIleCeHKEk+nwm+oN8s7VOP7QoWq0Qv2b84CYEFq9ihtWdtNr/NxO3NQrhve69SI
-         /qHdDKiI9Q3sXAlHFXGNKujjsW6Jahim/9xaV85kzo3f8WbgAQM7zUhoWZUtrZJsTbGt
-         gRHnBXrDNoq7hilkjAPo/48TYkW/BGDsR4xZWl1MSISlN4++bC9BEHhRIEJ++hioyazN
-         n+MI+eG42iYIyWtVTIFbVTOrYzAOME/h4hzPKRUSGUq46QOOIv0bY/NgVEf/MaRFNJRw
-         tMRg==
-X-Gm-Message-State: AO0yUKU+iOJ+GZzkqCECHI4DMePAZzViPG9gTJijmGOoFJFZU5HLRIny
-        b0zLXyvV6yOL/kQnRCy1fSS+Uw==
-X-Google-Smtp-Source: AK7set9IrUtS0MYoDpyUE9kUDDV8lJU7DfdO4dwR1skLJr+3VbeFqBnq5yZdMh1F1GsvAQSFdds7Mw==
-X-Received: by 2002:a17:907:2cc6:b0:930:d30a:6c20 with SMTP id hg6-20020a1709072cc600b00930d30a6c20mr5834516ejc.17.1679044927382;
-        Fri, 17 Mar 2023 02:22:07 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:848a:1971:93e0:b465? ([2a02:810d:15c0:828:848a:1971:93e0:b465])
-        by smtp.gmail.com with ESMTPSA id j10-20020a170906094a00b008cafeec917dsm745003ejd.101.2023.03.17.02.22.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 02:22:07 -0700 (PDT)
-Message-ID: <c299fae9-e923-4b3d-539d-01ce5fb63a46@linaro.org>
-Date:   Fri, 17 Mar 2023 10:22:06 +0100
+        Fri, 17 Mar 2023 11:23:15 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609BE5AB77
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Mar 2023 08:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679066594; x=1710602594;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=zH6EitUMEaU147W0JczqO8czkcauYeElBYHUWTJ1cBk=;
+  b=CLwtfhBd+o/7fK60au/Bp4Ji+GYlzPbMwNoua1TgVh6npf4lzOkXQ+kG
+   uw7CIIZ7oKIS9HT+NnB7U5Hi9IhSAkZrL/OWUROb2+fVtuJr4BK0ld04n
+   PRHKvyrMTdIzREHtEfh+Tvgy+haNYgDsjorwupd/xogNHbU1ZBZ10vE3k
+   sPl277bFyIlDO/q8LureHrD4TD2mBIBgCTmKTi9CgIzDmCiwIxJyHBas1
+   KoJSKfA5t+cqoAR8UtTMr1MDO6wv24B7skgn3Lo+5QjuJfJEWDt69KXH1
+   UgN342s7ixBfiuNCCBMwbFyQXYaju76mJxE9tkZAhrRftT4qmPeErw+eD
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="335778786"
+X-IronPort-AV: E=Sophos;i="5.98,268,1673942400"; 
+   d="scan'208";a="335778786"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2023 08:23:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="926181246"
+X-IronPort-AV: E=Sophos;i="5.98,268,1673942400"; 
+   d="scan'208";a="926181246"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 17 Mar 2023 08:23:12 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pdBvD-0009Qs-1K;
+        Fri, 17 Mar 2023 15:23:11 +0000
+Date:   Fri, 17 Mar 2023 23:22:57 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yang Li <yang.lee@linux.alibaba.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [herbert-cryptodev-2.6:master 21/74] ERROR: modpost:
+ "devm_platform_get_and_ioremap_resource" [drivers/crypto/ccree/ccree.ko]
+ undefined!
+Message-ID: <202303172304.WjoeTv4E-lkp@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH 2/2] crypto - img-hash: Drop of_match_ptr for ID table
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20230310223027.315954-1-krzysztof.kozlowski@linaro.org>
- <20230310223027.315954-2-krzysztof.kozlowski@linaro.org>
- <ZBPYpYfd29YwN1Dy@gondor.apana.org.au>
- <b8cd828b-edc5-6748-bf97-af0fc85e14a4@linaro.org>
- <ZBQlKMTcTm1yjete@gondor.apana.org.au>
- <e7cd7252-9cc6-0970-b0e2-35fccde45e86@linaro.org>
- <ZBQvx0PDQJ4qpnNO@gondor.apana.org.au>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <ZBQvx0PDQJ4qpnNO@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 17/03/2023 10:15, Herbert Xu wrote:
-> On Fri, Mar 17, 2023 at 10:01:44AM +0100, Krzysztof Kozlowski wrote:
->>
->> That's not true. There is no waste because having it on x86 allows to
->> match via ACPI PRP0001. It's on purpose there.
-> 
-> Alright how about this, I don't have any OF devices on my machine
-> yet this structure is still taking up the extra memory for every
-> single device driver.  This is wrong.
-> 
->> There are OF-drivers used on ACPI and x86/arm64.
-> 
-> Well then they should be selecting OF and everyone will be happy.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   e6af5c0c4d32a27e04a56f29aad587e03ff427f1
+commit: e70a329832df84e25ed47cbdc5c96276331356b3 [21/74] crypto: ccree - Use devm_platform_get_and_ioremap_resource()
+config: s390-randconfig-r032-20230316 (https://download.01.org/0day-ci/archive/20230317/202303172304.WjoeTv4E-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 67409911353323ca5edf2049ef0df54132fa1ca7)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install s390 cross compiling tool for clang build
+        # apt-get install binutils-s390x-linux-gnu
+        # https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=e70a329832df84e25ed47cbdc5c96276331356b3
+        git remote add herbert-cryptodev-2.6 https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+        git fetch --no-tags herbert-cryptodev-2.6 master
+        git checkout e70a329832df84e25ed47cbdc5c96276331356b3
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=s390 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash
 
-OK, I will change it. It's a bit tiring to discuss the same concept with
-different maintainers and each time receive different point of view or
-each time need to convince that the other way is preferred. I already
-had such talks with Mark, so it is just easier change patch. Also, I
-tend to keep forgetting all the arguments. :)
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303172304.WjoeTv4E-lkp@intel.com/
 
-Let me just share also other maintainer's point of view:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=0e62470652fa
-https://lore.kernel.org/all/20230311183534.1d0dfd64@jic23-huawei/
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-Anyway, I appreciate your feedback and thank you for picking up the
-first patch. I'll rework this one.
+ERROR: modpost: "devm_ioremap_resource" [drivers/dma/qcom/hdma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+>> ERROR: modpost: "devm_platform_get_and_ioremap_resource" [drivers/crypto/ccree/ccree.ko] undefined!
+ERROR: modpost: "debugfs_create_regset32" [drivers/crypto/ccree/ccree.ko] undefined!
 
-Have a nice day!
-
-Best regards,
-Krzysztof
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
