@@ -2,102 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BD3C761A6
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Mar 2023 05:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD64CC6FD1F
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Mar 2023 14:44:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbjCRFN1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Mar 2023 01:13:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55218 "EHLO
+        id S230459AbjCSOou (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 19 Mar 2023 10:44:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbjCRFN0 (ORCPT
+        with ESMTP id S230289AbjCSOot (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Mar 2023 01:13:26 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2273455A4;
-        Fri, 17 Mar 2023 22:13:25 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id o11so7416158ple.1;
-        Fri, 17 Mar 2023 22:13:25 -0700 (PDT)
+        Sun, 19 Mar 2023 10:44:49 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F341CBFD
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Mar 2023 07:44:46 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id z21so37644975edb.4
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Mar 2023 07:44:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679116404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vp4nrXm1X0DRjVSq3iwlTb4e7n7mV7oF4ktjLlYr7kI=;
-        b=bLjj9lGgZpmi+5FdHB64/F5xCOboYww86flECThggnpLYmZZA5HqQTRQcFCfg+10a9
-         gaz0V+wmOBm7A4cV7oLOCRDbxttum/0tzDarTuJxSZ6b0oQFZkkdZCaIn52+gfS9b2Yf
-         ts32C0rszSNrP3uxXG8IdM/ODszWZAHT7PALtVns+aiy/RgUeeDJACOY+FyFgOggJsCW
-         3jmRnpxXRZt66+1XPq+2yFozVuTkCwGg+SKIJkvcZ+kSuSwAEGRfREOmD8Z3OMxHC6Wp
-         ED2E75u8Bob8l5+LtugWgjavAYlz579OG/4/c6aVO+NkY3Xv6UcxQ0mOKdJ/I/g3GwRF
-         Zcow==
+        d=linaro.org; s=google; t=1679237085;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wW0qmeq/XE/BS6QmstxltBCzT+Jl3DqWsgHErkJk2t4=;
+        b=ZhlRshRBEeF/ffBl7mjoVExBy1LfUW86EngFn+0SoXLDONYnFeB0RjOhvD740DDdAq
+         JiSAJjwb4kJ2Gg1MNMAr7Yyt/P8un0+y6PgqLhYkF4y5G4XC5Yl+O2vLHkHJ1NsiuEi6
+         m3+E+ocdJ7X3Q0VM1iCfXmtc1F0YNyXt29IMQEL9VlQ58NeLCQfKJ8HRcfugC3lphXKO
+         97ZOsbKI5k93f1iaVtpSgV3eu+AgDvQycjzPYCR4rZnsEGkIFfNuTAnnZS3EIyFUDF7k
+         Q+QzYf8F08tq7D5hITFBmi11FLRyGxJgEQOxrK0mjWV14KpUzoADlhh8h71votf0T5ud
+         4EZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679116404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vp4nrXm1X0DRjVSq3iwlTb4e7n7mV7oF4ktjLlYr7kI=;
-        b=eeRykUxBYJ4uCXDzh2z12yw0KqfONz6VrMRaRM80DS9tmGVb8pYksZjEJOuJ8YaZV3
-         syHlIOJMM7z4jl6URiAUfOAyui+Agt8fXvcvsFNprdQv2e9f6AtMs/mAuIyQntggs2T9
-         oE1xT22IJeBNYacrsSy7oCnZPUD9KIhRCV1KzrElYoGqAc6W1pXme2ss9T3nI5Twzs/M
-         cI04bwejD2ACjIkjduliYiOs+xUO/+MRUh6FkF/qNOf51Q/aICYimWJo3tEduGwLtAYp
-         L0mPy+EWyN7VGOoL2j1f45DSFrCT/XJtpBZS+qsXrerGSfTkIwGYQLqsb4oL2zrD+gEN
-         GIsw==
-X-Gm-Message-State: AO0yUKWYJX4Axz2VXbaLQN+MuUyvaiSY+VpIvunQ1zooNW808U/aiAsX
-        jIdg+5nDm83m2RnHSUVeUqw=
-X-Google-Smtp-Source: AK7set/soYLT1CHxH7Zm0HB+kkpyXNgNLr1rZsO1BZXpOWuxHpdfWc2Pxx1BGwMWxRV9sT22pll0Hw==
-X-Received: by 2002:a17:903:1d0:b0:19d:1d32:fc7 with SMTP id e16-20020a17090301d000b0019d1d320fc7mr11937833plh.51.1679116404399;
-        Fri, 17 Mar 2023 22:13:24 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id q20-20020a170902b11400b0019251e959b1sm2350530plr.262.2023.03.17.22.13.23
+        d=1e100.net; s=20210112; t=1679237085;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wW0qmeq/XE/BS6QmstxltBCzT+Jl3DqWsgHErkJk2t4=;
+        b=LV9cSm+9FVp4lGIRxr80PdP+PD//PF5MAU5WHrcFAo3O+cmG3n6Veu0BJGKptvD8do
+         aFOqH7txgzdeZHrzdG7KF+c2XmZOXkPB6E2cleJttMFcJvlyF+IK6ACASn7z+5qGrOcI
+         efdOIoKgJ7W3gv7OMauW2YPYRFLk33qWmV5ATMmdWxbkeqsoxxmxQywdLNP/9mD4RpNG
+         Ia1SU/vl3Xm35ucKGefxFgn8AyRk6mwdr2xhk8KTOUIOkw5V/19jRZo6FIoyExyE+2Gq
+         48lIcsARipAd5ODnKG6uVUiYs+LlUEGuO/RAMo0L8Rm/kBmv7bA0KCSPDaPN6XP9xoIw
+         QgOw==
+X-Gm-Message-State: AO0yUKXXiHyamo8IuuM9ljvObtOW2hFZFiJwLEAPjn9jsXwuGZYmtFX0
+        O2VAPeP3INbpDeA259q7x8Qg2w==
+X-Google-Smtp-Source: AK7set/pmi9WCvGGmALTUjSWYkn5du0UgMhSPpbj8Do3+1D2jofLLlk23MQcoCW8cchbqZBOkChFpw==
+X-Received: by 2002:a17:906:b349:b0:878:6b39:6d2a with SMTP id cd9-20020a170906b34900b008786b396d2amr6835060ejb.46.1679237084757;
+        Sun, 19 Mar 2023 07:44:44 -0700 (PDT)
+Received: from krzk-bin.. ([2a02:810d:15c0:828:5b5f:f22b:a0b:559d])
+        by smtp.gmail.com with ESMTPSA id t14-20020a508d4e000000b004d8287c775fsm3583165edt.8.2023.03.19.07.44.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Mar 2023 22:13:23 -0700 (PDT)
-Date:   Fri, 17 Mar 2023 22:13:22 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, isaku.yamahata@gmail.com
-Subject: Re: [PATCH RFC v8 03/56] KVM: x86: Add platform hooks for private
- memory invalidations
-Message-ID: <20230318051322.GF408922@ls.amr.corp.intel.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-4-michael.roth@amd.com>
+        Sun, 19 Mar 2023 07:44:44 -0700 (PDT)
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v2] crypto - img-hash: Depend on OF and silence compile test warning
+Date:   Sun, 19 Mar 2023 15:44:39 +0100
+Message-Id: <20230319144439.31399-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230220183847.59159-4-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 20, 2023 at 12:37:54PM -0600,
-Michael Roth <michael.roth@amd.com> wrote:
+The driver is specific to OF platforms (can match only via OF table),
+thus add dependency on CONFIG_OF.  Mark the of_device_id table as
+unused.  This also fixes W=1 warning:
 
-> In some cases, like with SEV-SNP, guest memory needs to be updated in a
-> platform-specific manner before it can be safely freed back to the host.
-> Add hooks to wire up handling of this sort to the invalidation notifiers
-> for restricted memory.
-> 
-> Also issue invalidations of all allocated pages during notifier/memslot
-> unbinding so that the pages are not left in an unusable state when
-> they eventually get freed back to the host upon FD release.
+  drivers/crypto/img-hash.c:930:34: error: ‘img_hash_match’ defined but not used [-Werror=unused-const-variable=]
 
-I'm just curios. Could you please elaborate?
-Unbind is happen only when memory slot is delete or vm is destroyed.  In the
-case of memory slot deletion, the gpa region is zapped via
-kvm_arch_commit_memory_region().  In the case of VM destroy, we have
-kvm_flush_shadow_all() which calls
-kvm_arch_flush_shadow_all() =>kvm_mmu_zap_all().  Doesn't it work?
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Thanks,
+---
+
+Changes since v1:
+1. Rework - depend on OF and add maybe_unused.
+---
+ drivers/crypto/Kconfig    | 1 +
+ drivers/crypto/img-hash.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 3b2516d1433f..4a4aff8b16f0 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -647,6 +647,7 @@ source "drivers/crypto/vmx/Kconfig"
+ config CRYPTO_DEV_IMGTEC_HASH
+ 	tristate "Imagination Technologies hardware hash accelerator"
+ 	depends on MIPS || COMPILE_TEST
++	depends on OF || COMPILE_TEST
+ 	select CRYPTO_MD5
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_SHA256
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index fe93d19e3044..2be364d9f592 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -927,7 +927,7 @@ static void img_hash_done_task(unsigned long data)
+ 	img_hash_finish_req(hdev->req, err);
+ }
+ 
+-static const struct of_device_id img_hash_match[] = {
++static const struct of_device_id img_hash_match[] __maybe_unused = {
+ 	{ .compatible = "img,hash-accelerator" },
+ 	{}
+ };
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.34.1
+
