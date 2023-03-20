@@ -2,106 +2,148 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1A4C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Mar 2023 19:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC346C6FD1C
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Mar 2023 19:36:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230486AbjCTT20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Mar 2023 15:28:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
+        id S229888AbjCTTgF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Mar 2023 15:36:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231131AbjCTT2I (ORCPT
+        with ESMTP id S229949AbjCTTfd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Mar 2023 15:28:08 -0400
+        Mon, 20 Mar 2023 15:35:33 -0400
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D80E4D290;
-        Mon, 20 Mar 2023 12:20:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 01D2E136CA;
+        Mon, 20 Mar 2023 12:30:20 -0700 (PDT)
 Received: from vm02.corp.microsoft.com (unknown [167.220.197.27])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 514A420FAEEE;
-        Mon, 20 Mar 2023 12:20:15 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 514A420FAEEE
+        by linux.microsoft.com (Postfix) with ESMTPSA id 6FB7E20FB1BC;
+        Mon, 20 Mar 2023 12:20:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6FB7E20FB1BC
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1679340017;
-        bh=A8MP232mgpqFknsi5z1EHp/um0O9piNlnFXZ1XPwixI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=fvw2Zl5oKSgTwYWfPzF5A6yUj+hii+FAxGG5HK+xZinQlv3/sUBicgu5/GwvdEeSp
-         9JyslSRpSMuSmdlgKJEDGFESJRgdJe+C2h5CMsnPqK6zLy7FfAARcIXbFDsi+/XzYy
-         pdy+rrTQqfnTu9YVtkEOjoS9Um63p6tB3Cu5kr68=
+        s=default; t=1679340031;
+        bh=yubtDMU1v+j6puBmAVgHQ5Fbx/QE7P8/F/J6/XMCF5I=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qRsn/jD8/Zhfxs1pKJpuzggNoPqR1eQ/83CCyFv542Int3WEAgis1VYGpxm8RnqUQ
+         4D05Nv7bUNSZ2kZfJQ4Q8bKcmJT9ZrvL9pFeAgj12h94reMER9x9GDNMjI0HnZ5Pnr
+         j95Ck8CVgd9rc9C0WxRtfkN+CKDfHxKsX4nGUk64=
 From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
         "Brijesh Singh" <brijesh.singh@amd.com>,
         "Tom Lendacky" <thomas.lendacky@amd.com>,
         "Kalra, Ashish" <ashish.kalra@amd.com>,
-        linux-crypto@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Len Brown" <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org
-Subject: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
-Date:   Mon, 20 Mar 2023 19:19:48 +0000
-Message-Id: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v3 6/8] crypto: ccp - Add vdata for platform device
+Date:   Mon, 20 Mar 2023 19:19:54 +0000
+Message-Id: <20230320191956.1354602-7-jpiotrowski@linux.microsoft.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
+References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch series introduces support for discovering AMD's PSP from an ACPI
-table and extends the CCP driver to allow binding to that device on x86. This
-method of PSP discovery is used on Hyper-V when SNP isolation support is
-exposed to the guest. There is no ACPI node associated with this PSP, so after
-parsing the ASPT it is registered with the system as a platform_device.
+When matching the "psp" platform_device, the register offsets are
+determined at runtime from the ASP ACPI table. The structure containing
+the offset is passed through the platform data field provided before
+registering the platform device.
 
-I thought about putting psp.c in arch/x86/coco, but that directory is meant for
-the (confidential) guest side of CoCo, not the supporting host side code.
-It was kept in arch/x86/kernel because configuring the irq for the PSP through
-the ACPI interface requires poking at bits from the architectural vector
-domain.
+To support this scenario, dynamically allocate vdata structs and fill
+those in with offsets provided by the platform. Due to the fields of the
+structs being const, it was necessary to use temporary structs and
+memcpy, as any assignment of the whole struct fails with an 'read-only
+location' compiler error.
 
-This series is a prerequisite for nested SNP-host support on Hyper-V but is
-independent of the SNP-host support patch set. Hyper-V only supports nested
-SEV-SNP (not SEV or SEV-ES) so the PSP only supports a subset of the full PSP
-command set. Without SNP-host support (which is not upstream yet), the only
-PSP command that will succeed is SEV_PLATFORM_STATUS.
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+---
+ drivers/crypto/ccp/sp-platform.c | 57 ++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-Changes since v2:
-* Added links to ASPT spec and ACPICA commit
-* Added acked-by Tom to all commits
-Changes since v1:
-* move platform_device_add_data() call to commit that introduces psp device
-* change psp dependency from CONFIG_AMD_MEM_ENCRYPT to CONFIG_KVM_AMD_SEV
-* add blank lines, s/plat/platform/, remove variable initializers before first
-  use, remove masking/shifting where not needed
-* dynamically allocate sev_vdata/psp_vdata structs instead of overwriting static
-  variables
-
-Jeremi Piotrowski (8):
-  include/acpi: add definition of ASPT table
-  ACPI: ASPT: Add helper to parse table
-  x86/psp: Register PSP platform device when ASP table is present
-  x86/psp: Add IRQ support
-  crypto: cpp - Bind to psp platform device on x86
-  crypto: ccp - Add vdata for platform device
-  crypto: ccp - Skip DMA coherency check for platform psp
-  crypto: ccp - Allow platform device to be psp master device
-
- arch/x86/kernel/Makefile          |   1 +
- arch/x86/kernel/psp.c             | 219 ++++++++++++++++++++++++++++++
- drivers/acpi/Makefile             |   1 +
- drivers/acpi/aspt.c               | 104 ++++++++++++++
- drivers/crypto/ccp/sp-dev.c       |  65 +++++++++
- drivers/crypto/ccp/sp-dev.h       |   4 +
- drivers/crypto/ccp/sp-pci.c       |  48 -------
- drivers/crypto/ccp/sp-platform.c  |  76 ++++++++++-
- include/acpi/actbl1.h             |  46 +++++++
- include/linux/platform_data/psp.h |  32 +++++
- 10 files changed, 547 insertions(+), 49 deletions(-)
- create mode 100644 arch/x86/kernel/psp.c
- create mode 100644 drivers/acpi/aspt.c
- create mode 100644 include/linux/platform_data/psp.h
-
+diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+index 5dcc834deb72..2e57ec15046b 100644
+--- a/drivers/crypto/ccp/sp-platform.c
++++ b/drivers/crypto/ccp/sp-platform.c
+@@ -22,6 +22,7 @@
+ #include <linux/of.h>
+ #include <linux/of_address.h>
+ #include <linux/acpi.h>
++#include <linux/platform_data/psp.h>
+ 
+ #include "ccp-dev.h"
+ 
+@@ -86,6 +87,60 @@ static struct sp_dev_vdata *sp_get_acpi_version(struct platform_device *pdev)
+ 	return NULL;
+ }
+ 
++static void sp_platform_fill_vdata(struct sp_dev_vdata *vdata, struct psp_vdata *psp,
++				   struct sev_vdata *sev, const struct psp_platform_data *pdata)
++{
++	struct sev_vdata sevtmp = {
++		.cmdresp_reg = pdata->sev_cmd_resp_reg,
++		.cmdbuff_addr_lo_reg = pdata->sev_cmd_buf_lo_reg,
++		.cmdbuff_addr_hi_reg = pdata->sev_cmd_buf_hi_reg,
++	};
++	struct psp_vdata psptmp = {
++		.sev = sev,
++		.feature_reg = pdata->feature_reg,
++		.inten_reg = pdata->irq_en_reg,
++		.intsts_reg = pdata->irq_st_reg,
++	};
++
++	memcpy(sev, &sevtmp, sizeof(*sev));
++	memcpy(psp, &psptmp, sizeof(*psp));
++	vdata->psp_vdata = psp;
++}
++
++static struct sp_dev_vdata *sp_get_platform_version(struct sp_device *sp)
++{
++	struct psp_platform_data *pdata;
++	struct device *dev = sp->dev;
++	struct sp_dev_vdata *vdata;
++	struct psp_vdata *psp;
++	struct sev_vdata *sev;
++
++	pdata = dev_get_platdata(dev);
++	if (!pdata) {
++		dev_err(dev, "missing platform data\n");
++		return NULL;
++	}
++
++	vdata = devm_kzalloc(dev, sizeof(*vdata) + sizeof(*psp) + sizeof(*sev), GFP_KERNEL);
++	if (!vdata)
++		return NULL;
++
++	psp = (void *)vdata + sizeof(*vdata);
++	sev = (void *)psp + sizeof(*psp);
++	sp_platform_fill_vdata(vdata, psp, sev, pdata);
++
++	dev_dbg(dev, "PSP feature register:\t%x\n", psp->feature_reg);
++	dev_dbg(dev, "PSP IRQ enable register:\t%x\n", psp->inten_reg);
++	dev_dbg(dev, "PSP IRQ status register:\t%x\n", psp->intsts_reg);
++	dev_dbg(dev, "SEV cmdresp register:\t%x\n", sev->cmdresp_reg);
++	dev_dbg(dev, "SEV cmdbuf lo register:\t%x\n", sev->cmdbuff_addr_lo_reg);
++	dev_dbg(dev, "SEV cmdbuf hi register:\t%x\n", sev->cmdbuff_addr_hi_reg);
++	dev_dbg(dev, "SEV cmdresp IRQ:\t%x\n", pdata->mbox_irq_id);
++	dev_dbg(dev, "ACPI cmdresp register:\t%x\n", pdata->acpi_cmd_resp_reg);
++
++	return vdata;
++}
++
+ static int sp_get_irqs(struct sp_device *sp)
+ {
+ 	struct sp_platform *sp_platform = sp->dev_specific;
+@@ -137,6 +192,8 @@ static int sp_platform_probe(struct platform_device *pdev)
+ 	sp->dev_specific = sp_platform;
+ 	sp->dev_vdata = pdev->dev.of_node ? sp_get_of_version(pdev)
+ 					 : sp_get_acpi_version(pdev);
++	if (!sp->dev_vdata)
++		sp->dev_vdata = sp_get_platform_version(sp);
+ 	if (!sp->dev_vdata) {
+ 		ret = -ENODEV;
+ 		dev_err(dev, "missing driver data\n");
 -- 
 2.34.1
 
