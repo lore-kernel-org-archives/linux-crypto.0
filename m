@@ -2,157 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8930C7618A
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Mar 2023 09:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2363DC7618A
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Mar 2023 10:46:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjCTJbQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Mar 2023 05:31:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46836 "EHLO
+        id S230340AbjCTKqO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Mar 2023 06:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjCTJbP (ORCPT
+        with ESMTP id S230428AbjCTKpv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Mar 2023 05:31:15 -0400
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2079.outbound.protection.outlook.com [40.107.22.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C117126F2;
-        Mon, 20 Mar 2023 02:31:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OBjyrK/Hxo1+LG+VOGp4dFUm28bcaYN7bmk5/dpLizRCyBuGMChoB5laJ/bZ+dgiTvZ/NgawtmBnbh3fowyC8sa0s89RxiwmJX0zxPdOCwEQpQFS0ev+DjMuLLiMy63FRNgjOXtxQ1P+I4boVH1HMC3VpPfNeRXo8HRJbqzfx0fkwPDttxo9yUFZe7gg2wXD14YG4iCipnzzk2s9yb5OcvI57PZhFrRrNfzdfskw+kShStsXN1fpiKsvAbNz470YcqZGHQo/xWS1HBhsDXofNoyLHfILMT9KXlkLW+0FCBuJ72ktERJuvLHUIINC5j3VYFlAuu4Xd1lt8DRTMFD7Cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HvlGAbCRl8Lrr5cO5zhmeFe9/ypxS28cV24o1Shc38g=;
- b=UMyncatFtTaWEUn0AfQXTpp31wp/IaVG4b2YFtD+NlpZk003JCZ10TlBReJzVL9BdAEfNjTeLIAGDh4mQjfWzK3E9L5hZp+RjkLkAhlqYxGZDAWo8zE6FQMA/YE37kSRdTxw2YsdBdCs2MJeCmgj49t3lZm5hgDFbN9Y/LAYw3i1pKxgsyVmjRpHW3hF/hGva5tFvV+k4tybA0I8LBTRqqnUaiQYPhSW6UuQyYrnF5Iu9tsz98wQwigfynmWmrIUsNMShV0bn5mtAVZgDLnhLgM0usuLx6gycVQkRLzy1jVITj03MB2Bnc+GCjbO68mQMBc0jI3zGmY15Ts1DzCFsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HvlGAbCRl8Lrr5cO5zhmeFe9/ypxS28cV24o1Shc38g=;
- b=fd71Ns+43hRHl8hFLEcdQXlt1WFf0W0XEWewE1Qd53CYRgR00pqvqs3X93STOyic7RvPJt5tYl+dlR0DstdCiK6kE/Ps8+/wGiKkvg5Gm9LCdDGlG/y1uLvKaUTH4nUl1gG8ELQwJGQblwVwXj75UoXfoWKoNJBiTnQwkQtMBvY=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by VI1PR04MB6832.eurprd04.prod.outlook.com (2603:10a6:803:139::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Mon, 20 Mar
- 2023 09:31:10 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::c2c7:5798:7033:5f87]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::c2c7:5798:7033:5f87%7]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
- 09:31:10 +0000
-From:   Gaurav Jain <gaurav.jain@nxp.com>
-To:     Yu Zhe <yuzhe@nfschina.com>, Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "liqiong@nfschina.com" <liqiong@nfschina.com>
-Subject: RE: [EXT] [PATCH] crypto: caam - remove unnecessary (void*)
- conversions
-Thread-Topic: [EXT] [PATCH] crypto: caam - remove unnecessary (void*)
- conversions
-Thread-Index: AQHZWJr2GFYKyb+ilkyJEsC+bgKkFK8Da/qw
-Date:   Mon, 20 Mar 2023 09:31:10 +0000
-Message-ID: <AM0PR04MB600425038BDAE435B44E60A3E7809@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <20230317063643.27075-1-yuzhe@nfschina.com>
-In-Reply-To: <20230317063643.27075-1-yuzhe@nfschina.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|VI1PR04MB6832:EE_
-x-ms-office365-filtering-correlation-id: b0fe6c42-2be3-4911-4ead-08db2925d70e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: f30rG2CDzuI81aPHoIwdz/oVuwCJ580/N1WdSgub5QA4FcI06DJBiS04pqUxMr7KvroBoqgkTPGoWvrjK+97+8V9nKdJSC5K1NWOSXIhpFQuTxGhbqywvarzoVgX/BrexgvD6rP7/bhNcX5PCiXWdwKOcc3KwvDh7rSjlslokkwSY9boLAx889zREpchF91JOAqt2LNV+7cp6+EkoGqOv0Ii5RjxmPNkCdF3drAMmrcnHOiWfmIsFuu3Ijj2JROBiq/Vw5GXD2/BlHLMqBwjNpT/2sTjZv6+bYBJlExZvLLdEIHQzKtcMCTLjC5+7zCSDBrUrBA5lwZAUeEJUMHZhe2HclB2Ei3Z94nTC+LsbWkOlNo8kAR0DUMoCYPSIOAjdONbXz8dw+6w7f+simirrtNrDymyoUmcbHpbZEK1w6jylpjCV6kS0IRylrMyVpO4c8lmMvpJZidKKYMgBWBIHaFTcb3fFWJvF3GxIQWp5RSXG2nZKge+Rui1caz4sQL/ze6Ugqr2qmUkFcJ2nV3/ckjobIxmPN0S5Ue9SPBZzNDyRX59PkLRlpRJAAg+1jYzRMp282xczWhEC6E75uTrSo+8G5oirqvuse0Ctxmlq8I1WAlLWNTYL7Rr3WVz4H/vzafOwwCWwo4M+ssdFyceb9G4swE9sA4TeJj1juGm5YdfayXXsdab/vhBdd28Yj/nOKo2FPbD4Y2Nv3M5aK2StQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(366004)(136003)(346002)(39860400002)(396003)(451199018)(8936002)(5660300002)(44832011)(52536014)(41300700001)(55016003)(86362001)(33656002)(38070700005)(38100700002)(2906002)(122000001)(4326008)(83380400001)(478600001)(71200400001)(7696005)(186003)(26005)(6506007)(53546011)(55236004)(9686003)(54906003)(110136005)(316002)(66476007)(8676002)(66556008)(66946007)(64756008)(66446008)(76116006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?4cSZR0FN5BNt8ddEjABAtcvmIGw8TEJK8eZdqRBCeQlCHFf9+AoOK5PGO6Tm?=
- =?us-ascii?Q?3EQBsDWdVcLIAVSC89JwPLepbP/SgNWe/QNVy9zhjCij9OFyGbqQllzi+F1L?=
- =?us-ascii?Q?TNj25q4mcqkWi7Qnpm5phHIqpQrP0maCmtRF60Sv3q6af0hG8wHWyKVLVbRk?=
- =?us-ascii?Q?7nxXr+og+JaYqC9z+KuVkSEzl88E0nl/TDlQgyrsGkCb+Ivd9Ulmc+ii/sKk?=
- =?us-ascii?Q?md1WHhRJN7nZVXeukhf14TgBGH6ObNv4rQ5mOLE4wNjB4Wt/pMD+ixbGQD5k?=
- =?us-ascii?Q?Qaag7YjsfRYA6KZM+DPHV4Am9DV1bDXd/ISwPuVZ45X342pF0YmH8TQYk5cM?=
- =?us-ascii?Q?dKYACTJzpyK1sU9v+6UGxx8KRNg2bwkvP/xoOeX5XB9ZgVvOJalvXnHwkm3Z?=
- =?us-ascii?Q?T8NuqUp2vuP4W8FslMscxQTFwPVJwVKfLWdjSNaVEuaPA3KsCp0PB4g9iEWr?=
- =?us-ascii?Q?Ttzeu0UlGGR7NNY230Lmk/idKxaEq2K+zk7/v5NhWkO84TMjiYpEvmMu3Ifb?=
- =?us-ascii?Q?jeOGzBzzu7SeVxwlAcisQgFa9L1/ZFnf2faFrUvc6bDiGiEqLDxACvvPSbAX?=
- =?us-ascii?Q?od4uK/DXyDKg0oYE+j69Qo/TYs6SB0QJmbnZxrC0dwk/9JKg+28Webgg/ZIm?=
- =?us-ascii?Q?DnwIMrLPwkjsp8kR6qmltLx/OaEq/Znj3VnFnGsHbxx95aPqhjtOX2kp2WPe?=
- =?us-ascii?Q?FL7tmtYpMAgxCntVp+UbHwqS6xExz3XhAxIMRxMySbPVJwyjQGf1Lsu8f/W6?=
- =?us-ascii?Q?DfPoSX1L8sfaIchQMGAIPsX53HiIzua2j3i2A9Xzypufl3XDTfQZg8/XcLPT?=
- =?us-ascii?Q?dI4KLwyB0e9JojrGcK3qHh7i5zVwGvzRoMElLd7RutW4GD+VtrGnYp8c+7fx?=
- =?us-ascii?Q?HDPpoBW3PyCxsFQg9dZEilAOdJHZlb5FYlRVu+LdzrdipnZefgoRPEQILLcJ?=
- =?us-ascii?Q?LeRBC9qU3KZ8EqAjlvDKEbBRUHFGF+txjI4E45xweqmGuwLEKWr/pljoDmPR?=
- =?us-ascii?Q?gOPOmVqgjMwATvJ1r1SacOn+4J5Aps+vrq7FBAqOBSv/8frmV30K4LTA3g3n?=
- =?us-ascii?Q?+J12MyBJ8mpFx9pYtdAMaJXF5ttzY2HYTSyS81qXPcNh79NYyfLp+A1MpIOZ?=
- =?us-ascii?Q?2H673A8NTroH0GOcIxAsdKk95f4p/YnYTj4ullIqKApDCEHqbEQnysDXDUvw?=
- =?us-ascii?Q?F2FqdVF9GPHsAZYXheDI1fdB7nUCQWDqv5R1wqX8YfxMyka24uQ/J/doIxwd?=
- =?us-ascii?Q?6mEcqgkJioBiRL9kY5HH6bYPHyGHI5TnECEf4AZgIMDzthIPrN8+DcJ/90cI?=
- =?us-ascii?Q?sH2mvtg5eZb77fTu8c4Nx7JBAzvg94fHZnym88ax4ocYEL2NqMkLM7mMJIr0?=
- =?us-ascii?Q?jArlZzTnx6WMGLmUdNv4e9V2qd3V6M5WpBoSa3b9WaQDy+ucQeX5fiQhB2KQ?=
- =?us-ascii?Q?4z6r7zxMaarVkB5HrwqYS/Y80e9K5qVh6JcORU6JrIsS0unxlyyeAjWWjvx5?=
- =?us-ascii?Q?Ae0ym9KRu4QWUZeLScwZXE5o14wrloajrcpplCAUpgloAqOZnap2n7a18Opv?=
- =?us-ascii?Q?dlsHNuSlRr0IWrpWVqJ1CW0XXBxeU5Zs0wBN1Tdd?=
-Content-Type: text/plain; charset="us-ascii"
+        Mon, 20 Mar 2023 06:45:51 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20E57A9D;
+        Mon, 20 Mar 2023 03:43:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Date:MIME-Version:
+        Content-Transfer-Encoding:Content-Type:References:In-Reply-To:To:From:Subject
+        :Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
+        bh=S6PJWXorYfxubci0Llo4uduSyji2uSjy0wjtwS9/tr8=; b=aROtAmz/Rxblox23+2ut2cqkb6
+        sJNg3+qL1gw1ETWn6T8umzSrt1A2B+jolBZ6Q/mbL1Q1JgLvCbnHg3R/0jYt8gyF3k+Q00zD3KRiY
+        zDSMxK5AOLVsFA9gJIKqJe6yw+x+CcYUala7PIt9nTnwEFAuj28EuLQy0WANsgGQ6pthweqFFka9Z
+        EekcbYXTN6HN9kB+aQ8o0vVqYeikpetPHQL4/sAZ2Rjaa5nTPiOLLmVRbF7aB9mES5p9iC8PPHMeC
+        AV1HwEbRa/FXTW4udynlYKX+QZ0CCrKy5ZQOGlJ1IRr9EAQQMEYv/c943lcMusLj9/SMkSXNnvV2M
+        t/on2o8A==;
+Received: from [54.239.6.186] (helo=edge-cache-203.e-hkg50.amazon.com)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1peCy4-003tXs-0r;
+        Mon, 20 Mar 2023 10:42:20 +0000
+Message-ID: <8e05c7e2af238cdbcce1177e8684e192a71421b9.camel@infradead.org>
+Subject: Re: [PATCH v2 0/2] [RFC] virtio-rng entropy leak reporting feature
+From:   Amit Shah <amit@infradead.org>
+To:     bchalios@amazon.es, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, sgarzare@redhat.com,
+        amit@kernel.org, graf@amazon.de, xmarcalx@amazon.co.uk
+In-Reply-To: <5441d09dc213998042a337b7f411bd1662b604bc.camel@infradead.org>
+References: <20230131145543.86369-1-bchalios@amazon.es>
+         <Y9lBeymca9eFaJ33@zx2c4.com>
+         <65d872db2e1be29bb03b43ed606e7cc9e74ec08d.camel@infradead.org>
+         <e1c03136-b873-1f1d-8b06-d9186566fc0c@amazon.es>
+         <5441d09dc213998042a337b7f411bd1662b604bc.camel@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0fe6c42-2be3-4911-4ead-08db2925d70e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2023 09:31:10.1312
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fpKkBkH7Sh9UCh08WP9k5/DJhTQZF+ZuoJgYP1CBdJWqe6zxgEfjo5kmFrWa1soA8kvUQewEoYJavvGoLm49wQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6832
+Date:   Mon, 20 Mar 2023 11:42:02 +0100
+User-Agent: Evolution 3.44.4-0ubuntu1 
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reviewed-by: Gaurav Jain <Gaurav.jain@nxp.com>
+On Mon, 2023-03-13 at 19:05 +0100, Amit Shah wrote:
+> Hey Herbert / Jason / crypto maintainers,
 
-> -----Original Message-----
-> From: Yu Zhe <yuzhe@nfschina.com>
-> Sent: Friday, March 17, 2023 12:07 PM
-> To: Horia Geanta <horia.geanta@nxp.com>; Pankaj Gupta
-> <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
-> herbert@gondor.apana.org.au; davem@davemloft.net
-> Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; kernel-
-> janitors@vger.kernel.org; liqiong@nfschina.com; Yu Zhe <yuzhe@nfschina.co=
-m>
-> Subject: [EXT] [PATCH] crypto: caam - remove unnecessary (void*) conversi=
-ons
->=20
-> Caution: EXT Email
->=20
-> Pointer variables of void * type do not require type cast.
->=20
-> Signed-off-by: Yu Zhe <yuzhe@nfschina.com>
-> ---
->  drivers/crypto/caam/dpseci-debugfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/caam/dpseci-debugfs.c
-> b/drivers/crypto/caam/dpseci-debugfs.c
-> index 0eca8c2fd916..020a9d8a8a07 100644
-> --- a/drivers/crypto/caam/dpseci-debugfs.c
-> +++ b/drivers/crypto/caam/dpseci-debugfs.c
-> @@ -8,7 +8,7 @@
->=20
->  static int dpseci_dbg_fqs_show(struct seq_file *file, void *offset)  {
-> -       struct dpaa2_caam_priv *priv =3D (struct dpaa2_caam_priv *)file->=
-private;
-> +       struct dpaa2_caam_priv *priv =3D file->private;
->         u32 fqid, fcnt, bcnt;
->         int i, err;
->=20
-> --
-> 2.11.0
+[...]
 
+> Let's wait a couple more days for responses, otherwise I suggest you
+> resubmit to kickstart a new discussion, with the note that Jason had
+> something else in mind - so that it doesn't appear as though we're
+> trying to override that.
+
+I reached out to Jason on IRC, and he mentioned he will follow up with
+a patch that incorporates ideas from your patch plus hooking into
+random.c.  Sounds promising!
+
+		Amit
