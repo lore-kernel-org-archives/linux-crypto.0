@@ -2,43 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DE7C74A5B
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Mar 2023 05:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E45C7619A
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Mar 2023 05:35:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbjCUFfh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Mar 2023 01:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52830 "EHLO
+        id S229972AbjCUFfi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Mar 2023 01:35:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjCUFfg (ORCPT
+        with ESMTP id S229798AbjCUFfh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Mar 2023 01:35:36 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2057.outbound.protection.outlook.com [40.107.102.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3EA620067;
-        Mon, 20 Mar 2023 22:35:31 -0700 (PDT)
+        Tue, 21 Mar 2023 01:35:37 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on20609.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::609])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FACC20558;
+        Mon, 20 Mar 2023 22:35:33 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=c2TZceIACovO4U9L+T+KyTsUW8+hzaAUAsp+Irwx+UnSz81G8o7h7fP7Wc6IRgNPVYqiahQcq4vxI52adA9x5QKC6EpPtVMnW4tma61XHt59QnBhzFoQRvdHK2cWM6h7v4vkyoo1BGfz1LlsbMmyer2XvHz2YIwAhu0mpxVJljDtwzHznmwdhsd++3Ty6cjQ52UnUtBnyes3fPeS+gpmcRVRiYEq+Le2lEtgE4bRq2pnzIykwDAjBpsBHsSVm0NmrIyEm3M8YMZ6f5ppP6pcm5tg07Zx0xgSITXxEqQxE4gPZkoV6GksJC6+GHjZZHqud22ecx4IY3ln1ZS/gkrm0w==
+ b=LnNd64PEdw0/VUSbeTlAkY7wj/qsJ7HK84wAgCai49zbH9RPxNh82k0NUxJ07Mkjww3K2SG4q0MDja5OBlZ9J4bAoq+Apv8bB1ANl/ribe0Xv0VMcvlu+Cr72Zrcgp/qfsb2GCtAhipsOsTCkUI71CHMZLmLKvyAVGfJvRlNcCqw4LI4UPc4RO/M9++GY6DcnfRUQufwhcj8S/HWKy/G2yqySwazz6sZyt8q+RO+AAGNrJF1/1fLQHRKKdr4QmepvAaqloDNWZB7ooUZ1AicK09fDkKZtRgTQh0LWWCeY23kTEswxpFe3GQCZZPVubfn7uFevT2PQtfhg+8b9brAag==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8loD21eoObdxkdy1USh64SVrdam9+M2IedaBGHLJ0kI=;
- b=PQVgTp8OE6AI2gfT6Hh9WvebDBw5BCaHxo0uXnqPl1lPbMU/37U0fD2c4j3jiUZ+C3bSRc954ZvKKMLqDiKQwA3rxm4Dp0QA5F82My8yOYVEeLHQ9NrE3we+5Ytisk3vZbOrvVIewGDwTI33Kd8lyyr7JHq2yrKnuCTPnhtYZWkTWij0rWlu3oEEItfDJWWn7SMFVPYgB17/g5vIBEMer88/yHffa8E/kWpNqFZQCsRdMV7Fax89ziPK6iZsv+obRwCIoETlrIB1D53xLQklt9eSlrNYo/XyyW3LE4LO9pwukhzo+6CVtBxgwdG7xeE1zGGNNmFfpoZBR3QR3px+fA==
+ bh=a+32JL4z6VCwxwNdn8N0KRNJgVpYcqDdowZPrraSXbA=;
+ b=E63duK7YtOAWpSVRAty/f04VUs7WWqbeoTnJ3JB4kEng9IM5hHshpZ2apDzMPo3W2V66gZip79h+3JjlVRz3cO+rjhyQr75P/U/JF+4JddtDTQcf2R6SiApFQtN2yISKqvIodY1LLa6ybO6xq8l4rscsM0o1Aj8m20Fbn/qcnwqb9p09EcGurVSpXtW6aErGcTGiT4rn720VWAlCaagcAtyFzkSX8wHWZHJZkxRN4mqOuNSmVmzHDwzDrtdNofLHhJiTnZgm+AHYYaaRi0rfnSXSX1zYilP4O70Tg72MRfmDqBwuWDiha9pHaTqkwsVMJDcWqvb0dOBDWKcsAS0Bcw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8loD21eoObdxkdy1USh64SVrdam9+M2IedaBGHLJ0kI=;
- b=JQEQQfn9WPMw3JJCJHzb2Usvkxie59nBpY1PixbfdYoRdX6LwB0qxFBzeHfq0EJ2Sjr67Xjk/US//KeIxgODDocWZdrSeACmVwWZxKRVuG6eZt56K8+NmKWvsye47k7Wzft3zYMXlot5A3+A3xHPlyQYAAR25HRQeNYwDSAyV+A=
-Received: from DM6PR06CA0057.namprd06.prod.outlook.com (2603:10b6:5:54::34) by
- CY8PR12MB9034.namprd12.prod.outlook.com (2603:10b6:930:76::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6178.37; Tue, 21 Mar 2023 05:35:29 +0000
-Received: from DS1PEPF0000E64C.namprd02.prod.outlook.com
- (2603:10b6:5:54:cafe::64) by DM6PR06CA0057.outlook.office365.com
- (2603:10b6:5:54::34) with Microsoft SMTP Server (version=TLS1_2,
+ bh=a+32JL4z6VCwxwNdn8N0KRNJgVpYcqDdowZPrraSXbA=;
+ b=tpzNAONyAxLplI7e52Jn0iV3XHW8pNYpN8fc8In2foJArqivAWJss1yrmAJOfcmN/m3i6/s6yMr9GxHWjFi5jiD5N3VKNXEBWR4kQKQhdaTvmxVCNssVp3FePWEOB6Fu/Y+O/ggqsceYYbWQtzswdCY1Vswi6AUEYON6k1NP9P8=
+Received: from DM6PR18CA0031.namprd18.prod.outlook.com (2603:10b6:5:15b::44)
+ by BY5PR12MB4052.namprd12.prod.outlook.com (2603:10b6:a03:209::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Tue, 21 Mar
+ 2023 05:35:26 +0000
+Received: from DS1PEPF0000E648.namprd02.prod.outlook.com
+ (2603:10b6:5:15b:cafe::bd) by DM6PR18CA0031.outlook.office365.com
+ (2603:10b6:5:15b::44) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37 via Frontend
- Transport; Tue, 21 Mar 2023 05:35:28 +0000
+ Transport; Tue, 21 Mar 2023 05:35:26 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,135 +47,81 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF0000E64C.mail.protection.outlook.com (10.167.18.42) with Microsoft
+ DS1PEPF0000E648.mail.protection.outlook.com (10.167.18.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6178.30 via Frontend Transport; Tue, 21 Mar 2023 05:35:28 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
+ 15.20.6178.30 via Frontend Transport; Tue, 21 Mar 2023 05:35:25 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 21 Mar
- 2023 00:35:28 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 00:35:15 -0500
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 21 Mar
- 2023 00:35:27 -0500
+ 2023 00:35:14 -0500
 Received: from xhdharshah40.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
- Transport; Tue, 21 Mar 2023 00:35:18 -0500
+ Transport; Tue, 21 Mar 2023 00:35:04 -0500
 From:   Harsha Harsha <harsha.harsha@amd.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>, <michals@xilinx.com>
 CC:     <saratcha@xilinx.com>, <git@amd.com>,
-        Harsha Harsha <harsha.harsha@amd.com>,
-        Dhaval Shah <dhaval.r.shah@amd.com>
-Subject: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP RSA API for RSA encrypt/decrypt operation
-Date:   Tue, 21 Mar 2023 11:04:44 +0530
-Message-ID: <20230321053446.4303-3-harsha.harsha@amd.com>
+        Harsha Harsha <harsha.harsha@amd.com>
+Subject: [PATCH V2 0/4] crypto: Add Xilinx ZynqMP RSA driver support
+Date:   Tue, 21 Mar 2023 11:04:42 +0530
+Message-ID: <20230321053446.4303-1-harsha.harsha@amd.com>
 X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20230321053446.4303-1-harsha.harsha@amd.com>
-References: <20230321053446.4303-1-harsha.harsha@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E64C:EE_|CY8PR12MB9034:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6a27238f-3e0a-40c8-90c3-08db29ce14a4
+X-MS-TrafficTypeDiagnostic: DS1PEPF0000E648:EE_|BY5PR12MB4052:EE_
+X-MS-Office365-Filtering-Correlation-Id: 225338d7-fc90-4223-905d-08db29ce12ac
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +Cm9wWpJMcJstTzcY3MoCJP9Br6GdlpCm0JMlpcEexSlNZS581tx2+jIRNxLmmF24bNDpgUBI/mVNn0nf6vY3V1xWAOSRtUsL3gNGiqqP7w6sEpJEiikrAh1q6LF/RoclUL3dKkjWt/2KMhaDI4hAvrQYr8Ve79wOwKeNU0V9pAT/Mf8LN33DXHQLayd4Es17MJvsIlsE8DScgr53P9Txx5ZjOM566QRH+pUR87DJ6HFxTW3ua6ejBATtnUFEx9g96Ec2+FXZ5CKEUaqGn928aJuGwt1g3uuQTQ7qCKESFR1R0+kXeyq4imHMDUIEMD2XoQdath3u+PoeYHOJMcQLn3GgA6k+B1Ao09+obhfaZtLzrAxvaztlzgn+OYwncYdc35+pi13zaWjs8pts8t39PzdTxnIvCBm/9DBoiY5+dVbQzu5Tr9irlyAnHg9BliXGRau8d/4uI+3c+8LjoVsbM0RTgV4cpUgE2r0drqDYXxZOmC57u5erJmTHzqjF2/Zm4CZ4HwKzmU13hFZ7rMm0LwT7AZUY+fXIxcMYeYiPTZyGD9uRKDXolm4Q2km0C5fo5vn4svwXaw51QxTvRpcrg7E2/8+0hqGDcVc2mZu8y8hdrInz205BR3etCV/SLzRid1cGnCTGdtJeDg699HHrmHYOoL4pjEZCo2/U1bvRk/QsatAOreWqZfxT4B47koMYI6wstxvjLaR8CYkNPLkOacj21UHF48xnO1KXFj5LMwVcrpd9oVFtRv7rSUjBNC+
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(396003)(376002)(136003)(346002)(451199018)(36840700001)(46966006)(40470700004)(110136005)(336012)(1076003)(2616005)(26005)(47076005)(426003)(6666004)(8676002)(4326008)(316002)(83380400001)(186003)(70206006)(70586007)(54906003)(478600001)(8936002)(5660300002)(82740400003)(44832011)(81166007)(2906002)(41300700001)(36860700001)(356005)(82310400005)(86362001)(36756003)(40480700001)(40460700003)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: bm7PI79tZLJ/XIYz/gpl/CXWPbIXMZs09nA0bmo32AOTABmgmw2gDj/Bd8NLfR9waVQcuJYqSi0Lw8BUab/MGFKpoNdxRJ2oFq8Q32PXu1h/P3sTf5JTriOts6vCoNCuQocOT8UPoqfpVOzmPC4IgXA+3usJ3mBSBOoQuX/N0hgArTArr4eDePmZvfiQRnuHvButOgbJM8AgQJL+cvtU+UwKVnwxlnyCcychj4Njwdr0+HhSEIoTbzu1ehWOfXPRzhgyb1lM6VkylyoSbM5MuKqO5P+UEKPq31sVaPZ1GK8Gfid0hhU7kDBcYTYfQiOSNdHhpJ1tPfzIWVuU9lLOCieSp80EZvpqzlxyP/JdRYHTrQen90W0LrCw/MwpJjYHj24UptscdIQZD/QCzOPZ2iVkSSoOmLtjISKDadMavW3pKm1FktKH2fGaaAY8RrLkTXhl3nVK9QFsn5gPOUsgLm8O4xmanSUHuzdAynBR6ykTdqKg6eW70Fl13/fpfz7HwaiO7tA2ILnB0ZD3NG99t0FBZ/PVkVk6ORkRzUgzNeSpviRc7EIQRbV/4CNRlivM4ItS40UGzjGZmL3BDUAHVK9yNjahlkJp3pEsI0ZM4aykvjt8vk9tnNGni1TSmYOyfwpbriRee7C6WsDJLG2WZXdHNzWxfre5bduoSjcfKacIP49oqvslhOooQmt6B/5R0sa841s/9Txicv16+olH0CE+vkRsAtpog3pYwM1RlzPFlfNi8i60VE/2RZSQtiBc
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(376002)(396003)(346002)(136003)(39860400002)(451199018)(36840700001)(40470700004)(46966006)(86362001)(356005)(40460700003)(4326008)(36756003)(41300700001)(54906003)(70586007)(316002)(8936002)(4744005)(8676002)(44832011)(70206006)(110136005)(478600001)(5660300002)(82310400005)(426003)(2906002)(36860700001)(83380400001)(82740400003)(6666004)(186003)(26005)(47076005)(1076003)(336012)(81166007)(2616005)(40480700001)(2101003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2023 05:35:28.8606
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2023 05:35:25.5576
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a27238f-3e0a-40c8-90c3-08db29ce14a4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 225338d7-fc90-4223-905d-08db29ce12ac
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E64C.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E648.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB9034
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4052
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add zynqmp_pm_rsa API in the ZynqMP firmware to encrypt and decrypt
-the datai using RSA hardware engine for ZynqMP.
+This patch set does the following:
+  - Get the SoC family specific data for crypto operation
+  - Adds communication layer support for zynqmp_pm_rsa in zynqmp.c
+  - Adds Xilinx driver for RSA Algorithm
+  - Updates the list of MAINTAINERS
 
-Signed-off-by: Harsha Harsha <harsha.harsha@amd.com>
-Co-developed-by: Dhaval Shah <dhaval.r.shah@amd.com>
-Signed-off-by: Dhaval Shah <dhaval.r.shah@amd.com>
----
- drivers/firmware/xilinx/zynqmp.c     | 21 +++++++++++++++++++++
- include/linux/firmware/xlnx-zynqmp.h |  8 ++++++++
- 2 files changed, 29 insertions(+)
+V2 changes:
+- Added CRYPTO_ALG_ASYNC flag in .cra_flags
 
-diff --git a/drivers/firmware/xilinx/zynqmp.c b/drivers/firmware/xilinx/zynqmp.c
-index 10ae42a2ae22..d6f73823bab4 100644
---- a/drivers/firmware/xilinx/zynqmp.c
-+++ b/drivers/firmware/xilinx/zynqmp.c
-@@ -1426,6 +1426,27 @@ int zynqmp_pm_sha_hash(const u64 address, const u32 size, const u32 flags)
- }
- EXPORT_SYMBOL_GPL(zynqmp_pm_sha_hash);
- 
-+/**
-+ * zynqmp_pm_rsa - Access RSA hardware to encrypt/decrypt the data with RSA.
-+ * @address:	Address of the data
-+ * @size:	Size of the data.
-+ * @flags:
-+ *		BIT(0) - Encryption/Decryption
-+ *			 0 - RSA decryption with private key
-+ *			 1 - RSA encryption with public key.
-+ *
-+ * Return:	Returns status, either success or error code.
-+ */
-+int zynqmp_pm_rsa(const u64 address, const u32 size, const u32 flags)
-+{
-+	u32 lower_32_bits = lower_32_bits(address);
-+	u32 upper_32_bits = upper_32_bits(address);
-+
-+	return zynqmp_pm_invoke_fn(PM_SECURE_RSA, upper_32_bits, lower_32_bits,
-+				   size, flags, NULL);
-+}
-+EXPORT_SYMBOL_GPL(zynqmp_pm_rsa);
-+
- /**
-  * zynqmp_pm_register_notifier() - PM API for register a subsystem
-  *                                to be notified about specific
-diff --git a/include/linux/firmware/xlnx-zynqmp.h b/include/linux/firmware/xlnx-zynqmp.h
-index cd5acfa29cbc..8666b0c3cd66 100644
---- a/include/linux/firmware/xlnx-zynqmp.h
-+++ b/include/linux/firmware/xlnx-zynqmp.h
-@@ -117,6 +117,7 @@ enum pm_api_id {
- 	PM_FPGA_GET_STATUS = 23,
- 	PM_GET_CHIPID = 24,
- 	PM_SECURE_SHA = 26,
-+	PM_SECURE_RSA = 27,
- 	PM_PINCTRL_REQUEST = 28,
- 	PM_PINCTRL_RELEASE = 29,
- 	PM_PINCTRL_GET_FUNCTION = 30,
-@@ -542,6 +543,7 @@ int zynqmp_pm_set_requirement(const u32 node, const u32 capabilities,
- 			      const enum zynqmp_pm_request_ack ack);
- int zynqmp_pm_aes_engine(const u64 address, u32 *out);
- int zynqmp_pm_sha_hash(const u64 address, const u32 size, const u32 flags);
-+int zynqmp_pm_rsa(const u64 address, const u32 size, const u32 flags);
- int zynqmp_pm_fpga_load(const u64 address, const u32 size, const u32 flags);
- int zynqmp_pm_fpga_get_status(u32 *value);
- int zynqmp_pm_write_ggs(u32 index, u32 value);
-@@ -744,6 +746,12 @@ static inline int zynqmp_pm_sha_hash(const u64 address, const u32 size,
- 	return -ENODEV;
- }
- 
-+static inline int zynqmp_pm_rsa(const u64 address, const u32 size,
-+				const u32 flags)
-+{
-+	return -ENODEV;
-+}
-+
- static inline int zynqmp_pm_fpga_load(const u64 address, const u32 size,
- 				      const u32 flags)
- {
+Harsha Harsha (4):
+  firmware: xilinx: Get the SoC family specific data for crypto
+    operation
+  firmware: xilinx: Add ZynqMP RSA API for RSA encrypt/decrypt operation
+  crypto: xilinx: Add ZynqMP RSA driver
+  MAINTAINERS: Add maintainer for Xilinx ZynqMP RSA driver
+
+ MAINTAINERS                          |   5 +
+ drivers/crypto/Kconfig               |  10 +
+ drivers/crypto/xilinx/Makefile       |   1 +
+ drivers/crypto/xilinx/xilinx-rsa.c   | 490 +++++++++++++++++++++++++++
+ drivers/firmware/xilinx/zynqmp.c     | 100 ++++++
+ include/linux/firmware/xlnx-zynqmp.h |  42 +++
+ 6 files changed, 648 insertions(+)
+ create mode 100644 drivers/crypto/xilinx/xilinx-rsa.c
+
 -- 
 2.36.1
 
