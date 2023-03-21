@@ -2,48 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CACC74A5B
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Mar 2023 16:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B843C6FD1D
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Mar 2023 18:56:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbjCUQoy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Mar 2023 12:44:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56140 "EHLO
+        id S230103AbjCUS40 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 21 Mar 2023 14:56:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbjCUQow (ORCPT
+        with ESMTP id S229833AbjCUS4Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Mar 2023 12:44:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74035328E
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Mar 2023 09:43:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679417035;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ni73P6iOwq/z06Tc9mCMwHkprsEWFzyatJbBnmGE7Q8=;
-        b=Uo57u9/Sx4m+lXBOPenGtet2NB+Y8dO+s/RqEiUcTQme7jYkYGDPCzLmH/6VQ1slMbCelH
-        199TCXNwgpT1rZdBlYf4Y7gJkKb1jRbBGvbORqntdKc+KGiPxgqTux94G/RXJ/R/mWb5Mt
-        cTYnuY4E4hESXTRuQPHSiJtYPawsZLM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-462-qaZqdp-zNrahOBtwB2l9Lg-1; Tue, 21 Mar 2023 12:43:52 -0400
-X-MC-Unique: qaZqdp-zNrahOBtwB2l9Lg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F6FC101A54F;
-        Tue, 21 Mar 2023 16:43:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 637B3492C13;
-        Tue, 21 Mar 2023 16:43:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-cc:     dhowells@redhat.com, Jarkko Sakkinen <jarkko@kernel.org>,
+        Tue, 21 Mar 2023 14:56:25 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC93D497D8
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Mar 2023 11:56:11 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id h8so63638876ede.8
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Mar 2023 11:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1679424970;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o0ckUw7dWkverm2igg++8Ynt0yEw3mz/3PbETIyN2lM=;
+        b=YjXxz2fldoEPn98x7H4DLLXJC69GOlH6LDoVYMF6q1wVKfiNxHx8O8ZsXAOw4m1fcP
+         2tIEgQnL5cSvPsy7A7aXnxcTKfrlPMcfCG9R7ao4wEvcATARrJb5uwhCE0ti6wo2K+cz
+         C7EHru6XQt/a2dZQ1BqsbIHWbWlbOthBJn4Xw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679424970;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o0ckUw7dWkverm2igg++8Ynt0yEw3mz/3PbETIyN2lM=;
+        b=BL11KkwKqyUqNPQWo0MAnc+dMFwKbYfWxjdsnNxoFUQL4UY7EJK4Ar+oBq2/SobsRW
+         3jdYsu31T803dZPe7o8H1TiIs0/Exd2tY2RS9VDTQNUNcQbGl1X7FRsPLctLi+uh2O4l
+         3o9tv8LD/gx+1DY4liX89TYAgJX017IQgsrshYHKRuV9ZpvNiGeu72eL57kXGxOq2qiR
+         n6OgbqfKF2trdVWPsMs2iqa1QuF2wu1Bq4xJCkhwd6uOEq0sghSeODyJEpDOQR7iPfTl
+         zzPRTUIlXQwqKo+1iXHyihUnURXjobYwjxFYvBycnKPbHQwSQvSMsBlS2FEK5N19Z2b/
+         U1UA==
+X-Gm-Message-State: AO0yUKUjRMDa9z0IN98pPBOMRTDkJkCoe7yIoT9OXPJImwRr475cXOXV
+        6mzEvg2yHlYTZnIJ96Dzml9hL2KQ/HXPsjMrUx58o40v
+X-Google-Smtp-Source: AK7set+Qq9D+XYAjqwAoGxhiZo4xo8gBF+9rIBOrp+VcNqII8Z8rQDfpL+lW95RILsTvL9FotorAmw==
+X-Received: by 2002:a17:906:cc18:b0:8da:69ae:6ff0 with SMTP id ml24-20020a170906cc1800b008da69ae6ff0mr3710692ejb.22.1679424970075;
+        Tue, 21 Mar 2023 11:56:10 -0700 (PDT)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
+        by smtp.gmail.com with ESMTPSA id u17-20020a170906409100b009338ad391b9sm3688210ejj.213.2023.03.21.11.56.09
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Mar 2023 11:56:09 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id w9so63695840edc.3
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Mar 2023 11:56:09 -0700 (PDT)
+X-Received: by 2002:a17:907:9b03:b0:932:da0d:9375 with SMTP id
+ kn3-20020a1709079b0300b00932da0d9375mr2409395ejc.4.1679424514115; Tue, 21 Mar
+ 2023 11:48:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <2851036.1679417029@warthog.procyon.org.uk>
+In-Reply-To: <2851036.1679417029@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 21 Mar 2023 11:48:17 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wh1b0r+5SnwWedx=J4aZhRif1HLN_moxEG9Jzy23S6QUA@mail.gmail.com>
+Message-ID: <CAHk-=wh1b0r+5SnwWedx=J4aZhRif1HLN_moxEG9Jzy23S6QUA@mail.gmail.com>
+Subject: Re: [GIT PULL] keys: Miscellaneous fixes/changes
+To:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
         Bharath SM <bharathsm@microsoft.com>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Steve French <smfrench@gmail.com>,
@@ -53,66 +72,31 @@ cc:     dhowells@redhat.com, Jarkko Sakkinen <jarkko@kernel.org>,
         keyrings@vger.kernel.org, linux-cifs@vger.kernel.org,
         linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] keys: Miscellaneous fixes/changes
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2851035.1679417029.1@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 21 Mar 2023 16:43:49 +0000
-Message-ID: <2851036.1679417029@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus,
+On Tue, Mar 21, 2023 at 9:43=E2=80=AFAM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+>  (1) Fix request_key() so that it doesn't cache a looked up key on the
+>      current thread if that thread is a kernel thread.  The cache is
+>      cleared during notify_resume - but that doesn't happen in kernel
+>      threads.  This is causing cifs DNS keys to be un-invalidateable.
 
-Could you pull these fixes/changes for keyrings?
+I've pulled this, but I'd like people to look a bit more at this.
 
- (1) Fix request_key() so that it doesn't cache a looked up key on the
-     current thread if that thread is a kernel thread.  The cache is
-     cleared during notify_resume - but that doesn't happen in kernel
-     threads.  This is causing cifs DNS keys to be un-invalidateable.
+The issue with TIF_NOTIFY_RESUME is that it is only done on return to
+user space.
 
- (2) Fix a wrapper check in verify_pefile() to not round up the length.
+And these days, PF_KTHREAD isn't the only case that never returns to
+user space. PF_IO_WORKER has the exact same behaviour.
 
- (3) Change asymmetric_keys code to log errors to make it easier for users
-     to work out why failures occurred.
+Now, to counteract this, as of this merge window (and marked for
+stable) IO threads do a fake "return to user mode" handling in
+io_run_task_work(), and so I think we're all good, but I'd like people
+to at least think about this.
 
-Thanks,
-David
----
-The following changes since commit fc89d7fb499b0162e081f434d45e8d1b47e82ec=
-e:
-
-  Merge tag 'for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/m=
-st/vhost (2023-03-13 10:43:09 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/keys-fixes-20230321
-
-for you to fetch changes up to 3584c1dbfffdabf8e3dc1dd25748bb38dd01cd43:
-
-  asymmetric_keys: log on fatal failures in PE/pkcs7 (2023-03-21 16:23:56 =
-+0000)
-
-----------------------------------------------------------------
-keyrings fixes
-
-----------------------------------------------------------------
-David Howells (1):
-      keys: Do not cache key in task struct if key is requested from kerne=
-l thread
-
-Robbie Harwood (2):
-      verify_pefile: relax wrapper length check
-      asymmetric_keys: log on fatal failures in PE/pkcs7
-
- crypto/asymmetric_keys/pkcs7_verify.c  | 10 +++++-----
- crypto/asymmetric_keys/verify_pefile.c | 32 ++++++++++++++++++-----------=
----
- security/keys/request_key.c            |  9 ++++++---
- 3 files changed, 29 insertions(+), 22 deletions(-)
-
+              Linus
