@@ -2,66 +2,66 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66DBAC77B60
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Mar 2023 16:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68BCC77B60
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Mar 2023 16:21:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbjCVQUr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Mar 2023 12:20:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46478 "EHLO
+        id S230183AbjCVQVT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Mar 2023 12:21:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230025AbjCVQUq (ORCPT
+        with ESMTP id S230200AbjCVQVO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Mar 2023 12:20:46 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 979143B3C5;
-        Wed, 22 Mar 2023 09:20:40 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32MCY2A2018781;
-        Wed, 22 Mar 2023 16:20:15 GMT
+        Wed, 22 Mar 2023 12:21:14 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E7B060D55;
+        Wed, 22 Mar 2023 09:20:53 -0700 (PDT)
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32MCY50n002418;
+        Wed, 22 Mar 2023 16:20:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version; s=corp-2022-7-12;
- bh=ds3EDTffAzMh8JEz+W8FxnAH9vvZstp6bSSlX0uMyow=;
- b=aoYyvOS5AiQYALcxB1825xs3nAICdePY+llh0tJc4o2Yayde/zX5RAl2iiXhmgEQklVs
- eufyoRgPd55+T0LpEs1Cq0G/DGPQ80/ShVaA9EIVGPAONb+fAe4kM5rttpQah7Lx5Cbx
- RUKfSeOJ0Qh2AcLI9Z+/S+F40e25HFg0x/WD/zOLXTShP7esmNH8CQy8bXRhcdsp67GS
- g72+eklSvvqzuT57FACr2uUa8h0kWhdSpO8pyJzhUzwsS6cW5xLalQDI213uO1G15Vb6
- H5MEBcKPqhJJPHEcwzxXca78hYBepIiTy/nGlefTauj2+ljtkAUegZG7VRhkmDvK6C8p dw== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pd3qdsb31-1
+ bh=f04KKnVE6bf7zGWWJZG7CsnZsZq4OfQdu8k+D2doVsc=;
+ b=1Hra1EJBx+mRlolekca+7rSGhMFvmmaliZEIF0588iqw/QTiNkppTJ0W+9+p4pK6GVL2
+ dp4rSO+sN9CB2mL8PacveQx10JGF44wTTuY+8TkfslEWiHWWv40o9yHfhqqSh5ukLtZb
+ xcGFZNKnvS0DkTmC18FYD0VK10keFUoZvKlZyvmvOAsE5r+swFlTvP4EbyyWGoeKcnbo
+ aeSRioTGeWqzsg3+ZEq8q5pkS2ClBn68zN32zjjJHH0hsKiJFc0KygAmSuGLeZx9jBZf
+ Gp5dgEKQVV6ktN4ukPjnp0YXcjN8SCfCz76TR2Eke0fgmAgZSqXGuH8bar7t5OVKIzXD hA== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pd47tsgmv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Mar 2023 16:20:15 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32MFcomi019003;
-        Wed, 22 Mar 2023 16:20:14 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3pg4gj1w1r-1
+        Wed, 22 Mar 2023 16:20:22 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32MGJVlX008290;
+        Wed, 22 Mar 2023 16:20:21 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2049.outbound.protection.outlook.com [104.47.73.49])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3pg53jg0rv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 Mar 2023 16:20:14 +0000
+        Wed, 22 Mar 2023 16:20:21 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IjZAbOKzRccws6mCz1EEzUfiqX1do5rcIkLXQYtmwJarroclsZ3fMRxxl5/gfezwFJvI3H6WTjFMWOfEx5SQempqzsKDQ1mrOOwpVBcYGU+SQynVlWhRnyvyEyt060Cpv0dulA+RiYeGZbwy9ste0BDvQFGveEmu1oZk85z+UQXC8KKEC4KVjrOci1j5D0GgbEwcJzAaxWO2V0UfxvU8YbLp9LcJwUtb20eBTQKKtWvVPMADELTmA9HUDbrCKTj0wBXqc1V74bS/AtxxDIA87QzL5zgxUEgaIvmqByyLU0lI1Y0SMnspqxXaWDesu3ka4fHJskwgdXKqADCgwcYP1w==
+ b=lMbDL9uDR8yJNzeymMu+zsiiLTcy2ofS8JoEsKwLyOrLOJnnL2hjiI4kYJsvyQA+IyblpUjAKLfohO4NGZsb8ruuje/BLaiVcyaEoDYH/c0lmKXrUZuHor057GUmIuUTyn+Kf5CmhDNDUH85jYz7hZwu1MDyz7CS/QP+x6ZEblqGHgP/GKTvoMur9l7auxL1xQVAU9fr5D8MKj1RScmFJCe6RD09Ixokt3KxFf/fqbY0ehkDvzm5PQK2FMJKnKDzkRZaJ2l8qE/R4ZkujKZ+bYLd5EJtCktVWy+vHF/SsrBMLxsLRlPdsVvq1dNnnVPv5XAeiRMPzawmUdlA1NGK4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ds3EDTffAzMh8JEz+W8FxnAH9vvZstp6bSSlX0uMyow=;
- b=fr+OdrNEFmmqgg185ZqeeB6JLppErDk56/DV3yQV/rZbAncxITnASnzpfoHeX6YsgNQYNXLqUbhHM2T82xF1qiv+MDtj7TKn10KA7/FhzxH+FGpD5NSooo4ZnK40tibYgkd7Y2Ga8zC6BuQnFObIOeDG7n4PlCE2O3vgFoX0Bwbr/ggup7xwth8k6mFSMDJcOsvJ4R8UJ4QjVcul4JeEMyCZTE7ca6MJIhL5/1I+1yEGhjrtUjvd+3ftGw/Ox6cM4naNgTG+noKqxFkC9aCl3JALoK1Rx2v4F4zOKvZQVATFKrN/es3D9oce/Z6gRG86vFY7VtsojxF9LZZLpbKBqA==
+ bh=f04KKnVE6bf7zGWWJZG7CsnZsZq4OfQdu8k+D2doVsc=;
+ b=VD8w80YDHV5TadLEElk5YuScqdbODKe2RixOvTok3yN9/IeL24LlBvMRZabr/GHwjC02MPSdfwjbLUYQ7L4ceAUUP+zZNP6onPb7GWMgv5uIDYJpC/bjkbFUKaPJBiek+H7h/yfBTN0ibzIkDB210Aaw2eGvnmCEPryVxkAbqRRqkl//RL/7kZK111zaqebb4Qt0k+4ranVg3UHpCDZU17+8EeOeuUt6pNuDik/vqH+wZWZ0pU0dTmg8+uvc3MpP3x5llPmWXrjgsBnt0e3qRRvzrfo7LdvpNIUc7Bz3+7k/FM40xd7mA+BHHf5dR93HhCv0mmXKyJFDZ71gYZIlzg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ds3EDTffAzMh8JEz+W8FxnAH9vvZstp6bSSlX0uMyow=;
- b=kHLJ04u4jUM2oqUOfaFelf9E7VncH5febt4rc2OsJyZakIz1AcdOdV5ZUBfqNCfpeAVIzIeaXD0+9cBW5qC9zMpKlw3hcLJsjYymRQ6wQ9vHEJlv5LakMAs51NocdVmExNks06g45rtTyQMrkJntJ97Tv380PdIWn9Qh8qOKISo=
+ bh=f04KKnVE6bf7zGWWJZG7CsnZsZq4OfQdu8k+D2doVsc=;
+ b=PT/RYwLJdzvMzfKjhwQo3doIqapurZML70hoGC7PROfeYMg+U4Jn2jQ2c+Obdj5nBChErti0QzH6vc+TqSR+yf42E0Xg6wpTY4kJj3lgSmtqLpHM6y9iZzgAtptzCNlnBwRxwYViNkEslzIzASDArsf5WHZgsbodZOr717D6RmM=
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
  by MW6PR10MB7688.namprd10.prod.outlook.com (2603:10b6:303:246::18) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Wed, 22 Mar
- 2023 16:20:11 +0000
+ 2023 16:20:17 +0000
 Received: from CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::a326:1794:402f:1adb]) by CH2PR10MB4150.namprd10.prod.outlook.com
  ([fe80::a326:1794:402f:1adb%3]) with mapi id 15.20.6178.037; Wed, 22 Mar 2023
- 16:20:11 +0000
+ 16:20:17 +0000
 From:   Eric Snowberg <eric.snowberg@oracle.com>
 To:     jarkko@kernel.org, zohar@linux.ibm.com, dhowells@redhat.com,
         dwmw2@infradead.org
@@ -73,166 +73,190 @@ Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v6 3/6] KEYS: X.509: Parse Basic Constraints for CA
-Date:   Wed, 22 Mar 2023 12:16:31 -0400
-Message-Id: <20230322161634.2233838-4-eric.snowberg@oracle.com>
+Subject: [PATCH v6 5/6] KEYS: CA link restriction
+Date:   Wed, 22 Mar 2023 12:16:33 -0400
+Message-Id: <20230322161634.2233838-6-eric.snowberg@oracle.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20230322161634.2233838-1-eric.snowberg@oracle.com>
 References: <20230322161634.2233838-1-eric.snowberg@oracle.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BY3PR10CA0018.namprd10.prod.outlook.com
- (2603:10b6:a03:255::23) To CH2PR10MB4150.namprd10.prod.outlook.com
+X-ClientProxiedBy: BY3PR10CA0001.namprd10.prod.outlook.com
+ (2603:10b6:a03:255::6) To CH2PR10MB4150.namprd10.prod.outlook.com
  (2603:10b6:610:ac::13)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CH2PR10MB4150:EE_|MW6PR10MB7688:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8ee00003-b97e-4abb-7d55-08db2af14f73
+X-MS-Office365-Filtering-Correlation-Id: c24d99c8-1489-419e-4253-08db2af152ff
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0VHcNHpcSvrxmyXvZX8g6eh/VaKA0dKl/J/o95il8t4282e89q/GQi7vp10rHXyZSwkrAYPpxUzmfXyoq2uyEkvoKV1SvVkQnqtyl7N8Q+cLZQJhxFq0TmBX2HWL0T5kNEvlrpbq189H8UvyzOk2Q+95JDVBBtDkmKy3DXfl1nBb+Vna6lfM9Epm9vG4gaeGTSDLILEyfwFGRdHvt0IZ3lr/A1oSkJNu7/xSqzk3INRqH6ZbnxijfFgvl9xOaSRdJXSJvBGeeL8FMYnQwm5McRr9Fo5aCeQs0bBBm1OswdCUJ3dJJWvzB/BHJ1FxD6tWgvl9UsEHwSt9tZ0PEnRBG2Olud6MGcqeZKHbIl/YhBF9Vcx+Bfv7YecY1BWjNOoDvzUsdn2UrpnGlXv/Z79X/6C7CbtLeoqW0jhMdEdwTqf9ATpvR/6ev2EG72CRzL57+uKzDNf6o8/EmNwxAyDAVzoTN17bKCmiYfRIb2mfpf8tWixUFD710UdeWyHv6Hw0Le1asbuzhHtiAYaPxlGMhCZubrpI+/M47BGCf03A1E3qoVUxjJCUlaMXPCFTT+/61/549EkuRzS0zjjm7O+BQLdT/DLzTlf358X1+rUJGYzppht4SUlnNFaoO44yBhWP
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(136003)(346002)(376002)(366004)(39860400002)(451199018)(38100700002)(186003)(41300700001)(316002)(66476007)(44832011)(8676002)(5660300002)(36756003)(66556008)(4326008)(8936002)(66946007)(2906002)(7416002)(478600001)(6666004)(86362001)(2616005)(6512007)(1076003)(6486002)(6506007)(966005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: X+xe4tTNhvFHod5UXPmywBrOz9fzBh69Abc40gJXjLsZYEy7SY608T3QTbPVhvIzVxDRRQ/OG/IB1d1PzWedO0iGEwdr3FfQvnFQGd4EmRxyZQFquA/EcW+eh/LpRMzq9mJD8IfSzUjOIltPt3Ww5IGikdpgrwL/fYlw489lOfsBWLwrtCaoproIvEQ707mfqbCrGrxxut8ZUfVU0N14vfv1lLUEIYMZTq8hdDivYRuKWyOxcmxKlF6PZUrETWl8Yho16fUZSjXTkYXSQNi7Zd7nXfkaNApjRU3r2EZ/sh9jW4Pe9RrePXXa5hpu7O3+9YkOpVwkMbgQ98UD5D8lJX31c84qOIH6frY2yGzuMMfaPKMpajr+cYGoLWvIkmmhDw/l4JKfBGF7SxiXFLDuR+84vY5mQz5SMUgKdoxC3fh48LdrkzXYwgIKQk3NlfxAPTFmmZYqsdD6lZrRq5O9FCkmAgmc3S8avZwJ+9lUNRar/jmEV7U/sK/HrDOG/zJ314FhAz5Kmr0RQhIUX3+9nOqxKebQkYpAEEJtjXbllyGl1IwLLM+dr2791n+I9KeznltbfGIl9brrqU74r2Gb8W4d77NOu9XmB+pKGel8Ue0bwgo/Ps757ML9ziKOX5P4t9LS7nZ8EAJ4KUr7thkFPg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(396003)(136003)(346002)(376002)(366004)(39860400002)(451199018)(38100700002)(186003)(41300700001)(316002)(66476007)(44832011)(8676002)(5660300002)(36756003)(66556008)(4326008)(8936002)(66946007)(2906002)(7416002)(478600001)(6666004)(86362001)(2616005)(6512007)(1076003)(6486002)(6506007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rlx8n+ZI39uAOwrqs6ulYvfqvsDykzafoAEnIZDEVe2GSVBT7DU7idLbHV94?=
- =?us-ascii?Q?+mNqC+FQLH4IeZ/Q7xX3bbIlly+uabHkIXRvvR6j84J/aUM6TgPVzegeqFEs?=
- =?us-ascii?Q?CCMAMXlEFPilbe3MpggaKCW5T25lUWabNkPplpCqNmhaC5sMNXvxkOXOnWUq?=
- =?us-ascii?Q?2y8X2BqC3AP0qwNxQn9G/S3oNyL2zk20AAJMpPWUBLn5kDQnUJNMFUMLiibI?=
- =?us-ascii?Q?+pmDNNoEHG3+DkVXF4/RfOBCEsfW0Ac/eh96I1hkKX+9hzYo3g2rU7duNmJE?=
- =?us-ascii?Q?/POdLZAELefKvh8HUJ2NaDq7TX35j7CwXmBlBcTKI60e7it4e4wzcb1vN0Px?=
- =?us-ascii?Q?XugjWAknCmjHg8UO3WdgcvPRBQrsZcX4T1Gj5NmGVcsFzLxKpg8nwRte1U9O?=
- =?us-ascii?Q?6QeNVU6z1GoFUL/mKkPsCYJdqhjxmy3xfH/clkuwsqlZ+GD96CDhKVrNYC7d?=
- =?us-ascii?Q?YgwNdy6xoX3fC4bCuv40IVcbV4jyzjFKkULHmVuEhiu3WTvFna4g4AXur25d?=
- =?us-ascii?Q?+m+AokhlCKAY0gkFUrtUDxkn4d0/+T1wVFMt7LMAshYZleNIPs0bZ4vMQual?=
- =?us-ascii?Q?cq3Z1+Jei3i+FWMkan/buGShCkOhezyyLG1HggesCGuxATIFCnZvy8h26tvZ?=
- =?us-ascii?Q?gbxu+dUGWFPWb+SefZgI0HB6ZERKwgqWIzXTnKyIxjev05MIHGxjePosoKgQ?=
- =?us-ascii?Q?Y97cz7tAf3/Xl7CgWknf2y0hITvm4dIWya4/eeZ3l11pBFfqiLxIFvIGPRAV?=
- =?us-ascii?Q?OuTn4wnD+OYigQtnk3mlaDqBFVm8Dp2jAz1jF0pWNGJGmEmBTNPrUh4HD5km?=
- =?us-ascii?Q?bEJwniqN2sLzEaBTQSj14EdBzSBhC3cpkh0evDYo2ai/wlHFUuBA6r4u6F44?=
- =?us-ascii?Q?a2u1G0bvRNma1Q45stbpzxTuyvfrf5/RfPZ5nL5PogVZiU7K8t+dW3zrK4Mz?=
- =?us-ascii?Q?e4c5ArHX1vu6iX1IoJGWP0/UY8PBRu5nLUM6JLKJHZhFu6gQ3Og/B7pizGEV?=
- =?us-ascii?Q?YwEqsYfxDXLlRVcltd2/yQN3ah0YUSGz+5GKRFRQOTeVexW9KUfMEt0w6ojv?=
- =?us-ascii?Q?GsWFJBTiWaS3mSURSVheTFs8oSKfHYYO7v3WkIypP8Qmh7oba5FqqwOgPRmz?=
- =?us-ascii?Q?rM+h+9TiiKtILu3n+Duvvl22XEjR00XY7/+6+s5XxiFUMX/r5zpeo39nWViG?=
- =?us-ascii?Q?h79ljffgZ2NKCtmZFFuQvfS/p7IupxryBeY+3Netfo05xLt/TMglooCyXLJJ?=
- =?us-ascii?Q?ylFQd8WAlRENOZ4iMGt/vLmgjIJ0R9XYoH+N2sv+2NIrkLRTxT03gwXS4vYt?=
- =?us-ascii?Q?8DuEZWFSnxGbOiMBwA7okQmqUprq4RHnZhLnqz+cPrqFoXZFCfJrcbRqMqdl?=
- =?us-ascii?Q?6ghvEvWBv+jX3kELUsngNPkf8ccuiSPV29j1LSjQhM40pl83ru8N+b+z3Yi7?=
- =?us-ascii?Q?3yK5MVUHblbkKR7oYpbCVGnCuPptj2hMJ/4iog5VEoO177OQhgBUotIPVwX0?=
- =?us-ascii?Q?glAtSEbyF58HgYeleLjWxjdbfu52GVgbg7Xwu80/XK40wVnviZ8Dz3sLGivV?=
- =?us-ascii?Q?Tdga5lK+1Y6EotzOIqF9msTZQfbCkD0tRlZGOfo5pAS0ZH/I0CRhnB81NaEY?=
- =?us-ascii?Q?1zGR2SypHib7x4+IkrdqXcU=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2SKL0/LSkGe2cWZv1tz4uFJCJrHJ8r/guWrFrYYRl5Y2Dg5c5CeBgVimXez9?=
+ =?us-ascii?Q?q7BCdgSqTmd+IKb6wRsFyHrc4SiXPdgClPn8Hkn45M4HZ1Zs58tZbYGzcazl?=
+ =?us-ascii?Q?OZGacJq4JpsSGYhYTulzg8kZPQGyh6sQMc1uHvakys1XRI69hD2+568f8QNc?=
+ =?us-ascii?Q?GCYXmZk9JVNor5q5UVwNAOVsliBZUGcs/hZIEHujK66fJw26T2A6meGTLBCJ?=
+ =?us-ascii?Q?u496NRTNeIk0uBsEM/F7yItPP3jAIamk8FaNqqxxb/7FWn9XPtHcJKasqNXb?=
+ =?us-ascii?Q?WWhkjThg0mDSlbCVdrB9I46+g3bpLAxvTTj02dl4YUNwAZ3z3o2uFxZlCYcU?=
+ =?us-ascii?Q?58GcJNET3Z07dwD3crSJ55Yu7klRar+lKVfyWAonTHJgaZ6VqKcgCxBQ002m?=
+ =?us-ascii?Q?RWB5z8QoGvGPJhNKi2sll3Y32ncj2NiHQi+UVGMKKxcYF3pUAM/llENOA4nW?=
+ =?us-ascii?Q?cWxeP3gLKAKyC8pY/K5nQZ5KnKwZrGYpYHWI8GNkcqXzorjECBkL98AGmLdM?=
+ =?us-ascii?Q?btu+OzT/zRpdk1tfHVyOfQbzKKRxznLz2BA+h+Vfk4xTwioe3tRv8r++/qrx?=
+ =?us-ascii?Q?ThAjtrVpbtTnYFSGAVYnGXlXleyt0zR0DsqtNzQAMc1iN21zanm2ZAmvkpsR?=
+ =?us-ascii?Q?BoJ76kO3MPOq8Hpk+GGNvMyGuV8z/7pSiTOayKSbwGBQo/q+hckarRE3tja3?=
+ =?us-ascii?Q?QsQtLP336+1f+CPhVaVjgF2Q0p4jQNk0lApSwCtnqJBdw99RudPcbsSkESPL?=
+ =?us-ascii?Q?bm2wDqH4HDu9mpuXDtHqhCW+YNRDszJs+7F7PBetcKbyw9pyF1lSWe3ki+i2?=
+ =?us-ascii?Q?KMFDzLX2DTSFr3U0s9iowcAPg+rksWhb9PpjFqQOLrfko7GA+3IZHd6bjbwX?=
+ =?us-ascii?Q?OuvHmDhlnid8jXpTsjwsDFjtarwOz9gDkb4/svj9ibhvDABWAq7vwyn1RVF9?=
+ =?us-ascii?Q?HrgFBWAKPIMu1dKgggOQUdyKe6ztSt8vtHrvM5n2sMtbR38WL+RcteY/5WeP?=
+ =?us-ascii?Q?YRXMBxWk/kJMN6KvrPxwOsui8zUlHMoz15qCWHC8VDW694BDyXxsiWlDdKys?=
+ =?us-ascii?Q?sNZNxG40MI839BJPVhTwkd9pwgeQ8L4/5iSw/mJiS7hIvQMRB6OmYYX+J9pA?=
+ =?us-ascii?Q?oYExBSBPeZ0QmgKl37DWH/MpUQI7JR6sQv7n75LJg5QTJIwHKCT40dUKkMIv?=
+ =?us-ascii?Q?skcqTBVbkAj6GgCAYvw0R1O6sSMDP/NJRoxcE0nQ83KwPeiGRBFF6mU+cXLR?=
+ =?us-ascii?Q?C0gd0gKBbRnUy6T+2khczgzzySXTY3dnmKBmA+5+Ww4oBAQIcrM6MNwHUIYE?=
+ =?us-ascii?Q?YxYnHvbD6Q9xJSduKLUeHtV930wIkR86KZADumh2xa1bePEZq6Ig7YFm8WAK?=
+ =?us-ascii?Q?2M84u5QXnDDZlmKNlyjkDlY+RXHXDfCd8fE1EYQiXuppnamruv2sc4JmafBy?=
+ =?us-ascii?Q?8ExczIaYo+1Eyn0FTFDvLZAIXQc1KQ9HUFhVgPCoITHDdV+rKPbyVrkNoWNN?=
+ =?us-ascii?Q?drRuhtnWRrAHOTyIJEctS5p2qcGGxTy9UW4AxfHE79yPooxpFrDG2wDhuCME?=
+ =?us-ascii?Q?1gkACNXlaG5Wwgzc/mku5noRrr+Wa4HFxott7tFYgUKrMJwgslQeI4p9+7KE?=
+ =?us-ascii?Q?JV0T3J2nMOLQjsqx0Ne4DEU=3D?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?tWX/TSuveJ42ayitbgg0L6mqrRYU0uW+GWsy2/2zD7kcl1ePzGPqSc1g2sml?=
- =?us-ascii?Q?WsCtyYdJebBABXRkOKMUaTSrhceSNUrYfE+7uVCfvwfgo/gTh1gvQEULZGGy?=
- =?us-ascii?Q?dkxM07UoQ8F6hS/MWe45gNwWBuF+FxACwczybWTcXyczA98PepbCEeXblA78?=
- =?us-ascii?Q?LC7twCPy8XSHNIxoK9tz6TEh5Th9Ty16z6sCnZqddQkIOKmKS2KPTyp/hJN+?=
- =?us-ascii?Q?sIMZSKlJzXPCNKdpbHDbE+/3WRbq84xqgWqbtT2A4/iTrO6Pi881Jf0nlkin?=
- =?us-ascii?Q?OhdRvtVyAZA9NCj7bj+cEkGWGnTqsApubi2GD236Gniw7QM6tISpw8GAD6+F?=
- =?us-ascii?Q?6ncq/sDDyvmEKiDR1ITTqh6apV2OrRoEWtIRoC1QGV055QEQNe6rTjQgaaJ0?=
- =?us-ascii?Q?yYNJX/MhhB9TXA1q2oamtWFh51wkUhNeDJGLQslpUUOI7mScpJi7FCJr2PNB?=
- =?us-ascii?Q?Oo3Xvj3DURprbgJN0z0KQ6cmGngxgUkdSVSUX/j2h1MJ15BzPP8trZg8zVlQ?=
- =?us-ascii?Q?z3LYaq7qIK5ou67oJkLTel/XWxAL2zdGGz4uxVxYCvVXQ92rRT9gqg968A3Y?=
- =?us-ascii?Q?d8qgPawJZFVKYK7BIoe4mwp7NmUHO0ugTLfzy7Nu4uEMM68jCKTIncQSwyNr?=
- =?us-ascii?Q?1nJPzqgAtPDM4zPg+WfAbJiG2JZ17zJG0cxM4b5fmCua30wnnsE8e7Yr/4XQ?=
- =?us-ascii?Q?6HO8iItpDnovEuvvXtZMp82CygOGehqkiVHSnwTiHw/UTFB/7y5CzBzioV08?=
- =?us-ascii?Q?9to8EAfutAi77GZWUUNHVK62rIr9sP4TOAK++Yoe+Z20w5Ge3acUOrSZFkCL?=
- =?us-ascii?Q?5QeFfpgoYkdDhORj5hxy65HmDoiH0iDiGsSjDBHeAh4aiG9W1dvQn1wlMjBc?=
- =?us-ascii?Q?PEM2gytQ4MAqegxkPTOn/LDqVwgtcxZUzJnyJJYhUFAjiuXvQc+fOBwXkUAg?=
- =?us-ascii?Q?a+Da+6VPpRcKFFRKrEOVKwsTN495FvW9ONrE+L8pZFZndZARvYKnIhn3wft7?=
- =?us-ascii?Q?M05ewHMkfQQKz6Fy72CQ2qvyNMjH3iivd0B0/dY8pjfqrGVRvY3mg+JWHAVR?=
- =?us-ascii?Q?CXr46iOpFTUOnPDNK2J2DTNO26a/31vLFTBjTOvukME8TOMSb3TcoY7MiXjA?=
- =?us-ascii?Q?u21GaCKTJeMqjustvX3SL2fw4llKV1TwMx8Y0KcO6OCFQ6oBGfcgVPQr8CvH?=
- =?us-ascii?Q?umAEYtFPBbV3lVWe?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?1fEHoTCpJh5Tt4Z30rCl+NcbxwObXKQrxJSQKAm/hZTC1AUH9NJhAJmIJnUQ?=
+ =?us-ascii?Q?xoHIaox2yVIm0z3cAzSq6W0sKvkJHFlGN9P8aklYROp3esu6uaEkhr2spyk1?=
+ =?us-ascii?Q?/N5hggMtfaFuhxB+qHnIY2AYuZW0PLFh8koxQE4JyMEGeIXa1ggzmrkJDp+v?=
+ =?us-ascii?Q?mTZyiH9eFp/jwqB+01OVgbo1dgRkSNr1TM5Qn8oc9uceJCeuBuO4f1vzjlyM?=
+ =?us-ascii?Q?Bg6P0O5tI+Wjciiozq9meyHfngraAZ4D0TAZkAEwYF2dWcECr68R/PhYJ8Hd?=
+ =?us-ascii?Q?cqTgBRfTL1E6iwqZviZ6TZa+drT1ejSi4ph+8CQpgj/qJR7OzyRoooYdZ9Y4?=
+ =?us-ascii?Q?o1HHGjXVAKm9vC9J8rcMRtGokxQBezCRYzFOjbWJzmu4+hlIRDSPmFjyN1vl?=
+ =?us-ascii?Q?2Vv98Sg2bkajnghaRxLgvUuOwiTbU1n1m8HcfC3Jmqf4EKBtZJ1cWSzV3HLn?=
+ =?us-ascii?Q?LuxnXtI5wj01iDpMpzrbMQC1TFmC9rJHQo3C+sqEww40vlInpd5DByuxtdvj?=
+ =?us-ascii?Q?zpljLoduvDVZQNBJUdfFGkQ6F8K1FmhMdX4gZNo/vR12LT2XE7g1OgDXK4yT?=
+ =?us-ascii?Q?F3475vgtj6UWNk8M5iimeVs8eQyjG97mi8KSrzawor1/IsZNNviauA04FGUc?=
+ =?us-ascii?Q?ij6QHFazhWoxtnr2mRgpDtzGdhHJp3/oNOI7JkR4pTq1961gFQNFAElsIFGw?=
+ =?us-ascii?Q?PGKzOwXnmgyXw0L8IU0evByXJKTUFZ0MaUoAPDwH8SgQoP9PsRiTzGTQAFv1?=
+ =?us-ascii?Q?f20km9AQz3EO37I3gS8+QYTNt36xEJaxyzoHay53sc0TpYYugcEt1UDttKpr?=
+ =?us-ascii?Q?kr28uUozB14Cvs8o+FC/38C8sd7GX0TcUhcpudOK3QEBLNjjJPfvMVrdjGe9?=
+ =?us-ascii?Q?yxZyi+UnoKXK00vr/uRd4bYu4Ae6mhzw98W/opEF/aoELfqJQrWtMr0Ztofa?=
+ =?us-ascii?Q?QjRwcr8w6nN7qrzUHFg6rTCDtDXv6hnK3iU0ArBJYYudjFbSSpbl9CqQIJ44?=
+ =?us-ascii?Q?HTf/2JILB9SgHKV4zK4f7txIe2J0gPsUt2ATTCsKLIkcHrcQqP/dIUe9EuWo?=
+ =?us-ascii?Q?kigrNjlGaXHZ2Yk56sRM2dhzG/rh0VPW44nIkEpnGCcRlTjNvcKU0cjRTV51?=
+ =?us-ascii?Q?SP5DM0g8IZviyIp5n/OsFCEhmyD44H+ua1IQ9BzgHbiQ2oVF3e8TC3LcAaiU?=
+ =?us-ascii?Q?IRezmwSz1p5s7w3m?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ee00003-b97e-4abb-7d55-08db2af14f73
+X-MS-Exchange-CrossTenant-Network-Message-Id: c24d99c8-1489-419e-4253-08db2af152ff
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2023 16:20:11.3542
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2023 16:20:17.3345
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AEAwnsXRI+uBB8+aEpGZimRbvNScInAKg1/jvBHLa4XVcH1OfQ0H7lVlqakjm0cYU/yT5QVpmVoxZG+WCmOoSDbAjuijA0jX9KI3zMoK23s=
+X-MS-Exchange-CrossTenant-UserPrincipalName: AYaeYdytC3WNHz1ckPdeLQLGp2kI5F25fqyQ60iKTjDRW6K8STk+v43sorOi9NNWoOHWAxjDYwHGxc+JTkQjRp/84o6ne51zHy65g7/R+GM=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR10MB7688
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-22_13,2023-03-22_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- malwarescore=0 phishscore=0 mlxscore=0 bulkscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303150002 definitions=main-2303220115
-X-Proofpoint-GUID: xAQqvegQ0KrgP5rjvDp3g7MYdwrkzDVu
-X-Proofpoint-ORIG-GUID: xAQqvegQ0KrgP5rjvDp3g7MYdwrkzDVu
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 mlxscore=0
+ adultscore=0 phishscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
+ definitions=main-2303220115
+X-Proofpoint-GUID: zUpLddMecVk65VqPsKG9lHGhTOeBA_o2
+X-Proofpoint-ORIG-GUID: zUpLddMecVk65VqPsKG9lHGhTOeBA_o2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Parse the X.509 Basic Constraints.  The basic constraints extension
-identifies whether the subject of the certificate is a CA.
+Add a new link restriction.  Restrict the addition of keys in a keyring
+based on the key to be added being a CA.
 
-BasicConstraints ::= SEQUENCE {
-        cA                      BOOLEAN DEFAULT FALSE,
-        pathLenConstraint       INTEGER (0..MAX) OPTIONAL }
-
-If the CA is true, store it in the public_key.  This will be used
-in a follow on patch that requires knowing if the public key is a CA.
-
-Link: https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.9
 Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- crypto/asymmetric_keys/x509_cert_parser.c | 22 ++++++++++++++++++++++
- include/crypto/public_key.h               |  2 ++
- 2 files changed, 24 insertions(+)
+ crypto/asymmetric_keys/restrict.c | 42 +++++++++++++++++++++++++++++++
+ include/crypto/public_key.h       | 15 +++++++++++
+ 2 files changed, 57 insertions(+)
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 7a9b084e2043..77547d4bd94d 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -586,6 +586,28 @@ int x509_process_extension(void *context, size_t hdrlen,
- 		return 0;
- 	}
- 
-+	if (ctx->last_oid == OID_basicConstraints) {
-+		/*
-+		 * Get hold of the basicConstraints
-+		 * v[1] is the encoding size
-+		 *	(Expect 0x2 or greater, making it 1 or more bytes)
-+		 * v[2] is the encoding type
-+		 *	(Expect an ASN1_BOOL for the CA)
-+		 * v[3] is the contents of the ASN1_BOOL
-+		 *      (Expect 1 if the CA is TRUE)
-+		 * vlen should match the entire extension size
-+		 */
-+		if (v[0] != (ASN1_CONS_BIT | ASN1_SEQ))
-+			return -EBADMSG;
-+		if (vlen < 2)
-+			return -EBADMSG;
-+		if (v[1] != vlen - 2)
-+			return -EBADMSG;
-+		if (vlen >= 4 && v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
-+			ctx->cert->pub->key_eflags |= 1 << KEY_EFLAG_CA;
-+		return 0;
-+	}
-+
- 	return 0;
+diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+index 6b1ac5f5896a..dd9ced32c8a1 100644
+--- a/crypto/asymmetric_keys/restrict.c
++++ b/crypto/asymmetric_keys/restrict.c
+@@ -108,6 +108,48 @@ int restrict_link_by_signature(struct key *dest_keyring,
+ 	return ret;
  }
  
++/**
++ * restrict_link_by_ca - Restrict additions to a ring of CA keys
++ * @dest_keyring: Keyring being linked to.
++ * @type: The type of key being added.
++ * @payload: The payload of the new key.
++ * @trust_keyring: Unused.
++ *
++ * Check if the new certificate is a CA. If it is a CA, then mark the new
++ * certificate as being ok to link.
++ *
++ * Returns 0 if the new certificate was accepted, -ENOKEY if the
++ * certificate is not a CA. -ENOPKG if the signature uses unsupported
++ * crypto, or some other error if there is a matching certificate but
++ * the signature check cannot be performed.
++ */
++int restrict_link_by_ca(struct key *dest_keyring,
++			const struct key_type *type,
++			const union key_payload *payload,
++			struct key *trust_keyring)
++{
++	const struct public_key *pkey;
++
++	if (type != &key_type_asymmetric)
++		return -EOPNOTSUPP;
++
++	pkey = payload->data[asym_crypto];
++
++	if (!pkey)
++		return -ENOPKG;
++
++	if (!test_bit(KEY_EFLAG_CA, &pkey->key_eflags))
++		return -ENOKEY;
++
++	if (!test_bit(KEY_EFLAG_KEYCERTSIGN, &pkey->key_eflags))
++		return -ENOKEY;
++
++	if (test_bit(KEY_EFLAG_DIGITALSIG, &pkey->key_eflags))
++		return -ENOKEY;
++
++	return 0;
++}
++
+ static bool match_either_id(const struct asymmetric_key_id **pair,
+ 			    const struct asymmetric_key_id *single)
+ {
 diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-index 6d61695e1cde..c401762850f2 100644
+index 03c3fb990d59..653992a6e941 100644
 --- a/include/crypto/public_key.h
 +++ b/include/crypto/public_key.h
-@@ -28,6 +28,8 @@ struct public_key {
- 	bool key_is_private;
- 	const char *id_type;
- 	const char *pkey_algo;
-+	unsigned long key_eflags;	/* key extension flags */
-+#define KEY_EFLAG_CA		0	/* set if the CA basic constraints is set */
- };
+@@ -75,6 +75,21 @@ extern int restrict_link_by_key_or_keyring_chain(struct key *trust_keyring,
+ 						 const union key_payload *payload,
+ 						 struct key *trusted);
  
- extern void public_key_free(struct public_key *key);
++#if IS_REACHABLE(CONFIG_ASYMMETRIC_KEY_TYPE)
++extern int restrict_link_by_ca(struct key *dest_keyring,
++			       const struct key_type *type,
++			       const union key_payload *payload,
++			       struct key *trust_keyring);
++#else
++static inline int restrict_link_by_ca(struct key *dest_keyring,
++				      const struct key_type *type,
++				      const union key_payload *payload,
++				      struct key *trust_keyring)
++{
++	return 0;
++}
++#endif
++
+ extern int query_asymmetric_key(const struct kernel_pkey_params *,
+ 				struct kernel_pkey_query *);
+ 
 -- 
 2.27.0
 
