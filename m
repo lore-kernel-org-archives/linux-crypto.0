@@ -2,250 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BECC6FD1D
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Mar 2023 22:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65A8C6FD1C
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Mar 2023 06:17:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbjCUWdk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Mar 2023 18:33:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34624 "EHLO
+        id S229626AbjCVGRm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Mar 2023 02:17:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjCUWdj (ORCPT
+        with ESMTP id S229487AbjCVGRl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Mar 2023 18:33:39 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9844FAB1;
-        Tue, 21 Mar 2023 15:33:38 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id o6-20020a17090a9f8600b0023f32869993so17933399pjp.1;
-        Tue, 21 Mar 2023 15:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679438018;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tX8xvAVFZKTqI7vUXDNrblrC3elmwRfPb1uVZ3LjE7w=;
-        b=idwjHABsJoQhOKjchQUjb9zysZvH+mmxjBplmk1ZgOJxoMeEVaW6aDY6/ZbIkS8HaK
-         y0P3tqfKo/mYr0iWJbOPnAwFGm6eNpC0u7apGEHSQnK++avs7U7mRIJX14RpI5jUwOws
-         TmubWhnDh6b1z0qs4japlZpSBsR1mAfbRuGGPrw16XMbkRocJJM+ssqLO1GqsZhqvHks
-         0WmU0OqVfc11XX7xWC4Wk3P3aeIyKKMCnVG2Qbmf0L7UvrhtssdYNSbmgzLkPTq3ql8Q
-         wTgptr6ICFMA4c9SQL/5u48gWzYlOvYB2b6McWOHvafH38NQzh5OiqI5jaEuO5Rj6Bvn
-         O+Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679438018;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tX8xvAVFZKTqI7vUXDNrblrC3elmwRfPb1uVZ3LjE7w=;
-        b=C39Hmm5qAFS4riYlpnFcxtqGfwmYZa5GrPJZ9XLkBmrs3X1Yn63Fc5v6L+doo/Ud4K
-         QVxbA1cZWurGbj2Jvb1CrCNJhaPzAz0Xrv2jRwV8zvdPwPNEKgBJfP/7fe6QiD0xf+9s
-         BGMwFSTgx8gmkVBiEZ/Jyl4a4lcopMK+9RtlxFws+4lXLotEHRa7F3gf1A+p+ViGS/BE
-         H6qsLmNLnxKG4k2hu1eFzVAcz6K21THST7lBq6hVbiJfVdjx9Zq4WOVW8ajBp6kmV76y
-         ei+oFCYOKF6JgXE61NYwbSBGcPpluHwesRlS2ulbAybo955Mx6fOYpcKcgyvSgZBFecj
-         iXGQ==
-X-Gm-Message-State: AO0yUKUFHCO2jdMpX2sFLZC0MWvS9IBp9DuiC/lZ7IaGuI/85pwBNUe/
-        9Y5VQAHjEF8fkQVnIu7DHmk=
-X-Google-Smtp-Source: AK7set+rNYXFr/gXYLWPjvNlu5pTXTNQhJzXLhDRtdtUse1WQU06n4rU5ndF4A8bHEQHccTVWSpHPA==
-X-Received: by 2002:a17:90b:1c04:b0:23f:48b9:266d with SMTP id oc4-20020a17090b1c0400b0023f48b9266dmr1273655pjb.21.1679438017678;
-        Tue, 21 Mar 2023 15:33:37 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([104.28.213.199])
-        by smtp.gmail.com with ESMTPSA id g5-20020a170902c38500b0019cbec6c17bsm9222982plg.190.2023.03.21.15.33.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Mar 2023 15:33:37 -0700 (PDT)
-From:   David Yang <mmyangfl@gmail.com>
-Cc:     David Yang <mmyangfl@gmail.com>, Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH v2] crypto: hisilicon/trng - add support for HiSTB TRNG
-Date:   Wed, 22 Mar 2023 06:33:26 +0800
-Message-Id: <20230321223328.1908817-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.39.2
-MIME-Version: 1.0
+        Wed, 22 Mar 2023 02:17:41 -0400
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2084.outbound.protection.outlook.com [40.107.21.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7582859823;
+        Tue, 21 Mar 2023 23:17:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SLBG3Ol5YojTprjKJY1M3FMz7axlLmuNQKjVeF88fUvn8YsefAYWuzkOINZl8+toZMzC5xctOgAC2qYes1P3t1M0HbmqKcwasx8R6iBMXmlybLDjfBJlI7cYpBWfCfv5k7FZ/m/ia0JG+qusXrUaKa33MQG+rpyRTIRLZ7jw0eOfIdxPttoYDcixVf62q/jE7Zatswo3EAW2zZURcIhEcJItPJxqPWBxTM3sLWLouF1xrsEf0oDk77mmrDVZVoKUh2/CSwstT5GKIfN7nbv6NbaLrmKrZo+GLAb8MhxZvkPVFljT7QAZz551+O5nBPzVOCQYdFdo+rxJGDmXNh7bdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u3UeKKmRo5ymedSruODd4tSYgsD+Wr0rCFkvDOLjmzc=;
+ b=B+KS1eUnr5BtxIhwbeYyajwdj6HHc2kF4aMLzDolQqXtc3N3gpD9wDQLHPPN0Ev6p53wP8UGpaG4rwguZZFaQuc8/17mXJakL4rQ5aHOr5Cow4alAFmqUaA34bfn6fBiE/7rP50zVX0C379LnSExibfZ0oNKb1G/EFrkRLoC7WHej5uDdunjyXy42Bj0oQNn5Rp0BxUfPk5zKydK/jEV7mSUaq3w02djUb1Tg4nP3zsTvHowVjEN0aANpwBWr8Ix2YYR+TCuc5QJPEz2RBzoYRFhiChzlvOze8hq8A1+pHhzKTWPsW1MBA6RFtFBRMsUKt3FP1U9sfEGv76kJXFExQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u3UeKKmRo5ymedSruODd4tSYgsD+Wr0rCFkvDOLjmzc=;
+ b=du/5Pots94y5XL5Or1c8R+epizJTlpCYgMbVxd24VnEDPJidM3oR8XY/W1YfjdP7rY13wCKxjSPbAFGEfDhPJVzjcidHb+U1qhFizKOzpa7qjeXLQIgMih/zuA2Kq9kuV7so/1K8oXUWxdfGANXmCM1gD7aqb3qvGqFw8yesB18=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
+ by DB8PR04MB7020.eurprd04.prod.outlook.com (2603:10a6:10:126::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Wed, 22 Mar
+ 2023 06:17:34 +0000
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::a518:512c:4af1:276e]) by DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::a518:512c:4af1:276e%6]) with mapi id 15.20.6178.037; Wed, 22 Mar 2023
+ 06:17:34 +0000
+From:   meenakshi.aggarwal@nxp.com
+To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+Subject: [PATCH v2 0/2] No access to CAAM page 0 registers
+Date:   Wed, 22 Mar 2023 07:17:14 +0100
+Message-Id: <20230322061716.3195841-1-meenakshi.aggarwal@nxp.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230302062055.1564514-3-meenakshi.aggarwal@nxp.com>
+References: <20230302062055.1564514-3-meenakshi.aggarwal@nxp.com>
 Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain
+X-ClientProxiedBy: AM6PR04CA0042.eurprd04.prod.outlook.com
+ (2603:10a6:20b:f0::19) To DU0PR04MB9563.eurprd04.prod.outlook.com
+ (2603:10a6:10:314::7)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|DB8PR04MB7020:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5972ee0a-65c1-4b53-d1c7-08db2a9d1ee4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: F5KbAm3RQTVZ4hhtqi/XzW9/kjl9Tck2GlTMIwKjkGzaw7RUciJvqOfCrmXngq0LNJAe6rmIr6SUhDOHc+MlMS86aLLiDvxvIj2GnKNOJHmLha2UKdGiOUYPRaINWwgJyNPgs1P0GjINkoGBqpTwYDx2Ui9snA5N79cUF9izFpHLzjjQKpCLp907C/ltTGoV107mV1t8pQONu+hZfZ3yYTHTxt8T/c7jDmvDRdwGlDHNCNnvbQE//IAKMMEtYhdVzUq+dfToyJk3nngQ374M+97R1SBiGXkArSH41s1L7jHZjNOQ/cWFJAm1ENSEC0Di6CVa0u+6jE5myENkNUTzO1hsXpWC/xpiuWwIMZzUhuYtF6NVudLN9GcxxRg/qt6ofjJQcocreoacdjI+LTB5KWQzQqxQoYr7BhaR8oeqdKinGbf7n/9NkphJRTNiQ5gru7yEETKb9cGqg56HorXcZBxLPVcjEgVCoNp1O1RbfN1+36+T6MLgZmmxUYhly2igYGMWk6kXWfs2ALnKEy8O1ozNdjXmybAyikZH1ipcuOAkVti5cUbO1TOATI6OOjzkVNwHVpTSSatSZdTDpZYRNzPD+xLvFkO5mK1AEl/qtkwHZpvjU31WpUbeEfkoMgnFUfi8tSTgqgcf/kz2PtUQ8wYOOf8k24NCxSHr8h4d1WjpwBu2I1c+4Y5KeE+7/zzr7Fabpl2ime72Tjsrnddapg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(136003)(366004)(39860400002)(396003)(346002)(451199018)(6512007)(2616005)(83380400001)(478600001)(6486002)(26005)(186003)(6506007)(9686003)(1076003)(8936002)(6666004)(316002)(66556008)(52116002)(66476007)(86362001)(38350700002)(38100700002)(2906002)(4744005)(5660300002)(4326008)(66946007)(8676002)(36756003)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zym46uTnudT32nUAsCvwOi84pauZHWYMoGQ+P3IvRj+pT5C5kwvWSKXO7OpR?=
+ =?us-ascii?Q?DDcxf0nV+j/UkIBjyS5/wzS5VIRLE14bcMuHaMgPQuHzS8cIMHIfMDOSrB90?=
+ =?us-ascii?Q?J2EoOIByXWaEHAcjK3tchbLO2Znkcn/MjfZQLBZ13x3Ao3ytYKInhPuhkLFb?=
+ =?us-ascii?Q?6GV4cwf5XM1HocBYrs+zYlvW0Pv/CnNvfLoEbArPGtdzYaTML9+xxlRNPJHg?=
+ =?us-ascii?Q?m1CAi8f44jzBjH635w5DU6rSKcAsQhs/tLLlVyhyAQ+Z+0v/NKvLwOMqP5og?=
+ =?us-ascii?Q?K1fjsYmu/esnCdDev5QCyhXo0aZ4G9ME25AXPBMMpf9enxKxFh/XdD3JMAro?=
+ =?us-ascii?Q?Cdm7cuolDQAvq3PmtAlFoA1fOh0Lax6thuWKLuFXsK7dpaoM60ixcAxPvuUb?=
+ =?us-ascii?Q?ySFE8Y+4/jHPiTUbXlqSrJaZThiiNDwIWeFxwSRTBMhLB2uZrkcSnbma6L8l?=
+ =?us-ascii?Q?Sw1r/5ZIRT4FaESnSLKBlRNmerqokWjRVJ708SUq5LlAxOV/9q4xOv1Ncl1q?=
+ =?us-ascii?Q?8xUvJnAl9B4qIpppJs9dXOQ8TcpHvKjSWrl2ZWLYcWGWkXxp8b0UJ2oCscEG?=
+ =?us-ascii?Q?UhAPaYYiWT/F+2G8MJp6LtkGTF1oEbHS+4hp8IzzK1Hjd/J+KWkZrmOR/g+u?=
+ =?us-ascii?Q?BUO3LYmbGrVQVuvoQjpPIdepEHQeDckQHn5TgRq0OHTmqreSMA098OLP9nlD?=
+ =?us-ascii?Q?T94K+KwrsXt/g7M8uGFPAIDLxTkZ48Epdnj8RsAS1oQpi8pG76EHN7+kjTm3?=
+ =?us-ascii?Q?RqVnHF51xHkRlNJRbJhgKc4lC/Wf5cWS30QlVN/vJH0jc0AT+cljgtLlaB7d?=
+ =?us-ascii?Q?MEOxGkYYX0Hf2hd5uzzL6BweAMD0A4MQRj0pQg3xpv1w3Gj6ALHar7+clkAM?=
+ =?us-ascii?Q?PvjJWq7n2fB0RZZu0fb6b9hbVDyJayNifn8G0U0pkxnTTmyEwnoNRGrTnT0l?=
+ =?us-ascii?Q?bemxfSpkNBifj2xBH9ka/gzOne+yqJkF78ikrU49VejYnRpUa42T80hmpBix?=
+ =?us-ascii?Q?SDRA6XTmLopnwq+qWc4e1sZl2o8PD+9oLhzZ8yxaU1asvrCjM2Lz26yv26MA?=
+ =?us-ascii?Q?pomLrGAae3+WPE7mlacJqQCanJnbIkbCh7wTY9VmQg+hvA+dBQ59W/i0lxHi?=
+ =?us-ascii?Q?Pi2Yu39e1G0lMu/frKdCQ8nLNBJ7UzKA/2Kzq4Y8hXWIpK2GbJWOtvS7eifS?=
+ =?us-ascii?Q?YHv+v5anH4ZZEmG1PTdz+A8Utx6hfLISbrf9h8zCS32fokLcxaKwk5UEd02Q?=
+ =?us-ascii?Q?hf7xGQBhrmCoEDDAh5HGxcgUGQ0kI6WTaPv6c+/EZltQLH9U1LxWyHQrd7/k?=
+ =?us-ascii?Q?IUb2oRG6KP4I8+zBvREFR8x9BeeaaZ6r8CtNyfuOrdpEKn8jCZQPJB1f8AoF?=
+ =?us-ascii?Q?WI6RhfYhSVZ15O+26rrjtgYqdEQbXuwJG8fI+b+JrLgmIuRHFDtIAEi8p70g?=
+ =?us-ascii?Q?Id0bs9yKs5R7qhqUI9OGf1AHEJyF9ZxQDwfVVnYnDrfBB7fIfDHxc7+EeiAM?=
+ =?us-ascii?Q?djC7yHNCKGzhjJbGo0zvroVANhYO/KWFnWE2/MoJCToGd+asB2omVxaWNT/W?=
+ =?us-ascii?Q?r96U3HBHUc+4lVMqir+KQg3h//8ZHO79cyZvxFpk1teAoSbbxj0YiqMrC5qt?=
+ =?us-ascii?Q?Dg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5972ee0a-65c1-4b53-d1c7-08db2a9d1ee4
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2023 06:17:33.9124
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2FabnZf5MFytQeo8+Y1fo7aQjzZJDML24Tt9EE4IZNjvz1qaIfS3eBSnW3v0D+n2CNIkVu0uu4K+yDCdept4/O0HJ12iEGZBY7jTobcZYxE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7020
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HiSTB TRNG are found on some HiSilicon STB SoCs.
+From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
-v2: fix typo
- drivers/crypto/hisilicon/Kconfig         |   7 ++
- drivers/crypto/hisilicon/Makefile        |   2 +-
- drivers/crypto/hisilicon/trng/Makefile   |   3 +
- drivers/crypto/hisilicon/trng/trng-stb.c | 127 +++++++++++++++++++++++
- 4 files changed, 138 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/hisilicon/trng/trng-stb.c
+This series includes patches to reduce access to page 0 registers of
+CAAM from non-secure world.
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 4137a8bf1..e8690c223 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -82,3 +82,10 @@ config CRYPTO_DEV_HISI_TRNG
- 	select CRYPTO_RNG
- 	help
- 	  Support for HiSilicon TRNG Driver.
-+
-+config CRYPTO_DEV_HISTB_TRNG
-+	tristate "Support for HiSTB TRNG Driver"
-+	depends on ARCH_HISI || COMPILE_TEST
-+	select HW_RANDOM
-+	help
-+	  Support for HiSTB TRNG Driver.
-diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
-index 8595a5a5d..fc51e0ede 100644
---- a/drivers/crypto/hisilicon/Makefile
-+++ b/drivers/crypto/hisilicon/Makefile
-@@ -5,4 +5,4 @@ obj-$(CONFIG_CRYPTO_DEV_HISI_SEC2) += sec2/
- obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += hisi_qm.o
- hisi_qm-objs = qm.o sgl.o debugfs.o
- obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += zip/
--obj-$(CONFIG_CRYPTO_DEV_HISI_TRNG) += trng/
-+obj-y += trng/
-diff --git a/drivers/crypto/hisilicon/trng/Makefile b/drivers/crypto/hisilicon/trng/Makefile
-index d909079f3..cf20b057c 100644
---- a/drivers/crypto/hisilicon/trng/Makefile
-+++ b/drivers/crypto/hisilicon/trng/Makefile
-@@ -1,2 +1,5 @@
- obj-$(CONFIG_CRYPTO_DEV_HISI_TRNG) += hisi-trng-v2.o
- hisi-trng-v2-objs = trng.o
-+
-+obj-$(CONFIG_CRYPTO_DEV_HISTB_TRNG) += histb-trng.o
-+histb-trng-objs += trng-stb.o
-diff --git a/drivers/crypto/hisilicon/trng/trng-stb.c b/drivers/crypto/hisilicon/trng/trng-stb.c
-new file mode 100644
-index 000000000..6a4e92ab2
---- /dev/null
-+++ b/drivers/crypto/hisilicon/trng/trng-stb.c
-@@ -0,0 +1,127 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
-+/*
-+ * Device driver for True RNG in HiSTB SoCs
-+ *
-+ * Copyright (c) 2023 David Yang
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+
-+#define HISTB_TRNG_CTRL		0x0
-+#define HISTB_TRNG_NUMBER	0x4
-+#define HISTB_TRNG_STAT		0x8
-+
-+#define SLEEP_US		10
-+#define TIMEOUT_US		10000
-+
-+static int histb_trng_wait(struct hwrng *rng)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	u32 val;
-+
-+	return readl_relaxed_poll_timeout(base + HISTB_TRNG_STAT,
-+					  val, val & 0x7, SLEEP_US, TIMEOUT_US);
-+}
-+
-+static int histb_trng_init(struct hwrng *rng)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	u32 val;
-+
-+	val = readl_relaxed(base + HISTB_TRNG_CTRL);
-+
-+	/* select rng source 2 */
-+	val &= ~0x3;
-+	val |= 2;
-+	/* post_process_depth */
-+	val &= ~(0xf << 8);
-+	val |= 9 << 8;
-+
-+	val |= BIT(7);  /* post_process_enable */
-+	val |= BIT(5);  /* drop_enable */
-+
-+	writel_relaxed(val, base + HISTB_TRNG_CTRL);
-+
-+	if (histb_trng_wait(rng)) {
-+		pr_err("failed to bring up rng device, does it exist?\n");
-+		return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+
-+static int histb_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	size_t i;
-+	int ret;
-+
-+	for (i = 0; i < max; i += sizeof(u32)) {
-+		ret = histb_trng_wait(rng);
-+		if (ret) {
-+			pr_err("failed to generate random number, generated %zu\n", i);
-+			return i ? i : ret;
-+		}
-+
-+		*((u32 *) data + i) = readl_relaxed(base + HISTB_TRNG_NUMBER);
-+	}
-+
-+	return i;
-+}
-+
-+static int histb_trng_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct hwrng *rng;
-+	struct resource *res;
-+	int ret;
-+
-+	rng = devm_kzalloc(dev, sizeof(*rng), GFP_KERNEL);
-+	if (!rng)
-+		return -ENOMEM;
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	if (!res)
-+		return -ENODEV;
-+
-+	rng->priv = (unsigned long) devm_ioremap(dev, res->start, resource_size(res));
-+	if (!rng->priv)
-+		return -ENOMEM;
-+
-+	rng->name = KBUILD_MODNAME;
-+	rng->init = histb_trng_init;
-+	rng->read = histb_trng_read;
-+
-+	ret = devm_hwrng_register(dev, rng);
-+	if (ret) {
-+		dev_err(dev, "failed to register %s (%d)\n", rng->name, ret);
-+		return ret;
-+	}
-+
-+	platform_set_drvdata(pdev, rng);
-+	return 0;
-+}
-+
-+static const struct of_device_id histb_trng_of_match[] = {
-+	{ .compatible = "hisilicon,histb-trng", },
-+	{ }
-+};
-+
-+static struct platform_driver histb_trng_driver = {
-+	.probe = histb_trng_probe,
-+	.driver = {
-+		.name = "histb-trng",
-+		.of_match_table = of_match_ptr(histb_trng_of_match),
-+	},
-+};
-+
-+module_platform_driver(histb_trng_driver);
-+
-+MODULE_DESCRIPTION("HiSTB True RNG");
-+MODULE_LICENSE("Dual MIT/GPL");
+In non-secure world, access to page 0 registers of CAAM is
+forbidden, so we are using alias registers available in Job Ring's
+register address space.
+
+Allow CAAM's page 0 access to OPTEE, as OPTEE runs in secure world.
+
+changes in v2:
+	- Fixed compile time warnings coming with compilation flag W=1
+
+Horia GeantA (2):
+  crypto: caam - reduce page 0 regs access to minimum
+  crypto: caam - OP-TEE firmware support
+
+ drivers/crypto/caam/caamalg.c  |  21 +++----
+ drivers/crypto/caam/caamhash.c |  10 ++--
+ drivers/crypto/caam/caampkc.c  |   6 +-
+ drivers/crypto/caam/caamrng.c  |   6 +-
+ drivers/crypto/caam/ctrl.c     | 105 +++++++++++++++++++++++----------
+ drivers/crypto/caam/debugfs.c  |  12 ++--
+ drivers/crypto/caam/debugfs.h  |   7 ++-
+ drivers/crypto/caam/intern.h   |   1 +
+ 8 files changed, 109 insertions(+), 59 deletions(-)
+
 -- 
-2.39.2
+2.25.1
 
