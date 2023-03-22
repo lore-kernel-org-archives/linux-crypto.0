@@ -2,38 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0283C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Mar 2023 17:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B900C6FD1C
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Mar 2023 18:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbjCVRdo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Mar 2023 13:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39260 "EHLO
+        id S230098AbjCVSQL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Mar 2023 14:16:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjCVRdn (ORCPT
+        with ESMTP id S229815AbjCVSQK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Mar 2023 13:33:43 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7B6AF21950;
-        Wed, 22 Mar 2023 10:33:41 -0700 (PDT)
-Received: from [192.168.2.24] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id C619320FB5F9;
-        Wed, 22 Mar 2023 10:33:38 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C619320FB5F9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1679506420;
-        bh=YKj8pBxwtU/riqXskTaWyOA0jZcj9AQzuGvPjJCa4XQ=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=BlJF/6Vdj2pLFuNHbcrc6uACppjvORzIZPX3zgVql2+LketMx0Zkvx+2EPq90aGnK
-         1QC2+3/A3+vhY5OkM5FjlJVMyIY8LCcpFxxIDUta0R0ej74sk4LbzSOrXsCIivXGGQ
-         dJhABc9XTKKWM4A/LfSI/bt55TJN39vwMUD912uY=
-Message-ID: <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
-Date:   Wed, 22 Mar 2023 18:33:37 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>
+        Wed, 22 Mar 2023 14:16:10 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E8C9664FD;
+        Wed, 22 Mar 2023 11:15:47 -0700 (PDT)
+Received: from zn.tnic (p5de8e687.dip0.t-ipconnect.de [93.232.230.135])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6B0921EC01A9;
+        Wed, 22 Mar 2023 19:15:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1679508945;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=2ORkR6RJSrqaTM/Wmsze7uUB1vZ0g8AFPgDJBNyMQSk=;
+        b=kzwFWBuzi5GUFafB7dXy2IlK9aTob3kBQXJEZfppmdLlJg+3sJ1kxS+aC5C14V21aBLEtX
+        HglOR+mb1ldzDxCYgDqOh6okUSdmQdHMsSylF5k32kkESrioEBSJQ/tSXqPQLgha6/LRh+
+        +o9yTzMJIeULfIMagZ5DzYbLvb2fgRo=
+Date:   Wed, 22 Mar 2023 19:15:41 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 Cc:     linux-kernel@vger.kernel.org,
         Brijesh Singh <brijesh.singh@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
@@ -44,44 +42,41 @@ Cc:     linux-kernel@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
+Message-ID: <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
 References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
  <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/03/2023 16:46, Borislav Petkov wrote:
-> On Mon, Mar 20, 2023 at 07:19:48PM +0000, Jeremi Piotrowski wrote:
->> This series is a prerequisite for nested SNP-host support on Hyper-V
-> 
-> I'm curious: what in the *world* is a sensible use case for doing this
-> thing at all?
-> 
+On Wed, Mar 22, 2023 at 06:33:37PM +0100, Jeremi Piotrowski wrote:
+> What this does is it allows a normal (non-SNP) VM to host confidential (SNP)
+> VMs. I say "normal" but not every VM is going to be able to do this, it needs
 
-This is actually not as crazy as it sounds.
+If you say "non-SNP" VM then this sounds like purely for development.
+Because I cannot see how you're going to give the confidentiality
+guarantee to the SNP guests if the lower level is unencrypted, non-SNP
+and so on...
 
-What this does is it allows a normal (non-SNP) VM to host confidential (SNP)
-VMs. I say "normal" but not every VM is going to be able to do this, it needs
-to be running on AMD hardware and configured to have access to
-VirtualizationExtensions, a "HardwareIsolation" capability, and given a number
-of "hardware isolated guests" that it is allowed to spawn. In practice this
-will result in the VM seeing a PSP device, SEV-SNP related CPUID leafs, and
-have access to additional memory management instructions (rmpadjust/psmash).
-This allows the rest of the of KVM-SNP support to work.
+> to be running on AMD hardware and configured to have access to
+> VirtualizationExtensions, a "HardwareIsolation" capability, and given a number
+> of "hardware isolated guests" that it is allowed to spawn. In practice this
+> will result in the VM seeing a PSP device, SEV-SNP related CPUID
+> leafs, and have access to additional memory management instructions
+> (rmpadjust/psmash).  This allows the rest of the of KVM-SNP support to
+> work.
 
-So instead of taking a bare-metal AMD server with 128 CPUs to run confidential
-workloads you'll be able to provision an Azure VM with say 8 CPUs and run up to
-8 SNP guests nested inside it.
+So why don't you emulate the PSP in KVM instead of doing some BIOS hack?
+And multiplex the access to it between all the parties needing it?
 
-It's also useful for development, I participate in the kata-containers project
-where we're doing confidential-containers related work, and having access to
-test VMs to run SNP guests is going to make things much easier.
+-- 
+Regards/Gruss,
+    Boris.
 
-If you're interested, I posted the other half of the patches required some time
-back: https://lore.kernel.org/lkml/20230213103402.1189285-1-jpiotrowski@linux.microsoft.com/#t
-
-Jeremi
+https://people.kernel.org/tglx/notes-about-netiquette
