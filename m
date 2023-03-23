@@ -2,583 +2,478 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA214C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Mar 2023 06:51:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D968AC6FD1D
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Mar 2023 07:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjCWGvI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Mar 2023 02:51:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50768 "EHLO
+        id S230230AbjCWHXY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Mar 2023 03:23:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbjCWGvH (ORCPT
+        with ESMTP id S229484AbjCWHXX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Mar 2023 02:51:07 -0400
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2085.outbound.protection.outlook.com [40.107.247.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D282D151;
-        Wed, 22 Mar 2023 23:51:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P6gAIeLx3Tdi6urrla+KeVHFvkDQOnU8wFVcZv48irjZcZ4WlS2yR9zdxCD5OxXAqAWZI9EtijBwKt9U6qXG8PNDyYsdGUmd3mJSfQS297SN1wU5yRu2GSuA9uTNEVEyseQDMNiS+LUkdeGwLDBb1zXlRN2e/0TD315qZD2ZjHs8mEquho1CQN47qzD0Bi7DNR+vDLt8pCIBD1Y4vzFKSCKLaMRGHqtOmqd7yV4zc1ZZ6jel10XGONTXPNs5rXSMz8x902fwO1mZvOcbTc7sRQAx196Yk324HjlWun7JtLDxVEW6LuqABxAROVb6Or3Gtg5ImBXDXf0pmNHvIUH+Zw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bgh4WP0Nb4MB+lDsDochKK4zRI0eb5pyxnUmHDoNGpA=;
- b=X3tFqb+0jVsilMkjpIxUddc4qJAyYlOHZA9hpnLd6Eqgz0HTWo+yQqVhmqYq+/XwhjsTu/B2gYEGOXNHv6nIX1Zjr1Iy0dmfaMkDdMfqfobVMVDY2WOIRrgwqZsa+p9YzG+6YmmX/otMofvxirqkDix6Sg1YIGE82LTYB0/HMZgAm3vXPUY1BgR+EnQ0ney9waRW4sSzzJNN1xVg/+B2wWzT28j0T1i4GXsdh/QnZcJUZQfofg6TBBoAWT9tSG8ZuDdgxuqyNDYqVv51Goq7t/cQyrk1JBYv2Z++YqFUrp0rMhzR8NpZlfgI8SKFBc3labWy0T2pDqBm/iM0tLWZcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bgh4WP0Nb4MB+lDsDochKK4zRI0eb5pyxnUmHDoNGpA=;
- b=UTpprmz+N4diLJ8Wqm6VU80RMQCzDMUZVIjZf37jWiqN5Slklt2harJPR2Jlsof1/YiF8aXe9UrpATGj/RZlwUiChk2NEABwTilvCVorWcQ2TCK/MyrSIIsnwvLwBPZylZbbWoCucdx1iWUFJt8VO11Ii04fqK0UbZ8FExDTOpU=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by PAXPR04MB8206.eurprd04.prod.outlook.com (2603:10a6:102:1cb::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Thu, 23 Mar
- 2023 06:51:01 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::c2c7:5798:7033:5f87]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::c2c7:5798:7033:5f87%7]) with mapi id 15.20.6178.038; Thu, 23 Mar 2023
- 06:51:01 +0000
-From:   Gaurav Jain <gaurav.jain@nxp.com>
-To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Varun Sethi <V.Sethi@nxp.com>
-Subject: RE: [PATCH v2 1/2] crypto: caam - reduce page 0 regs access to
- minimum
-Thread-Topic: [PATCH v2 1/2] crypto: caam - reduce page 0 regs access to
- minimum
-Thread-Index: AQHZXIYE2xtrf7mAKE+fMldeQujGH68H7pTA
-Date:   Thu, 23 Mar 2023 06:51:01 +0000
-Message-ID: <AM0PR04MB600438C3B877D01E37BD2616E7879@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <20230302062055.1564514-3-meenakshi.aggarwal@nxp.com>
- <20230322061716.3195841-1-meenakshi.aggarwal@nxp.com>
- <20230322061716.3195841-2-meenakshi.aggarwal@nxp.com>
-In-Reply-To: <20230322061716.3195841-2-meenakshi.aggarwal@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|PAXPR04MB8206:EE_
-x-ms-office365-filtering-correlation-id: 88b003c0-6d63-4623-99af-08db2b6af720
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: AygyYMaUKcJvEsbrfiTtGTbhuwiAavsXriJ8um05fnonapDFM88iAnQtAtgNEP66JlzfIAof6RSXay7/sjBjRkKzDEaYyGfR0W2PGnN3llBxYdIsWazw8U3TLv5dpxGhMEWtUJMz7Srz3blSjTfzHwdxdYb1zyBZwzJZy5FYwmO9C2FUD97JuU82wbGkKtJJewGFeSgMM2ue9oef4Y0RHqd5um/guXg47nMtRe6PUiXPbMcGDGve1XidBS9ZIpb5b8/yAkuwRuLEXuIk++rjEwLsbjs5uGqBWtntdjkCiXIbkhrUUlVoR7d1ciwibt3wStQkuE636AA4SXmTT6beOWun/JXjXFcng+iBjr3PvslHA73jfTNnmBGcLFZtmui44YzPU+a7gYKZ+SM+wNlFwGGs3IOtPhvA32TpP59ZyREDjXTgP6sbmj7WtjLUngH67qoMEFkpLSeFMVKfRnZJ0PHagDcCFjkGflMJrJ/S4nHcRO7qg9Ts0kfmR8l/++1DWNmK5f8Jlzu4w2vAFtLLy0lEuSguhI5lexG9AfWHe49/Kl034yhA/vP9HVm2U2d+0rn4wvSBXAbMLxNSn7lrZyyivgxcSSkELFkdHXdgz/32hxLiIuNhAGClKiM5pQMJx1DArNpPvVOJ8cq9KgcgW2sUELuHQ4Pub4dTW/k27Fw8pBkwrAJWM+OMNgykUzoSbvqh1WOYRP5faDu9YiStKQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(376002)(396003)(346002)(39860400002)(136003)(451199018)(8936002)(76116006)(52536014)(66556008)(66446008)(64756008)(66476007)(41300700001)(8676002)(66946007)(4326008)(33656002)(478600001)(38100700002)(38070700005)(53546011)(122000001)(86362001)(26005)(9686003)(6506007)(55016003)(83380400001)(186003)(316002)(71200400001)(7696005)(110136005)(2906002)(5660300002)(44832011)(30864003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?q0ZYAaC3G8OXewO9i51Rjyp/iV4yoSugFkkvfFqAQF/8nzHmYKdIVSAHjhDQ?=
- =?us-ascii?Q?Z0VdzZMWyzbHkYASZdPY3Z8JxPqS8x2tV4oMk/4ncinmHXG3VmaAz0wFaKq5?=
- =?us-ascii?Q?Qd5yWa5fBXROhXsgY/eJswrauKbGGD9rC8ZznnrI3AT1Aco79JXvMSG3JyHV?=
- =?us-ascii?Q?EVhqGAzSAjfPN1iuYK4jdC9gmMAr4f1a/y1rL8N0fLipUUlhXPU0nSYL+puo?=
- =?us-ascii?Q?viJEc2mD7vVhpIR1RiLHaMSYi6OIhkY6OBxw3o5K6bn+e2pq2cS7IALUZotC?=
- =?us-ascii?Q?Wy37JQfpg2wwXQL3NIxbbFmjg7aTNxXBkMs5cL6wWUi47ogJxUKRSfwYHhhC?=
- =?us-ascii?Q?AwFt52aMYuxipud0PZz3o/W4NrGJmo7VtwEgadvoJR/Kt96osxvNkCs84KWE?=
- =?us-ascii?Q?ZzCVeo+khK7flxig1SoClaIz6O7V9m9j2M7AHDlmETMzYwqbfFBTyyx2fRYf?=
- =?us-ascii?Q?Ntc3/PcGyhyrHwIc4G1l41ffg5GSUnLU20w3jysOUdhDkoJO8MkZjiw/68HM?=
- =?us-ascii?Q?Fs9KMsXTnDoIMwKVUE4pskKi1TMbZIEs9kVpdho+Y8q8g14esyt+G3iz7Yni?=
- =?us-ascii?Q?ZcQ+Y6tJHRMYOzMHgwxLpwfc3KGPuIydPd8CJjX3KpzUzgCgbwafbNC5pmqW?=
- =?us-ascii?Q?ZxopZBLpnY/d1PGGjnPBJmkR8DZIYa1xWXQsLU7/F4Ig/9vJisaey2wUGD34?=
- =?us-ascii?Q?7c+05IlzX/qvN//uCdKwnbGIHc/0itU2Mphn2WpoHySOcUSPTMJrqQ/f2C5r?=
- =?us-ascii?Q?3jX+fhZctsLW2vTd8v14Rw2lP+L9u8Du/A550WWIs1UZ0dMmvU4TBMDEmiug?=
- =?us-ascii?Q?GifvD1glveblZ/9bIE78mbgF799uY5vURT+ydMC0e/Sl8NwMtkAix5EySgIx?=
- =?us-ascii?Q?GpwzMW1sjtaXbVwBMB+uhqvcEV4o7qxXiak/YIeTx53lqi0RqoP7HFD4MG79?=
- =?us-ascii?Q?G15G8I5YOxFq+s2psDKtsm0CKGsAlrP1IMEsuZ3ayg3GZEpj+j9gKWvpz/IS?=
- =?us-ascii?Q?vgrHX6f5X6h82IdYROHeCSl+h4kVJg49Kay/poiG/TAWL09mm6+AXVMA6pJb?=
- =?us-ascii?Q?TJUEU4AHmgubRcH6eaEt/y3ulRpjply8io4JYdLZVKlePeJDmmExnWHxrKXT?=
- =?us-ascii?Q?JIQqiC+NsujBf+fM/+inTM92EM18e2C15y3yKeCyxPNnETMNPZpBy8Xs9jSj?=
- =?us-ascii?Q?IDY4vyji2/EFMcK32H/L0wJyWBekdvvFULsdyCwyShyaTHzeEEdHtUI3tcps?=
- =?us-ascii?Q?nYXPGLRAXgP5q2Fg7fOVngmcZWX1kx7+ET/tPwnxjYx6xSqqAyR3C2zNyZnQ?=
- =?us-ascii?Q?jpAcn5n9/bqNKb6uVE2slhgB1BUsE+zz2j1t5/dR428TvmzeNfYEBaaQ8ifX?=
- =?us-ascii?Q?SeH0zSCNjx3FOt+orNFd2vrHN6t0OxLE+7jiB3QWTmNRXefuFS5wXHecs1u+?=
- =?us-ascii?Q?tXU5zNimO64zsuKXpUYfdz7/fYI6/fbmC2j2RVJY0sH+2etoPzIDB4ssIeYW?=
- =?us-ascii?Q?sBPo36yg51/9kZiCRQQJUjNn6KjjygDyHcG6GbQP3uRdCQL5Xcstz6JB88NS?=
- =?us-ascii?Q?QPZL2YEJd9gmpbILt+blLwRqMBnOC/vyDLvDsiAK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 23 Mar 2023 03:23:23 -0400
+X-Greylist: delayed 180 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 23 Mar 2023 00:23:20 PDT
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F0E9775
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Mar 2023 00:23:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1679555838; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=PNJw2ldCFHYUjIoUzmI2fVTDB1pYXSwm1P2XpqX02dTiDSRge/DY49aEj+T2O5fGCd
+    Opx/gnyCHmXFYtyA0jiiZeKnqxFlN2Cyuj3WjtUdYyDsjDqcwfv6IZoDi58zCzcoDPA7
+    IiG9cIrY9uKfNVG6dMY81Ry8L/x3gMdHHdgjtdiiEeozpQOy6DvDlAugKY2WtA8PxLtt
+    acmL5hySCEUuZ3hTxn3IqjoaT5MheS3j5pgUpiRV8a4UOM+tm0t9AVno8a38iMHgux9q
+    e/pYvQNaJ07uWauIUOcxNsg+tp7nWUYV/9KS2tdp99pYcRfBATXEYF+O3FPAllpC8q2m
+    myOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1679555838;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:To:From:Cc:Date:From:Subject:Sender;
+    bh=aTob7ObK7QLQQtxoiu1Xxke5tGs7lVBA0Ma06MwCevk=;
+    b=RWQcugEjKJpsBf2nb88ucLzncNetAyoIqo0JM/yildHOVO62+YsFvGrwcV0+xbIEzF
+    UpXFajni1KYLWlnEBvmLoXWvCBr0WydrALbIufQBzhIvWN3Ltsr8nh2tpnH3zNm7N3fz
+    Y+W8GCfn2bNWly/gxkebwL5eQNCALCtuUSUHSM0n0rxCAB5QhaSBolKI/Wy1WNBb+fkH
+    mKYDrPwsZiPtX/erwuCcSE5Vywv+1vEYAC9Bsy3ggcIlqzvBe82f19fMnXUGFSG6Fkc7
+    qa9XWM0OHLPrObvVUunu/naU/nOZgEbTzG89R0oGNizFuyS8SXBMI+JOjt3RwGrHrdTx
+    zt+Q==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1679555838;
+    s=strato-dkim-0002; d=chronox.de;
+    h=Message-ID:Date:Subject:To:From:Cc:Date:From:Subject:Sender;
+    bh=aTob7ObK7QLQQtxoiu1Xxke5tGs7lVBA0Ma06MwCevk=;
+    b=rNe7zw+gXnrrRiE4vcDb8VC5+4dL3uQbQB+pm3DWxKgasNPDjcp0nJGqUTDGFvl1a9
+    RwNiIYvXWzZO8u2Kl5tz9tMr6StZ2A7dFQpEil5Qo9oVexOM2O1dQPiOXmvuXOpUOcV+
+    cdZ7l0uKDSorK1XOvSgPOPHullekTUnFSwPdcH8M67jeshFK2chmYAxRNkyDs2xJjXoO
+    MHV1noKk/Rzs31fufWtte07N0lyxcQSJbwoRvcWkglGv/MbwyH6/JGDlWTa8GEm5g5pZ
+    MWTrHAlh+Zk0gGMNQG7Ag0640eiKPPur7C4bvLuEgw3l29PPyN8rHT5NY+Slle0CFFJR
+    WlFw==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9y2gdNk2TvDr2d0uyvAg="
+Received: from positron.chronox.de
+    by smtp.strato.de (RZmta 49.3.1 DYNA|AUTH)
+    with ESMTPSA id u24edez2N7HHVjL
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Thu, 23 Mar 2023 08:17:17 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: [PATCH] crypto: Jitter RNG - Permanent and Intermittent health errors
+Date:   Thu, 23 Mar 2023 08:17:14 +0100
+Message-ID: <12194787.O9o76ZdvQC@positron.chronox.de>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88b003c0-6d63-4623-99af-08db2b6af720
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2023 06:51:01.5537
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: k0YeG2XspO0lZ+3BWDRrKYflCbuj+DdOG9VQsHopX4ZBi4XaK/AaQHqRANer8p+EubX+p5rUFeQkDfXIxgWbPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8206
+Autocrypt: addr=smueller@chronox.de;
+ keydata=
+ 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
+ kBFBHm+xdudNab2U0OpfqrWerOw3WcGd2
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reviewed-by: Gaurav Jain <gaurav.jain@nxp.com>
+According to SP800-90B, two health failures are allowed: the intermittend
+and the permanent failure. So far, only the intermittent failure was
+implemented. The permanent failure was achieved by resetting the entire
+entropy source including its health test state and waiting for two or
+more back-to-back health errors.
 
-> -----Original Message-----
-> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Sent: Wednesday, March 22, 2023 11:47 AM
-> To: Horia Geanta <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>;
-> Pankaj Gupta <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
-> herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-> Cc: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>; Varun Sethi
-> <V.Sethi@nxp.com>
-> Subject: [PATCH v2 1/2] crypto: caam - reduce page 0 regs access to minim=
-um
->=20
-> From: Horia GeantA <horia.geanta@nxp.com>
->=20
-> Use job ring register map, in place of controller register map to access =
-page 0
-> registers, as access to the controller register map is not permitted.
->=20
-> Signed-off-by: Horia GeantA <horia.geanta@nxp.com>
-> Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
-> Signed-off-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Reviewed-by: Varun Sethi <v.sethi@nxp.com>
-> ---
->  drivers/crypto/caam/caamalg.c  | 21 ++++-----
-> drivers/crypto/caam/caamhash.c | 10 +++--  drivers/crypto/caam/caampkc.c =
- |
-> 6 +--  drivers/crypto/caam/caamrng.c  |  6 +--
->  drivers/crypto/caam/ctrl.c     | 82 +++++++++++++++++++++-------------
->  drivers/crypto/caam/debugfs.c  |  9 ++--  drivers/crypto/caam/debugfs.h =
- |  7
-> ++-
->  7 files changed, 83 insertions(+), 58 deletions(-)
->=20
-> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
-c
-> index 12b1c8346243..feb86013dbf6 100644
-> --- a/drivers/crypto/caam/caamalg.c
-> +++ b/drivers/crypto/caam/caamalg.c
-> @@ -3,7 +3,7 @@
->   * caam - Freescale FSL CAAM support for crypto API
->   *
->   * Copyright 2008-2011 Freescale Semiconductor, Inc.
-> - * Copyright 2016-2019 NXP
-> + * Copyright 2016-2019, 2023 NXP
->   *
->   * Based on talitos crypto API driver.
->   *
-> @@ -3542,13 +3542,14 @@ int caam_algapi_init(struct device *ctrldev)
->  	 * First, detect presence and attributes of DES, AES, and MD blocks.
->  	 */
->  	if (priv->era < 10) {
-> +		struct caam_perfmon __iomem *perfmon =3D &priv->jr[0]-
-> >perfmon;
->  		u32 cha_vid, cha_inst, aes_rn;
->=20
-> -		cha_vid =3D rd_reg32(&priv->ctrl->perfmon.cha_id_ls);
-> +		cha_vid =3D rd_reg32(&perfmon->cha_id_ls);
->  		aes_vid =3D cha_vid & CHA_ID_LS_AES_MASK;
->  		md_vid =3D (cha_vid & CHA_ID_LS_MD_MASK) >>
-> CHA_ID_LS_MD_SHIFT;
->=20
-> -		cha_inst =3D rd_reg32(&priv->ctrl->perfmon.cha_num_ls);
-> +		cha_inst =3D rd_reg32(&perfmon->cha_num_ls);
->  		des_inst =3D (cha_inst & CHA_ID_LS_DES_MASK) >>
->  			   CHA_ID_LS_DES_SHIFT;
->  		aes_inst =3D cha_inst & CHA_ID_LS_AES_MASK; @@ -3556,23
-> +3557,23 @@ int caam_algapi_init(struct device *ctrldev)
->  		ccha_inst =3D 0;
->  		ptha_inst =3D 0;
->=20
-> -		aes_rn =3D rd_reg32(&priv->ctrl->perfmon.cha_rev_ls) &
-> -			 CHA_ID_LS_AES_MASK;
-> +		aes_rn =3D rd_reg32(&perfmon->cha_rev_ls) &
-> CHA_ID_LS_AES_MASK;
->  		gcm_support =3D !(aes_vid =3D=3D CHA_VER_VID_AES_LP && aes_rn <
-> 8);
->  	} else {
-> +		struct version_regs __iomem *vreg =3D &priv->jr[0]->vreg;
->  		u32 aesa, mdha;
->=20
-> -		aesa =3D rd_reg32(&priv->ctrl->vreg.aesa);
-> -		mdha =3D rd_reg32(&priv->ctrl->vreg.mdha);
-> +		aesa =3D rd_reg32(&vreg->aesa);
-> +		mdha =3D rd_reg32(&vreg->mdha);
->=20
->  		aes_vid =3D (aesa & CHA_VER_VID_MASK) >>
-> CHA_VER_VID_SHIFT;
->  		md_vid =3D (mdha & CHA_VER_VID_MASK) >>
-> CHA_VER_VID_SHIFT;
->=20
-> -		des_inst =3D rd_reg32(&priv->ctrl->vreg.desa) &
-> CHA_VER_NUM_MASK;
-> +		des_inst =3D rd_reg32(&vreg->desa) & CHA_VER_NUM_MASK;
->  		aes_inst =3D aesa & CHA_VER_NUM_MASK;
->  		md_inst =3D mdha & CHA_VER_NUM_MASK;
-> -		ccha_inst =3D rd_reg32(&priv->ctrl->vreg.ccha) &
-> CHA_VER_NUM_MASK;
-> -		ptha_inst =3D rd_reg32(&priv->ctrl->vreg.ptha) &
-> CHA_VER_NUM_MASK;
-> +		ccha_inst =3D rd_reg32(&vreg->ccha) & CHA_VER_NUM_MASK;
-> +		ptha_inst =3D rd_reg32(&vreg->ptha) & CHA_VER_NUM_MASK;
->=20
->  		gcm_support =3D aesa & CHA_VER_MISC_AES_GCM;
->  	}
-> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhas=
-h.c
-> index 82d3c730a502..80deb003f0a5 100644
-> --- a/drivers/crypto/caam/caamhash.c
-> +++ b/drivers/crypto/caam/caamhash.c
-> @@ -3,7 +3,7 @@
->   * caam - Freescale FSL CAAM support for ahash functions of crypto API
->   *
->   * Copyright 2011 Freescale Semiconductor, Inc.
-> - * Copyright 2018-2019 NXP
-> + * Copyright 2018-2019, 2023 NXP
->   *
->   * Based on caamalg.c crypto API driver.
->   *
-> @@ -1956,12 +1956,14 @@ int caam_algapi_hash_init(struct device *ctrldev)
->  	 * presence and attributes of MD block.
->  	 */
->  	if (priv->era < 10) {
-> -		md_vid =3D (rd_reg32(&priv->ctrl->perfmon.cha_id_ls) &
-> +		struct caam_perfmon __iomem *perfmon =3D &priv->jr[0]-
-> >perfmon;
-> +
-> +		md_vid =3D (rd_reg32(&perfmon->cha_id_ls) &
->  			  CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
-> -		md_inst =3D (rd_reg32(&priv->ctrl->perfmon.cha_num_ls) &
-> +		md_inst =3D (rd_reg32(&perfmon->cha_num_ls) &
->  			   CHA_ID_LS_MD_MASK) >> CHA_ID_LS_MD_SHIFT;
->  	} else {
-> -		u32 mdha =3D rd_reg32(&priv->ctrl->vreg.mdha);
-> +		u32 mdha =3D rd_reg32(&priv->jr[0]->vreg.mdha);
->=20
->  		md_vid =3D (mdha & CHA_VER_VID_MASK) >>
-> CHA_VER_VID_SHIFT;
->  		md_inst =3D mdha & CHA_VER_NUM_MASK;
-> diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.=
-c
-> index e40614fef39d..72afc249d42f 100644
-> --- a/drivers/crypto/caam/caampkc.c
-> +++ b/drivers/crypto/caam/caampkc.c
-> @@ -3,7 +3,7 @@
->   * caam - Freescale FSL CAAM support for Public Key Cryptography
->   *
->   * Copyright 2016 Freescale Semiconductor, Inc.
-> - * Copyright 2018-2019 NXP
-> + * Copyright 2018-2019, 2023 NXP
->   *
->   * There is no Shared Descriptor for PKC so that the Job Descriptor must=
- carry
->   * all the desired key parameters, input and output pointers.
-> @@ -1168,10 +1168,10 @@ int caam_pkc_init(struct device *ctrldev)
->=20
->  	/* Determine public key hardware accelerator presence. */
->  	if (priv->era < 10) {
-> -		pk_inst =3D (rd_reg32(&priv->ctrl->perfmon.cha_num_ls) &
-> +		pk_inst =3D (rd_reg32(&priv->jr[0]->perfmon.cha_num_ls) &
->  			   CHA_ID_LS_PK_MASK) >> CHA_ID_LS_PK_SHIFT;
->  	} else {
-> -		pkha =3D rd_reg32(&priv->ctrl->vreg.pkha);
-> +		pkha =3D rd_reg32(&priv->jr[0]->vreg.pkha);
->  		pk_inst =3D pkha & CHA_VER_NUM_MASK;
->=20
->  		/*
-> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.=
-c
-> index 1fd8ff965006..50eb55da45c2 100644
-> --- a/drivers/crypto/caam/caamrng.c
-> +++ b/drivers/crypto/caam/caamrng.c
-> @@ -3,7 +3,7 @@
->   * caam - Freescale FSL CAAM support for hw_random
->   *
->   * Copyright 2011 Freescale Semiconductor, Inc.
-> - * Copyright 2018-2019 NXP
-> + * Copyright 2018-2019, 2023 NXP
->   *
->   * Based on caamalg.c crypto API driver.
->   *
-> @@ -227,10 +227,10 @@ int caam_rng_init(struct device *ctrldev)
->=20
->  	/* Check for an instantiated RNG before registration */
->  	if (priv->era < 10)
-> -		rng_inst =3D (rd_reg32(&priv->ctrl->perfmon.cha_num_ls) &
-> +		rng_inst =3D (rd_reg32(&priv->jr[0]->perfmon.cha_num_ls) &
->  			    CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT;
->  	else
-> -		rng_inst =3D rd_reg32(&priv->ctrl->vreg.rng) &
-> CHA_VER_NUM_MASK;
-> +		rng_inst =3D rd_reg32(&priv->jr[0]->vreg.rng) &
-> CHA_VER_NUM_MASK;
->=20
->  	if (!rng_inst)
->  		return 0;
-> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c inde=
-x
-> 6278afb951c3..ae07c1e5fd38 100644
-> --- a/drivers/crypto/caam/ctrl.c
-> +++ b/drivers/crypto/caam/ctrl.c
-> @@ -3,7 +3,7 @@
->   * Controller-level driver, kernel property detection, initialization
->   *
->   * Copyright 2008-2012 Freescale Semiconductor, Inc.
-> - * Copyright 2018-2019 NXP
-> + * Copyright 2018-2019, 2023 NXP
->   */
->=20
->  #include <linux/device.h>
-> @@ -395,7 +395,7 @@ static void kick_trng(struct platform_device *pdev, i=
-nt
-> ent_delay)
->  		      RTMCTL_SAMP_MODE_RAW_ES_SC);
->  }
->=20
-> -static int caam_get_era_from_hw(struct caam_ctrl __iomem *ctrl)
-> +static int caam_get_era_from_hw(struct caam_perfmon __iomem *perfmon)
->  {
->  	static const struct {
->  		u16 ip_id;
-> @@ -421,12 +421,12 @@ static int caam_get_era_from_hw(struct caam_ctrl
-> __iomem *ctrl)
->  	u16 ip_id;
->  	int i;
->=20
-> -	ccbvid =3D rd_reg32(&ctrl->perfmon.ccb_id);
-> +	ccbvid =3D rd_reg32(&perfmon->ccb_id);
->  	era =3D (ccbvid & CCBVID_ERA_MASK) >> CCBVID_ERA_SHIFT;
->  	if (era)	/* This is '0' prior to CAAM ERA-6 */
->  		return era;
->=20
-> -	id_ms =3D rd_reg32(&ctrl->perfmon.caam_id_ms);
-> +	id_ms =3D rd_reg32(&perfmon->caam_id_ms);
->  	ip_id =3D (id_ms & SECVID_MS_IPID_MASK) >> SECVID_MS_IPID_SHIFT;
->  	maj_rev =3D (id_ms & SECVID_MS_MAJ_REV_MASK) >>
-> SECVID_MS_MAJ_REV_SHIFT;
->=20
-> @@ -444,9 +444,9 @@ static int caam_get_era_from_hw(struct caam_ctrl
-> __iomem *ctrl)
->   * In case this property is not passed an attempt to retrieve the CAAM
->   * era via register reads will be made.
->   *
-> - * @ctrl:	controller region
-> + * @perfmon:	Performance Monitor Registers
->   */
-> -static int caam_get_era(struct caam_ctrl __iomem *ctrl)
-> +static int caam_get_era(struct caam_perfmon __iomem *perfmon)
->  {
->  	struct device_node *caam_node;
->  	int ret;
-> @@ -459,7 +459,7 @@ static int caam_get_era(struct caam_ctrl __iomem *ctr=
-l)
->  	if (!ret)
->  		return prop;
->  	else
-> -		return caam_get_era_from_hw(ctrl);
-> +		return caam_get_era_from_hw(perfmon);
->  }
->=20
->  /*
-> @@ -626,6 +626,7 @@ static int caam_probe(struct platform_device *pdev)
->  	struct device_node *nprop, *np;
->  	struct caam_ctrl __iomem *ctrl;
->  	struct caam_drv_private *ctrlpriv;
-> +	struct caam_perfmon __iomem *perfmon;
->  	struct dentry *dfs_root;
->  	u32 scfgr, comp_params;
->  	u8 rng_vid;
-> @@ -665,9 +666,36 @@ static int caam_probe(struct platform_device *pdev)
->  		return ret;
->  	}
->=20
-> -	caam_little_end =3D !(bool)(rd_reg32(&ctrl->perfmon.status) &
-> +	ring =3D 0;
-> +	for_each_available_child_of_node(nprop, np)
-> +		if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
-> +		    of_device_is_compatible(np, "fsl,sec4.0-job-ring")) {
-> +			u32 reg;
-> +
-> +			if (of_property_read_u32_index(np, "reg", 0, &reg)) {
-> +				dev_err(dev, "%s read reg property error\n",
-> +					np->full_name);
-> +				continue;
-> +			}
-> +
-> +			ctrlpriv->jr[ring] =3D (struct caam_job_ring __iomem
-> __force *)
-> +					     ((__force uint8_t *)ctrl + reg);
-> +
-> +			ctrlpriv->total_jobrs++;
-> +			ring++;
-> +		}
-> +
-> +	/*
-> +	 * Wherever possible, instead of accessing registers from the global
-> page,
-> +	 * use the alias registers in the first (cf. DT nodes order)
-> +	 * job ring's page.
-> +	 */
-> +	perfmon =3D ring ? (struct caam_perfmon __iomem *)&ctrlpriv->jr[0]-
-> >perfmon :
-> +			 (struct caam_perfmon __iomem *)&ctrl->perfmon;
-> +
-> +	caam_little_end =3D !(bool)(rd_reg32(&perfmon->status) &
->  				  (CSTA_PLEND | CSTA_ALT_PLEND));
-> -	comp_params =3D rd_reg32(&ctrl->perfmon.comp_parms_ms);
-> +	comp_params =3D rd_reg32(&perfmon->comp_parms_ms);
->  	if (comp_params & CTPR_MS_PS && rd_reg32(&ctrl->mcr) &
-> MCFGR_LONG_PTR)
->  		caam_ptr_sz =3D sizeof(u64);
->  	else
-> @@ -778,7 +806,7 @@ static int caam_probe(struct platform_device *pdev)
->  		return ret;
->  	}
->=20
-> -	ctrlpriv->era =3D caam_get_era(ctrl);
-> +	ctrlpriv->era =3D caam_get_era(perfmon);
->  	ctrlpriv->domain =3D iommu_get_domain_for_dev(dev);
->=20
->  	dfs_root =3D debugfs_create_dir(dev_name(dev), NULL); @@ -789,7
-> +817,7 @@ static int caam_probe(struct platform_device *pdev)
->  			return ret;
->  	}
->=20
-> -	caam_debugfs_init(ctrlpriv, dfs_root);
-> +	caam_debugfs_init(ctrlpriv, perfmon, dfs_root);
->=20
->  	/* Check to see if (DPAA 1.x) QI present. If so, enable */
->  	if (ctrlpriv->qi_present && !caam_dpaa2) { @@ -808,26 +836,13 @@
-> static int caam_probe(struct platform_device *pdev)  #endif
->  	}
->=20
-> -	ring =3D 0;
-> -	for_each_available_child_of_node(nprop, np)
-> -		if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
-> -		    of_device_is_compatible(np, "fsl,sec4.0-job-ring")) {
-> -			ctrlpriv->jr[ring] =3D (struct caam_job_ring __iomem
-> __force *)
-> -					     ((__force uint8_t *)ctrl +
-> -					     (ring + JR_BLOCK_NUMBER) *
-> -					      BLOCK_OFFSET
-> -					     );
-> -			ctrlpriv->total_jobrs++;
-> -			ring++;
-> -		}
-> -
->  	/* If no QI and no rings specified, quit and go home */
->  	if ((!ctrlpriv->qi_present) && (!ctrlpriv->total_jobrs)) {
->  		dev_err(dev, "no queues configured, terminating\n");
->  		return -ENOMEM;
->  	}
->=20
-> -	comp_params =3D rd_reg32(&ctrl->perfmon.comp_parms_ls);
-> +	comp_params =3D rd_reg32(&perfmon->comp_parms_ls);
->  	ctrlpriv->blob_present =3D !!(comp_params & CTPR_LS_BLOB);
->=20
->  	/*
-> @@ -836,15 +851,20 @@ static int caam_probe(struct platform_device *pdev)
->  	 * check both here.
->  	 */
->  	if (ctrlpriv->era < 10) {
-> -		rng_vid =3D (rd_reg32(&ctrl->perfmon.cha_id_ls) &
-> +		rng_vid =3D (rd_reg32(&perfmon->cha_id_ls) &
->  			   CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT;
->  		ctrlpriv->blob_present =3D ctrlpriv->blob_present &&
-> -			(rd_reg32(&ctrl->perfmon.cha_num_ls) &
-> CHA_ID_LS_AES_MASK);
-> +			(rd_reg32(&perfmon->cha_num_ls) &
-> CHA_ID_LS_AES_MASK);
->  	} else {
-> -		rng_vid =3D (rd_reg32(&ctrl->vreg.rng) & CHA_VER_VID_MASK) >>
-> +		struct version_regs __iomem *vreg;
-> +
-> +		vreg =3D ring ? (struct version_regs __iomem *)&ctrlpriv->jr[0]-
-> >vreg :
-> +			      (struct version_regs __iomem *)&ctrl->vreg;
-> +
-> +		rng_vid =3D (rd_reg32(&vreg->rng) & CHA_VER_VID_MASK) >>
->  			   CHA_VER_VID_SHIFT;
->  		ctrlpriv->blob_present =3D ctrlpriv->blob_present &&
-> -			(rd_reg32(&ctrl->vreg.aesa) &
-> CHA_VER_MISC_AES_NUM_MASK);
-> +			(rd_reg32(&vreg->aesa) &
-> CHA_VER_MISC_AES_NUM_MASK);
->  	}
->=20
->  	/*
-> @@ -925,8 +945,8 @@ static int caam_probe(struct platform_device *pdev)
->=20
->  	/* NOTE: RTIC detection ought to go here, around Si time */
->=20
-> -	caam_id =3D (u64)rd_reg32(&ctrl->perfmon.caam_id_ms) << 32 |
-> -		  (u64)rd_reg32(&ctrl->perfmon.caam_id_ls);
-> +	caam_id =3D (u64)rd_reg32(&perfmon->caam_id_ms) << 32 |
-> +		  (u64)rd_reg32(&perfmon->caam_id_ls);
->=20
->  	/* Report "alive" for developer to see */
->  	dev_info(dev, "device ID =3D 0x%016llx (Era %d)\n", caam_id, diff --git
-> a/drivers/crypto/caam/debugfs.c b/drivers/crypto/caam/debugfs.c index
-> 806bb20d2aa1..798ba989a8a0 100644
-> --- a/drivers/crypto/caam/debugfs.c
-> +++ b/drivers/crypto/caam/debugfs.c
-> @@ -1,5 +1,5 @@
->  // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-> -/* Copyright 2019 NXP */
-> +/* Copyright 2019, 2023 NXP */
->=20
->  #include <linux/debugfs.h>
->  #include "compat.h"
-> @@ -42,16 +42,15 @@ void caam_debugfs_qi_init(struct caam_drv_private
-> *ctrlpriv)  }  #endif
->=20
-> -void caam_debugfs_init(struct caam_drv_private *ctrlpriv, struct dentry =
-*root)
-> +void caam_debugfs_init(struct caam_drv_private *ctrlpriv,
-> +		       struct caam_perfmon __iomem *perfmon,
-> +		       struct dentry *root)
->  {
-> -	struct caam_perfmon *perfmon;
-> -
->  	/*
->  	 * FIXME: needs better naming distinction, as some amalgamation of
->  	 * "caam" and nprop->full_name. The OF name isn't distinctive,
->  	 * but does separate instances
->  	 */
-> -	perfmon =3D (struct caam_perfmon __force *)&ctrlpriv->ctrl->perfmon;
->=20
->  	ctrlpriv->ctl =3D debugfs_create_dir("ctl", root);
->=20
-> diff --git a/drivers/crypto/caam/debugfs.h b/drivers/crypto/caam/debugfs.=
-h
-> index 661d768acdbf..78e3c6b957c2 100644
-> --- a/drivers/crypto/caam/debugfs.h
-> +++ b/drivers/crypto/caam/debugfs.h
-> @@ -1,16 +1,19 @@
->  /* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-> -/* Copyright 2019 NXP */
-> +/* Copyright 2019, 2023 NXP */
->=20
->  #ifndef CAAM_DEBUGFS_H
->  #define CAAM_DEBUGFS_H
->=20
->  struct dentry;
->  struct caam_drv_private;
-> +struct caam_perfmon;
->=20
->  #ifdef CONFIG_DEBUG_FS
-> -void caam_debugfs_init(struct caam_drv_private *ctrlpriv, struct dentry =
-*root);
-> +void caam_debugfs_init(struct caam_drv_private *ctrlpriv,
-> +		       struct caam_perfmon __iomem *perfmon, struct dentry
-> *root);
->  #else
->  static inline void caam_debugfs_init(struct caam_drv_private *ctrlpriv,
-> +				     struct caam_perfmon __iomem *perfmon,
->  				     struct dentry *root)
->  {}
->  #endif
-> --
-> 2.25.1
+This approach is appropriate for RCT, but not for APT as APT has a
+non-linear cutoff value. Thus, this patch implements 2 cutoff values
+for both RCT/APT. This implies that the health state is left untouched
+when an intermittent failure occurs. The noise source is reset
+and a new APT powerup-self test is performed. Yet, whith the unchanged
+health test state, the counting of failures continues until a permanent
+failure is reached.
+
+Any non-failing raw entropy value causes the health tests to reset.
+
+The intermittent error has an unchanged significance level of 2^-30.
+The permanent error has a significance level of 2^-60. Considering that
+this level also indicates a false-positive rate (see SP800-90B section 4.2)
+a false-positive must only be incurred with a low probability when
+considering a fleet of Linux kernels as a whole. Hitting the permanent
+error may cause a panic(), the following calculation applies: Assuming
+that a fleet of 10^9 Linux kernels run concurrently with this patch in
+FIPS mode and on each kernel 2 health tests are performed every minute
+for one year, the chances of a false positive is about 1:1000
+based on the binomial distribution.
+
+In addition, any power-up health test errors triggered with
+jent_entropy_init are treated as permanent errors.
+
+A permanent failure causes the entire entropy source to permanently
+return an error. This implies that a caller can only remedy the situation
+by re-allocating a new instance of the Jitter RNG. In a subsequent
+patch, a transparent re-allocation will be provided which also changes
+the implied heuristic entropy assessment.
+
+In addition, when the kernel is booted with fips=1, the Jitter RNG
+is defined to be part of a FIPS module. The permanent error of the
+Jitter RNG is translated as a FIPS module error. In this case, the entire
+FIPS module must cease operation. This is implemented in the kernel by
+invoking panic().
+
+The patch also fixes an off-by-one in the RCT cutoff value which is now
+set to 30 instead of 31. This is because the counting of the values
+starts with 0.
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/jitterentropy-kcapi.c |  45 ++++++-----
+ crypto/jitterentropy.c       | 144 +++++++++++++----------------------
+ 2 files changed, 80 insertions(+), 109 deletions(-)
+
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index 2d115bec15ae..31d0fd57791b 100644
+--- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -37,6 +37,7 @@
+  * DAMAGE.
+  */
+ 
++#include <linux/fips.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+@@ -102,7 +103,7 @@ void jent_get_nstime(__u64 *out)
+ struct jitterentropy {
+ 	spinlock_t jent_lock;
+ 	struct rand_data *entropy_collector;
+-	unsigned int reset_cnt;
++	bool disabled;
+ };
+ 
+ static int jent_kcapi_init(struct crypto_tfm *tfm)
+@@ -138,29 +139,35 @@ static int jent_kcapi_random(struct crypto_rng *tfm,
+ 
+ 	spin_lock(&rng->jent_lock);
+ 
+-	/* Return a permanent error in case we had too many resets in a row. */
+-	if (rng->reset_cnt > (1<<10)) {
++	/* Enforce a disabled entropy source. */
++	if (rng->disabled) {
+ 		ret = -EFAULT;
+ 		goto out;
+ 	}
+ 
+ 	ret = jent_read_entropy(rng->entropy_collector, rdata, dlen);
+ 
+-	/* Reset RNG in case of health failures */
+-	if (ret < -1) {
+-		pr_warn_ratelimited("Reset Jitter RNG due to health test failure: %s failure\n",
+-				    (ret == -2) ? "Repetition Count Test" :
+-						  "Adaptive Proportion Test");
+-
+-		rng->reset_cnt++;
+-
++	if (ret == -3) {
++		/* Handle permanent health test error */
++		/*
++		 * If the kernel was booted with fips=2, it implies that
++		 * the entire kernel acts as a FIPS 140 module. In this case
++		 * an SP800-90B permanent health test error is treated as
++		 * a FIPS module error.
++		 */
++		if (fips_enabled)
++			panic("Jitter RNG permanent health test failure\n");
++
++		pr_err("Jitter RNG permanent health test failure - disabling entropy source\n");
++		rng->disabled = true;
++		ret = -EFAULT;
++	} else if (ret == -2) {
++		/* Handle intermittent health test error */
++		pr_warn_ratelimited("Reset Jitter RNG due to intermittent health test failure\n");
+ 		ret = -EAGAIN;
+-	} else {
+-		rng->reset_cnt = 0;
+-
+-		/* Convert the Jitter RNG error into a usable error code */
+-		if (ret == -1)
+-			ret = -EINVAL;
++	} else if (ret == -1) {
++		/* Handle other errors */
++		ret = -EINVAL;
+ 	}
+ 
+ out:
+@@ -197,6 +204,10 @@ static int __init jent_mod_init(void)
+ 
+ 	ret = jent_entropy_init();
+ 	if (ret) {
++		/* Handle permanent health test error */
++		if (fips_enabled)
++			panic("jitterentropy: Initialization failed with host not compliant with requirements: %d\n", ret);
++
+ 		pr_info("jitterentropy: Initialization failed with host not compliant with requirements: %d\n", ret);
+ 		return -EFAULT;
+ 	}
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 93bff3213823..aa04749c6e46 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -85,10 +85,14 @@ struct rand_data {
+ 				      * bit generation */
+ 
+ 	/* Repetition Count Test */
+-	int rct_count;			/* Number of stuck values */
++	unsigned int rct_count;			/* Number of stuck values */
+ 
+-	/* Adaptive Proportion Test for a significance level of 2^-30 */
++	/* Intermittent health test failure threshold of 2^-30 */
++#define JENT_RCT_CUTOFF		30	/* Taken from SP800-90B sec 4.4.1 */
+ #define JENT_APT_CUTOFF		325	/* Taken from SP800-90B sec 4.4.2 */
++	/* Permanent health test failure threshold of 2^-60 */
++#define JENT_RCT_CUTOFF_PERMANENT	60
++#define JENT_APT_CUTOFF_PERMANENT	355
+ #define JENT_APT_WINDOW_SIZE	512	/* Data window size */
+ 	/* LSB of time stamp to process */
+ #define JENT_APT_LSB		16
+@@ -97,8 +101,6 @@ struct rand_data {
+ 	unsigned int apt_count;		/* APT counter */
+ 	unsigned int apt_base;		/* APT base reference */
+ 	unsigned int apt_base_set:1;	/* APT base reference set? */
+-
+-	unsigned int health_failure:1;	/* Permanent health failure */
+ };
+ 
+ /* Flags that can be used to initialize the RNG */
+@@ -169,19 +171,26 @@ static void jent_apt_insert(struct rand_data *ec, unsigned int delta_masked)
+ 		return;
+ 	}
+ 
+-	if (delta_masked == ec->apt_base) {
++	if (delta_masked == ec->apt_base)
+ 		ec->apt_count++;
+ 
+-		if (ec->apt_count >= JENT_APT_CUTOFF)
+-			ec->health_failure = 1;
+-	}
+-
+ 	ec->apt_observations++;
+ 
+ 	if (ec->apt_observations >= JENT_APT_WINDOW_SIZE)
+ 		jent_apt_reset(ec, delta_masked);
+ }
+ 
++/* APT health test failure detection */
++static int jent_apt_permanent_failure(struct rand_data *ec)
++{
++	return (ec->apt_count >= JENT_APT_CUTOFF_PERMANENT) ? 1 : 0;
++}
++
++static int jent_apt_failure(struct rand_data *ec)
++{
++	return (ec->apt_count >= JENT_APT_CUTOFF) ? 1 : 0;
++}
++
+ /***************************************************************************
+  * Stuck Test and its use as Repetition Count Test
+  *
+@@ -206,55 +215,14 @@ static void jent_apt_insert(struct rand_data *ec, unsigned int delta_masked)
+  */
+ static void jent_rct_insert(struct rand_data *ec, int stuck)
+ {
+-	/*
+-	 * If we have a count less than zero, a previous RCT round identified
+-	 * a failure. We will not overwrite it.
+-	 */
+-	if (ec->rct_count < 0)
+-		return;
+-
+ 	if (stuck) {
+ 		ec->rct_count++;
+-
+-		/*
+-		 * The cutoff value is based on the following consideration:
+-		 * alpha = 2^-30 as recommended in FIPS 140-2 IG 9.8.
+-		 * In addition, we require an entropy value H of 1/OSR as this
+-		 * is the minimum entropy required to provide full entropy.
+-		 * Note, we collect 64 * OSR deltas for inserting them into
+-		 * the entropy pool which should then have (close to) 64 bits
+-		 * of entropy.
+-		 *
+-		 * Note, ec->rct_count (which equals to value B in the pseudo
+-		 * code of SP800-90B section 4.4.1) starts with zero. Hence
+-		 * we need to subtract one from the cutoff value as calculated
+-		 * following SP800-90B.
+-		 */
+-		if ((unsigned int)ec->rct_count >= (31 * ec->osr)) {
+-			ec->rct_count = -1;
+-			ec->health_failure = 1;
+-		}
+ 	} else {
++		/* Reset RCT */
+ 		ec->rct_count = 0;
+ 	}
+ }
+ 
+-/*
+- * Is there an RCT health test failure?
+- *
+- * @ec [in] Reference to entropy collector
+- *
+- * @return
+- * 	0 No health test failure
+- * 	1 Permanent health test failure
+- */
+-static int jent_rct_failure(struct rand_data *ec)
+-{
+-	if (ec->rct_count < 0)
+-		return 1;
+-	return 0;
+-}
+-
+ static inline __u64 jent_delta(__u64 prev, __u64 next)
+ {
+ #define JENT_UINT64_MAX		(__u64)(~((__u64) 0))
+@@ -303,18 +271,26 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
+ 	return 0;
+ }
+ 
+-/*
+- * Report any health test failures
+- *
+- * @ec [in] Reference to entropy collector
+- *
+- * @return
+- * 	0 No health test failure
+- * 	1 Permanent health test failure
+- */
++/* RCT health test failure detection */
++static int jent_rct_permanent_failure(struct rand_data *ec)
++{
++	return (ec->rct_count >= JENT_RCT_CUTOFF_PERMANENT) ? 1 : 0;
++}
++
++static int jent_rct_failure(struct rand_data *ec)
++{
++	return (ec->rct_count >= JENT_RCT_CUTOFF) ? 1 : 0;
++}
++
++/* Report of health test failures */
+ static int jent_health_failure(struct rand_data *ec)
+ {
+-	return ec->health_failure;
++	return jent_rct_failure(ec) | jent_apt_failure(ec);
++}
++
++static int jent_permanent_health_failure(struct rand_data *ec)
++{
++	return jent_rct_permanent_failure(ec) | jent_apt_permanent_failure(ec);
+ }
+ 
+ /***************************************************************************
+@@ -600,8 +576,8 @@ static void jent_gen_entropy(struct rand_data *ec)
+  *
+  * The following error codes can occur:
+  *	-1	entropy_collector is NULL
+- *	-2	RCT failed
+- *	-3	APT test failed
++ *	-2	Intermittent health failure
++ *	-3	Permanent health failure
+  */
+ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
+ 		      unsigned int len)
+@@ -616,39 +592,23 @@ int jent_read_entropy(struct rand_data *ec, unsigned char *data,
+ 
+ 		jent_gen_entropy(ec);
+ 
+-		if (jent_health_failure(ec)) {
+-			int ret;
+-
+-			if (jent_rct_failure(ec))
+-				ret = -2;
+-			else
+-				ret = -3;
+-
++		if (jent_permanent_health_failure(ec)) {
+ 			/*
+-			 * Re-initialize the noise source
+-			 *
+-			 * If the health test fails, the Jitter RNG remains
+-			 * in failure state and will return a health failure
+-			 * during next invocation.
++			 * At this point, the Jitter RNG instance is considered
++			 * as a failed instance. There is no rerun of the
++			 * startup test any more, because the caller
++			 * is assumed to not further use this instance.
+ 			 */
+-			if (jent_entropy_init())
+-				return ret;
+-
+-			/* Set APT to initial state */
+-			jent_apt_reset(ec, 0);
+-			ec->apt_base_set = 0;
+-
+-			/* Set RCT to initial state */
+-			ec->rct_count = 0;
+-
+-			/* Re-enable Jitter RNG */
+-			ec->health_failure = 0;
+-
++			return -3;
++		} else if (jent_health_failure(ec)) {
+ 			/*
+-			 * Return the health test failure status to the
+-			 * caller as the generated value is not appropriate.
++			 * Perform startup health tests and return permanent
++			 * error if it fails.
+ 			 */
+-			return ret;
++			if (jent_entropy_init())
++				return -3;
++
++			return -2;
+ 		}
+ 
+ 		if ((DATA_SIZE_BITS / 8) < len)
+-- 
+2.40.0
+
+
+
 
