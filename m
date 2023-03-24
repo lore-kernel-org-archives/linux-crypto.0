@@ -2,124 +2,70 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A372C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Mar 2023 17:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F81C6FD20
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Mar 2023 17:49:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbjCXRKP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Mar 2023 13:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
+        id S231501AbjCXRtr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Mar 2023 13:49:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjCXRKO (ORCPT
+        with ESMTP id S232012AbjCXRtd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Mar 2023 13:10:14 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5E3B212BD;
-        Fri, 24 Mar 2023 10:10:13 -0700 (PDT)
-Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 301FA20FC447;
-        Fri, 24 Mar 2023 10:10:11 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 301FA20FC447
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1679677813;
-        bh=bgmIaw8wMSWsss3W40BPK0PE6LwvUlJau2CCprtxb5E=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=ApLRO3o9k0dlJ9d76y1Wc0ezRYgX7lkHSFHT0b0W3AVxDVbYjkE+0L20p6ZqCiAND
-         AclxT9+NdVy9U0QBpsJwdUDbIsT9vV2MFj2DmzBIz5nOB/WshsW4k/NdkL9ivJKLii
-         8nMzoS7XjfpVUgq4kjpdEKqE6J92EjCBr85yCf5g=
-Message-ID: <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
-Date:   Fri, 24 Mar 2023 18:10:09 +0100
+        Fri, 24 Mar 2023 13:49:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B97B206A1
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Mar 2023 10:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679680060;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=neMn6XIO4FLNVSN/ptkltqoXMKLLln2HdqxphUzJHq8=;
+        b=VCxP8mw0AhTBYTkbhwZdAy/IJSZWndg/XWBTkaIAwa0hSXT4Ca59kBxZnZhrONaPL1ewQu
+        LZTdX1fS+Xh/DK3Gcb4Nmg5oQi7XWcyGZmrP7gK9NdbMvATIw0TXHUDwRRIblUyZR8vSAd
+        bXp87C5yOuv5e5WV+ZGoLZ7wLWMQ0Zw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-519-99qs1hHTMtiVZU_lfPrnzg-1; Fri, 24 Mar 2023 13:47:36 -0400
+X-MC-Unique: 99qs1hHTMtiVZU_lfPrnzg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 530A0185A790;
+        Fri, 24 Mar 2023 17:47:36 +0000 (UTC)
+Received: from rules.brq.redhat.com (unknown [10.45.242.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2435B492B01;
+        Fri, 24 Mar 2023 17:47:34 +0000 (UTC)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>
+Subject: RE: [PATCH v3] Jitter RNG - Permanent and Intermittent health errors
+Date:   Fri, 24 Mar 2023 18:47:09 +0100
+Message-Id: <20230324174709.21533-1-vdronov@redhat.com>
+In-Reply-To: <5915902.lOV4Wx5bFT@positron.chronox.de>
+References: <5915902.lOV4Wx5bFT@positron.chronox.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Kalra, Ashish" <ashish.kalra@amd.com>,
-        linux-crypto@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
- <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
- <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
- <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
- <ecf005b1-ddb9-da4c-4526-28df4806426c@linux.microsoft.com>
- <20230323152342.GFZBxu/m3u6aFUDY/7@fat_crate.local>
- <105d019c-2249-5dfd-e032-95944ea6dc8c@linux.microsoft.com>
- <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-In-Reply-To: <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/23/2023 5:34 PM, Borislav Petkov wrote:
-> On Thu, Mar 23, 2023 at 05:11:26PM +0100, Jeremi Piotrowski wrote:
->> That same interface is exposed by physical hardware+firmware to the underlying
->> Hyper-V.
-> 
-> Let me see if I understand it correctly: Hyper-V *baremetal* is using
-> the same ASPT spec to to talk to the *physical* PSP device?
-> 
+Hi,
+Aaaand I would suggest the following smallest fix, just a comment update:
 
-Yes
++        * If the kernel was booted with fips=2, it implies that
 
-> Is that ASPT interface to talk to the PSP used by the L0 hypervisor?
-> 
+change to:
 
-Yes (unless I am mistaken, this is the same statement as above).
++        * If the kernel was booted with fips=1, it implies that
 
-> Or does the L0 HV have a normal driver, similar to the Linux one,
-> without the functionality this ASPT spec provides?
-> 
-The L0 HV relies on the ASPT spec/interface to map registers and setup
-interrupts and then uses a protocol driver to handle the PSP command set
-(like the Linux one).
+Otherwise,
+Reviewed-by: Vladis Dronov <vdronov@redhat.com>
 
->> So it wasn't a matter of Microsoft architects coming up with a
->> guest-host interface but rather exposing the virtual hardware in the same
->> way as on a physical server.
-> 
-> So if you want to expose the same interface to the L1 guest, why isn't
-> Hyper-V emulating an ACPI device just like any other functionality? Why
-> does it need to reach into the interrupt handling internals?
-> 
+Best regards,
+Vladis
 
-The primary stack for nested SNP support is Hyper-V-on-Hyper-V. 
-By exposing the PSP device to the L1 guest in the same way (as the L0),
-everything can done in the exact same way as on bare-metal.
-
-I just really want nested SNP support to work in KVM-on-Hyper-V as well so
-that's why I'm adding support for these things.
-
-Also: if Linux were to run bare-metal on that hardware it would need to be
-able to handle the PSP through the ASPT interface as well.
-
-> I'd expect that the L0 HV would emulate a PSP device, the L1 would
-> simply load the Linux PSP device driver and everything should just work.
-> 
-> What's the point of that alternate access at all?
-> 
-
-So it's actually great that you made me ask around because I learned something that
-will help:
-
-Since the AMD PSP is a privileged device, there is a desire to not have to trust the
-ACPI stack, and instead rely fully on static ACPI tables for discovery and configuration.
-This also applies to the AMD IOMMU. If you look at iommu_setup_intcapxt() in
-drivers/iommu/amd/init.c, it does exactly the things that are needed to setup the
-PSP interrupt too. Here's a link to the patch that added that:
-https://lore.kernel.org/all/20201111144322.1659970-3-dwmw2@infradead.org/#t
-
-So my plan now is to post a v4 with proper irq_domain handling.
-Ok Thomas?
-
-Best wishes,
-Jeremi
