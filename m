@@ -2,95 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DF9C6FD1C
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Mar 2023 11:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5310BC6FD1F
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 Mar 2023 14:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbjCYLBw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 25 Mar 2023 07:01:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53942 "EHLO
+        id S230223AbjCYOqB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 25 Mar 2023 10:46:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231473AbjCYLBv (ORCPT
+        with ESMTP id S230062AbjCYOqA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 Mar 2023 07:01:51 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A13F956
-        for <linux-crypto@vger.kernel.org>; Sat, 25 Mar 2023 04:01:50 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id b20so17396132edd.1
-        for <linux-crypto@vger.kernel.org>; Sat, 25 Mar 2023 04:01:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1679742109;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zafUbUEAV6rjedbLPFbfMgyY+HDLY0SQ0UIeszhwa4Y=;
-        b=luQ+jJETbggWlEZ4mKxSwssRXNVCRBhmGBdRXYfwA8AVwFvxv/0GHEQlxcSYJMCnhK
-         lnlzGrQrkBIDr69Ea1z3xGRAq6SKGFTe/kJIpzkeDBfzoOwGd2P5TfM8rNAsZkTxilKw
-         Ml3E1+Io9DrIPJ8K5EOhA5NEohODS5gxhgssK1CuUFQxv6NREZYdcpHsnGkD4OlHHF/c
-         lTch3pnAcVH1PPQ0WPSnBUZwvdsohMUk7HUFW5zINr25Bd7wxgchnyStHWgBt55HwjmW
-         nPzWt37I7CAvsKOsslrq91E8tF0cKPvgak3lzIhjGP+uSyGyqeERnK71ShTfZg3ZwZda
-         EBMQ==
+        Sat, 25 Mar 2023 10:46:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A695AF31
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Mar 2023 07:45:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679755513;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P3wI73F5NrWC541iZLBNtRH4JahD9rlIWrqZXmkzEXA=;
+        b=ObiboKN5AicD4+v9lck3NVTs9ExEjN1XRgO7oUOTdErQOtdr8A9Ki31wVEm6QOBCET3LZr
+        jslMIAM/BbDANl6RhdU7jBbGHUzv64c+exfNv0zUl01dxEBjoYaSDFibdm6EwXLlzTDrqU
+        o2k/uEC4TQWNYEiWSqAl0Z+PTWO0bgM=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-_Kv3DJpHMwyGslwUdsmO3A-1; Sat, 25 Mar 2023 10:45:12 -0400
+X-MC-Unique: _Kv3DJpHMwyGslwUdsmO3A-1
+Received: by mail-qv1-f70.google.com with SMTP id dg8-20020a056214084800b005acc280bf19so2101717qvb.22
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Mar 2023 07:45:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679742109;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zafUbUEAV6rjedbLPFbfMgyY+HDLY0SQ0UIeszhwa4Y=;
-        b=nT8dK1iHnlseJkkg8Z5LPhasRTXjKfx0T/04xXM9Ft6GWeVbmM5fDyBtYR030HvsO8
-         /T66lY+4HZJq8GXOe5sLCb+gW4YI963QtYjA2GJnYi5EB3FBdnMTbKO2qr35+QSui+Be
-         h3oTkQR2hpGijbmn2FxbZXOKG/rIx4ERe/03qJRRYFifhjIG5hb8E6QgE4TUbbA2Y2PB
-         vIFh1nBe/YkQA1l6QqKq8hMud1Rktw4fUYpbCdCzviih2DMDPRGiwBjGHGYk4dyQow4Q
-         /awRaPzyVSRgZ0cXd5hve+G8p1Vhag1JEf0Q2O0yi5CNEi73z/Cmablshj2Rs1ol2/Mt
-         Y66A==
-X-Gm-Message-State: AAQBX9ehERFbtqPPN/1ZLTJIw88Y0OO8s9F5okP6MoR8+B2mj0QwekL1
-        h1TnRZ0TCANomJ9ccRwX+B8zkg==
-X-Google-Smtp-Source: AKy350bzYt5sqH0jJm2NqtOhFix6zch6UBRqw1JweY5kSlupQfB/ZdKaWtQxICM37T2obD95X71I8Q==
-X-Received: by 2002:a17:906:25d5:b0:932:40f4:5c44 with SMTP id n21-20020a17090625d500b0093240f45c44mr5703891ejb.36.1679742108965;
-        Sat, 25 Mar 2023 04:01:48 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:d230:b2c7:d55:c9c8? ([2a02:810d:15c0:828:d230:b2c7:d55:c9c8])
-        by smtp.gmail.com with ESMTPSA id r5-20020a1709064d0500b00923f05b2931sm11560427eju.118.2023.03.25.04.01.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Mar 2023 04:01:48 -0700 (PDT)
-Message-ID: <03009090-e1e9-a176-c629-dee99993e9ad@linaro.org>
-Date:   Sat, 25 Mar 2023 12:01:47 +0100
+        d=1e100.net; s=20210112; t=1679755511;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P3wI73F5NrWC541iZLBNtRH4JahD9rlIWrqZXmkzEXA=;
+        b=U3ZbBaRtUdwIypYy1B5sZPuDEvRTCTmrj3rIV4AFT3iW3255N1cjDx0s5GX6F/meY5
+         3XEW+5USu2cj3O4wtmq9wcHm2/oW12Iutzalp/QsFYHy0oN8oupOhOLpWBurQQjul2dW
+         aWdx0aGmRCtq41b/+DKkNfsgNjZ9MD/xIpguzHFFpF486UXm0tTxgCM5IwCXMeaGmOAR
+         4tWVAgio24Isw9wti4AM61h9t8pTV6UZmnM3/STqLivl8sJwYgxUdAp7eweEb+s48PJr
+         abulKBQcIiF9Qnwuaik3qNUKTf1+RScG9yjLDhKPls/ZE5nXLqFt2ZqXOLzcRsR8KSj0
+         Qncg==
+X-Gm-Message-State: AO0yUKV/DUBR7xNyxiNbsMXWOVb6CjRH1E1OM8utyvTR6DFsG8v7kgzP
+        HKJUd+ta2+LH2qdKUPALx8HqDnQ95DAXJM+zcAbeLR1PZQxDQ5Fm3xKSIn9K3dF/t/6zA8hjFEn
+        McSp2mJbIHEdPDcf+mEFZl0JPkh+iTqiZ+SPckBYBQL//SgPbRfw=
+X-Received: by 2002:a05:620a:24d0:b0:746:bd8a:37ff with SMTP id m16-20020a05620a24d000b00746bd8a37ffmr1364633qkn.9.1679755511299;
+        Sat, 25 Mar 2023 07:45:11 -0700 (PDT)
+X-Google-Smtp-Source: AK7set8XFUBOoReIxxhA+jtQunK58lE3h4vuNjs63HgKPkGfgxMrHqT1R3Lh7D5QDzhZ8grhZuzCJJOPGkAKdMoRaHE=
+X-Received: by 2002:a05:620a:24d0:b0:746:bd8a:37ff with SMTP id
+ m16-20020a05620a24d000b00746bd8a37ffmr1364630qkn.9.1679755511031; Sat, 25 Mar
+ 2023 07:45:11 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v2] crypto - img-hash: Depend on OF and silence compile
- test warning
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-References: <20230319144439.31399-1-krzysztof.kozlowski@linaro.org>
- <ZB14gXqnkBzhdm0i@gondor.apana.org.au>
- <2dd13286-c518-66a7-44f4-b6c4f8acd061@linaro.org>
- <ZB6NxI9/llX7oFdg@gondor.apana.org.au>
-Content-Language: en-US
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <ZB6NxI9/llX7oFdg@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <5915902.lOV4Wx5bFT@positron.chronox.de> <20230324174709.21533-1-vdronov@redhat.com>
+ <7502351.DBV9aYCCVu@tauon.chronox.de>
+In-Reply-To: <7502351.DBV9aYCCVu@tauon.chronox.de>
+From:   Vladis Dronov <vdronov@redhat.com>
+Date:   Sat, 25 Mar 2023 15:44:59 +0100
+Message-ID: <CAMusb+RsaSdztEgUMO=JD-ZcJ19v41r1Mw0oY-CUgtJTr+FzTg@mail.gmail.com>
+Subject: Re: [PATCH v3] Jitter RNG - Permanent and Intermittent health errors
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 25/03/2023 06:59, Herbert Xu wrote:
-> On Fri, Mar 24, 2023 at 11:51:43AM +0100, Krzysztof Kozlowski wrote:
->>
->>> You should either add a dependency on OF or __maybe_unused.
->>> Adding both makes no sense.
->>
->> Of course it makes, otherwise you have warnings which is also fixed here.
-> 
-> It won't create a warning if you depend on OF without COMPILE_TEST.
+Hi, Stephan,
 
-In that case yes, but we want COMPILE_TEST for build coverage.
+On Fri, Mar 24, 2023 at 6:56=E2=80=AFPM Stephan Mueller <smueller@chronox.d=
+e> wrote:
+>
+> Thank you very much. I have fixed it in my local copy, but will wait for
+> another bit in case there are other reports.
 
-> 
-> Anyway, I think adding __maybe_unused by itself is sufficient.
+A couple of more suggestions, if I may. These are really small,
+I'm suggesting them just due to a sense of perfection.
 
+1) A patch name. All the patches in this area look like
+"crypto: jitter - <lowercase letters>". Probably a patch name could be
+adjusted as "crypto: jitter - permanent and intermittent health errors"?
 
+2) You use panic("Jitter RNG permanent health test failure\n") in your
+patch. With that, probably, jent_panic() could be removed, since
+nothing is using it, couldn't it?
 
 Best regards,
-Krzysztof
+Vladis
 
