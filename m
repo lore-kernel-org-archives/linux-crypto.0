@@ -2,295 +2,114 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7E9C74A5B
-	for <linux-crypto@archiver.kernel.org>; Sun, 26 Mar 2023 05:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF2EC6FD1C
+	for <linux-crypto@archiver.kernel.org>; Sun, 26 Mar 2023 08:50:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230292AbjCZFfM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 26 Mar 2023 01:35:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48772 "EHLO
+        id S231786AbjCZIue (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 26 Mar 2023 04:50:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjCZFfL (ORCPT
+        with ESMTP id S230162AbjCZIud (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 26 Mar 2023 01:35:11 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47AAAA5F5;
-        Sat, 25 Mar 2023 22:35:09 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id h12-20020a17090aea8c00b0023d1311fab3so5598834pjz.1;
-        Sat, 25 Mar 2023 22:35:09 -0700 (PDT)
+        Sun, 26 Mar 2023 04:50:33 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130CA7EF8
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Mar 2023 01:50:31 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id ew6so24086127edb.7
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Mar 2023 01:50:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679808908;
+        d=linaro.org; s=google; t=1679820629;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+khonTWL58OUZUKKdpO+61yxaCEo0mE/6suCgfy7HI0=;
-        b=kDqbJXpACtGq/sBGO+1dmT3492ANjYsmoF5ewMyRkGLbMxKoIb8IzqhJDOwW8/YAU3
-         xsRWr809GJrZBLTzouJjoQu0Mv9huEifm4MXwxx7fRqRoVzfp/cBCDejqfMq0H/CgOBu
-         bNcmbM9k7qUUMRrIt8P6FCClP56IVIvqkwDnCGTo0EdyTehH2RiJJy/139n80gowaM72
-         cQXnKblbSHFyzhK9VJfufWGZ8B8sGuFxl93JfEJPOzEfX959/RPXRQCH51ya5Hdu+gW2
-         g1UUYsJOad0EvQz5+AD+LM2cGelvIKIb/SYvKDcUj+E5b4GZPMnoo1WPpXo9Yh0zvkh/
-         FONA==
+        bh=HelX9TaRrTL0/uXiqpcAS3IoL+rsoXCQpE6cEfXOz3Q=;
+        b=nXcN4xbgt18TOtDZK8uFwr6TCqdGFizMpBb60AEuO2T1D7SdGye5fAK2tnOgtiPdqD
+         KXW+wCu1mbIxx9N0wmgaPehuUvS9wSxPrp3IMO6+DHgJHbJhWWpA8qXAkDkn6+WKLURl
+         G2d9p1C5vukiSUC60DDr5HVzabzC6Ox6VYyRdrqJiDZ6DKENKSbzhdHUdf2LJEgVFl4g
+         Xai5ZzXgZICPwmAlUxBnuaeUNniM9TgxCQoHbyoceebfbvIzaAeai1TUioBgN94k+NfY
+         hUXpGw5h3Ax0rh1S1V3Zy1HdfUNbUkqdCoAoijqHn7TfRvUEND0m0CVbT8KpZf4/Imkc
+         o5GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679808908;
+        d=1e100.net; s=20210112; t=1679820629;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+khonTWL58OUZUKKdpO+61yxaCEo0mE/6suCgfy7HI0=;
-        b=YVedjnfqSG/lgQta9Qkel6ArHtwMFBjS/KEie3F4GUGkXKzIaHxauO5qmrKB/w45w+
-         R9OWeGE/Ln8O/DjiKcqLuNNOow3w2FkErWpdooyoXKkGO2wIKYmi1c3OL9km1zD9tpLf
-         omP+2D/ibimM0Uwp4Enhhrqewl2sVMw0i5a7FMFpz4w32QaG8IE6Sq5MNzsfaBIOmRV9
-         5piXJHZtIMjaRfCE9bbEx1PmT9C656c28ZUA8lbR4aW+oKSWkoSqyVyPkK2/FPDXnE0f
-         o9vjSgOx/AX61p8nYywzIgCrPhjpIa61Ma7romsbPkFwryy9TAnJG7FLHwon8ZLaJopw
-         qjVA==
-X-Gm-Message-State: AAQBX9cPByresXociDGUdzz6zuRbBsMUCnLHqt5U02AXWL19I4LxRiTs
-        7l5TB7kDRhtal9+9yGZNR8ukGGh4iYpQOeh2cDA=
-X-Google-Smtp-Source: AKy350aektzCLVMOFIz1Ow9xJbNGzKqeTPDxaaMEOpaZDULH4/ieRe2S7wt1yiHNJvgDC90JItvrtg==
-X-Received: by 2002:a17:903:4304:b0:19f:1c64:c9d8 with SMTP id jz4-20020a170903430400b0019f1c64c9d8mr6441948plb.14.1679808908601;
-        Sat, 25 Mar 2023 22:35:08 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([104.28.213.202])
-        by smtp.gmail.com with ESMTPSA id p11-20020a170903248b00b0019ac7319ed1sm16750184plw.126.2023.03.25.22.34.54
+        bh=HelX9TaRrTL0/uXiqpcAS3IoL+rsoXCQpE6cEfXOz3Q=;
+        b=HQBjN9ZkVwplQD5ppOq7U4wem2Wlh2dyIE/hdAjBmIbo5hriBMVMXViOp5b2pD5jFL
+         nvFdlY8Qx8fmJuBraVLJNcE1ivESAUbt6WMI5jVvqS1F27FRjyU0SrM0ru4Ew+1idM+3
+         9CFsKrJEN8JY4h8rg3tGfOj69Y+9H7SQUSoAgLD9qcd2ABsCRjLDiiKgEid/qkYvspbp
+         bk3XqoV1V9MUWaQbjvYzD1210JT6IR03SAd6YGmOrrQqFz4A6VvxZa8tv/YzdAvI6GDC
+         sdOCViG7F1INojeLBv29vf3hu2y8Gx0o0PR/K6ok2WwjviEEFRsam+MpBcP2Xa8P89pY
+         SPwQ==
+X-Gm-Message-State: AAQBX9drvDaWTZd9fQ+Blf/lapQ9fdMQo6Aq/nlr4KqGNHX7hOrYdF65
+        51SLObDy0bW0Ej9k6VwwhyMhaw==
+X-Google-Smtp-Source: AKy350YURsee9IcVUspqIlMZJZ9hVHOq3HCdxcN5vA+XRdkAfAqpR6f3zs4y1LtjXTb6+g3+KaxoHw==
+X-Received: by 2002:a17:906:ce26:b0:932:dac6:3e46 with SMTP id sd6-20020a170906ce2600b00932dac63e46mr10147737ejb.7.1679820629549;
+        Sun, 26 Mar 2023 01:50:29 -0700 (PDT)
+Received: from krzk-bin.. ([2a02:810d:15c0:828:6cac:926d:a4f2:aa09])
+        by smtp.gmail.com with ESMTPSA id be8-20020a1709070a4800b0093f822321fesm1683165ejc.137.2023.03.26.01.50.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Mar 2023 22:35:08 -0700 (PDT)
-From:   David Yang <mmyangfl@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     David Yang <mmyangfl@gmail.com>, Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 26 Mar 2023 01:50:29 -0700 (PDT)
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: hisilicon/trng - add support for HiSTB TRNG
-Date:   Sun, 26 Mar 2023 13:34:41 +0800
-Message-Id: <20230326053448.299008-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v3] crypto - img-hash: Depend on OF and silence compile test warning
+Date:   Sun, 26 Mar 2023 10:50:27 +0200
+Message-Id: <20230326085027.4759-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HiSTB TRNG are found on some HiSilicon STB SoCs.
+The driver is specific to OF platforms (can match only via OF table),
+thus add dependency on CONFIG_OF.  Mark the of_device_id table as
+unused.  This also fixes W=1 warning:
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
+  drivers/crypto/img-hash.c:930:34: error: ‘img_hash_match’ defined but not used [-Werror=unused-const-variable=]
+
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
 ---
-v2: fix typo
-v3: add option for post process depth, adjust timeout
- drivers/crypto/hisilicon/Kconfig         |   7 +
- drivers/crypto/hisilicon/Makefile        |   2 +-
- drivers/crypto/hisilicon/trng/Makefile   |   3 +
- drivers/crypto/hisilicon/trng/trng-stb.c | 171 +++++++++++++++++++++++
- 4 files changed, 182 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/hisilicon/trng/trng-stb.c
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 4137a8bf131f..e8690c223584 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -82,3 +82,10 @@ config CRYPTO_DEV_HISI_TRNG
- 	select CRYPTO_RNG
- 	help
- 	  Support for HiSilicon TRNG Driver.
-+
-+config CRYPTO_DEV_HISTB_TRNG
-+	tristate "Support for HiSTB TRNG Driver"
-+	depends on ARCH_HISI || COMPILE_TEST
-+	select HW_RANDOM
-+	help
-+	  Support for HiSTB TRNG Driver.
-diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
-index 8595a5a5d228..fc51e0edec69 100644
---- a/drivers/crypto/hisilicon/Makefile
-+++ b/drivers/crypto/hisilicon/Makefile
-@@ -5,4 +5,4 @@ obj-$(CONFIG_CRYPTO_DEV_HISI_SEC2) += sec2/
- obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += hisi_qm.o
- hisi_qm-objs = qm.o sgl.o debugfs.o
- obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += zip/
--obj-$(CONFIG_CRYPTO_DEV_HISI_TRNG) += trng/
-+obj-y += trng/
-diff --git a/drivers/crypto/hisilicon/trng/Makefile b/drivers/crypto/hisilicon/trng/Makefile
-index d909079f351c..cf20b057c66b 100644
---- a/drivers/crypto/hisilicon/trng/Makefile
-+++ b/drivers/crypto/hisilicon/trng/Makefile
-@@ -1,2 +1,5 @@
- obj-$(CONFIG_CRYPTO_DEV_HISI_TRNG) += hisi-trng-v2.o
- hisi-trng-v2-objs = trng.o
-+
-+obj-$(CONFIG_CRYPTO_DEV_HISTB_TRNG) += histb-trng.o
-+histb-trng-objs += trng-stb.o
-diff --git a/drivers/crypto/hisilicon/trng/trng-stb.c b/drivers/crypto/hisilicon/trng/trng-stb.c
-new file mode 100644
-index 000000000000..44ee071fd348
---- /dev/null
-+++ b/drivers/crypto/hisilicon/trng/trng-stb.c
-@@ -0,0 +1,171 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
-+/*
-+ * Device driver for True RNG in HiSTB SoCs
-+ *
-+ * Copyright (c) 2023 David Yang
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/hw_random.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/module.h>
-+#include <linux/of_device.h>
-+#include <linux/timekeeping.h>
-+
-+#define HISTB_TRNG_CTRL		0x0
-+#define  RNG_SOURCE			GENMASK(1, 0)
-+#define  DROP_ENABLE			BIT(5)
-+#define  POST_PROCESS_ENABLE		BIT(7)
-+#define  POST_PROCESS_DEPTH		GENMASK(15, 8)
-+#define HISTB_TRNG_NUMBER	0x4
-+#define HISTB_TRNG_STAT		0x8
-+#define  DATA_COUNT			GENMASK(2, 0)	/* max 4 */
-+
-+/*
-+ * Observed:
-+ * depth = 1 -> ~1ms
-+ * depth = 255 -> ~16ms
-+ */
-+static int histb_trng_wait(struct hwrng *rng)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	u32 val;
-+
-+	return readl_relaxed_poll_timeout(base + HISTB_TRNG_STAT,
-+					  val, val & DATA_COUNT, 1000,
-+					  30 * 1000);
-+}
-+
-+static void histb_trng_init(struct hwrng *rng, unsigned int depth)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	u32 val;
-+
-+	val = readl_relaxed(base + HISTB_TRNG_CTRL);
-+
-+	val &= ~RNG_SOURCE;
-+	val |= 2;
-+
-+	val &= ~POST_PROCESS_DEPTH;
-+	val |= min(depth, 0xffu) << 8;
-+
-+	val |= POST_PROCESS_ENABLE;
-+	val |= DROP_ENABLE;
-+
-+	writel_relaxed(val, base + HISTB_TRNG_CTRL);
-+}
-+
-+static int histb_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	size_t i;
-+
-+	for (i = 0; i < max; i += sizeof(u32)) {
-+		if (!(readl_relaxed(base + HISTB_TRNG_STAT) & DATA_COUNT)) {
-+			if (!wait)
-+				break;
-+			if (histb_trng_wait(rng)) {
-+				pr_err("failed to generate random number, generated %zu\n",
-+				       i);
-+				if (i)
-+					break;
-+				return -ETIMEDOUT;
-+			}
-+		}
-+		*(u32 *) (data + i) = readl_relaxed(base + HISTB_TRNG_NUMBER);
-+	}
-+
-+	return i;
-+}
-+
-+static unsigned int histb_trng_get_depth(struct hwrng *rng)
-+{
-+	void __iomem *base = (void __iomem *) rng->priv;
-+	u32 val = readl_relaxed(base + HISTB_TRNG_CTRL);
-+
-+	return (val & POST_PROCESS_DEPTH) >> 8;
-+}
-+
-+static ssize_t
-+depth_show(struct device *dev, struct device_attribute *attr, char *buf)
-+{
-+	struct hwrng *rng = dev_get_drvdata(dev);
-+
-+	return sprintf(buf, "%d\n", histb_trng_get_depth(rng));
-+}
-+
-+static ssize_t
-+depth_store(struct device *dev, struct device_attribute *attr,
-+	    const char *buf, size_t count)
-+{
-+	struct hwrng *rng = dev_get_drvdata(dev);
-+	unsigned int depth;
-+
-+	if (kstrtouint(buf, 0, &depth))
-+		return -ERANGE;
-+
-+	histb_trng_init(rng, depth);
-+	return count;
-+}
-+
-+static DEVICE_ATTR_RW(depth);
-+
-+static struct attribute *histb_trng_attrs[] = {
-+	&dev_attr_depth.attr,
-+	NULL,
-+};
-+
-+ATTRIBUTE_GROUPS(histb_trng);
-+
-+static int histb_trng_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct hwrng *rng;
-+	int ret;
-+
-+	rng = devm_kzalloc(dev, sizeof(*rng), GFP_KERNEL);
-+	if (!rng)
-+		return -ENOMEM;
-+
-+	rng->priv = (unsigned long) devm_platform_ioremap_resource(pdev, 0);
-+	if (rng->priv <= 0)
-+		return -ENOMEM;
-+
-+	histb_trng_init(rng, 144);
-+	if (histb_trng_wait(rng))
-+		return -ENODEV;
-+
-+	rng->name = KBUILD_MODNAME;
-+	rng->read = histb_trng_read;
-+
-+	ret = devm_hwrng_register(dev, rng);
-+	if (ret) {
-+		dev_err(dev, "failed to register %s (%d)\n", rng->name, ret);
-+		return ret;
-+	}
-+
-+	platform_set_drvdata(pdev, rng);
-+	dev_set_drvdata(dev, rng);
-+	return 0;
-+}
-+
-+static const struct of_device_id histb_trng_of_match[] = {
-+	{ .compatible = "hisilicon,histb-trng", },
-+	{ }
-+};
-+
-+static struct platform_driver histb_trng_driver = {
-+	.probe = histb_trng_probe,
-+	.driver = {
-+		.name = "histb-trng",
-+		.of_match_table = of_match_ptr(histb_trng_of_match),
-+		.dev_groups = histb_trng_groups,
-+	},
-+};
-+
-+module_platform_driver(histb_trng_driver);
-+
-+MODULE_DESCRIPTION("HiSTB True RNG");
-+MODULE_LICENSE("Dual MIT/GPL");
+Changes since v2:
+1. Do not allow compile testing without OF.
+
+Changes since v1:
+1. Rework - depend on OF and add maybe_unused.
+---
+ drivers/crypto/Kconfig    | 1 +
+ drivers/crypto/img-hash.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 3b2516d1433f..c636fbeb2144 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -647,6 +647,7 @@ source "drivers/crypto/vmx/Kconfig"
+ config CRYPTO_DEV_IMGTEC_HASH
+ 	tristate "Imagination Technologies hardware hash accelerator"
+ 	depends on MIPS || COMPILE_TEST
++	depends on OF
+ 	select CRYPTO_MD5
+ 	select CRYPTO_SHA1
+ 	select CRYPTO_SHA256
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index fe93d19e3044..2be364d9f592 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -927,7 +927,7 @@ static void img_hash_done_task(unsigned long data)
+ 	img_hash_finish_req(hdev->req, err);
+ }
+ 
+-static const struct of_device_id img_hash_match[] = {
++static const struct of_device_id img_hash_match[] __maybe_unused = {
+ 	{ .compatible = "img,hash-accelerator" },
+ 	{}
+ };
 -- 
-2.39.2
+2.34.1
 
