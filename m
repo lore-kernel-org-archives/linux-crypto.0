@@ -2,106 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD5AC76195
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Mar 2023 16:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F78C6FD1D
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Mar 2023 17:02:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbjC0QrE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Mar 2023 12:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33744 "EHLO
+        id S232636AbjC0RCn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Mar 2023 13:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjC0QrD (ORCPT
+        with ESMTP id S232307AbjC0RC2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Mar 2023 12:47:03 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BDF2698
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Mar 2023 09:47:02 -0700 (PDT)
-Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id EA6233FFEB
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Mar 2023 16:46:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1679935618;
-        bh=dnwNY1277mN3/tMvV/2wrgLdhuMzkawp9ZPzDMrskro=;
-        h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-         MIME-Version:Content-Type;
-        b=cHiU6SdsHngwMW0LPlzmhI8L0n2nFPanaugNvW5d9c7qsO9xaY8PsWmfu4dDMyqKC
-         3bxeD9GoIAT3gvxlr5WwG83fBiLALZfRsjRk6pHmrWujRAHIFDZpZ4oili8keg0oW+
-         6MnJ1FP/A3owAhGb3FwnLqclYHUqleXKJ9E8QLzGEwp8ESIRZLkOjY1zko/2le7DQF
-         BZn7PLp8rVWKuiwrKnO5NxAgPLp3epSyvrXfKShuQWMhOBz1ZKSrEJZRnnQfAV2KsC
-         xC+sV1b2QIdtYWIhiNl980Q6Dhymk2OosnzVMmUFaVM7ClFuHjGvg0qk/gpHWyU8n5
-         bEgcdQD9X86ng==
-Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-177bf70751bso5491245fac.16
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Mar 2023 09:46:57 -0700 (PDT)
+        Mon, 27 Mar 2023 13:02:28 -0400
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81975BA8;
+        Mon, 27 Mar 2023 10:02:03 -0700 (PDT)
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-17ec8963db8so9948693fac.8;
+        Mon, 27 Mar 2023 10:02:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679935616;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dnwNY1277mN3/tMvV/2wrgLdhuMzkawp9ZPzDMrskro=;
-        b=Swi0TSGBeTX/eYPgya4ilEgiArkYVxFMJNuUSf+KtyrcY4Pz7PTHl2j51jMyKV2Fu6
-         SO91DXpcB6C3eXjD8p5eFmoVUfUX+9q4fMY58OJB5juRnbvz+zArQygFxujpBRgMxrsA
-         +u9at2KjWUk4C87nujXb4kRPJK+kW8sEnx15mku/0r8EExr1tS8UkB8Ci0ubcbJfzSH8
-         rlDpQ9pljkV2eDYX+LuwrJYm6RfHibwDVpRBezieDcC1wOdGt4IpTVXaWrnLNNZlPiaz
-         UEcmc+eE5KF7p8XBqa2/LPu2l1179DaBLE7z7z0CTbX99LLh0FayoLFkeHwX2RK+m19U
-         av4g==
-X-Gm-Message-State: AAQBX9cF51a7b+w80c5tH5DzXEPURZGZ9zMcxhvm9L8hOpSAD2VTxBSc
-        tQ7lDVT7ZUngZfVmDFa9KwmsuKx6QzEMqf+vX/V6lNO9xSobd7+vdvxsjcA2Pb4D74lypYe8UvY
-        OUE4A1ndqibvakzV5pyWW4bz4+nj1Z/tGcfzs1UQNh9PGJPqT
-X-Received: by 2002:a05:6830:615:b0:6a1:535f:b095 with SMTP id w21-20020a056830061500b006a1535fb095mr37942oti.18.1679935616549;
-        Mon, 27 Mar 2023 09:46:56 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YzCaVqAP3Jt4SXwUkhpY4ZoyjeqjEWHSQOkKc8CEBxkJLNANioZjPoLdcYKPtoV9g06eP8vA==
-X-Received: by 2002:a05:6830:615:b0:6a1:535f:b095 with SMTP id w21-20020a056830061500b006a1535fb095mr37936oti.18.1679935616296;
-        Mon, 27 Mar 2023 09:46:56 -0700 (PDT)
-Received: from canonical.com ([177.188.140.13])
-        by smtp.gmail.com with ESMTPSA id b7-20020a9d7547000000b0069fb8bfb4f3sm4438410otl.77.2023.03.27.09.46.55
+        d=1e100.net; s=20210112; t=1679936523;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g36LB56fmScqFYQLMR1QrBmpqkKWb5a6f9AKykOj3Bw=;
+        b=Qmu+VySu7TL05kGXlSHzDXFO0MWG8ytlr/Zu4j/Ey6WvUhWMP7UMh0zR+RDFuLyyfw
+         2QUIiYsULZkBIiU+Q1EFNRshIlFJrRReh/f15+vQqlErxQYcRDogRyvtkM2P/LIhXnfP
+         vofS/ajM6RKli6/gzuCP/UfxvevPbcGlseglMG4pcHJY++q2xQYafnRFIXo/V0pDo3Ga
+         tU9I/R72ZUGcpcyS8ePXMxgrwUcjCZ51lEG279efsQVl71a+nto+/q2b8H0omS+dxJcn
+         jonR56UvR9/ZbByx/JskpWogoeWY3r8bOwYebzMXL707k9jraSxRAjgaxR6wYqQGrSsS
+         G7GQ==
+X-Gm-Message-State: AAQBX9cO32HZvM/nE8z9DWEYDX8PF7V5piYKxbH+XgrPeF7pLj9CQ14o
+        +zGBKrZZecOeNHQVFV10+g==
+X-Google-Smtp-Source: AKy350YnHstOEw1avVxSXYtmJmZlzDSW/DDiq3a65+LUgrmEvX2Gwz7648gA6HnLvYFD+vanJTRbEQ==
+X-Received: by 2002:a05:6870:e255:b0:17a:a7af:6ce7 with SMTP id d21-20020a056870e25500b0017aa7af6ce7mr8867996oac.39.1679936522863;
+        Mon, 27 Mar 2023 10:02:02 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id bf9-20020a0568700a0900b0017264f96879sm640694oac.17.2023.03.27.10.02.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 09:46:55 -0700 (PDT)
-References: <12194787.O9o76ZdvQC@positron.chronox.de>
- <4478169.LvFx2qVVIh@positron.chronox.de>
-User-agent: mu4e 1.9.22; emacs 29.0.60
-From:   Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-To:     Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        Vladis Dronov <vdronov@redhat.com>
-Subject: Re: [PATCH v4] crypto: jitter - permanent and intermittent health
- errors
-Date:   Mon, 27 Mar 2023 13:40:07 -0300
-In-reply-to: <4478169.LvFx2qVVIh@positron.chronox.de>
-Message-ID: <87fs9qnnuq.fsf@canonical.com>
+        Mon, 27 Mar 2023 10:02:02 -0700 (PDT)
+Received: (nullmailer pid 4106102 invoked by uid 1000);
+        Mon, 27 Mar 2023 17:02:01 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mediatek@lists.infradead.org
+Subject: [PATCH] dt-bindings: rng: Drop unneeded quotes
+Date:   Mon, 27 Mar 2023 12:01:53 -0500
+Message-Id: <20230327170153.4105594-1-robh@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Cleanup bindings dropping unneeded quotes. Once all these are fixed,
+checking for this can be enabled in yamllint.
 
-It looks good to me too.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 4 ++--
+ Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml | 4 ++--
+ Documentation/devicetree/bindings/rng/mtk-rng.yaml           | 4 ++--
+ Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml   | 2 +-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-I also did a quick smoke test using AF_ALG and I didn't find any issues.
+diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+index 09c6c906b1f9..457a6e43d810 100644
+--- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+@@ -2,8 +2,8 @@
+ # Copyright 2019 BayLibre, SAS
+ %YAML 1.2
+ ---
+-$id: "http://devicetree.org/schemas/rng/amlogic,meson-rng.yaml#"
+-$schema: "http://devicetree.org/meta-schemas/core.yaml#"
++$id: http://devicetree.org/schemas/rng/amlogic,meson-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+ title: Amlogic Meson Random number generator
+ 
+diff --git a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
+index a00e9bc8b609..827983008ecf 100644
+--- a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
++++ b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
+@@ -1,8 +1,8 @@
+ # SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+ %YAML 1.2
+ ---
+-$id: "http://devicetree.org/schemas/rng/brcm,iproc-rng200.yaml#"
+-$schema: "http://devicetree.org/meta-schemas/core.yaml#"
++$id: http://devicetree.org/schemas/rng/brcm,iproc-rng200.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+ title: HWRNG support for the iproc-rng200 driver
+ 
+diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+index bb32491ee8ae..7e8dc62e5d3a 100644
+--- a/Documentation/devicetree/bindings/rng/mtk-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+@@ -1,8 +1,8 @@
+ # SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+ %YAML 1.2
+ ---
+-$id: "http://devicetree.org/schemas/rng/mtk-rng.yaml#"
+-$schema: "http://devicetree.org/meta-schemas/core.yaml#"
++$id: http://devicetree.org/schemas/rng/mtk-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+ title: MediaTek Random number generator
+ 
+diff --git a/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml b/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml
+index e749818fc193..06a6791b3356 100644
+--- a/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml
+@@ -25,7 +25,7 @@ properties:
+     maxItems: 1
+ 
+   ti,syscon-sa-cfg:
+-    $ref: "/schemas/types.yaml#/definitions/phandle"
++    $ref: /schemas/types.yaml#/definitions/phandle
+     description: |
+       Phandle to syscon node of the SA configuration registers.  These
+       registers are shared between HWRNG and crypto drivers.
+-- 
+2.39.2
 
-Average of 10 runs doing a million reads of 8, 32, 64 and 128 bytes each
-time with drbg_nopr_sha256.
-
-Without the patch:
-
-bsize  count    total (secs)  user (secs)  system (secs)
-8      1000000  3,739         0,483        3,247
-32     1000000  3,835         0,49         3,337
-64     1000000  4,652         0,502        4,14
-128    1000000  6,3           0,562        5,73
-
-With the patch:
-
-bsize  count    total (secs)  user (secs)  system (secs)
-8      1000000  3,376         0,429        2,936
-32     1000000  3,361         0,422        2,927
-64     1000000  4,072         0,446        3,614
-128    1000000  5,439         0,424        4,981
-
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-
---
-Regards,
-Marcelo
