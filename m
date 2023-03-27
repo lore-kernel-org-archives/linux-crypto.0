@@ -2,46 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F78C6FD1D
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Mar 2023 17:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EC5C77B61
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Mar 2023 17:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232636AbjC0RCn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Mar 2023 13:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
+        id S232200AbjC0RIw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Mar 2023 13:08:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232307AbjC0RC2 (ORCPT
+        with ESMTP id S232541AbjC0RIb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Mar 2023 13:02:28 -0400
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81975BA8;
-        Mon, 27 Mar 2023 10:02:03 -0700 (PDT)
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-17ec8963db8so9948693fac.8;
-        Mon, 27 Mar 2023 10:02:03 -0700 (PDT)
+        Mon, 27 Mar 2023 13:08:31 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3CC35A9;
+        Mon, 27 Mar 2023 10:07:28 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id f6-20020a17090ac28600b0023b9bf9eb63so9592122pjt.5;
+        Mon, 27 Mar 2023 10:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679936848;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4xly0GzQvPfILGOWv1mMDVBgOAznYSMXIGKYil5doN4=;
+        b=kPECvF8v9MrjYejXS1kTs26xLMq5QuebytHoSLEu0lLafedcZeLRjO0XvDiqPNdle1
+         lspbWT4KByO1YXO7YRzn//6xQ2RgqpIC2cwzF8bixBiaIF00oIRsxoBhe0zk/6gsj1ou
+         Fz3d1iMe7CWqep+NZc88OZ+8SG43swPScXCnV3D4E0tcy7EsJ2wnyZGk2DQhDmdkK5B7
+         TvyHN9bD0R5/3QtsEyul54sIXQgnh4F+yl31jcgrCsHzGiXls/U7PzZ44k6a9omyVeRn
+         WxQwzsw868WsC5X2scMvf/kdbzIoTreQUJaWmBPVjKACN6fIDO3c40dvmwPFnraoLzfF
+         dUTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679936523;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g36LB56fmScqFYQLMR1QrBmpqkKWb5a6f9AKykOj3Bw=;
-        b=Qmu+VySu7TL05kGXlSHzDXFO0MWG8ytlr/Zu4j/Ey6WvUhWMP7UMh0zR+RDFuLyyfw
-         2QUIiYsULZkBIiU+Q1EFNRshIlFJrRReh/f15+vQqlErxQYcRDogRyvtkM2P/LIhXnfP
-         vofS/ajM6RKli6/gzuCP/UfxvevPbcGlseglMG4pcHJY++q2xQYafnRFIXo/V0pDo3Ga
-         tU9I/R72ZUGcpcyS8ePXMxgrwUcjCZ51lEG279efsQVl71a+nto+/q2b8H0omS+dxJcn
-         jonR56UvR9/ZbByx/JskpWogoeWY3r8bOwYebzMXL707k9jraSxRAjgaxR6wYqQGrSsS
-         G7GQ==
-X-Gm-Message-State: AAQBX9cO32HZvM/nE8z9DWEYDX8PF7V5piYKxbH+XgrPeF7pLj9CQ14o
-        +zGBKrZZecOeNHQVFV10+g==
-X-Google-Smtp-Source: AKy350YnHstOEw1avVxSXYtmJmZlzDSW/DDiq3a65+LUgrmEvX2Gwz7648gA6HnLvYFD+vanJTRbEQ==
-X-Received: by 2002:a05:6870:e255:b0:17a:a7af:6ce7 with SMTP id d21-20020a056870e25500b0017aa7af6ce7mr8867996oac.39.1679936522863;
-        Mon, 27 Mar 2023 10:02:02 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id bf9-20020a0568700a0900b0017264f96879sm640694oac.17.2023.03.27.10.02.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 10:02:02 -0700 (PDT)
-Received: (nullmailer pid 4106102 invoked by uid 1000);
-        Mon, 27 Mar 2023 17:02:01 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Olivia Mackall <olivia@selenic.com>,
+        d=1e100.net; s=20210112; t=1679936848;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4xly0GzQvPfILGOWv1mMDVBgOAznYSMXIGKYil5doN4=;
+        b=phfY4H3GK+7lTnik8FOrvNmxLd8OLrmsw7/+N5xyIEE0JlakHJirsT/ODZIM8VwR+9
+         18iMihnwoTkoBRPKmypKWCrXSSWNN2da1kLSmJ1clbTr3QAfiHq5Vx6M8L9uO+O4i9l8
+         BLtNNB3li9zvk1a0o3ElTfc6eLvz9RCl9UCrRzOyCqmZ5YkLuALxKuX59Xzy4aSmUPqb
+         BZ1KV+1Fc6lH92MgPABmmZKkzDh5zB/lCXUt9zYgtbSu/961n2Y0+HJOHxTAouc/B8Zi
+         YBT+ZsTM8POGKLwpC5/+zyJSELa2n8vLAE0Vcz66JlRtzX9In3FQ1NGTmLaWuTGEoP7u
+         mjkw==
+X-Gm-Message-State: AAQBX9dO/QtXEYFd6+jWXTRTdEFVt5rykPqq4OCnnMdcRXEUUdyJhz/O
+        03D62QtR+wJm/RDw4YB4lJk=
+X-Google-Smtp-Source: AKy350b5i1zL+7Kc62BGEJOvl18jMSAOVQSlGlHcYfpt3b3Kh4/hMZv0Lolgjp0OESx8lwvFOgkRww==
+X-Received: by 2002:a17:902:d492:b0:1a0:57df:861c with SMTP id c18-20020a170902d49200b001a057df861cmr20430671plg.1.1679936847754;
+        Mon, 27 Mar 2023 10:07:27 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id u23-20020a170902a61700b00192fe452e17sm4979449plq.162.2023.03.27.10.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 10:07:25 -0700 (PDT)
+Message-ID: <cbb30ff5-d247-e545-23df-ff9d393ba57c@gmail.com>
+Date:   Mon, 27 Mar 2023 10:07:16 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH] dt-bindings: rng: Drop unneeded quotes
+Content-Language: en-US
+To:     Rob Herring <robh@kernel.org>, Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Neil Armstrong <neil.armstrong@linaro.org>,
@@ -59,85 +75,25 @@ Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-mediatek@lists.infradead.org
-Subject: [PATCH] dt-bindings: rng: Drop unneeded quotes
-Date:   Mon, 27 Mar 2023 12:01:53 -0500
-Message-Id: <20230327170153.4105594-1-robh@kernel.org>
-X-Mailer: git-send-email 2.39.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230327170153.4105594-1-robh@kernel.org>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230327170153.4105594-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Cleanup bindings dropping unneeded quotes. Once all these are fixed,
-checking for this can be enabled in yamllint.
+On 3/27/23 10:01, Rob Herring wrote:
+> Cleanup bindings dropping unneeded quotes. Once all these are fixed,
+> checking for this can be enabled in yamllint.
+> 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>   Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 4 ++--
+>   Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml | 4 ++--
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 4 ++--
- Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml | 4 ++--
- Documentation/devicetree/bindings/rng/mtk-rng.yaml           | 4 ++--
- Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml   | 2 +-
- 4 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
-index 09c6c906b1f9..457a6e43d810 100644
---- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
-@@ -2,8 +2,8 @@
- # Copyright 2019 BayLibre, SAS
- %YAML 1.2
- ---
--$id: "http://devicetree.org/schemas/rng/amlogic,meson-rng.yaml#"
--$schema: "http://devicetree.org/meta-schemas/core.yaml#"
-+$id: http://devicetree.org/schemas/rng/amlogic,meson-rng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
- 
- title: Amlogic Meson Random number generator
- 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
-index a00e9bc8b609..827983008ecf 100644
---- a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
-+++ b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.yaml
-@@ -1,8 +1,8 @@
- # SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
- %YAML 1.2
- ---
--$id: "http://devicetree.org/schemas/rng/brcm,iproc-rng200.yaml#"
--$schema: "http://devicetree.org/meta-schemas/core.yaml#"
-+$id: http://devicetree.org/schemas/rng/brcm,iproc-rng200.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
- 
- title: HWRNG support for the iproc-rng200 driver
- 
-diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
-index bb32491ee8ae..7e8dc62e5d3a 100644
---- a/Documentation/devicetree/bindings/rng/mtk-rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
-@@ -1,8 +1,8 @@
- # SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
- %YAML 1.2
- ---
--$id: "http://devicetree.org/schemas/rng/mtk-rng.yaml#"
--$schema: "http://devicetree.org/meta-schemas/core.yaml#"
-+$id: http://devicetree.org/schemas/rng/mtk-rng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
- 
- title: MediaTek Random number generator
- 
-diff --git a/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml b/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml
-index e749818fc193..06a6791b3356 100644
---- a/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/ti,keystone-rng.yaml
-@@ -25,7 +25,7 @@ properties:
-     maxItems: 1
- 
-   ti,syscon-sa-cfg:
--    $ref: "/schemas/types.yaml#/definitions/phandle"
-+    $ref: /schemas/types.yaml#/definitions/phandle
-     description: |
-       Phandle to syscon node of the SA configuration registers.  These
-       registers are shared between HWRNG and crypto drivers.
+Acked-by: Florian Fainelli <f.fainelli@gmail.com> #brcm,iproc-rng200
 -- 
-2.39.2
+Florian
 
