@@ -2,89 +2,122 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EA2C76195
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Mar 2023 08:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B604C77B6E
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Mar 2023 09:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbjC1IEa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Mar 2023 04:04:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56044 "EHLO
+        id S232636AbjC1J2x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Mar 2023 05:28:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjC1IE3 (ORCPT
+        with ESMTP id S232452AbjC1J2s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2023 04:04:29 -0400
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B9E12F
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 01:04:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1679990661; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=sMZ6QzO1ZJleEDtBN5taOVA/cep4+5/d0B6s2oHMTu5efEyamDl5UVfPLblR6Mk/fg
-    r9CvvQiuQe6AG+63zFHfnc2jHrRlnGQ4Ccvv86FJIv5MRcwKU4VTayW/YOBqNJOEcFsL
-    x3h/UmUbn2xjB0ljiOGrC8+fCmcohmTpMe/tlBdm3dMi+VuiaZVJxhVMqcbTrJz7xOyc
-    LdakVPHTHQwVjcRgJccQe3e2Pc3yGQns2goz2oEGnKg6xMYVDENDLbI9gAsFD3xJWvpK
-    AmORfSXuCdYHk7K0Unlpb5N0VvC3SF+8+G/9zo5pVhvLz2n2UiD+SVQQGYWS4cFqq6gD
-    4jNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1679990661;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:To:From:Cc:Date:From:
-    Subject:Sender;
-    bh=ZVr+GBseoUw7mQIsJmBJ7iRh/RojZKBlyaxOMmlUPCE=;
-    b=YOHNBkBw8Pbascq3Ayi7XwBBy9F5wHzAduN+BzLgSoowCdc0MT4paLYqaT1KWXUBtO
-    gWJwkTjTUABuydxHuN6uVprKuOvKoe4f8DSQY8SWnDGmsW4TYW0dqlcYssAVl7zhI9Zb
-    VODXXb+BhU4kN8MsYvmo7PzjBA8NH2GRfIXs1mA/xkt25qZ0gBQJB44R2kzCmo/ELObe
-    emDzTRsOGoeBLX2c4zhqlhYGWngMafAYVLZmekDU4XT30Sef9s/uoO7wy3Q5vMQr4BTC
-    4u9cEH5u/xbwq/u+NmSUT9OMUXbHylBNw3iBDJ/DdcQCY+lsQjCpCDKNERCtKrM0xza3
-    HRhg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1679990661;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:To:From:Cc:Date:From:
-    Subject:Sender;
-    bh=ZVr+GBseoUw7mQIsJmBJ7iRh/RojZKBlyaxOMmlUPCE=;
-    b=PcxBA7o3mu3XEap6mVwpZ4pkm5wn75ge0J61hEFtRooL5v0hLo2BYD5r1VeZqYNEk5
-    uuDESLQx6+QLGRWet9as9z2epVAzUOUyoRFSyZM0sBxLA2jZTBKjMH1DMJz/hlh+hkIt
-    jq/L8JeQwVcGQz6u84mTxFluUZSxOGKxmk+nk13M95yFaUF6mnd/LrEhSuxMss40lUhS
-    BCxRBR5GzlXRRr7gfhjotYt9Wu8Y1SOyv+493gh7MIg4lgslQlLOScSRJm1RDl2BSs9d
-    w6G8GJQ1rEIhCMUMbMgeux0Id1DSMXWqo24Yz0q0Bx+aQfNTTmZQE5KMIjPKTGtG8r+w
-    kadw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9y2gdNk2TvDz1d0+/iw=="
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 49.3.1 AUTH)
-    with ESMTPSA id u24edez2S84LphG
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Tue, 28 Mar 2023 10:04:21 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: drbg - Only fail when jent is unavailable in FIPS mode
-Date:   Tue, 28 Mar 2023 10:04:20 +0200
-Message-ID: <1802483.TS1nA93jg2@tauon.chronox.de>
-In-Reply-To: <ZCJgez22L30w5B0L@gondor.apana.org.au>
-References: <ZCJgez22L30w5B0L@gondor.apana.org.au>
+        Tue, 28 Mar 2023 05:28:48 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C108A5FFD
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 02:28:25 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id fy10-20020a17090b020a00b0023b4bcf0727so11893871pjb.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 02:28:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1679995705;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TwOeeM0Gc4tN+QYu8+Z9WuguitIgi90Sd1+U++iusLY=;
+        b=s72MT9nY/6jH9o35SvPW523lbHGEmGn7+JEP2R8hz0I6//1W7BiS6BRqO92l0Q7IWJ
+         5gsJwuqiIyaOrgyfMdPtrk18Ve1s8dFzTFxK0ejRtADaNYszk57CHuYubHBBe1mQZozX
+         ue7SySqUxsxmzKJXxltkkSwmmyWO+qTwpxj9Wji80Ybg6aF+swYc0pzsq7DDazUmKTdG
+         lJyZI2bdfpqzauwAuc8KLIWhIZzE52syRlJba6PWpyMwzkrzXGGCVimyNc8ePLXkMzOG
+         z+FqQU0FIzC+4SXlyL2gRLtgY+PmuvLu8Y1Q4FfoLrHcczRzlsRnVN/HgJqgsGJu8Dyt
+         x1rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679995705;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TwOeeM0Gc4tN+QYu8+Z9WuguitIgi90Sd1+U++iusLY=;
+        b=qs7pDd5BLG9IYDaFfOkA61FIacCqZ4JcUOWgsMHJpmIkKuc1W+SbPMzpdYgHvQs/RG
+         QUqs1+U3yfsoQyU+NCFh8mfDb9pTnFpedb1Z6kJEAGjT7/uqRyXV84vWZCoYDTH1Z1hR
+         qRK8k4YHAkzDKH/TAG4Yxm4vrS/8HekEwDiiKkziQa1w+Ii4qCl1KLElK4pX3kMfZdT3
+         M8fzlXUJRHo/7H6GRqt64gUQ9fLMXu8cL+anZzzZbwhmusJkrRFttSd/JDL83WLFngL1
+         pVe+lX5C95IZfIN+LWq8rVZKXg6gq4r5wuq+pp8ugonSX0uEZHeq9seykhINcyJzF6nE
+         6p2Q==
+X-Gm-Message-State: AO0yUKWKQFZgUcYQOTRaJqij/Eh3iIc5FgXAN7UIo42YKrjORAlv+zTr
+        58uuxbJvL92oCFoQgqVRgTmQbw==
+X-Google-Smtp-Source: AK7set/gqVQvlh1dYk1GKB0z0VrICqZ6/xVXx8jSzvzqqoBg9TGalA4//LSCrdA1mFhcFd1qvSSnJA==
+X-Received: by 2002:a05:6a20:3a87:b0:da:dc14:33d with SMTP id d7-20020a056a203a8700b000dadc14033dmr11444261pzh.53.1679995704945;
+        Tue, 28 Mar 2023 02:28:24 -0700 (PDT)
+Received: from localhost.localdomain ([2401:4900:1c61:449a:10df:e7c1:9bdd:74f0])
+        by smtp.gmail.com with ESMTPSA id a24-20020aa78658000000b005a8bc11d259sm21261518pfo.141.2023.03.28.02.28.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 02:28:24 -0700 (PDT)
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
+        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
+        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
+        rfoss@kernel.org, neil.armstrong@linaro.org
+Subject: [PATCH v3 0/9] arm64: qcom: Enable Crypto Engine for a few Qualcomm SoCs
+Date:   Tue, 28 Mar 2023 14:58:06 +0530
+Message-Id: <20230328092815.292665-1-bhupesh.sharma@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 28. M=E4rz 2023, 05:35:23 CEST schrieb Herbert Xu:
+Changes since v2:
+-----------------
+- v2 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230322114519.3412469-1-bhupesh.sharma@linaro.org/
+- No functional change since v2. As the sdm845 patch from v1 was accepted in linux-next,
+  dropped it from this version.
 
-Hi Herbert,
+Changes since v1:
+-----------------
+- v1 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230321190118.3327360-1-bhupesh.sharma@linaro.org/
+- Folded the BAM DMA dt-binding change.
+  (sent earlier as: https://lore.kernel.org/linux-arm-msm/20230321184811.3325725-1-bhupesh.sharma@linaro.org/)
+- Folded the QCE dt-binding change.
+  (sent earlier as: https://lore.kernel.org/linux-arm-msm/20230320073816.3012198-1-bhupesh.sharma@linaro.org/)
+- Folded Neil's SM8450 dts patch in this series.
+- Addressed review comments from Rob, Stephan and Konrad.
+- Collected Konrad's R-B for [PATCH 5/9].
 
-> When jent initialisation fails for any reason other than ENOENT,
-> the entire drbg fails to initialise, even when we're not in FIPS
-> mode.  This is wrong because we can still use the kernel RNG when
-> we're not in FIPS mode.
->=20
-> Change it so that it only fails when we are in FIPS mode.
+This patchset enables Crypto Engine support for Qualcomm SoCs like
+SM6115, SM8150, SM8250, SM8350 and SM8450.
 
-Reviewed-by: Stephan Mueller <smueller@chronox.de>
+Note that:
+- SM8250 crypto engine patch utilizes the work already done by myself and
+  Vladimir.
+- SM8350 crypto engine patch utilizes the work already done by Robert.
+- SM8450 crypto engine patch utilizes the work already done by Neil.
 
-Ciao
-Stephan
+Also this patchset is rebased on linux-next/master.
 
+Bhupesh Sharma (8):
+  dt-bindings: dma: Add support for SM6115 and QCM2290 SoCs
+  dt-bindings: dma: Increase iommu maxItems for BAM DMA
+  dt-bindings: qcom-qce: Fix compatibles combinations for SM8150 and
+    IPQ4019 SoCs
+  dt-bindings: qcom-qce: Add compatibles for SM6115 and QCM2290
+  arm64: dts: qcom: sm6115: Add Crypto Engine support
+  arm64: dts: qcom: sm8150: Add Crypto Engine support
+  arm64: dts: qcom: sm8250: Add Crypto Engine support
+  arm64: dts: qcom: sm8350: Add Crypto Engine support
+
+Neil Armstrong (1):
+  arm64: dts: qcom: sm8450: add crypto nodes
+
+ .../devicetree/bindings/crypto/qcom-qce.yaml  |  8 ++++++
+ .../devicetree/bindings/dma/qcom,bam-dma.yaml | 24 ++++++++++------
+ arch/arm64/boot/dts/qcom/sm6115.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8150.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8350.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8450.dtsi          | 28 +++++++++++++++++++
+ 7 files changed, 140 insertions(+), 8 deletions(-)
+
+-- 
+2.38.1
 
