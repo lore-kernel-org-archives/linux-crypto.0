@@ -2,125 +2,141 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8D4C761A6
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Mar 2023 09:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F86C77B60
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Mar 2023 11:01:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232883AbjC1Ja7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Mar 2023 05:30:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
+        id S232289AbjC1LBS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Mar 2023 07:01:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232762AbjC1JaS (ORCPT
+        with ESMTP id S230390AbjC1LBR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Mar 2023 05:30:18 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA1E7684
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 02:29:13 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id dw14so7530303pfb.6
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 02:29:13 -0700 (PDT)
+        Tue, 28 Mar 2023 07:01:17 -0400
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC9037A8F
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 04:01:14 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-54606036bb3so56558207b3.6
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Mar 2023 04:01:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1679995747;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20210112; t=1680001274;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9oFHBwDflAuoBx3nAvQZJqLFUNje4jYksqgr3MUJ8Rg=;
-        b=StsbH33A0Z//LD07mPIP8zFLStHzWcZyoorzQYE4OzFziUz5oL9ZOpoedu+0PiAAiH
-         EjAadapaZFYB1gfC+2mOoTix9LKyhg8E4Clrdwi6CjVjg6dr3rAJzxP0j5wZtdeujy9z
-         OwJO5gR0n4dgsfLmI2sA+ySKVv3XQYoxUPTcc98HsN/4CLCqI9t65qqMsVkHmQ16syvS
-         aBmgFUmDUSIdtsJZWE518O5gniNkVzkyi88XnxuslaQgiIZsPcG7AbFP/h3fIrz+KZ24
-         y/OcGXDUSX9y4efG5dLn6z9pxEygzfgFGqAs5PJsaQ7Cb9BcT6roucQ2yPLj6hz36pBL
-         PyqA==
+        bh=+fgeMetkUHl5uF0RC5fOFpwZWWL0WPLVzX+x0gJMhjk=;
+        b=FNjdZIOSPlXF6+ZBjpZXVTK3KrDZjuECOPHp0Z4AFMBhownpN1aIv7BS+d7vR544mP
+         xTlTmPPvS6NHSKB6V7URLEdFefrFwql0OyZoaKik2cuU397pIgBMQXZsvM517UZ4DzDC
+         5DJvrnK4h5V484cMJh4SpW/K84HnR/AU8fofYZ+R93fouP+m5cFTj2G+71JleBTW41R3
+         Pit+25cPIFSlmqU+4cB/jBPntBxoP9sBULFfmJl2ImekZyVKCEVlHaBWgzo0AgMMfU0t
+         9T3AQ4EHfMu3XZXJJ/315bdXtU8wg8SLHdZ3u7DKfJRVkRIXUBenuX/exOHX55D9MueN
+         rXcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679995747;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680001274;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9oFHBwDflAuoBx3nAvQZJqLFUNje4jYksqgr3MUJ8Rg=;
-        b=eKKcz+EC+B6DsuhgSjcPwThfSfTOIVQRXE+Frz/cpRRSlDUjftG5nmxngGebWFPZya
-         Dn6FnD1lVxIGrG95bHcHX4WS8b4/14Cf3JQuMRvG/Zxe1drfknq0ELmZHcPhiV5uH/2I
-         f50Vkv4/LjVE0M53OuMbbvOH6o58tYDyF7i130nxaXRrau8VYxVwF4AWWhreybrqupjd
-         390rW/9bhel8zTC8CbTNDHR1IkZywcOv8f2yn9GdQsKPLWpTvBQUKmrJR5RlDKvQ/DMp
-         UDjm2aoPy9acBu20bPdn6Nf/XrACeY1YKHCJEy6yLTqflFsJQFQQ9GYIPg9cyZxBZROD
-         pfvw==
-X-Gm-Message-State: AAQBX9cb60vai0dbTmZ/mluDW6EAMS2VHHb+GMwLJpcfqMHSYuiIW2Lc
-        yDpmLFN/rO5IzLbaMCnRw4lhYg==
-X-Google-Smtp-Source: AKy350aa3V6HXe2gvRLn5hs80i9QJDxGwIBrCU0AW1gwNvwpm/+xdIz0ON0Ao1HnOMhqZAf5lkxdPw==
-X-Received: by 2002:aa7:99d2:0:b0:626:7c43:7cb8 with SMTP id v18-20020aa799d2000000b006267c437cb8mr14611382pfi.20.1679995747407;
-        Tue, 28 Mar 2023 02:29:07 -0700 (PDT)
-Received: from localhost.localdomain ([2401:4900:1c61:449a:10df:e7c1:9bdd:74f0])
-        by smtp.gmail.com with ESMTPSA id a24-20020aa78658000000b005a8bc11d259sm21261518pfo.141.2023.03.28.02.29.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 02:29:07 -0700 (PDT)
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
-        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
-        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org
-Subject: [PATCH v3 9/9] arm64: dts: qcom: sm8450: add crypto nodes
-Date:   Tue, 28 Mar 2023 14:58:15 +0530
-Message-Id: <20230328092815.292665-10-bhupesh.sharma@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230328092815.292665-1-bhupesh.sharma@linaro.org>
-References: <20230328092815.292665-1-bhupesh.sharma@linaro.org>
+        bh=+fgeMetkUHl5uF0RC5fOFpwZWWL0WPLVzX+x0gJMhjk=;
+        b=mYbVTam2E1S8WXO/ZHAbjg5iytzSzYTqEnOJF4Xr0qKJ9uwPUhznULt+r92jHo0siJ
+         HTB4oFr6Gz5mYlT4O1hpCsCE4LcY32YNiwnkoed6UyoFHcLdJByi4fpn5B94PpTB4+Jh
+         vlY45xopE1NG1QSCOmjZ+qHOzFahLpOb1Pc/kUqKRq4UJRg9NDhXwK8B3+m4SFwqWVUC
+         EzEAsmoqU8ICaGtELezY92XWcTWJ+a6Jxcco96Q6A082jimW2q3OSXA8KAvFgnb+kP2q
+         w2FAmgPwLyE7antEnjiU0rSz2QTGxHbPnOioV5wKx96mp4u0M9ayt2VHkimEDL3rx9el
+         Vx8Q==
+X-Gm-Message-State: AAQBX9fR9PXcd6IhcyHcsfuT6lntgYO5gSBHPeBqwkvaTmUQoKKBPFxk
+        +was3RLA3ijuTW/oJ+G6oaNnRP5N5Jv3xXPc1URe2ARm
+X-Google-Smtp-Source: AKy350avqf3y8y/lYar+0FtL5NnWHb471GTkrJFku4XdelFS/5mLRwWuxKjQaWey2iVWz9WSKNmDcJlD6nuHSaxyTe0=
+X-Received: by 2002:a81:d30b:0:b0:545:64d7:5086 with SMTP id
+ y11-20020a81d30b000000b0054564d75086mr7121397ywi.1.1680001273515; Tue, 28 Mar
+ 2023 04:01:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <ZCJk8JQV+0N3VwPS@gondor.apana.org.au>
+In-Reply-To: <ZCJk8JQV+0N3VwPS@gondor.apana.org.au>
+From:   =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date:   Tue, 28 Mar 2023 13:01:01 +0200
+Message-ID: <CAAUqJDtqmXOBNY0YzkuzfaK-zvzhHqazc+=vs=OouKLBAZ90Pw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: algif_hash - Allocate hash state with kmalloc
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Neil Armstrong <neil.armstrong@linaro.org>
+On Tue, Mar 28, 2023 at 5:58=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> Allocating the hash state on the stack limits its size.  Change
+> this to use kmalloc so the limit can be removed for new drivers.
+>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+> index 1d017ec5c63c..63af72e19fa8 100644
+> --- a/crypto/algif_hash.c
+> +++ b/crypto/algif_hash.c
+> @@ -235,24 +235,31 @@ static int hash_accept(struct socket *sock, struct =
+socket *newsock, int flags,
+>         struct alg_sock *ask =3D alg_sk(sk);
+>         struct hash_ctx *ctx =3D ask->private;
+>         struct ahash_request *req =3D &ctx->req;
+> -       char state[HASH_MAX_STATESIZE];
+> +       struct crypto_ahash *tfm;
+>         struct sock *sk2;
+>         struct alg_sock *ask2;
+>         struct hash_ctx *ctx2;
+> +       char *state;
+>         bool more;
+>         int err;
+>
+> +       tfm =3D crypto_ahash_reqtfm(req);
+> +       state =3D kmalloc(crypto_ahash_statesize(tfm), GFP_KERNEL);
 
-Add crypto engine (CE) and CE BAM related nodes and definitions
-for the SM8450 SoC.
+Shouldn't sock_kmalloc() be used instead?
 
-Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-[Bhupesh: Corrected the compatible list]
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
----
- arch/arm64/boot/dts/qcom/sm8450.dtsi | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-index 31877f18dce2..d7a28cac4f47 100644
---- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-@@ -4146,6 +4146,34 @@ ufs_mem_phy_lanes: phy@1d87400 {
- 			};
- 		};
- 
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x28000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			iommus = <&apps_smmu 0x584 0x11>,
-+				 <&apps_smmu 0x588 0x0>,
-+				 <&apps_smmu 0x598 0x5>,
-+				 <&apps_smmu 0x59a 0x0>,
-+				 <&apps_smmu 0x59f 0x0>;
-+		};
-+
-+		crypto: crypto@1de0000 {
-+			compatible = "qcom,sm8450-qce", "qcom,sm8150-qce", "qcom,qce";
-+			reg = <0 0x01dfa000 0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x584 0x11>,
-+				 <&apps_smmu 0x588 0x0>,
-+				 <&apps_smmu 0x598 0x5>,
-+				 <&apps_smmu 0x59a 0x0>,
-+				 <&apps_smmu 0x59f 0x0>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>;
-+			interconnect-names = "memory";
-+		};
-+
- 		sdhc_2: mmc@8804000 {
- 			compatible = "qcom,sm8450-sdhci", "qcom,sdhci-msm-v5";
- 			reg = <0 0x08804000 0 0x1000>;
--- 
-2.38.1
-
+> +       err =3D -ENOMEM;
+> +       if (!state)
+> +               goto out;
+> +
+>         lock_sock(sk);
+>         more =3D ctx->more;
+>         err =3D more ? crypto_ahash_export(req, state) : 0;
+>         release_sock(sk);
+>
+>         if (err)
+> -               return err;
+> +               goto out_free_state;
+>
+>         err =3D af_alg_accept(ask->parent, newsock, kern);
+>         if (err)
+> -               return err;
+> +               goto out_free_state;
+>
+>         sk2 =3D newsock->sk;
+>         ask2 =3D alg_sk(sk2);
+> @@ -260,7 +267,7 @@ static int hash_accept(struct socket *sock, struct so=
+cket *newsock, int flags,
+>         ctx2->more =3D more;
+>
+>         if (!more)
+> -               return err;
+> +               goto out_free_state;
+>
+>         err =3D crypto_ahash_import(&ctx2->req, state);
+>         if (err) {
+> @@ -268,6 +275,10 @@ static int hash_accept(struct socket *sock, struct s=
+ocket *newsock, int flags,
+>                 sock_put(sk2);
+>         }
+>
+> +out_free_state:
+> +       kfree_sensitive(state);
+> +
+> +out:
+>         return err;
+>  }
+>
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
