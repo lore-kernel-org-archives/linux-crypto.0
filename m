@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C917DC77B6C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BF4C77B60
 	for <linux-crypto@archiver.kernel.org>; Tue, 28 Mar 2023 19:56:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjC1T42 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Mar 2023 15:56:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbjC1T41 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
+        id S229720AbjC1T41 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 28 Mar 2023 15:56:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229460AbjC1T40 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Mar 2023 15:56:26 -0400
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B6143AA2;
-        Tue, 28 Mar 2023 12:56:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175AD1BE1;
+        Tue, 28 Mar 2023 12:56:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1680033386; x=1711569386;
+  t=1680033385; x=1711569385;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=B79al2p37wc0hLyQzNhdQMnWH/qY4G74yzTaZc4Qtqg=;
-  b=lDCtGG9aG8/HR4efU839qQZ04ThxubNmUC1iY2ZIlGybwZxGFRMKDCZG
-   Kr+iy+ALaMlc1yLPbn2OTT1RSV+y6qkhbMq06SiLNLxFYWjlR8GCz23aY
-   7EWuVtCldWiasJt0o1yLLOaKx4sVEU5PfX1Fz5Za6JwMorTLJzvLcGDU0
-   xQRQAWR/sprUk4LP/QybdE8nt2Jhkry+d48XVnORIS/DHR2mC27lXkYqB
-   IVMvoBGL7/U1/sTn/W7TztHDkN3mO09ykcHtNaQlXjHA9mY3XqIZTZNKC
-   crVrPOdJ6QzIFgCK1munlUhdTvSfvfsDZP3JKErczO27RXRUjGRfQu6Jy
-   g==;
+  bh=3pNleVDsOKO+SQXxRv8CZk7/1rEyCdwTx0A5JZpAvdk=;
+  b=DwT6Q2XvK9Lmli2/QoHwmFU8zQHquGP7TvUBc5resLBrCGsaHoMRqdoi
+   gQ9K7p2DsXN1YKhGsqVZC6xqwEitWLq6d0JkG7MqQSwgdH0Xd6zceRBWT
+   FjyLlsLhIVpNvZqvSIeOKahyRvBe0akU2MwUM8SX24157rGIStZA7FI2S
+   8QCz16WX+expsjGs1Z20WwDfTF43bl3fdGd/iptxbMxEzbgZKlSCDmKDc
+   P2Z0hMHACPC7warATC1AFMN6HrDKNsgbo3jx+TBvZPD3xZ6Y2yDOnBF3k
+   nGB5FmhXw58rmN/rn7m4nPY2h14Ggl81lA26q1pVsGgNxYNM6mkAm7gMm
+   w==;
 X-IronPort-AV: E=Sophos;i="5.98,297,1673938800"; 
-   d="scan'208";a="144351915"
+   d="scan'208";a="144351914"
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 28 Mar 2023 12:56:24 -0700
 Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
@@ -47,9 +47,9 @@ CC:     <linux-crypto@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Ryan Wanner <Ryan.Wanner@microchip.com>
-Subject: [PATCH 3/4] crypto: atmel-aes - Detecting in-place operations two sg lists
-Date:   Tue, 28 Mar 2023 12:56:28 -0700
-Message-ID: <74e969a12021b008d12d871d8d4d9162905f3c48.1680019905.git.Ryan.Wanner@microchip.com>
+Subject: [PATCH 2/4] crypto: atmel-tdes - Detecting in-place operations with two sg lists
+Date:   Tue, 28 Mar 2023 12:56:27 -0700
+Message-ID: <ad0815e3b8ffcb9d627895fe2464ef15dbb44a56.1680019905.git.Ryan.Wanner@microchip.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <cover.1680019905.git.Ryan.Wanner@microchip.com>
 References: <cover.1680019905.git.Ryan.Wanner@microchip.com>
@@ -65,26 +65,27 @@ From: Ryan Wanner <Ryan.Wanner@microchip.com>
 Avoiding detecting finely in-place operations with different
 scatter lists. Copying the source data for decryption into rctx->lastc
 regardless if the operation is in-place or not. This allows in-place
-operations with different scatter lists.
+operations with different scatter lists without affecting other
+operations.
 
 This approach takes less resources than parsing both scatter lists to
 check if they are equal.
 
 Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 ---
- drivers/crypto/atmel-aes.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/crypto/atmel-tdes.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 063394cfa874..08a923c2a0eb 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -493,17 +493,11 @@ static void atmel_aes_set_iv_as_last_ciphertext_block(struct atmel_aes_dev *dd)
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 8b7bc1076e0d..edf18073516e 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -565,17 +565,12 @@ atmel_tdes_set_iv_as_last_ciphertext_block(struct atmel_tdes_dev *dd)
  	if (req->cryptlen < ivsize)
  		return;
  
--	if (rctx->mode & AES_FLAGS_ENCRYPT) {
-+	if (rctx->mode & AES_FLAGS_ENCRYPT)
+-	if (rctx->mode & TDES_FLAGS_ENCRYPT) {
++	if (rctx->mode & TDES_FLAGS_ENCRYPT)
  		scatterwalk_map_and_copy(req->iv, req->dst,
  					 req->cryptlen - ivsize, ivsize, 0);
 -	} else {
@@ -97,15 +98,16 @@ index 063394cfa874..08a923c2a0eb 100644
 -	}
 +	else
 +		memcpy(req->iv, rctx->lastc, ivsize);
++
  }
  
- static inline struct atmel_aes_ctr_ctx *
-@@ -1146,7 +1140,7 @@ static int atmel_aes_crypt(struct skcipher_request *req, unsigned long mode)
+ static void atmel_tdes_finish_req(struct atmel_tdes_dev *dd, int err)
+@@ -722,7 +717,7 @@ static int atmel_tdes_crypt(struct skcipher_request *req, unsigned long mode)
  	rctx->mode = mode;
  
- 	if (opmode != AES_FLAGS_ECB &&
--	    !(mode & AES_FLAGS_ENCRYPT) && req->src == req->dst) {
-+	    !(mode & AES_FLAGS_ENCRYPT)) {
+ 	if ((mode & TDES_FLAGS_OPMODE_MASK) != TDES_FLAGS_ECB &&
+-	    !(mode & TDES_FLAGS_ENCRYPT) && req->src == req->dst) {
++	    !(mode & TDES_FLAGS_ENCRYPT)) {
  		unsigned int ivsize = crypto_skcipher_ivsize(skcipher);
  
  		if (req->cryptlen >= ivsize)
