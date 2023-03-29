@@ -2,110 +2,99 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AB3C761AF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 14:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC248C6FD18
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 14:58:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230343AbjC2Ons (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Mar 2023 10:43:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39636 "EHLO
+        id S230199AbjC2O6w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Mar 2023 10:58:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbjC2OnS (ORCPT
+        with ESMTP id S229525AbjC2O6v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Mar 2023 10:43:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06AE1FF3
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Mar 2023 07:39:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680100785;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eOGvCBK3xTc7UhN8iQW8f99rBt5fCj0lar0/GGKSAUo=;
-        b=I7DsYnxIXi+N95JxEr8u3mTDsEOO3Rl0GZAt2maRaaN0hsdWK0xUa7V6pfebfrJYdZhYdN
-        bDX2gKAThIpA9TbaQAw78yN0rmH+SuZcOynknYVd4L3pGUxJoVVAGJYJ2eQLKYj202wOZi
-        DV2odxcOIVHprMQ3Mqw2nfO/NOT6REU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-OX_M3mnhOyOLIjTwhOpgsw-1; Wed, 29 Mar 2023 10:39:40 -0400
-X-MC-Unique: OX_M3mnhOyOLIjTwhOpgsw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52F783C10ED2;
-        Wed, 29 Mar 2023 14:39:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 900FA2166B33;
-        Wed, 29 Mar 2023 14:39:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <e128356a-f56f-4c02-7437-dfea38e4194b@suse.de>
-References: <e128356a-f56f-4c02-7437-dfea38e4194b@suse.de> <20230329141354.516864-1-dhowells@redhat.com> <20230329141354.516864-49-dhowells@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-doc@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-sctp@vger.kernel.org, linux-afs@lists.infradead.org,
-        rds-devel@oss.oracle.com, linux-x25@vger.kernel.org,
-        dccp@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-wpan@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-can@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
-        Al Viro <viro@zeniv.linux.org.uk>, linux-hams@vger.kernel.org,
-        mptcp@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Christian Brauner <brauner@kernel.org>, netdev@vger.kernel.org,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
-        Chuck Lever III <chuck.lever@oracle.com>,
-        tipc-discussion@lists.sourceforge.net,
-        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        bpf@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [RFC PATCH v2 48/48] sock: Remove ->sendpage*() in favour of sendmsg(MSG_SPLICE_PAGES)
+        Wed, 29 Mar 2023 10:58:51 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED71A2113;
+        Wed, 29 Mar 2023 07:58:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680101930; x=1711637930;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=GN23CeAT5EHQB/8GlHtyJojqMc0q6OVj81+ZN6OvJJQ=;
+  b=ZJ4gTLhHrB3HW+UnKQODjaISXRYwurbb+Ik73D1X67KvUTfAgqo1SGiU
+   A4Hyk5RQW8q8ymMbAtSkpXQHLwYjVXk4gShiDkKqrSH6LCe5LPd3EMH/n
+   GdTpDrH9GskFRrsQ/1KMpz6w7OCk/ltdKI4d7yOvLNzmGXR7qT2uD/tnf
+   KQJLUW784t5j+3fNRvatfoz/UtJiPIGH1DRCkXQHJbYiK5AOHYdF28GZS
+   0ZTkl/FZGSexY6GX3BiKPZELsCi50fyGmsunnCRuqG7WElMQfcmbhRBVZ
+   iyGlcDDL6nt7XrpXGNML2ts3dwGrwD83rqw6PEboOaiQPb6id2xTd20Lh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="368667517"
+X-IronPort-AV: E=Sophos;i="5.98,301,1673942400"; 
+   d="scan'208";a="368667517"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2023 07:58:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="716908627"
+X-IronPort-AV: E=Sophos;i="5.98,301,1673942400"; 
+   d="scan'208";a="716908627"
+Received: from allenhsi-mobl1.amr.corp.intel.com ([10.212.70.154])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2023 07:58:49 -0700
+Message-ID: <e208af4cc343901ac5d9a0e5b4f21923623b266f.camel@linux.intel.com>
+Subject: Re: [PATCH v2 10/15] crypto: iaa - Add per-cpu workqueue table with
+ rebalancing
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     herbert@gondor.apana.org.au, fenghua.yu@intel.com,
+        vkoul@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Date:   Wed, 29 Mar 2023 09:58:48 -0500
+In-Reply-To: <20230329075149.2736-1-hdanton@sina.com>
+References: <20230328153535.126223-1-tom.zanussi@linux.intel.com>
+         <20230329075149.2736-1-hdanton@sina.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.44.1-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <518630.1680100773.1@warthog.procyon.org.uk>
-Date:   Wed, 29 Mar 2023 15:39:33 +0100
-Message-ID: <518631.1680100773@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hannes Reinecke <hare@suse.de> wrote:
-
-> > [!] Note: This is a work in progress.  At the moment, some things won't
-> >      build if this patch is applied.  nvme, kcm, smc, tls.
-
-Actually, that needs updating.  nvme and smc now build.
-
-> Weelll ... what happens to consumers of kernel_sendpage()?
-> (Let's call them nvme ...)
-> Should they be moved over, too?
-
-Patch 42 should address NVMe, I think.  I can't test it, though, as I don't
-have hardware.
-
-There should be no callers of kernel_sendmsg() by the end of this patchset,
-and the only remaining implementors of sendpage are Chelsio-TLS, AF_TLS and
-AF_KCM, which as stated in the cover, aren't yet converted and won't build.
-
-> Or what is the general consensus here?
-> 
-> (And what do we do with TLS? It does have a ->sendpage() version, too ...)
-
-I know.  There are three things left that I need to tackle, but I'd like to
-get opinions on some of the other bits and I might need some help with AF_TLS
-and AF_KCM.
-
-That said, should I just remove tls_sw_do_sendpage() since presumably the data
-is going to get copied(?) and encrypted and the source pages aren't going to
-be held onto?
-
-David
+SGkgSGlsbGYsCgpPbiBXZWQsIDIwMjMtMDMtMjkgYXQgMTU6NTEgKzA4MDAsIEhpbGxmIERhbnRv
+biB3cm90ZToKPiBPbiAyOCBNYXIgMjAyMyAxMDozNTozMCAtMDUwMCBUb20gWmFudXNzaQo+IDx0
+b20uemFudXNzaUBsaW51eC5pbnRlbC5jb20+Cj4gPiArLyoKPiA+ICsgKiBHaXZlbiBhIGNwdSwg
+ZmluZCB0aGUgY2xvc2VzdCBJQUEgaW5zdGFuY2UuwqAgVGhlIGlkZWEgaXMgdG8gdHJ5Cj4gPiB0
+bwo+ID4gKyAqIGNob29zZSB0aGUgbW9zdCBhcHByb3ByaWF0ZSBJQUEgaW5zdGFuY2UgZm9yIGEg
+Y2FsbGVyIGFuZAo+ID4gc3ByZWFkCj4gPiArICogYXZhaWxhYmxlIHdvcmtxdWV1ZXMgYXJvdW5k
+IHRvIGNsaWVudHMuCj4gPiArICovCj4gPiArc3RhdGljIGlubGluZSBpbnQgY3B1X3RvX2lhYShp
+bnQgY3B1KQo+ID4gK3sKPiA+ICvCoMKgwqDCoMKgwqDCoGludCBub2RlLCBuX2NwdXMgPSAwLCB0
+ZXN0X2NwdSwgaWFhID0gMDsKPiA+ICvCoMKgwqDCoMKgwqDCoGludCBucl9pYWFfcGVyX25vZGUs
+IG5yX2NvcmVzX3Blcl9pYWE7Cj4gPiArwqDCoMKgwqDCoMKgwqBjb25zdCBzdHJ1Y3QgY3B1bWFz
+ayAqbm9kZV9jcHVzOwo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoMKgaWYgKCFucl9ub2RlcykKPiA+
+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gMDsKPiA+ICsKPiA+ICvCoMKg
+wqDCoMKgwqDCoG5yX2lhYV9wZXJfbm9kZSA9IG5yX2lhYSAvIG5yX25vZGVzOwo+ID4gK8KgwqDC
+oMKgwqDCoMKgaWYgKCFucl9pYWFfcGVyX25vZGUpCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgcmV0dXJuIDA7Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgwqBucl9jb3Jlc19wZXJf
+aWFhID0gbnJfY3B1c19wZXJfbm9kZSAvIG5yX2lhYV9wZXJfbm9kZTsKPiA+ICsKPiA+ICvCoMKg
+wqDCoMKgwqDCoGZvcl9lYWNoX29ubGluZV9ub2RlKG5vZGUpIHsKPiA+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqBub2RlX2NwdXMgPSBjcHVtYXNrX29mX25vZGUobm9kZSk7Cj4gPiAr
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKCFjcHVtYXNrX3Rlc3RfY3B1KGNwdSwg
+bm9kZV9jcHVzKSkKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgY29udGludWU7Cj4gCj4gY3B1X3RvX25vZGUoY3B1KSB3b3JrcyBmb3IgeW91LgoKWWVz
+LCB0aGFua3MgZm9yIHBvaW50aW5nIHRoYXQgb3V0LgoKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqBmb3JfZWFjaF9jcHUodGVzdF9jcHUsIG5vZGVfY3B1cykgewo+ID4g
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoKG5fY3B1
+cyAlIG5yX2NwdXNfcGVyX25vZGUpID09IDApCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpYWEgPSBub2RlICogbnJfaWFh
+X3Blcl9ub2RlOwo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqBpZiAodGVzdF9jcHUgPT0gY3B1KQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIGlhYTsKPiAK
+PiBHaXZlbiBucl9pYWFfcGVyX25vZGUsIHdoeSByb3VuZCByb2Jpbi1pbmcgZXZlcnkgaWFhIGlu
+IHRoZSBub2RlIG5vdAo+IHdvcms/CgpUcnVlLCB3ZSBzaG91bGQgYmUgYWJsZSB0byBzaW1wbGlm
+eSB0aGlzLCB3aWxsIGRvIGZvciB0aGUgbmV4dCB2ZXJzaW9uLgoKVGhhbmtzLAoKVG9tCgoKPiA+
+ICsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgbl9j
+cHVzKys7Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoGlmICgobl9jcHVzICUgY3B1c19wZXJfaWFhKSA9PSAwKQo+ID4gK8KgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWFhKys7
+Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ID4gK8KgwqDCoMKgwqDCoMKg
+fQo+ID4gKwo+ID4gK8KgwqDCoMKgwqDCoMKgcmV0dXJuIC0xOwo+ID4gK30KCg==
 
