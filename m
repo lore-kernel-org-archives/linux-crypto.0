@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BF8C761AF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 14:19:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B88C74A5B
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 14:21:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230475AbjC2OT3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Mar 2023 10:19:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
+        id S231356AbjC2OVX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Mar 2023 10:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbjC2ORm (ORCPT
+        with ESMTP id S231124AbjC2OTo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Mar 2023 10:17:42 -0400
+        Wed, 29 Mar 2023 10:19:44 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8908840DC
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Mar 2023 07:16:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 258FB618D
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Mar 2023 07:16:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680099315;
+        s=mimecast20190719; t=1680099341;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=M5DaLi1tovZrH11oTI95mtlHRv/XZcPSFvwL/aUxUh4=;
-        b=Dk//I4lx7BOnYxkfIz9av1ekycqK22HPXeNxO1cvCjF8u68qCSuXVWi021S1bxx9ueIwEZ
-        Kv55SWUKxhqolj0IODlih/ilHJqUdr8G7gqd+wnEe8ObkCiRPl1Dh76AL+LY1pK0xaIWGa
-        1XcSQIcbrOceMyZqQ55U01F8cDhiYWQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=taClZ7tV+6NGiC2MYzyqiyjdYhpNZJPUqY1OQ7XAIPM=;
+        b=HJvb5g/qQoGgy6IrePByMk8+DEFH/1I5i5Rc6ZiiXng1FNjQgNEEb+e3LiNkVG1mrVaS61
+        49ro1DQ81IOtOjJiEpHLJpUlrECmLw9+JLD2UndKGqGgSs620gCEU6N5fy8GAtrzZrUyPV
+        Q6fxPyJ/SVA4sOCn4EaUTzSBTwYj4Nw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-612-sHDpKiIEOqiGBf3DQmh3WA-1; Wed, 29 Mar 2023 10:15:11 -0400
-X-MC-Unique: sHDpKiIEOqiGBf3DQmh3WA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-572-EfC1k2O2OHKPPpyIGoOAVw-1; Wed, 29 Mar 2023 10:15:39 -0400
+X-MC-Unique: EfC1k2O2OHKPPpyIGoOAVw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6673388562B;
-        Wed, 29 Mar 2023 14:15:10 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DCF561C0758D;
+        Wed, 29 Mar 2023 14:15:37 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 548E32027041;
-        Wed, 29 Mar 2023 14:15:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C9F6B4020C83;
+        Wed, 29 Mar 2023 14:15:35 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Matthew Wilcox <willy@infradead.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -55,26 +55,19 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         linux-crypto@vger.kernel.org
-Subject: [RFC PATCH v2 26/48] crypto: af_alg/hash: Support MSG_SPLICE_PAGES
-Date:   Wed, 29 Mar 2023 15:13:32 +0100
-Message-Id: <20230329141354.516864-27-dhowells@redhat.com>
+Subject: [RFC PATCH v2 36/48] algif: Remove hash_sendpage*()
+Date:   Wed, 29 Mar 2023 15:13:42 +0100
+Message-Id: <20230329141354.516864-37-dhowells@redhat.com>
 In-Reply-To: <20230329141354.516864-1-dhowells@redhat.com>
 References: <20230329141354.516864-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make AF_ALG sendmsg() support MSG_SPLICE_PAGES in the hashing code.  This
-causes pages to be spliced from the source iterator if possible.
-
-This allows ->sendpage() to be replaced by something that can handle
-multiple multipage folios in a single transaction.
-
-[!] Note that this makes use of netfs_extract_iter_to_sg() from netfslib.
-    This probably needs moving to core code somewhere.
+Remove hash_sendpage*()..
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -87,174 +80,105 @@ cc: Matthew Wilcox <willy@infradead.org>
 cc: linux-crypto@vger.kernel.org
 cc: netdev@vger.kernel.org
 ---
- crypto/af_alg.c     | 11 +++--
- crypto/algif_hash.c | 99 ++++++++++++++++++++++++++++-----------------
- 2 files changed, 70 insertions(+), 40 deletions(-)
+ crypto/algif_hash.c | 66 ---------------------------------------------
+ 1 file changed, 66 deletions(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 7fe8c8db6bb5..686610a4986f 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -543,9 +543,14 @@ void af_alg_free_sg(struct af_alg_sgl *sgl)
- {
- 	int i;
- 
--	if (sgl->need_unpin)
--		for (i = 0; i < sgl->sgt.nents; i++)
--			unpin_user_page(sg_page(&sgl->sgt.sgl[i]));
-+	if (sgl->sgt.sgl) {
-+		if (sgl->need_unpin)
-+			for (i = 0; i < sgl->sgt.nents; i++)
-+				unpin_user_page(sg_page(&sgl->sgt.sgl[i]));
-+		if (sgl->sgt.sgl != sgl->sgl)
-+			kvfree(sgl->sgt.sgl);
-+		sgl->sgt.sgl = NULL;
-+	}
- }
- EXPORT_SYMBOL_GPL(af_alg_free_sg);
- 
 diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index f051fa624bd7..b89c2c50cecc 100644
+index b89c2c50cecc..dc6c45637b2d 100644
 --- a/crypto/algif_hash.c
 +++ b/crypto/algif_hash.c
-@@ -64,77 +64,102 @@ static void hash_free_result(struct sock *sk, struct hash_ctx *ctx)
- static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
- 			size_t ignored)
- {
--	int limit = ALG_MAX_PAGES * PAGE_SIZE;
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct hash_ctx *ctx = ask->private;
--	long copied = 0;
-+	ssize_t copied = 0;
-+	size_t len, max_pages = ALG_MAX_PAGES, npages;
-+	bool continuing = ctx->more, need_init = false;
- 	int err;
- 
--	if (limit > sk->sk_sndbuf)
--		limit = sk->sk_sndbuf;
-+	/* Don't limit to ALG_MAX_PAGES if the pages are all already pinned. */
-+	if (!user_backed_iter(&msg->msg_iter))
-+		max_pages = INT_MAX;
-+	else
-+		max_pages = min_t(size_t, max_pages,
-+				  DIV_ROUND_UP(sk->sk_sndbuf, PAGE_SIZE));
- 
- 	lock_sock(sk);
--	if (!ctx->more) {
-+	if (!continuing) {
- 		if ((msg->msg_flags & MSG_MORE))
- 			hash_free_result(sk, ctx);
--
--		err = crypto_wait_req(crypto_ahash_init(&ctx->req), &ctx->wait);
--		if (err)
--			goto unlock;
-+		need_init = true;
- 	}
- 
- 	ctx->more = false;
- 
- 	while (msg_data_left(msg)) {
--		int len = msg_data_left(msg);
--
--		if (len > limit)
--			len = limit;
--
- 		ctx->sgl.sgt.sgl = ctx->sgl.sgl;
- 		ctx->sgl.sgt.nents = 0;
- 		ctx->sgl.sgt.orig_nents = 0;
- 
--		len = netfs_extract_iter_to_sg(&msg->msg_iter, len,
--					       &ctx->sgl.sgt, ALG_MAX_PAGES, 0);
--		if (len < 0) {
--			err = copied ? 0 : len;
--			goto unlock;
-+		err = -EIO;
-+		npages = iov_iter_npages(&msg->msg_iter, max_pages);
-+		if (npages == 0)
-+			goto unlock_free;
-+
-+		if (npages > ARRAY_SIZE(ctx->sgl.sgl)) {
-+			err = -ENOMEM;
-+			ctx->sgl.sgt.sgl =
-+				kvmalloc(array_size(npages, sizeof(*ctx->sgl.sgt.sgl)),
-+					GFP_KERNEL);
-+			if (!ctx->sgl.sgt.sgl)
-+				goto unlock_free;
- 		}
-+		sg_init_table(ctx->sgl.sgl, npages);
- 
- 		ctx->sgl.need_unpin = iov_iter_extract_will_pin(&msg->msg_iter);
- 
--		ahash_request_set_crypt(&ctx->req, ctx->sgl.sgt.sgl, NULL, len);
-+		err = netfs_extract_iter_to_sg(&msg->msg_iter, LONG_MAX,
-+					       &ctx->sgl.sgt, npages, 0);
-+		if (err < 0)
-+			goto unlock_free;
-+		len = err;
-+		sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
- 
--		err = crypto_wait_req(crypto_ahash_update(&ctx->req),
--				      &ctx->wait);
--		af_alg_free_sg(&ctx->sgl);
--		if (err) {
--			iov_iter_revert(&msg->msg_iter, len);
--			goto unlock;
-+		if (!msg_data_left(msg)) {
-+			err = hash_alloc_result(sk, ctx);
-+			if (err)
-+				goto unlock_free;
- 		}
- 
--		copied += len;
--	}
-+		ahash_request_set_crypt(&ctx->req, ctx->sgl.sgt.sgl, ctx->result, len);
- 
--	err = 0;
-+		if (!msg_data_left(msg) && !continuing && !(msg->msg_flags & MSG_MORE)) {
-+			err = crypto_ahash_digest(&ctx->req);
-+		} else {
-+			if (need_init) {
-+				err = crypto_wait_req(crypto_ahash_init(&ctx->req),
-+						      &ctx->wait);
-+				if (err)
-+					goto unlock_free;
-+				need_init = false;
-+			}
-+
-+			if (msg_data_left(msg) || (msg->msg_flags & MSG_MORE))
-+				err = crypto_ahash_update(&ctx->req);
-+			else
-+				err = crypto_ahash_finup(&ctx->req);
-+			continuing = true;
-+		}
- 
--	ctx->more = msg->msg_flags & MSG_MORE;
--	if (!ctx->more) {
--		err = hash_alloc_result(sk, ctx);
-+		err = crypto_wait_req(err, &ctx->wait);
- 		if (err)
--			goto unlock;
-+			goto unlock_free;
- 
--		ahash_request_set_crypt(&ctx->req, NULL, ctx->result, 0);
--		err = crypto_wait_req(crypto_ahash_final(&ctx->req),
--				      &ctx->wait);
-+		copied += len;
-+		af_alg_free_sg(&ctx->sgl);
- 	}
- 
-+	ctx->more = msg->msg_flags & MSG_MORE;
-+	err = 0;
- unlock:
- 	release_sock(sk);
-+	return copied ?: err;
- 
--	return err ?: copied;
-+unlock_free:
-+	af_alg_free_sg(&ctx->sgl);
-+	goto unlock;
+@@ -162,58 +162,6 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	goto unlock;
  }
  
- static ssize_t hash_sendpage(struct socket *sock, struct page *page,
+-static ssize_t hash_sendpage(struct socket *sock, struct page *page,
+-			     int offset, size_t size, int flags)
+-{
+-	struct sock *sk = sock->sk;
+-	struct alg_sock *ask = alg_sk(sk);
+-	struct hash_ctx *ctx = ask->private;
+-	int err;
+-
+-	if (flags & MSG_SENDPAGE_NOTLAST)
+-		flags |= MSG_MORE;
+-
+-	lock_sock(sk);
+-	sg_init_table(ctx->sgl.sgl, 1);
+-	sg_set_page(ctx->sgl.sgl, page, size, offset);
+-
+-	if (!(flags & MSG_MORE)) {
+-		err = hash_alloc_result(sk, ctx);
+-		if (err)
+-			goto unlock;
+-	} else if (!ctx->more)
+-		hash_free_result(sk, ctx);
+-
+-	ahash_request_set_crypt(&ctx->req, ctx->sgl.sgl, ctx->result, size);
+-
+-	if (!(flags & MSG_MORE)) {
+-		if (ctx->more)
+-			err = crypto_ahash_finup(&ctx->req);
+-		else
+-			err = crypto_ahash_digest(&ctx->req);
+-	} else {
+-		if (!ctx->more) {
+-			err = crypto_ahash_init(&ctx->req);
+-			err = crypto_wait_req(err, &ctx->wait);
+-			if (err)
+-				goto unlock;
+-		}
+-
+-		err = crypto_ahash_update(&ctx->req);
+-	}
+-
+-	err = crypto_wait_req(err, &ctx->wait);
+-	if (err)
+-		goto unlock;
+-
+-	ctx->more = flags & MSG_MORE;
+-
+-unlock:
+-	release_sock(sk);
+-
+-	return err ?: size;
+-}
+-
+ static int hash_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 			int flags)
+ {
+@@ -318,7 +266,6 @@ static struct proto_ops algif_hash_ops = {
+ 
+ 	.release	=	af_alg_release,
+ 	.sendmsg	=	hash_sendmsg,
+-	.sendpage	=	hash_sendpage,
+ 	.recvmsg	=	hash_recvmsg,
+ 	.accept		=	hash_accept,
+ };
+@@ -370,18 +317,6 @@ static int hash_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
+ 	return hash_sendmsg(sock, msg, size);
+ }
+ 
+-static ssize_t hash_sendpage_nokey(struct socket *sock, struct page *page,
+-				   int offset, size_t size, int flags)
+-{
+-	int err;
+-
+-	err = hash_check_key(sock);
+-	if (err)
+-		return err;
+-
+-	return hash_sendpage(sock, page, offset, size, flags);
+-}
+-
+ static int hash_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
+ 			      size_t ignored, int flags)
+ {
+@@ -420,7 +355,6 @@ static struct proto_ops algif_hash_ops_nokey = {
+ 
+ 	.release	=	af_alg_release,
+ 	.sendmsg	=	hash_sendmsg_nokey,
+-	.sendpage	=	hash_sendpage_nokey,
+ 	.recvmsg	=	hash_recvmsg_nokey,
+ 	.accept		=	hash_accept_nokey,
+ };
 
