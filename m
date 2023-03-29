@@ -2,64 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1FD6C74A5B
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 18:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 561DEC6FD18
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 19:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjC2SoH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Mar 2023 14:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48464 "EHLO
+        id S229530AbjC2TUq convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Mar 2023 15:20:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjC2SoG (ORCPT
+        with ESMTP id S229884AbjC2TUo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Mar 2023 14:44:06 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0837F59F3;
-        Wed, 29 Mar 2023 11:44:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9176BB823F8;
-        Wed, 29 Mar 2023 18:44:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 241FAC433D2;
-        Wed, 29 Mar 2023 18:44:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680115441;
-        bh=AdTMFlaA1yVpN8yNukEmcL6Sup36/1XqYQqUHYbspDs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gchDkbybXrNa2nr5NVf2u/a3UBLqWO4oDXNai1+pd0Y+WcT05699mtknFCZ6mC04k
-         f4eBJXcNS8WKaxncS4UezFbxNraVBIXjwNwnyi/iwFeeJEpv2y/ABSUFjbR6za1oor
-         o0Us/G/C9mS0f03HI4KvA3BqUjFo6lr1PPoJ7xursEwwI0qWuS8n9T+z0M84A3xgUq
-         LKE5LnD6r9J61sco6GQMTOrFgd8FzA0Qq1v48meX9Yl8bBOcTpKB0ULf52FOWctPvw
-         aK7S1K+9YpwkpBSnHNwYMzV8W1LtbgB5JgiR7JtXhRaTZyLlkdHXiKthNJITvanvJh
-         k6iXLWOW74/bg==
-Date:   Wed, 29 Mar 2023 18:43:59 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Heiko Stuebner <heiko@sntech.de>
+        Wed, 29 Mar 2023 15:20:44 -0400
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CBD4201;
+        Wed, 29 Mar 2023 12:20:40 -0700 (PDT)
+Received: from ip4d1634d3.dynamic.kabel-deutschland.de ([77.22.52.211] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <heiko@sntech.de>)
+        id 1phbLK-0006eg-Uh; Wed, 29 Mar 2023 21:20:22 +0200
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     Eric Biggers <ebiggers@kernel.org>, christoph.muellner@vrull.eu
 Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
         aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
         davem@davemloft.net, conor.dooley@microchip.com,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v4 0/4] Implement GCM ghash using Zbc and Zbkb extensions
-Message-ID: <ZCSG71bRuTzVutdm@gmail.com>
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 4/4] RISC-V: crypto: add accelerated GCM GHASH implementation
+Date:   Wed, 29 Mar 2023 21:20:21 +0200
+Message-ID: <2102949.OBFZWjSADL@diego>
+In-Reply-To: <ZCSFXIAnl6LTVLJL@gmail.com>
 References: <20230329140642.2186644-1-heiko.stuebner@vrull.eu>
+ <20230329140642.2186644-5-heiko.stuebner@vrull.eu>
+ <ZCSFXIAnl6LTVLJL@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230329140642.2186644-1-heiko.stuebner@vrull.eu>
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Heiko,
+Hi Eric,
 
-On Wed, Mar 29, 2023 at 04:06:38PM +0200, Heiko Stuebner wrote:
->
-> [PATCH v4 0/4] Implement GCM ghash using Zbc and Zbkb extensions
+Am Mittwoch, 29. März 2023, 20:37:16 CEST schrieb Eric Biggers:
+> Hi Heiko,
+> 
+> On Wed, Mar 29, 2023 at 04:06:42PM +0200, Heiko Stuebner wrote:
+> > diff --git a/arch/riscv/crypto/ghash-riscv64-zbc.pl b/arch/riscv/crypto/ghash-riscv64-zbc.pl
+> > new file mode 100644
+> > index 000000000000..691231ffa11c
+> > --- /dev/null
+> > +++ b/arch/riscv/crypto/ghash-riscv64-zbc.pl
+> > @@ -0,0 +1,400 @@
+> > +#! /usr/bin/env perl
+> > +# Copyright 2022 The OpenSSL Project Authors. All Rights Reserved.
+> > +#
+> > +# Licensed under the Apache License 2.0 (the "License").  You may not use
+> > +# this file except in compliance with the License.  You can obtain a copy
+> > +# in the file LICENSE in the source distribution or at
+> > +# https://www.openssl.org/source/license.html
+> 
+> My understanding is that code that is licensed under (only) the Apache License
+> 2.0 cannot be included in GPLv2 programs such as the Linux kernel.
 
-Has there been consideration of implementing AES-GCM instead of GHASH by itself?
-This is what arm64 does, for example.  There is not currently any use case for
-GHASH outside of AES-GCM, and it's more efficient to implement the full AES-GCM.
+Thanks a lot for pointing out that possible licensing issue.
+It seems I'm not touching enough non-GPL code most days to keep that
+in the front of my mind :-) .
 
-- Eric
+
+> Is this code written by Andy Polyakov?  What's been done in the past for his
+> code is that he re-releases it in CRYPTOGAMS at
+> https://github.com/dot-asm/cryptogams with a Linux kernel compatible license.
+> The Linux kernel then takes the code from there instead of from OpenSSL.
+
+The git log for the original openssl ".pl" thankfully only contains
+@vrull.eu addresses, so getting this in a compatible license shouldn't be
+overly hard - I hope.
+
+
+Heiko
+
+
