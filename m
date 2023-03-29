@@ -2,187 +2,185 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07F2C6FD18
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 23:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0157BC74A5B
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Mar 2023 23:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbjC2XAX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Mar 2023 19:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43942 "EHLO
+        id S230301AbjC2XUA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Mar 2023 19:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbjC2XAW (ORCPT
+        with ESMTP id S229623AbjC2XT7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Mar 2023 19:00:22 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2081.outbound.protection.outlook.com [40.107.237.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC29D4699;
-        Wed, 29 Mar 2023 16:00:20 -0700 (PDT)
+        Wed, 29 Mar 2023 19:19:59 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2062.outbound.protection.outlook.com [40.107.94.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA082E3;
+        Wed, 29 Mar 2023 16:19:58 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NDF5hj8BDGMD4qxIh985mwaV/AH5sy9XS7UG48Ey3Sf4GgaINL+hztWMJII1g2higdWH6eoCS1TkBmRi6WRzx0SOV69r3mCNx1dF8yWMU0N1qhn7ERlgkXx3bUUncIrytsPH0GstKu/+WtzniaNFyp4q6RwS7tWsdijRtjM538ZXHpkjZVjUR4DdV/8kd/cEgwC2NlKhWObjwPB+rvuM9Wfqc399/qmpjtHVUKPFJ1ISw+vxIfTjNinkfvo/5xiZElpvsNc+rKJkveIT1eUus0l+ncdczf1oYapSbga51YOzLU778GKGRhOEp6tkTb9+CcWZZXgNEPloMiCat9GeJQ==
+ b=MbnLoZd3fVjqPI8L7aFA11XA9nFEdVIOtp29qU5JkKpYFVZ1dBC8bx7tqshT0iLEoyZxjec+Wh3QKrKjERfyN3zfC8n63xdvTWI4yNCPtjfXlO2Is8G4CPrwAb1OkP+A1J34gynpK3DnT8hYueYMYvJqjIbauPgoqFD00ouKBEgQwPNXETxItZmJKpzxfV/MaQ5JuxwKfcXpf1TRMdn+vUGWgNNkDGTUvTSDIqfKFis38/tIPX8RIYwH4YY0hyFMth685P42a+g3KJ8AU/0OfWLnvGMCEc4r05KR9mWamMpv4mo748aIb2E7RrbuB01kGI7FkGf0aQccico2XEZ0CA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F65i/CnmezvIfKePWCnnkLjIp+bYiExkhS6ySO1ya+M=;
- b=G/BIQHVHu16TUvTOHERBJD0cNDjgTbNkzJUtsIdc8C4gLOQfeJJ0wn3ITqWAM7JkKSdikjUzXQcmGOksmQNXYKReGHQo02rJY4m8zzR3UEfIk8VLAHi9J3c1HmJ7PxkVYbk+SvWlkFt3/1Qw+gs+QG/c2+tCOuG9JWhiSoT2Lw+RLUZeL3jSSmNN5oHWVzwqcySUD//a2VEyfod8KzjGLZFCtnRVCXZY6gHlg2j5RcqE1Z3AavQeg/JSfq3tiNnjJ3QXyJ4MGxFWjh+dcuQKEkS/yUM8S9jRSzY3kC/a7LQuzSI8i5dKznNiKfjgCnV6KUWWhfN+nzYIjG+7ARaX3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=suse.cz smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
+ bh=Y/kX8qYNlXwuWrAPBMe748avmZtxV/AfEqDk7APmL8c=;
+ b=au3gUphRTWGD0CR06DZ+SyIaD/IrgSOznN8vVusfOBHrzY4MD8Zs4H9j0ErefbpBkyyISJ+iOhwwyL6vehi50GRiTf5c8HhJiV1rby3s5mZQHbepSmy0IHVn/6FsEj25J8QKTaTQ3DPS0XZoCFbAW9XsUXfWCc/hu0ZIAs2lqpVx74jwUxCCsLUeBX49oBlsivrk87oCKview4dmxJnfKCZE6Y8H7u+QL8mUiTKA3CAvfh9UTJp0spZGzJt/9ttTef6zCi9jFKPMBPX3GTDnoI/3RUhNNV6KqrBvy0VJmgOqAv0vvr4jSWLEADqJCr/JF3tg6gSXHV4l1dleWB9I0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F65i/CnmezvIfKePWCnnkLjIp+bYiExkhS6ySO1ya+M=;
- b=fbek3/RGpoHnVnJ0SrKVy2bxepOxiHlSPYjOG/EghObYfHS+XmLajG78U9JksX/E3eQOFe7UvPpcxCfuNmBYAgd+MdIM3lXlTJViYCUAiCIWysAoojToIah+ospKCq7HjVI7lqVcvcE25CozFM6PDS7U2xacQtvXwFr4pS5BVvs=
-Received: from DM6PR06CA0012.namprd06.prod.outlook.com (2603:10b6:5:120::25)
- by SN7PR12MB8434.namprd12.prod.outlook.com (2603:10b6:806:2e6::6) with
+ bh=Y/kX8qYNlXwuWrAPBMe748avmZtxV/AfEqDk7APmL8c=;
+ b=IM9WLvruNBZpEjII7+92gcTtOdHoDbx3Q9l8v9pTFe+W6YOB7veQUEGJ+osxsvau5iLc4mALhQWr/gV/VdHp1z+O1e0EvI8h+pN46fQbYy8HuDaW6OR+d7PYxVVWccDr3ufgpbQsSZpZG/sOkumYL3MlUcqA4sK5j2YpxC8Ud3k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by IA1PR12MB7686.namprd12.prod.outlook.com (2603:10b6:208:422::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41; Wed, 29 Mar
- 2023 23:00:18 +0000
-Received: from DM6NAM11FT054.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:120:cafe::73) by DM6PR06CA0012.outlook.office365.com
- (2603:10b6:5:120::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.20 via Frontend
- Transport; Wed, 29 Mar 2023 23:00:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT054.mail.protection.outlook.com (10.13.173.95) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6222.22 via Frontend Transport; Wed, 29 Mar 2023 23:00:17 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 29 Mar
- 2023 18:00:16 -0500
-Date:   Wed, 29 Mar 2023 17:59:58 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Vlastimil Babka <vbabka@suse.cz>
-CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v8 12/56] x86/sev: Add RMP entry lookup helpers
-Message-ID: <20230329225958.4s3nwcqyjwzydwsf@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-13-michael.roth@amd.com>
- <b48ad925-eff0-8421-730a-6da13bf93ab6@suse.cz>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.38; Wed, 29 Mar
+ 2023 23:19:55 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::5b56:bf13:70be:ea60]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::5b56:bf13:70be:ea60%6]) with mapi id 15.20.6222.033; Wed, 29 Mar 2023
+ 23:19:55 +0000
+Message-ID: <839942af-2b48-a06f-7fc1-6be1ce7cebcd@amd.com>
+Date:   Wed, 29 Mar 2023 18:19:52 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH] crypto: ccp - Clear PSP interrupt status register before
+ calling handler
+Content-Language: en-US
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>,
+        linux-crypto@vger.kernel.org
+Cc:     John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20230328151636.1353846-1-jpiotrowski@linux.microsoft.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20230328151636.1353846-1-jpiotrowski@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA0PR11CA0128.namprd11.prod.outlook.com
+ (2603:10b6:806:131::13) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b48ad925-eff0-8421-730a-6da13bf93ab6@suse.cz>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT054:EE_|SN7PR12MB8434:EE_
-X-MS-Office365-Filtering-Correlation-Id: 386e2420-2963-4438-c419-08db30a95d40
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|IA1PR12MB7686:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9540b5d4-7fb9-44ff-7d54-08db30ac1af9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8+uw6rUbm+26o3aAn9ppZfmNfSIoOrNoLwa5+GtFs6ghcG7NMHOaIeJA/+TzRSQQl9NEcbZjvYZLQRka6G3jOBNmON7xkjaXFOo/YmouydAZ3291KdPWG9GePxSHSOqlA4Q65AwXqhvCoKWoo2EPxa9DgJ8RYGwRluZOH3iFV1NyVlTEHmcWnCS/K5NbO0VertEhJwl88/BOTlpzzloFiHIohMm5UkZTnFCTZX9QVYzr1wC+sKxYo7R8ECxcgOE6xJJvK58AtZsAiSTnSYjq/gwngZf7Drmk03yswHMKnmDnO8u8SiqhkVePGtZJNqld15PvaBPb/lBbVM367AvUxaCETjjBmlTKIydKMa1vQfFUr7Zpjdb4RZzS/vhKuPKTvcb3yPEdKEWMWsYw/brDifnzNkyGnBcTu6cueP5hvRIVL3umv68tUUGbhobBchkehSoB8xnC2aUkKRg/ZiQD6jf4pUSjf2y+zx8TEYHp6P7BJ5KW6p3RNxQtyAXPnvL4MZ3zeMsK3TSozOGQmOVmDgJ5mg53PLAFnqvog8/D4fUNeib6J81QfQeOLJ0xK3ejJgzZik8rzZBxq7kvjOZHYVM6zluCzWoAyl1rFwj0O7v9DfO3G0cc8Bb9KijKJ37Z02j9RFQlO+QDNi9v/RIP05YQOwoeNjK920p93YOpJ9dqO8Jbkle9gCIF2bK3YKCZk9RJ8EfYQ2XMt484QWoH09tQ1ewPXN4twTau1qV8szwX2wf66p9rJAXeEcbJrxak
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(39860400002)(396003)(136003)(451199021)(40470700004)(46966006)(36840700001)(5660300002)(7416002)(7406005)(8936002)(6916009)(70586007)(70206006)(316002)(41300700001)(40480700001)(8676002)(54906003)(81166007)(426003)(66899021)(2616005)(2906002)(336012)(4326008)(82740400003)(36860700001)(44832011)(478600001)(40460700003)(356005)(47076005)(36756003)(16526019)(6666004)(82310400005)(966005)(186003)(83380400001)(86362001)(53546011)(1076003)(26005)(36900700001)(309714004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: kMGPK2tTrR+DrPOCk+WLJpwaMNK5iZGnCcc6nzp+4nPS1QyfVqbpDTx8FWbOPYXbBt6qLb4l46DLCFkz3zCqZI/cNHx+2b96qxMhYU/6H5f/Ob4VjJj+orkBZxgeUSZiJ+fBc8Cwzj464R36F667LWnXaQy///HhyrBV/p7Mz+steofdcYgHvMCJg3Pmyn4VrH+GsikqS1dtli9VagG2JEDy10NAf/Ka3y4cqYGVBRGJIKXgjsqFrsPFaf/HRqGC4PMzPh8tJZG2ut58RqPy00K5ArkjXiKFgBu+6U8UbtduAMBCOViTBFAOy7d6Br2ELj6hHz1/7OGVo2ZtrUsdM37s4YuDWR14tVOZrMnudZri4+hEoK989DfaxXfsQfkeCPzCMlco8UIzyZNsnXAC1HUeoW3uh9P6Ieps5uooCRfsCqEuoaJRFiJkjq7hes3c+/nVW4HCSumFWXJc2NERfP/8xeK2UIZzU4/KiA2rRTx2h+MzHdERjBTDvr8ruS36XKVfeuxokWFZRlCgy3mOrzYjHWHiR1eHexWpjJCWYSuM5vRy04VsBE0jM/HggvwWRyG+cmNHhW37AStKAHh6m6AEBrdFoKbhU7n0+8jJFRlVangqdRWDi+5uHtj1ES1t5mxn4c0sGlr1BuD39DELCw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(39860400002)(366004)(451199021)(4326008)(66556008)(66476007)(8676002)(66946007)(41300700001)(6506007)(38100700002)(31696002)(86362001)(6486002)(36756003)(54906003)(26005)(6666004)(478600001)(6512007)(53546011)(316002)(83380400001)(186003)(2616005)(31686004)(5660300002)(8936002)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z040czByUGFBSlUxTHhVbG1peFhCSU8zcnJxSW1MenNwOHYzdURRbk80T1I3?=
+ =?utf-8?B?T05uUzN0aXprc1dMRmFJcGxRZWVZd2hiT1BsMG5hM2xUMmhZWFcxMVNybkov?=
+ =?utf-8?B?MWVpbEtjY3Zpa1ZxZ3FVTjJ6ODMzMU9NVDZLbGdRT3RzZUZhbXBraW9MNjRS?=
+ =?utf-8?B?T09SK045SWwwOEx5cUR2RDVCR2lETUxxMTFHSExTOWZGTUFVb0h0K0pRR0cx?=
+ =?utf-8?B?Wk13RVJiWThsUVBsNjFoYy8vQW5LZUZsWVNiN0NRZ2EwOE95cUtaRUhSaTE5?=
+ =?utf-8?B?d1lDemh4cnhCdGdwSGRObEFTZmM1S29XOU8rRDE0WlFrdFRjMjhkZVB1MWVu?=
+ =?utf-8?B?M2dBYUlUbDVLUVNyamt2T2xlYU9zTW1OMlBpaHF1V1UvTU1TNjhPUWhnRDln?=
+ =?utf-8?B?UGZHN0hRZDRkMGJKM2dKMjhlQmM4TExvcTJ3VG9XQXltTUdWSUNWVFpVekJ1?=
+ =?utf-8?B?RmllUEZMdktIa0FmaU9EQ2U4TTVxMkFMMWg5cnhmRSt3cEtMWGdHTHJqMWMr?=
+ =?utf-8?B?Z1hzSU44S3pSR2QwaTZseWZHTE9PT25SMjQweFlMdW55a2IwcHgrbWYvUmpr?=
+ =?utf-8?B?dEdzQmVVeUVkbWl6b21HK3VCZXFTckVSSlM3OEZVTFgxTWtJaHZTY05LMjBk?=
+ =?utf-8?B?ZUpWTmx4V2pzUkVLRUVUYVFkbEwxMGcvVnlzMDRxQi9XVVZpcUJ3ZWUyN051?=
+ =?utf-8?B?b2JtOXh5L1ZUV1R5cWUxNE5ZSHVlZnlFbmNZMTJwWTdRT1VwSnYrWUN1cjlG?=
+ =?utf-8?B?QTA3SEg2cE9iaThETkQ4MS9mVjZ5czhYcGhLWmdSSS9XZ01lU044dDFSRVZK?=
+ =?utf-8?B?ZXIrUFpML2VoMkZwNFdJLyt5Mm5hM3M5T205SUJ2V3BYVHFFK1dhMG9mMEJL?=
+ =?utf-8?B?UnVOQlh0b0Z6N01kanhHQkJIaE54bmhXMlV4UXFJb0tQWldSUmdiRXVGNUtO?=
+ =?utf-8?B?MFI1OVZiUFNmZmx4K2NjRjhGSElwSzFwUWRNbmJCWHZxZmtzc2VJV0JjQzZ3?=
+ =?utf-8?B?aXl4M21vMVlOd1V0ZHNROE1teFR3QWZHUXN3eDlmSk0zUjRjRjY1d0JGQnZN?=
+ =?utf-8?B?cUhYOGRjSExSaTNTVi8yUWVtY3RIVE5GYS82d1doQlQ0eURqNjAwZGwrTUNj?=
+ =?utf-8?B?WTd4VkxCaGRkeStSMnpvUDVlOTU4dnN0aGdxRU1NTG8vZ2NrM0E5ZGVNYlJG?=
+ =?utf-8?B?OVNLTVNmdHdHVlgxWWlzMytBWncwak14cmtDZ0N2TlIwQ29ZZFlkbjNxaGFU?=
+ =?utf-8?B?N2kvY3hWNEdrVzJsZUFMSzY4Znc2RFpkU0tsUkE2RnNjdHFrSmFRMU5NVHBV?=
+ =?utf-8?B?T1pCaDNTZDd5d3FOZXI1VzZYVlZXS25GRjNVbER1YnFrWEx2TnFka2k3WThj?=
+ =?utf-8?B?VHhyT29oN1N3SEdqeXErVU1HZWlKdkw1RlgzUGo3VDBLUXRNNTgvUHprdFZ1?=
+ =?utf-8?B?OVNEZWhWRkZnY3M5ZXczbXRTanZaRHJXMzh0UmJRSFRYNXE4R21ZUWM3SmFS?=
+ =?utf-8?B?Y2lMdTRWUVhTaGRFS0hyZjhyTEtsRktNZWZwd1hvVDIyS1pKdklSaWhuVTJW?=
+ =?utf-8?B?ZWxxbkxHRnRWMzJpRnE5TmJjdlRDZFY2dVlETUZwd0hFemt6dW54ZkxkWVJ5?=
+ =?utf-8?B?cElIY3I4WmNqRS9IMTJsTFFyVnVjeHQxU3IrNmJrOUsyTU8ySVhocjAyWlk0?=
+ =?utf-8?B?SER1V0lDYjBPYkpFUlcvc1ZoR1N5ZHc5enhDa05FRlIrbTBXaDBPRndyeVh3?=
+ =?utf-8?B?ZHNvQ2REenVGRG9VNzRoTENnWkJmQ3UzUkdwaHNsNlBSaDY3YkZTY0xJZVEz?=
+ =?utf-8?B?T29yZXNwUkx6TFV2QzYxSW9WZytZZUZmMTZubnNXUTd3QWV6bjZJWGhYcVg4?=
+ =?utf-8?B?TGVtQlJ1Mk1ka281MERvWFQ5S2psUndBZWZxSDdzVkxPNE1GdTBEZDJkNGNt?=
+ =?utf-8?B?LzlZTzYvaTZUaU9YL1pWYVJKbGRHblZWTlZIMFdUUkFTaEZFL1JyV1RjcVI5?=
+ =?utf-8?B?clpKcWxzTHRDT0ZIeElhTkx3Y000QW01ODhBRU5seWo5WGlwUGlTemlZQ2JH?=
+ =?utf-8?B?TFhJTTdwVzYrbVhycnl5YjZhUk5jSVFoQlJNcFN4VWZFSWx1VkpxaHJFTE50?=
+ =?utf-8?Q?vTS8lE0KiSZEGbiYn8e8GOfhw?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 23:00:17.4407
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9540b5d4-7fb9-44ff-7d54-08db30ac1af9
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2023 23:19:55.0195
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 386e2420-2963-4438-c419-08db30a95d40
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT054.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8434
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: By6fk5ij3SYHIVwdt7W4jM96jkSiEsomRn+F3ZdY4r3X0y4C8ziPSirvubMJT5RU3kIlXvD1SdYkh7k6/gkMog==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7686
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 03, 2023 at 04:28:39PM +0100, Vlastimil Babka wrote:
-> On 2/20/23 19:38, Michael Roth wrote:
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> > 
-> > The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
-> > entry for a given page. The RMP entry format is documented in AMD PPR, see
-> > https://bugzilla.kernel.org/attachment.cgi?id=296015.
-> > 
-> > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > ---
+On 3/28/23 10:16, Jeremi Piotrowski wrote:
+> The PSP IRQ is edge-triggered (MSI or MSI-X) in all cases supported by
+> the psp module so clear the interrupt status register early in the
+> handler to prevent missed interrupts. sev_irq_handler() calls wake_up()
+> on a wait queue, which can result in a new command being submitted from
+> a different CPU. This then races with the clearing of isr and can result
+> in missed interrupts. A missed interrupt results in a command waiting
+> until it times out, which results in the psp being declared dead.
 > 
-> > +/*
-> > + * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
-> > + * and -errno if there is no corresponding RMP entry.
-> > + */
+> This is unlikely on bare metal, but has been observed when running
+> virtualized. In the cases where this is observed, sev->cmdresp_reg has
+> PSP_CMDRESP_RESP set which indicates that the command was processed
+> correctly but no interrupt was asserted.
 > 
-> Hmm IMHO the kernel's idiomatic way is to return 0 on "success" and I'd
-> assume the more intuitive expectation of success here if the entry is
-> assigned?
-
-In general I'd agree. Here's it's a little awkward though.
-snp_lookup_rmpentry() sort of wants to be a bool, where true indicates
-an assigned entry was found, false indicates no assigned entry.
-
-But it also has to deal with error values, so the most direct way to
-encapsulate that is true == 1, false == 0, and < 0 for errors.
-
-Inverting it to align more with kernel expections of 0 == success/true
-gets awkward too, because stuff like:
-
-  if (snp_lookup_rmpentry(...))
-    //error
-
-still doesn't work the way most other functions written in this way
-would since it could still be "successful" if we were expecting PFN to
-be in shared state. So the return value needs special handling there
-too.
-
-Would it make sense to define it something like this?:
-
-  /*
-   * Query information about the RMP entry corresponding to the given
-   * PFN.
-   * 
-   * Returns 0 on success, and -errno if there was a problem accessing
-   * the RMP entry.
-   */
-  int snp_lookup_rmpentry(u64 pfn, int *level, bool *assigned)
-
-> The various callers seem to differ though so I guess it depends on
-> context. Some however don't distinguish their "failure" from an ERR and
-> maybe they should, at least for the purposes of the various printks?
-
-Yes, regardless of what we decide above, the call-sites should properly
-distinguish between failure/assigned/not-assigned and report the
-information accordingly. I'll get those fixed up where needed.
-
-Thanks,
-
--Mike
-
+> The full sequence of events looks like this:
 > 
-> > +int snp_lookup_rmpentry(u64 pfn, int *level)
-> > +{
-> > +	struct rmpentry *e;
-> > +
-> > +	e = __snp_lookup_rmpentry(pfn, level);
-> > +	if (IS_ERR(e))
-> > +		return PTR_ERR(e);
-> > +
-> > +	return !!rmpentry_assigned(e);
-> > +}
-> > +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+> CPU 1: submits SEV cmd #1
+> CPU 1: calls wait_event_timeout()
+> CPU 0: enters psp_irq_handler()
+> CPU 0: calls sev_handler()->wake_up()
+> CPU 1: wakes up; finishes processing cmd #1
+> CPU 1: submits SEV cmd #2
+> CPU 1: calls wait_event_timeout()
+> PSP:   finishes processing cmd #2; interrupt status is still set; no interrupt
+> CPU 0: clears intsts
+> CPU 0: exits psp_irq_handler()
+> CPU 1: wait_event_timeout() times out; psp_dead=true
 > 
+> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+
+> ---
+>   drivers/crypto/ccp/psp-dev.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+> index c9c741ac8442..949a3fa0b94a 100644
+> --- a/drivers/crypto/ccp/psp-dev.c
+> +++ b/drivers/crypto/ccp/psp-dev.c
+> @@ -42,6 +42,9 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
+>   	/* Read the interrupt status: */
+>   	status = ioread32(psp->io_regs + psp->vdata->intsts_reg);
+>   
+> +	/* Clear the interrupt status by writing the same value we read. */
+> +	iowrite32(status, psp->io_regs + psp->vdata->intsts_reg);
+> +
+>   	/* invoke subdevice interrupt handlers */
+>   	if (status) {
+>   		if (psp->sev_irq_handler)
+> @@ -51,9 +54,6 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
+>   			psp->tee_irq_handler(irq, psp->tee_irq_data, status);
+>   	}
+>   
+> -	/* Clear the interrupt status by writing the same value we read. */
+> -	iowrite32(status, psp->io_regs + psp->vdata->intsts_reg);
+> -
+>   	return IRQ_HANDLED;
+>   }
+>   
