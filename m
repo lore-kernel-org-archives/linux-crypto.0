@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D02AC77B62
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Mar 2023 08:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D144C77B61
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Mar 2023 08:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbjC3IP7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Mar 2023 04:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
+        id S230428AbjC3IQ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Mar 2023 04:16:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbjC3IP6 (ORCPT
+        with ESMTP id S230384AbjC3IQk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Mar 2023 04:15:58 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580E66E98
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2023 01:15:53 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id o20so15831638ljp.3
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2023 01:15:53 -0700 (PDT)
+        Thu, 30 Mar 2023 04:16:40 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BFB97A82
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2023 01:16:25 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id bi9so23457323lfb.12
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Mar 2023 01:16:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680164151;
+        d=linaro.org; s=google; t=1680164183;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=JA4XVHo0Eq19cyVZPkQAeO5VCdeLqQwOP0zPCiEBUMw=;
-        b=EWXEC36M+TxkQLalkkn9rZ18ai2dy9NRazwNzO1L8FJUl9ResCIWtediINEPJ/Bxvs
-         Je1bgkzkOTsNypIWNvYCAYtCWEC7j2Vl7x90ZXH4kPAYXioXtea9SaMQTs1VJHATL4oH
-         fzRmSCrNRvWPUFijWJ3YqMnDUf4tnQCZF98UcZT4ELvZJe9fdWt1WTbLG6IkvAZMWtIh
-         UvVi6CcHTEuDj6KqD9N3Jkz2fxHYaYxTRpViUBaD042syf7CiBpQ1HG5QVPS4F+B4eUT
-         g3DZf7HJxDX8A7OWw/mEKRzD1/VYUv278u2YeOiFyFic3QnvuXxRZcsn3bSoGjNKLbIA
-         Zn2w==
+        bh=KaDyW6z6XuYhRtr0QA2BxgBT9mFk6zOPgn6BDQB/clc=;
+        b=tceJLeFJ1+iCkdm97eVxZvU9flLgSis4gO3XGnszaE4I82F7leGqF306RA7Pu3W4pL
+         +BmVBDBfMpSUvfoPlbQv+F+WsJJrJnXnrzPa+dQ30P0KsvfGFClkHH71INxqIDStBRJa
+         Se6qWPZxa0tvkqYR6VVXHUGHv8YkqXD0NIjXcuXA6pLdHlH4AvflPxGiSreK5p9pr300
+         CpoRvx1iYHTLk4x83BV6pIR/N7XRwqNncxWsHDktw5zhBReNI2PQdEWJLBjIVxvtHBzE
+         7WpGBtuA6q5zeGpErkGy4eHHvLqGACFnDwrHRdMaWebPoTfyB244f+KKxPD1NrFQ01Et
+         xdHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680164151;
+        d=1e100.net; s=20210112; t=1680164183;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JA4XVHo0Eq19cyVZPkQAeO5VCdeLqQwOP0zPCiEBUMw=;
-        b=QLriqRD5QZihEBRTdm7wNppdL1Ndwi62MRzCGbFwt3GV+TCM8gdElXfgPVX2P+xp5F
-         uV91q2K6OXdv8huYuzWWi7raSCKVtnuJ8zYtaY+Y+RR0Z2dlgyxBD/J+H+Y+V5h8QafQ
-         cK2Yw6GE9M7PlvLlKa1F8CDa7CpzBSi6FbvdtMbUeFRZWWTXTu6AAhvfDZeXTuQIQzH/
-         ZxYijrPdyjNKnjzlODJGGzQm00v2X9hiDOo25wkgs+MSeQbOTwkQDqyc4Ta2O9p/Px/L
-         t66AUVFDyTmAv+FXegCkPCuFJ28gtGjFunxe+/KzoHlzm3+sisbRyd/V5JC1RHYRv7OK
-         BLWQ==
-X-Gm-Message-State: AAQBX9c5/63qDHfo+cbvEcB4JehJpVBMKbARX3y399hoZXzvT8trIwdw
-        vjiSb/CfFGaCAz8F+QM6RLcgJA==
-X-Google-Smtp-Source: AKy350Y8D7vwA4tRhgHdmVdiyKJ+l63hqNEVbOuIw5/rG0Pn7g7QJPS8YNRy4aPi5ZxXVQPb3M3Bcg==
-X-Received: by 2002:a2e:aa1c:0:b0:2a1:9b6a:72b9 with SMTP id bf28-20020a2eaa1c000000b002a19b6a72b9mr1795529ljb.13.1680164151534;
-        Thu, 30 Mar 2023 01:15:51 -0700 (PDT)
+        bh=KaDyW6z6XuYhRtr0QA2BxgBT9mFk6zOPgn6BDQB/clc=;
+        b=F6tPxCsDjbiCmzVmsZpO9xT0xqaBC3c54fl6VIzFUbM9tJklBgiBiOqy8qFJ8b88MO
+         WrVAKKCBP+KFPqRJpLT14lcColZnfW4gJSliYZ//HCPtf5+e10oHYqNAUYSN5bGAZuzI
+         j4KkyocdLKFzwT8RhHTTpqJw0ivqKNFAU7MExhMIUHJXfrDqVVdl+bJyK3rHY+siIuQR
+         fC0IgTmttJAC5rH/ixNseHW5P04hVz/ZtQxkVgzZ4+a4zrxAp8p5mzqpY9pzAaX4AKfx
+         xtTjiPRK0nu36KZun4hQy9OnW1bBRWv6L3XNqUuHEZbXzT4mJAYck//Ri2W1fCLoSJHX
+         2+MA==
+X-Gm-Message-State: AAQBX9eqTnMaI13NcnLxjyQiz5NfkcI9ryR4RLizHtaCtJS/E35pPlVc
+        NvN2lYWNoTUurAG73wv8cOq3dA==
+X-Google-Smtp-Source: AKy350YHij+FTXrBHe1yofTEvB7NvFe8x3XC5Pl4Mkxm+AfAM30UwgMEBfzreMB46mYkPwd0+PHcKQ==
+X-Received: by 2002:a19:ad48:0:b0:4ea:ea00:5d45 with SMTP id s8-20020a19ad48000000b004eaea005d45mr6342262lfd.44.1680164183388;
+        Thu, 30 Mar 2023 01:16:23 -0700 (PDT)
 Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
-        by smtp.gmail.com with ESMTPSA id w23-20020a2e3017000000b0029df8e31785sm4192341ljw.107.2023.03.30.01.15.50
+        by smtp.gmail.com with ESMTPSA id p16-20020a05651238d000b004e8508899basm5823667lft.86.2023.03.30.01.16.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Mar 2023 01:15:50 -0700 (PDT)
-Message-ID: <edb749aa-9ae5-81b2-77b9-416810c5cca7@linaro.org>
-Date:   Thu, 30 Mar 2023 10:15:49 +0200
+        Thu, 30 Mar 2023 01:16:23 -0700 (PDT)
+Message-ID: <05535da9-474d-eb14-44af-4621020400fb@linaro.org>
+Date:   Thu, 30 Mar 2023 10:16:22 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [PATCH v3 3/9] dt-bindings: qcom-qce: Fix compatibles
- combinations for SM8150 and IPQ4019 SoCs
+Subject: Re: [PATCH v3 4/9] dt-bindings: qcom-qce: Add compatibles for SM6115
+ and QCM2290
 Content-Language: en-US
 To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
         linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
@@ -66,9 +66,9 @@ Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
         konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
         rfoss@kernel.org, neil.armstrong@linaro.org
 References: <20230328092815.292665-1-bhupesh.sharma@linaro.org>
- <20230328092815.292665-4-bhupesh.sharma@linaro.org>
+ <20230328092815.292665-5-bhupesh.sharma@linaro.org>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230328092815.292665-4-bhupesh.sharma@linaro.org>
+In-Reply-To: <20230328092815.292665-5-bhupesh.sharma@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -76,17 +76,15 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 28/03/2023 11:28, Bhupesh Sharma wrote:
-> Currently the compatible list available in 'qce' dt-bindings does not
-> support SM8150 and IPQ4019 SoCs directly, leading to following
-> 'dtbs_check' error:
+> Crypto Engine block on Qualcomm SoCs SM6115 and QCM2290
+> do not require clocks strictly, so add compatibles for these
+> SoCs, indicating that they are similar to the flavour
+> found on SM8150.
 > 
->  arch/arm64/boot/dts/qcom/sm8150-sony-xperia-kumano-griffin.dtb:
->   crypto@1dfa000: compatible: 'oneOf' conditional failed, one must be fixed:
-> 	['qcom,sm8150-qce', 'qcom,qce'] is too long
-> 	['qcom,sm8150-qce', 'qcom,qce'] is too short
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
 
-There is no such change in the files. Document only warnings which are
-real - happening.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
