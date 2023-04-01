@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0499AC77B6D
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Apr 2023 01:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2B4C76196
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Apr 2023 02:01:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233776AbjDABuT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Mar 2023 21:50:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59492 "EHLO
+        id S234093AbjDACB0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 31 Mar 2023 22:01:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234097AbjDABt4 (ORCPT
+        with ESMTP id S233796AbjDACBI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Mar 2023 21:49:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F84125459;
-        Fri, 31 Mar 2023 18:46:38 -0700 (PDT)
+        Fri, 31 Mar 2023 22:01:08 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F72222219;
+        Fri, 31 Mar 2023 19:00:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0492162D18;
-        Sat,  1 Apr 2023 01:45:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F34CC433A0;
-        Sat,  1 Apr 2023 01:45:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C84ADB83313;
+        Sat,  1 Apr 2023 01:44:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53342C433A1;
+        Sat,  1 Apr 2023 01:44:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680313501;
-        bh=COtBPWd792pj4wDo6QCmYmv27EpEeD8uoH4fJakfhLM=;
+        s=k20201202; t=1680313469;
+        bh=VCwMMj2q4qUoHuODRqKDgoLte/T7yupow6Vv8LVr/gY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=roQzn49CfHGCeK35ch7COHPv7ggSSxsyfIqxPTAUojksAZRCOTM0KvfXX5MCaMUlY
-         ZhO7CWMdffAPqwV3lwzidmUa2EAvQGw+A1Yt8pMDxqCzNOYltHcLtq+4tqa5OP7ADe
-         pug/FkDGrLCO8kZiaqD1WdiRgFRJuATJjLgDOYhP3iVK7p43o8PcgROq0lOZOB1TFd
-         0r7uQGbfMr7bhV+ir4FN+03t3F2p8eTxzj7jm5eib6OYMlPIRqylCQCXiIjIwBtyn/
-         WRI8mkm+IBtqQXVooBgeBFytb9fi6C4HUYUH7nnX4oP7xK09cPdClOqpIvoCTgErye
-         IW8lAI/wGaUfA==
+        b=KIe3kYl0UICuwLjnvWySkw8K35NrizDxTOtjHfJP1vgbAbTC2a57HChOdIpzHs1Dv
+         4i3p5ZWChduHUvpAepSdmYqgqwv77wMedCr4UVZ3+wjeZPYJdnydz7wIWpd9Nh/uA4
+         KOVCNBY8dcxxUIsvCYNgVj33Iiep8YXEtP8V6ws3Yd7+TJWmzXLP4037ys9GsOKo0E
+         5SFTH1xAh3PAQjyUn9Smr2SIvfNJ6MYKXH2ICPglje2bMv5H5etqhjhhs0IlrIktlM
+         1anA7bKCcN01hO8GCXfPzvztuueUWpVDjtFKby+yA9IBzbHNhwiShRVqIVRZtvzD/5
+         jV3HpyEuo/eBA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Robbie Harwood <rharwood@redhat.com>,
@@ -42,12 +42,12 @@ Cc:     Robbie Harwood <rharwood@redhat.com>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         kexec@lists.infradead.org, Sasha Levin <sashal@kernel.org>,
         davem@davemloft.net
-Subject: [PATCH AUTOSEL 4.14 3/3] verify_pefile: relax wrapper length check
-Date:   Fri, 31 Mar 2023 21:44:54 -0400
-Message-Id: <20230401014454.3357487-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 6/7] verify_pefile: relax wrapper length check
+Date:   Fri, 31 Mar 2023 21:44:16 -0400
+Message-Id: <20230401014417.3357252-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230401014454.3357487-1-sashal@kernel.org>
-References: <20230401014454.3357487-1-sashal@kernel.org>
+In-Reply-To: <20230401014417.3357252-1-sashal@kernel.org>
+References: <20230401014417.3357252-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -86,10 +86,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index d178650fd524c..411977947adbe 100644
+index 7553ab18db898..fe1bb374239d7 100644
 --- a/crypto/asymmetric_keys/verify_pefile.c
 +++ b/crypto/asymmetric_keys/verify_pefile.c
-@@ -139,11 +139,15 @@ static int pefile_strip_sig_wrapper(const void *pebuf,
+@@ -135,11 +135,15 @@ static int pefile_strip_sig_wrapper(const void *pebuf,
  	pr_debug("sig wrapper = { %x, %x, %x }\n",
  		 wrapper.length, wrapper.revision, wrapper.cert_type);
  
