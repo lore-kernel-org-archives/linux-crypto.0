@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB174C77B61
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Apr 2023 01:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 386EBC77B6D
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Apr 2023 01:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233947AbjDABsF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Mar 2023 21:48:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49114 "EHLO
+        id S233994AbjDABta (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 31 Mar 2023 21:49:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233846AbjDABrm (ORCPT
+        with ESMTP id S233658AbjDABs4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Mar 2023 21:47:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DF911EFDF;
-        Fri, 31 Mar 2023 18:45:28 -0700 (PDT)
+        Fri, 31 Mar 2023 21:48:56 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4662443A;
+        Fri, 31 Mar 2023 18:46:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B081062D1A;
-        Sat,  1 Apr 2023 01:44:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB21FC433AE;
-        Sat,  1 Apr 2023 01:44:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7CFCBB83314;
+        Sat,  1 Apr 2023 01:44:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0935FC433D2;
+        Sat,  1 Apr 2023 01:44:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680313471;
-        bh=xIRVmdSoxQHHV+WQF3InEHiP6aN6H/TEQ+/N5ju+cTU=;
+        s=k20201202; t=1680313484;
+        bh=PXrgjoxCAiyTLGkdrfEmudMLRAmtP2/RRWUBN2gPaso=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Yqi8jHH56end0k08FQDMdYsqDsMclJo1Y7W6+t+vNUJ+OsYoSppPB3I25SD3mJAYq
-         v/ZcsoURhBwj7nmqz4gXhxzGqRukrjcnYyni7n46KN95go0NWgR5MWkJCHCzf3TUvg
-         j7qjtTDf4N6kG/iBkJWeLDHy/a1GrAj8dkOruMcbFyhULMPPaFENgJ+3QQlOfIfJtm
-         gTIVoRgtbb7xRbi2eF+5CkXo4SPcW5/WT7sO/tQ5dCj04Aa11JlMiFo4KUniF3OY4Q
-         UpMJkKh4PTHT0cnQpOcn7Iz+iTaSSySgrm+TXGAEyvW6o5COOHw+wzhAUXJ+AvWotQ
-         +Y4gZ7PRzLRmA==
+        b=cnzs5qR188th4L+fTvAvX2nK9S/g+dIH4TLfsm0RZ6NjnUFMle11xbIMdP8Or/ni0
+         jdP2u+ACfSfT6W0Xax1eIm32+HKtdsWfnlqWSa2G0UpD2SVC5h5z1cU0LmaPqW/6Qx
+         G+rIHxWDTviI1OMgzb21e5N1eh0KJ5XSl/+x0o7YU1uZ3yeX3JGcrXy/LhFFvJok7O
+         1VKSlckHbQErfmN+JTTUVwbveKQg5n0ciG/wBmyhNaj4JRrDzpAaDFozYml9tALxh7
+         PuyFHj0LQ29O5wBJ/k2htHZyUBknXYDw3gPQ1zyAL1Lw9Q+u+74sW3XmAMMOaFAVLR
+         rytAZC1LRw02A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Robbie Harwood <rharwood@redhat.com>,
@@ -42,12 +42,12 @@ Cc:     Robbie Harwood <rharwood@redhat.com>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         kexec@lists.infradead.org, Sasha Levin <sashal@kernel.org>,
         davem@davemloft.net
-Subject: [PATCH AUTOSEL 5.10 7/7] asymmetric_keys: log on fatal failures in PE/pkcs7
-Date:   Fri, 31 Mar 2023 21:44:17 -0400
-Message-Id: <20230401014417.3357252-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 6/6] asymmetric_keys: log on fatal failures in PE/pkcs7
+Date:   Fri, 31 Mar 2023 21:44:31 -0400
+Message-Id: <20230401014431.3357345-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230401014417.3357252-1-sashal@kernel.org>
-References: <20230401014417.3357252-1-sashal@kernel.org>
+In-Reply-To: <20230401014431.3357345-1-sashal@kernel.org>
+References: <20230401014431.3357345-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -117,7 +117,7 @@ index ce49820caa97f..01e54450c846f 100644
  	}
  	pkcs7->data = data;
 diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index fe1bb374239d7..22beaf2213a22 100644
+index c43b077ba37db..0701bb161b63f 100644
 --- a/crypto/asymmetric_keys/verify_pefile.c
 +++ b/crypto/asymmetric_keys/verify_pefile.c
 @@ -74,7 +74,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
