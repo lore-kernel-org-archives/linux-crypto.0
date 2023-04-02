@@ -2,155 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C0EC761AF
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Apr 2023 01:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89271C7619A
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Apr 2023 10:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbjDBB3v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 1 Apr 2023 21:29:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41036 "EHLO
+        id S230309AbjDBKHX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 2 Apr 2023 06:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjDBB3u (ORCPT
+        with ESMTP id S229492AbjDBKHW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Apr 2023 21:29:50 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D990E191F6
-        for <linux-crypto@vger.kernel.org>; Sat,  1 Apr 2023 18:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680398988; x=1711934988;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=W/SmP22p0hn1435eIuv6dkRF92zCBjSdnRaI0sEkxUI=;
-  b=GRyVUFAqoIh95nK1nURYiBQt302BfHs2MwElL3alfhpCaKCk7Az2VLi/
-   jeFKV9AEuADzwBcT6c2VAmzC0BgaJMjyS6qVt5bkZARk46TLbRoUJfkO/
-   5MZ3/UumLhOzkjO5bu29M2oTD1BLGcOzSkMIHUgt7WqfGmMMBA/bHZgyY
-   8Y3Md7eQkjDNbNSVWUz8SFhWx6Vo4uXVEPssKp7ESuPmuldXg/F+wAyO5
-   VdtoPrx4X8KRwS9HaJQHzC+xVDJrBvaJvUfyZH/JVzv2aFtNcYUp22jmJ
-   uqqhfcjo3Aoj9pvhdAJxg6kWFdfIFmTcDN4nLCMW2Mbh4pN+3e+rgleD1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="340420640"
-X-IronPort-AV: E=Sophos;i="5.98,311,1673942400"; 
-   d="scan'208";a="340420640"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2023 18:29:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10667"; a="635696693"
-X-IronPort-AV: E=Sophos;i="5.98,311,1673942400"; 
-   d="scan'208";a="635696693"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 01 Apr 2023 18:29:46 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pimXR-000N9r-0L;
-        Sun, 02 Apr 2023 01:29:45 +0000
-Date:   Sun, 2 Apr 2023 09:29:43 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
-Cc:     oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH] crypto: hash - Remove maximum statesize limit
-Message-ID: <202304020900.MhnE9RIZ-lkp@intel.com>
-References: <ZCJllZQBWfjMCaoQ@gondor.apana.org.au>
+        Sun, 2 Apr 2023 06:07:22 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4515AE9
+        for <linux-crypto@vger.kernel.org>; Sun,  2 Apr 2023 03:07:20 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id u20so17308719pfk.12
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2023 03:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1680430040;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LbcpNdii47h7TS2sDEqIBCRRzLggrrEsT68ykuaA9G4=;
+        b=R86U4rubSlMu45rTmKuGAh1ipkQWxDqIc2yaQZ85Du3zUVU3JZp41800pHfCldruTL
+         KPKq6BNNFQ0rySvQyQyESWp2hOy0Nwk44tENFq9vQTsgIaBZzTjP8Y1N7/7A4QRta6Yh
+         dDSdteaVIY/4BHTJ7zM8AKmN8uefWwklMnLqydTVxfws2kPecGsNB+/AktaX8JcQ4a1u
+         lpyTQdyxhvpm71bo+GQV56pqgnvM3Nf5Y9NVLsy8YJytVkCo/IlJMC9yEuIfcsHAgjIl
+         8JM117lDSm3WacL7KxP27R3suAD4W247audx3IXuGvHIkJAQAwCCj+Rhyn3KPqJ12ut5
+         yimQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680430040;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LbcpNdii47h7TS2sDEqIBCRRzLggrrEsT68ykuaA9G4=;
+        b=qQi8fi3/Q2AHh4I4co8UB8OE+hTcSrquiozeYniBz+Q/uZGns7iYm24kK0AlAYMGaQ
+         aeMnjUMKMZWExAAqbMr7mf6dHcnHF1GEbVRI43gW7MuYf/kDVVvWWNgi3srwNwEVtkqp
+         NjDyT6NvW/MtkDNd2/5AOpvRkg1sOlCOGqGdXltY/K5EVU71scL0GfQHJYVeY9G7QBDy
+         OzkPJC0V8YVdhHpnIBPYOImYsR9C+fZsDqU+8mbrDhvfHhT8M38qLZnq/JDwjSJW2ti6
+         +dZ2xHos/Zm3A70T7oWweuEyzFmkCyEZUg4PUPwuqamaEQMM0IMskSEZiTQZRtKbjzMl
+         aWaA==
+X-Gm-Message-State: AAQBX9efpoDulCvFnBVRgDJTMhbhJft2cRsZOQkV9reqBJjeCrcwrkea
+        3wh+jR1Kl9Z+etF1PqED/6f+VQ==
+X-Google-Smtp-Source: AKy350ZBYGQQN100axzsFpPvHBD8jqrHFqg3mLi4YgSLtrKJamjsjGuvXDq36mOgNs3Fq6UKyxZbYw==
+X-Received: by 2002:a62:1c49:0:b0:626:80f:7a0d with SMTP id c70-20020a621c49000000b00626080f7a0dmr31584270pfc.8.1680430039671;
+        Sun, 02 Apr 2023 03:07:19 -0700 (PDT)
+Received: from localhost.localdomain ([223.233.66.184])
+        by smtp.gmail.com with ESMTPSA id a26-20020a62bd1a000000b0062dba4e4706sm4788739pff.191.2023.04.02.03.07.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Apr 2023 03:07:19 -0700 (PDT)
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
+        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
+        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
+        rfoss@kernel.org, neil.armstrong@linaro.org
+Subject: [PATCH v5 00/11] arm64: qcom: Enable Crypto Engine for a few Qualcomm SoCs
+Date:   Sun,  2 Apr 2023 15:34:58 +0530
+Message-Id: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZCJllZQBWfjMCaoQ@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+Changes since v4:
+-----------------
+- v4 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230331164323.729093-1-bhupesh.sharma@linaro.org/
+- Collected R-Bs from Konrad for a couple of patches sent in v4.
+- Fixed incorrect email IDs for a couple of patches sent in v3, which I used for
+  some patches created on a different work machine.
+- No functional changes since v3.
 
-I love your patch! Yet something to improve:
+Changes since v3:
+-----------------
+- v3 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230328092815.292665-1-bhupesh.sharma@linaro.org/
+- Collected Acks from Krzysztof for a couple of patches sent in v3.
+- Fixed review comments from Krzysztof regarding DMA binding document
+  and also added a couple of new patches which are required to fix the
+  'dtbs_check' errors highlighted after this fix.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on next-20230331]
-[cannot apply to herbert-crypto-2.6/master linus/master v6.3-rc4]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Changes since v2:
+-----------------
+- v2 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230322114519.3412469-1-bhupesh.sharma@linaro.org/
+- No functional change since v2. As the sdm845 patch from v1 was accepted in linux-next,
+  dropped it from this version.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-hash-Remove-maximum-statesize-limit/20230328-115842
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/ZCJllZQBWfjMCaoQ%40gondor.apana.org.au
-patch subject: [PATCH] crypto: hash - Remove maximum statesize limit
-config: x86_64-rhel-8.3-func (https://download.01.org/0day-ci/archive/20230402/202304020900.MhnE9RIZ-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/5258657ff30097b887ac972b95a5563918f4448f
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Herbert-Xu/crypto-hash-Remove-maximum-statesize-limit/20230328-115842
-        git checkout 5258657ff30097b887ac972b95a5563918f4448f
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 olddefconfig
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+Changes since v1:
+-----------------
+- v1 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230321190118.3327360-1-bhupesh.sharma@linaro.org/
+- Folded the BAM DMA dt-binding change.
+  (sent earlier as: https://lore.kernel.org/linux-arm-msm/20230321184811.3325725-1-bhupesh.sharma@linaro.org/)
+- Folded the QCE dt-binding change.
+  (sent earlier as: https://lore.kernel.org/linux-arm-msm/20230320073816.3012198-1-bhupesh.sharma@linaro.org/)
+- Folded Neil's SM8450 dts patch in this series.
+- Addressed review comments from Rob, Stephan and Konrad.
+- Collected Konrad's R-B for [PATCH 5/9].
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304020900.MhnE9RIZ-lkp@intel.com/
+This patchset enables Crypto Engine support for Qualcomm SoCs like
+SM6115, SM8150, SM8250, SM8350 and SM8450.
 
-All errors (new ones prefixed by >>):
+Note that:
+- SM8250 crypto engine patch utilizes the work already done by myself and
+  Vladimir.
+- SM8350 crypto engine patch utilizes the work already done by Robert.
+- SM8450 crypto engine patch utilizes the work already done by Neil.
 
-   crypto/algif_hash.c: In function 'hash_accept':
->> crypto/algif_hash.c:238:20: error: 'HASH_MAX_STATESIZE' undeclared (first use in this function); did you mean 'HASH_MAX_DESCSIZE'?
-     238 |         char state[HASH_MAX_STATESIZE];
-         |                    ^~~~~~~~~~~~~~~~~~
-         |                    HASH_MAX_DESCSIZE
-   crypto/algif_hash.c:238:20: note: each undeclared identifier is reported only once for each function it appears in
-   crypto/algif_hash.c:238:14: warning: unused variable 'state' [-Wunused-variable]
-     238 |         char state[HASH_MAX_STATESIZE];
-         |              ^~~~~
+Also this patchset is rebased on linux-next/master.
 
+Bhupesh Sharma (10):
+  dt-bindings: dma: Add support for SM6115 and QCM2290 SoCs
+  dt-bindings: dma: Increase iommu maxItems for BAM DMA
+  arm64: dts: qcom: sdm8550: Fix the BAM DMA engine compatible string
+  arm64: dts: qcom: sdm845: Fix the slimbam DMA engine compatible string
+  dt-bindings: qcom-qce: Fix compatible combinations for SM8150 and
+    IPQ4019 SoCs
+  dt-bindings: qcom-qce: Add compatibles for SM6115 and QCM2290
+  arm64: dts: qcom: sm6115: Add Crypto Engine support
+  arm64: dts: qcom: sm8150: Add Crypto Engine support
+  arm64: dts: qcom: sm8250: Add Crypto Engine support
+  arm64: dts: qcom: sm8350: Add Crypto Engine support
 
-vim +238 crypto/algif_hash.c
+Neil Armstrong (1):
+  arm64: dts: qcom: sm8450: add crypto nodes
 
-fe869cdb89c95d Herbert Xu    2010-10-19  230  
-cdfbabfb2f0ce9 David Howells 2017-03-09  231  static int hash_accept(struct socket *sock, struct socket *newsock, int flags,
-cdfbabfb2f0ce9 David Howells 2017-03-09  232  		       bool kern)
-fe869cdb89c95d Herbert Xu    2010-10-19  233  {
-fe869cdb89c95d Herbert Xu    2010-10-19  234  	struct sock *sk = sock->sk;
-fe869cdb89c95d Herbert Xu    2010-10-19  235  	struct alg_sock *ask = alg_sk(sk);
-fe869cdb89c95d Herbert Xu    2010-10-19  236  	struct hash_ctx *ctx = ask->private;
-fe869cdb89c95d Herbert Xu    2010-10-19  237  	struct ahash_request *req = &ctx->req;
-b68a7ec1e9a3ef Kees Cook     2018-08-07 @238  	char state[HASH_MAX_STATESIZE];
-fe869cdb89c95d Herbert Xu    2010-10-19  239  	struct sock *sk2;
-fe869cdb89c95d Herbert Xu    2010-10-19  240  	struct alg_sock *ask2;
-fe869cdb89c95d Herbert Xu    2010-10-19  241  	struct hash_ctx *ctx2;
-4afa5f96179274 Herbert Xu    2015-11-01  242  	bool more;
-fe869cdb89c95d Herbert Xu    2010-10-19  243  	int err;
-fe869cdb89c95d Herbert Xu    2010-10-19  244  
-4afa5f96179274 Herbert Xu    2015-11-01  245  	lock_sock(sk);
-4afa5f96179274 Herbert Xu    2015-11-01  246  	more = ctx->more;
-4afa5f96179274 Herbert Xu    2015-11-01  247  	err = more ? crypto_ahash_export(req, state) : 0;
-4afa5f96179274 Herbert Xu    2015-11-01  248  	release_sock(sk);
-4afa5f96179274 Herbert Xu    2015-11-01  249  
-fe869cdb89c95d Herbert Xu    2010-10-19  250  	if (err)
-fe869cdb89c95d Herbert Xu    2010-10-19  251  		return err;
-fe869cdb89c95d Herbert Xu    2010-10-19  252  
-cdfbabfb2f0ce9 David Howells 2017-03-09  253  	err = af_alg_accept(ask->parent, newsock, kern);
-fe869cdb89c95d Herbert Xu    2010-10-19  254  	if (err)
-fe869cdb89c95d Herbert Xu    2010-10-19  255  		return err;
-fe869cdb89c95d Herbert Xu    2010-10-19  256  
-fe869cdb89c95d Herbert Xu    2010-10-19  257  	sk2 = newsock->sk;
-fe869cdb89c95d Herbert Xu    2010-10-19  258  	ask2 = alg_sk(sk2);
-fe869cdb89c95d Herbert Xu    2010-10-19  259  	ctx2 = ask2->private;
-4afa5f96179274 Herbert Xu    2015-11-01  260  	ctx2->more = more;
-4afa5f96179274 Herbert Xu    2015-11-01  261  
-4afa5f96179274 Herbert Xu    2015-11-01  262  	if (!more)
-4afa5f96179274 Herbert Xu    2015-11-01  263  		return err;
-fe869cdb89c95d Herbert Xu    2010-10-19  264  
-fe869cdb89c95d Herbert Xu    2010-10-19  265  	err = crypto_ahash_import(&ctx2->req, state);
-fe869cdb89c95d Herbert Xu    2010-10-19  266  	if (err) {
-fe869cdb89c95d Herbert Xu    2010-10-19  267  		sock_orphan(sk2);
-fe869cdb89c95d Herbert Xu    2010-10-19  268  		sock_put(sk2);
-fe869cdb89c95d Herbert Xu    2010-10-19  269  	}
-fe869cdb89c95d Herbert Xu    2010-10-19  270  
-fe869cdb89c95d Herbert Xu    2010-10-19  271  	return err;
-fe869cdb89c95d Herbert Xu    2010-10-19  272  }
-fe869cdb89c95d Herbert Xu    2010-10-19  273  
+ .../devicetree/bindings/crypto/qcom-qce.yaml  |  8 ++++++
+ .../devicetree/bindings/dma/qcom,bam-dma.yaml | 22 +++++++++------
+ arch/arm64/boot/dts/qcom/sdm845.dtsi          |  2 +-
+ arch/arm64/boot/dts/qcom/sm6115.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8150.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8350.dtsi          | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8450.dtsi          | 28 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |  2 +-
+ 9 files changed, 140 insertions(+), 10 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.38.1
+
