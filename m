@@ -2,123 +2,110 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE12C77B60
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 11:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CD6C77B60
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 12:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232100AbjDCLIO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 07:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
+        id S231492AbjDCMQb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 08:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231951AbjDCLIN (ORCPT
+        with ESMTP id S230105AbjDCMQa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 07:08:13 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C59423C
-        for <linux-crypto@vger.kernel.org>; Mon,  3 Apr 2023 04:08:07 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id j24so28958052wrd.0
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Apr 2023 04:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680520085;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bptug0IUr53yiSheFLOI8G2Iif+jS74EZZFVW0ghq4Y=;
-        b=vreEWXlZbzmDkdbQfhaSTbAF0zBCQML/+uh0/XT61CID87nHXYxLi2ptmfsWCR7FZS
-         rd+JBdYxMW4T1r4QbUMScNhtx09lwBNSecJlAIr7j8sZOkodTCCRv4NJpv78+eoMDyJo
-         LleEmISnMK5nUIbsrLrudbyB+Ai4e5sO/70RXb5RiEhfeD997/YARfoTge/hXktX6sNS
-         bs7Iq8IVtp4DrRq8Xd5HvvELojLB+4y8IDSuhxW9T3gbrjdLf+6Jg7/bUJ4tk88bM6JA
-         LcBMnByuGe+3t9LxG+4fuK0E9ipAglBRPcPRiUGuJAVcmovEUl4jA5/JeFvT1zzxAB+y
-         ViPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680520085;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Bptug0IUr53yiSheFLOI8G2Iif+jS74EZZFVW0ghq4Y=;
-        b=l5yM8jIHCgrg8JqDEYNAPfZ3tQtn/pkgZml989U6ymNeTpt45JeB77bB/kxnPqxtdS
-         7oQcmmU1e+vrU/iSx7+gClq/Ntn2lHruaxpi1zoVRjbXt81zfGujISMlOKlcfEq/+JrR
-         4+z366St6uJBcGatIdTjFr1mnlJ7Y6ZeTkdlpGOQOdZXpYA52Tq62WYjuq3x9i4Sq2tn
-         W4jytEWX+KnK9eXF5jDVfda/V/l+B/sFQXEjPPkjwjFQB+l3e843uJMwsZdbXM68S8n5
-         fgeetBlonCYXvMl21Ywg3O+tyeNUfh4iZ4s6wOFTrGzp9XOPZCvmoaw9Lq9W0mYzg4BK
-         i6Nw==
-X-Gm-Message-State: AAQBX9d90R0O3ZQ/VBiCClLiWSOZs/j47VCsCbsePNtX6rSP7oWNtkqH
-        aTA9jATdF690+0Q0i3pWgS+dHUo9OX2ZNvPq217V7w==
-X-Google-Smtp-Source: AKy350a35YO64iiFVjm8L45Px3SvEHZQujkKj79U+2xxdb5LSQringWJf/gKcgWkxVo+4wghHg8fc88lKlahPBMtNCg=
-X-Received: by 2002:adf:fccb:0:b0:2ce:a8d6:570f with SMTP id
- f11-20020adffccb000000b002cea8d6570fmr7454599wrs.4.1680520085453; Mon, 03 Apr
- 2023 04:08:05 -0700 (PDT)
+        Mon, 3 Apr 2023 08:16:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AC5113F2;
+        Mon,  3 Apr 2023 05:16:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D890C61888;
+        Mon,  3 Apr 2023 12:16:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66B61C433EF;
+        Mon,  3 Apr 2023 12:16:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680524165;
+        bh=t8WBdW45+1Hqn/jcQvHAdYy51f3JmJMvVFmk48M7AiU=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=ivU9ezAkyEv2NnkR6ifcx9U961kKK2Qpk/PEiUrNlg5AWDDk7AzT3pIA88+jP5vAx
+         wozi35njaonVEe+ZTVPEBIqGqS046LxdsPAUc1jP4wiS7a6t3lDzjwG2btjx2Syi+7
+         +Ec5sBYZZ2DLlXUUKeU8Z04sL3FFCbXYK8M+5KtAT4Sj8REUcxY6o8vdJaCc4lVhcJ
+         RN7yWhvbqezyDzivNJOwHfnKHfNlhHwvUPJfh9H+57FOA+gLj/NEB/jOAaPrp+jX+P
+         cMmwsxbwCMYE6YULuOAKLekMvCap7SUsuiKw+id9m8hyeHdBNcVzMNWMJh5m+8BuEq
+         A3qtr8eDVzpiw==
+Message-ID: <9ecab48e-e828-0a03-2bc7-678e555bc80d@kernel.org>
+Date:   Mon, 3 Apr 2023 15:15:59 +0300
 MIME-Version: 1.0
-References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
- <20230402100509.1154220-6-bhupesh.sharma@linaro.org> <21eaeea4-4f2e-5ce5-c75b-d74ded8e6e4c@linaro.org>
- <CAH=2NtzKGxzmCq2JTajxWoeRFR+mPnFY3YF5mn0tGt30T7SJoQ@mail.gmail.com> <463a9885-741e-a44a-c6c2-7cf5b0560d2d@linaro.org>
-In-Reply-To: <463a9885-741e-a44a-c6c2-7cf5b0560d2d@linaro.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Mon, 3 Apr 2023 16:37:54 +0530
-Message-ID: <CAH=2NtxgxrybNDm7HOBtMjcMk6WM5dMko2GWo8H8Z6F1HgKLrQ@mail.gmail.com>
-Subject: Re: [PATCH v5 05/11] dt-bindings: qcom-qce: Fix compatible
- combinations for SM8150 and IPQ4019 SoCs
-To:     Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        agross@kernel.org, linux-kernel@vger.kernel.org,
+Subject: Re: [PATCH v5 10/11] arm64: dts: qcom: sm8350: Add Crypto Engine
+ support
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, andersson@kernel.org,
         bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
-        robh+dt@kernel.org, rfoss@kernel.org, neil.armstrong@linaro.org
-Content-Type: text/plain; charset="UTF-8"
+        robh+dt@kernel.org, konrad.dybcio@linaro.org,
+        vladimir.zapolskiy@linaro.org, rfoss@kernel.org,
+        neil.armstrong@linaro.org
+References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
+ <20230402100509.1154220-11-bhupesh.sharma@linaro.org>
+Content-Language: en-US
+From:   Georgi Djakov <djakov@kernel.org>
+In-Reply-To: <20230402100509.1154220-11-bhupesh.sharma@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 3 Apr 2023 at 16:18, Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
->
->
->
-> On 3.04.2023 08:15, Bhupesh Sharma wrote:
-> > On Mon, 3 Apr 2023 at 11:06, Vladimir Zapolskiy
-> > <vladimir.zapolskiy@linaro.org> wrote:
-> >>
-> >> On 4/2/23 13:05, Bhupesh Sharma wrote:
-> >>> Currently the compatible list available in 'qce' dt-bindings does not
-> >>> support SM8150 and IPQ4019 SoCs directly which may lead to potential
-> >>> 'dtbs_check' error(s).
-> >>>
-> >>> Fix the same.
-> >>>
-> >>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> >>> ---
-> >>>   Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 6 ++++++
-> >>>   1 file changed, 6 insertions(+)
-> >>>
-> >>> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> >>> index e375bd981300..90ddf98a6df9 100644
-> >>> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> >>> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> >>> @@ -24,6 +24,12 @@ properties:
-> >>>           deprecated: true
-> >>>           description: Kept only for ABI backward compatibility
-> >>>
-> >>> +      - items:
-> >>> +          - enum:
-> >>> +              - qcom,ipq4019-qce
-> >>> +              - qcom,sm8150-qce
-> >>> +          - const: qcom,qce
-> >>> +
-> >>>         - items:
-> >>>             - enum:
-> >>>                 - qcom,ipq6018-qce
-> >>
-> >> Two commit tags given for v2 are missing.
-> >
-> > Cannot get your comment. Please be more descriptive.
+Hi Bhupesh,
 
-> https://lore.kernel.org/linux-arm-msm/333081a2-6b31-3fca-1a95-4273b5a46fb7@linaro.org/
+On 2.04.23 13:05, Bhupesh Sharma wrote:
+> Add crypto engine (CE) and CE BAM related nodes and definitions to
+> 'sm8350.dtsi'.
+> 
+> Co-developed-by and Signed-off-by: Robert Foss <rfoss@kernel.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>   arch/arm64/boot/dts/qcom/sm8350.dtsi | 22 ++++++++++++++++++++++
+>   1 file changed, 22 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sm8350.dtsi b/arch/arm64/boot/dts/qcom/sm8350.dtsi
+> index 7fbc288eca58..090ee07d1800 100644
+> --- a/arch/arm64/boot/dts/qcom/sm8350.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sm8350.dtsi
+> @@ -1730,6 +1730,28 @@ ufs_mem_phy_lanes: phy@1d87400 {
+>   			};
+>   		};
+>   
+> +		cryptobam: dma-controller@1dc4000 {
+> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> +			reg = <0 0x01dc4000 0 0x24000>;
+> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +			#dma-cells = <1>;
+> +			qcom,ee = <0>;
+> +			qcom,controlled-remotely;
+> +			iommus = <&apps_smmu 0x594 0x0011>,
+> +				 <&apps_smmu 0x596 0x0011>;
+> +		};
+> +
+> +		crypto: crypto@1dfa000 {
+> +			compatible = "qcom,sm8350-qce", "qcom,sm8150-qce", "qcom,qce";
+> +			reg = <0 0x01dfa000 0 0x6000>;
+> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
+> +			dma-names = "rx", "tx";
+> +			iommus = <&apps_smmu 0x594 0x0011>,
+> +				 <&apps_smmu 0x596 0x0011>;
+> +			interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
+> +			interconnect-names = "memory";
 
-I think Krzysztof mentioned (here:
-https://lore.kernel.org/linux-arm-msm/d5821429-032d-e1e6-3a4e-ca19eb4a60ed@linaro.org/)
-and I also agree that there is no need to split the enum into const.
+We switched to #interconnect-cells = <2> (since commit 4f287e31ff5f), so maybe #include
+dt-bindings/interconnect/qcom,icc.h and add the tags.
 
-Also, I will add the 'Fixes: 00f3bc2db351 ("dt-bindings: qcom-qce: Add
-new SoC compatible strings for Qualcomm QCE IP")' tag in the next
-version (waiting for more comments before spinning a new version).
+BR,
+Georgi
 
-Regards,
-Bhupesh
+> +		};
+> +
+>   		ipa: ipa@1e40000 {
+>   			compatible = "qcom,sm8350-ipa";
+>   
+
