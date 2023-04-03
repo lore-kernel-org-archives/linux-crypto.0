@@ -2,110 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CD6C77B60
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 12:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3765C76196
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 14:54:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231492AbjDCMQb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 08:16:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
+        id S233245AbjDCOyu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 10:54:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230105AbjDCMQa (ORCPT
+        with ESMTP id S234021AbjDCOyn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 08:16:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AC5113F2;
-        Mon,  3 Apr 2023 05:16:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D890C61888;
-        Mon,  3 Apr 2023 12:16:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66B61C433EF;
-        Mon,  3 Apr 2023 12:16:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680524165;
-        bh=t8WBdW45+1Hqn/jcQvHAdYy51f3JmJMvVFmk48M7AiU=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=ivU9ezAkyEv2NnkR6ifcx9U961kKK2Qpk/PEiUrNlg5AWDDk7AzT3pIA88+jP5vAx
-         wozi35njaonVEe+ZTVPEBIqGqS046LxdsPAUc1jP4wiS7a6t3lDzjwG2btjx2Syi+7
-         +Ec5sBYZZ2DLlXUUKeU8Z04sL3FFCbXYK8M+5KtAT4Sj8REUcxY6o8vdJaCc4lVhcJ
-         RN7yWhvbqezyDzivNJOwHfnKHfNlhHwvUPJfh9H+57FOA+gLj/NEB/jOAaPrp+jX+P
-         cMmwsxbwCMYE6YULuOAKLekMvCap7SUsuiKw+id9m8hyeHdBNcVzMNWMJh5m+8BuEq
-         A3qtr8eDVzpiw==
-Message-ID: <9ecab48e-e828-0a03-2bc7-678e555bc80d@kernel.org>
-Date:   Mon, 3 Apr 2023 15:15:59 +0300
+        Mon, 3 Apr 2023 10:54:43 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B18D1206A
+        for <linux-crypto@vger.kernel.org>; Mon,  3 Apr 2023 07:54:21 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id m6-20020a05600c3b0600b003ee6e324b19so18310150wms.1
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Apr 2023 07:54:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112; t=1680533656;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zQ+D+rvKejqeMnWp70EKl6CxPWKKv8D5XFmi8cEhbpo=;
+        b=19sjDoEWHn3qr/r+4w4MBgaavARXaINMpW7n0PSpX7v+T4dvwGSdoVh/HKyRReHWTm
+         TMAo9mIPCOXH563paV8996QHd7zwtIZetRxP5j4CZLmhykrWSxEPWJ6sizuFUsLf3ox+
+         M5JA+htRsFp4IFKV3XhlKH/u9xn+ywEhSY4PQ7mtpViYCU63l2XeVYgSuzHSXG4vgW2j
+         /kvVVs0NMt64gqVpmpCNxJREDdMTyg7myayfYJCLWSJ9eXCfYQ2/HGHC+bh7WBiyflk5
+         k1oqBHMT1BSJLU5UeR329Dai44m2FR8GEcubaPvs+iasGQYm4WDmbxuF3eWxo15T7sGA
+         K88g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680533656;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zQ+D+rvKejqeMnWp70EKl6CxPWKKv8D5XFmi8cEhbpo=;
+        b=C7Xy6RQT2jgj2EJ+ESbcvaU3nUo6I7ThKDHqUeFt2o0Do6edTMLgprLc3nNSUO5F0F
+         IZaUnM8wLnSmXtRW6SiSnAkKkneZrNEEbb9XWnjofYA1VIzyUYmhk+d/2IEqEzXfC8Do
+         m5jhHzfSM0DMttPOM7IbpJ0wHpa573wPJA9dTp+Wnn2cI1id1b50xXkIpPs+ya2G1liZ
+         YkV4VZ+mvo5UOOY39i0cgS1VT9cyegc1WHgrPEy9RaZLAEUkegzhKBjqeAA6wX0nV3WA
+         xA+0XdOw4D6vZuJjc5jT2RVIuip6lttBfo7xBqqFIXXO88+4/Yh0D+8q8uKVV1kq+cv1
+         j4Pw==
+X-Gm-Message-State: AAQBX9ex/u5J0MfeXYdrK3Ojr+RpbbSIwo55Pd/p9J7Mz3zVEuAUMKOR
+        4XhX+yHYjOBQMPniYMP5HXAL74xzdXbf1v9CZHQ=
+X-Google-Smtp-Source: AKy350YV721bPoxlptQMY+4EjEdRARLIo8tlWdaWA0MzyriXcpeXXrhtsduVC2tjei0esd0t3OUJPw==
+X-Received: by 2002:a1c:c913:0:b0:3ef:acf6:f815 with SMTP id f19-20020a1cc913000000b003efacf6f815mr14033935wmb.32.1680533656505;
+        Mon, 03 Apr 2023 07:54:16 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:4a02:2aff:fe07:1efc])
+        by smtp.googlemail.com with ESMTPSA id u21-20020a05600c00d500b003ee4e99a8f6sm12299588wmm.33.2023.04.03.07.54.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 07:54:16 -0700 (PDT)
+Date:   Mon, 3 Apr 2023 16:54:14 +0200
+From:   Corentin LABBE <clabbe@baylibre.com>
+To:     Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        fenghua.yu@intel.com, vkoul@kernel.org, dave.jiang@intel.com,
+        tony.luck@intel.com, wajdi.k.feghali@intel.com,
+        james.guilford@intel.com, kanchana.p.sridhar@intel.com,
+        giovanni.cabiddu@intel.com, daniele.alessandrelli@intel.com,
+        prabhjot.khurana@intel.com, mgross@linux.intel.com,
+        declan.murphy@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH 2/3] crypto: ixp4xx - Move driver to
+ drivers/crypto/intel/ixp4xx
+Message-ID: <ZCroljP+zzGVigFi@Red>
+References: <20230328153951.126564-1-tom.zanussi@linux.intel.com>
+ <20230328153951.126564-3-tom.zanussi@linux.intel.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5 10/11] arm64: dts: qcom: sm8350: Add Crypto Engine
- support
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
-        robh+dt@kernel.org, konrad.dybcio@linaro.org,
-        vladimir.zapolskiy@linaro.org, rfoss@kernel.org,
-        neil.armstrong@linaro.org
-References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
- <20230402100509.1154220-11-bhupesh.sharma@linaro.org>
-Content-Language: en-US
-From:   Georgi Djakov <djakov@kernel.org>
-In-Reply-To: <20230402100509.1154220-11-bhupesh.sharma@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230328153951.126564-3-tom.zanussi@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Bhupesh,
-
-On 2.04.23 13:05, Bhupesh Sharma wrote:
-> Add crypto engine (CE) and CE BAM related nodes and definitions to
-> 'sm8350.dtsi'.
+Le Tue, Mar 28, 2023 at 10:39:50AM -0500, Tom Zanussi a écrit :
+> With the growing number of Intel crypto drivers, it makes sense to
+> group them all into a single drivers/crypto/intel/ directory.
 > 
-> Co-developed-by and Signed-off-by: Robert Foss <rfoss@kernel.org>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->   arch/arm64/boot/dts/qcom/sm8350.dtsi | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
+> Create a separate drivers/crypto/intel/ixp4xx directory and move
+> drivers/crypto/ixp4xx_crypto.c to it, along with a new Kconfig and
+> Makefile to contain the config and make bits.
 > 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8350.dtsi b/arch/arm64/boot/dts/qcom/sm8350.dtsi
-> index 7fbc288eca58..090ee07d1800 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8350.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8350.dtsi
-> @@ -1730,6 +1730,28 @@ ufs_mem_phy_lanes: phy@1d87400 {
->   			};
->   		};
->   
-> +		cryptobam: dma-controller@1dc4000 {
-> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-> +			reg = <0 0x01dc4000 0 0x24000>;
-> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-> +			#dma-cells = <1>;
-> +			qcom,ee = <0>;
-> +			qcom,controlled-remotely;
-> +			iommus = <&apps_smmu 0x594 0x0011>,
-> +				 <&apps_smmu 0x596 0x0011>;
-> +		};
-> +
-> +		crypto: crypto@1dfa000 {
-> +			compatible = "qcom,sm8350-qce", "qcom,sm8150-qce", "qcom,qce";
-> +			reg = <0 0x01dfa000 0 0x6000>;
-> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
-> +			dma-names = "rx", "tx";
-> +			iommus = <&apps_smmu 0x594 0x0011>,
-> +				 <&apps_smmu 0x596 0x0011>;
-> +			interconnects = <&aggre2_noc MASTER_CRYPTO &mc_virt SLAVE_EBI1>;
-> +			interconnect-names = "memory";
+> Also add a COMPILE_TEST dependency to CRYPTO_DEV_IXP4XX so it can be
+> more easily compile-tested.
+> 
+> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
 
-We switched to #interconnect-cells = <2> (since commit 4f287e31ff5f), so maybe #include
-dt-bindings/interconnect/qcom,icc.h and add the tags.
+Acked-by: Corentin LABBE <clabbe@baylibre.com>
 
-BR,
-Georgi
-
-> +		};
-> +
->   		ipa: ipa@1e40000 {
->   			compatible = "qcom,sm8350-ipa";
->   
-
+Thanks
