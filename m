@@ -2,101 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 325C6C761AF
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 06:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B52D2C761A6
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 07:00:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbjDCGU4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 02:20:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35408 "EHLO
+        id S231586AbjDCHAl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 03:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjDCGU4 (ORCPT
+        with ESMTP id S231613AbjDCHAW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 02:20:56 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977847695;
-        Sun,  2 Apr 2023 23:20:47 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1680502845;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i42bYRlR2kxtr0gbsfE9X6XNMmr22amRVlMTmSUpKYo=;
-        b=cEqd0YLaWwP/vnr5lIBv03l5pHM2JWrtJsop+GgvwoYVTyymV3kNlAmsZte5gu/34iaKte
-        6rXfOtMZj7Jos7sskbeViOFEujeDJWbnh3M0YsFhvDT4jMVwV9YJnElFzK3oDcAsW8D4gx
-        OlF/XPzYVXsKzPXeO8e7WJQIq+Rq+2vJVMzDKuikO8bkRsGxsu/7lMi8j/I1uD3KKOh6hs
-        90c8jb+p6V1NDuBd7TrwXmg03WSz48u/PkgXTUHnyKuzS3m0EQP5lRYfzhqieDC2nraQdU
-        etsJ6LUr4yQUdvF714lABNduwiffcUlOxlBokxI/Ofti/mwiO6/xIwnucemhRg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1680502845;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i42bYRlR2kxtr0gbsfE9X6XNMmr22amRVlMTmSUpKYo=;
-        b=RuAt71zBd1H4cTsCQ/ZvDpU8FcnCA3H19MrqzS7AYadaBjM0NZzjhazlHRTK7xQOYbg+XT
-        gShlLA/Ge7ObjpDg==
-To:     Borislav Petkov <bp@alien8.de>,
-        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Kalra, Ashish" <ashish.kalra@amd.com>,
-        linux-crypto@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
-In-Reply-To: <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
-References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
- <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
- <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
- <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
- <ecf005b1-ddb9-da4c-4526-28df4806426c@linux.microsoft.com>
- <20230323152342.GFZBxu/m3u6aFUDY/7@fat_crate.local>
- <105d019c-2249-5dfd-e032-95944ea6dc8c@linux.microsoft.com>
- <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
- <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
- <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
-Date:   Mon, 03 Apr 2023 08:20:44 +0200
-Message-ID: <877cutsczn.ffs@tglx>
+        Mon, 3 Apr 2023 03:00:22 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A074CE38A
+        for <linux-crypto@vger.kernel.org>; Sun,  2 Apr 2023 23:59:47 -0700 (PDT)
+Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3336ZVmq009923;
+        Mon, 3 Apr 2023 08:59:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : from : subject : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=VJ5A6Gk6cqgeOFIfWofDzb9dSKDciEwj0Io5fqbefMY=;
+ b=RCyHMUqyMzipa1NftYtdB79Fti/HSZO6JCl4uCmAQt8tmh4xtTZIPzHhqv9kUzWGHpfw
+ lsP7Br0DUZQpvSsgABjgMG6TyV6z52crbLH7M0yry7WQV824D+3UMAQ3kcNfZCmto8+F
+ BGeP3+Manv3GU+MKRb23CQnNJL0QHU972fS42Z1TQMof8ifLvE6t9gUgvOBpOdhBF7He
+ bCG3UipTWcpMmQn+PIL8EksIcxIyADN7WbmkhpBsKxbCRnhL8ffG+4TqFHmQoLIdmBGh
+ LjQZK+luT3U0nvuJ2/aYjw9y2ua2h+UR5AGMqFozDpznSeoUl6roPiyDJ/x6nPg6MERd EQ== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ppa1m8cug-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 03 Apr 2023 08:59:41 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id E97B310002A;
+        Mon,  3 Apr 2023 08:59:40 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 85497210F76;
+        Mon,  3 Apr 2023 08:59:40 +0200 (CEST)
+Received: from [10.201.22.173] (10.201.22.173) by SHFDAG1NODE3.st.com
+ (10.75.129.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.17; Mon, 3 Apr
+ 2023 08:59:40 +0200
+Message-ID: <34f2cffe-f4ce-9746-1a01-39abb80437d9@foss.st.com>
+Date:   Mon, 3 Apr 2023 08:59:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.0
+From:   Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
+Subject: Re: [PATCH] crypto: hash - Remove maximum statesize limit
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <ZCJk8JQV+0N3VwPS@gondor.apana.org.au>
+ <ZCJllZQBWfjMCaoQ@gondor.apana.org.au>
+ <0ac4854f-a8cb-1344-7de7-3c2579e6eba6@foss.st.com>
+ <ZCT/SoUW4q5PA4JF@gondor.apana.org.au>
+In-Reply-To: <ZCT/SoUW4q5PA4JF@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.22.173]
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE3.st.com
+ (10.75.129.71)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-03_04,2023-03-31_01,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Apr 02 2023 at 17:44, Borislav Petkov wrote:
-> On Fri, Mar 24, 2023 at 06:10:09PM +0100, Jeremi Piotrowski wrote:
->> Since the AMD PSP is a privileged device, there is a desire to not have to trust the
->> ACPI stack,
->
-> And yet you do:
->
-> +	err = acpi_parse_aspt(&res[0], &pdata);
-> +	if (err)
-> +		return err;
->
-> You don't trust the ACPI stack, and yet you're parsing an ACPI table?!?!
-> You have to make up your mind here.
->
-> Btw, you still haven't answered my question about doing:
->
-> 	devm_request_irq(dev, 9, ..)
->
-> where 9 is the default ACPI interrupt.
->
-> You can have some silly table tell you what to map or you can simply map
-> IRQ 9 and be done with it. In this second case you can *really* not
-> trust ACPI because you know which IRQ it is.
 
-The real problem here is that the information provided about the overall
-design and requirements is close to zero. All we heard so far is hand
-waving about not trusting PCI and ACPI.
+> Please use the cryptodev tree for all crypto work.
 
-Jeremi, can you please describe exactly what the design and constraints
-are in understandable and coherent sentences?
+Thanks for the tip, the serie works on STM32MP1
 
-Thanks,
+Tested-by : Thomas Bourgoin <thomas.bourgoin@foss.st.com>
 
-        tglx
+BR
