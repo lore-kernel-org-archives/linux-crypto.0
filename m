@@ -2,155 +2,131 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C38E9C76188
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 18:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 921B1C77B62
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 20:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233168AbjDCSfH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 14:35:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38050 "EHLO
+        id S232782AbjDCUFl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 16:05:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbjDCSfG (ORCPT
+        with ESMTP id S232095AbjDCUFk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 14:35:06 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2061e.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8a::61e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4886E448A;
-        Mon,  3 Apr 2023 11:34:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=InUY9G2ReyTqRks6KRfvXB2yinED/yNCV/phk+rGcBhLrGDIWri40HnD7KkhFVhVe3ihpNfJpUD+PZEeFvPV3zAgahHKgO+fMx88AvraDWokAArBGNDJ/Q2Go7QWtSIiOIUbVDSFuNK95zD9g/GJhnq91U6TVfga2Kto+6JRjmom8f8dknqtXwRH7yxn5eas6hWo2sT9DeS08JXw2DFOtczLklGz8tMjHMSvWhDtYOHdYP9ngHIa6SgFMRKm5l3SkxFFeJ61EWNgMen9N5CwzOgem8IIWscPMW9iT4DyFTG4vIH+fa4JeXmws39zRvIg+tFE+R3jFWmWNHet0dYk3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0JG8ZQbgcdWCm1NNm1RDFSg43s1mjeApJXMO1CEXoVs=;
- b=jFVCgfZlPFvcZsiQ7c4EWGws/H0J7ULg/J6lAoQDssfS6Wlj22132p+CDQmdpOecIZLVQTzADy3AG0X+wblUc9Hpu2DwfKzJsWfui1Ob8QprPUnFD+D8zwBCLsFTv+SQD9AVkpNtnZT+FHf+VkgdBqLaARAWgLSXG86UQlHQD851o3whYUtf8mJQfTXN2nrghKFL5IUlcTZO7aegLMFzmDXHIOpAQwR0fAryTdkiIvzKhfjJT8VpBockEPhSfWK5RIy4t6seBEVcF7PWnyn6rxzSlMAxrFfB8xsJlBAjhcORgcgLM9+C1FdCvUDcM4/RJ8aJavF9yhG52Sy2noGwWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0JG8ZQbgcdWCm1NNm1RDFSg43s1mjeApJXMO1CEXoVs=;
- b=Xp/nOzZZm/bQRhdqvRJP7aAI2nP6WWT3S3xcy7nxZsCHzleAF4DPmX/jqK5rkEHk/LQmqMjbLwbvmicDxP7Imy4KNTqxLlsvmavL1ARouQDsxrPwzf/dyX0EPD7YNiquiz8HGptzNLwnMtMqBsotUrq+B2xEa47FNTmIOqd0ipA=
-Received: from BL1PR13CA0334.namprd13.prod.outlook.com (2603:10b6:208:2c6::9)
- by SJ2PR12MB8928.namprd12.prod.outlook.com (2603:10b6:a03:53e::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Mon, 3 Apr
- 2023 18:34:03 +0000
-Received: from BL02EPF000108EB.namprd05.prod.outlook.com
- (2603:10b6:208:2c6:cafe::d2) by BL1PR13CA0334.outlook.office365.com
- (2603:10b6:208:2c6::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.26 via Frontend
- Transport; Mon, 3 Apr 2023 18:34:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF000108EB.mail.protection.outlook.com (10.167.241.200) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6178.30 via Frontend Transport; Mon, 3 Apr 2023 18:32:50 +0000
-Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 3 Apr
- 2023 13:32:34 -0500
-From:   Mario Limonciello <mario.limonciello@amd.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-CC:     Held Felix <Felix.Held@amd.com>, <linux-kernel@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, Mark Hasemeyer <markhas@chromium.org>,
-        "Grzegorz Bernacki" <gjb@semihalf.com>,
-        =?UTF-8?q?Jan=20D=C4=85bro=C5=9B?= <jsd@semihalf.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-Subject: [PATCH v8 3/6] crypto: ccp: Return doorbell status code as an argument
-Date:   Mon, 3 Apr 2023 13:32:12 -0500
-Message-ID: <20230403183216.3493-4-mario.limonciello@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230403183216.3493-1-mario.limonciello@amd.com>
-References: <20230403183216.3493-1-mario.limonciello@amd.com>
+        Mon, 3 Apr 2023 16:05:40 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA6D30FC
+        for <linux-crypto@vger.kernel.org>; Mon,  3 Apr 2023 13:05:37 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id d17so30563468wrb.11
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Apr 2023 13:05:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1680552336;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ypjGSD9MoiyC/BSmZV4rpdSicxantTDyraV9ZwR3Wko=;
+        b=HUKwUP5VZRNpodrnPPM3ifw1bAJa/1Pwl19tZY0gZTDQdqvslDjrKagBUWgrt8/NY1
+         iJ2tN7m+ZqpRE+cPJMdWcNCThCpokwmT7wlwclKRVO8wDwCdc/pV4pkMjvEhq5no8djC
+         kPGn53hin1pRv+iB8fzqU95rfylIHRDYJ0C5vDUFdDcMnNXlFDzMODxFRuRHDnhIfDgD
+         CXJ6y6TnYjCZVy6iOCDFQph/FZRUWWpdmfYk6xaMyt1+X7y038/HXHZtZNOQxDMfQztv
+         7Znx05mTUxZUmAcoNI+qMtJA3exG/ecL3Ah/qeCHRICM69kcalZ0fIqnlwgmhR9/jGmJ
+         RS1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680552336;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ypjGSD9MoiyC/BSmZV4rpdSicxantTDyraV9ZwR3Wko=;
+        b=7wbs6ed+9FzT7OlhSDPUnRm+NgWz17kkascMxN27fhQOcX15ddsw+ScEF3RrKd9RM5
+         +JjGIqkqIJKSps48PdF0me97AtNgG1V8Kq6K7lp2T66RK6bKclI+dt/CR/otJmN46C9f
+         NdrXiS6k7PATKGDNugr19t6ulIAPp6bglMJ9xngbuAikA687wbStT+0SMmJqll8eC/T8
+         lvMgFQdjBR3ysa5npCt7QhvngNCH+LK6q3Bkf0m0A2NElBYorEgi4qUgoK2EembbHqfk
+         dgrX4FZykfe5TML7Qr/RTlB+DHwM+Uvcu344pz/0HgGvcADE8qNCJaE0G6Cf0YZ2mT5B
+         48rg==
+X-Gm-Message-State: AAQBX9d7vPU9utEdEbko8/L1Of/nwzmPbb1C6amRYdqo6SVMJkZm19bv
+        WCyalvqHyk1Y5pIZ+J1ZdOZ6TA==
+X-Google-Smtp-Source: AKy350Ykoxehj3xlHAZUYS0YuJeY0lOEIiHNddtOkaPl+8pQTa1wGWFgeMQoaWYcLwn59zlnlqdkXg==
+X-Received: by 2002:adf:dbcf:0:b0:2ce:da65:1e1d with SMTP id e15-20020adfdbcf000000b002ceda651e1dmr14024101wrj.24.1680552336280;
+        Mon, 03 Apr 2023 13:05:36 -0700 (PDT)
+Received: from localhost.localdomain ([94.52.112.99])
+        by smtp.gmail.com with ESMTPSA id iv19-20020a05600c549300b003ef69873cf1sm20798037wmb.40.2023.04.03.13.05.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 13:05:35 -0700 (PDT)
+From:   Abel Vesa <abel.vesa@linaro.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: [PATCH v5 0/6] Add dedicated Qcom ICE driver
+Date:   Mon,  3 Apr 2023 23:05:24 +0300
+Message-Id: <20230403200530.2103099-1-abel.vesa@linaro.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF000108EB:EE_|SJ2PR12MB8928:EE_
-X-MS-Office365-Filtering-Correlation-Id: d560c404-ac4c-461b-a680-08db3471fda8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wUIiIm2QUlL/ordE2+jHT5jdWeati8XQEn6EOTBH7TG7aiNXJSKjdciEcOj6XjfADbkeCBmkTS2WTpaeRtFenx8N3Iy2rJN0ujMWf8RJ9m5bxwKDoMlcCqRPzX73auZpYRV7+6aeCVGLwN5rT3xhTVKPoguv7Ko3BY3WOQQ/OpqDx8BgTNBWXL35yMMKrVEq4PrTMt95uycsp5FeywOwWHmtnZWBxaiiL188H7RAhEIsWHDp5p84OKM7VQRhFeRhNUdhtNNaw+NszCGPip0a7DddNxeHDEIssOlWvr29fejU1oj049gwctbQktP5Qadncyl+mECnG07Qc6TsrTC4sZm+5sQlRddzzPEbhOHlclJ1a9/LoaBN+zSCk8LXi4WEyUCycH3cCqZTm8UAYQCGo6R2IdKTLIu291BaPq3P4MkczZHGX/YFGRaRrVN79un+1k/D33T9e7b772qouUE9ozBq6zV3VYO1r9o7WV0ZaWsNP+PUimS4zil50kA6ZM6xrhcSDYU0gFveYhcuoiUOSng0uV4/svz4JjqgXcVeMP8cmm0SUkC8iYyDxU3f5MArgoOOHCl5uv+1TXLbW2cA6UHQl1UbqWkwGHNGDGS9Fk1rny0RhYqo9PHWPgP+ph4KhlQz/ge0JOu/cfspbqKGRSlTaGlj2PmHzsyQvLQwZKJn7HulfaYYyILVDyZxTW9SSuBIKYxeRiiikRteq3saueMCOryyHTB/fqGReKmVdE2C7AEjrlDgIOsWWLo3JBd4s9AubjKOgLxN38NaXKwQ2A==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(136003)(396003)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(356005)(5660300002)(81166007)(44832011)(2616005)(82310400005)(47076005)(83380400001)(336012)(110136005)(426003)(54906003)(6636002)(316002)(7696005)(40480700001)(16526019)(186003)(478600001)(6666004)(86362001)(1076003)(26005)(36756003)(82740400003)(40460700003)(36860700001)(4326008)(41300700001)(8676002)(8936002)(70206006)(70586007)(2906002)(36900700001)(134885004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2023 18:32:50.7810
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d560c404-ac4c-461b-a680-08db3471fda8
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BL02EPF000108EB.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8928
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If the doorbell failed to ring we return -EIO, but the caller can't
-determine why it failed.  Pass the reason for the failure in an
-argument for caller to investigate.
+As both SDCC and UFS drivers use the ICE with duplicated implementation,
+while none of the currently supported platforms make use concomitantly
+of the same ICE IP block instance, the new SM8550 allows both UFS and
+SDCC to do so. In order to support such scenario, there is a need for
+a unified implementation and a devicetree node to be shared between
+both types of storage devices. So lets drop the duplicate implementation
+of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
+Also, switch all UFS and SDCC devicetree nodes to use the new ICE
+approach.
 
-Suggested-by: Mark Hasemeyer <markhas@chromium.org>
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-Reviewed-by: Mark Hasemeyer <markhas@chromium.org>
-Tested-by: Mark Hasemeyer <markhas@chromium.org>
----
- drivers/crypto/ccp/platform-access.c | 4 +++-
- include/linux/psp-platform-access.h  | 4 ++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+The v4 is here:
+https://lore.kernel.org/all/20230327134734.3256974-1-abel.vesa@linaro.org/
 
-diff --git a/drivers/crypto/ccp/platform-access.c b/drivers/crypto/ccp/platform-access.c
-index 1cc154a1c6ab..48f59ae91692 100644
---- a/drivers/crypto/ccp/platform-access.c
-+++ b/drivers/crypto/ccp/platform-access.c
-@@ -132,7 +132,7 @@ int psp_send_platform_access_msg(enum psp_platform_access_msg msg,
- }
- EXPORT_SYMBOL_GPL(psp_send_platform_access_msg);
- 
--int psp_ring_platform_doorbell(int msg)
-+int psp_ring_platform_doorbell(int msg, u32 *result)
- {
- 	struct psp_device *psp = psp_get_master_device();
- 	struct psp_platform_access_device *pa_dev;
-@@ -164,6 +164,8 @@ int psp_ring_platform_doorbell(int msg)
- 
- 	val = FIELD_GET(PSP_CMDRESP_STS, ioread32(cmd));
- 	if (val) {
-+		if (result)
-+			*result = val;
- 		ret = -EIO;
- 		goto unlock;
- 	}
-diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
-index 89df4549fada..1b661341d8f3 100644
---- a/include/linux/psp-platform-access.h
-+++ b/include/linux/psp-platform-access.h
-@@ -45,9 +45,9 @@ int psp_send_platform_access_msg(enum psp_platform_access_msg, struct psp_reques
-  *  -%EBUSY:     mailbox in recovery or in use
-  *  -%ENODEV:    driver not bound with PSP device
-  *  -%ETIMEDOUT: request timed out
-- *  -%EIO:       unknown error (see kernel log)
-+ *  -%EIO:       error will be stored in result argument
-  */
--int psp_ring_platform_doorbell(int msg);
-+int psp_ring_platform_doorbell(int msg, u32 *result);
- 
- /**
-  * psp_check_platform_access_status() - Checks whether platform features is ready
+Changes since v4:
+ * dropped the SDHCI dt-bindings patch as it will be added along
+   with the first use of qcom,ice property from an SDHCI DT node
+
+See each individual patch for changelogs.
+
+Abel Vesa (6):
+  dt-bindings: crypto: Add Qualcomm Inline Crypto Engine
+  dt-bindings: ufs: qcom: Add ICE phandle
+  soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver
+  scsi: ufs: ufs-qcom: Switch to the new ICE API
+  mmc: sdhci-msm: Switch to the new ICE API
+  arm64: dts: qcom: sm8550: Add the Inline Crypto Engine node
+
+ .../crypto/qcom,inline-crypto-engine.yaml     |  42 ++
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     |  19 +
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |  10 +
+ drivers/mmc/host/Kconfig                      |   2 +-
+ drivers/mmc/host/sdhci-msm.c                  | 220 +++--------
+ drivers/soc/qcom/Kconfig                      |   4 +
+ drivers/soc/qcom/Makefile                     |   1 +
+ drivers/soc/qcom/ice.c                        | 365 ++++++++++++++++++
+ drivers/ufs/host/Kconfig                      |   2 +-
+ drivers/ufs/host/Makefile                     |   4 +-
+ drivers/ufs/host/ufs-qcom-ice.c               | 244 ------------
+ drivers/ufs/host/ufs-qcom.c                   |  97 ++++-
+ drivers/ufs/host/ufs-qcom.h                   |  32 +-
+ include/soc/qcom/ice.h                        |  37 ++
+ 14 files changed, 626 insertions(+), 453 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+ create mode 100644 drivers/soc/qcom/ice.c
+ delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+ create mode 100644 include/soc/qcom/ice.h
+
 -- 
 2.34.1
 
