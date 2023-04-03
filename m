@@ -2,89 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3E2C7619A
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Apr 2023 15:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0E1C76196
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 04:19:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230437AbjDBPod (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Apr 2023 11:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44446 "EHLO
+        id S231241AbjDCETV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 00:19:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230283AbjDBPoc (ORCPT
+        with ESMTP id S229863AbjDCETV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Apr 2023 11:44:32 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DBE33592;
-        Sun,  2 Apr 2023 08:44:31 -0700 (PDT)
-Received: from zn.tnic (p5de8e687.dip0.t-ipconnect.de [93.232.230.135])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4DE171EC0464;
-        Sun,  2 Apr 2023 17:44:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1680450269;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=vQcaoKs/WxKbULaS5V6K0JDkCQY6Irgs3SFQbr71L4Q=;
-        b=iVMRLK+q6loLxDv3MSGsW2KkKCZ8v16oUEr8Gwh6NALthDikMK68MLvhysoI2hOq6BXseI
-        HsN35LZHkIa0xhz8KAFNx0dEYYg/uTFtYYRSQPm8Zq6KuwiTqmpwPw9w2SLNRmCO+38ti/
-        /q+/6JoOhm9IChvyQ5i/BZkLtRRiVMI=
-Date:   Sun, 2 Apr 2023 17:44:25 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Kalra, Ashish" <ashish.kalra@amd.com>,
-        linux-crypto@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
-Message-ID: <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
-References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
- <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
- <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
- <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
- <ecf005b1-ddb9-da4c-4526-28df4806426c@linux.microsoft.com>
- <20230323152342.GFZBxu/m3u6aFUDY/7@fat_crate.local>
- <105d019c-2249-5dfd-e032-95944ea6dc8c@linux.microsoft.com>
- <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
- <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
+        Mon, 3 Apr 2023 00:19:21 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A014F65AE;
+        Sun,  2 Apr 2023 21:19:18 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pjBej-00BbAq-2b; Mon, 03 Apr 2023 12:18:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 03 Apr 2023 12:18:57 +0800
+Date:   Mon, 3 Apr 2023 12:18:57 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Yangfl <mmyangfl@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] crypto: hisilicon/trng - add support for HiSTB TRNG
+Message-ID: <ZCpTsUf/8glcN1kS@gondor.apana.org.au>
+References: <20230331101943.831347-1-mmyangfl@gmail.com>
+ <ZCfmCmxobIKaBdT4@gondor.apana.org.au>
+ <CAAXyoMN+eVLNeiDtkwSZC2gFUDsBwn8SFST1=Nrw-qNr-u3-5w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
+In-Reply-To: <CAAXyoMN+eVLNeiDtkwSZC2gFUDsBwn8SFST1=Nrw-qNr-u3-5w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 24, 2023 at 06:10:09PM +0100, Jeremi Piotrowski wrote:
-> Since the AMD PSP is a privileged device, there is a desire to not have to trust the
-> ACPI stack,
+On Sat, Apr 01, 2023 at 10:05:25PM +0800, Yangfl wrote:
+>
+> Which meson driver? I didn't find any rng module under amlogic/ dir.
 
-And yet you do:
+drivers/char/hw_random/meson-rng.c 
 
-+	err = acpi_parse_aspt(&res[0], &pdata);
-+	if (err)
-+		return err;
-
-You don't trust the ACPI stack, and yet you're parsing an ACPI table?!?!
-You have to make up your mind here.
-
-Btw, you still haven't answered my question about doing:
-
-	devm_request_irq(dev, 9, ..)
-
-where 9 is the default ACPI interrupt.
-
-You can have some silly table tell you what to map or you can simply map
-IRQ 9 and be done with it. In this second case you can *really* not
-trust ACPI because you know which IRQ it is.
-
+Cheers,
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
