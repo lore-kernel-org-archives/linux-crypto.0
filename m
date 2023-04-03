@@ -2,197 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 478B8C76196
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 04:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 640BBC761A6
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 05:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjDCEsu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 00:48:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44952 "EHLO
+        id S231569AbjDCFgp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 01:36:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbjDCEst (ORCPT
+        with ESMTP id S231543AbjDCFgo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 00:48:49 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E52F8A4A
-        for <linux-crypto@vger.kernel.org>; Sun,  2 Apr 2023 21:48:47 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pjC7W-00BbZG-Ao; Mon, 03 Apr 2023 12:48:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 03 Apr 2023 12:48:42 +0800
-Date:   Mon, 3 Apr 2023 12:48:42 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: api - Move low-level functions into algapi.h
-Message-ID: <ZCpaqiwr5zC+lN+F@gondor.apana.org.au>
+        Mon, 3 Apr 2023 01:36:44 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463B1198B
+        for <linux-crypto@vger.kernel.org>; Sun,  2 Apr 2023 22:36:42 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id c29so36500246lfv.3
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2023 22:36:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1680500200;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zNisbyazzEuiDoc493Vd97NOzyQn4Z3XdTw9SUjbEVs=;
+        b=FKMn4FIKmR76VOUgJbP6Az952xGQ89BUZaCITbwcATVHFfCmKI50/fFP0aTiU12xYX
+         TlvL3BpFrG1DNVu7tESCh+WqKUXjFtQVDJSQZpiuWs6NxzLY3dtNH/hRfJbe7EjyAJh2
+         A2NAKH+2+v0QQgeNbY2miGvOYSQ36I1t5Wx82wtx6DhaHGYnwCZicqCm3tOqRG6Ph7tU
+         bFPfzYuiJnZPX1c9piXYoe6dbBWr/NJ3/4mJOnqWKmqxufvLYOpSwTo0lFuuHhXeCjfE
+         4xsS0KNngHWT9SNIAx+5CwI4d2onCCkFiVtgJE3HrDO0SSWQxWuqMrpKDN88fcHmwI3U
+         /UDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680500200;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zNisbyazzEuiDoc493Vd97NOzyQn4Z3XdTw9SUjbEVs=;
+        b=f6mmIZjHOmk0QPWvhs/mEVtmFc7154efVutD3rjoo6F2UUf3FoFdB9+nj6W2xdNjRN
+         WMDldCsacN3raiYWB8h44uHVOp8cQYITrEwRF42NhX75IBj5jIBHTCSwtyBeO3fVRlNH
+         RcYEjKX9g2rG428NEoComnskVh9TdbabMLcpml8CwbzEPAdAVgY1Ndpc3Uq8A2hRJk/I
+         CnbepO6lq4TgfOlBT0EpTVDBqkBL4G3E5qRvJ+4ezHfkpNvoUGpwtpdsjCoP7bsCCe+g
+         htb48w7hUKf/vtZ6dftZFZpDzLvU4pXV7F8TEAi6dW+oVFeYsWBxOnq+hD/h0X/aC+FZ
+         ld/A==
+X-Gm-Message-State: AAQBX9fAbql9Qjlt6dneVKKvf+qKK1rv634/2sSjLcrpftUsRI4WknUb
+        bEMo+tZrqzw4pyN/xJucv5WN6A==
+X-Google-Smtp-Source: AKy350bvhQIqIFG6nLBH4pVgxB/u6kZnVKvq8YYr6y6Rrl71vml3LsIIAr3DDcYH6vn+My/tNbY7qQ==
+X-Received: by 2002:ac2:5311:0:b0:4d2:c70a:fe0a with SMTP id c17-20020ac25311000000b004d2c70afe0amr2797282lfh.2.1680500200412;
+        Sun, 02 Apr 2023 22:36:40 -0700 (PDT)
+Received: from [10.8.0.2] (mleia.com. [178.79.152.223])
+        by smtp.gmail.com with ESMTPSA id z19-20020ac25df3000000b004eb274b3a43sm1593811lfq.134.2023.04.02.22.36.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 02 Apr 2023 22:36:39 -0700 (PDT)
+Message-ID: <21eaeea4-4f2e-5ce5-c75b-d74ded8e6e4c@linaro.org>
+Date:   Mon, 3 Apr 2023 08:36:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH v5 05/11] dt-bindings: qcom-qce: Fix compatible
+ combinations for SM8150 and IPQ4019 SoCs
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
+        robh+dt@kernel.org, konrad.dybcio@linaro.org, rfoss@kernel.org,
+        neil.armstrong@linaro.org
+References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
+ <20230402100509.1154220-6-bhupesh.sharma@linaro.org>
+Content-Language: en-US
+From:   Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+In-Reply-To: <20230402100509.1154220-6-bhupesh.sharma@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A number of low-level functions were exposed in crypto.h.  Move
-them into algapi.h (and internal.h).
+On 4/2/23 13:05, Bhupesh Sharma wrote:
+> Currently the compatible list available in 'qce' dt-bindings does not
+> support SM8150 and IPQ4019 SoCs directly which may lead to potential
+> 'dtbs_check' error(s).
+> 
+> Fix the same.
+> 
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>   Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> index e375bd981300..90ddf98a6df9 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+> @@ -24,6 +24,12 @@ properties:
+>           deprecated: true
+>           description: Kept only for ABI backward compatibility
+>   
+> +      - items:
+> +          - enum:
+> +              - qcom,ipq4019-qce
+> +              - qcom,sm8150-qce
+> +          - const: qcom,qce
+> +
+>         - items:
+>             - enum:
+>                 - qcom,ipq6018-qce
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Two commit tags given for v2 are missing.
 
- crypto/internal.h       |    2 ++
- crypto/tcrypt.c         |   11 +++++++----
- include/crypto/algapi.h |   14 ++++++++++++++
- include/linux/crypto.h  |   30 +++---------------------------
- 4 files changed, 26 insertions(+), 31 deletions(-)
-
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 932f0aafddc3..f84dfe6491e5 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -47,6 +47,8 @@ extern struct list_head crypto_alg_list;
- extern struct rw_semaphore crypto_alg_sem;
- extern struct blocking_notifier_head crypto_chain;
- 
-+int alg_test(const char *driver, const char *alg, u32 type, u32 mask);
-+
- #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
- static inline bool crypto_boot_test_finished(void)
- {
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 6521feec7756..202ca1a3105d 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -25,14 +25,17 @@
- #include <linux/err.h>
- #include <linux/fips.h>
- #include <linux/init.h>
--#include <linux/gfp.h>
-+#include <linux/interrupt.h>
-+#include <linux/jiffies.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
-+#include <linux/moduleparam.h>
- #include <linux/scatterlist.h>
-+#include <linux/slab.h>
- #include <linux/string.h>
--#include <linux/moduleparam.h>
--#include <linux/jiffies.h>
- #include <linux/timex.h>
--#include <linux/interrupt.h>
-+
-+#include "internal.h"
- #include "tcrypt.h"
- 
- /*
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index bbf8c43c3320..016d5a302b84 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -49,6 +49,7 @@ struct crypto_instance;
- struct module;
- struct notifier_block;
- struct rtattr;
-+struct scatterlist;
- struct seq_file;
- struct sk_buff;
- 
-@@ -132,6 +133,14 @@ struct crypto_attr_type {
- 	u32 mask;
- };
- 
-+/*
-+ * Algorithm registration interface.
-+ */
-+int crypto_register_alg(struct crypto_alg *alg);
-+void crypto_unregister_alg(struct crypto_alg *alg);
-+int crypto_register_algs(struct crypto_alg *algs, int count);
-+void crypto_unregister_algs(struct crypto_alg *algs, int count);
-+
- void crypto_mod_put(struct crypto_alg *alg);
- 
- int crypto_register_template(struct crypto_template *tmpl);
-@@ -263,4 +272,9 @@ static inline void crypto_request_complete(struct crypto_async_request *req,
- 	req->complete(req->data, err);
- }
- 
-+static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
-+{
-+	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
-+}
-+
- #endif	/* _CRYPTO_ALGAPI_H */
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index d57597ebef6e..fdfa3e8eda43 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -12,13 +12,10 @@
- #ifndef _LINUX_CRYPTO_H
- #define _LINUX_CRYPTO_H
- 
--#include <linux/atomic.h>
--#include <linux/kernel.h>
--#include <linux/list.h>
--#include <linux/bug.h>
-+#include <linux/completion.h>
- #include <linux/refcount.h>
- #include <linux/slab.h>
--#include <linux/completion.h>
-+#include <linux/types.h>
- 
- /*
-  * Algorithm masks and types.
-@@ -158,10 +155,9 @@
- 
- #define CRYPTO_MINALIGN_ATTR __attribute__ ((__aligned__(CRYPTO_MINALIGN)))
- 
--struct scatterlist;
--struct crypto_async_request;
- struct crypto_tfm;
- struct crypto_type;
-+struct module;
- 
- typedef void (*crypto_completion_t)(void *req, int err);
- 
-@@ -411,14 +407,6 @@ static inline void crypto_init_wait(struct crypto_wait *wait)
- 	init_completion(&wait->completion);
- }
- 
--/*
-- * Algorithm registration interface.
-- */
--int crypto_register_alg(struct crypto_alg *alg);
--void crypto_unregister_alg(struct crypto_alg *alg);
--int crypto_register_algs(struct crypto_alg *algs, int count);
--void crypto_unregister_algs(struct crypto_alg *algs, int count);
--
- /*
-  * Algorithm query interface.
-  */
-@@ -459,8 +447,6 @@ static inline void crypto_free_tfm(struct crypto_tfm *tfm)
- 	return crypto_destroy_tfm(tfm, tfm);
- }
- 
--int alg_test(const char *driver, const char *alg, u32 type, u32 mask);
--
- /*
-  * Transform helpers which query the underlying algorithm.
-  */
-@@ -474,16 +460,6 @@ static inline const char *crypto_tfm_alg_driver_name(struct crypto_tfm *tfm)
- 	return tfm->__crt_alg->cra_driver_name;
- }
- 
--static inline int crypto_tfm_alg_priority(struct crypto_tfm *tfm)
--{
--	return tfm->__crt_alg->cra_priority;
--}
--
--static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
--{
--	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
--}
--
- static inline unsigned int crypto_tfm_alg_blocksize(struct crypto_tfm *tfm)
- {
- 	return tfm->__crt_alg->cra_blocksize;
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--
+Best wishes,
+Vladimir
