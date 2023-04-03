@@ -2,107 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD13C761AF
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 06:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 325C6C761AF
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 06:20:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231452AbjDCGPb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 02:15:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59108 "EHLO
+        id S230484AbjDCGU4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 02:20:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231381AbjDCGPa (ORCPT
+        with ESMTP id S229698AbjDCGU4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 02:15:30 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D18A65BB
-        for <linux-crypto@vger.kernel.org>; Sun,  2 Apr 2023 23:15:28 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id h17so28036009wrt.8
-        for <linux-crypto@vger.kernel.org>; Sun, 02 Apr 2023 23:15:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680502526;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OYr1/KuS7kMHwn46ltI5HEmCt5k4aJgWKClGbWF133s=;
-        b=NTT03Lm8sZsH76eTG3jdAAaurDzfPUGB/iUpyvrJJCgS/iHAOeP0mrd1UJgq2TUEf4
-         PHikextz4mHfKRXGZ4176flEtQA/gWpe9qSMGNQywQtYGkfXzsQxACYuZL2EPyY1WuLH
-         zfgdDB7IP0Cq5JaR/05zHCo8WFZZANccGr8a3VV3/ATQhd2bPMp2PGSd3VuyW3TytX/9
-         SsoAXEjVr4cLrtTZfufguHJhwRPZxbI4dOyUo11D3Sp2U35r1NGH4GBoT5loZVl4ey+j
-         QwbzVdgsaj55u3lJQXWm+Nlm9GErX/1dT51kDE6G5ziC++k4jRAkazihgt5lJheHXYgP
-         H1Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680502526;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OYr1/KuS7kMHwn46ltI5HEmCt5k4aJgWKClGbWF133s=;
-        b=hWG+imrgS0xg1Ppnh6x2Cf5JA19pYlzzYTdSrHfVHdjB8pgPHwCixIArrosM6a0r6c
-         MBTblrJOW3z8wBH0Jd6yP/PznoZNhwQUCDKTrqnYtBm6iXTgppFUiczlIAeFklezAjnG
-         Hne7R2pvlQ1uY9QnFnKGwCh1uPCTm7w8KJ3mjCf47+ToAHxWnMvK9GxRPu17Siw+6voX
-         ZFmS4U/UAMv/fd3aq3eZS710WpUosKsBXKyrLlpg+uYN/t5NUwGf0kW3sh+yu9Ro7rje
-         ZbcwGCD8Q+HQWmosSF4Xzlb932y67sKGTrkWzgMrEugmgbmRQeEDNz3yOlCjmek2Pm9T
-         3CNA==
-X-Gm-Message-State: AAQBX9flnt/m5nenqJjPt8oTA7k7R6L5ZW9tjYXTCsELnN9kYwOB4YSS
-        YhQOVZSlxxCouhSN40hQSerJ3JdVENdHuZrLNkO+Ow==
-X-Google-Smtp-Source: AKy350acf1mfzrEPgp1c2mLaWyYaPeg8MW/g55MD0k5rk9VLpt+743GauRSVo2/m6TW4qS0GzGWVj+lSeid5yNUguIM=
-X-Received: by 2002:a05:6000:5c1:b0:2d7:9771:fc4b with SMTP id
- bh1-20020a05600005c100b002d79771fc4bmr4955083wrb.5.1680502526512; Sun, 02 Apr
- 2023 23:15:26 -0700 (PDT)
+        Mon, 3 Apr 2023 02:20:56 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977847695;
+        Sun,  2 Apr 2023 23:20:47 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1680502845;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i42bYRlR2kxtr0gbsfE9X6XNMmr22amRVlMTmSUpKYo=;
+        b=cEqd0YLaWwP/vnr5lIBv03l5pHM2JWrtJsop+GgvwoYVTyymV3kNlAmsZte5gu/34iaKte
+        6rXfOtMZj7Jos7sskbeViOFEujeDJWbnh3M0YsFhvDT4jMVwV9YJnElFzK3oDcAsW8D4gx
+        OlF/XPzYVXsKzPXeO8e7WJQIq+Rq+2vJVMzDKuikO8bkRsGxsu/7lMi8j/I1uD3KKOh6hs
+        90c8jb+p6V1NDuBd7TrwXmg03WSz48u/PkgXTUHnyKuzS3m0EQP5lRYfzhqieDC2nraQdU
+        etsJ6LUr4yQUdvF714lABNduwiffcUlOxlBokxI/Ofti/mwiO6/xIwnucemhRg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1680502845;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i42bYRlR2kxtr0gbsfE9X6XNMmr22amRVlMTmSUpKYo=;
+        b=RuAt71zBd1H4cTsCQ/ZvDpU8FcnCA3H19MrqzS7AYadaBjM0NZzjhazlHRTK7xQOYbg+XT
+        gShlLA/Ge7ObjpDg==
+To:     Borislav Petkov <bp@alien8.de>,
+        Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Kalra, Ashish" <ashish.kalra@amd.com>,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
+In-Reply-To: <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
+References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
+ <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
+ <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
+ <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
+ <ecf005b1-ddb9-da4c-4526-28df4806426c@linux.microsoft.com>
+ <20230323152342.GFZBxu/m3u6aFUDY/7@fat_crate.local>
+ <105d019c-2249-5dfd-e032-95944ea6dc8c@linux.microsoft.com>
+ <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
+ <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
+ <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
+Date:   Mon, 03 Apr 2023 08:20:44 +0200
+Message-ID: <877cutsczn.ffs@tglx>
 MIME-Version: 1.0
-References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
- <20230402100509.1154220-6-bhupesh.sharma@linaro.org> <21eaeea4-4f2e-5ce5-c75b-d74ded8e6e4c@linaro.org>
-In-Reply-To: <21eaeea4-4f2e-5ce5-c75b-d74ded8e6e4c@linaro.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Mon, 3 Apr 2023 11:45:05 +0530
-Message-ID: <CAH=2NtzKGxzmCq2JTajxWoeRFR+mPnFY3YF5mn0tGt30T7SJoQ@mail.gmail.com>
-Subject: Re: [PATCH v5 05/11] dt-bindings: qcom-qce: Fix compatible
- combinations for SM8150 and IPQ4019 SoCs
-To:     Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
-        robh+dt@kernel.org, konrad.dybcio@linaro.org, rfoss@kernel.org,
-        neil.armstrong@linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 3 Apr 2023 at 11:06, Vladimir Zapolskiy
-<vladimir.zapolskiy@linaro.org> wrote:
+On Sun, Apr 02 2023 at 17:44, Borislav Petkov wrote:
+> On Fri, Mar 24, 2023 at 06:10:09PM +0100, Jeremi Piotrowski wrote:
+>> Since the AMD PSP is a privileged device, there is a desire to not have to trust the
+>> ACPI stack,
 >
-> On 4/2/23 13:05, Bhupesh Sharma wrote:
-> > Currently the compatible list available in 'qce' dt-bindings does not
-> > support SM8150 and IPQ4019 SoCs directly which may lead to potential
-> > 'dtbs_check' error(s).
-> >
-> > Fix the same.
-> >
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > ---
-> >   Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 6 ++++++
-> >   1 file changed, 6 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > index e375bd981300..90ddf98a6df9 100644
-> > --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> > @@ -24,6 +24,12 @@ properties:
-> >           deprecated: true
-> >           description: Kept only for ABI backward compatibility
-> >
-> > +      - items:
-> > +          - enum:
-> > +              - qcom,ipq4019-qce
-> > +              - qcom,sm8150-qce
-> > +          - const: qcom,qce
-> > +
-> >         - items:
-> >             - enum:
-> >                 - qcom,ipq6018-qce
+> And yet you do:
 >
-> Two commit tags given for v2 are missing.
+> +	err = acpi_parse_aspt(&res[0], &pdata);
+> +	if (err)
+> +		return err;
+>
+> You don't trust the ACPI stack, and yet you're parsing an ACPI table?!?!
+> You have to make up your mind here.
+>
+> Btw, you still haven't answered my question about doing:
+>
+> 	devm_request_irq(dev, 9, ..)
+>
+> where 9 is the default ACPI interrupt.
+>
+> You can have some silly table tell you what to map or you can simply map
+> IRQ 9 and be done with it. In this second case you can *really* not
+> trust ACPI because you know which IRQ it is.
 
-Cannot get your comment. Please be more descriptive.
+The real problem here is that the information provided about the overall
+design and requirements is close to zero. All we heard so far is hand
+waving about not trusting PCI and ACPI.
+
+Jeremi, can you please describe exactly what the design and constraints
+are in understandable and coherent sentences?
 
 Thanks,
-Bhupesh
+
+        tglx
