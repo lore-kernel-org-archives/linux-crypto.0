@@ -2,185 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B209AC761A6
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 09:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF542C76196
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Apr 2023 10:48:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231713AbjDCJsZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Apr 2023 05:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
+        id S231744AbjDCKsd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Apr 2023 06:48:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232339AbjDCJsL (ORCPT
+        with ESMTP id S231310AbjDCKsc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Apr 2023 05:48:11 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0AFD65BB;
-        Mon,  3 Apr 2023 02:48:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mlNqvBfFr8nVWDXnwXXaATG13iLKOW0daZ8uWaUOwwhjuOfgJBaUUs0XjYymK1JRbiycAnD6vhmamLShQIlVS6iW3mhU0YZLpuzYqTh6PimDxJXblw7EoFVCInVfmGnW6cI6UFp0Oo9FHg6lyOf5FjxwKLsoY52Puy7MH1Y0NHXXSCp2FS6xCtmbyio1EmHaX88Hg1PPBDu+xJFGOybaxdOdJinEkBmQdKg6EF65LmOT3+fqmEHg7KnXk8cfUIjVqyyry4V9n2TdpaVfScTthmXtqQMamgBdtvgKbGHnReDk2uC5NQaniEPU/+DJuWEk8XJv632FSfq+k/2rmADthQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0RYgv8N+j3k7nxIQgJvlAaBBYeRpdcVwG6bECK54+4w=;
- b=GNpeqAfw1o/OQIiwX096CaN4x7MArhNCgnVneW50qvhsjjeZAC/ygNLp1OExTslkXTGvzauxGxhsbYX2YAq68mTDpjDI0/FuyleO4m2SxNaQxjOgBZAJFyQPl3aELBUylm9LIQ2DeOPx9f01ZwQWcur64oZ/W6Z0QDO2nrbqy1zw/fwJia3fUuKaJc0IfPK4OkBBrjjst0g5LK8AbbxQe2WyNASuXwyktv8U94McyDDS5t6QL2NP/4HT/pNfmsprqKev1/tXC7g6DbBRQA5qHES3cNg6fxwkkmT3Kvg68135RoyKou0HZ2rVCZcoFyfCD9UOXf2dmpDScGNQqORDdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0RYgv8N+j3k7nxIQgJvlAaBBYeRpdcVwG6bECK54+4w=;
- b=tk5Hrcq9yr115iue6UtJQ/j4Qo46BXBSxaX49bib4ij4inCzeDd97j/NJfluzKJPhe6TasdlPQir+00StuGXj/eBqoIkwJvXFDVEDjfMLlEETPBBqpO8UFF1FmJ8EAb0CnaiExoUN22/BN2dfpPzq0LONjpbfVwVO0HOZ/RUjqI=
-Received: from MN2PR12MB4607.namprd12.prod.outlook.com (2603:10b6:208:a1::18)
- by PH8PR12MB7278.namprd12.prod.outlook.com (2603:10b6:510:222::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.29; Mon, 3 Apr
- 2023 09:47:59 +0000
-Received: from MN2PR12MB4607.namprd12.prod.outlook.com
- ([fe80::68bb:3dc7:2fc2:fc00]) by MN2PR12MB4607.namprd12.prod.outlook.com
- ([fe80::68bb:3dc7:2fc2:fc00%3]) with mapi id 15.20.6254.033; Mon, 3 Apr 2023
- 09:47:58 +0000
-From:   "Harsha, Harsha" <harsha.harsha@amd.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "michals@xilinx.com" <michals@xilinx.com>,
-        "saratcha@xilinx.com" <saratcha@xilinx.com>,
-        "git (AMD-Xilinx)" <git@amd.com>,
-        "Shah, Dhaval (CPG-PSAV)" <dhaval.r.shah@amd.com>
-Subject: RE: [PATCH V2 3/4] crypto: xilinx: Add ZynqMP RSA driver
-Thread-Topic: [PATCH V2 3/4] crypto: xilinx: Add ZynqMP RSA driver
-Thread-Index: AQHZW7b6DfKLwgB1B02PBPlygQUroK8Up9+AgATDHaA=
-Date:   Mon, 3 Apr 2023 09:47:58 +0000
-Message-ID: <MN2PR12MB46070886A98A29851B65133BF3929@MN2PR12MB4607.namprd12.prod.outlook.com>
-References: <20230321053446.4303-1-harsha.harsha@amd.com>
- <20230321053446.4303-4-harsha.harsha@amd.com>
- <ZCah3f/Z8nzdHITy@gondor.apana.org.au>
-In-Reply-To: <ZCah3f/Z8nzdHITy@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN2PR12MB4607:EE_|PH8PR12MB7278:EE_
-x-ms-office365-filtering-correlation-id: 5dca1c10-14c8-46a4-7744-08db342881e5
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Cb2bePvBb+JH4PSNrFbwqg/P+7w9FeecbrU2xfWIuRDPCxlGASJHq7nU8GAbiw4fVo+su456zPGW+TKCj1YPJfiSCi0h5zJ5QsvhGe17vXWSllJhdyzATuUocJeFIXPBipWGiI5gaRa5f2XktC0osZHmPgiJ7bK7rm3qLq51tsVuujI1R3CLwJc2gh43Va1lM5hnCfICW48UhZ5ZorwbbjI6bgXHb1hDs7hRUQU2dHi/uiLCZqVYIMiiOhgPG5VAJFBaBd3ArU7WLE2V8k1mtRFQnbihgSt8mQA/Uwe8QItsfRPF83ZI2xbOaICqNxdNpkE0TpgSg90EYTM7LrjUKuGJczzw/4Q05fmzFsxsqfX9TMwEAhUEPzPBl49P1kWW8KByMnEY9ZMwgXB6YRKTXNQGeUJTbKUMj7EY4CoYGFx5jYkYg5kVQ7WaR3TnR+ce6i+Um9ULaGVU7YJIcjP7aaGcX4u7Uq14xtXUGM8wqOE4VN6TZtLH+VNu3LkX3EkB386coAoieDj9qWpZRciesD1l9CkJiDlcF6hmGXhAK7lzKtbgkjUGVTEqu0Y49bSmwoBC4afANANv2k1pQU8Wz3ey7fV+uQa6x2y9m+g8YbQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4607.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(376002)(136003)(366004)(451199021)(55016003)(41300700001)(8676002)(4326008)(66556008)(478600001)(66946007)(64756008)(66476007)(6916009)(76116006)(66446008)(316002)(8936002)(54906003)(122000001)(52536014)(5660300002)(38100700002)(186003)(53546011)(83380400001)(7696005)(966005)(71200400001)(9686003)(6506007)(26005)(86362001)(2906002)(33656002)(38070700005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?22fVYKBKzFEZJ3hHvZeZx8m091LoUBMSkkDC7PA+YdvP0mpEc2SMuok6dTYk?=
- =?us-ascii?Q?fVq5I7zDcEymMRinrtUrT21Kn4YLltmkhB7HaYoVwDKe1y91ECr3SVuWJ7pt?=
- =?us-ascii?Q?xnyb31evLCFR+kcvHHzjEp9RdovEQZZv/tmVX7k04a4rama8QuQjp7d+A8pf?=
- =?us-ascii?Q?vtxxn2ApW8Y/BTmy/CjiVQr6toRuqxwryWjTepETPMkVK7DU06AllTZUNQZF?=
- =?us-ascii?Q?AjTho1gLQUj1S52ccBPTle4Nt4Ifbr3z1YVpzruGwk5LYnL/eDzXrQco+t7j?=
- =?us-ascii?Q?2imOvVq9PxU7LZD0QpnSJIWc01rUkUJxz1T4EPz/85LnYoAQ3sbuC+2yiLaV?=
- =?us-ascii?Q?WxDA61xmUkBozgirQw22dFAbXP3ompCfVrS5i6nxGwKVdtGVUiPHtCyqI0Et?=
- =?us-ascii?Q?qDiQqVlVt4kvMdV8a9x6eMN6ZTxy3DOJPbTDxAxQhM7Y+1vfGcvvcigIl0By?=
- =?us-ascii?Q?aIzKfmLNbqDS6Kfk7UODUdjkEf9oEPNlZ/2rGF8/f+2erU9ag61qu4rgW49a?=
- =?us-ascii?Q?dDVITfeWgPoVvdXuQrSrizJ/pJtcaURWNbZ5Elw0dye7In4GhSAgozPw7+6C?=
- =?us-ascii?Q?Wp4whFLJAUeomJFpeMvJbYkjejchkkXFqLZCTBYQgqEd0iHxDH85XDtfOydJ?=
- =?us-ascii?Q?NYuut8f9IO/qLtA3qUzt3eldvCfCjxcqfrWnrUgXdEwZmR0h1LS9/6+TYt1n?=
- =?us-ascii?Q?Q3jvOQKH+PblpyAQCV9qukfXo6HS3esN6YZ4OpkXWA+MOFqXQcq9XzLN2h3q?=
- =?us-ascii?Q?aEgd84S3x8SWJ933k9WAk6BNerEPTY11Py3UZ62yCz+2C7kJBXn0fWle1u8R?=
- =?us-ascii?Q?sD17uRxcQVSxns5QjMyksyUVVNUK4dNLOkOJG9JWCrnKrxetj0y5AcDGbo7u?=
- =?us-ascii?Q?f3ZEPuGipE4ZP6wzjXIKwqkkXLjClqmwmY+erg6M6lw6BJPuvaY2m6gO1TMM?=
- =?us-ascii?Q?UNqUxjFPOuOkNWPoOweVRCVrpsRjBq726CwL0U/v5dB6zD+mSA+ngjjBae4R?=
- =?us-ascii?Q?ZrNT3AuzfEbipu8+DhGLOnCmvsl/I5cU/32mpNMQ8lyScgXIZTAuMycGTtyb?=
- =?us-ascii?Q?HEvCvcstzFifpsxsA7BKZakgGQvgyu23mchYOKruYcXwbsbeo6E1eNfnmGe8?=
- =?us-ascii?Q?0s2J1wRib3P9o0MqMU5ykcYaYNfsKA97AdjHTw9kKYi3P/JAKAfr2a06JRk9?=
- =?us-ascii?Q?4L9WFbuOsIs44o30bAKF08VTwbT6b+hZGO60z7P3XWjKqjcLNSRaeXKh6ZQ8?=
- =?us-ascii?Q?Vy3ONf2tVgYlmDuM9KT7BGtj3HRio56penUxQgsKW97U93gkuyqkWAZvCqmF?=
- =?us-ascii?Q?n48bjVOnx0VR2H+/ADeFonfRmFA38D9zDmNXD5T9XyjiCirgYZfTSz6SkDW4?=
- =?us-ascii?Q?W793epuYkyIlKP3kAk/4odcaEFrUtSZSV6dMj21V2XQrjnX9ogBzjvi1Jxrf?=
- =?us-ascii?Q?XMZLq2QiaS74BRr5CXBRRO52mYsnh7Za+ZEL2WX6CfdYIAAfKpd7uKG2RSAH?=
- =?us-ascii?Q?qeV/jq4ViNWeoJG/6vQARvJN7oGoAAYeuXSurr60HIwBt47GXYBZpJvAIOpD?=
- =?us-ascii?Q?6jvxAPi4yffVbWH9mRk=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 3 Apr 2023 06:48:32 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D889C7ED8
+        for <linux-crypto@vger.kernel.org>; Mon,  3 Apr 2023 03:48:30 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id a11so29851172lji.6
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Apr 2023 03:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1680518909;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4n9yhzm1Rmk8D25FTiH0wOJ+GO4nCT0aVo2ehKd/0bI=;
+        b=c0uJzu1LiPBut0N7W8zNzlAV9wmMrZZZpbLe/3ycBlOFIuMn0P5nX3QLN31VNxOVps
+         ppMd6IWf3/FQ99ALwIPjufG53hlW0NOaO9kfCdzuagDp3o5/4+wANyp0vWasLbujmCmA
+         PUvisxJBeLuctt5Y/FnhZ1VbuudXDFYUEwRKj0D1wkz/T09+BkHogFOcvQ7ErrrcDrY2
+         v4SjUKlP9XTkcXhdPM1OlC6kXUqiP4jNSbb+TP4rZOeqN9z12ks8VP3Wa80F83Hbe3zC
+         cTXQhrN5dRWJ7ox445WJftUWLlFDLHPraL+HlIrf9bVUvCGKNGbsMqUOPa6fhkHCjLSM
+         f3uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680518909;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4n9yhzm1Rmk8D25FTiH0wOJ+GO4nCT0aVo2ehKd/0bI=;
+        b=4IjP3YqontMkoM1Df/gaZbwDwGncdQaSGDobCc9DuMYh8Iojif++aUMI0ACXq7920O
+         7uWumMA4jjTnkVrK/0yBmTG7kWFNI3GQmrpFOz0BiY8K2sbrJkhe1NqxiIfit3+Uggsl
+         P7kUAETPRHMG9hGfIG8ezqL4naZPLRr8Nprf171roub4dcL86MjmsggBSHVG3O9LRv7+
+         TelVSaqpI0sd6AT48f6gE+y+zxsK7yetB+pzoNrwcELqcVrQ6C77goqMf496BqKcfAZi
+         z0aecD6liOY6DAFg+/AF6SM5zhiYVXbrxVs8PNZ98qdzVjJXiNgzWBjSGw3hLg8YrR61
+         X7Wg==
+X-Gm-Message-State: AAQBX9clZtOCZskZzQg8EBACmCkh6/Y0UWJOvjlyFLJamLNeeTQmT19F
+        GsaWNi0C6zHghxEc3gIrAZbbqA==
+X-Google-Smtp-Source: AKy350b9py/sij6PkWPceiL0IU5yAJ5hg6zA+et/1jOZ9VZhnEZINtiQQwxVTa7ptGeT1rQVEva9GQ==
+X-Received: by 2002:a2e:b043:0:b0:295:c491:3b16 with SMTP id d3-20020a2eb043000000b00295c4913b16mr4737035ljl.7.1680518909142;
+        Mon, 03 Apr 2023 03:48:29 -0700 (PDT)
+Received: from [192.168.1.101] (abxj135.neoplus.adsl.tpnet.pl. [83.9.3.135])
+        by smtp.gmail.com with ESMTPSA id g25-20020a2e9cd9000000b00298a8527806sm1688302ljj.93.2023.04.03.03.48.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Apr 2023 03:48:28 -0700 (PDT)
+Message-ID: <463a9885-741e-a44a-c6c2-7cf5b0560d2d@linaro.org>
+Date:   Mon, 3 Apr 2023 12:48:27 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4607.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5dca1c10-14c8-46a4-7744-08db342881e5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2023 09:47:58.5341
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QatCGiyTlEW4lY/LQE8eOt0hTEWd5/q3oYk3V1wvzu574GTpAT8EBpc6vC7Zk1tL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7278
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v5 05/11] dt-bindings: qcom-qce: Fix compatible
+ combinations for SM8150 and IPQ4019 SoCs
+Content-Language: en-US
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
+        robh+dt@kernel.org, rfoss@kernel.org, neil.armstrong@linaro.org
+References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
+ <20230402100509.1154220-6-bhupesh.sharma@linaro.org>
+ <21eaeea4-4f2e-5ce5-c75b-d74ded8e6e4c@linaro.org>
+ <CAH=2NtzKGxzmCq2JTajxWoeRFR+mPnFY3YF5mn0tGt30T7SJoQ@mail.gmail.com>
+From:   Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <CAH=2NtzKGxzmCq2JTajxWoeRFR+mPnFY3YF5mn0tGt30T7SJoQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
 
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Friday, March 31, 2023 2:33 PM
-> To: Harsha, Harsha <harsha.harsha@amd.com>
-> Cc: davem@davemloft.net; linux-crypto@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
-> michals@xilinx.com; saratcha@xilinx.com; git (AMD-Xilinx) <git@amd.com>;
-> Shah, Dhaval (CPG-PSAV) <dhaval.r.shah@amd.com>
-> Subject: Re: [PATCH V2 3/4] crypto: xilinx: Add ZynqMP RSA driver
->=20
-> On Tue, Mar 21, 2023 at 11:04:45AM +0530, Harsha Harsha wrote:
-> >
-> > +static inline int xilinx_copy_and_save_keypart(u8 **kpbuf, unsigned in=
-t
-> *kplen,
-> > +					       const u8 *buf, size_t sz) {
-> > +	int nskip;
-> > +
-> > +	for (nskip =3D 0; nskip < sz; nskip++)
-> > +		if (buf[nskip])
-> > +			break;
-> > +
-> > +	*kplen =3D sz - nskip;
-> > +	*kpbuf =3D kmemdup(buf + nskip, *kplen, GFP_KERNEL);
-> > +	if (!*kpbuf)
-> > +		return -ENOMEM;
-> > +
-> > +	return 0;
-> > +}
->=20
-> ...
->=20
-> > +static int xilinx_rsa_setkey(struct crypto_akcipher *tfm, const void *=
-key,
-> > +			     unsigned int keylen, bool private) {
-> > +	struct xilinx_rsa_tfm_ctx *tctx =3D akcipher_tfm_ctx(tfm);
-> > +	struct rsa_key raw_key;
-> > +	int ret;
-> > +
-> > +	if (private)
-> > +		ret =3D rsa_parse_priv_key(&raw_key, key, keylen);
-> > +	else
-> > +		ret =3D rsa_parse_pub_key(&raw_key, key, keylen);
-> > +	if (ret)
-> > +		goto n_key;
-> > +
-> > +	ret =3D xilinx_copy_and_save_keypart(&tctx->n_buf, &tctx->n_len,
-> > +					   raw_key.n, raw_key.n_sz);
->=20
-> What happens when you call setkey twice? Wouldn't this leak memory?
+On 3.04.2023 08:15, Bhupesh Sharma wrote:
+> On Mon, 3 Apr 2023 at 11:06, Vladimir Zapolskiy
+> <vladimir.zapolskiy@linaro.org> wrote:
+>>
+>> On 4/2/23 13:05, Bhupesh Sharma wrote:
+>>> Currently the compatible list available in 'qce' dt-bindings does not
+>>> support SM8150 and IPQ4019 SoCs directly which may lead to potential
+>>> 'dtbs_check' error(s).
+>>>
+>>> Fix the same.
+>>>
+>>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>>> ---
+>>>   Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 6 ++++++
+>>>   1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>>> index e375bd981300..90ddf98a6df9 100644
+>>> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>>> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+>>> @@ -24,6 +24,12 @@ properties:
+>>>           deprecated: true
+>>>           description: Kept only for ABI backward compatibility
+>>>
+>>> +      - items:
+>>> +          - enum:
+>>> +              - qcom,ipq4019-qce
+>>> +              - qcom,sm8150-qce
+>>> +          - const: qcom,qce
+>>> +
+>>>         - items:
+>>>             - enum:
+>>>                 - qcom,ipq6018-qce
+>>
+>> Two commit tags given for v2 are missing.
+> 
+> Cannot get your comment. Please be more descriptive.
 
-Thanks for the review. I will check the behavior and get back to you.
+https://lore.kernel.org/linux-arm-msm/333081a2-6b31-3fca-1a95-4273b5a46fb7@linaro.org/
 
-Regards,
-Harsha
-
->=20
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Konrad
+> 
+> Thanks,
+> Bhupesh
