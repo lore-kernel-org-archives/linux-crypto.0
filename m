@@ -2,62 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8092FC761AF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Apr 2023 10:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54092C77B6C
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Apr 2023 10:42:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234445AbjDDKM0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Apr 2023 06:12:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42670 "EHLO
+        id S234480AbjDDKmI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Apr 2023 06:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234402AbjDDKMU (ORCPT
+        with ESMTP id S234440AbjDDKmH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2023 06:12:20 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1359930E6
-        for <linux-crypto@vger.kernel.org>; Tue,  4 Apr 2023 03:12:10 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id t10so128226323edd.12
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Apr 2023 03:12:10 -0700 (PDT)
+        Tue, 4 Apr 2023 06:42:07 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E3F7171D
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Apr 2023 03:42:01 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id e18so32274499wra.9
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Apr 2023 03:42:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680603128;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xTheVrrzZgI2UatHNgx/iTW24+oxWTi/GNFmjmsvjoQ=;
-        b=ao+ZBWMwwB/pLABUItwEupGXl8poQ6XMbDDiXZ0A7majfEF3uLeXu7lGivbuFdu9IK
-         1oMth/fUFT6Ky5hxR6rlbYWGlefSkRJ8bZevmF2xdkO4G86CP9On0eqSVAFE2mg2qF6N
-         oqxywNkgi9sS8by7ChDgBpS2u/8XeFV04cIGjhSRzAjGFWqtXf3/jVHUgQT8gD7IdMPB
-         OzfqH4qdG/b83IJEzNqEyKM8SKNcfXwxwEiTm704wcvZJAL+a/ai1M2MYjDDly39ulrW
-         mq0pTt2VDD6PJjrJ5Ct15h39hHw7NdlgJ006gZphGbRbuNFbWz6les2sAWXHUsYDQnoL
-         VPrQ==
+        d=linaro.org; s=google; t=1680604920;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kMMkkwa1DeBjuIxqtolsFfNBw/JbCSfKSLU5AIzSffM=;
+        b=TQwvDVU3vO5kpLXTSCPdY1bue1XUsBgljwBUxgP1u61LURfmaxlwu8FGMRiCcOX2ei
+         T2ZtRYyq7mvITHzni6P7Og77oa92as3SdzsoN1//oQALYYNrNvHPMuqY2ROOEMRH/UAV
+         f8pWztspMH7NDFIBRCz+sncxvYKO/04iwxhunvALSTMfDwv3M5adgku52j3Jvm2OZ6ee
+         4/hNiZMkWtZkr1Gk/DCE4sPqbHeBnxEnFQVuU9ZQ+W1/Xcp3oiTXUAUI4IM8/0fpM2jL
+         Zkpu7dbmvCdDH+93QmlaW+KJL2x3eqcCgUPLxgY/9WhCC9Il5ecbz1f7IMKFo79E3vfq
+         N6Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680603128;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xTheVrrzZgI2UatHNgx/iTW24+oxWTi/GNFmjmsvjoQ=;
-        b=eDVr6Co4Gp7ykhzs9C7uVe+V0/TGbETLh9X/HxkiW1Fzugp5xpUdjTjGZIN2Z7W20Z
-         X8tb0BGua5rMZLlAxOcuYTVodYnYsIykJ1JY4g/eiBJB3aT2RkvjMu6vfRQubkFDm9B1
-         jwBG4KkqFsD86rKfy0PgPXSErKmyYWnArXKOz7H+G1a8ZdVNTHM2WYtSoydgnMZBhhtd
-         05prc5mI7kSie4rPmc4DbFzaGaMH2nt25ea6IxKlV+81NTBy/41L+iSHvKvS1l476Cjj
-         zuQPGGG+QJ1jSYhl7PbvVoV2AgWDVHsEk5T69RSCk1CQBGu7wQWsqJZtwmpCiEjmh7E1
-         5bxQ==
-X-Gm-Message-State: AAQBX9dNZ5a/oUhGFxaw3OGbLJBb4ZrzP1uDB8rZBuTzskheImE1EK1F
-        bIdXKJo7dcQMhFNxd+1nl4b8Qg==
-X-Google-Smtp-Source: AKy350bDKkBioiP7BMZu/6m8PZU3hw/V+yKQqTf4KCF46eRor84VbeJ0prTRJhc1ldSMylybV2yl/g==
-X-Received: by 2002:a05:6402:2788:b0:500:2cc6:36d5 with SMTP id b8-20020a056402278800b005002cc636d5mr21154431ede.8.1680603128556;
-        Tue, 04 Apr 2023 03:12:08 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:99ed:4575:6001:8bda? ([2a02:810d:15c0:828:99ed:4575:6001:8bda])
-        by smtp.gmail.com with ESMTPSA id z21-20020a056402275500b00501d73cfc86sm5647456edd.9.2023.04.04.03.12.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 03:12:08 -0700 (PDT)
-Message-ID: <c816d432-26b8-2655-adf1-4b72b8645215@linaro.org>
-Date:   Tue, 4 Apr 2023 12:12:06 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v5 2/6] dt-bindings: ufs: qcom: Add ICE phandle
-Content-Language: en-US
-To:     Abel Vesa <abel.vesa@linaro.org>
+        d=1e100.net; s=20210112; t=1680604920;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kMMkkwa1DeBjuIxqtolsFfNBw/JbCSfKSLU5AIzSffM=;
+        b=qbVgOvaqRnpKzawzvK0NY6dzKDe/XJjTp0ntDYIF8X6/x5pWQJWe5u+0opipgLF++b
+         dw7BzBLe7GJwTnZAuATH/f1H6drOvCvJP/yGpF45o8bMIkFXHUCi3/l+nl8T0YIb41FP
+         /vV74LrMMbnR+IYbsBgtvEl/5v2Yibz/MVr+yoaOLQ3aJoLyfcIl9e0e8dsx1pvkdHR1
+         kPEzUSEq7xnm0JusjAZYcszgfhKQXzC4SHj0pnXOFVkEcv3AGpog+ZPUpQNqOP8SEdTN
+         9DlVHiLq2Z7XH22HjDbYc27pz9Oejqo2aeA4KJxJ7IM3eow837SYN4nI0A3wL72znEnl
+         atsg==
+X-Gm-Message-State: AAQBX9drUJTVGCQR7Zq+ki0sUq5Q2cOCX9Iaq6DqW0+5B08mYpnHg1F+
+        tP7nIvvEsSNoJWI3aLuYH+9KjA==
+X-Google-Smtp-Source: AKy350andMQlc/NSkoD1itFkTq9FAROBUT7E0DWG3ebDLDs5tZZH76/uH88kkbI44lS/ZaGqyyrRpA==
+X-Received: by 2002:a5d:6e42:0:b0:2d6:a357:f133 with SMTP id j2-20020a5d6e42000000b002d6a357f133mr1132544wrz.44.1680604919960;
+        Tue, 04 Apr 2023 03:41:59 -0700 (PDT)
+Received: from linaro.org ([94.52.112.99])
+        by smtp.gmail.com with ESMTPSA id v8-20020a05600c470800b003ef71d7d64asm22334917wmo.6.2023.04.04.03.41.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 03:41:59 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 13:41:57 +0300
+From:   Abel Vesa <abel.vesa@linaro.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -78,54 +72,68 @@ Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v5 2/6] dt-bindings: ufs: qcom: Add ICE phandle
+Message-ID: <ZCv+9WjlkA4n9Dwg@linaro.org>
 References: <20230403200530.2103099-1-abel.vesa@linaro.org>
  <20230403200530.2103099-3-abel.vesa@linaro.org>
  <9fc90c8b-9234-84fa-7dab-fee9de2b9813@linaro.org>
  <ZCvm3fzSh8owVDdc@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <ZCvm3fzSh8owVDdc@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <c816d432-26b8-2655-adf1-4b72b8645215@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c816d432-26b8-2655-adf1-4b72b8645215@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 04/04/2023 10:59, Abel Vesa wrote:
-> On 23-04-04 07:41:55, Krzysztof Kozlowski wrote:
->> On 03/04/2023 22:05, Abel Vesa wrote:
->>> Starting with SM8550, the ICE will have its own devicetree node
->>> so add the qcom,ice property to reference it.
->>>
->>> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
->>> ---
->>>
->>> The v4 is here:
->>> https://lore.kernel.org/all/20230327134734.3256974-4-abel.vesa@linaro.org/
->>>
->>> Changes since v4:
->>>  * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
->>>    it while making sure none of the other platforms are allowed to use it
->>
->> Why?
+On 23-04-04 12:12:06, Krzysztof Kozlowski wrote:
+> On 04/04/2023 10:59, Abel Vesa wrote:
+> > On 23-04-04 07:41:55, Krzysztof Kozlowski wrote:
+> >> On 03/04/2023 22:05, Abel Vesa wrote:
+> >>> Starting with SM8550, the ICE will have its own devicetree node
+> >>> so add the qcom,ice property to reference it.
+> >>>
+> >>> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> >>> ---
+> >>>
+> >>> The v4 is here:
+> >>> https://lore.kernel.org/all/20230327134734.3256974-4-abel.vesa@linaro.org/
+> >>>
+> >>> Changes since v4:
+> >>>  * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
+> >>>    it while making sure none of the other platforms are allowed to use it
+> >>
+> >> Why?
+> > 
+> > SM8550 will be the first platform to use the new DT bindings w.r.t ICE.
 > 
-> SM8550 will be the first platform to use the new DT bindings w.r.t ICE.
+> This I understand, but why other platforms cannot use it?
 
-This I understand, but why other platforms cannot use it?
+The platforms that do not have ICE support yet will be added in the same
+subschema along with SM8550 when the ICE DT node will be added in their
+dtsi.
 
 > 
->>
->> Also, this does not solve my previous question still.
+> > 
+> >>
+> >> Also, this does not solve my previous question still.
+> > 
+> > Well, the clocks are not added for the a few platforms (which include
+> > SM8550). Same for 'ice' reg range.. So the only thing left is to
+> > enforce the qcom,ice property availability only for SM8550. I believe
+> > it solves the mutual exclusiveness of the "ice" reg range along with the
+> > clocks versus the qcom,ice property, by enforcing at compatible level.
 > 
-> Well, the clocks are not added for the a few platforms (which include
-> SM8550). Same for 'ice' reg range.. So the only thing left is to
-> enforce the qcom,ice property availability only for SM8550. I believe
-> it solves the mutual exclusiveness of the "ice" reg range along with the
-> clocks versus the qcom,ice property, by enforcing at compatible level.
+> Ah, I think I understand. That would work except I don't understand why
+> enforcing qcom,qce only for specific, new SoCs. Assuming it is a correct
+> hardware representation, we want it for everyone, don't we?
 
-Ah, I think I understand. That would work except I don't understand why
-enforcing qcom,qce only for specific, new SoCs. Assuming it is a correct
-hardware representation, we want it for everyone, don't we?
+Yes, but they will be added to the subschema (qcom,ice one) when their
+their ICE support (ICE DT) will be added. This way, we keep the bindings
+check without failures (for now).
 
-Best regards,
-Krzysztof
-
+> 
+> Best regards,
+> Krzysztof
+> 
