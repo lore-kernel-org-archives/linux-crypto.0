@@ -2,83 +2,241 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27512C761AF
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Apr 2023 13:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE15C761A6
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Apr 2023 14:41:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235281AbjDDNls (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Apr 2023 09:41:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58832 "EHLO
+        id S230293AbjDDOk7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Apr 2023 10:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235174AbjDDNli (ORCPT
+        with ESMTP id S229866AbjDDOk5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2023 09:41:38 -0400
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B8D468E;
-        Tue,  4 Apr 2023 06:41:32 -0700 (PDT)
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-17aa62d0a4aso34564106fac.4;
-        Tue, 04 Apr 2023 06:41:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680615684;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        Tue, 4 Apr 2023 10:40:57 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803443AB5;
+        Tue,  4 Apr 2023 07:40:53 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2a5f619b4e2so760481fa.0;
+        Tue, 04 Apr 2023 07:40:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680619252;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3I6cThnoomrgNOtBCTblrlL1is2L6H9KiAc6aOP6ctc=;
-        b=xVqeStmZjPHwAEwZCaIKGogun0lfGY4J48d04yaJHsL1Yt2uHUfqvJ5Hk2fsyVYUW3
-         p+AXyRL3cxA/wzIUa5faBAXmTeFRHNxwJ5Jnqlg4P6q4WcsbfaED04sYVBnFrv7pS2ZJ
-         fVqFCPTXemsxGofpUm3nKMQC5rxNRKw/Ji7GX6dWav1MMD3gpjjmjoBX0Nxh8eAR596u
-         ZxZxWmcUAPtyt6ykvAFDsAAQHbE5Hp8FU6/bIdP7BqrdGrP6BjJEP4E46nv846mQZdQP
-         NqlanCv2+sJjej1szpuK/FH172R1G0gxxUAjAlz/M3IwuMC428HUzRpq6RQoxx9WPrDi
-         8YJw==
-X-Gm-Message-State: AAQBX9fvWEGs+Rtmf7zEMqdxYDpsABHzsJXz7UIX9TlGFLDnLO3Ce3R9
-        GNN4eSFO1oPxbtyqQeY45A==
-X-Google-Smtp-Source: AKy350bKGsx+/Tt/VIIG128S9NPudARV02KnL1yfh2vnqwtnyPDoIkASjDjLF9wtWnumEJBdxTf7Ew==
-X-Received: by 2002:a05:6870:309:b0:177:9040:d236 with SMTP id m9-20020a056870030900b001779040d236mr1371463oaf.28.1680615683906;
-        Tue, 04 Apr 2023 06:41:23 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id j19-20020a9d7f13000000b006a13dd5c8a2sm5554659otq.5.2023.04.04.06.41.23
+        bh=8jMFTqZ3iX4TYtwGxvCBQk3Ib7hvU7vvi0bgFu56EK0=;
+        b=AqFcW0+z2nqWIvV59SVfS9ovPz0wpK2NVEr/92uv+2oNKtQqs0gM/H2+VYxlIo6YCr
+         eD55r5NM39gud2Bz0x2CVKXX13ykMnkdqi+WwOXPr/tfqFyAbPK525CHZAJIHrXY53Ia
+         fmt6XU4HZiphjGhVWXAO88HzQSDHCJwiWkb1bKbJUt3aalNhPv6t5mnKFv4YP/ovYrSO
+         hP/i6xLR0H0NikKmLnUvedmvf+aRZKUcPUYzcaGhE6RkmsNzBNUaaYgQuXurUewfKcDj
+         /blybMBPkXprc32WMhNsW+JdCZEkNHKFGzrqwx0XQsdCsK5KLMiiqnFlmSi21btzyxfu
+         ddXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680619252;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8jMFTqZ3iX4TYtwGxvCBQk3Ib7hvU7vvi0bgFu56EK0=;
+        b=Th9YS3j9uJdSMf8fHrKMWxDn9oO/4qYZignQPSo09xd/fJP11Q7B0lKAEJDP2W4rTF
+         Wz7IEZPE//r8Oe7Qg679ZWMCqKyBWuVCu/GnLXRHwYydTKMn/kAXcoCdM7pDewgaciPp
+         /q8rfwZSzh/UOXWIn8+UskB2xVTxsdbdQNvlLcjQZYMeFs9tSDrUiyfNfx9j68ejjwNp
+         v1wHzdsfN1FTh27/rPDlxoRJy+W5qtn0Rj1WlBCDhNSuTKak9Tm+poHdMlk3IFg0Y2y4
+         nLEhFS5zRiha7vuKeOtoRuUtrDtfdlr12qZyKkki/x7bWzGX6G/v05gDpiumPJr9RcV2
+         0FIA==
+X-Gm-Message-State: AAQBX9c3YEMqFpv5gfniDZrgAvHTd06ktOkGrK/rWQ7/1dVdEaQfcro2
+        BLH1fjRc5EwAleLMqM2covs=
+X-Google-Smtp-Source: AKy350b1m3A3BFbhnjEWAZBZaO+cl87OMMz86TJAKmwKy4zTQ86+WUTaHK3S2APiVUkq35oqpY+1rQ==
+X-Received: by 2002:a2e:bd84:0:b0:2a6:1dbf:5d3e with SMTP id o4-20020a2ebd84000000b002a61dbf5d3emr1026319ljq.0.1680619251465;
+        Tue, 04 Apr 2023 07:40:51 -0700 (PDT)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id a7-20020a05651c010700b0029c13f4d519sm2369013ljb.119.2023.04.04.07.40.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Apr 2023 06:41:23 -0700 (PDT)
-Received: (nullmailer pid 3782488 invoked by uid 1000);
-        Tue, 04 Apr 2023 13:41:22 -0000
-Date:   Tue, 4 Apr 2023 08:41:22 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     rfoss@kernel.org, andersson@kernel.org, agross@kernel.org,
-        linux-crypto@vger.kernel.org, konrad.dybcio@linaro.org,
-        vladimir.zapolskiy@linaro.org, bhupesh.linux@gmail.com,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
-        neil.armstrong@linaro.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/11] dt-bindings: dma: Add support for SM6115 and
- QCM2290 SoCs
-Message-ID: <168061568226.3782433.11290866098182220844.robh@kernel.org>
-References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
- <20230402100509.1154220-2-bhupesh.sharma@linaro.org>
+        Tue, 04 Apr 2023 07:40:51 -0700 (PDT)
+Date:   Tue, 4 Apr 2023 17:40:48 +0300
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH RFC v8 04/56] KVM: Add HVA range operator
+Message-ID: <20230404174048.00005ef9.zhi.wang.linux@gmail.com>
+In-Reply-To: <20230327003444.lqfrididd4gavomb@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+        <20230220183847.59159-5-michael.roth@amd.com>
+        <20230220233709.00006dfc@gmail.com>
+        <20230327003444.lqfrididd4gavomb@amd.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230402100509.1154220-2-bhupesh.sharma@linaro.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sun, 26 Mar 2023 19:34:44 -0500
+Michael Roth <michael.roth@amd.com> wrote:
 
-On Sun, 02 Apr 2023 15:34:59 +0530, Bhupesh Sharma wrote:
-> Add new compatible for BAM DMA engine version v1.7.4 which is
-> found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
-> to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
-> accordingly.
+> On Mon, Feb 20, 2023 at 11:37:09PM +0200, Zhi Wang wrote:
+> > On Mon, 20 Feb 2023 12:37:55 -0600
+> > Michael Roth <michael.roth@amd.com> wrote:
+> > 
+> > > From: Vishal Annapurve <vannapurve@google.com>
+> > > 
+> > > Introduce HVA range operator so that other KVM subsystems
+> > > can operate on HVA range.
+> > > 
+> > > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> > > [mdr: minor checkpatch alignment fixups]
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >  include/linux/kvm_host.h |  6 +++++
+> > >  virt/kvm/kvm_main.c      | 48 ++++++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 54 insertions(+)
+> > > 
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index 4d542060cd93..c615650ed256 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -1402,6 +1402,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
+> > >  void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+> > >  void kvm_mmu_invalidate_end(struct kvm *kvm);
+> > >  
+> > > +typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
+> > > +				struct kvm_gfn_range *range, void *data);
+> > > +
+> > > +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
+> > > +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
+> > > +
+> > >  long kvm_arch_dev_ioctl(struct file *filp,
+> > >  			unsigned int ioctl, unsigned long arg);
+> > >  long kvm_arch_vcpu_ioctl(struct file *filp,
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index f7e00593cc5d..4ccd655dd5af 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -642,6 +642,54 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+> > >  	return (int)ret;
+> > >  }
+> > >  
+> > 
+> > Below function seems a reduced duplicate of __kvm_handle_hva_range()
+> > in virt/kvm/kvm_main.c. It would be nice to factor __kvm_handle_hva_range().
 > 
-> While at it, also update qcom,bam-dma bindings to add comments
-> which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
-> This provides an easy reference for identifying the actual BAM DMA
-> version available on Qualcomm SoCs.
+> A few differences make it difficult to refactor this clearly:
 > 
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->  .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+>   - This handler is mainly used for loading initial contents into guest
+>     image before booting and doesn't rely on the MMU lock being held. It
+>     also *can't* be called with MMU lock held because it suffers from the
+>     same issue with mem_attr_update() hook where it needs to take a
+>     mutex as part of unmapping from directmap when transitioning page to
+>     private state in RMP table
+>   - This handler wants to return an error code, as opposed to existing
+>     handlers which return a true/false values which are passed along to
+>     MMU notifier call-site and handled differently.
+>   - This handler wants to terminate iterating through memslots as soon
+>     as it encounters the first failure, whereas the existing handlers
+>     expect to be called for each slot regardless of return value.
+> 
+> So it's a pretty different use-case that adds enough complexity to
+> __kvm_handle_hva_range() that it might need be worth refactoring it,
+> since it complicates some bits that are closely tied to dealing with
+> invalidations where the extra complexity probably needs to be
+> well-warranted.
+> 
+> I took a stab at it here for reference, but even with what seems to be
+> the minimal set of changes it doesn't save on any code and ultimately I
+> think it makes it harder to make sense of what going on:
+> 
+>   https://github.com/mdroth/linux/commit/976c5fb708f7babe899fd80e27e19f8ba3f6818d
+> 
+> Is there a better approach?
 > 
 
-Acked-by: Rob Herring <robh@kernel.org>
+Those requirements looks pretty suitable for kvm_handle_hva_range(). Guess
+we just need to extend the iterator a little bit.
+
+My ideas:
+
+1) Add a lock flag in struct kvm_hva_range to indicate if kvm_lock is required
+or not during the iteration. Check the flag with if (!locked && hva_range.need_lock). Then the unlock part can be left un-touched.
+
+2) Add an error code in struct kvm_gfn_range, the handler can set it so that __kvm_handle_hva_range() can check gfn_range.err after ret|= handler(xxx);
+If the err is set, bail out.
+
+3) Return the gfn_range.err to the caller. The caller can decide how to convert
+it (to boolean or keep it)
+
+4) Set hva_range.need_lock in the existing and the new caller.
+
+How about this?
+
+> Thanks,
+> 
+> -Mike
+> 
+> > 
+> > > +int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
+> > > +			   unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
+> > > +{
+> > > +	int ret = 0;
+> > > +	struct kvm_gfn_range gfn_range;
+> > > +	struct kvm_memory_slot *slot;
+> > > +	struct kvm_memslots *slots;
+> > > +	int i, idx;
+> > > +
+> > > +	if (WARN_ON_ONCE(hva_end <= hva_start))
+> > > +		return -EINVAL;
+> > > +
+> > > +	idx = srcu_read_lock(&kvm->srcu);
+> > > +
+> > > +	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+> > > +		struct interval_tree_node *node;
+> > > +
+> > > +		slots = __kvm_memslots(kvm, i);
+> > > +		kvm_for_each_memslot_in_hva_range(node, slots,
+> > > +						  hva_start, hva_end - 1) {
+> > > +			unsigned long start, end;
+> > > +
+> > > +			slot = container_of(node, struct kvm_memory_slot,
+> > > +					    hva_node[slots->node_idx]);
+> > > +			start = max(hva_start, slot->userspace_addr);
+> > > +			end = min(hva_end, slot->userspace_addr +
+> > > +						  (slot->npages << PAGE_SHIFT));
+> > > +
+> > > +			/*
+> > > +			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+> > > +			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
+> > > +			 */
+> > > +			gfn_range.start = hva_to_gfn_memslot(start, slot);
+> > > +			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
+> > > +			gfn_range.slot = slot;
+> > > +
+> > > +			ret = handler(kvm, &gfn_range, data);
+> > > +			if (ret)
+> > > +				goto e_ret;
+> > > +		}
+> > > +	}
+> > > +
+> > > +e_ret:
+> > > +	srcu_read_unlock(&kvm->srcu, idx);
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +
+> > >  static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+> > >  						unsigned long start,
+> > >  						unsigned long end,
+> > 
 
