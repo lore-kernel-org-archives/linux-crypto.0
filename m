@@ -2,121 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B98C761A6
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Apr 2023 11:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27512C761AF
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Apr 2023 13:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234926AbjDDLFr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Apr 2023 07:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36136 "EHLO
+        id S235281AbjDDNls (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Apr 2023 09:41:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234705AbjDDLFb (ORCPT
+        with ESMTP id S235174AbjDDNli (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Apr 2023 07:05:31 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E6A418C
-        for <linux-crypto@vger.kernel.org>; Tue,  4 Apr 2023 04:03:21 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id t10so128756160edd.12
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Apr 2023 04:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680606197;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P2X3kREg8ClZqoLFGTfMEQlTm6xCmy/glA1Hk2D1aa0=;
-        b=vj66DxpITdwlhJH75l7RkUQZ6WiakI8+iJL0HkFajARLadSSmedSCC38T3fau0NSAi
-         cuHLk9G6os+2CZPFZVMURrKYJtSV7XCcHUktC2KxBi0JYdJlEn3jIyfrRNS76EsHP+Gc
-         vSP5yuFfS0DKENJu13mSmPMXDHrOXQXyXBYgwI3yB8ukOi9+MFNaQF9blxs+UoTs3Txj
-         P/UnBYcmSIK9qgN4/80r2zy0VyjYl/ggKEoJFNcam6FWF7UWgHng1XycK5KJiIIpCKFx
-         8UCAyfQtf3TLsUcvIFlRm7Fj10RNvbeRR0Jx2rNoMSjsM3v8zioZQ2F1Kxd7kbRj5vr5
-         XELQ==
+        Tue, 4 Apr 2023 09:41:38 -0400
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B8D468E;
+        Tue,  4 Apr 2023 06:41:32 -0700 (PDT)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-17aa62d0a4aso34564106fac.4;
+        Tue, 04 Apr 2023 06:41:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680606197;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2X3kREg8ClZqoLFGTfMEQlTm6xCmy/glA1Hk2D1aa0=;
-        b=3uP1WZkN2mWw+ZLNod6U25wzXMZeQgJ+AJUHTAuIoxR660ZouZfxarW9pcc+cFBy82
-         L2n5gxsty+l31fEBPARYiGA6D1eqvX6Og4uxgJw6DD2O866oSYvC2Ejo+Uh0shJ6T8wv
-         8kNXePdE6zv9mGlIS88Zlr3+YG2r2p9omsv/YJQAP+27Xjwt1qNFKgW/dt6sIOiaRdzW
-         MUj75GcfatJHMaBLi9MsoceKLEg4En9EefGQkyFzGdzVmuDd2oQt2T1hj8Cril2vHecj
-         yTnYVt5DXs/XRNfyOInmlRa7021NJ1QQkQHnh8hL9SPbliT9+5LoXLwh8ifzhWItZpf9
-         LUIw==
-X-Gm-Message-State: AAQBX9d9+R2jheaYtA3L0idFs4s2K6KJVDy/7s5I7YH6YEjfpZa0a28K
-        ClZLu9yY6HaaTrl46zlmxrTZEw==
-X-Google-Smtp-Source: AKy350Z6X6wonQ9ndSEeOqk1V1vulMt/+C2VlT2zTtfQjqb1wDbl0iUZQJtUmkPOwDAPJiXlYGDAKA==
-X-Received: by 2002:a17:906:1281:b0:947:405a:955f with SMTP id k1-20020a170906128100b00947405a955fmr1842422ejb.31.1680606197540;
-        Tue, 04 Apr 2023 04:03:17 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:99ed:4575:6001:8bda? ([2a02:810d:15c0:828:99ed:4575:6001:8bda])
-        by smtp.gmail.com with ESMTPSA id c10-20020a170906d18a00b00923f05b2931sm5796213ejz.118.2023.04.04.04.03.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Apr 2023 04:03:17 -0700 (PDT)
-Message-ID: <5f8692af-700a-a47f-d81c-fe9c905958e1@linaro.org>
-Date:   Tue, 4 Apr 2023 13:03:15 +0200
+        d=1e100.net; s=20210112; t=1680615684;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3I6cThnoomrgNOtBCTblrlL1is2L6H9KiAc6aOP6ctc=;
+        b=xVqeStmZjPHwAEwZCaIKGogun0lfGY4J48d04yaJHsL1Yt2uHUfqvJ5Hk2fsyVYUW3
+         p+AXyRL3cxA/wzIUa5faBAXmTeFRHNxwJ5Jnqlg4P6q4WcsbfaED04sYVBnFrv7pS2ZJ
+         fVqFCPTXemsxGofpUm3nKMQC5rxNRKw/Ji7GX6dWav1MMD3gpjjmjoBX0Nxh8eAR596u
+         ZxZxWmcUAPtyt6ykvAFDsAAQHbE5Hp8FU6/bIdP7BqrdGrP6BjJEP4E46nv846mQZdQP
+         NqlanCv2+sJjej1szpuK/FH172R1G0gxxUAjAlz/M3IwuMC428HUzRpq6RQoxx9WPrDi
+         8YJw==
+X-Gm-Message-State: AAQBX9fvWEGs+Rtmf7zEMqdxYDpsABHzsJXz7UIX9TlGFLDnLO3Ce3R9
+        GNN4eSFO1oPxbtyqQeY45A==
+X-Google-Smtp-Source: AKy350bKGsx+/Tt/VIIG128S9NPudARV02KnL1yfh2vnqwtnyPDoIkASjDjLF9wtWnumEJBdxTf7Ew==
+X-Received: by 2002:a05:6870:309:b0:177:9040:d236 with SMTP id m9-20020a056870030900b001779040d236mr1371463oaf.28.1680615683906;
+        Tue, 04 Apr 2023 06:41:23 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id j19-20020a9d7f13000000b006a13dd5c8a2sm5554659otq.5.2023.04.04.06.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 06:41:23 -0700 (PDT)
+Received: (nullmailer pid 3782488 invoked by uid 1000);
+        Tue, 04 Apr 2023 13:41:22 -0000
+Date:   Tue, 4 Apr 2023 08:41:22 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     rfoss@kernel.org, andersson@kernel.org, agross@kernel.org,
+        linux-crypto@vger.kernel.org, konrad.dybcio@linaro.org,
+        vladimir.zapolskiy@linaro.org, bhupesh.linux@gmail.com,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
+        neil.armstrong@linaro.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] dt-bindings: dma: Add support for SM6115 and
+ QCM2290 SoCs
+Message-ID: <168061568226.3782433.11290866098182220844.robh@kernel.org>
+References: <20230402100509.1154220-1-bhupesh.sharma@linaro.org>
+ <20230402100509.1154220-2-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v5 2/6] dt-bindings: ufs: qcom: Add ICE phandle
-Content-Language: en-US
-To:     Abel Vesa <abel.vesa@linaro.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20230403200530.2103099-1-abel.vesa@linaro.org>
- <20230403200530.2103099-3-abel.vesa@linaro.org>
- <9fc90c8b-9234-84fa-7dab-fee9de2b9813@linaro.org>
- <ZCvm3fzSh8owVDdc@linaro.org>
- <c816d432-26b8-2655-adf1-4b72b8645215@linaro.org>
- <ZCv+9WjlkA4n9Dwg@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <ZCv+9WjlkA4n9Dwg@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230402100509.1154220-2-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 04/04/2023 12:41, Abel Vesa wrote:
->>>>
->>>> Also, this does not solve my previous question still.
->>>
->>> Well, the clocks are not added for the a few platforms (which include
->>> SM8550). Same for 'ice' reg range.. So the only thing left is to
->>> enforce the qcom,ice property availability only for SM8550. I believe
->>> it solves the mutual exclusiveness of the "ice" reg range along with the
->>> clocks versus the qcom,ice property, by enforcing at compatible level.
->>
->> Ah, I think I understand. That would work except I don't understand why
->> enforcing qcom,qce only for specific, new SoCs. Assuming it is a correct
->> hardware representation, we want it for everyone, don't we?
+
+On Sun, 02 Apr 2023 15:34:59 +0530, Bhupesh Sharma wrote:
+> Add new compatible for BAM DMA engine version v1.7.4 which is
+> found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
+> to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
+> accordingly.
 > 
-> Yes, but they will be added to the subschema (qcom,ice one) when their
-> their ICE support (ICE DT) will be added. This way, we keep the bindings
-> check without failures (for now).
+> While at it, also update qcom,bam-dma bindings to add comments
+> which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
+> This provides an easy reference for identifying the actual BAM DMA
+> version available on Qualcomm SoCs.
+> 
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+> 
 
-I understand that then you will rework this if:then case, so I think it
-is just easier to make it correct from the first place. If there is
-qcom,qce, then reg is maxItems:1. Otherwise - maxItems can be 2. You
-achieve the same result, all DTS validate, without any need of further
-changes later.
-
-
-Best regards,
-Krzysztof
+Acked-by: Rob Herring <robh@kernel.org>
 
