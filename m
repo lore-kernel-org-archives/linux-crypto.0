@@ -2,42 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BE3C76188
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 05:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F071FC761AF
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 05:49:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236900AbjDEFts (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 01:49:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43290 "EHLO
+        id S236922AbjDEFtz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 01:49:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236914AbjDEFtn (ORCPT
+        with ESMTP id S236939AbjDEFtt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 01:49:43 -0400
+        Wed, 5 Apr 2023 01:49:49 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047974C23;
-        Tue,  4 Apr 2023 22:49:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B3F5254;
+        Tue,  4 Apr 2023 22:49:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=2cph45vi9UXMWYj+/V5DmnXu58ktqclhI29RNkQDrVw=; b=24ytSQXz7tvVrd0iuYnV4gKyLr
-        4MfP2OXqfiVyeHzlmxi0633eHCTjFhmPP0o3j2XYmRpIAAaXqhI1n0JMsdX6jSWE7BlownX4YiA1B
-        MEe9mwvq0UQrr12wDvPsAEw/hZAOMtBvsaYSYYTgU/C6pC7lCBO5F/eUP76BduwTgETZDyI0OqpXe
-        X7r4nR878mvIQo+vgAHOug5PgaHjCnQEyB78GB/qgijMX+vzraF9EOW7PAtG4bS03sOX2zOwT4qXP
-        tudzRI18aW4uYOyzdB8xmmrer+eHXxdtBZ/3XPzTY0hMrFJpnwVsGLdFKU9w/hUqubtH0yNIFX17S
-        5iW4d7UA==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=PGw5UIqvDhDkNQgNkGUxScJJw9bBMO7Ehoy7OU8UD30=; b=DdNURE14+VtGgRdramlRA30wGc
+        U7/0vK92LR+RMv+QQX2zfiP/6pJK3HH/jO+Ikne3s+ZwzytF/uxHW4cZhfiWaPYd43Wd+66NyI1HB
+        yv6IngcmcAYXUOvgh04ryWy06vMMa4W3N3mvlu/l+4s9TVQrJ9coQ9itT3eZTl3qyp46Q0FI/+5Vx
+        99TRcBG0eV3iH7xIpvsjhYlnXMX04ZFwd7n3t4hHmh6P+LaRzaIpv4fmgUD5Bl9MDv8CsOrwlSUkQ
+        APWRATob000f0yIYSi/k0n5Bm3pVjUP4YYsPz81AxYqPj+9h9oeCTBW1+uk7SMxZMhai8B3Acq9Ha
+        L/mpyoaw==;
 Received: from [2001:4bb8:191:a744:c06e:b99:9fd8:3e0] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pjw16-003QkG-2Q;
-        Wed, 05 Apr 2023 05:49:09 +0000
+        id 1pjw1B-003Qlq-2a;
+        Wed, 05 Apr 2023 05:49:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
         David Sterba <dsterba@suse.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: remove crc32c_impl
-Date:   Wed,  5 Apr 2023 07:49:03 +0200
-Message-Id: <20230405054905.94678-1-hch@lst.de>
+Subject: [PATCH 2/2] libcrc32c: remove crc32c_impl
+Date:   Wed,  5 Apr 2023 07:49:05 +0200
+Message-Id: <20230405054905.94678-3-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230405054905.94678-1-hch@lst.de>
+References: <20230405054905.94678-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -45,17 +47,43 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi all,
+This was only ever used by btrfs, and the btrfs users just went away.
 
-this series stops printing the crc32c implementation at btrfs load
-time as it's already printed at mount time, and then removes the
-now unused crc32c_impl function.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/crc32c.h | 1 -
+ lib/libcrc32c.c        | 6 ------
+ 2 files changed, 7 deletions(-)
 
-This series is on top of the btrfs for-next tree, which has a bunch
-of required crc32c-related work.
+diff --git a/include/linux/crc32c.h b/include/linux/crc32c.h
+index bd21af828ff6fd..357ae4611a4539 100644
+--- a/include/linux/crc32c.h
++++ b/include/linux/crc32c.h
+@@ -5,7 +5,6 @@
+ #include <linux/types.h>
+ 
+ extern u32 crc32c(u32 crc, const void *address, unsigned int length);
+-extern const char *crc32c_impl(void);
+ 
+ /* This macro exists for backwards-compatibility. */
+ #define crc32c_le crc32c
+diff --git a/lib/libcrc32c.c b/lib/libcrc32c.c
+index 5ca0d815a95df6..649e687413a0c1 100644
+--- a/lib/libcrc32c.c
++++ b/lib/libcrc32c.c
+@@ -65,12 +65,6 @@ static void __exit libcrc32c_mod_fini(void)
+ 	crypto_free_shash(tfm);
+ }
+ 
+-const char *crc32c_impl(void)
+-{
+-	return crypto_shash_driver_name(tfm);
+-}
+-EXPORT_SYMBOL(crc32c_impl);
+-
+ module_init(libcrc32c_mod_init);
+ module_exit(libcrc32c_mod_fini);
+ 
+-- 
+2.39.2
 
-Diffstat:
- fs/btrfs/super.c       |    2 +-
- include/linux/crc32c.h |    1 -
- lib/libcrc32c.c        |    6 ------
- 3 files changed, 1 insertion(+), 8 deletions(-)
