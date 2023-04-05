@@ -2,240 +2,158 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B461DC7619A
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 09:08:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FECBC77B6C
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 09:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237601AbjDEJIn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 05:08:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39878 "EHLO
+        id S237145AbjDEJeJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 05:34:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237394AbjDEJIa (ORCPT
+        with ESMTP id S237276AbjDEJeD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 05:08:30 -0400
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2075.outbound.protection.outlook.com [40.107.6.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D428010F9;
-        Wed,  5 Apr 2023 02:08:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ai5jWHJb69H67MSX6NNEaeVjyCj9vGfOTW5yt5FIqlSQFamQpn55vlNLfvpwX3sNyhy3GncmLMmMRLJiKM05cRs3UsaOFRqnlDb7sUmws2RSONOTckgG4QBMBczoRty/588SbUGBLUyZC4rxX4FcbktP81Do0ytS93T3edcAFQcMMDMvxG8fdoHnSbk9h/pqHYmApSRgZDsvMEb+z1PeSYXq6ydfzSHlgE309n3D9nPCzW029lMvvd8yLVv8JU6ys/XAaM2T537gEJeFlFjF1xpTRHfI3hiV35gPe7FnOHq9hoQ/QhfJrz8Ru0KPlflUViLsFAEu63S2bUrqXjZv3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ei7J33+PihTCCgUfyvNxA1s2Hz/Q3GjwGH9WjKWHp3c=;
- b=mv50FRPEpjA8mOb8ibyND82mEFqy6ueKEShVOJka9puu6K/PWNZb+EiE3cT10eaa0qbUk+ttG12rcjTKNf02IgdMWP2rxGKxnkrzVVBTCtoQhy6RAo5tarpMtry4agQ5ZGzGKYt1Yk5yvKiexFg6kopMCPUCrUbsLEdyuw96dq13vq3EfQZTr1Z6hY7BSGzsoqt95lC4Zw8MjtZuXGfK/KPdKfkTcTM68OZyCglw5YEKb0Jdu0TT6fz8esLB+NDAUNXJT8lAx8shJaPMQSux9VwVtUIY0OwWYxrbHujGMX/uBufGkjLIx/V/SDkezcy3boY/z64eUFoeh3exI2EA4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ei7J33+PihTCCgUfyvNxA1s2Hz/Q3GjwGH9WjKWHp3c=;
- b=Cmc4x/uJ+r2kwEPBOMs6zfP4UDPt/cwd7SzNuya1bkAOdHDsaJZCH5TP1dE1LS11cw+tZjheL482GV+L5a6/MuhcNWA7x7nrX9wp88ZspHZVyIjPKumNr14LvKAEYjjnd5oKUcoZeBKS6GKWQMvSPM1Bonqa9gsOk2LfkWtWzvM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by AM8PR04MB7473.eurprd04.prod.outlook.com (2603:10a6:20b:1d0::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.29; Wed, 5 Apr
- 2023 09:08:21 +0000
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::dca6:e1e8:f142:2bc5]) by DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::dca6:e1e8:f142:2bc5%8]) with mapi id 15.20.6254.033; Wed, 5 Apr 2023
- 09:08:21 +0000
-From:   meenakshi.aggarwal@nxp.com
-To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
-        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-Subject: [PATCH v3 2/2] crypto: caam - OP-TEE firmware support
-Date:   Wed,  5 Apr 2023 11:07:52 +0200
-Message-Id: <20230405090752.1708455-3-meenakshi.aggarwal@nxp.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230405090752.1708455-1-meenakshi.aggarwal@nxp.com>
-References: <20230322061716.3195841-3-meenakshi.aggarwal@nxp.com>
- <20230405090752.1708455-1-meenakshi.aggarwal@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM8P251CA0029.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:21b::34) To DU0PR04MB9563.eurprd04.prod.outlook.com
- (2603:10a6:10:314::7)
+        Wed, 5 Apr 2023 05:34:03 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A82959C4;
+        Wed,  5 Apr 2023 02:33:41 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id i9so35527280wrp.3;
+        Wed, 05 Apr 2023 02:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680687182;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+m6lntKXuHckes3DfOCLKyfUm4RY1tSieGlGMdRdeCg=;
+        b=ovQ3eb1eiAQwqbo5Ec1rsGTce+Hz+32WrCzTCV6aKN7VzI1t4WTQw+oi5Fjm2tx9ED
+         U2PLKAiosMdQeR7Kkq4DSD9rqJjesQPtz0iZSEb7eXbSbTNSow2QT+s6rufHSiuQosKa
+         BBYiEAEslILdu1TIp0BUOeiJSb1WUTPzbKIV26qCpu4lIhlb/AcewWwRltj5jdlAzBZ5
+         /n6V3UzQce7EFM/A/DlgNUEX5Iq0veIkKxpe/lw9Z594oiA4n/TAkEb7ebKyjKkVcFUq
+         JcXG+bAOF2T3hOwYu4OUr5B6YAZw0RkrUJEmwBPsQiySJx/lS0eoCWjMoLpGDbByT/Kf
+         MxJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680687182;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+m6lntKXuHckes3DfOCLKyfUm4RY1tSieGlGMdRdeCg=;
+        b=rNLnuUpB06fmSb46eCDhDt960xnc8GfirSmU9ZyK66IJowoPmnMzcMQXRg+8hSf0IW
+         f1X3AN33KrEIONSJyV8xaMCDb/9dOS+rrTYxk4ccbQjg0HUa4XvrV+yMqZ5m3YFYX8m9
+         AEuzlbhTxD8Snsanhkv+KxROyFELTc/JtmyC8Iq4L9a16jSnCJjLwzcgxdTF6tQLYqxr
+         T8Gom7T5OZvvvUpNf8xED4erNLMs+FE0gIZOxQ9f0YNem7ZHMY5NDgEPBrfIce93aOp9
+         OrPEMKliV/8foudJm32oxU4SQ3rr3MytzxszJbzkBDnIE28pgW2uDXO9QAarxdzW0Bpg
+         2TyA==
+X-Gm-Message-State: AAQBX9ebUEJ8btzkT282ffwbHBNYVh2F0dTvda31u5moFDge7ymuCBk/
+        DZ+dld3aUqZEB3RsWHguKUQ=
+X-Google-Smtp-Source: AKy350bEmXKhbpOLml2JKednF6JyosoF9/Y0Oyj1dYtb90pMMFwBNblSBshHAYOgh5VmCXkMUWMlIQ==
+X-Received: by 2002:adf:dc01:0:b0:2cf:9889:8428 with SMTP id t1-20020adfdc01000000b002cf98898428mr3327565wri.35.1680687181685;
+        Wed, 05 Apr 2023 02:33:01 -0700 (PDT)
+Received: from [192.168.2.202] (pd9e5a520.dip0.t-ipconnect.de. [217.229.165.32])
+        by smtp.gmail.com with ESMTPSA id y5-20020a1c4b05000000b003ede06f3178sm1599550wma.31.2023.04.05.02.33.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Apr 2023 02:33:01 -0700 (PDT)
+Message-ID: <0c433e15-640e-280f-fcb0-a8fe081d1bcc@gmail.com>
+Date:   Wed, 5 Apr 2023 11:33:00 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AM8PR04MB7473:EE_
-X-MS-Office365-Filtering-Correlation-Id: c57c5c55-76e4-488d-8a8d-08db35b54d73
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b45e8ecsKgYB/JW3wfSwx70qZIiusczzz7rUloWAwg2n5wSrx0YKy0bHeDj21Agsm4tTA6DuXDPZVUijAja95sUSUdZ+/jdmS4b8G7SO6keLDcLpeGFGU4t9RJ7/k1+N0ZoOm7561tiQZe9r9samdfPGyVHLEe8LLSMYnMNx5t0v7hTfs2j8rKXp1Os+DOvDsj/DBXY3WmuTrfhSoBjiwj/nIewss3HCpNu/jtUkIcWvWkOC8Jen1fLwvPVU5yAGbSl1WHdhnD8dxvNewD/YPzrNWjCtChTCuLtwevdgpPxPIUqC5/VTEbqx0vYqVXKD5O9wVZyv0ox27YOfVDxV7UhfldjFDaxW65dvKgFhX4dcUqyNra3J8kTBT5qJICwY8M6tFLFDR2dV+8q3Ig1SP93O/FateML8noFL99xrS5SRaJbTrXkZkV0LWddvphvBCPSjtBX4Lffx2CVuHNiwJGWuFby5yWxf2KoEH4DGDyl1aVY6MX1zDu1V+UQNn8nwbJ17IFRWmIQoDbQQOu7CncrsxZPaJI9R6+U9m6BsagJ1gihq9H1kNnxImcxSAAfy4a7oAFjz45t2gH/fwRWX8/U57RkTf2LBAtfbCleC8xKX15nKaGsZJ+ETwJ6Bi76OQCFHI9eyzKbYavSxjVZpYQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(366004)(136003)(376002)(346002)(451199021)(6666004)(86362001)(41300700001)(36756003)(186003)(6486002)(4326008)(8676002)(52116002)(478600001)(38100700002)(2906002)(66476007)(83380400001)(66946007)(66556008)(316002)(8936002)(38350700002)(26005)(5660300002)(2616005)(6512007)(9686003)(6506007)(1076003)(309714004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4wz6ZRgOEhL7MOrVJ6V27PT/Zcf5yjQ9EOmcjokEyzCcNSucswviLaUcXQhT?=
- =?us-ascii?Q?lkDOrnIMWgQdBKybaUmJO6DpceUjYw8ZWOA3EZrx/Z82mGP1KvAb0lTwMs/B?=
- =?us-ascii?Q?rP8m1JjicDHVrSfk2nUCbRHRF43OiHASApBk93Sa6G4XWp93DcjkbaYvKAD4?=
- =?us-ascii?Q?7rr0UwfDEKk2XS/8th7TzjIUofuT0sm+yj6S0lZpoSDvy1K9+APxhMtvo9Si?=
- =?us-ascii?Q?la2L/aW3p/Uyoae945jVwsfxA9aGhBWBV5UTZ1bTekxXFhWLhEOEt0g2f14n?=
- =?us-ascii?Q?PVpF2P2SXLwl55ZOQtrFUUTXz0PZ8PtLQw1oNp5FfLjrxaNAJGg8KRrU04JV?=
- =?us-ascii?Q?ky4eUImsKUKIZMPShaEEDiAdOniolP/2A4/YJ8XxykjvaER6axLKOxdibHJw?=
- =?us-ascii?Q?Un7GYTOmDg2rIn4lmNYL+Q03jbhmKfwnRlvX/b8d6E6heah8LEWBlhlSLiKV?=
- =?us-ascii?Q?h4yWmoarOQ9j5IXMrQc/VbwRT+z+mTVal//J1vR0wAiixyY5ekPXj7YFGI7L?=
- =?us-ascii?Q?/O0ah9SB1/WzOqsE+tbfnotQwzkLrKhMMCUVpj4qE0rZVTdVnCaau7vZgtuv?=
- =?us-ascii?Q?lxjgWAJRsdiJpKruEPc1l+nvqHuEqnbowVGewhmtiTP17Z/fDfmI7BnSip1B?=
- =?us-ascii?Q?5TMcOoK3WeTqPeZXkIMMRUBX9ZXshE2sO96mn39MVT5LtQsTpDP2CCsblgq5?=
- =?us-ascii?Q?JkfaC8NiSJOobGJT6Mu4CVQhaiOTpko2j9Wi+hew7QwOntE4PhydNfEphRBr?=
- =?us-ascii?Q?QxrI497oGcdhb3H/w6wEldAIxP+TWP1/Sg40YzlbudgSkPHlo6RW+/MdXRaX?=
- =?us-ascii?Q?ryMcpIEUZsarisrnpSIFgJJu3OmDTehwzIufnMqVcmWqUVlMWikhImlphXZC?=
- =?us-ascii?Q?bYCzmIrJ4Hs9T3waevz6F02SEZFVfqX3C3oQtop/iPUKI/sTedRITrJMklt9?=
- =?us-ascii?Q?gFxUIQNmbfhur4pBoVPWLmf7OqoNxU9sgDmWgS5yq2LMv3INAzBvvzbGkRxq?=
- =?us-ascii?Q?Xv0nkExDxQxe9XpS09F7Ea3As6BGdqUXbj1AWPegJVJOGEa8g/sZXOpvYqMj?=
- =?us-ascii?Q?/YwgHbTGn0iskXuJaHZPsaLcwfnEpPCM5Bd0JTLEJhAaeH4aJqWP6xAjR94G?=
- =?us-ascii?Q?o0HzKvylK0EUvvCJjGXgunxJi8tzVcM1VtdwU7O/G+j3gQRoQu0eyTGMJGao?=
- =?us-ascii?Q?X9YItUyZPVRo+LaCM5vH9f2Hbi7+FmCw4dey848FYF+PtKxzwxU4QIF4vW3V?=
- =?us-ascii?Q?rmQp7NuMQxIv3xaxja/tN8zTMpLWS4gnjRR2b8giXB6ZO+bQ6EQ49AYhCgCk?=
- =?us-ascii?Q?0zMmbuc3shDUoegbuc4R3P3fPk1iU0v0AYn5X1R+3vZ85YdLiryYi8PHQ5Q9?=
- =?us-ascii?Q?UoPnnCHmnGCB5gvMJk7i/yk1eFMKeBamnvH+D6jg2DOK+eNcQH/mjdRMEids?=
- =?us-ascii?Q?ZPM4J1PvWnIkcl5BnpeXKj+O+lURsX5VpQEj1uYipeiml6gau9bAMID+wOKw?=
- =?us-ascii?Q?g+fKKuYGUS0QUFLj4uHzjTQe+CxeOs1p/G8ZhYuUTcu2QtuixCT0RL4Skpyx?=
- =?us-ascii?Q?5ObIWf2JUEhrw09N9/Bpn9BQpYxP5dnTm6sdtMrAmle798QUncxXYjWm5s9h?=
- =?us-ascii?Q?/g=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c57c5c55-76e4-488d-8a8d-08db35b54d73
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2023 09:08:20.9550
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XXYco8enPe/21usqiZwaRvJ6ZVd5CPs1/VdzuyAoUoRGeryYrm/Uc3BT1cCCtQtJeBcxP25vcXtbcqYj596rba9FyRuVvG4qmBA6Lmzbkek=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7473
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH V4 22/23] platform/surface: Disable for RISC-V
+To:     Sunil V L <sunilvl@ventanamicro.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-acpi@vger.kernel.org, linux-crypto@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org, llvm@lists.linux.dev
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Len Brown <lenb@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Marc Zyngier <maz@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>
+References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
+ <20230404182037.863533-23-sunilvl@ventanamicro.com>
+Content-Language: en-US
+From:   Maximilian Luz <luzmaximilian@gmail.com>
+In-Reply-To: <20230404182037.863533-23-sunilvl@ventanamicro.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Horia GeantA <horia.geanta@nxp.com>
+On 4/4/23 20:20, Sunil V L wrote:
+> With CONFIG_ACPI enabled for RISC-V, this driver gets enabled
+> in allmodconfig build. However, RISC-V doesn't support sub-word
+> atomics which is used by this driver. Due to this, the build fails
+> with below error.
+> 
+> In function â€˜ssh_seq_nextâ€™,
+>      inlined from â€˜ssam_request_write_dataâ€™ at drivers/platform/surface/aggregator/controller.c:1483:8:
+> ././include/linux/compiler_types.h:399:45: error: call to â€˜__compiletime_assert_335â€™ declared with attribute error: BUILD_BUG failed
+>    399 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+>        |                                             ^
+> ./include/linux/compiler.h:78:45: note: in definition of macro â€˜unlikelyâ€™
+>     78 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+>        |                                             ^
+> ././include/linux/compiler_types.h:387:9: note: in expansion of macro â€˜__compiletime_assertâ€™
+>    387 |         __compiletime_assert(condition, msg, prefix, suffix)
+>        |         ^~~~~~~~~~~~~~~~~~~~
+> ././include/linux/compiler_types.h:399:9: note: in expansion of macro â€˜_compiletime_assertâ€™
+>    399 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+>        |         ^~~~~~~~~~~~~~~~~~~
+> ./include/linux/build_bug.h:39:37: note: in expansion of macro â€˜compiletime_assertâ€™
+>     39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>        |                                     ^~~~~~~~~~~~~~~~~~
+> ./include/linux/build_bug.h:59:21: note: in expansion of macro â€˜BUILD_BUG_ON_MSGâ€™
+>     59 | #define BUILD_BUG() BUILD_BUG_ON_MSG(1, "BUILD_BUG failed")
+>        |                     ^~~~~~~~~~~~~~~~
+> ./arch/riscv/include/asm/cmpxchg.h:335:17: note: in expansion of macro â€˜BUILD_BUGâ€™
+>    335 |                 BUILD_BUG();                                            \
+>        |                 ^~~~~~~~~
+> ./arch/riscv/include/asm/cmpxchg.h:344:30: note: in expansion of macro â€˜__cmpxchgâ€™
+>    344 |         (__typeof__(*(ptr))) __cmpxchg((ptr),                           \
+>        |                              ^~~~~~~~~
+> ./include/linux/atomic/atomic-instrumented.h:1916:9: note: in expansion of macro â€˜arch_cmpxchgâ€™
+>   1916 |         arch_cmpxchg(__ai_ptr, __VA_ARGS__); \
+>        |         ^~~~~~~~~~~~
+> drivers/platform/surface/aggregator/controller.c:61:32: note: in expansion of macro â€˜cmpxchgâ€™
+>     61 |         while (unlikely((ret = cmpxchg(&c->value, old, new)) != old)) {
+>        |                                ^~~~~~~
+> 
+> So, disable this driver for RISC-V even when ACPI is enabled for now.
 
-caam driver needs to be aware of OP-TEE f/w presence, since some things
-are done differently:
+CONFIG_SURFACE_PLATFORMS should be enabled for ARM64 || X86 || COMPILE_TEST only,
+so I guess the issue only happens when compiling with the latter enabled?
 
-1. there is no access to controller's register page (note however that
-some registers are aliased in job rings' register pages)
+I'm not aware of any current plans of MS to release RISC-V-based Surface
+devices, so you could maybe also just explicitly disable CONFIG_SURFACE_PLATFORMS.
+In any case, I don't see any issues with disabling the whole platform/surface
+or only individual drivers for RISC-V, so for either solution:
 
-2 Due to this, MCFGR[PS] cannot be read and driver assumes
-MCFGR[PS] = b'0 - engine using 32-bit address pointers.
+Acked-by: Maximilian Luz <luzmaximilian@gmail.com>
 
-This is in sync with the fact that:
--all i.MX SoCs currently use MCFGR[PS] = b'0
--only i.MX OP-TEE use cases don't allow access to controller register page
-
-Signed-off-by: Horia GeantA <horia.geanta@nxp.com>
-Signed-off-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
----
- drivers/crypto/caam/ctrl.c    | 23 ++++++++++++++++++++++-
- drivers/crypto/caam/debugfs.c |  3 +++
- drivers/crypto/caam/intern.h  |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index de1f0acdb712..9c5a035e1b96 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -633,6 +633,7 @@ static int caam_probe(struct platform_device *pdev)
- 	int pg_size;
- 	int BLOCK_OFFSET = 0;
- 	bool pr_support = false;
-+	bool reg_access = true;
- 
- 	ctrlpriv = devm_kzalloc(&pdev->dev, sizeof(*ctrlpriv), GFP_KERNEL);
- 	if (!ctrlpriv)
-@@ -646,6 +647,17 @@ static int caam_probe(struct platform_device *pdev)
- 	caam_imx = (bool)imx_soc_match;
- 
- 	if (imx_soc_match) {
-+		/*
-+		 * Until Layerscape and i.MX OP-TEE get in sync,
-+		 * only i.MX OP-TEE use cases disallow access to
-+		 * caam page 0 (controller) registers.
-+		 */
-+		np = of_find_compatible_node(NULL, NULL, "linaro,optee-tz");
-+		ctrlpriv->optee_en = !!np;
-+		of_node_put(np);
-+
-+		reg_access = !ctrlpriv->optee_en;
-+
- 		if (!imx_soc_match->data) {
- 			dev_err(dev, "No clock data provided for i.MX SoC");
- 			return -EINVAL;
-@@ -696,7 +708,8 @@ static int caam_probe(struct platform_device *pdev)
- 	caam_little_end = !(bool)(rd_reg32(&perfmon->status) &
- 				  (CSTA_PLEND | CSTA_ALT_PLEND));
- 	comp_params = rd_reg32(&perfmon->comp_parms_ms);
--	if (comp_params & CTPR_MS_PS && rd_reg32(&ctrl->mcr) & MCFGR_LONG_PTR)
-+	if (reg_access && comp_params & CTPR_MS_PS &&
-+	    rd_reg32(&ctrl->mcr) & MCFGR_LONG_PTR)
- 		caam_ptr_sz = sizeof(u64);
- 	else
- 		caam_ptr_sz = sizeof(u32);
-@@ -761,6 +774,9 @@ static int caam_probe(struct platform_device *pdev)
- 	}
- #endif
- 
-+	if (!reg_access)
-+		goto set_dma_mask;
-+
- 	/*
- 	 * Enable DECO watchdogs and, if this is a PHYS_ADDR_T_64BIT kernel,
- 	 * long pointers in master configuration register.
-@@ -800,6 +816,7 @@ static int caam_probe(struct platform_device *pdev)
- 			      JRSTART_JR1_START | JRSTART_JR2_START |
- 			      JRSTART_JR3_START);
- 
-+set_dma_mask:
- 	ret = dma_set_mask_and_coherent(dev, caam_get_dma_mask(dev));
- 	if (ret) {
- 		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
-@@ -842,6 +859,9 @@ static int caam_probe(struct platform_device *pdev)
- 		return -ENOMEM;
- 	}
- 
-+	if (!reg_access)
-+		goto report_live;
-+
- 	comp_params = rd_reg32(&perfmon->comp_parms_ls);
- 	ctrlpriv->blob_present = !!(comp_params & CTPR_LS_BLOB);
- 
-@@ -944,6 +964,7 @@ static int caam_probe(struct platform_device *pdev)
- 		clrsetbits_32(&ctrl->scfgr, 0, SCFGR_RDBENABLE);
- 	}
- 
-+report_live:
- 	/* NOTE: RTIC detection ought to go here, around Si time */
- 
- 	caam_id = (u64)rd_reg32(&perfmon->caam_id_ms) << 32 |
-diff --git a/drivers/crypto/caam/debugfs.c b/drivers/crypto/caam/debugfs.c
-index b2ef2273298d..6358d3cabf57 100644
---- a/drivers/crypto/caam/debugfs.c
-+++ b/drivers/crypto/caam/debugfs.c
-@@ -77,6 +77,9 @@ void caam_debugfs_init(struct caam_drv_private *ctrlpriv,
- 	debugfs_create_file("fault_status", 0444, ctrlpriv->ctl,
- 			    &perfmon->status, &caam_fops_u32_ro);
- 
-+	if (ctrlpriv->optee_en)
-+		return;
-+
- 	/* Internal covering keys (useful in non-secure mode only) */
- 	ctrlpriv->ctl_kek_wrap.data = (__force void *)&ctrlpriv->ctrl->kek[0];
- 	ctrlpriv->ctl_kek_wrap.size = KEK_KEY_SIZE * sizeof(u32);
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 572cf66c887a..86ed1b91c22d 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -94,6 +94,7 @@ struct caam_drv_private {
- 	u8 qi_present;		/* Nonzero if QI present in device */
- 	u8 blob_present;	/* Nonzero if BLOB support present in device */
- 	u8 mc_en;		/* Nonzero if MC f/w is active */
-+	u8 optee_en;		/* Nonzero if OP-TEE f/w is active */
- 	int secvio_irq;		/* Security violation interrupt number */
- 	int virt_en;		/* Virtualization enabled in CAAM */
- 	int era;		/* CAAM Era (internal HW revision) */
--- 
-2.25.1
-
+> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
+> ---
+>   drivers/platform/surface/aggregator/Kconfig | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/platform/surface/aggregator/Kconfig b/drivers/platform/surface/aggregator/Kconfig
+> index c114f9dd5fe1..88afc38ffdc5 100644
+> --- a/drivers/platform/surface/aggregator/Kconfig
+> +++ b/drivers/platform/surface/aggregator/Kconfig
+> @@ -4,7 +4,7 @@
+>   menuconfig SURFACE_AGGREGATOR
+>   	tristate "Microsoft Surface System Aggregator Module Subsystem and Drivers"
+>   	depends on SERIAL_DEV_BUS
+> -	depends on ACPI
+> +	depends on ACPI && !RISCV
+>   	select CRC_CCITT
+>   	help
+>   	  The Surface System Aggregator Module (Surface SAM or SSAM) is an
