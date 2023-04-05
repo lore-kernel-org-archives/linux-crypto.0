@@ -2,38 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9CBC76188
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 14:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDF4C761A6
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 14:59:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238203AbjDEObk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 10:31:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39592 "EHLO
+        id S237636AbjDEO7C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 10:59:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238037AbjDEObj (ORCPT
+        with ESMTP id S229879AbjDEO7C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 10:31:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2ED2C1;
-        Wed,  5 Apr 2023 07:31:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2F8C762685;
-        Wed,  5 Apr 2023 14:31:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ACCAC4339B;
-        Wed,  5 Apr 2023 14:31:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680705092;
-        bh=zSAJvHpnJ4t5+N5rlPStNtw8kt3Pvqahl38JBpYY8G0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UA05BQCDFOlATRVQf6u1KpRp0bUorSfIjan7xcEWrovcLCtG6gNGf4096NaaFpr2s
-         /NErwGnTgYtFy7ZdM1i3tquxq7hjpC7wmlV/TgnIJRKIV1zF9lu4CP5c8oe5KWAPHQ
-         77r0V/i0nWcoazrEjCoyt7/BUVuUxRkvmgtkAr2FDL554YVLCeL8LL8MAUxVvd56xW
-         HSEjZG/XTAXMZ8qANPYHf87Ju78DBpuPGv0tiGZtDTnsJuQVELo9YGtEi7XFG0cTuO
-         7prRmTBPrYhuaCNo5CQeQaue1Clx1elgq7OvAyjF9XJ8U7qcdmsWp05Vs6w78hkng0
-         eI+P4ShYUl+zQ==
-Date:   Wed, 5 Apr 2023 15:31:24 +0100
-From:   Conor Dooley <conor@kernel.org>
+        Wed, 5 Apr 2023 10:59:02 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C050C4203
+        for <linux-crypto@vger.kernel.org>; Wed,  5 Apr 2023 07:58:58 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id t4so31273695wra.7
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Apr 2023 07:58:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1680706737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=22RndxDAcYTUmY2kPiSUATZV+V86fIqA8CXijZRxME0=;
+        b=ZqGBQ9vNPVA+48EQUhzwUp+/WM53IeOgdUq3ewaCaqBbb8KK+ZrgBqGqifDz5crZgH
+         /CleaEnxpWFOwffvcRE4PaNDqGEkHcmG0OnVDXABv3fNoyuPYsmlu61jRwXJVRT+0413
+         mj3JxSMHJ4zfndN1qkJQtOlXmiTBVil5f75tStkVD9R/uslQhGH8H1MqAJOwCBRPjH+m
+         pPbqDNNVAlFvGYVNAj6it/vbzhHsRPjyqEeiisOWJDq8uQmtwvTmIABAQmyolRpXrQlx
+         u4jHzID07wGJh+JOI1MOMTs/Slm2YMjD7pi+6pusqv7u8uoeOcLu5iBDA0Y978a8Lfpj
+         Bm+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680706737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=22RndxDAcYTUmY2kPiSUATZV+V86fIqA8CXijZRxME0=;
+        b=s1jnZWQlC/wo40r5l/qpC23JR//YOE4gEOEoE4k6ij8t1bWaH4Ei0NgG63izLhEH3C
+         nLTsvea1Ds2GVUv9l7aK7/uxTGJiDfRfKhqTdZZNqxqb94KKVXZPz5w4OJs3jtdol+TO
+         KhXf+lLHLoSk00V/eJ8C/iwV0keCmus8WNbNFVkW2SrqTtVkImyMp/TxNxtAlh/tbhsH
+         W2QgXJqPGNFcgNq6t/dQMfKZQ49FaTT6pUsvj6rmm/nyZ5ZcHXbFqtFyJsmDBUeMRO8e
+         KCnszalAi5lEVLLYVScbKFr7VDSTlEpUxLwRfv8BPkvF6BG57zk07ZkiNodWtab9CSdv
+         oECg==
+X-Gm-Message-State: AAQBX9fSEzmzdkTkjt5NE3tuiVdv4EedEy/tmyxPXTg9JmtGZjqyiP8I
+        R3qhGDSXGwlWSxt/CUuHX5MB3w==
+X-Google-Smtp-Source: AKy350bfWb7Q1dmeYeMrl784mM8dxuKi/bAHVMH6KYjH4SSAhIOa0dR3y/3E8flmAsd88iA8B0uhtw==
+X-Received: by 2002:a5d:4283:0:b0:2e5:8874:d883 with SMTP id k3-20020a5d4283000000b002e58874d883mr2297075wrq.8.1680706737309;
+        Wed, 05 Apr 2023 07:58:57 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id o15-20020a5d474f000000b002d7a75a2c20sm15255777wrs.80.2023.04.05.07.58.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Apr 2023 07:58:56 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 16:58:55 +0200
+From:   Andrew Jones <ajones@ventanamicro.com>
 To:     Sunil V L <sunilvl@ventanamicro.com>
 Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
@@ -41,13 +58,14 @@ Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         llvm@lists.linux.dev,
         "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
         "Rafael J . Wysocki" <rafael@kernel.org>,
-        Tom Rix <trix@redhat.com>, Weili Qian <qianweili@huawei.com>,
+        Tom Rix <trix@redhat.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Weili Qian <qianweili@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Jonathan Corbet <corbet@lwn.net>,
         Marc Zyngier <maz@kernel.org>,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
+        Len Brown <lenb@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
         Mark Gross <markgross@kernel.org>,
         Hans de Goede <hdegoede@redhat.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -56,133 +74,31 @@ Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         Nick Desaulniers <ndesaulniers@google.com>,
         Zhou Wang <wangzhou1@hisilicon.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
-        Len Brown <lenb@kernel.org>,
         Maximilian Luz <luzmaximilian@gmail.com>,
         "David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH V4 13/23] RISC-V: cpufeature: Add ACPI support in
- riscv_fill_hwcap()
-Message-ID: <20230405-compel-slinky-2fe11b4bf0b3@spud>
+Subject: Re: [PATCH V4 11/23] RISC-V: smpboot: Add ACPI support in smp_setup()
+Message-ID: <yqged6rmz4qb6sxhjfmypnjx3tmmoramynt45rszr2dk5awlmr@ovhlptchhv7t>
 References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
- <20230404182037.863533-14-sunilvl@ventanamicro.com>
- <20230404-promotion-scarce-7c69ff7e5f99@spud>
- <ZC15LqYqLzmiVdcr@sunil-laptop>
+ <20230404182037.863533-12-sunilvl@ventanamicro.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="G5/7scijW3x9IuES"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZC15LqYqLzmiVdcr@sunil-laptop>
+In-Reply-To: <20230404182037.863533-12-sunilvl@ventanamicro.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Apr 04, 2023 at 11:50:25PM +0530, Sunil V L wrote:
+> Enable SMP boot on ACPI based platforms by using the RINTC
+> structures in the MADT table.
+> 
+> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
+> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> ---
+>  arch/riscv/include/asm/acpi.h |  2 +
+>  arch/riscv/kernel/smpboot.c   | 72 ++++++++++++++++++++++++++++++++++-
+>  2 files changed, 73 insertions(+), 1 deletion(-)
+>
 
---G5/7scijW3x9IuES
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 05, 2023 at 07:05:42PM +0530, Sunil V L wrote:
-> On Tue, Apr 04, 2023 at 09:57:19PM +0100, Conor Dooley wrote:
-> > On Tue, Apr 04, 2023 at 11:50:27PM +0530, Sunil V L wrote:
-> > > On ACPI based systems, the information about the hart
-> > > like ISA is provided by the RISC-V Hart Capabilities Table (RHCT).
-> > > Enable filling up hwcap structure based on the information in RHCT.
-> > >=20
-> > > Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
-> > > Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> > > ---
-> > >  arch/riscv/kernel/cpufeature.c | 39 ++++++++++++++++++++++++++++++--=
---
-> > >  1 file changed, 35 insertions(+), 4 deletions(-)
-> > >=20
-> > > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufe=
-ature.c
-> > > index 63e56ce04162..5d2065b937e5 100644
-> > > --- a/arch/riscv/kernel/cpufeature.c
-> > > +++ b/arch/riscv/kernel/cpufeature.c
-> > > @@ -6,6 +6,7 @@
-> > >   * Copyright (C) 2017 SiFive
-> > >   */
-> > > =20
-> > > +#include <linux/acpi.h>
-> > >  #include <linux/bitmap.h>
-> > >  #include <linux/ctype.h>
-> > >  #include <linux/libfdt.h>
-> > > @@ -13,6 +14,8 @@
-> > >  #include <linux/memory.h>
-> > >  #include <linux/module.h>
-> > >  #include <linux/of.h>
-> > > +#include <linux/of_device.h>
-> > > +#include <asm/acpi.h>
-> > >  #include <asm/alternative.h>
-> > >  #include <asm/cacheflush.h>
-> > >  #include <asm/errata_list.h>
-> > > @@ -91,6 +94,9 @@ void __init riscv_fill_hwcap(void)
-> > >  	char print_str[NUM_ALPHA_EXTS + 1];
-> > >  	int i, j, rc;
-> > >  	unsigned long isa2hwcap[26] =3D {0};
-> > > +	struct acpi_table_header *rhct;
-> > > +	acpi_status status;
-> > > +	unsigned int cpu;
-> > > =20
-> > >  	isa2hwcap['i' - 'a'] =3D COMPAT_HWCAP_ISA_I;
-> > >  	isa2hwcap['m' - 'a'] =3D COMPAT_HWCAP_ISA_M;
-> > > @@ -103,14 +109,36 @@ void __init riscv_fill_hwcap(void)
-> > > =20
-> > >  	bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
-> > > =20
-> > > -	for_each_of_cpu_node(node) {
-> > > +	if (!acpi_disabled) {
-> > > +		status =3D acpi_get_table(ACPI_SIG_RHCT, 0, &rhct);
-> > > +		if (ACPI_FAILURE(status))
-> > > +			return;
-> > > +	}
-> > > +
-> > > +	for_each_possible_cpu(cpu) {
-> > >  		unsigned long this_hwcap =3D 0;
-> > >  		DECLARE_BITMAP(this_isa, RISCV_ISA_EXT_MAX);
-> > >  		const char *temp;
-> > > =20
-> > > -		if (of_property_read_string(node, "riscv,isa", &isa)) {
-> > > -			pr_warn("Unable to find \"riscv,isa\" devicetree entry\n");
-> > > -			continue;
-> > > +		if (acpi_disabled) {
-> > > +			node =3D of_cpu_device_node_get(cpu);
-> > > +			if (node) {
-> > > +				rc =3D of_property_read_string(node, "riscv,isa", &isa);
-> >=20
-> > Hmm, after digging in the previous patch, I think this is actually not
-> > possible to fail? We already validated it when setting up the mask of
-> > possible cpus, but I think leaving the error handling here makes things
-> > a lot more obvious.
-> >=20
-> Yeah, do you prefer to merge these patches again since only in this
-> patch, we change the loop to for_each_possible_cpu() from
-> for_each_of_cpu_node() which actually makes riscv_of_processor_hartid()
-> not useful?
-
-Yah, all 3 of us mistakenly thought that that was an unrelated cleanup
-on the last revision, but clearly it is not.
-Squash it back IMO, sorry for my part in the extra work generated.
-
-Cheers,
-Conor.
-
->=20
-> > I'd swear I gave you a (conditional) R-b on v3 though, no?
-> > Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-
---G5/7scijW3x9IuES
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZC2GOAAKCRB4tDGHoIJi
-0rnsAP0cgFLWkLbUrSntzAuLfoBAltCrodxxTLrayMe+WsSAOgEA0umoMwKzM2ox
-W+uIW/1axAfQExBp1IRIgO1BnHHRKAE=
-=CYcq
------END PGP SIGNATURE-----
-
---G5/7scijW3x9IuES--
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
