@@ -2,125 +2,198 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A26C7619A
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 07:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 095B3C761AF
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 07:56:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236867AbjDEHcw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 03:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44550 "EHLO
+        id S237009AbjDEH4i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 03:56:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237055AbjDEHcZ (ORCPT
+        with ESMTP id S237041AbjDEH4h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 03:32:25 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A6D559B
-        for <linux-crypto@vger.kernel.org>; Wed,  5 Apr 2023 00:31:44 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id q191so3865270pgq.7
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Apr 2023 00:31:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680679903;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9oFHBwDflAuoBx3nAvQZJqLFUNje4jYksqgr3MUJ8Rg=;
-        b=iXUMZHc446PS3IQBnpaoYwlsVWtesXSS14qR/2raGp8D9arZ2hC9sa7ua9uL3LlVWz
-         ODVIdaWILyr+HCGJo8szz2pHi3D19q5+yC2y3dK5Ue2H96BOwQ7Bx9GedzGCAz0TSqzQ
-         yLnvyeBLmNEoIveXrjAFAzyx6gjpmqkCFwz0gyUerlMBPip6iTofHr3jRF5glsxqTL3Z
-         O5oGrcm8Gr7qkVYb/sd3WePQtA5khwlR2liNu5y0GiyN/JA+z50i2VAsfp1VV2osfDBT
-         s078Ck6ypD0yAnFyG7Kv0NmlgK94VgCD2CKuLabl3K+D4yGbBCW/HQC8L0g8o3lfeCnY
-         baEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680679903;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9oFHBwDflAuoBx3nAvQZJqLFUNje4jYksqgr3MUJ8Rg=;
-        b=cJQAqK5Do8KEehpkhprtmvuIpAalZwzN/ZO24yGEg0t0KFVW+IMLCpUxVbNBKzpG+9
-         Lbhq+mEwFYKt8GRkUS44a0JZm+CFx0wqypvCx9X3uuKwbaDJEbWLwzhYjV/AfsQOolei
-         95RIjBJR5ooro5WEI/AA1ennBdAAJxrMCclaV2lpjnMjLjFKWI7DNFfNl3mJOEJ3V7HK
-         9Uc1WsPjYGJftbYyd2PaszbYSOlc8HN/b33tWwJQHc8NTiJg+qf9gNtvFXEMmEP+JkPy
-         XgU/QNM3zYhA2IxV9IXtFSw0MMkTvEPIa0XPOAPTsMj3LzNqKw32qRnvnk+cVQS0jxhw
-         tXoQ==
-X-Gm-Message-State: AAQBX9fLM2evULviTswUmD/AHJGdHmrAcTrykHBsO/OPTIhDFVr8zN/o
-        ppYBte9QT2Y42PcWWE3SylZu8Q==
-X-Google-Smtp-Source: AKy350YhwcabbMAVUwTuagacxKx3KGMxiWOnBOsSG28WbyONpgKoA/kMxM9LvBpYrEs/YV0r2K8kzA==
-X-Received: by 2002:aa7:93da:0:b0:62d:d748:94d2 with SMTP id y26-20020aa793da000000b0062dd74894d2mr5410013pff.28.1680679903377;
-        Wed, 05 Apr 2023 00:31:43 -0700 (PDT)
-Received: from localhost.localdomain ([223.233.67.41])
-        by smtp.gmail.com with ESMTPSA id l7-20020a635b47000000b004facdf070d6sm8781507pgm.39.2023.04.05.00.31.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 00:31:43 -0700 (PDT)
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
-        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
-        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org
-Subject: [PATCH v6 11/11] arm64: dts: qcom: sm8450: add crypto nodes
-Date:   Wed,  5 Apr 2023 12:58:36 +0530
-Message-Id: <20230405072836.1690248-12-bhupesh.sharma@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
-References: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
+        Wed, 5 Apr 2023 03:56:37 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC50F30ED;
+        Wed,  5 Apr 2023 00:56:35 -0700 (PDT)
+Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 27A40210DEC6;
+        Wed,  5 Apr 2023 00:56:33 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 27A40210DEC6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1680681395;
+        bh=egqdAV4kdd4zNtqfpyFgRnX5D2obdbt5vjBGu/pAukg=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=D+25i0yDYLpCIJ/YBM9SNd9uQlmVXmidaOufFyZqtV31fx3il+atpwL7iIac0YPKB
+         dnaowxVR8WqIefn4i8lHUEGLmic9T7PQvIHou4sRaUmXj/T18tzeWyZW9DVRnLPfBi
+         Cf+PG1MyCAbSGCJ7UmRTN2898Bv6P5yvTUpeLS/4=
+Message-ID: <8d39a9a1-4b7b-08fe-7b09-2ff0a419468f@linux.microsoft.com>
+Date:   Wed, 5 Apr 2023 09:56:31 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>
+Cc:     linux-kernel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Kalra, Ashish" <ashish.kalra@amd.com>,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
+ <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
+ <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
+ <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
+ <ecf005b1-ddb9-da4c-4526-28df4806426c@linux.microsoft.com>
+ <20230323152342.GFZBxu/m3u6aFUDY/7@fat_crate.local>
+ <105d019c-2249-5dfd-e032-95944ea6dc8c@linux.microsoft.com>
+ <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
+ <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
+ <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local> <877cutsczn.ffs@tglx>
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <877cutsczn.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Neil Armstrong <neil.armstrong@linaro.org>
+On 4/3/2023 8:20 AM, Thomas Gleixner wrote:
+> On Sun, Apr 02 2023 at 17:44, Borislav Petkov wrote:
+>> On Fri, Mar 24, 2023 at 06:10:09PM +0100, Jeremi Piotrowski wrote:
+>>> Since the AMD PSP is a privileged device, there is a desire to not have to trust the
+>>> ACPI stack,
+>>
+>> And yet you do:
+>>
+>> +	err = acpi_parse_aspt(&res[0], &pdata);
+>> +	if (err)
+>> +		return err;
+>>
+>> You don't trust the ACPI stack, and yet you're parsing an ACPI table?!?!
+>> You have to make up your mind here.
+>>
+>> Btw, you still haven't answered my question about doing:
+>>
+>> 	devm_request_irq(dev, 9, ..)
+>>
+>> where 9 is the default ACPI interrupt.
+>>
+>> You can have some silly table tell you what to map or you can simply map
+>> IRQ 9 and be done with it. In this second case you can *really* not
+>> trust ACPI because you know which IRQ it is
 
-Add crypto engine (CE) and CE BAM related nodes and definitions
-for the SM8450 SoC.
+Will respond to this mail directly.
 
-Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-[Bhupesh: Corrected the compatible list]
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
----
- arch/arm64/boot/dts/qcom/sm8450.dtsi | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+> 
+> The real problem here is that the information provided about the overall
+> design and requirements is close to zero. All we heard so far is hand
+> waving about not trusting PCI and ACPI.
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-index 31877f18dce2..d7a28cac4f47 100644
---- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-@@ -4146,6 +4146,34 @@ ufs_mem_phy_lanes: phy@1d87400 {
- 			};
- 		};
- 
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x28000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			iommus = <&apps_smmu 0x584 0x11>,
-+				 <&apps_smmu 0x588 0x0>,
-+				 <&apps_smmu 0x598 0x5>,
-+				 <&apps_smmu 0x59a 0x0>,
-+				 <&apps_smmu 0x59f 0x0>;
-+		};
-+
-+		crypto: crypto@1de0000 {
-+			compatible = "qcom,sm8450-qce", "qcom,sm8150-qce", "qcom,qce";
-+			reg = <0 0x01dfa000 0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x584 0x11>,
-+				 <&apps_smmu 0x588 0x0>,
-+				 <&apps_smmu 0x598 0x5>,
-+				 <&apps_smmu 0x59a 0x0>,
-+				 <&apps_smmu 0x59f 0x0>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>;
-+			interconnect-names = "memory";
-+		};
-+
- 		sdhc_2: mmc@8804000 {
- 			compatible = "qcom,sm8450-sdhci", "qcom,sdhci-msm-v5";
- 			reg = <0 0x08804000 0 0x1000>;
--- 
-2.38.1
+That's not a fair characterization Thomas, but I will turn the other cheek.
 
+> 
+> Jeremi, can you please describe exactly what the design and constraints
+> are in understandable and coherent sentences?
+> 
+
+Here goes, I will keep it as simple as I can.
+
+The goal of these patches is to operate all the hardware interfaces required
+to run AMD SEV-SNP VMs, but in the context of a Linux VM running on top of
+Hyper-V. This Linux VM is called the SNP-host VM. All the patches I submit 
+target the SNP-host VM kernel, which uses KVM to bring up SEV-SNP VMs. To get
+SEV-SNP working you need to combine this work with AMD's KVM SEV-SNP patches.
+I posted two patch sets: one that extends AMD's patches, and one that is
+independent of them (this one here) that could be merged sooner.
+
+Here are the design constraints:
+1. the interfaces exposed to the SNP-host VM to operate SEV-SNP match real
+   hardware interface specifications defined by AMD. This is because we are
+   emulating/virtualizing a hardware feature, and not some made up virtual
+   thing.
+
+2. the SNP-host VM may run either Windows(Hyper-V) or Linux, so the SEV-SNP
+   interfaces need to be supported by both.
+
+3. Hyper-V Generation 2 VMs do not have a PCI bus. The SNP-host VM must be a
+   Hyper-V Gen 2 VM.
+
+One of the components needed to operate SEV-SNP is the Platform Security
+Processor (PSP), aka AMD Secure Processor (ASP). The PSP is the root-of-trust on
+AMD systems. The PSP is specified as being discoverable either on the PCI bus,
+or through the presence of an ACPI table with the "ASPT" (AMD Secure Processor
+Table) signature.
+
+Here goes the design:
+Constraint 1 means that only the two specified ways of discovering and
+configuring a PSP inside the SNP-host VM were in the running: PCI or ASPT.
+Constraint 3 means that the PCI version of the PSP is not a viable option.
+Additionally, the ASPT is used on AMD hardware in Microsoft datacenters, which
+means it is supported in Hyper-V (constraint 2). The outcome is that the
+SNP-host VM sees an ASPT.
+
+The ASPT provides the following information: memory range of PSP registers and
+offsets of individual PSP registers inside that memory range. There are 7
+registers:
+- 6 are related to the "command submission" portion of the PSP; the ccp module
+  knows how to operate those.
+- the last one, "ACPI CmdResp" register, is used to configure the PSP interrupt
+  to the OS.
+
+The PSP interrupt configuration through the "ACPI CmdResp" register takes the
+following information:
+- APIC ID
+- interrupt vector
+- destination mode (physical/logical)
+- message type (fixed/lowest priority)
+
+So to hook this up with the Linux device model I wrote patches that do the
+following:
+Detect the ASPT table, extract information and register a "psp" platform_device
+for the "ccp" module to bind to.
+Create an irq_domain and encapsulate dealing with the PSP interrupt register
+there, so that the "ccp" module has an irq number that it passes to
+request_irq().
+
+There is an "if (hypervisor == Hyper-V)" check before the ASPT table detection.
+Here is the reasoning behind that:
+According to AMD specifications the *same* PSP may be discoverable both through
+ASPT and on the PCI bus. In that case, if the ASPT is to be used the OS is supposed
+to disable the "PCI interface" through the "ACPI CmdResp" register, which will
+result in no PCI-MSI interrupts, BAR writes ignored, BAR reads return all 0xF's.
+I can't verify whether that would work correctly, so in the interest of not
+breaking other users, the ASPT handling is hidden behind the hypervisor check.
+There is nothing Hyper-V specific about any of this code, it supports a hardware
+interface present in server grade hardware and would work on physical hardware if
+when (not if) someone removes the condition.
+
+That's all there is to it.
+
+All the other information I gave is background information that I hoped would
+help better understand the setting. The most relevant piece of information is the
+one that I came across last. You asked "what makes this PSP device special". The PSP
+is the root-of-trust on the system, it controls memory encryption keys, it can
+encrypt/decrypt individual memory pages. SEV-SNP ties together a lot of system components
+and requires enabling support for it in the AMD IOMMU too, which is presumably why
+the PSP gets the same special treatment (as the AMD IOMMU). The ASPT and AMD PSP interrupt
+configuration through the "ACPI CmdResp" register is based on a similar design of the AMD IOMMU.
+The AMD IOMMU is:
+- discovered through the presence of the IVRS ACPI table
+- the MMIO address of the IOMMU is parsed out of the IVRS table
+- if x2APIC support is enabled, the IOMMU interrupts are delivered based on
+  programming APIC-ID+vector+destination mode into an interrupt control register
+  in IOMMU MMIO space. This causes any PCI-MSI configuration present for the
+  IOMMU to   be ignored.
+- Linux supports and uses that interrupt delivery mechanism. It is implemented
+  as an irq_domain.
+
+Do you think it makes sense to include parts of the above description in cover letter
+commit message?
+
+Thanks,
+Jeremi
