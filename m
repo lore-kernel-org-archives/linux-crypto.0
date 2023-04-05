@@ -2,155 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C5FC77B62
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 08:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 839D8C7619A
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 08:50:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237176AbjDEIfw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 04:35:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58166 "EHLO
+        id S237140AbjDEIuQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 04:50:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236931AbjDEIfv (ORCPT
+        with ESMTP id S237501AbjDEIuP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 04:35:51 -0400
-X-Greylist: delayed 600 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 05 Apr 2023 01:35:50 PDT
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39DAD2704;
-        Wed,  5 Apr 2023 01:35:50 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.west.internal (Postfix) with ESMTP id D88F52B0670E;
-        Wed,  5 Apr 2023 04:16:39 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Wed, 05 Apr 2023 04:16:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1680682599; x=1680689799; bh=E4
-        FRrBsELPivENRQDY0P/B5Hrosa4b2SmzmKSYFWm74=; b=O/RfOi1e5gJBwc3CRO
-        6EWvOBPfA7kqdj7sZ1wQWWJRIVpKzE5AI1hqc9WANjEOPc0VlKVpBB4IA4gZh8jQ
-        7gQbGkU/Y7DjtFOLLPN2B+vqHOOIpYuv14gSHyL8hoTTLdHfdixPwXlAinewnJDy
-        pCU4zgyjDP5nazvefaHE4a+MCCjlehkk78cElYr1RQto9eQtQ66JYTUtMLTXLFyT
-        alXZtoTKYSuJlOQrx08qlQ0XnRUG+rrBgeadWFfm485RuHUuAtjGh84wQTvAYf1u
-        Z4J5r1RhIdDO0VDx3umJg901SgI7cGEjedjvsQUVn+HdOdl7WOHeLra+pJfCDene
-        /X1Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1680682599; x=1680689799; bh=E4FRrBsELPivE
-        NRQDY0P/B5Hrosa4b2SmzmKSYFWm74=; b=irXtbfnN+lz4Id+q0cchgDiq/0att
-        SZqF0jA+dW9eKrzI/Hdz0raj/1VcYz0S2gflBmiiqXTKBYnMjkxwwGXfOBUii5yE
-        UrocSTbwq7UP1YsQOV8mpGny+1J6D/q3YTuWIjpoWhsH+YM/IfYiygJCac3N83Rc
-        FJfmsJfFPEZjMUiI7b0DptN2qlYh2d+yzFiyZZCVdZw8M2Qder99fArmpHJjQqtb
-        qgM7HX6Vcg63d5aPXxLvB+iY6dIDVy5KgzAvwHDcIEJfNmboJODOxqD/5X2FpFq8
-        3vw1jmm7OATqI4D9ojOZsheWtwXNAsp0MSV7XYqVK+79+CiIBWKVP4crA==
-X-ME-Sender: <xms:ZS4tZMZI9AV0RkcBkz6u_qTZcu_jT_tJVGVzJyGanPX9Z0iZPDhS6Q>
-    <xme:ZS4tZHb84hRVmfo9CZeAclAfKYo1GAUMzA1q3vIakl9kqrd-rtexHH9Q_vpBMa_vo
-    DitDxNyuewPeT5a4og>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdejuddgtddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:ZS4tZG_an9tb6QDw-DeyRnF-MoiRX3UK2FT5yYldQhdyUCEPK3p6cw>
-    <xmx:ZS4tZGonhwZm-UauGA8CU4Sr3yRYaGJgKoEqtpioN0iBOguVj5kRVA>
-    <xmx:ZS4tZHrI8LJ6T2u70F_faSulNUPHdK-DiuwYUbgSpTxTR3iMl3AIXw>
-    <xmx:Zy4tZBagRz_7kfsOKTOayTV_ewyD5h_EN8mJJP8RTtf85jnMin17RvleoA4>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 3B97AB6008F; Wed,  5 Apr 2023 04:16:37 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-334-g8c072af647-fm-20230330.001-g8c072af6
-Mime-Version: 1.0
-Message-Id: <dcd04005-2dba-4ccc-a235-a809220f9dbd@app.fastmail.com>
-In-Reply-To: <20230404182037.863533-24-sunilvl@ventanamicro.com>
-References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
- <20230404182037.863533-24-sunilvl@ventanamicro.com>
-Date:   Wed, 05 Apr 2023 10:16:00 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Sunil V L" <sunilvl@ventanamicro.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-acpi@vger.kernel.org, linux-crypto@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, llvm@lists.linux.dev
-Cc:     "Jonathan Corbet" <corbet@lwn.net>,
-        "Paul Walmsley" <paul.walmsley@sifive.com>,
-        "Palmer Dabbelt" <palmer@dabbelt.com>,
-        "Albert Ou" <aou@eecs.berkeley.edu>, "Len Brown" <lenb@kernel.org>,
-        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Weili Qian" <qianweili@huawei.com>,
-        "Zhou Wang" <wangzhou1@hisilicon.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Marc Zyngier" <maz@kernel.org>,
-        "Maximilian Luz" <luzmaximilian@gmail.com>,
-        "Hans de Goede" <hdegoede@redhat.com>,
-        "Mark Gross" <markgross@kernel.org>,
-        "Nathan Chancellor" <nathan@kernel.org>,
-        "Nick Desaulniers" <ndesaulniers@google.com>,
-        "Tom Rix" <trix@redhat.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH V4 23/23] crypto: hisilicon/qm: Workaround to enable build with
- RISC-V clang
-Content-Type: text/plain
+        Wed, 5 Apr 2023 04:50:15 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 617A92736;
+        Wed,  5 Apr 2023 01:50:14 -0700 (PDT)
+Received: from [192.168.2.41] (77-166-152-30.fixed.kpn.net [77.166.152.30])
+        by linux.microsoft.com (Postfix) with ESMTPSA id B71A4210DECD;
+        Wed,  5 Apr 2023 01:50:11 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B71A4210DECD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1680684613;
+        bh=57bX2Yn8I2wf2e2nSid0EfvUv8qculkKdJgSF0wuaDI=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=iFVxKM2NDuDMdhtMT/d9+4pCUGi1W+d9juefoMlc51Ur6HIxAfXT48Zuzxyrd0me0
+         E6N/u4B9cPxr/O9iTE5I1hgsjQnFVMPmZaKvzdNZi0wSda9Ku+bX+rzploONz0qou2
+         tSxj70KaD5qziqt+mXesRRb6+njF2ssR33e4y3V4=
+Message-ID: <ceece3a9-bbe9-f8d4-f446-c2c8dd285a8e@linux.microsoft.com>
+Date:   Wed, 5 Apr 2023 10:50:10 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v3 0/8] Support ACPI PSP on Hyper-V
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Kalra, Ashish" <ashish.kalra@amd.com>,
+        linux-crypto@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
+References: <20230320191956.1354602-1-jpiotrowski@linux.microsoft.com>
+ <20230322154655.GDZBsi75f6LnQStxSp@fat_crate.local>
+ <1d25221c-eaab-0f97-83aa-8b4fbe3a53ed@linux.microsoft.com>
+ <20230322181541.GEZBtFzRAMcH9BAzUe@fat_crate.local>
+ <ecf005b1-ddb9-da4c-4526-28df4806426c@linux.microsoft.com>
+ <20230323152342.GFZBxu/m3u6aFUDY/7@fat_crate.local>
+ <105d019c-2249-5dfd-e032-95944ea6dc8c@linux.microsoft.com>
+ <20230323163450.GGZBx/qpnclFnMaf7e@fat_crate.local>
+ <c8458bfa-0985-f6a5-52a3-ef96c7669fe6@linux.microsoft.com>
+ <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+In-Reply-To: <20230402154425.GCZCmi2eiKYO2yYhNs@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 4, 2023, at 20:20, Sunil V L wrote:
-> With CONFIG_ACPI enabled for RISC-V, this driver gets enabled in
-> allmodconfig build. The gcc tool chain builds this driver removing the
-> inline arm64 assembly code. However, clang for RISC-V tries to build
-> the arm64 assembly and below error is seen.
->
-> drivers/crypto/hisilicon/qm.c:627:10: error: invalid output constraint 
-> '+Q' in asm
->                        "+Q" (*((char __iomem *)fun_base))
->                        ^
-> It appears that RISC-V clang is not smart enough to detect
-> IS_ENABLED(CONFIG_ARM64) and remove the dead code.
->
-> As a workaround, move this check to preprocessing stage which works
-> with the RISC-V clang tool chain.
->
-> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
-
-Your patch looks correct for this particular problem, but I
-see that there are a couple of other issues in the same function:
-
-> -	}
-> +#if IS_ENABLED(CONFIG_ARM64)
-> +	unsigned long tmp0 = 0, tmp1 = 0;
+On 4/2/2023 5:44 PM, Borislav Petkov wrote:
+> On Fri, Mar 24, 2023 at 06:10:09PM +0100, Jeremi Piotrowski wrote:
+>> Since the AMD PSP is a privileged device, there is a desire to not have to trust the
+>> ACPI stack,
 > 
->  	asm volatile("ldp %0, %1, %3\n"
->  		     "stp %0, %1, %2\n"
-> @@ -627,6 +623,11 @@ static void qm_mb_write(struct hisi_qm *qm, const 
-> void *src)
->  		       "+Q" (*((char __iomem *)fun_base))
->  		     : "Q" (*((char *)src))
->  		     : "memory");
+> And yet you do:
+> 
+> +	err = acpi_parse_aspt(&res[0], &pdata);
+> +	if (err)
+> +		return err;
+> 
+> You don't trust the ACPI stack, and yet you're parsing an ACPI table?!?!
+> You have to make up your mind here.
+> 
+> Btw, you still haven't answered my question about doing:
+> 
+> 	devm_request_irq(dev, 9, ..)
+> 
+> where 9 is the default ACPI interrupt.
+> 
+> You can have some silly table tell you what to map or you can simply map
+> IRQ 9 and be done with it. In this second case you can *really* not
+> trust ACPI because you know which IRQ it is.
+> 
 
-For the arm64 version:
+Sorry I broke threading. Meant to post this email:
+https://lore.kernel.org/lkml/35f6b321-1668-2b62-cb47-3f3760be2e1d@linux.microsoft.com/#t
+as a reply to *this* one.
 
-- the "dmb oshst" barrier needs to come before the stp, not after
-  it,  otherwise there is no guarantee that data written to memory
-  is visible by the device when the mailbox gets triggered
-- The input/output arguments need to be pointers to 128-bit types,
-  either a struct or a __uint128_t
-- this lacks a byteswap on big-endian kernels
-
-> +#else
-> +	memcpy_toio(fun_base, src, 16);
-> +	dma_wmb();
-> +#endif
-
-This version has the same problems, plus the write is not actually
-atomic. I wonder if a pair of writeq() calls would just do the
-right thing here for both arm64 and others, or possibly a
-writeq() followed by a writeq_relaxed() to avoid the extra dmb()
-in the middle.
-
-     Arnd
+Jeremi
