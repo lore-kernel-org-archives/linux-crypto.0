@@ -2,73 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0AD2C77B62
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 05:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A07F5C76188
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 06:04:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236929AbjDEFt4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 01:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43144 "EHLO
+        id S236774AbjDEGEk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 02:04:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236893AbjDEFts (ORCPT
+        with ESMTP id S229478AbjDEGEi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 01:49:48 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F017C4C26;
-        Tue,  4 Apr 2023 22:49:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=vcMv3tvKdemNUTXrzjg4RlFzzLZmXitLif8MJjxnjA8=; b=EHArZHOQHvo1lYWfDQtZn+71Hj
-        r1p5zbdo1tHJY4wqResYVY3hqzBcDyzNoirbQJttiHBDtj/Oqs+C8N8inlab16FAeBw1O3yXFyBbK
-        xRkWOCvnqSEoLngqoh4Ctq2ugNKuWqTwnM9WbLVTiAFsngQfskEfQ3qGHc65NenpVcsjwnsZ42S3i
-        FVZjLnwrT2A0SyvhvHBEJhz8Mt+OlgnRRTvYkCTc5ysusbT8s5Ot1l2wjKkZU/K1ptbNBi5WENcuA
-        ZT3i6K8mGWPaW/NbNN2aq5Nz4v+/uAfez/4+HejH9+jgn/nSyvNnpqJN80CBsIvRueZWNlF2ujNOo
-        Diwl0vxw==;
-Received: from [2001:4bb8:191:a744:c06e:b99:9fd8:3e0] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pjw19-003Ql2-0w;
-        Wed, 05 Apr 2023 05:49:11 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-btrfs@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 1/2] btrfs: don't print the crc32c implementtion at load time
-Date:   Wed,  5 Apr 2023 07:49:04 +0200
-Message-Id: <20230405054905.94678-2-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230405054905.94678-1-hch@lst.de>
+        Wed, 5 Apr 2023 02:04:38 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C82173A;
+        Tue,  4 Apr 2023 23:04:36 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pjwFg-00CU7i-9v; Wed, 05 Apr 2023 14:04:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Apr 2023 14:04:12 +0800
+Date:   Wed, 5 Apr 2023 14:04:12 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/2] libcrc32c: remove crc32c_impl
+Message-ID: <ZC0PXBnNulTC7Xqn@gondor.apana.org.au>
 References: <20230405054905.94678-1-hch@lst.de>
+ <20230405054905.94678-3-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230405054905.94678-3-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Btrfs can use various different checksumming algorithms, and prints
-the one used for a given file system at mount time.  Don't bother
-printing the crc32c implementation at module load time.
+On Wed, Apr 05, 2023 at 07:49:05AM +0200, Christoph Hellwig wrote:
+> This was only ever used by btrfs, and the btrfs users just went away.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  include/linux/crc32c.h | 1 -
+>  lib/libcrc32c.c        | 6 ------
+>  2 files changed, 7 deletions(-)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/btrfs/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index 285c7189b92466..bf79e49157c5e5 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -2412,7 +2412,7 @@ static int __init btrfs_print_mod_info(void)
- 			", fsverity=no"
- #endif
- 			;
--	pr_info("Btrfs loaded, crc32c=%s%s\n", crc32c_impl(), options);
-+	pr_info("Btrfs loaded%s\n", options);
- 	return 0;
- }
- 
+Thanks,
 -- 
-2.39.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
