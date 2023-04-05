@@ -2,161 +2,174 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D19AC77B60
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 11:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9820C761A6
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 13:35:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237852AbjDELgB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 07:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47474 "EHLO
+        id S238272AbjDENf6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 09:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237871AbjDELf6 (ORCPT
+        with ESMTP id S238256AbjDENf5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 07:35:58 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887F41BD7;
-        Wed,  5 Apr 2023 04:35:55 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id e18so35855315wra.9;
-        Wed, 05 Apr 2023 04:35:55 -0700 (PDT)
+        Wed, 5 Apr 2023 09:35:57 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608C749D1
+        for <linux-crypto@vger.kernel.org>; Wed,  5 Apr 2023 06:35:55 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id p13-20020a17090a284d00b0023d2e945aebso4077841pjf.0
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Apr 2023 06:35:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680694553;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FlvKXsC33Y3r1CipsD3fypO8/mtd2VSfqMY0AAuYEJU=;
-        b=lORbIDSoT/048s2YK0Ooqaq76pp9nO16IgSl7E0zcw4519qRfB2EB9bS33CYOOkI5J
-         pfTaClxlRxqDfVRYTx2Z+UgdqAZLwhJB9A5pB14jcytveOARMJzLG5xpjgyCQ8NG+8lz
-         ev3K604YpC9YuL/r728Z1Y9hLVtLsaw+N/7x4L7nFGT0fiuzIfjnVXthx/T5amkZgCq0
-         pEEuVse58fqlV2CyoHyzTOON/kzCpp1NDkIarzhDQElXYaKK062+3PuMCp88nlhfHLQh
-         IU1Fh5+UUIInU8suruQpN1cboZlK59YnMqsD0tiYx/ZtqdSFCdDLQzmdD790LguYejUB
-         v8aw==
+        d=ventanamicro.com; s=google; t=1680701755;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JIHDYxgUdzzSqTP2brP/Gv5M90CrOXKIjgMsPWUPa3E=;
+        b=CKTKF4kpb7ZHTt5WzSMSNpO/YiANGdZvzrrD77G3R2AwcXrky8I6y4ejU+fBNRkbFN
+         lryZ+EIvfsuH2rhE1cSkHr2YVlmsBsCIb8FDF1XSoF0GPIMefcCmWeKloUJDFICHi6eb
+         7MRvsY+ChHOJQlUMZypaYAaLEZHVZ0W99yx9LtAckYSxsCvWLVnwy22p6QBxC6+q6Wm5
+         UhgAmuMSveoY6oR2rnXWLS00Sqg1O+H6+VjZvXkfNBpXmNdo6GRt3ztEp6czta8goSwK
+         oRSWcq7xRdYhdRHeqG+fJZwC0rkHEmiTgcIOzCeYaKuTbI1JTB78nUaYlT1a1CD4IDgf
+         bc6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680694553;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FlvKXsC33Y3r1CipsD3fypO8/mtd2VSfqMY0AAuYEJU=;
-        b=l1p4Nal/G3l4CLnqG2AoBkxX1vYXVfPVa2Dxx9n0fUj23CuwOHOTca5Gawcr+2oTjl
-         fd3k34m2VFQya4eBFtQPIIO6Fb5Zdda4CFW85+2rKoqYn3uo0TzwoFSBrlGdVNy7k58u
-         1eaUOeqpk7q8HThRCng7urkBlGLUkx3zZmFqs7xLsycyAav0hCxREP6v4yfUllUCvtJA
-         hQyNTk+qI02jC28ofcCxsZRq/li5aKmO0L5AlMwJ0mayXcORX+E1Xy2hfFZx3yRswcmD
-         Zo4SIctrFcUsuw/G/HckKXSzAyOvN8ofXFJJC03qIF8rnWbDF8M9zAQtixEFDfA6nUAz
-         MAbA==
-X-Gm-Message-State: AAQBX9csPRk53vQu36/yGJJSU+UEUA1k0n7+64ld187DVXoUYGLMzZRK
-        1hlqfsJKqvesNG3kA9LdVwc=
-X-Google-Smtp-Source: AKy350aseZzBCum6L3ZdzJV0ccP/niUOapvEPnQGYI92PSTLWqPEIZgktt6CkrodRO1mno8ot6F6IQ==
-X-Received: by 2002:adf:f004:0:b0:2cf:f01f:ed89 with SMTP id j4-20020adff004000000b002cff01fed89mr4390917wro.24.1680694553507;
-        Wed, 05 Apr 2023 04:35:53 -0700 (PDT)
-Received: from [192.168.237.204] (s-8d3a2aa4.on.site.uni-stuttgart.de. [141.58.42.164])
-        by smtp.gmail.com with ESMTPSA id r7-20020a5d4987000000b002ceacff44c7sm14806432wrq.83.2023.04.05.04.35.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 04:35:53 -0700 (PDT)
-Message-ID: <bedd7426-5875-dbd7-38fe-2e943c7109f8@gmail.com>
-Date:   Wed, 5 Apr 2023 13:35:45 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH V4 22/23] platform/surface: Disable for RISC-V
-To:     Sunil V L <sunilvl@ventanamicro.com>
+        d=1e100.net; s=20210112; t=1680701755;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JIHDYxgUdzzSqTP2brP/Gv5M90CrOXKIjgMsPWUPa3E=;
+        b=FZ7+uZ+ovo61G49/LQx4jHlQNrVlKENHQEPJpUClFet4YUYCT1t6DYH8B6Em8YeYw9
+         yifYNpCT1uhHzDakMI7mG79AtHIRUfd7NWmGN1Ao5rNQr7wErM6UYChhVAWyxmsoyJMR
+         H9qGiElWjjBYIRfa5eq3Q6VOUHhvJSZYqqsgmjv3XQ6WFXE8wS6TPgmuhyja7sPlEBpE
+         XQbGbM5VwHyzINx8tcHquCXxvk/MXw7SW04GOolEkVBJ54/PxcD3T2fjDKID3qYDz3pu
+         jhsriBkOBf2EEKVy4vAEp3JFIxSP9ob52+eIZL7I6fONVR+kT2xlSiDwzLw426yzJJB+
+         X1Vg==
+X-Gm-Message-State: AAQBX9fj8HCm68odBuRmywytvQFzY+I0H66v8M5A7XWIHBY4XRbYaWq0
+        bcad3ByP1aPX8YXS1cidKKOYiQ==
+X-Google-Smtp-Source: AKy350YakjU97DwbNOaHnJ7tP50TtKQnFHAXGnpEmklEn/OYjSLROKhCvPK2o+vvLvZ4pWgOW/ApXw==
+X-Received: by 2002:a17:902:e891:b0:1a1:f413:70b1 with SMTP id w17-20020a170902e89100b001a1f41370b1mr7345803plg.18.1680701754753;
+        Wed, 05 Apr 2023 06:35:54 -0700 (PDT)
+Received: from sunil-laptop ([106.51.184.50])
+        by smtp.gmail.com with ESMTPSA id 19-20020a170902c11300b0019cad2de86bsm10131129pli.156.2023.04.05.06.35.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Apr 2023 06:35:54 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 19:05:42 +0530
+From:   Sunil V L <sunilvl@ventanamicro.com>
+To:     Conor Dooley <conor@kernel.org>
 Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
         linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        llvm@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Len Brown <lenb@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        llvm@lists.linux.dev,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Tom Rix <trix@redhat.com>, Weili Qian <qianweili@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Jonathan Corbet <corbet@lwn.net>,
         Marc Zyngier <maz@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Mark Gross <markgross@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Nathan Chancellor <nathan@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Len Brown <lenb@kernel.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
         "David S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH V4 13/23] RISC-V: cpufeature: Add ACPI support in
+ riscv_fill_hwcap()
+Message-ID: <ZC15LqYqLzmiVdcr@sunil-laptop>
 References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
- <20230404182037.863533-23-sunilvl@ventanamicro.com>
- <0c433e15-640e-280f-fcb0-a8fe081d1bcc@gmail.com>
- <ZC1XUdD3DFnNauQ2@sunil-laptop>
-Content-Language: en-US
-From:   Maximilian Luz <luzmaximilian@gmail.com>
-In-Reply-To: <ZC1XUdD3DFnNauQ2@sunil-laptop>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ <20230404182037.863533-14-sunilvl@ventanamicro.com>
+ <20230404-promotion-scarce-7c69ff7e5f99@spud>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230404-promotion-scarce-7c69ff7e5f99@spud>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/5/23 13:11, Sunil V L wrote:
-> On Wed, Apr 05, 2023 at 11:33:00AM +0200, Maximilian Luz wrote:
->> On 4/4/23 20:20, Sunil V L wrote:
->>> With CONFIG_ACPI enabled for RISC-V, this driver gets enabled
->>> in allmodconfig build. However, RISC-V doesn't support sub-word
->>> atomics which is used by this driver. Due to this, the build fails
->>> with below error.
->>>
->>> In function â€˜ssh_seq_nextâ€™,
->>>       inlined from â€˜ssam_request_write_dataâ€™ at drivers/platform/surface/aggregator/controller.c:1483:8:
->>> ././include/linux/compiler_types.h:399:45: error: call to â€˜__compiletime_assert_335â€™ declared with attribute error: BUILD_BUG failed
->>>     399 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
->>>         |                                             ^
->>> ./include/linux/compiler.h:78:45: note: in definition of macro â€˜unlikelyâ€™
->>>      78 | # define unlikely(x)    __builtin_expect(!!(x), 0)
->>>         |                                             ^
->>> ././include/linux/compiler_types.h:387:9: note: in expansion of macro â€˜__compiletime_assertâ€™
->>>     387 |         __compiletime_assert(condition, msg, prefix, suffix)
->>>         |         ^~~~~~~~~~~~~~~~~~~~
->>> ././include/linux/compiler_types.h:399:9: note: in expansion of macro â€˜_compiletime_assertâ€™
->>>     399 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
->>>         |         ^~~~~~~~~~~~~~~~~~~
->>> ./include/linux/build_bug.h:39:37: note: in expansion of macro â€˜compiletime_assertâ€™
->>>      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
->>>         |                                     ^~~~~~~~~~~~~~~~~~
->>> ./include/linux/build_bug.h:59:21: note: in expansion of macro â€˜BUILD_BUG_ON_MSGâ€™
->>>      59 | #define BUILD_BUG() BUILD_BUG_ON_MSG(1, "BUILD_BUG failed")
->>>         |                     ^~~~~~~~~~~~~~~~
->>> ./arch/riscv/include/asm/cmpxchg.h:335:17: note: in expansion of macro â€˜BUILD_BUGâ€™
->>>     335 |                 BUILD_BUG();                                            \
->>>         |                 ^~~~~~~~~
->>> ./arch/riscv/include/asm/cmpxchg.h:344:30: note: in expansion of macro â€˜__cmpxchgâ€™
->>>     344 |         (__typeof__(*(ptr))) __cmpxchg((ptr),                           \
->>>         |                              ^~~~~~~~~
->>> ./include/linux/atomic/atomic-instrumented.h:1916:9: note: in expansion of macro â€˜arch_cmpxchgâ€™
->>>    1916 |         arch_cmpxchg(__ai_ptr, __VA_ARGS__); \
->>>         |         ^~~~~~~~~~~~
->>> drivers/platform/surface/aggregator/controller.c:61:32: note: in expansion of macro â€˜cmpxchgâ€™
->>>      61 |         while (unlikely((ret = cmpxchg(&c->value, old, new)) != old)) {
->>>         |                                ^~~~~~~
->>>
->>> So, disable this driver for RISC-V even when ACPI is enabled for now.
->>
->> CONFIG_SURFACE_PLATFORMS should be enabled for ARM64 || X86 || COMPILE_TEST only,
->> so I guess the issue only happens when compiling with the latter enabled?
->>
->> I'm not aware of any current plans of MS to release RISC-V-based Surface
->> devices, so you could maybe also just explicitly disable CONFIG_SURFACE_PLATFORMS.
->> In any case, I don't see any issues with disabling the whole platform/surface
->> or only individual drivers for RISC-V, so for either solution:
->>
->> Acked-by: Maximilian Luz <luzmaximilian@gmail.com>
->>
-> Hi Maximilian,
+On Tue, Apr 04, 2023 at 09:57:19PM +0100, Conor Dooley wrote:
+> On Tue, Apr 04, 2023 at 11:50:27PM +0530, Sunil V L wrote:
+> > On ACPI based systems, the information about the hart
+> > like ISA is provided by the RISC-V Hart Capabilities Table (RHCT).
+> > Enable filling up hwcap structure based on the information in RHCT.
+> > 
+> > Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
+> > Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > ---
+> >  arch/riscv/kernel/cpufeature.c | 39 ++++++++++++++++++++++++++++++----
+> >  1 file changed, 35 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> > index 63e56ce04162..5d2065b937e5 100644
+> > --- a/arch/riscv/kernel/cpufeature.c
+> > +++ b/arch/riscv/kernel/cpufeature.c
+> > @@ -6,6 +6,7 @@
+> >   * Copyright (C) 2017 SiFive
+> >   */
+> >  
+> > +#include <linux/acpi.h>
+> >  #include <linux/bitmap.h>
+> >  #include <linux/ctype.h>
+> >  #include <linux/libfdt.h>
+> > @@ -13,6 +14,8 @@
+> >  #include <linux/memory.h>
+> >  #include <linux/module.h>
+> >  #include <linux/of.h>
+> > +#include <linux/of_device.h>
+> > +#include <asm/acpi.h>
+> >  #include <asm/alternative.h>
+> >  #include <asm/cacheflush.h>
+> >  #include <asm/errata_list.h>
+> > @@ -91,6 +94,9 @@ void __init riscv_fill_hwcap(void)
+> >  	char print_str[NUM_ALPHA_EXTS + 1];
+> >  	int i, j, rc;
+> >  	unsigned long isa2hwcap[26] = {0};
+> > +	struct acpi_table_header *rhct;
+> > +	acpi_status status;
+> > +	unsigned int cpu;
+> >  
+> >  	isa2hwcap['i' - 'a'] = COMPAT_HWCAP_ISA_I;
+> >  	isa2hwcap['m' - 'a'] = COMPAT_HWCAP_ISA_M;
+> > @@ -103,14 +109,36 @@ void __init riscv_fill_hwcap(void)
+> >  
+> >  	bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
+> >  
+> > -	for_each_of_cpu_node(node) {
+> > +	if (!acpi_disabled) {
+> > +		status = acpi_get_table(ACPI_SIG_RHCT, 0, &rhct);
+> > +		if (ACPI_FAILURE(status))
+> > +			return;
+> > +	}
+> > +
+> > +	for_each_possible_cpu(cpu) {
+> >  		unsigned long this_hwcap = 0;
+> >  		DECLARE_BITMAP(this_isa, RISCV_ISA_EXT_MAX);
+> >  		const char *temp;
+> >  
+> > -		if (of_property_read_string(node, "riscv,isa", &isa)) {
+> > -			pr_warn("Unable to find \"riscv,isa\" devicetree entry\n");
+> > -			continue;
+> > +		if (acpi_disabled) {
+> > +			node = of_cpu_device_node_get(cpu);
+> > +			if (node) {
+> > +				rc = of_property_read_string(node, "riscv,isa", &isa);
 > 
-> Thanks!. Yes, COMPILE_TEST gets enabled for allmodconfig builds. Since
-> the whole intention of COMPILE_TEST appears to be able to compile-test
-> drivers on a platform than they are supposed to be used, I think it is
-> better not to skip whole set of drivers but only that which can not build.
-> So, I prefer to keep this change as is.
+> Hmm, after digging in the previous patch, I think this is actually not
+> possible to fail? We already validated it when setting up the mask of
+> possible cpus, but I think leaving the error handling here makes things
+> a lot more obvious.
+> 
+Yeah, do you prefer to merge these patches again since only in this
+patch, we change the loop to for_each_possible_cpu() from
+for_each_of_cpu_node() which actually makes riscv_of_processor_hartid()
+not useful?
 
-Hi Sunil,
-
-What I wanted to say with my previous mail: I'm fairly confident that
-platform/surface drivers will not be actively used on RISC-V hardware any
-time soon (not sure if that came over in this way). But whatever you/others
-prefer, I'm happy with either.
-
-Best regards,
-Max
+> I'd swear I gave you a (conditional) R-b on v3 though, no?
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> 
+Thanks,
+Sunil
