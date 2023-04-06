@@ -2,124 +2,139 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D57C77B72
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 14:00:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E205C7618D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 14:47:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238896AbjDFOAE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Apr 2023 10:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42046 "EHLO
+        id S239464AbjDFOrW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Apr 2023 10:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238978AbjDFN7x (ORCPT
+        with ESMTP id S239121AbjDFOrD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2023 09:59:53 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7906581
-        for <linux-crypto@vger.kernel.org>; Thu,  6 Apr 2023 06:59:47 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id br6so50914384lfb.11
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Apr 2023 06:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680789586;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ahOtErsAZTwjnxvLm+Q7vFYLyLF4PgdNHJFRQu9gQIE=;
-        b=kmt4M8Hx4w/t+axa3WrnxHX+1XcH/Csa7PEULn+hnUQNZeqU1vfcpgKvdXbL/8QOxC
-         I1CSGA2cglCL00n+FGfB5L0fcO2hL22Yf4raMBmrht4fzO7lZx72TZ55IOAhsFlDWsEl
-         wY2xiymIVcZbMRlKj+rEtpruZhTtBq7467tW7PkvpEfGqTaTc4gbg9ANzsRsvHSFEm3S
-         djbk4UQmDvDn1WJY9vBvFaCT6Rv265DYIRwtkH4Z/IS9IXtb8PG6GHTaIDtV9bWJxRkt
-         o70V7sNMM8ZdRx2IVfykopTkjF86wDJOWIPRg8b/b3NsJW4DKwT9fQfwgTjDolpf4zD/
-         7x6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680789586;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ahOtErsAZTwjnxvLm+Q7vFYLyLF4PgdNHJFRQu9gQIE=;
-        b=Iqose8vJWVHkdSp4itPjdjKuk/rC3o/DSRG5/qC2EscKoiCgflLfI0mAChGaoAnyX2
-         FCNakylJVxep0pDp3FY1P4PtEhbm6t0eAQ0dIGBjVTQWL197bOnRvfAjlgLeQ/YYT42s
-         /w6Yk/rk04LS6LbUdIJB4Z9NFjqQVMgGzZ2O7ew20cEQKI9fLeNOk0t+ZRimkj7iltiO
-         n+qi5YrkI5RNA87SkZaYqBxu4VLQQNtFT5MYFWilqWBrM4V68t3tBWSgtpluDKb3ii70
-         +38tZkrTR0Myw7mdexmwr8oIkpvD+jCqEF/TlMLshy7QGPpHIc5/GF2nYOBjCnIBjit7
-         YEqA==
-X-Gm-Message-State: AAQBX9dUFl+E+sUXtuYGO81BZy5dF0euEPacu4dBw+64L6jhLYUOU6a1
-        SIvoGQ51MSLKuwbLDuxM2yTMig==
-X-Google-Smtp-Source: AKy350aoUklCC061oW2drNDEOT/plxqF0kMjER+zJgHC6nWb/WxYQP5DpTC1JTzNFAyC748GebfEYg==
-X-Received: by 2002:a05:6512:503:b0:4e7:fa9a:4d3c with SMTP id o3-20020a056512050300b004e7fa9a4d3cmr2374207lfb.16.1680789585933;
-        Thu, 06 Apr 2023 06:59:45 -0700 (PDT)
-Received: from [192.168.1.101] (abxh37.neoplus.adsl.tpnet.pl. [83.9.1.37])
-        by smtp.gmail.com with ESMTPSA id z1-20020a2e8e81000000b00295a8c68585sm299658ljk.56.2023.04.06.06.59.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Apr 2023 06:59:45 -0700 (PDT)
-Message-ID: <af22628c-e54b-f7e1-16a6-6534f4526cd5@linaro.org>
-Date:   Thu, 6 Apr 2023 15:59:40 +0200
+        Thu, 6 Apr 2023 10:47:03 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819FC8A5B;
+        Thu,  6 Apr 2023 07:45:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680792342; x=1712328342;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=wKLD3ul2fnQNnbci3vu7fUACYJnL7Pb0yr2YSwJ4YfE=;
+  b=A2m8dlFAIZ8suroi3kz8QDGKbyYDtx6flW4MyIOO8hCnDi6IZcZAzOVr
+   inEwSxAJf8yFsQGjOWAOlR2qtYXOeS86METfwccLwYoWY2NjyjV2V4nzA
+   V5raNxMCCt1YiyBuYvL6k1e5y+tRCFlqVjuc7o4CG6FC5u9lOuoq8Vyt9
+   f3DYh7lBx7ZmhIl7MUzwYNGFz72yJWP0OFUbquz7OTE59QsS+/etr4/cf
+   xUQhnhOPSvRf5NDTZ+jPQZv3pLh4rPblHshJPOaNFrRl3jtqHb7Qk2V+s
+   GGvrlu3zqb+zeHBnChL7G84Mu+Ncrf/ovd3G9DEeq0SkpL9UYhKF6o0TT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10672"; a="326817273"
+X-IronPort-AV: E=Sophos;i="5.98,323,1673942400"; 
+   d="scan'208";a="326817273"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2023 07:43:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10672"; a="861424812"
+X-IronPort-AV: E=Sophos;i="5.98,323,1673942400"; 
+   d="scan'208";a="861424812"
+Received: from akshayph-mobl.amr.corp.intel.com ([10.212.115.108])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2023 07:43:41 -0700
+Message-ID: <0b95f8b723f50395ee325ff5475e5d5189776928.camel@linux.intel.com>
+Subject: Re: [PATCH v2 12/15] crypto: iaa - Add support for iaa_crypto
+ deflate compression algorithm
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
+        dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org
+Date:   Thu, 06 Apr 2023 09:43:40 -0500
+In-Reply-To: <ZC58JggIXgpJ1tpD@gondor.apana.org.au>
+References: <20230328153535.126223-1-tom.zanussi@linux.intel.com>
+         <20230328153535.126223-13-tom.zanussi@linux.intel.com>
+         <ZC58JggIXgpJ1tpD@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.1-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v6 09/11] arm64: dts: qcom: sm8250: Add Crypto Engine
- support
-Content-Language: en-US
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
-        robh+dt@kernel.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org
-References: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
- <20230405072836.1690248-10-bhupesh.sharma@linaro.org>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20230405072836.1690248-10-bhupesh.sharma@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Herbert,
 
+On Thu, 2023-04-06 at 16:00 +0800, Herbert Xu wrote:
+> On Tue, Mar 28, 2023 at 10:35:32AM -0500, Tom Zanussi wrote:
+> >=20
+> > @@ -881,12 +1574,26 @@ static int iaa_crypto_probe(struct idxd_dev
+> > *idxd_dev)
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rebalance_wq_table();
+> > =C2=A0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (first_wq) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0iaa_crypto_enabled =3D true;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0ret =3D iaa_register_compression_device();
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if (ret !=3D 0) {
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iaa_cr=
+ypto_enabled =3D false;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_db=
+g(dev, "IAA compression device
+> > registration failed\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto e=
+rr_register;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0}
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0pr_info("iaa_crypto now ENABLED\n");
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> > +
+>=20
+> Sorry for picking on your driver but I've got to start somewhere :)
 
-On 5.04.2023 09:28, Bhupesh Sharma wrote:
-> Add crypto engine (CE) and CE BAM related nodes and definitions to
-> 'sm8250.dtsi'.
-> 
-> Co-developed-by and Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->  arch/arm64/boot/dts/qcom/sm8250.dtsi | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-> index 7b78761f2041..2f6b8d4a2d41 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-> @@ -2222,6 +2222,28 @@ ufs_mem_phy_lanes: phy@1d87400 {
->  			};
->  		};
->  
-> +		cryptobam: dma-controller@1dc4000 {
-> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-> +			reg = <0 0x01dc4000 0 0x24000>;
-> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-> +			#dma-cells = <1>;
-> +			qcom,ee = <0>;
-> +			qcom,controlled-remotely;
-> +			iommus = <&apps_smmu 0x594 0x0011>,
-> +				 <&apps_smmu 0x596 0x0011>;
-> +		};
-> +
-> +		crypto: crypto@1dfa000 {
-> +			compatible = "qcom,sm8250-qce", "qcom,sm8150-qce", "qcom,qce";
-> +			reg = <0 0x01dfa000 0 0x6000>;
-> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
-> +			dma-names = "rx", "tx";
-> +			iommus = <&apps_smmu 0x594 0x0011>,
-> +				 <&apps_smmu 0x596 0x0011>;
-> +			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
-> +			interconnect-names = "memory";
-Shouldn't we also attach the contexts from qcom_cedev_ns_cb{}?
+No problem, thanks for reviewing the code. ;-)
 
-Konrad
-> +		};
-> +
->  		tcsr_mutex: hwlock@1f40000 {
->  			compatible = "qcom,tcsr-mutex";
->  			reg = <0x0 0x01f40000 0x0 0x40000>;
+>=20
+> A long standing problem shared by almost all crypto drivers is that
+> the hardware removal handling is completely broken.
+>=20
+> This is because hardware can be removed at any time, including during
+> a crypto operatin.=C2=A0 So drivers must work carefully around that fact.
+>=20
+> Here is a recipe for dealing with this safely:
+>=20
+> 1) Never unregister your crypto algorithms, even after the last
+> piece of hardware has been unplugged.=C2=A0 The algorithms should only
+> be unregistered (if they have been registered through the first
+> successful probe call) in the module unload function.
+>=20
+> 2) Never free any software state for your hardware without some form
+> of synchronisation with oustanding operations.
+>=20
+> Any mechanism would do, for example, you could use a spinlock if the
+> critical path isn't very long.=C2=A0 The operational path would take the
+> lock, check the hardware state, and if present proceed with the
+> operation (but still being prepared to cope if the hardware goes
+> AWAL because even if the driver state is still present the actual
+> hardware may be gone already).
+>=20
+> Then the removal path would simply take the spinlock, set a flag
+> indicating the hardware is gone and then you could safely unlock
+> and free your driver states.
+>=20
+
+OK, yeah, thanks for pointing this out along with the detailed
+explanation and remedy.  Will take care of this in the next version.
+
+Tom
+
+> Thanks,
+
