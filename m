@@ -2,94 +2,110 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4184EC7618D
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 08:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B83C7618D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 08:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235239AbjDFIBK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Apr 2023 04:01:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41820 "EHLO
+        id S235272AbjDFIuO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Apr 2023 04:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235162AbjDFIBJ (ORCPT
+        with ESMTP id S234663AbjDFIuM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2023 04:01:09 -0400
+        Thu, 6 Apr 2023 04:50:12 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC7C7A87;
-        Thu,  6 Apr 2023 01:01:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD7D4ED2
+        for <linux-crypto@vger.kernel.org>; Thu,  6 Apr 2023 01:50:08 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pkKXu-00D12g-1x; Thu, 06 Apr 2023 16:00:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Apr 2023 16:00:38 +0800
-Date:   Thu, 6 Apr 2023 16:00:38 +0800
+        id 1pkLJi-00D1x1-FY; Thu, 06 Apr 2023 16:50:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Apr 2023 16:50:02 +0800
+Date:   Thu, 6 Apr 2023 16:50:02 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH v2 12/15] crypto: iaa - Add support for iaa_crypto
- deflate compression algorithm
-Message-ID: <ZC58JggIXgpJ1tpD@gondor.apana.org.au>
-References: <20230328153535.126223-1-tom.zanussi@linux.intel.com>
- <20230328153535.126223-13-tom.zanussi@linux.intel.com>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>
+Subject: Re: [PATCH v4] crypto: jitter - permanent and intermittent health
+ errors
+Message-ID: <ZC6HuugQ9ddW0hed@gondor.apana.org.au>
+References: <12194787.O9o76ZdvQC@positron.chronox.de>
+ <4478169.LvFx2qVVIh@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230328153535.126223-13-tom.zanussi@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4478169.LvFx2qVVIh@positron.chronox.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 10:35:32AM -0500, Tom Zanussi wrote:
->
-> @@ -881,12 +1574,26 @@ static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
->  
->  	rebalance_wq_table();
->  
-> +	if (first_wq) {
-> +		iaa_crypto_enabled = true;
-> +		ret = iaa_register_compression_device();
-> +		if (ret != 0) {
-> +			iaa_crypto_enabled = false;
-> +			dev_dbg(dev, "IAA compression device registration failed\n");
-> +			goto err_register;
-> +		}
-> +
-> +		pr_info("iaa_crypto now ENABLED\n");
-> +	}
-> +
+On Mon, Mar 27, 2023 at 09:03:52AM +0200, Stephan Müller wrote:
+> According to SP800-90B, two health failures are allowed: the intermittend
+> and the permanent failure. So far, only the intermittent failure was
+> implemented. The permanent failure was achieved by resetting the entire
+> entropy source including its health test state and waiting for two or
+> more back-to-back health errors.
+> 
+> This approach is appropriate for RCT, but not for APT as APT has a
+> non-linear cutoff value. Thus, this patch implements 2 cutoff values
+> for both RCT/APT. This implies that the health state is left untouched
+> when an intermittent failure occurs. The noise source is reset
+> and a new APT powerup-self test is performed. Yet, whith the unchanged
+> health test state, the counting of failures continues until a permanent
+> failure is reached.
+> 
+> Any non-failing raw entropy value causes the health tests to reset.
+> 
+> The intermittent error has an unchanged significance level of 2^-30.
+> The permanent error has a significance level of 2^-60. Considering that
+> this level also indicates a false-positive rate (see SP800-90B section 4.2)
+> a false-positive must only be incurred with a low probability when
+> considering a fleet of Linux kernels as a whole. Hitting the permanent
+> error may cause a panic(), the following calculation applies: Assuming
+> that a fleet of 10^9 Linux kernels run concurrently with this patch in
+> FIPS mode and on each kernel 2 health tests are performed every minute
+> for one year, the chances of a false positive is about 1:1000
+> based on the binomial distribution.
+> 
+> In addition, any power-up health test errors triggered with
+> jent_entropy_init are treated as permanent errors.
+> 
+> A permanent failure causes the entire entropy source to permanently
+> return an error. This implies that a caller can only remedy the situation
+> by re-allocating a new instance of the Jitter RNG. In a subsequent
+> patch, a transparent re-allocation will be provided which also changes
+> the implied heuristic entropy assessment.
+> 
+> In addition, when the kernel is booted with fips=1, the Jitter RNG
+> is defined to be part of a FIPS module. The permanent error of the
+> Jitter RNG is translated as a FIPS module error. In this case, the entire
+> FIPS module must cease operation. This is implemented in the kernel by
+> invoking panic().
+> 
+> The patch also fixes an off-by-one in the RCT cutoff value which is now
+> set to 30 instead of 31. This is because the counting of the values
+> starts with 0.
+> 
+> Reviewed-by: Vladis Dronov <vdronov@redhat.com>
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+> 
+> v4:
+>  - fix comment regarding fips=1
+>  - update patch subject to match common naming schema
+>  - remove now unused jent_panic function
+>  - added Reviewed-by line
+> 
+> v3:
+>  - remove an unused goto target
+> 
+> v2:
+>  - Drop the enforcement of permanent disabling the entropy source
+> 
+>  crypto/jitterentropy-kcapi.c |  51 ++++++-------
+>  crypto/jitterentropy.c       | 144 +++++++++++++----------------------
+>  crypto/jitterentropy.h       |   1 -
+>  3 files changed, 76 insertions(+), 120 deletions(-)
 
-Sorry for picking on your driver but I've got to start somewhere :)
-
-A long standing problem shared by almost all crypto drivers is that
-the hardware removal handling is completely broken.
-
-This is because hardware can be removed at any time, including during
-a crypto operatin.  So drivers must work carefully around that fact.
-
-Here is a recipe for dealing with this safely:
-
-1) Never unregister your crypto algorithms, even after the last
-piece of hardware has been unplugged.  The algorithms should only
-be unregistered (if they have been registered through the first
-successful probe call) in the module unload function.
-
-2) Never free any software state for your hardware without some form
-of synchronisation with oustanding operations.
-
-Any mechanism would do, for example, you could use a spinlock if the
-critical path isn't very long.  The operational path would take the
-lock, check the hardware state, and if present proceed with the
-operation (but still being prepared to cope if the hardware goes
-AWAL because even if the driver state is still present the actual
-hardware may be gone already).
-
-Then the removal path would simply take the spinlock, set a flag
-indicating the hardware is gone and then you could safely unlock
-and free your driver states.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
