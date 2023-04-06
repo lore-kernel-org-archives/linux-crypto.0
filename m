@@ -2,100 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CAE1C7618D
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 06:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4184EC7618D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 08:01:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235554AbjDFGmS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Apr 2023 02:42:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
+        id S235239AbjDFIBK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Apr 2023 04:01:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235272AbjDFGmR (ORCPT
+        with ESMTP id S235162AbjDFIBJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2023 02:42:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE74102;
-        Wed,  5 Apr 2023 23:42:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A5FC62A96;
-        Thu,  6 Apr 2023 06:42:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BDA8C433EF;
-        Thu,  6 Apr 2023 06:42:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680763335;
-        bh=mJqfGgkA1fMz6skz9F+zwsRRFRctn6sP7FnHEqyeZJw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BECv1iinE7TxL2/LN70X9EyhKkkahnEO0lctucOs5wq0wMqUcqlULI3/C0hflGF/6
-         xkj6ZhM+0ot9r+9R+5YG1/cv5bvIbidRcHjHrOxwkMdZjRGHd7GaR43jg/JeLI3fKm
-         oaYpAJX2QfCUTEq+HlgZgnuunsRSkS9Tzu8WiReZEjmeHGenr/UXfbWjcipVkDm8LR
-         8dKvxmx1Fe/UuGgQuRbt2FkFXyJ/fLeS0RTnQ1XrZjymIYczf3UJytZLTP2SWV1C2p
-         23zLDwheOy+pb0z7eleokhheSCUSdpnOPyxNknVf3bf6/9yHeHP4yhpFtb0/OeeVZL
-         +NAOBcf3fUKCg==
-Date:   Thu, 6 Apr 2023 08:42:12 +0200
-From:   Wolfram Sang <wsa@kernel.org>
-To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
-        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
-        linux-kernel@vger.kernel.org,
-        Mark Hasemeyer <markhas@chromium.org>,
-        Grzegorz Bernacki <gjb@semihalf.com>
-Subject: Re: [PATCH v8 0/6] Use CCP driver to handle PSP I2C arbitration
-Message-ID: <ZC5pxORLN+SF/91S@sai>
-Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
-        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
-        linux-kernel@vger.kernel.org, Mark Hasemeyer <markhas@chromium.org>,
-        Grzegorz Bernacki <gjb@semihalf.com>
-References: <20230403183216.3493-1-mario.limonciello@amd.com>
+        Thu, 6 Apr 2023 04:01:09 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC7C7A87;
+        Thu,  6 Apr 2023 01:01:01 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pkKXu-00D12g-1x; Thu, 06 Apr 2023 16:00:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Apr 2023 16:00:38 +0800
+Date:   Thu, 6 Apr 2023 16:00:38 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
+        dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org
+Subject: Re: [PATCH v2 12/15] crypto: iaa - Add support for iaa_crypto
+ deflate compression algorithm
+Message-ID: <ZC58JggIXgpJ1tpD@gondor.apana.org.au>
+References: <20230328153535.126223-1-tom.zanussi@linux.intel.com>
+ <20230328153535.126223-13-tom.zanussi@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="dxxWHW86FhdhLb9p"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230403183216.3493-1-mario.limonciello@amd.com>
+In-Reply-To: <20230328153535.126223-13-tom.zanussi@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Mar 28, 2023 at 10:35:32AM -0500, Tom Zanussi wrote:
+>
+> @@ -881,12 +1574,26 @@ static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
+>  
+>  	rebalance_wq_table();
+>  
+> +	if (first_wq) {
+> +		iaa_crypto_enabled = true;
+> +		ret = iaa_register_compression_device();
+> +		if (ret != 0) {
+> +			iaa_crypto_enabled = false;
+> +			dev_dbg(dev, "IAA compression device registration failed\n");
+> +			goto err_register;
+> +		}
+> +
+> +		pr_info("iaa_crypto now ENABLED\n");
+> +	}
+> +
 
---dxxWHW86FhdhLb9p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Sorry for picking on your driver but I've got to start somewhere :)
 
-On Mon, Apr 03, 2023 at 01:32:09PM -0500, Mario Limonciello wrote:
-> The CCP driver now has symbols that can be used by i2c-designware-amdpsp
-> to handle the communication regarding i2c arbitration with the PSP for
-> both Cezanne and Mendocino based designs.
+A long standing problem shared by almost all crypto drivers is that
+the hardware removal handling is completely broken.
 
-How should this go upstream, i.e. are there dependencies? Shall I pick
-the I2C patches or is it better if all goes via the crypto tree?
+This is because hardware can be removed at any time, including during
+a crypto operatin.  So drivers must work carefully around that fact.
 
+Here is a recipe for dealing with this safely:
 
---dxxWHW86FhdhLb9p
-Content-Type: application/pgp-signature; name="signature.asc"
+1) Never unregister your crypto algorithms, even after the last
+piece of hardware has been unplugged.  The algorithms should only
+be unregistered (if they have been registered through the first
+successful probe call) in the module unload function.
 
------BEGIN PGP SIGNATURE-----
+2) Never free any software state for your hardware without some form
+of synchronisation with oustanding operations.
 
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmQuacQACgkQFA3kzBSg
-KbbnKA/9FkOCsNE4br0lLkyFwLvhKnpsOXOiXTTASDuP/uTpLQKhjbNamFkckTJd
-DNohsW34fuxuwG2mdQPd+812+lIrWJS9EZJMMaOll9kNySJNtMUU5ezPWBReIiRL
-wKL8Yi+xaCr2/vhbCpLc0DIi6SbskJy1vMk+ceZ8SGh8l+IYDvBMowf0DbnXl43b
-hyjM6xpmjQ4smTwdVACx38K1IdDOYCsoO+6h/pcDcgriE8hiRz4P7vbru+yWqJt6
-XTVGU5P666vYOwq/ZSbkWz2dCZZ88Ukz6kpa4SgWPzA6r+qJ3A6pWErBHd64OmwF
-s3/24EOuWF/QgEO2Rwu5n7WjKVaQCWPYmsXmdixwWbW9pHJUxWU9dLApbItBuMZn
-VK3hR9Mr+lOF/bJGfnpjo1pjv5S1TvOnMsn6qyeFuBV2rYDg8TR8jQTsQOaYuhmL
-Ji2twu1v1KFNQ4SDIevv8pqQLZz88vrW15qH0ZlsmXV0lTAJNW+ycJLh5Rub2aGa
-SRBctuqB8Smp2S0H5HKwGTX135JYBAkmJEfc8jY8HcM/ZCjRXazsv723XUcj/yto
-WktxREwePFhtU1WU3XvcwovTkrzDqpIu3yK/HkDxsqn+mQHbec7FDz5BG3xT5rn/
-dzCoH4X8SbKPlewobhUVBFcZvT7wO4+bu8OToDVOrbO3PHRV/hc=
-=0N0f
------END PGP SIGNATURE-----
+Any mechanism would do, for example, you could use a spinlock if the
+critical path isn't very long.  The operational path would take the
+lock, check the hardware state, and if present proceed with the
+operation (but still being prepared to cope if the hardware goes
+AWAL because even if the driver state is still present the actual
+hardware may be gone already).
 
---dxxWHW86FhdhLb9p--
+Then the removal path would simply take the spinlock, set a flag
+indicating the hardware is gone and then you could safely unlock
+and free your driver states.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
