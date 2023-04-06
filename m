@@ -2,256 +2,718 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D53EC7619A
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Apr 2023 23:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BF1C7619A
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 00:39:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233331AbjDEXsy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Apr 2023 19:48:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40820 "EHLO
+        id S231124AbjDFAjd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Apr 2023 20:39:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233254AbjDEXsx (ORCPT
+        with ESMTP id S229520AbjDFAjc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Apr 2023 19:48:53 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E97447695;
-        Wed,  5 Apr 2023 16:48:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bjWb60QM+mc+GWtfat4vXbeR7I+fAuAnXKzTwv6p2RTO8fzhYS/QxN1WMz3vPaFGLzp44LYizcljBeWirpEU72iUNr4GFh02ns4FrqlOUeTRMfeGhkvAw0hqeVjeT8sI1ASTg8XtJfXqUrWG91AWossqPTJjhnbN4thB6mQaxnIQomXTi9rR6EwyQ7/bnSOkdi9+Hxe3feBbYbSZlTslg6Zi+vT5SngM+bWXMF5Y6RsUXH8bjE2QiMNXxHi2t5ZOGvDZngyp2Zctlz/SZ7+wPFWQ/TrwuIIpeZOg45UkpsGQOTQkWTiwhbkFl8R4qQyxp4qaB6Fvysx23reeQGLuMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C8ebVcd/2bOXLpPkp09qqS5sbtf8/fY71rqwKjQZaXE=;
- b=FSISSYnxQGbeljddeVy1Azw35fbTYA/rlBout9MPO37DfHNrO1lGPXTw6quC/DWzazqQgwitn0oMXzFGFnseIWz+T/Cnb5xRhuHSosw9IoBpljZ3S3TDH3kdm3jxbgc18piZr8HNnmYhz0symqtdr+rYbtp4XGTfqwhD0yt7E3HB34cBsvU2oCaQekfWQRnPdQXOXlZTE69ZlF2R2Vi+UasjL7KjEoy6UQuYyOAh3TqDTzljSIB1DRHwEUgKl6HtGaQvehJmWhQdfYdILOy0401pyrKajHux4nVCe1HAKu6RtI6w4VFcaHTfFnzIWuZPlHu5zHA1bTTrgMbWYUUwTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C8ebVcd/2bOXLpPkp09qqS5sbtf8/fY71rqwKjQZaXE=;
- b=Fb/S8vITSLnS++7GHBbRcQLmdnLFW7Eeu1vbiUGHcwJdn/ZFGLlolwFbo02oZs291ubKl67qK3UOtXP/Uw9naUgV1Fbddxg/vX3CSBbm0pKL3dEGbIa64oBOtELegL5JJGdNI5cCYROFVbc9JkGMvzHqRJBp7i/IZ+8QsXja7jk=
-Received: from BN0PR10CA0021.namprd10.prod.outlook.com (2603:10b6:408:143::24)
- by CH2PR12MB4152.namprd12.prod.outlook.com (2603:10b6:610:a7::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.35; Wed, 5 Apr
- 2023 23:48:49 +0000
-Received: from BN8NAM11FT084.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:143:cafe::33) by BN0PR10CA0021.outlook.office365.com
- (2603:10b6:408:143::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.35 via Frontend
- Transport; Wed, 5 Apr 2023 23:48:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT084.mail.protection.outlook.com (10.13.176.169) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6277.30 via Frontend Transport; Wed, 5 Apr 2023 23:48:49 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 5 Apr
- 2023 18:48:46 -0500
-Date:   Wed, 5 Apr 2023 18:48:26 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>
-Subject: Re: [PATCH RFC v8 48/56] KVM: SVM: Add SNP-specific handling for
- memory attribute updates
-Message-ID: <20230405234826.adaxo5fws6icwngy@amd.com>
-References: <20230220183847.59159-1-michael.roth@amd.com>
- <20230220183847.59159-49-michael.roth@amd.com>
- <f664f44d-fc0a-1af7-070c-306ab100bbc9@intel.com>
+        Wed, 5 Apr 2023 20:39:32 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0498F5BBD;
+        Wed,  5 Apr 2023 17:39:30 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8616462C3B;
+        Thu,  6 Apr 2023 00:39:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7472C433EF;
+        Thu,  6 Apr 2023 00:39:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680741568;
+        bh=el04a0jRmjCACnLdwtcpRmwcVvJMRRZ/WRNLCFQ2KQY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=NoC5KZNmxdW3tuUPlOiDpPYZujsjf5I6TvGOLUFIPolCdLzGs8PGOsytLjgF5CiaM
+         bsydCSI7auPRyMzDTvcLHa2xKwhXj8z8XxdWiBscVenupOHS3QpOL7i0nfl1/WFLip
+         spE481VAlnl9uTbu4naW2opaE02YtcbMZcjzUu/0Myx7g00kyOaovfK0Lc1icsosqO
+         RqXhYwLc0kwhr7FesE45qUU2fB4kMuzvsBvjLrzGHKd+64uZY7K0b9dz/14h4Io9k0
+         P0xQIDKApm8lQq6mWY3VogKY0Jqyk3lisIfF+r2j34hao4dgXtv1dEZx9+qEIm76zB
+         6yR08gaNFOwAw==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     fsverity@lists.linux.dev
+Cc:     linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org
+Subject: [RFC PATCH] fsverity: use shash API instead of ahash API
+Date:   Wed,  5 Apr 2023 17:37:14 -0700
+Message-Id: <20230406003714.94580-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <f664f44d-fc0a-1af7-070c-306ab100bbc9@intel.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT084:EE_|CH2PR12MB4152:EE_
-X-MS-Office365-Filtering-Correlation-Id: f406b4a7-764a-40c5-4fbf-08db36304db1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HvHpBlwzja9kOmDkOyCtdnIhn6oCjda6QMp/kx2ib12Vc8oRCFF6OLgqH18VP+52mOwE8pslf4qSa/TKBwEnsI/w99cqg7GEaHpcaDJPscurtIl7UKkwDU6wORB/ipVBCSLCfZ2veyzVbG7hdXZ9DbfYPIGH7RTthDk1Lw1QAGSuX95O+v+oA2NRNSmXgNdugKeNW8hLynA8SZg2qI77PbRI5S9VQ/aGqz7L0vzvNi7Cd9E5ku5FuWjMaN74NkEnm1tGdWYVYn8S5btWlgVkU6zRaNntuvjoYJsoVJNJ8vQ+N00jbfcKHVUb5lG0Fv5/x25UQ1okGV5MbtOxGazymkveQUdyFrx4bKkHOlZjlW/1wgkyAH5fIsJyZfq6WYiPPP+Lvk+xgZo8jNaxbufqWRyRP4CX3Hfy03FdK8w8Ynwy6raYuTUJCX7SRKX6JHCZGwl0SalY5hFuoCdMD57ihvu0Ryzq9htO4AqaJtZhBxnVaJfVS8mS+mC+uWdc+imHPS1CvsWbaQLrGNuhCiuXoaHeEO6ZhqOUnuDSZuMnNA3qWMfAgWTrGBFrFvxsCBCZTMsBX5FMy7cAgwxXWDXgvyO88ezUsDTwNsVvX/Td2R+piDYDLZk8R4r/pu9eMTZ8EMW4SQey0K08jyJzcJ9KDKc7FDnvOcehvt6CNQiba8wvNj5LtutVaQb52NkEQeJAvRT6xilScXW+2jQAYiOAxa5I0OFySQNXPdRjYtW9hnYCXXt7xWMHJAISnCD/N+3EJHfvsnrKkCjQUHFiqKgsOw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(376002)(39860400002)(396003)(451199021)(36840700001)(46966006)(40470700004)(1076003)(53546011)(26005)(16526019)(186003)(40460700003)(4326008)(478600001)(54906003)(36860700001)(82310400005)(316002)(966005)(7416002)(86362001)(7406005)(5660300002)(36756003)(8936002)(2906002)(82740400003)(44832011)(70206006)(6916009)(70586007)(8676002)(356005)(81166007)(41300700001)(15650500001)(40480700001)(6666004)(2616005)(426003)(336012)(83380400001)(47076005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Apr 2023 23:48:49.2384
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f406b4a7-764a-40c5-4fbf-08db36304db1
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT084.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4152
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 01, 2023 at 03:37:00PM -0800, Dave Hansen wrote:
-> On 2/20/23 10:38, Michael Roth wrote:
-> > +		/*
-> > +		 * TODO: The RMP entry's hugepage bit is ignored for
-> > +		 * shared/unassigned pages. Either handle looping through each
-> > +		 * sub-page as part of snp_make_page_shared(), or remove the
-> > +		 * level argument.
-> > +		 */
-> > +		if (op == SNP_PAGE_STATE_PRIVATE && order &&
-> > +		    IS_ALIGNED(gfn, 1 << order) && (gfn + (1 << order)) <= end) {
-> > +			level = order_to_level(order);
-> > +			npages = 1 << order;
-> > +		}
-> 
-> That's a wee bit obtuse.
-> 
-> First of all, I assume that the 'RFC' is because of these TODOs and they
-> won't survive to the point when you ask for this to be merged.
+From: Eric Biggers <ebiggers@google.com>
 
-Yes, will make sure to have all the TODOs in the tree addressed before
-dropping the RFC tag.
+The "ahash" API, like the other scatterlist-based crypto APIs such as
+"skcipher", comes with some well-known limitations.  First, it can't
+easily be used with vmalloc addresses.  Second, the request struct can't
+be allocated on the stack.  This adds complexity and a possible failure
+point that needs to be worked around, e.g. using a mempool.
 
-> 
-> BTW, what keeps the restrictedmem_get_page() offset and the gfn aligned?
+The only benefit of ahash over "shash" is that ahash is needed to access
+traditional memory-to-memory crypto accelerators, i.e. drivers/crypto/.
+However, this style of crypto acceleration has largely fallen out of
+favor and been superseded by CPU-based acceleration or inline crypto
+engines.  Also, ahash needs to be used asynchronously to take full
+advantage of such hardware, but fs/verity/ has never done this.
 
-I don't think anything enforces that currently, but there is a TODO in the
-UPM v10 patchset to enforce that:
+On all systems that aren't actually using one of these ahash-only crypto
+accelerators, ahash just adds unnecessary overhead as it sits between
+the user and the underlying shash algorithms.
 
-  https://github.com/AMDESE/linux/commit/5c86db7f98701f614c48946b733f2542c962f139#diff-e7514a224c92c2e47224f99919405a37ee7edc4612953135229cfb6e07a680d8R2131
+Also, XFS is planned to cache fsverity Merkle tree blocks in the
+existing XFS buffer cache.  As a result, it will be possible for a
+single Merkle tree block to be split across discontiguous pages
+(https://lore.kernel.org/r/20230405233753.GU3223426@dread.disaster.area).
+This data will need to be hashed.  It is easiest to work with a vmapped
+address in this case.  However, ahash is incompatible with this.
 
-So currently this patch relies on the following:
+Therefore, let's convert fs/verity/ from ahash to shash.  This
+simplifies the code, and it should also slightly improve performance for
+everyone who wasn't actually using one of these ahash-only crypto
+accelerators, i.e. almost everyone (or maybe even everyone)!
 
- - the fact that the memslot alignment/sizes for a standard x86 guest's
-   associated memory regions are 2M-aligned, so when they are bound to a
-   restrictedmem FD they are naturally packed in at restrictedmem offsets
-   that are also 2M-aligned. But of course we can't assume userspace will
-   live up to this assumption and need the above TODO in KVM to enforce
-   this when registering new memslots.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/verity/enable.c           |  19 ++---
+ fs/verity/fsverity_private.h |  13 +---
+ fs/verity/hash_algs.c        | 131 ++++++-----------------------------
+ fs/verity/verify.c           | 108 +++++++++++------------------
+ 4 files changed, 71 insertions(+), 200 deletions(-)
 
- - that restrictedmem/shmem will ensure that THPs are only allocated for
-   restrictedmem offsets that are 2M-aligned. I think this enforcement
-   happens in shmem_alloc_hugefolio().
+diff --git a/fs/verity/enable.c b/fs/verity/enable.c
+index 7a0e3a84d370b..7e60b45286b57 100644
+--- a/fs/verity/enable.c
++++ b/fs/verity/enable.c
+@@ -7,6 +7,7 @@
+ 
+ #include "fsverity_private.h"
+ 
++#include <crypto/hash.h>
+ #include <linux/mount.h>
+ #include <linux/sched/signal.h>
+ #include <linux/uaccess.h>
+@@ -19,7 +20,7 @@ struct block_buffer {
+ /* Hash a block, writing the result to the next level's pending block buffer. */
+ static int hash_one_block(struct inode *inode,
+ 			  const struct merkle_tree_params *params,
+-			  struct ahash_request *req, struct block_buffer *cur)
++			  struct block_buffer *cur)
+ {
+ 	struct block_buffer *next = cur + 1;
+ 	int err;
+@@ -27,8 +28,7 @@ static int hash_one_block(struct inode *inode,
+ 	/* Zero-pad the block if it's shorter than the block size. */
+ 	memset(&cur->data[cur->filled], 0, params->block_size - cur->filled);
+ 
+-	err = fsverity_hash_block(params, inode, req, virt_to_page(cur->data),
+-				  offset_in_page(cur->data),
++	err = fsverity_hash_block(params, inode, cur->data,
+ 				  &next->data[next->filled]);
+ 	if (err)
+ 		return err;
+@@ -67,7 +67,6 @@ static int build_merkle_tree(struct file *filp,
+ 	struct inode *inode = file_inode(filp);
+ 	const u64 data_size = inode->i_size;
+ 	const int num_levels = params->num_levels;
+-	struct ahash_request *req;
+ 	struct block_buffer _buffers[1 + FS_VERITY_MAX_LEVELS + 1] = {};
+ 	struct block_buffer *buffers = &_buffers[1];
+ 	unsigned long level_offset[FS_VERITY_MAX_LEVELS];
+@@ -81,9 +80,6 @@ static int build_merkle_tree(struct file *filp,
+ 		return 0;
+ 	}
+ 
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(params->hash_alg, GFP_KERNEL);
+-
+ 	/*
+ 	 * Allocate the block buffers.  Buffer "-1" is for data blocks.
+ 	 * Buffers 0 <= level < num_levels are for the actual tree levels.
+@@ -120,7 +116,7 @@ static int build_merkle_tree(struct file *filp,
+ 			fsverity_err(inode, "Short read of file data");
+ 			goto out;
+ 		}
+-		err = hash_one_block(inode, params, req, &buffers[-1]);
++		err = hash_one_block(inode, params, &buffers[-1]);
+ 		if (err)
+ 			goto out;
+ 		for (level = 0; level < num_levels; level++) {
+@@ -131,8 +127,7 @@ static int build_merkle_tree(struct file *filp,
+ 			}
+ 			/* Next block at @level is full */
+ 
+-			err = hash_one_block(inode, params, req,
+-					     &buffers[level]);
++			err = hash_one_block(inode, params, &buffers[level]);
+ 			if (err)
+ 				goto out;
+ 			err = write_merkle_tree_block(inode,
+@@ -152,8 +147,7 @@ static int build_merkle_tree(struct file *filp,
+ 	/* Finish all nonempty pending tree blocks. */
+ 	for (level = 0; level < num_levels; level++) {
+ 		if (buffers[level].filled != 0) {
+-			err = hash_one_block(inode, params, req,
+-					     &buffers[level]);
++			err = hash_one_block(inode, params, &buffers[level]);
+ 			if (err)
+ 				goto out;
+ 			err = write_merkle_tree_block(inode,
+@@ -173,7 +167,6 @@ static int build_merkle_tree(struct file *filp,
+ out:
+ 	for (level = -1; level < num_levels; level++)
+ 		kfree(buffers[level].data);
+-	fsverity_free_hash_request(params->hash_alg, req);
+ 	return err;
+ }
+ 
+diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
+index d34dcc033d723..8527beca2a454 100644
+--- a/fs/verity/fsverity_private.h
++++ b/fs/verity/fsverity_private.h
+@@ -11,9 +11,6 @@
+ #define pr_fmt(fmt) "fs-verity: " fmt
+ 
+ #include <linux/fsverity.h>
+-#include <linux/mempool.h>
+-
+-struct ahash_request;
+ 
+ /*
+  * Implementation limit: maximum depth of the Merkle tree.  For now 8 is plenty;
+@@ -23,11 +20,10 @@ struct ahash_request;
+ 
+ /* A hash algorithm supported by fs-verity */
+ struct fsverity_hash_alg {
+-	struct crypto_ahash *tfm; /* hash tfm, allocated on demand */
++	struct crypto_shash *tfm; /* hash tfm, allocated on demand */
+ 	const char *name;	  /* crypto API name, e.g. sha256 */
+ 	unsigned int digest_size; /* digest size in bytes, e.g. 32 for SHA-256 */
+ 	unsigned int block_size;  /* block size in bytes, e.g. 64 for SHA-256 */
+-	mempool_t req_pool;	  /* mempool with a preallocated hash request */
+ 	/*
+ 	 * The HASH_ALGO_* constant for this algorithm.  This is different from
+ 	 * FS_VERITY_HASH_ALG_*, which uses a different numbering scheme.
+@@ -85,15 +81,10 @@ extern struct fsverity_hash_alg fsverity_hash_algs[];
+ 
+ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 						unsigned int num);
+-struct ahash_request *fsverity_alloc_hash_request(struct fsverity_hash_alg *alg,
+-						  gfp_t gfp_flags);
+-void fsverity_free_hash_request(struct fsverity_hash_alg *alg,
+-				struct ahash_request *req);
+ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+ 				      const u8 *salt, size_t salt_size);
+ int fsverity_hash_block(const struct merkle_tree_params *params,
+-			const struct inode *inode, struct ahash_request *req,
+-			struct page *page, unsigned int offset, u8 *out);
++			const struct inode *inode, const void *data, u8 *out);
+ int fsverity_hash_buffer(struct fsverity_hash_alg *alg,
+ 			 const void *data, size_t size, u8 *out);
+ void __init fsverity_check_hash_algs(void);
+diff --git a/fs/verity/hash_algs.c b/fs/verity/hash_algs.c
+index 13fcf31be8441..1b24b7049d660 100644
+--- a/fs/verity/hash_algs.c
++++ b/fs/verity/hash_algs.c
+@@ -8,7 +8,6 @@
+ #include "fsverity_private.h"
+ 
+ #include <crypto/hash.h>
+-#include <linux/scatterlist.h>
+ 
+ /* The hash algorithms supported by fs-verity */
+ struct fsverity_hash_alg fsverity_hash_algs[] = {
+@@ -44,7 +43,7 @@ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 						unsigned int num)
+ {
+ 	struct fsverity_hash_alg *alg;
+-	struct crypto_ahash *tfm;
++	struct crypto_shash *tfm;
+ 	int err;
+ 
+ 	if (num >= ARRAY_SIZE(fsverity_hash_algs) ||
+@@ -63,11 +62,7 @@ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 	if (alg->tfm != NULL)
+ 		goto out_unlock;
+ 
+-	/*
+-	 * Using the shash API would make things a bit simpler, but the ahash
+-	 * API is preferable as it allows the use of crypto accelerators.
+-	 */
+-	tfm = crypto_alloc_ahash(alg->name, 0, 0);
++	tfm = crypto_alloc_shash(alg->name, 0, 0);
+ 	if (IS_ERR(tfm)) {
+ 		if (PTR_ERR(tfm) == -ENOENT) {
+ 			fsverity_warn(inode,
+@@ -84,68 +79,26 @@ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 	}
+ 
+ 	err = -EINVAL;
+-	if (WARN_ON(alg->digest_size != crypto_ahash_digestsize(tfm)))
++	if (WARN_ON(alg->digest_size != crypto_shash_digestsize(tfm)))
+ 		goto err_free_tfm;
+-	if (WARN_ON(alg->block_size != crypto_ahash_blocksize(tfm)))
+-		goto err_free_tfm;
+-
+-	err = mempool_init_kmalloc_pool(&alg->req_pool, 1,
+-					sizeof(struct ahash_request) +
+-					crypto_ahash_reqsize(tfm));
+-	if (err)
++	if (WARN_ON(alg->block_size != crypto_shash_blocksize(tfm)))
+ 		goto err_free_tfm;
+ 
+ 	pr_info("%s using implementation \"%s\"\n",
+-		alg->name, crypto_ahash_driver_name(tfm));
++		alg->name, crypto_shash_driver_name(tfm));
+ 
+ 	/* pairs with smp_load_acquire() above */
+ 	smp_store_release(&alg->tfm, tfm);
+ 	goto out_unlock;
+ 
+ err_free_tfm:
+-	crypto_free_ahash(tfm);
++	crypto_free_shash(tfm);
+ 	alg = ERR_PTR(err);
+ out_unlock:
+ 	mutex_unlock(&fsverity_hash_alg_init_mutex);
+ 	return alg;
+ }
+ 
+-/**
+- * fsverity_alloc_hash_request() - allocate a hash request object
+- * @alg: the hash algorithm for which to allocate the request
+- * @gfp_flags: memory allocation flags
+- *
+- * This is mempool-backed, so this never fails if __GFP_DIRECT_RECLAIM is set in
+- * @gfp_flags.  However, in that case this might need to wait for all
+- * previously-allocated requests to be freed.  So to avoid deadlocks, callers
+- * must never need multiple requests at a time to make forward progress.
+- *
+- * Return: the request object on success; NULL on failure (but see above)
+- */
+-struct ahash_request *fsverity_alloc_hash_request(struct fsverity_hash_alg *alg,
+-						  gfp_t gfp_flags)
+-{
+-	struct ahash_request *req = mempool_alloc(&alg->req_pool, gfp_flags);
+-
+-	if (req)
+-		ahash_request_set_tfm(req, alg->tfm);
+-	return req;
+-}
+-
+-/**
+- * fsverity_free_hash_request() - free a hash request object
+- * @alg: the hash algorithm
+- * @req: the hash request object to free
+- */
+-void fsverity_free_hash_request(struct fsverity_hash_alg *alg,
+-				struct ahash_request *req)
+-{
+-	if (req) {
+-		ahash_request_zero(req);
+-		mempool_free(req, &alg->req_pool);
+-	}
+-}
+-
+ /**
+  * fsverity_prepare_hash_state() - precompute the initial hash state
+  * @alg: hash algorithm
+@@ -159,23 +112,20 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+ 				      const u8 *salt, size_t salt_size)
+ {
+ 	u8 *hashstate = NULL;
+-	struct ahash_request *req = NULL;
++	SHASH_DESC_ON_STACK(desc, alg->tfm);
+ 	u8 *padded_salt = NULL;
+ 	size_t padded_salt_size;
+-	struct scatterlist sg;
+-	DECLARE_CRYPTO_WAIT(wait);
+ 	int err;
+ 
++	desc->tfm = alg->tfm;
++
+ 	if (salt_size == 0)
+ 		return NULL;
+ 
+-	hashstate = kmalloc(crypto_ahash_statesize(alg->tfm), GFP_KERNEL);
++	hashstate = kmalloc(crypto_shash_statesize(alg->tfm), GFP_KERNEL);
+ 	if (!hashstate)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(alg, GFP_KERNEL);
+-
+ 	/*
+ 	 * Zero-pad the salt to the next multiple of the input size of the hash
+ 	 * algorithm's compression function, e.g. 64 bytes for SHA-256 or 128
+@@ -190,26 +140,18 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+ 		goto err_free;
+ 	}
+ 	memcpy(padded_salt, salt, salt_size);
+-
+-	sg_init_one(&sg, padded_salt, padded_salt_size);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+-					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
+-	ahash_request_set_crypt(req, &sg, NULL, padded_salt_size);
+-
+-	err = crypto_wait_req(crypto_ahash_init(req), &wait);
++	err = crypto_shash_init(desc);
+ 	if (err)
+ 		goto err_free;
+ 
+-	err = crypto_wait_req(crypto_ahash_update(req), &wait);
++	err = crypto_shash_update(desc, padded_salt, padded_salt_size);
+ 	if (err)
+ 		goto err_free;
+ 
+-	err = crypto_ahash_export(req, hashstate);
++	err = crypto_shash_export(desc, hashstate);
+ 	if (err)
+ 		goto err_free;
+ out:
+-	fsverity_free_hash_request(alg, req);
+ 	kfree(padded_salt);
+ 	return hashstate;
+ 
+@@ -223,9 +165,7 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+  * fsverity_hash_block() - hash a single data or hash block
+  * @params: the Merkle tree's parameters
+  * @inode: inode for which the hashing is being done
+- * @req: preallocated hash request
+- * @page: the page containing the block to hash
+- * @offset: the offset of the block within @page
++ * @data: virtual address of a buffer containing the block to hash
+  * @out: output digest, size 'params->digest_size' bytes
+  *
+  * Hash a single data or hash block.  The hash is salted if a salt is specified
+@@ -234,33 +174,24 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+  * Return: 0 on success, -errno on failure
+  */
+ int fsverity_hash_block(const struct merkle_tree_params *params,
+-			const struct inode *inode, struct ahash_request *req,
+-			struct page *page, unsigned int offset, u8 *out)
++			const struct inode *inode, const void *data, u8 *out)
+ {
+-	struct scatterlist sg;
+-	DECLARE_CRYPTO_WAIT(wait);
++	SHASH_DESC_ON_STACK(desc, params->hash_alg->tfm);
+ 	int err;
+ 
+-	sg_init_table(&sg, 1);
+-	sg_set_page(&sg, page, params->block_size, offset);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+-					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
+-	ahash_request_set_crypt(req, &sg, out, params->block_size);
++	desc->tfm = params->hash_alg->tfm;
+ 
+ 	if (params->hashstate) {
+-		err = crypto_ahash_import(req, params->hashstate);
++		err = crypto_shash_import(desc, params->hashstate);
+ 		if (err) {
+ 			fsverity_err(inode,
+ 				     "Error %d importing hash state", err);
+ 			return err;
+ 		}
+-		err = crypto_ahash_finup(req);
++		err = crypto_shash_finup(desc, data, params->block_size, out);
+ 	} else {
+-		err = crypto_ahash_digest(req);
++		err = crypto_shash_digest(desc, data, params->block_size, out);
+ 	}
+-
+-	err = crypto_wait_req(err, &wait);
+ 	if (err)
+ 		fsverity_err(inode, "Error %d computing block hash", err);
+ 	return err;
+@@ -273,32 +204,12 @@ int fsverity_hash_block(const struct merkle_tree_params *params,
+  * @size: size of data to hash, in bytes
+  * @out: output digest, size 'alg->digest_size' bytes
+  *
+- * Hash some data which is located in physically contiguous memory (i.e. memory
+- * allocated by kmalloc(), not by vmalloc()).  No salt is used.
+- *
+  * Return: 0 on success, -errno on failure
+  */
+ int fsverity_hash_buffer(struct fsverity_hash_alg *alg,
+ 			 const void *data, size_t size, u8 *out)
+ {
+-	struct ahash_request *req;
+-	struct scatterlist sg;
+-	DECLARE_CRYPTO_WAIT(wait);
+-	int err;
+-
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(alg, GFP_KERNEL);
+-
+-	sg_init_one(&sg, data, size);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+-					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
+-	ahash_request_set_crypt(req, &sg, out, size);
+-
+-	err = crypto_wait_req(crypto_ahash_digest(req), &wait);
+-
+-	fsverity_free_hash_request(alg, req);
+-	return err;
++	return crypto_shash_tfm_digest(alg->tfm, data, size, out);
+ }
+ 
+ void __init fsverity_check_hash_algs(void)
+diff --git a/fs/verity/verify.c b/fs/verity/verify.c
+index e2508222750b3..702500ef1f348 100644
+--- a/fs/verity/verify.c
++++ b/fs/verity/verify.c
+@@ -29,21 +29,6 @@ static inline int cmp_hashes(const struct fsverity_info *vi,
+ 	return -EBADMSG;
+ }
+ 
+-static bool data_is_zeroed(struct inode *inode, struct page *page,
+-			   unsigned int len, unsigned int offset)
+-{
+-	void *virt = kmap_local_page(page);
+-
+-	if (memchr_inv(virt + offset, 0, len)) {
+-		kunmap_local(virt);
+-		fsverity_err(inode,
+-			     "FILE CORRUPTED!  Data past EOF is not zeroed");
+-		return false;
+-	}
+-	kunmap_local(virt);
+-	return true;
+-}
+-
+ /*
+  * Returns true if the hash block with index @hblock_idx in the tree, located in
+  * @hpage, has already been verified.
+@@ -122,9 +107,7 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
+  */
+ static bool
+ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+-		  struct ahash_request *req, struct page *data_page,
+-		  u64 data_pos, unsigned int dblock_offset_in_page,
+-		  unsigned long max_ra_pages)
++		  const void *data, u64 data_pos, unsigned long max_ra_pages)
+ {
+ 	const struct merkle_tree_params *params = &vi->tree_params;
+ 	const unsigned int hsize = params->digest_size;
+@@ -136,11 +119,11 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 	struct {
+ 		/* Page containing the hash block */
+ 		struct page *page;
++		/* Mapped address of the hash block (will be within @page) */
++		const void *addr;
+ 		/* Index of the hash block in the tree overall */
+ 		unsigned long index;
+-		/* Byte offset of the hash block within @page */
+-		unsigned int offset_in_page;
+-		/* Byte offset of the wanted hash within @page */
++		/* Byte offset of the wanted hash relative to @addr */
+ 		unsigned int hoffset;
+ 	} hblocks[FS_VERITY_MAX_LEVELS];
+ 	/*
+@@ -150,6 +133,9 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 	u64 hidx = data_pos >> params->log_blocksize;
+ 	int err;
+ 
++	/* Up to 1 + FS_VERITY_MAX_LEVELS pages may be mapped at once */
++	BUILD_BUG_ON(1 + FS_VERITY_MAX_LEVELS > KM_MAX_IDX);
++
+ 	if (unlikely(data_pos >= inode->i_size)) {
+ 		/*
+ 		 * This can happen in the data page spanning EOF when the Merkle
+@@ -159,8 +145,12 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		 * any part past EOF should be all zeroes.  Therefore, we need
+ 		 * to verify that any data blocks fully past EOF are all zeroes.
+ 		 */
+-		return data_is_zeroed(inode, data_page, params->block_size,
+-				      dblock_offset_in_page);
++		if (memchr_inv(data, 0, params->block_size)) {
++			fsverity_err(inode,
++				     "FILE CORRUPTED!  Data past EOF is not zeroed");
++			return false;
++		}
++		return true;
+ 	}
+ 
+ 	/*
+@@ -175,6 +165,7 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		unsigned int hblock_offset_in_page;
+ 		unsigned int hoffset;
+ 		struct page *hpage;
++		const void *haddr;
+ 
+ 		/*
+ 		 * The index of the block in the current level; also the index
+@@ -192,10 +183,9 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		hblock_offset_in_page =
+ 			(hblock_idx << params->log_blocksize) & ~PAGE_MASK;
+ 
+-		/* Byte offset of the hash within the page */
+-		hoffset = hblock_offset_in_page +
+-			  ((hidx << params->log_digestsize) &
+-			   (params->block_size - 1));
++		/* Byte offset of the hash within the block */
++		hoffset = (hidx << params->log_digestsize) &
++			  (params->block_size - 1);
+ 
+ 		hpage = inode->i_sb->s_vop->read_merkle_tree_page(inode,
+ 				hpage_idx, level == 0 ? min(max_ra_pages,
+@@ -207,15 +197,17 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 				     err, hpage_idx);
+ 			goto out;
+ 		}
++		haddr = kmap_local_page(hpage) + hblock_offset_in_page;
+ 		if (is_hash_block_verified(vi, hpage, hblock_idx)) {
+-			memcpy_from_page(_want_hash, hpage, hoffset, hsize);
++			memcpy(_want_hash, haddr + hoffset, hsize);
+ 			want_hash = _want_hash;
++			kunmap_local(haddr);
+ 			put_page(hpage);
+ 			goto descend;
+ 		}
+ 		hblocks[level].page = hpage;
++		hblocks[level].addr = haddr;
+ 		hblocks[level].index = hblock_idx;
+-		hblocks[level].offset_in_page = hblock_offset_in_page;
+ 		hblocks[level].hoffset = hoffset;
+ 		hidx = next_hidx;
+ 	}
+@@ -225,13 +217,11 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 	/* Descend the tree verifying hash blocks. */
+ 	for (; level > 0; level--) {
+ 		struct page *hpage = hblocks[level - 1].page;
++		const void *haddr = hblocks[level - 1].addr;
+ 		unsigned long hblock_idx = hblocks[level - 1].index;
+-		unsigned int hblock_offset_in_page =
+-			hblocks[level - 1].offset_in_page;
+ 		unsigned int hoffset = hblocks[level - 1].hoffset;
+ 
+-		err = fsverity_hash_block(params, inode, req, hpage,
+-					  hblock_offset_in_page, real_hash);
++		err = fsverity_hash_block(params, inode, haddr, real_hash);
+ 		if (err)
+ 			goto out;
+ 		err = cmp_hashes(vi, want_hash, real_hash, data_pos, level - 1);
+@@ -246,29 +236,30 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 			set_bit(hblock_idx, vi->hash_block_verified);
+ 		else
+ 			SetPageChecked(hpage);
+-		memcpy_from_page(_want_hash, hpage, hoffset, hsize);
++		memcpy(_want_hash, haddr + hoffset, hsize);
+ 		want_hash = _want_hash;
++		kunmap_local(haddr);
+ 		put_page(hpage);
+ 	}
+ 
+ 	/* Finally, verify the data block. */
+-	err = fsverity_hash_block(params, inode, req, data_page,
+-				  dblock_offset_in_page, real_hash);
++	err = fsverity_hash_block(params, inode, data, real_hash);
+ 	if (err)
+ 		goto out;
+ 	err = cmp_hashes(vi, want_hash, real_hash, data_pos, -1);
+ out:
+-	for (; level > 0; level--)
++	for (; level > 0; level--) {
++		kunmap_local(hblocks[level - 1].addr);
+ 		put_page(hblocks[level - 1].page);
+-
++	}
+ 	return err == 0;
+ }
+ 
+ static bool
+-verify_data_blocks(struct inode *inode, struct fsverity_info *vi,
+-		   struct ahash_request *req, struct folio *data_folio,
++verify_data_blocks(struct inode *inode, struct folio *data_folio,
+ 		   size_t len, size_t offset, unsigned long max_ra_pages)
+ {
++	struct fsverity_info *vi = inode->i_verity_info;
+ 	const unsigned int block_size = vi->tree_params.block_size;
+ 	u64 pos = (u64)data_folio->index << PAGE_SHIFT;
+ 
+@@ -278,11 +269,14 @@ verify_data_blocks(struct inode *inode, struct fsverity_info *vi,
+ 			 folio_test_uptodate(data_folio)))
+ 		return false;
+ 	do {
+-		struct page *data_page =
+-			folio_page(data_folio, offset >> PAGE_SHIFT);
+-
+-		if (!verify_data_block(inode, vi, req, data_page, pos + offset,
+-				       offset & ~PAGE_MASK, max_ra_pages))
++		void *data;
++		bool valid;
++
++		data = kmap_local_folio(data_folio, offset);
++		valid = verify_data_block(inode, vi, data, pos + offset,
++					  max_ra_pages);
++		kunmap_local(data);
++		if (!valid)
+ 			return false;
+ 		offset += block_size;
+ 		len -= block_size;
+@@ -304,19 +298,8 @@ verify_data_blocks(struct inode *inode, struct fsverity_info *vi,
+  */
+ bool fsverity_verify_blocks(struct folio *folio, size_t len, size_t offset)
+ {
+-	struct inode *inode = folio->mapping->host;
+-	struct fsverity_info *vi = inode->i_verity_info;
+-	struct ahash_request *req;
+-	bool valid;
+-
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(vi->tree_params.hash_alg, GFP_NOFS);
++	return verify_data_blocks(folio->mapping->host, folio, len, offset, 0);
+ 
+-	valid = verify_data_blocks(inode, vi, req, folio, len, offset, 0);
+-
+-	fsverity_free_hash_request(vi->tree_params.hash_alg, req);
+-
+-	return valid;
+ }
+ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
+ 
+@@ -338,14 +321,9 @@ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
+ void fsverity_verify_bio(struct bio *bio)
+ {
+ 	struct inode *inode = bio_first_page_all(bio)->mapping->host;
+-	struct fsverity_info *vi = inode->i_verity_info;
+-	struct ahash_request *req;
+ 	struct folio_iter fi;
+ 	unsigned long max_ra_pages = 0;
+ 
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(vi->tree_params.hash_alg, GFP_NOFS);
+-
+ 	if (bio->bi_opf & REQ_RAHEAD) {
+ 		/*
+ 		 * If this bio is for data readahead, then we also do readahead
+@@ -360,14 +338,12 @@ void fsverity_verify_bio(struct bio *bio)
+ 	}
+ 
+ 	bio_for_each_folio_all(fi, bio) {
+-		if (!verify_data_blocks(inode, vi, req, fi.folio, fi.length,
+-					fi.offset, max_ra_pages)) {
++		if (!verify_data_blocks(inode, fi.folio, fi.length, fi.offset,
++					max_ra_pages)) {
+ 			bio->bi_status = BLK_STS_IOERR;
+ 			break;
+ 		}
+ 	}
+-
+-	fsverity_free_hash_request(vi->tree_params.hash_alg, req);
+ }
+ EXPORT_SYMBOL_GPL(fsverity_verify_bio);
+ #endif /* CONFIG_BLOCK */
 
-which both seem to hold in testing. But it's probably a good idea to add
-an explicit check for this, at least until KVM implements something to
-enforce this earlier in guest life-cycle.
-
-> 
-> Let's start with this:
-> 
-> > +static inline u8 order_to_level(int order)
-> > +{
-> > +	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
-> > +
-> > +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
-> > +		return PG_LEVEL_1G;
-> > +
-> > +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
-> > +		return PG_LEVEL_2M;
-> > +
-> > +	return PG_LEVEL_4K;
-> > +}
-> 
-> Right now, 'order' comes only from restrictedmem_get_page(), which I dug
-> out of:
-> 
-> > https://github.com/mdroth/linux/commit/c6792672cd11737fd255dff10b2d5b6bccc626a8
-> 
-> That order is *only* filled in by THPs.  That makes the PG_LEVEL_1G
-> stuff here kinda silly.  I guess it might be seen as thorough, but it's
-> dead code.  I'd probably just make this work on order==9 || order==0 and
-> warn on anything else.
-
-Ok, makes sense.
-
-> 
-> I'd also highly recommend some comments about how racy this all is.  I
-> guess it probably works, but it would be good to add some comments about
-> page splits and collapsing.
-
-Collapsing while in this code path should be ok since the 4K sub-pages will
-just end up getting mapped as 4K in RMP table. KVM MMU will then map
-them into nested page table as 4K as well and we'll get non-optimal
-performance, but things should otherwise work.
-
-Splitting is a similar story: if we map as 2M in RMP table, and then
-afterward the page gets split, then KVM MMU during fault time would map
-the pages in the NPT as 4K, and when the guest attempts to access
-private pages of this sort they'll generate a nested page fault with
-PFERR_GUEST_RMP_BIT and PFERR_GUEST_SIZEM_BIT set, and the code in
-handle_rmp_page_fault() will issue a PSMASH instruction to split the
-2M RMP entry into 512 4K RMP entries.
-
-Will add some comments around this.
-
-> 
-> It's also not obvious why this only cares about private pages.
-
-Mainly because the shared memory that actually get mapped into the guest
-is always shared in the RMP table. It is normal VMA memory that is not
-allocated by UPM/restrictedmem. We will never attempt to make them
-private, so there is never a need to bother with switching them back to
-shared.
-
-So we only need to handle RMP updates for the UPM/restrictedmem PFNs.
-Obviously for shared->private conversion before mapping it into the
-guest, but also for private->shared conversion since we will still
-get RMP check failures if we try to leave the PFNs as private in the
-RMP table and map the above-mentioned VMA memory into the guest
-instead.
-
-Will add some more comments around this.
-
-> 
-> Anyway, this is the exact kind of thing where I really like a
-> well-commented helper:
-> 
-> bool can_install_large_rmp_entry(gfn, order)
-> {
-> 	// small pages, blah blah
-> 	if (!order)
-> 		return false;
-> 
-> 	// The region being updated must be aligned
-> 	if (!IS_ALIGNED(gfn, 1 << order))
-> 		return false;
-> 	// ... and fit
-> 	if (gfn + (1 << order)) > end)
-> 		return false;
-> 
-> 	return true;	
-> }
-> 
-> Which gets used like this:
-> 
-> 	if (op == SNP_PAGE_STATE_PRIVATE &&
-> 	    can_install_large_rmp_entry(gfn, order)) {
-> 		level = ...
-> 	}
-
-Makes sense, will implement something along these lines.
-
-Thanks!
-
--Mike
+base-commit: 99ddf2254febae9eab7fb0bcc02c5322243f5c49
+-- 
+2.40.0
 
