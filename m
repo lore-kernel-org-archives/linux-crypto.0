@@ -2,139 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E205C7618D
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 14:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E44B0C7618D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 20:16:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239464AbjDFOrW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Apr 2023 10:47:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51228 "EHLO
+        id S238652AbjDFUQl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Apr 2023 16:16:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239121AbjDFOrD (ORCPT
+        with ESMTP id S238444AbjDFUQk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2023 10:47:03 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819FC8A5B;
-        Thu,  6 Apr 2023 07:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680792342; x=1712328342;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=wKLD3ul2fnQNnbci3vu7fUACYJnL7Pb0yr2YSwJ4YfE=;
-  b=A2m8dlFAIZ8suroi3kz8QDGKbyYDtx6flW4MyIOO8hCnDi6IZcZAzOVr
-   inEwSxAJf8yFsQGjOWAOlR2qtYXOeS86METfwccLwYoWY2NjyjV2V4nzA
-   V5raNxMCCt1YiyBuYvL6k1e5y+tRCFlqVjuc7o4CG6FC5u9lOuoq8Vyt9
-   f3DYh7lBx7ZmhIl7MUzwYNGFz72yJWP0OFUbquz7OTE59QsS+/etr4/cf
-   xUQhnhOPSvRf5NDTZ+jPQZv3pLh4rPblHshJPOaNFrRl3jtqHb7Qk2V+s
-   GGvrlu3zqb+zeHBnChL7G84Mu+Ncrf/ovd3G9DEeq0SkpL9UYhKF6o0TT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10672"; a="326817273"
-X-IronPort-AV: E=Sophos;i="5.98,323,1673942400"; 
-   d="scan'208";a="326817273"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2023 07:43:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10672"; a="861424812"
-X-IronPort-AV: E=Sophos;i="5.98,323,1673942400"; 
-   d="scan'208";a="861424812"
-Received: from akshayph-mobl.amr.corp.intel.com ([10.212.115.108])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2023 07:43:41 -0700
-Message-ID: <0b95f8b723f50395ee325ff5475e5d5189776928.camel@linux.intel.com>
-Subject: Re: [PATCH v2 12/15] crypto: iaa - Add support for iaa_crypto
- deflate compression algorithm
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org
-Date:   Thu, 06 Apr 2023 09:43:40 -0500
-In-Reply-To: <ZC58JggIXgpJ1tpD@gondor.apana.org.au>
-References: <20230328153535.126223-1-tom.zanussi@linux.intel.com>
-         <20230328153535.126223-13-tom.zanussi@linux.intel.com>
-         <ZC58JggIXgpJ1tpD@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1-0ubuntu1 
+        Thu, 6 Apr 2023 16:16:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF756592;
+        Thu,  6 Apr 2023 13:16:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CD7CC64C01;
+        Thu,  6 Apr 2023 20:16:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C57C433EF;
+        Thu,  6 Apr 2023 20:16:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680812197;
+        bh=Ro81oFs2ERAZEjBoyQDuaMoEroanaW6iQPKQU7mVPEU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eRkFDdcqoGk64bp4sT+M9/sjnM3oJqqqFa2dofyP1WAn1JhXccOhbdpxbyTmu8TMS
+         JWnOy2uQeOiJODNWHP7bJUSzb4d5M7BCWqCs3JwxfAeXj7OxEyBgXU0nbYifzB7Se4
+         5XGHJ5HCAU04iATsAYymN3/hh0YExMF56CzNN0aTMLVlA2xTSHz6p0xjjHSsGduug8
+         zVCShD2Cv7sBYRv2vbj9r+g1Caq3c/JbwfdMEKnmRwq0QPPM1+4Ecc/xuVIp0YCPGj
+         /8z0S7YvyK3861/A3gyEaFP6Nr5J7g+cY6gyRo9dZXllu9MSv+FassMFU7aSFthh3E
+         fMXJZCq8wDVPQ==
+Date:   Thu, 6 Apr 2023 13:16:34 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v5 4/6] scsi: ufs: ufs-qcom: Switch to the new ICE API
+Message-ID: <20230406201634.GA20288@sol.localdomain>
+References: <20230403200530.2103099-1-abel.vesa@linaro.org>
+ <20230403200530.2103099-5-abel.vesa@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230403200530.2103099-5-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+Hi Abel,
 
-On Thu, 2023-04-06 at 16:00 +0800, Herbert Xu wrote:
-> On Tue, Mar 28, 2023 at 10:35:32AM -0500, Tom Zanussi wrote:
-> >=20
-> > @@ -881,12 +1574,26 @@ static int iaa_crypto_probe(struct idxd_dev
-> > *idxd_dev)
-> > =C2=A0
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0rebalance_wq_table();
-> > =C2=A0
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (first_wq) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0iaa_crypto_enabled =3D true;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0ret =3D iaa_register_compression_device();
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (ret !=3D 0) {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0iaa_cr=
-ypto_enabled =3D false;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_db=
-g(dev, "IAA compression device
-> > registration failed\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto e=
-rr_register;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0}
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0pr_info("iaa_crypto now ENABLED\n");
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> > +
->=20
-> Sorry for picking on your driver but I've got to start somewhere :)
+On Mon, Apr 03, 2023 at 11:05:28PM +0300, Abel Vesa wrote:
+> Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
+> use the new ICE api provided by the Qualcomm soc driver ice. The platforms
+> that already have ICE support will use the API as library since there will
+> not be a devicetree node, but instead they have reg range. In this case,
+> the of_qcom_ice_get will return an ICE instance created for the consumer's
+> device. But if there are platforms that do not have ice reg in the
+> consumer devicetree node and instead provide a dedicated ICE devicetree
+> node, the of_qcom_ice_get will look up the device based on qcom,ice
+> property and will get the ICE instance registered by the probe function
+> of the ice driver.
+> 
+> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
 
-No problem, thanks for reviewing the code. ;-)
+This is still silent about how the ICE clock behavior is being changed.
 
->=20
-> A long standing problem shared by almost all crypto drivers is that
-> the hardware removal handling is completely broken.
->=20
-> This is because hardware can be removed at any time, including during
-> a crypto operatin.=C2=A0 So drivers must work carefully around that fact.
->=20
-> Here is a recipe for dealing with this safely:
->=20
-> 1) Never unregister your crypto algorithms, even after the last
-> piece of hardware has been unplugged.=C2=A0 The algorithms should only
-> be unregistered (if they have been registered through the first
-> successful probe call) in the module unload function.
->=20
-> 2) Never free any software state for your hardware without some form
-> of synchronisation with oustanding operations.
->=20
-> Any mechanism would do, for example, you could use a spinlock if the
-> critical path isn't very long.=C2=A0 The operational path would take the
-> lock, check the hardware state, and if present proceed with the
-> operation (but still being prepared to cope if the hardware goes
-> AWAL because even if the driver state is still present the actual
-> hardware may be gone already).
->=20
-> Then the removal path would simply take the spinlock, set a flag
-> indicating the hardware is gone and then you could safely unlock
-> and free your driver states.
->=20
+I'm still trying to understand all this myself, so please bear with me, but my
+understanding is that the UFS clocks can be disabled even while the host
+controller is runtime-resumed.  This is called "clock gating" in the code.
 
-OK, yeah, thanks for pointing this out along with the detailed
-explanation and remedy.  Will take care of this in the next version.
+Before, the ICE clock was just listed as one of the UFS clocks.  So, it was just
+managed like the other UFS clocks.
 
-Tom
+Now, it appears that the ICE clock is always enabled while the host controller
+is runtime-resumed.  So, this patch removes support for gating of the ICE clock.
 
-> Thanks,
+Is that intended?
 
+- Eric
