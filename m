@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 266C1C77B6C
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 20:23:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FDBC77B6C
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 20:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239252AbjDFUXL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Apr 2023 16:23:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57342 "EHLO
+        id S240063AbjDFUig (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Apr 2023 16:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239087AbjDFUW4 (ORCPT
+        with ESMTP id S240257AbjDFUiW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2023 16:22:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA267976B;
-        Thu,  6 Apr 2023 13:22:33 -0700 (PDT)
+        Thu, 6 Apr 2023 16:38:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A807FB47B;
+        Thu,  6 Apr 2023 13:34:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 72BEA6434E;
-        Thu,  6 Apr 2023 20:22:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EE1BC433D2;
-        Thu,  6 Apr 2023 20:22:32 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E014C6471F;
+        Thu,  6 Apr 2023 20:34:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95E7CC433D2;
+        Thu,  6 Apr 2023 20:34:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680812552;
-        bh=QbU1tiiVtHmL+PJo3an08Q0eap2Dp32ICrXVxmaFXMM=;
+        s=k20201202; t=1680813275;
+        bh=piwLBENh4irhNGFJSxnTnkgU+tz4S7Qx3VDC5mBsLow=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OTyOeiezNd9LajC1COfog+DUblRjvVWaWdgSE/lh87jYEAg0XWWIlzI44HlLh5Rs5
-         K4Oe+I6TEL7tgVRZbgOEOpWU7nPh/6jRRa9sfhogVV9bsTJIt/Q/ktHis3mhRPBcoj
-         uWdebuQBK+1WHU8qaILAHsncwVGDbE0XNVeYDUAUrlRrrzfJP3r+6cT0Ra+Vj1RVFi
-         jAhfooNC9IAFxgw/7Q4jFMfauJQML0of5074/Yog2DLxSmTd+rzHSlLfdzE5+CWiLo
-         lM3740EvfiGjstKT8J9TOrTXqC3mpibEGeZZUo9OglYfD/bZOvVAYRz9arLNYQXbvG
-         5BLNVFSt02/Pw==
-Date:   Thu, 6 Apr 2023 13:22:30 -0700
+        b=eKmaeMCgUMeITeDCNa33PhQDb7Ra//T9u6ZrmomOXgtwhrr6fphYxLIU4OQN4QXGe
+         KYEDTQUr+Ag83EPbtj7/mOs71LKexZ8aUpqf/3Ds8OM+NRZiCV7Yz9fVJEHG0I5pXG
+         4d5T45oQeqHxxxN9mfQT6g+a7MHaryvDunWV91pt9w3XTHSR8o0XjuQKZtRhdepfal
+         BJy2EVQTh0hqfLeKXaHaHjRRU1giIX/KarfNTuF3poLm/C5EzASATDPHZOWyphetxl
+         QRq7rFce1sH2MOhvQNmVa7pc8pLJBrwbrcpIyun52nycMADa89n+aCJkePKpTxkduL
+         mADB0NIRV4Izw==
+Date:   Thu, 6 Apr 2023 13:34:32 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Abel Vesa <abel.vesa@linaro.org>
 Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
@@ -54,92 +54,59 @@ Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v5 5/6] mmc: sdhci-msm: Switch to the new ICE API
-Message-ID: <20230406202230.GB20288@sol.localdomain>
+Subject: Re: [PATCH v5 3/6] soc: qcom: Make the Qualcomm UFS/SDCC ICE a
+ dedicated driver
+Message-ID: <20230406203432.GC20288@sol.localdomain>
 References: <20230403200530.2103099-1-abel.vesa@linaro.org>
- <20230403200530.2103099-6-abel.vesa@linaro.org>
+ <20230403200530.2103099-4-abel.vesa@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230403200530.2103099-6-abel.vesa@linaro.org>
+In-Reply-To: <20230403200530.2103099-4-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 11:05:29PM +0300, Abel Vesa wrote:
-> diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
-> index 8ac81d57a3df..1a6e63b7af12 100644
-> --- a/drivers/mmc/host/sdhci-msm.c
-> +++ b/drivers/mmc/host/sdhci-msm.c
-> @@ -19,6 +19,8 @@
->  #include <linux/firmware/qcom/qcom_scm.h>
->  #include <linux/regulator/consumer.h>
->  #include <linux/interconnect.h>
->  #include <linux/pinctrl/consumer.h>
->  #include <linux/reset.h>
->  
-> +#include <soc/qcom/ice.h>
+On Mon, Apr 03, 2023 at 11:05:27PM +0300, Abel Vesa wrote:
+> This takes the already existing duplicated support in both ufs-qcom
+> and sdhci-msm drivers and makes it a dedicated driver that can be used
+> by both mentioned drivers. The reason for this is because, staring with
+> SM8550, the ICE IP block is shared between UFS and SDCC, which means we
+> need to probe a dedicated device and share it between those two
+> consumers. So let's add the ICE dedicated driver as a soc driver.
+> Platforms that already have ICE supported, will use it as a library
+> as the of_qcom_ice_get will return an ICE instance created for the
+> consumer device. This allows the backwards compatibility with old-style
+> devicetree approach. Also, add support to HW version 4.x since it
+> works out-of-the-box with the current driver. The 4.x HW version is
+> found on SM8550 platform.
 
-The include of <linux/firmware/qcom/qcom_scm.h> should be removed.
+Can you please split up long paragraphs like this into multiple paragraphs?
 
->  static int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
->  			      struct cqhci_host *cq_host)
->  {
->  	struct mmc_host *mmc = msm_host->mmc;
->  	struct device *dev = mmc_dev(mmc);
-> -	struct resource *res;
->  
->  	if (!(cqhci_readl(cq_host, CQHCI_CAP) & CQHCI_CAP_CS))
->  		return 0;
->  
-> -	res = platform_get_resource_byname(msm_host->pdev, IORESOURCE_MEM,
-> -					   "ice");
-> -	if (!res) {
-> -		dev_warn(dev, "ICE registers not found\n");
-> -		goto disable;
-> -	}
-> -
-> -	if (!qcom_scm_ice_available()) {
-> -		dev_warn(dev, "ICE SCM interface not found\n");
-> -		goto disable;
-> +	msm_host->ice = of_qcom_ice_get(dev);
-> +	if (msm_host->ice == ERR_PTR(-EOPNOTSUPP)) {
-> +		dev_warn(dev, "Disabling inline encryption support\n");
-> +		msm_host->ice = NULL;
->  	}
->  
-> -	msm_host->ice_mem = devm_ioremap_resource(dev, res);
-> -	if (IS_ERR(msm_host->ice_mem))
-> -		return PTR_ERR(msm_host->ice_mem);
-> -
-> -	if (!sdhci_msm_ice_supported(msm_host))
-> -		goto disable;
-> +	if (IS_ERR(msm_host->ice))
-> +		return PTR_ERR(msm_host->ice);
->  
->  	mmc->caps2 |= MMC_CAP2_CRYPTO;
-> -	return 0;
->  
-> -disable:
-> -	dev_warn(dev, "Disabling inline encryption support\n");
->  	return 0;
->  }
+> +	pdev = of_find_device_by_node(node);
+> +	if (!pdev) {
+> +		dev_err(dev, "Cannot find device node %s\n", node->name);
+> +		ice = ERR_PTR(-EPROBE_DEFER);
+> +		goto out;
+> +	}
+> +
+> +	ice = platform_get_drvdata(pdev);
+> +	if (!ice) {
+> +		dev_err(dev, "Cannot get ice instance from %s\n",
+> +			dev_name(&pdev->dev));
+> +		platform_device_put(pdev);
+> +		ice = ERR_PTR(-EPROBE_DEFER);
+> +		goto out;
+> +	}
+> +
+> +	ice->link = device_link_add(dev, &pdev->dev, DL_FLAG_AUTOREMOVE_SUPPLIER);
+> +	if (!ice->link) {
+> +		dev_err(&pdev->dev,
+> +			"Failed to create device link to consumer %s\n",
+> +			dev_name(dev));
+> +		ice = ERR_PTR(-EINVAL);
+> +	}
 
-This is sometimes setting MMC_CAP2_CRYPTO when ICE is unsupported.
-
-BTW, it would be better to set not msm_host->ice until it's known that it will
-have a valid value:
-
-	ice = of_qcom_ice_get(dev);
-	if (ice == ERR_PTR(-EOPNOTSUPP)) {
-		dev_warn(dev, "Disabling inline encryption support\n");
-		return 0;
-	}
-	if (IS_ERR_OR_NULL(ice))
-		return PTR_ERR_OR_ZERO(ice);
-
-	msm_host->ice = ice;
-	mmc->caps2 |= MMC_CAP2_CRYPTO;
-	return 0;
+Is a call to platform_device_put() missing above?
 
 - Eric
