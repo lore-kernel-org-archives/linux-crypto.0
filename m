@@ -2,105 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D20BDC76196
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 06:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33293C77B6F
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 07:02:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230358AbjDGGSj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Apr 2023 02:18:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46692 "EHLO
+        id S229506AbjDGHCo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Apr 2023 03:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbjDGGSi (ORCPT
+        with ESMTP id S233753AbjDGHCm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Apr 2023 02:18:38 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51F13197;
-        Thu,  6 Apr 2023 23:18:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E2AE560FA9;
-        Fri,  7 Apr 2023 06:18:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF7FC4339B;
-        Fri,  7 Apr 2023 06:18:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680848317;
-        bh=PkUkc3BxGY08e5rKE6FcXGqmMgAN6jFXJmjAdt2/kNM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=osdZjFbBHEtChPItfYS8FeJjike3PRGZdD7nSd7mHn55EhxyKj7ysh5K8oPyKTerl
-         44u81tzYhXuE7rzRw6ZhL4LdT0AWF+eF4NUL9lPRedfvC82vj157xhOylR4H7mJQBs
-         UcfYAA/ekXQ2rc/+85DU3yGgQtSckQJC0tLr7aM1eq9WG7yywgU5QbGnnABL8UikzM
-         t9m27fzWWlj8ZjCVGqUVOxlACcHd5Hl4GfLfcq6Yyexmq8lzWyr3a3ZQau31avXblm
-         iw5kSi4+m09LsN7wz7rJ3UpboUflwFo8mPrZiiL5d8GyZQNvpurNJGVNknU8o/C4yf
-         PUuNVMnpowlFg==
-Date:   Fri, 7 Apr 2023 08:18:33 +0200
-From:   Wolfram Sang <wsa@kernel.org>
-To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
-        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
-        linux-kernel@vger.kernel.org,
-        Mark Hasemeyer <markhas@chromium.org>,
-        Grzegorz Bernacki <gjb@semihalf.com>
-Subject: Re: [PATCH v8 0/6] Use CCP driver to handle PSP I2C arbitration
-Message-ID: <ZC+1ufdj8WYixQsM@sai>
-Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
-        Mario Limonciello <mario.limonciello@amd.com>,
+        Fri, 7 Apr 2023 03:02:42 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7478F7ED8
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Apr 2023 00:02:40 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id m6-20020a05600c3b0600b003ee6e324b19so24771011wms.1
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Apr 2023 00:02:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1680850959; x=1683442959;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yDRZJb+gw9WKl+q/YP3+9vfEWrdxXYb08xE3KjrncwY=;
+        b=TlUNuHXhE7dkX3ma2znO7zdAacJiO27ghArmpkXlH8c3ATv+KBTc8LUhyVrkypI+mP
+         0zQlggzvEemyf2P17MWTNYZVT5pEmY7G8l0KpU4b0QsyPvMfMJZshCs5c4HdBgpV6MQP
+         XN2grzseW68CfcpULpwxh3ynO/USV/6im6FxHW40/svQL+ApI5uK1eCRpcAHn1PqPRYE
+         iwww25egOIvVPfxbt4pMX674CTKLbiVEO/0Ip1e+6ahSlHwFQkQF7naCFmxlgJCIHPZU
+         6QypBjxTNvF8oRGQexdGN9PM2UNsP9cuq6GQxZBhFfnm80WY+czp/4FjLGOZC9ZJW9dw
+         8zbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680850959; x=1683442959;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yDRZJb+gw9WKl+q/YP3+9vfEWrdxXYb08xE3KjrncwY=;
+        b=BrG2hUL+0PQVFD56tZ/X7CoO/XW+JlcLoOC6DHwxLVvzaed5cKDwysZ5K9elSeqQAC
+         DeCBH7rxb0wfTjOvx0QU6n9ePHvwsnrSKthmxb18H3v96H512DU+RbTp29ni1gK2UWzS
+         TY/BZK01jY33G8ubufCE0z/AgPwvpGI6bMjq8JwTkKqd19hXd4QM0nIcxCj+oSBAi4DN
+         1BmqHgmoQhN9mklrBN6FGYJDG6UtaAkluZOZhi1HXFmiE09GhD38tPXeIpLG2CArxD1N
+         b7NZQW4uha8tP2WvF07EgJPNBd7FHxC01i9WfalfSg7ffUB3MrmSs23xpXGj/zYLW5Ud
+         QjaA==
+X-Gm-Message-State: AAQBX9eEJFfWNera+c80zWNUB7e09PQm2I/RT0y0nPGouKOMFr+3OFt6
+        +mDEMWLK52s4n2uwAS1KL7E3KA==
+X-Google-Smtp-Source: AKy350Yf7cZzWZgOSGchAXM9/7IoYqhc4Z0zpcrhQUgBsDYEyMpw3OS/oAAO8/EgLIduuLczRZdj6g==
+X-Received: by 2002:a05:600c:2202:b0:3ee:289a:3c3a with SMTP id z2-20020a05600c220200b003ee289a3c3amr566623wml.30.1680850958894;
+        Fri, 07 Apr 2023 00:02:38 -0700 (PDT)
+Received: from linaro.org ([94.52.112.99])
+        by smtp.gmail.com with ESMTPSA id i42-20020a05600c4b2a00b003f0321c22basm7224793wmp.12.2023.04.07.00.02.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Apr 2023 00:02:38 -0700 (PDT)
+Date:   Fri, 7 Apr 2023 10:02:36 +0300
+From:   Abel Vesa <abel.vesa@linaro.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
-        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
-        linux-kernel@vger.kernel.org, Mark Hasemeyer <markhas@chromium.org>,
-        Grzegorz Bernacki <gjb@semihalf.com>
-References: <20230403183216.3493-1-mario.limonciello@amd.com>
- <ZC5pxORLN+SF/91S@sai>
- <82ef9505-f8ae-36d0-fdeb-9bfc92aec557@amd.com>
+        "David S . Miller" <davem@davemloft.net>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v5 4/6] scsi: ufs: ufs-qcom: Switch to the new ICE API
+Message-ID: <ZC/ADOlol2XO7ACL@linaro.org>
+References: <20230403200530.2103099-1-abel.vesa@linaro.org>
+ <20230403200530.2103099-5-abel.vesa@linaro.org>
+ <20230406201634.GA20288@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="5nOnx0Jc9l74hNuL"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <82ef9505-f8ae-36d0-fdeb-9bfc92aec557@amd.com>
+In-Reply-To: <20230406201634.GA20288@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 23-04-06 13:16:34, Eric Biggers wrote:
+> Hi Abel,
+> 
+> On Mon, Apr 03, 2023 at 11:05:28PM +0300, Abel Vesa wrote:
+> > Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
+> > use the new ICE api provided by the Qualcomm soc driver ice. The platforms
+> > that already have ICE support will use the API as library since there will
+> > not be a devicetree node, but instead they have reg range. In this case,
+> > the of_qcom_ice_get will return an ICE instance created for the consumer's
+> > device. But if there are platforms that do not have ice reg in the
+> > consumer devicetree node and instead provide a dedicated ICE devicetree
+> > node, the of_qcom_ice_get will look up the device based on qcom,ice
+> > property and will get the ICE instance registered by the probe function
+> > of the ice driver.
+> > 
+> > Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> 
+> This is still silent about how the ICE clock behavior is being changed.
 
---5nOnx0Jc9l74hNuL
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Right, I'll add the some more info into the commit message about the
+clock being handled by the ICE driver.
 
+> 
+> I'm still trying to understand all this myself, so please bear with me, but my
+> understanding is that the UFS clocks can be disabled even while the host
+> controller is runtime-resumed.  This is called "clock gating" in the code.
 
-> > How should this go upstream, i.e. are there dependencies? Shall I pick
-> > the I2C patches or is it better if all goes via the crypto tree?
-> >=20
-> IMO it's better to go through the crypto tree.=C2=A0 There are dependenci=
-es
-> in the crypto part from the earlier series that was merged.
+The ICE clock is now being controlled by the new driver.
+> 
+> Before, the ICE clock was just listed as one of the UFS clocks.  So, it was just
+> managed like the other UFS clocks.
+> 
+> Now, it appears that the ICE clock is always enabled while the host controller
+> is runtime-resumed.  So, this patch removes support for gating of the ICE clock.
 
-Ok, fine with me. I acked the I2C patches. Thanks for the heads up.
+I just tested this and it works as expected, which is:
 
+ICE clock gets enable on qcom_ice_create (via *clk_get*_enabled) and
+then, on the runtime suspend of the UFS, the qcom_ice_suspend is called
+which will disable the clock. Then, every time UFS runtime
+resumes/suspends the clock gets enabled/disabled.
 
---5nOnx0Jc9l74hNuL
-Content-Type: application/pgp-signature; name="signature.asc"
+Hope that makes sense.
 
------BEGIN PGP SIGNATURE-----
+Let me know if you think I'm missing something here.
 
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmQvtbkACgkQFA3kzBSg
-KbYilg//b/7oRyaFxSoYypW8qZWg9NazCHaTiYpl8oPfrkrDTH3KGB7/TdHX4zCt
-lmVf9f0hZPJdOmvJk0SwmKNvcZUIgk/lEi2fxUAUaVPjRWM7qfh7Hn5OBSuXafRm
-oJZ7rNgR2pT4rL5HwDn4sdLMQaVLAYR9TgxqKX9zjcA9yTsHidTs9WnlzzB9fwSi
-k36Gw+AdUZDySzAr8GplP9n0BA4CUcJ2zNW5x3+3VJ/eM/Iq7aTiEDyC6z2sm5bM
-G7DNfoXvIWzWFH8hp4/Nee8NemLNEIqw0STVKhhfRO9LnlMSZGTVktTywi4J/SVa
-+xah/GFpZ1DNQQJ/Atgi2qv/tnK3X7uK3Wl3ZRMiS3gIxnqp79hP72NRxWYQMMbK
-EygnaMvZgwZ/ulRoBVYnYFH0dP6CrItSqD99IMssuFYfX6sDUO7m52wsXFLcoGNr
-PskEmTLtASyjG738ty77bjalo6oAFWAvCuRPY5KGMOjIP74452lpOhdC0BKyBi0B
-gt9sD9uwx8/jxQK4zB1V9OZYTISxFG4A624O+CuhXH9qAq95JNYwHhPW92EXkcqC
-BqgU2E7TelqVt4WfU3//4RMId0OAjmr0IkJJGXmQa8YFTpKjhUeSYSZytgTuPLf3
-/DUxDn4iMQtQGfGvLiAh9vLtf0UwsVOHkyR65BFJg/g8JI0jIIg=
-=GnBm
------END PGP SIGNATURE-----
-
---5nOnx0Jc9l74hNuL--
+> 
+> Is that intended?
+> 
+> - Eric
