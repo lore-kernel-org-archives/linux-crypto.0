@@ -2,57 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33293C77B6F
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 07:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F9BC76196
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 10:50:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbjDGHCo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Apr 2023 03:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
+        id S240616AbjDGKup (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Apr 2023 06:50:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233753AbjDGHCm (ORCPT
+        with ESMTP id S231175AbjDGKum (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Apr 2023 03:02:42 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7478F7ED8
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Apr 2023 00:02:40 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id m6-20020a05600c3b0600b003ee6e324b19so24771011wms.1
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Apr 2023 00:02:40 -0700 (PDT)
+        Fri, 7 Apr 2023 06:50:42 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C599EF9
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Apr 2023 03:50:40 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id o32so23838506wms.1
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Apr 2023 03:50:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680850959; x=1683442959;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yDRZJb+gw9WKl+q/YP3+9vfEWrdxXYb08xE3KjrncwY=;
-        b=TlUNuHXhE7dkX3ma2znO7zdAacJiO27ghArmpkXlH8c3ATv+KBTc8LUhyVrkypI+mP
-         0zQlggzvEemyf2P17MWTNYZVT5pEmY7G8l0KpU4b0QsyPvMfMJZshCs5c4HdBgpV6MQP
-         XN2grzseW68CfcpULpwxh3ynO/USV/6im6FxHW40/svQL+ApI5uK1eCRpcAHn1PqPRYE
-         iwww25egOIvVPfxbt4pMX674CTKLbiVEO/0Ip1e+6ahSlHwFQkQF7naCFmxlgJCIHPZU
-         6QypBjxTNvF8oRGQexdGN9PM2UNsP9cuq6GQxZBhFfnm80WY+czp/4FjLGOZC9ZJW9dw
-         8zbg==
+        d=linaro.org; s=google; t=1680864639; x=1683456639;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=06TnYBdo9T2x70dl6lUY38eRXb4b9fDtFg6W0E/jF9s=;
+        b=wYDrtmyCUeuPHoQ+a+L+bYIKD5tVHF0T4I7wDqd7k8R9pfkM+J9OhoQDyESXnzz1iz
+         k3ooh1VU2Q8gW2TSMLRlbtghkI19sy19ypdWoc+Omxxem6YZuXrgCPFr2LGsUITxWliE
+         +zBT3kCgH6wuumOU7JtR9EXz8g2jSMCePAMrqaI2lCCSey7kNVinVsK5dKZLfyxYqxVp
+         gySoNb8rDY/w1WGiu9q8a23DHmXgXkXf7veY050tTyaiF3nf+/mROPMw7MS6i60JLSEW
+         pbhVwVkWGBoCGj+2wJv+zy42hiGSIYRliEDZRZysa98BQX7OD7u+MFN7XB7Gr72FM0OU
+         A2QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680850959; x=1683442959;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yDRZJb+gw9WKl+q/YP3+9vfEWrdxXYb08xE3KjrncwY=;
-        b=BrG2hUL+0PQVFD56tZ/X7CoO/XW+JlcLoOC6DHwxLVvzaed5cKDwysZ5K9elSeqQAC
-         DeCBH7rxb0wfTjOvx0QU6n9ePHvwsnrSKthmxb18H3v96H512DU+RbTp29ni1gK2UWzS
-         TY/BZK01jY33G8ubufCE0z/AgPwvpGI6bMjq8JwTkKqd19hXd4QM0nIcxCj+oSBAi4DN
-         1BmqHgmoQhN9mklrBN6FGYJDG6UtaAkluZOZhi1HXFmiE09GhD38tPXeIpLG2CArxD1N
-         b7NZQW4uha8tP2WvF07EgJPNBd7FHxC01i9WfalfSg7ffUB3MrmSs23xpXGj/zYLW5Ud
-         QjaA==
-X-Gm-Message-State: AAQBX9eEJFfWNera+c80zWNUB7e09PQm2I/RT0y0nPGouKOMFr+3OFt6
-        +mDEMWLK52s4n2uwAS1KL7E3KA==
-X-Google-Smtp-Source: AKy350Yf7cZzWZgOSGchAXM9/7IoYqhc4Z0zpcrhQUgBsDYEyMpw3OS/oAAO8/EgLIduuLczRZdj6g==
-X-Received: by 2002:a05:600c:2202:b0:3ee:289a:3c3a with SMTP id z2-20020a05600c220200b003ee289a3c3amr566623wml.30.1680850958894;
-        Fri, 07 Apr 2023 00:02:38 -0700 (PDT)
-Received: from linaro.org ([94.52.112.99])
-        by smtp.gmail.com with ESMTPSA id i42-20020a05600c4b2a00b003f0321c22basm7224793wmp.12.2023.04.07.00.02.37
+        d=1e100.net; s=20210112; t=1680864639; x=1683456639;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=06TnYBdo9T2x70dl6lUY38eRXb4b9fDtFg6W0E/jF9s=;
+        b=gviu9wi+rpIH+fR+r9TnafX61pRqIXHgDA83vxW+OEyYqQY8VUp/oYhquw6TBGoIBs
+         33BTTh6H3d4c+5gqTA5nTEqeQl73yVgFoJuTzBKrnipvcC3hV2/G1C2iXSLviI3XMmvs
+         +nfVg0vpP81grYIufNAEVVDm0COrzulTYo2EIfcMIB0UFlMWqT52ipBFAS7mGKTK0m0o
+         TVee0O3Ub4XAeIJRyr3J0m17psdKYpKQRXkd8xqyqinJe8ogFE2nKEIDNrxSgWzOqujt
+         VEH6vgiJfrshsvcn3AXAyU+GbMPPdC9KxXq0w51jKZbqcUx3M20fEoC8EFqafdQh3aIz
+         YkXg==
+X-Gm-Message-State: AAQBX9fFmxZYfuqzum+CRyGiB7NI7XlRV7Cq+C1nt/8w+tbj0cuOMkh2
+        Ap/7huWLEBgclajZSjWI6mtG8A==
+X-Google-Smtp-Source: AKy350ZwCtSoQjiiwA1Djng0xz4M3/ZbNCZlAcTQ8nHuWoyebrI7lbwqlVuy6DqJem2lF9sXrcoJ7A==
+X-Received: by 2002:a05:600c:2285:b0:3ee:ed5:6115 with SMTP id 5-20020a05600c228500b003ee0ed56115mr1076006wmf.19.1680864639120;
+        Fri, 07 Apr 2023 03:50:39 -0700 (PDT)
+Received: from localhost.localdomain ([94.52.112.99])
+        by smtp.gmail.com with ESMTPSA id i16-20020a05600c355000b003ede6540190sm8131909wmq.0.2023.04.07.03.50.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Apr 2023 00:02:38 -0700 (PDT)
-Date:   Fri, 7 Apr 2023 10:02:36 +0300
+        Fri, 07 Apr 2023 03:50:38 -0700 (PDT)
 From:   Abel Vesa <abel.vesa@linaro.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Andy Gross <agross@kernel.org>,
@@ -67,70 +65,70 @@ Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v5 4/6] scsi: ufs: ufs-qcom: Switch to the new ICE API
-Message-ID: <ZC/ADOlol2XO7ACL@linaro.org>
-References: <20230403200530.2103099-1-abel.vesa@linaro.org>
- <20230403200530.2103099-5-abel.vesa@linaro.org>
- <20230406201634.GA20288@sol.localdomain>
+Subject: [PATCH v6 0/6] Add dedicated Qcom ICE driver
+Date:   Fri,  7 Apr 2023 13:50:23 +0300
+Message-Id: <20230407105029.2274111-1-abel.vesa@linaro.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230406201634.GA20288@sol.localdomain>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 23-04-06 13:16:34, Eric Biggers wrote:
-> Hi Abel,
-> 
-> On Mon, Apr 03, 2023 at 11:05:28PM +0300, Abel Vesa wrote:
-> > Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
-> > use the new ICE api provided by the Qualcomm soc driver ice. The platforms
-> > that already have ICE support will use the API as library since there will
-> > not be a devicetree node, but instead they have reg range. In this case,
-> > the of_qcom_ice_get will return an ICE instance created for the consumer's
-> > device. But if there are platforms that do not have ice reg in the
-> > consumer devicetree node and instead provide a dedicated ICE devicetree
-> > node, the of_qcom_ice_get will look up the device based on qcom,ice
-> > property and will get the ICE instance registered by the probe function
-> > of the ice driver.
-> > 
-> > Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
-> 
-> This is still silent about how the ICE clock behavior is being changed.
+As both SDCC and UFS drivers use the ICE with duplicated implementation,
+while none of the currently supported platforms make use concomitantly
+of the same ICE IP block instance, the new SM8550 allows both UFS and
+SDCC to do so. In order to support such scenario, there is a need for
+a unified implementation and a devicetree node to be shared between
+both types of storage devices. So lets drop the duplicate implementation
+of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
 
-Right, I'll add the some more info into the commit message about the
-clock being handled by the ICE driver.
+For now, only SM8550 has been added to support the new approach. This
+also involves adding support for HW version 4.x.
 
-> 
-> I'm still trying to understand all this myself, so please bear with me, but my
-> understanding is that the UFS clocks can be disabled even while the host
-> controller is runtime-resumed.  This is called "clock gating" in the code.
+The v5 is here:
+https://lore.kernel.org/all/20230403200530.2103099-1-abel.vesa@linaro.org/
 
-The ICE clock is now being controlled by the new driver.
-> 
-> Before, the ICE clock was just listed as one of the UFS clocks.  So, it was just
-> managed like the other UFS clocks.
-> 
-> Now, it appears that the ICE clock is always enabled while the host controller
-> is runtime-resumed.  So, this patch removes support for gating of the ICE clock.
+Changes since v5:
+ * See each individual patch for changelogs.
 
-I just tested this and it works as expected, which is:
+Changes since v4:
+ * dropped the SDHCI dt-bindings patch as it will be added along
+   with the first use of qcom,ice property from an SDHCI DT node
 
-ICE clock gets enable on qcom_ice_create (via *clk_get*_enabled) and
-then, on the runtime suspend of the UFS, the qcom_ice_suspend is called
-which will disable the clock. Then, every time UFS runtime
-resumes/suspends the clock gets enabled/disabled.
+Abel Vesa (6):
+  dt-bindings: crypto: Add Qualcomm Inline Crypto Engine
+  dt-bindings: ufs: qcom: Add ICE phandle
+  soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver
+  scsi: ufs: ufs-qcom: Switch to the new ICE API
+  mmc: sdhci-msm: Switch to the new ICE API
+  arm64: dts: qcom: sm8550: Add the Inline Crypto Engine node
 
-Hope that makes sense.
+ .../crypto/qcom,inline-crypto-engine.yaml     |  42 ++
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     |  26 ++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |   9 +
+ drivers/mmc/host/Kconfig                      |   2 +-
+ drivers/mmc/host/sdhci-msm.c                  | 223 +++--------
+ drivers/soc/qcom/Kconfig                      |   4 +
+ drivers/soc/qcom/Makefile                     |   1 +
+ drivers/soc/qcom/ice.c                        | 366 ++++++++++++++++++
+ drivers/ufs/host/Kconfig                      |   2 +-
+ drivers/ufs/host/Makefile                     |   4 +-
+ drivers/ufs/host/ufs-qcom-ice.c               | 244 ------------
+ drivers/ufs/host/ufs-qcom.c                   |  99 ++++-
+ drivers/ufs/host/ufs-qcom.h                   |  32 +-
+ include/soc/qcom/ice.h                        |  37 ++
+ 14 files changed, 637 insertions(+), 454 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+ create mode 100644 drivers/soc/qcom/ice.c
+ delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+ create mode 100644 include/soc/qcom/ice.h
 
-Let me know if you think I'm missing something here.
+-- 
+2.34.1
 
-> 
-> Is that intended?
-> 
-> - Eric
