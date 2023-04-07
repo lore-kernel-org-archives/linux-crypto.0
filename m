@@ -2,111 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FDBC77B6C
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Apr 2023 20:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D20BDC76196
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 06:18:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240063AbjDFUig (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Apr 2023 16:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54380 "EHLO
+        id S230358AbjDGGSj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Apr 2023 02:18:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240257AbjDFUiW (ORCPT
+        with ESMTP id S229844AbjDGGSi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Apr 2023 16:38:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A807FB47B;
-        Thu,  6 Apr 2023 13:34:53 -0700 (PDT)
+        Fri, 7 Apr 2023 02:18:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51F13197;
+        Thu,  6 Apr 2023 23:18:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E014C6471F;
-        Thu,  6 Apr 2023 20:34:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95E7CC433D2;
-        Thu,  6 Apr 2023 20:34:34 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E2AE560FA9;
+        Fri,  7 Apr 2023 06:18:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF7FC4339B;
+        Fri,  7 Apr 2023 06:18:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680813275;
-        bh=piwLBENh4irhNGFJSxnTnkgU+tz4S7Qx3VDC5mBsLow=;
+        s=k20201202; t=1680848317;
+        bh=PkUkc3BxGY08e5rKE6FcXGqmMgAN6jFXJmjAdt2/kNM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eKmaeMCgUMeITeDCNa33PhQDb7Ra//T9u6ZrmomOXgtwhrr6fphYxLIU4OQN4QXGe
-         KYEDTQUr+Ag83EPbtj7/mOs71LKexZ8aUpqf/3Ds8OM+NRZiCV7Yz9fVJEHG0I5pXG
-         4d5T45oQeqHxxxN9mfQT6g+a7MHaryvDunWV91pt9w3XTHSR8o0XjuQKZtRhdepfal
-         BJy2EVQTh0hqfLeKXaHaHjRRU1giIX/KarfNTuF3poLm/C5EzASATDPHZOWyphetxl
-         QRq7rFce1sH2MOhvQNmVa7pc8pLJBrwbrcpIyun52nycMADa89n+aCJkePKpTxkduL
-         mADB0NIRV4Izw==
-Date:   Thu, 6 Apr 2023 13:34:32 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Abel Vesa <abel.vesa@linaro.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        b=osdZjFbBHEtChPItfYS8FeJjike3PRGZdD7nSd7mHn55EhxyKj7ysh5K8oPyKTerl
+         44u81tzYhXuE7rzRw6ZhL4LdT0AWF+eF4NUL9lPRedfvC82vj157xhOylR4H7mJQBs
+         UcfYAA/ekXQ2rc/+85DU3yGgQtSckQJC0tLr7aM1eq9WG7yywgU5QbGnnABL8UikzM
+         t9m27fzWWlj8ZjCVGqUVOxlACcHd5Hl4GfLfcq6Yyexmq8lzWyr3a3ZQau31avXblm
+         iw5kSi4+m09LsN7wz7rJ3UpboUflwFo8mPrZiiL5d8GyZQNvpurNJGVNknU8o/C4yf
+         PUuNVMnpowlFg==
+Date:   Fri, 7 Apr 2023 08:18:33 +0200
+From:   Wolfram Sang <wsa@kernel.org>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
+        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Mark Hasemeyer <markhas@chromium.org>,
+        Grzegorz Bernacki <gjb@semihalf.com>
+Subject: Re: [PATCH v8 0/6] Use CCP driver to handle PSP I2C arbitration
+Message-ID: <ZC+1ufdj8WYixQsM@sai>
+Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
+        Mario Limonciello <mario.limonciello@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v5 3/6] soc: qcom: Make the Qualcomm UFS/SDCC ICE a
- dedicated driver
-Message-ID: <20230406203432.GC20288@sol.localdomain>
-References: <20230403200530.2103099-1-abel.vesa@linaro.org>
- <20230403200530.2103099-4-abel.vesa@linaro.org>
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
+        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
+        linux-kernel@vger.kernel.org, Mark Hasemeyer <markhas@chromium.org>,
+        Grzegorz Bernacki <gjb@semihalf.com>
+References: <20230403183216.3493-1-mario.limonciello@amd.com>
+ <ZC5pxORLN+SF/91S@sai>
+ <82ef9505-f8ae-36d0-fdeb-9bfc92aec557@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="5nOnx0Jc9l74hNuL"
 Content-Disposition: inline
-In-Reply-To: <20230403200530.2103099-4-abel.vesa@linaro.org>
+In-Reply-To: <82ef9505-f8ae-36d0-fdeb-9bfc92aec557@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 11:05:27PM +0300, Abel Vesa wrote:
-> This takes the already existing duplicated support in both ufs-qcom
-> and sdhci-msm drivers and makes it a dedicated driver that can be used
-> by both mentioned drivers. The reason for this is because, staring with
-> SM8550, the ICE IP block is shared between UFS and SDCC, which means we
-> need to probe a dedicated device and share it between those two
-> consumers. So let's add the ICE dedicated driver as a soc driver.
-> Platforms that already have ICE supported, will use it as a library
-> as the of_qcom_ice_get will return an ICE instance created for the
-> consumer device. This allows the backwards compatibility with old-style
-> devicetree approach. Also, add support to HW version 4.x since it
-> works out-of-the-box with the current driver. The 4.x HW version is
-> found on SM8550 platform.
 
-Can you please split up long paragraphs like this into multiple paragraphs?
+--5nOnx0Jc9l74hNuL
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +	pdev = of_find_device_by_node(node);
-> +	if (!pdev) {
-> +		dev_err(dev, "Cannot find device node %s\n", node->name);
-> +		ice = ERR_PTR(-EPROBE_DEFER);
-> +		goto out;
-> +	}
-> +
-> +	ice = platform_get_drvdata(pdev);
-> +	if (!ice) {
-> +		dev_err(dev, "Cannot get ice instance from %s\n",
-> +			dev_name(&pdev->dev));
-> +		platform_device_put(pdev);
-> +		ice = ERR_PTR(-EPROBE_DEFER);
-> +		goto out;
-> +	}
-> +
-> +	ice->link = device_link_add(dev, &pdev->dev, DL_FLAG_AUTOREMOVE_SUPPLIER);
-> +	if (!ice->link) {
-> +		dev_err(&pdev->dev,
-> +			"Failed to create device link to consumer %s\n",
-> +			dev_name(dev));
-> +		ice = ERR_PTR(-EINVAL);
-> +	}
 
-Is a call to platform_device_put() missing above?
+> > How should this go upstream, i.e. are there dependencies? Shall I pick
+> > the I2C patches or is it better if all goes via the crypto tree?
+> >=20
+> IMO it's better to go through the crypto tree.=C2=A0 There are dependenci=
+es
+> in the crypto part from the earlier series that was merged.
 
-- Eric
+Ok, fine with me. I acked the I2C patches. Thanks for the heads up.
+
+
+--5nOnx0Jc9l74hNuL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmQvtbkACgkQFA3kzBSg
+KbYilg//b/7oRyaFxSoYypW8qZWg9NazCHaTiYpl8oPfrkrDTH3KGB7/TdHX4zCt
+lmVf9f0hZPJdOmvJk0SwmKNvcZUIgk/lEi2fxUAUaVPjRWM7qfh7Hn5OBSuXafRm
+oJZ7rNgR2pT4rL5HwDn4sdLMQaVLAYR9TgxqKX9zjcA9yTsHidTs9WnlzzB9fwSi
+k36Gw+AdUZDySzAr8GplP9n0BA4CUcJ2zNW5x3+3VJ/eM/Iq7aTiEDyC6z2sm5bM
+G7DNfoXvIWzWFH8hp4/Nee8NemLNEIqw0STVKhhfRO9LnlMSZGTVktTywi4J/SVa
++xah/GFpZ1DNQQJ/Atgi2qv/tnK3X7uK3Wl3ZRMiS3gIxnqp79hP72NRxWYQMMbK
+EygnaMvZgwZ/ulRoBVYnYFH0dP6CrItSqD99IMssuFYfX6sDUO7m52wsXFLcoGNr
+PskEmTLtASyjG738ty77bjalo6oAFWAvCuRPY5KGMOjIP74452lpOhdC0BKyBi0B
+gt9sD9uwx8/jxQK4zB1V9OZYTISxFG4A624O+CuhXH9qAq95JNYwHhPW92EXkcqC
+BqgU2E7TelqVt4WfU3//4RMId0OAjmr0IkJJGXmQa8YFTpKjhUeSYSZytgTuPLf3
+/DUxDn4iMQtQGfGvLiAh9vLtf0UwsVOHkyR65BFJg/g8JI0jIIg=
+=GnBm
+-----END PGP SIGNATURE-----
+
+--5nOnx0Jc9l74hNuL--
