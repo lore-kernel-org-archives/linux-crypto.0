@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59556C77B61
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 18:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9232C77B6C
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 19:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229968AbjDGSOB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Apr 2023 14:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59154 "EHLO
+        id S230385AbjDGTSL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Apr 2023 15:18:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbjDGSOA (ORCPT
+        with ESMTP id S230347AbjDGTSK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Apr 2023 14:14:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F386A53;
-        Fri,  7 Apr 2023 11:13:59 -0700 (PDT)
+        Fri, 7 Apr 2023 15:18:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A477BBB9A;
+        Fri,  7 Apr 2023 12:18:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6332860F87;
-        Fri,  7 Apr 2023 18:13:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 454ECC433EF;
-        Fri,  7 Apr 2023 18:13:57 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3F7AF64D51;
+        Fri,  7 Apr 2023 19:18:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 316F4C433EF;
+        Fri,  7 Apr 2023 19:18:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680891238;
-        bh=1RojAWCE830GdRwpiX0yQKERd7BzZhTLhzLyTIf7/Pk=;
+        s=k20201202; t=1680895088;
+        bh=v36g2BJAp9VAUH4Pa6BbAM86j6+La0PhFyT56lBz4qk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jJjWk131PcWTKGtHQQZK6HO2GfF1YInZNDlH/Y+ATqrcMghPbJJx1yYC9KoMT/YP1
-         p0DsR3RfB7bJVgBoWAahft/wjY5aahUPRl2AhmQO4TSsaIuiD+iT+aaRlBzZVC31Gn
-         +tmLP148gGtW73LMJ8yZhhCjpX2mTYG5tTe/SNH7oBZbISJYhsDuv0vClGeYSP6tfL
-         eVLnh/yVsEEzu4aq77Y95AsbL4FCpI6kWo5zRK2Dq3KD4EeeXK8deeavkCHqmAzqeQ
-         IH/ffgD1YEcBqyA2Wn8juylsc96R1mWB2KVK3D5Q3897wrC3j40ncwgGZPWC4PIgOA
-         /V/AIcpN3DKMA==
-Date:   Fri, 7 Apr 2023 11:16:47 -0700
+        b=MiTiaY4nNrXh2Blyn4YPwEYHeW1ZRvk7gDlluFVq7g0F5of484SqgjKjTogpg7PYY
+         U7nFq0OuSg4f3cJ0Slb0/ECgFq1IOCt5bj3lc6EI7yCutpMlbHLZu/5rb9fIhh/xZ7
+         KZOlhNoAXKw1XOGLEyQH3W4olv3S9pdTRU6y72XxZ1aN/F6sbHsefCN1YokjDYYGfQ
+         XewjP5Wog4DHU8Up85MynErWjvvYhzNr2z80wyNFovvWpxQpOwBUT0u2XQA0fkJdxY
+         j6lBo/q9pJ5y0fcOXnyjYsEaYmAv1Yn0j+DFGJpnzRQcoDBjZqkIyfaEQ1O6F9jAXA
+         xstivBMt6PjzQ==
+Date:   Fri, 7 Apr 2023 12:20:57 -0700
 From:   Bjorn Andersson <andersson@kernel.org>
 To:     Abel Vesa <abel.vesa@linaro.org>
 Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
@@ -54,72 +54,76 @@ Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v6 6/6] arm64: dts: qcom: sm8550: Add the Inline Crypto
- Engine node
-Message-ID: <20230407181647.5johwgldjuzk347c@ripper>
+Subject: Re: [PATCH v6 0/6] Add dedicated Qcom ICE driver
+Message-ID: <20230407192057.pgccwiie3mriuklp@ripper>
 References: <20230407105029.2274111-1-abel.vesa@linaro.org>
- <20230407105029.2274111-7-abel.vesa@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230407105029.2274111-7-abel.vesa@linaro.org>
+In-Reply-To: <20230407105029.2274111-1-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 07, 2023 at 01:50:29PM +0300, Abel Vesa wrote:
-> Add support for UFS ICE by adding the qcom,ice property and the
-> ICE dedicated devicetree node. While at it, add the reg-name property
-> to the UFS HC node to be in line with older platforms.
+On Fri, Apr 07, 2023 at 01:50:23PM +0300, Abel Vesa wrote:
+> As both SDCC and UFS drivers use the ICE with duplicated implementation,
+> while none of the currently supported platforms make use concomitantly
+> of the same ICE IP block instance, the new SM8550 allows both UFS and
+> SDCC to do so. In order to support such scenario, there is a need for
+> a unified implementation and a devicetree node to be shared between
+> both types of storage devices. So lets drop the duplicate implementation
+> of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
 > 
-> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
-> ---
+> For now, only SM8550 has been added to support the new approach. This
+> also involves adding support for HW version 4.x.
 > 
-> The v5 is here:
-> https://lore.kernel.org/all/20230403200530.2103099-7-abel.vesa@linaro.org/
-> 
-> Changes since v5:
->  * Dropped the reg-names property from UFS node as it was not needed and
->    makes the bindings check fail
 
-You forgot to drop the related sentence from the commit message.
+I picked the ICE driver and pushed it out to make it possible to pick up
+the mmc and ufs patches independently.
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git tags/20230407105029.2274111-4-abel.vesa@linaro.org
 
 Regards,
 Bjorn
 
+> The v5 is here:
+> https://lore.kernel.org/all/20230403200530.2103099-1-abel.vesa@linaro.org/
+> 
+> Changes since v5:
+>  * See each individual patch for changelogs.
 > 
 > Changes since v4:
->  * none
+>  * dropped the SDHCI dt-bindings patch as it will be added along
+>    with the first use of qcom,ice property from an SDHCI DT node
 > 
-> Changes since v3:
->  * none
+> Abel Vesa (6):
+>   dt-bindings: crypto: Add Qualcomm Inline Crypto Engine
+>   dt-bindings: ufs: qcom: Add ICE phandle
+>   soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver
+>   scsi: ufs: ufs-qcom: Switch to the new ICE API
+>   mmc: sdhci-msm: Switch to the new ICE API
+>   arm64: dts: qcom: sm8550: Add the Inline Crypto Engine node
 > 
->  arch/arm64/boot/dts/qcom/sm8550.dtsi | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  .../crypto/qcom,inline-crypto-engine.yaml     |  42 ++
+>  .../devicetree/bindings/ufs/qcom,ufs.yaml     |  26 ++
+>  arch/arm64/boot/dts/qcom/sm8550.dtsi          |   9 +
+>  drivers/mmc/host/Kconfig                      |   2 +-
+>  drivers/mmc/host/sdhci-msm.c                  | 223 +++--------
+>  drivers/soc/qcom/Kconfig                      |   4 +
+>  drivers/soc/qcom/Makefile                     |   1 +
+>  drivers/soc/qcom/ice.c                        | 366 ++++++++++++++++++
+>  drivers/ufs/host/Kconfig                      |   2 +-
+>  drivers/ufs/host/Makefile                     |   4 +-
+>  drivers/ufs/host/ufs-qcom-ice.c               | 244 ------------
+>  drivers/ufs/host/ufs-qcom.c                   |  99 ++++-
+>  drivers/ufs/host/ufs-qcom.h                   |  32 +-
+>  include/soc/qcom/ice.h                        |  37 ++
+>  14 files changed, 637 insertions(+), 454 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>  create mode 100644 drivers/soc/qcom/ice.c
+>  delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+>  create mode 100644 include/soc/qcom/ice.h
 > 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8550.dtsi b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-> index d252658c73dd..2b3a721292b6 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8550.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-> @@ -1932,9 +1932,18 @@ ufs_mem_hc: ufs@1d84000 {
->  				<0 0>,
->  				<0 0>,
->  				<0 0>;
-> +			qcom,ice = <&ice>;
-> +
->  			status = "disabled";
->  		};
->  
-> +		ice: crypto@1d88000 {
-> +			compatible = "qcom,sm8550-inline-crypto-engine",
-> +				     "qcom,inline-crypto-engine";
-> +			reg = <0 0x01d88000 0 0x8000>;
-> +			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-> +		};
-> +
->  		tcsr_mutex: hwlock@1f40000 {
->  			compatible = "qcom,tcsr-mutex";
->  			reg = <0 0x01f40000 0 0x20000>;
 > -- 
 > 2.34.1
 > 
