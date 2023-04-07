@@ -2,63 +2,40 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B62C6FD1D
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 13:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0344C77B70
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 17:28:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231825AbjDGNsD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Apr 2023 09:48:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59152 "EHLO
+        id S229664AbjDGR2e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Apr 2023 13:28:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbjDGNrs (ORCPT
+        with ESMTP id S229536AbjDGR2d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Apr 2023 09:47:48 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 364A8B744
-        for <linux-crypto@vger.kernel.org>; Fri,  7 Apr 2023 06:46:11 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-930e691e34eso166306266b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Apr 2023 06:46:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680875150;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yp5m0Gs2+7L1T7k0BOgEaesPaUmP03C3lD6UUC3EEfI=;
-        b=Q8cKW1Y9yPr2fpOL+h62V4+4LKKzKurXsFkFP8HTS2ZsTk9QbnScMQLueaGMd7uxZX
-         YyGeO6gYuhxM6rR/qSd0ky8WzO4rKTu9/9GfMP+ymDyx4DYYHEsSR7+F6n0q1DbLETJQ
-         Jt2ABT8Dw/7A33eJt7UZSOdw35bxMH1hYkzCVFewZ53L5myO44Ju9OrNH6hfYM9UUF+T
-         9m+/zQXxoXAPESyq24BEBOh2tjmnLglWDM1YkGWRwmpjFRRYMMY1GV28mQHARPO8UTTw
-         bVg9Pf+cquhScTcOKyWUSiuTVy1i16oake/nYxX+a2qGw7/ytbvucNpn0uvrZMJT6jat
-         xczw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680875150;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yp5m0Gs2+7L1T7k0BOgEaesPaUmP03C3lD6UUC3EEfI=;
-        b=2vg2Ima1EBJy3dwJfwickiKKXOEneNn5GrbGE6vP3AFD+dh2JQR+URfcUbtVdP973R
-         IlsBeXvsH/vpAqjb/Jhg7v9kNxfV3spfCZwC2nw1p44/QosTpr9dH6G9/fHCvAU7Wm6p
-         wj1DHz5htmjwZt7SW1j9PkasoFMx+vG0PUkNQcEm1ykIdCaSfnnd1z/WirGPgwIJoUy8
-         sgwtEZc84Cd48Cd7h+b0x73w553F8OJUd76LesrnD9TfwpMDZzkWdlzxNwAodMuB1o+6
-         ozQq4R2oEFAQWQ7TmokKrELiPCIpPqc+GkRnxxUjvUvBb5VTIvrtRP1vtwQ72nKspTsi
-         d3mQ==
-X-Gm-Message-State: AAQBX9fp55lJg/1k4mba3Zj37BRCGqO15kkkz2FRuyHzKxliayL2esDV
-        hUdqL+5m3cBqIjAZAgtEJ604iw==
-X-Google-Smtp-Source: AKy350YfI24zrr3k/owoorldtK4j2Zc1yFlw5O+l6gy+yzp0dsAPQIPRc+pCkj0U+Y3iqphLdUBj2g==
-X-Received: by 2002:a50:fb85:0:b0:502:3376:786d with SMTP id e5-20020a50fb85000000b005023376786dmr1810673edq.6.1680875150253;
-        Fri, 07 Apr 2023 06:45:50 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:b20f:8824:c926:8299? ([2a02:810d:15c0:828:b20f:8824:c926:8299])
-        by smtp.gmail.com with ESMTPSA id v7-20020a50a447000000b00504832f2489sm47159edb.78.2023.04.07.06.45.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Apr 2023 06:45:48 -0700 (PDT)
-Message-ID: <9a4aa196-3110-9c62-6e30-a8bfa2a9327c@linaro.org>
-Date:   Fri, 7 Apr 2023 15:45:47 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v6 2/6] dt-bindings: ufs: qcom: Add ICE phandle
-Content-Language: en-US
-To:     Abel Vesa <abel.vesa@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
+        Fri, 7 Apr 2023 13:28:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678A8A5FA;
+        Fri,  7 Apr 2023 10:28:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 04B4365230;
+        Fri,  7 Apr 2023 17:28:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA1BC433D2;
+        Fri,  7 Apr 2023 17:28:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680888511;
+        bh=idDlc8ZJaRbDwkcyJQzHCf0qlNbEXgjDa3puNQw4N9c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mtBo5tg3cXKg1cI2/vhx9WamdcOwjH8ylXUHOfZVQsAdN5yBfGzf1oiHOC5v+ZWAK
+         OdyC9vP3M+bOKFJpA/p4IA8YWTmzSewUlKlVulK3AQGjjBs/eME276YiXn47k/uyzP
+         ZDhxRPgiqhH8QVUO1MMKbp1rUk7ZIw8CaDgYYCVriHLS4gtWMBuMFvszA1JKiygBJY
+         g6QYxVv84iIQr5Wy+S9O4UFRpKPyuWp351KbwQikrVkS+ajyF9nQ28WVIiDKnvSVyp
+         iqS7g3X4sJmdfdP7rWwRwJSK+VZuBPOO/JMlP2JMBVeiUahrwpirsJ4DJF4jmakBnp
+         B6fqfgaLfbbmw==
+Date:   Fri, 7 Apr 2023 17:28:29 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Andy Gross <agross@kernel.org>,
@@ -73,88 +50,82 @@ To:     Abel Vesa <abel.vesa@linaro.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-scsi@vger.kernel.org
-References: <20230407105029.2274111-1-abel.vesa@linaro.org>
- <20230407105029.2274111-3-abel.vesa@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230407105029.2274111-3-abel.vesa@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v5 4/6] scsi: ufs: ufs-qcom: Switch to the new ICE API
+Message-ID: <ZDBSvVIIq6cMTf1Y@gmail.com>
+References: <20230403200530.2103099-1-abel.vesa@linaro.org>
+ <20230403200530.2103099-5-abel.vesa@linaro.org>
+ <20230406201634.GA20288@sol.localdomain>
+ <ZC/ADOlol2XO7ACL@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZC/ADOlol2XO7ACL@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 07/04/2023 12:50, Abel Vesa wrote:
-> Starting with SM8550, the ICE will have its own devicetree node
-> so add the qcom,ice property to reference it.
+On Fri, Apr 07, 2023 at 10:02:36AM +0300, Abel Vesa wrote:
+> On 23-04-06 13:16:34, Eric Biggers wrote:
+> > Hi Abel,
+> > 
+> > On Mon, Apr 03, 2023 at 11:05:28PM +0300, Abel Vesa wrote:
+> > > Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
+> > > use the new ICE api provided by the Qualcomm soc driver ice. The platforms
+> > > that already have ICE support will use the API as library since there will
+> > > not be a devicetree node, but instead they have reg range. In this case,
+> > > the of_qcom_ice_get will return an ICE instance created for the consumer's
+> > > device. But if there are platforms that do not have ice reg in the
+> > > consumer devicetree node and instead provide a dedicated ICE devicetree
+> > > node, the of_qcom_ice_get will look up the device based on qcom,ice
+> > > property and will get the ICE instance registered by the probe function
+> > > of the ice driver.
+> > > 
+> > > Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> > 
+> > This is still silent about how the ICE clock behavior is being changed.
 > 
-> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
-> ---
+> Right, I'll add the some more info into the commit message about the
+> clock being handled by the ICE driver.
 > 
-> The v5 is here:
-> https://lore.kernel.org/all/20230403200530.2103099-3-abel.vesa@linaro.org/
+> > 
+> > I'm still trying to understand all this myself, so please bear with me, but my
+> > understanding is that the UFS clocks can be disabled even while the host
+> > controller is runtime-resumed.  This is called "clock gating" in the code.
 > 
-> Changes since v5:
->  * dropped the sm8550 specific subschema and replaced it with one that
->    mutually excludes the qcom,ice vs both the ICE specific reg range
->    and the ICE clock
+> The ICE clock is now being controlled by the new driver.
+> > 
+> > Before, the ICE clock was just listed as one of the UFS clocks.  So, it was just
+> > managed like the other UFS clocks.
+> > 
+> > Now, it appears that the ICE clock is always enabled while the host controller
+> > is runtime-resumed.  So, this patch removes support for gating of the ICE clock.
 > 
-> Changes since v4:
->  * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
->    it while making sure none of the other platforms are allowed to use it
+> I just tested this and it works as expected, which is:
 > 
-> Changes since v3:
->  * dropped the "and drop core clock" part from subject line
+> ICE clock gets enable on qcom_ice_create (via *clk_get*_enabled) and
+> then, on the runtime suspend of the UFS, the qcom_ice_suspend is called
+> which will disable the clock. Then, every time UFS runtime
+> resumes/suspends the clock gets enabled/disabled.
 > 
-> Changes since v2:
->  * dropped all changes except the qcom,ice property
+> Hope that makes sense.
 > 
+> Let me know if you think I'm missing something here.
 > 
->  .../devicetree/bindings/ufs/qcom,ufs.yaml     | 26 +++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
-> index c5a06c048389..71aa79eac6b4 100644
-> --- a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
-> +++ b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
-> @@ -70,6 +70,10 @@ properties:
->    power-domains:
->      maxItems: 1
->  
-> +  qcom,ice:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description: phandle to the Inline Crypto Engine node
-> +
->    reg:
->      minItems: 1
->      maxItems: 2
-> @@ -187,6 +191,28 @@ allOf:
->  
->      # TODO: define clock bindings for qcom,msm8994-ufshc
->  
-> +  - if:
-> +      properties:
-> +        qcom,ice:
-> +          minItems: 1
 
-Drop minItems
+Well, it's better than v4 and earlier of this patchset, where the clock was
+never turned off.
 
-> +          maxItems: 1
-> +    then:
-> +      properties:
-> +        reg:
-> +          minItems: 1
+But, this patchset still seems to be a regression from the status quo, since it
+makes the ICE clock no longer be disabled when "UFS clock gating" disables the
+other UFS clocks.  Instead, it will only be disabled on runtime-suspend.
 
-Drop minItems
+Now, I don't know whether anyone ever confirmed that the current behavior is
+actually optimal and works as intended.  So, it *might* actually be fine to
+change it!  But I was hoping that you at least had some thoughts about this,
+whereas currently this patchset just ignores the issue entirely.
 
-> +          maxItems: 1
-> +        clocks:
-> +          minItems: 8
-> +          maxItems: 8
-Best regards,
-Krzysztof
-
+- Eric
