@@ -2,54 +2,53 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47736C77B73
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Apr 2023 21:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC52C77B74
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Apr 2023 21:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229458AbjDHVkw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Apr 2023 17:40:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38892 "EHLO
+        id S229494AbjDHVky (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 8 Apr 2023 17:40:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjDHVkv (ORCPT
+        with ESMTP id S229445AbjDHVku (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Apr 2023 17:40:51 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06361976B
-        for <linux-crypto@vger.kernel.org>; Sat,  8 Apr 2023 14:40:50 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id t4so39632907wra.7
-        for <linux-crypto@vger.kernel.org>; Sat, 08 Apr 2023 14:40:49 -0700 (PDT)
+        Sat, 8 Apr 2023 17:40:50 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C594C17
+        for <linux-crypto@vger.kernel.org>; Sat,  8 Apr 2023 14:40:48 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id w21so1440295wra.4
+        for <linux-crypto@vger.kernel.org>; Sat, 08 Apr 2023 14:40:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680990048; x=1683582048;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G/ds8fvt8IhNIUkcMPcB2187U+f/tO5X7bx8/qa8ONM=;
-        b=m0SLzn1iqfD6YsYtHojGNxnFSimTvg28gxXYWGvhbeFi3ywBXyW2aKpPKcOOnk81GA
-         pLcEC/zzrZ2ZJakFH4GZvs1NXYVS8Q5ZATw+aSem6W2Z4reoZoq35ICKnVa68eA/Po/7
-         BFDtRtkmaD6WxD4wCiLae4gl/1Q2r4k3JeKUpjo012rA+ctcgAR0df1Cf5XPDm4XLmRV
-         YMWY1CvCaELFO2/x7NQzHDQWbhzCpl7SOTToN6mh4//P9fwC7b1iIqg+NZ8ZIVkIWySc
-         Pi2SUMiMC5Z6faMkDkzq3p3ZxBXZ2Nq+Es4E+Y0cqnd3Kht+YjeQRGlh9xH60wew+601
-         brew==
+        d=linaro.org; s=google; t=1680990047; x=1683582047;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1r1SnOX6wBN2nHGoU3kualPj54nGeQSAaKXS+XIlZkY=;
+        b=bBHCoWqCZjmRMr/6jc1rmR8Zb3K5vch/8ZNshCg45bdBET0jkywDKUWqGOJiRN2Z8B
+         X4s3n6cRGmlKcNQfE65/c9k15VqfINbbSEi+w0fFsPOyau57izi4gZHjRELdirmkOcqS
+         b/MGT5prRycMjYmnmUm7uXaNiYZUaBUvMf+bJOPztSwftxdAjr4yS7ae5FoEKcxn8qc/
+         JDrouNcvioskloCtX1qRiDEb+JKBUDRk1sivUHgDEKNzmWDVHl8/ojePIAmAktLC/62R
+         6QoHzgqQnSMuVxwyHSG/qNDjTiR1QKk75H+ztg+h4NggiFsBGTBDJA56pE5roG/+1uw2
+         CWLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680990048; x=1683582048;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G/ds8fvt8IhNIUkcMPcB2187U+f/tO5X7bx8/qa8ONM=;
-        b=RFB8ZwDa8+IX+OlgWRdyROLt1g6m5LEACPdoz2TOk8YzNzFF8MUbmLsAO5PjBwdptm
-         r/+M69dewEEgfV0tthUur2LLiewrKtf4k3lBunAjy881K19LiyStpMfupV8zE7Zidi8d
-         U0BwMCSIB/w2pHqrwptfsJtOSnpe9ebA0ZtYSbwofoxIRmwFqe6dx5SYYP0s0xPbsyCJ
-         XFUKyPXnQhJwVqdajiqEwkNoQ63hwbvSNC0JItJg5E8Xo7kCA2ado/M6M2WP34+m2lYJ
-         wjQWicbTxqbTEqi1KAwDl9TZv+ZaaXh7ceM7K4dEMIu4i+tjvTbOtw5uZYrrnL1oGuz+
-         g02A==
-X-Gm-Message-State: AAQBX9fLDmFa18jrOkc1giwzWwrcp098yIaGOnoyiyn+IO8AYIz1xbQt
-        QTOBZWd/OPqscreD0Y+coihDkg==
-X-Google-Smtp-Source: AKy350ZoIOX+1ULO+/6nI4Sk6F63spIEVpgG402AEJu/jOF7CaFaEsl7we9f/uNDu20eJD4ZJ49o7A==
-X-Received: by 2002:adf:dc07:0:b0:2e2:730a:c7de with SMTP id t7-20020adfdc07000000b002e2730ac7demr1863136wri.24.1680990048420;
-        Sat, 08 Apr 2023 14:40:48 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680990047; x=1683582047;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1r1SnOX6wBN2nHGoU3kualPj54nGeQSAaKXS+XIlZkY=;
+        b=l69FjgYsuEJ97KzAIc2rtcQ0HVrgv/Efep7/Dj1YvkgxpzIGpOqItW+Dqt3xLPdOvB
+         H/Y/y1rO+sp/8yERAgdILIpLueFfeGLauz9xKC0qsROfm0bV94jczNY01TjziJWSuR6O
+         FmjjqeBsOUbfWbxJ0XLI7Pnv3droephKzRyA9Kjs92pldkTBW8iQRQsjVSOtb4FfArOf
+         RX4YcOSYc3C6QY0zBjeYzH9w3kzXSOLxgfUQ+I54nFsNv9Ur47wjylUNM50E4aPyx1ld
+         G6reMslYioXLLYBOx8ZwU/fEobOYYosEJeMCZGcOAegQMbQdszKzaVUnCHWQQbLUnlJQ
+         cmuw==
+X-Gm-Message-State: AAQBX9cx5IkqOV5pGPKxQcbYjhLbMORGCeRfIMm+updFoUY0Qn7CDpR9
+        j3szD5D87MwEnnkrplUiO6ivOQ==
+X-Google-Smtp-Source: AKy350YFShjn4hELK46QnNTz06X559nncDEtCLRY2NKWt5Icc+qKjSwPyUFsi9Ob6YNkuINvGr+6TQ==
+X-Received: by 2002:a5d:50d0:0:b0:2ce:ae4c:c429 with SMTP id f16-20020a5d50d0000000b002ceae4cc429mr3829849wrt.4.1680990046639;
+        Sat, 08 Apr 2023 14:40:46 -0700 (PDT)
 Received: from localhost.localdomain ([188.25.26.161])
-        by smtp.gmail.com with ESMTPSA id s6-20020a5d4ec6000000b002efb6e0c495sm3061377wrv.91.2023.04.08.14.40.46
+        by smtp.gmail.com with ESMTPSA id s6-20020a5d4ec6000000b002efb6e0c495sm3061377wrv.91.2023.04.08.14.40.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Apr 2023 14:40:48 -0700 (PDT)
+        Sat, 08 Apr 2023 14:40:46 -0700 (PDT)
 From:   Abel Vesa <abel.vesa@linaro.org>
 To:     Ulf Hansson <ulf.hansson@linaro.org>,
         Rob Herring <robh+dt@kernel.org>,
@@ -71,92 +70,57 @@ Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-scsi@vger.kernel.org
-Subject: [PATCH v7 1/3] dt-bindings: ufs: qcom: Add ICE phandle
-Date:   Sun,  9 Apr 2023 00:40:39 +0300
-Message-Id: <20230408214041.533749-2-abel.vesa@linaro.org>
+Subject: [PATCH v7 0/3] Add dedicated Qcom ICE driver
+Date:   Sun,  9 Apr 2023 00:40:38 +0300
+Message-Id: <20230408214041.533749-1-abel.vesa@linaro.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230408214041.533749-1-abel.vesa@linaro.org>
-References: <20230408214041.533749-1-abel.vesa@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Starting with SM8550, the ICE will have its own devicetree node
-so add the qcom,ice property to reference it.
-
-Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
----
+As both SDCC and UFS drivers use the ICE with duplicated implementation,
+while none of the currently supported platforms make use concomitantly
+of the same ICE IP block instance, the new SM8550 allows both UFS and
+SDCC to do so. In order to support such scenario, there is a need for
+a unified implementation and a devicetree node to be shared between
+both types of storage devices. So lets drop the duplicate implementation
+of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
 
 The v6 is here:
-https://lore.kernel.org/all/20230407105029.2274111-3-abel.vesa@linaro.org/
+https://lore.kernel.org/all/20230407105029.2274111-1-abel.vesa@linaro.org/
 
 Changes since v6:
+ * Dropped the patches 1, 3 and 6 as they are already in Bjorn's tree.
  * Dropped the minItems for both the qcom,ice and the reg in the
-   qcom,ice compatile subschema, like Krzysztof suggested
+   qcom,ice compatile subschema, in the ufs schema file,
+   like Krzysztof suggested
 
 Changes since v5:
- * dropped the sm8550 specific subschema and replaced it with one that
-   mutually excludes the qcom,ice vs both the ICE specific reg range
-   and the ICE clock
+ * See each individual patch for changelogs.
 
 Changes since v4:
- * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
-   it while making sure none of the other platforms are allowed to use it
-
-Changes since v3:
- * dropped the "and drop core clock" part from subject line
-
-Changes since v2:
- * dropped all changes except the qcom,ice property
+ * dropped the SDHCI dt-bindings patch as it will be added along
+   with the first use of qcom,ice property from an SDHCI DT node
 
 
- .../devicetree/bindings/ufs/qcom,ufs.yaml     | 24 +++++++++++++++++++
- 1 file changed, 24 insertions(+)
+Abel Vesa (3):
+  dt-bindings: ufs: qcom: Add ICE phandle
+  scsi: ufs: ufs-qcom: Switch to the new ICE API
+  mmc: sdhci-msm: Switch to the new ICE API
 
-diff --git a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
-index c5a06c048389..10d426ba1959 100644
---- a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
-+++ b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
-@@ -70,6 +70,10 @@ properties:
-   power-domains:
-     maxItems: 1
- 
-+  qcom,ice:
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+    description: phandle to the Inline Crypto Engine node
-+
-   reg:
-     minItems: 1
-     maxItems: 2
-@@ -187,6 +191,26 @@ allOf:
- 
-     # TODO: define clock bindings for qcom,msm8994-ufshc
- 
-+  - if:
-+      properties:
-+        qcom,ice:
-+          maxItems: 1
-+    then:
-+      properties:
-+        reg:
-+          maxItems: 1
-+        clocks:
-+          minItems: 8
-+          maxItems: 8
-+    else:
-+      properties:
-+        reg:
-+          minItems: 2
-+          maxItems: 2
-+        clocks:
-+          minItems: 9
-+          maxItems: 11
-+
- unevaluatedProperties: false
- 
- examples:
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     |  24 ++
+ drivers/mmc/host/Kconfig                      |   2 +-
+ drivers/mmc/host/sdhci-msm.c                  | 223 ++++------------
+ drivers/ufs/host/Kconfig                      |   2 +-
+ drivers/ufs/host/Makefile                     |   4 +-
+ drivers/ufs/host/ufs-qcom-ice.c               | 244 ------------------
+ drivers/ufs/host/ufs-qcom.c                   |  99 ++++++-
+ drivers/ufs/host/ufs-qcom.h                   |  32 +--
+ 8 files changed, 176 insertions(+), 454 deletions(-)
+ delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+
 -- 
 2.34.1
 
