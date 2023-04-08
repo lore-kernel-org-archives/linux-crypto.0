@@ -2,85 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3026CC76196
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Apr 2023 19:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C4EC7619A
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Apr 2023 15:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229819AbjDGTht (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Apr 2023 15:37:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38056 "EHLO
+        id S229504AbjDHP1k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 8 Apr 2023 11:27:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230383AbjDGThs (ORCPT
+        with ESMTP id S229456AbjDHP1j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Apr 2023 15:37:48 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB2059CD;
-        Fri,  7 Apr 2023 12:37:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680896266; x=1712432266;
-  h=message-id:subject:from:to:cc:date:
-   content-transfer-encoding:mime-version;
-  bh=weBJwIjqEna6+z89gcYkPRC8lEijMlTfTNZaTTEeeNk=;
-  b=ULexbXs8ina2XkzNhvlstejSAcRnKPfA0vHMqpnDZiymrDl2e2PUWdAC
-   Rgjz//UoI073PV8IppJWdjVrSA7Qw3xbR2ZOfsUYlor4zxXAp+/DCbkCC
-   7nUyq0CJ3X2ntDYDplZRAW8HhRbOZ5lmEgB3B2SmHuqUnuZoMv/x1nL9J
-   8qdQDh96aKXeL9sMAqhp59CuiczvMFFQvRK9NhDw07uDbdW4vcz6QCMD/
-   TLZQUQTJGkoUf+J3aaxveS8ZHlvB3yWu6aPM/TXGHQ6kqC1F/5nYnfeIh
-   xRB5bNk0VV5JFL5aE0JIbbqeTesc7SOLiZ1qxJowt6Uf4eWgRkjJosyTr
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10673"; a="429341155"
-X-IronPort-AV: E=Sophos;i="5.98,327,1673942400"; 
-   d="scan'208";a="429341155"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2023 12:37:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10673"; a="756819847"
-X-IronPort-AV: E=Sophos;i="5.98,327,1673942400"; 
-   d="scan'208";a="756819847"
-Received: from bjcleere-mobl2.amr.corp.intel.com ([10.212.83.122])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2023 12:37:45 -0700
-Message-ID: <37694343f8b89dc0469d4a1718dad8f5f8c765bd.camel@linux.intel.com>
-Subject: [PATCH] crypto: ixp4xx - Remove COMPILE_TEST from Kconfig
- dependencies
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     clabbe@baylibre.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Date:   Fri, 07 Apr 2023 14:37:44 -0500
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1-0ubuntu1 
+        Sat, 8 Apr 2023 11:27:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 072E32728
+        for <linux-crypto@vger.kernel.org>; Sat,  8 Apr 2023 08:27:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 96A8760AAF
+        for <linux-crypto@vger.kernel.org>; Sat,  8 Apr 2023 15:27:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1C30C433EF;
+        Sat,  8 Apr 2023 15:27:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680967658;
+        bh=SK4bJcghYhzS7aiZ7Whg9J6EtWf5VeIz4iKAQnRpO+4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DqFLXXR0E86/u01AVXPSnjKStPIzyY1s9+BnqPXZ9DOkgXs1WV+PMDCuSoCdHYdvK
+         cxyvHuaEdBvW/rQoiIbMG8FHd2DSa7MFRSdRsTpbPsYAYam1vgPu3nZnFbJpihPy0H
+         figi4bPPw8WJ/0OLBr6G6tZ719PYyYtd/LXmCXXI0i7jHVNFlNDloNtBfUjuoHy7CP
+         Rg6+MqCUBz9Rij6IoUasw/IQJ4IZZKrIEKEwn0v3cH4obInjNwGnQXa4jqN0o8HNnF
+         So5oxB+juwXSyyTxnmldweIbGrWWMF5o4NC4CAQjmpMSYMmojDdZGG/xMTFt0tBOOr
+         PlUSxR8FcBVCg==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Kees Cook <keescook@chromium.org>
+Subject: [PATCH 00/10] crypto: x86 - avoid absolute references
+Date:   Sat,  8 Apr 2023 17:27:12 +0200
+Message-Id: <20230408152722.3975985-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2222; i=ardb@kernel.org; h=from:subject; bh=SK4bJcghYhzS7aiZ7Whg9J6EtWf5VeIz4iKAQnRpO+4=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIcWw/axVLK/gppqXso/3cm1b7d/eMXVLmXmbs1i/yqzDU ZVHT77qKGVhEONgkBVTZBGY/ffdztMTpWqdZ8nCzGFlAhnCwMUpABM5JsLIsG5F9vP5Kd0dXxJN Vi9mYGCOPOIp5CO/SnPNAd4+haWGSxn+u8dwTH1jGOZp+GZeV7BWaxm/uhSf63sRk6TuX1Murkz gBAA=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-COMPILE_TEST was added during the move to drivers/crypto/intel/ but
-shouldn't have been as it triggers a build bug when not compiled by
-the target compiler.  So remove it to match the original.
+This is preparatory work for allowing the kernel to be built as a PIE
+executable, which relies mostly on RIP-relative symbol references from
+code, which don't need to be updated when a binary is loaded at an
+address different from its link time address.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/oe-kbuild-all/202304061846.G6cpPXiQ-lkp@intel=
-.com/
-Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
----
- drivers/crypto/intel/ixp4xx/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Most changes are quite straight-forward, i.e., just adding a (%rip)
+suffix is enough in many cases. However, some are slightly trickier, and
+need some minor reshuffling of the asm code to get rid of the absolute
+references in the code.
 
-diff --git a/drivers/crypto/intel/ixp4xx/Kconfig b/drivers/crypto/intel/ixp=
-4xx/Kconfig
-index af3cc5688328..4cfb1e37f45b 100644
---- a/drivers/crypto/intel/ixp4xx/Kconfig
-+++ b/drivers/crypto/intel/ixp4xx/Kconfig
-@@ -1,6 +1,6 @@
- config CRYPTO_DEV_IXP4XX
- 	tristate "Driver for IXP4xx crypto hardware acceleration"
--	depends on (ARCH_IXP4XX || COMPILE_TEST) && IXP4XX_QMGR && IXP4XX_NPE
-+	depends on ARCH_IXP4XX && IXP4XX_QMGR && IXP4XX_NPE
- 	select CRYPTO_AES
- 	select CRYPTO_DES
- 	select CRYPTO_ECB
---=20
-2.34.1
+Tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y on a x86 CPU that
+implements AVX, AVX2 and AVX512.
 
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Kees Cook <keescook@chromium.org>
+
+Ard Biesheuvel (10):
+  crypto: x86/aegis128 - Use RIP-relative addressing
+  crypto: x86/aesni - Use RIP-relative addressing
+  crypto: x86/aria - Use RIP-relative addressing
+  crypto: x86/camellia - Use RIP-relative addressing
+  crypto: x86/cast5 - Use RIP-relative addressing
+  crypto: x86/cast6 - Use RIP-relative addressing
+  crypto: x86/crc32c - Use RIP-relative addressing
+  crypto: x86/des3 - Use RIP-relative addressing
+  crypto: x86/ghash - Use RIP-relative addressing
+  crypto: x86/sha256 - Use RIP-relative addressing
+
+ arch/x86/crypto/aegis128-aesni-asm.S         |  6 +-
+ arch/x86/crypto/aesni-intel_asm.S            |  2 +-
+ arch/x86/crypto/aesni-intel_avx-x86_64.S     |  6 +-
+ arch/x86/crypto/aria-aesni-avx-asm_64.S      | 28 +++---
+ arch/x86/crypto/aria-aesni-avx2-asm_64.S     | 28 +++---
+ arch/x86/crypto/aria-gfni-avx512-asm_64.S    | 24 ++---
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 30 +++---
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 30 +++---
+ arch/x86/crypto/camellia-x86_64-asm_64.S     |  8 +-
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S    | 50 +++++-----
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S    | 44 +++++----
+ arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  3 +-
+ arch/x86/crypto/des3_ede-asm_64.S            | 96 +++++++++++++-------
+ arch/x86/crypto/ghash-clmulni-intel_asm.S    |  4 +-
+ arch/x86/crypto/sha256-avx2-asm.S            | 18 ++--
+ 15 files changed, 213 insertions(+), 164 deletions(-)
+
+-- 
+2.39.2
 
