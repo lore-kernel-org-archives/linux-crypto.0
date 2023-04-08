@@ -2,97 +2,161 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D9BC7619A
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Apr 2023 16:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47736C77B73
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Apr 2023 21:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230158AbjDHQGs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Apr 2023 12:06:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43296 "EHLO
+        id S229458AbjDHVkw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 8 Apr 2023 17:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbjDHQGr (ORCPT
+        with ESMTP id S229486AbjDHVkv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Apr 2023 12:06:47 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B66439745;
-        Sat,  8 Apr 2023 09:06:43 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6343fe70a2aso104764b3a.0;
-        Sat, 08 Apr 2023 09:06:43 -0700 (PDT)
+        Sat, 8 Apr 2023 17:40:51 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06361976B
+        for <linux-crypto@vger.kernel.org>; Sat,  8 Apr 2023 14:40:50 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id t4so39632907wra.7
+        for <linux-crypto@vger.kernel.org>; Sat, 08 Apr 2023 14:40:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680970003;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1680990048; x=1683582048;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xz6YJvnk1QAZeeNU3EF1FtxUPt7rc/kW8KB3lvnh+Xk=;
-        b=oTUd60ZAmAVPUZRMtW+NY8eqzrFIMcGJFkRKESVUwGP6d0g8i+UQkybG7NuhyRDM6w
-         VvuNRvflyumFas+D37eKR20una8ysfTED6S9r24xuQb1FEZ36QkQaQlisFgXfaemLKnE
-         AGJqewynIEZ6Bc2RJIXmMK5tTC8ZpPJD2HOFBw1YgXrQ3jrqnKLVUoKXUL60kR2RWBcb
-         Q99aV+Ps08zm/lSR9DbdufNOIfob+Cg+mNY+ARs0aIz6fcviM9wTCLZhg6ZsOEo6h14a
-         q8JOk314G97U3MV+n/UUe5qbQbRvAu4zlyoAnBbZFRe2tXUXQCYrjfE7F3XfGe4SKlr4
-         11NA==
+        bh=G/ds8fvt8IhNIUkcMPcB2187U+f/tO5X7bx8/qa8ONM=;
+        b=m0SLzn1iqfD6YsYtHojGNxnFSimTvg28gxXYWGvhbeFi3ywBXyW2aKpPKcOOnk81GA
+         pLcEC/zzrZ2ZJakFH4GZvs1NXYVS8Q5ZATw+aSem6W2Z4reoZoq35ICKnVa68eA/Po/7
+         BFDtRtkmaD6WxD4wCiLae4gl/1Q2r4k3JeKUpjo012rA+ctcgAR0df1Cf5XPDm4XLmRV
+         YMWY1CvCaELFO2/x7NQzHDQWbhzCpl7SOTToN6mh4//P9fwC7b1iIqg+NZ8ZIVkIWySc
+         Pi2SUMiMC5Z6faMkDkzq3p3ZxBXZ2Nq+Es4E+Y0cqnd3Kht+YjeQRGlh9xH60wew+601
+         brew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680970003;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680990048; x=1683582048;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xz6YJvnk1QAZeeNU3EF1FtxUPt7rc/kW8KB3lvnh+Xk=;
-        b=vWKF8rVh2AG8bIhQnP4fxfwE1yHonBjdUYCKQcWF5ZM2keSCXKhz8nrBC800GtU0x1
-         sP2NaRE18Ti6WwdrI7uIwYarxAh5M49QuhoPBxe2vtxvGmZuvxzgHR2n/3Rct+zbLeT5
-         AtKxwjnQ9VctOhLev73mACie4DeN08WM3wo7CDwpHoo/3yVjNZt+MpLotdzQxXhdqxuq
-         9QSMfVycSB0ABVkKZPMKr/uS7JKHpkk+CvnULzeMSHGiiraGewyMQWIGoT3NbAqfutcx
-         Qo6xcEGC830SCXvy9DvqaNwPk2g0qPlsTut62KIN/Ru3H79GnhH+MNxz+4AcRkypqlEe
-         uZ8w==
-X-Gm-Message-State: AAQBX9eovOshg/Yr32V8kKAn6pSKKzmCqU3bX5AondP7V/+gZXbq7uYz
-        VKmxDbPBlrnTntRnEO+j9fuQMUz4O2gUfHAcH8uTZvpqkl7U+mfA
-X-Google-Smtp-Source: AKy350bGYz8K7w7t+fCh0R8EQfFoXCTx8a2Agw8MEoIx9217PAmDo+/aDO/w81mSAp69SlaB6NLqPeYQIXDFAgbdCTA=
-X-Received: by 2002:a05:6a00:1994:b0:631:9e50:1490 with SMTP id
- d20-20020a056a00199400b006319e501490mr1419323pfl.2.1680970003237; Sat, 08 Apr
- 2023 09:06:43 -0700 (PDT)
+        bh=G/ds8fvt8IhNIUkcMPcB2187U+f/tO5X7bx8/qa8ONM=;
+        b=RFB8ZwDa8+IX+OlgWRdyROLt1g6m5LEACPdoz2TOk8YzNzFF8MUbmLsAO5PjBwdptm
+         r/+M69dewEEgfV0tthUur2LLiewrKtf4k3lBunAjy881K19LiyStpMfupV8zE7Zidi8d
+         U0BwMCSIB/w2pHqrwptfsJtOSnpe9ebA0ZtYSbwofoxIRmwFqe6dx5SYYP0s0xPbsyCJ
+         XFUKyPXnQhJwVqdajiqEwkNoQ63hwbvSNC0JItJg5E8Xo7kCA2ado/M6M2WP34+m2lYJ
+         wjQWicbTxqbTEqi1KAwDl9TZv+ZaaXh7ceM7K4dEMIu4i+tjvTbOtw5uZYrrnL1oGuz+
+         g02A==
+X-Gm-Message-State: AAQBX9fLDmFa18jrOkc1giwzWwrcp098yIaGOnoyiyn+IO8AYIz1xbQt
+        QTOBZWd/OPqscreD0Y+coihDkg==
+X-Google-Smtp-Source: AKy350ZoIOX+1ULO+/6nI4Sk6F63spIEVpgG402AEJu/jOF7CaFaEsl7we9f/uNDu20eJD4ZJ49o7A==
+X-Received: by 2002:adf:dc07:0:b0:2e2:730a:c7de with SMTP id t7-20020adfdc07000000b002e2730ac7demr1863136wri.24.1680990048420;
+        Sat, 08 Apr 2023 14:40:48 -0700 (PDT)
+Received: from localhost.localdomain ([188.25.26.161])
+        by smtp.gmail.com with ESMTPSA id s6-20020a5d4ec6000000b002efb6e0c495sm3061377wrv.91.2023.04.08.14.40.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Apr 2023 14:40:48 -0700 (PDT)
+From:   Abel Vesa <abel.vesa@linaro.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: [PATCH v7 1/3] dt-bindings: ufs: qcom: Add ICE phandle
+Date:   Sun,  9 Apr 2023 00:40:39 +0300
+Message-Id: <20230408214041.533749-2-abel.vesa@linaro.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230408214041.533749-1-abel.vesa@linaro.org>
+References: <20230408214041.533749-1-abel.vesa@linaro.org>
 MIME-Version: 1.0
-References: <20230401164448.1393336-1-mmyangfl@gmail.com> <ZC6Ibor2aGR8D8fR@gondor.apana.org.au>
-In-Reply-To: <ZC6Ibor2aGR8D8fR@gondor.apana.org.au>
-From:   Yangfl <mmyangfl@gmail.com>
-Date:   Sun, 9 Apr 2023 00:06:06 +0800
-Message-ID: <CAAXyoMMBWnqQGVWVOsEaKviukQJK1iyx+OAez0AQfKPL5b_UvQ@mail.gmail.com>
-Subject: Re: [PATCH v5] crypto: hisilicon/trng - add support for HiSTB TRNG
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> =E4=BA=8E2023=E5=B9=B44=E6=9C=886=
-=E6=97=A5=E5=91=A8=E5=9B=9B 16:53=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Sun, Apr 02, 2023 at 12:44:40AM +0800, David Yang wrote:
-> > HiSTB TRNG are found on some HiSilicon STB SoCs.
-> >
-> > Signed-off-by: David Yang <mmyangfl@gmail.com>
-> > ---
-> > v2: fix typo
-> > v3: add option for post process depth, adjust timeout
-> > v4: do not case to __iomem, as requested
-> > v5: do not use rng->priv at all
-> >  drivers/crypto/hisilicon/Kconfig         |   7 +
-> >  drivers/crypto/hisilicon/Makefile        |   2 +-
-> >  drivers/crypto/hisilicon/trng/Makefile   |   3 +
-> >  drivers/crypto/hisilicon/trng/trng-stb.c | 176 +++++++++++++++++++++++
-> >  4 files changed, 187 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/crypto/hisilicon/trng/trng-stb.c
->
-> Patch applied.  Thanks.
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Starting with SM8550, the ICE will have its own devicetree node
+so add the qcom,ice property to reference it.
 
-Thanks for merging this patch. But after considering your former reply
-about drivers/char/hw_random , I'm thinking if that is a better place
-for this driver. If that is the case I'd like to post a new version of
-patch.
+Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+---
 
-Sorry for late reply.
+The v6 is here:
+https://lore.kernel.org/all/20230407105029.2274111-3-abel.vesa@linaro.org/
+
+Changes since v6:
+ * Dropped the minItems for both the qcom,ice and the reg in the
+   qcom,ice compatile subschema, like Krzysztof suggested
+
+Changes since v5:
+ * dropped the sm8550 specific subschema and replaced it with one that
+   mutually excludes the qcom,ice vs both the ICE specific reg range
+   and the ICE clock
+
+Changes since v4:
+ * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
+   it while making sure none of the other platforms are allowed to use it
+
+Changes since v3:
+ * dropped the "and drop core clock" part from subject line
+
+Changes since v2:
+ * dropped all changes except the qcom,ice property
+
+
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
+index c5a06c048389..10d426ba1959 100644
+--- a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
++++ b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
+@@ -70,6 +70,10 @@ properties:
+   power-domains:
+     maxItems: 1
+ 
++  qcom,ice:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description: phandle to the Inline Crypto Engine node
++
+   reg:
+     minItems: 1
+     maxItems: 2
+@@ -187,6 +191,26 @@ allOf:
+ 
+     # TODO: define clock bindings for qcom,msm8994-ufshc
+ 
++  - if:
++      properties:
++        qcom,ice:
++          maxItems: 1
++    then:
++      properties:
++        reg:
++          maxItems: 1
++        clocks:
++          minItems: 8
++          maxItems: 8
++    else:
++      properties:
++        reg:
++          minItems: 2
++          maxItems: 2
++        clocks:
++          minItems: 9
++          maxItems: 11
++
+ unevaluatedProperties: false
+ 
+ examples:
+-- 
+2.34.1
+
