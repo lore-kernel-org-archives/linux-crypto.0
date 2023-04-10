@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25103C77B6F
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 20:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB43C7EE22
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 20:59:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbjDJU7K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 16:59:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46190 "EHLO
+        id S229970AbjDJU7L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 16:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbjDJU7G (ORCPT
+        with ESMTP id S229708AbjDJU7G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 10 Apr 2023 16:59:06 -0400
 Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6464D1BD9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47F31986;
         Mon, 10 Apr 2023 13:59:03 -0700 (PDT)
 Received: from stefanw-SCHENKER ([37.4.248.58]) by mrelayeu.kundenserver.de
  (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1N0nvJ-1qXbbO3SlR-00wikr; Mon, 10 Apr 2023 22:58:23 +0200
+ 1Mbies-1qMxZc4AEY-00dHHu; Mon, 10 Apr 2023 22:58:27 +0200
 From:   Stefan Wahren <stefan.wahren@i2se.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -34,59 +34,127 @@ Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-pm@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH V2 0/6] ARM: dts: imx6ull: Fix dtbs_check warnings
-Date:   Mon, 10 Apr 2023 22:57:57 +0200
-Message-Id: <20230410205803.45853-1-stefan.wahren@i2se.com>
+Subject: [PATCH V2 5/6] ARM: dts: imx: Adjust dma-apbh node name
+Date:   Mon, 10 Apr 2023 22:58:02 +0200
+Message-Id: <20230410205803.45853-6-stefan.wahren@i2se.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230410205803.45853-1-stefan.wahren@i2se.com>
+References: <20230410205803.45853-1-stefan.wahren@i2se.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XdkOV61ksLSZtrlonvh6FpUglprFQYh8we1Z9a1smKkM61WGGKL
- l9lfGj7qHDXOar1nDRo/Zpoacgv6qmrSB7uJpYJsBh4hSb/Zf+jhTpyhkHekdaCsEmUNP8K
- 5nq4hI6eXuU3ctgDiajlXhWxzNBq7t8sIh8MlD52wcymz3z0BCBd+FKFLw3v1oT5wag+1CS
- u+U2wJ8FFziHoEM5W8khg==
-UI-OutboundReport: notjunk:1;M01:P0:7vWcb7TeIFQ=;AhkpwLufc1X/9dgTkPUEPG0JE1P
- 91acookKLxUcDdaSia2GmB+tzjFNap06FOlMBk6Evf2oZZK6XhNupAabmbo0STqSLzRpuCoxt
- TPnXsg6F2iDW+FGIkjINax3Mb7HdbOIDkfLjf10eReWvPBxpC8jpa9citKVqObAkmTpQHzsaB
- QTy2Ojk8r/HEvJ6p+5lC3JzxGoFXQhC5pm1T5IFcy+fJRmSGGXqzUURFVx3OWURJQZ7zbeHwN
- AYji52Gy/ZiBQBkRgmrJ902oZ87W4EUbmgsQuf7a9FFrKCfg0oxgtaRmopXkQk6LIeXVkvlOT
- Y0ZOpHgl3cZ4XJVKQcnQ71fqmW6gs8YQXP9GxIxFs/LT/3aaSX9sld+HhaY5VAnP5ITt0whji
- EfEArolCSCmz5kJOYgoYv18tt7eqUxdY/VXzqV1Mnm7uPoHOVoqqe2uaAW77xnfrq2bWwOWrx
- mzzkEj0TmeED3r79l93lYCJVW41LlpMlhIp+cZVSphTl0QlhfZzy1S31T49uJPfVcXYlAQt+k
- zW9CCYQ4EKW0iQs4sFc8DY54rwSJMG8d/bg2xGzky1UCEtGOr5vm0rqddPckiS8iod4sfkAmL
- mHOqHbpBZJdEzx2MTfRHJbauFLn2ML/PPH9cJx3zRl7ZCaQxdnD1/kq1Rw/pvOG0501CIBl9e
- 2BdlKqKnVS16uDR7t4z4j44BB9ifmRZ2ysB3M6skWg==
+X-Provags-ID: V03:K1:dFgTmzeQNO8zmrMdWcR6j1768YcKmhjLtnhqM0x6Xny26HEQOmo
+ GV38Wx261D8cXTYuPbkPCQ79QGk0YQoMKlnR7qoiM+aGXVbNL7MGgf9uvLCWS0n4LLlhDlj
+ 8dinS22sNnhS5r9lkcsNx5ny6rt8oXJ6OxERSmJjAHvQE5EbqViPLa5ml9j4v4fwgHBDo6g
+ JGSVAew/YneAyT10h7Tfg==
+UI-OutboundReport: notjunk:1;M01:P0:nMwNnZNfjPc=;sHCyT8PgYZQuE/55DCBO5aIcaGQ
+ XON7AHXAS6nlLtkpUpExmee4BcKAPmmh4lUnOQfpTXcvGDGX2KOOGvfXnNgUeRoy3qG21OL/V
+ 151IzrdXt2dK9hZs0/x/NvHwYSs+JJqlnYzW+HDSCRg4oMAY4DiG/tbp7FvVHIU15IPJQh9le
+ K6GVxNEQfCP1t8VlUwYr0OCtZNEWpBGOhB3tl6viTRkJcAcTomfCqcE8lGc30wkrxMsIurGu0
+ a/OQts95Xf4G7+a3nzMPvt615AQWWRM3QDefkSxVdc9UF+ie6Pm6h7lor8XwzwSmM8pxBfkwN
+ yM0m9B1S2xo6MkubUVL2Fj6o4+tTRZCZvZaAvzcLU9crTOQoWEaRvk+sRCmCfc2HqnX0j1iKb
+ LKg4ENcKgfTRMWlJcly3ky+wFK79LR6qJOXY//PEoewFZSyF+7J5OTfbW7f4Bu3Dne3W7UY0r
+ oIaZRus/XfI8HS+KWWPFE4/RlUYuLk2SMXsVTgzDNxsJG0liqmMQmE+kKBfuOPXZhvzY+F9Pz
+ eNOjOGSknF5DQwJ6nssxfrluXQtagEDDrIWLnRotmrBhcT/+IVuefPLxhr72mg827ZEcLTl6p
+ cIKJgc9LmB5VBE02RNEZBzS55pHA2t0J+f7AhEja7hAKWhfL9bf7oM78/oKblwniHnYQvwlws
+ MqOAXFneLLFGz7QnpIapFEN832gmjHy61Z15Eq2kjw==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series tries to address some dtbs_check warnings on i.MX6ULL.
+Currently the dtbs_check generates warnings like this:
 
-Changes in V2:
-- new patch to fix fsl-imx-uart warnings 
-- fixed GPC typo found by Fabio Estevam
-- keep enum in bindings as suggested by Krzysztof Kozlowski
-- make imx6ul GPT compatible to imx6sx
+$nodename:0: 'dma-apbh@110000' does not match '^dma-controller(@.*)?$'
 
-Stefan Wahren (6):
-  dt-bindings: serial: fsl-imx-uart: add missing properties
-  dt-bindings: crypto: fsl-dcp: add imx6sl and imx6ull compatible
-  dt-bindings: imx-thermal: add imx6sll and imx6ul compatible
-  dt-bindings: imxgpt: add imx6ul compatible
-  ARM: dts: imx: Adjust dma-apbh node name
-  ARM: dts: imx6ul: Add clock and PGC node to GPC
+So fix all affected dma-apbh node names.
 
- .../devicetree/bindings/crypto/fsl-dcp.yaml   | 12 ++++++---
- .../bindings/serial/fsl-imx-uart.yaml         | 25 +++++++++++++++++++
- .../bindings/thermal/imx-thermal.yaml         | 14 ++++++++---
- .../devicetree/bindings/timer/fsl,imxgpt.yaml |  3 +++
- arch/arm/boot/dts/imx23.dtsi                  |  2 +-
- arch/arm/boot/dts/imx28.dtsi                  |  2 +-
- arch/arm/boot/dts/imx6qdl.dtsi                |  2 +-
- arch/arm/boot/dts/imx6sx.dtsi                 |  2 +-
- arch/arm/boot/dts/imx6ul.dtsi                 | 14 ++++++++++-
- arch/arm/boot/dts/imx7s.dtsi                  |  2 +-
- 10 files changed, 65 insertions(+), 13 deletions(-)
+Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+---
+ arch/arm/boot/dts/imx23.dtsi   | 2 +-
+ arch/arm/boot/dts/imx28.dtsi   | 2 +-
+ arch/arm/boot/dts/imx6qdl.dtsi | 2 +-
+ arch/arm/boot/dts/imx6sx.dtsi  | 2 +-
+ arch/arm/boot/dts/imx6ul.dtsi  | 2 +-
+ arch/arm/boot/dts/imx7s.dtsi   | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/arch/arm/boot/dts/imx23.dtsi b/arch/arm/boot/dts/imx23.dtsi
+index d19508c8f9ed..a3668a0827fc 100644
+--- a/arch/arm/boot/dts/imx23.dtsi
++++ b/arch/arm/boot/dts/imx23.dtsi
+@@ -59,7 +59,7 @@ icoll: interrupt-controller@80000000 {
+ 				reg = <0x80000000 0x2000>;
+ 			};
+ 
+-			dma_apbh: dma-apbh@80004000 {
++			dma_apbh: dma-controller@80004000 {
+ 				compatible = "fsl,imx23-dma-apbh";
+ 				reg = <0x80004000 0x2000>;
+ 				interrupts = <0 14 20 0
+diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.dtsi
+index a8d3c3113e0f..29e37b1fae66 100644
+--- a/arch/arm/boot/dts/imx28.dtsi
++++ b/arch/arm/boot/dts/imx28.dtsi
+@@ -78,7 +78,7 @@ hsadc: hsadc@80002000 {
+ 				status = "disabled";
+ 			};
+ 
+-			dma_apbh: dma-apbh@80004000 {
++			dma_apbh: dma-controller@80004000 {
+ 				compatible = "fsl,imx28-dma-apbh";
+ 				reg = <0x80004000 0x2000>;
+ 				interrupts = <82 83 84 85
+diff --git a/arch/arm/boot/dts/imx6qdl.dtsi b/arch/arm/boot/dts/imx6qdl.dtsi
+index b72ec745f6d1..bda182edc589 100644
+--- a/arch/arm/boot/dts/imx6qdl.dtsi
++++ b/arch/arm/boot/dts/imx6qdl.dtsi
+@@ -150,7 +150,7 @@ soc: soc {
+ 		interrupt-parent = <&gpc>;
+ 		ranges;
+ 
+-		dma_apbh: dma-apbh@110000 {
++		dma_apbh: dma-controller@110000 {
+ 			compatible = "fsl,imx6q-dma-apbh", "fsl,imx28-dma-apbh";
+ 			reg = <0x00110000 0x2000>;
+ 			interrupts = <0 13 IRQ_TYPE_LEVEL_HIGH>,
+diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
+index 93ac2380ca1e..4233943a1cca 100644
+--- a/arch/arm/boot/dts/imx6sx.dtsi
++++ b/arch/arm/boot/dts/imx6sx.dtsi
+@@ -209,7 +209,7 @@ gpu: gpu@1800000 {
+ 			power-domains = <&pd_pu>;
+ 		};
+ 
+-		dma_apbh: dma-apbh@1804000 {
++		dma_apbh: dma-controller@1804000 {
+ 			compatible = "fsl,imx6sx-dma-apbh", "fsl,imx28-dma-apbh";
+ 			reg = <0x01804000 0x2000>;
+ 			interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>,
+diff --git a/arch/arm/boot/dts/imx6ul.dtsi b/arch/arm/boot/dts/imx6ul.dtsi
+index 3d9d0f823568..118764c50d92 100644
+--- a/arch/arm/boot/dts/imx6ul.dtsi
++++ b/arch/arm/boot/dts/imx6ul.dtsi
+@@ -164,7 +164,7 @@ intc: interrupt-controller@a01000 {
+ 			      <0x00a06000 0x2000>;
+ 		};
+ 
+-		dma_apbh: dma-apbh@1804000 {
++		dma_apbh: dma-controller@1804000 {
+ 			compatible = "fsl,imx6q-dma-apbh", "fsl,imx28-dma-apbh";
+ 			reg = <0x01804000 0x2000>;
+ 			interrupts = <0 13 IRQ_TYPE_LEVEL_HIGH>,
+diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
+index efe2525b62fa..54026c2c93fa 100644
+--- a/arch/arm/boot/dts/imx7s.dtsi
++++ b/arch/arm/boot/dts/imx7s.dtsi
+@@ -1257,7 +1257,7 @@ fec1: ethernet@30be0000 {
+ 			};
+ 		};
+ 
+-		dma_apbh: dma-apbh@33000000 {
++		dma_apbh: dma-controller@33000000 {
+ 			compatible = "fsl,imx7d-dma-apbh", "fsl,imx28-dma-apbh";
+ 			reg = <0x33000000 0x2000>;
+ 			interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>,
 -- 
 2.34.1
 
