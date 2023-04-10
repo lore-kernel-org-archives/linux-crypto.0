@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8318BC77B61
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 23:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 964ACC77B61
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 23:12:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbjDJXMR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 19:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
+        id S229970AbjDJXM0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 19:12:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229872AbjDJXLv (ORCPT
+        with ESMTP id S229888AbjDJXME (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2023 19:11:51 -0400
+        Mon, 10 Apr 2023 19:12:04 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55A352694;
-        Mon, 10 Apr 2023 16:11:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3068426A0;
+        Mon, 10 Apr 2023 16:11:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681168303; x=1712704303;
+  t=1681168304; x=1712704304;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=OVcWEfHIwxJSYOH3PtUNQyn0mkISh7WF54jUMQ9NGf0=;
-  b=hR9QD36cyQELP1j2wAI4/EAVDcDcUF++1lSJuzaeYWKpHwmdAkPfNi+5
-   IFuBCPCt806EbcfhH0dG8jB0LcTP6n5010A7fxAr0JxdcmJmBPN+FLuBq
-   85SwBX025khVGcX2dLgTMPAyfCw3/v+EY2BJMyAH+6nvrZj8EO56LptbN
-   WJeVr3DX07zf9Nb0I62xIfBhGurcmddyReuxQgZNahVywgHeC129vy2bY
-   qiy/6a5PultrulO+0pMTmvgrw28b9lO0TePxaKmjlNSlAG/fyTLHyhSJ0
-   AUPOXur3fJA2ONsL+d5PCKmENVB3p0AMjdePxrxane6bMN12HnzP+I50S
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="340962566"
+  bh=oHbg3AIw6EWjGuPusXhPaguYziSB624KfaS9uRwcK7A=;
+  b=QOSepriM0sBRHpQU/S0aJFUuTodmrVCHiwGcl67dnvk7CjT7N6IuCSrS
+   QisXFEn5oNx72b/+j9lwKniUPb1m6yOB2oV4DSh50/+JDEzuQs5ufxZ/T
+   d8gYaEPqvqEanp+GiKFjEAdLvcCHMGokIvu5X0wXyQbM0MWTYuj6P4Obf
+   pTEnU5kM6GdFsZrvNB8Ken04IdC0dVlEAqy5gu6K0P4YCr96oLsIRDFQh
+   Kagoxuxsjx9qgfaE5wwHjJtvmAS/lA6RGWcy+vCP7GSfy61l4iASaDbXu
+   jKG6WRXn0YNiJCdbeiiqvXov2FyfXjD18pckbSOv43vCMy6wQ7lZF/Rzz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="340962596"
 X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
-   d="scan'208";a="340962566"
+   d="scan'208";a="340962596"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 16:11:41 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 16:11:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="757608012"
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="757608021"
 X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
-   d="scan'208";a="757608012"
+   d="scan'208";a="757608021"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Apr 2023 16:11:40 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 10 Apr 2023 16:11:41 -0700
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dm-devel@redhat.com
@@ -48,12 +48,15 @@ Cc:     ebiggers@kernel.org, gmazyland@gmail.com, luto@kernel.org,
         ardb@kernel.org, dan.j.williams@intel.com, bernie.keany@intel.com,
         charishma1.gairuboyina@intel.com,
         lalithambika.krishnakumar@intel.com, chang.seok.bae@intel.com,
+        "David S. Miller" <davem@davemloft.net>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org
-Subject: [PATCH v6 08/12] x86/PM/keylocker: Restore internal wrapping key on resume from ACPI S3/4
-Date:   Mon, 10 Apr 2023 15:59:32 -0700
-Message-Id: <20230410225936.8940-9-chang.seok.bae@intel.com>
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: [PATCH v6 11/12] crypto: x86/aes-kl - Support AES algorithm using Key Locker instructions
+Date:   Mon, 10 Apr 2023 15:59:35 -0700
+Message-Id: <20230410225936.8940-12-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230410225936.8940-1-chang.seok.bae@intel.com>
 References: <20220112211258.21115-1-chang.seok.bae@intel.com>
@@ -62,313 +65,483 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When the system enters the ACPI S3 or S4 sleep states, the internal
-wrapping key is discarded.
+Key Locker is a CPU feature to reduce key exfiltration opportunities while
+maintaining a programming interface similar to AES-NI. It converts the AES
+key into an encoded form, called the 'key handle'.
 
-The primary use case for the feature is bare metal dm-crypt. The key needs
-to be restored properly on wakeup, as dm-crypt does not prompt for the key
-on resume from suspend. Even the prompt it does perform for unlocking
-the volume where the hibernation image is stored, it still expects to reuse
-the key handles within the hibernation image once it is loaded. So it is
-motivated to meet dm-crypt's expectation that the key handles in the
-suspend-image remain valid after resume from an S-state.
+The key handle is a wrapped version of the clear-text key where the
+wrapping key has limited exposure. Once converted via setkey(), all
+subsequent data encryption using new AES instructions ('AES-KL') uses this
+key handle, reducing the exposure of private key material in memory.
 
-Key Locker provides a mechanism to back up the internal wrapping key in
-non-volatile storage. The kernel requests a backup right after the key is
-loaded at boot time. It is copied back to each CPU upon wakeup.
+AES-KL is analogous to that of AES-NI. Most assembly code is translated
+from the AES-NI code. They are operational in both 32-bit and 64-bit modes
+like AES-NI. However, users need to be aware of the following differences:
 
-While the backup may be maintained in NVM across S5 and G3 "off"
-states it is not architecturally guaranteed, nor is it expected by dm-crypt
-which expects to prompt for the key each time the volume is started.
+== Key Handle ==
 
-The entirety of Key Locker needs to be disabled if the backup mechanism is
-not available unless CONFIG_SUSPEND=n, otherwise dm-crypt requires the
-backup to be available.
+AES-KL may fail with an invalid key handle. It could be corrupted or fail
+with handle restriction. A key handle may be encoded with some
+restrictions. The implementation restricts every handle only available
+in kernel mode via setkey().
 
-In the event of a key restore failure the kernel proceeds with an
-initialized IWKey state. This has the effect of invalidating any key
-handles that might be present in a suspend-image. When this happens
-dm-crypt will see I/O errors resulting from error returns from
-crypto_skcipher_{en,de}crypt(). While this will disrupt operations in the
-current boot, data is not at risk and access is restored at the next reboot
-to create new handles relative to the current IWKey.
+=== AES Compliance ===
 
-Manage a feature-specific flag to communicate with the crypto
-implementation. This ensures to stop using the AES instructions upon the
-key restore failure while not turning off the feature.
+Key Locker is not AES compliant in that it lacks support for 192-bit keys.
+However, per the expectations of Linux crypto-cipher implementations the
+software cipher implementation must support all the AES compliant
+key-sizes. The AES-KL cipher implementation achieves this constraint by
+logging a warning and falling back to AES-NI. In other words the 192-bit
+key-size limitation for what can be converted into a Key Locker key-handle
+is only documented, not enforced. This along with the below performance and
+failure mode implications is an end-user consideration for selecting AES-KL
+vs AES-NI.
+
+== API Limitation ==
+
+The setkey() function transforms an AES key to a handle. An extended key is
+a usual outcome of setkey() in other AES cipher implementations. For this
+reason, a setkey() failure does not fall back to the other. So, AES-KL will
+be exposed via synchronous interfaces only.
+
+== Wrapping-key Restore Failure ==
+
+The setkey() failure is also possible with the wrapping-key restore
+failure. In an event of hardware failure, the wrapping key is lost from
+deep sleep states. Then, setkey() will fail with the ENODEV error. And the
+suspended data transforming task may resume but will fail due to the
+wrapping key change.
+
+== Performance ==
+
+This feature comes with some performance penalties vs AES-NI. The
+cryptsetup benchmark indicates Key Locker raw throughput can be  ~5x slower
+than AES-NI. For disk encryption, storage bandwidth may be the bottleneck
+before encryption bandwidth, but the potential performance difference is
+why AES-KL is advertised as a distinct cipher in /proc/crypto rather than
+the kernel transparently replacing AES-NI usage with AES-KL.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Tom Rix <trix@redhat.com>
 Cc: x86@kernel.org
+Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
-Cc: linux-pm@vger.kernel.org
 ---
 Changes from v5:
-* Fix the 'valid_kl' flag not to be set when the feature is disabled.
-  (Reported by Marvin Hsu marvin.hsu@intel.com) Add the function
-  comment about this.
-* Improve the error handling in setup_keylocker(). All the error cases
-  fall through the end that disables the feature. Otherwise, all the
-  successful cases return immediately.
-
-Changes from v4:
-* Update the changelog and title. (Rafael Wysocki)
+* Replace the ret instruction with RET as rebased on the upstream -- commit
+  f94909ceb1ed ("x86: Prepare asm files for straight-line-speculation").
 
 Changes from v3:
-* Fix the build issue with !X86_KEYLOCKER. (Eric Biggers)
+* Exclude non-AES-KL objects. (Eric Biggers)
+* Simplify the assembler dependency check. (Peter Zijlstra)
+* Trim the Kconfig help text. (Dan Williams)
+* Fix a defined-but-not-used warning.
 
 Changes from RFC v2:
-* Change the backup key failure handling. (Dan Williams)
+* Move out each mode support in new patches.
+* Update the changelog to describe the limitation and the tradeoff
+  clearly. (Andy Lutomirski)
 
 Changes from RFC v1:
-* Folded the warning message into the if condition check. (Rafael
-  Wysocki)
-* Rebased on the changes of the previous patches.
-* Added error code for key restoration failures.
-* Moved the restore helper.
-* Added function descriptions.
+* Rebased on the refactored code. (Ard Biesheuvel)
+* Dropped exporting the single block interface. (Ard Biesheuvel)
+* Fixed the fallback and error handling paths. (Ard Biesheuvel)
+* Revised the module description. (Dave Hansen and Peter Zijlsta)
+* Made the build depend on the binutils version to support new
+  instructions. (Borislav Petkov and Peter Zijlstra)
+* Updated the changelog accordingly.
+Link: https://lore.kernel.org/lkml/CAMj1kXGa4f21eH0mdxd1pQsZMUjUr1Btq+Dgw-gC=O-yYft7xw@mail.gmail.com/
 ---
- arch/x86/include/asm/keylocker.h |   4 +
- arch/x86/kernel/keylocker.c      | 138 ++++++++++++++++++++++++++++++-
- arch/x86/power/cpu.c             |   2 +
- 3 files changed, 140 insertions(+), 4 deletions(-)
+ arch/x86/crypto/Makefile           |   3 +
+ arch/x86/crypto/aeskl-intel_asm.S  | 184 +++++++++++++++++++++++++++++
+ arch/x86/crypto/aeskl-intel_glue.c | 115 ++++++++++++++++++
+ crypto/Kconfig                     |  36 ++++++
+ 4 files changed, 338 insertions(+)
+ create mode 100644 arch/x86/crypto/aeskl-intel_asm.S
+ create mode 100644 arch/x86/crypto/aeskl-intel_glue.c
 
-diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-index 820ac29c06d9..c1d27fb5a1c3 100644
---- a/arch/x86/include/asm/keylocker.h
-+++ b/arch/x86/include/asm/keylocker.h
-@@ -32,9 +32,13 @@ struct iwkey {
- #ifdef CONFIG_X86_KEYLOCKER
- void setup_keylocker(struct cpuinfo_x86 *c);
- void destroy_keylocker_data(void);
-+void restore_keylocker(void);
-+extern bool valid_keylocker(void);
- #else
- #define setup_keylocker(c) do { } while (0)
- #define destroy_keylocker_data() do { } while (0)
-+#define restore_keylocker() do { } while (0)
-+static inline bool valid_keylocker(void) { return false; }
- #endif
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 8469b0a09cb5..ab9bd2b102dd 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -50,6 +50,9 @@ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
+ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o aes-intel_glue.o
+ aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
  
- #endif /*__ASSEMBLY__ */
-diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
-index 2519102f72f1..72d075499067 100644
---- a/arch/x86/kernel/keylocker.c
-+++ b/arch/x86/kernel/keylocker.c
-@@ -11,20 +11,45 @@
- #include <asm/fpu/api.h>
- #include <asm/keylocker.h>
- #include <asm/tlbflush.h>
-+#include <asm/msr.h>
- 
- static __initdata struct keylocker_setup_data {
-+	bool initialized;
- 	struct iwkey key;
- } kl_setup;
- 
++obj-$(CONFIG_CRYPTO_AES_KL) += aeskl-intel.o
++aeskl-intel-y := aeskl-intel_asm.o aeskl-intel_glue.o
++
+ obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
+ sha1-ssse3-y := sha1_avx2_x86_64_asm.o sha1_ssse3_asm.o sha1_ssse3_glue.o
+ sha1-ssse3-$(CONFIG_AS_SHA1_NI) += sha1_ni_asm.o
+diff --git a/arch/x86/crypto/aeskl-intel_asm.S b/arch/x86/crypto/aeskl-intel_asm.S
+new file mode 100644
+index 000000000000..17c7b306a766
+--- /dev/null
++++ b/arch/x86/crypto/aeskl-intel_asm.S
+@@ -0,0 +1,184 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
-+ * This flag is set with IWKey load. When the key restore fails, it is
-+ * reset. This restore state is exported to the crypto library, then AES-KL
-+ * will not be used there. So, the feature is soft-disabled with this flag.
++ * Implement AES algorithm using Intel AES Key Locker instructions.
++ *
++ * Most code is based from the AES-NI implementation, aesni-intel_asm.S
++ *
 + */
-+static bool valid_kl;
 +
-+bool valid_keylocker(void)
-+{
-+	return valid_kl;
-+}
-+EXPORT_SYMBOL_GPL(valid_keylocker);
++#include <linux/linkage.h>
++#include <asm/inst.h>
++#include <asm/frame.h>
++#include "aes-intel_asm.S"
 +
- static void __init generate_keylocker_data(void)
- {
- 	get_random_bytes(&kl_setup.key.integrity_key,  sizeof(kl_setup.key.integrity_key));
- 	get_random_bytes(&kl_setup.key.encryption_key, sizeof(kl_setup.key.encryption_key));
- }
- 
++.text
++
++#define STATE1	%xmm0
++#define STATE2	%xmm1
++#define STATE3	%xmm2
++#define STATE4	%xmm3
++#define STATE5	%xmm4
++#define STATE6	%xmm5
++#define STATE7	%xmm6
++#define STATE8	%xmm7
++#define STATE	STATE1
++
++#define IV	%xmm9
++#define KEY	%xmm10
++#define BSWAP_MASK %xmm11
++#define CTR	%xmm12
++#define INC	%xmm13
++
++#ifdef __x86_64__
++#define IN1	%xmm8
++#define IN2	%xmm9
++#define IN3	%xmm10
++#define IN4	%xmm11
++#define IN5	%xmm12
++#define IN6	%xmm13
++#define IN7	%xmm14
++#define IN8	%xmm15
++#define IN	IN1
++#define TCTR_LOW %r11
++#else
++#define IN	%xmm1
++#endif
++
++#ifdef __x86_64__
++#define AREG	%rax
++#define HANDLEP	%rdi
++#define OUTP	%rsi
++#define KLEN	%r9d
++#define INP	%rdx
++#define T1	%r10
++#define LEN	%rcx
++#define IVP	%r8
++#else
++#define AREG	%eax
++#define HANDLEP	%edi
++#define OUTP	AREG
++#define KLEN	%ebx
++#define INP	%edx
++#define T1	%ecx
++#define LEN	%esi
++#define IVP	%ebp
++#endif
++
++#define UKEYP	OUTP
++#define GF128MUL_MASK %xmm11
++
 +/*
-+ * This is invoked when the bootup is finished, which means IWKey is
-+ * loaded. Then, the 'valid_kl' flag is set here when the feature is
-+ * enabled.
++ * int aeskl_setkey(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len)
 + */
- void __init destroy_keylocker_data(void)
- {
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER))
-+		return;
++SYM_FUNC_START(aeskl_setkey)
++	FRAME_BEGIN
++#ifndef __x86_64__
++	push HANDLEP
++	movl (FRAME_OFFSET+8)(%esp),  HANDLEP	# ctx
++	movl (FRAME_OFFSET+12)(%esp), UKEYP	# in_key
++	movl (FRAME_OFFSET+16)(%esp), %edx	# key_len
++#endif
++	movl %edx, 480(HANDLEP)
++	movdqu (UKEYP), STATE1
++	mov $1, %eax
++	cmp $16, %dl
++	je .Lsetkey_128
 +
- 	memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
-+	kl_setup.initialized = true;
-+	valid_kl = true;
- }
- 
- static void __init load_keylocker(void)
-@@ -34,6 +59,27 @@ static void __init load_keylocker(void)
- 	kernel_fpu_end();
- }
- 
-+/**
-+ * copy_keylocker - Copy the internal wrapping key from the backup.
-+ *
-+ * Request hardware to copy the key in non-volatile storage to the CPU
-+ * state.
-+ *
-+ * Returns:	-EBUSY if the copy fails, 0 if successful.
++	movdqu 0x10(UKEYP), STATE2
++	encodekey256 %eax, %eax
++	movdqu STATE4, 0x30(HANDLEP)
++	jmp .Lsetkey_end
++.Lsetkey_128:
++	encodekey128 %eax, %eax
++
++.Lsetkey_end:
++	movdqu STATE1, (HANDLEP)
++	movdqu STATE2, 0x10(HANDLEP)
++	movdqu STATE3, 0x20(HANDLEP)
++
++	xor AREG, AREG
++#ifndef __x86_64__
++	popl HANDLEP
++#endif
++	FRAME_END
++	RET
++SYM_FUNC_END(aeskl_setkey)
++
++/*
++ * int _aeskl_enc(const void *ctx, u8 *dst, const u8 *src)
 + */
-+static int copy_keylocker(void)
-+{
-+	u64 status;
++SYM_FUNC_START(_aeskl_enc)
++	FRAME_BEGIN
++#ifndef __x86_64__
++	pushl HANDLEP
++	pushl KLEN
++	movl (FRAME_OFFSET+12)(%esp), HANDLEP	# ctx
++	movl (FRAME_OFFSET+16)(%esp), OUTP	# dst
++	movl (FRAME_OFFSET+20)(%esp), INP	# src
++#endif
++	movdqu (INP), STATE
++	movl 480(HANDLEP), KLEN
 +
-+	wrmsrl(MSR_IA32_COPY_IWKEY_TO_LOCAL, 1);
++	cmp $16, KLEN
++	je .Lenc_128
++	aesenc256kl (HANDLEP), STATE
++	jz .Lenc_err
++	jmp .Lenc_noerr
++.Lenc_128:
++	aesenc128kl (HANDLEP), STATE
++	jz .Lenc_err
 +
-+	rdmsrl(MSR_IA32_IWKEY_COPY_STATUS, status);
-+	if (status & BIT(0))
-+		return 0;
-+	else
-+		return -EBUSY;
-+}
++.Lenc_noerr:
++	xor AREG, AREG
++	jmp .Lenc_end
++.Lenc_err:
++	mov $1, AREG
++.Lenc_end:
++	movdqu STATE, (OUTP)
++#ifndef __x86_64__
++	popl KLEN
++	popl HANDLEP
++#endif
++	FRAME_END
++	RET
++SYM_FUNC_END(_aeskl_enc)
 +
- /**
-  * setup_keylocker - Enable the feature.
-  * @c:		A pointer to struct cpuinfo_x86
-@@ -52,6 +98,7 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 
- 	if (c == &boot_cpu_data) {
- 		u32 eax, ebx, ecx, edx;
-+		bool backup_available;
- 
- 		cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
- 		/*
-@@ -65,13 +112,54 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 			goto disable;
- 		}
- 
-+		backup_available = !!(ebx & KEYLOCKER_CPUID_EBX_BACKUP);
-+		/*
-+		 * The internal wrapping key in CPU state is volatile in
-+		 * S3/4 states. So ensure the backup capability along with
-+		 * S-states.
-+		 */
-+		if (!backup_available && IS_ENABLED(CONFIG_SUSPEND)) {
-+			pr_debug("x86/keylocker: No key backup support with possible S3/4.\n");
-+			goto disable;
-+		}
-+
- 		generate_keylocker_data();
--	}
-+		load_keylocker();
- 
--	load_keylocker();
-+		/* Backup an internal wrapping key in non-volatile media. */
-+		if (backup_available)
-+			wrmsrl(MSR_IA32_BACKUP_IWKEY_TO_PLATFORM, 1);
- 
--	pr_info_once("x86/keylocker: Enabled.\n");
--	return;
-+		pr_info("x86/keylocker: Enabled.\n");
-+		return;
-+	} else {
-+		int rc;
-+
-+		/*
-+		 * Load the internal wrapping key directly when available
-+		 * in memory, which is only possible at boot-time.
-+		 *
-+		 * NB: When system wakes up, this path also recovers the
-+		 * internal wrapping key.
-+		 */
-+		if (!kl_setup.initialized) {
-+			load_keylocker();
-+			return;
-+		} else if (valid_kl) {
-+			rc = copy_keylocker();
-+			if (!rc)
-+				return;
-+
-+			/*
-+			 * The boot CPU was successful but the key copy
-+			 * fails here. Then, the subsequent feature use
-+			 * will have inconsistent keys and failures. So,
-+			 * invalidate the feature via the flag.
-+			 */
-+			valid_kl = false;
-+			pr_err_once("x86/keylocker: Invalid copy status (rc: %d).\n", rc);
-+		}
-+	}
- 
- disable:
- 	setup_clear_cpu_cap(X86_FEATURE_KEYLOCKER);
-@@ -80,3 +168,45 @@ void __ref setup_keylocker(struct cpuinfo_x86 *c)
- 	/* Make sure the feature disabled for kexec-reboot. */
- 	cr4_clear_bits(X86_CR4_KEYLOCKER);
- }
-+
-+/**
-+ * restore_keylocker - Restore the internal wrapping key.
-+ *
-+ * The boot CPU executes this while other CPUs restore it through the setup
-+ * function.
++/*
++ * int _aeskl_dec(const void *ctx, u8 *dst, const u8 *src)
 + */
-+void restore_keylocker(void)
-+{
-+	u64 backup_status;
-+	int rc;
++SYM_FUNC_START(_aeskl_dec)
++	FRAME_BEGIN
++#ifndef __x86_64__
++	pushl HANDLEP
++	pushl KLEN
++	movl (FRAME_OFFSET+12)(%esp), HANDLEP	# ctx
++	movl (FRAME_OFFSET+16)(%esp), OUTP	# dst
++	movl (FRAME_OFFSET+20)(%esp), INP	# src
++#endif
++	movdqu (INP), STATE
++	mov 480(HANDLEP), KLEN
 +
-+	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER) || !valid_kl)
-+		return;
++	cmp $16, KLEN
++	je .Ldec_128
++	aesdec256kl (HANDLEP), STATE
++	jz .Ldec_err
++	jmp .Ldec_noerr
++.Ldec_128:
++	aesdec128kl (HANDLEP), STATE
++	jz .Ldec_err
 +
-+	/*
-+	 * The IA32_IWKEYBACKUP_STATUS MSR contains a bitmap that indicates
-+	 * an invalid backup if bit 0 is set and a read (or write) error if
-+	 * bit 2 is set.
-+	 */
-+	rdmsrl(MSR_IA32_IWKEY_BACKUP_STATUS, backup_status);
-+	if (backup_status & BIT(0)) {
-+		rc = copy_keylocker();
-+		if (rc)
-+			pr_err("x86/keylocker: Invalid copy state (rc: %d).\n", rc);
-+		else
-+			return;
-+	} else {
-+		pr_err("x86/keylocker: The key backup access failed with %s.\n",
-+		       (backup_status & BIT(2)) ? "read error" : "invalid status");
-+	}
++.Ldec_noerr:
++	xor AREG, AREG
++	jmp .Ldec_end
++.Ldec_err:
++	mov $1, AREG
++.Ldec_end:
++	movdqu STATE, (OUTP)
++#ifndef __x86_64__
++	popl KLEN
++	popl HANDLEP
++#endif
++	FRAME_END
++	RET
++SYM_FUNC_END(_aeskl_dec)
 +
-+	/*
-+	 * Now the backup key is not available. Invalidate the feature via
-+	 * the flag to avoid any subsequent use. But keep the feature with
-+	 * zero IWKeys instead of disabling it. The current users will see
-+	 * key handle integrity failure but that's because of the internal
-+	 * key change.
-+	 */
-+	pr_err("x86/keylocker: Failed to restore internal wrapping key.\n");
-+	valid_kl = false;
-+}
-diff --git a/arch/x86/power/cpu.c b/arch/x86/power/cpu.c
-index 236447ee9beb..34d2cf946b13 100644
---- a/arch/x86/power/cpu.c
-+++ b/arch/x86/power/cpu.c
-@@ -27,6 +27,7 @@
- #include <asm/mmu_context.h>
- #include <asm/cpu_device_id.h>
- #include <asm/microcode.h>
+diff --git a/arch/x86/crypto/aeskl-intel_glue.c b/arch/x86/crypto/aeskl-intel_glue.c
+new file mode 100644
+index 000000000000..0062baaaf7b2
+--- /dev/null
++++ b/arch/x86/crypto/aeskl-intel_glue.c
+@@ -0,0 +1,115 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Support for AES Key Locker instructions. This file contains glue
++ * code and the real AES implementation is in aeskl-intel_asm.S.
++ *
++ * Most code is based on AES-NI glue code, aesni-intel_glue.c
++ */
++
++#include <linux/types.h>
++#include <linux/module.h>
++#include <linux/err.h>
++#include <crypto/algapi.h>
++#include <crypto/aes.h>
++#include <crypto/xts.h>
++#include <crypto/internal/skcipher.h>
++#include <crypto/internal/simd.h>
++#include <asm/simd.h>
++#include <asm/cpu_device_id.h>
++#include <asm/fpu/api.h>
 +#include <asm/keylocker.h>
++
++#include "aes-intel_glue.h"
++#include "aesni-intel_glue.h"
++
++asmlinkage int aeskl_setkey(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len);
++
++asmlinkage int _aeskl_enc(const void *ctx, u8 *out, const u8 *in);
++asmlinkage int _aeskl_dec(const void *ctx, u8 *out, const u8 *in);
++
++static int __maybe_unused aeskl_setkey_common(struct crypto_tfm *tfm, void *raw_ctx,
++					      const u8 *in_key, unsigned int key_len)
++{
++	struct crypto_aes_ctx *ctx = aes_ctx(raw_ctx);
++	int err;
++
++	if (!crypto_simd_usable())
++		return -EBUSY;
++
++	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
++	    key_len != AES_KEYSIZE_256)
++		return -EINVAL;
++
++	kernel_fpu_begin();
++	if (unlikely(key_len == AES_KEYSIZE_192)) {
++		pr_warn_once("AES-KL does not support 192-bit key. Use AES-NI.\n");
++		err = aesni_set_key(ctx, in_key, key_len);
++	} else {
++		if (!valid_keylocker())
++			err = -ENODEV;
++		else
++			err = aeskl_setkey(ctx, in_key, key_len);
++	}
++	kernel_fpu_end();
++
++	return err;
++}
++
++static inline u32 keylength(const void *raw_ctx)
++{
++	struct crypto_aes_ctx *ctx = aes_ctx((void *)raw_ctx);
++
++	return ctx->key_length;
++}
++
++static inline int aeskl_enc(const void *ctx, u8 *out, const u8 *in)
++{
++	if (unlikely(keylength(ctx) == AES_KEYSIZE_192))
++		return -EINVAL;
++	else if (!valid_keylocker())
++		return -ENODEV;
++	else if (_aeskl_enc(ctx, out, in))
++		return -EINVAL;
++	else
++		return 0;
++}
++
++static inline int aeskl_dec(const void *ctx, u8 *out, const u8 *in)
++{
++	if (unlikely(keylength(ctx) == AES_KEYSIZE_192))
++		return -EINVAL;
++	else if (!valid_keylocker())
++		return -ENODEV;
++	else if (_aeskl_dec(ctx, out, in))
++		return -EINVAL;
++	else
++		return 0;
++}
++
++static int __init aeskl_init(void)
++{
++	if (!valid_keylocker())
++		return -ENODEV;
++
++	/*
++	 * AES-KL itself does not depend on AES-NI. But AES-KL does not
++	 * support 192-bit keys. To make itself AES-compliant, it falls
++	 * back to AES-NI.
++	 */
++	if (!boot_cpu_has(X86_FEATURE_AES))
++		return -ENODEV;
++
++	return 0;
++}
++
++static void __exit aeskl_exit(void)
++{
++	return;
++}
++
++late_initcall(aeskl_init);
++module_exit(aeskl_exit);
++
++MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, AES Key Locker implementation");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_CRYPTO("aes");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 9c86f7045157..e432d1ded391 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -573,6 +573,42 @@ config CRYPTO_TWOFISH
  
- #ifdef CONFIG_X86_32
- __visible unsigned long saved_context_ebx;
-@@ -264,6 +265,7 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
- 	x86_platform.restore_sched_clock_state();
- 	cache_bp_restore();
- 	perf_restore_debug_store();
-+	restore_keylocker();
+ 	  See https://www.schneier.com/twofish.html for further information.
  
- 	c = &cpu_data(smp_processor_id());
- 	if (cpu_has(c, X86_FEATURE_MSR_IA32_FEAT_CTL))
++config AS_HAS_KEYLOCKER
++	def_bool $(as-instr,encodekey256 %eax$(comma)%eax)
++	help
++	  Supported by binutils >= 2.36 and LLVM integrated assembler >= V12
++
++config CRYPTO_AES_KL
++	tristate "AES cipher algorithms (AES-KL)"
++	depends on AS_HAS_KEYLOCKER
++	depends on CRYPTO_AES_NI_INTEL
++	select X86_KEYLOCKER
++
++	help
++	  Key Locker provides AES SIMD instructions (AES-KL) for secure
++	  data encryption and decryption. While this new instruction
++	  set is analogous to AES-NI, AES-KL supports to encode an AES
++	  key to an encoded form ('key handle') and uses it to transform
++	  data instead of accessing the AES key.
++
++	  The setkey() transforms an AES key to a key handle, then the AES
++	  key is no longer needed for data transformation. A user may
++	  displace their keys from possible exposition.
++
++	  This key encryption is done by the CPU-internal wrapping key.
++	  This wrapping key support is provided with X86_KEYLOCKER.
++
++	  AES-KL supports 128-/256-bit keys only. While giving a 192-bit
++	  key does not return an error, as the AES-NI driver is chosen to
++	  process it, the claimed security property is not available with
++	  that.
++
++	  Bare metal disk encryption is the preferred use case. Key Locker
++	  usage requires explicit opt-in at setup time. So select it if
++	  unsure.
++
++	  See Documentation/x86/keylocker.rst for more details.
++
+ config CRYPTO_TWOFISH_COMMON
+ 	tristate
+ 	help
 -- 
 2.17.1
 
