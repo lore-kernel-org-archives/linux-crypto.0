@@ -2,87 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4649CC77B70
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 13:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCADC77B61
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 17:22:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229697AbjDJNf7 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 09:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
+        id S230311AbjDJRWV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 13:22:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjDJNf6 (ORCPT
+        with ESMTP id S230309AbjDJRWT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2023 09:35:58 -0400
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE624C09;
-        Mon, 10 Apr 2023 06:35:54 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id EF6EC24E171;
-        Mon, 10 Apr 2023 21:35:44 +0800 (CST)
-Received: from EXMBX164.cuchost.com (172.16.7.74) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 10 Apr
- 2023 21:35:45 +0800
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX164.cuchost.com
- (172.16.6.74) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 10 Apr
- 2023 21:35:44 +0800
-Received: from EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4]) by
- EXMBX168.cuchost.com ([fe80::3c2d:dee5:4938:3fc4%16]) with mapi id
- 15.00.1497.044; Mon, 10 Apr 2023 21:35:44 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "David S . Miller" <davem@davemloft.net>,
+        Mon, 10 Apr 2023 13:22:19 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F41E126A8
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 10:22:16 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5047060185eso2783285a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 10:22:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681147335;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aF4gu0RaNrTTFCvcYQcWRArSpPeebO9/4yLFj3PI3mY=;
+        b=fWCOpX7/SwjuHyqJLAqClg3voZ5jnOfmERlA2t3+Wdt9T0LUdPTYVjAYkiEPr99UP2
+         Nx8wnItxxh0CdR0zx6rkW0veQhlk7VxWS5zTmRO0dzt7ojT1RYshEkgPSquRabUVM+Ya
+         dHJ7o4zREoGZ/ccqzPge9HqhFAOi/MIsI4QoXEWtHuUxBiKXcnhN3unjMjlv356KPCEu
+         PJii2cjj5EbSPOeVYME5nVy2k0DoyEcMbWlniNuwM5+ttHHgciawikdWbFw3uZUd1vlZ
+         w8rE6Ep82LRdkZkdxQRb5K/92nPikFsWfYi41qGwZC1PTvf0dWBevYf8xjGNnFTdhEXo
+         3q4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681147335;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aF4gu0RaNrTTFCvcYQcWRArSpPeebO9/4yLFj3PI3mY=;
+        b=ja1c1yRc1a9MGXxJsYvtaCoF6EMbZqaFuwd2WISv56l+mQWUC8hn9pUQK3OOmTxFoi
+         1UWLmfSokM+H2x1N+V+AwdXUhmgwMxjSXJlrvP3f7CA6mNclaIfssU4zGq6HDiq2GyCr
+         lfIjBBeIgM8PMaTSv3iURApZzQ43/049SUUlSJYpbYnwtNFevfU9OEL5NPkHtGQcU3+W
+         qdWyO6H26tjbOe2qC/wvxjpoxg7+3PMLn5t4E0veohLB0jk8gPXbNKqE7b8S5flvUWGJ
+         1+wicDtNHedO84wzCHGiC1mcwaApOj4CuWMvko8oyVb8wpicBPVJ+7hgGYOFO5/O2nd6
+         CLvw==
+X-Gm-Message-State: AAQBX9cDd4yOFrSCmF/bAbuk4DnbUTV/CwXlogsJixKmQlAcWvzZJcV5
+        +rq8s6tq2reGi7PNaAjPT44wGg==
+X-Google-Smtp-Source: AKy350aNsSC8fqZ/yvuVJrmsoq1jKWAOxaKpue1KeRo5d69Vg7dnLJrE0uJOHhunMzUrshZGuWOHOQ==
+X-Received: by 2002:aa7:d14f:0:b0:4be:b39b:ea8f with SMTP id r15-20020aa7d14f000000b004beb39bea8fmr6554535edo.2.1681147335445;
+        Mon, 10 Apr 2023 10:22:15 -0700 (PDT)
+Received: from ?IPV6:2a02:810d:15c0:828:1a6c:6968:e633:48df? ([2a02:810d:15c0:828:1a6c:6968:e633:48df])
+        by smtp.gmail.com with ESMTPSA id h10-20020aa7de0a000000b005023ddb37eesm4875429edv.8.2023.04.10.10.22.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Apr 2023 10:22:14 -0700 (PDT)
+Message-ID: <5d5e5030-7db7-447e-e5a4-2157171d7575@linaro.org>
+Date:   Mon, 10 Apr 2023 19:22:13 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v7 1/3] dt-bindings: ufs: qcom: Add ICE phandle
+Content-Language: en-US
+To:     Abel Vesa <abel.vesa@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-Subject: RE: [PATCH v4 4/4] crypto: starfive - Add hash and HMAC support
-Thread-Topic: [PATCH v4 4/4] crypto: starfive - Add hash and HMAC support
-Thread-Index: AQHZa3+jdYvISdTjqUmPzN0mADxyja8jpS2AgACU6YD//5HogIAAsqtQ//+FIACAAIes4A==
-Date:   Mon, 10 Apr 2023 13:35:44 +0000
-Message-ID: <2b33000067d54d9e83d5a81ef102d2a9@EXMBX168.cuchost.com>
-References: <20230410073752.39506-1-jiajie.ho@starfivetech.com>
- <20230410073752.39506-5-jiajie.ho@starfivetech.com>
- <ZDO/z++4/TE6AiIz@gondor.apana.org.au>
- <6df549e9-d0f6-23ca-882f-527c4e40b553@starfivetech.com>
- <ZDPgXyGZtMZw5G4q@gondor.apana.org.au>
- <c1925af208b540c2bd78a16bc593ecae@EXMBX168.cuchost.com>
- <ZDQPLGG+DorFwZ+1@gondor.apana.org.au>
-In-Reply-To: <ZDQPLGG+DorFwZ+1@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [161.142.156.149]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <20230408214041.533749-1-abel.vesa@linaro.org>
+ <20230408214041.533749-2-abel.vesa@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230408214041.533749-2-abel.vesa@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> > The sequence of event would be:
-> > 1. Wait for DMA transfer to complete.
-> > 2. Set bit in device CSR to indicate final block has been transferred.
+On 08/04/2023 23:40, Abel Vesa wrote:
+> Starting with SM8550, the ICE will have its own devicetree node
+> so add the qcom,ice property to reference it.
 > 
-> OK, 2 should be done in the DMA callback function.
-> 
-> > 3. Device will send IRQ once result is ready.
-> > 4. Read out final digest value from device.
-> 
-> 4 should be done from a tasklet scheduled from the IRQ handler.
-> 
+> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
 
-I'll update the driver accordingly. 
-Thanks again for the advice.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Regards,
-Jia Jie
+Best regards,
+Krzysztof
+
