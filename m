@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81929C77B74
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 23:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FC6C77B73
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 23:12:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229914AbjDJXMG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 19:12:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47586 "EHLO
+        id S229917AbjDJXMH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 19:12:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbjDJXLn (ORCPT
+        with ESMTP id S229802AbjDJXLo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2023 19:11:43 -0400
+        Mon, 10 Apr 2023 19:11:44 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC30A2135;
-        Mon, 10 Apr 2023 16:11:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B823F2699;
+        Mon, 10 Apr 2023 16:11:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681168302; x=1712704302;
+  t=1681168303; x=1712704303;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=e8bCb4INlqBkf0K+wkKTyG3ginAA5mKmpmasRm00usQ=;
-  b=kciAi+OyVrPTwC+YTe2Hg54uD7HTaP1j7wFBu0d8ITm2GiBpzPMJPIJ/
-   y1Z5bf+wZEUWMIgtS5IMMfQJvguk3IcTBcp6q75SjhtWZo/HhqSluqUsT
-   ua9cZ5eAytCVhh1rj8MsVwInejbHG+ZKcPTbMt6WcQe0LYV62IOcNrB4/
-   t7qu7aUiEe1IcQ+h6tBDQUjhBgmp/o/Erxl2L6LQJMmLCFPEedpUPWghm
-   luufPwJwlpQmHBI9YmYiMm1wovn/GzArJDcxOHg+7H7aX9Qy7oLrkRNZN
-   2wpkE/3IY/+rSYtSoKhmy/+VoUy6aTPb/RXAeGX+AaKVZT2OCUXAiTFBj
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="340962521"
+  bh=gGdT5ei86w9Hizyjm1aYXsjM9Us57NAQM61P97l7pFk=;
+  b=mezJxstoAG2m6k/+UNrGcnTtbun9WK3YGF54kfGaeAOaCkE/yf+o2IA3
+   1wejJBeqqW1XZg72EEU5xjFcOp4Zacn37KgHWbCD4oToBh4kCGkzmnWwP
+   AJhC6uRX0lhV08NdSFfUKVuj1fM+5IJoYT5J2WGgWumBjiu22iY8WeA1M
+   HY/PoqZ6G9OlSRqwYGqHHxB+ia4cJOoLfMgWx3CJgLLz8W8/RWj7TuswY
+   TpEYb9vSQtVZJPA6Za6vTQmpV+SpQucbjJ28kIYcRsmdR8xifcBzvsIxa
+   ksq7VTASCNZonqcZMQp//y+QwkM00Bsh0YvsuXuD5S9d5joL0RmRczpV4
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="340962575"
 X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
-   d="scan'208";a="340962521"
+   d="scan'208";a="340962575"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 16:11:40 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 16:11:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="757607999"
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="757608015"
 X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
-   d="scan'208";a="757607999"
+   d="scan'208";a="757608015"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Apr 2023 16:11:39 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 10 Apr 2023 16:11:41 -0700
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dm-devel@redhat.com
@@ -48,13 +48,12 @@ Cc:     ebiggers@kernel.org, gmazyland@gmail.com, luto@kernel.org,
         ardb@kernel.org, dan.j.williams@intel.com, bernie.keany@intel.com,
         charishma1.gairuboyina@intel.com,
         lalithambika.krishnakumar@intel.com, chang.seok.bae@intel.com,
+        Jonathan Corbet <corbet@lwn.net>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v6 04/12] x86/asm: Add a wrapper function for the LOADIWKEY instruction
-Date:   Mon, 10 Apr 2023 15:59:28 -0700
-Message-Id: <20230410225936.8940-5-chang.seok.bae@intel.com>
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
+Subject: [PATCH v6 09/12] x86/cpu: Add a configuration and command line option for Key Locker
+Date:   Mon, 10 Apr 2023 15:59:33 -0700
+Message-Id: <20230410225936.8940-10-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230410225936.8940-1-chang.seok.bae@intel.com>
 References: <20220112211258.21115-1-chang.seok.bae@intel.com>
@@ -63,124 +62,87 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Key Locker introduces a CPU-internal wrapping key to encode a user key to a
-key handle. Then a key handle is referenced instead of the plain text key.
+Add CONFIG_X86_KEYLOCKER to gate whether Key Locker is initialized at boot.
+The option is selected by the Key Locker cipher module CRYPTO_AES_KL (to be
+added in a later patch).
 
-The new instruction loads an internal wrapping key in the
-software-inaccessible CPU state. It operates only in kernel mode.
-
-Define struct iwkey to pass the key value.
-
-The kernel will use this function to load a new key at boot time when the
-feature is enabled.
+Add a new command line option "nokeylocker" to optionally override the
+default CONFIG_X86_KEYLOCKER=y behavior.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: x86@kernel.org
+Cc: linux-doc@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
 Changes from RFC v2:
-* Separate out the code as a new patch.
-* Improve the usability with the new struct as an argument. (Dan
-  Williams)
-
-Note, Dan wondered if:
-  WARN_ON(!irq_fpu_usable());
-would be appropriate in the load_xmm_iwkey() function.
+* Make the option selected by CRYPTO_AES_KL. (Dan Williams)
+* Massage the changelog and the config option description.
 ---
- arch/x86/include/asm/keylocker.h     | 25 ++++++++++++++++++++++
- arch/x86/include/asm/special_insns.h | 32 ++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
- create mode 100644 arch/x86/include/asm/keylocker.h
+ Documentation/admin-guide/kernel-parameters.txt |  2 ++
+ arch/x86/Kconfig                                |  3 +++
+ arch/x86/kernel/cpu/common.c                    | 16 ++++++++++++++++
+ 3 files changed, 21 insertions(+)
 
-diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-new file mode 100644
-index 000000000000..df84c83228a1
---- /dev/null
-+++ b/arch/x86/include/asm/keylocker.h
-@@ -0,0 +1,25 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef _ASM_KEYLOCKER_H
-+#define _ASM_KEYLOCKER_H
-+
-+#ifndef __ASSEMBLY__
-+
-+#include <asm/fpu/types.h>
-+
-+/**
-+ * struct iwkey - A temporary internal wrapping key storage.
-+ * @integrity_key:	A 128-bit key to check that key handles have not
-+ *			been tampered with.
-+ * @encryption_key:	A 256-bit encryption key used in
-+ *			wrapping/unwrapping a clear text key.
-+ *
-+ * This storage should be flushed immediately after loaded.
-+ */
-+struct iwkey {
-+	struct reg_128_bit integrity_key;
-+	struct reg_128_bit encryption_key[2];
-+};
-+
-+#endif /*__ASSEMBLY__ */
-+#endif /* _ASM_KEYLOCKER_H */
-diff --git a/arch/x86/include/asm/special_insns.h b/arch/x86/include/asm/special_insns.h
-index d6cd9344f6c7..90b23f55970a 100644
---- a/arch/x86/include/asm/special_insns.h
-+++ b/arch/x86/include/asm/special_insns.h
-@@ -9,6 +9,7 @@
- #include <asm/processor-flags.h>
- #include <linux/irqflags.h>
- #include <linux/jump_label.h>
-+#include <asm/keylocker.h>
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 5f2ec4b0f927..6534e6217e56 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -3655,6 +3655,8 @@
  
- /*
-  * The compiler should not reorder volatile asm statements with respect to each
-@@ -296,6 +297,37 @@ static __always_inline void tile_release(void)
- 	asm volatile(".byte 0xc4, 0xe2, 0x78, 0x49, 0xc0");
- }
+ 	nohugevmalloc	[KNL,X86,PPC,ARM64] Disable kernel huge vmalloc mappings.
  
-+/**
-+ * load_xmm_iwkey - Load a CPU-internal wrapping key
-+ * @key:	A struct iwkey pointer.
-+ *
-+ * Load @key to XMMs then do LOADIWKEY. After this, flush XMM
-+ * registers. Caller is responsible for kernel_cpu_begin().
-+ */
-+static inline void load_xmm_iwkey(struct iwkey *key)
++	nokeylocker	[X86] Disable Key Locker hardware feature.
++
+ 	nosmt		[KNL,S390] Disable symmetric multithreading (SMT).
+ 			Equivalent to smt=1.
+ 
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index c94297369448..91f2063ab283 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1894,6 +1894,9 @@ config X86_INTEL_MEMORY_PROTECTION_KEYS
+ 
+ 	  If unsure, say y.
+ 
++config X86_KEYLOCKER
++	bool
++
+ choice
+ 	prompt "TSX enable mode"
+ 	depends on CPU_SUP_INTEL
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index a1edd5997e0a..c5550b8f030d 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -419,6 +419,22 @@ static __always_inline void setup_umip(struct cpuinfo_x86 *c)
+ static const unsigned long cr4_pinned_mask =
+ 	X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_UMIP |
+ 	X86_CR4_FSGSBASE | X86_CR4_CET;
++
++static __init int x86_nokeylocker_setup(char *arg)
 +{
-+	struct reg_128_bit zeros = { 0 };
++	/* Expect an exact match without trailing characters. */
++	if (strlen(arg))
++		return 0;
 +
-+	asm volatile ("movdqu %0, %%xmm0; movdqu %1, %%xmm1; movdqu %2, %%xmm2;"
-+		      :: "m"(key->integrity_key), "m"(key->encryption_key[0]),
-+			 "m"(key->encryption_key[1]));
++	if (!cpu_feature_enabled(X86_FEATURE_KEYLOCKER))
++		return 1;
 +
-+	/*
-+	 * LOADIWKEY %xmm1,%xmm2
-+	 *
-+	 * EAX and XMM0 are implicit operands. Load a key value
-+	 * from XMM0-2 to a software-invisible CPU state. With zero
-+	 * in EAX, CPU does not do hardware randomization and the key
-+	 * backup is allowed.
-+	 *
-+	 * This instruction is supported by binutils >= 2.36.
-+	 */
-+	asm volatile (".byte 0xf3,0x0f,0x38,0xdc,0xd1" :: "a"(0));
-+
-+	asm volatile ("movdqu %0, %%xmm0; movdqu %0, %%xmm1; movdqu %0, %%xmm2;"
-+		      :: "m"(zeros));
++	setup_clear_cpu_cap(X86_FEATURE_KEYLOCKER);
++	pr_info("x86/keylocker: Disabled by kernel command line.\n");
++	return 1;
 +}
++__setup("nokeylocker", x86_nokeylocker_setup);
 +
- #endif /* __KERNEL__ */
+ static DEFINE_STATIC_KEY_FALSE_RO(cr_pinning);
+ static unsigned long cr4_pinned_bits __ro_after_init;
  
- #endif /* _ASM_X86_SPECIAL_INSNS_H */
 -- 
 2.17.1
 
