@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA43C77B75
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 20:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 677A2C77B74
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 20:59:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbjDJU66 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 16:58:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45900 "EHLO
+        id S229942AbjDJU7I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 16:59:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbjDJU64 (ORCPT
+        with ESMTP id S229945AbjDJU7F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2023 16:58:56 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B26E6F;
-        Mon, 10 Apr 2023 13:58:55 -0700 (PDT)
+        Mon, 10 Apr 2023 16:59:05 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06AD919AC;
+        Mon, 10 Apr 2023 13:59:01 -0700 (PDT)
 Received: from stefanw-SCHENKER ([37.4.248.58]) by mrelayeu.kundenserver.de
  (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MlwJv-1qDJ3K0TsR-00j5dn; Mon, 10 Apr 2023 22:58:25 +0200
+ 1Mq33i-1q8c5J2ojK-00nCNa; Mon, 10 Apr 2023 22:58:27 +0200
 From:   Stefan Wahren <stefan.wahren@i2se.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -33,74 +33,72 @@ Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-pm@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH V2 2/6] dt-bindings: crypto: fsl-dcp: add imx6sl and imx6ull compatible
-Date:   Mon, 10 Apr 2023 22:57:59 +0200
-Message-Id: <20230410205803.45853-3-stefan.wahren@i2se.com>
+        linux-pm@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>,
+        Jacky Bai <ping.bai@nxp.com>
+Subject: [PATCH V2 6/6] ARM: dts: imx6ul: Add clock and PGC node to GPC
+Date:   Mon, 10 Apr 2023 22:58:03 +0200
+Message-Id: <20230410205803.45853-7-stefan.wahren@i2se.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230410205803.45853-1-stefan.wahren@i2se.com>
 References: <20230410205803.45853-1-stefan.wahren@i2se.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:u4UCiJkTnoSzdaA3kq33v+s/Pi1vopzInEGk01LNGa+mKCiScvd
- y165hMXMv0tjOC6jUzkbAG3kGIj24s7q8e3etyYqgt7COomH2Q/CZCWDD12B4MEnTskbY5G
- D8faRUTtU2l3pO8II9uZJjLIkz/RbZUqkn5gF9V+fSaIlWupGzn88cUBcuTI+poCo4gaoKH
- RKR5Dj/Wf57UwjIeklo4g==
-UI-OutboundReport: notjunk:1;M01:P0:+uG4vE/bgsA=;4t/3vismX//bq75J5wiQHANcPzt
- bBmsDvFYUbaH2USTbaQpZdbpV2XSpuywitpRLQ1OL1MN6i5qJD065KqLF5bcwNH/jKTqvWt8Z
- QtwjQSwsmvyE98AFy5OSEJ6ofcoTq3exO7rPMeozndW+hPIFRgJRFInKNXZOgOKvuWeUtgJSZ
- vR/bpPTe3i2MRkJmmVZgxvB0+RyT/tRjaZlRKOpnXscgIauKHcWQMIFG01RqyIj0eN/MNdk/u
- W9yL+0DyJ2n5jlpoJMZ4NI989JV3VV40TzdWoVYMt0f27SWkPxFq2e2wTiJ8Um42o+i96WgnK
- SLjDCMxGYAZ0EyDWxvLLZL9JsfQSmK8wJJTr6bEkMEq/UwzLivMxXzVFVjxvHBO+AhGgxr1G4
- +EBnRDMVkzF0eYlXHwA/Mh/eaHzqpihuqIaAnkscJXymtQQfTboGGSRaOmJz9ydBVFQ5HRKpl
- z+BCdC2CQGBOs6ZP/TJHPJ8A7+K8VmG7B4fem0mUXAZav3sHjS+Y73V0jHxsFnP+IwnHykpOJ
- 3yRUURSn0pF4IUtQVTJLHmGTXXKQr8WL09fM5Mdl0JdulLQZ0OIcCNNJI36kwqj10jt4stn4j
- A8xBvHG0DOXsezjdQgiS0ffAQ42xdRxIE4hnQq8PzKux+Cum3pqyXiDaa149XEzX9h/7T4Xjh
- e8vTOd4uXZhVldFrfhys0ogyLEmfVbJWTUvaZ5h7Cg==
+X-Provags-ID: V03:K1:WZWb9zy2e6xiV2Erw3KXRr3x/9eM39sIhOC1xwuV+9SfFMjKR5C
+ wAEc10noMM6Rv6S1mfndJh0nrcRHq7I3BodHvQ3o6BIE4etPFTKIv2ll2YmLi5cP5YWWhaX
+ WVSSlWl8qKZMujjt1WpaBH/hdvdKh9WVml/jPuy0vRluOtlQDIVSUGvkYppE7V1hhJmhC+N
+ ULtuh4O+0a8xKs7cXXKkA==
+UI-OutboundReport: notjunk:1;M01:P0:lJVF6llLldM=;wJzWl01m464IvovsGI/oyUDWGIc
+ Mr2RZ4c2qJVIgSQuCkiZwGHQ77TCaYHpLTW89Y29PBQ0m9ZLL2BYWmKL9IVcRkMPXnZQy9Hzg
+ EpLoopRfs/+0pbGWA2F0sTw+9gaRuBIizFU8k8QGZY7xpPn2UxFLYhxoaFQOU7hnUyQd2bW3Z
+ EAjvkT1Qp/Sx1AT3Sx7UWv4dVIVlWSXPX/6DgHshpOz8LyGXSUytb/73SjtwgK9Fq1ErRFuv9
+ unK6ywXlAgdA7U/VWN4rhPVjq6UjB4WK1mjGHvWGGm0Pv8METad21yokUBIQz5e7oJNxLRy+i
+ tz1HysqsKVeIrQq0OvpnmGHBPm4YJNV37sYDuvYJRRHuy6MIq6lcA0a7+rpflo75QnQUU7hsZ
+ 3TxGQrBFqQzvNbA6IGy+UbJpIuyCxWuhq1ENkSPqvr+CjB0TUZ5MofoLX6wacTNcOu42CPS9Y
+ t45HVyyLrQsfZvDsreXtVRoGsL+U/19fokT0GwSmSk7knJ0928pwMNryCuHWqnEC61cp95wk+
+ EY/X4G8F4LLahwWUOi/M3/MgwDkQzlBDt+0FmoD9BVNRfmRgMl9s+pZ8AHiCb0duwOX/yjcIw
+ 0RIlJ3X3LKzQ9+Jhkjk4h/VvqzLiWJXV0pBq4VwH5BcA1H5Tw/5D0cf+Q82Dr3K/K1S8aPZ0a
+ jDXEI3KO83hGDqhMo9NbgcwXLqKIGynXj+ngYqDu8w==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the dtbs_check for imx6 generates warnings like this:
+According to fsl,imx-gpc.yaml the General Power Control requires
+a ipg clock and a Power Gating Control node. So add them to fix
+the dtbs_check warnings on i.MX6UL boards:
 
-'fsl,imx6sl-dcp' is not one of ['fsl,imx23-dcp', 'fsl,imx28-dcp']
-['fsl,imx6sl-dcp', 'fsl,imx28-dcp'] is too long
+gpc@20dc000: 'clocks' is a required property
+gpc@20dc000: 'clock-names' is a required property
+gpc@20dc000: 'pgc' is a required property
 
-or
-
-'fsl,imx6ull-dcp' is not one of ['fsl,imx23-dcp', 'fsl,imx28-dcp']
-['fsl,imx6ull-dcp', 'fsl,imx28-dcp'] is too long
-
-So add them to the devicetree binding.
-
+Suggested-by: Jacky Bai <ping.bai@nxp.com>
 Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 ---
- .../devicetree/bindings/crypto/fsl-dcp.yaml          | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ arch/arm/boot/dts/imx6ul.dtsi | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml b/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-index 99be01539fcd..8dd36c2f76fd 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-+++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-@@ -11,9 +11,15 @@ maintainers:
+diff --git a/arch/arm/boot/dts/imx6ul.dtsi b/arch/arm/boot/dts/imx6ul.dtsi
+index 118764c50d92..a8efaed69214 100644
+--- a/arch/arm/boot/dts/imx6ul.dtsi
++++ b/arch/arm/boot/dts/imx6ul.dtsi
+@@ -719,6 +719,18 @@ gpc: gpc@20dc000 {
+ 				#interrupt-cells = <3>;
+ 				interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
+ 				interrupt-parent = <&intc>;
++				clocks = <&clks IMX6UL_CLK_IPG>;
++				clock-names = "ipg";
++
++				pgc {
++						#address-cells = <1>;
++						#size-cells = <0>;
++
++						power-domain@0 {
++							reg = <0>;
++							#power-domain-cells = <0>;
++						};
++				};
+ 			};
  
- properties:
-   compatible:
--    enum:
--      - fsl,imx23-dcp
--      - fsl,imx28-dcp
-+    oneOf:
-+      - enum:
-+          - fsl,imx23-dcp
-+          - fsl,imx28-dcp
-+      - items:
-+          - enum:
-+              - fsl,imx6sl-dcp
-+              - fsl,imx6ull-dcp
-+          - const: fsl,imx28-dcp
- 
-   reg:
-     maxItems: 1
+ 			iomuxc: pinctrl@20e0000 {
 -- 
 2.34.1
 
