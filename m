@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46D9C77B70
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 23:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6591C76196
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 23:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbjDJXLw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 19:11:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
+        id S229899AbjDJXMF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 19:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbjDJXLm (ORCPT
+        with ESMTP id S229507AbjDJXLn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2023 19:11:42 -0400
+        Mon, 10 Apr 2023 19:11:43 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E65B82118;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA653212F;
         Mon, 10 Apr 2023 16:11:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1681168301; x=1712704301;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=ICOUeWJ4MvP0vL80dft48PfCDjzRn/jTo0cQSkMOY5o=;
-  b=BJVqyUW6fr1++i17en4FHgZjoOT7E6mRvVuu4LVkLkX94Ve67nWn5fFk
-   ho/OoxJQJliW/t1PSfYw1OKyJ2AnPn9LtQurXhS3yFSXvRDII6WTAzyLy
-   PQUWnveojym3rAZcUavXzLJ/wEB/QZBIZZW7wWCgkVoKx1UcuHb6+2hhr
-   2u6LMp9RGNOVD/MM5uJ+tvCAL8kET4w9lLJC5z8L/1etyuR6nSM7/uDB9
-   0EZrcmIgYpsPPBO6ZtEqZMDADx1rGJU/faaKmsN0yHElBxXmZwC5fTagb
-   Mql1WALFP/rlrLXuRfAeX83c8bBc/SnlFJz5a7FsIYKuFH4P9Wfn40E1k
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="340962538"
+  bh=1nnA3+UMtwhKXHQJhoeke18gc8xz62Yzi4vhC4igcco=;
+  b=fVnt/qm4yLQ85OxedmG0vaSltMnLh+2DmHnNgZxmDENXUfKHf/17OAHI
+   4xYD+JUnLL0BdFAEGJDPX6GKoc/M5JvX7fPd/yQcTVkZtlgiuhtJ96JJm
+   590OJtTXuR1wYN6BAem5G+l7CzNy4DWSjy29YMDD0jaGXab1doHttpCuG
+   h1NmlLcaTTHOS4vLuQSuxb5O4H+nXPqPeuz2dnA6imcw5WOd3J+RhRilt
+   nstoBWUqSn+CcJS8VE/ITJh3YW2isGxgCfqMCc7dAN+xWKbqP0FhBHDnE
+   KTe+VySHN0XReTqjPWfWKfeDUMmhkThjuSf3izMZs/xfQuCzpyNjNEjl7
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="340962518"
 X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
-   d="scan'208";a="340962538"
+   d="scan'208";a="340962518"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 16:11:40 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 16:11:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="757608002"
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="757607996"
 X-IronPort-AV: E=Sophos;i="5.98,335,1673942400"; 
-   d="scan'208";a="757608002"
+   d="scan'208";a="757607996"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by fmsmga004.fm.intel.com with ESMTP; 10 Apr 2023 16:11:40 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 10 Apr 2023 16:11:39 -0700
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dm-devel@redhat.com
@@ -49,11 +49,10 @@ Cc:     ebiggers@kernel.org, gmazyland@gmail.com, luto@kernel.org,
         charishma1.gairuboyina@intel.com,
         lalithambika.krishnakumar@intel.com, chang.seok.bae@intel.com,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v6 05/12] x86/msr-index: Add MSRs for Key Locker internal wrapping key
-Date:   Mon, 10 Apr 2023 15:59:29 -0700
-Message-Id: <20230410225936.8940-6-chang.seok.bae@intel.com>
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v6 03/12] x86/insn: Add Key Locker instructions to the opcode map
+Date:   Mon, 10 Apr 2023 15:59:27 -0700
+Message-Id: <20230410225936.8940-4-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230410225936.8940-1-chang.seok.bae@intel.com>
 References: <20220112211258.21115-1-chang.seok.bae@intel.com>
@@ -62,25 +61,51 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CPU state that contains the internal wrapping key is in the same power
-domain as the cache. So any sleep state that would invalidate the cache
-(like S3) also invalidates the state of the wrapping key.
+Add the following Key Locker instructions to the opcode map:
 
-But, since the state is inaccessible to software, it needs a special
-mechanism to save and restore the key during deep sleep.
+LOADIWKEY:
+	Load an CPU-internal wrapping key.
 
-A set of new MSRs are provided as an abstract interface to save and restore
-the wrapping key, and to check the key status.
+ENCODEKEY128:
+	Wrap a 128-bit AES key to a key handle.
 
-The wrapping key is saved in a platform-scoped state of non-volatile media.
-The backup itself and its path from the CPU are encrypted and integrity
-protected.
+ENCODEKEY256:
+	Wrap a 256-bit AES key to a key handle.
 
-But this storage's non-volatility is not architecturally guaranteed across
-off states, such as S5 and G3.
+AESENC128KL:
+	Encrypt a 128-bit block of data using a 128-bit AES key indicated
+	by a key handle.
 
-The MSRs will be used to back up the key for S3/4 sleep states. Then the
-kernel code writes one of them to restore the key in each CPU state.
+AESENC256KL:
+	Encrypt a 128-bit block of data using a 256-bit AES key indicated
+	by a key handle.
+
+AESDEC128KL:
+	Decrypt a 128-bit block of data using a 128-bit AES key indicated
+	by a key handle.
+
+AESDEC256KL:
+	Decrypt a 128-bit block of data using a 256-bit AES key indicated
+	by a key handle.
+
+AESENCWIDE128KL:
+	Encrypt 8 128-bit blocks of data using a 128-bit AES key indicated
+	by a key handle.
+
+AESENCWIDE256KL:
+	Encrypt 8 128-bit blocks of data using a 256-bit AES key indicated
+	by a key handle.
+
+AESDECWIDE128KL:
+	Decrypt 8 128-bit blocks of data using a 128-bit AES key indicated
+	by a key handle.
+
+AESDECWIDE256KL:
+	Decrypt 8 128-bit blocks of data using a 256-bit AES key indicated
+	by a key handle.
+
+Details of these instructions can be found in Intel Software Developer's
+Manual.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
@@ -89,32 +114,78 @@ Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
 Cc: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
-Changes from RFC v2:
-* Update the changelog. (Dan Williams)
-* Rename the MSRs. (Dan Williams)
+Changes from RFC v1:
+* Separated out the LOADIWKEY addition in a new patch.
+* Included AES instructions to avoid warning messages when the AES Key
+  Locker module is built.
 ---
- arch/x86/include/asm/msr-index.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/lib/x86-opcode-map.txt       | 11 +++++++----
+ tools/arch/x86/lib/x86-opcode-map.txt | 11 +++++++----
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index ad35355ee43e..4fa3b9e26162 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -1115,4 +1115,10 @@
- 						* a #GP
- 						*/
+diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
+index 5168ee0360b2..87e9696c47d2 100644
+--- a/arch/x86/lib/x86-opcode-map.txt
++++ b/arch/x86/lib/x86-opcode-map.txt
+@@ -800,11 +800,12 @@ cb: sha256rnds2 Vdq,Wdq | vrcp28ss/d Vx,Hx,Wx (66),(ev)
+ cc: sha256msg1 Vdq,Wdq | vrsqrt28ps/d Vx,Wx (66),(ev)
+ cd: sha256msg2 Vdq,Wdq | vrsqrt28ss/d Vx,Hx,Wx (66),(ev)
+ cf: vgf2p8mulb Vx,Wx (66)
++d8: AESENCWIDE128KL Qpi (F3),(000),(00B) | AESENCWIDE256KL Qpi (F3),(000),(10B) | AESDECWIDE128KL Qpi (F3),(000),(01B) | AESDECWIDE256KL Qpi (F3),(000),(11B)
+ db: VAESIMC Vdq,Wdq (66),(v1)
+-dc: vaesenc Vx,Hx,Wx (66)
+-dd: vaesenclast Vx,Hx,Wx (66)
+-de: vaesdec Vx,Hx,Wx (66)
+-df: vaesdeclast Vx,Hx,Wx (66)
++dc: vaesenc Vx,Hx,Wx (66) | LOADIWKEY Vx,Hx (F3) | AESENC128KL Vpd,Qpi (F3)
++dd: vaesenclast Vx,Hx,Wx (66) | AESDEC128KL Vpd,Qpi (F3)
++de: vaesdec Vx,Hx,Wx (66) | AESENC256KL Vpd,Qpi (F3)
++df: vaesdeclast Vx,Hx,Wx (66) | AESDEC256KL Vpd,Qpi (F3)
+ f0: MOVBE Gy,My | MOVBE Gw,Mw (66) | CRC32 Gd,Eb (F2) | CRC32 Gd,Eb (66&F2)
+ f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
+ f2: ANDN Gy,By,Ey (v)
+@@ -814,6 +815,8 @@ f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,
+ f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
+ f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3)
+ f9: MOVDIRI My,Gy
++fa: ENCODEKEY128 Ew,Ew (F3)
++fb: ENCODEKEY256 Ew,Ew (F3)
+ EndTable
  
-+/* MSRs for managing an internal wrapping key for Key Locker. */
-+#define MSR_IA32_IWKEY_COPY_STATUS		0x00000990
-+#define MSR_IA32_IWKEY_BACKUP_STATUS		0x00000991
-+#define MSR_IA32_BACKUP_IWKEY_TO_PLATFORM	0x00000d91
-+#define MSR_IA32_COPY_IWKEY_TO_LOCAL		0x00000d92
-+
- #endif /* _ASM_X86_MSR_INDEX_H */
+ Table: 3-byte opcode 2 (0x0f 0x3a)
+diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
+index 5168ee0360b2..87e9696c47d2 100644
+--- a/tools/arch/x86/lib/x86-opcode-map.txt
++++ b/tools/arch/x86/lib/x86-opcode-map.txt
+@@ -800,11 +800,12 @@ cb: sha256rnds2 Vdq,Wdq | vrcp28ss/d Vx,Hx,Wx (66),(ev)
+ cc: sha256msg1 Vdq,Wdq | vrsqrt28ps/d Vx,Wx (66),(ev)
+ cd: sha256msg2 Vdq,Wdq | vrsqrt28ss/d Vx,Hx,Wx (66),(ev)
+ cf: vgf2p8mulb Vx,Wx (66)
++d8: AESENCWIDE128KL Qpi (F3),(000),(00B) | AESENCWIDE256KL Qpi (F3),(000),(10B) | AESDECWIDE128KL Qpi (F3),(000),(01B) | AESDECWIDE256KL Qpi (F3),(000),(11B)
+ db: VAESIMC Vdq,Wdq (66),(v1)
+-dc: vaesenc Vx,Hx,Wx (66)
+-dd: vaesenclast Vx,Hx,Wx (66)
+-de: vaesdec Vx,Hx,Wx (66)
+-df: vaesdeclast Vx,Hx,Wx (66)
++dc: vaesenc Vx,Hx,Wx (66) | LOADIWKEY Vx,Hx (F3) | AESENC128KL Vpd,Qpi (F3)
++dd: vaesenclast Vx,Hx,Wx (66) | AESDEC128KL Vpd,Qpi (F3)
++de: vaesdec Vx,Hx,Wx (66) | AESENC256KL Vpd,Qpi (F3)
++df: vaesdeclast Vx,Hx,Wx (66) | AESDEC256KL Vpd,Qpi (F3)
+ f0: MOVBE Gy,My | MOVBE Gw,Mw (66) | CRC32 Gd,Eb (F2) | CRC32 Gd,Eb (66&F2)
+ f1: MOVBE My,Gy | MOVBE Mw,Gw (66) | CRC32 Gd,Ey (F2) | CRC32 Gd,Ew (66&F2)
+ f2: ANDN Gy,By,Ey (v)
+@@ -814,6 +815,8 @@ f6: ADCX Gy,Ey (66) | ADOX Gy,Ey (F3) | MULX By,Gy,rDX,Ey (F2),(v) | WRSSD/Q My,
+ f7: BEXTR Gy,Ey,By (v) | SHLX Gy,Ey,By (66),(v) | SARX Gy,Ey,By (F3),(v) | SHRX Gy,Ey,By (F2),(v)
+ f8: MOVDIR64B Gv,Mdqq (66) | ENQCMD Gv,Mdqq (F2) | ENQCMDS Gv,Mdqq (F3)
+ f9: MOVDIRI My,Gy
++fa: ENCODEKEY128 Ew,Ew (F3)
++fb: ENCODEKEY256 Ew,Ew (F3)
+ EndTable
+ 
+ Table: 3-byte opcode 2 (0x0f 0x3a)
 -- 
 2.17.1
 
