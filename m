@@ -2,141 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93DFAC77B6F
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 08:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB14CC77B61
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Apr 2023 09:10:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229700AbjDJIs6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Apr 2023 04:48:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36280 "EHLO
+        id S229818AbjDJJKy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Apr 2023 05:10:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbjDJIsl (ORCPT
+        with ESMTP id S229785AbjDJJKZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Apr 2023 04:48:41 -0400
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB82559F3;
-        Mon, 10 Apr 2023 01:47:31 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id BFC6924E0D6;
-        Mon, 10 Apr 2023 16:43:40 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 10 Apr
- 2023 16:43:41 +0800
-Received: from [192.168.155.128] (202.188.176.82) by EXMBX168.cuchost.com
- (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 10 Apr
- 2023 16:43:37 +0800
-Message-ID: <6df549e9-d0f6-23ca-882f-527c4e40b553@starfivetech.com>
-Date:   Mon, 10 Apr 2023 16:43:37 +0800
+        Mon, 10 Apr 2023 05:10:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B26D33AA7
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 02:10:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4D1E360EAB
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 09:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40B2C4339C
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 09:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681117823;
+        bh=EnS4Za9wWGQUDLP6ZUsyP+vM/Yrl2QXc/bQ4IWvbCuY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=iVF6eZh5N9u9+FtOTYoV70kKks1IFjl3juU3kbDgbm2QaGXUV62X9L5aVb5+jK1yK
+         85NbDXTIZiPnp9JpNhlbMlO10N6guh4iVriRcqx8OPg2dECZ3oRP9HcN8DhVRCIJnR
+         UaHJTsyil+3plUmpGMX9wujqnh+igYCXD6ZyBp7Z2xoWdE/w0gsv/MvP8XYxm/TuUs
+         uMxYoUHsYfeh3wUhNC4e7MjRXCk9TG13Nz+RGFC66PwxPQcdd5jkgoewu4DHmxPqQl
+         fXw2+P9VJSf5vhQ5lRyyL8Ops6t/6G/CqizL9DE1x+V0Jq7Hzdk3ukk24e1uUNzN/C
+         7Fxrx0U6HAV/Q==
+Received: by mail-lf1-f51.google.com with SMTP id r27so5680245lfe.0
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 02:10:23 -0700 (PDT)
+X-Gm-Message-State: AAQBX9ewZdravQNCpez7SDLvUoemc62z1oUhlvinOeOFMXn06x70Fyjo
+        H3cD+DNZieN7zZUimMwxfaN6BGCa+PhnGlZME9k=
+X-Google-Smtp-Source: AKy350Y26/TLrecJNbfS01aqrFvgjqLsQ/36JJdiA2gAY3yVzVePPFNHMVhC1fMnD3I7dkIlxOpya+SgHv+IoqPa1uE=
+X-Received: by 2002:ac2:4908:0:b0:4db:1c2a:a96e with SMTP id
+ n8-20020ac24908000000b004db1c2aa96emr1761537lfi.9.1681117821725; Mon, 10 Apr
+ 2023 02:10:21 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v4 4/4] crypto: starfive - Add hash and HMAC support
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
-References: <20230410073752.39506-1-jiajie.ho@starfivetech.com>
- <20230410073752.39506-5-jiajie.ho@starfivetech.com>
- <ZDO/z++4/TE6AiIz@gondor.apana.org.au>
-From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
-In-Reply-To: <ZDO/z++4/TE6AiIz@gondor.apana.org.au>
+References: <20230408152722.3975985-1-ardb@kernel.org> <CAMj1kXEtwDyaJASbpRGOf9P1pvoyt02HMN9pawq4QyRD8UzJoA@mail.gmail.com>
+In-Reply-To: <CAMj1kXEtwDyaJASbpRGOf9P1pvoyt02HMN9pawq4QyRD8UzJoA@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 10 Apr 2023 11:10:10 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXH5PhrQbwAOvpGwqCU-TTmfK-=eYbbwbcxra=e_8wjX-g@mail.gmail.com>
+Message-ID: <CAMj1kXH5PhrQbwAOvpGwqCU-TTmfK-=eYbbwbcxra=e_8wjX-g@mail.gmail.com>
+Subject: Re: [PATCH 00/10] crypto: x86 - avoid absolute references
+To:     linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Kees Cook <keescook@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [202.188.176.82]
-X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
- (172.16.6.78)
-X-YovoleRuleAgent: yovoleflag
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 10/4/2023 3:50 pm, Herbert Xu wrote:
-> On Mon, Apr 10, 2023 at 03:37:52PM +0800, Jia Jie Ho wrote:
->>
->> +static void starfive_hash_start(void *param)
->> +{
->> +	struct starfive_cryp_ctx *ctx = param;
->> +	struct starfive_cryp_request_ctx *rctx = ctx->rctx;
->> +	struct starfive_cryp_dev *cryp = ctx->cryp;
->> +	union starfive_alg_cr alg_cr;
->> +	union starfive_hash_csr csr;
->> +
->> +	dma_unmap_sg(cryp->dev, rctx->in_sg, rctx->in_sg_len, DMA_TO_DEVICE);
->> +
->> +	alg_cr.v = 0;
->> +	alg_cr.clear = 1;
->> +
->> +	writel(alg_cr.v, cryp->base + STARFIVE_ALG_CR_OFFSET);
->> +
->> +	csr.v = readl(cryp->base + STARFIVE_HASH_SHACSR);
->> +	csr.firstb = 0;
->> +	csr.final = 1;
->> +
->> +	reinit_completion(&cryp->hash_done);
->> +	writel(~STARFIVE_IE_MASK_HASH_DONE, cryp->base + STARFIVE_IE_MASK_OFFSET);
->> +	writel(csr.v, cryp->base + STARFIVE_HASH_SHACSR);
->> +}
-> 
-> Why are you still using a completion? The callback function should
-> invoke the crypto_engine finalize_request call directly.
-> 
+On Sat, 8 Apr 2023 at 17:32, Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> On Sat, 8 Apr 2023 at 17:27, Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > This is preparatory work for allowing the kernel to be built as a PIE
+> > executable, which relies mostly on RIP-relative symbol references from
+> > code, which don't need to be updated when a binary is loaded at an
+> > address different from its link time address.
+> >
+> > Most changes are quite straight-forward, i.e., just adding a (%rip)
+> > suffix is enough in many cases. However, some are slightly trickier, and
+> > need some minor reshuffling of the asm code to get rid of the absolute
+> > references in the code.
+> >
+> > Tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y on a x86 CPU that
+> > implements AVX, AVX2 and AVX512.
+> >
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: Eric Biggers <ebiggers@kernel.org>
+> > Cc: Kees Cook <keescook@chromium.org>
+> >
+> > Ard Biesheuvel (10):
+>
+> >   crypto: x86/camellia - Use RIP-relative addressing
+> >   crypto: x86/cast5 - Use RIP-relative addressing
+> >   crypto: x86/cast6 - Use RIP-relative addressing
+> >   crypto: x86/des3 - Use RIP-relative addressing
+>
+> Note: the patches above are
+>
+> Co-developed-by: Thomas Garnier <thgarnie@chromium.org>
+> Signed-off-by: Thomas Garnier <thgarnie@chromium.org>
+>
+> but this got lost inadvertently - apologies.
+>
+> Herbert: will patchwork pick those up if I put them in a reply to each
+> of those individual patches?
+>
 
-Hi Herbert,
-The hardware requires user to set a 'final' bit after data transfer completed.
-This completion is to wait for the interrupt signal from device that the final digest 
-has been populated to the read registers.
-
-I'll do the finalize_request call directly in the next version.
-
->> +static int starfive_hash_xmit(struct starfive_cryp_ctx *ctx)
->> +{
->> +	struct starfive_cryp_request_ctx *rctx = ctx->rctx;
->> +	struct starfive_cryp_dev *cryp = ctx->cryp;
->> +	int ret;
->> +
->> +	rctx->csr.hash.v = 0;
->> +	rctx->csr.hash.reset = 1;
->> +	writel(rctx->csr.hash.v, cryp->base + STARFIVE_HASH_SHACSR);
->> +
->> +	if (starfive_hash_wait_busy(ctx))
->> +		return dev_err_probe(cryp->dev, -ETIMEDOUT, "Error resetting engine.\n");
->> +
->> +	rctx->csr.hash.v = 0;
->> +	rctx->csr.hash.mode = ctx->hash_mode & STARFIVE_HASH_MODE_MASK;
->> +	rctx->csr.hash.ie = 1;
->> +
->> +	if (ctx->hash_mode & STARFIVE_HASH_HMAC_FLAGS) {
->> +		ret = starfive_hash_hmac_key(ctx);
->> +		if (ret)
->> +			return ret;
->> +	} else {
->> +		rctx->csr.hash.start = 1;
->> +		rctx->csr.hash.firstb = 1;
->> +		writel(rctx->csr.hash.v, cryp->base + STARFIVE_HASH_SHACSR);
->> +	}
->> +
->> +	ret = starfive_hash_xmit_dma(ctx);
->> +	if (ret)
->> +		return ret;
->> +
->> +	if (!wait_for_completion_timeout(&cryp->hash_done, msecs_to_jiffies(10000)))
->> +		return dev_err_probe(cryp->dev, -ETIMEDOUT, "Timeout waiting for hash done\n");
-> 
-> There is no point in waiting for completion.  Just return 0 and
-> you're done.
-> 
-
-I'll change this in the next version too.
-
-Thanks for taking time reviewing this patch.
-
-Best regards,
-Jia Jie
-
+Never mind, I'll be sending out a v2 in any case.
