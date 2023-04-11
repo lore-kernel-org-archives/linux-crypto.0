@@ -2,60 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06F5C76196
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Apr 2023 05:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EA1C76196
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Apr 2023 05:47:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbjDKFqW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Apr 2023 01:46:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56444 "EHLO
+        id S230186AbjDKFro (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Apr 2023 01:47:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230112AbjDKFqQ (ORCPT
+        with ESMTP id S230190AbjDKFrU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Apr 2023 01:46:16 -0400
+        Tue, 11 Apr 2023 01:47:20 -0400
 Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E1310DA
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 22:46:11 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id qa44so17137265ejc.4
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 22:46:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53E930F9
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 22:46:58 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id f26so11328580ejb.1
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Apr 2023 22:46:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1681191969;
+        d=linaro.org; s=google; t=1681192014;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Xihmr9JL0Vhdbfp74EXOqdqMM6EAF6p1smPLjZIdIQE=;
-        b=bTkaxylAGG9cL59FJ6r3UP6O/AXJcv7OzX36B7yfYZ57VCz4O5YWb4HjDojB4jvHyb
-         eCeH/s9yAOO00bUB96rxCNCaa7XwGBS+TG/GBt/NDYqGTkCYqevwopDXUPWFRpC5NIqX
-         03JNqc61S0YCgKosNqMg0bCKmXspaWE6DfNyDrRZLd9jQ9wyndZCHKas5UsGU51ttY/Z
-         LfW5+tmDhoaP/5GsHXQEqsrtQYRfDR4PfqaD2cuTNr623hRoD2Dz6K9ANXteWPLvmyCd
-         CZCspl+lq0Q5AIzq6mNbA56dXoM6XIiHWkpi4lPSRWgIeMNyA3+IOKNwydnuhMaMTtKW
-         DoRg==
+        bh=/pS0YHLfeqUXxXueVr3xrpqfYzfFGCjkGT7qYBY7SpQ=;
+        b=GVral6enKQmYqWeI17NidZmmODtmBgPO48BHtpOhGVXebFO7gIcRgTB485y+xw7YrY
+         zV8iPV3ZQRCorR2soGJtBXTEe5Wx3tuUVt37a5SE5AO3UZd5FIrCOX3qtp8AHyAtFN9o
+         4aJVXZGGpEjSjOO4xAU8Is13FOekSNuuZcCr7ynfyza0ftmnT5ZESjFl1kFEvVG5/f4t
+         YX0unimqbu8SUs0t1t5jj98lWXmrO1PjR3yBCEUJtqfVQ57Q3/v7n3y2GMnM93I9+uCb
+         SSjuU7UN0prH7hd2Jz7jof+tbCMrSqJWqdcROJQp2IDunLcEpZQcH6sSvqvdl4bjzQYG
+         4RYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681191969;
+        d=1e100.net; s=20210112; t=1681192014;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xihmr9JL0Vhdbfp74EXOqdqMM6EAF6p1smPLjZIdIQE=;
-        b=l4qoTTmYHtOqQ1IZ2R1H/b/Oybr37qG5AHdqvWJwNZIfTgW/cFSdewjvcmnf75hx5g
-         NSLIP0FqIXorB2PZphIRwK0iTn2fWDtHdv9GXHfDopoM3fbZ57LpVt8Eip2I2f65XXF+
-         HXAsVO+ieX4NO9ziAHqmcg8f4muKwnaO9H6qKoRT8cD5mtCI1oF753ui0RVeO1xf6c3M
-         NcHxIWW7s2gNR1OKqr9OsKGWg+XGJEQalUoMedMwxD86Ddar3iLVmvPyUn18dueW24KB
-         vhjlGmn+KzT7Bi1mQy5dEFqwi/KLuLX4rINbXrJ4hVT0J6V+gwQpU9c70xoBga2Bjg9A
-         qOIw==
-X-Gm-Message-State: AAQBX9cMPpb3KevG6CWC/yKxBNq7ZEQa7+PTvfDs49U7bkFpepY4eg9S
-        0yTz9yBbIO9vmoW71Vf8IrGRcg==
-X-Google-Smtp-Source: AKy350Y+EqZzcprQnTEQPVL3vMWZOK+45c9QuOgJkvcIYZwiYynI5m2dsKOmr8YO99UKYCsC/hv4Xw==
-X-Received: by 2002:a17:906:ca44:b0:90b:53f6:fd8b with SMTP id jx4-20020a170906ca4400b0090b53f6fd8bmr9755035ejb.31.1681191969687;
-        Mon, 10 Apr 2023 22:46:09 -0700 (PDT)
+        bh=/pS0YHLfeqUXxXueVr3xrpqfYzfFGCjkGT7qYBY7SpQ=;
+        b=dTW2GwsDHgNZ9p/Ovk9b7e03iWY8aZGez+gr7YIWOjUcLQx+0QhyLoOJCYxwWfi4tv
+         b3Cb8VnEUsIYy/ca9ZloQJsRpW6CSvTMKYRPyLr3uD/AQ8LJBdG98cbwi6Jx85Ja+L48
+         F88rUxdLD11JGsAlgizFgThAu86oyqxovtxLwBPEIpsQo4/rwzzpyGGYylIh7wkv+U9O
+         aDoihIt0MX1X2/KnwGlGRAYSh+bQoiXWa3FqtlZGYMqPEGvj5VY4R5x6FgrZovGV1qvn
+         fVvPgei3bAencuDAt8janzv9j8d9SfJPZBB6gaQKRKAqX26iL46oGFs3W14M5vglODof
+         xfkQ==
+X-Gm-Message-State: AAQBX9fHhl6AJtgoD331PQ6OnZQHyUM41rKZbW8ce9NmU+JIFnebc+ZU
+        9oSQ8QlybMjr0KNgMYFvpvtm7A==
+X-Google-Smtp-Source: AKy350a47ut/AkoSQIwjbjtHVtAuQPe8zGjAcqV7+PVPlBYc8n00LUtmFdTEEoQ6FmCGLG+TbipydQ==
+X-Received: by 2002:a17:907:a44:b0:947:d3d0:ae1c with SMTP id be4-20020a1709070a4400b00947d3d0ae1cmr12030744ejc.0.1681192014573;
+        Mon, 10 Apr 2023 22:46:54 -0700 (PDT)
 Received: from ?IPV6:2a02:810d:15c0:828:dad2:72b7:3626:af61? ([2a02:810d:15c0:828:dad2:72b7:3626:af61])
-        by smtp.gmail.com with ESMTPSA id m2-20020a1709062ac200b008b176df2899sm5750277eje.160.2023.04.10.22.46.08
+        by smtp.gmail.com with ESMTPSA id xj11-20020a170906db0b00b0092be625d981sm5756333ejb.91.2023.04.10.22.46.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Apr 2023 22:46:09 -0700 (PDT)
-Message-ID: <83c098ed-a9f4-e856-fea7-c8714c1cc1aa@linaro.org>
-Date:   Tue, 11 Apr 2023 07:46:07 +0200
+        Mon, 10 Apr 2023 22:46:54 -0700 (PDT)
+Message-ID: <a0a64ba0-cbd0-1e43-320e-a9036da60613@linaro.org>
+Date:   Tue, 11 Apr 2023 07:46:52 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.1
-Subject: Re: [PATCH V2 6/6] ARM: dts: imx6ul: Add clock and PGC node to GPC
+Subject: Re: [PATCH V2 1/6] dt-bindings: serial: fsl-imx-uart: add missing
+ properties
 Content-Language: en-US
 To:     Stefan Wahren <stefan.wahren@i2se.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -72,48 +73,29 @@ Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-pm@vger.kernel.org, Jacky Bai <ping.bai@nxp.com>
+        linux-pm@vger.kernel.org
 References: <20230410205803.45853-1-stefan.wahren@i2se.com>
- <20230410205803.45853-7-stefan.wahren@i2se.com>
+ <20230410205803.45853-2-stefan.wahren@i2se.com>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230410205803.45853-7-stefan.wahren@i2se.com>
+In-Reply-To: <20230410205803.45853-2-stefan.wahren@i2se.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 10/04/2023 22:58, Stefan Wahren wrote:
-> According to fsl,imx-gpc.yaml the General Power Control requires
-> a ipg clock and a Power Gating Control node. So add them to fix
-> the dtbs_check warnings on i.MX6UL boards:
+On 10/04/2023 22:57, Stefan Wahren wrote:
+> Currently the dtbs_check for imx generates warnings like this:
 > 
-> gpc@20dc000: 'clocks' is a required property
-> gpc@20dc000: 'clock-names' is a required property
-> gpc@20dc000: 'pgc' is a required property
+> serial@7000c000: Unevaluated properties are not allowed
+> ('clock-names', 'clocks', 'dma-names', 'dmas' were unexpected)
 > 
-> Suggested-by: Jacky Bai <ping.bai@nxp.com>
+> So add the missing properties to the devicetree binding.
+> 
 > Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-> ---
->  arch/arm/boot/dts/imx6ul.dtsi | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/arm/boot/dts/imx6ul.dtsi b/arch/arm/boot/dts/imx6ul.dtsi
-> index 118764c50d92..a8efaed69214 100644
-> --- a/arch/arm/boot/dts/imx6ul.dtsi
-> +++ b/arch/arm/boot/dts/imx6ul.dtsi
-> @@ -719,6 +719,18 @@ gpc: gpc@20dc000 {
->  				#interrupt-cells = <3>;
->  				interrupts = <GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH>;
->  				interrupt-parent = <&intc>;
-> +				clocks = <&clks IMX6UL_CLK_IPG>;
-> +				clock-names = "ipg";
-> +
-> +				pgc {
-> +						#address-cells = <1>;
-> +						#size-cells = <0>;
 
-Wrong indentation.
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
