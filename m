@@ -2,98 +2,82 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC1DC7619A
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 11:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05633C77B6E
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 13:25:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbjDLLzw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Apr 2023 07:55:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
+        id S230363AbjDLNZY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Apr 2023 09:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231409AbjDLLzo (ORCPT
+        with ESMTP id S231613AbjDLNYv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2023 07:55:44 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61BD77EC4
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:55:43 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id y11-20020a17090a600b00b0024693e96b58so10168136pji.1
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:55:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1681300543; x=1683892543;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JdU41sKVVYSe/xl+xymK9a9yazNGz6ifbujCFlYI9rk=;
-        b=R2nBc2dZiZqmMG0xzo/+KKsG+NVLWIvXsmQ0un4e6JxFReluxR+GgJSXiuvt45drMN
-         0E8XNsfVcGdlhiBlE75hSiC4M/nko64EWFarYsM1KIkPdYxR4fACekefBlJW3AEmFhzU
-         zVlo7K1l7eZM7VqTOhDFBrrCfQNOZ2yBSU0Wf6pYKxOUlg9fRA/cs6q6ExZ4+s3mKu7l
-         yTX4BpvdZUIkH+arZuf9xkLt0+Osa8eIWXFWRP2yLi9l3Pigem7pTyNWGVWgLufFtwiI
-         v+31Cf4trYh6dfaO2ZijgDJZxaNq9KXKEBqtjqzD2PmWJw60MeDA8Ffh88xgpXfQXivl
-         ALKg==
+        Wed, 12 Apr 2023 09:24:51 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 899259ED0;
+        Wed, 12 Apr 2023 06:24:23 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id w13so28228580oik.2;
+        Wed, 12 Apr 2023 06:24:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681300543; x=1683892543;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JdU41sKVVYSe/xl+xymK9a9yazNGz6ifbujCFlYI9rk=;
-        b=cjFoSEF2B4bJM0K+XYL8a5FmKbmCj6XHk9VBNEAm+6HTtrLP1nTFtXUDYwJ8DBHv2H
-         cCmQnuOgDc67JAcVTsYEOpHlqEmXgIxqiZ8+T2KfWpWwG4gTdHhkhAbKQib8eR1wiwML
-         zGmuqUj98hcy2yc+zgwgXiBhuCJsm0W41GFhjkDul4FwUUfF70ukH5iEam+hAifpbNRz
-         7xcAHKV+IRvk1J92g2mddaD25LHAvMVIl9U5TPkyeDHRsuyfCYBPxeGAYW51OHviPBLB
-         DC9WhhVOOlzp8Y8YrtDAq5DjS3LMi07MNcYgsicXcLtNiDMsnmK/3n65cVdkYby/XdzZ
-         1nCA==
-X-Gm-Message-State: AAQBX9cEnnsTOMCrr2ElhFFsq2IpksVBufuA4Lcwk3dAlrBdYldsD6ZZ
-        kgtzaEcIuq9AH+cWWoHzs6/vRg==
-X-Google-Smtp-Source: AKy350ZX7QT7vb/UQxp6azYVplp03GhKCjpga4j8tEITnuOzlx0+PbCTd+G8HI7pjwkyzrEYrMLYGw==
-X-Received: by 2002:a17:90a:2e03:b0:244:952c:9701 with SMTP id q3-20020a17090a2e0300b00244952c9701mr23042939pjd.7.1681300542744;
-        Wed, 12 Apr 2023 04:55:42 -0700 (PDT)
-Received: from localhost.localdomain ([124.123.191.81])
-        by smtp.gmail.com with ESMTPSA id iq3-20020a17090afb4300b00233b196fe30sm1308948pjb.20.2023.04.12.04.55.37
+        d=1e100.net; s=20210112; t=1681305786; x=1683897786;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t7nW6mawiUuyYszKT+ZrkBThDfGBOABkC1FpPQVvJWI=;
+        b=XcT9DruApjzDiS139B4vZXzxQ2d/u4KE8o8WqcnOhetJ4P2o/23swtdE647D9AiSFN
+         cSkQZh6Z+lzgzKdGpkxeMRRbbbWexlA5bDqNuhFIr0uSd8eVqrieUmbjIocaH7C5UjH8
+         eK0HHldjlxWM958Tleh2nVDUjTq+VWypkAhR3CJKKhf4i8QTz0GwDviTpGp9IEmto5T1
+         aOmhkInlkM4TyGlk6W9l7BayBQAWmJ7XUo6IjA4gHm65h8xN+/5vKBiPmXUUPZanDGBm
+         DCnEVEaVRxv9bWn+HJ1vDQCFZYafIi4hyQ3IrGCxseT83RCIRYu0OehvSPMWMlSAtPXa
+         96dg==
+X-Gm-Message-State: AAQBX9enuxb3l1CMWGrIMzzsHITjRJnC8y9Mx/RIQCOiB85ZuoVw7xB1
+        8fnO6uQHJc89ZnxHU8ZpJ2xh3VxkuA==
+X-Google-Smtp-Source: AKy350Ze5ahkO+i51YqIaIv90DMIyhWWgOpcR5PQ65mfFvNAEbx1vXIzAmE9jG1S0P8ZzwcVpdix5g==
+X-Received: by 2002:a05:6808:3a7:b0:389:2d2b:4b05 with SMTP id n7-20020a05680803a700b003892d2b4b05mr6088608oie.5.1681305784977;
+        Wed, 12 Apr 2023 06:23:04 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id fe6-20020a0568082b0600b00387372f548asm6562499oib.16.2023.04.12.06.23.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 04:55:42 -0700 (PDT)
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-To:     bhupesh.sharma@linaro.org
-Cc:     agross@kernel.org, andersson@kernel.org, bhupesh.linux@gmail.com,
-        devicetree@vger.kernel.org, djakov@kernel.org,
-        konrad.dybcio@linaro.org, krzysztof.kozlowski@linaro.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, neil.armstrong@linaro.org,
-        rfoss@kernel.org, robh+dt@kernel.org,
-        vladimir.zapolskiy@linaro.org, lkft-triage@lists.linaro.org,
-        anders.roxell@linaro.org,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: [PATCH v6 00/11] arm64: qcom: Enable Crypto Engine for a few Qualcomm SoCs
-Date:   Wed, 12 Apr 2023 17:25:32 +0530
-Message-Id: <20230412115532.300516-1-naresh.kamboju@linaro.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
+        Wed, 12 Apr 2023 06:23:04 -0700 (PDT)
+Received: (nullmailer pid 2007502 invoked by uid 1000);
+        Wed, 12 Apr 2023 13:23:03 -0000
+Date:   Wed, 12 Apr 2023 08:23:03 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc:     andersson@kernel.org, krzysztof.kozlowski@linaro.org,
+        neil.armstrong@linaro.org, djakov@kernel.org,
+        devicetree@vger.kernel.org, robh+dt@kernel.org, rfoss@kernel.org,
+        linux-kernel@vger.kernel.org, agross@kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        vladimir.zapolskiy@linaro.org, konrad.dybcio@linaro.org,
+        bhupesh.linux@gmail.com
+Subject: Re: [PATCH v6 05/11] dt-bindings: qcom-qce: Fix compatible
+ combinations for SM8150 and IPQ4019 SoCs
+Message-ID: <168130578228.2007207.11606069055162808337.robh@kernel.org>
 References: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
+ <20230405072836.1690248-6-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230405072836.1690248-6-bhupesh.sharma@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
- > This patchset enables Crypto Engine support for Qualcomm SoCs like
- > SM6115, SM8150, SM8250, SM8350 and SM8450.
- > 
- > Note that:
- > - SM8250 crypto engine patch utilizes the work already done by myself and
- >   Vladimir.
- > - SM8350 crypto engine patch utilizes the work already done by Robert.
- > - SM8450 crypto engine patch utilizes the work already done by Neil.
- > 
- > Also this patchset is rebased on linux-next/master.
+On Wed, 05 Apr 2023 12:58:30 +0530, Bhupesh Sharma wrote:
+> Currently the compatible list available in 'qce' dt-bindings does not
+> support SM8150 and IPQ4019 SoCs directly which may lead to potential
+> 'dtbs_check' error(s).
+> 
+> Fix the same.
+> 
+> Fixes: 00f3bc2db351 ("dt-bindings: qcom-qce: Add new SoC compatible strings for Qualcomm QCE IP")
+> Reviewed-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
 
-These patches tested on top of Linux next-20230406.
-
-
-Tested-by: Anders Roxell <anders.roxell@linaro.org>
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
-
+Acked-by: Rob Herring <robh@kernel.org>
 
