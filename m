@@ -2,296 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 170D1C77B76
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 11:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC1DC7619A
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 11:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229737AbjDLLBT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Apr 2023 07:01:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56002 "EHLO
+        id S231481AbjDLLzw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Apr 2023 07:55:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbjDLLBO (ORCPT
+        with ESMTP id S231409AbjDLLzo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2023 07:01:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DD772BE
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:01:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B55A762889
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 11:01:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 066C3C4339B;
-        Wed, 12 Apr 2023 11:01:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681297266;
-        bh=5OVijsRVQVtqmMk0R5SCMF+TcfjOykH+XE0rrmzmn+U=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LT0lH7d+1EOQ537YAhmnobGOrnO5Z0TOPJxRCHOIDltu9hGN8VXyGEk+8aDbDtFuQ
-         cgx6fIqTFhVhCXHsT3l6cbAgX2UVPnHfAwidld/TSZssLPdbYK5BGNoXrZ81gTmQmy
-         G2bJcrQDl7lsv/7P5FtmhILdbKdDFZgnPko6kMUD9gQMx3NDeHULKD3yP88mEWaq3Y
-         wmO9A4WNyiGCxcKYerrQwTcdOOSZ2joh6HPn6Ev7ZOJWvRn6Jn4jaIHtKaSXWxiWGv
-         v2hiKzbAmFRzb+hirw1mZXJtWGny37LBz/75zNKrvL5BBplLclOAyReaFWo8I0fV4E
-         /2B83cPFCLgtQ==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 12/13] crypto: x86/crc32 - Use local .L symbols for code
-Date:   Wed, 12 Apr 2023 13:00:34 +0200
-Message-Id: <20230412110035.361447-13-ardb@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230412110035.361447-1-ardb@kernel.org>
-References: <20230412110035.361447-1-ardb@kernel.org>
+        Wed, 12 Apr 2023 07:55:44 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61BD77EC4
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:55:43 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id y11-20020a17090a600b00b0024693e96b58so10168136pji.1
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:55:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681300543; x=1683892543;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JdU41sKVVYSe/xl+xymK9a9yazNGz6ifbujCFlYI9rk=;
+        b=R2nBc2dZiZqmMG0xzo/+KKsG+NVLWIvXsmQ0un4e6JxFReluxR+GgJSXiuvt45drMN
+         0E8XNsfVcGdlhiBlE75hSiC4M/nko64EWFarYsM1KIkPdYxR4fACekefBlJW3AEmFhzU
+         zVlo7K1l7eZM7VqTOhDFBrrCfQNOZ2yBSU0Wf6pYKxOUlg9fRA/cs6q6ExZ4+s3mKu7l
+         yTX4BpvdZUIkH+arZuf9xkLt0+Osa8eIWXFWRP2yLi9l3Pigem7pTyNWGVWgLufFtwiI
+         v+31Cf4trYh6dfaO2ZijgDJZxaNq9KXKEBqtjqzD2PmWJw60MeDA8Ffh88xgpXfQXivl
+         ALKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681300543; x=1683892543;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JdU41sKVVYSe/xl+xymK9a9yazNGz6ifbujCFlYI9rk=;
+        b=cjFoSEF2B4bJM0K+XYL8a5FmKbmCj6XHk9VBNEAm+6HTtrLP1nTFtXUDYwJ8DBHv2H
+         cCmQnuOgDc67JAcVTsYEOpHlqEmXgIxqiZ8+T2KfWpWwG4gTdHhkhAbKQib8eR1wiwML
+         zGmuqUj98hcy2yc+zgwgXiBhuCJsm0W41GFhjkDul4FwUUfF70ukH5iEam+hAifpbNRz
+         7xcAHKV+IRvk1J92g2mddaD25LHAvMVIl9U5TPkyeDHRsuyfCYBPxeGAYW51OHviPBLB
+         DC9WhhVOOlzp8Y8YrtDAq5DjS3LMi07MNcYgsicXcLtNiDMsnmK/3n65cVdkYby/XdzZ
+         1nCA==
+X-Gm-Message-State: AAQBX9cEnnsTOMCrr2ElhFFsq2IpksVBufuA4Lcwk3dAlrBdYldsD6ZZ
+        kgtzaEcIuq9AH+cWWoHzs6/vRg==
+X-Google-Smtp-Source: AKy350ZX7QT7vb/UQxp6azYVplp03GhKCjpga4j8tEITnuOzlx0+PbCTd+G8HI7pjwkyzrEYrMLYGw==
+X-Received: by 2002:a17:90a:2e03:b0:244:952c:9701 with SMTP id q3-20020a17090a2e0300b00244952c9701mr23042939pjd.7.1681300542744;
+        Wed, 12 Apr 2023 04:55:42 -0700 (PDT)
+Received: from localhost.localdomain ([124.123.191.81])
+        by smtp.gmail.com with ESMTPSA id iq3-20020a17090afb4300b00233b196fe30sm1308948pjb.20.2023.04.12.04.55.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Apr 2023 04:55:42 -0700 (PDT)
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+To:     bhupesh.sharma@linaro.org
+Cc:     agross@kernel.org, andersson@kernel.org, bhupesh.linux@gmail.com,
+        devicetree@vger.kernel.org, djakov@kernel.org,
+        konrad.dybcio@linaro.org, krzysztof.kozlowski@linaro.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, neil.armstrong@linaro.org,
+        rfoss@kernel.org, robh+dt@kernel.org,
+        vladimir.zapolskiy@linaro.org, lkft-triage@lists.linaro.org,
+        anders.roxell@linaro.org,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH v6 00/11] arm64: qcom: Enable Crypto Engine for a few Qualcomm SoCs
+Date:   Wed, 12 Apr 2023 17:25:32 +0530
+Message-Id: <20230412115532.300516-1-naresh.kamboju@linaro.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
+References: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7697; i=ardb@kernel.org; h=from:subject; bh=5OVijsRVQVtqmMk0R5SCMF+TcfjOykH+XE0rrmzmn+U=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIcWsP1BA9Om/x9uPVakWtEXxfr+7S6jzyNfNd8Tqfi7YW uC9Yt2BjlIWBjEOBlkxRRaB2X/f7Tw9UarWeZYszBxWJpAhDFycAjARqQBGhk72N/nH5poe4qhy ZGfw4V4Vyex/8J/Xy9TVd8RPbi8wnszwP6d0ydXOqdedkkvtT2za4L5U2ptxlVyKuq2XhE7zlQg eJgA=
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Avoid cluttering up the kallsyms symbol table with entries that should
-not end up in things like backtraces, as they have undescriptive and
-generated identifiers.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/x86/crypto/crc32-pclmul_asm.S        | 16 ++---
- arch/x86/crypto/crc32c-pcl-intel-asm_64.S | 67 ++++++++++----------
- 2 files changed, 41 insertions(+), 42 deletions(-)
+ > This patchset enables Crypto Engine support for Qualcomm SoCs like
+ > SM6115, SM8150, SM8250, SM8350 and SM8450.
+ > 
+ > Note that:
+ > - SM8250 crypto engine patch utilizes the work already done by myself and
+ >   Vladimir.
+ > - SM8350 crypto engine patch utilizes the work already done by Robert.
+ > - SM8450 crypto engine patch utilizes the work already done by Neil.
+ > 
+ > Also this patchset is rebased on linux-next/master.
 
-diff --git a/arch/x86/crypto/crc32-pclmul_asm.S b/arch/x86/crypto/crc32-pclmul_asm.S
-index ca53e96996ac2143..5d31137e2c7dfca0 100644
---- a/arch/x86/crypto/crc32-pclmul_asm.S
-+++ b/arch/x86/crypto/crc32-pclmul_asm.S
-@@ -90,7 +90,7 @@ SYM_FUNC_START(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligne
- 	sub     $0x40, LEN
- 	add     $0x40, BUF
- 	cmp     $0x40, LEN
--	jb      less_64
-+	jb      .Lless_64
- 
- #ifdef __x86_64__
- 	movdqa .Lconstant_R2R1(%rip), CONSTANT
-@@ -98,7 +98,7 @@ SYM_FUNC_START(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligne
- 	movdqa .Lconstant_R2R1, CONSTANT
- #endif
- 
--loop_64:/*  64 bytes Full cache line folding */
-+.Lloop_64:/*  64 bytes Full cache line folding */
- 	prefetchnta    0x40(BUF)
- 	movdqa  %xmm1, %xmm5
- 	movdqa  %xmm2, %xmm6
-@@ -139,8 +139,8 @@ loop_64:/*  64 bytes Full cache line folding */
- 	sub     $0x40, LEN
- 	add     $0x40, BUF
- 	cmp     $0x40, LEN
--	jge     loop_64
--less_64:/*  Folding cache line into 128bit */
-+	jge     .Lloop_64
-+.Lless_64:/*  Folding cache line into 128bit */
- #ifdef __x86_64__
- 	movdqa  .Lconstant_R4R3(%rip), CONSTANT
- #else
-@@ -167,8 +167,8 @@ less_64:/*  Folding cache line into 128bit */
- 	pxor    %xmm4, %xmm1
- 
- 	cmp     $0x10, LEN
--	jb      fold_64
--loop_16:/* Folding rest buffer into 128bit */
-+	jb      .Lfold_64
-+.Lloop_16:/* Folding rest buffer into 128bit */
- 	movdqa  %xmm1, %xmm5
- 	pclmulqdq $0x00, CONSTANT, %xmm1
- 	pclmulqdq $0x11, CONSTANT, %xmm5
-@@ -177,9 +177,9 @@ loop_16:/* Folding rest buffer into 128bit */
- 	sub     $0x10, LEN
- 	add     $0x10, BUF
- 	cmp     $0x10, LEN
--	jge     loop_16
-+	jge     .Lloop_16
- 
--fold_64:
-+.Lfold_64:
- 	/* perform the last 64 bit fold, also adds 32 zeroes
- 	 * to the input stream */
- 	pclmulqdq $0x01, %xmm1, CONSTANT /* R4 * xmm1.low */
-diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-index 5f843dce77f1de66..81ce0f4db555ce03 100644
---- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-+++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
-@@ -49,15 +49,15 @@
- ## ISCSI CRC 32 Implementation with crc32 and pclmulqdq Instruction
- 
- .macro LABEL prefix n
--\prefix\n\():
-+.L\prefix\n\():
- .endm
- 
- .macro JMPTBL_ENTRY i
--.quad crc_\i
-+.quad .Lcrc_\i
- .endm
- 
- .macro JNC_LESS_THAN j
--	jnc less_than_\j
-+	jnc .Lless_than_\j
- .endm
- 
- # Define threshold where buffers are considered "small" and routed to more
-@@ -108,30 +108,30 @@ SYM_FUNC_START(crc_pcl)
- 	neg     %bufp
- 	and     $7, %bufp		# calculate the unalignment amount of
- 					# the address
--	je      proc_block		# Skip if aligned
-+	je      .Lproc_block		# Skip if aligned
- 
- 	## If len is less than 8 and we're unaligned, we need to jump
- 	## to special code to avoid reading beyond the end of the buffer
- 	cmp     $8, len
--	jae     do_align
-+	jae     .Ldo_align
- 	# less_than_8 expects length in upper 3 bits of len_dw
- 	# less_than_8_post_shl1 expects length = carryflag * 8 + len_dw[31:30]
- 	shl     $32-3+1, len_dw
--	jmp     less_than_8_post_shl1
-+	jmp     .Lless_than_8_post_shl1
- 
--do_align:
-+.Ldo_align:
- 	#### Calculate CRC of unaligned bytes of the buffer (if any)
- 	movq    (bufptmp), tmp		# load a quadward from the buffer
- 	add     %bufp, bufptmp		# align buffer pointer for quadword
- 					# processing
- 	sub     %bufp, len		# update buffer length
--align_loop:
-+.Lalign_loop:
- 	crc32b  %bl, crc_init_dw 	# compute crc32 of 1-byte
- 	shr     $8, tmp			# get next byte
- 	dec     %bufp
--	jne     align_loop
-+	jne     .Lalign_loop
- 
--proc_block:
-+.Lproc_block:
- 
- 	################################################################
- 	## 2) PROCESS  BLOCKS:
-@@ -141,11 +141,11 @@ proc_block:
- 	movq    len, tmp		# save num bytes in tmp
- 
- 	cmpq    $128*24, len
--	jae     full_block
-+	jae     .Lfull_block
- 
--continue_block:
-+.Lcontinue_block:
- 	cmpq    $SMALL_SIZE, len
--	jb      small
-+	jb      .Lsmall
- 
- 	## len < 128*24
- 	movq    $2731, %rax		# 2731 = ceil(2^16 / 24)
-@@ -175,7 +175,7 @@ continue_block:
- 	################################################################
- 	## 2a) PROCESS FULL BLOCKS:
- 	################################################################
--full_block:
-+.Lfull_block:
- 	movl    $128,%eax
- 	lea     128*8*2(block_0), block_1
- 	lea     128*8*3(block_0), block_2
-@@ -190,7 +190,6 @@ full_block:
- 	## 3) CRC Array:
- 	################################################################
- 
--crc_array:
- 	i=128
- .rept 128-1
- .altmacro
-@@ -243,28 +242,28 @@ LABEL crc_ 0
- 	ENDBR
- 	mov     tmp, len
- 	cmp     $128*24, tmp
--	jae     full_block
-+	jae     .Lfull_block
- 	cmp     $24, tmp
--	jae     continue_block
-+	jae     .Lcontinue_block
- 
--less_than_24:
-+.Lless_than_24:
- 	shl     $32-4, len_dw			# less_than_16 expects length
- 						# in upper 4 bits of len_dw
--	jnc     less_than_16
-+	jnc     .Lless_than_16
- 	crc32q  (bufptmp), crc_init
- 	crc32q  8(bufptmp), crc_init
--	jz      do_return
-+	jz      .Ldo_return
- 	add     $16, bufptmp
- 	# len is less than 8 if we got here
- 	# less_than_8 expects length in upper 3 bits of len_dw
- 	# less_than_8_post_shl1 expects length = carryflag * 8 + len_dw[31:30]
- 	shl     $2, len_dw
--	jmp     less_than_8_post_shl1
-+	jmp     .Lless_than_8_post_shl1
- 
- 	#######################################################################
- 	## 6) LESS THAN 256-bytes REMAIN AT THIS POINT (8-bits of len are full)
- 	#######################################################################
--small:
-+.Lsmall:
- 	shl $32-8, len_dw		# Prepare len_dw for less_than_256
- 	j=256
- .rept 5					# j = {256, 128, 64, 32, 16}
-@@ -280,32 +279,32 @@ LABEL less_than_ %j			# less_than_j: Length should be in
- 	crc32q  i(bufptmp), crc_init	# Compute crc32 of 8-byte data
- 	i=i+8
- .endr
--	jz      do_return		# Return if remaining length is zero
-+	jz      .Ldo_return		# Return if remaining length is zero
- 	add     $j, bufptmp		# Advance buf
- .endr
- 
--less_than_8:				# Length should be stored in
-+.Lless_than_8:				# Length should be stored in
- 					# upper 3 bits of len_dw
- 	shl     $1, len_dw
--less_than_8_post_shl1:
--	jnc     less_than_4
-+.Lless_than_8_post_shl1:
-+	jnc     .Lless_than_4
- 	crc32l  (bufptmp), crc_init_dw	# CRC of 4 bytes
--	jz      do_return		# return if remaining data is zero
-+	jz      .Ldo_return		# return if remaining data is zero
- 	add     $4, bufptmp
--less_than_4:				# Length should be stored in
-+.Lless_than_4:				# Length should be stored in
- 					# upper 2 bits of len_dw
- 	shl     $1, len_dw
--	jnc     less_than_2
-+	jnc     .Lless_than_2
- 	crc32w  (bufptmp), crc_init_dw	# CRC of 2 bytes
--	jz      do_return		# return if remaining data is zero
-+	jz      .Ldo_return		# return if remaining data is zero
- 	add     $2, bufptmp
--less_than_2:				# Length should be stored in the MSB
-+.Lless_than_2:				# Length should be stored in the MSB
- 					# of len_dw
- 	shl     $1, len_dw
--	jnc     less_than_1
-+	jnc     .Lless_than_1
- 	crc32b  (bufptmp), crc_init_dw	# CRC of 1 byte
--less_than_1:				# Length should be zero
--do_return:
-+.Lless_than_1:				# Length should be zero
-+.Ldo_return:
- 	movq    crc_init, %rax
- 	popq    %rsi
- 	popq    %rdi
--- 
-2.39.2
+These patches tested on top of Linux next-20230406.
+
+
+Tested-by: Anders Roxell <anders.roxell@linaro.org>
+Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
+
 
