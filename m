@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 586DAC77B6E
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 11:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE262C77B71
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 11:01:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbjDLLA6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Apr 2023 07:00:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55754 "EHLO
+        id S229705AbjDLLA7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Apr 2023 07:00:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbjDLLAz (ORCPT
+        with ESMTP id S229647AbjDLLA5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2023 07:00:55 -0400
+        Wed, 12 Apr 2023 07:00:57 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 128CB6EAD
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:00:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4C26583
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 04:00:56 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 839F762889
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 11:00:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6A09C4339E;
-        Wed, 12 Apr 2023 11:00:50 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9F2E1632EC
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 11:00:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2378C433EF;
+        Wed, 12 Apr 2023 11:00:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681297251;
-        bh=mPiYY79mrBdPcJSB+Lsy+wY627fy3181XFaLtnuKu5s=;
+        s=k20201202; t=1681297255;
+        bh=ZwHHUi68L0/HwbVdVnggFFtQQ/3/Z1k/X5PTHCX4P2E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hAeYX4yUEGV7RoHrUzJYtIrZX+gSYmK/pzgcyRhLIB9v4rqDdaP8RKg9k1GdQgUTW
-         piOWHVTg5gnokZE4aBgfYBjABrx8+1T88npplEupBvToYoUYPCbCMKAisxxfxiH6Tq
-         UVGeebr0Ld/PYuZkq1XWx23ZHsFB9ShVB3ay5N9HPxwKbIyqmY5zY5AxnrvU8Dmdbh
-         gWMUlMwPopoP295mjndq9RK8YYk/xBYgBGN5I8qDGfpuIz8GSW+qZHPkh7L/qo/yEM
-         MIipNTjUDocdfBPG5L3VCZm0TKhdMnnvUb/wKy2kNYZRYCqD4SIlVk8jYnO2GQ8AaI
-         U5w1N9hJVmMoA==
+        b=ubqwvkFnkGECPmccX0ZS7iufy9eP17n2J0P5Lef1q8aOEP7v7kZP1y1/mQDU8BX4T
+         ll1jf9npj1XR633bvvoRG+rwGhy+nJmy6UY30aXOG8gHz6st2JFB1zK5Z0cHrwrway
+         GQXunJF8TlW/EaZysBMnyTC/sa9he5F1gg0mIaKqNsh8rGy8c2ZppoMjqpzMQtgDK7
+         6AHDGVEjeFmDa61VoanEZJan1V9LN2aFHyzHoXlHO4cWZxFAy6I0G5TjbOsVQHSn0Q
+         DQIMTENbB9a8my9Ou8JqDetyCYrRzNqmdokY/nif9PP14A+T+xLAeMyDb41viIX9XY
+         saMmUYNGRxlWw==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Eric Biggers <ebiggers@kernel.org>,
         Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2 03/13] crypto: x86/aria - Use RIP-relative addressing
-Date:   Wed, 12 Apr 2023 13:00:25 +0200
-Message-Id: <20230412110035.361447-4-ardb@kernel.org>
+Subject: [PATCH v2 05/13] crypto: x86/cast5 - Use RIP-relative addressing
+Date:   Wed, 12 Apr 2023 13:00:27 +0200
+Message-Id: <20230412110035.361447-6-ardb@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230412110035.361447-1-ardb@kernel.org>
 References: <20230412110035.361447-1-ardb@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7533; i=ardb@kernel.org; h=from:subject; bh=mPiYY79mrBdPcJSB+Lsy+wY627fy3181XFaLtnuKu5s=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIcWs31VUdMnKu8c/HrL9kHczKWKjwxwBqzUmUs/nRzprG 2ot1K/tKGVhEONgkBVTZBGY/ffdztMTpWqdZ8nCzGFlAhnCwMUpABOJyGdkOHx9+2rZo4a2XyZX e8ts3ZSq9sGELzlx1+KOjc4pyl+arzAytBl9KA7YKqtcI7V51XNjXb0AhasvXN6/YlUsaewsk/n NBwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3646; i=ardb@kernel.org; h=from:subject; bh=ZwHHUi68L0/HwbVdVnggFFtQQ/3/Z1k/X5PTHCX4P2E=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIcWs3yPH8rCt/+sJQX+cDN/rvJeMP2LBUSv1saHpVnSid evh+D8dpSwMYhwMsmKKLAKz/77beXqiVK3zLFmYOaxMIEMYuDgFYCIRvIwMX8LCanh6OC8k2wpP Sbddxcf59o+A/edbZw4snPzujNrFQEaGLXXrPMWzjE6+M3zU9SNYbGPPt8C1Ysws0q++VeZvVm/ iAAA=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -55,196 +55,115 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 Prefer RIP-relative addressing where possible, which removes the need
 for boot time relocation fixups.
 
+Co-developed-by: Thomas Garnier <thgarnie@chromium.org>
+Signed-off-by: Thomas Garnier <thgarnie@chromium.org>
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/x86/crypto/aria-aesni-avx-asm_64.S   | 28 ++++++++++----------
- arch/x86/crypto/aria-aesni-avx2-asm_64.S  | 28 ++++++++++----------
- arch/x86/crypto/aria-gfni-avx512-asm_64.S | 24 ++++++++---------
- 3 files changed, 40 insertions(+), 40 deletions(-)
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S | 38 +++++++++++---------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
 
-diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S b/arch/x86/crypto/aria-aesni-avx-asm_64.S
-index 9243f6289d34bfbf..7c1abc513f34621e 100644
---- a/arch/x86/crypto/aria-aesni-avx-asm_64.S
-+++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
-@@ -80,7 +80,7 @@
- 	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
- 	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
- 							\
--	vmovdqu .Lshufb_16x16b, a0;			\
-+	vmovdqu .Lshufb_16x16b(%rip), a0;		\
- 	vmovdqu st1, a1;				\
- 	vpshufb a0, a2, a2;				\
- 	vpshufb a0, a3, a3;				\
-@@ -132,7 +132,7 @@
- 	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
- 	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
- 							\
--	vmovdqu .Lshufb_16x16b, a0;			\
-+	vmovdqu .Lshufb_16x16b(%rip), a0;		\
- 	vmovdqu st1, a1;				\
- 	vpshufb a0, a2, a2;				\
- 	vpshufb a0, a3, a3;				\
-@@ -300,11 +300,11 @@
- 			    x4, x5, x6, x7,		\
- 			    t0, t1, t2, t3,		\
- 			    t4, t5, t6, t7)		\
--	vmovdqa .Ltf_s2_bitmatrix, t0;			\
--	vmovdqa .Ltf_inv_bitmatrix, t1;			\
--	vmovdqa .Ltf_id_bitmatrix, t2;			\
--	vmovdqa .Ltf_aff_bitmatrix, t3;			\
--	vmovdqa .Ltf_x2_bitmatrix, t4;			\
-+	vmovdqa .Ltf_s2_bitmatrix(%rip), t0;		\
-+	vmovdqa .Ltf_inv_bitmatrix(%rip), t1;		\
-+	vmovdqa .Ltf_id_bitmatrix(%rip), t2;		\
-+	vmovdqa .Ltf_aff_bitmatrix(%rip), t3;		\
-+	vmovdqa .Ltf_x2_bitmatrix(%rip), t4;		\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
- 	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
-@@ -324,13 +324,13 @@
- 		       x4, x5, x6, x7,			\
- 		       t0, t1, t2, t3,			\
- 		       t4, t5, t6, t7)			\
--	vmovdqa .Linv_shift_row, t0;			\
--	vmovdqa .Lshift_row, t1;			\
--	vbroadcastss .L0f0f0f0f, t6;			\
--	vmovdqa .Ltf_lo__inv_aff__and__s2, t2;		\
--	vmovdqa .Ltf_hi__inv_aff__and__s2, t3;		\
--	vmovdqa .Ltf_lo__x2__and__fwd_aff, t4;		\
--	vmovdqa .Ltf_hi__x2__and__fwd_aff, t5;		\
-+	vmovdqa .Linv_shift_row(%rip), t0;		\
-+	vmovdqa .Lshift_row(%rip), t1;			\
-+	vbroadcastss .L0f0f0f0f(%rip), t6;		\
-+	vmovdqa .Ltf_lo__inv_aff__and__s2(%rip), t2;	\
-+	vmovdqa .Ltf_hi__inv_aff__and__s2(%rip), t3;	\
-+	vmovdqa .Ltf_lo__x2__and__fwd_aff(%rip), t4;	\
-+	vmovdqa .Ltf_hi__x2__and__fwd_aff(%rip), t5;	\
- 							\
- 	vaesenclast t7, x0, x0;				\
- 	vaesenclast t7, x4, x4;				\
-diff --git a/arch/x86/crypto/aria-aesni-avx2-asm_64.S b/arch/x86/crypto/aria-aesni-avx2-asm_64.S
-index 82a14b4ad920f792..c60fa2980630379b 100644
---- a/arch/x86/crypto/aria-aesni-avx2-asm_64.S
-+++ b/arch/x86/crypto/aria-aesni-avx2-asm_64.S
-@@ -96,7 +96,7 @@
- 	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
- 	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
- 							\
--	vbroadcasti128 .Lshufb_16x16b, a0;		\
-+	vbroadcasti128 .Lshufb_16x16b(%rip), a0;	\
- 	vmovdqu st1, a1;				\
- 	vpshufb a0, a2, a2;				\
- 	vpshufb a0, a3, a3;				\
-@@ -148,7 +148,7 @@
- 	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
- 	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
- 							\
--	vbroadcasti128 .Lshufb_16x16b, a0;		\
-+	vbroadcasti128 .Lshufb_16x16b(%rip), a0;	\
- 	vmovdqu st1, a1;				\
- 	vpshufb a0, a2, a2;				\
- 	vpshufb a0, a3, a3;				\
-@@ -307,11 +307,11 @@
- 			    x4, x5, x6, x7,		\
- 			    t0, t1, t2, t3,		\
- 			    t4, t5, t6, t7)		\
--	vpbroadcastq .Ltf_s2_bitmatrix, t0;		\
--	vpbroadcastq .Ltf_inv_bitmatrix, t1;		\
--	vpbroadcastq .Ltf_id_bitmatrix, t2;		\
--	vpbroadcastq .Ltf_aff_bitmatrix, t3;		\
--	vpbroadcastq .Ltf_x2_bitmatrix, t4;		\
-+	vpbroadcastq .Ltf_s2_bitmatrix(%rip), t0;	\
-+	vpbroadcastq .Ltf_inv_bitmatrix(%rip), t1;	\
-+	vpbroadcastq .Ltf_id_bitmatrix(%rip), t2;	\
-+	vpbroadcastq .Ltf_aff_bitmatrix(%rip), t3;	\
-+	vpbroadcastq .Ltf_x2_bitmatrix(%rip), t4;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
- 	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
-@@ -332,12 +332,12 @@
- 		       t4, t5, t6, t7)			\
- 	vpxor t7, t7, t7;				\
- 	vpxor t6, t6, t6;				\
--	vbroadcasti128 .Linv_shift_row, t0;		\
--	vbroadcasti128 .Lshift_row, t1;			\
--	vbroadcasti128 .Ltf_lo__inv_aff__and__s2, t2;	\
--	vbroadcasti128 .Ltf_hi__inv_aff__and__s2, t3;	\
--	vbroadcasti128 .Ltf_lo__x2__and__fwd_aff, t4;	\
--	vbroadcasti128 .Ltf_hi__x2__and__fwd_aff, t5;	\
-+	vbroadcasti128 .Linv_shift_row(%rip), t0;	\
-+	vbroadcasti128 .Lshift_row(%rip), t1;		\
-+	vbroadcasti128 .Ltf_lo__inv_aff__and__s2(%rip), t2; \
-+	vbroadcasti128 .Ltf_hi__inv_aff__and__s2(%rip), t3; \
-+	vbroadcasti128 .Ltf_lo__x2__and__fwd_aff(%rip), t4; \
-+	vbroadcasti128 .Ltf_hi__x2__and__fwd_aff(%rip), t5; \
- 							\
- 	vextracti128 $1, x0, t6##_x;			\
- 	vaesenclast t7##_x, x0##_x, x0##_x;		\
-@@ -369,7 +369,7 @@
- 	vaesdeclast t7##_x, t6##_x, t6##_x;		\
- 	vinserti128 $1, t6##_x, x6, x6;			\
- 							\
--	vpbroadcastd .L0f0f0f0f, t6;			\
-+	vpbroadcastd .L0f0f0f0f(%rip), t6;		\
- 							\
- 	/* AES inverse shift rows */			\
- 	vpshufb t0, x0, x0;				\
-diff --git a/arch/x86/crypto/aria-gfni-avx512-asm_64.S b/arch/x86/crypto/aria-gfni-avx512-asm_64.S
-index 3193f07014506655..860887e5d02ed6ef 100644
---- a/arch/x86/crypto/aria-gfni-avx512-asm_64.S
-+++ b/arch/x86/crypto/aria-gfni-avx512-asm_64.S
-@@ -80,7 +80,7 @@
- 	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
- 	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
- 							\
--	vbroadcasti64x2 .Lshufb_16x16b, a0;		\
-+	vbroadcasti64x2 .Lshufb_16x16b(%rip), a0;	\
- 	vmovdqu64 st1, a1;				\
- 	vpshufb a0, a2, a2;				\
- 	vpshufb a0, a3, a3;				\
-@@ -132,7 +132,7 @@
- 	transpose_4x4(c0, c1, c2, c3, a0, a1);		\
- 	transpose_4x4(d0, d1, d2, d3, a0, a1);		\
- 							\
--	vbroadcasti64x2 .Lshufb_16x16b, a0;		\
-+	vbroadcasti64x2 .Lshufb_16x16b(%rip), a0;	\
- 	vmovdqu64 st1, a1;				\
- 	vpshufb a0, a2, a2;				\
- 	vpshufb a0, a3, a3;				\
-@@ -308,11 +308,11 @@
- 			    x4, x5, x6, x7,		\
- 			    t0, t1, t2, t3,		\
- 			    t4, t5, t6, t7)		\
--	vpbroadcastq .Ltf_s2_bitmatrix, t0;		\
--	vpbroadcastq .Ltf_inv_bitmatrix, t1;		\
--	vpbroadcastq .Ltf_id_bitmatrix, t2;		\
--	vpbroadcastq .Ltf_aff_bitmatrix, t3;		\
--	vpbroadcastq .Ltf_x2_bitmatrix, t4;		\
-+	vpbroadcastq .Ltf_s2_bitmatrix(%rip), t0;	\
-+	vpbroadcastq .Ltf_inv_bitmatrix(%rip), t1;	\
-+	vpbroadcastq .Ltf_id_bitmatrix(%rip), t2;	\
-+	vpbroadcastq .Ltf_aff_bitmatrix(%rip), t3;	\
-+	vpbroadcastq .Ltf_x2_bitmatrix(%rip), t4;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
- 	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
-@@ -332,11 +332,11 @@
- 			     y4, y5, y6, y7,		\
- 			     t0, t1, t2, t3,		\
- 			     t4, t5, t6, t7)		\
--	vpbroadcastq .Ltf_s2_bitmatrix, t0;		\
--	vpbroadcastq .Ltf_inv_bitmatrix, t1;		\
--	vpbroadcastq .Ltf_id_bitmatrix, t2;		\
--	vpbroadcastq .Ltf_aff_bitmatrix, t3;		\
--	vpbroadcastq .Ltf_x2_bitmatrix, t4;		\
-+	vpbroadcastq .Ltf_s2_bitmatrix(%rip), t0;	\
-+	vpbroadcastq .Ltf_inv_bitmatrix(%rip), t1;	\
-+	vpbroadcastq .Ltf_id_bitmatrix(%rip), t2;	\
-+	vpbroadcastq .Ltf_aff_bitmatrix(%rip), t3;	\
-+	vpbroadcastq .Ltf_x2_bitmatrix(%rip), t4;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x1, x1;	\
- 	vgf2p8affineinvqb $(tf_s2_const), t0, x5, x5;	\
- 	vgf2p8affineqb $(tf_inv_const), t1, x2, x2;	\
+diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+index 0326a01503c3a554..b4e460a87f18ddaa 100644
+--- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+@@ -84,15 +84,19 @@
+ 
+ #define lookup_32bit(src, dst, op1, op2, op3, interleave_op, il_reg) \
+ 	movzbl		src ## bh,     RID1d;    \
++	leaq		s1(%rip),      RID2;     \
++	movl		(RID2,RID1,4), dst ## d; \
+ 	movzbl		src ## bl,     RID2d;    \
++	leaq		s2(%rip),      RID1;     \
++	op1		(RID1,RID2,4), dst ## d; \
+ 	shrq $16,	src;                     \
+-	movl		s1(, RID1, 4), dst ## d; \
+-	op1		s2(, RID2, 4), dst ## d; \
+ 	movzbl		src ## bh,     RID1d;    \
++	leaq		s3(%rip),      RID2;     \
++	op2		(RID2,RID1,4), dst ## d; \
+ 	movzbl		src ## bl,     RID2d;    \
+ 	interleave_op(il_reg);			 \
+-	op2		s3(, RID1, 4), dst ## d; \
+-	op3		s4(, RID2, 4), dst ## d;
++	leaq		s4(%rip),      RID1;     \
++	op3		(RID1,RID2,4), dst ## d;
+ 
+ #define dummy(d) /* do nothing */
+ 
+@@ -151,15 +155,15 @@
+ 	subround(l ## 3, r ## 3, l ## 4, r ## 4, f);
+ 
+ #define enc_preload_rkr() \
+-	vbroadcastss	.L16_mask,                RKR;      \
++	vbroadcastss	.L16_mask(%rip),          RKR;      \
+ 	/* add 16-bit rotation to key rotations (mod 32) */ \
+ 	vpxor		kr(CTX),                  RKR, RKR;
+ 
+ #define dec_preload_rkr() \
+-	vbroadcastss	.L16_mask,                RKR;      \
++	vbroadcastss	.L16_mask(%rip),          RKR;      \
+ 	/* add 16-bit rotation to key rotations (mod 32) */ \
+ 	vpxor		kr(CTX),                  RKR, RKR; \
+-	vpshufb		.Lbswap128_mask,          RKR, RKR;
++	vpshufb		.Lbswap128_mask(%rip),    RKR, RKR;
+ 
+ #define transpose_2x4(x0, x1, t0, t1) \
+ 	vpunpckldq		x1, x0, t0; \
+@@ -235,9 +239,9 @@ SYM_FUNC_START_LOCAL(__cast5_enc_blk16)
+ 
+ 	movq %rdi, CTX;
+ 
+-	vmovdqa .Lbswap_mask, RKM;
+-	vmovd .Lfirst_mask, R1ST;
+-	vmovd .L32_mask, R32;
++	vmovdqa .Lbswap_mask(%rip), RKM;
++	vmovd .Lfirst_mask(%rip), R1ST;
++	vmovd .L32_mask(%rip), R32;
+ 	enc_preload_rkr();
+ 
+ 	inpack_blocks(RL1, RR1, RTMP, RX, RKM);
+@@ -271,7 +275,7 @@ SYM_FUNC_START_LOCAL(__cast5_enc_blk16)
+ 	popq %rbx;
+ 	popq %r15;
+ 
+-	vmovdqa .Lbswap_mask, RKM;
++	vmovdqa .Lbswap_mask(%rip), RKM;
+ 
+ 	outunpack_blocks(RR1, RL1, RTMP, RX, RKM);
+ 	outunpack_blocks(RR2, RL2, RTMP, RX, RKM);
+@@ -308,9 +312,9 @@ SYM_FUNC_START_LOCAL(__cast5_dec_blk16)
+ 
+ 	movq %rdi, CTX;
+ 
+-	vmovdqa .Lbswap_mask, RKM;
+-	vmovd .Lfirst_mask, R1ST;
+-	vmovd .L32_mask, R32;
++	vmovdqa .Lbswap_mask(%rip), RKM;
++	vmovd .Lfirst_mask(%rip), R1ST;
++	vmovd .L32_mask(%rip), R32;
+ 	dec_preload_rkr();
+ 
+ 	inpack_blocks(RL1, RR1, RTMP, RX, RKM);
+@@ -341,7 +345,7 @@ SYM_FUNC_START_LOCAL(__cast5_dec_blk16)
+ 	round(RL, RR, 1, 2);
+ 	round(RR, RL, 0, 1);
+ 
+-	vmovdqa .Lbswap_mask, RKM;
++	vmovdqa .Lbswap_mask(%rip), RKM;
+ 	popq %rbx;
+ 	popq %r15;
+ 
+@@ -504,8 +508,8 @@ SYM_FUNC_START(cast5_ctr_16way)
+ 
+ 	vpcmpeqd RKR, RKR, RKR;
+ 	vpaddq RKR, RKR, RKR; /* low: -2, high: -2 */
+-	vmovdqa .Lbswap_iv_mask, R1ST;
+-	vmovdqa .Lbswap128_mask, RKM;
++	vmovdqa .Lbswap_iv_mask(%rip), R1ST;
++	vmovdqa .Lbswap128_mask(%rip), RKM;
+ 
+ 	/* load IV and byteswap */
+ 	vmovq (%rcx), RX;
 -- 
 2.39.2
 
