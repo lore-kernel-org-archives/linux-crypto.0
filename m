@@ -2,284 +2,143 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09C4C7619A
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 15:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A413AC77B6E
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 16:28:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231245AbjDLP5b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Apr 2023 11:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55558 "EHLO
+        id S230163AbjDLQ2w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Apr 2023 12:28:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjDLP5a (ORCPT
+        with ESMTP id S229628AbjDLQ2v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2023 11:57:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA35F5FEA
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 08:56:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681315002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Jp+uLMlvohTK1fCAD9z2ZBAqRyO1rsjM59UZ+H2UJdE=;
-        b=PsisnjkhQVyqJMUURVovNzggbLaW7ArKaewDs/KbF+JnhdLAyNvDfNSyCnRj/a4vgPcBmK
-        9E2I0QxvObhXLRi23dyQmjtuuu/goPzGQgHlNRqzqWywAP7Soa5VzXAZRqeHeZBvswRsjY
-        ZPJNMBqCYshnxVU6Eyw+bWrZjDV8FR4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-gsFujymGPYeLeLNikER73A-1; Wed, 12 Apr 2023 11:56:40 -0400
-X-MC-Unique: gsFujymGPYeLeLNikER73A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9740A811E7C;
-        Wed, 12 Apr 2023 15:56:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8ECEA40C20FA;
-        Wed, 12 Apr 2023 15:56:38 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Chuck Lever <chuck.lever@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-cc:     dhowells@redhat.com, Scott Mayhew <smayhew@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Did the in-kernel Camellia or CMAC crypto implementation break?
+        Wed, 12 Apr 2023 12:28:51 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C34422F;
+        Wed, 12 Apr 2023 09:28:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nKCqQk+MHVP6oHtE6TKWsCYnPyKCp1OUSY3mdKhqddu2EK0rAZtMDtpdEKluLc9Y9yOfB4jeQbJdoMNim+GsUSJAnuQg9ax3G7O3SZ1NiiplXnrydHEYkEb96N+eDbhuqVKEgLSKJAdCLBerhb8eeaRsMu+M8zwXFH6bHIeZijGv5IIbEa2eJqqKTPqROe0mA/vkeXCw7MJlWiApzutrrbB44W+Bp0HyEyMEdvcPknESaMhHNxpHDrQDF2ott//JBDyYx4wPzDzJprgOR0WI5LUklxjX87Is1bB9aef09648YlBK/0QXVlQH1z/CfJ2Wu2CFnPLABxvB7bqA8B1ELA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dSAxoiUuyfryV8V4Cff5qIItOQN7ZzyIMqH3Uoq84BA=;
+ b=OLPRh/rK2zjQ3/eIxRC5t5OuyNSjHndT/nJPS4uC8AxXhWGjDaVOZv1DVIegTUf/6kSEYxMyJ35SoVNua+UzTJIEIdW6dOQ44mBqdtu8X0ZqCclFoKtZGIV9PWucCv+IUux5MpfOi7A2G6UC5b8cMrkB9YxnEZ7mjzTIwVF1kVk4Y6GZTLmXCJj5jIEZDzZfFwJbEfCae5Ay/TOPzHUL5/rInfBCIfn5w0pXjYs+4+r2GBIfRgpbp9PqcuLfYp/5bLgiVXb/a5O9NuNJ5OQGytAMAcaD6UVvRwM+WNnB6MuhiwSyarnQGPjpjWQo0/j8E5k7uEphj2eBM/xQM8miJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dSAxoiUuyfryV8V4Cff5qIItOQN7ZzyIMqH3Uoq84BA=;
+ b=QOE4cg49RlYSEcfvcBFiUsvMBA4Z5a9IaPJFmaaMh7bB5nbyVxg3uHmDZ7H1AK6oIcaI80puI82nsvwGRcmKahGm6sBJ1nXkw/aycdP8sUkLZFywEOSgyh8BN+Fcq2TsjZCTHZ9iSaY1cTwNoz9ajlkvn3cKLvkQK/THHWL93fA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+ by SJ2PR12MB8808.namprd12.prod.outlook.com (2603:10b6:a03:4d0::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.30; Wed, 12 Apr
+ 2023 16:28:47 +0000
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::f4d:82d0:c8c:bebe]) by MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::f4d:82d0:c8c:bebe%2]) with mapi id 15.20.6277.036; Wed, 12 Apr 2023
+ 16:28:47 +0000
+Message-ID: <e53a03cf-71ce-1864-5700-b48e8beb17a6@amd.com>
+Date:   Wed, 12 Apr 2023 11:28:44 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v8 0/6] Use CCP driver to handle PSP I2C arbitration
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+References: <20230403183216.3493-1-mario.limonciello@amd.com>
+ <ZC5pxORLN+SF/91S@sai> <82ef9505-f8ae-36d0-fdeb-9bfc92aec557@amd.com>
+ <ZC+1ufdj8WYixQsM@sai>
+Cc:     Wolfram Sang <wsa@kernel.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
+        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Mark Hasemeyer <markhas@chromium.org>,
+        Grzegorz Bernacki <gjb@semihalf.com>
+From:   "Limonciello, Mario" <mario.limonciello@amd.com>
+In-Reply-To: <ZC+1ufdj8WYixQsM@sai>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR03CA0016.namprd03.prod.outlook.com
+ (2603:10b6:208:23a::21) To MN0PR12MB6101.namprd12.prod.outlook.com
+ (2603:10b6:208:3cb::10)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <380322.1681314997.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 12 Apr 2023 16:56:37 +0100
-Message-ID: <380323.1681314997@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|SJ2PR12MB8808:EE_
+X-MS-Office365-Filtering-Correlation-Id: a981588b-62f8-4611-8d3f-08db3b72fd96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xUcyYZwhcIxm3vIIGD9OWRpDDRRB7/a/ONCBFO35GCs43lfAx68GpAgnRqYdsrXHMHDm3ZL1JlIfRIQUXQ/8o/ZCDrKbXLfnkcaQbUx+JEOhEhxF1yZel0egrJH4Ozmutk6VKH/J3ZbB6yV6mxXx41IPmJb/7hZH9szEy8yCxLKaTAIQ7Lo8PSgoWR8IDzKsmfI2Kt3XY2OROqbF719DooOcdxzlnB9GH0jelKw2zXgYPTStnbaH29wN+TylDc7xa/O+A5dcjUuiBlQRyFN+k5JIoRwKVUpIaiHEYoLvEEpxEFbDIjmoH/zUFKfGwMue2U2y7ozYLbIPmx3KFWn5y/pR8xYWHV6X2TDCjGN/Jsb/SDvyO7GNALvU7O/IbU7xBMZs2ryoNWyjYTuIyaM5cs64Dgez8rNdcinOjbFGhPQXO3ECeTTGALuJfPco6iycncX+BUJuhKdv7g5B0fflO2zAM2Dq/BPxg2E48IMcWL8cc8UbrjjgtThjcaqrOT6JK0va3+RLZHDe1u05TA0oNIXq5cT1GHJdxm93K/W4g4OombYu7o/gz1Z3qPnAjc3E2OOqZqJFYYVYFM+E8I5T4lFuQuyr6vwCvC2EXmy4qZbjaCofQJkfjc/1sWHFyd1ypsZxiJNCYgxQceHjtMCqOA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(39860400002)(136003)(346002)(451199021)(6916009)(38100700002)(66556008)(5660300002)(6512007)(316002)(2616005)(26005)(6486002)(6506007)(53546011)(6666004)(4744005)(2906002)(7416002)(186003)(36756003)(54906003)(86362001)(478600001)(66946007)(41300700001)(4326008)(66476007)(8676002)(8936002)(31696002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T0JPN25MTnc2TjUwRXk4eUtlT0Y4OVFNREJtVnk1VDJPMGh5V0t2VFA5K3ow?=
+ =?utf-8?B?T09adVJ4OTJ2OG5FdXMzbk4ydkY2Y0ZKSTFMS0RzNldiaGozOTNlRDI2cGRQ?=
+ =?utf-8?B?MW55dmp0SzJKQm1vQmU2Q0M2eU5ZdVVubFNIYzVQckdCZTJBZzFLY3JYbUV0?=
+ =?utf-8?B?MGJ5d0VWcnhKbUc4cjh6NWcyeWxOaEtuQjdDeHJVVHZlMTFNRjJMdHV2V1A1?=
+ =?utf-8?B?aTFqUVdlOE44YW5CT1c2dUE1OFFxblVQOXM5Qyt6dzBIaXBxaVp6V05ORTFN?=
+ =?utf-8?B?c3dtbzMyR213N2hQT2xjYURLMW5ZZFFPeUhDZGlZMjc4WVkrMEpHSGQ4NzBO?=
+ =?utf-8?B?MkIwVVJNR2x5cGZCQnRmbjNMVjJCdFU5eVMwb084VWFyZjhXbnBqNk9YUlAv?=
+ =?utf-8?B?eDdWZ2R0aHBlL0ZEd0ZaeFhIVlIxN1FjdHRTK1ltQkNKZFYzY2IvYnZnN1hm?=
+ =?utf-8?B?ZGRiTFArcWlmcmpZelBoWm42WWsvaStBRWRGQmI0WHI5Y3R3Y3pkSjhTZC8v?=
+ =?utf-8?B?L1BSNjdMWVRSRHIrMDM0UE8zZzNxaSs2U0tZN0p3SkhCb21sUHdrcVVzMjls?=
+ =?utf-8?B?blBZU0liWXFMc1BwZmUvNjZFZmlVcmxwbVNZUFhML3BLNW5tb3RvN0dMTjVH?=
+ =?utf-8?B?OCtYZFRvV1BDd25hR2EwY3JHRzRJdnRXU0FubmJ3MU9NMWNQOVR3RVNoMTdV?=
+ =?utf-8?B?ZFJzWTdod0ZJR3BJdWdSV1NkWHcrenhuMElGZkJ5QVdpNUUxek9IME5rMjY4?=
+ =?utf-8?B?a05wRHRQNjl1dkZRbEVyN1drbm5jbzI1YkpWOStVVTQ2bmNSVllaUUx2Tno5?=
+ =?utf-8?B?dTBCZlp6cnlaVTlCODdla2hlTURBdVVTSFFpVElWS0xiZko2bEsrNGl2VEU3?=
+ =?utf-8?B?L3FQa3k2WWZIN2M2cEFTVC9jU2RveWlOa05kTEM4aGo3Z1RpV3dWWko4QWVM?=
+ =?utf-8?B?SjlsTVBEbDZnaFVocXhwbDRlUEJwVTlROUNDejNHK3dteW56TlNtNEE3Y0VQ?=
+ =?utf-8?B?U1FqN3ltNk9sNENtdVBST2ZJTDVWUlhJOEo0Vkt4S0trMUZJeW1lMUhvM0xu?=
+ =?utf-8?B?WnhqQUFHT0djYmZreWgwaktxOHUxR2xDamYyOG93U241MU1XOFJKOVJwZXhx?=
+ =?utf-8?B?M2YxZUJ4VC93WVFLT2NTeVdTSDAvamczbi9Ec1pMdm9VcjJIczdzZXlvWFQw?=
+ =?utf-8?B?SVZtMElOS1lvL1dUT1RCUytjMTdCOXJlS05FOEcydm5CUVpCL08yakUxeVht?=
+ =?utf-8?B?NGp3aDNTcGZ4dFdoTFdTL0srcmdVV2ZJMDZXS2s2TDUzWHZuSXovdUFsRlFx?=
+ =?utf-8?B?UzMxUHFEVmJRMzNBVGt4RW94aE5ZOCs0ak41OEFGUFZJYmFnU2hEZDIyeUVU?=
+ =?utf-8?B?cjhhKzdINlBOdXRFeGVEVnEwTmhoZmZOb2JnVkxPbkFHamlBMTE5U0piZW4x?=
+ =?utf-8?B?K1VCeU5yOGx3R1VTNUdubjR0QS9tc0NGcnpNaHB2STBsd0tJQkpSckk4SXJE?=
+ =?utf-8?B?TGVOSjJsOVd5TmlEcFA4TEFYdVlRRklJbmxJQmZwR1UyNHJqZWZuV3IwODJN?=
+ =?utf-8?B?NTNPall2Nkc0NVJWVHFJQk8ydm1laUpUNk41b1ZGbjJ1UHlTMzdwT3c4bWUz?=
+ =?utf-8?B?eGd2MEJHTzdpS0ZiNkxQc2VzYXhGVkdrcjBKT01CWCtoSzd4NGVlNWkrZmVK?=
+ =?utf-8?B?UjFLUnRlbzY0QWtXMkVOcTJQQzdNRUtqNDFFNStnSEUzR3hjT1FJcVFubVF6?=
+ =?utf-8?B?NnJKRzZtVmo2aWVyR2lqekpreUpKVHZvdTRmOGtzdEVGS2JJSjNGRUY1dTBK?=
+ =?utf-8?B?OXFTUngxc3o3c0ZJa2VWcm9NenJtdE54T2RQTFFGazBhazdTNlREMmxBVnhl?=
+ =?utf-8?B?eis1VnJBanA3RzJ4Z3FZbFpYTlhWSVNleFhodFF2KzRIdmwvQlZMY0Vod3Y1?=
+ =?utf-8?B?TVhMVEFuUE9vVWcvMHlVYkRNQ1duVWFCTkNPZk0zSDBEMVRjNkN6VjVkNndj?=
+ =?utf-8?B?T2RJSDN5NXE0WGNoOHR6MDF6TnRSaCt6SlpNb05EWndoUXVBdmt3Rnd4MXNr?=
+ =?utf-8?B?OEpWNllyWkgrMTB4Q1JHWkViZ3BMUTRsVlNlekV2MmlMWkhPa0pNYVNyMUho?=
+ =?utf-8?Q?lAoSAN07n6bFOyl95Tu0gH/45?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a981588b-62f8-4611-8d3f-08db3b72fd96
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2023 16:28:47.3192
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C0ytBS75t3qz4Qed7C6q8yyLQJ0kiCsSVJVOoDTj6RF4uGqWKaNgBm7HLyuHGDO0BuFK+N+Ms1yqyvxcSK7i3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8808
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Chuck, Herbert,
+On 4/7/2023 01:18, Wolfram Sang wrote:
+> 
+>>> How should this go upstream, i.e. are there dependencies? Shall I pick
+>>> the I2C patches or is it better if all goes via the crypto tree?
+>>>
+>> IMO it's better to go through the crypto tree.  There are dependencies
+>> in the crypto part from the earlier series that was merged.
+> 
+> Ok, fine with me. I acked the I2C patches. Thanks for the heads up.
+> 
 
-I was trying to bring my krb5 crypto lib patches up to date, but noticed t=
-hat
-the Camellia encryption selftests are failing (the key derivation tests wo=
-rk,
-but the crypto tests failed).
+Herbert,
 
-After some investigation that didn't get anywhere, I tried the sunrpc kuni=
-t
-tests that Chuck added - and those fail similarly (dmesg attached below). =
- I
-tried the hardware accelerated version also and that has the same failure.
-
-Note that Chuck and I implemented the kerberos Camellia routines
-independently.
-
-David
----
-    KTAP version 1
-    # Subtest: RFC 6803 suite
-    1..3
-        KTAP version 1
-        # Subtest: RFC 6803 key derivation
-        ok 1 Derive Kc subkey for camellia128-cts-cmac
-        ok 2 Derive Ke subkey for camellia128-cts-cmac
-        ok 3 Derive Ki subkey for camellia128-cts-cmac
-        ok 4 Derive Kc subkey for camellia256-cts-cmac
-        ok 5 Derive Ke subkey for camellia256-cts-cmac
-        ok 6 Derive Ki subkey for camellia256-cts-cmac
-    # RFC 6803 key derivation: pass:6 fail:0 skip:0 total:6
-    ok 1 RFC 6803 key derivation
-        KTAP version 1
-        # Subtest: RFC 6803 checksum
-        ok 1 camellia128-cts-cmac checksum test 1
-        ok 2 camellia128-cts-cmac checksum test 2
-        ok 3 camellia256-cts-cmac checksum test 3
-        ok 4 camellia256-cts-cmac checksum test 4
-    # RFC 6803 checksum: pass:4 fail:0 skip:0 total:4
-    ok 2 RFC 6803 checksum
-        KTAP version 1
-        # Subtest: RFC 6803 encryption
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D 135 (0x87)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D -108 (0xffffffffffff=
-ff94)
-
-HMAC mismatch
-        not ok 1 Encrypt empty plaintext with camellia128-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D -49 (0xffffffffffffffcf)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D -3 (0xffffffffffffff=
-fd)
-
-HMAC mismatch
-        not ok 2 Encrypt 1 byte with camellia128-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D -36 (0xffffffffffffffdc)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D 44 (0x2c)
-
-HMAC mismatch
-        not ok 3 Encrypt 9 bytes with camellia128-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D -58 (0xffffffffffffffc6)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D -103 (0xffffffffffff=
-ff99)
-
-HMAC mismatch
-        not ok 4 Encrypt 13 bytes with camellia128-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D 160 (0xa0)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D 95 (0x5f)
-
-HMAC mismatch
-        not ok 5 Encrypt 30 bytes with camellia128-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D -150 (0xffffffffffffff6a)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D 48 (0x30)
-
-HMAC mismatch
-        not ok 6 Encrypt empty plaintext with camellia256-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D 24 (0x18)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D 22 (0x16)
-
-HMAC mismatch
-        not ok 7 Encrypt 1 byte with camellia256-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D 108 (0x6c)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D -106 (0xffffffffffff=
-ff96)
-
-HMAC mismatch
-        not ok 8 Encrypt 9 bytes with camellia256-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D 64 (0x40)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D -196 (0xffffffffffff=
-ff3c)
-
-HMAC mismatch
-        not ok 9 Encrypt 13 bytes with camellia256-cts-cmac
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1389
-    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
-f.len) =3D=3D 0, but
-        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
-) =3D=3D -238 (0xffffffffffffff12)
-
-encrypted result mismatch
-    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
-rb5_test.c:1393
-    Expected memcmp(param->expected_result->data + (param->expected_result=
-->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
-        memcmp(param->expected_result->data + (param->expected_result->len=
- - checksum.len), checksum.data, checksum.len) =3D=3D 168 (0xa8)
-
-HMAC mismatch
-        not ok 10 Encrypt 30 bytes with camellia256-cts-cmac
-    # RFC 6803 encryption: pass:0 fail:10 skip:0 total:10
-    not ok 3 RFC 6803 encryption
-# RFC 6803 suite: pass:2 fail:1 skip:0 total:3
-# Totals: pass:10 fail:10 skip:0 total:20
-not ok 3 RFC 6803 suite
-
+Would you mind to queue these up for -next?  I do have some other 
+separate work I will be submitting that is going to layer on top of 
+them, so I'd like to base it off your branch with these landed.
