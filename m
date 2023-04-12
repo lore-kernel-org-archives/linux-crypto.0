@@ -2,112 +2,241 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E9EC7619A
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 17:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13EDC7619A
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 17:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229516AbjDLRLc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Apr 2023 13:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49040 "EHLO
+        id S229974AbjDLRpr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Apr 2023 13:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbjDLRL3 (ORCPT
+        with ESMTP id S229674AbjDLRpq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2023 13:11:29 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1235E46A3
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 10:11:26 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pmdzp-0001ho-BG; Wed, 12 Apr 2023 19:11:01 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pmdzm-00AmwQ-36; Wed, 12 Apr 2023 19:10:58 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1pmdzk-00CfNB-OC; Wed, 12 Apr 2023 19:10:56 +0200
-Date:   Wed, 12 Apr 2023 19:10:56 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Roy Pledge <Roy.Pledge@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
+        Wed, 12 Apr 2023 13:45:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C3F659B
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 10:44:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681321497;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tP+I0V87B+GLz22Mtkfzoxy6lXr4PfDB+kQ9sXzfXKA=;
+        b=VtlI7eYZ/jnNpmqmq3w/w33YcGekFGSoHZ51np6IG621i+vnEGGVdNcJDyay6+t2rhJb3Q
+        wouFi8aI4K8LhgHXuQiZkw/vNYK306X3v5I+V6FFQfEwJyG6gV8TrjMSWyGnn7OoQZbobv
+        45PyCSWUaz/ow6Adfi3cnaxt7K4XHxM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-300-CxVCpa1lMU--81LOx_0mHw-1; Wed, 12 Apr 2023 13:44:54 -0400
+X-MC-Unique: CxVCpa1lMU--81LOx_0mHw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 869AB185A78B;
+        Wed, 12 Apr 2023 17:44:53 +0000 (UTC)
+Received: from aion.usersys.redhat.com (unknown [10.22.32.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AAF02166B26;
+        Wed, 12 Apr 2023 17:44:52 +0000 (UTC)
+Received: by aion.usersys.redhat.com (Postfix, from userid 1000)
+        id 790761A27F5; Wed, 12 Apr 2023 13:44:52 -0400 (EDT)
+Date:   Wed, 12 Apr 2023 13:44:52 -0400
+From:   Scott Mayhew <smayhew@redhat.com>
+To:     Chuck Lever III <chuck.lever@oracle.com>
+Cc:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vinod Koul <vkoul@kernel.org>,
-        Ioana Ciornei <ioana.ciornei@nxp.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Richard Cochran <richardcochran@gmail.com>
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kernel@pengutronix.de, dmaengine@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
-Message-ID: <20230412171056.xcluewbuyytm77yp@pengutronix.de>
-References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
+Message-ID: <ZDbuFO+f8FCvrawH@aion.usersys.redhat.com>
+References: <380323.1681314997@warthog.procyon.org.uk>
+ <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="2x2mx27jq2zwvoxs"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+In-Reply-To: <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, 12 Apr 2023, Chuck Lever III wrote:
 
---2x2mx27jq2zwvoxs
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> 
+> 
+> > On Apr 12, 2023, at 11:56 AM, David Howells <dhowells@redhat.com> wrote:
+> > 
+> > Hi Chuck, Herbert,
+> > 
+> > I was trying to bring my krb5 crypto lib patches up to date, but noticed that
+> > the Camellia encryption selftests are failing (the key derivation tests work,
+> > but the crypto tests failed).
+> > 
+> > After some investigation that didn't get anywhere, I tried the sunrpc kunit
+> > tests that Chuck added - and those fail similarly (dmesg attached below).  I
+> > tried the hardware accelerated version also and that has the same failure.
+> 
+> Ah, I see Scott is Cc'd. Yes, Scott reported this to me yesterday.
 
-Hello,
+Yes, I found that if I run the test via kunit.py it works fine.  If I
+try to run it via loading the gss_krb5_test module, the checksum tests
+fail.  But if I build the tests directly into the kernel, then they also
+run fine.
 
-On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=F6nig wrote:
-> Hello,
->=20
-> many bus remove functions return an integer which is a historic
-> misdesign that makes driver authors assume that there is some kind of
-> error handling in the upper layers. This is wrong however and returning
-> and error code only yields an error message.
->=20
-> This series improves the fsl-mc bus by changing the remove callback to
-> return no value instead. As a preparation all drivers are changed to
-> return zero before so that they don't trigger the error message.
+-Scott
+> 
+> 
+> > Note that Chuck and I implemented the kerberos Camellia routines
+> > independently.
+> 
+> Yes, but we implemented the same unit tests (from RFC 6803).
+> 
+> 
+> > David
+> > ---
+> >    KTAP version 1
+> >    # Subtest: RFC 6803 suite
+> >    1..3
+> >        KTAP version 1
+> >        # Subtest: RFC 6803 key derivation
+> >        ok 1 Derive Kc subkey for camellia128-cts-cmac
+> >        ok 2 Derive Ke subkey for camellia128-cts-cmac
+> >        ok 3 Derive Ki subkey for camellia128-cts-cmac
+> >        ok 4 Derive Kc subkey for camellia256-cts-cmac
+> >        ok 5 Derive Ke subkey for camellia256-cts-cmac
+> >        ok 6 Derive Ki subkey for camellia256-cts-cmac
+> >    # RFC 6803 key derivation: pass:6 fail:0 skip:0 total:6
+> >    ok 1 RFC 6803 key derivation
+> >        KTAP version 1
+> >        # Subtest: RFC 6803 checksum
+> >        ok 1 camellia128-cts-cmac checksum test 1
+> >        ok 2 camellia128-cts-cmac checksum test 2
+> >        ok 3 camellia256-cts-cmac checksum test 3
+> >        ok 4 camellia256-cts-cmac checksum test 4
+> >    # RFC 6803 checksum: pass:4 fail:0 skip:0 total:4
+> >    ok 2 RFC 6803 checksum
+> >        KTAP version 1
+> >        # Subtest: RFC 6803 encryption
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 135 (0x87)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == -108 (0xffffffffffffff94)
+> > 
+> > HMAC mismatch
+> >        not ok 1 Encrypt empty plaintext with camellia128-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == -49 (0xffffffffffffffcf)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == -3 (0xfffffffffffffffd)
+> > 
+> > HMAC mismatch
+> >        not ok 2 Encrypt 1 byte with camellia128-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == -36 (0xffffffffffffffdc)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 44 (0x2c)
+> > 
+> > HMAC mismatch
+> >        not ok 3 Encrypt 9 bytes with camellia128-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == -58 (0xffffffffffffffc6)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == -103 (0xffffffffffffff99)
+> > 
+> > HMAC mismatch
+> >        not ok 4 Encrypt 13 bytes with camellia128-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 160 (0xa0)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 95 (0x5f)
+> > 
+> > HMAC mismatch
+> >        not ok 5 Encrypt 30 bytes with camellia128-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == -150 (0xffffffffffffff6a)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 48 (0x30)
+> > 
+> > HMAC mismatch
+> >        not ok 6 Encrypt empty plaintext with camellia256-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 24 (0x18)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 22 (0x16)
+> > 
+> > HMAC mismatch
+> >        not ok 7 Encrypt 1 byte with camellia256-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 108 (0x6c)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == -106 (0xffffffffffffff96)
+> > 
+> > HMAC mismatch
+> >        not ok 8 Encrypt 9 bytes with camellia256-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 64 (0x40)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == -196 (0xffffffffffffff3c)
+> > 
+> > HMAC mismatch
+> >        not ok 9 Encrypt 13 bytes with camellia256-cts-cmac
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1389
+> >    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == 0, but
+> >        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len) == -238 (0xffffffffffffff12)
+> > 
+> > encrypted result mismatch
+> >    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:1393
+> >    Expected memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 0, but
+> >        memcmp(param->expected_result->data + (param->expected_result->len - checksum.len), checksum.data, checksum.len) == 168 (0xa8)
+> > 
+> > HMAC mismatch
+> >        not ok 10 Encrypt 30 bytes with camellia256-cts-cmac
+> >    # RFC 6803 encryption: pass:0 fail:10 skip:0 total:10
+> >    not ok 3 RFC 6803 encryption
+> > # RFC 6803 suite: pass:2 fail:1 skip:0 total:3
+> > # Totals: pass:10 fail:10 skip:0 total:20
+> > not ok 3 RFC 6803 suite
+> > 
+> 
+> --
+> Chuck Lever
+> 
+> 
 
-Who is supposed to pick up this patch series (or point out a good reason
-for not taking it)?
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---2x2mx27jq2zwvoxs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmQ25h8ACgkQj4D7WH0S
-/k7l+Af+N5+aCs46B4ridehobQBafv9tZPTtFGoBY5sC3oXI6o1esrrE+v65jjyp
-+6c8u6nhgNeTebXzIxFZRF5wUcD+7uIAD+ZomoHHX7CJ83BoYu0ifciGJOIC15r5
-j5AnkV0+1vzfztf5wozUdHsk/m+PKeRgKLzvJ2z7HmFShucihqWRGFUkdu9+DIw4
-0hxxi+Y0L+5iuoKcXmrFi28Rid2oVDjeSYvkQTsWtp3l/4Gtu2Dqc0hW2hU66NmG
-6rOxQ24mymBgwEc0XyR0uBq+/1YBdKzJOFjjH3ilQNzWb66Spxl1q74K0karyFcS
-rEZESsixkY8yP2PuyQt8FJxICwYcXQ==
-=BATw
------END PGP SIGNATURE-----
-
---2x2mx27jq2zwvoxs--
