@@ -2,82 +2,284 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05633C77B6E
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 13:25:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D09C4C7619A
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Apr 2023 15:57:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbjDLNZY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Apr 2023 09:25:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
+        id S231245AbjDLP5b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Apr 2023 11:57:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231613AbjDLNYv (ORCPT
+        with ESMTP id S229575AbjDLP5a (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Apr 2023 09:24:51 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 899259ED0;
-        Wed, 12 Apr 2023 06:24:23 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id w13so28228580oik.2;
-        Wed, 12 Apr 2023 06:24:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681305786; x=1683897786;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t7nW6mawiUuyYszKT+ZrkBThDfGBOABkC1FpPQVvJWI=;
-        b=XcT9DruApjzDiS139B4vZXzxQ2d/u4KE8o8WqcnOhetJ4P2o/23swtdE647D9AiSFN
-         cSkQZh6Z+lzgzKdGpkxeMRRbbbWexlA5bDqNuhFIr0uSd8eVqrieUmbjIocaH7C5UjH8
-         eK0HHldjlxWM958Tleh2nVDUjTq+VWypkAhR3CJKKhf4i8QTz0GwDviTpGp9IEmto5T1
-         aOmhkInlkM4TyGlk6W9l7BayBQAWmJ7XUo6IjA4gHm65h8xN+/5vKBiPmXUUPZanDGBm
-         DCnEVEaVRxv9bWn+HJ1vDQCFZYafIi4hyQ3IrGCxseT83RCIRYu0OehvSPMWMlSAtPXa
-         96dg==
-X-Gm-Message-State: AAQBX9enuxb3l1CMWGrIMzzsHITjRJnC8y9Mx/RIQCOiB85ZuoVw7xB1
-        8fnO6uQHJc89ZnxHU8ZpJ2xh3VxkuA==
-X-Google-Smtp-Source: AKy350Ze5ahkO+i51YqIaIv90DMIyhWWgOpcR5PQ65mfFvNAEbx1vXIzAmE9jG1S0P8ZzwcVpdix5g==
-X-Received: by 2002:a05:6808:3a7:b0:389:2d2b:4b05 with SMTP id n7-20020a05680803a700b003892d2b4b05mr6088608oie.5.1681305784977;
-        Wed, 12 Apr 2023 06:23:04 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id fe6-20020a0568082b0600b00387372f548asm6562499oib.16.2023.04.12.06.23.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 06:23:04 -0700 (PDT)
-Received: (nullmailer pid 2007502 invoked by uid 1000);
-        Wed, 12 Apr 2023 13:23:03 -0000
-Date:   Wed, 12 Apr 2023 08:23:03 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     andersson@kernel.org, krzysztof.kozlowski@linaro.org,
-        neil.armstrong@linaro.org, djakov@kernel.org,
-        devicetree@vger.kernel.org, robh+dt@kernel.org, rfoss@kernel.org,
-        linux-kernel@vger.kernel.org, agross@kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        vladimir.zapolskiy@linaro.org, konrad.dybcio@linaro.org,
-        bhupesh.linux@gmail.com
-Subject: Re: [PATCH v6 05/11] dt-bindings: qcom-qce: Fix compatible
- combinations for SM8150 and IPQ4019 SoCs
-Message-ID: <168130578228.2007207.11606069055162808337.robh@kernel.org>
-References: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
- <20230405072836.1690248-6-bhupesh.sharma@linaro.org>
+        Wed, 12 Apr 2023 11:57:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA35F5FEA
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 08:56:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681315002;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Jp+uLMlvohTK1fCAD9z2ZBAqRyO1rsjM59UZ+H2UJdE=;
+        b=PsisnjkhQVyqJMUURVovNzggbLaW7ArKaewDs/KbF+JnhdLAyNvDfNSyCnRj/a4vgPcBmK
+        9E2I0QxvObhXLRi23dyQmjtuuu/goPzGQgHlNRqzqWywAP7Soa5VzXAZRqeHeZBvswRsjY
+        ZPJNMBqCYshnxVU6Eyw+bWrZjDV8FR4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-557-gsFujymGPYeLeLNikER73A-1; Wed, 12 Apr 2023 11:56:40 -0400
+X-MC-Unique: gsFujymGPYeLeLNikER73A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9740A811E7C;
+        Wed, 12 Apr 2023 15:56:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8ECEA40C20FA;
+        Wed, 12 Apr 2023 15:56:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Chuck Lever <chuck.lever@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+cc:     dhowells@redhat.com, Scott Mayhew <smayhew@redhat.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Did the in-kernel Camellia or CMAC crypto implementation break?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230405072836.1690248-6-bhupesh.sharma@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <380322.1681314997.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 12 Apr 2023 16:56:37 +0100
+Message-ID: <380323.1681314997@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Chuck, Herbert,
 
-On Wed, 05 Apr 2023 12:58:30 +0530, Bhupesh Sharma wrote:
-> Currently the compatible list available in 'qce' dt-bindings does not
-> support SM8150 and IPQ4019 SoCs directly which may lead to potential
-> 'dtbs_check' error(s).
-> 
-> Fix the same.
-> 
-> Fixes: 00f3bc2db351 ("dt-bindings: qcom-qce: Add new SoC compatible strings for Qualcomm QCE IP")
-> Reviewed-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
+I was trying to bring my krb5 crypto lib patches up to date, but noticed t=
+hat
+the Camellia encryption selftests are failing (the key derivation tests wo=
+rk,
+but the crypto tests failed).
 
-Acked-by: Rob Herring <robh@kernel.org>
+After some investigation that didn't get anywhere, I tried the sunrpc kuni=
+t
+tests that Chuck added - and those fail similarly (dmesg attached below). =
+ I
+tried the hardware accelerated version also and that has the same failure.
+
+Note that Chuck and I implemented the kerberos Camellia routines
+independently.
+
+David
+---
+    KTAP version 1
+    # Subtest: RFC 6803 suite
+    1..3
+        KTAP version 1
+        # Subtest: RFC 6803 key derivation
+        ok 1 Derive Kc subkey for camellia128-cts-cmac
+        ok 2 Derive Ke subkey for camellia128-cts-cmac
+        ok 3 Derive Ki subkey for camellia128-cts-cmac
+        ok 4 Derive Kc subkey for camellia256-cts-cmac
+        ok 5 Derive Ke subkey for camellia256-cts-cmac
+        ok 6 Derive Ki subkey for camellia256-cts-cmac
+    # RFC 6803 key derivation: pass:6 fail:0 skip:0 total:6
+    ok 1 RFC 6803 key derivation
+        KTAP version 1
+        # Subtest: RFC 6803 checksum
+        ok 1 camellia128-cts-cmac checksum test 1
+        ok 2 camellia128-cts-cmac checksum test 2
+        ok 3 camellia256-cts-cmac checksum test 3
+        ok 4 camellia256-cts-cmac checksum test 4
+    # RFC 6803 checksum: pass:4 fail:0 skip:0 total:4
+    ok 2 RFC 6803 checksum
+        KTAP version 1
+        # Subtest: RFC 6803 encryption
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D 135 (0x87)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D -108 (0xffffffffffff=
+ff94)
+
+HMAC mismatch
+        not ok 1 Encrypt empty plaintext with camellia128-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D -49 (0xffffffffffffffcf)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D -3 (0xffffffffffffff=
+fd)
+
+HMAC mismatch
+        not ok 2 Encrypt 1 byte with camellia128-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D -36 (0xffffffffffffffdc)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D 44 (0x2c)
+
+HMAC mismatch
+        not ok 3 Encrypt 9 bytes with camellia128-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D -58 (0xffffffffffffffc6)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D -103 (0xffffffffffff=
+ff99)
+
+HMAC mismatch
+        not ok 4 Encrypt 13 bytes with camellia128-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D 160 (0xa0)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D 95 (0x5f)
+
+HMAC mismatch
+        not ok 5 Encrypt 30 bytes with camellia128-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D -150 (0xffffffffffffff6a)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D 48 (0x30)
+
+HMAC mismatch
+        not ok 6 Encrypt empty plaintext with camellia256-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D 24 (0x18)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D 22 (0x16)
+
+HMAC mismatch
+        not ok 7 Encrypt 1 byte with camellia256-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D 108 (0x6c)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D -106 (0xffffffffffff=
+ff96)
+
+HMAC mismatch
+        not ok 8 Encrypt 9 bytes with camellia256-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D 64 (0x40)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D -196 (0xffffffffffff=
+ff3c)
+
+HMAC mismatch
+        not ok 9 Encrypt 13 bytes with camellia256-cts-cmac
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1389
+    Expected memcmp(param->expected_result->data, buf.head[0].iov_base, bu=
+f.len) =3D=3D 0, but
+        memcmp(param->expected_result->data, buf.head[0].iov_base, buf.len=
+) =3D=3D -238 (0xffffffffffffff12)
+
+encrypted result mismatch
+    # RFC 6803 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_k=
+rb5_test.c:1393
+    Expected memcmp(param->expected_result->data + (param->expected_result=
+->len - checksum.len), checksum.data, checksum.len) =3D=3D 0, but
+        memcmp(param->expected_result->data + (param->expected_result->len=
+ - checksum.len), checksum.data, checksum.len) =3D=3D 168 (0xa8)
+
+HMAC mismatch
+        not ok 10 Encrypt 30 bytes with camellia256-cts-cmac
+    # RFC 6803 encryption: pass:0 fail:10 skip:0 total:10
+    not ok 3 RFC 6803 encryption
+# RFC 6803 suite: pass:2 fail:1 skip:0 total:3
+# Totals: pass:10 fail:10 skip:0 total:20
+not ok 3 RFC 6803 suite
 
