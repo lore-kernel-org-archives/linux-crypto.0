@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B56DC77B73
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 06:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EC1C77B6C
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 06:25:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbjDMGYx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 02:24:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41422 "EHLO
+        id S229618AbjDMGZD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Apr 2023 02:25:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjDMGYw (ORCPT
+        with ESMTP id S229924AbjDMGY7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 02:24:52 -0400
+        Thu, 13 Apr 2023 02:24:59 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B466583;
-        Wed, 12 Apr 2023 23:24:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A48BA8688;
+        Wed, 12 Apr 2023 23:24:55 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pmqNV-00FNVI-Fs; Thu, 13 Apr 2023 14:24:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Apr 2023 14:24:17 +0800
+        id 1pmqNZ-00FNVh-O9; Thu, 13 Apr 2023 14:24:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Apr 2023 14:24:21 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Thu, 13 Apr 2023 14:24:17 +0800
-Subject: [PATCH 2/6] crypto: api - Add crypto_clone_tfm
+Date:   Thu, 13 Apr 2023 14:24:21 +0800
+Subject: [PATCH 4/6] crypto: hmac - Add support for cloning
 References: <ZDefxOq6Ax0JeTRH@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         David Ahern <dsahern@kernel.org>,
@@ -44,133 +44,50 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Leonard Crestez <cdleonard@gmail.com>,
         Salam Noureddine <noureddine@arista.com>,
         netdev@vger.kernel.org
-Message-Id: <E1pmqNV-00FNVI-Fs@formenos.hmeau.com>
+Message-Id: <E1pmqNZ-00FNVh-O9@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds the helper crypto_clone_tfm.  The purpose is to
-allocate a tfm object with GFP_ATOMIC.  As we cannot sleep, the
-object has to be cloned from an existing tfm object.
-
-This allows code paths that cannot otherwise allocate a crypto_tfm
-object to do so.  Once a new tfm has been obtained its key could
-then be changed without impacting other users.
+Allow hmac to be cloned.  The underlying hash can be used directly
+with a reference count.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/api.c      |   59 +++++++++++++++++++++++++++++++++++++++++++++---------
- crypto/internal.h |    2 +
- 2 files changed, 52 insertions(+), 9 deletions(-)
+ crypto/hmac.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/crypto/api.c b/crypto/api.c
-index f509d73fa682..d375e8cd770d 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -488,28 +488,44 @@ struct crypto_tfm *crypto_alloc_base(const char *alg_name, u32 type, u32 mask)
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 3610ff0b6739..09a7872b4060 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -160,6 +160,20 @@ static int hmac_init_tfm(struct crypto_shash *parent)
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(crypto_alloc_base);
  
--void *crypto_create_tfm_node(struct crypto_alg *alg,
--			const struct crypto_type *frontend,
--			int node)
-+static void *crypto_alloc_tfmmem(struct crypto_alg *alg,
-+				 const struct crypto_type *frontend, int node,
-+				 gfp_t gfp)
++static int hmac_clone_tfm(struct crypto_shash *dst, struct crypto_shash *src)
++{
++	struct hmac_ctx *sctx = hmac_ctx(src);
++	struct hmac_ctx *dctx = hmac_ctx(dst);
++	struct crypto_shash *hash;
++
++	hash = crypto_clone_shash(sctx->hash);
++	if (IS_ERR(hash))
++		return PTR_ERR(hash);
++
++	dctx->hash = hash;
++	return 0;
++}
++
+ static void hmac_exit_tfm(struct crypto_shash *parent)
  {
--	char *mem;
--	struct crypto_tfm *tfm = NULL;
-+	struct crypto_tfm *tfm;
- 	unsigned int tfmsize;
- 	unsigned int total;
--	int err = -ENOMEM;
-+	char *mem;
+ 	struct hmac_ctx *ctx = hmac_ctx(parent);
+@@ -227,6 +241,7 @@ static int hmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.import = hmac_import;
+ 	inst->alg.setkey = hmac_setkey;
+ 	inst->alg.init_tfm = hmac_init_tfm;
++	inst->alg.clone_tfm = hmac_clone_tfm;
+ 	inst->alg.exit_tfm = hmac_exit_tfm;
  
- 	tfmsize = frontend->tfmsize;
- 	total = tfmsize + sizeof(*tfm) + frontend->extsize(alg);
- 
--	mem = kzalloc_node(total, GFP_KERNEL, node);
-+	mem = kzalloc_node(total, gfp, node);
- 	if (mem == NULL)
--		goto out_err;
-+		return ERR_PTR(-ENOMEM);
- 
- 	tfm = (struct crypto_tfm *)(mem + tfmsize);
- 	tfm->__crt_alg = alg;
- 	tfm->node = node;
- 	refcount_set(&tfm->refcnt, 1);
- 
-+	return mem;
-+}
-+
-+void *crypto_create_tfm_node(struct crypto_alg *alg,
-+			     const struct crypto_type *frontend,
-+			     int node)
-+{
-+	struct crypto_tfm *tfm;
-+	char *mem;
-+	int err;
-+
-+	mem = crypto_alloc_tfmmem(alg, frontend, node, GFP_KERNEL);
-+	if (IS_ERR(mem))
-+		goto out;
-+
-+	tfm = (struct crypto_tfm *)(mem + frontend->tfmsize);
-+
- 	err = frontend->init_tfm(tfm);
- 	if (err)
- 		goto out_free_tfm;
-@@ -525,13 +541,38 @@ void *crypto_create_tfm_node(struct crypto_alg *alg,
- 	if (err == -EAGAIN)
- 		crypto_shoot_alg(alg);
- 	kfree(mem);
--out_err:
- 	mem = ERR_PTR(err);
- out:
- 	return mem;
- }
- EXPORT_SYMBOL_GPL(crypto_create_tfm_node);
- 
-+void *crypto_clone_tfm(const struct crypto_type *frontend,
-+		       struct crypto_tfm *otfm)
-+{
-+	struct crypto_alg *alg = otfm->__crt_alg;
-+	struct crypto_tfm *tfm;
-+	char *mem;
-+
-+	mem = ERR_PTR(-ESTALE);
-+	if (unlikely(!crypto_mod_get(alg)))
-+		goto out;
-+
-+	mem = crypto_alloc_tfmmem(alg, frontend, otfm->node, GFP_ATOMIC);
-+	if (IS_ERR(mem)) {
-+		crypto_mod_put(alg);
-+		goto out;
-+	}
-+
-+	tfm = (struct crypto_tfm *)(mem + frontend->tfmsize);
-+	tfm->crt_flags = otfm->crt_flags;
-+	tfm->exit = otfm->exit;
-+
-+out:
-+	return mem;
-+}
-+EXPORT_SYMBOL_GPL(crypto_clone_tfm);
-+
- struct crypto_alg *crypto_find_alg(const char *alg_name,
- 				   const struct crypto_type *frontend,
- 				   u32 type, u32 mask)
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 5eee009ee494..8dd746b1130b 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -106,6 +106,8 @@ struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
- 				      u32 mask);
- void *crypto_create_tfm_node(struct crypto_alg *alg,
- 			const struct crypto_type *frontend, int node);
-+void *crypto_clone_tfm(const struct crypto_type *frontend,
-+		       struct crypto_tfm *otfm);
- 
- static inline void *crypto_create_tfm(struct crypto_alg *alg,
- 			const struct crypto_type *frontend)
+ 	inst->free = shash_free_singlespawn_instance;
