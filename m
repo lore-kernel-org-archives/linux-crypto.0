@@ -2,161 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 862C1C77B6E
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 15:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8C4C77B6E
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 19:47:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbjDMPlN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 11:41:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59278 "EHLO
+        id S229713AbjDMTrC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Apr 2023 15:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231535AbjDMPlK (ORCPT
+        with ESMTP id S229628AbjDMTrC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 11:41:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856F02735
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2023 08:40:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681400423;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=jbHS4ONCJAZNCIhp3+ndbTPNcdIWskwH2IT/8x7UvBA=;
-        b=a9bw73Ws3vx3sbSLD9LbXYgLNuA93vLJWHIaVhjkcdk9zVS7X3FOj6vEW3MCFZzzlEmLVv
-        nulCQWM40KwXg+4omYPAWmZ74cQKQDCobLQ2m7niOnt+CzvwhbTGwXaSgdZJ3vhmCNsSEk
-        yVrpSvhm+ql4O6WDR84LpsNhKCkWRfQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-218-Oh9Gs8FWMu2C7uje-2dTFQ-1; Thu, 13 Apr 2023 11:40:20 -0400
-X-MC-Unique: Oh9Gs8FWMu2C7uje-2dTFQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C06A0101A552;
-        Thu, 13 Apr 2023 15:40:19 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D85BC492B00;
-        Thu, 13 Apr 2023 15:40:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-cc:     dhowells@redhat.com, Chuck Lever <chuck.lever@oracle.com>,
-        Scott Mayhew <smayhew@redhat.com>, linux-nfs@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: Add some test vectors for cmac(camellia)
+        Thu, 13 Apr 2023 15:47:02 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865D665B6;
+        Thu, 13 Apr 2023 12:47:00 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33DJkde9010136;
+        Thu, 13 Apr 2023 19:46:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=9bXJxQDpqf1FHLqGzpmDLwhqgj0ZIvKATcvCppLD37c=;
+ b=r0GRWg6onBfCy+Ud/Ja+kk63Q68i4wgCjw68rZfbSVHGeLCdP0OLL8apQzbXMYxGqkTY
+ Lad0Dv7Fmj3YK3Uf4pTTpzs9BGU61zkuiHQbIqnJAM+L4Ff4o34HoG52I5LIndL25Km1
+ yvCkBGZtlEo3ALzAuhooNTLqlzAhTj75l8orUnrm/GFc5xrO+c0vPTRpJtH8+nbqeArT
+ 0e7g7iaw4YfMvhI+IWm3DKgm8kJt4PEjNfM4sEQsI2Y5vSfAm0xFIhWEiCaySOxTMHFN
+ f71Q7IqWw2vEBq/YTvMKu0077GXtMvWt1v7IEfyt4ZbNPi6H0q7wjo+hAnZx8mansaiZ Bw== 
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxmf6hruc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Apr 2023 19:46:40 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33DGbSCn020774;
+        Thu, 13 Apr 2023 19:46:39 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
+        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3pu0jhd4qx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Apr 2023 19:46:39 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33DJkbYm22151704
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Apr 2023 19:46:37 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A35715803F;
+        Thu, 13 Apr 2023 19:46:37 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16C1A58054;
+        Thu, 13 Apr 2023 19:46:37 +0000 (GMT)
+Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
+        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Apr 2023 19:46:37 +0000 (GMT)
+From:   Danny Tsen <dtsen@linux.ibm.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
+        Danny Tsen <dtsen@linux.ibm.com>
+Subject: [PATCH v2 0/2] Remove POWER10_CPU dependency and move PPC_MODULE_FEATURE_P10.
+Date:   Thu, 13 Apr 2023 15:46:23 -0400
+Message-Id: <20230413194625.10631-1-dtsen@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1119459.1681400418.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 13 Apr 2023 16:40:18 +0100
-Message-ID: <1119460.1681400418@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kkHix0dOBNVrQxcEppfrkjkeKkloETFL
+X-Proofpoint-ORIG-GUID: kkHix0dOBNVrQxcEppfrkjkeKkloETFL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-13_14,2023-04-13_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=639
+ impostorscore=0 clxscore=1015 priorityscore=1501 spamscore=0
+ malwarescore=0 bulkscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304130174
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-    =
+Remove Power10 dependency in Kconfig and detect Power10 feature at runtime.
+Move PPC_MODULE_FEATURE_P10 definition to be in
+arch/powerpc/include/asm/cpufeature.h.
 
-Add some test vectors for 128-bit cmac(camellia) as found in
-draft-kato-ipsec-camellia-cmac96and128-01 section 6.2.
+Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 
-The document also shows vectors for camellia-cmac-96, and for VK with a
-length greater than 16, but I'm not sure how to express those in testmgr.
+Danny Tsen (2):
+  Kconfig: Remove POWER10_CPU dependency.
+  aes-gcm-p10-glue.c, cpufeature.h: Move Power10 feature, PPC_MODULE_FEATURE_P10.
 
-This also leaves cts(cbc(camellia)) untested, but I can't seem to find any
-tests for that that I could put into testmgr.
+ arch/powerpc/crypto/Kconfig            | 2 +-
+ arch/powerpc/crypto/aes-gcm-p10-glue.c | 1 -
+ arch/powerpc/include/asm/cpufeature.h  | 1 +
+ 3 files changed, 2 insertions(+), 2 deletions(-)
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: Scott Mayhew <smayhew@redhat.com>
-cc: linux-nfs@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-Link: https://datatracker.ietf.org/doc/pdf/draft-kato-ipsec-camellia-cmac9=
-6and128-01
----
- crypto/testmgr.c |    6 ++++++
- crypto/testmgr.h |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index c91e93ece20b..082a77e6a95c 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4572,6 +4572,12 @@ static const struct alg_test_desc alg_test_descs[] =
-=3D {
- 		.suite =3D {
- 			.hash =3D __VECS(aes_cmac128_tv_template)
- 		}
-+	}, {
-+		.alg =3D "cmac(camellia)",
-+		.test =3D alg_test_hash,
-+		.suite =3D {
-+			.hash =3D __VECS(camellia_cmac128_tv_template)
-+		}
- 	}, {
- 		.alg =3D "cmac(des3_ede)",
- 		.test =3D alg_test_hash,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index f10bfb9d9973..5ca7a412508f 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -25665,6 +25665,53 @@ static const struct cipher_testvec fcrypt_pcbc_tv=
-_template[] =3D {
- /*
-  * CAMELLIA test vectors.
-  */
-+static const struct hash_testvec camellia_cmac128_tv_template[] =3D {
-+	{ /* From draft-kato-ipsec-camellia-cmac96and128-01 */
-+		.key		=3D "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	=3D zeroed_string,
-+		.digest		=3D "\xba\x92\x57\x82\xaa\xa1\xf5\xd9"
-+				  "\xa0\x0f\x89\x64\x80\x94\xfc\x71",
-+		.psize		=3D 0,
-+		.ksize		=3D 16,
-+	}, {
-+		.key		=3D "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	=3D "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a",
-+		.digest		=3D "\x6d\x96\x28\x54\xa3\xb9\xfd\xa5"
-+				  "\x6d\x7d\x45\xa9\x5e\xe1\x79\x93",
-+		.psize		=3D 16,
-+		.ksize		=3D 16,
-+	}, {
-+		.key		=3D "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	=3D "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+				  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11",
-+		.digest		=3D "\x5c\x18\xd1\x19\xcc\xd6\x76\x61"
-+				  "\x44\xac\x18\x66\x13\x1d\x9f\x22",
-+		.psize		=3D 40,
-+		.ksize		=3D 16,
-+	}, {
-+		.key		=3D "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+				  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.plaintext	=3D "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+				  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+				  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
-+				  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-+				  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
-+				  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
-+				  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
-+				  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
-+		.digest		=3D "\xc2\x69\x9a\x6e\xba\x55\xce\x9d"
-+				  "\x93\x9a\x8a\x4e\x19\x46\x6e\xe9",
-+		.psize		=3D 64,
-+		.ksize		=3D 16,
-+	}
-+};
- static const struct cipher_testvec camellia_tv_template[] =3D {
- 	{
- 		.key	=3D "\x01\x23\x45\x67\x89\xab\xcd\xef"
+-- 
+2.31.1
 
