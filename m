@@ -2,170 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9E9C77B6F
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 13:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7B5C77B61
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 13:52:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbjDMNqg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 09:46:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48808 "EHLO
+        id S231417AbjDMNwv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Apr 2023 09:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229873AbjDMNqf (ORCPT
+        with ESMTP id S231527AbjDMNws (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 09:46:35 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC93107;
-        Thu, 13 Apr 2023 06:46:34 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33DDNQAg027774;
-        Thu, 13 Apr 2023 13:46:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=IknDKo8aPXe8KSIUXHfcta5u2283EZUc+I6HVf7NQNY=;
- b=DmbZZfQ5iAutx8JLs68teO+m0dKIT5sJkbjodU/NzSHhGvNyVG0X/vuogXbYhVr+uUH1
- 74Rsa5xgw9XGstibqIJKMf9YEC+1TpHOF3wrfcRicAqPI/yOlmoUkAh9fuXJJ1SHIhQs
- 3qjO3oT1VTw7gHAr4KhyEXoMQBEfxrfWbjBuIcaZashYeYLqmtIi4ACdVd2wzOO4xsEX
- FIYq4C7DsLfeC2K2LtTRizUoK4thwcWEvlbo3WQmwbj1Mis6dBdJKVG+ED2tN9umnZl+
- SGA/tpW7FEtfRWD8KKy6u8JTKWafTG8rr6NLsJKlJXdlK7k+ltnICImndczNnx1H8Iz+ ig== 
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxf12ap1m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 13:46:20 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33DDbi3m020727;
-        Thu, 13 Apr 2023 13:46:20 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
-        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3pu0jhbr7c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 13:46:20 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33DDkIX425100928
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Apr 2023 13:46:18 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 12F305805F;
-        Thu, 13 Apr 2023 13:46:18 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D6FF58059;
-        Thu, 13 Apr 2023 13:46:17 +0000 (GMT)
-Received: from [9.65.220.56] (unknown [9.65.220.56])
-        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Apr 2023 13:46:17 +0000 (GMT)
-Message-ID: <29ed9474-748f-feb3-6cfd-15da9fca217e@linux.ibm.com>
-Date:   Thu, 13 Apr 2023 08:46:16 -0500
+        Thu, 13 Apr 2023 09:52:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7ACE132
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2023 06:52:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681393921;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=B7GgR7IsxIkffahtry2Nj63PUFsJG3FcJvFXpSBJLNA=;
+        b=WeYtm5z8FECNSeXo8cURFN0w7g/55IbCvNz/JYUyccAX5INFGHT4/aa3xY789loElB28sU
+        6CLfix8z7GRHQqkOwa4LCVysPDoRI6eV5yzJzQkyTZEv7eMqlv2ZQS4EuybQTHHJtFmgvG
+        ypXparrjTW4gwdK90lc0yrfrvR2vCRc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-22-jphSqTr7PGaLvWhPkTXB_g-1; Thu, 13 Apr 2023 09:51:59 -0400
+X-MC-Unique: jphSqTr7PGaLvWhPkTXB_g-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C45411C07597;
+        Thu, 13 Apr 2023 13:51:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E0C43492B00;
+        Thu, 13 Apr 2023 13:51:56 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Chuck Lever <chuck.lever@oracle.com>
+cc:     dhowells@redhat.com, Scott Mayhew <smayhew@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] sunrpc: Fix RFC6803 encryption test
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.9.1
-Subject: Re: [PATCH] Remove POWER10_CPU dependency and move
- PPC_MODULE_FEATURE_P10.
-Content-Language: en-US
-From:   Danny Tsen <dtsen@linux.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>, linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
-References: <20230412181232.2051-1-dtsen@linux.ibm.com>
- <87wn2g9b9l.fsf@mpe.ellerman.id.au>
- <71c63813-bbf1-8baa-3b94-f5184cc5e872@linux.ibm.com>
-In-Reply-To: <71c63813-bbf1-8baa-3b94-f5184cc5e872@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: E2Gy5TDZ7eyJlB5R6jjXP3YahDHk4bKK
-X-Proofpoint-GUID: E2Gy5TDZ7eyJlB5R6jjXP3YahDHk4bKK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-13_08,2023-04-13_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- adultscore=0 mlxscore=0 spamscore=0 suspectscore=0 priorityscore=1501
- malwarescore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304130116
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1078409.1681393916.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 13 Apr 2023 14:51:56 +0100
+Message-ID: <1078410.1681393916@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+    =
 
-On 4/13/23 8:18 AM, Danny Tsen wrote:
-> Hi Michael,
->
-> If I do separate patch for moving PPC_MODULE_FEATURE_P10, this will 
-> break the build since it is currently defined in aes-gcm-p10-glue.c.  
-> And the p10 will be detected when loading the module in 
-> module_cpu_feature_match(PPC_MODULE_FEATURE_P10, p10_init); so it 
-> won't load if it's not P10.
->
-> Thanks.
->
-> -Danny
->
-> On 4/13/23 8:12 AM, Michael Ellerman wrote:
->> Danny Tsen <dtsen@linux.ibm.com> writes:
->>> Remove Power10 dependency in Kconfig and detect Power10 feature at 
->>> runtime.
->>> Move PPC_MODULE_FEATURE_P10 definition to be in
->>> arch/powerpc/include/asm/cpufeature.h.
->> This should be two patches, one for the Kconfig change and one moving
->> the feature flag.
+The usage_data[] array in rfc6803_encrypt_case() is uninitialised, so clea=
+r
+it as it may cause the tests to fail otherwise.
 
-I think I misunderstood.  I can do two patches one for Kconfig change 
-and one moving the feature flag.  I'll fix it.
+Fixes: b958cff6b27b ("SUNRPC: Add encryption KUnit tests for the RFC 6803 =
+encryption types")
+Link: https://lore.kernel.org/r/380323.1681314997@warthog.procyon.org.uk/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Chuck Lever <chuck.lever@oracle.com>
+cc: Scott Mayhew <smayhew@redhat.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: linux-nfs@vger.kernel.org
+cc: linux-crypto@vger.kernel.org
+---
+ net/sunrpc/auth_gss/gss_krb5_test.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks.
+diff --git a/net/sunrpc/auth_gss/gss_krb5_test.c b/net/sunrpc/auth_gss/gss=
+_krb5_test.c
+index ce0541e32fc9..aa6ec4e858aa 100644
+--- a/net/sunrpc/auth_gss/gss_krb5_test.c
++++ b/net/sunrpc/auth_gss/gss_krb5_test.c
+@@ -1327,6 +1327,7 @@ static void rfc6803_encrypt_case(struct kunit *test)
+ 	if (!gk5e)
+ 		kunit_skip(test, "Encryption type is not available");
+ =
 
--Danny
++	memset(usage_data, 0, sizeof(usage_data));
+ 	usage.data[3] =3D param->constant;
+ =
 
->>
->> Also don't you need a cpu feature check in p10_init()? Otherwise the
->> driver can be loaded on non-P10 CPUs, either by being built-in, or
->> manually.
->>
->> cheers
->>
->>> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
->>> ---
->>>   arch/powerpc/crypto/Kconfig            | 2 +-
->>>   arch/powerpc/crypto/aes-gcm-p10-glue.c | 1 -
->>>   arch/powerpc/include/asm/cpufeature.h  | 1 +
->>>   3 files changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
->>> index 1f8f02b494e1..7113f9355165 100644
->>> --- a/arch/powerpc/crypto/Kconfig
->>> +++ b/arch/powerpc/crypto/Kconfig
->>> @@ -96,7 +96,7 @@ config CRYPTO_AES_PPC_SPE
->>>     config CRYPTO_AES_GCM_P10
->>>       tristate "Stitched AES/GCM acceleration support on P10 or 
->>> later CPU (PPC)"
->>> -    depends on PPC64 && POWER10_CPU && CPU_LITTLE_ENDIAN
->>> +    depends on PPC64 && CPU_LITTLE_ENDIAN
->>>       select CRYPTO_LIB_AES
->>>       select CRYPTO_ALGAPI
->>>       select CRYPTO_AEAD
->>> diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c 
->>> b/arch/powerpc/crypto/aes-gcm-p10-glue.c
->>> index 1533c8cdd26f..bd3475f5348d 100644
->>> --- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
->>> +++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
->>> @@ -22,7 +22,6 @@
->>>   #include <linux/module.h>
->>>   #include <linux/types.h>
->>>   -#define PPC_MODULE_FEATURE_P10    (32 + 
->>> ilog2(PPC_FEATURE2_ARCH_3_1))
->>>   #define    PPC_ALIGN        16
->>>   #define GCM_IV_SIZE        12
->>>   diff --git a/arch/powerpc/include/asm/cpufeature.h 
->>> b/arch/powerpc/include/asm/cpufeature.h
->>> index f6f790a90367..2dcc66225e7f 100644
->>> --- a/arch/powerpc/include/asm/cpufeature.h
->>> +++ b/arch/powerpc/include/asm/cpufeature.h
->>> @@ -22,6 +22,7 @@
->>>    */
->>>     #define PPC_MODULE_FEATURE_VEC_CRYPTO            (32 + 
->>> ilog2(PPC_FEATURE2_VEC_CRYPTO))
->>> +#define PPC_MODULE_FEATURE_P10                (32 + 
->>> ilog2(PPC_FEATURE2_ARCH_3_1))
->>>     #define cpu_feature(x)        (x)
->>>   --
->>> 2.31.1
+ 	Ke.len =3D gk5e->Ke_length;
+
