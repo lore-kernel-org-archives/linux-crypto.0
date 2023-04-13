@@ -2,54 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8C4C77B6E
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 19:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9235CC77B71
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 19:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229713AbjDMTrC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 15:47:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41998 "EHLO
+        id S229786AbjDMTrD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Apr 2023 15:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbjDMTrC (ORCPT
+        with ESMTP id S229546AbjDMTrB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 15:47:02 -0400
+        Thu, 13 Apr 2023 15:47:01 -0400
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865D665B6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CBBC65BA;
         Thu, 13 Apr 2023 12:47:00 -0700 (PDT)
 Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33DJkde9010136;
-        Thu, 13 Apr 2023 19:46:41 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33DJkdeS010136;
+        Thu, 13 Apr 2023 19:46:47 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=9bXJxQDpqf1FHLqGzpmDLwhqgj0ZIvKATcvCppLD37c=;
- b=r0GRWg6onBfCy+Ud/Ja+kk63Q68i4wgCjw68rZfbSVHGeLCdP0OLL8apQzbXMYxGqkTY
- Lad0Dv7Fmj3YK3Uf4pTTpzs9BGU61zkuiHQbIqnJAM+L4Ff4o34HoG52I5LIndL25Km1
- yvCkBGZtlEo3ALzAuhooNTLqlzAhTj75l8orUnrm/GFc5xrO+c0vPTRpJtH8+nbqeArT
- 0e7g7iaw4YfMvhI+IWm3DKgm8kJt4PEjNfM4sEQsI2Y5vSfAm0xFIhWEiCaySOxTMHFN
- f71Q7IqWw2vEBq/YTvMKu0077GXtMvWt1v7IEfyt4ZbNPi6H0q7wjo+hAnZx8mansaiZ Bw== 
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxmf6hruc-1
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=UtfWhfePeY3iT6Yd0gWI/Qu25dAx2vch014M/4BoIJI=;
+ b=c6hUfGDs4UW/GIJTOW9Pllpg99UqzQGz3xRDkYoqv10iMuUOf1kG7MxFsrI8TZSJKUje
+ 62lQvyAumY29QjNu9XzVmpDxLPnf8PMdNqz6IqDRgDgirLfKo7SQBqjvyltphFqHTJsS
+ soHvFIS6JbaFcMB3xmUzVzsJpg46id6TyiTg1d/hp9HjGTBfLkq6pljSBYtoQBFD8gZw
+ 29PXZxNHn1P/OOLGP3qqR/5XfXKgYji8AfCJmQAZ53Tbxm8KaI+BM6hj197wq8ak+CzW
+ 7zOMUg8neLDcLKDEtXkcN9v6DRX2MYGT6iapsY3kxdSVFxiiTaQGjh3rQfz3l2PmAQ/n 5w== 
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxmf6hrxs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 19:46:40 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33DGbSCn020774;
-        Thu, 13 Apr 2023 19:46:39 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
-        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3pu0jhd4qx-1
+        Thu, 13 Apr 2023 19:46:47 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33DHiFs2029810;
+        Thu, 13 Apr 2023 19:46:46 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([9.208.130.102])
+        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3pu0fqvad3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 19:46:39 +0000
+        Thu, 13 Apr 2023 19:46:46 +0000
 Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33DJkbYm22151704
+        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33DJkjH112255912
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Apr 2023 19:46:37 GMT
+        Thu, 13 Apr 2023 19:46:45 GMT
 Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A35715803F;
-        Thu, 13 Apr 2023 19:46:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E80FA58054;
+        Thu, 13 Apr 2023 19:46:44 +0000 (GMT)
 Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 16C1A58054;
-        Thu, 13 Apr 2023 19:46:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 5B5795803F;
+        Thu, 13 Apr 2023 19:46:44 +0000 (GMT)
 Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
         by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Apr 2023 19:46:37 +0000 (GMT)
+        Thu, 13 Apr 2023 19:46:44 +0000 (GMT)
 From:   Danny Tsen <dtsen@linux.ibm.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
@@ -57,19 +58,21 @@ Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
         Danny Tsen <dtsen@linux.ibm.com>
-Subject: [PATCH v2 0/2] Remove POWER10_CPU dependency and move PPC_MODULE_FEATURE_P10.
-Date:   Thu, 13 Apr 2023 15:46:23 -0400
-Message-Id: <20230413194625.10631-1-dtsen@linux.ibm.com>
+Subject: [PATCH v2 2/2] Move Power10 feature, PPC_MODULE_FEATURE_P10.
+Date:   Thu, 13 Apr 2023 15:46:25 -0400
+Message-Id: <20230413194625.10631-3-dtsen@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230413194625.10631-1-dtsen@linux.ibm.com>
+References: <20230413194625.10631-1-dtsen@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kkHix0dOBNVrQxcEppfrkjkeKkloETFL
-X-Proofpoint-ORIG-GUID: kkHix0dOBNVrQxcEppfrkjkeKkloETFL
+X-Proofpoint-GUID: _8sKyKnqj3QIYZrqgbZvE0vIdD2ph8Nm
+X-Proofpoint-ORIG-GUID: _8sKyKnqj3QIYZrqgbZvE0vIdD2ph8Nm
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-04-13_14,2023-04-13_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=639
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=783
  impostorscore=0 clxscore=1015 priorityscore=1501 spamscore=0
  malwarescore=0 bulkscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
@@ -78,21 +81,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove Power10 dependency in Kconfig and detect Power10 feature at runtime.
-Move PPC_MODULE_FEATURE_P10 definition to be in
+Move Power10 feature, PPC_MODULE_FEATURE_P10, definition to be in
 arch/powerpc/include/asm/cpufeature.h.
 
 Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
-
-Danny Tsen (2):
-  Kconfig: Remove POWER10_CPU dependency.
-  aes-gcm-p10-glue.c, cpufeature.h: Move Power10 feature, PPC_MODULE_FEATURE_P10.
-
- arch/powerpc/crypto/Kconfig            | 2 +-
+---
  arch/powerpc/crypto/aes-gcm-p10-glue.c | 1 -
  arch/powerpc/include/asm/cpufeature.h  | 1 +
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+index 1533c8cdd26f..bd3475f5348d 100644
+--- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
++++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+@@ -22,7 +22,6 @@
+ #include <linux/module.h>
+ #include <linux/types.h>
+ 
+-#define PPC_MODULE_FEATURE_P10	(32 + ilog2(PPC_FEATURE2_ARCH_3_1))
+ #define	PPC_ALIGN		16
+ #define GCM_IV_SIZE		12
+ 
+diff --git a/arch/powerpc/include/asm/cpufeature.h b/arch/powerpc/include/asm/cpufeature.h
+index f6f790a90367..2dcc66225e7f 100644
+--- a/arch/powerpc/include/asm/cpufeature.h
++++ b/arch/powerpc/include/asm/cpufeature.h
+@@ -22,6 +22,7 @@
+  */
+ 
+ #define PPC_MODULE_FEATURE_VEC_CRYPTO			(32 + ilog2(PPC_FEATURE2_VEC_CRYPTO))
++#define PPC_MODULE_FEATURE_P10				(32 + ilog2(PPC_FEATURE2_ARCH_3_1))
+ 
+ #define cpu_feature(x)		(x)
+ 
 -- 
 2.31.1
 
