@@ -2,105 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A212C77B73
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 19:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D871C77B6E
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 20:12:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229869AbjDMTrE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 15:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41994 "EHLO
+        id S229630AbjDMUMU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Apr 2023 16:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbjDMTrB (ORCPT
+        with ESMTP id S229580AbjDMUMT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 15:47:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EEC5FFC;
-        Thu, 13 Apr 2023 12:46:58 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33DJepTj032206;
-        Thu, 13 Apr 2023 19:46:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=QqJtw0YR6Qs9LHnWPAtvotjvbtopuiPZ5ZwiXoGzSKw=;
- b=ikC8JFDGIf80WkAOe/4pLHVZWYcdLrJX+Ov/cZJRrtYI0K9q15iK9tHr4/TZY6xpLPqk
- OSruMoz0Y0HB4sMtH2Vn90StNj2QbK7r431bxVI6Px2yBmLAOjW5Tdvt0/O7bCbB6Ukf
- 95RLS960vPnGdl9yWmAWVLdHq2irTtVUaEK+zhOpB3i98/ToaRtgqOfbReiMlDKbDhzF
- 9HlqJT69AI4xdXimzPmFeY3E6sEx5KDVsxpzHxzCpbVhnxhVK4tR9QtkVHLmDIdxhVGm
- 9Qz1VdyMDoxFl6UZ6POE1RsAzfbdnfEqv/HXF4Tp8DcM0gTvqfiHAWUVEjS2EeyoezAy ww== 
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pxr3sg6h2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 19:46:45 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33DHHAdb020727;
-        Thu, 13 Apr 2023 19:46:43 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([9.208.129.116])
-        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3pu0jhd4r7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Apr 2023 19:46:43 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-        by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33DJkgGi13566660
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Apr 2023 19:46:42 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 393485804E;
-        Thu, 13 Apr 2023 19:46:42 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0B135803F;
-        Thu, 13 Apr 2023 19:46:41 +0000 (GMT)
-Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
-        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Apr 2023 19:46:41 +0000 (GMT)
-From:   Danny Tsen <dtsen@linux.ibm.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
-        Danny Tsen <dtsen@linux.ibm.com>
-Subject: [PATCH v2 1/2] Remove POWER10_CPU dependency.
-Date:   Thu, 13 Apr 2023 15:46:24 -0400
-Message-Id: <20230413194625.10631-2-dtsen@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230413194625.10631-1-dtsen@linux.ibm.com>
-References: <20230413194625.10631-1-dtsen@linux.ibm.com>
+        Thu, 13 Apr 2023 16:12:19 -0400
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FAD53C21
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2023 13:12:19 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-54c17fa9ae8so403690447b3.5
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Apr 2023 13:12:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681416738; x=1684008738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=huT4FujcHXScyzhCCiWxC6Qo3dKvB4TLtzgLZuY6bg4=;
+        b=loF2Zs/MUL5DZEttkHR48HL2G4xLa7co1JZa/ZjsBPFQ94c2xdNrhQdAVvBxoYq1rU
+         lH+xnCOZe//rfTcRCgZb5PR2dsQAKsf72k9TViqafM5wtRFdrJ2dihjPAywS30NEN1LJ
+         gj2yEiEVnZ9d2U//PgtjyxWF7DUTOnRQ6igXlwfy+2NwbVxCtrCSWt54xRZZAvqLletA
+         8QQwxTskeQseWSevoIv235O8iagmTnWehYeDlZ+B4RN9CWBKNiHEe4pVn4ZftvLhvWXp
+         tqXYrZ8CytHTnpNa/tewuMt3e1wbCVOkb9TKRNZ1vr0EHrDXwoYqXiwjaEAyFaWUw8qM
+         yw1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681416738; x=1684008738;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=huT4FujcHXScyzhCCiWxC6Qo3dKvB4TLtzgLZuY6bg4=;
+        b=dg3BsVrm+uH1Jpd/O+g1+ry30vjKwQzQLgQTRkhGq7dikjYyne+rW8V16EmjZRhWsu
+         BpPzWhWHv39qHloh1xNR5nKWxFCEKEB9H4HSaNEZeKCV/N5sB4KzIOYDnVds70dDIU0l
+         wQgOQOaZkb7LPvAFYAXISml1XEJSKBnD2NAYuKGFRru9T4W4lWfFPr0hPgqgKwL+WBi1
+         mrBTA1w6CG6pN9unhMun5uRxjxYYiS0DZuhERnEhnEvT0sY8xvMI4MrYn2tC+5ocWwnN
+         3G2PT+fkOrGfjrcXmonGZOgn4hkye11rR9dWlCoeTXNXpMNOVuiVRX/7iTsvdhiovC9E
+         bKFA==
+X-Gm-Message-State: AAQBX9c1P1fd8nBG0MkD4oeaPQyzH7sryjmfl8v3FYpWPHmvz1W82RwK
+        k0Qr6vpNVFr1cSlndETDU4YdU9CzVmXKasKx5kgCTg==
+X-Google-Smtp-Source: AKy350bJXLu0gVkdee3XTye1rjXA9u/btZu7MnQNaZUQ3umViEaPtAxZrgeXwB+pnPtVn6JPDmnFmoHbMCAWioBMEUQ=
+X-Received: by 2002:a81:e503:0:b0:54f:40fe:10cc with SMTP id
+ s3-20020a81e503000000b0054f40fe10ccmr2233268ywl.9.1681416737751; Thu, 13 Apr
+ 2023 13:12:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7VLX_QjmA4Kcm7QEvWV-VO_USEmA1q70
-X-Proofpoint-GUID: 7VLX_QjmA4Kcm7QEvWV-VO_USEmA1q70
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-13_14,2023-04-13_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=783
- priorityscore=1501 spamscore=0 phishscore=0 suspectscore=0 malwarescore=0
- clxscore=1015 adultscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
- definitions=main-2304130174
+References: <37694343f8b89dc0469d4a1718dad8f5f8c765bd.camel@linux.intel.com> <ZDJtc7C6YBgknbTq@gondor.apana.org.au>
+In-Reply-To: <ZDJtc7C6YBgknbTq@gondor.apana.org.au>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Thu, 13 Apr 2023 22:12:06 +0200
+Message-ID: <CACRpkdYnXdFky0z0EEsmbQ5hbs=J=oRb+3vAcuDpWaLTh1kxmQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ixp4xx - Do not check word size when compile testing
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Tom Zanussi <tom.zanussi@linux.intel.com>, clabbe@baylibre.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove Power10 dependency in Kconfig and detect Power10 feature at runtime.
+On Sun, Apr 9, 2023 at 9:47=E2=80=AFAM Herbert Xu <herbert@gondor.apana.org=
+.au> wrote:
+> On Fri, Apr 07, 2023 at 02:37:44PM -0500, Tom Zanussi wrote:
+> > COMPILE_TEST was added during the move to drivers/crypto/intel/ but
+> > shouldn't have been as it triggers a build bug when not compiled by
+> > the target compiler.  So remove it to match the original.
+> >
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Link: https://lore.kernel.org/oe-kbuild-all/202304061846.G6cpPXiQ-lkp@i=
+ntel.com/
+> > Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+> > ---
+> >  drivers/crypto/intel/ixp4xx/Kconfig | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> We could also fix it by making the BUILD_BUG_ON conditional:
+>
+> ---8<---
+> The BUILD_BUG_ON preventing compilation on foreign architectures
+> should be disabled when we're doing compile testing.
+>
+> Fixes: 1bc7fdbf2677 ("crypto: ixp4xx - Move driver to...")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: https://lore.kernel.org/oe-kbuild-all/202304061846.G6cpPXiQ-lkp@int=
+el.com/
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
----
- arch/powerpc/crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This fix is more elegant I think, as it keeps the compile coverage.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index 1f8f02b494e1..7113f9355165 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -96,7 +96,7 @@ config CRYPTO_AES_PPC_SPE
- 
- config CRYPTO_AES_GCM_P10
- 	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
--	depends on PPC64 && POWER10_CPU && CPU_LITTLE_ENDIAN
-+	depends on PPC64 && CPU_LITTLE_ENDIAN
- 	select CRYPTO_LIB_AES
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_AEAD
--- 
-2.31.1
-
+Yours,
+Linus Walleij
