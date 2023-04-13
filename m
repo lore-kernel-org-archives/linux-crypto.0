@@ -2,92 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA25AC77B79
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 06:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86210C77B6C
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Apr 2023 06:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbjDMGZG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 02:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41718 "EHLO
+        id S229535AbjDMGhL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Apr 2023 02:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbjDMGZD (ORCPT
+        with ESMTP id S229482AbjDMGhL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 02:25:03 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5297EF9;
-        Wed, 12 Apr 2023 23:24:59 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pmqNd-00FNW8-Vk; Thu, 13 Apr 2023 14:24:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Apr 2023 14:24:25 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Thu, 13 Apr 2023 14:24:25 +0800
-Subject: [PATCH 6/6] crypto: cryptd - Add support for cloning hashes
-References: <ZDefxOq6Ax0JeTRH@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Safonov <dima@arista.com>,
-        Andy Lutomirski <luto@amacapital.net>,
+        Thu, 13 Apr 2023 02:37:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C9D87EF8
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Apr 2023 23:36:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681367791;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=y6rFAsx3AMO/NMfWX40xAA11ybh8cS3RvU0h7vdkgkI=;
+        b=CTw36T7+G/EDxP6AwGiulOa5cY9wxYqhIdjJRgLCn8B6eOGOza2oHFHiCCL/EQ33So0ly0
+        jw1GUxTN4bfrlK3Ro7FCaEbCX2Mz19xHU9b3MwM1CC4HXYxfIJTjhPYt95ak0KeEIKS6x/
+        TVY5mNDgWKpY3MSF8t1/4Iw6K1NuaBk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-113-qa-1fW4gNjGaJMXqhTI9-A-1; Thu, 13 Apr 2023 02:36:27 -0400
+X-MC-Unique: qa-1fW4gNjGaJMXqhTI9-A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DF31D1C07552;
+        Thu, 13 Apr 2023 06:36:26 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F04272027043;
+        Thu, 13 Apr 2023 06:36:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZDecCAHlErjm/gSm@gondor.apana.org.au>
+References: <ZDecCAHlErjm/gSm@gondor.apana.org.au> <ZDbuFO+f8FCvrawH@aion.usersys.redhat.com> <380323.1681314997@warthog.procyon.org.uk> <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com> <385663.1681321803@warthog.procyon.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, Scott Mayhew <smayhew@redhat.com>,
+        Chuck Lever III <chuck.lever@oracle.com>,
         Ard Biesheuvel <ardb@kernel.org>,
-        Bob Gilligan <gilligan@arista.com>,
-        Dan Carpenter <error27@gmail.com>,
-        David Laight <David.Laight@aculab.com>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Francesco Ruggeri <fruggeri05@gmail.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Ivan Delalande <colona@arista.com>,
-        Leonard Crestez <cdleonard@gmail.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        netdev@vger.kernel.org
-Message-Id: <E1pmqNd-00FNW8-Vk@formenos.hmeau.com>
+        Jeff Layton <jlayton@kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <413270.1681367785.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 13 Apr 2023 07:36:25 +0100
+Message-ID: <413271.1681367785@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Allow cryptd hashes to be cloned.  The underlying hash will be cloned.
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> > I have them built into the kernel, both in sunrpc and my krb5 lib.  Bo=
+th are
+> > failing.
+> =
 
- crypto/cryptd.c |   16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+> So are there Crypto API test vectors for these algorithms and if so
+> are they succeeding or not? If they are working but your own vectors
+> going through your code isn't, then I would start looking there.
 
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 43ce347ccba0..bbcc368b6a55 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -446,6 +446,21 @@ static int cryptd_hash_init_tfm(struct crypto_ahash *tfm)
- 	return 0;
- }
- 
-+static int cryptd_hash_clone_tfm(struct crypto_ahash *ntfm,
-+				 struct crypto_ahash *tfm)
-+{
-+	struct cryptd_hash_ctx *nctx = crypto_ahash_ctx(ntfm);
-+	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
-+	struct crypto_shash *hash;
-+
-+	hash = crypto_clone_shash(ctx->child);
-+	if (IS_ERR(hash))
-+		return PTR_ERR(hash);
-+
-+	nctx->child = hash;
-+	return 0;
-+}
-+
- static void cryptd_hash_exit_tfm(struct crypto_ahash *tfm)
- {
- 	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
-@@ -678,6 +693,7 @@ static int cryptd_create_hash(struct crypto_template *tmpl, struct rtattr **tb,
- 	inst->alg.halg.base.cra_ctxsize = sizeof(struct cryptd_hash_ctx);
- 
- 	inst->alg.init_tfm = cryptd_hash_init_tfm;
-+	inst->alg.clone_tfm = cryptd_hash_clone_tfm;
- 	inst->alg.exit_tfm = cryptd_hash_exit_tfm;
- 
- 	inst->alg.init   = cryptd_hash_init_enqueue;
+krb5: Running camellia128-cts-cmac key
+alg: No test for cmac(camellia) (cmac(camellia-asm))
+krb5: Running camellia128-cts-cmac enc no plain
+alg: No test for cts(cbc(camellia)) (cts(cbc-camellia-asm))
+
+I'm guessing not.
+
+Do you know if there is "standard" test data somewhere?  rfc3713 appendix =
+A
+has three but are there more?
+
+David
+
