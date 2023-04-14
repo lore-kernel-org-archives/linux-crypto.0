@@ -2,55 +2,109 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B8AC77B6E
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 02:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF455C77B6E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 08:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbjDNCI6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Apr 2023 22:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39874 "EHLO
+        id S229469AbjDNIDj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 04:03:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbjDNCI6 (ORCPT
+        with ESMTP id S229476AbjDNIDj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Apr 2023 22:08:58 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262A72D4A;
-        Thu, 13 Apr 2023 19:08:55 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pn8ri-00FiCd-4a; Fri, 14 Apr 2023 10:08:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Apr 2023 10:08:42 +0800
-Date:   Fri, 14 Apr 2023 10:08:42 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Chuck Lever III <chuck.lever@oracle.com>,
-        Scott Mayhew <smayhew@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
-Message-ID: <ZDi1qjVpcpr2BZfN@gondor.apana.org.au>
-References: <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com>
- <380323.1681314997@warthog.procyon.org.uk>
- <1078650.1681394138@warthog.procyon.org.uk>
+        Fri, 14 Apr 2023 04:03:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECAA410DB;
+        Fri, 14 Apr 2023 01:03:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8150061509;
+        Fri, 14 Apr 2023 08:03:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FEA1C433EF;
+        Fri, 14 Apr 2023 08:03:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681459415;
+        bh=A/hvv45Iuk0V5ALA824dIubPvLgUljKnosLa3dg0EbI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=V/uwUPy98/cFW554EfKlf6cexw08ln3C2B5ofLE9nOvQezv/KhEjJbYIQrjQMccQO
+         v3x7hoEOJPfEQipk5f+ghSpMXXToj/wKRGF3+m5rRVLcDbZMHGsqpOPo16l34CCPKZ
+         NkxueHB8RY0GL7qEcegiYKsDPK9q+jGy/gVezoh/AeQqgSJWJsI3JXn6WSl8Y4xqop
+         Qp5B8SSowKiZOHth0iAxZWcPHVCjv8gZ/IvKwSZnr1+E3dem3zY2ZnqWKGIaZ6VGId
+         XFYWMCscrvH9wGgiMTtdlte0jJBlajO/5v15A1EQnV5rDK1AOjk/9M9OgMlG0gSvMI
+         Je2lDSIUh6crQ==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Russ Weight <russell.h.weight@intel.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Tianfei zhang <tianfei.zhang@intel.com>,
+        Cezary Rojewski <cezary.rojewski@intel.com>,
+        =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= 
+        <amadeuszx.slawinski@linux.intel.com>,
+        Takashi Iwai <tiwai@suse.de>, linux-kernel@vger.kernel.org
+Subject: [PATCH] firmware_loader: rework crypto dependencies
+Date:   Fri, 14 Apr 2023 10:03:07 +0200
+Message-Id: <20230414080329.76176-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1078650.1681394138@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 13, 2023 at 02:55:38PM +0100, David Howells wrote:
-> 
-> Found it (see patch sent separately).  There was an uninitialised variable in
-> sunrpc.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Now that you have it working, perhaps you could convert some of
-your test vectors into crypto API test vectors?
+The crypto dependencies for the firmwware loader are incomplete,
+in particular a built-in FW_LOADER fails to link against a modular
+crypto hash driver:
 
-Thanks,
+ld.lld: error: undefined symbol: crypto_alloc_shash
+ld.lld: error: undefined symbol: crypto_shash_digest
+ld.lld: error: undefined symbol: crypto_destroy_tfm
+>>> referenced by main.c
+>>>               drivers/base/firmware_loader/main.o:(fw_log_firmware_info) in archive vmlinux.a
+
+Rework this to use the usual 'select' from the driver module,
+to respect the built-in vs module dependencies, and add a
+more verbose crypto dependency to the debug option to prevent
+configurations that lead to a link failure.
+
+Fixes: 02fe26f25325 ("firmware_loader: Add debug message with checksum for FW file")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+Tested on a few hundred randconfig builds
+---
+ drivers/base/firmware_loader/Kconfig | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/base/firmware_loader/Kconfig b/drivers/base/firmware_loader/Kconfig
+index 0cabc783d67a..5ca00e02fe82 100644
+--- a/drivers/base/firmware_loader/Kconfig
++++ b/drivers/base/firmware_loader/Kconfig
+@@ -3,6 +3,8 @@ menu "Firmware loader"
+ 
+ config FW_LOADER
+ 	tristate "Firmware loading facility" if EXPERT
++	select CRYPTO_HASH if FW_LOADER_DEBUG
++	select CRYPTO_SHA256 if FW_LOADER_DEBUG
+ 	default y
+ 	help
+ 	  This enables the firmware loading facility in the kernel. The kernel
+@@ -26,10 +28,9 @@ config FW_LOADER
+ 
+ config FW_LOADER_DEBUG
+ 	bool "Log filenames and checksums for loaded firmware"
++	depends on CRYPTO = FW_LOADER || CRYPTO=y
+ 	depends on DYNAMIC_DEBUG
+ 	depends on FW_LOADER
+-	depends on CRYPTO
+-	depends on CRYPTO_SHA256
+ 	default FW_LOADER
+ 	help
+ 	  Select this option to use dynamic debug to log firmware filenames and
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.2
+
