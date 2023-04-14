@@ -2,77 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CEDC77B70
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 08:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F21C77B76
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 09:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbjDNIyh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 04:54:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34132 "EHLO
+        id S229553AbjDNJUp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 05:20:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbjDNIyg (ORCPT
+        with ESMTP id S229448AbjDNJUo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 04:54:36 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A079E6189;
-        Fri, 14 Apr 2023 01:54:34 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pnFBr-00FoD9-C5; Fri, 14 Apr 2023 16:53:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Apr 2023 16:53:55 +0800
-Date:   Fri, 14 Apr 2023 16:53:55 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Russ Weight <russell.h.weight@intel.com>,
-        linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Fri, 14 Apr 2023 05:20:44 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64F5C59FF;
+        Fri, 14 Apr 2023 02:20:43 -0700 (PDT)
+Received: from stefanw-SCHENKER ([37.4.248.58]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1N8X9L-1qQnTW2gUL-014RZd; Fri, 14 Apr 2023 11:20:11 +0200
+From:   Stefan Wahren <stefan.wahren@i2se.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Tianfei zhang <tianfei.zhang@intel.com>,
-        Cezary Rojewski <cezary.rojewski@intel.com>,
-        Amadeusz =?utf-8?B?U8WCYXdpxYRza2k=?= 
-        <amadeuszx.slawinski@linux.intel.com>,
-        Takashi Iwai <tiwai@suse.de>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] firmware_loader: rework crypto dependencies
-Message-ID: <ZDkUowCa9ft1x6FH@gondor.apana.org.au>
-References: <20230414080329.76176-1-arnd@kernel.org>
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
+        linux-imx@nxp.com, "Rafael J . Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-pm@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH V3 3/6] dt-bindings: imx-thermal: add imx6sll and imx6ul compatible
+Date:   Fri, 14 Apr 2023 11:19:44 +0200
+Message-Id: <20230414091947.7831-4-stefan.wahren@i2se.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230414091947.7831-1-stefan.wahren@i2se.com>
+References: <20230414091947.7831-1-stefan.wahren@i2se.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230414080329.76176-1-arnd@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:yhVLvdOtotpcDXG6lxpSO4LOeUKBcNbf9LpLbV/9MnR3OlD+Ttj
+ GR5NmFY7sFWd/sGUYtTg1kiWDWMczU/jUX8FpwS83xxBWTX9d2I+6U7VQf9uYBU5BCDZdji
+ cV26mP7jBSQRSF5Q+9D5LDaBf6UvEeLaKMhweNXe+fQeptU81b5JkN2R1Fqge3+A7hLi1Dg
+ SoZwiewyvQCWZYEt0YoOQ==
+UI-OutboundReport: notjunk:1;M01:P0:rDISmrQLwxc=;Ki/zD+XBOrmhx9wA7kHnYw5dyFg
+ CH7yv0LZEQK0zsViWPmQVjJZOi4RYTTTJKmQB8xWtlZQAjme9vvifMGVnEEnRkogQ31gxtJMy
+ d502Ff7m3gsCQDo2dYJBLqkhlGBgsUFtHu354fhi4gnS0TmgITYCU1FEEg3/7y4ghDLJnZDOI
+ +gIAIYId+D3+GXgsG7pYSTJwYYMVswv0vHfroVnpyYE2I3pkMzltQtJBvH0v+Vu7Gswz1bfEb
+ FONzLodS1ERhzl9KfDl8kuC4yMmNJJZiJlrx0e3u7gOZUm+FBRSPz80vGxD1ppXhf08xoiOry
+ tzsohwwGEt/Q4jdgJtqDx1WZ4sUMRL6gwFfS99+IXYSB/yn4l3ZgPQdbKJwCoepg1P+X8i//J
+ FpzRCO/IWsCnGMCcMcPZngQYHaqrg3k5qGkl36QnYfl+GYAsOzLGI589mhdmxfaOhRZH0zZN0
+ 32/XmSvi/dgoeAEcY0cjrsaGbjxxxe5PZ1VhaK87oIoytnw5gtcATKQF/c+j//HKESp1BeQVh
+ USd/ULRvdZqIzvcbJuIVXw89vbr+k1e5iDkZ0z+qouiKV0YwqEQ6eg85BrWim6WKp5MNey739
+ UdWV4U0h3ZSwRK+ytGKWJxZjJb51QYWmTk3R9GsR0btSbexk5/oYwqOxv34uGjWXVjQPO/rb8
+ Sq8hWuOBUkfkbaQtXF1Oy2OQuz9c2tJyKKvYpKqM5Q==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 14, 2023 at 10:03:07AM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> The crypto dependencies for the firmwware loader are incomplete,
-> in particular a built-in FW_LOADER fails to link against a modular
-> crypto hash driver:
-> 
-> ld.lld: error: undefined symbol: crypto_alloc_shash
-> ld.lld: error: undefined symbol: crypto_shash_digest
-> ld.lld: error: undefined symbol: crypto_destroy_tfm
-> >>> referenced by main.c
-> >>>               drivers/base/firmware_loader/main.o:(fw_log_firmware_info) in archive vmlinux.a
-> 
-> Rework this to use the usual 'select' from the driver module,
-> to respect the built-in vs module dependencies, and add a
-> more verbose crypto dependency to the debug option to prevent
-> configurations that lead to a link failure.
-> 
-> Fixes: 02fe26f25325 ("firmware_loader: Add debug message with checksum for FW file")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> Tested on a few hundred randconfig builds
-> ---
->  drivers/base/firmware_loader/Kconfig | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+Currently the dtbs_check for imx6 generates warnings like this:
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+['fsl,imx6sll-tempmon', 'fsl,imx6sx-tempmon'] is too long
 
-Thanks,
+So add them to the devicetree binding.
+
+Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ .../devicetree/bindings/thermal/imx-thermal.yaml   | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/thermal/imx-thermal.yaml b/Documentation/devicetree/bindings/thermal/imx-thermal.yaml
+index b22c8b59d5c7..8902e9499c96 100644
+--- a/Documentation/devicetree/bindings/thermal/imx-thermal.yaml
++++ b/Documentation/devicetree/bindings/thermal/imx-thermal.yaml
+@@ -12,10 +12,16 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    enum:
+-      - fsl,imx6q-tempmon
+-      - fsl,imx6sx-tempmon
+-      - fsl,imx7d-tempmon
++    oneOf:
++      - enum:
++          - fsl,imx6q-tempmon
++          - fsl,imx6sx-tempmon
++          - fsl,imx7d-tempmon
++      - items:
++          - enum:
++              - fsl,imx6sll-tempmon
++              - fsl,imx6ul-tempmon
++          - const: fsl,imx6sx-tempmon
+ 
+   interrupts:
+     description: |
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
