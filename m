@@ -2,62 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D84C77B6F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 11:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8BCC77B70
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 11:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjDNLFs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 07:05:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40336 "EHLO
+        id S229775AbjDNLF7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 07:05:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230092AbjDNLFq (ORCPT
+        with ESMTP id S230218AbjDNLFz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 07:05:46 -0400
+        Fri, 14 Apr 2023 07:05:55 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6664C2D;
-        Fri, 14 Apr 2023 04:05:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365D39ED1;
+        Fri, 14 Apr 2023 04:05:44 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pnHEc-00FqgN-A2; Fri, 14 Apr 2023 19:04:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Apr 2023 19:04:54 +0800
-Date:   Fri, 14 Apr 2023 19:04:54 +0800
+        id 1pnHFF-00Fqgw-6F; Fri, 14 Apr 2023 19:05:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Apr 2023 19:05:33 +0800
+Date:   Fri, 14 Apr 2023 19:05:33 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Chuck Lever III <chuck.lever@oracle.com>,
-        Scott Mayhew <smayhew@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
-Message-ID: <ZDkzVmO2eUbcuy9E@gondor.apana.org.au>
-References: <ZDkoiqPXwIRYmeF3@gondor.apana.org.au>
- <ZDkUSESImVSUX0RW@gondor.apana.org.au>
- <ZDi1qjVpcpr2BZfN@gondor.apana.org.au>
- <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com>
- <380323.1681314997@warthog.procyon.org.uk>
- <1078650.1681394138@warthog.procyon.org.uk>
- <1235770.1681462057@warthog.procyon.org.uk>
- <1239035.1681467430@warthog.procyon.org.uk>
- <1239686.1681468477@warthog.procyon.org.uk>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>, stable@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp: Don't initialize CCP for PSP 0x1649
+Message-ID: <ZDkzfXjnrLKT/iQl@gondor.apana.org.au>
+References: <20230403173801.2593-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1239686.1681468477@warthog.procyon.org.uk>
+In-Reply-To: <20230403173801.2593-1-mario.limonciello@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 14, 2023 at 11:34:37AM +0100, David Howells wrote:
->
-> In krb5, for encryption, there are two keys, not one, and no IV to be passed
-> in.  The code I have will insert a confounder and a checksum, which must have
-> space allowed for it.
+On Mon, Apr 03, 2023 at 12:38:01PM -0500, Mario Limonciello wrote:
+> A number of platforms are emitting the error:
+> ```ccp: unable to access the device: you might be running a broken BIOS.```
+> 
+> This is expected behavior as CCP is no longer accessible from the PSP's
+> PCIe BAR so stop trying to probe CCP for 0x1649.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+> ---
+>  drivers/crypto/ccp/sp-pci.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Two keys is not an issue.  Authenc for example supports two keys
-by encoding them into a single byte-stream.  AEAD also supports
-having no IVs by providing IV generators (see seqiv, eseqiv, etc.).
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
