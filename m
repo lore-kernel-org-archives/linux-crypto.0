@@ -2,118 +2,121 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA68BC77B72
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 13:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2406C77B72
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 14:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjDNN33 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 09:29:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55176 "EHLO
+        id S229836AbjDNOk3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 10:40:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjDNN32 (ORCPT
+        with ESMTP id S229579AbjDNOk2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 09:29:28 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019286E87;
-        Fri, 14 Apr 2023 06:29:26 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33EDIdW1025912;
-        Fri, 14 Apr 2023 13:29:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=L17NEor15alxJnJyRZpYEiLZmDLO42JcdjMLI+tQ52s=;
- b=k28EzNguGaMswoOu1OjTLikcPom2JuC/5+dGXxoeRcKzkRnKwqEGPvrEsMxT9GDHJbVU
- UKr0034wf3T852k1E50/Ne7HEiLr43ahlNP0J/CG4ZWPeBi1q354txo+rI0daGDIVNv0
- c26oKF/S8IkuxHypxBOHbdCCqPHOy+NwsJKGrPC+joI0INGaayFCuVWoXaCYM2QtKHdu
- Gauj8Vi6pAz/myts07wazLGOQUeY+rCXRmdWwKHkVqBbRIXncZBdpp/muSBDMVoqMIBn
- iuhE9Gf/IHj5HM/3XdFXDotlSYnCulRiIvX2wDTsgAxnwS6aTlldpiChDWVSu6BSSr8I Hw== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3py7kt8ba9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Apr 2023 13:29:12 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33EDNMdB027913;
-        Fri, 14 Apr 2023 13:29:11 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([9.208.130.101])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3pu0jjs2v7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 14 Apr 2023 13:29:11 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33EDTAfb10879716
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Apr 2023 13:29:10 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F18FE5805E;
-        Fri, 14 Apr 2023 13:29:09 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 103BE58051;
-        Fri, 14 Apr 2023 13:29:09 +0000 (GMT)
-Received: from [9.160.183.133] (unknown [9.160.183.133])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 14 Apr 2023 13:29:08 +0000 (GMT)
-Message-ID: <29e7972a-17ad-638e-fa2d-1c65ae619c41@linux.ibm.com>
-Date:   Fri, 14 Apr 2023 08:29:08 -0500
+        Fri, 14 Apr 2023 10:40:28 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7295E4ED5;
+        Fri, 14 Apr 2023 07:40:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mmYe/IXiQSjhMX0G/AAs4rgpK/cNUJ/xfxO/hT6JL6Q40v2S2wsfa+iIOi/rey+GjKeb9Y8PXMtgJngXqPWqlIpQ1YAU7itRXgaO8tHe1k3C6RVGL8A6jkohsMMphUw57kYSRZ+WX87E2bYeOpuTzw2878AJeE+vyI1HEZvSHEyTFvkJGr0/rILySiY/2rUQm91F/T9VNaaSh0JL8OsUWf1t19wt8WtnZsYIS9bXl67LU87H4Ip5KfGM7dGzFMg3kZiqZglEBYaZ1nqt/dReElIUyFCKEnSH+ziVfCKe9iuGZP9LgiR7SStnOJCSPGhJHmtQyYt/dI8++mUj70p/ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ONOVSniRBduhW96TjCCba/8MQUcS6+KmVHb0z4YH23E=;
+ b=idBoMqKlQDdcTWHlhwrz20LZaTx/xzvzovqPSjNuz2P0dNEJZGFxGZe7UzngF0nPRMw7/Td5eoOeS55RkNHe2SSEpyviNOGOfna0LuC/EZ22X52gl6QmoF/kXLoaX7i8/Q1X/8xBasSjpKUJ1F+w973ZLJs01wTO5jP6k8KzLTxcewjB2Xx1ciQHjHBT3Oia7V0zDhwZcCNDbs8ePAj6sqvwPeNQH/G2zMQljO8OiRGAW1kt4xPndJ1tJY+sVSy59VyVbrJpakAmF4XsJo3fMGgJ6Cp+rOrO2bBZgNnVEk5gfeoh9BCwq29DUsobgtXTsaHdXOSSZ9e+oVIoJ8Ht/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ONOVSniRBduhW96TjCCba/8MQUcS6+KmVHb0z4YH23E=;
+ b=ar9x2oKoIX3NQ0JYcji5hyeXdhRWedf07GatvYfbBUXdKphlqGr3b42nQTluCL/f2h57gcfFR4n314QbT5WPgKsg9lIpEsbbu42EYdrR6/Ym/biGrTUsShzaNojOpG3OR0I5G2OcbBOH1wEU1yAgdxq3JbEVUqisLDpgGwHLie4=
+Received: from BN9PR03CA0108.namprd03.prod.outlook.com (2603:10b6:408:fd::23)
+ by PH7PR12MB5998.namprd12.prod.outlook.com (2603:10b6:510:1da::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.36; Fri, 14 Apr
+ 2023 14:40:25 +0000
+Received: from BN8NAM11FT090.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:fd:cafe::5) by BN9PR03CA0108.outlook.office365.com
+ (2603:10b6:408:fd::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.36 via Frontend
+ Transport; Fri, 14 Apr 2023 14:40:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT090.mail.protection.outlook.com (10.13.177.105) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6298.33 via Frontend Transport; Fri, 14 Apr 2023 14:40:24 +0000
+Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 14 Apr
+ 2023 09:40:22 -0500
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Jan Dabros <jsd@semihalf.com>, <linux-i2c@vger.kernel.org>
+CC:     <linux-crypto@vger.kernel.org>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v9 0/2] Use CCP driver to handle PSP I2C arbitration
+Date:   Fri, 14 Apr 2023 09:40:06 -0500
+Message-ID: <20230414144008.836-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH v2 1/2] Remove POWER10_CPU dependency.
-Content-Language: en-US
-To:     Michael Ellerman <mpe@ellerman.id.au>, linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
-References: <20230413194625.10631-1-dtsen@linux.ibm.com>
- <20230413194625.10631-2-dtsen@linux.ibm.com>
- <87ildya9xd.fsf@mpe.ellerman.id.au>
-From:   Danny Tsen <dtsen@linux.ibm.com>
-In-Reply-To: <87ildya9xd.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TAZXTrc9NthrcIflRSRgsBWMNDFafO9O
-X-Proofpoint-ORIG-GUID: TAZXTrc9NthrcIflRSRgsBWMNDFafO9O
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-14_06,2023-04-14_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=0 adultscore=0 malwarescore=0 mlxscore=0
- spamscore=0 impostorscore=0 phishscore=0 clxscore=1015 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304140118
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT090:EE_|PH7PR12MB5998:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64b6ceff-74fb-473e-a24f-08db3cf62e7c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wwR/uNEyLHZN9wcs/UKJskLMb5mfXKfA3Iptxc4pbNTamu08zlKPRsKHiwsuBDQRoIfELhsB1TpTSzPUbpu7CGJ2uqhJctXxqNwwUog10W24g2xU8LtNRl2VtrhhNZM3EVNUffjXd1cfu7lXuDEOq1YXGFODPOLj8ezn0+B76vrFK2WjdbWanxi79qC2brxFFucfD801fzYMLhmTOny2DZ55VFcIYLfniU+IIi0TUUkLOif1TcKSivn/VWBO1U1V6diBOPLhu4Gdb38757dLD3SbM/2gDhP7qO3GlqM/Uu4iBlIiYNeE6BlYU8eXTIgTmY3Nt2ZtFmetRpq/r36LTXTJmjPxn8neIHcPBuBDyxSqOmjVtioxpJ5RtV6CLSzt0sONwWSdOo9wuw2P7osmxbcSH+gFiFzqsQtZJ9NsP0ng0mlem3KBIsdTsMyhqZFy5ubR9c9iWk9Faf/xlAkv7mEM/NLrmFbJNUwjvYVN7gSnCOXZE40P/IhI0mwrBmHbfpOLWe0CRngSr+f66wpo/v8lYmbDFM5dmDWrOAYXRkhyQotaRFuQfcvxw2ZLE9eKujcGvpotW/rd8qw+kF+LrJlewLyf9caN9LIarv9o+96KyhH7iTTSYfmFzX+zpDqPyFbaVRN/E3qYud9Lj6T3v4CPcrdXMXYMCiJBr/EBwVs7DZiufCvv7Drwsvh5Qnsfn8prLUSiuJohNX+VS5GOa/TojU9cCa4yPDyX/HZSdco=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(396003)(39860400002)(346002)(451199021)(40470700004)(36840700001)(46966006)(5660300002)(41300700001)(81166007)(356005)(8676002)(40480700001)(36860700001)(478600001)(2616005)(8936002)(82740400003)(2906002)(44832011)(4744005)(426003)(336012)(83380400001)(47076005)(82310400005)(186003)(16526019)(40460700003)(1076003)(70206006)(86362001)(70586007)(26005)(316002)(110136005)(4326008)(7696005)(54906003)(36756003)(6666004)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2023 14:40:24.2285
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64b6ceff-74fb-473e-a24f-08db3cf62e7c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT090.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5998
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks Michael.
+The CCP driver now has symbols that can be used by i2c-designware-amdpsp
+to handle the communication regarding i2c arbitration with the PSP for
+both Cezanne and Mendocino based designs.
 
--Danny
+Utilize those symbols.
 
-On 4/14/23 8:08 AM, Michael Ellerman wrote:
-> Danny Tsen <dtsen@linux.ibm.com> writes:
->> Remove Power10 dependency in Kconfig and detect Power10 feature at runtime.
-> ... using the existing call to module_cpu_feature_match() :)
->
->> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
->> ---
->>   arch/powerpc/crypto/Kconfig | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
->
-> cheers
->
->> diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
->> index 1f8f02b494e1..7113f9355165 100644
->> --- a/arch/powerpc/crypto/Kconfig
->> +++ b/arch/powerpc/crypto/Kconfig
->> @@ -96,7 +96,7 @@ config CRYPTO_AES_PPC_SPE
->>   
->>   config CRYPTO_AES_GCM_P10
->>   	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
->> -	depends on PPC64 && POWER10_CPU && CPU_LITTLE_ENDIAN
->> +	depends on PPC64 && CPU_LITTLE_ENDIAN
->>   	select CRYPTO_LIB_AES
->>   	select CRYPTO_ALGAPI
->>   	select CRYPTO_AEAD
->> -- 
->> 2.31.1
+v8->v9:
+ * Drop v8 patches 1-4 as they're merged now
+ * Pick up tags for v8 patches 5-6
+ * Repost to linux-crypto as this needs to merge through crypto tree.
+
+Mario Limonciello (2):
+  i2c: designware: Use PCI PSP driver for communication
+  i2c: designware: Add doorbell support for Mendocino
+
+ drivers/i2c/busses/Kconfig                  |   5 +-
+ drivers/i2c/busses/i2c-designware-amdpsp.c  | 197 +++++---------------
+ drivers/i2c/busses/i2c-designware-core.h    |   1 -
+ drivers/i2c/busses/i2c-designware-platdrv.c |   1 -
+ include/linux/psp-platform-access.h         |   1 +
+ 5 files changed, 53 insertions(+), 152 deletions(-)
+
+-- 
+2.34.1
+
