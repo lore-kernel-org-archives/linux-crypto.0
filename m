@@ -2,97 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AE2C77B6E
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 09:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D405BC77B70
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 09:26:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbjDNJW6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 05:22:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45370 "EHLO
+        id S229656AbjDNJ0N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 05:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbjDNJW6 (ORCPT
+        with ESMTP id S229479AbjDNJ0M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 05:22:58 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FB8259FF;
-        Fri, 14 Apr 2023 02:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681464177; x=1713000177;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Ebf6LIMNhryNaqylHZcAfkVO+1R1IJ4F5ZzDNTo8xYQ=;
-  b=HrHMRY4j9e1cKrQNxS66sFiWyIVFyuMTmr4u/MZtJmUd89uUBfkRmhv7
-   V6JbU+Ze709gQlxLY8mhz0ZVzF1Viig4DxdN4ejBT9nEXx0deAkhK7dpj
-   EDxiVLMQhFexKS/czkpIL0rp9b6Lp3ImGjbRP6RSygknWwcEPj7hidSKs
-   GDs2gyQxJUNy7NuwiLie642Pvo6gHyYnUhyhVvVSUOKuKNFZ1SrZaVxRY
-   5/ybwUuPUYSmJrbzC25GoLeNuMhJzNzao6/dBJZdJODxECXw6KwCbd9Og
-   bR37GMPswdryEfNqj4G8swZvoiw1qGetQVkWgf8afbZDMYohsxT8cpsaZ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="346255518"
-X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
-   d="scan'208";a="346255518"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2023 02:22:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10679"; a="935944807"
-X-IronPort-AV: E=Sophos;i="5.99,195,1677571200"; 
-   d="scan'208";a="935944807"
-Received: from aslawinx-mobl.ger.corp.intel.com (HELO [10.99.16.144]) ([10.99.16.144])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2023 02:22:53 -0700
-Message-ID: <8978fc5c-73fc-c654-dce2-d3b22511da64@linux.intel.com>
-Date:   Fri, 14 Apr 2023 11:22:51 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH] firmware_loader: rework crypto dependencies
-Content-Language: en-US
-To:     Arnd Bergmann <arnd@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Russ Weight <russell.h.weight@intel.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
+        Fri, 14 Apr 2023 05:26:12 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769122100;
+        Fri, 14 Apr 2023 02:26:11 -0700 (PDT)
+Received: from stefanw-SCHENKER ([37.4.248.58]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MHndY-1pbil01MKE-00ExRq; Fri, 14 Apr 2023 11:20:12 +0200
+From:   Stefan Wahren <stefan.wahren@i2se.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Tianfei zhang <tianfei.zhang@intel.com>,
-        Cezary Rojewski <cezary.rojewski@intel.com>,
-        Takashi Iwai <tiwai@suse.de>, linux-kernel@vger.kernel.org
-References: <20230414080329.76176-1-arnd@kernel.org>
-From:   =?UTF-8?Q?Amadeusz_S=c5=82awi=c5=84ski?= 
-        <amadeuszx.slawinski@linux.intel.com>
-In-Reply-To: <20230414080329.76176-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
+        linux-imx@nxp.com, "Rafael J . Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-pm@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH V3 4/6] dt-bindings: imxgpt: add imx6ul compatible
+Date:   Fri, 14 Apr 2023 11:19:45 +0200
+Message-Id: <20230414091947.7831-5-stefan.wahren@i2se.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230414091947.7831-1-stefan.wahren@i2se.com>
+References: <20230414091947.7831-1-stefan.wahren@i2se.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:egH7C3VWWiwX5h70heHyF3Hbrr2woAXkBy8iCnJcYjcN37pLXtw
+ 8N4bFakSW1kRpwArx6vnh5b9DBGDCC/Ks36ZGsVvBe1e01TvR0EX0JbGf8QKVzPITSPX6pv
+ xnLz1LzTTDWlG8jjPY8Xw6ZnlTcJvGxw4DEkJQ6hG4b9Pq5Q0fFbANatjsq2Fb7j8UMcsvw
+ hVsexP3i2sFjBaVtFXibA==
+UI-OutboundReport: notjunk:1;M01:P0:HkTdbiXyVe4=;tQfg1yApb1BMGE1b4c4DobBApSF
+ ZSsjtTCuf602XInLNIxl7DZHJG1x2d+XrNKZmZ1w3n35NtrDO6/gdE0ydOFx/IVy7j6xB+wGK
+ 0t/aSI4GiiojPh6MWWeSIBoXaCep4+QRfC1s1lLfdChabebe8Pv4KmgyF7FLBy01tNN+n4/xh
+ jCYxDvquvAqWgXAiYG3X9LIZqotWbCVWW0u7OiTUUttEbZ/Ub/hOmZFsV8oXwC/u/FcNjkgpC
+ EjVuWcLF0Yq1zhzQOLsAB7j9xvqY6rETKbkMIkGnyR/Dn0LKSxTjGm4zf7p+LTzrn82F2CU4H
+ /vdA6VNG9e6HoUbAIi2cII6eX7wC7+NXVQBxAWVEQKUsRoITxHiGwJDsLDRMfGUgRwCkf6p5S
+ SAVg//rHhz+V4iEGt15yT1vUInMBYHiTOGTtHCsemMN2LNOZAKLIOMg130qvC1gvicEiHiXiZ
+ 0LwqSJyg/ZekLHhgBZU8nUDynMi1c8Z9Hhcq1T6zQPgRuFvCZj01SktLXCEcoyYw/+N4GBCRY
+ bSmpBOrYOp3GBY15RAFakD8iSNaqlcyWYiPvymfiYMk+Ikp8xCccy76FVmxIAKlxH5/tbKhCd
+ zB4jio0f/zoOAym0GRsfFvJptuJiaF4XT9O+4dEfISpQGt6SCIVgJD5O5Y7pbOwVUOO5jCzoU
+ n0miRL7VlmEFdvTyVC4QqnPjZbK9YiJRQdm9bbYXSbo5lnNFGIAreOIyRQS8aZI0uYXlIBSBX
+ lyA4l6bIiQuUmY+UioT4TO4OoeH8Q2sHA==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/14/2023 10:03 AM, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> The crypto dependencies for the firmwware loader are incomplete,
-> in particular a built-in FW_LOADER fails to link against a modular
-> crypto hash driver:
-> 
-> ld.lld: error: undefined symbol: crypto_alloc_shash
-> ld.lld: error: undefined symbol: crypto_shash_digest
-> ld.lld: error: undefined symbol: crypto_destroy_tfm
->>>> referenced by main.c
->>>>                drivers/base/firmware_loader/main.o:(fw_log_firmware_info) in archive vmlinux.a
-> 
-> Rework this to use the usual 'select' from the driver module,
-> to respect the built-in vs module dependencies, and add a
-> more verbose crypto dependency to the debug option to prevent
-> configurations that lead to a link failure.
-> 
-> Fixes: 02fe26f25325 ("firmware_loader: Add debug message with checksum for FW file")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> Tested on a few hundred randconfig builds
-> ---
+Currently the dtbs_check for imx6ul generates warnings like this:
 
-When I thought I've tested all combinations... ;)
+['fsl,imx6ul-gpt', 'fsl,imx6sx-gpt'] is too long
 
-Thanks!
+According to the timer-imx-gpt driver all imx6 use the same imx6dl data,
+but according to the existing DTS files the imx6ul GPT IP is derived from
+imx6sx. So better follow the DTS files here and make the imx6ul GPT
+compatible to the imx6sl one to fix the warning.
 
-Reviewed-by: Amadeusz Sławiński <amadeuszx.slawinski@linux.intel.com>
+Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
+index 716c6afcca1f..685137338ac9 100644
+--- a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
++++ b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
+@@ -34,6 +34,9 @@ properties:
+               - fsl,imxrt1050-gpt
+               - fsl,imxrt1170-gpt
+           - const: fsl,imx6dl-gpt
++      - items:
++          - const: fsl,imx6ul-gpt
++          - const: fsl,imx6sx-gpt
+ 
+   reg:
+     maxItems: 1
+-- 
+2.34.1
+
