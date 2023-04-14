@@ -2,55 +2,79 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8BCC77B70
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 11:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6102C77B6F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 11:06:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229775AbjDNLF7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 07:05:59 -0400
+        id S230414AbjDNLGW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 07:06:22 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbjDNLFz (ORCPT
+        with ESMTP id S230479AbjDNLGO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 07:05:55 -0400
+        Fri, 14 Apr 2023 07:06:14 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365D39ED1;
-        Fri, 14 Apr 2023 04:05:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD4AE9754;
+        Fri, 14 Apr 2023 04:06:07 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pnHFF-00Fqgw-6F; Fri, 14 Apr 2023 19:05:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Apr 2023 19:05:33 +0800
-Date:   Fri, 14 Apr 2023 19:05:33 +0800
+        id 1pnHFc-00Fqhg-96; Fri, 14 Apr 2023 19:05:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Apr 2023 19:05:56 +0800
+Date:   Fri, 14 Apr 2023 19:05:56 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>, stable@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ccp: Don't initialize CCP for PSP 0x1649
-Message-ID: <ZDkzfXjnrLKT/iQl@gondor.apana.org.au>
-References: <20230403173801.2593-1-mario.limonciello@amd.com>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Jan Dabros <jsd@semihalf.com>, linux-crypto@vger.kernel.org,
+        linux-i2c@vger.kernel.org, Held Felix <Felix.Held@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Mark Hasemeyer <markhas@chromium.org>,
+        Grzegorz Bernacki <gjb@semihalf.com>
+Subject: Re: [PATCH v8 0/6] Use CCP driver to handle PSP I2C arbitration
+Message-ID: <ZDkzlM9fAh/TVcrg@gondor.apana.org.au>
+References: <20230403183216.3493-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230403173801.2593-1-mario.limonciello@amd.com>
+In-Reply-To: <20230403183216.3493-1-mario.limonciello@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 12:38:01PM -0500, Mario Limonciello wrote:
-> A number of platforms are emitting the error:
-> ```ccp: unable to access the device: you might be running a broken BIOS.```
+On Mon, Apr 03, 2023 at 01:32:09PM -0500, Mario Limonciello wrote:
+> The CCP driver now has symbols that can be used by i2c-designware-amdpsp
+> to handle the communication regarding i2c arbitration with the PSP for
+> both Cezanne and Mendocino based designs.
 > 
-> This is expected behavior as CCP is no longer accessible from the PSP's
-> PCIe BAR so stop trying to probe CCP for 0x1649.
+> Utilize those symbols.
 > 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
-> ---
->  drivers/crypto/ccp/sp-pci.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v7->v8:
+>  * Pick up tags
+>  * Drop hunk for error message change
+>  * Fix kernel robot build failures
+> 
+> Mario Limonciello (6):
+>   crypto: ccp: Drop extra doorbell checks
+>   crypto: ccp: Bump up doorbell debug message to error
+>   crypto: ccp: Return doorbell status code as an argument
+>   crypto: ccp: Use lower 8 bytes to communicate with doorbell command
+>     register
+>   i2c: designware: Use PCI PSP driver for communication
+>   i2c: designware: Add doorbell support for Mendocino
+> 
+>  drivers/crypto/ccp/platform-access.c        |  31 +--
+>  drivers/i2c/busses/Kconfig                  |   5 +-
+>  drivers/i2c/busses/i2c-designware-amdpsp.c  | 197 +++++---------------
+>  drivers/i2c/busses/i2c-designware-core.h    |   1 -
+>  drivers/i2c/busses/i2c-designware-platdrv.c |   1 -
+>  include/linux/psp-platform-access.h         |   5 +-
+>  6 files changed, 62 insertions(+), 178 deletions(-)
+> 
+> 
+> base-commit: d6cb9ab4bfeaaa69147948e42d7cff080db82d07
+> -- 
+> 2.34.1
 
-Patch applied.  Thanks.
+Patches 1-4 applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
