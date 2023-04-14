@@ -2,119 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBC8C77B70
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 08:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E92C77B6E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 08:49:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjDNIHS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 04:07:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48882 "EHLO
+        id S229933AbjDNIs7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 04:48:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbjDNIHR (ORCPT
+        with ESMTP id S229703AbjDNIs6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 04:07:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D21D640F1;
-        Fri, 14 Apr 2023 01:07:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 14 Apr 2023 04:48:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4625BB0
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Apr 2023 01:47:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681462063;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jb/RqJ7lTYgOp0Zg/Ax0skaO2qNbV/j6uuRXrVdlbsY=;
+        b=fRXiY6iy49r3ANS2iaL3v6ggdQmEVgMkrugcZjFoVyMYHUv4TcO4oCHL2ZRkco6GxGjApd
+        NE8lgCKjurL0M7kKZQsxYK93tEISDPhviFCfrnRoDc4C1zgxpAV3f4EumfC57HoZMW8y6s
+        JU90Ts+GeaOI8J9laKkmYEJ658cqa/U=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-480-UUVI9vDUNtibQQKhwMkfkw-1; Fri, 14 Apr 2023 04:47:39 -0400
+X-MC-Unique: UUVI9vDUNtibQQKhwMkfkw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 63DD161610;
-        Fri, 14 Apr 2023 08:07:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24FEEC433D2;
-        Fri, 14 Apr 2023 08:07:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681459635;
-        bh=CMhlV7gPjxolgtoBHwxReUD4SNxzZsVia1mEu5DPBd8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=uABKpT3UCvTTNEsfJZpyjJBkygzHhGJQja6hX0ABRo3ZqRlS5uvNVlZFDkeNBkODp
-         otvcfYNuh5ilBkLyOcNItBbWSMahvv2QXfZr797hemQq9CMMIAWj38JQH8YderAKqR
-         sO6P/HMzoBSFL/erIvEGazK5Sz4CT/bQdL5ou1qDI503nuLI1F734X9l4lJx+GkrH8
-         E46a+sPrkwchkLNtJsm+bRvr+0bOnKVL2kW52GfGvMG4J3wnfIpUe/sCIO5MCOiOXV
-         czagPpNjp7NFkphzMdAOFXugeRxgOOrwECN3vAsxfc16HFcG4FF6BdZ0i5mGZ6lDre
-         BnDVmWVbfjsOA==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Linus Walleij <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>,
-        Krzysztof Halasa <khalasa@piap.pl>,
-        Corentin Labbe <clabbe@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] ixp4xx_crypto: fix building wiht 64-bit dma_addr_t
-Date:   Fri, 14 Apr 2023 10:06:56 +0200
-Message-Id: <20230414080709.284005-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1C27085A588;
+        Fri, 14 Apr 2023 08:47:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 136FE2166B26;
+        Fri, 14 Apr 2023 08:47:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+In-Reply-To: <ZDi1qjVpcpr2BZfN@gondor.apana.org.au>
+References: <ZDi1qjVpcpr2BZfN@gondor.apana.org.au> <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com> <380323.1681314997@warthog.procyon.org.uk> <1078650.1681394138@warthog.procyon.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, Chuck Lever III <chuck.lever@oracle.com>,
+        Scott Mayhew <smayhew@redhat.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1235645.1681461986.1@warthog.procyon.org.uk>
+From:   David Howells <dhowells@redhat.com>
+Date:   Fri, 14 Apr 2023 09:47:37 +0100
+Message-ID: <1235770.1681462057@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-The crypt_ctl structure must be exactly 64 bytes long to work correctly,
-and it has to be a power-of-two size to allow turning the
-64-bit division in crypt_phys2virt() into a shift operation, avoiding
-the link failure:
+> Now that you have it working, perhaps you could convert some of
+> your test vectors into crypto API test vectors?
 
-ERROR: modpost: "__aeabi_uldivmod" [drivers/crypto/intel/ixp4xx/ixp4xx_crypto.ko] undefined!
+Actually, I was wondering about that.  I see that all the testing data seems
+to be statically loaded in testmgr.[ch], even if the algorithms to be tested
+are resident in modules that aren't loaded yet (so it's kind of test "on
+demand").  I guess it can't be split up amongst the algorithm modules as some
+of the tests require stuff from multiple modules (eg. aes + cbs + cts).
 
-The failure now shows up because the driver is available for compile
-testing after the move, and a previous fix turned the more descriptive
-BUILD_BUG_ON() into a link error.
+If I'm going to do that, I presume I'd need to create an API akin to the
+skcipher API or the hash API, say, to do autoload/create krb5 crypto.  Maybe
+loading with something like:
 
-Change the variably-sized dma_addr_t into the expected 'u32' type that is
-needed for the hardware, and reinstate the size check for all 32-bit
-architectures to simplify debugging if it hits again.
+	struct crypto_krb5 *alg;
 
-Fixes: 1bc7fdbf2677 ("crypto: ixp4xx - Move driver to drivers/crypto/intel/ixp4xx")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+	alg = crypto_alloc_krb5("aes256-cts-hmac-sha384-192", 0,
+				CRYPTO_ALG_ASYNC);
 
-diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-index 5d640f13ad1c..ed15379a9818 100644
---- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-+++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-@@ -118,9 +118,9 @@ struct crypt_ctl {
- 	u8 mode;		/* NPE_OP_*  operation mode */
- #endif
- 	u8 iv[MAX_IVLEN];	/* IV for CBC mode or CTR IV for CTR mode */
--	dma_addr_t icv_rev_aes;	/* icv or rev aes */
--	dma_addr_t src_buf;
--	dma_addr_t dst_buf;
-+	u32 icv_rev_aes;	/* icv or rev aes */
-+	u32 src_buf;
-+	u32 dst_buf;
- #ifdef __ARMEB__
- 	u16 auth_offs;		/* Authentication start offset */
- 	u16 auth_len;		/* Authentication data length */
-@@ -263,7 +263,8 @@ static int setup_crypt_desc(void)
- {
- 	struct device *dev = &pdev->dev;
- 
--	BUILD_BUG_ON(!IS_ENABLED(CONFIG_COMPILE_TEST) &&
-+	BUILD_BUG_ON(!(IS_ENABLED(CONFIG_COMPILE_TEST) &&
-+		       IS_ENABLED(CONFIG_64BIT)) &&
- 		     sizeof(struct crypt_ctl) != 64);
- 	crypt_virt = dma_alloc_coherent(dev,
- 					NPE_QLEN * sizeof(struct crypt_ctl),
-@@ -1170,10 +1171,11 @@ static int aead_perform(struct aead_request *req, int encrypt,
- 	}
- 
- 	if (unlikely(lastlen < authsize)) {
-+		dma_addr_t dma;
- 		/* The 12 hmac bytes are scattered,
- 		 * we need to copy them into a safe buffer */
--		req_ctx->hmac_virt = dma_pool_alloc(buffer_pool, flags,
--						    &crypt->icv_rev_aes);
-+		req_ctx->hmac_virt = dma_pool_alloc(buffer_pool, flags, &dma);
-+		crypt->icv_rev_aes = dma;
- 		if (unlikely(!req_ctx->hmac_virt))
- 			goto free_buf_dst;
- 		if (!encrypt) {
--- 
-2.39.2
+and split the algorithms into separate modules?  Much of the code would still
+end up in a common module, though.
+
+Note that each algorithm can be asked to do four different things and has four
+different types of test:
+
+ - PRF calculation
+ - Key derivation
+ - Encryption/decryption
+ - Checksum generation/verification
+
+David
 
