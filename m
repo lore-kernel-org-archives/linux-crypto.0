@@ -2,159 +2,86 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F969C77B7C
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 09:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DDAC77B6F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 10:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbjDNJ0O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 05:26:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47156 "EHLO
+        id S229632AbjDNKSC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 06:18:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjDNJ0N (ORCPT
+        with ESMTP id S229734AbjDNKSC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 05:26:13 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF10210A;
-        Fri, 14 Apr 2023 02:26:12 -0700 (PDT)
-Received: from stefanw-SCHENKER ([37.4.248.58]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MZk1p-1pt79P49MV-00WlRr; Fri, 14 Apr 2023 11:20:13 +0200
-From:   Stefan Wahren <stefan.wahren@i2se.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>
-Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
-        linux-imx@nxp.com, "Rafael J . Wysocki" <rafael@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amitk@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-pm@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH V3 5/6] ARM: dts: imx: Adjust dma-apbh node name
-Date:   Fri, 14 Apr 2023 11:19:46 +0200
-Message-Id: <20230414091947.7831-6-stefan.wahren@i2se.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230414091947.7831-1-stefan.wahren@i2se.com>
-References: <20230414091947.7831-1-stefan.wahren@i2se.com>
+        Fri, 14 Apr 2023 06:18:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D4990
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Apr 2023 03:17:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681467436;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HGlU0PvOV1zf33jFs6Isk0h8BFNeNak/ejipOrEy1sk=;
+        b=BpyinE9LU5QpFZ6u3I30F5MBsHXCbX9IUx+uxNS9IIZf0QARmTULz4WBRggS4p32v1KpJ7
+        sY0cSZPVPyl5J5wB+DneidXgDTATpFUQO1le1Pf2BhbMqe79/bW4CMi8YSfWBe4N5gSA2C
+        4vbUZvNUwyVdaYJMpnu8AwazSNguLK8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-589-n6LkH29JOM-7W2ZSpQRXPA-1; Fri, 14 Apr 2023 06:17:12 -0400
+X-MC-Unique: n6LkH29JOM-7W2ZSpQRXPA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9011A811E7C;
+        Fri, 14 Apr 2023 10:17:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7327492C14;
+        Fri, 14 Apr 2023 10:17:10 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZDkUSESImVSUX0RW@gondor.apana.org.au>
+References: <ZDkUSESImVSUX0RW@gondor.apana.org.au> <ZDi1qjVpcpr2BZfN@gondor.apana.org.au> <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com> <380323.1681314997@warthog.procyon.org.uk> <1078650.1681394138@warthog.procyon.org.uk> <1235770.1681462057@warthog.procyon.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, Chuck Lever III <chuck.lever@oracle.com>,
+        Scott Mayhew <smayhew@redhat.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:NRNPh3BpQ+BjhLfRznBBdYdDO+A5MYq9E+lVY0pK1fteDl4SyQB
- dwLHhpgbQO2P6TOiH0edt4WnLckDaFf43cIoQMKhw4R5juOaL5oETxK5gbZIRCQdVysnKMH
- 2iUGUnGxEm4pWVtgXRM33RA6dF4Bwk/beGd+O5Jsh9nFZxX+XkcFOGuQhxgamzg+tppfMzw
- k45kFQBd1Qx8DP2fVm0fA==
-UI-OutboundReport: notjunk:1;M01:P0:JH8s12BWlLI=;sOuYv+jA6kqRGFy2YWPZ+tkdqm2
- hELifqDCje/aXXBZG7l/FtbTcTselvA/ABuSFqNwGmnf9h6k/C2lZCma7T6O18lcB1tV7Kdtl
- YkhrOs4HzfZK+NhbUn+gKGVjDNT5lPzyQplmHZPM1VB9tgQBPOfdKhs1QZLwVk7tppFeUApVb
- sFkIMwRIouZyPJhJnAP7ZBBiudpYUB5dQrBx34LyMFH99yMBXTYx4sjDPVi/Csbty2uI+6ZOW
- uGJXh2vI1Wet83Jxm+//IeDSYFUIN/ObNZTruNg4P5rBEjze502x1HKyWgIqhNPhHbbAavBif
- 1Wzr6wYCMvlP64qH6WPPnGC0DGRjWCJ+2JuVVYEvsRIttPPf8AfwLC3J4lGPEqZBUvAP7FVCn
- C+U64AzULCTn1JPDq07KUHhw4m4Pp3ItwyJXdhKl/zba49UlwmfrBBcQfbVivtcXvxNMestiW
- Y2SuPlQ1YeWxAoRQUoZTCBhWu8PAW2LiJNuFiM8TYRVqiI3PWtYbhzHV/+dce/8GS82ZJdvOJ
- 8K4IUjzg2m2l1XwQ+2zCX/vmjbbqjhkKDyg7KEAXzsg2WpaBNusU/kZ2zu4g1SIRX+IEVIN16
- zw68N1olDX5tAo0E9uEmr7bXPK7snnlMqj+NI0n5xJGA/S7oxcYQ+N0xYqoVFHNMjHMySSHkW
- w4Z9RW/zq8Vp+pUS32q7G1Iuvp67zDSzcc5+8q2sQQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1239034.1681467430.1@warthog.procyon.org.uk>
+Date:   Fri, 14 Apr 2023 11:17:10 +0100
+Message-ID: <1239035.1681467430@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the dtbs_check generates warnings like this:
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-$nodename:0: 'dma-apbh@110000' does not match '^dma-controller(@.*)?$'
+> > Actually, I was wondering about that.  I see that all the testing data
+> > seems to be statically loaded in testmgr.[ch], even if the algorithms to
+> > be tested are resident in modules that aren't loaded yet (so it's kind of
+> > test "on demand").  I guess it can't be split up amongst the algorithm
+> > modules as some of the tests require stuff from multiple modules (eg. aes
+> > + cbs + cts).
+> 
+> Yes I've been meaning to split this up so they're colocated with
+> the generic implementation.
 
-So fix all affected dma-apbh node names.
+Might be easier if I wait to see how you do that.
 
-Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
----
- arch/arm/boot/dts/imx23.dtsi   | 2 +-
- arch/arm/boot/dts/imx28.dtsi   | 2 +-
- arch/arm/boot/dts/imx6qdl.dtsi | 2 +-
- arch/arm/boot/dts/imx6sx.dtsi  | 2 +-
- arch/arm/boot/dts/imx6ul.dtsi  | 2 +-
- arch/arm/boot/dts/imx7s.dtsi   | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+> Unless this code has at least two users it's probably not worth
+> it (but there are exceptions, e.g. we did a one-user algorithm
+> for dm-crypt).
 
-diff --git a/arch/arm/boot/dts/imx23.dtsi b/arch/arm/boot/dts/imx23.dtsi
-index d19508c8f9ed..a3668a0827fc 100644
---- a/arch/arm/boot/dts/imx23.dtsi
-+++ b/arch/arm/boot/dts/imx23.dtsi
-@@ -59,7 +59,7 @@ icoll: interrupt-controller@80000000 {
- 				reg = <0x80000000 0x2000>;
- 			};
- 
--			dma_apbh: dma-apbh@80004000 {
-+			dma_apbh: dma-controller@80004000 {
- 				compatible = "fsl,imx23-dma-apbh";
- 				reg = <0x80004000 0x2000>;
- 				interrupts = <0 14 20 0
-diff --git a/arch/arm/boot/dts/imx28.dtsi b/arch/arm/boot/dts/imx28.dtsi
-index a8d3c3113e0f..29e37b1fae66 100644
---- a/arch/arm/boot/dts/imx28.dtsi
-+++ b/arch/arm/boot/dts/imx28.dtsi
-@@ -78,7 +78,7 @@ hsadc: hsadc@80002000 {
- 				status = "disabled";
- 			};
- 
--			dma_apbh: dma-apbh@80004000 {
-+			dma_apbh: dma-controller@80004000 {
- 				compatible = "fsl,imx28-dma-apbh";
- 				reg = <0x80004000 0x2000>;
- 				interrupts = <82 83 84 85
-diff --git a/arch/arm/boot/dts/imx6qdl.dtsi b/arch/arm/boot/dts/imx6qdl.dtsi
-index b72ec745f6d1..bda182edc589 100644
---- a/arch/arm/boot/dts/imx6qdl.dtsi
-+++ b/arch/arm/boot/dts/imx6qdl.dtsi
-@@ -150,7 +150,7 @@ soc: soc {
- 		interrupt-parent = <&gpc>;
- 		ranges;
- 
--		dma_apbh: dma-apbh@110000 {
-+		dma_apbh: dma-controller@110000 {
- 			compatible = "fsl,imx6q-dma-apbh", "fsl,imx28-dma-apbh";
- 			reg = <0x00110000 0x2000>;
- 			interrupts = <0 13 IRQ_TYPE_LEVEL_HIGH>,
-diff --git a/arch/arm/boot/dts/imx6sx.dtsi b/arch/arm/boot/dts/imx6sx.dtsi
-index 93ac2380ca1e..4233943a1cca 100644
---- a/arch/arm/boot/dts/imx6sx.dtsi
-+++ b/arch/arm/boot/dts/imx6sx.dtsi
-@@ -209,7 +209,7 @@ gpu: gpu@1800000 {
- 			power-domains = <&pd_pu>;
- 		};
- 
--		dma_apbh: dma-apbh@1804000 {
-+		dma_apbh: dma-controller@1804000 {
- 			compatible = "fsl,imx6sx-dma-apbh", "fsl,imx28-dma-apbh";
- 			reg = <0x01804000 0x2000>;
- 			interrupts = <GIC_SPI 13 IRQ_TYPE_LEVEL_HIGH>,
-diff --git a/arch/arm/boot/dts/imx6ul.dtsi b/arch/arm/boot/dts/imx6ul.dtsi
-index 3d9d0f823568..118764c50d92 100644
---- a/arch/arm/boot/dts/imx6ul.dtsi
-+++ b/arch/arm/boot/dts/imx6ul.dtsi
-@@ -164,7 +164,7 @@ intc: interrupt-controller@a01000 {
- 			      <0x00a06000 0x2000>;
- 		};
- 
--		dma_apbh: dma-apbh@1804000 {
-+		dma_apbh: dma-controller@1804000 {
- 			compatible = "fsl,imx6q-dma-apbh", "fsl,imx28-dma-apbh";
- 			reg = <0x01804000 0x2000>;
- 			interrupts = <0 13 IRQ_TYPE_LEVEL_HIGH>,
-diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
-index efe2525b62fa..54026c2c93fa 100644
---- a/arch/arm/boot/dts/imx7s.dtsi
-+++ b/arch/arm/boot/dts/imx7s.dtsi
-@@ -1257,7 +1257,7 @@ fec1: ethernet@30be0000 {
- 			};
- 		};
- 
--		dma_apbh: dma-apbh@33000000 {
-+		dma_apbh: dma-controller@33000000 {
- 			compatible = "fsl,imx7d-dma-apbh", "fsl,imx28-dma-apbh";
- 			reg = <0x33000000 0x2000>;
- 			interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>,
--- 
-2.34.1
+There would be just two users at the moment: sunrpc/nfs and rxrpc/afs.  I
+don't know if cifs or ceph could make use of it.
+
+David
 
