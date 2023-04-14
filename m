@@ -2,347 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E8F5C77B72
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 12:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6204AC77B6E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Apr 2023 13:08:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbjDNMdE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Apr 2023 08:33:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51028 "EHLO
+        id S229693AbjDNNIY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Apr 2023 09:08:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbjDNMdD (ORCPT
+        with ESMTP id S229636AbjDNNIX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Apr 2023 08:33:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 416FC1B3
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Apr 2023 05:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681475536;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ma6AzEgjH68boZIz4seiIqCkkeg8yX+XPOYKi/FG/dU=;
-        b=CuNRpci4Ld1LtHVwryGTQfMlGPRYi9U9K8Qplwoww2/IfYQ+E4Ywlz0DNQWVssVFYUW0iS
-        G01YpNzwulr/9fRkcdZGjGnYDycswuGcnL4fVpB74osq3W7TjvqXi6khAhxsPVJp6EYL5x
-        FfrT/NWwQA0qPM6KQ7LGEJUAGeVxNcI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-279-mftgtqT1Nr6Coi-CPJ3zTA-1; Fri, 14 Apr 2023 08:32:10 -0400
-X-MC-Unique: mftgtqT1Nr6Coi-CPJ3zTA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 14 Apr 2023 09:08:23 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C4E6E77;
+        Fri, 14 Apr 2023 06:08:22 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AD88838149C1;
-        Fri, 14 Apr 2023 12:32:09 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.5])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA1D71121320;
-        Fri, 14 Apr 2023 12:32:08 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZDkoiqPXwIRYmeF3@gondor.apana.org.au>
-References: <ZDkoiqPXwIRYmeF3@gondor.apana.org.au> <ZDkUSESImVSUX0RW@gondor.apana.org.au> <ZDi1qjVpcpr2BZfN@gondor.apana.org.au> <48886D84-1A04-4B07-A666-BB56684E759F@oracle.com> <380323.1681314997@warthog.procyon.org.uk> <1078650.1681394138@warthog.procyon.org.uk> <1235770.1681462057@warthog.procyon.org.uk> <1239035.1681467430@warthog.procyon.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, Chuck Lever III <chuck.lever@oracle.com>,
-        Scott Mayhew <smayhew@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: Did the in-kernel Camellia or CMAC crypto implementation break?
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4PycFc55W0z4xDp;
+        Fri, 14 Apr 2023 23:08:20 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1681477701;
+        bh=oj/wAWvWwblyAy9BivgS9S5w0Qg18/UMB9ocKCFLE8Y=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=AI6TsBJJTv4I2Vv0XN3pvsY3994LZ5BmYemqW7/MsyiHQSzEbkP4SLwc6hEgrLyVq
+         5rUJB7vaqMls8qsgrvRV+qmzBf1xOsiYZu3fg4JSrpcQw5CfBJbbeeLwqi46ImlnWu
+         i+6ravrfwv1mRDgDxcwojXWeQ4gw/GAw7rYsUQslDrO4M8LFRr6uuNf0xczs8helCM
+         YeC+wisOnp9G5rlqdLZD+m7Lr5asYDIst48O9Mzxhw+ic+YEHr/tR5OnGaid2u9OWz
+         RXUi5j7bUDEDhaC4VyrHTNicU+uelac+Dormr2/kWG0eIKdh3EhgbSgjo3g9e3csCV
+         o/ponLWrNh3IQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
+        Danny Tsen <dtsen@linux.ibm.com>
+Subject: Re: [PATCH v2 1/2] Remove POWER10_CPU dependency.
+In-Reply-To: <20230413194625.10631-2-dtsen@linux.ibm.com>
+References: <20230413194625.10631-1-dtsen@linux.ibm.com>
+ <20230413194625.10631-2-dtsen@linux.ibm.com>
+Date:   Fri, 14 Apr 2023 23:08:14 +1000
+Message-ID: <87ildya9xd.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1247262.1681475528.1@warthog.procyon.org.uk>
-Date:   Fri, 14 Apr 2023 13:32:08 +0100
-Message-ID: <1247263.1681475528@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-
-> Could you outline how this new interface would work?
-
-Attached is documentation for the API as I currently have it.
-
-David
----
-.. SPDX-License-Identifier: GPL-2.0
-
-===========================
-Kerberos V Cryptography API
-===========================
-
-.. Contents:
-
-  - Overview.
-    - Small Buffer.
-  - Encoding Type.
-  - Key Derivation.
-    - PRF+ Calculation.
-    - Kc, Ke And Ki Derivation.
-  - Crypto Functions.
-    - Encryption Mode.
-    - Checksum Mode.
-
-Overview
-========
-
-This API provides Kerberos 5-style cryptography for key derivation, encryption
-and checksumming for use in network filesystems and can be used to implement
-the low-level crypto that's needed for GSSAPI.
-
-The following crypto types are supported::
-
-	KRB5_ENCTYPE_AES128_CTS_HMAC_SHA1_96
-	KRB5_ENCTYPE_AES256_CTS_HMAC_SHA1_96
-	KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128
-	KRB5_ENCTYPE_AES256_CTS_HMAC_SHA384_192
-	KRB5_ENCTYPE_CAMELLIA128_CTS_CMAC
-	KRB5_ENCTYPE_CAMELLIA256_CTS_CMAC
-
-	KRB5_CKSUMTYPE_HMAC_SHA1_96_AES128
-	KRB5_CKSUMTYPE_HMAC_SHA1_96_AES256
-	KRB5_CKSUMTYPE_CMAC_CAMELLIA128
-	KRB5_CKSUMTYPE_CMAC_CAMELLIA256
-	KRB5_CKSUMTYPE_HMAC_SHA256_128_AES128
-	KRB5_CKSUMTYPE_HMAC_SHA384_192_AES256
-
-The API can be included by::
-
-	#include <crypto/krb5.h>
-
-Small Buffer
-------------
-
-To pass small pieces of data about, such as keys, a buffer structure is
-defined, giving a pointer to the data and the size of that data::
-
-	struct krb5_buffer {
-		unsigned int	len;
-		void		*data;
-	};
-
-Encoding Type
-=============
-
-The encoding type is defined by the following structure::
-
-	struct krb5_enctype {
-		int		etype;
-		int		ctype;
-		const char	*name;
-		u16		key_bytes;
-		u16		key_len;
-		u16		Kc_len;
-		u16		Ke_len;
-		u16		Ki_len;
-		u16		prf_len;
-		u16		block_len;
-		u16		conf_len;
-		u16		cksum_len;
-		bool		pad;
-		...
-	};
-
-The fields of interest to the user of the API are as follows:
-
-  * ``etype`` and ``ctype`` indicate the protocol number for this encoding
-    type for encryption and checksumming respectively.  They hold
-    ``KRB5_ENCTYPE_*`` and ``KRB5_CKSUMTYPE_*`` constants.
-
-  * ``name`` is the formal name of the encoding.
-
-  * ``key_len`` and ``key_bytes`` are the input key length and the derived key
-    length.  (I think they only differ for DES, which isn't supported here).
-
-  * ``Kc_len``, ``Ke_len`` and ``Ki_len`` are the sizes of the derived Kc, Ke
-    and Ki keys.  Kc is used for in checksum mode; Ke and Ki are used in
-    encryption mode.
-
-  * ``prf_len`` is the size of the result from the PRF+ function calculation.
-
-  * ``block_len``, ``conf_len`` and ``cksum_len`` are the encryption block
-    length, confounder length and checksum length respectively.  All three are
-    used in encryption mode, but only the checksum length is used in checksum
-    mode.
-
-The encoding type is looked up by number using the following function::
-
-	const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
-
-Key Derivation
-==============
-
-Once the application has selected an encryption type, the keys that will be
-used to do the actual crypto can be derived from the transport key.
-
-PRF+ Calculation
-----------------
-
-To aid in key derivation, a function to calculate the Kerberos GSSAPI
-mechanism's PRF+ is provided::
-
-	int crypto_krb5_calc_PRFplus(const struct krb5_enctype *krb5,
-				     const struct krb5_buffer *K,
-				     unsigned int L,
-				     const struct krb5_buffer *S,
-				     struct krb5_buffer *result,
-				     gfp_t gfp);
-
-This can be used to derive the transport key from a source key plus additional
-data to limit its use.
-
-Kc, Ke And Ki Derivation
-------------------------
-
-To do actual crypto on messages, three keys can be derived: *Kc*, used in
-checksum-only mode, and *Ke* and *Ki* which are used in encryption mode for
-encryption and the integrity hash.  Three functions are provided to derive
-these keys from the transport key::
-
-	int crypto_krb5_get_Kc(const struct krb5_enctype *krb5,
-			       const struct krb5_buffer *TK,
-			       u32 usage,
-			       struct krb5_buffer *key,
-			       struct crypto_shash **_shash,
-			       gfp_t gfp);
-	int crypto_krb5_get_Ke(const struct krb5_enctype *krb5,
-			       const struct krb5_buffer *TK,
-			       u32 usage,
-			       struct krb5_buffer *key,
-			       struct crypto_sync_skcipher **_ci,
-			       gfp_t gfp);
-	int crypto_krb5_get_Ki(const struct krb5_enctype *krb5,
-			       const struct krb5_buffer *TK,
-			       u32 usage,
-			       struct krb5_buffer *key,
-			       struct crypto_shash **_shash,
-			       gfp_t gfp);
-
-In all cases, ``krb5`` is the encoding type, ``TK`` is the transport key,
-``usage`` indicates the use to which the keys will be put, ``key`` is the
-prepared output buffer for the raw key and ``gfp`` are flags to control any
-allocation performated.
-
-For Kc and Ki, ``_shash`` points to where the prepared and keyed hash context
-should be returned and for Ke, ``_ci`` points to where the prepared and keyed
-cipher should be returned.  These will need to be passed into the crypto
-functions.
-
-For use with the encrypt/decrypt functions, a struct is provided to hold the
-Ke skcipher and Ki shash::
-
-	struct krb5_enc_keys {
-		struct crypto_sync_skcipher	*Ke;
-		struct crypto_shash		*Ki;
-	};
-
-and this can be cleaned up with::
-
-	void crypto_krb5_free_enc_keys(struct krb5_enc_keys *e);
-
-Crypto Functions
-================
-
-Once the keys have been derived, crypto can be performed on the data.  The
-caller must leave gaps in the buffer for the storage of the confounder (if
-needed) and the checksum when preparing a message for transmission.  An enum
-and two functions are provided to aid in this::
-
-	enum krb5_crypto_mode {
-		KRB5_CHECKSUM_MODE,
-		KRB5_ENCRYPT_MODE,
-	};
-
-	size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
-					   enum krb5_crypto_mode mode, bool pad,
-					   size_t data_size, size_t *_offset);
-
-	size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
-					 enum krb5_crypto_mode mode, bool pad,
-					 size_t *_buffer_size, size_t *_offset);
-
-Both functions take the encoding type, an indication the mode of crypto
-(checksum-only or full encryption) and an indication if padding is going to be
-required by the application.
-
-The first function returns how big the buffer will need to be to house a given
-amount of data; the second function returns how much data will fit in a buffer
-of a particular size, and adjusts down the size of the required buffer
-accordingly.  In both cases, the offset of the data within the buffer is also
-returned.
-
-When a message has been received, the location and size of the data can be
-determined by calling::
-
-	size_t crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-					     size_t *_offset, size_t len);
-
-This returns the size of the data (plus any padding) and the offset of the
-data.  It is up to the caller to determine how much padding there is.
-
-
-Encryption Mode
----------------
-
-A pair of functions are provided to encrypt and decrypt a message::
-
-	ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
-				    struct krb5_enc_keys *keys,
-				    struct scatterlist *sg, unsigned int nr_sg,
-				    size_t sg_len,
-				    size_t data_offset, size_t data_len,
-				    bool preconfounded);
-	int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
-				struct krb5_enc_keys *keys,
-				struct scatterlist *sg, unsigned int nr_sg,
-				size_t *_offset, size_t *_len,
-				int *_error_code);
-
-In both cases, the input and output buffers are indicated by the same
-scatterlist.
-
-For the encryption function, the output buffer may be larger than is needed
-(the amount of output generated is returned) and the location and size of the
-data are indicated (which must match the encoding).  If no confounder is set,
-the function will insert one.
-
-For the decryption function, the offset and length of the message in buffer
-are supplied and these are shrunk to fit the data.  If a decryption failure
-occurs, a kerberos 5 error code is indicated.
-
-Checksum Mode
--------------
-
-A pair of function are provided to generate the checksum on a message and to
-verify that checksum::
-
-	ssize_t crypto_krb5_get_mic(const struct krb5_enctype *krb5,
-				    struct crypto_shash *shash,
-				    const struct krb5_buffer *metadata,
-				    struct scatterlist *sg, unsigned int nr_sg,
-				    size_t sg_len,
-				    size_t data_offset, size_t data_len);
-	int crypto_krb5_verify_mic(const struct krb5_enctype *krb5,
-				   struct crypto_shash *shash,
-				   const struct krb5_buffer *metadata,
-				   struct scatterlist *sg, unsigned int nr_sg,
-				   size_t *_offset, size_t *_len,
-				   int *_error_code);
-
-In both cases, the input and output buffers are indicated by the same
-scatterlist.  Additional metadata can be passed in which will get added to the
-hash before the data.
-
-For the get_mic function, the output buffer may be larger than is needed (the
-amount of output generated is returned) and the location and size of the data
-are indicated (which must match the encoding).
-
-For the verification function, the offset and length of the message in buffer
-are supplied and these are shrunk to fit the data.  If a verification failure
-occurs, a kerberos 5 error code is indicated.
-
+Danny Tsen <dtsen@linux.ibm.com> writes:
+> Remove Power10 dependency in Kconfig and detect Power10 feature at runtime.
+
+... using the existing call to module_cpu_feature_match() :)
+
+> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+> ---
+>  arch/powerpc/crypto/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+
+cheers
+
+> diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+> index 1f8f02b494e1..7113f9355165 100644
+> --- a/arch/powerpc/crypto/Kconfig
+> +++ b/arch/powerpc/crypto/Kconfig
+> @@ -96,7 +96,7 @@ config CRYPTO_AES_PPC_SPE
+>  
+>  config CRYPTO_AES_GCM_P10
+>  	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
+> -	depends on PPC64 && POWER10_CPU && CPU_LITTLE_ENDIAN
+> +	depends on PPC64 && CPU_LITTLE_ENDIAN
+>  	select CRYPTO_LIB_AES
+>  	select CRYPTO_ALGAPI
+>  	select CRYPTO_AEAD
+> -- 
+> 2.31.1
