@@ -2,193 +2,82 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847A1C77B7C
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Apr 2023 10:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 057F7C7619A
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Apr 2023 15:07:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbjDOKMH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Apr 2023 06:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59754 "EHLO
+        id S229989AbjDOPHs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 15 Apr 2023 11:07:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbjDOKMD (ORCPT
+        with ESMTP id S229535AbjDOPHs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Apr 2023 06:12:03 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 744C9198A;
-        Sat, 15 Apr 2023 03:12:01 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Pz8Df1Kp9zKyFZ;
-        Sat, 15 Apr 2023 18:09:22 +0800 (CST)
-Received: from cgs.huawei.com (10.244.148.83) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Sat, 15 Apr 2023 18:11:59 +0800
-From:   Gaosheng Cui <cuigaosheng1@huawei.com>
-To:     <stable@vger.kernel.org>, <cuigaosheng1@huawei.com>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <gregkh@linuxfoundation.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH 5.10 2/4] crypto: api - Do not create test larvals if manager is disabled
-Date:   Sat, 15 Apr 2023 18:11:56 +0800
-Message-ID: <20230415101158.1648486-3-cuigaosheng1@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230415101158.1648486-1-cuigaosheng1@huawei.com>
+        Sat, 15 Apr 2023 11:07:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20AA340D6;
+        Sat, 15 Apr 2023 08:07:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B2F2160F91;
+        Sat, 15 Apr 2023 15:07:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C094AC433D2;
+        Sat, 15 Apr 2023 15:07:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1681571266;
+        bh=Fl/gTvlCoViEMPTAMS2nrZbrWPrbjIjS7GU06V6dev8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=u9u+LEf76lHNymV/w4KL2lcwmfO18+8hx/35jXjq5vY+5OqkKYq7qQyQ7OK6kltOk
+         OEwl6XVgEm58klJCMyABK+dUGW7ow1oXcuGHCDzx5aHkAuYphcQ4wtmKMnzWjPvnQU
+         ysl3e5T/LBKNLMp5jSduI7KLdCBgVdh2prgkTRc8=
+Date:   Sat, 15 Apr 2023 17:07:43 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Gaosheng Cui <cuigaosheng1@huawei.com>
+Cc:     stable@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 5.10 1/4] crypto: api - Fix built-in testing dependency
+ failures
+Message-ID: <2023041513-sloppily-external-4c18@gregkh>
 References: <20230415101158.1648486-1-cuigaosheng1@huawei.com>
+ <20230415101158.1648486-2-cuigaosheng1@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.244.148.83]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230415101158.1648486-2-cuigaosheng1@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+On Sat, Apr 15, 2023 at 06:11:55PM +0800, Gaosheng Cui wrote:
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> When complex algorithms that depend on other algorithms are built
+> into the kernel, the order of registration must be done such that
+> the underlying algorithms are ready before the ones on top are
+> registered.  As otherwise they would fail during the self-test
+> which is required during registration.
+> 
+> In the past we have used subsystem initialisation ordering to
+> guarantee this.  The number of such precedence levels are limited
+> and they may cause ripple effects in other subsystems.
+> 
+> This patch solves this problem by delaying all self-tests during
+> boot-up for built-in algorithms.  They will be tested either when
+> something else in the kernel requests for them, or when we have
+> finished registering all built-in algorithms, whichever comes
+> earlier.
+> 
+> Reported-by: Vladis Dronov <vdronov@redhat.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+> ---
+>  crypto/algapi.c   | 73 +++++++++++++++++++++++++++++++++--------------
+>  crypto/api.c      | 52 +++++++++++++++++++++++++++++----
+>  crypto/internal.h | 10 +++++++
+>  3 files changed, 108 insertions(+), 27 deletions(-)
 
-The delayed boot-time testing patch created a dependency loop
-between api.c and algapi.c because it added a crypto_alg_tested
-call to the former when the crypto manager is disabled.
+What is the git commit id of this, and the other 3 patches, in Linus's
+tree?  That is required to have here, as you know.
 
-We could instead avoid creating the test larvals if the crypto
-manager is disabled.  This avoids the dependency loop as well
-as saving some unnecessary work, albeit in a very unlikely case.
+thanks,
 
-Reported-by: Nathan Chancellor <nathan@kernel.org>
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Fixes: adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
----
- crypto/algapi.c | 56 +++++++++++++++++++++++++++++++------------------
- crypto/api.c    |  7 ++-----
- 2 files changed, 38 insertions(+), 25 deletions(-)
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index d6cd860bca4f..f6481cb79946 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -216,6 +216,32 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
- }
- EXPORT_SYMBOL_GPL(crypto_remove_spawns);
- 
-+static struct crypto_larval *crypto_alloc_test_larval(struct crypto_alg *alg)
-+{
-+	struct crypto_larval *larval;
-+
-+	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER))
-+		return NULL;
-+
-+	larval = crypto_larval_alloc(alg->cra_name,
-+				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
-+	if (IS_ERR(larval))
-+		return larval;
-+
-+	larval->adult = crypto_mod_get(alg);
-+	if (!larval->adult) {
-+		kfree(larval);
-+		return ERR_PTR(-ENOENT);
-+	}
-+
-+	refcount_set(&larval->alg.cra_refcnt, 1);
-+	memcpy(larval->alg.cra_driver_name, alg->cra_driver_name,
-+	       CRYPTO_MAX_ALG_NAME);
-+	larval->alg.cra_priority = alg->cra_priority;
-+
-+	return larval;
-+}
-+
- static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
- {
- 	struct crypto_alg *q;
-@@ -250,31 +276,20 @@ static struct crypto_larval *__crypto_register_alg(struct crypto_alg *alg)
- 			goto err;
- 	}
- 
--	larval = crypto_larval_alloc(alg->cra_name,
--				     alg->cra_flags | CRYPTO_ALG_TESTED, 0);
-+	larval = crypto_alloc_test_larval(alg);
- 	if (IS_ERR(larval))
- 		goto out;
- 
--	ret = -ENOENT;
--	larval->adult = crypto_mod_get(alg);
--	if (!larval->adult)
--		goto free_larval;
--
--	refcount_set(&larval->alg.cra_refcnt, 1);
--	memcpy(larval->alg.cra_driver_name, alg->cra_driver_name,
--	       CRYPTO_MAX_ALG_NAME);
--	larval->alg.cra_priority = alg->cra_priority;
--
- 	list_add(&alg->cra_list, &crypto_alg_list);
--	list_add(&larval->alg.cra_list, &crypto_alg_list);
-+
-+	if (larval)
-+		list_add(&larval->alg.cra_list, &crypto_alg_list);
- 
- 	crypto_stats_init(alg);
- 
- out:
- 	return larval;
- 
--free_larval:
--	kfree(larval);
- err:
- 	larval = ERR_PTR(ret);
- 	goto out;
-@@ -403,10 +418,11 @@ int crypto_register_alg(struct crypto_alg *alg)
- 	down_write(&crypto_alg_sem);
- 	larval = __crypto_register_alg(alg);
- 	test_started = static_key_enabled(&crypto_boot_test_finished);
--	larval->test_started = test_started;
-+	if (!IS_ERR_OR_NULL(larval))
-+		larval->test_started = test_started;
- 	up_write(&crypto_alg_sem);
- 
--	if (IS_ERR(larval))
-+	if (IS_ERR_OR_NULL(larval))
- 		return PTR_ERR(larval);
- 
- 	if (test_started)
-@@ -616,8 +632,8 @@ int crypto_register_instance(struct crypto_template *tmpl,
- 	larval = __crypto_register_alg(&inst->alg);
- 	if (IS_ERR(larval))
- 		goto unlock;
--
--	larval->test_started = true;
-+	else if (larval)
-+		larval->test_started = true;
- 
- 	hlist_add_head(&inst->list, &tmpl->instances);
- 	inst->tmpl = tmpl;
-@@ -626,7 +642,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
- 	up_write(&crypto_alg_sem);
- 
- 	err = PTR_ERR(larval);
--	if (IS_ERR(larval))
-+	if (IS_ERR_OR_NULL(larval))
- 		goto err;
- 
- 	crypto_wait_for_test(larval);
-diff --git a/crypto/api.c b/crypto/api.c
-index 44d3e4f8bb58..0e7a255252ca 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -166,11 +166,8 @@ void crypto_wait_for_test(struct crypto_larval *larval)
- 	int err;
- 
- 	err = crypto_probing_notify(CRYPTO_MSG_ALG_REGISTER, larval->adult);
--	if (err != NOTIFY_STOP) {
--		if (WARN_ON(err != NOTIFY_DONE))
--			goto out;
--		crypto_alg_tested(larval->alg.cra_driver_name, 0);
--	}
-+	if (WARN_ON_ONCE(err != NOTIFY_STOP))
-+		goto out;
- 
- 	err = wait_for_completion_killable(&larval->completion);
- 	WARN_ON(err);
--- 
-2.25.1
-
+greg k-h
