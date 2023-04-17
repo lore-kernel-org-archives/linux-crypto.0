@@ -2,82 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 057F7C7619A
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Apr 2023 15:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6230DC77B77
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Apr 2023 07:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbjDOPHs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Apr 2023 11:07:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56694 "EHLO
+        id S229940AbjDQHkw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Apr 2023 03:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbjDOPHs (ORCPT
+        with ESMTP id S229711AbjDQHku (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Apr 2023 11:07:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20AA340D6;
-        Sat, 15 Apr 2023 08:07:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B2F2160F91;
-        Sat, 15 Apr 2023 15:07:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C094AC433D2;
-        Sat, 15 Apr 2023 15:07:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1681571266;
-        bh=Fl/gTvlCoViEMPTAMS2nrZbrWPrbjIjS7GU06V6dev8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=u9u+LEf76lHNymV/w4KL2lcwmfO18+8hx/35jXjq5vY+5OqkKYq7qQyQ7OK6kltOk
-         OEwl6XVgEm58klJCMyABK+dUGW7ow1oXcuGHCDzx5aHkAuYphcQ4wtmKMnzWjPvnQU
-         ysl3e5T/LBKNLMp5jSduI7KLdCBgVdh2prgkTRc8=
-Date:   Sat, 15 Apr 2023 17:07:43 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Gaosheng Cui <cuigaosheng1@huawei.com>
-Cc:     stable@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 5.10 1/4] crypto: api - Fix built-in testing dependency
- failures
-Message-ID: <2023041513-sloppily-external-4c18@gregkh>
-References: <20230415101158.1648486-1-cuigaosheng1@huawei.com>
- <20230415101158.1648486-2-cuigaosheng1@huawei.com>
+        Mon, 17 Apr 2023 03:40:50 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E56C4EFD
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Apr 2023 00:40:24 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-504dfc87927so4487715a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Apr 2023 00:40:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681717220; x=1684309220;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jOuJf1Uk2XVzTeZs33zX+691srOKO1AbhUKqZP8jH3E=;
+        b=bD/FFEpVwIhN3pNSBZp3oeHUq+WS77cAz7PD/ZDAxvCN2FFkuT1Md8xPhUGKe3V14h
+         KG2U6A26i2gEjFiIYpxVVOSGJ6vCsoDHLqpw+wPcwir9uk39FZSJFROsp5b9vErKDybJ
+         fd2qa2dKD/pu+lZohU/reF67C6eliqsk7s6AdMgse9o7usfrvfePAr840Ucb+9KBgMNF
+         9MwSrl4L6QmFXSI53P5U/syh7tDQyfs8u+xFeKcV5EOZ3zJFkM+c6UkSUW089UdKRsUh
+         Wfi98fwzrmg0JUXmrM9uIl+Z5LnhsqdhR9shJ27fNa+ELDg4kk6iYumtkPvGzyywYlyn
+         WH9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681717220; x=1684309220;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jOuJf1Uk2XVzTeZs33zX+691srOKO1AbhUKqZP8jH3E=;
+        b=ApSqQNuMNGsxGR1O8wvshAjcjN4Co3Hl5yamaeismMJpxpPUEElVUn9DLrhVsg/KSi
+         e5Ia8c+DM5NiziVfohwFo/08WkFvOgPn0C8BjhZOVvfCAgyhG/PphjgvN3FtF9XvHYpN
+         Xw6fFK/gUhIkz9PQ11N0TRAB7AfmHy6Q5Iq8btaImtgDkjufJkQP7Tu2ptuh+lcAyR/3
+         pWqa01KKj8X34R3RkMQ4j1d+lZUE/gMiWvGHuYP755lxdVrTFpGJSLAQFxN5BdZ6Bczu
+         k7n+XGgHbt182B8U5UcFyASv96BqRDrWcc7HWtlvqHJcKOPizz7r6Xjp4VXK2o1Da8hC
+         2gsQ==
+X-Gm-Message-State: AAQBX9d9hSvMOaXUOMQQJaIU5alZdSGbMjgpWzI+PoBO96tcP3BYbAjj
+        Zy/npNLFK5Ake3LjpNLLsWMvjw==
+X-Google-Smtp-Source: AKy350Y85eczDG7Mw8aICC9OfwA8qtxoVQbiQnVpgM7S2lQj5ctUHXmf9vdwjdbGCteBPpkM0yTRwg==
+X-Received: by 2002:a05:6402:1645:b0:506:8d35:40b7 with SMTP id s5-20020a056402164500b005068d3540b7mr7121155edx.8.1681717219986;
+        Mon, 17 Apr 2023 00:40:19 -0700 (PDT)
+Received: from [192.168.2.1] (146725694.box.freepro.com. [130.180.211.218])
+        by smtp.googlemail.com with ESMTPSA id c18-20020aa7c752000000b00501d73cfc86sm5527649eds.9.2023.04.17.00.40.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Apr 2023 00:40:19 -0700 (PDT)
+Message-ID: <c240cbef-1d9e-dc1b-b619-c22dacf8d41f@linaro.org>
+Date:   Mon, 17 Apr 2023 09:40:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230415101158.1648486-2-cuigaosheng1@huawei.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH V2 3/6] dt-bindings: imx-thermal: add imx6sll and imx6ul
+ compatible
+Content-Language: en-US
+To:     Stefan Wahren <stefan.wahren@i2se.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
+        linux-imx@nxp.com, "Rafael J . Wysocki" <rafael@kernel.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-pm@vger.kernel.org
+References: <20230410205803.45853-1-stefan.wahren@i2se.com>
+ <20230410205803.45853-4-stefan.wahren@i2se.com>
+From:   Daniel Lezcano <daniel.lezcano@linaro.org>
+In-Reply-To: <20230410205803.45853-4-stefan.wahren@i2se.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 15, 2023 at 06:11:55PM +0800, Gaosheng Cui wrote:
-> From: Herbert Xu <herbert@gondor.apana.org.au>
+On 10/04/2023 22:58, Stefan Wahren wrote:
+> Currently the dtbs_check for imx6 generates warnings like this:
 > 
-> When complex algorithms that depend on other algorithms are built
-> into the kernel, the order of registration must be done such that
-> the underlying algorithms are ready before the ones on top are
-> registered.  As otherwise they would fail during the self-test
-> which is required during registration.
+> ['fsl,imx6sll-tempmon', 'fsl,imx6sx-tempmon'] is too long
 > 
-> In the past we have used subsystem initialisation ordering to
-> guarantee this.  The number of such precedence levels are limited
-> and they may cause ripple effects in other subsystems.
+> So add them to the devicetree binding.
 > 
-> This patch solves this problem by delaying all self-tests during
-> boot-up for built-in algorithms.  They will be tested either when
-> something else in the kernel requests for them, or when we have
-> finished registering all built-in algorithms, whichever comes
-> earlier.
-> 
-> Reported-by: Vladis Dronov <vdronov@redhat.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
+> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 > ---
->  crypto/algapi.c   | 73 +++++++++++++++++++++++++++++++++--------------
->  crypto/api.c      | 52 +++++++++++++++++++++++++++++----
->  crypto/internal.h | 10 +++++++
->  3 files changed, 108 insertions(+), 27 deletions(-)
 
-What is the git commit id of this, and the other 3 patches, in Linus's
-tree?  That is required to have here, as you know.
+Applied, thanks
 
-thanks,
+-- 
+<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
 
-greg k-h
+Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
+<http://twitter.com/#!/linaroorg> Twitter |
+<http://www.linaro.org/linaro-blog/> Blog
+
