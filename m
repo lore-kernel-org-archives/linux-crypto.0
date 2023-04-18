@@ -2,33 +2,33 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 933C6C7EE25
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 12:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D60C77B78
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 12:28:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231284AbjDRMZK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Apr 2023 08:25:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33590 "EHLO
+        id S231295AbjDRM2S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Apr 2023 08:28:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231182AbjDRMZJ (ORCPT
+        with ESMTP id S230256AbjDRM2S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2023 08:25:09 -0400
+        Tue, 18 Apr 2023 08:28:18 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD9E7A81;
-        Tue, 18 Apr 2023 05:24:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0255A244;
+        Tue, 18 Apr 2023 05:27:56 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 41EC763108;
-        Tue, 18 Apr 2023 12:24:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DB08C433D2;
-        Tue, 18 Apr 2023 12:24:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A9D4F63160;
+        Tue, 18 Apr 2023 12:27:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93F5AC433D2;
+        Tue, 18 Apr 2023 12:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1681820685;
+        s=korg; t=1681820823;
         bh=COtBPWd792pj4wDo6QCmYmv27EpEeD8uoH4fJakfhLM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PDnXTZoIfZDWsn1a4ZXCGbl704I9f90/EgCmUmRWSAnloQZn5ogYlpybVhKuze3hX
-         6vuAn/WbtaoZTuD9b1gapSXZebyH3N4dP+ckhqLujll4hENYBHkkbZxKg+jAHfDNXt
-         jv66q/Q6DRTrJ9nWZLXinlnNEPsfRTgPkUU8zlrc=
+        b=PbotKGOYKw7sNKZeahCZW0LgeRiiixVX5nW0ybMeamx+GHro366gUxPkL92TQUQbi
+         mbk/YHgKhDWKduXodEmnSVH1+JJOhKA4Q1uurAamQiZMB9x7VZcESXUnPu63IrpChT
+         K6B9ZY75h9yfbqnXIkXrIyMjcBYto+L1fLPIDgkQ=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         kexec@lists.infradead.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.14 30/37] verify_pefile: relax wrapper length check
-Date:   Tue, 18 Apr 2023 14:21:40 +0200
-Message-Id: <20230418120255.753919976@linuxfoundation.org>
+Subject: [PATCH 4.19 45/57] verify_pefile: relax wrapper length check
+Date:   Tue, 18 Apr 2023 14:21:45 +0200
+Message-Id: <20230418120300.309593262@linuxfoundation.org>
 X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230418120254.687480980@linuxfoundation.org>
-References: <20230418120254.687480980@linuxfoundation.org>
+In-Reply-To: <20230418120258.713853188@linuxfoundation.org>
+References: <20230418120258.713853188@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
