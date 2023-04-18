@@ -2,106 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1447EC77B76
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 09:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 933C6C7EE25
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 12:25:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231231AbjDRJ2N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Apr 2023 05:28:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34286 "EHLO
+        id S231284AbjDRMZK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Apr 2023 08:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbjDRJ2M (ORCPT
+        with ESMTP id S231182AbjDRMZJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2023 05:28:12 -0400
+        Tue, 18 Apr 2023 08:25:09 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1683E170E;
-        Tue, 18 Apr 2023 02:28:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD9E7A81;
+        Tue, 18 Apr 2023 05:24:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A4B98623D5;
-        Tue, 18 Apr 2023 09:28:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B476EC433EF;
-        Tue, 18 Apr 2023 09:28:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 41EC763108;
+        Tue, 18 Apr 2023 12:24:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DB08C433D2;
+        Tue, 18 Apr 2023 12:24:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1681810090;
-        bh=LplBaAfiQN63yKSqWMsQVi8bs1BiaFM52dC7sMKWPZ8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SHbE3VNR/WwjzDYQNg2o/1AmILBYDwf4FE0A0zBuEzDtaU/vG43snOtOnptRO7hKv
-         3jKr4VxEDAaltjV1qkHWmgtva3kkxtGsofA14eMM9OolRbtm6saofpjHuHx02NvbKy
-         aSV29vf9iGR2aS8bJ/Wyje+U1N0RAuOjdcP2AD5c=
-Date:   Tue, 18 Apr 2023 11:28:07 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     cuigaosheng <cuigaosheng1@huawei.com>
-Cc:     stable@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 5.10 1/4] crypto: api - Fix built-in testing dependency
- failures
-Message-ID: <2023041809-silicon-backspace-327d@gregkh>
-References: <20230415101158.1648486-1-cuigaosheng1@huawei.com>
- <20230415101158.1648486-2-cuigaosheng1@huawei.com>
- <2023041513-sloppily-external-4c18@gregkh>
- <3f6315cc-4684-2121-3556-0ace47c29b35@huawei.com>
+        s=korg; t=1681820685;
+        bh=COtBPWd792pj4wDo6QCmYmv27EpEeD8uoH4fJakfhLM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=PDnXTZoIfZDWsn1a4ZXCGbl704I9f90/EgCmUmRWSAnloQZn5ogYlpybVhKuze3hX
+         6vuAn/WbtaoZTuD9b1gapSXZebyH3N4dP+ckhqLujll4hENYBHkkbZxKg+jAHfDNXt
+         jv66q/Q6DRTrJ9nWZLXinlnNEPsfRTgPkUU8zlrc=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Robbie Harwood <rharwood@redhat.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kexec@lists.infradead.org, Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 4.14 30/37] verify_pefile: relax wrapper length check
+Date:   Tue, 18 Apr 2023 14:21:40 +0200
+Message-Id: <20230418120255.753919976@linuxfoundation.org>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230418120254.687480980@linuxfoundation.org>
+References: <20230418120254.687480980@linuxfoundation.org>
+User-Agent: quilt/0.67
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3f6315cc-4684-2121-3556-0ace47c29b35@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Apr 16, 2023 at 03:22:18PM +0800, cuigaosheng wrote:
-> On 2023/4/15 23:07, Greg KH wrote:
-> > On Sat, Apr 15, 2023 at 06:11:55PM +0800, Gaosheng Cui wrote:
-> > > From: Herbert Xu <herbert@gondor.apana.org.au>
-> > > 
-> > > When complex algorithms that depend on other algorithms are built
-> > > into the kernel, the order of registration must be done such that
-> > > the underlying algorithms are ready before the ones on top are
-> > > registered.  As otherwise they would fail during the self-test
-> > > which is required during registration.
-> > > 
-> > > In the past we have used subsystem initialisation ordering to
-> > > guarantee this.  The number of such precedence levels are limited
-> > > and they may cause ripple effects in other subsystems.
-> > > 
-> > > This patch solves this problem by delaying all self-tests during
-> > > boot-up for built-in algorithms.  They will be tested either when
-> > > something else in the kernel requests for them, or when we have
-> > > finished registering all built-in algorithms, whichever comes
-> > > earlier.
-> > > 
-> > > Reported-by: Vladis Dronov <vdronov@redhat.com>
-> > > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
-> > > ---
-> > >   crypto/algapi.c   | 73 +++++++++++++++++++++++++++++++++--------------
-> > >   crypto/api.c      | 52 +++++++++++++++++++++++++++++----
-> > >   crypto/internal.h | 10 +++++++
-> > >   3 files changed, 108 insertions(+), 27 deletions(-)
-> > What is the git commit id of this, and the other 3 patches, in Linus's
-> > tree?  That is required to have here, as you know.
-> > 
-> > thanks,
-> > 
-> > greg k-h
-> > .
-> 
-> Thanks for taking time to review these patch.
-> 
-> These patches are in Linus's tree, reference as follows:
->   Reference 1: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=adad556efcdd42a1d9e060cbe5f6161cccf1fa28
->   Reference 2: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cad439fc040efe5f4381e3a7d583c5c200dbc186
->   Reference 3: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e42dff467ee688fe6b5a083f1837d06e3b27d8c0
->   Reference 4: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=beaaaa37c664e9afdf2913aee19185d8e3793b50
+From: Robbie Harwood <rharwood@redhat.com>
 
-Please resend the patches with the git commit id in the changelog
-somewhere, as is normally done (there are thousands of examples on the
-mailing list.)
+[ Upstream commit 4fc5c74dde69a7eda172514aaeb5a7df3600adb3 ]
 
-Also be sure that you are also backporting the patches to newer kernel
-releases so that someone does not upgrade and have a regression (i.e. if
-a patch is also needed in 5.15.y send a backport for that too.)
+The PE Format Specification (section "The Attribute Certificate Table
+(Image Only)") states that `dwLength` is to be rounded up to 8-byte
+alignment when used for traversal.  Therefore, the field is not required
+to be an 8-byte multiple in the first place.
 
-Thanks,
+Accordingly, pesign has not performed this alignment since version
+0.110.  This causes kexec failure on pesign'd binaries with "PEFILE:
+Signature wrapper len wrong".  Update the comment and relax the check.
 
-greg k-h
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jarkko Sakkinen <jarkko@kernel.org>
+cc: Eric Biederman <ebiederm@xmission.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: keyrings@vger.kernel.org
+cc: linux-crypto@vger.kernel.org
+cc: kexec@lists.infradead.org
+Link: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#the-attribute-certificate-table-image-only
+Link: https://github.com/rhboot/pesign
+Link: https://lore.kernel.org/r/20230220171254.592347-2-rharwood@redhat.com/ # v2
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/asymmetric_keys/verify_pefile.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index d178650fd524c..411977947adbe 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -139,11 +139,15 @@ static int pefile_strip_sig_wrapper(const void *pebuf,
+ 	pr_debug("sig wrapper = { %x, %x, %x }\n",
+ 		 wrapper.length, wrapper.revision, wrapper.cert_type);
+ 
+-	/* Both pesign and sbsign round up the length of certificate table
+-	 * (in optional header data directories) to 8 byte alignment.
++	/* sbsign rounds up the length of certificate table (in optional
++	 * header data directories) to 8 byte alignment.  However, the PE
++	 * specification states that while entries are 8-byte aligned, this is
++	 * not included in their length, and as a result, pesign has not
++	 * rounded up since 0.110.
+ 	 */
+-	if (round_up(wrapper.length, 8) != ctx->sig_len) {
+-		pr_debug("Signature wrapper len wrong\n");
++	if (wrapper.length > ctx->sig_len) {
++		pr_debug("Signature wrapper bigger than sig len (%x > %x)\n",
++			 ctx->sig_len, wrapper.length);
+ 		return -ELIBBAD;
+ 	}
+ 	if (wrapper.revision != WIN_CERT_REVISION_2_0) {
+-- 
+2.39.2
+
+
+
