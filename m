@@ -2,33 +2,33 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D7DC77B7D
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 12:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB24C77B76
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 12:39:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231774AbjDRMhL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Apr 2023 08:37:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
+        id S231812AbjDRMjS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Apr 2023 08:39:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbjDRMhJ (ORCPT
+        with ESMTP id S231818AbjDRMjR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2023 08:37:09 -0400
+        Tue, 18 Apr 2023 08:39:17 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C521CFAF;
-        Tue, 18 Apr 2023 05:37:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8950E1385B;
+        Tue, 18 Apr 2023 05:39:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ABFB4632A0;
-        Tue, 18 Apr 2023 12:37:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99843C433EF;
-        Tue, 18 Apr 2023 12:37:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 24970632EA;
+        Tue, 18 Apr 2023 12:39:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 131C0C4339B;
+        Tue, 18 Apr 2023 12:39:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1681821422;
-        bh=xIRVmdSoxQHHV+WQF3InEHiP6aN6H/TEQ+/N5ju+cTU=;
+        s=korg; t=1681821554;
+        bh=HPq4VGBl81F4lwzin8cZJ2MPhHPIfxlWUoMzT/tqjTY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GTZ/rCE9rS+zZ70jK73lxw6I4Xg0n+YBNjH4ga3+PGzj2SRXm9+bEZqjfGN/kqppw
-         7TtwUqvVnrX64Swicg6p9IPRq/w+/45mNRsgYQ+oLdnVAwF6P4CfhNYTI7VgswFn1V
-         NRd6T+zQu3cP84EW0T1WxRzjMH0FrLFQjS5gT6E4=
+        b=K5MIWASlhJf7D5xyV5xefEFKYYiSOpzrOj0YLXDOMu2XEHmpei++aElToIRWIHdYS
+         4dkQrXuYDbVJ+ebUm93FnNL2vX6BVW3SQXPPrjXMh5VIZsINBSL7LKlS/lLm697UqK
+         Tc3eoZTjWjvlcPtiT96NZYs5k3KXhqblUFXh7iUk=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         kexec@lists.infradead.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 092/124] asymmetric_keys: log on fatal failures in PE/pkcs7
-Date:   Tue, 18 Apr 2023 14:21:51 +0200
-Message-Id: <20230418120313.191130834@linuxfoundation.org>
+Subject: [PATCH 5.15 46/91] asymmetric_keys: log on fatal failures in PE/pkcs7
+Date:   Tue, 18 Apr 2023 14:21:50 +0200
+Message-Id: <20230418120307.173008698@linuxfoundation.org>
 X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230418120309.539243408@linuxfoundation.org>
-References: <20230418120309.539243408@linuxfoundation.org>
+In-Reply-To: <20230418120305.520719816@linuxfoundation.org>
+References: <20230418120305.520719816@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -80,7 +80,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 17 insertions(+), 17 deletions(-)
 
 diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index ce49820caa97f..01e54450c846f 100644
+index f94a1d1ad3a6c..df279538cead3 100644
 --- a/crypto/asymmetric_keys/pkcs7_verify.c
 +++ b/crypto/asymmetric_keys/pkcs7_verify.c
 @@ -79,16 +79,16 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
@@ -104,7 +104,7 @@ index ce49820caa97f..01e54450c846f 100644
  			ret = -EKEYREJECTED;
  			goto error;
  		}
-@@ -488,7 +488,7 @@ int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
+@@ -481,7 +481,7 @@ int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
  			       const void *data, size_t datalen)
  {
  	if (pkcs7->data) {
