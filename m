@@ -2,114 +2,129 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44996C6FD18
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Apr 2023 13:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34707C77B73
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 08:38:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231625AbjDRNve (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Apr 2023 09:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37732 "EHLO
+        id S232164AbjDSIi1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Apr 2023 04:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230305AbjDRNvc (ORCPT
+        with ESMTP id S231308AbjDSIi0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Apr 2023 09:51:32 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB88B5582;
-        Tue, 18 Apr 2023 06:51:29 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [7.221.188.12])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Q14zl6wnWzsRJd;
-        Tue, 18 Apr 2023 21:49:55 +0800 (CST)
-Received: from [10.67.110.176] (10.67.110.176) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 18 Apr 2023 21:51:25 +0800
-Subject: Re: [PATCH 5.10 1/4] crypto: api - Fix built-in testing dependency
- failures
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <stable@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-References: <20230415101158.1648486-1-cuigaosheng1@huawei.com>
- <20230415101158.1648486-2-cuigaosheng1@huawei.com>
- <2023041513-sloppily-external-4c18@gregkh>
- <3f6315cc-4684-2121-3556-0ace47c29b35@huawei.com>
- <2023041809-silicon-backspace-327d@gregkh>
-From:   cuigaosheng <cuigaosheng1@huawei.com>
-Message-ID: <501026a4-f847-0153-4d15-f1e0278e39d7@huawei.com>
-Date:   Tue, 18 Apr 2023 21:51:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Wed, 19 Apr 2023 04:38:26 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A712D5BA1;
+        Wed, 19 Apr 2023 01:38:23 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pp3KA-00089X-Gl; Wed, 19 Apr 2023 16:38:00 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Apr 2023 16:37:59 +0800
+Date:   Wed, 19 Apr 2023 16:37:59 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     kernel test robot <lkp@intel.com>
+Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+        linux-samsung-soc@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-amlogic@lists.infradead.org,
+        Sean Wang <sean.wang@mediatek.com>,
+        Avi Fishman <avifishman70@gmail.com>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Tali Perry <tali.perry1@gmail.com>,
+        Patrick Venture <venture@google.com>,
+        Nancy Yuen <yuenn@google.com>,
+        Benjamin Fair <benjaminfair@google.com>
+Subject: [PATCH] hwrng: Kconfig - Add HAS_IOMEM dependencies for
+ exynos/meson/mtk/npcm
+Message-ID: <ZD+oZ9DWiTxeo3RY@gondor.apana.org.au>
+References: <202304191106.swKbBeDh-lkp@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <2023041809-silicon-backspace-327d@gregkh>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.110.176]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500012.china.huawei.com (7.221.188.12)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202304191106.swKbBeDh-lkp@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-On 2023/4/18 17:28, Greg KH wrote:
-> On Sun, Apr 16, 2023 at 03:22:18PM +0800, cuigaosheng wrote:
->> On 2023/4/15 23:07, Greg KH wrote:
->>> On Sat, Apr 15, 2023 at 06:11:55PM +0800, Gaosheng Cui wrote:
->>>> From: Herbert Xu <herbert@gondor.apana.org.au>
->>>>
->>>> When complex algorithms that depend on other algorithms are built
->>>> into the kernel, the order of registration must be done such that
->>>> the underlying algorithms are ready before the ones on top are
->>>> registered.  As otherwise they would fail during the self-test
->>>> which is required during registration.
->>>>
->>>> In the past we have used subsystem initialisation ordering to
->>>> guarantee this.  The number of such precedence levels are limited
->>>> and they may cause ripple effects in other subsystems.
->>>>
->>>> This patch solves this problem by delaying all self-tests during
->>>> boot-up for built-in algorithms.  They will be tested either when
->>>> something else in the kernel requests for them, or when we have
->>>> finished registering all built-in algorithms, whichever comes
->>>> earlier.
->>>>
->>>> Reported-by: Vladis Dronov <vdronov@redhat.com>
->>>> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->>>> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
->>>> ---
->>>>    crypto/algapi.c   | 73 +++++++++++++++++++++++++++++++++--------------
->>>>    crypto/api.c      | 52 +++++++++++++++++++++++++++++----
->>>>    crypto/internal.h | 10 +++++++
->>>>    3 files changed, 108 insertions(+), 27 deletions(-)
->>> What is the git commit id of this, and the other 3 patches, in Linus's
->>> tree?  That is required to have here, as you know.
->>>
->>> thanks,
->>>
->>> greg k-h
->>> .
->> Thanks for taking time to review these patch.
->>
->> These patches are in Linus's tree, reference as follows:
->>    Reference 1: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=adad556efcdd42a1d9e060cbe5f6161cccf1fa28
->>    Reference 2: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cad439fc040efe5f4381e3a7d583c5c200dbc186
->>    Reference 3: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e42dff467ee688fe6b5a083f1837d06e3b27d8c0
->>    Reference 4: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=beaaaa37c664e9afdf2913aee19185d8e3793b50
-> Please resend the patches with the git commit id in the changelog
-> somewhere, as is normally done (there are thousands of examples on the
-> mailing list.)
+On Wed, Apr 19, 2023 at 11:43:42AM +0800, kernel test robot wrote:
 >
-> Also be sure that you are also backporting the patches to newer kernel
-> releases so that someone does not upgrade and have a regression (i.e. if
-> a patch is also needed in 5.15.y send a backport for that too.)
->
-> Thanks,
->
-> greg k-h
-> .
+>    s390-linux-ld: drivers/char/hw_random/exynos-trng.o: in function `exynos_trng_probe':
+>    exynos-trng.c:(.text+0x39e): undefined reference to `devm_platform_ioremap_resource'
+>    s390-linux-ld: drivers/char/hw_random/meson-rng.o: in function `meson_rng_probe':
+>    meson-rng.c:(.text+0x10a): undefined reference to `devm_platform_ioremap_resource'
+>    s390-linux-ld: drivers/char/hw_random/mtk-rng.o: in function `mtk_rng_probe':
+>    mtk-rng.c:(.text+0x40e): undefined reference to `devm_platform_ioremap_resource'
+>    s390-linux-ld: drivers/char/hw_random/npcm-rng.o: in function `npcm_rng_probe':
+>    npcm-rng.c:(.text+0x2ca): undefined reference to `devm_platform_ioremap_resource'
 
+OK, this patch should fix these ones at least:
 
-As I did more testing, I found that the patch set conflicted with SIMD,
-so we needed a more appropriate solution to fix it, please ignore this
-patch set, thanks.
+---8<---
+Add missing dependencies on HAS_IOMEM as otherwise they will trigger
+failed builds with COMPILE_TEST enabled.
 
-Thanks for your time again!
+Also add dependencies on OF where appropriate.
 
+Change the default so that these drivers are not enabled just because
+COMPILE_TEST is turned on.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Link: https://lore.kernel.org/oe-kbuild-all/202304191106.swKbBeDh-lkp@intel.com/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index ae508e96cfc2..f3146470ce88 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -400,9 +400,9 @@ config HW_RANDOM_POLARFIRE_SOC
+ 
+ config HW_RANDOM_MESON
+ 	tristate "Amlogic Meson Random Number Generator support"
+-	depends on HW_RANDOM
+ 	depends on ARCH_MESON || COMPILE_TEST
+-	default y
++	depends on HAS_IOMEM && OF
++	default HW_RANDOM if ARCH_MESON
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator hardware found on Amlogic Meson SoCs.
+@@ -427,9 +427,9 @@ config HW_RANDOM_CAVIUM
+ 
+ config HW_RANDOM_MTK
+ 	tristate "Mediatek Random Number Generator support"
+-	depends on HW_RANDOM
+ 	depends on ARCH_MEDIATEK || COMPILE_TEST
+-	default y
++	depends on HAS_IOMEM && OF
++	default HW_RANDOM if ARCH_MEDIATEK
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator hardware found on Mediatek SoCs.
+@@ -456,7 +456,8 @@ config HW_RANDOM_S390
+ config HW_RANDOM_EXYNOS
+ 	tristate "Samsung Exynos True Random Number Generator support"
+ 	depends on ARCH_EXYNOS || COMPILE_TEST
+-	default HW_RANDOM
++	depends on HAS_IOMEM
++	default HW_RANDOM if ARCH_EXYNOS
+ 	help
+ 	  This driver provides support for the True Random Number
+ 	  Generator available in Exynos SoCs.
+@@ -483,7 +484,8 @@ config HW_RANDOM_OPTEE
+ config HW_RANDOM_NPCM
+ 	tristate "NPCM Random Number Generator support"
+ 	depends on ARCH_NPCM || COMPILE_TEST
+-	default HW_RANDOM
++	depends on HAS_IOMEM
++	default HW_RANDOM if ARCH_NPCM
+ 	help
+ 	  This driver provides support for the Random Number
+ 	  Generator hardware available in Nuvoton NPCM SoCs.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
