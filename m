@@ -2,98 +2,139 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EFAC77B73
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 21:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF9BC77B73
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 21:56:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbjDSVyq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Apr 2023 17:54:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35408 "EHLO
+        id S229547AbjDSV4c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Apr 2023 17:56:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbjDSVyp (ORCPT
+        with ESMTP id S229499AbjDSV4b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Apr 2023 17:54:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2E95254
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:53:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681941237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=7V/7A9HFgrOFYYI+MzgPh8m/YX9YupoUtBE6VyddJTo=;
-        b=H03nh/LOJbBp/ZfTLCKkdKP+dxhB1u70Mugr4xCIUb3AJSuGSbyXgcse4yqA3XAk9DrFq5
-        Q38mlj5oQyhcGvfcbV3kF1cHyCq7J2dZOGhMydu27P+ufVWnObQzjscyWoAr4ldjb+I1q8
-        OQN4tZpRyeXYcKxYaB2FmgZLySW3/S8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-63-hg3qMRh6NI-bfpfC1yAjKA-1; Wed, 19 Apr 2023 17:53:54 -0400
-X-MC-Unique: hg3qMRh6NI-bfpfC1yAjKA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B2B49800047;
-        Wed, 19 Apr 2023 21:53:53 +0000 (UTC)
-Received: from aion.usersys.redhat.com (unknown [10.22.16.241])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A676F140EBF4;
-        Wed, 19 Apr 2023 21:53:53 +0000 (UTC)
-Received: by aion.usersys.redhat.com (Postfix, from userid 1000)
-        id 4533D1A27F5; Wed, 19 Apr 2023 17:53:53 -0400 (EDT)
-Date:   Wed, 19 Apr 2023 17:53:53 -0400
-From:   Scott Mayhew <smayhew@redhat.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     chuck.lever@oracle.com, linux-nfs@vger.kernel.org
-Subject: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
- ciphers enabled
-Message-ID: <ZEBi8ReG9LKLcmW3@aion.usersys.redhat.com>
+        Wed, 19 Apr 2023 17:56:31 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8797340FE
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:56:30 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-51efefe7814so253541a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:56:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1681941390; x=1684533390;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OLFmQtDzjn4fYBCM5a8di1qRrzs1inEcdVm3lZ+12QM=;
+        b=Q0LakSBjf0+GBzOMLbAb3DpXco7mN4HHs+Qs/Nvg+jLZjcJ1Ie+a7eCijmH4a8EEbS
+         33LOFnttp72BosihncMJLawycgMQDlKvNydTZiCFj83K0yz6dglI2Uk8Soum3R0B6cDL
+         7kT2rgDuuy2BSkC721XmaGpdyGoniKYYFQdeipvyAeUW+DwbeNi0QdvuxXFIXA6hz82o
+         Mt7lompywH7ief7lBe9GAKR27XOorkb+5Hy+igyRHThnYXros/YOxszVOWr9mPsuL9+d
+         F2Hbq9EBe7DKdB01RQkTOyfNw68JW+Iaoe0HAhw9Mon/+ggI56OS0ryOXqmr4x8rNAHr
+         QsPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681941390; x=1684533390;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OLFmQtDzjn4fYBCM5a8di1qRrzs1inEcdVm3lZ+12QM=;
+        b=jWp7ra0laP8jORGYQIKpEIXRSAPubmQzvWeCfA/exZRese2RCPNwOrpNn4o/ObO3Xv
+         5MO6OXvP7Iy/csqyGawA5Z6sdd2uRF46wqXCiRzQyoVhYlnFW43lqkw4Js5OVyqqC7iT
+         pSOvP5hfTuZDivko7X7iX3AOfETdFAL1n/BIkjDYmjvl5OSSAUvIQshdEwe2RL9Dt9/1
+         B+A0wzLIHb5XqNMRxxlKNEvkxU5dmQoeI6GcjIGc2xVqmVTljiRUbY2o5ei6vb1N3Rha
+         C7gih9t32he/bX+0u6YdhqWh/2nqu89n8x0betc2iHQc8bnc/whWMaYWpttImeU6zHQJ
+         BmUA==
+X-Gm-Message-State: AAQBX9dCCrw0wA+4U/f2gYcJL5aYMdxzeOx+CaOsjLDyK2J0Vr+8CPry
+        UUZ1GlleCoRW8Q5L8x+aZ7Nsl0yYLVP/OR0dcOS42jhKfHRgFdtmwAFexA==
+X-Google-Smtp-Source: AKy350ZzIjgiQTad0i+K7AT2aLRAa2MzlG+eA4IP23ChGDk1CoGmo4OGkFCXhCcBg96+koUcNJCu5vVd0OB81LDKpxI=
+X-Received: by 2002:a17:90a:4142:b0:247:19c5:aa3d with SMTP id
+ m2-20020a17090a414200b0024719c5aa3dmr3916943pjg.36.1681941389816; Wed, 19 Apr
+ 2023 14:56:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+References: <202304081828.zjGcFUyE-lkp@intel.com> <ZD+0DJq1NHmMSSja@gondor.apana.org.au>
+ <ZD+1BQd8Phqk3lzv@gondor.apana.org.au> <ZD+1phnERT6EkIUe@gondor.apana.org.au>
+In-Reply-To: <ZD+1phnERT6EkIUe@gondor.apana.org.au>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 19 Apr 2023 14:56:17 -0700
+Message-ID: <CAKwvOdmxK8jKK3aW7xViDyjA=NtmcvXsv=OPNRFC0FTrnVCS4A@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm/sha512-neon - Fix clang function cast warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     kernel test robot <lkp@intel.com>,
+        Robert Elliott <elliott@hpe.com>, llvm@lists.linux.dev,
+        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Chuck's recently-added RPCSEC GSS krb5 KUnit test
-(net/sunrpc/auth_gss/gss_krb5_test.c) is failing on arm64, specifically
-the RFC 3962 test cases (I'm just pasting the output of 1 case, but all
-6 cases fail):
+On Wed, Apr 19, 2023 at 2:35=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> Instead of casting the function which upsets clang for some reason,
+> change the assembly function siganture instead.
 
----8<---
-[  237.255197]         # Subtest: RFC 3962 encryption
-[  237.255588]     # RFC 3962 encryption: EXPECTATION FAILED at net/sunrpc/auth_gss/gss_krb5_test.c:772
-                   Expected memcmp(param->next_iv->data, iv, param->next_iv->len) == 0, but
-                       memcmp(param->next_iv->data, iv, param->next_iv->len) == 1 (0x1)
-               
-               IV mismatch
----8<---
+Same comments as sha1 and sha256.  Looks like more casts to remove:
 
-If I disable the hardware accelerated ciphers
-(CONFIG_CRYPTO_AES_ARM64_CE_BLK and CONFIG_CRYPTO_AES_ARM64_NEON_BLK),
-then the test works.
+arch/arm/crypto/sha512-glue.c
+34:             (sha512_block_fn *)sha512_block_data_order);
+40:             (sha512_block_fn *)sha512_block_data_order);
+48:             (sha512_block_fn *)sha512_block_data_order);
 
-Likewise, if I modify Chuck's test to explicitly request
-"cts(cbc(aes-generic))", then the test works.
 
-The problem is that the asm helper aes_cbc_cts_encrypt in
-arch/arm64/crypto/aes-modes.S doesn't return the next IV.
 
-If I make the following change, then the test works:
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: https://lore.kernel.org/oe-kbuild-all/202304081828.zjGcFUyE-lkp@int=
+el.com/
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/arch/arm/crypto/sha512-neon-glue.c b/arch/arm/crypto/sha512-=
+neon-glue.c
+> index c879ad32db51..c6e58fe475ac 100644
+> --- a/arch/arm/crypto/sha512-neon-glue.c
+> +++ b/arch/arm/crypto/sha512-neon-glue.c
+> @@ -20,8 +20,8 @@
+>  MODULE_ALIAS_CRYPTO("sha384-neon");
+>  MODULE_ALIAS_CRYPTO("sha512-neon");
+>
+> -asmlinkage void sha512_block_data_order_neon(u64 *state, u8 const *src,
+> -                                            int blocks);
+> +asmlinkage void sha512_block_data_order_neon(struct sha512_state *state,
+> +                                            const u8 *src, int blocks);
+>
+>  static int sha512_neon_update(struct shash_desc *desc, const u8 *data,
+>                               unsigned int len)
+> @@ -33,8 +33,7 @@ static int sha512_neon_update(struct shash_desc *desc, =
+const u8 *data,
+>                 return sha512_arm_update(desc, data, len);
+>
+>         kernel_neon_begin();
+> -       sha512_base_do_update(desc, data, len,
+> -               (sha512_block_fn *)sha512_block_data_order_neon);
+> +       sha512_base_do_update(desc, data, len, sha512_block_data_order_ne=
+on);
+>         kernel_neon_end();
+>
+>         return 0;
+> @@ -49,9 +48,8 @@ static int sha512_neon_finup(struct shash_desc *desc, c=
+onst u8 *data,
+>         kernel_neon_begin();
+>         if (len)
+>                 sha512_base_do_update(desc, data, len,
+> -                       (sha512_block_fn *)sha512_block_data_order_neon);
+> -       sha512_base_do_finalize(desc,
+> -               (sha512_block_fn *)sha512_block_data_order_neon);
+> +                                     sha512_block_data_order_neon);
+> +       sha512_base_do_finalize(desc, sha512_block_data_order_neon);
+>         kernel_neon_end();
+>
+>         return sha512_base_finish(desc, out);
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
 
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 0e834a2c062c..477605fad76b 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -268,6 +268,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
- 	add		x4, x0, x4
- 	st1		{v0.16b}, [x4]			/* overlapping stores */
- 	st1		{v1.16b}, [x0]
-+	st1		{v1.16b}, [x5]
- 	ret
- AES_FUNC_END(aes_cbc_cts_encrypt)
 
-But I don't know if that change is at all correct! (I've never even
-looked at arm64 asm before).  If someone who's knowledgeable about this
-code could chime in, I'd appreciate it.
-
--Scott
-
+--=20
+Thanks,
+~Nick Desaulniers
