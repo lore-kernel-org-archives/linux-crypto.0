@@ -2,128 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34707C77B73
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 08:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A992C6FD18
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 09:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232164AbjDSIi1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Apr 2023 04:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48680 "EHLO
+        id S232001AbjDSJ2E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Apr 2023 05:28:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231308AbjDSIi0 (ORCPT
+        with ESMTP id S231714AbjDSJ2D (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Apr 2023 04:38:26 -0400
+        Wed, 19 Apr 2023 05:28:03 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A712D5BA1;
-        Wed, 19 Apr 2023 01:38:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02757AB9;
+        Wed, 19 Apr 2023 02:28:00 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pp3KA-00089X-Gl; Wed, 19 Apr 2023 16:38:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Apr 2023 16:37:59 +0800
-Date:   Wed, 19 Apr 2023 16:37:59 +0800
+        id 1pp46F-00091g-Ap; Wed, 19 Apr 2023 17:27:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Apr 2023 17:27:40 +0800
+Date:   Wed, 19 Apr 2023 17:27:40 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     kernel test robot <lkp@intel.com>
-Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
-        linux-samsung-soc@vger.kernel.org,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        linux-amlogic@lists.infradead.org,
-        Sean Wang <sean.wang@mediatek.com>,
-        Avi Fishman <avifishman70@gmail.com>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Tali Perry <tali.perry1@gmail.com>,
-        Patrick Venture <venture@google.com>,
-        Nancy Yuen <yuenn@google.com>,
-        Benjamin Fair <benjaminfair@google.com>
-Subject: [PATCH] hwrng: Kconfig - Add HAS_IOMEM dependencies for
- exynos/meson/mtk/npcm
-Message-ID: <ZD+oZ9DWiTxeo3RY@gondor.apana.org.au>
-References: <202304191106.swKbBeDh-lkp@intel.com>
+Cc:     Robert Elliott <elliott@hpe.com>, llvm@lists.linux.dev,
+        oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: arm/sha1-neon - Fix clang function cast warnings
+Message-ID: <ZD+0DJq1NHmMSSja@gondor.apana.org.au>
+References: <202304081828.zjGcFUyE-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202304191106.swKbBeDh-lkp@intel.com>
+In-Reply-To: <202304081828.zjGcFUyE-lkp@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 11:43:42AM +0800, kernel test robot wrote:
->
->    s390-linux-ld: drivers/char/hw_random/exynos-trng.o: in function `exynos_trng_probe':
->    exynos-trng.c:(.text+0x39e): undefined reference to `devm_platform_ioremap_resource'
->    s390-linux-ld: drivers/char/hw_random/meson-rng.o: in function `meson_rng_probe':
->    meson-rng.c:(.text+0x10a): undefined reference to `devm_platform_ioremap_resource'
->    s390-linux-ld: drivers/char/hw_random/mtk-rng.o: in function `mtk_rng_probe':
->    mtk-rng.c:(.text+0x40e): undefined reference to `devm_platform_ioremap_resource'
->    s390-linux-ld: drivers/char/hw_random/npcm-rng.o: in function `npcm_rng_probe':
->    npcm-rng.c:(.text+0x2ca): undefined reference to `devm_platform_ioremap_resource'
-
-OK, this patch should fix these ones at least:
-
----8<---
-Add missing dependencies on HAS_IOMEM as otherwise they will trigger
-failed builds with COMPILE_TEST enabled.
-
-Also add dependencies on OF where appropriate.
-
-Change the default so that these drivers are not enabled just because
-COMPILE_TEST is turned on.
+Instead of casting the function which upsets clang for some reason,
+change the assembly function siganture instead.
 
 Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/oe-kbuild-all/202304191106.swKbBeDh-lkp@intel.com/
+Link: https://lore.kernel.org/oe-kbuild-all/202304081828.zjGcFUyE-lkp@intel.com/
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index ae508e96cfc2..f3146470ce88 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -400,9 +400,9 @@ config HW_RANDOM_POLARFIRE_SOC
+diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon_glue.c
+index cfe36ae0f3f5..9c70b87e69f7 100644
+--- a/arch/arm/crypto/sha1_neon_glue.c
++++ b/arch/arm/crypto/sha1_neon_glue.c
+@@ -26,8 +26,8 @@
  
- config HW_RANDOM_MESON
- 	tristate "Amlogic Meson Random Number Generator support"
--	depends on HW_RANDOM
- 	depends on ARCH_MESON || COMPILE_TEST
--	default y
-+	depends on HAS_IOMEM && OF
-+	default HW_RANDOM if ARCH_MESON
- 	help
- 	  This driver provides kernel-side support for the Random Number
- 	  Generator hardware found on Amlogic Meson SoCs.
-@@ -427,9 +427,9 @@ config HW_RANDOM_CAVIUM
+ #include "sha1.h"
  
- config HW_RANDOM_MTK
- 	tristate "Mediatek Random Number Generator support"
--	depends on HW_RANDOM
- 	depends on ARCH_MEDIATEK || COMPILE_TEST
--	default y
-+	depends on HAS_IOMEM && OF
-+	default HW_RANDOM if ARCH_MEDIATEK
- 	help
- 	  This driver provides kernel-side support for the Random Number
- 	  Generator hardware found on Mediatek SoCs.
-@@ -456,7 +456,8 @@ config HW_RANDOM_S390
- config HW_RANDOM_EXYNOS
- 	tristate "Samsung Exynos True Random Number Generator support"
- 	depends on ARCH_EXYNOS || COMPILE_TEST
--	default HW_RANDOM
-+	depends on HAS_IOMEM
-+	default HW_RANDOM if ARCH_EXYNOS
- 	help
- 	  This driver provides support for the True Random Number
- 	  Generator available in Exynos SoCs.
-@@ -483,7 +484,8 @@ config HW_RANDOM_OPTEE
- config HW_RANDOM_NPCM
- 	tristate "NPCM Random Number Generator support"
- 	depends on ARCH_NPCM || COMPILE_TEST
--	default HW_RANDOM
-+	depends on HAS_IOMEM
-+	default HW_RANDOM if ARCH_NPCM
- 	help
- 	  This driver provides support for the Random Number
- 	  Generator hardware available in Nuvoton NPCM SoCs.
+-asmlinkage void sha1_transform_neon(void *state_h, const char *data,
+-				    unsigned int rounds);
++asmlinkage void sha1_transform_neon(struct sha1_state *state_h,
++				    const u8 *data, int rounds);
+ 
+ static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
+ 			  unsigned int len)
+@@ -39,8 +39,7 @@ static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
+ 		return sha1_update_arm(desc, data, len);
+ 
+ 	kernel_neon_begin();
+-	sha1_base_do_update(desc, data, len,
+-			    (sha1_block_fn *)sha1_transform_neon);
++	sha1_base_do_update(desc, data, len, sha1_transform_neon);
+ 	kernel_neon_end();
+ 
+ 	return 0;
+@@ -54,9 +53,8 @@ static int sha1_neon_finup(struct shash_desc *desc, const u8 *data,
+ 
+ 	kernel_neon_begin();
+ 	if (len)
+-		sha1_base_do_update(desc, data, len,
+-				    (sha1_block_fn *)sha1_transform_neon);
+-	sha1_base_do_finalize(desc, (sha1_block_fn *)sha1_transform_neon);
++		sha1_base_do_update(desc, data, len, sha1_transform_neon);
++	sha1_base_do_finalize(desc, sha1_transform_neon);
+ 	kernel_neon_end();
+ 
+ 	return sha1_base_finish(desc, out);
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
