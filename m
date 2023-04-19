@@ -2,90 +2,99 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 925C4C6FD18
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 21:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C2FC77B73
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Apr 2023 21:54:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbjDSVqO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Apr 2023 17:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33668 "EHLO
+        id S230298AbjDSVyB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Apr 2023 17:54:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229682AbjDSVqN (ORCPT
+        with ESMTP id S230195AbjDSVyA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Apr 2023 17:46:13 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B9326AC
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:46:11 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-63b620188aeso447769b3a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:46:11 -0700 (PDT)
+        Wed, 19 Apr 2023 17:54:00 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3AC95593
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:53:58 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so240992a12.1
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Apr 2023 14:53:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681940770; x=1684532770;
+        d=google.com; s=20221208; t=1681941238; x=1684533238;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5eNA55poY27sJGkFBB9ELAvckRSp+Hs3DdUKmyP8I/c=;
-        b=Wu+EO2gLZK7bRlRXhOue6NYns1NGF7FgYObfpP2p7tSWYpnQJon+eZ1th/qgEPsbeT
-         n6YG0IH0XPWgIbKKR/M3vjqnEh+7YqJN4K0V0IqQN1geeWosh3pj/m3nQmPs69zCTXOO
-         F3hp3XJG3srHyjCAcvzWdXQrY8iGq+h3sroGuLR4nVCU/CgUPdhjHcZiGoQBwmYQOq6q
-         6nHpbRCJtMdALeo1UBhlq4sGLfDBin4I4t5N2QYN2KQWrLWqqQOZulXn7jLCyO4SF5D1
-         ADWe84kC/4VIG85xthR+4jmVpFZfD4HWvnk92BW52dBG9a56AAf+S53ye2pt6Wt1zQqu
-         4zxQ==
+        bh=j8iHanY7fwyxMAC+40k2hC5PB13EWng94w0vOBJ90SQ=;
+        b=qHXH/QEPdhfNUubovbW2N/tO1b/Cf9V9pOr4tjVtzyoUiD2aJpz58/QOC6orq7L4RS
+         KwtQmYBSyAEUEYT/K+noG9KXEodKAYZColxmjFNmASfWWPvr0wwQypJzfTPHlavOuXrR
+         e7W20zZl7AZSzBcHLMhaHJcpeEXBVJy/1G4aUlcRkCp9Am0NWRWTpritQjIQeYbsFIdo
+         /Y4XLIOIjK0OvPn152AwXWNd7b8doRZWKLgNIcp8ysckM6ry6QdkklWHv7w17qtVwFcG
+         GHzJPYuxFai5e6xvaVXT5fO1SMlFJL+a0hQbT64r8ei3PKsZqWpSX3qKaGaZOrmEXMJ2
+         gcGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681940770; x=1684532770;
+        d=1e100.net; s=20221208; t=1681941238; x=1684533238;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5eNA55poY27sJGkFBB9ELAvckRSp+Hs3DdUKmyP8I/c=;
-        b=hU9UD69e8ShbIz4xeThWg6sN+umT3+8VeteJxIMA/mwODVEykRxgEA3f9ZZVOgOIXC
-         DkYPnbPhN3u2/inhHNiEOj9SQxJzhT74v4BeU8gWyh7+F0EflEeRFinoLRfh5MZVRG4O
-         p+Z0w2c23Pc6lJyMhHa1EPa9lcS8MGHi+v39u+S+TFk5tgsCFF6+oOlAriWwBpQFbTUa
-         1CGmDcm3FiJQSXvvSIjHgIVYUr5mFoC30pTquHQlGHKJGcAaFwoKmvdONSC3Afe+l3k/
-         D9oGsAXy1HtKba1r5OwKG6N2lKpRl85iVs3FoyCYJ/tTgno4HxXY4EI/Z/dChR9M27a+
-         8prQ==
-X-Gm-Message-State: AAQBX9cqaVTnclM3m7uRI/YXjRXpjJUZS1RBLPWojDPPdSEXVlqcCxoB
-        3i59BQUQnO4IATpB19EcYUxHridMx7BKZPETQ5OjjQ==
-X-Google-Smtp-Source: AKy350bL48Q9SK3cJudoJ6xx9ltTOmsUb9nCB/69hFqPx6lo5kbFN2yYSkaFZsBy9oE0K351LWgmiL9hiI5w4oDtC+Q=
-X-Received: by 2002:a17:90b:4c4f:b0:247:78e7:8739 with SMTP id
- np15-20020a17090b4c4f00b0024778e78739mr4187323pjb.0.1681940770255; Wed, 19
- Apr 2023 14:46:10 -0700 (PDT)
+        bh=j8iHanY7fwyxMAC+40k2hC5PB13EWng94w0vOBJ90SQ=;
+        b=SqI7849Q+L0oMUshbMRPG4Gf2Ocef+rnppuVz3jYUkPDJ1Zscwnq5wKryqAOI49pyB
+         zdFKyQNn7Ie+9hWV/6EkiaL/lIhrbdCyrdGBoZRKQgWatEGlUNVBNShxb8iEvYCiBONR
+         DIGyUZkKNEIOI4YKR0Lm5iXJpl59W2tpH2ko1WUYrNy5VYfqix+ZREHkTha4ga3vtqbd
+         M2JJBBcQfAmn3IAfQ619sT4yvLJHifSYpEuvkW5fKAnWyjtI3tB/LXfQLzc7XzHHG6js
+         9FsE/JjLfboBngJKwNfbkyZfdCUXKwP13VV1l88LS+8nHsC77v36YLxAtAHnVU0pxlVD
+         LYHg==
+X-Gm-Message-State: AAQBX9dALNx20gdoWHQU7/QoE7JOC131Lt1AXIfH1Ubon+UMO1jUzo5X
+        f7PMCg7AbkXByv92ED4O+twjpJPos692Qz0AcZoeHw==
+X-Google-Smtp-Source: AKy350au7CHiEJh3jH0BOBk7n3u4G+wlWReJVqLi7dJNUMc2sVuxMTkPvY3TekaRVMIqFKa4nmdijy5uBsrs/pUwlaw=
+X-Received: by 2002:a17:90a:4307:b0:247:96e0:2ebf with SMTP id
+ q7-20020a17090a430700b0024796e02ebfmr4202460pjg.1.1681941237996; Wed, 19 Apr
+ 2023 14:53:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <202304081828.zjGcFUyE-lkp@intel.com> <ZD+0DJq1NHmMSSja@gondor.apana.org.au>
-In-Reply-To: <ZD+0DJq1NHmMSSja@gondor.apana.org.au>
+ <ZD+1BQd8Phqk3lzv@gondor.apana.org.au>
+In-Reply-To: <ZD+1BQd8Phqk3lzv@gondor.apana.org.au>
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Wed, 19 Apr 2023 14:45:58 -0700
-Message-ID: <CAKwvOdm2VyCzfmG6707osmtyniV-oL-ism08kER49D7p_7x+Rg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm/sha1-neon - Fix clang function cast warnings
+Date:   Wed, 19 Apr 2023 14:53:45 -0700
+Message-ID: <CAKwvOdmi26QmGKsoZGauj+qBBaqvH7v6ryohQDmwLA_Mht5doA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm/sha256-neon - Fix clang function cast warnings
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     kernel test robot <lkp@intel.com>,
         Robert Elliott <elliott@hpe.com>, llvm@lists.linux.dev,
         oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Nathan Huckleberry <nhuck@google.com>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 2:27=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+On Wed, Apr 19, 2023 at 2:32=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
 g.au> wrote:
 >
 > Instead of casting the function which upsets clang for some reason,
 > change the assembly function siganture instead.
 
-s/siganture/signature/
+Thanks for the patch, same comments as the sha1 patch:
+https://lore.kernel.org/oe-kbuild-all/CAKwvOdm2VyCzfmG6707osmtyniV-oL-ism08=
+kER49D7p_7x+Rg@mail.gmail.com/
+though sha256_block_data_order_neon is defined in
+arch/arm/crypto/sha256-armv4.pl and does not have any comments about
+the function signature.
+Also, I see a few more casts to sha256_block_fn:
 
-Thanks for the patch!  Perhaps worth noting in the commit message that
-this fixes an instance of -Wcast-function-type-strict triggered for
-W=3D1 builds, which helps us catch potential kCFI violations at compile
-time rather than runtime.
+arch/arm/crypto/sha256_glue.c
+37:                             (sha256_block_fn *)sha256_block_data_order)=
+;
+44:                             (sha256_block_fn *)sha256_block_data_order)=
+;
+52:                           (sha256_block_fn *)sha256_block_data_order);
 
-After this patch, there's only 4 more users of the sha1_block_fn
-typedef, consider if that typedef is a candidate for removal now?
+arch/arm/crypto/sha2-ce-glue.c
+41:                           (sha256_block_fn *)sha2_ce_transform);
+56:                                   (sha256_block_fn *)sha2_ce_transform)=
+;
+57:     sha256_base_do_finalize(desc, (sha256_block_fn *)sha2_ce_transform)=
+;
 
-Also, you should update the comment in
-arch/arm/crypto/sha1-armv7-neon.S above the assembler implementation
-on L288-289 to reflect this revised fn signature, in this patch.
+Can those be cleaned up, too? (Either in this patch or a follow up?)
 
 >
 > Reported-by: kernel test robot <lkp@intel.com>
@@ -93,49 +102,51 @@ on L288-289 to reflect this revised fn signature, in this patch.
 el.com/
 > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 >
-> diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon=
-_glue.c
-> index cfe36ae0f3f5..9c70b87e69f7 100644
-> --- a/arch/arm/crypto/sha1_neon_glue.c
-> +++ b/arch/arm/crypto/sha1_neon_glue.c
-> @@ -26,8 +26,8 @@
+> diff --git a/arch/arm/crypto/sha256_neon_glue.c b/arch/arm/crypto/sha256_=
+neon_glue.c
+> index 701706262ef3..ccdcfff71910 100644
+> --- a/arch/arm/crypto/sha256_neon_glue.c
+> +++ b/arch/arm/crypto/sha256_neon_glue.c
+> @@ -21,8 +21,8 @@
 >
->  #include "sha1.h"
+>  #include "sha256_glue.h"
 >
-> -asmlinkage void sha1_transform_neon(void *state_h, const char *data,
-> -                                   unsigned int rounds);
-> +asmlinkage void sha1_transform_neon(struct sha1_state *state_h,
-> +                                   const u8 *data, int rounds);
+> -asmlinkage void sha256_block_data_order_neon(u32 *digest, const void *da=
+ta,
+> -                                            unsigned int num_blks);
+> +asmlinkage void sha256_block_data_order_neon(struct sha256_state *digest=
+,
+> +                                            const u8 *data, int num_blks=
+);
 >
->  static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
->                           unsigned int len)
-> @@ -39,8 +39,7 @@ static int sha1_neon_update(struct shash_desc *desc, co=
-nst u8 *data,
->                 return sha1_update_arm(desc, data, len);
+>  static int crypto_sha256_neon_update(struct shash_desc *desc, const u8 *=
+data,
+>                                      unsigned int len)
+> @@ -34,8 +34,7 @@ static int crypto_sha256_neon_update(struct shash_desc =
+*desc, const u8 *data,
+>                 return crypto_sha256_arm_update(desc, data, len);
 >
 >         kernel_neon_begin();
-> -       sha1_base_do_update(desc, data, len,
-> -                           (sha1_block_fn *)sha1_transform_neon);
-> +       sha1_base_do_update(desc, data, len, sha1_transform_neon);
+> -       sha256_base_do_update(desc, data, len,
+> -                       (sha256_block_fn *)sha256_block_data_order_neon);
+> +       sha256_base_do_update(desc, data, len, sha256_block_data_order_ne=
+on);
 >         kernel_neon_end();
 >
 >         return 0;
-> @@ -54,9 +53,8 @@ static int sha1_neon_finup(struct shash_desc *desc, con=
-st u8 *data,
->
+> @@ -50,9 +49,8 @@ static int crypto_sha256_neon_finup(struct shash_desc *=
+desc, const u8 *data,
 >         kernel_neon_begin();
 >         if (len)
-> -               sha1_base_do_update(desc, data, len,
-> -                                   (sha1_block_fn *)sha1_transform_neon)=
-;
-> -       sha1_base_do_finalize(desc, (sha1_block_fn *)sha1_transform_neon)=
-;
-> +               sha1_base_do_update(desc, data, len, sha1_transform_neon)=
-;
-> +       sha1_base_do_finalize(desc, sha1_transform_neon);
+>                 sha256_base_do_update(desc, data, len,
+> -                       (sha256_block_fn *)sha256_block_data_order_neon);
+> -       sha256_base_do_finalize(desc,
+> -                       (sha256_block_fn *)sha256_block_data_order_neon);
+> +                                     sha256_block_data_order_neon);
+> +       sha256_base_do_finalize(desc, sha256_block_data_order_neon);
 >         kernel_neon_end();
 >
->         return sha1_base_finish(desc, out);
+>         return sha256_base_finish(desc, out);
 > --
 > Email: Herbert Xu <herbert@gondor.apana.org.au>
 > Home Page: http://gondor.apana.org.au/~herbert/
