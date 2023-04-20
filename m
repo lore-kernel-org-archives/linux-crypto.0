@@ -2,95 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9B1C77B78
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 09:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0E7C77B73
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234155AbjDTJ4K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 05:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41360 "EHLO
+        id S234367AbjDTKFz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 06:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234197AbjDTJ4G (ORCPT
+        with ESMTP id S234467AbjDTKFk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 05:56:06 -0400
+        Thu, 20 Apr 2023 06:05:40 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68AB8110
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2023 02:56:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5271FC1
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2023 03:05:23 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ppR18-000Y4B-At; Thu, 20 Apr 2023 17:55:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 17:55:55 +0800
-Date:   Thu, 20 Apr 2023 17:55:55 +0800
+        id 1ppRAB-000YDz-RT; Thu, 20 Apr 2023 18:05:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:05:16 +0800
+Date:   Thu, 20 Apr 2023 18:05:16 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Cc:     linux-crypto@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>
-Subject: Re: [PATCH v2 1/2] crypto: jitter - replace LFSR with SHA3-256
-Message-ID: <ZEEMK/zlZdz2t7CA@gondor.apana.org.au>
-References: <2684670.mvXUDI8C0e@positron.chronox.de>
- <4825604.31r3eYUQgx@positron.chronox.de>
- <2283439.ElGaqSPkdT@positron.chronox.de>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: hash - Add statesize to crypto_ahash
+Message-ID: <ZEEOXIHwqKblKfBJ@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2283439.ElGaqSPkdT@positron.chronox.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 10, 2023 at 10:55:13PM +0200, Stephan Müller wrote:
->
-> +static int jent_kcapi_init(struct crypto_tfm *tfm)
-> +{
-> +	struct jitterentropy *rng = crypto_tfm_ctx(tfm);
-> +	struct crypto_shash *hash;
-> +	struct shash_desc *sdesc;
-> +	int size, ret = 0;
-> +
-> +	/*
-> +	 * Use SHA3-256 as conditioner. We allocate only the generic
-> +	 * implementation as we are not interested in high-performance. The
-> +	 * execution time of the SHA3 operation is measured and adds to the
-> +	 * Jitter RNG's unpredictable behavior. If we have a slower hash
-> +	 * implementation, the execution timing variations are larger. When
-> +	 * using a fast implementation, we would need to call it more often
-> +	 * as its variations are lower.
-> +	 */
-> +	hash = crypto_alloc_shash(JENT_CONDITIONING_HASH, 0, 0);
-> +	if (IS_ERR(hash)) {
-> +		pr_err("Cannot allocate conditioning digest\n");
-> +		return PTR_ERR(hash);
-> +	}
-> +	rng->tfm = hash;
-> +
-> +	size = sizeof(struct shash_desc) + crypto_shash_descsize(hash);
-> +	sdesc = kmalloc(size, GFP_KERNEL);
-> +	if (!sdesc) {
-> +		ret = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	sdesc->tfm = hash;
-> +	crypto_shash_init(sdesc);
-> +	rng->sdesc = sdesc;
-> +
-> +	rng->entropy_collector = jent_entropy_collector_alloc(1, 0, sdesc);
-> +	if (!rng->entropy_collector)
-> +		ret = -ENOMEM;
+As ahash drivers may need to use fallbacks, their state size
+is thus variable.  Deal with this by making it an attribute
+of crypto_ahash.
 
-Is this supposed to fail or not?
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-> +
-> +	spin_lock_init(&rng->jent_lock);
-> +	return 0;
-> +
-> +err:
-> +	jent_kcapi_cleanup(tfm);
-> +	return ret;
-> +}
-> +
+ crypto/ahash.c                 |    3 +++
+ include/crypto/hash.h          |    3 ++-
+ include/crypto/internal/hash.h |    6 ++++++
+ 3 files changed, 11 insertions(+), 1 deletion(-)
 
-Thanks,
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index b9e34797175b..ad21101107bd 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -432,6 +432,8 @@ static int crypto_ahash_init_tfm(struct crypto_tfm *tfm)
+ 
+ 	hash->setkey = ahash_nosetkey;
+ 
++	crypto_ahash_set_statesize(hash, alg->halg.statesize);
++
+ 	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
+ 		return crypto_init_shash_ops_async(tfm);
+ 
+@@ -563,6 +565,7 @@ struct crypto_ahash *crypto_clone_ahash(struct crypto_ahash *hash)
+ 	nhash->import = hash->import;
+ 	nhash->setkey = hash->setkey;
+ 	nhash->reqsize = hash->reqsize;
++	nhash->statesize = hash->statesize;
+ 
+ 	if (tfm->__crt_alg->cra_type != &crypto_ahash_type)
+ 		return crypto_clone_shash_ops_async(nhash, hash);
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index a641c63ab954..fa0702a71f43 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -260,6 +260,7 @@ struct crypto_ahash {
+ 	int (*setkey)(struct crypto_ahash *tfm, const u8 *key,
+ 		      unsigned int keylen);
+ 
++	unsigned int statesize;
+ 	unsigned int reqsize;
+ 	struct crypto_tfm base;
+ };
+@@ -400,7 +401,7 @@ static inline unsigned int crypto_ahash_digestsize(struct crypto_ahash *tfm)
+  */
+ static inline unsigned int crypto_ahash_statesize(struct crypto_ahash *tfm)
+ {
+-	return crypto_hash_alg_common(tfm)->statesize;
++	return tfm->statesize;
+ }
+ 
+ static inline u32 crypto_ahash_get_flags(struct crypto_ahash *tfm)
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 37edf3f4e8af..b925f82206ef 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -149,6 +149,12 @@ static inline struct ahash_alg *__crypto_ahash_alg(struct crypto_alg *alg)
+ 			    halg);
+ }
+ 
++static inline void crypto_ahash_set_statesize(struct crypto_ahash *tfm,
++					      unsigned int size)
++{
++	tfm->statesize = size;
++}
++
+ static inline void crypto_ahash_set_reqsize(struct crypto_ahash *tfm,
+ 					    unsigned int reqsize)
+ {
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
