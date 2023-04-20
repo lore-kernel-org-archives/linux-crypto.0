@@ -2,79 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC26C77B72
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E332EC77B72
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:14:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232922AbjDTKGZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 06:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47214 "EHLO
+        id S234668AbjDTKOJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 06:14:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234242AbjDTKFy (ORCPT
+        with ESMTP id S232726AbjDTKNW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 06:05:54 -0400
+        Thu, 20 Apr 2023 06:13:22 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8361730DC
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2023 03:05:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCF446A1;
+        Thu, 20 Apr 2023 03:11:08 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ppRAa-000YE4-N4; Thu, 20 Apr 2023 18:05:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:05:41 +0800
-Date:   Thu, 20 Apr 2023 18:05:41 +0800
+        id 1ppRF8-000YMk-Qu; Thu, 20 Apr 2023 18:10:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:10:23 +0800
+Date:   Thu, 20 Apr 2023 18:10:23 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: hash - Make crypto_ahash_alg helper available
-Message-ID: <ZEEOdfbxSY8EayoO@gondor.apana.org.au>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor@kernel.org>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v5 4/4] crypto: starfive - Add hash and HMAC support
+Message-ID: <ZEEPjzLIlZW6HaAM@gondor.apana.org.au>
+References: <20230411081424.131912-1-jiajie.ho@starfivetech.com>
+ <20230411081424.131912-5-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20230411081424.131912-5-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move the crypto_ahash_alg helper into include/crypto/internal so
-that drivers can use it.
+On Tue, Apr 11, 2023 at 04:14:24PM +0800, Jia Jie Ho wrote:
+>
+> +static int starfive_hash_export(struct ahash_request *req, void *out)
+> +{
+> +	struct starfive_cryp_request_ctx *rctx = ahash_request_ctx(req);
+> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> +	struct starfive_cryp_ctx *ctx = crypto_ahash_ctx(tfm);
+> +
+> +	ahash_request_set_tfm(&rctx->ahash_fbk_req, ctx->ahash_fbk);
+> +	ahash_request_set_callback(&rctx->ahash_fbk_req,
+> +				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
+> +				   req->base.complete, req->base.data);
+> +
+> +	ahash_request_set_crypt(&rctx->ahash_fbk_req, req->src,
+> +				req->result, req->nbytes);
+> +
+> +	return crypto_ahash_export(&rctx->ahash_fbk_req, out);
+> +}
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+You can't export a freshly created request.  The fallback
+request needs to have been created by the usual init/update
+calls.
 
- crypto/ahash.c                 |    6 ------
- include/crypto/internal/hash.h |    6 ++++++
- 2 files changed, 6 insertions(+), 6 deletions(-)
+The export function should simply invoke export.
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index ad21101107bd..8e756e7b1f6d 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -31,12 +31,6 @@ struct ahash_request_priv {
- 	void *ubuf[] CRYPTO_MINALIGN_ATTR;
- };
- 
--static inline struct ahash_alg *crypto_ahash_alg(struct crypto_ahash *hash)
--{
--	return container_of(crypto_hash_alg_common(hash), struct ahash_alg,
--			    halg);
--}
--
- static int hash_walk_next(struct crypto_hash_walk *walk)
- {
- 	unsigned int alignmask = walk->alignmask;
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index b925f82206ef..cf65676e45f4 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -149,6 +149,12 @@ static inline struct ahash_alg *__crypto_ahash_alg(struct crypto_alg *alg)
- 			    halg);
- }
- 
-+static inline struct ahash_alg *crypto_ahash_alg(struct crypto_ahash *hash)
-+{
-+	return container_of(crypto_hash_alg_common(hash), struct ahash_alg,
-+			    halg);
-+}
-+
- static inline void crypto_ahash_set_statesize(struct crypto_ahash *tfm,
- 					      unsigned int size)
- {
+> +static int starfive_hash_cra_init_algs(struct crypto_tfm *tfm,
+> +				       const char *algs_hmac_name,
+> +				       unsigned int mode,
+> +				       const char *alg_name)
+> +{
+> +	struct starfive_cryp_ctx *ctx = crypto_tfm_ctx(tfm);
+> +	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
+> +
+> +	ctx->cryp = starfive_cryp_find_dev(ctx);
+> +
+> +	if (!ctx->cryp)
+> +		return -ENODEV;
+> +
+> +	ctx->ahash_fbk = crypto_alloc_ahash(alg_name, 0,
+> +					    CRYPTO_ALG_NEED_FALLBACK);
+> +
+> +	if (IS_ERR(ctx->ahash_fbk))
+> +		return dev_err_probe(ctx->cryp->dev, PTR_ERR(ctx->ahash_fbk),
+> +				     "starfive_hash: Could not load fallback driver.\n");
+> +
+> +	crypto_hash_alg_common(ahash)->statesize = crypto_ahash_statesize(ctx->ahash_fbk);
+
+I've just posted a patch to linux-crypto to do this properly:
+
+https://lore.kernel.org/linux-crypto/ZEEOXIHwqKblKfBJ@gondor.apana.org.au/T/#u
+
+Please switch to using the helper that I added.
+
+> +static int starfive_hash256_setkey(struct crypto_ahash *tfm,
+> +				   const u8 *key, unsigned int keylen)
+> +{
+> +	struct starfive_cryp_ctx *ctx = crypto_ahash_ctx(tfm);
+> +	unsigned int digestsize = crypto_ahash_digestsize(tfm);
+> +	unsigned int blocksize;
+> +	int ret = 0;
+> +
+> +	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
+
+Please use crypto_ahash_blocksize.  We should never use crypto_ahash_tfm
+in new code.
+
+> +static int starfive_hash_cra_sha224_init(struct crypto_tfm *tfm)
+> +{
+> +	return starfive_hash_cra_init_algs(tfm, NULL,
+> +					   STARFIVE_HASH_SHA224,
+> +					   "sha224-generic");
+> +}
+
+Please switch to the new API and use init_tfm/exit_tfm instead of
+cra_init/cra_exit.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
