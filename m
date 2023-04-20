@@ -2,98 +2,148 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225A5C77B72
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 11:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1440CC77B72
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 12:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235094AbjDTLN5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 07:13:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35392 "EHLO
+        id S229775AbjDTMtC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 08:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235263AbjDTLNm (ORCPT
+        with ESMTP id S229671AbjDTMtC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 07:13:42 -0400
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.216])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7AC167C3
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2023 04:09:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1681988729; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=fa2IOZkgZU20f4pvyEv55U/WjWe7EuubxiTBwqSGH+ETzbkx5OCXW06h5jQXKcRP2S
-    4A7CJMU+0AxwxaKfOdkmbNlVwc80BepEGoXBehumWPCpFFCiVbaLbGFm2v5vpauWTtw/
-    mJOQwtYwXBbbSY1+V5X0r3+/KhLNuIW/0sw3k6PgGhbkYNpfmU4OFuktFqQwVdPYpfKo
-    kexdKCqVoAm9UWbU0VmQEsQ4T0X+Q73aHBFRD+BmX2t1WVrE4k/xch0sbCZdk/iNpPQq
-    KRTsck5bXu9sqjVTz9u7TNmd29OMBH05WzIkVVd9F6Mbv/4pSUq8nWgmTqDd2rGfiaOk
-    kRwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1681988729;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=SpPXeg6/w5ni9ozyHCM/qz2BSfusPOb+psA4ihAd4mU=;
-    b=VaGo5rB7MeJBuT/YCD5oHwUpuZVOmfIDZ3IEVX6TF8HwMNJDGeAkOb3gWMG6cszd0h
-    6bwUug9oxAleo9+X1fPKBFedRgm/CpBKeO2spZOsrm6wLFJK5vF0sn5i2HyQQ5g3wolj
-    aFhmHc0T0Pf6XqRqrHnfwo9gGG8sGC2zbCiy1DwJijpIXoMC+Z2IN3LZtU9ZQ6kLO6bW
-    rLSkwqBcn2xysXdMVcroFDxjOXsmr0DU173V3xmxBYPfV8crPQy0RFitQbon/id10QPO
-    ZRicgzuLAcPdlUEK8uPVIW/JW2CvqDuv+SRXjP23LNNDX4ErFmtkvPVdnP4ADo2hyqoJ
-    eqSQ==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1681988729;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=SpPXeg6/w5ni9ozyHCM/qz2BSfusPOb+psA4ihAd4mU=;
-    b=hTPDywEHARMYOPF3XYY/bVvPN+QKBFnCmQumWMNXyEjIVK6kE48X4yFuSA6weW6rco
-    FZ9bUHs03rFEPlINrdyowMGQduS8aPclhr8OJvxohn23inAAOrUCGut034EQFIm01ANm
-    zrC6iv8pznvTZ4fjGxxo9IWlRMCi+xKKDlm40w3b+p8i/3Qy4ZTsf4PdMBG9BsfeGuwB
-    n5uYCl7ulOYN8xeE04Yk+6JxfQH1RocJfiqaenkgdLirwZ6xU7VBKTNUEcoF39SqSNvt
-    lD/N6YLLFmi6I759/5zm3nsuwJgty85wdVF1yKowdKfvjloZW/Gl4Tipquo45sZs8sxp
-    6H8A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1681988729;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=SpPXeg6/w5ni9ozyHCM/qz2BSfusPOb+psA4ihAd4mU=;
-    b=6X5r0jpFj2AdAP/wFoykW5pqqCajWIG8NwFJGFkj4ild9oUIC2HmDF34eHKggVkSvI
-    mHXkljEXhQemfon0H7AQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9y2gdNk2TvDz1d0u3TRk="
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 49.4.0 AUTH)
-    with ESMTPSA id ta02b6z3KB5S8DX
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Thu, 20 Apr 2023 13:05:28 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>
-Subject: Re: [PATCH v2 1/2] crypto: jitter - replace LFSR with SHA3-256
-Date:   Thu, 20 Apr 2023 13:05:27 +0200
-Message-ID: <15434794.O8ra6N0tA4@tauon.chronox.de>
-In-Reply-To: <ZEEMK/zlZdz2t7CA@gondor.apana.org.au>
-References: <2684670.mvXUDI8C0e@positron.chronox.de>
- <2283439.ElGaqSPkdT@positron.chronox.de>
- <ZEEMK/zlZdz2t7CA@gondor.apana.org.au>
+        Thu, 20 Apr 2023 08:49:02 -0400
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171F7A7;
+        Thu, 20 Apr 2023 05:49:01 -0700 (PDT)
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-38e12d973bfso534127b6e.0;
+        Thu, 20 Apr 2023 05:49:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681994940; x=1684586940;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EEUOOi7Fz+VazakHzsq9RZGvdzOdQ6E4gugoOE3P2nw=;
+        b=InBQMckw8D/MwC+lsyg/dukc3SRlMLJhj1J4qrqpCGrvmlDKyDKX7wBiegdwugkL4/
+         yunw3a5YtGZ3G/QMl3eZZesS7muuI47GepWYDq9pq/XBi8xQ2oF45h6Web0+sGse8+wY
+         L+hIAuIKc0T1yty46CdF8Owg2XJ2W9Q9URnHrCaYWfI5Jje6ZTbj6D6Y+efHOhGJpm3R
+         tHDlCfmviDEMdMQ4+zzzLgFc3k6fUiIgcemzqp1bdIMgZp5NxT79vC5FoEaMxOdC7FsS
+         Dx+a1ftv3G+geOV/tvv/lo/0tA7kExUpEAe7z6wNHHuccoiRRp8jeUc84QrFE5xU4vsH
+         68jg==
+X-Gm-Message-State: AAQBX9ci5Z/67vngx+Zkmi4Aya+uA8P++ju2EvStbnw+tlgObpTrsmx6
+        byoloM1QkiWIlIJgz1oW2Q==
+X-Google-Smtp-Source: AKy350bWxrvtN/1/bQ50uazmYuUpvfPgWUTslz3PKt1Rtz9FumSlaqHN7alJxrCzhHswsY+F5q7tBg==
+X-Received: by 2002:aca:be55:0:b0:38e:295e:82ef with SMTP id o82-20020acabe55000000b0038e295e82efmr691968oif.17.1681994940297;
+        Thu, 20 Apr 2023 05:49:00 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id n9-20020acabd09000000b0038c06ae307asm518381oif.52.2023.04.20.05.48.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Apr 2023 05:48:59 -0700 (PDT)
+Received: (nullmailer pid 2649879 invoked by uid 1000);
+        Thu, 20 Apr 2023 12:48:58 -0000
+Date:   Thu, 20 Apr 2023 07:48:58 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     David Yang <mmyangfl@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5] crypto: hisilicon/trng - add support for HiSTB TRNG
+Message-ID: <20230420124858.GA2645094-robh@kernel.org>
+References: <20230401164448.1393336-1-mmyangfl@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230401164448.1393336-1-mmyangfl@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Donnerstag, 20. April 2023, 11:55:55 CEST schrieb Herbert Xu:
-
-Hi Herbert,
-
-> > +	rng->entropy_collector = jent_entropy_collector_alloc(1, 0, sdesc);
-> > +	if (!rng->entropy_collector)
-> > +		ret = -ENOMEM;
+On Sun, Apr 02, 2023 at 12:44:40AM +0800, David Yang wrote:
+> HiSTB TRNG are found on some HiSilicon STB SoCs.
 > 
-> Is this supposed to fail or not?
+> Signed-off-by: David Yang <mmyangfl@gmail.com>
+> ---
+> v2: fix typo
+> v3: add option for post process depth, adjust timeout
+> v4: do not case to __iomem, as requested
+> v5: do not use rng->priv at all
+>  drivers/crypto/hisilicon/Kconfig         |   7 +
+>  drivers/crypto/hisilicon/Makefile        |   2 +-
+>  drivers/crypto/hisilicon/trng/Makefile   |   3 +
+>  drivers/crypto/hisilicon/trng/trng-stb.c | 176 +++++++++++++++++++++++
+>  4 files changed, 187 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/crypto/hisilicon/trng/trng-stb.c
+> 
+> diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+> index 4137a8bf131f..e8690c223584 100644
+> --- a/drivers/crypto/hisilicon/Kconfig
+> +++ b/drivers/crypto/hisilicon/Kconfig
+> @@ -82,3 +82,10 @@ config CRYPTO_DEV_HISI_TRNG
+>  	select CRYPTO_RNG
+>  	help
+>  	  Support for HiSilicon TRNG Driver.
+> +
+> +config CRYPTO_DEV_HISTB_TRNG
+> +	tristate "Support for HiSTB TRNG Driver"
+> +	depends on ARCH_HISI || COMPILE_TEST
+> +	select HW_RANDOM
+> +	help
+> +	  Support for HiSTB TRNG Driver.
+> diff --git a/drivers/crypto/hisilicon/Makefile b/drivers/crypto/hisilicon/Makefile
+> index 8595a5a5d228..fc51e0edec69 100644
+> --- a/drivers/crypto/hisilicon/Makefile
+> +++ b/drivers/crypto/hisilicon/Makefile
+> @@ -5,4 +5,4 @@ obj-$(CONFIG_CRYPTO_DEV_HISI_SEC2) += sec2/
+>  obj-$(CONFIG_CRYPTO_DEV_HISI_QM) += hisi_qm.o
+>  hisi_qm-objs = qm.o sgl.o debugfs.o
+>  obj-$(CONFIG_CRYPTO_DEV_HISI_ZIP) += zip/
+> -obj-$(CONFIG_CRYPTO_DEV_HISI_TRNG) += trng/
+> +obj-y += trng/
+> diff --git a/drivers/crypto/hisilicon/trng/Makefile b/drivers/crypto/hisilicon/trng/Makefile
+> index d909079f351c..cf20b057c66b 100644
+> --- a/drivers/crypto/hisilicon/trng/Makefile
+> +++ b/drivers/crypto/hisilicon/trng/Makefile
+> @@ -1,2 +1,5 @@
+>  obj-$(CONFIG_CRYPTO_DEV_HISI_TRNG) += hisi-trng-v2.o
+>  hisi-trng-v2-objs = trng.o
+> +
+> +obj-$(CONFIG_CRYPTO_DEV_HISTB_TRNG) += histb-trng.o
+> +histb-trng-objs += trng-stb.o
+> diff --git a/drivers/crypto/hisilicon/trng/trng-stb.c b/drivers/crypto/hisilicon/trng/trng-stb.c
+> new file mode 100644
+> index 000000000000..29200a7d3d81
+> --- /dev/null
+> +++ b/drivers/crypto/hisilicon/trng/trng-stb.c
+> @@ -0,0 +1,176 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+> +/*
+> + * Device driver for True RNG in HiSTB SoCs
+> + *
+> + * Copyright (c) 2023 David Yang
+> + */
+> +
+> +#include <crypto/internal/rng.h>
+> +#include <linux/device.h>
+> +#include <linux/err.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/io.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/of_device.h>
 
-Correct. Thanks a lot for the catch. I will update this.
+You don't need anything from this header...
 
-Ciao
-Stephan
+You need platform_device.h and mod_devicetable.h
+
+[...]
 
 
+> +static const struct of_device_id histb_trng_of_match[] = {
+> +	{ .compatible = "hisilicon,histb-trng", },
+
+This binding isn't documented. Please submit a schema.
+
+Rob
