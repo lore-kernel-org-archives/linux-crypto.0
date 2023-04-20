@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B30C77B73
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 16:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7666EC77B76
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 16:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234440AbjDTQcM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 12:32:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47930 "EHLO
+        id S234195AbjDTQcW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 12:32:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233174AbjDTQcJ (ORCPT
+        with ESMTP id S234580AbjDTQcR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 12:32:09 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2050.outbound.protection.outlook.com [40.107.94.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B667B10F1;
-        Thu, 20 Apr 2023 09:32:07 -0700 (PDT)
+        Thu, 20 Apr 2023 12:32:17 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2089.outbound.protection.outlook.com [40.107.96.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD491711;
+        Thu, 20 Apr 2023 09:32:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RCWw4LmYEwkJsX3iI2d7HjXLCJvlOq20hCdQ7isZwTyzHHTfrVaWWKztBjFLDZwkcg3x/ft1wPSdVAWRPJ1285kVTpw166EypGQGZyq4EvdvmK/mCbrLEUugon6EsnqWLJsl/DU2JpPiWzyGzo+Zrd/MkgmgSqgekmEG/L3HN23k3WUVLRAYYsG0llbybb82gCfWLxOIQYClrrXad+0AwEmsu4SkWS1bTRxHEz4+cRqfd104xq4Ba4hjtg6vTBiVTgOagZPuJ5An5oWWcmCKvtxV3V7sCtgdlw64juBYGVbNjWSv6zfZVq3sWNmu30mFk4mWRCKAfpUcgyOX5I+tsw==
+ b=kih4XmTveQjRZXe3GTqoZ7vJOtrfXKkEFIU1L9fVNfNGRNfwaBVPSztkAKXgKy82sJfH9+IYl3gQjOQfy10jEx+h59ob0b/MoeAputLtggnygsr2dAY6eCTt4ci8Hdr87kfmYkwPYBmDp6vYbTn/Bzi9IWYHaYBfjhX+cOvjPwdSG+aD3PrudBOjDqQQVCRSFA5MaTxySCn2iK12Wryw5U6T+R9vOSH2cHAMQrUg/ZjPr377ISgbXPs0EYzkhyCwZD1aZGYxdlBGMTVkdAxFFm7e9Z3B+aOTKM/Ywod/RlYpaFSoERfcGhDWeT5dxfEloRrp3G55CeWA6ArAe4eJxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U13fFXEM07lJGuyTMo7PvjJrJ/WZmstRJ6eJu+3aEtM=;
- b=FgCKTHbWGKZGhS8FmYH/J6mzs9x08hzI1RoNGPc/PNsIvE1I5hHwLQlSBMitjBXm7x3o5VfLcbmIVyGQ+lWwRbdttE6PoZGsfMvpG4EGFR0u1XGTFznZIqmdd1gvaWXyGQFLMYdLpMbq+esV1pnUwO5a5mZn2h44qsnFRaH4zXtsR2J1Ms4FZNVLZQAaCATB1QRZLGE0sLh9lsoSpW4oCu/6KzfoyypwXgOPcYxdOoM6OJFQqGvZnm3NO77QyzGD5NDjDZB1eEutf5BJYnzYRjgNguo0Isl9QtzM6OgkHpcD2bOmzyliglPdp/odekV8/W3GHh0OZ53T088LA9d/OQ==
+ bh=/AxmwsspBY+a02inqk/oy2ghT7n4ZQQaI56gq4KLeQM=;
+ b=DGuMH1Ryvto9z9k9IGX91Mpsum433NVt2UDPPALJoCSZUabNodCAfV0HderaA7GlCGlTORhNoyGcbYIGL+NlFWud27L4X4A5oFSoWKsHPD2MmPf2LIJ5sOBvlhH+CCtaXhwjoy6EjbTIRRhYL4OtcOotqCnJ5f5jZeHCwg4E6/rKlpRSPPvyg0GPYnjGhVppC3mZX95wHWzw/7rx9k7+9Fs1JTHS3r6D0lRD6hJ+w5hOgRDf0x2on5WoQwWtaut8Bbz82NhnHsIooHSgIZQz02W+M2LnNyQvaAySM9iSkt47c3MZcLIqfhRffxl3GGEjBM93pphgCdpHUmcjIjMQsA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U13fFXEM07lJGuyTMo7PvjJrJ/WZmstRJ6eJu+3aEtM=;
- b=PIYhXMxUBfwsKa8vT5tEzrX0bRHT3AC82jPLxNuL4MB2f4u2OaV26xNBSt/6FlFGizuPPyDO10ULmYsyKJsenQ3R9Asj21vl1ExxkxQcc/cP/gKoAWeu3R0qZXp5RoXm2H58pt5IftvgTCzwklGkok97c8dpUWO57W01aUggFEw=
-Received: from DS7PR03CA0352.namprd03.prod.outlook.com (2603:10b6:8:55::32) by
- MN2PR12MB4317.namprd12.prod.outlook.com (2603:10b6:208:1d0::16) with
+ bh=/AxmwsspBY+a02inqk/oy2ghT7n4ZQQaI56gq4KLeQM=;
+ b=h7V9aiF7EF7war79wg0aX8nHQjxj6Hz8WOTEfu/Mc02icp4liSaBDmtTIXSbCJd0WiWHefpy/Pl757qESaFPAm9T3xrN2w+QvhydpL01t9xiHvNg1B9st+oc7XOza5g+nHe+tl3IZIDfm7iFNhN+pkBgkXG64m9MlZkEqkPDBNQ=
+Received: from DS7PR05CA0074.namprd05.prod.outlook.com (2603:10b6:8:57::22) by
+ MN2PR12MB4189.namprd12.prod.outlook.com (2603:10b6:208:1d8::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Thu, 20 Apr
- 2023 16:32:04 +0000
-Received: from DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:55:cafe::c2) by DS7PR03CA0352.outlook.office365.com
- (2603:10b6:8:55::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.25 via Frontend
- Transport; Thu, 20 Apr 2023 16:32:04 +0000
+ 2023 16:32:08 +0000
+Received: from DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:57:cafe::28) by DS7PR05CA0074.outlook.office365.com
+ (2603:10b6:8:57::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.11 via Frontend
+ Transport; Thu, 20 Apr 2023 16:32:06 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT113.mail.protection.outlook.com (10.13.173.5) with Microsoft SMTP
+ DM6NAM11FT016.mail.protection.outlook.com (10.13.173.139) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6319.25 via Frontend Transport; Thu, 20 Apr 2023 16:32:04 +0000
+ 15.20.6319.26 via Frontend Transport; Thu, 20 Apr 2023 16:32:06 +0000
 Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 20 Apr
- 2023 11:32:00 -0500
+ 2023 11:32:05 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Tom Lendacky <thomas.lendacky@amd.com>,
@@ -61,9 +61,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 CC:     "David S . Miller" <davem@davemloft.net>,
         Mario Limonciello <mario.limonciello@amd.com>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 03/10] crypto: ccp: Add bootloader and TEE version offsets
-Date:   Thu, 20 Apr 2023 11:31:31 -0500
-Message-ID: <20230420163140.14940-4-mario.limonciello@amd.com>
+Subject: [PATCH 06/10] crypto: ccp: Add support for setting user ID for dynamic boost control
+Date:   Thu, 20 Apr 2023 11:31:34 -0500
+Message-ID: <20230420163140.14940-7-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230420163140.14940-1-mario.limonciello@amd.com>
 References: <20230420163140.14940-1-mario.limonciello@amd.com>
@@ -75,80 +75,145 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT113:EE_|MN2PR12MB4317:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7eeceb28-acab-4aea-0a90-08db41bcc694
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT016:EE_|MN2PR12MB4189:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1985492f-a8e6-4a81-ef99-08db41bcc7f7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: A1b2SOhOFPhiWaPPTqnkhZFM+b20jh8kyTRWr1erXbwEBHHsc4nYDoizSRUmxz1KeWgqVISyo9s9T2BnlZ/1B1Hd5yLn9nG4DihWYzVy4AGcr2bb3qIfFRnQdKncHBUvfOcGasFOGSuWRmAWOpIAO354G/8ww7X+YGIsa17kWHi1jupBJGL5/DNpTxpCT4Xe1VmQuzMwZOtAEt6I8e7ofilKaABqD0no4J3BAFMbpvyiAyTbGWiJfc/Mk2Pff73uCUlZ0917J+JHzbdVAqdCqih8Xy+hR2zE+zJl+0i2q/E4kBv/Wd5SFnVczyEMfhy8Gza5FdgLzWGSXBQoW+MY6llMLVkoJAfo2n4Dym5hk8a2Fz0CbPqjej3qgwk8Kb42dPbpKe31nr9iA0dABMjNKbeDIstb76Euh/d4PVd/c8QFSxzy63qcBymfh4aQIV5Ho41JnEm3jCorv6TvCLnmP99Sj/0liP34c393ZuFNDfqMwEKRFhIpmAPaVk0TwBjr/fhZQLTctcezwsWqNVkWv0B1522atnDmiU/FOyc+r9KYAgzT/n6bPifmE/JB7s1LxgcGRXYApoqZ1uG/bYkBB+KEhJvZvYhN+jIaKJgsEbgQ1jyAhikowDVF+TrW9Ir11LMYTq1VwhCKpvtKx8mHWdNx0fyzT/uYMEDug+2tVP3fstyzuowVE9H2RBB5Zsv1rgBQwSfar9W47hytxFLuY8ejS1KTbEnIFkv1O/qOP88=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(376002)(39860400002)(136003)(451199021)(40470700004)(46966006)(36840700001)(86362001)(186003)(16526019)(426003)(336012)(41300700001)(81166007)(356005)(1076003)(82740400003)(316002)(40480700001)(4326008)(26005)(6666004)(7696005)(83380400001)(47076005)(82310400005)(36860700001)(2616005)(478600001)(36756003)(40460700003)(110136005)(8676002)(8936002)(5660300002)(70586007)(70206006)(2906002)(6636002)(54906003)(44832011)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: OBfuZLkIge9ouGWLWuL1ACXaXFG95EPa5fLdZTZsTaMt2QnyaJVVdE3vPjvPydeZNgCfhFVnefX4fammxrm2oGBKZbAArbht7W18kgCxxetfD4jpMdYOVFhiPHk08pdo5jzOtNJq16ga0FMC5h0JZw6y08KoTODRlPm0QPJK+2l9cHpNKYKw030ennoTZHITHo8apzXYULJe0OTFiHgxf5IAHPKF6FT7nIHlz3GAtC9lNoSQIQwrOrJYLicaA6Ps14IM6zCEvTMHH297TD550IvlsJie+xiHkUIGNEIIEjlBhoWBW3T38bE7aifbvyNJxqjONf7TNoEpgWaNQKdoXFO7zV3XkBratakYfAI4/hwNdBdNbVoUVZFmER3kpuMmCvizwbNnbg/Nayf/lmoNgYo5qKbavBflaUvfsIt6ek4zKfxAw07eihLsXQEidYn9+YI98bHFwRCNVAMQkrszvBvhXRtrm23DqVhPGbPOmPNflTV+4BH+UkwH2zY4+UgR+w8Tr0jFNp746EIhmPLn3U9yY/ZG+x0BMzQIbLeVXbILUh6L87AZ/5SpICW6skDP3dqbekGN2D9V/TektZ+tYbuEBHaJv1D3UPz9eNDJdjxmGM1b6v2uDL8qkVCLr+dBpmBPqpGCyLvGGBhvd5y8zHhvXHWEwmJrZqZ7CiYP/4XXjTa2z4F8H8VkrAvK57G4BqaUvWauMGjLSwm08rYhVj3ysozG8M7IZIh0piDaduk=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(136003)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(2906002)(41300700001)(5660300002)(8676002)(70586007)(70206006)(4326008)(316002)(110136005)(8936002)(44832011)(54906003)(6636002)(478600001)(7696005)(40460700003)(356005)(6666004)(40480700001)(26005)(1076003)(426003)(47076005)(83380400001)(2616005)(336012)(36860700001)(82740400003)(82310400005)(36756003)(16526019)(186003)(86362001)(81166007)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2023 16:32:04.3523
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2023 16:32:06.6847
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7eeceb28-acab-4aea-0a90-08db41bcc694
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1985492f-a8e6-4a81-ef99-08db41bcc7f7
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT016.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4317
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4189
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The bootloader and TEE versions are stored in registers that can be
-accessed from sysfs.  This exports the information for recent client
-and datacenter parts.
+As part of the authentication flow for Dynamic Boost Control, the calling
+software will need to send a uid used in all of it's future
+communications.
+
+Add support for another IOCTL call to let userspace software set this up.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/crypto/ccp/sp-pci.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/crypto/ccp/dbc.c            | 18 ++++++++++++++++++
+ drivers/crypto/ccp/dbc.h            |  6 ++++++
+ include/linux/psp-platform-access.h |  1 +
+ include/uapi/linux/psp-dbc.h        | 20 ++++++++++++++++++++
+ 4 files changed, 45 insertions(+)
 
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 4d729aa1b260..460f3ee12fb6 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -417,6 +417,7 @@ static const struct tee_vdata teev1 = {
- 	.cmdbuff_addr_hi_reg	= 0x1054c,	/* C2PMSG_19 */
- 	.ring_wptr_reg          = 0x10550,	/* C2PMSG_20 */
- 	.ring_rptr_reg          = 0x10554,	/* C2PMSG_21 */
-+	.info_reg		= 0x109e8,	/* C2PMSG_58 */
+diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
+index 7afeca903136..ca7ec528536b 100644
+--- a/drivers/crypto/ccp/dbc.c
++++ b/drivers/crypto/ccp/dbc.c
+@@ -117,6 +117,24 @@ static long dbc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 			goto unlock;
+ 		}
+ 		break;
++	case DBCIOCUID:
++		dbc_dev->mbox->req.header.payload_size = sizeof(dbc_dev->mbox->dbc_set_uid);
++		if (copy_from_user(&dbc_dev->mbox->dbc_set_uid.user, argp,
++				   sizeof(struct dbc_user_setuid))) {
++			ret = -EFAULT;
++			goto unlock;
++		}
++
++		ret = send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_SET_UID);
++		if (ret)
++			goto unlock;
++
++		if (copy_to_user(argp, &dbc_dev->mbox->dbc_set_uid.user,
++				 sizeof(struct dbc_user_setuid))) {
++			ret = -EFAULT;
++			goto unlock;
++		}
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 
+diff --git a/drivers/crypto/ccp/dbc.h b/drivers/crypto/ccp/dbc.h
+index 1c3a0a078d15..156435100076 100644
+--- a/drivers/crypto/ccp/dbc.h
++++ b/drivers/crypto/ccp/dbc.h
+@@ -33,9 +33,15 @@ struct dbc_nonce {
+ 	struct dbc_user_nonce		user;
+ } __packed;
+ 
++struct dbc_set_uid {
++	struct psp_req_buffer_hdr	header;
++	struct dbc_user_setuid		user;
++} __packed;
++
+ union dbc_buffer {
+ 	struct psp_request		req;
+ 	struct dbc_nonce		dbc_nonce;
++	struct dbc_set_uid		dbc_set_uid;
  };
  
- static const struct platform_access_vdata pa_v1 = {
-@@ -429,6 +430,7 @@ static const struct platform_access_vdata pa_v1 = {
+ void dbc_dev_destroy(struct psp_device *psp);
+diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
+index 53b4a1df5180..18b9e0f0cb03 100644
+--- a/include/linux/psp-platform-access.h
++++ b/include/linux/psp-platform-access.h
+@@ -9,6 +9,7 @@ enum psp_platform_access_msg {
+ 	PSP_CMD_NONE = 0x0,
+ 	PSP_I2C_REQ_BUS_CMD = 0x64,
+ 	PSP_DYNAMIC_BOOST_GET_NONCE,
++	PSP_DYNAMIC_BOOST_SET_UID,
+ };
  
- static const struct psp_vdata pspv1 = {
- 	.sev			= &sevv1,
-+	.bootloader_info_reg	= 0x105ec,	/* C2PMSG_59 */
- 	.feature_reg		= 0x105fc,	/* C2PMSG_63 */
- 	.inten_reg		= 0x10610,	/* P2CMSG_INTEN */
- 	.intsts_reg		= 0x10614,	/* P2CMSG_INTSTS */
-@@ -436,6 +438,7 @@ static const struct psp_vdata pspv1 = {
+ struct psp_req_buffer_hdr {
+diff --git a/include/uapi/linux/psp-dbc.h b/include/uapi/linux/psp-dbc.h
+index d032f78934e2..7443c78ede19 100644
+--- a/include/uapi/linux/psp-dbc.h
++++ b/include/uapi/linux/psp-dbc.h
+@@ -18,6 +18,7 @@
  
- static const struct psp_vdata pspv2 = {
- 	.sev			= &sevv2,
-+	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
- 	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
- 	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
- 	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
-@@ -444,6 +447,7 @@ static const struct psp_vdata pspv2 = {
- static const struct psp_vdata pspv3 = {
- 	.tee			= &teev1,
- 	.platform_access	= &pa_v1,
-+	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
- 	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
- 	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
- 	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
-@@ -452,6 +456,7 @@ static const struct psp_vdata pspv3 = {
- static const struct psp_vdata pspv4 = {
- 	.sev			= &sevv2,
- 	.tee			= &teev1,
-+	.bootloader_info_reg	= 0x109ec,	/* C2PMSG_59 */
- 	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
- 	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
- 	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
+ #define DBC_NONCE_SIZE		16
+ #define DBC_SIG_SIZE		32
++#define DBC_UID_SIZE		16
+ 
+ /**
+  * struct dbc_user_nonce - Nonce exchange structure (input/output).
+@@ -34,6 +35,16 @@ struct dbc_user_nonce {
+ 	__u8	signature[DBC_SIG_SIZE];
+ } __packed;
+ 
++/**
++ * struct dbc_user_setuid - UID exchange structure (input).
++ * @uid:       16 byte value representing software identity
++ * @signature: 32 byte signature created by software using a previous nonce
++ */
++struct dbc_user_setuid {
++	__u8	uid[DBC_UID_SIZE];
++	__u8	signature[DBC_SIG_SIZE];
++} __packed;
++
+ /**
+  * Dynamic Boost Control (DBC) IOC
+  *
+@@ -64,4 +75,13 @@ struct dbc_user_nonce {
+  */
+ #define DBCIOCNONCE	_IOWR(DBC_IOC_TYPE, 0x1, struct dbc_user_nonce)
+ 
++/**
++ * DBCIOCUID - Set the user ID (UID) of a calling process.
++ *             The user ID is 8 bytes long. It must be programmed using a
++ *             32 byte signature built using the nonce fetched from
++ *             DBCIOCNONCE.
++ *             The UID can only be set once until the system is rebooted.
++ */
++#define DBCIOCUID	_IOW(DBC_IOC_TYPE, 0x2, struct dbc_user_setuid)
++
+ #endif /* __PSP_DBC_USER_H__ */
 -- 
 2.34.1
 
