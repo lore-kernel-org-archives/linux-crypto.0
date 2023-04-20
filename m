@@ -2,142 +2,169 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15323C77B73
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 15:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5082C77B76
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 16:31:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233108AbjDTPAs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 11:00:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
+        id S232168AbjDTQbZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 12:31:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231738AbjDTPAr (ORCPT
+        with ESMTP id S231867AbjDTQbY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 11:00:47 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D203135AF;
-        Thu, 20 Apr 2023 08:00:45 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id a11so2398410ybm.3;
-        Thu, 20 Apr 2023 08:00:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682002845; x=1684594845;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZr84TaNrsHBkXDcq7S+XPnDLhczJIO2B/rcwo5kl+U=;
-        b=Q6DbU6jrrrl0MeDwpdNnG171UCRkBeLin3keeisf4sgJCu4VcEqwQ/oalqX8zU7JOL
-         Md8/j5mn5JZZ/ZyCUbo/w9gboNxtQgdZCUvMx6tQCJzKws5yAsOksTsycClqC1v1oXwO
-         0HOlCEjfp8VwpjP1LKhH/IslHbjdfFOr9M7qMqMYakppJIaSp0MmruBYB8WgSWjsr7cc
-         nZjXM4/mqWRRqK9YcB1Ku5JeSz4NGBhqyyRYIGm1JQeziBdHR9o1P7FFaro85YNkAUp1
-         YQasuPSqLPGtKg0VgKackMsoMJraZ77Ryyowyi8T9f+G5aWtbh9mIkJH5yPBYpm37CVm
-         ImLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682002845; x=1684594845;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jZr84TaNrsHBkXDcq7S+XPnDLhczJIO2B/rcwo5kl+U=;
-        b=CNMH/VQHwkNqSgS5mr4hvf1IQE0LFCFyQv4nF5lRalRPuCZzqckrH7mGDiH2oClj40
-         9KAgJYIBXmZ/bG7HaD0oqC7rsJp66dHgrdRoL5/7FLfLbqyTKhOdhnw9OeGq2AneF7UA
-         xB1ioFKX4n3UYvJWORQ+ITu73fON9cVADin7trUZRG0wl/dDVpeRgPkvnJ8WX54yQZ98
-         lc7HWve8dPhUPsvix76fdNIOiLFVvMTj0rFioq/VrRHbm+kQUSntFb7ywmy1qf7zgtYf
-         1N/WSZ7efYqrF4GCMfTahEKI4/e5XFKCLWfviD2tTT3ee6MeLoDFBFm/eLe51ICGwF5a
-         3rTw==
-X-Gm-Message-State: AAQBX9dmXGqZelLw9wXYJmQwdylZu2HdO4ithGjIfxo9q9qz1PKxDFn3
-        pBmFVem8Ww5jNrMhI2JGlN4=
-X-Google-Smtp-Source: AKy350Zz06ofQ07Heq9i94XNXQo9VeNZ5YVAYDVV+mFS0UjuOh3H9ckIko7IE/sEbVIZlnLu4WAZmw==
-X-Received: by 2002:a25:2f12:0:b0:b92:5bf4:670d with SMTP id v18-20020a252f12000000b00b925bf4670dmr1393153ybv.5.1682002844552;
-        Thu, 20 Apr 2023 08:00:44 -0700 (PDT)
-Received: from obacon-Precision-3640-Tower.genetec.com ([68.67.62.2])
-        by smtp.gmail.com with ESMTPSA id f15-20020a05620a280f00b0074df2ac52f8sm496850qkp.21.2023.04.20.08.00.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 08:00:44 -0700 (PDT)
-From:   Olivier Bacon <olivierb89@gmail.com>
-X-Google-Original-From: Olivier Bacon <obacon@genetec.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Olivier Bacon <obacon@genetec.com>,
-        Sylvain Ouellet <souellet@genetec.com>
-Subject: [PATCH] crypto: engine - fix crypto_queue backlog handling
-Date:   Thu, 20 Apr 2023 11:00:35 -0400
-Message-Id: <20230420150035.19369-1-obacon@genetec.com>
-X-Mailer: git-send-email 2.40.0
+        Thu, 20 Apr 2023 12:31:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E50DE77;
+        Thu, 20 Apr 2023 09:31:21 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 977FF21A14;
+        Thu, 20 Apr 2023 16:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1682008279; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2vbLoApHWWuDvlIYJY/7MrXOyrVieSuLGNdDWo7gZ4I=;
+        b=S9pFjdEC0JTo/RCJM5CnYDyb/QoYQOzQy/CvitLpsvwmcChEObw0XZLw617Gw56a7+j3iD
+        QpNsvrBE2AH/XaMx3KKlx48T0A9CzZXR8wcDodYGqxs33GkoK5DQNzxuCt8PfiwgwxAy7d
+        j67iCDamnbETaMdR6k2EO0O2uU18DWU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1682008279;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2vbLoApHWWuDvlIYJY/7MrXOyrVieSuLGNdDWo7gZ4I=;
+        b=kRdOKfwlpUyj0B8yvJsIRfqkatWgwOj9y7NQ2vqZDh088EhuZrNAMvaTHSqbYsT2uJTAxv
+        aSNaixUKPGBz0zCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1789313584;
+        Thu, 20 Apr 2023 16:31:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vCD/BNdoQWSpegAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Thu, 20 Apr 2023 16:31:19 +0000
+Message-ID: <9c8829f6-8049-2c83-49a4-285757cc9259@suse.cz>
+Date:   Thu, 20 Apr 2023 18:31:18 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH RFC v8 12/56] x86/sev: Add RMP entry lookup helpers
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20230220183847.59159-1-michael.roth@amd.com>
+ <20230220183847.59159-13-michael.roth@amd.com>
+ <b48ad925-eff0-8421-730a-6da13bf93ab6@suse.cz>
+ <20230329225958.4s3nwcqyjwzydwsf@amd.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20230329225958.4s3nwcqyjwzydwsf@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CRYPTO_TFM_REQ_MAY_BACKLOG tells the crypto driver that it should
-internally backlog requests until the crypto hw's queue becomes
-full. At that point, crypto_engine backlogs the request and returns
--EBUSY. Calling driver such as dm-crypt then waits until the
-complete() function is called with a status of -EINPROGRESS before
-sending a new request.
+On 3/30/23 00:59, Michael Roth wrote:
+> On Fri, Mar 03, 2023 at 04:28:39PM +0100, Vlastimil Babka wrote:
+>> On 2/20/23 19:38, Michael Roth wrote:
+>> > From: Brijesh Singh <brijesh.singh@amd.com>
+>> > 
+>> > The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
+>> > entry for a given page. The RMP entry format is documented in AMD PPR, see
+>> > https://bugzilla.kernel.org/attachment.cgi?id=296015.
+>> > 
+>> > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+>> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+>> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+>> > ---
+>> 
+>> > +/*
+>> > + * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+>> > + * and -errno if there is no corresponding RMP entry.
+>> > + */
+>> 
+>> Hmm IMHO the kernel's idiomatic way is to return 0 on "success" and I'd
+>> assume the more intuitive expectation of success here if the entry is
+>> assigned?
+> 
+> In general I'd agree. Here's it's a little awkward though.
+> snp_lookup_rmpentry() sort of wants to be a bool, where true indicates
+> an assigned entry was found, false indicates no assigned entry.
+> 
+> But it also has to deal with error values, so the most direct way to
+> encapsulate that is true == 1, false == 0, and < 0 for errors.
+> 
+> Inverting it to align more with kernel expections of 0 == success/true
+> gets awkward too, because stuff like:
+> 
+>   if (snp_lookup_rmpentry(...))
+>     //error
+> 
+> still doesn't work the way most other functions written in this way
+> would since it could still be "successful" if we were expecting PFN to
+> be in shared state. So the return value needs special handling there
+> too.
+> 
+> Would it make sense to define it something like this?:
+> 
+>   /*
+>    * Query information about the RMP entry corresponding to the given
+>    * PFN.
+>    * 
+>    * Returns 0 on success, and -errno if there was a problem accessing
+>    * the RMP entry.
+>    */
+>   int snp_lookup_rmpentry(u64 pfn, int *level, bool *assigned)
 
-The problem lies in the call to complete() with a value of -EINPROGRESS
-that is made when a backlog item is present on the queue. The call is
-done before the successful execution of the crypto request. In the case
-that do_one_request() returns < 0 and the retry support is available,
-the request is put back in the queue. This leads upper drivers to send
-a new request even if the queue is still full.
+Yeah that looks fine to me. Hope you find out it makes it easier to work
+with in the callers too.
 
-The problem can be reproduced by doing a large dd into a crypto
-dm-crypt device. This is pretty easy to see when using
-Freescale CAAM crypto driver and SWIOTLB dma. Since the actual amount
-of requests that can be hold in the queue is unlimited we get IOs error
-and dma allocation.
+> 
+>> The various callers seem to differ though so I guess it depends on
+>> context. Some however don't distinguish their "failure" from an ERR and
+>> maybe they should, at least for the purposes of the various printks?
+> 
+> Yes, regardless of what we decide above, the call-sites should properly
+> distinguish between failure/assigned/not-assigned and report the
+> information accordingly. I'll get those fixed up where needed.
 
-The fix is to call complete with a value of -EINPROGRESS only if
-the request is not enqueued back in crypto_queue. This is done
-by calling complete() later in the code. In order to delay the decision,
-crypto_queue is modified to correctly set the backlog pointer
-when a request is enqueued back.
+Great, thanks!
 
-Fixes: 6a89f492f8e5 ("crypto: engine - support for parallel requests based on retry mechanism")
-Co-developed-by: Sylvain Ouellet <souellet@genetec.com>
-Signed-off-by: Sylvain Ouellet <souellet@genetec.com>
-Signed-off-by: Olivier Bacon <obacon@genetec.com>
----
- crypto/algapi.c        | 3 +++
- crypto/crypto_engine.c | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index d08f864f08be..18a8ca9cafbc 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -961,6 +961,9 @@ EXPORT_SYMBOL_GPL(crypto_enqueue_request);
- void crypto_enqueue_request_head(struct crypto_queue *queue,
- 				 struct crypto_async_request *request)
- {
-+	if (unlikely(queue->qlen >= queue->max_qlen))
-+		queue->backlog = queue->backlog->prev;
-+
- 	queue->qlen++;
- 	list_add(&request->list, &queue->list);
- }
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index 21f791615114..74fcc0897041 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -129,9 +129,6 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	if (!engine->retry_support)
- 		engine->cur_req = async_req;
- 
--	if (backlog)
--		crypto_request_complete(backlog, -EINPROGRESS);
--
- 	if (engine->busy)
- 		was_busy = true;
- 	else
-@@ -217,6 +214,9 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	crypto_request_complete(async_req, ret);
- 
- retry:
-+	if (backlog)
-+		crypto_request_complete(backlog, -EINPROGRESS);
-+
- 	/* If retry mechanism is supported, send new requests to engine */
- 	if (engine->retry_support) {
- 		spin_lock_irqsave(&engine->queue_lock, flags);
--- 
-2.40.0
+> Thanks,
+> 
+> -Mike
+> 
+>> 
+>> > +int snp_lookup_rmpentry(u64 pfn, int *level)
+>> > +{
+>> > +	struct rmpentry *e;
+>> > +
+>> > +	e = __snp_lookup_rmpentry(pfn, level);
+>> > +	if (IS_ERR(e))
+>> > +		return PTR_ERR(e);
+>> > +
+>> > +	return !!rmpentry_assigned(e);
+>> > +}
+>> > +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+>> 
 
