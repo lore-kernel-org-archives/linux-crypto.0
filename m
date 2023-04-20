@@ -2,108 +2,64 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226EFC77B73
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB38C77B78
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:23:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234590AbjDTKW4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 06:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35378 "EHLO
+        id S234754AbjDTKX5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 06:23:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234587AbjDTKWY (ORCPT
+        with ESMTP id S233960AbjDTKXZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 06:22:24 -0400
+        Thu, 20 Apr 2023 06:23:25 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F6D55A7
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Apr 2023 03:22:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E39D7689;
+        Thu, 20 Apr 2023 03:22:36 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ppRQJ-000YdC-0j; Thu, 20 Apr 2023 18:21:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:21:56 +0800
-Date:   Thu, 20 Apr 2023 18:21:56 +0800
+        id 1ppRQo-000Ydi-9Y; Thu, 20 Apr 2023 18:22:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:22:27 +0800
+Date:   Thu, 20 Apr 2023 18:22:27 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-        Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v2 00/13] crypto: x86 - avoid absolute references
-Message-ID: <ZEESRGc7VdXdYspd@gondor.apana.org.au>
-References: <20230412110035.361447-1-ardb@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Chuck Lever <chuck.lever@oracle.com>,
+        Scott Mayhew <smayhew@redhat.com>, linux-nfs@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: Add some test vectors for cmac(camellia)
+Message-ID: <ZEESY6Gqs1goh8cz@gondor.apana.org.au>
+References: <1119460.1681400418@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230412110035.361447-1-ardb@kernel.org>
+In-Reply-To: <1119460.1681400418@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 12, 2023 at 01:00:22PM +0200, Ard Biesheuvel wrote:
-> This is preparatory work for allowing the x86 kernel to be built as a
-> PIE executable, which relies mostly on RIP-relative symbol references
-> from code, as these don't need to be updated when a binary is loaded at
-> an address different from its link time address.
+On Thu, Apr 13, 2023 at 04:40:18PM +0100, David Howells wrote:
+>     
+> Add some test vectors for 128-bit cmac(camellia) as found in
+> draft-kato-ipsec-camellia-cmac96and128-01 section 6.2.
 > 
-> Most changes are quite straight-forward, i.e., just adding a (%rip)
-> suffix is enough in many cases. However, some are slightly trickier, and
-> need some minor reshuffling of the asm code to get rid of the absolute
-> references in the code.
+> The document also shows vectors for camellia-cmac-96, and for VK with a
+> length greater than 16, but I'm not sure how to express those in testmgr.
 > 
-> Tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y on a x86 CPU that
-> implements AVX, AVX2 and AVX512.
+> This also leaves cts(cbc(camellia)) untested, but I can't seem to find any
+> tests for that that I could put into testmgr.
 > 
-> Changes since v1:
-> - add missing tags from Thomas Garnier
-> - simplify AES-NI GCM tail handling and drop an entire permute vector
->   table (patch #2)
-> - add a couple of patches to switch to local labels, which removes ~1000
->   useless code symbols (e.g., _loop0, _loop1, _done etc etc) from
->   kallsyms
-> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Kees Cook <keescook@chromium.org>
-> 
-> Ard Biesheuvel (13):
->   crypto: x86/aegis128 - Use RIP-relative addressing
->   crypto: x86/aesni - Use RIP-relative addressing
->   crypto: x86/aria - Use RIP-relative addressing
->   crypto: x86/camellia - Use RIP-relative addressing
->   crypto: x86/cast5 - Use RIP-relative addressing
->   crypto: x86/cast6 - Use RIP-relative addressing
->   crypto: x86/crc32c - Use RIP-relative addressing
->   crypto: x86/des3 - Use RIP-relative addressing
->   crypto: x86/ghash - Use RIP-relative addressing
->   crypto: x86/sha256 - Use RIP-relative addressing
->   crypto: x86/aesni - Use local .L symbols for code
->   crypto: x86/crc32 - Use local .L symbols for code
->   crypto: x86/sha - Use local .L symbols for code
-> 
->  arch/x86/crypto/aegis128-aesni-asm.S         |   6 +-
->  arch/x86/crypto/aesni-intel_asm.S            | 198 +++++++--------
->  arch/x86/crypto/aesni-intel_avx-x86_64.S     | 254 +++++++++-----------
->  arch/x86/crypto/aria-aesni-avx-asm_64.S      |  28 +--
->  arch/x86/crypto/aria-aesni-avx2-asm_64.S     |  28 +--
->  arch/x86/crypto/aria-gfni-avx512-asm_64.S    |  24 +-
->  arch/x86/crypto/camellia-aesni-avx-asm_64.S  |  30 +--
->  arch/x86/crypto/camellia-aesni-avx2-asm_64.S |  30 +--
->  arch/x86/crypto/camellia-x86_64-asm_64.S     |   6 +-
->  arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |  38 +--
->  arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  32 +--
->  arch/x86/crypto/crc32-pclmul_asm.S           |  16 +-
->  arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  70 +++---
->  arch/x86/crypto/des3_ede-asm_64.S            |  96 +++++---
->  arch/x86/crypto/ghash-clmulni-intel_asm.S    |   4 +-
->  arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  25 +-
->  arch/x86/crypto/sha256-avx-asm.S             |  16 +-
->  arch/x86/crypto/sha256-avx2-asm.S            |  54 +++--
->  arch/x86/crypto/sha256-ssse3-asm.S           |  16 +-
->  arch/x86/crypto/sha512-avx-asm.S             |   8 +-
->  arch/x86/crypto/sha512-avx2-asm.S            |  16 +-
->  arch/x86/crypto/sha512-ssse3-asm.S           |   8 +-
->  22 files changed, 509 insertions(+), 494 deletions(-)
-> 
-> -- 
-> 2.39.2
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: Chuck Lever <chuck.lever@oracle.com>
+> cc: Scott Mayhew <smayhew@redhat.com>
+> cc: linux-nfs@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
+> Link: https://datatracker.ietf.org/doc/pdf/draft-kato-ipsec-camellia-cmac96and128-01
+> ---
+>  crypto/testmgr.c |    6 ++++++
+>  crypto/testmgr.h |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 53 insertions(+)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
