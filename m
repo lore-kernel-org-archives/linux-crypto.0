@@ -2,121 +2,65 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E332EC77B72
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 822FEC77B72
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Apr 2023 10:21:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234668AbjDTKOJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Apr 2023 06:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
+        id S234502AbjDTKVj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Apr 2023 06:21:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232726AbjDTKNW (ORCPT
+        with ESMTP id S234539AbjDTKVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Apr 2023 06:13:22 -0400
+        Thu, 20 Apr 2023 06:21:15 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCF446A1;
-        Thu, 20 Apr 2023 03:11:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688D9769B;
+        Thu, 20 Apr 2023 03:20:07 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1ppRF8-000YMk-Qu; Thu, 20 Apr 2023 18:10:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:10:23 +0800
-Date:   Thu, 20 Apr 2023 18:10:23 +0800
+        id 1ppRNs-000Ybg-Tl; Thu, 20 Apr 2023 18:19:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Apr 2023 18:19:26 +0800
+Date:   Thu, 20 Apr 2023 18:19:26 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Conor Dooley <conor@kernel.org>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v5 4/4] crypto: starfive - Add hash and HMAC support
-Message-ID: <ZEEPjzLIlZW6HaAM@gondor.apana.org.au>
-References: <20230411081424.131912-1-jiajie.ho@starfivetech.com>
- <20230411081424.131912-5-jiajie.ho@starfivetech.com>
+To:     David Yang <mmyangfl@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, Olivia Mackall <olivia@selenic.com>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Jia Jie Ho <jiajie.ho@starfivetech.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        William Zhang <william.zhang@broadcom.com>,
+        Jenny Zhang <jenny.zhang@starfivetech.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: histb - Move driver to
+ drivers/char/hw_random/histb-rng.c
+Message-ID: <ZEERrqU8rHzDAPI2@gondor.apana.org.au>
+References: <20230410091408.56638-1-mmyangfl@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230411081424.131912-5-jiajie.ho@starfivetech.com>
+In-Reply-To: <20230410091408.56638-1-mmyangfl@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 04:14:24PM +0800, Jia Jie Ho wrote:
+On Mon, Apr 10, 2023 at 05:13:54PM +0800, David Yang wrote:
 >
-> +static int starfive_hash_export(struct ahash_request *req, void *out)
-> +{
-> +	struct starfive_cryp_request_ctx *rctx = ahash_request_ctx(req);
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-> +	struct starfive_cryp_ctx *ctx = crypto_ahash_ctx(tfm);
-> +
-> +	ahash_request_set_tfm(&rctx->ahash_fbk_req, ctx->ahash_fbk);
-> +	ahash_request_set_callback(&rctx->ahash_fbk_req,
-> +				   req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP,
-> +				   req->base.complete, req->base.data);
-> +
-> +	ahash_request_set_crypt(&rctx->ahash_fbk_req, req->src,
-> +				req->result, req->nbytes);
-> +
-> +	return crypto_ahash_export(&rctx->ahash_fbk_req, out);
-> +}
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index 4fdf07ae3c54..1a241f37abed 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -335,6 +335,18 @@ config HW_RANDOM_HISI
+>  
+>  	  If unsure, say Y.
+>  
+> +config HW_RANDOM_HISTB
+> +	tristate "Hisilicon STB Random Number Generator support"
+> +	depends on ARCH_HISI || COMPILE_TEST
+> +	depends on HW_RANDOM
+> +	default ARCH_HISI
 
-You can't export a freshly created request.  The fallback
-request needs to have been created by the usual init/update
-calls.
-
-The export function should simply invoke export.
-
-> +static int starfive_hash_cra_init_algs(struct crypto_tfm *tfm,
-> +				       const char *algs_hmac_name,
-> +				       unsigned int mode,
-> +				       const char *alg_name)
-> +{
-> +	struct starfive_cryp_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
-> +
-> +	ctx->cryp = starfive_cryp_find_dev(ctx);
-> +
-> +	if (!ctx->cryp)
-> +		return -ENODEV;
-> +
-> +	ctx->ahash_fbk = crypto_alloc_ahash(alg_name, 0,
-> +					    CRYPTO_ALG_NEED_FALLBACK);
-> +
-> +	if (IS_ERR(ctx->ahash_fbk))
-> +		return dev_err_probe(ctx->cryp->dev, PTR_ERR(ctx->ahash_fbk),
-> +				     "starfive_hash: Could not load fallback driver.\n");
-> +
-> +	crypto_hash_alg_common(ahash)->statesize = crypto_ahash_statesize(ctx->ahash_fbk);
-
-I've just posted a patch to linux-crypto to do this properly:
-
-https://lore.kernel.org/linux-crypto/ZEEOXIHwqKblKfBJ@gondor.apana.org.au/T/#u
-
-Please switch to using the helper that I added.
-
-> +static int starfive_hash256_setkey(struct crypto_ahash *tfm,
-> +				   const u8 *key, unsigned int keylen)
-> +{
-> +	struct starfive_cryp_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	unsigned int digestsize = crypto_ahash_digestsize(tfm);
-> +	unsigned int blocksize;
-> +	int ret = 0;
-> +
-> +	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
-
-Please use crypto_ahash_blocksize.  We should never use crypto_ahash_tfm
-in new code.
-
-> +static int starfive_hash_cra_sha224_init(struct crypto_tfm *tfm)
-> +{
-> +	return starfive_hash_cra_init_algs(tfm, NULL,
-> +					   STARFIVE_HASH_SHA224,
-> +					   "sha224-generic");
-> +}
-
-Please switch to the new API and use init_tfm/exit_tfm instead of
-cra_init/cra_exit.
+Please drop the dependency on HW_RANDOM.
 
 Thanks,
 -- 
