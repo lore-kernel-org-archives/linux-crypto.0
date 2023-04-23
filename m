@@ -2,160 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99866C77B78
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Apr 2023 21:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88237C77B60
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Apr 2023 00:01:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233468AbjDUVMH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Apr 2023 17:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53626 "EHLO
+        id S229507AbjDWXzp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 23 Apr 2023 19:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233046AbjDUVMF (ORCPT
+        with ESMTP id S229476AbjDWXzo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Apr 2023 17:12:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1405B3;
-        Fri, 21 Apr 2023 14:12:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D590C652FA;
-        Fri, 21 Apr 2023 21:12:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAEB5C433EF;
-        Fri, 21 Apr 2023 21:12:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682111523;
-        bh=PAOoIU6HaP+dNtnNsbCXQ8sw9/H/z7hjv1lJ3ORbvxc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jePOQTa0sfmvjhSWAEmpkRnbTF/ETBNc1qzMc+qjIB9xW/vx/o0xRkyg1ajg54vOS
-         HMJ5R1PWc1GnC1SvDrVNBjfHJ+KnYkPDK4KAoTyqGzCZWlON59OUAFgEUFUsapUE0l
-         QTYacVcekJ8VQlT5fjFTligNTnILJo8EDfztXiktOfOug+mut4f48NpG5HAWZJBYXk
-         Ewjt5EpATs5Tzf3yXz9JJOhpoKytKUuSgJpU8JZZZQ0V69ZmScwbHff/s6onQstssJ
-         1ff4rTxsp2rnujUvPt+kVI/Ju/XhBhZQPxds5orhDguE5OBhauRfkgfjyLkOyqKIle
-         0c3vTkrfOp+nA==
-Date:   Sat, 22 Apr 2023 00:12:00 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Mimi Zohar <zohar@linux.ibm.com>
-Cc:     Eric Snowberg <eric.snowberg@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "pvorel@suse.cz" <pvorel@suse.cz>,
-        Kanth Ghatraju <kanth.ghatraju@oracle.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>,
-        "erpalmer@linux.vnet.ibm.com" <erpalmer@linux.vnet.ibm.com>,
-        "coxu@redhat.com" <coxu@redhat.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v5 5/6] KEYS: CA link restriction
-Message-ID: <ZEL8IKYhMdOvpWa1@kernel.org>
-References: <20230302164652.83571-1-eric.snowberg@oracle.com>
- <20230302164652.83571-6-eric.snowberg@oracle.com>
- <ZAz8QlynTSMD7kuE@kernel.org>
- <07FFED83-501D-418C-A4BB-862A547DD7B0@oracle.com>
- <20230320182822.6xyh6ibatrz5yrhb@kernel.org>
- <84d46fb108f6ce2a322b6486529fc6dd0f8deea5.camel@linux.ibm.com>
- <20230329232735.dvmxvwis2psbvyw5@kernel.org>
- <55b5c21ee1cf47aff0b2e5a94ec65fe326c8d6ba.camel@linux.ibm.com>
+        Sun, 23 Apr 2023 19:55:44 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE32710E7;
+        Sun, 23 Apr 2023 16:55:42 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1a814fe0ddeso43789715ad.2;
+        Sun, 23 Apr 2023 16:55:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682294142; x=1684886142;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K4dhQ+Vl6Yr6TY/lKeJ/u29Yt2u4QfMPU7QYP0YhBF4=;
+        b=kBnTUBlb7sGxwyjR1OH8Jx27X+Q1mvH/36hGFIFPXF1hmT3KNsN+sfKZ7Ru77xZlmr
+         3jqvLqrOUNCPBW9+kjYZ7JFPmXzna4OL+UkJ2kQy+iHQhdB8fY/D3x94kTDVPVNJUgKz
+         WNXtdkISWY0QQ0/zOogHhBj8XoM6qPMEYYMi8TVk0YOWRtRYILotJY+WRpXeXICs7Alw
+         Hbft9YX5umH16E+TM5O4Dm04fjdJMBVRhtivof7Yy0Si1ID0Qz5MGRrsMUtYqRkceM+q
+         6LPl0KT6t0Jr2D11oQP2Rgy95Kw44UX8Cdp91K0YTEYHNzjrTocEqRenoDnZDwiRvz7Q
+         iSHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682294142; x=1684886142;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K4dhQ+Vl6Yr6TY/lKeJ/u29Yt2u4QfMPU7QYP0YhBF4=;
+        b=gEyUFdJ6ENg3ZNcYqDz6qw+qvOFksKRjKOz2+zAr+f+XLjQ9loNinQs4lJBwLdrQJq
+         zOgYoqr0nN4SQ7ph4fkmeFRI0iP0dJdbUMPJIXFWw3uqh8arKoUJOPi6b0sd4PsIu3VN
+         C9G2VSCVA+24gwJB1xOqNCSBnMQ15jwR+ZcU+Jg0Ppg/aVu6yKJvcHSy2vl81qObnm6c
+         Q/8YRV17/dOKvnv9f55N/Ie1n2vHr4GdiLaq7PBAzHIyTm7u+iGEy6j4SgFi2X+xfk+4
+         izjtlNJOZd6pV5PyzgSuG4VVLoZZNzECi/nNelRsBDZ6gChyVCDGwPkdV3elXewDVuah
+         IFtw==
+X-Gm-Message-State: AAQBX9eq2h6ENBGPVjK2bowoZrxZxqUeJl/5olgFgSyDDtYzbYrKZCJ5
+        iT3jWDlySwAFmDBqlQ1/QeOKx82Cv4cNpHRk
+X-Google-Smtp-Source: AKy350Zo1nTCfznS7N7Qhb8HC8hGXv/LcFgMoxOYO5hc4WT2P0Ru1biDigHBppS3dZDCNV7aHq5dgg==
+X-Received: by 2002:a17:902:b097:b0:1a6:6b30:2b3b with SMTP id p23-20020a170902b09700b001a66b302b3bmr11509075plr.64.1682294141783;
+        Sun, 23 Apr 2023 16:55:41 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([104.28.245.199])
+        by smtp.gmail.com with ESMTPSA id u8-20020a170902bf4800b0019c13d032d8sm5458314pls.253.2023.04.23.16.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Apr 2023 16:55:41 -0700 (PDT)
+From:   David Yang <mmyangfl@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     David Yang <mmyangfl@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: engine - Fix typo in struct crypto_engine_op doc
+Date:   Mon, 24 Apr 2023 07:55:31 +0800
+Message-Id: <20230423235532.2729539-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55b5c21ee1cf47aff0b2e5a94ec65fe326c8d6ba.camel@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 30, 2023 at 02:01:52AM -0400, Mimi Zohar wrote:
-> On Thu, 2023-03-30 at 02:27 +0300, Jarkko Sakkinen wrote:
-> > On Mon, Mar 20, 2023 at 04:35:33PM -0400, Mimi Zohar wrote:
-> > > On Mon, 2023-03-20 at 20:28 +0200, Jarkko Sakkinen wrote:
-> > > > On Mon, Mar 20, 2023 at 05:35:05PM +0000, Eric Snowberg wrote:
-> > > > > 
-> > > > > 
-> > > > > > On Mar 11, 2023, at 3:10 PM, Jarkko Sakkinen <jarkko@kernel.org> wrote:
-> > > > > > 
-> > > > > > On Thu, Mar 02, 2023 at 11:46:51AM -0500, Eric Snowberg wrote:
-> > > > > >> Add a new link restriction.  Restrict the addition of keys in a keyring
-> > > > > >> based on the key to be added being a CA.
-> > > > > >> 
-> > > > > >> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> > > > > >> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-> > > > > >> ---
-> > > > > >> crypto/asymmetric_keys/restrict.c | 38 +++++++++++++++++++++++++++++++
-> > > > > >> include/crypto/public_key.h       | 15 ++++++++++++
-> > > > > >> 2 files changed, 53 insertions(+)
-> > > > > >> 
-> > > > > >> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-> > > > > >> index 6b1ac5f5896a..48457c6f33f9 100644
-> > > > > >> --- a/crypto/asymmetric_keys/restrict.c
-> > > > > >> +++ b/crypto/asymmetric_keys/restrict.c
-> > > > > >> @@ -108,6 +108,44 @@ int restrict_link_by_signature(struct key *dest_keyring,
-> > > > > >> 	return ret;
-> > > > > >> }
-> > > > > >> 
-> > > > > >> +/**
-> > > > > >> + * restrict_link_by_ca - Restrict additions to a ring of CA keys
-> > > > > >> + * @dest_keyring: Keyring being linked to.
-> > > > > >> + * @type: The type of key being added.
-> > > > > >> + * @payload: The payload of the new key.
-> > > > > >> + * @trust_keyring: Unused.
-> > > > > >> + *
-> > > > > >> + * Check if the new certificate is a CA. If it is a CA, then mark the new
-> > > > > >> + * certificate as being ok to link.
-> > > > > >> + *
-> > > > > >> + * Returns 0 if the new certificate was accepted, -ENOKEY if the
-> > > > > >> + * certificate is not a CA. -ENOPKG if the signature uses unsupported
-> > > > > >> + * crypto, or some other error if there is a matching certificate but
-> > > > > >> + * the signature check cannot be performed.
-> > > > > >> + */
-> > > > > >> +int restrict_link_by_ca(struct key *dest_keyring,
-> > > > > >> +			const struct key_type *type,
-> > > > > >> +			const union key_payload *payload,
-> > > > > >> +			struct key *trust_keyring)
-> > > > > >> +{
-> > > > > >> +	const struct public_key *pkey;
-> > > > > >> +
-> > > > > >> +	if (type != &key_type_asymmetric)
-> > > > > >> +		return -EOPNOTSUPP;
-> > > > > >> +
-> > > > > >> +	pkey = payload->data[asym_crypto];
-> > > > > >> +	if (!pkey)
-> > > > > >> +		return -ENOPKG;
-> > > > > >> +	if (!test_bit(KEY_EFLAG_CA, &pkey->key_eflags))
-> > > > > >> +		return -ENOKEY;
-> > > > > >> +	if (!test_bit(KEY_EFLAG_KEYCERTSIGN, &pkey->key_eflags))
-> > > > > >> +		return -ENOKEY;
-> > > > > >> +	if (test_bit(KEY_EFLAG_DIGITALSIG, &pkey->key_eflags))
-> > > > > >> +		return -ENOKEY;
-> > > > > > 
-> > > > > > nit: would be more readable, if conditions were separated by
-> > > > > > empty lines.
-> > > > > 
-> > > > > Ok, I will make this change in the next round.  Thanks.
-> > > > 
-> > > > Cool! Mimi have you tested these patches with IMA applied?
-> > > 
-> > > Yes, it's working as expected.
-> > 
-> > Thank you. Please check that I filled additional tags correctly:
-> > 
-> > https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/log/
-> > 
-> > I will then put these also to my 'next' branch and they will get mirrored
-> > to linux-next.
-> 
-> Thanks, Jarkko.  The tags look good.
+There is a redundant underscore in prepare_request. Remove it.
 
-Hi, sorry for radio silence. I've been transitioning to a new job.
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ include/crypto/engine.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Commits are in my next branch, and I will include them to my PR.
+diff --git a/include/crypto/engine.h b/include/crypto/engine.h
+index ae133e98d813..b9e76ed4085b 100644
+--- a/include/crypto/engine.h
++++ b/include/crypto/engine.h
+@@ -78,7 +78,7 @@ struct crypto_engine {
+ 
+ /*
+  * struct crypto_engine_op - crypto hardware engine operations
+- * @prepare__request: do some prepare if need before handle the current request
++ * @prepare_request: do some prepare if need before handle the current request
+  * @unprepare_request: undo any work done by prepare_request()
+  * @do_one_request: do encryption for current request
+  */
+-- 
+2.39.2
 
-BR, Jarkko
