@@ -2,91 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D24D9C7618E
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Apr 2023 17:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D858BC7618E
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Apr 2023 18:48:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231937AbjDXRUd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Apr 2023 13:20:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
+        id S232406AbjDXSsX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Apr 2023 14:48:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbjDXRUc (ORCPT
+        with ESMTP id S230355AbjDXSsW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Apr 2023 13:20:32 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB86196;
-        Mon, 24 Apr 2023 10:20:31 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-24781e23c27so4357472a91.0;
-        Mon, 24 Apr 2023 10:20:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682356831; x=1684948831;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bz4PPwCaKOw0TaRok5nu1KAg7hjKr3ZGu5Hk6jWlZ5U=;
-        b=ivIyFPrOSWQu1Q30hx8qM2Ryi8ZSyvMGSoP2WJ9ULnKKubdgVQOBOQ/aBXWwypZnYL
-         trkP9n5E9WcgXyL25jJXKI+ED0O/HEJ8sCaF530uDwNQb3EH8PXzemD+PNAyFy5rWA9r
-         +64dWSL9JUrTqFb0OJwfeULwgLz04q1neKzi/enDMfkNMvTFuFjVrxKAvqCo2ObHSg6j
-         cfkqV+w/moZJiP9J32Q6w3T7QOjN1LwPl6rm0IHjSo9uZwrM99qblFOc+/UPvKmuqkpj
-         9kVwwPmf+/Tss1VG4mptiA238DewxED5svaxQSoWlzxlXTIqrRu0mgEBDU8njuZNSJyK
-         /fFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682356831; x=1684948831;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bz4PPwCaKOw0TaRok5nu1KAg7hjKr3ZGu5Hk6jWlZ5U=;
-        b=N5vNUqjKnbs60ubl6DpJx1r2BwmcSeCuixeuXaWdL1qq6HtYx3+SF11LsgrmIJWuVs
-         Dy6zFI3dfccxzFIca2e7FxtzuGBRJ1eoLyZUV+ulezqXkzT5wPzzmqhcHTpNKR4IMIk0
-         57QzUqKvCC6T5CGwUbgc+XhuDT2PVeumTQDEFx/KYAjgM+mtlvVFIrAUhLVm8iUNkuID
-         ilBUPULNuXWrxHlZO2qGNm/DKM3qshHArYgvtkXCVzvvFithR94WQVsJZBY3Wx4e37WT
-         OlBnWbyH34Pjf5Vw1o7kvMBAwLqnz/Py0sE2xYYp2iDCIYJsIj6dUqFF4VhyrP+5DfFu
-         dQ4g==
-X-Gm-Message-State: AAQBX9dHsPuSQTjQHAD5CON1Zi3/0V+5KbySIqYOgnor4CmE9544iTEn
-        QadPfFZOuocOIEyfXtrhezr9U5GaOzgBsOB9
-X-Google-Smtp-Source: AKy350bQ6dnJrRGMpphf90z2NAgv+5SCDicWmPUv54KlvPgZ+A9vBkaaJSuhtUAebVx5uiPXNxcWqQ==
-X-Received: by 2002:a17:90b:1bc8:b0:249:897b:fac with SMTP id oa8-20020a17090b1bc800b00249897b0facmr14080342pjb.39.1682356830727;
-        Mon, 24 Apr 2023 10:20:30 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([104.28.245.199])
-        by smtp.gmail.com with ESMTPSA id t5-20020a170902a5c500b001a4fecf79e4sm6829605plq.49.2023.04.24.10.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Apr 2023 10:20:30 -0700 (PDT)
-From:   David Yang <mmyangfl@gmail.com>
+        Mon, 24 Apr 2023 14:48:22 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FCAD30ED;
+        Mon, 24 Apr 2023 11:47:48 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33OIjWt3005208;
+        Mon, 24 Apr 2023 18:47:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=PU0yTWnCifsPQLIhuXxRyUNG/QoJ66lSgetgnDeM0x0=;
+ b=PnTYr+Ut4Lq9NoIL5qtGqNXEJPagn/Bvf6+H0Uddxxr/+dWY2ihQ5uc6axzg0txrZT3w
+ kAZd7fJ0XOjIGWqpPhLU7PzYhLp1ocWqqc0hTdJFthWG9enyCbs7Anly4nXueMbinun+
+ XHPBHsuR1Uh14D8MTIuyKN2FD0lCNkppEgY8hzWFXQ2wKNIKYJs0AkjgLzVTiSk60MuS
+ HlzA0E4iGfVqyn9UXYPI8qFU341VMjjdk4R8HkB1jgIYAs7JTF5ChSL7COZRQU5Xwzbb
+ awuQKdV/6KEISHjfoue8qzhuYeMBiTmDRWSDhhwSno3k9+L+WkgaIba+rbEUfFy0WSCn Cw== 
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q5w76cj3g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Apr 2023 18:47:32 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33OIBntJ014357;
+        Mon, 24 Apr 2023 18:47:31 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
+        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3q4777mge5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Apr 2023 18:47:30 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33OIlTk020840748
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Apr 2023 18:47:29 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 21FAC5805A;
+        Mon, 24 Apr 2023 18:47:29 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E702A58051;
+        Mon, 24 Apr 2023 18:47:28 +0000 (GMT)
+Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
+        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Apr 2023 18:47:28 +0000 (GMT)
+From:   Danny Tsen <dtsen@linux.ibm.com>
 To:     linux-crypto@vger.kernel.org
-Cc:     David Yang <mmyangfl@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3] crypto: engine - Fix struct crypto_engine_op doc
-Date:   Tue, 25 Apr 2023 01:20:21 +0800
-Message-Id: <20230424172021.2893856-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.39.2
+Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
+        Danny Tsen <dtsen@linux.ibm.com>
+Subject: [PATCH 0/5] crypto: Accelerated Chacha20/Poly1305 implementation
+Date:   Mon, 24 Apr 2023 14:47:21 -0400
+Message-Id: <20230424184726.2091-1-dtsen@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: I01tP0s8TSId33nmyRRvCVMuahHNnH4n
+X-Proofpoint-ORIG-GUID: I01tP0s8TSId33nmyRRvCVMuahHNnH4n
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-24_11,2023-04-21_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ impostorscore=0 priorityscore=1501 spamscore=0 mlxscore=0 mlxlogscore=536
+ phishscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304240167
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove redundant underscore and fix some grammar in prepare_request doc.
+This patch series provide an accelerated/optimized Chacha20 and Poly1305
+implementation for Power10 or later CPU (ppc64le).  This module
+implements algorithm specified in RFC7539.  The implementation
+provides 3.5X better performance than the baseline for Chacha20 and
+Poly1305 individually and 1.5X improvement for Chacha20/Poly1305
+operation.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
-v2: fix description too
-v3: remove inappropriate commit tags
- include/crypto/engine.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch has been tested with the kernel crypto module tcrypt.ko and
+has passed the selftest.  The patch is also tested with
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
 
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index ae133e98d813..2038764b30c2 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -78,7 +78,7 @@ struct crypto_engine {
- 
- /*
-  * struct crypto_engine_op - crypto hardware engine operations
-- * @prepare__request: do some prepare if need before handle the current request
-+ * @prepare_request: do some preparation if needed before handling the current request
-  * @unprepare_request: undo any work done by prepare_request()
-  * @do_one_request: do encryption for current request
-  */
+
+Danny Tsen (5):
+  An optimized Chacha20 implementation with 8-way unrolling for ppc64le.
+  Glue code for optmized Chacha20 implementation for ppc64le.
+  An optimized Poly1305 implementation with 4-way unrolling for ppc64le.
+  Glue code for optmized Poly1305 implementation for ppc64le.
+  Update Kconfig and Makefile.
+
+ arch/powerpc/crypto/Kconfig             |   26 +
+ arch/powerpc/crypto/Makefile            |    4 +
+ arch/powerpc/crypto/chacha-p10-glue.c   |  223 +++++
+ arch/powerpc/crypto/chacha-p10le-8x.S   |  842 ++++++++++++++++++
+ arch/powerpc/crypto/poly1305-p10-glue.c |  186 ++++
+ arch/powerpc/crypto/poly1305-p10le_64.S | 1075 +++++++++++++++++++++++
+ 6 files changed, 2356 insertions(+)
+ create mode 100644 arch/powerpc/crypto/chacha-p10-glue.c
+ create mode 100644 arch/powerpc/crypto/chacha-p10le-8x.S
+ create mode 100644 arch/powerpc/crypto/poly1305-p10-glue.c
+ create mode 100644 arch/powerpc/crypto/poly1305-p10le_64.S
+
 -- 
-2.39.2
+2.31.1
 
