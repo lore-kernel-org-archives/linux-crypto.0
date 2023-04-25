@@ -2,107 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893B0C77B61
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Apr 2023 11:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C92FC77B76
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Apr 2023 12:02:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234030AbjDYL6i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Apr 2023 07:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60100 "EHLO
+        id S230195AbjDYMC2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Apr 2023 08:02:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233892AbjDYL6c (ORCPT
+        with ESMTP id S234006AbjDYMC1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2023 07:58:32 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12FC74C0C;
-        Tue, 25 Apr 2023 04:58:24 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33PBnDTr000928;
-        Tue, 25 Apr 2023 11:58:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=XChf822fBz7pcuvL0Rw0vcWCMdx3TekKKlF+GQ1BEOY=;
- b=jLNmfcRyqx98Il4Rf4UxA8Tcct5qvULDoZfO8IwHw83GBfLQqP0BFAoGWhDsFn0H+KDc
- TQ3TdrrR5g9W79lRDq66CZN3FWWkP3CfPFOvkH8aeQBmENwUG+NdCaEwuf7L2JQ8qiyo
- xJDac6Cb4A2PuqNARYAaUnUYxKNM5eQmAe8Sw4I8xGVXEZN4j5754RRX0hTZ+XjEvSAK
- tB+RbKycVq6q4URb74vmZzMdsH36Y6Tap1sgBSc8S+l3rhc+7TRx2JCZTJs7nbDWAal5
- bYkBebhIe1xr+fyCWL8pG4/Kjwc7i3c3fkiseaSDO+RlkqY4bxYNjjiPK+ZF8nisFhU2 0Q== 
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q6earr9g2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Apr 2023 11:58:12 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33P96Ii2015923;
-        Tue, 25 Apr 2023 11:58:11 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([9.208.130.101])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3q47784396-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Apr 2023 11:58:11 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-        by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33PBw9rO16188024
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Apr 2023 11:58:10 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C87AA58054;
-        Tue, 25 Apr 2023 11:58:09 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8CA435803F;
-        Tue, 25 Apr 2023 11:58:08 +0000 (GMT)
-Received: from [9.160.16.18] (unknown [9.160.16.18])
-        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Apr 2023 11:58:08 +0000 (GMT)
-Message-ID: <3dd118d7-8ba9-33ff-fc3d-030c601df0d1@linux.ibm.com>
-Date:   Tue, 25 Apr 2023 06:58:07 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH 4/5] Glue code for optmized Poly1305 implementation for
- ppc64le.
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
-        nayna@linux.ibm.com, appro@cryptogams.org,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+        Tue, 25 Apr 2023 08:02:27 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B95F4C0C;
+        Tue, 25 Apr 2023 05:02:24 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Q5LGL5LpBz4xFh;
+        Tue, 25 Apr 2023 22:02:18 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1682424139;
+        bh=rH8304UzqliqdTTNowtCqG5UFDD8oj/c7YMTXxFApSA=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=B/AvhVrrpcUYzRgq0Q3x/7YLgVsVSqkIBfwT0x5l7H/4xYfG/JpEVEHsQafVMKlQe
+         JpomzP4KwlTR11vBdAzCNE0KV4C9jvVn9t7CNRYNqf+EaBgZ+THpT0Db/opqR6S/Yp
+         rpTRJLPUlI5hUljD9iP/y3dZKAiq3TwUW83MWh/d9RNP6tGvlIuQME9KlogUfZHaWf
+         gObSVb8nLLC7xm/NpP1ktG/qX8caZameK4EjGph7m+Q5yd5utydiKaNhfrrHiRd4Tp
+         aVYOs8D35k8eaqmtKnsp9EP1NRDfb6OR0DJKwBlSFaOnedkTh9x8Ssy/n4rPfKvDxA
+         cVZQrrxN4vb9w==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Danny Tsen <dtsen@linux.ibm.com>,
+        "Elliott, Robert (Servers)" <elliott@hpe.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "leitao@debian.org" <leitao@debian.org>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
+        "appro@cryptogams.org" <appro@cryptogams.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "ltcgcw@linux.vnet.ibm.com" <ltcgcw@linux.vnet.ibm.com>,
+        "dtsen@us.ibm.com" <dtsen@us.ibm.com>
+Subject: Re: [PATCH 1/5] An optimized Chacha20 implementation with 8-way
+ unrolling for ppc64le.
+In-Reply-To: <a8239d13-a3ee-d6c6-13c5-7f668991489d@linux.ibm.com>
 References: <20230424184726.2091-1-dtsen@linux.ibm.com>
- <20230424184726.2091-5-dtsen@linux.ibm.com>
- <ZEdovn1XbEUptK+m@gondor.apana.org.au>
-From:   Danny Tsen <dtsen@linux.ibm.com>
-In-Reply-To: <ZEdovn1XbEUptK+m@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BbxoMNJ3dhrS0Z9Z14v7l8l5J4AUHGAt
-X-Proofpoint-GUID: BbxoMNJ3dhrS0Z9Z14v7l8l5J4AUHGAt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-25_04,2023-04-25_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxscore=0 adultscore=0 mlxlogscore=879 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 clxscore=1015 impostorscore=0 suspectscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304250103
+ <20230424184726.2091-2-dtsen@linux.ibm.com>
+ <MW5PR84MB1842E9D9F596D3928B415DBAAB679@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+ <a8239d13-a3ee-d6c6-13c5-7f668991489d@linux.ibm.com>
+Date:   Tue, 25 Apr 2023 22:02:16 +1000
+Message-ID: <87a5ywyxtj.fsf@mail.concordia>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Did not notice that.  Will do fix it.
+Danny Tsen <dtsen@linux.ibm.com> writes:
+> This is recommended template to use for IBM copyright.
 
-Thanks.
+According to who?
 
--Danny
+The documentation I've seen specifies "IBM Corp." or "IBM Corporation".
 
-On 4/25/23 12:44 AM, Herbert Xu wrote:
-> On Mon, Apr 24, 2023 at 02:47:25PM -0400, Danny Tsen wrote:
->> +	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
->> +		bytes = round_down(srclen, POLY1305_BLOCK_SIZE);
->> +		used = crypto_poly1305_setdctxkey(dctx, src, bytes);
->> +		if (likely(used)) {
->> +			srclen -= used;
->> +			src += used;
->> +		}
->> +		if (srclen >= POLY1305_BLOCK_SIZE*4) {
->> +			vsx_begin();
-> Your chacha code has a SIMD-fallback, how come this one doesn't?
->
-> Thanks,
+cheers
