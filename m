@@ -2,58 +2,53 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49D0C77B61
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Apr 2023 05:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DE7C6FD18
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Apr 2023 05:46:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233309AbjDYFom (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Apr 2023 01:44:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55408 "EHLO
+        id S232203AbjDYFqe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Apr 2023 01:46:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjDYFom (ORCPT
+        with ESMTP id S233109AbjDYFqd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Apr 2023 01:44:42 -0400
+        Tue, 25 Apr 2023 01:46:33 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3A430FE;
-        Mon, 24 Apr 2023 22:44:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80993AD29;
+        Mon, 24 Apr 2023 22:46:19 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1prBTZ-001zum-5I; Tue, 25 Apr 2023 13:44:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Apr 2023 13:44:30 +0800
-Date:   Tue, 25 Apr 2023 13:44:30 +0800
+        id 1prBV5-001zwD-Cx; Tue, 25 Apr 2023 13:46:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Apr 2023 13:46:04 +0800
+Date:   Tue, 25 Apr 2023 13:46:04 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Danny Tsen <dtsen@linux.ibm.com>
 Cc:     linux-crypto@vger.kernel.org, leitao@debian.org,
         nayna@linux.ibm.com, appro@cryptogams.org,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
-Subject: Re: [PATCH 4/5] Glue code for optmized Poly1305 implementation for
- ppc64le.
-Message-ID: <ZEdovn1XbEUptK+m@gondor.apana.org.au>
+Subject: Re: [PATCH 5/5] Update Kconfig and Makefile.
+Message-ID: <ZEdpHDpm19XwN3dG@gondor.apana.org.au>
 References: <20230424184726.2091-1-dtsen@linux.ibm.com>
- <20230424184726.2091-5-dtsen@linux.ibm.com>
+ <20230424184726.2091-6-dtsen@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230424184726.2091-5-dtsen@linux.ibm.com>
+In-Reply-To: <20230424184726.2091-6-dtsen@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 24, 2023 at 02:47:25PM -0400, Danny Tsen wrote:
+On Mon, Apr 24, 2023 at 02:47:26PM -0400, Danny Tsen wrote:
 >
-> +	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
-> +		bytes = round_down(srclen, POLY1305_BLOCK_SIZE);
-> +		used = crypto_poly1305_setdctxkey(dctx, src, bytes);
-> +		if (likely(used)) {
-> +			srclen -= used;
-> +			src += used;
-> +		}
-> +		if (srclen >= POLY1305_BLOCK_SIZE*4) {
-> +			vsx_begin();
+> +config CRYPTO_CHACHA20_P10
+> +	tristate "Ciphers: ChaCha20, XChacha20, XChacha12 (P10 or later)"
+> +	depends on PPC64 && CPU_LITTLE_ENDIAN
+> +	select CRYPTO_SKCIPHER
 
-Your chacha code has a SIMD-fallback, how come this one doesn't?
+I thought your IS_REACHABLE test was so that you could build this
+without the Crypto API? Colour me confused.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
