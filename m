@@ -2,108 +2,79 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3248C7EE20
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 16:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8C7C7EE23
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 17:06:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231735AbjDZQr0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 12:47:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49632 "EHLO
+        id S236244AbjDZRGm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 13:06:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231137AbjDZQrZ (ORCPT
+        with ESMTP id S233921AbjDZRGe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 12:47:25 -0400
+        Wed, 26 Apr 2023 13:06:34 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09153599;
-        Wed, 26 Apr 2023 09:47:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C6A37D99;
+        Wed, 26 Apr 2023 10:06:33 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C11E63787;
-        Wed, 26 Apr 2023 16:47:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60921C433EF;
-        Wed, 26 Apr 2023 16:47:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2BA646132A;
+        Wed, 26 Apr 2023 17:06:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F965C4339B;
+        Wed, 26 Apr 2023 17:06:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682527644;
-        bh=LQIlZBXyvbpRW/w7bY9aSuiYQzw21Inh3Gti8/6IHO0=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=sKZvNectox1rW/0Kt+dYBwGPPJyiXg/4k6NvGpRI/m3H/I1ZyTCgo54bLncGXM15x
-         1AQ5mmloG8jT8XJd8KasLmwdRAm0lFLwFMG9Io4HoxUyA0rqXdOlBXI2zrxNazX81q
-         WKgBJBQ6k/Peg/xD7UpueXtlG1s4ySQovbI/kAsmeZAOEU2+nZQBXhZJPyj4ph2Sfe
-         ajKQQm31OtiPNfdz33ot6Y5A8HBt3UNngT3WVqjDNLSpv0L7cYv8dJhTI+f7bqnZZ6
-         DLunByvUsKVa91qD51NoR05GAJDp/UH86hcoNCzQYq4g6dMPlRBqmsSU8gSMCH5uPM
-         G4gwU3FQgRP/w==
-From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To:     Sunil V L <sunilvl@ventanamicro.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-acpi@vger.kernel.org, linux-crypto@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, llvm@lists.linux.dev
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Len Brown <lenb@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Marc Zyngier <maz@kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH V4 05/23] ACPI: OSL: Make should_use_kmap() 0 for RISC-V
-In-Reply-To: <20230404182037.863533-6-sunilvl@ventanamicro.com>
-References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
- <20230404182037.863533-6-sunilvl@ventanamicro.com>
-Date:   Wed, 26 Apr 2023 18:47:20 +0200
-Message-ID: <87a5yua8vb.fsf@all.your.base.are.belong.to.us>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        s=k20201202; t=1682528792;
+        bh=luhXDip7ZThYSriayg4A6CXDv28E1cgSnb+UHfM0u8E=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=JFxxa6D8768xouyfUFRqRT3nR+u3110qlBQfn3DHuc6AR18eolzSMo5NPf1ofuST5
+         3b2xuj/Ad/92qy3rzgREOyg8WU4IVCY+WSEB5IuktvIbaP4DV8Lk+LNmmj+wFMSPk5
+         oJw4gZbZghPvxDQrmOrlrXIWlFup2QEwYC/+5FjUncIClnKZmisOaUTxlhae7rlYoE
+         Y5rSdBe3uVls8qvZb0V712ubak5oEyD5Wg9sbor7MH9F7WAyNTROuTFwhEW1jUVGyN
+         TuVvFnESvaVaXq/L/fjotrmZOHiF8zHLH00rz+LqLbh+kpVHexkhscKf3is+lw0L20
+         etcNu8E4J6MXA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F87AC43158;
+        Wed, 26 Apr 2023 17:06:32 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 6.4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+References: <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+ <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au> <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.4-p1
+X-PR-Tracked-Commit-Id: 482c84e906e535072c55395acabd3a58e9443d12
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 733f7e9c18c5e377025c1bfdce6bc9a7d55649be
+Message-Id: <168252879251.19907.570748263553593045.pr-tracker-bot@kernel.org>
+Date:   Wed, 26 Apr 2023 17:06:32 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sunil V L <sunilvl@ventanamicro.com> writes:
+The pull request you sent on Mon, 24 Apr 2023 12:52:27 +0800:
 
-> Without this, if the tables are larger than 4K,
-> acpi_map() will fail.
->
-> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> ---
->  drivers/acpi/osl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/acpi/osl.c b/drivers/acpi/osl.c
-> index 3269a888fb7a..f725813d0cce 100644
-> --- a/drivers/acpi/osl.c
-> +++ b/drivers/acpi/osl.c
-> @@ -276,7 +276,7 @@ acpi_map_lookup_virt(void __iomem *virt, acpi_size si=
-ze)
->  	return NULL;
->  }
->=20=20
-> -#if defined(CONFIG_IA64) || defined(CONFIG_ARM64)
-> +#if defined(CONFIG_IA64) || defined(CONFIG_ARM64) || defined(CONFIG_RISC=
-V)
->  /* ioremap will take care of cache attributes */
->  #define should_use_kmap(pfn)   0
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.4-p1
 
-An observation, which can be addressed later; The acpi_os_ioremap()
-(called when the config above is enabled for RV), does not have an arch
-specific implementation for RISC-V. The generic one calls
-ioremap_cached(), which on RISC-V defaults to ioremap() -- caching
-disabled/_PAGE_IO.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/733f7e9c18c5e377025c1bfdce6bc9a7d55649be
 
-That is probably not what we want, but rather something similar that
-arm64 does.
+Thank you!
 
-
-Bj=C3=B6rn
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
