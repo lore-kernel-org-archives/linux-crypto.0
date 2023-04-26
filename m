@@ -2,71 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB91C77B60
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 09:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 844DDC77B7F
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 11:43:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239464AbjDZJsq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 05:48:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36818 "EHLO
+        id S240589AbjDZLnj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 07:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240281AbjDZJsp (ORCPT
+        with ESMTP id S240571AbjDZLng (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 05:48:45 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B94A32726
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 02:48:43 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Q5vBW3zdKzLnl5;
-        Wed, 26 Apr 2023 17:45:55 +0800 (CST)
-Received: from [10.67.110.176] (10.67.110.176) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 26 Apr 2023 17:48:39 +0800
-Subject: Re: [PATCH -next] crypto: jitter - change module_init(jent_mod_init)
- to subsys_initcall(jent_mod_init)
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-References: <20230425125709.39470-1-cuigaosheng1@huawei.com>
- <ZEjkmOPvk7Iz213G@gondor.apana.org.au>
- <d3198a93-3811-69d3-9a19-602bf8b849aa@huawei.com>
- <ZEjuUg9GQGB+4WO/@gondor.apana.org.au>
-From:   cuigaosheng <cuigaosheng1@huawei.com>
-Message-ID: <be567820-a2b5-8496-0d8a-e44fdd8fdc3b@huawei.com>
-Date:   Wed, 26 Apr 2023 17:48:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Wed, 26 Apr 2023 07:43:36 -0400
+Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CE74C04;
+        Wed, 26 Apr 2023 04:43:34 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.18.147.229])
+        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4Q5xYv0M32z9v7Yn;
+        Wed, 26 Apr 2023 19:32:51 +0800 (CST)
+Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
+        by APP2 (Coremail) with SMTP id GxC2BwAn7lQ6Dklko7NWAg--.7207S2;
+        Wed, 26 Apr 2023 12:43:07 +0100 (CET)
+Message-ID: <40fbededd8dbe3b70fffb179574f344e9b0aed17.camel@huaweicloud.com>
+Subject: Re: [RFC][PATCH 3/6] verification: Introduce verify_umd_signature()
+ and verify_umd_message_sig()
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+        yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+        sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+        rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com,
+        shuah@kernel.org
+Cc:     linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Date:   Wed, 26 Apr 2023 13:42:45 +0200
+In-Reply-To: <CS69GBAMXJ1X.1T8NO0CZUBXLG@suppilovahvero>
+References: <20230425173557.724688-1-roberto.sassu@huaweicloud.com>
+         <20230425173557.724688-4-roberto.sassu@huaweicloud.com>
+         <CS69GBAMXJ1X.1T8NO0CZUBXLG@suppilovahvero>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-In-Reply-To: <ZEjuUg9GQGB+4WO/@gondor.apana.org.au>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.110.176]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500012.china.huawei.com (7.221.188.12)
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: GxC2BwAn7lQ6Dklko7NWAg--.7207S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7GFyruF4rXw4xKFWxZF43KFg_yoW8Jryxpa
+        n5tF4fKr1Dtr1jyayxKry3ZFW8tw4Yyr1DWw1DC3y5Za4rWFyY9r1Iga13uFZ8ur1FkFZI
+        vanIqa45Z3WDA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAkuxUUUUU=
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQATBF1jj4yCiAAAsh
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Submitting patches directly to stable branches will not be accepted.
+On Wed, 2023-04-26 at 03:28 +0300, Jarkko Sakkinen wrote:
+> On Tue Apr 25, 2023 at 8:35 PM EEST, Roberto Sassu wrote:
+> > From: Roberto Sassu <roberto.sassu@huawei.com>
+> > 
+> > Introduce verify_umd_signature() and verify_umd_message_sig(), to verify
+> > UMD-parsed signatures from detached data. It aims to be used by kernel
+> > subsystems wishing to verify the authenticity of system data, with
+> > system-defined keyrings as trust anchor.
+> 
+> UMD is not generic knowledge. It is a term coined up in this patch set
+> so please open code it to each patch.
 
-Maybe it doesn't need fixing，we can also compile ecdh into modules
-to get around this problem.
+Yes, Linus also commented on this:
 
-Thanks for your time.
+https://lwn.net/ml/linux-kernel/CAHk-=wihqhksXHkcjuTrYmC-vajeRcNh3s6eeoJNxS7wp77dFQ@mail.gmail.com/
 
-On 2023/4/26 17:26, Herbert Xu wrote:
-> On Wed, Apr 26, 2023 at 05:18:11PM +0800, cuigaosheng wrote:
->> Thanks for taking time to review this patch.
->>
->> We have not used subsystem initialisation ordering to guarantee the
->> order of registration since commit adad556efcdd ("crypto: api - Fix
->> built-in testing dependency failures"),but this patch is not a bugfix,
->> it's not merged into the earlier stable branch.
-> You're going about this backwards.  We don't apply patches to
-> the mainline kernel to fix problems that only exist in an older
-> version.
->
-> If you have a problem with an older kernel then you should fix
-> it there.
->
-> Cheers,
+I will check if the full name is mentioned at least once. So far, it
+seems that using umd for function names should be ok.
+
+> One discussion points should be what these handlers should be called.
+> Right now the patch set is misleads the reader to think as this was
+> some kind of "official" term and set to stone.
+
+I proposed some naming here (dependency of this patch set):
+
+https://lore.kernel.org/bpf/20230317145240.363908-6-roberto.sassu@huaweicloud.com/
+
+Please let me know if it sounds reasonable to you.
+
+Thanks
+
+Roberto
+
