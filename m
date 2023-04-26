@@ -2,42 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C25C77B60
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 07:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5469FC77B60
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 08:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239777AbjDZH4d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 03:56:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54334 "EHLO
+        id S239779AbjDZIKD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 04:10:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239789AbjDZH4c (ORCPT
+        with ESMTP id S239827AbjDZIJu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 03:56:32 -0400
+        Wed, 26 Apr 2023 04:09:50 -0400
 Received: from smtp.smtpout.orange.fr (smtp-11.smtpout.orange.fr [80.12.242.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 509323599
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 00:56:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA29D19A3
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 01:09:48 -0700 (PDT)
 Received: from [192.168.1.18] ([86.243.2.178])
         by smtp.orange.fr with ESMTPA
-        id ra0jpTVVNLbpDra0jpjLj7; Wed, 26 Apr 2023 09:56:25 +0200
+        id raDepUY94jKvyraDepZTxa; Wed, 26 Apr 2023 10:09:47 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-        s=t20230301; t=1682495785;
-        bh=x9q/MDfjDKLRkQp6Nz1mvWEiFgcdxPkXqgmQvabibnY=;
+        s=t20230301; t=1682496587;
+        bh=3Dnct6syEmfol0OwB5y57UYOe2Ebjv/G1frdM6J2D2M=;
         h=Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=EnPNaKS146EDU6/dfFqh2oCsqlJEgHSAaZkgDNuogyNBxIqY/O81K2lfZAoEqP0pL
-         PbtMrBBAfK6vzJX++H8eZEYXa8lCedoufWG/iAM14Rp4P85Fxnyr2hj5z+Ny6kucj1
-         4n46MllVxZrxOE8aWE5CabXIgdOmaMhEF5Bq4Ht9RWI47AyeHYOUb4sqE+scHboZY/
-         ubXUy1trFBCRuRt0W8ldKab1yotwYlfrr+G94P/10wTKBTquIZG4MEMQfaIV3GQPmW
-         6rt2OvpxglYUnGZZPQZasD+PyitaWHBDZlkBMnUSxDxaF96/eB1WlPf0c/Hp2pxTHq
-         zL5vDW5gsFkiA==
+        b=KOsXkypVrNH0KqrELFWbVO44jVwy7NpAA45jduf5vUoI1PnrgF6myXhsk6DPTZg73
+         YMiBSHe+eSenrv2OrpjNWPoxQnJIpDgIIWKtVPaiMQ6WB4C79hG+y8gqBHaNNWHAQd
+         ubu8Tqs0bCpx7/2ZLi5d7xKGby3QoFX8L5WoS4dhfISqWh4nRV2WCfbyx5TqNEYBG8
+         HW6BEpN7h0GwD8b9iGp7c3bvwXIJVnpKjO/+Z6n4jmrOc/RggjhuEX+X3EQLCjGdkx
+         Hbm6G+RxoaytUmrBMV94NApD41jQEPKCOj+fiHlN7//+2IQDV1HcjjhoZ9YEB4iTNK
+         ObHMOr+b0HCyQ==
 X-ME-Helo: [192.168.1.18]
 X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Wed, 26 Apr 2023 09:56:25 +0200
+X-ME-Date: Wed, 26 Apr 2023 10:09:47 +0200
 X-ME-IP: 86.243.2.178
-Message-ID: <c3faff36-3698-a137-f007-ff8bca6a2e88@wanadoo.fr>
-Date:   Wed, 26 Apr 2023 09:56:21 +0200
+Message-ID: <b06ffea5-d631-dc1a-89af-71e72a4365c5@wanadoo.fr>
+Date:   Wed, 26 Apr 2023 10:09:42 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
 Subject: Re: [PATCH v6 2/4] crypto: starfive - Add crypto engine support
+Content-Language: fr
 To:     jiajie.ho@starfivetech.com
 Cc:     davem@davemloft.net, devicetree@vger.kernel.org,
         herbert@gondor.apana.org.au, kernel@esmil.dk,
@@ -46,7 +47,6 @@ Cc:     davem@davemloft.net, devicetree@vger.kernel.org,
         palmer@dabbelt.com, robh+dt@kernel.org
 References: <20230426065848.842221-1-jiajie.ho@starfivetech.com>
  <20230426065848.842221-3-jiajie.ho@starfivetech.com>
-Content-Language: fr
 From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 In-Reply-To: <20230426065848.842221-3-jiajie.ho@starfivetech.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -136,6 +136,11 @@ Le 26/04/2023 à 08:58, Jia Jie Ho a écrit :
 > +	  skciphers, AEAD and hash functions.
 > +
 > +	  If you choose 'M' here, this module will be called starfive-crypto.
+
+
+jh7110-cryp?
+
+
 > diff --git a/drivers/crypto/starfive/Makefile b/drivers/crypto/starfive/Makefile
 > new file mode 100644
 > index 000000000000..41221acaee39
@@ -146,294 +151,4 @@ Le 26/04/2023 à 08:58, Jia Jie Ho a écrit :
 > +
 > +obj-$(CONFIG_CRYPTO_DEV_JH7110) += jh7110-crypto.o
 > +jh7110-crypto-objs := jh7110-cryp.o
-> diff --git a/drivers/crypto/starfive/jh7110-cryp.c b/drivers/crypto/starfive/jh7110-cryp.c
-> new file mode 100644
-> index 000000000000..a944897609a2
-> --- /dev/null
-> +++ b/drivers/crypto/starfive/jh7110-cryp.c
-> @@ -0,0 +1,199 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Cryptographic API.
-> + *
-> + * Support for StarFive hardware cryptographic engine.
-> + * Copyright (c) 2022 StarFive Technology
-> + *
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/delay.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/module.h>
-> +#include <linux/of_device.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/reset.h>
-> +
-> +#include "jh7110-cryp.h"
-> +
-> +#define DRIVER_NAME             "starfive-crypto"
-> +
-> +struct starfive_dev_list {
-> +	struct list_head        dev_list;
-> +	spinlock_t              lock; /* protect dev_list */
-> +};
-> +
-> +static struct starfive_dev_list dev_list = {
-> +	.dev_list = LIST_HEAD_INIT(dev_list.dev_list),
-> +	.lock     = __SPIN_LOCK_UNLOCKED(dev_list.lock),
-> +};
-> +
-> +struct starfive_cryp_dev *starfive_cryp_find_dev(struct starfive_cryp_ctx *ctx)
-> +{
-> +	struct starfive_cryp_dev *cryp = NULL, *tmp;
-> +
-> +	spin_lock_bh(&dev_list.lock);
-> +	if (!ctx->cryp) {
-> +		list_for_each_entry(tmp, &dev_list.dev_list, list) {
-> +			cryp = tmp;
-> +			break;
-> +		}
-> +		ctx->cryp = cryp;
-> +	} else {
-> +		cryp = ctx->cryp;
-> +	}
-> +
-> +	spin_unlock_bh(&dev_list.lock);
-> +
-> +	return cryp;
-> +}
-> +
-> +static int starfive_dma_init(struct starfive_cryp_dev *cryp)
-> +{
-> +	dma_cap_mask_t mask;
-> +
-> +	cryp->tx = NULL;
-> +	cryp->rx = NULL;
-
-Harmless, but 'crypt' is kzalloc()'ed, so these fields are already NULL.
-
-> +
-> +	dma_cap_zero(mask);
-> +	dma_cap_set(DMA_SLAVE, mask);
-> +
-> +	cryp->tx = dma_request_chan(cryp->dev, "tx");
-> +	if (IS_ERR(cryp->tx))
-> +		return dev_err_probe(cryp->dev, PTR_ERR(cryp->tx),
-> +				     "Error requesting tx dma channel.\n");
-> +
-> +	cryp->rx = dma_request_chan(cryp->dev, "rx");
-> +	if (IS_ERR(cryp->rx)) {
-> +		dma_release_channel(cryp->tx);
-> +		return dev_err_probe(cryp->dev, PTR_ERR(cryp->rx),
-> +				     "Error requesting rx dma channel.\n");
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void starfive_dma_cleanup(struct starfive_cryp_dev *cryp)
-> +{
-> +	dma_release_channel(cryp->tx);
-> +	dma_release_channel(cryp->rx);
-> +}
-> +
-> +static int starfive_cryp_probe(struct platform_device *pdev)
-> +{
-> +	struct starfive_cryp_dev *cryp;
-> +	struct resource *res;
-> +	int ret;
-> +
-> +	cryp = devm_kzalloc(&pdev->dev, sizeof(*cryp), GFP_KERNEL);
-> +	if (!cryp)
-> +		return -ENOMEM;
-> +
-> +	platform_set_drvdata(pdev, cryp);
-> +	cryp->dev = &pdev->dev;
-> +
-> +	cryp->base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
-> +	if (IS_ERR(cryp->base))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(cryp->base),
-> +				     "Error remapping memory for platform device\n");
-> +
-> +	cryp->phys_base = res->start;
-> +	cryp->dma_maxburst = 32;
-> +
-> +	cryp->hclk = devm_clk_get(&pdev->dev, "hclk");
-> +	if (IS_ERR(cryp->hclk))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(cryp->hclk),
-> +				     "Error getting hardware reference clock\n");
-> +
-> +	cryp->ahb = devm_clk_get(&pdev->dev, "ahb");
-> +	if (IS_ERR(cryp->ahb))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(cryp->ahb),
-> +				     "Error getting ahb reference clock\n");
-> +
-> +	cryp->rst = devm_reset_control_get_shared(cryp->dev, NULL);
-> +	if (IS_ERR(cryp->rst))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(cryp->rst),
-> +				     "Error getting hardware reset line\n");
-> +
-> +	clk_prepare_enable(cryp->hclk);
-> +	clk_prepare_enable(cryp->ahb);
-> +	reset_control_deassert(cryp->rst);
-> +
-> +	spin_lock(&dev_list.lock);
-> +	list_add(&cryp->list, &dev_list.dev_list);
-> +	spin_unlock(&dev_list.lock);
-> +
-> +	ret = starfive_dma_init(cryp);
-> +	if (ret)
-> +		goto err_dma_init;
-> +
-> +	/* Initialize crypto engine */
-> +	cryp->engine = crypto_engine_alloc_init(&pdev->dev, 1);
-> +	if (!cryp->engine) {
-> +		ret = -ENOMEM;
-> +		goto err_engine;
-> +	}
-> +
-> +	ret = crypto_engine_start(cryp->engine);
-> +	if (ret)
-> +		goto err_engine_start;
-> +
-> +	return 0;
-> +
-> +err_engine_start:
-> +	crypto_engine_exit(cryp->engine);
-> +err_engine:
-> +	starfive_dma_cleanup(cryp);
-> +err_dma_init:
-> +	spin_lock(&dev_list.lock);
-> +	list_del(&cryp->list);
-> +	spin_unlock(&dev_list.lock);
-
-I think that there should be:
-	clk_disable_unprepare(cryp->hclk);
-	clk_disable_unprepare(cryp->ahb);
-	reset_control_assert(cryp->rst);
-
-as in the remove function.
-
-> +
-> +	return ret;
-> +}
-> +
-> +static int starfive_cryp_remove(struct platform_device *pdev)
-> +{
-> +	struct starfive_cryp_dev *cryp = platform_get_drvdata(pdev);
-> +
-> +	if (!cryp)
-> +		return -ENODEV;
-
-I don't think that this can happen.
-
-CJ
-
-> +
-> +	crypto_engine_stop(cryp->engine);
-> +	crypto_engine_exit(cryp->engine);
-> +
-> +	starfive_dma_cleanup(cryp);
-> +
-> +	spin_lock(&dev_list.lock);
-> +	list_del(&cryp->list);
-> +	spin_unlock(&dev_list.lock);
-> +
-> +	clk_disable_unprepare(cryp->hclk);
-> +	clk_disable_unprepare(cryp->ahb);
-> +	reset_control_assert(cryp->rst);
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct of_device_id starfive_dt_ids[] __maybe_unused = {
-> +	{ .compatible = "starfive,jh7110-crypto", .data = NULL},
-> +	{},
-> +};
-> +MODULE_DEVICE_TABLE(of, starfive_dt_ids);
-> +
-> +static struct platform_driver starfive_cryp_driver = {
-> +	.probe  = starfive_cryp_probe,
-> +	.remove = starfive_cryp_remove,
-> +	.driver = {
-> +		.name           = DRIVER_NAME,
-> +		.of_match_table = starfive_dt_ids,
-> +	},
-> +};
-> +
-> +module_platform_driver(starfive_cryp_driver);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_DESCRIPTION("StarFive Cryptographic Module");
-> diff --git a/drivers/crypto/starfive/jh7110-cryp.h b/drivers/crypto/starfive/jh7110-cryp.h
-> new file mode 100644
-> index 000000000000..393efd38b098
-> --- /dev/null
-> +++ b/drivers/crypto/starfive/jh7110-cryp.h
-> @@ -0,0 +1,63 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __STARFIVE_STR_H__
-> +#define __STARFIVE_STR_H__
-> +
-> +#include <linux/delay.h>
-> +#include <linux/dma-mapping.h>
-> +#include <linux/dmaengine.h>
-> +
-> +#include <crypto/engine.h>
-> +
-> +#define STARFIVE_ALG_CR_OFFSET			0x0
-> +#define STARFIVE_ALG_FIFO_OFFSET		0x4
-> +#define STARFIVE_IE_MASK_OFFSET			0x8
-> +#define STARFIVE_IE_FLAG_OFFSET			0xc
-> +#define STARFIVE_DMA_IN_LEN_OFFSET		0x10
-> +#define STARFIVE_DMA_OUT_LEN_OFFSET		0x14
-> +
-> +#define STARFIVE_MSG_BUFFER_SIZE		SZ_16K
-> +
-> +union starfive_alg_cr {
-> +	u32 v;
-> +	struct {
-> +		u32 start			:1;
-> +		u32 aes_dma_en			:1;
-> +		u32 rsvd_0			:1;
-> +		u32 hash_dma_en			:1;
-> +		u32 alg_done			:1;
-> +		u32 rsvd_1			:3;
-> +		u32 clear			:1;
-> +		u32 rsvd_2			:23;
-> +	};
-> +};
-> +
-> +struct starfive_cryp_ctx {
-> +	struct crypto_engine_ctx		enginectx;
-> +	struct starfive_cryp_dev		*cryp;
-> +};
-> +
-> +struct starfive_cryp_dev {
-> +	struct list_head			list;
-> +	struct device				*dev;
-> +
-> +	struct clk				*hclk;
-> +	struct clk				*ahb;
-> +	struct reset_control			*rst;
-> +
-> +	void __iomem				*base;
-> +	phys_addr_t				phys_base;
-> +
-> +	u32					dma_maxburst;
-> +	struct dma_chan				*tx;
-> +	struct dma_chan				*rx;
-> +	struct dma_slave_config			cfg_in;
-> +	struct dma_slave_config			cfg_out;
-> +
-> +	struct crypto_engine			*engine;
-> +
-> +	union starfive_alg_cr			alg_cr;
-> +};
-> +
-> +struct starfive_cryp_dev *starfive_cryp_find_dev(struct starfive_cryp_ctx *ctx);
-> +
-> +#endif
 
