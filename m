@@ -2,88 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92546C7618E
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 23:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C217CC77B60
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 23:23:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239013AbjDZXVU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 19:21:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42174 "EHLO
+        id S233315AbjDZXXi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 19:23:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233315AbjDZXVT (ORCPT
+        with ESMTP id S231631AbjDZXXf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 19:21:19 -0400
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8EA3A9F;
-        Wed, 26 Apr 2023 16:21:08 -0700 (PDT)
-Received: from ip4d1634d3.dynamic.kabel-deutschland.de ([77.22.52.211] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1proR6-0000Cq-Lc; Thu, 27 Apr 2023 01:20:32 +0200
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     Eric Biggers <ebiggers@kernel.org>
+        Wed, 26 Apr 2023 19:23:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874433A90;
+        Wed, 26 Apr 2023 16:23:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 240B96308C;
+        Wed, 26 Apr 2023 23:23:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28A4CC4339B;
+        Wed, 26 Apr 2023 23:23:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682551413;
+        bh=ljfhtZUXSaQHweOFdXEqbHy6V/WG7H3gj8DTqCSLU4k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=U7ysqy1cyC5qk+5uCIMUWE4azLykmQqFV/eT3GtTTFLLHrGb2LGy2Cw1aSYvgGsiU
+         jC4bTHSc4HZBA12fBSlPObnA++Kr+Y0C8JZ2y0Mkc7DW2vj+pymGJRh5vh27NRt9sQ
+         X3zYYFbvGBwpmqA6SV7V/vJj5f2LucE8QPlWw3M1z9rrNZX9wKyepUbxQb4YOi9OlX
+         FIZDy1mFIyqkDRVUK59+RfzdjIjDJoZMBEVi+76sBwdUeYw/e+F0hjD3/4sw8vxXpU
+         GiT1+6oB8BDn+qMZEBqaEBlW5vgD44v8CzHLdhVcTOIklj9ZdV/ZwjDD4oDNfDyiEZ
+         i8+WC/yAE9uvQ==
+Date:   Wed, 26 Apr 2023 16:23:31 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>
 Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
         aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
         davem@davemloft.net, conor.dooley@microchip.com,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu
 Subject: Re: [PATCH v4 0/4] Implement GCM ghash using Zbc and Zbkb extensions
-Date:   Thu, 27 Apr 2023 01:20:31 +0200
-Message-ID: <7664296.GXAFRqVoOG@diego>
-In-Reply-To: <20230426225550.GA65659@sol.localdomain>
+Message-ID: <20230426232331.GB65659@sol.localdomain>
 References: <20230329140642.2186644-1-heiko.stuebner@vrull.eu>
  <20230426225550.GA65659@sol.localdomain>
+ <7664296.GXAFRqVoOG@diego>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7664296.GXAFRqVoOG@diego>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
-
-Am Donnerstag, 27. April 2023, 00:55:50 CEST schrieb Eric Biggers:
-> On Wed, Mar 29, 2023 at 04:06:38PM +0200, Heiko Stuebner wrote:
-> > From: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> > 
-> > This was originally part of my vector crypto series, but was part
-> > of a separate openssl merge request implementing GCM ghash as using
-> > non-vector extensions.
-> > 
-> > As that pull-request
-> >     https://github.com/openssl/openssl/pull/20078
-> > got merged recently into openssl, we could also check if this could
-> > go into the kernel as well and provide a base for further accelerated
-> > cryptographic support.
+On Thu, Apr 27, 2023 at 01:20:31AM +0200, Heiko Stübner wrote:
+> But for me, this small bit of scalar crypto is also sort of a stepping
+> stone :-). Previous versions [0] already included patches using the
+> vector crypto extensions too, I just split that into a separate thing,
+> as _this_ series actually uses ratified extensions :-)
 > 
-> One more question.  It seems that this patchset uses the RISC-V scalar crypto
-> extensions.  I've been hearing rumors that the RISC-V scalar crypto extensions
-> have been superseded by the vector crypto extensions.  Is that accurate?  I
-> wonder if it's worth putting effort into implementations that use the scalar
-> crypto extensions when they might already be obsolete.
+> 
+> Heiko
+> 
+> 
+> 
+> [0] https://lore.kernel.org/lkml/20230313191302.580787-12-heiko.stuebner@vrull.eu/T/
 
-Yes there are the vector crypto extensions - still deep in the
-ratification process.
+That patchset wasn't sent to linux-crypto.  Can you make sure to include
+linux-crypto@vger.kernel.org on any subsequent patchsets?  Thanks!
 
-And of course the RISC-V speciality, all extensions are separate
-entities that core manufacturers can select at will.
-
-And I guess the whole vector extension + vector-crypto extensions
-might require more investment for manufacturers, where the variants
-introduced here also "just" work with bitmanip instructions (Zbb + Zbc
-extensions).
-
-
-But for me, this small bit of scalar crypto is also sort of a stepping
-stone :-). Previous versions [0] already included patches using the
-vector crypto extensions too, I just split that into a separate thing,
-as _this_ series actually uses ratified extensions :-)
-
-
-Heiko
-
-
-
-[0] https://lore.kernel.org/lkml/20230313191302.580787-12-heiko.stuebner@vrull.eu/T/
-
-
+- Eric
