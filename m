@@ -2,119 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 071FAC77B7C
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 18:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1E2C77B78
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 19:12:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236317AbjDZSpa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 14:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56984 "EHLO
+        id S238401AbjDZTMO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 15:12:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236147AbjDZSpZ (ORCPT
+        with ESMTP id S235268AbjDZTMN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 14:45:25 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C5383E1
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 11:45:05 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-63b5fca48bcso6182342b3a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 11:45:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1682534704; x=1685126704;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lXwqrHaYzKo2yrBADgB5WqZEnPYQ+1SHT4/YEIm6rfk=;
-        b=yxmeIMM7AqMrYpjTPhdJvmtkQFPvan9NpmCeQGiyWsJ8rAwTZOYkEjw1ULTCzu/UY/
-         p+JxxPb6kjDGYGiZE6rGIf6FxsOeVd1XHZhjjQ2Jt4srKtvhvz1BgV7n0RYa9HqX5Tcx
-         pGupfUA0qbgmg2dhyuu0IoXpUgUMTMKispsGRNr4cTt3RXtSfFdnWYxRuJLLfAaqJWoC
-         gcJZez6b6z+kNe50a27vXIEmYxCHZZVP7PtZAOjCK4mZPRQPvsgg+f+Nw5U9T8Kk4QnF
-         iZ//DRkyY1yc2h8A7CQpRKuOXCl1fQrYYoUeWxtQK3nHGckqos7RLKXsKDV8iBrIiaXZ
-         XfOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682534704; x=1685126704;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lXwqrHaYzKo2yrBADgB5WqZEnPYQ+1SHT4/YEIm6rfk=;
-        b=ePS5TC8ro9YwIsJHepVicjbFGVbEU1i4oLFx2AHqC3e1kWm/6rddvi/jg+5tTjb0+I
-         8pcZahZ/l7HKE4CNBxxlWDeeb8Bus33JegDKEiXREesA9K+wCFy6ill5Jy3PX1zJzqax
-         VVFL4pgM97tO2VwBPmlEIuGTR/Mk288jbUIC9w8d+SnTdMsZp1YowTFPf/6hd4+iCjzb
-         y02Z5Hcv5FGSdRvx6Hys+0oIchotRLnC4CnB+4H4X8xrANRnszYfmx8QcH3BIFlz5N+9
-         Rjo3qKr8kbWpIZzlFV3vX0NjKWPoVlSTRLq2gAkRddRcV81JAHhp6cLnGeJE5XOJS8AL
-         +dag==
-X-Gm-Message-State: AC+VfDw42CZycPW0mwG6o3JLX/nS9znZmF3BJP4UByMNRzU7pf1J+RlY
-        cOkzi5ppvdPifw4ei2GKA56XnA==
-X-Google-Smtp-Source: ACHHUZ6XGF1YFTCK+4TjiFTAQPFcameE2epgjBDRDaOfU6uZsFJI6CGSCG2MRBu5cCtfg/boc69nAQ==
-X-Received: by 2002:a17:902:f682:b0:1a9:9929:face with SMTP id l2-20020a170902f68200b001a99929facemr5189336plg.34.1682534704484;
-        Wed, 26 Apr 2023 11:45:04 -0700 (PDT)
-Received: from localhost ([50.221.140.188])
-        by smtp.gmail.com with ESMTPSA id 21-20020a170902ee5500b001a0763fa8d6sm10257455plo.98.2023.04.26.11.45.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Apr 2023 11:45:03 -0700 (PDT)
-Date:   Wed, 26 Apr 2023 11:45:03 -0700 (PDT)
-X-Google-Original-Date: Wed, 26 Apr 2023 11:44:26 PDT (-0700)
-Subject:     Re: [PATCH V4 10/23] RISC-V: smpboot: Create wrapper smp_setup()
-In-Reply-To: <20230404182037.863533-11-sunilvl@ventanamicro.com>
-CC:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        llvm@lists.linux.dev, corbet@lwn.net,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        aou@eecs.berkeley.edu, lenb@kernel.org, daniel.lezcano@linaro.org,
-        tglx@linutronix.de, qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, Marc Zyngier <maz@kernel.org>,
-        luzmaximilian@gmail.com, hdegoede@redhat.com, markgross@kernel.org,
-        nathan@kernel.org, ndesaulniers@google.com, trix@redhat.com,
-        rafael@kernel.org, davem@davemloft.net, sunilvl@ventanamicro.com,
-        rafael.j.wysocki@intel.com,
-        Conor Dooley <conor.dooley@microchip.com>,
-        ajones@ventanamicro.com
-From:   Palmer Dabbelt <palmer@dabbelt.com>
-To:     sunilvl@ventanamicro.com
-Message-ID: <mhng-d7d9cb6c-3d07-4286-aa68-e99df654a92b@palmer-ri-x1c9a>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Wed, 26 Apr 2023 15:12:13 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E36C133;
+        Wed, 26 Apr 2023 12:12:10 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33QJ9dwD028793;
+        Wed, 26 Apr 2023 19:11:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=yhvrAIKR5O57Y5/51eA5aOty3mrW59iWoKUgs2oPvAQ=;
+ b=H/PJ+d8IO01PGaMx8ecDjU40okUO18C8qBr2ImM4Pp6VBkuvVuZGSN+CxsqRC8HucE0T
+ jQKg9mUUiGdQ1I7/tUqOH5/jehwnybZUtKMGK8pITFKTl4U3kU9hqL/H6NNx50xfmVaP
+ vrjj/bVkFIc/y58KvRc+0I6xPJDVZAO7F+BOItIx9F5jzsMRlXn/grV0jGVf14IuttAn
+ BexiSvvAarQ/lX9YWXgHzC8zkIHWpu2Zdw8NjbLF0N0rlJIFGuGfFXU6+ultiZP/QtOD
+ hZtBxv8a4v7i/j1JnuePzgFPInPU/TqRxmvyaNutTDVdM6WwTc8FpjzuEH71eSb9s3mP Ag== 
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3q78023apk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Apr 2023 19:11:53 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 33QIYbWi009083;
+        Wed, 26 Apr 2023 19:11:52 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
+        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3q4778cgba-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Apr 2023 19:11:52 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 33QJBoqh36438288
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Apr 2023 19:11:50 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71C4C58059;
+        Wed, 26 Apr 2023 19:11:50 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3CCE258055;
+        Wed, 26 Apr 2023 19:11:50 +0000 (GMT)
+Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
+        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 26 Apr 2023 19:11:50 +0000 (GMT)
+From:   Danny Tsen <dtsen@linux.ibm.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
+        Danny Tsen <dtsen@linux.ibm.com>
+Subject: [PATCH v2 0/5] crypto: Accelerated Chacha20/Poly1305 implementation
+Date:   Wed, 26 Apr 2023 15:11:42 -0400
+Message-Id: <20230426191147.60610-1-dtsen@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1iYHzCvbW89hit0Gy51rS9MZavwYgW2Q
+X-Proofpoint-ORIG-GUID: 1iYHzCvbW89hit0Gy51rS9MZavwYgW2Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-26_10,2023-04-26_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ spamscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 phishscore=0 mlxlogscore=536 clxscore=1015 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304260169
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 04 Apr 2023 11:20:24 PDT (-0700), sunilvl@ventanamicro.com wrote:
-> smp_setup() currently assumes DT-based platforms. To enable ACPI,
-> first make this a wrapper function and move existing code to
-> a separate DT-specific function.
->
-> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/kernel/smpboot.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/riscv/kernel/smpboot.c b/arch/riscv/kernel/smpboot.c
-> index 00b53913d4c6..26214ddefaa4 100644
-> --- a/arch/riscv/kernel/smpboot.c
-> +++ b/arch/riscv/kernel/smpboot.c
-> @@ -70,7 +70,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
->  	}
->  }
->
-> -void __init setup_smp(void)
-> +static void __init of_parse_and_init_cpus(void)
->  {
->  	struct device_node *dn;
->  	unsigned long hart;
-> @@ -116,6 +116,11 @@ void __init setup_smp(void)
->  	}
->  }
->
-> +void __init setup_smp(void)
-> +{
-> +	of_parse_and_init_cpus();
-> +}
-> +
->  static int start_secondary_cpu(int cpu, struct task_struct *tidle)
->  {
->  	if (cpu_ops[cpu]->cpu_start)
+This patch series provide an accelerated/optimized Chacha20 and Poly1305
+implementation for Power10 or later CPU (ppc64le).  This module
+implements algorithm specified in RFC7539.  The implementation
+provides 3.5X better performance than the baseline for Chacha20 and
+Poly1305 individually and 1.5X improvement for Chacha20/Poly1305
+operation.
 
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+This patch has been tested with the kernel crypto module tcrypt.ko and
+has passed the selftest.  The patch is also tested with
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
+
+
+Danny Tsen (5):
+  An optimized Chacha20 implementation with 8-way unrolling for ppc64le.
+  Glue code for optmized Chacha20 implementation for ppc64le.
+  An optimized Poly1305 implementation with 4-way unrolling for ppc64le.
+  Glue code for optmized Poly1305 implementation for ppc64le.
+  Update Kconfig and Makefile.
+
+ arch/powerpc/crypto/Kconfig             |   26 +
+ arch/powerpc/crypto/Makefile            |    4 +
+ arch/powerpc/crypto/chacha-p10-glue.c   |  221 +++++
+ arch/powerpc/crypto/chacha-p10le-8x.S   |  842 ++++++++++++++++++
+ arch/powerpc/crypto/poly1305-p10-glue.c |  186 ++++
+ arch/powerpc/crypto/poly1305-p10le_64.S | 1075 +++++++++++++++++++++++
+ 6 files changed, 2354 insertions(+)
+ create mode 100644 arch/powerpc/crypto/chacha-p10-glue.c
+ create mode 100644 arch/powerpc/crypto/chacha-p10le-8x.S
+ create mode 100644 arch/powerpc/crypto/poly1305-p10-glue.c
+ create mode 100644 arch/powerpc/crypto/poly1305-p10le_64.S
+
+-- 
+2.31.1
+
