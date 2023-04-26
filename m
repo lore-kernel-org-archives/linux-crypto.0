@@ -2,95 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A827CC77B7C
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 08:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F35C77B60
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 08:19:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239464AbjDZIKE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 04:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36884 "EHLO
+        id S229744AbjDZIT0 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 04:19:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240127AbjDZIJ7 (ORCPT
+        with ESMTP id S239683AbjDZITZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 04:09:59 -0400
-Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 382AC1726
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 01:09:57 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-        by smtp.orange.fr with ESMTPA
-        id raDnpA1yS5yGNraDnpJfQb; Wed, 26 Apr 2023 10:09:55 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-        s=t20230301; t=1682496595;
-        bh=LAH0ATvyqMIb5cRVxJ4q6wIOaOYd7NEbV2R9rOtQO/k=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=NwYy5HYlxehL5uwgIHgDaEMuDSSsnez3Al6jf9JWsoWmBoISrbZLVpSLfMvBDATqB
-         eVnLakwyQZdTumiRLZWWokP+E9Um4hQ23HzKGC03YM5cCW1Dnga0UK9WrSqMnBXXMP
-         TgOytrWjmUNNXyKR4cTdfo+sE5y40g0v0ixOIWl/Sy+d6orkmto54kOLjip2LvtCzi
-         V2t99F+/tezNTsR/g4r76eboJ2ej7FiknryDPpC4FOQSr4PSvqXHLHpvkfT6ZwJiSj
-         A58XZxkk6uujn9lPs9RwzxxFqD2KyUrDC2i+/3+1FigA8NUWmYMEhyv9vhlX6iV7GK
-         nFMyJGeTs2rPQ==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Wed, 26 Apr 2023 10:09:55 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <67846b76-1ade-c253-e50b-1c0a0dd0a84a@wanadoo.fr>
-Date:   Wed, 26 Apr 2023 10:09:50 +0200
+        Wed, 26 Apr 2023 04:19:25 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7156C3AA7
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 01:19:22 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-81-f59XHfplO1GBTvvR8VoUKw-1; Wed, 26 Apr 2023 09:19:18 +0100
+X-MC-Unique: f59XHfplO1GBTvvR8VoUKw-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 26 Apr
+ 2023 09:19:17 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 26 Apr 2023 09:19:17 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Danny Tsen' <dtsen@linux.ibm.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "leitao@debian.org" <leitao@debian.org>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
+        "appro@cryptogams.org" <appro@cryptogams.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "ltcgcw@linux.vnet.ibm.com" <ltcgcw@linux.vnet.ibm.com>,
+        "dtsen@us.ibm.com" <dtsen@us.ibm.com>
+Subject: RE: [PATCH 1/5] An optimized Chacha20 implementation with 8-way
+ unrolling for ppc64le.
+Thread-Topic: [PATCH 1/5] An optimized Chacha20 implementation with 8-way
+ unrolling for ppc64le.
+Thread-Index: AQHZdt1hkavbjt5YJ0uOPniHUxI1nq89P9VQ
+Date:   Wed, 26 Apr 2023 08:19:17 +0000
+Message-ID: <0bb5f98165c3408fb191488f3cf0f76c@AcuMS.aculab.com>
+References: <20230424184726.2091-1-dtsen@linux.ibm.com>
+ <20230424184726.2091-2-dtsen@linux.ibm.com>
+In-Reply-To: <20230424184726.2091-2-dtsen@linux.ibm.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v6 4/4] crypto: starfive - Add hash and HMAC support
-Content-Language: fr
-To:     jiajie.ho@starfivetech.com
-Cc:     davem@davemloft.net, devicetree@vger.kernel.org,
-        herbert@gondor.apana.org.au, kernel@esmil.dk,
-        krzysztof.kozlowski+dt@linaro.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, robh+dt@kernel.org
-References: <20230426065848.842221-1-jiajie.ho@starfivetech.com>
- <20230426065848.842221-5-jiajie.ho@starfivetech.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20230426065848.842221-5-jiajie.ho@starfivetech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 26/04/2023 à 08:58, Jia Jie Ho a écrit :
-> Adding hash/HMAC support for SHA-2 and SM3 to StarFive cryptographic
-> module.
+From: Danny Tsen
+> Sent: 24 April 2023 19:47
 > 
-> Co-developed-by: Huan Feng <huan.feng-bONrM45KWFOXmMXjJBpWqg@public.gmane.org>
-> Signed-off-by: Huan Feng <huan.feng-bONrM45KWFOXmMXjJBpWqg@public.gmane.org>
-> Signed-off-by: Jia Jie Ho <jiajie.ho-bONrM45KWFOXmMXjJBpWqg@public.gmane.org>
+> Improve overall performance of chacha20 encrypt and decrypt operations
+> for Power10 or later CPU.
+> 
+> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 > ---
->   drivers/crypto/starfive/Kconfig       |   4 +
->   drivers/crypto/starfive/Makefile      |   2 +-
->   drivers/crypto/starfive/jh7110-cryp.c |  38 ++
->   drivers/crypto/starfive/jh7110-cryp.h |  70 +-
->   drivers/crypto/starfive/jh7110-hash.c | 896 ++++++++++++++++++++++++++
->   5 files changed, 1006 insertions(+), 4 deletions(-)
->   create mode 100644 drivers/crypto/starfive/jh7110-hash.c
-> 
-
-[...]
-
-> +int starfive_hash_register_algs(void)
-> +{
-> +	int ret = 0;
+>  arch/powerpc/crypto/chacha-p10le-8x.S | 842 ++++++++++++++++++++++++++
+>  1 file changed, 842 insertions(+)
+>  create mode 100644 arch/powerpc/crypto/chacha-p10le-8x.S
+...
+> +.macro QT_loop_8x
+> +	# QR(v0, v4,  v8, v12, v1, v5,  v9, v13, v2, v6, v10, v14, v3, v7, v11, v15)
+> +	xxlor	0, 32+25, 32+25
+> +	xxlor	32+25, 20, 20
+> +	vadduwm 0, 0, 4
+> +	vadduwm 1, 1, 5
+> +	vadduwm 2, 2, 6
+> +	vadduwm 3, 3, 7
+> +	  vadduwm 16, 16, 20
+> +	  vadduwm 17, 17, 21
+> +	  vadduwm 18, 18, 22
+> +	  vadduwm 19, 19, 23
 > +
-> +	ret = crypto_register_ahashes(algs_sha2_sm3, ARRAY_SIZE(algs_sha2_sm3));
-> +
-> +	return ret;
+> +	  vpermxor 12, 12, 0, 25
+> +	  vpermxor 13, 13, 1, 25
+> +	  vpermxor 14, 14, 2, 25
+> +	  vpermxor 15, 15, 3, 25
+> +	  vpermxor 28, 28, 16, 25
+> +	  vpermxor 29, 29, 17, 25
+> +	  vpermxor 30, 30, 18, 25
+> +	  vpermxor 31, 31, 19, 25
+> +	xxlor	32+25, 0, 0
+> +	vadduwm 8, 8, 12
+> +	vadduwm 9, 9, 13
+> +	vadduwm 10, 10, 14
+> +	vadduwm 11, 11, 15
+...
 
-Nit: return crypto_register_ahashes(algs_sha2_sm3, 
-ARRAY_SIZE(algs_sha2_sm3));
+Is it just me or is all this code just complete jibberish?
 
-?
+There really ought to be enough comments so that it is possible
+to check that the code is doing something that looks like chacha20
+without spending all day tracking register numbers through
+hundreds of lines of assembler.
 
-> +}
-> +
-> +void starfive_hash_unregister_algs(void)
-> +{
-> +	crypto_unregister_ahashes(algs_sha2_sm3, ARRAY_SIZE(algs_sha2_sm3));
-> +}
+I also wonder how much faster the 8-way unroll is?
+On modern cpu with 'out of order' execute (etc) it is
+not impossible to get the loop operations 'for free'
+because they use execution units that are otherwise idle.
+
+Massive loop unrolling is so 1980's.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
