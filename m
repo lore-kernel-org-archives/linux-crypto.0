@@ -2,124 +2,75 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F35C77B60
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 08:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13471C7618E
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Apr 2023 08:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229744AbjDZIT0 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Apr 2023 04:19:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43698 "EHLO
+        id S239639AbjDZIpd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Apr 2023 04:45:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239683AbjDZITZ (ORCPT
+        with ESMTP id S239752AbjDZIpc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Apr 2023 04:19:25 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7156C3AA7
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 01:19:22 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-81-f59XHfplO1GBTvvR8VoUKw-1; Wed, 26 Apr 2023 09:19:18 +0100
-X-MC-Unique: f59XHfplO1GBTvvR8VoUKw-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 26 Apr
- 2023 09:19:17 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 26 Apr 2023 09:19:17 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Danny Tsen' <dtsen@linux.ibm.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "leitao@debian.org" <leitao@debian.org>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "appro@cryptogams.org" <appro@cryptogams.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "ltcgcw@linux.vnet.ibm.com" <ltcgcw@linux.vnet.ibm.com>,
-        "dtsen@us.ibm.com" <dtsen@us.ibm.com>
-Subject: RE: [PATCH 1/5] An optimized Chacha20 implementation with 8-way
- unrolling for ppc64le.
-Thread-Topic: [PATCH 1/5] An optimized Chacha20 implementation with 8-way
- unrolling for ppc64le.
-Thread-Index: AQHZdt1hkavbjt5YJ0uOPniHUxI1nq89P9VQ
-Date:   Wed, 26 Apr 2023 08:19:17 +0000
-Message-ID: <0bb5f98165c3408fb191488f3cf0f76c@AcuMS.aculab.com>
-References: <20230424184726.2091-1-dtsen@linux.ibm.com>
- <20230424184726.2091-2-dtsen@linux.ibm.com>
-In-Reply-To: <20230424184726.2091-2-dtsen@linux.ibm.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Wed, 26 Apr 2023 04:45:32 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8E52684
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Apr 2023 01:45:25 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1praly-002Vld-Vg; Wed, 26 Apr 2023 16:45:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Apr 2023 16:45:12 +0800
+Date:   Wed, 26 Apr 2023 16:45:12 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Gaosheng Cui <cuigaosheng1@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: jitter - change module_init(jent_mod_init)
+ to subsys_initcall(jent_mod_init)
+Message-ID: <ZEjkmOPvk7Iz213G@gondor.apana.org.au>
+References: <20230425125709.39470-1-cuigaosheng1@huawei.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230425125709.39470-1-cuigaosheng1@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Danny Tsen
-> Sent: 24 April 2023 19:47
+On Tue, Apr 25, 2023 at 08:57:09PM +0800, Gaosheng Cui wrote:
+> The ecdh-nist-p256 algorithm will depend on jitterentropy_rng,
+> and when they are built into kernel, the order of registration
+> should be done such that the underlying algorithms are ready
+> before the ones on top are registered.
 > 
-> Improve overall performance of chacha20 encrypt and decrypt operations
-> for Power10 or later CPU.
+> Now ecdh is initialized with subsys_initcall but jitterentropy_rng
+> is initialized with module_init.
 > 
-> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+> This patch will change module_init(jent_mod_init) to
+> subsys_initcall(jent_mod_init), so jitterentropy_rng will be
+> registered before ecdh-nist-p256 when they are built into kernel.
+> 
+> Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
 > ---
->  arch/powerpc/crypto/chacha-p10le-8x.S | 842 ++++++++++++++++++++++++++
->  1 file changed, 842 insertions(+)
->  create mode 100644 arch/powerpc/crypto/chacha-p10le-8x.S
-...
-> +.macro QT_loop_8x
-> +	# QR(v0, v4,  v8, v12, v1, v5,  v9, v13, v2, v6, v10, v14, v3, v7, v11, v15)
-> +	xxlor	0, 32+25, 32+25
-> +	xxlor	32+25, 20, 20
-> +	vadduwm 0, 0, 4
-> +	vadduwm 1, 1, 5
-> +	vadduwm 2, 2, 6
-> +	vadduwm 3, 3, 7
-> +	  vadduwm 16, 16, 20
-> +	  vadduwm 17, 17, 21
-> +	  vadduwm 18, 18, 22
-> +	  vadduwm 19, 19, 23
-> +
-> +	  vpermxor 12, 12, 0, 25
-> +	  vpermxor 13, 13, 1, 25
-> +	  vpermxor 14, 14, 2, 25
-> +	  vpermxor 15, 15, 3, 25
-> +	  vpermxor 28, 28, 16, 25
-> +	  vpermxor 29, 29, 17, 25
-> +	  vpermxor 30, 30, 18, 25
-> +	  vpermxor 31, 31, 19, 25
-> +	xxlor	32+25, 0, 0
-> +	vadduwm 8, 8, 12
-> +	vadduwm 9, 9, 13
-> +	vadduwm 10, 10, 14
-> +	vadduwm 11, 11, 15
-...
+>  crypto/jitterentropy-kcapi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+> index b9edfaa51b27..563c1ea8c8fe 100644
+> --- a/crypto/jitterentropy-kcapi.c
+> +++ b/crypto/jitterentropy-kcapi.c
+> @@ -205,7 +205,7 @@ static void __exit jent_mod_exit(void)
+>  	crypto_unregister_rng(&jent_alg);
+>  }
+>  
+> -module_init(jent_mod_init);
+> +subsys_initcall(jent_mod_init);
 
-Is it just me or is all this code just complete jibberish?
+This is unnecessary because we now postpone the testing of all
+algorithms until their first use.  So unless something in the
+kernel makes use of this before/during module_init, then we don't
+need to move jent.
 
-There really ought to be enough comments so that it is possible
-to check that the code is doing something that looks like chacha20
-without spending all day tracking register numbers through
-hundreds of lines of assembler.
-
-I also wonder how much faster the 8-way unroll is?
-On modern cpu with 'out of order' execute (etc) it is
-not impossible to get the loop operations 'for free'
-because they use execution units that are otherwise idle.
-
-Massive loop unrolling is so 1980's.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
