@@ -2,172 +2,217 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD93C7EE21
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Apr 2023 05:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4265DC77B7F
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Apr 2023 09:23:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242586AbjD0FHN convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Apr 2023 01:07:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43272 "EHLO
+        id S243311AbjD0JXM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Apr 2023 05:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242675AbjD0FHM (ORCPT
+        with ESMTP id S243264AbjD0JXL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Apr 2023 01:07:12 -0400
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2247B4489;
-        Wed, 26 Apr 2023 22:07:08 -0700 (PDT)
-Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id E186C24E12B;
-        Thu, 27 Apr 2023 13:06:54 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
- (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 27 Apr
- 2023 13:06:54 +0800
-Received: from [192.168.155.161] (202.188.176.82) by EXMBX168.cuchost.com
- (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 27 Apr
- 2023 13:06:51 +0800
-Message-ID: <65fde5d5-6d86-c94e-9985-231e81641386@starfivetech.com>
-Date:   Thu, 27 Apr 2023 13:06:49 +0800
+        Thu, 27 Apr 2023 05:23:11 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438D02D71
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Apr 2023 02:23:03 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-63b35789313so5859533b3a.3
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Apr 2023 02:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1682587383; x=1685179383;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b4tmAtbJaHWfTAbFkdGyP1UUwCahMULqyPQK3zTjGzc=;
+        b=K5jLEqhDbTkTtYuPE6+Ra/lfEGtBsFz6bD+QwskySxg855wiFn0qDjLEfswlGFfhfi
+         tOdnFRv/n7SuEaT5szOXglGImaRKUHKwKldEAxzxH8OTFpP2ASczXusutBgYCAJ/IM9T
+         qo/cclpS2UtxF+D7UaTNfNS7UgHAlWLwobc28ylRvM2rShK2glsBS8xQIVZbUdIkEdf3
+         ZAokL+mH+OIn/pqvNLquuERSdwdpP2zLejahscptpuC6+PX+rVTUqyzeT4HuLEKlWgVz
+         xzCrcMujA0CBmsmbswdLf0XRvh1srcH3cIpJyWqm2bh3PmIcbbDULRMbPmHyZGvksUDj
+         UbjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682587383; x=1685179383;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b4tmAtbJaHWfTAbFkdGyP1UUwCahMULqyPQK3zTjGzc=;
+        b=FISLTwpLi9gmwrIrzznU8QBOjv2kNyUBu2VuAXNxW6fTfnXgXCqz+k7n7xJnYteXS4
+         LdA9zLpmk5pKiOX6dkZ5HHRZ0IuRweDxVqRwuYjMm1o+rir2LX1HeT474+ZXFcADbR8y
+         Rf378uvmkW61U6MI9U3yUgAANrjvL0xkksjltZ/r2qim41Ca3tZH2mjHbwWs4BV4Epr3
+         3M7RgKOoUB8U094P4j2htFMdtGitq5fFD2mle+gR+6UaBmcIiwKJHKHBVM32dAnIxMk7
+         SQL0vcw/3ddTUrOLDyFWfPWDxWmN9eXvffAZBTNTY2/WdXiU93fe44yAtJShjfs6M4cx
+         DmPw==
+X-Gm-Message-State: AC+VfDx3YqzZhL5mD+oVxe+6vCFuwIOqRU+U/2Xg/QGPVSTwHZvKUL3W
+        VfHRJfBwbqc387OvbMBuHmkmCQ==
+X-Google-Smtp-Source: ACHHUZ7RWci9fHcfj1Kz5md3jazQZh7oA/8a9iSA8EEYdE24w8faCyvnC3O4ecPFfRxC69G0cl789g==
+X-Received: by 2002:a05:6a00:22ca:b0:63b:5c82:e21a with SMTP id f10-20020a056a0022ca00b0063b5c82e21amr1814185pfj.1.1682587382560;
+        Thu, 27 Apr 2023 02:23:02 -0700 (PDT)
+Received: from sunil-laptop ([2409:4071:6e90:4e5:b276:2557:8da6:6c7e])
+        by smtp.gmail.com with ESMTPSA id i66-20020a62c145000000b0063d318699f9sm12712205pfg.48.2023.04.27.02.22.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Apr 2023 02:23:02 -0700 (PDT)
+Date:   Thu, 27 Apr 2023 14:52:50 +0530
+From:   Sunil V L <sunilvl@ventanamicro.com>
+To:     Palmer Dabbelt <palmer@dabbelt.com>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        llvm@lists.linux.dev, corbet@lwn.net,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, lenb@kernel.org, daniel.lezcano@linaro.org,
+        tglx@linutronix.de, qianweili@huawei.com, wangzhou1@hisilicon.com,
+        herbert@gondor.apana.org.au, Marc Zyngier <maz@kernel.org>,
+        luzmaximilian@gmail.com, hdegoede@redhat.com, markgross@kernel.org,
+        nathan@kernel.org, ndesaulniers@google.com, trix@redhat.com,
+        rafael@kernel.org, davem@davemloft.net, rafael.j.wysocki@intel.com
+Subject: Re: [PATCH V4 08/23] RISC-V: ACPI: Cache and retrieve the RINTC
+ structure
+Message-ID: <ZEo+6rwM+c6DvlMM@sunil-laptop>
+References: <20230404182037.863533-9-sunilvl@ventanamicro.com>
+ <mhng-fd6c3622-ce6c-4895-8dc9-7dbaa2ab14f4@palmer-ri-x1c9a>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH v6 2/4] crypto: starfive - Add crypto engine support
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-CC:     <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <kernel@esmil.dk>,
-        <krzysztof.kozlowski+dt@linaro.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-riscv@lists.infradead.org>, <palmer@dabbelt.com>,
-        <robh+dt@kernel.org>
-References: <20230426065848.842221-1-jiajie.ho@starfivetech.com>
- <20230426065848.842221-3-jiajie.ho@starfivetech.com>
- <c3faff36-3698-a137-f007-ff8bca6a2e88@wanadoo.fr>
-Content-Language: en-US
-From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
-In-Reply-To: <c3faff36-3698-a137-f007-ff8bca6a2e88@wanadoo.fr>
-Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [202.188.176.82]
-X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
- (172.16.6.78)
-X-YovoleRuleAgent: yovoleflag
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <mhng-fd6c3622-ce6c-4895-8dc9-7dbaa2ab14f4@palmer-ri-x1c9a>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 26/4/2023 3:56 pm, Christophe JAILLET wrote:
-> Le 26/04/2023 à 08:58, Jia Jie Ho a écrit :
->> Adding device probe and DMA init for StarFive cryptographic module.
->>
->> Co-developed-by: Huan Feng <huan.feng-bONrM45KWFOXmMXjJBpWqg@public.gmane.org>
->> Signed-off-by: Huan Feng <huan.feng-bONrM45KWFOXmMXjJBpWqg@public.gmane.org>
->> Signed-off-by: Jia Jie Ho <jiajie.ho-bONrM45KWFOXmMXjJBpWqg@public.gmane.org>
->> ---
->>   MAINTAINERS                           |   7 +
->>   drivers/crypto/Kconfig                |   1 +
->>   drivers/crypto/Makefile               |   1 +
->>   drivers/crypto/starfive/Kconfig       |  17 +++
->>   drivers/crypto/starfive/Makefile      |   4 +
->>   drivers/crypto/starfive/jh7110-cryp.c | 199 ++++++++++++++++++++++++++
->>   drivers/crypto/starfive/jh7110-cryp.h |  63 ++++++++
->>   7 files changed, 292 insertions(+)
->>   create mode 100644 drivers/crypto/starfive/Kconfig
->>   create mode 100644 drivers/crypto/starfive/Makefile
->>   create mode 100644 drivers/crypto/starfive/jh7110-cryp.c
->>   create mode 100644 drivers/crypto/starfive/jh7110-cryp.h
->>
+Hi Palmer,
 
-[...]
-
->> +
->> +static int starfive_dma_init(struct starfive_cryp_dev *cryp)
->> +{
->> +    dma_cap_mask_t mask;
->> +
->> +    cryp->tx = NULL;
->> +    cryp->rx = NULL;
+On Wed, Apr 26, 2023 at 11:45:00AM -0700, Palmer Dabbelt wrote:
+> On Tue, 04 Apr 2023 11:20:22 PDT (-0700), sunilvl@ventanamicro.com wrote:
+> > RINTC structures in the MADT provide mapping between the hartid
+> > and the CPU. This is required many times even at run time like
+> > cpuinfo. So, instead of parsing the ACPI table every time, cache
+> > the RINTC structures and provide a function to get the correct
+> > RINTC structure for a given cpu.
+> > 
+> > Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
+> > Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> > ---
+> >  arch/riscv/include/asm/acpi.h |  2 ++
+> >  arch/riscv/kernel/acpi.c      | 60 +++++++++++++++++++++++++++++++++++
+> >  2 files changed, 62 insertions(+)
+> > 
+> > diff --git a/arch/riscv/include/asm/acpi.h b/arch/riscv/include/asm/acpi.h
+> > index 9be52b6ffae1..1606dce8992e 100644
+> > --- a/arch/riscv/include/asm/acpi.h
+> > +++ b/arch/riscv/include/asm/acpi.h
+> > @@ -59,6 +59,8 @@ static inline bool acpi_has_cpu_in_madt(void)
+> > 
+> >  static inline void arch_fix_phys_package_id(int num, u32 slot) { }
+> > 
+> > +struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu);
+> > +u32 get_acpi_id_for_cpu(int cpu);
+> >  #endif /* CONFIG_ACPI */
+> > 
+> >  #endif /*_ASM_ACPI_H*/
+> > diff --git a/arch/riscv/kernel/acpi.c b/arch/riscv/kernel/acpi.c
+> > index 81d448c41714..40ab55309c70 100644
+> > --- a/arch/riscv/kernel/acpi.c
+> > +++ b/arch/riscv/kernel/acpi.c
+> > @@ -24,6 +24,66 @@ EXPORT_SYMBOL(acpi_disabled);
+> >  int acpi_pci_disabled = 1;	/* skip ACPI PCI scan and IRQ initialization */
+> >  EXPORT_SYMBOL(acpi_pci_disabled);
+> > 
+> > +static struct acpi_madt_rintc cpu_madt_rintc[NR_CPUS];
+> > +
+> > +static int acpi_parse_madt_rintc(union acpi_subtable_headers *header, const unsigned long end)
+> > +{
+> > +	struct acpi_madt_rintc *rintc = (struct acpi_madt_rintc *)header;
+> > +	int cpuid;
+> > +
+> > +	if (!(rintc->flags & ACPI_MADT_ENABLED))
+> > +		return 0;
+> > +
+> > +	cpuid = riscv_hartid_to_cpuid(rintc->hart_id);
 > 
-> Harmless, but 'crypt' is kzalloc()'ed, so these fields are already NULL.
->
-
-Hi Christophe,
-I'll remove these in the next version.
- 
->> +
->> +    dma_cap_zero(mask);
->> +    dma_cap_set(DMA_SLAVE, mask);
->> +
->> +    cryp->tx = dma_request_chan(cryp->dev, "tx");
->> +    if (IS_ERR(cryp->tx))
->> +        return dev_err_probe(cryp->dev, PTR_ERR(cryp->tx),
->> +                     "Error requesting tx dma channel.\n");
->> +
->> +    cryp->rx = dma_request_chan(cryp->dev, "rx");
->> +    if (IS_ERR(cryp->rx)) {
->> +        dma_release_channel(cryp->tx);
->> +        return dev_err_probe(cryp->dev, PTR_ERR(cryp->rx),
->> +                     "Error requesting rx dma channel.\n");
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static void starfive_dma_cleanup(struct starfive_cryp_dev *cryp)
->> +{
->> +    dma_release_channel(cryp->tx);
->> +    dma_release_channel(cryp->rx);
->> +}
->> +
->> +static int starfive_cryp_probe(struct platform_device *pdev)
->> +{
-
-[...]
-
->> +
->> +    ret = crypto_engine_start(cryp->engine);
->> +    if (ret)
->> +        goto err_engine_start;
->> +
->> +    return 0;
->> +
->> +err_engine_start:
->> +    crypto_engine_exit(cryp->engine);
->> +err_engine:
->> +    starfive_dma_cleanup(cryp);
->> +err_dma_init:
->> +    spin_lock(&dev_list.lock);
->> +    list_del(&cryp->list);
->> +    spin_unlock(&dev_list.lock);
+> Unless I'm missing something, this races with CPUs coming online.  Maybe
+> that's a rare enough case we don't care, but I think we'd also just have
+> simpler logic if we fixed it...
 > 
-> I think that there should be:
->     clk_disable_unprepare(cryp->hclk);
->     clk_disable_unprepare(cryp->ahb);
->     reset_control_assert(cryp->rst);
+This depend only on cpuid_to_hartid_map filled up. I wish I could
+initialize this RINTC mapping in setup_smp() itself like ARM64. But in
+RISC-V, this file smpboot.c gets built only when CONFIG_SMP is enabled.
+Hence, we need to initialize this array outside of setup_smp().
+
+I can update the code to initialize this from setup_arch() immediately
+after setup_smp() if ACPI is enabled. That should avoid the global
+variable check also. Let me know if you prefer this.
+
+> > +	/*
+> > +	 * When CONFIG_SMP is disabled, mapping won't be created for
+> > +	 * all cpus.
+> > +	 * CPUs more than NR_CPUS, will be ignored.
+> > +	 */
+> > +	if (cpuid >= 0 && cpuid < NR_CPUS)
+> > +		cpu_madt_rintc[cpuid] = *rintc;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int acpi_init_rintc_array(void)
+> > +{
+> > +	if (acpi_table_parse_madt(ACPI_MADT_TYPE_RINTC, acpi_parse_madt_rintc, 0) > 0)
+> > +		return 0;
+> > +
+> > +	return -ENODEV;
+> > +}
+> > +
+> > +/*
+> > + * Instead of parsing (and freeing) the ACPI table, cache
+> > + * the RINTC structures since they are frequently used
+> > + * like in  cpuinfo.
+> > + */
+> > +struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu)
+> > +{
+> > +	static bool rintc_init_done;
 > 
-> as in the remove function.
+> ... basically just get rid of this global variable, and instead have a
+> 
+>    if (!&cpu_madt_rintc[cpu])
+>        ... parse ...
+>    return &cpu_madt_rintc[cpu];
+> 
+> that'd probably let us get rid of a handful of these helpers too, as now
+> it's just a call to the parsing bits.
+> 
+I am afraid this (!&cpu_madt_rintc[cpu]) check won't work since we are
+not caching the RINTC pointers but actual contents itself. So, the
+address is always valid. However, as per Drew's earlier feedback I am
+going to reduce one helper. I am planning to send the next version of
+this patch once 6.4 rc1 is available since the ACPICA patches are merged
+now.
+
+> > +
+> > +	if (!rintc_init_done) {
+> > +		if (acpi_init_rintc_array()) {
+> > +			pr_err("No valid RINTC entries exist\n");
+> > +			return NULL;
+> > +		}
+> > +
+> > +		rintc_init_done = true;
+> > +	}
+> > +
+> > +	return &cpu_madt_rintc[cpu];
+> > +}
+> > +
+> > +u32 get_acpi_id_for_cpu(int cpu)
+> > +{
+> > +	struct acpi_madt_rintc *rintc = acpi_cpu_get_madt_rintc(cpu);
+> > +
+> > +	BUG_ON(!rintc);
+> 
+> We should have some better error reporting here.  It looks like all the
+> callerss of get_acpi_id_for_cpu() are tolerant of a nonsense ID being
+> returned, so maybe we just pr_warn() something users can understand and then
+> return -1 or something?
 > 
 
-Will add these in next version.
+RINTC is mandatory for ACPI systems. Also, all 32bit values are valid
+for UID. So, there is no bogus value we can return. 
 
->> +
->> +    return ret;
->> +}
->> +
->> +static int starfive_cryp_remove(struct platform_device *pdev)
->> +{
->> +    struct starfive_cryp_dev *cryp = platform_get_drvdata(pdev);
->> +
->> +    if (!cryp)
->> +        return -ENODEV;
-> 
-> I don't think that this can happen.
-> 
+Actually, I just realized this check is redundant. It will never be NULL
+since it is a static array. So, we can just get rid of the BUG.
 
-I'll update this too along with your other comments.
-Thanks for taking time reviewing this patch series.
-
-Best regards,
-Jia Jie
-
-
+Thanks!
+Sunil
