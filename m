@@ -2,1082 +2,206 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FD0C77B60
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 11:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFBFC77B61
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 12:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345632AbjD1LEo (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 07:04:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47674 "EHLO
+        id S229934AbjD1M7W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Apr 2023 08:59:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345519AbjD1LEn (ORCPT
+        with ESMTP id S229551AbjD1M7V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2023 07:04:43 -0400
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4557E448C
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Apr 2023 04:03:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1682679713; c=relaxed/relaxed; h=date:from:message-id:mime-version:subject:to; bh=V56FEsJobNDyA19FboZVS3+KQvUZ3u+gIvK5WOE8Nt0=; b=A/QjAUbrNjSWM/4wseqSHNw1zrSaoDrWqoi8VPZMude8HAyBXWlGeDH32QRrKUKPPOpnt5FyJeIFSq6smoEwbjMpiWGc5hDpmyLVyNbG9tSJkpaMhNRK+t2zW83iJ4yshwj6NjXFZxxvjNB4GFwlhFoUR89uPoEpc7tJDGY1zTfnZN9xBkdTGHIifloNEHlyBwF/jxNKshl8n7WpGudvdj7gbLoFBrCbxyibihqid15UIvLToYCCsXh9XpEy9ex332Zph5OdHd6CosqzCQBK5GsRbI3tWJsjhhO5pzrFhdGb7PzgH5lweCdZkN6H0RbX4Wfgb9WVNPjUFcyP0BFC+A==
-Received: from 210.104.33.70 (nsr.re.kr)
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-        by mail.nsr.re.kr with SMTP; Fri, 28 Apr 2023 19:59:32 +0900
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 623;
-          Fri, 28 Apr 2023 20:01:11 +0900 (KST)
-From:   Dongsoo Lee <letrhee@nsr.re.kr>
-To:     linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        "David S. Miller" <abc@test.nsr.re.kr>,
-        Dongsoo Lee <letrhee@gmail.com>,
-        Dongsoo Lee <letrhee@nsr.re.kr>
-Subject: [PATCH 1/3] crypto: LEA block cipher implementation
-Date:   Fri, 28 Apr 2023 20:00:56 +0900
-Message-Id: <20230428110058.1516119-2-letrhee@nsr.re.kr>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230428110058.1516119-1-letrhee@nsr.re.kr>
-References: <20230428110058.1516119-1-letrhee@nsr.re.kr>
+        Fri, 28 Apr 2023 08:59:21 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C22319BE;
+        Fri, 28 Apr 2023 05:59:20 -0700 (PDT)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33S7iEgR032679;
+        Fri, 28 Apr 2023 12:59:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=8t0eS7tzgne541sUYB4lRlU/IV34EjZJTfHY582pXgE=;
+ b=pP7GvZAabti5DSBjllibumnc3tqREAsgv/vyPSHRRK60aV4nlqdxNxqB0hGTLpgykzs8
+ 8hYJwKl1S1s5uTl33Eh/thoLeCl2gDTHq63DaDM8+6IT110WEZCavDHZSxA2zyFBaxSi
+ lMRshGhzEE7CiD3CA7SvkLHCfofcMS2gNwjy2FRW6HUxfAH95ry5SUKq2RF/2Qvuki+j
+ XXt22iQs5G96J7ApU4MgNbxz3UWPIg6zwwbs00FsgrlBjRmL2JWVQgIftncZhMqTLS0e
+ 2FyeGBkSS/veokiZ6PnCFl6AoB1R6KBeRaOxezrqD9+3p5tHUTCtn6orjFih/mFra348 tQ== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3q47fax6g5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Apr 2023 12:59:11 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33SCBBnv029932;
+        Fri, 28 Apr 2023 12:59:09 GMT
+Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2048.outbound.protection.outlook.com [104.47.74.48])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3q461arukv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Apr 2023 12:59:09 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gnK9LUvGhZPd0FGFpHQKLiz77+v/OI7hAQAKAhAS4GyhOMWoaKn6IhC8i2L7vsUbr4V3t1r8c3EXGpJftnzw/mlSyS9TiG885NsFhY9QLJQsyAD+S6t+3Tq+HBWpqPrw6/27fZ1JHMG0QTHPtX6inx4ny+6eGdSfGJ6zA9J89DNIEF+HwLdtSAk4sMf/0Z3qHj9/yzueds+lLFMe/J3edD+a5srA62k4GL01MhBh23CWYGl/Ui+IAnm5g1PBrC6f9PuqnG4JY6ihNmitBfxXp8tJ5XUNnKR76cOZKemGm2yx1MMN9qKMMquA7HQZfKHRN5j27SHtVxyMWvKGkjcTkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8t0eS7tzgne541sUYB4lRlU/IV34EjZJTfHY582pXgE=;
+ b=aaACejdqBGBu60Y9A2kgK5rgyN1aXjBAkezeQF26u723sReRpyJDoFqazPGmd7EVQDUEHm00ZcPbpfNpLzjFioVusOXttRmx2yMI364IdnPvcgiErx9iod7Nq34ZtXfV1B+nbcg4LqL7Vr1M/HEnIbnWOEqZutkr/BSTlWjPE0PYegsyDjh0anac9+oQ7xk+JYuq47QdIAVdob0t2hyONxU+kAPYfGIpZji96Nr3a73+ifpS/4CvuhLneYQ516TqfmVti0MjClHoitwWXelM+N7T3OxRDU2s/q52Fp3o8O4Pwfe7JWg218VXof5cIz7lU5uBPUFXgB12sYPnvk49Gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8t0eS7tzgne541sUYB4lRlU/IV34EjZJTfHY582pXgE=;
+ b=qwoKbfwW3A1TB5GwDzhtJbLkHmmjjckSmeRLnN+1P+XjTwlReDUI4Ifn70JPoHE063fdIDu476ElGGK83WMRAikBdv/Ycc7DuJ2p+SRykCWallQXY/C9bD+/2XpNH9qp/1UkoXV66QL6AqQ8GTUnJn+B3pzZnncLrX969F2XHCY=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by IA1PR10MB7261.namprd10.prod.outlook.com (2603:10b6:208:3f6::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.21; Fri, 28 Apr
+ 2023 12:59:07 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::ecbd:fc46:2528:36db]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::ecbd:fc46:2528:36db%5]) with mapi id 15.20.6340.024; Fri, 28 Apr 2023
+ 12:59:07 +0000
+From:   Chuck Lever III <chuck.lever@oracle.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Scott Mayhew <smayhew@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+Subject: Re: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
+ ciphers enabled
+Thread-Topic: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
+ ciphers enabled
+Thread-Index: AQHZcwlyVC5Tj4/bTUCg0bPZoyBbT69Ahe0AgAADmoCAADLHAA==
+Date:   Fri, 28 Apr 2023 12:59:07 +0000
+Message-ID: <F46EA3E0-1338-4E92-8CCF-DD869BD573BE@oracle.com>
+References: <ZEBi8ReG9LKLcmW3@aion.usersys.redhat.com>
+ <ZEuVcizjPtG96/ST@gondor.apana.org.au>
+ <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
+In-Reply-To: <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3731.500.231)
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|IA1PR10MB7261:EE_
+x-ms-office365-filtering-correlation-id: 00a8bd2b-8b00-43ba-8327-08db47e85a4e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZhGmnuWnnqkF0GSdFn0V1DXKb696B21VajzZxUGu0obsMOTFfjsgBUp6aZlg5o9m6+6fIh14ndo6mxERrgMwsY4oAjacL0g20muNFPn8y1LN6BcAX5F5yzS8592O2IlBnmqbiZx4+YIWAwEJqfH3nJ7HbiJjX/Ybkfcfytu/LlYacvAuTO4F4I0wwAce/Mt9QsYcwn8TZPZbveepekd7CBJlG511HZy9aotD2Y98B4APbu2Y8Z207KwLfgYN5sBnESnN5LdPgMnORC54cK8FcwLgpZqYHUQ6748h9P48z4hT1irQXwEyUrDA3J4Ac5r+nIu1/l75slmADc0vdNLXb2dlvbnlp+XaqrWskw9Ukov56ux3lLS8oNFyTqo8MuTo+tQ/2t8/sOJyQz85cd4BY2CXP8cxC6sCaJbiUGDml1IHHO1LnbNqNvFGz1OaVPIEPHJtXQGbzSOser/ydnu7yhzhOSZ6lY2gTSsJf45bHVGcGpkuC10JZdicC0NkJHFRcVQovglz19wExa7PMoMYKvhv4uCjHRu2RP9tEc5DfFQr8fgy9UA4a8AOPa79wG4tJpr78XX4EinPuQDh7U/e5TEQ/8CkjFHTHlm93V0bPPRWBuDkcKQwpysU0h+R15BSH3ZSalt87osXs4kbdmnjRw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(366004)(39860400002)(346002)(396003)(451199021)(6486002)(36756003)(83380400001)(53546011)(71200400001)(186003)(2906002)(6512007)(26005)(6506007)(478600001)(54906003)(2616005)(33656002)(316002)(66946007)(66446008)(6916009)(66476007)(76116006)(4326008)(64756008)(66556008)(8676002)(86362001)(38100700002)(122000001)(5660300002)(91956017)(8936002)(41300700001)(38070700005)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1YEUK/9wk2lem+vxuWeIZVBcGGzOKR8r7pTGH+4HfNuNNSoiZd7/GzaUph2C?=
+ =?us-ascii?Q?6KMTdxMxDPlSyPSFwC19Kcl6oJ1JGRH/OSUO3QpzzBsTUanJ+g6I+m1SaATv?=
+ =?us-ascii?Q?FANynbO1umg9n+Q6R6V/AOrQBEszfpZPPaSwjYo/nRM42lRH20aqCdYs6qHk?=
+ =?us-ascii?Q?vYfmHtCmY6776cZib6JHv/IYulkKfpwV8mqcPHNX/AdAub25NVjW59Kaohsx?=
+ =?us-ascii?Q?tsXFLcv7OD0Qd0bunRjNFMnCarPjsV/IWh6anB3ClrpE05/s4Uu3EgV4r/5v?=
+ =?us-ascii?Q?6yhBCEKIxIuQ1H9xMdR6lx5oWAvhPDD1XHN/GVthZmynWT+Et7YaCrXvmVw4?=
+ =?us-ascii?Q?Kbnb4O2xDIOJ1gGK4rjc2tlpDB5dMjddAUGDkWIBzN8vp/JkFlZayulEcAKy?=
+ =?us-ascii?Q?IHwOpOxFHGnqCNlDEkfu0fr4OI0BRXiMdWeLXU4NqilSdoGdsI84iZZMQ2Qv?=
+ =?us-ascii?Q?f+jUeb3+sdnLA/xkXsCReBcjhlKN/WsUhMsC5Dg9io5abZMItf0QKQCqMSth?=
+ =?us-ascii?Q?w5JgWxQ+FdMlzqaPET4dVPN4MnU0Q0QX6NPu1IvK2f0UR4O8WRI6WgO+m64B?=
+ =?us-ascii?Q?JlF30Mtfk5fBLs5d2gGs7u85VIwS+FaoxvtXmLfU+KKB5pXSH3oSxCwl0KQZ?=
+ =?us-ascii?Q?Qvps3EISankU3OmVx+XTcM1JKYFrZwzwi227IGdNJUuLiJqrh/fJGOZRWLH8?=
+ =?us-ascii?Q?7PNMpfJMB8EsXP7tVpMMKB057DghMajVT3C9Lsjen7JXeUxgdoDtJ9pi0Dak?=
+ =?us-ascii?Q?UaSvxwUJAU05x95rQwZ4ezk+0epAqmxRMsZi7UHE9b9kRPFzj6A9plIhD3o8?=
+ =?us-ascii?Q?AFckk/A7fqeP/Jrb+iocWuF6rNBHIfqv+V4hQllXwOggOQhJe7dIt7M7tRMU?=
+ =?us-ascii?Q?ZPSe/Ua2HWrHW7r8yeKBM/Bqcwu3kqk0GEOBMudXhsc772S7yS9AglNbSb5e?=
+ =?us-ascii?Q?nFpyGeJUk9N2HFoHzHer3wN6VMNNENFemtIDgtNK7b1sG+Fr+S/YEqpRb0p+?=
+ =?us-ascii?Q?ijuyVhtrSZQEoGD+ieNcMusqcNv1fbXGY1Ns7zf/z2nn1uSqnoXmoCQgVW1i?=
+ =?us-ascii?Q?mLETL0jQjWprzqP8AxUhPat8vzSrjbO6afUakINlThmUG0/ZlnbGGnD1AEF0?=
+ =?us-ascii?Q?LYcQ8imO4ATkfXgP1l2DTKm3qO6F5cG0nnk4bECKRcMncdUO6ul1MvmAJ7eq?=
+ =?us-ascii?Q?M6Q9mpJ4F9AOS54vNH0plWxXkiaf8L7MQcGGF+mTkHLIFO8fhp7LRbfLlLyR?=
+ =?us-ascii?Q?wVLbwsgZ+86TtXR2Ibnwm/mDY8+YzWSROjBnLwcZ9WfK3CcC9SCxbo7eOAJG?=
+ =?us-ascii?Q?hN2WUKT803YxBjen1pR99TsNv/AXsrYzPzYbF7h+YZhxdRKxlMVIhsHX/Lea?=
+ =?us-ascii?Q?G2tukGY04icjmN5aLhb0EzgTTtTrPMsNRNiAV/y/UA7QZ3avxqBu9v+h3jov?=
+ =?us-ascii?Q?qnlEe6VS+qtg5ZNXGLcc25iuVttTZvWkpMScwPtfE10UGczcRbMFURfBKAOY?=
+ =?us-ascii?Q?QGmk9dUTXe6d8F45TKa8kou/4Q8YXux8QeUjMtuIpa8qMLMxZ2q9L0ec5l4e?=
+ =?us-ascii?Q?oG3y6sLP8RLL25O5Jq2QutzuLgAr4fcRwfcwS1ewU4tQxYVzM2Avjl2Q6Ywl?=
+ =?us-ascii?Q?tA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A5AC89D3B90E8147B7472D1F3F59FBE9@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: b5X/vpCssd6E4Smuuebg+zDO524GgGfAXeCOkn3/J8ik686uccl1aNubiSsuYpT6tN+Uw2HJmqUnoQx/uJy3k5oKecD+xqC/zawsIxp24K1qZPhjeoyQpsfAp0KleX9L5ODw29321E7L6y5uwArHAhjFJhNZ/a+SQYp/lUhUGzpdLjnEPOORYu8vjELYEMU4EQgiP1xRUWurK+CqeZIsMl13rJGaQWAw+mKIYYJR5fWZQ8n2LchRNKxlYkfxn0SInVk2w5YZwLcmQn+OmWqwPhuieGWLIKvAX6OQXvsttdQyIJzOatJrK7n2+moMEoa00bg9fUnbF/PcFxt7/s2mugZGIJX7Oc0Q+X3AtTF7W3vWzxvNvWBuNjTgXcwNmvU8vVOu1d0Z3srVMeNoS14uzdLK9qPEt9yXyJxwO1zVNjWXrsR21+AbxmND93irOobzdd77Mu+OrPUb3H/8DHmusiLqbcmSDO5LeFM5eFNkAjEAk8F3YWV8bSnz56FThkQYhUyVv/Bb/Yvpk8KejwvO/kiVeRqkD5uqymTTXYWmSK3hQhETmkvqnjiiRuY1mGy7lxJ/yk87HXGRfPqSgwRXl7OGh9cZOiHq8zPH1vxpW5XAMopbHSbI5s3xHLIySsT9JpRZN4H6uKB/P9duUglaFH8YcE+XEVEftGn06026IDDzzuQLk/sygM/HRC44g77cK1qnq+CYKxfDW0vpHvNX6r4r5uHWJjIZxZUvyk+p/P5R5mOhG7flTO5iGSyx0AayEh2HBk/VhsOyaT6P5p0ICw+4zj2qb8ruDVHEY/sfejbBOJSYmCyXN3aZ5kUiznWjBQBUBJSFHaMEHT4BdF+hJMSEeNRLV7Q7Mi+iOWcPBgiRfMbMO4Gj+stCPCabwk59
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00a8bd2b-8b00-43ba-8327-08db47e85a4e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 12:59:07.6015
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MYXaVp8h+8hQSSPTEgfZ1nRalbrUvPMX/UEsDgMqiUJ396pK/duzF7C0Uh5G3y/5Prb7gfUgEjfknzMRaSJWQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7261
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-28_04,2023-04-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
+ adultscore=0 malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304280107
+X-Proofpoint-ORIG-GUID: DM41IRo9eybXACGIcYrL9h9CfeqDITYn
+X-Proofpoint-GUID: DM41IRo9eybXACGIcYrL9h9CfeqDITYn
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LEA is a Korean national standard block cipher, described in
-"KS X 3246" and is also included in the international standard, "ISO/IEC
-29192-2:2019 standard (Information security - Lightweight cryptography
-- Part 2: Block ciphers)".
 
-The LEA algorithm is a symmetric key cipher that processes data blocks
-of 128-bits and has three different key lengths, each with a different
-number of rounds:
 
-- LEA-128: 128-bit key, 24 rounds,
-- LEA-192: 192-bit key, 28 rounds, and
-- LEA-256: 256-bit key, 32 rounds.
+> On Apr 28, 2023, at 5:57 AM, Ard Biesheuvel <ardb@kernel.org> wrote:
+>=20
+> On Fri, 28 Apr 2023 at 10:44, Herbert Xu <herbert@gondor.apana.org.au> wr=
+ote:
+>>=20
+>> Scott Mayhew <smayhew@redhat.com> wrote:
+>>>=20
+>>> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-mode=
+s.S
+>>> index 0e834a2c062c..477605fad76b 100644
+>>> --- a/arch/arm64/crypto/aes-modes.S
+>>> +++ b/arch/arm64/crypto/aes-modes.S
+>>> @@ -268,6 +268,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
+>>>       add             x4, x0, x4
+>>>       st1             {v0.16b}, [x4]                  /* overlapping st=
+ores */
+>>>       st1             {v1.16b}, [x0]
+>>> +       st1             {v1.16b}, [x5]
+>>>       ret
+>>> AES_FUNC_END(aes_cbc_cts_encrypt)
+>>>=20
+>>> But I don't know if that change is at all correct! (I've never even
+>>> looked at arm64 asm before).  If someone who's knowledgeable about this
+>>> code could chime in, I'd appreciate it.
+>>=20
+>> Ard, could you please take a look at this?
+>>=20
+>=20
+> The issue seems to be that the caller expects iv_out to have been
+> populated even when doing ciphertext stealing.
+>=20
+> This is meaningless, because the output IV can only be used to chain
+> additional encrypted data if the split is at a block boundary. The
+> ciphertext stealing fundamentally terminates the encryption, and
+> produces a block of ciphertext that is shorter than the block size, so
+> what the output IV should be is actually unspecified.
+>=20
+> IOW, test cases having plain/ciphertext vectors whose size is not a
+> multiple of the cipher block size should not specify an expected value
+> for the output IV.
 
-The round function of LEA consists of 32-bit ARX(modular Addition,
-bitwise Rotation, and bitwise XOR) operations.
+The test cases are extracted from RFC 3962 Appendix B. The
+standard clearly expects there to be a non-zero next IV for
+plaintext sizes that are not block-aligned.
 
-The implementation same as submitted generic C implementation is
-distributed through the Korea Internet & Security Agency (KISA).
+Also, these test cases pass on other hardware platforms.
 
-- https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
-- https://seed.kisa.or.kr/kisa/Board/20/detailView.do
 
-Signed-off-by: Dongsoo Lee <letrhee@nsr.re.kr>
----
- crypto/Kconfig       |  12 +
- crypto/Makefile      |   1 +
- crypto/lea_generic.c | 915 +++++++++++++++++++++++++++++++++++++++++++
- include/crypto/lea.h |  39 ++
- 4 files changed, 967 insertions(+)
- create mode 100644 crypto/lea_generic.c
- create mode 100644 include/crypto/lea.h
+--
+Chuck Lever
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 9c86f7045157..5c56f6083cbd 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -485,6 +485,18 @@ config CRYPTO_KHAZAD
- 	  See https://web.archive.org/web/20171011071731/http://www.larc.usp.br/~pbarreto/KhazadPage.html
- 	  for further information.
- 
-+config CRYPTO_LEA
-+	tristate "LEA"
-+	select CRYPTO_ALGAPI
-+	help
-+	  LEA cipher algorithm (KS X 3246, ISO/IEC 29192-2:2019)
-+
-+	  LEA is one of the standard cryptographic alorithms of
-+	  the Republic of Korea. It consists of four 32bit word.
-+
-+	  See:
-+	  https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
-+
- config CRYPTO_SEED
- 	tristate "SEED"
- 	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
-diff --git a/crypto/Makefile b/crypto/Makefile
-index d0126c915834..bf52af4dfdf2 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -149,6 +149,7 @@ obj-$(CONFIG_CRYPTO_KHAZAD) += khazad.o
- obj-$(CONFIG_CRYPTO_ANUBIS) += anubis.o
- obj-$(CONFIG_CRYPTO_SEED) += seed.o
- obj-$(CONFIG_CRYPTO_ARIA) += aria_generic.o
-+obj-$(CONFIG_CRYPTO_LEA) += lea_generic.o
- obj-$(CONFIG_CRYPTO_CHACHA20) += chacha_generic.o
- obj-$(CONFIG_CRYPTO_POLY1305) += poly1305_generic.o
- obj-$(CONFIG_CRYPTO_DEFLATE) += deflate.o
-diff --git a/crypto/lea_generic.c b/crypto/lea_generic.c
-new file mode 100644
-index 000000000000..919c23e7bcc5
---- /dev/null
-+++ b/crypto/lea_generic.c
-@@ -0,0 +1,915 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Cryptographic API.
-+ *
-+ * LEA Cipher Algorithm
-+ *
-+ * LEA is a 128-bit block cipher developed by South Korea in 2013.
-+ *
-+ * LEA is the national standard of Republic of Korea (KS X 3246) and included in
-+ * the ISO/IEC 29192-2:2019 standard (Information security - Lightweight
-+ * cryptography - Part 2: Block ciphers).
-+ *
-+ * Copyright (c) 2023 National Security Research.
-+ * Author: Dongsoo Lee <letrhee@nsr.re.kr>
-+ */
-+
-+
-+#include <asm/unaligned.h>
-+#include <linux/module.h>
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+#include <crypto/lea.h>
-+
-+static const u32 lea_delta[8][36] ____cacheline_aligned = {
-+	{
-+		0xc3efe9db, 0x87dfd3b7, 0x0fbfa76f, 0x1f7f4ede, 0x3efe9dbc, 0x7dfd3b78,
-+		0xfbfa76f0, 0xf7f4ede1, 0xefe9dbc3, 0xdfd3b787, 0xbfa76f0f, 0x7f4ede1f,
-+		0xfe9dbc3e, 0xfd3b787d, 0xfa76f0fb, 0xf4ede1f7, 0xe9dbc3ef, 0xd3b787df,
-+		0xa76f0fbf, 0x4ede1f7f, 0x9dbc3efe, 0x3b787dfd, 0x76f0fbfa, 0xede1f7f4,
-+		0xdbc3efe9, 0xb787dfd3, 0x6f0fbfa7, 0xde1f7f4e, 0xbc3efe9d, 0x787dfd3b,
-+		0xf0fbfa76, 0xe1f7f4eD, 0xc3efe9db, 0x87dfd3b7, 0x0fbfa76f, 0x1f7f4ede
-+	},
-+	{
-+		0x44626b02, 0x88c4d604, 0x1189ac09, 0x23135812, 0x4626b024, 0x8c4d6048,
-+		0x189ac091, 0x31358122, 0x626b0244, 0xc4d60488, 0x89ac0911, 0x13581223,
-+		0x26b02446, 0x4d60488c, 0x9ac09118, 0x35812231, 0x6b024462, 0xd60488c4,
-+		0xac091189, 0x58122313, 0xb0244626, 0x60488c4d, 0xc091189a, 0x81223135,
-+		0x0244626b, 0x0488c4d6, 0x091189ac, 0x12231358, 0x244626b0, 0x488c4d60,
-+		0x91189ac0, 0x22313581, 0x44626b02, 0x88c4d604, 0x1189ac09, 0x23135812
-+	},
-+	{
-+		0x79e27c8a, 0xf3c4f914, 0xe789f229, 0xcf13e453, 0x9e27c8a7, 0x3c4f914f,
-+		0x789f229e, 0xf13e453c, 0xe27c8a79, 0xc4f914f3, 0x89f229e7, 0x13e453cf,
-+		0x27c8a79e, 0x4f914f3c, 0x9f229e78, 0x3e453cf1, 0x7c8a79e2, 0xf914f3c4,
-+		0xf229e789, 0xe453cf13, 0xc8a79e27, 0x914f3c4f, 0x229e789f, 0x453cf13e,
-+		0x8a79e27c, 0x14f3c4f9, 0x29e789f2, 0x53cf13e4, 0xa79e27c8, 0x4f3c4f91,
-+		0x9e789f22, 0x3cf13e45, 0x79e27c8a, 0xf3c4f914, 0xe789f229, 0xcf13e453
-+	},
-+	{
-+		0x78df30ec, 0xf1be61d8, 0xe37cc3b1, 0xc6f98763, 0x8df30ec7, 0x1be61d8f,
-+		0x37cc3b1e, 0x6f98763c, 0xdf30ec78, 0xbe61d8f1, 0x7cc3b1e3, 0xf98763c6,
-+		0xf30ec78d, 0xe61d8f1b, 0xcc3b1e37, 0x98763c6f, 0x30ec78df, 0x61d8f1be,
-+		0xc3b1e37c, 0x8763c6f9, 0x0ec78df3, 0x1d8f1be6, 0x3b1e37cc, 0x763c6f98,
-+		0xec78df30, 0xd8f1be61, 0xb1e37cc3, 0x63c6f987, 0xc78df30e, 0x8f1be61d,
-+		0x1e37cc3b, 0x3c6f9876, 0x78df30ec, 0xf1be61d8, 0xe37cc3b1, 0xc6f98763
-+	},
-+	{
-+		0x715ea49e, 0xe2bd493c, 0xc57a9279, 0x8af524f3, 0x15ea49e7, 0x2bd493ce,
-+		0x57a9279c, 0xaf524f38, 0x5ea49e71, 0xbd493ce2, 0x7a9279c5, 0xf524f38a,
-+		0xea49e715, 0xd493ce2b, 0xa9279c57, 0x524f38af, 0xa49e715e, 0x493ce2bd,
-+		0x9279c57a, 0x24f38af5, 0x49e715ea, 0x93ce2bd4, 0x279c57a9, 0x4f38af52,
-+		0x9e715ea4, 0x3ce2bd49, 0x79c57a92, 0xf38af524, 0xe715ea49, 0xce2bd493,
-+		0x9c57a927, 0x38af524f, 0x715ea49e, 0xe2bd493c, 0xc57a9279, 0x8af524f3
-+	},
-+	{
-+		0xc785da0a, 0x8f0bb415, 0x1e17682b, 0x3c2ed056, 0x785da0ac, 0xf0bb4158,
-+		0xe17682b1, 0xc2ed0563, 0x85da0ac7, 0x0bb4158f, 0x17682b1e, 0x2ed0563c,
-+		0x5da0ac78, 0xbb4158f0, 0x7682b1e1, 0xed0563c2, 0xda0ac785, 0xb4158f0b,
-+		0x682b1e17, 0xd0563c2e, 0xa0ac785d, 0x4158f0bb, 0x82b1e176, 0x0563c2ed,
-+		0x0ac785da, 0x158f0bb4, 0x2b1e1768, 0x563c2ed0, 0xac785da0, 0x58f0bb41,
-+		0xb1e17682, 0x63c2ed05, 0xc785da0a, 0x8f0bb415, 0x1e17682b, 0x3c2ed056
-+	},
-+	{
-+		0xe04ef22a, 0xc09de455, 0x813bc8ab, 0x02779157, 0x04ef22ae, 0x09de455c,
-+		0x13bc8ab8, 0x27791570, 0x4ef22ae0, 0x9de455c0, 0x3bc8ab81, 0x77915702,
-+		0xef22ae04, 0xde455c09, 0xbc8ab813, 0x79157027, 0xf22ae04e, 0xe455c09d,
-+		0xc8ab813b, 0x91570277, 0x22ae04ef, 0x455c09de, 0x8ab813bc, 0x15702779,
-+		0x2ae04ef2, 0x55c09de4, 0xab813bc8, 0x57027791, 0xae04ef22, 0x5c09de45,
-+		0xb813bc8a, 0x70277915, 0xe04ef22a, 0xc09de455, 0x813bc8ab, 0x02779157
-+	},
-+	{
-+		0xe5c40957, 0xcb8812af, 0x9710255f, 0x2e204abf, 0x5c40957e, 0xb8812afc,
-+		0x710255f9, 0xe204abf2, 0xc40957e5, 0x8812afcb, 0x10255f97, 0x204abf2e,
-+		0x40957e5c, 0x812afcb8, 0x0255f971, 0x04abf2e2, 0x0957e5c4, 0x12afcb88,
-+		0x255f9710, 0x4abf2e20, 0x957e5c40, 0x2afcb881, 0x55f97102, 0xabf2e204,
-+		0x57e5c409, 0xafcb8812, 0x5f971025, 0xbf2e204a, 0x7e5c4095, 0xfcb8812a,
-+		0xf9710255, 0xf2e204ab, 0xe5c40957, 0xcb8812af, 0x9710255f, 0x2e204abf
-+	}
-+};
-+
-+void lea_encrypt(const void *ctx, u8 *out, const u8 *in)
-+{
-+	const struct crypto_lea_ctx *key = ctx;
-+	u32 X0 = get_unaligned_le32(&in[0]);
-+	u32 X1 = get_unaligned_le32(&in[4]);
-+	u32 X2 = get_unaligned_le32(&in[8]);
-+	u32 X3 = get_unaligned_le32(&in[12]);
-+
-+	X3 = ror32((X2 ^ key->rk[4]) + (X3 ^ key->rk[5]), 3);
-+	X2 = ror32((X1 ^ key->rk[2]) + (X2 ^ key->rk[3]), 5);
-+	X1 = rol32((X0 ^ key->rk[0]) + (X1 ^ key->rk[1]), 9);
-+	X0 = ror32((X3 ^ key->rk[10]) + (X0 ^ key->rk[11]), 3);
-+	X3 = ror32((X2 ^ key->rk[8]) + (X3 ^ key->rk[9]), 5);
-+	X2 = rol32((X1 ^ key->rk[6]) + (X2 ^ key->rk[7]), 9);
-+	X1 = ror32((X0 ^ key->rk[16]) + (X1 ^ key->rk[17]), 3);
-+	X0 = ror32((X3 ^ key->rk[14]) + (X0 ^ key->rk[15]), 5);
-+	X3 = rol32((X2 ^ key->rk[12]) + (X3 ^ key->rk[13]), 9);
-+	X2 = ror32((X1 ^ key->rk[22]) + (X2 ^ key->rk[23]), 3);
-+	X1 = ror32((X0 ^ key->rk[20]) + (X1 ^ key->rk[21]), 5);
-+	X0 = rol32((X3 ^ key->rk[18]) + (X0 ^ key->rk[19]), 9);
-+
-+	X3 = ror32((X2 ^ key->rk[28]) + (X3 ^ key->rk[29]), 3);
-+	X2 = ror32((X1 ^ key->rk[26]) + (X2 ^ key->rk[27]), 5);
-+	X1 = rol32((X0 ^ key->rk[24]) + (X1 ^ key->rk[25]), 9);
-+	X0 = ror32((X3 ^ key->rk[34]) + (X0 ^ key->rk[35]), 3);
-+	X3 = ror32((X2 ^ key->rk[32]) + (X3 ^ key->rk[33]), 5);
-+	X2 = rol32((X1 ^ key->rk[30]) + (X2 ^ key->rk[31]), 9);
-+	X1 = ror32((X0 ^ key->rk[40]) + (X1 ^ key->rk[41]), 3);
-+	X0 = ror32((X3 ^ key->rk[38]) + (X0 ^ key->rk[39]), 5);
-+	X3 = rol32((X2 ^ key->rk[36]) + (X3 ^ key->rk[37]), 9);
-+	X2 = ror32((X1 ^ key->rk[46]) + (X2 ^ key->rk[47]), 3);
-+	X1 = ror32((X0 ^ key->rk[44]) + (X1 ^ key->rk[45]), 5);
-+	X0 = rol32((X3 ^ key->rk[42]) + (X0 ^ key->rk[43]), 9);
-+
-+	X3 = ror32((X2 ^ key->rk[52]) + (X3 ^ key->rk[53]), 3);
-+	X2 = ror32((X1 ^ key->rk[50]) + (X2 ^ key->rk[51]), 5);
-+	X1 = rol32((X0 ^ key->rk[48]) + (X1 ^ key->rk[49]), 9);
-+	X0 = ror32((X3 ^ key->rk[58]) + (X0 ^ key->rk[59]), 3);
-+	X3 = ror32((X2 ^ key->rk[56]) + (X3 ^ key->rk[57]), 5);
-+	X2 = rol32((X1 ^ key->rk[54]) + (X2 ^ key->rk[55]), 9);
-+	X1 = ror32((X0 ^ key->rk[64]) + (X1 ^ key->rk[65]), 3);
-+	X0 = ror32((X3 ^ key->rk[62]) + (X0 ^ key->rk[63]), 5);
-+	X3 = rol32((X2 ^ key->rk[60]) + (X3 ^ key->rk[61]), 9);
-+	X2 = ror32((X1 ^ key->rk[70]) + (X2 ^ key->rk[71]), 3);
-+	X1 = ror32((X0 ^ key->rk[68]) + (X1 ^ key->rk[69]), 5);
-+	X0 = rol32((X3 ^ key->rk[66]) + (X0 ^ key->rk[67]), 9);
-+
-+	X3 = ror32((X2 ^ key->rk[76]) + (X3 ^ key->rk[77]), 3);
-+	X2 = ror32((X1 ^ key->rk[74]) + (X2 ^ key->rk[75]), 5);
-+	X1 = rol32((X0 ^ key->rk[72]) + (X1 ^ key->rk[73]), 9);
-+	X0 = ror32((X3 ^ key->rk[82]) + (X0 ^ key->rk[83]), 3);
-+	X3 = ror32((X2 ^ key->rk[80]) + (X3 ^ key->rk[81]), 5);
-+	X2 = rol32((X1 ^ key->rk[78]) + (X2 ^ key->rk[79]), 9);
-+	X1 = ror32((X0 ^ key->rk[88]) + (X1 ^ key->rk[89]), 3);
-+	X0 = ror32((X3 ^ key->rk[86]) + (X0 ^ key->rk[87]), 5);
-+	X3 = rol32((X2 ^ key->rk[84]) + (X3 ^ key->rk[85]), 9);
-+	X2 = ror32((X1 ^ key->rk[94]) + (X2 ^ key->rk[95]), 3);
-+	X1 = ror32((X0 ^ key->rk[92]) + (X1 ^ key->rk[93]), 5);
-+	X0 = rol32((X3 ^ key->rk[90]) + (X0 ^ key->rk[91]), 9);
-+
-+	X3 = ror32((X2 ^ key->rk[100]) + (X3 ^ key->rk[101]), 3);
-+	X2 = ror32((X1 ^ key->rk[98]) + (X2 ^ key->rk[99]), 5);
-+	X1 = rol32((X0 ^ key->rk[96]) + (X1 ^ key->rk[97]), 9);
-+	X0 = ror32((X3 ^ key->rk[106]) + (X0 ^ key->rk[107]), 3);
-+	X3 = ror32((X2 ^ key->rk[104]) + (X3 ^ key->rk[105]), 5);
-+	X2 = rol32((X1 ^ key->rk[102]) + (X2 ^ key->rk[103]), 9);
-+	X1 = ror32((X0 ^ key->rk[112]) + (X1 ^ key->rk[113]), 3);
-+	X0 = ror32((X3 ^ key->rk[110]) + (X0 ^ key->rk[111]), 5);
-+	X3 = rol32((X2 ^ key->rk[108]) + (X3 ^ key->rk[109]), 9);
-+	X2 = ror32((X1 ^ key->rk[118]) + (X2 ^ key->rk[119]), 3);
-+	X1 = ror32((X0 ^ key->rk[116]) + (X1 ^ key->rk[117]), 5);
-+	X0 = rol32((X3 ^ key->rk[114]) + (X0 ^ key->rk[115]), 9);
-+
-+	X3 = ror32((X2 ^ key->rk[124]) + (X3 ^ key->rk[125]), 3);
-+	X2 = ror32((X1 ^ key->rk[122]) + (X2 ^ key->rk[123]), 5);
-+	X1 = rol32((X0 ^ key->rk[120]) + (X1 ^ key->rk[121]), 9);
-+	X0 = ror32((X3 ^ key->rk[130]) + (X0 ^ key->rk[131]), 3);
-+	X3 = ror32((X2 ^ key->rk[128]) + (X3 ^ key->rk[129]), 5);
-+	X2 = rol32((X1 ^ key->rk[126]) + (X2 ^ key->rk[127]), 9);
-+	X1 = ror32((X0 ^ key->rk[136]) + (X1 ^ key->rk[137]), 3);
-+	X0 = ror32((X3 ^ key->rk[134]) + (X0 ^ key->rk[135]), 5);
-+	X3 = rol32((X2 ^ key->rk[132]) + (X3 ^ key->rk[133]), 9);
-+	X2 = ror32((X1 ^ key->rk[142]) + (X2 ^ key->rk[143]), 3);
-+	X1 = ror32((X0 ^ key->rk[140]) + (X1 ^ key->rk[141]), 5);
-+	X0 = rol32((X3 ^ key->rk[138]) + (X0 ^ key->rk[139]), 9);
-+
-+	if (key->round > 24) {
-+		X3 = ror32((X2 ^ key->rk[148]) + (X3 ^ key->rk[149]), 3);
-+		X2 = ror32((X1 ^ key->rk[146]) + (X2 ^ key->rk[147]), 5);
-+		X1 = rol32((X0 ^ key->rk[144]) + (X1 ^ key->rk[145]), 9);
-+		X0 = ror32((X3 ^ key->rk[154]) + (X0 ^ key->rk[155]), 3);
-+		X3 = ror32((X2 ^ key->rk[152]) + (X3 ^ key->rk[153]), 5);
-+		X2 = rol32((X1 ^ key->rk[150]) + (X2 ^ key->rk[151]), 9);
-+		X1 = ror32((X0 ^ key->rk[160]) + (X1 ^ key->rk[161]), 3);
-+		X0 = ror32((X3 ^ key->rk[158]) + (X0 ^ key->rk[159]), 5);
-+		X3 = rol32((X2 ^ key->rk[156]) + (X3 ^ key->rk[157]), 9);
-+		X2 = ror32((X1 ^ key->rk[166]) + (X2 ^ key->rk[167]), 3);
-+		X1 = ror32((X0 ^ key->rk[164]) + (X1 ^ key->rk[165]), 5);
-+		X0 = rol32((X3 ^ key->rk[162]) + (X0 ^ key->rk[163]), 9);
-+	}
-+
-+	if (key->round > 28) {
-+		X3 = ror32((X2 ^ key->rk[172]) + (X3 ^ key->rk[173]), 3);
-+		X2 = ror32((X1 ^ key->rk[170]) + (X2 ^ key->rk[171]), 5);
-+		X1 = rol32((X0 ^ key->rk[168]) + (X1 ^ key->rk[169]), 9);
-+		X0 = ror32((X3 ^ key->rk[178]) + (X0 ^ key->rk[179]), 3);
-+		X3 = ror32((X2 ^ key->rk[176]) + (X3 ^ key->rk[177]), 5);
-+		X2 = rol32((X1 ^ key->rk[174]) + (X2 ^ key->rk[175]), 9);
-+		X1 = ror32((X0 ^ key->rk[184]) + (X1 ^ key->rk[185]), 3);
-+		X0 = ror32((X3 ^ key->rk[182]) + (X0 ^ key->rk[183]), 5);
-+		X3 = rol32((X2 ^ key->rk[180]) + (X3 ^ key->rk[181]), 9);
-+		X2 = ror32((X1 ^ key->rk[190]) + (X2 ^ key->rk[191]), 3);
-+		X1 = ror32((X0 ^ key->rk[188]) + (X1 ^ key->rk[189]), 5);
-+		X0 = rol32((X3 ^ key->rk[186]) + (X0 ^ key->rk[187]), 9);
-+	}
-+
-+	put_unaligned_le32(X0, &out[0]);
-+	put_unaligned_le32(X1, &out[4]);
-+	put_unaligned_le32(X2, &out[8]);
-+	put_unaligned_le32(X3, &out[12]);
-+}
-+EXPORT_SYMBOL_GPL(lea_encrypt);
-+
-+void lea_decrypt(const void *ctx, u8 *out, const u8 *in)
-+{
-+	const struct crypto_lea_ctx *key = ctx;
-+
-+	u32 X0 = get_unaligned_le32(&in[0]);
-+	u32 X1 = get_unaligned_le32(&in[4]);
-+	u32 X2 = get_unaligned_le32(&in[8]);
-+	u32 X3 = get_unaligned_le32(&in[12]);
-+
-+	if (key->round > 28) {
-+		X0 = (ror32(X0, 9) - (X3 ^ key->rk[186])) ^ key->rk[187];
-+		X1 = (rol32(X1, 5) - (X0 ^ key->rk[188])) ^ key->rk[189];
-+		X2 = (rol32(X2, 3) - (X1 ^ key->rk[190])) ^ key->rk[191];
-+		X3 = (ror32(X3, 9) - (X2 ^ key->rk[180])) ^ key->rk[181];
-+		X0 = (rol32(X0, 5) - (X3 ^ key->rk[182])) ^ key->rk[183];
-+		X1 = (rol32(X1, 3) - (X0 ^ key->rk[184])) ^ key->rk[185];
-+		X2 = (ror32(X2, 9) - (X1 ^ key->rk[174])) ^ key->rk[175];
-+		X3 = (rol32(X3, 5) - (X2 ^ key->rk[176])) ^ key->rk[177];
-+		X0 = (rol32(X0, 3) - (X3 ^ key->rk[178])) ^ key->rk[179];
-+		X1 = (ror32(X1, 9) - (X0 ^ key->rk[168])) ^ key->rk[169];
-+		X2 = (rol32(X2, 5) - (X1 ^ key->rk[170])) ^ key->rk[171];
-+		X3 = (rol32(X3, 3) - (X2 ^ key->rk[172])) ^ key->rk[173];
-+	}
-+
-+	if (key->round > 24) {
-+		X0 = (ror32(X0, 9) - (X3 ^ key->rk[162])) ^ key->rk[163];
-+		X1 = (rol32(X1, 5) - (X0 ^ key->rk[164])) ^ key->rk[165];
-+		X2 = (rol32(X2, 3) - (X1 ^ key->rk[166])) ^ key->rk[167];
-+		X3 = (ror32(X3, 9) - (X2 ^ key->rk[156])) ^ key->rk[157];
-+		X0 = (rol32(X0, 5) - (X3 ^ key->rk[158])) ^ key->rk[159];
-+		X1 = (rol32(X1, 3) - (X0 ^ key->rk[160])) ^ key->rk[161];
-+		X2 = (ror32(X2, 9) - (X1 ^ key->rk[150])) ^ key->rk[151];
-+		X3 = (rol32(X3, 5) - (X2 ^ key->rk[152])) ^ key->rk[153];
-+		X0 = (rol32(X0, 3) - (X3 ^ key->rk[154])) ^ key->rk[155];
-+		X1 = (ror32(X1, 9) - (X0 ^ key->rk[144])) ^ key->rk[145];
-+		X2 = (rol32(X2, 5) - (X1 ^ key->rk[146])) ^ key->rk[147];
-+		X3 = (rol32(X3, 3) - (X2 ^ key->rk[148])) ^ key->rk[149];
-+	}
-+
-+	X0 = (ror32(X0, 9) - (X3 ^ key->rk[138])) ^ key->rk[139];
-+	X1 = (rol32(X1, 5) - (X0 ^ key->rk[140])) ^ key->rk[141];
-+	X2 = (rol32(X2, 3) - (X1 ^ key->rk[142])) ^ key->rk[143];
-+	X3 = (ror32(X3, 9) - (X2 ^ key->rk[132])) ^ key->rk[133];
-+	X0 = (rol32(X0, 5) - (X3 ^ key->rk[134])) ^ key->rk[135];
-+	X1 = (rol32(X1, 3) - (X0 ^ key->rk[136])) ^ key->rk[137];
-+	X2 = (ror32(X2, 9) - (X1 ^ key->rk[126])) ^ key->rk[127];
-+	X3 = (rol32(X3, 5) - (X2 ^ key->rk[128])) ^ key->rk[129];
-+	X0 = (rol32(X0, 3) - (X3 ^ key->rk[130])) ^ key->rk[131];
-+	X1 = (ror32(X1, 9) - (X0 ^ key->rk[120])) ^ key->rk[121];
-+	X2 = (rol32(X2, 5) - (X1 ^ key->rk[122])) ^ key->rk[123];
-+	X3 = (rol32(X3, 3) - (X2 ^ key->rk[124])) ^ key->rk[125];
-+
-+	X0 = (ror32(X0, 9) - (X3 ^ key->rk[114])) ^ key->rk[115];
-+	X1 = (rol32(X1, 5) - (X0 ^ key->rk[116])) ^ key->rk[117];
-+	X2 = (rol32(X2, 3) - (X1 ^ key->rk[118])) ^ key->rk[119];
-+	X3 = (ror32(X3, 9) - (X2 ^ key->rk[108])) ^ key->rk[109];
-+	X0 = (rol32(X0, 5) - (X3 ^ key->rk[110])) ^ key->rk[111];
-+	X1 = (rol32(X1, 3) - (X0 ^ key->rk[112])) ^ key->rk[113];
-+	X2 = (ror32(X2, 9) - (X1 ^ key->rk[102])) ^ key->rk[103];
-+	X3 = (rol32(X3, 5) - (X2 ^ key->rk[104])) ^ key->rk[105];
-+	X0 = (rol32(X0, 3) - (X3 ^ key->rk[106])) ^ key->rk[107];
-+	X1 = (ror32(X1, 9) - (X0 ^ key->rk[96])) ^ key->rk[97];
-+	X2 = (rol32(X2, 5) - (X1 ^ key->rk[98])) ^ key->rk[99];
-+	X3 = (rol32(X3, 3) - (X2 ^ key->rk[100])) ^ key->rk[101];
-+
-+	X0 = (ror32(X0, 9) - (X3 ^ key->rk[90])) ^ key->rk[91];
-+	X1 = (rol32(X1, 5) - (X0 ^ key->rk[92])) ^ key->rk[93];
-+	X2 = (rol32(X2, 3) - (X1 ^ key->rk[94])) ^ key->rk[95];
-+	X3 = (ror32(X3, 9) - (X2 ^ key->rk[84])) ^ key->rk[85];
-+	X0 = (rol32(X0, 5) - (X3 ^ key->rk[86])) ^ key->rk[87];
-+	X1 = (rol32(X1, 3) - (X0 ^ key->rk[88])) ^ key->rk[89];
-+	X2 = (ror32(X2, 9) - (X1 ^ key->rk[78])) ^ key->rk[79];
-+	X3 = (rol32(X3, 5) - (X2 ^ key->rk[80])) ^ key->rk[81];
-+	X0 = (rol32(X0, 3) - (X3 ^ key->rk[82])) ^ key->rk[83];
-+	X1 = (ror32(X1, 9) - (X0 ^ key->rk[72])) ^ key->rk[73];
-+	X2 = (rol32(X2, 5) - (X1 ^ key->rk[74])) ^ key->rk[75];
-+	X3 = (rol32(X3, 3) - (X2 ^ key->rk[76])) ^ key->rk[77];
-+
-+	X0 = (ror32(X0, 9) - (X3 ^ key->rk[66])) ^ key->rk[67];
-+	X1 = (rol32(X1, 5) - (X0 ^ key->rk[68])) ^ key->rk[69];
-+	X2 = (rol32(X2, 3) - (X1 ^ key->rk[70])) ^ key->rk[71];
-+	X3 = (ror32(X3, 9) - (X2 ^ key->rk[60])) ^ key->rk[61];
-+	X0 = (rol32(X0, 5) - (X3 ^ key->rk[62])) ^ key->rk[63];
-+	X1 = (rol32(X1, 3) - (X0 ^ key->rk[64])) ^ key->rk[65];
-+	X2 = (ror32(X2, 9) - (X1 ^ key->rk[54])) ^ key->rk[55];
-+	X3 = (rol32(X3, 5) - (X2 ^ key->rk[56])) ^ key->rk[57];
-+	X0 = (rol32(X0, 3) - (X3 ^ key->rk[58])) ^ key->rk[59];
-+	X1 = (ror32(X1, 9) - (X0 ^ key->rk[48])) ^ key->rk[49];
-+	X2 = (rol32(X2, 5) - (X1 ^ key->rk[50])) ^ key->rk[51];
-+	X3 = (rol32(X3, 3) - (X2 ^ key->rk[52])) ^ key->rk[53];
-+
-+	X0 = (ror32(X0, 9) - (X3 ^ key->rk[42])) ^ key->rk[43];
-+	X1 = (rol32(X1, 5) - (X0 ^ key->rk[44])) ^ key->rk[45];
-+	X2 = (rol32(X2, 3) - (X1 ^ key->rk[46])) ^ key->rk[47];
-+	X3 = (ror32(X3, 9) - (X2 ^ key->rk[36])) ^ key->rk[37];
-+	X0 = (rol32(X0, 5) - (X3 ^ key->rk[38])) ^ key->rk[39];
-+	X1 = (rol32(X1, 3) - (X0 ^ key->rk[40])) ^ key->rk[41];
-+	X2 = (ror32(X2, 9) - (X1 ^ key->rk[30])) ^ key->rk[31];
-+	X3 = (rol32(X3, 5) - (X2 ^ key->rk[32])) ^ key->rk[33];
-+	X0 = (rol32(X0, 3) - (X3 ^ key->rk[34])) ^ key->rk[35];
-+	X1 = (ror32(X1, 9) - (X0 ^ key->rk[24])) ^ key->rk[25];
-+	X2 = (rol32(X2, 5) - (X1 ^ key->rk[26])) ^ key->rk[27];
-+	X3 = (rol32(X3, 3) - (X2 ^ key->rk[28])) ^ key->rk[29];
-+
-+	X0 = (ror32(X0, 9) - (X3 ^ key->rk[18])) ^ key->rk[19];
-+	X1 = (rol32(X1, 5) - (X0 ^ key->rk[20])) ^ key->rk[21];
-+	X2 = (rol32(X2, 3) - (X1 ^ key->rk[22])) ^ key->rk[23];
-+	X3 = (ror32(X3, 9) - (X2 ^ key->rk[12])) ^ key->rk[13];
-+	X0 = (rol32(X0, 5) - (X3 ^ key->rk[14])) ^ key->rk[15];
-+	X1 = (rol32(X1, 3) - (X0 ^ key->rk[16])) ^ key->rk[17];
-+	X2 = (ror32(X2, 9) - (X1 ^ key->rk[6])) ^ key->rk[7];
-+	X3 = (rol32(X3, 5) - (X2 ^ key->rk[8])) ^ key->rk[9];
-+	X0 = (rol32(X0, 3) - (X3 ^ key->rk[10])) ^ key->rk[11];
-+	X1 = (ror32(X1, 9) - (X0 ^ key->rk[0])) ^ key->rk[1];
-+	X2 = (rol32(X2, 5) - (X1 ^ key->rk[2])) ^ key->rk[3];
-+	X3 = (rol32(X3, 3) - (X2 ^ key->rk[4])) ^ key->rk[5];
-+
-+	put_unaligned_le32(X0, &out[0]);
-+	put_unaligned_le32(X1, &out[4]);
-+	put_unaligned_le32(X2, &out[8]);
-+	put_unaligned_le32(X3, &out[12]);
-+}
-+EXPORT_SYMBOL_GPL(lea_decrypt);
-+
-+int lea_set_key(struct crypto_lea_ctx *key, const u8 *in_key,
-+						u32 key_len)
-+{
-+	const u32 *_mk = (const u32 *)in_key;
-+
-+	switch (key_len) {
-+	case 16:
-+		key->rk[0] = rol32(get_unaligned_le32(&_mk[0]) + lea_delta[0][0], 1);
-+		key->rk[6] = rol32(key->rk[0] + lea_delta[1][1], 1);
-+		key->rk[12] = rol32(key->rk[6] + lea_delta[2][2], 1);
-+		key->rk[18] = rol32(key->rk[12] + lea_delta[3][3], 1);
-+		key->rk[24] = rol32(key->rk[18] + lea_delta[0][4], 1);
-+		key->rk[30] = rol32(key->rk[24] + lea_delta[1][5], 1);
-+		key->rk[36] = rol32(key->rk[30] + lea_delta[2][6], 1);
-+		key->rk[42] = rol32(key->rk[36] + lea_delta[3][7], 1);
-+		key->rk[48] = rol32(key->rk[42] + lea_delta[0][8], 1);
-+		key->rk[54] = rol32(key->rk[48] + lea_delta[1][9], 1);
-+		key->rk[60] = rol32(key->rk[54] + lea_delta[2][10], 1);
-+		key->rk[66] = rol32(key->rk[60] + lea_delta[3][11], 1);
-+		key->rk[72] = rol32(key->rk[66] + lea_delta[0][12], 1);
-+		key->rk[78] = rol32(key->rk[72] + lea_delta[1][13], 1);
-+		key->rk[84] = rol32(key->rk[78] + lea_delta[2][14], 1);
-+		key->rk[90] = rol32(key->rk[84] + lea_delta[3][15], 1);
-+		key->rk[96] = rol32(key->rk[90] + lea_delta[0][16], 1);
-+		key->rk[102] = rol32(key->rk[96] + lea_delta[1][17], 1);
-+		key->rk[108] = rol32(key->rk[102] + lea_delta[2][18], 1);
-+		key->rk[114] = rol32(key->rk[108] + lea_delta[3][19], 1);
-+		key->rk[120] = rol32(key->rk[114] + lea_delta[0][20], 1);
-+		key->rk[126] = rol32(key->rk[120] + lea_delta[1][21], 1);
-+		key->rk[132] = rol32(key->rk[126] + lea_delta[2][22], 1);
-+		key->rk[138] = rol32(key->rk[132] + lea_delta[3][23], 1);
-+
-+		key->rk[1] = key->rk[3] = key->rk[5] =
-+				rol32(get_unaligned_le32(&_mk[1]) + lea_delta[0][1], 3);
-+		key->rk[7] = key->rk[9] = key->rk[11] =
-+				rol32(key->rk[1] + lea_delta[1][2], 3);
-+		key->rk[13] = key->rk[15] = key->rk[17] =
-+				rol32(key->rk[7] + lea_delta[2][3], 3);
-+		key->rk[19] = key->rk[21] = key->rk[23] =
-+				rol32(key->rk[13] + lea_delta[3][4], 3);
-+		key->rk[25] = key->rk[27] = key->rk[29] =
-+				rol32(key->rk[19] + lea_delta[0][5], 3);
-+		key->rk[31] = key->rk[33] = key->rk[35] =
-+				rol32(key->rk[25] + lea_delta[1][6], 3);
-+		key->rk[37] = key->rk[39] = key->rk[41] =
-+				rol32(key->rk[31] + lea_delta[2][7], 3);
-+		key->rk[43] = key->rk[45] = key->rk[47] =
-+				rol32(key->rk[37] + lea_delta[3][8], 3);
-+		key->rk[49] = key->rk[51] = key->rk[53] =
-+				rol32(key->rk[43] + lea_delta[0][9], 3);
-+		key->rk[55] = key->rk[57] = key->rk[59] =
-+				rol32(key->rk[49] + lea_delta[1][10], 3);
-+		key->rk[61] = key->rk[63] = key->rk[65] =
-+				rol32(key->rk[55] + lea_delta[2][11], 3);
-+		key->rk[67] = key->rk[69] = key->rk[71] =
-+				rol32(key->rk[61] + lea_delta[3][12], 3);
-+		key->rk[73] = key->rk[75] = key->rk[77] =
-+				rol32(key->rk[67] + lea_delta[0][13], 3);
-+		key->rk[79] = key->rk[81] = key->rk[83] =
-+				rol32(key->rk[73] + lea_delta[1][14], 3);
-+		key->rk[85] = key->rk[87] = key->rk[89] =
-+				rol32(key->rk[79] + lea_delta[2][15], 3);
-+		key->rk[91] = key->rk[93] = key->rk[95] =
-+				rol32(key->rk[85] + lea_delta[3][16], 3);
-+		key->rk[97] = key->rk[99] = key->rk[101] =
-+				rol32(key->rk[91] + lea_delta[0][17], 3);
-+		key->rk[103] = key->rk[105] = key->rk[107] =
-+				rol32(key->rk[97] + lea_delta[1][18], 3);
-+		key->rk[109] = key->rk[111] = key->rk[113] =
-+				rol32(key->rk[103] + lea_delta[2][19], 3);
-+		key->rk[115] = key->rk[117] = key->rk[119] =
-+				rol32(key->rk[109] + lea_delta[3][20], 3);
-+		key->rk[121] = key->rk[123] = key->rk[125] =
-+				rol32(key->rk[115] + lea_delta[0][21], 3);
-+		key->rk[127] = key->rk[129] = key->rk[131] =
-+				rol32(key->rk[121] + lea_delta[1][22], 3);
-+		key->rk[133] = key->rk[135] = key->rk[137] =
-+				rol32(key->rk[127] + lea_delta[2][23], 3);
-+		key->rk[139] = key->rk[141] = key->rk[143] =
-+				rol32(key->rk[133] + lea_delta[3][24], 3);
-+
-+		key->rk[2] = rol32(get_unaligned_le32(&_mk[2]) + lea_delta[0][2], 6);
-+		key->rk[8] = rol32(key->rk[2] + lea_delta[1][3], 6);
-+		key->rk[14] = rol32(key->rk[8] + lea_delta[2][4], 6);
-+		key->rk[20] = rol32(key->rk[14] + lea_delta[3][5], 6);
-+		key->rk[26] = rol32(key->rk[20] + lea_delta[0][6], 6);
-+		key->rk[32] = rol32(key->rk[26] + lea_delta[1][7], 6);
-+		key->rk[38] = rol32(key->rk[32] + lea_delta[2][8], 6);
-+		key->rk[44] = rol32(key->rk[38] + lea_delta[3][9], 6);
-+		key->rk[50] = rol32(key->rk[44] + lea_delta[0][10], 6);
-+		key->rk[56] = rol32(key->rk[50] + lea_delta[1][11], 6);
-+		key->rk[62] = rol32(key->rk[56] + lea_delta[2][12], 6);
-+		key->rk[68] = rol32(key->rk[62] + lea_delta[3][13], 6);
-+		key->rk[74] = rol32(key->rk[68] + lea_delta[0][14], 6);
-+		key->rk[80] = rol32(key->rk[74] + lea_delta[1][15], 6);
-+		key->rk[86] = rol32(key->rk[80] + lea_delta[2][16], 6);
-+		key->rk[92] = rol32(key->rk[86] + lea_delta[3][17], 6);
-+		key->rk[98] = rol32(key->rk[92] + lea_delta[0][18], 6);
-+		key->rk[104] = rol32(key->rk[98] + lea_delta[1][19], 6);
-+		key->rk[110] = rol32(key->rk[104] + lea_delta[2][20], 6);
-+		key->rk[116] = rol32(key->rk[110] + lea_delta[3][21], 6);
-+		key->rk[122] = rol32(key->rk[116] + lea_delta[0][22], 6);
-+		key->rk[128] = rol32(key->rk[122] + lea_delta[1][23], 6);
-+		key->rk[134] = rol32(key->rk[128] + lea_delta[2][24], 6);
-+		key->rk[140] = rol32(key->rk[134] + lea_delta[3][25], 6);
-+
-+		key->rk[4] = rol32(get_unaligned_le32(&_mk[3]) + lea_delta[0][3], 11);
-+		key->rk[10] = rol32(key->rk[4] + lea_delta[1][4], 11);
-+		key->rk[16] = rol32(key->rk[10] + lea_delta[2][5], 11);
-+		key->rk[22] = rol32(key->rk[16] + lea_delta[3][6], 11);
-+		key->rk[28] = rol32(key->rk[22] + lea_delta[0][7], 11);
-+		key->rk[34] = rol32(key->rk[28] + lea_delta[1][8], 11);
-+		key->rk[40] = rol32(key->rk[34] + lea_delta[2][9], 11);
-+		key->rk[46] = rol32(key->rk[40] + lea_delta[3][10], 11);
-+		key->rk[52] = rol32(key->rk[46] + lea_delta[0][11], 11);
-+		key->rk[58] = rol32(key->rk[52] + lea_delta[1][12], 11);
-+		key->rk[64] = rol32(key->rk[58] + lea_delta[2][13], 11);
-+		key->rk[70] = rol32(key->rk[64] + lea_delta[3][14], 11);
-+		key->rk[76] = rol32(key->rk[70] + lea_delta[0][15], 11);
-+		key->rk[82] = rol32(key->rk[76] + lea_delta[1][16], 11);
-+		key->rk[88] = rol32(key->rk[82] + lea_delta[2][17], 11);
-+		key->rk[94] = rol32(key->rk[88] + lea_delta[3][18], 11);
-+		key->rk[100] = rol32(key->rk[94] + lea_delta[0][19], 11);
-+		key->rk[106] = rol32(key->rk[100] + lea_delta[1][20], 11);
-+		key->rk[112] = rol32(key->rk[106] + lea_delta[2][21], 11);
-+		key->rk[118] = rol32(key->rk[112] + lea_delta[3][22], 11);
-+		key->rk[124] = rol32(key->rk[118] + lea_delta[0][23], 11);
-+		key->rk[130] = rol32(key->rk[124] + lea_delta[1][24], 11);
-+		key->rk[136] = rol32(key->rk[130] + lea_delta[2][25], 11);
-+		key->rk[142] = rol32(key->rk[136] + lea_delta[3][26], 11);
-+		break;
-+
-+	case 24:
-+		key->rk[0] = rol32(get_unaligned_le32(&_mk[0]) + lea_delta[0][0], 1);
-+		key->rk[6] = rol32(key->rk[0] + lea_delta[1][1], 1);
-+		key->rk[12] = rol32(key->rk[6] + lea_delta[2][2], 1);
-+		key->rk[18] = rol32(key->rk[12] + lea_delta[3][3], 1);
-+		key->rk[24] = rol32(key->rk[18] + lea_delta[4][4], 1);
-+		key->rk[30] = rol32(key->rk[24] + lea_delta[5][5], 1);
-+		key->rk[36] = rol32(key->rk[30] + lea_delta[0][6], 1);
-+		key->rk[42] = rol32(key->rk[36] + lea_delta[1][7], 1);
-+		key->rk[48] = rol32(key->rk[42] + lea_delta[2][8], 1);
-+		key->rk[54] = rol32(key->rk[48] + lea_delta[3][9], 1);
-+		key->rk[60] = rol32(key->rk[54] + lea_delta[4][10], 1);
-+		key->rk[66] = rol32(key->rk[60] + lea_delta[5][11], 1);
-+		key->rk[72] = rol32(key->rk[66] + lea_delta[0][12], 1);
-+		key->rk[78] = rol32(key->rk[72] + lea_delta[1][13], 1);
-+		key->rk[84] = rol32(key->rk[78] + lea_delta[2][14], 1);
-+		key->rk[90] = rol32(key->rk[84] + lea_delta[3][15], 1);
-+		key->rk[96] = rol32(key->rk[90] + lea_delta[4][16], 1);
-+		key->rk[102] = rol32(key->rk[96] + lea_delta[5][17], 1);
-+		key->rk[108] = rol32(key->rk[102] + lea_delta[0][18], 1);
-+		key->rk[114] = rol32(key->rk[108] + lea_delta[1][19], 1);
-+		key->rk[120] = rol32(key->rk[114] + lea_delta[2][20], 1);
-+		key->rk[126] = rol32(key->rk[120] + lea_delta[3][21], 1);
-+		key->rk[132] = rol32(key->rk[126] + lea_delta[4][22], 1);
-+		key->rk[138] = rol32(key->rk[132] + lea_delta[5][23], 1);
-+		key->rk[144] = rol32(key->rk[138] + lea_delta[0][24], 1);
-+		key->rk[150] = rol32(key->rk[144] + lea_delta[1][25], 1);
-+		key->rk[156] = rol32(key->rk[150] + lea_delta[2][26], 1);
-+		key->rk[162] = rol32(key->rk[156] + lea_delta[3][27], 1);
-+
-+		key->rk[1] = rol32(get_unaligned_le32(&_mk[1]) + lea_delta[0][1], 3);
-+		key->rk[7] = rol32(key->rk[1] + lea_delta[1][2], 3);
-+		key->rk[13] = rol32(key->rk[7] + lea_delta[2][3], 3);
-+		key->rk[19] = rol32(key->rk[13] + lea_delta[3][4], 3);
-+		key->rk[25] = rol32(key->rk[19] + lea_delta[4][5], 3);
-+		key->rk[31] = rol32(key->rk[25] + lea_delta[5][6], 3);
-+		key->rk[37] = rol32(key->rk[31] + lea_delta[0][7], 3);
-+		key->rk[43] = rol32(key->rk[37] + lea_delta[1][8], 3);
-+		key->rk[49] = rol32(key->rk[43] + lea_delta[2][9], 3);
-+		key->rk[55] = rol32(key->rk[49] + lea_delta[3][10], 3);
-+		key->rk[61] = rol32(key->rk[55] + lea_delta[4][11], 3);
-+		key->rk[67] = rol32(key->rk[61] + lea_delta[5][12], 3);
-+		key->rk[73] = rol32(key->rk[67] + lea_delta[0][13], 3);
-+		key->rk[79] = rol32(key->rk[73] + lea_delta[1][14], 3);
-+		key->rk[85] = rol32(key->rk[79] + lea_delta[2][15], 3);
-+		key->rk[91] = rol32(key->rk[85] + lea_delta[3][16], 3);
-+		key->rk[97] = rol32(key->rk[91] + lea_delta[4][17], 3);
-+		key->rk[103] = rol32(key->rk[97] + lea_delta[5][18], 3);
-+		key->rk[109] = rol32(key->rk[103] + lea_delta[0][19], 3);
-+		key->rk[115] = rol32(key->rk[109] + lea_delta[1][20], 3);
-+		key->rk[121] = rol32(key->rk[115] + lea_delta[2][21], 3);
-+		key->rk[127] = rol32(key->rk[121] + lea_delta[3][22], 3);
-+		key->rk[133] = rol32(key->rk[127] + lea_delta[4][23], 3);
-+		key->rk[139] = rol32(key->rk[133] + lea_delta[5][24], 3);
-+		key->rk[145] = rol32(key->rk[139] + lea_delta[0][25], 3);
-+		key->rk[151] = rol32(key->rk[145] + lea_delta[1][26], 3);
-+		key->rk[157] = rol32(key->rk[151] + lea_delta[2][27], 3);
-+		key->rk[163] = rol32(key->rk[157] + lea_delta[3][28], 3);
-+
-+		key->rk[2] = rol32(get_unaligned_le32(&_mk[2]) + lea_delta[0][2], 6);
-+		key->rk[8] = rol32(key->rk[2] + lea_delta[1][3], 6);
-+		key->rk[14] = rol32(key->rk[8] + lea_delta[2][4], 6);
-+		key->rk[20] = rol32(key->rk[14] + lea_delta[3][5], 6);
-+		key->rk[26] = rol32(key->rk[20] + lea_delta[4][6], 6);
-+		key->rk[32] = rol32(key->rk[26] + lea_delta[5][7], 6);
-+		key->rk[38] = rol32(key->rk[32] + lea_delta[0][8], 6);
-+		key->rk[44] = rol32(key->rk[38] + lea_delta[1][9], 6);
-+		key->rk[50] = rol32(key->rk[44] + lea_delta[2][10], 6);
-+		key->rk[56] = rol32(key->rk[50] + lea_delta[3][11], 6);
-+		key->rk[62] = rol32(key->rk[56] + lea_delta[4][12], 6);
-+		key->rk[68] = rol32(key->rk[62] + lea_delta[5][13], 6);
-+		key->rk[74] = rol32(key->rk[68] + lea_delta[0][14], 6);
-+		key->rk[80] = rol32(key->rk[74] + lea_delta[1][15], 6);
-+		key->rk[86] = rol32(key->rk[80] + lea_delta[2][16], 6);
-+		key->rk[92] = rol32(key->rk[86] + lea_delta[3][17], 6);
-+		key->rk[98] = rol32(key->rk[92] + lea_delta[4][18], 6);
-+		key->rk[104] = rol32(key->rk[98] + lea_delta[5][19], 6);
-+		key->rk[110] = rol32(key->rk[104] + lea_delta[0][20], 6);
-+		key->rk[116] = rol32(key->rk[110] + lea_delta[1][21], 6);
-+		key->rk[122] = rol32(key->rk[116] + lea_delta[2][22], 6);
-+		key->rk[128] = rol32(key->rk[122] + lea_delta[3][23], 6);
-+		key->rk[134] = rol32(key->rk[128] + lea_delta[4][24], 6);
-+		key->rk[140] = rol32(key->rk[134] + lea_delta[5][25], 6);
-+		key->rk[146] = rol32(key->rk[140] + lea_delta[0][26], 6);
-+		key->rk[152] = rol32(key->rk[146] + lea_delta[1][27], 6);
-+		key->rk[158] = rol32(key->rk[152] + lea_delta[2][28], 6);
-+		key->rk[164] = rol32(key->rk[158] + lea_delta[3][29], 6);
-+
-+		key->rk[3] = rol32(get_unaligned_le32(&_mk[3]) + lea_delta[0][3], 11);
-+		key->rk[9] = rol32(key->rk[3] + lea_delta[1][4], 11);
-+		key->rk[15] = rol32(key->rk[9] + lea_delta[2][5], 11);
-+		key->rk[21] = rol32(key->rk[15] + lea_delta[3][6], 11);
-+		key->rk[27] = rol32(key->rk[21] + lea_delta[4][7], 11);
-+		key->rk[33] = rol32(key->rk[27] + lea_delta[5][8], 11);
-+		key->rk[39] = rol32(key->rk[33] + lea_delta[0][9], 11);
-+		key->rk[45] = rol32(key->rk[39] + lea_delta[1][10], 11);
-+		key->rk[51] = rol32(key->rk[45] + lea_delta[2][11], 11);
-+		key->rk[57] = rol32(key->rk[51] + lea_delta[3][12], 11);
-+		key->rk[63] = rol32(key->rk[57] + lea_delta[4][13], 11);
-+		key->rk[69] = rol32(key->rk[63] + lea_delta[5][14], 11);
-+		key->rk[75] = rol32(key->rk[69] + lea_delta[0][15], 11);
-+		key->rk[81] = rol32(key->rk[75] + lea_delta[1][16], 11);
-+		key->rk[87] = rol32(key->rk[81] + lea_delta[2][17], 11);
-+		key->rk[93] = rol32(key->rk[87] + lea_delta[3][18], 11);
-+		key->rk[99] = rol32(key->rk[93] + lea_delta[4][19], 11);
-+		key->rk[105] = rol32(key->rk[99] + lea_delta[5][20], 11);
-+		key->rk[111] = rol32(key->rk[105] + lea_delta[0][21], 11);
-+		key->rk[117] = rol32(key->rk[111] + lea_delta[1][22], 11);
-+		key->rk[123] = rol32(key->rk[117] + lea_delta[2][23], 11);
-+		key->rk[129] = rol32(key->rk[123] + lea_delta[3][24], 11);
-+		key->rk[135] = rol32(key->rk[129] + lea_delta[4][25], 11);
-+		key->rk[141] = rol32(key->rk[135] + lea_delta[5][26], 11);
-+		key->rk[147] = rol32(key->rk[141] + lea_delta[0][27], 11);
-+		key->rk[153] = rol32(key->rk[147] + lea_delta[1][28], 11);
-+		key->rk[159] = rol32(key->rk[153] + lea_delta[2][29], 11);
-+		key->rk[165] = rol32(key->rk[159] + lea_delta[3][30], 11);
-+
-+		key->rk[4] = rol32(get_unaligned_le32(&_mk[4]) + lea_delta[0][4], 13);
-+		key->rk[10] = rol32(key->rk[4] + lea_delta[1][5], 13);
-+		key->rk[16] = rol32(key->rk[10] + lea_delta[2][6], 13);
-+		key->rk[22] = rol32(key->rk[16] + lea_delta[3][7], 13);
-+		key->rk[28] = rol32(key->rk[22] + lea_delta[4][8], 13);
-+		key->rk[34] = rol32(key->rk[28] + lea_delta[5][9], 13);
-+		key->rk[40] = rol32(key->rk[34] + lea_delta[0][10], 13);
-+		key->rk[46] = rol32(key->rk[40] + lea_delta[1][11], 13);
-+		key->rk[52] = rol32(key->rk[46] + lea_delta[2][12], 13);
-+		key->rk[58] = rol32(key->rk[52] + lea_delta[3][13], 13);
-+		key->rk[64] = rol32(key->rk[58] + lea_delta[4][14], 13);
-+		key->rk[70] = rol32(key->rk[64] + lea_delta[5][15], 13);
-+		key->rk[76] = rol32(key->rk[70] + lea_delta[0][16], 13);
-+		key->rk[82] = rol32(key->rk[76] + lea_delta[1][17], 13);
-+		key->rk[88] = rol32(key->rk[82] + lea_delta[2][18], 13);
-+		key->rk[94] = rol32(key->rk[88] + lea_delta[3][19], 13);
-+		key->rk[100] = rol32(key->rk[94] + lea_delta[4][20], 13);
-+		key->rk[106] = rol32(key->rk[100] + lea_delta[5][21], 13);
-+		key->rk[112] = rol32(key->rk[106] + lea_delta[0][22], 13);
-+		key->rk[118] = rol32(key->rk[112] + lea_delta[1][23], 13);
-+		key->rk[124] = rol32(key->rk[118] + lea_delta[2][24], 13);
-+		key->rk[130] = rol32(key->rk[124] + lea_delta[3][25], 13);
-+		key->rk[136] = rol32(key->rk[130] + lea_delta[4][26], 13);
-+		key->rk[142] = rol32(key->rk[136] + lea_delta[5][27], 13);
-+		key->rk[148] = rol32(key->rk[142] + lea_delta[0][28], 13);
-+		key->rk[154] = rol32(key->rk[148] + lea_delta[1][29], 13);
-+		key->rk[160] = rol32(key->rk[154] + lea_delta[2][30], 13);
-+		key->rk[166] = rol32(key->rk[160] + lea_delta[3][31], 13);
-+
-+		key->rk[5] = rol32(get_unaligned_le32(&_mk[5]) + lea_delta[0][5], 17);
-+		key->rk[11] = rol32(key->rk[5] + lea_delta[1][6], 17);
-+		key->rk[17] = rol32(key->rk[11] + lea_delta[2][7], 17);
-+		key->rk[23] = rol32(key->rk[17] + lea_delta[3][8], 17);
-+		key->rk[29] = rol32(key->rk[23] + lea_delta[4][9], 17);
-+		key->rk[35] = rol32(key->rk[29] + lea_delta[5][10], 17);
-+		key->rk[41] = rol32(key->rk[35] + lea_delta[0][11], 17);
-+		key->rk[47] = rol32(key->rk[41] + lea_delta[1][12], 17);
-+		key->rk[53] = rol32(key->rk[47] + lea_delta[2][13], 17);
-+		key->rk[59] = rol32(key->rk[53] + lea_delta[3][14], 17);
-+		key->rk[65] = rol32(key->rk[59] + lea_delta[4][15], 17);
-+		key->rk[71] = rol32(key->rk[65] + lea_delta[5][16], 17);
-+		key->rk[77] = rol32(key->rk[71] + lea_delta[0][17], 17);
-+		key->rk[83] = rol32(key->rk[77] + lea_delta[1][18], 17);
-+		key->rk[89] = rol32(key->rk[83] + lea_delta[2][19], 17);
-+		key->rk[95] = rol32(key->rk[89] + lea_delta[3][20], 17);
-+		key->rk[101] = rol32(key->rk[95] + lea_delta[4][21], 17);
-+		key->rk[107] = rol32(key->rk[101] + lea_delta[5][22], 17);
-+		key->rk[113] = rol32(key->rk[107] + lea_delta[0][23], 17);
-+		key->rk[119] = rol32(key->rk[113] + lea_delta[1][24], 17);
-+		key->rk[125] = rol32(key->rk[119] + lea_delta[2][25], 17);
-+		key->rk[131] = rol32(key->rk[125] + lea_delta[3][26], 17);
-+		key->rk[137] = rol32(key->rk[131] + lea_delta[4][27], 17);
-+		key->rk[143] = rol32(key->rk[137] + lea_delta[5][28], 17);
-+		key->rk[149] = rol32(key->rk[143] + lea_delta[0][29], 17);
-+		key->rk[155] = rol32(key->rk[149] + lea_delta[1][30], 17);
-+		key->rk[161] = rol32(key->rk[155] + lea_delta[2][31], 17);
-+		key->rk[167] = rol32(key->rk[161] + lea_delta[3][0], 17);
-+		break;
-+
-+	case 32:
-+		key->rk[0] = rol32(get_unaligned_le32(&_mk[0]) + lea_delta[0][0], 1);
-+		key->rk[8] = rol32(key->rk[0] + lea_delta[1][3], 6);
-+		key->rk[16] = rol32(key->rk[8] + lea_delta[2][6], 13);
-+		key->rk[24] = rol32(key->rk[16] + lea_delta[4][4], 1);
-+		key->rk[32] = rol32(key->rk[24] + lea_delta[5][7], 6);
-+		key->rk[40] = rol32(key->rk[32] + lea_delta[6][10], 13);
-+		key->rk[48] = rol32(key->rk[40] + lea_delta[0][8], 1);
-+		key->rk[56] = rol32(key->rk[48] + lea_delta[1][11], 6);
-+		key->rk[64] = rol32(key->rk[56] + lea_delta[2][14], 13);
-+		key->rk[72] = rol32(key->rk[64] + lea_delta[4][12], 1);
-+		key->rk[80] = rol32(key->rk[72] + lea_delta[5][15], 6);
-+		key->rk[88] = rol32(key->rk[80] + lea_delta[6][18], 13);
-+		key->rk[96] = rol32(key->rk[88] + lea_delta[0][16], 1);
-+		key->rk[104] = rol32(key->rk[96] + lea_delta[1][19], 6);
-+		key->rk[112] = rol32(key->rk[104] + lea_delta[2][22], 13);
-+		key->rk[120] = rol32(key->rk[112] + lea_delta[4][20], 1);
-+		key->rk[128] = rol32(key->rk[120] + lea_delta[5][23], 6);
-+		key->rk[136] = rol32(key->rk[128] + lea_delta[6][26], 13);
-+		key->rk[144] = rol32(key->rk[136] + lea_delta[0][24], 1);
-+		key->rk[152] = rol32(key->rk[144] + lea_delta[1][27], 6);
-+		key->rk[160] = rol32(key->rk[152] + lea_delta[2][30], 13);
-+		key->rk[168] = rol32(key->rk[160] + lea_delta[4][28], 1);
-+		key->rk[176] = rol32(key->rk[168] + lea_delta[5][31], 6);
-+		key->rk[184] = rol32(key->rk[176] + lea_delta[6][2], 13);
-+
-+		key->rk[1] = rol32(get_unaligned_le32(&_mk[1]) + lea_delta[0][1], 3);
-+		key->rk[9] = rol32(key->rk[1] + lea_delta[1][4], 11);
-+		key->rk[17] = rol32(key->rk[9] + lea_delta[2][7], 17);
-+		key->rk[25] = rol32(key->rk[17] + lea_delta[4][5], 3);
-+		key->rk[33] = rol32(key->rk[25] + lea_delta[5][8], 11);
-+		key->rk[41] = rol32(key->rk[33] + lea_delta[6][11], 17);
-+		key->rk[49] = rol32(key->rk[41] + lea_delta[0][9], 3);
-+		key->rk[57] = rol32(key->rk[49] + lea_delta[1][12], 11);
-+		key->rk[65] = rol32(key->rk[57] + lea_delta[2][15], 17);
-+		key->rk[73] = rol32(key->rk[65] + lea_delta[4][13], 3);
-+		key->rk[81] = rol32(key->rk[73] + lea_delta[5][16], 11);
-+		key->rk[89] = rol32(key->rk[81] + lea_delta[6][19], 17);
-+		key->rk[97] = rol32(key->rk[89] + lea_delta[0][17], 3);
-+		key->rk[105] = rol32(key->rk[97] + lea_delta[1][20], 11);
-+		key->rk[113] = rol32(key->rk[105] + lea_delta[2][23], 17);
-+		key->rk[121] = rol32(key->rk[113] + lea_delta[4][21], 3);
-+		key->rk[129] = rol32(key->rk[121] + lea_delta[5][24], 11);
-+		key->rk[137] = rol32(key->rk[129] + lea_delta[6][27], 17);
-+		key->rk[145] = rol32(key->rk[137] + lea_delta[0][25], 3);
-+		key->rk[153] = rol32(key->rk[145] + lea_delta[1][28], 11);
-+		key->rk[161] = rol32(key->rk[153] + lea_delta[2][31], 17);
-+		key->rk[169] = rol32(key->rk[161] + lea_delta[4][29], 3);
-+		key->rk[177] = rol32(key->rk[169] + lea_delta[5][0], 11);
-+		key->rk[185] = rol32(key->rk[177] + lea_delta[6][3], 17);
-+
-+		key->rk[2] = rol32(get_unaligned_le32(&_mk[2]) + lea_delta[0][2], 6);
-+		key->rk[10] = rol32(key->rk[2] + lea_delta[1][5], 13);
-+		key->rk[18] = rol32(key->rk[10] + lea_delta[3][3], 1);
-+		key->rk[26] = rol32(key->rk[18] + lea_delta[4][6], 6);
-+		key->rk[34] = rol32(key->rk[26] + lea_delta[5][9], 13);
-+		key->rk[42] = rol32(key->rk[34] + lea_delta[7][7], 1);
-+		key->rk[50] = rol32(key->rk[42] + lea_delta[0][10], 6);
-+		key->rk[58] = rol32(key->rk[50] + lea_delta[1][13], 13);
-+		key->rk[66] = rol32(key->rk[58] + lea_delta[3][11], 1);
-+		key->rk[74] = rol32(key->rk[66] + lea_delta[4][14], 6);
-+		key->rk[82] = rol32(key->rk[74] + lea_delta[5][17], 13);
-+		key->rk[90] = rol32(key->rk[82] + lea_delta[7][15], 1);
-+		key->rk[98] = rol32(key->rk[90] + lea_delta[0][18], 6);
-+		key->rk[106] = rol32(key->rk[98] + lea_delta[1][21], 13);
-+		key->rk[114] = rol32(key->rk[106] + lea_delta[3][19], 1);
-+		key->rk[122] = rol32(key->rk[114] + lea_delta[4][22], 6);
-+		key->rk[130] = rol32(key->rk[122] + lea_delta[5][25], 13);
-+		key->rk[138] = rol32(key->rk[130] + lea_delta[7][23], 1);
-+		key->rk[146] = rol32(key->rk[138] + lea_delta[0][26], 6);
-+		key->rk[154] = rol32(key->rk[146] + lea_delta[1][29], 13);
-+		key->rk[162] = rol32(key->rk[154] + lea_delta[3][27], 1);
-+		key->rk[170] = rol32(key->rk[162] + lea_delta[4][30], 6);
-+		key->rk[178] = rol32(key->rk[170] + lea_delta[5][1], 13);
-+		key->rk[186] = rol32(key->rk[178] + lea_delta[7][31], 1);
-+
-+		key->rk[3] = rol32(get_unaligned_le32(&_mk[3]) + lea_delta[0][3], 11);
-+		key->rk[11] = rol32(key->rk[3] + lea_delta[1][6], 17);
-+		key->rk[19] = rol32(key->rk[11] + lea_delta[3][4], 3);
-+		key->rk[27] = rol32(key->rk[19] + lea_delta[4][7], 11);
-+		key->rk[35] = rol32(key->rk[27] + lea_delta[5][10], 17);
-+		key->rk[43] = rol32(key->rk[35] + lea_delta[7][8], 3);
-+		key->rk[51] = rol32(key->rk[43] + lea_delta[0][11], 11);
-+		key->rk[59] = rol32(key->rk[51] + lea_delta[1][14], 17);
-+		key->rk[67] = rol32(key->rk[59] + lea_delta[3][12], 3);
-+		key->rk[75] = rol32(key->rk[67] + lea_delta[4][15], 11);
-+		key->rk[83] = rol32(key->rk[75] + lea_delta[5][18], 17);
-+		key->rk[91] = rol32(key->rk[83] + lea_delta[7][16], 3);
-+		key->rk[99] = rol32(key->rk[91] + lea_delta[0][19], 11);
-+		key->rk[107] = rol32(key->rk[99] + lea_delta[1][22], 17);
-+		key->rk[115] = rol32(key->rk[107] + lea_delta[3][20], 3);
-+		key->rk[123] = rol32(key->rk[115] + lea_delta[4][23], 11);
-+		key->rk[131] = rol32(key->rk[123] + lea_delta[5][26], 17);
-+		key->rk[139] = rol32(key->rk[131] + lea_delta[7][24], 3);
-+		key->rk[147] = rol32(key->rk[139] + lea_delta[0][27], 11);
-+		key->rk[155] = rol32(key->rk[147] + lea_delta[1][30], 17);
-+		key->rk[163] = rol32(key->rk[155] + lea_delta[3][28], 3);
-+		key->rk[171] = rol32(key->rk[163] + lea_delta[4][31], 11);
-+		key->rk[179] = rol32(key->rk[171] + lea_delta[5][2], 17);
-+		key->rk[187] = rol32(key->rk[179] + lea_delta[7][0], 3);
-+
-+		key->rk[4] = rol32(get_unaligned_le32(&_mk[4]) + lea_delta[0][4], 13);
-+		key->rk[12] = rol32(key->rk[4] + lea_delta[2][2], 1);
-+		key->rk[20] = rol32(key->rk[12] + lea_delta[3][5], 6);
-+		key->rk[28] = rol32(key->rk[20] + lea_delta[4][8], 13);
-+		key->rk[36] = rol32(key->rk[28] + lea_delta[6][6], 1);
-+		key->rk[44] = rol32(key->rk[36] + lea_delta[7][9], 6);
-+		key->rk[52] = rol32(key->rk[44] + lea_delta[0][12], 13);
-+		key->rk[60] = rol32(key->rk[52] + lea_delta[2][10], 1);
-+		key->rk[68] = rol32(key->rk[60] + lea_delta[3][13], 6);
-+		key->rk[76] = rol32(key->rk[68] + lea_delta[4][16], 13);
-+		key->rk[84] = rol32(key->rk[76] + lea_delta[6][14], 1);
-+		key->rk[92] = rol32(key->rk[84] + lea_delta[7][17], 6);
-+		key->rk[100] = rol32(key->rk[92] + lea_delta[0][20], 13);
-+		key->rk[108] = rol32(key->rk[100] + lea_delta[2][18], 1);
-+		key->rk[116] = rol32(key->rk[108] + lea_delta[3][21], 6);
-+		key->rk[124] = rol32(key->rk[116] + lea_delta[4][24], 13);
-+		key->rk[132] = rol32(key->rk[124] + lea_delta[6][22], 1);
-+		key->rk[140] = rol32(key->rk[132] + lea_delta[7][25], 6);
-+		key->rk[148] = rol32(key->rk[140] + lea_delta[0][28], 13);
-+		key->rk[156] = rol32(key->rk[148] + lea_delta[2][26], 1);
-+		key->rk[164] = rol32(key->rk[156] + lea_delta[3][29], 6);
-+		key->rk[172] = rol32(key->rk[164] + lea_delta[4][0], 13);
-+		key->rk[180] = rol32(key->rk[172] + lea_delta[6][30], 1);
-+		key->rk[188] = rol32(key->rk[180] + lea_delta[7][1], 6);
-+
-+		key->rk[5] = rol32(get_unaligned_le32(&_mk[5]) + lea_delta[0][5], 17);
-+		key->rk[13] = rol32(key->rk[5] + lea_delta[2][3], 3);
-+		key->rk[21] = rol32(key->rk[13] + lea_delta[3][6], 11);
-+		key->rk[29] = rol32(key->rk[21] + lea_delta[4][9], 17);
-+		key->rk[37] = rol32(key->rk[29] + lea_delta[6][7], 3);
-+		key->rk[45] = rol32(key->rk[37] + lea_delta[7][10], 11);
-+		key->rk[53] = rol32(key->rk[45] + lea_delta[0][13], 17);
-+		key->rk[61] = rol32(key->rk[53] + lea_delta[2][11], 3);
-+		key->rk[69] = rol32(key->rk[61] + lea_delta[3][14], 11);
-+		key->rk[77] = rol32(key->rk[69] + lea_delta[4][17], 17);
-+		key->rk[85] = rol32(key->rk[77] + lea_delta[6][15], 3);
-+		key->rk[93] = rol32(key->rk[85] + lea_delta[7][18], 11);
-+		key->rk[101] = rol32(key->rk[93] + lea_delta[0][21], 17);
-+		key->rk[109] = rol32(key->rk[101] + lea_delta[2][19], 3);
-+		key->rk[117] = rol32(key->rk[109] + lea_delta[3][22], 11);
-+		key->rk[125] = rol32(key->rk[117] + lea_delta[4][25], 17);
-+		key->rk[133] = rol32(key->rk[125] + lea_delta[6][23], 3);
-+		key->rk[141] = rol32(key->rk[133] + lea_delta[7][26], 11);
-+		key->rk[149] = rol32(key->rk[141] + lea_delta[0][29], 17);
-+		key->rk[157] = rol32(key->rk[149] + lea_delta[2][27], 3);
-+		key->rk[165] = rol32(key->rk[157] + lea_delta[3][30], 11);
-+		key->rk[173] = rol32(key->rk[165] + lea_delta[4][1], 17);
-+		key->rk[181] = rol32(key->rk[173] + lea_delta[6][31], 3);
-+		key->rk[189] = rol32(key->rk[181] + lea_delta[7][2], 11);
-+
-+		key->rk[6] = rol32(get_unaligned_le32(&_mk[6]) + lea_delta[1][1], 1);
-+		key->rk[14] = rol32(key->rk[6] + lea_delta[2][4], 6);
-+		key->rk[22] = rol32(key->rk[14] + lea_delta[3][7], 13);
-+		key->rk[30] = rol32(key->rk[22] + lea_delta[5][5], 1);
-+		key->rk[38] = rol32(key->rk[30] + lea_delta[6][8], 6);
-+		key->rk[46] = rol32(key->rk[38] + lea_delta[7][11], 13);
-+		key->rk[54] = rol32(key->rk[46] + lea_delta[1][9], 1);
-+		key->rk[62] = rol32(key->rk[54] + lea_delta[2][12], 6);
-+		key->rk[70] = rol32(key->rk[62] + lea_delta[3][15], 13);
-+		key->rk[78] = rol32(key->rk[70] + lea_delta[5][13], 1);
-+		key->rk[86] = rol32(key->rk[78] + lea_delta[6][16], 6);
-+		key->rk[94] = rol32(key->rk[86] + lea_delta[7][19], 13);
-+		key->rk[102] = rol32(key->rk[94] + lea_delta[1][17], 1);
-+		key->rk[110] = rol32(key->rk[102] + lea_delta[2][20], 6);
-+		key->rk[118] = rol32(key->rk[110] + lea_delta[3][23], 13);
-+		key->rk[126] = rol32(key->rk[118] + lea_delta[5][21], 1);
-+		key->rk[134] = rol32(key->rk[126] + lea_delta[6][24], 6);
-+		key->rk[142] = rol32(key->rk[134] + lea_delta[7][27], 13);
-+		key->rk[150] = rol32(key->rk[142] + lea_delta[1][25], 1);
-+		key->rk[158] = rol32(key->rk[150] + lea_delta[2][28], 6);
-+		key->rk[166] = rol32(key->rk[158] + lea_delta[3][31], 13);
-+		key->rk[174] = rol32(key->rk[166] + lea_delta[5][29], 1);
-+		key->rk[182] = rol32(key->rk[174] + lea_delta[6][0], 6);
-+		key->rk[190] = rol32(key->rk[182] + lea_delta[7][3], 13);
-+
-+		key->rk[7] = rol32(get_unaligned_le32(&_mk[7]) + lea_delta[1][2], 3);
-+		key->rk[15] = rol32(key->rk[7] + lea_delta[2][5], 11);
-+		key->rk[23] = rol32(key->rk[15] + lea_delta[3][8], 17);
-+		key->rk[31] = rol32(key->rk[23] + lea_delta[5][6], 3);
-+		key->rk[39] = rol32(key->rk[31] + lea_delta[6][9], 11);
-+		key->rk[47] = rol32(key->rk[39] + lea_delta[7][12], 17);
-+		key->rk[55] = rol32(key->rk[47] + lea_delta[1][10], 3);
-+		key->rk[63] = rol32(key->rk[55] + lea_delta[2][13], 11);
-+		key->rk[71] = rol32(key->rk[63] + lea_delta[3][16], 17);
-+		key->rk[79] = rol32(key->rk[71] + lea_delta[5][14], 3);
-+		key->rk[87] = rol32(key->rk[79] + lea_delta[6][17], 11);
-+		key->rk[95] = rol32(key->rk[87] + lea_delta[7][20], 17);
-+		key->rk[103] = rol32(key->rk[95] + lea_delta[1][18], 3);
-+		key->rk[111] = rol32(key->rk[103] + lea_delta[2][21], 11);
-+		key->rk[119] = rol32(key->rk[111] + lea_delta[3][24], 17);
-+		key->rk[127] = rol32(key->rk[119] + lea_delta[5][22], 3);
-+		key->rk[135] = rol32(key->rk[127] + lea_delta[6][25], 11);
-+		key->rk[143] = rol32(key->rk[135] + lea_delta[7][28], 17);
-+		key->rk[151] = rol32(key->rk[143] + lea_delta[1][26], 3);
-+		key->rk[159] = rol32(key->rk[151] + lea_delta[2][29], 11);
-+		key->rk[167] = rol32(key->rk[159] + lea_delta[3][0], 17);
-+		key->rk[175] = rol32(key->rk[167] + lea_delta[5][30], 3);
-+		key->rk[183] = rol32(key->rk[175] + lea_delta[6][1], 11);
-+		key->rk[191] = rol32(key->rk[183] + lea_delta[7][4], 17);
-+
-+		break;
-+
-+	default:
-+		return 1;
-+	}
-+
-+	key->round = LEA_ROUND_CNT(key_len);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(lea_set_key);
-+
-+static int crypto_lea_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-+											u32 key_len)
-+{
-+	return lea_set_key(crypto_tfm_ctx(tfm), in_key, key_len);
-+}
-+
-+static void crypto_lea_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+{
-+	const struct crypto_lea_ctx *key = crypto_tfm_ctx(tfm);
-+
-+	lea_encrypt(key, out, in);
-+}
-+
-+static void crypto_lea_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+{
-+	const struct crypto_lea_ctx *key = crypto_tfm_ctx(tfm);
-+
-+	lea_decrypt(key, out, in);
-+}
-+
-+static struct crypto_alg lea_alg = {
-+	.cra_name        = "lea",
-+	.cra_driver_name = "lea-generic",
-+	.cra_priority    = 100,
-+	.cra_flags       = CRYPTO_ALG_TYPE_CIPHER,
-+	.cra_blocksize   = LEA_BLOCK_SIZE,
-+	.cra_ctxsize     = sizeof(struct crypto_lea_ctx),
-+	.cra_module      = THIS_MODULE,
-+	.cra_u           = {
-+		.cipher = {
-+			.cia_min_keysize = LEA_MIN_KEY_SIZE,
-+			.cia_max_keysize = LEA_MAX_KEY_SIZE,
-+			.cia_setkey = crypto_lea_set_key,
-+			.cia_encrypt = crypto_lea_encrypt,
-+			.cia_decrypt = crypto_lea_decrypt
-+		}
-+	}
-+};
-+
-+static int crypto_lea_init(void)
-+{
-+	return crypto_register_alg(&lea_alg);
-+}
-+
-+static void crypto_lea_exit(void)
-+{
-+	crypto_unregister_alg(&lea_alg);
-+}
-+
-+module_init(crypto_lea_init);
-+module_exit(crypto_lea_exit);
-+
-+MODULE_DESCRIPTION("LEA Cipher Algorithm");
-+MODULE_AUTHOR("Dongsoo Lee <letrhee@nsr.re.kr>");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("lea");
-+MODULE_ALIAS_CRYPTO("lea-generic");
-diff --git a/include/crypto/lea.h b/include/crypto/lea.h
-new file mode 100644
-index 000000000000..1668c7ed5a6e
---- /dev/null
-+++ b/include/crypto/lea.h
-@@ -0,0 +1,39 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Cryptographic API.
-+ *
-+ * LEA Cipher Algorithm
-+ *
-+ * LEA is a 128-bit block cipher developed by South Korea in 2013.
-+ *
-+ * LEA is the national standard of Republic of Korea (KS X 3246) and included in
-+ * the ISO/IEC 29192-2:2019 standard (Information security - Lightweight
-+ * cryptography - Part 2: Block ciphers).
-+ *
-+ * Copyright (c) 2023 National Security Research.
-+ * Author: Dongsoo Lee <letrhee@nsr.re.kr>
-+ */
-+
-+#ifndef _CRYPTO_LEA_H
-+#define _CRYPTO_LEA_H
-+
-+#include <linux/types.h>
-+
-+#define LEA_MIN_KEY_SIZE 16
-+#define LEA_MAX_KEY_SIZE 32
-+#define LEA_BLOCK_SIZE 16
-+#define LEA_ROUND_CNT(key_len) ((key_len >> 1) + 16)
-+
-+#define LEA_MAX_KEYLENGTH_U32 (LEA_ROUND_CNT(LEA_MAX_KEY_SIZE) * 6)
-+#define LEA_MAX_KEYLENGTH (LEA_MAX_KEYLENGTH_U32 * sizeof(u32))
-+
-+struct crypto_lea_ctx {
-+	u32 rk[LEA_MAX_KEYLENGTH_U32];
-+	u32 round;
-+};
-+
-+int lea_set_key(struct crypto_lea_ctx *ctx, const u8 *in_key, u32 key_len);
-+void lea_encrypt(const void *ctx, u8 *out, const u8 *in);
-+void lea_decrypt(const void *ctx, u8 *out, const u8 *in);
-+
-+#endif
--- 
-2.34.1
+
