@@ -2,109 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCD1C77B61
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 21:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34249C77B60
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 23:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbjD1VHK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 17:07:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46570 "EHLO
+        id S1346529AbjD1XUJ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Apr 2023 19:20:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbjD1VHJ (ORCPT
+        with ESMTP id S230110AbjD1XUI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2023 17:07:09 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD0D10CF;
-        Fri, 28 Apr 2023 14:07:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682716025; x=1714252025;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=j5yjbkrUnLbhgf5RqgvDiK85j0zR1x8IzFncQZH7CJE=;
-  b=jRQEfN/LkUvD3iHkmSrfthV6Q78l9pyhTzSJAJxppUxJOFJupNz32sSe
-   eem725bRH3ep0CqjPOYYVCrukFqgovI+X4iMLFLOirLnQpTuUB0gi8Cte
-   KLvnVNNhSEewaytntzMZX2XFm7uFIcEX8lIjaec5mPpdiEt7pylqxQMd5
-   ItZ/k248li2gY0Ld+gqNXeABmnK+26krkhd8aBqqFcivpzqEw1p6qLvXm
-   ZPSa3sb76ukOPY2LStqxyQeanvHpOaBgotdMEafhZY71pW2NK2Qp+4F07
-   looAAtEVxVo6+UD7UE5h+4fhNvubfaMz2UX+xsKtv3/V7rLV1abS7lhXi
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="434151426"
-X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
-   d="scan'208";a="434151426"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 14:07:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="672330648"
-X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
-   d="scan'208";a="672330648"
-Received: from sheilalo-mobl.amr.corp.intel.com (HELO ykaur1-mobl2.amr.corp.intel.com) ([10.209.181.29])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 14:07:02 -0700
-Message-ID: <374d40f829001d0ea737e776f5f9dca8b311fffd.camel@linux.intel.com>
-Subject: Re: [PATCH v3 15/15] crypto: iaa - Add IAA Compression Accelerator
- stats
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Randy Dunlap <rdunlap@infradead.org>, herbert@gondor.apana.org.au,
-        davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org
-Cc:     dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        hdanton@sina.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Date:   Fri, 28 Apr 2023 16:06:50 -0500
-In-Reply-To: <7f257119-339b-1d42-4252-181f9666d78e@infradead.org>
-References: <20230428205539.113902-1-tom.zanussi@linux.intel.com>
-         <20230428205539.113902-16-tom.zanussi@linux.intel.com>
-         <7f257119-339b-1d42-4252-181f9666d78e@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1-0ubuntu1 
+        Fri, 28 Apr 2023 19:20:08 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678DB49DA;
+        Fri, 28 Apr 2023 16:20:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 00D3F6171A;
+        Fri, 28 Apr 2023 23:20:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED74AC433EF;
+        Fri, 28 Apr 2023 23:20:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682724006;
+        bh=cIqm3XTL0SG2Eh3M38737ND7Xx7N1gvN2VlCssMaT80=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qduOYs9UigQVQhE+1Tqthv8UtsnibtIOE7Nh74kF5jb/uCPDKveP9wqLSWQMGbj/k
+         xlm4JsiX4/AiKmyjZq63KcnWwx4nC9BxpBMVFeT9MgbohJ4mFnlOjYpdibsIXwLECs
+         h+NZ1tCGbBD2RcEHlxKcAiQimS9f/gTX/j7EhM95JvbE0OdUHhB3l+MmQ87K5JgYQP
+         7fl89K6nAczkClmmOC5fOZseW9ScS+d+4iVAuw1K97cZDHSP5qi8ojvxX8M6yTjAb2
+         AossC/JSf3Mpbksmr8MKzgqzTotU54us1Dqg0dS+K9oaDS0wbowMtoPmXNR3uBNx5S
+         5keHczeR6v4Mw==
+Date:   Fri, 28 Apr 2023 16:19:52 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dongsoo Lee <letrhee@nsr.re.kr>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        "David S. Miller" <abc@test.nsr.re.kr>,
+        Dongsoo Lee <letrhee@gmail.com>
+Subject: Re: [PATCH 0/3] crypto: LEA block cipher implementation
+Message-ID: <20230428231952.GA3150@sol.localdomain>
+References: <20230428110058.1516119-1-letrhee@nsr.re.kr>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230428110058.1516119-1-letrhee@nsr.re.kr>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Randy,
+Hi Dongsoo,
 
-On Fri, 2023-04-28 at 14:00 -0700, Randy Dunlap wrote:
-> Hi--
->=20
-> On 4/28/23 13:55, Tom Zanussi wrote:
-> > diff --git a/drivers/crypto/intel/iaa/Kconfig
-> > b/drivers/crypto/intel/iaa/Kconfig
-> > index fcccb6ff7e29..cffb3a4359fc 100644
-> > --- a/drivers/crypto/intel/iaa/Kconfig
-> > +++ b/drivers/crypto/intel/iaa/Kconfig
-> > @@ -8,3 +8,12 @@ config CRYPTO_DEV_IAA_CRYPTO
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 decompression wi=
-th the Intel Analytics Accelerator (IAA)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 hardware using t=
-he cryptographic API.=C2=A0 If you choose 'M'
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 here, the module=
- will be called iaa_crypto.
-> > +
-> > +config CRYPTO_DEV_IAA_CRYPTO_STATS
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool "Enable Intel(R) IAA Co=
-mpression Accelerator
-> > Statistics"
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on CRYPTO_DEV_IAA_CR=
-YPTO
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0default n
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0help
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable statisti=
-cs for the IAA compression accelerator.
->=20
-> The line above should use one tab + 2 spaces for indentation
-> instead of bunch-of-spaces.
+On Fri, Apr 28, 2023 at 08:00:55PM +0900, Dongsoo Lee wrote:
+> The Korean e-government framework contains various cryptographic
+> applications, and KCMVP-validated cryptographic module should be used
+> according to the government requirements. The ARIA block cipher, which
+> is already included in Linux kernel, has been widely used as a symmetric
+> key cipher. However, the adoption of LEA increase rapidly for new
+> applications.
+> 
+> By adding LEA to the Linux kernel, Dedicated device drivers that require
+> LEA encryption can be provided without additional crypto implementation.
+> An example of an immediately applicable use case is disk encryption
+> using cryptsetup.
+> 
+> The submitted implementation includes a generic C implementation that
+> uses 32-bit ARX operations, and an optimized implementation for the
+> x86_64 environment.
 
-Yep, so much for consistency, will fix.  Thanks for pointing it out.
+Can you elaborate further on the use case for this cipher?  Your description
+above is very vague.  What is the actual use case when so many other ciphers
+already exist, including much better studied ones?  Are people being required to
+use this cipher, and if so under what situations?  There is also already another
+"national pride" block cipher from Korea (ARIA); do we really need another one?
 
-Tom
+BTW, in 2018, I investigated LEA and various other ciphers as options for
+storage encryption on ARM processors without the crypto extensions.  We ended up
+not selecting LEA for several different reasons (e.g. see
+https://lore.kernel.org/r/20180507232000.GA194688@google.com), and we later
+created Adiantum for the use case.  But, it sounds like "storage encryption on
+processors without crypto instructions" isn't the use case you have in mind at
+all anyway, seeing as the only assembly code you're providing is for x86_64.
+What sort of use case do you actually have in mind?  Is this perhaps a PhD
+thesis type of thing that won't actually be used in a real world application?
 
->=20
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 These include per-dev=
-ice and per-workqueue statistics in
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 addition to global dr=
-iver statistics.
->=20
-> Thanks.
+IIRC, one of the issues with LEA was that the LEA paper doesn't provide test
+vectors, so I couldn't be certain that I had actually implemented the algorithm
+correctly.  It sounds like there are now test vectors available.  How confident
+are you that they actually match the original algorithm?
 
+> The implementation has been tested with kernel module tcrypt.ko and has
+> passed the selftest using test vectors for KCMVP[4]. The path also test
+> with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
+
+There is a KASAN out-of-bounds error in lea_set_key() when running the
+self-tests.
+
+- Eric
