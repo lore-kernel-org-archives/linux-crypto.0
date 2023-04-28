@@ -2,45 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1E1C7EE22
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 18:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903A7C77B7E
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 18:56:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346516AbjD1S4L (ORCPT
+        id S1346531AbjD1S4M (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 14:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36616 "EHLO
+        Fri, 28 Apr 2023 14:56:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346461AbjD1S4I (ORCPT
+        with ESMTP id S1346468AbjD1S4I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 28 Apr 2023 14:56:08 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2055.outbound.protection.outlook.com [40.107.102.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456B05249;
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2047.outbound.protection.outlook.com [40.107.95.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4D64EFE;
         Fri, 28 Apr 2023 11:56:07 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RZhZtYtTWOSusHKVG1KjPStAx6qW21RBgUThmUtmAXl9HlHodFsZ6xGCPvC0fx1Mk4H0mfapCy3ArBOpHHFpwKNcSVQd05sljiYNdmpCKZrDhcBkNdlDpRRYrUmzzMVfc6+A9JJL/fLxFlLMVjafPqinB5HuJjPl/wTigcIPA7bO+vt86q58j6X30NxAhYbWj4p4alhJZRaGaGQCrWRiBzdcyeeSFgXTrF+8cl3JoutOihoHGCNHq0mrAKW9LjhrkFZ7G3NEWxpIK+Pq/Q1Y5HmS79+X8bgs+njnzsxPq9DSw5YZeS8IV2AkC/WIG+YFJEoKR/128t8cDNqedkJ9PQ==
+ b=EGInx/Jn6V599fH7MxVZeLu6BjNL8iXLN1wXyxJ/Dx/qVoLbrvL9lgCPoFBugR8HytE49xmkBoifC4St3+zgEberJ4VKDX7ezMtGgwl2ZttO6PJxxitOG7PiHh3j45adaPAPQYn2ljmUv18s4KIdbzXsmrm8CyQ25QczYnoy8BJQ2YEMlo+iA5vUJv0qgQ6+Ujwot4OmLAJ2m39pEUs2vfuSUlYSUBiDx1jHZJP/boW4BI4h4FsXldCLU7oHiSm4HIvVWVjmDKxWZPxpzyGtPrsyWD+Ph8rtScBdwtlT9JMqPus3L68lYkbmJFDhWJyIV13X+she+8FWC8AZZDXKXw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uCK3UFN7kfeIWQFj87Ev9Xsr6tgtpWCv/5cTFSUBohk=;
- b=nemAPUSg94rtzUqrsKTS2667fC+c78ARA+dMUVLrSHzoI2F8zSDgx9XI5N/TJZ9JK1ChbWOtBXqWl7C/Ut9VcxwJgnsJ/d3Qol8QQ921q3yyzxyGnFljI5yPy1qaEe3rtnttziqWZc9QTKVy0XSUvZoUnVTDgKuUk6fQxMx2oUebD1zL91riNmaalZ6kd/0/iZjXYAr+rUed2kbGtvFUnhjyEK061SIwnb0srA35Yk4MKC2ctlwnGgFWilugZNyZSsUOTLI/R+QQRYUJNmsL3rJJc8CzwiqqBGzR3T5E1M2Hyy04cg5x1Z90EeQQHr2flBv1QUhB2dGlRyfff/urKA==
+ bh=P8pXCP4cZAIIewrP9UkvRDq/kcEppWjyHw+UNk2bTMk=;
+ b=QmtTVVE4oNxr52I58W7NkIHcfji2gGyOjVoNGX+Lui3whKiPew0SC5WU5BrmA1wMnqjIaKlRUQtHnNk8EPIv1te2ptcN+3gAqcq8Ov+75+n0noGuHyibq+PnDyI4Mb9DW+GyPtt7dBNXG4RA6l72IyUgMwkcIwBq1BD8qAE+KPPcFRlAOby/3LYrkN+QlWYS4R9jGXTdnISw/qe0xrSKxIsrw6v5grbc0pShSZJWLLZH2tJhIKkszq9Q3RSh/Px9xE2fvxmvq2aPikDO419JOkizFK7WOTW/hUY9Q2ISoa85Wn45p2IPiTtDBDRHbmRdvYZmupZ8BoQRI38n/RItjQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uCK3UFN7kfeIWQFj87Ev9Xsr6tgtpWCv/5cTFSUBohk=;
- b=YA5R3dQHArK/3S12ygQgPI0YoUrjR1ua4ilgqmF/aazWXU6fjBZKWX/tMpM505GXWURx3U2PYUDZ3jZ4QslXHwDwqRxfpVgQ9+33cpXAjfp+sri6TJhACh8bHLHj4AAGXO3QhXm8W6/lEkc5/BRqcEKPa2col5cuiQ/tTz500mQ=
-Received: from DS7PR07CA0018.namprd07.prod.outlook.com (2603:10b6:5:3af::27)
- by CH2PR12MB4969.namprd12.prod.outlook.com (2603:10b6:610:68::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.24; Fri, 28 Apr
- 2023 18:56:04 +0000
+ bh=P8pXCP4cZAIIewrP9UkvRDq/kcEppWjyHw+UNk2bTMk=;
+ b=4oihphtGh1XFUqMIRBfPVQkR1glHiOcEnohDDodNj2iCO0ISDTpK4LQWIK5PRW9JmxALSHY2YNwX1dzVADoqelWYk+TCPDWXsrcG57FaO9FMQ8ndum4nYIsSqA/vzPJyS8D3L7jvf7TKFzOYhAFQSlZKhyauSoxnfRMwA9niLKg=
+Received: from DS7PR07CA0024.namprd07.prod.outlook.com (2603:10b6:5:3af::6) by
+ BL1PR12MB5206.namprd12.prod.outlook.com (2603:10b6:208:31c::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6340.23; Fri, 28 Apr 2023 18:56:03 +0000
 Received: from DM6NAM11FT050.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3af:cafe::93) by DS7PR07CA0018.outlook.office365.com
- (2603:10b6:5:3af::27) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:5:3af:cafe::76) by DS7PR07CA0024.outlook.office365.com
+ (2603:10b6:5:3af::6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.24 via Frontend
- Transport; Fri, 28 Apr 2023 18:56:04 +0000
+ Transport; Fri, 28 Apr 2023 18:56:02 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -50,21 +49,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DM6NAM11FT050.mail.protection.outlook.com (10.13.173.111) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6340.25 via Frontend Transport; Fri, 28 Apr 2023 18:56:04 +0000
+ 15.20.6340.25 via Frontend Transport; Fri, 28 Apr 2023 18:56:01 +0000
 Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 28 Apr
- 2023 13:56:02 -0500
+ 2023 13:56:00 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>
 CC:     David S Miller <davem@davemloft.net>,
         Mario Limonciello <mario.limonciello@amd.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 04/10] crypto: ccp: move setting PSP master to earlier in the init
-Date:   Fri, 28 Apr 2023 13:55:34 -0500
-Message-ID: <20230428185543.8381-5-mario.limonciello@amd.com>
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH v2 02/10] crypto: ccp: Add support for displaying PSP firmware versions
+Date:   Fri, 28 Apr 2023 13:55:32 -0500
+Message-ID: <20230428185543.8381-3-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230428185543.8381-1-mario.limonciello@amd.com>
 References: <20230428185543.8381-1-mario.limonciello@amd.com>
@@ -76,59 +75,178 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT050:EE_|CH2PR12MB4969:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90b9aea5-083c-4bb2-78d1-08db481a379f
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT050:EE_|BL1PR12MB5206:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1206370c-59b9-4f27-4274-08db481a363c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6NKDy9yUb3K9t/WX6FE/BvU+sPuUAmlW7jEHlKAdiZJuwZMkbG+eCb9m2GT87OGXBbl/BG1IWLcrp+JLmUHdDl0a3wbeTp4DTRz0KNKBbkWE+Ai7lMaIMwcwxn/I5G6Ha+Q3cyXXUAnpgZ4We4IlJNwQRFhq09lfvuxGQpfYWDB0ZfCjMDRWF4q7ci4tquMAZgzaJSyndh+jezvRYrKfWK+Q9WCZS+ceCzzcjQ3PIWu+SST/H/nXl5Y9cHzUTnAnWLw6KK7PTpCXcJ8DxO1l5eiOP8EQl87pC8edtSQ5FJsNojvrXnAxr/X9wpcpslhOTP4add/Jze7dySIXO84szS4ySao8y1/rEfHWyTYnEG1d4r++vBli88i9cYRV1E3JovF2iNMfEmZA9bfU/czhpcWgtjOwENMaBM28YYi+NOmXJxRJc5Qv4Zyi8s6sNqvdObKx2Rn8nAmRPs8y2dzT1dOl7RYf35iNjAxFYXM0EmAWdguV9a/QLRy+fL2Wd4f4TGq58xuGmrXweZWJY/qDtlpgaIhcIQJjGSfVtIaEhhHtBYFX1lPCjFVDV64Mx0Yi6xwtE4YxrF9PWP10kIwJgamvvKMLxBOeLeGV7s6I6MpX62hJ3tT7SAr7TQY+OxYYpE9WD6AVR7kigOhPPQkxJ7ewN4ScH4evdMJlY+jFZ27RrvACAnpL5M/1SqnVcxgBAl5llYQFIFp0KosVHriiiowJsOqykT2rLUF1xSKtPgA=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(376002)(346002)(451199021)(36840700001)(46966006)(40470700004)(86362001)(2906002)(82310400005)(36756003)(4744005)(40460700003)(40480700001)(6666004)(7696005)(4326008)(83380400001)(2616005)(47076005)(186003)(36860700001)(16526019)(426003)(336012)(1076003)(26005)(44832011)(6636002)(70206006)(70586007)(478600001)(110136005)(82740400003)(356005)(316002)(5660300002)(41300700001)(81166007)(8676002)(54906003)(8936002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: xl0xSvkO7B403rdB4fY9ykvhLqrKF6ugCuD2ohZYEywWMyUqb2t2AtRrZ2DklFEjIxj1YruOO+miXl7FPPnfcUd+ITarvfTOiSCM42d3rHGk82TeGmw8nKgnqkgFqY8Rn3Tss58bfOFK0NRjJq7Hp+SxyZpzN/IieeOnOoo3gofkVbLuNzJwIp88KMyyV7gKef5Z+Q/NJ8kJjZZI3aUKTm285FFNOPR2ohKVWVXu+U0uLed96prB02K+kXUbDPeC6LI4Mc63lf6cdGvhft7iixUS3cPJOxC70Yphlxv7gaYBMF04+rx4pZpVx29ezBvMSHipEcjmksirrcm3aOcmvA9F9yk3rFZuSAVX5aWLg0bGVVnRfxdAUdaW7W0/i2YbqFn5By8H+jj9OR09lzc3JfQx6DgkAMUB2HiiVuHZI40rB3u1+ucmQf3qF/oYxXogm1Y+8OgnoqKcS7Unp92ONowCDhzUO1lcMYscJfUC+ljltZ3LK1jgmirKd5zLikSgz6da/M3v7UmOIyrBJQBmv/DyhgfR0Z8WOgGswwAJnBPX/haBK4Anl283iIuUMdC8cKN24NZKIQdxvsbIa7qWP/67jAzs08L5ifyXaYRUfTED04Tgb8xFYrFD/831pskK5G7DfSqytWJ7Aki0EG1O5tQPGRed8SXmZn+Yf6UgThA8ZbfJWTha7qg7foGwfnj6cLEHB2J7Qvih9HJmAqWmd7BKx27FiwXX2z3ayBAB29SaFSl1RVAg2FSRV0DBUj8oaVwe/kt36t76BZgM8v88Q9fGim+mqEKkQCQ5C8WigR4=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(376002)(136003)(39860400002)(451199021)(40470700004)(36840700001)(46966006)(54906003)(6636002)(110136005)(478600001)(7696005)(6666004)(40460700003)(41300700001)(83380400001)(2906002)(36860700001)(82740400003)(86362001)(5660300002)(44832011)(82310400005)(81166007)(356005)(8676002)(8936002)(16526019)(40480700001)(1076003)(186003)(26005)(70586007)(336012)(316002)(4326008)(47076005)(2616005)(426003)(70206006)(36756003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2023 18:56:04.1667
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2023 18:56:01.8544
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90b9aea5-083c-4bb2-78d1-08db481a379f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1206370c-59b9-4f27-4274-08db481a363c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT050.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4969
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5206
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dynamic boost control needs to use platform access symbols
-that look for the PSP master as part of initialization.
-
-So move the PSP master before psp_init() so that dynamic boost
-control can be initialized properly.
+As it's not always obvious what PSP bootloader or TEE version are
+present in OEM systems, add the ability to get this information from
+sysfs for supported platforms.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+v1->v2:
+ * Move GENMASK declarations to top of the file
+ * Add comment to support why checking for 0xffffffff
+---
+ Documentation/ABI/testing/sysfs-driver-ccp | 18 ++++++
+ drivers/crypto/ccp/sp-dev.h                |  2 +
+ drivers/crypto/ccp/sp-pci.c                | 64 ++++++++++++++++++++++
+ 3 files changed, 84 insertions(+)
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index e3d6955d3265..e9136e398174 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -173,13 +173,14 @@ int psp_dev_init(struct sp_device *sp)
- 		goto e_err;
- 	}
- 
-+	/* master device must be set for platform access */
-+	if (psp->sp->set_psp_master_device)
-+		psp->sp->set_psp_master_device(psp->sp);
+diff --git a/Documentation/ABI/testing/sysfs-driver-ccp b/Documentation/ABI/testing/sysfs-driver-ccp
+index 7aded9b75553..ee6b787eee7a 100644
+--- a/Documentation/ABI/testing/sysfs-driver-ccp
++++ b/Documentation/ABI/testing/sysfs-driver-ccp
+@@ -85,3 +85,21 @@ Description:
+ 		Possible values:
+ 		0: Not enforced
+ 		1: Enforced
 +
- 	ret = psp_init(psp);
- 	if (ret)
- 		goto e_irq;
++What:		/sys/bus/pci/devices/<BDF>/bootloader_version
++Date:		June 2023
++KernelVersion:	6.4
++Contact:	mario.limonciello@amd.com
++Description:
++		The /sys/bus/pci/devices/<BDF>/bootloader_version
++		file reports the firmware version of the AMD AGESA
++		bootloader.
++
++What:		/sys/bus/pci/devices/<BDF>/tee_version
++Date:		June 2023
++KernelVersion:	6.4
++Contact:	mario.limonciello@amd.com
++Description:
++		The /sys/bus/pci/devices/<BDF>/tee_version
++		file reports the firmware version of the AMD Trusted
++		Execution Environment (TEE).
+diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
+index 1253a0217985..76c32ee6bd65 100644
+--- a/drivers/crypto/ccp/sp-dev.h
++++ b/drivers/crypto/ccp/sp-dev.h
+@@ -51,6 +51,7 @@ struct tee_vdata {
+ 	const unsigned int cmdbuff_addr_hi_reg;
+ 	const unsigned int ring_wptr_reg;
+ 	const unsigned int ring_rptr_reg;
++	const unsigned int info_reg;
+ };
  
--	if (sp->set_psp_master_device)
--		sp->set_psp_master_device(sp);
--
- 	/* Enable interrupt */
- 	iowrite32(-1, psp->io_regs + psp->vdata->inten_reg);
+ struct platform_access_vdata {
+@@ -69,6 +70,7 @@ struct psp_vdata {
+ 	const unsigned int feature_reg;
+ 	const unsigned int inten_reg;
+ 	const unsigned int intsts_reg;
++	const unsigned int bootloader_info_reg;
+ };
+ 
+ /* Structure to hold SP device data */
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 85e3dc8853e2..7ef7c09b4a2f 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -8,6 +8,7 @@
+  * Author: Gary R Hook <gary.hook@amd.com>
+  */
+ 
++#include <linux/bitfield.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/device.h>
+@@ -24,6 +25,12 @@
+ #include "ccp-dev.h"
+ #include "psp-dev.h"
+ 
++/* used for version string AA.BB.CC.DD */
++#define AA				GENMASK(31, 24)
++#define BB				GENMASK(23, 16)
++#define CC				GENMASK(15, 8)
++#define DD				GENMASK(7, 0)
++
+ #define MSIX_VECTORS			2
+ 
+ struct sp_pci {
+@@ -88,8 +95,65 @@ static struct attribute_group psp_security_attr_group = {
+ 	.is_visible = psp_security_is_visible,
+ };
+ 
++#define version_attribute_show(name, _offset)					\
++static ssize_t name##_show(struct device *d, struct device_attribute *attr,	\
++			   char *buf)						\
++{										\
++	struct sp_device *sp = dev_get_drvdata(d);				\
++	struct psp_device *psp = sp->psp_data;					\
++	unsigned int val = ioread32(psp->io_regs + _offset);			\
++	return sysfs_emit(buf, "%02lx.%02lx.%02lx.%02lx\n",			\
++			  FIELD_GET(AA, val),			\
++			  FIELD_GET(BB, val),			\
++			  FIELD_GET(CC, val),			\
++			  FIELD_GET(DD, val));			\
++}
++
++version_attribute_show(bootloader_version, psp->vdata->bootloader_info_reg)
++static DEVICE_ATTR_RO(bootloader_version);
++version_attribute_show(tee_version, psp->vdata->tee->info_reg)
++static DEVICE_ATTR_RO(tee_version);
++
++static struct attribute *psp_firmware_attrs[] = {
++	&dev_attr_bootloader_version.attr,
++	&dev_attr_tee_version.attr,
++	NULL,
++};
++
++static umode_t psp_firmware_is_visible(struct kobject *kobj, struct attribute *attr, int idx)
++{
++	struct device *dev = kobj_to_dev(kobj);
++	struct sp_device *sp = dev_get_drvdata(dev);
++	struct psp_device *psp = sp->psp_data;
++	unsigned int val = 0xffffffff;
++
++	if (!psp)
++		return 0;
++
++	if (attr == &dev_attr_bootloader_version.attr &&
++	    psp->vdata->bootloader_info_reg)
++		val = ioread32(psp->io_regs + psp->vdata->bootloader_info_reg);
++
++	if (attr == &dev_attr_tee_version.attr &&
++	    psp->capability & PSP_CAPABILITY_TEE &&
++	    psp->vdata->tee->info_reg)
++		val = ioread32(psp->io_regs + psp->vdata->tee->info_reg);
++
++	/* If platform disallows accessing this register it will be all f's */
++	if (val != 0xffffffff)
++		return 0444;
++
++	return 0;
++}
++
++static struct attribute_group psp_firmware_attr_group = {
++	.attrs = psp_firmware_attrs,
++	.is_visible = psp_firmware_is_visible,
++};
++
+ static const struct attribute_group *psp_groups[] = {
+ 	&psp_security_attr_group,
++	&psp_firmware_attr_group,
+ 	NULL,
+ };
  
 -- 
 2.34.1
