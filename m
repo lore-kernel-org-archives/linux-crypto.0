@@ -2,284 +2,352 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD94FC77B60
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 18:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 875BDC77B61
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 20:55:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346603AbjD1S4k (ORCPT
+        id S1346760AbjD1Uz4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 14:56:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37502 "EHLO
+        Fri, 28 Apr 2023 16:55:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346545AbjD1S4g (ORCPT
+        with ESMTP id S1346536AbjD1Uzy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2023 14:56:36 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2056.outbound.protection.outlook.com [40.107.244.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFBA0659A;
-        Fri, 28 Apr 2023 11:56:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VjWruWPzY0sZwFTIWCCHXAaoDvCl4HV3VqD8Q0nzSxtZuL2A+919zKrLWma2BbOvQv5FF1uSzQFCHH9dWqElWkCF2MeHnvwMgTlDcWTFnKDD/jkUf1NFDDRVnaSwRrCeszEghejDb0cuFyNA4BXGS9zwO/AgVttHm3bjkNLGSGErt21WPfbco0fjJnykvkGTP+21oQy7NBOfj2TeajOuh+9KxB1kk5pzbYfe7wJ3Uflq7NNsfQl2ASWpOpcMX3jEfdfhIwSEkuMq+RuMpWHRlLy8l2/rssYzBspXN2mk1ArTWMC9/DcYlyewrBxVE/hHfllaDnw+iFKk47pOfnZSYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aS8JSioac+K5cQTdnoc+oQ3hySJkWDuNq/W398kLq/w=;
- b=mVDuJioyJcsUD267AuBe5iJ7HvyjifR6ErWswm5GfKmoAiX1vzGu50D7HAQs81Rz+0ISpb1V5m2rKQpQ0BrYtLyOhAbLINEQq0VEO/6WtRuBTMMsLZ0WJIDn9PtiiSbnfOcCIkCb5Vsh7NNFHC3c3GEbyBiGlrE8UDzwkkZRJsg1jT2I0DpmuFiBgUUcxNcv/pspna4S4uDCw8cVYt9j90MyPK8Pymdt2BjiPHnoVjKfn3g/6c5K8gtMn2QEUXy0xraucM+e0dWjYlIrmB0Nox9PEONOUNEHx5nWxbWxitcOVpI7aeFaL8lKJp/0SrlCe2fyJansgsC/aB2UiFeLDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aS8JSioac+K5cQTdnoc+oQ3hySJkWDuNq/W398kLq/w=;
- b=Heb98Bry/+zMqFffrvTEUtRWOjBbtwDLqdYPZSjhI6HPX2hjWCfe5rPXsgDiaZtM31OBbfEtsWTQ8RzAFdD+Sw0JmphFxaKWha8+FYCDd/wp9Wf1MwA6eum12KRWqO+HkpxZvOcJ9z5V4lBjZw/ulAXoOXsl9xE70eEQKtBPTKY=
-Received: from DM6PR11CA0069.namprd11.prod.outlook.com (2603:10b6:5:14c::46)
- by LV2PR12MB5727.namprd12.prod.outlook.com (2603:10b6:408:17d::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.21; Fri, 28 Apr
- 2023 18:56:12 +0000
-Received: from DM6NAM11FT045.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:14c:cafe::7f) by DM6PR11CA0069.outlook.office365.com
- (2603:10b6:5:14c::46) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.24 via Frontend
- Transport; Fri, 28 Apr 2023 18:56:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT045.mail.protection.outlook.com (10.13.173.123) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6340.23 via Frontend Transport; Fri, 28 Apr 2023 18:56:12 +0000
-Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 28 Apr
- 2023 13:56:08 -0500
-From:   Mario Limonciello <mario.limonciello@amd.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-CC:     David S Miller <davem@davemloft.net>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 07/10] crypto: ccp: Add support for getting and setting DBC parameters
-Date:   Fri, 28 Apr 2023 13:55:37 -0500
-Message-ID: <20230428185543.8381-8-mario.limonciello@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230428185543.8381-1-mario.limonciello@amd.com>
-References: <20230428185543.8381-1-mario.limonciello@amd.com>
+        Fri, 28 Apr 2023 16:55:54 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCCE5171D;
+        Fri, 28 Apr 2023 13:55:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682715352; x=1714251352;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9rP5kGE41nvjznZjtYkyCSvNPhFEM1ndpHzJYAROGYM=;
+  b=dag2dolT9BlNNFcDiU1ZIytIJHaRHEgT0pl9JlzKmMyndv9MdUPpZ1Pz
+   UpE7AONTUwCHZpvxflZ4tcdPgDl3d98UBRfd7mpauHOQFK0HcwgKbWak/
+   uI/SG7PSe7KFhSHhw+xdoguMterOyQJQVJMC0bkIw+haciAMapb9KQxa8
+   bU0NFLv/IZyxpUHfv6N/e8CVIl9zasTxCzn7QZWQWvmHEHbXllHuZqN6N
+   Q6Y8NS16gbE3L933lH8qJXYM6IAGCPWdistvSPRwbs4a9UDqw1+NSPIME
+   l48aDlSW1MoX8jgI+L4WWQ7xTtlBJphdGKh3wgqawt2fNIhPPAn4rvA5d
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="336937623"
+X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
+   d="scan'208";a="336937623"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 13:55:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="838980339"
+X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
+   d="scan'208";a="838980339"
+Received: from ykaur1-mobl2.amr.corp.intel.com (HELO tzanussi-mobl1.intel.com) ([10.209.181.29])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 13:55:44 -0700
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        fenghua.yu@intel.com, vkoul@kernel.org
+Cc:     dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
+        hdanton@sina.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: [PATCH v3 00/15] crypto: Add Intel Analytics Accelerator (IAA) crypto compression driver
+Date:   Fri, 28 Apr 2023 15:55:24 -0500
+Message-Id: <20230428205539.113902-1-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT045:EE_|LV2PR12MB5727:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2429067a-ee09-47ea-c1e6-08db481a3c5d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jcCoQPnH0N6a2w/A/robeilUgdZa1UpH2pZnVnz2xBdj+30qV3DrEcddHiScmpOQe7mo3T629CbrhSmyAEHQIMZ9g2vGeI4PrDCIH7RLWwpKGZvfNHebiijR75aEQggCVfU27dWcxN65AVriw5x0HGKhMlC0/Y2eHaOFSybBUO0Zxmje+SLOL7ipQe3G5JCe8S2Hmat8fg2UPrxprGwBpy5lvZmYPWSTpdIUqqhpkggujYG7y4bOUsmpyBO9EghZmMkWlgFmfHpdM1x5cq37AGdsq0G7BktIXQYorti/V6Hwlbj3bOqio5iOQTIW6lMjjrDdfu6KgssYm8oy/8RVOm6rVNl91CQ+PdqArFHuxYP2uNLOOtgniPqQTjAr2OnGzX/Pt0pTeAB/waaaiD37HJZGWPoeBGhSVeaGYyqpKiKBbTVZXnO3A3mVpcjjgOKYWYjxEh3ndUixuwvrDIylmTizegFAjybSpmP9QkZ6q8xvIdfj+h6II4tmd9n6GDYau+rrvgSIYYQ1y184qF2uBJtS5DFuUGJWRplKcz0oZs7gvNhIExMxFlEJDJUplCs6+rCWIS47f6a1lJX5e4ZIVHFyNZfv+71T1K8FKJhHLl0fzclokkCouGP/HFneMU/aI52+beeBXUB3Iukxgcu++4ihwTsLZADyb/v43z61DeGmo76ZWfH9QjOvXmXNm4XqX92oMOuw+GHWcXXvLvt3XDI2yjlHcoPLDy7IdleDbJ4=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(396003)(136003)(346002)(451199021)(40470700004)(46966006)(36840700001)(110136005)(54906003)(7696005)(426003)(4326008)(83380400001)(6636002)(36756003)(82310400005)(86362001)(41300700001)(8936002)(6666004)(8676002)(2616005)(478600001)(16526019)(44832011)(186003)(316002)(26005)(70586007)(5660300002)(1076003)(336012)(70206006)(81166007)(47076005)(40460700003)(36860700001)(356005)(2906002)(82740400003)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Apr 2023 18:56:12.1402
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2429067a-ee09-47ea-c1e6-08db481a3c5d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT045.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5727
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-After software has authenticated a dynamic boost control request,
-it can fetch and set supported parameters using a selection of messages.
+Hi, this is v3 of the IAA crypto driver, incorporating feedback from
+v2.
 
-Add support for these messages and export the ability to do this to
-userspace.
+v3 changes:
 
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
----
- drivers/crypto/ccp/dbc.c            | 41 ++++++++++++++++++++
- drivers/crypto/ccp/dbc.h            |  6 +++
- include/linux/psp-platform-access.h |  2 +
- include/uapi/linux/psp-dbc.h        | 60 +++++++++++++++++++++++++++++
- 4 files changed, 109 insertions(+)
+  - Reworked the code to only allow the registered crypto alg to be
+    unregistered by removing the module.  Also added an iaa_wq_get()
+    and iaa_wq_put() to take/give up a reference to the work queue
+    while there are compresses/decompresses in flight.  This is
+    synchronized with the wq remove function, so that the
+    iaa_wq/iaa_devices can't go away beneath active operations.  This
+    was tested by removing/disabling the iaa wqs/devices while
+    operations were in flight.
 
-diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
-index ca7ec528536b..89976d6b9109 100644
---- a/drivers/crypto/ccp/dbc.c
-+++ b/drivers/crypto/ccp/dbc.c
-@@ -74,6 +74,30 @@ static int send_dbc_nonce(struct psp_dbc_device *dbc_dev)
- 	return ret;
- }
+  - Simplified the rebalance code and removed cpu_to_iaa() function
+    since it was overly complicated and wasn't actually working as
+    advertised.
+
+  - As a result of reworking the above code, fixed several bugs such
+    as possibly unregistering an unregistered crypto alg, a memory
+    leak where iaa_wqs weren't being freed, and making sure the
+    compression schemes were registered before registering the driver.
+
+  - Added set_/idxd_wq_private() accessors for wq private data.
+
+  - Added missing XPORT_SYMBOL_NS_GPL() to [PATCH 04/15] dmaengine:
+    idxd: Export descriptor management functions
+
+  - Added Dave's Reviewed-by: tags from v2.
+
+  - Updated Documentation and commit messages to reflect the changes
+    above.
+  
+  - Rebased to to cryptodev tree, since that has the earlier changes
+    that moved the intel drivers to crypto/intel.
+
+v2 changes:
+
+  - Removed legacy interface and all related code; merged async
+    interface into main deflate patch.
+
+  - Added support for the null destination case.  Thanks to Giovanni
+    Cabiddu for making me aware of this as well as the selftests for
+    it.
+
+  - Had to do some rearrangement of the code in order to pass all the
+    selftests.  Also added a testcase for 'canned'.
+
+  - Moved the iaa crypto driver to drivers/crypto/intel, and moved all
+    the other intel drivers there as well (which will be posted as a
+    separate series immediately following this one).
+
+  - Added an iaa crypto section to MAINTAINERS.
+
+  - Updated the documenation and commit messages to reflect the removal
+    of the legacy interface.
+
+  - Changed kernel version from 6.3.0 to 6.4.0 in patch 01/15 (wq
+    driver name support)
+
+v1:
+
+This series adds Linux crypto algorithm support for Intel® In-memory
+Analytics Accelerator (Intel IAA) [1] hardware compression and
+decompression, which is available on Sapphire Rapids systems.
+
+The IAA crypto support is implemented as an IDXD sub-driver.  The IDXD
+driver already present in the kernel provides discovery and management
+of the IAA devices on a system, as well as all the functionality
+needed to manage, submit, and wait for completion of work executed on
+them.  The first 7 patches (patches starting with dmaengine:) add
+small bits of underlying IDXD plumbing needed to allow external
+sub-drivers to take advantage of this support and claim ownership of
+specific IAA devices and workqueues.
+
+The remaining patches add the main support for this feature via the
+crypto API, making it transparently accessible to kernel features that
+can make use of it such as zswap and zram (patches starting with
+crypto – iaa:).
+
+These include both sync/async support for the deflate algorithm
+implemented by the IAA hardware, as well as an additional option for
+driver statistics and Documentation.
+
+Patch 8 ('[PATCH 08/15] crypto: iaa - Add IAA Compression Accelerator
+Documentation') describes the IAA crypto driver in detail; the
+following is just a high-level synopsis meant to aid the following
+discussion.
+
+The IAA hardware is fairly complex and generally requires a
+knowledgeable administrator with sufficiently detailed understanding
+of the hardware to set it up before it can be used.  As mentioned in
+the Documentation, this typically requires using a special tool called
+accel-config to enumerate and configure IAA workqueues, engines, etc,
+although this can also be done using only sysfs files.
+
+The operation of the driver mirrors this requirement and only allows
+the hardware to be accessed via the crypto layer once the hardware has
+been configured and bound to the the IAA crypto driver.  As an IDXD
+sub-driver, the IAA crypto driver essentially takes ownership of the
+hardware until it is given up explicitly by the administrator.  This
+occurs automatically when the administrator enables the first IAA
+workqueue or disables the last one; the iaa_crypto (sync and async)
+algorithms are registered when the first workqueue is enabled, and
+deregistered when the last one is disabled.
+
+The normal sequence of operations would normally be: 
+
+  < configure the hardware using accel-config or sysfs > 
+
+  < configure the iaa crypto driver (see below) > 
+
+  < configure the subsystem e.g. zswap/zram to use the iaa_crypto algo >  
+
+  < run the workload > 
+
+There are a small number of iaa_crypto driver attributes that the
+administrator can configure, and which also need to be configured
+before the algorithm is enabled:
+
+compression_mode: 
+
+  The IAA crypto driver supports an extensible interface supporting
+  any number of different compression modes that can be tailored to
+  specific types of workloads.  These are implemented as tables and
+  given arbitrary names describing their intent.
+
+  There are currently only 2 compression modes, “canned” and “fixed”.
+  In order to set a compression mode, echo the mode’s name to the
+  compression_mode driver attribute:
  
-+static int send_dbc_parameter(struct psp_dbc_device *dbc_dev)
-+{
-+	dbc_dev->mbox->req.header.payload_size = sizeof(dbc_dev->mbox->dbc_param);
-+
-+	switch (dbc_dev->mbox->dbc_param.user.msg_index) {
-+	case PARAM_SET_FMAX_CAP:
-+	case PARAM_SET_PWR_CAP:
-+	case PARAM_SET_GFX_MODE:
-+		return send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_SET_PARAMETER);
-+	case PARAM_GET_FMAX_CAP:
-+	case PARAM_GET_PWR_CAP:
-+	case PARAM_GET_CURR_TEMP:
-+	case PARAM_GET_FMAX_MAX:
-+	case PARAM_GET_FMAX_MIN:
-+	case PARAM_GET_SOC_PWR_MAX:
-+	case PARAM_GET_SOC_PWR_MIN:
-+	case PARAM_GET_SOC_PWR_CUR:
-+	case PARAM_GET_GFX_MODE:
-+		return send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_GET_PARAMETER);
-+	}
-+
-+	return -EINVAL;
-+}
-+
- void dbc_dev_destroy(struct psp_device *psp)
- {
- 	struct psp_dbc_device *dbc_dev = psp->dbc_data;
-@@ -135,6 +159,23 @@ static long dbc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
- 			goto unlock;
- 		}
- 		break;
-+	case DBCIOCPARAM:
-+		if (copy_from_user(&dbc_dev->mbox->dbc_param.user, argp,
-+				   sizeof(struct dbc_user_param))) {
-+			ret = -EFAULT;
-+			goto unlock;
-+		}
-+
-+		ret = send_dbc_parameter(dbc_dev);
-+		if (ret)
-+			goto unlock;
-+
-+		if (copy_to_user(argp, &dbc_dev->mbox->dbc_param.user,
-+				 sizeof(struct dbc_user_param)))  {
-+			ret = -EFAULT;
-+			goto unlock;
-+		}
-+		break;
- 	default:
- 		ret = -EINVAL;
- 
-diff --git a/drivers/crypto/ccp/dbc.h b/drivers/crypto/ccp/dbc.h
-index 156435100076..e963099ca38e 100644
---- a/drivers/crypto/ccp/dbc.h
-+++ b/drivers/crypto/ccp/dbc.h
-@@ -38,10 +38,16 @@ struct dbc_set_uid {
- 	struct dbc_user_setuid		user;
- } __packed;
- 
-+struct dbc_param {
-+	struct psp_req_buffer_hdr	header;
-+	struct dbc_user_param		user;
-+} __packed;
-+
- union dbc_buffer {
- 	struct psp_request		req;
- 	struct dbc_nonce		dbc_nonce;
- 	struct dbc_set_uid		dbc_set_uid;
-+	struct dbc_param		dbc_param;
- };
- 
- void dbc_dev_destroy(struct psp_device *psp);
-diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
-index 18b9e0f0cb03..c1dc87fc536b 100644
---- a/include/linux/psp-platform-access.h
-+++ b/include/linux/psp-platform-access.h
-@@ -10,6 +10,8 @@ enum psp_platform_access_msg {
- 	PSP_I2C_REQ_BUS_CMD = 0x64,
- 	PSP_DYNAMIC_BOOST_GET_NONCE,
- 	PSP_DYNAMIC_BOOST_SET_UID,
-+	PSP_DYNAMIC_BOOST_GET_PARAMETER,
-+	PSP_DYNAMIC_BOOST_SET_PARAMETER,
- };
- 
- struct psp_req_buffer_hdr {
-diff --git a/include/uapi/linux/psp-dbc.h b/include/uapi/linux/psp-dbc.h
-index 7443c78ede19..b3845a9ff5fd 100644
---- a/include/uapi/linux/psp-dbc.h
-+++ b/include/uapi/linux/psp-dbc.h
-@@ -45,6 +45,23 @@ struct dbc_user_setuid {
- 	__u8	signature[DBC_SIG_SIZE];
- } __packed;
- 
-+/**
-+ * struct dbc_user_param - Parameter exchange structure (input/output).
-+ * @msg_index: Message indicating what parameter to set or get (input)
-+ * @param:     4 byte parameter, units are message specific. (input/output)
-+ * @signature: 32 byte signature.
-+ *             - When sending a message this is to be created by software
-+ *               using a previous nonce (input)
-+ *             - For interpreting results, this signature is updated by the
-+ *               PSP to allow software to validate the authenticity of the
-+ *               results.
-+ */
-+struct dbc_user_param {
-+	__u32	msg_index;
-+	__u32	param;
-+	__u8	signature[DBC_SIG_SIZE];
-+} __packed;
-+
- /**
-  * Dynamic Boost Control (DBC) IOC
-  *
-@@ -84,4 +101,47 @@ struct dbc_user_setuid {
-  */
- #define DBCIOCUID	_IOW(DBC_IOC_TYPE, 0x2, struct dbc_user_setuid)
- 
-+/**
-+ * DBCIOCPARAM - Set or get a parameter from the PSP.
-+ *               This request will only work after DBCIOCUID has successfully
-+ *               set the UID of the calling process.
-+ *               Whether the parameter is set or get is controlled by the
-+ *               message ID in the request.
-+ *               This command must be sent using a 32 byte signature built
-+ *               using the nonce fetched from DBCIOCNONCE.
-+ *               When the command succeeds, the 32 byte signature will be
-+ *               updated by the PSP for software to authenticate the results.
-+ */
-+#define DBCIOCPARAM	_IOWR(DBC_IOC_TYPE, 0x3, struct dbc_user_param)
-+
-+/**
-+ * enum dbc_cmd_msg - Messages utilized by DBCIOCPARAM
-+ * @PARAM_GET_FMAX_CAP:		Get frequency cap (MHz)
-+ * @PARAM_SET_FMAX_CAP:		Set frequency cap (MHz)
-+ * @PARAM_GET_PWR_CAP:		Get socket power cap (mW)
-+ * @PARAM_SET_PWR_CAP:		Set socket power cap (mW)
-+ * @PARAM_GET_GFX_MODE:		Get graphics mode (0/1)
-+ * @PARAM_SET_GFX_MODE:		Set graphics mode (0/1)
-+ * @PARAM_GET_CURR_TEMP:	Get current temperature (degrees C)
-+ * @PARAM_GET_FMAX_MAX:		Get maximum allowed value for frequency (MHz)
-+ * @PARAM_GET_FMAX_MIN:		Get minimum allowed value for frequency (MHz)
-+ * @PARAM_GET_SOC_PWR_MAX:	Get maximum allowed value for SoC power (mw)
-+ * @PARAM_GET_SOC_PWR_MIN:	Get minimum allowed value for SoC power (mw)
-+ * @PARAM_GET_SOC_PWR_CUR:	Get current value for SoC Power (mW)
-+ */
-+enum dbc_cmd_msg {
-+	PARAM_GET_FMAX_CAP	= 0x3,
-+	PARAM_SET_FMAX_CAP	= 0x4,
-+	PARAM_GET_PWR_CAP	= 0x5,
-+	PARAM_SET_PWR_CAP	= 0x6,
-+	PARAM_GET_GFX_MODE	= 0x7,
-+	PARAM_SET_GFX_MODE	= 0x8,
-+	PARAM_GET_CURR_TEMP	= 0x9,
-+	PARAM_GET_FMAX_MAX	= 0xA,
-+	PARAM_GET_FMAX_MIN	= 0xB,
-+	PARAM_GET_SOC_PWR_MAX	= 0xC,
-+	PARAM_GET_SOC_PWR_MIN	= 0xD,
-+	PARAM_GET_SOC_PWR_CUR	= 0xE,
-+};
-+
- #endif /* __PSP_DBC_USER_H__ */
+    echo "canned" > /sys/bus/dsa/drivers/crypto/compression_mode
+
+There are a few other available iaa_crypto driver attributes (see
+Documentation for details) but the main one we want to consider in
+detail for now is the ‘sync_mode’ attribute.
+
+The ‘sync_mode’ attribute has 3 possible settings: ‘sync’, ‘async’,
+and ‘async_irq’.
+
+The context for these different modes is that although the iaa_crypto
+driver implements the asynchronous crypto interface, the async
+interface is currently only used in a synchronous way by facilities
+like zswap that make use of it.
+
+This is fine for software compress/decompress algorithms, since
+there’s no real benefit in being able to use a truly asynchronous
+interface with them.  This isn’t the case, though, for hardware
+compress/decompress engines such as IAA, where truly asynchronous
+behavior is beneficial if not completely necessary to make optimal use
+of the hardware.
+
+The IAA crypto driver ‘sync_mode’ support should allow facilities such
+as zswap to ‘support async (de)compression in some way [2]’ once
+they are modified to actually make use of it.
+
+When the ‘async_irq’ sync_mode is specified, the driver sets the bits
+in the IAA work descriptor to generate an irq when the work completes.
+So for every compression or decompression, the IAA acomp_alg
+implementations called by crypto_acomp_compress/decompress() simply
+set up the descriptor, turn on the 'request irq' bit and return
+immediately with -EINPROGRESS.  When the work completes, the irq fires
+and the IDXD driver’s irq thread for that irq invokes the callback the
+iaa_crypto module registered with IDXD.  When the irq thread gets
+scheduled, it wakes up the caller, which could be for instance zswap,
+waiting synchronously via crypto_wait_req().
+
+Using the simple madvise test program in '[PATCH 08/15] crypto: iaa -
+Add IAA Compression Accelerator Documentation' along with a set of
+pages from the spec17 benchmark and tracepoint instrumentation
+measuring the time taken between the start and end of each compress
+and decompress, this case, async_irq, takes on average 6,847 ns for
+compression and 5,840 ns for decompression. (See Table 1 below for a
+summary of all the tests.)
+
+When sync_mode is set to ‘sync’, the interrupt bit is not set and the
+work descriptor is submitted in the same way it was for the previous
+case.  In this case the call doesn’t return but rather loops around
+waiting in the iaa_crypto driver’s check_completion() function which
+continually checks the descriptor’s completion bit until it finds it
+set to ‘completed’.  It then returns to the caller, again for example
+zswap waiting in crypto_wait_req().  From the standpoint of zswap,
+this case is exactly the same as the previous case, the difference
+seen only in the crypto layer and the iaa_crypto driver internally;
+from its standpoint they’re both synchronous calls.  There is however
+a large performance difference: an average of 3,177 ns for compress
+and 2,235 ns for decompress.
+
+The final sync_mode is ‘async’.  In this case also the interrupt bit
+is not set and the work descriptor is submitted, returning immediately
+to the caller with -EINPROGRESS.  Because there’s no interrupt set to
+notify anyone when the work completes, the caller needs to somehow
+check for work completion.  Because core code like zswap can’t do this
+directly by for example calling iaa_crypto’s check_completion(), there
+would need to be some changes made to code like zswap and the crypto
+layer in order to take advantage of this mode.  As such, there are no
+numbers to share for this mode.
+
+Finally, just a quick discussion of the remaining numbers in Table 1,
+those comparing the iaa_crypto sync and async irq cases to software
+deflate.  Software deflate took average of 108,978 ns for compress and
+14,485 ns for decompress.
+
+As can be seen from Table 1, the numbers using the iaa_crypto driver
+for deflate as compared to software are so much better that merging it
+would seem to make sense on its own merits.  The 'async' sync_mode
+described above, however, offers the possibility of even greater gains
+to be had against higher-performing algorithms such as lzo, via
+parallelization, once the calling facilities are modified to take
+advantage of it.  Follow-up patchsets to this one will demonstrate
+concretely how that might be accomplished.
+
+Thanks, 
+
+Tom  
+
+
+  Table 1. Zswap latency and compression numbers (in ns): 
+
+  Algorithm                    compress      decompress
+  ----------------------------------------------------------
+  iaa sync			3,177		2,235
+  iaa async irq   		6,847		5,840
+  software deflate	      108,978	       14,485
+
+[1] https://cdrdv2.intel.com/v1/dl/getContent/721858
+
+[2] https://lore.kernel.org/lkml/20201107065332.26992-1-song.bao.hua@hisilicon.com/
+
+
+Dave Jiang (2):
+  dmaengine: idxd: add wq driver name support for accel-config user tool
+  dmaengine: idxd: add external module driver support for dsa_bus_type
+
+Tom Zanussi (13):
+  dmaengine: idxd: Export drv_enable/disable and related functions
+  dmaengine: idxd: Export descriptor management functions
+  dmaengine: idxd: Export wq resource management functions
+  dmaengine: idxd: Add private_data to struct idxd_wq
+  dmaengine: idxd: add callback support for iaa crypto
+  crypto: iaa - Add IAA Compression Accelerator Documentation
+  crypto: iaa - Add Intel IAA Compression Accelerator crypto driver core
+  crypto: iaa - Add per-cpu workqueue table with rebalancing
+  crypto: iaa - Add compression mode management along with fixed mode
+  crypto: iaa - Add support for iaa_crypto deflate compression algorithm
+  crypto: iaa - Add support for default IAA 'canned' compression mode
+  crypto: iaa - Add irq support for the crypto async interface
+  crypto: iaa - Add IAA Compression Accelerator stats
+
+ .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
+ .../driver-api/crypto/iaa/iaa-crypto.rst      |  640 +++++
+ Documentation/driver-api/crypto/iaa/index.rst |   20 +
+ Documentation/driver-api/crypto/index.rst     |   20 +
+ Documentation/driver-api/index.rst            |    1 +
+ MAINTAINERS                                   |    7 +
+ crypto/testmgr.c                              |   10 +
+ crypto/testmgr.h                              |   72 +
+ drivers/crypto/intel/Kconfig                  |    1 +
+ drivers/crypto/intel/Makefile                 |    1 +
+ drivers/crypto/intel/iaa/Kconfig              |   19 +
+ drivers/crypto/intel/iaa/Makefile             |   12 +
+ drivers/crypto/intel/iaa/iaa_crypto.h         |  175 ++
+ .../crypto/intel/iaa/iaa_crypto_comp_canned.c |  110 +
+ .../crypto/intel/iaa/iaa_crypto_comp_fixed.c  |   92 +
+ drivers/crypto/intel/iaa/iaa_crypto_main.c    | 2151 +++++++++++++++++
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c   |  271 +++
+ drivers/crypto/intel/iaa/iaa_crypto_stats.h   |   58 +
+ drivers/dma/idxd/bus.c                        |    6 +
+ drivers/dma/idxd/cdev.c                       |    8 +
+ drivers/dma/idxd/device.c                     |    9 +-
+ drivers/dma/idxd/dma.c                        |    9 +-
+ drivers/dma/idxd/idxd.h                       |   84 +-
+ drivers/dma/idxd/irq.c                        |   12 +-
+ drivers/dma/idxd/submit.c                     |    9 +-
+ drivers/dma/idxd/sysfs.c                      |   28 +
+ include/uapi/linux/idxd.h                     |    1 +
+ 27 files changed, 3812 insertions(+), 20 deletions(-)
+ create mode 100644 Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+ create mode 100644 Documentation/driver-api/crypto/iaa/index.rst
+ create mode 100644 Documentation/driver-api/crypto/index.rst
+ create mode 100644 drivers/crypto/intel/iaa/Kconfig
+ create mode 100644 drivers/crypto/intel/iaa/Makefile
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto.h
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_comp_canned.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_main.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.h
+
 -- 
 2.34.1
 
