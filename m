@@ -2,94 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C612C77B61
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 09:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563CAC77B60
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 10:05:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346020AbjD1J7X (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 05:59:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35670 "EHLO
+        id S229903AbjD1KFq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Apr 2023 06:05:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346014AbjD1J7F (ORCPT
+        with ESMTP id S229451AbjD1KFp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2023 05:59:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80F26A4F;
-        Fri, 28 Apr 2023 02:58:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 68B1B6428A;
-        Fri, 28 Apr 2023 09:57:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8A32C4339C;
-        Fri, 28 Apr 2023 09:57:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682675844;
-        bh=M/pAXMYOk5Udpz1kEDYt2VEG95hOJ5W2yFdUzgAeJqg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=OmGsYSEotFUtGu8b99vp6CGKP0d6RcISjTHZLlVmEZs3/H7M8hClpSUn7w4ZYJyyj
-         8jrGAXsoazQA0pFMC1BDdcuSN9QaBuL37FftEmXMR/sbEwDG/GdzPb0upMEiCcNV6i
-         VLQ0j7Rx7frR8ui/NV3EyHZR7f5Qm5TNPFQRU0XAOencpgN043WyzFdzAE1ICjXrct
-         NLMzItQQ3VR+KBh5JHQAEF2tJpjto+RqSyklOwaukuG28HQP/i0wJDSbhZ7wPBzmSx
-         mRsgRrDgBtKeusKdnxx3W8LiCdTDqmoYaX0iGR0EpklIJ7Tn6V6Zvk84m6h4nYjp2h
-         a8fB1F08vktrg==
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2a8aea0c7dcso92443201fa.2;
-        Fri, 28 Apr 2023 02:57:24 -0700 (PDT)
-X-Gm-Message-State: AC+VfDzvYwetGJY67GkZX/8qQjenU/LHxWAU+e8sG6Awjr6hEkrF/wLa
-        vL/0kN1gPOfNvy+MBDgj/pHzSXUwjvQGUH/ueVM=
-X-Google-Smtp-Source: ACHHUZ7QGt7fOiiwO/OqFnfXzRlCEKwzWXQyYc+yZ6wejlVL8fRisGNBn9srVRtDdkZW0VfGjTqssnkLLN0bSY+4moM=
-X-Received: by 2002:a2e:9658:0:b0:2a8:d021:4121 with SMTP id
- z24-20020a2e9658000000b002a8d0214121mr1466652ljh.26.1682675842804; Fri, 28
- Apr 2023 02:57:22 -0700 (PDT)
+        Fri, 28 Apr 2023 06:05:45 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A685D10B;
+        Fri, 28 Apr 2023 03:05:43 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1psKyw-003E2t-5P; Fri, 28 Apr 2023 18:05:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Apr 2023 18:05:39 +0800
+Date:   Fri, 28 Apr 2023 18:05:39 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Olivier Bacon <olivierb89@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Olivier Bacon <obacon@genetec.com>,
+        Sylvain Ouellet <souellet@genetec.com>
+Subject: Re: [PATCH] crypto: engine - fix crypto_queue backlog handling
+Message-ID: <ZEuac5MjDVWidTBX@gondor.apana.org.au>
+References: <20230420150035.19369-1-obacon@genetec.com>
 MIME-Version: 1.0
-References: <ZEBi8ReG9LKLcmW3@aion.usersys.redhat.com> <ZEuVcizjPtG96/ST@gondor.apana.org.au>
-In-Reply-To: <ZEuVcizjPtG96/ST@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 28 Apr 2023 10:57:11 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
-Message-ID: <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
-Subject: Re: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
- ciphers enabled
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Scott Mayhew <smayhew@redhat.com>, linux-crypto@vger.kernel.org,
-        chuck.lever@oracle.com, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230420150035.19369-1-obacon@genetec.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 28 Apr 2023 at 10:44, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Scott Mayhew <smayhew@redhat.com> wrote:
-> >
-> > diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-> > index 0e834a2c062c..477605fad76b 100644
-> > --- a/arch/arm64/crypto/aes-modes.S
-> > +++ b/arch/arm64/crypto/aes-modes.S
-> > @@ -268,6 +268,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
-> >        add             x4, x0, x4
-> >        st1             {v0.16b}, [x4]                  /* overlapping stores */
-> >        st1             {v1.16b}, [x0]
-> > +       st1             {v1.16b}, [x5]
-> >        ret
-> > AES_FUNC_END(aes_cbc_cts_encrypt)
-> >
-> > But I don't know if that change is at all correct! (I've never even
-> > looked at arm64 asm before).  If someone who's knowledgeable about this
-> > code could chime in, I'd appreciate it.
->
-> Ard, could you please take a look at this?
->
+On Thu, Apr 20, 2023 at 11:00:35AM -0400, Olivier Bacon wrote:
+> CRYPTO_TFM_REQ_MAY_BACKLOG tells the crypto driver that it should
+> internally backlog requests until the crypto hw's queue becomes
+> full. At that point, crypto_engine backlogs the request and returns
+> -EBUSY. Calling driver such as dm-crypt then waits until the
+> complete() function is called with a status of -EINPROGRESS before
+> sending a new request.
+> 
+> The problem lies in the call to complete() with a value of -EINPROGRESS
+> that is made when a backlog item is present on the queue. The call is
+> done before the successful execution of the crypto request. In the case
+> that do_one_request() returns < 0 and the retry support is available,
+> the request is put back in the queue. This leads upper drivers to send
+> a new request even if the queue is still full.
+> 
+> The problem can be reproduced by doing a large dd into a crypto
+> dm-crypt device. This is pretty easy to see when using
+> Freescale CAAM crypto driver and SWIOTLB dma. Since the actual amount
+> of requests that can be hold in the queue is unlimited we get IOs error
+> and dma allocation.
+> 
+> The fix is to call complete with a value of -EINPROGRESS only if
+> the request is not enqueued back in crypto_queue. This is done
+> by calling complete() later in the code. In order to delay the decision,
+> crypto_queue is modified to correctly set the backlog pointer
+> when a request is enqueued back.
+> 
+> Fixes: 6a89f492f8e5 ("crypto: engine - support for parallel requests based on retry mechanism")
+> Co-developed-by: Sylvain Ouellet <souellet@genetec.com>
+> Signed-off-by: Sylvain Ouellet <souellet@genetec.com>
+> Signed-off-by: Olivier Bacon <obacon@genetec.com>
+> ---
+>  crypto/algapi.c        | 3 +++
+>  crypto/crypto_engine.c | 6 +++---
+>  2 files changed, 6 insertions(+), 3 deletions(-)
 
-The issue seems to be that the caller expects iv_out to have been
-populated even when doing ciphertext stealing.
-
-This is meaningless, because the output IV can only be used to chain
-additional encrypted data if the split is at a block boundary. The
-ciphertext stealing fundamentally terminates the encryption, and
-produces a block of ciphertext that is shorter than the block size, so
-what the output IV should be is actually unspecified.
-
-IOW, test cases having plain/ciphertext vectors whose size is not a
-multiple of the cipher block size should not specify an expected value
-for the output IV.
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
