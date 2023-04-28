@@ -2,206 +2,259 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFBFC77B61
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 12:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DDAC77B61
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Apr 2023 15:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229934AbjD1M7W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 08:59:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
+        id S229441AbjD1Py5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Apr 2023 11:54:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbjD1M7V (ORCPT
+        with ESMTP id S1345910AbjD1Pyy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2023 08:59:21 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C22319BE;
-        Fri, 28 Apr 2023 05:59:20 -0700 (PDT)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33S7iEgR032679;
-        Fri, 28 Apr 2023 12:59:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=8t0eS7tzgne541sUYB4lRlU/IV34EjZJTfHY582pXgE=;
- b=pP7GvZAabti5DSBjllibumnc3tqREAsgv/vyPSHRRK60aV4nlqdxNxqB0hGTLpgykzs8
- 8hYJwKl1S1s5uTl33Eh/thoLeCl2gDTHq63DaDM8+6IT110WEZCavDHZSxA2zyFBaxSi
- lMRshGhzEE7CiD3CA7SvkLHCfofcMS2gNwjy2FRW6HUxfAH95ry5SUKq2RF/2Qvuki+j
- XXt22iQs5G96J7ApU4MgNbxz3UWPIg6zwwbs00FsgrlBjRmL2JWVQgIftncZhMqTLS0e
- 2FyeGBkSS/veokiZ6PnCFl6AoB1R6KBeRaOxezrqD9+3p5tHUTCtn6orjFih/mFra348 tQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3q47fax6g5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Apr 2023 12:59:11 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33SCBBnv029932;
-        Fri, 28 Apr 2023 12:59:09 GMT
-Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam04lp2048.outbound.protection.outlook.com [104.47.74.48])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3q461arukv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Apr 2023 12:59:09 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gnK9LUvGhZPd0FGFpHQKLiz77+v/OI7hAQAKAhAS4GyhOMWoaKn6IhC8i2L7vsUbr4V3t1r8c3EXGpJftnzw/mlSyS9TiG885NsFhY9QLJQsyAD+S6t+3Tq+HBWpqPrw6/27fZ1JHMG0QTHPtX6inx4ny+6eGdSfGJ6zA9J89DNIEF+HwLdtSAk4sMf/0Z3qHj9/yzueds+lLFMe/J3edD+a5srA62k4GL01MhBh23CWYGl/Ui+IAnm5g1PBrC6f9PuqnG4JY6ihNmitBfxXp8tJ5XUNnKR76cOZKemGm2yx1MMN9qKMMquA7HQZfKHRN5j27SHtVxyMWvKGkjcTkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8t0eS7tzgne541sUYB4lRlU/IV34EjZJTfHY582pXgE=;
- b=aaACejdqBGBu60Y9A2kgK5rgyN1aXjBAkezeQF26u723sReRpyJDoFqazPGmd7EVQDUEHm00ZcPbpfNpLzjFioVusOXttRmx2yMI364IdnPvcgiErx9iod7Nq34ZtXfV1B+nbcg4LqL7Vr1M/HEnIbnWOEqZutkr/BSTlWjPE0PYegsyDjh0anac9+oQ7xk+JYuq47QdIAVdob0t2hyONxU+kAPYfGIpZji96Nr3a73+ifpS/4CvuhLneYQ516TqfmVti0MjClHoitwWXelM+N7T3OxRDU2s/q52Fp3o8O4Pwfe7JWg218VXof5cIz7lU5uBPUFXgB12sYPnvk49Gw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8t0eS7tzgne541sUYB4lRlU/IV34EjZJTfHY582pXgE=;
- b=qwoKbfwW3A1TB5GwDzhtJbLkHmmjjckSmeRLnN+1P+XjTwlReDUI4Ifn70JPoHE063fdIDu476ElGGK83WMRAikBdv/Ycc7DuJ2p+SRykCWallQXY/C9bD+/2XpNH9qp/1UkoXV66QL6AqQ8GTUnJn+B3pzZnncLrX969F2XHCY=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by IA1PR10MB7261.namprd10.prod.outlook.com (2603:10b6:208:3f6::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.21; Fri, 28 Apr
- 2023 12:59:07 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::ecbd:fc46:2528:36db]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::ecbd:fc46:2528:36db%5]) with mapi id 15.20.6340.024; Fri, 28 Apr 2023
- 12:59:07 +0000
-From:   Chuck Lever III <chuck.lever@oracle.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Mayhew <smayhew@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
-Subject: Re: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
- ciphers enabled
-Thread-Topic: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
- ciphers enabled
-Thread-Index: AQHZcwlyVC5Tj4/bTUCg0bPZoyBbT69Ahe0AgAADmoCAADLHAA==
-Date:   Fri, 28 Apr 2023 12:59:07 +0000
-Message-ID: <F46EA3E0-1338-4E92-8CCF-DD869BD573BE@oracle.com>
-References: <ZEBi8ReG9LKLcmW3@aion.usersys.redhat.com>
- <ZEuVcizjPtG96/ST@gondor.apana.org.au>
- <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
-In-Reply-To: <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3731.500.231)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|IA1PR10MB7261:EE_
-x-ms-office365-filtering-correlation-id: 00a8bd2b-8b00-43ba-8327-08db47e85a4e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZhGmnuWnnqkF0GSdFn0V1DXKb696B21VajzZxUGu0obsMOTFfjsgBUp6aZlg5o9m6+6fIh14ndo6mxERrgMwsY4oAjacL0g20muNFPn8y1LN6BcAX5F5yzS8592O2IlBnmqbiZx4+YIWAwEJqfH3nJ7HbiJjX/Ybkfcfytu/LlYacvAuTO4F4I0wwAce/Mt9QsYcwn8TZPZbveepekd7CBJlG511HZy9aotD2Y98B4APbu2Y8Z207KwLfgYN5sBnESnN5LdPgMnORC54cK8FcwLgpZqYHUQ6748h9P48z4hT1irQXwEyUrDA3J4Ac5r+nIu1/l75slmADc0vdNLXb2dlvbnlp+XaqrWskw9Ukov56ux3lLS8oNFyTqo8MuTo+tQ/2t8/sOJyQz85cd4BY2CXP8cxC6sCaJbiUGDml1IHHO1LnbNqNvFGz1OaVPIEPHJtXQGbzSOser/ydnu7yhzhOSZ6lY2gTSsJf45bHVGcGpkuC10JZdicC0NkJHFRcVQovglz19wExa7PMoMYKvhv4uCjHRu2RP9tEc5DfFQr8fgy9UA4a8AOPa79wG4tJpr78XX4EinPuQDh7U/e5TEQ/8CkjFHTHlm93V0bPPRWBuDkcKQwpysU0h+R15BSH3ZSalt87osXs4kbdmnjRw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(366004)(39860400002)(346002)(396003)(451199021)(6486002)(36756003)(83380400001)(53546011)(71200400001)(186003)(2906002)(6512007)(26005)(6506007)(478600001)(54906003)(2616005)(33656002)(316002)(66946007)(66446008)(6916009)(66476007)(76116006)(4326008)(64756008)(66556008)(8676002)(86362001)(38100700002)(122000001)(5660300002)(91956017)(8936002)(41300700001)(38070700005)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1YEUK/9wk2lem+vxuWeIZVBcGGzOKR8r7pTGH+4HfNuNNSoiZd7/GzaUph2C?=
- =?us-ascii?Q?6KMTdxMxDPlSyPSFwC19Kcl6oJ1JGRH/OSUO3QpzzBsTUanJ+g6I+m1SaATv?=
- =?us-ascii?Q?FANynbO1umg9n+Q6R6V/AOrQBEszfpZPPaSwjYo/nRM42lRH20aqCdYs6qHk?=
- =?us-ascii?Q?vYfmHtCmY6776cZib6JHv/IYulkKfpwV8mqcPHNX/AdAub25NVjW59Kaohsx?=
- =?us-ascii?Q?tsXFLcv7OD0Qd0bunRjNFMnCarPjsV/IWh6anB3ClrpE05/s4Uu3EgV4r/5v?=
- =?us-ascii?Q?6yhBCEKIxIuQ1H9xMdR6lx5oWAvhPDD1XHN/GVthZmynWT+Et7YaCrXvmVw4?=
- =?us-ascii?Q?Kbnb4O2xDIOJ1gGK4rjc2tlpDB5dMjddAUGDkWIBzN8vp/JkFlZayulEcAKy?=
- =?us-ascii?Q?IHwOpOxFHGnqCNlDEkfu0fr4OI0BRXiMdWeLXU4NqilSdoGdsI84iZZMQ2Qv?=
- =?us-ascii?Q?f+jUeb3+sdnLA/xkXsCReBcjhlKN/WsUhMsC5Dg9io5abZMItf0QKQCqMSth?=
- =?us-ascii?Q?w5JgWxQ+FdMlzqaPET4dVPN4MnU0Q0QX6NPu1IvK2f0UR4O8WRI6WgO+m64B?=
- =?us-ascii?Q?JlF30Mtfk5fBLs5d2gGs7u85VIwS+FaoxvtXmLfU+KKB5pXSH3oSxCwl0KQZ?=
- =?us-ascii?Q?Qvps3EISankU3OmVx+XTcM1JKYFrZwzwi227IGdNJUuLiJqrh/fJGOZRWLH8?=
- =?us-ascii?Q?7PNMpfJMB8EsXP7tVpMMKB057DghMajVT3C9Lsjen7JXeUxgdoDtJ9pi0Dak?=
- =?us-ascii?Q?UaSvxwUJAU05x95rQwZ4ezk+0epAqmxRMsZi7UHE9b9kRPFzj6A9plIhD3o8?=
- =?us-ascii?Q?AFckk/A7fqeP/Jrb+iocWuF6rNBHIfqv+V4hQllXwOggOQhJe7dIt7M7tRMU?=
- =?us-ascii?Q?ZPSe/Ua2HWrHW7r8yeKBM/Bqcwu3kqk0GEOBMudXhsc772S7yS9AglNbSb5e?=
- =?us-ascii?Q?nFpyGeJUk9N2HFoHzHer3wN6VMNNENFemtIDgtNK7b1sG+Fr+S/YEqpRb0p+?=
- =?us-ascii?Q?ijuyVhtrSZQEoGD+ieNcMusqcNv1fbXGY1Ns7zf/z2nn1uSqnoXmoCQgVW1i?=
- =?us-ascii?Q?mLETL0jQjWprzqP8AxUhPat8vzSrjbO6afUakINlThmUG0/ZlnbGGnD1AEF0?=
- =?us-ascii?Q?LYcQ8imO4ATkfXgP1l2DTKm3qO6F5cG0nnk4bECKRcMncdUO6ul1MvmAJ7eq?=
- =?us-ascii?Q?M6Q9mpJ4F9AOS54vNH0plWxXkiaf8L7MQcGGF+mTkHLIFO8fhp7LRbfLlLyR?=
- =?us-ascii?Q?wVLbwsgZ+86TtXR2Ibnwm/mDY8+YzWSROjBnLwcZ9WfK3CcC9SCxbo7eOAJG?=
- =?us-ascii?Q?hN2WUKT803YxBjen1pR99TsNv/AXsrYzPzYbF7h+YZhxdRKxlMVIhsHX/Lea?=
- =?us-ascii?Q?G2tukGY04icjmN5aLhb0EzgTTtTrPMsNRNiAV/y/UA7QZ3avxqBu9v+h3jov?=
- =?us-ascii?Q?qnlEe6VS+qtg5ZNXGLcc25iuVttTZvWkpMScwPtfE10UGczcRbMFURfBKAOY?=
- =?us-ascii?Q?QGmk9dUTXe6d8F45TKa8kou/4Q8YXux8QeUjMtuIpa8qMLMxZ2q9L0ec5l4e?=
- =?us-ascii?Q?oG3y6sLP8RLL25O5Jq2QutzuLgAr4fcRwfcwS1ewU4tQxYVzM2Avjl2Q6Ywl?=
- =?us-ascii?Q?tA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <A5AC89D3B90E8147B7472D1F3F59FBE9@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 28 Apr 2023 11:54:54 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D45412B;
+        Fri, 28 Apr 2023 08:54:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682697292; x=1714233292;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=h6uIyeYL79bSTSpFqsQE6YehbS58Bqy5B/88nYriI/E=;
+  b=Ub4vmxhgA2SVT3iBPaVn8bFbtRR0hdKfSlYqok/8R3WsdqGpYaTHHJih
+   6yeCHwV1pFmHjL5DcyPkVRguQILiJomDmldVQIhA++BaNedIzolZ6QEd2
+   xgRwIrjR6pThPkcQFA4lFXgbu+2U+qaKNQsnvoA+vSGcm23TSP2WuDt2C
+   DQj5iwYQCLBPgDkyK84EvSS9F+9eE0WCcC2+RmvJWgMRdGWYlC6+qoW2V
+   Wg3ycl5sbdZqAdne8LzNM0ndrFsbM5m/a0jB2/9/M491FpOK8CEPmf0uJ
+   Q/+fnNzi7I+5lkG7UMYFiFRwzCMpWWX1SEWWvWb4IXREPasPEHMVILLVh
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="327404521"
+X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
+   d="scan'208";a="327404521"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 08:54:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="869243891"
+X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
+   d="scan'208";a="869243891"
+Received: from scha1-mobl1.amr.corp.intel.com (HELO [10.212.154.191]) ([10.212.154.191])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 08:54:51 -0700
+Message-ID: <f0c77850-f8ca-3e21-2722-1deaae424130@intel.com>
+Date:   Fri, 28 Apr 2023 08:54:51 -0700
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: b5X/vpCssd6E4Smuuebg+zDO524GgGfAXeCOkn3/J8ik686uccl1aNubiSsuYpT6tN+Uw2HJmqUnoQx/uJy3k5oKecD+xqC/zawsIxp24K1qZPhjeoyQpsfAp0KleX9L5ODw29321E7L6y5uwArHAhjFJhNZ/a+SQYp/lUhUGzpdLjnEPOORYu8vjELYEMU4EQgiP1xRUWurK+CqeZIsMl13rJGaQWAw+mKIYYJR5fWZQ8n2LchRNKxlYkfxn0SInVk2w5YZwLcmQn+OmWqwPhuieGWLIKvAX6OQXvsttdQyIJzOatJrK7n2+moMEoa00bg9fUnbF/PcFxt7/s2mugZGIJX7Oc0Q+X3AtTF7W3vWzxvNvWBuNjTgXcwNmvU8vVOu1d0Z3srVMeNoS14uzdLK9qPEt9yXyJxwO1zVNjWXrsR21+AbxmND93irOobzdd77Mu+OrPUb3H/8DHmusiLqbcmSDO5LeFM5eFNkAjEAk8F3YWV8bSnz56FThkQYhUyVv/Bb/Yvpk8KejwvO/kiVeRqkD5uqymTTXYWmSK3hQhETmkvqnjiiRuY1mGy7lxJ/yk87HXGRfPqSgwRXl7OGh9cZOiHq8zPH1vxpW5XAMopbHSbI5s3xHLIySsT9JpRZN4H6uKB/P9duUglaFH8YcE+XEVEftGn06026IDDzzuQLk/sygM/HRC44g77cK1qnq+CYKxfDW0vpHvNX6r4r5uHWJjIZxZUvyk+p/P5R5mOhG7flTO5iGSyx0AayEh2HBk/VhsOyaT6P5p0ICw+4zj2qb8ruDVHEY/sfejbBOJSYmCyXN3aZ5kUiznWjBQBUBJSFHaMEHT4BdF+hJMSEeNRLV7Q7Mi+iOWcPBgiRfMbMO4Gj+stCPCabwk59
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00a8bd2b-8b00-43ba-8327-08db47e85a4e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 12:59:07.6015
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MYXaVp8h+8hQSSPTEgfZ1nRalbrUvPMX/UEsDgMqiUJ396pK/duzF7C0Uh5G3y/5Prb7gfUgEjfknzMRaSJWQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7261
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-28_04,2023-04-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- adultscore=0 malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304280107
-X-Proofpoint-ORIG-GUID: DM41IRo9eybXACGIcYrL9h9CfeqDITYn
-X-Proofpoint-GUID: DM41IRo9eybXACGIcYrL9h9CfeqDITYn
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 3/3] crypto: LEA block cipher AVX2 optimization
+Content-Language: en-US
+To:     Dongsoo Lee <letrhee@nsr.re.kr>, linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        "David S. Miller" <abc@test.nsr.re.kr>,
+        Dongsoo Lee <letrhee@gmail.com>
+References: <20230428110058.1516119-1-letrhee@nsr.re.kr>
+ <20230428110058.1516119-4-letrhee@nsr.re.kr>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230428110058.1516119-4-letrhee@nsr.re.kr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+> +config CRYPTO_LEA_AVX2
+> +	tristate "Ciphers: LEA with modes: ECB, CBC, CTR, XTS (SSE2/MOVBE/AVX2)"
+> +	select CRYPTO_LEA
+> +	imply CRYPTO_XTS
+> +	imply CRYPTO_CTR
+> +	help
+> +	  LEA cipher algorithm (KS X 3246, ISO/IEC 29192-2:2019)
+> +
+> +	  LEA is one of the standard cryptographic alorithms of
+> +	  the Republic of Korea. It consists of four 32bit word.
 
+The "four 32bit word" thing is probably not a detail end users care
+about enough to see in Kconfig text.
 
-> On Apr 28, 2023, at 5:57 AM, Ard Biesheuvel <ardb@kernel.org> wrote:
->=20
-> On Fri, 28 Apr 2023 at 10:44, Herbert Xu <herbert@gondor.apana.org.au> wr=
-ote:
->>=20
->> Scott Mayhew <smayhew@redhat.com> wrote:
->>>=20
->>> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-mode=
-s.S
->>> index 0e834a2c062c..477605fad76b 100644
->>> --- a/arch/arm64/crypto/aes-modes.S
->>> +++ b/arch/arm64/crypto/aes-modes.S
->>> @@ -268,6 +268,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
->>>       add             x4, x0, x4
->>>       st1             {v0.16b}, [x4]                  /* overlapping st=
-ores */
->>>       st1             {v1.16b}, [x0]
->>> +       st1             {v1.16b}, [x5]
->>>       ret
->>> AES_FUNC_END(aes_cbc_cts_encrypt)
->>>=20
->>> But I don't know if that change is at all correct! (I've never even
->>> looked at arm64 asm before).  If someone who's knowledgeable about this
->>> code could chime in, I'd appreciate it.
->>=20
->> Ard, could you please take a look at this?
->>=20
->=20
-> The issue seems to be that the caller expects iv_out to have been
-> populated even when doing ciphertext stealing.
->=20
-> This is meaningless, because the output IV can only be used to chain
-> additional encrypted data if the split is at a block boundary. The
-> ciphertext stealing fundamentally terminates the encryption, and
-> produces a block of ciphertext that is shorter than the block size, so
-> what the output IV should be is actually unspecified.
->=20
-> IOW, test cases having plain/ciphertext vectors whose size is not a
-> multiple of the cipher block size should not specify an expected value
-> for the output IV.
+> +	  See:
+> +	  https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
+> +
+> +	  Architecture: x86_64 using:
+> +	  - SSE2 (Streaming SIMD Extensions 2)
+> +	  - MOVBE (Move Data After Swapping Bytes)
+> +	  - AVX2 (Advanced Vector Extensions)
 
-The test cases are extracted from RFC 3962 Appendix B. The
-standard clearly expects there to be a non-zero next IV for
-plaintext sizes that are not block-aligned.
+What about i386?  If this is truly 64-bit-only for some reason, it's not
+reflected anywhere that I can see, like having a:
 
-Also, these test cases pass on other hardware platforms.
+	depends on X86_64
 
+I'm also a _bit_ confused why this has one config option called "_AVX2"
+but that also includes the SSE2 implementation.
 
---
-Chuck Lever
+> +	  Processes 4(SSE2), 8(AVX2) blocks in parallel.
+> +	  In CTR mode, the MOVBE instruction is utilized for improved performance.
+> +
+>  config CRYPTO_CHACHA20_X86_64
+>  	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (SSSE3/AVX2/AVX-512VL)"
+>  	depends on X86 && 64BIT
+> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+> index 9aa46093c91b..de23293b88df 100644
+> --- a/arch/x86/crypto/Makefile
+> +++ b/arch/x86/crypto/Makefile
+> @@ -109,6 +109,9 @@ aria-aesni-avx2-x86_64-y := aria-aesni-avx2-asm_64.o aria_aesni_avx2_glue.o
+>  obj-$(CONFIG_CRYPTO_ARIA_GFNI_AVX512_X86_64) += aria-gfni-avx512-x86_64.o
+>  aria-gfni-avx512-x86_64-y := aria-gfni-avx512-asm_64.o aria_gfni_avx512_glue.o
+>  
+> +obj-$(CONFIG_CRYPTO_LEA_AVX2) += lea-avx2-x86_64.o
+> +lea-avx2-x86_64-y := lea_avx2_x86_64-asm.o lea_avx2_glue.o
+> +
+>  quiet_cmd_perlasm = PERLASM $@
+>        cmd_perlasm = $(PERL) $< > $@
+>  $(obj)/%.S: $(src)/%.pl FORCE
+> diff --git a/arch/x86/crypto/lea_avx2_glue.c b/arch/x86/crypto/lea_avx2_glue.c
+> new file mode 100644
+> index 000000000000..532958d3caa5
+> --- /dev/null
+> +++ b/arch/x86/crypto/lea_avx2_glue.c
+> @@ -0,0 +1,1112 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Glue Code for the SSE2/MOVBE/AVX2 assembler instructions for the LEA Cipher
+> + *
+> + * Copyright (c) 2023 National Security Research.
+> + * Author: Dongsoo Lee <letrhee@nsr.re.kr>
+> + */
+> +
+> +#include <asm/simd.h>
+> +#include <asm/unaligned.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/ctr.h>
+> +#include <crypto/internal/simd.h>
+> +#include <crypto/scatterwalk.h>
+> +#include <crypto/skcipher.h>
+> +#include <crypto/internal/skcipher.h>
+> +#include <linux/err.h>
+> +#include <linux/module.h>
+> +#include <linux/types.h>
+> +
+> +#include <crypto/lea.h>
+> +#include <crypto/xts.h>
+> +#include "ecb_cbc_helpers.h"
+> +
+> +#define SIMD_KEY_ALIGN 16
+> +#define SIMD_ALIGN_ATTR __aligned(SIMD_KEY_ALIGN)
+> +
+> +struct lea_xts_ctx {
+> +	u8 raw_crypt_ctx[sizeof(struct crypto_lea_ctx)] SIMD_ALIGN_ATTR;
+> +	u8 raw_tweak_ctx[sizeof(struct crypto_lea_ctx)] SIMD_ALIGN_ATTR;
+> +};
+
+The typing here is a bit goofy.  What's wrong with:
+
+struct lea_xts_ctx {
+	struct crypto_lea_ctx crypt_ctx SIMD_ALIGN_ATTR;
+	struct crypto_lea_ctx lea_ctx   SIMD_ALIGN_ATTR;
+};
+
+?  You end up with the same sized structure but you don't have to cast
+it as much.
+
+> +struct _lea_u128 {
+> +	u64 v0, v1;
+> +};
+> +
+> +static inline void xor_1blk(u8 *out, const u8 *in1, const u8 *in2)
+> +{
+> +	const struct _lea_u128 *_in1 = (const struct _lea_u128 *)in1;
+> +	const struct _lea_u128 *_in2 = (const struct _lea_u128 *)in2;
+> +	struct _lea_u128 *_out = (struct _lea_u128 *)out;
+> +
+> +	_out->v0 = _in1->v0 ^ _in2->v0;
+> +	_out->v1 = _in1->v1 ^ _in2->v1;
+> +}
+> +
+> +static inline void xts_next_tweak(u8 *out, const u8 *in)
+> +{
+> +	const u64 *_in = (const u64 *)in;
+> +	u64 *_out = (u64 *)out;
+> +	u64 v0 = _in[0];
+> +	u64 v1 = _in[1];
+> +	u64 carry = (u64)(((s64)v1) >> 63);
+> +
+> +	v1 = (v1 << 1) ^ (v0 >> 63);
+> +	v0 = (v0 << 1) ^ ((u64)carry & 0x87);
+> +
+> +	_out[0] = v0;
+> +	_out[1] = v1;
+> +}
+
+I don't really care either way, but it's interesting that in two
+adjacent functions this deals with two adjacent 64-bit values.  In one
+it defines a structure with two u64's and in the next it treats it as an
+array.
+
+> +static int xts_encrypt_8way(struct skcipher_request *req)
+> +{
+...
+
+It's kinda a shame that there isn't more code shared here between, for
+instance the 4way and 8way functions.  But I guess this crypto code
+tends to be merged and then very rarely fixed up after.
+
+> +static int xts_lea_set_key(struct crypto_skcipher *tfm, const u8 *key,
+> +				u32 keylen)
+> +{
+> +	struct crypto_tfm *tfm_ctx = crypto_skcipher_ctx(tfm);
+> +	struct lea_xts_ctx *ctx = crypto_tfm_ctx(tfm_ctx);
+> +
+> +	struct crypto_lea_ctx *crypt_key =
+> +		(struct crypto_lea_ctx *)(ctx->raw_crypt_ctx);
+> +	struct crypto_lea_ctx *tweak_key =
+> +		(struct crypto_lea_ctx *)(ctx->raw_tweak_ctx);
+
+These were those goofy casts that can go away if the typing is a bit
+more careful
+
+...
+> +static struct simd_skcipher_alg *lea_simd_algs[ARRAY_SIZE(lea_simd_avx2_algs)];
+> +
+> +static int __init crypto_lea_avx2_init(void)
+> +{
+> +	const char *feature_name;
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_XMM2)) {
+> +		pr_info("SSE2 instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_MOVBE)) {
+> +		pr_info("MOVBE instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_AVX2) || !boot_cpu_has(X86_FEATURE_AVX)) {
+> +		pr_info("AVX2 instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+> +				&feature_name)) {
+> +		pr_info("CPU feature '%s' is not supported.\n", feature_name);
+> +		return -ENODEV;
+> +	}
+
+This looks suspect.
+
+It requires that *ALL* of XMM2, MOVBE, AVX, AVX2 and XSAVE support for
+*ANY* of these to be used.  In other cipher code that I've seen, it
+separates out the AVX/YMM acceleration from the pure SSE2/XMM
+acceleration functions so that CPUs with only SSE2 can still benefit.
+
+Either this is wrong, or there is something subtle going on that I'm
+missing.
 
 
