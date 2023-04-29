@@ -2,80 +2,158 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BADCBC77B60
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Apr 2023 02:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4969C77B7C
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Apr 2023 10:31:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230249AbjD2CVJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Apr 2023 22:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
+        id S230466AbjD2Kbc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 29 Apr 2023 06:31:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbjD2CVI (ORCPT
+        with ESMTP id S229507AbjD2Kba (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Apr 2023 22:21:08 -0400
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A54421FDB;
-        Fri, 28 Apr 2023 19:21:07 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-549d9c2935fso329124eaf.2;
-        Fri, 28 Apr 2023 19:21:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682734867; x=1685326867;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+VbzhKX8KyWXXSbsbGtVXK/3HSJI8EHHi0iaF6HDus0=;
-        b=ku47PZtJcy5ST8LFXA0TA3wTiFinOlI0dsiopX2V20ErUzUGQo2sBs2NsB6CiOo/lE
-         5cwWh+mMqvjeSlrxHpB0VEBO6F+0Omgbyk/K8710zsE3XZL4kRlswv0wnaI59vIUf583
-         s7l7BGVJBa4nIkiH8d2r62/scAQgR1uKptXg/LFMH0gU5DALVj9/B/EXtGzIcVEVT4P4
-         JYvs7chDtttmwsUMXhd19C3OIKZrS6lvo0ZLBbBRzyaB8eDPN+lhCCpHxyyckJwn3oLV
-         HFplcWB4hTwhKgptePg/ORFeM/wijSLFOgv/frCojt2f92exbdg6JOM9+m5FKVDUctRI
-         sbkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682734867; x=1685326867;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+VbzhKX8KyWXXSbsbGtVXK/3HSJI8EHHi0iaF6HDus0=;
-        b=Q0dxq8oLKCashDqphudm5x7vjPyG3yXcGAjyjqd07CSgBHt1+KNnHqmp0QZzFQ8JEm
-         SfurRu6IRSnl32AHwTQ/5pwWsF5SmlWK6MA5tP9jlTqP1mbN9VFaBLWZWsQF7Sen2+jt
-         a29qRSept2BiF9BGk5NsYSEXYmJQcXHVZTNYrsLhoewVxHHQJF6xIPjDyJF9uMMGF72R
-         R5MRU/aTXPQdbwyaoQchcCCFYr6+ND9Z9P0n2LmDdtD4AsPVG0HZEEK53VIKxdEOSZv8
-         D69WG5Xvt419Sb1JENDCpEsD6/pZn/j79bYDAvoPRESFz7q/XkxyE2w0rPLLahNMRhc0
-         IhaQ==
-X-Gm-Message-State: AC+VfDxqwZfhZrPJUzigE666AXqH6Lb96UU2Py2Gjg5kDGuVV0gozZdy
-        ugiry9RnW68HB8u3JlgeP8uk8NBzf/gf/97dX1q0LNFkzt7rmNyB
-X-Google-Smtp-Source: ACHHUZ4cK6msl+fxsDnYGrxVu2eYinhbV3XpH73egvC18FRJoj84xzVx85iB70tF1pQu0dLjVzbT5p4nT4tOzNHo2dA=
-X-Received: by 2002:a54:4490:0:b0:38d:61e9:12cd with SMTP id
- v16-20020a544490000000b0038d61e912cdmr3655317oiv.21.1682734866902; Fri, 28
- Apr 2023 19:21:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230428110058.1516119-1-letrhee@nsr.re.kr> <20230428110058.1516119-2-letrhee@nsr.re.kr>
- <20230428232938.GB3150@sol.localdomain>
-In-Reply-To: <20230428232938.GB3150@sol.localdomain>
-From:   Letrhee <letrhee@gmail.com>
-Date:   Sat, 29 Apr 2023 11:20:54 +0900
-Message-ID: <CAFiNs_rFYp9L_AB1x+dkRg+oUF1uGKxDm5qQqAaoK1AcS=45AQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] crypto: LEA block cipher implementation
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Dongsoo Lee <letrhee@nsr.re.kr>, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+        Sat, 29 Apr 2023 06:31:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 935D61BE8;
+        Sat, 29 Apr 2023 03:31:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 27A2D61610;
+        Sat, 29 Apr 2023 10:31:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28794C433EF;
+        Sat, 29 Apr 2023 10:31:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682764288;
+        bh=0GbmBMGiNiQlIdnACBgahvtc+QtoJehbHv6nICycqIU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tFhPkZUDutv1XqNNNayYgpxTWhqBsGyicP5ZE+0P5aZPM1SFgNwGsYutMDbjAeX7r
+         JoIbcHIL0grDinAv1Xen+AI6GLJDOeK7oulXXWtq6Af2EkCNZQ+Mv+TGKx4KpPj8HN
+         o37YI2ZiY580d9dsHNxhOy0NYV9xON8ceNNwkVCsu8Ru8dxYj+hqpK5NDa69iCq5bv
+         r9g9qfYstDE8+Mz8clTHSExMwWUjXwj04kTfT766VTMf5JEJoTxTu2UDU6msp9DTxf
+         zniinNBnHQ9amnPS6KwooRNkDA8OaKb5fE7QYpuHGv+Jrcx6drNQ/sHkF9tOE8VPCP
+         qPbfmrd2AbdWQ==
+Date:   Sat, 29 Apr 2023 11:31:20 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Sunil V L <sunilvl@ventanamicro.com>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        llvm@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Len Brown <lenb@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        "David S. Miller" <abc@test.nsr.re.kr>
-Content-Type: text/plain; charset="UTF-8"
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Marc Zyngier <maz@kernel.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Andrew Jones <ajones@ventanamicro.com>
+Subject: Re: [PATCH V4 13/23] RISC-V: cpufeature: Add ACPI support in
+ riscv_fill_hwcap()
+Message-ID: <20230429-voucher-tutor-715fd4f6c24e@spud>
+References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
+ <20230404182037.863533-14-sunilvl@ventanamicro.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mD53ytQ30VQ4ln/R"
+Content-Disposition: inline
+In-Reply-To: <20230404182037.863533-14-sunilvl@ventanamicro.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thank you for taking the time to review the implementation. I
-appreciate your feedback and will respond to other reviews soon.
 
-As you mentioned, I agree that using loop unrolling in generic C code
-can be unnecessary and make it difficult to verify against the
-original paper. Additionally, I acknowledge that the submitted code
-may lack sufficient comments.
+--mD53ytQ30VQ4ln/R
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'll follow your suggestion and re-implement the code.
+Hey Sunil,
 
-Thank you again for your review.
+On Tue, Apr 04, 2023 at 11:50:27PM +0530, Sunil V L wrote:
+
+> @@ -103,14 +109,36 @@ void __init riscv_fill_hwcap(void)
+> =20
+>  	bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
+> =20
+> -	for_each_of_cpu_node(node) {
+> +	if (!acpi_disabled) {
+> +		status =3D acpi_get_table(ACPI_SIG_RHCT, 0, &rhct);
+> +		if (ACPI_FAILURE(status))
+> +			return;
+> +	}
+> +
+> +	for_each_possible_cpu(cpu) {
+>  		unsigned long this_hwcap =3D 0;
+>  		DECLARE_BITMAP(this_isa, RISCV_ISA_EXT_MAX);
+>  		const char *temp;
+> =20
+> -		if (of_property_read_string(node, "riscv,isa", &isa)) {
+> -			pr_warn("Unable to find \"riscv,isa\" devicetree entry\n");
+> -			continue;
+> +		if (acpi_disabled) {
+> +			node =3D of_cpu_device_node_get(cpu);
+> +			if (node) {
+> +				rc =3D of_property_read_string(node, "riscv,isa", &isa);
+> +				of_node_put(node);
+> +				if (rc) {
+> +					pr_warn("Unable to find \"riscv,isa\" devicetree entry\n");
+> +					continue;
+> +				}
+> +			} else {
+> +				pr_warn("Unable to find cpu node\n");
+> +				continue;
+
+I was poking at this the last few days and went back to look at the ACPI
+code again. Is there a reason we don't do early-return here? IOW:
+
+	node =3D of_cpu_device_node_get(cpu);
+	if (!node) {
+		pr_warn()
+		continue;
+	}
+
+	rc =3D of_property_read_string(node, "riscv,isa", &isa);
+	of_node_put(node);
+	if (rc) {
+		pr_warn();
+		continue;
+	}
+
+Cheers,
+Conor.
+
+> +			}
+> +		} else {
+> +			rc =3D acpi_get_riscv_isa(rhct, cpu, &isa);
+> +			if (rc < 0) {
+> +				pr_warn("Unable to get ISA for the hart - %d\n", cpu);
+> +				continue;
+> +			}
+>  		}
+> =20
+>  		temp =3D isa;
+> @@ -243,6 +271,9 @@ void __init riscv_fill_hwcap(void)
+
+--mD53ytQ30VQ4ln/R
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZEzx+AAKCRB4tDGHoIJi
+0uDXAP0UihCqegQRGuBLnWtSMvMhsuIza2XwUNXv6Jsjw1EdNwD5AT1aXZpghWod
+R72zPlGiSaij2J867SuTR51j5SWNmQE=
+=7cU+
+-----END PGP SIGNATURE-----
+
+--mD53ytQ30VQ4ln/R--
