@@ -2,158 +2,183 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4969C77B7C
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Apr 2023 10:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C60C3C77B61
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 May 2023 13:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230466AbjD2Kbc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 Apr 2023 06:31:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49432 "EHLO
+        id S229816AbjEANFL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 May 2023 09:05:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbjD2Kba (ORCPT
+        with ESMTP id S232444AbjEANFK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Apr 2023 06:31:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 935D61BE8;
-        Sat, 29 Apr 2023 03:31:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 1 May 2023 09:05:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 752141A4
+        for <linux-crypto@vger.kernel.org>; Mon,  1 May 2023 06:04:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682946263;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UYsaUmIN1//t+NOWiNJWe2minSguFcUXxBJycxrvUmg=;
+        b=ZUjINdY6ox0hAur6+HQAiUHazWsmdZlpp09pdIMsmlIDhh1DSz2asfYFiTkE+tgGQUdnyc
+        CQwCrEeRYwqxvsFrH593ia/j30nSHXY/RFlg3A1fKtk9iwgUN193OPlPG4c9qGZhv4WMOA
+        wzrG0mR9/IlT/PrYw4a4CIKwETHwX4o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-507-2lRZoT6ZPYq6YCw4WRIwTA-1; Mon, 01 May 2023 09:03:54 -0400
+X-MC-Unique: 2lRZoT6ZPYq6YCw4WRIwTA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 27A2D61610;
-        Sat, 29 Apr 2023 10:31:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28794C433EF;
-        Sat, 29 Apr 2023 10:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682764288;
-        bh=0GbmBMGiNiQlIdnACBgahvtc+QtoJehbHv6nICycqIU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tFhPkZUDutv1XqNNNayYgpxTWhqBsGyicP5ZE+0P5aZPM1SFgNwGsYutMDbjAeX7r
-         JoIbcHIL0grDinAv1Xen+AI6GLJDOeK7oulXXWtq6Af2EkCNZQ+Mv+TGKx4KpPj8HN
-         o37YI2ZiY580d9dsHNxhOy0NYV9xON8ceNNwkVCsu8Ru8dxYj+hqpK5NDa69iCq5bv
-         r9g9qfYstDE8+Mz8clTHSExMwWUjXwj04kTfT766VTMf5JEJoTxTu2UDU6msp9DTxf
-         zniinNBnHQ9amnPS6KwooRNkDA8OaKb5fE7QYpuHGv+Jrcx6drNQ/sHkF9tOE8VPCP
-         qPbfmrd2AbdWQ==
-Date:   Sat, 29 Apr 2023 11:31:20 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Sunil V L <sunilvl@ventanamicro.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        llvm@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Len Brown <lenb@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 77E61A0F385;
+        Mon,  1 May 2023 13:02:51 +0000 (UTC)
+Received: from aion.usersys.redhat.com (unknown [10.22.16.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D838492C13;
+        Mon,  1 May 2023 13:02:51 +0000 (UTC)
+Received: by aion.usersys.redhat.com (Postfix, from userid 1000)
+        id 9D6F61A27F5; Mon,  1 May 2023 09:02:50 -0400 (EDT)
+Date:   Mon, 1 May 2023 09:02:50 -0400
+From:   Scott Mayhew <smayhew@redhat.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Chuck Lever III <chuck.lever@oracle.com>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Marc Zyngier <maz@kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Andrew Jones <ajones@ventanamicro.com>
-Subject: Re: [PATCH V4 13/23] RISC-V: cpufeature: Add ACPI support in
- riscv_fill_hwcap()
-Message-ID: <20230429-voucher-tutor-715fd4f6c24e@spud>
-References: <20230404182037.863533-1-sunilvl@ventanamicro.com>
- <20230404182037.863533-14-sunilvl@ventanamicro.com>
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+Subject: Re: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
+ ciphers enabled
+Message-ID: <ZE+4enFNICjno26e@aion.usersys.redhat.com>
+References: <ZEBi8ReG9LKLcmW3@aion.usersys.redhat.com>
+ <ZEuVcizjPtG96/ST@gondor.apana.org.au>
+ <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
+ <F46EA3E0-1338-4E92-8CCF-DD869BD573BE@oracle.com>
+ <CAMj1kXE29dMSgjkDPUXf0LFnxyrMeSO5NxG8fjYCuG=HJJ7wiA@mail.gmail.com>
+ <870429E7-8202-405B-96F7-46A11B41EF05@oracle.com>
+ <CAMj1kXGrrRj6b6RR4orKNykjjxyvd4Xe+8eOu-nY9jT=25_21A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="mD53ytQ30VQ4ln/R"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230404182037.863533-14-sunilvl@ventanamicro.com>
+In-Reply-To: <CAMj1kXGrrRj6b6RR4orKNykjjxyvd4Xe+8eOu-nY9jT=25_21A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, 28 Apr 2023, Ard Biesheuvel wrote:
 
---mD53ytQ30VQ4ln/R
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Fri, 28 Apr 2023 at 17:18, Chuck Lever III <chuck.lever@oracle.com> wrote:
+> >
+> >
+> >
+> > > On Apr 28, 2023, at 12:09 PM, Ard Biesheuvel <ardb@kernel.org> wrote:
+> > >
+> > > On Fri, 28 Apr 2023 at 13:59, Chuck Lever III <chuck.lever@oracle.com> wrote:
+> > >>
+> > >>
+> > >>
+> > >>> On Apr 28, 2023, at 5:57 AM, Ard Biesheuvel <ardb@kernel.org> wrote:
+> > >>>
+> > >>> On Fri, 28 Apr 2023 at 10:44, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > >>>>
+> > >>>> Scott Mayhew <smayhew@redhat.com> wrote:
+> > >>>>>
+> > >>>>> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+> > >>>>> index 0e834a2c062c..477605fad76b 100644
+> > >>>>> --- a/arch/arm64/crypto/aes-modes.S
+> > >>>>> +++ b/arch/arm64/crypto/aes-modes.S
+> > >>>>> @@ -268,6 +268,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
+> > >>>>>      add             x4, x0, x4
+> > >>>>>      st1             {v0.16b}, [x4]                  /* overlapping stores */
+> > >>>>>      st1             {v1.16b}, [x0]
+> > >>>>> +       st1             {v1.16b}, [x5]
+> > >>>>>      ret
+> > >>>>> AES_FUNC_END(aes_cbc_cts_encrypt)
+> > >>>>>
+> > >>>>> But I don't know if that change is at all correct! (I've never even
+> > >>>>> looked at arm64 asm before).  If someone who's knowledgeable about this
+> > >>>>> code could chime in, I'd appreciate it.
+> > >>>>
+> > >>>> Ard, could you please take a look at this?
+> > >>>>
+> > >>>
+> > >>> The issue seems to be that the caller expects iv_out to have been
+> > >>> populated even when doing ciphertext stealing.
+> > >>>
+> > >>> This is meaningless, because the output IV can only be used to chain
+> > >>> additional encrypted data if the split is at a block boundary. The
+> > >>> ciphertext stealing fundamentally terminates the encryption, and
+> > >>> produces a block of ciphertext that is shorter than the block size, so
+> > >>> what the output IV should be is actually unspecified.
+> > >>>
+> > >>> IOW, test cases having plain/ciphertext vectors whose size is not a
+> > >>> multiple of the cipher block size should not specify an expected value
+> > >>> for the output IV.
+> > >>
+> > >> The test cases are extracted from RFC 3962 Appendix B. The
+> > >> standard clearly expects there to be a non-zero next IV for
+> > >> plaintext sizes that are not block-aligned.
+> > >>
+> > >
+> > > OK, so this is the Kerberos V specific spec on how to use AES in CBC
+> > > mode, which appears to describe how to chain multiple CBC encryptions
+> > > together.
+> > >
+> > > CBC-CTS itself does not define this: the IV is an input only, and the
+> > > reason we happen to return the IV is because a single CBC operation
+> > > may be broken up into several ones, which can only be done on block
+> > > boundaries. This is why CBC-CTS itself passes all its tests: a single
+> > > CBC-CTS encryption only performs ciphertext stealing at the very end,
+> > > and the next IV is never used in that case. (This is why the CTS mode
+> > > tests in crypto/testmgr.h don't have iv_out vectors)
+> > >
+> > > Note that RFC3962 defines that the penultimate block of CBC-CTS
+> > > ciphertext is used as the next IV. CBC returns the last ciphertext
+> > > block as the output IV. It is a happy coincidence that the generic CTS
+> > > template encapsulates CBC in a way where its output IV ends up in the
+> > > right place.
+> > >
+> > >> Also, these test cases pass on other hardware platforms.
+> > >>
+> > >
+> > > Fair enough.
+> > >
+> > > I am not opposed to fixing this, but given that it is the RFC3962 spec
+> > > that defines that the next IV is the penultimate full block of the
+> > > previous CBC-CTS ciphertext, we might consider doing the memcpy() in
+> > > the Kerberos code not in the CBC-CTS implementations.
+> >
+> > Interesting thought. I'm all about proper layering, so I think this
+> > is worth considering. Can you send an RFC patch?
+> >
+> 
+> I'm not that familiar with kunit so this is just an off hand
+> suggestion, but I imagine something like the below would suffice
+> 
+> --- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
+> +++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+> @@ -639,6 +639,13 @@ gss_krb5_cts_crypt(struct crypto_sync_skcipher
+> *cipher, struct xdr_buf *buf,
+> 
+>         ret = write_bytes_to_xdr_buf(buf, offset, data, len);
+> 
+> +       /*
+> +        * CBC-CTS does not define an output IV but RFC 3962 defines it as the
+> +        * penultimate block of ciphertext, so copy that into the IV buffer
+> +        * before returning.
+> +        */
+> +       if (encrypt)
+> +               memcpy(iv, data, crypto_sync_skcipher_ivsize(cipher));
+>  out:
+>         kfree(data);
+>         return ret;
+> 
+Thanks, Ard.  That fixes it on aarch64 (also ran it on x86_64, ppc64le,
+s390x, and aarch64 w/ 64k pages).  Could you send it as an official
+patch and add
 
-Hey Sunil,
+Tested-by: Scott Mayhew <smayhew@redhat.com>
 
-On Tue, Apr 04, 2023 at 11:50:27PM +0530, Sunil V L wrote:
+-Scott
 
-> @@ -103,14 +109,36 @@ void __init riscv_fill_hwcap(void)
-> =20
->  	bitmap_zero(riscv_isa, RISCV_ISA_EXT_MAX);
-> =20
-> -	for_each_of_cpu_node(node) {
-> +	if (!acpi_disabled) {
-> +		status =3D acpi_get_table(ACPI_SIG_RHCT, 0, &rhct);
-> +		if (ACPI_FAILURE(status))
-> +			return;
-> +	}
-> +
-> +	for_each_possible_cpu(cpu) {
->  		unsigned long this_hwcap =3D 0;
->  		DECLARE_BITMAP(this_isa, RISCV_ISA_EXT_MAX);
->  		const char *temp;
-> =20
-> -		if (of_property_read_string(node, "riscv,isa", &isa)) {
-> -			pr_warn("Unable to find \"riscv,isa\" devicetree entry\n");
-> -			continue;
-> +		if (acpi_disabled) {
-> +			node =3D of_cpu_device_node_get(cpu);
-> +			if (node) {
-> +				rc =3D of_property_read_string(node, "riscv,isa", &isa);
-> +				of_node_put(node);
-> +				if (rc) {
-> +					pr_warn("Unable to find \"riscv,isa\" devicetree entry\n");
-> +					continue;
-> +				}
-> +			} else {
-> +				pr_warn("Unable to find cpu node\n");
-> +				continue;
-
-I was poking at this the last few days and went back to look at the ACPI
-code again. Is there a reason we don't do early-return here? IOW:
-
-	node =3D of_cpu_device_node_get(cpu);
-	if (!node) {
-		pr_warn()
-		continue;
-	}
-
-	rc =3D of_property_read_string(node, "riscv,isa", &isa);
-	of_node_put(node);
-	if (rc) {
-		pr_warn();
-		continue;
-	}
-
-Cheers,
-Conor.
-
-> +			}
-> +		} else {
-> +			rc =3D acpi_get_riscv_isa(rhct, cpu, &isa);
-> +			if (rc < 0) {
-> +				pr_warn("Unable to get ISA for the hart - %d\n", cpu);
-> +				continue;
-> +			}
->  		}
-> =20
->  		temp =3D isa;
-> @@ -243,6 +271,9 @@ void __init riscv_fill_hwcap(void)
-
---mD53ytQ30VQ4ln/R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZEzx+AAKCRB4tDGHoIJi
-0uDXAP0UihCqegQRGuBLnWtSMvMhsuIza2XwUNXv6Jsjw1EdNwD5AT1aXZpghWod
-R72zPlGiSaij2J867SuTR51j5SWNmQE=
-=7cU+
------END PGP SIGNATURE-----
-
---mD53ytQ30VQ4ln/R--
