@@ -2,183 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C60C3C77B61
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 May 2023 13:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D1DC77B7C
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 May 2023 14:01:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbjEANFL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 May 2023 09:05:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50374 "EHLO
+        id S232356AbjEAOBL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 1 May 2023 10:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232444AbjEANFK (ORCPT
+        with ESMTP id S232349AbjEAOBJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 May 2023 09:05:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 752141A4
-        for <linux-crypto@vger.kernel.org>; Mon,  1 May 2023 06:04:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682946263;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UYsaUmIN1//t+NOWiNJWe2minSguFcUXxBJycxrvUmg=;
-        b=ZUjINdY6ox0hAur6+HQAiUHazWsmdZlpp09pdIMsmlIDhh1DSz2asfYFiTkE+tgGQUdnyc
-        CQwCrEeRYwqxvsFrH593ia/j30nSHXY/RFlg3A1fKtk9iwgUN193OPlPG4c9qGZhv4WMOA
-        wzrG0mR9/IlT/PrYw4a4CIKwETHwX4o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-507-2lRZoT6ZPYq6YCw4WRIwTA-1; Mon, 01 May 2023 09:03:54 -0400
-X-MC-Unique: 2lRZoT6ZPYq6YCw4WRIwTA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 77E61A0F385;
-        Mon,  1 May 2023 13:02:51 +0000 (UTC)
-Received: from aion.usersys.redhat.com (unknown [10.22.16.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D838492C13;
-        Mon,  1 May 2023 13:02:51 +0000 (UTC)
-Received: by aion.usersys.redhat.com (Postfix, from userid 1000)
-        id 9D6F61A27F5; Mon,  1 May 2023 09:02:50 -0400 (EDT)
-Date:   Mon, 1 May 2023 09:02:50 -0400
-From:   Scott Mayhew <smayhew@redhat.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Chuck Lever III <chuck.lever@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
-Subject: Re: RPCSEC GSS krb5 KUnit test fails on arm64 with h/w accelerated
- ciphers enabled
-Message-ID: <ZE+4enFNICjno26e@aion.usersys.redhat.com>
-References: <ZEBi8ReG9LKLcmW3@aion.usersys.redhat.com>
- <ZEuVcizjPtG96/ST@gondor.apana.org.au>
- <CAMj1kXGOxw2mm8dVNHBg3HfJ7==JVV+vdXaW3iGGKamb4ZAg-g@mail.gmail.com>
- <F46EA3E0-1338-4E92-8CCF-DD869BD573BE@oracle.com>
- <CAMj1kXE29dMSgjkDPUXf0LFnxyrMeSO5NxG8fjYCuG=HJJ7wiA@mail.gmail.com>
- <870429E7-8202-405B-96F7-46A11B41EF05@oracle.com>
- <CAMj1kXGrrRj6b6RR4orKNykjjxyvd4Xe+8eOu-nY9jT=25_21A@mail.gmail.com>
+        Mon, 1 May 2023 10:01:09 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A21510FC;
+        Mon,  1 May 2023 07:01:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682949668; x=1714485668;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=ZgJxwxQNUm3eiCKrax81lV+9lJby3eUeSvSu4Z4cWpw=;
+  b=bTtX8I7Tlpzl4k3uXnTdOwgZUSKI60cvVj52tzHc5x1Xe/EaJ7aFQCLj
+   Q4XHRvRvhK59iomNJ7FgQO56DrhBXCb3PlC72qLC6Rro5mClo9gEzysLb
+   MvM8QlcPX4iv+zsa/cwodFIkwQOtp4Z9u4NN2xII0qXEl0voVioTJ2Dj6
+   DfjCSinZ//ryG1ExNezoWq6aCLQdXQVUIBWJycU78upFyd/yj+Mc2dfp8
+   0dYjs5vYCJ9w5zm9VYUKY5omXtY3m1Zyt4SbblGLVpkPUTAiXchliNFhF
+   2Etb3zRRsLMdWuo91VkBdDryfctq93qSEhu3zE24RxZi51vh/IAD2Pah9
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10697"; a="413582120"
+X-IronPort-AV: E=Sophos;i="5.99,241,1677571200"; 
+   d="scan'208";a="413582120"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2023 07:01:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10697"; a="942045094"
+X-IronPort-AV: E=Sophos;i="5.99,241,1677571200"; 
+   d="scan'208";a="942045094"
+Received: from jplee-mobl1.amr.corp.intel.com ([10.213.190.187])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2023 07:01:05 -0700
+Message-ID: <6835178f8f58f6fce7797953f64c3f4c959d6ade.camel@linux.intel.com>
+Subject: Re: [PATCH v3 01/15] dmaengine: idxd: add wq driver name support
+ for accel-config user tool
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     Fenghua Yu <fenghua.yu@intel.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, vkoul@kernel.org
+Cc:     dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
+        hdanton@sina.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Date:   Mon, 01 May 2023 09:01:04 -0500
+In-Reply-To: <d886d1dd-51c8-d2e6-940b-9e5041707c6e@intel.com>
+References: <20230428205539.113902-1-tom.zanussi@linux.intel.com>
+         <20230428205539.113902-2-tom.zanussi@linux.intel.com>
+         <d886d1dd-51c8-d2e6-940b-9e5041707c6e@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.1-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXGrrRj6b6RR4orKNykjjxyvd4Xe+8eOu-nY9jT=25_21A@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 28 Apr 2023, Ard Biesheuvel wrote:
+Hi Fenghua,
 
-> On Fri, 28 Apr 2023 at 17:18, Chuck Lever III <chuck.lever@oracle.com> wrote:
-> >
-> >
-> >
-> > > On Apr 28, 2023, at 12:09 PM, Ard Biesheuvel <ardb@kernel.org> wrote:
-> > >
-> > > On Fri, 28 Apr 2023 at 13:59, Chuck Lever III <chuck.lever@oracle.com> wrote:
-> > >>
-> > >>
-> > >>
-> > >>> On Apr 28, 2023, at 5:57 AM, Ard Biesheuvel <ardb@kernel.org> wrote:
-> > >>>
-> > >>> On Fri, 28 Apr 2023 at 10:44, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > >>>>
-> > >>>> Scott Mayhew <smayhew@redhat.com> wrote:
-> > >>>>>
-> > >>>>> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-> > >>>>> index 0e834a2c062c..477605fad76b 100644
-> > >>>>> --- a/arch/arm64/crypto/aes-modes.S
-> > >>>>> +++ b/arch/arm64/crypto/aes-modes.S
-> > >>>>> @@ -268,6 +268,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
-> > >>>>>      add             x4, x0, x4
-> > >>>>>      st1             {v0.16b}, [x4]                  /* overlapping stores */
-> > >>>>>      st1             {v1.16b}, [x0]
-> > >>>>> +       st1             {v1.16b}, [x5]
-> > >>>>>      ret
-> > >>>>> AES_FUNC_END(aes_cbc_cts_encrypt)
-> > >>>>>
-> > >>>>> But I don't know if that change is at all correct! (I've never even
-> > >>>>> looked at arm64 asm before).  If someone who's knowledgeable about this
-> > >>>>> code could chime in, I'd appreciate it.
-> > >>>>
-> > >>>> Ard, could you please take a look at this?
-> > >>>>
-> > >>>
-> > >>> The issue seems to be that the caller expects iv_out to have been
-> > >>> populated even when doing ciphertext stealing.
-> > >>>
-> > >>> This is meaningless, because the output IV can only be used to chain
-> > >>> additional encrypted data if the split is at a block boundary. The
-> > >>> ciphertext stealing fundamentally terminates the encryption, and
-> > >>> produces a block of ciphertext that is shorter than the block size, so
-> > >>> what the output IV should be is actually unspecified.
-> > >>>
-> > >>> IOW, test cases having plain/ciphertext vectors whose size is not a
-> > >>> multiple of the cipher block size should not specify an expected value
-> > >>> for the output IV.
-> > >>
-> > >> The test cases are extracted from RFC 3962 Appendix B. The
-> > >> standard clearly expects there to be a non-zero next IV for
-> > >> plaintext sizes that are not block-aligned.
-> > >>
-> > >
-> > > OK, so this is the Kerberos V specific spec on how to use AES in CBC
-> > > mode, which appears to describe how to chain multiple CBC encryptions
-> > > together.
-> > >
-> > > CBC-CTS itself does not define this: the IV is an input only, and the
-> > > reason we happen to return the IV is because a single CBC operation
-> > > may be broken up into several ones, which can only be done on block
-> > > boundaries. This is why CBC-CTS itself passes all its tests: a single
-> > > CBC-CTS encryption only performs ciphertext stealing at the very end,
-> > > and the next IV is never used in that case. (This is why the CTS mode
-> > > tests in crypto/testmgr.h don't have iv_out vectors)
-> > >
-> > > Note that RFC3962 defines that the penultimate block of CBC-CTS
-> > > ciphertext is used as the next IV. CBC returns the last ciphertext
-> > > block as the output IV. It is a happy coincidence that the generic CTS
-> > > template encapsulates CBC in a way where its output IV ends up in the
-> > > right place.
-> > >
-> > >> Also, these test cases pass on other hardware platforms.
-> > >>
-> > >
-> > > Fair enough.
-> > >
-> > > I am not opposed to fixing this, but given that it is the RFC3962 spec
-> > > that defines that the next IV is the penultimate full block of the
-> > > previous CBC-CTS ciphertext, we might consider doing the memcpy() in
-> > > the Kerberos code not in the CBC-CTS implementations.
-> >
-> > Interesting thought. I'm all about proper layering, so I think this
-> > is worth considering. Can you send an RFC patch?
-> >
-> 
-> I'm not that familiar with kunit so this is just an off hand
-> suggestion, but I imagine something like the below would suffice
-> 
-> --- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> +++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> @@ -639,6 +639,13 @@ gss_krb5_cts_crypt(struct crypto_sync_skcipher
-> *cipher, struct xdr_buf *buf,
-> 
->         ret = write_bytes_to_xdr_buf(buf, offset, data, len);
-> 
-> +       /*
-> +        * CBC-CTS does not define an output IV but RFC 3962 defines it as the
-> +        * penultimate block of ciphertext, so copy that into the IV buffer
-> +        * before returning.
-> +        */
-> +       if (encrypt)
-> +               memcpy(iv, data, crypto_sync_skcipher_ivsize(cipher));
->  out:
->         kfree(data);
->         return ret;
-> 
-Thanks, Ard.  That fixes it on aarch64 (also ran it on x86_64, ppc64le,
-s390x, and aarch64 w/ 64k pages).  Could you send it as an official
-patch and add
+On Fri, 2023-04-28 at 17:14 -0700, Fenghua Yu wrote:
+> Hi, Tom,
+>=20
+> On 4/28/23 13:55, Tom Zanussi wrote:
+> > From: Dave Jiang <dave.jiang@intel.com>
+> >=20
+> > With the possibility of multiple wq drivers that can be bound to
+> > the wq,
+> > the user config tool accel-config needs a way to know which wq
+> > driver to
+> > bind to the wq. Introduce per wq driver_name sysfs attribute where
+> > the user
+> > can indicate the driver to be bound to the wq. This allows accel-
+> > config to
+> > just bind to the driver using wq->driver_name.
+> >=20
+> > Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+> > Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+> > ---
+>=20
+> ...
+>=20
+> > diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+> > index 7ced8d283d98..505118fc19de 100644
+> > --- a/drivers/dma/idxd/idxd.h
+> > +++ b/drivers/dma/idxd/idxd.h
+> > @@ -214,6 +214,8 @@ struct idxd_wq {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char name[WQ_NAME_SIZE =
++ 1];
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u64 max_xfer_bytes;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 max_batch_size;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char driver_name[WQ_NAME_SIZ=
+E + 1];
+>=20
+> It's confused to use "WQ_NAME_SIZE" for driver name size.
+> Maybe it's better to have a new definition "DRIVER_NAME_SIZE"?
+> BTW, WQ_NAME_SIZE is 1024 which is unnecessary big for storing=20
+> driver_name[] in the structure. It would be better to have a smaller=20
+> size (e.g. 128) in DRIVER_NAME_SIZE.
 
-Tested-by: Scott Mayhew <smayhew@redhat.com>
+Yes, that makes sense - I'll add an IAA_DRIVER_NAME_SIZE of 128 and use
+that instead.
 
--Scott
+Thanks,
+
+Tom
+
+>=20
+> Thanks.
+>=20
+> -Fenghua
 
