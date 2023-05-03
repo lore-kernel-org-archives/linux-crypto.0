@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDD0C77B78
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 May 2023 10:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6730C77B78
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 May 2023 10:55:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229486AbjECKW1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 May 2023 06:22:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39154 "EHLO
+        id S229771AbjECKzA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 3 May 2023 06:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbjECKW0 (ORCPT
+        with ESMTP id S229569AbjECKy7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 May 2023 06:22:26 -0400
+        Wed, 3 May 2023 06:54:59 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB70E43;
-        Wed,  3 May 2023 03:22:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1988849DE;
+        Wed,  3 May 2023 03:54:57 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pu9cg-004hJW-Em; Wed, 03 May 2023 18:22:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 May 2023 18:22:11 +0800
-Date:   Wed, 3 May 2023 18:22:11 +0800
+        id 1puA83-004ibe-9X; Wed, 03 May 2023 18:54:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 May 2023 18:54:36 +0800
+Date:   Wed, 3 May 2023 18:54:36 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Dmitry Vyukov <dvyukov@google.com>
 Cc:     syzbot <syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com>,
@@ -27,10 +27,10 @@ Cc:     syzbot <syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com>,
         linux-kernel@vger.kernel.org, olivia@selenic.com,
         syzkaller-bugs@googlegroups.com, Jason Wang <jasowang@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [syzbot] [crypto?] KCSAN: data-race in random_recv_done /
- virtio_read (3)
-Message-ID: <ZFI102tIiZFiZNK4@gondor.apana.org.au>
+        Laurent Vivier <lvivier@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>
+Subject: [PATCH] hwrng: virtio - Fix race on data_avail and actual data
+Message-ID: <ZFI9bHr1o2Cvdebp@gondor.apana.org.au>
 References: <00000000000050327205f9d993b2@google.com>
  <CACT4Y+awU85RHZjf3+_85AvJOHghoOhH3c9E-70p+a=FrRDYkg@mail.gmail.com>
 MIME-Version: 1.0
@@ -62,9 +62,74 @@ On Fri, Apr 21, 2023 at 04:52:13PM +0200, Dmitry Vyukov wrote:
 > vi->data_idx is not yet reset to 0. Then concurrent reading will read
 > not where it's supposed to read.
 
-This appears to be a genuine bug.  I'll look into it.
+Yes this is a real race.  This bug appears to have been around
+forever.
 
-Thanks!
+---8<---
+The virtio rng device kicks off a new entropy request whenever the
+data available reaches zero.  When a new request occurs at the end
+of a read operation, that is, when the result of that request is
+only needed by the next reader, then there is a race between the
+writing of the new data and the next reader.
+
+This is because there is no synchronisation whatsoever between the
+writer and the reader.
+
+Fix this by writing data_avail with smp_store_release and reading
+it with smp_load_acquire when we first enter read.  The subsequent
+reads are safe because they're either protected by the first load
+acquire, or by the completion mechanism.
+
+Reported-by: syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com
+Fixes: f7f510ec1957 ("virtio: An entropy device, as suggested by hpa.")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index f7690e0f92ed..e41a84e6b4b5 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -4,6 +4,7 @@
+  *  Copyright (C) 2007, 2008 Rusty Russell IBM Corporation
+  */
+ 
++#include <asm/barrier.h>
+ #include <linux/err.h>
+ #include <linux/hw_random.h>
+ #include <linux/scatterlist.h>
+@@ -37,13 +38,13 @@ struct virtrng_info {
+ static void random_recv_done(struct virtqueue *vq)
+ {
+ 	struct virtrng_info *vi = vq->vdev->priv;
++	unsigned int len;
+ 
+ 	/* We can get spurious callbacks, e.g. shared IRQs + virtio_pci. */
+-	if (!virtqueue_get_buf(vi->vq, &vi->data_avail))
++	if (!virtqueue_get_buf(vi->vq, &len))
+ 		return;
+ 
+-	vi->data_idx = 0;
+-
++	smp_store_release(&vi->data_avail, len);
+ 	complete(&vi->have_data);
+ }
+ 
+@@ -52,7 +53,6 @@ static void request_entropy(struct virtrng_info *vi)
+ 	struct scatterlist sg;
+ 
+ 	reinit_completion(&vi->have_data);
+-	vi->data_avail = 0;
+ 	vi->data_idx = 0;
+ 
+ 	sg_init_one(&sg, vi->data, sizeof(vi->data));
+@@ -88,7 +88,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
+ 	read = 0;
+ 
+ 	/* copy available data */
+-	if (vi->data_avail) {
++	if (smp_load_acquire(&vi->data_avail)) {
+ 		chunk = copy_data(vi, buf, size);
+ 		size -= chunk;
+ 		read += chunk;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
