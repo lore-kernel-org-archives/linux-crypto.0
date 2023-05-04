@@ -2,173 +2,145 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 752B4C77B78
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 May 2023 05:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E065C77B7C
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 May 2023 07:34:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbjEDF3X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 May 2023 01:29:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48842 "EHLO
+        id S229934AbjEDHeV convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 4 May 2023 03:34:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjEDF3W (ORCPT
+        with ESMTP id S229765AbjEDHeU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 May 2023 01:29:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4091BD1
-        for <linux-crypto@vger.kernel.org>; Wed,  3 May 2023 22:28:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683178117;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rknz9rWFTYmTSoqDehsopyM4J34RAfhCmfEUYFTI4vk=;
-        b=WZNgzGYeZe/7zITAlKDYXrgpM/wWNcG/AzyB/vIpWnnlZXRC8yMsMnvd3zsVyd6OGvb+c8
-        Dh+RL+SnHKrcVL+mKQu4446LH8iR+2VRuq9jDIZgJA0YOLLEsKftTkNuliCJHivh7aWvvb
-        qgCjMhE2r2ybJpT6SxWKdY/83T4ZyO4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-548-PGlj7Q1HPpexzE8FCaETAA-1; Thu, 04 May 2023 01:28:36 -0400
-X-MC-Unique: PGlj7Q1HPpexzE8FCaETAA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f1745d08b5so70515e9.1
-        for <linux-crypto@vger.kernel.org>; Wed, 03 May 2023 22:28:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683178115; x=1685770115;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rknz9rWFTYmTSoqDehsopyM4J34RAfhCmfEUYFTI4vk=;
-        b=Eqd7XwtFwroVYZ9T4z0Iji5UH0oMP/V8zU+nSDey5FYks8/EYOJDyoT7vF/iivHLVP
-         uIq3RD9o33XtNzGKdbdrUp7V84X6MToSXOu+bPt9kBianYKLHHvDGDJYySYUFk+RpKu6
-         +giZIathZE9jSuL6XJF9B3o5U3/f+uD8YDQRfb6H+GEQpZfm5+xhm//FO7prU0++jEU3
-         ImTyYec6G1AQ8CXZEYmGgbfJP+QYxql66GAGH33BrOGNb+Mn0WYf12b8A3LS47oG/8WL
-         3qzf2LlI8LXi3AKrrD00SREdb7+YUGcbSPvmUt4QFBmLJdXW6VpxPojvfm9zdG0GqrAG
-         D7Rw==
-X-Gm-Message-State: AC+VfDy7GBJkBzunbFshKWICI6PtU09i/73U1KLT+9deULYyIRmgvw/P
-        0Jcof6BNJqG8VDOu1dX6M8xRAqQbB39FI5Qc3AJ+p5Z//scCJEWZMfvJsWe3yPKlHfmVbWloGgI
-        nbsydJ0x8aznF36rmVtQ5Alc+
-X-Received: by 2002:a7b:ce8b:0:b0:3f1:6faa:d94c with SMTP id q11-20020a7bce8b000000b003f16faad94cmr16392048wmj.16.1683178115460;
-        Wed, 03 May 2023 22:28:35 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6POiYPPqmIlSPfpvcMsDXK5aF0I0YO5IEpOhc6/XuSAbh//EpUFBgAgN7y/MN/MRyTPhiCQA==
-X-Received: by 2002:a7b:ce8b:0:b0:3f1:6faa:d94c with SMTP id q11-20020a7bce8b000000b003f16faad94cmr16392033wmj.16.1683178115152;
-        Wed, 03 May 2023 22:28:35 -0700 (PDT)
-Received: from redhat.com ([31.187.78.120])
-        by smtp.gmail.com with ESMTPSA id x16-20020a05600c21d000b003f318be9442sm3682466wmj.40.2023.05.03.22.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 22:28:34 -0700 (PDT)
-Date:   Thu, 4 May 2023 01:28:30 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, olivia@selenic.com,
-        syzkaller-bugs@googlegroups.com, Jason Wang <jasowang@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [v2 PATCH] hwrng: virtio - Fix race on data_avail and actual data
-Message-ID: <20230504012732-mutt-send-email-mst@kernel.org>
-References: <00000000000050327205f9d993b2@google.com>
- <CACT4Y+awU85RHZjf3+_85AvJOHghoOhH3c9E-70p+a=FrRDYkg@mail.gmail.com>
- <ZFI9bHr1o2Cvdebp@gondor.apana.org.au>
- <20230503073220-mutt-send-email-mst@kernel.org>
- <ZFMtpC18ykLd/jf2@gondor.apana.org.au>
+        Thu, 4 May 2023 03:34:20 -0400
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A2AA9;
+        Thu,  4 May 2023 00:34:16 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 5611324E1A6;
+        Thu,  4 May 2023 15:34:14 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 4 May
+ 2023 15:34:14 +0800
+Received: from ubuntu.localdomain (161.142.156.10) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 4 May
+ 2023 15:34:08 +0800
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>
+CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+Subject: [PATCH v7 1/4] dt-bindings: crypto: Add StarFive crypto module
+Date:   Thu, 4 May 2023 15:33:57 +0800
+Message-ID: <20230504073400.1170979-2-jiajie.ho@starfivetech.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230504073400.1170979-1-jiajie.ho@starfivetech.com>
+References: <20230504073400.1170979-1-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZFMtpC18ykLd/jf2@gondor.apana.org.au>
+Content-Type: text/plain
+X-Originating-IP: [161.142.156.10]
+X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 04, 2023 at 11:59:32AM +0800, Herbert Xu wrote:
-> On Wed, May 03, 2023 at 07:37:00AM -0400, Michael S. Tsirkin wrote:
-> >
-> > On the surface of it, it looks like you removed this store
-> > which isn't described in the commit log.
-> > I do not, offhand, remember why we stored 0 in data_idx here
-> > when we also zero it in request_entropy.
-> > It was added with
-> 
-> Yes I removed because it's redundant.  But you're right I'll add
-> a note about it in the log:
-> 
-> ---8<---
-> The virtio rng device kicks off a new entropy request whenever the
-> data available reaches zero.  When a new request occurs at the end
-> of a read operation, that is, when the result of that request is
-> only needed by the next reader, then there is a race between the
-> writing of the new data and the next reader.
-> 
-> This is because there is no synchronisation whatsoever between the
-> writer and the reader.
-> 
-> Fix this by writing data_avail with smp_store_release and reading
-> it with smp_load_acquire when we first enter read.  The subsequent
-> reads are safe because they're either protected by the first load
-> acquire, or by the completion mechanism.
-> 
-> Also remove the redundant zeroing of data_idx in random_recv_done
-> (data_idx must already be zero at this point) and data_avail in
-> request_entropy (ditto).
-> 
-> Reported-by: syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com
-> Fixes: f7f510ec1957 ("virtio: An entropy device, as suggested by hpa.")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Add documentation to describe StarFive cryptographic engine.
 
+Co-developed-by: Huan Feng <huan.feng@starfivetech.com>
+Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
+---
+ .../crypto/starfive,jh7110-crypto.yaml        | 70 +++++++++++++++++++
+ 1 file changed, 70 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-feel free ro merge, thanks!
-
-> 
-> diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
-> index f7690e0f92ed..e41a84e6b4b5 100644
-> --- a/drivers/char/hw_random/virtio-rng.c
-> +++ b/drivers/char/hw_random/virtio-rng.c
-> @@ -4,6 +4,7 @@
->   *  Copyright (C) 2007, 2008 Rusty Russell IBM Corporation
->   */
->  
-> +#include <asm/barrier.h>
->  #include <linux/err.h>
->  #include <linux/hw_random.h>
->  #include <linux/scatterlist.h>
-> @@ -37,13 +38,13 @@ struct virtrng_info {
->  static void random_recv_done(struct virtqueue *vq)
->  {
->  	struct virtrng_info *vi = vq->vdev->priv;
-> +	unsigned int len;
->  
->  	/* We can get spurious callbacks, e.g. shared IRQs + virtio_pci. */
-> -	if (!virtqueue_get_buf(vi->vq, &vi->data_avail))
-> +	if (!virtqueue_get_buf(vi->vq, &len))
->  		return;
->  
-> -	vi->data_idx = 0;
-> -
-> +	smp_store_release(&vi->data_avail, len);
->  	complete(&vi->have_data);
->  }
->  
-> @@ -52,7 +53,6 @@ static void request_entropy(struct virtrng_info *vi)
->  	struct scatterlist sg;
->  
->  	reinit_completion(&vi->have_data);
-> -	vi->data_avail = 0;
->  	vi->data_idx = 0;
->  
->  	sg_init_one(&sg, vi->data, sizeof(vi->data));
-> @@ -88,7 +88,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
->  	read = 0;
->  
->  	/* copy available data */
-> -	if (vi->data_avail) {
-> +	if (smp_load_acquire(&vi->data_avail)) {
->  		chunk = copy_data(vi, buf, size);
->  		size -= chunk;
->  		read += chunk;
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml b/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
+new file mode 100644
+index 000000000000..71a2876bd6e4
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
+@@ -0,0 +1,70 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/starfive,jh7110-crypto.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: StarFive Cryptographic Module
++
++maintainers:
++  - Jia Jie Ho <jiajie.ho@starfivetech.com>
++  - William Qiu <william.qiu@starfivetech.com>
++
++properties:
++  compatible:
++    const: starfive,jh7110-crypto
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: Hardware reference clock
++      - description: AHB reference clock
++
++  clock-names:
++    items:
++      - const: hclk
++      - const: ahb
++
++  interrupts:
++    maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  dmas:
++    items:
++      - description: TX DMA channel
++      - description: RX DMA channel
++
++  dma-names:
++    items:
++      - const: tx
++      - const: rx
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - resets
++  - dmas
++  - dma-names
++
++additionalProperties: false
++
++examples:
++  - |
++    crypto: crypto@16000000 {
++        compatible = "starfive,jh7110-crypto";
++        reg = <0x16000000 0x4000>;
++        clocks = <&clk 15>, <&clk 16>;
++        clock-names = "hclk", "ahb";
++        interrupts = <28>;
++        resets = <&reset 3>;
++        dmas = <&dma 1 2>,
++               <&dma 0 2>;
++        dma-names = "tx", "rx";
++    };
++...
+-- 
+2.25.1
 
