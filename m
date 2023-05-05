@@ -2,107 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F0CC7EE2A
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 19:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2607C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 23:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233204AbjEETrJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 May 2023 15:47:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
+        id S230033AbjEEXFJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 May 2023 19:05:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232137AbjEETrI (ORCPT
+        with ESMTP id S229649AbjEEXFH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 May 2023 15:47:08 -0400
+        Fri, 5 May 2023 19:05:07 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D8DE0;
-        Fri,  5 May 2023 12:47:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B5410D9;
+        Fri,  5 May 2023 16:05:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 40EC160DBE;
-        Fri,  5 May 2023 19:47:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD1EC433EF;
-        Fri,  5 May 2023 19:46:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FB0064049;
+        Fri,  5 May 2023 23:05:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE07C433D2;
+        Fri,  5 May 2023 23:05:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683316026;
-        bh=Sb2KgQ5DsUgQ8xKWmkYNMl26e38BQYOVMpl/Vac7Mlc=;
+        s=k20201202; t=1683327905;
+        bh=XEls8cwJ9PihLtpf+B0rKLZ28vKzCt/oNFmXwSPyGBY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=elsCHSqNwFxUfu6VDPA5BgwMa9uPCAgvGK/9pAW2TU5GB9bI3Ll6zAfgwLZ0x/r5R
-         IluW+zvNltdv9tF/cWmtu/jBRAAqCK5t2m8FHh2N6sAIIyhxca/kBfj26fVEeoWd2L
-         A2r85aEVAIz5tUkrO73+HjZlYFK2Hmh7eFe7uuLwvJg4PXMsc+efjVhtqEnrcUOG3P
-         ULB+CdNJnc7D3UqmB9EY104YZbopRSB4H5PLwfM4gBQWbRTiDjSNdEafQuGCZngOO3
-         ZJ/Sv/PL7t1UG3pd7QfV1iPUyhYqUn3e6R7gLh6KK4sIutQOZ+ihxN1XWeAU8Hc+Y7
-         F5IdlWXYgma6Q==
-Date:   Fri, 5 May 2023 21:46:56 +0200
-From:   Simon Horman <horms@kernel.org>
-To:     Ross Philipson <ross.philipson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
-        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
-        trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v6 07/14] x86: Secure Launch kernel early boot stub
-Message-ID: <ZFVdMJIQ+4BmXvhN@kernel.org>
-References: <20230504145023.835096-1-ross.philipson@oracle.com>
- <20230504145023.835096-8-ross.philipson@oracle.com>
- <ZFVBLCLVK7AAStst@kernel.org>
- <81ce947c-07a0-0975-1d09-776fb03c64b9@oracle.com>
+        b=XilQ/Vh/UD1tIZCxAQQ+QHytgnxpjUeJDJbIJSsHNNr7MH7+JLo5cm1wFMvCh9ZJY
+         +hT0xuYdHLzYDZ92IPmUNVoAG65m2H0o2JnlqarI3Uh42MUh3iNV7+NmqWODb3fpSi
+         gRgzF7EwqqsUN61BGPzM/V+/7tbuLX4ZsG2PYO4YqK6Kgz0Z+E2DdpKJfsvGVGGldQ
+         iMTqudUcmHOB/lChu3/EcfigLOB2d/+85W2AktNAi1rfOyGU9ZZE54OzK1IDpuU4xa
+         +Bnh57fiAMxW6ebhmgJaKKCMpQozBKH6bQ7DUXInkjjmGBQ1V38gZeh18whqKTyyOV
+         it2aHsnrmiwHQ==
+Date:   Fri, 5 May 2023 23:05:04 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com, gmazyland@gmail.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, tglx@linutronix.de, bp@suse.de,
+        mingo@kernel.org, x86@kernel.org, herbert@gondor.apana.org.au,
+        ardb@kernel.org, dan.j.williams@intel.com, bernie.keany@intel.com,
+        charishma1.gairuboyina@intel.com,
+        lalithambika.krishnakumar@intel.com,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v6 07/12] x86/cpu/keylocker: Load an internal wrapping
+ key at boot-time
+Message-ID: <ZFWLoOZZTnBrid+7@gmail.com>
+References: <20220112211258.21115-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-8-chang.seok.bae@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <81ce947c-07a0-0975-1d09-776fb03c64b9@oracle.com>
+In-Reply-To: <20230410225936.8940-8-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 05, 2023 at 02:58:28PM -0400, Ross Philipson wrote:
-> On 5/5/23 13:47, Simon Horman wrote:
-> > On Thu, May 04, 2023 at 02:50:16PM +0000, Ross Philipson wrote:
+On Mon, Apr 10, 2023 at 03:59:31PM -0700, Chang S. Bae wrote:
+> diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
+> index e85dfb6c1524..820ac29c06d9 100644
+> --- a/arch/x86/include/asm/keylocker.h
+> +++ b/arch/x86/include/asm/keylocker.h
+> @@ -5,6 +5,7 @@
+>  
+>  #ifndef __ASSEMBLY__
+>  
+> +#include <asm/processor.h>
+>  #include <linux/bits.h>
+>  #include <asm/fpu/types.h>
+>  
+> @@ -28,5 +29,13 @@ struct iwkey {
+>  #define KEYLOCKER_CPUID_EBX_WIDE	BIT(2)
+>  #define KEYLOCKER_CPUID_EBX_BACKUP	BIT(4)
+>  
+> +#ifdef CONFIG_X86_KEYLOCKER
+> +void setup_keylocker(struct cpuinfo_x86 *c);
+> +void destroy_keylocker_data(void);
+> +#else
+> +#define setup_keylocker(c) do { } while (0)
+> +#define destroy_keylocker_data() do { } while (0)
+> +#endif
 
-...
+Shouldn't the !CONFIG_X86_KEYLOCKER stubs be static inline functions instead of
+macros, so that type checking works?
 
-> > > +asmlinkage __visible void sl_check_region(void *base, u32 size)
-> > > +{
-> > > +	sl_check_pmr_coverage(base, size, false);
-> > > +}
-> > 
-> > I'm a nit unsure, what to do here, but clang-16 with W=1 says the following.
-> > 
-> > arch/x86/boot/compressed/sl_main.c:533:27: warning: no previous prototype for function 'sl_main' [-Wmissing-prototypes]
-> > asmlinkage __visible void sl_main(void *bootparams)
-> >                            ^
-> > arch/x86/boot/compressed/sl_main.c:533:22: note: declare 'static' if the function is not intended to be used outside of this translation unit
-> > asmlinkage __visible void sl_main(void *bootparams)
-> >                       ^
-> >                       static
-> 
-> Yea we will have to look into why this is. This function is only ever called
-> from asm code so that might have something to do with this.
-
-Thanks.
-
-...
-
-> > > diff --git a/arch/x86/include/uapi/asm/bootparam.h b/arch/x86/include/uapi/asm/bootparam.h
-> > > index 01d19fc..74e3e7df 100644
-> > > --- a/arch/x86/include/uapi/asm/bootparam.h
-> > > +++ b/arch/x86/include/uapi/asm/bootparam.h
-> > > @@ -26,6 +26,7 @@
-> > >   /* loadflags */
-> > >   #define LOADED_HIGH	(1<<0)
-> > >   #define KASLR_FLAG	(1<<1)
-> > > +#define SLAUNCH_FLAG	(1<<2)
-> > >   #define QUIET_FLAG	(1<<5)
-> > >   #define KEEP_SEGMENTS	(1<<6)
-> > >   #define CAN_USE_HEAP	(1<<7)
-> > 
-> > nit: please consider using BIT()
-> 
-> I am a little reluctant to change something like this in an existing header.
-> It seems a bit out of scope for the patch set.
-
-Yes, sorry for the noise on this one.
-I agree that what you have is the best approach here.
+- Eric
