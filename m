@@ -2,91 +2,129 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05607C77B7F
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 17:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C58C77B7F
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 18:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233226AbjEERz7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 May 2023 13:55:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51610 "EHLO
+        id S233309AbjEESrH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 May 2023 14:47:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233136AbjEERzt (ORCPT
+        with ESMTP id S233283AbjEESrG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 May 2023 13:55:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2031F496;
-        Fri,  5 May 2023 10:55:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 268AC635D0;
-        Fri,  5 May 2023 17:54:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4700C433D2;
-        Fri,  5 May 2023 17:54:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683309290;
-        bh=iGxlMMfHq5zekP1cLLlA597ifNT3g2z8NHymFlQCd4A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nwja6AwnW4smOMGRvawHd98VsnoIFBSK6V0Q7CWqwqpW+qLg4TnkjoEXb5RTczp2T
-         H07bIqfn8yxspOmufiM8hf7fNhnsOdCexce9/d/ezR8WycIYoieyrINfU54O74/CF8
-         BkTMvbNq2yJFNqMqCs71QXMf7i7+w3t+L20j8nrckRfVZ/KwKnjDEXJ5oY4B5cqTnv
-         Lsk1y/8yD+JH/9r19Orhvb8pvG1Io1rOzioDerHmQfbQhl0TZ9VEstOquq01RaGDPp
-         nhSu9KZwx8NAF+ojYagr0e1ZZ5hoboZprPhyn+OeFJ0qg0HkwHdgVtIRLdu9NvEQek
-         uq9EJ14iow/xQ==
-Date:   Fri, 5 May 2023 19:54:44 +0200
-From:   Simon Horman <horms@kernel.org>
-To:     Ross Philipson <ross.philipson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
-        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
-        trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v6 09/14] x86: Secure Launch SMP bringup support
-Message-ID: <ZFVC5Fv0wO0Awt0N@kernel.org>
-References: <20230504145023.835096-1-ross.philipson@oracle.com>
- <20230504145023.835096-10-ross.philipson@oracle.com>
+        Fri, 5 May 2023 14:47:06 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21181CFD3
+        for <linux-crypto@vger.kernel.org>; Fri,  5 May 2023 11:47:03 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-50bc4bc2880so3374759a12.2
+        for <linux-crypto@vger.kernel.org>; Fri, 05 May 2023 11:47:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1683312422; x=1685904422;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xizeI1xw1N1o1KCR/0d3CEO5HKUJMy4YKMQX1QmsJGU=;
+        b=BYjn7MR+ccvEmSQ0mrXcIifJSGfkZYwfRcTeP0ubpg11K5pBkh3FQ/6t9t7zmM5pm4
+         Nja8mfI6By1KkXVz/cH092kKR4ynt0oIMRA9EoGPv5a12FRs1uVJBLYrM4bHUxtgDewC
+         s6i2bvPJT162ghE3iQXfHMRsqHt1M60kBOIMhqSLJBQubkfYgxx9MmtdI+rcAic5qg0Y
+         8kVtA3EQ8tHR4LmGqfU0bAoM55gZvv7QNCQG5GPVvdPgn6K3WBLOxwec8qDjSsipcG1D
+         XYZLHJu/I9NwxRuoMkTXSMGWDBTLWbrizX8sTIO8d16Ekbmc4PLyX9X8010RAitoXF3s
+         8qpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683312422; x=1685904422;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xizeI1xw1N1o1KCR/0d3CEO5HKUJMy4YKMQX1QmsJGU=;
+        b=GZVtrRl5JeTIg4XFuX9Tvk5Vzh/EWyUagCXCjiWE/RTac+6pDw8bO+cWXwbtHxln6m
+         ow5LZ242bQc4OhbfJXR304FRww/8De3cVjqmkSqNCub5fIvalydPxqw1mLuTMLUGezkt
+         q7cTMuowNHOuPHDk0jaHcpuMBTv4c72sZ7nGBx0VJfNFO6u8OljhmQkDciIh0MdwpOof
+         AdCdxs2QT7p5vp9+u2/QMBdkgN36gcfEs9xjHbTBWMSKB5ftAX6fT3oCKXjhn7iA0/hg
+         OTjSuEZ1PGh8/EBnR04rp+tvDoLjc8eWwhpCJ+eROWjWLARQTo3dkjmR57vBum38RBDZ
+         tCMA==
+X-Gm-Message-State: AC+VfDzyhwLDJDmn0yUticu+9wn9Y92b9ZeoAQh+DwsCE3tDl+2shl3M
+        Mew5ND762GCtF0DtXIwW7QjtLQ==
+X-Google-Smtp-Source: ACHHUZ6EzeWMpBxmWaCjOrtvtyfpMbhXeKnbo8gnWIGqsyLOp/pkuaTAcAyh14W6LDPIk97mCn1Hgw==
+X-Received: by 2002:a17:906:db03:b0:965:4b43:11f1 with SMTP id xj3-20020a170906db0300b009654b4311f1mr1799980ejb.3.1683312422000;
+        Fri, 05 May 2023 11:47:02 -0700 (PDT)
+Received: from ?IPV6:2a02:810d:15c0:828:52e:24ce:bbc1:127d? ([2a02:810d:15c0:828:52e:24ce:bbc1:127d])
+        by smtp.gmail.com with ESMTPSA id n10-20020a1709065daa00b0094edbe5c7ddsm1252130ejv.38.2023.05.05.11.47.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 May 2023 11:47:01 -0700 (PDT)
+Message-ID: <316e9ee5-fccc-e199-f727-7b8187e965ff@linaro.org>
+Date:   Fri, 5 May 2023 20:47:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230504145023.835096-10-ross.philipson@oracle.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v7 1/3] dt-bindings: ufs: qcom: Add ICE phandle
+Content-Language: en-US
+To:     Abel Vesa <abel.vesa@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <20230408214041.533749-1-abel.vesa@linaro.org>
+ <20230408214041.533749-2-abel.vesa@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230408214041.533749-2-abel.vesa@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 04, 2023 at 02:50:18PM +0000, Ross Philipson wrote:
-> On Intel, the APs are left in a well documented state after TXT performs
-> the late launch. Specifically they cannot have #INIT asserted on them so
-> a standard startup via INIT/SIPI/SIPI cannot be performed. Instead the
-> early SL stub code parked the APs in a pause/jmp loop waiting for an NMI.
-> The modified SMP boot code is called for the Secure Launch case. The
-> jump address for the RM piggy entry point is fixed up in the jump where
-> the APs are waiting and an NMI IPI is sent to the AP. The AP vectors to
-> the Secure Launch entry point in the RM piggy which mimics what the real
-> mode code would do then jumps to the standard RM piggy protected mode
-> entry point.
+On 08/04/2023 23:40, Abel Vesa wrote:
+> Starting with SM8550, the ICE will have its own devicetree node
+> so add the qcom,ice property to reference it.
 > 
-> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> ---
+> 
+> The v6 is here:
+> https://lore.kernel.org/all/20230407105029.2274111-3-abel.vesa@linaro.org/
+> 
+> Changes since v6:
+>  * Dropped the minItems for both the qcom,ice and the reg in the
+>    qcom,ice compatile subschema, like Krzysztof suggested
+> 
+> Changes since v5:
+>  * dropped the sm8550 specific subschema and replaced it with one that
+>    mutually excludes the qcom,ice vs both the ICE specific reg range
+>    and the ICE clock
+> 
+> Changes since v4:
+>  * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
+>    it while making sure none of the other platforms are allowed to use it
+> 
+> Changes since v3:
+>  * dropped the "and drop core clock" part from subject line
+> 
+> Changes since v2:
+>  * dropped all changes except the qcom,ice property
+> 
+> 
+>  .../devicetree/bindings/ufs/qcom,ufs.yaml     | 24 +++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
 
-Hi Ross,
+I see dt_binding_check errors after applying this patch. Are you sure
+this was tested?
 
-just one minor nit on this one.
+Best regards,
+Krzysztof
 
->  /*
->   * NOTE - on most systems this is a PHYSICAL apic ID, but on multiquad
->   * (ie clustered apic addressing mode), this is a LOGICAL apic ID.
-> @@ -1132,6 +1210,13 @@ static int do_boot_cpu(int apicid, int cpu, struct task_struct *idle,
->  	cpumask_clear_cpu(cpu, cpu_initialized_mask);
->  	smp_mb();
->  
-> +	/* With Intel TXT, the AP startup is totally different */
-> +	if ((slaunch_get_flags() & (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)) ==
-
-nit: spaces around '|'
-
-> +	   (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)) {
-> +		boot_error = slaunch_wakeup_cpu_from_txt(cpu, apicid);
-> +		goto txt_wake;
-> +	}
