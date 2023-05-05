@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2607C77B75
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 23:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40248C77B7C
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 23:10:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbjEEXFJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 May 2023 19:05:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
+        id S230514AbjEEXJ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 May 2023 19:09:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjEEXFH (ORCPT
+        with ESMTP id S229681AbjEEXJ5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 May 2023 19:05:07 -0400
+        Fri, 5 May 2023 19:09:57 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B5410D9;
-        Fri,  5 May 2023 16:05:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0AD3C27;
+        Fri,  5 May 2023 16:09:56 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FB0064049;
-        Fri,  5 May 2023 23:05:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE07C433D2;
-        Fri,  5 May 2023 23:05:05 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 083AF64089;
+        Fri,  5 May 2023 23:09:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E06EC433D2;
+        Fri,  5 May 2023 23:09:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683327905;
-        bh=XEls8cwJ9PihLtpf+B0rKLZ28vKzCt/oNFmXwSPyGBY=;
+        s=k20201202; t=1683328195;
+        bh=mXw9zNMy/vcWygWO+q0RxSEPXTN5AIfnE0Kge2powyU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XilQ/Vh/UD1tIZCxAQQ+QHytgnxpjUeJDJbIJSsHNNr7MH7+JLo5cm1wFMvCh9ZJY
-         +hT0xuYdHLzYDZ92IPmUNVoAG65m2H0o2JnlqarI3Uh42MUh3iNV7+NmqWODb3fpSi
-         gRgzF7EwqqsUN61BGPzM/V+/7tbuLX4ZsG2PYO4YqK6Kgz0Z+E2DdpKJfsvGVGGldQ
-         iMTqudUcmHOB/lChu3/EcfigLOB2d/+85W2AktNAi1rfOyGU9ZZE54OzK1IDpuU4xa
-         +Bnh57fiAMxW6ebhmgJaKKCMpQozBKH6bQ7DUXInkjjmGBQ1V38gZeh18whqKTyyOV
-         it2aHsnrmiwHQ==
-Date:   Fri, 5 May 2023 23:05:04 +0000
+        b=nPd4Rl+8NrMd3AdqO3cYS5efsxQkx6NKNmiss+u2Bg50EH6ySrj2EGbf69JJZi1jL
+         VM39cUq4ZhY91v0k4JyIqTJl22p36bUxiOsP3OhePkbfdIBN02mLGKeWDLBARwGNp4
+         uttN+9X8WVQEuWxj2H4Q08u2b50jFWRD/BG8hFJoF0WRNQHkUgZRXgFLc8VXDO/2za
+         Aghkmz5xPY6KU5F1mEwsDDW0Dz2ZKL+4fo2CAFDTJ9o+P15ctKKHq+hpsvcKsJeTUH
+         CE6JnmuxK1Ja76yzoqQASquBxHEQVChhW6xnslyKbQIzG8moMFyWrgAgKQEJt8TTor
+         EzrCJkPT87aPg==
+Date:   Fri, 5 May 2023 23:09:53 +0000
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Chang S. Bae" <chang.seok.bae@intel.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
@@ -43,47 +43,48 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         charishma1.gairuboyina@intel.com,
         lalithambika.krishnakumar@intel.com,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v6 07/12] x86/cpu/keylocker: Load an internal wrapping
- key at boot-time
-Message-ID: <ZFWLoOZZTnBrid+7@gmail.com>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org
+Subject: Re: [PATCH v6 08/12] x86/PM/keylocker: Restore internal wrapping key
+ on resume from ACPI S3/4
+Message-ID: <ZFWMwQc4NKg7ueqG@gmail.com>
 References: <20220112211258.21115-1-chang.seok.bae@intel.com>
  <20230410225936.8940-1-chang.seok.bae@intel.com>
- <20230410225936.8940-8-chang.seok.bae@intel.com>
+ <20230410225936.8940-9-chang.seok.bae@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230410225936.8940-8-chang.seok.bae@intel.com>
+In-Reply-To: <20230410225936.8940-9-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 10, 2023 at 03:59:31PM -0700, Chang S. Bae wrote:
-> diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
-> index e85dfb6c1524..820ac29c06d9 100644
-> --- a/arch/x86/include/asm/keylocker.h
-> +++ b/arch/x86/include/asm/keylocker.h
-> @@ -5,6 +5,7 @@
->  
->  #ifndef __ASSEMBLY__
->  
-> +#include <asm/processor.h>
->  #include <linux/bits.h>
->  #include <asm/fpu/types.h>
->  
-> @@ -28,5 +29,13 @@ struct iwkey {
->  #define KEYLOCKER_CPUID_EBX_WIDE	BIT(2)
->  #define KEYLOCKER_CPUID_EBX_BACKUP	BIT(4)
->  
-> +#ifdef CONFIG_X86_KEYLOCKER
-> +void setup_keylocker(struct cpuinfo_x86 *c);
-> +void destroy_keylocker_data(void);
-> +#else
-> +#define setup_keylocker(c) do { } while (0)
-> +#define destroy_keylocker_data() do { } while (0)
-> +#endif
+On Mon, Apr 10, 2023 at 03:59:32PM -0700, Chang S. Bae wrote:
+> +/*
+> + * This flag is set with IWKey load. When the key restore fails, it is
+> + * reset. This restore state is exported to the crypto library, then AES-KL
+> + * will not be used there. So, the feature is soft-disabled with this flag.
+> + */
+> +static bool valid_kl;
+> +
+> +bool valid_keylocker(void)
+> +{
+> +	return valid_kl;
+> +}
+> +EXPORT_SYMBOL_GPL(valid_keylocker);
 
-Shouldn't the !CONFIG_X86_KEYLOCKER stubs be static inline functions instead of
-macros, so that type checking works?
+It would be simpler to export this bool directly.
+
+> +	if (status & BIT(0))
+> +		return 0;
+> +	else
+> +		return -EBUSY;
+[...]
+> +		pr_info("x86/keylocker: Enabled.\n");
+> +		return;
+> +	} else {
+> +		int rc;
+
+The kernel coding style usually doesn't use 'else' after a return.
 
 - Eric
