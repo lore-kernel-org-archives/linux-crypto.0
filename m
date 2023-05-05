@@ -2,133 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FBA2C77B75
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 04:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C6EC7EE2A
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 May 2023 08:39:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbjEEECU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 May 2023 00:02:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60852 "EHLO
+        id S230508AbjEEIjx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 5 May 2023 04:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230206AbjEEECF (ORCPT
+        with ESMTP id S230444AbjEEIjw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 May 2023 00:02:05 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D44A5DE
-        for <linux-crypto@vger.kernel.org>; Thu,  4 May 2023 21:02:03 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-120-46.bstnma.fios.verizon.net [173.48.120.46])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 34541Ykn012843
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 5 May 2023 00:01:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1683259299; bh=t9ztIRuj4Z9rkaKhBQhhRzpmN07bJoq1+o+WdNUbNy4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=AjuR9ctkBqBovaMAGoU/5wd8bSwtlSOGNI+Ax4R7tZrTP7WU2i9uRKsk51lDzCub4
-         lBiFGpJKe5e8LL8PWhEpC45GAy2J6OCjegtJkhIZzBW4ANhumptwN72zpcBE655Ffa
-         ODIW8Ox0yAtO0DBZZR4fDocgTPoCcdrykxedL8HN1cWeIBpoqleT1kwIucKX3H8KZc
-         WRzSECaZKDvlRnY6ci+SYJWMmNdfB1L2LkzAeUzDqyWVbM5pzxtm/9ywFH4aVGwz9k
-         HuIdhpypa/k/k00QffVCZPOLkb7KLuHKAMMBJuNFIl5VpqTkTxOmjJTI6+6jzpBp33
-         9J+5RdQGce1Tg==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id BF6B915C02E8; Fri,  5 May 2023 00:01:34 -0400 (EDT)
-Date:   Fri, 5 May 2023 00:01:34 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Tudor Ambarus <tudor.ambarus@linaro.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, olivia@selenic.com,
-        syzkaller-bugs@googlegroups.com, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>,
-        Aleksandr Nogikh <nogikh@google.com>
-Subject: Re: [PATCH] hwrng: virtio - Fix race on data_avail and actual data
-Message-ID: <20230505040134.GA883142@mit.edu>
-References: <00000000000050327205f9d993b2@google.com>
- <CACT4Y+awU85RHZjf3+_85AvJOHghoOhH3c9E-70p+a=FrRDYkg@mail.gmail.com>
- <ZFI9bHr1o2Cvdebp@gondor.apana.org.au>
- <ede92183-bef3-78a7-abae-335c6c5cca1e@linaro.org>
- <ZFMsvxW+pEZA2EZ7@gondor.apana.org.au>
- <41ddc20d-8675-d8bc-18c6-2a26f0d6b104@linaro.org>
+        Fri, 5 May 2023 04:39:52 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A74C618876;
+        Fri,  5 May 2023 01:39:50 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-24e4f674356so1385831a91.3;
+        Fri, 05 May 2023 01:39:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683275990; x=1685867990;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5aRZSqqSGHolTlh1jtoDKdcPZUN/607EWF6b0DkrsH0=;
+        b=AZK4dSGaMIFsre3ab92ohSTLZERw1D4UVGxEBRjOtKP6UhdmDSBcr8z0sm901npXrG
+         mWUooB0uHfaLjnmx7bfX1yx+wRSHgQsx4tLIA4huIQrbAiarI6jvfGE1nfn/xSB0A89l
+         t6mKGCVygg6b2/gLC4N6mWNU39w8dUQLO8K6lLO/j9eruFTh/Hmbg6SLuwv+pb6ySicp
+         eexkrTwLz8PrhTPSZnAE48CBGL3lK5qeCNmkq0OLRWpZauERfD7pcXFXqLVgeGbx5j67
+         3rLwWjyGlmZROMsmlX0gAsAHyAM1A+F83Nn4OTesBSFWvjv2aYpVxpSm78AGf0YEnIta
+         b7OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683275990; x=1685867990;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5aRZSqqSGHolTlh1jtoDKdcPZUN/607EWF6b0DkrsH0=;
+        b=Ja43UoPVcSP9LfPeihJ8aylyudcP0mPEVC+daMvzo1jyt2pA9CNh3Uv/AIZkJnCnqu
+         iKJTT+MOoIEtrMkuXj/iDgi/dyY4GYQayGf6cbRjvhObvEPZF2meQ/98/hNM4IsKE+qv
+         eaUQCkerGjCIs7gl8jQvYbSOTLZuiSxd/YeLk2mp9sjAbKJ+YFIau6kCjFfmHYtfVE4C
+         aJDkxZoOW0pkcPzk2LRfpGbWsc6Gbc99cbU7rFl5+8E1PVQ+WnOT1diT8w0Ci5A6zNHm
+         22IVCkVymY8MwGfugPG/XtUX+Si0VbP9VbrgY5o/q2FIKim6l201awmsjwJasZiyvkLF
+         wrVQ==
+X-Gm-Message-State: AC+VfDxwZGlsWcBWV9e3+g7i2h6nQGoBBOiTsS7Q03xfaWu7YozSd1YP
+        c9FRWUwhW1nAGSD0ybKuAYU=
+X-Google-Smtp-Source: ACHHUZ4UH5k0im9tHcDD0dnFM8xRvkntB8xfaghRqc4oSAV95zeDV+5tHiAc0U5MZUzLoIsVrIWOYA==
+X-Received: by 2002:a17:90a:e645:b0:247:35f8:81d2 with SMTP id ep5-20020a17090ae64500b0024735f881d2mr699164pjb.29.1683275990015;
+        Fri, 05 May 2023 01:39:50 -0700 (PDT)
+Received: from debian.me (subs32-116-206-28-14.three.co.id. [116.206.28.14])
+        by smtp.gmail.com with ESMTPSA id v13-20020a17090a0c8d00b00246b1b4a3ffsm12895140pja.0.2023.05.05.01.39.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 May 2023 01:39:49 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 9BAC3106281; Fri,  5 May 2023 15:39:46 +0700 (WIB)
+Date:   Fri, 5 May 2023 15:39:46 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Ross Philipson <ross.philipson@oracle.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kexec@lists.infradead.org, linux-efi@vger.kernel.org
+Cc:     dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
+        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
+        trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v6 00/14] x86: Trenchboot secure dynamic launch Linux
+ kernel support
+Message-ID: <ZFTA0kg98XxeP2Hh@debian.me>
+References: <20230504145023.835096-1-ross.philipson@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="8WmKHbH6zHIoE+UF"
 Content-Disposition: inline
-In-Reply-To: <41ddc20d-8675-d8bc-18c6-2a26f0d6b104@linaro.org>
+In-Reply-To: <20230504145023.835096-1-ross.philipson@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 04, 2023 at 09:10:43AM +0100, Tudor Ambarus wrote:
-> > The syzbot ID is already present in the in the Reported-by tag.
-> > There is no reason to clutter up the commit message with redundant
-> > information.
-> 
-> As you prefer. Theodore Ts'o encourages to add a dashboard link, here's
-> his reasoning:
-> https://github.com/google/syzkaller/issues/3393#issuecomment-1347476434
 
-The reason why I've requested having both the Link and Reported-by is
-because you don't know the secret incantation:
+--8WmKHbH6zHIoE+UF
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-s;Reported-by: syzbot\+\([0-9a-z]+\)@syzkaller.appspotmail.com;https://syzkaller.appspotmail.com/extid?=\1;
+On Thu, May 04, 2023 at 02:50:09PM +0000, Ross Philipson wrote:
+> This patchset provides detailed documentation of DRTM, the approach used =
+for
+> adding the capbility, and relevant API/ABI documentation. In addition to =
+the
+> documentation the patch set introduces Intel TXT support as the first pla=
+tform
+> for Linux Secure Launch.
 
-... you can't easily get from a "Reported-by:" e-mail address to a URL
-link that will actually get you to the syzkaller page.  What I used to
-do was to go to https://groups.google.com/g/syzkaller-bugs and then
-enter into the Google Groups searech box:
+I'd like to apply this series, but on what commit it is based on? I
+don't see any branch containing this series version in trenchboot tree
+[1].
 
-   Reported-by: syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com
+Thanks.
 
-which is a ***super*** clunky way to get to the syzkaller page.  What
-would be nice is if there was an easy way that didn't rely on kernel
-developers knowing the internal URL structure of Syzbot to be able to
-enter the Reported-by link on some convenient web page, perhaps in a
-search box found in the front page of https://syzkaller.appspot.com,
-and be able to find the syzbot report web page that way.
+[1]: https://github.com/TrenchBoot/linux
 
-Since that doesn't exist today, I include both the Reported-by: and
-Link: in my commit descriptions, out of consideration to the reviewer
-who might want to be able to find the Syzbot page and don't know the
-secret trick to calculate the URL from the Reported-by: e-mail
-address.
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--8WmKHbH6zHIoE+UF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Another gotcha with Syzbot is that there are two id's, the "extid" and
-the "id" which makes thing ***super*** confusing.  For example, both
-of these URL's go the same Syzbot report:
+-----BEGIN PGP SIGNATURE-----
 
-https://syzkaller.appspot.com/bug?extid=726dc8c62c3536431ceb
-https://syzkaller.appspot.com/bug?id=eec08eb3763c9ec749fd565e70cfe6e485af7ed7
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZFTA0gAKCRD2uYlJVVFO
+o32tAQDw4tpfR8Ba+q25skoHxrAI3+hK4yJ0HkwQNobWGCAvRQD/Yq0tZ28KagpK
+QjB72gS5Kql0kR9GkjUSvUZRkt138ws=
+=ApTD
+-----END PGP SIGNATURE-----
 
-The Reported-by e-mail address uses the extid.  So for example, this
-case, it would be syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com.
-
-However, all of the links in the Syzbot web pages use the id form of
-the URL.  So if you were browsing the syzbot reports assigned to the
-crypto subsystem via https://syzkaller.appspot.com/upstream/s/crypto,
-you would find the id-style link, and then the commit fixing the bug
-might have something like this:
-
-Reported-by: syzbot+726dc8c62c3536431ceb@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?id=eec08eb3763c9ec749fd565e70cfe6e485af7ed7
-
-In that case, there is no (obvious) relationship between the hex
-string found in the Reported-by line and the Link line.
-
-
-One additional unfortunate fallout from syzbot having an "extid" and
-"id", is that depending on how the syzbot entry initially found by the
-contributor sending in a patch to address a syzbot report, either URL
-can be found in mailing list archives.  So if you search for
-"extid=726dc8c62c3536431ceb" you won't find references to
-"id=eec08eb3763c9ec749fd565e70cfe6e485af7ed7" even though they are
-both referring to same Syzbot report.
-
-<<< sigh >>>>   As they say, the hardest problem to solve in the
-C.S. world is naming, and syzbot has two names for every single syzbot
-report, and both are exposed to the poor user.   :-(
-
-					- Ted
+--8WmKHbH6zHIoE+UF--
