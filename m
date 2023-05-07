@@ -2,31 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0285C77B75
-	for <linux-crypto@archiver.kernel.org>; Sun,  7 May 2023 13:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 681FCC77B7C
+	for <linux-crypto@archiver.kernel.org>; Sun,  7 May 2023 18:12:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbjEGNUF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 7 May 2023 09:20:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56172 "EHLO
+        id S231791AbjEGSMH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 7 May 2023 14:12:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbjEGNUE (ORCPT
+        with ESMTP id S231685AbjEGSMG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 7 May 2023 09:20:04 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B3517DDB;
-        Sun,  7 May 2023 06:20:01 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pveIl-006CHt-F5; Sun, 07 May 2023 21:19:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 07 May 2023 21:19:48 +0800
-Date:   Sun, 7 May 2023 21:19:48 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.4
-Message-ID: <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+        Sun, 7 May 2023 14:12:06 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28EB340C1;
+        Sun,  7 May 2023 11:12:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B227761234;
+        Sun,  7 May 2023 18:12:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E4BAC433D2;
+        Sun,  7 May 2023 18:12:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683483125;
+        bh=hV5wKgT1Grye95s2Xy/mi+6KaUCW4PA6/wlQyfFwJQA=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=U0d3Dll7eyj9jIy48UTUokVr9BqAq7JnEJ9K0AJkU/Ip4GziEnW8CaeIneEqd+UDp
+         /7JDbymCN8Xjsz5/SGs/wetx+tG2L1g6mt7CPhqXkXsgDwkbDH7KzjCe6pgGijGx+V
+         Wq/hY3aQXmXXF8o7zgor4xs3XAZwRqQ243jcVXuBMTko1hhfGGG3/AkWL37v1PrnQ4
+         EH07RxUheV4iJOBQDpRNn7IR2h2RwegADze01OC9a0SFK27PBTU2i1TA3IFMT1Bzd+
+         KKZc5XZ9G+U98Gk5xHAd4QVqVZLRZ3mETyzvA9h1tT6bi5bPmEpQAuitaSJW8HggSX
+         RNv9fSw1Iw1DQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0ADC0C395FD;
+        Sun,  7 May 2023 18:12:05 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
 References: <YgMn+1qQPQId50hO@gondor.apana.org.au>
  <YjE5yThYIzih2kM6@gondor.apana.org.au>
  <YkUdKiJflWqxBmx5@gondor.apana.org.au>
@@ -36,62 +47,34 @@ References: <YgMn+1qQPQId50hO@gondor.apana.org.au>
  <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
  <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
  <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
- <ZARrt99wJb7IhoY4@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+ <ZARrt99wJb7IhoY4@gondor.apana.org.au> <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.4-p2
+X-PR-Tracked-Commit-Id: b8969a1b69672b163d057e7745ebc915df689211
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 6f69c981811c8b019d7882839e31c34ea8330860
+Message-Id: <168348312503.16669.16856484399666238691.pr-tracker-bot@kernel.org>
+Date:   Sun, 07 May 2023 18:12:05 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+The pull request you sent on Sun, 7 May 2023 21:19:48 +0800:
 
-The following changes since commit 482c84e906e535072c55395acabd3a58e9443d12:
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.4-p2
 
-  i2c: designware: Add doorbell support for Mendocino (2023-04-20 18:20:05 +0800)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/6f69c981811c8b019d7882839e31c34ea8330860
 
-are available in the Git repository at:
+Thank you!
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.4-p2 
-
-for you to fetch changes up to b8969a1b69672b163d057e7745ebc915df689211:
-
-  crypto: api - Fix CRYPTO_USER checks for report function (2023-05-02 18:22:24 +0800)
-
-----------------------------------------------------------------
-This push fixes the following problems:
-
-- A long-standing bug in crypto_engine.
-- A buggy but harmless check in the sun8i-ss driver. 
-- A regression in the CRYPTO_USER interface.
-----------------------------------------------------------------
-
-Christophe JAILLET (1):
-      crypto: sun8i-ss - Fix a test in sun8i_ss_setup_ivs()
-
-Olivier Bacon (1):
-      crypto: engine - fix crypto_queue backlog handling
-
-Ondrej Mosnacek (1):
-      crypto: api - Fix CRYPTO_USER checks for report function
-
- crypto/acompress.c                                  | 2 +-
- crypto/aead.c                                       | 2 +-
- crypto/ahash.c                                      | 2 +-
- crypto/akcipher.c                                   | 2 +-
- crypto/algapi.c                                     | 3 +++
- crypto/crypto_engine.c                              | 6 +++---
- crypto/kpp.c                                        | 2 +-
- crypto/rng.c                                        | 2 +-
- crypto/scompress.c                                  | 2 +-
- crypto/shash.c                                      | 2 +-
- crypto/skcipher.c                                   | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
- 12 files changed, 16 insertions(+), 13 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
