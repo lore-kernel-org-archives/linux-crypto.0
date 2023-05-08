@@ -2,651 +2,210 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BA4C77B75
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 May 2023 20:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89652C77B75
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 May 2023 20:16:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233815AbjEHUKS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 May 2023 16:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52034 "EHLO
+        id S232915AbjEHUQK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 May 2023 16:16:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234126AbjEHUJe (ORCPT
+        with ESMTP id S232528AbjEHUQI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 May 2023 16:09:34 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719A983E5;
-        Mon,  8 May 2023 13:08:36 -0700 (PDT)
+        Mon, 8 May 2023 16:16:08 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152E4E44;
+        Mon,  8 May 2023 13:16:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683576516; x=1715112516;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=j4WRZw7PMvF/57RvQGYOQ4R4fbU3hEzfYez55SAJGkg=;
-  b=elYA3VdDEq3dIvNrsT+QaccpSERO8tdnwKcYu1MwJZayauTRR1qGGePe
-   052HjJVXrh6sw7RV03g42YOx1ppb5nXsuEZzkGirZEMkdnBz/ygfOqwTy
-   eLU3RVI2T766B+16SyPl8pR3stQEwceq3XfCS/+eLzp3gxIz0gj6ErUM2
-   f64HmaDxEweoE4sfEFeljHwMP8xhjAXL3waad/fptBw2nksZnForI3tuj
-   hVs3CysOYC+g7Ig5WoH02vJwRlcWu9Rq2A12QEdKBPkV2IyfpSB9dZiC1
-   aEqbVCTGGYwMcFH2qQXNERMXjzZ4BxUfPBYfTFs/S34mW0dcyoV2U0un5
+  t=1683576968; x=1715112968;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ctCmlpD7x7JJyvf9349qJVVapEHgckh+soNzGwPgizc=;
+  b=KhITDvyP5fN+3kninXkZavPq9f2nRr5IpTN6dVq9vgO+K689svXo7KXc
+   IPL7BMlNDgKz7+4kgF1BYhEupEx+uPp+lOFfcbgUQ53BSbANQX0luG8Bz
+   Cy0q+w827Q5dvsdRJ0d/oozSklOY0SP3MAztRpYjq+/8Ben60pl8w/L2G
+   xJUyyreq4w1sa2yI/9dlikNgnFh55yfwGhlde0JptY1O/aPFKbT5Vd6Qn
+   PHSMPwYASrkeGnDQaAoSoT563SVrXJnFABlpryRGjlaUB6z+qY3tDQbT4
+   Kvu4PsNrbNj/smyat3VRGMV7cZ2OY6p4nm+T4TIk8NQ3XBja22jJ8eQZ/
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10704"; a="348573765"
+X-IronPort-AV: E=McAfee;i="6600,9927,10704"; a="330108167"
 X-IronPort-AV: E=Sophos;i="5.99,259,1677571200"; 
-   d="scan'208";a="348573765"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2023 13:08:12 -0700
+   d="scan'208";a="330108167"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2023 13:16:07 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10704"; a="788241730"
+X-IronPort-AV: E=McAfee;i="6600,9927,10704"; a="701553546"
 X-IronPort-AV: E=Sophos;i="5.99,259,1677571200"; 
-   d="scan'208";a="788241730"
-Received: from sajmal-mobl1.amr.corp.intel.com (HELO tzanussi-mobl1.intel.com) ([10.212.74.4])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2023 13:08:11 -0700
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        fenghua.yu@intel.com, vkoul@kernel.org
-Cc:     dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org
-Subject: [PATCH v4 15/15] crypto: iaa - Add IAA Compression Accelerator stats
-Date:   Mon,  8 May 2023 15:07:37 -0500
-Message-Id: <c04ceaec4e5e8206087b460d733c3595fb1d9730.1683573703.git.zanussi@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1683573703.git.zanussi@kernel.org>
-References: <cover.1683573703.git.zanussi@kernel.org>
+   d="scan'208";a="701553546"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga007.fm.intel.com with ESMTP; 08 May 2023 13:16:07 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 8 May 2023 13:16:06 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Mon, 8 May 2023 13:16:06 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 8 May 2023 13:16:05 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JZDMIg4QsPcrovyDwHUY86S9VvHnDEJ22d2WQ5idZDvBmaBtyxkgDCCti+FEY1pg7m65jtihgT+RMvrUFZMSPtLzfRwggVWRJYOVhQG3ri+21xonLo+iyZZhK/X4Y5B5iu0d7Tn+Ev8IatkEFjiAgG5pzTPihGya8CrdYWaHyzNKzFBKnHHOl893ssjQvV/BCryk1/qoXGknOypKlyr8FhoVIEsxYbKhelLGqTwVL9hoUFyfEjKKKEZkIOvimqBQW8ADHq7GRl28wwNJ1o7tfhDJdm7Yo8X+5KClHfQg3DWFbddl9uL+IX+LJqrcxl+seMpH7BfKI3NUvwf10tm16g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k7BCM/4DJsw1UMRd3ZrOY1ui2LF7prWcl/6AN6S4GtA=;
+ b=QSM4QoF7cZmg8fnbGV2tZnSP33IVI5onvA7s+SSD3dNAUV59FAsb55UwyTG8STDYUF78LkhmG1wpEsuy88+TxMCtmm+mGio7srIl/h8Qw5A7ExqHPhidNwANwYKblJhH6GPiib+0CvKqYmAOMM5rImlfbeuX2hb3YMkNN+LQePx7zC/Xm4hewZFkDSNiTcuzD76eDiuY6PrKlU8dptmdv5JlPtdf3tZo+dCkfiDpYO/Rqb4kbYIbPMVgskIJjw9UeUh4Ljv2zEFkDvS/5LbQWzDSGELzT0N125gwlsPW8ZHewe28vuPZiJ7Hct8EOhN0KRTxX2vFlj5Kq2mG2Iji3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com (2603:10b6:510:41::12)
+ by SJ2PR11MB8585.namprd11.prod.outlook.com (2603:10b6:a03:56b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.32; Mon, 8 May
+ 2023 20:16:02 +0000
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::cfb2:e73:907d:cb77]) by PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::cfb2:e73:907d:cb77%5]) with mapi id 15.20.6363.032; Mon, 8 May 2023
+ 20:16:01 +0000
+Message-ID: <ac5de854-d274-92ab-a0fa-9a0e738a68fa@intel.com>
+Date:   Mon, 8 May 2023 13:15:59 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v6 07/12] x86/cpu/keylocker: Load an internal wrapping key
+ at boot-time
+Content-Language: en-US
+To:     "Elliott, Robert (Servers)" <elliott@hpe.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+CC:     "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "gmazyland@gmail.com" <gmazyland@gmail.com>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bp@suse.de" <bp@suse.de>, "mingo@kernel.org" <mingo@kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "Keany, Bernie" <bernie.keany@intel.com>,
+        "Gairuboyina, Charishma1" <charishma1.gairuboyina@intel.com>,
+        "Krishnakumar, Lalithambika" <lalithambika.krishnakumar@intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20220112211258.21115-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-8-chang.seok.bae@intel.com>
+ <MW5PR84MB184225DA6EA0FA7A9191C057AB719@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+In-Reply-To: <MW5PR84MB184225DA6EA0FA7A9191C057AB719@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR01CA0057.prod.exchangelabs.com (2603:10b6:a03:94::34)
+ To PH0PR11MB4855.namprd11.prod.outlook.com (2603:10b6:510:41::12)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4855:EE_|SJ2PR11MB8585:EE_
+X-MS-Office365-Filtering-Correlation-Id: ff4baf35-66c9-43f3-53bd-08db50010b17
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dmyaWzxbE9BjlmjFqMq65/tl6UKgcgUvBbyGEEvbjnON1MSjfAtlDUjsaQFVkudrVRXqP00wpX3h/HjcZQSrksIsxgkjrJC4Ycxjw/5LqT2WA0jUi+7HFo/6y4nXHFQ6xbKZSzWAs60mjpRKsNdYvyQR1WErbEIYiySAGEWd3rDmd+qCS+cmSvBS1HSYOUbpHOZFdsm17gsb9SnrJTVpDeiwihuzox1fv2sBNYnLX/G+Fp/ybizDBoWMahIxEQntTpIqMuA4n+L222WFaULc+NCrWzksiU96d3BKIzJUVqxWBs1ipcxYJA+ZuLNbwvHhg1lPhYVn3kt/P6rZbc5iOvpJZC8FxEI/8tFkgmHm5fA7/UidOFkA9nh7X4PwwBh1SaOWJ75RtHjyokXo4fIyU595CNxXKWOzt3tPq2REXIgamOgrpc2DlQdS+DAJJXd6tVSK3le5C27QtovUwNES8UT0Jeh01Ot3XzN+nqQHEQepfn91xh/5PPAhwtJUwB04GSHlVj5xDS0Nk7ddRVu8WeEPRA5U/2mD83e2ZJSRF24rr+AEC/N9Mf6BAPwvATcAKAXvv+Ac4MtAyAp/IrfDReBIzssKUx7+Hzw0pgCpaK3QnE1au35p3q2mBMFEdv5wUbPyk1lXDcyOf+0VuoScrA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4855.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(39860400002)(366004)(376002)(136003)(396003)(451199021)(31696002)(86362001)(66556008)(36756003)(296002)(110136005)(54906003)(4326008)(316002)(478600001)(66476007)(66946007)(6486002)(8676002)(5660300002)(41300700001)(8936002)(7416002)(2906002)(186003)(38100700002)(82960400001)(26005)(6512007)(6506007)(53546011)(83380400001)(2616005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1Y1RHo5YXVoUGRZMmE0bmhXdmE4TmtHaEd1Q3F5MDRIUVgxaXB4UmdieWV3?=
+ =?utf-8?B?TmtBR3dPOExsRzgxVGVibzJLWGN3TkRya0lyOXJjSG1DV1ZsZ0MzbjhMYTFX?=
+ =?utf-8?B?S21Zb05mRHMwZEo5QzV3dVY4ekN3cHNQN1lkQjJUaHB5UEc1YXJZSDhUQmd3?=
+ =?utf-8?B?UXQ1dTlVM2dheFV0M2g5TTVPdG9EQkQ2MWswWG9NZnJpYU40WXBaS1RmNFNH?=
+ =?utf-8?B?OURLc2RUSXZSZ2wvNUF6Y2xqL3VRc3BCcGhJRng5K0VRSGVlUmZFN0VuSUNM?=
+ =?utf-8?B?akYwSzA3bm9HalJ3VUVGbTlkK1VyR1VCdHNYakhZV051MXBSUTdjVE9TOXlp?=
+ =?utf-8?B?NkxXWWdhWWtEcmpOaVl1bWQrcGlod2daV1U3SWNSbTNmVGk3dStDcHFlaTlJ?=
+ =?utf-8?B?NElUc2xjTmNPcCtacEhJUlhCMnVkd2NvUDBYU2lsQlNlNFB4Q0Q3L0p0bE5l?=
+ =?utf-8?B?RTh0VXluTG1wN2NaTW5uQVVyRTJTdzJqZ2ZrS3BsSklLZnNEcHNrdnNtTjZC?=
+ =?utf-8?B?b3hFRi93U2ZFUjN3c2VxeWJOZGlQN25WSWpjQUVTUWdCaCtHeFJ1MGdrOFBG?=
+ =?utf-8?B?Q1FNN3JRRnVic0toWWZ6cDB0NC9JcXZsTmRlUjRHOGtGVDBDNy90dXFKR3pO?=
+ =?utf-8?B?eUFTcko2a2NXZS9lUWlaNHFVSkw0eVI1WUhmcmVtTjBpK0lYQlU3aUdOcVVy?=
+ =?utf-8?B?THJGWmdjV3dJRkxqa3Uzam9zc204ZDQ1OW84QWVPejN3RzRMOUJyNEdJWDlq?=
+ =?utf-8?B?eCtmTTlnb2NTbkRta2sraUt2RDBmMVBENXBTOEEvMlgvNDNqVmc0VDBMOGZh?=
+ =?utf-8?B?bFdNWFFSQlZRdG41eDJYZ0xKUUtBdDMyZWV0Q2hBZkJtNXhPMFJ0VmNpZXlE?=
+ =?utf-8?B?dEV6dDVMWEdJQXJESEs1MzlCUUJ5S09OWVMvTEhCdGVRbWxINS9PcVRNMEZU?=
+ =?utf-8?B?Qjdka3RjUkt4TjJldlg3MU1CaWtwKzZtOU15dzdhVEt6SVR5VHFtZHlBV0p3?=
+ =?utf-8?B?WXM5TU14eGc1cnhsbFQwZXptWVhIR3F4UXg4ZThVemxnZjZNWTJpVUNsQ21G?=
+ =?utf-8?B?TWEzVzVVNytGdW9kcHYxeUZqNDUxendmMVJteCtXRlJ3dU9QTWVUZDNyRitR?=
+ =?utf-8?B?VkcrTzVjVzJBZTYwcWE4eVkrR1VSMEN0M2l6Rlk2M0l2bitESEhxZGFFdGdF?=
+ =?utf-8?B?NkJPZUJnRm14OEEybDRZZkxINmhnc0F2QUpWMlRXb20yTkRveE9Cd21CQ0Nj?=
+ =?utf-8?B?T1plOGJwVW81ZU05MElBeUdXQlN1SWdzUUxZWUFwOFVaWmcxZGhKajd3c2My?=
+ =?utf-8?B?SEhEaTZ0THhPM0g1YlViMmJlYXUrQWJkZVZBeXoxZm9IL0RKMElYeDRmbkd6?=
+ =?utf-8?B?bUwwRFhhaVNJVyt0OCtCa05FUEtiM0FpTXJsNElEcDFaWmZQUE1zZXJPWWdW?=
+ =?utf-8?B?MkRpc3Q3Ujg4Y1h3TFN0MkpodWI1UDRaUTZ4cXNQUnRYSkxIcFF3dElKRGhU?=
+ =?utf-8?B?bjNOMFQrM3VhWkZsZ0Z4RE5iV29Qcy9Bd0tMODhWQ29TRFFacnJ1cWYrSlV5?=
+ =?utf-8?B?NnptLzMvZU1YTzE4N3NXZ21WRDlpdlBENDF2blRhSG1mS0VETG1TTXpUTk0y?=
+ =?utf-8?B?bm9DaW5BNEZ3UUhkWG1XTUdKTXhvZ0p2aGdoQ1ExVytOZFBRMW5xWC9iUmR1?=
+ =?utf-8?B?b29mNzNQcXZMcWtEUkFQeDRxSzd5Z1ZnWGpxbmxmR3Q5dHZ0b2xYQ1daL3lM?=
+ =?utf-8?B?SVplR1ZSbFhadkFjY0NXQVJKYWZKMlBOenFJNUJCb0JORkxhN2pnWmlJVDJ2?=
+ =?utf-8?B?S1NmNVl2YlFlRGVMQXlXWVlSS1d2OEQvaEZ0b01iVkluQWJwQW5Rbm1DZEpq?=
+ =?utf-8?B?YkpMQU5OUVBielF5NktkSXlGang3bUYybStLWjZzS1hXQnRVejJxM2x4VkVM?=
+ =?utf-8?B?ZER2SVFKSnZ0cVRXVHFRK0ViNitONCswNTlpZlk1VVFTWjhEUHZxdjBkbWRG?=
+ =?utf-8?B?Q2tta3Q0NGJpakJvVFRlcWlydytLdS8xUlR4T2JrK3FMbUFYbGlhblNScThh?=
+ =?utf-8?B?L0dSNmxjRGNtTjdIOWk0NlV1cG1iVkEwWWRoVzFKQ1hibHJwQ25US21PZTVj?=
+ =?utf-8?B?RElCK3NCN2ZoY2tKSkdHV1JaL25XNzhwVjh0Z0huSWpCYzY3R3M3VnlWVU1i?=
+ =?utf-8?B?elE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff4baf35-66c9-43f3-53bd-08db50010b17
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4855.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2023 20:16:01.8431
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H/zXW3EWrEDFirrgcxz0qceLaiwo3XK/4bmtEDE5IT50E+Vif86oUyNP/Z5jGk/cJMPelqTZYoOvmh2FNJ99xO8thdXsAxPiUqy7UnZDtb8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8585
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for optional debugfs statistics support for the IAA
-Compression Accelerator.  This is enabled by the kernel config item:
+On 5/8/2023 12:18 PM, Elliott, Robert (Servers) wrote:
+> 
+>> diff --git a/arch/x86/kernel/keylocker.c b/arch/x86/kernel/keylocker.c
+> ...
+>> +void __init destroy_keylocker_data(void)
+>> +{
+>> +     memset(&kl_setup.key, KEY_DESTROY, sizeof(kl_setup.key));
+>> +}
+> 
+> That's a special value for garbage collected keyring keys assigned
+> a keytype of ".dead". memzero() or memzero_explicit() might be better
+> for this use case.
+memzero() looks to be the same as memset() in x86:
 
-  CRYPTO_DEV_IAA_CRYPTO_STATS
+$ git grep memzero arch/x86/ | grep define
+arch/x86/boot/compressed/misc.c:#define memzero(s, n)   memset((s), 0, (n))
 
-When enabled, the IAA crypto driver will generate statistics which can
-be accessed at /sys/kernel/debug/iaa-crypto/.
+Instead, memzero_explicit() looks to be about the right call here:
 
-See Documentation/driver-api/crypto/iax/iax-crypto.rst for details.
+/**
+  * memzero_explicit - Fill a region of memory (e.g. sensitive
+  *		      keying data) with 0s.
+  ...
+  * Note: usually using memset() is just fine (!), but in cases
+  * where clearing out _local_ data at the end of a scope is
+  * necessary, memzero_explicit() should be used instead in
+  * order to prevent the compiler from optimising away zeroing.
+  ...
 
-Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
----
- drivers/crypto/intel/iaa/Kconfig            |   9 +
- drivers/crypto/intel/iaa/Makefile           |   2 +
- drivers/crypto/intel/iaa/iaa_crypto.h       |  22 ++
- drivers/crypto/intel/iaa/iaa_crypto_main.c  |  65 +++++
- drivers/crypto/intel/iaa/iaa_crypto_stats.c | 271 ++++++++++++++++++++
- drivers/crypto/intel/iaa/iaa_crypto_stats.h |  58 +++++
- 6 files changed, 427 insertions(+)
- create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.c
- create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.h
+Then,
 
-diff --git a/drivers/crypto/intel/iaa/Kconfig b/drivers/crypto/intel/iaa/Kconfig
-index fcccb6ff7e29..d53f4b1d494f 100644
---- a/drivers/crypto/intel/iaa/Kconfig
-+++ b/drivers/crypto/intel/iaa/Kconfig
-@@ -8,3 +8,12 @@ config CRYPTO_DEV_IAA_CRYPTO
- 	  decompression with the Intel Analytics Accelerator (IAA)
- 	  hardware using the cryptographic API.  If you choose 'M'
- 	  here, the module will be called iaa_crypto.
-+
-+config CRYPTO_DEV_IAA_CRYPTO_STATS
-+	bool "Enable Intel(R) IAA Compression Accelerator Statistics"
-+	depends on CRYPTO_DEV_IAA_CRYPTO
-+	default n
-+	help
-+	  Enable statistics for the IAA compression accelerator.
-+	  These include per-device and per-workqueue statistics in
-+	  addition to global driver statistics.
-diff --git a/drivers/crypto/intel/iaa/Makefile b/drivers/crypto/intel/iaa/Makefile
-index ff6ab1d0bc13..2a1bee385932 100644
---- a/drivers/crypto/intel/iaa/Makefile
-+++ b/drivers/crypto/intel/iaa/Makefile
-@@ -8,3 +8,5 @@ ccflags-y += -I $(srctree)/drivers/dma/idxd -DDEFAULT_SYMBOL_NAMESPACE=IDXD
- obj-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO) := iaa_crypto.o
- 
- iaa_crypto-y := iaa_crypto_main.o iaa_crypto_comp_canned.o iaa_crypto_comp_fixed.o
-+
-+iaa_crypto-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS) += iaa_crypto_stats.o
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto.h b/drivers/crypto/intel/iaa/iaa_crypto.h
-index cf9aec13b98d..e322fb94ce51 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto.h
-+++ b/drivers/crypto/intel/iaa/iaa_crypto.h
-@@ -48,6 +48,11 @@ struct iaa_wq {
- 	bool			remove;
- 
- 	struct iaa_device	*iaa_device;
-+
-+	u64			comp_calls;
-+	u64			comp_bytes;
-+	u64			decomp_calls;
-+	u64			decomp_bytes;
- };
- 
- struct iaa_device_compression_mode {
-@@ -70,6 +75,11 @@ struct iaa_device {
- 
- 	int				n_wq;
- 	struct list_head		wqs;
-+
-+	u64				comp_calls;
-+	u64				comp_bytes;
-+	u64				decomp_calls;
-+	u64				decomp_bytes;
- };
- 
- struct wq_table_entry {
-@@ -150,4 +160,16 @@ int add_iaa_compression_mode(const char *name,
- void remove_iaa_compression_mode(const char *name);
- int set_iaa_compression_mode(const char *name);
- 
-+#if defined(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS)
-+void	global_stats_show(struct seq_file *m);
-+void	device_stats_show(struct seq_file *m, struct iaa_device *iaa_device);
-+void	reset_iaa_crypto_stats(void);
-+void	reset_device_stats(struct iaa_device *iaa_device);
-+#else
-+static inline void	global_stats_show(struct seq_file *m) {}
-+static inline void	device_stats_show(struct seq_file *m, struct iaa_device *iaa_device) {}
-+static inline void	reset_iaa_crypto_stats(void) {}
-+static inline void	reset_device_stats(struct iaa_device *iaa_device) {}
-+#endif
-+
- #endif
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index b1293400d466..f7f7fef2fc9a 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -14,6 +14,7 @@
- 
- #include "idxd.h"
- #include "iaa_crypto.h"
-+#include "iaa_crypto_stats.h"
- 
- #ifdef pr_fmt
- #undef pr_fmt
-@@ -1141,6 +1142,7 @@ static inline int check_completion(struct device *dev,
- 			ret = -ETIMEDOUT;
- 			dev_dbg(dev, "%s timed out, size=0x%x\n",
- 				op_str, comp->output_size);
-+			update_completion_timeout_errs();
- 			goto out;
- 		}
- 
-@@ -1150,6 +1152,7 @@ static inline int check_completion(struct device *dev,
- 			dev_dbg(dev, "compressed > uncompressed size,"
- 				" not compressing, size=0x%x\n",
- 				comp->output_size);
-+			update_completion_comp_buf_overflow_errs();
- 			goto out;
- 		}
- 
-@@ -1162,6 +1165,7 @@ static inline int check_completion(struct device *dev,
- 		dev_dbg(dev, "iaa %s status=0x%x, error=0x%x, size=0x%x\n",
- 			op_str, comp->status, comp->error_code, comp->output_size);
- 		print_hex_dump(KERN_INFO, "cmp-rec: ", DUMP_PREFIX_OFFSET, 8, 1, comp, 64, 0);
-+		update_completion_einval_errs();
- 
- 		goto out;
- 	}
-@@ -1207,6 +1211,15 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
- 
- 	ctx->req->dlen = idxd_desc->iax_completion->output_size;
- 
-+	/* Update stats */
-+	if (ctx->compress) {
-+		update_total_comp_bytes_out(ctx->req->dlen);
-+		update_wq_comp_bytes(iaa_wq->wq, ctx->req->dlen);
-+	} else {
-+		update_total_decomp_bytes_in(ctx->req->dlen);
-+		update_wq_decomp_bytes(iaa_wq->wq, ctx->req->dlen);
-+	}
-+
- 	if (ctx->compress && iaa_verify_compress) {
- 		u32 compression_crc;
- 
-@@ -1311,6 +1324,10 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
- 		goto err;
- 	}
- 
-+	/* Update stats */
-+	update_total_comp_calls();
-+	update_wq_comp_calls(wq);
-+
- 	if (async_mode && !disable_async) {
- 		ret = -EINPROGRESS;
- 		dev_dbg(dev, "%s: returning -EINPROGRESS\n", __func__);
-@@ -1325,6 +1342,10 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
- 
- 	*dlen = idxd_desc->iax_completion->output_size;
- 
-+	/* Update stats */
-+	update_total_comp_bytes_out(*dlen);
-+	update_wq_comp_bytes(wq, *dlen);
-+
- 	*compression_crc = idxd_desc->iax_completion->crc;
- 
- 	if (!async_mode)
-@@ -1511,6 +1532,10 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 		goto err;
- 	}
- 
-+	/* Update stats */
-+	update_total_decomp_calls();
-+	update_wq_decomp_calls(wq);
-+
- 	if (async_mode && !disable_async) {
- 		ret = -EINPROGRESS;
- 		dev_dbg(dev, "%s: returning -EINPROGRESS\n", __func__);
-@@ -1527,6 +1552,10 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 
- 	if (!async_mode)
- 		idxd_free_desc(wq, idxd_desc);
-+
-+	/* Update stats */
-+	update_total_decomp_bytes_in(slen);
-+	update_wq_decomp_bytes(wq, slen);
- out:
- 	return ret;
- err:
-@@ -1991,6 +2020,38 @@ static struct idxd_device_driver iaa_crypto_driver = {
- 	.desc_complete = iaa_desc_complete,
- };
- 
-+int wq_stats_show(struct seq_file *m, void *v)
-+{
-+	struct iaa_device *iaa_device;
-+
-+	mutex_lock(&iaa_devices_lock);
-+
-+	global_stats_show(m);
-+
-+	list_for_each_entry(iaa_device, &iaa_devices, list)
-+		device_stats_show(m, iaa_device);
-+
-+	mutex_unlock(&iaa_devices_lock);
-+
-+	return 0;
-+}
-+
-+int iaa_crypto_stats_reset(void *data, u64 value)
-+{
-+	struct iaa_device *iaa_device;
-+
-+	reset_iaa_crypto_stats();
-+
-+	mutex_lock(&iaa_devices_lock);
-+
-+	list_for_each_entry(iaa_device, &iaa_devices, list)
-+		reset_device_stats(iaa_device);
-+
-+	mutex_unlock(&iaa_devices_lock);
-+
-+	return 0;
-+}
-+
- static int __init iaa_crypto_init_module(void)
- {
- 	int ret = 0;
-@@ -2038,6 +2099,9 @@ static int __init iaa_crypto_init_module(void)
- 		goto err_sync_attr_create;
- 	}
- 
-+	if (iaa_crypto_debugfs_init())
-+		pr_warn("debugfs init failed, stats not available\n");
-+
- 	pr_debug("initialized\n");
- out:
- 	return ret;
-@@ -2063,6 +2127,7 @@ static void __exit iaa_crypto_cleanup_module(void)
- 	if (iaa_unregister_compression_device())
- 		pr_debug("IAA compression device unregister failed\n");
- 
-+	iaa_crypto_debugfs_cleanup();
- 	driver_remove_file(&iaa_crypto_driver.drv,
- 			   &driver_attr_sync_mode);
- 	driver_remove_file(&iaa_crypto_driver.drv,
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.c b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-new file mode 100644
-index 000000000000..5ef9b6ae4d74
---- /dev/null
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-@@ -0,0 +1,271 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/highmem.h>
-+#include <linux/mm.h>
-+#include <linux/slab.h>
-+#include <linux/delay.h>
-+#include <linux/smp.h>
-+#include <uapi/linux/idxd.h>
-+#include <linux/idxd.h>
-+#include <linux/dmaengine.h>
-+#include "../../dma/idxd/idxd.h"
-+#include <linux/debugfs.h>
-+#include <crypto/internal/acompress.h>
-+#include "iaa_crypto.h"
-+#include "iaa_crypto_stats.h"
-+
-+static u64 total_comp_calls;
-+static u64 total_decomp_calls;
-+static u64 max_comp_delay_ns;
-+static u64 max_decomp_delay_ns;
-+static u64 max_acomp_delay_ns;
-+static u64 max_adecomp_delay_ns;
-+static u64 total_comp_bytes_out;
-+static u64 total_decomp_bytes_in;
-+static u64 total_completion_einval_errors;
-+static u64 total_completion_timeout_errors;
-+static u64 total_completion_comp_buf_overflow_errors;
-+
-+static struct dentry *iaa_crypto_debugfs_root;
-+
-+void update_total_comp_calls(void)
-+{
-+	total_comp_calls++;
-+}
-+
-+void update_total_comp_bytes_out(int n)
-+{
-+	total_comp_bytes_out += n;
-+}
-+
-+void update_total_decomp_calls(void)
-+{
-+	total_decomp_calls++;
-+}
-+
-+void update_total_decomp_bytes_in(int n)
-+{
-+	total_decomp_bytes_in += n;
-+}
-+
-+void update_completion_einval_errs(void)
-+{
-+	total_completion_einval_errors++;
-+}
-+
-+void update_completion_timeout_errs(void)
-+{
-+	total_completion_timeout_errors++;
-+}
-+
-+void update_completion_comp_buf_overflow_errs(void)
-+{
-+	total_completion_comp_buf_overflow_errors++;
-+}
-+
-+void update_max_comp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_comp_delay_ns)
-+		max_comp_delay_ns = time_diff;
-+}
-+
-+void update_max_decomp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_decomp_delay_ns)
-+		max_decomp_delay_ns = time_diff;
-+}
-+
-+void update_max_acomp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_acomp_delay_ns)
-+		max_acomp_delay_ns = time_diff;
-+}
-+
-+void update_max_adecomp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_adecomp_delay_ns)
-+
-+		max_adecomp_delay_ns = time_diff;
-+}
-+
-+void update_wq_comp_calls(struct idxd_wq *idxd_wq)
-+{
-+	struct iaa_wq *wq = idxd_wq_private(idxd_wq);
-+
-+	wq->comp_calls++;
-+	wq->iaa_device->comp_calls++;
-+}
-+
-+void update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n)
-+{
-+	struct iaa_wq *wq = idxd_wq_private(idxd_wq);
-+
-+	wq->comp_bytes += n;
-+	wq->iaa_device->comp_bytes += n;
-+}
-+
-+void update_wq_decomp_calls(struct idxd_wq *idxd_wq)
-+{
-+	struct iaa_wq *wq = idxd_wq_private(idxd_wq);
-+
-+	wq->decomp_calls++;
-+	wq->iaa_device->decomp_calls++;
-+}
-+
-+void update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n)
-+{
-+	struct iaa_wq *wq = idxd_wq_private(idxd_wq);
-+
-+	wq->decomp_bytes += n;
-+	wq->iaa_device->decomp_bytes += n;
-+}
-+
-+void reset_iaa_crypto_stats(void)
-+{
-+	total_comp_calls = 0;
-+	total_decomp_calls = 0;
-+	max_comp_delay_ns = 0;
-+	max_decomp_delay_ns = 0;
-+	max_acomp_delay_ns = 0;
-+	max_adecomp_delay_ns = 0;
-+	total_comp_bytes_out = 0;
-+	total_decomp_bytes_in = 0;
-+	total_completion_einval_errors = 0;
-+	total_completion_timeout_errors = 0;
-+	total_completion_comp_buf_overflow_errors = 0;
-+}
-+
-+static void reset_wq_stats(struct iaa_wq *wq)
-+{
-+	wq->comp_calls = 0;
-+	wq->comp_bytes = 0;
-+	wq->decomp_calls = 0;
-+	wq->decomp_bytes = 0;
-+}
-+
-+void reset_device_stats(struct iaa_device *iaa_device)
-+{
-+	struct iaa_wq *iaa_wq;
-+
-+	iaa_device->comp_calls = 0;
-+	iaa_device->comp_bytes = 0;
-+	iaa_device->decomp_calls = 0;
-+	iaa_device->decomp_bytes = 0;
-+
-+	list_for_each_entry(iaa_wq, &iaa_device->wqs, list)
-+		reset_wq_stats(iaa_wq);
-+}
-+
-+static void wq_show(struct seq_file *m, struct iaa_wq *iaa_wq)
-+{
-+	seq_printf(m, "    name: %s\n", iaa_wq->wq->name);
-+	seq_printf(m, "    comp_calls: %llu\n", iaa_wq->comp_calls);
-+	seq_printf(m, "    comp_bytes: %llu\n", iaa_wq->comp_bytes);
-+	seq_printf(m, "    decomp_calls: %llu\n", iaa_wq->decomp_calls);
-+	seq_printf(m, "    decomp_bytes: %llu\n\n", iaa_wq->decomp_bytes);
-+}
-+
-+void device_stats_show(struct seq_file *m, struct iaa_device *iaa_device)
-+{
-+	struct iaa_wq *iaa_wq;
-+
-+	seq_puts(m, "iaa device:\n");
-+	seq_printf(m, "  id: %d\n", iaa_device->idxd->id);
-+	seq_printf(m, "  n_wqs: %d\n", iaa_device->n_wq);
-+	seq_printf(m, "  comp_calls: %llu\n", iaa_device->comp_calls);
-+	seq_printf(m, "  comp_bytes: %llu\n", iaa_device->comp_bytes);
-+	seq_printf(m, "  decomp_calls: %llu\n", iaa_device->decomp_calls);
-+	seq_printf(m, "  decomp_bytes: %llu\n", iaa_device->decomp_bytes);
-+	seq_puts(m, "  wqs:\n");
-+
-+	list_for_each_entry(iaa_wq, &iaa_device->wqs, list)
-+		wq_show(m, iaa_wq);
-+}
-+
-+void global_stats_show(struct seq_file *m)
-+{
-+	seq_puts(m, "global stats:\n");
-+	seq_printf(m, "  total_comp_calls: %llu\n", total_comp_calls);
-+	seq_printf(m, "  total_decomp_calls: %llu\n", total_decomp_calls);
-+	seq_printf(m, "  total_comp_bytes_out: %llu\n", total_comp_bytes_out);
-+	seq_printf(m, "  total_decomp_bytes_in: %llu\n", total_decomp_bytes_in);
-+	seq_printf(m, "  total_completion_einval_errors: %llu\n",
-+		   total_completion_einval_errors);
-+	seq_printf(m, "  total_completion_timeout_errors: %llu\n",
-+		   total_completion_timeout_errors);
-+	seq_printf(m, "  total_completion_comp_buf_overflow_errors: %llu\n\n",
-+		   total_completion_comp_buf_overflow_errors);
-+}
-+
-+static int wq_stats_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, wq_stats_show, file);
-+}
-+
-+const struct file_operations wq_stats_fops = {
-+	.open = wq_stats_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = single_release,
-+};
-+
-+DEFINE_DEBUGFS_ATTRIBUTE(wq_stats_reset_fops, NULL, iaa_crypto_stats_reset, "%llu\n");
-+
-+int __init iaa_crypto_debugfs_init(void)
-+{
-+	if (!debugfs_initialized())
-+		return -ENODEV;
-+
-+	iaa_crypto_debugfs_root = debugfs_create_dir("iaa_crypto", NULL);
-+	if (!iaa_crypto_debugfs_root)
-+		return -ENOMEM;
-+
-+	debugfs_create_u64("max_comp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_comp_delay_ns);
-+	debugfs_create_u64("max_decomp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_decomp_delay_ns);
-+	debugfs_create_u64("max_acomp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_comp_delay_ns);
-+	debugfs_create_u64("max_adecomp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_decomp_delay_ns);
-+	debugfs_create_u64("total_comp_calls", 0644,
-+			   iaa_crypto_debugfs_root, &total_comp_calls);
-+	debugfs_create_u64("total_decomp_calls", 0644,
-+			   iaa_crypto_debugfs_root, &total_decomp_calls);
-+	debugfs_create_u64("total_comp_bytes_out", 0644,
-+			   iaa_crypto_debugfs_root, &total_comp_bytes_out);
-+	debugfs_create_u64("total_decomp_bytes_in", 0644,
-+			   iaa_crypto_debugfs_root, &total_decomp_bytes_in);
-+	debugfs_create_file("wq_stats", 0644, iaa_crypto_debugfs_root, NULL,
-+			    &wq_stats_fops);
-+	debugfs_create_file("stats_reset", 0644, iaa_crypto_debugfs_root, NULL,
-+			    &wq_stats_reset_fops);
-+
-+	return 0;
-+}
-+
-+void __exit iaa_crypto_debugfs_cleanup(void)
-+{
-+	debugfs_remove_recursive(iaa_crypto_debugfs_root);
-+}
-+
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.h b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-new file mode 100644
-index 000000000000..ad8333329fa6
---- /dev/null
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-@@ -0,0 +1,58 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
-+
-+#ifndef __CRYPTO_DEV_IAA_CRYPTO_STATS_H__
-+#define __CRYPTO_DEV_IAA_CRYPTO_STATS_H__
-+
-+#if defined(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS)
-+int	iaa_crypto_debugfs_init(void);
-+void	iaa_crypto_debugfs_cleanup(void);
-+
-+void	update_total_comp_calls(void);
-+void	update_total_comp_bytes_out(int n);
-+void	update_total_decomp_calls(void);
-+void	update_total_decomp_bytes_in(int n);
-+void	update_max_comp_delay_ns(u64 start_time_ns);
-+void	update_max_decomp_delay_ns(u64 start_time_ns);
-+void	update_max_acomp_delay_ns(u64 start_time_ns);
-+void	update_max_adecomp_delay_ns(u64 start_time_ns);
-+void	update_completion_einval_errs(void);
-+void	update_completion_timeout_errs(void);
-+void	update_completion_comp_buf_overflow_errs(void);
-+
-+void	update_wq_comp_calls(struct idxd_wq *idxd_wq);
-+void	update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n);
-+void	update_wq_decomp_calls(struct idxd_wq *idxd_wq);
-+void	update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n);
-+
-+int	wq_stats_show(struct seq_file *m, void *v);
-+int	iaa_crypto_stats_reset(void *data, u64 value);
-+
-+static inline u64	iaa_get_ts(void) { return ktime_get_ns(); }
-+
-+#else
-+static inline int	iaa_crypto_debugfs_init(void) { return 0; }
-+static inline void	iaa_crypto_debugfs_cleanup(void) {}
-+
-+static inline void	update_total_comp_calls(void) {}
-+static inline void	update_total_comp_bytes_out(int n) {}
-+static inline void	update_total_decomp_calls(void) {}
-+static inline void	update_total_decomp_bytes_in(int n) {}
-+static inline void	update_max_comp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_max_decomp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_max_acomp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_max_adecomp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_completion_einval_errs(void) {}
-+static inline void	update_completion_timeout_errs(void) {}
-+static inline void	update_completion_comp_buf_overflow_errs(void) {}
-+
-+static inline void	update_wq_comp_calls(struct idxd_wq *idxd_wq) {}
-+static inline void	update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n) {}
-+static inline void	update_wq_decomp_calls(struct idxd_wq *idxd_wq) {}
-+static inline void	update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n) {}
-+
-+static inline u64	iaa_get_ts(void) { return 0; }
-+
-+#endif // CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS
-+
-+#endif
--- 
-2.34.1
+void __init destroy_keylocker_data(void)
+{
+	memzero_explicit(&kl_setup.key, sizeof(kl_setup.key));
+}
 
+Thanks,
+Chang
