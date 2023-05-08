@@ -2,135 +2,181 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB2CDC77B75
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 May 2023 06:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6737DC77B73
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 May 2023 07:54:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232716AbjEHGVK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 May 2023 02:21:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45388 "EHLO
+        id S233608AbjEHHx7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 May 2023 03:53:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232340AbjEHGVI (ORCPT
+        with ESMTP id S233602AbjEHHx6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 May 2023 02:21:08 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B75B13875
-        for <linux-crypto@vger.kernel.org>; Sun,  7 May 2023 23:21:03 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-50bc4b88998so7492201a12.3
-        for <linux-crypto@vger.kernel.org>; Sun, 07 May 2023 23:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683526861; x=1686118861;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=a0zCtbvyuCZv5ZDHktClt14M1N3Yn1Kq3aOXWGII3Xk=;
-        b=obRN4lQ7yHzsItWJG4sNNHmfey7iO95l0VBtNkqyNMnl86G7pjomhab75YLbaKbRKD
-         d7J1yxq+fKLj4/sPDMuDIXjxAo+SUv5eDxcWFbjTkhF4YWwuvaabWmEy4FhxjwvGo5Wa
-         kIsTsi5TImn74gKb5GZs00vVaOQFMt7OBK3FnzxmzS6qRN/koqzTeZ6wtAyJs8u+qhVb
-         XMuUo7E/lgFVbOdcPWdUUXwiF3kHyGJ147q+SuJyTul+JVYJ6NxNu0xQPEEJBoc4jRdH
-         qQr9j3XOsFF8lSiK+LDLQfUSWjNDTbsSlk6mZv+slmqmJmSh+gIR82sZNW2/xsjw6VCj
-         yvjA==
+        Mon, 8 May 2023 03:53:58 -0400
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C6D11BCB
+        for <linux-crypto@vger.kernel.org>; Mon,  8 May 2023 00:53:51 -0700 (PDT)
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-76978e7cd59so288957839f.2
+        for <linux-crypto@vger.kernel.org>; Mon, 08 May 2023 00:53:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683526861; x=1686118861;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a0zCtbvyuCZv5ZDHktClt14M1N3Yn1Kq3aOXWGII3Xk=;
-        b=fec+CZlmOBjludkYc0thZ+E3YbVPMDORjMZza0T4CwZPIVmw/14P7tisnpCgCng5eJ
-         vJ9YYdf3tSS5nXXnmgIvi5P+aC7Ds8rZt1vXyHfVet6L2t8vra+uhk+sWg+AAZYWEwyl
-         fX2nGLseoIFiMWJjuQ8C2GDJfDm4wRULb31iAFmfn8PEIDVISBsy3zvehDC3zitpiIM/
-         c5lx5+6DXFh7od+N0xTY1L+neoV1j/n+mbILwhpl+8iMgQXq/yaQEPn8grqkpFu6XoBH
-         1PwLyvZZ6veahMrO1U/KMnd4opLwNQ+drpNNQjVOIg56gnGLn3Wy+PvlY/+wHFavaU9V
-         I5vQ==
-X-Gm-Message-State: AC+VfDyIu01DsfGdpjfPkEh/9XOCeLkUpofG5iiGyOerh0aQSjUD5OLq
-        h2WFDtVwaLF+Cza73ENXmpYcdw==
-X-Google-Smtp-Source: ACHHUZ7imTk2GtOBXkQpqz9YJxyQfy/GWd7QwSAHeIMqTup1BE9EF/jBA4+9QziBnqdNtVPsmJ/Q3w==
-X-Received: by 2002:a17:906:58c5:b0:966:58ad:d934 with SMTP id e5-20020a17090658c500b0096658add934mr2980785ejs.0.1683526861596;
-        Sun, 07 May 2023 23:21:01 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:50e0:ebdf:b755:b300? ([2a02:810d:15c0:828:50e0:ebdf:b755:b300])
-        by smtp.gmail.com with ESMTPSA id kg20-20020a17090776f400b0094f3e169ca5sm4511506ejc.158.2023.05.07.23.20.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 May 2023 23:21:00 -0700 (PDT)
-Message-ID: <df471efa-9ec5-f323-3892-2505ba782512@linaro.org>
-Date:   Mon, 8 May 2023 08:20:59 +0200
+        d=1e100.net; s=20221208; t=1683532430; x=1686124430;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6THjU9G7GWWkzKSUk+M6cXMclI+q/U9yXztnzFrTX5A=;
+        b=XV27ibIaFNxRY6oDNo8wihbVjcNWgUh5YOX3Sp7l8bYglP/uvO+9TG+2MYT6DM+xx2
+         rZ8R1q+hOpYd9Ub+Pylr3UQtlhHpZ8gZWgkVdl/6abPtg4nB3Zaafq4pf4Y2KL/khSjq
+         uuDQUQNcq8S7wIKaQfGIOM2TTyo/RagZbsbMQO9RjiDoczXN/M7ErmDcfxOYo/IZnb3M
+         JZPAV4bQdYSZDtQcW2q7TPDfXccOvq4arjj91G9n60KCBMQLq6h1idybdCSk9jdVWYgE
+         iVsXd2xatTzYCmbnWA9erNMKMXGXOU9OjE80h/cNTgVSt2n8eFSVuWvycE5VaSEMWM8B
+         PX7w==
+X-Gm-Message-State: AC+VfDyjbgK8f5jHAb12kD2ReR0HW+XW0TDQOXbq995YZXUITgmU/iyP
+        jfsZSnzI9xEnjYdvFp5PbMXOtzu5F9VTYnO1SRtMhAVI6+qV
+X-Google-Smtp-Source: ACHHUZ7uEWCFS94+1wObozpsCwTvPiLDKzdl4aPIC2cf3eu6FjwjmFnUWvT3535f/DiImxvwhew1x9MK0wsz/0lVb1BhN85rIrN+
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH v7 1/3] dt-bindings: ufs: qcom: Add ICE phandle
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Abel Vesa <abel.vesa@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20230408214041.533749-1-abel.vesa@linaro.org>
- <20230408214041.533749-2-abel.vesa@linaro.org>
- <316e9ee5-fccc-e199-f727-7b8187e965ff@linaro.org>
-Content-Language: en-US
-In-Reply-To: <316e9ee5-fccc-e199-f727-7b8187e965ff@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a02:a145:0:b0:416:5d12:9550 with SMTP id
+ m5-20020a02a145000000b004165d129550mr4759256jah.5.1683532430678; Mon, 08 May
+ 2023 00:53:50 -0700 (PDT)
+Date:   Mon, 08 May 2023 00:53:50 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007fa2d705fb29f046@google.com>
+Subject: [syzbot] [crypto?] general protection fault in __aria_aesni_avx_gfni_crypt_16way
+From:   syzbot <syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com>
+To:     bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au, hpa@zytor.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 05/05/2023 20:47, Krzysztof Kozlowski wrote:
-> On 08/04/2023 23:40, Abel Vesa wrote:
->> Starting with SM8550, the ICE will have its own devicetree node
->> so add the qcom,ice property to reference it.
->>
->> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
->> ---
->>
->> The v6 is here:
->> https://lore.kernel.org/all/20230407105029.2274111-3-abel.vesa@linaro.org/
->>
->> Changes since v6:
->>  * Dropped the minItems for both the qcom,ice and the reg in the
->>    qcom,ice compatile subschema, like Krzysztof suggested
->>
->> Changes since v5:
->>  * dropped the sm8550 specific subschema and replaced it with one that
->>    mutually excludes the qcom,ice vs both the ICE specific reg range
->>    and the ICE clock
->>
->> Changes since v4:
->>  * Added check for sm8550 compatible w.r.t. qcom,ice in order to enforce
->>    it while making sure none of the other platforms are allowed to use it
->>
->> Changes since v3:
->>  * dropped the "and drop core clock" part from subject line
->>
->> Changes since v2:
->>  * dropped all changes except the qcom,ice property
->>
->>
->>  .../devicetree/bindings/ufs/qcom,ufs.yaml     | 24 +++++++++++++++++++
->>  1 file changed, 24 insertions(+)
->>
-> 
-> I see dt_binding_check errors after applying this patch. Are you sure
-> this was tested?
+Hello,
 
-False alarm, it was other patch in my tree.
+syzbot found the following issue on:
 
-This one is good.
+HEAD commit:    2e1e1337881b Merge tag '6.4-rc-ksmbd-server-fixes-part2' o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=122a50b8280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c1d541e02d3faec
+dashboard link: https://syzkaller.appspot.com/bug?extid=a6abcf08bad8b18fd198
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Best regards,
-Krzysztof
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2e1e1337.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/38d33ceb7578/vmlinux-2e1e1337.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/91f968ac33ba/bzImage-2e1e1337.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
+
+general protection fault, maybe for address 0xffffffff8c123858: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 19386 Comm: syz-executor.0 Not tainted 6.3.0-syzkaller-13390-g2e1e1337881b #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:__aria_aesni_avx_gfni_crypt_16way+0x2a6/0x4f40 arch/x86/crypto/aria-aesni-avx-asm_64.S:1164
+Code: d0 10 c4 e2 69 00 d7 c5 11 ef ea c5 e9 72 d0 08 c4 e2 69 00 d7 c5 09 ef f2 c4 e2 79 00 d7 c5 01 ef fa c5 f9 6f 05 5a ac c8 0a <c5> f9 6f 0d 4a ac c8 0a c5 f9 6f 15 5a ac c8 0a c5 f9 6f 1d 32 ac
+RSP: 0018:ffffc90021a67048 EFLAGS: 00010286
+RAX: ffff888027fc2890 RBX: 0000000000000000 RCX: ffff888027fc2890
+RDX: ffff888027fc2890 RSI: ffff888027fc2890 RDI: ffff88802731c828
+RBP: ffff888015ef8d00 R08: ffff888027fc2910 R09: ffff88802731c828
+R10: ffff888015ef8c00 R11: ffff888015ef8c00 R12: ffff888015ef8d00
+R13: ffff88802731c828 R14: dffffc0000000000 R15: ffff888027fc2890
+FS:  00007f8122ec1700(0000) GS:ffff88802c700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020002cc0 CR3: 0000000076f07000 CR4: 0000000000350ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ aria_aesni_avx_gfni_ctr_crypt_16way+0x1d/0x110 arch/x86/crypto/aria-aesni-avx-asm_64.S:1339
+ aria_avx_ctr_encrypt+0x180/0x680 arch/x86/crypto/aria_aesni_avx_glue.c:103
+ crypto_skcipher_encrypt+0xbc/0x100 crypto/skcipher.c:653
+ crypto_skcipher_encrypt+0xbc/0x100 crypto/skcipher.c:653
+ crypto_gcm_encrypt+0x393/0x4b0 crypto/gcm.c:459
+ crypto_aead_encrypt+0xbc/0x100 crypto/aead.c:121
+ tls_do_encryption net/tls/tls_sw.c:544 [inline]
+ tls_push_record+0x12d8/0x30f0 net/tls/tls_sw.c:777
+ bpf_exec_tx_verdict+0xdf0/0x1210 net/tls/tls_sw.c:817
+ tls_sw_sendmsg+0x100b/0x1850 net/tls/tls_sw.c:1033
+ inet6_sendmsg+0x9d/0xe0 net/ipv6/af_inet6.c:651
+ sock_sendmsg_nosec net/socket.c:724 [inline]
+ sock_sendmsg+0xde/0x190 net/socket.c:747
+ sock_write_iter+0x295/0x3d0 net/socket.c:1140
+ call_write_iter include/linux/fs.h:1868 [inline]
+ do_iter_readv_writev+0x20b/0x3b0 fs/read_write.c:735
+ do_iter_write+0x185/0x7e0 fs/read_write.c:860
+ vfs_writev+0x1aa/0x670 fs/read_write.c:933
+ do_writev+0x279/0x2f0 fs/read_write.c:976
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f812208c169
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8122ec1168 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 00007f81221abf80 RCX: 00007f812208c169
+RDX: 0000000000000001 RSI: 0000000020003d00 RDI: 0000000000000003
+RBP: 00007f81220e7ca1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe74050cff R14: 00007f8122ec1300 R15: 0000000000022000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__aria_aesni_avx_gfni_crypt_16way+0x2a6/0x4f40 arch/x86/crypto/aria-aesni-avx-asm_64.S:1164
+Code: d0 10 c4 e2 69 00 d7 c5 11 ef ea c5 e9 72 d0 08 c4 e2 69 00 d7 c5 09 ef f2 c4 e2 79 00 d7 c5 01 ef fa c5 f9 6f 05 5a ac c8 0a <c5> f9 6f 0d 4a ac c8 0a c5 f9 6f 15 5a ac c8 0a c5 f9 6f 1d 32 ac
+RSP: 0018:ffffc90021a67048 EFLAGS: 00010286
+RAX: ffff888027fc2890 RBX: 0000000000000000 RCX: ffff888027fc2890
+RDX: ffff888027fc2890 RSI: ffff888027fc2890 RDI: ffff88802731c828
+RBP: ffff888015ef8d00 R08: ffff888027fc2910 R09: ffff88802731c828
+R10: ffff888015ef8c00 R11: ffff888015ef8c00 R12: ffff888015ef8d00
+R13: ffff88802731c828 R14: dffffc0000000000 R15: ffff888027fc2890
+FS:  00007f8122ec1700(0000) GS:ffff88802c700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020002cc0 CR3: 0000000076f07000 CR4: 0000000000350ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	d0 10                	rclb   (%rax)
+   2:	c4 e2 69 00 d7       	vpshufb %xmm7,%xmm2,%xmm2
+   7:	c5 11 ef ea          	vpxor  %xmm2,%xmm13,%xmm13
+   b:	c5 e9 72 d0 08       	vpsrld $0x8,%xmm0,%xmm2
+  10:	c4 e2 69 00 d7       	vpshufb %xmm7,%xmm2,%xmm2
+  15:	c5 09 ef f2          	vpxor  %xmm2,%xmm14,%xmm14
+  19:	c4 e2 79 00 d7       	vpshufb %xmm7,%xmm0,%xmm2
+  1e:	c5 01 ef fa          	vpxor  %xmm2,%xmm15,%xmm15
+  22:	c5 f9 6f 05 5a ac c8 	vmovdqa 0xac8ac5a(%rip),%xmm0        # 0xac8ac84
+  29:	0a
+* 2a:	c5 f9 6f 0d 4a ac c8 	vmovdqa 0xac8ac4a(%rip),%xmm1        # 0xac8ac7c <-- trapping instruction
+  31:	0a
+  32:	c5 f9 6f 15 5a ac c8 	vmovdqa 0xac8ac5a(%rip),%xmm2        # 0xac8ac94
+  39:	0a
+  3a:	c5                   	.byte 0xc5
+  3b:	f9                   	stc
+  3c:	6f                   	outsl  %ds:(%rsi),(%dx)
+  3d:	1d                   	.byte 0x1d
+  3e:	32                   	.byte 0x32
+  3f:	ac                   	lods   %ds:(%rsi),%al
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
