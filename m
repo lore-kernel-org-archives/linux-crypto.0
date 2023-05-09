@@ -2,202 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81630C7EE22
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 01:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C459C7EE2C
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 02:18:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233960AbjEIBvp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 May 2023 21:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
+        id S231468AbjEICSE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 8 May 2023 22:18:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234167AbjEIBvb (ORCPT
+        with ESMTP id S229575AbjEICSE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 May 2023 21:51:31 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BCF59EF3;
-        Mon,  8 May 2023 18:50:59 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-64395e2a715so5178880b3a.3;
-        Mon, 08 May 2023 18:50:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683597057; x=1686189057;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r4f4E1+rA4dHfPSu/M3jA+g54pakUhc0stJxnLeN1Fs=;
-        b=BlC5e7sLPZcdnhGY9IdaZcf6A0c4mdvoKJTXiiChnnwy3x5RM8qM7xkAP0OVbMQaeW
-         MR3fcwXTNXAnyJWfklwKLK4Wets4jaq7tMX/6qGkC4e/KnUzhIGo1LMHJmvqaWpg7H6t
-         EJ2KqP10bIIhBuEDZiZ1yF5VKoXCvdV7bJ/oy/AttGnBg+cQJPeS91PtzTDi35LMH3/n
-         sRRodVOwL/YgILFkdVlMafLyauE+lc+mS/5klszWC3n+YKzsk4YJ/gSU044e6RMak5bG
-         GyZCnUUHTd5XJZDOH68e1lXrcHLBvLzB2hlUojtfAuupnCfaVlkmlCHj1tAjl7u8UdoT
-         27nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683597057; x=1686189057;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=r4f4E1+rA4dHfPSu/M3jA+g54pakUhc0stJxnLeN1Fs=;
-        b=TtJBBCrkFVWzxUhNNynjjB4fkk/xoGh1OkctoYFwVtKUEw1yOHXnww5hHv5t2nL27U
-         f1pK1C3wIH7lwPsx2DyTdxiDGz/SZNIRsxtmQzCLrTBNFzZYd83TvD8w9rXp1I/MRQtI
-         9TtJw/UDm0Rw8dCg3HnwfXnaiDmA6p4C468Q2kOoxBGgSPGZRurr/oDmJfurF/HBDvuq
-         IW54p8PiEbTmEx5lDkn6uCGZLqlL1IFfgeCAk0XutKXiigDwtR/dZPxIA3vUtn/HAeYh
-         yjLSlrpHh7tRv3pqwCjz1gtWM9EH90UrQyEm/Zbx5O++ivjqwwx08fF4FU1HGzROCzTF
-         6QrQ==
-X-Gm-Message-State: AC+VfDyN5OsY50FuLzdexjot5/GDe9HWURv2GZyjJG1D++MI3B8dvZtL
-        WJk1ViNGKp9n6vnSy8c6auE=
-X-Google-Smtp-Source: ACHHUZ78UP2KJlfYM2yhQBOhZcrpnls7iwQOh8gZKajnLTG0xzmGlHeQE6xKDmmCEP5FF6c1tSzwWw==
-X-Received: by 2002:a05:6a00:2310:b0:642:fbed:2808 with SMTP id h16-20020a056a00231000b00642fbed2808mr16104761pfh.25.1683597056841;
-        Mon, 08 May 2023 18:50:56 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id y9-20020a62b509000000b0063f0c9eadc7sm534263pfe.200.2023.05.08.18.50.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 May 2023 18:50:56 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-From:   Tejun Heo <tj@kernel.org>
-To:     jiangshanlai@gmail.com
-Cc:     linux-kernel@vger.kernel.org, kernel-team@meta.com,
-        Tejun Heo <tj@kernel.org>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shijith Thotton <sthotton@marvell.com>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        ye xingchen <ye.xingchen@zte.com.cn>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 11/13] crypto: octeontx2: Use alloc_ordered_workqueue() to create ordered workqueues
-Date:   Mon,  8 May 2023 15:50:30 -1000
-Message-Id: <20230509015032.3768622-12-tj@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230509015032.3768622-1-tj@kernel.org>
-References: <20230509015032.3768622-1-tj@kernel.org>
+        Mon, 8 May 2023 22:18:04 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C15FE60;
+        Mon,  8 May 2023 19:18:02 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pwCvA-006hX7-Oq; Tue, 09 May 2023 10:17:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 09 May 2023 10:17:45 +0800
+Date:   Tue, 9 May 2023 10:17:45 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Sunil V L <sunilvl@ventanamicro.com>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        llvm@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Marc Zyngier <maz@kernel.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Subject: Re: [PATCH V5 03/21] crypto: hisilicon/qm: Fix to enable build with
+ RISC-V clang
+Message-ID: <ZFmtSReX9/WR5CkK@gondor.apana.org.au>
+References: <20230508115237.216337-1-sunilvl@ventanamicro.com>
+ <20230508115237.216337-4-sunilvl@ventanamicro.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230508115237.216337-4-sunilvl@ventanamicro.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-BACKGROUND
-==========
+On Mon, May 08, 2023 at 05:22:19PM +0530, Sunil V L wrote:
+> With CONFIG_ACPI enabled for RISC-V, this driver gets enabled in
+> allmodconfig build. However, build fails with clang and below
+> error is seen.
+> 
+> drivers/crypto/hisilicon/qm.c:627:10: error: invalid output constraint '+Q' in asm
+>                        "+Q" (*((char __iomem *)fun_base))
+>                        ^
+> This is expected error with clang due to the way it is designed.
+> 
+> To fix this issue, move arm64 assembly code under #if.
+> 
+> Link: https://github.com/ClangBuiltLinux/linux/issues/999
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> [sunilvl@ventanamicro.com: Moved tmp0 and tmp1 into the #if]
+> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
+> ---
+>  drivers/crypto/hisilicon/qm.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index ad0c042b5e66..2eaeaac2e246 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -610,13 +610,9 @@ EXPORT_SYMBOL_GPL(hisi_qm_wait_mb_ready);
+>  static void qm_mb_write(struct hisi_qm *qm, const void *src)
+>  {
+>  	void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
+> -	unsigned long tmp0 = 0, tmp1 = 0;
+>  
+> -	if (!IS_ENABLED(CONFIG_ARM64)) {
+> -		memcpy_toio(fun_base, src, 16);
+> -		dma_wmb();
+> -		return;
+> -	}
 
-When multiple work items are queued to a workqueue, their execution order
-doesn't match the queueing order. They may get executed in any order and
-simultaneously. When fully serialized execution - one by one in the queueing
-order - is needed, an ordered workqueue should be used which can be created
-with alloc_ordered_workqueue().
+Please leave this bit as it stands.
 
-However, alloc_ordered_workqueue() was a later addition. Before it, an
-ordered workqueue could be obtained by creating an UNBOUND workqueue with
-@max_active==1. This originally was an implementation side-effect which was
-broken by 4c16bd327c74 ("workqueue: restore WQ_UNBOUND/max_active==1 to be
-ordered"). Because there were users that depended on the ordered execution,
-5c0338c68706 ("workqueue: restore WQ_UNBOUND/max_active==1 to be ordered")
-made workqueue allocation path to implicitly promote UNBOUND workqueues w/
-@max_active==1 to ordered workqueues.
+> +#if IS_ENABLED(CONFIG_ARM64)
+> +	unsigned long tmp0 = 0, tmp1 = 0;
+>  
+>  	asm volatile("ldp %0, %1, %3\n"
+>  		     "stp %0, %1, %2\n"
+> @@ -626,6 +622,11 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
+>  		       "+Q" (*((char __iomem *)fun_base))
+>  		     : "Q" (*((char *)src))
+>  		     : "memory");
 
-While this has worked okay, overloading the UNBOUND allocation interface
-this way creates other issues. It's difficult to tell whether a given
-workqueue actually needs to be ordered and users that legitimately want a
-min concurrency level wq unexpectedly gets an ordered one instead. With
-planned UNBOUND workqueue updates to improve execution locality and more
-prevalence of chiplet designs which can benefit from such improvements, this
-isn't a state we wanna be in forever.
+And simply add the ifdef around the assembly.
 
-This patch series audits all callsites that create an UNBOUND workqueue w/
-@max_active==1 and converts them to alloc_ordered_workqueue() as necessary.
-
-WHAT TO LOOK FOR
-================
-
-The conversions are from
-
-  alloc_workqueue(WQ_UNBOUND | flags, 1, args..)
-
-to
-
-  alloc_ordered_workqueue(flags, args...)
-
-which don't cause any functional changes. If you know that fully ordered
-execution is not ncessary, please let me know. I'll drop the conversion and
-instead add a comment noting the fact to reduce confusion while conversion
-is in progress.
-
-If you aren't fully sure, it's completely fine to let the conversion
-through. The behavior will stay exactly the same and we can always
-reconsider later.
-
-As there are follow-up workqueue core changes, I'd really appreciate if the
-patch can be routed through the workqueue tree w/ your acks. Thanks.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Boris Brezillon <bbrezillon@kernel.org>
-Cc: Arnaud Ebalard <arno@natisbad.org>
-Cc: Srujana Challa <schalla@marvell.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Shijith Thotton <sthotton@marvell.com>
-Cc: Vladis Dronov <vdronov@redhat.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: Alexander Lobakin <alobakin@pm.me>
-Cc: Minghao Chi <chi.minghao@zte.com.cn>
-Cc: ye xingchen <ye.xingchen@zte.com.cn>
-Cc: linux-crypto@vger.kernel.org
----
- drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c | 12 ++++++------
- drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c |  6 +++---
- 2 files changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index ddf6e913c1c4..30e6acfc93d9 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -357,9 +357,9 @@ static int cptpf_vfpf_mbox_init(struct otx2_cptpf_dev *cptpf, int num_vfs)
- 	u64 vfpf_mbox_base;
- 	int err, i;
- 
--	cptpf->vfpf_mbox_wq = alloc_workqueue("cpt_vfpf_mailbox",
--					      WQ_UNBOUND | WQ_HIGHPRI |
--					      WQ_MEM_RECLAIM, 1);
-+	cptpf->vfpf_mbox_wq =
-+		alloc_ordered_workqueue("cpt_vfpf_mailbox",
-+					WQ_HIGHPRI | WQ_MEM_RECLAIM);
- 	if (!cptpf->vfpf_mbox_wq)
- 		return -ENOMEM;
- 
-@@ -453,9 +453,9 @@ static int cptpf_afpf_mbox_init(struct otx2_cptpf_dev *cptpf)
- 	resource_size_t offset;
- 	int err;
- 
--	cptpf->afpf_mbox_wq = alloc_workqueue("cpt_afpf_mailbox",
--					      WQ_UNBOUND | WQ_HIGHPRI |
--					      WQ_MEM_RECLAIM, 1);
-+	cptpf->afpf_mbox_wq =
-+		alloc_ordered_workqueue("cpt_afpf_mailbox",
-+					WQ_HIGHPRI | WQ_MEM_RECLAIM);
- 	if (!cptpf->afpf_mbox_wq)
- 		return -ENOMEM;
- 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-index 392e9fee05e8..6023a7adb70c 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
-@@ -75,9 +75,9 @@ static int cptvf_pfvf_mbox_init(struct otx2_cptvf_dev *cptvf)
- 	resource_size_t offset, size;
- 	int ret;
- 
--	cptvf->pfvf_mbox_wq = alloc_workqueue("cpt_pfvf_mailbox",
--					      WQ_UNBOUND | WQ_HIGHPRI |
--					      WQ_MEM_RECLAIM, 1);
-+	cptvf->pfvf_mbox_wq =
-+		alloc_ordered_workqueue("cpt_pfvf_mailbox",
-+					WQ_HIGHPRI | WQ_MEM_RECLAIM);
- 	if (!cptvf->pfvf_mbox_wq)
- 		return -ENOMEM;
- 
+Thanks,
 -- 
-2.40.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
