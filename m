@@ -2,116 +2,153 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D331C7EE26
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 10:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F6CC7EE25
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 16:16:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234914AbjEIKK2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 May 2023 06:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48244 "EHLO
+        id S229572AbjEIQQX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 May 2023 12:16:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234498AbjEIKK1 (ORCPT
+        with ESMTP id S233731AbjEIQQW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 May 2023 06:10:27 -0400
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF3644AC
-        for <linux-crypto@vger.kernel.org>; Tue,  9 May 2023 03:10:24 -0700 (PDT)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-55c939fb24dso51644987b3.2
-        for <linux-crypto@vger.kernel.org>; Tue, 09 May 2023 03:10:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683627024; x=1686219024;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rQkbfRIbUJCVqw4JhZ/x8mgAn7rLfZy1brM0sCnVSgw=;
-        b=U1CNfIFlZ/a1WePhr2f4aPDZkCagS2Q5q5SRO7RjjDU2jDZUwcoVsBFqx9cloGIY/v
-         kfVsJo63yMDr2c/jAyx3dvDZI3A5/535YyoDqLTJBa0R9n55KGrxAVK05n56G5erKouc
-         8/5szb42oNcPenusnzqM4m49wyN8bOkTvy+39kUXY2R/9iSUOmQVL7GhtXYVEf+VLFTC
-         rzhHhTaFeS81uybq1ZDPuzz4/7tKc4CWdtVOwsiCgKh5cs2bBfcM5mTEp4lXF677J+tH
-         SjvRpzkqrsC1jHTznwynV7b5svGS85/ACYbXI4PlHzXDvSe+Z1anVO8M1/Sf+GrCztxR
-         QI0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683627024; x=1686219024;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rQkbfRIbUJCVqw4JhZ/x8mgAn7rLfZy1brM0sCnVSgw=;
-        b=KY8lnl5J+ELHxc41NpN/HZTPp2CyW72IUlIAoTZpDlAu/p5lgCWU9ZDIjTlcyZrxzV
-         lPNNClYgoszhd1xcCIzwIHziD64YSLY6l1ERk7J/tKwcJV0WNmGFIVHH2SIsp0u94/m1
-         A2kUz4e8VBfPbxEI0hycMXMKRX83C83tPNdA0PPZ3/QJEsM/VLco9Z38TCcLZ1RKa9Xj
-         5AJ1Vy7sDac8dG8KjzCq5Lpw6/QEub3ITfZulc9XkfmLQOxwIU9UWL9Q/62464a84rcy
-         Y0hmPO4PHoNiwScPX/ZlDy9tq4MFwe4i8p6YKWbN4KNxpOFObSYZOCtYFwO/6Mx37Sbm
-         nYLA==
-X-Gm-Message-State: AC+VfDydYm9PsYLEPj97p/cvpNzuuDBqW+f9eOUYIeyY1agIf7xNIe7d
-        F5FBmcsqorb/86zrASmdoNgjQtexTiBSklYUPIqLZA==
-X-Google-Smtp-Source: ACHHUZ7en5HQ9tk8fC7W17P/UB40PYuc/5jwewMS+g/NJbXve0voOVRVYuXomwyHeYVPu4jgr23oEop/AXyacJy+J6o=
-X-Received: by 2002:a81:5404:0:b0:55d:c333:26c4 with SMTP id
- i4-20020a815404000000b0055dc33326c4mr9833694ywb.0.1683627023804; Tue, 09 May
- 2023 03:10:23 -0700 (PDT)
+        Tue, 9 May 2023 12:16:22 -0400
+X-Greylist: delayed 372 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 09 May 2023 09:16:19 PDT
+Received: from sender3-of-o58.zoho.com (sender3-of-o58.zoho.com [136.143.184.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453324202;
+        Tue,  9 May 2023 09:16:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1683648561; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=e8z1GRKHIutI17sD6Ooa+GsqxZ6LiVUfaM2CBuq8Fnl8NkgMxccjJcIrLDwAp2AUFpse+WGI2R/+IhIwcdj+ZpURqgiXFh/3MQANM/u/SrCS5YDPCYRVn3jlne5PxwqF9qHJUE+2udAR3VOFk0gcRTuEqSXVNS1vmXslPZQ4KMY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1683648561; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=qGk4Rls13lFQhdUfzwlL+5GIuudpucnLpMrkFUq4WaI=; 
+        b=EuJwYk5JFudfE1FA1+kyp1s7cosrwAQvGkYpJIqCWrw/drRm7W3tBpSTR8qG1T0YVT679qzwII3KdnJmusJ9i50PdxKmXiEfZqRml52LXLn8BqSGyKJmx54K5jjLh3TWp9uzlAdMPLU3RIq2iHBdCga2Hjm7FAPPC4PZQmuzirg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=apertussolutions.com;
+        spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+        dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1683648561;
+        s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+        h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+        bh=qGk4Rls13lFQhdUfzwlL+5GIuudpucnLpMrkFUq4WaI=;
+        b=SNFsz95maKu0/BHCbIqIyqUPOIR4r7MdlMd2xIlqC3KZ/LoT7dARRjOYEYESg5CP
+        0/GLY2THkxoK8LM8zNM85SqghmumzF7tBHxSS7X/VzJIeyypFttd0ukbH/+B0G2CV21
+        DHNisWZA600cfK7c2MQCmBpROG/vdDyyDEiXN2U8=
+Received: from [10.10.1.128] (static-72-81-132-2.bltmmd.fios.verizon.net [72.81.132.2]) by mx.zohomail.com
+        with SMTPS id 1683648559080793.9506296306162; Tue, 9 May 2023 09:09:19 -0700 (PDT)
+Message-ID: <dad2d0b2-65d6-89bf-d2f0-7f420436e44c@apertussolutions.com>
+Date:   Tue, 9 May 2023 12:09:14 -0400
 MIME-Version: 1.0
-References: <20230408214041.533749-1-abel.vesa@linaro.org> <20230408214041.533749-4-abel.vesa@linaro.org>
- <CAPDyKFqMAeKrw1KqhHhdd6U4LUogd6UiiMwe1C2fReSen11A6g@mail.gmail.com>
-In-Reply-To: <CAPDyKFqMAeKrw1KqhHhdd6U4LUogd6UiiMwe1C2fReSen11A6g@mail.gmail.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Tue, 9 May 2023 12:09:48 +0200
-Message-ID: <CAPDyKFpwzunLC447WWqPqrMpJRbCFqUoADERU7KG4iorOgADzA@mail.gmail.com>
-Subject: Re: [PATCH v7 3/3] mmc: sdhci-msm: Switch to the new ICE API
-To:     Bjorn Andersson <andersson@kernel.org>,
-        Abel Vesa <abel.vesa@linaro.org>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v6 06/14] x86: Add early SHA support for Secure Launch
+ early measurements
+Content-Language: en-US
+To:     Simon Horman <horms@kernel.org>,
+        Ross Philipson <ross.philipson@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
+        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
+        trenchboot-devel@googlegroups.com
+References: <20230504145023.835096-1-ross.philipson@oracle.com>
+ <20230504145023.835096-7-ross.philipson@oracle.com>
+ <ZFUwLjPfhz8Ch9bE@kernel.org>
+From:   "Daniel P. Smith" <dpsmith@apertussolutions.com>
+In-Reply-To: <ZFUwLjPfhz8Ch9bE@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 17 Apr 2023 at 10:47, Ulf Hansson <ulf.hansson@linaro.org> wrote:
->
-> On Sat, 8 Apr 2023 at 23:40, Abel Vesa <abel.vesa@linaro.org> wrote:
-> >
-> > Now that there is a new dedicated ICE driver, drop the sdhci-msm ICE
-> > implementation and use the new ICE api provided by the Qualcomm soc
-> > driver ice. The platforms that already have ICE support will use the
-> > API as library since there will not be a devicetree node, but instead
-> > they have reg range. In this case, the of_qcom_ice_get will return an
-> > ICE instance created for the consumer's device. But if there are
-> > platforms that do not have ice reg in the consumer devicetree node
-> > and instead provide a dedicated ICE devicetree node, theof_qcom_ice_get
-> > will look up the device based on qcom,ice property and will get the ICE
-> > instance registered by the probe function of the ice driver.
-> >
-> > The ICE clock is now handle by the new driver. This is done by enabling
-> > it on the creation of the ICE instance and then enabling/disabling it on
-> > SDCC runtime resume/suspend.
-> >
-> > Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
->
-> Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
->
-> Bjorn, I think it should be easier if you pick this together with qcom
-> soc driver changes. I don't think there is any conflict with changes
-> in my mmc tree.
->
-> Otherwise, I will just wait for the next release cycle.
+On 5/5/23 12:34, Simon Horman wrote:
+> On Thu, May 04, 2023 at 02:50:15PM +0000, Ross Philipson wrote:
+>> From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+>>
+>> The SHA algorithms are necessary to measure configuration information into
+>> the TPM as early as possible before using the values. This implementation
+>> uses the established approach of #including the SHA libraries directly in
+>> the code since the compressed kernel is not uncompressed at this point.
+>>
+>> The SHA code here has its origins in the code from the main kernel:
+>>
+>> commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
+>>
+>> That code could not be pulled directly into the setup portion of the
+>> compressed kernel because of other dependencies it pulls in. The result
+>> is this is a modified copy of that code that still leverages the core
+>> SHA algorithms.
+>>
+>> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+>> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+>> ---
+>>   arch/x86/boot/compressed/Makefile       |  2 +
+>>   arch/x86/boot/compressed/early_sha1.c   | 97 +++++++++++++++++++++++++++++++++
+>>   arch/x86/boot/compressed/early_sha1.h   | 17 ++++++
+>>   arch/x86/boot/compressed/early_sha256.c |  7 +++
+>>   lib/crypto/sha1.c                       |  4 ++
+>>   lib/crypto/sha256.c                     |  8 +++
+>>   6 files changed, 135 insertions(+)
+>>   create mode 100644 arch/x86/boot/compressed/early_sha1.c
+>>   create mode 100644 arch/x86/boot/compressed/early_sha1.h
+>>   create mode 100644 arch/x86/boot/compressed/early_sha256.c
+>>
+>> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+>> index 6b6cfe6..1d327d4 100644
+>> --- a/arch/x86/boot/compressed/Makefile
+>> +++ b/arch/x86/boot/compressed/Makefile
+>> @@ -112,6 +112,8 @@ vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi.o
+>>   vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
+>>   vmlinux-objs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
+>>   
+>> +vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o $(obj)/early_sha256.o
+>> +
+>>   $(obj)/vmlinux: $(vmlinux-objs-y) FORCE
+>>   	$(call if_changed,ld)
+>>   
+>> diff --git a/arch/x86/boot/compressed/early_sha1.c b/arch/x86/boot/compressed/early_sha1.c
+>> new file mode 100644
+>> index 0000000..524ec23
+>> --- /dev/null
+>> +++ b/arch/x86/boot/compressed/early_sha1.c
+>> @@ -0,0 +1,97 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Copyright (c) 2022 Apertus Solutions, LLC.
+>> + */
+>> +
+>> +#include <linux/init.h>
+>> +#include <linux/linkage.h>
+>> +#include <linux/string.h>
+>> +#include <asm/boot.h>
+>> +#include <asm/unaligned.h>
+>> +
+>> +#include "early_sha1.h"
+>> +
+>> +#define SHA1_DISABLE_EXPORT
+> 
+> Hi Ross,
+> 
+> I could be mistaken, but it seems to me that *_DISABLE_EXPORT
+> is a mechanism of this patch to disable exporting symbols
+> (use of EXPORT_SYMBOL), at compile time.
+> 
+> If so, this doesn't strike me as something that should be part of upstream
+> kernel code.  Could you consider dropping this part of the patch?
 
-Okay, it looks like all dependent pieces made it into v6.4-rc1. So,
-applied for next, thanks!
+Greetings Simon,
 
-[...]
+This was patterned after the move of sha256 to /lib. Upon re-inspection, 
+it appears this has since been updated to use the __DISABLE_EXPORTS 
+CFLAG mechanism of EXPORT_SYMBOL as a conditionally included rule in the 
+Makefile where the desire to disable exporting is wanted. We will update 
+this patch to follow the same pattern.
 
-Kind regards
-Uffe
+V/r,
+Daniel P. Smith
