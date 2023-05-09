@@ -2,204 +2,241 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E23C77B75
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 17:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E0CC77B7C
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 17:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233867AbjEIRso (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 May 2023 13:48:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52248 "EHLO
+        id S234437AbjEIRuS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 May 2023 13:50:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjEIRsm (ORCPT
+        with ESMTP id S234364AbjEIRuS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 May 2023 13:48:42 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3080635BB;
-        Tue,  9 May 2023 10:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683654521; x=1715190521;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=iXZtNR+OyqxCgnFJ9okZ6J9OorS5EjQMbZp+J6HkxhA=;
-  b=l+JPY4jGyUrrxGVvHjpsHW569lCnkqOHF0MhN2/xQLelHdGwL9W6sXP+
-   5hyl9EPIZ6PalD7bGzixu5PuD2S6DokaDGGPL1JIR6hEAxj9lH4QIvWGD
-   RUtxneIIwfBlMJIvMPIpNX04XAzh9H8TcXm/InNGtFq/v7qcHL6F4zcI9
-   PluNJckLd7QWEn20Q5uh8H0Wbhd7XxMXM/aj7a7jtFcjx5JysNcmyWkV9
-   SgfOjYb2+dSnw6fSW3ob4O3SK1omr6jkSNROXh2Io095b4PAGSY0hxLJh
-   VGJxxlpTseyvC0jgzUZOAuFcgWjHVJAyihJU+ZhRw1I9+NdyCS5iOh7LW
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="339242061"
-X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
-   d="scan'208";a="339242061"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 10:48:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="810800672"
-X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
-   d="scan'208";a="810800672"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga002.fm.intel.com with ESMTP; 09 May 2023 10:48:40 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 9 May 2023 10:48:40 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 9 May 2023 10:48:39 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 9 May 2023 10:48:39 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 9 May 2023 10:48:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AkClnCNV39jTvIKuC22aGNiGwpmEbEWHbDHVk1Pt4BEEAugTF/sQBA+2YoLqUHgRo24Es/Rn/op1rl/VvOd18M7RJX8GGbtfAvZxcJ9qM0nXVlLXft5kP/3KRGQpAGkdImgaScnujEXFeIa9PyOdlG4fCTRr6RSNSJP+SuBxgotFfmvefEBO4zJUjvzvXnM9KIk+PZS5GwujoLxVXaY2JCsbnZr00msKrWGgYDgwlu5xYzKgOqQteXLKGugeXQxGDiz9qa6/Z5qiU5yV05TR6xxOwpAfh0njyeaER0xmgR9071FJfSr0Q220V8xON+e+8c6zFwy+m/EZMY8pr4BdsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=As9m9D1jJ3WM0Ukz8fuhk7rbJTBHzyp2U9bqx5p6q/0=;
- b=mLPICvPQ4GSsk9cAtfCsbS0HB2iuzopMfUil0vIoDaGA21NdrK+MOCELcj++msR3/4EiwV0Xn7OfRi0CinDaBfZSAy0yr+gtY+K+x2ITULA11JOIvJ5AAahHOhG62AQJhi1JAxpVmk11BDPfCset7ECwB6t7QnVwvjvIwlRMXNQu28+0xl2jWkzQOdp3gjDuWnhTAZMQX0kD0hQUZXs2GxE3pkC9Tvg2flvsl49AYwcP8Fp62P1YgBbr8QS1/wwJ4W2plT9CTBXvKRf0dXzkDbz0k6H7MB7EVAGol4+xWh0H5vkQzxRT1cvHlAdrFpvyatg7SBubABcMVfn8tY8s+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from IA1PR11MB6097.namprd11.prod.outlook.com (2603:10b6:208:3d7::17)
- by CH0PR11MB5235.namprd11.prod.outlook.com (2603:10b6:610:e2::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33; Tue, 9 May
- 2023 17:48:38 +0000
-Received: from IA1PR11MB6097.namprd11.prod.outlook.com
- ([fe80::bbe8:5390:54c6:b0e2]) by IA1PR11MB6097.namprd11.prod.outlook.com
- ([fe80::bbe8:5390:54c6:b0e2%7]) with mapi id 15.20.6363.032; Tue, 9 May 2023
- 17:48:37 +0000
-Message-ID: <d9bad7c2-14d7-7f06-da50-81069853babd@intel.com>
-Date:   Tue, 9 May 2023 10:48:57 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH v4 01/15] dmaengine: idxd: add wq driver name support for
- accel-config user tool
-Content-Language: en-US
-To:     Tom Zanussi <tom.zanussi@linux.intel.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <vkoul@kernel.org>
-CC:     <dave.jiang@intel.com>, <tony.luck@intel.com>,
-        <wajdi.k.feghali@intel.com>, <james.guilford@intel.com>,
-        <kanchana.p.sridhar@intel.com>, <giovanni.cabiddu@intel.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>
-References: <cover.1683573703.git.zanussi@kernel.org>
- <a874741f266f57502d671843b9d4a9b563c372e3.1683573703.git.zanussi@kernel.org>
-From:   Fenghua Yu <fenghua.yu@intel.com>
-In-Reply-To: <a874741f266f57502d671843b9d4a9b563c372e3.1683573703.git.zanussi@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0288.namprd03.prod.outlook.com
- (2603:10b6:a03:39e::23) To IA1PR11MB6097.namprd11.prod.outlook.com
- (2603:10b6:208:3d7::17)
+        Tue, 9 May 2023 13:50:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74FF3C3A;
+        Tue,  9 May 2023 10:50:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5671E62B20;
+        Tue,  9 May 2023 17:50:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C601C433EF;
+        Tue,  9 May 2023 17:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683654615;
+        bh=rVSz+Tb3H1/HHESESFxVFjW2CxxTsz7vH2xOqzNlQXc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SWUmzHG8xFjWpRkUn7jxvkUG21EZyVRmvIHAfaVcDHRGM9jMRutvis8vhLLUy4O6s
+         TNfr8CkW+0xFnginSyEkOvFBFvpfOmfhA5nD3ARTrQ70JeNf4ZdFCI5HaO0KOLYccW
+         vQdtgGdmg/tQ5H63l/yZA/IRiWefyI99JD7UG/jkDkK98gs8oeXFAAGuZ3x/WUQl08
+         dJVCQI52RgYMOfw8/KVYJ1KtUhhMWuPE0OU99QGXVBQFCtLEJXKyVpOEh03tYK0nnO
+         JOdA+2jhGLcjwX9OUN+wPeWnGy/ROl2o4urTxQBEOvfJ3/SX8Fmf+xvybwL/5Cz17z
+         qRmXV8na65m5w==
+Date:   Tue, 9 May 2023 18:50:07 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Sunil V L <sunilvl@ventanamicro.com>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        llvm@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Len Brown <lenb@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Marc Zyngier <maz@kernel.org>,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
+Subject: Re: [PATCH V5 08/21] RISC-V: ACPI: Cache and retrieve the RINTC
+ structure
+Message-ID: <20230509-atlantic-writing-3ceea38e050e@spud>
+References: <20230508115237.216337-1-sunilvl@ventanamicro.com>
+ <20230508115237.216337-9-sunilvl@ventanamicro.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR11MB6097:EE_|CH0PR11MB5235:EE_
-X-MS-Office365-Filtering-Correlation-Id: d8504165-6545-446c-f3a4-08db50b59de0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Y/h9IiOA4CiwYv0by9PGoYnbBpt4AssiqQX4CYs4cGEekvYiHwgB5C0Gr/r4n4046o+3M2oCjGWHTjaG4oheejTZbn3GRHktbA7vDM46D/r0eBB17ZKoiGmWNI6mz3vmIQxTR3iZGoIo+5z2bQw3TUSeLMe0tQ90dqXIKbS5rnQIAhZtFrO+ieTG4JQjVDyhHaHbOHr9eACWNTZdkoKFtfIdSvCO1mFgJ5QqAA8FAoKfVUUpOTz5R50o4s7ULxc0/r3C66Y6zrtZlDWjx85+kEOSXkTsOyo8/FIXCSA/t4duzyl5rFEYBaPIcGnBxczfHEeMxvxlUlq63sqJytv3p8PZhuIkRX5+EWyTwgEc1SQlU26FokUWDmuaYDkh03AP8xAcDJKejxmwMHSDaoT8uUH/ioSgpowukJkG1yLUoSNu5iWejmEDEiyC7AOkjb+vXS5yvgzz4K2rN9MNI2e+itGzpFQK7OFgzBxgAOnk46xXNa6le7dWkt4DlauBNjNRD5LMbCXpV7PeWE+hML34pKl7Blz2629IZvn+oB7rwvsPM1QARtDpTDHhHVmdbJaBK8tgDErJpT4Xtemvtzq31x5qSO9sxhHPLkjBFNTzIeqVA9YcaPethmw/ZVjQDHfg/+mN8RVsQaYXSerR4iXwH9tHbfNQ7LypwnO0qEhcR/sK57VfbpN2j6rkkU/DptQWz53R3PD0q3krTMdL/G5Rtg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6097.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(136003)(376002)(346002)(366004)(451199021)(186003)(2616005)(2906002)(38100700002)(36756003)(86362001)(31696002)(82960400001)(5660300002)(8936002)(8676002)(44832011)(66946007)(66556008)(66476007)(4326008)(478600001)(6666004)(41300700001)(6486002)(316002)(31686004)(53546011)(6506007)(6512007)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SlZxVm4zZE00SFRVcUpIR0czeldFV3VpbDlxbEFHWXJkTElQU1RTS2V0Unls?=
- =?utf-8?B?M3JCNzlzcG5NOVVKdS9udmgwWE5TOGhGRFN2UFZlUGdPWWVOL1IrTnRnRVE3?=
- =?utf-8?B?Ui83MGVtc1hMRGp6bndZWlJZS2ZMUDhTVWg5MnRqMzlLNTVjTHdyTkxMYk5C?=
- =?utf-8?B?OGpjTytKL1E5UFpHNFZqQk5jMVpQZ082K3gzMlc1RGJWTXBxNlVnTHhsWWFn?=
- =?utf-8?B?K2l1NC9LSHBjOFMydGxpYUxCNjJ0VWUxeWcrU1lyOGR2VWduc0JEU2tTV3da?=
- =?utf-8?B?bTd2RzJCcHl2aDlmbE4rTEFsZkt6YVU0YkUvUjhzWGpQT2FrZWFxQkUyUEZ4?=
- =?utf-8?B?WUpjYlBrVzljajFnOVBDVkxVbm1MZmFhTXYwcUZldnFNY0pwcXRVRGw4QVJL?=
- =?utf-8?B?Sll6MVdOajUvZytyZUhGTjFNR3gxY3EvNTZRWUxWZ2hhN3krRDROOUcyTy9K?=
- =?utf-8?B?WkVhVDVtVTR0V0daS0gvNDZ4MmNoa1dZd002OC9uZVcrdlF0Y0ZSQUd5Qzln?=
- =?utf-8?B?Rk1DUkpla2pLUWkvQUdCRVlHTzh4L0pJV1BsNWw5UEVsMHR0SFNEK3pjYjdO?=
- =?utf-8?B?aHhCa09GQXdHNnV5OHFHNXY3ZURHSk1waUt0c043MkFYd1F6VnR3bkZiWWhP?=
- =?utf-8?B?YnY2aGpVcERoMGtWUS9NZ3QvY09aN2Q1V0ZJdnpoSjVTMForY0tWVmNpd3pE?=
- =?utf-8?B?MTRHZ3hFeTUzR3ZxV3FQVnBTNE84KzlnWE9lZVRTSWhubWpLeTVUUEVCV2t5?=
- =?utf-8?B?cVlvV2pjS2dibzZwVzJoMk84V0NTc2lhWDZkUnVoOE9rSUlyb1dpRmppNzRJ?=
- =?utf-8?B?NnlIOFJjcnpsaEtqRkk3QUlkbEdCeGdkcWZJeDhTbjF6RmNyQ1J0OXpINFZ1?=
- =?utf-8?B?aGlWd1E5Tm1hUVVTSERMTm9tVng0VHl1MUFvcm5Nb1YxWklsR0xjb1pHT0VE?=
- =?utf-8?B?dVpMZWc5Um9DTjA4bS81UW5XdWViNDBGeHRHbXhxYzZaM0lmUXNXTjhvakhQ?=
- =?utf-8?B?enVMUWlTMDNtUytmYW5YVGNyVkI2aUoySmxMcDhZQ3VESXgrNXpJZmRlZmFE?=
- =?utf-8?B?czRTN1R0WTdBY0VDbGlvYURHSVJMSXFJOFZjcTZDbUVma3hITmZGdkNYNHNY?=
- =?utf-8?B?NVUwRFprUmhpMTRJNzRIRTFwRmcwMlU1UHpFb1Y4K3pSQmwzTTlIS0QvTjJM?=
- =?utf-8?B?UXJ0RVl2bktqSFF5eEVzSndzYis5TldZcHZQa3htWFkrbTVKT3pZSjByRGRV?=
- =?utf-8?B?WEhiVGxicUNqSzhYQ3JuZTcwMEFrMHoxdDM2M1JVK0srbElBQzR0R2FqOGhy?=
- =?utf-8?B?MzdXQXkyUm1OQzBmU2tLaHdPa3A3NnVXUm5Dc3BOWmhNTjAvTHozR1dlRGxZ?=
- =?utf-8?B?Si9WQVlkdlFTZEZIdEhoM2NGa3FLb01Id0J2VDRrMGRieDNpOWZPdEM3Z3g5?=
- =?utf-8?B?YXN6TmkwbHZvVU5rdFBoVGU3OUlLNk9PSzJBY2V4NGN3US9DRHN5STlJTjM5?=
- =?utf-8?B?RnpjTFpEUml2Y0daNFJ1bVNFM05RWFZIOWN6aFdXemlGMlVnbFN4OERJYzFp?=
- =?utf-8?B?NUFKV2JGcjErbnQwQ1VvanJZUllaWHV2S0VZZ0kzTDB5Zmk1UzlxTlk1MWpJ?=
- =?utf-8?B?b2pXK3VHM1lJckxQRXFUb21BRDR6TEtUcWR1ajBaajc3M0thdG5LMkVCaHIx?=
- =?utf-8?B?bXRNaEtNZnZadlB3M0Zhd29BN3JNUXhsRUMrc3ZlOTBQZE1rTkFmVm95V2JL?=
- =?utf-8?B?SjNvMGRmN3ZrTUtDMzZFejNXMFdKR2xFWkIwSFNJbE1GUVE4MmhocWFBMStk?=
- =?utf-8?B?dERvZFNNSVkwSE5lVWRwcXV0aGdFTlptUkZwQzdOc0NtbldVZmMrUkwzcGhL?=
- =?utf-8?B?bjB2UFRHYlR4eUZZcTM2VmZSUUl5Qno1OStieTlBdUM1MXR3VzJ4bWJ3WXVx?=
- =?utf-8?B?K1hqSXpnYlZnZXFJbzhJNTlPdFFpd25Ucyt2RW15YmtBenhURVJUWFJHaG9p?=
- =?utf-8?B?Tk9tNW9ONmRsNUVYcVBpd3AwYllJdVd0L3J0VmM3dkdIZGRNanBuTG9ubVZx?=
- =?utf-8?B?WHc0KzU2WldZNjE3bEtya3Z0OW1WRDFRRlg5NmNDQzhnU2JvQzV2Ly94bWFq?=
- =?utf-8?Q?jpoQX04OPYajlq9UzTaV8D2fh?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8504165-6545-446c-f3a4-08db50b59de0
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6097.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2023 17:48:37.3525
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yfXlMcW1zzEpCfhbbgYo6DCDAEPmJzCsaPhJ6FVHa5gSOO4EYZNKNK0ZPRvT+Z4lmYFTC2m5cKhFuB/PjXUG8g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5235
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="VyG74+KZvewY8TZ5"
+Content-Disposition: inline
+In-Reply-To: <20230508115237.216337-9-sunilvl@ventanamicro.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Tom,
 
-On 5/8/23 13:07, Tom Zanussi wrote:
-> From: Dave Jiang <dave.jiang@intel.com>
-> 
-> With the possibility of multiple wq drivers that can be bound to the wq,
-> the user config tool accel-config needs a way to know which wq driver to
-> bind to the wq. Introduce per wq driver_name sysfs attribute where the user
-> can indicate the driver to be bound to the wq. This allows accel-config to
-> just bind to the driver using wq->driver_name.
-> 
-> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+--VyG74+KZvewY8TZ5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hey Sunil,
+
+On Mon, May 08, 2023 at 05:22:24PM +0530, Sunil V L wrote:
+> RINTC structures in the MADT provide mapping between the hartid
+> and the CPU. This is required many times even at run time like
+> cpuinfo. So, instead of parsing the ACPI table every time, cache
+> the RINTC structures and provide a function to get the correct
+> RINTC structure for a given cpu.
+>=20
+> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
+> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
+=46rom this patch until "RISC-V: Add ACPI initialization in
+setup_arch()" (which is 19/21), the series fails to build.
+
+allmodconfig, clang-16:
+=2E./arch/riscv/include/asm/acpi.h:22:23: error: unknown type name 'acpi_ph=
+ysical_address'; did you mean 'efi_physical_addr_t'?
+=2E./arch/riscv/include/asm/acpi.h:22:51: error: unknown type name 'acpi_si=
+ze'
+
+rv32_defconfig, clang-16:
+arch/riscv/kernel/setup.c:297:7: error: use of undeclared identifier 'acpi_=
+disabled'; did you mean '__cpu_disable'?
+arch/riscv/kernel/setup.c:297:7: warning: address of function '__cpu_disabl=
+e' will always evaluate to 'true' [-Wpointer-bool-conversion]
+
+I ballsed up a toolchain upgrade to gcc-13, so the whole series is
+showing build issues on patchwork for the gcc configurations:
+https://patchwork.kernel.org/project/linux-riscv/list/?series=3D745787
+
+However, I suspect that the same patches that fail for clang-16 will
+fail for gcc-13 too, once I have fixed that!
+
+Cheers,
+Conor.
+
 > ---
->   .../ABI/stable/sysfs-driver-dma-idxd          |  6 ++++
->   drivers/dma/idxd/cdev.c                       |  8 ++++++
->   drivers/dma/idxd/dma.c                        |  6 ++++
->   drivers/dma/idxd/idxd.h                       |  9 ++++++
->   drivers/dma/idxd/sysfs.c                      | 28 +++++++++++++++++++
->   include/uapi/linux/idxd.h                     |  1 +
->   6 files changed, 58 insertions(+)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
-> index 3becc9a82bdf..d5daae442fe7 100644
-> --- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
-> +++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
-> @@ -244,6 +244,12 @@ Description:	Shows the operation capability bits displayed in bitmap format
->   		correlates to the operations allowed. It's visible only
->   		on platforms that support the capability.
->   
-> +What:		/sys/bus/dsa/devices/wq<m>.<n>/driver_name
-> +Date:		Mar 27, 2023 > +KernelVersion:	6.4.0
+>  arch/riscv/include/asm/acpi.h | 10 ++++++++
+>  arch/riscv/kernel/acpi.c      | 45 +++++++++++++++++++++++++++++++++++
+>  arch/riscv/kernel/setup.c     |  4 ++++
+>  3 files changed, 59 insertions(+)
+>=20
+> diff --git a/arch/riscv/include/asm/acpi.h b/arch/riscv/include/asm/acpi.h
+> index 9be52b6ffae1..6519529c8bdf 100644
+> --- a/arch/riscv/include/asm/acpi.h
+> +++ b/arch/riscv/include/asm/acpi.h
+> @@ -59,6 +59,16 @@ static inline bool acpi_has_cpu_in_madt(void)
+> =20
+>  static inline void arch_fix_phys_package_id(int num, u32 slot) { }
+> =20
+> +void acpi_init_rintc_map(void);
+> +struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu);
+> +u32 get_acpi_id_for_cpu(int cpu);
+> +#else
+> +static inline void acpi_init_rintc_map(void) { }
+> +static inline struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu)
+> +{
+> +	return NULL;
+> +}
+> +
+>  #endif /* CONFIG_ACPI */
+> =20
+>  #endif /*_ASM_ACPI_H*/
+> diff --git a/arch/riscv/kernel/acpi.c b/arch/riscv/kernel/acpi.c
+> index 81d448c41714..89e142611c84 100644
+> --- a/arch/riscv/kernel/acpi.c
+> +++ b/arch/riscv/kernel/acpi.c
+> @@ -24,6 +24,51 @@ EXPORT_SYMBOL(acpi_disabled);
+>  int acpi_pci_disabled =3D 1;	/* skip ACPI PCI scan and IRQ initializatio=
+n */
+>  EXPORT_SYMBOL(acpi_pci_disabled);
+> =20
+> +static struct acpi_madt_rintc cpu_madt_rintc[NR_CPUS];
+> +
+> +static int acpi_parse_madt_rintc(union acpi_subtable_headers *header, co=
+nst unsigned long end)
+> +{
+> +	struct acpi_madt_rintc *rintc =3D (struct acpi_madt_rintc *)header;
+> +	int cpuid;
+> +
+> +	if (!(rintc->flags & ACPI_MADT_ENABLED))
+> +		return 0;
+> +
+> +	cpuid =3D riscv_hartid_to_cpuid(rintc->hart_id);
+> +	/*
+> +	 * When CONFIG_SMP is disabled, mapping won't be created for
+> +	 * all cpus.
+> +	 * CPUs more than num_possible_cpus, will be ignored.
+> +	 */
+> +	if (cpuid >=3D 0 && cpuid < num_possible_cpus())
+> +		cpu_madt_rintc[cpuid] =3D *rintc;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Instead of parsing (and freeing) the ACPI table, cache
+> + * the RINTC structures since they are frequently used
+> + * like in  cpuinfo.
+> + */
+> +void __init acpi_init_rintc_map(void)
+> +{
+> +	if (acpi_table_parse_madt(ACPI_MADT_TYPE_RINTC, acpi_parse_madt_rintc, =
+0) <=3D 0) {
+> +		pr_err("No valid RINTC entries exist\n");
+> +		BUG();
+> +	}
+> +}
+> +
+> +struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu)
+> +{
+> +	return &cpu_madt_rintc[cpu];
+> +}
+> +
+> +u32 get_acpi_id_for_cpu(int cpu)
+> +{
+> +	return acpi_cpu_get_madt_rintc(cpu)->uid;
+> +}
+> +
+>  /*
+>   * __acpi_map_table() will be called before paging_init(), so early_iore=
+map()
+>   * or early_memremap() should be called here to for ACPI table mapping.
+> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
+> index 9fb839074e16..a44c7fcde12f 100644
+> --- a/arch/riscv/kernel/setup.c
+> +++ b/arch/riscv/kernel/setup.c
+> @@ -21,6 +21,7 @@
+>  #include <linux/efi.h>
+>  #include <linux/crash_dump.h>
+> =20
+> +#include <asm/acpi.h>
+>  #include <asm/alternative.h>
+>  #include <asm/cacheflush.h>
+>  #include <asm/cpu_ops.h>
+> @@ -293,6 +294,9 @@ void __init setup_arch(char **cmdline_p)
+>  	setup_smp();
+>  #endif
+> =20
+> +	if (!acpi_disabled)
+> +		acpi_init_rintc_map();
+> +
+>  	riscv_init_cbo_blocksizes();
+>  	riscv_fill_hwcap();
+>  	apply_boot_alternatives();
+> --=20
+> 2.34.1
+>=20
 
-Need to be changed to 6.5.0 now:)
+--VyG74+KZvewY8TZ5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-After fixing the KernelVersion,
+-----BEGIN PGP SIGNATURE-----
 
-Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZFqHzwAKCRB4tDGHoIJi
+0vwIAP42h0wsHOgAHQ3WyuVw8G1XFBezccQwODC76RxofaL0TAEA+V+4IuPaUdHr
+5H2An4OZhjeskB4ClsRk3M+rqDqMXAc=
+=OVlw
+-----END PGP SIGNATURE-----
 
-Thanks.
-
--Fenghua
+--VyG74+KZvewY8TZ5--
