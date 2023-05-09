@@ -2,241 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E0CC77B7C
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 17:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B75EC7EE22
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 18:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234437AbjEIRuS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 May 2023 13:50:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52928 "EHLO
+        id S233513AbjEISRf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 May 2023 14:17:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234364AbjEIRuS (ORCPT
+        with ESMTP id S230078AbjEISRe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 May 2023 13:50:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74FF3C3A;
-        Tue,  9 May 2023 10:50:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5671E62B20;
-        Tue,  9 May 2023 17:50:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C601C433EF;
-        Tue,  9 May 2023 17:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683654615;
-        bh=rVSz+Tb3H1/HHESESFxVFjW2CxxTsz7vH2xOqzNlQXc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SWUmzHG8xFjWpRkUn7jxvkUG21EZyVRmvIHAfaVcDHRGM9jMRutvis8vhLLUy4O6s
-         TNfr8CkW+0xFnginSyEkOvFBFvpfOmfhA5nD3ARTrQ70JeNf4ZdFCI5HaO0KOLYccW
-         vQdtgGdmg/tQ5H63l/yZA/IRiWefyI99JD7UG/jkDkK98gs8oeXFAAGuZ3x/WUQl08
-         dJVCQI52RgYMOfw8/KVYJ1KtUhhMWuPE0OU99QGXVBQFCtLEJXKyVpOEh03tYK0nnO
-         JOdA+2jhGLcjwX9OUN+wPeWnGy/ROl2o4urTxQBEOvfJ3/SX8Fmf+xvybwL/5Cz17z
-         qRmXV8na65m5w==
-Date:   Tue, 9 May 2023 18:50:07 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Sunil V L <sunilvl@ventanamicro.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        llvm@lists.linux.dev, Jonathan Corbet <corbet@lwn.net>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Marc Zyngier <maz@kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mark Gross <markgross@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH V5 08/21] RISC-V: ACPI: Cache and retrieve the RINTC
- structure
-Message-ID: <20230509-atlantic-writing-3ceea38e050e@spud>
-References: <20230508115237.216337-1-sunilvl@ventanamicro.com>
- <20230508115237.216337-9-sunilvl@ventanamicro.com>
+        Tue, 9 May 2023 14:17:34 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F1BE56;
+        Tue,  9 May 2023 11:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683656254; x=1715192254;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=+zof/M4BrnkXcaqZnvlv0ayjo/OkY4a8oPbzI+2bvgw=;
+  b=UDTMJIWGf1W1UyvCQljrRYawh5S2hiaz+TBGHbi66PHzYnEANYs2hH6F
+   6xaEiQTkOndGuWl66DXX2hAdb5lyHl2J6gI9Xvvf5yfZUAObH6TtPGOW0
+   3d7dPXWPzeL7idk3oI0vxxxNOP9ES01Lj9EHPmifFBdIy8Qz4mNhkKz5P
+   r3hH05KSFvC50tO4F7jW0a57icCOtae+lM/Pmd5VnNGua7QEbTuCV882F
+   0voERed0oS3stzmnrCQExRIi/oi5hdb1xX6TTpgt1sGc0J3uS5nuASgWl
+   s605rWXhK1dm3OiUOzZr2+QBKo0mZGAT3HhnYNCHe5PHYzcPBw0WU128z
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="348848993"
+X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
+   d="scan'208";a="348848993"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 11:17:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="763958071"
+X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
+   d="scan'208";a="763958071"
+Received: from acyuen-mobl4.amr.corp.intel.com ([10.212.1.251])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 11:17:30 -0700
+Message-ID: <16d1abf15c99929c794f32d750b358d1c0981c18.camel@linux.intel.com>
+Subject: Re: [PATCH v4 01/15] dmaengine: idxd: add wq driver name support
+ for accel-config user tool
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     Fenghua Yu <fenghua.yu@intel.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, vkoul@kernel.org
+Cc:     dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org
+Date:   Tue, 09 May 2023 13:17:29 -0500
+In-Reply-To: <d9bad7c2-14d7-7f06-da50-81069853babd@intel.com>
+References: <cover.1683573703.git.zanussi@kernel.org>
+         <a874741f266f57502d671843b9d4a9b563c372e3.1683573703.git.zanussi@kernel.org>
+         <d9bad7c2-14d7-7f06-da50-81069853babd@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.44.1-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="VyG74+KZvewY8TZ5"
-Content-Disposition: inline
-In-Reply-To: <20230508115237.216337-9-sunilvl@ventanamicro.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+T24gVHVlLCAyMDIzLTA1LTA5IGF0IDEwOjQ4IC0wNzAwLCBGZW5naHVhIFl1IHdyb3RlOgo+IEhp
+LCBUb20sCj4gCj4gT24gNS84LzIzIDEzOjA3LCBUb20gWmFudXNzaSB3cm90ZToKPiA+IEZyb206
+IERhdmUgSmlhbmcgPGRhdmUuamlhbmdAaW50ZWwuY29tPgo+ID4gCj4gPiBXaXRoIHRoZSBwb3Nz
+aWJpbGl0eSBvZiBtdWx0aXBsZSB3cSBkcml2ZXJzIHRoYXQgY2FuIGJlIGJvdW5kIHRvCj4gPiB0
+aGUgd3EsCj4gPiB0aGUgdXNlciBjb25maWcgdG9vbCBhY2NlbC1jb25maWcgbmVlZHMgYSB3YXkg
+dG8ga25vdyB3aGljaCB3cQo+ID4gZHJpdmVyIHRvCj4gPiBiaW5kIHRvIHRoZSB3cS4gSW50cm9k
+dWNlIHBlciB3cSBkcml2ZXJfbmFtZSBzeXNmcyBhdHRyaWJ1dGUgd2hlcmUKPiA+IHRoZSB1c2Vy
+Cj4gPiBjYW4gaW5kaWNhdGUgdGhlIGRyaXZlciB0byBiZSBib3VuZCB0byB0aGUgd3EuIFRoaXMg
+YWxsb3dzIGFjY2VsLQo+ID4gY29uZmlnIHRvCj4gPiBqdXN0IGJpbmQgdG8gdGhlIGRyaXZlciB1
+c2luZyB3cS0+ZHJpdmVyX25hbWUuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IERhdmUgSmlhbmcg
+PGRhdmUuamlhbmdAaW50ZWwuY29tPgo+ID4gU2lnbmVkLW9mZi1ieTogVG9tIFphbnVzc2kgPHRv
+bS56YW51c3NpQGxpbnV4LmludGVsLmNvbT4KPiA+IC0tLQo+ID4gwqAgLi4uL0FCSS9zdGFibGUv
+c3lzZnMtZHJpdmVyLWRtYS1pZHhkwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA2ICsrKysKPiA+IMKg
+IGRyaXZlcnMvZG1hL2lkeGQvY2Rldi5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgfMKgIDggKysrKysrCj4gPiDCoCBkcml2ZXJzL2RtYS9pZHhkL2RtYS5jwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNiArKysrCj4g
+PiDCoCBkcml2ZXJzL2RtYS9pZHhkL2lkeGQuaMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHzCoCA5ICsrKysrKwo+ID4gwqAgZHJpdmVycy9kbWEvaWR4ZC9zeXNm
+cy5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjgKPiA+ICsr
+KysrKysrKysrKysrKysrKysKPiA+IMKgIGluY2x1ZGUvdWFwaS9saW51eC9pZHhkLmjCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxICsKPiA+IMKgIDYgZmlsZXMg
+Y2hhbmdlZCwgNTggaW5zZXJ0aW9ucygrKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvRG9jdW1lbnRh
+dGlvbi9BQkkvc3RhYmxlL3N5c2ZzLWRyaXZlci1kbWEtaWR4ZAo+ID4gYi9Eb2N1bWVudGF0aW9u
+L0FCSS9zdGFibGUvc3lzZnMtZHJpdmVyLWRtYS1pZHhkCj4gPiBpbmRleCAzYmVjYzlhODJiZGYu
+LmQ1ZGFhZTQ0MmZlNyAxMDA2NDQKPiA+IC0tLSBhL0RvY3VtZW50YXRpb24vQUJJL3N0YWJsZS9z
+eXNmcy1kcml2ZXItZG1hLWlkeGQKPiA+ICsrKyBiL0RvY3VtZW50YXRpb24vQUJJL3N0YWJsZS9z
+eXNmcy1kcml2ZXItZG1hLWlkeGQKPiA+IEBAIC0yNDQsNiArMjQ0LDEyIEBAIERlc2NyaXB0aW9u
+OsKgwqDCoMKgwqDCoMKgU2hvd3MgdGhlIG9wZXJhdGlvbgo+ID4gY2FwYWJpbGl0eSBiaXRzIGRp
+c3BsYXllZCBpbiBiaXRtYXAgZm9ybWF0Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoGNvcnJlbGF0ZXMgdG8gdGhlIG9wZXJhdGlvbnMgYWxsb3dlZC4gSXQncyB2aXNpYmxlCj4g
+PiBvbmx5Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG9uIHBsYXRmb3JtcyB0
+aGF0IHN1cHBvcnQgdGhlIGNhcGFiaWxpdHkuCj4gPiDCoCAKPiA+ICtXaGF0OsKgwqDCoMKgwqDC
+oMKgwqDCoMKgL3N5cy9idXMvZHNhL2RldmljZXMvd3E8bT4uPG4+L2RyaXZlcl9uYW1lCj4gPiAr
+RGF0ZTrCoMKgwqDCoMKgwqDCoMKgwqDCoE1hciAyNywgMjAyMyA+ICtLZXJuZWxWZXJzaW9uOsKg
+wqA2LjQuMAo+IAo+IE5lZWQgdG8gYmUgY2hhbmdlZCB0byA2LjUuMCBub3c6KQoKWWVzLCB3aWxs
+IGNoYW5nZS4KCj4gCj4gQWZ0ZXIgZml4aW5nIHRoZSBLZXJuZWxWZXJzaW9uLAo+IAo+IFJldmll
+d2VkLWJ5OiBGZW5naHVhIFl1IDxmZW5naHVhLnl1QGludGVsLmNvbT4KPiAKClRoYW5rcyBmb3Ig
+eW91ciByZXZpZXcocykuCgpUb20KCj4gVGhhbmtzLgo+IAo+IC1GZW5naHVhCgo=
 
---VyG74+KZvewY8TZ5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hey Sunil,
-
-On Mon, May 08, 2023 at 05:22:24PM +0530, Sunil V L wrote:
-> RINTC structures in the MADT provide mapping between the hartid
-> and the CPU. This is required many times even at run time like
-> cpuinfo. So, instead of parsing the ACPI table every time, cache
-> the RINTC structures and provide a function to get the correct
-> RINTC structure for a given cpu.
->=20
-> Signed-off-by: Sunil V L <sunilvl@ventanamicro.com>
-> Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-
-=46rom this patch until "RISC-V: Add ACPI initialization in
-setup_arch()" (which is 19/21), the series fails to build.
-
-allmodconfig, clang-16:
-=2E./arch/riscv/include/asm/acpi.h:22:23: error: unknown type name 'acpi_ph=
-ysical_address'; did you mean 'efi_physical_addr_t'?
-=2E./arch/riscv/include/asm/acpi.h:22:51: error: unknown type name 'acpi_si=
-ze'
-
-rv32_defconfig, clang-16:
-arch/riscv/kernel/setup.c:297:7: error: use of undeclared identifier 'acpi_=
-disabled'; did you mean '__cpu_disable'?
-arch/riscv/kernel/setup.c:297:7: warning: address of function '__cpu_disabl=
-e' will always evaluate to 'true' [-Wpointer-bool-conversion]
-
-I ballsed up a toolchain upgrade to gcc-13, so the whole series is
-showing build issues on patchwork for the gcc configurations:
-https://patchwork.kernel.org/project/linux-riscv/list/?series=3D745787
-
-However, I suspect that the same patches that fail for clang-16 will
-fail for gcc-13 too, once I have fixed that!
-
-Cheers,
-Conor.
-
-> ---
->  arch/riscv/include/asm/acpi.h | 10 ++++++++
->  arch/riscv/kernel/acpi.c      | 45 +++++++++++++++++++++++++++++++++++
->  arch/riscv/kernel/setup.c     |  4 ++++
->  3 files changed, 59 insertions(+)
->=20
-> diff --git a/arch/riscv/include/asm/acpi.h b/arch/riscv/include/asm/acpi.h
-> index 9be52b6ffae1..6519529c8bdf 100644
-> --- a/arch/riscv/include/asm/acpi.h
-> +++ b/arch/riscv/include/asm/acpi.h
-> @@ -59,6 +59,16 @@ static inline bool acpi_has_cpu_in_madt(void)
-> =20
->  static inline void arch_fix_phys_package_id(int num, u32 slot) { }
-> =20
-> +void acpi_init_rintc_map(void);
-> +struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu);
-> +u32 get_acpi_id_for_cpu(int cpu);
-> +#else
-> +static inline void acpi_init_rintc_map(void) { }
-> +static inline struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu)
-> +{
-> +	return NULL;
-> +}
-> +
->  #endif /* CONFIG_ACPI */
-> =20
->  #endif /*_ASM_ACPI_H*/
-> diff --git a/arch/riscv/kernel/acpi.c b/arch/riscv/kernel/acpi.c
-> index 81d448c41714..89e142611c84 100644
-> --- a/arch/riscv/kernel/acpi.c
-> +++ b/arch/riscv/kernel/acpi.c
-> @@ -24,6 +24,51 @@ EXPORT_SYMBOL(acpi_disabled);
->  int acpi_pci_disabled =3D 1;	/* skip ACPI PCI scan and IRQ initializatio=
-n */
->  EXPORT_SYMBOL(acpi_pci_disabled);
-> =20
-> +static struct acpi_madt_rintc cpu_madt_rintc[NR_CPUS];
-> +
-> +static int acpi_parse_madt_rintc(union acpi_subtable_headers *header, co=
-nst unsigned long end)
-> +{
-> +	struct acpi_madt_rintc *rintc =3D (struct acpi_madt_rintc *)header;
-> +	int cpuid;
-> +
-> +	if (!(rintc->flags & ACPI_MADT_ENABLED))
-> +		return 0;
-> +
-> +	cpuid =3D riscv_hartid_to_cpuid(rintc->hart_id);
-> +	/*
-> +	 * When CONFIG_SMP is disabled, mapping won't be created for
-> +	 * all cpus.
-> +	 * CPUs more than num_possible_cpus, will be ignored.
-> +	 */
-> +	if (cpuid >=3D 0 && cpuid < num_possible_cpus())
-> +		cpu_madt_rintc[cpuid] =3D *rintc;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Instead of parsing (and freeing) the ACPI table, cache
-> + * the RINTC structures since they are frequently used
-> + * like in  cpuinfo.
-> + */
-> +void __init acpi_init_rintc_map(void)
-> +{
-> +	if (acpi_table_parse_madt(ACPI_MADT_TYPE_RINTC, acpi_parse_madt_rintc, =
-0) <=3D 0) {
-> +		pr_err("No valid RINTC entries exist\n");
-> +		BUG();
-> +	}
-> +}
-> +
-> +struct acpi_madt_rintc *acpi_cpu_get_madt_rintc(int cpu)
-> +{
-> +	return &cpu_madt_rintc[cpu];
-> +}
-> +
-> +u32 get_acpi_id_for_cpu(int cpu)
-> +{
-> +	return acpi_cpu_get_madt_rintc(cpu)->uid;
-> +}
-> +
->  /*
->   * __acpi_map_table() will be called before paging_init(), so early_iore=
-map()
->   * or early_memremap() should be called here to for ACPI table mapping.
-> diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
-> index 9fb839074e16..a44c7fcde12f 100644
-> --- a/arch/riscv/kernel/setup.c
-> +++ b/arch/riscv/kernel/setup.c
-> @@ -21,6 +21,7 @@
->  #include <linux/efi.h>
->  #include <linux/crash_dump.h>
-> =20
-> +#include <asm/acpi.h>
->  #include <asm/alternative.h>
->  #include <asm/cacheflush.h>
->  #include <asm/cpu_ops.h>
-> @@ -293,6 +294,9 @@ void __init setup_arch(char **cmdline_p)
->  	setup_smp();
->  #endif
-> =20
-> +	if (!acpi_disabled)
-> +		acpi_init_rintc_map();
-> +
->  	riscv_init_cbo_blocksizes();
->  	riscv_fill_hwcap();
->  	apply_boot_alternatives();
-> --=20
-> 2.34.1
->=20
-
---VyG74+KZvewY8TZ5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZFqHzwAKCRB4tDGHoIJi
-0vwIAP42h0wsHOgAHQ3WyuVw8G1XFBezccQwODC76RxofaL0TAEA+V+4IuPaUdHr
-5H2An4OZhjeskB4ClsRk3M+rqDqMXAc=
-=OVlw
------END PGP SIGNATURE-----
-
---VyG74+KZvewY8TZ5--
