@@ -2,103 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B75EC7EE22
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 May 2023 18:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 069A0C7EE26
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 May 2023 01:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233513AbjEISRf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 May 2023 14:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44136 "EHLO
+        id S235263AbjEJBVs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 9 May 2023 21:21:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230078AbjEISRe (ORCPT
+        with ESMTP id S231468AbjEJBVs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 May 2023 14:17:34 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F1BE56;
-        Tue,  9 May 2023 11:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683656254; x=1715192254;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=+zof/M4BrnkXcaqZnvlv0ayjo/OkY4a8oPbzI+2bvgw=;
-  b=UDTMJIWGf1W1UyvCQljrRYawh5S2hiaz+TBGHbi66PHzYnEANYs2hH6F
-   6xaEiQTkOndGuWl66DXX2hAdb5lyHl2J6gI9Xvvf5yfZUAObH6TtPGOW0
-   3d7dPXWPzeL7idk3oI0vxxxNOP9ES01Lj9EHPmifFBdIy8Qz4mNhkKz5P
-   r3hH05KSFvC50tO4F7jW0a57icCOtae+lM/Pmd5VnNGua7QEbTuCV882F
-   0voERed0oS3stzmnrCQExRIi/oi5hdb1xX6TTpgt1sGc0J3uS5nuASgWl
-   s605rWXhK1dm3OiUOzZr2+QBKo0mZGAT3HhnYNCHe5PHYzcPBw0WU128z
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="348848993"
-X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
-   d="scan'208";a="348848993"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 11:17:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="763958071"
-X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
-   d="scan'208";a="763958071"
-Received: from acyuen-mobl4.amr.corp.intel.com ([10.212.1.251])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 11:17:30 -0700
-Message-ID: <16d1abf15c99929c794f32d750b358d1c0981c18.camel@linux.intel.com>
-Subject: Re: [PATCH v4 01/15] dmaengine: idxd: add wq driver name support
- for accel-config user tool
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Fenghua Yu <fenghua.yu@intel.com>, herbert@gondor.apana.org.au,
-        davem@davemloft.net, vkoul@kernel.org
-Cc:     dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org
-Date:   Tue, 09 May 2023 13:17:29 -0500
-In-Reply-To: <d9bad7c2-14d7-7f06-da50-81069853babd@intel.com>
-References: <cover.1683573703.git.zanussi@kernel.org>
-         <a874741f266f57502d671843b9d4a9b563c372e3.1683573703.git.zanussi@kernel.org>
-         <d9bad7c2-14d7-7f06-da50-81069853babd@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.1-0ubuntu1 
+        Tue, 9 May 2023 21:21:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C29F211B;
+        Tue,  9 May 2023 18:21:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 17658616DA;
+        Wed, 10 May 2023 01:21:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F214DC433EF;
+        Wed, 10 May 2023 01:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683681706;
+        bh=T+hNUKAHDe9/ZAR53PM2iZM4RaBimliyI1btNF2Jf4k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WoPGVpnQuUFTlGuKZx2LN+aJQD2+DlIT5gCBC8mO4wyKgGinDHp4aovWaFaYexlKU
+         Y6jnJsD/RGrgxlVqUKFSThnxS4m/bVDvO/cCrR6BFvcypk77gTyAydbmojrnFC/nPy
+         wJzQQ6+mHSe0ggabvV7VKj7YdoFe2TkDI4Pt/oS43WyHFDtzqUp7//ER40IjBXvBgb
+         eg0arAk5eTxvrnprmSO5QzZoHAs8wmVeCwtywD5ubsINReU32BkJZpg0UxCkGn99Z7
+         11LRF/RhTZyO+rgagdAYPyMQygKom5LEW09j7fEMpSq2+s+V4f+YMyyQSbHBDvg0B2
+         h+ZlBQRySDMAQ==
+Date:   Tue, 9 May 2023 18:21:44 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ross Philipson <ross.philipson@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
+        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
+        trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v6 06/14] x86: Add early SHA support for Secure Launch
+ early measurements
+Message-ID: <20230510012144.GA1851@quark.localdomain>
+References: <20230504145023.835096-1-ross.philipson@oracle.com>
+ <20230504145023.835096-7-ross.philipson@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230504145023.835096-7-ross.philipson@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gVHVlLCAyMDIzLTA1LTA5IGF0IDEwOjQ4IC0wNzAwLCBGZW5naHVhIFl1IHdyb3RlOgo+IEhp
-LCBUb20sCj4gCj4gT24gNS84LzIzIDEzOjA3LCBUb20gWmFudXNzaSB3cm90ZToKPiA+IEZyb206
-IERhdmUgSmlhbmcgPGRhdmUuamlhbmdAaW50ZWwuY29tPgo+ID4gCj4gPiBXaXRoIHRoZSBwb3Nz
-aWJpbGl0eSBvZiBtdWx0aXBsZSB3cSBkcml2ZXJzIHRoYXQgY2FuIGJlIGJvdW5kIHRvCj4gPiB0
-aGUgd3EsCj4gPiB0aGUgdXNlciBjb25maWcgdG9vbCBhY2NlbC1jb25maWcgbmVlZHMgYSB3YXkg
-dG8ga25vdyB3aGljaCB3cQo+ID4gZHJpdmVyIHRvCj4gPiBiaW5kIHRvIHRoZSB3cS4gSW50cm9k
-dWNlIHBlciB3cSBkcml2ZXJfbmFtZSBzeXNmcyBhdHRyaWJ1dGUgd2hlcmUKPiA+IHRoZSB1c2Vy
-Cj4gPiBjYW4gaW5kaWNhdGUgdGhlIGRyaXZlciB0byBiZSBib3VuZCB0byB0aGUgd3EuIFRoaXMg
-YWxsb3dzIGFjY2VsLQo+ID4gY29uZmlnIHRvCj4gPiBqdXN0IGJpbmQgdG8gdGhlIGRyaXZlciB1
-c2luZyB3cS0+ZHJpdmVyX25hbWUuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IERhdmUgSmlhbmcg
-PGRhdmUuamlhbmdAaW50ZWwuY29tPgo+ID4gU2lnbmVkLW9mZi1ieTogVG9tIFphbnVzc2kgPHRv
-bS56YW51c3NpQGxpbnV4LmludGVsLmNvbT4KPiA+IC0tLQo+ID4gwqAgLi4uL0FCSS9zdGFibGUv
-c3lzZnMtZHJpdmVyLWRtYS1pZHhkwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA2ICsrKysKPiA+IMKg
-IGRyaXZlcnMvZG1hL2lkeGQvY2Rldi5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgfMKgIDggKysrKysrCj4gPiDCoCBkcml2ZXJzL2RtYS9pZHhkL2RtYS5jwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNiArKysrCj4g
-PiDCoCBkcml2ZXJzL2RtYS9pZHhkL2lkeGQuaMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIHzCoCA5ICsrKysrKwo+ID4gwqAgZHJpdmVycy9kbWEvaWR4ZC9zeXNm
-cy5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMjgKPiA+ICsr
-KysrKysrKysrKysrKysrKysKPiA+IMKgIGluY2x1ZGUvdWFwaS9saW51eC9pZHhkLmjCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCAxICsKPiA+IMKgIDYgZmlsZXMg
-Y2hhbmdlZCwgNTggaW5zZXJ0aW9ucygrKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvRG9jdW1lbnRh
-dGlvbi9BQkkvc3RhYmxlL3N5c2ZzLWRyaXZlci1kbWEtaWR4ZAo+ID4gYi9Eb2N1bWVudGF0aW9u
-L0FCSS9zdGFibGUvc3lzZnMtZHJpdmVyLWRtYS1pZHhkCj4gPiBpbmRleCAzYmVjYzlhODJiZGYu
-LmQ1ZGFhZTQ0MmZlNyAxMDA2NDQKPiA+IC0tLSBhL0RvY3VtZW50YXRpb24vQUJJL3N0YWJsZS9z
-eXNmcy1kcml2ZXItZG1hLWlkeGQKPiA+ICsrKyBiL0RvY3VtZW50YXRpb24vQUJJL3N0YWJsZS9z
-eXNmcy1kcml2ZXItZG1hLWlkeGQKPiA+IEBAIC0yNDQsNiArMjQ0LDEyIEBAIERlc2NyaXB0aW9u
-OsKgwqDCoMKgwqDCoMKgU2hvd3MgdGhlIG9wZXJhdGlvbgo+ID4gY2FwYWJpbGl0eSBiaXRzIGRp
-c3BsYXllZCBpbiBiaXRtYXAgZm9ybWF0Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoGNvcnJlbGF0ZXMgdG8gdGhlIG9wZXJhdGlvbnMgYWxsb3dlZC4gSXQncyB2aXNpYmxlCj4g
-PiBvbmx5Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoG9uIHBsYXRmb3JtcyB0
-aGF0IHN1cHBvcnQgdGhlIGNhcGFiaWxpdHkuCj4gPiDCoCAKPiA+ICtXaGF0OsKgwqDCoMKgwqDC
-oMKgwqDCoMKgL3N5cy9idXMvZHNhL2RldmljZXMvd3E8bT4uPG4+L2RyaXZlcl9uYW1lCj4gPiAr
-RGF0ZTrCoMKgwqDCoMKgwqDCoMKgwqDCoE1hciAyNywgMjAyMyA+ICtLZXJuZWxWZXJzaW9uOsKg
-wqA2LjQuMAo+IAo+IE5lZWQgdG8gYmUgY2hhbmdlZCB0byA2LjUuMCBub3c6KQoKWWVzLCB3aWxs
-IGNoYW5nZS4KCj4gCj4gQWZ0ZXIgZml4aW5nIHRoZSBLZXJuZWxWZXJzaW9uLAo+IAo+IFJldmll
-d2VkLWJ5OiBGZW5naHVhIFl1IDxmZW5naHVhLnl1QGludGVsLmNvbT4KPiAKClRoYW5rcyBmb3Ig
-eW91ciByZXZpZXcocykuCgpUb20KCj4gVGhhbmtzLgo+IAo+IC1GZW5naHVhCgo=
+On Thu, May 04, 2023 at 02:50:15PM +0000, Ross Philipson wrote:
+> From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+> 
+> The SHA algorithms are necessary to measure configuration information into
+> the TPM as early as possible before using the values. This implementation
+> uses the established approach of #including the SHA libraries directly in
+> the code since the compressed kernel is not uncompressed at this point.
+> 
+> The SHA code here has its origins in the code from the main kernel:
+> 
+> commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
+> 
+> That code could not be pulled directly into the setup portion of the
+> compressed kernel because of other dependencies it pulls in. The result
+> is this is a modified copy of that code that still leverages the core
+> SHA algorithms.
+> 
+> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 
+SHA-1 is insecure.  Why are you still using SHA-1?  Don't TPMs support SHA-2
+now?
+
+And if you absolutely MUST use SHA-1 despite it being insecure, please at least
+don't obfuscate it by calling it simply "SHA".
+
+- Eric
