@@ -2,133 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED32C7EE22
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 03:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0087BC77B7D
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 03:44:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230520AbjEKDed (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 May 2023 23:34:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39198 "EHLO
+        id S230316AbjEKDol (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 May 2023 23:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjEKDec (ORCPT
+        with ESMTP id S230205AbjEKDok (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2023 23:34:32 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A682D64;
-        Wed, 10 May 2023 20:34:28 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pwx3z-007Ytd-Ii; Thu, 11 May 2023 11:33:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 May 2023 11:33:56 +0800
-Date:   Thu, 11 May 2023 11:33:56 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ross Philipson <ross.philipson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        ross.philipson@oracle.com, dpsmith@apertussolutions.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        ardb@kernel.org, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
-        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
-        trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v6 06/14] x86: Add early SHA support for Secure Launch
- early measurements
-Message-ID: <ZFxiJF373HCwZLKE@gondor.apana.org.au>
+        Wed, 10 May 2023 23:44:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF8E30FB;
+        Wed, 10 May 2023 20:44:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1730B64160;
+        Thu, 11 May 2023 03:44:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD1A6C433EF;
+        Thu, 11 May 2023 03:44:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1683776678;
+        bh=0znUxwXk2K0JJbiEiLhhTK64Sd0XVZz9CaoB7WaSTOQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Sk8439F0iNdydOVyHAr9ets543Vgaznl/4yqDjkXoVux9ZjftvyQTZKHy/3L7kEoV
+         OGbQmqdKeom9HSU1lSxUVe+c4t8x2H7VtWNr+/CSk1hjtrzqE/JMN8SQEH9HlRDGaC
+         UgfyfVLeoAhSW7y0DKufd0mGLED6PyZ5cwOPuEgk=
+Date:   Thu, 11 May 2023 12:44:32 +0900
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Wangzhou <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux.dev, acc@lists.linaro.org,
+        Weili Qian <qianweili@huawei.com>
+Subject: Re: [PATCH] uacce: use filep->f_mapping to replace inode->i_mapping
+Message-ID: <2023051110-jelly-barricade-d737@gregkh>
+References: <20230511021553.44318-1-zhangfei.gao@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230504145023.835096-7-ross.philipson@oracle.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.doc,apana.lists.os.linux.kernel
+In-Reply-To: <20230511021553.44318-1-zhangfei.gao@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ross Philipson <ross.philipson@oracle.com> wrote:
->
-> +static void __sha_transform(u32 *digest, const char *data)
-> +{
-> +       u32 ws[SHA1_WORKSPACE_WORDS];
+On Thu, May 11, 2023 at 10:15:53AM +0800, Zhangfei Gao wrote:
+> The inode can be different in a container, for example, a docker and host
+> both open the same uacce parent device, which uses the same uacce struct
+> but different inode, so uacce->inode is not enough.
+> 
+> What's worse, when docker stops, the inode will be destroyed as well,
+> causing use-after-free in uacce_remove.
+> 
+> So use q->filep->f_mapping to replace uacce->inode->i_mapping.
+> 
+> Signed-off-by: Weili Qian <qianweili@huawei.com>
+> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+> ---
+>  drivers/misc/uacce/uacce.c | 16 +++++++++-------
+>  include/linux/uacce.h      |  4 ++--
+>  2 files changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+> index 346bd7cf2e94..740ace422baa 100644
+> --- a/drivers/misc/uacce/uacce.c
+> +++ b/drivers/misc/uacce/uacce.c
+> @@ -166,8 +166,8 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+>  
+>  	init_waitqueue_head(&q->wait);
+>  	filep->private_data = q;
+> -	uacce->inode = inode;
+>  	q->state = UACCE_Q_INIT;
+> +	q->private_data = filep;
+>  	mutex_init(&q->mutex);
+>  	list_add(&q->list, &uacce->queues);
+>  	mutex_unlock(&uacce->mutex);
+> @@ -574,12 +574,6 @@ void uacce_remove(struct uacce_device *uacce)
+>  
+>  	if (!uacce)
+>  		return;
+> -	/*
+> -	 * unmap remaining mapping from user space, preventing user still
+> -	 * access the mmaped area while parent device is already removed
+> -	 */
+> -	if (uacce->inode)
+> -		unmap_mapping_range(uacce->inode->i_mapping, 0, 0, 1);
+>  
+>  	/*
+>  	 * uacce_fops_open() may be running concurrently, even after we remove
+> @@ -589,6 +583,8 @@ void uacce_remove(struct uacce_device *uacce)
+>  	mutex_lock(&uacce->mutex);
+>  	/* ensure no open queue remains */
+>  	list_for_each_entry_safe(q, next_q, &uacce->queues, list) {
+> +		struct file *filep = q->private_data;
 > +
-> +       sha1_transform(digest, data, ws);
+>  		/*
+>  		 * Taking q->mutex ensures that fops do not use the defunct
+>  		 * uacce->ops after the queue is disabled.
+> @@ -597,6 +593,12 @@ void uacce_remove(struct uacce_device *uacce)
+>  		uacce_put_queue(q);
+>  		mutex_unlock(&q->mutex);
+>  		uacce_unbind_queue(q);
 > +
-> +       memzero_explicit(ws, sizeof(ws));
-> +}
-> +
-> +void early_sha1_init(struct sha1_state *sctx)
-> +{
-> +       sha1_init(sctx->state);
-> +       sctx->count = 0;
-> +}
-> +
-> +void early_sha1_update(struct sha1_state *sctx,
-> +                      const u8 *data,
-> +                      unsigned int len)
-> +{
-> +       unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
-> +
-> +       sctx->count += len;
-> +
-> +       if (likely((partial + len) >= SHA1_BLOCK_SIZE)) {
-> +               int blocks;
-> +
-> +               if (partial) {
-> +                       int p = SHA1_BLOCK_SIZE - partial;
-> +
-> +                       memcpy(sctx->buffer + partial, data, p);
-> +                       data += p;
-> +                       len -= p;
-> +
-> +                       __sha_transform(sctx->state, sctx->buffer);
-> +               }
-> +
-> +               blocks = len / SHA1_BLOCK_SIZE;
-> +               len %= SHA1_BLOCK_SIZE;
-> +
-> +               if (blocks) {
-> +                       while (blocks--) {
-> +                               __sha_transform(sctx->state, data);
-> +                               data += SHA1_BLOCK_SIZE;
-> +                       }
-> +               }
-> +               partial = 0;
-> +       }
-> +
-> +       if (len)
-> +               memcpy(sctx->buffer + partial, data, len);
-> +}
-> +
-> +void early_sha1_final(struct sha1_state *sctx, u8 *out)
-> +{
-> +       const int bit_offset = SHA1_BLOCK_SIZE - sizeof(__be64);
-> +       unsigned int partial = sctx->count % SHA1_BLOCK_SIZE;
-> +       __be64 *bits = (__be64 *)(sctx->buffer + bit_offset);
-> +       __be32 *digest = (__be32 *)out;
-> +       int i;
-> +
-> +       sctx->buffer[partial++] = 0x80;
-> +       if (partial > bit_offset) {
-> +               memset(sctx->buffer + partial, 0x0, SHA1_BLOCK_SIZE - partial);
-> +               partial = 0;
-> +
-> +               __sha_transform(sctx->state, sctx->buffer);
-> +       }
-> +
-> +       memset(sctx->buffer + partial, 0x0, bit_offset - partial);
-> +       *bits = cpu_to_be64(sctx->count << 3);
-> +       __sha_transform(sctx->state, sctx->buffer);
-> +
-> +       for (i = 0; i < SHA1_DIGEST_SIZE / sizeof(__be32); i++)
-> +               put_unaligned_be32(sctx->state[i], digest++);
-> +
-> +       *sctx = (struct sha1_state){};
-> +}
+> +		/*
+> +		 * unmap remaining mapping from user space, preventing user still
+> +		 * access the mmaped area while parent device is already removed
+> +		 */
+> +		unmap_mapping_range(filep->f_mapping, 0, 0, 1);
+>  	}
+>  
+>  	/* disable sva now since no opened queues */
+> diff --git a/include/linux/uacce.h b/include/linux/uacce.h
+> index 0a81c3dfd26c..64b800b74436 100644
+> --- a/include/linux/uacce.h
+> +++ b/include/linux/uacce.h
+> @@ -86,6 +86,7 @@ enum uacce_q_state {
+>   * @state: queue state machine
+>   * @pasid: pasid associated to the mm
+>   * @handle: iommu_sva handle returned by iommu_sva_bind_device()
+> + * @private_data: private data for saving filep
+>   */
+>  struct uacce_queue {
+>  	struct uacce_device *uacce;
+> @@ -97,6 +98,7 @@ struct uacce_queue {
+>  	enum uacce_q_state state;
+>  	u32 pasid;
+>  	struct iommu_sva *handle;
+> +	void *private_data;
 
-If we're going to add SHA1 then this should go into lib/crypto
-just like SHA2.
+Make this a real pointer to the inode, no need to make this "void *",
+right?
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+thanks,
+
+greg k-h
