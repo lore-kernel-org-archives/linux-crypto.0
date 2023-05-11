@@ -2,107 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030F2C77B7C
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 04:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22854C7EE22
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 04:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbjEKEFg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 May 2023 00:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
+        id S229799AbjEKE3o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 May 2023 00:29:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjEKEFe (ORCPT
+        with ESMTP id S236497AbjEKE3n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 May 2023 00:05:34 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949E23AA5;
-        Wed, 10 May 2023 21:05:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=es1hAOZEanSpUzrO4i+W99kSmiTSzzhtBMlo8JnwlYU=; b=XiM0jwFnKxFWGJpiCOPcZXBOTf
-        7Lff2nNv1b4BAaAzu2+8+Z6IL8XztnltccQ/JJuih56T1wL6PGmnGsDk5E0M2IhLX/LK07JbuLSIZ
-        7MeUi0RBKlVjXfF2dQ49aEOFQTTDRlx51zHwTVQTE5xRu4I0fDcigOhciITUn6bZwgzkWHvP5GDoh
-        2fdZoKkTwbsFp75btQY8vp64HMyDOb8xRvh6sSFXwAn6is5GoyjejZl85uiLUVi+kd01BW70CUhr5
-        tVCPkz/2NQ/hoG7jre3wotCKe/XGVrVJE/Z2HuYhiIxeH3PutobfBK7QQ7ocB4hd/asQ7TR+7XP1K
-        n3LuDq7A==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pwxYC-001apk-2B;
-        Thu, 11 May 2023 04:05:08 +0000
-Date:   Thu, 11 May 2023 05:05:08 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux.dev, acc@lists.linaro.org,
-        Weili Qian <qianweili@huawei.com>
-Subject: Re: [PATCH] uacce: use filep->f_mapping to replace inode->i_mapping
-Message-ID: <20230511040508.GF3390869@ZenIV>
-References: <20230511021553.44318-1-zhangfei.gao@linaro.org>
+        Thu, 11 May 2023 00:29:43 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6345F2708
+        for <linux-crypto@vger.kernel.org>; Wed, 10 May 2023 21:29:41 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pwxvr-007ZSC-G8; Thu, 11 May 2023 12:29:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 May 2023 12:29:36 +0800
+Date:   Thu, 11 May 2023 12:29:36 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: lib/sha256 - Remove redundant and unused
+ sha224_update
+Message-ID: <ZFxvMLICNQi8TMdl@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230511021553.44318-1-zhangfei.gao@linaro.org>
-Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 11, 2023 at 10:15:53AM +0800, Zhangfei Gao wrote:
-> The inode can be different in a container, for example, a docker and host
-> both open the same uacce parent device, which uses the same uacce struct
-> but different inode, so uacce->inode is not enough.
-> 
-> What's worse, when docker stops, the inode will be destroyed as well,
-> causing use-after-free in uacce_remove.
-> 
-> So use q->filep->f_mapping to replace uacce->inode->i_mapping.
+The function sha224_update is exactly the same as sha256_update.
+Moreover it's not even used in the kernel so it can be removed.
 
-> @@ -574,12 +574,6 @@ void uacce_remove(struct uacce_device *uacce)
->  
->  	if (!uacce)
->  		return;
-> -	/*
-> -	 * unmap remaining mapping from user space, preventing user still
-> -	 * access the mmaped area while parent device is already removed
-> -	 */
-> -	if (uacce->inode)
-> -		unmap_mapping_range(uacce->inode->i_mapping, 0, 0, 1);
->  
->  	/*
->  	 * uacce_fops_open() may be running concurrently, even after we remove
-> @@ -589,6 +583,8 @@ void uacce_remove(struct uacce_device *uacce)
->  	mutex_lock(&uacce->mutex);
->  	/* ensure no open queue remains */
->  	list_for_each_entry_safe(q, next_q, &uacce->queues, list) {
-> +		struct file *filep = q->private_data;
-> +
->  		/*
->  		 * Taking q->mutex ensures that fops do not use the defunct
->  		 * uacce->ops after the queue is disabled.
-> @@ -597,6 +593,12 @@ void uacce_remove(struct uacce_device *uacce)
->  		uacce_put_queue(q);
->  		mutex_unlock(&q->mutex);
->  		uacce_unbind_queue(q);
-> +
-> +		/*
-> +		 * unmap remaining mapping from user space, preventing user still
-> +		 * access the mmaped area while parent device is already removed
-> +		 */
-> +		unmap_mapping_range(filep->f_mapping, 0, 0, 1);
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-IDGI.  Going through uacce_queue instead of uacce_device is fine, but why
-bother with file *or* inode?  Just store a reference to struct address_space in
-your uacce_queue and be done with that...
+ include/crypto/sha2.h |    2 +-
+ lib/crypto/sha256.c   |    6 ------
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-Another problem in that driver is uacce_vma_close(); this
-        if (vma->vm_pgoff < UACCE_MAX_REGION)
-                qfr = q->qfrs[vma->vm_pgoff];
-
-        kfree(qfr);
-can't be right - you have q->qfrs left pointing to freed object.  If nothing
-else, subsequent mmap() will fail with -EEXIST, won't it?
+diff --git a/include/crypto/sha2.h b/include/crypto/sha2.h
+index 2838f529f31e..b9e9281d76c9 100644
+--- a/include/crypto/sha2.h
++++ b/include/crypto/sha2.h
+@@ -128,7 +128,7 @@ static inline void sha224_init(struct sha256_state *sctx)
+ 	sctx->state[7] = SHA224_H7;
+ 	sctx->count = 0;
+ }
+-void sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len);
++/* Simply use sha256_update as it is equivalent to sha224_update. */
+ void sha224_final(struct sha256_state *sctx, u8 *out);
+ 
+ #endif /* _CRYPTO_SHA2_H */
+diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+index 72a4b0b1df28..b32b6cc016a8 100644
+--- a/lib/crypto/sha256.c
++++ b/lib/crypto/sha256.c
+@@ -151,12 +151,6 @@ void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ }
+ EXPORT_SYMBOL(sha256_update);
+ 
+-void sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+-{
+-	sha256_update(sctx, data, len);
+-}
+-EXPORT_SYMBOL(sha224_update);
+-
+ static void __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+ {
+ 	__be32 *dst = (__be32 *)out;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
