@@ -2,112 +2,169 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D457C77B7F
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 10:00:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18442C7EE22
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 10:31:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237780AbjEKKAD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 May 2023 06:00:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45362 "EHLO
+        id S237826AbjEKKbn convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 May 2023 06:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237889AbjEKJ76 (ORCPT
+        with ESMTP id S237909AbjEKKbR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 May 2023 05:59:58 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08FB41FF3
-        for <linux-crypto@vger.kernel.org>; Thu, 11 May 2023 02:59:57 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-3077d134028so4759606f8f.3
-        for <linux-crypto@vger.kernel.org>; Thu, 11 May 2023 02:59:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683799195; x=1686391195;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7gMr5NOPVmuNsZ2AgAQsBS1s/tGTLr7USPVZEmTtLAM=;
-        b=P69Q7bzbfakRA/K9JgmDghQPAMnRpt0SCpQ7ZEumIPlKWL6gppMxmleXCq84NRDQec
-         L2leVzR/3FWZLsOj6Tl6Lex+dPFazIfbltuPkNdELguYK9TjZf/WA3SwYldnKNuD33cY
-         i6uyQL+VVn9SJjeCEw1kfc9ZC3MC3bElmvRDJRLebt/SEChGfGw+F+z5Xcf2FixWs+Xp
-         Sg7ShRary7Rz+qfF4Bwfz3G5Fgox00N/+dYFL+zNdz36daMbcPuLYtYVi8wEXEoFrAq3
-         tYrRDOVU9B+js8/ZnaxWh01dOtRU60ZLFi0ybj43WSF9n9IwXb3clh60dC0V+yh+OPsZ
-         m9fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683799195; x=1686391195;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7gMr5NOPVmuNsZ2AgAQsBS1s/tGTLr7USPVZEmTtLAM=;
-        b=k8LGHTmth72w/Fl3nUEkN7eUkhkn2LtkbHVPhempqvXGAEqB4nmmpfhJmLIt7vbK9L
-         fMkXB3FC9LlzxhalR3tvHGDXcYcxeINaWUNpdcUGy2rJIw0ewcMKDBwIFrDEWpPGl7aq
-         2FPcmEeKguK+oY87y7AZRXWWURCgfZUvahKwANI1KobTF1NgxkCpqb0sDcW/Xlo1KO4r
-         DnWQME91ARHvsR8KBrL63QLYUHj97dPBDQ3qGG1EuCfHvbX3M11CC4+1dCsXBL39meSF
-         BzLZ2hz8vEl//94lHjFtXK96GhkxzUTv5N0N60TpmIUO2aYVqddYWlx3OsIoEbb4pQOm
-         YDgA==
-X-Gm-Message-State: AC+VfDy1jhVrXdiOz1jbVWVlIN3qzkp5rGnFvMhxHTZpf0bZMH6G1ERt
-        SXaGF8s76MBrIS31U54PcP21lQ==
-X-Google-Smtp-Source: ACHHUZ4pzscXK11l7u6GlPD+PahTw1+974nMATdOD8dNFVVaDttsw1qXyCihSWf8jbDdM1+W/oZSLg==
-X-Received: by 2002:adf:d0c7:0:b0:306:372d:7891 with SMTP id z7-20020adfd0c7000000b00306372d7891mr14334874wrh.59.1683799195475;
-        Thu, 11 May 2023 02:59:55 -0700 (PDT)
-Received: from localhost.localdomain ([64.64.123.10])
-        by smtp.gmail.com with ESMTPSA id k9-20020a05600c1c8900b003f4283f5c1bsm12122791wms.2.2023.05.11.02.59.47
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 11 May 2023 02:59:55 -0700 (PDT)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux.dev, acc@lists.linaro.org,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [PATCH v2 2/2] uacce: vma_close clears q->qfrs when freeing qfrs
-Date:   Thu, 11 May 2023 17:59:21 +0800
-Message-Id: <20230511095921.9331-3-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
-In-Reply-To: <20230511095921.9331-1-zhangfei.gao@linaro.org>
-References: <20230511021553.44318-1-zhangfei.gao@linaro.org>
- <20230511095921.9331-1-zhangfei.gao@linaro.org>
+        Thu, 11 May 2023 06:31:17 -0400
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C571BAD34;
+        Thu, 11 May 2023 03:30:54 -0700 (PDT)
+Received: from ip5b412278.dynamic.kabel-deutschland.de ([91.65.34.120] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <heiko@sntech.de>)
+        id 1px3ZJ-0004sW-Uy; Thu, 11 May 2023 12:30:41 +0200
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, conor.dooley@microchip.com,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu
+Subject: Re: [PATCH v4 4/4] RISC-V: crypto: add accelerated GCM GHASH implementation
+Date:   Thu, 11 May 2023 12:30:41 +0200
+Message-ID: <3540048.LM0AJKV5NW@diego>
+In-Reply-To: <CAJkfWY63E7x-OQ2yTKJ03Sd7P2AuLruan_41EXzYcTZpNnLPzw@mail.gmail.com>
+References: <20230329140642.2186644-1-heiko.stuebner@vrull.eu>
+ <20230329140642.2186644-5-heiko.stuebner@vrull.eu>
+ <CAJkfWY63E7x-OQ2yTKJ03Sd7P2AuLruan_41EXzYcTZpNnLPzw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-vma_close frees qfrs but not clears q->qfrs, which still points
-to the freed object, leading to subsequent mmap fail.
-So vma_close clears q->qfrs as well.
+Hi Nathan,
 
-Suggested-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
----
- drivers/misc/uacce/uacce.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Am Dienstag, 11. April 2023, 17:00:00 CEST schrieb Nathan Huckleberry:
+> On Wed, Mar 29, 2023 at 7:08 AM Heiko Stuebner <heiko@sntech.de> wrote:
+> > +struct riscv64_ghash_ctx {
+> > +       void (*ghash_func)(u64 Xi[2], const u128 Htable[16],
+> > +                          const u8 *inp, size_t len);
+> > +
+> > +       /* key used by vector asm */
+> > +       u128 htable[16];
+> 
+> This field looks too big. The assembly only loads the first 128-byte
+> value from this table.
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index 338b59ef5493..930c252753a0 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -200,12 +200,15 @@ static int uacce_fops_release(struct inode *inode, struct file *filep)
- static void uacce_vma_close(struct vm_area_struct *vma)
- {
- 	struct uacce_queue *q = vma->vm_private_data;
--	struct uacce_qfile_region *qfr = NULL;
- 
--	if (vma->vm_pgoff < UACCE_MAX_REGION)
--		qfr = q->qfrs[vma->vm_pgoff];
-+	if (vma->vm_pgoff < UACCE_MAX_REGION) {
-+		struct uacce_qfile_region *qfr = q->qfrs[vma->vm_pgoff];
- 
--	kfree(qfr);
-+		mutex_lock(&q->mutex);
-+		q->qfrs[vma->vm_pgoff] = NULL;
-+		mutex_unlock(&q->mutex);
-+		kfree(qfr);
-+	}
- }
- 
- static const struct vm_operations_struct uacce_vm_ops = {
--- 
-2.39.2 (Apple Git-143)
+OpenSSL defines the Htable field handed to the init- and the other
+functions as this "u128 Htable[16]"    [0] . As I really like the concept
+of keeping in sync with openSSL, I guess I'd rather not change that.
+
+[0] https://github.com/openssl/openssl/blob/master/crypto/modes/gcm128.c#L88
+
+
+> Is this copied from another implementation? There's an optimization
+> where you precompute the first N powers of H so that you can perform 1
+> finite field reduction for every N multiplications, but it doesn't
+> look like that's being used here.
+
+The whole crypto-specific code comes from openSSL itself, so for now I
+guess I'd like to try keeping things the same.
+
+
+> > +#define RISCV64_ZBC_SETKEY(VARIANT, GHASH)                             \
+> > +void gcm_init_rv64i_ ## VARIANT(u128 Htable[16], const u64 Xi[2]);     \
+> > +static int riscv64_zbc_ghash_setkey_ ## VARIANT(struct crypto_shash *tfm,      \
+> > +                                          const u8 *key,               \
+> > +                                          unsigned int keylen)         \
+> > +{                                                                      \
+> > +       struct riscv64_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(tfm)); \
+> > +       const u64 k[2] = { cpu_to_be64(((const u64 *)key)[0]),          \
+> > +                          cpu_to_be64(((const u64 *)key)[1]) };        \
+> > +                                                                       \
+> > +       if (keylen != GHASH_BLOCK_SIZE)                                 \
+> > +               return -EINVAL;                                         \
+> > +                                                                       \
+> > +       memcpy(&ctx->key, key, GHASH_BLOCK_SIZE);                       \
+> > +       gcm_init_rv64i_ ## VARIANT(ctx->htable, k);                     \
+> > +                                                                       \
+> > +       ctx->ghash_func = gcm_ghash_rv64i_ ## GHASH;                    \
+> > +                                                                       \
+> > +       return 0;                                                       \
+> > +}
+> 
+> I'd prefer three identical functions over a macro here. Code searching
+> tools and compiler warnings are significantly worse with macros.
+
+done :-)
+
+
+> > +
+> > +static int riscv64_zbc_ghash_update(struct shash_desc *desc,
+> > +                          const u8 *src, unsigned int srclen)
+> > +{
+> > +       unsigned int len;
+> > +       struct riscv64_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
+> > +       struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
+> > +
+> > +       if (dctx->bytes) {
+> > +               if (dctx->bytes + srclen < GHASH_DIGEST_SIZE) {
+> > +                       memcpy(dctx->buffer + dctx->bytes, src,
+> > +                               srclen);
+> > +                       dctx->bytes += srclen;
+> > +                       return 0;
+> > +               }
+> > +               memcpy(dctx->buffer + dctx->bytes, src,
+> > +                       GHASH_DIGEST_SIZE - dctx->bytes);
+> > +
+> > +               ctx->ghash_func(dctx->shash, ctx->htable,
+> > +                               dctx->buffer, GHASH_DIGEST_SIZE);
+> > +
+> > +               src += GHASH_DIGEST_SIZE - dctx->bytes;
+> > +               srclen -= GHASH_DIGEST_SIZE - dctx->bytes;
+> > +               dctx->bytes = 0;
+> > +       }
+> > +       len = srclen & ~(GHASH_DIGEST_SIZE - 1);
+> > +
+> > +       if (len) {
+> > +               gcm_ghash_rv64i_zbc(dctx->shash, ctx->htable,
+> > +                               src, len);
+> > +               src += len;
+> > +               srclen -= len;
+> > +       }
+> > +
+> > +       if (srclen) {
+> > +               memcpy(dctx->buffer, src, srclen);
+> > +               dctx->bytes = srclen;
+> > +       }
+> > +       return 0;
+> > +}
+> > +
+> > +static int riscv64_zbc_ghash_final(struct shash_desc *desc, u8 *out)
+> > +{
+> > +       int i;
+> > +       struct riscv64_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
+> > +       struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
+> > +
+> > +       if (dctx->bytes) {
+> > +               for (i = dctx->bytes; i < GHASH_DIGEST_SIZE; i++)
+> > +                       dctx->buffer[i] = 0;
+> > +               ctx->ghash_func(dctx->shash, ctx->htable,
+> > +                               dctx->buffer, GHASH_DIGEST_SIZE);
+> 
+> Can we do this without an indirect call?
+
+hmm, the indirect call is in both riscv64_zbc_ghash_update() and
+riscv64_zbc_ghash_final() . And I found a missing one at the bottom
+of riscv64_zbc_ghash_update(), where gcm_ghash_rv64i_zbc() is
+called right now.
+
+Getting rid of the indirect call would mean duplicating both of these
+functions for all instances. Especially with the slightly higher
+complexity of the update this somehow seems not the best way to go.
+
+
+Thanks for your pointers
+Heiko
+
 
