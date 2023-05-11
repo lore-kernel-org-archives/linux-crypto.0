@@ -2,138 +2,175 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCB1C7EE25
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 May 2023 23:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB541C77B7C
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 02:16:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236794AbjEJXFE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 May 2023 19:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34922 "EHLO
+        id S230041AbjEKCQY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 10 May 2023 22:16:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236829AbjEJXFC (ORCPT
+        with ESMTP id S229555AbjEKCQX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2023 19:05:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D5E524C;
-        Wed, 10 May 2023 16:04:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5DF0E636E4;
-        Wed, 10 May 2023 23:04:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC8E5C433D2;
-        Wed, 10 May 2023 23:04:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683759892;
-        bh=QxtvXxDtUmO2zciTU9oZisOXrc+rH38HVyRqoKkNSF0=;
-        h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-        b=jxqufG+qooH4aJVMNjh2O09Sd+b03vlSqSVZwvPJFqf855TFAXGtc/cXNknIFIma3
-         JsMe4/YBqLkuayBZN6xHYBuiil2dRiQfdRci+VO2FEFdWkzbyOCIckowL3kcVuH5XU
-         pGPZCpMVQeUJki4RoervOwfbZQYT3ku4mLwdrHgPg4QmMrGxUz/kYOlutbENNgnwjN
-         K8I+BVuw2hezglvSVaOw5VJ18WpelPJEsc/fARh+V+dDVZTkPIJug7p2mObnNO6bAI
-         49j9mDbx/JKn0sV1f2vXuwlJqtdewvUC0e72YsmRP6QxItVW+hDJW/3XT5rjTID3wj
-         DV7Vsm5t7ac6A==
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Thu, 11 May 2023 02:04:47 +0300
-Message-Id: <CSIZ2DT5C4WQ.19ZUUIWKNAJY9@suppilovahvero>
-Cc:     <dpsmith@apertussolutions.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
-        <ardb@kernel.org>, <mjg59@srcf.ucam.org>,
-        <James.Bottomley@hansenpartnership.com>, <luto@amacapital.net>,
-        <nivedita@alum.mit.edu>, <kanth.ghatraju@oracle.com>,
-        <trenchboot-devel@googlegroups.com>
-Subject: Re: [PATCH v6 04/14] x86: Secure Launch Resource Table header file
-From:   "Jarkko Sakkinen" <jarkko@kernel.org>
-To:     "Ross Philipson" <ross.philipson@oracle.com>,
-        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-        <linux-integrity@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <iommu@lists.linux-foundation.org>,
-        <kexec@lists.infradead.org>, <linux-efi@vger.kernel.org>
-X-Mailer: aerc 0.14.0
-References: <20230504145023.835096-1-ross.philipson@oracle.com>
- <20230504145023.835096-5-ross.philipson@oracle.com>
-In-Reply-To: <20230504145023.835096-5-ross.philipson@oracle.com>
+        Wed, 10 May 2023 22:16:23 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 455CB273E
+        for <linux-crypto@vger.kernel.org>; Wed, 10 May 2023 19:16:22 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-304935cc79bso7505686f8f.2
+        for <linux-crypto@vger.kernel.org>; Wed, 10 May 2023 19:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1683771381; x=1686363381;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c7NhY70nKePpFKW1tNMvcsBAqsK2Oz2JiYYqlXCn6ek=;
+        b=VzlDVeswYJTkHS18WfZGHZ94kK1HMGNiS+QWCFjD+YQvom1A9OAwXhkdBvdBe22xb1
+         wo2+YNPN2MLaLnGPFkdicBRqtv0CqWMFPg8QmcSKYNV9CwYtC9HjcrmNGJ/D2dsCz3lb
+         Z5PlRQDTuLjC9YYVM1X5I8xGDP/4vF1xu/GrZJojtbOuyCP+QJF9DWyY0/3Y99Q8a5ua
+         eByKEUXFxYnoBU9GBECtwMdo6BJkmns+hZ8YD2GZV8eQReJfbHcXZ0zBy6866p8r3miX
+         9dO9UeQ30UHWgOkJMCSmPXFkmsjsPkCrdbwew7yxIcitgBsJRx24CfkS0WtbbIPC8y/0
+         lm4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683771381; x=1686363381;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c7NhY70nKePpFKW1tNMvcsBAqsK2Oz2JiYYqlXCn6ek=;
+        b=gktIjNYbTeMTIAsLYg92h5gNceHTdm7fiAX+qFhyp20V8y7PV2u3zYeFl91xnKSz4q
+         F3AhxOO13VvcyDQ5eR1oIQ0KCiBcmIarIFi7ClAR+nhstKjZV3OReuiYr9bhST4gM4oJ
+         EIJb5SWQnMJSzKzwi7l4Tnh1xt3lQDRS1fmbFsxeXAYBK3RTRfds/0OtQc/2AIDz6CF0
+         O5acr+JmNF8qdAzk7VQtTetZovu0BJQMNYAMwWEdQB/sY3XbY3q4hHvSP25cGE7lbbSg
+         fT8dHPjI3qvPaJN88HHZI8A5pjsrZRmBeOPqyzoSjpf71yiKyqz9c0TO/tz1+CjGnUd7
+         DKdw==
+X-Gm-Message-State: AC+VfDwMlf1b3qSmLWKQWEq7sj2djIn1Nl73SQ1g38p4Y982l7+cXB3k
+        4PZXHZuQVUYWZIAKuWWa5WWl7Q==
+X-Google-Smtp-Source: ACHHUZ7Sd+QhrUQhXDP5FYiCHBKYHYlWW2eiRLWyVaZMfV2uj0aNLztC4C2YUrLSDZA108qzs4//xg==
+X-Received: by 2002:a5d:45c7:0:b0:306:3bac:e235 with SMTP id b7-20020a5d45c7000000b003063bace235mr11720300wrs.10.1683771380676;
+        Wed, 10 May 2023 19:16:20 -0700 (PDT)
+Received: from localhost.localdomain ([64.64.123.10])
+        by smtp.gmail.com with ESMTPSA id j18-20020a5d4492000000b003021288a56dsm18945908wrq.115.2023.05.10.19.16.14
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 10 May 2023 19:16:20 -0700 (PDT)
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jean-philippe <jean-philippe@linaro.org>,
+        Wangzhou <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux.dev, acc@lists.linaro.org,
+        Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Weili Qian <qianweili@huawei.com>
+Subject: [PATCH] uacce: use filep->f_mapping to replace inode->i_mapping
+Date:   Thu, 11 May 2023 10:15:53 +0800
+Message-Id: <20230511021553.44318-1-zhangfei.gao@linaro.org>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu May 4, 2023 at 5:50 PM EEST, Ross Philipson wrote:
-> Introduce the Secure Launch Resource Table which forms the formal
-> interface between the pre and post launch code.
->
-> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-> ---
->  include/linux/slr_table.h | 270 ++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 270 insertions(+)
->  create mode 100644 include/linux/slr_table.h
->
-> diff --git a/include/linux/slr_table.h b/include/linux/slr_table.h
-> new file mode 100644
-> index 0000000..d4b76e5
-> --- /dev/null
-> +++ b/include/linux/slr_table.h
-> @@ -0,0 +1,270 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Secure Launch Resource Table
-> + *
-> + * Copyright (c) 2023, Oracle and/or its affiliates.
-> + */
-> +
-> +#ifndef _LINUX_SLR_TABLE_H
-> +#define _LINUX_SLR_TABLE_H
-> +
-> +/* Put this in efi.h if it becomes a standard */
-> +#define SLR_TABLE_GUID				EFI_GUID(0x877a9b2a, 0x0385, 0x45d1, 0xa0, 0x3=
-4, 0x9d, 0xac, 0x9c, 0x9e, 0x56, 0x5f)
-> +
-> +/* SLR table header values */
-> +#define SLR_TABLE_MAGIC		0x4452544d
-> +#define SLR_TABLE_REVISION	1
-> +
-> +/* Current revisions for the policy and UEFI config */
-> +#define SLR_POLICY_REVISION		1
-> +#define SLR_UEFI_CONFIG_REVISION	1
-> +
-> +/* SLR defined architectures */
-> +#define SLR_INTEL_TXT		1
-> +#define SLR_AMD_SKINIT		2
-> +
-> +/* SLR defined bootloaders */
-> +#define SLR_BOOTLOADER_INVALID	0
-> +#define SLR_BOOTLOADER_GRUB	1
-> +
-> +/* Log formats */
-> +#define SLR_DRTM_TPM12_LOG	1
-> +#define SLR_DRTM_TPM20_LOG	2
-> +
-> +/* DRTM Policy Entry Flags */
-> +#define SLR_POLICY_FLAG_MEASURED	0x1
-> +#define SLR_POLICY_IMPLICIT_SIZE	0x2
-> +
-> +/* Array Lengths */
-> +#define TPM_EVENT_INFO_LENGTH		32
-> +#define TXT_VARIABLE_MTRRS_LENGTH	32
-> +
-> +/* Tags */
-> +#define SLR_ENTRY_INVALID	0x0000
-> +#define SLR_ENTRY_DL_INFO	0x0001
-> +#define SLR_ENTRY_LOG_INFO	0x0002
-> +#define SLR_ENTRY_ENTRY_POLICY	0x0003
-> +#define SLR_ENTRY_INTEL_INFO	0x0004
-> +#define SLR_ENTRY_AMD_INFO	0x0005
-> +#define SLR_ENTRY_ARM_INFO	0x0006
-> +#define SLR_ENTRY_UEFI_INFO	0x0007
-> +#define SLR_ENTRY_UEFI_CONFIG	0x0008
-> +#define SLR_ENTRY_END		0xffff
+The inode can be different in a container, for example, a docker and host
+both open the same uacce parent device, which uses the same uacce struct
+but different inode, so uacce->inode is not enough.
 
-"Enums are preferred when defining several related constants."
+What's worse, when docker stops, the inode will be destroyed as well,
+causing use-after-free in uacce_remove.
 
-See:
+So use q->filep->f_mapping to replace uacce->inode->i_mapping.
 
-https://www.kernel.org/doc/html/latest/process/coding-style.html#macros-enu=
-ms-and-rtl
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+---
+ drivers/misc/uacce/uacce.c | 16 +++++++++-------
+ include/linux/uacce.h      |  4 ++--
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-BR, Jarkko
+diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+index 346bd7cf2e94..740ace422baa 100644
+--- a/drivers/misc/uacce/uacce.c
++++ b/drivers/misc/uacce/uacce.c
+@@ -166,8 +166,8 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+ 
+ 	init_waitqueue_head(&q->wait);
+ 	filep->private_data = q;
+-	uacce->inode = inode;
+ 	q->state = UACCE_Q_INIT;
++	q->private_data = filep;
+ 	mutex_init(&q->mutex);
+ 	list_add(&q->list, &uacce->queues);
+ 	mutex_unlock(&uacce->mutex);
+@@ -574,12 +574,6 @@ void uacce_remove(struct uacce_device *uacce)
+ 
+ 	if (!uacce)
+ 		return;
+-	/*
+-	 * unmap remaining mapping from user space, preventing user still
+-	 * access the mmaped area while parent device is already removed
+-	 */
+-	if (uacce->inode)
+-		unmap_mapping_range(uacce->inode->i_mapping, 0, 0, 1);
+ 
+ 	/*
+ 	 * uacce_fops_open() may be running concurrently, even after we remove
+@@ -589,6 +583,8 @@ void uacce_remove(struct uacce_device *uacce)
+ 	mutex_lock(&uacce->mutex);
+ 	/* ensure no open queue remains */
+ 	list_for_each_entry_safe(q, next_q, &uacce->queues, list) {
++		struct file *filep = q->private_data;
++
+ 		/*
+ 		 * Taking q->mutex ensures that fops do not use the defunct
+ 		 * uacce->ops after the queue is disabled.
+@@ -597,6 +593,12 @@ void uacce_remove(struct uacce_device *uacce)
+ 		uacce_put_queue(q);
+ 		mutex_unlock(&q->mutex);
+ 		uacce_unbind_queue(q);
++
++		/*
++		 * unmap remaining mapping from user space, preventing user still
++		 * access the mmaped area while parent device is already removed
++		 */
++		unmap_mapping_range(filep->f_mapping, 0, 0, 1);
+ 	}
+ 
+ 	/* disable sva now since no opened queues */
+diff --git a/include/linux/uacce.h b/include/linux/uacce.h
+index 0a81c3dfd26c..64b800b74436 100644
+--- a/include/linux/uacce.h
++++ b/include/linux/uacce.h
+@@ -86,6 +86,7 @@ enum uacce_q_state {
+  * @state: queue state machine
+  * @pasid: pasid associated to the mm
+  * @handle: iommu_sva handle returned by iommu_sva_bind_device()
++ * @private_data: private data for saving filep
+  */
+ struct uacce_queue {
+ 	struct uacce_device *uacce;
+@@ -97,6 +98,7 @@ struct uacce_queue {
+ 	enum uacce_q_state state;
+ 	u32 pasid;
+ 	struct iommu_sva *handle;
++	void *private_data;
+ };
+ 
+ /**
+@@ -114,7 +116,6 @@ struct uacce_queue {
+  * @mutex: protects uacce operation
+  * @priv: private pointer of the uacce
+  * @queues: list of queues
+- * @inode: core vfs
+  */
+ struct uacce_device {
+ 	const char *algs;
+@@ -130,7 +131,6 @@ struct uacce_device {
+ 	struct mutex mutex;
+ 	void *priv;
+ 	struct list_head queues;
+-	struct inode *inode;
+ };
+ 
+ #if IS_ENABLED(CONFIG_UACCE)
+-- 
+2.39.2 (Apple Git-143)
+
