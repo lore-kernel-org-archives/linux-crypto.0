@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0087BC77B7D
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 03:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 030F2C77B7C
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 May 2023 04:05:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbjEKDol (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 May 2023 23:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41462 "EHLO
+        id S229485AbjEKEFg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 11 May 2023 00:05:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230205AbjEKDok (ORCPT
+        with ESMTP id S229473AbjEKEFe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 May 2023 23:44:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF8E30FB;
-        Wed, 10 May 2023 20:44:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1730B64160;
-        Thu, 11 May 2023 03:44:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD1A6C433EF;
-        Thu, 11 May 2023 03:44:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1683776678;
-        bh=0znUxwXk2K0JJbiEiLhhTK64Sd0XVZz9CaoB7WaSTOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Sk8439F0iNdydOVyHAr9ets543Vgaznl/4yqDjkXoVux9ZjftvyQTZKHy/3L7kEoV
-         OGbQmqdKeom9HSU1lSxUVe+c4t8x2H7VtWNr+/CSk1hjtrzqE/JMN8SQEH9HlRDGaC
-         UgfyfVLeoAhSW7y0DKufd0mGLED6PyZ5cwOPuEgk=
-Date:   Thu, 11 May 2023 12:44:32 +0900
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Thu, 11 May 2023 00:05:34 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949E23AA5;
+        Wed, 10 May 2023 21:05:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=es1hAOZEanSpUzrO4i+W99kSmiTSzzhtBMlo8JnwlYU=; b=XiM0jwFnKxFWGJpiCOPcZXBOTf
+        7Lff2nNv1b4BAaAzu2+8+Z6IL8XztnltccQ/JJuih56T1wL6PGmnGsDk5E0M2IhLX/LK07JbuLSIZ
+        7MeUi0RBKlVjXfF2dQ49aEOFQTTDRlx51zHwTVQTE5xRu4I0fDcigOhciITUn6bZwgzkWHvP5GDoh
+        2fdZoKkTwbsFp75btQY8vp64HMyDOb8xRvh6sSFXwAn6is5GoyjejZl85uiLUVi+kd01BW70CUhr5
+        tVCPkz/2NQ/hoG7jre3wotCKe/XGVrVJE/Z2HuYhiIxeH3PutobfBK7QQ7ocB4hd/asQ7TR+7XP1K
+        n3LuDq7A==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pwxYC-001apk-2B;
+        Thu, 11 May 2023 04:05:08 +0000
+Date:   Thu, 11 May 2023 05:05:08 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         jean-philippe <jean-philippe@linaro.org>,
         Wangzhou <wangzhou1@hisilicon.com>,
@@ -41,12 +41,13 @@ Cc:     Arnd Bergmann <arnd@arndb.de>,
         iommu@lists.linux.dev, acc@lists.linaro.org,
         Weili Qian <qianweili@huawei.com>
 Subject: Re: [PATCH] uacce: use filep->f_mapping to replace inode->i_mapping
-Message-ID: <2023051110-jelly-barricade-d737@gregkh>
+Message-ID: <20230511040508.GF3390869@ZenIV>
 References: <20230511021553.44318-1-zhangfei.gao@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20230511021553.44318-1-zhangfei.gao@linaro.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -60,28 +61,7 @@ On Thu, May 11, 2023 at 10:15:53AM +0800, Zhangfei Gao wrote:
 > causing use-after-free in uacce_remove.
 > 
 > So use q->filep->f_mapping to replace uacce->inode->i_mapping.
-> 
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
-> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
-> ---
->  drivers/misc/uacce/uacce.c | 16 +++++++++-------
->  include/linux/uacce.h      |  4 ++--
->  2 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-> index 346bd7cf2e94..740ace422baa 100644
-> --- a/drivers/misc/uacce/uacce.c
-> +++ b/drivers/misc/uacce/uacce.c
-> @@ -166,8 +166,8 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
->  
->  	init_waitqueue_head(&q->wait);
->  	filep->private_data = q;
-> -	uacce->inode = inode;
->  	q->state = UACCE_Q_INIT;
-> +	q->private_data = filep;
->  	mutex_init(&q->mutex);
->  	list_add(&q->list, &uacce->queues);
->  	mutex_unlock(&uacce->mutex);
+
 > @@ -574,12 +574,6 @@ void uacce_remove(struct uacce_device *uacce)
 >  
 >  	if (!uacce)
@@ -114,30 +94,15 @@ On Thu, May 11, 2023 at 10:15:53AM +0800, Zhangfei Gao wrote:
 > +		 * access the mmaped area while parent device is already removed
 > +		 */
 > +		unmap_mapping_range(filep->f_mapping, 0, 0, 1);
->  	}
->  
->  	/* disable sva now since no opened queues */
-> diff --git a/include/linux/uacce.h b/include/linux/uacce.h
-> index 0a81c3dfd26c..64b800b74436 100644
-> --- a/include/linux/uacce.h
-> +++ b/include/linux/uacce.h
-> @@ -86,6 +86,7 @@ enum uacce_q_state {
->   * @state: queue state machine
->   * @pasid: pasid associated to the mm
->   * @handle: iommu_sva handle returned by iommu_sva_bind_device()
-> + * @private_data: private data for saving filep
->   */
->  struct uacce_queue {
->  	struct uacce_device *uacce;
-> @@ -97,6 +98,7 @@ struct uacce_queue {
->  	enum uacce_q_state state;
->  	u32 pasid;
->  	struct iommu_sva *handle;
-> +	void *private_data;
 
-Make this a real pointer to the inode, no need to make this "void *",
-right?
+IDGI.  Going through uacce_queue instead of uacce_device is fine, but why
+bother with file *or* inode?  Just store a reference to struct address_space in
+your uacce_queue and be done with that...
 
-thanks,
+Another problem in that driver is uacce_vma_close(); this
+        if (vma->vm_pgoff < UACCE_MAX_REGION)
+                qfr = q->qfrs[vma->vm_pgoff];
 
-greg k-h
+        kfree(qfr);
+can't be right - you have q->qfrs left pointing to freed object.  If nothing
+else, subsequent mmap() will fail with -EEXIST, won't it?
