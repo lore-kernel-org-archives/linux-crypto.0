@@ -2,54 +2,130 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A562C7EE26
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 16:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2397FC77B7F
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 17:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbjELQ1R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 May 2023 12:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57100 "EHLO
+        id S236972AbjELRw6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 May 2023 13:52:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbjELQ1Q (ORCPT
+        with ESMTP id S229901AbjELRwz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2023 12:27:16 -0400
-Received: from cavan.codon.org.uk (irc.codon.org.uk [IPv6:2a00:1098:84:22e::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD0B8A76;
-        Fri, 12 May 2023 09:27:13 -0700 (PDT)
-Received: by cavan.codon.org.uk (Postfix, from userid 1000)
-        id B2FD340A6F; Fri, 12 May 2023 17:27:12 +0100 (BST)
-Date:   Fri, 12 May 2023 17:27:12 +0100
-From:   Matthew Garrett <mjg59@srcf.ucam.org>
-To:     Ross Philipson <ross.philipson@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, ardb@kernel.org,
-        James.Bottomley@hansenpartnership.com, luto@amacapital.net,
-        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
-        trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v6 07/14] x86: Secure Launch kernel early boot stub
-Message-ID: <20230512162712.GB18400@srcf.ucam.org>
-References: <20230504145023.835096-1-ross.philipson@oracle.com>
- <20230504145023.835096-8-ross.philipson@oracle.com>
- <20230512112623.GE14461@srcf.ucam.org>
- <98decbe9-846a-6d36-aa7a-f906a19fa6cf@oracle.com>
+        Fri, 12 May 2023 13:52:55 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B226E89;
+        Fri, 12 May 2023 10:52:53 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-50b383222f7so15202879a12.3;
+        Fri, 12 May 2023 10:52:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683913972; x=1686505972;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+z5HbnsTK18J0+qXZRdJVRc1SE6gpbbfgXJ/tjWlB7U=;
+        b=jty0sa+qiVBl5OBRqSGPyQX8XtvTrVX31/CTJT9G4H0dNADmEd5XBqiBBuxfxwOj07
+         CF/WDXpxQNfxWFAzSRhgJ0uQzAH6n4Irku64TGg4IxGZaF3oVKH1vKpiX2O1vsTTbA5j
+         m/qme+Cjx9V1rG4QChsvbYG5dU6Kq/+3RU6Lmrmq270b+cwrhQxuqW1HqCmSOLhlrerJ
+         wonZ59RTM2uHZtGjZ7pJowG0bvX9qY9Wp8e8jpESXBZCbTLuCB8KNdoBT/fWHFau1u9z
+         40FKpOmu68z3/iRKQojCEodN/17NHG3psyJDu37MYCZb9onfdQM9A1UrxsIID7+PpxHU
+         eq2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683913972; x=1686505972;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+z5HbnsTK18J0+qXZRdJVRc1SE6gpbbfgXJ/tjWlB7U=;
+        b=QMd9tNFzYZkYLpVW9EaYGNmQ9hOMMVpd8pKJ8k8jD+0LmsvSHfGX4vcrFlFVjFlTwf
+         KQKwq2tMIAf29dQa/HsLM0whApXKPG3lDzPgxTeI7cwmQABsNPU5a5+SiZr/tL0a6CE4
+         l+J9ws2uLnmRXNc+cTT4Zhe89Pd2BpcsBgPP1nmS7SI7WAHx1N4Lywx0+odsw/Uu3gxn
+         mazgU+AeuNWIf7cGm2fR5i5BH7s3cQcGfAUcMotWTDGke2OiLgGjxl93ag+HGuzhogH1
+         U9kWf9iQ3+moX/E9/PKb7q/LRngz76JkcHAYtS9Et/F1PJbC9CvwgL5fIglCVM4da8ab
+         e8EA==
+X-Gm-Message-State: AC+VfDyVj16XQEkP1Jl3ZpAqfX84YaQzydwPUm/q2LRaFWolkJcA6PJR
+        5/ao8xVd9+DwOe88TwFl+Zg=
+X-Google-Smtp-Source: ACHHUZ56Nh7GwRsgEU7BrtcKNxP6mA30n2Lp1bDbFoN+fPJbMW2/FQ70ahtIiWVgDXjjaIwqqpCnZQ==
+X-Received: by 2002:a17:907:1b17:b0:94f:432f:243e with SMTP id mp23-20020a1709071b1700b0094f432f243emr22067959ejc.14.1683913971874;
+        Fri, 12 May 2023 10:52:51 -0700 (PDT)
+Received: from [192.168.8.101] (37-48-17-149.nat.epc.tmcz.cz. [37.48.17.149])
+        by smtp.gmail.com with ESMTPSA id n25-20020a170906379900b00965c529f103sm5575504ejc.86.2023.05.12.10.52.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 May 2023 10:52:51 -0700 (PDT)
+Message-ID: <8c7dcc39-d7c9-d81e-a7af-5cbf055082c7@gmail.com>
+Date:   Fri, 12 May 2023 19:52:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98decbe9-846a-6d36-aa7a-f906a19fa6cf@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.10.0
+Subject: Re: [PATCH v6 11/12] crypto: x86/aes-kl - Support AES algorithm using
+ Key Locker instructions
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        tglx@linutronix.de, bp@suse.de, mingo@kernel.org, x86@kernel.org,
+        herbert@gondor.apana.org.au, ardb@kernel.org,
+        dan.j.williams@intel.com, bernie.keany@intel.com,
+        charishma1.gairuboyina@intel.com,
+        lalithambika.krishnakumar@intel.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+References: <20220112211258.21115-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-12-chang.seok.bae@intel.com>
+ <ZFWY6/VelArVYy1F@gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+In-Reply-To: <ZFWY6/VelArVYy1F@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 12, 2023 at 12:17:50PM -0400, Ross Philipson wrote:
+On 5/6/23 02:01, Eric Biggers wrote:
+...
+> This does not correctly describe what is going on.  Actually, this patchset
+> registers the AES-KL XTS algorithm with the usual name "xts(aes)".  So, it can
+> potentially be used by any AES-XTS user.  It seems that you're actually relying
+> on the algorithm priorities to prioritize AES-NI, as you've assigned priority
+> 200 to AES-KL, whereas AES-NI has priority 401.  Is that what you intend, and if
+> so can you please update your explanation to properly explain this?
+> 
+> The alternative would be to use a unique algorithm name, such as
+> "keylocker-xts(aes)".  I'm not sure that would be better, given that the
+> algorithms are compatible.  However, that actually would seem to match the
+> explanation you gave more closely, so perhaps that's what you actually intended?
 
-> I am not 100% sure what you are asking but we also measure the EFI memory
-> map. This comment is just to note that if the e820 exceeded the space in the
-> fixed map in boot parameters, we would pick up any extra entries when
-> measuring the setup_data list.
+Sorry to be late in-game, but as this is intended for LUKS/dm-crypt use,
+I have a comment here:
 
-Ack, picked this up in a later patch but didn't come back to follow up. 
-Thanks!
+LUKS2 will no longer support algorithms with the dash in the name for dm-crypt
+(iow "aes-generic" or something like that will no longer work, and I am afraid
+you will need aes-kl/keylocker-xts here to force to use AES-KL for dm-crypt).
+
+One reason is described in https://gitlab.com/cryptsetup/cryptsetup/-/issues/809,
+but the major problem is that cryptsetup used CIPHER-MODE-IV syntax (that mixes
+badly with the dash in algorithm names). And we still rely on internal conversions
+of common modes to that syntax (currently it worked only by a luck).
+
+When I added the "capi" format for dm-crypt for algorithms specification,
+I made a mistake in that it allows everything, including crypto driver
+platform-specific names.
+The intention was to keep the kernel to decide which crypto driver will be used.
+So, this is perhaps fine for dm-crypt now but LUKS is a portable format, and a generic
+algorithm (like AES) should not depend on a specific driver or CPU feature.
+
+IOW, implement xts(aes) and let the user prioritize the driver (no changes
+needed for LUKS header then, AES-KL is loaded automatically) or/and create a wrapper
+(similar to paes, that we already support) that will force to use AES-KL
+(...but without the dash in the name, please :)
+
+If there is a problem with it, please create an issue for cryptsetup upstream
+to discuss it there (before the kernel part is merged!), so we can find some
+solution - I would like to avoid incompatibilities later.
+
+Thanks,
+Milan
