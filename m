@@ -2,87 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1ED1C77B75
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 10:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA52C77B7F
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 10:55:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240529AbjELKk7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 May 2023 06:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
+        id S240686AbjELKzN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 May 2023 06:55:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240605AbjELKk6 (ORCPT
+        with ESMTP id S240939AbjELKzH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2023 06:40:58 -0400
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B1011FD6;
-        Fri, 12 May 2023 03:40:56 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 34CAekj4037117;
-        Fri, 12 May 2023 05:40:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1683888046;
-        bh=8SxkRosU+5sptrW+a2kD7cwTFrcO+YdyW+ZrnrbVrDI=;
-        h=From:To:CC:Subject:Date;
-        b=A+Vu2BrTl8l2vnucAi5N560zj9QTiMDqJbfIDyorzpwb/7FslxbkQYL1UIj3DTU3s
-         sM0YSVASdrA/F7ER6T5SV0olR6d4PUp6MFKFq9VuE/RX8s/kDOl5ERojLqbeEkzkqY
-         BkhIzdDjRAQYfSbAFzUPsKCvjBwiseXtsoa3yE+w=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 34CAekT8014448
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 12 May 2023 05:40:46 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
- May 2023 05:40:46 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 12 May 2023 05:40:45 -0500
-Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 34CAejHN011203;
-        Fri, 12 May 2023 05:40:45 -0500
-From:   Jayesh Choudhary <j-choudhary@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <kristo@kernel.org>, <kamlesh@ti.com>, <u-kumar1@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <j-choudhary@ti.com>
-Subject: [PATCH] crypto: sa2ul: change unsafe data size limit to 255 bytes
-Date:   Fri, 12 May 2023 16:10:44 +0530
-Message-ID: <20230512104044.163279-1-j-choudhary@ti.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 12 May 2023 06:55:07 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B1B93;
+        Fri, 12 May 2023 03:55:02 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pxQPo-008C3C-A6; Fri, 12 May 2023 18:54:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 May 2023 18:54:25 +0800
+Date:   Fri, 12 May 2023 18:54:25 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 2/4] crypto: starfive - Add crypto engine support
+Message-ID: <ZF4a4am3fpWTIKs1@gondor.apana.org.au>
+References: <20230504073400.1170979-1-jiajie.ho@starfivetech.com>
+ <20230504073400.1170979-3-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230504073400.1170979-3-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tero Kristo <t-kristo@ti.com>
+On Thu, May 04, 2023 at 03:33:58PM +0800, Jia Jie Ho wrote:
+>
+> +config CRYPTO_DEV_JH7110
+> +	tristate "StarFive JH7110 cryptographic engine driver"
+> +	depends on SOC_STARFIVE
 
-256 bytes is quite often used in performance benchmarks and this size
-appears to be also working just fine, so mark it as safe so that we do
-not fallback to software implementation for this packet size. Otherwise
-there is a strange bump up in crypto performance at 256 byte packet size.
+Please enable COMPILE_TEST.
 
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
-Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
----
- drivers/crypto/sa2ul.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/sa2ul.h b/drivers/crypto/sa2ul.h
-index 92bf97232a29..12c17a68d350 100644
---- a/drivers/crypto/sa2ul.h
-+++ b/drivers/crypto/sa2ul.h
-@@ -170,7 +170,7 @@ struct sa_tfm_ctx;
-  * the following range, so avoid using it.
-  */
- #define SA_UNSAFE_DATA_SZ_MIN	240
--#define SA_UNSAFE_DATA_SZ_MAX	256
-+#define SA_UNSAFE_DATA_SZ_MAX	255
- 
- struct sa_match_data;
- 
+Thanks,
 -- 
-2.25.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
