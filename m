@@ -2,88 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD4AC77B7C
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 10:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 628A9C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 11:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240466AbjELK7S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 May 2023 06:59:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56776 "EHLO
+        id S240939AbjELK7v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 May 2023 06:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240810AbjELK6v (ORCPT
+        with ESMTP id S240804AbjELK7d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2023 06:58:51 -0400
+        Fri, 12 May 2023 06:59:33 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D2C12E9D
-        for <linux-crypto@vger.kernel.org>; Fri, 12 May 2023 03:58:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A5011D93
+        for <linux-crypto@vger.kernel.org>; Fri, 12 May 2023 03:59:31 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pxQTv-008CA1-Aj; Fri, 12 May 2023 18:58:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 May 2023 18:58:40 +0800
-Date:   Fri, 12 May 2023 18:58:40 +0800
+        id 1pxQUe-008CAQ-M7; Fri, 12 May 2023 18:59:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 12 May 2023 18:59:25 +0800
+Date:   Fri, 12 May 2023 18:59:25 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Cc:     linux-crypto@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>,
-        Marcelo Cerri <marcelo.cerri@canonical.com>
-Subject: Re: [PATCH v3 0/2] crypto: jitter - SHA-3 conditioner and test
- interface
-Message-ID: <ZF4b4DHR22f0W5NY@gondor.apana.org.au>
-References: <2684670.mvXUDI8C0e@positron.chronox.de>
- <4825604.31r3eYUQgx@positron.chronox.de>
- <2687238.mvXUDI8C0e@positron.chronox.de>
+To:     Srujana Challa <schalla@marvell.com>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
+        bbrezillon@kernel.org, arno@natisbad.org
+Subject: Re: [PATCH 0/2] crypto: octeontx2: hardware configuration for inline
+ IPsec
+Message-ID: <ZF4cDZWbDf2cJCDK@gondor.apana.org.au>
+References: <20230425140620.2031480-1-schalla@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2687238.mvXUDI8C0e@positron.chronox.de>
+In-Reply-To: <20230425140620.2031480-1-schalla@marvell.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 08:07:39AM +0200, Stephan Müller wrote:
-> The patch set replaces the LFSR conditioning function of the Jitter RNG
-> with SHA-3 256. This change requires also a new test interface to
-> analyze the raw unconditioned noise data.
+On Tue, Apr 25, 2023 at 07:36:18PM +0530, Srujana Challa wrote:
+> On OcteonTX2/OctoenTX3 variants of silicon, Admin function (AF)
+> handles resource allocation and configuration for PFs and their VFs.
+> PFs request the AF directly, via mailboxes.
+> Unlike PFs, VFs cannot send a mailbox request directly. A VF sends
+> mailbox messages to its parent PF, with which it shares a
+> mailbox region. The PF then forwards these messages to the AF.
 > 
-> Albeit the test interface can be used directly with dd, a small helper
-> tool is provided at [1] which can be used to perform the collection
-> of raw entropy. The analysis of the data can be done with your favorite
-> tool. Or you may use the helper in [2] which uses the NIST SP800-90B
-> tool for entropy rate measurement.
+> Patch1 adds AF to CPT PF uplink mbox to submit the CPT instructions
+> from AF.
+> Patch2 adds code to configure inline-IPsec HW resources for
+> CPT VFs as CPT VFs cannot send a mailbox request directly to AF.
 > 
-> [1] https://github.com/smuellerDD/jitterentropy-library/tree/master/tests/raw-entropy/recording_runtime_kernelspace
+> Srujana Challa (2):
+>   crypto: octeontx2: add support for AF to CPT PF uplink mbox
+>   crypto: octeontx2: hardware configuration for inline IPsec
 > 
-> [2] https://github.com/smuellerDD/jitterentropy-library/tree/master/tests/raw-entropy/validation-runtime-kernel
-> 
-> Changes v3:
-> 
-> - fix jent_kcapi_init: error code for jent_entropy_collector_alloc now
->   properly cleans up the state
-> 
-> - fix jent_kcapi_init: initialize lock at the beginning as it is used in
->   error code path function jent_kcapi_cleanup
-> 
-> - editorial change: update description in MODULE_PARM_DESC in patch 0002
-> 
-> Changes v2:
-> 
-> - fix use-after-free by switching shash_desc_zero and crypto_free_shash
->   in jent_mod_init reported by kernel-test-robot
-> 
-> Stephan Mueller (2):
->   crypto: jitter - replace LFSR with SHA3-256
->   crypto: jitter - add interface for gathering of raw entropy
-> 
->  crypto/Kconfig                 |  21 +++
->  crypto/Makefile                |   1 +
->  crypto/jitterentropy-kcapi.c   | 190 ++++++++++++++++++---
->  crypto/jitterentropy-testing.c | 294 +++++++++++++++++++++++++++++++++
->  crypto/jitterentropy.c         | 145 ++++++----------
->  crypto/jitterentropy.h         |  20 ++-
->  6 files changed, 551 insertions(+), 120 deletions(-)
->  create mode 100644 crypto/jitterentropy-testing.c
+>  .../marvell/octeontx2/otx2_cpt_common.h       |  15 ++
+>  .../marvell/octeontx2/otx2_cpt_mbox_common.c  |   3 +
+>  drivers/crypto/marvell/octeontx2/otx2_cptlf.c |  34 +--
+>  drivers/crypto/marvell/octeontx2/otx2_cptlf.h |  33 ++-
+>  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   7 +
+>  .../marvell/octeontx2/otx2_cptpf_main.c       |  41 +++
+>  .../marvell/octeontx2/otx2_cptpf_mbox.c       | 247 +++++++++++++++++-
+>  .../marvell/octeontx2/otx2_cptpf_ucode.c      |  10 +-
+>  drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   1 +
+>  .../marvell/octeontx2/otx2_cptvf_main.c       |   8 +-
+>  10 files changed, 359 insertions(+), 40 deletions(-)
 > 
 > -- 
-> 2.40.0
+> 2.25.1
 
 All applied.  Thanks.
 -- 
