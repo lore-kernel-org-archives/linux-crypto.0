@@ -2,130 +2,217 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2397FC77B7F
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 17:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A080FC7EE23
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 18:03:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236972AbjELRw6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 May 2023 13:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47750 "EHLO
+        id S238159AbjELSD5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 12 May 2023 14:03:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbjELRwz (ORCPT
+        with ESMTP id S237665AbjELSDz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2023 13:52:55 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B226E89;
-        Fri, 12 May 2023 10:52:53 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-50b383222f7so15202879a12.3;
-        Fri, 12 May 2023 10:52:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683913972; x=1686505972;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+z5HbnsTK18J0+qXZRdJVRc1SE6gpbbfgXJ/tjWlB7U=;
-        b=jty0sa+qiVBl5OBRqSGPyQX8XtvTrVX31/CTJT9G4H0dNADmEd5XBqiBBuxfxwOj07
-         CF/WDXpxQNfxWFAzSRhgJ0uQzAH6n4Irku64TGg4IxGZaF3oVKH1vKpiX2O1vsTTbA5j
-         m/qme+Cjx9V1rG4QChsvbYG5dU6Kq/+3RU6Lmrmq270b+cwrhQxuqW1HqCmSOLhlrerJ
-         wonZ59RTM2uHZtGjZ7pJowG0bvX9qY9Wp8e8jpESXBZCbTLuCB8KNdoBT/fWHFau1u9z
-         40FKpOmu68z3/iRKQojCEodN/17NHG3psyJDu37MYCZb9onfdQM9A1UrxsIID7+PpxHU
-         eq2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683913972; x=1686505972;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+z5HbnsTK18J0+qXZRdJVRc1SE6gpbbfgXJ/tjWlB7U=;
-        b=QMd9tNFzYZkYLpVW9EaYGNmQ9hOMMVpd8pKJ8k8jD+0LmsvSHfGX4vcrFlFVjFlTwf
-         KQKwq2tMIAf29dQa/HsLM0whApXKPG3lDzPgxTeI7cwmQABsNPU5a5+SiZr/tL0a6CE4
-         l+J9ws2uLnmRXNc+cTT4Zhe89Pd2BpcsBgPP1nmS7SI7WAHx1N4Lywx0+odsw/Uu3gxn
-         mazgU+AeuNWIf7cGm2fR5i5BH7s3cQcGfAUcMotWTDGke2OiLgGjxl93ag+HGuzhogH1
-         U9kWf9iQ3+moX/E9/PKb7q/LRngz76JkcHAYtS9Et/F1PJbC9CvwgL5fIglCVM4da8ab
-         e8EA==
-X-Gm-Message-State: AC+VfDyVj16XQEkP1Jl3ZpAqfX84YaQzydwPUm/q2LRaFWolkJcA6PJR
-        5/ao8xVd9+DwOe88TwFl+Zg=
-X-Google-Smtp-Source: ACHHUZ56Nh7GwRsgEU7BrtcKNxP6mA30n2Lp1bDbFoN+fPJbMW2/FQ70ahtIiWVgDXjjaIwqqpCnZQ==
-X-Received: by 2002:a17:907:1b17:b0:94f:432f:243e with SMTP id mp23-20020a1709071b1700b0094f432f243emr22067959ejc.14.1683913971874;
-        Fri, 12 May 2023 10:52:51 -0700 (PDT)
-Received: from [192.168.8.101] (37-48-17-149.nat.epc.tmcz.cz. [37.48.17.149])
-        by smtp.gmail.com with ESMTPSA id n25-20020a170906379900b00965c529f103sm5575504ejc.86.2023.05.12.10.52.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 10:52:51 -0700 (PDT)
-Message-ID: <8c7dcc39-d7c9-d81e-a7af-5cbf055082c7@gmail.com>
-Date:   Fri, 12 May 2023 19:52:49 +0200
+        Fri, 12 May 2023 14:03:55 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31F330F0;
+        Fri, 12 May 2023 11:03:28 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1683914574;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u7fvD2GdqOQNGxWui4lgM0lmaDQ5NzqVVPg5OJ46+K8=;
+        b=TMd9YWufj4C4apzXCv73MfS74eNHfpwEzirL39R43AEm4JtQ/rZDmZjBcGVu5Ow4Vrqt0e
+        NJdEiZcLMr9bq0ibxtc6k+wtKEVmlqrg4UskEvfS1+mdOAjN8wVz6VbmRJ7uRp3ww9u94k
+        kBJ6qvtlf0a3Rs783+AOemGAGRPDryYG2hSg+lxbWOugs4+iQrSuhzxYE+er0YAcfLaI/9
+        OemvWNTAPZ2+E8/J526Lqg73bmUENRUpAnH+7HHgytx37HLehdL9V9uu2ARuZ3tacUT1M1
+        ebyw2jpt/ycGLwGs6c1fwMQ+K9YhsWyjqSAh+KVcD236nVYYQ72+k6LQEMb5ng==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1683914574;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u7fvD2GdqOQNGxWui4lgM0lmaDQ5NzqVVPg5OJ46+K8=;
+        b=BZpOsxtvuF9Uu+TyQ/KB7ss5HC4P0Yz6Ag1UfGx/W9nQkzEswHiifo6E0TaXFFhUpgdJ3Y
+        9IRce0wATfBqCDCA==
+To:     Ross Philipson <ross.philipson@oracle.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kexec@lists.infradead.org, linux-efi@vger.kernel.org
+Cc:     ross.philipson@oracle.com, dpsmith@apertussolutions.com,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, ardb@kernel.org,
+        mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+        luto@amacapital.net, nivedita@alum.mit.edu,
+        kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v6 09/14] x86: Secure Launch SMP bringup support
+In-Reply-To: <20230504145023.835096-10-ross.philipson@oracle.com>
+References: <20230504145023.835096-1-ross.philipson@oracle.com>
+ <20230504145023.835096-10-ross.philipson@oracle.com>
+Date:   Fri, 12 May 2023 20:02:53 +0200
+Message-ID: <87h6shbf76.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.10.0
-Subject: Re: [PATCH v6 11/12] crypto: x86/aes-kl - Support AES algorithm using
- Key Locker instructions
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        tglx@linutronix.de, bp@suse.de, mingo@kernel.org, x86@kernel.org,
-        herbert@gondor.apana.org.au, ardb@kernel.org,
-        dan.j.williams@intel.com, bernie.keany@intel.com,
-        charishma1.gairuboyina@intel.com,
-        lalithambika.krishnakumar@intel.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-References: <20220112211258.21115-1-chang.seok.bae@intel.com>
- <20230410225936.8940-1-chang.seok.bae@intel.com>
- <20230410225936.8940-12-chang.seok.bae@intel.com>
- <ZFWY6/VelArVYy1F@gmail.com>
-From:   Milan Broz <gmazyland@gmail.com>
-In-Reply-To: <ZFWY6/VelArVYy1F@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/6/23 02:01, Eric Biggers wrote:
-...
-> This does not correctly describe what is going on.  Actually, this patchset
-> registers the AES-KL XTS algorithm with the usual name "xts(aes)".  So, it can
-> potentially be used by any AES-XTS user.  It seems that you're actually relying
-> on the algorithm priorities to prioritize AES-NI, as you've assigned priority
-> 200 to AES-KL, whereas AES-NI has priority 401.  Is that what you intend, and if
-> so can you please update your explanation to properly explain this?
-> 
-> The alternative would be to use a unique algorithm name, such as
-> "keylocker-xts(aes)".  I'm not sure that would be better, given that the
-> algorithms are compatible.  However, that actually would seem to match the
-> explanation you gave more closely, so perhaps that's what you actually intended?
+On Thu, May 04 2023 at 14:50, Ross Philipson wrote:
+>  
+> +#ifdef CONFIG_SECURE_LAUNCH
+> +
+> +static atomic_t first_ap_only = {1};
 
-Sorry to be late in-game, but as this is intended for LUKS/dm-crypt use,
-I have a comment here:
+ATOMIC_INIT(1) if at all.
 
-LUKS2 will no longer support algorithms with the dash in the name for dm-crypt
-(iow "aes-generic" or something like that will no longer work, and I am afraid
-you will need aes-kl/keylocker-xts here to force to use AES-KL for dm-crypt).
+> +
+> +/*
+> + * Called to fix the long jump address for the waiting APs to vector to
+> + * the correct startup location in the Secure Launch stub in the rmpiggy.
+> + */
+> +static int
+> +slaunch_fixup_jump_vector(void)
 
-One reason is described in https://gitlab.com/cryptsetup/cryptsetup/-/issues/809,
-but the major problem is that cryptsetup used CIPHER-MODE-IV syntax (that mixes
-badly with the dash in algorithm names). And we still rely on internal conversions
-of common modes to that syntax (currently it worked only by a luck).
+One line please.
 
-When I added the "capi" format for dm-crypt for algorithms specification,
-I made a mistake in that it allows everything, including crypto driver
-platform-specific names.
-The intention was to keep the kernel to decide which crypto driver will be used.
-So, this is perhaps fine for dm-crypt now but LUKS is a portable format, and a generic
-algorithm (like AES) should not depend on a specific driver or CPU feature.
+> +{
+> +	struct sl_ap_wake_info *ap_wake_info;
+> +	u32 *ap_jmp_ptr = NULL;
+> +
+> +	if (!atomic_dec_and_test(&first_ap_only))
+> +		return 0;
 
-IOW, implement xts(aes) and let the user prioritize the driver (no changes
-needed for LUKS header then, AES-KL is loaded automatically) or/and create a wrapper
-(similar to paes, that we already support) that will force to use AES-KL
-(...but without the dash in the name, please :)
+Why does this need an atomic? CPU bringup is fully serialized and even
+with the upcoming parallel bootup work, there is no concurrency on this
+function.
 
-If there is a problem with it, please create an issue for cryptsetup upstream
-to discuss it there (before the kernel part is merged!), so we can find some
-solution - I would like to avoid incompatibilities later.
+Aside of that. Why isn't this initialized during boot in a __init function?
+
+> +	ap_wake_info = slaunch_get_ap_wake_info();
+> +
+> +	ap_jmp_ptr = (u32 *)__va(ap_wake_info->ap_wake_block +
+> +				 ap_wake_info->ap_jmp_offset);
+> +
+> +	*ap_jmp_ptr = real_mode_header->sl_trampoline_start32;
+> +
+> +	pr_debug("TXT AP long jump address updated\n");
+> +
+> +	return 0;
+
+Why does this need a return code of all return paths return 0?
+
+> +}
+> +
+> +/*
+> + * TXT AP startup is quite different than normal. The APs cannot have #INIT
+> + * asserted on them or receive SIPIs. The early Secure Launch code has parked
+> + * the APs in a pause loop waiting to receive an NMI. This will wake the APs
+> + * and have them jump to the protected mode code in the rmpiggy where the rest
+> + * of the SMP boot of the AP will proceed normally.
+> + */
+> +static int
+> +slaunch_wakeup_cpu_from_txt(int cpu, int apicid)
+> +{
+> +	unsigned long send_status = 0, accept_status = 0;
+> +
+> +	/* Only done once */
+
+Yes. But not here.
+
+> +	if (slaunch_fixup_jump_vector())
+> +		return -1;
+> +
+> +	/* Send NMI IPI to idling AP and wake it up */
+> +	apic_icr_write(APIC_DM_NMI, apicid);
+> +
+> +	if (init_udelay == 0)
+> +		udelay(10);
+> +	else
+> +		udelay(300);
+
+The wonders of copy & pasta. This condition is pointless because this
+code only runs on systems which force init_udelay to 0.
+
+> +	send_status = safe_apic_wait_icr_idle();
+
+Moar copy & pasta. As this is guaranteed to be X2APIC mode, this
+function is a nop and returns 0 unconditionally.
+
+> +	if (init_udelay == 0)
+> +		udelay(10);
+> +	else
+> +		udelay(300);
+> +
+> +	accept_status = (apic_read(APIC_ESR) & 0xEF);
+
+The point of this is? Bit 0-3 are Pentium and P6 only.
+
+Bit 4 Tried to send low prio IPI but not supported
+Bit 5 Illegal Vector sent
+Bit 6 Illegal Vector received
+Bit 7 X2APIC illegal register access
+
+IOW, there is no accept error here. That would be bit 2 which is never set
+on anything modern
+
+But aside of that the read is moot anyway because the CPU has the APIC
+error vector enabled so if this would happen the APIC error interrupt
+would have swallowed and cleared the error condition.
+
+IOW. Everything except the apic_icr_write() here is completely useless.
+
+> +#else
+> +
+> +#define slaunch_wakeup_cpu_from_txt(cpu, apicid)	0
+
+inline stub please. 
+
+> +
+> +#endif  /* !CONFIG_SECURE_LAUNCH */
+> +
+>  /*
+>   * NOTE - on most systems this is a PHYSICAL apic ID, but on multiquad
+>   * (ie clustered apic addressing mode), this is a LOGICAL apic ID.
+> @@ -1132,6 +1210,13 @@ static int do_boot_cpu(int apicid, int cpu, struct task_struct *idle,
+>  	cpumask_clear_cpu(cpu, cpu_initialized_mask);
+>  	smp_mb();
+>  
+> +	/* With Intel TXT, the AP startup is totally different */
+> +	if ((slaunch_get_flags() & (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)) ==
+> +	   (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)) {
+
+Stick this condition into a helper function please
+
+> +		boot_error = slaunch_wakeup_cpu_from_txt(cpu, apicid);
+> +		goto txt_wake;
+> +	}
+> +
+>  	/*
+>  	 * Wake up a CPU in difference cases:
+>  	 * - Use a method from the APIC driver if one defined, with wakeup
+> @@ -1147,6 +1232,7 @@ static int do_boot_cpu(int apicid, int cpu, struct task_struct *idle,
+>  		boot_error = wakeup_cpu_via_init_nmi(cpu, start_ip, apicid,
+>  						     cpu0_nmi_registered);
+>  
+> +txt_wake:
+
+Sorry, but what has this to do with TXT ? And why can't the above just
+be yet another if clause in the existing if/else if maze?
+
+Now that brings me to another question. How is this supposed to work
+with CPU hotplug post boot?
+
+It will simply not work at all because once a CPU is offlined it is
+going to sit in an endless loop and wait for INIT/SIPI/SIPI. So it will
+get that NMI and go back to wait.
+
+So you need a TXT specific cpu_play_dead() implementation, which should
+preferrably use monitor/mwait where each "offline" CPU sits and waits
+until a condition becomes true. Then you don't need a NMI for wakeup at
+all. Just writing the condition into that per CPU cache line should be
+enough.
 
 Thanks,
-Milan
+
+        tglx
+
