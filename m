@@ -2,130 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E100C7EE2A
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 May 2023 19:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB9AC77B7F
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 May 2023 07:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239290AbjELTmp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 May 2023 15:42:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51186 "EHLO
+        id S229639AbjEMHn5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 13 May 2023 03:43:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238467AbjELTmo (ORCPT
+        with ESMTP id S229820AbjEMHn4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 May 2023 15:42:44 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E016A76;
-        Fri, 12 May 2023 12:42:41 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f49bf0223cso35801935e9.1;
-        Fri, 12 May 2023 12:42:40 -0700 (PDT)
+        Sat, 13 May 2023 03:43:56 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD49D273D;
+        Sat, 13 May 2023 00:43:55 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-64359d9c531so8109933b3a.3;
+        Sat, 13 May 2023 00:43:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683920559; x=1686512559;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DN2lJwVxCSywQ45Toh9NWXRSKQkBQksDIAdmNfkgPbg=;
-        b=Pz9gZZLJj0bTpnXxFNomhku198dAZLFRV9cNoX36VzMjl1POqEJjByjCx+TOScAYIb
-         3iBkJdxH5ycv111ZXQ9w7h5tkc6P6Ne+UvjU0DctlUE/JiprguiPY3w509PMSPt8tF6z
-         ytunHZ+/UlNq4E3rW3AUAMrjsEZKmnMdcB2tP7BxF3dHO0s0MOncGzB6XsKwEB44Cmji
-         AbA7RoRaC1NUFSuAs7sWmFnh/TCSXajfjoYgev0bXVcYeVaHxuO8Z1E8aT/caQG42it9
-         9xYqhMcpvIdddCJF612T/XiuXecsioCbOv1cG1NVkkUlxpo/Z6UC2sr7Aa0rYOAahIHb
-         Y7qA==
+        d=gmail.com; s=20221208; t=1683963835; x=1686555835;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rcUJ2CE5Wu113tG/GDgAYSmXKbkEEJm0H8VDNYsDl+s=;
+        b=O1xV9PonVSBFFzyRLM6xv010yjVa4NgU8Eu18/b8WChpjN9f8ZkGmAECwxqv7jq9D6
+         el8VNYhNd8owXUxhyd/HKyEWPPrnRH/t087fxXQedwr/Ufk68kyP2cJcuqIsD2doQN5i
+         7AdIp3GJRqyRcuSbUuVzKK6suVvmuYqeWmlL7Hnzuo0lBRubQVmxOQNjDwDHIM1ctMgF
+         zHDv/ggSr7ILGTIQ1C5Fjx0d2dmJkowSFrcs+Gwm8STqzmL3xcnTZEmNLASpI956Czv8
+         SmiuPXV6orVfIt+gyH2qyF3F2qW30vLeMIJcZw45QB9pxWzYSmJAUE1IfQjWSG9n/7fc
+         khAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683920559; x=1686512559;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DN2lJwVxCSywQ45Toh9NWXRSKQkBQksDIAdmNfkgPbg=;
-        b=YbmunFJuMSbcCxmH/MQI0+Jz4zBE6JRcSTLmHuZ2ggRwCEMifCuhcJwwv6jKYEEZ2j
-         C1ncyfCr35lcNcnrRBf9rHiqSMIwxTIqaM9fw7Nyb1cUHCcMQDEVaTtZXPl/9iregG0B
-         BpOcLugeUeAbKZXyCLOQQ9K7AdCsnQn139PzF8ChEsx7Skl5YmLvG0uw67vlv/EANhFX
-         G4TXebUxORlXzbHxVF9XHtPU/mXC9q9nknvzuj+VHW8r6u2altZeuAYbR22MrHKvpA00
-         pNLLuVv3nO5X1PDx1snGoUl4QqqgS1QohkKOY5ddEfmhv6s2D3YPVlD6NPKJcB7d8JZM
-         sl3g==
-X-Gm-Message-State: AC+VfDz0zEFfp5XdbiXY8o3qAfBLfaPEflrq/ICEsGJhZ53691mQUEPn
-        3dfjhD+fomu99ejNt7UOa24=
-X-Google-Smtp-Source: ACHHUZ7WQC0iGvDme0/M8wQdMxZpP0KeML4RwxJscAaHJ8Z1gcQLji5mEU4q1GgRZuVlj8wSQ4Pbow==
-X-Received: by 2002:a05:600c:2210:b0:3f4:2174:b288 with SMTP id z16-20020a05600c221000b003f42174b288mr14545149wml.4.1683920559237;
-        Fri, 12 May 2023 12:42:39 -0700 (PDT)
-Received: from [10.80.67.26] (default-46-102-197-194.interdsl.co.uk. [46.102.197.194])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5d4003000000b003063176ef0dsm24256011wrp.97.2023.05.12.12.42.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 12:42:38 -0700 (PDT)
-Message-ID: <4a8f15b7-2897-e7f5-fe7e-fded3a4130c6@gmail.com>
-Date:   Fri, 12 May 2023 20:42:37 +0100
+        d=1e100.net; s=20221208; t=1683963835; x=1686555835;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rcUJ2CE5Wu113tG/GDgAYSmXKbkEEJm0H8VDNYsDl+s=;
+        b=JbYX6yrSTk2ReaajTQ4+oaosvieaU402DTaDrVXgzKRDC6Q+ohKXL98QXMd8Hk78eY
+         E7Mvx4pzWlA90JY6jJBN6JkBpXsSpWEKugB1a8FMNeJMnigKiyMAceiToqEC/f5RiRcO
+         +0am56WU03STf/HZ8n1+T/xlxYssvMTqfqUI47mEoNE5VMr1mgzmhvZ3FbWsJKi1Jv3i
+         YPJQeE2kQ7Qd/iqIpYYxE2jynYd10pBMCDpL3AbRTBOG2LRXc0ontl03vESNh1UCFNdd
+         b6uRfxaDyXxJt757wQ8qoQlvGpnZXwxBXSlqNg4KRm9xtTmhQQS4bR9+yDXXxSB7vG/f
+         FemQ==
+X-Gm-Message-State: AC+VfDxRLP+M+tdjmOCLOkv6JXS1lxBS/6v2nZbPO0W/0AC9rVSzl1QB
+        DFYJfQ8TaQ0GvjI+tjMz7vYp9pfM8w0FQtpVNlU=
+X-Google-Smtp-Source: ACHHUZ4e0OyfA8rnWZsAtKADV29YrjaRGWVqwm3g+ybr6oKj7NAR3YvzpM7ovceXoGtVYG3flLa83Q==
+X-Received: by 2002:a05:6a00:2396:b0:646:6c71:ee13 with SMTP id f22-20020a056a00239600b006466c71ee13mr24964740pfc.24.1683963835065;
+        Sat, 13 May 2023 00:43:55 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([104.28.213.199])
+        by smtp.gmail.com with ESMTPSA id u19-20020aa78393000000b006242f4a8945sm8128895pfm.182.2023.05.13.00.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 May 2023 00:43:54 -0700 (PDT)
+From:   David Yang <mmyangfl@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     David Yang <mmyangfl@gmail.com>, Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
+Date:   Sat, 13 May 2023 15:43:20 +0800
+Message-Id: <20230513074339.266879-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v6 06/14] x86: Add early SHA support for Secure Launch
- early measurements
-Content-Language: en-GB
-To:     Matthew Garrett <mjg59@srcf.ucam.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Ross Philipson <ross.philipson@oracle.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        dpsmith@apertussolutions.com, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, James.Bottomley@hansenpartnership.com,
-        luto@amacapital.net, nivedita@alum.mit.edu,
-        kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com,
-        richard@hughsie.com
-References: <20230504145023.835096-1-ross.philipson@oracle.com>
- <20230504145023.835096-7-ross.philipson@oracle.com>
- <20230510012144.GA1851@quark.localdomain>
- <20230512110455.GD14461@srcf.ucam.org>
- <CAMj1kXE8m5jCH3vW54ys=dE2-Vf_gnnueR6_g4Rq-LSJ5BqRjA@mail.gmail.com>
- <20230512112847.GF14461@srcf.ucam.org> <87pm75bs3v.ffs@tglx>
- <20230512161318.GA18400@srcf.ucam.org> <873541bej2.ffs@tglx>
- <20230512191203.GA21013@srcf.ucam.org>
-From:   Andrew Cooper <andyhhp@gmail.com>
-In-Reply-To: <20230512191203.GA21013@srcf.ucam.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/05/2023 8:12 pm, Matthew Garrett wrote:
-> On Fri, May 12, 2023 at 08:17:21PM +0200, Thomas Gleixner wrote:
->> On Fri, May 12 2023 at 17:13, Matthew Garrett wrote:
->>> On Fri, May 12, 2023 at 03:24:04PM +0200, Thomas Gleixner wrote:
->>>> On Fri, May 12 2023 at 12:28, Matthew Garrett wrote:
->>>>> Unless we assert that SHA-1 events are unsupported, it seems a bit odd 
->>>>> to force a policy on people who have both banks enabled. People with 
->>>>> mixed fleets are potentially going to be dealing with SHA-1 measurements 
->>>>> for a while yet, and while there's obviously a security benefit in using 
->>>>> SHA-2 instead it'd be irritating to have to maintain two attestation 
->>>>> policies.
->>>> Why?
->>>>
->>>> If you have a mixed fleet then it's not too much asked to provide two
->>>> data sets. On a TPM2 system you can enforce SHA-2 and only fallback to
->>>> SHA-1 on TPM 1.2 hardware. No?
->>> No, beause having TPM2 hardware doesn't guarantee that your firmware 
->>> enables SHA-2 (which also means this is something that could change with 
->>> firmware updates, which means that refusing to support SHA-1 if the 
->>> SHA-2 banks are enabled could result in an entirely different policy 
->>> being required (and plausibly one that isn't implemented in their 
->>> existing tooling)
->> It's not rocket science to have both variants supported in tooling,
->> really.
-> People who are currently using tboot are only getting SHA-1, so there's 
-> no obvious reason for them to have added support yet. *My* tooling all 
-> supports SHA-2 so I'm completely fine here, but either we refuse to 
-> support a bunch of hardware or we have to support SHA-1 anyway, and if 
-> we have to support it the only reason not to implement it even in the 
-> "SHA-2 is supported" case is because we have opinions about how other 
-> people implement their security.
+HiSilicon ADVCA Subsystem contains various cryptographic devices, including
+symmetric key ciphers, hash functions, RSA algorithms, as well as key
+ladder and OTP memory.
 
-The way to deal with this is to merge DRTM support (when it's ready of
-course) so people have an option which isn't tboot.
+This series adds symmetric key cipher and SHA algorithm family driver.
 
-Then warn on finding a TPM2 without SHA-2, and make it a failure for
-https://fwupd.github.io/libfwupdplugin/hsi.html#tpm-20-present etc, and
-eventually the vendors will decide that the easiest way to avoid getting
-a cross in their customers UIs is to implement SHA-2 support properly.
+This series is based on Hi3798Mv100.
 
-~Andrew
+David Yang (2):
+  crypto: hisilicon - Add HiSilicon ADVCA Subsystem
+  crypto: hisilicon/advca - Add SHA support
+
+ drivers/crypto/hisilicon/Kconfig              |   11 +
+ drivers/crypto/hisilicon/Makefile             |    1 +
+ drivers/crypto/hisilicon/advca/Makefile       |    2 +
+ .../crypto/hisilicon/advca/hisi-advca-muc.c   | 1527 +++++++++++++++++
+ .../crypto/hisilicon/advca/hisi-advca-sha.c   |  644 +++++++
+ 5 files changed, 2185 insertions(+)
+ create mode 100644 drivers/crypto/hisilicon/advca/Makefile
+ create mode 100644 drivers/crypto/hisilicon/advca/hisi-advca-muc.c
+ create mode 100644 drivers/crypto/hisilicon/advca/hisi-advca-sha.c
+
+
+base-commit: 9a48d604672220545d209e9996c2a1edbb5637f6
+-- 
+2.39.2
+
