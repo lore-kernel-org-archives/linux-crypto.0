@@ -2,48 +2,48 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FAAC77B7C
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 May 2023 08:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A498C77B7F
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 May 2023 09:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230086AbjEMInO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 13 May 2023 04:43:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42168 "EHLO
+        id S231273AbjEMJGN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 13 May 2023 05:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbjEMInN (ORCPT
+        with ESMTP id S229671AbjEMJGM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 13 May 2023 04:43:13 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9AC4C10;
-        Sat, 13 May 2023 01:43:11 -0700 (PDT)
+        Sat, 13 May 2023 05:06:12 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189934ED7;
+        Sat, 13 May 2023 02:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683967391; x=1715503391;
+  t=1683968771; x=1715504771;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=+QgOiRaS6uSr1eVJzQcLvEfSxNZaNOBXvZTLLm9zO+E=;
-  b=MryeNSW/TpIAQLasOR5vkHTYbaFfuS/iKhCHDdn0n/At+UZAZ4Pd3lrg
-   1MYq/rxh3ulqhee3OIL7ihhJJSxNrPiblQ2LVXEqDbsvDf7gcxdBfvMiK
-   nVoU3HBo5TQ9cjCE0nCu1kHZG4wxmDkuEDvkWA6B4mk4YGI5KvQ/oRqKr
-   1K9vvZD1b8s4YZbajD8nXEmBgsr3ayxpStwo79Pbne3YNWQNCL8/eJVzY
-   Sspz4Hoc4oei3CmDyMrnNLj2upYEIgm6LSny5gQTKQucFl96z3xUWlQVb
-   uv3wUcPmZ7nOCaHSOU1L5GlVNLPYb0p73sSudjqKswwDENHZdcNFkte1M
+  bh=D70CvXStS43IjD7L5CpDH3KFVNxY0NX2aLgy/4yjULo=;
+  b=M1AApBaPM6C2tSuriPjmNBxawo2ddoYUzyqKltjvN2hx3yBp3iuRf5f8
+   2ygLwh3yFaHvcu4PQkyxVh0vmXB4RdCiLezPhdv/p0eYE5Z++QUJEQ/oD
+   UhUwaVz5JPm4mTQiks+dJn/jgDyWlblgzwdVn+4fHoH4Z+UdLM/ASNpbf
+   yBHor/U63+lzIY0+0uDoxTeIH/sM46a5I0ve54ET0/ZMzdPBbRpnlvp/h
+   tlLWp0+s17EvivPGZfMlIOOukVFoP6Sogn86eTBn2v/1f5To/v9sAPvyz
+   iy/riLVSv5wQ3xOjvnp93fE6TGJof3upnx9WE9nA8flZtEi97LuQ1bYAc
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="414322385"
+X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="335468893"
 X-IronPort-AV: E=Sophos;i="5.99,271,1677571200"; 
-   d="scan'208";a="414322385"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2023 01:43:10 -0700
+   d="scan'208";a="335468893"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2023 02:06:10 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="790071567"
+X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="844685129"
 X-IronPort-AV: E=Sophos;i="5.99,271,1677571200"; 
-   d="scan'208";a="790071567"
+   d="scan'208";a="844685129"
 Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 13 May 2023 01:43:07 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 13 May 2023 02:06:08 -0700
 Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1pxkqJ-0005PI-0x;
-        Sat, 13 May 2023 08:43:07 +0000
-Date:   Sat, 13 May 2023 16:42:38 +0800
+        id 1pxlCZ-0005Py-26;
+        Sat, 13 May 2023 09:06:07 +0000
+Date:   Sat, 13 May 2023 17:05:22 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     David Yang <mmyangfl@gmail.com>, linux-crypto@vger.kernel.org
 Cc:     oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
@@ -52,13 +52,13 @@ Cc:     oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Philipp Zabel <p.zabel@pengutronix.de>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
-Message-ID: <202305131630.Wt74Rpda-lkp@intel.com>
-References: <20230513074339.266879-2-mmyangfl@gmail.com>
+Subject: Re: [PATCH v2 2/2] crypto: hisilicon/advca - Add SHA support
+Message-ID: <202305131617.8wrECG3g-lkp@intel.com>
+References: <20230513074339.266879-3-mmyangfl@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230513074339.266879-2-mmyangfl@gmail.com>
+In-Reply-To: <20230513074339.266879-3-mmyangfl@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -71,73 +71,87 @@ kernel test robot noticed the following build warnings:
 
 url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230513-154545
 base:   9a48d604672220545d209e9996c2a1edbb5637f6
-patch link:    https://lore.kernel.org/r/20230513074339.266879-2-mmyangfl%40gmail.com
-patch subject: [PATCH v2 1/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
-config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20230513/202305131630.Wt74Rpda-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 12.1.0
+patch link:    https://lore.kernel.org/r/20230513074339.266879-3-mmyangfl%40gmail.com
+patch subject: [PATCH v2 2/2] crypto: hisilicon/advca - Add SHA support
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20230513/202305131617.8wrECG3g-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.1.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/6f6cb7dd5da91063c560d2d252104268ffac785b
+        # https://github.com/intel-lab-lkp/linux/commit/57ff91a10a13d90fadb0567f9245d9040ce9659e
         git remote add linux-review https://github.com/intel-lab-lkp/linux
         git fetch --no-tags linux-review David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230513-154545
-        git checkout 6f6cb7dd5da91063c560d2d252104268ffac785b
+        git checkout 57ff91a10a13d90fadb0567f9245d9040ce9659e
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sh olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sh SHELL=/bin/bash drivers/crypto/hisilicon/advca/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash drivers/crypto/hisilicon/advca/
 
 If you fix the issue, kindly add following tag where applicable
 | Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202305131630.Wt74Rpda-lkp@intel.com/
+| Link: https://lore.kernel.org/oe-kbuild-all/202305131617.8wrECG3g-lkp@intel.com/
 
 All warnings (new ones prefixed by >>):
 
->> drivers/crypto/hisilicon/advca/hisi-advca-muc.c:77:41: warning: unsigned conversion from 'int' to 'unsigned char:2' changes value from '4' to '0' [-Woverflow]
-      77 | #define  MUC_MODE_CTR                   4  /* not for DES */
-         |                                         ^
-   drivers/crypto/hisilicon/advca/hisi-advca-muc.c:1283:25: note: in expansion of macro 'MUC_MODE_CTR'
-    1283 |                 .mode = MUC_MODE_##_MODE, \
-         |                         ^~~~~~~~~
-   drivers/crypto/hisilicon/advca/hisi-advca-muc.c:1298:9: note: in expansion of macro 'hica_muc_tmpl_define'
-    1298 |         hica_muc_tmpl_define(AES, _MODE, aes, _mode, AES_MIN_KEY_SIZE, \
-         |         ^~~~~~~~~~~~~~~~~~~~
-   drivers/crypto/hisilicon/advca/hisi-advca-muc.c:1311:9: note: in expansion of macro 'hica_muc_tmpl_define_aes'
-    1311 |         hica_muc_tmpl_define_aes(CTR, ctr),
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/crypto/hisilicon/advca/hisi-advca-sha.c: In function 'hica_sha_update':
+>> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:216:26: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     216 |         bool inplace = !((unsigned int) data & 3);
+         |                          ^
 
 
-vim +77 drivers/crypto/hisilicon/advca/hisi-advca-muc.c
+vim +216 drivers/crypto/hisilicon/advca/hisi-advca-sha.c
 
-    69	
-    70	/* for CTRL reg */
-    71	#define MUC_DECRYPT		BIT(0)
-    72	#define MUC_MODE		GENMASK(3, 1)  /* other: as 0 */
-    73	#define  MUC_MODE_ECB			0
-    74	#define  MUC_MODE_CBC			1
-    75	#define  MUC_MODE_CFB			2
-    76	#define  MUC_MODE_OFB			3
-  > 77	#define  MUC_MODE_CTR			4  /* not for DES */
-    78	#define MUC_ALG			GENMASK(5, 4)  /* other: as 0 */
-    79	#define  MUC_ALG_DES			0
-    80	#define  MUC_ALG_DES3_EDE		1
-    81	#define  MUC_ALG_AES			2
-    82	#define MUC_WIDTH		GENMASK(7, 6)  /* other: as 0 */
-    83	#define  MUC_WIDTH_BLOCK		0
-    84	#define  MUC_WIDTH_8B			1
-    85	#define  MUC_WIDTH_1B			2
-    86	#define MUC_CHAN0_IV_CHANGE	BIT(8)
-    87	#define MUC_KEY			GENMASK(10, 9)  /* other: as 0 */
-    88	#define  MUC_KEY_AES_128B		0
-    89	#define  MUC_KEY_AES_192B		1
-    90	#define  MUC_KEY_AES_256B		2
-    91	#define  MUC_KEY_DES			0
-    92	#define  MUC_KEY_DES3_EDE_3KEY		0
-    93	#define  MUC_KEY_DES3_EDE_2KEY		3
-    94	#define MUC_KEY_FROM_MKL	BIT(13)
-    95	#define MUC_KEY_ID		GENMASK(16, 14)
-    96	#define MUC_WEIGHT		GENMASK(31, 22)
-    97	
+   211	
+   212	static int hica_sha_update(const struct hica_sha_priv *priv, const void *data,
+   213				   unsigned int len, bool may_sleep)
+   214	{
+   215		struct device *dev = priv->dev;
+ > 216		bool inplace = !((unsigned int) data & 3);
+   217		u8 *buf = NULL;
+   218		dma_addr_t addr;
+   219		int ret;
+   220	
+   221		if (!len)
+   222			return 0;
+   223	
+   224		if (WARN_ON(len % SHA_BLOCK_SIZE))
+   225			return -EINVAL;
+   226	
+   227		if (inplace) {
+   228			addr = dma_map_single(dev, (void *) data, len, DMA_TO_DEVICE);
+   229			if (dma_mapping_error(dev, addr)) {
+   230				dev_err(dev, "error mapping src\n");
+   231				return -EIO;
+   232			}
+   233	
+   234			inplace = !(addr & 3);
+   235			if (!inplace)
+   236				dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
+   237		}
+   238	
+   239		if (!inplace) {
+   240			buf = dma_alloc_attrs(dev, len, &addr,
+   241					      may_sleep ? GFP_KERNEL : GFP_ATOMIC, 0);
+   242			if (!buf)
+   243				return -ENOMEM;
+   244			memcpy(buf, data, len);
+   245		}
+   246	
+   247		dma_sync_single_for_device(dev, addr, len, DMA_TO_DEVICE);
+   248		ret = hica_sha_record(priv, addr, len) ?:
+   249		      hica_sha_wait(priv, SHA_RECORD_READY);
+   250	
+   251		if (!buf)
+   252			dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
+   253		else {
+   254			memzero_explicit(buf, len);
+   255			dma_free_attrs(dev, len, buf, addr, 0);
+   256		}
+   257	
+   258		pr_debug("%s: read %u\n", __func__, len);
+   259		return ret;
+   260	}
+   261	
 
 -- 
 0-DAY CI Kernel Test Service
