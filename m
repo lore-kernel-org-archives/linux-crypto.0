@@ -2,157 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A498C77B7F
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 May 2023 09:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B0CC7EE23
+	for <linux-crypto@archiver.kernel.org>; Sun, 14 May 2023 02:30:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231273AbjEMJGN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 13 May 2023 05:06:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50404 "EHLO
+        id S229611AbjENCam (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 13 May 2023 22:30:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbjEMJGM (ORCPT
+        with ESMTP id S229447AbjENCal (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 13 May 2023 05:06:12 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189934ED7;
-        Sat, 13 May 2023 02:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683968771; x=1715504771;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=D70CvXStS43IjD7L5CpDH3KFVNxY0NX2aLgy/4yjULo=;
-  b=M1AApBaPM6C2tSuriPjmNBxawo2ddoYUzyqKltjvN2hx3yBp3iuRf5f8
-   2ygLwh3yFaHvcu4PQkyxVh0vmXB4RdCiLezPhdv/p0eYE5Z++QUJEQ/oD
-   UhUwaVz5JPm4mTQiks+dJn/jgDyWlblgzwdVn+4fHoH4Z+UdLM/ASNpbf
-   yBHor/U63+lzIY0+0uDoxTeIH/sM46a5I0ve54ET0/ZMzdPBbRpnlvp/h
-   tlLWp0+s17EvivPGZfMlIOOukVFoP6Sogn86eTBn2v/1f5To/v9sAPvyz
-   iy/riLVSv5wQ3xOjvnp93fE6TGJof3upnx9WE9nA8flZtEi97LuQ1bYAc
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="335468893"
-X-IronPort-AV: E=Sophos;i="5.99,271,1677571200"; 
-   d="scan'208";a="335468893"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2023 02:06:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10708"; a="844685129"
-X-IronPort-AV: E=Sophos;i="5.99,271,1677571200"; 
-   d="scan'208";a="844685129"
-Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 13 May 2023 02:06:08 -0700
-Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pxlCZ-0005Py-26;
-        Sat, 13 May 2023 09:06:07 +0000
-Date:   Sat, 13 May 2023 17:05:22 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     David Yang <mmyangfl@gmail.com>, linux-crypto@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] crypto: hisilicon/advca - Add SHA support
-Message-ID: <202305131617.8wrECG3g-lkp@intel.com>
-References: <20230513074339.266879-3-mmyangfl@gmail.com>
+        Sat, 13 May 2023 22:30:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB852130;
+        Sat, 13 May 2023 19:30:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F299C61232;
+        Sun, 14 May 2023 02:30:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E98B8C433D2;
+        Sun, 14 May 2023 02:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684031439;
+        bh=K8z4msTDWrINW1KUS2sZfaj4ZFghKPB1pjFp8U06XIg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NHuNnC9/0qv/2GSNLS0AMudMB2l2KxVhfgvaF1HXnLycNDyQ63AtxSUfoZC//6nMh
+         30mnzDZU/o+BYN0sbn5hKLExZNYVSxST2MWqIWEAO22nL1T1Pv1WRK5Ph/A13cC8Og
+         tsyDtuEJ7EQ783ZRFjyYxLRtakER5q/q5rAltJNLuC75QbwdOEkZ/m+ci7CXyHkp3I
+         bguj3CfiPPKsnWrHONgLhfgUrvNVysj/ejHrkaLPAF0KT2g5wz3vHifzKYz/07ZN6n
+         mTM2WPRrN8TqVLLetLD18V4wbRj6WMhoB4V6T5g0hMhOqJeVh4VDkrDBo77oLAZLpp
+         wGsad3y2AIfPQ==
+Date:   Sun, 14 May 2023 10:30:23 +0800
+From:   Shawn Guo <shawnguo@kernel.org>
+To:     Stefan Wahren <stefan.wahren@i2se.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>, kernel@pengutronix.de,
+        Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-pm@vger.kernel.org
+Subject: Re: [PATCH V3 5/6] ARM: dts: imx: Adjust dma-apbh node name
+Message-ID: <20230514023023.GG727834@dragon>
+References: <20230414091947.7831-1-stefan.wahren@i2se.com>
+ <20230414091947.7831-6-stefan.wahren@i2se.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230513074339.266879-3-mmyangfl@gmail.com>
+In-Reply-To: <20230414091947.7831-6-stefan.wahren@i2se.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+On Fri, Apr 14, 2023 at 11:19:46AM +0200, Stefan Wahren wrote:
+> Currently the dtbs_check generates warnings like this:
+> 
+> $nodename:0: 'dma-apbh@110000' does not match '^dma-controller(@.*)?$'
+> 
+> So fix all affected dma-apbh node names.
+> 
+> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on 9a48d604672220545d209e9996c2a1edbb5637f6]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230513-154545
-base:   9a48d604672220545d209e9996c2a1edbb5637f6
-patch link:    https://lore.kernel.org/r/20230513074339.266879-3-mmyangfl%40gmail.com
-patch subject: [PATCH v2 2/2] crypto: hisilicon/advca - Add SHA support
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20230513/202305131617.8wrECG3g-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/57ff91a10a13d90fadb0567f9245d9040ce9659e
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230513-154545
-        git checkout 57ff91a10a13d90fadb0567f9245d9040ce9659e
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash drivers/crypto/hisilicon/advca/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202305131617.8wrECG3g-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/crypto/hisilicon/advca/hisi-advca-sha.c: In function 'hica_sha_update':
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:216:26: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
-     216 |         bool inplace = !((unsigned int) data & 3);
-         |                          ^
-
-
-vim +216 drivers/crypto/hisilicon/advca/hisi-advca-sha.c
-
-   211	
-   212	static int hica_sha_update(const struct hica_sha_priv *priv, const void *data,
-   213				   unsigned int len, bool may_sleep)
-   214	{
-   215		struct device *dev = priv->dev;
- > 216		bool inplace = !((unsigned int) data & 3);
-   217		u8 *buf = NULL;
-   218		dma_addr_t addr;
-   219		int ret;
-   220	
-   221		if (!len)
-   222			return 0;
-   223	
-   224		if (WARN_ON(len % SHA_BLOCK_SIZE))
-   225			return -EINVAL;
-   226	
-   227		if (inplace) {
-   228			addr = dma_map_single(dev, (void *) data, len, DMA_TO_DEVICE);
-   229			if (dma_mapping_error(dev, addr)) {
-   230				dev_err(dev, "error mapping src\n");
-   231				return -EIO;
-   232			}
-   233	
-   234			inplace = !(addr & 3);
-   235			if (!inplace)
-   236				dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
-   237		}
-   238	
-   239		if (!inplace) {
-   240			buf = dma_alloc_attrs(dev, len, &addr,
-   241					      may_sleep ? GFP_KERNEL : GFP_ATOMIC, 0);
-   242			if (!buf)
-   243				return -ENOMEM;
-   244			memcpy(buf, data, len);
-   245		}
-   246	
-   247		dma_sync_single_for_device(dev, addr, len, DMA_TO_DEVICE);
-   248		ret = hica_sha_record(priv, addr, len) ?:
-   249		      hica_sha_wait(priv, SHA_RECORD_READY);
-   250	
-   251		if (!buf)
-   252			dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
-   253		else {
-   254			memzero_explicit(buf, len);
-   255			dma_free_attrs(dev, len, buf, addr, 0);
-   256		}
-   257	
-   258		pr_debug("%s: read %u\n", __func__, len);
-   259		return ret;
-   260	}
-   261	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Applied, thanks!
