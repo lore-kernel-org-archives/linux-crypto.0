@@ -2,134 +2,137 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F427C7EE30
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 09:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4CBC7EE2C
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 12:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233666AbjEOJpa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 May 2023 05:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50468 "EHLO
+        id S241989AbjEOMyN convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 08:54:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241127AbjEOJpL (ORCPT
+        with ESMTP id S238913AbjEOMyL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 May 2023 05:45:11 -0400
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFDC1BD7;
-        Mon, 15 May 2023 02:43:44 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.nyi.internal (Postfix) with ESMTP id DD5495803CE;
-        Mon, 15 May 2023 05:43:41 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Mon, 15 May 2023 05:43:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1684143821; x=1684151021; bh=rh
-        DpJI+VS2ftRNM4C+B3O914qD0XGOeUnvYVI19CEcc=; b=ouvD58uxjfNX4wP0nP
-        xvpLpKJ0T+XQe0vE3+HQlIgXzQFoYhQav58t5Dt2KUNupaE1hauor5HqsvRweZIA
-        n7VUIbSESGSsJAS4/IBRJKBSsxxY38GuTgOajMXeSWSgJQimKnSYKuYGHWHVY4NP
-        /Z9Gf1cMeQiyDMZN5qrJRzyawySnZgkgQbE4fwGD0ipwb+g7TY93g3qvv7gHFwjA
-        LLXU0AdO2UkJkc2revwtVIywBQkAzGtx29mZ5LC6bOrEx+xHyUGvBZi9mcGzUgv7
-        bZKliDv8gyReD6p2qApGsiWp78ZcFzHWVRJfXszfRmnRY8Ih0GVViZweQT8LUDUT
-        mtnw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1684143821; x=1684151021; bh=rhDpJI+VS2ftR
-        NM4C+B3O914qD0XGOeUnvYVI19CEcc=; b=W0CbDVAPadlsN/NG6WntcvQsG7eam
-        98jhjJQ/QA65KOBFXAByPwX2xRzcv5kefvCfHPyQfFXa0MZRfWDETlJBF1OM7JTd
-        KGU/Srx/r17/VNHIFDuh+T58q6Lcf9BWxvGxNcF3d0lxRehwVtidwFFf4DBPLiXJ
-        cJfmJ30HkBGxX4vJRin9a4WPll+IgH7hNRfqTxWjs8QSbe4SPY5P4YZHkg9FjAh6
-        Vckfzq4j7n1ln9MnIkonN2rGXhPG0IqlKgKNjAzWvEmgORkY0ycBuLQj62JeA408
-        +aj8JQv1XXfSBVZ5xCX6pwqZJ1zQHl98KBdzzqe14Hydi21btJoSo9DIA==
-X-ME-Sender: <xms:y_5hZKy7-ycOVkrUGZnJEVNTV3o6YuyL_MeHS-twItZHxAUa3nejWw>
-    <xme:y_5hZGSMUaPvv901TovUBRVAUK_jevHQqJtWvocrwJVgb2lacmpWr56gmq4_8jr92
-    yS_vMMHlrogk3gXavU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeehjedgudelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:y_5hZMX2aul_vmm39YeEhHkNWk0zLtYqTE5NC3HBR9sayqdtv0vKtw>
-    <xmx:y_5hZAh8vxQdrl9TrGbz6lAoeU8NgKb2AF_qgUO4jxo84uU8puLK3A>
-    <xmx:y_5hZMDDmmLTxLsN8FYBvs8HP-DutPDML8AhpGWpw48AuKcy5Vu4_Q>
-    <xmx:zf5hZOyPkZngc4eRCdWmxCUqxpL7o310qROMxzps2Vc0Ig1f5oDEJg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 7747DB60086; Mon, 15 May 2023 05:43:39 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-415-gf2b17fe6c3-fm-20230503.001-gf2b17fe6
-Mime-Version: 1.0
-Message-Id: <4975b92f-92f6-4d50-8386-9add12ddfd61@app.fastmail.com>
-In-Reply-To: <20230515075659.118447996@infradead.org>
-References: <20230515075659.118447996@infradead.org>
-Date:   Mon, 15 May 2023 11:42:23 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Peter Zijlstra" <peterz@infradead.org>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>
-Cc:     "Jonathan Corbet" <corbet@lwn.net>,
-        "Will Deacon" <will@kernel.org>,
-        "Boqun Feng" <boqun.feng@gmail.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
-        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        "Baolu Lu" <baolu.lu@linux.intel.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        Mon, 15 May 2023 08:54:11 -0400
+Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB20199F;
+        Mon, 15 May 2023 05:54:10 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by ex01.ufhost.com (Postfix) with ESMTP id 2A28324E03C;
+        Mon, 15 May 2023 20:54:09 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
+ 2023 20:54:09 +0800
+Received: from ubuntu.localdomain (161.142.156.10) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
+ 2023 20:53:59 +0800
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        "Pekka Enberg" <penberg@kernel.org>,
-        "David Rientjes" <rientjes@google.com>,
-        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Roman Gushchin" <roman.gushchin@linux.dev>,
-        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 00/11] Introduce cmpxchg128() -- aka. the demise of
- cmpxchg_double()
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor@kernel.org>
+CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+Subject: [PATCH v8 0/4] crypto: starfive - Add drivers for crypto engine
+Date:   Mon, 15 May 2023 20:53:51 +0800
+Message-ID: <20230515125355.624250-1-jiajie.ho@starfivetech.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
 Content-Type: text/plain
+X-Originating-IP: [161.142.156.10]
+X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 15, 2023, at 09:56, Peter Zijlstra wrote:
->
-> Since v2:
->
->  - reworked this_cpu_cmpxchg() to not implicity do u128 but provide explicit
->    this_cpu_cmpxchg128() (arnd)
->  - added try_cmpxchg12_local() (per the addition of the try_cmpxchg*_local()
->    family of functions)
->  - slight cleanup of the SLUB conversion (due to rebase and having to touch it)
->  - added a 'cleanup' patch for SLUB, since I was staring at that anyway
->
+This patch series adds kernel driver support for StarFive JH7110 crypto
+engine. The first patch adds Documentations for the device and Patch 2
+adds device probe and DMA init for the module. Patch 3 adds crypto and
+DMA dts node for VisionFive 2 board. Patch 4 adds hash/hmac support to
+the module.
 
-This is clearly an improvement over the previous state, so I'm
-happy with that, and the explicit this_cpu_cmpxchg128() interface
-addresses most of my previous concerns.
+Patch 3 needs to be applied on top of:
+https://lore.kernel.org/lkml/20230424135409.6648-3-xingyu.wu@starfivetech.com/
 
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+Patch 4 needs to be applied on top of:
+https://lore.kernel.org/linux-crypto/ZEEOXIHwqKblKfBJ@gondor.apana.org.au/T/#u
 
-The need for runtime feature checking in the callers on x86-64 is still
-a bit awkward, but this is no worse than before. I understand that
-turning this into a compile-time choice would require first settling
-a larger debate about raising the default target for distros beyond
-the current CONFIG_GENERIC_CPU.
+Changes v7->v8
+- Enable COMPILE_TEST in Kconfig (Herbert)
+- Fix compile_test warning on 'long unsigned int' to 'unsigned int'
+  conversion (Herbert)
 
-    Arnd
+Changes v6->v7
+- Remove NULL assignment as struct is kzalloc()-ed (Christophe)
+- Do clk_disable_unprepare and assert reset if probe failed (Christophe)
+- Remove unnecessary null pointer check (Christophe)
+- Update module name in Kconfig description (Christophe)
+
+Changes v5->v6
+- Remove set_crypt in export as request will have been created by
+  init/updated calls (Herbert)
+- Use new helper to set statesize of crypto_ahash (Herbert)
+- Use crypto_ahash_blocksize instead of crypto_ahash_tfm (Herbert)
+- Switch to init_tfm/exit_tfm instead of cra_init/cra_exit (Herbert)
+
+Changes v4->v5
+- Schedule tasklet from IRQ handler instead of using completion to sync
+  events (Herbert)
+
+Changes v3->v4:
+- Use fallback for non-aligned cases as hardware doesn't support
+  hashing piece-meal (Herbert)
+- Use ahash_request_set_* helpers to update members of ahash_request
+  (Herbert)
+- Set callbacks for async fallback (Herbert)
+- Remove completion variable and use dma_callback to do the rest of
+  processing instead. (Herbert)
+
+Changes v2->v3:
+- Only implement digest and use fallback for other ops (Herbert)
+- Use interrupt instead of polling for hash complete (Herbert)
+- Remove manual data copy from out-of-bound memory location as it will
+  be handled by DMA API. (Christoph & Herbert)
+
+Changes v1->v2:
+- Fixed yaml filename and format (Krzysztof)
+- Removed unnecessary property names in yaml (Krzysztof)
+- Moved of_device_id table close to usage (Krzysztof)
+- Use dev_err_probe for error returns (Krzysztof)
+- Dropped redundant readl and writel wrappers (Krzysztof)
+- Updated commit signed offs (Conor)
+- Dropped redundant node in dts, module set to on in dtsi (Conor)
+
+Jia Jie Ho (4):
+  dt-bindings: crypto: Add StarFive crypto module
+  crypto: starfive - Add crypto engine support
+  riscv: dts: starfive: Add crypto and DMA node for VisionFive 2
+  crypto: starfive - Add hash and HMAC support
+
+ .../crypto/starfive,jh7110-crypto.yaml        |  70 ++
+ MAINTAINERS                                   |   7 +
+ arch/riscv/boot/dts/starfive/jh7110.dtsi      |  28 +
+ drivers/crypto/Kconfig                        |   1 +
+ drivers/crypto/Makefile                       |   1 +
+ drivers/crypto/starfive/Kconfig               |  21 +
+ drivers/crypto/starfive/Makefile              |   4 +
+ drivers/crypto/starfive/jh7110-cryp.c         | 240 +++++
+ drivers/crypto/starfive/jh7110-cryp.h         | 127 +++
+ drivers/crypto/starfive/jh7110-hash.c         | 892 ++++++++++++++++++
+ 10 files changed, 1391 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/starfive,jh7110-crypto.yaml
+ create mode 100644 drivers/crypto/starfive/Kconfig
+ create mode 100644 drivers/crypto/starfive/Makefile
+ create mode 100644 drivers/crypto/starfive/jh7110-cryp.c
+ create mode 100644 drivers/crypto/starfive/jh7110-cryp.h
+ create mode 100644 drivers/crypto/starfive/jh7110-hash.c
+
+-- 
+2.25.1
+
