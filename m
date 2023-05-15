@@ -2,60 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86148C7EE22
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 06:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAF8C7EE26
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 08:07:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232090AbjEOGUu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 May 2023 02:20:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52494 "EHLO
+        id S230002AbjEOIHY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 04:07:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229701AbjEOGUt (ORCPT
+        with ESMTP id S230074AbjEOIHW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 May 2023 02:20:49 -0400
-X-Greylist: delayed 531 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 14 May 2023 23:20:48 PDT
-Received: from out-43.mta1.migadu.com (out-43.mta1.migadu.com [IPv6:2001:41d0:203:375::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE59E99
-        for <linux-crypto@vger.kernel.org>; Sun, 14 May 2023 23:20:48 -0700 (PDT)
-Date:   Mon, 15 May 2023 02:11:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1684131116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gQtZtkYSr01iPUQ02O9EobNAKFbxisOovLBX2ZmpB7g=;
-        b=O9YpRD3DZPEXA9ewsr2sNqxtN7Vi/X8uluvLidZYd38LkD6FuRqZXWsgWVCxdOzOKNmXpD
-        yAsKazwRFfkvObwLb+W6n0yNVX2ydTWdRJoYQPnW74kG3grbMjFO/L+6AV5QsviCIf3jwS
-        JjU47Hg728g4OEulJNDfTCYZTiL6eek=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     FUJITA Tomonori <tomo@exabit.dev>
-Cc:     rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        FUJITA Tomonori <fujita.tomonori@gmail.com>
-Subject: Re: [PATCH 1/2] rust: add synchronous message digest support
-Message-ID: <ZGHNKCY/2C5buW7O@moria.home.lan>
-References: <20230515043353.2324288-1-tomo@exabit.dev>
- <010101881db037b4-c8c941a9-c482-4759-9c07-b8bf645d96ed-000000@us-west-2.amazonses.com>
+        Mon, 15 May 2023 04:07:22 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA211716;
+        Mon, 15 May 2023 01:07:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To;
+        bh=gp7OCKaBYjIIkPcuPMybL+ixdp/AdwhFq0MWXNBGUCo=; b=mfr/Lee6q6wb3hW9VLMJP6RMas
+        nTl9Qe1+9Iu48xOQT4aXYKIo3YdHu4pVixS6ep5klWjn2Hleinv1VLcJZJw+35Dak53xO4M9X9KIK
+        FpMiCIIAsi7/QgdKTHO+THopVLnjgnmza7zDZfiP5yT3vka2IQVSR4N/m/pdNqYPnTzsA8lIVgWqD
+        P5m3mwC26ExmfD/meFO5f1ezwrEtuIohzrkIWoLo3mQANg3Hx3wLE8RBN4yr9HOkOwiYyEuNQ3/1W
+        PLL/LI+1uLThBRAeCCPMwP+WHJ7vOYl/0orY1PoeN18xp4Y80oyboD7BypdwlKtzQ00oQnrhgh54F
+        yIuqhB5w==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pyTDk-00BQMy-1T;
+        Mon, 15 May 2023 08:06:16 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0C5C8300786;
+        Mon, 15 May 2023 10:06:10 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
+        id AB37F202674A5; Mon, 15 May 2023 10:06:10 +0200 (CEST)
+Message-ID: <20230515080553.979680310@infradead.org>
+User-Agent: quilt/0.66
+Date:   Mon, 15 May 2023 09:57:00 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     torvalds@linux-foundation.org
+Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
+        boqun.feng@gmail.com, mark.rutland@arm.com,
+        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
+        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v3 01/11] cyrpto/b128ops: Remove struct u128
+References: <20230515075659.118447996@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <010101881db037b4-c8c941a9-c482-4759-9c07-b8bf645d96ed-000000@us-west-2.amazonses.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 15, 2023 at 04:34:27AM +0000, FUJITA Tomonori wrote:
-> From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> 
-> Adds abstractions for crypto shash.
-> 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/bindings/bindings_helper.h |   1 +
->  rust/helpers.c                  |  24 +++++++
->  rust/kernel/crypto.rs           | 108 ++++++++++++++++++++++++++++++++
->  rust/kernel/lib.rs              |   2 +
+Per git-grep u128_xor() and its related struct u128 are unused except
+to implement {be,le}128_xor(). Remove them to free up the namespace.
 
-I think in the long run we're going to need Rust bindings located right
-next to the .c files they're wrapping. Certainly modules will.
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ include/crypto/b128ops.h |   14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
+
+--- a/include/crypto/b128ops.h
++++ b/include/crypto/b128ops.h
+@@ -50,10 +50,6 @@
+ #include <linux/types.h>
+ 
+ typedef struct {
+-	u64 a, b;
+-} u128;
+-
+-typedef struct {
+ 	__be64 a, b;
+ } be128;
+ 
+@@ -61,20 +57,16 @@ typedef struct {
+ 	__le64 b, a;
+ } le128;
+ 
+-static inline void u128_xor(u128 *r, const u128 *p, const u128 *q)
++static inline void be128_xor(be128 *r, const be128 *p, const be128 *q)
+ {
+ 	r->a = p->a ^ q->a;
+ 	r->b = p->b ^ q->b;
+ }
+ 
+-static inline void be128_xor(be128 *r, const be128 *p, const be128 *q)
+-{
+-	u128_xor((u128 *)r, (u128 *)p, (u128 *)q);
+-}
+-
+ static inline void le128_xor(le128 *r, const le128 *p, const le128 *q)
+ {
+-	u128_xor((u128 *)r, (u128 *)p, (u128 *)q);
++	r->a = p->a ^ q->a;
++	r->b = p->b ^ q->b;
+ }
+ 
+ #endif /* _CRYPTO_B128OPS_H */
+
+
