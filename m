@@ -2,165 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2F3C77B7D
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 03:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5093C77B7D
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 03:28:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235202AbjEODJy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 14 May 2023 23:09:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
+        id S238416AbjEOD2m convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 14 May 2023 23:28:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232859AbjEODJw (ORCPT
+        with ESMTP id S238405AbjEOD2Q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 May 2023 23:09:52 -0400
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4E1B10F8
-        for <linux-crypto@vger.kernel.org>; Sun, 14 May 2023 20:09:50 -0700 (PDT)
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-333eb36e510so67915805ab.1
-        for <linux-crypto@vger.kernel.org>; Sun, 14 May 2023 20:09:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684120190; x=1686712190;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RRU0rjb8JefBTmoDMF+g1dYQsfw2AxmnXJwd6Giu3tg=;
-        b=Y9iOuRk953QGUGGfDfllHIatOD/2+o7Ta23XZJ0jKoZOtP/t/+AOgg2vOJ3CLNL1IW
-         vOxxO/oHpv5L7yZnqUHc3KZQFfjC0zkUPx4fQI2QeI8ExlJUBqLsSW/TjYQqRghTv5py
-         uHn7CNP4DL7r9O9MHBwMNkINQaZkL9L+gKk2Y9244Fv/s8hB0xXWlXU+bgSKFJNWtJ0g
-         Ik8z6gcWr5gMus3iaf65UgZwWyjJ8iapdrZq93dzexKiPeA4tY/1dVIQWwSGUZc7UT7A
-         Y1H4p8rFbz4bEhu1Wf/xRcoln/pt6wfVVFQ/sRPHWYLXbHNxRgPDgGrgnOr2nOJy+Ejc
-         yh7w==
-X-Gm-Message-State: AC+VfDx6FPhh30J4Zw7YLyw/Uv1wd7CUweAewjErGxrlbGEg3GAYvfUD
-        qSWZqtAYvkeJ+MgZ6du3DOWI8/yVtHqKkisFYS+vvYvhzVPy
-X-Google-Smtp-Source: ACHHUZ6vyiRKV66BJe2HM3So05t4s7Hvx7UV1Jc2piMsLNRNTvjOSAfEWvK0yNwAu0RWtZKgh2M2jkXd0OQElpHK3DCYUR1DSjWp
+        Sun, 14 May 2023 23:28:16 -0400
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D35270F;
+        Sun, 14 May 2023 20:27:49 -0700 (PDT)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 8885180B2;
+        Mon, 15 May 2023 11:27:43 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
+ 2023 11:27:43 +0800
+Received: from [192.168.155.85] (202.188.176.82) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
+ 2023 11:27:40 +0800
+Message-ID: <2ae2d187-5db7-9207-7846-1a80e87047b2@starfivetech.com>
+Date:   Mon, 15 May 2023 11:27:35 +0800
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:687:b0:333:74f7:a7ff with SMTP id
- o7-20020a056e02068700b0033374f7a7ffmr15178579ils.6.1684120190239; Sun, 14 May
- 2023 20:09:50 -0700 (PDT)
-Date:   Sun, 14 May 2023 20:09:50 -0700
-In-Reply-To: <0000000000007fa2d705fb29f046@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b2cbe305fbb2c9d9@google.com>
-Subject: Re: [syzbot] [crypto?] general protection fault in __aria_aesni_avx_gfni_crypt_16way
-From:   syzbot <syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com>
-To:     bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, hpa@zytor.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v7 4/4] crypto: starfive - Add hash and HMAC support
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+References: <20230504073400.1170979-1-jiajie.ho@starfivetech.com>
+ <20230504073400.1170979-5-jiajie.ho@starfivetech.com>
+ <ZF4bKe0YkpcQakLs@gondor.apana.org.au>
+Content-Language: en-US
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+In-Reply-To: <ZF4bKe0YkpcQakLs@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
+X-Originating-IP: [202.188.176.82]
+X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On 12/5/2023 6:55 pm, Herbert Xu wrote:
+> On Thu, May 04, 2023 at 03:34:00PM +0800, Jia Jie Ho wrote:
+>>
+>> +	writel(~STARFIVE_IE_MASK_HASH_DONE, cryp->base + STARFIVE_IE_MASK_OFFSET);
+>> +	writel(csr.v, cryp->base + STARFIVE_HASH_SHACSR);
+> 
+> With compile testing I get
+> 
+> ../drivers/crypto/starfive/jh7110-hash.c: In function ‘starfive_hash_start’:
+> ../drivers/crypto/starfive/jh7110-hash.c:110:9: warning: conversion from ‘long unsigned int’ to ‘unsigned int’ changes value from ‘18446744073709551611’ to ‘4294967291’ [-Woverflow]
+> 
 
-HEAD commit:    31f4104e392a Merge tag 'locking_urgent_for_v6.4_rc2' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11768616280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8bc832f563d8bf38
-dashboard link: https://syzkaller.appspot.com/bug?extid=a6abcf08bad8b18fd198
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1737e3be280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149d4c06280000
+Hi Herbert,
+I've added COMPILE_TEST in the Kconfig, then ran make W=1, sparse and smatch.
+However it did not produce the error message.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-31f4104e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/967f88e07e18/vmlinux-31f4104e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b4e92e4df24e/bzImage-31f4104e.xz
++config CRYPTO_DEV_JH7110
++       tristate "StarFive JH7110 cryptographic engine driver"
++       depends on SOC_STARFIVE || COMPILE_TEST
++       select CRYPTO_ENGINE
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
+Symbol: COMPILE_TEST [=y]
+Type  : bool
+Defined at init/Kconfig:142
 
-general protection fault, maybe for address 0xffffffff8c12a198: 0000 [#1] PREEMPT SMP KASAN
-CPU: 2 PID: 5136 Comm: syz-executor269 Not tainted 6.4.0-rc1-syzkaller-00190-g31f4104e392a #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:__aria_aesni_avx_gfni_crypt_16way+0x2a6/0x4f40 arch/x86/crypto/aria-aesni-avx-asm_64.S:1164
-Code: d0 10 c4 e2 69 00 d7 c5 11 ef ea c5 e9 72 d0 08 c4 e2 69 00 d7 c5 09 ef f2 c4 e2 79 00 d7 c5 01 ef fa c5 f9 6f 05 7a 15 c9 0a <c5> f9 6f 0d 6a 15 c9 0a c5 f9 6f 15 7a 15 c9 0a c5 f9 6f 1d 52 15
-RSP: 0018:ffffc9000384f210 EFLAGS: 00010286
-RAX: ffff888026364890 RBX: 0000000000000000 RCX: ffff888026364890
-RDX: ffff888026364890 RSI: ffff888026364890 RDI: ffff888023c79028
-RBP: ffff88801fb3c900 R08: ffff888026364910 R09: ffff888023c79028
-R10: ffff88801fb3c800 R11: ffff88801fb3c800 R12: ffff88801fb3c900
-R13: ffff888023c79028 R14: dffffc0000000000 R15: ffff888026364890
-FS:  0000000000000000(0000) GS:ffff88802c800000(0063) knlGS:0000000056fc72c0
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 00007f29a06956a8 CR3: 000000001f222000 CR4: 0000000000350ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- aria_aesni_avx_gfni_ctr_crypt_16way+0x1d/0x110 arch/x86/crypto/aria-aesni-avx-asm_64.S:1339
- aria_avx_ctr_encrypt+0x180/0x680 arch/x86/crypto/aria_aesni_avx_glue.c:103
- crypto_skcipher_encrypt+0xbc/0x100 crypto/skcipher.c:653
- crypto_skcipher_encrypt+0xbc/0x100 crypto/skcipher.c:653
- crypto_gcm_encrypt+0x393/0x4b0 crypto/gcm.c:459
- crypto_aead_encrypt+0xbc/0x100 crypto/aead.c:121
- tls_do_encryption net/tls/tls_sw.c:544 [inline]
- tls_push_record+0x12d8/0x30f0 net/tls/tls_sw.c:777
- bpf_exec_tx_verdict+0xdf0/0x1210 net/tls/tls_sw.c:817
- tls_sw_sendmsg+0x100b/0x1850 net/tls/tls_sw.c:1033
- inet6_sendmsg+0x9d/0xe0 net/ipv6/af_inet6.c:651
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:747
- sock_write_iter+0x295/0x3d0 net/socket.c:1140
- call_write_iter include/linux/fs.h:1868 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x945/0xd50 fs/read_write.c:584
- ksys_write+0x1ec/0x250 fs/read_write.c:637
- do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
- __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
- do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
- entry_SYSENTER_compat_after_hwframe+0x70/0x82
-RIP: 0023:0xf7f45579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000ff8f022c EFLAGS: 00000246 ORIG_RAX: 0000000000000004
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000020000580
-RDX: 0000000000000278 RSI: 00000000f7fe8000 RDI: 0000000000000000
-RBP: 00000000ff8f0290 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__aria_aesni_avx_gfni_crypt_16way+0x2a6/0x4f40 arch/x86/crypto/aria-aesni-avx-asm_64.S:1164
-Code: d0 10 c4 e2 69 00 d7 c5 11 ef ea c5 e9 72 d0 08 c4 e2 69 00 d7 c5 09 ef f2 c4 e2 79 00 d7 c5 01 ef fa c5 f9 6f 05 7a 15 c9 0a <c5> f9 6f 0d 6a 15 c9 0a c5 f9 6f 15 7a 15 c9 0a c5 f9 6f 1d 52 15
-RSP: 0018:ffffc9000384f210 EFLAGS: 00010286
-RAX: ffff888026364890 RBX: 0000000000000000 RCX: ffff888026364890
-RDX: ffff888026364890 RSI: ffff888026364890 RDI: ffff888023c79028
-RBP: ffff88801fb3c900 R08: ffff888026364910 R09: ffff888023c79028
-R10: ffff88801fb3c800 R11: ffff88801fb3c800 R12: ffff88801fb3c900
-R13: ffff888023c79028 R14: dffffc0000000000 R15: ffff888026364890
-FS:  0000000000000000(0000) GS:ffff88802c800000(0063) knlGS:0000000056fc72c0
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 00007f29a06956a8 CR3: 000000001f222000 CR4: 0000000000350ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	d0 10                	rclb   (%rax)
-   2:	c4 e2 69 00 d7       	vpshufb %xmm7,%xmm2,%xmm2
-   7:	c5 11 ef ea          	vpxor  %xmm2,%xmm13,%xmm13
-   b:	c5 e9 72 d0 08       	vpsrld $0x8,%xmm0,%xmm2
-  10:	c4 e2 69 00 d7       	vpshufb %xmm7,%xmm2,%xmm2
-  15:	c5 09 ef f2          	vpxor  %xmm2,%xmm14,%xmm14
-  19:	c4 e2 79 00 d7       	vpshufb %xmm7,%xmm0,%xmm2
-  1e:	c5 01 ef fa          	vpxor  %xmm2,%xmm15,%xmm15
-  22:	c5 f9 6f 05 7a 15 c9 	vmovdqa 0xac9157a(%rip),%xmm0        # 0xac915a4
-  29:	0a
-* 2a:	c5 f9 6f 0d 6a 15 c9 	vmovdqa 0xac9156a(%rip),%xmm1        # 0xac9159c <-- trapping instruction
-  31:	0a
-  32:	c5 f9 6f 15 7a 15 c9 	vmovdqa 0xac9157a(%rip),%xmm2        # 0xac915b4
-  39:	0a
-  3a:	c5                   	.byte 0xc5
-  3b:	f9                   	stc
-  3c:	6f                   	outsl  %ds:(%rsi),(%dx)
-  3d:	1d                   	.byte 0x1d
-  3e:	52                   	push   %rdx
-  3f:	15                   	.byte 0x15
+make C=2 drivers/crypto/
+make W=1 drivers/crypto/
+~/smatch/smatch_scripts/kchecker drivers/crypto/
 
+Am I missing something?
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Thanks,
+Jia Jie
