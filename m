@@ -2,43 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AFBC7EE2A
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 08:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B6DC7EE24
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 08:07:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233752AbjEOIHg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 May 2023 04:07:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38630 "EHLO
+        id S239801AbjEOIHi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 04:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238458AbjEOIHa (ORCPT
+        with ESMTP id S236245AbjEOIH1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 May 2023 04:07:30 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE7DF1736;
+        Mon, 15 May 2023 04:07:27 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50FFF1723;
         Mon, 15 May 2023 01:07:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Subject:Cc:To:From:Date:Message-ID:
-        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=oaAnHSQUa44CIjEzLECo4Bz9k0HVG1DLxoBT0I79NeI=; b=NfkvPcdWsJTjmoEQrA9fvkbzZc
-        OLWjr4UU1kWvWf66uviIN6aqUIZ1bU0a8aEQPzT/ji1FUTxQToxV1V2kLh8dentwTx5nRMQ4vbB0i
-        gIPkqOaBfpPHRlc4Q9v4DKGIZOs5zR693IMyllbhfUlUJPHFrv0sH5wUWWcgPRBAKgBI1lgDssb4e
-        9PWNLgpBVKQLGKCOHMSvDJkLwwQ85cxYADGoR5hXnOpJdsJmtsyLLYpk0hwzrXnE5x14WXOtUXAW9
-        mjJQ2i0rMf3kX9KquBpjBy/2GJyEk+TX/LIQwUBEiDSc3Rf/hALuWs5q5Nr/iPhIXqgtRSb4GdE7Z
-        shGEbmvA==;
+        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To;
+        bh=axnHoGjIL7t9C+QVLq6pAPgEZLVVerXkwPR51K17BxQ=; b=J+RYi2Olcu/GDwkb7uyoMxOowZ
+        gdnnCNimNXMzjHfiHbHeyq75lJdwzqja8okQUmitQ1ua7iWanYtjpUVa32iVsf63pmox4vvEN+Ejz
+        1wpagut3YpzUSwNPpwpsl3jsBlJSSesN7UlPVAxsCXGiTi2d8aMeHHRkqQGQKv/P2cwZEs4JCNCfS
+        xBlhWHGUBVitTRjLQwLm3qFy1fFLZshzr1Jf7x5B4z/zbEO4fjLkYFu6HtcQ+JbhA2M4mY6B7vLd7
+        0ZMD0sEUiA88G6VeDUxFw1EIBsMuAOuqnZrusc8ZVstoP2bAOXDwpltv/Y/kKX6d4HXBKVWWAlia0
+        mx0Oe8lw==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pyTDk-003HUQ-Em; Mon, 15 May 2023 08:06:17 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pyTDk-00BQMz-1T;
+        Mon, 15 May 2023 08:06:16 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 079C030003A;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 09F29300244;
         Mon, 15 May 2023 10:06:10 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id A6A6E202F7F66; Mon, 15 May 2023 10:06:10 +0200 (CEST)
-Message-ID: <20230515075659.118447996@infradead.org>
+        id AEDEA202FCE90; Mon, 15 May 2023 10:06:10 +0200 (CEST)
+Message-ID: <20230515080554.047618712@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 15 May 2023 09:56:59 +0200
+Date:   Mon, 15 May 2023 09:57:01 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -59,79 +60,75 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         iommu@lists.linux.dev, linux-arch@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 00/11] Introduce cmpxchg128() -- aka. the demise of cmpxchg_double()
+Subject: [PATCH v3 02/11] types: Introduce [us]128
+References: <20230515075659.118447996@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi!
+Introduce [us]128 (when available). Unlike [us]64, ensure they are
+always naturally aligned.
 
-I seem to have forgotten to post this series last release; so here goes. I'm
-really hoping to merge it and forget about it.
+This also enables 128bit wide atomics (which require natural
+alignment) such as cmpxchg128().
 
-
-Since Linus hated on cmpxchg_double(), a few patches to get rid of it, as
-proposed here:
-
-  https://lkml.kernel.org/r/Y2U3WdU61FvYlpUh@hirez.programming.kicks-ass.net
-
-
-These patches are based on 6.4.0-rc2.
-
-Available here:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git core/wip-u128
-
-Since v2:
-
- - reworked this_cpu_cmpxchg() to not implicity do u128 but provide explicit
-   this_cpu_cmpxchg128() (arnd)
- - added try_cmpxchg12_local() (per the addition of the try_cmpxchg*_local()
-   family of functions)
- - slight cleanup of the SLUB conversion (due to rebase and having to touch it)
- - added a 'cleanup' patch for SLUB, since I was staring at that anyway
-
-Since v1:
-
- - rebaed on Eric's ghash cleanups (hence the cryptodev-2.6 dependency)
- - rebased on Heiko's s390/cpum_sf CDSG patch
- - fixed up a bunch of arch code
- - fixed up the inline asm to use 'u128 *' mem argument so the compiler knows
-   how wide the modification is.
- - reworked the percpu thing to use union based type-punning instead of
-   _Generic() based casts.
-
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- Documentation/core-api/this_cpu_ops.rst     |   2 -
- arch/arm64/include/asm/atomic_ll_sc.h       |  56 ++++----
- arch/arm64/include/asm/atomic_lse.h         |  39 +++---
- arch/arm64/include/asm/cmpxchg.h            |  48 ++-----
- arch/arm64/include/asm/percpu.h             |  30 +++--
- arch/s390/include/asm/cmpxchg.h             |  32 +----
- arch/s390/include/asm/cpu_mf.h              |   2 +-
- arch/s390/include/asm/percpu.h              |  34 +++--
- arch/s390/kernel/perf_cpum_sf.c             |  16 +--
- arch/x86/include/asm/cmpxchg.h              |  25 ----
- arch/x86/include/asm/cmpxchg_32.h           |   2 +-
- arch/x86/include/asm/cmpxchg_64.h           |  63 ++++++++-
- arch/x86/include/asm/percpu.h               | 100 +++++++++------
- drivers/iommu/amd/amd_iommu_types.h         |   9 +-
- drivers/iommu/amd/iommu.c                   |  10 +-
- drivers/iommu/intel/irq_remapping.c         |   8 +-
- include/asm-generic/percpu.h                |  66 ++--------
- include/crypto/b128ops.h                    |  14 +-
- include/linux/atomic/atomic-arch-fallback.h |  95 +++++++++++++-
- include/linux/atomic/atomic-instrumented.h  |  93 ++++++++++++--
- include/linux/dmar.h                        | 125 +++++++++---------
- include/linux/percpu-defs.h                 |  38 ------
- include/linux/slub_def.h                    |  12 +-
- include/linux/types.h                       |   5 +
- include/uapi/linux/types.h                  |   4 +
- lib/crypto/curve25519-hacl64.c              |   2 -
- lib/crypto/poly1305-donna64.c               |   2 -
- mm/slab.h                                   |  49 ++++++-
- mm/slub.c                                   | 191 ++++++++++++++--------------
- scripts/atomic/gen-atomic-fallback.sh       |   4 +-
- scripts/atomic/gen-atomic-instrumented.sh   |  19 +--
- 31 files changed, 667 insertions(+), 528 deletions(-)
+ include/linux/types.h      |    5 +++++
+ include/uapi/linux/types.h |    4 ++++
+ 2 files changed, 9 insertions(+)
+
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -10,6 +10,11 @@
+ #define DECLARE_BITMAP(name,bits) \
+ 	unsigned long name[BITS_TO_LONGS(bits)]
+ 
++#ifdef __SIZEOF_INT128__
++typedef __s128 s128;
++typedef __u128 u128;
++#endif
++
+ typedef u32 __kernel_dev_t;
+ 
+ typedef __kernel_fd_set		fd_set;
+--- a/include/uapi/linux/types.h
++++ b/include/uapi/linux/types.h
+@@ -13,6 +13,10 @@
+ 
+ #include <linux/posix_types.h>
+ 
++#ifdef __SIZEOF_INT128__
++typedef __signed__ __int128 __s128 __attribute__((aligned(16)));
++typedef unsigned __int128 __u128 __attribute__((aligned(16)));
++#endif
+ 
+ /*
+  * Below are truly Linux-specific types that should never collide with
+--- a/lib/crypto/curve25519-hacl64.c
++++ b/lib/crypto/curve25519-hacl64.c
+@@ -14,8 +14,6 @@
+ #include <crypto/curve25519.h>
+ #include <linux/string.h>
+ 
+-typedef __uint128_t u128;
+-
+ static __always_inline u64 u64_eq_mask(u64 a, u64 b)
+ {
+ 	u64 x = a ^ b;
+--- a/lib/crypto/poly1305-donna64.c
++++ b/lib/crypto/poly1305-donna64.c
+@@ -10,8 +10,6 @@
+ #include <asm/unaligned.h>
+ #include <crypto/internal/poly1305.h>
+ 
+-typedef __uint128_t u128;
+-
+ void poly1305_core_setkey(struct poly1305_core_key *key,
+ 			  const u8 raw_key[POLY1305_BLOCK_SIZE])
+ {
+
 
