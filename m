@@ -2,92 +2,70 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5093C77B7D
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 03:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356F2C7EE22
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 04:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238416AbjEOD2m convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 14 May 2023 23:28:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37834 "EHLO
+        id S231910AbjEOEZI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 00:25:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238405AbjEOD2Q (ORCPT
+        with ESMTP id S229539AbjEOEZG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 14 May 2023 23:28:16 -0400
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D35270F;
-        Sun, 14 May 2023 20:27:49 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 8885180B2;
-        Mon, 15 May 2023 11:27:43 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
- 2023 11:27:43 +0800
-Received: from [192.168.155.85] (202.188.176.82) by EXMBX168.cuchost.com
- (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
- 2023 11:27:40 +0800
-Message-ID: <2ae2d187-5db7-9207-7846-1a80e87047b2@starfivetech.com>
-Date:   Mon, 15 May 2023 11:27:35 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH v7 4/4] crypto: starfive - Add hash and HMAC support
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "David S . Miller" <davem@davemloft.net>,
+        Mon, 15 May 2023 00:25:06 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFC810CC;
+        Sun, 14 May 2023 21:25:04 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pyPkf-0090a9-6j; Mon, 15 May 2023 12:24:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 15 May 2023 12:24:01 +0800
+Date:   Mon, 15 May 2023 12:24:01 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Emil Renner Berthing <kernel@esmil.dk>,
         Conor Dooley <conor@kernel.org>,
         Palmer Dabbelt <palmer@dabbelt.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v7 4/4] crypto: starfive - Add hash and HMAC support
+Message-ID: <ZGGz4YFDMKQThG2x@gondor.apana.org.au>
 References: <20230504073400.1170979-1-jiajie.ho@starfivetech.com>
  <20230504073400.1170979-5-jiajie.ho@starfivetech.com>
  <ZF4bKe0YkpcQakLs@gondor.apana.org.au>
-Content-Language: en-US
-From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
-In-Reply-To: <ZF4bKe0YkpcQakLs@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [202.188.176.82]
-X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX168.cuchost.com
- (172.16.6.78)
-X-YovoleRuleAgent: yovoleflag
-Content-Transfer-Encoding: 8BIT
+ <2ae2d187-5db7-9207-7846-1a80e87047b2@starfivetech.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ae2d187-5db7-9207-7846-1a80e87047b2@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/5/2023 6:55 pm, Herbert Xu wrote:
-> On Thu, May 04, 2023 at 03:34:00PM +0800, Jia Jie Ho wrote:
->>
->> +	writel(~STARFIVE_IE_MASK_HASH_DONE, cryp->base + STARFIVE_IE_MASK_OFFSET);
->> +	writel(csr.v, cryp->base + STARFIVE_HASH_SHACSR);
-> 
-> With compile testing I get
-> 
-> ../drivers/crypto/starfive/jh7110-hash.c: In function ‘starfive_hash_start’:
-> ../drivers/crypto/starfive/jh7110-hash.c:110:9: warning: conversion from ‘long unsigned int’ to ‘unsigned int’ changes value from ‘18446744073709551611’ to ‘4294967291’ [-Woverflow]
-> 
+On Mon, May 15, 2023 at 11:27:35AM +0800, Jia Jie Ho wrote:
+>
+> I've added COMPILE_TEST in the Kconfig, then ran make W=1, sparse and smatch.
+> However it did not produce the error message.
 
-Hi Herbert,
-I've added COMPILE_TEST in the Kconfig, then ran make W=1, sparse and smatch.
-However it did not produce the error message.
+I guess you weren't testing on a 64-bit platform.  BIT(2) is
+an unsigned long, so ~BIT(2) is 64-bit long on 64-bit platforms.
 
-+config CRYPTO_DEV_JH7110
-+       tristate "StarFive JH7110 cryptographic engine driver"
-+       depends on SOC_STARFIVE || COMPILE_TEST
-+       select CRYPTO_ENGINE
+You're trying to feed it into writel which takes a 32-bit value,
+hence the warning.
 
-Symbol: COMPILE_TEST [=y]
-Type  : bool
-Defined at init/Kconfig:142
+If you have to use the BIT macro, then you need to cast the result
+to u32:
 
-make C=2 drivers/crypto/
-make W=1 drivers/crypto/
-~/smatch/smatch_scripts/kchecker drivers/crypto/
+#define STARFIVE_IE_MASK_HASH_DONE ((u32)BIT(2))
 
-Am I missing something?
+But it's probably a lot clearer if you do it as:
 
-Thanks,
-Jia Jie
+#define STARFIVE_IE_MASK_HASH_DONE 0x4
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
