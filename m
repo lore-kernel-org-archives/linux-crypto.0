@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CAF8C7EE26
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 08:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD56C7EE2F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 08:07:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbjEOIHY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 May 2023 04:07:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38464 "EHLO
+        id S233460AbjEOIHZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 04:07:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230074AbjEOIHW (ORCPT
+        with ESMTP id S230288AbjEOIHX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 May 2023 04:07:22 -0400
+        Mon, 15 May 2023 04:07:23 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA211716;
-        Mon, 15 May 2023 01:07:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FFDA1731;
+        Mon, 15 May 2023 01:07:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=gp7OCKaBYjIIkPcuPMybL+ixdp/AdwhFq0MWXNBGUCo=; b=mfr/Lee6q6wb3hW9VLMJP6RMas
-        nTl9Qe1+9Iu48xOQT4aXYKIo3YdHu4pVixS6ep5klWjn2Hleinv1VLcJZJw+35Dak53xO4M9X9KIK
-        FpMiCIIAsi7/QgdKTHO+THopVLnjgnmza7zDZfiP5yT3vka2IQVSR4N/m/pdNqYPnTzsA8lIVgWqD
-        P5m3mwC26ExmfD/meFO5f1ezwrEtuIohzrkIWoLo3mQANg3Hx3wLE8RBN4yr9HOkOwiYyEuNQ3/1W
-        PLL/LI+1uLThBRAeCCPMwP+WHJ7vOYl/0orY1PoeN18xp4Y80oyboD7BypdwlKtzQ00oQnrhgh54F
-        yIuqhB5w==;
+        bh=3RRGLs3vZsBA3WquAm9CYBrs3TiBBk1z4f/JSTl06ko=; b=C7Q+9vEV1QZqlrWrdiRS/4ZaOo
+        C4QaD94dYLKM4rVSpBMuM4MPCUEwWG2wlZb7z7L+ytDDmEzthuIXFw5s4xhl1Zhwa8PHyegz3LsWv
+        sX9yk6m2RhCvKI4eawfr4xg6NlwXbIHLgql/4Hh2IAyjJ5EKkfn282tlp6HqkTBBJgH+es2+j28ap
+        mwmpcCi64hREGLbEv+l39wIXLA29adUS/A2oGsp2yAeCyreAL19bzS9x+aYuSwanUcEPwpYAb2/WQ
+        Q6Uzz57SiaFlBid1/0NAHDSF0uzCiEKR6fHXhBcPEjn8/4auGrU3RiX6Ur+Re+rAmPdmvbZq7AL9R
+        kV+s3owA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pyTDk-00BQMy-1T;
-        Mon, 15 May 2023 08:06:16 +0000
+        id 1pyTDl-00BQN3-1H;
+        Mon, 15 May 2023 08:06:17 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 0C5C8300786;
-        Mon, 15 May 2023 10:06:10 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 8708C300ECD;
+        Mon, 15 May 2023 10:06:15 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id AB37F202674A5; Mon, 15 May 2023 10:06:10 +0200 (CEST)
-Message-ID: <20230515080553.979680310@infradead.org>
+        id BBF7D202FCEA5; Mon, 15 May 2023 10:06:10 +0200 (CEST)
+Message-ID: <20230515080554.248739380@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 15 May 2023 09:57:00 +0200
+Date:   Mon, 15 May 2023 09:57:04 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -60,7 +60,7 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-mm@kvack.org, linux-s390@vger.kernel.org,
         iommu@lists.linux.dev, linux-arch@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v3 01/11] cyrpto/b128ops: Remove struct u128
+Subject: [PATCH v3 05/11] percpu: Wire up cmpxchg128
 References: <20230515075659.118447996@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -68,51 +68,177 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Per git-grep u128_xor() and its related struct u128 are unused except
-to implement {be,le}128_xor(). Remove them to free up the namespace.
+In order to replace cmpxchg_double() with the newly minted
+cmpxchg128() family of functions, wire it up in this_cpu_cmpxchg().
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- include/crypto/b128ops.h |   14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/percpu.h |   20 +++++++++++++
+ arch/s390/include/asm/percpu.h  |   16 ++++++++++
+ arch/x86/include/asm/percpu.h   |   59 ++++++++++++++++++++++++++++++++++++++++
+ include/asm-generic/percpu.h    |   16 ++++++++++
+ 4 files changed, 111 insertions(+)
 
---- a/include/crypto/b128ops.h
-+++ b/include/crypto/b128ops.h
-@@ -50,10 +50,6 @@
- #include <linux/types.h>
+--- a/arch/arm64/include/asm/percpu.h
++++ b/arch/arm64/include/asm/percpu.h
+@@ -140,6 +140,10 @@ PERCPU_RET_OP(add, add, ldadd)
+  * re-enabling preemption for preemptible kernels, but doing that in a way
+  * which builds inside a module would mean messing directly with the preempt
+  * count. If you do this, peterz and tglx will hunt you down.
++ *
++ * Not to mention it'll break the actual preemption model for missing a
++ * preemption point when TIF_NEED_RESCHED gets set while preemption is
++ * disabled.
+  */
+ #define this_cpu_cmpxchg_double_8(ptr1, ptr2, o1, o2, n1, n2)		\
+ ({									\
+@@ -240,6 +244,22 @@ PERCPU_RET_OP(add, add, ldadd)
+ #define this_cpu_cmpxchg_8(pcp, o, n)	\
+ 	_pcp_protect_return(cmpxchg_relaxed, pcp, o, n)
  
- typedef struct {
--	u64 a, b;
--} u128;
--
--typedef struct {
- 	__be64 a, b;
- } be128;
++#define this_cpu_cmpxchg64(pcp, o, n)	this_cpu_cmpxchg_8(pcp, o, n)
++
++#define this_cpu_cmpxchg128(pcp, o, n)					\
++({									\
++	typedef typeof(pcp) pcp_op_T__;					\
++	u128 old__, new__, ret__;					\
++	pcp_op_T__ *ptr__;						\
++	old__ = o;							\
++	new__ = n;							\
++	preempt_disable_notrace();					\
++	ptr__ = raw_cpu_ptr(&(pcp));					\
++	ret__ = cmpxchg128_local((void *)ptr__, old__, new__);		\
++	preempt_enable_notrace();					\
++	ret__;								\
++})
++
+ #ifdef __KVM_NVHE_HYPERVISOR__
+ extern unsigned long __hyp_per_cpu_offset(unsigned int cpu);
+ #define __per_cpu_offset
+--- a/arch/s390/include/asm/percpu.h
++++ b/arch/s390/include/asm/percpu.h
+@@ -148,6 +148,22 @@
+ #define this_cpu_cmpxchg_4(pcp, oval, nval) arch_this_cpu_cmpxchg(pcp, oval, nval)
+ #define this_cpu_cmpxchg_8(pcp, oval, nval) arch_this_cpu_cmpxchg(pcp, oval, nval)
  
-@@ -61,20 +57,16 @@ typedef struct {
- 	__le64 b, a;
- } le128;
++#define this_cpu_cmpxchg64(pcp, o, n)	this_cpu_cmpxchg_8(pcp, o, n)
++
++#define this_cpu_cmpxchg128(pcp, oval, nval)				\
++({									\
++	typedef typeof(pcp) pcp_op_T__;					\
++	u128 old__, new__, ret__;					\
++	pcp_op_T__ *ptr__;						\
++	old__ = oval;							\
++	new__ = nval;							\
++	preempt_disable_notrace();					\
++	ptr__ = raw_cpu_ptr(&(pcp));					\
++	ret__ = cmpxchg128((void *)ptr__, old__, new__);		\
++	preempt_enable_notrace();					\
++	ret__;								\
++})
++
+ #define arch_this_cpu_xchg(pcp, nval)					\
+ ({									\
+ 	typeof(pcp) *ptr__;						\
+--- a/arch/x86/include/asm/percpu.h
++++ b/arch/x86/include/asm/percpu.h
+@@ -210,6 +210,65 @@ do {									\
+ 	(typeof(_var))(unsigned long) pco_old__;			\
+ })
  
--static inline void u128_xor(u128 *r, const u128 *p, const u128 *q)
-+static inline void be128_xor(be128 *r, const be128 *p, const be128 *q)
- {
- 	r->a = p->a ^ q->a;
- 	r->b = p->b ^ q->b;
- }
++#if defined(CONFIG_X86_32) && defined(CONFIG_X86_CMPXCHG64)
++#define percpu_cmpxchg64_op(size, qual, _var, _oval, _nval)		\
++({									\
++	union {								\
++		u64 var;						\
++		struct {						\
++			u32 low, high;					\
++		};							\
++	} old__, new__;							\
++									\
++	old__.var = _oval;						\
++	new__.var = _nval;						\
++									\
++	asm qual ("cmpxchg8b " __percpu_arg([var])			\
++		  : [var] "+m" (_var),					\
++		    "+a" (old__.low),					\
++		    "+d" (old__.high)					\
++		  : "b" (new__.low),					\
++		    "c" (new__.high)					\
++		  : "memory");						\
++									\
++	old__.var;							\
++})
++
++#define raw_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg64_op(8,         , pcp, oval, nval)
++#define this_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg64_op(8, volatile, pcp, oval, nval)
++#endif
++
++#ifdef CONFIG_X86_64
++#define raw_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg_op(8,         , pcp, oval, nval);
++#define this_cpu_cmpxchg64(pcp, oval, nval)	percpu_cmpxchg_op(8, volatile, pcp, oval, nval);
++
++#define percpu_cmpxchg128_op(size, qual, _var, _oval, _nval)		\
++({									\
++	union {								\
++		u128 var;						\
++		struct {						\
++			u64 low, high;					\
++		};							\
++	} old__, new__;							\
++									\
++	old__.var = _oval;						\
++	new__.var = _nval;						\
++									\
++	asm qual ("cmpxchg16b " __percpu_arg([var])			\
++		  : [var] "+m" (_var),					\
++		    "+a" (old__.low),					\
++		    "+d" (old__.high)					\
++		  : "b" (new__.low),					\
++		    "c" (new__.high)					\
++		  : "memory");						\
++									\
++	old__.var;							\
++})
++
++#define raw_cpu_cmpxchg128(pcp, oval, nval)	percpu_cmpxchg128_op(16,         , pcp, oval, nval)
++#define this_cpu_cmpxchg128(pcp, oval, nval)	percpu_cmpxchg128_op(16, volatile, pcp, oval, nval)
++#endif
++
+ /*
+  * this_cpu_read() makes gcc load the percpu variable every time it is
+  * accessed while this_cpu_read_stable() allows the value to be cached.
+--- a/include/asm-generic/percpu.h
++++ b/include/asm-generic/percpu.h
+@@ -298,6 +298,14 @@ do {									\
+ #define raw_cpu_cmpxchg_8(pcp, oval, nval) \
+ 	raw_cpu_generic_cmpxchg(pcp, oval, nval)
+ #endif
++#ifndef raw_cpu_cmpxchg64
++#define raw_cpu_cmpxchg64(pcp, oval, nval) \
++	raw_cpu_generic_cmpxchg(pcp, oval, nval)
++#endif
++#ifndef raw_cpu_cmpxchg128
++#define raw_cpu_cmpxchg128(pcp, oval, nval) \
++	raw_cpu_generic_cmpxchg(pcp, oval, nval)
++#endif
  
--static inline void be128_xor(be128 *r, const be128 *p, const be128 *q)
--{
--	u128_xor((u128 *)r, (u128 *)p, (u128 *)q);
--}
--
- static inline void le128_xor(le128 *r, const le128 *p, const le128 *q)
- {
--	u128_xor((u128 *)r, (u128 *)p, (u128 *)q);
-+	r->a = p->a ^ q->a;
-+	r->b = p->b ^ q->b;
- }
+ #ifndef raw_cpu_cmpxchg_double_1
+ #define raw_cpu_cmpxchg_double_1(pcp1, pcp2, oval1, oval2, nval1, nval2) \
+@@ -423,6 +431,14 @@ do {									\
+ #define this_cpu_cmpxchg_8(pcp, oval, nval) \
+ 	this_cpu_generic_cmpxchg(pcp, oval, nval)
+ #endif
++#ifndef this_cpu_cmpxchg64
++#define this_cpu_cmpxchg64(pcp, oval, nval) \
++	this_cpu_generic_cmpxchg(pcp, oval, nval)
++#endif
++#ifndef this_cpu_cmpxchg128
++#define this_cpu_cmpxchg128(pcp, oval, nval) \
++	this_cpu_generic_cmpxchg(pcp, oval, nval)
++#endif
  
- #endif /* _CRYPTO_B128OPS_H */
+ #ifndef this_cpu_cmpxchg_double_1
+ #define this_cpu_cmpxchg_double_1(pcp1, pcp2, oval1, oval2, nval1, nval2) \
 
 
