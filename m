@@ -2,113 +2,134 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A08C77B75
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 08:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F427C7EE30
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 09:45:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238193AbjEOIxR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 May 2023 04:53:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36762 "EHLO
+        id S233666AbjEOJpa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 05:45:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238258AbjEOIxF (ORCPT
+        with ESMTP id S241127AbjEOJpL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 May 2023 04:53:05 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2D571A4;
-        Mon, 15 May 2023 01:53:04 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34F8dWhE030931;
-        Mon, 15 May 2023 08:52:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=tL2Dh34WXBi3w0uOo/CEgFzRe9FVdf1V2DHXt3B1hzQ=;
- b=RgF2SLU/GSbIC43sewd93OJMJuQob/OvXp/h4GcpmDVvR3haOU9gtgWCmUKnHIJqaRGS
- zM/YtGmo0F8o8AehEEdxcNS5S0EutJWDp4JzJk07alCpgvPG+u+6OvcpgT1klbETGM7R
- B3vqZS3dTkEwbYIKYt4ZQsetvwQt11RWsnoYCa5Px4UUmeFelWObYB7JNRzhe/quKuJD
- vMFqFRrITU3nBkbW2ns34tBjo2HW/+MSDGQuEIVXyWuTB3BizyyzEZpEsC9781iymOJu
- Bb0Z15FQiZPDvAoBVmZu1rGvQpa8B5kCqVkHQuthmRbvDz+D5OTlICsTTU9UlTO916UP ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qkgnsskcr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 May 2023 08:52:52 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34F8g6jY012065;
-        Mon, 15 May 2023 08:52:52 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qkgnsskbd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 May 2023 08:52:52 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34F4cDHw008930;
-        Mon, 15 May 2023 08:52:49 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3qj264rt34-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 May 2023 08:52:49 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34F8qlos22151814
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 May 2023 08:52:47 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E464220043;
-        Mon, 15 May 2023 08:52:46 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27F9620040;
-        Mon, 15 May 2023 08:52:45 +0000 (GMT)
-Received: from osiris (unknown [9.179.13.205])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Mon, 15 May 2023 08:52:45 +0000 (GMT)
-Date:   Mon, 15 May 2023 10:52:43 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, joro@8bytes.org,
-        suravee.suthikulpanit@amd.com, robin.murphy@arm.com,
-        dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 10/11] arch: Remove cmpxchg_double
-Message-ID: <ZGHy21ZEK4Q6umhV@osiris>
+        Mon, 15 May 2023 05:45:11 -0400
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFDC1BD7;
+        Mon, 15 May 2023 02:43:44 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailnew.nyi.internal (Postfix) with ESMTP id DD5495803CE;
+        Mon, 15 May 2023 05:43:41 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Mon, 15 May 2023 05:43:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1684143821; x=1684151021; bh=rh
+        DpJI+VS2ftRNM4C+B3O914qD0XGOeUnvYVI19CEcc=; b=ouvD58uxjfNX4wP0nP
+        xvpLpKJ0T+XQe0vE3+HQlIgXzQFoYhQav58t5Dt2KUNupaE1hauor5HqsvRweZIA
+        n7VUIbSESGSsJAS4/IBRJKBSsxxY38GuTgOajMXeSWSgJQimKnSYKuYGHWHVY4NP
+        /Z9Gf1cMeQiyDMZN5qrJRzyawySnZgkgQbE4fwGD0ipwb+g7TY93g3qvv7gHFwjA
+        LLXU0AdO2UkJkc2revwtVIywBQkAzGtx29mZ5LC6bOrEx+xHyUGvBZi9mcGzUgv7
+        bZKliDv8gyReD6p2qApGsiWp78ZcFzHWVRJfXszfRmnRY8Ih0GVViZweQT8LUDUT
+        mtnw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1684143821; x=1684151021; bh=rhDpJI+VS2ftR
+        NM4C+B3O914qD0XGOeUnvYVI19CEcc=; b=W0CbDVAPadlsN/NG6WntcvQsG7eam
+        98jhjJQ/QA65KOBFXAByPwX2xRzcv5kefvCfHPyQfFXa0MZRfWDETlJBF1OM7JTd
+        KGU/Srx/r17/VNHIFDuh+T58q6Lcf9BWxvGxNcF3d0lxRehwVtidwFFf4DBPLiXJ
+        cJfmJ30HkBGxX4vJRin9a4WPll+IgH7hNRfqTxWjs8QSbe4SPY5P4YZHkg9FjAh6
+        Vckfzq4j7n1ln9MnIkonN2rGXhPG0IqlKgKNjAzWvEmgORkY0ycBuLQj62JeA408
+        +aj8JQv1XXfSBVZ5xCX6pwqZJ1zQHl98KBdzzqe14Hydi21btJoSo9DIA==
+X-ME-Sender: <xms:y_5hZKy7-ycOVkrUGZnJEVNTV3o6YuyL_MeHS-twItZHxAUa3nejWw>
+    <xme:y_5hZGSMUaPvv901TovUBRVAUK_jevHQqJtWvocrwJVgb2lacmpWr56gmq4_8jr92
+    yS_vMMHlrogk3gXavU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeehjedgudelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:y_5hZMX2aul_vmm39YeEhHkNWk0zLtYqTE5NC3HBR9sayqdtv0vKtw>
+    <xmx:y_5hZAh8vxQdrl9TrGbz6lAoeU8NgKb2AF_qgUO4jxo84uU8puLK3A>
+    <xmx:y_5hZMDDmmLTxLsN8FYBvs8HP-DutPDML8AhpGWpw48AuKcy5Vu4_Q>
+    <xmx:zf5hZOyPkZngc4eRCdWmxCUqxpL7o310qROMxzps2Vc0Ig1f5oDEJg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 7747DB60086; Mon, 15 May 2023 05:43:39 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-415-gf2b17fe6c3-fm-20230503.001-gf2b17fe6
+Mime-Version: 1.0
+Message-Id: <4975b92f-92f6-4d50-8386-9add12ddfd61@app.fastmail.com>
+In-Reply-To: <20230515075659.118447996@infradead.org>
 References: <20230515075659.118447996@infradead.org>
- <20230515080554.589824283@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230515080554.589824283@infradead.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: t1yqOEs5O0QDxVKZWXKnAMcNMUkxJyzX
-X-Proofpoint-GUID: 01k30nTH3vJOdbRkPWfhMNqXAs4dbI1r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-15_06,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- spamscore=0 bulkscore=0 clxscore=1011 phishscore=0 adultscore=0
- mlxlogscore=660 priorityscore=1501 suspectscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305150073
+Date:   Mon, 15 May 2023 11:42:23 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Peter Zijlstra" <peterz@infradead.org>,
+        "Linus Torvalds" <torvalds@linux-foundation.org>
+Cc:     "Jonathan Corbet" <corbet@lwn.net>,
+        "Will Deacon" <will@kernel.org>,
+        "Boqun Feng" <boqun.feng@gmail.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
+        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
+        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
+        "Alexander Gordeev" <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        "Baolu Lu" <baolu.lu@linux.intel.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Pekka Enberg" <penberg@kernel.org>,
+        "David Rientjes" <rientjes@google.com>,
+        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Roman Gushchin" <roman.gushchin@linux.dev>,
+        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 00/11] Introduce cmpxchg128() -- aka. the demise of
+ cmpxchg_double()
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 15, 2023 at 09:57:09AM +0200, Peter Zijlstra wrote:
-> No moar users, remove the monster.
-> 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> ---
-...
->  arch/s390/include/asm/cmpxchg.h            |   34 -----------------
->  arch/s390/include/asm/percpu.h             |   18 ---------
+On Mon, May 15, 2023, at 09:56, Peter Zijlstra wrote:
+>
+> Since v2:
+>
+>  - reworked this_cpu_cmpxchg() to not implicity do u128 but provide explicit
+>    this_cpu_cmpxchg128() (arnd)
+>  - added try_cmpxchg12_local() (per the addition of the try_cmpxchg*_local()
+>    family of functions)
+>  - slight cleanup of the SLUB conversion (due to rebase and having to touch it)
+>  - added a 'cleanup' patch for SLUB, since I was staring at that anyway
+>
 
-FWIW, for s390:
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+This is clearly an improvement over the previous state, so I'm
+happy with that, and the explicit this_cpu_cmpxchg128() interface
+addresses most of my previous concerns.
+
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+
+The need for runtime feature checking in the callers on x86-64 is still
+a bit awkward, but this is no worse than before. I understand that
+turning this into a compile-time choice would require first settling
+a larger debate about raising the default target for distros beyond
+the current CONFIG_GENERIC_CPU.
+
+    Arnd
