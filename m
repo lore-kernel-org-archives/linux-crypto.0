@@ -2,88 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 224B9C77B75
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 06:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A51C77B75
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 May 2023 06:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238527AbjEOGFv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 May 2023 02:05:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38984 "EHLO
+        id S239399AbjEOGHq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 15 May 2023 02:07:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238536AbjEOGFT (ORCPT
+        with ESMTP id S238183AbjEOGHc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 May 2023 02:05:19 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E578D49D9;
-        Sun, 14 May 2023 22:57:56 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pyRCi-0092NQ-2h; Mon, 15 May 2023 13:57:05 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 15 May 2023 13:57:04 +0800
-Date:   Mon, 15 May 2023 13:57:04 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     syzbot <syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Taehee Yoo <ap420073@gmail.com>
-Cc:     bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net,
-        hpa@zytor.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Subject: Re: [syzbot] [crypto?] general protection fault in
- __aria_aesni_avx_gfni_crypt_16way
-Message-ID: <ZGHJsNY4P7yoCPDg@gondor.apana.org.au>
-References: <0000000000007fa2d705fb29f046@google.com>
- <000000000000b2cbe305fbb2c9d9@google.com>
+        Mon, 15 May 2023 02:07:32 -0400
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037B32703;
+        Sun, 14 May 2023 23:04:29 -0700 (PDT)
+Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id BD54D24DB84;
+        Mon, 15 May 2023 14:04:27 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
+ (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
+ 2023 14:04:27 +0800
+Received: from [192.168.155.85] (202.188.176.82) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 15 May
+ 2023 14:04:24 +0800
+Message-ID: <3ec4b399-48d8-0129-85b7-0fe30e6de9c5@starfivetech.com>
+Date:   Mon, 15 May 2023 14:04:21 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000b2cbe305fbb2c9d9@google.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH v7 4/4] crypto: starfive - Add hash and HMAC support
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Emil Renner Berthing <kernel@esmil.dk>,
+        Conor Dooley <conor@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+References: <20230504073400.1170979-1-jiajie.ho@starfivetech.com>
+ <20230504073400.1170979-5-jiajie.ho@starfivetech.com>
+ <ZF4bKe0YkpcQakLs@gondor.apana.org.au>
+ <2ae2d187-5db7-9207-7846-1a80e87047b2@starfivetech.com>
+ <ZGGz4YFDMKQThG2x@gondor.apana.org.au>
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+In-Reply-To: <ZGGz4YFDMKQThG2x@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [202.188.176.82]
+X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, May 14, 2023 at 08:09:50PM -0700, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
+On 15/5/2023 12:24 pm, Herbert Xu wrote:
+> On Mon, May 15, 2023 at 11:27:35AM +0800, Jia Jie Ho wrote:
+>>
+>> I've added COMPILE_TEST in the Kconfig, then ran make W=1, sparse and smatch.
+>> However it did not produce the error message.
 > 
-> HEAD commit:    31f4104e392a Merge tag 'locking_urgent_for_v6.4_rc2' of gi..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=11768616280000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=8bc832f563d8bf38
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a6abcf08bad8b18fd198
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> userspace arch: i386
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1737e3be280000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149d4c06280000
+> I guess you weren't testing on a 64-bit platform.  BIT(2) is
+> an unsigned long, so ~BIT(2) is 64-bit long on 64-bit platforms.
+> 
+I am cross-compiling on a 64-bit platform. 
+I'll check my compiler settings again in case this masks errors in future patches.
 
-...
-
-> ----------------
-> Code disassembly (best guess):
->    0:	d0 10                	rclb   (%rax)
->    2:	c4 e2 69 00 d7       	vpshufb %xmm7,%xmm2,%xmm2
->    7:	c5 11 ef ea          	vpxor  %xmm2,%xmm13,%xmm13
->    b:	c5 e9 72 d0 08       	vpsrld $0x8,%xmm0,%xmm2
->   10:	c4 e2 69 00 d7       	vpshufb %xmm7,%xmm2,%xmm2
->   15:	c5 09 ef f2          	vpxor  %xmm2,%xmm14,%xmm14
->   19:	c4 e2 79 00 d7       	vpshufb %xmm7,%xmm0,%xmm2
->   1e:	c5 01 ef fa          	vpxor  %xmm2,%xmm15,%xmm15
->   22:	c5 f9 6f 05 7a 15 c9 	vmovdqa 0xac9157a(%rip),%xmm0        # 0xac915a4
->   29:	0a
-> * 2a:	c5 f9 6f 0d 6a 15 c9 	vmovdqa 0xac9156a(%rip),%xmm1        # 0xac9159c <-- trapping instruction
->   31:	0a
->   32:	c5 f9 6f 15 7a 15 c9 	vmovdqa 0xac9157a(%rip),%xmm2        # 0xac915b4
->   39:	0a
->   3a:	c5                   	.byte 0xc5
->   3b:	f9                   	stc
->   3c:	6f                   	outsl  %ds:(%rsi),(%dx)
->   3d:	1d                   	.byte 0x1d
->   3e:	52                   	push   %rdx
->   3f:	15                   	.byte 0x15
-
-Ard, this looks like something that you recently touched.  Any
-ideas what might be causing this?
+> You're trying to feed it into writel which takes a 32-bit value,
+> hence the warning.
+> 
+> If you have to use the BIT macro, then you need to cast the result
+> to u32:
+> 
+> #define STARFIVE_IE_MASK_HASH_DONE ((u32)BIT(2))
+> 
+> But it's probably a lot clearer if you do it as:
+> 
+> #define STARFIVE_IE_MASK_HASH_DONE 0x4
+Sure, I'll do this for the next version.
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jia Jie
+
