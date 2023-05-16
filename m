@@ -2,43 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12AD6C77B7F
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 05:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D580C77B7F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 05:24:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbjEPFJ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 May 2023 01:09:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42078 "EHLO
+        id S229763AbjEPFYD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 May 2023 01:24:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbjEPFJ5 (ORCPT
+        with ESMTP id S229493AbjEPFYD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 May 2023 01:09:57 -0400
+        Tue, 16 May 2023 01:24:03 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEFF10F9;
-        Mon, 15 May 2023 22:09:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781471A5;
+        Mon, 15 May 2023 22:24:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DE15562389;
-        Tue, 16 May 2023 05:09:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 289ABC433D2;
-        Tue, 16 May 2023 05:09:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0124C62610;
+        Tue, 16 May 2023 05:23:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18B19C433D2;
+        Tue, 16 May 2023 05:23:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684213793;
-        bh=JN+FqY71yE/yb3BNXOSt+31KNPTN3jnuXZKiwpoPjvw=;
+        s=k20201202; t=1684214639;
+        bh=hnjWicuJzuwUHxN6oi8ZS9vvercGouIlbJJlGvLG0Mk=;
         h=From:To:Cc:Subject:Date:From;
-        b=KFHN+MVER33h+h85TIBHg1uWv16N0wJBs6nksE01GjxtLN/au4noicAKiQ4BKUBPI
-         St1pdX0qei8Kq7tDwuBITbpWi9jvhMkeggSV2B3/cv0N5l+nW7wTDrpDMpPMfIx3/p
-         qli0AKWwc4Fg8egal6Zv4GNnDO6nui8TWB+lfCPX1ARbYGz3qBqPKfivYj0NmuL0RX
-         jUZ7/oQXNgfov2x9utfcuyf1DyA5qGsmWBFd4HcAggamksR6mgt03B1DmX9e19l2bw
-         LZlQWq6T1QfjghWlj3P1NQy+jTUkl1KqZ89kL9s4A6sd7TdxQ+5an05ZvprKMgyUs2
-         RDSXHkA3IOg4w==
+        b=okfxgzX7ckjp7HBU6+vbzUwlyy5fYuOvlbhlpwxNDuCg2JXPaoOAMt3XmJlq7VNR1
+         m80SiJrYA91Dn1o3QMb0s13Fnv5EuxeYCjXF0JlYTRrCddaaX5aTSV22tp77BCbug9
+         kQuXMwonG/PW8SeAKa+b6ec3CTOBpzQ3ItnCGR2o1VhseRpEBptIMDEP9QUXYR2jgI
+         3eok9Z3U9RoJqCL2FEfZ69P+Hh+KPg21QL33Z4naa2krnucij94LZNfsHMyA/Pmxd1
+         3osP7EInSUAHK0JQuD2ReRrzy0cV1pwhOvbpPF/V/2zd86ctiXtyvjkO26igl/+1Wh
+         QksYcAYciSkNA==
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     stable@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6.1] crypto: testmgr - fix RNG performance in fuzz tests
-Date:   Mon, 15 May 2023 22:08:50 -0700
-Message-Id: <20230516050850.59514-1-ebiggers@kernel.org>
+To:     fsverity@lists.linux.dev
+Cc:     linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-btrfs@vger.kernel.org
+Subject: [PATCH v2] fsverity: use shash API instead of ahash API
+Date:   Mon, 15 May 2023 22:23:06 -0700
+Message-Id: <20230516052306.99600-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -48,714 +49,674 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-commit f900fde28883602b6c5e1027a6c912b673382aaf upstream.
+The "ahash" API, like the other scatterlist-based crypto APIs such as
+"skcipher", comes with some well-known limitations.  First, it can't
+easily be used with vmalloc addresses.  Second, the request struct can't
+be allocated on the stack.  This adds complexity and a possible failure
+point that needs to be worked around, e.g. using a mempool.
 
-The performance of the crypto fuzz tests has greatly regressed since
-v5.18.  When booting a kernel on an arm64 dev board with all software
-crypto algorithms and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled, the
-fuzz tests now take about 200 seconds to run, or about 325 seconds with
-lockdep enabled, compared to about 5 seconds before.
+The only benefit of ahash over "shash" is that ahash is needed to access
+traditional memory-to-memory crypto accelerators, i.e. drivers/crypto/.
+However, this style of crypto acceleration has largely fallen out of
+favor and been superseded by CPU-based acceleration or inline crypto
+engines.  Also, ahash needs to be used asynchronously to take full
+advantage of such hardware, but fs/verity/ has never done this.
 
-The root cause is that the random number generation has become much
-slower due to commit d4150779e60f ("random32: use real rng for
-non-deterministic randomness").  On my same arm64 dev board, at the time
-the fuzz tests are run, get_random_u8() is about 345x slower than
-prandom_u32_state(), or about 469x if lockdep is enabled.
+On all systems that aren't actually using one of these ahash-only crypto
+accelerators, ahash just adds unnecessary overhead as it sits between
+the user and the underlying shash algorithms.
 
-Lockdep makes a big difference, but much of the rest comes from the
-get_random_*() functions taking a *very* slow path when the CRNG is not
-yet initialized.  Since the crypto self-tests run early during boot,
-even having a hardware RNG driver enabled (CONFIG_CRYPTO_DEV_QCOM_RNG in
-my case) doesn't prevent this.  x86 systems don't have this issue, but
-they still see a significant regression if lockdep is enabled.
+Also, XFS is planned to cache fsverity Merkle tree blocks in the
+existing XFS buffer cache.  As a result, it will be possible for a
+single Merkle tree block to be split across discontiguous pages
+(https://lore.kernel.org/r/20230405233753.GU3223426@dread.disaster.area).
+This data will need to be hashed.  It is easiest to work with a vmapped
+address in this case.  However, ahash is incompatible with this.
 
-Converting the "Fully random bytes" case in generate_random_bytes() to
-use get_random_bytes() helps significantly, improving the test time to
-about 27 seconds.  But that's still over 5x slower than before.
+Therefore, let's convert fs/verity/ from ahash to shash.  This
+simplifies the code, and it should also slightly improve performance for
+everyone who wasn't actually using one of these ahash-only crypto
+accelerators, i.e. almost everyone (or maybe even everyone)!
 
-This is all a bit silly, though, since the fuzz tests don't actually
-need cryptographically secure random numbers.  So let's just make them
-use a non-cryptographically-secure RNG as they did before.  The original
-prandom_u32() is gone now, so let's use prandom_u32_state() instead,
-with an explicitly managed state, like various other self-tests in the
-kernel source tree (rbtree_test.c, test_scanf.c, etc.) already do.  This
-also has the benefit that no locking is required anymore, so performance
-should be even better than the original version that used prandom_u32().
-
-Fixes: d4150779e60f ("random32: use real rng for non-deterministic randomness")
-Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/testmgr.c | 266 ++++++++++++++++++++++++++++++-----------------
- 1 file changed, 169 insertions(+), 97 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 814d2dc87d7e8..56c39a0c94952 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -852,12 +852,50 @@ static int prepare_keybuf(const u8 *key, unsigned int ksize,
+v2: rebased onto v6.4-rc2.
+
+ fs/verity/enable.c           |  19 ++---
+ fs/verity/fsverity_private.h |  13 +---
+ fs/verity/hash_algs.c        | 131 ++++++-----------------------------
+ fs/verity/verify.c           | 108 +++++++++++------------------
+ 4 files changed, 71 insertions(+), 200 deletions(-)
+
+diff --git a/fs/verity/enable.c b/fs/verity/enable.c
+index fc4c50e5219dc..bd86b25ac084b 100644
+--- a/fs/verity/enable.c
++++ b/fs/verity/enable.c
+@@ -7,6 +7,7 @@
  
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+ #include "fsverity_private.h"
  
-+/*
-+ * The fuzz tests use prandom instead of the normal Linux RNG since they don't
-+ * need cryptographically secure random numbers.  This greatly improves the
-+ * performance of these tests, especially if they are run before the Linux RNG
-+ * has been initialized or if they are run on a lockdep-enabled kernel.
-+ */
-+
-+static inline void init_rnd_state(struct rnd_state *rng)
-+{
-+	prandom_seed_state(rng, get_random_u64());
-+}
-+
-+static inline u8 prandom_u8(struct rnd_state *rng)
-+{
-+	return prandom_u32_state(rng);
-+}
-+
-+static inline u32 prandom_u32_below(struct rnd_state *rng, u32 ceil)
-+{
-+	/*
-+	 * This is slightly biased for non-power-of-2 values of 'ceil', but this
-+	 * isn't important here.
-+	 */
-+	return prandom_u32_state(rng) % ceil;
-+}
-+
-+static inline bool prandom_bool(struct rnd_state *rng)
-+{
-+	return prandom_u32_below(rng, 2);
-+}
-+
-+static inline u32 prandom_u32_inclusive(struct rnd_state *rng,
-+					u32 floor, u32 ceil)
-+{
-+	return floor + prandom_u32_below(rng, ceil - floor + 1);
-+}
-+
- /* Generate a random length in range [0, max_len], but prefer smaller values */
--static unsigned int generate_random_length(unsigned int max_len)
-+static unsigned int generate_random_length(struct rnd_state *rng,
-+					   unsigned int max_len)
++#include <crypto/hash.h>
+ #include <linux/mount.h>
+ #include <linux/sched/signal.h>
+ #include <linux/uaccess.h>
+@@ -20,7 +21,7 @@ struct block_buffer {
+ /* Hash a block, writing the result to the next level's pending block buffer. */
+ static int hash_one_block(struct inode *inode,
+ 			  const struct merkle_tree_params *params,
+-			  struct ahash_request *req, struct block_buffer *cur)
++			  struct block_buffer *cur)
  {
--	unsigned int len = prandom_u32_max(max_len + 1);
-+	unsigned int len = prandom_u32_below(rng, max_len + 1);
+ 	struct block_buffer *next = cur + 1;
+ 	int err;
+@@ -36,8 +37,7 @@ static int hash_one_block(struct inode *inode,
+ 	/* Zero-pad the block if it's shorter than the block size. */
+ 	memset(&cur->data[cur->filled], 0, params->block_size - cur->filled);
  
--	switch (prandom_u32_max(4)) {
-+	switch (prandom_u32_below(rng, 4)) {
- 	case 0:
- 		return len % 64;
- 	case 1:
-@@ -870,43 +908,44 @@ static unsigned int generate_random_length(unsigned int max_len)
- }
- 
- /* Flip a random bit in the given nonempty data buffer */
--static void flip_random_bit(u8 *buf, size_t size)
-+static void flip_random_bit(struct rnd_state *rng, u8 *buf, size_t size)
- {
- 	size_t bitpos;
- 
--	bitpos = prandom_u32_max(size * 8);
-+	bitpos = prandom_u32_below(rng, size * 8);
- 	buf[bitpos / 8] ^= 1 << (bitpos % 8);
- }
- 
- /* Flip a random byte in the given nonempty data buffer */
--static void flip_random_byte(u8 *buf, size_t size)
-+static void flip_random_byte(struct rnd_state *rng, u8 *buf, size_t size)
- {
--	buf[prandom_u32_max(size)] ^= 0xff;
-+	buf[prandom_u32_below(rng, size)] ^= 0xff;
- }
- 
- /* Sometimes make some random changes to the given nonempty data buffer */
--static void mutate_buffer(u8 *buf, size_t size)
-+static void mutate_buffer(struct rnd_state *rng, u8 *buf, size_t size)
- {
- 	size_t num_flips;
- 	size_t i;
- 
- 	/* Sometimes flip some bits */
--	if (prandom_u32_max(4) == 0) {
--		num_flips = min_t(size_t, 1 << prandom_u32_max(8), size * 8);
-+	if (prandom_u32_below(rng, 4) == 0) {
-+		num_flips = min_t(size_t, 1 << prandom_u32_below(rng, 8),
-+				  size * 8);
- 		for (i = 0; i < num_flips; i++)
--			flip_random_bit(buf, size);
-+			flip_random_bit(rng, buf, size);
+-	err = fsverity_hash_block(params, inode, req, virt_to_page(cur->data),
+-				  offset_in_page(cur->data),
++	err = fsverity_hash_block(params, inode, cur->data,
+ 				  &next->data[next->filled]);
+ 	if (err)
+ 		return err;
+@@ -76,7 +76,6 @@ static int build_merkle_tree(struct file *filp,
+ 	struct inode *inode = file_inode(filp);
+ 	const u64 data_size = inode->i_size;
+ 	const int num_levels = params->num_levels;
+-	struct ahash_request *req;
+ 	struct block_buffer _buffers[1 + FS_VERITY_MAX_LEVELS + 1] = {};
+ 	struct block_buffer *buffers = &_buffers[1];
+ 	unsigned long level_offset[FS_VERITY_MAX_LEVELS];
+@@ -90,9 +89,6 @@ static int build_merkle_tree(struct file *filp,
+ 		return 0;
  	}
  
- 	/* Sometimes flip some bytes */
--	if (prandom_u32_max(4) == 0) {
--		num_flips = min_t(size_t, 1 << prandom_u32_max(8), size);
-+	if (prandom_u32_below(rng, 4) == 0) {
-+		num_flips = min_t(size_t, 1 << prandom_u32_below(rng, 8), size);
- 		for (i = 0; i < num_flips; i++)
--			flip_random_byte(buf, size);
-+			flip_random_byte(rng, buf, size);
- 	}
- }
- 
- /* Randomly generate 'count' bytes, but sometimes make them "interesting" */
--static void generate_random_bytes(u8 *buf, size_t count)
-+static void generate_random_bytes(struct rnd_state *rng, u8 *buf, size_t count)
- {
- 	u8 b;
- 	u8 increment;
-@@ -915,11 +954,11 @@ static void generate_random_bytes(u8 *buf, size_t count)
- 	if (count == 0)
- 		return;
- 
--	switch (prandom_u32_max(8)) { /* Choose a generation strategy */
-+	switch (prandom_u32_below(rng, 8)) { /* Choose a generation strategy */
- 	case 0:
- 	case 1:
- 		/* All the same byte, plus optional mutations */
--		switch (prandom_u32_max(4)) {
-+		switch (prandom_u32_below(rng, 4)) {
- 		case 0:
- 			b = 0x00;
- 			break;
-@@ -927,28 +966,28 @@ static void generate_random_bytes(u8 *buf, size_t count)
- 			b = 0xff;
- 			break;
- 		default:
--			b = get_random_u8();
-+			b = prandom_u8(rng);
- 			break;
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(params->hash_alg, GFP_KERNEL);
+-
+ 	/*
+ 	 * Allocate the block buffers.  Buffer "-1" is for data blocks.
+ 	 * Buffers 0 <= level < num_levels are for the actual tree levels.
+@@ -130,7 +126,7 @@ static int build_merkle_tree(struct file *filp,
+ 			fsverity_err(inode, "Short read of file data");
+ 			goto out;
  		}
- 		memset(buf, b, count);
--		mutate_buffer(buf, count);
-+		mutate_buffer(rng, buf, count);
- 		break;
- 	case 2:
- 		/* Ascending or descending bytes, plus optional mutations */
--		increment = get_random_u8();
--		b = get_random_u8();
-+		increment = prandom_u8(rng);
-+		b = prandom_u8(rng);
- 		for (i = 0; i < count; i++, b += increment)
- 			buf[i] = b;
--		mutate_buffer(buf, count);
-+		mutate_buffer(rng, buf, count);
- 		break;
- 	default:
- 		/* Fully random bytes */
--		for (i = 0; i < count; i++)
--			buf[i] = get_random_u8();
-+		prandom_bytes_state(rng, buf, count);
- 	}
+-		err = hash_one_block(inode, params, req, &buffers[-1]);
++		err = hash_one_block(inode, params, &buffers[-1]);
+ 		if (err)
+ 			goto out;
+ 		for (level = 0; level < num_levels; level++) {
+@@ -141,8 +137,7 @@ static int build_merkle_tree(struct file *filp,
+ 			}
+ 			/* Next block at @level is full */
+ 
+-			err = hash_one_block(inode, params, req,
+-					     &buffers[level]);
++			err = hash_one_block(inode, params, &buffers[level]);
+ 			if (err)
+ 				goto out;
+ 			err = write_merkle_tree_block(inode,
+@@ -162,8 +157,7 @@ static int build_merkle_tree(struct file *filp,
+ 	/* Finish all nonempty pending tree blocks. */
+ 	for (level = 0; level < num_levels; level++) {
+ 		if (buffers[level].filled != 0) {
+-			err = hash_one_block(inode, params, req,
+-					     &buffers[level]);
++			err = hash_one_block(inode, params, &buffers[level]);
+ 			if (err)
+ 				goto out;
+ 			err = write_merkle_tree_block(inode,
+@@ -183,7 +177,6 @@ static int build_merkle_tree(struct file *filp,
+ out:
+ 	for (level = -1; level < num_levels; level++)
+ 		kfree(buffers[level].data);
+-	fsverity_free_hash_request(params->hash_alg, req);
+ 	return err;
  }
  
--static char *generate_random_sgl_divisions(struct test_sg_division *divs,
-+static char *generate_random_sgl_divisions(struct rnd_state *rng,
-+					   struct test_sg_division *divs,
- 					   size_t max_divs, char *p, char *end,
- 					   bool gen_flushes, u32 req_flags)
+diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
+index d34dcc033d723..8527beca2a454 100644
+--- a/fs/verity/fsverity_private.h
++++ b/fs/verity/fsverity_private.h
+@@ -11,9 +11,6 @@
+ #define pr_fmt(fmt) "fs-verity: " fmt
+ 
+ #include <linux/fsverity.h>
+-#include <linux/mempool.h>
+-
+-struct ahash_request;
+ 
+ /*
+  * Implementation limit: maximum depth of the Merkle tree.  For now 8 is plenty;
+@@ -23,11 +20,10 @@ struct ahash_request;
+ 
+ /* A hash algorithm supported by fs-verity */
+ struct fsverity_hash_alg {
+-	struct crypto_ahash *tfm; /* hash tfm, allocated on demand */
++	struct crypto_shash *tfm; /* hash tfm, allocated on demand */
+ 	const char *name;	  /* crypto API name, e.g. sha256 */
+ 	unsigned int digest_size; /* digest size in bytes, e.g. 32 for SHA-256 */
+ 	unsigned int block_size;  /* block size in bytes, e.g. 64 for SHA-256 */
+-	mempool_t req_pool;	  /* mempool with a preallocated hash request */
+ 	/*
+ 	 * The HASH_ALGO_* constant for this algorithm.  This is different from
+ 	 * FS_VERITY_HASH_ALG_*, which uses a different numbering scheme.
+@@ -85,15 +81,10 @@ extern struct fsverity_hash_alg fsverity_hash_algs[];
+ 
+ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 						unsigned int num);
+-struct ahash_request *fsverity_alloc_hash_request(struct fsverity_hash_alg *alg,
+-						  gfp_t gfp_flags);
+-void fsverity_free_hash_request(struct fsverity_hash_alg *alg,
+-				struct ahash_request *req);
+ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+ 				      const u8 *salt, size_t salt_size);
+ int fsverity_hash_block(const struct merkle_tree_params *params,
+-			const struct inode *inode, struct ahash_request *req,
+-			struct page *page, unsigned int offset, u8 *out);
++			const struct inode *inode, const void *data, u8 *out);
+ int fsverity_hash_buffer(struct fsverity_hash_alg *alg,
+ 			 const void *data, size_t size, u8 *out);
+ void __init fsverity_check_hash_algs(void);
+diff --git a/fs/verity/hash_algs.c b/fs/verity/hash_algs.c
+index ea00dbedf756b..e7e982412e23a 100644
+--- a/fs/verity/hash_algs.c
++++ b/fs/verity/hash_algs.c
+@@ -8,7 +8,6 @@
+ #include "fsverity_private.h"
+ 
+ #include <crypto/hash.h>
+-#include <linux/scatterlist.h>
+ 
+ /* The hash algorithms supported by fs-verity */
+ struct fsverity_hash_alg fsverity_hash_algs[] = {
+@@ -44,7 +43,7 @@ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 						unsigned int num)
  {
-@@ -959,24 +998,26 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
- 		unsigned int this_len;
- 		const char *flushtype_str;
+ 	struct fsverity_hash_alg *alg;
+-	struct crypto_ahash *tfm;
++	struct crypto_shash *tfm;
+ 	int err;
  
--		if (div == &divs[max_divs - 1] || prandom_u32_max(2) == 0)
-+		if (div == &divs[max_divs - 1] || prandom_bool(rng))
- 			this_len = remaining;
- 		else
--			this_len = 1 + prandom_u32_max(remaining);
-+			this_len = prandom_u32_inclusive(rng, 1, remaining);
- 		div->proportion_of_total = this_len;
+ 	if (num >= ARRAY_SIZE(fsverity_hash_algs) ||
+@@ -63,11 +62,7 @@ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 	if (alg->tfm != NULL)
+ 		goto out_unlock;
  
--		if (prandom_u32_max(4) == 0)
--			div->offset = (PAGE_SIZE - 128) + prandom_u32_max(128);
--		else if (prandom_u32_max(2) == 0)
--			div->offset = prandom_u32_max(32);
-+		if (prandom_u32_below(rng, 4) == 0)
-+			div->offset = prandom_u32_inclusive(rng,
-+							    PAGE_SIZE - 128,
-+							    PAGE_SIZE - 1);
-+		else if (prandom_bool(rng))
-+			div->offset = prandom_u32_below(rng, 32);
- 		else
--			div->offset = prandom_u32_max(PAGE_SIZE);
--		if (prandom_u32_max(8) == 0)
-+			div->offset = prandom_u32_below(rng, PAGE_SIZE);
-+		if (prandom_u32_below(rng, 8) == 0)
- 			div->offset_relative_to_alignmask = true;
+-	/*
+-	 * Using the shash API would make things a bit simpler, but the ahash
+-	 * API is preferable as it allows the use of crypto accelerators.
+-	 */
+-	tfm = crypto_alloc_ahash(alg->name, 0, 0);
++	tfm = crypto_alloc_shash(alg->name, 0, 0);
+ 	if (IS_ERR(tfm)) {
+ 		if (PTR_ERR(tfm) == -ENOENT) {
+ 			fsverity_warn(inode,
+@@ -84,68 +79,26 @@ struct fsverity_hash_alg *fsverity_get_hash_alg(const struct inode *inode,
+ 	}
  
- 		div->flush_type = FLUSH_TYPE_NONE;
- 		if (gen_flushes) {
--			switch (prandom_u32_max(4)) {
-+			switch (prandom_u32_below(rng, 4)) {
- 			case 0:
- 				div->flush_type = FLUSH_TYPE_REIMPORT;
- 				break;
-@@ -988,7 +1029,7 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
+ 	err = -EINVAL;
+-	if (WARN_ON_ONCE(alg->digest_size != crypto_ahash_digestsize(tfm)))
++	if (WARN_ON_ONCE(alg->digest_size != crypto_shash_digestsize(tfm)))
+ 		goto err_free_tfm;
+-	if (WARN_ON_ONCE(alg->block_size != crypto_ahash_blocksize(tfm)))
+-		goto err_free_tfm;
+-
+-	err = mempool_init_kmalloc_pool(&alg->req_pool, 1,
+-					sizeof(struct ahash_request) +
+-					crypto_ahash_reqsize(tfm));
+-	if (err)
++	if (WARN_ON_ONCE(alg->block_size != crypto_shash_blocksize(tfm)))
+ 		goto err_free_tfm;
  
- 		if (div->flush_type != FLUSH_TYPE_NONE &&
- 		    !(req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) &&
--		    prandom_u32_max(2) == 0)
-+		    prandom_bool(rng))
- 			div->nosimd = true;
+ 	pr_info("%s using implementation \"%s\"\n",
+-		alg->name, crypto_ahash_driver_name(tfm));
++		alg->name, crypto_shash_driver_name(tfm));
  
- 		switch (div->flush_type) {
-@@ -1023,7 +1064,8 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
+ 	/* pairs with smp_load_acquire() above */
+ 	smp_store_release(&alg->tfm, tfm);
+ 	goto out_unlock;
+ 
+ err_free_tfm:
+-	crypto_free_ahash(tfm);
++	crypto_free_shash(tfm);
+ 	alg = ERR_PTR(err);
+ out_unlock:
+ 	mutex_unlock(&fsverity_hash_alg_init_mutex);
+ 	return alg;
  }
  
- /* Generate a random testvec_config for fuzz testing */
--static void generate_random_testvec_config(struct testvec_config *cfg,
-+static void generate_random_testvec_config(struct rnd_state *rng,
-+					   struct testvec_config *cfg,
- 					   char *name, size_t max_namelen)
+-/**
+- * fsverity_alloc_hash_request() - allocate a hash request object
+- * @alg: the hash algorithm for which to allocate the request
+- * @gfp_flags: memory allocation flags
+- *
+- * This is mempool-backed, so this never fails if __GFP_DIRECT_RECLAIM is set in
+- * @gfp_flags.  However, in that case this might need to wait for all
+- * previously-allocated requests to be freed.  So to avoid deadlocks, callers
+- * must never need multiple requests at a time to make forward progress.
+- *
+- * Return: the request object on success; NULL on failure (but see above)
+- */
+-struct ahash_request *fsverity_alloc_hash_request(struct fsverity_hash_alg *alg,
+-						  gfp_t gfp_flags)
+-{
+-	struct ahash_request *req = mempool_alloc(&alg->req_pool, gfp_flags);
+-
+-	if (req)
+-		ahash_request_set_tfm(req, alg->tfm);
+-	return req;
+-}
+-
+-/**
+- * fsverity_free_hash_request() - free a hash request object
+- * @alg: the hash algorithm
+- * @req: the hash request object to free
+- */
+-void fsverity_free_hash_request(struct fsverity_hash_alg *alg,
+-				struct ahash_request *req)
+-{
+-	if (req) {
+-		ahash_request_zero(req);
+-		mempool_free(req, &alg->req_pool);
+-	}
+-}
+-
+ /**
+  * fsverity_prepare_hash_state() - precompute the initial hash state
+  * @alg: hash algorithm
+@@ -159,23 +112,20 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+ 				      const u8 *salt, size_t salt_size)
  {
- 	char *p = name;
-@@ -1035,7 +1077,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 	u8 *hashstate = NULL;
+-	struct ahash_request *req = NULL;
++	SHASH_DESC_ON_STACK(desc, alg->tfm);
+ 	u8 *padded_salt = NULL;
+ 	size_t padded_salt_size;
+-	struct scatterlist sg;
+-	DECLARE_CRYPTO_WAIT(wait);
+ 	int err;
  
- 	p += scnprintf(p, end - p, "random:");
- 
--	switch (prandom_u32_max(4)) {
-+	switch (prandom_u32_below(rng, 4)) {
- 	case 0:
- 	case 1:
- 		cfg->inplace_mode = OUT_OF_PLACE;
-@@ -1050,12 +1092,12 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
- 		break;
- 	}
- 
--	if (prandom_u32_max(2) == 0) {
-+	if (prandom_bool(rng)) {
- 		cfg->req_flags |= CRYPTO_TFM_REQ_MAY_SLEEP;
- 		p += scnprintf(p, end - p, " may_sleep");
- 	}
- 
--	switch (prandom_u32_max(4)) {
-+	switch (prandom_u32_below(rng, 4)) {
- 	case 0:
- 		cfg->finalization_type = FINALIZATION_TYPE_FINAL;
- 		p += scnprintf(p, end - p, " use_final");
-@@ -1070,36 +1112,37 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
- 		break;
- 	}
- 
--	if (!(cfg->req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) &&
--	    prandom_u32_max(2) == 0) {
-+	if (!(cfg->req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) && prandom_bool(rng)) {
- 		cfg->nosimd = true;
- 		p += scnprintf(p, end - p, " nosimd");
- 	}
- 
- 	p += scnprintf(p, end - p, " src_divs=[");
--	p = generate_random_sgl_divisions(cfg->src_divs,
-+	p = generate_random_sgl_divisions(rng, cfg->src_divs,
- 					  ARRAY_SIZE(cfg->src_divs), p, end,
- 					  (cfg->finalization_type !=
- 					   FINALIZATION_TYPE_DIGEST),
- 					  cfg->req_flags);
- 	p += scnprintf(p, end - p, "]");
- 
--	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_u32_max(2) == 0) {
-+	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_bool(rng)) {
- 		p += scnprintf(p, end - p, " dst_divs=[");
--		p = generate_random_sgl_divisions(cfg->dst_divs,
-+		p = generate_random_sgl_divisions(rng, cfg->dst_divs,
- 						  ARRAY_SIZE(cfg->dst_divs),
- 						  p, end, false,
- 						  cfg->req_flags);
- 		p += scnprintf(p, end - p, "]");
- 	}
- 
--	if (prandom_u32_max(2) == 0) {
--		cfg->iv_offset = 1 + prandom_u32_max(MAX_ALGAPI_ALIGNMASK);
-+	if (prandom_bool(rng)) {
-+		cfg->iv_offset = prandom_u32_inclusive(rng, 1,
-+						       MAX_ALGAPI_ALIGNMASK);
- 		p += scnprintf(p, end - p, " iv_offset=%u", cfg->iv_offset);
- 	}
- 
--	if (prandom_u32_max(2) == 0) {
--		cfg->key_offset = 1 + prandom_u32_max(MAX_ALGAPI_ALIGNMASK);
-+	if (prandom_bool(rng)) {
-+		cfg->key_offset = prandom_u32_inclusive(rng, 1,
-+							MAX_ALGAPI_ALIGNMASK);
- 		p += scnprintf(p, end - p, " key_offset=%u", cfg->key_offset);
- 	}
- 
-@@ -1612,11 +1655,14 @@ static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
- 
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 	if (!noextratests) {
-+		struct rnd_state rng;
- 		struct testvec_config cfg;
- 		char cfgname[TESTVEC_CONFIG_NAMELEN];
- 
-+		init_rnd_state(&rng);
++	desc->tfm = alg->tfm;
 +
- 		for (i = 0; i < fuzz_iterations; i++) {
--			generate_random_testvec_config(&cfg, cfgname,
-+			generate_random_testvec_config(&rng, &cfg, cfgname,
- 						       sizeof(cfgname));
- 			err = test_hash_vec_cfg(vec, vec_name, &cfg,
- 						req, desc, tsgl, hashstate);
-@@ -1634,15 +1680,16 @@ static int test_hash_vec(const struct hash_testvec *vec, unsigned int vec_num,
-  * Generate a hash test vector from the given implementation.
-  * Assumes the buffers in 'vec' were already allocated.
+ 	if (salt_size == 0)
+ 		return NULL;
+ 
+-	hashstate = kmalloc(crypto_ahash_statesize(alg->tfm), GFP_KERNEL);
++	hashstate = kmalloc(crypto_shash_statesize(alg->tfm), GFP_KERNEL);
+ 	if (!hashstate)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(alg, GFP_KERNEL);
+-
+ 	/*
+ 	 * Zero-pad the salt to the next multiple of the input size of the hash
+ 	 * algorithm's compression function, e.g. 64 bytes for SHA-256 or 128
+@@ -190,26 +140,18 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+ 		goto err_free;
+ 	}
+ 	memcpy(padded_salt, salt, salt_size);
+-
+-	sg_init_one(&sg, padded_salt, padded_salt_size);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+-					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
+-	ahash_request_set_crypt(req, &sg, NULL, padded_salt_size);
+-
+-	err = crypto_wait_req(crypto_ahash_init(req), &wait);
++	err = crypto_shash_init(desc);
+ 	if (err)
+ 		goto err_free;
+ 
+-	err = crypto_wait_req(crypto_ahash_update(req), &wait);
++	err = crypto_shash_update(desc, padded_salt, padded_salt_size);
+ 	if (err)
+ 		goto err_free;
+ 
+-	err = crypto_ahash_export(req, hashstate);
++	err = crypto_shash_export(desc, hashstate);
+ 	if (err)
+ 		goto err_free;
+ out:
+-	fsverity_free_hash_request(alg, req);
+ 	kfree(padded_salt);
+ 	return hashstate;
+ 
+@@ -223,9 +165,7 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+  * fsverity_hash_block() - hash a single data or hash block
+  * @params: the Merkle tree's parameters
+  * @inode: inode for which the hashing is being done
+- * @req: preallocated hash request
+- * @page: the page containing the block to hash
+- * @offset: the offset of the block within @page
++ * @data: virtual address of a buffer containing the block to hash
+  * @out: output digest, size 'params->digest_size' bytes
+  *
+  * Hash a single data or hash block.  The hash is salted if a salt is specified
+@@ -234,33 +174,24 @@ const u8 *fsverity_prepare_hash_state(struct fsverity_hash_alg *alg,
+  * Return: 0 on success, -errno on failure
   */
--static void generate_random_hash_testvec(struct shash_desc *desc,
-+static void generate_random_hash_testvec(struct rnd_state *rng,
-+					 struct shash_desc *desc,
- 					 struct hash_testvec *vec,
- 					 unsigned int maxkeysize,
- 					 unsigned int maxdatasize,
- 					 char *name, size_t max_namelen)
+ int fsverity_hash_block(const struct merkle_tree_params *params,
+-			const struct inode *inode, struct ahash_request *req,
+-			struct page *page, unsigned int offset, u8 *out)
++			const struct inode *inode, const void *data, u8 *out)
  {
- 	/* Data */
--	vec->psize = generate_random_length(maxdatasize);
--	generate_random_bytes((u8 *)vec->plaintext, vec->psize);
-+	vec->psize = generate_random_length(rng, maxdatasize);
-+	generate_random_bytes(rng, (u8 *)vec->plaintext, vec->psize);
+-	struct scatterlist sg;
+-	DECLARE_CRYPTO_WAIT(wait);
++	SHASH_DESC_ON_STACK(desc, params->hash_alg->tfm);
+ 	int err;
+ 
+-	sg_init_table(&sg, 1);
+-	sg_set_page(&sg, page, params->block_size, offset);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+-					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
+-	ahash_request_set_crypt(req, &sg, out, params->block_size);
++	desc->tfm = params->hash_alg->tfm;
+ 
+ 	if (params->hashstate) {
+-		err = crypto_ahash_import(req, params->hashstate);
++		err = crypto_shash_import(desc, params->hashstate);
+ 		if (err) {
+ 			fsverity_err(inode,
+ 				     "Error %d importing hash state", err);
+ 			return err;
+ 		}
+-		err = crypto_ahash_finup(req);
++		err = crypto_shash_finup(desc, data, params->block_size, out);
+ 	} else {
+-		err = crypto_ahash_digest(req);
++		err = crypto_shash_digest(desc, data, params->block_size, out);
+ 	}
+-
+-	err = crypto_wait_req(err, &wait);
+ 	if (err)
+ 		fsverity_err(inode, "Error %d computing block hash", err);
+ 	return err;
+@@ -273,32 +204,12 @@ int fsverity_hash_block(const struct merkle_tree_params *params,
+  * @size: size of data to hash, in bytes
+  * @out: output digest, size 'alg->digest_size' bytes
+  *
+- * Hash some data which is located in physically contiguous memory (i.e. memory
+- * allocated by kmalloc(), not by vmalloc()).  No salt is used.
+- *
+  * Return: 0 on success, -errno on failure
+  */
+ int fsverity_hash_buffer(struct fsverity_hash_alg *alg,
+ 			 const void *data, size_t size, u8 *out)
+ {
+-	struct ahash_request *req;
+-	struct scatterlist sg;
+-	DECLARE_CRYPTO_WAIT(wait);
+-	int err;
+-
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(alg, GFP_KERNEL);
+-
+-	sg_init_one(&sg, data, size);
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP |
+-					CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   crypto_req_done, &wait);
+-	ahash_request_set_crypt(req, &sg, out, size);
+-
+-	err = crypto_wait_req(crypto_ahash_digest(req), &wait);
+-
+-	fsverity_free_hash_request(alg, req);
+-	return err;
++	return crypto_shash_tfm_digest(alg->tfm, data, size, out);
+ }
+ 
+ void __init fsverity_check_hash_algs(void)
+diff --git a/fs/verity/verify.c b/fs/verity/verify.c
+index e2508222750b3..702500ef1f348 100644
+--- a/fs/verity/verify.c
++++ b/fs/verity/verify.c
+@@ -29,21 +29,6 @@ static inline int cmp_hashes(const struct fsverity_info *vi,
+ 	return -EBADMSG;
+ }
+ 
+-static bool data_is_zeroed(struct inode *inode, struct page *page,
+-			   unsigned int len, unsigned int offset)
+-{
+-	void *virt = kmap_local_page(page);
+-
+-	if (memchr_inv(virt + offset, 0, len)) {
+-		kunmap_local(virt);
+-		fsverity_err(inode,
+-			     "FILE CORRUPTED!  Data past EOF is not zeroed");
+-		return false;
+-	}
+-	kunmap_local(virt);
+-	return true;
+-}
+-
+ /*
+  * Returns true if the hash block with index @hblock_idx in the tree, located in
+  * @hpage, has already been verified.
+@@ -122,9 +107,7 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
+  */
+ static bool
+ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+-		  struct ahash_request *req, struct page *data_page,
+-		  u64 data_pos, unsigned int dblock_offset_in_page,
+-		  unsigned long max_ra_pages)
++		  const void *data, u64 data_pos, unsigned long max_ra_pages)
+ {
+ 	const struct merkle_tree_params *params = &vi->tree_params;
+ 	const unsigned int hsize = params->digest_size;
+@@ -136,11 +119,11 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 	struct {
+ 		/* Page containing the hash block */
+ 		struct page *page;
++		/* Mapped address of the hash block (will be within @page) */
++		const void *addr;
+ 		/* Index of the hash block in the tree overall */
+ 		unsigned long index;
+-		/* Byte offset of the hash block within @page */
+-		unsigned int offset_in_page;
+-		/* Byte offset of the wanted hash within @page */
++		/* Byte offset of the wanted hash relative to @addr */
+ 		unsigned int hoffset;
+ 	} hblocks[FS_VERITY_MAX_LEVELS];
+ 	/*
+@@ -150,6 +133,9 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 	u64 hidx = data_pos >> params->log_blocksize;
+ 	int err;
+ 
++	/* Up to 1 + FS_VERITY_MAX_LEVELS pages may be mapped at once */
++	BUILD_BUG_ON(1 + FS_VERITY_MAX_LEVELS > KM_MAX_IDX);
++
+ 	if (unlikely(data_pos >= inode->i_size)) {
+ 		/*
+ 		 * This can happen in the data page spanning EOF when the Merkle
+@@ -159,8 +145,12 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		 * any part past EOF should be all zeroes.  Therefore, we need
+ 		 * to verify that any data blocks fully past EOF are all zeroes.
+ 		 */
+-		return data_is_zeroed(inode, data_page, params->block_size,
+-				      dblock_offset_in_page);
++		if (memchr_inv(data, 0, params->block_size)) {
++			fsverity_err(inode,
++				     "FILE CORRUPTED!  Data past EOF is not zeroed");
++			return false;
++		}
++		return true;
+ 	}
  
  	/*
- 	 * Key: length in range [1, maxkeysize], but usually choose maxkeysize.
-@@ -1652,9 +1699,9 @@ static void generate_random_hash_testvec(struct shash_desc *desc,
- 	vec->ksize = 0;
- 	if (maxkeysize) {
- 		vec->ksize = maxkeysize;
--		if (prandom_u32_max(4) == 0)
--			vec->ksize = 1 + prandom_u32_max(maxkeysize);
--		generate_random_bytes((u8 *)vec->key, vec->ksize);
-+		if (prandom_u32_below(rng, 4) == 0)
-+			vec->ksize = prandom_u32_inclusive(rng, 1, maxkeysize);
-+		generate_random_bytes(rng, (u8 *)vec->key, vec->ksize);
+@@ -175,6 +165,7 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		unsigned int hblock_offset_in_page;
+ 		unsigned int hoffset;
+ 		struct page *hpage;
++		const void *haddr;
  
- 		vec->setkey_error = crypto_shash_setkey(desc->tfm, vec->key,
- 							vec->ksize);
-@@ -1688,6 +1735,7 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
- 	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
- 	const char *algname = crypto_hash_alg_common(tfm)->base.cra_name;
- 	const char *driver = crypto_ahash_driver_name(tfm);
-+	struct rnd_state rng;
- 	char _generic_driver[CRYPTO_MAX_ALG_NAME];
- 	struct crypto_shash *generic_tfm = NULL;
- 	struct shash_desc *generic_desc = NULL;
-@@ -1701,6 +1749,8 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
- 	if (noextratests)
- 		return 0;
+ 		/*
+ 		 * The index of the block in the current level; also the index
+@@ -192,10 +183,9 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 		hblock_offset_in_page =
+ 			(hblock_idx << params->log_blocksize) & ~PAGE_MASK;
  
-+	init_rnd_state(&rng);
-+
- 	if (!generic_driver) { /* Use default naming convention? */
- 		err = build_generic_driver_name(algname, _generic_driver);
+-		/* Byte offset of the hash within the page */
+-		hoffset = hblock_offset_in_page +
+-			  ((hidx << params->log_digestsize) &
+-			   (params->block_size - 1));
++		/* Byte offset of the hash within the block */
++		hoffset = (hidx << params->log_digestsize) &
++			  (params->block_size - 1);
+ 
+ 		hpage = inode->i_sb->s_vop->read_merkle_tree_page(inode,
+ 				hpage_idx, level == 0 ? min(max_ra_pages,
+@@ -207,15 +197,17 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 				     err, hpage_idx);
+ 			goto out;
+ 		}
++		haddr = kmap_local_page(hpage) + hblock_offset_in_page;
+ 		if (is_hash_block_verified(vi, hpage, hblock_idx)) {
+-			memcpy_from_page(_want_hash, hpage, hoffset, hsize);
++			memcpy(_want_hash, haddr + hoffset, hsize);
+ 			want_hash = _want_hash;
++			kunmap_local(haddr);
+ 			put_page(hpage);
+ 			goto descend;
+ 		}
+ 		hblocks[level].page = hpage;
++		hblocks[level].addr = haddr;
+ 		hblocks[level].index = hblock_idx;
+-		hblocks[level].offset_in_page = hblock_offset_in_page;
+ 		hblocks[level].hoffset = hoffset;
+ 		hidx = next_hidx;
+ 	}
+@@ -225,13 +217,11 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 	/* Descend the tree verifying hash blocks. */
+ 	for (; level > 0; level--) {
+ 		struct page *hpage = hblocks[level - 1].page;
++		const void *haddr = hblocks[level - 1].addr;
+ 		unsigned long hblock_idx = hblocks[level - 1].index;
+-		unsigned int hblock_offset_in_page =
+-			hblocks[level - 1].offset_in_page;
+ 		unsigned int hoffset = hblocks[level - 1].hoffset;
+ 
+-		err = fsverity_hash_block(params, inode, req, hpage,
+-					  hblock_offset_in_page, real_hash);
++		err = fsverity_hash_block(params, inode, haddr, real_hash);
  		if (err)
-@@ -1769,10 +1819,11 @@ static int test_hash_vs_generic_impl(const char *generic_driver,
+ 			goto out;
+ 		err = cmp_hashes(vi, want_hash, real_hash, data_pos, level - 1);
+@@ -246,29 +236,30 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
+ 			set_bit(hblock_idx, vi->hash_block_verified);
+ 		else
+ 			SetPageChecked(hpage);
+-		memcpy_from_page(_want_hash, hpage, hoffset, hsize);
++		memcpy(_want_hash, haddr + hoffset, hsize);
+ 		want_hash = _want_hash;
++		kunmap_local(haddr);
+ 		put_page(hpage);
  	}
  
- 	for (i = 0; i < fuzz_iterations * 8; i++) {
--		generate_random_hash_testvec(generic_desc, &vec,
-+		generate_random_hash_testvec(&rng, generic_desc, &vec,
- 					     maxkeysize, maxdatasize,
- 					     vec_name, sizeof(vec_name));
--		generate_random_testvec_config(cfg, cfgname, sizeof(cfgname));
-+		generate_random_testvec_config(&rng, cfg, cfgname,
-+					       sizeof(cfgname));
- 
- 		err = test_hash_vec_cfg(&vec, vec_name, cfg,
- 					req, desc, tsgl, hashstate);
-@@ -2174,11 +2225,14 @@ static int test_aead_vec(int enc, const struct aead_testvec *vec,
- 
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 	if (!noextratests) {
-+		struct rnd_state rng;
- 		struct testvec_config cfg;
- 		char cfgname[TESTVEC_CONFIG_NAMELEN];
- 
-+		init_rnd_state(&rng);
-+
- 		for (i = 0; i < fuzz_iterations; i++) {
--			generate_random_testvec_config(&cfg, cfgname,
-+			generate_random_testvec_config(&rng, &cfg, cfgname,
- 						       sizeof(cfgname));
- 			err = test_aead_vec_cfg(enc, vec, vec_name,
- 						&cfg, req, tsgls);
-@@ -2194,6 +2248,7 @@ static int test_aead_vec(int enc, const struct aead_testvec *vec,
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 
- struct aead_extra_tests_ctx {
-+	struct rnd_state rng;
- 	struct aead_request *req;
- 	struct crypto_aead *tfm;
- 	const struct alg_test_desc *test_desc;
-@@ -2212,24 +2267,26 @@ struct aead_extra_tests_ctx {
-  * here means the full ciphertext including the authentication tag.  The
-  * authentication tag (and hence also the ciphertext) is assumed to be nonempty.
-  */
--static void mutate_aead_message(struct aead_testvec *vec, bool aad_iv,
-+static void mutate_aead_message(struct rnd_state *rng,
-+				struct aead_testvec *vec, bool aad_iv,
- 				unsigned int ivsize)
- {
- 	const unsigned int aad_tail_size = aad_iv ? ivsize : 0;
- 	const unsigned int authsize = vec->clen - vec->plen;
- 
--	if (prandom_u32_max(2) == 0 && vec->alen > aad_tail_size) {
-+	if (prandom_bool(rng) && vec->alen > aad_tail_size) {
- 		 /* Mutate the AAD */
--		flip_random_bit((u8 *)vec->assoc, vec->alen - aad_tail_size);
--		if (prandom_u32_max(2) == 0)
-+		flip_random_bit(rng, (u8 *)vec->assoc,
-+				vec->alen - aad_tail_size);
-+		if (prandom_bool(rng))
- 			return;
- 	}
--	if (prandom_u32_max(2) == 0) {
-+	if (prandom_bool(rng)) {
- 		/* Mutate auth tag (assuming it's at the end of ciphertext) */
--		flip_random_bit((u8 *)vec->ctext + vec->plen, authsize);
-+		flip_random_bit(rng, (u8 *)vec->ctext + vec->plen, authsize);
- 	} else {
- 		/* Mutate any part of the ciphertext */
--		flip_random_bit((u8 *)vec->ctext, vec->clen);
-+		flip_random_bit(rng, (u8 *)vec->ctext, vec->clen);
- 	}
+ 	/* Finally, verify the data block. */
+-	err = fsverity_hash_block(params, inode, req, data_page,
+-				  dblock_offset_in_page, real_hash);
++	err = fsverity_hash_block(params, inode, data, real_hash);
+ 	if (err)
+ 		goto out;
+ 	err = cmp_hashes(vi, want_hash, real_hash, data_pos, -1);
+ out:
+-	for (; level > 0; level--)
++	for (; level > 0; level--) {
++		kunmap_local(hblocks[level - 1].addr);
+ 		put_page(hblocks[level - 1].page);
+-
++	}
+ 	return err == 0;
  }
  
-@@ -2240,7 +2297,8 @@ static void mutate_aead_message(struct aead_testvec *vec, bool aad_iv,
+ static bool
+-verify_data_blocks(struct inode *inode, struct fsverity_info *vi,
+-		   struct ahash_request *req, struct folio *data_folio,
++verify_data_blocks(struct inode *inode, struct folio *data_folio,
+ 		   size_t len, size_t offset, unsigned long max_ra_pages)
+ {
++	struct fsverity_info *vi = inode->i_verity_info;
+ 	const unsigned int block_size = vi->tree_params.block_size;
+ 	u64 pos = (u64)data_folio->index << PAGE_SHIFT;
+ 
+@@ -278,11 +269,14 @@ verify_data_blocks(struct inode *inode, struct fsverity_info *vi,
+ 			 folio_test_uptodate(data_folio)))
+ 		return false;
+ 	do {
+-		struct page *data_page =
+-			folio_page(data_folio, offset >> PAGE_SHIFT);
+-
+-		if (!verify_data_block(inode, vi, req, data_page, pos + offset,
+-				       offset & ~PAGE_MASK, max_ra_pages))
++		void *data;
++		bool valid;
++
++		data = kmap_local_folio(data_folio, offset);
++		valid = verify_data_block(inode, vi, data, pos + offset,
++					  max_ra_pages);
++		kunmap_local(data);
++		if (!valid)
+ 			return false;
+ 		offset += block_size;
+ 		len -= block_size;
+@@ -304,19 +298,8 @@ verify_data_blocks(struct inode *inode, struct fsverity_info *vi,
   */
- #define MIN_COLLISION_FREE_AUTHSIZE 8
+ bool fsverity_verify_blocks(struct folio *folio, size_t len, size_t offset)
+ {
+-	struct inode *inode = folio->mapping->host;
+-	struct fsverity_info *vi = inode->i_verity_info;
+-	struct ahash_request *req;
+-	bool valid;
+-
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(vi->tree_params.hash_alg, GFP_NOFS);
++	return verify_data_blocks(folio->mapping->host, folio, len, offset, 0);
  
--static void generate_aead_message(struct aead_request *req,
-+static void generate_aead_message(struct rnd_state *rng,
-+				  struct aead_request *req,
- 				  const struct aead_test_suite *suite,
- 				  struct aead_testvec *vec,
- 				  bool prefer_inauthentic)
-@@ -2249,17 +2307,18 @@ static void generate_aead_message(struct aead_request *req,
- 	const unsigned int ivsize = crypto_aead_ivsize(tfm);
- 	const unsigned int authsize = vec->clen - vec->plen;
- 	const bool inauthentic = (authsize >= MIN_COLLISION_FREE_AUTHSIZE) &&
--				 (prefer_inauthentic || prandom_u32_max(4) == 0);
-+				 (prefer_inauthentic ||
-+				  prandom_u32_below(rng, 4) == 0);
+-	valid = verify_data_blocks(inode, vi, req, folio, len, offset, 0);
+-
+-	fsverity_free_hash_request(vi->tree_params.hash_alg, req);
+-
+-	return valid;
+ }
+ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
  
- 	/* Generate the AAD. */
--	generate_random_bytes((u8 *)vec->assoc, vec->alen);
-+	generate_random_bytes(rng, (u8 *)vec->assoc, vec->alen);
- 	if (suite->aad_iv && vec->alen >= ivsize)
- 		/* Avoid implementation-defined behavior. */
- 		memcpy((u8 *)vec->assoc + vec->alen - ivsize, vec->iv, ivsize);
+@@ -338,14 +321,9 @@ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
+ void fsverity_verify_bio(struct bio *bio)
+ {
+ 	struct inode *inode = bio_first_page_all(bio)->mapping->host;
+-	struct fsverity_info *vi = inode->i_verity_info;
+-	struct ahash_request *req;
+ 	struct folio_iter fi;
+ 	unsigned long max_ra_pages = 0;
  
--	if (inauthentic && prandom_u32_max(2) == 0) {
-+	if (inauthentic && prandom_bool(rng)) {
- 		/* Generate a random ciphertext. */
--		generate_random_bytes((u8 *)vec->ctext, vec->clen);
-+		generate_random_bytes(rng, (u8 *)vec->ctext, vec->clen);
- 	} else {
- 		int i = 0;
- 		struct scatterlist src[2], dst;
-@@ -2271,7 +2330,7 @@ static void generate_aead_message(struct aead_request *req,
- 		if (vec->alen)
- 			sg_set_buf(&src[i++], vec->assoc, vec->alen);
- 		if (vec->plen) {
--			generate_random_bytes((u8 *)vec->ptext, vec->plen);
-+			generate_random_bytes(rng, (u8 *)vec->ptext, vec->plen);
- 			sg_set_buf(&src[i++], vec->ptext, vec->plen);
+-	/* This allocation never fails, since it's mempool-backed. */
+-	req = fsverity_alloc_hash_request(vi->tree_params.hash_alg, GFP_NOFS);
+-
+ 	if (bio->bi_opf & REQ_RAHEAD) {
+ 		/*
+ 		 * If this bio is for data readahead, then we also do readahead
+@@ -360,14 +338,12 @@ void fsverity_verify_bio(struct bio *bio)
+ 	}
+ 
+ 	bio_for_each_folio_all(fi, bio) {
+-		if (!verify_data_blocks(inode, vi, req, fi.folio, fi.length,
+-					fi.offset, max_ra_pages)) {
++		if (!verify_data_blocks(inode, fi.folio, fi.length, fi.offset,
++					max_ra_pages)) {
+ 			bio->bi_status = BLK_STS_IOERR;
+ 			break;
  		}
- 		sg_init_one(&dst, vec->ctext, vec->alen + vec->clen);
-@@ -2291,7 +2350,7 @@ static void generate_aead_message(struct aead_request *req,
- 		 * Mutate the authentic (ciphertext, AAD) pair to get an
- 		 * inauthentic one.
- 		 */
--		mutate_aead_message(vec, suite->aad_iv, ivsize);
-+		mutate_aead_message(rng, vec, suite->aad_iv, ivsize);
  	}
- 	vec->novrfy = 1;
- 	if (suite->einval_allowed)
-@@ -2305,7 +2364,8 @@ static void generate_aead_message(struct aead_request *req,
-  * If 'prefer_inauthentic' is true, then this function will generate inauthentic
-  * test vectors (i.e. vectors with 'vec->novrfy=1') more often.
-  */
--static void generate_random_aead_testvec(struct aead_request *req,
-+static void generate_random_aead_testvec(struct rnd_state *rng,
-+					 struct aead_request *req,
- 					 struct aead_testvec *vec,
- 					 const struct aead_test_suite *suite,
- 					 unsigned int maxkeysize,
-@@ -2321,18 +2381,18 @@ static void generate_random_aead_testvec(struct aead_request *req,
- 
- 	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
- 	vec->klen = maxkeysize;
--	if (prandom_u32_max(4) == 0)
--		vec->klen = prandom_u32_max(maxkeysize + 1);
--	generate_random_bytes((u8 *)vec->key, vec->klen);
-+	if (prandom_u32_below(rng, 4) == 0)
-+		vec->klen = prandom_u32_below(rng, maxkeysize + 1);
-+	generate_random_bytes(rng, (u8 *)vec->key, vec->klen);
- 	vec->setkey_error = crypto_aead_setkey(tfm, vec->key, vec->klen);
- 
- 	/* IV */
--	generate_random_bytes((u8 *)vec->iv, ivsize);
-+	generate_random_bytes(rng, (u8 *)vec->iv, ivsize);
- 
- 	/* Tag length: in [0, maxauthsize], but usually choose maxauthsize */
- 	authsize = maxauthsize;
--	if (prandom_u32_max(4) == 0)
--		authsize = prandom_u32_max(maxauthsize + 1);
-+	if (prandom_u32_below(rng, 4) == 0)
-+		authsize = prandom_u32_below(rng, maxauthsize + 1);
- 	if (prefer_inauthentic && authsize < MIN_COLLISION_FREE_AUTHSIZE)
- 		authsize = MIN_COLLISION_FREE_AUTHSIZE;
- 	if (WARN_ON(authsize > maxdatasize))
-@@ -2341,11 +2401,11 @@ static void generate_random_aead_testvec(struct aead_request *req,
- 	vec->setauthsize_error = crypto_aead_setauthsize(tfm, authsize);
- 
- 	/* AAD, plaintext, and ciphertext lengths */
--	total_len = generate_random_length(maxdatasize);
--	if (prandom_u32_max(4) == 0)
-+	total_len = generate_random_length(rng, maxdatasize);
-+	if (prandom_u32_below(rng, 4) == 0)
- 		vec->alen = 0;
- 	else
--		vec->alen = generate_random_length(total_len);
-+		vec->alen = generate_random_length(rng, total_len);
- 	vec->plen = total_len - vec->alen;
- 	vec->clen = vec->plen + authsize;
- 
-@@ -2356,7 +2416,7 @@ static void generate_random_aead_testvec(struct aead_request *req,
- 	vec->novrfy = 0;
- 	vec->crypt_error = 0;
- 	if (vec->setkey_error == 0 && vec->setauthsize_error == 0)
--		generate_aead_message(req, suite, vec, prefer_inauthentic);
-+		generate_aead_message(rng, req, suite, vec, prefer_inauthentic);
- 	snprintf(name, max_namelen,
- 		 "\"random: alen=%u plen=%u authsize=%u klen=%u novrfy=%d\"",
- 		 vec->alen, vec->plen, authsize, vec->klen, vec->novrfy);
-@@ -2368,7 +2428,7 @@ static void try_to_generate_inauthentic_testvec(
- 	int i;
- 
- 	for (i = 0; i < 10; i++) {
--		generate_random_aead_testvec(ctx->req, &ctx->vec,
-+		generate_random_aead_testvec(&ctx->rng, ctx->req, &ctx->vec,
- 					     &ctx->test_desc->suite.aead,
- 					     ctx->maxkeysize, ctx->maxdatasize,
- 					     ctx->vec_name,
-@@ -2399,7 +2459,8 @@ static int test_aead_inauthentic_inputs(struct aead_extra_tests_ctx *ctx)
- 		 */
- 		try_to_generate_inauthentic_testvec(ctx);
- 		if (ctx->vec.novrfy) {
--			generate_random_testvec_config(&ctx->cfg, ctx->cfgname,
-+			generate_random_testvec_config(&ctx->rng, &ctx->cfg,
-+						       ctx->cfgname,
- 						       sizeof(ctx->cfgname));
- 			err = test_aead_vec_cfg(DECRYPT, &ctx->vec,
- 						ctx->vec_name, &ctx->cfg,
-@@ -2489,12 +2550,13 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
- 	 * the other implementation against them.
- 	 */
- 	for (i = 0; i < fuzz_iterations * 8; i++) {
--		generate_random_aead_testvec(generic_req, &ctx->vec,
-+		generate_random_aead_testvec(&ctx->rng, generic_req, &ctx->vec,
- 					     &ctx->test_desc->suite.aead,
- 					     ctx->maxkeysize, ctx->maxdatasize,
- 					     ctx->vec_name,
- 					     sizeof(ctx->vec_name), false);
--		generate_random_testvec_config(&ctx->cfg, ctx->cfgname,
-+		generate_random_testvec_config(&ctx->rng, &ctx->cfg,
-+					       ctx->cfgname,
- 					       sizeof(ctx->cfgname));
- 		if (!ctx->vec.novrfy) {
- 			err = test_aead_vec_cfg(ENCRYPT, &ctx->vec,
-@@ -2533,6 +2595,7 @@ static int test_aead_extra(const struct alg_test_desc *test_desc,
- 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
- 	if (!ctx)
- 		return -ENOMEM;
-+	init_rnd_state(&ctx->rng);
- 	ctx->req = req;
- 	ctx->tfm = crypto_aead_reqtfm(req);
- 	ctx->test_desc = test_desc;
-@@ -2922,11 +2985,14 @@ static int test_skcipher_vec(int enc, const struct cipher_testvec *vec,
- 
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- 	if (!noextratests) {
-+		struct rnd_state rng;
- 		struct testvec_config cfg;
- 		char cfgname[TESTVEC_CONFIG_NAMELEN];
- 
-+		init_rnd_state(&rng);
-+
- 		for (i = 0; i < fuzz_iterations; i++) {
--			generate_random_testvec_config(&cfg, cfgname,
-+			generate_random_testvec_config(&rng, &cfg, cfgname,
- 						       sizeof(cfgname));
- 			err = test_skcipher_vec_cfg(enc, vec, vec_name,
- 						    &cfg, req, tsgls);
-@@ -2944,7 +3010,8 @@ static int test_skcipher_vec(int enc, const struct cipher_testvec *vec,
-  * Generate a symmetric cipher test vector from the given implementation.
-  * Assumes the buffers in 'vec' were already allocated.
-  */
--static void generate_random_cipher_testvec(struct skcipher_request *req,
-+static void generate_random_cipher_testvec(struct rnd_state *rng,
-+					   struct skcipher_request *req,
- 					   struct cipher_testvec *vec,
- 					   unsigned int maxdatasize,
- 					   char *name, size_t max_namelen)
-@@ -2958,17 +3025,17 @@ static void generate_random_cipher_testvec(struct skcipher_request *req,
- 
- 	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
- 	vec->klen = maxkeysize;
--	if (prandom_u32_max(4) == 0)
--		vec->klen = prandom_u32_max(maxkeysize + 1);
--	generate_random_bytes((u8 *)vec->key, vec->klen);
-+	if (prandom_u32_below(rng, 4) == 0)
-+		vec->klen = prandom_u32_below(rng, maxkeysize + 1);
-+	generate_random_bytes(rng, (u8 *)vec->key, vec->klen);
- 	vec->setkey_error = crypto_skcipher_setkey(tfm, vec->key, vec->klen);
- 
- 	/* IV */
--	generate_random_bytes((u8 *)vec->iv, ivsize);
-+	generate_random_bytes(rng, (u8 *)vec->iv, ivsize);
- 
- 	/* Plaintext */
--	vec->len = generate_random_length(maxdatasize);
--	generate_random_bytes((u8 *)vec->ptext, vec->len);
-+	vec->len = generate_random_length(rng, maxdatasize);
-+	generate_random_bytes(rng, (u8 *)vec->ptext, vec->len);
- 
- 	/* If the key couldn't be set, no need to continue to encrypt. */
- 	if (vec->setkey_error)
-@@ -3010,6 +3077,7 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
- 	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
- 	const char *algname = crypto_skcipher_alg(tfm)->base.cra_name;
- 	const char *driver = crypto_skcipher_driver_name(tfm);
-+	struct rnd_state rng;
- 	char _generic_driver[CRYPTO_MAX_ALG_NAME];
- 	struct crypto_skcipher *generic_tfm = NULL;
- 	struct skcipher_request *generic_req = NULL;
-@@ -3027,6 +3095,8 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
- 	if (strncmp(algname, "kw(", 3) == 0)
- 		return 0;
- 
-+	init_rnd_state(&rng);
-+
- 	if (!generic_driver) { /* Use default naming convention? */
- 		err = build_generic_driver_name(algname, _generic_driver);
- 		if (err)
-@@ -3111,9 +3181,11 @@ static int test_skcipher_vs_generic_impl(const char *generic_driver,
- 	}
- 
- 	for (i = 0; i < fuzz_iterations * 8; i++) {
--		generate_random_cipher_testvec(generic_req, &vec, maxdatasize,
-+		generate_random_cipher_testvec(&rng, generic_req, &vec,
-+					       maxdatasize,
- 					       vec_name, sizeof(vec_name));
--		generate_random_testvec_config(cfg, cfgname, sizeof(cfgname));
-+		generate_random_testvec_config(&rng, cfg, cfgname,
-+					       sizeof(cfgname));
- 
- 		err = test_skcipher_vec_cfg(ENCRYPT, &vec, vec_name,
- 					    cfg, req, tsgls);
+-
+-	fsverity_free_hash_request(vi->tree_params.hash_alg, req);
+ }
+ EXPORT_SYMBOL_GPL(fsverity_verify_bio);
+ #endif /* CONFIG_BLOCK */
 
-base-commit: bf4ad6fa4e5332e53913b073d0219319a4091619
+base-commit: f1fcbaa18b28dec10281551dfe6ed3a3ed80e3d6
 -- 
 2.40.1
 
