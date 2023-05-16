@@ -2,72 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62A0C77B75
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 18:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE46C77B75
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 18:14:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbjEPSIc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 May 2023 14:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52926 "EHLO
+        id S229562AbjEPSO3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 May 2023 14:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230269AbjEPSIc (ORCPT
+        with ESMTP id S229449AbjEPSO2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 May 2023 14:08:32 -0400
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE0F11C
-        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 11:08:29 -0700 (PDT)
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-331632be774so45523785ab.0
-        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 11:08:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684260509; x=1686852509;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T7cfmVckDHddvRqZ8odcZBeCbYSIduTckoQySA1Yp2w=;
-        b=DlZmvQhyoQohopSNHXQwwUQRFntvBgGe05h38wIasH6pB/goLlmK2+7yhZmXucKGVu
-         J5nIDs1RzQd9/k77KpAgSRWkXzN55LgxM8pQhDIrGBbD8pQVCzNj9yulJ+kIGhm6M6zP
-         a1mAr9YoeVASQI/FImWVWUVUFMhSG9oLBAWrqZOUxuZD1eINiip3IaV7bOBOauspW9ir
-         DO9Yl+UdnB9jVttlzz3nTRVkiTNcwsoE7M3N1xaMUqizLGLt3xllZRD91eYkX9qH+fJe
-         5yNiu2kP0XrQ74awnZhqj9KUbT+nUskQaKXO9elGfHy6fkrAwj2FocH0kc9pt4afdZMD
-         q4BA==
-X-Gm-Message-State: AC+VfDwhULG1lfy7/3Y+1qV7Su3hKysEiHHXh2L6C+mlft2SId3cmkX4
-        lAp3PRSirdwVsWEysklH5fzfVUTrdAhTFaSqqPgRE+YLEWYi
-X-Google-Smtp-Source: ACHHUZ63BE9GYHrroUdVptFYUVNfxy+8tYlUHvBejzt2rUT9DhZdFrbd4+sq88RXmQVswjnq12HB6/+V+e7muZaqmwJn/Q3txz7K
+        Tue, 16 May 2023 14:14:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21232420A
+        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 11:14:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AA8986351F
+        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 18:14:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE2DEC4339B;
+        Tue, 16 May 2023 18:14:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684260867;
+        bh=jfDxPqpHA0GQF2a7OMKuszIKEHTxP81kP5w+2MzNhrs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=tIXuUZhID5gPpQ7N96+Y0/A4JKkaCMNeq7KxLAQ17JJNdEgB+4RwXoERV0OPazers
+         dGlLWWpGWG8fZYs5AUiMuJTXNHjAB3X+SYZRajxTCz0pxJT4TzMRY/ThEYXWeaW3pr
+         VakucT86Rg6C1cIbwRQAvqpSXI4cYxgARlWrfAu1ON9wXc98tcVWDSBvSwq8mA4sMJ
+         X2/HXx9YGEfZZY0bD4IRBWKW1uLjpSzb8a1iA4g1cCUbSnmxfKqDlttJ4ko8mrOg9w
+         pFR5HnTs4aYPgEURKU4EdaIKh39Wjes34U2y66yXV/M8oC2EncFffdQf1fe09OeFGe
+         x68Z1f0R7Pp+Q==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
+        Taehee Yoo <ap420073@gmail.com>,
+        syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
+Subject: [PATCH] crypto: x86/aria - Use 16 byte alignment for GFNI constant vectors
+Date:   Tue, 16 May 2023 20:14:19 +0200
+Message-Id: <20230516181419.3633842-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-Received: by 2002:a02:862b:0:b0:418:81f5:6f39 with SMTP id
- e40-20020a02862b000000b0041881f56f39mr6649927jai.3.1684260508921; Tue, 16 May
- 2023 11:08:28 -0700 (PDT)
-Date:   Tue, 16 May 2023 11:08:28 -0700
-In-Reply-To: <CAMj1kXH8B6dmt0LVVyyorAzrKmkD2uFZ-5r4w0kMTYKbhqSPMA@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000057f58705fbd375a3@google.com>
-Subject: Re: [syzbot] [crypto?] general protection fault in __aria_aesni_avx_gfni_crypt_16way
-From:   syzbot <syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com>
-To:     ap420073@gmail.com, ardb@kernel.org, bp@alien8.de,
-        dave.hansen@linux.intel.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, hpa@zytor.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1448; i=ardb@kernel.org; h=from:subject; bh=jfDxPqpHA0GQF2a7OMKuszIKEHTxP81kP5w+2MzNhrs=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JISX5+O+21eViTR//Jn1aV/R5kdMP2c/8WyPnMHiKRbx7s GKO/hHpjlIWBjEOBlkxRRaB2X/f7Tw9UarWeZYszBxWJpAhDFycAjARNmaG/4mrZacHvPv+ZNqr MpGr9S9PbX88Y2rPpvUbRYVXaoTs8k5nZHjlKal4pzDxHOfGufVhz8/2shoFSF1kf7FHfFoky7/ FG1kB
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+The GFNI routines in the AVX version of the ARIA implementation now use
+explicit VMOVDQA instructions to load the constant input vectors, which
+means they must be 16 byte aligned. So ensure that this is the case, by
+dropping the section split and the incorrect .align 8 directive, and
+emitting the constants into the 16-byte aligned section instead.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Note that the AVX2 version of this code deviates from this pattern, and
+does not require a similar fix, given that it loads these contants as
+8-byte memory operands, for which AVX2 permits any alignment.
 
-Reported-and-tested-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
+Cc: Taehee Yoo <ap420073@gmail.com>
+Fixes: 8b84475318641c2b ("crypto: x86/aria-avx - Do not use avx2 instructions")
+Reported-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
+Tested-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/x86/crypto/aria-aesni-avx-asm_64.S | 2 --
+ 1 file changed, 2 deletions(-)
 
-Tested on:
+diff --git a/arch/x86/crypto/aria-aesni-avx-asm_64.S b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+index 7c1abc513f34621e..9556dacd984154a2 100644
+--- a/arch/x86/crypto/aria-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/aria-aesni-avx-asm_64.S
+@@ -773,8 +773,6 @@
+ 	.octa 0x3F893781E95FE1576CDA64D2BA0CB204
+ 
+ #ifdef CONFIG_AS_GFNI
+-.section	.rodata.cst8, "aM", @progbits, 8
+-.align 8
+ /* AES affine: */
+ #define tf_aff_const BV8(1, 1, 0, 0, 0, 1, 1, 0)
+ .Ltf_aff_bitmatrix:
+-- 
+2.39.2
 
-commit:         d5253ed2 crypto: x86/aria - Use 16 byte alignment for ..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git crypto-aria-x86-fix
-console output: https://syzkaller.appspot.com/x/log.txt?x=17fed781280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8bc832f563d8bf38
-dashboard link: https://syzkaller.appspot.com/bug?extid=a6abcf08bad8b18fd198
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
-
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
