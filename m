@@ -2,126 +2,304 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F68C7EE25
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 15:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA7BC77B7F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 17:09:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232434AbjEPPcx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 May 2023 11:32:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54064 "EHLO
+        id S229928AbjEPRJB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 May 2023 13:09:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232889AbjEPPco (ORCPT
+        with ESMTP id S229809AbjEPRJA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 May 2023 11:32:44 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7ACA729B
-        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 08:32:42 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-50bcb229adaso26001820a12.2
-        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 08:32:42 -0700 (PDT)
+        Tue, 16 May 2023 13:09:00 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6C43A99;
+        Tue, 16 May 2023 10:08:59 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-559f1819c5dso209238577b3.0;
+        Tue, 16 May 2023 10:08:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684251161; x=1686843161;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+WfDmrqy+QvMst4XEpE/xoK4sak7nQ3C4hjNO9HTTG0=;
-        b=xDEJo0SLmGVlDXhX/NOriVq2mlAqG47xuhR/5aeirsLGvc7tkTl9nINt7oJZhqwU6o
-         koJhGF/IIzflE+YEoTP50NrniSiBi0YiQRxPW6iLxHejXOiDzRaDMgTVxhbW3e3EL5Dh
-         nuUQkhfOcADYBv3spwgyGfSZLOlDBU5J9PVGl3aATwbkjucWdrAxzPZuYLZBn9iDJm3S
-         A4/nurYAYt32tYoLTewVmH9oXggLmJ74/ynZ9y3ksrgZnbZQn4MOm6osU8cZ8D/XK7VR
-         hAvXQejna4ki7fOPorsJxh03h+xg2xP5CaH1XM+RGR4AjYLWCKw6LgH0+fhVeMYnrItR
-         LOvg==
+        d=gmail.com; s=20221208; t=1684256938; x=1686848938;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IoZfVLATXsKVHHcpu7CsyMOzTw/I5V1LB+e9jNjQDEs=;
+        b=VgPL0KLbiVS1VMFwI/dFRr08PMpKPAm6+wBWT6vyBjzgKvYsmSh1ByxYiHJR4pH9A2
+         xAAH++r59FVdWOvzXiKSqKis5H7rRd1/tm+x7GSqVui0Zt205p7T31mUvFDcR0DBkwud
+         G+wg+sarj9RJu3Q0ty+Rrq1IR+YUfMtu/vsxP8stctpS08q0+TRFEhPWzXVVMD8jp6xV
+         u3XWEQ6NFGLWEc7nDVErn12GWGVEIm6AiELQuk+c609d0Ko46gN36Zb6D4N5gO3eDzTC
+         V3SxGh9E5G8pDebJNms/Sc7jeI3uyAJ2NU9yNl2yI3b7yMQ8viOeJYYWlDYgJvqiG7+/
+         xutQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684251161; x=1686843161;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+WfDmrqy+QvMst4XEpE/xoK4sak7nQ3C4hjNO9HTTG0=;
-        b=CwZQIZQx25LsKCNwYB7Z+6GN93LUArVz7b59qm/bKU1Xzc51O5gluOvOHsg8cQLcJ/
-         kKEf12DMzputDoMiuyvwJdMT9PrfL4aqTsrCjesmp5S4AgS1Av4pvlP4d0fEmPjPUAj/
-         V5g6nLQORTIfBTZEh7nwieRq28CVx6M87dzeL/hiejJddjqFLUvOPVks4/HmV7rtQ1jw
-         5kT0RCaA6lWYOI+CkGomod0nglLn5UAMUu1ZHH15EyJ7jYE5T3Zxq3RsbuEwYEXIHYwx
-         C3z/oJO7lLGkXF4TjZ8aLgxQoc0Y9Z96DO+4Szyi/utY6/hK940n1j1rTmKrA04QFJM1
-         2Mmw==
-X-Gm-Message-State: AC+VfDzZgG2QVkL6nKGkvcjXmC3h5HvOk/Zqn3PBLqMC9tlnBkF77+Kn
-        54MpInBK4/cdGRL77uzqPLmcwA==
-X-Google-Smtp-Source: ACHHUZ7x0LFHxkX8C01IljtyBknQMJkvvH2qc+W3wIiGMrH81XlGSgasoeiOPj4uhkFFeOaCs2aTJg==
-X-Received: by 2002:a50:ed99:0:b0:50b:c41b:25d with SMTP id h25-20020a50ed99000000b0050bc41b025dmr27405434edr.7.1684251161319;
-        Tue, 16 May 2023 08:32:41 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:77d1:16a1:abe1:84fc? ([2a02:810d:15c0:828:77d1:16a1:abe1:84fc])
-        by smtp.gmail.com with ESMTPSA id w15-20020a50fa8f000000b0050d89daaa70sm8389780edr.2.2023.05.16.08.32.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 May 2023 08:32:40 -0700 (PDT)
-Message-ID: <5b818f32-33c4-3f89-ce02-eb803d34ea48@linaro.org>
-Date:   Tue, 16 May 2023 17:32:38 +0200
+        d=1e100.net; s=20221208; t=1684256938; x=1686848938;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IoZfVLATXsKVHHcpu7CsyMOzTw/I5V1LB+e9jNjQDEs=;
+        b=fOSAUL7wLXx3Ape4hY4MVZI75UeVc/K8xTbuMOAa7oIVLf5u+yYa4kr/r1R55zb4A0
+         cO7LRG6aB8OAJYp0N1mHNnxQdqWpCJBk8ejyf/6TIrZwsJaCmTGmwKq/NJFjn+veWa34
+         N6ckdn7HdPmAQu0ZuWQTIJkRSEBx2NsB31b1/1PZpjxhVbDFx7JfA0IrKkD0Oa6JqFaP
+         CxEU9lRS+VnwIODhq703rNTEsAcI61Pus8nrxkPXCGAFO0EZRXuKoe2uK5zQi82TsElB
+         HwrI/fmqnMIWZ/VkZnPBgOhjkhtdep6p8bQi5uMcaiEw1mIpCPIr4YaM70VJQ+XJRCgZ
+         mE9Q==
+X-Gm-Message-State: AC+VfDwRZUzpNnPdZntDoRFfDjLxjUFUkAHM42jIa6JiCa3HavqJqDBT
+        Zv5apiNrghUPKgeq5LoSSGRQWQVrVwZGsZUM1Vg=
+X-Google-Smtp-Source: ACHHUZ7B0Mro9qr/cbLq12TPKgf0LmWyhGW0MAwVaP1i2Ljqood6CeQnJWO3EE7TAxGHdJh4qqHKaN/eR4d//RZqOa8=
+X-Received: by 2002:a81:a511:0:b0:556:c778:9d60 with SMTP id
+ u17-20020a81a511000000b00556c7789d60mr34897031ywg.43.1684256938346; Tue, 16
+ May 2023 10:08:58 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] dt-bindings: xilinx: Switch xilinx.com emails to amd.com
-Content-Language: en-US
-To:     Michal Simek <michal.simek@amd.com>, piyush.mehta@amd.com,
-        nava.kishore.manne@amd.com, sai.krishna.potthuri@amd.com,
-        shubhrajyoti.datta@amd.com, vishal.sagar@amd.com,
-        kalyani.akula@amd.com, bharat.kumar.gogada@amd.com,
-        linux-kernel@vger.kernel.org, monstr@monstr.eu,
-        michal.simek@xilinx.com, git@xilinx.com
-Cc:     Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Jolly Shah <jolly.shah@xilinx.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Manish Narani <manish.narani@xilinx.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Rajan Vaja <rajan.vaja@xilinx.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        Srinivas Neeli <srinivas.neeli@amd.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Rix <trix@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-watchdog@vger.kernel.org
-References: <f5b2bd1e78407e4128fc8f0b5874ba723e710a88.1684245058.git.michal.simek@amd.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <f5b2bd1e78407e4128fc8f0b5874ba723e710a88.1684245058.git.michal.simek@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230515043353.2324288-1-tomo@exabit.dev> <010101881db03866-754b644c-682c-44be-8d8e-8376d34c77b3-000000@us-west-2.amazonses.com>
+In-Reply-To: <010101881db03866-754b644c-682c-44be-8d8e-8376d34c77b3-000000@us-west-2.amazonses.com>
+From:   Wedson Almeida Filho <wedsonaf@gmail.com>
+Date:   Tue, 16 May 2023 14:08:47 -0300
+Message-ID: <CANeycqohNOf38MDw4mybzBib2Apu=7b_6qn_1oykm70zMVvKrw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] rust: add socket support
+To:     FUJITA Tomonori <tomo@exabit.dev>
+Cc:     rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        FUJITA Tomonori <fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 16/05/2023 15:51, Michal Simek wrote:
-> @xilinx.com is still working but better to switch to new amd.com after
-> AMD/Xilinx acquisition.
-> 
-> Signed-off-by: Michal Simek <michal.simek@amd.com>
+On Mon, 15 May 2023 at 02:45, FUJITA Tomonori <tomo@exabit.dev> wrote:
+>
+> From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>
+> minimum abstraction for networking.
+>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/bindings/bindings_helper.h |   3 +
+>  rust/kernel/lib.rs              |   2 +
+>  rust/kernel/net.rs              | 174 ++++++++++++++++++++++++++++++++
+>  3 files changed, 179 insertions(+)
+>  create mode 100644 rust/kernel/net.rs
 
+Fujita, thanks for this.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+We have basic networking support in the `rust` branch. In fact, we
+also have support for async networking in there as well. For example,
+the 9p server uses it.
 
-Best regards,
-Krzysztof
+At the moment we're prioritizing upstreaming the pieces for which we
+have projects waiting. Do you have an _actual_ user in mind for this?
 
+In any case, let's please start with that instead of a brand-new
+reimplementation.
+
+Cheers,
+-Wedson
+
+> diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
+> index 65683b9aa45d..7cbb5dd96bf6 100644
+> --- a/rust/bindings/bindings_helper.h
+> +++ b/rust/bindings/bindings_helper.h
+> @@ -7,8 +7,11 @@
+>   */
+>
+>  #include <crypto/hash.h>
+> +#include <linux/net.h>
+>  #include <linux/slab.h>
+>  #include <linux/refcount.h>
+> +#include <linux/socket.h>
+> +#include <linux/tcp.h>
+>  #include <linux/wait.h>
+>  #include <linux/sched.h>
+>
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index 753fd62b84f1..42dbef3d9e88 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -40,6 +40,8 @@ pub mod crypto;
+>  pub mod error;
+>  pub mod init;
+>  pub mod ioctl;
+> +#[cfg(CONFIG_NET)]
+> +pub mod net;
+>  pub mod prelude;
+>  pub mod print;
+>  mod static_assert;
+> diff --git a/rust/kernel/net.rs b/rust/kernel/net.rs
+> new file mode 100644
+> index 000000000000..204b5222abdc
+> --- /dev/null
+> +++ b/rust/kernel/net.rs
+> @@ -0,0 +1,174 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +//! Networking.
+> +//!
+> +//! C headers: [`include/linux/net.h`](../../../../include/linux/net.h),
+> +//! [`include/linux/socket.h`](../../../../include/linux/socket.h),
+> +
+> +use crate::{
+> +    bindings,
+> +    error::{to_result, Result},
+> +};
+> +use alloc::vec::Vec;
+> +
+> +/// Represents `struct socket *`.
+> +///
+> +/// # Invariants
+> +///
+> +/// The pointer is valid.
+> +pub struct Socket {
+> +    pub(crate) sock: *mut bindings::socket,
+> +}
+> +
+> +impl Drop for Socket {
+> +    fn drop(&mut self) {
+> +        // SAFETY: The type invariant guarantees that the pointer is valid.
+> +        unsafe { bindings::sock_release(self.sock) }
+> +    }
+> +}
+> +
+> +/// Address families. Defines AF_* here.
+> +pub enum Family {
+> +    /// Internet IP Protocol.
+> +    Ip = bindings::AF_INET as isize,
+> +}
+> +
+> +/// Communication type.
+> +pub enum SocketType {
+> +    /// Stream (connection).
+> +    Stream = bindings::sock_type_SOCK_STREAM as isize,
+> +}
+> +
+> +/// Protocols.
+> +pub enum Protocol {
+> +    /// Transmission Control Protocol.
+> +    Tcp = bindings::IPPROTO_TCP as isize,
+> +}
+> +
+> +impl Socket {
+> +    /// Creates a [`Socket`] object.
+> +    pub fn new(family: Family, sf: SocketType, proto: Protocol) -> Result<Self> {
+> +        let mut sock = core::ptr::null_mut();
+> +
+> +        // SAFETY: FFI call.
+> +        to_result(unsafe {
+> +            bindings::sock_create_kern(
+> +                &mut bindings::init_net,
+> +                family as _,
+> +                sf as _,
+> +                proto as _,
+> +                &mut sock,
+> +            )
+> +        })
+> +        .map(|_| Socket { sock })
+> +    }
+> +
+> +    /// Moves a socket to listening state.
+> +    pub fn listen(&mut self, backlog: i32) -> Result {
+> +        // SAFETY: The type invariant guarantees that the pointer is valid.
+> +        to_result(unsafe { bindings::kernel_listen(self.sock, backlog) })
+> +    }
+> +
+> +    /// Binds an address to a socket.
+> +    pub fn bind(&mut self, addr: &SocketAddr) -> Result {
+> +        let (addr, addrlen) = match addr {
+> +            SocketAddr::V4(addr) => (
+> +                addr as *const _ as _,
+> +                core::mem::size_of::<bindings::sockaddr>() as i32,
+> +            ),
+> +        };
+> +        // SAFETY: The type invariant guarantees that the pointer is valid.
+> +        to_result(unsafe { bindings::kernel_bind(self.sock, addr, addrlen) })
+> +    }
+> +
+> +    /// Accepts a connection
+> +    pub fn accept(&mut self) -> Result<Self> {
+> +        let mut client = core::ptr::null_mut();
+> +        // SAFETY: The type invariant guarantees that the pointer is valid.
+> +        to_result(unsafe { bindings::kernel_accept(self.sock, &mut client, 0) })
+> +            .map(|_| Socket { sock: client })
+> +    }
+> +
+> +    /// Receives a message from a socket.
+> +    pub fn recvmsg(&mut self, bufs: &mut [&mut [u8]], flags: i32) -> Result<usize> {
+> +        let mut msg = bindings::msghdr::default();
+> +        let mut kvec = Vec::try_with_capacity(bufs.len())?;
+> +        let mut len = 0;
+> +        for i in 0..bufs.len() {
+> +            len += bufs[i].len();
+> +            kvec.try_push(bindings::kvec {
+> +                iov_base: bufs[i].as_mut_ptr().cast(),
+> +                iov_len: bufs[i].len(),
+> +            })?;
+> +        }
+> +        // SAFETY: The type invariant guarantees that the pointer is valid.
+> +        let r = unsafe {
+> +            bindings::kernel_recvmsg(
+> +                self.sock,
+> +                &mut msg,
+> +                kvec.as_mut_ptr(),
+> +                bufs.len(),
+> +                len,
+> +                flags,
+> +            )
+> +        };
+> +        to_result(r).map(|_| r as usize)
+> +    }
+> +
+> +    /// Sends a message through a socket.
+> +    pub fn sendmsg(&mut self, bufs: &[&[u8]]) -> Result<usize> {
+> +        let mut msg = bindings::msghdr::default();
+> +        let mut kvec = Vec::try_with_capacity(bufs.len())?;
+> +        let mut len = 0;
+> +        for i in 0..bufs.len() {
+> +            len += bufs[i].len();
+> +            kvec.try_push(bindings::kvec {
+> +                iov_base: bufs[i].as_ptr() as *mut u8 as _,
+> +                iov_len: bufs[i].len(),
+> +            })?;
+> +        }
+> +        // SAFETY: The type invariant guarantees that the pointer is valid.
+> +        let r = unsafe {
+> +            bindings::kernel_sendmsg(self.sock, &mut msg, kvec.as_mut_ptr(), bufs.len(), len)
+> +        };
+> +        to_result(r).map(|_| r as usize)
+> +    }
+> +}
+> +
+> +/// A socket address.
+> +pub enum SocketAddr {
+> +    /// An IPv4 socket address.
+> +    V4(SocketAddrV4),
+> +}
+> +
+> +/// Represents `struct in_addr`.
+> +#[repr(transparent)]
+> +pub struct Ipv4Addr(bindings::in_addr);
+> +
+> +impl Ipv4Addr {
+> +    /// Creates a new IPv4 address from four eight-bit octets.
+> +    pub const fn new(a: u8, b: u8, c: u8, d: u8) -> Self {
+> +        Self(bindings::in_addr {
+> +            s_addr: u32::from_be_bytes([a, b, c, d]).to_be(),
+> +        })
+> +    }
+> +}
+> +
+> +/// Prepresents `struct sockaddr_in`.
+> +#[repr(transparent)]
+> +pub struct SocketAddrV4(bindings::sockaddr_in);
+> +
+> +impl SocketAddrV4 {
+> +    /// Creates a new IPv4 socket address.
+> +    pub const fn new(addr: Ipv4Addr, port: u16) -> Self {
+> +        Self(bindings::sockaddr_in {
+> +            sin_family: Family::Ip as _,
+> +            sin_port: port.to_be(),
+> +            sin_addr: addr.0,
+> +            __pad: [0; 8],
+> +        })
+> +    }
+> +}
+> +
+> +/// Waits for a full request
+> +pub const MSG_WAITALL: i32 = bindings::MSG_WAITALL as i32;
+> --
+> 2.34.1
+>
