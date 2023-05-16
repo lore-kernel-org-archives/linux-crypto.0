@@ -2,30 +2,29 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C721C77B7F
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 04:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FFC0C77B7F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 04:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229630AbjEPE1o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 May 2023 00:27:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33488 "EHLO
+        id S229732AbjEPE3j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 May 2023 00:29:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjEPE1n (ORCPT
+        with ESMTP id S229619AbjEPE3j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 May 2023 00:27:43 -0400
+        Tue, 16 May 2023 00:29:39 -0400
 Received: from mail.nsr.re.kr (unknown [210.104.33.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478513C27;
-        Mon, 15 May 2023 21:27:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1684211140; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=HBi/8JzYkQRXK7f+rKqRBFiLUILZNW6t5000hG5Ul+A=; b=nveoYEfcSjttc/uXCF5SmU1wRpkm05yD4XL1v76BXptApTCwDvvbrCsskON+CLng5nioUvWorgyywHkaF2sLHqaL/d1UY6JDHxdWtWi0Oiyv88rQHIXCJLbsWXnvz0Hl6ilzPH0kV/i9IfZf1qVf2vvnRGo0uhiheCAjIRKfJ2vuGTkzlEQukukG9v8qovHQpbujjRcI800dtxs1Tb0BV2xT7OW39IEzM4453+GWCCJDZVtykeGRWwwaACIrbcmFY9126298VxuysFvxiTM88Oec+gkcCmKzmZWsygUDfqW1k0jy6xwMRUn8Ej7G/grYuEc38muTWsRw32dca8z4Xw==
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A642709;
+        Mon, 15 May 2023 21:29:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1684211263; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=8QnBe+FmwYhxB58/tqEQzgt9Fguui1fViSCh9RAcyus=; b=xPeeWNy9QffjNcz8KLRYO2d5dUw12D4P7gudo6kDJF3R1KvmIiI9lBslCKPLKEYDbKsrx64upnKj4UyMRLzpQf1YSf8kqMzSfIoNowJIbhmTbWWauCyqjDFd3k65AtwE+/aDAbAIRT9lBKHQI4QyH4o6NjU7crB1lThOc6RsY7zLDOvJkap+yePX8KhuAkQ8f1cvuYRUQoCCMyADRJHJopT86yhYq8Zv0FP4VORtcH14/dmbDaeOfdUN12h8ExToLvvZ2ze7FGW51i/jY3HV7I+CUDuc+R7ewQ4VXwUvFUQEdRHVqiwTSt9KiXJH6vqsLy66hiY8LMyB5avcpWLA0g==
 Received: from 210.104.33.70 (nsr.re.kr)
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-        by mail.nsr.re.kr with SMTP; Tue, 16 May 2023 13:25:25 +0900
+        by mail.nsr.re.kr with SMTP; Tue, 16 May 2023 13:27:28 +0900
 Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 195;
-          Tue, 16 May 2023 13:27:12 +0900 (KST)
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 758;
+          Tue, 16 May 2023 13:29:16 +0900 (KST)
 From:   Dongsoo Lee <letrhee@nsr.re.kr>
-To:     'Eric Biggers' <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        'Herbert Xu' <herbert@gondor.apana.org.au>,
+To:     'Dave Hansen' <dave.hansen@intel.com>, linux-crypto@vger.kernel.org
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
         "'David S. Miller'" <davem@davemloft.net>,
         'Thomas Gleixner' <tglx@linutronix.de>,
         'Ingo Molnar' <mingo@redhat.com>,
@@ -33,230 +32,411 @@ Cc:     linux-crypto@vger.kernel.org,
         'Dave Hansen' <dave.hansen@linux.intel.com>, x86@kernel.org,
         "'H. Peter Anvin'" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
         'Dongsoo Lee' <letrhee@gmail.com>
-References: <20230428110058.1516119-1-letrhee@nsr.re.kr> <20230428231952.GA3150@sol.localdomain>
-In-Reply-To: <20230428231952.GA3150@sol.localdomain>
-Subject: RE: [PATCH 0/3] crypto: LEA block cipher implementation
-Date:   Tue, 16 May 2023 13:27:12 +0900
-Message-ID: <000b01d987ae$af907700$0eb16500$@nsr.re.kr>
+References: <20230428110058.1516119-1-letrhee@nsr.re.kr> <20230428110058.1516119-4-letrhee@nsr.re.kr> <f0c77850-f8ca-3e21-2722-1deaae424130@intel.com>
+In-Reply-To: <f0c77850-f8ca-3e21-2722-1deaae424130@intel.com>
+Subject: RE: [PATCH 3/3] crypto: LEA block cipher AVX2 optimization
+Date:   Tue, 16 May 2023 13:29:16 +0900
+Message-ID: <000d01d987ae$f9c0ed50$ed42c7f0$@nsr.re.kr>
 MIME-Version: 1.0
 Content-Type: text/plain;
-        charset="ks_c_5601-1987"
+        charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Mailer: Microsoft Outlook 16.0
 Content-Language: ko
-Thread-Index: AQHK1YbJb9NIiePFBRS96VOevnCZtwH6THbqr2nfm4A=
+Thread-Index: AQHK1YbJb9NIiePFBRS96VOevnCZtwHh++F1ApCjMaivVh1lQA==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thank you for your kind review and sorry for taking a bit of time to
-respond.
+Thanks for the review and sorry it took me a while to respond.
 
-We expect that the first application of the patch would be disk =
-encryption
-on the Gooroom platform ('Gooroom' is a Korean word, meaning 'cloud') =
-[1].
-Currently, the Gooroom platform uses AES-XTS for disk encryption. The =
-main
-reason for submitting this patch is to make disk encryption with LEA =
-(e.g.
-LEA-XTS) available in it.
+>> +config CRYPTO_LEA_AVX2
+>> +	tristate "Ciphers: LEA with modes: ECB, CBC, CTR, XTS
+>> (SSE2/MOVBE/AVX2)"
+>> +	select CRYPTO_LEA
+>> +	imply CRYPTO_XTS
+>> +	imply CRYPTO_CTR
+>> +	help
+>> +	  LEA cipher algorithm (KS X 3246, ISO/IEC 29192-2:2019)
+>> +
+>> +	  LEA is one of the standard cryptographic alorithms of
+>> +	  the Republic of Korea. It consists of four 32bit word.
+> The "four 32bit word" thing is probably not a detail end users care =
+about enough to see in Kconfig text.
 
-The Gooroom platform is a government-driven Debian-based Linux =
-distribution
-in South Korea. In Korea, there are many crypto companies that want to
-bundle Linux into their products and sell them. They create their own
-Gooroom platforms by modifying the original Gooroom platform for their
-services. (Of course, the Gooroom platform is not mandatory, and =
-companies
-wishing to use Linux are free to choose an appropriate distribution.) =
-BTW,
-in Korea, many crypto companies want to use LEA, because LEA is one of =
-the
-block ciphers of the KCMVP, a validation program for commercial crypto =
-S/W
-to be delivered to the Korean government.
+I am in the process of re-implementing it for LEA cipher and will try to =
+improve the description.
 
-The Linux Crypto API already has another Korean block cipher, ARIA, also
-one of the block ciphers of the KCVMP. However, LEA is more widely used
-than ARIA in industry nowadays, because LEA is one of the lightweight
-cryptography standard of ISO/IEC [2] and performs well on low-end =
-devices
-that support 32-bit operations. So we think they are complementary to =
-each
-other.
-LEA also performs slightly better in Generic C and AVX2 instruction
-implementations than ARIA. While there is no AVX512 instruction
-implementation of LEA yet, it is expected that the techniques used in =
-the
-AVX2 implementation can also be applied to AVX512. Rather, using 512-bit
-registers and rotation instructions, LEA is expected to show even better
-performance in AVX512 than in AVX2.
+>> +	  See:
+>> +	  https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
+>> +
+>> +	  Architecture: x86_64 using:
+>> +	  - SSE2 (Streaming SIMD Extensions 2)
+>> +	  - MOVBE (Move Data After Swapping Bytes)
+>> +	  - AVX2 (Advanced Vector Extensions)
+>
+>What about i386?  If this is truly 64-bit-only for some reason, it's =
+not reflected anywhere that I can see, like having a:
+>
+>	depends on X86_64
+>
+>I'm also a _bit_ confused why this has one config option called "_AVX2"
+>but that also includes the SSE2 implementation.
 
-Performance comparisons of the two ciphers on a Ryzen R9 5950X using the
-tcrypt module are shown below. Please note that this CPU does not =
-support
-GFNI and AVX512, so the results on ARIA may show less efficiency =
-compared
-to the ones offered by the current Linux kernel. The experiments on LEA
-were done with the version that we are currently working on.
+As you mentioned, the SIMD optimizations used in this implementation are =
+also applicable on i386. The initial support target was for x86_64 =
+environments where AVX2 instructions are available, so we ended up with =
+an awkward support target, which may need to be changed.
+Internally, there is an implementation for i386, and I'll include it in =
+the submission.
 
-- 256-bit key, 4096 bytes
-  - aes-aesni
-    - ecb enc   1,637 cycles
-    - ecb dec   1,608 cycles
-    - ctr enc   1,649 cycles
-  - aria-generic
-    - ecb enc 235,293 cycles
-    - ecb dec 237,949 cycles
-    - ctr enc 240,754 cycles
-  - lea-generic
-    - ecb enc  31,945 cycles
-    - ecb dec  50,511 cycles
-    - ctr enc  33,942 cycles
-  - aria-avx2
-    - ecb enc  9,807 cycles
-    - ecb dec 10,203 cycles
-    - ctr enc 10,038 cycles
-  - lea-avx2
-    - ecb enc  5,784 cycles
-    - ecb dec  7,423 cycles
-    - ctr enc  6,136 cycles
+The LEA 4-way SIMD implementation can be done purely using SSE2 =
+commands, but it can also be done a bit faster using `vpunpckldq` (AVX), =
+`vpbroadcast` (AVX2), `vpxor` (AVX), etc. In this implementation, 4-way =
+encryption is not possible without AVX2. If a future SSE2 implementation =
+were to be added, it would be possible to include both a 4-way =
+implementation with SSE2 and a 4-way implementation with AVX2.
 
-In general, it's obvious that the hardware-accelerated AES is the best
-performer. However, there exist not only environments where the =
-hardware-
-accelerated AES is not supported, but also situations where AES is not
-preferred for various reasons. In these cases, if someone wants to =
-encrypt
-using a block cipher, LEA could be an alternative.
+>> +struct lea_xts_ctx {
+>> +	u8 raw_crypt_ctx[sizeof(struct crypto_lea_ctx)] SIMD_ALIGN_ATTR;
+>> +	u8 raw_tweak_ctx[sizeof(struct crypto_lea_ctx)] SIMD_ALIGN_ATTR; };
+>
+>The typing here is a bit goofy.  What's wrong with:
+>
+>struct lea_xts_ctx {
+>	struct crypto_lea_ctx crypt_ctx SIMD_ALIGN_ATTR;
+>	struct crypto_lea_ctx lea_ctx   SIMD_ALIGN_ATTR;
+>};
+>
+>?  You end up with the same sized structure but you don't have to cast =
+it as much.
 
-Apart from this, we also have implemented LEA in lightweight =
-environments
-such as 8-bit AVR and 16-bit MSP [3]. Only the assembly implementation =
-of
-LEA with AVX2 was submitted because the main goal was x86_64 as =
-mentioned
-earlier. If LEA were to be included in the Linux kernel, it would be
-possible to modify and supplement the submission with lightweight
-implementations to provide efficient encryption on low-performance =
-devices.
+This is a mistake I made by just bringing in other code without much =
+thought. I'll fix it.
 
-Although the designers of LEA did not provide test vectors in their =
-paper
-[5], the ISO/IEC standard [2] and the KS standard [4] do. Furthermore, =
-the
-Block Cipher LEA Specification("=BA=ED=B7=CF=BE=CF=C8=A3 LEA =
-=B1=D4=B0=DD=BC=AD", written in Korean)
-document on the LEA introduction page [6] and the Wikipedia article on =
-LEA
-[7] show the same test vectors as in the standards.
-The test vectors for ECB, CBC, CTR, and GCM modes included in the =
-testmgr
-module are taken from the KCMVP Cryptographic Algorithm Verification
-Criteria V3.0("KCMVP =B0=CB=C1=F5=B4=EB=BB=F3 =
-=BE=CF=C8=A3=BE=CB=B0=ED=B8=AE=C1=F2 =B0=CB=C1=F5=B1=E2=C1=D8 V3.0", =
-written in
-Korean) [8]. Test vectors for the XTS mode were generated by ourselves, =
-and
-we crosschecked them using Crypto++ [9] and testmgr on Linux.
+>> +struct _lea_u128 {
+>> +	u64 v0, v1;
+>> +};
+>> +
+>> +static inline void xor_1blk(u8 *out, const u8 *in1, const u8 *in2) {
+>> +	const struct _lea_u128 *_in1 =3D (const struct _lea_u128 *)in1;
+>> +	const struct _lea_u128 *_in2 =3D (const struct _lea_u128 *)in2;
+>> +	struct _lea_u128 *_out =3D (struct _lea_u128 *)out;
+>> +
+>> +	_out->v0 =3D _in1->v0 ^ _in2->v0;
+>> +	_out->v1 =3D _in1->v1 ^ _in2->v1;
+>> +}
+>> +
+>> +static inline void xts_next_tweak(u8 *out, const u8 *in) {
+>> +	const u64 *_in =3D (const u64 *)in;
+>> +	u64 *_out =3D (u64 *)out;
+>> +	u64 v0 =3D _in[0];
+>> +	u64 v1 =3D _in[1];
+>> +	u64 carry =3D (u64)(((s64)v1) >> 63);
+>> +
+>> +	v1 =3D (v1 << 1) ^ (v0 >> 63);
+>> +	v0 =3D (v0 << 1) ^ ((u64)carry & 0x87);
+>> +
+>> +	_out[0] =3D v0;
+>> +	_out[1] =3D v1;
+>> +}
+>
+>I don't really care either way, but it's interesting that in two =
+adjacent functions this deals with two adjacent 64-bit values.  In one =
+it defines a structure with two u64's and in the next it treats it as an =
+array.
 
-[1] https://github.com/gooroom https://www.gooroom.kr/
-[2] ISO/IEC 29192-2:2019, Information security - Lightweight =
-cryptography -
-Part 2: Block ciphers.
-[3]
-https://github.com/cryptolu/FELICS/tree/master/block_ciphers/source/ciphe=
-rs/
-LEA_128_128_v01/source
-[4] KS X 3246, 128-bit block cipher LEA.
-[5] Hong, Deukjo, et al. "LEA: A 128-bit block cipher for fast =
-encryption
-on common processors.", WISA 2013.
-[6] https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
-[7] https://en.wikipedia.org/wiki/LEA_(cipher)
-[8] https://seed.kisa.or.kr/kisa/kcmvp/EgovVerification.do
-[9] https://www.cryptopp.com/
+I'll unify them in one way.
 
-+) We applied the optimization technique introduced in your the other
-review to our decryption code. So, could you please let us know how to
-state that fact clearly?
+
+>> +static int xts_encrypt_8way(struct skcipher_request *req) {
+>...
+>
+>It's kinda a shame that there isn't more code shared here between, for =
+instance the 4way and 8way functions.  But I guess this crypto code =
+tends to be merged and then very rarely fixed up after.
+
+This is a mistake in implementation: as I mentioned, the code I =
+submitted also requires AVX2 for the 4-way implementation, so this is =
+unnecessary duplication. I will add a proper SSE2 4-way implementation =
+by sharing the code with the 8-way.
+
+
+>> +static int xts_lea_set_key(struct crypto_skcipher *tfm, const u8 =
+*key,
+>> +				u32 keylen)
+>> +{
+>> +	struct crypto_tfm *tfm_ctx =3D crypto_skcipher_ctx(tfm);
+>> +	struct lea_xts_ctx *ctx =3D crypto_tfm_ctx(tfm_ctx);
+>> +
+>> +	struct crypto_lea_ctx *crypt_key =3D
+>> +		(struct crypto_lea_ctx *)(ctx->raw_crypt_ctx);
+>> +	struct crypto_lea_ctx *tweak_key =3D
+>> +		(struct crypto_lea_ctx *)(ctx->raw_tweak_ctx);
+>
+>These were those goofy casts that can go away if the typing is a bit =
+more careful
+
+I'll fix it by redefining `struct lea_xts_ctx`.
+
+
+>> +static struct simd_skcipher_alg
+>> *lea_simd_algs[ARRAY_SIZE(lea_simd_avx2_algs)];
+>> +
+>> +static int __init crypto_lea_avx2_init(void) {
+>> +	const char *feature_name;
+>> +
+>> +	if (!boot_cpu_has(X86_FEATURE_XMM2)) {
+>> +		pr_info("SSE2 instructions are not detected.\n");
+>> +		return -ENODEV;
+>> +	}
+>> +
+>> +	if (!boot_cpu_has(X86_FEATURE_MOVBE)) {
+>> +		pr_info("MOVBE instructions are not detected.\n");
+>> +		return -ENODEV;
+>> +	}
+>> +
+>> +	if (!boot_cpu_has(X86_FEATURE_AVX2) ||=20
+>> +!boot_cpu_has(X86_FEATURE_AVX))
+>> {
+>> +		pr_info("AVX2 instructions are not detected.\n");
+>> +		return -ENODEV;
+>> +	}
+>> +
+>> +	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+>> +				&feature_name)) {
+>> +		pr_info("CPU feature '%s' is not supported.\n", feature_name);
+>> +		return -ENODEV;
+>> +	}
+>
+>This looks suspect.
+>
+>It requires that *ALL* of XMM2, MOVBE, AVX, AVX2 and XSAVE support for
+>*ANY* of these to be used.  In other cipher code that I've seen, it =
+separates out the AVX/YMM acceleration from the pure SSE2/XMM =
+acceleration functions so that CPUs with only SSE2 can still benefit.
+>
+>Either this is wrong, or there is something subtle going on that I'm =
+missing.
+
+This is a mistake, as the initial support was implemented for x86_64 =
+environments with AVX2 instructions.
+
+Since there are already implementations that support i386 and x86_64, =
+SSE2, SSE2 and MOVBE, and AVX2 each independently, I will change it to =
+support the various environments in the next version.
+
+
+Thank you.
+
 
 -----Original Message-----
-From: Eric Biggers <ebiggers@kernel.org>=20
-Sent: Saturday, April 29, 2023 8:20 AM
-To: Dongsoo Lee <letrhee@nsr.re.kr>
-Cc: linux-crypto@vger.kernel.org; Herbert Xu =
-<herbert@gondor.apana.org.au>;
-David S. Miller <davem@davemloft.net>; Thomas Gleixner
-<tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>; Borislav Petkov
-<bp@alien8.de>; Dave Hansen <dave.hansen@linux.intel.com>; =
-x86@kernel.org;
-H. Peter Anvin <hpa@zytor.com>; linux-kernel@vger.kernel.org; David S.
-Miller <abc@test.nsr.re.kr>; Dongsoo Lee <letrhee@gmail.com>
-Subject: Re: [PATCH 0/3] crypto: LEA block cipher implementation
+From: Dave Hansen <dave.hansen@intel.com>=20
+Sent: Saturday, April 29, 2023 12:55 AM
+To: Dongsoo Lee <letrhee@nsr.re.kr>; linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller =
+<davem@davemloft.net>; Thomas Gleixner <tglx@linutronix.de>; Ingo Molnar =
+<mingo@redhat.com>; Borislav Petkov <bp@alien8.de>; Dave Hansen =
+<dave.hansen@linux.intel.com>; x86@kernel.org; H. Peter Anvin =
+<hpa@zytor.com>; linux-kernel@vger.kernel.org; David S. Miller =
+<abc@test.nsr.re.kr>; Dongsoo Lee <letrhee@gmail.com>
+Subject: Re: [PATCH 3/3] crypto: LEA block cipher AVX2 optimization
 
-Hi Dongsoo,
+> +config CRYPTO_LEA_AVX2
+> +	tristate "Ciphers: LEA with modes: ECB, CBC, CTR, XTS
+> (SSE2/MOVBE/AVX2)"
+> +	select CRYPTO_LEA
+> +	imply CRYPTO_XTS
+> +	imply CRYPTO_CTR
+> +	help
+> +	  LEA cipher algorithm (KS X 3246, ISO/IEC 29192-2:2019)
+> +
+> +	  LEA is one of the standard cryptographic alorithms of
+> +	  the Republic of Korea. It consists of four 32bit word.
 
-On Fri, Apr 28, 2023 at 08:00:55PM +0900, Dongsoo Lee wrote:
-> The Korean e-government framework contains various cryptographic=20
-> applications, and KCMVP-validated cryptographic module should be used=20
-> according to the government requirements. The ARIA block cipher, which =
+The "four 32bit word" thing is probably not a detail end users care =
+about enough to see in Kconfig text.
 
-> is already included in Linux kernel, has been widely used as a=20
-> symmetric key cipher. However, the adoption of LEA increase rapidly=20
-> for new applications.
->=20
-> By adding LEA to the Linux kernel, Dedicated device drivers that=20
-> require LEA encryption can be provided without additional crypto
-implementation.
-> An example of an immediately applicable use case is disk encryption=20
-> using cryptsetup.
->=20
-> The submitted implementation includes a generic C implementation that=20
-> uses 32-bit ARX operations, and an optimized implementation for the
-> x86_64 environment.
+> +	  See:
+> +	  https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
+> +
+> +	  Architecture: x86_64 using:
+> +	  - SSE2 (Streaming SIMD Extensions 2)
+> +	  - MOVBE (Move Data After Swapping Bytes)
+> +	  - AVX2 (Advanced Vector Extensions)
 
-Can you elaborate further on the use case for this cipher?  Your
-description above is very vague.  What is the actual use case when so =
-many
-other ciphers already exist, including much better studied ones?  Are
-people being required to use this cipher, and if so under what =
-situations?
-There is also already another "national pride" block cipher from Korea
-(ARIA); do we really need another one?
+What about i386?  If this is truly 64-bit-only for some reason, it's not =
+reflected anywhere that I can see, like having a:
 
-BTW, in 2018, I investigated LEA and various other ciphers as options =
-for
-storage encryption on ARM processors without the crypto extensions.  We
-ended up not selecting LEA for several different reasons (e.g. see
-https://lore.kernel.org/r/20180507232000.GA194688@google.com), and we =
-later
-created Adiantum for the use case.  But, it sounds like "storage =
-encryption
-on processors without crypto instructions" isn't the use case you have =
-in
-mind at all anyway, seeing as the only assembly code you're providing is
-for x86_64.
-What sort of use case do you actually have in mind?  Is this perhaps a =
-PhD
-thesis type of thing that won't actually be used in a real world
-application?
+	depends on X86_64
 
-IIRC, one of the issues with LEA was that the LEA paper doesn't provide
-test vectors, so I couldn't be certain that I had actually implemented =
-the
-algorithm correctly.  It sounds like there are now test vectors =
-available.
-How confident are you that they actually match the original algorithm?
+I'm also a _bit_ confused why this has one config option called "_AVX2"
+but that also includes the SSE2 implementation.
 
-> The implementation has been tested with kernel module tcrypt.ko and=20
-> has passed the selftest using test vectors for KCMVP[4]. The path also =
+> +	  Processes 4(SSE2), 8(AVX2) blocks in parallel.
+> +	  In CTR mode, the MOVBE instruction is utilized for improved
+> performance.
+> +
+>  config CRYPTO_CHACHA20_X86_64
+>  	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12=20
+> (SSSE3/AVX2/AVX-512VL)"
+>  	depends on X86 && 64BIT
+> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile index =
 
-> test with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
+> 9aa46093c91b..de23293b88df 100644
+> --- a/arch/x86/crypto/Makefile
+> +++ b/arch/x86/crypto/Makefile
+> @@ -109,6 +109,9 @@ aria-aesni-avx2-x86_64-y :=3D=20
+> aria-aesni-avx2-asm_64.o aria_aesni_avx2_glue.o
+>  obj-$(CONFIG_CRYPTO_ARIA_GFNI_AVX512_X86_64) +=3D=20
+> aria-gfni-avx512-x86_64.o  aria-gfni-avx512-x86_64-y :=3D=20
+> aria-gfni-avx512-asm_64.o aria_gfni_avx512_glue.o
+>
+> +obj-$(CONFIG_CRYPTO_LEA_AVX2) +=3D lea-avx2-x86_64.o =
+lea-avx2-x86_64-y=20
+> +:=3D lea_avx2_x86_64-asm.o lea_avx2_glue.o
+> +
+>  quiet_cmd_perlasm =3D PERLASM $@
+>        cmd_perlasm =3D $(PERL) $< > $@
+>  $(obj)/%.S: $(src)/%.pl FORCE
+> diff --git a/arch/x86/crypto/lea_avx2_glue.c=20
+> b/arch/x86/crypto/lea_avx2_glue.c new file mode 100644 index=20
+> 000000000000..532958d3caa5
+> --- /dev/null
+> +++ b/arch/x86/crypto/lea_avx2_glue.c
+> @@ -0,0 +1,1112 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Glue Code for the SSE2/MOVBE/AVX2 assembler instructions for the=20
+> +LEA
+> Cipher
+> + *
+> + * Copyright (c) 2023 National Security Research.
+> + * Author: Dongsoo Lee <letrhee@nsr.re.kr> */
+> +
+> +#include <asm/simd.h>
+> +#include <asm/unaligned.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/ctr.h>
+> +#include <crypto/internal/simd.h>
+> +#include <crypto/scatterwalk.h>
+> +#include <crypto/skcipher.h>
+> +#include <crypto/internal/skcipher.h> #include <linux/err.h> #include =
 
-There is a KASAN out-of-bounds error in lea_set_key() when running the =
-self-
-tests.
+> +<linux/module.h> #include <linux/types.h>
+> +
+> +#include <crypto/lea.h>
+> +#include <crypto/xts.h>
+> +#include "ecb_cbc_helpers.h"
+> +
+> +#define SIMD_KEY_ALIGN 16
+> +#define SIMD_ALIGN_ATTR __aligned(SIMD_KEY_ALIGN)
+> +
+> +struct lea_xts_ctx {
+> +	u8 raw_crypt_ctx[sizeof(struct crypto_lea_ctx)] SIMD_ALIGN_ATTR;
+> +	u8 raw_tweak_ctx[sizeof(struct crypto_lea_ctx)] SIMD_ALIGN_ATTR; };
 
-- Eric
+The typing here is a bit goofy.  What's wrong with:
+
+struct lea_xts_ctx {
+	struct crypto_lea_ctx crypt_ctx SIMD_ALIGN_ATTR;
+	struct crypto_lea_ctx lea_ctx   SIMD_ALIGN_ATTR;
+};
+
+?  You end up with the same sized structure but you don't have to cast =
+it as much.
+
+> +struct _lea_u128 {
+> +	u64 v0, v1;
+> +};
+> +
+> +static inline void xor_1blk(u8 *out, const u8 *in1, const u8 *in2) {
+> +	const struct _lea_u128 *_in1 =3D (const struct _lea_u128 *)in1;
+> +	const struct _lea_u128 *_in2 =3D (const struct _lea_u128 *)in2;
+> +	struct _lea_u128 *_out =3D (struct _lea_u128 *)out;
+> +
+> +	_out->v0 =3D _in1->v0 ^ _in2->v0;
+> +	_out->v1 =3D _in1->v1 ^ _in2->v1;
+> +}
+> +
+> +static inline void xts_next_tweak(u8 *out, const u8 *in) {
+> +	const u64 *_in =3D (const u64 *)in;
+> +	u64 *_out =3D (u64 *)out;
+> +	u64 v0 =3D _in[0];
+> +	u64 v1 =3D _in[1];
+> +	u64 carry =3D (u64)(((s64)v1) >> 63);
+> +
+> +	v1 =3D (v1 << 1) ^ (v0 >> 63);
+> +	v0 =3D (v0 << 1) ^ ((u64)carry & 0x87);
+> +
+> +	_out[0] =3D v0;
+> +	_out[1] =3D v1;
+> +}
+
+I don't really care either way, but it's interesting that in two =
+adjacent functions this deals with two adjacent 64-bit values.  In one =
+it defines a structure with two u64's and in the next it treats it as an =
+array.
+
+> +static int xts_encrypt_8way(struct skcipher_request *req) {
+...
+
+It's kinda a shame that there isn't more code shared here between, for =
+instance the 4way and 8way functions.  But I guess this crypto code =
+tends to be merged and then very rarely fixed up after.
+
+> +static int xts_lea_set_key(struct crypto_skcipher *tfm, const u8 =
+*key,
+> +				u32 keylen)
+> +{
+> +	struct crypto_tfm *tfm_ctx =3D crypto_skcipher_ctx(tfm);
+> +	struct lea_xts_ctx *ctx =3D crypto_tfm_ctx(tfm_ctx);
+> +
+> +	struct crypto_lea_ctx *crypt_key =3D
+> +		(struct crypto_lea_ctx *)(ctx->raw_crypt_ctx);
+> +	struct crypto_lea_ctx *tweak_key =3D
+> +		(struct crypto_lea_ctx *)(ctx->raw_tweak_ctx);
+
+These were those goofy casts that can go away if the typing is a bit =
+more careful
+
+...
+> +static struct simd_skcipher_alg
+> *lea_simd_algs[ARRAY_SIZE(lea_simd_avx2_algs)];
+> +
+> +static int __init crypto_lea_avx2_init(void) {
+> +	const char *feature_name;
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_XMM2)) {
+> +		pr_info("SSE2 instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_MOVBE)) {
+> +		pr_info("MOVBE instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!boot_cpu_has(X86_FEATURE_AVX2) ||=20
+> +!boot_cpu_has(X86_FEATURE_AVX))
+> {
+> +		pr_info("AVX2 instructions are not detected.\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+> +				&feature_name)) {
+> +		pr_info("CPU feature '%s' is not supported.\n", feature_name);
+> +		return -ENODEV;
+> +	}
+
+This looks suspect.
+
+It requires that *ALL* of XMM2, MOVBE, AVX, AVX2 and XSAVE support for
+*ANY* of these to be used.  In other cipher code that I've seen, it =
+separates out the AVX/YMM acceleration from the pure SSE2/XMM =
+acceleration functions so that CPUs with only SSE2 can still benefit.
+
+Either this is wrong, or there is something subtle going on that I'm =
+missing.
+
