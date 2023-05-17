@@ -2,103 +2,90 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B89C7EE25
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 May 2023 01:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0AC2C77B75
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 May 2023 02:53:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231510AbjEQBTQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 May 2023 21:19:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37366 "EHLO
+        id S232226AbjEQCx2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 May 2023 22:53:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231530AbjEQBTL (ORCPT
+        with ESMTP id S231966AbjEQCx0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 May 2023 21:19:11 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED3946B8;
-        Tue, 16 May 2023 18:18:57 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34H1Brql017084;
-        Wed, 17 May 2023 01:18:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=vIE2W4w77++8cdSRWw17/uGI+S/ioy1NWgJSZqgWq0k=;
- b=Say9xVllENx5owHUYNktS930wTKTj8lYf4apWDiNJdmpkFN1fzA4xTIhwLDuA4L5zsrJ
- 34n+lbO/P2Lmr4FjE3CSCZdrofFeXXRTgioGz0U31BpRh4j7QfSA6HxxtJHPjE0h1Sz6
- diqtBA7PNZlLOjYUt07LJF6fcl3T1cJj4Hzxusz8QC2ccj1toR2v+26xc2GOHeaFRcM5
- sC0o7moIQWWxPEHc04l39r7n/5Zqwdc8+LYNW5gtJkkzkJ7LSeG5dsV5Kz7lwoSYhjsz
- NmyMY+IZJtnGzfD6VzClwT0I/cRc4J/Kd0Y9GDj1Ql99a2GJ1rRRFPeylz+stamOoldo zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmn22r4hu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 May 2023 01:18:36 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34H1EoQV024877;
-        Wed, 17 May 2023 01:18:35 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmn22r4h6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 May 2023 01:18:35 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34H0JDLU025221;
-        Wed, 17 May 2023 01:18:34 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3qj265yy73-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 May 2023 01:18:34 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34H1IXeB31392250
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 May 2023 01:18:33 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE9915805D;
-        Wed, 17 May 2023 01:18:32 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C63755805C;
-        Wed, 17 May 2023 01:18:30 +0000 (GMT)
-Received: from sig-9-77-133-203.ibm.com (unknown [9.77.133.203])
-        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 17 May 2023 01:18:30 +0000 (GMT)
-Message-ID: <e8c470bcf50282680300cd04a6aba0d0dbdef035.camel@linux.ibm.com>
-Subject: Re: [PATCH 3/3] integrity: Remove EXPERIMENTAL from Kconfig
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, dhowells@redhat.com,
-        dwmw2@infradead.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, jlee@suse.com, kanth.ghatraju@oracle.com,
-        konrad.wilk@oracle.com, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Tue, 16 May 2023 21:18:30 -0400
-In-Reply-To: <20230508220708.2888510-4-eric.snowberg@oracle.com>
-References: <20230508220708.2888510-1-eric.snowberg@oracle.com>
-         <20230508220708.2888510-4-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+        Tue, 16 May 2023 22:53:26 -0400
+Received: from a27-52.smtp-out.us-west-2.amazonses.com (a27-52.smtp-out.us-west-2.amazonses.com [54.240.27.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 643094493
+        for <linux-crypto@vger.kernel.org>; Tue, 16 May 2023 19:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=s25kmyuhzvo7troimxqpmtptpemzlc6l; d=exabit.dev; t=1684291599;
+        h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:Mime-Version:Content-Type:Content-Transfer-Encoding;
+        bh=KQmit5OcpOxpqlAG2WNT/FBrH9mqQ2rnKfBqNv+af6o=;
+        b=eFZ25YFhluKlo44NiPU38p0wv+C3FA3LRpGXKYCj/SecwKEYys9EP568OoXONrJ2
+        4hqgX3Zh/wRRBwrIbDlhhQ+Jmsz5fs6XeiizE564GGnDGIea+rnIstcr+S0v75OP0t+
+        U9QruQC7N1azgTDrLnvoguexkLpDm20UY1sZAWhGoWLIfWWLbPaSj4paBe6tNokoV+x
+        X6pkgKiW9wwxOJe5CLFmyodL7sZ6VKp1rspoHI0w2Zx3kK34cpzftKQ6N3dbSUtS/du
+        oko4jBQv/5qL42ZPO31461TtdRHKZxPw8SXWrcQq5Z6FzKuVgFi02hPL1pQT3BHmZkU
+        uLAOmHbMjA==
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+        s=hsbnp7p3ensaochzwyq5wwmceodymuwv; d=amazonses.com; t=1684291599;
+        h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:Mime-Version:Content-Type:Content-Transfer-Encoding:Feedback-ID;
+        bh=KQmit5OcpOxpqlAG2WNT/FBrH9mqQ2rnKfBqNv+af6o=;
+        b=VECbSMQEsdcKEVV5U/aNeTaehZqFXGP17fiictEbFu96F/C20w302G31gZ7q8qNO
+        +r4G8noPf3JofkgR55seDkKhveinmOO+t4tT6u70DLumUymchi5QL7ifCNdO5j6KVuU
+        5fPQyEl3hnSFdAX6MZWUgcOBR9yHCEyj2qw9F6T0=
+Date:   Wed, 17 May 2023 02:46:39 +0000
+Message-ID: <01010188279a3c77-331a93b1-4bef-491f-b772-564ec329b92c-000000@us-west-2.amazonses.com>
+To:     wedsonaf@gmail.com
+Cc:     tomo@exabit.dev, rust-for-linux@vger.kernel.org,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        fujita.tomonori@gmail.com
+Subject: Re: [PATCH 2/2] rust: add socket support
+From:   FUJITA Tomonori <tomo@exabit.dev>
+In-Reply-To: <CANeycqohNOf38MDw4mybzBib2Apu=7b_6qn_1oykm70zMVvKrw@mail.gmail.com>
+References: <20230515043353.2324288-1-tomo@exabit.dev>
+        <010101881db03866-754b644c-682c-44be-8d8e-8376d34c77b3-000000@us-west-2.amazonses.com>
+        <CANeycqohNOf38MDw4mybzBib2Apu=7b_6qn_1oykm70zMVvKrw@mail.gmail.com>
 Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LwaftEa0i45zaMhbeCaoP0_meuq_ur0_
-X-Proofpoint-GUID: YOAFi2lIcuThCqoQJupaJ-ottlMst4CO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-16_14,2023-05-16_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- suspectscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2304280000
- definitions=main-2305170006
+Feedback-ID: 1.us-west-2.j0GTvY5MHQQ5Spu+i4ZGzzYI1gDE7m7iuMEacWMZbe8=:AmazonSES
+X-SES-Outgoing: 2023.05.17-54.240.27.52
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2023-05-08 at 18:07 -0400, Eric Snowberg wrote:
-> Remove the EXPERIMENTAL from the
-> IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY Kconfig
-> now that digitalSignature usage enforcement is set.
+Hi,
+
+On Tue, 16 May 2023 14:08:47 -0300
+Wedson Almeida Filho <wedsonaf@gmail.com> wrote:
+
+> We have basic networking support in the `rust` branch. In fact, we
+> also have support for async networking in there as well. For example,
+> the 9p server uses it.
 > 
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> At the moment we're prioritizing upstreaming the pieces for which we
+> have projects waiting. Do you have an _actual_ user in mind for this?
 
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+I've implemented in-kernel TLS 1.3 handshake on the top of this.
 
+https://github.com/fujita/rust-tls
+
+The in-kernel TLS handshake feature is controversial. Proposals were
+rejected in the past. So I like to know the opinions of subsystem
+maintainers early, implementing in-kernel security-relevant code in
+Rust could change the situation.
+
+The requirement for networking is simple, read/write with a vector and
+setsockopt. So I submitted minimum abstractions.
+
+
+> In any case, let's please start with that instead of a brand-new
+> reimplementation.
+
+Sure, if netdev maintainers could merge Rust abstractions for
+networking soon, I'll rework on this. But I don't think there is much
+overlap between this and rust branch. Even if we could have
+abstractions specific for TCP like TcpListener and TcpStream, we still
+need thin abstractions for socket because there are several use-cases
+of non IP sockets, I think.
+
+Thanks,
