@@ -2,102 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD1BC7EE23
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 May 2023 23:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB64C77B75
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 May 2023 01:18:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230360AbjEPXRD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 May 2023 19:17:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52450 "EHLO
+        id S231417AbjEQBSo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 16 May 2023 21:18:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjEPXRC (ORCPT
+        with ESMTP id S229552AbjEQBSn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 May 2023 19:17:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC9D448C;
-        Tue, 16 May 2023 16:17:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9780463848;
-        Tue, 16 May 2023 23:17:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFDC5C433EF;
-        Tue, 16 May 2023 23:16:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684279020;
-        bh=zCFk9ckmMwoH0fK8TjR+DgTP01W/heIVljzahFq+A38=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=NICfEbOp4ULW5GEyU9ohb43NabVga42QJFmD77gToi4aEEmSR4l23+0E6WVSr+LG9
-         t5+BAjOEL6PQZ0svP9qh+u4sTZapXD2zezdB6CH2J6m2hVn7D7iO3XqzZY/EWCDhwJ
-         DEbBC96l0uq2HKlTsqmZPc/xkBFpLCnzN5uv5diojginclAUxcz68Op66s+MLJD+mc
-         lly1L8n6Xgcayt36KyXXYITiWlon+A1YCip9Drmo8s70vIqb2MrTzlJbH91J06QHS1
-         ClKINgaDfe9Wp3LKGUtPjq6lkZ1EA+qETfcYX5XYF6zsbpu57WZXYJC3pjoiIssXkj
-         9S0PnO9uDsqWg==
-Message-ID: <174a6ed0-1a2a-40d1-9a14-8bbbdd6e582c@kernel.org>
-Date:   Wed, 17 May 2023 08:16:52 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] dt-bindings: xilinx: Switch xilinx.com emails to amd.com
-To:     Michal Simek <michal.simek@amd.com>, piyush.mehta@amd.com,
-        nava.kishore.manne@amd.com, sai.krishna.potthuri@amd.com,
-        shubhrajyoti.datta@amd.com, vishal.sagar@amd.com,
-        kalyani.akula@amd.com, bharat.kumar.gogada@amd.com,
-        linux-kernel@vger.kernel.org, monstr@monstr.eu,
-        michal.simek@xilinx.com, git@xilinx.com
-Cc:     Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Jolly Shah <jolly.shah@xilinx.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        =?UTF-8?Q?Krzysztof_Wilczy=c5=84ski?= <kw@linux.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Manish Narani <manish.narani@xilinx.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Rajan Vaja <rajan.vaja@xilinx.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        Srinivas Neeli <srinivas.neeli@amd.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Rix <trix@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-watchdog@vger.kernel.org
-References: <f5b2bd1e78407e4128fc8f0b5874ba723e710a88.1684245058.git.michal.simek@amd.com>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <f5b2bd1e78407e4128fc8f0b5874ba723e710a88.1684245058.git.michal.simek@amd.com>
-Content-Type: text/plain; charset=UTF-8
+        Tue, 16 May 2023 21:18:43 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCA9269D;
+        Tue, 16 May 2023 18:18:41 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34H17jt8025818;
+        Wed, 17 May 2023 01:18:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=KmU7UPnAnSf6c1RNg/uFbRLIxBBlxHBio2SWVAbWWFM=;
+ b=kbWjXyzASgiEX9FLUfizn4xO+bz7/O3QPlo7Vb5LXbvLHruiNJHKdImjWUzHk7pAQJEf
+ KzIqx+aWe6+MeW7nVfhkNDkWeS/GII0/izK7m90GkWdbPs02dAjLXaKqWutzZ/NIqO4Z
+ rkVQvWPp+L3fssSVHg+BTIUyIj3KIJvRdOMqGtUIMcnwRTuxaPgpRPv40HyWjvM5Ijxn
+ K8ii4yRFb8EytsGXLltuKR3mPKxxzlt6+G4A8oTJytdpn6DhuOYJG5ogY8r/3lLULQHH
+ Waf7ZL+XZ98o0KcPzRg4x5SWNOAHBhIM9o0/9ZWQC5stuqQ52LeFpLSKfIL9whhffPQE sw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmmbu16kb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 May 2023 01:18:14 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 34H1GJC0029300;
+        Wed, 17 May 2023 01:18:13 GMT
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qmmbu16jw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 May 2023 01:18:13 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 34GLiqVg009219;
+        Wed, 17 May 2023 01:18:13 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([9.208.129.116])
+        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3qj265k57v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 May 2023 01:18:12 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+        by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 34H1IBGG52494720
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 May 2023 01:18:12 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D1C0C5805E;
+        Wed, 17 May 2023 01:18:11 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6B89C58059;
+        Wed, 17 May 2023 01:18:09 +0000 (GMT)
+Received: from sig-9-77-133-203.ibm.com (unknown [9.77.133.203])
+        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 17 May 2023 01:18:09 +0000 (GMT)
+Message-ID: <d96f5b8ef6f4afdcae1a3be776d10749bf0b4984.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/3] KEYS: DigitalSignature link restriction
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, dhowells@redhat.com,
+        dwmw2@infradead.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com, jlee@suse.com, kanth.ghatraju@oracle.com,
+        konrad.wilk@oracle.com, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Date:   Tue, 16 May 2023 21:18:07 -0400
+In-Reply-To: <20230508220708.2888510-2-eric.snowberg@oracle.com>
+References: <20230508220708.2888510-1-eric.snowberg@oracle.com>
+         <20230508220708.2888510-2-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: XMO5lPHlzZjAtUWe1T3poojACAQ46MFQ
+X-Proofpoint-GUID: PW6OjyfkjRZcuKRr-tKInEv9N3JM2dEP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-16_14,2023-05-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ adultscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ phishscore=0 spamscore=0 impostorscore=0 mlxlogscore=975 malwarescore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305170006
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/16/23 22:51, Michal Simek wrote:
-> @xilinx.com is still working but better to switch to new amd.com after
-> AMD/Xilinx acquisition.
+On Mon, 2023-05-08 at 18:07 -0400, Eric Snowberg wrote:
+> Add a new link restriction.  Restrict the addition of keys in a keyring
+> based on the key having digitalSignature usage set. Additionally, verify
+> the new certificate against the ones in the system keyrings.  Add two
+> additional functions to use the new restriction within either the builtin
+> or secondary keyrings.
 > 
-> Signed-off-by: Michal Simek <michal.simek@amd.com>
-Acked-by: Damien Le Moal <dlemoal@kernel.org>
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+
+Thanks, Eric.
+
+Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+
