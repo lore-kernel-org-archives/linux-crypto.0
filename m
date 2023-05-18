@@ -2,172 +2,201 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79FBDC7EE2A
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 May 2023 14:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53441C7EE24
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 May 2023 06:48:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231909AbjEQOQ5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 May 2023 10:16:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42520 "EHLO
+        id S229704AbjERGsY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 May 2023 02:48:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231888AbjEQOQ4 (ORCPT
+        with ESMTP id S229566AbjERGsX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 May 2023 10:16:56 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9A718C;
-        Wed, 17 May 2023 07:16:54 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9661a1ff1e9so119738366b.1;
-        Wed, 17 May 2023 07:16:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684333013; x=1686925013;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9mWuBFORINAsgkFiENnuZWACjGF2Zo8AfvFi7n4DTJY=;
-        b=biypyogl/DqZwN8+l2p9gGZMhx1QXp7js5dS6YSXbdcF3ZHK3bAXOKr9bIZ2d5+mvl
-         Qn4Gx8A74tCXzyGwgnn35/7evQqgN/7wXY9AeQJjQf2d0yv+FYmCHdYp8GwNzBMM0M2X
-         RepZrNuNaoOJQYiVZCSiNqbUDnKxLYbuFDB8j4b1yBI/QsVPe3WOIE4R72ZLtO7EIxoT
-         24iEumAIof2PKi6dQYEuyikyK+F0NROw542Ffk8G2rKhOQY1gF3SmvrkEBVbE4TJefAI
-         GSNWr7uxGsud5z6OeWp2cGbBzJ4OT09LPkQaqsMmhTV5gi2hCXnVzgGn3dz+0FxHoXgI
-         VP5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684333013; x=1686925013;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9mWuBFORINAsgkFiENnuZWACjGF2Zo8AfvFi7n4DTJY=;
-        b=Z+pQ/oqFjWFJrG9+QOfmcz2fk6OWGFRuNpj7cn7shDKRiYpYGRowq2JkVCH+kIFmIE
-         Z+0NVG8IOQUjZKlbbISdY7MjZKegbdAZtLRCoaG1zNR0fgP1TIgmH3N5XFiNQzdHdBnq
-         /abMBpvgJN9Fhoxr2Unjzxbrf982Poi9gPfMU/V+4s8UYXrLNCrOxyg/2ZFPVVdup7oM
-         V2twmI0RsL0z51GbdEiOchF4MggywuQOyDAYGkJlRsqmXHdd7IprC9JGRI2HIlRl0F42
-         5AjgXpG+NqpXRXqQKXbczJ3a9xWbkvy1NFceT+GK4eMZUxXbd6K/9yEmefwohVyZzQ0P
-         lziQ==
-X-Gm-Message-State: AC+VfDwxtRBr8RIE7cgkgUEf6LEFJU/lPfTBEAuqBqM5CSGiYZfEo1KB
-        BXxqVrmLl5g5ht0kVKhEg9+SlUrulB4J1qMrc2c=
-X-Google-Smtp-Source: ACHHUZ5TyNAWL0L+xFq4qCoGU4tNyKIEpqxlZu0ALd+ZVRg36+lSEN4BwR3Z/P1zVEHc2oshTTV+tnv1x2FEG17G5M8=
-X-Received: by 2002:a17:907:36c3:b0:96a:3811:f589 with SMTP id
- bj3-20020a17090736c300b0096a3811f589mr24647279ejc.10.1684333012989; Wed, 17
- May 2023 07:16:52 -0700 (PDT)
+        Thu, 18 May 2023 02:48:23 -0400
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E8582111;
+        Wed, 17 May 2023 23:48:22 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34HMFG8Q012878;
+        Wed, 17 May 2023 23:47:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=iST4eMZ3Y/H3jJ5jB58qB6a65/g7GndqiAsrabU2nCs=;
+ b=ZiTZEwyWgX5vQNpL/naZ0L/86pB9FhmzbKYVIdFWRdlsdMSzeYImUvf3FwX3gXd+YwPG
+ YOpI5q4HlJrvDpyfVnwP3HhOaHNg9crz7HZakZC53CdipDXpH+kzO+JyLqetBqenP5En
+ YRHM7pyjWemba1eW42RMTCI1I5AlFomN4gIuzP7wPdBxMTGwiPUl3lQxXmsZnUh/q7bX
+ NRS4sY0X2zghnw+AkmhROU8U3ksn961M+TPgPHDkwX8C7ZFwy1cprEHX5vU4Ah5k6Sts
+ atd+begOFNVfRcWA0Z+i6W8tZZ4EP3iuNuzA5yOfENYEg1JZAWTYHOxNJj8tJGmiYSY2 PA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3qn7jb9hh7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 17 May 2023 23:47:44 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 17 May
+ 2023 23:47:42 -0700
+Received: from bbhushan2.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 17 May 2023 23:47:40 -0700
+From:   Bharat Bhushan <bbhushan2@marvell.com>
+To:     <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+        <Jason@zx2c4.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>
+CC:     Bharat Bhushan <bbhushan2@marvell.com>
+Subject: [PATCH] hwrng: cn10k: Add extended trng register support
+Date:   Thu, 18 May 2023 12:17:34 +0530
+Message-ID: <20230518064734.18819-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <f5b2bd1e78407e4128fc8f0b5874ba723e710a88.1684245058.git.michal.simek@amd.com>
-In-Reply-To: <f5b2bd1e78407e4128fc8f0b5874ba723e710a88.1684245058.git.michal.simek@amd.com>
-From:   Jassi Brar <jassisinghbrar@gmail.com>
-Date:   Wed, 17 May 2023 09:16:41 -0500
-Message-ID: <CABb+yY2JaC8b-HFEU_WnSBSCr2edgEezXJkfMUYqjeLBA1MvYw@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: xilinx: Switch xilinx.com emails to amd.com
-To:     Michal Simek <michal.simek@amd.com>
-Cc:     piyush.mehta@amd.com, nava.kishore.manne@amd.com,
-        sai.krishna.potthuri@amd.com, shubhrajyoti.datta@amd.com,
-        vishal.sagar@amd.com, kalyani.akula@amd.com,
-        bharat.kumar.gogada@amd.com, linux-kernel@vger.kernel.org,
-        monstr@monstr.eu, michal.simek@xilinx.com, git@xilinx.com,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jolly Shah <jolly.shah@xilinx.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        Manish Narani <manish.narani@xilinx.com>,
-        Mark Brown <broonie@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Moritz Fischer <mdf@kernel.org>,
-        Rajan Vaja <rajan.vaja@xilinx.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        Srinivas Neeli <srinivas.neeli@amd.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Rix <trix@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-watchdog@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-GUID: vJntWTUk__tfLhKuKM5HH8ATwzib_3jG
+X-Proofpoint-ORIG-GUID: vJntWTUk__tfLhKuKM5HH8ATwzib_3jG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-18_05,2023-05-17_02,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 16, 2023 at 8:51=E2=80=AFAM Michal Simek <michal.simek@amd.com>=
- wrote:
->
-> @xilinx.com is still working but better to switch to new amd.com after
-> AMD/Xilinx acquisition.
->
-> Signed-off-by: Michal Simek <michal.simek@amd.com>
-> ---
->
->  Documentation/devicetree/bindings/arm/xilinx.yaml             | 2 +-
->  Documentation/devicetree/bindings/ata/ceva,ahci-1v84.yaml     | 2 +-
->  .../devicetree/bindings/clock/xlnx,clocking-wizard.yaml       | 2 +-
->  Documentation/devicetree/bindings/clock/xlnx,versal-clk.yaml  | 2 +-
->  Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml | 4 ++--
->  .../bindings/firmware/xilinx/xlnx,zynqmp-firmware.yaml        | 2 +-
->  .../devicetree/bindings/fpga/xilinx-zynq-fpga-mgr.yaml        | 2 +-
->  Documentation/devicetree/bindings/fpga/xlnx,versal-fpga.yaml  | 2 +-
->  .../devicetree/bindings/fpga/xlnx,zynqmp-pcap-fpga.yaml       | 2 +-
->  Documentation/devicetree/bindings/gpio/gpio-zynq.yaml         | 2 +-
->  Documentation/devicetree/bindings/gpio/xlnx,gpio-xilinx.yaml  | 2 +-
->  .../devicetree/bindings/gpio/xlnx,zynqmp-gpio-modepin.yaml    | 2 +-
->  Documentation/devicetree/bindings/i2c/cdns,i2c-r1p10.yaml     | 2 +-
->  .../devicetree/bindings/mailbox/xlnx,zynqmp-ipi-mailbox.yaml  | 2 +-
->  .../devicetree/bindings/media/xilinx/xlnx,csi2rxss.yaml       | 2 +-
->  .../bindings/memory-controllers/snps,dw-umctl2-ddrc.yaml      | 2 +-
->  .../bindings/memory-controllers/xlnx,zynq-ddrc-a05.yaml       | 2 +-
->  Documentation/devicetree/bindings/pci/xilinx-versal-cpm.yaml  | 2 +-
->  .../devicetree/bindings/pinctrl/xlnx,zynq-pinctrl.yaml        | 2 +-
->  .../devicetree/bindings/pinctrl/xlnx,zynqmp-pinctrl.yaml      | 2 +-
->  .../devicetree/bindings/power/reset/xlnx,zynqmp-power.yaml    | 2 +-
->  Documentation/devicetree/bindings/rtc/xlnx,zynqmp-rtc.yaml    | 2 +-
->  Documentation/devicetree/bindings/serial/cdns,uart.yaml       | 2 +-
->  Documentation/devicetree/bindings/spi/spi-cadence.yaml        | 2 +-
->  Documentation/devicetree/bindings/spi/spi-xilinx.yaml         | 2 +-
->  Documentation/devicetree/bindings/spi/spi-zynqmp-qspi.yaml    | 2 +-
->  Documentation/devicetree/bindings/spi/xlnx,zynq-qspi.yaml     | 2 +-
->  Documentation/devicetree/bindings/timer/cdns,ttc.yaml         | 2 +-
->  .../devicetree/bindings/watchdog/xlnx,xps-timebase-wdt.yaml   | 4 ++--
->  29 files changed, 31 insertions(+), 31 deletions(-)
->
-.....
-> diff --git a/Documentation/devicetree/bindings/mailbox/xlnx,zynqmp-ipi-ma=
-ilbox.yaml b/Documentation/devicetree/bindings/mailbox/xlnx,zynqmp-ipi-mail=
-box.yaml
-> index 374ffe64016f..aeaddbf574b0 100644
-> --- a/Documentation/devicetree/bindings/mailbox/xlnx,zynqmp-ipi-mailbox.y=
-aml
-> +++ b/Documentation/devicetree/bindings/mailbox/xlnx,zynqmp-ipi-mailbox.y=
-aml
-> @@ -33,7 +33,7 @@ description: |
->                +------------------------------------------+
->
->  maintainers:
-> -  - Shubhrajyoti Datta <shubhrajyoti.datta@xilinx.com>
-> +  - Shubhrajyoti Datta <shubhrajyoti.datta@amd.com>
->
->  properties:
->    compatible:
->
-Acked-by: Jassi Brar <jassisinghbrar@gmail.com>
+The way random data is read from hardware has changed from
+Octeon CN10KA-B0 and later SoCs onwards. A new set of registers
+have been added to read random data and to verify whether the
+read data is valid or not. This patch extends and uses
+RNM_PF_TRNG_DAT and RNM_PF_TRNG_STS CSRs to read random number
+and status for the applicable silicon variants.
 
-Just curious, some developers' ids are left unchanged, and not all
-devs have S.O.B.
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+---
+ drivers/char/hw_random/cn10k-rng.c | 64 ++++++++++++++++++++++++++++--
+ 1 file changed, 60 insertions(+), 4 deletions(-)
 
-cheers.
+diff --git a/drivers/char/hw_random/cn10k-rng.c b/drivers/char/hw_random/cn10k-rng.c
+index c1193f85982c..42e44705320c 100644
+--- a/drivers/char/hw_random/cn10k-rng.c
++++ b/drivers/char/hw_random/cn10k-rng.c
+@@ -23,14 +23,49 @@
+ #define RNM_PF_RANDOM		0x400
+ #define RNM_TRNG_RESULT		0x408
+ 
++/* Extended TRNG Read and Status Registers */
++#define RNM_PF_TRNG_DAT		0x1000
++#define RNM_PF_TRNG_RES		0x1008
++
+ struct cn10k_rng {
+ 	void __iomem *reg_base;
+ 	struct hwrng ops;
+ 	struct pci_dev *pdev;
++	/* Octeon CN10K-A A0/A1, CNF10K-A A0/A1 and CNF10K-B A0/B0
++	 * does not support extended TRNG registers
++	 */
++	bool extended_trng_regs;
+ };
+ 
+ #define PLAT_OCTEONTX_RESET_RNG_EBG_HEALTH_STATE     0xc2000b0f
+ 
++#define PCI_SUBSYS_DEVID_CN10K_A_RNG	0xB900
++#define PCI_SUBSYS_DEVID_CNF10K_A_RNG	0xBA00
++#define PCI_SUBSYS_DEVID_CNF10K_B_RNG	0xBC00
++
++static bool cn10k_is_extended_trng_regs_supported(struct pci_dev *pdev)
++{
++	/* CN10K-A A0/A1 */
++	if ((pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A_RNG) &&
++	    (!pdev->revision || (pdev->revision & 0xff) == 0x50 ||
++	     (pdev->revision & 0xff) == 0x51))
++		return false;
++
++	/* CNF10K-A A0 */
++	if ((pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_A_RNG) &&
++	    (!pdev->revision || (pdev->revision & 0xff) == 0x60 ||
++	     (pdev->revision & 0xff) == 0x61))
++		return false;
++
++	/* CNF10K-B A0/B0 */
++	if ((pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_RNG) &&
++	    (!pdev->revision || (pdev->revision & 0xff) == 0x70 ||
++	     (pdev->revision & 0xff) == 0x74))
++		return false;
++
++	return true;
++}
++
+ static unsigned long reset_rng_health_state(struct cn10k_rng *rng)
+ {
+ 	struct arm_smccc_res res;
+@@ -63,9 +98,22 @@ static int check_rng_health(struct cn10k_rng *rng)
+ 	return 0;
+ }
+ 
+-static void cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
++static size_t cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
+ {
++	u16 retry_count = 0;
+ 	u64 upper, lower;
++	u64 status;
++
++	if (rng->extended_trng_regs) {
++		do {
++			*value = readq(rng->reg_base + RNM_PF_TRNG_DAT);
++			if (*value)
++				return 8;
++			status = readq(rng->reg_base + RNM_PF_TRNG_RES);
++			if (!status && (retry_count++ > 0x1000))
++				return 0;
++		} while (!status);
++	}
+ 
+ 	*value = readq(rng->reg_base + RNM_PF_RANDOM);
+ 
+@@ -82,6 +130,7 @@ static void cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
+ 
+ 		*value = (upper & 0xFFFFFFFF00000000) | (lower & 0xFFFFFFFF);
+ 	}
++	return 8;
+ }
+ 
+ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
+@@ -100,7 +149,9 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
+ 	size = max;
+ 
+ 	while (size >= 8) {
+-		cn10k_read_trng(rng, &value);
++		err = cn10k_read_trng(rng, &value);
++		if (!err)
++			goto out;
+ 
+ 		*((u64 *)pos) = value;
+ 		size -= 8;
+@@ -108,7 +159,9 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
+ 	}
+ 
+ 	if (size > 0) {
+-		cn10k_read_trng(rng, &value);
++		err = cn10k_read_trng(rng, &value);
++		if (!err)
++			goto out;
+ 
+ 		while (size > 0) {
+ 			*pos = (u8)value;
+@@ -118,6 +171,7 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
+ 		}
+ 	}
+ 
++out:
+ 	return max - size;
+ }
+ 
+@@ -144,9 +198,11 @@ static int cn10k_rng_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (!rng->ops.name)
+ 		return -ENOMEM;
+ 
+-	rng->ops.read    = cn10k_rng_read;
++	rng->ops.read = cn10k_rng_read;
+ 	rng->ops.priv = (unsigned long)rng;
+ 
++	rng->extended_trng_regs = cn10k_is_extended_trng_regs_supported(pdev);
++
+ 	reset_rng_health_state(rng);
+ 
+ 	err = devm_hwrng_register(&pdev->dev, &rng->ops);
+-- 
+2.17.1
+
