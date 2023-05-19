@@ -2,44 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F77DC7EE29
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567E2C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231673AbjESRaQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 13:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39092 "EHLO
+        id S231722AbjESRaR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 13:30:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbjESR3v (ORCPT
+        with ESMTP id S231702AbjESR3x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 13:29:51 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on20603.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eb2::603])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FE4510DD;
-        Fri, 19 May 2023 10:29:18 -0700 (PDT)
+        Fri, 19 May 2023 13:29:53 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2047.outbound.protection.outlook.com [40.107.94.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2C610F0;
+        Fri, 19 May 2023 10:29:20 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cHo6tO7sexkKSAoaMEQ9d7BzY634g6+LOH6k0GZ2AkPPQWUAfPtnGsJ0eQmy22SdBJUWNy4yif5tgIaS2FiuhheY4Rq/8BI7SYYYNKQoSZHtAXpw9UjbGJzEtdGoYm8blP9TUobd5Ew6e+iH24s6NcMEuwMnrrzu8zHoRDHkyP0JrHAWRjtzD+5mO3psvu5zipSVJq7FznMKX/sTPXlGWuJ4Qjks59X61wV9ckAKkbc7Gy2fde567qIIET7K8gzZPGLYfuxxfaXbYGqSTK1YScsMqEILOZsl3pPQfhkq5HcCPvPUQ9HEn+5gM4RGAzq7hnbhtHZpNHpKFxKkjuYLdQ==
+ b=Bjz2RJ4Q28cksrrJankz+O/I2b0n8f/jB6i20wkZENDESsKByX01o5PsdEHQmMM1Som0ldMGVOaN+6/kRYSpIr/CjhBMzgEFHNr5ZeTmInk0pyMG5DkGH3tUlESkMwixQL/GjnONRcEnrOYgULxpDR/S/NEfwmOx6x7/hwVe3EZVH7pqXBh8tOlWOWRAPBgq+0EwWCu8VJoXfvEYjwEyLclvDYtUgx6Z2lJF4i/jv9z61Ei5VKEIp4uteMXGU3D4N7UItTIsW1EDimfO7hx/AOw6rCj93HHyCgwnKCmx0xZJyy51usUnOna0fEGAMiLnvvAvaLX04N8l1s3IyIXBpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y65ySYxEZTxXTPx6XZLcx4EtwRy46OgHE/Wts/IgVII=;
- b=mmrPJzuxUC/0edSYG/0cG2JtJZv2upvm2ZoiXMw5mc8HpznvYJnm0cy0kuZPS+7YYBFF3kyGqzsa0DbXtpDb4uU2gdeN5FaaaCpd7g4wcjGNGTbqQzmphU4a30tXP+qXfhN+F5lNQ3YjxffgbpH9P6q6h26UR9oNL25gG8W526racPSc+ypBMuO/Fe1nfSXJRuwpHmKiG+LKeN0xCIWSJqUYrlnnsjMGm5JjXX4qYOFojj2f0u/DKBQg7la0C/q05gqP2YhBR7m8kC8+rkwHfMOTHd6qhYBYbfLlCWs5PSiwVsIL39hetoxP1Trvf/JLQdPDyjKlZ/8Yfnnj5x+Irg==
+ bh=aS8JSioac+K5cQTdnoc+oQ3hySJkWDuNq/W398kLq/w=;
+ b=nWn/NYlcEpvZEP4uWZ/U/wbG5iMdV7RSgS0aki81Y3bkluoDkSIR/wYKI4KcZKkTl3lyYWPBQcIeM/9TQimi/NU4Gl8yex90AhV1+8SXM0nvWCGfTBID9TDOPK5MCeGFTdh6ichmcKSeyB6dt2VWzdYLj4jZ/EVaY73SsZlNGVWH7xiQh54M03/CVn/Jz3cZy33yT1BoXAYpUmGo7V2kLYHaNWxwNPqqEbDegAL7prDBaO1MIdCcrUHr+7Sa/Rc8wV4FIz5N5xXYdz/cs8twB9D4uk0L2wy2XkOb1PA2sgiHN+nnG8Gvfn0Qeq7rQy5PyNFY5JWQeHhx9VtxSdHyzg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y65ySYxEZTxXTPx6XZLcx4EtwRy46OgHE/Wts/IgVII=;
- b=sAak2WYuqLGvXJ9SMA0P0SyOzxj9EsRgb13FSnrSdxdn1Hx1I5+/FJb3vMo/L0cdfQepN8e3S2zOdJYS1UrB/QirspDyVs0r8YYk/w1y35F+lVyHDTLKOEhvGeRVn9Z+Hj2RmiUefFgVVJVrx59MAa5coGdHmMHHyVE+SNz4jiI=
-Received: from DS7PR05CA0030.namprd05.prod.outlook.com (2603:10b6:5:3b9::35)
- by PH7PR12MB6657.namprd12.prod.outlook.com (2603:10b6:510:1fe::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.19; Fri, 19 May
- 2023 17:29:01 +0000
-Received: from DM6NAM11FT079.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b9:cafe::53) by DS7PR05CA0030.outlook.office365.com
- (2603:10b6:5:3b9::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.15 via Frontend
- Transport; Fri, 19 May 2023 17:29:00 +0000
+ bh=aS8JSioac+K5cQTdnoc+oQ3hySJkWDuNq/W398kLq/w=;
+ b=5iYi602Jovqe9+n+uhA7mvYkrQu8XvsF0puaDikTHa+Dn5JBN770vcpG329hSDs5jPdaA/hjIq8LKDXAREsuQSvtSqjtQ7ickc2DtPHbz8frpGjomK1SKArCi5PUwZ9i4iuweOaqYUDso9LQ1PZm4XHlMjF2amLVDVzPGwAYegs=
+Received: from DS7PR05CA0085.namprd05.prod.outlook.com (2603:10b6:8:56::15) by
+ BL3PR12MB9051.namprd12.prod.outlook.com (2603:10b6:208:3ba::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6411.21; Fri, 19 May 2023 17:29:07 +0000
+Received: from DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:56:cafe::6f) by DS7PR05CA0085.outlook.office365.com
+ (2603:10b6:8:56::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.7 via Frontend
+ Transport; Fri, 19 May 2023 17:29:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT079.mail.protection.outlook.com (10.13.173.4) with Microsoft SMTP
+ DM6NAM11FT082.mail.protection.outlook.com (10.13.173.107) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:28:59 +0000
+ 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:07 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 19 May
- 2023 12:28:57 -0500
+ 2023 12:29:05 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -61,10 +60,12 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     John Allen <john.allen@amd.com>, <linux-crypto@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v3 00/10] Add dynamic boost control support
-Date:   Thu, 18 May 2023 22:24:38 -0500
-Message-ID: <20230519032448.94279-1-mario.limonciello@amd.com>
+Subject: [PATCH v3 07/10] crypto: ccp: Add support for getting and setting DBC parameters
+Date:   Thu, 18 May 2023 22:24:45 -0500
+Message-ID: <20230519032448.94279-8-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230519032448.94279-1-mario.limonciello@amd.com>
+References: <20230519032448.94279-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -73,90 +74,210 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT079:EE_|PH7PR12MB6657:EE_
-X-MS-Office365-Filtering-Correlation-Id: f425c73e-db26-4582-97c3-08db588e8865
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT082:EE_|BL3PR12MB9051:EE_
+X-MS-Office365-Filtering-Correlation-Id: aeadc324-9aa3-45f3-0126-08db588e8cb0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NbzkAb/uNqLEQ5ZswlN2+C8H57DR+3FBTU3CjO++7tKv8uYEDkpTXPDY6nsmV5ckCRWEBUQKCd+cT+B6Ceu4ZA7+RSUcmjlDxEtM8c5uC6gBmrJEISZyDATXjVx9nlQHX0Xi/dPdCENNaj14lySvGqH85OwAIeUVqRBpGgxdj6+2aiKbm6BzoN2c/BHE2HFAVaTttjozUblxd7m8tVvthc6GnYa0AT9sfWhFqsgQYtmosTdWhBgXhCxKEGhMkjYAHnRSBiQR+4xZiVilwIRPvbQrdEcH/Ffn1qU+kf40NP4+N3fYYR8AVxdwMNizugXUC3jmJQHTIM5yFyv82ABtrbMvYsftzSRpguXkuHxoq9eUDFh7c3P/WScRrFJC2LUXFxNjhWGj8XWND30guEVRMtTuGoAvJsDGAhr4LFhQX/0CwwYP2G7IrSeSYnqQm76rvmP+cIhuj46x2QUvEy/YCMXJlCXEyVLm+wgzrXjhmzeNHD/RzVDZDPaYbEkW/wF5Uq4BTr3mlWfXiSOIPfiUjcTxRut5CzkNHnSMUumYm+R9lYfne5jN+V4G0gQDzVZxcmZekhD4Enjdk2M2/RAO03HC+b/xWeCWQcP5vFgHUaEhye/0lXFczqaB35j2HavwQFcKiUeohIqPnharsRWYSgYZ5trehtD9UOUsf7k80bZDbyRNP1xdptjygs8fw5U4qpB397zhI28MbBdQHixly84xaKx5wQKW8l1zZbnQ0oQXF65bkFdjQSq7fWtTy8b2DJaRLFyJPDHfpbz7iIKN5w==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(346002)(396003)(376002)(451199021)(46966006)(40470700004)(36840700001)(316002)(86362001)(4326008)(41300700001)(8936002)(8676002)(5660300002)(356005)(82310400005)(54906003)(81166007)(110136005)(82740400003)(478600001)(2906002)(70586007)(70206006)(44832011)(336012)(426003)(6666004)(40480700001)(7696005)(36860700001)(1076003)(26005)(47076005)(186003)(36756003)(40460700003)(16526019)(2616005)(83380400001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: o5Mar65pjOwErDzPxMMu8IrUpKRBPG55GDgslCwLxPfJNh/ATdW1x5fsrtXaxqLX5pv8UrIQLxHuKNQm+nBWpiQxWfY2l/ErOHqp//XPgLcLTxs0bnaWKnMrN/SYb9PyYNRRtXFTLmnoe1S541+ykVibO+061jw2x64n/L98PfWU9Pk7UmoALezJEu+RUQzMbuIiDpAYFWmf5xp+OsPILOPbHeyjmHtdweqFZ2piqB2dG6MSt+YriMachZXkSDmLwcVaKELLYFipf15jc8BZ76QMPhByyQ0MqxwDKh3ZfXke21jfXtmjubODg0ddm2r3JeCeTd9U5QiPTJHA5Id+ISNtZYn6fohFw8gW0LY4ceXfQ3T8cUOq/Ig0T9XlhKuRBGGi9awp0wrOiJTmmkMvF2ahZJtIuYPtzteUeaZXsUky0XPq1gQ2egoY5jzSKYaw4NgnswpD8AShb4o1hDMtx237INpKvf+7fw8eJ5JhuHiQMJ/YD4UfO/u6T44jrx1+fvvClSrrj6sAtHTU7bYWNTfKn2dFUiV92hmJ6cB86e7BNCBVkyrrLneyu6//Mc2IWJUSIJOb8ZwF48XrtHpSmHjuDnmLddHVp5YeQOj9PANZX8087PcTdXo3ejvVGh2m9w6G5UrH2RMz+jCRoOGx3DqTEW3vx/uQQaSfynNzqsrvKEEXwPcq7kRq2+enp5KDY9x7+ydVfqf4EZsLH7uMsdDj/Sc3/qMC47uI9/RPjJeWfSugA7iilR9bj4G6sZ/SALnQfJdjuw2wBaA3ArQcZA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(136003)(376002)(346002)(451199021)(46966006)(40470700004)(36840700001)(70206006)(70586007)(4326008)(82740400003)(8676002)(8936002)(40480700001)(316002)(110136005)(54906003)(478600001)(41300700001)(7696005)(6666004)(40460700003)(86362001)(2906002)(81166007)(356005)(26005)(36756003)(1076003)(44832011)(36860700001)(186003)(336012)(82310400005)(16526019)(426003)(47076005)(5660300002)(2616005)(83380400001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:28:59.9235
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:07.1221
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f425c73e-db26-4582-97c3-08db588e8865
+X-MS-Exchange-CrossTenant-Network-Message-Id: aeadc324-9aa3-45f3-0126-08db588e8cb0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT079.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6657
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB9051
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dynamic boost control is a feature of some SoCs that allows
-an authenticated entity to send commands to the security processor
-to control certain SOC characteristics with the intention to improve
-performance.
+After software has authenticated a dynamic boost control request,
+it can fetch and set supported parameters using a selection of messages.
 
-This is implemented via a mechanism that a userspace application would
-authenticate using a nonce and key exchange over an IOCTL interface.
+Add support for these messages and export the ability to do this to
+userspace.
 
-After authentication is complete an application can exchange signed
-messages with the security processor and both ends can validate the
-data transmitted.
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+---
+ drivers/crypto/ccp/dbc.c            | 41 ++++++++++++++++++++
+ drivers/crypto/ccp/dbc.h            |  6 +++
+ include/linux/psp-platform-access.h |  2 +
+ include/uapi/linux/psp-dbc.h        | 60 +++++++++++++++++++++++++++++
+ 4 files changed, 109 insertions(+)
 
-This series includes a test suite that can be run on real hardware
-to ensure that the communication works as expected.  This can also be
-used for an application to model the communication path.
-
-Two sysfs files are introduced for reading the PSP bootloader version
-as well as TEE version which can be useful data points for debugging
-communication problems.
-
-v2->v3:
- * Pick up tags
- * Clean up master device if psp_init() failed
-
-Mario Limonciello (10):
-  crypto: ccp: Rename macro for security attributes
-  crypto: ccp: Add support for displaying PSP firmware versions
-  crypto: ccp: Add bootloader and TEE version offsets
-  crypto: ccp: move setting PSP master to earlier in the init
-  crypto: ccp: Add support for fetching a nonce for dynamic boost
-    control
-  crypto: ccp: Add support for setting user ID for dynamic boost control
-  crypto: ccp: Add support for getting and setting DBC parameters
-  crypto: ccp: Add a sample script for Dynamic Boost Control
-  crypto: ccp: Add unit tests for dynamic boost control
-  crypto: ccp: Add Mario to MAINTAINERS
-
- Documentation/ABI/testing/sysfs-driver-ccp |  18 ++
- MAINTAINERS                                |  11 +
- drivers/crypto/ccp/Makefile                |   3 +-
- drivers/crypto/ccp/dbc.c                   | 250 +++++++++++++++++++
- drivers/crypto/ccp/dbc.h                   |  56 +++++
- drivers/crypto/ccp/psp-dev.c               |  19 +-
- drivers/crypto/ccp/psp-dev.h               |   1 +
- drivers/crypto/ccp/sp-dev.h                |   7 +
- drivers/crypto/ccp/sp-pci.c                |  96 +++++++-
- include/linux/psp-platform-access.h        |   4 +
- include/uapi/linux/psp-dbc.h               | 147 ++++++++++++
- tools/crypto/ccp/.gitignore                |   1 +
- tools/crypto/ccp/dbc.py                    |  98 ++++++++
- tools/crypto/ccp/dbc_cli.py                | 123 ++++++++++
- tools/crypto/ccp/test_dbc.py               | 266 +++++++++++++++++++++
- 15 files changed, 1083 insertions(+), 17 deletions(-)
- create mode 100644 drivers/crypto/ccp/dbc.c
- create mode 100644 drivers/crypto/ccp/dbc.h
- create mode 100644 include/uapi/linux/psp-dbc.h
- create mode 100644 tools/crypto/ccp/.gitignore
- create mode 100644 tools/crypto/ccp/dbc.py
- create mode 100755 tools/crypto/ccp/dbc_cli.py
- create mode 100755 tools/crypto/ccp/test_dbc.py
-
-
-base-commit: f573db7aa528f11820dcc811bc7791b231d22b1c
+diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
+index ca7ec528536b..89976d6b9109 100644
+--- a/drivers/crypto/ccp/dbc.c
++++ b/drivers/crypto/ccp/dbc.c
+@@ -74,6 +74,30 @@ static int send_dbc_nonce(struct psp_dbc_device *dbc_dev)
+ 	return ret;
+ }
+ 
++static int send_dbc_parameter(struct psp_dbc_device *dbc_dev)
++{
++	dbc_dev->mbox->req.header.payload_size = sizeof(dbc_dev->mbox->dbc_param);
++
++	switch (dbc_dev->mbox->dbc_param.user.msg_index) {
++	case PARAM_SET_FMAX_CAP:
++	case PARAM_SET_PWR_CAP:
++	case PARAM_SET_GFX_MODE:
++		return send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_SET_PARAMETER);
++	case PARAM_GET_FMAX_CAP:
++	case PARAM_GET_PWR_CAP:
++	case PARAM_GET_CURR_TEMP:
++	case PARAM_GET_FMAX_MAX:
++	case PARAM_GET_FMAX_MIN:
++	case PARAM_GET_SOC_PWR_MAX:
++	case PARAM_GET_SOC_PWR_MIN:
++	case PARAM_GET_SOC_PWR_CUR:
++	case PARAM_GET_GFX_MODE:
++		return send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_GET_PARAMETER);
++	}
++
++	return -EINVAL;
++}
++
+ void dbc_dev_destroy(struct psp_device *psp)
+ {
+ 	struct psp_dbc_device *dbc_dev = psp->dbc_data;
+@@ -135,6 +159,23 @@ static long dbc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 			goto unlock;
+ 		}
+ 		break;
++	case DBCIOCPARAM:
++		if (copy_from_user(&dbc_dev->mbox->dbc_param.user, argp,
++				   sizeof(struct dbc_user_param))) {
++			ret = -EFAULT;
++			goto unlock;
++		}
++
++		ret = send_dbc_parameter(dbc_dev);
++		if (ret)
++			goto unlock;
++
++		if (copy_to_user(argp, &dbc_dev->mbox->dbc_param.user,
++				 sizeof(struct dbc_user_param)))  {
++			ret = -EFAULT;
++			goto unlock;
++		}
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 
+diff --git a/drivers/crypto/ccp/dbc.h b/drivers/crypto/ccp/dbc.h
+index 156435100076..e963099ca38e 100644
+--- a/drivers/crypto/ccp/dbc.h
++++ b/drivers/crypto/ccp/dbc.h
+@@ -38,10 +38,16 @@ struct dbc_set_uid {
+ 	struct dbc_user_setuid		user;
+ } __packed;
+ 
++struct dbc_param {
++	struct psp_req_buffer_hdr	header;
++	struct dbc_user_param		user;
++} __packed;
++
+ union dbc_buffer {
+ 	struct psp_request		req;
+ 	struct dbc_nonce		dbc_nonce;
+ 	struct dbc_set_uid		dbc_set_uid;
++	struct dbc_param		dbc_param;
+ };
+ 
+ void dbc_dev_destroy(struct psp_device *psp);
+diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
+index 18b9e0f0cb03..c1dc87fc536b 100644
+--- a/include/linux/psp-platform-access.h
++++ b/include/linux/psp-platform-access.h
+@@ -10,6 +10,8 @@ enum psp_platform_access_msg {
+ 	PSP_I2C_REQ_BUS_CMD = 0x64,
+ 	PSP_DYNAMIC_BOOST_GET_NONCE,
+ 	PSP_DYNAMIC_BOOST_SET_UID,
++	PSP_DYNAMIC_BOOST_GET_PARAMETER,
++	PSP_DYNAMIC_BOOST_SET_PARAMETER,
+ };
+ 
+ struct psp_req_buffer_hdr {
+diff --git a/include/uapi/linux/psp-dbc.h b/include/uapi/linux/psp-dbc.h
+index 7443c78ede19..b3845a9ff5fd 100644
+--- a/include/uapi/linux/psp-dbc.h
++++ b/include/uapi/linux/psp-dbc.h
+@@ -45,6 +45,23 @@ struct dbc_user_setuid {
+ 	__u8	signature[DBC_SIG_SIZE];
+ } __packed;
+ 
++/**
++ * struct dbc_user_param - Parameter exchange structure (input/output).
++ * @msg_index: Message indicating what parameter to set or get (input)
++ * @param:     4 byte parameter, units are message specific. (input/output)
++ * @signature: 32 byte signature.
++ *             - When sending a message this is to be created by software
++ *               using a previous nonce (input)
++ *             - For interpreting results, this signature is updated by the
++ *               PSP to allow software to validate the authenticity of the
++ *               results.
++ */
++struct dbc_user_param {
++	__u32	msg_index;
++	__u32	param;
++	__u8	signature[DBC_SIG_SIZE];
++} __packed;
++
+ /**
+  * Dynamic Boost Control (DBC) IOC
+  *
+@@ -84,4 +101,47 @@ struct dbc_user_setuid {
+  */
+ #define DBCIOCUID	_IOW(DBC_IOC_TYPE, 0x2, struct dbc_user_setuid)
+ 
++/**
++ * DBCIOCPARAM - Set or get a parameter from the PSP.
++ *               This request will only work after DBCIOCUID has successfully
++ *               set the UID of the calling process.
++ *               Whether the parameter is set or get is controlled by the
++ *               message ID in the request.
++ *               This command must be sent using a 32 byte signature built
++ *               using the nonce fetched from DBCIOCNONCE.
++ *               When the command succeeds, the 32 byte signature will be
++ *               updated by the PSP for software to authenticate the results.
++ */
++#define DBCIOCPARAM	_IOWR(DBC_IOC_TYPE, 0x3, struct dbc_user_param)
++
++/**
++ * enum dbc_cmd_msg - Messages utilized by DBCIOCPARAM
++ * @PARAM_GET_FMAX_CAP:		Get frequency cap (MHz)
++ * @PARAM_SET_FMAX_CAP:		Set frequency cap (MHz)
++ * @PARAM_GET_PWR_CAP:		Get socket power cap (mW)
++ * @PARAM_SET_PWR_CAP:		Set socket power cap (mW)
++ * @PARAM_GET_GFX_MODE:		Get graphics mode (0/1)
++ * @PARAM_SET_GFX_MODE:		Set graphics mode (0/1)
++ * @PARAM_GET_CURR_TEMP:	Get current temperature (degrees C)
++ * @PARAM_GET_FMAX_MAX:		Get maximum allowed value for frequency (MHz)
++ * @PARAM_GET_FMAX_MIN:		Get minimum allowed value for frequency (MHz)
++ * @PARAM_GET_SOC_PWR_MAX:	Get maximum allowed value for SoC power (mw)
++ * @PARAM_GET_SOC_PWR_MIN:	Get minimum allowed value for SoC power (mw)
++ * @PARAM_GET_SOC_PWR_CUR:	Get current value for SoC Power (mW)
++ */
++enum dbc_cmd_msg {
++	PARAM_GET_FMAX_CAP	= 0x3,
++	PARAM_SET_FMAX_CAP	= 0x4,
++	PARAM_GET_PWR_CAP	= 0x5,
++	PARAM_SET_PWR_CAP	= 0x6,
++	PARAM_GET_GFX_MODE	= 0x7,
++	PARAM_SET_GFX_MODE	= 0x8,
++	PARAM_GET_CURR_TEMP	= 0x9,
++	PARAM_GET_FMAX_MAX	= 0xA,
++	PARAM_GET_FMAX_MIN	= 0xB,
++	PARAM_GET_SOC_PWR_MAX	= 0xC,
++	PARAM_GET_SOC_PWR_MIN	= 0xD,
++	PARAM_GET_SOC_PWR_CUR	= 0xE,
++};
++
+ #endif /* __PSP_DBC_USER_H__ */
 -- 
 2.34.1
 
