@@ -2,172 +2,158 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97525C7EE26
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 19:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D018AC7EE26
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 21:48:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjESTTY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 15:19:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34678 "EHLO
+        id S229653AbjESVse (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 17:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbjESTTX (ORCPT
+        with ESMTP id S229557AbjESVsd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 15:19:23 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2044.outbound.protection.outlook.com [40.107.93.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D5DED;
-        Fri, 19 May 2023 12:19:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mz2y/C3KEpr+pprEoDjs+e03OBLrlD3zu1173DotaXP1hpPxT6HDgpmZAcBsabVWJkFZuKsJF6mIwtxRYWz139hghCjTVP8lM8wiJk8knHIoUMxAKkDr8iSYRzfjr8tdUcpzOhw+MS3ylJ7guN/vaPCIOEtXMRAga/NAgsq4lAwH7HCrdTA14M4eFeF2V58CvlTZ/eewo4UrlQtL2gnZKu3QGfTQU/n9jQM3EqEO5iozs+yWcaao70wxnm925KObRJrnjGuXdrffBlXq9d0LbyTlAZ7qBi5At0z/eoksU6JnA/Q71TkTUC1hXldfFU08HS7AcwHQUVg4boxmi4PF3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k4OrkYlFkJ6O7FcGH9EZKiNZlB6Ae47orp5csS8Ee+Q=;
- b=iLJfde2e9aFq5oznYuLuBlS4UZNUIzqROJEQNEpolcW7wEvlSZXFa0A1yF1qPm4iiSFOO9A+fkJb7hkkrMnKfTYQ42DXH3YBZbS601aBb8tBLHJNnIdMKce6ThKR8sMjtQWst65mz0TAl2ojUJOYcatFank03QlHRJjqW/bgmOdgvoUyzKsIQsc0+q7yXWfIDZgPwdiN5t9PnZ/SseHyaSSmBazEXwKll9dasVh3Fm3oTi1Q9kBAgFYnqoZ42gtuhtG3YJa9STdA9SdT/WuVRvJf5VeJXDR6xKMf0VNWM6HmFzGZtOvERWDX+rT3k+ANzOsXjXfKw2/WkDFgvlFf/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k4OrkYlFkJ6O7FcGH9EZKiNZlB6Ae47orp5csS8Ee+Q=;
- b=AIRyIaWlMTJ89WKIJF7NoSIGS/CpVm+v5leTImyuO7jN5+6841RPUUBl15DKi4c5r74wzLiQeGO+D9C2/hwRj7PiWHSiSXZY7z1RDGIpVdcJttT6wToXkkXSCIWWdGmVmElytNr/pcH9zPZg499ZFTmdyw4S/zFAvMbs5JlstQg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
- by MW6PR12MB7069.namprd12.prod.outlook.com (2603:10b6:303:238::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21; Fri, 19 May
- 2023 19:19:20 +0000
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::38dc:9789:e0:aef6]) by BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::38dc:9789:e0:aef6%5]) with mapi id 15.20.6387.030; Fri, 19 May 2023
- 19:19:20 +0000
-Date:   Fri, 19 May 2023 14:19:10 -0500
-From:   John Allen <john.allen@amd.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH 3/3] crypto: ccp - Add support for PCI device 0x156E
-Message-ID: <ZGfLrtmVOcCYiWFW@johallen-workstation>
-References: <20230519032414.94247-1-mario.limonciello@amd.com>
- <20230519032414.94247-4-mario.limonciello@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230519032414.94247-4-mario.limonciello@amd.com>
-X-ClientProxiedBy: YQZPR01CA0130.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:87::15) To BL1PR12MB5995.namprd12.prod.outlook.com
- (2603:10b6:208:39b::20)
+        Fri, 19 May 2023 17:48:33 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95104110
+        for <linux-crypto@vger.kernel.org>; Fri, 19 May 2023 14:48:32 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-64d2f99c8c3so979544b3a.0
+        for <linux-crypto@vger.kernel.org>; Fri, 19 May 2023 14:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1684532912; x=1687124912;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zau2qsQhDV1bV+FMZBbLle6RPe9ivNDcr7IgnOjplHE=;
+        b=IMAwsr9+5YpQkpjpZW1wfxFE419+51fvECkQ//gzJPWu+Ym5syz5uYmop1IrWnHqdX
+         OXTkDjceuLKn/gxeZFArNWe0DqX2O3IQuJ6gzbhP2S6HDfdPUmTtIDyUxe7tAjgYlsf3
+         iEW0ApPGQekcmHedcd1pzdR1DgEtlvos/27mjFIM/vvPDUbWY98OPGu/0qEoT15Kf5x5
+         mTCqQROwCJKhPauYPn80TvWK7lXJD8dW7B1XXP17ou0xUiBwwL42H/qwdZfNicRB/cow
+         ETp4P7vhaS4JQDesCY54+cd9h5mkgno+3+rKrAyIJtJQDYrC7284UNacABL9c0PXGdeD
+         ieKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684532912; x=1687124912;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Zau2qsQhDV1bV+FMZBbLle6RPe9ivNDcr7IgnOjplHE=;
+        b=IVr+KAcBUOOCKNVM1XASuYO+h9f7k7yocmXfuaO6ovpCIfyqiqswbQ9SgPoGH4VbtL
+         zlmWXf2DWWN1Y4P17Vu6E2DLse0Iju9jWy/oLYPZVQa4l/zJpSP2oU7hYBErl4Cl7Jwm
+         8hQktvqomZNpaYUldr06Ok9KZrh1EV7/c0rqE1Cef0Wl4xzvdVCvrRn38OWPT4TFibzn
+         ud/mSgmZXL2DrbM6HH+2ISsya0Pq4h0JV8g0W3Si3Fg9weuufI7Y0oLZKD/assd1fcox
+         wsTnCmkJp0wWcGvDOEc7kt4dbI6H1DeO3In4ffzmYSEhzEusUEnczJayAg2Teoah0Lo4
+         tNUw==
+X-Gm-Message-State: AC+VfDzXUSVULZhhtzRXh6ytk/gYik/O4d8F5QMRzM08sdzeLvWszJtJ
+        HrpLU2H0a4YAguQwAD8GYbbrnA==
+X-Google-Smtp-Source: ACHHUZ4h5q/mZRzPyIqULeKtyzgLrq5KYlThiD42UFvTU6gxmHsk/Wh1DL4/bZlqVwqR2vaYQWZyDQ==
+X-Received: by 2002:a05:6a00:2d90:b0:64d:2487:5b3c with SMTP id fb16-20020a056a002d9000b0064d24875b3cmr4608384pfb.29.1684532911929;
+        Fri, 19 May 2023 14:48:31 -0700 (PDT)
+Received: from localhost.localdomain ([2401:4900:1c60:d309:883d:817e:8e91:be39])
+        by smtp.gmail.com with ESMTPSA id n14-20020aa7904e000000b006470a6ef529sm144891pfo.88.2023.05.19.14.48.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 May 2023 14:48:31 -0700 (PDT)
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
+        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
+        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
+        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
+        stephan@gerhold.net
+Subject: [PATCH v7 00/11] arm64: qcom: Enable Crypto Engine for a few Qualcomm SoCs
+Date:   Sat, 20 May 2023 03:18:02 +0530
+Message-Id: <20230519214813.2593271-1-bhupesh.sharma@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|MW6PR12MB7069:EE_
-X-MS-Office365-Filtering-Correlation-Id: fdf14d23-f2b4-4d36-d340-08db589df21d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YRw++EcJnF6wzWaizMXBuqZgFfqprivaSlHAgb14vUA4KmWOVBNj5v/RO0WV3t9eLZzCP6CnTSIzOisiodKjzE99st7fP1prJj87PuDLLbiUqH1j6EWwSYLqb8b2QaSKU+0llUGhetgtzP5WiqiM/Yx5Ri8ctjgeKgVsDZ3sDgie8A78Z7hYMCj8jSVhnWsM/fCHhOv0VTm5+HC/K8xslp0DS74O6c4dqmjcehxmPu/i+TAhs7mqMLtRi3gPzbL4h6o0A0xDUZxzECrphGLdVSN40YPu4mz27R4i66f7lgplGeK+lEfDiTGYbirKFbdvS7kw/Ltk+kg4YrzSV4Lzs87Vmul2GbPHaNcBHoIUNMof+e2bCZ5Ju4Aj47UxUIRDEHflbVI5d0Jbw1OqTKFd0/2SwkV6vxXaHkXcMVxg4ImRA0o7MkYdbnpmX0OBfQWw+nrPrknu/nr7nTDs5rMfkXmS/coLhGidfn1kmUs7SYYc/mvtinY/hTm2b8aunBEclB5D+9ZtqS0W45ctQ7lw3ELAZwtfT9VZMM3It8jrDLXe8WeaiiAv0uZFKPKkclB9
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(39860400002)(396003)(136003)(376002)(346002)(366004)(451199021)(66946007)(66476007)(66556008)(6916009)(4326008)(8676002)(8936002)(316002)(54906003)(478600001)(41300700001)(6666004)(86362001)(2906002)(9686003)(6506007)(26005)(6512007)(6486002)(44832011)(33716001)(38100700002)(186003)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Rxv8GyDZBxzis5rONnwt9bwXXtp8lFuNKGb00UqcQbF7Qvb54rFiet8DeLbS?=
- =?us-ascii?Q?+F2QBPQrCUyxcViV6AsNdGBCMpkVHke3rv/F7P2RQ26kCaTXnhBlAB/z/aSz?=
- =?us-ascii?Q?0glHNgg8No4rTOk3SmN2IsfB/9Z/GVFcF9m3Q56G8iKKBF0ZUN5VER9bh+vP?=
- =?us-ascii?Q?Ly4UEHh4DBf49+zOFhB9VfsnOFGDDNqTV1IDevU7HiJUvSIoP1a+Xt4t8/vS?=
- =?us-ascii?Q?waLDY7IBJT2w9uGBYPDwFkBUAhlA9myNzf7nPYXGrnrKVzgZXEbAMpFg5Aor?=
- =?us-ascii?Q?nKICPoOK2SuErb9AEvUL4rN2HhqFGY7U3bbmePwpX6lXEv7MZshnDoAMN0kE?=
- =?us-ascii?Q?asfQZZB9tpGb4MEG8vqxS1tUCiHZvujO1nScZUWFXWei1Ptf2prfU+WhUkYC?=
- =?us-ascii?Q?g0YE6OrQ4QIG2dqLljTq13803Yqx3564PV9zaj4VIEJte96WZ660B+mwaRE3?=
- =?us-ascii?Q?V0zFpMObZ1amXKxq1tKhiHAnFmjih56EFrGEVeruvnu9CYRmAeBdmZAiMC8b?=
- =?us-ascii?Q?xFlUMSBzdsBENBslmxc99zx4B71k7jCRczchCZopjH29d7QDqXOP7DZ/MKkl?=
- =?us-ascii?Q?m35Sirp5xPEVxXAyAllgFotFrpo+2Y9eS0CVe6JaBix0tu/H8NqwW0AC4HHj?=
- =?us-ascii?Q?98SLGErV89UQhSLLxQwbsx+TvA9jS6Yx1nNcBPTYDFHxWga1El+5lKqdEpCm?=
- =?us-ascii?Q?6vZSoMDB9nOG+UdwW8SinijT7u62PK+3CmiwpdNj66s/tNR33JE1pdC1/jjN?=
- =?us-ascii?Q?+cRypHoA/TDlG1GpQTzwdZchUCIWOSZgWq0YKcuxOT529NZhpnDspRAAt3PZ?=
- =?us-ascii?Q?0MsigAIXk3Q0fAIGRgLvfrorbaDk+uQW4dDKy8Vc6I/ncUY5rVfbRn+0i0Wx?=
- =?us-ascii?Q?iTVwbIyk8LSFOZzpLNZ1frLW8cjYYVzB+Pa1N7uw3zuddU1hNKswR4jK+gp2?=
- =?us-ascii?Q?9tlQxRuCgQ1c99Acw10xjSypjNBjGEAZhgS0ROvtQ6ubuvPopyP1kuNpTZyJ?=
- =?us-ascii?Q?cqpYUc966zBxEY/gnB6PiM6aQQzdeuJuYxrM2hgtFiEO3VnynEkzANpFXdYB?=
- =?us-ascii?Q?qyx+bEv63nnMbSBIPuWwti1ERJ26d5g6Q+o38UUgmqisjqCjA04BDwJm1DZ2?=
- =?us-ascii?Q?g6A3DzFZBetR+bxi57VilLyMKk3AwQ4FNGejpIZc+cGKEhXRCCnfeG1r6YKl?=
- =?us-ascii?Q?3g/CqETQgAimDUfDqFWGbYeE9t6JpfoOZ66tU1A+7q2OWPq8aioslPB8ZCBm?=
- =?us-ascii?Q?KN2X9ceY/daaXyMCbjRDXJslhsGGWweMR4XYv9Dgi2tJq9kHXDNg9riGd5Se?=
- =?us-ascii?Q?g0AqpA2A/XN7NIi4e/RvIc5ps6kuV+xnlJD3BAj06zwKd3clsaA6bC38AIEM?=
- =?us-ascii?Q?VoAKcrxCHDs4TtB3gtsQZdti7vMS20vDZjmUHTmU2/Yy4FE8mpSXPPcJeKgU?=
- =?us-ascii?Q?iUO9rSNEeeGBhPxM0m6YLxf7meYLkiSpbUMUCHRG1i2YLNEXv2qd+wF8LLU0?=
- =?us-ascii?Q?srGIgFcJXRUk7JeNB9WKppiacETqXz/uUMlFplkoJ8R7jV0iznJ2Y3CYAHjZ?=
- =?us-ascii?Q?xcPaX45RcydSRzoBa7+DKcOsZZ31HjxycHTeAVaE?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fdf14d23-f2b4-4d36-d340-08db589df21d
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 19:19:20.0092
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2+tjXWwK8M3XCOQLEVeGSvR8souhi8WT5LndWMpp7Mvvb3Gv/nJJs9WJvIia7/CzQrMRJ3PLnmpxZ2zwprXBlg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB7069
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 18, 2023 at 10:24:14PM -0500, Mario Limonciello wrote:
-> From: John Allen <john.allen@amd.com>
-> 
-> Add a new CCP/PSP PCI device ID and new PSP register offsets.
-> 
-> Signed-off-by: John Allen <john.allen@amd.com>
+Changes since v6:
+-----------------
+- v6 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230405072836.1690248-1-bhupesh.sharma@linaro.org/
+- Collected Acks, R-Bs and Tested-by for various patches.
+- Addressed Konrad's comment about iommu sids for sm8150 and sm8250
+  crypto node entries.
+- Addressed Konrad's and Stephan's comments about adding RPM clock for
+  crypto blocks on qcm2290 and sm6115.
 
-Hi Herbert,
+Changes since v5:
+-----------------
+- v5 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230402100509.1154220-1-bhupesh.sharma@linaro.org/
+- Collected Ack from Rob for [PATCH 01/11].
+- Addressed Georgi's comment about interconnect cells in [PATCH 10/11].
 
-Please hold off on applying this patch for now. I need to do a little
-bit more testing.
+Changes since v4:
+-----------------
+- v4 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230331164323.729093-1-bhupesh.sharma@linaro.org/
+- Collected R-Bs from Konrad for a couple of patches sent in v4.
+- Fixed incorrect email IDs for a couple of patches sent in v3, which I used for
+  some patches created on a different work machine.
+- No functional changes since v3.
 
-Thanks,
-John
+Changes since v3:
+-----------------
+- v3 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230328092815.292665-1-bhupesh.sharma@linaro.org/
+- Collected Acks from Krzysztof for a couple of patches sent in v3.
+- Fixed review comments from Krzysztof regarding DMA binding document
+  and also added a couple of new patches which are required to fix the
+  'dtbs_check' errors highlighted after this fix.
 
-> ---
->  drivers/crypto/ccp/sp-pci.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-> index d0d70af0c4c0..b603ad9b8341 100644
-> --- a/drivers/crypto/ccp/sp-pci.c
-> +++ b/drivers/crypto/ccp/sp-pci.c
-> @@ -420,6 +420,14 @@ static const struct psp_vdata pspv5 = {
->  	.intsts_reg		= 0x10514,	/* P2CMSG_INTSTS */
->  };
->  
-> +static const struct psp_vdata pspv6 = {
-> +	.sev                    = &sevv2,
-> +	.tee                    = &teev2,
-> +	.feature_reg            = 0x109fc,	/* C2PMSG_63 */
-> +	.inten_reg              = 0x10510,	/* P2CMSG_INTEN */
-> +	.intsts_reg             = 0x10514,	/* P2CMSG_INTSTS */
-> +};
-> +
->  #endif
->  
->  static const struct sp_dev_vdata dev_vdata[] = {
-> @@ -478,6 +486,12 @@ static const struct sp_dev_vdata dev_vdata[] = {
->  		.bar = 2,
->  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
->  		.psp_vdata = &pspv5,
-> +#endif
-> +	},
-> +	{	/* 8 */
-> +		.bar = 2,
-> +#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-> +		.psp_vdata = &pspv6,
->  #endif
->  	},
->  };
-> @@ -491,6 +505,7 @@ static const struct pci_device_id sp_pci_table[] = {
->  	{ PCI_VDEVICE(AMD, 0x15C7), (kernel_ulong_t)&dev_vdata[6] },
->  	{ PCI_VDEVICE(AMD, 0x1649), (kernel_ulong_t)&dev_vdata[6] },
->  	{ PCI_VDEVICE(AMD, 0x17E0), (kernel_ulong_t)&dev_vdata[7] },
-> +	{ PCI_VDEVICE(AMD, 0x156E), (kernel_ulong_t)&dev_vdata[8] },
->  	/* Last entry must be zero */
->  	{ 0, }
->  };
-> -- 
-> 2.34.1
-> 
+Changes since v2:
+-----------------
+- v2 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230322114519.3412469-1-bhupesh.sharma@linaro.org/
+- No functional change since v2. As the sdm845 patch from v1 was accepted in linux-next,
+  dropped it from this version.
+
+Changes since v1:
+-----------------
+- v1 can be viewed here: https://lore.kernel.org/linux-arm-msm/20230321190118.3327360-1-bhupesh.sharma@linaro.org/
+- Folded the BAM DMA dt-binding change.
+  (sent earlier as: https://lore.kernel.org/linux-arm-msm/20230321184811.3325725-1-bhupesh.sharma@linaro.org/)
+- Folded the QCE dt-binding change.
+  (sent earlier as: https://lore.kernel.org/linux-arm-msm/20230320073816.3012198-1-bhupesh.sharma@linaro.org/)
+- Folded Neil's SM8450 dts patch in this series.
+- Addressed review comments from Rob, Stephan and Konrad.
+- Collected Konrad's R-B for [PATCH 5/9].
+
+This patchset enables Crypto Engine support for Qualcomm SoCs like
+SM6115, SM8150, SM8250, SM8350 and SM8450.
+
+Note that:
+- SM8250 crypto engine patch utilizes the work already done by myself and
+  Vladimir.
+- SM8350 crypto engine patch utilizes the work already done by Robert.
+- SM8450 crypto engine patch utilizes the work already done by Neil.
+
+Also this patchset is rebased on linux-next/master.
+
+Bhupesh Sharma (10):
+  dt-bindings: dma: Add support for SM6115 and QCM2290 SoCs
+  dt-bindings: dma: Increase iommu maxItems for BAM DMA
+  arm64: dts: qcom: sdm8550: Fix the BAM DMA engine compatible string
+  arm64: dts: qcom: sdm845: Fix the slimbam DMA engine compatible string
+  dt-bindings: qcom-qce: Fix compatible combinations for SM8150 and
+    IPQ4019 SoCs
+  dt-bindings: qcom-qce: Add compatibles for SM6115 and QCM2290
+  arm64: dts: qcom: sm6115: Add Crypto Engine support
+  arm64: dts: qcom: sm8150: Add Crypto Engine support
+  arm64: dts: qcom: sm8250: Add Crypto Engine support
+  arm64: dts: qcom: sm8350: Add Crypto Engine support
+
+Neil Armstrong (1):
+  arm64: dts: qcom: sm8450: add crypto nodes
+
+ .../devicetree/bindings/crypto/qcom-qce.yaml  | 50 +++++++++++++++----
+ .../devicetree/bindings/dma/qcom,bam-dma.yaml | 22 +++++---
+ arch/arm64/boot/dts/qcom/sdm845.dtsi          |  2 +-
+ arch/arm64/boot/dts/qcom/sm6115.dtsi          | 25 ++++++++++
+ arch/arm64/boot/dts/qcom/sm8150.dtsi          | 30 +++++++++++
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          | 32 ++++++++++++
+ arch/arm64/boot/dts/qcom/sm8350.dtsi          | 22 ++++++++
+ arch/arm64/boot/dts/qcom/sm8450.dtsi          | 28 +++++++++++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |  2 +-
+ 9 files changed, 194 insertions(+), 19 deletions(-)
+
+-- 
+2.38.1
+
