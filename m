@@ -2,91 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E91D7C7EE2A
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 May 2023 14:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEFC0C77B73
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 00:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231232AbjEROnY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 May 2023 10:43:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60034 "EHLO
+        id S229616AbjESAms (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 18 May 2023 20:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231675AbjEROnX (ORCPT
+        with ESMTP id S229557AbjESAmr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2023 10:43:23 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E682AF7
-        for <linux-crypto@vger.kernel.org>; Thu, 18 May 2023 07:43:20 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9659c5b14d8so330464366b.3
-        for <linux-crypto@vger.kernel.org>; Thu, 18 May 2023 07:43:20 -0700 (PDT)
+        Thu, 18 May 2023 20:42:47 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204EABC;
+        Thu, 18 May 2023 17:42:47 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1ae4c5e12edso21359645ad.3;
+        Thu, 18 May 2023 17:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684420999; x=1687012999;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c5mg0bYNmMZvR4XH2KepYJHCkc1QT01FXeVw0nsFkdI=;
-        b=OE2AED9qmZeTEF4yTzRED57SFPtPzoTevCrBoA2Q6K6gvRvkQLMs6JKlvgW9jETwAT
-         sp6LZGN/xQgYPx1elInzgtAzdG3z1OgVoXHWSSNpCjuCdDfXNhiIlxI8jFzKwreq+KpV
-         t6vYmcjPbdFqMFTTLhtX607igdRWV+UuwJtM/wr4dgzRLg/qiMlIl1Kx51TJzB7pYgAZ
-         w8R0wayIPAPMVBatVENiYy3xTDjOGl2vTYWhqnLXez6YZhMYHZSJnQ/RBJ5IrvEVWH1A
-         Eavd23Glvi7/xu8ZnLh7ObYJnhLaX02jGOwI4obyur9GDUNATueJv8JPtxU/pQQMBtJ5
-         Q0yg==
+        d=gmail.com; s=20221208; t=1684456966; x=1687048966;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2YJeCVahMakSFFIeHkE0L5vaAYWzeS9qst+vBo++bi0=;
+        b=FhVbqUWSfKoK65eksBcMm+T/anGwzJ7feZxDU9sQLJuv5vpIWmfyiQXDcuurFsNM/Z
+         tXNZIdpE0ugAni5joL8Y7T7mQ1R1AsMH/ro19c3opgXo/WWdLFunhUgeC0VVh7ZgxeTH
+         vbVwkoIvoVDjE1G+OV7XcxQ9lGNbB8Kovpny75gaQMi0vQqwpV+rfLP76tRJwDWTVJZQ
+         oJZwadsywzFEpRnAENSS5y955l7Vve6MI6Igo85hFz3ZjRIFgbPP++oy125CiMpBVqdr
+         f3QQkqRgwuzHoJKYxSKUTSZfpaKqD7OgDNRJQK4m+tdu9RPRF9KYVIWlRwgzTuFyC+bJ
+         CrNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684420999; x=1687012999;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c5mg0bYNmMZvR4XH2KepYJHCkc1QT01FXeVw0nsFkdI=;
-        b=STMvT85QGUz6Go7qi2/eASZWrczTfDETt1s1YkfmzZxHkk8IUVesfeSdYToXT2Kp+Z
-         a9ZlzBXqQ/APLSi9tRR6sBFDsfdAbzQsEPUXVRB64BXL7eK/6oF4dJQDM2ZhNZYMYh5O
-         gtAjHT/QgVVXgLSYfKMCnpB+JEMeCHQ80lFg+rzIi3/8RwjgrNgSftMJv+GiiA/loe31
-         QefxQOpmLutj3YtOpOClHtx8IDC2PI1FXRo6Hg4oqW8aQD68oCnp30EfuEWmY0LiIEaK
-         o7nbblGhhyrqXKoAUaIdGETnesiiXzRmhXgDkG50mUnch9JhhLoH/LOdvbHAz1mGGz9K
-         SFgg==
-X-Gm-Message-State: AC+VfDwOX8ejHozivDBNyoO8XS159mHBvLkmjIR+NvzN6vcUItV3aoUa
-        RB7pOa/d2HOCKd+728Izw6kW4g==
-X-Google-Smtp-Source: ACHHUZ45LkdJN1RAMofvHRAMOL/5aJwIIPt/2VGC/d6xWczG4Bg4nJDUcgLltbg0DwlPo+UOxleaXg==
-X-Received: by 2002:a17:906:d542:b0:96b:e92:4feb with SMTP id cr2-20020a170906d54200b0096b0e924febmr15567096ejc.60.1684420999310;
-        Thu, 18 May 2023 07:43:19 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:7e24:6d1b:6bf:4249? ([2a02:810d:15c0:828:7e24:6d1b:6bf:4249])
-        by smtp.gmail.com with ESMTPSA id zm10-20020a170906994a00b0094a82a236cbsm1031416ejb.129.2023.05.18.07.43.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 May 2023 07:43:18 -0700 (PDT)
-Message-ID: <1fe6d202-f180-b76f-bf8e-98280355ae5a@linaro.org>
-Date:   Thu, 18 May 2023 16:43:17 +0200
+        d=1e100.net; s=20221208; t=1684456966; x=1687048966;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2YJeCVahMakSFFIeHkE0L5vaAYWzeS9qst+vBo++bi0=;
+        b=GkP5Q9owsj7p5wmEQ8Fpr0j8HjQOaXsSo3cU7IOZ6yr7nS/QXJIeKMvi/n1sLFrx5v
+         /2mOqsqknVd1+EXyRasc4SeODTcI/7i6W1r0eq37MczpTrifEV1IK4bSSDei3QSUxd1Q
+         4JV3RR7W3Czjn9MQwqiwU1no84i9I+3+7+iUFlVKIQS+1ZiwIYaNpfVPhu0CGT4n7ph+
+         ozRD9IfYqSTZwaj1qxVcjjotZvuzT1w+t6ZTjMw1efvpYwJ8T/+DOogzCwk2JJXJImj3
+         Cwi5w5HNuk1CfU9e58HFQ6hfWyWGOsEC/MroHAPh0w92oP8m11g9mOKkVDith2R0V7xN
+         bvVw==
+X-Gm-Message-State: AC+VfDzzoSQ92NGQTdn/eXmnk8ySUz9aV2zoDYg2vhemBqzmubVjznJ6
+        YSNrnV63uI/n9OasrlV8cuc=
+X-Google-Smtp-Source: ACHHUZ7uGgeA0JSUHZOioCuEkISbTecVbqi5XMFhJ+uP4uwWKkKBFlNJvWeibygfrTk2BCH5gq2FcA==
+X-Received: by 2002:a17:902:ced0:b0:1a9:a478:66c5 with SMTP id d16-20020a170902ced000b001a9a47866c5mr880974plg.63.1684456966374;
+        Thu, 18 May 2023 17:42:46 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b0019ef86c2574sm2033106plh.270.2023.05.18.17.42.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 May 2023 17:42:45 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 18 May 2023 14:42:44 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     jiangshanlai@gmail.com
+Cc:     linux-kernel@vger.kernel.org, kernel-team@meta.com,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shijith Thotton <sthotton@marvell.com>,
+        Vladis Dronov <vdronov@redhat.com>,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Alexander Lobakin <alobakin@pm.me>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        ye xingchen <ye.xingchen@zte.com.cn>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 11/13] crypto: octeontx2: Use alloc_ordered_workqueue()
+ to create ordered workqueues
+Message-ID: <ZGbGBCA6NGCcSNgC@slm.duckdns.org>
+References: <20230509015032.3768622-1-tj@kernel.org>
+ <20230509015032.3768622-12-tj@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH V3 4/4] arm64: dts: qcom: ipq9574: Enable crypto nodes
-Content-Language: en-US
-To:     Anusha Rao <quic_anusha@quicinc.com>, agross@kernel.org,
-        andersson@kernel.org, konrad.dybcio@linaro.org,
-        thara.gopinath@gmail.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        mturquette@baylibre.com, sboyd@kernel.org, p.zabel@pengutronix.de,
-        bhupesh.sharma@linaro.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
-Cc:     quic_srichara@quicinc.com, quic_gokulsri@quicinc.com,
-        quic_sjaganat@quicinc.com, quic_kathirav@quicinc.com,
-        quic_arajkuma@quicinc.com, quic_poovendh@quicinc.com
-References: <20230518141105.24741-1-quic_anusha@quicinc.com>
- <20230518141105.24741-5-quic_anusha@quicinc.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230518141105.24741-5-quic_anusha@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230509015032.3768622-12-tj@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 18/05/2023 16:11, Anusha Rao wrote:
-> Enable crypto support for ipq9574.
-> 
-> Signed-off-by: Anusha Rao <quic_anusha@quicinc.com>
-> ---
+Applied to wq/for-6.5-cleanup-ordered.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Thanks.
 
-Best regards,
-Krzysztof
-
+-- 
+tejun
