@@ -2,129 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5945EC77B75
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 21:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58DA2C7EE23
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 22:33:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231883AbjESVuk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 17:50:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33400 "EHLO
+        id S229616AbjESWdp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 18:33:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231951AbjESVuH (ORCPT
+        with ESMTP id S229557AbjESWdp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 17:50:07 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30899170F
-        for <linux-crypto@vger.kernel.org>; Fri, 19 May 2023 14:49:37 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64d3fbb8c1cso770045b3a.3
-        for <linux-crypto@vger.kernel.org>; Fri, 19 May 2023 14:49:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1684532975; x=1687124975;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZX3REAuTIsVZ6DzzbZjgxi6x6RxwtquozCIGLLCHmIk=;
-        b=b1RKkDvksKLGmpT/EePmAxBCny09Q8ABI2ZOS/AahJ95WTR/XKUx1Xi0Lwupi84AgN
-         q78qnHcZbVvTREDAWZHIlQKI3/17yFz7MfSnN25tKUTNdvjl7zTbtMPDr7OpB2smOM4x
-         64ftMOc4OHycDjXL7Qa7WBBnI+0II0yCBr+RggyFd8kDWGSKv+Es245t+2CPwlsDJpw/
-         ImaGahLSj5iVkZHHNEIz1q88iXVBVVpPIgJ84bVrTg1ncjUEQB0pVBn0NuUKtQUF2Xw0
-         G7kofeFvOjbG13fZVqTVzZ6C3pNvNR3q/YZS4B+xizw27dY/QM7CgrMtkfYLZU8SpcxZ
-         B1RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684532975; x=1687124975;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZX3REAuTIsVZ6DzzbZjgxi6x6RxwtquozCIGLLCHmIk=;
-        b=dBIKjsKqwSzA5IFegfcXzSCYELSOMIPvZDc8ZS336z14umEsJB28tALBrYEUz3N92U
-         XV3Zi3Brdp06sNONBgnKdtbseusNeYNaZG2RBAy/vozRtLyC1PeOKzr6DnTeBsCiuuXy
-         iH5DIhXoCQPlCiGUuW93kuoXccJP3l3AgxqD1znjeUy+arnAHNsX3L1yn9VDevZgDgTO
-         g9bNI/Ie5FmVNv04Sne0zWQeu7R9pY9JexSelsY2OeiNdAsNGz4UbJkj8N/rjc7bzm3R
-         HOfYDjiSkQr4+OCSE752lzyzyV1yShAlHxEMMQV1+yyxFj3SmzsoV54X372OKydmQLbF
-         711A==
-X-Gm-Message-State: AC+VfDwnQToHVCB88JinRaJJCOBBfonWtnuQwZ/35pS9AarYN+QYa5pu
-        N4YPxesXIIjMdfWPVOkzCWL0iw==
-X-Google-Smtp-Source: ACHHUZ5XFBBazjQnC9SapcON49nM7yp9PFi6hL2/RvVNtYkoWpfPuJC/BWW0x5ixKhqy/Vsc8b2ADg==
-X-Received: by 2002:a05:6a00:2405:b0:640:f313:efba with SMTP id z5-20020a056a00240500b00640f313efbamr4225248pfh.19.1684532975199;
-        Fri, 19 May 2023 14:49:35 -0700 (PDT)
-Received: from localhost.localdomain ([2401:4900:1c60:d309:883d:817e:8e91:be39])
-        by smtp.gmail.com with ESMTPSA id n14-20020aa7904e000000b006470a6ef529sm144891pfo.88.2023.05.19.14.49.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 May 2023 14:49:34 -0700 (PDT)
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.sharma@linaro.org, bhupesh.linux@gmail.com,
-        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
-        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
-        stephan@gerhold.net, Anders Roxell <anders.roxell@linaro.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: [PATCH v7 11/11] arm64: dts: qcom: sm8450: add crypto nodes
-Date:   Sat, 20 May 2023 03:18:13 +0530
-Message-Id: <20230519214813.2593271-12-bhupesh.sharma@linaro.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230519214813.2593271-1-bhupesh.sharma@linaro.org>
-References: <20230519214813.2593271-1-bhupesh.sharma@linaro.org>
+        Fri, 19 May 2023 18:33:45 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB891BD;
+        Fri, 19 May 2023 15:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=dzkMn7jXhuW46G6N54fI9VSxhbfWQPb9eBen4fnyZMM=; b=oW7jKK9dD+JkZYQopHTtoZLdIf
+        ifss5k+Ba6BO4/frKHPmNl85tmAk4YqdDhEOMgQznNFvPHj5/8/7esRY7q4PBd2yDceO38esCsptk
+        Hq66dDEhvIakalnxaiNTw0uhYSLcrjsoO+8pcOYB6ic0Pzvfct4mOPU4Fs916n/IYmA30U+ogqdKC
+        yyZ86xBRVgHWTutdUkAzx0MTyB4ufBlb6QyDazHWnSuWZKR+NI4MnedIgreM7ElDZCoFkAHpT8E+h
+        lXzE29T9kkNXQpIzwfctQr8e82xBxy8b2XtqO3hwfpn8R1JkxyPdWbjWfegu8O45gKn5tmEUGa+er
+        LkAS18Tg==;
+Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q08fJ-00HShm-0H;
+        Fri, 19 May 2023 22:33:37 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH] powerpc/crypto: fix build warnings when DEBUG_FS is not enabled
+Date:   Fri, 19 May 2023 15:33:34 -0700
+Message-Id: <20230519223334.11992-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Neil Armstrong <neil.armstrong@linaro.org>
+Fix build warnings when DEBUG_FS is not enabled by using an empty
+do-while loop instead of a value:
 
-Add crypto engine (CE) and CE BAM related nodes and definitions
-for the SM8450 SoC.
+In file included from ../drivers/crypto/nx/nx.c:27:
+../drivers/crypto/nx/nx.c: In function 'nx_register_algs':
+../drivers/crypto/nx/nx.h:173:33: warning: statement with no effect [-Wunused-value]
+  173 | #define NX_DEBUGFS_INIT(drv)    (0)
+../drivers/crypto/nx/nx.c:573:9: note: in expansion of macro 'NX_DEBUGFS_INIT'
+  573 |         NX_DEBUGFS_INIT(&nx_driver);
+../drivers/crypto/nx/nx.c: In function 'nx_remove':
+../drivers/crypto/nx/nx.h:174:33: warning: statement with no effect [-Wunused-value]
+  174 | #define NX_DEBUGFS_FINI(drv)    (0)
+../drivers/crypto/nx/nx.c:793:17: note: in expansion of macro 'NX_DEBUGFS_FINI'
+  793 |                 NX_DEBUGFS_FINI(&nx_driver);
 
-Tested-by: Anders Roxell <anders.roxell@linaro.org>
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-[Bhupesh: Corrected the compatible list]
-Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Also, there is no need to build nx_debugfs.o when DEBUG_FS is not
+enabled, so change the Makefile to accommodate that.
+
+Fixes: ae0222b7289d ("powerpc/crypto: nx driver code supporting nx encryption")
+Fixes: aef7b31c8833 ("powerpc/crypto: Build files for the nx device driver")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Breno Leitão <leitao@debian.org>
+Cc: Nayna Jain <nayna@linux.ibm.com>
+Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: linuxppc-dev@lists.ozlabs.org
 ---
- arch/arm64/boot/dts/qcom/sm8450.dtsi | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ drivers/crypto/nx/Makefile |    2 +-
+ drivers/crypto/nx/nx.h     |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-index 595533aeafc4..1c65f7dc67f2 100644
---- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-@@ -4138,6 +4138,34 @@ ufs_mem_phy_lanes: phy@1d87400 {
- 			};
- 		};
+diff -- a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
+--- a/drivers/crypto/nx/Makefile
++++ b/drivers/crypto/nx/Makefile
+@@ -1,7 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ obj-$(CONFIG_CRYPTO_DEV_NX_ENCRYPT) += nx-crypto.o
+ nx-crypto-objs := nx.o \
+-		  nx_debugfs.o \
+ 		  nx-aes-cbc.o \
+ 		  nx-aes-ecb.o \
+ 		  nx-aes-gcm.o \
+@@ -11,6 +10,7 @@ nx-crypto-objs := nx.o \
+ 		  nx-sha256.o \
+ 		  nx-sha512.o
  
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x28000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			iommus = <&apps_smmu 0x584 0x11>,
-+				 <&apps_smmu 0x588 0x0>,
-+				 <&apps_smmu 0x598 0x5>,
-+				 <&apps_smmu 0x59a 0x0>,
-+				 <&apps_smmu 0x59f 0x0>;
-+		};
-+
-+		crypto: crypto@1de0000 {
-+			compatible = "qcom,sm8450-qce", "qcom,sm8150-qce", "qcom,qce";
-+			reg = <0 0x01dfa000 0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x584 0x11>,
-+				 <&apps_smmu 0x588 0x0>,
-+				 <&apps_smmu 0x598 0x5>,
-+				 <&apps_smmu 0x59a 0x0>,
-+				 <&apps_smmu 0x59f 0x0>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>;
-+			interconnect-names = "memory";
-+		};
-+
- 		sdhc_2: mmc@8804000 {
- 			compatible = "qcom,sm8450-sdhci", "qcom,sdhci-msm-v5";
- 			reg = <0 0x08804000 0 0x1000>;
--- 
-2.38.1
-
++nx-crypto-$(CONFIG_DEBUG_FS) += nx_debugfs.o
+ obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o nx-compress.o
+ obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o nx-compress.o
+ nx-compress-objs := nx-842.o
+diff -- a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
+--- a/drivers/crypto/nx/nx.h
++++ b/drivers/crypto/nx/nx.h
+@@ -170,8 +170,8 @@ struct nx_sg *nx_walk_and_build(struct n
+ void nx_debugfs_init(struct nx_crypto_driver *);
+ void nx_debugfs_fini(struct nx_crypto_driver *);
+ #else
+-#define NX_DEBUGFS_INIT(drv)	(0)
+-#define NX_DEBUGFS_FINI(drv)	(0)
++#define NX_DEBUGFS_INIT(drv)	do {} while (0)
++#define NX_DEBUGFS_FINI(drv)	do {} while (0)
+ #endif
+ 
+ #define NX_PAGE_NUM(x)		((u64)(x) & 0xfffffffffffff000ULL)
