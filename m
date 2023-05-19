@@ -2,253 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E64C83003
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 16:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86385C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231273AbjESQq3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 12:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34812 "EHLO
+        id S230203AbjESR2h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 13:28:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbjESQqY (ORCPT
+        with ESMTP id S229932AbjESR2e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 12:46:24 -0400
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D735109;
-        Fri, 19 May 2023 09:46:23 -0700 (PDT)
-Received: from meer.lwn.net (unknown [IPv6:2601:281:8300:73::5f6])
-        by ms.lwn.net (Postfix) with ESMTPA id ED7661C23;
-        Fri, 19 May 2023 16:46:20 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net ED7661C23
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-        t=1684514781; bh=ZNWlLNsdSomgBztRTjC+ofbceWifFCA/vAFOs2WlHCs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rPsDctuhmTCg0BIh4e5K/F/w56Ongswu/On9iWrqdPI3OOROTzZ4CRxTSH+ZIpOXH
-         4e0wfTarhBIGZAJBoVQX9p6Fnurkti4KW46yM+gGcKLUNVfc7oZExwgwgIhH30d76B
-         cySHXVaHprtCFqJ7ZyeOjGIoXRqpCJKMasxy7C+Pbh3y8Z828ZPqrMXHt0sPiCDk6Y
-         t4hdxm9UAS6ypA28+RX8gp8VgQoiVs2Duwb2aRRUrWgB0ryC279wVkSVwwLjH6QlsI
-         jeE+KL8Mw1Yw+JFtm2DjAxDnbWJoLqURh18bLHz1tRmlinQRaOkw4D4tD7jKOoDN40
-         ugODp0420HArg==
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     linux-doc@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Fri, 19 May 2023 13:28:34 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADFFBC;
+        Fri, 19 May 2023 10:28:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fZrguVHrmYErYxtd29Huhph1aXDrTMzXiCjMq75ywSgEGOF9O05NSExFatA8P84gkte8f/dtdLEdsxKCpk6moBiSFzgUqBt9NxobH4Jh4enodl22AYZ5GI+Q3bDpgusXK/CQ/LZULMgpv354t/bzKL8KeK03ZcjDfox37xEvaBFiQ0OVbW9AH1ovg3g38KciIZPggUeigg/l/9GXrZ4r5WfbMWnhK8vrsDNajXPxTpD9dG5UydAldFsOo/HgtFREE9auHsI9iHWGKVDlmlXakLR4EhdIy5CWzt1Ppw1/Q2F/iEd/QYlcqqV7gbkcZwrsyTnrO5Z00VSLySonf8NYMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xISGo/DhlU67XWiPpElk8BO8w40MEfpTWkofp4Jk8Y0=;
+ b=Rta91m8shJsC+69UWLTJcQ5nSqKb3l62IxTTf+AiW2zZiKA2IZdZ615SwQX6w6q1w62jCgBPWPT76mlPubJyAjklZP/aMwfA2T5iU7FgMIYYpFgGStnxSlGImVqLHJneSI3G0udddXgq/nMiURFosATR0iaeNGwkFwLuorLah7+EUp767HfgawZcn6nh+cJThfwBJ47ztfUcCDn7OKZnxCkDlLu01YXdiYtlQkvbV1/Asq6pFzKUWBViEpVShA2DrL5fZFBFX0BUek7JuJQMIoZUBLC0MLTPMY84KRHfdSpcdo1J5ir58qoZlbxlXpoJ3i2tC3QF7dvonIoFLCxAQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xISGo/DhlU67XWiPpElk8BO8w40MEfpTWkofp4Jk8Y0=;
+ b=uZz06JUWBiRyxhYs2ZlxKSFg6Nl6xT7mvrw7m3hdmCpoKXQGTuv84VAwA2M7cjOpbILaQFYhmA+L0Hl3RiwERGkhZO9Rt2MnZKTpzFQcpvIMSHvOE3N2/EplNuJQuwA9GQp6rZ1rI4G9+AWhf//tKj5sr5xderRY+qqHYhoWpK8=
+Received: from DM6PR02CA0147.namprd02.prod.outlook.com (2603:10b6:5:332::14)
+ by IA0PR12MB7579.namprd12.prod.outlook.com (2603:10b6:208:43c::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21; Fri, 19 May
+ 2023 17:28:30 +0000
+Received: from DM6NAM11FT031.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:332:cafe::bb) by DM6PR02CA0147.outlook.office365.com
+ (2603:10b6:5:332::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.20 via Frontend
+ Transport; Fri, 19 May 2023 17:28:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT031.mail.protection.outlook.com (10.13.172.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:28:29 +0000
+Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 19 May
+ 2023 12:28:27 -0500
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        linux-crypto@vger.kernel.org, linux-sunxi@lists.linux.dev
-Subject: [PATCH 5/7] crypto: update some Arm documentation references
-Date:   Fri, 19 May 2023 10:46:05 -0600
-Message-Id: <20230519164607.38845-6-corbet@lwn.net>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230519164607.38845-1-corbet@lwn.net>
-References: <20230519164607.38845-1-corbet@lwn.net>
+        "David S . Miller" <davem@davemloft.net>
+CC:     John Allen <john.allen@amd.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Mario Limonciello <mario.limonciello@amd.com>
+Subject: [PATCH 1/3] crypto: ccp - Validate that platform access mailbox registers are declared
+Date:   Thu, 18 May 2023 22:24:12 -0500
+Message-ID: <20230519032414.94247-2-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230519032414.94247-1-mario.limonciello@amd.com>
+References: <20230519032414.94247-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT031:EE_|IA0PR12MB7579:EE_
+X-MS-Office365-Filtering-Correlation-Id: c189b4d2-5a6c-4bda-59b7-08db588e765b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hnvaPjmOWTgiDEcy/zVAp85VioPQg647+PcoH8ScE4S4MUmxKR1kENygGv6NyASS9mrxnExuTw8l0EqogRixSifqBJGy9uwid9jpGomVklLI1keoVP3IozndLM8jeO6uIsT9RtOEvA7qL21J/KJ2LWbmEEt17uca7DswabT9X/X1gYUetz2jD46nM+kaPoPX3wksZ8mmqOnBbWWLqc6bVPxavr/pOWophOcCLkmEZ9UfRZ/8dJ8oXdYojMnhbiCoIYj+lh+JfyA8WLu3kv+J1bChbtcQPX7Cb8PkqZuSA6HSrJupQJMVUhD+2rNdeyUdH8oAfyMw8cyHWccRB2V8wDe4yjSOycz7gms0pPllH94qLFWoIXIxn8Ckoc8QZTG5T3/Av57XMXdJaKzBKXwssPNryVye02tS4hzOS8D3StAjEA0WwBxoADleEeiz95UCj2+xSb5/GNXv2yrZxeF3oJzqaRuTwJHtfI3hhTBBra/v5s5Wv62q1X/TpNgKPsOPzr4HNuyPd0MWZ/neP1xdBvlpQuMfRJ02doSmL8kxV1AC1E4xNk+0dDwv6GiRWV4FV9kDwlsiuAiV51kv7ePp1FnJmNBHTmPciuSMUyx2umuQw+x3EruqXSSaVOV2aQY0lb0Ff+Splmh74cnjoAqR4KuYLT228vMTEt4sZFHiGC0rYNRov/PHvXQAfk9mp/1jpV+F0blmzpgdpk2T0lUKk58+y3uaw1mNuVIQcgRmgQdQPG5Zn2hiS1JGd7Xxg88yn5H7DrCJ7XjAE4CjcAR2eA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(39860400002)(376002)(346002)(451199021)(46966006)(40470700004)(36840700001)(70206006)(70586007)(4744005)(2906002)(8936002)(8676002)(5660300002)(44832011)(316002)(4326008)(15650500001)(41300700001)(86362001)(2616005)(426003)(54906003)(47076005)(110136005)(40460700003)(478600001)(36756003)(7696005)(6666004)(40480700001)(26005)(186003)(16526019)(336012)(1076003)(36860700001)(83380400001)(81166007)(82310400005)(356005)(82740400003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:28:29.6574
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c189b4d2-5a6c-4bda-59b7-08db588e765b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT031.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7579
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Arm documentation has moved to Documentation/arch/arm; update a
-set of references under crypto/allwinner to match.
+Some platforms might support platform access doorbell but not mailbox.
+Add an extra guard to ensure this doesn't cause accesses to wrong ranges
+if a consumer calls psp_send_platform_access_msg().
 
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Chen-Yu Tsai <wens@csie.org>
-Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
-Cc: Samuel Holland <samuel@sholland.org>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-sunxi@lists.linux.dev
-Signed-off-by: Jonathan Corbet <corbet@lwn.net>
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c | 2 +-
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c   | 2 +-
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c   | 2 +-
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h        | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c   | 2 +-
- 13 files changed, 13 insertions(+), 13 deletions(-)
+ drivers/crypto/ccp/platform-access.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-index 10fe9f73a5fb..f2dd66706c10 100644
---- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-+++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c
-@@ -8,7 +8,7 @@
-  * keysize in CBC and ECB mode.
-  * Add support also for DES and 3DES in CBC and ECB mode.
-  *
-- * You could find the datasheet in Documentation/arm/sunxi.rst
-+ * You could find the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include "sun4i-ss.h"
+diff --git a/drivers/crypto/ccp/platform-access.c b/drivers/crypto/ccp/platform-access.c
+index 939c924fc383..94367bc49e35 100644
+--- a/drivers/crypto/ccp/platform-access.c
++++ b/drivers/crypto/ccp/platform-access.c
+@@ -67,6 +67,11 @@ int psp_send_platform_access_msg(enum psp_platform_access_msg msg,
+ 		return -ENODEV;
  
-diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
-index 006e40133c28..51a3a7b5b985 100644
---- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
-@@ -6,7 +6,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the SS.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
-index d28292762b32..f7893e4ac59d 100644
---- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-hash.c
-@@ -6,7 +6,7 @@
-  *
-  * This file add support for MD5 and SHA1.
-  *
-- * You could find the datasheet in Documentation/arm/sunxi.rst
-+ * You could find the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include "sun4i-ss.h"
- #include <asm/unaligned.h>
-diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
-index ba59c7a48825..6c5d4aa6453c 100644
---- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
-+++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
-@@ -8,7 +8,7 @@
-  * Support MD5 and SHA1 hash algorithms.
-  * Support DES and 3DES
-  *
-- * You could find the datasheet in Documentation/arm/sunxi.rst
-+ * You could find the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- 
- #include <linux/clk.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index 74b4e910a38d..c13550090785 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -8,7 +8,7 @@
-  * This file add support for AES cipher with 128,192,256 bits keysize in
-  * CBC and ECB mode.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- 
- #include <linux/bottom_half.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index a6865ff4d400..07ea0cc82b16 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -7,7 +7,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the CryptoEngine.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index 8b5b9b9d04c3..930ad157004c 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -7,7 +7,7 @@
-  *
-  * This file add support for MD5 and SHA1/SHA224/SHA256/SHA384/SHA512.
-  *
-- * You could find the datasheet in Documentation/arm/sunxi.rst
-+ * You could find the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include <linux/bottom_half.h>
- #include <linux/dma-mapping.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-index b3cc43ea6c8a..80815379f6fc 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the PRNG
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include "sun8i-ce.h"
- #include <linux/dma-mapping.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-index e2b9b9104694..9c35f2a83eda 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the TRNG
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include "sun8i-ce.h"
- #include <linux/dma-mapping.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-index 16966cc94e24..381a90fbeaff 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-@@ -8,7 +8,7 @@
-  * This file add support for AES cipher with 128,192,256 bits keysize in
-  * CBC and ECB mode.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- 
- #include <linux/bottom_half.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index c9dc06f97857..3dd844b40ff7 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -7,7 +7,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the SecuritySystem
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-index 577bf636f7fb..a4b67d130d11 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-@@ -7,7 +7,7 @@
-  *
-  * This file add support for MD5 and SHA1/SHA224/SHA256.
-  *
-- * You could find the datasheet in Documentation/arm/sunxi.rst
-+ * You could find the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include <linux/bottom_half.h>
- #include <linux/dma-mapping.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-index 70c7b5d571b8..a923cfc6553f 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-@@ -7,7 +7,7 @@
-  *
-  * This file handle the PRNG found in the SS
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-+ * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
-  */
- #include "sun8i-ss.h"
- #include <linux/dma-mapping.h>
+ 	pa_dev = psp->platform_access_data;
++
++	if (!pa_dev->vdata->cmdresp_reg || !pa_dev->vdata->cmdbuff_addr_lo_reg ||
++	    !pa_dev->vdata->cmdbuff_addr_hi_reg)
++		return -ENODEV;
++
+ 	cmd = psp->io_regs + pa_dev->vdata->cmdresp_reg;
+ 	lo = psp->io_regs + pa_dev->vdata->cmdbuff_addr_lo_reg;
+ 	hi = psp->io_regs + pa_dev->vdata->cmdbuff_addr_hi_reg;
 -- 
-2.40.1
+2.34.1
 
