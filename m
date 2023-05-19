@@ -2,88 +2,91 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEFC0C77B73
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 00:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1056DC77B7A
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 08:04:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbjESAms (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 May 2023 20:42:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42034 "EHLO
+        id S229669AbjESIEb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 04:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbjESAmr (ORCPT
+        with ESMTP id S229492AbjESIEa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 May 2023 20:42:47 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204EABC;
-        Thu, 18 May 2023 17:42:47 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1ae4c5e12edso21359645ad.3;
-        Thu, 18 May 2023 17:42:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684456966; x=1687048966;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2YJeCVahMakSFFIeHkE0L5vaAYWzeS9qst+vBo++bi0=;
-        b=FhVbqUWSfKoK65eksBcMm+T/anGwzJ7feZxDU9sQLJuv5vpIWmfyiQXDcuurFsNM/Z
-         tXNZIdpE0ugAni5joL8Y7T7mQ1R1AsMH/ro19c3opgXo/WWdLFunhUgeC0VVh7ZgxeTH
-         vbVwkoIvoVDjE1G+OV7XcxQ9lGNbB8Kovpny75gaQMi0vQqwpV+rfLP76tRJwDWTVJZQ
-         oJZwadsywzFEpRnAENSS5y955l7Vve6MI6Igo85hFz3ZjRIFgbPP++oy125CiMpBVqdr
-         f3QQkqRgwuzHoJKYxSKUTSZfpaKqD7OgDNRJQK4m+tdu9RPRF9KYVIWlRwgzTuFyC+bJ
-         CrNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684456966; x=1687048966;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2YJeCVahMakSFFIeHkE0L5vaAYWzeS9qst+vBo++bi0=;
-        b=GkP5Q9owsj7p5wmEQ8Fpr0j8HjQOaXsSo3cU7IOZ6yr7nS/QXJIeKMvi/n1sLFrx5v
-         /2mOqsqknVd1+EXyRasc4SeODTcI/7i6W1r0eq37MczpTrifEV1IK4bSSDei3QSUxd1Q
-         4JV3RR7W3Czjn9MQwqiwU1no84i9I+3+7+iUFlVKIQS+1ZiwIYaNpfVPhu0CGT4n7ph+
-         ozRD9IfYqSTZwaj1qxVcjjotZvuzT1w+t6ZTjMw1efvpYwJ8T/+DOogzCwk2JJXJImj3
-         Cwi5w5HNuk1CfU9e58HFQ6hfWyWGOsEC/MroHAPh0w92oP8m11g9mOKkVDith2R0V7xN
-         bvVw==
-X-Gm-Message-State: AC+VfDzzoSQ92NGQTdn/eXmnk8ySUz9aV2zoDYg2vhemBqzmubVjznJ6
-        YSNrnV63uI/n9OasrlV8cuc=
-X-Google-Smtp-Source: ACHHUZ7uGgeA0JSUHZOioCuEkISbTecVbqi5XMFhJ+uP4uwWKkKBFlNJvWeibygfrTk2BCH5gq2FcA==
-X-Received: by 2002:a17:902:ced0:b0:1a9:a478:66c5 with SMTP id d16-20020a170902ced000b001a9a47866c5mr880974plg.63.1684456966374;
-        Thu, 18 May 2023 17:42:46 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b0019ef86c2574sm2033106plh.270.2023.05.18.17.42.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 17:42:45 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 18 May 2023 14:42:44 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     jiangshanlai@gmail.com
-Cc:     linux-kernel@vger.kernel.org, kernel-team@meta.com,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shijith Thotton <sthotton@marvell.com>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Alexander Lobakin <alobakin@pm.me>,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        ye xingchen <ye.xingchen@zte.com.cn>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 11/13] crypto: octeontx2: Use alloc_ordered_workqueue()
- to create ordered workqueues
-Message-ID: <ZGbGBCA6NGCcSNgC@slm.duckdns.org>
-References: <20230509015032.3768622-1-tj@kernel.org>
- <20230509015032.3768622-12-tj@kernel.org>
+        Fri, 19 May 2023 04:04:30 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1F9D1716;
+        Fri, 19 May 2023 01:03:52 -0700 (PDT)
+Received: from [192.168.1.141] ([37.4.248.58]) by mrelayeu.kundenserver.de
+ (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1N8GEY-1qDJBS1EiO-014Ene; Fri, 19 May 2023 10:03:06 +0200
+Message-ID: <47df90f9-0348-6333-757e-ddfeb6b8fbad@i2se.com>
+Date:   Fri, 19 May 2023 10:03:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230509015032.3768622-12-tj@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH V3 0/6] ARM: dts: imx6ull: Fix dtbs_check warnings
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Cc:     kernel@pengutronix.de, Fabio Estevam <festevam@gmail.com>,
+        linux-imx@nxp.com, "Rafael J . Wysocki" <rafael@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amitk@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-pm@vger.kernel.org
+References: <20230414091947.7831-1-stefan.wahren@i2se.com>
+Content-Language: en-US
+From:   Stefan Wahren <stefan.wahren@i2se.com>
+In-Reply-To: <20230414091947.7831-1-stefan.wahren@i2se.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:o50LvgBs3SXoordAvhv+x1aO0U3G28hVUe8aqojg5w5tK7KhXtv
+ mpB4Dy+8i1KKdQGAU6+aziMNlZV9e5ZXvm73FD/3yzmCiq4c9ZX8NXbRYKqsOYQbugoqAXd
+ ols6QeeZ5lr6tlqVAeKtNF5v9kvCgsCtDQPT6FUt3IWw2jTBjwiaRgB0LeCJSHLSbYwqlum
+ x9br5GUoK5g13+DDhXaeQ==
+UI-OutboundReport: notjunk:1;M01:P0:9tNi0MwuB1k=;dPML9IMKGd20U4dSjP9SPuVIi3h
+ 9ScdMdp4KMiWhozhbzxUmG0PkdOdPlixH2yUKYLbKUbEM4jNFD8hqg+60GApmnr8w8POfOn9a
+ YtpAZ13gha8PKCD4ZY0S7LgSdl+R4jyRySCKwhqF6B+TBw5hKh6CcIxLznyqQErNSxfDiBZZi
+ ZHsJFVdRtjefVjLYEURXmOzQBkrvVqE3AtO/bAvugZOxs+QgPMNUFzuOwbLsSfDN7Uj2019dD
+ Wk3fdvoWrxlqcV+MWQ1aYSxUzr60YkapFWlmFfnvZ5/2KK+KcHM5Wl/vvyJbenHTttGSnfmEi
+ C7WhmJ17mEalJ6ci27arr2dKwUKpZRaRDaGt5I7ZeE4BC8/W+wkJdFZ23Bvjh2qNR8XAtSyzn
+ Z9yaj2Ta9Qt4GgeHQ7wljUx8yYZW9IcvrNS9PCeBE7viVc9yxXY3Mi3/d8DQD9jUS5jFT1LRL
+ zjGp04cemydApzFHWf1UUCjYKdnKaR6fkxRjOD1b5NB4mvpTW8ORUYiw9x8FY9D5xCEYWPjWO
+ 5yd1tyHZm42tZYa0IM8ZjcFnDb22UW3oTWpLd0RWaucrF/WwjAaWFUULkhcLrmfNP+SKAhQPM
+ QKca0ZlhF8PQOsilbJR1MGFEYhIqKkvNe8ntlo0rb3YdCJeusKylauh9bxSHyOUTHWcXzoDdR
+ DpCkvL+dzMJSKwG2VD4rpeiinQs4VVGaxElRfdxo9A==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Applied to wq/for-6.5-cleanup-ordered.
+Hi,
 
-Thanks.
+Am 14.04.23 um 11:19 schrieb Stefan Wahren:
+> This series tries to address some dtbs_check warnings on i.MX6ULL.
+> 
+> Changes in V3:
+> - add Krzysztof's Reviewed-Bys
+> - fix indentation in Patch 6 found by Krzysztof Kozlowski
+> 
+> Changes in V2:
+> - new patch to fix fsl-imx-uart warnings
+> - fixed GPC typo found by Fabio Estevam
+> - keep enum in bindings as suggested by Krzysztof Kozlowski
+> - make imx6ul GPT compatible to imx6sx
+> 
+> Stefan Wahren (6):
+>    dt-bindings: serial: fsl-imx-uart: add missing properties
+>    dt-bindings: crypto: fsl-dcp: add imx6sl and imx6ull compatible
+>    dt-bindings: imx-thermal: add imx6sll and imx6ul compatible
+>    dt-bindings: imxgpt: add imx6ul compatible
+>    ARM: dts: imx: Adjust dma-apbh node name
+>    ARM: dts: imx6ul: Add clock and PGC node to GPC
+> 
 
--- 
-tejun
+currently patch 3, 5 and 6 has been applied. Should i resend the rest of 
+the series?
