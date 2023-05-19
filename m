@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 558EAC77B7F
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 08:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBBCC77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 08:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbjESI3P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 04:29:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57424 "EHLO
+        id S230224AbjESI3Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 04:29:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbjESI3N (ORCPT
+        with ESMTP id S230262AbjESI3O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 04:29:13 -0400
+        Fri, 19 May 2023 04:29:14 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E321E58;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F7EE5F;
         Fri, 19 May 2023 01:29:11 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pzvTZ-00AnMQ-5M; Fri, 19 May 2023 16:28:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 May 2023 16:28:37 +0800
+        id 1pzvTX-00AnME-24; Fri, 19 May 2023 16:28:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 May 2023 16:28:35 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Fri, 19 May 2023 16:28:37 +0800
-Subject: [PATCH 3/3] crypto: cmac - Add support for cloning
+Date:   Fri, 19 May 2023 16:28:35 +0800
+Subject: [PATCH 2/3] crypto: cipher - Add crypto_clone_cipher
 References: <ZGcyuyjJwZhdYS/G@gondor.apana.org.au>
 To:     Dmitry Safonov <dima@arista.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
@@ -44,54 +44,67 @@ To:     Dmitry Safonov <dima@arista.com>,
         Leonard Crestez <cdleonard@gmail.com>,
         Salam Noureddine <noureddine@arista.com>,
         netdev@vger.kernel.org
-Message-Id: <E1pzvTZ-00AnMQ-5M@formenos.hmeau.com>
+Message-Id: <E1pzvTX-00AnME-24@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Allow hmac to be cloned.  The underlying cipher needs to support
-cloning by not having a cra_init function (all implementations of
-aes that do not require a fallback can be cloned).
+Allow simple ciphers to be cloned, if they don't have a cra_init
+function.  This basically rules out those ciphers that require a
+fallback.
+
+In future simple ciphers will be eliminated, and replaced with a
+linear skcipher interface.  When that happens this restriction will
+disappear.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/cmac.c |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ crypto/cipher.c                  |   23 +++++++++++++++++++++++
+ include/crypto/internal/cipher.h |    2 ++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/crypto/cmac.c b/crypto/cmac.c
-index bcc6f19a4f64..fce6b0f58e88 100644
---- a/crypto/cmac.c
-+++ b/crypto/cmac.c
-@@ -213,7 +213,22 @@ static int cmac_init_tfm(struct crypto_shash *tfm)
- 	ctx->child = cipher;
- 
- 	return 0;
--};
-+}
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index b47141ed4a9f..d39ef5f72ab8 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -90,3 +90,26 @@ void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
+ 	cipher_crypt_one(tfm, dst, src, false);
+ }
+ EXPORT_SYMBOL_NS_GPL(crypto_cipher_decrypt_one, CRYPTO_INTERNAL);
 +
-+static int cmac_clone_tfm(struct crypto_shash *tfm, struct crypto_shash *otfm)
++struct crypto_cipher *crypto_clone_cipher(struct crypto_cipher *cipher)
 +{
-+	struct cmac_tfm_ctx *octx = crypto_shash_ctx(otfm);
-+	struct cmac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-+	struct crypto_cipher *cipher;
++	struct crypto_tfm *tfm = crypto_cipher_tfm(cipher);
++	struct crypto_alg *alg = tfm->__crt_alg;
++	struct crypto_cipher *ncipher;
++	struct crypto_tfm *ntfm;
 +
-+	cipher = crypto_clone_cipher(octx->child);
-+	if (IS_ERR(cipher))
-+		return PTR_ERR(cipher);
++	if (alg->cra_init)
++		return ERR_PTR(-ENOSYS);
 +
-+	ctx->child = cipher;
++	ntfm = __crypto_alloc_tfm(alg, CRYPTO_ALG_TYPE_CIPHER,
++				  CRYPTO_ALG_TYPE_MASK);
++	if (IS_ERR(ntfm))
++		return ERR_CAST(ntfm);
 +
-+	return 0;
++	ntfm->crt_flags = tfm->crt_flags;
++
++	ncipher = __crypto_cipher_cast(ntfm);
++
++	return ncipher;
 +}
++EXPORT_SYMBOL_GPL(crypto_clone_cipher);
+diff --git a/include/crypto/internal/cipher.h b/include/crypto/internal/cipher.h
+index a9174ba90250..5030f6d2df31 100644
+--- a/include/crypto/internal/cipher.h
++++ b/include/crypto/internal/cipher.h
+@@ -176,6 +176,8 @@ void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
+ void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
+ 			       u8 *dst, const u8 *src);
  
- static void cmac_exit_tfm(struct crypto_shash *tfm)
- {
-@@ -280,6 +295,7 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.final = crypto_cmac_digest_final;
- 	inst->alg.setkey = crypto_cmac_digest_setkey;
- 	inst->alg.init_tfm = cmac_init_tfm;
-+	inst->alg.clone_tfm = cmac_clone_tfm;
- 	inst->alg.exit_tfm = cmac_exit_tfm;
- 
- 	inst->free = shash_free_singlespawn_instance;
++struct crypto_cipher *crypto_clone_cipher(struct crypto_cipher *cipher);
++
+ struct crypto_cipher_spawn {
+ 	struct crypto_spawn base;
+ };
