@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 167A2C77B75
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DC5C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231937AbjESRaT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 13:30:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
+        id S231173AbjESRaw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 13:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231792AbjESR3y (ORCPT
+        with ESMTP id S231627AbjESR3v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 13:29:54 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D7810FF;
-        Fri, 19 May 2023 10:29:23 -0700 (PDT)
+        Fri, 19 May 2023 13:29:51 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3764D10E7;
+        Fri, 19 May 2023 10:29:20 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bl1BtrsvjIPdr9Rx7IKXR3S1hHrJ6sHam/vmrd4jXDUdfSF0cMRpwoMBbvMrAjf6iiRhwiK3MBeNjIB0Eomvu97zIYlH1qKdRUgw7IY5Ymiuqg7qeO0fBU8fye8rffBtReTrzsdqJKGKz+T3FH8ZndyjjW1KGXrNHravidAftdsi5bkDaUJvUa97wlAZHe9+0NGE2FitjOiIu/xFEEsvgO5OdJG2AV+ZMF/EAEsqbcaHW6FjGHWDrHrZETyiBkxhgV83aM5qChISUrTXGc1i7K1ceFrWAvYzPGqj8bRQjjJE93oB4+FrH1DYlD3kfIUmYrPTjJ8BStfIckKJBdK+ZA==
+ b=DUXhncL4hRTJQSoYCPnpixnyLT2B66nZPHDQM0cDS4lAxRfo6INg3Ep55ecZkqQ3EF3mhRCzCOIEzQMTF/DfphihpLxsL9MQQz8ATGghd0TEyzSZQSAxYTX1kPSTz7nXr08V0Vyvo4+Lx7RJZ4qgljDqhTJzXBPxnATrcWUHN5wcYZXdl2dcP83alDQeV3xpOwqApGwrhERCRCF/u4b2RfXkS3Nx5/LDgLOxUzC8N3MdShBxVw6JdhDpDU1o/k09rRYSwnBRqhxxdJ07SGHS0VenEYMne20S0tnTB/laqK5v1vBJzojOZw2eTW1fBUC8ZB7xRWNWfR1C7ks36/u5eA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=J5UoFraxHPBUsLmDGAbHt7a9vEfgZB82Dtkjge2Jds4=;
- b=D8Ab2dx0HOdBmy2hPaIyUrxbYrNLwcFDPb74VH2qfDdtAc5nWAJKiFdIVeyCwZmVTQgZQmt6jVek8qrNnGkeGL86a3SybcZ7cYeRGvPgQV6q6VWgSWR7hmr2coGjFfb0bSxY7TW5bASVBZvlzfM8bsVfws+8K6XqhpS/6rkPjRDFA8eZ5tfTMQ0rwpTPW2DPZvx4JIfg2PoDB+evObsd7d4dssG1jWMQRr/Dy2xwj8AWgd1NAIfdhmpQhilRqN0MkBJEgwZjAdWzpaa8G1fNKenww3lP4GpC2eE31pyR+n8+f8uwEEifgkyMkQsU3kl0t29ATfBTqfZ0lNbkKjcT6w==
+ bh=uksMuvkHaQ2TyTvo4yDqIpiAZyC6gKRoWCNv996UReE=;
+ b=AjihvanmZC5NfhJ+eFyGxuW0U39u13mtwRp8H1E6NfFoM4sKLOjZx06ulcnwrgZ2MRZ/nWAHjh4w84OJC+bEfEDkVDnlXcSEqFueGpMohLpII5oGeixrQdiyhYiX4WBI2CXsZPtDs1w9f5qF1r8r/a5G+rOyxlN1nAuH8LY1FZQjoWfjMbaU3dUgm+Xw71uLEGTRLmyMKemCUts88X8feb+Ymr65QYEw+3/htkRMeIV/fG0vv9EvkVEuSVyVPgkCeBABHOS0dhAr4RqUm3bjamES2KKN1t8JCZMkLVAKTxqCmY6lkRrgGnyhjibXsF2RSfi8c4ha8FTgDncBgA0Tvw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=J5UoFraxHPBUsLmDGAbHt7a9vEfgZB82Dtkjge2Jds4=;
- b=g9Vm6EcMOZafNW/K2EnN/3vvtwSH69sSf6z1zeg0Q8dbJ0LgeyjiAOJYDVm+49Vykp00x4PFg8MxgKZo+pIVJRKST839gYZgHJGZYKcKHy+0ygF9H4MKcGfZcmDhFUnYdij5EY4/nO8E88HX6+/h18Y1Q2whdWfq0ySXdHCZePE=
-Received: from DM6PR08CA0027.namprd08.prod.outlook.com (2603:10b6:5:80::40) by
- MN0PR12MB6224.namprd12.prod.outlook.com (2603:10b6:208:3c0::21) with
+ bh=uksMuvkHaQ2TyTvo4yDqIpiAZyC6gKRoWCNv996UReE=;
+ b=gpNCo4eVVYGXBerMysK3ufe2rEPIUP1/pqHaBph7/SEcVEEN1sZjIrCpTs3V7qcS+GNqmIl3dyPaBw4HdiQvu8J2dqvmYPYVw8EgXFfme7VkFIwqD7+ZH1zyo+bStrY3awwLcxgz9zoIrN8csj6Xj0KbMiJXOp4Y0/ptJsuGZrE=
+Received: from DS7PR05CA0098.namprd05.prod.outlook.com (2603:10b6:8:56::8) by
+ BY5PR12MB4886.namprd12.prod.outlook.com (2603:10b6:a03:1c5::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Fri, 19 May
- 2023 17:29:10 +0000
-Received: from DM6NAM11FT013.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:80:cafe::fd) by DM6PR08CA0027.outlook.office365.com
- (2603:10b6:5:80::40) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21 via Frontend
- Transport; Fri, 19 May 2023 17:29:10 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.19; Fri, 19 May
+ 2023 17:29:05 +0000
+Received: from DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:56:cafe::9f) by DS7PR05CA0098.outlook.office365.com
+ (2603:10b6:8:56::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.7 via Frontend
+ Transport; Fri, 19 May 2023 17:29:05 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT013.mail.protection.outlook.com (10.13.173.142) with Microsoft SMTP
+ DM6NAM11FT082.mail.protection.outlook.com (10.13.173.107) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:09 +0000
+ 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:03 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 19 May
- 2023 12:29:08 -0500
+ 2023 12:29:02 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -61,9 +61,9 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     John Allen <john.allen@amd.com>, <linux-crypto@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v3 10/10] crypto: ccp: Add Mario to MAINTAINERS
-Date:   Thu, 18 May 2023 22:24:48 -0500
-Message-ID: <20230519032448.94279-11-mario.limonciello@amd.com>
+Subject: [PATCH v3 04/10] crypto: ccp: move setting PSP master to earlier in the init
+Date:   Thu, 18 May 2023 22:24:42 -0500
+Message-ID: <20230519032448.94279-5-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230519032448.94279-1-mario.limonciello@amd.com>
 References: <20230519032448.94279-1-mario.limonciello@amd.com>
@@ -75,57 +75,73 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT013:EE_|MN0PR12MB6224:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3a3f264c-db08-42d6-ab5a-08db588e8e34
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT082:EE_|BY5PR12MB4886:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45473252-e1f4-46bb-97c6-08db588e8ab6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kTYXWZR7JIoCJWj8alrCIy/zMiV5QN1B9x9Xm1ExWKxZ8kNlGXnpmfdSTs7UcR4o7QLCxtVeCYjiNkrZtWb01gYmd2sOfclx3HSPGwwdjgL6s8eHuJckvknBR7b8DImgCp6ODoIHO4AzU85CFlX2BaLU+mhCmjY+LZYGcMB2wOzZJq9RVFbmZP98VwoQuGn9DziLDWXpJ4B4Gn6lJtDecPw25Fe0D3oVlawdbtTXt9tU567C3iQTIsSFGbZytDrZd5VRJK9rPz0jYtVFuVhHuLEc4fsrG2GItfCGTbNeVP3iquUEaEp5YiadByFhj1jG/Esb00Gq6E4G2gVmUo59zeUuVaOHrfRluDBBPydBPhTUfly9+U4cvlvloyRjFjVtTCWZ5uXyNyO7Cfd/YJipFSjQmjk3w/c10Okl86iIwUJWNth6C26ahHgVTTdwBm/FPqjP9f+wPtyAAyvX2ocvY95jeVGlbR8DXCeO70U5A1DaP4SqF9zJadp7diDsWhK/ekRrlrVyU1asZ1igdfmpozUum1EomZYwhJLc6Y6YKKceLI6YbqprvmYbD1O2FIl+3vPlDiJ/zL9y17cV96T7G3qm36JFojn+p+VP4hEMddxlh3DYiY/X1Y8PVsg6nuzSF+FrsFJR+U1Fwk1jRzRjICh+pb8fVMPQRdOb8Z58h699F75Swe78p52eZDHUhMPuZNgvAB7WBXokwVgZWDZwFsmaaycLNP2Axt5foQJA2gG8fWOKiioaauhXQfLHmeVywTgUCqPdAss5wtNHJzH6PQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(478600001)(36756003)(86362001)(6666004)(316002)(110136005)(54906003)(4326008)(70586007)(70206006)(82310400005)(44832011)(5660300002)(4744005)(2906002)(40480700001)(8676002)(41300700001)(82740400003)(81166007)(8936002)(356005)(16526019)(36860700001)(7696005)(2616005)(83380400001)(186003)(1076003)(26005)(426003)(336012)(47076005)(40460700003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: YtpNz7pXpJO4qUsWbrBKjiVPDCmfx5vN+bOgU9/LGUP4o51qJhOqbp2Es3+oEEkUo+wpfxJEo4uY8ghKaAoFNJgpMA1fS7aNH/M2+cs2diwJRBoqP0R6wuY6DBfNGKSF6SQFaqxNNQT6psmStNhtkcY/ETTo/twtvmodCxqyx8erBJXElurtGCWY7ULVKDDHBmyrpCUVpaqAk8daKpP/BgL2ZQJlJGS1QkhD0kawAnP/JNnyoRSNN9psxJgrkl3oRBe6FKOSOv/zCt2k1xf7aoo5qNnpfq36Gd/DeSd486RQh9PIR4d6G90naxUaZQNTxCBQkwO6wutXEzNIGlqog8fCiOs6irMCAFYGec+/pVf63NgMnB0pOZwXcm6PDMFCTDzXxtWd5Juw1XvrbJoA5JHRsdiVQ4xxCoVeAK/XTBYwieAtVKSO9iMvkpIx7+R0lVQyLVVcsHIT6koKNfhFC3eTM90tQtOQmPFg9M+vxowbgbDp77ed3Xbnl+6XooaDUN9zj2BzvWdsCUMJdoY5xQj/2oK7uEmlC03UL/frJNrOGbXGGofRApQonKuWG8211rrOFdK+WuT9ysYHsoLPMEqCy7V74+p10KcRrf54RchezlrLT93yuEXjPEUAbAIxpQvSph4JOZLk000hRI6Dg5r2vWcY5xhe/7DDLkudjxR+hH87FNJ3mJbNFaQ4u6TF2Cqhf2Rzx3KwxgnNSkkm12eupAhF1c7t5d6W2sQRNnO3F45bW2DLfy2Sf+Pt92GpXHAlaQeyw+hyJjnZ5sYgpQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(136003)(376002)(451199021)(36840700001)(40470700004)(46966006)(40460700003)(6666004)(7696005)(41300700001)(44832011)(36756003)(1076003)(5660300002)(82310400005)(47076005)(186003)(83380400001)(426003)(336012)(2616005)(16526019)(26005)(86362001)(36860700001)(2906002)(356005)(81166007)(8936002)(40480700001)(8676002)(82740400003)(70206006)(4326008)(54906003)(70586007)(110136005)(478600001)(316002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:09.6692
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:03.8098
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a3f264c-db08-42d6-ab5a-08db588e8e34
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45473252-e1f4-46bb-97c6-08db588e8ab6
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT013.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6224
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4886
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I will maintain the platform access interface and dynamic boost
-control support.
+Dynamic boost control needs to use platform access symbols
+that look for the PSP master as part of initialization.
+
+So move the PSP master before psp_init() so that dynamic boost
+control can be initialized properly.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+v2->v3:
+ * Clean up master device if psp_init() failed
+---
+ drivers/crypto/ccp/psp-dev.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f2e19f576fec..fdc923bff7f8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -988,6 +988,17 @@ S:	Supported
- F:	drivers/crypto/ccp/sev*
- F:	include/uapi/linux/psp-sev.h
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+index e3d6955d3265..3390f0bd6408 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -173,13 +173,14 @@ int psp_dev_init(struct sp_device *sp)
+ 		goto e_err;
+ 	}
  
-+AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DBC SUPPORT
-+M:	Mario Limonciello <mario.limonciello@amd.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Supported
-+F:	drivers/crypto/ccp/dbc.c
-+F:	drivers/crypto/ccp/dbc.h
-+F:	drivers/crypto/ccp/platform-access.c
-+F:	drivers/crypto/ccp/platform-access.h
-+F:	include/uapi/linux/psp-dbc.h
-+F:	tools/crypto/ccp/*.py
++	/* master device must be set for platform access */
++	if (psp->sp->set_psp_master_device)
++		psp->sp->set_psp_master_device(psp->sp);
 +
- AMD DISPLAY CORE
- M:	Harry Wentland <harry.wentland@amd.com>
- M:	Leo Li <sunpeng.li@amd.com>
+ 	ret = psp_init(psp);
+ 	if (ret)
+ 		goto e_irq;
+ 
+-	if (sp->set_psp_master_device)
+-		sp->set_psp_master_device(sp);
+-
+ 	/* Enable interrupt */
+ 	iowrite32(-1, psp->io_regs + psp->vdata->inten_reg);
+ 
+@@ -188,6 +189,9 @@ int psp_dev_init(struct sp_device *sp)
+ 	return 0;
+ 
+ e_irq:
++	if (sp->clear_psp_master_device)
++		sp->clear_psp_master_device(sp);
++
+ 	sp_free_psp_irq(psp->sp, psp);
+ e_err:
+ 	sp->psp_data = NULL;
 -- 
 2.34.1
 
