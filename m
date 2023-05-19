@@ -2,53 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80308C77B7F
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 08:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B16C77B7F
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 09:05:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbjESIy6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 04:54:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44066 "EHLO
+        id S230147AbjESJFn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 05:05:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231299AbjESIy5 (ORCPT
+        with ESMTP id S229876AbjESJFm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 04:54:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C643410E6;
-        Fri, 19 May 2023 01:54:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 788A06552C;
-        Fri, 19 May 2023 08:54:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD99AC4339C;
-        Fri, 19 May 2023 08:54:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684486464;
-        bh=l6xWlNTW11M1IArH9XbVsO0LuYjgvFrPFdvjgT2fKsY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=TLL7EZD00J0qHP0WIImFoaeP9iS7POWP+jnrXXMOVsvPZf7p0pLPOZmZditjFFg31
-         hQ44JGMc+sINjBZQV4JnhcqiHZ/mQYoX/q3UD8LQ3fL7avD2osNo6ikbeO+dTVqI8U
-         SLLneongeou+VquX03U5xk32P8IGa+mc28lW+KBpgGF+YcNep+zjvA092liO93u4Po
-         Mr+Hg/2V7r/LSvvS51mmeCcObriQgn7bfCwvJml8+elLZMzpPHkT4iYPgk0FkGLQ/W
-         H2027cYo7hdUiOwfaUuO0jp4YfS9qDFtQWfaHB6t7GSPEli7Z/CzCLg1UuRwwtw8K9
-         mD5z70YGlVj8g==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4f2676d62a2so3346163e87.0;
-        Fri, 19 May 2023 01:54:24 -0700 (PDT)
-X-Gm-Message-State: AC+VfDwz/1er401cIoV6TLsg0UmhbYPE5TCnAfnokzh6bDmWjvQM2ck7
-        teEQdq8n/96UESDwnjrg6kSqQteCAOlkqzB54JM=
-X-Google-Smtp-Source: ACHHUZ7SvdXKZpS/i9iOaPcFYPkRcxW6aWBrXA6Y7mN4OZu24KBaz9xljJ2ps4rcZZOJmt7v9Wu5xjt2j2ikxrgIIvk=
-X-Received: by 2002:ac2:43a4:0:b0:4f2:7b65:baeb with SMTP id
- t4-20020ac243a4000000b004f27b65baebmr455104lfl.53.1684486462868; Fri, 19 May
- 2023 01:54:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <ZGcyuyjJwZhdYS/G@gondor.apana.org.au> <E1pzvTZ-00AnMQ-5M@formenos.hmeau.com>
-In-Reply-To: <E1pzvTZ-00AnMQ-5M@formenos.hmeau.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 19 May 2023 10:54:11 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGwS03zUBTGb7jmk1-6r+=a-HH+A-S9ZFTYRyJSzN0Xcg@mail.gmail.com>
-Message-ID: <CAMj1kXGwS03zUBTGb7jmk1-6r+=a-HH+A-S9ZFTYRyJSzN0Xcg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] crypto: cmac - Add support for cloning
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+        Fri, 19 May 2023 05:05:42 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 653FE1723;
+        Fri, 19 May 2023 02:05:15 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pzw1s-00AoNA-Ne; Fri, 19 May 2023 17:04:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 May 2023 17:04:04 +0800
+Date:   Fri, 19 May 2023 17:04:04 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
 Cc:     Dmitry Safonov <dima@arista.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
@@ -69,62 +42,65 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Leonard Crestez <cdleonard@gmail.com>,
         Salam Noureddine <noureddine@arista.com>,
         netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH] crypto: shash - Allow cloning on algorithms with no init_tfm
+Message-ID: <ZGc7hCaDrnEFG8Lr@gondor.apana.org.au>
+References: <ZGcyuyjJwZhdYS/G@gondor.apana.org.au>
+ <E1pzvTZ-00AnMQ-5M@formenos.hmeau.com>
+ <CAMj1kXGwS03zUBTGb7jmk1-6r+=a-HH+A-S9ZFTYRyJSzN0Xcg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGwS03zUBTGb7jmk1-6r+=a-HH+A-S9ZFTYRyJSzN0Xcg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Fri, May 19, 2023 at 10:54:11AM +0200, Ard Biesheuvel wrote:
+>
+> Does this imply that the cmac-aes-ce and cmac-aes-neon implementations
+> for arm64 need a similar treatment?
 
-On Fri, 19 May 2023 at 10:29, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> Allow hmac to be cloned.  The underlying cipher needs to support
-> cloning by not having a cra_init function (all implementations of
-> aes that do not require a fallback can be cloned).
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Good catch.  Since these don't have init functions we can deal
+with them at a higher level:
 
-Does this imply that the cmac-aes-ce and cmac-aes-neon implementations
-for arm64 need a similar treatment?
+---8<---
+Some shash algorithms are so simple that they don't have an init_tfm
+function.  These can be cloned trivially.  Check this before failing
+in crypto_clone_shash.
 
-> ---
->
->  crypto/cmac.c |   18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/crypto/cmac.c b/crypto/cmac.c
-> index bcc6f19a4f64..fce6b0f58e88 100644
-> --- a/crypto/cmac.c
-> +++ b/crypto/cmac.c
-> @@ -213,7 +213,22 @@ static int cmac_init_tfm(struct crypto_shash *tfm)
->         ctx->child = cipher;
->
->         return 0;
-> -};
-> +}
-> +
-> +static int cmac_clone_tfm(struct crypto_shash *tfm, struct crypto_shash *otfm)
-> +{
-> +       struct cmac_tfm_ctx *octx = crypto_shash_ctx(otfm);
-> +       struct cmac_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-> +       struct crypto_cipher *cipher;
-> +
-> +       cipher = crypto_clone_cipher(octx->child);
-> +       if (IS_ERR(cipher))
-> +               return PTR_ERR(cipher);
-> +
-> +       ctx->child = cipher;
-> +
-> +       return 0;
-> +}
->
->  static void cmac_exit_tfm(struct crypto_shash *tfm)
->  {
-> @@ -280,6 +295,7 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
->         inst->alg.final = crypto_cmac_digest_final;
->         inst->alg.setkey = crypto_cmac_digest_setkey;
->         inst->alg.init_tfm = cmac_init_tfm;
-> +       inst->alg.clone_tfm = cmac_clone_tfm;
->         inst->alg.exit_tfm = cmac_exit_tfm;
->
->         inst->free = shash_free_singlespawn_instance;
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 717b42df3495..1fadb6b59bdc 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -597,7 +597,7 @@ struct crypto_shash *crypto_clone_shash(struct crypto_shash *hash)
+ 		return hash;
+ 	}
+ 
+-	if (!alg->clone_tfm)
++	if (!alg->clone_tfm && (alg->init_tfm || alg->base.cra_init))
+ 		return ERR_PTR(-ENOSYS);
+ 
+ 	nhash = crypto_clone_tfm(&crypto_shash_type, tfm);
+@@ -606,10 +606,12 @@ struct crypto_shash *crypto_clone_shash(struct crypto_shash *hash)
+ 
+ 	nhash->descsize = hash->descsize;
+ 
+-	err = alg->clone_tfm(nhash, hash);
+-	if (err) {
+-		crypto_free_shash(nhash);
+-		return ERR_PTR(err);
++	if (alg->clone_tfm) {
++		err = alg->clone_tfm(nhash, hash);
++		if (err) {
++			crypto_free_shash(nhash);
++			return ERR_PTR(err);
++		}
+ 	}
+ 
+ 	return nhash;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
