@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40488C77B7A
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 167A2C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231892AbjESRaS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 13:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39150 "EHLO
+        id S231937AbjESRaT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 13:30:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231741AbjESR3x (ORCPT
+        with ESMTP id S231792AbjESR3y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 13:29:53 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2056.outbound.protection.outlook.com [40.107.96.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F7010F5;
-        Fri, 19 May 2023 10:29:21 -0700 (PDT)
+        Fri, 19 May 2023 13:29:54 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D7810FF;
+        Fri, 19 May 2023 10:29:23 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n+VuWDSdQLhBh53ge00NzEXfKz+5YxR5AuAKoTXQxkXkPyv4t5gvHPjeshzaXuerwVfnLKjgHUvL4MSmKweqUGIsOtnF9oeuGZDj9sGIj3qJBDSXwjCz4iEWmProehYr8pTyxPEzUK1ENRIzcRpjHA6X87ieyowoGOmCqX9KEaHU4BCLXsVZwZKpU7yGqwEUBTa0Nm/2pvjqbFfJb/WJGIZY27t6qTS91V4daY3uKBYazdhXKBwW1TEaBz6533xafI5VWpjiNdixbDRfw2RqM71rE2tr5mqQJ1Ajge9i+GtnS++m5dQM3ZXaGo4vPwAcIlglcbdli0wPlN2s+8diBw==
+ b=Bl1BtrsvjIPdr9Rx7IKXR3S1hHrJ6sHam/vmrd4jXDUdfSF0cMRpwoMBbvMrAjf6iiRhwiK3MBeNjIB0Eomvu97zIYlH1qKdRUgw7IY5Ymiuqg7qeO0fBU8fye8rffBtReTrzsdqJKGKz+T3FH8ZndyjjW1KGXrNHravidAftdsi5bkDaUJvUa97wlAZHe9+0NGE2FitjOiIu/xFEEsvgO5OdJG2AV+ZMF/EAEsqbcaHW6FjGHWDrHrZETyiBkxhgV83aM5qChISUrTXGc1i7K1ceFrWAvYzPGqj8bRQjjJE93oB4+FrH1DYlD3kfIUmYrPTjJ8BStfIckKJBdK+ZA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lJ2R7p1+EheZHnyiiVN2R3UsfUXuzN8/4nby8MGswZg=;
- b=ZmILaaoN1oSIFfqHMNiLhiGJFNS2T69O/cpDIdpAw4PTIJVwMD+B8wlJtGGlsuSTKZSDU3sgsyPaxRhG0L+d61UhVUKitwVaRxq7i3ARA/Qe/+apJhiQ9yc7lKyKbODmsFFSW4rCFMQI2SWEZ+RR6lVRO9iqiEr7cQvIY7yNVgMhHkh0UB0NHnGfomPMCaBUpOQQpwXMszvPslJISpEfhBoL3+rt8dSgRq+RCd+e4SYYFNUKlcR+CNUG/b1L+mVkUUGli5JVGLNuBr536/g5tlgz6jEHCOaIPNaBgyJsZR7aWA2E9xbd0kS4fFSfHboxwb4tmj0s2e5p8gTSaerGEA==
+ bh=J5UoFraxHPBUsLmDGAbHt7a9vEfgZB82Dtkjge2Jds4=;
+ b=D8Ab2dx0HOdBmy2hPaIyUrxbYrNLwcFDPb74VH2qfDdtAc5nWAJKiFdIVeyCwZmVTQgZQmt6jVek8qrNnGkeGL86a3SybcZ7cYeRGvPgQV6q6VWgSWR7hmr2coGjFfb0bSxY7TW5bASVBZvlzfM8bsVfws+8K6XqhpS/6rkPjRDFA8eZ5tfTMQ0rwpTPW2DPZvx4JIfg2PoDB+evObsd7d4dssG1jWMQRr/Dy2xwj8AWgd1NAIfdhmpQhilRqN0MkBJEgwZjAdWzpaa8G1fNKenww3lP4GpC2eE31pyR+n8+f8uwEEifgkyMkQsU3kl0t29ATfBTqfZ0lNbkKjcT6w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lJ2R7p1+EheZHnyiiVN2R3UsfUXuzN8/4nby8MGswZg=;
- b=glxFIvHwQqLoqDYDg9iTHVLz6NIHLSy5NjJe1uM19gPgKpi6+7trE04ml1xnCCLZr5hU/Au9aUO6om0yGJ8gJkAuIX1f8zI9oe7pEWEXvGcCqnjzLs65k8YAVI3J0ssZ/0hsTaAXtieNuiKl+TfD/HE77Xd+5wbECmKONDBgd1g=
-Received: from DS7PR05CA0103.namprd05.prod.outlook.com (2603:10b6:8:56::18) by
- MN2PR12MB4176.namprd12.prod.outlook.com (2603:10b6:208:1d5::20) with
+ bh=J5UoFraxHPBUsLmDGAbHt7a9vEfgZB82Dtkjge2Jds4=;
+ b=g9Vm6EcMOZafNW/K2EnN/3vvtwSH69sSf6z1zeg0Q8dbJ0LgeyjiAOJYDVm+49Vykp00x4PFg8MxgKZo+pIVJRKST839gYZgHJGZYKcKHy+0ygF9H4MKcGfZcmDhFUnYdij5EY4/nO8E88HX6+/h18Y1Q2whdWfq0ySXdHCZePE=
+Received: from DM6PR08CA0027.namprd08.prod.outlook.com (2603:10b6:5:80::40) by
+ MN0PR12MB6224.namprd12.prod.outlook.com (2603:10b6:208:3c0::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21; Fri, 19 May
- 2023 17:29:08 +0000
-Received: from DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:56:cafe::a7) by DS7PR05CA0103.outlook.office365.com
- (2603:10b6:8:56::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.7 via Frontend
- Transport; Fri, 19 May 2023 17:29:08 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Fri, 19 May
+ 2023 17:29:10 +0000
+Received: from DM6NAM11FT013.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:80:cafe::fd) by DM6PR08CA0027.outlook.office365.com
+ (2603:10b6:5:80::40) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21 via Frontend
+ Transport; Fri, 19 May 2023 17:29:10 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT082.mail.protection.outlook.com (10.13.173.107) with Microsoft SMTP
+ DM6NAM11FT013.mail.protection.outlook.com (10.13.173.142) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:08 +0000
+ 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:09 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 19 May
- 2023 12:29:06 -0500
+ 2023 12:29:08 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -61,9 +61,9 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     John Allen <john.allen@amd.com>, <linux-crypto@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v3 08/10] crypto: ccp: Add a sample script for Dynamic Boost Control
-Date:   Thu, 18 May 2023 22:24:46 -0500
-Message-ID: <20230519032448.94279-9-mario.limonciello@amd.com>
+Subject: [PATCH v3 10/10] crypto: ccp: Add Mario to MAINTAINERS
+Date:   Thu, 18 May 2023 22:24:48 -0500
+Message-ID: <20230519032448.94279-11-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230519032448.94279-1-mario.limonciello@amd.com>
 References: <20230519032448.94279-1-mario.limonciello@amd.com>
@@ -75,288 +75,57 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT082:EE_|MN2PR12MB4176:EE_
-X-MS-Office365-Filtering-Correlation-Id: aff85af8-8230-4d5a-a965-08db588e8d3c
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT013:EE_|MN0PR12MB6224:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a3f264c-db08-42d6-ab5a-08db588e8e34
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FVc98Np0Dt3Agp2ph3WPy1MPP+RXbi1gas5OyErY6SEY8S5du0CzSXedhLm5w8ilrHhj8oHXJbGi5c3xY+cBA94AwT+shLKOrdc9bPhY67czt00lrxa83Ew4/0s6fma70/AqgqqgYr5WeBU4vaG8iByNg7EsSLahGz3XeqZ1BLXDgdFi50gcYvFu898exGioyvsGIEM2OCFrFuxIseHWovmrUyzbABTus2HiT7+Y7bCCWrJUVHLFFaa+Lq6+aIkJMbLZMDbrWnPV7evVxXFTkfbZSHq2rgd+uvxX69LRMAr6xOApaHlEf3ykPF/EOeULqXQjaWGxXA8x69uZ25117fNXz8Du5QCVBRSHRPgX5UmDAk+jwCn5KQmy6NU1OffcijR9zCKBOeC1/WjAfPl7/Ahy5dAJhsM01AgL65J+5vu3fUHbugzPs7pMNjxHcIRMQbX9PatYdWmDAG7ZzvTEsxFM6CJoGSqZ2AJWejmxYmp8vKAYJU2LCBXIYpCn7XKe276T+sZhLldwNrpf+s+Wd6+Zu7BgmBeoEprxCXmLAzixI4617TISKIF/zAYUoedRD3DszOiCbu9XYx3acwA9ouVR6qaVeoigbWPeV1pvxllKLMcVWYJE7RHqmB3ix3+wVU0YVxY9wP5chINOgknHkOSrqce7f8G4gES02zowwwXW5qrt/GnsJRyu19/1tgb6kKE/Eou3zv5viwxDGNfy5YWVWypgo0Ai4b/qUZE4zdPIkXt7B29B+bL8PIepW88OGGPIOorh/K1x8lbRFEOWXQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(396003)(136003)(451199021)(40470700004)(46966006)(36840700001)(86362001)(2906002)(16526019)(70586007)(70206006)(186003)(26005)(1076003)(54906003)(478600001)(36756003)(110136005)(40480700001)(40460700003)(6666004)(7696005)(356005)(81166007)(82310400005)(2616005)(47076005)(426003)(336012)(41300700001)(44832011)(36860700001)(83380400001)(8676002)(5660300002)(8936002)(82740400003)(4326008)(316002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: kTYXWZR7JIoCJWj8alrCIy/zMiV5QN1B9x9Xm1ExWKxZ8kNlGXnpmfdSTs7UcR4o7QLCxtVeCYjiNkrZtWb01gYmd2sOfclx3HSPGwwdjgL6s8eHuJckvknBR7b8DImgCp6ODoIHO4AzU85CFlX2BaLU+mhCmjY+LZYGcMB2wOzZJq9RVFbmZP98VwoQuGn9DziLDWXpJ4B4Gn6lJtDecPw25Fe0D3oVlawdbtTXt9tU567C3iQTIsSFGbZytDrZd5VRJK9rPz0jYtVFuVhHuLEc4fsrG2GItfCGTbNeVP3iquUEaEp5YiadByFhj1jG/Esb00Gq6E4G2gVmUo59zeUuVaOHrfRluDBBPydBPhTUfly9+U4cvlvloyRjFjVtTCWZ5uXyNyO7Cfd/YJipFSjQmjk3w/c10Okl86iIwUJWNth6C26ahHgVTTdwBm/FPqjP9f+wPtyAAyvX2ocvY95jeVGlbR8DXCeO70U5A1DaP4SqF9zJadp7diDsWhK/ekRrlrVyU1asZ1igdfmpozUum1EomZYwhJLc6Y6YKKceLI6YbqprvmYbD1O2FIl+3vPlDiJ/zL9y17cV96T7G3qm36JFojn+p+VP4hEMddxlh3DYiY/X1Y8PVsg6nuzSF+FrsFJR+U1Fwk1jRzRjICh+pb8fVMPQRdOb8Z58h699F75Swe78p52eZDHUhMPuZNgvAB7WBXokwVgZWDZwFsmaaycLNP2Axt5foQJA2gG8fWOKiioaauhXQfLHmeVywTgUCqPdAss5wtNHJzH6PQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(478600001)(36756003)(86362001)(6666004)(316002)(110136005)(54906003)(4326008)(70586007)(70206006)(82310400005)(44832011)(5660300002)(4744005)(2906002)(40480700001)(8676002)(41300700001)(82740400003)(81166007)(8936002)(356005)(16526019)(36860700001)(7696005)(2616005)(83380400001)(186003)(1076003)(26005)(426003)(336012)(47076005)(40460700003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:08.0439
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:09.6692
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: aff85af8-8230-4d5a-a965-08db588e8d3c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a3f264c-db08-42d6-ab5a-08db588e8e34
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT013.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4176
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6224
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dynamic Boost Control is utilized by userspace with a collection
-of 2 R/W IOCTLs and 1 W IOCTL. Userspace needs to prepare buffers
-with the appropriate signature data and details of the request.
-
-To allow rapid prototyping and testing this interface, add a python3
-command line script that can validate the functionality of these
-IOCTLs.
-
-NOTE: This script does *not* generate signatures.  They will need to
-be prepared separately and passed as arguments.
+I will maintain the platform access interface and dynamic boost
+control support.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- tools/crypto/ccp/.gitignore |   1 +
- tools/crypto/ccp/dbc.py     |  98 ++++++++++++++++++++++++++++
- tools/crypto/ccp/dbc_cli.py | 123 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 222 insertions(+)
- create mode 100644 tools/crypto/ccp/.gitignore
- create mode 100644 tools/crypto/ccp/dbc.py
- create mode 100755 tools/crypto/ccp/dbc_cli.py
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tools/crypto/ccp/.gitignore b/tools/crypto/ccp/.gitignore
-new file mode 100644
-index 000000000000..bee8a64b79a9
---- /dev/null
-+++ b/tools/crypto/ccp/.gitignore
-@@ -0,0 +1 @@
-+__pycache__
-diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
-new file mode 100644
-index 000000000000..f1b7342060b1
---- /dev/null
-+++ b/tools/crypto/ccp/dbc.py
-@@ -0,0 +1,98 @@
-+#!/usr/bin/python3
-+# SPDX-License-Identifier: GPL-2.0
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f2e19f576fec..fdc923bff7f8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -988,6 +988,17 @@ S:	Supported
+ F:	drivers/crypto/ccp/sev*
+ F:	include/uapi/linux/psp-sev.h
+ 
++AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DBC SUPPORT
++M:	Mario Limonciello <mario.limonciello@amd.com>
++L:	linux-crypto@vger.kernel.org
++S:	Supported
++F:	drivers/crypto/ccp/dbc.c
++F:	drivers/crypto/ccp/dbc.h
++F:	drivers/crypto/ccp/platform-access.c
++F:	drivers/crypto/ccp/platform-access.h
++F:	include/uapi/linux/psp-dbc.h
++F:	tools/crypto/ccp/*.py
 +
-+from ioctl_opt import IOWR, IOW
-+import ctypes
-+import fcntl
-+
-+DBC_UID_SIZE = 16
-+DBC_NONCE_SIZE = 16
-+DBC_SIG_SIZE = 32
-+
-+PARAM_GET_FMAX_CAP = (0x3,)
-+PARAM_SET_FMAX_CAP = (0x4,)
-+PARAM_GET_PWR_CAP = (0x5,)
-+PARAM_SET_PWR_CAP = (0x6,)
-+PARAM_GET_GFX_MODE = (0x7,)
-+PARAM_SET_GFX_MODE = (0x8,)
-+PARAM_GET_CURR_TEMP = (0x9,)
-+PARAM_GET_FMAX_MAX = (0xA,)
-+PARAM_GET_FMAX_MIN = (0xB,)
-+PARAM_GET_SOC_PWR_MAX = (0xC,)
-+PARAM_GET_SOC_PWR_MIN = (0xD,)
-+PARAM_GET_SOC_PWR_CUR = (0xE,)
-+
-+DEVICE_NODE = "/dev/dbc"
-+
-+
-+class _dbc_get_nonce(ctypes.Structure):
-+    _fields_ = [
-+        ("auth_needed", ctypes.c_uint32),
-+        ("nonce", ctypes.c_uint8 * DBC_NONCE_SIZE),
-+        ("signature", ctypes.c_uint8 * DBC_SIG_SIZE),
-+    ]
-+
-+
-+class _dbc_set_uid(ctypes.Structure):
-+    _fields_ = [
-+        ("uid", ctypes.c_uint8 * DBC_UID_SIZE),
-+        ("signature", ctypes.c_uint8 * DBC_SIG_SIZE),
-+    ]
-+
-+
-+class _dbc_param(ctypes.Structure):
-+    _fields_ = [
-+        ("msg_index", ctypes.c_uint32),
-+        ("parameter", ctypes.c_uint32),
-+        ("signature", ctypes.c_uint8 * DBC_SIG_SIZE),
-+    ]
-+
-+
-+DBCIOCNONCE = IOWR(ord("D"), 0x01, _dbc_get_nonce)
-+DBCIOCUID = IOW(ord("D"), 0x02, _dbc_set_uid)
-+DBCIOCPARAM = IOWR(ord("D"), 0x03, _dbc_param)
-+
-+
-+def get_nonce(device, signature):
-+    nonce = _dbc_get_nonce()
-+    if signature:
-+        nonce.auth_needed = 1
-+        tmp = ctypes.c_ubyte * len(signature)
-+        nonce.signature = tmp.from_buffer_copy(bytes(signature, "ascii"))
-+    result = fcntl.ioctl(device, DBCIOCNONCE, nonce, True)
-+    if result < 0:
-+        raise IOError(result)
-+    return nonce
-+
-+
-+def set_uid(device, new_uid, signature):
-+    uid = _dbc_set_uid()
-+    if not signature:
-+        raise ValueError("Signature required")
-+    if not new_uid:
-+        raise ValueError("UID required")
-+    tmp = ctypes.c_ubyte * len(signature)
-+    tmp2 = ctypes.c_ubyte * len(new_uid)
-+    uid.signature = tmp.from_buffer_copy(bytes(signature, "ascii"))
-+    uid.uid = tmp2.from_buffer_copy(bytes(new_uid, "ascii"))
-+    result = fcntl.ioctl(device, DBCIOCUID, uid, True)
-+    if result < 0:
-+        raise IOError(result)
-+    return True
-+
-+
-+def process_param(device, message, signature, data=None):
-+    param = _dbc_param()
-+    if not signature:
-+        raise ValueError("Signature required")
-+    if type(message) != tuple:
-+        raise ValueError("Expected message tuple")
-+    tmp = ctypes.c_ubyte * len(signature)
-+    param.signature = tmp.from_buffer_copy(bytes(signature, "ascii"))
-+    param.msg_index = message[0]
-+    if data:
-+        param.parameter = data
-+    result = fcntl.ioctl(device, DBCIOCPARAM, param, True)
-+    if result < 0:
-+        raise IOError(result)
-+    return param
-diff --git a/tools/crypto/ccp/dbc_cli.py b/tools/crypto/ccp/dbc_cli.py
-new file mode 100755
-index 000000000000..2dbefc2b7ed3
---- /dev/null
-+++ b/tools/crypto/ccp/dbc_cli.py
-@@ -0,0 +1,123 @@
-+#!/usr/bin/python3
-+# SPDX-License-Identifier: GPL-2.0
-+import argparse
-+import binascii
-+import os
-+import errno
-+from dbc import *
-+
-+ERRORS = {
-+    errno.EACCES: "Access is denied",
-+    errno.E2BIG: "Excess data provided",
-+    errno.EINVAL: "Bad parameters",
-+    errno.EAGAIN: "Bad state",
-+    errno.ENOENT: "Not implemented or message failure",
-+    errno.EBUSY: "Busy",
-+    errno.ENFILE: "Overflow",
-+    errno.EPERM: "Signature invalid",
-+}
-+
-+messages = {
-+    "get-fmax-cap": PARAM_GET_FMAX_CAP,
-+    "set-fmax-cap": PARAM_SET_FMAX_CAP,
-+    "get-power-cap": PARAM_GET_PWR_CAP,
-+    "set-power-cap": PARAM_SET_PWR_CAP,
-+    "get-graphics-mode": PARAM_GET_GFX_MODE,
-+    "set-graphics-mode": PARAM_SET_GFX_MODE,
-+    "get-current-temp": PARAM_GET_CURR_TEMP,
-+    "get-fmax-max": PARAM_GET_FMAX_MAX,
-+    "get-fmax-min": PARAM_GET_FMAX_MAX,
-+    "get-soc-power-max": PARAM_GET_SOC_PWR_MAX,
-+    "get-soc-power-min": PARAM_GET_SOC_PWR_MIN,
-+    "get-soc-power-cur": PARAM_GET_SOC_PWR_CUR,
-+}
-+
-+
-+def _pretty_buffer(ba):
-+    return str(binascii.hexlify(ba, " "))
-+
-+
-+def parse_args():
-+    parser = argparse.ArgumentParser(
-+        description="Dynamic Boost control command line interface"
-+    )
-+    parser.add_argument(
-+        "command",
-+        choices=["get-nonce", "get-param", "set-param", "set-uid"],
-+        help="Command to send",
-+    )
-+    parser.add_argument("--device", default="/dev/dbc", help="Device to operate")
-+    parser.add_argument("--signature", help="Signature for command")
-+    parser.add_argument("--message", choices=messages.keys(), help="Message index")
-+    parser.add_argument("--data", help="Argument to pass to message")
-+    parser.add_argument("--uid", help="UID to pass")
-+    return parser.parse_args()
-+
-+
-+def pretty_error(code):
-+    if code in ERRORS:
-+        print(ERRORS[code])
-+    else:
-+        print("failed with return code %d" % code)
-+
-+
-+if __name__ == "__main__":
-+    args = parse_args()
-+    data = 0
-+    if not os.path.exists(args.device):
-+        raise IOError("Missing device {device}".format(device=args.device))
-+    if args.signature and len(args.signature) != DBC_SIG_SIZE:
-+        raise ValueError(
-+            "Invalid signature length %d (expected %d)"
-+            % (len(args.signature), DBC_SIG_SIZE)
-+        )
-+    if args.uid and len(args.uid) != DBC_UID_SIZE:
-+        raise ValueError(
-+            "Invalid UID length %d (expected %d)" % (len(args.uid), DBC_UID_SIZE)
-+        )
-+    if args.data:
-+        try:
-+            data = int(args.data, 10)
-+        except ValueError:
-+            data = int(args.data, 16)
-+
-+    with open(args.device) as d:
-+        if args.command == "get-nonce":
-+            try:
-+                nonce = get_nonce(d, args.signature)
-+                print("Nonce: %s" % _pretty_buffer(bytes(nonce.nonce)))
-+            except OSError as e:
-+                pretty_error(e.errno)
-+        elif args.command == "set-uid":
-+            try:
-+                result = set_uid(d, args.uid, args.signature)
-+                if result:
-+                    print("Set UID")
-+            except OSError as e:
-+                pretty_error(e.errno)
-+        elif args.command == "get-param":
-+            if not args.message or args.message.startswith("set"):
-+                raise ValueError("Invalid message %s" % args.message)
-+            try:
-+                param = process_param(d, messages[args.message], args.signature)
-+                print(
-+                    "Parameter: {par}, response signature {sig}".format(
-+                        par=param.parameter,
-+                        sig=_pretty_buffer(bytes(param.signature)),
-+                    )
-+                )
-+            except OSError as e:
-+                pretty_error(e.errno)
-+        elif args.command == "set-param":
-+            if not args.message or args.message.startswith("get"):
-+                raise ValueError("Invalid message %s" % args.message)
-+            try:
-+                param = process_param(d, messages[args.message], args.signature, data)
-+                print(
-+                    "Parameter: {par}, response signature {sig}".format(
-+                        par=param.parameter,
-+                        sig=_pretty_buffer(bytes(param.signature)),
-+                    )
-+                )
-+            except OSError as e:
-+                pretty_error(e.errno)
+ AMD DISPLAY CORE
+ M:	Harry Wentland <harry.wentland@amd.com>
+ M:	Leo Li <sunpeng.li@amd.com>
 -- 
 2.34.1
 
