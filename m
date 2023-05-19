@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CA1C77B7A
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E77ADC77B7A
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 17:30:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229665AbjESR3n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 13:29:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39010 "EHLO
+        id S230497AbjESRaM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 13:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbjESR3m (ORCPT
+        with ESMTP id S231816AbjESR3y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 13:29:42 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2075.outbound.protection.outlook.com [40.107.220.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0820E52;
-        Fri, 19 May 2023 10:29:09 -0700 (PDT)
+        Fri, 19 May 2023 13:29:54 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B2D10FC;
+        Fri, 19 May 2023 10:29:22 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LeCnaNHZ7WxrQzTS3iQjhN1TnAHC/WM7NFabKn2FxTo83Rk/QtuGENuDspwQXWcpEiDvdpk0SouPgBEDEDdS3vHQaG8STm6PL1i0UTAjNQR30h0CrWXccYNxHizB6gIHDOqWJ+JfHqFxaUMBkwuk00K0CwBC4p7M7lMiEo5ErLeMkpXoLQ49wthE6qhjRO45o9kDJeww1SoPwRcsXDiGyPvdv2AwacJjkAZz396sD/uxU22Lz2BPoeUPuW+ckOoBu7WxBMHCBRb9/0l9gjpdx5izXZeSLwRbhHlbzkxOFldP99uBkBbYaWCE0btIlDXXQhpkC1ELX7iNEReD8yW6vA==
+ b=BwFW9TS7rGNUePGy9IZy6jZOxVeu+TDsDv5cvFyshPyw4ftIZl0BSNYIV62wSS+ufQSCbVaFsBTpzN3n/gYO2JIrtS2cfjtZKf/45fG8BqHxdLarXZ5EmhoCckwxPQdLfz4jqh1IUbiGKMrjQA1UAVGy3Sy0umVDNW22FFlJW5zWUuzNYn0Jl0/iup+IX1GDob1s8wpLcgorgWBVen5uUre2BPaevzf9jXNa5K/Lp0I1lDoKCDoclZi3gAeZ16fEa29pUG4GRzsF8lkecc7/ugF+BE5r/UFM6/lS0LlSsjLV4GqNTfcDhYbK5I/Eexvv2H3nA8j6NjjeDyjjn4R4Eg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=McArOqsmUatZT0/1PIvPXrql42CsdIl3qB5N0XrfNIg=;
- b=RV3o2DvYBwQmFDFz56n76cTYmg4pf6or0kSIYeV1T6ySsFt+g5Bpx9D+gCY6g8IGyktOj+sydHRAHhG8xlHzLEOPAG0k1dWY2OipVctz3GVV3CrYWlKsj89yM6UxQ5yrXTxVFTN9o6YErRYXwPb9TAZ6YZAfr1JX0mYjEpY6kGjbW8sU3w6nm+uZuWWxpL/raVj/uuRvlYKmWmV8kzNtIbdrfxIdXK0uqAKa2ALi30J+tS8bQl5vRsbx88huzyTinI8RvvM4o5QOUs23VoK36fl60wtxSbbF1saG90coz1VSRKKK0LAP6ld7raUzPPWm5OkT6Hi5IW5G83JF5V/3FA==
+ bh=3vRp3oQ5mI3lG5LA7CKfO8Bfupy1g/R2DxOVyVWTqMs=;
+ b=gBc6Qix/IBamjl/B2oM5Dwp7A0saf0zsirNmzqttG10B8mlZvN+6iYZduQlwSgIBVR4dnFJvq1Ph8NzA7kvkPgddtNG2YC2B1qyDqFrnUhIpGsjQXwcAN42o55NNqYgfVQrZxGs/h1FnCmmpeKfTk5vSROSsXDtTBE80H9lr5UKLLvwHguMl+bAQGpmaPKt0QdVvLCt8OGEZS1t3vJi7Kh2F44i0QECBcC1vlURSgHCJ58YVPPrr0FBT0WJZgRq5ndEEpJOHKB1QshVgLSHWWsJPiXjECJykDrVmsCZslJzpWi/k4Neqxe8uG5vrCDMKKd87Fc1b4twWVGOX+cR/7Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=McArOqsmUatZT0/1PIvPXrql42CsdIl3qB5N0XrfNIg=;
- b=e85q6l3hk8XXlVSlrcwgcoKb0xV9HP08Zfs0/IOKY8A9EXl47aBZ8ac2OGkI2E0Lfk7dVFiggLywrSdt0z9+n0THn5nErwQWzfATyw2TZDAlA7yEcOQuc4VEC98yG0gii344/mcd2qHfHDH1g2phJo1Ui8bivbfkW1IBiwom7os=
-Received: from DS7PR05CA0013.namprd05.prod.outlook.com (2603:10b6:5:3b9::18)
- by SA1PR12MB8859.namprd12.prod.outlook.com (2603:10b6:806:37c::10) with
+ bh=3vRp3oQ5mI3lG5LA7CKfO8Bfupy1g/R2DxOVyVWTqMs=;
+ b=j4XwNOc2K648TxtL2mOb1K2BSvoe8X50mHsnOq01MQYZytuHzL15qTQ2QGhjDNK/NBkljzBurqGJXLvhAGP4JOQJoVuj4uUVDcZCGHcasdx7IVDAh/Myue7rKr+Blv0/4xq06TSybUmWAcMkhnr21ut9ju8tan896Enlhujkzfo=
+Received: from DS7PR05CA0085.namprd05.prod.outlook.com (2603:10b6:8:56::15) by
+ SA1PR12MB6773.namprd12.prod.outlook.com (2603:10b6:806:258::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.21; Fri, 19 May
- 2023 17:29:01 +0000
-Received: from DM6NAM11FT079.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b9:cafe::32) by DS7PR05CA0013.outlook.office365.com
- (2603:10b6:5:3b9::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.6 via Frontend
- Transport; Fri, 19 May 2023 17:29:01 +0000
+ 2023 17:29:08 +0000
+Received: from DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:56:cafe::bb) by DS7PR05CA0085.outlook.office365.com
+ (2603:10b6:8:56::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.7 via Frontend
+ Transport; Fri, 19 May 2023 17:29:08 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT079.mail.protection.outlook.com (10.13.173.4) with Microsoft SMTP
+ DM6NAM11FT082.mail.protection.outlook.com (10.13.173.107) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:01 +0000
+ 15.20.6411.21 via Frontend Transport; Fri, 19 May 2023 17:29:08 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 19 May
- 2023 12:28:58 -0500
+ 2023 12:29:07 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -61,9 +61,9 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     John Allen <john.allen@amd.com>, <linux-crypto@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v3 01/10] crypto: ccp: Rename macro for security attributes
-Date:   Thu, 18 May 2023 22:24:39 -0500
-Message-ID: <20230519032448.94279-2-mario.limonciello@amd.com>
+Subject: [PATCH v3 09/10] crypto: ccp: Add unit tests for dynamic boost control
+Date:   Thu, 18 May 2023 22:24:47 -0500
+Message-ID: <20230519032448.94279-10-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230519032448.94279-1-mario.limonciello@amd.com>
 References: <20230519032448.94279-1-mario.limonciello@amd.com>
@@ -75,104 +75,322 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT079:EE_|SA1PR12MB8859:EE_
-X-MS-Office365-Filtering-Correlation-Id: 429cc0b5-f168-4ee6-2567-08db588e895b
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT082:EE_|SA1PR12MB6773:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ea52ae3-3806-4ff4-7e82-08db588e8d73
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zBaJb/hbPJI2UytMrXvrkML55kLb13wj/dvZHhXuUFYcJrwsMb0jbe9J9Z9xCMOB7GUxgmbruAeVmlTH4q4yMc8TOf38jBNUBdkWemw68/aQy3b8Y4Yfl9P0GGBSIXwr3k301N3v8w7EQnSgTC69FwlmATZPtmA06fVYpd/+v+wm0D3gL7rnZx97636n/SxfqeLUfAbl2VGiAQmvP1boexfIOHBOZPkUOc+n+VFCgeh+tLVo33qy3z2v/eny2Jh1z4dAinfMtlE7C8pqP2v5XmMb02n5QDnr/ymCLk5fAvBKQHPAjijKtoXnR4J5pTbW7hVykyn/mwS5kRGRTUvzHy9nYFTsVDFz54BYlNmfQ0BKNvTbPRXU3CbhauhcewrvqvzWbar/Hky8SjDzgiO+BkcBtXr5Pwz4BGuvQH1v/HK+AiMcrUGevVFokL4dIwx25Ag8eJan5LV6dSOmtCSvAbCir1WOHxYFTw5VOOJwMwTvjvDAbk4N766fi046oBH/1cjoaECjRlQ5a5YQmTyk9AdEOaLiBAVsDo5lCRtw13Sf79HnI8WmZ3ruHN9qzewAObnyzrp5TpJIxVtGWmdZmVDbwl17P4TxvADkVB5b8cJByN3r7ANx14rJmTxHxaI1ajz5QwOnkuDuQoqqWTwYzea6Uv8Cpbngfm2wLGYQDZTHbEUIAf4PxX89NoEdRC86qjXa/DrLNCDvN8U27cmYw/yhXo67RcASN0lbo5IUxtNcGmXxiU+sPaG0X1sohwhTXsUwyQ8W9rEU8LSgGF54og==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(39860400002)(376002)(451199021)(40470700004)(46966006)(36840700001)(16526019)(70206006)(70586007)(4326008)(110136005)(54906003)(82740400003)(8676002)(8936002)(40480700001)(478600001)(316002)(6666004)(41300700001)(7696005)(40460700003)(2906002)(86362001)(15650500001)(81166007)(356005)(26005)(44832011)(47076005)(2616005)(83380400001)(1076003)(36860700001)(186003)(426003)(336012)(36756003)(5660300002)(82310400005)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: t4A9A+sJXkXWjko/GPoIJZW+BAdSNFqOvf/n+QXVNpN7ascIv0ph0QJpp6co8VUViUGhv2UA9RCpZz2GGOLmBQoO6A+5zwcU8iQfox6PNCMNYiHiLzRgQO6JEmXhH6PJmS40Bh7ERc+tko1XxYQnI4eO4gOsO5AgTsEduo6yJxPNrnvMfURmH6+mVNUCgcNypa6JSkrjVLa0QNkI4qQeIYKR+vqyoUiJcNUUpAKyRtE1T6PUQ8mICBhKLQryr4tYqFxnZsnOiBNvKwcWQEUOGe4H4OzW2V05TpojfEjNuB6nOJRKdLRoXSc4j6+5nfHWRXVNlpmypWFJFqIAtT8Mdl6RJ5gxWhX+GT+A/SARqv5Kr0V14Hhbk3ZQmomr7JTJ/us11G/zPE0TuFcKua+ypYPQGv7hyF+RivRDF2KJo+bWFX6AVxg28tvYpa1CumtypX1MOMeoTwekzbB3SIPdUJraDJ6vMFyACvCh4YlJeriZKScrmJiCycqgYTbmRvrP5vmr4+raFfVL09ku1RgDjQCCEDvBCvZEAPOZkZwkZXAjVDphnh0nfBmnBc13CXfT0WgObiqwi0NTEvptJutcDxAjGpbVkSHoqiMt4NRdICPIprsmpwO8K531k+5phsZK9L/YM5oWoU7EcfnqXP/hkdHhdvt5IF/ROVuKwp8DfVZnocuSyCO8zeYPqxrUZTKI7+oVbV0xuf/3/QE/+yGI3XZRWPY7XZjKoSspdTKINTj4bkbmXNaedvR/w0ewUxMgZe7yElrGrBS68iBcSeiq2A==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(396003)(376002)(39860400002)(451199021)(40470700004)(36840700001)(46966006)(54906003)(5660300002)(26005)(1076003)(44832011)(478600001)(186003)(110136005)(316002)(41300700001)(70586007)(70206006)(4326008)(16526019)(8936002)(6666004)(7696005)(82310400005)(86362001)(2906002)(8676002)(82740400003)(426003)(47076005)(336012)(2616005)(40460700003)(36756003)(356005)(81166007)(36860700001)(40480700001)(83380400001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:01.5484
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2023 17:29:08.4188
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 429cc0b5-f168-4ee6-2567-08db588e895b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ea52ae3-3806-4ff4-7e82-08db588e8d73
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT079.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT082.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8859
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6773
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The attribute_show() macro is only valid for determining the availability
-of security related sysfs entries. Rename the macro to better show this
-relationship.
+Interacting with dynamic boost control messages requires the caller
+to supply a signature. To allow validation of individual dynamic
+boost control components, introduce a set of tests that can be run.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+The tests can be run in 3 distinct different environments, and so
+certain tests will be skipped depending on the environment.
+
+1. Systems that do not support DBC.
+2. Production systems that support DBC but are secured silicon.
+3. Pre-production systems that support DBC but are unsecured silicon.
+
+Unsecured silicon does not validate the signature, and so this allows
+testing more of the state machine and functionality.
+
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
-v2->v3:
- * Pick up tag
+v1->v2:
+    * Update commit message
 ---
- drivers/crypto/ccp/sp-pci.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ tools/crypto/ccp/test_dbc.py | 266 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 266 insertions(+)
+ create mode 100755 tools/crypto/ccp/test_dbc.py
 
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index b603ad9b8341..c8f075a7f49f 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -32,7 +32,7 @@ struct sp_pci {
- };
- static struct sp_device *sp_dev_master;
- 
--#define attribute_show(name, def)						\
-+#define security_attribute_show(name, def)					\
- static ssize_t name##_show(struct device *d, struct device_attribute *attr,	\
- 			   char *buf)						\
- {										\
-@@ -42,24 +42,24 @@ static ssize_t name##_show(struct device *d, struct device_attribute *attr,	\
- 	return sysfs_emit(buf, "%d\n", (psp->capability & bit) > 0);		\
- }
- 
--attribute_show(fused_part, FUSED_PART)
-+security_attribute_show(fused_part, FUSED_PART)
- static DEVICE_ATTR_RO(fused_part);
--attribute_show(debug_lock_on, DEBUG_LOCK_ON)
-+security_attribute_show(debug_lock_on, DEBUG_LOCK_ON)
- static DEVICE_ATTR_RO(debug_lock_on);
--attribute_show(tsme_status, TSME_STATUS)
-+security_attribute_show(tsme_status, TSME_STATUS)
- static DEVICE_ATTR_RO(tsme_status);
--attribute_show(anti_rollback_status, ANTI_ROLLBACK_STATUS)
-+security_attribute_show(anti_rollback_status, ANTI_ROLLBACK_STATUS)
- static DEVICE_ATTR_RO(anti_rollback_status);
--attribute_show(rpmc_production_enabled, RPMC_PRODUCTION_ENABLED)
-+security_attribute_show(rpmc_production_enabled, RPMC_PRODUCTION_ENABLED)
- static DEVICE_ATTR_RO(rpmc_production_enabled);
--attribute_show(rpmc_spirom_available, RPMC_SPIROM_AVAILABLE)
-+security_attribute_show(rpmc_spirom_available, RPMC_SPIROM_AVAILABLE)
- static DEVICE_ATTR_RO(rpmc_spirom_available);
--attribute_show(hsp_tpm_available, HSP_TPM_AVAILABLE)
-+security_attribute_show(hsp_tpm_available, HSP_TPM_AVAILABLE)
- static DEVICE_ATTR_RO(hsp_tpm_available);
--attribute_show(rom_armor_enforced, ROM_ARMOR_ENFORCED)
-+security_attribute_show(rom_armor_enforced, ROM_ARMOR_ENFORCED)
- static DEVICE_ATTR_RO(rom_armor_enforced);
- 
--static struct attribute *psp_attrs[] = {
-+static struct attribute *psp_security_attrs[] = {
- 	&dev_attr_fused_part.attr,
- 	&dev_attr_debug_lock_on.attr,
- 	&dev_attr_tsme_status.attr,
-@@ -83,13 +83,13 @@ static umode_t psp_security_is_visible(struct kobject *kobj, struct attribute *a
- 	return 0;
- }
- 
--static struct attribute_group psp_attr_group = {
--	.attrs = psp_attrs,
-+static struct attribute_group psp_security_attr_group = {
-+	.attrs = psp_security_attrs,
- 	.is_visible = psp_security_is_visible,
- };
- 
- static const struct attribute_group *psp_groups[] = {
--	&psp_attr_group,
-+	&psp_security_attr_group,
- 	NULL,
- };
- 
+diff --git a/tools/crypto/ccp/test_dbc.py b/tools/crypto/ccp/test_dbc.py
+new file mode 100755
+index 000000000000..a58c153d52e6
+--- /dev/null
++++ b/tools/crypto/ccp/test_dbc.py
+@@ -0,0 +1,266 @@
++#!/usr/bin/python3
++# SPDX-License-Identifier: GPL-2.0
++import unittest
++import os
++import time
++import glob
++from dbc import *
++
++# Artificial delay between set commands
++SET_DELAY = 0.5
++
++
++class invalid_param(ctypes.Structure):
++    _fields_ = [
++        ("data", ctypes.c_uint8),
++    ]
++
++
++def system_is_secured() -> bool:
++    fused_part = glob.glob("/sys/bus/pci/drivers/ccp/**/fused_part")[0]
++    if os.path.exists(fused_part):
++        with open(fused_part, "r") as r:
++            return int(r.read()) == 1
++    return True
++
++
++class DynamicBoostControlTest(unittest.TestCase):
++    def __init__(self, data) -> None:
++        self.d = None
++        self.signature = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
++        self.uid = "1111111111111111"
++        super().__init__(data)
++
++    def setUp(self) -> None:
++        self.d = open(DEVICE_NODE)
++        return super().setUp()
++
++    def tearDown(self) -> None:
++        if self.d:
++            self.d.close()
++        return super().tearDown()
++
++
++class TestUnsupportedSystem(DynamicBoostControlTest):
++    def setUp(self) -> None:
++        if os.path.exists(DEVICE_NODE):
++            self.skipTest("system is supported")
++        with self.assertRaises(FileNotFoundError) as error:
++            super().setUp()
++        self.assertEqual(error.exception.errno, 2)
++
++    def test_unauthenticated_nonce(self) -> None:
++        """fetch unauthenticated nonce"""
++        with self.assertRaises(TypeError) as error:
++            get_nonce(self.d, None)
++
++
++class TestInvalidIoctls(DynamicBoostControlTest):
++    def __init__(self, data) -> None:
++        self.data = invalid_param()
++        self.data.data = 1
++        super().__init__(data)
++
++    def setUp(self) -> None:
++        if not os.path.exists(DEVICE_NODE):
++            self.skipTest("system is unsupported")
++        return super().setUp()
++
++    def test_invalid_nonce_ioctl(self) -> None:
++        """tries to call get_nonce ioctl with invalid data structures"""
++
++        # 0x1 (get nonce), and invalid data
++        INVALID1 = IOWR(ord("D"), 0x01, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID1, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
++
++    def test_invalid_setuid_ioctl(self) -> None:
++        """tries to call set_uid ioctl with invalid data structures"""
++
++        # 0x2 (set uid), and invalid data
++        INVALID2 = IOW(ord("D"), 0x02, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID2, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
++
++    def test_invalid_setuid_rw_ioctl(self) -> None:
++        """tries to call set_uid ioctl with invalid data structures"""
++
++        # 0x2 as RW (set uid), and invalid data
++        INVALID3 = IOWR(ord("D"), 0x02, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID3, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
++
++    def test_invalid_param_ioctl(self) -> None:
++        """tries to call param ioctl with invalid data structures"""
++        # 0x3 (param), and invalid data
++        INVALID4 = IOWR(ord("D"), 0x03, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID4, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
++
++    def test_invalid_call_ioctl(self) -> None:
++        """tries to call the DBC ioctl with invalid data structures"""
++        # 0x4, and invalid data
++        INVALID5 = IOWR(ord("D"), 0x04, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID5, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
++
++
++class TestInvalidSignature(DynamicBoostControlTest):
++    def setUp(self) -> None:
++        if not os.path.exists(DEVICE_NODE):
++            self.skipTest("system is unsupported")
++        if not system_is_secured():
++            self.skipTest("system is unfused")
++        return super().setUp()
++
++    def test_unauthenticated_nonce(self) -> None:
++        """fetch unauthenticated nonce"""
++        get_nonce(self.d, None)
++
++    def test_multiple_unauthenticated_nonce(self) -> None:
++        """ensure state machine always returns nonce"""
++        for count in range(0, 2):
++            get_nonce(self.d, None)
++
++    def test_authenticated_nonce(self) -> None:
++        """fetch authenticated nonce"""
++        with self.assertRaises(OSError) as error:
++            get_nonce(self.d, self.signature)
++        self.assertEqual(error.exception.errno, 22)
++
++    def test_set_uid(self) -> None:
++        """set uid"""
++        with self.assertRaises(OSError) as error:
++            set_uid(self.d, self.uid, self.signature)
++        self.assertEqual(error.exception.errno, 11)
++
++    def test_get_param(self) -> None:
++        """fetch a parameter"""
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_GET_SOC_PWR_CUR, self.signature)
++        self.assertEqual(error.exception.errno, 11)
++
++    def test_set_param(self) -> None:
++        """set a parameter"""
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_SET_PWR_CAP, self.signature, 1000)
++        self.assertEqual(error.exception.errno, 11)
++
++
++class TestUnFusedSystem(DynamicBoostControlTest):
++    def setup_identity(self) -> None:
++        """sets up the identity of the caller"""
++        # if already authenticated these may fail
++        try:
++            get_nonce(self.d, None)
++        except PermissionError:
++            pass
++        try:
++            set_uid(self.d, self.uid, self.signature)
++        except BlockingIOError:
++            pass
++        try:
++            get_nonce(self.d, self.signature)
++        except PermissionError:
++            pass
++
++    def setUp(self) -> None:
++        if not os.path.exists(DEVICE_NODE):
++            self.skipTest("system is unsupported")
++        if system_is_secured():
++            self.skipTest("system is fused")
++        super().setUp()
++        self.setup_identity()
++        time.sleep(SET_DELAY)
++
++    def test_get_valid_param(self) -> None:
++        """fetch all possible parameters"""
++        # SOC power
++        soc_power_max = process_param(self.d, PARAM_GET_SOC_PWR_MAX, self.signature)
++        soc_power_min = process_param(self.d, PARAM_GET_SOC_PWR_MIN, self.signature)
++        self.assertGreater(soc_power_max.parameter, soc_power_min.parameter)
++
++        # fmax
++        fmax_max = process_param(self.d, PARAM_GET_FMAX_MAX, self.signature)
++        fmax_min = process_param(self.d, PARAM_GET_FMAX_MIN, self.signature)
++        self.assertGreater(fmax_max.parameter, fmax_min.parameter)
++
++        # cap values
++        keys = {
++            "fmax-cap": PARAM_GET_FMAX_CAP,
++            "power-cap": PARAM_GET_PWR_CAP,
++            "current-temp": PARAM_GET_CURR_TEMP,
++            "soc-power-cur": PARAM_GET_SOC_PWR_CUR,
++        }
++        for k in keys:
++            result = process_param(self.d, keys[k], self.signature)
++            self.assertGreater(result.parameter, 0)
++
++    def test_get_invalid_param(self) -> None:
++        """fetch an invalid parameter"""
++        try:
++            set_uid(self.d, self.uid, self.signature)
++        except OSError:
++            pass
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, (0xF,), self.signature)
++        self.assertEqual(error.exception.errno, 22)
++
++    def test_set_fmax(self) -> None:
++        """get/set fmax limit"""
++        # fetch current
++        original = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
++
++        # set the fmax
++        target = original.parameter - 100
++        process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, target)
++        time.sleep(SET_DELAY)
++        new = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
++        self.assertEqual(new.parameter, target)
++
++        # revert back to current
++        process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, original.parameter)
++        time.sleep(SET_DELAY)
++        cur = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
++        self.assertEqual(cur.parameter, original.parameter)
++
++    def test_set_power_cap(self) -> None:
++        """get/set power cap limit"""
++        # fetch current
++        original = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
++
++        # set the fmax
++        target = original.parameter - 10
++        process_param(self.d, PARAM_SET_PWR_CAP, self.signature, target)
++        time.sleep(SET_DELAY)
++        new = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
++        self.assertEqual(new.parameter, target)
++
++        # revert back to current
++        process_param(self.d, PARAM_SET_PWR_CAP, self.signature, original.parameter)
++        time.sleep(SET_DELAY)
++        cur = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
++        self.assertEqual(cur.parameter, original.parameter)
++
++    def test_set_3d_graphics_mode(self) -> None:
++        """set/get 3d graphics mode"""
++        # these aren't currently implemented but may be some day
++        # they are *expected* to fail
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_GET_GFX_MODE, self.signature)
++        self.assertEqual(error.exception.errno, 2)
++
++        time.sleep(SET_DELAY)
++
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_SET_GFX_MODE, self.signature, 1)
++        self.assertEqual(error.exception.errno, 2)
++
++
++if __name__ == "__main__":
++    unittest.main()
 -- 
 2.34.1
 
