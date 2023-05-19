@@ -2,26 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3842AC77B75
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 09:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A97C3C77B75
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 09:50:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231849AbjESJjN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 05:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42810 "EHLO
+        id S229826AbjESJuP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 19 May 2023 05:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230461AbjESJiu (ORCPT
+        with ESMTP id S230412AbjESJuO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 05:38:50 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E135F210D;
-        Fri, 19 May 2023 02:37:34 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pzwWa-00ApJo-MZ; Fri, 19 May 2023 17:35:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 19 May 2023 17:35:48 +0800
-Date:   Fri, 19 May 2023 17:35:48 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
+        Fri, 19 May 2023 05:50:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D85114;
+        Fri, 19 May 2023 02:50:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BB8D064CAF;
+        Fri, 19 May 2023 09:50:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E0CFC4339C;
+        Fri, 19 May 2023 09:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684489812;
+        bh=cxsLRE0alCrf2ZfgwTTn9OcSDuEYffyVmRa3xxSbSVA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=G0RyNwKIDZ0zSSG6wCVVJlHLA9iEGgez/wzoq8th6H7bbLW0ra3DBSoRHEGMHWiNV
+         /O2iplAC+fZeRHgge0C1G/uyEYNnMBlVpGQp/AaECLynPQy7bWAYrNV8ro6q4EDve1
+         mieTp0ttxxbo2/PkjdVfRMVLNsFQi624KK7RdrEQRgDLB8G8xeUMVnQa7IsG1jBeKl
+         b0IQYfsYncQ1s6Ke3MKPIV7oce6X2bqPm+Yf2xbkzsAlDLX7ooxZxHHes8RFOxgb0i
+         oJwbN8/Q6sj+n6+A+T30KYqnmYeXlJCLcx9Vy6vfSZBcHkiahCWbD2wy75x1Kli0rL
+         A2GYRgE2ttADA==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-4f387d97dddso3508841e87.3;
+        Fri, 19 May 2023 02:50:12 -0700 (PDT)
+X-Gm-Message-State: AC+VfDwhkgBxf5URlhcB/dTcnZl24ydrmDLEcUYNMFq1YxiF2mjM10Ex
+        07zWgaV3UnpQM0ihUKzD0XxBxHIiKijCM2yVoEc=
+X-Google-Smtp-Source: ACHHUZ5GcgO2M7ELebyN3Y1RyiaRrgxpvXBxmuk2yUVv8d3D90lsJfyWfmQipdKuDjOf1BlNC20rnWfiygUIXWwKBo4=
+X-Received: by 2002:ac2:5a0b:0:b0:4ef:e87e:df88 with SMTP id
+ q11-20020ac25a0b000000b004efe87edf88mr603195lfn.64.1684489810195; Fri, 19 May
+ 2023 02:50:10 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230512202311.2845526-1-dima@arista.com> <20230512202311.2845526-2-dima@arista.com>
+ <ZGG5rtuHB4lvLyKI@gondor.apana.org.au> <eb6d0724-92d6-3c3f-b698-9734adc7e1b9@arista.com>
+ <ZGcyuyjJwZhdYS/G@gondor.apana.org.au>
+In-Reply-To: <ZGcyuyjJwZhdYS/G@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 19 May 2023 11:49:58 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFoiJpZLCiE4uNTEXMncvWheSn8nVWGB8g3sL1K8jGyuw@mail.gmail.com>
+Message-ID: <CAMj1kXFoiJpZLCiE4uNTEXMncvWheSn8nVWGB8g3sL1K8jGyuw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] crypto: cmac - Add cloning support
+To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Dmitry Safonov <dima@arista.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         linux-kernel@vger.kernel.org, David Ahern <dsahern@kernel.org>,
@@ -42,46 +71,23 @@ Cc:     Dmitry Safonov <dima@arista.com>,
         Leonard Crestez <cdleonard@gmail.com>,
         Salam Noureddine <noureddine@arista.com>,
         netdev@vger.kernel.org
-Subject: Re: [PATCH] crypto: shash - Allow cloning on algorithms with no
- init_tfm
-Message-ID: <ZGdC9MDomBGRpccP@gondor.apana.org.au>
-References: <ZGcyuyjJwZhdYS/G@gondor.apana.org.au>
- <E1pzvTZ-00AnMQ-5M@formenos.hmeau.com>
- <CAMj1kXGwS03zUBTGb7jmk1-6r+=a-HH+A-S9ZFTYRyJSzN0Xcg@mail.gmail.com>
- <ZGc7hCaDrnEFG8Lr@gondor.apana.org.au>
- <CAMj1kXEkz1QvkXWc8dCGhU_MPf+1M3P2+rAiLciuixnKCmRESg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXEkz1QvkXWc8dCGhU_MPf+1M3P2+rAiLciuixnKCmRESg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 19, 2023 at 11:31:30AM +0200, Ard Biesheuvel wrote:
+For the series,
+
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+
+
+On Fri, 19 May 2023 at 10:27, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> OK. So IIUC, cloning a keyless hash just shares the TFM and bumps the
-> refcount, but here we must actually allocate a new TFM referring to
-> the same algo, and this new TFM needs its key to be set before use, as
-> it doesn't inherit it from the clonee, right? And this works in the
-> same way as cloning an instance of the generic HMAC template, as this
-> will just clone the inner shash too, and will also leave the key
-> unset.
-
-Yes that's pretty much it.  Cloning a tfm is basically exactly
-the same as allocating a tfm, except that instead of going through
-the init_tfm code-path it executes clone_tfm instead (thus allowing
-any internal data structures to either be shared or allocated with
-GFP_ATOMIC).
-
-The key will be unset just like a freshly allocated tfm.
-
-> If so,
-> 
-> Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> This series of patches add cloning support for the cmac algorithm.
+>
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
