@@ -2,123 +2,53 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58DA2C7EE23
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 May 2023 22:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB31FC7EE26
+	for <linux-crypto@archiver.kernel.org>; Sat, 20 May 2023 05:11:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbjESWdp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 May 2023 18:33:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52016 "EHLO
+        id S231215AbjETFLK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 20 May 2023 01:11:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbjESWdp (ORCPT
+        with ESMTP id S231290AbjETFKn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 May 2023 18:33:45 -0400
+        Sat, 20 May 2023 01:10:43 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB891BD;
-        Fri, 19 May 2023 15:33:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F33E52;
+        Fri, 19 May 2023 22:10:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=dzkMn7jXhuW46G6N54fI9VSxhbfWQPb9eBen4fnyZMM=; b=oW7jKK9dD+JkZYQopHTtoZLdIf
-        ifss5k+Ba6BO4/frKHPmNl85tmAk4YqdDhEOMgQznNFvPHj5/8/7esRY7q4PBd2yDceO38esCsptk
-        Hq66dDEhvIakalnxaiNTw0uhYSLcrjsoO+8pcOYB6ic0Pzvfct4mOPU4Fs916n/IYmA30U+ogqdKC
-        yyZ86xBRVgHWTutdUkAzx0MTyB4ufBlb6QyDazHWnSuWZKR+NI4MnedIgreM7ElDZCoFkAHpT8E+h
-        lXzE29T9kkNXQpIzwfctQr8e82xBxy8b2XtqO3hwfpn8R1JkxyPdWbjWfegu8O45gKn5tmEUGa+er
-        LkAS18Tg==;
-Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q08fJ-00HShm-0H;
-        Fri, 19 May 2023 22:33:37 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH] powerpc/crypto: fix build warnings when DEBUG_FS is not enabled
-Date:   Fri, 19 May 2023 15:33:34 -0700
-Message-Id: <20230519223334.11992-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.40.1
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IZDwpSbAMestbxTLBfVfseHT/Ao1tda2Hw4YjCVMEYs=; b=cHkX9gDilxrMdUT4jG8u5OaHR4
+        L649r4BgCX/pLuYAkhtU7SfafGHxxnrkUHEgT73x1yGjbRqyAlVK21YJ9K37RG+dA6B4QsRCgDg5u
+        AMOqipYZn/a8zn8pcotnMu0xnrY0QfgL3AWKEk2bB7uEqQdxqWYQHjtC3u8IGIjc9BW/mC34TmmPK
+        4hfhEzqh4EWdQQP0Rk18v7/YSyzKzOWnHuAu/JZ6gwW/k/cKdTLVGCvGU/aHKgYJaGyj+c4eypG3x
+        qMaW3NS65gjbl/lOfjSfziIpL+N28MVHooIGIOoavwJekn2IMwGE+x/KxENxInlUVJdZ6dLPQSnzT
+        K0XEfMPQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q0Er9-000kTk-0P;
+        Sat, 20 May 2023 05:10:15 +0000
+Date:   Fri, 19 May 2023 22:10:15 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH v2] fsverity: use shash API instead of ahash API
+Message-ID: <ZGhWN6zohGXQvPNv@infradead.org>
+References: <20230516052306.99600-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230516052306.99600-1-ebiggers@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix build warnings when DEBUG_FS is not enabled by using an empty
-do-while loop instead of a value:
+I'm not really an expert on fsverify, but the rationale of not using
+clumsy external crypto offloads from the file system makes sense, and
+the code looks much nicer now:
 
-In file included from ../drivers/crypto/nx/nx.c:27:
-../drivers/crypto/nx/nx.c: In function 'nx_register_algs':
-../drivers/crypto/nx/nx.h:173:33: warning: statement with no effect [-Wunused-value]
-  173 | #define NX_DEBUGFS_INIT(drv)    (0)
-../drivers/crypto/nx/nx.c:573:9: note: in expansion of macro 'NX_DEBUGFS_INIT'
-  573 |         NX_DEBUGFS_INIT(&nx_driver);
-../drivers/crypto/nx/nx.c: In function 'nx_remove':
-../drivers/crypto/nx/nx.h:174:33: warning: statement with no effect [-Wunused-value]
-  174 | #define NX_DEBUGFS_FINI(drv)    (0)
-../drivers/crypto/nx/nx.c:793:17: note: in expansion of macro 'NX_DEBUGFS_FINI'
-  793 |                 NX_DEBUGFS_FINI(&nx_driver);
-
-Also, there is no need to build nx_debugfs.o when DEBUG_FS is not
-enabled, so change the Makefile to accommodate that.
-
-Fixes: ae0222b7289d ("powerpc/crypto: nx driver code supporting nx encryption")
-Fixes: aef7b31c8833 ("powerpc/crypto: Build files for the nx device driver")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Breno Leitão <leitao@debian.org>
-Cc: Nayna Jain <nayna@linux.ibm.com>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: linuxppc-dev@lists.ozlabs.org
----
- drivers/crypto/nx/Makefile |    2 +-
- drivers/crypto/nx/nx.h     |    4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff -- a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
---- a/drivers/crypto/nx/Makefile
-+++ b/drivers/crypto/nx/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_NX_ENCRYPT) += nx-crypto.o
- nx-crypto-objs := nx.o \
--		  nx_debugfs.o \
- 		  nx-aes-cbc.o \
- 		  nx-aes-ecb.o \
- 		  nx-aes-gcm.o \
-@@ -11,6 +10,7 @@ nx-crypto-objs := nx.o \
- 		  nx-sha256.o \
- 		  nx-sha512.o
- 
-+nx-crypto-$(CONFIG_DEBUG_FS) += nx_debugfs.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o nx-compress.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o nx-compress.o
- nx-compress-objs := nx-842.o
-diff -- a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -170,8 +170,8 @@ struct nx_sg *nx_walk_and_build(struct n
- void nx_debugfs_init(struct nx_crypto_driver *);
- void nx_debugfs_fini(struct nx_crypto_driver *);
- #else
--#define NX_DEBUGFS_INIT(drv)	(0)
--#define NX_DEBUGFS_FINI(drv)	(0)
-+#define NX_DEBUGFS_INIT(drv)	do {} while (0)
-+#define NX_DEBUGFS_FINI(drv)	do {} while (0)
- #endif
- 
- #define NX_PAGE_NUM(x)		((u64)(x) & 0xfffffffffffff000ULL)
+Reviewed-by: Christoph Hellwig <hch@lst.de>
