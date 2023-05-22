@@ -2,116 +2,52 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A14C4C7EE29
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 May 2023 03:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0496C7EE29
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 May 2023 05:15:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbjEVDaB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 May 2023 23:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53786 "EHLO
+        id S231808AbjEVFPr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 May 2023 01:15:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231433AbjEVDaA (ORCPT
+        with ESMTP id S231867AbjEVFPp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 May 2023 23:30:00 -0400
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 820C4C6;
-        Sun, 21 May 2023 20:29:57 -0700 (PDT)
-Received: from prodtpl.icoremail.net (unknown [10.12.1.20])
-        by hzbj-icmmx-6 (Coremail) with SMTP id AQAAfwB389ib4mpk8QZSAA--.8581S2;
-        Mon, 22 May 2023 11:33:47 +0800 (CST)
-Received: from phytium.com.cn (unknown [218.76.62.144])
-        by mail (Coremail) with SMTP id AQAAfwA34VGu4Wpk4UwAAA--.2436S3;
-        Mon, 22 May 2023 11:29:50 +0800 (CST)
-From:   yangmengfei1394 <yangmengfei1394@phytium.com.cn>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yangmengfei1394 <yangmengfei1394@phytium.com.cn>
-Subject: [PATCH] Crypto module : rearrange the default functions of akcipher
-Date:   Mon, 22 May 2023 11:30:27 +0800
-Message-Id: <20230522033027.989-1-yangmengfei1394@phytium.com.cn>
-X-Mailer: git-send-email 2.35.1.windows.2
-In-Reply-To: <20230510075142.1638-1-yangmengfei1394@phytium.com.cn>
-References: <20230510075142.1638-1-yangmengfei1394@phytium.com.cn>
+        Mon, 22 May 2023 01:15:45 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E29A1;
+        Sun, 21 May 2023 22:15:36 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1q0xtA-00BjFj-4s; Mon, 22 May 2023 13:15:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 22 May 2023 13:15:20 +0800
+Date:   Mon, 22 May 2023 13:15:20 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Huan Feng <huan.feng@starfivetech.com>,
+        Jia Jie Ho <jiajie.ho@starfivetech.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the crypto tree
+Message-ID: <ZGr6aB9uJVnyfJQ9@gondor.apana.org.au>
+References: <20230522105257.562cb1ec@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: AQAAfwA34VGu4Wpk4UwAAA--.2436S3
-X-CM-SenderInfo: 51dqwzxhqjwvjlrtmko6sk53xlxphulrpou0/1tbiAQAEBmRmgN8EeAACsg
-Authentication-Results: hzbj-icmmx-6; spf=neutral smtp.mail=yangmengfe
-        i1394@phytium.com.cn;
-X-Coremail-Antispam: 1Uk129KBjvJXoW7uF4UAFWfuF15Gw4kurWDtwb_yoW8Kr4rpF
-        1fK397Jr4UXF1293y8JFs5Jry5XrWxA3Wayr48Cw1fKFs2gryFgr47t348CFy5JF98Ary8
-        Cw4v9w1UWw4DCaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        DUYxn0WfASr-VFAU7a7-sFnT9fnUUIcSsGvfJ3UbIYCTnIWIevJa73UjIFyTuYvj4RJUUU
-        UUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230522105257.562cb1ec@canb.auug.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-According to your last email, we rearrange the default functions,
-move the code that sets the default functions from
-crypto_register_akcipher into akcipher_prepare_alg,
-add the set_pub_key function check at the same time.
+On Mon, May 22, 2023 at 10:52:57AM +1000, Stephen Rothwell wrote:
+> Hi all,
+> 
+> After merging the crypto tree, today's linux-next build (x86_64
+> allmodconfig) failed like this:
 
-Signed-off-by: yangmengfei1394 <yangmengfei1394@phytium.com.cn>
----
- crypto/akcipher.c | 30 ++++++++++++++++--------------
- 1 file changed, 16 insertions(+), 14 deletions(-)
+Sorry, a fix is pending and will be pushed out soon.
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 7960ceb528c3..45502446b231 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -126,19 +126,6 @@ struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_akcipher);
- 
--static void akcipher_prepare_alg(struct akcipher_alg *alg)
--{
--	struct crypto_istat_akcipher *istat = akcipher_get_stat(alg);
--	struct crypto_alg *base = &alg->base;
--
--	base->cra_type = &crypto_akcipher_type;
--	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
--	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
--
--	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
--		memset(istat, 0, sizeof(*istat));
--}
--
- static int akcipher_default_op(struct akcipher_request *req)
- {
- 	return -ENOSYS;
-@@ -150,8 +137,9 @@ static int akcipher_default_set_key(struct crypto_akcipher *tfm,
- 	return -ENOSYS;
- }
- 
--int crypto_register_akcipher(struct akcipher_alg *alg)
-+static void akcipher_prepare_alg(struct akcipher_alg *alg)
- {
-+	struct crypto_istat_akcipher *istat = akcipher_get_stat(alg);
- 	struct crypto_alg *base = &alg->base;
- 
- 	if (!alg->sign)
-@@ -164,6 +152,20 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
- 		alg->decrypt = akcipher_default_op;
- 	if (!alg->set_priv_key)
- 		alg->set_priv_key = akcipher_default_set_key;
-+	if (!alg->set_pub_key)
-+		alg->set_pub_key = akcipher_default_set_key;
-+
-+	base->cra_type = &crypto_akcipher_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
-+
-+	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
-+		memset(istat, 0, sizeof(*istat));
-+}
-+
-+int crypto_register_akcipher(struct akcipher_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
- 
- 	akcipher_prepare_alg(alg);
- 	return crypto_register_alg(base);
+Cheers,
 -- 
-2.35.1.windows.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
