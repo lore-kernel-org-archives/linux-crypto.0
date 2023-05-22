@@ -2,51 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0496C7EE29
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 May 2023 05:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AFCC77B75
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 May 2023 05:17:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231808AbjEVFPr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 May 2023 01:15:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54982 "EHLO
+        id S231689AbjEVFRz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 22 May 2023 01:17:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231867AbjEVFPp (ORCPT
+        with ESMTP id S231922AbjEVFRy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 May 2023 01:15:45 -0400
+        Mon, 22 May 2023 01:17:54 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E29A1;
-        Sun, 21 May 2023 22:15:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B535107;
+        Sun, 21 May 2023 22:17:51 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q0xtA-00BjFj-4s; Mon, 22 May 2023 13:15:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 22 May 2023 13:15:20 +0800
-Date:   Mon, 22 May 2023 13:15:20 +0800
+        id 1q0xvM-00BjHf-DL; Mon, 22 May 2023 13:17:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 22 May 2023 13:17:36 +0800
+Date:   Mon, 22 May 2023 13:17:36 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Huan Feng <huan.feng@starfivetech.com>,
-        Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the crypto tree
-Message-ID: <ZGr6aB9uJVnyfJQ9@gondor.apana.org.au>
-References: <20230522105257.562cb1ec@canb.auug.org.au>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: starfive - Fix driver dependencies
+Message-ID: <ZGr68A1WPF07yFUz@gondor.apana.org.au>
+References: <20230519134233.108251-1-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230522105257.562cb1ec@canb.auug.org.au>
+In-Reply-To: <20230519134233.108251-1-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 22, 2023 at 10:52:57AM +1000, Stephen Rothwell wrote:
-> Hi all,
+On Fri, May 19, 2023 at 09:42:33PM +0800, Jia Jie Ho wrote:
+> Kconfig updated to depend on DMADEVICES instead of selecting it.
 > 
-> After merging the crypto tree, today's linux-next build (x86_64
-> allmodconfig) failed like this:
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: https://lore.kernel.org/oe-kbuild-all/202305191929.Eq4OVZ6D-lkp@intel.com/
+> Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+> ---
+>  drivers/crypto/starfive/Kconfig | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-Sorry, a fix is pending and will be pushed out soon.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
