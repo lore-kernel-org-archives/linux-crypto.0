@@ -2,142 +2,116 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32667C77B7C
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 May 2023 00:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A14C4C7EE29
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 May 2023 03:30:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229764AbjEVA7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 May 2023 20:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38590 "EHLO
+        id S229621AbjEVDaB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 21 May 2023 23:30:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229852AbjEVA73 (ORCPT
+        with ESMTP id S231433AbjEVDaA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 May 2023 20:59:29 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73856CF;
-        Sun, 21 May 2023 17:59:26 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QPfGz0VlGz4x3x;
-        Mon, 22 May 2023 10:59:22 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1684717164;
-        bh=NcOxMgq8TvvhdzUGOGPEsHFpZuTqpWx3N3QVCPjo0Jw=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=VHunKFXMg3G8W3SyuU0IfGzTnEzVJN+5tqGL6YE/f6O0Yx+eFKs7oIdoBWjviuYD7
-         lvi0o8hiqI4gntU808PuELCGNXNzLmvgC6242pYSdUPsSpTvPD6JjBfEIvJlYKbSMh
-         X7ZkFpQ+g8M5vgjaFI7dd1AGpTf/bvtONqLhmfOA9i3yKDgabp+SCmRR+bJ4XLdczs
-         PnNmA8ipY8km9hMhYrV0/yQTADpuZFgXLU7VMLbwJrFYd2oAe62rP2eddtNzZ1k83w
-         saO3fh6Y7d+DSefHDr7aJgNEnWVUhvZUQkGrmx5MEpXMbtYhNgi03SRwgoD7lcK+df
-         XA0uTduEMYGPg==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Breno =?utf-8?Q?Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] powerpc/crypto: fix build warnings when DEBUG_FS is not
- enabled
-In-Reply-To: <20230519223334.11992-1-rdunlap@infradead.org>
-References: <20230519223334.11992-1-rdunlap@infradead.org>
-Date:   Mon, 22 May 2023 10:59:17 +1000
-Message-ID: <87jzx19o62.fsf@mail.lhotse>
+        Sun, 21 May 2023 23:30:00 -0400
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 820C4C6;
+        Sun, 21 May 2023 20:29:57 -0700 (PDT)
+Received: from prodtpl.icoremail.net (unknown [10.12.1.20])
+        by hzbj-icmmx-6 (Coremail) with SMTP id AQAAfwB389ib4mpk8QZSAA--.8581S2;
+        Mon, 22 May 2023 11:33:47 +0800 (CST)
+Received: from phytium.com.cn (unknown [218.76.62.144])
+        by mail (Coremail) with SMTP id AQAAfwA34VGu4Wpk4UwAAA--.2436S3;
+        Mon, 22 May 2023 11:29:50 +0800 (CST)
+From:   yangmengfei1394 <yangmengfei1394@phytium.com.cn>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yangmengfei1394 <yangmengfei1394@phytium.com.cn>
+Subject: [PATCH] Crypto module : rearrange the default functions of akcipher
+Date:   Mon, 22 May 2023 11:30:27 +0800
+Message-Id: <20230522033027.989-1-yangmengfei1394@phytium.com.cn>
+X-Mailer: git-send-email 2.35.1.windows.2
+In-Reply-To: <20230510075142.1638-1-yangmengfei1394@phytium.com.cn>
+References: <20230510075142.1638-1-yangmengfei1394@phytium.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: AQAAfwA34VGu4Wpk4UwAAA--.2436S3
+X-CM-SenderInfo: 51dqwzxhqjwvjlrtmko6sk53xlxphulrpou0/1tbiAQAEBmRmgN8EeAACsg
+Authentication-Results: hzbj-icmmx-6; spf=neutral smtp.mail=yangmengfe
+        i1394@phytium.com.cn;
+X-Coremail-Antispam: 1Uk129KBjvJXoW7uF4UAFWfuF15Gw4kurWDtwb_yoW8Kr4rpF
+        1fK397Jr4UXF1293y8JFs5Jry5XrWxA3Wayr48Cw1fKFs2gryFgr47t348CFy5JF98Ary8
+        Cw4v9w1UWw4DCaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
+        DUYxn0WfASr-VFAU7a7-sFnT9fnUUIcSsGvfJ3UbIYCTnIWIevJa73UjIFyTuYvj4RJUUU
+        UUUUU
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Randy Dunlap <rdunlap@infradead.org> writes:
-> Fix build warnings when DEBUG_FS is not enabled by using an empty
-> do-while loop instead of a value:
->
-> In file included from ../drivers/crypto/nx/nx.c:27:
-> ../drivers/crypto/nx/nx.c: In function 'nx_register_algs':
-> ../drivers/crypto/nx/nx.h:173:33: warning: statement with no effect [-Wun=
-used-value]
->   173 | #define NX_DEBUGFS_INIT(drv)    (0)
-> ../drivers/crypto/nx/nx.c:573:9: note: in expansion of macro 'NX_DEBUGFS_=
-INIT'
->   573 |         NX_DEBUGFS_INIT(&nx_driver);
-> ../drivers/crypto/nx/nx.c: In function 'nx_remove':
-> ../drivers/crypto/nx/nx.h:174:33: warning: statement with no effect [-Wun=
-used-value]
->   174 | #define NX_DEBUGFS_FINI(drv)    (0)
-> ../drivers/crypto/nx/nx.c:793:17: note: in expansion of macro 'NX_DEBUGFS=
-_FINI'
->   793 |                 NX_DEBUGFS_FINI(&nx_driver);
->
-> Also, there is no need to build nx_debugfs.o when DEBUG_FS is not
-> enabled, so change the Makefile to accommodate that.
->
-> Fixes: ae0222b7289d ("powerpc/crypto: nx driver code supporting nx encryp=
-tion")
-> Fixes: aef7b31c8833 ("powerpc/crypto: Build files for the nx device drive=
-r")
+According to your last email, we rearrange the default functions,
+move the code that sets the default functions from
+crypto_register_akcipher into akcipher_prepare_alg,
+add the set_pub_key function check at the same time.
 
-In recent years the subject prefix for this code has been "crypto: nx:"
-or similar.
+Signed-off-by: yangmengfei1394 <yangmengfei1394@phytium.com.cn>
+---
+ crypto/akcipher.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
 
-Maybe Herbert can fix it up to his liking when he applies it.
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index 7960ceb528c3..45502446b231 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -126,19 +126,6 @@ struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type,
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_akcipher);
+ 
+-static void akcipher_prepare_alg(struct akcipher_alg *alg)
+-{
+-	struct crypto_istat_akcipher *istat = akcipher_get_stat(alg);
+-	struct crypto_alg *base = &alg->base;
+-
+-	base->cra_type = &crypto_akcipher_type;
+-	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
+-	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
+-
+-	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
+-		memset(istat, 0, sizeof(*istat));
+-}
+-
+ static int akcipher_default_op(struct akcipher_request *req)
+ {
+ 	return -ENOSYS;
+@@ -150,8 +137,9 @@ static int akcipher_default_set_key(struct crypto_akcipher *tfm,
+ 	return -ENOSYS;
+ }
+ 
+-int crypto_register_akcipher(struct akcipher_alg *alg)
++static void akcipher_prepare_alg(struct akcipher_alg *alg)
+ {
++	struct crypto_istat_akcipher *istat = akcipher_get_stat(alg);
+ 	struct crypto_alg *base = &alg->base;
+ 
+ 	if (!alg->sign)
+@@ -164,6 +152,20 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
+ 		alg->decrypt = akcipher_default_op;
+ 	if (!alg->set_priv_key)
+ 		alg->set_priv_key = akcipher_default_set_key;
++	if (!alg->set_pub_key)
++		alg->set_pub_key = akcipher_default_set_key;
++
++	base->cra_type = &crypto_akcipher_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
++
++	if (IS_ENABLED(CONFIG_CRYPTO_STATS))
++		memset(istat, 0, sizeof(*istat));
++}
++
++int crypto_register_akcipher(struct akcipher_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
+ 
+ 	akcipher_prepare_alg(alg);
+ 	return crypto_register_alg(base);
+-- 
+2.35.1.windows.2
 
-cheers
-
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Breno Leit=C3=A3o <leitao@debian.org>
-> Cc: Nayna Jain <nayna@linux.ibm.com>
-> Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Cc: linuxppc-dev@lists.ozlabs.org
-> ---
->  drivers/crypto/nx/Makefile |    2 +-
->  drivers/crypto/nx/nx.h     |    4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff -- a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-> --- a/drivers/crypto/nx/Makefile
-> +++ b/drivers/crypto/nx/Makefile
-> @@ -1,7 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  obj-$(CONFIG_CRYPTO_DEV_NX_ENCRYPT) +=3D nx-crypto.o
->  nx-crypto-objs :=3D nx.o \
-> -		  nx_debugfs.o \
->  		  nx-aes-cbc.o \
->  		  nx-aes-ecb.o \
->  		  nx-aes-gcm.o \
-> @@ -11,6 +10,7 @@ nx-crypto-objs :=3D nx.o \
->  		  nx-sha256.o \
->  		  nx-sha512.o
->=20=20
-> +nx-crypto-$(CONFIG_DEBUG_FS) +=3D nx_debugfs.o
->  obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) +=3D nx-compress-pseries.o =
-nx-compress.o
->  obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) +=3D nx-compress-powernv.o =
-nx-compress.o
->  nx-compress-objs :=3D nx-842.o
-> diff -- a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-> --- a/drivers/crypto/nx/nx.h
-> +++ b/drivers/crypto/nx/nx.h
-> @@ -170,8 +170,8 @@ struct nx_sg *nx_walk_and_build(struct n
->  void nx_debugfs_init(struct nx_crypto_driver *);
->  void nx_debugfs_fini(struct nx_crypto_driver *);
->  #else
-> -#define NX_DEBUGFS_INIT(drv)	(0)
-> -#define NX_DEBUGFS_FINI(drv)	(0)
-> +#define NX_DEBUGFS_INIT(drv)	do {} while (0)
-> +#define NX_DEBUGFS_FINI(drv)	do {} while (0)
->  #endif
->=20=20
->  #define NX_PAGE_NUM(x)		((u64)(x) & 0xfffffffffffff000ULL)
