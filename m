@@ -2,86 +2,90 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C765FC7EE2D
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 May 2023 07:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE4EC7EE23
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 May 2023 08:35:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235614AbjEWHeH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 May 2023 03:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35834 "EHLO
+        id S235556AbjEWIfg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 May 2023 04:35:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235619AbjEWHdm (ORCPT
+        with ESMTP id S236217AbjEWIfA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2023 03:33:42 -0400
-Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE58210E6;
-        Tue, 23 May 2023 00:32:43 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by fd01.gateway.ufhost.com (Postfix) with ESMTP id 74BAE7FE0;
-        Tue, 23 May 2023 15:31:21 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 23 May
- 2023 15:31:21 +0800
-Received: from [192.168.155.209] (202.188.176.82) by EXMBX168.cuchost.com
- (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Tue, 23 May
- 2023 15:31:18 +0800
-Message-ID: <33a663b7-a353-69b9-7fed-b7758cadb12b@starfivetech.com>
-Date:   Tue, 23 May 2023 15:31:13 +0800
+        Tue, 23 May 2023 04:35:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314FA10EF;
+        Tue, 23 May 2023 01:33:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C2B5601C6;
+        Tue, 23 May 2023 08:33:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE65AC4339B;
+        Tue, 23 May 2023 08:33:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684830800;
+        bh=MnGHsJX536Td4nzr8n47Z1xXn9aYKRj+yG30BHNM0pE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=VjlerZ6DwRlft+MW5AKa+6QzLwoGVwrBuYKV+9G06XcHljxy7GOaXAbhHxd9ty586
+         UWdkKzXGJtP3kRTiZHA09Hl2Pl0CNxAEpvuTodMwV/nnbjo2sWcEn+ndrB3DH/CISL
+         cbVi/qZnNhjVc/KZgj9Azp3zgVlNZ+MUjvA22O5mbEPUi1vVVMnr0hjai3o7mATxzU
+         Tzc2RVu1t0N9TguAkJhw9vR6d9p2E+HZjl85aDIVRq6XwxHCF6ramLRYPb64N7GQol
+         qj9Ri9a+fbbIWlle9CCv5FzqeUWcqSCPNk7HEyFIdhmKOUcnbA9a7DbJJvvrZYpVHO
+         R/I8YD1ENffig==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: marvell/cesa - Fix type mismatch warning
+Date:   Tue, 23 May 2023 10:33:04 +0200
+Message-Id: <20230523083313.899332-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.1
-Subject: Re: [PATCH] crypto: starfive - Depend on AMBA_PL08X instead of
- selecting it
-Content-Language: en-US
-To:     Conor Dooley <conor.dooley@microchip.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-References: <20230522105257.562cb1ec@canb.auug.org.au>
- <ZGr6aB9uJVnyfJQ9@gondor.apana.org.au>
- <20230523103637.20175fbc@canb.auug.org.au>
- <ZGwmAp5RPqAjVMCg@gondor.apana.org.au>
- <20230523-pelvis-unwritten-bedc9c75d899@wendy>
-From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
-In-Reply-To: <20230523-pelvis-unwritten-bedc9c75d899@wendy>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [202.188.176.82]
-X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX168.cuchost.com
- (172.16.6.78)
-X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 23/5/2023 2:56 pm, Conor Dooley wrote:
-> On Tue, May 23, 2023 at 10:33:38AM +0800, Herbert Xu wrote:
->> On Tue, May 23, 2023 at 10:36:37AM +1000, Stephen Rothwell wrote:
->> > 
->> > That did not fix it :-(
->> 
->> OK, this patch should fix it:
->> 
->> ---8<---
->> A platform option like AMBA should never be selected by a driver.
->> Use a dependency instead.
-> 
-> Randy submitted a patch to change the driver to not conflict with
-> the arch symbols:
-> https://lore.kernel.org/all/20230523000606.9405-1-rdunlap@infradead.org/
-> 
-> The corresponding change here makes sense to me,
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> 
-> @StarFive folks, you will need to go and submit a patch for
-> arch/riscv/Kconfig.socs that selects ARM_AMBA for your platform.
-> 
+From: Arnd Bergmann <arnd@arndb.de>
 
-Sure, I'll submit a patch for this.
+Commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") uncovered
+a type mismatch in cesa 3des support that leads to a memcpy beyond the
+end of a structure:
 
-Thanks
-Jia Jie
+In function 'fortify_memcpy_chk',
+    inlined from 'mv_cesa_des3_ede_setkey' at drivers/crypto/marvell/cesa/cipher.c:307:2:
+include/linux/fortify-string.h:583:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+  583 |                         __write_overflow_field(p_size_field, size);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is probably harmless as the actual data that is copied has the correct
+type, but clearly worth fixing nonetheless.
+
+Fixes: 4ada48397823 ("crypto: marvell/cesa - add Triple-DES support")
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Gustavo A. R. Silva" <gustavoars@kernel.org>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/marvell/cesa/cipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/marvell/cesa/cipher.c b/drivers/crypto/marvell/cesa/cipher.c
+index c6f2fa753b7c..0f37dfd42d85 100644
+--- a/drivers/crypto/marvell/cesa/cipher.c
++++ b/drivers/crypto/marvell/cesa/cipher.c
+@@ -297,7 +297,7 @@ static int mv_cesa_des_setkey(struct crypto_skcipher *cipher, const u8 *key,
+ static int mv_cesa_des3_ede_setkey(struct crypto_skcipher *cipher,
+ 				   const u8 *key, unsigned int len)
+ {
+-	struct mv_cesa_des_ctx *ctx = crypto_skcipher_ctx(cipher);
++	struct mv_cesa_des3_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 	int err;
+ 
+ 	err = verify_skcipher_des3_key(cipher, key);
+-- 
+2.39.2
 
