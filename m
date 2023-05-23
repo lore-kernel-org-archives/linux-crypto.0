@@ -2,64 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8BA2C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 May 2023 16:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A39C77B75
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 May 2023 17:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237240AbjEWQzK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 May 2023 12:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33256 "EHLO
+        id S237922AbjEWRFQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 23 May 2023 13:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237395AbjEWQzH (ORCPT
+        with ESMTP id S237980AbjEWRFA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 May 2023 12:55:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC72119;
-        Tue, 23 May 2023 09:55:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C4C8960FE4;
-        Tue, 23 May 2023 16:55:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03121C433A0;
-        Tue, 23 May 2023 16:55:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684860905;
-        bh=2LzcOiQLC5olbdkH1iNnRq1VU9n6cqrsWV+BKWk4NLM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hblGAen6ACc5znsH46OJeOvOTTKnoaGyl/L/5b9VASCmGoYHPc4CKnBI2AFekmZCz
-         ZrDu44bpy9c01OheLjM07rLfRImBoj6ZNbjAYwWqTbIVjmZKh9L4CamU29ADsB46XQ
-         YwX98pxdVWQtFqhCxMwUerZMU5FRVrW2Kf4WJQROuL3QLnqdXnbMZP5PACvY8dxj9w
-         pZNkmyrCl6J2BkRvaxNMBklGII5j4NRwbS7r/4Yr1/JB4z4DMr/Dwa40CU4aWsRqgk
-         gXBpGlPj4AnOSQdNXBzwcU7G9tNeHjhhEuODgAwBGFVhw7XHHN/eo/6+GBH3puTR9r
-         uPdRTQAP/tC3w==
-Date:   Tue, 23 May 2023 16:55:03 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     meenakshi.aggarwal@nxp.com
-Cc:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
-        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, iuliana.prodan@nxp.com
-Subject: Re: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-Message-ID: <20230523165503.GA864814@google.com>
-References: <20230523153421.1528359-1-meenakshi.aggarwal@nxp.com>
+        Tue, 23 May 2023 13:05:00 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A97BF
+        for <linux-crypto@vger.kernel.org>; Tue, 23 May 2023 10:04:59 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-64d5b4c3ffeso2337450b3a.2
+        for <linux-crypto@vger.kernel.org>; Tue, 23 May 2023 10:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1684861498; x=1687453498;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zhFkuNdU3RaSjvEtwO+y/7ecKvyCxdBlxw2Du+ZEjV0=;
+        b=MqpM42aQRI8ph68RBJUNu9y7y5/zbk0lexhnWzEHDaVozMUf2QZJiRhNvzjbOMZyar
+         KcyfpLCKEttgYvBwNGF1lrT2UM+BIE/9QpJGfR8c/up0eGl2p8gaM4Mp28AKbtzjb7AF
+         5DaO3affYplmoINg1LOMGrb3Dm+GDL/dKas3U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684861498; x=1687453498;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zhFkuNdU3RaSjvEtwO+y/7ecKvyCxdBlxw2Du+ZEjV0=;
+        b=Z9OV91P/ql1HjQc4MrIGXPWgV60QkmneRiFtieNpGdirgzL56NBAtrzTVrGapX+dfV
+         byjmqr5h9qI08a8otHjoHb36H4OJmuA6UhLt/Msn7eZQm9p0qmW5h3cvP3C+XWYFi9E+
+         XXRV9D18vIoVE411ESpAZH+DVfNgtjt2j0yvu+/oopkjfkAUzxPeG9OZiLiuoe3rsyqb
+         nkxe9BdcdxLu27IzUAiKdIbKOBUbY2XQAk0K3/1S/1qbSWlYeGQLhRHV/t6bJiiSzAcM
+         LwxUmaAXbpSnM89m9+XMQ8JxDa/DIn6FUMo3N8zJAjECIzLqtVVlFuhXNBEPuGv1P+Ui
+         4xsQ==
+X-Gm-Message-State: AC+VfDzUzF8MbRYdD8bQCM7W5R5r0wIakG1fIYTHntPApyZlZJSsfq7g
+        xc+2jt7W17bh1cCeylKJf0k7xg==
+X-Google-Smtp-Source: ACHHUZ4C5ACZqIuLvNOviGcFe5FNlvLcov5GqImR93+0T2n48F8wmgporLkFQ2YeewVG5bRNiRQXSA==
+X-Received: by 2002:a05:6a20:258b:b0:10c:5745:3f44 with SMTP id k11-20020a056a20258b00b0010c57453f44mr3697979pzd.61.1684861498587;
+        Tue, 23 May 2023 10:04:58 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id h37-20020a631225000000b00520f316ebe3sm6181002pgl.62.2023.05.23.10.04.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 May 2023 10:04:58 -0700 (PDT)
+Date:   Tue, 23 May 2023 10:04:57 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: marvell/cesa - Fix type mismatch warning
+Message-ID: <202305231004.DC22DCDC@keescook>
+References: <20230523083313.899332-1-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230523153421.1528359-1-meenakshi.aggarwal@nxp.com>
+In-Reply-To: <20230523083313.899332-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 23, 2023 at 05:34:16PM +0200, meenakshi.aggarwal@nxp.com wrote:
-> CRYPTO_ALG_ALLOCATES_MEMORY flag is limited only to dm-crypt use-cases,
-> which seems to be 4 entries maximum.
+On Tue, May 23, 2023 at 10:33:04AM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") uncovered
+> a type mismatch in cesa 3des support that leads to a memcpy beyond the
+> end of a structure:
+> 
+> In function 'fortify_memcpy_chk',
+>     inlined from 'mv_cesa_des3_ede_setkey' at drivers/crypto/marvell/cesa/cipher.c:307:2:
+> include/linux/fortify-string.h:583:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+>   583 |                         __write_overflow_field(p_size_field, size);
+>       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> This is probably harmless as the actual data that is copied has the correct
+> type, but clearly worth fixing nonetheless.
+> 
+> Fixes: 4ada48397823 ("crypto: marvell/cesa - add Triple-DES support")
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-This isn't mentioned in the documentation for CRYPTO_ALG_ALLOCATES_MEMORY.  So
-it's not part of the contract of CRYPTO_ALG_ALLOCATES_MEMORY currently.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-Please don't make this change without updating the documentation.
-
-If you'd like to make this change, please update the documentation for
-CRYPTO_ALG_ALLOCATES_MEMORY to mention this additional exception.
-
-- Eric
+-- 
+Kees Cook
