@@ -2,59 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B918C7EE2C
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 10:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93485C7EE32
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 10:15:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232234AbjEXKPB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 06:15:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43294 "EHLO
+        id S232493AbjEXKPC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 06:15:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232381AbjEXKO0 (ORCPT
+        with ESMTP id S232750AbjEXKO2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 06:14:26 -0400
+        Wed, 24 May 2023 06:14:28 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB9A10C3
-        for <linux-crypto@vger.kernel.org>; Wed, 24 May 2023 03:13:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1DDC0;
+        Wed, 24 May 2023 03:14:09 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q1lV2-00Ckzi-A3; Wed, 24 May 2023 18:13:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 May 2023 18:13:44 +0800
-Date:   Wed, 24 May 2023 18:13:44 +0800
+        id 1q1lVE-00Ckzq-PC; Wed, 24 May 2023 18:13:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 May 2023 18:13:56 +0800
+Date:   Wed, 24 May 2023 18:13:56 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, Taehee Yoo <ap420073@gmail.com>,
-        syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
-Subject: Re: [PATCH] crypto: x86/aria - Use 16 byte alignment for GFNI
- constant vectors
-Message-ID: <ZG3jWHFZXGUqKmUt@gondor.apana.org.au>
-References: <20230516181419.3633842-1-ardb@kernel.org>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: aegis: add header for internal prototypes
+Message-ID: <ZG3jZJ7XPMrb3isX@gondor.apana.org.au>
+References: <20230516202855.561496-1-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230516181419.3633842-1-ardb@kernel.org>
+In-Reply-To: <20230516202855.561496-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 16, 2023 at 08:14:19PM +0200, Ard Biesheuvel wrote:
-> The GFNI routines in the AVX version of the ARIA implementation now use
-> explicit VMOVDQA instructions to load the constant input vectors, which
-> means they must be 16 byte aligned. So ensure that this is the case, by
-> dropping the section split and the incorrect .align 8 directive, and
-> emitting the constants into the 16-byte aligned section instead.
+On Tue, May 16, 2023 at 10:28:48PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Note that the AVX2 version of this code deviates from this pattern, and
-> does not require a similar fix, given that it loads these contants as
-> 8-byte memory operands, for which AVX2 permits any alignment.
+> gcc warns if prototypes are only visible to the caller but
+> not the callee:
 > 
-> Cc: Taehee Yoo <ap420073@gmail.com>
-> Fixes: 8b84475318641c2b ("crypto: x86/aria-avx - Do not use avx2 instructions")
-> Reported-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
-> Tested-by: syzbot+a6abcf08bad8b18fd198@syzkaller.appspotmail.com
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> crypto/aegis128-neon-inner.c:134:6: warning: no previous prototype for 'crypto_aegis128_init_neon' [-Wmissing-prototypes]
+> crypto/aegis128-neon-inner.c:164:6: warning: no previous prototype for 'crypto_aegis128_update_neon' [-Wmissing-prototypes]
+> crypto/aegis128-neon-inner.c:221:6: warning: no previous prototype for 'crypto_aegis128_encrypt_chunk_neon' [-Wmissing-prototypes]
+> crypto/aegis128-neon-inner.c:270:6: warning: no previous prototype for 'crypto_aegis128_decrypt_chunk_neon' [-Wmissing-prototypes]
+> crypto/aegis128-neon-inner.c:316:5: warning: no previous prototype for 'crypto_aegis128_final_neon' [-Wmissing-prototypes]
+> 
+> The prototypes cannot be in the regular aegis.h, as the inner neon code
+> cannot include normal kernel headers. Instead add a new header just for
+> the functions provided by this file.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  arch/x86/crypto/aria-aesni-avx-asm_64.S | 2 --
->  1 file changed, 2 deletions(-)
+>  crypto/aegis-neon.h          | 17 +++++++++++++++++
+>  crypto/aegis128-neon-inner.c |  1 +
+>  crypto/aegis128-neon.c       | 12 +-----------
+>  3 files changed, 19 insertions(+), 11 deletions(-)
+>  create mode 100644 crypto/aegis-neon.h
 
 Patch applied.  Thanks.
 -- 
