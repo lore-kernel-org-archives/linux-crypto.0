@@ -2,60 +2,86 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE43BC77B73
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 09:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 761F7C77B73
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 09:56:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231785AbjEXJun (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 05:50:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
+        id S229459AbjEXJ4Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 05:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231818AbjEXJuf (ORCPT
+        with ESMTP id S229448AbjEXJ4X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 05:50:35 -0400
+        Wed, 24 May 2023 05:56:23 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3B418B;
-        Wed, 24 May 2023 02:50:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18C19E;
+        Wed, 24 May 2023 02:56:21 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q1l7V-00CkU8-Pj; Wed, 24 May 2023 17:49:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 May 2023 17:49:25 +0800
-Date:   Wed, 24 May 2023 17:49:25 +0800
+        id 1q1lDy-00Ckbo-Ar; Wed, 24 May 2023 17:56:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 May 2023 17:56:06 +0800
+Date:   Wed, 24 May 2023 17:56:06 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH v5 13/15] crypto: iaa - Add support for default IAA
- 'canned' compression mode
-Message-ID: <ZG3dpbPlRXbF2ZxN@gondor.apana.org.au>
-References: <20230516215009.51794-1-tom.zanussi@linux.intel.com>
- <20230516215009.51794-14-tom.zanussi@linux.intel.com>
+To:     Bharat Bhushan <bbhushan2@marvell.com>
+Cc:     olivia@selenic.com, Jason@zx2c4.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sgoutham@marvell.com
+Subject: Re: [PATCH] hwrng: cn10k: Add extended trng register support
+Message-ID: <ZG3fNmNfUHeWIsNZ@gondor.apana.org.au>
+References: <20230518064734.18819-1-bbhushan2@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230516215009.51794-14-tom.zanussi@linux.intel.com>
+In-Reply-To: <20230518064734.18819-1-bbhushan2@marvell.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 16, 2023 at 04:50:07PM -0500, Tom Zanussi wrote:
-.
-> To choose 'fixed' mode:
-> 
->   echo "fixed" >  /sys/bus/dsa/drivers/crypto/compression_mode
-> 
-> To choose 'canned' mode:
-> 
->   echo "canned" >  /sys/bus/dsa/drivers/crypto/compression_mode
+On Thu, May 18, 2023 at 12:17:34PM +0530, Bharat Bhushan wrote:
+>
+> -static void cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
+> +static size_t cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
 
-This seems to be a strange way to switch modes.  How about just
-registering both algorithms and then let the user decide which
-one to use throught the algorithm name?
+Since the return value is either 0 or 8, why did you pick size_t
+as the return value?
 
-Thanks,
+>  {
+> +	u16 retry_count = 0;
+>  	u64 upper, lower;
+> +	u64 status;
+> +
+> +	if (rng->extended_trng_regs) {
+> +		do {
+> +			*value = readq(rng->reg_base + RNM_PF_TRNG_DAT);
+> +			if (*value)
+> +				return 8;
+> +			status = readq(rng->reg_base + RNM_PF_TRNG_RES);
+> +			if (!status && (retry_count++ > 0x1000))
+> +				return 0;
+> +		} while (!status);
+> +	}
+>  
+>  	*value = readq(rng->reg_base + RNM_PF_RANDOM);
+>  
+> @@ -82,6 +130,7 @@ static void cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
+>  
+>  		*value = (upper & 0xFFFFFFFF00000000) | (lower & 0xFFFFFFFF);
+>  	}
+> +	return 8;
+>  }
+>  
+>  static int cn10k_rng_read(struct hwrng *hwrng, void *data,
+> @@ -100,7 +149,9 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
+>  	size = max;
+>  
+>  	while (size >= 8) {
+> -		cn10k_read_trng(rng, &value);
+> +		err = cn10k_read_trng(rng, &value);
+> +		if (!err)
+> +			goto out;
+
+It appears that err is either 8 or 0, so it's not really an error.
+Could you plesae use a more meaningful name for this variable?
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
