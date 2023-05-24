@@ -2,93 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D58CC7EE2C
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 09:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE2DC7EE23
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 09:41:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230402AbjEXJlB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 05:41:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56788 "EHLO
+        id S230294AbjEXJlU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 05:41:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjEXJkp (ORCPT
+        with ESMTP id S230353AbjEXJk6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 05:40:45 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42957E4B;
-        Wed, 24 May 2023 02:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+7rsgv7m8GCnzFvm19d5DgMqjyzShFESP6prEZ6wJl0=; b=KHb/vRVq9nPWkyfrDVNCJCbRnU
-        r02TvBlK6AG32SCrGO3KSNfCQvZa6N5eizVD6/ZBLpDNCLMKfuMfrS4hduHPYAbyOmmbEzebI/piP
-        ICAizbPhwdM/CwYkH1nxdI5vtyJFFJAFJRvdE4VUHuj9KnBcC1pt4YWa9bkYDrt6ffrCo7dZPG5fd
-        n4XHfnYBqz1dbZcOQ2RKg9i1j8/RoKwozKZOPL2GaDvLeog3nVR8gjCA49TA9Zs81ZN3qdHSggcl/
-        mOgvg9GjEuf3ThX5Adu5GGG/Vg2xvMQR9OkTo2+c422YYvnUI+qRsLMg6rxL9hiD+0gC7iLGyo4xD
-        QiQO7D7A==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q1kyC-00B4OS-Rp; Wed, 24 May 2023 09:39:48 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 7126D3002C5;
-        Wed, 24 May 2023 11:39:47 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 4112D241F8382; Wed, 24 May 2023 11:39:47 +0200 (CEST)
-Date:   Wed, 24 May 2023 11:39:47 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
-        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, mpe@ellerman.id.au
-Subject: Re: [PATCH v3 00/11] Introduce cmpxchg128() -- aka. the demise of
- cmpxchg_double()
-Message-ID: <20230524093947.GQ83892@hirez.programming.kicks-ass.net>
-References: <20230515075659.118447996@infradead.org>
- <4975b92f-92f6-4d50-8386-9add12ddfd61@app.fastmail.com>
+        Wed, 24 May 2023 05:40:58 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82B0130;
+        Wed, 24 May 2023 02:40:42 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1q1kyn-00CkGv-K5; Wed, 24 May 2023 17:40:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 24 May 2023 17:40:25 +0800
+Date:   Wed, 24 May 2023 17:40:25 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Jia Jie Ho <jiajie.ho@starfivetech.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/2] crypto: starfive - Add RSA algo support
+Message-ID: <ZG3biep8vAWQ5ZgA@gondor.apana.org.au>
+References: <20230516075752.659287-1-jiajie.ho@starfivetech.com>
+ <20230516075752.659287-3-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4975b92f-92f6-4d50-8386-9add12ddfd61@app.fastmail.com>
+In-Reply-To: <20230516075752.659287-3-jiajie.ho@starfivetech.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 15, 2023 at 11:42:23AM +0200, Arnd Bergmann wrote:
+On Tue, May 16, 2023 at 03:57:52PM +0800, Jia Jie Ho wrote:
+>
+> +static struct akcipher_alg starfive_rsa = {
+> +	.encrypt = starfive_rsa_enc,
+> +	.decrypt = starfive_rsa_dec,
+> +	.sign = starfive_rsa_dec,
+> +	.verify = starfive_rsa_enc,
+> +	.set_pub_key = starfive_rsa_set_pub_key,
+> +	.set_priv_key = starfive_rsa_set_priv_key,
+> +	.max_size = starfive_rsa_max_size,
+> +	.init = starfive_rsa_init_tfm,
+> +	.exit = starfive_rsa_exit_tfm,
+> +	.base = {
+> +		.cra_name = "rsa",
+> +		.cra_driver_name = "starfive-rsa",
+> +		.cra_flags = CRYPTO_ALG_TYPE_AKCIPHER |
+> +			     CRYPTO_ALG_ASYNC |
 
-> The need for runtime feature checking in the callers on x86-64 is still
-> a bit awkward, but this is no worse than before. I understand that
-> turning this into a compile-time choice would require first settling
-> a larger debate about raising the default target for distros beyond
-> the current CONFIG_GENERIC_CPU.
+Why did you set the ASYNC flag? Your implementation appears to
+be completely synchronous.
 
-Looks like Power is going to be in the same boat, they can do
-cmpxchg128, but only for Power8+.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
