@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E88BC77B73
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 17:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A2EFC7EE2E
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 17:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbjEXRKW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 13:10:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36498 "EHLO
+        id S233428AbjEXRKX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 13:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235354AbjEXRKV (ORCPT
+        with ESMTP id S235363AbjEXRKW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 13:10:21 -0400
+        Wed, 24 May 2023 13:10:22 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F81130;
-        Wed, 24 May 2023 10:10:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF0113E;
+        Wed, 24 May 2023 10:10:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684948217; x=1716484217;
+  t=1684948220; x=1716484220;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=81gnBmdY+U7xfe837vfBU6KLieNoX+Gj0y/Y+DROwhg=;
-  b=hitSJlfoQ6ozM0Kk9By08uqIP67yKbFdm7BtijsNJgFI/HSPciFCaX8P
-   fm0odnw1V2q6qopYp4+uzHDhGBl2gDJtkVlVTLKUKPJ4SFdCvrtJ+FzUc
-   +XKiYKUDADZSiw7CBjRlq46B/7zsonZfoWeK4CvAXm9KLvkjCYdjdCsSk
-   XnkyQky2HIwSQ+d6EOEPMXNNp3n3emFqtM1W4X0BMh2ZfdIqSeuwYHvK/
-   YC+qxSyngoybx4NDKnFLaZK/GPocM5seoa/KPXtjHdRvnSeX/eqS/1bue
-   2mOFN1axdI1RVWu8E83Pe3qxpo730viM7a3TLxtIkIUrgSbFJO3yp/CmK
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="338206637"
+  bh=EqZrJYyo/GziPMZxaJs9+u1mtCZh0+buRAvMpDKc0L8=;
+  b=IL0cchXpaBMLR1XJRQi1/ZFvICeVWDfCKeQrvFoV3bqWsySDZ7s01vOU
+   NsJQTcd08I2I/W7zoxHiogB9ZkQxn/OPdJHD8AR/L+fz+Rulm2jxRTqio
+   K4rGeXDbKg9tlcLE7ig3xzH6J0gsyhAbMFOb0xPX0Kxz9XS7czeA3hoWQ
+   QHcJWBKdZU6IQAMJ5wHxvQuZKWl+LYFDGcFqozbfkHj2zXzMFTagTkmx7
+   qnKq0ATnt9NLLobUu3TnERDmygxMIig77sc32ob4gxIjt1pHHClu67RTR
+   0z/MNMBox8+BJ+55xetAFRwfLyisP35U1yiIya5HgkHbS3bbcUTn2T2Qd
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="338206669"
 X-IronPort-AV: E=Sophos;i="6.00,189,1681196400"; 
-   d="scan'208";a="338206637"
+   d="scan'208";a="338206669"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2023 10:09:50 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2023 10:09:51 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="704427331"
+X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="704427337"
 X-IronPort-AV: E=Sophos;i="6.00,189,1681196400"; 
-   d="scan'208";a="704427331"
+   d="scan'208";a="704427337"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by orsmga002.jf.intel.com with ESMTP; 24 May 2023 10:09:49 -0700
+  by orsmga002.jf.intel.com with ESMTP; 24 May 2023 10:09:50 -0700
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dm-devel@redhat.com
@@ -49,130 +49,130 @@ Cc:     ebiggers@kernel.org, elliott@hpe.com, gmazyland@gmail.com,
         dan.j.williams@intel.com, bernie.keany@intel.com,
         charishma1.gairuboyina@intel.com,
         lalithambika.krishnakumar@intel.com, nhuck@google.com,
-        chang.seok.bae@intel.com
-Subject: [PATCH v7 00/12] x86: Support Key Locker
-Date:   Wed, 24 May 2023 09:57:05 -0700
-Message-Id: <20230524165717.14062-1-chang.seok.bae@intel.com>
+        chang.seok.bae@intel.com, Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v7 02/12] x86/cpufeature: Enumerate Key Locker feature
+Date:   Wed, 24 May 2023 09:57:07 -0700
+Message-Id: <20230524165717.14062-3-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230410225936.8940-1-chang.seok.bae@intel.com>
+In-Reply-To: <20230524165717.14062-1-chang.seok.bae@intel.com>
 References: <20230410225936.8940-1-chang.seok.bae@intel.com>
+ <20230524165717.14062-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi all,
+Key Locker is a CPU feature to minimize exposure of clear-text key
+material. An encoded form, called 'key handle', is referenced for data
+encryption or decryption instead of accessing the clear text key.
 
-The previous posting [v6] was intended to deliver the hardware
-performance update primarily by revamping the old series. Then,
-multiple feedbacks were received. This revision thus incorporates the
-changes to address them. So, the primary goal here is to meet those
-reviewers' expectations at first.
+A wrapping key loaded in the CPU's software-inaccessible state is used
+to transform a user key into a key handle. On rarely unexpected
+hardware failure, the key could be lost.
 
-The series has two parts of changes -- the x86 core and its crypto
-library. In this revision, much more changes were made on the latter.
-Also, overall changelogs were revisited to be more reviewable.
+Here enumerate this hardware capability. It will not be shown up in
+/proc/cpuinfo as userspace usage is not supported. This is because
+there is no ABI to coordinate the wrapping-key failure.
 
-Here is the overview of those feedbacks/changes (skip some trivial):
+The feature supports Advanced Encryption Standard (AES) cipher
+algorithm with new SIMD instruction set like its predecessor (AES-NI).
+Mark the feature depending on XMM2. The new AES implementation will be
+in the crypto library.
 
-Part 1. Crypto Library (PATCH10-12):
+Add X86_FEATURE_KEYLOCKER to the disabled features mask at the moment.
+It will be enabled under a new config option.
 
-  PATCH12: AES-KL driver
-  - Merge all the AES-KL patches. (Eric Biggers)
-  - Make the driver for the 64-bit mode only. (Eric Biggers)
-  - Rework the key-size check code (Eric Biggers)
-  - Adjust the Kconfig change (Robert Elliott)
-  - Update the changelog. (Eric Biggers)
-  - Adjust the ASM code to return a proper error code. (Eric Biggers)
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+Changes from v6:
+* Massage the changelog -- re-organize the change descriptions
 
-  PATCH11: AES-NI rework
-  - Inline the helper code to avoid the indirect call. (Eric Biggers)
-  - Rename the filename: aes-intel* -> aes-helper*. (Eric Biggers)
-  - Don't export symbols yet here. Instead, do it when needed later.
-  - Improve the coding style (Eric Biggers)
+Changes from RFC v2:
+* Do not publish the feature flag to userspace.
+* Update the changelog.
 
-  PATCH10: the AESNI-XTS field type fix
-  - Add as a new patch. (Eric Biggers)
+Changes from RFC v1:
+* Updated the changelog.
+---
+ arch/x86/include/asm/cpufeatures.h          | 1 +
+ arch/x86/include/asm/disabled-features.h    | 8 +++++++-
+ arch/x86/include/uapi/asm/processor-flags.h | 2 ++
+ arch/x86/kernel/cpu/cpuid-deps.c            | 1 +
+ 4 files changed, 11 insertions(+), 1 deletion(-)
 
-Part 2. The X86 Core (PATCH1-9):
-
-  PATCH09: a chicken bit and a Kconfig option
-  - Rebase on the upstream: commit a894a8a56b57 ("Documentation:
-    kernel-parameters: sort all "no..." parameters")
-
-  PATCH08: the wrapping key recovery
-  - Limit the symbol export only when needed.
-
-  PATCH07: the wrapping key load at boot-time
-  - Use memzero_explicit() instead of memset(). (Robert Elliott)
-  - Improve the function prototype. (Eric Biggers and Dave Hansen)
-
-  PATCH01: documentation
-  - Rebase on the upstream -- commit ff61f0791ce9 ("docs: move x86
-    documentation into Documentation/arch/"). (Nathan Huckleberry)
-
-This version can be also found here:
-    git://github.com/intel-staging/keylocker.git kl-v7
-
-[v6] -- the last posting:
-    https://lore.kernel.org/lkml/20230410225936.8940-1-chang.seok.bae@intel.com/
-
-Thanks,
-Chang
-
-Chang S. Bae (12):
-  Documentation/x86: Document Key Locker
-  x86/cpufeature: Enumerate Key Locker feature
-  x86/insn: Add Key Locker instructions to the opcode map
-  x86/asm: Add a wrapper function for the LOADIWKEY instruction
-  x86/msr-index: Add MSRs for Key Locker wrapping key
-  x86/keylocker: Define Key Locker CPUID leaf
-  x86/cpu/keylocker: Load a wrapping key at boot-time
-  x86/PM/keylocker: Restore the wrapping key on the resume from ACPI
-    S3/4
-  x86/cpu: Add a configuration and command line option for Key Locker
-  crypto: x86/aesni - Use the proper data type in struct aesni_xts_ctx
-  crypto: x86/aes - Prepare for a new AES implementation
-  crypto: x86/aes-kl - Implement the AES-XTS algorithm
-
- .../admin-guide/kernel-parameters.txt         |   2 +
- Documentation/arch/x86/index.rst              |   1 +
- Documentation/arch/x86/keylocker.rst          |  97 +++
- arch/x86/Kconfig                              |   3 +
- arch/x86/crypto/Kconfig                       |  22 +
- arch/x86/crypto/Makefile                      |   3 +
- arch/x86/crypto/aes-helper_asm.S              |  22 +
- arch/x86/crypto/aes-helper_glue.h             | 161 +++++
- arch/x86/crypto/aeskl-intel_asm.S             | 580 ++++++++++++++++++
- arch/x86/crypto/aeskl-intel_glue.c            | 216 +++++++
- arch/x86/crypto/aesni-intel_asm.S             |  55 +-
- arch/x86/crypto/aesni-intel_glue.c            | 242 +++-----
- arch/x86/crypto/aesni-intel_glue.h            |  17 +
- arch/x86/include/asm/cpufeatures.h            |   1 +
- arch/x86/include/asm/disabled-features.h      |   8 +-
- arch/x86/include/asm/keylocker.h              |  45 ++
- arch/x86/include/asm/msr-index.h              |   6 +
- arch/x86/include/asm/special_insns.h          |  32 +
- arch/x86/include/uapi/asm/processor-flags.h   |   2 +
- arch/x86/kernel/Makefile                      |   1 +
- arch/x86/kernel/cpu/common.c                  |  21 +-
- arch/x86/kernel/cpu/cpuid-deps.c              |   1 +
- arch/x86/kernel/keylocker.c                   | 212 +++++++
- arch/x86/kernel/smpboot.c                     |   2 +
- arch/x86/lib/x86-opcode-map.txt               |  11 +-
- arch/x86/power/cpu.c                          |   2 +
- tools/arch/x86/lib/x86-opcode-map.txt         |  11 +-
- 27 files changed, 1573 insertions(+), 203 deletions(-)
- create mode 100644 Documentation/arch/x86/keylocker.rst
- create mode 100644 arch/x86/crypto/aes-helper_asm.S
- create mode 100644 arch/x86/crypto/aes-helper_glue.h
- create mode 100644 arch/x86/crypto/aeskl-intel_asm.S
- create mode 100644 arch/x86/crypto/aeskl-intel_glue.c
- create mode 100644 arch/x86/crypto/aesni-intel_glue.h
- create mode 100644 arch/x86/include/asm/keylocker.h
- create mode 100644 arch/x86/kernel/keylocker.c
-
-
-base-commit: 3a128547bd4425cdef27c606efc88e1eb03a2dba
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index cb8ca46213be..4a12673df7e9 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -389,6 +389,7 @@
+ #define X86_FEATURE_AVX512_VPOPCNTDQ	(16*32+14) /* POPCNT for vectors of DW/QW */
+ #define X86_FEATURE_LA57		(16*32+16) /* 5-level page tables */
+ #define X86_FEATURE_RDPID		(16*32+22) /* RDPID instruction */
++#define X86_FEATURE_KEYLOCKER		(16*32+23) /* "" Key Locker */
+ #define X86_FEATURE_BUS_LOCK_DETECT	(16*32+24) /* Bus Lock detect */
+ #define X86_FEATURE_CLDEMOTE		(16*32+25) /* CLDEMOTE instruction */
+ #define X86_FEATURE_MOVDIRI		(16*32+27) /* MOVDIRI instruction */
+diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
+index fafe9be7a6f4..eb841d694ed9 100644
+--- a/arch/x86/include/asm/disabled-features.h
++++ b/arch/x86/include/asm/disabled-features.h
+@@ -38,6 +38,12 @@
+ # define DISABLE_OSPKE		(1<<(X86_FEATURE_OSPKE & 31))
+ #endif /* CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS */
+ 
++#ifdef CONFIG_X86_KEYLOCKER
++# define DISABLE_KEYLOCKER	0
++#else
++# define DISABLE_KEYLOCKER	(1<<(X86_FEATURE_KEYLOCKER & 31))
++#endif /* CONFIG_X86_KEYLOCKER */
++
+ #ifdef CONFIG_X86_5LEVEL
+ # define DISABLE_LA57	0
+ #else
+@@ -126,7 +132,7 @@
+ #define DISABLED_MASK14	0
+ #define DISABLED_MASK15	0
+ #define DISABLED_MASK16	(DISABLE_PKU|DISABLE_OSPKE|DISABLE_LA57|DISABLE_UMIP| \
+-			 DISABLE_ENQCMD)
++			 DISABLE_ENQCMD|DISABLE_KEYLOCKER)
+ #define DISABLED_MASK17	0
+ #define DISABLED_MASK18	0
+ #define DISABLED_MASK19	0
+diff --git a/arch/x86/include/uapi/asm/processor-flags.h b/arch/x86/include/uapi/asm/processor-flags.h
+index d898432947ff..262348aeaad1 100644
+--- a/arch/x86/include/uapi/asm/processor-flags.h
++++ b/arch/x86/include/uapi/asm/processor-flags.h
+@@ -128,6 +128,8 @@
+ #define X86_CR4_PCIDE		_BITUL(X86_CR4_PCIDE_BIT)
+ #define X86_CR4_OSXSAVE_BIT	18 /* enable xsave and xrestore */
+ #define X86_CR4_OSXSAVE		_BITUL(X86_CR4_OSXSAVE_BIT)
++#define X86_CR4_KEYLOCKER_BIT	19 /* enable Key Locker */
++#define X86_CR4_KEYLOCKER	_BITUL(X86_CR4_KEYLOCKER_BIT)
+ #define X86_CR4_SMEP_BIT	20 /* enable SMEP support */
+ #define X86_CR4_SMEP		_BITUL(X86_CR4_SMEP_BIT)
+ #define X86_CR4_SMAP_BIT	21 /* enable SMAP support */
+diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+index f6748c8bd647..200c5e69f78c 100644
+--- a/arch/x86/kernel/cpu/cpuid-deps.c
++++ b/arch/x86/kernel/cpu/cpuid-deps.c
+@@ -81,6 +81,7 @@ static const struct cpuid_dep cpuid_deps[] = {
+ 	{ X86_FEATURE_XFD,			X86_FEATURE_XSAVES    },
+ 	{ X86_FEATURE_XFD,			X86_FEATURE_XGETBV1   },
+ 	{ X86_FEATURE_AMX_TILE,			X86_FEATURE_XFD       },
++	{ X86_FEATURE_KEYLOCKER,		X86_FEATURE_XMM2      },
+ 	{}
+ };
+ 
 -- 
 2.17.1
 
