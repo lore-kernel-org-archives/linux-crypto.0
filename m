@@ -2,1219 +2,180 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3BEBC77B7C
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 17:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC39BC77B7C
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 17:18:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234022AbjEXRLi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 13:11:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36856 "EHLO
+        id S231633AbjEXRSq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 13:18:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235980AbjEXRK5 (ORCPT
+        with ESMTP id S231526AbjEXRSp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 13:10:57 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674071B4;
-        Wed, 24 May 2023 10:10:29 -0700 (PDT)
+        Wed, 24 May 2023 13:18:45 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C20BB;
+        Wed, 24 May 2023 10:18:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1684948229; x=1716484229;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=9/5gnc/XJECGIE2pSVhiuudjhsgUa8FK7B6AwTL6aPs=;
-  b=NEb0W29QdfC3QIIdcM/MMs2Dbaad0R7hk1yfPy31CJeKmmkQqBYmcgkN
-   Qd+ztOcSAXdmpF8hNIXGKzw2BQ7SM3O4soyTcWQbxTTiquQfTH8WeEfYW
-   pz5nJme7bRUKeCKn8C7w+jq7bF6rDliRZ18DNlq1fti81AxvKP2KC104t
-   Xf6LGcUSIyesXZWEt/T9PiXVy0g2LTwyHIZ4zFwVQMz7/6cuHt7w3LZAl
-   +docfbGcjPcEyCpT5PwCHuI+llxDML9Eislr8L8y7t1uM55yuseA+5ejL
-   cYTp6u1fCnt0ZcJHURYQWCBFMp7iHlHvQqBUwyqd1heXTc1OBoM4wZJ9m
+  t=1684948722; x=1716484722;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=HbCt5jy8CXf6A0tu2BTAKveAKadXHasb93l61S5/VRE=;
+  b=R0g0cnTH7ins8GazmB54fWzZOJ67OuRhnSrduVbCTRMULB8bQTe3u9WF
+   /h/KyjGILq7dy8n5tybeJ/qtdMDs5u6srVJpFIHq08gsHJJzdwKAPyqQD
+   3ZEb8n9VuC0WvrngV8Mi8P/sM2r9fH0aVjdGnShHZjrelg13bpayAAWnl
+   GVd5UxCR6Hevr/Qoe1rPNjBARhl0LGBAgt55M+AVae5dcnc/2mB6VUiTj
+   PFGcXYPC74IRK7uSXVRmYrwhTCIjTjZrSTopLdwAsivyo/zxovQ3Indyd
+   XweH+0dxj8nEcH7Ol5bmWvibInMiCXYPY0/xYTSctCrBYgI8ubh4bTKBu
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="338206830"
+X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="351144277"
 X-IronPort-AV: E=Sophos;i="6.00,189,1681196400"; 
-   d="scan'208";a="338206830"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2023 10:09:57 -0700
+   d="scan'208";a="351144277"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2023 10:18:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="704427378"
+X-IronPort-AV: E=McAfee;i="6600,9927,10720"; a="769531203"
 X-IronPort-AV: E=Sophos;i="6.00,189,1681196400"; 
-   d="scan'208";a="704427378"
-Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by orsmga002.jf.intel.com with ESMTP; 24 May 2023 10:09:57 -0700
+   d="scan'208";a="769531203"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga008.fm.intel.com with ESMTP; 24 May 2023 10:18:26 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Wed, 24 May 2023 10:18:26 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Wed, 24 May 2023 10:18:26 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Wed, 24 May 2023 10:18:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nHXNJ54Hs4sldYqZo5sXPabzruL3bsuHlxzobQAkZ0EhQKLRQfbbqmHyFodqju4cims3HHeDsFZ/QwXvgY/h6mBxn2mMjCpv1MMItoUBbmrxX9xd8Kimi8e2+yUgVlZkL3WtLNyp9FKISx3WwRCH4/SYQzvBZrl1rg2bI9lHUZud5lc9WO8c6pPO7pkwrWBJxqQubp/GIuOHzICXzIDrt1ADCPGSM8mUiqXlQ6nd+p/a3Y10kA0oRcrGqqFp2C09aGIC2v4nbaertmNSSmAyM3Ioiwz8eS4nJ65cFdwpZ5s/+1A0mRChb2QKqN9ws2mML/wuyHvaud8K0ONowpvYXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zlH4Iyf/0SLgLNGGfGM7dmSuH75p+bIUmqd//XStDRM=;
+ b=liAoD7e9LFaAPx+dDtPAX7c4maKp3DJA2qxu9BazOYBqejzeaOz5tFQoxBNAtPU41GGxyg0dKYlB5yrKjMnhOtw7gIbunofSOwNu8zjyp1gtUBcg9QOTX98WZ5si8ni4P2Yk8DE92yyh5CN7OOkhRrHHe+gtUmC+wOOdNJvAeoBP/relLQoAASqaqctELfVEmvDECK9n9m8tJ6fouXXfPnuIessnQt3uzdT3duSZKqI3zbJ0Jp1Cc/fXb/5ZxDvQR9T6Zx0SXDaFme2/Js/jd/pGSS1FF4/+DOEvjXCLt0caSEbCwM08AQvP+hAuQIRJ7YuWBrqcck5rCbIptJGqZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com (2603:10b6:510:41::12)
+ by PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.28; Wed, 24 May
+ 2023 17:18:23 +0000
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::bad1:92a2:fa0a:1850]) by PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::bad1:92a2:fa0a:1850%7]) with mapi id 15.20.6411.029; Wed, 24 May 2023
+ 17:18:23 +0000
+Message-ID: <fce772b2-29e1-7daf-0a61-7e8e78f7331a@intel.com>
+Date:   Wed, 24 May 2023 10:18:20 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v6 11/12] crypto: x86/aes-kl - Support AES algorithm using
+ Key Locker instructions
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com
-Cc:     ebiggers@kernel.org, elliott@hpe.com, gmazyland@gmail.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, tglx@linutronix.de,
-        bp@alien8.de, mingo@kernel.org, x86@kernel.org,
-        herbert@gondor.apana.org.au, ardb@kernel.org,
-        dan.j.williams@intel.com, bernie.keany@intel.com,
-        charishma1.gairuboyina@intel.com,
-        lalithambika.krishnakumar@intel.com, nhuck@google.com,
-        chang.seok.bae@intel.com, "David S. Miller" <davem@davemloft.net>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v7 12/12] crypto: x86/aes-kl - Implement the AES-XTS algorithm
-Date:   Wed, 24 May 2023 09:57:17 -0700
-Message-Id: <20230524165717.14062-13-chang.seok.bae@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230524165717.14062-1-chang.seok.bae@intel.com>
-References: <20230410225936.8940-1-chang.seok.bae@intel.com>
- <20230524165717.14062-1-chang.seok.bae@intel.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <dm-devel@redhat.com>, <gmazyland@gmail.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <tglx@linutronix.de>, <bp@suse.de>,
+        <mingo@kernel.org>, <x86@kernel.org>,
+        <herbert@gondor.apana.org.au>, <ardb@kernel.org>,
+        <dan.j.williams@intel.com>, <bernie.keany@intel.com>,
+        <charishma1.gairuboyina@intel.com>,
+        <lalithambika.krishnakumar@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Nathan Chancellor" <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+References: <20220112211258.21115-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-1-chang.seok.bae@intel.com>
+ <20230410225936.8940-12-chang.seok.bae@intel.com>
+ <ZFWY6/VelArVYy1F@gmail.com> <288de217-f0ff-658c-5490-6fbf5f57f5a7@intel.com>
+Content-Language: en-US
+In-Reply-To: <288de217-f0ff-658c-5490-6fbf5f57f5a7@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR13CA0023.namprd13.prod.outlook.com
+ (2603:10b6:a03:180::36) To PH0PR11MB4855.namprd11.prod.outlook.com
+ (2603:10b6:510:41::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4855:EE_|PH0PR11MB5013:EE_
+X-MS-Office365-Filtering-Correlation-Id: 393f1cee-0e98-4997-0f5a-08db5c7ae0ea
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dDbMrULwgrIbAASEWmtW+W9YQ2WqB4Xt21WZ2LqoTiPmNsnnI7q7Wrdwn5/jUruEjBpc6vyjectaeTjbqgW2rCdsk+RK/0SMCUOj6f3jYVU0FK937lDc81SFhVRzsrE0ZGipqLwIOMjHrvz7u0koF0Ac+JMntMVXY3MT4lV0H2ASvIX/0jjJeDr68HKzjrTpmTBDrVcefpCtAh2sGuLsqI7tXc5bWLonQ4gOibxGE3r/Tp9rUqQXFJnbYSywEJmuXeU91IOHkm4TBxLVnJkEiFk49Rtys1Oibdc/+BBD/Bw0HYjr5AmAZwgzgLN2wf5EX1fKtVHVK5NqRfdsbpjJmTH+p9zX7TW9uQwreylVrqZgkydmpvMVs6Ss+8an3Xh/E1IBqCbw4eNPb8x8Nm7j/PE/KZByvdJjG1EuBjhvCBPlMGKATTWOLI9bCKjgVdVLsmvAZToi4AJiWzvvvFE/Wbw/Oh6RMpIYmKzkpLZqSKsMBxw3y2gAclPaPcA/7xqCUzxoqx7zvKq5bBMaEHSQbV6F7Uem0VbmfReHBfcG02j36OJjX5zcRly8J+zjvzz14V/4nbKw/7cLoYraKTQMS4eh1WiL6mPtBvMreKb0xgX9sBlI4Xz2047cRIJBZpGkGPUPJ2ryWfSVm2ssAIC+Ig==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4855.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(366004)(39860400002)(396003)(376002)(451199021)(66556008)(8936002)(5660300002)(54906003)(83380400001)(53546011)(31696002)(6512007)(6506007)(86362001)(26005)(186003)(82960400001)(2616005)(38100700002)(8676002)(478600001)(6486002)(66476007)(6916009)(316002)(36756003)(4326008)(41300700001)(7416002)(2906002)(4744005)(66946007)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3FkN1p3alBzSHVidVpqQmJ0Z2J2eDBNOWJ6SlJJU2c1c1MrR2dtRDIyd1JL?=
+ =?utf-8?B?d2xYdFI2aXRkR2RvdjZmay9VcVphay9FYU01d2t1UzFBNjk0OXBtS3Y5YkdG?=
+ =?utf-8?B?YkNFakUyclZrT2g5MENLWnVOMHNJY1M0eGJMOVJsYjd2aDVMTHVwM3U5NDN6?=
+ =?utf-8?B?M2Zwd2htb1dSUExoN1o5RFZtQlBQdmQ1RnlEY1pucXFLUGdKRTlTTmlmMk1H?=
+ =?utf-8?B?VFprQ21ISW5uanRieFdJNTdkeFpyV25oWWhHSnVkQXZUYUlrMUdXYVdFU1VP?=
+ =?utf-8?B?WHVYTi9jd1YzSVVzYyt1bk9PMDlBaXMxQ2xMM2k1ZXlqSGxGZ2p1MCtqeXFP?=
+ =?utf-8?B?aWJoRkRVSERBeWVtN0E2cE9ZdTNuU093Z2VwdWhBVmRDNFJUclV5dDVpR2xJ?=
+ =?utf-8?B?NGpjejBFQ2pxRHJpbnhKanQ2Tm4wZFdSdHNzaVZGZDltL1REMnhvZTFNTFp3?=
+ =?utf-8?B?ZzUvN3VKT3htbUE4eTNBUVJpRHdySkd3S1FCalRuZzVYSW1qanNYVE5qMUo3?=
+ =?utf-8?B?Rkk2Z1NOc2RuL1ZoMjZ2dFBRMnozVm9ieHB4QThYTkdOZUorYUtDcmpXSnJu?=
+ =?utf-8?B?citTdUpVUmg4dXRpblJrZlcwMmNqaVpEcysydjE4RGpxRnMrN2dnSDIzVHM0?=
+ =?utf-8?B?RDR2VGRJUlc5Mjh1bXVMQTRualB3Z3FxWC9ZbEwrc1hwR2F0N2lORlVBajhj?=
+ =?utf-8?B?UzZRNUZlalRmMDNFUW9RNHJFSWJ1VE53d3ZvcEp4RWNyWE5qclBXVjBNQ0tI?=
+ =?utf-8?B?aENUeU40MUpIYlBITXhHaEgrbVV3QVhMSDJZRmlJTGNhRk4xaU9oRjlUdDZQ?=
+ =?utf-8?B?dzNpWFZmK3lkQnlJcUdkVlQvRHBTa1R5ZDU0NnZsWkt5Q25YaUhEMURxZjZV?=
+ =?utf-8?B?RzB2U09PT0p1TVhUU2VlQnIvbklYMVNLaFBWS1RHSGhRUXJ6a0UybEtTS3g3?=
+ =?utf-8?B?YTZ2Y3ZZUE5XVTFralJvQ0t4ZnpFREpaSXpkTTd3dk43eEEyZE13K3RSR0pQ?=
+ =?utf-8?B?bG01NzRuWmVJQ1RWR3RQbmdhcHpSeGtSc2dUdDdyb2o1cStONEhHZXdJTkc1?=
+ =?utf-8?B?ejNhck1QaWJSYmhSdUpDSXFtenNsQ2Fsd2laVFNRQm9yMG1nZXFRSEVwR3pr?=
+ =?utf-8?B?Z2FLeXhQanlTZGJQNU9INHZMeElvSnduTVNHblNpMlJyYTg5d0hFQ2FLVDVT?=
+ =?utf-8?B?NVNka2JpMXN3RXVBVzdaaGpOYnlxTE5Ea0tFeDJFZWd4RzNHb2xxUEl0Y3JL?=
+ =?utf-8?B?cDVwUFZ4a3g3bWtYQ2VtWDNMTWg3YXhTYmM3MUxaalhpK2p6S3JqOVhnb2xr?=
+ =?utf-8?B?R1NVZUEra3ZzcUEvWExwU25VcEY3WHEycXJ3N0ZhMzFLeW5IU0NVSnEwTWVG?=
+ =?utf-8?B?MC84R0wvdUVHZUhqQUJSYlZoT2pOelhzZEN2b1FGdnZXQjVaT2xFcEFodXlr?=
+ =?utf-8?B?QTAyKzZ4K3NwbGlGOWFFSW5GWXg1Qm40K25yTmcxeUVnQUtaMHlNY0pRTllG?=
+ =?utf-8?B?bHVzbXRmNmMrS0F5RTk2Ulg4eTI0OUVQTm1sQ1E2RWdEYm5LdURNbTVYZ2Fl?=
+ =?utf-8?B?SkZ6MVJXdllLVnRzdUxjN0IySEpzVTZsQ2dVd1EvOGFNSlRCckhjUnp6a2Vt?=
+ =?utf-8?B?TnpHKzZBVEF2SkhNcEVoOUVTc1dkRmF5VHNMVFE5dTNBZlJoS0JrWEp1SFZP?=
+ =?utf-8?B?K0lXWXNoNWFIV01ydHN5Y3dCVDRLc29HdmR6dTUyWFBVSUJtUXhDbExkcCtD?=
+ =?utf-8?B?N0VqU0xjWTh1WlBHVGlSU3F3d000TnpKWEpjd1hqdEtXeUZQb3hCb05McllO?=
+ =?utf-8?B?OHpTWG9JVVRCSjdmMC9rYmowNitFQU9xall3SVMzQUpOMHJUNFpMSHg5d2RT?=
+ =?utf-8?B?OHpTbXFjcFZFZ012OGQxSmRMTHlpUUQ4Y3pITEtIOW1oblZFQUs2ZXBNd1p5?=
+ =?utf-8?B?MVorUGpmckZrTURnTGduUXM0WUNOemU4bjJKOFFGRURHeXNabTY4d2JjT2x1?=
+ =?utf-8?B?RGgxVnBjZ1pNRXRjaVYwdzBwcVoxWXlYekhjVFVHTXVzZDA3cmhPQnQxMGJH?=
+ =?utf-8?B?MndsSytLZjNZMlVYSXRwcnJXWDl6aDNhbUZoRnp0ZnI1Nno0ZGN6MFZOVWl5?=
+ =?utf-8?B?SXJCU3lrRGlTWmF3QXNib0RqKzlDWXlPUzRLQkRYVEhrTk5Kc2tPQVcrQ1dm?=
+ =?utf-8?B?L3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 393f1cee-0e98-4997-0f5a-08db5c7ae0ea
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4855.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2023 17:18:23.4338
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JZZmXvfs2R4qSq+Q4WK2PEkOrSz+A1/oarfpSDX+9likOBMs9PD/frH7DF13NLtU9SKeTdQbGzPUZXDHeV8b8qEXVJVAyxxSzcBpApEDInI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5013
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Key Locker is a CPU feature to reduce key exfiltration opportunities.
-It converts the AES key into an encoded form, called 'key handle', to
-reduce the exposure of private key material in memory.
+On 5/8/2023 11:18 AM, Chang S. Bae wrote:
+> 
+> I thought this is something benign to stay here. But, yes, I agree that 
+> it is better to simplify the code.
 
-This key conversion as well as all subsequent data transformation are
-provided by new AES instructions ('AES-KL'). AES-KL is analogous to
-that of AES-NI as maintains a similar programming interface.
+After staring at this a bit, I realized that at least the feature flag 
+check needs to stay there. This can populate a proper error code when 
+the feature abruptly gets disabled (most likely due to the backup failure).
 
-Support the XTS mode as the primary use case is dm-crypt. The
-implementation has some details worth mentioning, which differentiate
-itself from others, that users may need to be aware of:
-
-== Key Handle Restriction ==
-
-A key handle may be encoded with some restrictions. Restrict every
-handle only available in kernel mode via setkey().
-
-Subsequently the key handle could be corrupted or fail with handle
-restrictions. Then, encrypt()/decrypt() returns -EINVAL.
-
-== API Limitation ==
-
-The setkey() function transforms an AES key into a handle. But, an
-extended key is a usual outcome of setkey() in other AES cipher
-implementations. For this reason, a setkey() failure does not fall
-back to the other. So, expose AES-KL methods via synchronous
-interfaces only.
-
-=== AES Compliance ===
-
-Key Locker is not AES compliant as it lacks 192-bit key support.
-However, per the expectations of Linux crypto-cipher implementations
-the software cipher implementation must support all the AES-compliant
-key sizes.
-
-The AES-KL cipher implementation achieves this constraint by logging a
-warning and falling back to AES-NI. In other words, the 192-bit
-key-size limitation for what can be converted into a key handle is
-only documented, not enforced.
-
-== Wrapping Key Restore Failure ==
-
-The failure of setkey() as well as encode()/decode() is also possible
-with the wrapping key failure. In the event of hardware failure, the
-wrapping key is lost from deep sleep states. Then, those functions
-return -ENODEV as the feature is disabled.
-
-== Userspace Exposition ==
-
-Some hardware implementations may have some performance penalties.
-E.g., the cryptsetup benchmark indicates the raw throughput is
-measurably slower than AES-NI. But, for disk encryption, storage
-bandwidth may be the bottleneck before encryption bandwidth.
-
-This, along with the above points, is an end-user consideration for
-selecting AES-KL over AES-NI. Thus, advertise it with a unique name
-'xts-aes-aeskl' in /proc/crypto while not replacing AES-NI under the
-generic name 'xts(aes)' with a lower priority.
-
-== 64-bit Only ==
-
-AES-KL provides wide instructions that process eight blocks at once
-which can boost the AES performance. Leveraging those, the code needs
-to clobber more than eight 128-bit registers.
-
-But, the 32-bit does not have enough wide registers. Then, the
-performance is unlikely better than 64-bit which has already a gap vs.
-AES-NI. So, simply make it for the 64-bit mode only at the moment.
-
-Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Acked-by: Dan Williams <dan.j.williams@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Milan Broz <gmazyland@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
-Changes from v6:
-* Merge all the AES-KL patches. (Eric Biggers)
-* Make the driver for the 64-bit mode only. (Eric Biggers)
-* Rework the key-size check code:
-  - Trim unnecessary checks. (Eric Biggers)
-  - Document the reason
-  - Make sure both XTS keys with the same size
-* Adjust the Kconfig change:
-  - Move the location. (Robert Elliott)
-  - Trim the description to follow others such as AES-NI.
-* Update the changelog:
-  - Explain the priority value for the common name under 'User
-    Exposition' (renamed from 'Performance'). (Eric Biggers)
-  - Trim the introduction
-  - Switch to more imperative mood for those explaining the code
-    change
-  - Add a new section '64-bit Only'
-* Adjust the ASM code to return a proper error code. (Eric Biggers)
-* Update assembly code macros:
-  - Remove unused one.
-  - Document the reason for the duplicated ones.
-
-Changes from v5:
-* Replace the ret instruction with RET as rebased on the upstream -- commit
-  f94909ceb1ed ("x86: Prepare asm files for straight-line-speculation").
-
-Changes from v3:
-* Exclude non-AES-KL objects. (Eric Biggers)
-* Simplify the assembler dependency check. (Peter Zijlstra)
-* Trim the Kconfig help text. (Dan Williams)
-* Fix a defined-but-not-used warning.
-
-Changes from RFC v2:
-* Move out each mode support in new patches.
-* Update the changelog to describe the limitation and the tradeoff
-  clearly. (Andy Lutomirski)
-
-Changes from RFC v1:
-* Rebased on the refactored code. (Ard Biesheuvel)
-* Dropped exporting the single block interface. (Ard Biesheuvel)
-* Fixed the fallback and error handling paths. (Ard Biesheuvel)
-* Revised the module description. (Dave Hansen and Peter Zijlsta)
-* Made the build depend on the binutils version to support new
-  instructions. (Borislav Petkov and Peter Zijlstra)
-* Updated the changelog accordingly.
-Link: https://lore.kernel.org/lkml/CAMj1kXGa4f21eH0mdxd1pQsZMUjUr1Btq+Dgw-gC=O-yYft7xw@mail.gmail.com/
----
- arch/x86/crypto/Kconfig            |  22 ++
- arch/x86/crypto/Makefile           |   3 +
- arch/x86/crypto/aeskl-intel_asm.S  | 580 +++++++++++++++++++++++++++++
- arch/x86/crypto/aeskl-intel_glue.c | 216 +++++++++++
- arch/x86/crypto/aesni-intel_asm.S  |   8 +-
- arch/x86/crypto/aesni-intel_glue.c |  40 +-
- arch/x86/crypto/aesni-intel_glue.h |  17 +
- 7 files changed, 873 insertions(+), 13 deletions(-)
- create mode 100644 arch/x86/crypto/aeskl-intel_asm.S
- create mode 100644 arch/x86/crypto/aeskl-intel_glue.c
- create mode 100644 arch/x86/crypto/aesni-intel_glue.h
-
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index 9bbfd01cfa2f..658adfd7aebf 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -2,6 +2,11 @@
- 
- menu "Accelerated Cryptographic Algorithms for CPU (x86)"
- 
-+config AS_HAS_KEYLOCKER
-+	def_bool $(as-instr,encodekey256 %eax$(comma)%eax)
-+	help
-+	  Supported by binutils >= 2.36 and LLVM integrated assembler >= V12
-+
- config CRYPTO_CURVE25519_X86
- 	tristate "Public key crypto: Curve25519 (ADX)"
- 	depends on X86 && 64BIT
-@@ -29,6 +34,23 @@ config CRYPTO_AES_NI_INTEL
- 	  Architecture: x86 (32-bit and 64-bit) using:
- 	  - AES-NI (AES new instructions)
- 
-+config CRYPTO_AES_KL
-+	tristate "Ciphers: AES, modes: XTS (AES-KL)"
-+	depends on X86 && 64BIT
-+	depends on AS_HAS_KEYLOCKER
-+	depends on CRYPTO_AES_NI_INTEL
-+	select X86_KEYLOCKER
-+
-+	help
-+	  Block cipher: AES cipher algorithms
-+	  Length-preserving ciphers: AES with XTS
-+
-+	  Architecture: x86 (64-bit) using:
-+	  - AES-KL (AES Key Locker)
-+	  - AES-NI for a 192-bit key
-+
-+	  See Documentation/arch/x86/keylocker.rst for more details.
-+
- config CRYPTO_BLOWFISH_X86_64
- 	tristate "Ciphers: Blowfish, modes: ECB, CBC"
- 	depends on X86 && 64BIT
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 9aa46093c91b..ae2aa7abd151 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -50,6 +50,9 @@ obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
- aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
- aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
- 
-+obj-$(CONFIG_CRYPTO_AES_KL) += aeskl-intel.o
-+aeskl-intel-y := aeskl-intel_asm.o aeskl-intel_glue.o
-+
- obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
- sha1-ssse3-y := sha1_avx2_x86_64_asm.o sha1_ssse3_asm.o sha1_ssse3_glue.o
- sha1-ssse3-$(CONFIG_AS_SHA1_NI) += sha1_ni_asm.o
-diff --git a/arch/x86/crypto/aeskl-intel_asm.S b/arch/x86/crypto/aeskl-intel_asm.S
-new file mode 100644
-index 000000000000..402dd7796375
---- /dev/null
-+++ b/arch/x86/crypto/aeskl-intel_asm.S
-@@ -0,0 +1,580 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Implement AES algorithm using AES Key Locker instructions.
-+ *
-+ * Most code is based from the AES-NI implementation, aesni-intel_asm.S
-+ *
-+ */
-+
-+#include <linux/linkage.h>
-+#include <linux/cfi_types.h>
-+#include <asm/errno.h>
-+#include <asm/inst.h>
-+#include <asm/frame.h>
-+#include "aes-helper_asm.S"
-+
-+.text
-+
-+#define STATE1	%xmm0
-+#define STATE2	%xmm1
-+#define STATE3	%xmm2
-+#define STATE4	%xmm3
-+#define STATE5	%xmm4
-+#define STATE6	%xmm5
-+#define STATE7	%xmm6
-+#define STATE8	%xmm7
-+#define STATE	STATE1
-+
-+#define IV	%xmm9
-+#define KEY	%xmm10
-+#define INC	%xmm13
-+
-+#define IN1	%xmm8
-+#define IN	IN1
-+
-+#define AREG	%rax
-+#define HANDLEP	%rdi
-+#define OUTP	%rsi
-+#define KLEN	%r9d
-+#define INP	%rdx
-+#define T1	%r10
-+#define LEN	%rcx
-+#define IVP	%r8
-+
-+#define UKEYP	OUTP
-+#define GF128MUL_MASK %xmm11
-+
-+/*
-+ * int aeskl_setkey(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len)
-+ */
-+SYM_FUNC_START(aeskl_setkey)
-+	FRAME_BEGIN
-+	movl %edx, 480(HANDLEP)
-+	movdqu (UKEYP), STATE1
-+	mov $1, %eax
-+	cmp $16, %dl
-+	je .Lsetkey_128
-+
-+	movdqu 0x10(UKEYP), STATE2
-+	encodekey256 %eax, %eax
-+	movdqu STATE4, 0x30(HANDLEP)
-+	jmp .Lsetkey_end
-+.Lsetkey_128:
-+	encodekey128 %eax, %eax
-+
-+.Lsetkey_end:
-+	movdqu STATE1, (HANDLEP)
-+	movdqu STATE2, 0x10(HANDLEP)
-+	movdqu STATE3, 0x20(HANDLEP)
-+
-+	xor AREG, AREG
-+	FRAME_END
-+	RET
-+SYM_FUNC_END(aeskl_setkey)
-+
-+/*
-+ * int __aeskl_enc(const void *ctx, u8 *dst, const u8 *src)
-+ */
-+SYM_FUNC_START(__aeskl_enc)
-+	FRAME_BEGIN
-+	movdqu (INP), STATE
-+	movl 480(HANDLEP), KLEN
-+
-+	cmp $16, KLEN
-+	je .Lenc_128
-+	aesenc256kl (HANDLEP), STATE
-+	jz .Lenc_err
-+	jmp .Lenc_noerr
-+.Lenc_128:
-+	aesenc128kl (HANDLEP), STATE
-+	jz .Lenc_err
-+
-+.Lenc_noerr:
-+	xor AREG, AREG
-+	jmp .Lenc_end
-+.Lenc_err:
-+	mov $(-EINVAL), AREG
-+.Lenc_end:
-+	movdqu STATE, (OUTP)
-+	FRAME_END
-+	RET
-+SYM_FUNC_END(__aeskl_enc)
-+
-+/*
-+ * int __aeskl_dec(const void *ctx, u8 *dst, const u8 *src)
-+ */
-+SYM_FUNC_START(__aeskl_dec)
-+	FRAME_BEGIN
-+	movdqu (INP), STATE
-+	mov 480(HANDLEP), KLEN
-+
-+	cmp $16, KLEN
-+	je .Ldec_128
-+	aesdec256kl (HANDLEP), STATE
-+	jz .Ldec_err
-+	jmp .Ldec_noerr
-+.Ldec_128:
-+	aesdec128kl (HANDLEP), STATE
-+	jz .Ldec_err
-+
-+.Ldec_noerr:
-+	xor AREG, AREG
-+	jmp .Ldec_end
-+.Ldec_err:
-+	mov $(-EINVAL), AREG
-+.Ldec_end:
-+	movdqu STATE, (OUTP)
-+	FRAME_END
-+	RET
-+SYM_FUNC_END(__aeskl_dec)
-+
-+/*
-+ * XTS implementation
-+ */
-+
-+/*
-+ * _aeskl_gf128mul_x_ble: 	internal ABI
-+ *	Multiply in GF(2^128) for XTS IVs
-+ * input:
-+ *	IV:	current IV
-+ *	GF128MUL_MASK == mask with 0x87 and 0x01
-+ * output:
-+ *	IV:	next IV
-+ * changed:
-+ *	CTR:	== temporary value
-+ *
-+ * While based on the AES-NI code, this macro is separated here due to
-+ * the register constraint. E.g., aesencwide256kl has implicit
-+ * operands: XMM0-7.
-+ */
-+#define _aeskl_gf128mul_x_ble() \
-+	pshufd $0x13, IV, KEY; \
-+	paddq IV, IV; \
-+	psrad $31, KEY; \
-+	pand GF128MUL_MASK, KEY; \
-+	pxor KEY, IV;
-+
-+/*
-+ * int __aeskl_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-+ *			   const u8 *src, unsigned int len, le128 *iv)
-+ */
-+SYM_FUNC_START(__aeskl_xts_encrypt)
-+	FRAME_BEGIN
-+	movdqa .Lgf128mul_x_ble_mask(%rip), GF128MUL_MASK
-+	movups (IVP), IV
-+
-+	mov 480(HANDLEP), KLEN
-+
-+.Lxts_enc8:
-+	sub $128, LEN
-+	jl .Lxts_enc1_pre
-+
-+	movdqa IV, STATE1
-+	movdqu (INP), INC
-+	pxor INC, STATE1
-+	movdqu IV, (OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE2
-+	movdqu 0x10(INP), INC
-+	pxor INC, STATE2
-+	movdqu IV, 0x10(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE3
-+	movdqu 0x20(INP), INC
-+	pxor INC, STATE3
-+	movdqu IV, 0x20(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE4
-+	movdqu 0x30(INP), INC
-+	pxor INC, STATE4
-+	movdqu IV, 0x30(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE5
-+	movdqu 0x40(INP), INC
-+	pxor INC, STATE5
-+	movdqu IV, 0x40(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE6
-+	movdqu 0x50(INP), INC
-+	pxor INC, STATE6
-+	movdqu IV, 0x50(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE7
-+	movdqu 0x60(INP), INC
-+	pxor INC, STATE7
-+	movdqu IV, 0x60(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE8
-+	movdqu 0x70(INP), INC
-+	pxor INC, STATE8
-+	movdqu IV, 0x70(OUTP)
-+
-+	cmp $16, KLEN
-+	je .Lxts_enc8_128
-+	aesencwide256kl (%rdi)
-+	jz .Lxts_enc_ret_err
-+	jmp .Lxts_enc8_end
-+.Lxts_enc8_128:
-+	aesencwide128kl (%rdi)
-+	jz .Lxts_enc_ret_err
-+
-+.Lxts_enc8_end:
-+	movdqu 0x00(OUTP), INC
-+	pxor INC, STATE1
-+	movdqu STATE1, 0x00(OUTP)
-+
-+	movdqu 0x10(OUTP), INC
-+	pxor INC, STATE2
-+	movdqu STATE2, 0x10(OUTP)
-+
-+	movdqu 0x20(OUTP), INC
-+	pxor INC, STATE3
-+	movdqu STATE3, 0x20(OUTP)
-+
-+	movdqu 0x30(OUTP), INC
-+	pxor INC, STATE4
-+	movdqu STATE4, 0x30(OUTP)
-+
-+	movdqu 0x40(OUTP), INC
-+	pxor INC, STATE5
-+	movdqu STATE5, 0x40(OUTP)
-+
-+	movdqu 0x50(OUTP), INC
-+	pxor INC, STATE6
-+	movdqu STATE6, 0x50(OUTP)
-+
-+	movdqu 0x60(OUTP), INC
-+	pxor INC, STATE7
-+	movdqu STATE7, 0x60(OUTP)
-+
-+	movdqu 0x70(OUTP), INC
-+	pxor INC, STATE8
-+	movdqu STATE8, 0x70(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+
-+	add $128, INP
-+	add $128, OUTP
-+	test LEN, LEN
-+	jnz .Lxts_enc8
-+
-+.Lxts_enc_ret_iv:
-+	movups IV, (IVP)
-+.Lxts_enc_ret_noerr:
-+	xor AREG, AREG
-+	jmp .Lxts_enc_ret
-+.Lxts_enc_ret_err:
-+	mov $(-EINVAL), AREG
-+.Lxts_enc_ret:
-+	FRAME_END
-+	RET
-+
-+.Lxts_enc1_pre:
-+	add $128, LEN
-+	jz .Lxts_enc_ret_iv
-+	sub $16, LEN
-+	jl .Lxts_enc_cts4
-+
-+.Lxts_enc1:
-+	movdqu (INP), STATE1
-+	pxor IV, STATE1
-+
-+	cmp $16, KLEN
-+	je .Lxts_enc1_128
-+	aesenc256kl (HANDLEP), STATE1
-+	jz .Lxts_enc_ret_err
-+	jmp .Lxts_enc1_end
-+.Lxts_enc1_128:
-+	aesenc128kl (HANDLEP), STATE1
-+	jz .Lxts_enc_ret_err
-+
-+.Lxts_enc1_end:
-+	pxor IV, STATE1
-+	_aeskl_gf128mul_x_ble()
-+
-+	test LEN, LEN
-+	jz .Lxts_enc1_out
-+
-+	add $16, INP
-+	sub $16, LEN
-+	jl .Lxts_enc_cts1
-+
-+	movdqu STATE1, (OUTP)
-+	add $16, OUTP
-+	jmp .Lxts_enc1
-+
-+.Lxts_enc1_out:
-+	movdqu STATE1, (OUTP)
-+	jmp .Lxts_enc_ret_iv
-+
-+.Lxts_enc_cts4:
-+	movdqu STATE8, STATE1
-+	sub $16, OUTP
-+
-+.Lxts_enc_cts1:
-+	lea .Lcts_permute_table(%rip), T1
-+	add LEN, INP		/* rewind input pointer */
-+	add $16, LEN		/* # bytes in final block */
-+	movups (INP), IN1
-+
-+	mov T1, IVP
-+	add $32, IVP
-+	add LEN, T1
-+	sub LEN, IVP
-+	add OUTP, LEN
-+
-+	movups (T1), STATE2
-+	movaps STATE1, STATE3
-+	pshufb STATE2, STATE1
-+	movups STATE1, (LEN)
-+
-+	movups (IVP), STATE1
-+	pshufb STATE1, IN1
-+	pblendvb STATE3, IN1
-+	movaps IN1, STATE1
-+
-+	pxor IV, STATE1
-+
-+	cmp $16, KLEN
-+	je .Lxts_enc1_cts_128
-+	aesenc256kl (HANDLEP), STATE1
-+	jz .Lxts_enc_ret_err
-+	jmp .Lxts_enc1_cts_end
-+.Lxts_enc1_cts_128:
-+	aesenc128kl (HANDLEP), STATE1
-+	jz .Lxts_enc_ret_err
-+
-+.Lxts_enc1_cts_end:
-+	pxor IV, STATE1
-+	movups STATE1, (OUTP)
-+	jmp .Lxts_enc_ret_noerr
-+SYM_FUNC_END(__aeskl_xts_encrypt)
-+
-+/*
-+ * int __aeskl_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-+ *			   const u8 *src, unsigned int len, le128 *iv)
-+ */
-+SYM_FUNC_START(__aeskl_xts_decrypt)
-+	FRAME_BEGIN
-+	movdqa .Lgf128mul_x_ble_mask(%rip), GF128MUL_MASK
-+	movups (IVP), IV
-+
-+	mov 480(HANDLEP), KLEN
-+
-+	test $15, LEN
-+	jz .Lxts_dec8
-+	sub $16, LEN
-+
-+.Lxts_dec8:
-+	sub $128, LEN
-+	jl .Lxts_dec1_pre
-+
-+	movdqa IV, STATE1
-+	movdqu (INP), INC
-+	pxor INC, STATE1
-+	movdqu IV, (OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE2
-+	movdqu 0x10(INP), INC
-+	pxor INC, STATE2
-+	movdqu IV, 0x10(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE3
-+	movdqu 0x20(INP), INC
-+	pxor INC, STATE3
-+	movdqu IV, 0x20(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE4
-+	movdqu 0x30(INP), INC
-+	pxor INC, STATE4
-+	movdqu IV, 0x30(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE5
-+	movdqu 0x40(INP), INC
-+	pxor INC, STATE5
-+	movdqu IV, 0x40(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE6
-+	movdqu 0x50(INP), INC
-+	pxor INC, STATE6
-+	movdqu IV, 0x50(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE7
-+	movdqu 0x60(INP), INC
-+	pxor INC, STATE7
-+	movdqu IV, 0x60(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+	movdqa IV, STATE8
-+	movdqu 0x70(INP), INC
-+	pxor INC, STATE8
-+	movdqu IV, 0x70(OUTP)
-+
-+	cmp $16, KLEN
-+	je .Lxts_dec8_128
-+	aesdecwide256kl (%rdi)
-+	jz .Lxts_dec_ret_err
-+	jmp .Lxts_dec8_end
-+.Lxts_dec8_128:
-+	aesdecwide128kl (%rdi)
-+	jz .Lxts_dec_ret_err
-+
-+.Lxts_dec8_end:
-+	movdqu 0x00(OUTP), INC
-+	pxor INC, STATE1
-+	movdqu STATE1, 0x00(OUTP)
-+
-+	movdqu 0x10(OUTP), INC
-+	pxor INC, STATE2
-+	movdqu STATE2, 0x10(OUTP)
-+
-+	movdqu 0x20(OUTP), INC
-+	pxor INC, STATE3
-+	movdqu STATE3, 0x20(OUTP)
-+
-+	movdqu 0x30(OUTP), INC
-+	pxor INC, STATE4
-+	movdqu STATE4, 0x30(OUTP)
-+
-+	movdqu 0x40(OUTP), INC
-+	pxor INC, STATE5
-+	movdqu STATE5, 0x40(OUTP)
-+
-+	movdqu 0x50(OUTP), INC
-+	pxor INC, STATE6
-+	movdqu STATE6, 0x50(OUTP)
-+
-+	movdqu 0x60(OUTP), INC
-+	pxor INC, STATE7
-+	movdqu STATE7, 0x60(OUTP)
-+
-+	movdqu 0x70(OUTP), INC
-+	pxor INC, STATE8
-+	movdqu STATE8, 0x70(OUTP)
-+
-+	_aeskl_gf128mul_x_ble()
-+
-+	add $128, INP
-+	add $128, OUTP
-+	test LEN, LEN
-+	jnz .Lxts_dec8
-+
-+.Lxts_dec_ret_iv:
-+	movups IV, (IVP)
-+.Lxts_dec_ret_noerr:
-+	xor AREG, AREG
-+	jmp .Lxts_dec_ret
-+.Lxts_dec_ret_err:
-+	mov $(-EINVAL), AREG
-+.Lxts_dec_ret:
-+	FRAME_END
-+	RET
-+
-+.Lxts_dec1_pre:
-+	add $128, LEN
-+	jz .Lxts_dec_ret_iv
-+
-+.Lxts_dec1:
-+	movdqu (INP), STATE1
-+
-+	add $16, INP
-+	sub $16, LEN
-+	jl .Lxts_dec_cts1
-+
-+	pxor IV, STATE1
-+
-+	cmp $16, KLEN
-+	je .Lxts_dec1_128
-+	aesdec256kl (HANDLEP), STATE1
-+	jz .Lxts_dec_ret_err
-+	jmp .Lxts_dec1_end
-+.Lxts_dec1_128:
-+	aesdec128kl (HANDLEP), STATE1
-+	jz .Lxts_dec_ret_err
-+
-+.Lxts_dec1_end:
-+	pxor IV, STATE1
-+	_aeskl_gf128mul_x_ble()
-+
-+	test LEN, LEN
-+	jz .Lxts_dec1_out
-+
-+	movdqu STATE1, (OUTP)
-+	add $16, OUTP
-+	jmp .Lxts_dec1
-+
-+.Lxts_dec1_out:
-+	movdqu STATE1, (OUTP)
-+	jmp .Lxts_dec_ret_iv
-+
-+.Lxts_dec_cts1:
-+	movdqa IV, STATE5
-+	_aeskl_gf128mul_x_ble()
-+
-+	pxor IV, STATE1
-+
-+	cmp $16, KLEN
-+	je .Lxts_dec1_cts_pre_128
-+	aesdec256kl (HANDLEP), STATE1
-+	jz .Lxts_dec_ret_err
-+	jmp .Lxts_dec1_cts_pre_end
-+.Lxts_dec1_cts_pre_128:
-+	aesdec128kl (HANDLEP), STATE1
-+	jz .Lxts_dec_ret_err
-+
-+.Lxts_dec1_cts_pre_end:
-+	pxor IV, STATE1
-+
-+	lea .Lcts_permute_table(%rip), T1
-+	add LEN, INP		/* rewind input pointer */
-+	add $16, LEN		/* # bytes in final block */
-+	movups (INP), IN1
-+
-+	mov T1, IVP
-+	add $32, IVP
-+	add LEN, T1
-+	sub LEN, IVP
-+	add OUTP, LEN
-+
-+	movups (T1), STATE2
-+	movaps STATE1, STATE3
-+	pshufb STATE2, STATE1
-+	movups STATE1, (LEN)
-+
-+	movups (IVP), STATE1
-+	pshufb STATE1, IN1
-+	pblendvb STATE3, IN1
-+	movaps IN1, STATE1
-+
-+	pxor STATE5, STATE1
-+
-+	cmp $16, KLEN
-+	je .Lxts_dec1_cts_128
-+	aesdec256kl (HANDLEP), STATE1
-+	jz .Lxts_dec_ret_err
-+	jmp .Lxts_dec1_cts_end
-+.Lxts_dec1_cts_128:
-+	aesdec128kl (HANDLEP), STATE1
-+	jz .Lxts_dec_ret_err
-+
-+.Lxts_dec1_cts_end:
-+	pxor STATE5, STATE1
-+
-+	movups STATE1, (OUTP)
-+	jmp .Lxts_dec_ret_noerr
-+
-+SYM_FUNC_END(__aeskl_xts_decrypt)
-+
-diff --git a/arch/x86/crypto/aeskl-intel_glue.c b/arch/x86/crypto/aeskl-intel_glue.c
-new file mode 100644
-index 000000000000..c6824c50fc72
---- /dev/null
-+++ b/arch/x86/crypto/aeskl-intel_glue.c
-@@ -0,0 +1,216 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Support for AES Key Locker instructions. This file contains glue
-+ * code and the real AES implementation is in aeskl-intel_asm.S.
-+ *
-+ * Most code is based on AES-NI glue code, aesni-intel_glue.c
-+ */
-+
-+#include <linux/types.h>
-+#include <linux/module.h>
-+#include <linux/err.h>
-+#include <crypto/algapi.h>
-+#include <crypto/aes.h>
-+#include <crypto/xts.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/internal/simd.h>
-+#include <asm/simd.h>
-+#include <asm/cpu_device_id.h>
-+#include <asm/fpu/api.h>
-+#include <asm/keylocker.h>
-+
-+#include "aes-helper_glue.h"
-+#include "aesni-intel_glue.h"
-+
-+asmlinkage int aeskl_setkey(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int keylen);
-+
-+asmlinkage int __aeskl_enc(const void *ctx, u8 *out, const u8 *in);
-+asmlinkage int __aeskl_dec(const void *ctx, u8 *out, const u8 *in);
-+
-+asmlinkage int __aeskl_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+				   unsigned int len, u8 *iv);
-+asmlinkage int __aeskl_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+				   unsigned int len, u8 *iv);
-+
-+static int aeskl_setkey_common(struct crypto_tfm *tfm, void *raw_ctx, const u8 *in_key,
-+			       unsigned int keylen)
-+{
-+	/* raw_ctx is an aligned address via xts_setkey_common() */
-+	struct crypto_aes_ctx *ctx = (struct crypto_aes_ctx *)raw_ctx;
-+	int err;
-+
-+	if (!crypto_simd_usable())
-+		return -EBUSY;
-+
-+	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
-+	    keylen != AES_KEYSIZE_256)
-+		return -EINVAL;
-+
-+	kernel_fpu_begin();
-+	if (unlikely(keylen == AES_KEYSIZE_192)) {
-+		pr_warn_once("AES-KL does not support 192-bit key. Use AES-NI.\n");
-+		err = aesni_set_key(ctx, in_key, keylen);
-+	} else {
-+		if (!valid_keylocker())
-+			err = -ENODEV;
-+		else
-+			err = aeskl_setkey(ctx, in_key, keylen);
-+	}
-+	kernel_fpu_end();
-+
-+	return err;
-+}
-+
-+/*
-+ * The below wrappers for the encryption/decryption functions
-+ * incorporate the feature availability check:
-+ *
-+ * In the rare event of hardware failure, the wrapping key can be lost
-+ * after wake-up from a deep sleep state. Then, this check helps to
-+ * avoid any subsequent misuse with populating a proper error code.
-+ */
-+
-+static inline int aeskl_enc(const void *ctx, u8 *out, const u8 *in)
-+{
-+	if (!valid_keylocker())
-+		return -ENODEV;
-+
-+	return __aeskl_enc(ctx, out, in);
-+}
-+
-+static inline int aeskl_dec(const void *ctx, u8 *out, const u8 *in)
-+{
-+	if (!valid_keylocker())
-+		return -ENODEV;
-+
-+	return __aeskl_dec(ctx, out, in);
-+}
-+
-+static inline int aeskl_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+				    unsigned int len, u8 *iv)
-+{
-+	if (!valid_keylocker())
-+		return -ENODEV;
-+
-+	return __aeskl_xts_encrypt(ctx, out, in, len, iv);
-+}
-+
-+static inline int aeskl_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+				    unsigned int len, u8 *iv)
-+{
-+	if (!valid_keylocker())
-+		return -ENODEV;
-+
-+	return __aeskl_xts_decrypt(ctx, out, in, len, iv);
-+}
-+
-+static int aeskl_xts_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+			    unsigned int keylen)
-+{
-+	return xts_setkey_common(tfm, key, keylen, aeskl_setkey_common);
-+}
-+
-+static inline int xts_keylen(struct skcipher_request *req, u32 *keylen)
-+{
-+	struct aes_xts_ctx *ctx = aes_xts_ctx(crypto_skcipher_reqtfm(req));
-+
-+	if (ctx->crypt_ctx.key_length != ctx->tweak_ctx.key_length)
-+		return -EINVAL;
-+
-+	*keylen = ctx->crypt_ctx.key_length;
-+	return 0;
-+}
-+
-+static int xts_encrypt(struct skcipher_request *req)
-+{
-+	u32 keylen;
-+	int err;
-+
-+	err = xts_keylen(req, &keylen);
-+	if (err)
-+		return err;
-+
-+	if (likely(keylen != AES_KEYSIZE_192))
-+		return xts_crypt_common(req, aeskl_xts_encrypt, aeskl_enc);
-+	else
-+		return xts_crypt_common(req, aesni_xts_encrypt, aesni_enc);
-+}
-+
-+static int xts_decrypt(struct skcipher_request *req)
-+{
-+	u32 keylen;
-+	int rc;
-+
-+	rc = xts_keylen(req, &keylen);
-+	if (rc)
-+		return rc;
-+
-+	if (likely(keylen != AES_KEYSIZE_192))
-+		return xts_crypt_common(req, aeskl_xts_decrypt, aeskl_enc);
-+	else
-+		return xts_crypt_common(req, aesni_xts_decrypt, aesni_enc);
-+}
-+
-+static struct skcipher_alg aeskl_skciphers[] = {
-+	{
-+		.base = {
-+			.cra_name		= "__xts(aes)",
-+			.cra_driver_name	= "__xts-aes-aeskl",
-+			.cra_priority		= 200,
-+			.cra_flags		= CRYPTO_ALG_INTERNAL,
-+			.cra_blocksize		= AES_BLOCK_SIZE,
-+			.cra_ctxsize		= XTS_AES_CTX_SIZE,
-+			.cra_module		= THIS_MODULE,
-+		},
-+		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
-+		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
-+		.ivsize		= AES_BLOCK_SIZE,
-+		.walksize	= 2 * AES_BLOCK_SIZE,
-+		.setkey		= aeskl_xts_setkey,
-+		.encrypt	= xts_encrypt,
-+		.decrypt	= xts_decrypt,
-+	}
-+};
-+
-+static struct simd_skcipher_alg *aeskl_simd_skciphers[ARRAY_SIZE(aeskl_skciphers)];
-+
-+static int __init aeskl_init(void)
-+{
-+	u32 eax, ebx, ecx, edx;
-+	int err;
-+
-+	if (!valid_keylocker())
-+		return -ENODEV;
-+
-+	cpuid_count(KEYLOCKER_CPUID, 0, &eax, &ebx, &ecx, &edx);
-+	if (!(ebx & KEYLOCKER_CPUID_EBX_WIDE))
-+		return -ENODEV;
-+
-+	/*
-+	 * AES-KL itself does not depend on AES-NI. But AES-KL does not
-+	 * support 192-bit keys. To make itself AES-compliant, it falls
-+	 * back to AES-NI.
-+	 */
-+	if (!boot_cpu_has(X86_FEATURE_AES))
-+		return -ENODEV;
-+
-+	err = simd_register_skciphers_compat(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
-+					     aeskl_simd_skciphers);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+static void __exit aeskl_exit(void)
-+{
-+	simd_unregister_skciphers(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
-+				  aeskl_simd_skciphers);
-+}
-+
-+late_initcall(aeskl_init);
-+module_exit(aeskl_exit);
-+
-+MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, AES Key Locker implementation");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("aes");
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 3922d24cae2b..d38abcc69d9e 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -1821,10 +1821,10 @@ SYM_FUNC_START_LOCAL(_key_expansion_256b)
- SYM_FUNC_END(_key_expansion_256b)
- 
- /*
-- * int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-- *                   unsigned int key_len)
-+ * int __aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+ *                     unsigned int key_len)
-  */
--SYM_FUNC_START(aesni_set_key)
-+SYM_FUNC_START(__aesni_set_key)
- 	FRAME_BEGIN
- #ifndef __x86_64__
- 	pushl KEYP
-@@ -1933,7 +1933,7 @@ SYM_FUNC_START(aesni_set_key)
- #endif
- 	FRAME_END
- 	RET
--SYM_FUNC_END(aesni_set_key)
-+SYM_FUNC_END(__aesni_set_key)
- 
- /*
-  * void __aesni_enc(const void *ctx, u8 *dst, const u8 *src)
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 857cff484bb3..3aaf5504e349 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -37,6 +37,7 @@
- #include <linux/static_call.h>
- 
- #include "aes-helper_glue.h"
-+#include "aesni-intel_glue.h"
- 
- #define RFC4106_HASH_SUBKEY_SIZE 16
- #define AES_BLOCK_MASK (~(AES_BLOCK_SIZE - 1))
-@@ -72,8 +73,8 @@ struct gcm_context_data {
- 	u8 hash_keys[GCM_BLOCK_LEN * 16];
- };
- 
--asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
--			     unsigned int key_len);
-+asmlinkage int __aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+			       unsigned int key_len);
- asmlinkage void __aesni_enc(const void *ctx, u8 *out, const u8 *in);
- asmlinkage void __aesni_dec(const void *ctx, u8 *out, const u8 *in);
- asmlinkage void aesni_ecb_enc(struct crypto_aes_ctx *ctx, u8 *out,
-@@ -89,17 +90,32 @@ asmlinkage void aesni_cts_cbc_enc(struct crypto_aes_ctx *ctx, u8 *out,
- asmlinkage void aesni_cts_cbc_dec(struct crypto_aes_ctx *ctx, u8 *out,
- 				  const u8 *in, unsigned int len, u8 *iv);
- 
--static int aesni_enc(const void *ctx, u8 *out, const u8 *in)
-+int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-+		  unsigned int key_len)
-+{
-+	return __aesni_set_key(ctx, in_key, key_len);
-+}
-+#if IS_MODULE(CONFIG_CRYPTO_AES_KL)
-+EXPORT_SYMBOL_GPL(aesni_set_key);
-+#endif
-+
-+int aesni_enc(const void *ctx, u8 *out, const u8 *in)
- {
- 	__aesni_enc(ctx, out, in);
- 	return 0;
- }
-+#if IS_MODULE(CONFIG_CRYPTO_AES_KL)
-+EXPORT_SYMBOL_GPL(aesni_enc);
-+#endif
- 
--static int aesni_dec(const void *ctx, u8 *out, const u8 *in)
-+int aesni_dec(const void *ctx, u8 *out, const u8 *in)
- {
- 	__aesni_dec(ctx, out, in);
- 	return 0;
- }
-+#if IS_MODULE(CONFIG_CRYPTO_AES_KL)
-+EXPORT_SYMBOL_GPL(aesni_dec);
-+#endif
- 
- #define AVX_GEN2_OPTSIZE 640
- #define AVX_GEN4_OPTSIZE 4096
-@@ -110,19 +126,25 @@ asmlinkage void __aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out,
- asmlinkage void __aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out,
- 				    const u8 *in, unsigned int len, u8 *iv);
- 
--static int aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
--			     unsigned int len, u8 *iv)
-+int aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+		      unsigned int len, u8 *iv)
- {
- 	__aesni_xts_encrypt(ctx, out, in, len, iv);
- 	return 0;
- }
-+#if IS_MODULE(CONFIG_CRYPTO_AES_KL)
-+EXPORT_SYMBOL_GPL(aesni_xts_encrypt);
-+#endif
- 
--static int aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
--			     unsigned int len, u8 *iv)
-+int aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+		      unsigned int len, u8 *iv)
- {
- 	__aesni_xts_decrypt(ctx, out, in, len, iv);
- 	return 0;
- }
-+#if IS_MODULE(CONFIG_CRYPTO_AES_KL)
-+EXPORT_SYMBOL_GPL(aesni_xts_decrypt);
-+#endif
- 
- #ifdef CONFIG_X86_64
- 
-@@ -256,7 +278,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
- 		err = aes_expandkey(ctx, in_key, key_len);
- 	else {
- 		kernel_fpu_begin();
--		err = aesni_set_key(ctx, in_key, key_len);
-+		err = __aesni_set_key(ctx, in_key, key_len);
- 		kernel_fpu_end();
- 	}
- 
-diff --git a/arch/x86/crypto/aesni-intel_glue.h b/arch/x86/crypto/aesni-intel_glue.h
-new file mode 100644
-index 000000000000..81ecacb4e54c
---- /dev/null
-+++ b/arch/x86/crypto/aesni-intel_glue.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+/*
-+ * Support for Intel AES-NI instructions. This file contains function
-+ * prototypes to be referenced for other AES implementations
-+ */
-+
-+int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len);
-+
-+int aesni_enc(const void *ctx, u8 *out, const u8 *in);
-+int aesni_dec(const void *ctx, u8 *out, const u8 *in);
-+
-+int aesni_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+		      unsigned int len, u8 *iv);
-+int aesni_xts_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in,
-+		      unsigned int len, u8 *iv);
-+
--- 
-2.17.1
-
+Thanks,
+Chang
