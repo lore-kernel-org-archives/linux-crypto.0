@@ -2,136 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C46C77B7A
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 10:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32108C7EE2C
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 May 2023 11:34:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230082AbjEXKp2 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 06:45:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
+        id S232190AbjEXLec (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 07:34:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjEXKp1 (ORCPT
+        with ESMTP id S231921AbjEXLeb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 06:45:27 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAFED13E
-        for <linux-crypto@vger.kernel.org>; Wed, 24 May 2023 03:45:21 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <p.zabel@pengutronix.de>)
-        id 1q1lzS-0007w7-5i; Wed, 24 May 2023 12:45:10 +0200
-Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <p.zabel@pengutronix.de>)
-        id 1q1lzO-002Sr9-C7; Wed, 24 May 2023 12:45:06 +0200
-Received: from pza by lupine with local (Exim 4.94.2)
-        (envelope-from <p.zabel@pengutronix.de>)
-        id 1q1lzM-0005pO-Dd; Wed, 24 May 2023 12:45:04 +0200
-Message-ID: <b33cf92691afaa158c6282703128dfb8da4fe242.camel@pengutronix.de>
-Subject: Re: [PATCH v2 1/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
-From:   Philipp Zabel <p.zabel@pengutronix.de>
-To:     David Yang <mmyangfl@gmail.com>, linux-crypto@vger.kernel.org
-Cc:     Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 24 May 2023 12:45:04 +0200
-In-Reply-To: <20230513074339.266879-2-mmyangfl@gmail.com>
-References: <20230513074339.266879-1-mmyangfl@gmail.com>
-         <20230513074339.266879-2-mmyangfl@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.38.3-1+deb11u2 
+        Wed, 24 May 2023 07:34:31 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86EE812E;
+        Wed, 24 May 2023 04:34:29 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1q1ml8-0000gO-RQ; Wed, 24 May 2023 13:34:26 +0200
+Message-ID: <175578ec-9dec-7a9c-8d3a-43f24ff86b92@leemhuis.info>
+Date:   Wed, 24 May 2023 13:34:26 +0200
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Content-Language: en-US, de-DE
+From:   Thorsten Leemhuis <linux@leemhuis.info>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: build error while building arch/x86/purgatory/sha256.o: invalid
+ 'asm': operand is not a condition code [...]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1684928069;8444b3c6;
+X-HE-SMSGID: 1q1ml8-0000gO-RQ
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+Hi! My linux-next builds for Fedora[1] since yesterday fail with the
+following error:
 
-On Sa, 2023-05-13 at 15:43 +0800, David Yang wrote:
-> HiSilicon ADVCA Subsystem contains various cryptographic devices, including
-> symmetric key ciphers, hash functions, RSA algorithms, as well as key
-> ladder and OTP memory.
-> 
-> This patch adds symmetric key cipher driver.
-> 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
-> ---
->  drivers/crypto/hisilicon/Kconfig              |    8 +
->  drivers/crypto/hisilicon/Makefile             |    1 +
->  drivers/crypto/hisilicon/advca/Makefile       |    1 +
->  .../crypto/hisilicon/advca/hisi-advca-muc.c   | 1527 +++++++++++++++++
->  4 files changed, 1537 insertions(+)
->  create mode 100644 drivers/crypto/hisilicon/advca/Makefile
->  create mode 100644 drivers/crypto/hisilicon/advca/hisi-advca-muc.c
-> 
-[...]
-> diff --git a/drivers/crypto/hisilicon/advca/hisi-advca-muc.c b/drivers/crypto/hisilicon/advca/hisi-advca-muc.c
-> new file mode 100644
-> index 000000000000..362596a91e19
-> --- /dev/null
-> +++ b/drivers/crypto/hisilicon/advca/hisi-advca-muc.c
-> @@ -0,0 +1,1527 @@
-[...]
-> +static int hica_muc_probe(struct platform_device *pdev)
-> +{
-[...]
-> +	priv->rst = devm_reset_control_get_optional(dev, NULL);
+> In file included from <command-line>:
+> ./include/crypto/sha256_base.h: In function ‘lib_sha256_base_do_update.constprop.isra’:
+> ././include/linux/compiler_types.h:332:20: error: invalid 'asm': operand is not a condition code, invalid operand code 'c'
+>   332 | #define asm_inline asm __inline
+>       |                    ^~~
 
-Please use devm_reset_control_get_optional_exclusive() directly.
+See below for the full error message[2]. This happens on Fedora rawhide
+and 38 (both use gcc13), but not on Fedora 37 (which uses gcc12).
 
-Since priv->rst is only ever used in hica_muc_probe(), it could be
-stored in a local variable instead.
+Is this known already or do I have to bisect this?
 
-> +	if (IS_ERR(priv->rst))
-> +		return PTR_ERR(priv->rst);
-> +
-> +	ret = platform_get_irq(pdev, 0);
-> +	if (ret < 0)
-> +		return ret;
-> +	priv->irqs[0] = ret;
-> +	priv->irqs[1] = platform_get_irq_optional(pdev, 1);
-> +
-> +	priv->algs_num = ARRAY_SIZE(hica_muc_tmpls);
-> +	priv->algs = devm_kmalloc_array(dev, priv->algs_num,
-> +					sizeof(priv->algs[0]), GFP_KERNEL);
-> +	if (!priv->algs)
-> +		return -ENOMEM;
-> +
-> +	init_completion(&priv->cond);
-> +
-> +	priv->dev = dev;
-> +	platform_set_drvdata(pdev, priv);
-> +	dev_set_drvdata(dev, priv);
-> +
-> +	/* bring up device */
-> +	ret = reset_control_assert(priv->rst) ?:
-> +	      clk_bulk_prepare_enable(priv->clks_num, priv->clks) ?:
-> +	      reset_control_deassert(priv->rst);
+Ciao, Thorsten
 
-Using the ternary operator like this is a bit unconventional. Here, the
-clocks are kept enabled if the reset_control_deassert() fails.
+[1] https://copr.fedorainfracloud.org/coprs/g/kernel-vanilla/next/
 
-It would be good to add an error path that disables the clocks.
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (!(readl(priv->base + MUC_RST_STATUS) & MUC_STATE_VALID)) {
-> +		msleep(20);
-> +		if (!(readl(priv->base + MUC_RST_STATUS) & MUC_STATE_VALID)) {
-> +			dev_err(dev, "cannot bring up device\n");
-> +			return -ENODEV;
-
-This also leaves the clocks enabled. There are some more return
-statements with the same issue below.
-
-regards
-Philipp
+[2]
+> # CC      arch/x86/purgatory/sha256.o
+>  
+> gcc -Wp,-MMD,arch/x86/purgatory/.sha256.o.d -nostdinc
+> -I./arch/x86/include -I./arch/x86/include/generated  -I./include
+> -I./arch/x86/include/uapi -I./arch/x86/include/generated/uapi
+> -I./include/uapi -I./include/generated/uapi -include
+> ./include/linux/compiler-version.h -include ./include/linux/kconfig.h
+> -include ./include/linux/compiler_types.h -D__KERNEL__
+> -fmacro-prefix-map=./= -Wall -Wundef -Werror=strict-prototypes
+> -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE
+> -Werror=implicit-function-declaration -Werror=implicit-int
+> -Werror=return-type -Wno-format-security -funsigned-char -std=gnu11
+> -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -fcf-protection=branch
+> -fno-jump-tables -m64 -falign-jumps=1 -falign-loops=1 -mno-80387
+> -mno-fp-ret-in-387 -mpreferred-stack-boundary=3 -mskip-rax-setup
+> -mtune=generic -mno-red-zone -Wno-sign-compare
+> -fno-asynchronous-unwind-tables -fno-jump-tables -mharden-sls=all
+> -fpatchable-function-entry=16,16 -fno-delete-null-pointer-checks
+> -Wno-frame-address -Wno-format-truncation -Wno-format-overflow
+> -Wno-address-of-packed-member -O2 -fno-allow-store-data-races
+> -Wframe-larger-than=2048 -Wno-main -Wno-unused-but-set-variable
+> -Wno-unused-const-variable -Wno-dangling-pointer
+> -ftrivial-auto-var-init=zero -fno-stack-clash-protection
+> -DCC_USING_FENTRY -falign-functions=16 -Wdeclaration-after-statement
+> -Wvla -Wno-pointer-sign -Wcast-function-type -fstrict-flex-arrays=3
+> -Wno-stringop-truncation -Wno-stringop-overflow -Wno-restrict
+> -Wno-maybe-uninitialized -Wno-array-bounds -Wno-alloc-size-larger-than
+> -Wimplicit-fallthrough=5 -fno-strict-overflow -fno-stack-check
+> -fconserve-stack -Werror=date-time -Werror=incompatible-pointer-types
+> -Werror=designated-init -Wno-packed-not-aligned -g -D__DISABLE_EXPORTS
+> -mcmodel=large -ffreestanding -fno-zero-initialized-in-bss -g0
+> -DDISABLE_BRANCH_PROFILING -fno-stack-protector
+> -DKBUILD_MODFILE='"arch/x86/purgatory/sha256"'
+> -DKBUILD_BASENAME='"sha256"' -DKBUILD_MODNAME='"sha256"'
+> -D__KBUILD_MODNAME=kmod_sha256 -c -o arch/x86/purgatory/sha256.o
+> lib/crypto/sha256.c
+>
+> In file included from <command-line>:
+> ./include/crypto/sha256_base.h: In function ‘lib_sha256_base_do_update.constprop.isra’:
+> ././include/linux/compiler_types.h:332:20: error: invalid 'asm': operand is not a condition code, invalid operand code 'c'
+>   332 | #define asm_inline asm __inline
+>       |                    ^~~
+> ./arch/x86/include/asm/bug.h:28:9: note: in expansion of macro ‘asm_inline’
+>    28 |         asm_inline volatile("1:\t" ins "\n"                             \
+>       |         ^~~~~~~~~~
+> ./arch/x86/include/asm/bug.h:83:9: note: in expansion of macro ‘_BUG_FLAGS’
+>    83 |         _BUG_FLAGS(ASM_UD2, __flags, ASM_REACHABLE);            \
+>       |         ^~~~~~~~~~
+> ./include/asm-generic/bug.h:107:17: note: in expansion of macro ‘__WARN_FLAGS’
+>   107 |                 __WARN_FLAGS(BUGFLAG_NO_CUT_HERE | BUGFLAG_TAINT(taint));\
+>       |                 ^~~~~~~~~~~~
+> ./include/asm-generic/bug.h:134:17: note: in expansion of macro ‘__WARN_printf’
+>   134 |                 __WARN_printf(TAINT_WARN, format);                      \
+>       |                 ^~~~~~~~~~~~~
+> ./include/linux/once_lite.h:31:25: note: in expansion of macro ‘WARN’
+>    31 |                         func(__VA_ARGS__);                              \
+>       |                         ^~~~
+> ./include/asm-generic/bug.h:152:9: note: in expansion of macro ‘DO_ONCE_LITE_IF’
+>   152 |         DO_ONCE_LITE_IF(condition, WARN, 1, format)
+>       |         ^~~~~~~~~~~~~~~
+> ./include/linux/fortify-string.h:641:9: note: in expansion of macro ‘WARN_ONCE’
+>   641 |         WARN_ONCE(fortify_memcpy_chk(__fortify_size, __p_size,          \
+>       |         ^~~~~~~~~
+> ./include/linux/fortify-string.h:693:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+>   693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+>       |                          ^~~~~~~~~~~~~~~~~~~~
+> ./include/crypto/sha256_base.h:69:17: note: in expansion of macro ‘memcpy’
+>    69 |                 memcpy(sctx->buf + partial, data, len);
+>       |                 ^~~~~~
+> make[3]: *** [arch/x86/purgatory/Makefile:13: arch/x86/purgatory/sha256.o] Error 1
+> make[2]: *** [scripts/Makefile.build:494: arch/x86/purgatory] Error 2
+> make[1]: *** [scripts/Makefile.build:494: arch/x86] Error 2
+> make: *** [Makefile:2032: .] Error 2
