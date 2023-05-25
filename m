@@ -2,120 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203C2C7EE2F
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 13:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C92AC77B7E
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 16:06:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233502AbjEYNLq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 May 2023 09:11:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48998 "EHLO
+        id S234123AbjEYQGw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 May 2023 12:06:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231397AbjEYNLp (ORCPT
+        with ESMTP id S230051AbjEYQGv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 May 2023 09:11:45 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B9CB2;
-        Thu, 25 May 2023 06:11:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9DEm7cVBdm52kK3UCzMVMzsLM3W+SSD9KxYzTiOP2os=; b=U1iALbTK7rHRU7VruFM7TO2E1Z
-        xvRWFPd1doSjCsYDCMHOsTa++oGrg2nEYlCWtLO9dvrCYG9N6QHsuU4eTucS5i/YzLpxsrSFrNYvb
-        TnGFukTMiMyFir0UB6XRsXp7+8l811BLakEig4nBp09A0rwnSvgUO8h8Obxd2EIXiNEj99e87oVpR
-        wwUrVPb3F/WC52qPGfwBWdAQ/yTLMvMbyc9o7/4SrP+Orf6KuaDzcBvOeSUSIZQtnSs2xNgAfKEGX
-        wAZb3MoIN8mFE7OLypmP7Jb+v5G1tAMXpGUnnBN6AvHH0VEO3mjcUXclEe3PAtmDJI25A1jXCr8Et
-        CiIKtoYQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q2Ajx-00CD2j-1K; Thu, 25 May 2023 13:10:49 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E6AAC3001AE;
-        Thu, 25 May 2023 15:10:43 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id B530C20A78741; Thu, 25 May 2023 15:10:43 +0200 (CEST)
-Date:   Thu, 25 May 2023 15:10:43 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
-        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
+        Thu, 25 May 2023 12:06:51 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE47139;
+        Thu, 25 May 2023 09:06:50 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1ae74ab3089so11701995ad.0;
+        Thu, 25 May 2023 09:06:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685030810; x=1687622810;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P7DQGUGKavcUHdAu4oKuYB0d5xaJQooXg9CF7yRpzSQ=;
+        b=hM4TiVdYNoQfV2UmZNubJTd7hzS4Wfrry0F33AnppBdUiMm/ms1oHWHrCdVObIlno3
+         vvAuyL97m0qiEVZ90DMmPVCAg/iquZ/aeMz7/sPaMMzAylDARsvpxaJsHriTU+hMAZKr
+         G7w7sZWKJh/8DzlSWTvrjTue8G+Ns68XYvmBgIhGSsnkY6XxmbZJJjYUQD7b/oTqb3+P
+         rxozuMWPeD8MC08f9Dq0rOWHPk/DoA5iZw8wsHPsK7trcILegRFuT87pkiyeQAwISgfv
+         +z7a2TKhjAZ5amfigG4I2EiO5k1xZZNWzBfOiuyhVxTspUcVqvzK6NagJ2XLDW66XQkq
+         0QZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685030810; x=1687622810;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P7DQGUGKavcUHdAu4oKuYB0d5xaJQooXg9CF7yRpzSQ=;
+        b=iBgo3PFMLCenQn31xoxDrLwLWEQoMGEWNofu56UgJhhJDLu1S77erDhOkVE7496p2V
+         0eTMncQNYcXxxTDKe9TjdG/t0d8XJFuOp+XkSqakusLdebWP9h1uMmRxDH2iVHCrkdLV
+         jmB7M77VhZsoaB45Bk4Q9LQ+nKKDf4AaLGPbQXhty2IH521fTHsKPC02hAbvyKkFXbFX
+         ZIyKi9nrGNY883Jacg4XY9bygsyzx9FU80XiSeIKpzEFjcOa0CtpeVLT2AS8BtvA5Fms
+         jWCNo44v4puxSLlsybC8H5xxtd6snHABX+1zKcrQmvYQIxpTW9jJN/WMUSr9MC323NFO
+         ONFg==
+X-Gm-Message-State: AC+VfDzVa5gfNgAVpRff1AqFoZ5Lfss3qPXhsIkBM7PaqXE31Av6Qb9R
+        3iQ9MiKC7TUtkWVauHAn6k1UZ8PgpJ4UMEj55EM=
+X-Google-Smtp-Source: ACHHUZ4NuM4m4pZj6+zg4hB6ziG8zaUZ1JkMGm7eRDfBBu/mCuOq5axvTqfXbmvHLtQZeUvY9SnBWA==
+X-Received: by 2002:a17:902:e751:b0:1ac:7f56:de04 with SMTP id p17-20020a170902e75100b001ac7f56de04mr2229139plf.45.1685030809733;
+        Thu, 25 May 2023 09:06:49 -0700 (PDT)
+Received: from d.home.yangfl.dn42 ([104.28.245.202])
+        by smtp.gmail.com with ESMTPSA id q24-20020a170902b11800b001aad4be4503sm1627132plr.2.2023.05.25.09.06.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 09:06:49 -0700 (PDT)
+From:   David Yang <mmyangfl@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     David Yang <mmyangfl@gmail.com>, Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v3 08/11] slub: Replace cmpxchg_double()
-Message-ID: <20230525131043.GT83892@hirez.programming.kicks-ass.net>
-References: <20230515075659.118447996@infradead.org>
- <20230515080554.453785148@infradead.org>
- <20230524093246.GP83892@hirez.programming.kicks-ass.net>
- <20230525102946.GE38236@hirez.programming.kicks-ass.net>
- <292934ce-73fa-4077-9051-2ad909828f4a@app.fastmail.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
+Date:   Fri, 26 May 2023 00:04:29 +0800
+Message-Id: <20230525160446.43800-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <292934ce-73fa-4077-9051-2ad909828f4a@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 25, 2023 at 12:52:06PM +0200, Arnd Bergmann wrote:
-> On Thu, May 25, 2023, at 12:29, Peter Zijlstra wrote:
-> > On Wed, May 24, 2023 at 11:32:47AM +0200, Peter Zijlstra wrote:
-> >> On Mon, May 15, 2023 at 09:57:07AM +0200, Peter Zijlstra wrote:
-> >
-> > This then also means I need to look at this_cpu_cmpxchg128 and
-> > this_cpu_cmoxchg64 behaviour when we dont have the CPUID feature.
-> >
-> > Because current verions seem to assume the instruction is present.
-> 
-> As far as I could tell when reviewing your series, this_cpu_cmpxchg64()
-> is always available on all architectures. Depending on compile-time
-> feature detection this would be either a native instruction that
-> is guaranteed to work, or the irq-disabled version. On x86, this
-> is handled at runtime with alternative_io().
-> 
-> this_cpu_cmpxchg128() clearly needed the system_has_cmpxchg128()
-> check, same as system_has_cmpxchg_double() today.
+HiSilicon ADVCA Subsystem contains various cryptographic devices, including
+symmetric key ciphers, hash functions, RSA algorithms, as well as key
+ladder and OTP memory.
 
-So, having just dug through all that, on x86:
+This series adds symmetric key cipher and SHA algorithm family driver.
 
-this_cpu_cmpxchg64() is:
+This series is based on Hi3798Mv100.
 
- X86_CMPXCHG64=n -> fallback, irrespective of CX8
- X86_CMPXCHG64=y -> cmpxchg8b
- X86_64          -> cmpxchg
+v2: sorry, I accidentally skipped v1.
+v3:
+  * use devm_reset_control_get_optional_exclusive
+  * disable clocks if init failed
+  * put device reset when removal
+  * implement import function for sha device
+  * fix typo reported by test bot
+
+David Yang (2):
+  crypto: hisilicon - Add HiSilicon ADVCA Subsystem
+  crypto: hisilicon/advca - Add SHA support
+
+ drivers/crypto/hisilicon/Kconfig              |   11 +
+ drivers/crypto/hisilicon/Makefile             |    1 +
+ drivers/crypto/hisilicon/advca/Makefile       |    2 +
+ .../crypto/hisilicon/advca/hisi-advca-muc.c   | 1536 +++++++++++++++++
+ .../crypto/hisilicon/advca/hisi-advca-sha.c   |  658 +++++++
+ 5 files changed, 2208 insertions(+)
+ create mode 100644 drivers/crypto/hisilicon/advca/Makefile
+ create mode 100644 drivers/crypto/hisilicon/advca/hisi-advca-muc.c
+ create mode 100644 drivers/crypto/hisilicon/advca/hisi-advca-sha.c
 
 
-I've changed it to be similar between 32bit and 64bit such that both:
-
-  cmpxchg#b when CX#, otherwise this_cpu_cmpxchg#b_emu
-
+base-commit: 44c026a73be8038f03dbdeef028b642880cf1511
+-- 
+2.39.2
 
