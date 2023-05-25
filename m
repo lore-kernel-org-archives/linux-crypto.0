@@ -2,132 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FE4C7EE2F
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 10:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E441C7EE29
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 12:13:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240712AbjEYKwk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 May 2023 06:52:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37730 "EHLO
+        id S230054AbjEYMN5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 May 2023 08:13:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238970AbjEYKwi (ORCPT
+        with ESMTP id S229864AbjEYMN4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 May 2023 06:52:38 -0400
-Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB2AB199;
-        Thu, 25 May 2023 03:52:36 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.west.internal (Postfix) with ESMTP id 6FAD52B0681B;
-        Thu, 25 May 2023 06:52:32 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Thu, 25 May 2023 06:52:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1685011952; x=1685019152; bh=DU
-        FYLgNR0P3iMDujbNPJ6zcWMVF2ZDhcLM/UDfvQ7oE=; b=MOQIz0mdsCpzsJDpOT
-        8ymmHxd6/8U/1WrSlAu+26J9rPY+bl/QIyP7HlCrsPmJUlV8qXrewBBWaZM/zPbl
-        Avlzez1zIuARarFB8Q+CSpanGgDvavP3UvS7jOZjuO8BEJC5Skq+WhgsPSE7BYso
-        huvQr31ejgwQADplhhctQIrYZoiYvP65bWrP7Ep2/ENITKCKFjM+ORNVQInWBB/U
-        e1xnq3JiYlOQMGLPzi2Gn4d5fn7nPmSS0o6PhQUi+JS4X88aY797/1dcU900mr0r
-        b8dxJ/azB1vY1PWRzlUrX+dxP0NYO2gi5TQFJt7KPkijRDPkRNSWoC8W0yTowW0l
-        f+Mw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1685011952; x=1685019152; bh=DUFYLgNR0P3iM
-        DujbNPJ6zcWMVF2ZDhcLM/UDfvQ7oE=; b=EflHhJQg9wl2mG7bcZk8ETaFCFS2e
-        +KCM2ZXWihEVKvLhonnr7dOUeqG2bh5qJx2FysmmLCMzUPG+HlbFcFxvGE9Yt6Rg
-        c1Zq4zh4OEYt+Q71eWIJqiin1aNt49jXbiLQh9SJE62wFNAo911XNBoucik+Gzc8
-        cspfKUzRXOjWxDMSK7p38IylIxc/LuzE632/sGzGIEm6R1Y34aKYTzNNhuewVS6x
-        mPkAw7cYASaqD4haDeYKF5F8Li1HLZYnk6WFDdHQJiPyYzjJou5z/uFu4KgXX886
-        wVCJOeYCov0f/WDjAlcaoDUMGPabIC66aH+QqtLdoHG3Q/7JEQQMjfKGQ==
-X-ME-Sender: <xms:7D1vZO4QU9Jez8-ha0NTKuIxJkxVOyWMOw59fwy-mdgdKCWyERZ0Qw>
-    <xme:7D1vZH4l8nWr7ujQavOzUH-YdKW1mkNYstrhjZKuCzbgYa4fM7wmWEDCrZfB3fK5i
-    E6t_sOrA2-CCtDMUqg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeejjedgfedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:7D1vZNeCUZGBr8hqNazi1vE2XPDcy56nt9wPzXEdZqoJHZzP3_eX-w>
-    <xmx:7D1vZLJLWXCFdXo0PikDzn15lfJXSQx6C7gtfm9COaeI2OXgWNRmiw>
-    <xmx:7D1vZCLrYnBxTsTvaUHJd6WCBIVu4xSqVNpfgBb3TGefKjjwmCI_bg>
-    <xmx:8D1vZJLI8FQKNsj_QLZ7J4Fw_p8dg7sgs9AIRGxRbmH08jCfAongICIo1Eg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id C3EA8B60086; Thu, 25 May 2023 06:52:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-441-ga3ab13cd6d-fm-20230517.001-ga3ab13cd
-Mime-Version: 1.0
-Message-Id: <292934ce-73fa-4077-9051-2ad909828f4a@app.fastmail.com>
-In-Reply-To: <20230525102946.GE38236@hirez.programming.kicks-ass.net>
-References: <20230515075659.118447996@infradead.org>
- <20230515080554.453785148@infradead.org>
- <20230524093246.GP83892@hirez.programming.kicks-ass.net>
- <20230525102946.GE38236@hirez.programming.kicks-ass.net>
-Date:   Thu, 25 May 2023 12:52:06 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Peter Zijlstra" <peterz@infradead.org>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>
-Cc:     "Jonathan Corbet" <corbet@lwn.net>,
-        "Will Deacon" <will@kernel.org>,
-        "Boqun Feng" <boqun.feng@gmail.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
-        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
-        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        "Baolu Lu" <baolu.lu@linux.intel.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Pekka Enberg" <penberg@kernel.org>,
-        "David Rientjes" <rientjes@google.com>,
-        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Vlastimil Babka" <vbabka@suse.cz>,
-        "Roman Gushchin" <roman.gushchin@linux.dev>,
-        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        "Stephen Rothwell" <sfr@canb.auug.org.au>,
-        "Michael Ellerman" <mpe@ellerman.id.au>
-Subject: Re: [PATCH v3 08/11] slub: Replace cmpxchg_double()
-Content-Type: text/plain
+        Thu, 25 May 2023 08:13:56 -0400
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162E1BB;
+        Thu, 25 May 2023 05:13:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1685016712; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=r9CC3YFklz3i+XcbnKWGD5csS0s5IRx+zvD871hDGe4=; b=GH2soNeG+p4ODwPle/LOMysiyE3MOUObLZhH8QdfU14XDBrg5GNsHwaoZpj5wH+F7Kws/M1P4W0gpSsHxHglsyX09LbfCSLNKKnp/ocw0OB3GY7lhjLCExEc1BPUqTYspQlR5RVqKK8rYjEm1WGTvvZQqEwFbOAuGn+cwnalrvp8KjRqw3hBh9OICNS8vv5FFTEfpjSdSlOV89BKEcLMF6z/BRs/bwh+Wa/iFNgJzznSvXUL6vch99Lw5SvrjFG863MB3Xsoq71Xyjn8YPYxck/BoMJfMcubqQqIC8+cOf+b+Ox+YETxcehDP0N6S2d5fS5GIXzRfs9nm+zF45eWGw==
+Received: from 210.104.33.70 (nsr.re.kr)
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+        by mail.nsr.re.kr with SMTP; Thu, 25 May 2023 21:11:37 +0900
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 803;
+          Thu, 25 May 2023 21:13:28 +0900 (KST)
+From:   Dongsoo Lee <letrhee@nsr.re.kr>
+To:     linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Dongsoo Lee <letrhee@gmail.com>,
+        Dongsoo Lee <letrhee@nsr.re.kr>
+Subject: [PATCH v2 0/2] crypto: LEA block cipher implementation
+Date:   Thu, 25 May 2023 21:12:59 +0900
+Message-Id: <20230525121301.722682-1-letrhee@nsr.re.kr>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 25, 2023, at 12:29, Peter Zijlstra wrote:
-> On Wed, May 24, 2023 at 11:32:47AM +0200, Peter Zijlstra wrote:
->> On Mon, May 15, 2023 at 09:57:07AM +0200, Peter Zijlstra wrote:
->
-> This then also means I need to look at this_cpu_cmpxchg128 and
-> this_cpu_cmoxchg64 behaviour when we dont have the CPUID feature.
->
-> Because current verions seem to assume the instruction is present.
+This submission contains a generic C implementation of the LEA cipher algorithm and test vectors for it.
 
-As far as I could tell when reviewing your series, this_cpu_cmpxchg64()
-is always available on all architectures. Depending on compile-time
-feature detection this would be either a native instruction that
-is guaranteed to work, or the irq-disabled version. On x86, this
-is handled at runtime with alternative_io().
+The LEA algorithm is a lightweight block cipher that processes data blocks of 128-bits and has three different key lengths, each with a different number of rounds:
 
-this_cpu_cmpxchg128() clearly needed the system_has_cmpxchg128()
-check, same as system_has_cmpxchg_double() today.
+- LEA-128: 128-bit key, 24 rounds,
+- LEA-192: 192-bit key, 28 rounds, and
+- LEA-256: 256-bit key, 32 rounds.
 
-     Arnd
+The round function of LEA consists of 32-bit ARX(modular Addition, bitwise Rotation, and bitwise XOR) operations. See [2, 5, 7] for details.
+
+LEA is a Korean national standard block cipher, described in "KS X 3246"[1] and is also included in the international standard, "ISO/IEC 29192-2:2019 standard"[2].
+
+It is one of the approved block ciphers for the current Korean Cryptographic Module Validation Program (KCMVP).
+
+We expect that the first application of the patch would be disk encryption on the Gooroom platform ('Gooroom' is a Korean word, meaning 'cloud') [3]. Currently, the Gooroom platform uses AES-XTS for disk encryption. The main reason for submitting this patch is to make disk encryption with LEA (e.g. LEA-XTS) available on there.
+
+The Gooroom platform is a government-driven Debian-based Linux distribution in South Korea. In Korea, there are many crypto companies that want to bundle Linux into their products and sell them. They create their own Gooroom platforms by modifying the original Gooroom platform for their services. (Of course, the Gooroom platform is not mandatory, and companies wishing to use Linux are free to choose an appropriate distribution.) BTW, in Korea, many crypto companies want to use LEA, because LEA is one of the block ciphers of the KCMVP, a validation program for commercial crypto S/W to be delivered to the Korean government.
+
+The Linux Crypto API already has another Korean block cipher, ARIA, also one of the block ciphers of the KCVMP. However, LEA is more widely used than ARIA in industry nowadays, because LEA is one of the lightweight cryptography standard of ISO/IEC [2] and performs well on low-end devices that support 32-bit operations. So we think they are complementary to each other.
+
+In general, it's obvious that the hardware-accelerated AES is the best performer. However, there exist not only environments where the hardware-accelerated AES is not supported, but also situations where AES is not preferred for various reasons. In these cases, if someone wants to encrypt using a block cipher, LEA could be an alternative.
+
+There are also SIMD implementations for efficiently using LEA, which is not included in this patch. We have SSE2 and AVX2 assembly implementations, some of which were included in the previous version of the patch. The SIMD implementations are being re-implemented to support a wider range of environments.
+
+Apart from this, we also have implemented LEA in lightweight environments such as 8-bit AVR, 16-bit MSP and 32-bit ARM [4]. If LEA were to be included in the Linux kernel, it would be possible to modify and supplement the submission with lightweight implementations to provide efficient encryption on embedded linux devices.
+
+Although the designers of LEA did not provide test vectors in their paper [5], the ISO/IEC standard [2] and the KS standard [1] do. Furthermore, the Block Cipher LEA Specification("블록암호 LEA 규격서", written in Korean) document on the LEA introduction page [6] and the Wikipedia article on LEA [7] show the same test vectors as in the standards.
+
+The test vectors for ECB, CBC, CTR, and GCM modes included in the testmgr module are taken from the KCMVP Cryptographic Algorithm Verification Criteria V3.0("KCMVP 검증대상 암호알고리즘 검증기준 V3.0", written in Korean) [8]. Test vectors for the XTS mode were generated by ourselves, and we crosschecked them using Crypto++ [9] and testmgr on Linux.
+
+The implementation has been tested with kernel module tcrypt.ko and has passed the selftest using above-mentioned test vectors. It also has been tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS and KASAN enabled considering the previous review.
+
+[1] KS X 3246, 128-bit block cipher LEA.
+[2] ISO/IEC 29192-2:2019, Information security — Lightweight cryptography — Part 2: Block ciphers.
+[3] https://github.com/gooroom https://www.gooroom.kr/
+[4] https://github.com/cryptolu/FELICS/tree/master/block_ciphers/source/ciphers/LEA_128_128_v01/source
+[5] Hong, Deukjo, et al. "LEA: A 128-bit block cipher for fast encryption on common processors.", WISA 2013.
+[6] https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
+[7] https://en.wikipedia.org/wiki/LEA_(cipher)
+[8] https://seed.kisa.or.kr/kisa/kcmvp/EgovVerification.do
+[9] https://www.cryptopp.com/
+
+Changelog:
+v2:
+- Reimplemented the Generic C implementation as a Loop version.
+  - The decryption code was adapted from an optimized implementation by Eric Biggers.
+    https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/commit/?h=old/wip-lea&id=1d1cbba14380f8a1abc76baf939b9e51de047fb6
+- Removed AVX2 SIMD implementation.
+- Added comments for functions.
+- Improved the description in Kconfig.
+- Added test vectors from the standard documentation.
+
