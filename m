@@ -2,69 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42303C77B7C
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 00:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD5FC77B7A
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 01:25:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229551AbjEYAhk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 20:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41830 "EHLO
+        id S233285AbjEYBZ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 21:25:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjEYAhj (ORCPT
+        with ESMTP id S229587AbjEYBZ5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 20:37:39 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACE69B;
-        Wed, 24 May 2023 17:37:35 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q1yyg-00D229-Hg; Thu, 25 May 2023 08:37:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 May 2023 08:37:14 +0800
-Date:   Thu, 25 May 2023 08:37:14 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, giovanni.cabiddu@intel.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH v5 13/15] crypto: iaa - Add support for default IAA
- 'canned' compression mode
-Message-ID: <ZG6tun6TOYKr1nxK@gondor.apana.org.au>
-References: <20230516215009.51794-1-tom.zanussi@linux.intel.com>
- <20230516215009.51794-14-tom.zanussi@linux.intel.com>
- <ZG3dpbPlRXbF2ZxN@gondor.apana.org.au>
- <fa90e73483b866a0622ad077f4af16978d1c1c8d.camel@linux.intel.com>
+        Wed, 24 May 2023 21:25:57 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D620AF5;
+        Wed, 24 May 2023 18:25:55 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QRVk44c6gz4x4N;
+        Thu, 25 May 2023 11:25:48 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1684977949;
+        bh=LL0LczuKg+G9HWFDEaDIO2VCeLIMzL+Gu+5X/x5Ia2k=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qhD9yMYhTOo1JNmf+jr7SOyHfWJ3vdOdSP4uCqyv+c4KuI+tTo/+7pGmSQ9+KjzS6
+         +Ere/HJ1UZPnfRFEbkcj8ftWolTjEvIElBg7ULaJPrImDnYAoZg19wl3FfcZMdrtZW
+         2TuOS2AGyopVBrDIJbC1m9mYZMY+ZBpE/SIgfI8yA+JgtveXE4McDMU+mgwEW8FABa
+         Cp97blqnZrDRBdKfVNXVGO7k7UTp6326eOO7RRjXxuUAgqVrZhE+nycsoKBVdF0iUs
+         FEtDe7Hn87ltrRaWrNGCDbXkuFrQhBq1UBHV5EYRaXhU9F/6C8EgEazKXKwLkXjMUH
+         k7uFzHdyWAilQ==
+Date:   Thu, 25 May 2023 11:25:44 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Conor Dooley <conor.dooley@microchip.com>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Huan Feng <huan.feng@starfivetech.com>,
+        Jia Jie Ho <jiajie.ho@starfivetech.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: [PATCH] crypto: starfive - Depend on AMBA_PL08X instead of
+ selecting it
+Message-ID: <20230525112544.4848659a@canb.auug.org.au>
+In-Reply-To: <ZGwmAp5RPqAjVMCg@gondor.apana.org.au>
+References: <20230522105257.562cb1ec@canb.auug.org.au>
+        <ZGr6aB9uJVnyfJQ9@gondor.apana.org.au>
+        <20230523103637.20175fbc@canb.auug.org.au>
+        <ZGwmAp5RPqAjVMCg@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fa90e73483b866a0622ad077f4af16978d1c1c8d.camel@linux.intel.com>
+Content-Type: multipart/signed; boundary="Sig_/oVlWqZtlV47Kk5/Hqz/IfHY";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 24, 2023 at 10:58:54AM -0500, Tom Zanussi wrote:
+--Sig_/oVlWqZtlV47Kk5/Hqz/IfHY
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Herbert,
+
+On Tue, 23 May 2023 10:33:38 +0800 Herbert Xu <herbert@gondor.apana.org.au>=
+ wrote:
 >
-> Yes, I think you're right.  The reason we did it this way was that
-> we're expecting to add more modes, such as 'dynamic' and/or 'canned-
-> dynamic' etc.
-> 
-> But I don't see a reason we couldn't just register them all and have
-> the user choose using the algorithm names, especially if that's the way
-> crypto users expect things to work.
+> On Tue, May 23, 2023 at 10:36:37AM +1000, Stephen Rothwell wrote:
+> >=20
+> > That did not fix it :-( =20
+>=20
+> OK, this patch should fix it:
 
-Are these modes compatible with the deflate algorithm, that is,
-can the generic deflate uncompress the output of these modes and
-vice versa, can these modes uncompress the output of the generic
-algorithm?
+That seems to have fixed it, thanks.
 
-If they're all compatible, then you should just use the "deflate"
-algorithm name and use different driver names to differentiate them.
-But if they're not compatible then the modes should have distinct
-algorithm names.
-
+--=20
 Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Stephen Rothwell
+
+--Sig_/oVlWqZtlV47Kk5/Hqz/IfHY
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmRuuRgACgkQAVBC80lX
+0GyYuggAlKz2O2Mju74tsbyB/6gEAG9NBji6rVr5c2Pxqh8E6rqs+bnTND3oBHpr
+AC4IytuQqvgO+9lhKR6d0zIjAZEGOx0b71GSqEmUKHXwM9W0uZsLerQzgII7Oj41
+tdxkYUYK7vBKHpGC4QWX29kNWESpndWm90gAUjZt3Tjfu1sGsVX7LiheK0O2my2k
+khRMrW6TvS5xEBHrvnFti4INFfSBlLunjTh3ki0ruqqsxIpRoy36ncAzX9rvX9B9
+yb+se1xYXbR/HxGxJ7MPMvv/+7SFk9DPj4G/131jHF5veE7NhASXED0qcVcI9Dn+
+SK/c0JE0KQxf++D4GfKiveu56Ur1MA==
+=dvte
+-----END PGP SIGNATURE-----
+
+--Sig_/oVlWqZtlV47Kk5/Hqz/IfHY--
