@@ -2,203 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7892BC77B7A
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 03:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F00C7EE31
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 10:31:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234573AbjEYDmR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 23:42:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34060 "EHLO
+        id S240923AbjEYKbM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 25 May 2023 06:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbjEYDmP (ORCPT
+        with ESMTP id S240752AbjEYKbL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 23:42:15 -0400
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DC2DD3;
-        Wed, 24 May 2023 20:42:14 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34OMaJNq025096;
-        Wed, 24 May 2023 20:42:08 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=MGUEVrU5fDXX90/F1fmdkjV9kvu25Wlft4HKJZcgusg=;
- b=VdX4YQRhNNA/ykyz0UfjPJA9xuCsksW+lcJtj+wAlYFgKVEQ4dUFeG+392jFQVeYHgU1
- yrYj/jsXQQHpc5GlgrOaxoK94VLRFFYuFYx6Ihozj3TVbTsPXAJinBWsejMXv+uIHs+J
- WHQxOLgchTwqiP0zCazG3CwJb+rZCv2usaGQPDzWg8blNhCQiKauHk8tCtHg4wlNZwjh
- weGVS7XHpMvXKZjfpKGeZJUIqKyrFZoF7eMs81HTtrzTLzNi3/tKFWR3pbH+JE+gBJk6
- QaCWOP6BdZhFxCAWVM5B/xmSqWFWdWLBN61JtYzOd6ijLr5bLM57rUlAoqNVHX8H7mLN pA== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3qsbxewb82-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 24 May 2023 20:42:08 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 24 May
- 2023 20:42:06 -0700
-Received: from bbhushan2.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 24 May 2023 20:42:04 -0700
-From:   Bharat Bhushan <bbhushan2@marvell.com>
-To:     <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
-        <Jason@zx2c4.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>
-CC:     Bharat Bhushan <bbhushan2@marvell.com>
-Subject: [PATCH v2] hwrng: cn10k: Add extended trng register support
-Date:   Thu, 25 May 2023 09:12:00 +0530
-Message-ID: <20230525034200.22298-1-bbhushan2@marvell.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 25 May 2023 06:31:11 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18B7E6;
+        Thu, 25 May 2023 03:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2b0PecxjqDga2q+GYKiWoz11cnthWs1G0M5GzyNmn34=; b=mpUeLnCWo62XTpDTxX4burZAso
+        4r8I70jFGZVNknFGbGALewmKj5QyyPUMmDf6M1MerTWmgcKeUzUzEtXNEqaPjHyxCBnjAb3Lv70MZ
+        l7lvU1Mx4eAPduZLZX2QpZh+U1lTy6ByReO1PgmZlX8E/iTEE/ijH39fUttPtdqP/o/tzowIaiOeF
+        O0aQae7O5eq6uvs0Kg7tpmg/RNiZT6JSGFfKzy6eNymIVcT0hIlh6jkrpKYhbGwX6OJVtHYSd3YRk
+        vziECqTmVDnUrcqh0m3alPjvQFSM6x2fyvISqjodfjXw1qSa6YkSNFLTMiO3Udk2pb+JeKz2f/QTx
+        b49bAhdQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q28EF-00C6Pg-2p; Thu, 25 May 2023 10:29:55 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 332303002C5;
+        Thu, 25 May 2023 12:29:46 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id BE2BC24387C95; Thu, 25 May 2023 12:29:46 +0200 (CEST)
+Date:   Thu, 25 May 2023 12:29:46 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     torvalds@linux-foundation.org
+Cc:     corbet@lwn.net, will@kernel.org, boqun.feng@gmail.com,
+        mark.rutland@arm.com, catalin.marinas@arm.com, dennis@kernel.org,
+        tj@kernel.org, cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
+        robin.murphy@arm.com, dwmw2@infradead.org,
+        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
+        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-s390@vger.kernel.org,
+        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
+        linux-crypto@vger.kernel.org, sfr@canb.auug.org.au,
+        mpe@ellerman.id.au
+Subject: Re: [PATCH v3 08/11] slub: Replace cmpxchg_double()
+Message-ID: <20230525102946.GE38236@hirez.programming.kicks-ass.net>
+References: <20230515075659.118447996@infradead.org>
+ <20230515080554.453785148@infradead.org>
+ <20230524093246.GP83892@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Xf_uL481ZZ7k9_YsfwtgfpVuIbhbGnD8
-X-Proofpoint-GUID: Xf_uL481ZZ7k9_YsfwtgfpVuIbhbGnD8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-25_01,2023-05-24_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230524093246.GP83892@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The way random data is read from hardware has changed from
-Octeon CN10KA-B0 and later SoCs onwards. A new set of registers
-have been added to read random data and to verify whether the
-read data is valid or not. This patch extends and uses
-RNM_PF_TRNG_DAT and RNM_PF_TRNG_STS CSRs to read random number
-and status for the applicable silicon variants.
+On Wed, May 24, 2023 at 11:32:47AM +0200, Peter Zijlstra wrote:
+> On Mon, May 15, 2023 at 09:57:07AM +0200, Peter Zijlstra wrote:
+> 
+> > @@ -3008,6 +3029,22 @@ static inline bool pfmemalloc_match(stru
+> >  }
+> >  
+> >  #ifndef CONFIG_SLUB_TINY
+> > +static inline bool
+> > +__update_cpu_freelist_fast(struct kmem_cache *s,
+> > +			   void *freelist_old, void *freelist_new,
+> > +			   unsigned long tid)
+> > +{
+> > +#ifdef system_has_freelist_aba
+> > +	freelist_aba_t old = { .freelist = freelist_old, .counter = tid };
+> > +	freelist_aba_t new = { .freelist = freelist_new, .counter = next_tid(tid) };
+> > +
+> > +	return this_cpu_cmpxchg_freelist(s->cpu_slab->freelist_tid.full,
+> > +					 old.full, new.full) == old.full;
+> > +#else
+> > +	return false;
+> > +#endif
+> > +}
+> > +
+> >  /*
+> >   * Check the slab->freelist and either transfer the freelist to the
+> >   * per cpu freelist or deactivate the slab.
+> > @@ -3359,11 +3396,7 @@ static __always_inline void *__slab_allo
+> >  		 * against code executing on this cpu *not* from access by
+> >  		 * other cpus.
+> >  		 */
+> > -		if (unlikely(!this_cpu_cmpxchg_double(
+> > -				s->cpu_slab->freelist, s->cpu_slab->tid,
+> > -				object, tid,
+> > -				next_object, next_tid(tid)))) {
+> > -
+> > +		if (unlikely(!__update_cpu_freelist_fast(s, object, next_object, tid))) {
+> >  			note_cmpxchg_failure("slab_alloc", s, tid);
+> >  			goto redo;
+> >  		}
+> > @@ -3736,11 +3769,7 @@ static __always_inline void do_slab_free
+> >  
+> >  		set_freepointer(s, tail_obj, freelist);
+> >  
+> > -		if (unlikely(!this_cpu_cmpxchg_double(
+> > -				s->cpu_slab->freelist, s->cpu_slab->tid,
+> > -				freelist, tid,
+> > -				head, next_tid(tid)))) {
+> > -
+> > +		if (unlikely(!__update_cpu_freelist_fast(s, freelist, head, tid))) {
+> >  			note_cmpxchg_failure("slab_free", s, tid);
+> >  			goto redo;
+> >  		}
+> 
+> This isn't right; the this_cpu_cmpxchg_double() was unconditional and
+> relied on the local_irq_save() fallback when no native cmpxchg128 is
+> present.
 
-Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
----
-v2:
- - Change return type of cn10k_read_trng() to bool
+This then also means I need to look at this_cpu_cmpxchg128 and
+this_cpu_cmoxchg64 behaviour when we dont have the CPUID feature.
 
- drivers/char/hw_random/cn10k-rng.c | 63 ++++++++++++++++++++++++++++--
- 1 file changed, 59 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/char/hw_random/cn10k-rng.c b/drivers/char/hw_random/cn10k-rng.c
-index c1193f85982c..0cd7e1a8e499 100644
---- a/drivers/char/hw_random/cn10k-rng.c
-+++ b/drivers/char/hw_random/cn10k-rng.c
-@@ -23,14 +23,49 @@
- #define RNM_PF_RANDOM		0x400
- #define RNM_TRNG_RESULT		0x408
- 
-+/* Extended TRNG Read and Status Registers */
-+#define RNM_PF_TRNG_DAT		0x1000
-+#define RNM_PF_TRNG_RES		0x1008
-+
- struct cn10k_rng {
- 	void __iomem *reg_base;
- 	struct hwrng ops;
- 	struct pci_dev *pdev;
-+	/* Octeon CN10K-A A0/A1, CNF10K-A A0/A1 and CNF10K-B A0/B0
-+	 * does not support extended TRNG registers
-+	 */
-+	bool extended_trng_regs;
- };
- 
- #define PLAT_OCTEONTX_RESET_RNG_EBG_HEALTH_STATE     0xc2000b0f
- 
-+#define PCI_SUBSYS_DEVID_CN10K_A_RNG	0xB900
-+#define PCI_SUBSYS_DEVID_CNF10K_A_RNG	0xBA00
-+#define PCI_SUBSYS_DEVID_CNF10K_B_RNG	0xBC00
-+
-+static bool cn10k_is_extended_trng_regs_supported(struct pci_dev *pdev)
-+{
-+	/* CN10K-A A0/A1 */
-+	if ((pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A_RNG) &&
-+	    (!pdev->revision || (pdev->revision & 0xff) == 0x50 ||
-+	     (pdev->revision & 0xff) == 0x51))
-+		return false;
-+
-+	/* CNF10K-A A0 */
-+	if ((pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_A_RNG) &&
-+	    (!pdev->revision || (pdev->revision & 0xff) == 0x60 ||
-+	     (pdev->revision & 0xff) == 0x61))
-+		return false;
-+
-+	/* CNF10K-B A0/B0 */
-+	if ((pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B_RNG) &&
-+	    (!pdev->revision || (pdev->revision & 0xff) == 0x70 ||
-+	     (pdev->revision & 0xff) == 0x74))
-+		return false;
-+
-+	return true;
-+}
-+
- static unsigned long reset_rng_health_state(struct cn10k_rng *rng)
- {
- 	struct arm_smccc_res res;
-@@ -63,9 +98,23 @@ static int check_rng_health(struct cn10k_rng *rng)
- 	return 0;
- }
- 
--static void cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
-+/* Returns true when valid data available otherwise return false */
-+static bool cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
- {
-+	u16 retry_count = 0;
- 	u64 upper, lower;
-+	u64 status;
-+
-+	if (rng->extended_trng_regs) {
-+		do {
-+			*value = readq(rng->reg_base + RNM_PF_TRNG_DAT);
-+			if (*value)
-+				return true;
-+			status = readq(rng->reg_base + RNM_PF_TRNG_RES);
-+			if (!status && (retry_count++ > 0x1000))
-+				return false;
-+		} while (!status);
-+	}
- 
- 	*value = readq(rng->reg_base + RNM_PF_RANDOM);
- 
-@@ -82,6 +131,7 @@ static void cn10k_read_trng(struct cn10k_rng *rng, u64 *value)
- 
- 		*value = (upper & 0xFFFFFFFF00000000) | (lower & 0xFFFFFFFF);
- 	}
-+	return true;
- }
- 
- static int cn10k_rng_read(struct hwrng *hwrng, void *data,
-@@ -100,7 +150,8 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
- 	size = max;
- 
- 	while (size >= 8) {
--		cn10k_read_trng(rng, &value);
-+		if (!cn10k_read_trng(rng, &value))
-+			goto out;
- 
- 		*((u64 *)pos) = value;
- 		size -= 8;
-@@ -108,7 +159,8 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
- 	}
- 
- 	if (size > 0) {
--		cn10k_read_trng(rng, &value);
-+		if (!cn10k_read_trng(rng, &value))
-+			goto out;
- 
- 		while (size > 0) {
- 			*pos = (u8)value;
-@@ -118,6 +170,7 @@ static int cn10k_rng_read(struct hwrng *hwrng, void *data,
- 		}
- 	}
- 
-+out:
- 	return max - size;
- }
- 
-@@ -144,9 +197,11 @@ static int cn10k_rng_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (!rng->ops.name)
- 		return -ENOMEM;
- 
--	rng->ops.read    = cn10k_rng_read;
-+	rng->ops.read = cn10k_rng_read;
- 	rng->ops.priv = (unsigned long)rng;
- 
-+	rng->extended_trng_regs = cn10k_is_extended_trng_regs_supported(pdev);
-+
- 	reset_rng_health_state(rng);
- 
- 	err = devm_hwrng_register(&pdev->dev, &rng->ops);
--- 
-2.17.1
-
+Because current verions seem to assume the instruction is present.
