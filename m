@@ -2,94 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD5FC77B7A
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 01:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A06EC77B73
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 01:56:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233285AbjEYBZ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 May 2023 21:25:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52720 "EHLO
+        id S229530AbjEYB4S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 24 May 2023 21:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbjEYBZ5 (ORCPT
+        with ESMTP id S229459AbjEYB4R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 May 2023 21:25:57 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D620AF5;
-        Wed, 24 May 2023 18:25:55 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QRVk44c6gz4x4N;
-        Thu, 25 May 2023 11:25:48 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1684977949;
-        bh=LL0LczuKg+G9HWFDEaDIO2VCeLIMzL+Gu+5X/x5Ia2k=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=qhD9yMYhTOo1JNmf+jr7SOyHfWJ3vdOdSP4uCqyv+c4KuI+tTo/+7pGmSQ9+KjzS6
-         +Ere/HJ1UZPnfRFEbkcj8ftWolTjEvIElBg7ULaJPrImDnYAoZg19wl3FfcZMdrtZW
-         2TuOS2AGyopVBrDIJbC1m9mYZMY+ZBpE/SIgfI8yA+JgtveXE4McDMU+mgwEW8FABa
-         Cp97blqnZrDRBdKfVNXVGO7k7UTp6326eOO7RRjXxuUAgqVrZhE+nycsoKBVdF0iUs
-         FEtDe7Hn87ltrRaWrNGCDbXkuFrQhBq1UBHV5EYRaXhU9F/6C8EgEazKXKwLkXjMUH
-         k7uFzHdyWAilQ==
-Date:   Thu, 25 May 2023 11:25:44 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Conor Dooley <conor.dooley@microchip.com>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Huan Feng <huan.feng@starfivetech.com>,
-        Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: [PATCH] crypto: starfive - Depend on AMBA_PL08X instead of
- selecting it
-Message-ID: <20230525112544.4848659a@canb.auug.org.au>
-In-Reply-To: <ZGwmAp5RPqAjVMCg@gondor.apana.org.au>
-References: <20230522105257.562cb1ec@canb.auug.org.au>
-        <ZGr6aB9uJVnyfJQ9@gondor.apana.org.au>
-        <20230523103637.20175fbc@canb.auug.org.au>
-        <ZGwmAp5RPqAjVMCg@gondor.apana.org.au>
+        Wed, 24 May 2023 21:56:17 -0400
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715AF9B;
+        Wed, 24 May 2023 18:56:13 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id E423280C7;
+        Thu, 25 May 2023 09:56:04 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 25 May
+ 2023 09:56:05 +0800
+Received: from [192.168.155.165] (202.188.176.82) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Thu, 25 May
+ 2023 09:56:03 +0800
+Message-ID: <29d515ec-83aa-c13e-b491-bc2ab7454012@starfivetech.com>
+Date:   Thu, 25 May 2023 09:56:03 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/oVlWqZtlV47Kk5/Hqz/IfHY";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH 2/2] crypto: starfive - Add RSA algo support
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "David S . Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+References: <20230516075752.659287-1-jiajie.ho@starfivetech.com>
+ <20230516075752.659287-3-jiajie.ho@starfivetech.com>
+ <ZG3biep8vAWQ5ZgA@gondor.apana.org.au>
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+In-Reply-To: <ZG3biep8vAWQ5ZgA@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [202.188.176.82]
+X-ClientProxiedBy: EXCAS063.cuchost.com (172.16.6.23) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/oVlWqZtlV47Kk5/Hqz/IfHY
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 24/5/2023 5:40 pm, Herbert Xu wrote:
+> On Tue, May 16, 2023 at 03:57:52PM +0800, Jia Jie Ho wrote:
+>>
+>> +static struct akcipher_alg starfive_rsa = {
+>> +	.encrypt = starfive_rsa_enc,
+>> +	.decrypt = starfive_rsa_dec,
+>> +	.sign = starfive_rsa_dec,
+>> +	.verify = starfive_rsa_enc,
+>> +	.set_pub_key = starfive_rsa_set_pub_key,
+>> +	.set_priv_key = starfive_rsa_set_priv_key,
+>> +	.max_size = starfive_rsa_max_size,
+>> +	.init = starfive_rsa_init_tfm,
+>> +	.exit = starfive_rsa_exit_tfm,
+>> +	.base = {
+>> +		.cra_name = "rsa",
+>> +		.cra_driver_name = "starfive-rsa",
+>> +		.cra_flags = CRYPTO_ALG_TYPE_AKCIPHER |
+>> +			     CRYPTO_ALG_ASYNC |
+> 
+> Why did you set the ASYNC flag? Your implementation appears to
+> be completely synchronous.
+> 
 
-Hi Herbert,
+I mixed this up with other modules, will remove this in next version.
 
-On Tue, 23 May 2023 10:33:38 +0800 Herbert Xu <herbert@gondor.apana.org.au>=
- wrote:
->
-> On Tue, May 23, 2023 at 10:36:37AM +1000, Stephen Rothwell wrote:
-> >=20
-> > That did not fix it :-( =20
->=20
-> OK, this patch should fix it:
+Thanks,
+Jia Jie
 
-That seems to have fixed it, thanks.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/oVlWqZtlV47Kk5/Hqz/IfHY
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmRuuRgACgkQAVBC80lX
-0GyYuggAlKz2O2Mju74tsbyB/6gEAG9NBji6rVr5c2Pxqh8E6rqs+bnTND3oBHpr
-AC4IytuQqvgO+9lhKR6d0zIjAZEGOx0b71GSqEmUKHXwM9W0uZsLerQzgII7Oj41
-tdxkYUYK7vBKHpGC4QWX29kNWESpndWm90gAUjZt3Tjfu1sGsVX7LiheK0O2my2k
-khRMrW6TvS5xEBHrvnFti4INFfSBlLunjTh3ki0ruqqsxIpRoy36ncAzX9rvX9B9
-yb+se1xYXbR/HxGxJ7MPMvv/+7SFk9DPj4G/131jHF5veE7NhASXED0qcVcI9Dn+
-SK/c0JE0KQxf++D4GfKiveu56Ur1MA==
-=dvte
------END PGP SIGNATURE-----
-
---Sig_/oVlWqZtlV47Kk5/Hqz/IfHY--
