@@ -2,139 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0748C77B7A
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 20:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26470C77B7C
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 21:20:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243807AbjEZUvF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 16:51:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52366 "EHLO
+        id S230100AbjEZVUt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 17:20:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243628AbjEZUvE (ORCPT
+        with ESMTP id S229716AbjEZVUt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 16:51:04 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645D9E53
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 13:50:41 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4f3b314b1d7so1240481e87.1
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 13:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1685134239; x=1687726239;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=p86bLQNbobDigp0k3P3tmO5QVRnjnFz7+fIP1sFxECg=;
-        b=X0C2YM6zfUM1cor3ejxX0WrV5fJ/BeHuc73ilzWM5ze/g+4YqqvhHYfzSnKuizJ9/B
-         yChH2grov0wxgM9NcpLjefbhZbnnpsKA4gdlcjxkbCeWRYfR3bfX3KGpbXyizLW0xWE/
-         iq8QdC5eOUZKbwX58EePd1/egoua3thuV4KrNGDLX35VUvd/dtqN7syDy8pDKRC5/kGh
-         Ne/Ki5i9CMR0QJ6Pd8HQJ+YTqNfrvM84WLJACfaWqVqLjj9mRBdH1wpoMPBb6Jl3SwiW
-         ZsfM8fTjqLynNADYaLE05tMPGkvlWqCVg1+oOD2jw7Y6gEy2j/r0QOoEZKgiPLg2TSVO
-         O1zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685134239; x=1687726239;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p86bLQNbobDigp0k3P3tmO5QVRnjnFz7+fIP1sFxECg=;
-        b=RWPUsvfMH157SrJLjkkGakxr3WBmIRwPKBmJIRZieuuGzYpu/+iMrR5I0K2SSJI5E+
-         cxBJpS3+EZRd0ZRSTx38OP4+bg31OEWtsyiF4K60Pb/e656VWYDtZj0BoHSNTtPEDwHk
-         EtTdzjLcpY4NstrZYfrelihsKZX89tPrMRaMQVd+f2XzudYC8i/zPeDlfiO2vLM7XjtY
-         dzJCx0rgx4xgjTcDjEAgssjTuNtoNn1gEOLNqWRXA33/c2SZx7ql45OmGrhDKoOhRSOG
-         NTmJlcxbD39UR0fRbLAolx+7+2F7+LyywaaJdcK4iSqrFD6QMjhu9MvEuyUs1D6tEgRm
-         o38w==
-X-Gm-Message-State: AC+VfDzzeaYKImCksVpaiOcNUOgkOij+ZLzqFqn/ZDL+fMZ0e3mHifOe
-        OpO5ZlncsrPeaaXioZ99zfsKOA==
-X-Google-Smtp-Source: ACHHUZ48hIn+EMWhdHTr8iY1OzvhRt3OSLaAaGUEpHkGvWfieZ5elIptZwAVcQSo3wBqIVfOfBu+rA==
-X-Received: by 2002:ac2:4a76:0:b0:4f4:dfd4:33e4 with SMTP id q22-20020ac24a76000000b004f4dfd433e4mr822684lfp.51.1685134239533;
-        Fri, 26 May 2023 13:50:39 -0700 (PDT)
-Received: from [192.168.1.101] (abyj77.neoplus.adsl.tpnet.pl. [83.9.29.77])
-        by smtp.gmail.com with ESMTPSA id c18-20020ac25312000000b004f37bd02a89sm773168lfh.287.2023.05.26.13.50.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 May 2023 13:50:39 -0700 (PDT)
-Message-ID: <5e5c41e3-e659-67fb-34b8-8fe3713b36d9@linaro.org>
-Date:   Fri, 26 May 2023 22:50:37 +0200
+        Fri, 26 May 2023 17:20:49 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF19599;
+        Fri, 26 May 2023 14:20:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685136047; x=1716672047;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7KsCT3WZ1HGpyHVyBAkJkfv5z2dS/oXPfy61ucCGhNo=;
+  b=AV1iAvnVn3L9a52thwfbALwL0hOHU6RmVaV8gL/Lp7jYnKeWad/64hZu
+   jPblRXaQDEMmZT/AwhiN6VqwKvlcCQT87AiOAU5xGbc8wDKLLiKBPadSY
+   fRT8HwLFe8osTDM1g1wK85rJw9WCZY3T2UuZH8t9byuu4gfPnX8N9kc09
+   QYToI5W7GFGw81NxJT0C/qZYVODOuQKCi/i1O52zJSVnUvNwHzaZNYF3J
+   AJGADLx2ieouwl7QmLD8FL+7cesRXdsxw5Pq1k296O/qls6dxbGgZUU0b
+   BBHxmH/DGMzNsADJWRlPzxYgk0QGYeaJ3iQKkpmn/ILscvESWXEhhwbzy
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10722"; a="343804529"
+X-IronPort-AV: E=Sophos;i="6.00,195,1681196400"; 
+   d="scan'208";a="343804529"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2023 14:20:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10722"; a="849683617"
+X-IronPort-AV: E=Sophos;i="6.00,195,1681196400"; 
+   d="scan'208";a="849683617"
+Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 26 May 2023 14:20:45 -0700
+Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q2erc-000Jba-0x;
+        Fri, 26 May 2023 21:20:44 +0000
+Date:   Sat, 27 May 2023 05:19:51 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     David Yang <mmyangfl@gmail.com>, linux-crypto@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
+Message-ID: <202305270501.pOwEtEy0-lkp@intel.com>
+References: <20230525160446.43800-2-mmyangfl@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v8 11/11] arm64: dts: qcom: sm8450: add crypto nodes
-Content-Language: en-US
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
-        robh+dt@kernel.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
-        stephan@gerhold.net, Anders Roxell <anders.roxell@linaro.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
- <20230526192210.3146896-12-bhupesh.sharma@linaro.org>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20230526192210.3146896-12-bhupesh.sharma@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230525160446.43800-2-mmyangfl@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi David,
 
+kernel test robot noticed the following build warnings:
 
-On 26.05.2023 21:22, Bhupesh Sharma wrote:
-> From: Neil Armstrong <neil.armstrong@linaro.org>
-> 
-> Add crypto engine (CE) and CE BAM related nodes and definitions
-> for the SM8450 SoC.
-> 
-> Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> [Bhupesh: Corrected the compatible list]
-> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> ---
->  arch/arm64/boot/dts/qcom/sm8450.dtsi | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-> index 7f193802a7c4..1642daea9624 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
-> @@ -4173,6 +4173,34 @@ ufs_mem_phy_lanes: phy@1d87400 {
->  			};
->  		};
->  
-> +		cryptobam: dma-controller@1dc4000 {
-> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-> +			reg = <0 0x01dc4000 0 0x28000>;
-> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-> +			#dma-cells = <1>;
-> +			qcom,ee = <0>;
-> +			qcom,controlled-remotely;
-> +			iommus = <&apps_smmu 0x584 0x11>,
-> +				 <&apps_smmu 0x588 0x0>,
-> +				 <&apps_smmu 0x598 0x5>,
-Does mapping 0x598 with and without the SMR mask make sense?
+[auto build test WARNING on 44c026a73be8038f03dbdeef028b642880cf1511]
 
-(this is a genuine question, I have no idea but would be leaning
-on the side of no)
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230526-002048
+base:   44c026a73be8038f03dbdeef028b642880cf1511
+patch link:    https://lore.kernel.org/r/20230525160446.43800-2-mmyangfl%40gmail.com
+patch subject: [PATCH v3 1/2] crypto: hisilicon - Add HiSilicon ADVCA Subsystem
+config: alpha-randconfig-s033-20230526 (https://download.01.org/0day-ci/archive/20230527/202305270501.pOwEtEy0-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 12.1.0
+reproduce:
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/ae9280d4724511425d7fc2ad1119eba4e52f70b5
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230526-002048
+        git checkout ae9280d4724511425d7fc2ad1119eba4e52f70b5
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=alpha olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=alpha SHELL=/bin/bash drivers/crypto/hisilicon/advca/
 
-Konrad
-> +				 <&apps_smmu 0x59a 0x0>,
-> +				 <&apps_smmu 0x59f 0x0>;
-> +		};
-> +
-> +		crypto: crypto@1de0000 {
-> +			compatible = "qcom,sm8450-qce", "qcom,sm8150-qce", "qcom,qce";
-> +			reg = <0 0x01dfa000 0 0x6000>;
-> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
-> +			dma-names = "rx", "tx";
-> +			iommus = <&apps_smmu 0x584 0x11>,
-> +				 <&apps_smmu 0x588 0x0>,
-> +				 <&apps_smmu 0x598 0x5>,
-> +				 <&apps_smmu 0x59a 0x0>,
-> +				 <&apps_smmu 0x59f 0x0>;
-> +			interconnects = <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>;
-> +			interconnect-names = "memory";
-> +		};
-> +
->  		sdhc_2: mmc@8804000 {
->  			compatible = "qcom,sm8450-sdhci", "qcom,sdhci-msm-v5";
->  			reg = <0 0x08804000 0 0x1000>;
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202305270501.pOwEtEy0-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/crypto/hisilicon/advca/hisi-advca-muc.c:149:3: sparse: sparse: symbol 'hica_muc_key_maps' was not declared. Should it be static?
+
+vim +/hica_muc_key_maps +149 drivers/crypto/hisilicon/advca/hisi-advca-muc.c
+
+   144	
+   145	struct hica_muc_key_map {
+   146		unsigned int alg;
+   147		unsigned int key;
+   148		unsigned int len;
+ > 149	} hica_muc_key_maps[] = {
+   150		{      MUC_ALG_AES,      MUC_KEY_AES_256B,   AES_KEYSIZE_256 },
+   151		{      MUC_ALG_AES,      MUC_KEY_AES_192B,   AES_KEYSIZE_192 },
+   152		{      MUC_ALG_AES,      MUC_KEY_AES_128B,   AES_KEYSIZE_128 },
+   153		{      MUC_ALG_DES,           MUC_KEY_DES,      DES_KEY_SIZE },
+   154		{ MUC_ALG_DES3_EDE, MUC_KEY_DES3_EDE_3KEY, DES3_EDE_KEY_SIZE },
+   155		{ MUC_ALG_DES3_EDE, MUC_KEY_DES3_EDE_2KEY,  2 * DES_KEY_SIZE },
+   156		{ }
+   157	};
+   158	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
