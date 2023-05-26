@@ -2,120 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 339A3C7EE23
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 07:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 548C6C77B73
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 14:32:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242147AbjEZHtL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 03:49:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
+        id S237232AbjEZOcA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 10:32:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242533AbjEZHtK (ORCPT
+        with ESMTP id S243604AbjEZOb7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 03:49:10 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D27134
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 00:49:08 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3f6e4554453so2889745e9.3
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 00:49:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1685087346; x=1687679346;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mxX6zZjlTYv+FEpGCsdm1mGnEuSAnfP4zZXHzmmox9g=;
-        b=BraIA/chl7+Gd+OY29ymVgA3gbTv9S62ZpSTjWRPwROYoXp/IEgHgvOGuCEkgG8rqG
-         FNX/iSq2chwtlY/F5vvgCn6IPzzxd/3H3sIG4y1/qqRNhfJ1N+cgYpKxl4ZBCJErsZ/P
-         HV25K5BT/tjIEKsP5hrksSTzdqwOUCsbIj54ygN31an9+OXB3WI/YOnPiXgEOZOaCs3w
-         KNQEhQhmK6Hx/jJ9IWJskX4otf8OMNeM45mU24UFBzIqg+8pA5jpnVj/HsrXe9cqvWqr
-         Bp1D9nogSqgGOhDcfoPJ1k9XvwXib7VL4/OkkVvZr9zITlJe9anT02j5S2nZXDTnCrVO
-         nMYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685087346; x=1687679346;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mxX6zZjlTYv+FEpGCsdm1mGnEuSAnfP4zZXHzmmox9g=;
-        b=Zbmmi1wAHx7ast0hs62hvrAp1erqXZpWgp+t8GaPoHxUrNK6WGNfzUJ8kW0c0CkREO
-         Dscb/29Hr6YfLJF+d4d73YxyWS00rw0oIBC8i+bE2caxuhn4QT5KscZUbiFI5oGkYrOS
-         JQuBBwexVeQehpWbxmOwKbPj4kdhI49Y8S0MOe9Z23TeKBQMGkWznf2CONnXvifr35Hu
-         tHZu1C0Q5XyU36OA8pwk7bmG1UtNKTSIEn0PLuKMT7UyI8RPnkf1qh+UQnghpZz475ZP
-         zOXpuD3syBtykk68YoRD/RF8yYReCld7JlryvlZzn9IvPwK47D7A28YJj3XnA7QuAXbQ
-         9Usg==
-X-Gm-Message-State: AC+VfDyMhvK4D6UYLc3nJY6mv0nng/7LaSddNM5K8SHISu53lQ04lzB2
-        hhqI+0IHJNpGkz4p2bq/RmncTg==
-X-Google-Smtp-Source: ACHHUZ6OZf+EpCgaWY9P5FUG3oeamK1kisguCe1dnOyViW6q7fPuKY1Ei9wGkGFG81DyscwKe2n55g==
-X-Received: by 2002:a05:600c:204d:b0:3f6:479:3985 with SMTP id p13-20020a05600c204d00b003f604793985mr695388wmg.23.1685087346540;
-        Fri, 26 May 2023 00:49:06 -0700 (PDT)
-Received: from [192.168.2.107] ([79.115.63.206])
-        by smtp.gmail.com with ESMTPSA id l22-20020a1c7916000000b003f607875e5csm8025837wme.24.2023.05.26.00.49.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 May 2023 00:49:05 -0700 (PDT)
-Message-ID: <7b74964a-01b0-4628-772d-bdfaf526f609@linaro.org>
-Date:   Fri, 26 May 2023 08:49:03 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] crypto: Switch i2c drivers back to use .probe()
-Content-Language: en-US
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Fri, 26 May 2023 10:31:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5211E1AC
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 07:31:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685111471;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AN3wUYIRzonhCzYuNraybexj9Op6B4f47YxRrWuA7cY=;
+        b=eURjZsqJvzCu5vq6oh2cOFDiV5oDOHzapGP41iCFIadWFL/wGg4F5yV4W91ftUm/TzMU7x
+        j3/AFE1uCwtqyYYY5qy/CSKApnJ4nyxoWqZvEyG1/LaujcGVLRcGFPvW8p6+4WxpEUBRHA
+        00IPfoUJV0pyBdPQ3/jk3LKZi7JWTM4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-264-kDUtvQS7PwezkQVOO1pcxw-1; Fri, 26 May 2023 10:31:10 -0400
+X-MC-Unique: kDUtvQS7PwezkQVOO1pcxw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C755C811E91;
+        Fri, 26 May 2023 14:31:09 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 88ABC2166B2B;
+        Fri, 26 May 2023 14:31:07 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de
-References: <20230525210347.735106-1-u.kleine-koenig@pengutronix.de>
-From:   Tudor Ambarus <tudor.ambarus@linaro.org>
-In-Reply-To: <20230525210347.735106-1-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/8] crypto, splice, net: Make AF_ALG handle sendmsg(MSG_SPLICE_PAGES)
+Date:   Fri, 26 May 2023 15:30:56 +0100
+Message-Id: <20230526143104.882842-1-dhowells@redhat.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Here's the fourth tranche of patches towards providing a MSG_SPLICE_PAGES
+internal sendmsg flag that is intended to replace the ->sendpage() op with
+calls to sendmsg().  MSG_SPLICE_PAGES is a hint that tells the protocol
+that it should splice the pages supplied if it can.
 
+This set consists of the following parts:
 
-On 5/25/23 22:03, Uwe Kleine-König wrote:
-> After commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
-> call-back type"), all drivers being converted to .probe_new() and then
-> 03c835f498b5 ("i2c: Switch .probe() to not take an id parameter")
-> convert back to (the new) .probe() to be able to eventually drop
-> .probe_new() from struct i2c_driver.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Reviewed-by: Tudor Ambarus <tudor.ambarus@linaro.org>
+ (1) Move netfs_extract_iter_to_sg() to somewhere more general and rename
+     it to drop the "netfs" prefix.  We use this to extract directly from
+     an iterator into a scatterlist.
 
-> ---
->  drivers/crypto/atmel-ecc.c     | 2 +-
->  drivers/crypto/atmel-sha204a.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-> index aac64b555204..432beabd79e6 100644
-> --- a/drivers/crypto/atmel-ecc.c
-> +++ b/drivers/crypto/atmel-ecc.c
-> @@ -389,7 +389,7 @@ static struct i2c_driver atmel_ecc_driver = {
->  		.name	= "atmel-ecc",
->  		.of_match_table = of_match_ptr(atmel_ecc_dt_ids),
->  	},
-> -	.probe_new	= atmel_ecc_probe,
-> +	.probe		= atmel_ecc_probe,
->  	.remove		= atmel_ecc_remove,
->  	.id_table	= atmel_ecc_id,
->  };
-> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-> index 44a185a84760..c77f482d2a97 100644
-> --- a/drivers/crypto/atmel-sha204a.c
-> +++ b/drivers/crypto/atmel-sha204a.c
-> @@ -141,7 +141,7 @@ static const struct i2c_device_id atmel_sha204a_id[] = {
->  MODULE_DEVICE_TABLE(i2c, atmel_sha204a_id);
->  
->  static struct i2c_driver atmel_sha204a_driver = {
-> -	.probe_new		= atmel_sha204a_probe,
-> +	.probe			= atmel_sha204a_probe,
->  	.remove			= atmel_sha204a_remove,
->  	.id_table		= atmel_sha204a_id,
->  
-> 
-> base-commit: ac9a78681b921877518763ba0e89202254349d1b
+ (2) Make AF_ALG use iov_iter_extract_pages().  This has the additional
+     effect of pinning pages obtained from userspace rather than taking
+     refs on them.  Pages from kernel-backed iterators would not be pinned,
+     but AF_ALG isn't really meant for use by kernel services.
+
+ (3) Change AF_ALG still further to use extract_iter_to_sg().
+
+ (4) Make af_alg_sendmsg() support MSG_SPLICE_PAGES support and make
+     af_alg_sendpage() just a wrapper around sendmsg().  This has to take
+     refs on the pages pinned for the moment.
+
+ (5) Make hash_sendmsg() support MSG_SPLICE_PAGES by simply ignoring it.
+     hash_sendpage() is left untouched to be removed later, after the
+     splice core has been changed to call sendmsg().
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=sendpage-4
+
+David
+
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=51c78a4d532efe9543a4df019ff405f05c6157f6 # part 1
+
+David Howells (8):
+  Move netfs_extract_iter_to_sg() to lib/scatterlist.c
+  Drop the netfs_ prefix from netfs_extract_iter_to_sg()
+  crypto: af_alg: Pin pages rather than ref'ing if appropriate
+  crypto: af_alg: Use extract_iter_to_sg() to create scatterlists
+  crypto: af_alg: Indent the loop in af_alg_sendmsg()
+  crypto: af_alg: Support MSG_SPLICE_PAGES
+  crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+  crypto: af_alg/hash: Support MSG_SPLICE_PAGES
+
+ crypto/af_alg.c             | 183 +++++++++++-------------
+ crypto/algif_aead.c         |  34 ++---
+ crypto/algif_hash.c         | 110 +++++++++------
+ crypto/algif_skcipher.c     |  10 +-
+ fs/cifs/smb2ops.c           |   4 +-
+ fs/cifs/smbdirect.c         |   2 +-
+ fs/netfs/iterator.c         | 266 -----------------------------------
+ include/crypto/if_alg.h     |   7 +-
+ include/linux/netfs.h       |   4 -
+ include/linux/scatterlist.h |   1 +
+ include/linux/uio.h         |   5 +
+ lib/scatterlist.c           | 267 ++++++++++++++++++++++++++++++++++++
+ 12 files changed, 449 insertions(+), 444 deletions(-)
+
