@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1B5C7EE23
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 06:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B740C77B7C
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 07:23:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236626AbjEZGyS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 02:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45834 "EHLO
+        id S242018AbjEZHXH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 03:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231495AbjEZGyS (ORCPT
+        with ESMTP id S236681AbjEZHXG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 02:54:18 -0400
+        Fri, 26 May 2023 03:23:06 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D16395;
-        Thu, 25 May 2023 23:54:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16979B;
+        Fri, 26 May 2023 00:23:05 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 016BA61638;
-        Fri, 26 May 2023 06:54:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9849C433D2;
-        Fri, 26 May 2023 06:54:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1EB5A64D88;
+        Fri, 26 May 2023 07:23:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D370C433D2;
+        Fri, 26 May 2023 07:23:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685084056;
-        bh=FBf1cGUiX8H3z5J/mnshqSgpyzk0LkYamotNDGOq9Fw=;
+        s=k20201202; t=1685085784;
+        bh=Z+s29jQiBKqU2l46jPccXJdvd9jdYJHsfjEWMx9TRx4=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eHVNb4uUOelaJSfCEdjU7lmZFDOlG0X/Q0edskh4XSZq090d5m4oShj2XrKqc27kz
-         QS7cpm+RYkCP24vNgaV95MAIa2MgBOjG/Uv0HO8TMcRJa2eI+L7zIkb0xltqcs8fEe
-         iEGiXtoqeItNk1WCpJBuBg8FWtm+7IBM4nwsicMYaoSKSl+hFoQv+LUWSwI+SbG92+
-         3WgyHY7zktiXwhqhu021CgRJB8BBzGzF7CeiQ4q/2wxXuGN/2EwTz2t3xyHud7Qmwx
-         TjTwkdTNzsga1jAvwu45X20+ft8mETOscRWOJ9qbbZmpL72rwQiSlAdlCDyp0MEfR6
-         gY/Lfkr1BVp0Q==
-Date:   Thu, 25 May 2023 23:54:14 -0700
+        b=cO9AGl9ps5XpW7/aAs6LaRMSKLZ1cqcbu2Z+46QILzHNiwtf+EwAt9g9m5eSnbEqI
+         r1hv7FzcVRviZlyvezLBCR8xF52yBI8s7LWkZTZSidKN5OY3Ne3NJzcj7bo2IZ5Qbs
+         HvW1tCT4NqlDYUQXRyo5vbKNqwB1WIzNrZGoUahJ8IFi5b6dAgIrNM2ouWTK/W/PHl
+         suqEYo/I0NqUVeSf1wVwdUPMEFD48zm9+OmkkJJ9rUxHRzPTrUdJHGlSbBNvLBusDW
+         /JxJB6FvRBBemQWV1cwTv3exX0djxv0RnSgR6BnVJ99K9hJRB7P+Sx3SG5j0IWVNG4
+         GSjtfJJtfQY+Q==
+Date:   Fri, 26 May 2023 00:23:01 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Chang S. Bae" <chang.seok.bae@intel.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
@@ -46,42 +46,78 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Ingo Molnar <mingo@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v7 10/12] crypto: x86/aesni - Use the proper data type in
- struct aesni_xts_ctx
-Message-ID: <20230526065414.GB875@sol.localdomain>
+Subject: Re: [PATCH v7 12/12] crypto: x86/aes-kl - Implement the AES-XTS
+ algorithm
+Message-ID: <20230526072301.GC875@sol.localdomain>
 References: <20230410225936.8940-1-chang.seok.bae@intel.com>
  <20230524165717.14062-1-chang.seok.bae@intel.com>
- <20230524165717.14062-11-chang.seok.bae@intel.com>
+ <20230524165717.14062-13-chang.seok.bae@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230524165717.14062-11-chang.seok.bae@intel.com>
+In-Reply-To: <20230524165717.14062-13-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 24, 2023 at 09:57:15AM -0700, Chang S. Bae wrote:
-> +static inline unsigned long aes_align_addr(unsigned long addr)
+On Wed, May 24, 2023 at 09:57:17AM -0700, Chang S. Bae wrote:
+> == API Limitation ==
+> 
+> The setkey() function transforms an AES key into a handle. But, an
+> extended key is a usual outcome of setkey() in other AES cipher
+> implementations. For this reason, a setkey() failure does not fall
+> back to the other. So, expose AES-KL methods via synchronous
+> interfaces only.
+
+I don't understand what this paragraph is trying to say.
+
+> +/*
+> + * The below wrappers for the encryption/decryption functions
+> + * incorporate the feature availability check:
+> + *
+> + * In the rare event of hardware failure, the wrapping key can be lost
+> + * after wake-up from a deep sleep state. Then, this check helps to
+> + * avoid any subsequent misuse with populating a proper error code.
+> + */
+> +
+> +static inline int aeskl_enc(const void *ctx, u8 *out, const u8 *in)
 > +{
-> +	return (crypto_tfm_ctx_alignment() >= AESNI_ALIGN) ?
-> +	       ALIGN(addr, 1) : ALIGN(addr, AESNI_ALIGN);
+> +	if (!valid_keylocker())
+> +		return -ENODEV;
+> +
+> +	return __aeskl_enc(ctx, out, in);
 > +}
 
-Wouldn't it be simpler to make this take and return 'void *'?  Then the callers
-wouldn't need to cast to/from 'unsigned long'.
+Is it not sufficient for the valid_keylocker() check to occur at the top level
+(in xts_encrypt() and xts_decrypt()), which would seem to be a better place to
+do it?  Is this because valid_keylocker() needs to be checked in every
+kernel_fpu_begin() section separately, to avoid a race condition?  If that's
+indeed the reason, can you explain that in the comment?
 
-Also, aligning to a 1-byte boundary is a no-op.
+> +static inline int xts_keylen(struct skcipher_request *req, u32 *keylen)
+> +{
+> +	struct aes_xts_ctx *ctx = aes_xts_ctx(crypto_skcipher_reqtfm(req));
+> +
+> +	if (ctx->crypt_ctx.key_length != ctx->tweak_ctx.key_length)
+> +		return -EINVAL;
+> +
+> +	*keylen = ctx->crypt_ctx.key_length;
+> +	return 0;
+> +}
 
-So, please consider the following:
+This is odd.  Why would the key lengths be different here?
 
-static inline void *aes_align_addr(void *addr)
-{
-	if (crypto_tfm_ctx_alignment() >= AES_ALIGN)
-		return addr;
-	return PTR_ALIGN(addr, AES_ALIGN);
-}
+> +	err = simd_register_skciphers_compat(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
+> +					     aeskl_simd_skciphers);
+> +	if (err)
+> +		return err;
+> +
+> +	return 0;
 
-Also, aesni_rfc4106_gcm_ctx_get() and generic_gcmaes_ctx_get() should call this
-too, rather than duplicating similar code.
+This can be simplified to:
+
+	return simd_register_skciphers_compat(aeskl_skciphers,
+					      ARRAY_SIZE(aeskl_skciphers),
+					      aeskl_simd_skciphers);
 
 - Eric
