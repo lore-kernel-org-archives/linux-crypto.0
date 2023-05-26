@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E10C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 14:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4413C77B73
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 14:33:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243963AbjEZOc5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 10:32:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
+        id S243272AbjEZOc7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 10:32:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243739AbjEZOcX (ORCPT
+        with ESMTP id S237312AbjEZOc1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 10:32:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31321B3
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 07:31:24 -0700 (PDT)
+        Fri, 26 May 2023 10:32:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B75E6B
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 07:31:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685111483;
+        s=mimecast20190719; t=1685111497;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jPGukvQXP4Tai7PUqcbnIswr++Y11hB7rT1QDpn/afo=;
-        b=ejsUWzVdA+Eh3BkBKP8dNsDniUl9fmNjdm5uotBH7KH5j0X70QRqrCIjJV+cc6/9/fQUNU
-        kyXZnLAccMQ9NM2iylDtoXuFapTlvKQ7XxyiIBmyTc69k6jbeZS38JG/DV7p2QVcf6YZRF
-        PDYSiIPf5cxNBGmx5v9rpwuWZJw4vAo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=dc/SuOpUlYqAq5ekNpSzLieNRD28aCzVtUAi8o3Unyg=;
+        b=Kv+1lO4OL0PNzWq3ojuwl/jLhwdcaOIrfQpkZjABRJYwiA76yxGEMIJILt2S+1udaA1Zsp
+        37Qg1RbvNQLgK1/bVwO1GNzFtBWyaVujTf500asVPzSiL3eGgl8nwJSC1ZDvULMKUKH/DM
+        hK9fEFNBJm2lo7CCW5zGcZMij1thd9g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-29-Ivy8e833NRWSYrtoVTgS-g-1; Fri, 26 May 2023 10:31:21 -0400
-X-MC-Unique: Ivy8e833NRWSYrtoVTgS-g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+ us-mta-570-ERCJ1r-zM0q7W6bBwBEpZg-1; Fri, 26 May 2023 10:31:31 -0400
+X-MC-Unique: ERCJ1r-zM0q7W6bBwBEpZg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A6DD811E92;
-        Fri, 26 May 2023 14:31:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 576643855566;
+        Fri, 26 May 2023 14:31:30 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A4D0C140E961;
-        Fri, 26 May 2023 14:31:17 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 756352166B2B;
+        Fri, 26 May 2023 14:31:28 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     David Howells <dhowells@redhat.com>,
@@ -51,26 +51,23 @@ Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 3/8] crypto: af_alg: Pin pages rather than ref'ing if appropriate
-Date:   Fri, 26 May 2023 15:30:59 +0100
-Message-Id: <20230526143104.882842-4-dhowells@redhat.com>
+Subject: [PATCH net-next 7/8] crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+Date:   Fri, 26 May 2023 15:31:03 +0100
+Message-Id: <20230526143104.882842-8-dhowells@redhat.com>
 In-Reply-To: <20230526143104.882842-1-dhowells@redhat.com>
 References: <20230526143104.882842-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert AF_ALG to use iov_iter_extract_pages() instead of
-iov_iter_get_pages().  This will pin pages or leave them unaltered rather
-than getting a ref on them as appropriate to the iterator.
+Convert af_alg_sendpage() to use sendmsg() with MSG_SPLICE_PAGES rather
+than directly splicing in the pages itself.
 
-The pages need to be pinned for DIO-read rather than having refs taken on
-them to prevent VM copy-on-write from malfunctioning during a concurrent
-fork() (the result of the I/O would otherwise end up only visible to the
-child process and not the parent).
+This allows ->sendpage() to be replaced by something that can handle
+multiple multipage folios in a single transaction.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -83,55 +80,73 @@ cc: Matthew Wilcox <willy@infradead.org>
 cc: linux-crypto@vger.kernel.org
 cc: netdev@vger.kernel.org
 ---
- crypto/af_alg.c         | 10 +++++++---
- include/crypto/if_alg.h |  1 +
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ crypto/af_alg.c | 52 ++++++++-----------------------------------------
+ 1 file changed, 8 insertions(+), 44 deletions(-)
 
 diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 5f7252a5b7b4..7caff10df643 100644
+index 979033600185..105afd77a064 100644
 --- a/crypto/af_alg.c
 +++ b/crypto/af_alg.c
-@@ -533,14 +533,17 @@ static const struct net_proto_family alg_family = {
- 
- int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len)
+@@ -1117,53 +1117,17 @@ EXPORT_SYMBOL_GPL(af_alg_sendmsg);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ 			int offset, size_t size, int flags)
  {
-+	struct page **pages = sgl->pages;
- 	size_t off;
- 	ssize_t n;
- 	int npages, i;
+-	struct sock *sk = sock->sk;
+-	struct alg_sock *ask = alg_sk(sk);
+-	struct af_alg_ctx *ctx = ask->private;
+-	struct af_alg_tsgl *sgl;
+-	int err = -EINVAL;
++	struct bio_vec bvec;
++	struct msghdr msg = {
++		.msg_flags = flags | MSG_SPLICE_PAGES,
++	};
  
--	n = iov_iter_get_pages2(iter, sgl->pages, len, ALG_MAX_PAGES, &off);
-+	n = iov_iter_extract_pages(iter, &pages, len, ALG_MAX_PAGES, 0, &off);
- 	if (n < 0)
- 		return n;
+ 	if (flags & MSG_SENDPAGE_NOTLAST)
+-		flags |= MSG_MORE;
+-
+-	lock_sock(sk);
+-	if (!ctx->more && ctx->used)
+-		goto unlock;
+-
+-	if (!size)
+-		goto done;
+-
+-	if (!af_alg_writable(sk)) {
+-		err = af_alg_wait_for_wmem(sk, flags);
+-		if (err)
+-			goto unlock;
+-	}
+-
+-	err = af_alg_alloc_tsgl(sk);
+-	if (err)
+-		goto unlock;
+-
+-	ctx->merge = 0;
+-	sgl = list_entry(ctx->tsgl_list.prev, struct af_alg_tsgl, list);
+-
+-	if (sgl->cur)
+-		sg_unmark_end(sgl->sg + sgl->cur - 1);
+-
+-	sg_mark_end(sgl->sg + sgl->cur);
+-
+-	get_page(page);
+-	sg_set_page(sgl->sg + sgl->cur, page, size, offset);
+-	sgl->cur++;
+-	ctx->used += size;
+-
+-done:
+-	ctx->more = flags & MSG_MORE;
+-
+-unlock:
+-	af_alg_data_wakeup(sk);
+-	release_sock(sk);
++		msg.msg_flags |= MSG_MORE;
  
-+	sgl->need_unpin = iov_iter_extract_will_pin(iter);
-+
- 	npages = DIV_ROUND_UP(off + n, PAGE_SIZE);
- 	if (WARN_ON(npages == 0))
- 		return -EINVAL;
-@@ -573,8 +576,9 @@ void af_alg_free_sg(struct af_alg_sgl *sgl)
- {
- 	int i;
- 
--	for (i = 0; i < sgl->npages; i++)
--		put_page(sgl->pages[i]);
-+	if (sgl->need_unpin)
-+		for (i = 0; i < sgl->npages; i++)
-+			unpin_user_page(sgl->pages[i]);
+-	return err ?: size;
++	bvec_set_page(&bvec, page, size, offset);
++	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
++	return sock_sendmsg(sock, &msg);
  }
- EXPORT_SYMBOL_GPL(af_alg_free_sg);
+ EXPORT_SYMBOL_GPL(af_alg_sendpage);
  
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 7e76623f9ec3..46494b33f5bc 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -59,6 +59,7 @@ struct af_alg_sgl {
- 	struct scatterlist sg[ALG_MAX_PAGES + 1];
- 	struct page *pages[ALG_MAX_PAGES];
- 	unsigned int npages;
-+	bool need_unpin;
- };
- 
- /* TX SGL entry */
 
