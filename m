@@ -2,128 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18824C7EE31
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 07:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 339A3C7EE23
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 07:49:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242335AbjEZHhn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 03:37:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35776 "EHLO
+        id S242147AbjEZHtL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 03:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241569AbjEZHhl (ORCPT
+        with ESMTP id S242533AbjEZHtK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 03:37:41 -0400
-Received: from frasgout11.his.huawei.com (unknown [14.137.139.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF6E170E;
-        Fri, 26 May 2023 00:36:59 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.18.147.228])
-        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4QSGgW1kg8z9xFQf;
-        Fri, 26 May 2023 15:26:15 +0800 (CST)
-Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
-        by APP2 (Coremail) with SMTP id GxC2BwAHwUdYYXBkVgbbAg--.2318S2;
-        Fri, 26 May 2023 08:36:05 +0100 (CET)
-Message-ID: <a4cefa07e717bd99fa0ae8e5f18950d69145bd24.camel@huaweicloud.com>
-Subject: Re: [PATCH v5 2/2] KEYS: asymmetric: Copy sig and digest in
- public_key_verify_signature()
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Roberto Sassu <roberto.sassu@huawei.com>
-Date:   Fri, 26 May 2023 09:35:47 +0200
-In-Reply-To: <Y+W/fwRbzj5A5v44@kernel.org>
-References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
-         <20221227142740.2807136-3-roberto.sassu@huaweicloud.com>
-         <Y64XB0yi24yjeBDw@sol.localdomain>
-         <d2a54ddec403cad12c003132542070bf781d5e26.camel@huaweicloud.com>
-         <857eedc5ad18eddae7686dca63cf8c613a051be4.camel@huaweicloud.com>
-         <Y+VBMQEwPTPGBIpP@gmail.com> <Y+W/fwRbzj5A5v44@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        Fri, 26 May 2023 03:49:10 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D27134
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 00:49:08 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3f6e4554453so2889745e9.3
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 00:49:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1685087346; x=1687679346;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mxX6zZjlTYv+FEpGCsdm1mGnEuSAnfP4zZXHzmmox9g=;
+        b=BraIA/chl7+Gd+OY29ymVgA3gbTv9S62ZpSTjWRPwROYoXp/IEgHgvOGuCEkgG8rqG
+         FNX/iSq2chwtlY/F5vvgCn6IPzzxd/3H3sIG4y1/qqRNhfJ1N+cgYpKxl4ZBCJErsZ/P
+         HV25K5BT/tjIEKsP5hrksSTzdqwOUCsbIj54ygN31an9+OXB3WI/YOnPiXgEOZOaCs3w
+         KNQEhQhmK6Hx/jJ9IWJskX4otf8OMNeM45mU24UFBzIqg+8pA5jpnVj/HsrXe9cqvWqr
+         Bp1D9nogSqgGOhDcfoPJ1k9XvwXib7VL4/OkkVvZr9zITlJe9anT02j5S2nZXDTnCrVO
+         nMYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685087346; x=1687679346;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mxX6zZjlTYv+FEpGCsdm1mGnEuSAnfP4zZXHzmmox9g=;
+        b=Zbmmi1wAHx7ast0hs62hvrAp1erqXZpWgp+t8GaPoHxUrNK6WGNfzUJ8kW0c0CkREO
+         Dscb/29Hr6YfLJF+d4d73YxyWS00rw0oIBC8i+bE2caxuhn4QT5KscZUbiFI5oGkYrOS
+         JQuBBwexVeQehpWbxmOwKbPj4kdhI49Y8S0MOe9Z23TeKBQMGkWznf2CONnXvifr35Hu
+         tHZu1C0Q5XyU36OA8pwk7bmG1UtNKTSIEn0PLuKMT7UyI8RPnkf1qh+UQnghpZz475ZP
+         zOXpuD3syBtykk68YoRD/RF8yYReCld7JlryvlZzn9IvPwK47D7A28YJj3XnA7QuAXbQ
+         9Usg==
+X-Gm-Message-State: AC+VfDyMhvK4D6UYLc3nJY6mv0nng/7LaSddNM5K8SHISu53lQ04lzB2
+        hhqI+0IHJNpGkz4p2bq/RmncTg==
+X-Google-Smtp-Source: ACHHUZ6OZf+EpCgaWY9P5FUG3oeamK1kisguCe1dnOyViW6q7fPuKY1Ei9wGkGFG81DyscwKe2n55g==
+X-Received: by 2002:a05:600c:204d:b0:3f6:479:3985 with SMTP id p13-20020a05600c204d00b003f604793985mr695388wmg.23.1685087346540;
+        Fri, 26 May 2023 00:49:06 -0700 (PDT)
+Received: from [192.168.2.107] ([79.115.63.206])
+        by smtp.gmail.com with ESMTPSA id l22-20020a1c7916000000b003f607875e5csm8025837wme.24.2023.05.26.00.49.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 May 2023 00:49:05 -0700 (PDT)
+Message-ID: <7b74964a-01b0-4628-772d-bdfaf526f609@linaro.org>
+Date:   Fri, 26 May 2023 08:49:03 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: GxC2BwAHwUdYYXBkVgbbAg--.2318S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxAFWfZw48Xr15AF18uryDJrb_yoW5Gr1fpF
-        W3G3W5JF4jqryfCrsIv34F9F1rt3y8Jr15Xw1rZ34UZryv9rn8ur4IgF1fWFyDAr10kFW5
-        JF45Xr9ruw1jyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgAJBF1jj4m+WgAAsT
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH] crypto: Switch i2c drivers back to use .probe()
+Content-Language: en-US
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel@pengutronix.de
+References: <20230525210347.735106-1-u.kleine-koenig@pengutronix.de>
+From:   Tudor Ambarus <tudor.ambarus@linaro.org>
+In-Reply-To: <20230525210347.735106-1-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2023-02-10 at 05:52 +0200, Jarkko Sakkinen wrote:
-> On Thu, Feb 09, 2023 at 06:53:37PM +0000, Eric Biggers wrote:
-> > On Thu, Feb 09, 2023 at 11:49:19AM +0100, Roberto Sassu wrote:
-> > > On Fri, 2023-01-27 at 09:27 +0100, Roberto Sassu wrote:
-> > > > On Thu, 2022-12-29 at 14:39 -0800, Eric Biggers wrote:
-> > > > > On Tue, Dec 27, 2022 at 03:27:40PM +0100, Roberto Sassu wrote:
-> > > > > > From: Roberto Sassu <roberto.sassu@huawei.com>
-> > > > > > 
-> > > > > > Commit ac4e97abce9b8 ("scatterlist: sg_set_buf() argument must be in linear
-> > > > > > mapping") checks that both the signature and the digest reside in the
-> > > > > > linear mapping area.
-> > > > > > 
-> > > > > > However, more recently commit ba14a194a434c ("fork: Add generic vmalloced
-> > > > > > stack support") made it possible to move the stack in the vmalloc area,
-> > > > > > which is not contiguous, and thus not suitable for sg_set_buf() which needs
-> > > > > > adjacent pages.
-> > > > > > 
-> > > > > > Always make a copy of the signature and digest in the same buffer used to
-> > > > > > store the key and its parameters, and pass them to sg_init_one(). Prefer it
-> > > > > > to conditionally doing the copy if necessary, to keep the code simple. The
-> > > > > > buffer allocated with kmalloc() is in the linear mapping area.
-> > > > > > 
-> > > > > > Cc: stable@vger.kernel.org # 4.9.x
-> > > > > > Fixes: ba14a194a434 ("fork: Add generic vmalloced stack support")
-> > > > > > Link: https://lore.kernel.org/linux-integrity/Y4pIpxbjBdajymBJ@sol.localdomain/
-> > > > > > Suggested-by: Eric Biggers <ebiggers@kernel.org>
-> > > > > > Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
-> > > > > > ---
-> > > > > >  crypto/asymmetric_keys/public_key.c | 38 ++++++++++++++++-------------
-> > > > > >  1 file changed, 21 insertions(+), 17 deletions(-)
-> > > > > 
-> > > > > Reviewed-by: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > Hi David
-> > > > 
-> > > > could you please take this patch in your repo, if it is ok?
-> > > 
-> > > Kindly ask your support here. Has this patch been queued somewhere?
-> > > Wasn't able to find it, also it is not in linux-next.
-> > > 
-> > 
-> > The maintainer of asymmetric_keys (David Howells) is ignoring this patch, so
-> > you'll need to find someone else to apply it.  Herbert Xu, the maintainer of the
-> > crypto subsystem, might be willing to apply it.  Or maybe Jarkko Sakkinen, who
-> > is a co-maintainer of the keyrings subsystem (but not asymmetric_keys, for some
-> > reason; should that change?).
+
+
+On 5/25/23 22:03, Uwe Kleine-König wrote:
+> After commit b8a1a4cd5a98 ("i2c: Provide a temporary .probe_new()
+> call-back type"), all drivers being converted to .probe_new() and then
+> 03c835f498b5 ("i2c: Switch .probe() to not take an id parameter")
+> convert back to (the new) .probe() to be able to eventually drop
+> .probe_new() from struct i2c_driver.
 > 
-> I can apply this if no objections?
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Reviewed-by: Tudor Ambarus <tudor.ambarus@linaro.org>
 
-Hi Jarkko
-
-I wasn't able to reach David about this patch. Could you please apply
-it?
-
-Thanks
-
-Roberto
-
+> ---
+>  drivers/crypto/atmel-ecc.c     | 2 +-
+>  drivers/crypto/atmel-sha204a.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+> index aac64b555204..432beabd79e6 100644
+> --- a/drivers/crypto/atmel-ecc.c
+> +++ b/drivers/crypto/atmel-ecc.c
+> @@ -389,7 +389,7 @@ static struct i2c_driver atmel_ecc_driver = {
+>  		.name	= "atmel-ecc",
+>  		.of_match_table = of_match_ptr(atmel_ecc_dt_ids),
+>  	},
+> -	.probe_new	= atmel_ecc_probe,
+> +	.probe		= atmel_ecc_probe,
+>  	.remove		= atmel_ecc_remove,
+>  	.id_table	= atmel_ecc_id,
+>  };
+> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+> index 44a185a84760..c77f482d2a97 100644
+> --- a/drivers/crypto/atmel-sha204a.c
+> +++ b/drivers/crypto/atmel-sha204a.c
+> @@ -141,7 +141,7 @@ static const struct i2c_device_id atmel_sha204a_id[] = {
+>  MODULE_DEVICE_TABLE(i2c, atmel_sha204a_id);
+>  
+>  static struct i2c_driver atmel_sha204a_driver = {
+> -	.probe_new		= atmel_sha204a_probe,
+> +	.probe			= atmel_sha204a_probe,
+>  	.remove			= atmel_sha204a_remove,
+>  	.id_table		= atmel_sha204a_id,
+>  
+> 
+> base-commit: ac9a78681b921877518763ba0e89202254349d1b
