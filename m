@@ -2,149 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B06A5C7EE23
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 14:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AB8C7EE2C
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 16:12:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243734AbjEZOdD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 10:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
+        id S231261AbjEZQML (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 12:12:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243725AbjEZOca (ORCPT
+        with ESMTP id S230369AbjEZQMI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 10:32:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7449E5D
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 07:31:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685111496;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CKSB6Rx2bx1fJ9JqD5rxOprNdt4epz1O6h3wMG9pSn8=;
-        b=P3L28453IUY2jhuHUPHTVFgs5xi8AWH1ymTbDkNchba9G8G2SseO0EPKeUO0jHves6+Quu
-        nIiXc7ancwwXgXJyYyUJLJq0aVJnBuVQytNcul69YJ0Lm2vaQGVY40Koha6M6LLgGZM8uK
-        q29okbeg9acldVMhOaZr7I7ksou8oC4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-25-jLnS6QVHOfGVhUBPQMxYFw-1; Fri, 26 May 2023 10:31:25 -0400
-X-MC-Unique: jLnS6QVHOfGVhUBPQMxYFw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0AC7B3855561;
-        Fri, 26 May 2023 14:31:25 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 25EEC140E95D;
-        Fri, 26 May 2023 14:31:23 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 5/8] crypto: af_alg: Indent the loop in af_alg_sendmsg()
-Date:   Fri, 26 May 2023 15:31:01 +0100
-Message-Id: <20230526143104.882842-6-dhowells@redhat.com>
-In-Reply-To: <20230526143104.882842-1-dhowells@redhat.com>
-References: <20230526143104.882842-1-dhowells@redhat.com>
+        Fri, 26 May 2023 12:12:08 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82E11194;
+        Fri, 26 May 2023 09:12:07 -0700 (PDT)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34QC0bAA005049;
+        Fri, 26 May 2023 16:11:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=5f8QxYH454fr/3MxMEIQ6nF2pEfAdcsobX+bKB2IjKg=;
+ b=T1G1FjYpoa9v6lUKqxeqXD627zCd9BFxShXF6nuGEVF+Pp32FbEUcfd17Wi9jrRYqBHf
+ q2/4COpaB9ahmZA7+R66GUmK35/4pZSgoTVVmYArZdjzlZ23k1mHsj2z6uG7B61nAdl4
+ oX50lh9jAtmzVZMlb9YWFashWE3n+SzP9SxwmMcegKlDHy9KtMCeGBtnDRIvTV0r48xb
+ 8gpoflNRJTTUkyZUXmQUfdEyIsjATjH48jDDG8VnOfXn5P8JR3/W8u775pECRWO44y9/
+ yZ10pBLSbtq1mqPgSYqUt7t6XexFJ29DK99aANlAejGxuZIrBz1anmMMpBPWvgCR5eDS iQ== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3qtq28h7cq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 May 2023 16:11:55 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 34QGBswW007244
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 May 2023 16:11:54 GMT
+Received: from anusha-linux.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Fri, 26 May 2023 09:11:47 -0700
+From:   Anusha Rao <quic_anusha@quicinc.com>
+To:     <agross@kernel.org>, <andersson@kernel.org>,
+        <konrad.dybcio@linaro.org>, <thara.gopinath@gmail.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <mturquette@baylibre.com>,
+        <sboyd@kernel.org>, <p.zabel@pengutronix.de>,
+        <bhupesh.sharma@linaro.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>
+CC:     <quic_srichara@quicinc.com>, <quic_gokulsri@quicinc.com>,
+        <quic_sjaganat@quicinc.com>, <quic_kathirav@quicinc.com>,
+        <quic_arajkuma@quicinc.com>, <quic_poovendh@quicinc.com>
+Subject: [PATCH V4 0/4] Enable crypto for ipq9574
+Date:   Fri, 26 May 2023 21:41:25 +0530
+Message-ID: <20230526161129.1454-1-quic_anusha@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 9zOKCWi4Men4E7VMFGjcRvDElveEPond
+X-Proofpoint-ORIG-GUID: 9zOKCWi4Men4E7VMFGjcRvDElveEPond
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-26_06,2023-05-25_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxlogscore=797 bulkscore=0 adultscore=0
+ lowpriorityscore=0 clxscore=1011 priorityscore=1501 phishscore=0
+ mlxscore=0 spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2304280000 definitions=main-2305260137
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Put the loop in af_alg_sendmsg() into an if-statement to indent it to make
-the next patch easier to review as that will add another branch to handle
-MSG_SPLICE_PAGES to the if-statement.
+Update GCC driver to include clocks required for crypto.
+Enable crypto nodes in ipq9574.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-crypto@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- crypto/af_alg.c | 50 +++++++++++++++++++++++++------------------------
- 1 file changed, 26 insertions(+), 24 deletions(-)
+DTS patch depends on the below series
+https://lore.kernel.org/linux-arm-msm/20230517072806.13170-1-quic_kathirav@quicinc.com/
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 8a35f1364ac3..17ecaae50af7 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1030,35 +1030,37 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		if (sgl->cur)
- 			sg_unmark_end(sg + sgl->cur - 1);
- 
--		do {
--			struct page *pg;
--			unsigned int i = sgl->cur;
-+		if (1 /* TODO check MSG_SPLICE_PAGES */) {
-+			do {
-+				struct page *pg;
-+				unsigned int i = sgl->cur;
- 
--			plen = min_t(size_t, len, PAGE_SIZE);
-+				plen = min_t(size_t, len, PAGE_SIZE);
- 
--			pg = alloc_page(GFP_KERNEL);
--			if (!pg) {
--				err = -ENOMEM;
--				goto unlock;
--			}
-+				pg = alloc_page(GFP_KERNEL);
-+				if (!pg) {
-+					err = -ENOMEM;
-+					goto unlock;
-+				}
- 
--			sg_assign_page(sg + i, pg);
-+				sg_assign_page(sg + i, pg);
- 
--			err = memcpy_from_msg(page_address(sg_page(sg + i)),
--					      msg, plen);
--			if (err) {
--				__free_page(sg_page(sg + i));
--				sg_assign_page(sg + i, NULL);
--				goto unlock;
--			}
-+				err = memcpy_from_msg(page_address(sg_page(sg + i)),
-+						      msg, plen);
-+				if (err) {
-+					__free_page(sg_page(sg + i));
-+					sg_assign_page(sg + i, NULL);
-+					goto unlock;
-+				}
- 
--			sg[i].length = plen;
--			len -= plen;
--			ctx->used += plen;
--			copied += plen;
--			size -= plen;
--			sgl->cur++;
--		} while (len && sgl->cur < MAX_SGL_ENTS);
-+				sg[i].length = plen;
-+				len -= plen;
-+				ctx->used += plen;
-+				copied += plen;
-+				size -= plen;
-+				sgl->cur++;
-+			} while (len && sgl->cur < MAX_SGL_ENTS);
-+		}
- 
- 		if (!size)
- 			sg_mark_end(sg + sgl->cur - 1);
+Changes in V4:
+	Detailed change logs are added to the respective patches.
+
+V3 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230518141105.24741-1-quic_anusha@quicinc.com/
+
+V2 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230515150722.12196-1-quic_anusha@quicinc.com/
+
+V1 can be found at
+https://lore.kernel.org/linux-arm-msm/20230512090134.9811-1-quic_anusha@quicinc.com/
+
+Anusha Rao (4):
+  dt-bindings: clock: Add crypto clock and reset definitions
+  clk: qcom: gcc-ipq9574: Enable crypto clocks
+  dt-bindings: qcom-qce: add SoC compatible string for ipq9574
+  arm64: dts: qcom: ipq9574: Enable crypto nodes
+
+ .../devicetree/bindings/crypto/qcom-qce.yaml  |  1 +
+ arch/arm64/boot/dts/qcom/ipq9574.dtsi         | 20 ++++++
+ drivers/clk/qcom/gcc-ipq9574.c                | 72 +++++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq9574-gcc.h  |  4 ++
+ include/dt-bindings/reset/qcom,ipq9574-gcc.h  |  1 +
+ 5 files changed, 98 insertions(+)
+
+
+base-commit: aabe491169befbe5481144acf575a0260939764a
+-- 
+2.17.1
 
