@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59CCC7EE23
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 14:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E10C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 14:32:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243958AbjEZOc4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 10:32:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55250 "EHLO
+        id S243963AbjEZOc5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 10:32:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230263AbjEZOcW (ORCPT
+        with ESMTP id S243739AbjEZOcX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 10:32:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A32DF1A2
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 07:31:32 -0700 (PDT)
+        Fri, 26 May 2023 10:32:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31321B3
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 07:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685111491;
+        s=mimecast20190719; t=1685111483;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=j6NjOw4LTe31mdhiQO2H52w9dxcv2LHBSUfpmtyBwDw=;
-        b=DKub7SmabLoxssh5nBezdd2D2AwFP60FlTUqkqr+0FdwjAkMmboaK/XHVjkLW8EnjCklDK
-        DqTo3dGd3aFYSuNjjLkatMshRo1dLFaEwGEfhah/wblhdHAWjnl3ruOjkNVjQzTd5CA4ir
-        /zrL5/X+dz/IrudrcAPBWbxMG6y72Dw=
+        bh=jPGukvQXP4Tai7PUqcbnIswr++Y11hB7rT1QDpn/afo=;
+        b=ejsUWzVdA+Eh3BkBKP8dNsDniUl9fmNjdm5uotBH7KH5j0X70QRqrCIjJV+cc6/9/fQUNU
+        kyXZnLAccMQ9NM2iylDtoXuFapTlvKQ7XxyiIBmyTc69k6jbeZS38JG/DV7p2QVcf6YZRF
+        PDYSiIPf5cxNBGmx5v9rpwuWZJw4vAo=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-540-giAiFR8VOP2yBdrrkgccjg-1; Fri, 26 May 2023 10:31:28 -0400
-X-MC-Unique: giAiFR8VOP2yBdrrkgccjg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-29-Ivy8e833NRWSYrtoVTgS-g-1; Fri, 26 May 2023 10:31:21 -0400
+X-MC-Unique: Ivy8e833NRWSYrtoVTgS-g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9D41800B2A;
-        Fri, 26 May 2023 14:31:27 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A6DD811E92;
+        Fri, 26 May 2023 14:31:19 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D3B91407DEC3;
-        Fri, 26 May 2023 14:31:25 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A4D0C140E961;
+        Fri, 26 May 2023 14:31:17 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     David Howells <dhowells@redhat.com>,
@@ -51,23 +51,26 @@ Cc:     David Howells <dhowells@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 6/8] crypto: af_alg: Support MSG_SPLICE_PAGES
-Date:   Fri, 26 May 2023 15:31:02 +0100
-Message-Id: <20230526143104.882842-7-dhowells@redhat.com>
+Subject: [PATCH net-next 3/8] crypto: af_alg: Pin pages rather than ref'ing if appropriate
+Date:   Fri, 26 May 2023 15:30:59 +0100
+Message-Id: <20230526143104.882842-4-dhowells@redhat.com>
 In-Reply-To: <20230526143104.882842-1-dhowells@redhat.com>
 References: <20230526143104.882842-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make AF_ALG sendmsg() support MSG_SPLICE_PAGES.  This causes pages to be
-spliced from the source iterator.
+Convert AF_ALG to use iov_iter_extract_pages() instead of
+iov_iter_get_pages().  This will pin pages or leave them unaltered rather
+than getting a ref on them as appropriate to the iterator.
 
-This allows ->sendpage() to be replaced by something that can handle
-multiple multipage folios in a single transaction.
+The pages need to be pinned for DIO-read rather than having refs taken on
+them to prevent VM copy-on-write from malfunctioning during a concurrent
+fork() (the result of the I/O would otherwise end up only visible to the
+child process and not the parent).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -80,125 +83,55 @@ cc: Matthew Wilcox <willy@infradead.org>
 cc: linux-crypto@vger.kernel.org
 cc: netdev@vger.kernel.org
 ---
- crypto/af_alg.c         | 28 ++++++++++++++++++++++++++--
- crypto/algif_aead.c     | 22 +++++++++++-----------
- crypto/algif_skcipher.c |  8 ++++----
- 3 files changed, 41 insertions(+), 17 deletions(-)
+ crypto/af_alg.c         | 10 +++++++---
+ include/crypto/if_alg.h |  1 +
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 17ecaae50af7..979033600185 100644
+index 5f7252a5b7b4..7caff10df643 100644
 --- a/crypto/af_alg.c
 +++ b/crypto/af_alg.c
-@@ -940,6 +940,10 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 	bool init = false;
- 	int err = 0;
+@@ -533,14 +533,17 @@ static const struct net_proto_family alg_family = {
  
-+	if ((msg->msg_flags & MSG_SPLICE_PAGES) &&
-+	    !iov_iter_is_bvec(&msg->msg_iter))
-+		return -EINVAL;
+ int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len)
+ {
++	struct page **pages = sgl->pages;
+ 	size_t off;
+ 	ssize_t n;
+ 	int npages, i;
+ 
+-	n = iov_iter_get_pages2(iter, sgl->pages, len, ALG_MAX_PAGES, &off);
++	n = iov_iter_extract_pages(iter, &pages, len, ALG_MAX_PAGES, 0, &off);
+ 	if (n < 0)
+ 		return n;
+ 
++	sgl->need_unpin = iov_iter_extract_will_pin(iter);
 +
- 	if (msg->msg_controllen) {
- 		err = af_alg_cmsg_send(msg, &con);
- 		if (err)
-@@ -985,7 +989,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 	while (size) {
- 		struct scatterlist *sg;
- 		size_t len = size;
--		size_t plen;
-+		ssize_t plen;
- 
- 		/* use the existing memory in an allocated page */
- 		if (ctx->merge) {
-@@ -1030,7 +1034,27 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		if (sgl->cur)
- 			sg_unmark_end(sg + sgl->cur - 1);
- 
--		if (1 /* TODO check MSG_SPLICE_PAGES */) {
-+		if (msg->msg_flags & MSG_SPLICE_PAGES) {
-+			struct sg_table sgtable = {
-+				.sgl		= sg,
-+				.nents		= sgl->cur,
-+				.orig_nents	= sgl->cur,
-+			};
-+
-+			plen = extract_iter_to_sg(&msg->msg_iter, len, &sgtable,
-+						  MAX_SGL_ENTS, 0);
-+			if (plen < 0) {
-+				err = plen;
-+				goto unlock;
-+			}
-+
-+			for (; sgl->cur < sgtable.nents; sgl->cur++)
-+				get_page(sg_page(&sg[sgl->cur]));
-+			len -= plen;
-+			ctx->used += plen;
-+			copied += plen;
-+			size -= plen;
-+		} else {
- 			do {
- 				struct page *pg;
- 				unsigned int i = sgl->cur;
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index f6aa3856d8d5..b16111a3025a 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -9,8 +9,8 @@
-  * The following concept of the memory management is used:
-  *
-  * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
-- * filled by user space with the data submitted via sendpage/sendmsg. Filling
-- * up the TX SGL does not cause a crypto operation -- the data will only be
-+ * filled by user space with the data submitted via sendpage. Filling up
-+ * the TX SGL does not cause a crypto operation -- the data will only be
-  * tracked by the kernel. Upon receipt of one recvmsg call, the caller must
-  * provide a buffer which is tracked with the RX SGL.
-  *
-@@ -113,19 +113,19 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
- 	}
- 
- 	/*
--	 * Data length provided by caller via sendmsg/sendpage that has not
--	 * yet been processed.
-+	 * Data length provided by caller via sendmsg that has not yet been
-+	 * processed.
- 	 */
- 	used = ctx->used;
- 
- 	/*
--	 * Make sure sufficient data is present -- note, the same check is
--	 * also present in sendmsg/sendpage. The checks in sendpage/sendmsg
--	 * shall provide an information to the data sender that something is
--	 * wrong, but they are irrelevant to maintain the kernel integrity.
--	 * We need this check here too in case user space decides to not honor
--	 * the error message in sendmsg/sendpage and still call recvmsg. This
--	 * check here protects the kernel integrity.
-+	 * Make sure sufficient data is present -- note, the same check is also
-+	 * present in sendmsg. The checks in sendmsg shall provide an
-+	 * information to the data sender that something is wrong, but they are
-+	 * irrelevant to maintain the kernel integrity.  We need this check
-+	 * here too in case user space decides to not honor the error message
-+	 * in sendmsg and still call recvmsg. This check here protects the
-+	 * kernel integrity.
- 	 */
- 	if (!aead_sufficient_data(sk))
+ 	npages = DIV_ROUND_UP(off + n, PAGE_SIZE);
+ 	if (WARN_ON(npages == 0))
  		return -EINVAL;
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index a251cd6bd5b9..b1f321b9f846 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -9,10 +9,10 @@
-  * The following concept of the memory management is used:
-  *
-  * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
-- * filled by user space with the data submitted via sendpage/sendmsg. Filling
-- * up the TX SGL does not cause a crypto operation -- the data will only be
-- * tracked by the kernel. Upon receipt of one recvmsg call, the caller must
-- * provide a buffer which is tracked with the RX SGL.
-+ * filled by user space with the data submitted via sendmsg. Filling up the TX
-+ * SGL does not cause a crypto operation -- the data will only be tracked by
-+ * the kernel. Upon receipt of one recvmsg call, the caller must provide a
-+ * buffer which is tracked with the RX SGL.
-  *
-  * During the processing of the recvmsg operation, the cipher request is
-  * allocated and prepared. As part of the recvmsg operation, the processed
+@@ -573,8 +576,9 @@ void af_alg_free_sg(struct af_alg_sgl *sgl)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < sgl->npages; i++)
+-		put_page(sgl->pages[i]);
++	if (sgl->need_unpin)
++		for (i = 0; i < sgl->npages; i++)
++			unpin_user_page(sgl->pages[i]);
+ }
+ EXPORT_SYMBOL_GPL(af_alg_free_sg);
+ 
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 7e76623f9ec3..46494b33f5bc 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -59,6 +59,7 @@ struct af_alg_sgl {
+ 	struct scatterlist sg[ALG_MAX_PAGES + 1];
+ 	struct page *pages[ALG_MAX_PAGES];
+ 	unsigned int npages;
++	bool need_unpin;
+ };
+ 
+ /* TX SGL entry */
 
