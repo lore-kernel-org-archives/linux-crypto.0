@@ -2,80 +2,157 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 181B8C7EE2C
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 May 2023 22:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5324C7EE23
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 06:10:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233104AbjEYW70 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 May 2023 18:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46164 "EHLO
+        id S231691AbjEZGKk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 02:10:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbjEYW7Z (ORCPT
+        with ESMTP id S229523AbjEZGKj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 May 2023 18:59:25 -0400
-Received: from bee.tesarici.cz (bee.tesarici.cz [IPv6:2a03:3b40:fe:2d4::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FAB910F;
-        Thu, 25 May 2023 15:59:20 -0700 (PDT)
-Received: from meshulam (unknown [185.176.138.243])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by bee.tesarici.cz (Postfix) with ESMTPSA id 7DC8E14BB92;
-        Fri, 26 May 2023 00:59:16 +0200 (CEST)
-Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
-        t=1685055556; bh=kog4dbXqqG9kBj5lHS7A5wxZKGwA1hEOps5hdfkNd4c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=voT0v/B4F4JCfSsevmi6sqEuIDTsZ9KB77LA6dNgKfvOZhHuIDxAEh4n2LC4Uc7k4
-         VVo8BcsMS9B9BNRHjrenOpJhF9TBR2ZIcxRFOa1nvlHHRxo78PV4dhwXs5B7UAVGUm
-         pAVAcE0ORVA6ze+B6vZaKlAXxD0epe8rA2KbPC0sPz0QzyZj+5HqUGzGHuereD+RsG
-         PSx+LZFy7rW+0h0BKVh3BJTJViIUBS20Ei7GgN3yBG00V4KqhDAk0RLhUvp+doe3l7
-         Zoo1fZjVbwNa/vt3qdeBQxLpo+e4eOll1OWad+iKvnwCt1Ax6q5HU3wpOdd05BP/hl
-         R8A6qlWxHd/IA==
-Date:   Fri, 26 May 2023 00:59:15 +0200
-From:   Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     torvalds@linux-foundation.org, corbet@lwn.net, will@kernel.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 05/11] percpu: Wire up cmpxchg128
-Message-ID: <20230526005915.01a35500@meshulam>
-In-Reply-To: <20230525124955.GS83892@hirez.programming.kicks-ass.net>
-References: <20230515075659.118447996@infradead.org>
-        <20230515080554.248739380@infradead.org>
-        <20230525124955.GS83892@hirez.programming.kicks-ass.net>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-suse-linux-gnu)
+        Fri, 26 May 2023 02:10:39 -0400
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2052.outbound.protection.outlook.com [40.107.7.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37A4E125;
+        Thu, 25 May 2023 23:10:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CaVaduAnOFH1B1uCeZwZB+hTarih9jWwyXNcb17J13n2umSWMqPo0i1HtaYFtRrRq38NJw7SApkgFhxKZn/Mw2XjppdDML9vSooa/ZVSpRWggjBxSZ0D/4v/rUuOWAeijHlsQYGUTfbexA3gCwI6xjjs0gkcL6MdF+i3u6UW976tluv53g6vhc9JkqWD7ia0DiBYELtRKAJq7jjZsrfIDa98gnz2MYgpY8N2YWeAS2vHSMYvqynQrgzUUETgNtDkxDs0PaGNXoNN6g1CqOwIV7bcjic3Xd/qSkB3+HntNofslGrhkh+/66o+QOWps35OycVTWASVyKBQSOB00yWKXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gM9mPgDhIHDISveFc5jzf9+hgDWDRZvcVrRXjfCXksY=;
+ b=J9dryW/nqiqQKCzJyVZd27/Bm14zFqOtL1jo89qXx0lL1LckO3bRKKrtLhZIInDTVFFk29zQSIsgYniIzNrpyfsXBKdfLWswwpknKySaKlzwGAsI6l+RfZyneEcL4V9KdIOxHrl/SG4iM/LYjuySiNy+LRkFY4gFY2SlzaKfA3l/McUZIsHzrEBmWPinuOCUBqQbXsE6kthI7SDAMEyWJGozldtsu2rP1AxQHM3b3k8wWnYvZNH0yW+IGCSLCQCqcjN8mU1qkbtNX8jMnsk/h3kvzw6IBM7PcDPVnaUac8EFdXhHqDmm6tww2dpunafOsNRezvxVhnKSaUx94UkuCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gM9mPgDhIHDISveFc5jzf9+hgDWDRZvcVrRXjfCXksY=;
+ b=fM91zbGUVeyWeRaWBugsug9HZK3FRPx2OkNCUIG1VbIaKIsDwhIH1x/fROV0fQQdv+T/co7Y0myEguuPvJLrZb8InxkZtHeDsgoEpToONaIxpzuTnW+OrMhBWsaoq0sVfJdyvuwhgYLFPA4f0KYPl6nED2zLlpDer/pM1Q3xE8A=
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
+ by AS4PR04MB9410.eurprd04.prod.outlook.com (2603:10a6:20b:4e9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.15; Fri, 26 May
+ 2023 06:10:35 +0000
+Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::dca6:e1e8:f142:2bc5]) by DU0PR04MB9563.eurprd04.prod.outlook.com
+ ([fe80::dca6:e1e8:f142:2bc5%5]) with mapi id 15.20.6433.018; Fri, 26 May 2023
+ 06:10:35 +0000
+From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Horia Geanta <horia.geanta@nxp.com>, Varun Sethi <V.Sethi@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: RE: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
+Thread-Topic: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
+Thread-Index: AQHZjYweUt32QHpmXkqlWZrZU7kmVa9oE4qAgAQC2MA=
+Date:   Fri, 26 May 2023 06:10:34 +0000
+Message-ID: <DU0PR04MB95630B963A7F5AEED39E70D08E479@DU0PR04MB9563.eurprd04.prod.outlook.com>
+References: <20230523153421.1528359-1-meenakshi.aggarwal@nxp.com>
+ <20230523165503.GA864814@google.com>
+In-Reply-To: <20230523165503.GA864814@google.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DU0PR04MB9563:EE_|AS4PR04MB9410:EE_
+x-ms-office365-filtering-correlation-id: 12f465a7-9617-49d9-c32c-08db5dafeb35
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: SOVD5TJB3Nn1iciy8zAdzeBWwhGXOsyjzQ8x+7SDlRfvjhJKEm9myob8jBnQvgwh0g9H1C9hwSTzhMLDjtNHyxltEKwb6rqg1+EtU000+5K0/kjVft+H+IFi6LV4MyHgiqVP1LDolApZPCXKc5Yt/7pcbwy+dRJhGE8W+AUj1sCKya/T/Q8ylia38KCh5KuESO8zw8u8qqZSIhCLoSo1tmGX42GciuWCdS10s+yYJ4V/ka2gPx+fK7mesDsHrxgOmh90djzp9mkttoT93xoGWQB8djkU5P0rU4ugN+28fwFrmSNWAe9bxI/FX5L0+IYcrVE/8SjkOalo1eFlZhz1PXRHe4cg/4IMlrEv63iP6zocOKYh8HsA7lLK/Q4M8t/9QqhwPRMy/YAW36enWvW7xrZdisa8FqztEEpyMHWJ4p0HkqoRwhsjgB19ni5z7NMZdFx1ZjGDTD1KBtoiGf/sqxRN2mJvOYfd7nXAdCza6WzaAcRbioGnoEZO1HoO5Gs6+UwvmzbpfeU9M3w0RYjRuvln8AnrgLrejdaAqB61GVCDUI8+AO7pL6OtcGAoimeRlkOtwNRu35k5ZxrMabUTHxEJVbZ5oVLXBMx2LMiAz0Wjh6/YGCJ2aCv/pGm6QON0
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(346002)(39860400002)(396003)(366004)(451199021)(83380400001)(2906002)(186003)(38070700005)(86362001)(33656002)(38100700002)(122000001)(55016003)(8676002)(41300700001)(8936002)(7696005)(52536014)(5660300002)(54906003)(478600001)(64756008)(316002)(4326008)(6916009)(76116006)(66446008)(71200400001)(66556008)(66476007)(66946007)(26005)(6506007)(44832011)(53546011)(55236004)(9686003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?jltyTTX5SyMlN4byzxVZ0BviuWprww3d4x83hIWl4AH2YR/ibI8HyI6EF4?=
+ =?iso-8859-1?Q?Hb9pI4Ay6cVgSFedUoYEVGoHareYu+zM3xc1qVVb+X+RlCIRIjDr6+aus4?=
+ =?iso-8859-1?Q?JgfvDGltK/B6cux3DU1LER0VGoVPqMD2e+z/tHnckGYd15Ud2WN/TwrwkQ?=
+ =?iso-8859-1?Q?P8XlYN6LtHhSDIamA8epyT/LIqteQ3jz2xO30MHFdaclhy3u4LL3On4CxP?=
+ =?iso-8859-1?Q?wx79Y/ismMIPYBT+At3hPwBtPBuc5UNaYtQsJZ48AgDHdbu74TuBG4R7Id?=
+ =?iso-8859-1?Q?4vNiAAFdz4L/c41Dw5qLKJw5rN0azS3MKJIZx0o4beoedaNILUhhdZW0R5?=
+ =?iso-8859-1?Q?3W9Xe5s2RuElgWgT/4qnq5K/Xp0oJ0jjnsjMZ18JVUCsQEnDeMgJ/OClfq?=
+ =?iso-8859-1?Q?BS+pwFo8HB2e0GtbiDdojRPGizfW0Z+UZC72fsxqI9VSAsnSUlZSEFnPNh?=
+ =?iso-8859-1?Q?Qc7+YZK5YoQSCv5NdgzsN280sN3nhfu+PApe5GjohWhq38ZIjD27HG7u8H?=
+ =?iso-8859-1?Q?pe+fvNo4fdm3hd4SssKDmsNaKLcDilpfzmUvhnl5xkqv59Mi54C+ohMVam?=
+ =?iso-8859-1?Q?qrUXkXy+ShbT9RGabXODz1g1PlpgoBPNv8D5AGjw3Ccj74eswZGvynmLvY?=
+ =?iso-8859-1?Q?r8kLYYWn9L5L+U5x3Px6ZegNae0r7bLEEh3mTU7dsh2MBpHlR4FYQQXLz9?=
+ =?iso-8859-1?Q?68ieKfPnwkyRjMLanIxGtQFipcMYs6LWVecfaoULCWywCGqPl5d+zq+8s0?=
+ =?iso-8859-1?Q?ZvPgLIn9HRHDJoBeZ/dCmtSo4yneIBhUkwbGn13eBMx6Gi8bq5odkWgN6X?=
+ =?iso-8859-1?Q?ghzW2Btvp3Gd1n2l5T9XPP9cW4PY3NXKnbBobFOGJ5fjRz6sMisn/XgLiK?=
+ =?iso-8859-1?Q?iousz6aFf3FWnfHxi61d1J6MtUyh3bPq7O9UZTTdAb1uwy3pn910K2Eta4?=
+ =?iso-8859-1?Q?Vsb/SsWbMrLrtEZvqt22x8LI7QZTqAGVTsITJ1WX70HuwI5cYZruF24uMV?=
+ =?iso-8859-1?Q?znmn3x3TNKLP7xmrgM12rTy+qGe16uZzHPriB7zyXkL9HtoJWXx4C5sq+m?=
+ =?iso-8859-1?Q?JOcwE4JtDkuTwlcJfj31/892u+z1dH7y/FbSQ/ujJ1WlK3xmQLtG7tlaf+?=
+ =?iso-8859-1?Q?is/kEq+QaWea81VLDWEAMKymR+J8o40XX+Q9vlVHBa10Q2vlmaU1hq3t68?=
+ =?iso-8859-1?Q?JBU8TgxQp2jJUYfgvQOIhQ4Uj62grwROMFimXqEbU/SlbZJuNkFXhmjkX1?=
+ =?iso-8859-1?Q?TTd2DFWb7q47od97tdM+2qWW+4fjGMsafDyFaJeA2TYlnVsad1R0oI6XkG?=
+ =?iso-8859-1?Q?/kVIn3wdVgSjPxLJvTppk7cfAl7FybCiBxAHBW/e0wtm9AkoOERc6VtuTn?=
+ =?iso-8859-1?Q?LBvpImSobogvSMK8p3pFEvOx42UFv9G+sRWlXDaH5oEvIO7hny2r9yuaFB?=
+ =?iso-8859-1?Q?ZP4kKIrHvGUhQ2Tp2BE3L5TpSjOuUhz/0IqpITj83n5WAz8b360mXmjYIh?=
+ =?iso-8859-1?Q?3I3DCWMrzMC0H9NcQFAiUjA4d7c3ZKWwK0ESMLIJ3SXr6TWBRRgRszbwTM?=
+ =?iso-8859-1?Q?FDVIgkkD2K/0K7uE9Xvqietu9RiSk0bcmH73Foyy8Te2QHwUMAYD+vtJsz?=
+ =?iso-8859-1?Q?rPQhMfZpt8RCowyUA1pc1wjzqk6XOBlTQ+?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12f465a7-9617-49d9-c32c-08db5dafeb35
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 May 2023 06:10:34.9402
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ClVjG1ndMsGNvtsHDkiE0IijPU8rN8rq0OnHfG1KyKcQvdw7cPD1q52Rte568jd+Tenykot53liVY1+TtQ2mp2tA/uAgqzyVMUvFYeiXEts=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9410
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 25 May 2023 14:49:55 +0200
-Peter Zijlstra <peterz@infradead.org> wrote:
+Hi Eric,
 
->[...]
-> Build tested i386-defconfig.
-> 
-> (the things we do for museum pieces :/)
+=A0
 
-I have always thought it's not done for museum pieces but rather for
-dumb emulators. I can vaguely recall a reverse-engineered MIPS firmware
-which was able to run i386 binaries, but not i586...
+We are not updating the functioning of CRYPTO_ALG_ALLOCATES_MEMORY flag.
+We have introduced the changes in CAAM driver and this flag is no longer
+required for CAAM use-cases.
 
-Petr T
+I will update the description of my patches in next version.
+
+Thanks,
+Meenakshi
+
+> -----Original Message-----
+> From: Eric Biggers <ebiggers@kernel.org>
+> Sent: Tuesday, May 23, 2023 10:25 PM
+> To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+> Cc: Horia Geanta <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>;
+> Pankaj Gupta <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
+> herbert@gondor.apana.org.au; davem@davemloft.net; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Iuliana Prodan
+> <iuliana.prodan@nxp.com>
+> Subject: Re: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
+>=20
+> On Tue, May 23, 2023 at 05:34:16PM +0200, meenakshi.aggarwal@nxp.com
+> wrote:
+> > CRYPTO_ALG_ALLOCATES_MEMORY flag is limited only to dm-crypt
+> > use-cases, which seems to be 4 entries maximum.
+>=20
+> This isn't mentioned in the documentation for
+> CRYPTO_ALG_ALLOCATES_MEMORY.  So it's not part of the contract of
+> CRYPTO_ALG_ALLOCATES_MEMORY currently.
+>=20
+> Please don't make this change without updating the documentation.
+>=20
+> If you'd like to make this change, please update the documentation for
+> CRYPTO_ALG_ALLOCATES_MEMORY to mention this additional exception.
+>=20
+> - Eric
