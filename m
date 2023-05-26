@@ -2,122 +2,128 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B740C77B7C
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 07:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18824C7EE31
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 07:37:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242018AbjEZHXH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 03:23:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56592 "EHLO
+        id S242335AbjEZHhn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 03:37:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236681AbjEZHXG (ORCPT
+        with ESMTP id S241569AbjEZHhl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 03:23:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16979B;
-        Fri, 26 May 2023 00:23:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1EB5A64D88;
-        Fri, 26 May 2023 07:23:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D370C433D2;
-        Fri, 26 May 2023 07:23:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685085784;
-        bh=Z+s29jQiBKqU2l46jPccXJdvd9jdYJHsfjEWMx9TRx4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cO9AGl9ps5XpW7/aAs6LaRMSKLZ1cqcbu2Z+46QILzHNiwtf+EwAt9g9m5eSnbEqI
-         r1hv7FzcVRviZlyvezLBCR8xF52yBI8s7LWkZTZSidKN5OY3Ne3NJzcj7bo2IZ5Qbs
-         HvW1tCT4NqlDYUQXRyo5vbKNqwB1WIzNrZGoUahJ8IFi5b6dAgIrNM2ouWTK/W/PHl
-         suqEYo/I0NqUVeSf1wVwdUPMEFD48zm9+OmkkJJ9rUxHRzPTrUdJHGlSbBNvLBusDW
-         /JxJB6FvRBBemQWV1cwTv3exX0djxv0RnSgR6BnVJ99K9hJRB7P+Sx3SG5j0IWVNG4
-         GSjtfJJtfQY+Q==
-Date:   Fri, 26 May 2023 00:23:01 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com, elliott@hpe.com, gmazyland@gmail.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, tglx@linutronix.de,
-        bp@alien8.de, mingo@kernel.org, x86@kernel.org,
-        herbert@gondor.apana.org.au, ardb@kernel.org,
-        dan.j.williams@intel.com, bernie.keany@intel.com,
-        charishma1.gairuboyina@intel.com,
-        lalithambika.krishnakumar@intel.com, nhuck@google.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v7 12/12] crypto: x86/aes-kl - Implement the AES-XTS
- algorithm
-Message-ID: <20230526072301.GC875@sol.localdomain>
-References: <20230410225936.8940-1-chang.seok.bae@intel.com>
- <20230524165717.14062-1-chang.seok.bae@intel.com>
- <20230524165717.14062-13-chang.seok.bae@intel.com>
+        Fri, 26 May 2023 03:37:41 -0400
+Received: from frasgout11.his.huawei.com (unknown [14.137.139.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF6E170E;
+        Fri, 26 May 2023 00:36:59 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.18.147.228])
+        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4QSGgW1kg8z9xFQf;
+        Fri, 26 May 2023 15:26:15 +0800 (CST)
+Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
+        by APP2 (Coremail) with SMTP id GxC2BwAHwUdYYXBkVgbbAg--.2318S2;
+        Fri, 26 May 2023 08:36:05 +0100 (CET)
+Message-ID: <a4cefa07e717bd99fa0ae8e5f18950d69145bd24.camel@huaweicloud.com>
+Subject: Re: [PATCH v5 2/2] KEYS: asymmetric: Copy sig and digest in
+ public_key_verify_signature()
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Roberto Sassu <roberto.sassu@huawei.com>
+Date:   Fri, 26 May 2023 09:35:47 +0200
+In-Reply-To: <Y+W/fwRbzj5A5v44@kernel.org>
+References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
+         <20221227142740.2807136-3-roberto.sassu@huaweicloud.com>
+         <Y64XB0yi24yjeBDw@sol.localdomain>
+         <d2a54ddec403cad12c003132542070bf781d5e26.camel@huaweicloud.com>
+         <857eedc5ad18eddae7686dca63cf8c613a051be4.camel@huaweicloud.com>
+         <Y+VBMQEwPTPGBIpP@gmail.com> <Y+W/fwRbzj5A5v44@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230524165717.14062-13-chang.seok.bae@intel.com>
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: GxC2BwAHwUdYYXBkVgbbAg--.2318S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxAFWfZw48Xr15AF18uryDJrb_yoW5Gr1fpF
+        W3G3W5JF4jqryfCrsIv34F9F1rt3y8Jr15Xw1rZ34UZryv9rn8ur4IgF1fWFyDAr10kFW5
+        JF45Xr9ruw1jyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxV
+        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgAJBF1jj4m+WgAAsT
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 24, 2023 at 09:57:17AM -0700, Chang S. Bae wrote:
-> == API Limitation ==
+On Fri, 2023-02-10 at 05:52 +0200, Jarkko Sakkinen wrote:
+> On Thu, Feb 09, 2023 at 06:53:37PM +0000, Eric Biggers wrote:
+> > On Thu, Feb 09, 2023 at 11:49:19AM +0100, Roberto Sassu wrote:
+> > > On Fri, 2023-01-27 at 09:27 +0100, Roberto Sassu wrote:
+> > > > On Thu, 2022-12-29 at 14:39 -0800, Eric Biggers wrote:
+> > > > > On Tue, Dec 27, 2022 at 03:27:40PM +0100, Roberto Sassu wrote:
+> > > > > > From: Roberto Sassu <roberto.sassu@huawei.com>
+> > > > > > 
+> > > > > > Commit ac4e97abce9b8 ("scatterlist: sg_set_buf() argument must be in linear
+> > > > > > mapping") checks that both the signature and the digest reside in the
+> > > > > > linear mapping area.
+> > > > > > 
+> > > > > > However, more recently commit ba14a194a434c ("fork: Add generic vmalloced
+> > > > > > stack support") made it possible to move the stack in the vmalloc area,
+> > > > > > which is not contiguous, and thus not suitable for sg_set_buf() which needs
+> > > > > > adjacent pages.
+> > > > > > 
+> > > > > > Always make a copy of the signature and digest in the same buffer used to
+> > > > > > store the key and its parameters, and pass them to sg_init_one(). Prefer it
+> > > > > > to conditionally doing the copy if necessary, to keep the code simple. The
+> > > > > > buffer allocated with kmalloc() is in the linear mapping area.
+> > > > > > 
+> > > > > > Cc: stable@vger.kernel.org # 4.9.x
+> > > > > > Fixes: ba14a194a434 ("fork: Add generic vmalloced stack support")
+> > > > > > Link: https://lore.kernel.org/linux-integrity/Y4pIpxbjBdajymBJ@sol.localdomain/
+> > > > > > Suggested-by: Eric Biggers <ebiggers@kernel.org>
+> > > > > > Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
+> > > > > > ---
+> > > > > >  crypto/asymmetric_keys/public_key.c | 38 ++++++++++++++++-------------
+> > > > > >  1 file changed, 21 insertions(+), 17 deletions(-)
+> > > > > 
+> > > > > Reviewed-by: Eric Biggers <ebiggers@google.com>
+> > > > 
+> > > > Hi David
+> > > > 
+> > > > could you please take this patch in your repo, if it is ok?
+> > > 
+> > > Kindly ask your support here. Has this patch been queued somewhere?
+> > > Wasn't able to find it, also it is not in linux-next.
+> > > 
+> > 
+> > The maintainer of asymmetric_keys (David Howells) is ignoring this patch, so
+> > you'll need to find someone else to apply it.  Herbert Xu, the maintainer of the
+> > crypto subsystem, might be willing to apply it.  Or maybe Jarkko Sakkinen, who
+> > is a co-maintainer of the keyrings subsystem (but not asymmetric_keys, for some
+> > reason; should that change?).
 > 
-> The setkey() function transforms an AES key into a handle. But, an
-> extended key is a usual outcome of setkey() in other AES cipher
-> implementations. For this reason, a setkey() failure does not fall
-> back to the other. So, expose AES-KL methods via synchronous
-> interfaces only.
+> I can apply this if no objections?
 
-I don't understand what this paragraph is trying to say.
+Hi Jarkko
 
-> +/*
-> + * The below wrappers for the encryption/decryption functions
-> + * incorporate the feature availability check:
-> + *
-> + * In the rare event of hardware failure, the wrapping key can be lost
-> + * after wake-up from a deep sleep state. Then, this check helps to
-> + * avoid any subsequent misuse with populating a proper error code.
-> + */
-> +
-> +static inline int aeskl_enc(const void *ctx, u8 *out, const u8 *in)
-> +{
-> +	if (!valid_keylocker())
-> +		return -ENODEV;
-> +
-> +	return __aeskl_enc(ctx, out, in);
-> +}
+I wasn't able to reach David about this patch. Could you please apply
+it?
 
-Is it not sufficient for the valid_keylocker() check to occur at the top level
-(in xts_encrypt() and xts_decrypt()), which would seem to be a better place to
-do it?  Is this because valid_keylocker() needs to be checked in every
-kernel_fpu_begin() section separately, to avoid a race condition?  If that's
-indeed the reason, can you explain that in the comment?
+Thanks
 
-> +static inline int xts_keylen(struct skcipher_request *req, u32 *keylen)
-> +{
-> +	struct aes_xts_ctx *ctx = aes_xts_ctx(crypto_skcipher_reqtfm(req));
-> +
-> +	if (ctx->crypt_ctx.key_length != ctx->tweak_ctx.key_length)
-> +		return -EINVAL;
-> +
-> +	*keylen = ctx->crypt_ctx.key_length;
-> +	return 0;
-> +}
+Roberto
 
-This is odd.  Why would the key lengths be different here?
-
-> +	err = simd_register_skciphers_compat(aeskl_skciphers, ARRAY_SIZE(aeskl_skciphers),
-> +					     aeskl_simd_skciphers);
-> +	if (err)
-> +		return err;
-> +
-> +	return 0;
-
-This can be simplified to:
-
-	return simd_register_skciphers_compat(aeskl_skciphers,
-					      ARRAY_SIZE(aeskl_skciphers),
-					      aeskl_simd_skciphers);
-
-- Eric
