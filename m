@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA11C77B7C
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 19:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D668C77B7A
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 19:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbjEZTYM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 15:24:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
+        id S229694AbjEZTYy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 15:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242258AbjEZTXt (ORCPT
+        with ESMTP id S243940AbjEZTYV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 15:23:49 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFD810F5
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 12:23:27 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae85b71141so10687165ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 12:23:27 -0700 (PDT)
+        Fri, 26 May 2023 15:24:21 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D90171E
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 12:24:00 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-64d18d772bdso1539701b3a.3
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 12:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1685129006; x=1687721006;
+        d=linaro.org; s=google; t=1685129018; x=1687721018;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LMTHG8l+qigWdbQ7cyJvnKtXRMQ+ez6nvcozSSImI4Q=;
-        b=GJQcey1tIco4VsgW2wCa3EVnoFzVEek0hn7ePdRn29+qgiW0g9UYwipeEXNnCsMFmm
-         QdeaTktSBVaTQZCWHHFS06jCo6Aah31J9cn/15FwpU6QELQEa0EWimTP73hYhMFcHhE4
-         U/lK6w5eW3vOpHDeVHqcEkXq0g19aLyz68otddynIjR3pd2MwTG3g0sEP/5LX08fZZge
-         VR97znrZayCVAWtB16b2Z6oajzdVluVxGtmZO6LVZoPZOrOOjXtYBX08KhZJNcEZY4M8
-         lQRRghIrInaBgcKvJ1bsn0YK+aGeBMGWrhvB4TVXfEGyWseLzJnlmjVYVGJslPT4KAvK
-         JGCQ==
+        bh=1njn0X79ZVa4bpFpIROGKaYXKaM1KuhMVkxwXfg7gOQ=;
+        b=HrGYDfvG0Xsp/A/zedL8nS5rkVVlhkW+JEy5OlneDMG/FgpWWoHBL4qqfR3sqNrAHw
+         N02hyr2pY/kCoaFrrLZW33UmvPQ96h3Xx5/ILcF1jisy/CHOfgOd86RxzB14dsdsmfsd
+         eKLq79NclssCpBvvUwCSydAK6IKdT8VxPP7g9gzsBStvgk4tyIfza7M3D8fc7wAggdPf
+         NpZTMewKyelWDwdU0FWZf8Aij6Okk5N92xuX+jn8UEZosrGxQh7eKUknyIh0iOoVe34t
+         gh5vOcoAvxV7xexxHfH0dX3T0kFUTBdWel+49SZ64pQtbnZJELkjGVSMB6ovUEBHh98t
+         bRog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685129006; x=1687721006;
+        d=1e100.net; s=20221208; t=1685129018; x=1687721018;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LMTHG8l+qigWdbQ7cyJvnKtXRMQ+ez6nvcozSSImI4Q=;
-        b=gHS14A46IW5lB7iq7uM3/62mx4wxEzAUuzWkCSt1oiLTbwuB5Hy2VbeWAJ7dy6wvty
-         PL+IsEv7sNpKfUagVZhX4NHkRW7ZzEHzIduQN1O4fdBCRcZxz3pDSTPqvBaA/tWzsW16
-         B2HYnr4Li76CbRVocGMXuOpcMW+q6rnwJkhlc3Us6i7TT5GDfWLCjpbqhl5QJit/5Oii
-         kD1Z8r2BkIhv9cBwRWr6jXFsSQt+aXfozT6kUxHxUBB49RLU5TDatq+6/OYYn8Gn9u3d
-         OFy6FprRTPVApERxc7JmqZnv4ZVS/Spwaw2D1vrc2oDUBN6uEIabNTTbieRrAb3H8ZaU
-         IWgA==
-X-Gm-Message-State: AC+VfDxnwwNcND5q3lflqa4Nc+AlPREAH6nJiPBniPBqkJpa6r88o04r
-        y88mkX5qbMIgYkA+Wwq6S2Gziw==
-X-Google-Smtp-Source: ACHHUZ6BO9w5FdXzRsIZxZBqjjuAe8EPfEYlgN9HTmnQi9ZZydY15sIjo/INoBxrERq9+zRRSBPEhg==
-X-Received: by 2002:a17:903:2312:b0:1b0:155b:bff2 with SMTP id d18-20020a170903231200b001b0155bbff2mr3221607plh.59.1685129006728;
-        Fri, 26 May 2023 12:23:26 -0700 (PDT)
+        bh=1njn0X79ZVa4bpFpIROGKaYXKaM1KuhMVkxwXfg7gOQ=;
+        b=beyV3Z0gFz2DtBP71xwyj+wsRn9liWd4AvqPJqITpVFyH1eBUkzDd6Ql6qnvSHE4tY
+         /ccYLY7NseL8Mh4hL7b/P82MPn/3o5HzNTBd2FZk22aed8TKR2NU864vwpWXkaBUnxKm
+         B5uFYfZAgTjTqFS1xcSClTUbXwQcYoVKR9ECf+FzbmD5AtgbB5Rj4838hLVYWGhtLImP
+         ej6PfhNIWadBg6AIH8FaND9VPWMbl1/a+oXJX+zCJ1k/FUsKttzJC8FKfOHGgglydjtb
+         yNceIWxRCq2F4IU+rFy/vdccwiVU0BcwayY4SIUxdNAv8KIVgW746Rarl1pQu0Lukc+J
+         Vfiw==
+X-Gm-Message-State: AC+VfDwX1kUnwgWZQ0bpmsAQHH+wXBeOmqQbI64fmRqGkqME4l/+4iL8
+        wzbEvFUpeaKGK/H3gG7rPz21uQ==
+X-Google-Smtp-Source: ACHHUZ5x/8y9Vqs+MmpKmGon+S9SqikwtMNf3bIFaTila4wvgIZ2XbYAzpTfJLOZHFc47WEEg9bC1A==
+X-Received: by 2002:a05:6a20:d493:b0:10d:3134:10d7 with SMTP id im19-20020a056a20d49300b0010d313410d7mr437546pzb.27.1685129018344;
+        Fri, 26 May 2023 12:23:38 -0700 (PDT)
 Received: from localhost.localdomain ([2401:4900:1f3a:6990:1a5c:b29f:f8cf:923c])
-        by smtp.gmail.com with ESMTPSA id q18-20020a17090311d200b001b008b3dee2sm1955079plh.287.2023.05.26.12.23.20
+        by smtp.gmail.com with ESMTPSA id q18-20020a17090311d200b001b008b3dee2sm1955079plh.287.2023.05.26.12.23.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 May 2023 12:23:26 -0700 (PDT)
+        Fri, 26 May 2023 12:23:38 -0700 (PDT)
 From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
 To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
 Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
         rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
         stephan@gerhold.net, Anders Roxell <anders.roxell@linaro.org>,
         Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: [PATCH v8 09/11] arm64: dts: qcom: sm8250: Add Crypto Engine support
-Date:   Sat, 27 May 2023 00:52:08 +0530
-Message-Id: <20230526192210.3146896-10-bhupesh.sharma@linaro.org>
+Subject: [PATCH v8 11/11] arm64: dts: qcom: sm8450: add crypto nodes
+Date:   Sat, 27 May 2023 00:52:10 +0530
+Message-Id: <20230526192210.3146896-12-bhupesh.sharma@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
 References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
@@ -72,60 +72,59 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add crypto engine (CE) and CE BAM related nodes and definitions to
-'sm8250.dtsi'.
+From: Neil Armstrong <neil.armstrong@linaro.org>
+
+Add crypto engine (CE) and CE BAM related nodes and definitions
+for the SM8450 SoC.
 
 Tested-by: Anders Roxell <anders.roxell@linaro.org>
 Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Co-developed-by and Signed-off-by: Vladimir Zapolskiy <vladimir.zapolskiy@linaro.org>
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+[Bhupesh: Corrected the compatible list]
 Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
 ---
- arch/arm64/boot/dts/qcom/sm8250.dtsi | 32 ++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ arch/arm64/boot/dts/qcom/sm8450.dtsi | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8250.dtsi b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-index 7bea916900e2..79fad917d142 100644
---- a/arch/arm64/boot/dts/qcom/sm8250.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8250.dtsi
-@@ -2232,6 +2232,38 @@ ufs_mem_phy_lanes: phy@1d87400 {
+diff --git a/arch/arm64/boot/dts/qcom/sm8450.dtsi b/arch/arm64/boot/dts/qcom/sm8450.dtsi
+index 7f193802a7c4..1642daea9624 100644
+--- a/arch/arm64/boot/dts/qcom/sm8450.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8450.dtsi
+@@ -4173,6 +4173,34 @@ ufs_mem_phy_lanes: phy@1d87400 {
  			};
  		};
  
 +		cryptobam: dma-controller@1dc4000 {
 +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-+			reg = <0 0x01dc4000 0 0x24000>;
++			reg = <0 0x01dc4000 0 0x28000>;
 +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
 +			#dma-cells = <1>;
 +			qcom,ee = <0>;
 +			qcom,controlled-remotely;
-+			num-channels = <8>;
-+			qcom,num-ees = <2>;
-+			iommus = <&apps_smmu 0x592 0x0000>,
-+				 <&apps_smmu 0x598 0x0000>,
-+				 <&apps_smmu 0x599 0x0000>,
-+				 <&apps_smmu 0x59f 0x0000>,
-+				 <&apps_smmu 0x586 0x0011>,
-+				 <&apps_smmu 0x596 0x0011>;
++			iommus = <&apps_smmu 0x584 0x11>,
++				 <&apps_smmu 0x588 0x0>,
++				 <&apps_smmu 0x598 0x5>,
++				 <&apps_smmu 0x59a 0x0>,
++				 <&apps_smmu 0x59f 0x0>;
 +		};
 +
-+		crypto: crypto@1dfa000 {
-+			compatible = "qcom,sm8250-qce", "qcom,sm8150-qce", "qcom,qce";
++		crypto: crypto@1de0000 {
++			compatible = "qcom,sm8450-qce", "qcom,sm8150-qce", "qcom,qce";
 +			reg = <0 0x01dfa000 0 0x6000>;
 +			dmas = <&cryptobam 4>, <&cryptobam 5>;
 +			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x592 0x0000>,
-+				 <&apps_smmu 0x598 0x0000>,
-+				 <&apps_smmu 0x599 0x0000>,
-+				 <&apps_smmu 0x59f 0x0000>,
-+				 <&apps_smmu 0x586 0x0011>,
-+				 <&apps_smmu 0x596 0x0011>;
-+			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE_0 &mc_virt SLAVE_EBI_CH0>;
++			iommus = <&apps_smmu 0x584 0x11>,
++				 <&apps_smmu 0x588 0x0>,
++				 <&apps_smmu 0x598 0x5>,
++				 <&apps_smmu 0x59a 0x0>,
++				 <&apps_smmu 0x59f 0x0>;
++			interconnects = <&aggre2_noc MASTER_CRYPTO 0 &mc_virt SLAVE_EBI1 0>;
 +			interconnect-names = "memory";
 +		};
 +
- 		tcsr_mutex: hwlock@1f40000 {
- 			compatible = "qcom,tcsr-mutex";
- 			reg = <0x0 0x01f40000 0x0 0x40000>;
+ 		sdhc_2: mmc@8804000 {
+ 			compatible = "qcom,sm8450-sdhci", "qcom,sdhci-msm-v5";
+ 			reg = <0 0x08804000 0 0x1000>;
 -- 
 2.38.1
 
