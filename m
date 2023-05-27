@@ -2,234 +2,152 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3023C7EE23
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 May 2023 23:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCF6C77B73
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 May 2023 00:48:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230521AbjEZXF4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 May 2023 19:05:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51282 "EHLO
+        id S236867AbjE0Asf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 26 May 2023 20:48:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbjEZXFz (ORCPT
+        with ESMTP id S229901AbjE0Ase (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 May 2023 19:05:55 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E8CAD;
-        Fri, 26 May 2023 16:05:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685142352; x=1716678352;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pvJQz74MnTdZRRPfhTypRddqinT3EDy3g2yrcXnBbtk=;
-  b=ZsL3nzskDBFyIoaHBcU3K/yYfdbEhqP/svf7iIQeDMJoDwzdiOG11ryG
-   0+qZTjfHAOvfqjYFXrcTsxQWRrx7PQshxb9Qq6qmKAtmNS+ZAhFP+vfr3
-   ftCoNjGHMDP2Sc7dEyGe/EHr9SQu4nLe/C137zoXA+LkHIJB0fzXKT2su
-   CES2bmwg++Ji3YHCenE60jIFVktsl+IPvzVja4/DQyQ8xxks6tGkYQFpt
-   /d4o852ZP/m0Z+P2RxwiitXA7Z5oav877KYh+nFpSF/pUHZ/HLac2vP8H
-   SBH8gyFdaIyttQqrMINmeu7a1plpYBCFaknPhhR46mjWkpPpNhR/D2bvv
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10722"; a="356709014"
-X-IronPort-AV: E=Sophos;i="6.00,195,1681196400"; 
-   d="scan'208";a="356709014"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2023 16:05:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10722"; a="879689885"
-X-IronPort-AV: E=Sophos;i="6.00,195,1681196400"; 
-   d="scan'208";a="879689885"
-Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 26 May 2023 16:05:47 -0700
-Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q2gVG-000JeU-0A;
-        Fri, 26 May 2023 23:05:46 +0000
-Date:   Sat, 27 May 2023 07:04:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     David Yang <mmyangfl@gmail.com>, linux-crypto@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, David Yang <mmyangfl@gmail.com>,
-        Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] crypto: hisilicon/advca - Add SHA support
-Message-ID: <202305270619.CZWqR9rV-lkp@intel.com>
-References: <20230525160446.43800-3-mmyangfl@gmail.com>
+        Fri, 26 May 2023 20:48:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D3F187
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 17:47:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685148463;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=X9b3vzINIXR1anUzVhEr78wZfx7TKxIm6CwvQnMGeGU=;
+        b=jDSXvIsWfFKzFQptBOU16nQa/jV7WqFbqEPTYNEjjZfzZBTZ5gz77EX/D3q+76ILtKKlYB
+        +C5/JPeF5IS+OSkK1WpNeAHpzHbp6g3P1h3/gFWwRmZRYCYj/0ny1TdAlgNJhr1Kq+uk+0
+        PcJpvf7N798bLHZMNfRsBQkQZZkt/EM=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-dz_aewWCM6-VGDnxkWOAnA-1; Fri, 26 May 2023 20:47:42 -0400
+X-MC-Unique: dz_aewWCM6-VGDnxkWOAnA-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-3f51ea554a8so8962291cf.2
+        for <linux-crypto@vger.kernel.org>; Fri, 26 May 2023 17:47:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685148462; x=1687740462;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X9b3vzINIXR1anUzVhEr78wZfx7TKxIm6CwvQnMGeGU=;
+        b=fVCAgpsPLrWsVPGL6q39qb9tvaQPjwmLRUmkUzMV7j5g5CMPiX0c9zkdPMTayoqIND
+         EqY9Aca9Z2e6/qM4e+C2ZrbObjXaXbM2Wc4yiqCGJhBfdHIw5z3DmhMJYpLbulzSKS0M
+         52HLNxL3o3ZNHdQCIogj7N5kMD6pYPQ1QzBig031iE4Do+s7CXCLenRBkS9OTAWjsetU
+         yXyrjN6S3dfl/7nxhqLf9na8l6+HAHBdDQ7yZhQJIdLGauOtmt+YqOp0y/8kye2+AdcD
+         3VnOT/7ywir+2ucVKAtjjzegEDP6jLDRx3TX5sZ60TNgiJHqlBzFwRItgR+hGSOBZIr7
+         j8oQ==
+X-Gm-Message-State: AC+VfDwkZF0bGD1veud0XcTquYo6le9CofM+ikbHhykcJjL0aI2dh2I8
+        SwTocBuAcgqZltF7MQOE7AO2/ect2VUN/LN2/cCNA2adw8VpSMmsEvia+OR1I64p5FuK/YgYNx4
+        t7yezpkkqZgniV5FqjEr6dqSOuo79DfgV52GxyK+j
+X-Received: by 2002:a05:622a:86:b0:3f6:a490:49c0 with SMTP id o6-20020a05622a008600b003f6a49049c0mr3648199qtw.49.1685148461907;
+        Fri, 26 May 2023 17:47:41 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6HF6ptc85/qFKOadVoNN128ATBRgixZ9TzgK4szV2iFc9QcAgqllIS1WAphW/kC0r338Dd24DCMx6ic7EY3KQ=
+X-Received: by 2002:a05:622a:86:b0:3f6:a490:49c0 with SMTP id
+ o6-20020a05622a008600b003f6a49049c0mr3648186qtw.49.1685148461651; Fri, 26 May
+ 2023 17:47:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230525160446.43800-3-mmyangfl@gmail.com>
+References: <20221013184028.129486-1-leobras@redhat.com> <20221013184028.129486-5-leobras@redhat.com>
+In-Reply-To: <20221013184028.129486-5-leobras@redhat.com>
+From:   Leonardo Bras Soares Passos <leobras@redhat.com>
+Date:   Fri, 26 May 2023 21:47:30 -0300
+Message-ID: <CAJ6HWG62EgsivTKFUwwtSEsozY40PO8CD9P9wP7=NfYwhpBbnw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] crypto/pcrypt: Do not use isolated CPUs for callback
+To:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Tejun Heo <tj@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Phil Auld <pauld@redhat.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Wang Yufen <wangyufen@huawei.com>, mtosatti@redhat.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+Friendly ping
+(for this single patch)
 
-kernel test robot noticed the following build warnings:
+On Thu, Oct 13, 2022 at 3:41=E2=80=AFPM Leonardo Bras <leobras@redhat.com> =
+wrote:
+>
+> Currently pcrypt_aead_init_tfm() will pick callback cpus (ctx->cb_cpu)
+> from any online cpus. Later padata_reorder() will queue_work_on() the
+> chosen cb_cpu.
+>
+> This is undesired if the chosen cb_cpu is listed as isolated (i.e. using
+> isolcpus=3D... or nohz_full=3D... kernel parameters), since the work queu=
+ed
+> will interfere with the workload on the isolated cpu.
+>
+> Make sure isolated cpus are not used for pcrypt.
+>
+> Signed-off-by: Leonardo Bras <leobras@redhat.com>
+> ---
+>  crypto/pcrypt.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+> index 9d10b846ccf73..0162629a03957 100644
+> --- a/crypto/pcrypt.c
+> +++ b/crypto/pcrypt.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/kobject.h>
+>  #include <linux/cpu.h>
+>  #include <crypto/pcrypt.h>
+> +#include <linux/sched/isolation.h>
+>
+>  static struct padata_instance *pencrypt;
+>  static struct padata_instance *pdecrypt;
+> @@ -175,13 +176,15 @@ static int pcrypt_aead_init_tfm(struct crypto_aead =
+*tfm)
+>         struct pcrypt_instance_ctx *ictx =3D aead_instance_ctx(inst);
+>         struct pcrypt_aead_ctx *ctx =3D crypto_aead_ctx(tfm);
+>         struct crypto_aead *cipher;
+> +       const cpumask_t *hk_wq =3D housekeeping_cpumask(HK_TYPE_WQ);
+>
+>         cpu_index =3D (unsigned int)atomic_inc_return(&ictx->tfm_count) %
+> -                   cpumask_weight(cpu_online_mask);
+> +                   cpumask_weight_and(hk_wq, cpu_online_mask);
+>
+> -       ctx->cb_cpu =3D cpumask_first(cpu_online_mask);
+> +       ctx->cb_cpu =3D cpumask_first_and(hk_wq, cpu_online_mask);
+>         for (cpu =3D 0; cpu < cpu_index; cpu++)
+> -               ctx->cb_cpu =3D cpumask_next(ctx->cb_cpu, cpu_online_mask=
+);
+> +               ctx->cb_cpu =3D cpumask_next_and(ctx->cb_cpu, hk_wq,
+> +                                              cpu_online_mask);
+>
+>         cipher =3D crypto_spawn_aead(&ictx->spawn);
+>
+> --
+> 2.38.0
+>
 
-[auto build test WARNING on 44c026a73be8038f03dbdeef028b642880cf1511]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230526-002048
-base:   44c026a73be8038f03dbdeef028b642880cf1511
-patch link:    https://lore.kernel.org/r/20230525160446.43800-3-mmyangfl%40gmail.com
-patch subject: [PATCH v3 2/2] crypto: hisilicon/advca - Add SHA support
-config: alpha-randconfig-s033-20230526 (https://download.01.org/0day-ci/archive/20230527/202305270619.CZWqR9rV-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 12.1.0
-reproduce:
-        mkdir -p ~/bin
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/e564a62a5be87775c20a4de84d42b8be79be9d11
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review David-Yang/crypto-hisilicon-Add-HiSilicon-ADVCA-Subsystem/20230526-002048
-        git checkout e564a62a5be87775c20a4de84d42b8be79be9d11
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=alpha olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=alpha SHELL=/bin/bash drivers/crypto/hisilicon/advca/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202305270619.CZWqR9rV-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:163:32: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int [usertype] b @@     got restricted __be32 [usertype] @@
-   drivers/crypto/hisilicon/advca/hisi-advca-sha.c:163:32: sparse:     expected unsigned int [usertype] b
-   drivers/crypto/hisilicon/advca/hisi-advca-sha.c:163:32: sparse:     got restricted __be32 [usertype]
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:269:25: sparse: sparse: cast to restricted __be32
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:269:25: sparse: sparse: cast to restricted __be32
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:269:25: sparse: sparse: cast to restricted __be32
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:269:25: sparse: sparse: cast to restricted __be32
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:269:25: sparse: sparse: cast to restricted __be32
->> drivers/crypto/hisilicon/advca/hisi-advca-sha.c:269:25: sparse: sparse: cast to restricted __be32
-
-vim +163 drivers/crypto/hisilicon/advca/hisi-advca-sha.c
-
-   152	
-   153	/*
-   154	 * must be called before setting SHA_START
-   155	 * does nothing if import is not supported (SHA_TYPE_HASH)
-   156	 */
-   157	static void hica_sha_import(const struct hica_sha_priv *priv, const void *state)
-   158	{
-   159		if (priv->type != SHA_TYPE_MHASH)
-   160			return;
-   161	
-   162		for (unsigned int i = 0; i < SHA_DIGEST_SIZE; i += sizeof(u32))
- > 163			writel_relaxed(cpu_to_be32(*(const u32 *) (state + i)),
-   164				       priv->base + SHA_INIT0 + i);
-   165	}
-   166	
-   167	static int hica_sha_init(const struct hica_sha_priv *priv,
-   168				 const struct hica_sha_ctrl *ctrl, bool state)
-   169	{
-   170		u32 val;
-   171		int ret;
-   172	
-   173		/* re-enable SHA_START */
-   174		ret = reset_control_assert(priv->rst) ?:
-   175		      reset_control_deassert(priv->rst);
-   176		if (ret)
-   177			return ret;
-   178	
-   179		/* config SHA_CTRL */
-   180		val = readl_relaxed(priv->base + SHA_CTRL);
-   181	
-   182		val &= ~SHA_SINGLE_READ;
-   183		val &= ~SHA_ALG;
-   184		val |= (ctrl->alg << 1) & SHA_ALG;
-   185		val &= ~SHA_HMAC;
-   186		val |= SHA_ENDIAN;
-   187	
-   188		if (priv->type == SHA_TYPE_HASH)
-   189			val |= SHA_USED_BY_ARM;
-   190		else if (state)
-   191			val |= SHA_SET_INIT;
-   192	
-   193		writel(val, priv->base + SHA_CTRL);
-   194	
-   195		/* test SHA_CTRL */
-   196		val = readl_relaxed(priv->base + SHA_CTRL);
-   197		if (val & SHA_USED_BY_C51)
-   198			return -EBUSY;
-   199	
-   200		/* wait ready */
-   201		if (hica_sha_wait(priv, SHA_HASH_READY))
-   202			return -ETIMEDOUT;
-   203	
-   204		/* ask device to set state */
-   205		writel(SHA_START_BIT, priv->base + SHA_START);
-   206	
-   207		pr_debug("%s: alg %u\n", __func__, ctrl->alg);
-   208		return 0;
-   209	}
-   210	
-   211	static int hica_sha_update(const struct hica_sha_priv *priv, const void *data,
-   212				   unsigned int len, bool may_sleep)
-   213	{
-   214		struct device *dev = priv->dev;
-   215		bool inplace = !((uintptr_t) data & 3);
-   216		u8 *buf = NULL;
-   217		dma_addr_t addr;
-   218		int ret;
-   219	
-   220		if (!len)
-   221			return 0;
-   222	
-   223		if (WARN_ON(len % SHA_BLOCK_SIZE))
-   224			return -EINVAL;
-   225	
-   226		if (inplace) {
-   227			addr = dma_map_single(dev, (void *) data, len, DMA_TO_DEVICE);
-   228			if (dma_mapping_error(dev, addr)) {
-   229				dev_err(dev, "error mapping src\n");
-   230				return -EIO;
-   231			}
-   232	
-   233			inplace = !(addr & 3);
-   234			if (!inplace)
-   235				dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
-   236		}
-   237	
-   238		if (!inplace) {
-   239			buf = dma_alloc_attrs(dev, len, &addr,
-   240					      may_sleep ? GFP_KERNEL : GFP_ATOMIC, 0);
-   241			if (!buf)
-   242				return -ENOMEM;
-   243			memcpy(buf, data, len);
-   244		}
-   245	
-   246		dma_sync_single_for_device(dev, addr, len, DMA_TO_DEVICE);
-   247		ret = hica_sha_record(priv, addr, len) ?:
-   248		      hica_sha_wait(priv, SHA_RECORD_READY);
-   249	
-   250		if (!buf)
-   251			dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
-   252		else {
-   253			memzero_explicit(buf, len);
-   254			dma_free_attrs(dev, len, buf, addr, 0);
-   255		}
-   256	
-   257		pr_debug("%s: read %u\n", __func__, len);
-   258		return ret;
-   259	}
-   260	
-   261	static int hica_sha_export(const struct hica_sha_priv *priv, void *out,
-   262				   unsigned int digestsize)
-   263	{
-   264		if (hica_sha_wait(priv, SHA_RECORD_READY))
-   265			return -ETIMEDOUT;
-   266	
-   267		for (unsigned int i = 0; i < digestsize; i += sizeof(u32))
-   268			*(u32 *) (out + i) =
- > 269				be32_to_cpu(readl_relaxed(priv->base + SHA_OUT0 + i));
-   270	
-   271		return 0;
-   272	}
-   273	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
