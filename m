@@ -2,73 +2,75 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E768C77B7E
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 May 2023 18:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA77C77B7E
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 May 2023 03:42:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbjE1SRs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 May 2023 14:17:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52726 "EHLO
+        id S229627AbjE2Dl5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 28 May 2023 23:41:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjE1SRr (ORCPT
+        with ESMTP id S229589AbjE2Dl5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 May 2023 14:17:47 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2ECA8;
-        Sun, 28 May 2023 11:17:46 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3f6dfc4dffaso16813395e9.0;
-        Sun, 28 May 2023 11:17:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685297865; x=1687889865;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cWG6nB2NgjGQQddfrL4CH/8guhB7MB2C+knV5je6m/g=;
-        b=H6aS80i4wnhyB+doX5BIrcf1n3ZOU4YkJ8NEt2a4aGkhZNVb+EtoS549BJfxKIOQVW
-         pCLZQJ7fQms2PDgYuOxMFPRcxfnUfzhnQ44x79D4eQOlXFEfp9uzDfxMLAJScpnZA113
-         2s+JpNAYIQbJjdQFrMdI5cMtUnCx6dj+8DG1RTDVkGWJoq2aNVUlnle+10t2HXWLqQfQ
-         n/5hu5ivDBiwKxfRYFmK99LER3pV4e0WjBZyDxcbBYTfCajbMgCBvnzzYKcc6o+Pjv5o
-         6MmY1pIsO5AkMQn24l4Lrd8RF3TY6WqYuKxIrukpfPmJ6soRsZsRgLuLLtkDFZOSba68
-         H/2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685297865; x=1687889865;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cWG6nB2NgjGQQddfrL4CH/8guhB7MB2C+knV5je6m/g=;
-        b=BJtczxYYJvJkMtAu3uCbIMbLcPmSnUayab7lWn3Ld2l7PZm1nAm8MVmJGmknil/qVW
-         32MOOKBu1H6cPgtEwfdtBH+eTYenypTLoY2QfqsunY+GE2Pgm3or+aE65/Qr8RWLmHpm
-         2jkwxPOHnaC0KqTO1oq8Ofx4T1eEj6nshvM1cH2bt1Aezdo+m5B+8Qp6MjTaKHrNI8+U
-         NlZ7lYCvE1Elofb1YlTZRp/O/LQWdMyyoUBZGlCWxNNqP8p7fiYlCxnk/X+IoheZyELZ
-         pOi+sFap6FfwKO62cT5DfPrY9dUoI/z8WD6jErOONfEsgrqfRJAmHzgi+2D/JiEvJcy6
-         kDTA==
-X-Gm-Message-State: AC+VfDzxRW0doMbvaN8G1YN9gxgcWXDfFU0aJHBsBOn0BP/GcjM5j+cA
-        QMyZ2R2LpTaI3Sqe8X2L4+Y=
-X-Google-Smtp-Source: ACHHUZ6xsmJ1CrGjsEW0lipHfZD7qf0IW28Al2vz0S6vcIwSb/Z3txBItIb5/e0kirLW8VLEFSE+3g==
-X-Received: by 2002:a7b:c4d9:0:b0:3f6:244:55e3 with SMTP id g25-20020a7bc4d9000000b003f6024455e3mr7250659wmk.35.1685297864820;
-        Sun, 28 May 2023 11:17:44 -0700 (PDT)
-Received: from solport.. (203.red-83-43-24.dynamicip.rima-tde.net. [83.43.24.203])
-        by smtp.gmail.com with ESMTPSA id u4-20020a7bc044000000b003f6f6a6e760sm5277502wmc.32.2023.05.28.11.17.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 May 2023 11:17:44 -0700 (PDT)
-From:   =?UTF-8?q?Joan=20Bruguera=20Mic=C3=B3?= <joanbrugueram@gmail.com>
-To:     Thorsten Leemhuis <linux@leemhuis.info>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 28 May 2023 23:41:57 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8395AF;
+        Sun, 28 May 2023 20:41:52 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1q3TlM-00EIv4-MU; Mon, 29 May 2023 11:41:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 May 2023 11:41:40 +0800
+Date:   Mon, 29 May 2023 11:41:40 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>
-Subject: Re: build error while building arch/x86/purgatory/sha256.o: invalid 'asm': operand is not a condition code [...]
-Date:   Sun, 28 May 2023 18:17:37 +0000
-Message-Id: <20230528181737.388171-1-joanbrugueram@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230528164031.266590-1-joanbrugueram@gmail.com>
-References: <20230528164031.266590-1-joanbrugueram@gmail.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.4
+Message-ID: <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
+References: <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+ <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
+ <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
+ <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
+ <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
+ <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
+ <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+ <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adding `-fstrict-flex-arrays=3` to `PURGATORY_CFLAGS_REMOVE` in
-`arch/x86/purgatory/Makefile` fixes the build, through I don't know if
-that's the best solution.
+Hi Linus:
+
+The following changes since commit b8969a1b69672b163d057e7745ebc915df689211:
+
+  crypto: api - Fix CRYPTO_USER checks for report function (2023-05-02 18:22:24 +0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 v6.4-p3 
+
+for you to fetch changes up to 6ab39f99927eed605728b02d512438d828183c97:
+
+  crypto: x86/aria - Use 16 byte alignment for GFNI constant vectors (2023-05-24 18:10:27 +0800)
+
+----------------------------------------------------------------
+This push fixes an alignment crash in x86/aria.
+----------------------------------------------------------------
+
+Ard Biesheuvel (1):
+      crypto: x86/aria - Use 16 byte alignment for GFNI constant vectors
+
+ arch/x86/crypto/aria-aesni-avx-asm_64.S | 2 --
+ 1 file changed, 2 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
