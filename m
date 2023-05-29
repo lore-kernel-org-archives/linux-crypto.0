@@ -2,75 +2,136 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA77C77B7E
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 May 2023 03:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD5AC7EE23
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 May 2023 06:13:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbjE2Dl5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 May 2023 23:41:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37396 "EHLO
+        id S230347AbjE2GNc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 29 May 2023 02:13:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjE2Dl5 (ORCPT
+        with ESMTP id S229629AbjE2GN2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 May 2023 23:41:57 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8395AF;
-        Sun, 28 May 2023 20:41:52 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q3TlM-00EIv4-MU; Mon, 29 May 2023 11:41:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 29 May 2023 11:41:40 +0800
-Date:   Mon, 29 May 2023 11:41:40 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.4
-Message-ID: <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
-References: <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
- <ZARrt99wJb7IhoY4@gondor.apana.org.au>
- <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+        Mon, 29 May 2023 02:13:28 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01105AD
+        for <linux-crypto@vger.kernel.org>; Sun, 28 May 2023 23:13:26 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3f6ffc2b314so4950885e9.0
+        for <linux-crypto@vger.kernel.org>; Sun, 28 May 2023 23:13:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1685340805; x=1687932805;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=N0GoosA+9uka02/xKEt1rQ6orV6x3wMmK2ZhU5cav+I=;
+        b=K46+v7wYyQems0d2CvKbmd9LpTmOQUbsYBKc1WWH8U65Zrgp5Fe5s8mYfCviEyRAUV
+         R5NPDDZlDkCsV394FnSuNk+p96qQ7TJQU5P1J9rCaKpCHZXP3zxtlFexRdADTSaszglY
+         gtKU0lTE0Oq7P1LJ8k4yWW9RYFoXAvPLqBPjqk4MhQtCKyDYcLDTXOER8xq4vLiTNta1
+         VAPZ3b5ktwOBUwseYrVuD9/+CJhZSTzPVSmNUzAJSfpp869uBcIYXdUayLr7K5sc0iuX
+         fA+i+wxiTw7sYD2Le/5bBduMLw3NGHzYyy2NK9vZiGorPo46V9tZB5F5Wj0IRR5cD7gU
+         WThQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685340805; x=1687932805;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N0GoosA+9uka02/xKEt1rQ6orV6x3wMmK2ZhU5cav+I=;
+        b=lhWfOAVs8/vpgLqKLHBa2agGzlHgFkfz1+PJ+ieKoiS1cpFsvlRvdCpZEyoqwd4Nx7
+         wqnuvWZaF88oS5Fbjv0XpF1wpgf9qoLBWhC/MOFUun4xjJLy/GMTL61sEHjLswntn/Bu
+         Y1ihgDZDXeBGNt02JyLvus+ktQD5eJnOEJUpuZL/XC6wQu/zUgBkujHtOyr7in/RHqXk
+         7Nk+CnBTnxChtZSzjUtPJ0QFHVsc+BNrnaNXraU/XeGetGMoe0iZo+DjizkIh5raUIzp
+         AXAv4eFhn6atzbcXzz60oelDMp0U6Kw/t56WsjQUcW5s+6ooYOwENuTfBjYcid+HrrVi
+         JEjw==
+X-Gm-Message-State: AC+VfDwzswbrZZtIvXLPjORRXhsqre2LaVo7ued0D6ckfWAA93wWnP1u
+        N/yjES2ZeTXzLiRgGRyUiiBbkQE8+AbluZRSPlEthQ==
+X-Google-Smtp-Source: ACHHUZ6G1tf+Gf5X/mMh8v33xYphjI7AZtG1DORt+A6DQvoqWXp2ntBRnYy5vqfrG+UbsUuNLaIQL7it7ADddzUT1vg=
+X-Received: by 2002:a05:6000:18c4:b0:309:5889:b86a with SMTP id
+ w4-20020a05600018c400b003095889b86amr5935028wrq.27.1685340805413; Sun, 28 May
+ 2023 23:13:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org> <20230526192210.3146896-2-bhupesh.sharma@linaro.org>
+In-Reply-To: <20230526192210.3146896-2-bhupesh.sharma@linaro.org>
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Date:   Mon, 29 May 2023 11:43:11 +0530
+Message-ID: <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
+Subject: Re: [PATCH v8 01/11] dt-bindings: dma: Add support for SM6115 and
+ QCM2290 SoCs
+To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
+        robh+dt@kernel.org, konrad.dybcio@linaro.org,
+        vladimir.zapolskiy@linaro.org, rfoss@kernel.org,
+        neil.armstrong@linaro.org, djakov@kernel.org, stephan@gerhold.net,
+        Rob Herring <robh@kernel.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+Hi Vinod,
 
-The following changes since commit b8969a1b69672b163d057e7745ebc915df689211:
+> On Sat, 27 May 2023 at 00:52, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
+>
+> Add new compatible for BAM DMA engine version v1.7.4 which is
+> found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
+> to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
+> accordingly.
+>
+> While at it, also update qcom,bam-dma bindings to add comments
+> which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
+> This provides an easy reference for identifying the actual BAM DMA
+> version available on Qualcomm SoCs.
+>
+> Acked-by: Rob Herring <robh@kernel.org>
+> Tested-by: Anders Roxell <anders.roxell@linaro.org>
+> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> index f1ddcf672261..c663b6102f50 100644
+> --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> @@ -15,13 +15,19 @@ allOf:
+>
+>  properties:
+>    compatible:
+> -    enum:
+> -        # APQ8064, IPQ8064 and MSM8960
+> -      - qcom,bam-v1.3.0
+> -        # MSM8974, APQ8074 and APQ8084
+> -      - qcom,bam-v1.4.0
+> -        # MSM8916 and SDM845
+> -      - qcom,bam-v1.7.0
+> +    oneOf:
+> +      - enum:
+> +          # APQ8064, IPQ8064 and MSM8960
+> +          - qcom,bam-v1.3.0
+> +          # MSM8974, APQ8074 and APQ8084
+> +          - qcom,bam-v1.4.0
+> +          # MSM8916, SDM630
+> +          - qcom,bam-v1.7.0
+> +      - items:
+> +          - enum:
+> +              # SDM845, SM6115, SM8150, SM8250 and QCM2290
+> +              - qcom,bam-v1.7.4
+> +          - const: qcom,bam-v1.7.0
+>
+>    clocks:
+>      maxItems: 1
+> --
+> 2.38.1
 
-  crypto: api - Fix CRYPTO_USER checks for report function (2023-05-02 18:22:24 +0800)
+Bjorn has applied the dts patches from this series to his tree.
+As suggested by him, can you please pick patches [PATCH 1/11] and
+[PATCH 2/11] from this series via the 'dmaengine' tree.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 v6.4-p3 
-
-for you to fetch changes up to 6ab39f99927eed605728b02d512438d828183c97:
-
-  crypto: x86/aria - Use 16 byte alignment for GFNI constant vectors (2023-05-24 18:10:27 +0800)
-
-----------------------------------------------------------------
-This push fixes an alignment crash in x86/aria.
-----------------------------------------------------------------
-
-Ard Biesheuvel (1):
-      crypto: x86/aria - Use 16 byte alignment for GFNI constant vectors
-
- arch/x86/crypto/aria-aesni-avx-asm_64.S | 2 --
- 1 file changed, 2 deletions(-)
+Seems some Cc fields got messed up while sending the patchset, so
+Cc'ing the dmaengine list again.
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Bhupesh
