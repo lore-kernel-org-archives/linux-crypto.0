@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB145C7EE23
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 May 2023 10:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65FCEC7EE29
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 May 2023 10:15:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231396AbjE3KKK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 May 2023 06:10:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44796 "EHLO
+        id S229720AbjE3KPF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 May 2023 06:15:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231136AbjE3KJn (ORCPT
+        with ESMTP id S231438AbjE3KPE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 May 2023 06:09:43 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F5593;
-        Tue, 30 May 2023 03:09:37 -0700 (PDT)
+        Tue, 30 May 2023 06:15:04 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9EF93;
+        Tue, 30 May 2023 03:15:02 -0700 (PDT)
 Received: from stefanw-SCHENKER ([37.4.248.58]) by mrelayeu.kundenserver.de
  (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1N1gac-1qEl5B15OC-0121IH; Tue, 30 May 2023 12:09:09 +0200
+ 1MTzOe-1pe3Py0phi-00R2ux; Tue, 30 May 2023 12:09:08 +0200
 From:   Stefan Wahren <stefan.wahren@i2se.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -30,64 +30,57 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     Marek Vasut <marex@denx.de>, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
-        Stefan Wahren <stefan.wahren@i2se.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH V4 2/2] dt-bindings: imxgpt: add imx6ul compatible
-Date:   Tue, 30 May 2023 12:08:43 +0200
-Message-Id: <20230530100843.15072-3-stefan.wahren@i2se.com>
+        Stefan Wahren <stefan.wahren@i2se.com>
+Subject: [PATCH V4 0/2] dt-bindings: imx: Fix dtbs_check warnings
+Date:   Tue, 30 May 2023 12:08:41 +0200
+Message-Id: <20230530100843.15072-1-stefan.wahren@i2se.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230530100843.15072-1-stefan.wahren@i2se.com>
-References: <20230530100843.15072-1-stefan.wahren@i2se.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:q+6glmaBLTUjizXeKRScM+ThD4mzq5bQPImbRnYuNw8FauQ0lb+
- jXdEnpleoDdFRUXr73DrVn4cbennLfQOBxp8n8uljUgB0rn3s1QEU7qC6yfJD0y2uMinpaq
- EjAo/a+3MrrCGf13y7uwHIGdkuYzV8tyzbtCGLWJz48PQmgEhmXyxvn0pWlhMOQUHhVDsjS
- aQyASebSuJcP0uJnimhew==
-UI-OutboundReport: notjunk:1;M01:P0:6JsSqUpKsQg=;LuYs2rRX5rdwDRMVXWTFSE4j3Vm
- Cg9nHmh1jE7c8FEvQJl7dbq5iAGCQSBk9ldl0JOiXykrpkOc1T8+HW+kDUjgGt888s5Xuaa+F
- q8F86TVVbf9Ac31OpdxBBNdyRhfoQmoSMgFd+xeQKvVGf6eDcrbE9FSY/cmLTIh43oeEF4yCg
- VD63RfaSYVNbN5vusaGJv6uMmS/JEc4hByCZMGMul//BksgYpq3gyAa5UMCq539lhDuCQLVP9
- ulGOsqt94023ctjxyny+AtvAco5df6kS4PmDQZL/hllp/AzFSD0qLNcfzyK+HG0fDWuuNts/v
- 9QkszW96oGzF0Hqs2FTmWflKGeh5Y54XDTkciwt+9bC6zUoiBj9jy+r986o2GWC5GNMgt/wJd
- r3qQUCccUL9lr4w3aWOKaM++/O1X6KXi5RwO7j8+kArlTnJHcqzzt09KAN3OoZky8JOHewlT3
- Fi97Kc5BpwHu9S7MR+bGDLDDRmnkZGI/GDYt3LE6tlQQdv4/pniS0O4qS7KxTaV5zTu4uII1p
- mPWhMjJFC6gVrp2tju06Y4P4efRJBYpj9a2OGBGTjp4ty25RVLUHMN+jjuDi7v8s3InF9R6q/
- yLiVU9YWeCIZUhyzLCTztQOSq40FoRFEFQU6+nDqH6ue+aZv40D4hiCpPE+f58qjJpzQ8BstI
- NgPlOb8Y5uzXduHoQSNfHXLTdFNrJ5AAPU1L/jYvzA==
+X-Provags-ID: V03:K1:cmG0J6+3RtVmaV1J0wWj307gxunjjnimgjFaE9b6lVjMHRQjufg
+ bczJG8hWuj3cBP0mZBDkoj0Rx0boCBSHEqMopw1W/fl3a1EBEJayHTZOi4yy71Rdp0QPX4p
+ SoC2FaxRJQfVTSVVZo/iU34Wa1jcSC+Plmp+kz+DzQZK5viI8M0AaMBXH7HH5Y4meA+X1wY
+ 3zBD4aY/eCzRVei9EVb9w==
+UI-OutboundReport: notjunk:1;M01:P0:MFVebADgs8M=;xnkBNB/IZ2UWaMjlN/W/WmW97Al
+ 8Ur6JxLVRiRyU3Y91c+1lvMElxZ/mS4v2hrJH5/7lXDMmnre9AE4aXY+nNeNtM4Nirc/LZ2WH
+ WEiOm6FoHBV4/bNAGNmLMgpKgfYCsg5uHtTfaCXBcpWGNwgqfwajCTrN7biTMtskOCAM7C8H3
+ UNCI5trU59lHwLrOCA3sqTYd5RlZ5IiOi2Z14nWp0he+mAjEEyDa14Vh8Usp3kYTPCr4YRLJa
+ YwRrQ1YcchfzBvqCkXAp+m519anBb11NIU7eOO98HUNFeusmAb/6ue0sGCp98KAln5P99Rm+3
+ LYAcw/KsmkgXu1R3ZvCw/2aWAWgCBmywX02CMTyvym5cJE3apezJU1pYjeHWGeITaChKI6afw
+ L4REzpuoCa+7KxFfQRkzUhkoC5sKsLk4NDvT9AZRlVIfd9Nko2JkPnTUcOY7CJz2GnNCVqcXM
+ Ft3d0TX1zRsC7vclohVP5qI93fnKvhNcdoodOS2Lfcn8+lA4/UalTOLfMuabpR9XZMT+r+4Bn
+ t0gHywGxYm05hUNVLwRlmg15WFgd54dK0vauXotvsahfAVjeRFodH9KUzoxUNyMnKpJSDzgDR
+ TCjZxbJBqxk0ZbGBnsDdNAjlUtngNTjJA8+Xa4v60DFgUyw9yMMhpJFivmGbXTZnHNSYNWg8Y
+ Q9zRzXrsSh2dWNBuIW6ZdUgSsuDcqeZ0w/XoyYtSRA==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the dtbs_check for imx6ul generates warnings like this:
+This series tries to address some dtbs_check warnings on i.MX6ULL.
 
-['fsl,imx6ul-gpt', 'fsl,imx6sx-gpt'] is too long
+Changes in V4:
+- drop patch 1 from V3 which has already been addressed by Marek Vasut
+- drop already applied patches from V3 (#3, #5, #6) 
 
-According to the timer-imx-gpt driver all imx6 use the same imx6dl data,
-but according to the existing DTS files the imx6ul GPT IP is derived from
-imx6sx. So better follow the DTS files here and make the imx6ul GPT
-compatible to the imx6sl one to fix the warning.
+Changes in V3:
+- add Krzysztof's Reviewed-Bys
+- fix indentation in Patch 6 found by Krzysztof Kozlowski
 
-Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml | 3 +++
- 1 file changed, 3 insertions(+)
+Changes in V2:
+- new patch to fix fsl-imx-uart warnings 
+- fixed GPC typo found by Fabio Estevam
+- keep enum in bindings as suggested by Krzysztof Kozlowski
+- make imx6ul GPT compatible to imx6sx
 
-diff --git a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
-index 716c6afcca1f..685137338ac9 100644
---- a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
-+++ b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
-@@ -34,6 +34,9 @@ properties:
-               - fsl,imxrt1050-gpt
-               - fsl,imxrt1170-gpt
-           - const: fsl,imx6dl-gpt
-+      - items:
-+          - const: fsl,imx6ul-gpt
-+          - const: fsl,imx6sx-gpt
- 
-   reg:
-     maxItems: 1
+
+Stefan Wahren (2):
+  dt-bindings: crypto: fsl-dcp: add imx6sl and imx6ull compatible
+  dt-bindings: imxgpt: add imx6ul compatible
+
+ .../devicetree/bindings/crypto/fsl-dcp.yaml          | 12 +++++++++---
+ .../devicetree/bindings/timer/fsl,imxgpt.yaml        |  3 +++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
 -- 
 2.34.1
 
