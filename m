@@ -2,160 +2,127 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1B9C77B73
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 May 2023 13:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DADAC7EE31
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 May 2023 14:18:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbjE3Nvy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 May 2023 09:51:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
+        id S231926AbjE3OSd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 May 2023 10:18:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbjE3Nvv (ORCPT
+        with ESMTP id S232500AbjE3OSc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 May 2023 09:51:51 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9882115
-        for <linux-crypto@vger.kernel.org>; Tue, 30 May 2023 06:51:44 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1q3zkW-0001PG-Iu; Tue, 30 May 2023 15:50:56 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1q3zkQ-003tB5-4p; Tue, 30 May 2023 15:50:50 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1q3zkP-009W9H-Ah; Tue, 30 May 2023 15:50:49 +0200
-Date:   Tue, 30 May 2023 15:50:46 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Li Yang <leoyang.li@nxp.com>
-Cc:     Stuart Yoder <stuyoder@gmail.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Roy Pledge <roy.pledge@nxp.com>,
-        "Diana Madalina Craciun (OSS)" <diana.craciun@oss.nxp.com>,
+        Tue, 30 May 2023 10:18:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F7AE11F
+        for <linux-crypto@vger.kernel.org>; Tue, 30 May 2023 07:17:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685456220;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MWi+zmGc/Ddi01/GgCyhiHQp9bA5/4VLjJA2qlX57j4=;
+        b=fiGqG/wQDfEI4Yz9MNBLR0lGysiD522RuXgCcG/fOuMVuNDsFYNcoiEn1PLAGWow3QQUUB
+        kh+xEyfuXZ8bQhvBKXnBebymcIcixP8EHJxBGody1dRy557bxWrHoMwHp54Mw2UYWrYDCX
+        z3g6ds9zjDoqiPr5xM6sEb6Wj3wYPpM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-434-TTCJgiS3MASF7UDkH-Yhcw-1; Tue, 30 May 2023 10:16:56 -0400
+X-MC-Unique: TTCJgiS3MASF7UDkH-Yhcw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8D8780331C;
+        Tue, 30 May 2023 14:16:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3150148205E;
+        Tue, 30 May 2023 14:16:52 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
-        Ioana Ciornei <ioana.ciornei@nxp.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        "Y.B. Lu" <yangbo.lu@nxp.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 0/6] bus: fsl-mc: Make remove function return void
-Message-ID: <20230530135046.oovq5gxzbjfqgzos@pengutronix.de>
-References: <20230310224128.2638078-1-u.kleine-koenig@pengutronix.de>
- <20230412171056.xcluewbuyytm77yp@pengutronix.de>
- <AM0PR04MB6289BB9BA4BC0B398F2989108F9B9@AM0PR04MB6289.eurprd04.prod.outlook.com>
- <20230413060004.t55sqmfxqtnejvkc@pengutronix.de>
- <20230508134300.s36d6k4e25f6ubg4@pengutronix.de>
- <CADRPPNQ0QiLzzKhHon62haPJCanDoN=B4QsWCxunJTc4wXwMaA@mail.gmail.com>
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 00/10] crypto, splice, net: Make AF_ALG handle sendmsg(MSG_SPLICE_PAGES)
+Date:   Tue, 30 May 2023 15:16:24 +0100
+Message-ID: <20230530141635.136968-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="4dpyuum7f6cyucl4"
-Content-Disposition: inline
-In-Reply-To: <CADRPPNQ0QiLzzKhHon62haPJCanDoN=B4QsWCxunJTc4wXwMaA@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Here's the fourth tranche of patches towards providing a MSG_SPLICE_PAGES
+internal sendmsg flag that is intended to replace the ->sendpage() op with
+calls to sendmsg().  MSG_SPLICE_PAGES is a hint that tells the protocol
+that it should splice the pages supplied if it can.
 
---4dpyuum7f6cyucl4
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This set consists of the following parts:
 
-Hello,
+ (1) Move netfs_extract_iter_to_sg() to somewhere more general and rename
+     it to drop the "netfs" prefix.  We use this to extract directly from
+     an iterator into a scatterlist.
 
-On Mon, May 08, 2023 at 04:57:00PM -0500, Li Yang wrote:
-> On Mon, May 8, 2023 at 8:44=E2=80=AFAM Uwe Kleine-K=C3=B6nig
-> <u.kleine-koenig@pengutronix.de> wrote:
-> > On Thu, Apr 13, 2023 at 08:00:04AM +0200, Uwe Kleine-K=C3=B6nig wrote:
-> > > On Wed, Apr 12, 2023 at 09:30:05PM +0000, Leo Li wrote:
-> > > > > On Fri, Mar 10, 2023 at 11:41:22PM +0100, Uwe Kleine-K=C3=B6nig w=
-rote:
-> > > > > > Hello,
-> > > > > >
-> > > > > > many bus remove functions return an integer which is a historic
-> > > > > > misdesign that makes driver authors assume that there is some k=
-ind of
-> > > > > > error handling in the upper layers. This is wrong however and
-> > > > > > returning and error code only yields an error message.
-> > > > > >
-> > > > > > This series improves the fsl-mc bus by changing the remove call=
-back to
-> > > > > > return no value instead. As a preparation all drivers are chang=
-ed to
-> > > > > > return zero before so that they don't trigger the error message.
-> > > > >
-> > > > > Who is supposed to pick up this patch series (or point out a good=
- reason for
-> > > > > not taking it)?
-> > > >
-> > > > Previously Greg KH picked up MC bus patches.
-> > > >
-> > > > If no one is picking up them this time, I probably can take it thro=
-ugh
-> > > > the fsl soc tree.
-> > >
-> > > I guess Greg won't pick up this series as he didn't get a copy of it =
-:-)
-> > >
-> > > Browsing through the history of drivers/bus/fsl-mc there is no
-> > > consistent maintainer to see. So if you can take it, that's very
-> > > appreciated.
-> >
-> > My mail was meant encouraging, maybe it was too subtile? I'll try again:
-> >
-> > Yes, please apply, that would be wonderful!
->=20
-> Sorry for missing your previous email.  I will do that.  Thanks.
+ (2) Make AF_ALG use iov_iter_extract_pages().  This has the additional
+     effect of pinning pages obtained from userspace rather than taking
+     refs on them.  Pages from kernel-backed iterators would not be pinned,
+     but AF_ALG isn't really meant for use by kernel services.
 
-Either you didn't apply this patch set yet, or your tree isn't in next.
-Both variants would be great to be fixed.
+ (3) Change AF_ALG still further to use extract_iter_to_sg().
 
-I have another change pending for drivers/bus/fsl-mc/fsl-mc-bus.c, would
-be great to see these base patches in next first.
+ (4) Make af_alg_sendmsg() support MSG_SPLICE_PAGES support and make
+     af_alg_sendpage() just a wrapper around sendmsg().  This has to take
+     refs on the pages pinned for the moment.
 
-Best regards
-Uwe
+ (5) Make hash_sendmsg() support MSG_SPLICE_PAGES by simply ignoring it.
+     hash_sendpage() is left untouched to be removed later, after the
+     splice core has been changed to call sendmsg().
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig         =
-   |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+I've pushed the patches here also:
 
---4dpyuum7f6cyucl4
-Content-Type: application/pgp-signature; name="signature.asc"
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=sendpage-4
 
------BEGIN PGP SIGNATURE-----
+David
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmR1/zUACgkQj4D7WH0S
-/k6wYwf/aFknTYegOQsYhfPj+VXVEPLkfLFdy+0HcdoIWviyACOPr3L1s4X6BPqq
-sTJMW1RtfiDybFhNCMN1eH2tx0+vSuLIzI3rpU+vrob5w86uWd6UzbIMR8uxXPCn
-JN5+JDgQsZd0CZKYyCQOw7b+5KpzPhEHKUbUlyxocvtyBE6HFXoQtjsWQnrrCmHl
-gvroNfuqjlh3zmsw8ELv/tyZj207mMkvap8BWsKhMtbhRXg132eMBIFJ+XMB//he
-A7iG3AkhiRNNdYGFh/KKiRv2l1vHd+6+YmPEM4zRxDCtidaBJTbRL5SSs3AVeYK0
-+gXDgOa2Lsf8VzCxRpTavmjQhdDkcA==
-=eJpM
------END PGP SIGNATURE-----
+ver #2)
+ - Put the "netfs_" prefix removal first to shorten lines and avoid
+   checkpatch 80-char warnings.
+ - Fix a couple of spelling mistakes.
+ - Wrap some lines at 80 chars.
 
---4dpyuum7f6cyucl4--
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=51c78a4d532efe9543a4df019ff405f05c6157f6 # part 1
+Link: https://lore.kernel.org/r/20230526143104.882842-1-dhowells@redhat.com/ # v1
+
+David Howells (10):
+  Drop the netfs_ prefix from netfs_extract_iter_to_sg()
+  Fix a couple of spelling mistakes
+  Wrap lines at 80
+  Move netfs_extract_iter_to_sg() to lib/scatterlist.c
+  crypto: af_alg: Pin pages rather than ref'ing if appropriate
+  crypto: af_alg: Use extract_iter_to_sg() to create scatterlists
+  crypto: af_alg: Indent the loop in af_alg_sendmsg()
+  crypto: af_alg: Support MSG_SPLICE_PAGES
+  crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+  crypto: af_alg/hash: Support MSG_SPLICE_PAGES
+
+ crypto/af_alg.c         | 185 ++++++++++++---------------
+ crypto/algif_aead.c     |  38 +++---
+ crypto/algif_hash.c     | 114 +++++++++++------
+ crypto/algif_skcipher.c |  10 +-
+ fs/cifs/smb2ops.c       |   4 +-
+ fs/cifs/smbdirect.c     |   2 +-
+ fs/netfs/iterator.c     | 266 ---------------------------------------
+ include/crypto/if_alg.h |   7 +-
+ include/linux/netfs.h   |   4 -
+ include/linux/uio.h     |   5 +
+ lib/scatterlist.c       | 269 ++++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 459 insertions(+), 445 deletions(-)
+
