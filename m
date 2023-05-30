@@ -2,94 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C91D8C7EE23
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 May 2023 23:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B13C7EE23
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 May 2023 04:23:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjE2XNN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 May 2023 19:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35242 "EHLO
+        id S230016AbjE3EXu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 30 May 2023 00:23:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbjE2XNM (ORCPT
+        with ESMTP id S230021AbjE3EXn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 May 2023 19:13:12 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29429AD;
-        Mon, 29 May 2023 16:13:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=2GSBnGGF/cWciTe090S7qBqvsPOJa4MBkLkJEyta5hk=; b=JVJvd0HZPkeM1i/qHdw8SNFkZm
-        ofwPGKDaFbdxyWAqsXjT+IeCdSOdrhMr2amWD/SVGRRarIqMPqRi7JMhfIalNaMoCsU8XFY/Pim1W
-        ac5KSoDelKbQHKXAE2fA9lUiVPc1Y6A5heX9TVpXbL/m2tfCS3lm9FowHJmiFAzYo3UXIVdBgmpWa
-        SXftjTYfcMw4HRESb0VQuu3bXE9fKTplOvNff2WibOqrOtMwKH8wWwveigf/Q4MVfZ4xlDWaYtfbF
-        TTF8kK2Y2CeUesvsPM6ICOCu4AqUPgCPd5Y0LXdNA3vCS4sfiZmcggoaX5u0ow3ONWO21BqBEXftQ
-        S+Lrsa3Q==;
-Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q3m31-00BtbH-1I;
-        Mon, 29 May 2023 23:13:07 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        kernel test robot <lkp@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Paul Gazzillo <paul@pgazz.com>,
-        Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH] virt: sev-guest: fix kconfig warnings
-Date:   Mon, 29 May 2023 16:13:05 -0700
-Message-Id: <20230529231305.16995-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.40.1
+        Tue, 30 May 2023 00:23:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D6D0E4;
+        Mon, 29 May 2023 21:23:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B057F619B9;
+        Tue, 30 May 2023 04:23:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03344C433D2;
+        Tue, 30 May 2023 04:23:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685420621;
+        bh=GqutkF5MXsruCTwXr5ie/PdJ0e98ztYdsBZec7CiqHU=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=rCXiIQImQZ3BZIQhrr/E5IEfYFqR5NxJfeOT8IxJgsA+pjekgz9LJuZkeCVCGeM1o
+         SdiNRcgHSFViZtDOoOp4lJiLBxkZaRyg9eedKnkE5zF4t7nq0vG1GE8K2a9hU7HARh
+         wR+TqyQyiQLKTvCq3q/fg0j8AuijHn4MSeSlft9aICNsks8yuNeLNE0hya0l3lHhm/
+         bo8AqCJ2d13Ic3b4cvBQWr/FMKUlKYc397oCWMI3cNXjg3p2vKbCNXebQajn9AK5Hi
+         VnyQtA2EUlI3PrqJW1we6wf/D9OUydQ7bsH9jJJyqkThZZOeScps2umkRJULhM4Z5W
+         97OLLRGPTH80g==
+Date:   Mon, 29 May 2023 21:23:39 -0700
+From:   Kees Cook <kees@kernel.org>
+To:     =?ISO-8859-1?Q?Joan_Bruguera_Mic=F3?= <joanbrugueram@gmail.com>,
+        Thorsten Leemhuis <linux@leemhuis.info>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>
+Subject: =?US-ASCII?Q?Re=3A_build_error_while_building_arch/x86/purgatory/sha256?= =?US-ASCII?Q?=2Eo=3A_invalid_=27asm=27=3A_operand_i?= =?US-ASCII?Q?s_not_a_condition_code_=5B=2E=2E=2E=5D?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20230528164031.266590-1-joanbrugueram@gmail.com>
+References: <175578ec-9dec-7a9c-8d3a-43f24ff86b92@leemhuis.info> <20230528164031.266590-1-joanbrugueram@gmail.com>
+Message-ID: <EE2A76DE-973F-4FCD-AEC8-C24D9FFCC3F1@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-kconfig complains about unmet dependencies for SEV_GUEST
-whenever CRYPTO is not set/enabled, so also select CRYPTO
-when selecting other crypto kconfig options to silence the
-warnings.
+On May 28, 2023 9:40:31 AM PDT, "Joan Bruguera Mic=C3=B3" <joanbrugueram@gm=
+ail=2Ecom> wrote:
+>I can also reproduce the problem with Arch's linux-next-git, see config:
+>https://aur=2Earchlinux=2Eorg/cgit/aur=2Egit/tree/config?h=3Dlinux-next-g=
+it&id=3Df9a384e1c582321651fb613782ebc5a581146af0
+>
+>I've bisected it to df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3D=
+3"),
+>which explains why it only happens on GCC13=2E
+>
+>The problematic expansion that causes the error seems to be this fragment
+>from `_BUG_FLAGS` in `arch/x86/include/asm/bug=2Eh`:
+>    asm("=2Elong %c0 - =2E\n": : "i" (__FILE__));
+>
+>Along with the fact that this file is built with `-mcmodel=3Dlarge`
+>(see `PURGATORY_CFLAGS` in `arch/x86/purgatory/Makefile`)=2E
 
-Quietens these warnings:
+I haven't reproduced this yet, but the error implies that the asm input "i=
+"mmediate value of the __FILE__ string address cannot be used with the asm =
+template format "%c0" (a constant value)=2E
 
-WARNING: unmet direct dependencies detected for CRYPTO_GCM
-  Depends on [n]: CRYPTO [=n]
-  Selected by [y]:
-  - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
+https://gcc=2Egnu=2Eorg/onlinedocs/gcc/Extended-Asm=2Ehtml#Generic-Operand=
+-Modifiers
 
-WARNING: unmet direct dependencies detected for CRYPTO_AEAD2
-  Depends on [n]: CRYPTO [=n]
-  Selected by [y]:
-  - SEV_GUEST [=y] && VIRT_DRIVERS [=y] && AMD_MEM_ENCRYPT [=y]
+I cannot fathom why struct flex array logic would change that=2E=2E=2E
 
-Fixes: fce96cf04430 ("virt: Add SEV-SNP guest driver")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Link: lore.kernel.org/r/202305300557.PJ5ao694-lkp@intel.com
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Paul Gazzillo <paul@pgazz.com>
-Cc: Necip Fazil Yildiran <fazilyildiran@gmail.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
----
- drivers/virt/coco/sev-guest/Kconfig |    1 +
- 1 file changed, 1 insertion(+)
+I'll take a closer look in the morning=2E
 
-diff -- a/drivers/virt/coco/sev-guest/Kconfig b/drivers/virt/coco/sev-guest/Kconfig
---- a/drivers/virt/coco/sev-guest/Kconfig
-+++ b/drivers/virt/coco/sev-guest/Kconfig
-@@ -2,6 +2,7 @@ config SEV_GUEST
- 	tristate "AMD SEV Guest driver"
- 	default m
- 	depends on AMD_MEM_ENCRYPT
-+	select CRYPTO
- 	select CRYPTO_AEAD2
- 	select CRYPTO_GCM
- 	help
+-Kees
+
+
+--=20
+Kees Cook
