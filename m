@@ -2,100 +2,203 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBB9C7EE23
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 16:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F4EC7EE2D
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 17:03:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbjEaQb3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 May 2023 12:31:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55384 "EHLO
+        id S229932AbjEaRDD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 May 2023 13:03:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjEaQb3 (ORCPT
+        with ESMTP id S229965AbjEaRDB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2023 12:31:29 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8FA6129
-        for <linux-crypto@vger.kernel.org>; Wed, 31 May 2023 09:31:20 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b04782fe07so22504215ad.3
-        for <linux-crypto@vger.kernel.org>; Wed, 31 May 2023 09:31:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1685550680; x=1688142680;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ByzmIR8bdGAXP2o41OwIixgXQi8QYuh3izNby61Iy4=;
-        b=hbrIeOvaeAKyyvxHsoe7u4SWuGGCrkUeYy9BIzH3pyZFfF87fzRN4hsBFOI/2I8AAX
-         c/uIbxHraDc7ffkJ/UgVcHCW2LDjOCDYPpUcVZ5sVfalNIU3me49YUi6YEKMRIT6CAB8
-         ZHYplMOe/l48NyiEudrdmRuN8OuSuhtSJp/1o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685550680; x=1688142680;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2ByzmIR8bdGAXP2o41OwIixgXQi8QYuh3izNby61Iy4=;
-        b=Wqr8/nhA0KwX9E/gxyQGxEBT38Q7AbW02yNPCbFIfZObgfEBzJmC/qEWzz+RAiJ0IM
-         cGgNMnqZWKEU4NjMpakDnPbwzMC7MAZkNCbe0mC7FTjZ9RMXhXOnZDdp+/fq2Hk7p6bf
-         XBHv3cW1T5djm4Dadv5LyXq8YLNywgNiCE+nZ2EV7+7gYKj1UosGgXVrdyu7JZhBxDJ/
-         TXlxTJMwB0M34uCCpK9Tn4on5ttXKlEIpV13sYuhHyyDm2oJfoUACmrMWWY3fU1zVdtO
-         u+fWSNI6sS2F6zlaw56k9Hz8gcx9ajTYTyC2o4hRL25fZeefRmBJ3qNWS+bSqlldL6dS
-         1g+w==
-X-Gm-Message-State: AC+VfDzNKE3l2MKcWLEUQYmCvGgb4N1hORebrRERgaoeYKsXfee6Q3bt
-        e5x+Y4hviJAzoQEOOU8uiqBGKte7qjLGc6KIc2s=
-X-Google-Smtp-Source: ACHHUZ7+YRicU2hUq7DYy5WQBOqTFZW3O0RNpTvYGxbuQd/k91gpcaBhaOTyIxRwClClVq5v5gXBbw==
-X-Received: by 2002:a17:902:c94e:b0:1b1:8aa1:3a2f with SMTP id i14-20020a170902c94e00b001b18aa13a2fmr930782pla.27.1685550680219;
-        Wed, 31 May 2023 09:31:20 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id z3-20020a170903018300b001aface7bdd8sm1608614plg.31.2023.05.31.09.31.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 09:31:19 -0700 (PDT)
-Date:   Wed, 31 May 2023 09:31:18 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     arno@natisbad.org, arnd@kernel.org, schalla@marvell.com,
-        bbrezillon@kernel.org, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: marvell/cesa - Fix type mismatch warning
-Message-ID: <202305310930.844EBEA21C@keescook>
-References: <20230523083313.899332-1-arnd@kernel.org>
- <168548692863.1302890.6789778742527600870.b4-ty@chromium.org>
- <ZHcoQvWnzO0c1Cp9@gondor.apana.org.au>
+        Wed, 31 May 2023 13:03:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E6D0133
+        for <linux-crypto@vger.kernel.org>; Wed, 31 May 2023 10:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685552532;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=nA468CPms0dwjrbNccXgZQd/+AP0rCkmXR+Xx2SRtqE=;
+        b=IIQUzdHWsTduevyd3wHtURf/Z2W/RvxF8gIyTgS9AYen0B1WM2BNrah4XGBY2Gx8nY73ON
+        qdA1QpLGplYwC5tfpfpKFomgZr9ZMKhHj/+BltJQnycvOn0lMA/Hd0a7ko/cvEw8rl3k8E
+        T0Xdfu1c1usbmJESGSoxwPVPIKKEgbA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-295-cycqWSbcNNOBUdVOr9AGhg-1; Wed, 31 May 2023 13:02:07 -0400
+X-MC-Unique: cycqWSbcNNOBUdVOr9AGhg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A306185A78B;
+        Wed, 31 May 2023 17:02:07 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C0C8C154D7;
+        Wed, 31 May 2023 17:02:05 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Chuck Lever <chuck.lever@oracle.com>
+cc:     dhowells@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: How to get my krb5 crypto lib upstream?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZHcoQvWnzO0c1Cp9@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <723505.1685552525.1@warthog.procyon.org.uk>
+Date:   Wed, 31 May 2023 18:02:05 +0100
+Message-ID: <723506.1685552525@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 31, 2023 at 06:58:10PM +0800, Herbert Xu wrote:
-> On Tue, May 30, 2023 at 03:48:49PM -0700, Kees Cook wrote:
-> > On Tue, 23 May 2023 10:33:04 +0200, Arnd Bergmann wrote:
-> > > From: Arnd Bergmann <arnd@arndb.de>
-> > > 
-> > > Commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") uncovered
-> > > a type mismatch in cesa 3des support that leads to a memcpy beyond the
-> > > end of a structure:
-> > > 
-> > > In function 'fortify_memcpy_chk',
-> > >     inlined from 'mv_cesa_des3_ede_setkey' at drivers/crypto/marvell/cesa/cipher.c:307:2:
-> > > include/linux/fortify-string.h:583:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
-> > >   583 |                         __write_overflow_field(p_size_field, size);
-> > >       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > 
-> > > [...]
-> > 
-> > Applied to for-next/hardening, thanks!
-> > 
-> > [1/1] crypto: marvell/cesa - Fix type mismatch warning
-> >       https://git.kernel.org/kees/c/37f3abddda8d
-> 
-> Why did you apply it to your tree? This patch makes sense on its
-> own regardless of the fortify changes.
+Hi Herbert, Chuck,
 
-I snagged it since a week had gone by with no additional discussion and
-it fixed an issue exposed by work in the hardening tree. Let me know if
-you'd prefer I drop it for you to carry instead.
+I'm wondering how to make progress on getting my krb5 crypto lib upstream.
 
--Kees
+Can I push it as it stands and then we try and build it into the crypto API
+for it later?  That would allow me to push my rxgk implementation for AF_RXRPC
+and at least allow userspace to use that.
 
--- 
-Kees Cook
+As far as building a crypto API around it goes, we need four interfaces:
+
+ (1) Key generation.  We may need to generate a {cipher,hash} key pair {Ke,Ki}
+     or just a hash key Kc.  We might conceivably want both.
+
+     At the moment, I return a prepared cipher or a prepared hash.  I don't
+     deal with the key pairing here as it makes testing a bit more awkward.
+
+	int crypto_krb5_get_Kc(const struct krb5_enctype *krb5,
+			       const struct krb5_buffer *TK,
+			       u32 usage,
+			       struct krb5_buffer *key,
+			       struct crypto_shash **_shash,
+			       gfp_t gfp);
+	int crypto_krb5_get_Ke(const struct krb5_enctype *krb5,
+			       const struct krb5_buffer *TK,
+			       u32 usage,
+			       struct krb5_buffer *key,
+			       struct crypto_sync_skcipher **_ci,
+			       gfp_t gfp);
+	int crypto_krb5_get_Ki(const struct krb5_enctype *krb5,
+			       const struct krb5_buffer *TK,
+			       u32 usage,
+			       struct krb5_buffer *key,
+			       struct crypto_shash **_shash,
+			       gfp_t gfp);
+
+ (2) PRF+ generation.  This takes some a key and a metadata blob and generates
+     a new blob that then gets used as a key.
+
+	int crypto_krb5_calc_PRFplus(const struct krb5_enctype *krb5,
+				     const struct krb5_buffer *K,
+				     unsigned int L,
+				     const struct krb5_buffer *S,
+				     struct krb5_buffer *result,
+				     gfp_t gfp);
+
+ (3) Encrypt and Decrypt.
+
+     Encrypt has to be parameterised to take a specific confounder for testing
+     and generate a random one for normal operation.  The IV is fixed all
+     zeroes in the cases I've implemented.  When testing, decrypt should
+     perhaps be passed the confounder to check it.
+
+     When encrypting, the output buffer will be larger than the input buffer
+     (or, at least, room must be set aside) so that a confounder, padding and
+     a checksum can be inserted.
+
+     When decrypting, we either want to provide a separate output buffer so
+     that the confounder and checksum can be stripped off, or we need to be
+     able to find out where the decrypted payload plus the padding will be (we
+     can't work out how much padding there is - that's left to the caller).
+
+     At the moment, I pass a single buffer descriptor, providing encrypt with
+     extra space front and back and providing decrypt with somewhere to save
+     offset and length:
+
+	ssize_t crypto_krb5_encrypt(const struct krb5_enctype *krb5,
+				    struct krb5_enc_keys *keys,
+				    struct scatterlist *sg, unsigned int nr_sg,
+				    size_t sg_len,
+				    size_t data_offset, size_t data_len,
+				    bool preconfounded);
+	int crypto_krb5_decrypt(const struct krb5_enctype *krb5,
+				struct krb5_enc_keys *keys,
+				struct scatterlist *sg, unsigned int nr_sg,
+				size_t *_offset, size_t *_len,
+				int *_error_code);
+
+     I also allow a krb5/gssapi error code to be returned so that it can be
+     used in the generation of abort messages.  This needs sorting out
+     better.  It may be that only one code is actually relevant to this and
+     that the caller generates all the rest as it checks the metadata.
+
+     The AEAD interface might suffice as it stands if we pass in the keys
+     already generated and passed in as a single key blob.  We don't want an
+     IV generator as the protocol defines the IV to use.
+
+ (4) GetMIC and VerifyMIC.
+
+     Both of these need parameterising with extra metadata that will get
+     inserted into the hash before the data is hashed.  GetMIC will insert the
+     checksum into the buffer and VerifyMIC will check it and strip it off.
+
+     I'm not sure that the hash API is suitable for this.  AEAD might suit for
+     GetMIC at least, but using AEAD for VerifyMIC would lead to an extraneous
+     copy I'd prefer to avoid.
+
+
+	ssize_t crypto_krb5_get_mic(const struct krb5_enctype *krb5,
+				    struct crypto_shash *shash,
+				    const struct krb5_buffer *metadata,
+				    struct scatterlist *sg, unsigned int nr_sg,
+				    size_t sg_len,
+				    size_t data_offset, size_t data_len);
+	int crypto_krb5_verify_mic(const struct krb5_enctype *krb5,
+				   struct crypto_shash *shash,
+				   const struct krb5_buffer *metadata,
+				   struct scatterlist *sg, unsigned int nr_sg,
+				   size_t *_offset, size_t *_len,
+				   int *_error_code);
+
+There's a lot to be said in using an asynchronous overrideable interface for
+encrypt and decrypt.  The problem is that we want to do simultaneous hash and
+crypt if we can.  I think the Intel AES/SHA instructions permit this to be
+done and there is sufficient register space to do it - and I *think* that it
+may be possible to offload this to the Intel QAT or the Intel IAA on the
+latest 4th Gen Xeons - and maybe NICs that can handle NFS/SMB offload.
+
+I think we'll perhaps need a "krb5 encoding type" API that can provide key
+derivation, PRF+ and information - something along the following lines:
+
+	struct krb5_enctype {
+		int		etype;		// Encryption (key) type
+		int		ctype;		// Checksum type
+		const char	*name;		// "Friendly" name
+		const char	*encrypt_name;	// Crypto encrypt name
+		const char	*cksum_name;	// Crypto checksum name
+		const char	*hash_name;	// Crypto hash name
+		u16		block_len;	// Length of encryption block
+		u16		conf_len;	// Length of confounder
+		u16		cksum_len;	// Length of checksum
+		u16		key_bytes;	// Length of raw key
+		u16		key_len;	// Length of final key
+		u16		hash_len;	// Length of hash
+		u16		prf_len;	// Length of PRF() result
+		u16		Kc_len;		// Length of Kc
+		u16		Ke_len;		// Length of Ke
+		u16		Ki_len;		// Length of Ki
+		bool		keyed_cksum;	// T if a keyed cksum
+		bool		pad;		// T if should pad
+	};
+
+We need to be able to look the encoding up by ID, not by name.
+
+David
+
