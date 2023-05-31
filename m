@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD164C8300C
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 13:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2532C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 13:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236418AbjEaN2Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 May 2023 09:28:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47450 "EHLO
+        id S236431AbjEaN20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 May 2023 09:28:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236314AbjEaN2V (ORCPT
+        with ESMTP id S236330AbjEaN2V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 31 May 2023 09:28:21 -0400
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA6812B;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760A612E;
         Wed, 31 May 2023 06:28:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=1cvnhq64QQSvdQ/ThzyQEhZhPISdvBfB1iYqdfSw3+U=; b=dEAiPyJ7c8GWvTXHawa9FYMa5y
-        RcTU2/dDPs5cY4YnB6+unHRRRJkJTPocT+l9fVBL1T5GVSYwKO0qeN8JqCcETx/Inr4/AN1sfHxRe
-        b1b7BfbYcIcDYgL13wupMtVXdr7AJtNnY68GfgKL3U7VxymWSM1OiXmYlu2qvpGzKmGMenGmWnE6R
-        C89aJ+e5ksUXHGUNZjP1BUpQNpIOJc4I4d3iDnPyyPZC/izy9S6ksKb+nDOSLa1BGtKCDchQIM0ta
-        uoR3tky7q07ya5MwRnFIgl2eUqTdR+xf/+DHkFrE2NSPNjZStwAPAedEsWQ/7XfmOpjc+hjtQrfuA
-        UncWUN3Q==;
+        bh=iOoLCL15Lkqusyj683d7QtsgXbn6vbNrDVP1qYk8vVg=; b=Q+4qUo/0gXEAXjPbpQyNIIqvEh
+        kjEGNk0ljWZ9MChbj8TcT5wWJlI7fyolz8aXLp7afGfbtmKvuh5texHuol2FFPc/BFLMIGaaXVNYz
+        n0EkQ+NXc8ix3CcraX2ZQxht3IbiyDSMoaaq+Qqm5a/EG/DDCNhXI73AgUJK3I4daoxH+dJBjWHyz
+        eM9YvNvDd8eszZB1eMcUPBXuLuZLs1Zkp/PEFE3wYw/UvZpvTaa1O6ftlpoSXG4GLAv3P+xSm2e0j
+        Pp8sfVF7Z5X/h6J93s1K8E6FQQ14zcNfW0R1yKU5I/1qxkQ2WBcdqjbPSucwee3zzwS6V/rIDS6Im
+        DJYU1zvA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
         by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q4LrH-00FTCf-0R;
-        Wed, 31 May 2023 13:27:23 +0000
+        id 1q4LrF-00FTCX-2N;
+        Wed, 31 May 2023 13:27:21 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 63214300E3F;
-        Wed, 31 May 2023 15:27:21 +0200 (CEST)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id F0CD03003E1;
+        Wed, 31 May 2023 15:27:16 +0200 (CEST)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id AB266243B8573; Wed, 31 May 2023 15:27:16 +0200 (CEST)
-Message-ID: <20230531132324.058821078@infradead.org>
+        id 83785243B69E8; Wed, 31 May 2023 15:27:16 +0200 (CEST)
+Message-ID: <20230531132323.452120708@infradead.org>
 User-Agent: quilt/0.66
-Date:   Wed, 31 May 2023 15:08:45 +0200
+Date:   Wed, 31 May 2023 15:08:36 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     torvalds@linux-foundation.org
 Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
@@ -62,7 +62,7 @@ Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
         linux-crypto@vger.kernel.org, sfr@canb.auug.org.au,
         mpe@ellerman.id.au, James.Bottomley@hansenpartnership.com,
         deller@gmx.de, linux-parisc@vger.kernel.org
-Subject: [PATCH 12/12] s390/cpum_sf: Convert to cmpxchg128()
+Subject: [PATCH 03/12] arch: Introduce arch_{,try_}_cmpxchg128{,_local}()
 References: <20230531130833.635651916@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -70,73 +70,256 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that there is a cross arch u128 and cmpxchg128(), use those
-instead of the custom CDSG helper.
+For all architectures that currently support cmpxchg_double()
+implement the cmpxchg128() family of functions that is basically the
+same but with a saner interface.
 
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 Acked-by: Heiko Carstens <hca@linux.ibm.com>
+Acked-by: Mark Rutland <mark.rutland@arm.com>
 ---
- arch/s390/include/asm/cpu_mf.h  |    2 +-
- arch/s390/kernel/perf_cpum_sf.c |   16 +++-------------
- 2 files changed, 4 insertions(+), 14 deletions(-)
+ arch/arm64/include/asm/atomic_ll_sc.h |   41 +++++++++++++++++++++
+ arch/arm64/include/asm/atomic_lse.h   |   31 ++++++++++++++++
+ arch/arm64/include/asm/cmpxchg.h      |   26 +++++++++++++
+ arch/s390/include/asm/cmpxchg.h       |   14 +++++++
+ arch/x86/include/asm/cmpxchg_32.h     |    3 +
+ arch/x86/include/asm/cmpxchg_64.h     |   64 +++++++++++++++++++++++++++++++++-
+ 6 files changed, 177 insertions(+), 2 deletions(-)
 
---- a/arch/s390/include/asm/cpu_mf.h
-+++ b/arch/s390/include/asm/cpu_mf.h
-@@ -140,7 +140,7 @@ union hws_trailer_header {
- 		unsigned int dsdes:16;	/* 48-63: size of diagnostic SDE */
- 		unsigned long long overflow; /* 64 - Overflow Count   */
- 	};
--	__uint128_t val;
-+	u128 val;
- };
+--- a/arch/arm64/include/asm/atomic_ll_sc.h
++++ b/arch/arm64/include/asm/atomic_ll_sc.h
+@@ -326,6 +326,47 @@ __CMPXCHG_DBL(   ,        ,  ,         )
+ __CMPXCHG_DBL(_mb, dmb ish, l, "memory")
  
- struct hws_trailer_entry {
---- a/arch/s390/kernel/perf_cpum_sf.c
-+++ b/arch/s390/kernel/perf_cpum_sf.c
-@@ -1271,16 +1271,6 @@ static void hw_collect_samples(struct pe
- 	}
- }
+ #undef __CMPXCHG_DBL
++
++union __u128_halves {
++	u128 full;
++	struct {
++		u64 low, high;
++	};
++};
++
++#define __CMPXCHG128(name, mb, rel, cl...)                             \
++static __always_inline u128						\
++__ll_sc__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)	\
++{									\
++	union __u128_halves r, o = { .full = (old) },			\
++			       n = { .full = (new) };			\
++       unsigned int tmp;                                               \
++									\
++	asm volatile("// __cmpxchg128" #name "\n"			\
++       "       prfm    pstl1strm, %[v]\n"                              \
++       "1:     ldxp    %[rl], %[rh], %[v]\n"                           \
++       "       cmp     %[rl], %[ol]\n"                                 \
++       "       ccmp    %[rh], %[oh], 0, eq\n"                          \
++       "       b.ne    2f\n"                                           \
++       "       st" #rel "xp    %w[tmp], %[nl], %[nh], %[v]\n"          \
++       "       cbnz    %w[tmp], 1b\n"                                  \
++	"	" #mb "\n"						\
++	"2:"								\
++       : [v] "+Q" (*(u128 *)ptr),                                      \
++         [rl] "=&r" (r.low), [rh] "=&r" (r.high),                      \
++         [tmp] "=&r" (tmp)                                             \
++       : [ol] "r" (o.low), [oh] "r" (o.high),                          \
++         [nl] "r" (n.low), [nh] "r" (n.high)                           \
++       : "cc", ##cl);                                                  \
++									\
++	return r.full;							\
++}
++
++__CMPXCHG128(   ,        ,  )
++__CMPXCHG128(_mb, dmb ish, l, "memory")
++
++#undef __CMPXCHG128
++
+ #undef K
  
--static inline __uint128_t __cdsg(__uint128_t *ptr, __uint128_t old, __uint128_t new)
--{
--	asm volatile(
--		"	cdsg	%[old],%[new],%[ptr]\n"
--		: [old] "+d" (old), [ptr] "+QS" (*ptr)
--		: [new] "d" (new)
--		: "memory", "cc");
--	return old;
--}
--
- /* hw_perf_event_update() - Process sampling buffer
-  * @event:	The perf event
-  * @flush_all:	Flag to also flush partially filled sample-data-blocks
-@@ -1352,7 +1342,7 @@ static void hw_perf_event_update(struct
- 			new.f = 0;
- 			new.a = 1;
- 			new.overflow = 0;
--			prev.val = __cdsg(&te->header.val, old.val, new.val);
-+			prev.val = cmpxchg128(&te->header.val, old.val, new.val);
- 		} while (prev.val != old.val);
+ #endif	/* __ASM_ATOMIC_LL_SC_H */
+--- a/arch/arm64/include/asm/atomic_lse.h
++++ b/arch/arm64/include/asm/atomic_lse.h
+@@ -317,4 +317,35 @@ __CMPXCHG_DBL(_mb, al, "memory")
  
- 		/* Advance to next sample-data-block */
-@@ -1562,7 +1552,7 @@ static bool aux_set_alert(struct aux_buf
- 		}
- 		new.a = 1;
- 		new.overflow = 0;
--		prev.val = __cdsg(&te->header.val, old.val, new.val);
-+		prev.val = cmpxchg128(&te->header.val, old.val, new.val);
- 	} while (prev.val != old.val);
- 	return true;
- }
-@@ -1636,7 +1626,7 @@ static bool aux_reset_buffer(struct aux_
- 				new.a = 1;
- 			else
- 				new.a = 0;
--			prev.val = __cdsg(&te->header.val, old.val, new.val);
-+			prev.val = cmpxchg128(&te->header.val, old.val, new.val);
- 		} while (prev.val != old.val);
- 		*overflow += orig_overflow;
- 	}
+ #undef __CMPXCHG_DBL
+ 
++#define __CMPXCHG128(name, mb, cl...)					\
++static __always_inline u128						\
++__lse__cmpxchg128##name(volatile u128 *ptr, u128 old, u128 new)		\
++{									\
++	union __u128_halves r, o = { .full = (old) },			\
++			       n = { .full = (new) };			\
++	register unsigned long x0 asm ("x0") = o.low;			\
++	register unsigned long x1 asm ("x1") = o.high;			\
++	register unsigned long x2 asm ("x2") = n.low;			\
++	register unsigned long x3 asm ("x3") = n.high;			\
++	register unsigned long x4 asm ("x4") = (unsigned long)ptr;	\
++									\
++	asm volatile(							\
++	__LSE_PREAMBLE							\
++	"	casp" #mb "\t%[old1], %[old2], %[new1], %[new2], %[v]\n"\
++	: [old1] "+&r" (x0), [old2] "+&r" (x1),				\
++	  [v] "+Q" (*(u128 *)ptr)					\
++	: [new1] "r" (x2), [new2] "r" (x3), [ptr] "r" (x4),		\
++	  [oldval1] "r" (o.low), [oldval2] "r" (o.high)			\
++	: cl);								\
++									\
++	r.low = x0; r.high = x1;					\
++									\
++	return r.full;							\
++}
++
++__CMPXCHG128(   ,   )
++__CMPXCHG128(_mb, al, "memory")
++
++#undef __CMPXCHG128
++
+ #endif	/* __ASM_ATOMIC_LSE_H */
+--- a/arch/arm64/include/asm/cmpxchg.h
++++ b/arch/arm64/include/asm/cmpxchg.h
+@@ -146,6 +146,19 @@ __CMPXCHG_DBL(_mb)
+ 
+ #undef __CMPXCHG_DBL
+ 
++#define __CMPXCHG128(name)						\
++static inline u128 __cmpxchg128##name(volatile u128 *ptr,		\
++				      u128 old, u128 new)		\
++{									\
++	return __lse_ll_sc_body(_cmpxchg128##name,			\
++				ptr, old, new);				\
++}
++
++__CMPXCHG128(   )
++__CMPXCHG128(_mb)
++
++#undef __CMPXCHG128
++
+ #define __CMPXCHG_GEN(sfx)						\
+ static __always_inline unsigned long __cmpxchg##sfx(volatile void *ptr,	\
+ 					   unsigned long old,		\
+@@ -228,6 +241,19 @@ __CMPXCHG_GEN(_mb)
+ 	__ret;									\
+ })
+ 
++/* cmpxchg128 */
++#define system_has_cmpxchg128()		1
++
++#define arch_cmpxchg128(ptr, o, n)						\
++({										\
++	__cmpxchg128_mb((ptr), (o), (n));					\
++})
++
++#define arch_cmpxchg128_local(ptr, o, n)					\
++({										\
++	__cmpxchg128((ptr), (o), (n));						\
++})
++
+ #define __CMPWAIT_CASE(w, sfx, sz)					\
+ static inline void __cmpwait_case_##sz(volatile void *ptr,		\
+ 				       unsigned long val)		\
+--- a/arch/s390/include/asm/cmpxchg.h
++++ b/arch/s390/include/asm/cmpxchg.h
+@@ -224,4 +224,18 @@ static __always_inline int __cmpxchg_dou
+ 			 (unsigned long)(n1), (unsigned long)(n2));	\
+ })
+ 
++#define system_has_cmpxchg128()		1
++
++static __always_inline u128 arch_cmpxchg128(volatile u128 *ptr, u128 old, u128 new)
++{
++	asm volatile(
++		"	cdsg	%[old],%[new],%[ptr]\n"
++		: [old] "+d" (old), [ptr] "+QS" (*ptr)
++		: [new] "d" (new)
++		: "memory", "cc");
++	return old;
++}
++
++#define arch_cmpxchg128		arch_cmpxchg128
++
+ #endif /* __ASM_CMPXCHG_H */
+--- a/arch/x86/include/asm/cmpxchg_32.h
++++ b/arch/x86/include/asm/cmpxchg_32.h
+@@ -103,6 +103,7 @@ static inline bool __try_cmpxchg64(volat
+ 
+ #endif
+ 
+-#define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX8)
++#define system_has_cmpxchg_double()	boot_cpu_has(X86_FEATURE_CX8)
++#define system_has_cmpxchg64()		boot_cpu_has(X86_FEATURE_CX8)
+ 
+ #endif /* _ASM_X86_CMPXCHG_32_H */
+--- a/arch/x86/include/asm/cmpxchg_64.h
++++ b/arch/x86/include/asm/cmpxchg_64.h
+@@ -20,6 +20,68 @@
+ 	arch_try_cmpxchg((ptr), (po), (n));				\
+ })
+ 
+-#define system_has_cmpxchg_double() boot_cpu_has(X86_FEATURE_CX16)
++union __u128_halves {
++	u128 full;
++	struct {
++		u64 low, high;
++	};
++};
++
++#define __arch_cmpxchg128(_ptr, _old, _new, _lock)			\
++({									\
++	union __u128_halves o = { .full = (_old), },			\
++			    n = { .full = (_new), };			\
++									\
++	asm volatile(_lock "cmpxchg16b %[ptr]"				\
++		     : [ptr] "+m" (*(_ptr)),				\
++		       "+a" (o.low), "+d" (o.high)			\
++		     : "b" (n.low), "c" (n.high)			\
++		     : "memory");					\
++									\
++	o.full;								\
++})
++
++static __always_inline u128 arch_cmpxchg128(volatile u128 *ptr, u128 old, u128 new)
++{
++	return __arch_cmpxchg128(ptr, old, new, LOCK_PREFIX);
++}
++
++static __always_inline u128 arch_cmpxchg128_local(volatile u128 *ptr, u128 old, u128 new)
++{
++	return __arch_cmpxchg128(ptr, old, new,);
++}
++
++#define __arch_try_cmpxchg128(_ptr, _oldp, _new, _lock)			\
++({									\
++	union __u128_halves o = { .full = *(_oldp), },			\
++			    n = { .full = (_new), };			\
++	bool ret;							\
++									\
++	asm volatile(_lock "cmpxchg16b %[ptr]"				\
++		     CC_SET(e)						\
++		     : CC_OUT(e) (ret),					\
++		       [ptr] "+m" (*ptr),				\
++		       "+a" (o.low), "+d" (o.high)			\
++		     : "b" (n.low), "c" (n.high)			\
++		     : "memory");					\
++									\
++	if (unlikely(!ret))						\
++		*(_oldp) = o.full;					\
++									\
++	likely(ret);							\
++})
++
++static __always_inline bool arch_try_cmpxchg128(volatile u128 *ptr, u128 *oldp, u128 new)
++{
++	return __arch_try_cmpxchg128(ptr, oldp, new, LOCK_PREFIX);
++}
++
++static __always_inline bool arch_try_cmpxchg128_local(volatile u128 *ptr, u128 *oldp, u128 new)
++{
++	return __arch_try_cmpxchg128(ptr, oldp, new,);
++}
++
++#define system_has_cmpxchg_double()	boot_cpu_has(X86_FEATURE_CX16)
++#define system_has_cmpxchg128()		boot_cpu_has(X86_FEATURE_CX16)
+ 
+ #endif /* _ASM_X86_CMPXCHG_64_H */
 
 
