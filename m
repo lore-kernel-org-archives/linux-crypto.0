@@ -2,135 +2,155 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 589CAC7EE2E
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 13:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71424C7EE23
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 14:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236341AbjEaN2V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 May 2023 09:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47432 "EHLO
+        id S237204AbjEaOWx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 May 2023 10:22:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234861AbjEaN2U (ORCPT
+        with ESMTP id S237301AbjEaOWc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2023 09:28:20 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69925101;
-        Wed, 31 May 2023 06:28:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
-        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To;
-        bh=EFRjNdGkKmPs8t8EQjORBoOhY59fsy+w5h28GAZsB6Q=; b=UtVwkPrM/XC85pGt7r9J/NNpRu
-        UL+91AuyLHvjrvG49pQLde3FfNNUmo1htXYmBdQi6zGavV3SSWRcdYYRg2pT/RFAN1s0beaKp6uIt
-        qmsCYWl48JdxSnUcl0TZnP/DxO6Las7rvju+4B6BHlugr3GN/O1xwkrFbvEm1TcgBc0nFb02d74Q+
-        FugUvUwlkjaq40KU1RNfTvbPliEJmyGnO7N9Y8FQ1QTQ6NKNxRxIvQbmh4ObO5y3tSWG6QFsZealY
-        U6f5lhw6Luo8Kph7RKkJJmtoJB0hFyStxCRmgm2iCzUziTKBMxS0MFEMxeMLjZEeDlsmuqhPZCMlC
-        fkpnhqUg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q4LrG-00FTCc-1L;
-        Wed, 31 May 2023 13:27:22 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 55AC1300C4B;
-        Wed, 31 May 2023 15:27:21 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 992BE243B8570; Wed, 31 May 2023 15:27:16 +0200 (CEST)
-Message-ID: <20230531132323.788955257@infradead.org>
-User-Agent: quilt/0.66
-Date:   Wed, 31 May 2023 15:08:41 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     torvalds@linux-foundation.org
-Cc:     corbet@lwn.net, will@kernel.org, peterz@infradead.org,
-        boqun.feng@gmail.com, mark.rutland@arm.com,
-        catalin.marinas@arm.com, dennis@kernel.org, tj@kernel.org,
-        cl@linux.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, joro@8bytes.org, suravee.suthikulpanit@amd.com,
-        robin.murphy@arm.com, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        Andrew Morton <akpm@linux-foundation.org>, vbabka@suse.cz,
-        roman.gushchin@linux.dev, 42.hyeyoo@gmail.com,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-s390@vger.kernel.org,
-        iommu@lists.linux.dev, linux-arch@vger.kernel.org,
-        linux-crypto@vger.kernel.org, sfr@canb.auug.org.au,
-        mpe@ellerman.id.au, James.Bottomley@hansenpartnership.com,
-        deller@gmx.de, linux-parisc@vger.kernel.org,
-        Vasant Hegde <vasant.hegde@amd.com>
-Subject: [PATCH 08/12] x86,amd_iommu: Replace cmpxchg_double()
+        Wed, 31 May 2023 10:22:32 -0400
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE2EE51;
+        Wed, 31 May 2023 07:21:49 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 44D65580177;
+        Wed, 31 May 2023 10:21:45 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Wed, 31 May 2023 10:21:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1685542905; x=1685550105; bh=EB
+        qVSuczL8zsM7Z+quPoEDfVsyxlfcBd6Pp556uYrbw=; b=OzFEpTKSe5S3pZEmFP
+        KK1uM3LsgMCSyqEpKXgp8mQacr9rZEDCmrd2k8BVEDg3tEc7xY/t0qJaQdSDGOT2
+        bU9zqMXGeLUQtd2ZGrrNxWGkpEIaVxk071lBAmfAeMQCHDxFTt1RXc0tTa+8BNvc
+        dHGAYyoqxLWEz0DRWsqrZCl7jyQXG+IYTwZfBGL3jP6UuAq+xC/o+0owjbxmZ2CX
+        jKHn0znJCe5sFHF0XfK674YIkVcUuVTivSqn6lMR/WSjKrRbWWAoJGIngDeXfeY4
+        rj3t8KhnnMw/ULtpMFDj7NVn9Ce9QDTK6Kw9M2KCXxWhhGFtgzM636rI9Ixm3L54
+        I9vA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1685542905; x=1685550105; bh=EBqVSuczL8zsM
+        7Z+quPoEDfVsyxlfcBd6Pp556uYrbw=; b=oHsmrYj795DmAa232WElXIyigX6QS
+        0lEvQFY80QEb+Xv0tRxVq8oUZFcRlC2iXWMf6A9EQv2H5cUZwOYXI3ksFh0MS95T
+        a/00JTDEw8+IydUghKJpXfKrc3inW8q2ucI7PDOEPvDnPWUUJno8vH4RJtk3SbTY
+        Xo+OOCRlKmOMcOOakCRfPh4R5icttoicQwN5NjWzxihP8oZl/jY89WgumqrZIZXm
+        4AoaMaI7N608rPOsEyznGm2POVWr2Onut7ICia06/ESVNpGopI564yXoSbydFLpg
+        hbe4TBBj3hxrtKP7i4wcLhqKNVYnyN+0hkR0iUv05alMTrQZU5p/u+1Vw==
+X-ME-Sender: <xms:91d3ZBqipQsTqKHY6NRTD4pyQkRXLNRO_yNlvk1OpXfTPQ31eLUkEA>
+    <xme:91d3ZDp9FwkAkFZcsZEtPeT3CVkRHmUMy4T3RxqVKzTCMhojIEgOsZyV2jdVmH5Ey
+    jaX7xNsSz1_QTWZOGA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeekledgjeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:91d3ZOPFWq78uKB_gUsNnnF0OeIzGpfUdYgHxMmkoms0hJmzyG_XXA>
+    <xmx:91d3ZM6fl1ZFbJDMuACkoSnRzDO_6enBMAgadt8Tx1-uTxmtBRgJMQ>
+    <xmx:91d3ZA7jTUqIpcQxCcujApE4FZxs0WEfQdlu7IS1-X3dmHdmqcfy7g>
+    <xmx:-Vd3ZFWRn8mhzfxV02UCF_CEnRSQ6iF8oeqZ00eFXYcYhyAZq5xkxQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 0E183B60086; Wed, 31 May 2023 10:21:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-447-ge2460e13b3-fm-20230525.001-ge2460e13
+Mime-Version: 1.0
+Message-Id: <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
+In-Reply-To: <20230531132323.722039569@infradead.org>
 References: <20230531130833.635651916@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+ <20230531132323.722039569@infradead.org>
+Date:   Wed, 31 May 2023 16:21:22 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Peter Zijlstra" <peterz@infradead.org>,
+        "Linus Torvalds" <torvalds@linux-foundation.org>
+Cc:     "Jonathan Corbet" <corbet@lwn.net>,
+        "Will Deacon" <will@kernel.org>,
+        "Boqun Feng" <boqun.feng@gmail.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        "Catalin Marinas" <catalin.marinas@arm.com>, dennis@kernel.org,
+        "Tejun Heo" <tj@kernel.org>, "Christoph Lameter" <cl@linux.com>,
+        "Heiko Carstens" <hca@linux.ibm.com>, gor@linux.ibm.com,
+        "Alexander Gordeev" <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, "Sven Schnelle" <svens@linux.ibm.com>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+        "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, "Joerg Roedel" <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        "David Woodhouse" <dwmw2@infradead.org>,
+        "Baolu Lu" <baolu.lu@linux.intel.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Pekka Enberg" <penberg@kernel.org>,
+        "David Rientjes" <rientjes@google.com>,
+        "Joonsoo Kim" <iamjoonsoo.kim@lge.com>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Roman Gushchin" <roman.gushchin@linux.dev>,
+        "Hyeonggon Yoo" <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        "Stephen Rothwell" <sfr@canb.auug.org.au>,
+        "Michael Ellerman" <mpe@ellerman.id.au>,
+        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+        "Helge Deller" <deller@gmx.de>, linux-parisc@vger.kernel.org
+Subject: Re: [PATCH 07/12] percpu: #ifndef __SIZEOF_INT128__
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, May 31, 2023, at 15:08, Peter Zijlstra wrote:
+> Some 64bit architectures do not advertise __SIZEOF_INT128__ on all
+> supported compiler versions. Notably the HPPA64 only started doing
+> with GCC-11.
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-Tested-by: Vasant Hegde <vasant.hegde@amd.com>
----
- drivers/iommu/amd/amd_iommu_types.h |    9 +++++++--
- drivers/iommu/amd/iommu.c           |   10 ++++------
- 2 files changed, 11 insertions(+), 8 deletions(-)
+I checked the other compilers to be sure that anything else
+we support (gcc-5.1 and up) across all 64-bit architectures
+does support int128.
 
---- a/drivers/iommu/amd/amd_iommu_types.h
-+++ b/drivers/iommu/amd/amd_iommu_types.h
-@@ -986,8 +986,13 @@ union irte_ga_hi {
- };
- 
- struct irte_ga {
--	union irte_ga_lo lo;
--	union irte_ga_hi hi;
-+	union {
-+		struct {
-+			union irte_ga_lo lo;
-+			union irte_ga_hi hi;
-+		};
-+		u128 irte;
-+	};
- };
- 
- struct irq_2_irte {
---- a/drivers/iommu/amd/iommu.c
-+++ b/drivers/iommu/amd/iommu.c
-@@ -3003,10 +3003,10 @@ static int alloc_irq_index(struct amd_io
- static int modify_irte_ga(struct amd_iommu *iommu, u16 devid, int index,
- 			  struct irte_ga *irte, struct amd_ir_data *data)
- {
--	bool ret;
- 	struct irq_remap_table *table;
--	unsigned long flags;
- 	struct irte_ga *entry;
-+	unsigned long flags;
-+	u128 old;
- 
- 	table = get_irq_table(iommu, devid);
- 	if (!table)
-@@ -3017,16 +3017,14 @@ static int modify_irte_ga(struct amd_iom
- 	entry = (struct irte_ga *)table->table;
- 	entry = &entry[index];
- 
--	ret = cmpxchg_double(&entry->lo.val, &entry->hi.val,
--			     entry->lo.val, entry->hi.val,
--			     irte->lo.val, irte->hi.val);
- 	/*
- 	 * We use cmpxchg16 to atomically update the 128-bit IRTE,
- 	 * and it cannot be updated by the hardware or other processors
- 	 * behind us, so the return value of cmpxchg16 should be the
- 	 * same as the old value.
- 	 */
--	WARN_ON(!ret);
-+	old = entry->irte;
-+	WARN_ON(!try_cmpxchg128(&entry->irte, &old, irte->irte));
- 
- 	if (data)
- 		data->ref = entry;
+It would be nice to have the hack more localized to parisc
+and guarded with a CONFIG_GCC_VERSION check so we can kill
+it off in the future, once we drop either gcc-10 or parisc
+support.
 
+> +#ifndef __SIZEOF_INT128__
+> +#define raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)		\
+> +({									\
+> +	typeof(pcp) *__p = raw_cpu_ptr(&(pcp));				\
+> +	typeof(pcp) __val = *__p, __old = *(ovalp);			\
+> +	bool __ret;							\
+> +	if (!__builtin_memcmp(&__val, &__old, sizeof(pcp))) {		\
+> +		*__p = nval;						\
+> +		__ret = true;						\
+> +	} else {							\
+> +		*(ovalp) = __val;					\
+> +		__ret = false;						\
+> +	}								\
+> +	__ret;								\
+> +})
+> +
+> +#define raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)			\
+> +({									\
+> +	typeof(pcp) __old = (oval);					\
+> +	raw_cpu_generic_try_cmpxchg_memcpy(pcp, &__old, nval);		\
+> +	__old;								\
+> +})
 
+Instead of having this in include/asm-generic under
+!__SIZEOF_INT128__, could you just move this into the parisc
+files with a compiler version check?
+
+     Arnd
