@@ -2,62 +2,68 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B972C77B7C
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 09:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E052C77B7A
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 10:58:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235030AbjEaJA5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 May 2023 05:00:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44098 "EHLO
+        id S234338AbjEaK6l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 May 2023 06:58:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235273AbjEaJAz (ORCPT
+        with ESMTP id S234557AbjEaK6k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2023 05:00:55 -0400
-X-Greylist: delayed 1335 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 31 May 2023 02:00:51 PDT
-Received: from mail.ettrick.pl (mail.ettrick.pl [141.94.21.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFFD18D
-        for <linux-crypto@vger.kernel.org>; Wed, 31 May 2023 02:00:51 -0700 (PDT)
-Received: by mail.ettrick.pl (Postfix, from userid 1002)
-        id 40B19AC157; Wed, 31 May 2023 08:16:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ettrick.pl; s=mail;
-        t=1685521072; bh=ZOVeXw1jXE9TbyZP9aLdRwM96AORcRfum8b+rry5JMw=;
-        h=Date:From:To:Subject:From;
-        b=ryRQFcBo7uZBRFQqRngL8su6XVp6mf5xnHMx1ghgous1SIEkfvvR7uRLWJiWUg0Ml
-         EO8U8eoJhu8mRsWKG20jokWV7FB6rmPMtb8uexRCNAwzesay580JTqsxNBeevauaxb
-         r6j4/i0gW9M4iUjZl+w0s/al7Vq/uQA+9lG4bC6vQyrioCFPCeNk27eiMYguMDasZ5
-         uh36EDKS1P6S2jD2fwgwrjd2nDLOPF48z/rZZQ4Cn0pmL+508fkiAhUVF3oyYHZwpA
-         vBzwk6OBn3OBPwm1jGyRUWRljZFjYJKj/DnIONWonh2iB6I/L7be8ljbl3zcY38v/Q
-         jWi2LLQCSZlCw==
-Received: by mail.ettrick.pl for <linux-crypto@vger.kernel.org>; Wed, 31 May 2023 08:15:40 GMT
-Message-ID: <20230531064500-0.1.ax.4bm5t.0.1o7e9ob05y@ettrick.pl>
-Date:   Wed, 31 May 2023 08:15:40 GMT
-From:   "Norbert Karecki" <norbert.karecki@ettrick.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Fotowoltaika- propozycja instalacji
-X-Mailer: mail.ettrick.pl
+        Wed, 31 May 2023 06:58:40 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3CD3107;
+        Wed, 31 May 2023 03:58:37 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1q4JWs-00FEVF-8S; Wed, 31 May 2023 18:58:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 31 May 2023 18:58:10 +0800
+Date:   Wed, 31 May 2023 18:58:10 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     arno@natisbad.org, arnd@kernel.org, schalla@marvell.com,
+        bbrezillon@kernel.org, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: marvell/cesa - Fix type mismatch warning
+Message-ID: <ZHcoQvWnzO0c1Cp9@gondor.apana.org.au>
+References: <20230523083313.899332-1-arnd@kernel.org>
+ <168548692863.1302890.6789778742527600870.b4-ty@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <168548692863.1302890.6789778742527600870.b4-ty@chromium.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
-=20
-Czy rozwa=C5=BCali Pa=C5=84stwo monta=C5=BC systemu fotowoltaicznego?
-=20
-Instalacja fotowoltaiczna jest najlepszym sposobem na obni=C5=BCenie wyso=
-ko=C5=9Bci rachunk=C3=B3w za pr=C4=85d (pozostaj=C4=85 tylko op=C5=82aty =
-sta=C5=82e) i zabezpieczenie si=C4=99 przed rosn=C4=85cymi cenami energii=
- elektrycznej. Jest to w pe=C5=82ni odnawialne i bezemisyjne =C5=BAr=C3=B3=
-d=C5=82o energii, dzi=C4=99ki czemu przyczyniamy si=C4=99 do ochrony =C5=9B=
-rodowiska naturalnego.
-=20
-Dzia=C5=82amy od wielu lat na rynku energetycznym. Przygotujemy projekt, =
-wycen=C4=99 oraz kompleksowo wykonamy i zg=C5=82osimy realizacj=C4=99 do =
-zak=C5=82adu energetycznego.=20
-=20
-Czy chc=C4=85 Pa=C5=84stwo pozna=C4=87 nasz=C4=85 propozycj=C4=99? =20
+On Tue, May 30, 2023 at 03:48:49PM -0700, Kees Cook wrote:
+> On Tue, 23 May 2023 10:33:04 +0200, Arnd Bergmann wrote:
+> > From: Arnd Bergmann <arnd@arndb.de>
+> > 
+> > Commit df8fc4e934c1 ("kbuild: Enable -fstrict-flex-arrays=3") uncovered
+> > a type mismatch in cesa 3des support that leads to a memcpy beyond the
+> > end of a structure:
+> > 
+> > In function 'fortify_memcpy_chk',
+> >     inlined from 'mv_cesa_des3_ede_setkey' at drivers/crypto/marvell/cesa/cipher.c:307:2:
+> > include/linux/fortify-string.h:583:25: error: call to '__write_overflow_field' declared with attribute warning: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+> >   583 |                         __write_overflow_field(p_size_field, size);
+> >       |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > [...]
+> 
+> Applied to for-next/hardening, thanks!
+> 
+> [1/1] crypto: marvell/cesa - Fix type mismatch warning
+>       https://git.kernel.org/kees/c/37f3abddda8d
 
+Why did you apply it to your tree? This patch makes sense on its
+own regardless of the fortify changes.
 
-Pozdrawiam,
-Norbert Karecki
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
