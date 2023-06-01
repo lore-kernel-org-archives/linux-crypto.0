@@ -2,111 +2,201 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8C3C77B7E
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FE3C7EE29
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:18:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232356AbjFAKMS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:12:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47090 "EHLO
+        id S232588AbjFAKSe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 06:18:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233252AbjFAKLM (ORCPT
+        with ESMTP id S232499AbjFAKSG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:11:12 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B93A10FF
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 03:10:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685614210; x=1717150210;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=doZIg1eYy80ZoloO/1MxKEKosOxwnwuL9eiwma8GATk=;
-  b=MwZK25MP1aXxRZ1CgRPZDaPu+CI2MTROdWh6oNtaOm0bxbfKeskbQUoc
-   npyIewifZc7FNri6awf8XflXDgb00KusChrFJay8HLaDKXFWi7hI7XC+v
-   lPlCmqB2bdevy6dmGsABNZhuJ7l4JwLDXqnx3ySovkbzuxypl0txnuy2c
-   YI5EmVuXPTp0Sy/sLgQd++oNb78aq1CAwDWlxnVUwc1PB6XAKpQsqY3PP
-   bkEnCb2tscYA4EEH5ccALHN78kIenYy1c1hVk4f2wvhJtFPpEBUu18N6P
-   7bTeKdmaJjFWfZydqBKxdEaf+Pk1C7YSbmDr/SSNg+CmetQWRM9Rub2vJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="358791279"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="358791279"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 03:10:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="1037435186"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="1037435186"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.175])
-  by fmsmga005.fm.intel.com with ESMTP; 01 Jun 2023 03:10:08 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>,
-        Bolemx Sivanagaleela <bolemx.sivanagaleela@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 2/2] crypto: qat - unmap buffers before free for RSA
-Date:   Thu,  1 Jun 2023 11:10:00 +0100
-Message-Id: <20230601101000.18293-3-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230601101000.18293-1-giovanni.cabiddu@intel.com>
-References: <20230601101000.18293-1-giovanni.cabiddu@intel.com>
+        Thu, 1 Jun 2023 06:18:06 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF58A1FDB;
+        Thu,  1 Jun 2023 03:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=G1trJdY7ybtDfb34YzOEZVtQJ+4O7zYES3kMJ7sRdCU=; b=pytfcabSQbAioNogqcJyIjWxkb
+        I3OIRz0nPyGAHQCouHiezAZ3WYDnbr+0H5ASElPr4+OfQuPcqSEVXUzQNdmNT0vDCq0lYth70hxc+
+        nIxwWeL5rSBkZoelbLSxxySFndCPqg76D3wq86BEGZ1gkD10CrGs9NABCiAJPJkEv81csRGvvoVja
+        EaBwzktB36vi1XtuFtdCEjY2KE+yJjTGMIB4mjx3jEx3iBh0aM1LDhfieu9IZABiemcJgKbkPFNuq
+        /6ksBvE3iaE68Sn2CQ4733UmzPnTQKsAKE8EvFRBt0Ej6Ani+wvx452hsmvy64dZ4tGLH+6z41/Rs
+        43i6i9qw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q4fJv-008GIu-Pp; Thu, 01 Jun 2023 10:14:15 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 66A3C3002F0;
+        Thu,  1 Jun 2023 12:14:09 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 374AA21484A8B; Thu,  1 Jun 2023 12:14:09 +0200 (CEST)
+Date:   Thu, 1 Jun 2023 12:14:09 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+        Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org
+Subject: [PATCH v2 07/12] parisc/percpu: Work around the lack of
+ __SIZEOF_INT128__
+Message-ID: <20230601101409.GS4253@hirez.programming.kicks-ass.net>
+References: <20230531130833.635651916@infradead.org>
+ <20230531132323.722039569@infradead.org>
+ <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>
+On Wed, May 31, 2023 at 04:21:22PM +0200, Arnd Bergmann wrote:
 
-The callback function for RSA frees the memory allocated for the source
-and destination buffers before unmapping them.
-This sequence is wrong.
+> It would be nice to have the hack more localized to parisc
+> and guarded with a CONFIG_GCC_VERSION check so we can kill
+> it off in the future, once we drop either gcc-10 or parisc
+> support.
 
-Change the cleanup sequence to unmap the buffers before freeing them.
+I vote for dropping parisc -- it's the only 64bit arch that doesn't have
+sane atomics.
 
-Fixes: 3dfaf0071ed7 ("crypto: qat - remove dma_free_coherent() for RSA")
-Signed-off-by: Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>
-Co-developed-by: Bolemx Sivanagaleela <bolemx.sivanagaleela@intel.com>
-Signed-off-by: Bolemx Sivanagaleela <bolemx.sivanagaleela@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Anyway, the below seems to work -- build tested with GCC-10.1
+
 ---
- drivers/crypto/intel/qat/qat_common/qat_asym_algs.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Subject: parisc/percpu: Work around the lack of __SIZEOF_INT128__
+From: Peter Zijlstra <peterz@infradead.org>
+Date: Tue May 30 22:27:40 CEST 2023
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-index 8806242469a0..4128200a9032 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-@@ -520,12 +520,14 @@ static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
- 
- 	err = (err == ICP_QAT_FW_COMN_STATUS_FLAG_OK) ? 0 : -EINVAL;
- 
--	kfree_sensitive(req->src_align);
--
- 	dma_unmap_single(dev, req->in.rsa.enc.m, req->ctx.rsa->key_sz,
- 			 DMA_TO_DEVICE);
- 
-+	kfree_sensitive(req->src_align);
+HPPA64 is unique in not providing __SIZEOF_INT128__ across all
+supported compilers, specifically it only started doing this with
+GCC-11.
+
+Since the per-cpu ops are universally availably, and
+this_cpu_{,try_}cmpxchg128() is expected to be available on all 64bit
+architectures a wee bodge is in order.
+
+Sadly, while C reverts to memcpy() for assignment of POD types, it does
+not revert to memcmp() for for equality. Therefore frob that manually.
+
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+ arch/parisc/include/asm/percpu.h |   77 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
+
+--- /dev/null
++++ b/arch/parisc/include/asm/percpu.h
+@@ -0,0 +1,77 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_PARISC_PERCPU_H
++#define _ASM_PARISC_PERCPU_H
 +
- 	areq->dst_len = req->ctx.rsa->key_sz;
-+	dma_unmap_single(dev, req->out.rsa.enc.c, req->ctx.rsa->key_sz,
-+			 DMA_FROM_DEVICE);
- 	if (req->dst_align) {
- 		scatterwalk_map_and_copy(req->dst_align, areq->dst, 0,
- 					 areq->dst_len, 1);
-@@ -533,9 +535,6 @@ static void qat_rsa_cb(struct icp_qat_fw_pke_resp *resp)
- 		kfree_sensitive(req->dst_align);
- 	}
- 
--	dma_unmap_single(dev, req->out.rsa.enc.c, req->ctx.rsa->key_sz,
--			 DMA_FROM_DEVICE);
--
- 	dma_unmap_single(dev, req->phy_in, sizeof(struct qat_rsa_input_params),
- 			 DMA_TO_DEVICE);
- 	dma_unmap_single(dev, req->phy_out,
--- 
-2.40.1
-
++#include <linux/types.h>
++
++#if defined(CONFIG_64BIT) && CONFIG_GCC_VERSION < 1100000
++
++/*
++ * GCC prior to 11 does not provide __SIZEOF_INT128__ on HPPA64
++ * as such we need to provide an alternative implementation of
++ * {raw,this}_cpu_{,try_}cmpxchg128().
++ *
++ * This obviously doesn't function as u128 should, but for the purpose
++ * of per-cpu cmpxchg128 it might just do.
++ */
++typedef struct {
++	u64 a, b;
++} u128 __attribute__((aligned(16)));
++
++#define raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)		\
++({									\
++	typeof(pcp) *__p = raw_cpu_ptr(&(pcp));				\
++	typeof(pcp) __val = *__p, __old = *(ovalp);			\
++	bool __ret;							\
++	if (!__builtin_memcmp(&__val, &__old, sizeof(pcp))) {		\
++		*__p = nval;						\
++		__ret = true;						\
++	} else {							\
++		*(ovalp) = __val;					\
++		__ret = false;						\
++	}								\
++	__ret;								\
++})
++
++#define raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)			\
++({									\
++	typeof(pcp) __old = (oval);					\
++	raw_cpu_generic_try_cmpxchg_memcpy(pcp, &__old, nval);		\
++	__old;								\
++})
++
++#define raw_cpu_cmpxchg128(pcp, oval, nval) \
++	raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)
++#define raw_cpu_try_cmpxchg128(pcp, ovalp, nval) \
++	raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)
++
++#define this_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)		\
++({									\
++	bool __ret;							\
++	unsigned long __flags;						\
++	raw_local_irq_save(__flags);					\
++	__ret = raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval);	\
++	raw_local_irq_restore(__flags);					\
++	__ret;								\
++})
++
++#define this_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)		\
++({									\
++	typeof(pcp) __ret;						\
++	unsigned long __flags;						\
++	raw_local_irq_save(__flags);					\
++	__ret = raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval);	\
++	raw_local_irq_restore(__flags);					\
++	__ret;								\
++})
++
++#define this_cpu_cmpxchg128(pcp, oval, nval) \
++	this_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)
++#define this_cpu_try_cmpxchg128(pcp, ovalp, nval) \
++	this_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)
++
++#endif /* !__SIZEOF_INT128__ */
++
++#include <asm-generic/percpu.h>
++
++#endif /* _ASM_PARISC_PERCPU_H */
