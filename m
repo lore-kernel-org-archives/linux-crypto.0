@@ -2,123 +2,134 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23964C77B7E
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 19:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42972C77B7A
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 19:11:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232663AbjFATEQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 15:04:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53004 "EHLO
+        id S231863AbjFATLF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 15:11:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231410AbjFATEP (ORCPT
+        with ESMTP id S229651AbjFATLE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 15:04:15 -0400
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CC5184;
-        Thu,  1 Jun 2023 12:03:49 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailout.west.internal (Postfix) with ESMTP id AC642320091A;
-        Thu,  1 Jun 2023 15:03:46 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Thu, 01 Jun 2023 15:03:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1685646226; x=1685732626; bh=Du
-        N/fEwKhCSFTr6+YhFwlXQbFJgJ5LGQ3Wa6HZ4sPZ0=; b=C/QaeHLc892kUIexhi
-        CidYIiNZ+JwKxyerI0n6ZzlTonC2MCfttfinYy0j6nUZE0iErne0YyoQBGmfGXdj
-        9XSrK2L9/tABUCYBweKqmZhi51WYnI9Rc+ezixsjUrI5D0O7CJEu9tgr0LQ+hlaz
-        i4q8H2qUmcsm++18eETylqOYIPoiKrg4KB2Iu3TnF5M3VSLOCE8AKl8No+eIYhTr
-        PDuaFAvN7rYWdEJTKtZCj9dXjQe6si7FJa35LvMzr89wgvMuugL3R6Or9FMCsQ64
-        9p7ik2vhiZkkygcCrB0hgP/qhcSi51j0QFoZqyswikwZEd8/RytRtIER+3QkH70M
-        7naQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1685646226; x=1685732626; bh=DuN/fEwKhCSFT
-        r6+YhFwlXQbFJgJ5LGQ3Wa6HZ4sPZ0=; b=CE0FJDq5g3+5ijPC6hPr9VM97xL3s
-        mWuo2EbkcPLu+0Ph8QjOnsUIMAciuA7bGpSysjt9WU2bERAVqitgINu8w75IFTbW
-        ZGidhRm9cVrKhZRK6pUfPnAbX7QEoEprhUeQ51Eys7ws6XYfc1jOC5ra5VsAJH/J
-        +DhBt/1svBdIgekyjlbFPJW4k3lECF+4ACQxKjbaFOZd7RIDm4R1tLyy/UvsvOwO
-        VC/1wS+ux+mYJFDJjUxJoOE13KS+q2vCe3JMtyS4Kivp8Rf5jT7SwG950gJy5c9P
-        FM3Y0cXNwAT0I1W2B3CpjxRVEoYwBhUYOoytRrogBxVgl2nIlzNJcIp7Q==
-X-ME-Sender: <xms:kOt4ZA_xHqfSd9_RYqeU0tHY-I1qRDgVYk7nkh_VuFNAAPpWvX7Phg>
-    <xme:kOt4ZIs5inhK977IoAHvpOzRI5YQ2VRsMI28w1ZIZwpsy-4LSV5eFZEV51MXNDaY2
-    j0WGqpa8cAH4l9JxWQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeluddgudefvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
-    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:kOt4ZGC6ERAFa-qx2gxgJOc7DAlGEWcmZqsX_cIG0jQsYmt0S7C6Qg>
-    <xmx:kOt4ZAcHYho97oJtWheRANisLoDF2mjLF2bYpfDULl3ACdM99-K-jw>
-    <xmx:kOt4ZFMMxRbpFHYrHlhSI_2OYDfO__X7HEz-epFmBDG_X0BSzkQ2JA>
-    <xmx:kut4ZM--RC614ju2WZYpsnNbcb4noPLl_tcLOEN7DmPanaWTuZEL6g>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 8F4D8B60083; Thu,  1 Jun 2023 15:03:44 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-447-ge2460e13b3-fm-20230525.001-ge2460e13
-Mime-Version: 1.0
-Message-Id: <bfcb63da-eaec-44f6-bcf3-7a15ed745b6b@app.fastmail.com>
-In-Reply-To: <202306011127.B801968@keescook>
-References: <20230601151832.3632525-1-arnd@kernel.org>
- <202306010909.89C4BED@keescook>
- <f6fcae8a-9b50-48e4-84e9-c37613226c63@app.fastmail.com>
- <202306011127.B801968@keescook>
-Date:   Thu, 01 Jun 2023 21:03:24 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Kees Cook" <keescook@chromium.org>
-Cc:     "Arnd Bergmann" <arnd@kernel.org>, kasan-dev@googlegroups.com,
-        "Andrey Ryabinin" <ryabinin.a.a@gmail.com>,
-        "Alexander Potapenko" <glider@google.com>,
-        "Andrey Konovalov" <andreyknvl@gmail.com>,
-        "Dmitry Vyukov" <dvyukov@google.com>,
-        "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
-        "Marco Elver" <elver@google.com>, linux-media@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Ard Biesheuvel" <ardb@kernel.org>,
-        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
-        "Dan Carpenter" <dan.carpenter@linaro.org>,
-        "Matthias Brugger" <matthias.bgg@gmail.com>,
-        "AngeloGioacchino Del Regno" 
-        <angelogioacchino.delregno@collabora.com>,
-        "Nathan Chancellor" <nathan@kernel.org>,
-        "Nick Desaulniers" <ndesaulniers@google.com>,
-        "Tom Rix" <trix@redhat.com>,
-        "Josh Poimboeuf" <jpoimboe@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] [RFC] ubsan: disallow bounds checking with gcov on broken gcc
-Content-Type: text/plain
+        Thu, 1 Jun 2023 15:11:04 -0400
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413BB186
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 12:10:21 -0700 (PDT)
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6260b578097so10904906d6.3
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Jun 2023 12:10:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685646620; x=1688238620;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hm7Jjh9TF3Bsq+esRbEZ2y936YTbpq5qnxQF0w6eX7M=;
+        b=H6h67NlSnRvdOf5g3GoLF9c2Fmsjmr8qxRal6LLvABOKiRHbpfFPuaWgSO1mD6hlUv
+         1oMiCuMaTLTMny4jt0IO2kOf02mrivmKeAFEsRNgUq2ZedbRNWIuTeV/rFjCc1s6ZqKq
+         LZoOmTrVRc9qN87T7h69yVe7NxeQ/04KrPe4mCblEurvBxSLeMrUmrWjjS6xXxeQ9FSD
+         rlUnli8hrgWIVhdxMZFN7KTehn1UlEGQqTX+ljYg+P4glLlwA2Pr4xuV5YzhzCWQ5RJg
+         MmJ1sqdnCIkm2PB0QkTIe+MMFm/FR261lT5CW++F27T+R9r7uAg0LFjuLU0Ms3CfCl6z
+         sK3g==
+X-Gm-Message-State: AC+VfDwGD9FJCd9bTXjVoH2rE1TVcd2zDry+4kPHdQzAtiym+ra2L9IT
+        Qm9KB13Nf8npv3Ob6iTsv+m+
+X-Google-Smtp-Source: ACHHUZ7bZ4cyi3vQcWjCBhem09VoTvBAo4ZBUsrNepalRX5b0TnPcFZq7rotFJybrs3TC5fTvPZnGQ==
+X-Received: by 2002:a05:6214:1bcb:b0:628:3e37:e175 with SMTP id m11-20020a0562141bcb00b006283e37e175mr6190986qvc.25.1685646620329;
+        Thu, 01 Jun 2023 12:10:20 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id mn6-20020a0562145ec600b0060530c942f4sm7830403qvb.46.2023.06.01.12.10.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 12:10:19 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 15:10:18 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Alasdair Kergon <agk@redhat.com>, dm-devel@redhat.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: dm crypt: Avoid using MAX_CIPHER_BLOCKSIZE
+Message-ID: <ZHjtGvf+gHxeV83V@redhat.com>
+References: <ZHhbL+SbWRnTW4b7@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZHhbL+SbWRnTW4b7@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 1, 2023, at 20:28, Kees Cook wrote:
-> On Thu, Jun 01, 2023 at 07:50:38PM +0200, Arnd Bergmann wrote:
->> On Thu, Jun 1, 2023, at 18:14, Kees Cook wrote:
->> >
->> > i.e. fall back through these:
->> > 	-fsanitize=array-bounds (Clang)
->> > 	-fsanitize=bounds-strict (!GCOV || bug fixed in GCC)
->> > 	-fsanitize=bounds
->> 
->> From what I can tell, -fsanitize=bounds has the same problem
->> as -fsanitize=bounds-strict, so that would not help.
->
-> Ah, did something change with GCOV? This (bounds vs bounds-strict) is
-> the only recent change to CONFIG_UBSAN_BOUNDS...
+On Thu, Jun 01 2023 at  4:47P -0400,
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-I missed this problem in my usual randconfig builds because I was
-building with GCOV disabled due to disk size limitations until
-Dan Carpenter pointed out the specific issue.
+> MAX_CIPHER_BLOCKSIZE is an internal implementation detail and should
+> not be relied on by users of the Crypto API.
+> 
+> Instead of storing the IV on the stack, allocate it together with
+> the crypto request.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+> 
+>  drivers/md/dm-crypt.c |   15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 40cb1719ae4d..0e7e443dde11 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -31,10 +31,10 @@
+>  #include <asm/unaligned.h>
+>  #include <crypto/hash.h>
+>  #include <crypto/md5.h>
+> -#include <crypto/algapi.h>
+>  #include <crypto/skcipher.h>
+>  #include <crypto/aead.h>
+>  #include <crypto/authenc.h>
+> +#include <crypto/utils.h>
+>  #include <linux/rtnetlink.h> /* for struct rtattr and RTA macros only */
+>  #include <linux/key-type.h>
+>  #include <keys/user-type.h>
+> @@ -743,16 +743,23 @@ static int crypt_iv_eboiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+>  static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
+>  			    struct dm_crypt_request *dmreq)
+>  {
+> -	u8 buf[MAX_CIPHER_BLOCKSIZE] __aligned(__alignof__(__le64));
+> +	struct crypto_skcipher *tfm = any_tfm(cc);
+>  	struct skcipher_request *req;
+>  	struct scatterlist src, dst;
+>  	DECLARE_CRYPTO_WAIT(wait);
+> +	unsigned int reqsize;
+>  	int err;
+> +	u8 *buf;
+>  
+> -	req = skcipher_request_alloc(any_tfm(cc), GFP_NOIO);
+> +	reqsize = ALIGN(crypto_skcipher_reqsize(tfm), __alignof__(__le64));
+> +
+> +	req = kmalloc(reqsize + cc->iv_size, GFP_NOIO);
+>  	if (!req)
+>  		return -ENOMEM;
+>  
+> +	skcipher_request_set_tfm(req, tfm);
+> +
+> +	buf = (u8 *)req + reqsize;
+>  	memset(buf, 0, cc->iv_size);
+>  	*(__le64 *)buf = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
+>  
+> @@ -761,7 +768,7 @@ static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
+>  	skcipher_request_set_crypt(req, &src, &dst, cc->iv_size, buf);
+>  	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
+>  	err = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
+> -	skcipher_request_free(req);
+> +	kfree_sensitive(req);
+>  
+>  	return err;
+>  }
 
-I suspect it's been there for a longer time.
 
-      Arnd
+Strikes me as strange that open-coding skcipher_request_{alloc,free}
+is ideal, but dm-crypt is the only non-crypto consumer of
+MAX_CIPHER_BLOCKSIZE so really not worth standing up yet another
+interface wrapper.
+
+Anyway, this code is certainly better for dm-crypt's needs.  I'm happy
+with you applying this change via your crypto tree.
+
+Reviewed-by: Mike Snitzer <snitzer@kernel.org>
+
+Thanks.
