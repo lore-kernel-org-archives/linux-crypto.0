@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FA5C7EE2A
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A38C77B7E
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:19:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233328AbjFAKTT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:19:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55640 "EHLO
+        id S233425AbjFAKTp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 06:19:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232656AbjFAKS4 (ORCPT
+        with ESMTP id S233426AbjFAKTK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:18:56 -0400
+        Thu, 1 Jun 2023 06:19:10 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4903D2115
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 03:16:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EFBA1720
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 03:16:08 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ore@pengutronix.de>)
-        id 1q4fKZ-0004WA-5h; Thu, 01 Jun 2023 12:14:55 +0200
+        id 1q4fKZ-0004We-8g; Thu, 01 Jun 2023 12:14:55 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
         (envelope-from <ore@pengutronix.de>)
-        id 1q4fKX-004KWB-JG; Thu, 01 Jun 2023 12:14:53 +0200
+        id 1q4fKY-004KWW-JW; Thu, 01 Jun 2023 12:14:54 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
         (envelope-from <ore@pengutronix.de>)
-        id 1q4fKW-001V3d-J1; Thu, 01 Jun 2023 12:14:52 +0200
+        id 1q4fKW-001V4J-ME; Thu, 01 Jun 2023 12:14:52 +0200
 From:   Oleksij Rempel <o.rempel@pengutronix.de>
 To:     Abel Vesa <abelvesa@kernel.org>,
         Michael Turquette <mturquette@baylibre.com>,
@@ -54,9 +54,9 @@ Cc:     Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
         linux-mmc@vger.kernel.org
-Subject: [PATCH v1 1/7] dt-bindings: mmc: fsl-imx-esdhc: Add imx6ul support
-Date:   Thu,  1 Jun 2023 12:14:45 +0200
-Message-Id: <20230601101451.357662-2-o.rempel@pengutronix.de>
+Subject: [PATCH v1 5/7] dt-bindings: clock: imx6ul: Support optional enet*_ref_pad clocks
+Date:   Thu,  1 Jun 2023 12:14:49 +0200
+Message-Id: <20230601101451.357662-6-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230601101451.357662-1-o.rempel@pengutronix.de>
 References: <20230601101451.357662-1-o.rempel@pengutronix.de>
@@ -70,44 +70,51 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the 'fsl,imx6ul-usdhc' value to the compatible properties list in
-the fsl-imx-esdhc.yaml file. This is required to match the compatible
-strings present in the 'mmc@2190000' node of 'imx6ul-prti6g.dtb'. This
-commit addresses the following dtbs_check warning:
-  imx6ul-prti6g.dtb: mmc@2190000: compatible: 'oneOf' conditional failed,
-    one must be fixed: ['fsl,imx6ul-usdhc', 'fsl,imx6sx-usdhc'] is too long
-    'fsl,imx6ul-usdhc' is not one of ['fsl,imx25-esdhc', 'fsl,imx35-esdhc',
-    'fsl,imx51-esdhc', 'fsl,imx53-esdhc', 'fsl,imx6q-usdhc',
-    'fsl,imx6sl-usdhc', 'fsl,imx6sx-usdhc', 'fsl,imx7d-usdhc',
-    'fsl,imx7ulp-usdhc', 'fsl,imx8mm-usdhc', 'fsl,imxrt1050-usdhc',
-    'nxp,s32g2-usdhc']
-  From schema: Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml
+Extend the 'clocks' and 'clock-names' properties to support optional
+'enet1_ref_pad' and 'enet2_ref_pad' clocks to resolve the following
+dtbs_check warning:
+  imx6ul-prti6g.dtb: clock-controller@20c4000: clocks: [[17], [18], [19],
+    [20], [21]] is too long
+  From schema: Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
+
+  imx6ul-prti6g.dtb: clock-controller@20c4000: clock-names: ['ckil',
+    'osc', 'ipp_di0', 'ipp_di1', 'enet1_ref_pad'] is too long
+  From schema: Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/devicetree/bindings/clock/imx6ul-clock.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml b/Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml
-index fbfd822b9270..090e781705d3 100644
---- a/Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml
-+++ b/Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml
-@@ -30,6 +30,7 @@ properties:
-           - fsl,imx6q-usdhc
-           - fsl,imx6sl-usdhc
-           - fsl,imx6sx-usdhc
-+          - fsl,imx6ul-usdhc
-           - fsl,imx7d-usdhc
-           - fsl,imx7ulp-usdhc
-           - fsl,imx8mm-usdhc
-@@ -42,6 +43,7 @@ properties:
-           - enum:
-               - fsl,imx6sll-usdhc
-               - fsl,imx6ull-usdhc
-+              - fsl,imx6ul-usdhc
-           - const: fsl,imx6sx-usdhc
-       - items:
-           - const: fsl,imx7d-usdhc
+diff --git a/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml b/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
+index be54d4df5afa..d6a36fe575d3 100644
+--- a/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
++++ b/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
+@@ -28,18 +28,24 @@ properties:
+     const: 1
+ 
+   clocks:
++    minItems: 4
+     items:
+       - description: 32k osc
+       - description: 24m osc
+       - description: ipp_di0 clock input
+       - description: ipp_di1 clock input
++      - description: Optional lenet1_ref_pad or enet2_ref_pad clocks
++      - description: Optional lenet1_ref_pad or enet2_ref_pad clocks
+ 
+   clock-names:
++    minItems: 4
+     items:
+       - const: ckil
+       - const: osc
+       - const: ipp_di0
+       - const: ipp_di1
++      - enum: [enet1_ref_pad, enet2_ref_pad]
++      - enum: [enet1_ref_pad, enet2_ref_pad]
+ 
+ required:
+   - compatible
 -- 
 2.39.2
 
