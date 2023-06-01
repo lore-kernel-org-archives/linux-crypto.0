@@ -2,147 +2,166 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC07FC7EE23
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 16:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 957C3C7EE2A
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 17:39:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbjFAQPD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 12:15:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38654 "EHLO
+        id S231881AbjFARjo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 13:39:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231346AbjFAQO5 (ORCPT
+        with ESMTP id S231346AbjFARjn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 12:14:57 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0375712C
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 09:14:55 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1b05e96dabbso5940805ad.2
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Jun 2023 09:14:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1685636094; x=1688228094;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hf1MMDnk8ATuiHQnpftM3deH6vV2jBlcAPqcuKGi0Ek=;
-        b=BLOJsskDJTv8yn+ZTSU8DPbhPH9VAEpQcNphr4RmScmbAmgWrp0GukfjFro2r265wS
-         6nmFRGSXXGa7RcbInQP2zovN07D4+fErz4lNsHF1JQiB5r265YWCLnVrXvfV9fIuuPKD
-         bp9H8NF/OqTzmF7dGtp2dpe9nzNFgZX5Yid94=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685636094; x=1688228094;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hf1MMDnk8ATuiHQnpftM3deH6vV2jBlcAPqcuKGi0Ek=;
-        b=ld/yhtisBPUSmoaXuBOr9Z4Prt9avRUYwPCkHy7I5rrSiuWXZZKJiz81YccyRcHubW
-         RKUHgTD3Ou5xc06pzjoeQlLM+7PYVHJU0K6F6OD0UtWBjB7zWDCYUsl38BHrrH31UE36
-         ZXNtflEGynRG8AIo/Yq24JsBZcAietCZckW/NYSBEzG+za9Ls2n9xDjabkftK0DOOA7k
-         0btkUcus/Dr7onVvrkUqTe8L2TSW93DgPBhLjepvjUh1+nc+17VLK24+AhIHTj/t3B1H
-         DVJPOG4ipdWM0scKjHhA1VFlId45tTUrKTMmq9++KBrESpmznO+psTvmF6oJUUW5wXXH
-         tzeg==
-X-Gm-Message-State: AC+VfDxMIqDe5z7Z6nUjIEBFkNQTm470AcHT01JFI5pj70fr/r41m7sf
-        kwaXNy99nD1jU0b6o5d17i7Jyg==
-X-Google-Smtp-Source: ACHHUZ6ljnrlP3/ilIjQD+BaM7rS5m1dEr3AyuNBWAGikj0kydZDXi/vDU4GxazSWUNgX9O+Y6PY3A==
-X-Received: by 2002:a17:902:c20d:b0:1ac:6d4c:c24b with SMTP id 13-20020a170902c20d00b001ac6d4cc24bmr6045835pll.3.1685636094447;
-        Thu, 01 Jun 2023 09:14:54 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id g14-20020a1709029f8e00b001b176ba9f17sm3680035plq.149.2023.06.01.09.14.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jun 2023 09:14:53 -0700 (PDT)
-Date:   Thu, 1 Jun 2023 09:14:53 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     kasan-dev@googlegroups.com, ryabinin.a.a@gmail.com,
-        glider@google.com, andreyknvl@gmail.com, dvyukov@google.com,
-        vincenzo.frascino@arm.com, elver@google.com,
-        linux-media@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, ardb@kernel.org, mchehab@kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] [RFC] ubsan: disallow bounds checking with gcov on
- broken gcc
-Message-ID: <202306010909.89C4BED@keescook>
-References: <20230601151832.3632525-1-arnd@kernel.org>
+        Thu, 1 Jun 2023 13:39:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D304136;
+        Thu,  1 Jun 2023 10:39:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EE33E64860;
+        Thu,  1 Jun 2023 17:39:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60D9AC4339E;
+        Thu,  1 Jun 2023 17:39:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685641181;
+        bh=rOyxKwyKoD8JRFg4gUZg/5MsYAzctjBiJEmXXIw+2Pg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=o/tcJHGXDGK+Cmz0WPMH9eqt4DXVRB87b+bOc4yCFZZx+pNoEHu0L6Kk/WHl5TZCQ
+         v4wg++ka5L5/koa89l5lEtczt9Lp/CS49/lq9S/D/gsV6IN2cJNGZcqlW9mzDWtgf8
+         kSPa6HE9uQjRqdmZMZGwEA+2H5w1XPFs1bwtf87IXl053GkxGBjbRGWwQEhiSemK34
+         SURRDqI9JYl4AuMZSjsgfbIzfuYI4ScXci6h+5ayJwzrwQeS7v4C8WHfjDAbGm6Wt7
+         HhKwh2oygRzaHVjZAo7rCNsfYsqW/i3EtbygDwQjD02rjzFKXYyUdDoEjObai2iibs
+         UOf6kgrQWTHWg==
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-45c6c6e0ab2so599177e0c.1;
+        Thu, 01 Jun 2023 10:39:41 -0700 (PDT)
+X-Gm-Message-State: AC+VfDzzxOBgQs22Zp+fPZ5LbXE5al098PVjDPukZSVDJiG9ue70wnq0
+        mTIF1LqBegezr4klJ3rP77T6/6P+iMKs1xV/gVo=
+X-Google-Smtp-Source: ACHHUZ7saBfaT5uX7NLiJU4LIkIoXw37eBnBmjdUSiEWtD7RMOu14iPsR47csoQHy7I8rQlHKSda/v96q9Noy2qP/FE=
+X-Received: by 2002:aca:ead6:0:b0:398:2f7f:a5cd with SMTP id
+ i205-20020acaead6000000b003982f7fa5cdmr1228908oih.24.1685641160132; Thu, 01
+ Jun 2023 10:39:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230601151832.3632525-1-arnd@kernel.org>
+References: <20230531130833.635651916@infradead.org> <20230531132323.722039569@infradead.org>
+ <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com> <20230601101409.GS4253@hirez.programming.kicks-ass.net>
+ <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de> <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
+In-Reply-To: <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Fri, 2 Jun 2023 02:38:43 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATxpUK+w=VAkhLZserLr4cMk2ffSr+qzzZwuZ6DKWA0mw@mail.gmail.com>
+Message-ID: <CAK7LNATxpUK+w=VAkhLZserLr4cMk2ffSr+qzzZwuZ6DKWA0mw@mail.gmail.com>
+Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of __SIZEOF_INT128__
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Helge Deller <deller@gmx.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+        linux-parisc@vger.kernel.org,
+        John David Anglin <dave.anglin@bell.net>,
+        Sam James <sam@gentoo.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 05:18:11PM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Combining UBSAN and GCOV in randconfig builds results in a number of
-> stack frame size warnings, such as:
-> 
-> crypto/twofish_common.c:683:1: error: the frame size of 2040 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> drivers/media/platform/mediatek/vcodec/vdec/vdec_vp9_req_lat_if.c:1589:1: error: the frame size of 1696 bytes is larger than 1400 bytes [-Werror=frame-larger-than=]
-> drivers/media/platform/verisilicon/hantro_g2_vp9_dec.c:754:1: error: the frame size of 1260 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> drivers/staging/media/ipu3/ipu3-css-params.c:1206:1: error: the frame size of 1080 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> drivers/staging/media/rkvdec/rkvdec-vp9.c:1042:1: error: the frame size of 2176 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]
-> drivers/staging/media/rkvdec/rkvdec-vp9.c:995:1: error: the frame size of 1656 bytes is larger than 1024 bytes [-Werror=frame-larger-than=]
-> 
-> I managed to track this down to the -fsanitize=bounds option clashing
-> with the -fprofile-arcs option, which leads a lot of spilled temporary
-> variables in generated instrumentation code.
-> 
-> Hopefully this can be addressed in future gcc releases the same way
-> that clang handles the combination, but for existing compiler releases,
-> it seems best to disable one of the two flags. This can be done either
-> globally by just not passing both at the same time, or locally using
-> the no_sanitize or no_instrument_function attributes in the affected
-> functions.
-> 
-> Try the simplest approach here, and turn off -fsanitize=bounds on
-> gcc when GCOV is enabled, leaving the rest of UBSAN working. Doing
-> this globally also helps avoid inefficient code from the same
-> problem that did not push the build over the warning limit.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Link: https://lore.kernel.org/stable/6b1a0ee6-c78b-4873-bfd5-89798fce9899@kili.mountain/
-> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110074
-> Link: https://godbolt.org/z/zvf7YqK5K
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+On Thu, Jun 1, 2023 at 10:29=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Thu, Jun 1, 2023 at 6:32=E2=80=AFAM Helge Deller <deller@gmx.de> wrote=
+:
+> >
+> > I don't think we need to care about gcc-10 on parisc.
+> > Debian and Gentoo are the only supported distributions, while Debian
+> > requires gcc-12 to build > 6.x kernels, and I assume Gentoo uses at lea=
+st
+> > gcc-12 as well.
+> >
+> > So raising the gcc limit for parisc only (at least temporarily for now)
+> > should be fine and your workaround below wouldn't be necessary, right?
+>
+> This absolutely sounds like the right option. Let's simplify the
+> problem space by just saying that parisc needs the newer compiler.
+>
+> Right now we have that "minimum gcc version" in a somewhat annoying
+> place: it's in the ./scripts/min-tool-version.sh file as a shell
+> script.
+>
+> I wonder if we could move the gcc minimum version check into the
+> Kconfig file instead, and make it easier to let architectures override
+> the minimum version.
 
-I think more production systems will have CONFIG_UBSAN_BOUNDS enabled
-(e.g. Ubuntu has had it enabled for more than a year now) than GCOV,
-so I'd prefer we maintain all*config coverage for the more commonly
-used config.
+Currently, it is invoked in the Kconfig time,
+but not directly in Kconfig files.
 
-> ---
->  lib/Kconfig.ubsan | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/lib/Kconfig.ubsan b/lib/Kconfig.ubsan
-> index f7cbbad2bb2f4..8f71ff8f27576 100644
-> --- a/lib/Kconfig.ubsan
-> +++ b/lib/Kconfig.ubsan
-> @@ -29,6 +29,8 @@ config UBSAN_TRAP
->  
->  config CC_HAS_UBSAN_BOUNDS_STRICT
->  	def_bool $(cc-option,-fsanitize=bounds-strict)
-> +	# work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110074
-> +	depends on GCC_VERSION > 140000 || !GCOV_PROFILE_ALL
->  	help
->  	  The -fsanitize=bounds-strict option is only available on GCC,
->  	  but uses the more strict handling of arrays that includes knowledge
+scripts/Kconfig.include
+ -> scripts/cc-version.sh
+    -> scripts/min-tool-version.sh
 
-Alternatively, how about falling back to -fsanitize=bounds instead, as
-that (which has less coverage) wasn't triggering the stack frame
-warnings?
+It would be ugly if we wrote the equivalent code
+directly in Kconfig files.
 
-i.e. fall back through these:
-	-fsanitize=array-bounds (Clang)
-	-fsanitize=bounds-strict (!GCOV || bug fixed in GCC)
-	-fsanitize=bounds
 
--- 
-Kees Cook
+>
+> I don't quite know how to do that sanely, though. I don't think we
+> have a sane way to error out at Kconfig time (except by forcing some
+> syntax error inside an 'if' statement or something horrendously hacky
+> like that).
+
+The parse stage can fail by $(error-if ) macro, but
+the evaluation stage never fails. I think it is a design.
+
+I think checking the compiler version during the parse stage
+makes sense given the current situation. The compiler version is
+fixed when Kconfig starts. If the compiler is found to be too old,
+there is no meaning to proceed.
+
+
+You suggested to choose a compiler in the Kconfig time:
+https://lore.kernel.org/lkml/CAHk-=3DwhdrvCkSWh=3DBRrwZwNo3=3DyLBXXM88NGx8V=
+EpP1VTgmkyQ@mail.gmail.com/
+
+When we achieve that, moving the min version to Kconfig files will be
+the right thing to do. Then, everything will be evaluated dynamically.
+
+
+>
+> Added Masahiro to the (already overlong) participants list.
+>
+>                    Linus
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
