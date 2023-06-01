@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 801A1C77B7E
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B356CC7EE2A
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231493AbjFAKVC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:21:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55372 "EHLO
+        id S232459AbjFAKVD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 06:21:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233560AbjFAKTM (ORCPT
+        with ESMTP id S233508AbjFAKTQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:19:12 -0400
+        Thu, 1 Jun 2023 06:19:16 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1406C2129
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 03:16:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617161985
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 03:16:19 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <ore@pengutronix.de>)
-        id 1q4fKZ-0004WH-5v; Thu, 01 Jun 2023 12:14:55 +0200
+        id 1q4fKZ-0004WD-5l; Thu, 01 Jun 2023 12:14:55 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
         (envelope-from <ore@pengutronix.de>)
-        id 1q4fKY-004KWQ-95; Thu, 01 Jun 2023 12:14:54 +0200
+        id 1q4fKX-004KWH-WF; Thu, 01 Jun 2023 12:14:54 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
         (envelope-from <ore@pengutronix.de>)
-        id 1q4fKW-001V4d-Nx; Thu, 01 Jun 2023 12:14:52 +0200
+        id 1q4fKW-001V3z-KX; Thu, 01 Jun 2023 12:14:52 +0200
 From:   Oleksij Rempel <o.rempel@pengutronix.de>
 To:     Abel Vesa <abelvesa@kernel.org>,
         Michael Turquette <mturquette@baylibre.com>,
@@ -54,9 +54,9 @@ Cc:     Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
         linux-mmc@vger.kernel.org
-Subject: [PATCH v1 7/7] dt-bindings: input: touchscreen: edt-ft5x06: Add 'threshold' property
-Date:   Thu,  1 Jun 2023 12:14:51 +0200
-Message-Id: <20230601101451.357662-8-o.rempel@pengutronix.de>
+Subject: [PATCH v1 3/7] dt-bindings: timer: gpt: Support 3rd clock for i.MX6DL
+Date:   Thu,  1 Jun 2023 12:14:47 +0200
+Message-Id: <20230601101451.357662-4-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230601101451.357662-1-o.rempel@pengutronix.de>
 References: <20230601101451.357662-1-o.rempel@pengutronix.de>
@@ -70,36 +70,55 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a new property 'threshold' to the edt-ft5x06 touchscreen binding.
-This property allows setting the "click"-threshold in the range from 0
-to 255. This change addresses the following dtbs_check warning:
-  imx6dl-lanmcu.dtb: touchscreen@38: 'threshold' does not match any of the
-    regexes: 'pinctrl-[0-9]+'
-  From schema:
-    Documentation/devicetree/bindings/input/touchscreen/edt-ft5x06.yaml
+Add support for a 3rd clock, 'osc_per', for i.MX6DL to the 'fsl,imxgpt'
+binding to resolve the following dtbs_check warning:
+  imx6dl-alti6p.dtb: timer@2098000: clocks: [[2, 119], [2, 120], [2, 237]]
+    is too long
+  From schema: Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
+  imx6dl-alti6p.dtb: timer@2098000: clock-names: ['ipg', 'per', 'osc_per']
+    is too long
+  From schema: Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- .../devicetree/bindings/input/touchscreen/edt-ft5x06.yaml   | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../devicetree/bindings/timer/fsl,imxgpt.yaml | 22 ++++++++++++++-----
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/input/touchscreen/edt-ft5x06.yaml b/Documentation/devicetree/bindings/input/touchscreen/edt-ft5x06.yaml
-index ef4c841387bd..f2808cb4d99d 100644
---- a/Documentation/devicetree/bindings/input/touchscreen/edt-ft5x06.yaml
-+++ b/Documentation/devicetree/bindings/input/touchscreen/edt-ft5x06.yaml
-@@ -93,6 +93,12 @@ properties:
-     minimum: 1
-     maximum: 255
+diff --git a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
+index adf617b8f353..21ff51c3f38f 100644
+--- a/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
++++ b/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
+@@ -46,14 +46,24 @@ properties:
+     maxItems: 1
  
-+  threshold:
-+    description: Allows setting the  "click"-threshold in the range from 0 to 255.
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    minimum: 0
-+    maximum: 255
-+
-   touchscreen-size-x: true
-   touchscreen-size-y: true
-   touchscreen-fuzz-x: true
+   clocks:
+-    items:
+-      - description: SoC GPT ipg clock
+-      - description: SoC GPT per clock
++    anyOf:
++      - items:
++          - description: SoC GPT ipg clock
++          - description: SoC GPT per clock
++      - items:
++          - description: SoC GPT ipg clock
++          - description: SoC GPT per clock
++          - description: SoC GPT osc_per clock
+ 
+   clock-names:
+-    items:
+-      - const: ipg
+-      - const: per
++    anyOf:
++      - items:
++          - const: ipg
++          - const: per
++      - items:
++          - const: ipg
++          - const: per
++          - const: osc_per
+ 
+ required:
+   - compatible
 -- 
 2.39.2
 
