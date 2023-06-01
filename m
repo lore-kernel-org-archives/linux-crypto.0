@@ -2,164 +2,122 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AE5C7EE2A
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 18:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3DEC7EE23
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 18:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232466AbjFAS03 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 14:26:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59850 "EHLO
+        id S231383AbjFAS2u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 14:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232222AbjFAS01 (ORCPT
+        with ESMTP id S230007AbjFAS2t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 14:26:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF05193;
-        Thu,  1 Jun 2023 11:26:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 57802648CF;
-        Thu,  1 Jun 2023 18:26:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDE23C433EF;
-        Thu,  1 Jun 2023 18:26:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685643971;
-        bh=TBbu7osvFBKuf66WBcBQLyIQCCJTf+5qdAP5tofTIaE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=A9cmwW9ZU12QuOvLrFst3R1eecB/8LMV1FSykLyAWafIGCHBHtUxGHDDh+w2tozEN
-         guuJt/TO+te54HWzOFDRDpuYAUmqtNMFaIa/jK1bCdncLCkd2CRSe+EMKrItwoqTdu
-         Ri+VlwuL5pq3ChHAptv2CHRF9T4jNMUpUqOXZSxwrzJ4MfRrQC37bwVgo02bJvSA3a
-         F9uK8PF4RIU1kvZ7oDBgC4kljOq9Ec5nAJlv0W2mX0ZCRPX3XphjJ/uyCiJDBa/PYd
-         cX/uuGz+t6YmYK9/UCGKYH4pidln7BunKPHyJIk79yq3C7vtNGhIexTE9hulS7Ke/k
-         cV3Lr97berdVg==
-Date:   Thu, 1 Jun 2023 19:26:03 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Oleksij Rempel <o.rempel@pengutronix.de>
-Cc:     Abel Vesa <abelvesa@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
+        Thu, 1 Jun 2023 14:28:49 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2F510C6
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 11:28:24 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1b04949e5baso10492245ad.0
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Jun 2023 11:28:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1685644092; x=1688236092;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZLQgV5OTogJ1ylkCDiOjxfc1T+CJXFQFeKoN9hX3ug=;
+        b=ac+D7llpyM/BXxwdJaEuWvmMQMeui0FxZcRRZfnSpxqEIcArtXlCuZLwdqvfE3qGok
+         4YJ2vXhKuTgstjkSaUUfSn4yhgRW5lkYVmqdpxgsomkqIhx3z9M67ufAL1kVHNnkKSkr
+         AnBhc03iHLRfh7oBDG/8KKFHGAinTY75WMNeA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685644092; x=1688236092;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZZLQgV5OTogJ1ylkCDiOjxfc1T+CJXFQFeKoN9hX3ug=;
+        b=FYJ7YSMg6wVRwVn1hzutxpGCP1DNsBgYCUR5aVQi4EQu0lcbMFCkX0JJO7uU4xedOj
+         nnkIltSZtmfh9GQOqKGDZl50FDHjm7k/+bMV9ZOEcHLljHOs6Z7J/BvYNdsKvBpRIklB
+         uaDH0C1jAPsTHDjluVJ3AlPw4KG5ZuYeJ/jgBK8e0UQ8Z+etUtZQq4thuSXA2P/0J3lk
+         Ma1t9fw6qPeHo8hsZbgyZvI5fVzij2xFu6Xoq6SkZR2A76e2VCO3NvX2ZVo2103CMB2x
+         rEUxSWZOo1fQnCNhjlONwybj6WeYMg10AltLqbndU5TQn3ebKB+roRJ4PZ25BvRONeE6
+         tidw==
+X-Gm-Message-State: AC+VfDzfNr5OJ7SoIgPgJhW4GF/dBStZnjeaTv9irm+lbRxLbZMPQT+C
+        r9NfrhQWAH5BS0RHbpIt/SppCg==
+X-Google-Smtp-Source: ACHHUZ6VsAWG8Oi4STZkNdzz+9GCCgAqrG0b/8X2yp5U2lZsp1m4pLUb6tcFZsc1F6+QClxMAWQwkQ==
+X-Received: by 2002:a17:903:2286:b0:1b0:1036:608c with SMTP id b6-20020a170903228600b001b01036608cmr261752plh.25.1685644092279;
+        Thu, 01 Jun 2023 11:28:12 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id n18-20020a170903111200b001ac4e316b51sm3833178plh.109.2023.06.01.11.28.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 11:28:11 -0700 (PDT)
+Date:   Thu, 1 Jun 2023 11:28:11 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Arnd Bergmann <arnd@kernel.org>, kasan-dev@googlegroups.com,
+        Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+        Alexander Potapenko <glider@google.com>,
+        Andrey Konovalov <andreyknvl@gmail.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Marco Elver <elver@google.com>, linux-media@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>, kernel@pengutronix.de,
-        Peng Fan <peng.fan@nxp.com>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Michael Trimarchi <michael@amarulasolutions.com>,
-        Mark Brown <broonie@kernel.org>,
-        Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-        Anson Huang <Anson.Huang@nxp.com>, Marek Vasut <marex@denx.de>,
-        linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org
-Subject: Re: [PATCH v1 4/7] dt-bindings: crypto: fsl-dcp: Add i.MX6SL,
- i.MX6SLL, and i.MX6ULL support
-Message-ID: <20230601-deranged-whole-5f5d5b2b6db1@spud>
-References: <20230601101451.357662-1-o.rempel@pengutronix.de>
- <20230601101451.357662-5-o.rempel@pengutronix.de>
+        Ard Biesheuvel <ardb@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] [RFC] ubsan: disallow bounds checking with gcov on
+ broken gcc
+Message-ID: <202306011127.B801968@keescook>
+References: <20230601151832.3632525-1-arnd@kernel.org>
+ <202306010909.89C4BED@keescook>
+ <f6fcae8a-9b50-48e4-84e9-c37613226c63@app.fastmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="XbJH3SC5GDn8KS5H"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230601101451.357662-5-o.rempel@pengutronix.de>
+In-Reply-To: <f6fcae8a-9b50-48e4-84e9-c37613226c63@app.fastmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Thu, Jun 01, 2023 at 07:50:38PM +0200, Arnd Bergmann wrote:
+> On Thu, Jun 1, 2023, at 18:14, Kees Cook wrote:
+> > On Thu, Jun 01, 2023 at 05:18:11PM +0200, Arnd Bergmann wrote:
+> >
+> > I think more production systems will have CONFIG_UBSAN_BOUNDS enabled
+> > (e.g. Ubuntu has had it enabled for more than a year now) than GCOV,
+> > so I'd prefer we maintain all*config coverage for the more commonly
+> > used config.
+> 
+> Fair enough, I can send that as v2, but let's see what the others
+> think first.
+> 
+> >>  config CC_HAS_UBSAN_BOUNDS_STRICT
+> >>  	def_bool $(cc-option,-fsanitize=bounds-strict)
+> >> +	# work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110074
+> >> +	depends on GCC_VERSION > 140000 || !GCOV_PROFILE_ALL
+> >>  	help
+> >>  	  The -fsanitize=bounds-strict option is only available on GCC,
+> >>  	  but uses the more strict handling of arrays that includes knowledge
+> >
+> > Alternatively, how about falling back to -fsanitize=bounds instead, as
+> > that (which has less coverage) wasn't triggering the stack frame
+> > warnings?
+> >
+> > i.e. fall back through these:
+> > 	-fsanitize=array-bounds (Clang)
+> > 	-fsanitize=bounds-strict (!GCOV || bug fixed in GCC)
+> > 	-fsanitize=bounds
+> 
+> From what I can tell, -fsanitize=bounds has the same problem
+> as -fsanitize=bounds-strict, so that would not help.
 
---XbJH3SC5GDn8KS5H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, did something change with GCOV? This (bounds vs bounds-strict) is
+the only recent change to CONFIG_UBSAN_BOUNDS...
 
-On Thu, Jun 01, 2023 at 12:14:48PM +0200, Oleksij Rempel wrote:
-> Add support for i.MX6SL, i.MX6SLL, and i.MX6ULL to the 'fsl-dcp' binding
-> to address the following dtbs_check warning:
->   imx6ull-jozacp.dtb: crypto@2280000: compatible:0: 'fsl,imx6ull-dcp' is
->     not one of ['fsl,imx23-dcp', 'fsl,imx28-dcp']
->   From schema: Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
->=20
->   imx6ull-jozacp.dtb: crypto@2280000: compatible: ['fsl,imx6ull-dcp',
->     'fsl,imx28-dcp'] is too long
->   From schema: Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
->=20
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  .../devicetree/bindings/crypto/fsl-dcp.yaml   | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml b/Docu=
-mentation/devicetree/bindings/crypto/fsl-dcp.yaml
-> index 99be01539fcd..8af393b9f3ca 100644
-> --- a/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/fsl-dcp.yaml
-> @@ -11,9 +11,22 @@ maintainers:
-> =20
->  properties:
->    compatible:
-> -    enum:
-> -      - fsl,imx23-dcp
-> -      - fsl,imx28-dcp
-> +    oneOf:
-> +      - const: fsl,imx23-dcp
-> +      - const: fsl,imx28-dcp
-> +      - const: fsl,imx6sl-dcp
-> +      - const: fsl,imx6sll-dcp
-> +      - const: fsl,imx6ull-dcp
-
-Confused again here chief, why allow these to appear on their own if
-their are all compatible with the imx28-dcp?
-
-> +      - items:
-> +          - enum:
-> +              - fsl,imx6sl-dcp
-> +              - fsl,imx6sll-dcp
-> +              - fsl,imx6ull-dcp
-> +          - const: fsl,imx28-dcp
-> +      - items:
-> +          - enum:
-> +              - fsl,imx28-dcp
-> +          - const: fsl,imx23-dcp
-
-I don't get this either. Why set the imx23-dcp as the fallback for the
-imx28-dcp, when the imx28-dcp is being used as the fallback for the imx6
-stuff?
-
-I get the impression that some of the devicetrees should be fixed up,
-rather than adding these sorta odd conditions to the bindings.
-
-To me it'd make sense to swap everything that uses imx28-dcp as a
-fallback to use imx23-dcp instead, since that is the most generic one?
-
-What am I missing?
-
-Cheers,
-Conor.
-
-> =20
->    reg:
->      maxItems: 1
-> --=20
-> 2.39.2
->=20
-
---XbJH3SC5GDn8KS5H
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZHjiuwAKCRB4tDGHoIJi
-0t4oAP4t/nOvAEHSbADUVQoAIkzwjFhYsOKHRpmygBC9qWhAxQEAmbN2h5I3sx6y
-F0mOajZCVnZv5KCYbI53mIwOL2voPAg=
-=iUTA
------END PGP SIGNATURE-----
-
---XbJH3SC5GDn8KS5H--
+-- 
+Kees Cook
