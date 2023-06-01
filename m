@@ -2,183 +2,195 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C76F8C77B73
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 May 2023 22:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF45C77B73
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 00:19:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjEaWcc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 May 2023 18:32:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48326 "EHLO
+        id S229553AbjFAATM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 31 May 2023 20:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbjEaWcb (ORCPT
+        with ESMTP id S229469AbjFAATL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 May 2023 18:32:31 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2062.outbound.protection.outlook.com [40.107.93.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C769D;
-        Wed, 31 May 2023 15:32:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IUPTKhZ7RcHhXgkiJ1ktNgVr3NTacvzeC/2ovH3iEmWxVZ0B0ZbAcbQkS/ixpv9QPQPw+F9yw5xKZtLWWLUOeu6BkfXYo/s/f1G/TXqNBxhYDbXTIvvrvDJTtTB7ZreiNXGXZJk62LLUQaiLAhHuMXYa8nu8L+OPADoscSK5bMQ3Y4K4FjeEFUg9oN+ZmwBLgTb3KNC65fPi8JAT4m1uLkGZi0fG865yTw+i4dA24PmhbiAS5QRQqHLxklk01LPvch4m+ihjuYnSLz2Cjstq/hdXxXCUW3Op2JZiHFVcOXs7m38MOE3h1bK1xjHK2DFOmUIW1LoBvXs51aTiZ3dDxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nPQ7o1MxU00O3hYxKDVh88QYR+ja5Q2EH/JAIjzuxrQ=;
- b=YAq17avmx5mWEHKsr7s6017nLHL3+xVifW4sPIYiRvUgjv38pTWMSJ7SnlkXT2dt8E96MGs8rZfWNjYIPiiHb81AwdqRQdKVOZf/meoQlCFO4Tyr+/xlPC1nUzisipsIIEsbchoYFZaKrk/im7VArZjswCanpn/+JCtesFSuGjueP2xdzLf4keplR/cgqIkwKtwcmeHRq3a6dcjybafnynucZYN1eyHeMZifhSSm+PQAyNGt9Lshxxwlc27Zzfr2BO02arbFaVmgwXLT2Aam930eME9AdL1mjk3/LhnmRFQed9tgi9CjbTiiSiR7rO7ZDAuEVJFl3xfR+Aofsd9NsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nPQ7o1MxU00O3hYxKDVh88QYR+ja5Q2EH/JAIjzuxrQ=;
- b=hluevz/eRJkCmeLlCCMTapoPj+GeDFA4lEByobvesvT5SyKjJrQvpXlmsemfrMQd7OywFGK5R1nyoQCl8xUxCBlSG1MYglU6RwjqVk6xHJEgmxhbNooU5Ro5LQzHgWAJII8ffVjSWaD4cdZsauVoa2gUiPb2+6d8kzcOfzO79o8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
- by SJ0PR12MB6759.namprd12.prod.outlook.com (2603:10b6:a03:44b::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.24; Wed, 31 May
- 2023 22:32:28 +0000
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::803:a64e:c632:4452]) by BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::803:a64e:c632:4452%3]) with mapi id 15.20.6433.022; Wed, 31 May 2023
- 22:32:28 +0000
-Date:   Wed, 31 May 2023 17:32:22 -0500
-From:   John Allen <john.allen@amd.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mario Limonciello <mario.limonciello@amd.com>
-Subject: Re: [PATCH 3/3] crypto: ccp - Add support for PCI device 0x156E
-Message-ID: <ZHfK9hsCyrAeRyYz@johallen-workstation>
-References: <20230519032414.94247-1-mario.limonciello@amd.com>
- <20230519032414.94247-4-mario.limonciello@amd.com>
- <ZGfLrtmVOcCYiWFW@johallen-workstation>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZGfLrtmVOcCYiWFW@johallen-workstation>
-X-ClientProxiedBy: YQBPR01CA0166.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:7e::28) To BL1PR12MB5995.namprd12.prod.outlook.com
- (2603:10b6:208:39b::20)
+        Wed, 31 May 2023 20:19:11 -0400
+X-Greylist: delayed 294 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 31 May 2023 17:19:09 PDT
+Received: from sequoia-grove.ad.secure-endpoints.com (sequoia-grove.ad.secure-endpoints.com [IPv6:2001:470:1f07:f77:70f5:c082:a96a:5685])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34FB11F
+        for <linux-crypto@vger.kernel.org>; Wed, 31 May 2023 17:19:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
+        d=auristor.com; s=MDaemon; r=y; t=1685578454; x=1686183254;
+        i=jaltman@auristor.com; q=dns/txt; h=Message-ID:Date:
+        MIME-Version:User-Agent:Subject:To:Cc:References:
+        Content-Language:From:Organization:In-Reply-To:Content-Type;
+        bh=LNStOPfOIuOWsgox6l/zSnIfO1/ExWDWZbwjbk2aEYQ=; b=euESbeTFkk5t6
+        /B8WH+hQYcfpb+oBYhPaSA0OuorZMvYhjsWS+X6xUNxlq1B5EN/NErSq7TpyWcpy
+        iTvZDJtFM+wsV1uG/f6UF0kKcWOvgicbCD7QtJmsRRo7o46FKdjBgE1szwG3o96y
+        pGaLJtAjsZGx/RxO5n+rHmVznwOQc4=
+X-MDAV-Result: clean
+X-MDAV-Processed: sequoia-grove.ad.secure-endpoints.com, Wed, 31 May 2023 20:14:14 -0400
+Received: from [IPV6:2603:7000:73c:9c99:cc97:6df8:a457:33bf] by auristor.com (IPv6:2001:470:1f07:f77:28d9:68fb:855d:c2a5) (MDaemon PRO v23.0.2d) 
+        with ESMTPSA id md5001003481696.msg; Wed, 31 May 2023 20:14:13 -0400
+X-MDRemoteIP: 2603:7000:73c:9c99:cc97:6df8:a457:33bf
+X-MDHelo: [IPV6:2603:7000:73c:9c99:cc97:6df8:a457:33bf]
+X-MDArrival-Date: Wed, 31 May 2023 20:14:13 -0400
+X-MDOrigin-Country: US, NA
+X-Authenticated-Sender: jaltman@auristor.com
+X-Return-Path: prvs=1516548fbb=jaltman@auristor.com
+X-Envelope-From: jaltman@auristor.com
+X-MDaemon-Deliver-To: linux-crypto@vger.kernel.org
+Message-ID: <83d7f550-7216-6ff4-bc8a-859e752e12a3@auristor.com>
+Date:   Wed, 31 May 2023 20:14:02 -0400
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|SJ0PR12MB6759:EE_
-X-MS-Office365-Filtering-Correlation-Id: b94e8f70-611b-47a7-4683-08db6226e9ff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: T8OTz7wJ7L2431P9Gyye8CwBOzOACknJshD+nGaNwnCFjRyBGVUNd741alfHy5zikG69dQsJbdtTZ34/xEu4Sg6DGDbmfh/4XR/6qXrymekEK3nbZ6i29PC6D+Ql2qBgTNFC8FYB1hl0d04xXv6J07DNEyAyeN5xq6fqyglziZ/K/RD1sWxqfwCxHEHgLnr8TzO5j4nPkM2ulaEa1uh/ZtY0MUBnjQAaq0b5v70inoK4R2V23OZIjj3UZUuXtRbh/OU3spzEOhBQHUdyfhQRPyZ28xf0NmeCphCZud4lyGkqocxsOTd0HBkRFcy1nz7JD1ISZGlI1wYH2WTitvwOYTmcqT2ABKWASoAVko24ak13GB5WsQ/G7WSZuMnuIb+Xy9US4w2nmqUot7O9h+R3crs123kOXshcQ338oecCh7xH8YnOaZIIxxYt9YxOXNKMy4HRoDDNwN2KMcOeH+xr+dSgHXTZB2ID5PYwElLyCWZyIs9iFfpkznGU4NrAtio8ZmjI00QABvjvnVWWxV+n1nTHkK75NaNadrTKgAHLM4upMCS+jvDv/2l/XX1GKcdH
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(396003)(376002)(39860400002)(366004)(346002)(136003)(451199021)(33716001)(4326008)(38100700002)(41300700001)(316002)(6486002)(9686003)(6666004)(26005)(6916009)(66556008)(66476007)(6512007)(66946007)(6506007)(44832011)(8936002)(2906002)(5660300002)(8676002)(54906003)(478600001)(86362001)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?I06rgvuOnF4ainxqLVKn8wrHixEgXBAaM6f2z+CKgsh7IuGz3/KLjDvfLoI4?=
- =?us-ascii?Q?25TF1KeFDwA9B90K8lhkEOByzfvD72C8iPGkKITkTM/z+M3XFBwzEH5x8FWE?=
- =?us-ascii?Q?HtFR+6gcdt+g3TnxQpIhtG8vUnEW2h4pqpNZU19AYQOwc5SIBgzhtfUMcoTC?=
- =?us-ascii?Q?jZQD9K7OuU1m+JD8ff/bc5zwlMnv00LPEmce+txfWOcL9eiFCsl3oEstb1/d?=
- =?us-ascii?Q?YwMH4JOQVZe0Ej2qPI8fGJVHFJAV+segL842C8X5/NrP0xRmotAVFLTOLByW?=
- =?us-ascii?Q?MBtwiSFaPHezTwnqZYgSwtgbujNfmon6TyTI/8fyaJyj625NEmq+n5aYa5f+?=
- =?us-ascii?Q?p59DiNpRsc4bVukzGGPy9xbSmtk0ZVEfiL+QNIY12z+mIKk21hqotu09mWwt?=
- =?us-ascii?Q?j4Ca7SwguSFwPoNsEJrl6Wug4Q/nXMA2oHv3VlhnUQqEtNQBThKQ77ioZxiV?=
- =?us-ascii?Q?jG1T2Ud0p+SZ+9TRFOvvdi6p3tWOZ5sWcnAoyNpGgjFl7BVI1thyTtbkfH0R?=
- =?us-ascii?Q?AT4wclo/+eeMTebPYfUctZeMwcG6H6T8sPu1xJHeT94WxrFhquFMnnBGW4Ol?=
- =?us-ascii?Q?SFBQ3LG+ieIQxmHMdB9GoB3eWt+dyyCEyTALz699PZz5kuW9UMr9s8+Ec8j5?=
- =?us-ascii?Q?yXxaR1dWdgbNGgpxJvEzJFgftco5BAYlIT3E4zKdXkkQbRgK2199cVC3+Jz4?=
- =?us-ascii?Q?q+sJxiU+NJ9W/lglt0adBaQNjZwJy2ngVaCr8zVG+QjuOsAGA+HqlzKkU4dO?=
- =?us-ascii?Q?kr7jGe5RK0ORYIJ5z+hZD7PDaHK9De2Rq1x4r0tOtGnn0mLrPXVWxK12AUED?=
- =?us-ascii?Q?0br93D/MFrlMhYVlLbYDzaV0DvtY/XGA/bhiqzJwTKQShdjdWWokc5wFQuBe?=
- =?us-ascii?Q?7/stA19nu0oUBCbdqSa3+xCB/n1tDFDC8Myr4pTPG2iH3UtEcO4dp631Tlna?=
- =?us-ascii?Q?nG7vuh47Juir1pamvPCwPmD2Mr493rZSACIKfvz3W/zH0msJC23kjmS/Yoqg?=
- =?us-ascii?Q?eOIKAJEH/cUHQ49P4Ys6olEM6yolh5ELXoybFxK4lFKk+afdscHdCGlpbt//?=
- =?us-ascii?Q?6rR+uKvrrbmvQRmzFIlJlk8vCkrXMVCdeat2CBP0Etut1/K3JmnAJi/hobFS?=
- =?us-ascii?Q?aO8U7XPLfIEHY8U8JGsWHN/uZRlkQ5RoBwIIEuGxcKKUwT04Peon/sVDy55X?=
- =?us-ascii?Q?lGyP+T7B9FGRMQNJQ4I2F5Pio5fFSVoZENQSLdm6FaBFmaGJItMHc8SQji/r?=
- =?us-ascii?Q?iezkcb6BDDW5Qfyv4ZFnWY5/c3aaq8xpTSul644ohz3Qw20PHoBU6/uFdcY/?=
- =?us-ascii?Q?cjNiN5plEyt08Xod0tCQjEx//jQyg/Zn5V9q4RQTUHaf87TYr9yFc6tOvOL8?=
- =?us-ascii?Q?sPqgy0qfLkXBmbviW5j+nT0EL+AVgLOkcfmuxJXHUwmYjwDL/Y/r0wLjHmz9?=
- =?us-ascii?Q?nogryvVChE2Wkvy7v/nh5AUY8Z7XAUZZsKXhfmP6muX0tYP0WD5Eqg7Qd9a4?=
- =?us-ascii?Q?YJxN5hEoXXAl2iizSELVzs10Pjn//FjmdA5hTPSWGxucuHhqcorZstlY1EDs?=
- =?us-ascii?Q?iFKAgC40R6sMzf16woxu31ZEXdhBxxepZQrPGHrZ?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b94e8f70-611b-47a7-4683-08db6226e9ff
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2023 22:32:27.9550
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +JTqMqY1BqUJP5whdXFaGgkDHINDBGeirqoo7o31XHB03Ljlew9ZkCSLlDTNBuEBudOGFPXzLP6Mm+Jk3DbM0g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6759
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: How to get my krb5 crypto lib upstream?
+To:     David Howells <dhowells@redhat.com>,
+        Chuck Lever III <chuck.lever@oracle.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <8C32DD7C-719D-4CC5-A1E3-33BCE0A7FEFF@oracle.com>
+ <723506.1685552525@warthog.procyon.org.uk>
+ <726863.1685563684@warthog.procyon.org.uk>
+Content-Language: en-US
+From:   Jeffrey E Altman <jaltman@auristor.com>
+Organization: AuriStor, Inc.
+In-Reply-To: <726863.1685563684@warthog.procyon.org.uk>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms070606000804060500030007"
+X-MDCFSigsAdded: auristor.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 19, 2023 at 02:19:10PM -0500, John Allen wrote:
-> On Thu, May 18, 2023 at 10:24:14PM -0500, Mario Limonciello wrote:
-> > From: John Allen <john.allen@amd.com>
-> > 
-> > Add a new CCP/PSP PCI device ID and new PSP register offsets.
-> > 
-> > Signed-off-by: John Allen <john.allen@amd.com>
-> 
-> Hi Herbert,
-> 
-> Please hold off on applying this patch for now. I need to do a little
-> bit more testing.
-> 
-> Thanks,
-> John
+This is a cryptographically signed message in MIME format.
 
-Hi Herbert,
+--------------ms070606000804060500030007
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-I completed the aforementioned testing. This patch can be applied if
-everything else in the series looks good.
+On 5/31/2023 4:08 PM, David Howells wrote:
+> Fair point.  In rxgk, I use key_len, key_bytes, block_len, cksum_len plus the
+> name for procfs purposes.  I also wonder if I need separate key_len and
+> key_bytes if I'm not supporting DES (DES keys gets expanded IIRC).  Also, some
+> of the checks I'm doing could perhaps be moved into the krb5 lib.
 
-Thanks,
-John
+The "K" in RXGK is RFC3961 without support for weak ciphers.  No DES, no 
+3DES
+and no RC4-HMAC.   DES keys are never expanded.
 
-> 
-> > ---
-> >  drivers/crypto/ccp/sp-pci.c | 15 +++++++++++++++
-> >  1 file changed, 15 insertions(+)
-> > 
-> > diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-> > index d0d70af0c4c0..b603ad9b8341 100644
-> > --- a/drivers/crypto/ccp/sp-pci.c
-> > +++ b/drivers/crypto/ccp/sp-pci.c
-> > @@ -420,6 +420,14 @@ static const struct psp_vdata pspv5 = {
-> >  	.intsts_reg		= 0x10514,	/* P2CMSG_INTSTS */
-> >  };
-> >  
-> > +static const struct psp_vdata pspv6 = {
-> > +	.sev                    = &sevv2,
-> > +	.tee                    = &teev2,
-> > +	.feature_reg            = 0x109fc,	/* C2PMSG_63 */
-> > +	.inten_reg              = 0x10510,	/* P2CMSG_INTEN */
-> > +	.intsts_reg             = 0x10514,	/* P2CMSG_INTSTS */
-> > +};
-> > +
-> >  #endif
-> >  
-> >  static const struct sp_dev_vdata dev_vdata[] = {
-> > @@ -478,6 +486,12 @@ static const struct sp_dev_vdata dev_vdata[] = {
-> >  		.bar = 2,
-> >  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
-> >  		.psp_vdata = &pspv5,
-> > +#endif
-> > +	},
-> > +	{	/* 8 */
-> > +		.bar = 2,
-> > +#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-> > +		.psp_vdata = &pspv6,
-> >  #endif
-> >  	},
-> >  };
-> > @@ -491,6 +505,7 @@ static const struct pci_device_id sp_pci_table[] = {
-> >  	{ PCI_VDEVICE(AMD, 0x15C7), (kernel_ulong_t)&dev_vdata[6] },
-> >  	{ PCI_VDEVICE(AMD, 0x1649), (kernel_ulong_t)&dev_vdata[6] },
-> >  	{ PCI_VDEVICE(AMD, 0x17E0), (kernel_ulong_t)&dev_vdata[7] },
-> > +	{ PCI_VDEVICE(AMD, 0x156E), (kernel_ulong_t)&dev_vdata[8] },
-> >  	/* Last entry must be zero */
-> >  	{ 0, }
-> >  };
-> > -- 
-> > 2.34.1
-> > 
+The supported ciphers are
+
+  * aes128-cts-hmac-sha1-96 (RFC3962)
+  * aes256-cts-hmac-sha1-96 (RFC3962)
+  * aes128-cts-hmac-sha256-128  (RFC8009)
+  * aes256-cts-hmac-sha384-192  (RFC8009)
+
+There are other Kerberos ciphers that could be used with RXGK but there 
+are no RXGK server implementations that use them.   None of the RFC3961 
+ciphers or the RFC3961 interfaces support AEAD modes.
+
+Luke Howard proposed "AEAD Encryption Types for Kerberos 5" 
+https://datatracker.ietf.org/doc/draft-howard-krb-aead/ to IETF Kitten 
+which would add AES128 and AES256 GCM, CCM, and OCB modes. However, 
+there is some resistance to these additions because at the moment all 
+RFC3961 ciphers are safe for use with long term keys and repeating 
+cipher state; AEAD modes are not.
+
+RXGK can be constrained such that it is safe for use with AEAD modes and 
+I would like to see Luke's draft be adopted if only because CTS-HMAC is 
+not supported by Intel QAT and GCM is. Adoption of Luke's draft would 
+not only benefit AuriStorFS but NFSv4 gss-krb5 as well.
+
+My suggestion is that the kernel should provide an RFC3961 API for use 
+by gss_krb5 applications.   AEAD modes can be added to that if and when 
+Luke's draft is adopted.
+
+Jeffrey Altman
+
+
+
+
+--------------ms070606000804060500030007
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCC
+DHEwggXSMIIEuqADAgECAhBAAYJpmi/rPn/F0fJyDlzMMA0GCSqGSIb3DQEBCwUAMDoxCzAJ
+BgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTEz
+MB4XDTIyMDgwNDE2MDQ0OFoXDTI1MTAzMTE2MDM0OFowcDEvMC0GCgmSJomT8ixkAQETH0Ew
+MTQxMEQwMDAwMDE4MjY5OUEyRkQyMDAwMjMzQ0QxGTAXBgNVBAMTEEplZmZyZXkgRSBBbHRt
+YW4xFTATBgNVBAoTDEF1cmlTdG9yIEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQCkC7PKBBZnQqDKPtZPMLAy77zo2DPvwtGnd1hNjPvbXrpGxUb3
+xHZRtv179LHKAOcsY2jIctzieMxf82OMyhpBziMPsFAG/ukihBMFj3/xEeZVso3K27pSAyyN
+fO/wJ0rX7G+ges22Dd7goZul8rPaTJBIxbZDuaykJMGpNq4PQ8VPcnYZx+6b+nJwJJoJ46kI
+EEfNh3UKvB/vM0qtxS690iAdgmQIhTl+qfXq4IxWB6b+3NeQxgR6KLU4P7v88/tvJTpxIKkg
+9xj89ruzeThyRFd2DSe3vfdnq9+g4qJSHRXyTft6W3Lkp7UWTM4kMqOcc4VSRdufVKBQNXjG
+IcnhAgMBAAGjggKcMIICmDAOBgNVHQ8BAf8EBAMCBPAwgYQGCCsGAQUFBwEBBHgwdjAwBggr
+BgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2NzcC5pZGVudHJ1c3QuY29tMEIGCCsGAQUF
+BzAChjZodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3QuY29tL2NlcnRzL3RydXN0aWRjYWEx
+My5wN2MwHwYDVR0jBBgwFoAULbfeG1l+KpguzeHUG+PFEBJe6RQwCQYDVR0TBAIwADCCASsG
+A1UdIASCASIwggEeMIIBGgYLYIZIAYb5LwAGAgEwggEJMEoGCCsGAQUFBwIBFj5odHRwczov
+L3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRpZmljYXRlcy9wb2xpY3kvdHMvaW5kZXguaHRt
+bDCBugYIKwYBBQUHAgIwga0MgapUaGlzIFRydXN0SUQgQ2VydGlmaWNhdGUgaGFzIGJlZW4g
+aXNzdWVkIGluIGFjY29yZGFuY2Ugd2l0aCBJZGVuVHJ1c3QncyBUcnVzdElEIENlcnRpZmlj
+YXRlIFBvbGljeSBmb3VuZCBhdCBodHRwczovL3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRp
+ZmljYXRlcy9wb2xpY3kvdHMvaW5kZXguaHRtbDBFBgNVHR8EPjA8MDqgOKA2hjRodHRwOi8v
+dmFsaWRhdGlvbi5pZGVudHJ1c3QuY29tL2NybC90cnVzdGlkY2FhMTMuY3JsMB8GA1UdEQQY
+MBaBFGphbHRtYW5AYXVyaXN0b3IuY29tMB0GA1UdDgQWBBQB+nzqgljLocLTsiUn2yWqEc2s
+gjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAJwV
+eycprp8Ox1npiTyfwc5QaVaqtoe8Dcg2JXZc0h4DmYGW2rRLHp8YL43snEV93rPJVk6B2v4c
+WLeQfaMrnyNeEuvHx/2CT44cdLtaEk5zyqo3GYJYlLcRVz6EcSGHv1qPXgDT0xB/25etwGYq
+utYF4Chkxu4KzIpq90eDMw5ajkexw+8ARQz4N5+d6NRbmMCovd7wTGi8th/BZvz8hgKUiUJo
+Qle4wDxrdXdnIhCP7g87InXKefWgZBF4VX21t2+hkc04qrhIJlHrocPG9mRSnnk2WpsY0MXt
+a8ivbVKtfpY7uSNDZSKTDi1izEFH5oeQdYRkgIGb319a7FjslV8wggaXMIIEf6ADAgECAhBA
+AXA7OrqBjMk8rp4OuNQSMA0GCSqGSIb3DQEBCwUAMEoxCzAJBgNVBAYTAlVTMRIwEAYDVQQK
+EwlJZGVuVHJ1c3QxJzAlBgNVBAMTHklkZW5UcnVzdCBDb21tZXJjaWFsIFJvb3QgQ0EgMTAe
+Fw0yMDAyMTIyMTA3NDlaFw0zMDAyMTIyMTA3NDlaMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQK
+EwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTEzMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAu6sUO01SDD99PM+QdZkNxKxJNt0NgQE+Zt6ixaNP0JKSjTd+SG5L
+wqxBWjnOgI/3dlwgtSNeN77AgSs+rA4bK4GJ75cUZZANUXRKw/et8pf9Qn6iqgB63OdHxBN/
+15KbM3HR+PyiHXQoUVIevCKW8nnlWnnZabT1FejOhRRKVUg5HACGOTfnCOONrlxlg+m1Vjgn
+o1uNqNuLM/jkD1z6phNZ/G9IfZGI0ppHX5AA/bViWceX248VmefNhSR14ADZJtlAAWOi2un0
+3bqrBPHA9nDyXxI8rgWLfUP5rDy8jx2hEItg95+ORF5wfkGUq787HBjspE86CcaduLka/Bk2
+VwIDAQABo4IChzCCAoMwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwgYkG
+CCsGAQUFBwEBBH0wezAwBggrBgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2NzcC5pZGVu
+dHJ1c3QuY29tMEcGCCsGAQUFBzAChjtodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3QuY29t
+L3Jvb3RzL2NvbW1lcmNpYWxyb290Y2ExLnA3YzAfBgNVHSMEGDAWgBTtRBnA0/AGi+6ke75C
+5yZUyI42djCCASQGA1UdIASCARswggEXMIIBEwYEVR0gADCCAQkwSgYIKwYBBQUHAgEWPmh0
+dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20vY2VydGlmaWNhdGVzL3BvbGljeS90cy9pbmRl
+eC5odG1sMIG6BggrBgEFBQcCAjCBrQyBqlRoaXMgVHJ1c3RJRCBDZXJ0aWZpY2F0ZSBoYXMg
+YmVlbiBpc3N1ZWQgaW4gYWNjb3JkYW5jZSB3aXRoIElkZW5UcnVzdCdzIFRydXN0SUQgQ2Vy
+dGlmaWNhdGUgUG9saWN5IGZvdW5kIGF0IGh0dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20v
+Y2VydGlmaWNhdGVzL3BvbGljeS90cy9pbmRleC5odG1sMEoGA1UdHwRDMEEwP6A9oDuGOWh0
+dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2NvbW1lcmNpYWxyb290Y2ExLmNy
+bDAdBgNVHQ4EFgQULbfeG1l+KpguzeHUG+PFEBJe6RQwHQYDVR0lBBYwFAYIKwYBBQUHAwIG
+CCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4ICAQB/7BKcygLX6Nl4a03cDHt7TLdPxCzFvDF2
+bkVYCFTRX47UfeomF1gBPFDee3H/IPlLRmuTPoNt0qjdpfQzmDWN95jUXLdLPRToNxyaoB5s
+0hOhcV6H08u3FHACBif55i0DTDzVSaBv0AZ9h1XeuGx4Fih1Vm3Xxz24GBqqVudvPRLyMJ7u
+6hvBqTIKJ53uCs3dyQLZT9DXnp+kJv8y7ZSAY+QVrI/dysT8avtn8d7k7azNBkfnbRq+0e88
+QoBnel6u+fpwbd5NLRHywXeH+phbzULCa+bLPRMqJaW2lbhvSWrMHRDy3/d8HvgnLCBFK2s4
+Spns4YCN4xVcbqlGWzgolHCKUH39vpcsDo1ymZFrJ8QR6ihIn8FmJ5oKwAnnd/G6ADXFC9bu
+db9+532phSAXOZrrecIQn+vtP366PC+aClAPsIIDJDsotS5z4X2JUFsNIuEgXGqhiKE7SuZb
+rFG9sdcLprSlJN7TsRDc0W2b9nqwD+rj/5MN0C+eKwha+8ydv0+qzTyxPP90KRgaegGowC4d
+UsZyTk2n4Z3MuAHX5nAZL/Vh/SyDj/ajorV44yqZBzQ3ChKhXbfUSwe2xMmygA2Z5DRwMRJn
+p/BscizYdNk2WXJMTnH+wVLN8sLEwEtQR4eTLoFmQvrK2AMBS9kW5sBkMzINt/ZbbcZ3F+eA
+MDGCAxQwggMQAgEBME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEXMBUG
+A1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwDQYJYIZIAWUDBAIBBQCg
+ggGXMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDYwMTAw
+MTQwMlowLwYJKoZIhvcNAQkEMSIEIHuvJ7Wh61tm0h12NdyxfuhsrlzpMqj4+Wvetiad+dfA
+MF0GCSsGAQQBgjcQBDFQME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEX
+MBUGA1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwXwYLKoZIhvcNAQkQ
+AgsxUKBOMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRy
+dXN0SUQgQ0EgQTEzAhBAAYJpmi/rPn/F0fJyDlzMMGwGCSqGSIb3DQEJDzFfMF0wCwYJYIZI
+AWUDBAEqMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZI
+hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEATcyg
+O+z0jXcOli3OvTOCUVxLwTyo2/5DWnmpLnrNDcQbvGgZQ6gjF8dlaMco9TZQbwsmfNXg3a+2
+kIkdzln67/s89rWZi4imhxsfg/aQ7WiKiuY0F8LkdWHw5zpxOGbARY4bms6D4RygtVyRSRB4
+RJrmR+X6z6l/5eLrDrAS7LWPnfmneHYugj8JHF7fulMeV5aHcwwlfRjMBbgXeyCSrPWUbgPc
+Q3u7e/3M6s72KMUeepgXYeT8bV75PiXor1HTJfwutCKKjlhdn3E/r793E9Xgh5bWA5cUNPOg
+4fmSZCQBSBHRG0IMIeUrmGZZyqqx1qPRPji1D0+ulnhIKa3fbQAAAAAAAA==
+--------------ms070606000804060500030007--
+
