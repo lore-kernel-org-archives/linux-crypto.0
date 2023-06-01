@@ -2,353 +2,158 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC7EC77B7A
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 09:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EACAC77B7E
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 09:50:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232050AbjFAJ0W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 05:26:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46316 "EHLO
+        id S233060AbjFAJuI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 05:50:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232093AbjFAJ0V (ORCPT
+        with ESMTP id S232999AbjFAJuH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 05:26:21 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08EF099
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 02:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685611579; x=1717147579;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=6NFhgaWa0+t1f2IAroVolYLbXE+184pZxsPCKLEqTsU=;
-  b=npy9WLqPFl6BhDmrQM6P0deCie3/o6LyZX0xiMwze3+aKHyuJ1cqPZtl
-   7+taf2nGWGrymc1b9tbztG8OUh5/2hFTjAZFUs679RCfWkLGM3SHT+osS
-   ndNdwMBB2S8qSMUDOMwRVNIUVNkFTzJXUZHL6F92nLobJ4C4MMLghPoMo
-   4kXhtxwmVevfRsgQjEDjBevTQ75P/gqIa+Ry5z1LKLH9GUhCyUv9xE9yP
-   EVdX001hQD05fbRYDSEq2+BpciTUgJWx833zt23/AIoGuN5g8KuKfSr3m
-   xo1f1ZBewGEx9EGX+luir2P7XInexxyDe376PXFyIj8mopQN8Ax9yj3Pu
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="355512014"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="355512014"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 02:26:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="1037418557"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="1037418557"
-Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by fmsmga005.fm.intel.com with ESMTP; 01 Jun 2023 02:26:18 -0700
-From:   Damian Muszynski <damian.muszynski@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - add internal timer for qat 4xxx
-Date:   Thu,  1 Jun 2023 11:13:40 +0200
-Message-Id: <20230601091340.12626-1-damian.muszynski@intel.com>
-X-Mailer: git-send-email 2.40.1
+        Thu, 1 Jun 2023 05:50:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27B4FC
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 02:49:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685612961;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2bSBV8Q60GdSQ9cSAx/GWXvbTZ/nLQNHe8IPVOifGAA=;
+        b=Xnhj9aGCw2w1hODW8A8OtB7k3hD2FQvZ5t2wrFBfm5HzqYip+5QVCNSdQURd+zH2vnhDDW
+        zWPJr9/gckuMrLM28nt8/R32ATCipiGZR9gbDB9yIcUw0r5rCl1iBSye5Bv89UCB4ILlzi
+        HWDurA2EMlI71vGsZBdIHsJajB73KiE=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-259-zTh8Hej5N8mp7F5yRuUBIA-1; Thu, 01 Jun 2023 05:49:20 -0400
+X-MC-Unique: zTh8Hej5N8mp7F5yRuUBIA-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-75cb47e5507so7112785a.1
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Jun 2023 02:49:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685612960; x=1688204960;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2bSBV8Q60GdSQ9cSAx/GWXvbTZ/nLQNHe8IPVOifGAA=;
+        b=OsGlVlg/VQgqn2tUxFLfX/hSFomfk2DjZ47C3etds4odvwG2fpPWhBNHYwOyI0E+lJ
+         n6YTdB4d1RlZJHqmP9XOWDTVhA5bkiPgWMOzaIvr1vtH+5Y/wVZYph1dKjN69BzdHnhp
+         PNh0hXJchSSyZ6q77JCFpMAMW6gKxPO7Gdo47SxWPOGqBbZLUlomu8JcBcBa/lV+kPFC
+         XmN1YRhwUUpDeWJTkFQAuwn3s+T3x5KekgqZB3OXFLe58EjxE1EsiaCB5CsfZw4yw1W1
+         LPjpH/h5YPVXxX1YB81X3+PhR4MNqtYN4XwVsfOZGIxXzAG0Coyd03e/XFJCEzTdfcl7
+         zuug==
+X-Gm-Message-State: AC+VfDw2wYoSgiTrkfqBkn9rTCh9v8DNLfFqR3NzjssmybzKpFOeB5Po
+        iYfG7u9UjD9irojY4Hdc4uG5jf4/oAhwnpkgq4yiZ4p7GH8J/dD5C+QeeGcTG9jSaaOmP2B3nc4
+        K0+sw//ylhAoiR/jSY+zIUGYON76kmHQw
+X-Received: by 2002:a05:620a:17ab:b0:75b:23a1:829f with SMTP id ay43-20020a05620a17ab00b0075b23a1829fmr5373372qkb.0.1685612960365;
+        Thu, 01 Jun 2023 02:49:20 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5yBracybuX3X6v4h6rND3GfM88+X6dv2LFLqr5nImNW+d0uKGReZCHar0BcmPXwrs9IoB7eg==
+X-Received: by 2002:a05:620a:17ab:b0:75b:23a1:829f with SMTP id ay43-20020a05620a17ab00b0075b23a1829fmr5373359qkb.0.1685612960126;
+        Thu, 01 Jun 2023 02:49:20 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-242-89.dyn.eolo.it. [146.241.242.89])
+        by smtp.gmail.com with ESMTPSA id t15-20020a05620a004f00b0075d22e15f1bsm367441qkt.129.2023.06.01.02.49.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 02:49:19 -0700 (PDT)
+Message-ID: <bd2750e52b47af1782233e254114eb8d627f1073.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 08/10] crypto: af_alg: Support
+ MSG_SPLICE_PAGES
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Date:   Thu, 01 Jun 2023 11:49:15 +0200
+In-Reply-To: <20230530141635.136968-9-dhowells@redhat.com>
+References: <20230530141635.136968-1-dhowells@redhat.com>
+         <20230530141635.136968-9-dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The power management feature in QAT 4xxx devices can disable clock
-sources used to implement timers. Because of that, the firmware needs to
-get an external reliable source of time.
+On Tue, 2023-05-30 at 15:16 +0100, David Howells wrote:
+> Make AF_ALG sendmsg() support MSG_SPLICE_PAGES.  This causes pages to be
+> spliced from the source iterator.
+>=20
+> This allows ->sendpage() to be replaced by something that can handle
+> multiple multipage folios in a single transaction.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-crypto@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  crypto/af_alg.c         | 28 ++++++++++++++++++++++++++--
+>  crypto/algif_aead.c     | 22 +++++++++++-----------
+>  crypto/algif_skcipher.c |  8 ++++----
+>  3 files changed, 41 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index fd56ccff6fed..62f4205d42e3 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -940,6 +940,10 @@ int af_alg_sendmsg(struct socket *sock, struct msghd=
+r *msg, size_t size,
+>  	bool init =3D false;
+>  	int err =3D 0;
+> =20
+> +	if ((msg->msg_flags & MSG_SPLICE_PAGES) &&
+> +	    !iov_iter_is_bvec(&msg->msg_iter))
+> +		return -EINVAL;
+> +
+>  	if (msg->msg_controllen) {
+>  		err =3D af_alg_cmsg_send(msg, &con);
+>  		if (err)
+> @@ -985,7 +989,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr=
+ *msg, size_t size,
+>  	while (size) {
+>  		struct scatterlist *sg;
+>  		size_t len =3D size;
+> -		size_t plen;
+> +		ssize_t plen;
+> =20
+>  		/* use the existing memory in an allocated page */
+>  		if (ctx->merge) {
+> @@ -1030,7 +1034,27 @@ int af_alg_sendmsg(struct socket *sock, struct msg=
+hdr *msg, size_t size,
+>  		if (sgl->cur)
+>  			sg_unmark_end(sg + sgl->cur - 1);
+> =20
+> -		if (1 /* TODO check MSG_SPLICE_PAGES */) {
+> +		if (msg->msg_flags & MSG_SPLICE_PAGES) {
+> +			struct sg_table sgtable =3D {
+> +				.sgl		=3D sg,
+> +				.nents		=3D sgl->cur,
+> +				.orig_nents	=3D sgl->cur,
+> +			};
+> +
+> +			plen =3D extract_iter_to_sg(&msg->msg_iter, len, &sgtable,
+> +						  MAX_SGL_ENTS, 0);
 
-Add a kernel timer that periodically sends an event to the firmware.
-This is triggered every 200ms. At each timeout event, the driver
-sends a sync request to the firmware reporting the current timestamp
-counter value.
+It looks like the above expect/supports only ITER_BVEC iterators, what
+about adding a WARN_ON_ONCE(<other iov type>)?
 
-This is a pre-requisite for enabling the heartbeat, telemetry and
-rate limiting features.
+Also, I'm keeping this series a bit more in pw to allow Herbert or
+others to have a look.
 
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  3 +
- drivers/crypto/intel/qat/qat_common/Makefile  |  1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  3 +
- .../crypto/intel/qat/qat_common/adf_admin.c   | 12 ++++
- .../intel/qat/qat_common/adf_common_drv.h     |  1 +
- .../intel/qat/qat_common/adf_gen4_timer.c     | 72 +++++++++++++++++++
- .../intel/qat/qat_common/adf_gen4_timer.h     | 23 ++++++
- .../crypto/intel/qat/qat_common/adf_init.c    | 13 ++++
- .../qat/qat_common/icp_qat_fw_init_admin.h    |  5 ++
- 9 files changed, 133 insertions(+)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h
+Cheers,
 
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 7324b86a4f40..d7d5850af703 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -8,6 +8,7 @@
- #include <adf_gen4_hw_data.h>
- #include <adf_gen4_pfvf.h>
- #include <adf_gen4_pm.h>
-+#include <adf_gen4_timer.h>
- #include "adf_4xxx_hw_data.h"
- #include "icp_qat_hw.h"
- 
-@@ -405,6 +406,8 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
- 	hw_data->enable_pm = adf_gen4_enable_pm;
- 	hw_data->handle_pm_interrupt = adf_gen4_handle_pm_interrupt;
- 	hw_data->dev_config = adf_gen4_dev_config;
-+	hw_data->start_timer = adf_gen4_timer_start;
-+	hw_data->stop_timer = adf_gen4_timer_stop;
- 
- 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
- 	adf_gen4_init_pf_pfvf_ops(&hw_data->pfvf_ops);
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 38de3aba6e8c..0db463200495 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -17,6 +17,7 @@ intel_qat-objs := adf_cfg.o \
- 	adf_gen4_pm.o \
- 	adf_gen2_dc.o \
- 	adf_gen4_dc.o \
-+	adf_gen4_timer.o \
- 	qat_crypto.o \
- 	qat_compression.o \
- 	qat_comp_algs.o \
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index bd19e6460899..93938bb0fca0 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -188,6 +188,8 @@ struct adf_hw_device_data {
- 	int (*init_admin_comms)(struct adf_accel_dev *accel_dev);
- 	void (*exit_admin_comms)(struct adf_accel_dev *accel_dev);
- 	int (*send_admin_init)(struct adf_accel_dev *accel_dev);
-+	int (*start_timer)(struct adf_accel_dev *accel_dev);
-+	void (*stop_timer)(struct adf_accel_dev *accel_dev);
- 	int (*init_arb)(struct adf_accel_dev *accel_dev);
- 	void (*exit_arb)(struct adf_accel_dev *accel_dev);
- 	const u32 *(*get_arb_mapping)(struct adf_accel_dev *accel_dev);
-@@ -295,6 +297,7 @@ struct adf_accel_dev {
- 	struct list_head list;
- 	struct module *owner;
- 	struct adf_accel_pci accel_pci_dev;
-+	struct adf_timer *timer;
- 	union {
- 		struct {
- 			/* protects VF2PF interrupts access */
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-index 3b6184c35081..f4f698ec3a4e 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-@@ -223,6 +223,18 @@ static int adf_get_dc_capabilities(struct adf_accel_dev *accel_dev,
- 	return 0;
- }
- 
-+int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt)
-+{
-+	u32 ae_mask = accel_dev->hw_device->ae_mask;
-+	struct icp_qat_fw_init_admin_req req = { };
-+	struct icp_qat_fw_init_admin_resp resp;
-+
-+	req.cmd_id = ICP_QAT_FW_SYNC;
-+	req.int_timer_ticks = cnt;
-+
-+	return adf_send_admin(accel_dev, &req, &resp, ae_mask);
-+}
-+
- /**
-  * adf_send_admin_init() - Function sends init message to FW
-  * @accel_dev: Pointer to acceleration device.
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index db79759bee61..2c2ac4dc9753 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -95,6 +95,7 @@ int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
- void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
- int adf_send_admin_init(struct adf_accel_dev *accel_dev);
- int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay);
-+int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
- int adf_init_arb(struct adf_accel_dev *accel_dev);
- void adf_exit_arb(struct adf_accel_dev *accel_dev);
- void adf_update_ring_arb(struct adf_etr_ring_data *ring);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c
-new file mode 100644
-index 000000000000..9b403e7140b8
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c
-@@ -0,0 +1,72 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
-+
-+#include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
-+#include "adf_gen4_timer.h"
-+
-+#define ADF_GEN4_TIMER_VALUE_MS 200
-+
-+static unsigned long adf_get_next_timeout(void)
-+{
-+	unsigned long timeout = msecs_to_jiffies(ADF_GEN4_TIMER_VALUE_MS);
-+
-+	return rounddown(jiffies + timeout, timeout);
-+}
-+
-+/* This periodic update is used to trigger HB, RL & TL fw events */
-+static void timer_handler_bh(struct work_struct *work)
-+{
-+	struct adf_timer *timer_ctx = container_of(work, struct adf_timer, timer_bh);
-+	struct adf_accel_dev *accel_dev = timer_ctx->accel_dev;
-+
-+	if (adf_send_admin_tim_sync(accel_dev, timer_ctx->cnt))
-+		dev_err(&GET_DEV(accel_dev), "Failed to synchronize qat timer\n");
-+}
-+
-+static void timer_handler(struct timer_list *tl)
-+{
-+	struct adf_timer *timer_ctx = from_timer(timer_ctx, tl, timer);
-+	unsigned long timeout_val = adf_get_next_timeout();
-+
-+	/* Schedule a work queue to send admin request */
-+	adf_misc_wq_queue_work(&timer_ctx->timer_bh);
-+
-+	timer_ctx->cnt++;
-+	mod_timer(tl, timeout_val);
-+}
-+
-+int adf_gen4_timer_start(struct adf_accel_dev *accel_dev)
-+{
-+	unsigned long timeout_val = adf_get_next_timeout();
-+	struct adf_timer *timer_ctx;
-+
-+	timer_ctx = kzalloc(sizeof(*timer_ctx), GFP_KERNEL);
-+	if (!timer_ctx)
-+		return -ENOMEM;
-+
-+	timer_ctx->accel_dev = accel_dev;
-+	timer_ctx->cnt = 0;
-+	accel_dev->timer = timer_ctx;
-+
-+	INIT_WORK(&timer_ctx->timer_bh, timer_handler_bh);
-+	timer_setup(&timer_ctx->timer, timer_handler, 0);
-+	mod_timer(&timer_ctx->timer, timeout_val);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_timer_start);
-+
-+void adf_gen4_timer_stop(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_timer *timer_ctx = accel_dev->timer;
-+
-+	if (!timer_ctx)
-+		return;
-+
-+	del_timer_sync(&timer_ctx->timer);
-+
-+	kfree(timer_ctx);
-+	accel_dev->timer = NULL;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_timer_stop);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h
-new file mode 100644
-index 000000000000..f5ea4bb1774b
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h
-@@ -0,0 +1,23 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2023 Intel Corporation */
-+
-+#ifndef ADF_GEN4_TIMER_H_
-+#define ADF_GEN4_TIMER_H_
-+
-+#include <linux/timer.h>
-+#include <linux/workqueue.h>
-+#include <linux/types.h>
-+
-+#include "adf_accel_devices.h"
-+
-+struct adf_timer {
-+	struct adf_accel_dev *accel_dev;
-+	struct timer_list timer;
-+	struct work_struct timer_bh;
-+	u32 cnt;
-+};
-+
-+int adf_gen4_timer_start(struct adf_accel_dev *accel_dev);
-+void adf_gen4_timer_stop(struct adf_accel_dev *accel_dev);
-+
-+#endif /* ADF_GEN4_TIMER_H_ */
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
-index 826179c98524..0acba0f988da 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
-@@ -163,6 +163,7 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
- 	struct service_hndl *service;
- 	struct list_head *list_itr;
-+	int ret;
- 
- 	set_bit(ADF_STATUS_STARTING, &accel_dev->status);
- 
-@@ -187,6 +188,14 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- 		return -EFAULT;
- 	}
- 
-+	if (hw_data->start_timer) {
-+		ret = hw_data->start_timer(accel_dev);
-+		if (ret) {
-+			dev_err(&GET_DEV(accel_dev), "Failed to start internal sync timer\n");
-+			return ret;
-+		}
-+	}
-+
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
- 		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
-@@ -235,6 +244,7 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
-  */
- static void adf_dev_stop(struct adf_accel_dev *accel_dev)
- {
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
- 	struct service_hndl *service;
- 	struct list_head *list_itr;
- 	bool wait = false;
-@@ -270,6 +280,9 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
- 		}
- 	}
- 
-+	if (hw_data->stop_timer)
-+		hw_data->stop_timer(accel_dev);
-+
- 	if (wait)
- 		msleep(100);
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-index 56cb827f93ea..a304fd23ec50 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-@@ -37,6 +37,9 @@ struct icp_qat_fw_init_admin_req {
- 			__u16 ibuf_size_in_kb;
- 			__u16 resrvd3;
- 		};
-+		struct {
-+			u32 int_timer_ticks;
-+		};
- 		__u32 idle_filter;
- 	};
- 
-@@ -97,6 +100,8 @@ struct icp_qat_fw_init_admin_resp {
- 	};
- } __packed;
- 
-+#define ICP_QAT_FW_SYNC ICP_QAT_FW_HEARTBEAT_SYNC
-+
- #define ICP_QAT_FW_COMN_HEARTBEAT_OK 0
- #define ICP_QAT_FW_COMN_HEARTBEAT_BLOCKED 1
- #define ICP_QAT_FW_COMN_HEARTBEAT_FLAG_BITPOS 0
-
-base-commit: 8fd3bb7fdffbe273831d727501725547cb9b1b5d
--- 
-2.40.1
+Paolo
 
