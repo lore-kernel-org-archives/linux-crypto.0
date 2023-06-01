@@ -2,56 +2,121 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D30D9C77B7A
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6062C7EE31
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233067AbjFAKi4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:38:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42864 "EHLO
+        id S232938AbjFAKvM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 06:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232964AbjFAKin (ORCPT
+        with ESMTP id S229589AbjFAKvL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:38:43 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF35188;
-        Thu,  1 Jun 2023 03:38:40 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q4fO9-00FdBE-GN; Thu, 01 Jun 2023 18:18:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 01 Jun 2023 18:18:37 +0800
-Date:   Thu, 1 Jun 2023 18:18:37 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     arno@natisbad.org, arnd@kernel.org, schalla@marvell.com,
-        bbrezillon@kernel.org, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: marvell/cesa - Fix type mismatch warning
-Message-ID: <ZHhwfVH3pldZohHC@gondor.apana.org.au>
-References: <20230523083313.899332-1-arnd@kernel.org>
- <168548692863.1302890.6789778742527600870.b4-ty@chromium.org>
- <ZHcoQvWnzO0c1Cp9@gondor.apana.org.au>
- <202305310930.844EBEA21C@keescook>
+        Thu, 1 Jun 2023 06:51:11 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62AAD9D;
+        Thu,  1 Jun 2023 03:51:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=sqOkmNSuBD7GBtb46itE8ZDvhkHRWIc2NbvPp9qeOiw=; b=KZkC2WT4XQMr05qEkGpBjCv7TG
+        Ak6b/9n5dS5ZPNEFM10/VvLJvSS1D5ylwPHzd2DaQkM+piIbsvAz/pGM04U57+k94ayIQeNYv/Zpr
+        p75C1W/ZCqWn3ZEDzShydO0ovDBfnP1AqQJwgcDzODs4ufgi5DRaXCvhf1ySS+x4TLywE5eK3nk8v
+        3XQKlVIoFYPn55+2ybBmZuzlaHrG7I/QAPJb5OtatUGXyIlhc26higj14zyA/1vT2iclbpfYPL3TA
+        Nx806QJ6JOI2IEjvEs6POHy4WF448K4MQtyi2wClcFurUdFMq5GGHx9JYbaGa2fFQNILHK/d8n61V
+        wBRZ/4Zw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q4fsv-008IFd-Tl; Thu, 01 Jun 2023 10:50:26 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E2E913002F0;
+        Thu,  1 Jun 2023 12:50:21 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 96C9A21AA6F9B; Thu,  1 Jun 2023 12:50:21 +0200 (CEST)
+Date:   Thu, 1 Jun 2023 12:50:21 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Helge Deller <deller@gmx.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+        linux-parisc@vger.kernel.org,
+        John David Anglin <dave.anglin@bell.net>,
+        Sam James <sam@gentoo.org>
+Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of
+ __SIZEOF_INT128__
+Message-ID: <20230601105021.GU4253@hirez.programming.kicks-ass.net>
+References: <20230531130833.635651916@infradead.org>
+ <20230531132323.722039569@infradead.org>
+ <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
+ <20230601101409.GS4253@hirez.programming.kicks-ass.net>
+ <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202305310930.844EBEA21C@keescook>
+In-Reply-To: <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 31, 2023 at 09:31:18AM -0700, Kees Cook wrote:
-.
-> I snagged it since a week had gone by with no additional discussion and
-> it fixed an issue exposed by work in the hardening tree. Let me know if
-> you'd prefer I drop it for you to carry instead.
+On Thu, Jun 01, 2023 at 12:32:38PM +0200, Helge Deller wrote:
+> On 6/1/23 12:14, Peter Zijlstra wrote:
+> > On Wed, May 31, 2023 at 04:21:22PM +0200, Arnd Bergmann wrote:
+> > 
+> > > It would be nice to have the hack more localized to parisc
+> > > and guarded with a CONFIG_GCC_VERSION check so we can kill
+> > > it off in the future, once we drop either gcc-10 or parisc
+> > > support.
+> > 
+> > I vote for dropping parisc -- it's the only 64bit arch that doesn't have
+> > sane atomics.
+> 
+> Of course I'm against dropping parisc.
 
-Yes because these sort of changes cause unnecessary conflicts.
-It's not as if the patch depends on something in the hardening
-tree.
+:-)
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> > Anyway, the below seems to work -- build tested with GCC-10.1
+> 
+> I don't think we need to care about gcc-10 on parisc.
+> Debian and Gentoo are the only supported distributions, while Debian
+> requires gcc-12 to build > 6.x kernels, and I assume Gentoo uses at least
+> gcc-12 as well.
+> 
+> So raising the gcc limit for parisc only (at least temporarily for now)
+> should be fine and your workaround below wouldn't be necessary, right?
+
+Correct, if you're willing to set minimum GCC version to 11 for parisc
+all is well and this patch can go play in the bit bucket.
