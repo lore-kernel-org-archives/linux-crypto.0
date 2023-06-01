@@ -2,92 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B2CC77B7A
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 11:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205D1C77B7A
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 13:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232354AbjFALgI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 07:36:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
+        id S234126AbjFANap (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 09:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232009AbjFALgI (ORCPT
+        with ESMTP id S234145AbjFANaT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 07:36:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E72128
-        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 04:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685619320;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=g2HrdO1luTCQTFelo54c1HAUWB7J3N54nooptJdm2oE=;
-        b=g9999PChwm6UiyIi5Bzd8wFXGWC9pul4cXVajMI3otlXQ42wPOokdHVX757Wy9ywHuUEBw
-        KGYGnAwGtPkBMVFNdElnx9YGQocx03WxHhs148HZtoZFUQH9nmrb+4D4gLVM48fDnWzG8Z
-        mZq8w1EErSGcqKd+TBwGcdV/eg6o3X0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-138-b71uj-mYOMqSwieJCWkpYw-1; Thu, 01 Jun 2023 07:35:16 -0400
-X-MC-Unique: b71uj-mYOMqSwieJCWkpYw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 261D13C14111;
-        Thu,  1 Jun 2023 11:35:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AC97C8162;
-        Thu,  1 Jun 2023 11:35:13 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <bd2750e52b47af1782233e254114eb8d627f1073.camel@redhat.com>
-References: <bd2750e52b47af1782233e254114eb8d627f1073.camel@redhat.com> <20230530141635.136968-1-dhowells@redhat.com> <20230530141635.136968-9-dhowells@redhat.com>
-To:     Paolo Abeni <pabeni@redhat.com>
-Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 08/10] crypto: af_alg: Support MSG_SPLICE_PAGES
+        Thu, 1 Jun 2023 09:30:19 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9725EE5C
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 06:30:01 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-96f50e26b8bso121993366b.2
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Jun 2023 06:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1685626198; x=1688218198;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M0MHDOHZ+ksADoGSH1YMQnsp1jrJ4XOCHJuXFHrOLiU=;
+        b=Wzrl9TtntucSwzWDByRAkxjCnSV+EgfqMh48dfQmaPumGsHnc/KjkNxIYEpzsZtrbE
+         yTrJXb2D2OePNeDxgtLVBfiFOXCU4B/mT/iF6wGooOHsqF5zv2l0crtZfAD71X5MyYEm
+         k8oR/59towjRKyvjc/GD2+AYunFzYiKcaePnc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685626198; x=1688218198;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M0MHDOHZ+ksADoGSH1YMQnsp1jrJ4XOCHJuXFHrOLiU=;
+        b=F8VjEjK8S4GDh/GGI43wf/VY992BROR3uygh9Bw/knYqcLFKclbKSLaRvgRjPDo5+r
+         V8CZuucJwcdFNRAQqE28k94yh105aa83/WDs6yaz/tj5ejmAdUDDy/XA7nfZiumntRTz
+         NF56SwT5TkNDKZbCh91z+yXG8UisugyJFKlAJLczxEs8eVBkNUVC5bFMEWuERVm2hTA5
+         AfRwSX6O65/gp4a5wZPpcAbyZA4LDISLUXAtwEaXdFvuPTbK7/o9x7IUuionJZXEtSHj
+         5OXDvM5+9CnzvwyypiCpCKNvyL8oTM1NtKLTI/auuKE7jCC9A6lr/4VQT13biNo46KaH
+         GAZg==
+X-Gm-Message-State: AC+VfDyUNmOENHrV/8rhpaaDDHI+Qg88t/tu65tb1N/h5Vt6JJWBSGka
+        PYf9kS4gzuSpyvd06Exa88+upU7P2hT0UmQ8S/iA49wi
+X-Google-Smtp-Source: ACHHUZ61BE1SpqTeEwZJgOSUd3KWaYoAyy4INB6yrE/EkofsjwBTUvYeKoa0FIL5aNkWGTGGW9iMUg==
+X-Received: by 2002:a17:907:160d:b0:973:9494:4e5c with SMTP id hb13-20020a170907160d00b0097394944e5cmr6061982ejc.65.1685626197986;
+        Thu, 01 Jun 2023 06:29:57 -0700 (PDT)
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com. [209.85.128.45])
+        by smtp.gmail.com with ESMTPSA id lx6-20020a170906af0600b0096efa536229sm10759433ejb.149.2023.06.01.06.29.56
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Jun 2023 06:29:57 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-3f603ff9c02so8462465e9.2
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Jun 2023 06:29:56 -0700 (PDT)
+X-Received: by 2002:a17:907:2cc6:b0:973:fe5d:ef71 with SMTP id
+ hg6-20020a1709072cc600b00973fe5def71mr4787778ejc.14.1685626175454; Thu, 01
+ Jun 2023 06:29:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <822307.1685619312.1@warthog.procyon.org.uk>
-Date:   Thu, 01 Jun 2023 12:35:12 +0100
-Message-ID: <822308.1685619312@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+References: <20230531130833.635651916@infradead.org> <20230531132323.722039569@infradead.org>
+ <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com> <20230601101409.GS4253@hirez.programming.kicks-ass.net>
+ <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
+In-Reply-To: <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 1 Jun 2023 09:29:18 -0400
+X-Gmail-Original-Message-ID: <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
+Message-ID: <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
+Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of __SIZEOF_INT128__
+To:     Helge Deller <deller@gmx.de>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+        linux-parisc@vger.kernel.org,
+        John David Anglin <dave.anglin@bell.net>,
+        Sam James <sam@gentoo.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Paolo Abeni <pabeni@redhat.com> wrote:
+On Thu, Jun 1, 2023 at 6:32=E2=80=AFAM Helge Deller <deller@gmx.de> wrote:
+>
+> I don't think we need to care about gcc-10 on parisc.
+> Debian and Gentoo are the only supported distributions, while Debian
+> requires gcc-12 to build > 6.x kernels, and I assume Gentoo uses at least
+> gcc-12 as well.
+>
+> So raising the gcc limit for parisc only (at least temporarily for now)
+> should be fine and your workaround below wouldn't be necessary, right?
 
-> > +	if ((msg->msg_flags & MSG_SPLICE_PAGES) &&
-> > +	    !iov_iter_is_bvec(&msg->msg_iter))
-> > +		return -EINVAL;
-> > +
-> ...
-> It looks like the above expect/supports only ITER_BVEC iterators, what
-> about adding a WARN_ON_ONCE(<other iov type>)?
+This absolutely sounds like the right option. Let's simplify the
+problem space by just saying that parisc needs the newer compiler.
 
-Meh.  I relaxed that requirement as I'm now using tools to extract stuff from
-any iterator (extract_iter_to_sg() in this case) rather than walking the
-bvec[] directly.  I forgot to remove the check from af_alg.  I can add an
-extra patch to remove it.  Also, it probably doesn't matter for AF_ALG since
-that's only likely to be called from userspace, either directly (which will
-not set MSG_SPLICE_PAGES) or via splice (which will pass a BVEC).  Internal
-kernel code will use crypto API directly.
+Right now we have that "minimum gcc version" in a somewhat annoying
+place: it's in the ./scripts/min-tool-version.sh file as a shell
+script.
 
-> Also, I'm keeping this series a bit more in pw to allow Herbert or
-> others to have a look.
+I wonder if we could move the gcc minimum version check into the
+Kconfig file instead, and make it easier to let architectures override
+the minimum version.
 
-Thanks.
+I don't quite know how to do that sanely, though. I don't think we
+have a sane way to error out at Kconfig time (except by forcing some
+syntax error inside an 'if' statement or something horrendously hacky
+like that).
 
-David
+Added Masahiro to the (already overlong) participants list.
 
+                   Linus
