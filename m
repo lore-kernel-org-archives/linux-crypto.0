@@ -2,201 +2,128 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FE3C7EE29
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 398A4C77B7E
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 10:19:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232588AbjFAKSe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:18:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55578 "EHLO
+        id S233384AbjFAKTS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 06:19:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232499AbjFAKSG (ORCPT
+        with ESMTP id S233595AbjFAKSg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:18:06 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF58A1FDB;
-        Thu,  1 Jun 2023 03:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=G1trJdY7ybtDfb34YzOEZVtQJ+4O7zYES3kMJ7sRdCU=; b=pytfcabSQbAioNogqcJyIjWxkb
-        I3OIRz0nPyGAHQCouHiezAZ3WYDnbr+0H5ASElPr4+OfQuPcqSEVXUzQNdmNT0vDCq0lYth70hxc+
-        nIxwWeL5rSBkZoelbLSxxySFndCPqg76D3wq86BEGZ1gkD10CrGs9NABCiAJPJkEv81csRGvvoVja
-        EaBwzktB36vi1XtuFtdCEjY2KE+yJjTGMIB4mjx3jEx3iBh0aM1LDhfieu9IZABiemcJgKbkPFNuq
-        /6ksBvE3iaE68Sn2CQ4733UmzPnTQKsAKE8EvFRBt0Ej6Ani+wvx452hsmvy64dZ4tGLH+6z41/Rs
-        43i6i9qw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q4fJv-008GIu-Pp; Thu, 01 Jun 2023 10:14:15 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 66A3C3002F0;
-        Thu,  1 Jun 2023 12:14:09 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 374AA21484A8B; Thu,  1 Jun 2023 12:14:09 +0200 (CEST)
-Date:   Thu, 1 Jun 2023 12:14:09 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
-        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
+        Thu, 1 Jun 2023 06:18:36 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C481210D
+        for <linux-crypto@vger.kernel.org>; Thu,  1 Jun 2023 03:16:00 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ore@pengutronix.de>)
+        id 1q4fKZ-0004WP-69; Thu, 01 Jun 2023 12:14:55 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ore@pengutronix.de>)
+        id 1q4fKY-004KWR-A3; Thu, 01 Jun 2023 12:14:54 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ore@pengutronix.de>)
+        id 1q4fKW-001V4T-N5; Thu, 01 Jun 2023 12:14:52 +0200
+From:   Oleksij Rempel <o.rempel@pengutronix.de>
+To:     Abel Vesa <abelvesa@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org
-Subject: [PATCH v2 07/12] parisc/percpu: Work around the lack of
- __SIZEOF_INT128__
-Message-ID: <20230601101409.GS4253@hirez.programming.kicks-ass.net>
-References: <20230531130833.635651916@infradead.org>
- <20230531132323.722039569@infradead.org>
- <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+        Peng Fan <peng.fan@nxp.com>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Trimarchi <michael@amarulasolutions.com>,
+        Mark Brown <broonie@kernel.org>,
+        Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+        Anson Huang <Anson.Huang@nxp.com>, Marek Vasut <marex@denx.de>,
+        linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+Subject: [PATCH v1 6/7] dt-bindings: clock: imx6q: Allow single optional clock and add enet_ref_pad
+Date:   Thu,  1 Jun 2023 12:14:50 +0200
+Message-Id: <20230601101451.357662-7-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230601101451.357662-1-o.rempel@pengutronix.de>
+References: <20230601101451.357662-1-o.rempel@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 31, 2023 at 04:21:22PM +0200, Arnd Bergmann wrote:
+All clocks for this driver are optional, so this change allows the
+'clocks' and 'clock-names' properties to accept a single clock.
+Additionally, 'enet_ref_pad' clock is added. This resolves the following
+dtbs_check warning:
+  imx6dl-alti6p.dtb: clock-controller@20c4000: clocks: [[24]] is too short
+  From schema: Documentation/devicetree/bindings/clock/imx6q-clock.yaml
 
-> It would be nice to have the hack more localized to parisc
-> and guarded with a CONFIG_GCC_VERSION check so we can kill
-> it off in the future, once we drop either gcc-10 or parisc
-> support.
+  imx6dl-alti6p.dtb: clock-controller@20c4000: clock-names:0: 'osc' was
+    expected
+  From schema: Documentation/devicetree/bindings/clock/imx6q-clock.yaml
 
-I vote for dropping parisc -- it's the only 64bit arch that doesn't have
-sane atomics.
+  imx6dl-alti6p.dtb: clock-controller@20c4000: clock-names:
+    ['enet_ref_pad'] is too short
+  From schema: Documentation/devicetree/bindings/clock/imx6q-clock.yaml
 
-Anyway, the below seems to work -- build tested with GCC-10.1
-
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
-Subject: parisc/percpu: Work around the lack of __SIZEOF_INT128__
-From: Peter Zijlstra <peterz@infradead.org>
-Date: Tue May 30 22:27:40 CEST 2023
+ .../devicetree/bindings/clock/imx6q-clock.yaml    | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-HPPA64 is unique in not providing __SIZEOF_INT128__ across all
-supported compilers, specifically it only started doing this with
-GCC-11.
+diff --git a/Documentation/devicetree/bindings/clock/imx6q-clock.yaml b/Documentation/devicetree/bindings/clock/imx6q-clock.yaml
+index bae4fcb3aacc..ed65d19c2e0e 100644
+--- a/Documentation/devicetree/bindings/clock/imx6q-clock.yaml
++++ b/Documentation/devicetree/bindings/clock/imx6q-clock.yaml
+@@ -28,20 +28,23 @@ properties:
+     const: 1
+ 
+   clocks:
++    minItems: 1
+     items:
+       - description: 24m osc
+       - description: 32k osc
+       - description: ckih1 clock input
+       - description: anaclk1 clock input
+       - description: anaclk2 clock input
++      - description: enet_ref_pad
+ 
+   clock-names:
+-    items:
+-      - const: osc
+-      - const: ckil
+-      - const: ckih1
+-      - const: anaclk1
+-      - const: anaclk2
++    enum:
++      - osc
++      - ckil
++      - ckih1
++      - anaclk1
++      - anaclk2
++      - enet_ref_pad
+ 
+   fsl,pmic-stby-poweroff:
+     $ref: /schemas/types.yaml#/definitions/flag
+-- 
+2.39.2
 
-Since the per-cpu ops are universally availably, and
-this_cpu_{,try_}cmpxchg128() is expected to be available on all 64bit
-architectures a wee bodge is in order.
-
-Sadly, while C reverts to memcpy() for assignment of POD types, it does
-not revert to memcmp() for for equality. Therefore frob that manually.
-
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- arch/parisc/include/asm/percpu.h |   77 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 77 insertions(+)
-
---- /dev/null
-+++ b/arch/parisc/include/asm/percpu.h
-@@ -0,0 +1,77 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ASM_PARISC_PERCPU_H
-+#define _ASM_PARISC_PERCPU_H
-+
-+#include <linux/types.h>
-+
-+#if defined(CONFIG_64BIT) && CONFIG_GCC_VERSION < 1100000
-+
-+/*
-+ * GCC prior to 11 does not provide __SIZEOF_INT128__ on HPPA64
-+ * as such we need to provide an alternative implementation of
-+ * {raw,this}_cpu_{,try_}cmpxchg128().
-+ *
-+ * This obviously doesn't function as u128 should, but for the purpose
-+ * of per-cpu cmpxchg128 it might just do.
-+ */
-+typedef struct {
-+	u64 a, b;
-+} u128 __attribute__((aligned(16)));
-+
-+#define raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)		\
-+({									\
-+	typeof(pcp) *__p = raw_cpu_ptr(&(pcp));				\
-+	typeof(pcp) __val = *__p, __old = *(ovalp);			\
-+	bool __ret;							\
-+	if (!__builtin_memcmp(&__val, &__old, sizeof(pcp))) {		\
-+		*__p = nval;						\
-+		__ret = true;						\
-+	} else {							\
-+		*(ovalp) = __val;					\
-+		__ret = false;						\
-+	}								\
-+	__ret;								\
-+})
-+
-+#define raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)			\
-+({									\
-+	typeof(pcp) __old = (oval);					\
-+	raw_cpu_generic_try_cmpxchg_memcpy(pcp, &__old, nval);		\
-+	__old;								\
-+})
-+
-+#define raw_cpu_cmpxchg128(pcp, oval, nval) \
-+	raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)
-+#define raw_cpu_try_cmpxchg128(pcp, ovalp, nval) \
-+	raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)
-+
-+#define this_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)		\
-+({									\
-+	bool __ret;							\
-+	unsigned long __flags;						\
-+	raw_local_irq_save(__flags);					\
-+	__ret = raw_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval);	\
-+	raw_local_irq_restore(__flags);					\
-+	__ret;								\
-+})
-+
-+#define this_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)		\
-+({									\
-+	typeof(pcp) __ret;						\
-+	unsigned long __flags;						\
-+	raw_local_irq_save(__flags);					\
-+	__ret = raw_cpu_generic_cmpxchg_memcmp(pcp, oval, nval);	\
-+	raw_local_irq_restore(__flags);					\
-+	__ret;								\
-+})
-+
-+#define this_cpu_cmpxchg128(pcp, oval, nval) \
-+	this_cpu_generic_cmpxchg_memcmp(pcp, oval, nval)
-+#define this_cpu_try_cmpxchg128(pcp, ovalp, nval) \
-+	this_cpu_generic_try_cmpxchg_memcmp(pcp, ovalp, nval)
-+
-+#endif /* !__SIZEOF_INT128__ */
-+
-+#include <asm-generic/percpu.h>
-+
-+#endif /* _ASM_PARISC_PERCPU_H */
