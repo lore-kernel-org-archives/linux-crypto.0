@@ -2,166 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 957C3C7EE2A
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 17:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30856C7EE23
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 17:51:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231881AbjFARjo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 13:39:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36614 "EHLO
+        id S233007AbjFARvI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 13:51:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231346AbjFARjn (ORCPT
+        with ESMTP id S231298AbjFARvH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 13:39:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D304136;
-        Thu,  1 Jun 2023 10:39:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EE33E64860;
-        Thu,  1 Jun 2023 17:39:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60D9AC4339E;
-        Thu,  1 Jun 2023 17:39:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685641181;
-        bh=rOyxKwyKoD8JRFg4gUZg/5MsYAzctjBiJEmXXIw+2Pg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=o/tcJHGXDGK+Cmz0WPMH9eqt4DXVRB87b+bOc4yCFZZx+pNoEHu0L6Kk/WHl5TZCQ
-         v4wg++ka5L5/koa89l5lEtczt9Lp/CS49/lq9S/D/gsV6IN2cJNGZcqlW9mzDWtgf8
-         kSPa6HE9uQjRqdmZMZGwEA+2H5w1XPFs1bwtf87IXl053GkxGBjbRGWwQEhiSemK34
-         SURRDqI9JYl4AuMZSjsgfbIzfuYI4ScXci6h+5ayJwzrwQeS7v4C8WHfjDAbGm6Wt7
-         HhKwh2oygRzaHVjZAo7rCNsfYsqW/i3EtbygDwQjD02rjzFKXYyUdDoEjObai2iibs
-         UOf6kgrQWTHWg==
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-45c6c6e0ab2so599177e0c.1;
-        Thu, 01 Jun 2023 10:39:41 -0700 (PDT)
-X-Gm-Message-State: AC+VfDzzxOBgQs22Zp+fPZ5LbXE5al098PVjDPukZSVDJiG9ue70wnq0
-        mTIF1LqBegezr4klJ3rP77T6/6P+iMKs1xV/gVo=
-X-Google-Smtp-Source: ACHHUZ7saBfaT5uX7NLiJU4LIkIoXw37eBnBmjdUSiEWtD7RMOu14iPsR47csoQHy7I8rQlHKSda/v96q9Noy2qP/FE=
-X-Received: by 2002:aca:ead6:0:b0:398:2f7f:a5cd with SMTP id
- i205-20020acaead6000000b003982f7fa5cdmr1228908oih.24.1685641160132; Thu, 01
- Jun 2023 10:39:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230531130833.635651916@infradead.org> <20230531132323.722039569@infradead.org>
- <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com> <20230601101409.GS4253@hirez.programming.kicks-ass.net>
- <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de> <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
-In-Reply-To: <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 2 Jun 2023 02:38:43 +0900
-X-Gmail-Original-Message-ID: <CAK7LNATxpUK+w=VAkhLZserLr4cMk2ffSr+qzzZwuZ6DKWA0mw@mail.gmail.com>
-Message-ID: <CAK7LNATxpUK+w=VAkhLZserLr4cMk2ffSr+qzzZwuZ6DKWA0mw@mail.gmail.com>
-Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of __SIZEOF_INT128__
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Helge Deller <deller@gmx.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
-        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
+        Thu, 1 Jun 2023 13:51:07 -0400
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CA913D;
+        Thu,  1 Jun 2023 10:51:06 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.west.internal (Postfix) with ESMTP id 5FF8832006F5;
+        Thu,  1 Jun 2023 13:51:02 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Thu, 01 Jun 2023 13:51:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1685641861; x=1685728261; bh=rI
+        kHOu2cJZ+vhgMgLgXQFIzSc/FfETBAe+GmKBqE/d8=; b=YsbtSfmNvp2eXNoM+R
+        izu+ChEdBnznPH+LsBdjf2+h6LdAHRujYmHDAet9DAX1gmlHLKguMCLBwmLdAHEO
+        D+UVABb2eTTzqr0726+/7NHAOtmHqLCAXINuJsiG1IDxhjaITt017WqUNsBVChzh
+        D90g8W2yX8ZoFDket0s7THCrhtfyEuY5C0Ndajkk/+9tv8wElxHd4U/Gn7Ea7xEx
+        XbVfxHdS58S6O5Mq/yj2OHukD1a2RvVB62BOr0d3rvYg6DdO9l1EU2kX/KReg33O
+        fPR6tKEUO0F7F771g7sulSQlHpOBfGP9yais1MeBS4eMz09WTiPZ3dXkonAtsOj3
+        MpDQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1685641861; x=1685728261; bh=rIkHOu2cJZ+vh
+        gMgLgXQFIzSc/FfETBAe+GmKBqE/d8=; b=x278PMWMnWwyz8MB2+Pq6j4xDniu0
+        TlaDyapGkeiQFJNSM0ckJ1vVqYHPh1dpmpNaqeJMLl7g8wk5al2PlkQc7NvB9v+b
+        GnN6504fYOB+Hl1GRaqPa+18Zkb5vE0BQjoUe3wngRik4cKBXar65yZzHfpoMhTt
+        qksemY29jYOi6hdi0fsHGM5w4bTXLGf859Bz8PCzkDPKVPKbejaWAQPDdVsLH/fK
+        p6meRZqBmViLevJg6759hN/hDoAdYDzWXmViGsF+HwJAAA/2GYyXAVdAVpvsFx8m
+        N21D6im9GWBMQvaasV8H05L7MAuS6ST5q8RBgJocWC9hR3Er14DmqCocw==
+X-ME-Sender: <xms:hNp4ZEB47iSnUPOggsaPyqB3htwwzNbBYiP2c2CDEU-GAelh2g8d0g>
+    <xme:hNp4ZGjPiJzGYKEOKXF8ZVG6qJObsay-XWlXTArfI2edvCGmlHvO6H8hcnSw2yE8S
+    M_zWTR4S9o1_3Selek>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeluddguddukecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeeigfeiieeiheejjeeiudekleevvddvffetieehteeikeeigeeiffdttdef
+    tdeggfenucffohhmrghinhepghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:hNp4ZHkX2OtLDMVwiM9pUSRildLjmx7b470Z9Ca5GPuJafo5YZtD1A>
+    <xmx:hNp4ZKwgiGYOpOdmKAbTAywxVof93l8RU1AQtJKMm8M8XxQ-KJalsw>
+    <xmx:hNp4ZJQ1JHiPxb1I71yRvpM9eN-KRrOUQGwapN-tDspykREevQDiyg>
+    <xmx:hdp4ZICyxJxKWz4v3ZWf754mlZqb1XGQlvWDQ_AdPqLkWWJ3D8psOg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 38825B60086; Thu,  1 Jun 2023 13:51:00 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-447-ge2460e13b3-fm-20230525.001-ge2460e13
+Mime-Version: 1.0
+Message-Id: <f6fcae8a-9b50-48e4-84e9-c37613226c63@app.fastmail.com>
+In-Reply-To: <202306010909.89C4BED@keescook>
+References: <20230601151832.3632525-1-arnd@kernel.org>
+ <202306010909.89C4BED@keescook>
+Date:   Thu, 01 Jun 2023 19:50:38 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Kees Cook" <keescook@chromium.org>,
+        "Arnd Bergmann" <arnd@kernel.org>
+Cc:     kasan-dev@googlegroups.com,
+        "Andrey Ryabinin" <ryabinin.a.a@gmail.com>,
+        "Alexander Potapenko" <glider@google.com>,
+        "Andrey Konovalov" <andreyknvl@gmail.com>,
+        "Dmitry Vyukov" <dvyukov@google.com>,
+        "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
+        "Marco Elver" <elver@google.com>, linux-media@vger.kernel.org,
         linux-crypto@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-        linux-parisc@vger.kernel.org,
-        John David Anglin <dave.anglin@bell.net>,
-        Sam James <sam@gentoo.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Ard Biesheuvel" <ardb@kernel.org>,
+        "Mauro Carvalho Chehab" <mchehab@kernel.org>,
+        "Dan Carpenter" <dan.carpenter@linaro.org>,
+        "Matthias Brugger" <matthias.bgg@gmail.com>,
+        "AngeloGioacchino Del Regno" 
+        <angelogioacchino.delregno@collabora.com>,
+        "Nathan Chancellor" <nathan@kernel.org>,
+        "Nick Desaulniers" <ndesaulniers@google.com>,
+        "Tom Rix" <trix@redhat.com>,
+        "Josh Poimboeuf" <jpoimboe@kernel.org>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] [RFC] ubsan: disallow bounds checking with gcov on broken gcc
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 1, 2023 at 10:29=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Thu, Jun 1, 2023, at 18:14, Kees Cook wrote:
+> On Thu, Jun 01, 2023 at 05:18:11PM +0200, Arnd Bergmann wrote:
 >
-> On Thu, Jun 1, 2023 at 6:32=E2=80=AFAM Helge Deller <deller@gmx.de> wrote=
-:
-> >
-> > I don't think we need to care about gcc-10 on parisc.
-> > Debian and Gentoo are the only supported distributions, while Debian
-> > requires gcc-12 to build > 6.x kernels, and I assume Gentoo uses at lea=
-st
-> > gcc-12 as well.
-> >
-> > So raising the gcc limit for parisc only (at least temporarily for now)
-> > should be fine and your workaround below wouldn't be necessary, right?
+> I think more production systems will have CONFIG_UBSAN_BOUNDS enabled
+> (e.g. Ubuntu has had it enabled for more than a year now) than GCOV,
+> so I'd prefer we maintain all*config coverage for the more commonly
+> used config.
+
+Fair enough, I can send that as v2, but let's see what the others
+think first.
+
+>>  config CC_HAS_UBSAN_BOUNDS_STRICT
+>>  	def_bool $(cc-option,-fsanitize=bounds-strict)
+>> +	# work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=110074
+>> +	depends on GCC_VERSION > 140000 || !GCOV_PROFILE_ALL
+>>  	help
+>>  	  The -fsanitize=bounds-strict option is only available on GCC,
+>>  	  but uses the more strict handling of arrays that includes knowledge
 >
-> This absolutely sounds like the right option. Let's simplify the
-> problem space by just saying that parisc needs the newer compiler.
+> Alternatively, how about falling back to -fsanitize=bounds instead, as
+> that (which has less coverage) wasn't triggering the stack frame
+> warnings?
 >
-> Right now we have that "minimum gcc version" in a somewhat annoying
-> place: it's in the ./scripts/min-tool-version.sh file as a shell
-> script.
->
-> I wonder if we could move the gcc minimum version check into the
-> Kconfig file instead, and make it easier to let architectures override
-> the minimum version.
+> i.e. fall back through these:
+> 	-fsanitize=array-bounds (Clang)
+> 	-fsanitize=bounds-strict (!GCOV || bug fixed in GCC)
+> 	-fsanitize=bounds
 
-Currently, it is invoked in the Kconfig time,
-but not directly in Kconfig files.
+From what I can tell, -fsanitize=bounds has the same problem
+as -fsanitize=bounds-strict, so that would not help.
 
-scripts/Kconfig.include
- -> scripts/cc-version.sh
-    -> scripts/min-tool-version.sh
-
-It would be ugly if we wrote the equivalent code
-directly in Kconfig files.
-
-
->
-> I don't quite know how to do that sanely, though. I don't think we
-> have a sane way to error out at Kconfig time (except by forcing some
-> syntax error inside an 'if' statement or something horrendously hacky
-> like that).
-
-The parse stage can fail by $(error-if ) macro, but
-the evaluation stage never fails. I think it is a design.
-
-I think checking the compiler version during the parse stage
-makes sense given the current situation. The compiler version is
-fixed when Kconfig starts. If the compiler is found to be too old,
-there is no meaning to proceed.
-
-
-You suggested to choose a compiler in the Kconfig time:
-https://lore.kernel.org/lkml/CAHk-=3DwhdrvCkSWh=3DBRrwZwNo3=3DyLBXXM88NGx8V=
-EpP1VTgmkyQ@mail.gmail.com/
-
-When we achieve that, moving the min version to Kconfig files will be
-the right thing to do. Then, everything will be evaluated dynamically.
-
-
->
-> Added Masahiro to the (already overlong) participants list.
->
->                    Linus
-
-
-
---=20
-Best Regards
-Masahiro Yamada
+     Arnd
