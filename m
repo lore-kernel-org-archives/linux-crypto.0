@@ -2,125 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A7EC7EE29
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Jun 2023 21:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DE9C7EE2A
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 02:56:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbjFAVJf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 17:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40626 "EHLO
+        id S231628AbjFBC4G convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 1 Jun 2023 22:56:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbjFAVJe (ORCPT
+        with ESMTP id S229868AbjFBC4F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 17:09:34 -0400
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086FFF2;
-        Thu,  1 Jun 2023 14:09:32 -0700 (PDT)
-References: <20230531130833.635651916@infradead.org>
- <20230531132323.722039569@infradead.org>
- <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
- <20230601101409.GS4253@hirez.programming.kicks-ass.net>
- <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
- <20230601105021.GU4253@hirez.programming.kicks-ass.net>
-User-agent: mu4e 1.10.3; emacs 29.0.91
-From:   Sam James <sam@gentoo.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Helge Deller <deller@gmx.de>, Arnd Bergmann <arnd@arndb.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Will Deacon <will@kernel.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
-        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
-        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Baolu Lu <baolu.lu@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
-        Linux-Arch <linux-arch@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-        linux-parisc@vger.kernel.org,
-        John David Anglin <dave.anglin@bell.net>
-Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of
- __SIZEOF_INT128__
-Date:   Thu, 01 Jun 2023 22:08:44 +0100
-In-reply-to: <20230601105021.GU4253@hirez.programming.kicks-ass.net>
-Message-ID: <87jzwmvqin.fsf@gentoo.org>
+        Thu, 1 Jun 2023 22:56:05 -0400
+Received: from fd01.gateway.ufhost.com (fd01.gateway.ufhost.com [61.152.239.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD5819F;
+        Thu,  1 Jun 2023 19:56:00 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by fd01.gateway.ufhost.com (Postfix) with ESMTP id C4F027FC9;
+        Fri,  2 Jun 2023 10:55:58 +0800 (CST)
+Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Jun
+ 2023 10:55:58 +0800
+Received: from ubuntu.localdomain (202.188.176.82) by EXMBX168.cuchost.com
+ (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Jun
+ 2023 10:55:56 +0800
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH v2 1/2] crypto: starfive - Update hash module irq handling
+Date:   Fri, 2 Jun 2023 10:55:50 +0800
+Message-ID: <20230602025551.874280-2-jiajie.ho@starfivetech.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230602025551.874280-1-jiajie.ho@starfivetech.com>
+References: <20230602025551.874280-1-jiajie.ho@starfivetech.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain
+X-Originating-IP: [202.188.176.82]
+X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
+ (172.16.6.78)
+X-YovoleRuleAgent: yovoleflag
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hash driver needs to check the value of irq mask register before writing
+as it will mask irq of other modules.
 
+Co-developed-by: Huan Feng <huan.feng@starfivetech.com>
+Signed-off-by: Huan Feng <huan.feng@starfivetech.com>
+Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+---
+ drivers/crypto/starfive/jh7110-hash.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Peter Zijlstra <peterz@infradead.org> writes:
+diff --git a/drivers/crypto/starfive/jh7110-hash.c b/drivers/crypto/starfive/jh7110-hash.c
+index 3801e44f2f33..5064150b8a1c 100644
+--- a/drivers/crypto/starfive/jh7110-hash.c
++++ b/drivers/crypto/starfive/jh7110-hash.c
+@@ -39,6 +39,7 @@
+ #define STARFIVE_HASH_SHAWKLEN		(STARFIVE_HASH_REGS_OFFSET + 0x24)
+ 
+ #define STARFIVE_HASH_BUFLEN		SHA512_BLOCK_SIZE
++#define STARFIVE_HASH_RESET		0x2
+ 
+ static inline int starfive_hash_wait_busy(struct starfive_cryp_ctx *ctx)
+ {
+@@ -95,6 +96,7 @@ static void starfive_hash_start(void *param)
+ 	struct starfive_cryp_dev *cryp = ctx->cryp;
+ 	union starfive_alg_cr alg_cr;
+ 	union starfive_hash_csr csr;
++	u32 stat;
+ 
+ 	dma_unmap_sg(cryp->dev, rctx->in_sg, rctx->in_sg_len, DMA_TO_DEVICE);
+ 
+@@ -107,7 +109,9 @@ static void starfive_hash_start(void *param)
+ 	csr.firstb = 0;
+ 	csr.final = 1;
+ 
+-	writel(~STARFIVE_IE_MASK_HASH_DONE, cryp->base + STARFIVE_IE_MASK_OFFSET);
++	stat = readl(cryp->base + STARFIVE_IE_MASK_OFFSET);
++	stat &= ~STARFIVE_IE_MASK_HASH_DONE;
++	writel(stat, cryp->base + STARFIVE_IE_MASK_OFFSET);
+ 	writel(csr.v, cryp->base + STARFIVE_HASH_SHACSR);
+ }
+ 
+@@ -223,6 +227,9 @@ void starfive_hash_done_task(unsigned long param)
+ 	if (!err)
+ 		err = starfive_hash_copy_hash(cryp->req.hreq);
+ 
++	/* Reset to clear hash_done in irq register*/
++	writel(STARFIVE_HASH_RESET, cryp->base + STARFIVE_HASH_SHACSR);
++
+ 	crypto_finalize_hash_request(cryp->engine, cryp->req.hreq, err);
+ }
+ 
+-- 
+2.34.1
 
-> On Thu, Jun 01, 2023 at 12:32:38PM +0200, Helge Deller wrote:
->> On 6/1/23 12:14, Peter Zijlstra wrote:
->> > On Wed, May 31, 2023 at 04:21:22PM +0200, Arnd Bergmann wrote:
->> >=20
->> > > It would be nice to have the hack more localized to parisc
->> > > and guarded with a CONFIG_GCC_VERSION check so we can kill
->> > > it off in the future, once we drop either gcc-10 or parisc
->> > > support.
->> >=20
->> > I vote for dropping parisc -- it's the only 64bit arch that doesn't ha=
-ve
->> > sane atomics.
->>=20
->> Of course I'm against dropping parisc.
->
-> :-)
->
->> > Anyway, the below seems to work -- build tested with GCC-10.1
->>=20
->> I don't think we need to care about gcc-10 on parisc.
->> Debian and Gentoo are the only supported distributions, while Debian
->> requires gcc-12 to build > 6.x kernels, and I assume Gentoo uses at least
->> gcc-12 as well.
->>=20
->> So raising the gcc limit for parisc only (at least temporarily for now)
->> should be fine and your workaround below wouldn't be necessary, right?
->
-> Correct, if you're willing to set minimum GCC version to 11 for parisc
-> all is well and this patch can go play in the bit bucket.
-
-It's fine for us in Gentoo, thanks!
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iOUEARYKAI0WIQQlpruI3Zt2TGtVQcJzhAn1IN+RkAUCZHkJAF8UgAAAAAAuAChp
-c3N1ZXItZnByQG5vdGF0aW9ucy5vcGVucGdwLmZpZnRoaG9yc2VtYW4ubmV0MjVB
-NkJCODhERDlCNzY0QzZCNTU0MUMyNzM4NDA5RjUyMERGOTE5MA8cc2FtQGdlbnRv
-by5vcmcACgkQc4QJ9SDfkZCxTgD8DvRqnel67WrRU5+HwB76oJ89eB+XZVKI63Ih
-mkFPKKIBAJQcSVIUwNsG7OzOuRH/3R6pDjmn/yKfCEUMjHqK3HEH
-=fJgU
------END PGP SIGNATURE-----
---=-=-=--
