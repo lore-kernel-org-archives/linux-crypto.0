@@ -2,45 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2238DC7EE2E
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 19:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6044C77B7A
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 20:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235596AbjFBTlL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jun 2023 15:41:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41608 "EHLO
+        id S235459AbjFBUEC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jun 2023 16:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232032AbjFBTlK (ORCPT
+        with ESMTP id S234920AbjFBUEB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2023 15:41:10 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 954A719B;
-        Fri,  2 Jun 2023 12:41:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HVJVTkNH1pZdi0C/hWhAOiaW38lPOWDttFFCs73FclU=; b=wM1dz8N6OAf0W12V8J/kEnCvRH
-        8DtjUndvJz+PTSgsA/A+oiMsD8tNp9qs+dhSa2UKOI1BXKfuOqOBBl8uKl3GbeMha9dcQfJb7TPS3
-        QdMPqXRxHGoyDR8HD0bGFY8nlaIt31Q01EjneM5hnEItk8pGE5C4M2koQ5s9RQGq9tnT9ssyiE33p
-        fYyJAhvWvC4uiL6msuRvSDOeAvI+732wt4UOHmGoctQSOkcqwHvEW6T5YTpnZNir3UTkdCwmczsTh
-        VMUDFCxB2f43PU7qEkP/NHizR6e4P4m2N09ZsQ+sKpR3VqgB0ABj4vNRXA6EgHK6nUwi+Ni2JQ1v3
-        HI0I3/Fg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q5AdN-009TzM-2Z; Fri, 02 Jun 2023 19:40:25 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3213E3002F0;
-        Fri,  2 Jun 2023 21:40:21 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C9CDA2058127A; Fri,  2 Jun 2023 21:40:21 +0200 (CEST)
-Date:   Fri, 2 Jun 2023 21:40:21 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "H. Peter Anvin" <hpa@zytor.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Helge Deller <deller@gmx.de>,
+        Fri, 2 Jun 2023 16:04:01 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA001AB
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Jun 2023 13:03:59 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-51491b87565so3614202a12.1
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 13:03:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1685736238; x=1688328238;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8pqo3OfJjzReA0YZCNQePZ3Xh5QPxALpix/U4edhgSI=;
+        b=Im4MapHypRY5jX8xgqTbxFcbXBshMfGfNrYImvTx0oZWVgtn07XTkOrZXLhSID6rDy
+         H8wqJ3khM6dSpP43+z9jsTZCFMX66+PCnt/sBXd/G3B9Q7DxWkQH6lVeNCDBqiqHTVX/
+         i/kaBd+QoBGqexycB7GHMd59wxPcrn6LGlTmE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685736238; x=1688328238;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8pqo3OfJjzReA0YZCNQePZ3Xh5QPxALpix/U4edhgSI=;
+        b=ke8WAzR4g+8yvXM1Nw7EtEJCk7XCcAxSaNZr2V1Ba3idG1lyOLUMO3Hu6cEgZ0PjOF
+         HB4e3ujAyiaIKRz5tpLikYp7A0EpOJKgAPxzKCT1tW5/eT2X8Goz7c6if3wekXwCWz6R
+         mGZ2o7DME4iZ3ojrr6vWxjVpWnxkGMMHMpX78ffqxODlUCgKpvP6stiXmRHoIl+0o6ND
+         JszCOWdazWS/sWZeURvySHDVRvfOdhtDmaSg+NyHflafuPqievk8aCr3JwQdGAYs3KMa
+         eEr5fWdC9zd9d954Hnd0pctHsQql3rgnBdeYUD/O25drmyUaOa4+VBbRQmJh4FsMs5x0
+         WApA==
+X-Gm-Message-State: AC+VfDxlnsylaEvMejMZFdsqGGiMXStxKyCM9WD8nyi2kVaF+Z1dUT2W
+        kiJ9ns56Rp443/r64MRZF2/jIVxKLUADWs8Rdxp1mh8t
+X-Google-Smtp-Source: ACHHUZ7MXYTI1eNtazsvYx+eM53hSfFt2zxPPakEc3OwBiBTya+Jr0JooVqJdxBVf1/8J+is1X7gQQ==
+X-Received: by 2002:a17:907:97c3:b0:974:b15:fcda with SMTP id js3-20020a17090797c300b009740b15fcdamr13822828ejc.54.1685736238311;
+        Fri, 02 Jun 2023 13:03:58 -0700 (PDT)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com. [209.85.218.47])
+        by smtp.gmail.com with ESMTPSA id e2-20020a1709062c0200b0094e7d196aa4sm1103297ejh.160.2023.06.02.13.03.57
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Jun 2023 13:03:58 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-97458c97333so222439966b.2
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 13:03:57 -0700 (PDT)
+X-Received: by 2002:a05:6402:b10:b0:514:9b60:ea65 with SMTP id
+ bm16-20020a0564020b1000b005149b60ea65mr2665357edb.16.1685735862382; Fri, 02
+ Jun 2023 12:57:42 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230531130833.635651916@infradead.org> <20230531132323.722039569@infradead.org>
+ <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com> <20230601101409.GS4253@hirez.programming.kicks-ass.net>
+ <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de> <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
+ <20230602143912.GI620383@hirez.programming.kicks-ass.net> <E333E35E-5F9C-441C-B75A-082F19D37978@zytor.com>
+ <20230602191014.GA695361@hirez.programming.kicks-ass.net> <B432FCD8-2ED7-42B1-BC3B-34F277A1CD9F@zytor.com>
+ <20230602194021.GB695361@hirez.programming.kicks-ass.net>
+In-Reply-To: <20230602194021.GB695361@hirez.programming.kicks-ass.net>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 2 Jun 2023 15:57:25 -0400
+X-Gmail-Original-Message-ID: <CAHk-=wi4q=_+vQkOM0LRY7SfsH+D1-9DOSBABAzXrZwWxmJR+g@mail.gmail.com>
+Message-ID: <CAHk-=wi4q=_+vQkOM0LRY7SfsH+D1-9DOSBABAzXrZwWxmJR+g@mail.gmail.com>
+Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of __SIZEOF_INT128__
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     "H. Peter Anvin" <hpa@zytor.com>, Helge Deller <deller@gmx.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Jonathan Corbet <corbet@lwn.net>,
@@ -78,32 +105,25 @@ Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         linux-parisc@vger.kernel.org,
         John David Anglin <dave.anglin@bell.net>,
         Sam James <sam@gentoo.org>
-Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of
- __SIZEOF_INT128__
-Message-ID: <20230602194021.GB695361@hirez.programming.kicks-ass.net>
-References: <20230531130833.635651916@infradead.org>
- <20230531132323.722039569@infradead.org>
- <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
- <20230601101409.GS4253@hirez.programming.kicks-ass.net>
- <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
- <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
- <20230602143912.GI620383@hirez.programming.kicks-ass.net>
- <E333E35E-5F9C-441C-B75A-082F19D37978@zytor.com>
- <20230602191014.GA695361@hirez.programming.kicks-ass.net>
- <B432FCD8-2ED7-42B1-BC3B-34F277A1CD9F@zytor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B432FCD8-2ED7-42B1-BC3B-34F277A1CD9F@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 02, 2023 at 12:20:05PM -0700, H. Peter Anvin wrote:
-> Ok. So the patch description needs to be fixed. Otherwise the solution would be far simpler :)
+On Fri, Jun 2, 2023 at 3:40=E2=80=AFPM Peter Zijlstra <peterz@infradead.org=
+> wrote:
+>
+> "With 64bit builds depending on __SIZEOF_INT128__ to detect the
+> presence of __int128 raise the parisc minimum compiler version to
+> gcc-11.0.0."
+>
+> better?
 
-"With 64bit builds depending on __SIZEOF_INT128__ to detect the
-presence of __int128 raise the parisc minimum compiler version to
-gcc-11.0.0."
+I'd just say "64-bit targets need the __int128 type, which for pa-risc
+means raising the minimum gcc version to 11".
 
-better?
+The __SIZEOF_INT128__ part isn't the important part. That's just the sympto=
+m.
+
+               Linus
