@@ -2,117 +2,136 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B94BC77B7A
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 13:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC53C7EE33
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 14:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235055AbjFBNkS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jun 2023 09:40:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47338 "EHLO
+        id S236133AbjFBOkm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jun 2023 10:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234739AbjFBNkR (ORCPT
+        with ESMTP id S235775AbjFBOkl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2023 09:40:17 -0400
-Received: from frasgout11.his.huawei.com (unknown [14.137.139.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B47F1A7;
-        Fri,  2 Jun 2023 06:40:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.18.147.228])
-        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4QXkPp4Syrz9xqxL;
-        Fri,  2 Jun 2023 21:29:50 +0800 (CST)
-Received: from roberto-ThinkStation-P620 (unknown [10.204.63.22])
-        by APP2 (Coremail) with SMTP id GxC2BwDHjFMW8Xlkdj_8Ag--.3115S2;
-        Fri, 02 Jun 2023 14:39:48 +0100 (CET)
-Message-ID: <6fc56d38e9c9c79b263d4677a594d3a701279f9b.camel@huaweicloud.com>
-Subject: Re: [PATCH v5 2/2] KEYS: asymmetric: Copy sig and digest in
- public_key_verify_signature()
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Stefan Berger <stefanb@linux.ibm.com>, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Roberto Sassu <roberto.sassu@huawei.com>
-Date:   Fri, 02 Jun 2023 15:39:30 +0200
-In-Reply-To: <20230602131724.GA628@quark.localdomain>
-References: <20221227142740.2807136-1-roberto.sassu@huaweicloud.com>
-         <20221227142740.2807136-3-roberto.sassu@huaweicloud.com>
-         <fd161de5-61ce-94bf-96cf-65965115f981@linux.ibm.com>
-         <62078920aa02c2912beeb33511fdf6636365e6c8.camel@huaweicloud.com>
-         <20230602131724.GA628@quark.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        Fri, 2 Jun 2023 10:40:41 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87B51BD;
+        Fri,  2 Jun 2023 07:40:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=csXHyTVxkO+EGfVGUkTCJ6dG3JVY9wkWTgHzblW+1z8=; b=SkQmNVOGlL8AQWBC9GS+DAhOCy
+        pofqCKOFBuExSWYSUk1GOFt2m62JU8NEtYoPUUfMMqQ0Tvi3EJsHfNqSp200ooaTXY3PTzxOlEQx6
+        hi6KhG2M0AEguimnvfwFgRjrDAvrv2QoVKzAWqxP0rpemSCRkLCdxugTW/2YQ1/pytbyyJaEsm9Pe
+        9fF8rqccSYOqcoqSnuyarEBqbcWLdOeZyGMTbYC1Yo4yux9gcXUpErSi7OVplE7ALO5MRwva9+CqF
+        /GgutI8B0hYBrP2dcBrjvb6Ay3CWgXFc24hfBxmA3Q5N4iL4PvgjqQKKMoMxbpDLjeMpfcsPrfrFt
+        gFDjAmFA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q55vz-001Lw5-1U;
+        Fri, 02 Jun 2023 14:39:19 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id B3BB5300188;
+        Fri,  2 Jun 2023 16:39:12 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 6982E22BA6445; Fri,  2 Jun 2023 16:39:12 +0200 (CEST)
+Date:   Fri, 2 Jun 2023 16:39:12 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Helge Deller <deller@gmx.de>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Will Deacon <will@kernel.org>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>, dennis@kernel.org,
+        Tejun Heo <tj@kernel.org>, Christoph Lameter <cl@linux.com>,
+        Heiko Carstens <hca@linux.ibm.com>, gor@linux.ibm.com,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        borntraeger@linux.ibm.com, Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        suravee.suthikulpanit@amd.com, Robin Murphy <robin.murphy@arm.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Baolu Lu <baolu.lu@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, iommu@lists.linux.dev,
+        Linux-Arch <linux-arch@vger.kernel.org>,
+        linux-crypto@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+        linux-parisc@vger.kernel.org,
+        John David Anglin <dave.anglin@bell.net>,
+        Sam James <sam@gentoo.org>
+Subject: Re: [PATCH v2 07/12] parisc/percpu: Work around the lack of
+ __SIZEOF_INT128__
+Message-ID: <20230602143912.GI620383@hirez.programming.kicks-ass.net>
+References: <20230531130833.635651916@infradead.org>
+ <20230531132323.722039569@infradead.org>
+ <70a69deb-7ad4-45b2-8e13-34955594a7ce@app.fastmail.com>
+ <20230601101409.GS4253@hirez.programming.kicks-ass.net>
+ <14c50e58-fecc-e96a-ee73-39ef4e4617c7@gmx.de>
+ <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: GxC2BwDHjFMW8Xlkdj_8Ag--.3115S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1UKw17JFyUuw17JFW3trb_yoW8uF1xpa
-        y8K3W5GF4DXry8AF4a9ay0yFyrt3ykXryUX3y5J343Zrn09Fn8ur4IgF43WF98Cr18KFWY
-        yFWYg3sFq34UZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAQBF1jj44JRQAAsm
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=whL65CLuy9D9gyO608acM5WLWo_ggAMP1cGu2XvyC0-hA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2023-06-02 at 06:17 -0700, Eric Biggers wrote:
-> On Fri, Jun 02, 2023 at 11:17:04AM +0200, Roberto Sassu wrote:
-> > On Thu, 2023-06-01 at 17:00 -0400, Stefan Berger wrote:
-> > > On 12/27/22 09:27, Roberto Sassu wrote:
-> > > > From: Roberto Sassu <roberto.sassu@huawei.com>
-> > > > 
-> > > > Commit ac4e97abce9b8 ("scatterlist: sg_set_buf() argument must be in linear
-> > > > mapping") checks that both the signature and the digest reside in the
-> > > > linear mapping area.
-> > > > 
-> > > > However, more recently commit ba14a194a434c ("fork: Add generic vmalloced
-> > > > stack support") made it possible to move the stack in the vmalloc area,
-> > > > which is not contiguous, and thus not suitable for sg_set_buf() which needs
-> > > > adjacent pages.
-> > > > 
-> > > > Always make a copy of the signature and digest in the same buffer used to
-> > > > store the key and its parameters, and pass them to sg_init_one(). Prefer it
-> > > > to conditionally doing the copy if necessary, to keep the code simple. The
-> > > > buffer allocated with kmalloc() is in the linear mapping area.
-> > > > 
-> > > > Cc: stable@vger.kernel.org # 4.9.x
-> > > > Fixes: ba14a194a434 ("fork: Add generic vmalloced stack support")
-> > > > Link: https://lore.kernel.org/linux-integrity/Y4pIpxbjBdajymBJ@sol.localdomain/
-> > > > Suggested-by: Eric Biggers <ebiggers@kernel.org>
-> > > > Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
-> > > > Reviewed-by: Eric Biggers <ebiggers@google.com>
-> > > 
-> > > I just ran into an issue with OpenBMC on ARM where EVM ECDSA signature verification failed due to invalid hashes being passed to the ECDSA signature verification algorithm. This patch here resolved the issue.
-> > > 
-> > > Tested-by: Stefan Berger <stefanb@linux.ibm.com>
-> > 
-> > Thanks, Stefan.
-> > 
-> > I did multiple attempts to have the patch included, but I didn't have
-> > any luck with the maintainers (David, Jarkko).
-> > 
-> > It would be awesome if any maintainer picks it.
-> > 
-> > Thanks!
-> > 
-> 
-> As the maintainers are ignoring this patch, you could try the "maintainers of
-> last resort" (Andrew Morton or Linus Torvalds).
+On Thu, Jun 01, 2023 at 09:29:18AM -0400, Linus Torvalds wrote:
 
-Thanks, will do.
+> Right now we have that "minimum gcc version" in a somewhat annoying
+> place: it's in the ./scripts/min-tool-version.sh file as a shell
+> script.
 
-Roberto
+Something like so then?
 
+---
+Subject: parisc: Raise minimal GCC version
+From: Peter Zijlstra <peterz@infradead.org>
+Date: Fri Jun  2 16:33:54 CEST 2023
+
+With 64bit builds depending on __SIZEOF_INT128__ raise the parisc
+minimum compiler version to gcc-11.0.0.
+
+All other 64bit architectures provide this from GCC-5.1.0 (and
+probably before), except hppa64 which only started advertising this
+with GCC-11.
+
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+ scripts/min-tool-version.sh |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- a/scripts/min-tool-version.sh
++++ b/scripts/min-tool-version.sh
+@@ -17,7 +17,11 @@ binutils)
+ 	echo 2.25.0
+ 	;;
+ gcc)
+-	echo 5.1.0
++	if [ "$SRCARCH" = parisc ]; then
++		echo 11.0.0
++	else
++		echo 5.1.0
++	fi
+ 	;;
+ llvm)
+ 	if [ "$SRCARCH" = s390 ]; then
