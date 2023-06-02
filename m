@@ -2,73 +2,79 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E7EC7EE2F
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 02:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC0AC77B7A
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 06:05:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233514AbjFBC4L convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Jun 2023 22:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53132 "EHLO
+        id S232000AbjFBGFs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jun 2023 02:05:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233326AbjFBC4I (ORCPT
+        with ESMTP id S231354AbjFBGFr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Jun 2023 22:56:08 -0400
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DEF21A2;
-        Thu,  1 Jun 2023 19:56:04 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 4BA4624E266;
-        Fri,  2 Jun 2023 10:55:56 +0800 (CST)
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Jun
- 2023 10:55:56 +0800
-Received: from ubuntu.localdomain (202.188.176.82) by EXMBX168.cuchost.com
- (172.16.6.78) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 2 Jun
- 2023 10:55:54 +0800
-From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH v2 0/2] crypto: starfive - Add RSA algo to drivers
-Date:   Fri, 2 Jun 2023 10:55:49 +0800
-Message-ID: <20230602025551.874280-1-jiajie.ho@starfivetech.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 2 Jun 2023 02:05:47 -0400
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B54019A;
+        Thu,  1 Jun 2023 23:05:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1685685818; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=jvAAoIR7hWpzPGIvCqAL3GkKmLXxTRf22KLx1FttpVI=; b=biXsuUl1SHeh1YWBtqNITK0BNzQrygKmK5g7REAZ/eo/10bdmydFU2U8eX9tAHl30FYqSYNQkm6KIHIDkGKD80u8OlYjDxP1FNxzUZIUSsve9Kmz+zqojCm58dQhyvdfM8yjJOF0gZRIHtlkuW85riYkoqPYfvjT8+2dSm25Y8PM6oqsZsXkzU6szqhEiimP73EbPfJ97qn9XgHtXFbAP5NYUbqldzjaD34rzoSftTYJTFO1BHFqGVpkmhY450uncjLBUiq2WZP+h5xC68bMtDUbCijo0u9uPfB7xu4ZXF3GMv/wj88IE21lrjyz31eiQRYWvtkMlKVacFQnpv14aA==
+Received: from 210.104.33.70 (nsr.re.kr)
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+        by mail.nsr.re.kr with SMTP; Fri, 02 Jun 2023 15:03:23 +0900
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 161;
+          Fri, 2 Jun 2023 15:05:15 +0900 (KST)
+From:   Dongsoo Lee <letrhee@nsr.re.kr>
+To:     'Herbert Xu' <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, letrhee@gmail.com
+References: <20230525121301.722682-1-letrhee@nsr.re.kr> <ZHh1H3yKPU68J7Uv@gondor.apana.org.au>
+In-Reply-To: <ZHh1H3yKPU68J7Uv@gondor.apana.org.au>
+Subject: RE: [PATCH v2 0/2] crypto: LEA block cipher implementation
+Date:   Fri, 2 Jun 2023 15:05:16 +0900
+Message-ID: <008d01d99518$33db63f0$9b922bd0$@nsr.re.kr>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [202.188.176.82]
-X-ClientProxiedBy: EXCAS066.cuchost.com (172.16.6.26) To EXMBX168.cuchost.com
- (172.16.6.78)
-X-YovoleRuleAgent: yovoleflag
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain;
+        charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: ko
+Thread-Index: AQEgJe7QK/GSa6QvS9/PE8EqZ6STfbDp46/Q
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch series adds RSA support to VisionFive 2 SoCs. Patch 1 updates
-current irq handling of hash module to prevent conflict among other
-crypto modules. Patch 2 adds RSA algo to crypto engine drivers.
+>>
+>> We expect that the first application of the patch would be disk
+encryption on the Gooroom platform ('Gooroom' is a Korean word, meaning
+'cloud') [3]. Currently, the Gooroom platform uses AES-XTS for disk
+encryption. The main reason for submitting this patch is to make disk
+encryption with LEA (e.g. LEA-XTS) available on there.
+>
+>We don't add kernel algorithms without an in-kernel user.  Is there an
+existing in-kernel user that can use this as is or are you going to add one?
+>
+>Thanks,
 
-This patch series needs to be applied on:
-https://patchwork.kernel.org/project/linux-crypto/cover/20230515125355.624250-1-jiajie.ho@starfivetech.com/
+Our current goal is to encrypt with LEA in a data-at-rest environment.
 
-Changes v1 -> v2:
- - Removed ASYNC flag (Herbert)
+One option we are considering is utilizing the `dm-crypt` module for disk
+encryption. The `dm-crypt` module can use various ciphers provided by the
+Linux Crypto API. By specifying the `lea-xts-plain` option in the
+`cryptsetup` tool, it can immediately work without further modification.
 
-Jia Jie Ho (2):
-  crypto: starfive - Update hash module irq handling
-  crypto: starfive - Add RSA algo support
+Additionally, we are exploring the possibility of using `blk-crypto` for
+encryption. Currently, the ciphers available for `blk-crypto` are
+AES-256-XTS, AES-128-CBC-ESSIV, Adiantum, and SM4-XTS. We would like to add
+LEA-256-XTS to these.
 
- drivers/crypto/starfive/Kconfig       |   1 +
- drivers/crypto/starfive/Makefile      |   2 +-
- drivers/crypto/starfive/jh7110-cryp.c |  20 +-
- drivers/crypto/starfive/jh7110-cryp.h |  45 ++
- drivers/crypto/starfive/jh7110-hash.c |   9 +-
- drivers/crypto/starfive/jh7110-rsa.c  | 617 ++++++++++++++++++++++++++
- 6 files changed, 691 insertions(+), 3 deletions(-)
- create mode 100644 drivers/crypto/starfive/jh7110-rsa.c
+( https://github.com/torvalds/linux/blob/master/block/blk-crypto.c#L21 )
 
--- 
-2.34.1
+Instead of disk encryption, it is also possible to use `fscrypt` to encrypt
+the file system for data-at-rest environments. `fscrypt` currently supports
+AES-256-XTS, AES-256-CTS-CBC, AES-128-CBC-ESSIV, AES-128-CTS-CBC, SM4-XTS,
+SM4-CTS-CBC, Adiantum, and AES-256-HCTR2.
 
+( https://github.com/torvalds/linux/blob/master/fs/crypto/keysetup.c#L16 )
+
+The above are what we will do with LEA.
+
+Thank you.
