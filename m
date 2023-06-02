@@ -2,79 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC0AC77B7A
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 06:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EF3C7EE2A
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 08:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232000AbjFBGFs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jun 2023 02:05:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60822 "EHLO
+        id S234114AbjFBI2t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jun 2023 04:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231354AbjFBGFr (ORCPT
+        with ESMTP id S234277AbjFBI21 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2023 02:05:47 -0400
-Received: from mail.nsr.re.kr (unknown [210.104.33.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B54019A;
-        Thu,  1 Jun 2023 23:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1685685818; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=jvAAoIR7hWpzPGIvCqAL3GkKmLXxTRf22KLx1FttpVI=; b=biXsuUl1SHeh1YWBtqNITK0BNzQrygKmK5g7REAZ/eo/10bdmydFU2U8eX9tAHl30FYqSYNQkm6KIHIDkGKD80u8OlYjDxP1FNxzUZIUSsve9Kmz+zqojCm58dQhyvdfM8yjJOF0gZRIHtlkuW85riYkoqPYfvjT8+2dSm25Y8PM6oqsZsXkzU6szqhEiimP73EbPfJ97qn9XgHtXFbAP5NYUbqldzjaD34rzoSftTYJTFO1BHFqGVpkmhY450uncjLBUiq2WZP+h5xC68bMtDUbCijo0u9uPfB7xu4ZXF3GMv/wj88IE21lrjyz31eiQRYWvtkMlKVacFQnpv14aA==
-Received: from 210.104.33.70 (nsr.re.kr)
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
-        by mail.nsr.re.kr with SMTP; Fri, 02 Jun 2023 15:03:23 +0900
-Received: from 192.168.155.188 ([192.168.155.188])
-          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 161;
-          Fri, 2 Jun 2023 15:05:15 +0900 (KST)
-From:   Dongsoo Lee <letrhee@nsr.re.kr>
-To:     'Herbert Xu' <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, letrhee@gmail.com
-References: <20230525121301.722682-1-letrhee@nsr.re.kr> <ZHh1H3yKPU68J7Uv@gondor.apana.org.au>
-In-Reply-To: <ZHh1H3yKPU68J7Uv@gondor.apana.org.au>
-Subject: RE: [PATCH v2 0/2] crypto: LEA block cipher implementation
-Date:   Fri, 2 Jun 2023 15:05:16 +0900
-Message-ID: <008d01d99518$33db63f0$9b922bd0$@nsr.re.kr>
+        Fri, 2 Jun 2023 04:28:27 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C57310F8
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Jun 2023 01:27:40 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51491b87565so2630972a12.1
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 01:27:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1685694436; x=1688286436;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rqiBV30sd6pVAOr/JC2i8NEvFQRhidh6InexBKyx7mo=;
+        b=rIl0eivXD4yxDCT/YgMEsx+zB95XosuikN/Qy10i57lfY0bUaZOBftlmQqO+cFMD0D
+         HZAAhd0VW/ieFo5zYGo6vv2v0zUDlZ52siklLw4uV81kybENAfWJX5R3rwrvf1buexm1
+         yEMYUIUSzh/qNzwQBiwrUVRoKsvabnkfIAmeTWvOidfzk0NWYH9cT8KdwNTwXDRoHenP
+         EInC+vD5ibY9evurg3TMnF2a3tcxmfxxjvXFWOSqpjcgLZIxu/CI4Luehlm1nqH4vHwD
+         X0FqymZc2B+ehA1Y5i2CI/W5+vwNvIxBm+FpLQN812zDX0RThsO/Sk+wpIPeOHKFX7Xs
+         uPSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685694436; x=1688286436;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rqiBV30sd6pVAOr/JC2i8NEvFQRhidh6InexBKyx7mo=;
+        b=P9f1r8IamGNPL9JuEnLB5EM/fT3p709UA3EA66hfKkBKhIDHgdEeL0+PQCweo4v0iS
+         RRZDigdCcnvKwSzRRaHa1bILHuQKHkeefEYod3cqRirW1WbGL5kfKA0poF7FbUgsjvuQ
+         AKcEh4YszICNHqK2KPPcxCfsXgt+fPdsLbNv+P6zM3PqrLmEVKaKkx/CtysSIwx4zAyv
+         Jzw/5eV2+cbKf8sj4GMpclxDEKGfn8R4c+cnIlNnog5X+Jo/vkyyga+H770zYeVjCh8P
+         7gPHsp5oUZUCUVQ5ZTK/SqXstSlNrES3CqIpeYiJ44Qkd6RqGM0bEZ40m1oSJ1yoA/Cw
+         yi6w==
+X-Gm-Message-State: AC+VfDyoR021hifHTB3wa+Tr9ATaBVDfPA9BlciwPlVc51Lon4P/HrtN
+        kshCVoFRx27eur+7K15lWZb82w==
+X-Google-Smtp-Source: ACHHUZ7QkKl0T36/hmXWtoKKBK/0HSPptyUZfw8AKnhu87xXvJCANWT/QJH7XR+fLH3RF42PD2as2Q==
+X-Received: by 2002:a05:6402:2cd:b0:506:976e:5242 with SMTP id b13-20020a05640202cd00b00506976e5242mr1511546edx.25.1685694436433;
+        Fri, 02 Jun 2023 01:27:16 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.199.204])
+        by smtp.gmail.com with ESMTPSA id x26-20020aa7cd9a000000b005149461b1e0sm414404edv.25.2023.06.02.01.27.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Jun 2023 01:27:15 -0700 (PDT)
+Message-ID: <1d6f70ab-e971-4a83-a9b3-e049b38c29a0@linaro.org>
+Date:   Fri, 2 Jun 2023 10:27:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="us-ascii"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v1 1/7] dt-bindings: mmc: fsl-imx-esdhc: Add imx6ul
+ support
+To:     Oleksij Rempel <o.rempel@pengutronix.de>,
+        Abel Vesa <abelvesa@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     kernel@pengutronix.de, Peng Fan <peng.fan@nxp.com>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Michael Trimarchi <michael@amarulasolutions.com>,
+        Mark Brown <broonie@kernel.org>,
+        Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+        Anson Huang <Anson.Huang@nxp.com>, Marek Vasut <marex@denx.de>,
+        linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+References: <20230601101451.357662-1-o.rempel@pengutronix.de>
+ <20230601101451.357662-2-o.rempel@pengutronix.de>
+Content-Language: en-US
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230601101451.357662-2-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: ko
-Thread-Index: AQEgJe7QK/GSa6QvS9/PE8EqZ6STfbDp46/Q
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
->>
->> We expect that the first application of the patch would be disk
-encryption on the Gooroom platform ('Gooroom' is a Korean word, meaning
-'cloud') [3]. Currently, the Gooroom platform uses AES-XTS for disk
-encryption. The main reason for submitting this patch is to make disk
-encryption with LEA (e.g. LEA-XTS) available on there.
->
->We don't add kernel algorithms without an in-kernel user.  Is there an
-existing in-kernel user that can use this as is or are you going to add one?
->
->Thanks,
+On 01/06/2023 12:14, Oleksij Rempel wrote:
+> Add the 'fsl,imx6ul-usdhc' value to the compatible properties list in
+> the fsl-imx-esdhc.yaml file. This is required to match the compatible
+> strings present in the 'mmc@2190000' node of 'imx6ul-prti6g.dtb'. This
+> commit addresses the following dtbs_check warning:
+>   imx6ul-prti6g.dtb: mmc@2190000: compatible: 'oneOf' conditional failed,
+>     one must be fixed: ['fsl,imx6ul-usdhc', 'fsl,imx6sx-usdhc'] is too long
+>     'fsl,imx6ul-usdhc' is not one of ['fsl,imx25-esdhc', 'fsl,imx35-esdhc',
+>     'fsl,imx51-esdhc', 'fsl,imx53-esdhc', 'fsl,imx6q-usdhc',
+>     'fsl,imx6sl-usdhc', 'fsl,imx6sx-usdhc', 'fsl,imx7d-usdhc',
+>     'fsl,imx7ulp-usdhc', 'fsl,imx8mm-usdhc', 'fsl,imxrt1050-usdhc',
+>     'nxp,s32g2-usdhc']
+>   From schema: Documentation/devicetree/bindings/mmc/fsl-imx-esdhc.yaml
 
-Our current goal is to encrypt with LEA in a data-at-rest environment.
+Except what Conor wrote, please don't wrap that much the error log - it
+is unreadable. Trim it, remove unneeded parts and keep some decent
+one/two lines even if it exceeds the commit msg. This applies to other
+patches as well.
 
-One option we are considering is utilizing the `dm-crypt` module for disk
-encryption. The `dm-crypt` module can use various ciphers provided by the
-Linux Crypto API. By specifying the `lea-xts-plain` option in the
-`cryptsetup` tool, it can immediately work without further modification.
+Best regards,
+Krzysztof
 
-Additionally, we are exploring the possibility of using `blk-crypto` for
-encryption. Currently, the ciphers available for `blk-crypto` are
-AES-256-XTS, AES-128-CBC-ESSIV, Adiantum, and SM4-XTS. We would like to add
-LEA-256-XTS to these.
-
-( https://github.com/torvalds/linux/blob/master/block/blk-crypto.c#L21 )
-
-Instead of disk encryption, it is also possible to use `fscrypt` to encrypt
-the file system for data-at-rest environments. `fscrypt` currently supports
-AES-256-XTS, AES-256-CTS-CBC, AES-128-CBC-ESSIV, AES-128-CTS-CBC, SM4-XTS,
-SM4-CTS-CBC, Adiantum, and AES-256-HCTR2.
-
-( https://github.com/torvalds/linux/blob/master/fs/crypto/keysetup.c#L16 )
-
-The above are what we will do with LEA.
-
-Thank you.
