@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B55C7EE3A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4163C7EE39
 	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 15:35:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbjFCPfG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Jun 2023 11:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37462 "EHLO
+        id S229863AbjFCPfK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Jun 2023 11:35:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjFCPfF (ORCPT
+        with ESMTP id S229683AbjFCPfG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Jun 2023 11:35:05 -0400
+        Sat, 3 Jun 2023 11:35:06 -0400
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E410C132;
-        Sat,  3 Jun 2023 08:35:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64694123;
+        Sat,  3 Jun 2023 08:35:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685806503; x=1717342503;
+  t=1685806505; x=1717342505;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=Rw+wxmjMySuTIW59NrPQ4xVEjyG0POQ4g40kzOQSZSk=;
-  b=mZ6mAmTcn7JuhUEhOH5OSQ4u6BUmo0JLghhsZqb60KH6xkhMVTlcI9jk
-   bn/A7c/mZG/rQLjnN8DX0s9acDkSBIb4JvdXoz59euMI5JwOkrhW4Wr+Y
-   UHBcEWhiXMhzxZsEQ8bHdzKusJ9y3JZl0S53IYc2yPAp2NEUWk/BbfbSs
-   kMo9AFtoI7TuTJO/51mZRdTuNJU39kOVmpUWsgQW5fhgnQ+w+Gnt5nyHP
-   RNIp+xPLiQ/yiuNF6f/FZ1fABOOhOUaFhuGBQeqrjGecV2yHauQ+9G57s
-   wmWa4VzxjkyyVR+pp57M608B9gSXUvirl1sg1Jrex4VqAIEWKte0w10aM
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10730"; a="356097300"
+  bh=ijlcQTB25JWDSKBgGP5PTsXN7m/nFm/uJsgOpwUsehM=;
+  b=IHzuPO0OrKDv0tbBBH+0CZxWwqQijXemf2vDm7ye/Ea6XEEi3eOceRPR
+   7ez36hUY1KwBBMKtWis3dHoT0Pm+3QIsF24TOCHR3gnLgA/zED9S2acyG
+   5lyA1QPzHBTvUg5gYP8UlyzWUo8VyOrfS/VD+KMS1cSwhkYZHfLabp4yP
+   DVXqDSSYxlCuwv5IY/LTCZ1ZAfy7fvbb6fbViDYL/AluBBnnd7I/AIKZB
+   t6N53ShsW4Qn0sQ9imiocchH3lX6BPOzZoBalIw3fLymB7NFkp2h9Va9L
+   OILDueIDpn8LDK12rcpmW0nmbz2I1OszJOt3gO8WCe4D7r53FoNAQvT9f
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10730"; a="356097355"
 X-IronPort-AV: E=Sophos;i="6.00,216,1681196400"; 
-   d="scan'208";a="356097300"
+   d="scan'208";a="356097355"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2023 08:35:02 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2023 08:35:04 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10730"; a="702274230"
+X-IronPort-AV: E=McAfee;i="6600,9927,10730"; a="702274248"
 X-IronPort-AV: E=Sophos;i="6.00,216,1681196400"; 
-   d="scan'208";a="702274230"
+   d="scan'208";a="702274248"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by orsmga007.jf.intel.com with ESMTP; 03 Jun 2023 08:35:01 -0700
+  by orsmga007.jf.intel.com with ESMTP; 03 Jun 2023 08:35:03 -0700
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         dm-devel@redhat.com
@@ -50,11 +50,12 @@ Cc:     ebiggers@kernel.org, elliott@hpe.com, gmazyland@gmail.com,
         charishma1.gairuboyina@intel.com,
         lalithambika.krishnakumar@intel.com, nhuck@google.com,
         chang.seok.bae@intel.com, Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>,
-        linux-doc@vger.kernel.org
-Subject: [PATCH v8 01/12] Documentation/x86: Document Key Locker
-Date:   Sat,  3 Jun 2023 08:22:16 -0700
-Message-Id: <20230603152227.12335-2-chang.seok.bae@intel.com>
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v8 04/12] x86/asm: Add a wrapper function for the LOADIWKEY instruction
+Date:   Sat,  3 Jun 2023 08:22:19 -0700
+Message-Id: <20230603152227.12335-5-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230603152227.12335-1-chang.seok.bae@intel.com>
 References: <20230524165717.14062-1-chang.seok.bae@intel.com>
@@ -63,8 +64,16 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Document the overview of the feature along with relevant consideration
-when provisioning dm-crypt volumes with AES-KL instead of AES-NI.
+Key Locker introduces a CPU-internal wrapping key to encode a user key
+to a key handle. Then a key handle is referenced instead of the plain
+text key.
+
+LOADIWKEY loads a wrapping key in the software-inaccessible CPU state.
+It operates only in kernel mode.
+
+The kernel will use this to load a new key at boot time. Establish a
+wrapper to prepare for this use. Also, define struct iwkey to pass the
+key value to it.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
@@ -73,146 +82,112 @@ Cc: Ingo Molnar <mingo@redhat.com>
 Cc: Borislav Petkov <bp@alien8.de>
 Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
 Cc: x86@kernel.org
-Cc: linux-doc@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
 Changes from v6:
-* Rebase on the upstream -- commit ff61f0791ce9 ("docs: move x86
-  documentation into Documentation/arch/"). (Nathan Huckleberry)
-* Remove a duplicated sentence -- 'But there is no AES-KL instruction
-  to process a 192-bit key.'
-* Update the text for clarity and readability:
-  - Clarify the error code and exemplify the backup failure
-  - Use 'wrapping key' instead of less readable 'IWKey'
+* Massage the changelog -- clarify the reason and the changes a bit.
 
 Changes from v5:
-* Fix a typo: 'feature feature' -> 'feature'
+* Fix a typo: kernel_cpu_begin() -> kernel_fpu_begin()
 
 Changes from RFC v2:
-* Add as a new patch.
+* Separate out the code as a new patch.
+* Improve the usability with the new struct as an argument. (Dan
+  Williams)
 
-The preview is available here:
-  https://htmlpreview.github.io/?https://github.com/intel-staging/keylocker/kdoc/arch/x86/keylocker.html
+Note, Dan wondered if:
+  WARN_ON(!irq_fpu_usable());
+would be appropriate in the load_xmm_iwkey() function.
 ---
- Documentation/arch/x86/index.rst     |  1 +
- Documentation/arch/x86/keylocker.rst | 97 ++++++++++++++++++++++++++++
- 2 files changed, 98 insertions(+)
- create mode 100644 Documentation/arch/x86/keylocker.rst
+ arch/x86/include/asm/keylocker.h     | 25 ++++++++++++++++++++++
+ arch/x86/include/asm/special_insns.h | 32 ++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
+ create mode 100644 arch/x86/include/asm/keylocker.h
 
-diff --git a/Documentation/arch/x86/index.rst b/Documentation/arch/x86/index.rst
-index c73d133fd37c..256359c24669 100644
---- a/Documentation/arch/x86/index.rst
-+++ b/Documentation/arch/x86/index.rst
-@@ -42,3 +42,4 @@ x86-specific Documentation
-    features
-    elf_auxvec
-    xstate
-+   keylocker
-diff --git a/Documentation/arch/x86/keylocker.rst b/Documentation/arch/x86/keylocker.rst
+diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
 new file mode 100644
-index 000000000000..5557b8d0659a
+index 000000000000..9b3bec452b31
 --- /dev/null
-+++ b/Documentation/arch/x86/keylocker.rst
-@@ -0,0 +1,97 @@
-+.. SPDX-License-Identifier: GPL-2.0
++++ b/arch/x86/include/asm/keylocker.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +
-+==============
-+x86 Key Locker
-+==============
++#ifndef _ASM_KEYLOCKER_H
++#define _ASM_KEYLOCKER_H
 +
-+Introduction
-+============
++#ifndef __ASSEMBLY__
 +
-+Key Locker is a CPU feature to reduce key exfiltration opportunities
-+while maintaining a programming interface similar to AES-NI. It
-+converts the AES key into an encoded form, called the 'key handle'.
-+The key handle is a wrapped version of the clear-text key where the
-+wrapping key has limited exposure. Once converted, all subsequent data
-+encryption using new AES instructions (AES-KL) uses this key handle,
-+reducing the exposure of private key material in memory.
++#include <asm/fpu/types.h>
 +
-+CPU-internal Wrapping Key
-+=========================
++/**
++ * struct iwkey - A temporary wrapping key storage.
++ * @integrity_key:	A 128-bit key to check that key handles have not
++ *			been tampered with.
++ * @encryption_key:	A 256-bit encryption key used in
++ *			wrapping/unwrapping a clear text key.
++ *
++ * This storage should be flushed immediately after loaded.
++ */
++struct iwkey {
++	struct reg_128_bit integrity_key;
++	struct reg_128_bit encryption_key[2];
++};
 +
-+The CPU-internal wrapping key is an entity in a software-invisible CPU
-+state. On every system boot, a new key is loaded. So the key handle that
-+was encoded by the old wrapping key is no longer usable on system shutdown
-+or reboot.
++#endif /*__ASSEMBLY__ */
++#endif /* _ASM_KEYLOCKER_H */
+diff --git a/arch/x86/include/asm/special_insns.h b/arch/x86/include/asm/special_insns.h
+index de48d1389936..dd2d8b40fce3 100644
+--- a/arch/x86/include/asm/special_insns.h
++++ b/arch/x86/include/asm/special_insns.h
+@@ -9,6 +9,7 @@
+ #include <asm/processor-flags.h>
+ #include <linux/irqflags.h>
+ #include <linux/jump_label.h>
++#include <asm/keylocker.h>
+ 
+ /*
+  * The compiler should not reorder volatile asm statements with respect to each
+@@ -283,6 +284,37 @@ static __always_inline void tile_release(void)
+ 	asm volatile(".byte 0xc4, 0xe2, 0x78, 0x49, 0xc0");
+ }
+ 
++/**
++ * load_xmm_iwkey - Load a CPU-internal wrapping key
++ * @key:	A struct iwkey pointer.
++ *
++ * Load @key to XMMs then do LOADIWKEY. After this, flush XMM
++ * registers. Caller is responsible for kernel_fpu_begin().
++ */
++static inline void load_xmm_iwkey(struct iwkey *key)
++{
++	struct reg_128_bit zeros = { 0 };
 +
-+And the key may be lost on the following exceptional situation upon wakeup:
++	asm volatile ("movdqu %0, %%xmm0; movdqu %1, %%xmm1; movdqu %2, %%xmm2;"
++		      :: "m"(key->integrity_key), "m"(key->encryption_key[0]),
++			 "m"(key->encryption_key[1]));
 +
-+Wrapping Key Restore Failure
-+----------------------------
++	/*
++	 * LOADIWKEY %xmm1,%xmm2
++	 *
++	 * EAX and XMM0 are implicit operands. Load a key value
++	 * from XMM0-2 to a software-invisible CPU state. With zero
++	 * in EAX, CPU does not do hardware randomization and the key
++	 * backup is allowed.
++	 *
++	 * This instruction is supported by binutils >= 2.36.
++	 */
++	asm volatile (".byte 0xf3,0x0f,0x38,0xdc,0xd1" :: "a"(0));
 +
-+The CPU state is volatile with the ACPI S3/4 sleep states. When the system
-+supports those states, the key has to be backed up so that it is restored
-+on wake up. The kernel saves the key in non-volatile media.
++	asm volatile ("movdqu %0, %%xmm0; movdqu %0, %%xmm1; movdqu %0, %%xmm2;"
++		      :: "m"(zeros));
++}
 +
-+The event of a wrapping key restore failure upon resume from suspend, all
-+established key handles become invalid. In flight dm-crypt operations
-+receive error results from pending operations. In the likely scenario that
-+dm-crypt is hosting the root filesystem the recovery is identical to if a
-+storage controller failed to resume from suspend, reboot. If the volume
-+impacted by a wrapping key restore failure is a data-volume then it is
-+possible that I/O errors on that volume do not bring down the rest of the
-+system. However, a reboot is still required because the kernel will have
-+soft-disabled Key Locker. Upon the failure, the crypto library code will
-+return -ENODEV on every AES-KL function call. The Key Locker implementation
-+only loads a new wrapping key at initial boot, not any time after like
-+resume from suspend.
-+
-+Use Case and Non-use Cases
-+==========================
-+
-+Bare metal disk encryption is the only intended use case.
-+
-+Userspace usage is not supported because there is no ABI provided to
-+communicate and coordinate wrapping-key restore failure to userspace. For
-+now, key restore failures are only coordinated with kernel users. But the
-+kernel can not prevent userspace from using the feature's AES instructions
-+('AES-KL') when the feature has been enabled. So, the lack of userspace
-+support is only documented, not actively enforced.
-+
-+Key Locker is not expected to be advertised to guest VMs and the kernel
-+implementation ignores it even if the VMM enumerates the capability. The
-+expectation is that a guest VM wants private wrapping key state, but the
-+architecture does not provide that. An emulation of that capability, by
-+caching per-VM wrapping keys in memory, defeats the purpose of Key Locker.
-+The backup / restore facility is also not performant enough to be suitable
-+for guest VM context switches.
-+
-+AES Instruction Set
-+===================
-+
-+The feature accompanies a new AES instruction set. This instruction set is
-+analogous to AES-NI. A set of AES-NI instructions can be mapped to an
-+AES-KL instruction. For example, AESENC128KL is responsible for ten rounds
-+of transformation, which is equivalent to nine times AESENC and one
-+AESENCLAST in AES-NI.
-+
-+But they have some notable differences:
-+
-+* AES-KL provides a secure data transformation using an encrypted key.
-+
-+* If an invalid key handle is provided, e.g. a corrupted one or a handle
-+  restriction failure, the instruction fails with setting RFLAGS.ZF. The
-+  crypto library implementation includes the flag check to return -EINVAL.
-+  Note that this flag is also set if the wrapping key is changed, e.g.,
-+  because of the backup error.
-+
-+* AES-KL implements support for 128-bit and 256-bit keys, but there is no
-+  AES-KL instruction to process an 192-bit key. The AES-KL cipher
-+  implementation logs a warning message with a 192-bit key and then falls
-+  back to AES-NI. So, this 192-bit key-size limitation is only documented,
-+  not enforced. It means the key will remain in clear-text in memory. This
-+  is to meet Linux crypto-cipher expectation that each implementation must
-+  support all the AES-compliant key sizes.
-+
-+* Some AES-KL hardware implementation may have noticeable performance
-+  overhead when compared with AES-NI instructions.
-+
+ #endif /* __KERNEL__ */
+ 
+ #endif /* _ASM_X86_SPECIAL_INSNS_H */
 -- 
 2.17.1
 
