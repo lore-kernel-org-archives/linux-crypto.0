@@ -2,119 +2,189 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85734C7EE2C
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 00:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEC6C77B7A
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 08:24:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236574AbjFCAIP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jun 2023 20:08:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
+        id S229658AbjFCIYX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Jun 2023 04:24:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236467AbjFCAIO (ORCPT
+        with ESMTP id S229722AbjFCIYW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2023 20:08:14 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809D11BF
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Jun 2023 17:08:13 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-974f4897d87so143306266b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 17:08:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1685750891; x=1688342891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UIfddwJGgEUnwUCFA5IlnKSK6V7h4JvROQevxAQzNhk=;
-        b=haM75PQBkuqw+UWlyLARJvJ6YuWufLMf+LPGfYfVzXQNgRX9DwRI8tEA1riys0gSxO
-         0hTcajB+4GOiZZlSdECHvyT3ySrZt0Fy7GLp8Ba/0HUzO0vyjGpQzZd2qUZH2D2N7K0Q
-         a5IhAqy1GMwKlhuNhW2N9XR0uyLXD6JQNyq3U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685750891; x=1688342891;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UIfddwJGgEUnwUCFA5IlnKSK6V7h4JvROQevxAQzNhk=;
-        b=IBdF5yb7EfNlZfz7QD4DYP7/iwbQoyNU3CCj5y4V+Zv6DyHBKQ8XkDz5k169280cZm
-         wnh4BHGWGYFuzmxA17a34e0GlcsQ33sHzsNRsXoFjnf2JZlahWeubGkTDybeb2PtbTrf
-         EpJw/09moVGz8ZKSU7YHl/o3maT5/uST8CfOtyQa+M9VtVRGVwmXAJ28x6BxlJhyhykW
-         wsOCzpn6nCmC0P9UHcCbtmGTRAmrrjnW3F4B7eMDY+i5oEJy13hTBToFz3c+O60BnRU0
-         9KmyNmAthyMag1IIyBEX8lCngrA9Q5ZLaDgMjOnkFWvSrlFs2NEcugOnEo0TtBPK//Zy
-         hJPg==
-X-Gm-Message-State: AC+VfDwEP6uf9xPYBomAbY1n+8EizEPdC4N33lOv/afNAJw4qgf8Xu2V
-        vsFsmpxYHdK7w8FpVJ/h3j8PSp1meo7XUProCVzr8uB+
-X-Google-Smtp-Source: ACHHUZ4f+F7EbcI1pjtwiKjkrW9QyEq6fVRpnHr37U1vped6f8AW9EzjzHeaKHG70rW0ylPOYBil5w==
-X-Received: by 2002:a17:907:971b:b0:972:aa30:203e with SMTP id jg27-20020a170907971b00b00972aa30203emr118424ejc.34.1685750891624;
-        Fri, 02 Jun 2023 17:08:11 -0700 (PDT)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com. [209.85.128.52])
-        by smtp.gmail.com with ESMTPSA id j21-20020a170906095500b0096b20c968afsm1309271ejd.124.2023.06.02.17.08.11
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Jun 2023 17:08:11 -0700 (PDT)
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f6e4554453so25464505e9.3
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 17:08:11 -0700 (PDT)
-X-Received: by 2002:ac2:52ba:0:b0:4f2:7b65:baeb with SMTP id
- r26-20020ac252ba000000b004f27b65baebmr2458573lfm.53.1685750560415; Fri, 02
- Jun 2023 17:02:40 -0700 (PDT)
+        Sat, 3 Jun 2023 04:24:22 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18801E56
+        for <linux-crypto@vger.kernel.org>; Sat,  3 Jun 2023 01:24:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685780660; x=1717316660;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=bTmHxS5gWAum0zYENv0I1/xlacN07HIgXDCrsgATVLA=;
+  b=hfebDDbRJI4jrJxsGG16kgEisrJlsXbjPDMMlbEvWazTRsTxLvUFyLoK
+   zIH9iakjkSWrNkk66eE5cIr5Rm1DCgiuZuWynlYLUY4gKgkw/UvyRCL7/
+   tuOXXzFKyc4UPTr3MxF7UD9f6K0upu2uD2u1AY5y5YF4/q63khpkpWlFa
+   RKFw12mvVH0Cs1sJAd6PFPECfAaEosS41aYvRb/Rnd454yH5DjmVkm1Nm
+   l2U5XPjsJCSR0LeqSqypw2/Cv0wTj5524CoTSeVNAHA2QuHgqPayRqQwN
+   791wV1tirX7kQ8hCd6UlbFGVxM8v+dV/dUuFN/ZvmSMhqDWjwsHt/EsA5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="359358447"
+X-IronPort-AV: E=Sophos;i="6.00,215,1681196400"; 
+   d="scan'208";a="359358447"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2023 01:24:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="685566655"
+X-IronPort-AV: E=Sophos;i="6.00,215,1681196400"; 
+   d="scan'208";a="685566655"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga006.jf.intel.com with ESMTP; 03 Jun 2023 01:24:18 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Sat, 3 Jun 2023 01:24:17 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Sat, 3 Jun 2023 01:24:17 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.109)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Sat, 3 Jun 2023 01:24:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ppqz1r0JgumRMPycOvOTi5R4CVc+4Xsp6Ihb7yWONE8EVxrnsjNnLCYyycBgWtg/Eue9utzdLTWIXeS7xOsnL5pee1biGhgA9uY8To6SR0VDYcKFpT7e2NqXjUspPPPj8Zj8eDHTv7pEejeLDn7aFJkNDDzZ+MkyG+R5KcohGI6kwnE8dVYL8P/rVzTu7B44RKWjwqZ/NV8A0rUmasNhq+jyeMcoTLCvFEG7X1o1sDOwcYcOc0Q982RBGblEGnD03AtBR3aeSNxuH51vn0+ddhwtgju+joBEZPnQwshxbU1OCdQSnFNO71G0ZsUOOJoWAOjA/g13PLM1L3ElTPfDkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NAiVoBHGw9ywMwuKMYRoVIpGLcWn1nP0zwG6ilS/rX8=;
+ b=dbgjJYreqpmRdr7A9FK3mgmQuEQPz9Wn15IK+Y+/Cr6MHch+0MjjDOTLMSFG3Z/f+9UOT2dux1mExwEGA9R3WJMytPSQ/yGfAZ6UNYCgRThIm6mmi9vemHXbqw7SoAvysNlawzocgLhkoWBHtq9FpEY2jIaTr8hDSO0bVPXbYIPdZOLin695PVn+JFZSrq1cJrnIuf+cdMZpMG3sukoi4PwkoNUEcPg9jP8sBYWUcYHAO7gsNEYq2Dvg7mdOLxLGaJVGuGNC4VSMEe6WX92R9k3B2nOLDOle52fLzFxkBUO/pZ+GJ3IbirGxpV0zqGr+Z/bP1d76Buq2huyF/YiKtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by CY8PR11MB6939.namprd11.prod.outlook.com (2603:10b6:930:59::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.28; Sat, 3 Jun
+ 2023 08:24:15 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::db49:ca8a:d7b0:8714]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::db49:ca8a:d7b0:8714%7]) with mapi id 15.20.6433.018; Sat, 3 Jun 2023
+ 08:24:15 +0000
+Date:   Sat, 3 Jun 2023 09:24:04 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     kernel test robot <lkp@intel.com>
+CC:     Damian Muszynski <damian.muszynski@intel.com>,
+        <oe-kbuild-all@lists.linux.dev>, <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, <qat-linux@intel.com>
+Subject: Re: [herbert-cryptodev-2.6:master 45/47]
+ drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c:69:9: error: implicit
+ declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'?
+Message-ID: <ZHr4pBcuYGkDvtUd@gcabiddu-mobl1.ger.corp.intel.com>
+References: <202306030654.5t4qkyN1-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <202306030654.5t4qkyN1-lkp@intel.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: LO4P265CA0087.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2bd::18) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 MIME-Version: 1.0
-References: <4d7e38ff5bbc496cb794b50e1c5c83bcd2317e69.camel@huaweicloud.com> <CAHk-=wj4S0t5RnJQmF_wYwv+oMTKggwdLnrA9D1uMNKq4H4byw@mail.gmail.com>
-In-Reply-To: <CAHk-=wj4S0t5RnJQmF_wYwv+oMTKggwdLnrA9D1uMNKq4H4byw@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 2 Jun 2023 20:02:23 -0400
-X-Gmail-Original-Message-ID: <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com>
-Message-ID: <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com>
-Subject: Re: [GIT PULL] Asymmetric keys fix for v6.4-rc5
-To:     Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>, davem@davemloft.net,
-        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|CY8PR11MB6939:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2b15b657-c298-4421-8dd7-08db640beacb
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Gk/d7VAZR/7fsRa0W4l04ExqG9W7+dkYY1eHVsuSxPdwIU4yqY+yOfCoTV3aHVlPKVRRiERWvUivebkIxy8SyVKc0qLcBkNRH4HBB7nPojcm5XXjpq2rDYWpcijbCD6svvY4iY1Sa3DMFurmsPs3jYPILnMUOhpTRiAMNP2FoNgJj9GswqxFl/gC2mVJZkNsWuc2/SQj30Cwr/frzIThrexh6OFjPsWeuJ2VfFi54rewXiND6yLdSG7w+/UTq6cSVmoixhDh+wAtGU8N/kjZvfdYILKjdFjq7WMS4/N9qWnqBlidJi1gGCM3Wtt9RFKoeggnZ4YE4y7VAe+Oy8wJMWcWlpJjVbgZ0O9Q0SYKifVSm+ulWUR3DlZaC1vFR6UDH8WoVbMMcRYNgScQDOPCmkX1FALeqUzEoOX/v9Ce4Qu+RYlcDmo42bW0SFDqrvBkeGVrXtg97uN2fovmpVXrYKlYrLTvTC3reOjWzoECNlkg3SF/Cx/fwN6WhklgNxYbwqOAw9iAWatXhfAed2qnqj3AQbZ+iV7hSwumF3f8qNoR9QCBnyewFu7ZmrEbqxuZx2X1KhIlixyCZplD/2EIfg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(136003)(39860400002)(396003)(376002)(346002)(451199021)(83380400001)(2906002)(86362001)(38100700002)(82960400001)(966005)(6486002)(41300700001)(316002)(6666004)(36916002)(5660300002)(8676002)(8936002)(6862004)(54906003)(478600001)(66556008)(66946007)(66476007)(6636002)(4326008)(6512007)(6506007)(26005)(186003)(107886003)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oh0p6ysbTpm96f0aAT9FAZuMX4CROelBIhDAlg6qBvlnjetIkjDCtMF7/9CI?=
+ =?us-ascii?Q?FrBVGrEK5xpWlMaLSduLgRaCn9P30KVpOaVK5BaZRfxrl6IITL0FKDFowJhh?=
+ =?us-ascii?Q?ahupbhLSZVb1vzlPU7h0XZEm26U+4otFP/dRzmwTIVIATiWxghwCo3FaD5g9?=
+ =?us-ascii?Q?qQqz5NAQPHWXsHUW8oqVzBDFRhDsf7uTDzRaCi2ikXfw4j9K5h+FGCYDXA/E?=
+ =?us-ascii?Q?Lh9Txe1DpGExCX2Ni0ZQJ2SoPnA4n2ukqFO7X6v+0FRqQQIWYQ49YRMpza1j?=
+ =?us-ascii?Q?xOmjtmrkU++wi9gtNdD7zBcRBqLc2oZEkhqDvBTup881rtL2hHdfQUXqlD/H?=
+ =?us-ascii?Q?JIa/g3iVWpe5zIB2MWvrWe3ixX8xN/oNSDSwEWQ/ZKAmGnat258g5keBI1Qs?=
+ =?us-ascii?Q?Psn2eoo06AiD09Gxpy21tlHV2SmU+/4uhFql8ifR5Zx+QAfqdl4X2pAxy/D1?=
+ =?us-ascii?Q?fCIZz3uZ/zlwRjKVoqD6CWRhk9lJJDq8tkiFWlmzjKdFhNZWVvegSiqthWwl?=
+ =?us-ascii?Q?bgRpG5KEVjXMv3PFE5DeRZ6xqA7Lz/QDwAM/VUd2c4SD9QrMkXXni1kKYHMD?=
+ =?us-ascii?Q?CT8acvHI0GkG6SoolNXNcJ2hVVjZCN4bGR8Z4s2yzFxy+zASXp7x+bxumyIa?=
+ =?us-ascii?Q?LU5TIPZXVCsuU4DL1NkDKNmwATazw5nOwBFmBSwx4WkaeEuQLPt7q2cthhlx?=
+ =?us-ascii?Q?0louAhPxRJZ/bnTkAqZQgrqRpWJEskA33WPDHWNZ5neyHOn2AWwsFwDQh2pr?=
+ =?us-ascii?Q?0/jNciFHJJLCUPSYU/mDZs7mflzwdWuqewvQf0UZPKjpYVQaSuN4pjBPVTmH?=
+ =?us-ascii?Q?F4RnWJtJvPovlskeb5u7lszoiNxJzYqaWeGtzdPLhCJ9CGVyXLtQ/wdxApua?=
+ =?us-ascii?Q?m0CEgCkxi/1dPuJSX3XAU+UQGu6AFhT6Hg+50P9LZ+LlPfBmnBolu4AfRbaF?=
+ =?us-ascii?Q?HrNF10mTaDUFkoHiNR76quQCpA1XHNCFzzrkrWnCvkzYDoG0vnIutE6E565N?=
+ =?us-ascii?Q?d70C7D6N71FOQDwZ+u+EisjyWFhdVoB0i6eBTTU6P5WB9D3oYpIITDotr16S?=
+ =?us-ascii?Q?FRvql/AMB+AzdYqh/bN/gO4pjZMtjOzy0NSevmKQ7Kk+iQquf79F/7jqifl7?=
+ =?us-ascii?Q?8wVMENp58mUe9Pc+j2pHUzADSS8MS6yxuNOpH4nchQi59NaVDLaz3uh3a1gl?=
+ =?us-ascii?Q?FyF5qn5fkOC+dhL27IGepBmfeRVquj4S01NlLv+gbeJCE0SHcdTmGWVIzvt5?=
+ =?us-ascii?Q?Wfq5Nev5dKrWgWaiM58VxkgpOmjwpR5Rr31VeARbkyPu7LuCFGf4192tuCFO?=
+ =?us-ascii?Q?MFnuCOakugSm5NIHYYKnCTb9F0uuKN1rZBZF2UfilA7s6eMmGVojsMs9ilbw?=
+ =?us-ascii?Q?XOgqLK8AlbKNpVIo3ZH9MlSumvNl6ky28OF8AxmxpNSxetganbDQ4TP1+3g6?=
+ =?us-ascii?Q?xmxLp2En+sTRdAcA+p+GDifuVf2/tiK9xlpEaZGQcPChc+5AlBMniX5AuU7H?=
+ =?us-ascii?Q?Ph5A9MNqPdAe7yYOqxEpOkHs11+2DeW50kpxoC/9UgpAhZEh9MfGlnnajQdA?=
+ =?us-ascii?Q?q3JMB4YljpnVSPA3I4LSlgXhpn+o05HD7rDvuLHhtDoe96qEyTqzm9nc6aYG?=
+ =?us-ascii?Q?4g=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b15b657-c298-4421-8dd7-08db640beacb
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2023 08:24:15.2356
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t47nfA4qStSTiJ82Fs+vZIJOiNtUuhnwVlpWWf0f2PAZ0pYBFRdaO4VtQCmaLT4S+Oig0QwNHDSNZ5aoCV56RC1lWB/seGn6UC5xB13sRsc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6939
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 2, 2023 at 1:38=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> The patch re-uses the allocation it already does for the key data, and
-> it seems sane.
+On Sat, Jun 03, 2023 at 06:58:35AM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   1d217fa26680b074dbb44f6183f971a5304eaf8b
+> commit: 9260db6640a61ebba5348ceae7fa26307d9d5b0e [45/47] crypto: qat - move dbgfs init to separate file
+> config: parisc-randconfig-r005-20230531 (https://download.01.org/0day-ci/archive/20230603/202306030654.5t4qkyN1-lkp@intel.com/config)
+> compiler: hppa-linux-gcc (GCC) 12.3.0
+> reproduce (this is a W=1 build):
+>         mkdir -p ~/bin
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=9260db6640a61ebba5348ceae7fa26307d9d5b0e
+>         git remote add herbert-cryptodev-2.6 https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+>         git fetch --no-tags herbert-cryptodev-2.6 master
+>         git checkout 9260db6640a61ebba5348ceae7fa26307d9d5b0e
+>         # save the config file
+>         mkdir build_dir && cp config build_dir/.config
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=parisc olddefconfig
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=parisc SHELL=/bin/bash drivers/crypto/intel/qat/qat_c3xxxvf/ drivers/crypto/intel/qat/qat_c62x/ drivers/crypto/intel/qat/qat_dh895xcc/ fs/
+> 
+> If you fix the issue, kindly add following tag where applicable
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202306030654.5t4qkyN1-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c: In function 'adf_cleanup_accel':
+> >> drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c:69:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
+>       69 |         adf_dbgfs_exit(accel_dev);
+>          |         ^~~~~~~~~~~~~~
+>          |         adf_dbgfs_init
+>    cc1: some warnings being treated as errors
+adf_dbgfs.h is not defining adf_dbgfs_exit() when CONFIG_DEBUG_FS=n.
 
-Ugh. I had to check that it was ok to re-use the key buffer, but it
-does seem to be the case that you can just re-use the buffer after
-you've done that crypto_akcipher_set_priv/pub_key() call, and the
-crypto layer has to copy it into its own data structures.
+My bad. I thought I had a build with CONFIG_DEBUG_FS=n in my flow but I
+just realized it is not working as expected (CONFIG_DEBUG_FS was forced
+to y).
 
-I absolutely abhor the crypto interfaces. They all seem designed for
-that "external DMA engine" case that seems so horrendously pointless
-and slow.  In practice so few of them are that, and we have all those
-optimized routines for doing it all on the CPU - but have in the
-meantime wasted all that time and effort into copying everything,
-turning simple buffers into sg-bufs etc etc. The amount of indirection
-and "set this state in the state machine" is just nasty, and this
-seems to all be a prime example of it all. With some of it then
-randomly going through some kthread too.
+Sending a fix...
 
-I still think that patch is probably fine, but was also going "maybe
-the real problem is in that library helper function
-(asymmetric_verify(), in this case), which takes those (sig, siglen,
-digest, digestlen) arguments and turns it into a 'struct
-public_key_signature' without marshalling them.
+Regards,
 
-Just looking at this mess of indirection and different "helper"
-functions makes me second-guess myself about where the actual
-conversion should be - while also feeling like it should never have
-been done as a scatter-gather entry in the first place.
-
-Anyway, I don't feel competent to decide if that pull request is the
-right fix or not.
-
-But it clearly is *a* fix.
-
-            Linus
+-- 
+Giovanni
