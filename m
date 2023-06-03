@@ -2,141 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 616FEC7EE29
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Jun 2023 22:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85734C7EE2C
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 00:08:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236572AbjFBW7P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Jun 2023 18:59:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42774 "EHLO
+        id S236574AbjFCAIP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 2 Jun 2023 20:08:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236818AbjFBW7N (ORCPT
+        with ESMTP id S236467AbjFCAIO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Jun 2023 18:59:13 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CEAE62
-        for <linux-crypto@vger.kernel.org>; Fri,  2 Jun 2023 15:59:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685746747; x=1717282747;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=sUMEbFM86zU0fMuhT+iHRBGTBzBlHqfh0Ve0b2k8dDs=;
-  b=Hffsi3PJKdGzdtpczM30Hv0LpFmzRZE+9jBE8BaQ4DL3ds9JT2OEWokN
-   /aQPRevtELGSZPgtWVCw8D109JQ6OThvRMepFROwmooz/mSx/P3qDyaPT
-   C7pVKCi9dlKn9YwEwcT8YUv1sDAbCFIQHKGg/BGdSLXBKVqX3xI7iXNXD
-   fpB9m7Y3r0jB1kVSP80ZWrwi5H2NuNpyeuV3gM6gWLohgPg4fQNHdcV6G
-   PhQkXtx3RQN9F+407kOs9pwjsfKsH+ezf8m2pHjgFG/dFhKxZs+e6G3/F
-   JufgumV0Evdr4VWCVzuS/V0k/itY2DGBhmD7D+VOEXOI85994Fk4bi+Ec
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="419527338"
-X-IronPort-AV: E=Sophos;i="6.00,214,1681196400"; 
-   d="scan'208";a="419527338"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 15:59:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10729"; a="737695985"
-X-IronPort-AV: E=Sophos;i="6.00,214,1681196400"; 
-   d="scan'208";a="737695985"
-Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 02 Jun 2023 15:59:05 -0700
-Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q5Djc-00012H-1x;
-        Fri, 02 Jun 2023 22:59:04 +0000
-Date:   Sat, 3 Jun 2023 06:58:35 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Damian Muszynski <damian.muszynski@intel.com>
-Cc:     oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [herbert-cryptodev-2.6:master 45/47]
- drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c:69:9: error: implicit
- declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'?
-Message-ID: <202306030654.5t4qkyN1-lkp@intel.com>
+        Fri, 2 Jun 2023 20:08:14 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809D11BF
+        for <linux-crypto@vger.kernel.org>; Fri,  2 Jun 2023 17:08:13 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-974f4897d87so143306266b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 17:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1685750891; x=1688342891;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UIfddwJGgEUnwUCFA5IlnKSK6V7h4JvROQevxAQzNhk=;
+        b=haM75PQBkuqw+UWlyLARJvJ6YuWufLMf+LPGfYfVzXQNgRX9DwRI8tEA1riys0gSxO
+         0hTcajB+4GOiZZlSdECHvyT3ySrZt0Fy7GLp8Ba/0HUzO0vyjGpQzZd2qUZH2D2N7K0Q
+         a5IhAqy1GMwKlhuNhW2N9XR0uyLXD6JQNyq3U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685750891; x=1688342891;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UIfddwJGgEUnwUCFA5IlnKSK6V7h4JvROQevxAQzNhk=;
+        b=IBdF5yb7EfNlZfz7QD4DYP7/iwbQoyNU3CCj5y4V+Zv6DyHBKQ8XkDz5k169280cZm
+         wnh4BHGWGYFuzmxA17a34e0GlcsQ33sHzsNRsXoFjnf2JZlahWeubGkTDybeb2PtbTrf
+         EpJw/09moVGz8ZKSU7YHl/o3maT5/uST8CfOtyQa+M9VtVRGVwmXAJ28x6BxlJhyhykW
+         wsOCzpn6nCmC0P9UHcCbtmGTRAmrrjnW3F4B7eMDY+i5oEJy13hTBToFz3c+O60BnRU0
+         9KmyNmAthyMag1IIyBEX8lCngrA9Q5ZLaDgMjOnkFWvSrlFs2NEcugOnEo0TtBPK//Zy
+         hJPg==
+X-Gm-Message-State: AC+VfDwEP6uf9xPYBomAbY1n+8EizEPdC4N33lOv/afNAJw4qgf8Xu2V
+        vsFsmpxYHdK7w8FpVJ/h3j8PSp1meo7XUProCVzr8uB+
+X-Google-Smtp-Source: ACHHUZ4f+F7EbcI1pjtwiKjkrW9QyEq6fVRpnHr37U1vped6f8AW9EzjzHeaKHG70rW0ylPOYBil5w==
+X-Received: by 2002:a17:907:971b:b0:972:aa30:203e with SMTP id jg27-20020a170907971b00b00972aa30203emr118424ejc.34.1685750891624;
+        Fri, 02 Jun 2023 17:08:11 -0700 (PDT)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com. [209.85.128.52])
+        by smtp.gmail.com with ESMTPSA id j21-20020a170906095500b0096b20c968afsm1309271ejd.124.2023.06.02.17.08.11
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Jun 2023 17:08:11 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f6e4554453so25464505e9.3
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Jun 2023 17:08:11 -0700 (PDT)
+X-Received: by 2002:ac2:52ba:0:b0:4f2:7b65:baeb with SMTP id
+ r26-20020ac252ba000000b004f27b65baebmr2458573lfm.53.1685750560415; Fri, 02
+ Jun 2023 17:02:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <4d7e38ff5bbc496cb794b50e1c5c83bcd2317e69.camel@huaweicloud.com> <CAHk-=wj4S0t5RnJQmF_wYwv+oMTKggwdLnrA9D1uMNKq4H4byw@mail.gmail.com>
+In-Reply-To: <CAHk-=wj4S0t5RnJQmF_wYwv+oMTKggwdLnrA9D1uMNKq4H4byw@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 2 Jun 2023 20:02:23 -0400
+X-Gmail-Original-Message-ID: <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com>
+Message-ID: <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com>
+Subject: Re: [GIT PULL] Asymmetric keys fix for v6.4-rc5
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Stefan Berger <stefanb@linux.ibm.com>, davem@davemloft.net,
+        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-head:   1d217fa26680b074dbb44f6183f971a5304eaf8b
-commit: 9260db6640a61ebba5348ceae7fa26307d9d5b0e [45/47] crypto: qat - move dbgfs init to separate file
-config: parisc-randconfig-r005-20230531 (https://download.01.org/0day-ci/archive/20230603/202306030654.5t4qkyN1-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 12.3.0
-reproduce (this is a W=1 build):
-        mkdir -p ~/bin
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=9260db6640a61ebba5348ceae7fa26307d9d5b0e
-        git remote add herbert-cryptodev-2.6 https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-        git fetch --no-tags herbert-cryptodev-2.6 master
-        git checkout 9260db6640a61ebba5348ceae7fa26307d9d5b0e
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=parisc olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=parisc SHELL=/bin/bash drivers/crypto/intel/qat/qat_c3xxxvf/ drivers/crypto/intel/qat/qat_c62x/ drivers/crypto/intel/qat/qat_dh895xcc/ fs/
+On Fri, Jun 2, 2023 at 1:38=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> The patch re-uses the allocation it already does for the key data, and
+> it seems sane.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306030654.5t4qkyN1-lkp@intel.com/
+Ugh. I had to check that it was ok to re-use the key buffer, but it
+does seem to be the case that you can just re-use the buffer after
+you've done that crypto_akcipher_set_priv/pub_key() call, and the
+crypto layer has to copy it into its own data structures.
 
-All errors (new ones prefixed by >>):
+I absolutely abhor the crypto interfaces. They all seem designed for
+that "external DMA engine" case that seems so horrendously pointless
+and slow.  In practice so few of them are that, and we have all those
+optimized routines for doing it all on the CPU - but have in the
+meantime wasted all that time and effort into copying everything,
+turning simple buffers into sg-bufs etc etc. The amount of indirection
+and "set this state in the state machine" is just nasty, and this
+seems to all be a prime example of it all. With some of it then
+randomly going through some kthread too.
 
-   drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c: In function 'adf_cleanup_accel':
->> drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c:69:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
-      69 |         adf_dbgfs_exit(accel_dev);
-         |         ^~~~~~~~~~~~~~
-         |         adf_dbgfs_init
-   cc1: some warnings being treated as errors
---
-   drivers/crypto/intel/qat/qat_c62x/adf_drv.c: In function 'adf_cleanup_accel':
->> drivers/crypto/intel/qat/qat_c62x/adf_drv.c:69:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
-      69 |         adf_dbgfs_exit(accel_dev);
-         |         ^~~~~~~~~~~~~~
-         |         adf_dbgfs_init
-   cc1: some warnings being treated as errors
---
-   drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c: In function 'adf_cleanup_accel':
->> drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c:68:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
-      68 |         adf_dbgfs_exit(accel_dev);
-         |         ^~~~~~~~~~~~~~
-         |         adf_dbgfs_init
-   cc1: some warnings being treated as errors
+I still think that patch is probably fine, but was also going "maybe
+the real problem is in that library helper function
+(asymmetric_verify(), in this case), which takes those (sig, siglen,
+digest, digestlen) arguments and turns it into a 'struct
+public_key_signature' without marshalling them.
 
+Just looking at this mess of indirection and different "helper"
+functions makes me second-guess myself about where the actual
+conversion should be - while also feeling like it should never have
+been done as a scatter-gather entry in the first place.
 
-vim +69 drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
+Anyway, I don't feel competent to decide if that pull request is the
+right fix or not.
 
-    45	
-    46	static void adf_cleanup_accel(struct adf_accel_dev *accel_dev)
-    47	{
-    48		struct adf_accel_pci *accel_pci_dev = &accel_dev->accel_pci_dev;
-    49		int i;
-    50	
-    51		for (i = 0; i < ADF_PCI_MAX_BARS; i++) {
-    52			struct adf_bar *bar = &accel_pci_dev->pci_bars[i];
-    53	
-    54			if (bar->virt_addr)
-    55				pci_iounmap(accel_pci_dev->pci_dev, bar->virt_addr);
-    56		}
-    57	
-    58		if (accel_dev->hw_device) {
-    59			switch (accel_pci_dev->pci_dev->device) {
-    60			case PCI_DEVICE_ID_INTEL_QAT_DH895XCC:
-    61				adf_clean_hw_data_dh895xcc(accel_dev->hw_device);
-    62				break;
-    63			default:
-    64				break;
-    65			}
-    66			kfree(accel_dev->hw_device);
-    67			accel_dev->hw_device = NULL;
-    68		}
-  > 69		adf_dbgfs_exit(accel_dev);
-    70		adf_cfg_dev_remove(accel_dev);
-    71		adf_devmgr_rm_dev(accel_dev, NULL);
-    72	}
-    73	
+But it clearly is *a* fix.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+            Linus
