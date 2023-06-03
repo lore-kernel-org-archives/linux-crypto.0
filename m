@@ -2,188 +2,160 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D65EC77B7A
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 14:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63BE6C77B7A
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 15:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbjFCOZH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Jun 2023 10:25:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55800 "EHLO
+        id S229570AbjFCPfF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Jun 2023 11:35:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229579AbjFCOZG (ORCPT
+        with ESMTP id S229445AbjFCPfE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Jun 2023 10:25:06 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69380CA;
-        Sat,  3 Jun 2023 07:25:05 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5147f5efeb5so4655884a12.0;
-        Sat, 03 Jun 2023 07:25:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1685802303; x=1688394303;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=D6iHadZ6aDN6ik1d8aZpgtZeGgl/psuIib2XCjLYgR0=;
-        b=XhbIu/9dKocvcdYmQ5d2v+BNPlphuPAGp8b1hakt15x8t1Sep/kIwXkf/lyjrKmxAd
-         WP4KXzDNGk8Hq/I6QBUi3PX4hXTN3kFNGTeFUKXh1dRfyyOc1JdU4Ukn6MBR2YVJiqhy
-         jSPr9f0nRmfWd+WxyGr7hyc6Lq5oj94zb0GEBliBK9SD2hptTyK82lia6uNcc5/3ZWna
-         K2EIweqILB/VMhbt2G4hoBiJlyVAMpvawTyWUX/ps8SDJurtMp00ilYn3RktmwFRUYlT
-         XHbFi83eLqz1TdkwaMqkN/+a9l4/f18LB8GIhshNTX6/wY23pi1n4ixXeTt/Cz6T7Gv8
-         AJBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685802303; x=1688394303;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D6iHadZ6aDN6ik1d8aZpgtZeGgl/psuIib2XCjLYgR0=;
-        b=IPUmh1dJ70/FGyQYfHPTOwEEc+bTmrTIZf+4kj1c2SodABiSYc7iKyNGT5gGr67gYu
-         2WJ7VJTCnl4uFjNd6gTHterx0d3i5CqccayCDzLAXTIoP5EPX49sPkEX5dbWjvZSPNAd
-         Vy5PVky3fXbhDN1VYD/Au+G1MH7/iNMEA9RQED2ff2eI4+7Ae9zHwumJIgr3PBBRqTBI
-         EcIwuTQJqevk+5A0jBEEbu3r+1YRzo07zEzmc8XO0YlJzuigKOW4kK27WtHNw1qPqKIT
-         DH+NhfOlQHthFcbzcASem/8G27g3j7MzSMW4vJ12QQxhLO+D8+5oC4nVEdCsWzhWhhwE
-         GYUw==
-X-Gm-Message-State: AC+VfDwb3TsbRozxGF6RtwKwn5ys6rBCIeZ3NM1lxj9qZr3h9NOt2Or0
-        JRz7fDuQz13j3e2w5BwM6T3i0A+mJybhFA==
-X-Google-Smtp-Source: ACHHUZ7B0aJtR9dcOy6MYa7n52ctqMKE8n2OoW94DiylzyVy3J/5wZzHtAwZn380eiOFqZvy+vkUXA==
-X-Received: by 2002:aa7:c997:0:b0:50b:c630:a956 with SMTP id c23-20020aa7c997000000b0050bc630a956mr3986245edt.17.1685802303509;
-        Sat, 03 Jun 2023 07:25:03 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:810a:9640:26a8:7ce9:cf23:e2e1:1e2e])
-        by smtp.gmail.com with ESMTPSA id k6-20020a05640212c600b005149c7b1f49sm1779540edx.64.2023.06.03.07.25.02
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 03 Jun 2023 07:25:03 -0700 (PDT)
-From:   Franziska Naepelt <franziska.naepelt@googlemail.com>
-X-Google-Original-From: Franziska Naepelt <franziska.naepelt@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org,
-        Franziska Naepelt <franziska.naepelt@gmail.com>
-Subject: [PATCH] crypto: Fix checkpatch issues
-Date:   Sat,  3 Jun 2023 16:24:53 +0200
-Message-Id: <20230603142453.92582-1-franziska.naepelt@gmail.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sat, 3 Jun 2023 11:35:04 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB65123;
+        Sat,  3 Jun 2023 08:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685806503; x=1717342503;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references;
+  bh=7lmNG17/a8qDsi0tYtEOKJtLTD3wuHzdHs4MXb+C0eE=;
+  b=TjAcRsLgd1cdS8xxL1lsVz50ogiEnpe2ATUQvbULFWg8lvqGWiE0b9lq
+   KJjJ5Btdc0itQoCCNs211G53B/qoiJ/iKfh00leH1oSEVV87tgQtTuryI
+   TEp2+sePgNhEJebQL5NUjEVoc/OglMJiPd/MDuUppb4Gw4m6TFH9tH8fn
+   RwkffJAT/jGkbUz7FPTAYV1E1cV9JS6hDUfffvIXZk2PU2WNSe/ODDg3+
+   5kbm1XgnindSuY8bE6dhE3ESV7a+03sQtLT+gX7UraCuIPb5v7S+UyjGN
+   iESZkl4bPj0HQispj/zuYUfpYWC0Sca4RTX+D2qbbejOGymMV5V8vIukD
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10730"; a="356097295"
+X-IronPort-AV: E=Sophos;i="6.00,216,1681196400"; 
+   d="scan'208";a="356097295"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2023 08:35:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10730"; a="702274222"
+X-IronPort-AV: E=Sophos;i="6.00,216,1681196400"; 
+   d="scan'208";a="702274222"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
+  by orsmga007.jf.intel.com with ESMTP; 03 Jun 2023 08:35:00 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com
+Cc:     ebiggers@kernel.org, elliott@hpe.com, gmazyland@gmail.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, tglx@linutronix.de,
+        bp@alien8.de, mingo@kernel.org, x86@kernel.org,
+        herbert@gondor.apana.org.au, ardb@kernel.org,
+        dan.j.williams@intel.com, bernie.keany@intel.com,
+        charishma1.gairuboyina@intel.com,
+        lalithambika.krishnakumar@intel.com, nhuck@google.com,
+        chang.seok.bae@intel.com
+Subject: [PATCH v8 00/12] x86: Support Key Locker
+Date:   Sat,  3 Jun 2023 08:22:15 -0700
+Message-Id: <20230603152227.12335-1-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20230524165717.14062-1-chang.seok.bae@intel.com>
+References: <20230524165717.14062-1-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-crypto/crct10dif_common.c
-- WARNING: Missing or malformed SPDX-License-Identifier tag
+Hi all,
 
-crypto/fcrypt.c
-- WARNING: Missing or malformed SPDX-License-Identifier tag
-- WARNING: Block comments use a trailing */ on a separate line
+Posting V8 here, a brief status of this enabling:
 
-crypto/hmac.c
-- WARNING: Missing a blank line after declarations
+The last two revisions trend to update the crypto code mainly. The
+existing AEX-XTS code was improved further before being shared with
+the new code. Then, the new implementation was tuned for the AES-XTS
+mode which aligns with the claimed use case -- dm-crypt.
 
-crypto/md4.c
-- WARNING: Missing or malformed SPDX-License-Identifier tag
-- ERROR: space required after that ',' (ctx:VxV)
-- ERROR: space prohibited after that open square bracket '['
-- WARNING: space prohibited between function name and open parenthesis '('
-- ERROR: code indent should use tabs where possible
+But, I'd say some additional change might be still needed.
 
-not fixed:
-crypto/md4.c
-- ERROR: space required after that ',' (ctx:VxV)
-   Lines 64, 65, 66 have not been fixed due to readability
+The overall changes in charge of the last review:
 
-Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
----
- crypto/crct10dif_common.c |  1 +
- crypto/fcrypt.c           |  4 +++-
- crypto/hmac.c             |  1 +
- crypto/md4.c              | 11 ++++++-----
- 4 files changed, 11 insertions(+), 6 deletions(-)
+  * PATCH12:
+    - Clarify some documentation (Eric Biggers)
+    - Simplify (Eric Biggers) and cleanup code
 
-diff --git a/crypto/crct10dif_common.c b/crypto/crct10dif_common.c
-index b2fab366f518..134553bf0d60 100644
---- a/crypto/crct10dif_common.c
-+++ b/crypto/crct10dif_common.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  * Cryptographic API.
-  *
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index 95a16e88899b..d81d65489c41 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /* FCrypt encryption algorithm
-  *
-  * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
-@@ -303,7 +304,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
+  * PATCH11:
+    - Remove dead code.
 
- #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
- 			  * kernels - it seems to be faster but the code is
--			  * larger */
-+			  * larger
-+			  */
+  * PATCH10:
+    - Deduplicate the alignment code (Eric Biggers)
 
- 	u64 k;	/* k holds all 56 non-parity bits */
+The series can be found in this repo:
+    git://github.com/intel-staging/keylocker.git kl-v8
 
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 09a7872b4060..ea93f4c55f25 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -177,6 +177,7 @@ static int hmac_clone_tfm(struct crypto_shash *dst, struct crypto_shash *src)
- static void hmac_exit_tfm(struct crypto_shash *parent)
- {
- 	struct hmac_ctx *ctx = hmac_ctx(parent);
-+
- 	crypto_free_shash(ctx->hash);
- }
+The overall diff was populated in:
+    https://raw.githubusercontent.com/intel-staging/keylocker/diff/kl-v8-vs-v7.diff
 
-diff --git a/crypto/md4.c b/crypto/md4.c
-index 2e7f2f319f95..4083698c242c 100644
---- a/crypto/md4.c
-+++ b/crypto/md4.c
-@@ -1,4 +1,5 @@
--/* 
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-  * Cryptographic API.
-  *
-  * MD4 Message Digest Algorithm (RFC1320).
-@@ -90,7 +91,7 @@ static void md4_transform(u32 *hash, u32 const *in)
- 	ROUND1(c, d, a, b, in[14], 11);
- 	ROUND1(b, c, d, a, in[15], 19);
+The feature is already available on recent Intel client systems. The
+V3 cover letter covered the usage, the threat model and other details:
+    https://lore.kernel.org/lkml/20211124200700.15888-1-chang.seok.bae@intel.com/
 
--	ROUND2(a, b, c, d,in[ 0], 3);
-+	ROUND2(a, b, c, d, in[0], 3);
- 	ROUND2(d, a, b, c, in[4], 5);
- 	ROUND2(c, d, a, b, in[8], 9);
- 	ROUND2(b, c, d, a, in[12], 13);
-@@ -107,7 +108,7 @@ static void md4_transform(u32 *hash, u32 const *in)
- 	ROUND2(c, d, a, b, in[11], 9);
- 	ROUND2(b, c, d, a, in[15], 13);
+And the V6 cover followed up with updating the performance data:
+    https://lore.kernel.org/lkml/20230410225936.8940-1-chang.seok.bae@intel.com/
 
--	ROUND3(a, b, c, d,in[ 0], 3);
-+	ROUND3(a, b, c, d, in[0], 3);
- 	ROUND3(d, a, b, c, in[8], 9);
- 	ROUND3(c, d, a, b, in[4], 11);
- 	ROUND3(b, c, d, a, in[12], 15);
-@@ -190,7 +191,7 @@ static int md4_final(struct shash_desc *desc, u8 *out)
+V7 posting:
+    https://lore.kernel.org/lkml/20230524165717.14062-1-chang.seok.bae@intel.com/
 
- 	*p++ = 0x80;
- 	if (padding < 0) {
--		memset(p, 0x00, padding + sizeof (u64));
-+		memset(p, 0x00, padding + sizeof(u64));
- 		md4_transform_helper(mctx);
- 		p = (char *)mctx->block;
- 		padding = 56;
-@@ -200,7 +201,7 @@ static int md4_final(struct shash_desc *desc, u8 *out)
- 	mctx->block[14] = mctx->byte_count << 3;
- 	mctx->block[15] = mctx->byte_count >> 29;
- 	le32_to_cpu_array(mctx->block, (sizeof(mctx->block) -
--	                  sizeof(u64)) / sizeof(u32));
-+			  sizeof(u64)) / sizeof(u32));
- 	md4_transform(mctx->hash, mctx->block);
- 	cpu_to_le32_array(mctx->hash, ARRAY_SIZE(mctx->hash));
- 	memcpy(out, mctx->hash, sizeof(mctx->hash));
+Thanks,
+Chang
 
-base-commit: 7877cb91f1081754a1487c144d85dc0d2e2e7fc4
---
-2.39.2 (Apple Git-143)
+Chang S. Bae (12):
+  Documentation/x86: Document Key Locker
+  x86/cpufeature: Enumerate Key Locker feature
+  x86/insn: Add Key Locker instructions to the opcode map
+  x86/asm: Add a wrapper function for the LOADIWKEY instruction
+  x86/msr-index: Add MSRs for Key Locker wrapping key
+  x86/keylocker: Define Key Locker CPUID leaf
+  x86/cpu/keylocker: Load a wrapping key at boot-time
+  x86/PM/keylocker: Restore the wrapping key on the resume from ACPI
+    S3/4
+  x86/cpu: Add a configuration and command line option for Key Locker
+  crypto: x86/aesni - Use the proper data type in struct aesni_xts_ctx
+  crypto: x86/aes - Prepare for a new AES-XTS implementation
+  crypto: x86/aes-kl - Implement the AES-XTS algorithm
+
+ .../admin-guide/kernel-parameters.txt         |   2 +
+ Documentation/arch/x86/index.rst              |   1 +
+ Documentation/arch/x86/keylocker.rst          |  97 +++
+ arch/x86/Kconfig                              |   3 +
+ arch/x86/crypto/Kconfig                       |  22 +
+ arch/x86/crypto/Makefile                      |   3 +
+ arch/x86/crypto/aes-helper_asm.S              |  22 +
+ arch/x86/crypto/aes-helper_glue.h             | 161 +++++
+ arch/x86/crypto/aeskl-intel_asm.S             | 552 ++++++++++++++++++
+ arch/x86/crypto/aeskl-intel_glue.c            | 188 ++++++
+ arch/x86/crypto/aesni-intel_asm.S             |  55 +-
+ arch/x86/crypto/aesni-intel_glue.c            | 241 +++-----
+ arch/x86/crypto/aesni-intel_glue.h            |  16 +
+ arch/x86/include/asm/cpufeatures.h            |   1 +
+ arch/x86/include/asm/disabled-features.h      |   8 +-
+ arch/x86/include/asm/keylocker.h              |  45 ++
+ arch/x86/include/asm/msr-index.h              |   6 +
+ arch/x86/include/asm/special_insns.h          |  32 +
+ arch/x86/include/uapi/asm/processor-flags.h   |   2 +
+ arch/x86/kernel/Makefile                      |   1 +
+ arch/x86/kernel/cpu/common.c                  |  21 +-
+ arch/x86/kernel/cpu/cpuid-deps.c              |   1 +
+ arch/x86/kernel/keylocker.c                   | 212 +++++++
+ arch/x86/kernel/smpboot.c                     |   2 +
+ arch/x86/lib/x86-opcode-map.txt               |  11 +-
+ arch/x86/power/cpu.c                          |   2 +
+ tools/arch/x86/lib/x86-opcode-map.txt         |  11 +-
+ 27 files changed, 1507 insertions(+), 211 deletions(-)
+ create mode 100644 Documentation/arch/x86/keylocker.rst
+ create mode 100644 arch/x86/crypto/aes-helper_asm.S
+ create mode 100644 arch/x86/crypto/aes-helper_glue.h
+ create mode 100644 arch/x86/crypto/aeskl-intel_asm.S
+ create mode 100644 arch/x86/crypto/aeskl-intel_glue.c
+ create mode 100644 arch/x86/crypto/aesni-intel_glue.h
+ create mode 100644 arch/x86/include/asm/keylocker.h
+ create mode 100644 arch/x86/kernel/keylocker.c
+
+
+base-commit: 054377e4774eee812b7930933d7a354ed5a7ddd6
+-- 
+2.17.1
 
