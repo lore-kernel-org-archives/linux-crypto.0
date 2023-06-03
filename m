@@ -2,129 +2,188 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF73C7EE2F
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 10:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D65EC77B7A
+	for <linux-crypto@archiver.kernel.org>; Sat,  3 Jun 2023 14:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbjFCKlo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Jun 2023 06:41:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52284 "EHLO
+        id S229707AbjFCOZH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 3 Jun 2023 10:25:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbjFCKlm (ORCPT
+        with ESMTP id S229579AbjFCOZG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Jun 2023 06:41:42 -0400
-Received: from frasgout11.his.huawei.com (unknown [14.137.139.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D370E1;
-        Sat,  3 Jun 2023 03:41:40 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.18.147.227])
-        by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4QYGPH6kPbz9y4Sm;
-        Sat,  3 Jun 2023 18:31:15 +0800 (CST)
-Received: from [10.81.212.119] (unknown [10.81.212.119])
-        by APP2 (Coremail) with SMTP id GxC2BwCHWWDBGHtkrCoAAw--.3560S2;
-        Sat, 03 Jun 2023 11:41:16 +0100 (CET)
-Message-ID: <97fd9066-9afc-9faa-a604-46110ed1268c@huaweicloud.com>
-Date:   Sat, 3 Jun 2023 12:41:00 +0200
+        Sat, 3 Jun 2023 10:25:06 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69380CA;
+        Sat,  3 Jun 2023 07:25:05 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5147f5efeb5so4655884a12.0;
+        Sat, 03 Jun 2023 07:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20221208; t=1685802303; x=1688394303;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D6iHadZ6aDN6ik1d8aZpgtZeGgl/psuIib2XCjLYgR0=;
+        b=XhbIu/9dKocvcdYmQ5d2v+BNPlphuPAGp8b1hakt15x8t1Sep/kIwXkf/lyjrKmxAd
+         WP4KXzDNGk8Hq/I6QBUi3PX4hXTN3kFNGTeFUKXh1dRfyyOc1JdU4Ukn6MBR2YVJiqhy
+         jSPr9f0nRmfWd+WxyGr7hyc6Lq5oj94zb0GEBliBK9SD2hptTyK82lia6uNcc5/3ZWna
+         K2EIweqILB/VMhbt2G4hoBiJlyVAMpvawTyWUX/ps8SDJurtMp00ilYn3RktmwFRUYlT
+         XHbFi83eLqz1TdkwaMqkN/+a9l4/f18LB8GIhshNTX6/wY23pi1n4ixXeTt/Cz6T7Gv8
+         AJBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685802303; x=1688394303;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D6iHadZ6aDN6ik1d8aZpgtZeGgl/psuIib2XCjLYgR0=;
+        b=IPUmh1dJ70/FGyQYfHPTOwEEc+bTmrTIZf+4kj1c2SodABiSYc7iKyNGT5gGr67gYu
+         2WJ7VJTCnl4uFjNd6gTHterx0d3i5CqccayCDzLAXTIoP5EPX49sPkEX5dbWjvZSPNAd
+         Vy5PVky3fXbhDN1VYD/Au+G1MH7/iNMEA9RQED2ff2eI4+7Ae9zHwumJIgr3PBBRqTBI
+         EcIwuTQJqevk+5A0jBEEbu3r+1YRzo07zEzmc8XO0YlJzuigKOW4kK27WtHNw1qPqKIT
+         DH+NhfOlQHthFcbzcASem/8G27g3j7MzSMW4vJ12QQxhLO+D8+5oC4nVEdCsWzhWhhwE
+         GYUw==
+X-Gm-Message-State: AC+VfDwb3TsbRozxGF6RtwKwn5ys6rBCIeZ3NM1lxj9qZr3h9NOt2Or0
+        JRz7fDuQz13j3e2w5BwM6T3i0A+mJybhFA==
+X-Google-Smtp-Source: ACHHUZ7B0aJtR9dcOy6MYa7n52ctqMKE8n2OoW94DiylzyVy3J/5wZzHtAwZn380eiOFqZvy+vkUXA==
+X-Received: by 2002:aa7:c997:0:b0:50b:c630:a956 with SMTP id c23-20020aa7c997000000b0050bc630a956mr3986245edt.17.1685802303509;
+        Sat, 03 Jun 2023 07:25:03 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:810a:9640:26a8:7ce9:cf23:e2e1:1e2e])
+        by smtp.gmail.com with ESMTPSA id k6-20020a05640212c600b005149c7b1f49sm1779540edx.64.2023.06.03.07.25.02
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 03 Jun 2023 07:25:03 -0700 (PDT)
+From:   Franziska Naepelt <franziska.naepelt@googlemail.com>
+X-Google-Original-From: Franziska Naepelt <franziska.naepelt@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-kernel@vger.kernel.org,
+        Franziska Naepelt <franziska.naepelt@gmail.com>
+Subject: [PATCH] crypto: Fix checkpatch issues
+Date:   Sat,  3 Jun 2023 16:24:53 +0200
+Message-Id: <20230603142453.92582-1-franziska.naepelt@gmail.com>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [GIT PULL] Asymmetric keys fix for v6.4-rc5
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>, davem@davemloft.net,
-        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-References: <4d7e38ff5bbc496cb794b50e1c5c83bcd2317e69.camel@huaweicloud.com>
- <CAHk-=wj4S0t5RnJQmF_wYwv+oMTKggwdLnrA9D1uMNKq4H4byw@mail.gmail.com>
- <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com>
-From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
-In-Reply-To: <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: GxC2BwCHWWDBGHtkrCoAAw--.3560S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW5Ww1fXr15Aw1rXFW8Zwb_yoW8KFyxpF
-        WSgw4vkr1DJw1xG34xZw4rZ34ayFZ5Xr15GFs8Gr98Cwn8WFnav3yxt3y7ua13CrZ7Ww1I
-        qr40g34Du3s8AaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-        07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-        02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_
-        WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-        CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
-        wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-        7IU13rcDUUUUU==
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQARBF1jj44O5wABsD
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/3/2023 2:02 AM, Linus Torvalds wrote:
-> On Fri, Jun 2, 2023 at 1:38 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
->> The patch re-uses the allocation it already does for the key data, and
->> it seems sane.
-> 
-> Ugh. I had to check that it was ok to re-use the key buffer, but it
-> does seem to be the case that you can just re-use the buffer after
-> you've done that crypto_akcipher_set_priv/pub_key() call, and the
-> crypto layer has to copy it into its own data structures.
+crypto/crct10dif_common.c
+- WARNING: Missing or malformed SPDX-License-Identifier tag
 
-Yes, we could not do it if the set_pub_key/set_priv_key methods use 
-internally the passed pointer. I guess it depends on the methods, for 
-RSA and ECDSA it seems fine (they copy to a different location).
+crypto/fcrypt.c
+- WARNING: Missing or malformed SPDX-License-Identifier tag
+- WARNING: Block comments use a trailing */ on a separate line
 
-The doubt comes because the buffer is freed after crypto_wait_req() and 
-not after crypto_akcipher_set_*_key(), suggesting that it could be 
-actually used during the crypto operation.
+crypto/hmac.c
+- WARNING: Missing a blank line after declarations
 
-Rechecked the thread, and the suggestion to reuse the buffer and not 
-append the signature and digest at the end was by Eric Biggers.
+crypto/md4.c
+- WARNING: Missing or malformed SPDX-License-Identifier tag
+- ERROR: space required after that ',' (ctx:VxV)
+- ERROR: space prohibited after that open square bracket '['
+- WARNING: space prohibited between function name and open parenthesis '('
+- ERROR: code indent should use tabs where possible
 
-Eric, in light of this finding, should we still reuse the buffer?
+not fixed:
+crypto/md4.c
+- ERROR: space required after that ',' (ctx:VxV)
+   Lines 64, 65, 66 have not been fixed due to readability
 
-Thanks
+Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
+---
+ crypto/crct10dif_common.c |  1 +
+ crypto/fcrypt.c           |  4 +++-
+ crypto/hmac.c             |  1 +
+ crypto/md4.c              | 11 ++++++-----
+ 4 files changed, 11 insertions(+), 6 deletions(-)
 
-Roberto
+diff --git a/crypto/crct10dif_common.c b/crypto/crct10dif_common.c
+index b2fab366f518..134553bf0d60 100644
+--- a/crypto/crct10dif_common.c
++++ b/crypto/crct10dif_common.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * Cryptographic API.
+  *
+diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
+index 95a16e88899b..d81d65489c41 100644
+--- a/crypto/fcrypt.c
++++ b/crypto/fcrypt.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /* FCrypt encryption algorithm
+  *
+  * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+@@ -303,7 +304,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
 
-> I absolutely abhor the crypto interfaces. They all seem designed for
-> that "external DMA engine" case that seems so horrendously pointless
-> and slow.  In practice so few of them are that, and we have all those
-> optimized routines for doing it all on the CPU - but have in the
-> meantime wasted all that time and effort into copying everything,
-> turning simple buffers into sg-bufs etc etc. The amount of indirection
-> and "set this state in the state machine" is just nasty, and this
-> seems to all be a prime example of it all. With some of it then
-> randomly going through some kthread too.
-> 
-> I still think that patch is probably fine, but was also going "maybe
-> the real problem is in that library helper function
-> (asymmetric_verify(), in this case), which takes those (sig, siglen,
-> digest, digestlen) arguments and turns it into a 'struct
-> public_key_signature' without marshalling them.
-> 
-> Just looking at this mess of indirection and different "helper"
-> functions makes me second-guess myself about where the actual
-> conversion should be - while also feeling like it should never have
-> been done as a scatter-gather entry in the first place.
-> 
-> Anyway, I don't feel competent to decide if that pull request is the
-> right fix or not.
-> 
-> But it clearly is *a* fix.
-> 
->              Linus
+ #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
+ 			  * kernels - it seems to be faster but the code is
+-			  * larger */
++			  * larger
++			  */
+
+ 	u64 k;	/* k holds all 56 non-parity bits */
+
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 09a7872b4060..ea93f4c55f25 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -177,6 +177,7 @@ static int hmac_clone_tfm(struct crypto_shash *dst, struct crypto_shash *src)
+ static void hmac_exit_tfm(struct crypto_shash *parent)
+ {
+ 	struct hmac_ctx *ctx = hmac_ctx(parent);
++
+ 	crypto_free_shash(ctx->hash);
+ }
+
+diff --git a/crypto/md4.c b/crypto/md4.c
+index 2e7f2f319f95..4083698c242c 100644
+--- a/crypto/md4.c
++++ b/crypto/md4.c
+@@ -1,4 +1,5 @@
+-/* 
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
+  * Cryptographic API.
+  *
+  * MD4 Message Digest Algorithm (RFC1320).
+@@ -90,7 +91,7 @@ static void md4_transform(u32 *hash, u32 const *in)
+ 	ROUND1(c, d, a, b, in[14], 11);
+ 	ROUND1(b, c, d, a, in[15], 19);
+
+-	ROUND2(a, b, c, d,in[ 0], 3);
++	ROUND2(a, b, c, d, in[0], 3);
+ 	ROUND2(d, a, b, c, in[4], 5);
+ 	ROUND2(c, d, a, b, in[8], 9);
+ 	ROUND2(b, c, d, a, in[12], 13);
+@@ -107,7 +108,7 @@ static void md4_transform(u32 *hash, u32 const *in)
+ 	ROUND2(c, d, a, b, in[11], 9);
+ 	ROUND2(b, c, d, a, in[15], 13);
+
+-	ROUND3(a, b, c, d,in[ 0], 3);
++	ROUND3(a, b, c, d, in[0], 3);
+ 	ROUND3(d, a, b, c, in[8], 9);
+ 	ROUND3(c, d, a, b, in[4], 11);
+ 	ROUND3(b, c, d, a, in[12], 15);
+@@ -190,7 +191,7 @@ static int md4_final(struct shash_desc *desc, u8 *out)
+
+ 	*p++ = 0x80;
+ 	if (padding < 0) {
+-		memset(p, 0x00, padding + sizeof (u64));
++		memset(p, 0x00, padding + sizeof(u64));
+ 		md4_transform_helper(mctx);
+ 		p = (char *)mctx->block;
+ 		padding = 56;
+@@ -200,7 +201,7 @@ static int md4_final(struct shash_desc *desc, u8 *out)
+ 	mctx->block[14] = mctx->byte_count << 3;
+ 	mctx->block[15] = mctx->byte_count >> 29;
+ 	le32_to_cpu_array(mctx->block, (sizeof(mctx->block) -
+-	                  sizeof(u64)) / sizeof(u32));
++			  sizeof(u64)) / sizeof(u32));
+ 	md4_transform(mctx->hash, mctx->block);
+ 	cpu_to_le32_array(mctx->hash, ARRAY_SIZE(mctx->hash));
+ 	memcpy(out, mctx->hash, sizeof(mctx->hash));
+
+base-commit: 7877cb91f1081754a1487c144d85dc0d2e2e7fc4
+--
+2.39.2 (Apple Git-143)
 
