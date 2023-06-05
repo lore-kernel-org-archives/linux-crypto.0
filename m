@@ -2,83 +2,82 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D434DC7EE24
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jun 2023 14:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DEAC83003
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Jun 2023 14:48:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234480AbjFEOpc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Jun 2023 10:45:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33808 "EHLO
+        id S234614AbjFEOs5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 5 Jun 2023 10:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232533AbjFEOp3 (ORCPT
+        with ESMTP id S234622AbjFEOsr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Jun 2023 10:45:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA00310A;
-        Mon,  5 Jun 2023 07:45:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 5 Jun 2023 10:48:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B38F4
+        for <linux-crypto@vger.kernel.org>; Mon,  5 Jun 2023 07:47:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685976477;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GKnTrK6N8fyx8N4wY6ury0F8xx6HRQHrf6vLk5OPOl8=;
+        b=esh1Nw0AkQPNzS0h/xNmYifylD2K8X5I5CTmuOUYqEKCY3nD7Aogv8LYGBqRPQ56emvkUR
+        TqKtb3lbEZXwCv0SCZ0dqxcBIY2KFRz/E9P3W9rw6BvbIEcNqBXihnEXjqvEkQLkBO20EB
+        0+e0d6Lkei6s64G1k2LJg4/Z5f3EbBc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-314-3qv7PdMlP5-fXF9d25ZGlg-1; Mon, 05 Jun 2023 10:47:52 -0400
+X-MC-Unique: 3qv7PdMlP5-fXF9d25ZGlg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 64639625F7;
-        Mon,  5 Jun 2023 14:45:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D32C2C433AE;
-        Mon,  5 Jun 2023 14:45:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685976325;
-        bh=ua1Afonw01rPeQNE3BPvhZ+/s+M84W2XPIeCqh6o1dM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=QLgpQSKVsI7VXmAWGBYC0EcbFO9HZyDDgMGXWx4oDk0QxPfpnfJLmft8/z87ZPMJU
-         kPAdbXxqNgqdFbMdlFCmdCU5nQbNGY0sn7dggJnSGYOEkoczjSxKQqubLJEshneRvu
-         d45VXxB8vIrtRdVUqP/nMQO0sPDQazVjJNfV9diQ1a8xsJvEyUDD3YtExhjPDyWRCJ
-         Q4AJ3k4m8HlITY4j02f0k0s/8x5Y6zvSlZMaVUv3BamBchkfivSWhlg1Ch72JSjUGb
-         bZyEAsFxBgNq1BoLl7n8CJIuv8Xs2DwFdY3yx7azzdbLBnxdc7F4YrkLAkFteC89G9
-         PVgm0mdJ7bt1Q==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Damian Muszynski <damian.muszynski@intel.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: qat - fix adf_dbgfs_exit() typo
-Date:   Mon,  5 Jun 2023 16:45:02 +0200
-Message-Id: <20230605144519.1225211-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE563101A55C;
+        Mon,  5 Jun 2023 14:47:50 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5292A1121314;
+        Mon,  5 Jun 2023 14:47:47 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <4d7e38ff5bbc496cb794b50e1c5c83bcd2317e69.camel@huaweicloud.com>
+References: <4d7e38ff5bbc496cb794b50e1c5c83bcd2317e69.camel@huaweicloud.com>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     dhowells@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [GIT PULL] Asymmetric keys fix for v6.4-rc5
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1727998.1685976466.1@warthog.procyon.org.uk>
+Date:   Mon, 05 Jun 2023 15:47:46 +0100
+Message-ID: <1727999.1685976466@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+Roberto Sassu <roberto.sassu@huaweicloud.com> wrote:
 
-The stub function uses a different name from the normal one:
+> Here is a small fix to make an unconditional copy of the buffer passed
+> to crypto operations, to take into account the case of the stack not in
+> the linear mapping area.
 
-drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c:69:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
-drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c:69:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
-drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c:68:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
-drivers/crypto/intel/qat/qat_c62x/adf_drv.c:69:9: error: implicit declaration of function 'adf_dbgfs_exit'; did you mean 'adf_dbgfs_init'? [-Werror=implicit-function-declaration]
+I wonder if evm_verify_hmac() and other such callers of the signature
+verification service should be placing the data and crypto material in slab
+memory rather than it being on the stack.  But, for the moment:
 
-Rename the function to match the normal one.
-
-Fixes: 9260db6640a61 ("crypto: qat - move dbgfs init to separate file")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/intel/qat/qat_common/adf_dbgfs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.h b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.h
-index 1d64ad1a00374..e0cb2c2a2ed0b 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.h
-@@ -22,7 +22,7 @@ static inline void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
- {
- }
- 
--static inline void adf_dbgfs_cleanup(struct adf_accel_dev *accel_dev)
-+static inline void adf_dbgfs_exit(struct adf_accel_dev *accel_dev)
- {
- }
- #endif
--- 
-2.39.2
+Acked-by: David Howells <dhowells@redhat.com>
 
