@@ -2,140 +2,75 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C2CC77B73
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 08:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC7AC7EE24
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 08:22:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235408AbjFFIOj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 04:14:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43702 "EHLO
+        id S231715AbjFFIWJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 04:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235438AbjFFIOi (ORCPT
+        with ESMTP id S236334AbjFFIWH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 04:14:38 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3B0122
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 01:14:37 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-30ae4ec1ac7so4550878f8f.2
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Jun 2023 01:14:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1686039275; x=1688631275;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wqPSXg+U3/mqumv4DLK+ARpYMO1ucj61S84Jur+Gv2g=;
-        b=TTPlictXVmZ5tqtY4akUrDhkVQeIud6WSXHw/bU1EDNwRXbrMsN957b54Cvne9yOV1
-         IrC91M+HfOjLR2JGN/V6f2mvuzH4DjY/ibzm3OYtmMTUb2JEhScV3v/cgcQTbGLSpSad
-         V1DG9sRo1nYrTDyxOUJAFFkWhfhVd3k36NujJmHCQB2RyO518CJf9CHewxp90CaUmt1f
-         3pDG44OiBBV2zOH+ucE6Cw5AZi8u106tvRIoEFKskFwlfYC3RUPEZqzzuWf4BSbb3CvI
-         lHzCE7eG315aIanRfUMuRqvcpvtpJxbkUAXfIQTp6pF1MjEHZDvpc9aC/bMM6jcswFNM
-         NORw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686039275; x=1688631275;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wqPSXg+U3/mqumv4DLK+ARpYMO1ucj61S84Jur+Gv2g=;
-        b=Yr/s9DNqoxaCn9lkJWto9f/u5UVbQqqNlJV6yZHBB7ilHIsxCfnMwbIjcLwk/bqGKh
-         QFZu6AP+s/IK8yxEgrum1QjvDvDqHWTKisPrLcI5sKfw9Ojnyslwe6RJDCdfpM7k8cgc
-         e7xcNfS0JEeOvHazuk9aAsOjLr1NKxng4cElaIRjRqCLsWDr7+a2ZN6R4ZgUcvHHk9mN
-         rMZFMEpGpTygqDa37U3mhhr7zzFo71MonGU6ROqn+VzcNyf2Um2C80ig6f4I9IvD8G7K
-         N7S4pV57slC1xRzSq3LZL8cR+XbNsIdfxs4kDFFkNK1j4hKj4WB9U5TMkF8gzRxh7ziA
-         1Z8A==
-X-Gm-Message-State: AC+VfDysIBBBsJe/Kv5+RYwicU7oBqVuFesfXnyXmSUeILbH3hUfzJ5R
-        4QZyFu/A0IOjWLSXaHoKVwlJUC61SBY5PYUGr2sWZA==
-X-Google-Smtp-Source: ACHHUZ6VImNGGQl2NaxY9/WnzShy/0LQDDx4D6J0k26DamuInCHztTXzBb18rk47JEmCH5DzticzJurf3qgSJn3LYSY=
-X-Received: by 2002:adf:e38d:0:b0:2cd:bc79:5432 with SMTP id
- e13-20020adfe38d000000b002cdbc795432mr1296543wrm.25.1686039275555; Tue, 06
- Jun 2023 01:14:35 -0700 (PDT)
+        Tue, 6 Jun 2023 04:22:07 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8C4123;
+        Tue,  6 Jun 2023 01:22:00 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1q6Rwt-00HFv4-F2; Tue, 06 Jun 2023 16:21:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Jun 2023 16:21:51 +0800
+Date:   Tue, 6 Jun 2023 16:21:51 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Franziska Naepelt <franziska.naepelt@googlemail.com>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
+        linux-kernel@vger.kernel.org,
+        Franziska Naepelt <franziska.naepelt@gmail.com>
+Subject: Re: [PATCH] crypto: Fix checkpatch issues
+Message-ID: <ZH7sn7i2t+5IrXXK@gondor.apana.org.au>
+References: <20230603142453.92582-1-franziska.naepelt@gmail.com>
 MIME-Version: 1.0
-References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
- <20230526192210.3146896-2-bhupesh.sharma@linaro.org> <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
-In-Reply-To: <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Tue, 6 Jun 2023 13:44:23 +0530
-Message-ID: <CAH=2NtzAmza2f89dPx_7yiaUU9g5hNervg1pjQvRakadDph2Ew@mail.gmail.com>
-Subject: Re: [PATCH v8 01/11] dt-bindings: dma: Add support for SM6115 and
- QCM2290 SoCs
-To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
-        robh+dt@kernel.org, konrad.dybcio@linaro.org,
-        vladimir.zapolskiy@linaro.org, rfoss@kernel.org,
-        neil.armstrong@linaro.org, djakov@kernel.org, stephan@gerhold.net,
-        Rob Herring <robh@kernel.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230603142453.92582-1-franziska.naepelt@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 29 May 2023 at 11:43, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
->
-> Hi Vinod,
->
-> > On Sat, 27 May 2023 at 00:52, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
-> >
-> > Add new compatible for BAM DMA engine version v1.7.4 which is
-> > found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
-> > to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
-> > accordingly.
-> >
-> > While at it, also update qcom,bam-dma bindings to add comments
-> > which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
-> > This provides an easy reference for identifying the actual BAM DMA
-> > version available on Qualcomm SoCs.
-> >
-> > Acked-by: Rob Herring <robh@kernel.org>
-> > Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> > Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > ---
-> >  .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
-> >  1 file changed, 13 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
-> > index f1ddcf672261..c663b6102f50 100644
-> > --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
-> > +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
-> > @@ -15,13 +15,19 @@ allOf:
-> >
-> >  properties:
-> >    compatible:
-> > -    enum:
-> > -        # APQ8064, IPQ8064 and MSM8960
-> > -      - qcom,bam-v1.3.0
-> > -        # MSM8974, APQ8074 and APQ8084
-> > -      - qcom,bam-v1.4.0
-> > -        # MSM8916 and SDM845
-> > -      - qcom,bam-v1.7.0
-> > +    oneOf:
-> > +      - enum:
-> > +          # APQ8064, IPQ8064 and MSM8960
-> > +          - qcom,bam-v1.3.0
-> > +          # MSM8974, APQ8074 and APQ8084
-> > +          - qcom,bam-v1.4.0
-> > +          # MSM8916, SDM630
-> > +          - qcom,bam-v1.7.0
-> > +      - items:
-> > +          - enum:
-> > +              # SDM845, SM6115, SM8150, SM8250 and QCM2290
-> > +              - qcom,bam-v1.7.4
-> > +          - const: qcom,bam-v1.7.0
-> >
-> >    clocks:
-> >      maxItems: 1
-> > --
-> > 2.38.1
->
-> Bjorn has applied the dts patches from this series to his tree.
-> As suggested by him, can you please pick patches [PATCH 1/11] and
-> [PATCH 2/11] from this series via the 'dmaengine' tree.
->
-> Seems some Cc fields got messed up while sending the patchset, so
-> Cc'ing the dmaengine list again.
+On Sat, Jun 03, 2023 at 04:24:53PM +0200, Franziska Naepelt wrote:
+> crypto/crct10dif_common.c
+> - WARNING: Missing or malformed SPDX-License-Identifier tag
+> 
+> crypto/fcrypt.c
+> - WARNING: Missing or malformed SPDX-License-Identifier tag
+> - WARNING: Block comments use a trailing */ on a separate line
+> 
+> crypto/hmac.c
+> - WARNING: Missing a blank line after declarations
+> 
+> crypto/md4.c
+> - WARNING: Missing or malformed SPDX-License-Identifier tag
+> - ERROR: space required after that ',' (ctx:VxV)
+> - ERROR: space prohibited after that open square bracket '['
+> - WARNING: space prohibited between function name and open parenthesis '('
+> - ERROR: code indent should use tabs where possible
+> 
+> not fixed:
+> crypto/md4.c
+> - ERROR: space required after that ',' (ctx:VxV)
+>    Lines 64, 65, 66 have not been fixed due to readability
+> 
+> Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
+> ---
+>  crypto/crct10dif_common.c |  1 +
+>  crypto/fcrypt.c           |  4 +++-
+>  crypto/hmac.c             |  1 +
+>  crypto/md4.c              | 11 ++++++-----
+>  4 files changed, 11 insertions(+), 6 deletions(-)
 
-Ping. Any updates on these two patches?
+Please split these up into individual patches.
 
-Thanks.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
