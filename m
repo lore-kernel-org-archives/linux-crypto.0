@@ -2,772 +2,140 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2053C77B73
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 07:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C2CC77B73
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 08:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235987AbjFFHND (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 03:13:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33746 "EHLO
+        id S235408AbjFFIOj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 04:14:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236020AbjFFHMp (ORCPT
+        with ESMTP id S235438AbjFFIOi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 03:12:45 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BBEE77;
-        Tue,  6 Jun 2023 00:12:43 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-653436fcc1bso2360730b3a.2;
-        Tue, 06 Jun 2023 00:12:43 -0700 (PDT)
+        Tue, 6 Jun 2023 04:14:38 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3B0122
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 01:14:37 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-30ae4ec1ac7so4550878f8f.2
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Jun 2023 01:14:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686035563; x=1688627563;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SlUKxysIx/br+8XbmCOnzFgjR0z1UY9PY0k57iHoBPQ=;
-        b=STa6bNFE3w0kcGOCg06fKGwi6l330cvq63sb4pjAJgFmnirYFSYMTDTWgt2Oys6Ru5
-         QY74ESy/5nJojqtyvVx8t+2ZO+z+7dpVxPtZMdECekLI2otrJPfcNUz7GcEnMXzSyRGa
-         4yMkc0tcRGhXTxwuZupifj/+Q25Sy5XxbkANHt52wtlFzBzziXnCHmnCkJ8udx0w5Re/
-         M3CFRd4w6nrvWuGrv4w/CLWjvtYEBMQX9aQUGGlQOmyoy9i1raANY9XhOVq+Y48ndJBi
-         0AvcWJIkX2hPgX/5ntZyyajQctrvXSO4oFwW4//xu/P4CWAzC00izvfiBjUDs/41tC/F
-         vQVA==
+        d=linaro.org; s=google; t=1686039275; x=1688631275;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wqPSXg+U3/mqumv4DLK+ARpYMO1ucj61S84Jur+Gv2g=;
+        b=TTPlictXVmZ5tqtY4akUrDhkVQeIud6WSXHw/bU1EDNwRXbrMsN957b54Cvne9yOV1
+         IrC91M+HfOjLR2JGN/V6f2mvuzH4DjY/ibzm3OYtmMTUb2JEhScV3v/cgcQTbGLSpSad
+         V1DG9sRo1nYrTDyxOUJAFFkWhfhVd3k36NujJmHCQB2RyO518CJf9CHewxp90CaUmt1f
+         3pDG44OiBBV2zOH+ucE6Cw5AZi8u106tvRIoEFKskFwlfYC3RUPEZqzzuWf4BSbb3CvI
+         lHzCE7eG315aIanRfUMuRqvcpvtpJxbkUAXfIQTp6pF1MjEHZDvpc9aC/bMM6jcswFNM
+         NORw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686035563; x=1688627563;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SlUKxysIx/br+8XbmCOnzFgjR0z1UY9PY0k57iHoBPQ=;
-        b=FUHk/vStSflT/ExmaDeiuTt8PAn7tPBlJR/ze3SxNBN+OcBqPQaYdxq/zAftgKD05J
-         3Ml+WiK2+DEBml5EMGxQTUN9iG6HvhWtUht9XnSQgspoBXBxFlmzXeIINDzpbcwl9Ovb
-         SeFIAXOrGGrtNtyWjXUkpHsw7YKEWnvEoCjFK0RcTmm8Xc2LhOcrJIa0iOXuGNO5KKHH
-         gOeIOKxmrbSzNAf31ARdCkBPFT50HsBkhbiG8bBLrnxCIDosG7A51c1mHoaWknLDhLo2
-         IJk5SSJtSZH7apApfhd7upBTgqxRZqqhWhEl/UnurMm3XL63gZUBCyiE25jIMTgvAb90
-         XVhw==
-X-Gm-Message-State: AC+VfDwl6LsYI85eTZNBmZr/UeZt+D1mRAQnNCb+AihWn7dV8z/4R+Bo
-        J5z26al0tAt3NBZcPAv8/KSmEwC5ouJSSrr4GDo=
-X-Google-Smtp-Source: ACHHUZ4Rpg5CsGdi4Zps3ubrVDkLJF57V27n5rWb3W8toXsGctjGY0wrGhrLN8toAHcasPRk0B2rnA==
-X-Received: by 2002:aa7:888f:0:b0:659:4b77:51e3 with SMTP id z15-20020aa7888f000000b006594b7751e3mr347714pfe.31.1686035562952;
-        Tue, 06 Jun 2023 00:12:42 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([104.28.213.202])
-        by smtp.gmail.com with ESMTPSA id f25-20020aa782d9000000b0064d74808738sm6127247pfn.214.2023.06.06.00.12.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 00:12:42 -0700 (PDT)
-From:   David Yang <mmyangfl@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     David Yang <mmyangfl@gmail.com>, Weili Qian <qianweili@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 2/2] crypto: hisilicon/advca - Add SHA support
-Date:   Tue,  6 Jun 2023 15:11:12 +0800
-Message-Id: <20230606071128.375567-3-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230606071128.375567-1-mmyangfl@gmail.com>
-References: <20230606071128.375567-1-mmyangfl@gmail.com>
+        d=1e100.net; s=20221208; t=1686039275; x=1688631275;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wqPSXg+U3/mqumv4DLK+ARpYMO1ucj61S84Jur+Gv2g=;
+        b=Yr/s9DNqoxaCn9lkJWto9f/u5UVbQqqNlJV6yZHBB7ilHIsxCfnMwbIjcLwk/bqGKh
+         QFZu6AP+s/IK8yxEgrum1QjvDvDqHWTKisPrLcI5sKfw9Ojnyslwe6RJDCdfpM7k8cgc
+         e7xcNfS0JEeOvHazuk9aAsOjLr1NKxng4cElaIRjRqCLsWDr7+a2ZN6R4ZgUcvHHk9mN
+         rMZFMEpGpTygqDa37U3mhhr7zzFo71MonGU6ROqn+VzcNyf2Um2C80ig6f4I9IvD8G7K
+         N7S4pV57slC1xRzSq3LZL8cR+XbNsIdfxs4kDFFkNK1j4hKj4WB9U5TMkF8gzRxh7ziA
+         1Z8A==
+X-Gm-Message-State: AC+VfDysIBBBsJe/Kv5+RYwicU7oBqVuFesfXnyXmSUeILbH3hUfzJ5R
+        4QZyFu/A0IOjWLSXaHoKVwlJUC61SBY5PYUGr2sWZA==
+X-Google-Smtp-Source: ACHHUZ6VImNGGQl2NaxY9/WnzShy/0LQDDx4D6J0k26DamuInCHztTXzBb18rk47JEmCH5DzticzJurf3qgSJn3LYSY=
+X-Received: by 2002:adf:e38d:0:b0:2cd:bc79:5432 with SMTP id
+ e13-20020adfe38d000000b002cdbc795432mr1296543wrm.25.1686039275555; Tue, 06
+ Jun 2023 01:14:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
+ <20230526192210.3146896-2-bhupesh.sharma@linaro.org> <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
+In-Reply-To: <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Date:   Tue, 6 Jun 2023 13:44:23 +0530
+Message-ID: <CAH=2NtzAmza2f89dPx_7yiaUU9g5hNervg1pjQvRakadDph2Ew@mail.gmail.com>
+Subject: Re: [PATCH v8 01/11] dt-bindings: dma: Add support for SM6115 and
+ QCM2290 SoCs
+To:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>, dmaengine@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, krzysztof.kozlowski@linaro.org,
+        robh+dt@kernel.org, konrad.dybcio@linaro.org,
+        vladimir.zapolskiy@linaro.org, rfoss@kernel.org,
+        neil.armstrong@linaro.org, djakov@kernel.org, stephan@gerhold.net,
+        Rob Herring <robh@kernel.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add driver for SHA algorithm family.
+On Mon, 29 May 2023 at 11:43, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
+>
+> Hi Vinod,
+>
+> > On Sat, 27 May 2023 at 00:52, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
+> >
+> > Add new compatible for BAM DMA engine version v1.7.4 which is
+> > found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
+> > to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
+> > accordingly.
+> >
+> > While at it, also update qcom,bam-dma bindings to add comments
+> > which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
+> > This provides an easy reference for identifying the actual BAM DMA
+> > version available on Qualcomm SoCs.
+> >
+> > Acked-by: Rob Herring <robh@kernel.org>
+> > Tested-by: Anders Roxell <anders.roxell@linaro.org>
+> > Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> > ---
+> >  .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
+> >  1 file changed, 13 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> > index f1ddcf672261..c663b6102f50 100644
+> > --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> > +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> > @@ -15,13 +15,19 @@ allOf:
+> >
+> >  properties:
+> >    compatible:
+> > -    enum:
+> > -        # APQ8064, IPQ8064 and MSM8960
+> > -      - qcom,bam-v1.3.0
+> > -        # MSM8974, APQ8074 and APQ8084
+> > -      - qcom,bam-v1.4.0
+> > -        # MSM8916 and SDM845
+> > -      - qcom,bam-v1.7.0
+> > +    oneOf:
+> > +      - enum:
+> > +          # APQ8064, IPQ8064 and MSM8960
+> > +          - qcom,bam-v1.3.0
+> > +          # MSM8974, APQ8074 and APQ8084
+> > +          - qcom,bam-v1.4.0
+> > +          # MSM8916, SDM630
+> > +          - qcom,bam-v1.7.0
+> > +      - items:
+> > +          - enum:
+> > +              # SDM845, SM6115, SM8150, SM8250 and QCM2290
+> > +              - qcom,bam-v1.7.4
+> > +          - const: qcom,bam-v1.7.0
+> >
+> >    clocks:
+> >      maxItems: 1
+> > --
+> > 2.38.1
+>
+> Bjorn has applied the dts patches from this series to his tree.
+> As suggested by him, can you please pick patches [PATCH 1/11] and
+> [PATCH 2/11] from this series via the 'dmaengine' tree.
+>
+> Seems some Cc fields got messed up while sending the patchset, so
+> Cc'ing the dmaengine list again.
 
-Support for state injection was not tested due to lack of such device.
+Ping. Any updates on these two patches?
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/crypto/hisilicon/Kconfig              |   3 +
- drivers/crypto/hisilicon/advca/Makefile       |   1 +
- .../crypto/hisilicon/advca/hisi-advca-sha.c   | 659 ++++++++++++++++++
- 3 files changed, 663 insertions(+)
- create mode 100644 drivers/crypto/hisilicon/advca/hisi-advca-sha.c
-
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 99279a9ec6b1..6e94f56e9a2c 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -4,6 +4,9 @@ config CRYPTO_DEV_HISI_ADVCA
- 	tristate "Support for Hisilicon ADVCA Subsystem"
- 	depends on ARCH_HISI || COMPILE_TEST
- 	select CRYPTO_SKCIPHER
-+	select CRYPTO_HASH
-+	select CRYPTO_SHA1
-+	select CRYPTO_SHA256
- 	help
- 	  Support for Hisilicon ADVCA (Advanced Conditional Access) Subsystem,
- 	  which can be found on HiSilicon STB SoCs, such as Hi37xx.
-diff --git a/drivers/crypto/hisilicon/advca/Makefile b/drivers/crypto/hisilicon/advca/Makefile
-index 3f64b4a24e9e..e556d3f81729 100644
---- a/drivers/crypto/hisilicon/advca/Makefile
-+++ b/drivers/crypto/hisilicon/advca/Makefile
-@@ -1 +1,2 @@
- obj-$(CONFIG_CRYPTO_DEV_HISI_ADVCA) += hisi-advca-muc.o
-+obj-$(CONFIG_CRYPTO_DEV_HISI_ADVCA) += hisi-advca-sha.o
-diff --git a/drivers/crypto/hisilicon/advca/hisi-advca-sha.c b/drivers/crypto/hisilicon/advca/hisi-advca-sha.c
-new file mode 100644
-index 000000000000..44dbcd5876ee
---- /dev/null
-+++ b/drivers/crypto/hisilicon/advca/hisi-advca-sha.c
-@@ -0,0 +1,659 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * SHA - hash device for SHA1/2
-+ *
-+ * Copyright (c) 2023 David Yang
-+ */
-+
-+#include <crypto/internal/hash.h>
-+#include <crypto/sha1.h>
-+#include <crypto/sha2.h>
-+#include <linux/clk.h>
-+#include <linux/crypto.h>
-+#include <linux/device.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/err.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/of_device.h>
-+#include <linux/pm_runtime.h>
-+#include <linux/reset.h>
-+#include <linux/string.h>
-+
-+/******** hardware definitions ********/
-+
-+#define SHA_TOTAL_LEN_LOW	0x00
-+#define SHA_TOTAL_LEN_HIGH	0x04
-+#define SHA_STATUS		0x08
-+#define  SHA_HASH_READY			BIT(0)
-+#define  SHA_DMA_READY			BIT(1)
-+#define  SHA_MSG_READY			BIT(2)
-+#define  SHA_RECORD_READY		BIT(3)
-+#define  SHA_ERR_STATE			GENMASK(5, 4)
-+#define  SHA_LEN_ERR			BIT(6)
-+#define SHA_CTRL		0x0c
-+#define  SHA_SINGLE_READ		BIT(0)
-+#define  SHA_ALG			GENMASK(2, 1)
-+#define   SHA_ALG_SHA1				0
-+#define   SHA_ALG_SHA256			1
-+#define   SHA_ALG_SHA224			5
-+#define  SHA_HMAC			BIT(3)
-+#define  SHA_KEY_FROM_CPU		BIT(4)
-+#define  SHA_ENDIAN			BIT(5)
-+#define  SHA_USED_BY_ARM		BIT(6)  /* v1 only */
-+#define  SHA_USED_BY_C51		BIT(7)  /* v1 only */
-+#define  SHA_SET_INIT			BIT(6)  /* v2 only */
-+#define SHA_START		0x10
-+#define  SHA_START_BIT			BIT(0)
-+#define SHA_DMA_ADDR		0x14
-+#define SHA_DMA_LEN		0x18
-+#define SHA_DATA_IN		0x1c
-+#define SHA_RECORD_LEN_LOW	0x20
-+#define SHA_RECORD_LEN_HIGH	0x24
-+#define SHA_OUT0		0x30  /* till 7 (0x4c) */
-+#define SHA_MCU_KEY0		0x70  /* till 3 (0x7c) */
-+#define SHA_KL_KEY0		0x80  /* till 3 (0x8c) */
-+#define SHA_INIT0		0x90  /* till 7 (0xac) */
-+
-+#define SHA_KEY_SIZE	16u
-+#define SHA_DIGEST_SIZE	32u
-+#define SHA_BLOCK_SIZE	64u
-+
-+/******** driver definitions ********/
-+
-+#define SHA_TYPE_HASH	0
-+/* untested; test it before use */
-+#define SHA_TYPE_MHASH	1
-+
-+struct hica_sha_ctrl {
-+	unsigned int alg;
-+};
-+
-+struct hica_sha_alg {
-+	struct shash_alg alg;
-+	struct hica_sha_ctrl ctrl;
-+	struct hica_sha_priv *priv;
-+};
-+
-+struct hica_sha_tmpl {
-+	struct hica_sha_ctrl ctrl;
-+
-+	unsigned int digestsize;
-+	unsigned int statesize;
-+	unsigned int blocksize;
-+
-+	int (*update)(struct shash_desc *desc, const u8 *data,
-+		      unsigned int len);
-+
-+	const char *alg_name;
-+};
-+
-+struct hica_sha_priv {
-+	void __iomem *base;
-+	unsigned int type;
-+
-+	struct device *dev;
-+	struct hica_sha_alg *algs;
-+	unsigned int algs_num;
-+
-+	struct reset_control *rst;
-+	struct clk_bulk_data *clks;
-+	unsigned int clks_num;
-+
-+	struct mutex lock;
-+};
-+
-+struct hica_sha_tfm_ctx {
-+	struct hica_sha_priv *priv;
-+	struct hica_sha_ctrl ctrl;
-+
-+	unsigned int digestsize;
-+	unsigned int blocksize;
-+
-+	struct crypto_shash *fallback;
-+};
-+
-+struct hica_sha_desc_ctx {
-+	bool bypass;
-+
-+	/* keep this at the end of struct! */
-+	struct shash_desc fallback;
-+};
-+
-+static unsigned int bypass_size = 16 * SHA_BLOCK_SIZE;
-+module_param(bypass_size, uint, 0644);
-+
-+/******** reg ********/
-+
-+static int hica_sha_wait(const struct hica_sha_priv *priv, u32 mask)
-+{
-+	u32 val;
-+
-+	return readl_relaxed_poll_timeout(priv->base + SHA_STATUS, val,
-+					  val & mask, 1000, 500 * 1000);
-+}
-+
-+static int hica_sha_record(const struct hica_sha_priv *priv, dma_addr_t addr,
-+			   unsigned int len)
-+{
-+	if (WARN_ON(addr & 3 || len & 3))
-+		return -EINVAL;
-+
-+	if (hica_sha_wait(priv, SHA_RECORD_READY))
-+		return -ETIMEDOUT;
-+
-+	writel_relaxed(addr, priv->base + SHA_DMA_ADDR);
-+	writel(len, priv->base + SHA_DMA_LEN);
-+	return 0;
-+}
-+
-+/*
-+ * must be called before setting SHA_START
-+ * does nothing if import is not supported (SHA_TYPE_HASH)
-+ */
-+static void hica_sha_import(const struct hica_sha_priv *priv, const void *state)
-+{
-+	if (priv->type != SHA_TYPE_MHASH)
-+		return;
-+
-+	for (unsigned int i = 0; i < SHA_DIGEST_SIZE; i += sizeof(u32))
-+		writel_relaxed((__force __u32) cpu_to_be32(*(const u32 *) (state + i)),
-+			       priv->base + SHA_INIT0 + i);
-+}
-+
-+static int hica_sha_init(const struct hica_sha_priv *priv,
-+			 const struct hica_sha_ctrl *ctrl, bool state)
-+{
-+	u32 val;
-+	int ret;
-+
-+	/* re-enable SHA_START */
-+	ret = reset_control_assert(priv->rst) ?:
-+	      reset_control_deassert(priv->rst);
-+	if (ret)
-+		return ret;
-+
-+	/* config SHA_CTRL */
-+	val = readl_relaxed(priv->base + SHA_CTRL);
-+
-+	val &= ~SHA_SINGLE_READ;
-+	val &= ~SHA_ALG;
-+	val |= (ctrl->alg << 1) & SHA_ALG;
-+	val &= ~SHA_HMAC;
-+	/* evil config; it is the endianness of every 4-byte input data */
-+	val |= SHA_ENDIAN;
-+
-+	if (priv->type == SHA_TYPE_HASH)
-+		val |= SHA_USED_BY_ARM;
-+	else if (state)
-+		val |= SHA_SET_INIT;
-+
-+	writel(val, priv->base + SHA_CTRL);
-+
-+	/* test SHA_CTRL */
-+	val = readl_relaxed(priv->base + SHA_CTRL);
-+	if (val & SHA_USED_BY_C51)
-+		return -EBUSY;
-+
-+	/* wait ready */
-+	if (hica_sha_wait(priv, SHA_HASH_READY))
-+		return -ETIMEDOUT;
-+
-+	/* ask device to set state */
-+	writel(SHA_START_BIT, priv->base + SHA_START);
-+
-+	pr_debug("%s: alg %u\n", __func__, ctrl->alg);
-+	return 0;
-+}
-+
-+static int hica_sha_update(const struct hica_sha_priv *priv, const void *data,
-+			   unsigned int len, bool may_sleep)
-+{
-+	struct device *dev = priv->dev;
-+	bool inplace = !((uintptr_t) data & 3);
-+	u8 *buf = NULL;
-+	dma_addr_t addr;
-+	int ret;
-+
-+	if (!len)
-+		return 0;
-+
-+	if (WARN_ON(len % SHA_BLOCK_SIZE))
-+		return -EINVAL;
-+
-+	if (inplace) {
-+		addr = dma_map_single(dev, (void *) data, len, DMA_TO_DEVICE);
-+		if (dma_mapping_error(dev, addr)) {
-+			dev_err(dev, "error mapping src\n");
-+			return -EIO;
-+		}
-+
-+		inplace = !(addr & 3);
-+		if (!inplace)
-+			dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
-+	}
-+
-+	if (!inplace) {
-+		buf = dma_alloc_attrs(dev, len, &addr,
-+				      may_sleep ? GFP_KERNEL : GFP_ATOMIC, 0);
-+		if (!buf)
-+			return -ENOMEM;
-+		memcpy(buf, data, len);
-+	}
-+
-+	dma_sync_single_for_device(dev, addr, len, DMA_TO_DEVICE);
-+	ret = hica_sha_record(priv, addr, len) ?:
-+	      hica_sha_wait(priv, SHA_RECORD_READY);
-+
-+	if (!buf)
-+		dma_unmap_single(dev, addr, len, DMA_TO_DEVICE);
-+	else {
-+		memzero_explicit(buf, len);
-+		dma_free_attrs(dev, len, buf, addr, 0);
-+	}
-+
-+	pr_debug("%s: read %u\n", __func__, len);
-+	return ret;
-+}
-+
-+static int hica_sha_export(const struct hica_sha_priv *priv, void *out,
-+			   unsigned int digestsize)
-+{
-+	if (hica_sha_wait(priv, SHA_RECORD_READY))
-+		return -ETIMEDOUT;
-+
-+	for (unsigned int i = 0; i < digestsize; i += sizeof(u32))
-+		*(u32 *) (out + i) =
-+			be32_to_cpu((__force __be32) readl_relaxed(priv->base + SHA_OUT0 + i));
-+
-+	return 0;
-+}
-+
-+/******** shash_alg ********/
-+
-+static int hica_sha_alg_init(struct shash_desc *desc)
-+{
-+	struct hica_sha_desc_ctx *d_ctx = shash_desc_ctx(desc);
-+	struct hica_sha_tfm_ctx *ctx = crypto_shash_ctx(desc->tfm);
-+
-+	d_ctx->bypass = false;
-+
-+	d_ctx->fallback.tfm = ctx->fallback;
-+	return crypto_shash_init(&d_ctx->fallback);
-+}
-+
-+static int
-+_hica_sha_alg_update(struct shash_desc *desc, const u8 *data, unsigned int len,
-+		     void *buf, u32 *state, u64 *count)
-+{
-+	struct hica_sha_desc_ctx *d_ctx = shash_desc_ctx(desc);
-+	struct hica_sha_tfm_ctx *ctx = crypto_shash_ctx(desc->tfm);
-+	struct hica_sha_priv *priv = ctx->priv;
-+	struct device *dev = priv->dev;
-+	unsigned int top;
-+	unsigned int bottom;
-+	int ret;
-+
-+	if (d_ctx->bypass || len < bypass_size)
-+		goto fallback;
-+
-+	ret = crypto_shash_export(&d_ctx->fallback, buf);
-+	if (ret)
-+		return ret;
-+
-+	bottom = ALIGN(*count, ctx->blocksize);
-+	top = ALIGN_DOWN(*count + len, ctx->blocksize);
-+	if ((priv->type == SHA_TYPE_MHASH || !*count) && bottom < top &&
-+	    top - bottom >= bypass_size) {
-+		unsigned int runlen = bottom - *count;
-+		unsigned int dmalen = top - bottom;
-+
-+		if (runlen) {
-+			ret = crypto_shash_update(&d_ctx->fallback, data,
-+						  runlen);
-+			if (ret)
-+				return ret;
-+
-+			data += runlen;
-+			len -= runlen;
-+		}
-+
-+		if (mutex_trylock(&priv->lock)) {
-+			ret = crypto_shash_export(&d_ctx->fallback, buf);
-+			if (ret) {
-+				mutex_unlock(&priv->lock);
-+				return ret;
-+			}
-+
-+			pr_debug("%s: before %llu\n", __func__, *count);
-+			pm_runtime_get_sync(dev);
-+
-+			hica_sha_import(priv, state);
-+			ret = hica_sha_init(priv, &ctx->ctrl, state) ?:
-+			      hica_sha_update(priv, data, dmalen,
-+					      crypto_shash_get_flags(desc->tfm) &
-+					      CRYPTO_TFM_REQ_MAY_SLEEP) ?:
-+			      hica_sha_export(priv, state, ctx->digestsize);
-+
-+			pm_runtime_mark_last_busy(dev);
-+			pm_runtime_put_autosuspend(dev);
-+			mutex_unlock(&priv->lock);
-+			if (ret)
-+				return ret;
-+
-+			*count += dmalen;
-+			pr_debug("%s: after %llu\n", __func__, *count);
-+
-+			ret = crypto_shash_import(&d_ctx->fallback, buf);
-+			if (ret)
-+				return ret;
-+
-+			data += dmalen;
-+			len -= dmalen;
-+		}
-+	}
-+
-+	if (priv->type != SHA_TYPE_MHASH)
-+		d_ctx->bypass = true;
-+
-+fallback:
-+	return crypto_shash_update(&d_ctx->fallback, data, len);
-+}
-+
-+static int hica_sha_alg_update_sha1(struct shash_desc *desc, const u8 *data,
-+				    unsigned int len)
-+{
-+	struct sha1_state state;
-+
-+	return len ?: _hica_sha_alg_update(desc, data, len, &state, state.state,
-+					   &state.count);
-+}
-+
-+static int hica_sha_alg_update_sha256(struct shash_desc *desc, const u8 *data,
-+				      unsigned int len)
-+{
-+	struct sha256_state state;
-+
-+	return len ?: _hica_sha_alg_update(desc, data, len, &state, state.state,
-+					   &state.count);
-+}
-+
-+static int hica_sha_alg_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct hica_sha_desc_ctx *d_ctx = shash_desc_ctx(desc);
-+
-+	return crypto_shash_final(&d_ctx->fallback, out);
-+}
-+
-+static int hica_sha_alg_export(struct shash_desc *desc, void *out)
-+{
-+	struct hica_sha_desc_ctx *d_ctx = shash_desc_ctx(desc);
-+
-+	return crypto_shash_export(&d_ctx->fallback, out);
-+}
-+
-+static int hica_sha_alg_import(struct shash_desc *desc, const void *in)
-+{
-+	struct hica_sha_desc_ctx *d_ctx = shash_desc_ctx(desc);
-+	struct hica_sha_tfm_ctx *ctx = crypto_shash_ctx(desc->tfm);
-+
-+	d_ctx->bypass = false;
-+
-+	d_ctx->fallback.tfm = ctx->fallback;
-+	return crypto_shash_import(&d_ctx->fallback, in);
-+}
-+
-+static int hica_sha_alg_init_tfm(struct crypto_shash *tfm)
-+{
-+	struct hica_sha_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-+	struct hash_alg_common *halg =
-+		__crypto_hash_alg_common(tfm->base.__crt_alg);
-+	struct hica_sha_alg *p_alg =
-+		container_of(halg, typeof(*p_alg), alg.halg);
-+
-+	/* avoid pointer chain */
-+	ctx->digestsize = halg->digestsize;
-+	ctx->blocksize = crypto_shash_blocksize(tfm);
-+	if (ctx->digestsize > SHA_DIGEST_SIZE ||
-+	    ctx->blocksize > SHA_BLOCK_SIZE)
-+		return -EINVAL;
-+
-+	ctx->fallback = crypto_alloc_shash(crypto_shash_alg_name(tfm), 0,
-+					   CRYPTO_ALG_NEED_FALLBACK |
-+					   CRYPTO_ALG_ALLOCATES_MEMORY);
-+	if (IS_ERR(ctx->fallback))
-+		return PTR_ERR(ctx->fallback);
-+
-+	/* update statesize from fallback algorithm */
-+	tfm->descsize += crypto_shash_descsize(ctx->fallback);
-+
-+	ctx->priv = p_alg->priv;
-+	ctx->ctrl = p_alg->ctrl;
-+
-+	return 0;
-+}
-+
-+static void hica_sha_alg_exit_tfm(struct crypto_shash *tfm)
-+{
-+	struct hica_sha_tfm_ctx *ctx = crypto_shash_ctx(tfm);
-+
-+	crypto_free_shash(ctx->fallback);
-+}
-+
-+static int hica_sha_alg_register(struct hica_sha_alg *p_alg,
-+				 const struct hica_sha_tmpl *tmpl,
-+				 struct hica_sha_priv *priv)
-+{
-+	struct crypto_alg *base = &p_alg->alg.halg.base;
-+
-+	*p_alg = (typeof(*p_alg)) {
-+		.alg = {
-+			.init = hica_sha_alg_init,
-+			.update = tmpl->update,
-+			.final = hica_sha_alg_final,
-+			.export = hica_sha_alg_export,
-+			.import = hica_sha_alg_import,
-+			.init_tfm = hica_sha_alg_init_tfm,
-+			.exit_tfm = hica_sha_alg_exit_tfm,
-+
-+			.descsize = sizeof(struct hica_sha_desc_ctx),
-+
-+			.halg = {
-+				.digestsize = tmpl->digestsize,
-+				.statesize = tmpl->statesize,
-+				.base = {
-+					.cra_flags = CRYPTO_ALG_TYPE_SHASH |
-+						     CRYPTO_ALG_NEED_FALLBACK |
-+						     CRYPTO_ALG_KERN_DRIVER_ONLY |
-+						     CRYPTO_ALG_ALLOCATES_MEMORY,
-+					.cra_blocksize = tmpl->blocksize,
-+					.cra_ctxsize = sizeof(struct hica_sha_tfm_ctx),
-+					.cra_alignmask = 0,
-+
-+					.cra_priority = 200,
-+					.cra_module = THIS_MODULE,
-+				},
-+			},
-+		},
-+		.ctrl = tmpl->ctrl,
-+		.priv = priv,
-+	};
-+
-+	snprintf(base->cra_name, sizeof(base->cra_name), "%s", tmpl->alg_name);
-+	snprintf(base->cra_driver_name, sizeof(base->cra_driver_name),
-+		 "hisi-advca-%s", tmpl->alg_name);
-+
-+	return crypto_register_shash(&p_alg->alg);
-+}
-+
-+#define hica_sha_tmpl_define(_ALG, _alg, state) { \
-+	.ctrl = { \
-+		.alg = SHA_ALG_##_ALG, \
-+	}, \
-+	.digestsize = _ALG##_DIGEST_SIZE, \
-+	.statesize = sizeof(struct state##_state), \
-+	.blocksize = _ALG##_BLOCK_SIZE, \
-+	.update = hica_sha_alg_update_##state, \
-+	.alg_name = #_alg, \
-+}
-+
-+static const struct hica_sha_tmpl hica_sha_tmpls[] = {
-+	hica_sha_tmpl_define(SHA1, sha1, sha1),
-+	hica_sha_tmpl_define(SHA256, sha256, sha256),
-+
-+	/* MHASH only */
-+	hica_sha_tmpl_define(SHA224, sha224, sha256),
-+};
-+
-+/******** device ********/
-+
-+static int hica_sha_runtime_suspend(struct device *dev)
-+{
-+	struct hica_sha_priv *priv = dev_get_drvdata(dev);
-+
-+	clk_bulk_disable_unprepare(priv->clks_num, priv->clks);
-+
-+	return 0;
-+}
-+
-+static int hica_sha_runtime_resume(struct device *dev)
-+{
-+	struct hica_sha_priv *priv = dev_get_drvdata(dev);
-+
-+	return clk_bulk_prepare_enable(priv->clks_num, priv->clks);
-+}
-+
-+static const struct dev_pm_ops hica_sha_pm_ops = {
-+	.runtime_suspend = hica_sha_runtime_suspend,
-+	.runtime_resume = hica_sha_runtime_resume,
-+};
-+
-+static void hica_sha_remove(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct hica_sha_priv *priv = platform_get_drvdata(pdev);
-+
-+	for (int i = priv->algs_num; i > 0; ) {
-+		i--;
-+		crypto_unregister_shash(&priv->algs[i].alg);
-+	}
-+
-+	pm_runtime_disable(dev);
-+	pm_runtime_set_suspended(dev);
-+	clk_bulk_disable_unprepare(priv->clks_num, priv->clks);
-+	reset_control_assert(priv->rst);
-+}
-+
-+static int hica_sha_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	unsigned int saved = bypass_size;
-+	struct hica_sha_priv *priv;
-+	int ret;
-+
-+	/* acquire resources */
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	priv->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(priv->base))
-+		return PTR_ERR(priv->base);
-+
-+	ret = devm_clk_bulk_get_all(dev, &priv->clks);
-+	if (ret < 0)
-+		return ret;
-+	priv->clks_num = ret;
-+
-+	priv->rst = devm_reset_control_get_exclusive(dev, NULL);
-+	if (IS_ERR(priv->rst))
-+		return PTR_ERR(priv->rst);
-+
-+	priv->type = (uintptr_t) of_device_get_match_data(dev);
-+
-+	priv->algs_num = ARRAY_SIZE(hica_sha_tmpls);
-+	if (priv->type != SHA_TYPE_MHASH)
-+		priv->algs_num -= 1;
-+
-+	priv->algs = devm_kmalloc_array(dev, priv->algs_num,
-+					sizeof(priv->algs[0]), GFP_KERNEL);
-+	if (!priv->algs)
-+		return -ENOMEM;
-+
-+	mutex_init(&priv->lock);
-+
-+	priv->dev = dev;
-+	platform_set_drvdata(pdev, priv);
-+	dev_set_drvdata(dev, priv);
-+
-+	/* bring up device */
-+	ret = reset_control_assert(priv->rst);
-+	if (ret)
-+		return ret;
-+	ret = clk_bulk_prepare_enable(priv->clks_num, priv->clks);
-+	if (ret)
-+		goto err_rst;
-+	ret = reset_control_deassert(priv->rst);
-+	if (ret)
-+		goto err_clk;
-+
-+	if (hica_sha_wait(priv, SHA_HASH_READY)) {
-+		dev_err(dev, "cannot bring up device\n");
-+		ret = -ENODEV;
-+		goto err_clk;
-+	}
-+
-+	/* register algs */
-+	bypass_size = 0;
-+	for (int i = 0; i < priv->algs_num; i++) {
-+		ret = hica_sha_alg_register(&priv->algs[i], &hica_sha_tmpls[i],
-+					    priv);
-+		if (ret) {
-+			while (i > 0) {
-+				i--;
-+				crypto_unregister_shash(&priv->algs[i].alg);
-+			}
-+			bypass_size = saved;
-+			goto err_clk;
-+		}
-+	}
-+	bypass_size = saved;
-+
-+	pm_runtime_set_autosuspend_delay(dev, MSEC_PER_SEC);
-+	pm_runtime_use_autosuspend(dev);
-+	pm_runtime_set_active(dev);
-+	pm_runtime_enable(dev);
-+	return 0;
-+
-+err_clk:
-+	clk_bulk_disable_unprepare(priv->clks_num, priv->clks);
-+err_rst:
-+	reset_control_assert(priv->rst);
-+	return ret;
-+}
-+
-+static const struct of_device_id hica_sha_of_match[] = {
-+	{ .compatible = "hisilicon,advca-hash",
-+	  .data = (void *) SHA_TYPE_HASH },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, hica_sha_of_match);
-+
-+static struct platform_driver hica_sha_driver = {
-+	.probe = hica_sha_probe,
-+	.remove_new = hica_sha_remove,
-+	.driver = {
-+		.name = "hisi-advca-sha",
-+		.of_match_table = hica_sha_of_match,
-+		.pm = &hica_sha_pm_ops,
-+	},
-+};
-+
-+module_platform_driver(hica_sha_driver);
-+
-+MODULE_DESCRIPTION("HiSilicon Advanced Conditional Access Subsystem - SHA");
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("David Yang <mmyangfl@gmail.com>");
--- 
-2.39.2
-
+Thanks.
