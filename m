@@ -2,105 +2,121 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54419C7EE24
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 12:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D30C77B7A
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:10:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237330AbjFFMeE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 08:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35114 "EHLO
+        id S238076AbjFFNKr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 09:10:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235379AbjFFMeD (ORCPT
+        with ESMTP id S238068AbjFFNKq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 08:34:03 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E77BE10CE;
-        Tue,  6 Jun 2023 05:34:01 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-64d57cd373fso5110302b3a.1;
-        Tue, 06 Jun 2023 05:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686054841; x=1688646841;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eRUTvlQ9KEniKQ8vRqNFUfZRFkIjKMOzAlmDrlMZ5v0=;
-        b=Rk2ocRKPQ0Z6dfFpIz1iFKMoEgtVAMLUrdBKEiFLE+SaUU/ricpKqKQilB0Kvz2wcW
-         aATW//4JrJZCXwA7rSsfUzoWJV6DUM+odhM/vmzOtjB8kEKqQAAKyIPLKxKo+67SHc7f
-         /3r4IcELSpiZ+KJ2x7eXT5Drm67C8W5qApa7Lr4ibMlyC4e5jcFRwD+weGxk4+cEfjMT
-         mdMz9tQCdKcyEjpR3ngBzFPfJUFoGW9ynJvugyyblTHurl5dtSEH0ni2cBa34q2FoGwg
-         oVocUZ59ETEOaykaASWff8h32EFQma7BIuMEuE+GBnlWDPgfSaMV/qwiMFwna7WRSNGV
-         7xUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686054841; x=1688646841;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eRUTvlQ9KEniKQ8vRqNFUfZRFkIjKMOzAlmDrlMZ5v0=;
-        b=TJnjpwvpBXHMeIniD2XMubgp3ghebvRFChgXLZRwAmTFoVyR7emY5lqLFW3POQB1wr
-         wUEpSl6HrqYITXx0zbJSKJDOcBV7U4v/LOQUmq5jf12Fd9ZP9C5j0wRJji6FJEMusp3o
-         BRAEjYHg/rTCXuBlncQR5cMXOkRZW6YQ9D0p0DzfTTqhp3j4nFYnsB7GmRNM0zgfhLzK
-         BEw+2s4JQpdfzuo41BsgTiwcRJqeDC6MOCvQ8thJOhyFYwDjiD9fMp8Wju2Oz73ZUbZT
-         pfostElCAgdQI+QxrXkSU94kWJ7nI70p4eBzZbOFnYrr+1R8ENJe4TZ7WIWRa8b3NRX+
-         CUHA==
-X-Gm-Message-State: AC+VfDzD5L6JWhqLF1zOETN1q1JgvTdfM69QU9aLpi9s7HSr97XJeeTp
-        lAFiXbBbXQzcUSo45LzJDQU=
-X-Google-Smtp-Source: ACHHUZ5DtzhlqP8U69iBQgMy9/z7sBQOl1f0YIjZJ3lS7fn5INdkh8N6aS2aBv9fRQ+tRvweNVT8gA==
-X-Received: by 2002:a05:6a20:5486:b0:10b:60c1:2999 with SMTP id i6-20020a056a20548600b0010b60c12999mr2671662pzk.22.1686054841216;
-        Tue, 06 Jun 2023 05:34:01 -0700 (PDT)
-Received: from debian.me (subs02-180-214-232-93.three.co.id. [180.214.232.93])
-        by smtp.gmail.com with ESMTPSA id j13-20020aa783cd000000b0064f7c56d8b7sm6780033pfn.219.2023.06.06.05.34.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 05:34:00 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id 2417D106A3A; Tue,  6 Jun 2023 19:33:58 +0700 (WIB)
-Date:   Tue, 6 Jun 2023 19:33:58 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Franziska Naepelt <franziska.naepelt@googlemail.com>,
-        linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-kernel@vger.kernel.org,
-        Franziska Naepelt <franziska.naepelt@gmail.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH] crypto: crct10dif_common Add SPDX-License-Identifier tag
-Message-ID: <ZH8ntoGLJHQpZriL@debian.me>
-References: <20230606110322.96290-1-franziska.naepelt@gmail.com>
+        Tue, 6 Jun 2023 09:10:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8F21732
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:09:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686056957;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KDpL8BPNYzeJ3nB0d/6Bztw2bGaLmYC/5kDf71ULNUE=;
+        b=IbQ+3e2DquaK5BJL+qzLe9yAKSxwm5rGq5SxjDM0AAsUcqoqheGOh+1Nx7bnbfHOGK2n5G
+        SZ7e8LAh0exnVAc7VdjGZrca/+Wb0kly/4Uzv7V9zIK16uU1Gxz3kTtgyNUnRgK3M6BkAD
+        auTi5SyEgK+heb6sRBCzbP4P3rJ7SmY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-530-v4pgZxVdNFW6ROdtC_lYfw-1; Tue, 06 Jun 2023 09:09:16 -0400
+X-MC-Unique: v4pgZxVdNFW6ROdtC_lYfw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43DE2185A7A7;
+        Tue,  6 Jun 2023 13:09:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11E012026D6A;
+        Tue,  6 Jun 2023 13:09:11 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Simon Horman <simon.horman@corigine.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH net-next v3 02/10] Fix a couple of spelling mistakes
+Date:   Tue,  6 Jun 2023 14:08:48 +0100
+Message-ID: <20230606130856.1970660-3-dhowells@redhat.com>
+In-Reply-To: <20230606130856.1970660-1-dhowells@redhat.com>
+References: <20230606130856.1970660-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="y436K2REpvrPvhl3"
-Content-Disposition: inline
-In-Reply-To: <20230606110322.96290-1-franziska.naepelt@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Fix a couple of spelling mistakes in a comment.
 
---y436K2REpvrPvhl3
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Suggested-by: Simon Horman <simon.horman@corigine.com>
+Link: https://lore.kernel.org/r/ZHH2mSRqeL4Gs1ft@corigine.com/
+Link: https://lore.kernel.org/r/ZHH1nqZWOGzxlidT@corigine.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-crypto@vger.kernel.org
+cc: linux-cachefs@redhat.com
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+ fs/netfs/iterator.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Tue, Jun 06, 2023 at 01:03:22PM +0200, Franziska Naepelt wrote:
-> +// SPDX-License-Identifier: GPL-2.0-or-later
->  /*
->   * Cryptographic API.
->   *
+diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+index f8eba3de1a97..f41a37bca1e8 100644
+--- a/fs/netfs/iterator.c
++++ b/fs/netfs/iterator.c
+@@ -312,7 +312,7 @@ static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
+ }
+ 
+ /**
+- * extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
++ * extract_iter_to_sg - Extract pages from an iterator and add to an sglist
+  * @iter: The iterator to extract from
+  * @maxsize: The amount of iterator to copy
+  * @sgtable: The scatterlist table to fill in
+@@ -332,7 +332,7 @@ static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
+  * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA
+  * be allowed on the pages extracted.
+  *
+- * If successul, @sgtable->nents is updated to include the number of elements
++ * If successful, @sgtable->nents is updated to include the number of elements
+  * added and the number of bytes added is returned.  @sgtable->orig_nents is
+  * left unaltered.
+  *
 
-Shouldn't the license boilerplate text be also removed (and thus
-completing SPDX conversion)?
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---y436K2REpvrPvhl3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZH8ntQAKCRD2uYlJVVFO
-o6o9AQD1I9VD3LgPujQdO/Hk4zkpdA8SceQt72CP499hZpGoJwD/VyXeR65pDVF6
-SKpHInKN7YC8lnpxeV7drBALrK+xuAo=
-=fMjS
------END PGP SIGNATURE-----
-
---y436K2REpvrPvhl3--
