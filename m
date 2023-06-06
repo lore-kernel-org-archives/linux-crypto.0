@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE86BC77B7A
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF71C77B73
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:11:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238220AbjFFNLc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S238195AbjFFNLc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 6 Jun 2023 09:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39492 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238112AbjFFNLI (ORCPT
+        with ESMTP id S238191AbjFFNLJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 09:11:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3121E10F9
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:10:00 -0700 (PDT)
+        Tue, 6 Jun 2023 09:11:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A027410F1
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:09:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686056965;
+        s=mimecast20190719; t=1686056979;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8XAsj4uxJsU5nzHkgzshZ8+UJL6y54h/fBUZHPzhfR8=;
-        b=czNawJePBIkrxJq64k2Yhz3UL6kTI0MIldyFaT3m7LMdkNclFjWTiV7kZyV67dB7frDaNY
-        83cYbcJOdqNSh+zWIFZAVMjf4iNxeNPvxFDbUA1OjOIHPjZEH1zK8J0MVb7oJybpM7exrF
-        WKr+bmGW43oFOH2PpJCKy3dGcZ1YzQw=
+        bh=jD4W/W7iXB9ATeRl2QuO5GnCDoE2m4ZXOMCYUAgCXGY=;
+        b=ARcMw1QwxDMiJ0Wg8UQU800e8t/ta95t6M7hKZT8/I2pK5XQX3UL8CnaDqng9sj0zi9UD+
+        v6PZU0VIJjMxhWinKY9+cRbpg15264wHSKNdLBV3AB7OlEJqxuYYrnZq4vpdM0sFDpjeg9
+        qkuPIlqGlvIbUxCnCRmCECeiPwOASTo=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-141-ZSn3A2opOs6ohARDTNPPGQ-1; Tue, 06 Jun 2023 09:09:20 -0400
-X-MC-Unique: ZSn3A2opOs6ohARDTNPPGQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-552-JFtKf6EgPN2rwQdPKMPv1g-1; Tue, 06 Jun 2023 09:09:35 -0400
+X-MC-Unique: JFtKf6EgPN2rwQdPKMPv1g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 151988032F5;
-        Tue,  6 Jun 2023 13:09:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC95D811E91;
+        Tue,  6 Jun 2023 13:09:34 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F348C40CFD46;
-        Tue,  6 Jun 2023 13:09:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8ECF52166B25;
+        Tue,  6 Jun 2023 13:09:31 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     David Howells <dhowells@redhat.com>,
@@ -50,62 +50,107 @@ Cc:     David Howells <dhowells@redhat.com>,
         David Ahern <dsahern@kernel.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Jeff Layton <jlayton@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Simon Horman <simon.horman@corigine.com>,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: [PATCH net-next v3 03/10] Wrap lines at 80
-Date:   Tue,  6 Jun 2023 14:08:49 +0100
-Message-ID: <20230606130856.1970660-4-dhowells@redhat.com>
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 07/10] crypto: af_alg: Indent the loop in af_alg_sendmsg()
+Date:   Tue,  6 Jun 2023 14:08:53 +0100
+Message-ID: <20230606130856.1970660-8-dhowells@redhat.com>
 In-Reply-To: <20230606130856.1970660-1-dhowells@redhat.com>
 References: <20230606130856.1970660-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Wrap a line at 80 to stop checkpatch complaining.
+Put the loop in af_alg_sendmsg() into an if-statement to indent it to make
+the next patch easier to review as that will add another branch to handle
+MSG_SPLICE_PAGES to the if-statement.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jens Axboe <axboe@kernel.dk>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: "David S. Miller" <davem@davemloft.net>
 cc: Eric Dumazet <edumazet@google.com>
 cc: Jakub Kicinski <kuba@kernel.org>
 cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
 cc: Matthew Wilcox <willy@infradead.org>
-cc: Simon Horman <simon.horman@corigine.com>
 cc: linux-crypto@vger.kernel.org
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
 cc: netdev@vger.kernel.org
 ---
- fs/netfs/iterator.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-index f41a37bca1e8..9f09dc30ceb6 100644
---- a/fs/netfs/iterator.c
-+++ b/fs/netfs/iterator.c
-@@ -119,7 +119,8 @@ static ssize_t extract_user_to_sg(struct iov_iter *iter,
- 	size_t len, off;
+Notes:
+    ver #2)
+     - Fix a checkpatch warning.
+
+ crypto/af_alg.c | 51 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 27 insertions(+), 24 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index b8bf6d8525ba..fd56ccff6fed 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1030,35 +1030,38 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		if (sgl->cur)
+ 			sg_unmark_end(sg + sgl->cur - 1);
  
- 	/* We decant the page list into the tail of the scatterlist */
--	pages = (void *)sgtable->sgl + array_size(sg_max, sizeof(struct scatterlist));
-+	pages = (void *)sgtable->sgl +
-+		array_size(sg_max, sizeof(struct scatterlist));
- 	pages -= sg_max;
+-		do {
+-			struct page *pg;
+-			unsigned int i = sgl->cur;
++		if (1 /* TODO check MSG_SPLICE_PAGES */) {
++			do {
++				struct page *pg;
++				unsigned int i = sgl->cur;
  
- 	do {
+-			plen = min_t(size_t, len, PAGE_SIZE);
++				plen = min_t(size_t, len, PAGE_SIZE);
+ 
+-			pg = alloc_page(GFP_KERNEL);
+-			if (!pg) {
+-				err = -ENOMEM;
+-				goto unlock;
+-			}
++				pg = alloc_page(GFP_KERNEL);
++				if (!pg) {
++					err = -ENOMEM;
++					goto unlock;
++				}
+ 
+-			sg_assign_page(sg + i, pg);
++				sg_assign_page(sg + i, pg);
+ 
+-			err = memcpy_from_msg(page_address(sg_page(sg + i)),
+-					      msg, plen);
+-			if (err) {
+-				__free_page(sg_page(sg + i));
+-				sg_assign_page(sg + i, NULL);
+-				goto unlock;
+-			}
++				err = memcpy_from_msg(
++					page_address(sg_page(sg + i)),
++					msg, plen);
++				if (err) {
++					__free_page(sg_page(sg + i));
++					sg_assign_page(sg + i, NULL);
++					goto unlock;
++				}
+ 
+-			sg[i].length = plen;
+-			len -= plen;
+-			ctx->used += plen;
+-			copied += plen;
+-			size -= plen;
+-			sgl->cur++;
+-		} while (len && sgl->cur < MAX_SGL_ENTS);
++				sg[i].length = plen;
++				len -= plen;
++				ctx->used += plen;
++				copied += plen;
++				size -= plen;
++				sgl->cur++;
++			} while (len && sgl->cur < MAX_SGL_ENTS);
++		}
+ 
+ 		if (!size)
+ 			sg_mark_end(sg + sgl->cur - 1);
 
