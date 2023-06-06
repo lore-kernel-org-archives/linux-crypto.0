@@ -2,62 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF5B2C77B73
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 11:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0737C77B7A
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 11:17:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbjFFLLZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 07:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
+        id S229803AbjFFLR4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 07:17:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230110AbjFFLLY (ORCPT
+        with ESMTP id S230451AbjFFLRz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 07:11:24 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0449E;
-        Tue,  6 Jun 2023 04:11:23 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-977ed383b8aso222912466b.3;
-        Tue, 06 Jun 2023 04:11:23 -0700 (PDT)
+        Tue, 6 Jun 2023 07:17:55 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629789E;
+        Tue,  6 Jun 2023 04:17:54 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-977c89c47bdso536078066b.2;
+        Tue, 06 Jun 2023 04:17:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1686049881; x=1688641881;
+        d=googlemail.com; s=20221208; t=1686050272; x=1688642272;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6t2//VxeuXac+D3CtDXHHtOEiYVaPdfCbZwpL+Sh+X0=;
-        b=jY2Jp9PmjpXxBEpmLQ+YoPVYhkFKPIAtr1YnXtU72Sz2S7HvjLI2sae/qVjBPMw0Jj
-         1mIjydGVpfXV3/aaaFqCB0WX5fmt1qTwEIFKolS8RleU+CYT+lHxCMPu3Ko3fDWNhuQS
-         YhMxGzHcqoVCbxIlFAEwbmNCAK7BNqyBMvijNNvcPEncI2xb0nU/O+wDWYxVgotySaEF
-         CkTU/bYMV3hQoWGuCYSuX31hC/JWko9byjD6Mxf4pfOWCHkxOMTUAxoUBRtZnxG1Aov1
-         CC1qDp0xHw9GZBckGFI97hx2JlSuI0LXux7cGQ4B0F8tMEbgjwxYWlQhZBHKWuFQ06z0
-         VwNQ==
+        bh=xbQFn5Jj14cFrW5DQfIo4/7M5wSQ9mF1+GYFKFZYsk0=;
+        b=OrsWOkZzbCk4hb8xGy5UGIOaelac5zPAwYF8OL/37XsNwsUkCGEz682EP4V519o0q4
+         WlPyh2CrL3ONCtqovn3j8sI3b4wtkm83Atm20SbSLdLlSI/az7FUNiMDYPKVmKPheMjB
+         HSQZ1YV2TQErX1AGWG6ZaQE48svNRANXS6NIVaeldl06IrUsNhFkqFPuaka5J/dFqueF
+         EFdvTrqvObOWT3VzBEE2xgHGHKQQ9jhNKjvgKKIMvDSRq9C2SYz68Vg8EL+hTyfyOAag
+         pCUVPMS7iDoT1+Bgk4XooO4q6UUCLqLXFKo35rtUJDQNXUtgkMX97tqcbPsKDJgFX1Y8
+         IqcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686049881; x=1688641881;
+        d=1e100.net; s=20221208; t=1686050272; x=1688642272;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6t2//VxeuXac+D3CtDXHHtOEiYVaPdfCbZwpL+Sh+X0=;
-        b=X7Uvao+p8UO4owCT7fJ/otIdEclA4hiVr6/f89OSArlkRKY1CNcT+A9NfrrBtdTAeq
-         WyuFZ5+2bSbffCn1CjI0QnJ5GCKAi7DxAZJwNy9OQVv15IJ0XJUtaOYnFyj8LBKH8QNx
-         Le4WMxeY4g9phn9+gltkZoqvTR+gLbexOyx7jS1KUymF6YEExOghUXU9s+G6g4/LEnpS
-         MMBvXLhqhVz+1HRpnJO3C+LZuw0HTW30aPWUSd9Qx3WBNHowwaT/joOlVcWIJmdeAlxi
-         Oetd1AAhtBAskt8Jo5mT7dBkfriUeUwaky4p9muVOm9J4xg0svXmMi4C9dAHrBeixx1Z
-         oVYw==
-X-Gm-Message-State: AC+VfDzFxk9D1jbhBPCO3KctMgObFGyf8ZNaYhirQw3QPMmN58V0b6uB
-        5NiD33AoNB1IBQ8EVEWHVGcRCbNVQzRtaA==
-X-Google-Smtp-Source: ACHHUZ4JmVpt6jPZqJ5mAaxDwYQ9uekupNzZwkjIRAPKb/r2DQGSHpfSK2Fjp4HZz5rhw/JuX0ShzQ==
-X-Received: by 2002:a17:906:974b:b0:973:df9c:b1aa with SMTP id o11-20020a170906974b00b00973df9cb1aamr2040856ejy.71.1686049881264;
-        Tue, 06 Jun 2023 04:11:21 -0700 (PDT)
+        bh=xbQFn5Jj14cFrW5DQfIo4/7M5wSQ9mF1+GYFKFZYsk0=;
+        b=IHm/DSlvvw16sBsQUVOENPLqys4IIqE5Nx1pTnZBP1Rx7lfw6h7Eto5Xs0cHJKolKp
+         viJWSrz+bec/l/+86KYPx2wfKUGBFZtePP8twrSsM+n0MEjQwQ5d/T9/KFam0cu02MxN
+         YUXSoyhPN2VF0wB7eo9oi32gsOsimQyE5P96OZ4qb7oN5+KzwoARIGrdiujPb6xEvyEQ
+         KrSIk9eufIrpGS8n9Ozj54MXJA44lv7lbwGlVgwU9helAefd4Brt5DO8qw6Lrey8nTz/
+         sk38ZtlWEc9B0LFsq5qFYfaQRi/0yT5qX4eUOBQgSbTUIvF6qpeSF7q0XVFGT7eTd0ys
+         iSVQ==
+X-Gm-Message-State: AC+VfDy0skwyxgTic+lmuxt+YGSK+lDtyvlRgSEgTHGQqwSsApQgAxcO
+        84iJ457CAS247Dmv7Yu8g9I+2oTUhRiVvA==
+X-Google-Smtp-Source: ACHHUZ5A8QtpPqPJKBMBVDuYU0qIFO7YJ9uxc+T3X7EIO7diL7bcUZItA8H4dJ7u425JtT09P5hp3w==
+X-Received: by 2002:a17:907:6d8a:b0:96f:4db5:df69 with SMTP id sb10-20020a1709076d8a00b0096f4db5df69mr2221794ejc.23.1686050272515;
+        Tue, 06 Jun 2023 04:17:52 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:810a:9640:26a8:7ce9:cf23:e2e1:1e2e])
-        by smtp.gmail.com with ESMTPSA id e4-20020a170906504400b0095342bfb701sm5608364ejk.16.2023.06.06.04.11.20
+        by smtp.gmail.com with ESMTPSA id lz11-20020a170906fb0b00b00977da9d4ef9sm2454483ejb.18.2023.06.06.04.17.51
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 06 Jun 2023 04:11:20 -0700 (PDT)
+        Tue, 06 Jun 2023 04:17:52 -0700 (PDT)
 From:   Franziska Naepelt <franziska.naepelt@googlemail.com>
 X-Google-Original-From: Franziska Naepelt <franziska.naepelt@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-kernel@vger.kernel.org,
         Franziska Naepelt <franziska.naepelt@gmail.com>
-Subject: [PATCH] crypto: frcypt Fix checkpatch warnings
-Date:   Tue,  6 Jun 2023 13:10:42 +0200
-Message-Id: <20230606111042.96855-1-franziska.naepelt@gmail.com>
+Subject: [PATCH] crypto: hmac: Fix missing blank line
+Date:   Tue,  6 Jun 2023 13:17:49 +0200
+Message-Id: <20230606111749.97469-1-franziska.naepelt@gmail.com>
 X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -65,36 +65,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The following checkpatch warnings have been fixed:
-- WARNING: Missing or malformed SPDX-License-Identifier tag
-- WARNING: Block comments use a trailing */ on a separate line
+The following checkpatch warning has been fixed:
+- WARNING: Missing a blank line after declarations
 
 Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
 ---
- crypto/fcrypt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ crypto/hmac.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index 95a16e88899b..d81d65489c41 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /* FCrypt encryption algorithm
-  *
-  * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
-@@ -303,7 +304,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
- 
- #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
- 			  * kernels - it seems to be faster but the code is
--			  * larger */
-+			  * larger
-+			  */
- 
- 	u64 k;	/* k holds all 56 non-parity bits */
- 
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 09a7872b4060..ea93f4c55f25 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -177,6 +177,7 @@ static int hmac_clone_tfm(struct crypto_shash *dst, struct crypto_shash *src)
+ static void hmac_exit_tfm(struct crypto_shash *parent)
+ {
+ 	struct hmac_ctx *ctx = hmac_ctx(parent);
++
+ 	crypto_free_shash(ctx->hash);
+ }
+
 
 base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
--- 
+--
 2.39.2 (Apple Git-143)
 
