@@ -2,108 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 141B6C77B7A
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 11:04:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC6CC7EE33
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 11:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232486AbjFFLDu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 07:03:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
+        id S232550AbjFFLE2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 07:04:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236669AbjFFLDH (ORCPT
+        with ESMTP id S235562AbjFFLDd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 07:03:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2016319B3;
-        Tue,  6 Jun 2023 04:00:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 882826280D;
-        Tue,  6 Jun 2023 11:00:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7D95C433A1;
-        Tue,  6 Jun 2023 11:00:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686049219;
-        bh=FJZBvU9mZ929InzbREOPQybjQtP4GSxypUKiLaiGPYY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=f8YppWGM9pkCcQiw8BokRT2JY3X69vuGpmvJMhjP7v+Li0/uaE71ySscWjIpuV4RK
-         AhoN9TUo3jQwzL677mAtiESDt/zi+B7hK8acfqOVU7toT0lPBZ6ZTbE8rAC7Qru+7w
-         Wfffy+NLgnq8GzQJSBe8lBylVcGAbZdNjhFbKUdl1xQn9JD8FU9OQa0EZFg3/HeiJ5
-         j6BqlGeR+vNLo2nINfnlZ3o9q5CeXDbQGNeBFcsnEjUBInrraE3iVbxBLIfbcN8qtH
-         w0aeW0AUbZTwPHkcZEio7sxGoGumfZq9jkJi1Vc/KY9RusvNRYnDssU/50OOTXFz45
-         jE4m/lBQ2hP5g==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2b1c30a1653so32320511fa.2;
-        Tue, 06 Jun 2023 04:00:18 -0700 (PDT)
-X-Gm-Message-State: AC+VfDwf+WejIx8A98qzFziX1i7ixfFrpJ1tUJMMD0ZtxtncUwIvlGgg
-        vVQ+Zp7RYCNatw36xwBVFIn9uGYLUEi30dG3MjQ=
-X-Google-Smtp-Source: ACHHUZ563CmkIVh5K78BzyBEHDhqyYmtPZjw56PYzfIh3cc6Z/kEJrshyqqwF2nJo0HFFVkgYROpAOqSLHtjsHRwShg=
-X-Received: by 2002:a2e:b16f:0:b0:2ad:99dd:de07 with SMTP id
- a15-20020a2eb16f000000b002ad99ddde07mr985836ljm.16.1686049216890; Tue, 06 Jun
- 2023 04:00:16 -0700 (PDT)
+        Tue, 6 Jun 2023 07:03:33 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACC110E5;
+        Tue,  6 Jun 2023 04:03:30 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-977cf86aae5so392491366b.0;
+        Tue, 06 Jun 2023 04:03:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20221208; t=1686049409; x=1688641409;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XLJjLTW16hmNcMoYy+dcT/Da1eHMITmiB6Cn5sB+zWg=;
+        b=byHapCDzMAqDp+rL1zGcdj9FtVtBaXKwgeLv9H+ME6Fjjqtca1X9j3019nCzGg1gAT
+         1bWQA6o0dnIcmx17qFaGxVOy7tFLAp8Hy6eSHlVe/vj0vqAaMwu3fwRGX0hI6YRLfohb
+         IzTtroAiOUSNqDGlBTmBiZCqkk3omHqN227TnyNAA0uB8z1m4f2C/NhZWI45EGn213PG
+         Anx7xsuZIyKtmxVUVGVK4/Den72btZ4GK6WA5NNNvP8eFKd58nrxRm8GQF3AIy7jpWwv
+         htLRPm5ii/cct5dY85Yov2Rm06qQ9lbyb5j1iKCGgd8wEmC0BqEEseBTJJV2wclZfUaE
+         QQMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686049409; x=1688641409;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XLJjLTW16hmNcMoYy+dcT/Da1eHMITmiB6Cn5sB+zWg=;
+        b=N0Cg8ugSzPzDApxy6S0hIpv4g4mHqn9S8yy/V/u+wNblOvqO9njVkHixkSt9P2Vphs
+         LpNE090Z3SlXkAKOpDm46QLu9QMpOoaMXdeKMRXd0zBMVZDUVMOUDOgIv1vBEJHiFL8V
+         0y0D9bk5MOG6EHCeUxDda7miOk+xVd07zwjd4dz/qLzxJIZeFbOYDOMYVCaT68b+n/o2
+         5DeqcdC0/Yg0UQOwG7qQhMerihQmfDPojv7vqQ21UnWK8W44AWVaww9L/I9gXtS1EU8d
+         fxc5WWK827Bxa1V9Fmu67sB9f9z+6dyV15T87ySwct4OxIcm36cVBQdPMb6YcOyPE3Ol
+         426Q==
+X-Gm-Message-State: AC+VfDyfUFEfjgwmLWmOsl25W71i5bKPyUOIhRUTvKJ7gi5HrUIUZ1se
+        do3u3+ttiSJ/YkpV9gXVXRiqckUKrk90GA==
+X-Google-Smtp-Source: ACHHUZ6c7IEq2q5ff+8tswCLLhUYEw7lV3GOL4mDUapyxzKh3584IcVcmBgmotv1Su7lavI2p3UevA==
+X-Received: by 2002:a17:907:6088:b0:96a:411a:1cc4 with SMTP id ht8-20020a170907608800b0096a411a1cc4mr2108061ejc.66.1686049408991;
+        Tue, 06 Jun 2023 04:03:28 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:810a:9640:26a8:7ce9:cf23:e2e1:1e2e])
+        by smtp.gmail.com with ESMTPSA id k16-20020a1709065fd000b00977db7d08cbsm2279665ejv.74.2023.06.06.04.03.27
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 06 Jun 2023 04:03:28 -0700 (PDT)
+From:   Franziska Naepelt <franziska.naepelt@googlemail.com>
+X-Google-Original-From: Franziska Naepelt <franziska.naepelt@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-kernel@vger.kernel.org,
+        Franziska Naepelt <franziska.naepelt@gmail.com>
+Subject: [PATCH] crypto: crct10dif_common Add SPDX-License-Identifier tag
+Date:   Tue,  6 Jun 2023 13:03:22 +0200
+Message-Id: <20230606110322.96290-1-franziska.naepelt@gmail.com>
+X-Mailer: git-send-email 2.39.2 (Apple Git-143)
 MIME-Version: 1.0
-References: <4d7e38ff5bbc496cb794b50e1c5c83bcd2317e69.camel@huaweicloud.com>
- <CAHk-=wj4S0t5RnJQmF_wYwv+oMTKggwdLnrA9D1uMNKq4H4byw@mail.gmail.com>
- <CAHk-=wgCUzRNTg4fC8DF=UFnznK0M=mNUBDcsnLt7D4+HP2_1Q@mail.gmail.com> <ZH2hgrV6po9dkxi+@gondor.apana.org.au>
-In-Reply-To: <ZH2hgrV6po9dkxi+@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 6 Jun 2023 13:00:05 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFvpcKVQ2askwh-ahDRyjtN8MerjDJJBBMiTBZ1CSfZ9w@mail.gmail.com>
-Message-ID: <CAMj1kXFvpcKVQ2askwh-ahDRyjtN8MerjDJJBBMiTBZ1CSfZ9w@mail.gmail.com>
-Subject: Re: [GIT PULL] Asymmetric keys fix for v6.4-rc5
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        David Howells <dhowells@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>, davem@davemloft.net,
-        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
-        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 5 Jun 2023 at 10:49, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Fri, Jun 02, 2023 at 08:02:23PM -0400, Linus Torvalds wrote:
-> >
-> > I absolutely abhor the crypto interfaces. They all seem designed for
-> > that "external DMA engine" case that seems so horrendously pointless
-> > and slow.  In practice so few of them are that, and we have all those
-> > optimized routines for doing it all on the CPU - but have in the
-> > meantime wasted all that time and effort into copying everything,
-> > turning simple buffers into sg-bufs etc etc. The amount of indirection
-> > and "set this state in the state machine" is just nasty, and this
-> > seems to all be a prime example of it all. With some of it then
-> > randomly going through some kthread too.
->
-> You're right.  Originally SG lists were used as the majority of
-> our input came from network packets, in the form of skb's.  They
-> are easily translated into SG lists.  This is still somewhat the
-> case for parts of the Crypto API (e.g., skcipher and ahash).
->
-> However, for akcipher the only user of the underlying API is the
-> file in question so I absolutely agree that forcing it to go through
-> an SG list is just wrong.
->
-> I'll change the underlying akcipher interface to take pointers
-> instead and hide the SG list stuff (along with the copying) inside
-> API.
->
+Fix the following checkpatch warning:
+- WARNING: Missing or malformed SPDX-License-Identifier tag
 
-Could we do the same for the compression API? This is a major pain as
-well, and results (on my 128-core workstation) in 32 MiB permanently
-tied up in scratch buffers in the scomp-to-acomp adaptation layer
-because most of the underlying implementations are compression
-libraries operating on plain virtual addresses, and so the
-scatterlists needs to be copied into a buffer and back to perform the
-actual transformation.
+Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
+---
+ crypto/crct10dif_common.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The only user user of the async compression interface is zswap, but it
-blocks on the completion so it is actually synchronous as well.
+diff --git a/crypto/crct10dif_common.c b/crypto/crct10dif_common.c
+index b2fab366f518..134553bf0d60 100644
+--- a/crypto/crct10dif_common.c
++++ b/crypto/crct10dif_common.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * Cryptographic API.
+  *
+
+base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
+-- 
+2.39.2 (Apple Git-143)
+
