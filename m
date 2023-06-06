@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C61CC7EE24
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE86BC77B7A
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:11:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238216AbjFFNLW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 09:11:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39454 "EHLO
+        id S238220AbjFFNLc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 09:11:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238102AbjFFNLE (ORCPT
+        with ESMTP id S238112AbjFFNLI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 09:11:04 -0400
+        Tue, 6 Jun 2023 09:11:08 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30C7199C
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:09:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3121E10F9
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:10:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686056969;
+        s=mimecast20190719; t=1686056965;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jPGukvQXP4Tai7PUqcbnIswr++Y11hB7rT1QDpn/afo=;
-        b=i13vkd+x00Pj2JsKaKD3n6RTKSfhSOGpiXd1UHo1LwxtErAZGZ9gY46H1tWQim1E/45+fX
-        BVnhR72TJd4u35xXvWdDBYFiIw/Ef08xb29p6wd5mo/RoImDZoyjnJgiguj5oiRBjDlzhH
-        pzVacbEtqP58lWOXneKfi42Q+oNYDzs=
+        bh=8XAsj4uxJsU5nzHkgzshZ8+UJL6y54h/fBUZHPzhfR8=;
+        b=czNawJePBIkrxJq64k2Yhz3UL6kTI0MIldyFaT3m7LMdkNclFjWTiV7kZyV67dB7frDaNY
+        83cYbcJOdqNSh+zWIFZAVMjf4iNxeNPvxFDbUA1OjOIHPjZEH1zK8J0MVb7oJybpM7exrF
+        WKr+bmGW43oFOH2PpJCKy3dGcZ1YzQw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-173-ANQJNu_2OhaXPJwexz3WVg-1; Tue, 06 Jun 2023 09:09:28 -0400
-X-MC-Unique: ANQJNu_2OhaXPJwexz3WVg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-141-ZSn3A2opOs6ohARDTNPPGQ-1; Tue, 06 Jun 2023 09:09:20 -0400
+X-MC-Unique: ZSn3A2opOs6ohARDTNPPGQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 17D4C1019C88;
-        Tue,  6 Jun 2023 13:09:27 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 151988032F5;
+        Tue,  6 Jun 2023 13:09:19 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 17EE94087C62;
-        Tue,  6 Jun 2023 13:09:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F348C40CFD46;
+        Tue,  6 Jun 2023 13:09:15 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     David Howells <dhowells@redhat.com>,
@@ -50,88 +50,62 @@ Cc:     David Howells <dhowells@redhat.com>,
         David Ahern <dsahern@kernel.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 05/10] crypto: af_alg: Pin pages rather than ref'ing if appropriate
-Date:   Tue,  6 Jun 2023 14:08:51 +0100
-Message-ID: <20230606130856.1970660-6-dhowells@redhat.com>
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH net-next v3 03/10] Wrap lines at 80
+Date:   Tue,  6 Jun 2023 14:08:49 +0100
+Message-ID: <20230606130856.1970660-4-dhowells@redhat.com>
 In-Reply-To: <20230606130856.1970660-1-dhowells@redhat.com>
 References: <20230606130856.1970660-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert AF_ALG to use iov_iter_extract_pages() instead of
-iov_iter_get_pages().  This will pin pages or leave them unaltered rather
-than getting a ref on them as appropriate to the iterator.
-
-The pages need to be pinned for DIO-read rather than having refs taken on
-them to prevent VM copy-on-write from malfunctioning during a concurrent
-fork() (the result of the I/O would otherwise end up only visible to the
-child process and not the parent).
+Wrap a line at 80 to stop checkpatch complaining.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Steve French <sfrench@samba.org>
+cc: Shyam Prasad N <nspmangalore@gmail.com>
+cc: Rohith Surabattula <rohiths.msft@gmail.com>
+cc: Jens Axboe <axboe@kernel.dk>
 cc: Herbert Xu <herbert@gondor.apana.org.au>
 cc: "David S. Miller" <davem@davemloft.net>
 cc: Eric Dumazet <edumazet@google.com>
 cc: Jakub Kicinski <kuba@kernel.org>
 cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
 cc: Matthew Wilcox <willy@infradead.org>
+cc: Simon Horman <simon.horman@corigine.com>
 cc: linux-crypto@vger.kernel.org
+cc: linux-cachefs@redhat.com
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 cc: netdev@vger.kernel.org
 ---
- crypto/af_alg.c         | 10 +++++++---
- include/crypto/if_alg.h |  1 +
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ fs/netfs/iterator.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 5f7252a5b7b4..7caff10df643 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -533,14 +533,17 @@ static const struct net_proto_family alg_family = {
+diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
+index f41a37bca1e8..9f09dc30ceb6 100644
+--- a/fs/netfs/iterator.c
++++ b/fs/netfs/iterator.c
+@@ -119,7 +119,8 @@ static ssize_t extract_user_to_sg(struct iov_iter *iter,
+ 	size_t len, off;
  
- int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len)
- {
-+	struct page **pages = sgl->pages;
- 	size_t off;
- 	ssize_t n;
- 	int npages, i;
+ 	/* We decant the page list into the tail of the scatterlist */
+-	pages = (void *)sgtable->sgl + array_size(sg_max, sizeof(struct scatterlist));
++	pages = (void *)sgtable->sgl +
++		array_size(sg_max, sizeof(struct scatterlist));
+ 	pages -= sg_max;
  
--	n = iov_iter_get_pages2(iter, sgl->pages, len, ALG_MAX_PAGES, &off);
-+	n = iov_iter_extract_pages(iter, &pages, len, ALG_MAX_PAGES, 0, &off);
- 	if (n < 0)
- 		return n;
- 
-+	sgl->need_unpin = iov_iter_extract_will_pin(iter);
-+
- 	npages = DIV_ROUND_UP(off + n, PAGE_SIZE);
- 	if (WARN_ON(npages == 0))
- 		return -EINVAL;
-@@ -573,8 +576,9 @@ void af_alg_free_sg(struct af_alg_sgl *sgl)
- {
- 	int i;
- 
--	for (i = 0; i < sgl->npages; i++)
--		put_page(sgl->pages[i]);
-+	if (sgl->need_unpin)
-+		for (i = 0; i < sgl->npages; i++)
-+			unpin_user_page(sgl->pages[i]);
- }
- EXPORT_SYMBOL_GPL(af_alg_free_sg);
- 
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 7e76623f9ec3..46494b33f5bc 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -59,6 +59,7 @@ struct af_alg_sgl {
- 	struct scatterlist sg[ALG_MAX_PAGES + 1];
- 	struct page *pages[ALG_MAX_PAGES];
- 	unsigned int npages;
-+	bool need_unpin;
- };
- 
- /* TX SGL entry */
+ 	do {
 
