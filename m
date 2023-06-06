@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FB5C7EE2F
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 11:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB70C7EE24
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 12:15:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236429AbjFFLgu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 07:36:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58280 "EHLO
+        id S231605AbjFFMPA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 08:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235498AbjFFLgt (ORCPT
+        with ESMTP id S237590AbjFFMO4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 07:36:49 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C428F196;
-        Tue,  6 Jun 2023 04:36:48 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-39c503bc770so306517b6e.0;
-        Tue, 06 Jun 2023 04:36:48 -0700 (PDT)
+        Tue, 6 Jun 2023 08:14:56 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969D210C3;
+        Tue,  6 Jun 2023 05:14:55 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-655d1fc8ad8so1669853b3a.1;
+        Tue, 06 Jun 2023 05:14:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686051408; x=1688643408;
+        d=gmail.com; s=20221208; t=1686053695; x=1688645695;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R92KuS7gawSx2LWw+ooVWTPC6JkJv9bdowpbo01HVAw=;
-        b=KWM8ThY/M3uM372kffwhthc6oRXcuseLvAve9vjPRRuzhSZxcV1WgKQCyntbH7Esu7
-         cZlAzbtguAWGAxejMBdHHv7Ibvu3VWnpXyGRw51hrlfbOSnejVz5vCPbsh/1WI68Tp91
-         +2zdkEy/aDO0dcopt49vPZlstLrxUbp3PTlfEZTa6+LPHMdIllJ4PoXLh07CjiT7nuQ8
-         zvPy+HIydi7yjsqanQcMr/fRwI8lILVvDkxnyN3ALPKafYzdFFsXqpoREvA2TTNqZd8Q
-         qPXyI1Qq9XWu8GIrE7whBTX+FxVv/27CHPmeIfnsdcKICNNIHkymjVSYNnEZNgQMLg8X
-         E+xA==
+        bh=DZxsPxahs9NKr8hMwSFGfW9sJdI4zT80Uq7gZVXkfhQ=;
+        b=VkyY/6GpsS0zZSqL8bdeycfxo8QJTbFqmuF9AhB0dniioo0238NhSkK0ERbNUEzscD
+         vj9jAWdHhFDTm5eMyg63JM5F3Er89ow/LH4F2fCkb5mGbLQ14DIjD4ACM7ySWiKUxJmh
+         Yy8RGCYzs1nd/0Y/HDP3aV+MaLhOjQqJVnGpfpv5MdTyGtoIOXpuQMTKEcbQgmB5N9Nj
+         CDSoTZWFHgD0MYKlkStRhs+NukShEU1JTMCjgpFC5ZyZgE4wp3o94lMvci8lQrxeJZsd
+         t/l4gOJu6wG7iTOgzDIOvE48js1NyWSEeTIK4drBzoVa6K099ulj7b3bb3ZpKciwqP/5
+         iGkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686051408; x=1688643408;
+        d=1e100.net; s=20221208; t=1686053695; x=1688645695;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R92KuS7gawSx2LWw+ooVWTPC6JkJv9bdowpbo01HVAw=;
-        b=V5w5nPzymjIZOVSOF9Cwjg4LjVkKPXDyEP+xAa+sRAnzh3fipUAf1Rm/bPV0vpRAzO
-         j+XgWfnPX33SIZcsiQdt+rWHDSUl9thhVznhypkSF1tTo+e+L7sBaJf27YEiyzg5Z1oR
-         xE6Vpl5eizeopF6jMplH6q7tiKx/CXLBnhUvRAGfGToLfJku45C0PkZL8biAy7MVh+AP
-         HwEsP2wR2S7ncBlR1blrF07Dmpiu74wwIMpBB8iCFn+5X3k+WUyOKbdPyYQw0w/rYR3N
-         UcpBhbOrfyvaUAsmLSN9IPSkclx0Zam+O5Qmt7hJwR3lhwK53cRQWxMknrQdA4GM/XHV
-         zsJA==
-X-Gm-Message-State: AC+VfDxlULC5abDy8BDp/keCUxy3OCjOF305h0DbpOIoklTtBIPOqvHp
-        X5e3LKc/3//j5dkcxLkxlHzoTEhOnv4=
-X-Google-Smtp-Source: ACHHUZ6076hhAKQCiN1ZGGrVzz/fYBz/bp2CAfqnll20uGWpIG1MlOWX50Uveq2xE2o3dLht+3Ugsw==
-X-Received: by 2002:aca:130c:0:b0:396:3b9b:d217 with SMTP id e12-20020aca130c000000b003963b9bd217mr2133146oii.18.1686051407914;
-        Tue, 06 Jun 2023 04:36:47 -0700 (PDT)
-Received: from debian.me (subs09a-223-255-225-71.three.co.id. [223.255.225.71])
-        by smtp.gmail.com with ESMTPSA id g12-20020a63e60c000000b00502ecc282e2sm7244378pgh.5.2023.06.06.04.36.46
+        bh=DZxsPxahs9NKr8hMwSFGfW9sJdI4zT80Uq7gZVXkfhQ=;
+        b=Tjv1+vLV2cn3TDfXFoNNGAEscK2m9tKZg7ADKyL2rz61AalneyJcmvlxXwGMzvsq+f
+         kFf8x/A7nojj/SibQ40DMPUdzGLOlFZULrDKKwKfgAR+2gimRjzSKVFCdFj/NvMeQOqV
+         a8Jt4BkyqdElfhWikSXOea4ojCyksmja/AXV8HP2KpbhAd+0Ul4veS4PzVyiAcuHXQts
+         5aGad40xn06gtO9oJ2WYxxG2HzfhXv/IXUK78qKHUNvJE9H5H9k5e9Zaq8KE9d8npr9G
+         Crcw7wZMkW4Ke0tYdDJTKr3qJE01Z+CMVR8jEOVVuJbC1j7H3RkJi73WktZ0dprfo5PA
+         9Z4Q==
+X-Gm-Message-State: AC+VfDy1R+8AHoTo9h2i3Rz0eTfsKVzEYAiXk9i2TKDj18mPhREB+Y3t
+        B2GX6alRQaLRTFdPpofCru0=
+X-Google-Smtp-Source: ACHHUZ6Q7Oq40/JLIFZzXaEegZg6sXRcaOL2YrC8ZQMtLRVCeYKJK5SqLyeTZ9FFNOwV13uTttxC7Q==
+X-Received: by 2002:a05:6a00:a82:b0:647:e45f:1a4c with SMTP id b2-20020a056a000a8200b00647e45f1a4cmr522595pfl.11.1686053694900;
+        Tue, 06 Jun 2023 05:14:54 -0700 (PDT)
+Received: from debian.me (subs02-180-214-232-93.three.co.id. [180.214.232.93])
+        by smtp.gmail.com with ESMTPSA id x19-20020a056a00271300b0063d2cd02d69sm6773163pfv.54.2023.06.06.05.14.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 04:36:47 -0700 (PDT)
+        Tue, 06 Jun 2023 05:14:54 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id BD9E2106A3A; Tue,  6 Jun 2023 18:36:43 +0700 (WIB)
-Date:   Tue, 6 Jun 2023 18:36:43 +0700
+        id 5F0B2106A3A; Tue,  6 Jun 2023 19:14:51 +0700 (WIB)
+Date:   Tue, 6 Jun 2023 19:14:51 +0700
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     Franziska Naepelt <franziska.naepelt@googlemail.com>,
         linux-crypto@vger.kernel.org
@@ -59,68 +59,68 @@ Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-kernel@vger.kernel.org,
         Franziska Naepelt <franziska.naepelt@gmail.com>,
         Linux SPDX Licenses <linux-spdx@vger.kernel.org>,
-        Linux Kernel Janitors <kernel-janitors@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] crypto: frcypt Fix checkpatch warnings
-Message-ID: <ZH8aS-rMMKaxRD50@debian.me>
-References: <20230606111042.96855-1-franziska.naepelt@gmail.com>
+        James Morris <jmorris@intercode.com.au>,
+        Steve French <sfrench@samba.org>
+Subject: Re: [PATCH] crypto: md4: Fix checkpatch issues
+Message-ID: <ZH8jO0FO2QJ7eGBV@debian.me>
+References: <20230606112610.98149-1-franziska.naepelt@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="dC9uVHJs6Xkabe7S"
+        protocol="application/pgp-signature"; boundary="ba/Z41R8rl9t+wTp"
 Content-Disposition: inline
-In-Reply-To: <20230606111042.96855-1-franziska.naepelt@gmail.com>
+In-Reply-To: <20230606112610.98149-1-franziska.naepelt@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---dC9uVHJs6Xkabe7S
+--ba/Z41R8rl9t+wTp
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-[Also Cc: linux-spdx list and original author mentioned in the license
-boilerplate]
+On Tue, Jun 06, 2023 at 01:26:10PM +0200, Franziska Naepelt wrote:
+> The following checkpatch issues have been fixed:
+> - WARNING: Missing or malformed SPDX-License-Identifier tag in line 1
+> - ERROR: space required after that ',' (ctx:VxV)
+> - ERROR: space prohibited after that open square bracket '['
+> - WARNING: space prohibited between function name and open parenthesis '('
+> - ERROR: code indent should use tabs where possible
 
-On Tue, Jun 06, 2023 at 01:10:42PM +0200, Franziska Naepelt wrote:
-> The following checkpatch warnings have been fixed:
-> - WARNING: Missing or malformed SPDX-License-Identifier tag
-> - WARNING: Block comments use a trailing */ on a separate line
+Again, please split up into one patch per fixes, as a patch series.
 
-Two different logical changes in a patch - please break them into a
-2-patch series, with each patch do one job. And please write the patch
-description in imperative mood instead (e.g. "Do foo").
+>=20
+> not fixed:
+> - ERROR: space required after that ',' (ctx:VxV)
+> in lines: 64, 65, 66 have not ben fixed due to readability
 
+Can you clearly explain why do you skip #define ROUNDx macros?
+
+> -/*=20
 > +// SPDX-License-Identifier: GPL-2.0-or-later
->  /* FCrypt encryption algorithm
+> +/*
+>   * Cryptographic API.
 >   *
->   * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+>   * MD4 Message Digest Algorithm (RFC1320).
 
-NAK!
-
-There is also BSD 3-clause boilerplate (from original code that fcrypt.c
-is based on). Thus, the proper SPDX tag should have been:
-
-```
-// SPDX-License-Identifier: GPL-2.0-or-later AND BSD-3-Clause
-```
-
-And please also delete the boilerplate.
+What about removing the license boilerplate text below (and thus convert
+to SPDX)? Personally, I prefer having a SPDX conversion series for crypto/
+directory instead.
 
 Thanks.
 
 --=20
 An old man doll... just what I always wanted! - Clara
 
---dC9uVHJs6Xkabe7S
+--ba/Z41R8rl9t+wTp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZH8aSAAKCRD2uYlJVVFO
-o+5nAQDtfVmY2eW2DPOLirsfAmVGuQiWkV0+NL/MsYP9RNXafwD/ZPj7b2dzkhai
-PZb6kQJeq9muOKeXuk5Bf4e3ZxhizAI=
-=p0tN
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZH8jOAAKCRD2uYlJVVFO
+o00BAP9UG2AFI4DVm8DvY97Ml59CFiyeX1FPrNTc5SOzYbrMqAEAqS0rkoBnJn6o
+NtT32bb8/U3dleJsqZ01PleqrLephwk=
+=lzaw
 -----END PGP SIGNATURE-----
 
---dC9uVHJs6Xkabe7S--
+--ba/Z41R8rl9t+wTp--
