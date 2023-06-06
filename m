@@ -2,42 +2,41 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D30C77B7A
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E54C77B73
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 13:10:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238076AbjFFNKr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Jun 2023 09:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38996 "EHLO
+        id S238068AbjFFNKu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 6 Jun 2023 09:10:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238068AbjFFNKq (ORCPT
+        with ESMTP id S238081AbjFFNKs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Jun 2023 09:10:46 -0400
+        Tue, 6 Jun 2023 09:10:48 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8F21732
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:09:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F9E5172B
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 06:09:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686056957;
+        s=mimecast20190719; t=1686056951;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KDpL8BPNYzeJ3nB0d/6Bztw2bGaLmYC/5kDf71ULNUE=;
-        b=IbQ+3e2DquaK5BJL+qzLe9yAKSxwm5rGq5SxjDM0AAsUcqoqheGOh+1Nx7bnbfHOGK2n5G
-        SZ7e8LAh0exnVAc7VdjGZrca/+Wb0kly/4Uzv7V9zIK16uU1Gxz3kTtgyNUnRgK3M6BkAD
-        auTi5SyEgK+heb6sRBCzbP4P3rJ7SmY=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xU6E2fjjhcVwKorersDkYRkNjPEQVcB/v3lc/5jlH4Q=;
+        b=eq63PwoJkDHngCBkU0HdNd+ubLNblS0MPBb++auwlgg9ITZye8gPL8mLE8tBsIQJrCP1/5
+        PRDbJ95sKPqHUwEI5IyjjZZMiGlUNC4+n3VL0zYiBqx189Zi8dC6y6GeqLzVk1ygVZq8xr
+        5MycMWieSH1maLIf5Q3nyQHeIXyWta0=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-530-v4pgZxVdNFW6ROdtC_lYfw-1; Tue, 06 Jun 2023 09:09:16 -0400
-X-MC-Unique: v4pgZxVdNFW6ROdtC_lYfw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-648-zAky1qSONByxa_4w_IiLQw-1; Tue, 06 Jun 2023 09:09:05 -0400
+X-MC-Unique: zAky1qSONByxa_4w_IiLQw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43DE2185A7A7;
-        Tue,  6 Jun 2023 13:09:15 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C5BED8039B6;
+        Tue,  6 Jun 2023 13:09:04 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 11E012026D6A;
-        Tue,  6 Jun 2023 13:09:11 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7DCF64022C5;
+        Tue,  6 Jun 2023 13:09:02 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     netdev@vger.kernel.org
 Cc:     David Howells <dhowells@redhat.com>,
@@ -50,73 +49,86 @@ Cc:     David Howells <dhowells@redhat.com>,
         David Ahern <dsahern@kernel.org>,
         Matthew Wilcox <willy@infradead.org>,
         Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        Simon Horman <simon.horman@corigine.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: [PATCH net-next v3 02/10] Fix a couple of spelling mistakes
-Date:   Tue,  6 Jun 2023 14:08:48 +0100
-Message-ID: <20230606130856.1970660-3-dhowells@redhat.com>
-In-Reply-To: <20230606130856.1970660-1-dhowells@redhat.com>
-References: <20230606130856.1970660-1-dhowells@redhat.com>
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 00/10] crypto, splice, net: Make AF_ALG handle sendmsg(MSG_SPLICE_PAGES)
+Date:   Tue,  6 Jun 2023 14:08:46 +0100
+Message-ID: <20230606130856.1970660-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix a couple of spelling mistakes in a comment.
+Here are patches to make AF_ALG handle the MSG_SPLICE_PAGES internal
+sendmsg flag.  MSG_SPLICE_PAGES is an internal hint that tells the protocol
+that it should splice the pages supplied if it can.  The sendpage functions
+are then turned into wrappers around that.
 
-Suggested-by: Simon Horman <simon.horman@corigine.com>
-Link: https://lore.kernel.org/r/ZHH2mSRqeL4Gs1ft@corigine.com/
-Link: https://lore.kernel.org/r/ZHH1nqZWOGzxlidT@corigine.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Steve French <sfrench@samba.org>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: Rohith Surabattula <rohiths.msft@gmail.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-crypto@vger.kernel.org
-cc: linux-cachefs@redhat.com
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- fs/netfs/iterator.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This set consists of the following parts:
 
-diff --git a/fs/netfs/iterator.c b/fs/netfs/iterator.c
-index f8eba3de1a97..f41a37bca1e8 100644
---- a/fs/netfs/iterator.c
-+++ b/fs/netfs/iterator.c
-@@ -312,7 +312,7 @@ static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
- }
- 
- /**
-- * extract_iter_to_sg - Extract pages from an iterator and add ot an sglist
-+ * extract_iter_to_sg - Extract pages from an iterator and add to an sglist
-  * @iter: The iterator to extract from
-  * @maxsize: The amount of iterator to copy
-  * @sgtable: The scatterlist table to fill in
-@@ -332,7 +332,7 @@ static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
-  * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA
-  * be allowed on the pages extracted.
-  *
-- * If successul, @sgtable->nents is updated to include the number of elements
-+ * If successful, @sgtable->nents is updated to include the number of elements
-  * added and the number of bytes added is returned.  @sgtable->orig_nents is
-  * left unaltered.
-  *
+ (1) Move netfs_extract_iter_to_sg() to somewhere more general and rename
+     it to drop the "netfs" prefix.  We use this to extract directly from
+     an iterator into a scatterlist.
+
+ (2) Make AF_ALG use iov_iter_extract_pages().  This has the additional
+     effect of pinning pages obtained from userspace rather than taking
+     refs on them.  Pages from kernel-backed iterators would not be pinned,
+     but AF_ALG isn't really meant for use by kernel services.
+
+ (3) Change AF_ALG still further to use extract_iter_to_sg().
+
+ (4) Make af_alg_sendmsg() support MSG_SPLICE_PAGES support and make
+     af_alg_sendpage() just a wrapper around sendmsg().  This has to take
+     refs on the pages pinned for the moment.
+
+ (5) Make hash_sendmsg() support MSG_SPLICE_PAGES by simply ignoring it.
+     hash_sendpage() is left untouched to be removed later, after the
+     splice core has been changed to call sendmsg().
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=sendpage-2-alg
+
+David
+
+ver #3)
+ - Rebase and deal with fs/cifs/ moving.
+ - Reimpose the ALG_MAX_PAGES limit in hash_sendmsg() for kernel iters.
+ - Remove BVEC iter restriction when using MSG_SPLICE_PAGES.
+
+ver #2)
+ - Put the "netfs_" prefix removal first to shorten lines and avoid
+   checkpatch 80-char warnings.
+ - Fix a couple of spelling mistakes.
+ - Wrap some lines at 80 chars.
+
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=51c78a4d532efe9543a4df019ff405f05c6157f6 # part 1
+Link: https://lore.kernel.org/r/20230526143104.882842-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20230530141635.136968-1-dhowells@redhat.com/ # v2
+
+David Howells (10):
+  Drop the netfs_ prefix from netfs_extract_iter_to_sg()
+  Fix a couple of spelling mistakes
+  Wrap lines at 80
+  Move netfs_extract_iter_to_sg() to lib/scatterlist.c
+  crypto: af_alg: Pin pages rather than ref'ing if appropriate
+  crypto: af_alg: Use extract_iter_to_sg() to create scatterlists
+  crypto: af_alg: Indent the loop in af_alg_sendmsg()
+  crypto: af_alg: Support MSG_SPLICE_PAGES
+  crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+  crypto: af_alg/hash: Support MSG_SPLICE_PAGES
+
+ crypto/af_alg.c           | 181 +++++++++++--------------
+ crypto/algif_aead.c       |  38 +++---
+ crypto/algif_hash.c       | 110 ++++++++++------
+ crypto/algif_skcipher.c   |  10 +-
+ fs/netfs/iterator.c       | 266 -------------------------------------
+ fs/smb/client/smb2ops.c   |   4 +-
+ fs/smb/client/smbdirect.c |   2 +-
+ include/crypto/if_alg.h   |   7 +-
+ include/linux/netfs.h     |   4 -
+ include/linux/uio.h       |   5 +
+ lib/scatterlist.c         | 269 ++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 451 insertions(+), 445 deletions(-)
 
