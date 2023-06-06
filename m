@@ -2,48 +2,48 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C81C77B73
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8BAC7EE2A
 	for <linux-crypto@archiver.kernel.org>; Tue,  6 Jun 2023 17:32:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237989AbjFFRcJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S238396AbjFFRcJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 6 Jun 2023 13:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39374 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238431AbjFFRcH (ORCPT
+        with ESMTP id S238534AbjFFRcH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 6 Jun 2023 13:32:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 724B21739
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 10:31:45 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB951707
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 10:31:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0D8E76361C
-        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 17:31:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68A88C4339E;
-        Tue,  6 Jun 2023 17:31:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7C2F362B3C
+        for <linux-crypto@vger.kernel.org>; Tue,  6 Jun 2023 17:31:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFE2C4339C;
+        Tue,  6 Jun 2023 17:31:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686072704;
-        bh=COgrZ1YXlLvADfpqRNR2ZPciDf8oE9re8kVj5fLwNG8=;
+        s=k20201202; t=1686072705;
+        bh=ZHGtpuKKtqq1E75hZzNwkwZTjilt2miWhf5UUu3HCTw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dBgde/DkLUxNzJpAPNbjE4cltWTqoL0PJ+tbjmXCJV6wLyv14mXeppT5FuXxJsZw+
-         GoxfYh9c3r1jATropDp5WNJltDpnugaY4WJLDNWPwnC/j7nGMaMIf39YZpRU+kINtd
-         ToRjnL4klHqpjb8I9eqqDhx+8oAl4z24Lk2CekTbBF/4qthQ3N7AwJmziZ0CcsMYSL
-         hKqjE2noS5VQjfMzL14hrydqbLeTwJkRQ0FHGDxc3CHWh0+Mr7uhdz7GdImCcwvr+h
-         QR62A2hAPxX/SWNlGPA+MIWqp95NkAV6SDgiBOtgVe7ta66zXTq0i+uYAuXK1wP6hr
-         ZNNVHed+2mRgA==
+        b=JkZTRzNiYpP/WUFcc9rHR+O9+lG4zKdPaGBiZR5vzi7/SBN0Jnrz1LGMo9gkBOFnc
+         JtsTBMQAoBiSLddZppuPgKXYZJ+qDXGJwfk9jMHskEUI+mTlvTa0bL+aJmuHILMM3L
+         uKhYnO8FVnk8u9YSycJGFSMhUsxyjEoz9WZv4yaZgpu3Xu7cCqn4rTESPndeUjDKXT
+         QdjMjve8r8MKpWLYbHoF+Av0AN5pTe2UaVRZnWhYDS5aucmzvtkCEIdCYEqCn6XjcH
+         sxgAWvlrV5+Cd8aT+a5ikj0hREAHSdnI/UbpqaoCfs+IwPkVHm7UHKWr2Zw02ZOcRW
+         6Teo4LElQkbbQ==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 1/3] crypto: arm64 - add some missing SPDX headers
-Date:   Tue,  6 Jun 2023 19:31:25 +0200
-Message-Id: <20230606173127.4050254-2-ardb@kernel.org>
+Subject: [PATCH 2/3] crypto: arm - add some missing SPDX headers
+Date:   Tue,  6 Jun 2023 19:31:26 +0200
+Message-Id: <20230606173127.4050254-3-ardb@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230606173127.4050254-1-ardb@kernel.org>
 References: <20230606173127.4050254-1-ardb@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5545; i=ardb@kernel.org; h=from:subject; bh=COgrZ1YXlLvADfpqRNR2ZPciDf8oE9re8kVj5fLwNG8=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIaU+NzN4VlcK17myRZuee3EuYd3f+Tb7R27DrlDjI+9NR BLquGZ1lLIwiHEwyIopsgjM/vtu5+mJUrXOs2Rh5rAygQxh4OIUgIk43GL4n298dJV4+rPoi91z lm592vx4xpK1T/ojhFOZDjJart/2JYSRodvU7dQOyy3bLrooqS1ec0X8oe3xNxEberzOJrt8zd3 +lA0A
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6151; i=ardb@kernel.org; h=from:subject; bh=ZHGtpuKKtqq1E75hZzNwkwZTjilt2miWhf5UUu3HCTw=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIaU+N/vsOsPLCeIT3t+M3iiUozUlz1+7Nfl9iN+kqYLlW sH3XQw6SlkYxDgYZMUUWQRm/3238/REqVrnWbIwc1iZQIYwcHEKwEQa0xkZTu2LcP/JHJryvsFH 02tJ7E+TTZ1Nra43pJ7Nv5Pcsz7tGsP/LMFbf/hvLRW+9uutdtPC2dasz/ZeSeE/I5DIqHvqvM0 jDgA=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -51,60 +51,33 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Add some missing SPDX headers, and drop the associated boilerplate
-license text to/from the arm64 implementations of ChaCha and CRC-T10DIF.
+license text to/from the ARM implementations of ChaCha, CRC-32 and
+CRC-T10DIF.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/chacha-neon-core.S  | 10 +----
- arch/arm64/crypto/chacha-neon-glue.c  | 10 +----
- arch/arm64/crypto/crct10dif-ce-core.S | 40 +-------------------
- 3 files changed, 3 insertions(+), 57 deletions(-)
+ arch/arm/crypto/chacha-neon-core.S  | 10 +----
+ arch/arm/crypto/crc32-ce-core.S     | 30 ++-------------
+ arch/arm/crypto/crct10dif-ce-core.S | 40 +-------------------
+ 3 files changed, 5 insertions(+), 75 deletions(-)
 
-diff --git a/arch/arm64/crypto/chacha-neon-core.S b/arch/arm64/crypto/chacha-neon-core.S
-index b70ac76f2610ce08..400c6239321aa7bc 100644
---- a/arch/arm64/crypto/chacha-neon-core.S
-+++ b/arch/arm64/crypto/chacha-neon-core.S
+diff --git a/arch/arm/crypto/chacha-neon-core.S b/arch/arm/crypto/chacha-neon-core.S
+index 13d12f672656bb8d..46d708118ef948ec 100644
+--- a/arch/arm/crypto/chacha-neon-core.S
++++ b/arch/arm/crypto/chacha-neon-core.S
 @@ -1,21 +1,13 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
  /*
   * ChaCha/XChaCha NEON helper functions
   *
-  * Copyright (C) 2016-2018 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-  *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2 as
-- * published by the Free Software Foundation.
-- *
-  * Originally based on:
-  * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSSE3 functions
-  *
-  * Copyright (C) 2015 Martin Willi
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation; either version 2 of the License, or
-- * (at your option) any later version.
-  */
- 
- #include <linux/linkage.h>
-diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
-index af2bbca38e70fb35..c61152d6d9bd2137 100644
---- a/arch/arm64/crypto/chacha-neon-glue.c
-+++ b/arch/arm64/crypto/chacha-neon-glue.c
-@@ -1,22 +1,14 @@
-+// SPDX-License-Identifier: GPL-2.0-only
- /*
-  * ARM NEON and scalar accelerated ChaCha and XChaCha stream ciphers,
-  * including ChaCha20 (RFC7539)
-  *
-  * Copyright (C) 2016 - 2017 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+  * Copyright (C) 2016 Linaro, Ltd. <ard.biesheuvel@linaro.org>
   *
 - * This program is free software; you can redistribute it and/or modify
 - * it under the terms of the GNU General Public License version 2 as
 - * published by the Free Software Foundation.
 - *
   * Based on:
-  * ChaCha20 256-bit cipher algorithm, RFC7539, SIMD glue code
+  * ChaCha20 256-bit cipher algorithm, RFC7539, x64 SSE3 functions
   *
   * Copyright (C) 2015 Martin Willi
 - *
@@ -114,15 +87,60 @@ index af2bbca38e70fb35..c61152d6d9bd2137 100644
 - * (at your option) any later version.
   */
  
- #include <crypto/algapi.h>
-diff --git a/arch/arm64/crypto/crct10dif-ce-core.S b/arch/arm64/crypto/crct10dif-ce-core.S
-index 5604de61d06d04ee..bebdf4c72a5013c2 100644
---- a/arch/arm64/crypto/crct10dif-ce-core.S
-+++ b/arch/arm64/crypto/crct10dif-ce-core.S
+  /*
+diff --git a/arch/arm/crypto/crc32-ce-core.S b/arch/arm/crypto/crc32-ce-core.S
+index 3f13a76b9066e0f6..228a1f298f24d3d0 100644
+--- a/arch/arm/crypto/crc32-ce-core.S
++++ b/arch/arm/crypto/crc32-ce-core.S
+@@ -1,37 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Accelerated CRC32(C) using ARM CRC, NEON and Crypto Extensions instructions
+  *
+  * Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 as
+- * published by the Free Software Foundation.
+- */
+-
+-/* GPL HEADER START
+- *
+- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 only,
+- * as published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * General Public License version 2 for more details (a copy is included
+- * in the LICENSE file that accompanied this code).
+- *
+- * You should have received a copy of the GNU General Public License
+- * version 2 along with this program; If not, see http://www.gnu.org/licenses
+- *
+- * Please  visit http://www.xyratex.com/contact if you need additional
+- * information or have any questions.
+- *
+- * GPL HEADER END
+  */
+ 
+ /*
++ * Derived from the x86 SSE version:
++ *
+  * Copyright 2012 Xyratex Technology Limited
+  *
+  * Using hardware provided PCLMULQDQ instruction to accelerate the CRC32
+diff --git a/arch/arm/crypto/crct10dif-ce-core.S b/arch/arm/crypto/crct10dif-ce-core.S
+index 46c02c518a300ab0..5d24448fae1ccacb 100644
+--- a/arch/arm/crypto/crct10dif-ce-core.S
++++ b/arch/arm/crypto/crct10dif-ce-core.S
 @@ -1,13 +1,10 @@
 +/* SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause */
  //
- // Accelerated CRC-T10DIF using arm64 NEON and Crypto Extensions instructions
+ // Accelerated CRC-T10DIF using ARM NEON and Crypto Extensions instructions
  //
  // Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
  // Copyright (C) 2019 Google LLC <ebiggers@google.com>
