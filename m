@@ -2,65 +2,65 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40ED3C7EE23
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 15:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3970FC77B7A
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 15:39:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240756AbjFGPZ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jun 2023 11:25:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33636 "EHLO
+        id S241423AbjFGPjV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jun 2023 11:39:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241589AbjFGPZL (ORCPT
+        with ESMTP id S241418AbjFGPjQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2023 11:25:11 -0400
+        Wed, 7 Jun 2023 11:39:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 141D226AD
-        for <linux-crypto@vger.kernel.org>; Wed,  7 Jun 2023 08:23:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 052A583
+        for <linux-crypto@vger.kernel.org>; Wed,  7 Jun 2023 08:38:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686151377;
+        s=mimecast20190719; t=1686152311;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+21+UJe7FXTwrAHp4Kil2Yb3E5Xx9Nc7BO+F/S0Qdi8=;
-        b=FjSvRavTq2dj36DT92ds+z7J03yEPL0n3edaviRe5m2qHRNkIzFxfPDnirfyVJXaJ+e7Ej
-        x9sEqAFAjo4Sgu5eOiIBkYOXE3z3ljJbAGkyzDdjGK6kjw/YuugTXluwM2jX3DLrTYDIz1
-        JhIrRddNNSRCqWTuVurg/wQ1CEAvQ9w=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=zHVq+AaJsRP3MMD5HoVnegJq1rhI+iZeYf1Kj+A0Nvo=;
+        b=TssTSqZ+3E/UfDqo0W67A1o/MbwPonadgsI6PrBdmixASQapSKAgmtkPK9tZ/Tzjl0B20c
+        hBvVZ8WMBgcNYb4BkLFdZI8es9zkA0kANX7oXmTG88Oq1n0G1aH6atPrGK2WSrph7i/+ZN
+        Gxfw9PygbJiFaO3QuUeN9xZS8g8xioo=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-La3RqIe-NhWP3e92sFNq5w-1; Wed, 07 Jun 2023 09:47:45 -0400
-X-MC-Unique: La3RqIe-NhWP3e92sFNq5w-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-62627366ebeso79286426d6.3
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Jun 2023 06:47:45 -0700 (PDT)
+ us-mta-404-_5Q3TiKOMCqkvEYz_MUNGQ-1; Wed, 07 Jun 2023 09:56:14 -0400
+X-MC-Unique: _5Q3TiKOMCqkvEYz_MUNGQ-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-62b6762db6cso12571656d6.0
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Jun 2023 06:56:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686145665; x=1688737665;
+        d=1e100.net; s=20221208; t=1686146174; x=1688738174;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+21+UJe7FXTwrAHp4Kil2Yb3E5Xx9Nc7BO+F/S0Qdi8=;
-        b=l6F6a9PdPxY6Y5ihoVziVIKuWW6Q6Uqh/OxJiarYRbVs8954ulhGOmr2c0x45NTp5C
-         i+zXiQtRIE3A2GKKo9W2R4jU8lsQOWlW6wBNqRSpjWlUE5WRwRwyw60LgHmuE2K4kmJd
-         M36AUXZkZw//aJQXRR4/6hllwR3/+RPRYwzutmbRZO4BRPt5MXxfctyAAMEAg7diues1
-         oRhGt7fC9rkYCVr7OlJFikDtcHPOpR3nrTV0Wa1a9vQx0M0LzF6YFTAZ+cD9lGf7IRkr
-         KUrXH26d4UkQhMMozE9Quv7jaPGGK5S1cMuBXn2saH/rPnCj+851GTbusyfgq86X4hlx
-         cQAw==
-X-Gm-Message-State: AC+VfDztxYcbrAImcJ19ktpqFDgJM3AmT/nBbUdGrDUIo7YJV2wJwujj
-        MioNx5/QqYmar5THPfprLylW7Swi64Yg6FAcFJgoBWcyqJ3YQ9CMz9y3k4HiFShIPcg1Siu+IdG
-        hZfsgqGMp0eEvVGqyC/14WXnDPmrcb/xTsr/SK4Qd
-X-Received: by 2002:a05:6214:2a4c:b0:625:aa48:e628 with SMTP id jf12-20020a0562142a4c00b00625aa48e628mr3798652qvb.56.1686145665034;
-        Wed, 07 Jun 2023 06:47:45 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5LqxdVGt9gx33r5P7dquZMC9hoYE8QxbVMlD5LrvGUwG/TxPa0OKI696JmPUonIqCwR3J+uW/uXUU6LYLmhZE=
-X-Received: by 2002:a05:6214:2a4c:b0:625:aa48:e628 with SMTP id
- jf12-20020a0562142a4c00b00625aa48e628mr3798623qvb.56.1686145664752; Wed, 07
- Jun 2023 06:47:44 -0700 (PDT)
+        bh=zHVq+AaJsRP3MMD5HoVnegJq1rhI+iZeYf1Kj+A0Nvo=;
+        b=HQ8hogFBNGKvufPRicaqSC3bkqFjTmMjJHwMra6cNIaccDkdtUQvSy1YGBs5NLG0d3
+         7ClusSevlUUk5TppwXVkUmCvS8693cJcioKv1m5wi/FPETOUwv8+Aeg3aC6RuVDln6bo
+         TljiTt9P25RK9YOpdjW5DF/I8Cy+SfjaYDjZfkY0ds8mp7l3xou3AFtnXeK6+L4HLr7Z
+         THrCGYDU77+/l532GPtQo4crRVOwimnz5QxGUdWdDw/ocb/x89aleiECp1TLu/y/WKZ9
+         Xokh+N+eNCrk841vKJNT3YXx84fgiPZhjSoR28nkNzsrHxV8KqOFb9t3HmRt9hsOXz8E
+         qsgQ==
+X-Gm-Message-State: AC+VfDytT3PJe0N6jcm9BsTSIWkFHD0B8lgnr0/fh9IqBwBfnfMBQUbw
+        767n49mwK41GYP6c4j1YxoqGuFwbnFBOkHCgQAIP6I4up3IP4mQ9uD5nUpg3Tc9S1aw0NDAFEkM
+        hZEc5fO89w+r5+42dq35dLbgHiqvvhtnJL0vq0UnN
+X-Received: by 2002:a05:6214:d0a:b0:626:17b2:5583 with SMTP id 10-20020a0562140d0a00b0062617b25583mr2995560qvh.0.1686146174417;
+        Wed, 07 Jun 2023 06:56:14 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5HEDyEyI1XjMl1yL6Vf9kP387Y6xhzYFVTHowmTz0vgcWT3RbgWM1B06oyD5ILkdVw/rYU26DuplYERBf00D8=
+X-Received: by 2002:a05:6214:d0a:b0:626:17b2:5583 with SMTP id
+ 10-20020a0562140d0a00b0062617b25583mr2995538qvh.0.1686146174135; Wed, 07 Jun
+ 2023 06:56:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230607053940.39078-10-bagasdotme@gmail.com> <20230607053940.39078-18-bagasdotme@gmail.com>
-In-Reply-To: <20230607053940.39078-18-bagasdotme@gmail.com>
+References: <20230607053940.39078-10-bagasdotme@gmail.com> <20230607053940.39078-13-bagasdotme@gmail.com>
+In-Reply-To: <20230607053940.39078-13-bagasdotme@gmail.com>
 From:   Richard Fontana <rfontana@redhat.com>
-Date:   Wed, 7 Jun 2023 09:47:33 -0400
-Message-ID: <CAC1cPGx-mD0DAEanCFtoxoGRyHkcu-GTTNX=ePzjhb8XM+73mg@mail.gmail.com>
-Subject: Re: [PATCH 8/8] crypto: cts: Convert MIT boilerplate to corresponding
- SPDX license identifier
+Date:   Wed, 7 Jun 2023 09:56:03 -0400
+Message-ID: <CAC1cPGzZGWxS1qdKZkMuHrCenegje-M0QE0tFG5UotHAjN5vmQ@mail.gmail.com>
+Subject: Re: [PATCH 3/8] crypto: drbg: Convert dual BSD 3-Clause/GPL-1.0
+ license boilerplate to SPDX identifier
 To:     Bagas Sanjaya <bagasdotme@gmail.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -72,7 +72,8 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
-        Dan Carpenter <dan.carpenter@linaro.org>
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Stephan Mueller <smueller@chronox.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -82,59 +83,74 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 On Wed, Jun 7, 2023 at 1:41=E2=80=AFAM Bagas Sanjaya <bagasdotme@gmail.com>=
  wrote:
 >
-> License boilerplate in CTS mode implementation (crypto/cts.c) looks like
-> MIT license with advertising clause. Replace it with correspondig
-> SPDX tag.
+> Replace the boilerplate with corresponding SPDX tag. Since there is no
+> explicit GPL version, assume GPL 1.0+.
 >
+> Cc: Stephan Mueller <smueller@chronox.de>
 > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 > ---
->  crypto/cts.c | 24 +-----------------------
->  1 file changed, 1 insertion(+), 23 deletions(-)
+>  crypto/drbg.c | 33 +--------------------------------
+>  1 file changed, 1 insertion(+), 32 deletions(-)
 >
-> diff --git a/crypto/cts.c b/crypto/cts.c
-> index 8f604f6554b1c3..9ec7e9787c0f6a 100644
-> --- a/crypto/cts.c
-> +++ b/crypto/cts.c
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index ff4ebbc68efab1..f797deaf3952ef 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
 > @@ -1,3 +1,4 @@
-> +// SPDX-License-Identifier: MIT
+> +// SPDX-License-Identifier: BSD-3-Clause OR GPL-1.0+
 >  /*
->   * CTS: Cipher Text Stealing mode
+>   * DRBG: Deterministic Random Bits Generator
+>   *       Based on NIST Recommended DRBG from NIST SP800-90A with the fol=
+lowing
+> @@ -9,38 +10,6 @@
 >   *
-> @@ -5,29 +6,6 @@
->   * The Regents of the University of Michigan
->   * ALL RIGHTS RESERVED
+>   * Copyright Stephan Mueller <smueller@chronox.de>, 2014
 >   *
-> - * Permission is granted to use, copy, create derivative works
-> - * and redistribute this software and such derivative works
-> - * for any purpose, so long as the name of The University of
-> - * Michigan is not used in any advertising or publicity
-> - * pertaining to the use of distribution of this software
-> - * without specific, written prior authorization.  If the
-> - * above copyright notice or any other identification of the
-> - * University of Michigan is included in any copy of any
-> - * portion of this software, then the disclaimer below must
-> - * also be included.
+> - * Redistribution and use in source and binary forms, with or without
+> - * modification, are permitted provided that the following conditions
+> - * are met:
+> - * 1. Redistributions of source code must retain the above copyright
+> - *    notice, and the entire permission notice in its entirety,
+> - *    including the disclaimer of warranties.
+> - * 2. Redistributions in binary form must reproduce the above copyright
+> - *    notice, this list of conditions and the following disclaimer in th=
+e
+> - *    documentation and/or other materials provided with the distributio=
+n.
+> - * 3. The name of the author may not be used to endorse or promote
+> - *    products derived from this software without specific prior
+> - *    written permission.
 > - *
-> - * THIS SOFTWARE IS PROVIDED AS IS, WITHOUT REPRESENTATION
-> - * FROM THE UNIVERSITY OF MICHIGAN AS TO ITS FITNESS FOR ANY
-> - * PURPOSE, AND WITHOUT WARRANTY BY THE UNIVERSITY OF
-> - * MICHIGAN OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING
-> - * WITHOUT LIMITATION THE IMPLIED WARRANTIES OF
-> - * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-> - * REGENTS OF THE UNIVERSITY OF MICHIGAN SHALL NOT BE LIABLE
-> - * FOR ANY DAMAGES, INCLUDING SPECIAL, INDIRECT, INCIDENTAL, OR
-> - * CONSEQUENTIAL DAMAGES, WITH RESPECT TO ANY CLAIM ARISING
-> - * OUT OF OR IN CONNECTION WITH THE USE OF THE SOFTWARE, EVEN
-> - * IF IT HAS BEEN OR IS HEREAFTER ADVISED OF THE POSSIBILITY OF
-> - * SUCH DAMAGES.
->   */
+> - * ALTERNATIVELY, this product may be distributed under the terms of
+> - * the GNU General Public License, in which case the provisions of the G=
+PL are
+> - * required INSTEAD OF the above restrictions.  (This clause is
+> - * necessary due to a potential bad interaction between the GPL and
+> - * the restrictions contained in a BSD-style copyright.)
+> - *
+> - * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
+> - * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+> - * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
+> - * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
+> - * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+> - * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+> - * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+> - * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+> - * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+> - * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+> - * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
+> - * DAMAGE.
 
-This is not the MIT license (as defined by SPDX) - there may not be an
-SPDX identifier covering this license text.
+The non-GPL portion of this notice does not match BSD-3-Clause as
+currently defined by SPDX (see:
+https://github.com/spdx/license-list-XML/blob/main/src/BSD-3-Clause.xml).
+This is at least the third time in your recent patches that you have
+assumed that a non-GPL license matches a particular SPDX identifier
+without (apparently) checking.
 
-This is at least the second time in your recent patches where you have
-assumed that a non-GPL license corresponds to a particular SPDX
-identifier without (apparently) checking.
+That's assuming it's appropriate to represent this as a dual license
+and omit the 'ALTERNATIVELY' parenthetical. I'm not sure how I feel
+about that.
 
 Richard
 
