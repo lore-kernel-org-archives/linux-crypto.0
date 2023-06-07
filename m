@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2772C7EE23
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 05:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B83D2C87FDD
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 05:40:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234256AbjFGFkM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jun 2023 01:40:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36960 "EHLO
+        id S233006AbjFGFkN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jun 2023 01:40:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233947AbjFGFkL (ORCPT
+        with ESMTP id S233925AbjFGFkL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 7 Jun 2023 01:40:11 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86CA21BC9;
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6761BCE;
         Tue,  6 Jun 2023 22:40:05 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-25669acf1b0so6001654a91.0;
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-5144a9c11c7so6382310a12.2;
         Tue, 06 Jun 2023 22:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20221208; t=1686116405; x=1688708405;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v/Rzvp7nuogI5Ectr3FY2yXKUolZXQo8yN+TgASj1xc=;
-        b=MRdW5VFR6T30zctQdM6ToETADfjr+NIYOTbXzxRMTnkXkJnGTAKDUX8DYwKWJz31MT
-         IMWgL378x/sh0JVf0p/3cwfdC4T/J+337WiXTKrEU663M9fmQZDMLJG0lG4zMVkZaPoi
-         uvaxht7Hrt0VDtTvzbRbKlF07audtIoM9/TfGPnardXUX2VJxWKwKd/Yt/TqybjN4Nu4
-         z1Vw0Z137dmhbRuTLajHHRupMJwctKjh5jp2egBgRwOnM7mQhc+XGdBbd7HvQn0j0D7g
-         LQ/pYoQEUWPiNxNCjWlMWbAGt16KyvanCJSPjgfWInHfWM9aCr8Bkh5L5IOLhAPs3Scv
-         l+ZA==
+        bh=6+8UPp0cZHZIddVOMxW5nsY5DBDHJWP3+5gafJdKjQI=;
+        b=YovnA9P62qNMyWJjBcA9I69J6z5SjieW+klJnmPS2c0NJ+9bPaZHJmktJ1JXckJVVv
+         SN4LdeRvIFES24Qc2/s6GRXWPWW5y7sCRGTtLKgmNsIb2IDTjf3OWSPgKgm0ETeCjEm8
+         89rC96pa7SM4wFXEncmDC2KAyqKlsNeyADRy5wnxTUiTSEauVnuhOchS5p4ZOAHLe+pj
+         JXCKPsWhlBi5QKQy3FHmG5RlSHQdMA2N+H+oHaCA9oA5yCzRd4X8EEld3q4DqZJZyT0D
+         3XJliktDnlgLZ2RaBJKM76we4c/X3i/RRz/cajZFQyh0cBahVK5TuwEyKMjNUoKmc8oX
+         Sw1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1686116405; x=1688708405;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v/Rzvp7nuogI5Ectr3FY2yXKUolZXQo8yN+TgASj1xc=;
-        b=RTgk27F+zZ5C8L+JfQ9QEh5Z1zw/RtNW1MtSlitxq69lW0aDcpuuPxa4bAOCmenwf9
-         ZcR061EBbSo2yAgl12QMn5vfycBZtEbuSf91itLBxNotIwtGyujDjbxgZ5UA8nJ4MFgc
-         r7ipWDhmbWM620RcvK/Ibz7s0RM5SSrw6Jpk0aNu4qY3lZ1lBbZupzJXNS/iyQxymLBh
-         yFcCxb9YEBryhGKXHLQFeiijSvq9S8VS+RM6BQLAxtTrl48TVz9qWR8VKfsAA4BGPMGV
-         xnPHT0RsOn6hpozsgjNvpTAk5aZckrZl4h2n0IvP0jMzB6nTV2U1ewpS0ENBDxo8oM3r
-         xEgg==
-X-Gm-Message-State: AC+VfDziC60uqw+PTV5WP/umUis5osdJBzUgMWdvEqBPxhPnQYlpdP11
-        afwb10ELags2dkuwt4HKoVI=
-X-Google-Smtp-Source: ACHHUZ5mhizpDI1GSpP3Pe8ZLSwtX30DWzdzw/ugaG/JesMxJWpE7LEHYCiF048V2NzngDt/CM3F8A==
-X-Received: by 2002:a17:90a:50:b0:256:35f0:a2b0 with SMTP id 16-20020a17090a005000b0025635f0a2b0mr4167122pjb.0.1686116404968;
-        Tue, 06 Jun 2023 22:40:04 -0700 (PDT)
+        bh=6+8UPp0cZHZIddVOMxW5nsY5DBDHJWP3+5gafJdKjQI=;
+        b=dyWELoc+GDO3VqKPweyJjE13sB7OglyrxhRR5BLX9Zdb+PVdM41Cy6ogMawy5EAuqA
+         1eFKprU6zXFyfDwR6n8E1ywF1efkj/Z2A1ZpWO/1+mCcmlu7lA7giNG6TGIwlSRzCr4q
+         3bT1eFh1sl/jUK86WQg3oMNCm5ccCtmv0cvpiJhViAiyNw6DnGUMrxzHhIaZWyYjwQSR
+         BmVf9sie09GY0M02L/fhtH0riDDJr+ASSVb4+i2arULpPf4dkQbJFi3xrJ6hPb8c2rb8
+         ox0T6U4gqyob3hyMzybsjf/B5xBCwsHR7iENqsMIv4ZXgQWTbLeWat5bbDJOHb15lM9m
+         mrdA==
+X-Gm-Message-State: AC+VfDw7kFPXdiTDxw1ZlludY0fZ0huT9AkfiEeEUswdxjDHem2Q6r6Y
+        SEYrgXTgMCCwLpWQODnk4EM=
+X-Google-Smtp-Source: ACHHUZ5KDCaSA69ynZiyIKoO8lR256jraZo4SDPJo1wNlaDfijTQdbJgkTXjTJ63OEWwV+43YurifA==
+X-Received: by 2002:a05:6a20:a20d:b0:118:520:765a with SMTP id u13-20020a056a20a20d00b001180520765amr1468885pzk.61.1686116405227;
+        Tue, 06 Jun 2023 22:40:05 -0700 (PDT)
 Received: from debian.me (subs28-116-206-12-58.three.co.id. [116.206.12.58])
-        by smtp.gmail.com with ESMTPSA id s24-20020a170902989800b001b03b7f8adfsm887243plp.246.2023.06.06.22.40.03
+        by smtp.gmail.com with ESMTPSA id ev21-20020a17090aead500b00256833cd9a4sm468624pjb.54.2023.06.06.22.40.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 06 Jun 2023 22:40:04 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id E96DA1069BF; Wed,  7 Jun 2023 12:39:59 +0700 (WIB)
+        id 5A2421069B8; Wed,  7 Jun 2023 12:39:59 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -64,86 +64,66 @@ Cc:     Linux SPDX Licenses <linux-spdx@vger.kernel.org>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Dan Carpenter <dan.carpenter@linaro.org>,
-        Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH 2/8] crypto: fcrypt: Replace dual BSD 3-Clause/GPL 2.0+ boilerplate with SPDX identifier
-Date:   Wed,  7 Jun 2023 12:39:43 +0700
-Message-ID: <20230607053940.39078-12-bagasdotme@gmail.com>
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Salvatore Benedetto <salvatore.benedetto@intel.com>
+Subject: [PATCH 4/8] crypto: ecc: Replace BSD 2-Clause license boilerplate with SPDX identifier
+Date:   Wed,  7 Jun 2023 12:39:45 +0700
+Message-ID: <20230607053940.39078-14-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230607053940.39078-10-bagasdotme@gmail.com>
 References: <20230607053940.39078-10-bagasdotme@gmail.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3010; i=bagasdotme@gmail.com; h=from:subject; bh=unGm1pNbGyn58qqwh1tYYYzr9eXLpvqklZLnWANRr3c=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDCkNErKuC54tXHCL7aHmg5/TT/aalBxOWmyw3Xnesbub7 8wumMrC3lHKwiDGxSArpsgyKZGv6fQuI5EL7WsdYeawMoEMYeDiFICJ+LEzMtwqqZ7R935636ag WddOsIf+fjX3D7f8Mrb/uncO3u35lneP4b9LcvOaXv1Tb35MffZsYagNk4O8QDlfhGzfscoGaZu GVbwA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2101; i=bagasdotme@gmail.com; h=from:subject; bh=AgbqCTOFLAEDWxVOnLceuGG2uLpV5xnB9bcU418E8tM=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDCkNErKe+jbPV5RnR7h9Y642mcvvtjVr08Uzanlz5rWcP fSI5/y7jlIWBjEuBlkxRZZJiXxNp3cZiVxoX+sIM4eVCWQIAxenAExEQ4rhn02+w8l2HgH7hebt Dm7SH24Fsb+aPeffxoaf7jvTF/jFP2P4w/OU+WSvw82b155qCcmrHPrq4HDJQX7rGTtXC8krm6Z ocgIA
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-fcrypt implementation (crypto/fcrypt.c) have license boilerplate
-for GPL 2.0+ (as implemented in the kernel) and BSD 3-Clause
-(from original Royal Institute of Technology code). Replace the
-boilerplate text with corresponding SPDX license tag. As there
-is no wording that allows using either license alternatively,
-use AND operator.
+Convert boilerplate text for BSD 2-Clause to corresponding SPDX license
+identifier.
 
-Cc: David Howells <dhowells@redhat.com>
+Cc: Vitaly Chikunov <vt@altlinux.org>
+Cc: Salvatore Benedetto <salvatore.benedetto@intel.com>
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- crypto/fcrypt.c | 32 +-------------------------------
- 1 file changed, 1 insertion(+), 31 deletions(-)
+ crypto/ecc.c | 21 +--------------------
+ 1 file changed, 1 insertion(+), 20 deletions(-)
 
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index 95a16e88899baf..ecbd29d0deba6b 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -1,45 +1,15 @@
-+// SPDX-License-Identifier: BSD-3-Clause AND GPL-2.0-or-later
- /* FCrypt encryption algorithm
-  *
-  * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
-  * Written by David Howells (dhowells@redhat.com)
-  *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License
-- * as published by the Free Software Foundation; either version
-- * 2 of the License, or (at your option) any later version.
-- *
-  * Based on code:
-  *
-  * Copyright (c) 1995 - 2000 Kungliga Tekniska Högskolan
-  * (Royal Institute of Technology, Stockholm, Sweden).
-  * All rights reserved.
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index f53fb4d6af992b..9d86db24ca748c 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -1,27 +1,8 @@
++// SPDX-License-Identifier: BSD-2-Clause
+ /*
+  * Copyright (c) 2013, 2014 Kenneth MacKay. All rights reserved.
+  * Copyright (c) 2019 Vitaly Chikunov <vt@altlinux.org>
   *
 - * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions
-- * are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- *
-- * 2. Redistributions in binary form must reproduce the above copyright
+- * modification, are permitted provided that the following conditions are
+- * met:
+- *  * Redistributions of source code must retain the above copyright
+- *   notice, this list of conditions and the following disclaimer.
+- *  * Redistributions in binary form must reproduce the above copyright
 - *    notice, this list of conditions and the following disclaimer in the
 - *    documentation and/or other materials provided with the distribution.
 - *
-- * 3. Neither the name of the Institute nor the names of its contributors
-- *    may be used to endorse or promote products derived from this software
-- *    without specific prior written permission.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
-- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
-- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-- * SUCH DAMAGE.
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+- * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   */
  
- #include <asm/byteorder.h>
+ #include <crypto/ecc_curve.h>
 -- 
 An old man doll... just what I always wanted! - Clara
 
