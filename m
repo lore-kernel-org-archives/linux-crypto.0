@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF6FC77B7A
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 05:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EF6C77B7A
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 05:40:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234753AbjFGFkO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jun 2023 01:40:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37030 "EHLO
+        id S234850AbjFGFk0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jun 2023 01:40:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234133AbjFGFkL (ORCPT
+        with ESMTP id S234722AbjFGFkO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2023 01:40:11 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B8AC1BD3;
-        Tue,  6 Jun 2023 22:40:06 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-5144a9c11c7so6382312a12.2;
-        Tue, 06 Jun 2023 22:40:06 -0700 (PDT)
+        Wed, 7 Jun 2023 01:40:14 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E811BDC;
+        Tue,  6 Jun 2023 22:40:08 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6b2041315a5so2024234a34.0;
+        Tue, 06 Jun 2023 22:40:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686116405; x=1688708405;
+        d=gmail.com; s=20221208; t=1686116408; x=1688708408;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FCWFiUFPUn5eTTeVEYVaJy8+YMLW+6inCvkAAvBu/yM=;
-        b=ZoVD7remziHgcihW3SoqS7YUcNOA1w0Hz6BAAVNweCU4IabFTQ6bb9bZbLZynoc37r
-         1IC0xUllVyeZ7IyH0hCkoFwmfsfQ0wT1j0lwis9bfB9SQAARPxw/gePiydJTTZi7/wUY
-         QskOw1hq+jk+lQgMGUwv1zYPjypDQTZXowUgAT754i93VjCc1lI/56LykVYsr+jl37Il
-         aNohwCi80aI+YZdFpii/v6MRGHRouyz7jKiphklI/oWoTB2jlGPm8lUHZtKUau/9rJ/K
-         EqUaIBDFU4vmQD1vNPgAG8uOnPfR3EhMTo0ISX7CHq+vPJNXUH6u7HWnMNMMNeRyAwT+
-         xFKQ==
+        bh=wydK3CwztY8WGZmDLKnIHSNUUittxpAep0EjIDXFXjY=;
+        b=CesD+ICRzyvqAssgHdIongt8Jmy/0FhyMzJ0wigDQV82fZEh3l3kmV+Z9lYB6n8rH7
+         R8VQbE8T5/eZkdQdJrFEY/pn0mv0I/7D4/SJ0UzHCf/ba3RKkcwu3LOT+t7935Ps+Xgi
+         GOFgWKPYM/uOdaaKCvK8cyIhl20EpcmyBgi8wK+Y8qEd/XIVxJmGwxg4g8f+dOxEMdYt
+         3JLeKbTlV7vcCa/j6XTGoU3Q9z3zqDPJ1N11IpIIHFToGjNE99t0uU1xTyaJLID3RP9n
+         Sgp/zccl0IDERmkVGgvbcXrzM/3W4ifZezlVtRb6D32Kiz2FpgYmYBtvwgVdamj8BwqK
+         9v/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686116405; x=1688708405;
+        d=1e100.net; s=20221208; t=1686116408; x=1688708408;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FCWFiUFPUn5eTTeVEYVaJy8+YMLW+6inCvkAAvBu/yM=;
-        b=RGWAJ0iQjOX2mKcC9XfKxWQMUnKO1nbapQrlFMv6ubD551wanE27dbnL3braPAlwFY
-         B5My79g3k1KsQyImFNPRe0EhXxlSlSqpZcSbFZi1iPALrWWW1fUBiFAdEX4y+31n6+Cv
-         RKjQ/+xtwuY9oNMUJpGSdAftjVRmawx4bnQS9WsllyPz1gkqowh2SWYerIUAX1SQMktq
-         S6+tydbxhaXDvF1agodW62sS1Sk7qjcLOqHeJGBpcPidzw2waVearL3ak7faBrvUHURF
-         eCjaBIk0I5djAPj0SY43psUeFAbDoDXONx5qoNoKr0xxjz4UeevVAIweOKK1Iv2PlOvT
-         V4Sw==
-X-Gm-Message-State: AC+VfDx1nN499H6xfFnRuy+JIY4zmpwQbR71Elhcc4vPrtLX5Iv330Bz
-        aHw3eAcW5PB+QtXJbEeS7So=
-X-Google-Smtp-Source: ACHHUZ4dKn4gtyOqiaxD//vhrhPFtbxwNUIsEVbHCEHCMNldaX5c/0l+jxJj7iztIwby5kdxD44a/w==
-X-Received: by 2002:a05:6a20:6a03:b0:117:428d:f983 with SMTP id p3-20020a056a206a0300b00117428df983mr2569550pzk.1.1686116405474;
-        Tue, 06 Jun 2023 22:40:05 -0700 (PDT)
+        bh=wydK3CwztY8WGZmDLKnIHSNUUittxpAep0EjIDXFXjY=;
+        b=E1XbYM5SEwyaokZaqhNvDr+mawNnq5+MdMy6/yfId27S80CFG3MYtOK49S8apogdds
+         N0zTV8qRSd5Hd2tE0lwM7ixPYlkxAHwh3l85FS6sxZo111rLcvBJ5a++DI5Ce2xp+6oa
+         Sn0WwiVbtG6pasDnqXpDMYqEP2aX6bt+PniMV0e66d/flwPMloLECcd7fT29ep1lWhUb
+         5vHlajRxht2gM21cR5+hM9uZadlKE1Y2WALNj0kpg55GUsIuE5XjDL9UoWr81J7ZV9vq
+         RST7Q6Af6PjZdl+MxkXRpqC6cvU7+sRPe+ZcbCGOhpgUh1CdHbuY5Qfd9YuDL9CpJvvr
+         DyEA==
+X-Gm-Message-State: AC+VfDwDVcI495ITHt0G5z0c1w+ZRzDpykqWplZx7i5/TiTRdEvawCCF
+        U7JCH7xzFLsaukjTn1NZzEMX9Qoq4Do=
+X-Google-Smtp-Source: ACHHUZ7PaoC1qZYBeei0GVEApxz0Zv8+id1JFOxBWs1GKuz0xYbnhkVMj8G1ShF0uzCqwxSE210QMg==
+X-Received: by 2002:a05:6830:1bd4:b0:6af:8743:daac with SMTP id v20-20020a0568301bd400b006af8743daacmr4168372ota.36.1686116407700;
+        Tue, 06 Jun 2023 22:40:07 -0700 (PDT)
 Received: from debian.me (subs28-116-206-12-58.three.co.id. [116.206.12.58])
-        by smtp.gmail.com with ESMTPSA id q26-20020a62e11a000000b00657fbf81ffbsm4960598pfh.80.2023.06.06.22.40.03
+        by smtp.gmail.com with ESMTPSA id m26-20020aa78a1a000000b0065ccd867923sm3781553pfa.12.2023.06.06.22.40.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 22:40:04 -0700 (PDT)
+        Tue, 06 Jun 2023 22:40:07 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id 8F34A1044ED; Wed,  7 Jun 2023 12:39:59 +0700 (WIB)
+        id 8DED91069EC; Wed,  7 Jun 2023 12:39:59 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -65,78 +65,55 @@ Cc:     Linux SPDX Licenses <linux-spdx@vger.kernel.org>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Dan Carpenter <dan.carpenter@linaro.org>,
         Bagas Sanjaya <bagasdotme@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 3/8] crypto: drbg: Convert dual BSD 3-Clause/GPL-1.0 license boilerplate to SPDX identifier
-Date:   Wed,  7 Jun 2023 12:39:44 +0700
-Message-ID: <20230607053940.39078-13-bagasdotme@gmail.com>
+        Alexey Degtyarev <alexey@renatasystems.org>,
+        Vitaly Chikunov <vt@altlinux.org>
+Subject: [PATCH 5/8] crypto: streebog_generic: Correct SPDX license identifier
+Date:   Wed,  7 Jun 2023 12:39:46 +0700
+Message-ID: <20230607053940.39078-15-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230607053940.39078-10-bagasdotme@gmail.com>
 References: <20230607053940.39078-10-bagasdotme@gmail.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2787; i=bagasdotme@gmail.com; h=from:subject; bh=CMhqFfpL0Ha26FzgmqI+vIPR5sC4x/nvpsvCP+iQTxQ=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDCkNErIWnxc2xDuK7fc/kzXV7aGWv+rShPJpUrJX1u9ep MXjXTyto5SFQYyLQVZMkWVSIl/T6V1GIhfa1zrCzGFlAhnCwMUpABNxr2Zk2LZbXMU8QE+kSdxc Qed8nahYzT/Zotq0ybFdm2N4FFXuMjK8uT53l5k2l+ymyAXlXk/FTbUPMB5o1v+0mKM+7MyGyxZ MAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1460; i=bagasdotme@gmail.com; h=from:subject; bh=DU3W9+DKhaZRScsTkm8rgBF3OAAfXNjRmU2s4naxbqo=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDCkNErLrPk9sYJhbknN4b5fKu1dPb2TvW5hTJ5oRrrunr 1Hv9faejlIWBjEuBlkxRZZJiXxNp3cZiVxoX+sIM4eVCWQIAxenAExkAwPD/0zW4Kn2p9VOLRPa fvz6zCJxiY+J+Yvywh0Mcot2Kl/udWP4H8dlUjMjRMLzTuFKHj41pZXMM36vPh8w6YCYsuehxxF XeAA=
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace the boilerplate with corresponding SPDX tag. Since there is no
-explicit GPL version, assume GPL 1.0+.
+Streebog hash function implementation (crypto/streebog_generic.c) have
+GPL 2.0+ license boilerplate, but its SPDX identifier is mistagged
+as dual BSD/GPL. Correct the tag, while also removing the boilerplate.
 
-Cc: Stephan Mueller <smueller@chronox.de>
+Fixes: e18957e8e87403 ("crypto: streebog - add Streebog hash function")
+Cc: Alexey Degtyarev <alexey@renatasystems.org>
+Cc: Vitaly Chikunov <vt@altlinux.org>
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- crypto/drbg.c | 33 +--------------------------------
- 1 file changed, 1 insertion(+), 32 deletions(-)
+ crypto/streebog_generic.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index ff4ebbc68efab1..f797deaf3952ef 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1,3 +1,4 @@
-+// SPDX-License-Identifier: BSD-3-Clause OR GPL-1.0+
+diff --git a/crypto/streebog_generic.c b/crypto/streebog_generic.c
+index dc625ffc54ad7f..65d0e6bf5e1992 100644
+--- a/crypto/streebog_generic.c
++++ b/crypto/streebog_generic.c
+@@ -1,4 +1,4 @@
+-// SPDX-License-Identifier: GPL-2.0+ OR BSD-2-Clause
++// SPDX-License-Identifier: GPL-2.0-or-later
  /*
-  * DRBG: Deterministic Random Bits Generator
-  *       Based on NIST Recommended DRBG from NIST SP800-90A with the following
-@@ -9,38 +10,6 @@
+  * Streebog hash function as specified by GOST R 34.11-2012 and
+  * described at https://tools.ietf.org/html/rfc6986
+@@ -6,10 +6,6 @@
+  * Copyright (c) 2013 Alexey Degtyarev <alexey@renatasystems.org>
+  * Copyright (c) 2018 Vitaly Chikunov <vt@altlinux.org>
   *
-  * Copyright Stephan Mueller <smueller@chronox.de>, 2014
-  *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions
-- * are met:
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, and the entire permission notice in its entirety,
-- *    including the disclaimer of warranties.
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- * 3. The name of the author may not be used to endorse or promote
-- *    products derived from this software without specific prior
-- *    written permission.
-- *
-- * ALTERNATIVELY, this product may be distributed under the terms of
-- * the GNU General Public License, in which case the provisions of the GPL are
-- * required INSTEAD OF the above restrictions.  (This clause is
-- * necessary due to a potential bad interaction between the GPL and
-- * the restrictions contained in a BSD-style copyright.)
-- *
-- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-- * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-- * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-- * DAMAGE.
-- *
-  * DRBG Usage
-  * ==========
-  * The SP 800-90A DRBG allows the user to specify a personalization string
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+  */
+ 
+ #include <crypto/internal/hash.h>
 -- 
 An old man doll... just what I always wanted! - Clara
 
