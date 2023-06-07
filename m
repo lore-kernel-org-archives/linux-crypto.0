@@ -2,318 +2,129 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A19CC7EE23
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 05:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B2EFC83003
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Jun 2023 05:40:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232050AbjFGFgF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Jun 2023 01:36:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35226 "EHLO
+        id S234124AbjFGFkL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 7 Jun 2023 01:40:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjFGFgD (ORCPT
+        with ESMTP id S234044AbjFGFkK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Jun 2023 01:36:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DB3E1989;
-        Tue,  6 Jun 2023 22:36:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DD3B7635AE;
-        Wed,  7 Jun 2023 05:36:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A35C1C433EF;
-        Wed,  7 Jun 2023 05:36:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686116161;
-        bh=dmngplKS6c3sG/NymxeyYpNud7A468aDfo1T86Ux7j4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Q03XjOKTI/X0xf5zqp7RZWNr0/YWCdFOofxH3NAkjsEgrj9dq35ghwIb5R14vaIGE
-         234HkgyAcd+YjdIinu52r1AlCqnSkSwE+pDSfUmBJBq8z8WoDdUsJ0gFiN3G1qwL++
-         TcNqUdIcUokhbDWjl/MQkODY3E4q9Lx0Plf+XflUnTgqe1oocsRXSsB5PiG+Ke/YSQ
-         /HDldQzBZ3pHaq0VQNQ8ig1lD6SaXY3MoJZWiYB1HIimfMfxxvM1Gci0fCxqHyOGjj
-         kgK0AwAL3vT1JtcGazAFRhaxZtHSLegx/RgxKfTlDxJfThnzPXSko4nHHJX50qO6Tx
-         uscmcTg82naSQ==
-Date:   Tue, 6 Jun 2023 22:35:58 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com, elliott@hpe.com, gmazyland@gmail.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, tglx@linutronix.de,
-        bp@alien8.de, mingo@kernel.org, x86@kernel.org,
-        herbert@gondor.apana.org.au, ardb@kernel.org,
-        dan.j.williams@intel.com, bernie.keany@intel.com,
-        charishma1.gairuboyina@intel.com,
-        lalithambika.krishnakumar@intel.com, nhuck@google.com,
+        Wed, 7 Jun 2023 01:40:10 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B9D19B9;
+        Tue,  6 Jun 2023 22:40:05 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b039168ba0so60143445ad.3;
+        Tue, 06 Jun 2023 22:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686116404; x=1688708404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QnIpKHGIOTbO5xF+lSKDonxY4sTlRVD/4+u6L5lQYbA=;
+        b=pN46dgI2PiEML1SQ/upye3FTeKtmsdFjs4ymIH98J4xJVVtG0E3W6jzi/90/52kJHq
+         yKsQq7ENvxbAW0eBpoEddSsxykHlkCiYkqgP0BHaKlzZLnzT4TnU2YXCf7UzUeuxWhNR
+         hxXecBImGxDie8cVQOXQLDChledSJrgqQWyNzkc01rJa46pv8n2/oVDGN3hBkC6gXeH6
+         c4XNT5AobXAM17Avu5Ye9otWrf5lBj4ZtejY2JPqlqK9mURM0Tg/Er7xWvoNIsxNlQ2u
+         OSHK1KeEtjipAFcWvR7g0RRMRGJOh5zhaUSwyqeqfJseIK4LUU7GKFDrh3w8OO6W0WU8
+         johw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686116404; x=1688708404;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QnIpKHGIOTbO5xF+lSKDonxY4sTlRVD/4+u6L5lQYbA=;
+        b=Xt86Tq3WuqEFTFpMKGg+3JJTABl5k0nNZUHxty0n9ZtwMbGVZ1MzWhUfO10tAcQGgM
+         s9I5sEvE5/+BjMkaRncfX2EiFN0dp0PmjglGKxI9LlPIivTb1Rd78CgVXxl6V8kDRqHF
+         iJD5GIS1nxt9gaJnwTfFnQcqvgW5t22ne5uqZDMDzpN21lHxrC8HS8mqXKGQkY/dxTyL
+         YsYK0+R8GGdlkkbcqqJdGi+tQdOTw5lHlGmwHmN63FPbWn+LbSbEFAgbMiHkft2ifDWp
+         APBbU8O/Qwcl+NgsL2NVnvJ8ieqGujftMsKCnO9uL2M0XmX4PgZV1NoCPcVIyeAQUqVJ
+         XblA==
+X-Gm-Message-State: AC+VfDyNP1y2vhdpopmuhabr9+DjWJPtjhwkjYUKN6quCz/hbHGXTiiM
+        egjuDa5d17EXOTNFwSX8u7k=
+X-Google-Smtp-Source: ACHHUZ4WH3qatIHs9fnjT2MhOeHKHI6b15dSEKZ0JxD/EdjNDZ9cGjxJG70ofJMixeqnWYSLy4hq3g==
+X-Received: by 2002:a17:903:2284:b0:1b0:75e1:3949 with SMTP id b4-20020a170903228400b001b075e13949mr5486659plh.37.1686116404421;
+        Tue, 06 Jun 2023 22:40:04 -0700 (PDT)
+Received: from debian.me (subs28-116-206-12-58.three.co.id. [116.206.12.58])
+        by smtp.gmail.com with ESMTPSA id bc3-20020a170902930300b001a505f04a06sm9472196plb.190.2023.06.06.22.40.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jun 2023 22:40:04 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 3865E1069B9; Wed,  7 Jun 2023 12:39:59 +0700 (WIB)
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v8 12/12] crypto: x86/aes-kl - Implement the AES-XTS
- algorithm
-Message-ID: <20230607053558.GC941@sol.localdomain>
-References: <20230524165717.14062-1-chang.seok.bae@intel.com>
- <20230603152227.12335-1-chang.seok.bae@intel.com>
- <20230603152227.12335-13-chang.seok.bae@intel.com>
+        Franziska Naepelt <franziska.naepelt@googlemail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Linux SPDX Licenses <linux-spdx@vger.kernel.org>,
+        Linux Kernel Janitors <kernel-janitors@vger.kernel.org>,
+        Linux Crypto <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH 0/8] SPDX conversion for cryptographic algorithms
+Date:   Wed,  7 Jun 2023 12:39:41 +0700
+Message-ID: <20230607053940.39078-10-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230603152227.12335-13-chang.seok.bae@intel.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2422; i=bagasdotme@gmail.com; h=from:subject; bh=WDj4BEWJrXIL/c7Y0+Vf4YWvX5xVaNlCUhPBw+xl3tI=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDCkNEjLN4R7t19w950n41kqxveHbebXfsSP6v/q0Lws6D nZy/jjQUcrCIMbFICumyDIpka/p9C4jkQvtax1h5rAygQxh4OIUgIkYfmP478k3fV5BbOMh04vK dc/usBZoJX87Zi95XWfT5EWTNpt2azL8d5SNZ1qlbWu/XVzpn9wu1bykNxkCtZOOpWY5ealNqeT nBQA=
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jun 03, 2023 at 08:22:27AM -0700, Chang S. Bae wrote:
-> == Key Handle Restriction ==
-> 
-> A key handle may be encoded with some restrictions.
+I prompted to create this series when reviewing trivial,
+checkpatch-fixing patches from Franziska Naepelt [1]. When
+reviewing crypto ones and looking on SPDX changes, I felt that
+these could be better sent as separate patch series covering
+whole crypto/ directory instead. So here is the series and
+happy reviewing!
 
-It's unclear what this means.  Please avoid passive tense and the word "may"
-like this.  I think you mean something like "The AES-KL instruction set supports
-selecting key usage restrictions at key handle creation time."
+[1]: https://lore.kernel.org/all/?q=f%3A%22bagasdotme%40gmail.com%22+AND+tc%3A%22Franziska+Naepelt+%3Cfranziska.naepelt%40googlemail.com%3E%22 
 
-> Restrict every handle only available in kernel mode via setkey().
+Bagas Sanjaya (8):
+  crypto: Convert dual BSD 3-Clause/GPL 2.0 boilerplate to SPDX
+    identifier
+  crypto: fcrypt: Replace dual BSD 3-Clause/GPL 2.0+ boilerplate with
+    SPDX identifier
+  crypto: drbg: Convert dual BSD 3-Clause/GPL-1.0 license boilerplate to
+    SPDX identifier
+  crypto: ecc: Replace BSD 2-Clause license boilerplate with SPDX
+    identifier
+  crypto: streebog_generic: Correct SPDX license identifier
+  crypto: Replace GPL 2.0 boilerplate with SPDX license identifier
+  crypto: ecrdsa: Remove GPL 2.0+ boilerplate
+  crypto: cts: Convert MIT boilerplate to corresponding SPDX license
+    identifier
 
-I think you mean something like "Restrict all key handles created by the kernel
-to kernel mode use only."
+ crypto/aes_generic.c         | 31 +------------------------------
+ crypto/algif_rng.c           | 33 +--------------------------------
+ crypto/anubis.c              |  6 +-----
+ crypto/crct10dif_common.c    | 15 +--------------
+ crypto/crct10dif_generic.c   | 15 +--------------
+ crypto/cts.c                 | 24 +-----------------------
+ crypto/drbg.c                | 33 +--------------------------------
+ crypto/ecc.c                 | 21 +--------------------
+ crypto/ecrdsa.c              |  4 ----
+ crypto/ecrdsa_defs.h         |  4 ----
+ crypto/fcrypt.c              | 32 +-------------------------------
+ crypto/jitterentropy-kcapi.c | 32 +-------------------------------
+ crypto/jitterentropy.c       | 35 +----------------------------------
+ crypto/keywrap.c             | 32 +-------------------------------
+ crypto/khazad.c              |  6 +-----
+ crypto/md4.c                 |  6 +-----
+ crypto/md5.c                 |  6 +-----
+ crypto/poly1305_generic.c    |  5 +----
+ crypto/streebog_generic.c    |  6 +-----
+ crypto/vmac.c                | 13 +------------
+ crypto/wp512.c               |  6 +-----
+ 21 files changed, 19 insertions(+), 346 deletions(-)
 
-Can you also mention why you are doing this?  I suppose it might as well be
-done, but I'm not seeing how it would actually matter.
 
-What other sorts of key usage restrictions does AES-KL support?  Are any other
-ones useful here?
+base-commit: 134e0dc6b73ab7e99464182356a8b3fa4ea3b499
+-- 
+An old man doll... just what I always wanted! - Clara
 
-> Subsequently the key handle could be corrupted or fail with handle
-> restrictions. Then, encrypt()/decrypt() returns -EINVAL.
-
-Aren't these scenarios actually impossible?  At least without memory corruption.
-
-> == Userspace Exposition ==
-> 
-> Some hardware implementations may have some performance penalties.
-
-Likewise, please avoid vague statements like this.  This makes it unclear
-whether this is something that happens in the real world or whether it's just
-theoretical.  You indeed have actual benchmark results that show that AES-KL is
-much slower than AES-NI on current CPUs, right?
-
-> But, for disk encryption, storage bandwidth may be the bottleneck before
-> encryption bandwidth.
-
-Again, please try to be less vague.  E.g. "With a slow storage device, storage
-bandwidth is the bottleneck, even if disk encryption is enabled..."
-
-> Thus, advertise it with a unique name 'xts-aes-aeskl' in /proc/crypto while
-> not replacing AES-NI under the generic name 'xts(aes)' with a lower priority.
-
-The above sentence seems to say that xts-aes-aeskl does *not* have a lower
-priority than xts-aes-aesni.  But actually it does.
-
-> Then, the performance is unlikely better than 64-bit which has already a gap
-> vs. AES-NI.
-
-I don't understand what this sentence is trying to say.
-
-> diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-> index 9bbfd01cfa2f..658adfd7aebf 100644
-> --- a/arch/x86/crypto/Kconfig
-> +++ b/arch/x86/crypto/Kconfig
-> @@ -2,6 +2,11 @@
->  
->  menu "Accelerated Cryptographic Algorithms for CPU (x86)"
->  
-> +config AS_HAS_KEYLOCKER
-> +	def_bool $(as-instr,encodekey256 %eax$(comma)%eax)
-> +	help
-> +	  Supported by binutils >= 2.36 and LLVM integrated assembler >= V12
-
-It looks like arch/x86/Kconfig.assembler would be a better place for this.
-
-> diff --git a/arch/x86/crypto/aeskl-intel_asm.S b/arch/x86/crypto/aeskl-intel_asm.S
-> new file mode 100644
-> index 000000000000..61addc61dd4e
-> --- /dev/null
-> +++ b/arch/x86/crypto/aeskl-intel_asm.S
-> @@ -0,0 +1,552 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * Implement AES algorithm using AES Key Locker instructions.
-> + *
-> + * Most code is based from the AES-NI implementation, aesni-intel_asm.S
-> + *
-> + */
-> +
-> +#include <linux/linkage.h>
-> +#include <linux/cfi_types.h>
-> +#include <asm/errno.h>
-> +#include <asm/inst.h>
-> +#include <asm/frame.h>
-> +#include "aes-helper_asm.S"
-> +
-> +.text
-> +
-> +#define STATE1	%xmm0
-> +#define STATE2	%xmm1
-> +#define STATE3	%xmm2
-> +#define STATE4	%xmm3
-> +#define STATE5	%xmm4
-> +#define STATE6	%xmm5
-> +#define STATE7	%xmm6
-> +#define STATE8	%xmm7
-> +#define STATE	STATE1
-> +
-> +#define IV	%xmm9
-> +#define KEY	%xmm10
-> +#define INC	%xmm13
-> +
-> +#define IN1	%xmm8
-> +#define IN	IN1
-
-Why do both IN1 and IN exist?  Shouldn't there just be IN?
-
-> +
-> +#define AREG	%rax
-
-Shouldn't %rax just be hardcoded?
-
-> +#define HANDLEP	%rdi
-
-This should be called CTX, to match the function prototypes.
-
-> +#define UKEYP	OUTP
-
-This should be called IN_KEY, to match the function prototypes.
-
-> +#define GF128MUL_MASK %xmm11
-> +
-> +/*
-> + * int __aeskl_setkey(struct crypto_aes_ctx *ctx, const u8 *in_key, unsigned int key_len)
-> + */
-> +SYM_FUNC_START(__aeskl_setkey)
-> +	FRAME_BEGIN
-> +	movl %edx, 480(HANDLEP)
-> +	movdqu (UKEYP), STATE1
-> +	mov $1, %eax
-> +	cmp $16, %dl
-> +	je .Lsetkey_128
-> +
-> +	movdqu 0x10(UKEYP), STATE2
-> +	encodekey256 %eax, %eax
-> +	movdqu STATE4, 0x30(HANDLEP)
-> +	jmp .Lsetkey_end
-> +.Lsetkey_128:
-> +	encodekey128 %eax, %eax
-> +
-> +.Lsetkey_end:
-> +	movdqu STATE1, (HANDLEP)
-> +	movdqu STATE2, 0x10(HANDLEP)
-> +	movdqu STATE3, 0x20(HANDLEP)
-
-The moves to the ctx should use movdqa, since it is aligned.
-
-> +
-> +	xor AREG, AREG
-> +	FRAME_END
-> +	RET
-> +SYM_FUNC_END(__aeskl_setkey)
-
-This function always returns 0, so it really should return void.
-
-> +/*
-> + * int __aeskl_enc(const void *ctx, u8 *dst, const u8 *src)
-> + */
-> +SYM_FUNC_START(__aeskl_enc)
-> +	FRAME_BEGIN
-> +	movdqu (INP), STATE
-> +	movl 480(HANDLEP), KLEN
-> +
-> +	cmp $16, KLEN
-> +	je .Lenc_128
-> +	aesenc256kl (HANDLEP), STATE
-> +	jz .Lenc_err
-> +	jmp .Lenc_noerr
-> +.Lenc_128:
-> +	aesenc128kl (HANDLEP), STATE
-> +	jz .Lenc_err
-> +
-> +.Lenc_noerr:
-> +	xor AREG, AREG
-> +	jmp .Lenc_end
-> +.Lenc_err:
-> +	mov $(-EINVAL), AREG
-> +.Lenc_end:
-> +	movdqu STATE, (OUTP)
-> +	FRAME_END
-> +	RET
-> +SYM_FUNC_END(__aeskl_enc)
-
-In the common case (successful AES-256 encryption) this is executing 'jmp'
-twice.  I think the code should be rearranged to eliminate these jmps.
-
-> +/*
-> + * int __aeskl_xts_encrypt(const struct crypto_aes_ctx *ctx, u8 *dst,
-> + *			   const u8 *src, unsigned int len, le128 *iv)
-> + */
-> +SYM_FUNC_START(__aeskl_xts_encrypt)
-
-__aeskl_xts_encrypt() and __aeskl_xts_decrypt() are very similar.  To reduce
-code duplication, can you consider generating them from a macro that takes an
-argument that indicates whether it is encrypt or decrypt?
-
-> +static int aeskl_setkey(struct crypto_tfm *tfm, void *raw_ctx, const u8 *in_key,
-> +			unsigned int keylen)
-> +{
-> +	struct crypto_aes_ctx *ctx = (struct crypto_aes_ctx *)raw_ctx;
-> +	int err;
-> +
-> +	if (!crypto_simd_usable())
-> +		return -EBUSY;
-> +
-> +	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
-> +	    keylen != AES_KEYSIZE_256)
-> +		return -EINVAL;
-> +
-> +	kernel_fpu_begin();
-> +	if (unlikely(keylen == AES_KEYSIZE_192)) {
-> +		pr_warn_once("AES-KL does not support 192-bit key. Use AES-NI.\n");
-> +		err = aesni_set_key(ctx, in_key, keylen);
-> +	} else {
-> +		if (!valid_keylocker())
-> +			err = -ENODEV;
-> +		else
-> +			err = __aeskl_setkey(ctx, in_key, keylen);
-> +	}
-> +	kernel_fpu_end();
-> +
-> +	return err;
-> +}
-[...]
-> +			.cra_ctxsize		= XTS_AES_CTX_SIZE,
-[...]
-
-Something that your AES-KL code does that's a bit ugly is that it abuses
-'struct crypto_aes_ctx' to store a Keylocker key handle instead
-of the actual AES key schedule which the struct is supposed to be for.
-
-The proper way to represent that would be to make the tfm context for
-xts-aes-aeskl be a union of crypto_aes_ctx and a Keylocker specific context.
-
-If you don't do that and instead keep the proposed workaround, then please add a
-comment somewhere that very clearly explains how the struct is being used.
-Above aeskl_setkey() or above .cra_ctxsize might be a good place.
-
-> diff --git a/arch/x86/crypto/aesni-intel_glue.h b/arch/x86/crypto/aesni-intel_glue.h
-> new file mode 100644
-> index 000000000000..5b1919f49efe
-> --- /dev/null
-> +++ b/arch/x86/crypto/aesni-intel_glue.h
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +/*
-> + * Support for Intel AES-NI instructions. This file contains function
-> + * prototypes to be referenced for other AES implementations
-> + */
-
-It would be helpful if this comment was more concrete, like "These are AES-NI
-functions that are used by the AES-KL code as a fallback when it is given a
-192-bit key.  Key Locker does not support 192-bit keys."
-
-- Eric
