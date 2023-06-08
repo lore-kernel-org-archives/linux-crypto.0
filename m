@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A978EC7EE23
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 19:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E51E5C7EE45
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 19:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235886AbjFHTMx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jun 2023 15:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59506 "EHLO
+        id S236294AbjFHTMy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jun 2023 15:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235038AbjFHTMq (ORCPT
+        with ESMTP id S236304AbjFHTMw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2023 15:12:46 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2073.outbound.protection.outlook.com [40.107.100.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF8730CF;
-        Thu,  8 Jun 2023 12:12:32 -0700 (PDT)
+        Thu, 8 Jun 2023 15:12:52 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2051.outbound.protection.outlook.com [40.107.244.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B274D30C4;
+        Thu,  8 Jun 2023 12:12:35 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AUAlGrSgrREu2kMHVGs1b89GfY3Db81OFUHexEv/a71u9YtpqbCNoF7KZBaZ26uZer/CnWrULXpNnLzmkjEXdALU8S4cM4QI1TrGIslP+CmcC2Uh4e5wf80j+hChNO1GDgodhiBFDWVyk0N1N9lEOpxvaRizchNwQAoYQuQMk+C0ZdJtD3DgKPmdYA1NwyqvUinCPkDkJOLFHs2iIdxk5Ae1eGbxgpNB9RrpTYRk6uf73NO5HxRHosO9nZwvyg+ZzU/SThvxqa7MzrkAM1GaWzq9RBLM5dHI7LRNWhN+gjqWWRqlXNzopwA6mGAl48gALiwIoRdjRf7ez1Bsw+teog==
+ b=Dy6AomcSYowXMmQ+DSChsD7v+wAsfb7Iyj8L1NHm3OMFssbXBc6hijN61aEmE8aIJAh0LExD+jXT4wAxrewc83ogc1Dg6eCB/LgnU0rxQaI3+vckaz+kLDNLpKu/vv7AbcJKyKE8VeQH7DVHe+CRZY3cZ4m8p6sDKaawyvvzNra13rAa7b1Oo3YOsqKMz0EK5aC9R8fJF6wg2euFGQOxY3NC8ysgohtSdI8jdlOmudcRodkCol06O/+6dMxGNEO0s1YOU582g0G5tpLU8E6cwK8TvmNgGrTLWF2GZBPJ0rwonRpv/Wc80+BzeHougr3C28/Z7AMsdgZU/F01hxBdTQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=McArOqsmUatZT0/1PIvPXrql42CsdIl3qB5N0XrfNIg=;
- b=gRujwRXRuX/xHCuw6Ck9ypUkYDd1ustYbw4DxrJJC8hh6izjC8i+hRn9mINJAr1W14UwbM5neJ+1Huq6T6iaFR/LnXRUAI+qgooaD8zVsrkuodLajRH+qGRg0sLv6v4AuveWY10r8jFKn+vvBNMON0gEbf7VKbMteWCQhl52Hxs/A1l2jN0kfEC1oPeMskwANZPqS4z/64GFswMGlttbIrwhNgTOuy8pPSaxRGcHY0dZsFeDWe3ijZcLSPhjfmnuKzk/82DT/xIzt1SYzQzyc1WCjn6WdWZ9qL5hk+9UCyDbguHZxyxLHJ8mJMh/N31cB3xhSZ6WpIbMRZ183YWX+w==
+ bh=+fWtlEw/qV1KAfjJmylo84c8MbGkwhO7fFEruXnluLQ=;
+ b=atR/7eSx2ldF/uSukGm5r1I8QnYFitzJPYwWDk/92ARSglqCfBFxIKhJ/qxGs+zSyby15wCHbZ+255HkCxSpB89NGDb7ZRW+JVAh418rcOZC8ThvDgQvmREQhZzEh4K5mj8Nsr5oscwSG8ctDcWpWr9sPezYGn8tIlmJgwt8GMYwwwH3PwKrfinuqvq2P3x+E66GUY4XKAuSGsAzdPK2AOAmKpl25B57n52yPeJspm8J1OfhFAPThskHYiQZo/wP+CuSv0TZGZMAl8p0murjTlDm0Xi7LsGPanBjp9l4mI0YQXAPJxjYGw6wF6NjTS/OldmzENV9ovn10jI2HK5orw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=McArOqsmUatZT0/1PIvPXrql42CsdIl3qB5N0XrfNIg=;
- b=PQxVwu9MRfXrkPuCSZMrMeeXcNLeoG4hDMTuhkSCaXgj/rhOI+B9obVhxZeMfH51jhU8DC0n+qAU1zEWMVQqZC50IXvmeZQjNN4vrpbfQQwzV3b4OOQZ1dqpNoXXFGkfmQd1PPirPQUohg/IV0U+goWVZAQT0QgTh+U2d5oJY+E=
-Received: from MW4PR04CA0260.namprd04.prod.outlook.com (2603:10b6:303:88::25)
- by LV3PR12MB9120.namprd12.prod.outlook.com (2603:10b6:408:1a3::5) with
+ bh=+fWtlEw/qV1KAfjJmylo84c8MbGkwhO7fFEruXnluLQ=;
+ b=jcB/t8qPTgGUjlmaGGCk2qw6z37u63b2AxnnYiXJnCugUFx8W8zcmOiip1SRGGGel80eoJiL8pA5q6R5KXjSn34Krzy4fmZypUcrnevLmFBdiAbUEufXtmvwnZpoY/eDQZ/cuud9Ai+pJfUqHyo5PcN/SypUTiXZrF2I0TR0NLY=
+Received: from MW4PR04CA0249.namprd04.prod.outlook.com (2603:10b6:303:88::14)
+ by IA0PR12MB8716.namprd12.prod.outlook.com (2603:10b6:208:485::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.38; Thu, 8 Jun
- 2023 19:12:30 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.39; Thu, 8 Jun
+ 2023 19:12:32 +0000
 Received: from CO1PEPF000044FC.namprd21.prod.outlook.com
- (2603:10b6:303:88:cafe::b) by MW4PR04CA0260.outlook.office365.com
- (2603:10b6:303:88::25) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:303:88:cafe::e0) by MW4PR04CA0249.outlook.office365.com
+ (2603:10b6:303:88::14) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.26 via Frontend
- Transport; Thu, 8 Jun 2023 19:12:29 +0000
+ Transport; Thu, 8 Jun 2023 19:12:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -49,11 +49,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CO1PEPF000044FC.mail.protection.outlook.com (10.167.241.202) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.0 via Frontend Transport; Thu, 8 Jun 2023 19:12:29 +0000
+ 15.20.6500.0 via Frontend Transport; Thu, 8 Jun 2023 19:12:32 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 8 Jun
- 2023 14:12:25 -0500
+ 2023 14:12:28 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>,
@@ -61,9 +61,9 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     "David S . Miller" <davem@davemloft.net>,
         <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v4 01/11] crypto: ccp: Rename macro for security attributes
-Date:   Thu, 8 Jun 2023 06:17:47 -0500
-Message-ID: <20230608111757.32054-2-mario.limonciello@amd.com>
+Subject: [PATCH v4 08/11] crypto: ccp: Add a sample library for ioctl use
+Date:   Thu, 8 Jun 2023 06:17:54 -0500
+Message-ID: <20230608111757.32054-9-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230608111757.32054-1-mario.limonciello@amd.com>
 References: <20230608111757.32054-1-mario.limonciello@amd.com>
@@ -75,104 +75,139 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|LV3PR12MB9120:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4a37ac1d-76e5-4b06-2dc3-08db68544dfe
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|IA0PR12MB8716:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6085949-ef7d-4020-7cbf-08db68544f93
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vlYagklosJbBLF0ad7Tqe1fS9ZXrr7yXIau0nVV9mqo1Z99JjHImR7v9+yUmpzr4ZzTGfWphAAxhlG/20FJ5tJhD94kOj+fU/SY56UPbIvcD2TEUqbtsS3+imhmnVmKPddLB47PyTnd8QuDd3+Qt55fKOsK5LQan+GdvJgFjLyCFNSqoJxHVc48xkmV2sxd+W+elQCqYYn+4s/ZDXpme1Ddc0vq04xat94MQC0Hmkx6OOstKcJhcSeDS2inKpGisV00sWqFLA/Y7MTwahz9xn5s4utGa9hTQf9635Q4GPrwBuc4PHaEbqVoeVnFACJNvFfYR45BzxSs0SGyetmIRlmQvRRgsFw5TgppRSmE8m81VHbm7MoaUL1AKmNz7M2UClMYqN5VlI6NQBUd7/XN06Uwz+13UrWUOAXNM/DTnRy8JZ8yQ7LslBn/XYXClYJph/8bnBheygD8aAdmYTGAW2iqtVs5fmYwEBDYzc+jqDZUlFZItPHKKMf6RVXmVAZNhXhoR7tSry3GIiG6Nyfp3s82QNWt/uH4DdAP+W5jQoamGcEp7zxWqNs4QbjKURmU1Fye50tIW/2yygqTPPz9+M8igF5ad4FLbJEtFtQLDFFE0Kb3vv42S7jOSDdNRio6vv38hMhJePZcW9PS/mQ54PptbewrA+hB1P0vqZWl7DaAmR9sP70fiUbN3InMndHMTws9ripDB3p3zWQE6ht4M+5O5Cm0O/01ZuCZDVPCnlkqkDTDqq7JpBtGaWHeQGJTaKyvFP7MqAP5AwKyCB6aKUg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(346002)(136003)(376002)(451199021)(40470700004)(46966006)(36840700001)(7696005)(6666004)(81166007)(2906002)(82740400003)(356005)(70586007)(70206006)(54906003)(36756003)(110136005)(5660300002)(44832011)(8936002)(8676002)(86362001)(41300700001)(4326008)(40480700001)(15650500001)(316002)(40460700003)(478600001)(336012)(426003)(2616005)(26005)(1076003)(16526019)(186003)(82310400005)(36860700001)(47076005)(83380400001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: raPAFcc4wYRvyC1vrl7Hzo79FM0mDESkeM+P88HOvc+gkLKRhBsc2hWEOmdSpRz0hE3lj/dbyIS5lT6mBqJZ8Bf1yM0RaEC5C4MQzu99Zmz+GRYyhdMrRth7C8Lry4GBC7SA3Ku/JWHwN+HzFKcTC7eYe9H3aeK2MQDImN7xzbl+Fn4d0g74QyydxntduxI6MF9wWwlk6pa4iaGCefvZI4I7VqksKLzOXqamaESLp6dTYV+daaIC3KO12VGhdC+fOPVzffuLgBZE42bvX5XVYczpuGA383RoKQigNXw79au5KPiS03mwroTL8+MTSBpbYrfXK2m7E3uYE9ad1Z+LI4HxY4WcYHlLD12zq8HVvMhQrXcRdMoNBknAAzyq7MpbA0d8a7CQHkU+akJFv1xft5metYx3mvVhnDqIlybF5zVbqcAOzx4rUEs64a74PtunG5pQz3p3TE9rQFHMwklZbUTx8ZL7LWLzRlxag9omtnA9XmhZKRZCpm14LZBy4RTtOjRdEvIyE8ZvsaYZS9vn48E9UywWMGr8d92fxcgw7LOxqpBG7ftN5GvT2ulqF0SidHYnA0wurv72Z7NzdEiTIceDe+Cc3oqw7ofmzJav5+dRc6BKGcxql0q7x0vwSCt03hvZUkowZmOTe9/m6dY4tA8auofftznqCXNdasx/2KmRQ3+MJEHgN/glyW1Ci5mJAiCNFfWq9Thd9mvEZi2eJ21TL94kIaBhXGfsSHjXQFTzE4Z2zpofU2/3qrUr4VRgjoVXnzElvUBdzee0tjPGEnkfHS5ORN2PKTwqhDGCsAc=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(346002)(396003)(376002)(451199021)(40470700004)(46966006)(36840700001)(47076005)(426003)(336012)(110136005)(44832011)(82740400003)(54906003)(40480700001)(478600001)(8676002)(8936002)(41300700001)(70206006)(70586007)(356005)(81166007)(316002)(5660300002)(4326008)(86362001)(40460700003)(6666004)(7696005)(36756003)(2906002)(82310400005)(36860700001)(16526019)(186003)(1076003)(26005)(2616005)(36900700001)(309714004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 19:12:29.6696
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 19:12:32.3258
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a37ac1d-76e5-4b06-2dc3-08db68544dfe
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6085949-ef7d-4020-7cbf-08db68544f93
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044FC.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9120
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8716
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The attribute_show() macro is only valid for determining the availability
-of security related sysfs entries. Rename the macro to better show this
-relationship.
+Add a small shared library that demonstrates the usage of the
+IOCTL interface.  This library can be linked to but, is
+intended to be loaded and used by higher level languages
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
-v2->v3:
- * Pick up tag
+v3->v4:
+ * New patch
 ---
- drivers/crypto/ccp/sp-pci.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ tools/crypto/ccp/Makefile | 13 +++++++
+ tools/crypto/ccp/dbc.c    | 72 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
+ create mode 100644 tools/crypto/ccp/Makefile
+ create mode 100644 tools/crypto/ccp/dbc.c
 
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index b603ad9b8341..c8f075a7f49f 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -32,7 +32,7 @@ struct sp_pci {
- };
- static struct sp_device *sp_dev_master;
- 
--#define attribute_show(name, def)						\
-+#define security_attribute_show(name, def)					\
- static ssize_t name##_show(struct device *d, struct device_attribute *attr,	\
- 			   char *buf)						\
- {										\
-@@ -42,24 +42,24 @@ static ssize_t name##_show(struct device *d, struct device_attribute *attr,	\
- 	return sysfs_emit(buf, "%d\n", (psp->capability & bit) > 0);		\
- }
- 
--attribute_show(fused_part, FUSED_PART)
-+security_attribute_show(fused_part, FUSED_PART)
- static DEVICE_ATTR_RO(fused_part);
--attribute_show(debug_lock_on, DEBUG_LOCK_ON)
-+security_attribute_show(debug_lock_on, DEBUG_LOCK_ON)
- static DEVICE_ATTR_RO(debug_lock_on);
--attribute_show(tsme_status, TSME_STATUS)
-+security_attribute_show(tsme_status, TSME_STATUS)
- static DEVICE_ATTR_RO(tsme_status);
--attribute_show(anti_rollback_status, ANTI_ROLLBACK_STATUS)
-+security_attribute_show(anti_rollback_status, ANTI_ROLLBACK_STATUS)
- static DEVICE_ATTR_RO(anti_rollback_status);
--attribute_show(rpmc_production_enabled, RPMC_PRODUCTION_ENABLED)
-+security_attribute_show(rpmc_production_enabled, RPMC_PRODUCTION_ENABLED)
- static DEVICE_ATTR_RO(rpmc_production_enabled);
--attribute_show(rpmc_spirom_available, RPMC_SPIROM_AVAILABLE)
-+security_attribute_show(rpmc_spirom_available, RPMC_SPIROM_AVAILABLE)
- static DEVICE_ATTR_RO(rpmc_spirom_available);
--attribute_show(hsp_tpm_available, HSP_TPM_AVAILABLE)
-+security_attribute_show(hsp_tpm_available, HSP_TPM_AVAILABLE)
- static DEVICE_ATTR_RO(hsp_tpm_available);
--attribute_show(rom_armor_enforced, ROM_ARMOR_ENFORCED)
-+security_attribute_show(rom_armor_enforced, ROM_ARMOR_ENFORCED)
- static DEVICE_ATTR_RO(rom_armor_enforced);
- 
--static struct attribute *psp_attrs[] = {
-+static struct attribute *psp_security_attrs[] = {
- 	&dev_attr_fused_part.attr,
- 	&dev_attr_debug_lock_on.attr,
- 	&dev_attr_tsme_status.attr,
-@@ -83,13 +83,13 @@ static umode_t psp_security_is_visible(struct kobject *kobj, struct attribute *a
- 	return 0;
- }
- 
--static struct attribute_group psp_attr_group = {
--	.attrs = psp_attrs,
-+static struct attribute_group psp_security_attr_group = {
-+	.attrs = psp_security_attrs,
- 	.is_visible = psp_security_is_visible,
- };
- 
- static const struct attribute_group *psp_groups[] = {
--	&psp_attr_group,
-+	&psp_security_attr_group,
- 	NULL,
- };
- 
+diff --git a/tools/crypto/ccp/Makefile b/tools/crypto/ccp/Makefile
+new file mode 100644
+index 000000000000..ae4a66d1558a
+--- /dev/null
++++ b/tools/crypto/ccp/Makefile
+@@ -0,0 +1,13 @@
++# SPDX-License-Identifier: GPL-2.0-only
++CFLAGS += -D__EXPORTED_HEADERS__ -I../../../include/uapi -I../../../include
++
++TARGET = dbc_library.so
++
++all: $(TARGET)
++
++dbc_library.so: dbc.c
++	$(CC) $(CFLAGS) $(LDFLAGS) -shared -o $@ $<
++	chmod -x $@
++
++clean:
++	$(RM) $(TARGET)
+diff --git a/tools/crypto/ccp/dbc.c b/tools/crypto/ccp/dbc.c
+new file mode 100644
+index 000000000000..37e813175642
+--- /dev/null
++++ b/tools/crypto/ccp/dbc.c
+@@ -0,0 +1,72 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * AMD Secure Processor Dynamic Boost Control sample library
++ *
++ * Copyright (C) 2023 Advanced Micro Devices, Inc.
++ *
++ * Author: Mario Limonciello <mario.limonciello@amd.com>
++ */
++
++#include <assert.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++/* if uapi header isn't installed, this might not yet exist */
++#ifndef __packed
++#define __packed __attribute__((packed))
++#endif
++#include <linux/psp-dbc.h>
++
++int get_nonce(int fd, void *nonce_out, void *signature)
++{
++	struct dbc_user_nonce tmp = {
++		.auth_needed = !!signature,
++	};
++	int ret;
++
++	assert(nonce_out);
++
++	if (signature)
++		memcpy(tmp.signature, signature, sizeof(tmp.signature));
++
++	ret = ioctl(fd, DBCIOCNONCE, &tmp);
++	if (ret)
++		return ret;
++	memcpy(nonce_out, tmp.nonce, sizeof(tmp.nonce));
++
++	return 0;
++}
++
++int set_uid(int fd, __u8 *uid, __u8 *signature)
++{
++	struct dbc_user_setuid tmp;
++
++	assert(uid);
++	assert(signature);
++
++	memcpy(tmp.uid, uid, sizeof(tmp.uid));
++	memcpy(tmp.signature, signature, sizeof(tmp.signature));
++
++	return ioctl(fd, DBCIOCUID, &tmp);
++}
++
++int process_param(int fd, int msg_index, __u8 *signature, int *data)
++{
++	struct dbc_user_param tmp = {
++		.msg_index = msg_index,
++		.param = *data,
++	};
++	int ret;
++
++	assert(signature);
++	assert(data);
++
++	memcpy(tmp.signature, signature, sizeof(tmp.signature));
++
++	ret = ioctl(fd, DBCIOCPARAM, &tmp);
++	if (ret)
++		return ret;
++
++	*data = tmp.param;
++	return 0;
++}
 -- 
 2.34.1
 
