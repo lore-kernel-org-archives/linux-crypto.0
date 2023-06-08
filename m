@@ -2,62 +2,36 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5D7C7EE23
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 06:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC57C7EE25
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 06:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234974AbjFHGtl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jun 2023 02:49:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36400 "EHLO
+        id S235020AbjFHGyW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jun 2023 02:54:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234439AbjFHGtk (ORCPT
+        with ESMTP id S234797AbjFHGyV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2023 02:49:40 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E213A173B;
-        Wed,  7 Jun 2023 23:49:39 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-3f80cd74c63so2845191cf.3;
-        Wed, 07 Jun 2023 23:49:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686206979; x=1688798979;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3ARSspE8Wqbyj/GCtXfbj+s8zwVt9qmZGvXVlUiROqk=;
-        b=YNiDJNFPJc+61sZ8GD5vTbQx9l8pQc0mLRpvzwH5mScpnv4b6d+Fx8Xk/om416FCKF
-         ZFDOXv3ihgAyC0Pqdz/7JJ8wdPmpvgPzGSqAkQs0iRvHwV5/PeR6KuX5tb+LgNDQ5l6l
-         OtQNuTiNFmuF56o7jWSqv1VQ3oFfiYCWjq6+LCvHdkSxJ0TEYFQlbIR69DjjkHJXew9K
-         rcoKZj/Sw2BBCHpEv8hOJn7g+E2GfHvALT4W0SRwzizxO+tMRGnlBFRXyamNk4S8vaKH
-         cpaATUb5PufaR/q6HbpLq5fd0onmwanj9avXxSXpOaMd3FRT0TEXpxCgRbE4iZAnhYya
-         L49A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686206979; x=1688798979;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ARSspE8Wqbyj/GCtXfbj+s8zwVt9qmZGvXVlUiROqk=;
-        b=csGqTMT3zz9calkvCgc54D43n2lqZ5A0xTdpNBKea0ZnbwSguzjuNlROBwGY/pAvqm
-         yqVHYbuIpjriHfkt+76ATYYO3+z2oot2K81oFqAl/jvH1JCdgCHkzBe2wOXygqo9+KmS
-         1mstoRvOp/Kbaw+Lp1LhS/DtUwhREGzaICnbunapLcyD9JaVZS7ROV4A/LCyjp14wtqE
-         YcKpVoodcr2sNzhimQyDq7PePLX/bvAQRe08Cq906ClofWxM3yil0tVQwZ1QERwB2fTZ
-         s9vMT5905UziOtMsPebWhEPt8pTuCHMEi/KoR9MH1f6oNMZnUH+/DVkZbUr8JCwqJ69v
-         v1EQ==
-X-Gm-Message-State: AC+VfDyMNUea/sWda7fXH5W8w5aDW/6qkfd59ODGrp0B/HNNtCJKDmYH
-        deO8Sm5uwn64UemxJWhOIIs=
-X-Google-Smtp-Source: ACHHUZ6OYDuiqLS1qKmOsF4AO2kU9zCpuDaDkoZH6pWqspjDCpqZyamwOn9eKqiQtVUOfHXY6X6MHw==
-X-Received: by 2002:a05:622a:289:b0:3f6:c348:3fc6 with SMTP id z9-20020a05622a028900b003f6c3483fc6mr6384281qtw.8.1686206978969;
-        Wed, 07 Jun 2023 23:49:38 -0700 (PDT)
-Received: from [192.168.43.80] (subs03-180-214-233-89.three.co.id. [180.214.233.89])
-        by smtp.gmail.com with ESMTPSA id e21-20020a62aa15000000b0065014c15a57sm420351pff.35.2023.06.07.23.49.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 23:49:38 -0700 (PDT)
-Message-ID: <bb4060b4-47b6-a7ba-af73-8509241ee2cc@gmail.com>
-Date:   Thu, 8 Jun 2023 13:49:32 +0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH 8/8] crypto: cts: Convert MIT boilerplate to corresponding
- SPDX license identifier
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Thu, 8 Jun 2023 02:54:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331CD198C;
+        Wed,  7 Jun 2023 23:54:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C4D0B63FCB;
+        Thu,  8 Jun 2023 06:54:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6545C433EF;
+        Thu,  8 Jun 2023 06:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1686207259;
+        bh=PCwkSliYcR8EwEi5YD7rPecyA6buMZZEPx4FRd2SB8c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YvylF1doXzbz6mkc2jQMb384NyStymmrCjH+0mKi9ZOEqhr56H09fNhM7o31f/Yds
+         X8aQgdACyPmf8UvLoUSqGBXjlIDqnfRiiOlHyHW4fYNfchq2JkTqiX1tevtY1vKgi9
+         4w52LjOxAN57yHtb8lYR1sSJdzSaEIhFwbePAMtw=
+Date:   Thu, 8 Jun 2023 08:54:16 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
 Cc:     Richard Fontana <rfontana@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -69,29 +43,38 @@ Cc:     Richard Fontana <rfontana@redhat.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH 8/8] crypto: cts: Convert MIT boilerplate to
+ corresponding SPDX license identifier
+Message-ID: <2023060832-celtic-compost-ff48@gregkh>
 References: <20230607053940.39078-10-bagasdotme@gmail.com>
  <20230607053940.39078-18-bagasdotme@gmail.com>
  <CAC1cPGx-mD0DAEanCFtoxoGRyHkcu-GTTNX=ePzjhb8XM+73mg@mail.gmail.com>
- <ZIFn8mNXVcI0SGTR@debian.me> <2023060839-limpness-vessel-ccc7@gregkh>
-Content-Language: en-US
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <2023060839-limpness-vessel-ccc7@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <ZIFn8mNXVcI0SGTR@debian.me>
+ <2023060839-limpness-vessel-ccc7@gregkh>
+ <bb4060b4-47b6-a7ba-af73-8509241ee2cc@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bb4060b4-47b6-a7ba-af73-8509241ee2cc@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/8/23 12:40, Greg Kroah-Hartman wrote:
->> Greg, is Richard's comment right? If so, I'll drop this patch.
+On Thu, Jun 08, 2023 at 01:49:32PM +0700, Bagas Sanjaya wrote:
+> On 6/8/23 12:40, Greg Kroah-Hartman wrote:
+> >> Greg, is Richard's comment right? If so, I'll drop this patch.
+> > 
+> > Yes it is, please ask for all of these to not be applied.
+> > 
 > 
-> Yes it is, please ask for all of these to not be applied.
-> 
+> Did you mean this whole series? Other patches have not been reviewed
+> yet. Maybe Herbert can apply these rest of patches if there is
+> no objection.
 
-Did you mean this whole series? Other patches have not been reviewed
-yet. Maybe Herbert can apply these rest of patches if there is
-no objection.
+Based on the review of these, I would drop them all until you can get a
+review from someone with lots of license experience to add their
+reviewed-by to them.
 
--- 
-An old man doll... just what I always wanted! - Clara
+thanks,
 
+greg k-h
