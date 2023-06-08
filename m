@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F61C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 19:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE57FC7EE29
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 19:13:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236623AbjFHTNC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jun 2023 15:13:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59606 "EHLO
+        id S236639AbjFHTND (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jun 2023 15:13:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236320AbjFHTMw (ORCPT
+        with ESMTP id S235723AbjFHTMx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2023 15:12:52 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EC0030DB;
-        Thu,  8 Jun 2023 12:12:34 -0700 (PDT)
+        Thu, 8 Jun 2023 15:12:53 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D6E9D;
+        Thu,  8 Jun 2023 12:12:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Azdp+2f7y539KYi5rxy59RBwed1t+2wG+ADNjcjUudrfnZKfXJSgvRY1KS4v9QzvbyRhkf3KlKvePw2bGk4OYpYKZqVBx3WxF5B0QBphMqnJNr14x1EceW/4uDl8SLcpGDB6CHgb0W7UiEr/5rDXvPWPAG661JSspkMhyrKWm9HknVXaiUdnwFe7NF43jfLcpNFjl/x6R9RIy8v+AzvNenDjFUvFom2+/X7pTbrKNg+Pc5Aqx0HLnNnYrmUQ/bQsOp8Y7vHqHeLdzbjlOm0fpgE63w65IsVeHy5Pchb3rxPnRy5DfmWCHKhrsBjtzR6WOUDP7j5lS6oFTdZq98lMSw==
+ b=Zrt7GJNyF6DqyMklqSzL4KmOJuEZHqAMW6ikhVeD8z73FGnOi54WfYsTLbKzZvDRB3+kfx9ibLvJW6tdi+OMCVDBQOUGPYneNY1ri7ruXuHshpfjCzOoAXbgTtMf/El7h4jkkuV0aMTuPEpekNlCmlR8kfBGW8sg5LhWfsb+slZOiSGKzg++4UgKezGis5STWBN11De7QX3gmExZDJDMCQYak6DojUI+HMBJOIy3CrKJZcYDP830RqR4PnnnloYnm5gQc0lW5OH69fC8YS0ddbLX/in7wmSyjRhEQcaGuTj8Olec84qxvJmR3bcVb0BcdUY3rSMLz3O40AhACjBsGQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bdJT8NGzTdhfAe7TuVGd6FYb32oOl+oCsBjc9y2oR04=;
- b=dEIlhtJch0efwQuX1+uYTUgV+dlEe1+k8vevqoOuf2beDJK3AsWl22A3wx3NvC4vN3ixIrJobGtyA2j+setpU67mIhCqq9nGZCyXMHtwblyAjneHBWfimQ3sqzhyaC5JQO+JV/L/L8FbNdFFbsem5Onlcj6qdwm9AZ9LVDRHYa6I18CAOf9S1l4PpksnT0+l7M5rOmSljPJdipc43m3ODVhhHWhr3M3qIvshXGGbg5Kveu/KxbqFO1EvXQQYSad+4Y+HOGYSzLWQb+HEZL6G+rK8nwEXLMhH7iyNcWB7EaWy8r9aWPxZcC1/OSPdHQdvX/79cHm8+hEfk605ZUbiHw==
+ bh=2dOqqACfUJwO/by3O4wOEYvyIoycNd43moItLDSn8b4=;
+ b=jtw44Vqqixdc90N1qck+ByUIMl4dDfPvrYriKXhLGaz3DLG1toZOkuVZFzr5hTipv908RZNEfEV9LcEuNhPv212DRR+sMToCqBpzBXVTjCkDQKEC75SwfDQIqP3c4mi3fIuEQiKjp2lQGt+j1UAJKJ3/yVU1Tjy2142rqDXGjMUB4c1poMhIo0xklKcIa+1L/ykSeYkyLCc/8miQe3W1sFaTUjCQtroNBG9U7YtyeshtiAkbBFiZGWwnWA5KYbZCk6iBhgBfkN4fINgBpv783UJPGYua3uw0bQy5dRUqH72hnMFqg2HQzZRQYmitvgWnwj/FYHG5MPovimCic4EDIA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bdJT8NGzTdhfAe7TuVGd6FYb32oOl+oCsBjc9y2oR04=;
- b=FOPprEihnxUBA7Dtz34f03aW3g1e2lmdM6X8iyK/i6/OJL/YmV8EdMwmnhKSMEHIptW1LbjRD7TSD1Ha1wNPgB6W3vK0xDgZnJ/mOQMz7TVd9gjUdb4ZoBWAIF6HG5S1Fsw5pZ4fZ71xkbpPcyiIQ0aWnA0AbLVTFYbXiSfBqcs=
-Received: from MW4PR04CA0259.namprd04.prod.outlook.com (2603:10b6:303:88::24)
- by CY8PR12MB7243.namprd12.prod.outlook.com (2603:10b6:930:58::6) with
+ bh=2dOqqACfUJwO/by3O4wOEYvyIoycNd43moItLDSn8b4=;
+ b=EqDrln5D5wLuxdXQn19cIGSr4WYMz+2cbprNjlkfL3oz8s6EL0tOYZCP3FwNGjkxl/mqQAXYoWLsOJedS4V+wcsXxmg9Df4dcAcarhY1upvWpl/bZ1l8hidWeKDPd5z0BWuifAygW73Q/lLmCqw4NQ61qx+k5NhvzcjYSxepAqQ=
+Received: from MW4PR04CA0260.namprd04.prod.outlook.com (2603:10b6:303:88::25)
+ by LV2PR12MB5872.namprd12.prod.outlook.com (2603:10b6:408:173::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Thu, 8 Jun
- 2023 19:12:32 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.28; Thu, 8 Jun
+ 2023 19:12:33 +0000
 Received: from CO1PEPF000044FC.namprd21.prod.outlook.com
- (2603:10b6:303:88:cafe::ca) by MW4PR04CA0259.outlook.office365.com
- (2603:10b6:303:88::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33 via Frontend
- Transport; Thu, 8 Jun 2023 19:12:32 +0000
+ (2603:10b6:303:88:cafe::3e) by MW4PR04CA0260.outlook.office365.com
+ (2603:10b6:303:88::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.26 via Frontend
+ Transport; Thu, 8 Jun 2023 19:12:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -49,11 +49,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CO1PEPF000044FC.mail.protection.outlook.com (10.167.241.202) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.0 via Frontend Transport; Thu, 8 Jun 2023 19:12:31 +0000
+ 15.20.6500.0 via Frontend Transport; Thu, 8 Jun 2023 19:12:33 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 8 Jun
- 2023 14:12:27 -0500
+ 2023 14:12:28 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>,
@@ -61,9 +61,9 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     "David S . Miller" <davem@davemloft.net>,
         <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v4 06/11] crypto: ccp: Add support for setting user ID for dynamic boost control
-Date:   Thu, 8 Jun 2023 06:17:52 -0500
-Message-ID: <20230608111757.32054-7-mario.limonciello@amd.com>
+Subject: [PATCH v4 09/11] crypto: ccp: Add a sample python script for Dynamic Boost Control
+Date:   Thu, 8 Jun 2023 06:17:55 -0500
+Message-ID: <20230608111757.32054-10-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230608111757.32054-1-mario.limonciello@amd.com>
 References: <20230608111757.32054-1-mario.limonciello@amd.com>
@@ -75,148 +75,267 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|CY8PR12MB7243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 874229a5-7bc5-40c0-1d77-08db68544f53
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|LV2PR12MB5872:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3aed490e-ee96-47ba-28a7-08db68545001
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: F1cAVvh1Q5BpQLe3FHkmr9U4GuYW2JfHot4EftW3nqqfb6l5Gfz/+2b14dg2Ajq/8y3u8sOFUPUK8l7mLV7UekJ+q4McWtCWrnCJT6qAZanG+00BGBk+8skdTyU6sm6ZJHefEx/ZmbCAC0CbJdRoVbmjuMCkE7a1fI0+Vfqdgvo4PPdngxi3s8Et0ZpRz2itLgpQpwKY3rryTZjhoabvaV0SdXOO1r1CtHKiPQIackdGX+L/+PAeNJ0YUmnOjWSyNz7FobKAPrprVeHHkDIS5yFR0STml9Zg5ndZ974ydSwPVq99jCAe6rBEmeFPwAq8f+fD5FNAd64DTUkK2J8KaGOCZSyt6GVCqNYCbpQp6BF1FJ6h59X4JXnKvm8AE2CI5YzaOElHWLbEJxqsz5cB+QrEV36b7ChGcD+beQrgX/fu2nif2ExZKSTUQVYYX8jCb1focEW/IxYha+CtSBuBR/F765xcq9CFiiiDzruwkeTEDFd02uxHgvYhn03T8OqBrnufBK4jbsSmZJt5CIxi3PdFFWBFGDWuYs5YL88jimBKRhqzPSmyaciZIwuvJ44IJxYp9PFEsq7iOHv9Y+Ixp8008dd9uVPkoF2QMu/Y2zx+I2qQidAH9nKAHhAL9b0utf62L57Z0BuSF6thLvODxlQnzYqqg4DjxxHWoZJP4kLvwgaD/i3THgPhN6Rh+h/6sYkB2kFDBgZ6o57MUl+u0ssx3hJ7SEik++K+92qMRVrgepiyrBbIMyRBUrAC9yrO91s+PLVdTCsolRW4lhxi2A==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(396003)(376002)(39860400002)(451199021)(40470700004)(36840700001)(46966006)(54906003)(110136005)(40460700003)(40480700001)(478600001)(44832011)(8936002)(8676002)(36756003)(5660300002)(2906002)(86362001)(4326008)(356005)(81166007)(70206006)(70586007)(82740400003)(316002)(82310400005)(2616005)(1076003)(41300700001)(16526019)(47076005)(26005)(36860700001)(83380400001)(186003)(336012)(7696005)(6666004)(426003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: HhV1349TkqclRNzvLOKJ6v4YKCIUObSfGfsNnCBBOgsTBp668wWgcaeWWXAL34ijXaM0kMJ+6HzMIItzvJKSY6pit8nVOgtwWeW6RqrQvmvB/y50kJLhWCaFmvHtXO+/vasFBxMH9LoVJoflZCFvWzrACpDway6zNO6ChbHA6iIWpPJ2pktnxxsx1f3neJrOUA7VTrZ0ykMqRl9azW3SpDfK7Qj6saXBh++10aS17Il1xqr31T4AohS3+keUWtPG5r0OtBEJuZBknxcFgbqYQaMcp+nm2fVynz1y1TJe/VIIPfL7lZBa1eepvu614SCSbAoPxo5EtnKB9ml5EmfBHKus9Xtm4teSoyhLOGL/wNE7U9R/wDWWtYoZ++gRcU2L7NgPRXpO/RbxQ8mNOii0QqmeWGVtqtdlJfiORwVoz9HKRHwtMh92n6idTiVxNS+doCdJJ4obDNmUBtOQZzgtiXsoVXwxGIIZCuv+Un7Au3Y8T2ePRNRedA1z0ZYKZF9j367f74Q56D1KT+e4nxNeYnlCvkIINShafnKc4GKRF/CmswNwNCu2RHQeWS1NnbhfJDcNN5XSlRHAfAa2OTAWDlV9LYNxcmaKTmNUmawrsMULbnlux3IfKVjQFGr2jM27v9OemPraFF3uwJXIQoAp0Pi/HUCrzoa14At21M4iChr9jUIOf7JVm8+w+q+/TL5xjac5WQEX6r4wS3Jf64c8x/2h+kaVVn3HJ6W5VqVQYGZYSMzB1RI0Lbj/490SRG+/jsfiMZvjKMGr1b1UmCHBCw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(346002)(376002)(396003)(451199021)(36840700001)(46966006)(40470700004)(47076005)(1076003)(26005)(2616005)(83380400001)(41300700001)(6666004)(16526019)(7696005)(186003)(426003)(36860700001)(336012)(40460700003)(4326008)(478600001)(110136005)(54906003)(40480700001)(82310400005)(316002)(356005)(5660300002)(70206006)(70586007)(82740400003)(81166007)(8676002)(44832011)(8936002)(2906002)(86362001)(36756003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 19:12:31.9039
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 19:12:33.0445
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 874229a5-7bc5-40c0-1d77-08db68544f53
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3aed490e-ee96-47ba-28a7-08db68545001
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044FC.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7243
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5872
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As part of the authentication flow for Dynamic Boost Control, the calling
-software will need to send a uid used in all of its future
-communications.
+Dynamic Boost Control commands are triggered by userspace with
+an IOCTL interface that userspace will prepare proper buffers
+for a request.
 
-Add support for another IOCTL call to let userspace software set this up.
+To allow prototyping and testing this interface, add a python3
+command line script that loads the dbc_library.so for utilizing
+the IOCTLs.
+
+The signature to use and UID are passed as arguments to this script.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
-v1->v2:
- * Update commit message
+v3->v4:
+ * Use library from previous patch instead of python's ioctl interface
 ---
- drivers/crypto/ccp/dbc.c            | 18 ++++++++++++++++++
- drivers/crypto/ccp/dbc.h            |  6 ++++++
- include/linux/psp-platform-access.h |  1 +
- include/uapi/linux/psp-dbc.h        | 20 ++++++++++++++++++++
- 4 files changed, 45 insertions(+)
+ tools/crypto/ccp/.gitignore |   1 +
+ tools/crypto/ccp/dbc.py     |  64 +++++++++++++++++
+ tools/crypto/ccp/dbc_cli.py | 134 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 199 insertions(+)
+ create mode 100644 tools/crypto/ccp/.gitignore
+ create mode 100644 tools/crypto/ccp/dbc.py
+ create mode 100755 tools/crypto/ccp/dbc_cli.py
 
-diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
-index 7afeca903136..ca7ec528536b 100644
---- a/drivers/crypto/ccp/dbc.c
-+++ b/drivers/crypto/ccp/dbc.c
-@@ -117,6 +117,24 @@ static long dbc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
- 			goto unlock;
- 		}
- 		break;
-+	case DBCIOCUID:
-+		dbc_dev->mbox->req.header.payload_size = sizeof(dbc_dev->mbox->dbc_set_uid);
-+		if (copy_from_user(&dbc_dev->mbox->dbc_set_uid.user, argp,
-+				   sizeof(struct dbc_user_setuid))) {
-+			ret = -EFAULT;
-+			goto unlock;
-+		}
+diff --git a/tools/crypto/ccp/.gitignore b/tools/crypto/ccp/.gitignore
+new file mode 100644
+index 000000000000..bee8a64b79a9
+--- /dev/null
++++ b/tools/crypto/ccp/.gitignore
+@@ -0,0 +1 @@
++__pycache__
+diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
+new file mode 100644
+index 000000000000..3f6a825ffc9e
+--- /dev/null
++++ b/tools/crypto/ccp/dbc.py
+@@ -0,0 +1,64 @@
++#!/usr/bin/python3
++# SPDX-License-Identifier: GPL-2.0
 +
-+		ret = send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_SET_UID);
-+		if (ret)
-+			goto unlock;
++import ctypes
++import os
 +
-+		if (copy_to_user(argp, &dbc_dev->mbox->dbc_set_uid.user,
-+				 sizeof(struct dbc_user_setuid))) {
-+			ret = -EFAULT;
-+			goto unlock;
-+		}
-+		break;
- 	default:
- 		ret = -EINVAL;
- 
-diff --git a/drivers/crypto/ccp/dbc.h b/drivers/crypto/ccp/dbc.h
-index 1c3a0a078d15..156435100076 100644
---- a/drivers/crypto/ccp/dbc.h
-+++ b/drivers/crypto/ccp/dbc.h
-@@ -33,9 +33,15 @@ struct dbc_nonce {
- 	struct dbc_user_nonce		user;
- } __packed;
- 
-+struct dbc_set_uid {
-+	struct psp_req_buffer_hdr	header;
-+	struct dbc_user_setuid		user;
-+} __packed;
++DBC_UID_SIZE = 16
++DBC_NONCE_SIZE = 16
++DBC_SIG_SIZE = 32
 +
- union dbc_buffer {
- 	struct psp_request		req;
- 	struct dbc_nonce		dbc_nonce;
-+	struct dbc_set_uid		dbc_set_uid;
- };
- 
- void dbc_dev_destroy(struct psp_device *psp);
-diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
-index 53b4a1df5180..18b9e0f0cb03 100644
---- a/include/linux/psp-platform-access.h
-+++ b/include/linux/psp-platform-access.h
-@@ -9,6 +9,7 @@ enum psp_platform_access_msg {
- 	PSP_CMD_NONE = 0x0,
- 	PSP_I2C_REQ_BUS_CMD = 0x64,
- 	PSP_DYNAMIC_BOOST_GET_NONCE,
-+	PSP_DYNAMIC_BOOST_SET_UID,
- };
- 
- struct psp_req_buffer_hdr {
-diff --git a/include/uapi/linux/psp-dbc.h b/include/uapi/linux/psp-dbc.h
-index d032f78934e2..7443c78ede19 100644
---- a/include/uapi/linux/psp-dbc.h
-+++ b/include/uapi/linux/psp-dbc.h
-@@ -18,6 +18,7 @@
- 
- #define DBC_NONCE_SIZE		16
- #define DBC_SIG_SIZE		32
-+#define DBC_UID_SIZE		16
- 
- /**
-  * struct dbc_user_nonce - Nonce exchange structure (input/output).
-@@ -34,6 +35,16 @@ struct dbc_user_nonce {
- 	__u8	signature[DBC_SIG_SIZE];
- } __packed;
- 
-+/**
-+ * struct dbc_user_setuid - UID exchange structure (input).
-+ * @uid:       16 byte value representing software identity
-+ * @signature: 32 byte signature created by software using a previous nonce
-+ */
-+struct dbc_user_setuid {
-+	__u8	uid[DBC_UID_SIZE];
-+	__u8	signature[DBC_SIG_SIZE];
-+} __packed;
++PARAM_GET_FMAX_CAP = (0x3,)
++PARAM_SET_FMAX_CAP = (0x4,)
++PARAM_GET_PWR_CAP = (0x5,)
++PARAM_SET_PWR_CAP = (0x6,)
++PARAM_GET_GFX_MODE = (0x7,)
++PARAM_SET_GFX_MODE = (0x8,)
++PARAM_GET_CURR_TEMP = (0x9,)
++PARAM_GET_FMAX_MAX = (0xA,)
++PARAM_GET_FMAX_MIN = (0xB,)
++PARAM_GET_SOC_PWR_MAX = (0xC,)
++PARAM_GET_SOC_PWR_MIN = (0xD,)
++PARAM_GET_SOC_PWR_CUR = (0xE,)
 +
- /**
-  * Dynamic Boost Control (DBC) IOC
-  *
-@@ -64,4 +75,13 @@ struct dbc_user_nonce {
-  */
- #define DBCIOCNONCE	_IOWR(DBC_IOC_TYPE, 0x1, struct dbc_user_nonce)
- 
-+/**
-+ * DBCIOCUID - Set the user ID (UID) of a calling process.
-+ *             The user ID is 8 bytes long. It must be programmed using a
-+ *             32 byte signature built using the nonce fetched from
-+ *             DBCIOCNONCE.
-+ *             The UID can only be set once until the system is rebooted.
-+ */
-+#define DBCIOCUID	_IOW(DBC_IOC_TYPE, 0x2, struct dbc_user_setuid)
++DEVICE_NODE = "/dev/dbc"
 +
- #endif /* __PSP_DBC_USER_H__ */
++lib = ctypes.CDLL("./dbc_library.so", mode=ctypes.RTLD_GLOBAL)
++
++
++def handle_error(code):
++    val = code * -1
++    raise OSError(val, os.strerror(val))
++
++
++def get_nonce(device, signature):
++    if not device:
++        raise ValueError("Device required")
++    buf = ctypes.create_string_buffer(DBC_NONCE_SIZE)
++    ret = lib.get_nonce(device.fileno(), ctypes.byref(buf), signature)
++    if ret:
++        handle_error(ret)
++    return buf.value
++
++
++def set_uid(device, new_uid, signature):
++    if not signature:
++        raise ValueError("Signature required")
++    if not new_uid:
++        raise ValueError("UID required")
++    ret = lib.set_uid(device.fileno(), new_uid, signature)
++    if ret:
++        handle_error(ret)
++    return True
++
++
++def process_param(device, message, signature, data=None):
++    if not signature:
++        raise ValueError("Signature required")
++    if type(message) != tuple:
++        raise ValueError("Expected message tuple")
++    arg = ctypes.c_int(data if data else 0)
++    ret = lib.process_param(device.fileno(), message[0], signature, ctypes.pointer(arg))
++    if ret:
++        handle_error(ret)
++    return arg, signature
+diff --git a/tools/crypto/ccp/dbc_cli.py b/tools/crypto/ccp/dbc_cli.py
+new file mode 100755
+index 000000000000..97b20553a676
+--- /dev/null
++++ b/tools/crypto/ccp/dbc_cli.py
+@@ -0,0 +1,134 @@
++#!/usr/bin/python3
++# SPDX-License-Identifier: GPL-2.0
++import argparse
++import binascii
++import os
++import errno
++from dbc import *
++
++ERRORS = {
++    errno.EACCES: "Access is denied",
++    errno.E2BIG: "Excess data provided",
++    errno.EINVAL: "Bad parameters",
++    errno.EAGAIN: "Bad state",
++    errno.ENOENT: "Not implemented or message failure",
++    errno.EBUSY: "Busy",
++    errno.ENFILE: "Overflow",
++    errno.EPERM: "Signature invalid",
++}
++
++messages = {
++    "get-fmax-cap": PARAM_GET_FMAX_CAP,
++    "set-fmax-cap": PARAM_SET_FMAX_CAP,
++    "get-power-cap": PARAM_GET_PWR_CAP,
++    "set-power-cap": PARAM_SET_PWR_CAP,
++    "get-graphics-mode": PARAM_GET_GFX_MODE,
++    "set-graphics-mode": PARAM_SET_GFX_MODE,
++    "get-current-temp": PARAM_GET_CURR_TEMP,
++    "get-fmax-max": PARAM_GET_FMAX_MAX,
++    "get-fmax-min": PARAM_GET_FMAX_MAX,
++    "get-soc-power-max": PARAM_GET_SOC_PWR_MAX,
++    "get-soc-power-min": PARAM_GET_SOC_PWR_MIN,
++    "get-soc-power-cur": PARAM_GET_SOC_PWR_CUR,
++}
++
++
++def _pretty_buffer(ba):
++    return str(binascii.hexlify(ba, " "))
++
++
++def parse_args():
++    parser = argparse.ArgumentParser(
++        description="Dynamic Boost control command line interface"
++    )
++    parser.add_argument(
++        "command",
++        choices=["get-nonce", "get-param", "set-param", "set-uid"],
++        help="Command to send",
++    )
++    parser.add_argument("--device", default="/dev/dbc", help="Device to operate")
++    parser.add_argument("--signature", help="File containing signature for command")
++    parser.add_argument("--message", choices=messages.keys(), help="Message index")
++    parser.add_argument("--data", help="Argument to pass to message")
++    parser.add_argument("--uid", help="File containing UID to pass")
++    return parser.parse_args()
++
++
++def pretty_error(code):
++    if code in ERRORS:
++        print(ERRORS[code])
++    else:
++        print("failed with return code %d" % code)
++
++
++if __name__ == "__main__":
++    args = parse_args()
++    data = 0
++    sig = None
++    uid = None
++    if not os.path.exists(args.device):
++        raise IOError("Missing device {device}".format(device=args.device))
++    if args.signature:
++        if not os.path.exists(args.signature):
++            raise ValueError("Invalid signature file %s" % args.signature)
++        with open(args.signature, "rb") as f:
++            sig = f.read()
++        if len(sig) != DBC_SIG_SIZE:
++            raise ValueError(
++                "Invalid signature length %d (expected %d)" % (len(sig), DBC_SIG_SIZE)
++            )
++    if args.uid:
++        if not os.path.exists(args.uid):
++            raise ValueError("Invalid uid file %s" % args.uid)
++        with open(args.uid, "rb") as f:
++            uid = f.read()
++        if len(uid) != DBC_UID_SIZE:
++            raise ValueError(
++                "Invalid UID length %d (expected %d)" % (len(uid), DBC_UID_SIZE)
++            )
++    if args.data:
++        try:
++            data = int(args.data, 10)
++        except ValueError:
++            data = int(args.data, 16)
++
++    with open(args.device) as d:
++        if args.command == "get-nonce":
++            try:
++                nonce = get_nonce(d, sig)
++                print("Nonce: %s" % _pretty_buffer(bytes(nonce)))
++            except OSError as e:
++                pretty_error(e.errno)
++        elif args.command == "set-uid":
++            try:
++                result = set_uid(d, uid, sig)
++                if result:
++                    print("Set UID")
++            except OSError as e:
++                pretty_error(e.errno)
++        elif args.command == "get-param":
++            if not args.message or args.message.startswith("set"):
++                raise ValueError("Invalid message %s" % args.message)
++            try:
++                param, signature = process_param(d, messages[args.message], sig)
++                print(
++                    "Parameter: {par}, response signature {sig}".format(
++                        par=param,
++                        sig=_pretty_buffer(bytes(signature)),
++                    )
++                )
++            except OSError as e:
++                pretty_error(e.errno)
++        elif args.command == "set-param":
++            if not args.message or args.message.startswith("get"):
++                raise ValueError("Invalid message %s" % args.message)
++            try:
++                param, signature = process_param(d, messages[args.message], sig, data)
++                print(
++                    "Parameter: {par}, response signature {sig}".format(
++                        par=param,
++                        sig=_pretty_buffer(bytes(signature)),
++                    )
++                )
++            except OSError as e:
++                pretty_error(e.errno)
 -- 
 2.34.1
 
