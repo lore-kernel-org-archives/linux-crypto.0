@@ -2,60 +2,41 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D29C7EE23
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 08:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9D4C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 09:05:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235458AbjFHIhu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jun 2023 04:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39242 "EHLO
+        id S235170AbjFHJFn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jun 2023 05:05:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233645AbjFHIht (ORCPT
+        with ESMTP id S235746AbjFHJFk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2023 04:37:49 -0400
+        Thu, 8 Jun 2023 05:05:40 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4B226B2;
-        Thu,  8 Jun 2023 01:37:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02AEE50;
+        Thu,  8 Jun 2023 02:05:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9A69864AA9;
-        Thu,  8 Jun 2023 08:37:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3A46C433A1;
-        Thu,  8 Jun 2023 08:37:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686213467;
-        bh=b8w2dww11+jeMQIGk8g14QqcvLwbopMkYC+R8CQKZcI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=le1K4qUjRcurFJR4PvKWFr5yX1wr0bfbQMMQHpCiVNVL/GKFvdUoD3YXlQwh9z2aw
-         a2k/KClut7Rba/NBifCDLFmoNHZoSWst8biJ4nex0gyZrtMuZBwNJ/TI59S6X9Q3SI
-         PD52rYChAEgeGp/WmvngWXiwjouLglPxSMGOkbntnVfwdoRTNiMn8mcN4/PAGxHWnI
-         KKcwuJzJpG2khAypic80LcdVcW7flajlgM1XjpDxzo5fguM5HNdniH7+61plfrq24n
-         PqPJjdnb/NTO64Qyz6G4uavwQec+K3YYwagbM83ZkrAx2q9BgYjVnImFQ0YURyTh1m
-         nzneBZ1G8KChg==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so465853e87.3;
-        Thu, 08 Jun 2023 01:37:46 -0700 (PDT)
-X-Gm-Message-State: AC+VfDypERVI4+7y/0vomASr5qpZ8QsEXkJY8adAnn52FGKzyXhPLx6b
-        I04oGT/lUYJFRpFEtRzK2lzk3Xjxq/2RqKHZDXw=
-X-Google-Smtp-Source: ACHHUZ5YQ0EtwVOGgeqK+JNVOPM9pQ0uf1Q3nAcBP5h+ykVX8Gku7lWhb/0mJ5g2QMceulFBf3GJScF5rZVdvgUjp9g=
-X-Received: by 2002:a05:651c:113:b0:2b1:eab1:e083 with SMTP id
- a19-20020a05651c011300b002b1eab1e083mr3391281ljb.16.1686213465018; Thu, 08
- Jun 2023 01:37:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230607053940.39078-10-bagasdotme@gmail.com> <20230607053940.39078-11-bagasdotme@gmail.com>
- <CAC1cPGxD6xOLksyMHCcreFyEv5Yoo50LY=xM9BmOEP=oECoNww@mail.gmail.com>
-In-Reply-To: <CAC1cPGxD6xOLksyMHCcreFyEv5Yoo50LY=xM9BmOEP=oECoNww@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 8 Jun 2023 10:37:33 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGnzphm5Wyz7RfZdWVxPnEihR0NGy5mFs4neQM+7EfEGQ@mail.gmail.com>
-Message-ID: <CAMj1kXGnzphm5Wyz7RfZdWVxPnEihR0NGy5mFs4neQM+7EfEGQ@mail.gmail.com>
-Subject: Re: [PATCH 1/8] crypto: Convert dual BSD 3-Clause/GPL 2.0 boilerplate
- to SPDX identifier
-To:     Richard Fontana <rfontana@redhat.com>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 392FA64B1C;
+        Thu,  8 Jun 2023 09:05:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BEAC433EF;
+        Thu,  8 Jun 2023 09:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1686215133;
+        bh=b/HhhLn8tA5xrBrydV1Af1DGSHM7acWjZVlMLxM9uro=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=wx+Ytz28FmOSrtoOj0sYpKdPCfHo7/V7si2xru3lCENMHSox1yvRNu2+3HF8SW7Om
+         bRGeeMjINHGIaDXuxAVasZ5j4vUmfITRq6dXuCl6wII8GPZKZTP0taIa5G/KbnCc7P
+         R7oZ76z31qQc0r5gniCFz7Dr70yDEgifTkSfWe/A=
+Date:   Thu, 8 Jun 2023 11:05:30 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Richard Fontana <rfontana@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Franziska Naepelt <franziska.naepelt@googlemail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Linux SPDX Licenses <linux-spdx@vger.kernel.org>,
         Linux Kernel Janitors <kernel-janitors@vger.kernel.org>,
         Linux Crypto <linux-crypto@vger.kernel.org>,
@@ -69,44 +50,65 @@ Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
         "Adam J . Richter" <adam@yggdrasil.com>,
         Dr Brian Gladman <brg@gladman.me.uk>,
         Stephan Mueller <smueller@chronox.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 1/8] crypto: Convert dual BSD 3-Clause/GPL 2.0
+ boilerplate to SPDX identifier
+Message-ID: <2023060850-shakable-dynamite-c4ff@gregkh>
+References: <20230607053940.39078-10-bagasdotme@gmail.com>
+ <20230607053940.39078-11-bagasdotme@gmail.com>
+ <CAC1cPGxD6xOLksyMHCcreFyEv5Yoo50LY=xM9BmOEP=oECoNww@mail.gmail.com>
+ <CAMj1kXGnzphm5Wyz7RfZdWVxPnEihR0NGy5mFs4neQM+7EfEGQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMj1kXGnzphm5Wyz7RfZdWVxPnEihR0NGy5mFs4neQM+7EfEGQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 7 Jun 2023 at 16:38, Richard Fontana <rfontana@redhat.com> wrote:
->
-> On Wed, Jun 7, 2023 at 1:42=E2=80=AFAM Bagas Sanjaya <bagasdotme@gmail.co=
-m> wrote:
+On Thu, Jun 08, 2023 at 10:37:33AM +0200, Ard Biesheuvel wrote:
+> On Wed, 7 Jun 2023 at 16:38, Richard Fontana <rfontana@redhat.com> wrote:
 > >
-> > Replace license boilerplate for dual BSD-3-Clause/GPL 2.0 (only or
-> > later) with corresponding SPDX license identifier.
->
-> This is at least the fourth or fifth time (I'm losing track) where you
-> have incorrectly assumed a particular non-GPL license text matches a
-> particular SPDX identifier without (apparently) checking.
->
+> > On Wed, Jun 7, 2023 at 1:42 AM Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+> > >
+> > > Replace license boilerplate for dual BSD-3-Clause/GPL 2.0 (only or
+> > > later) with corresponding SPDX license identifier.
+> >
+> > This is at least the fourth or fifth time (I'm losing track) where you
+> > have incorrectly assumed a particular non-GPL license text matches a
+> > particular SPDX identifier without (apparently) checking.
+> >
+> 
+> What exactly does 'checking' entail here? There is no guidance in
+> Documentation/process/license-rules.rst on how to perform this
+> comparison.
+> 
+> Also, checkpatch now complains about missing SPDX identifiers, which
+> is what triggered this effort. Should it stop doing that?
+> 
+> > Bagas, I urge that you learn more about the nature of SPDX identifiers
+> > before submitting any further patches at least involving replacement
+> > of non-GPL notices with SPDX identifiers. For this unprecedented
+> > license notice replacement initiative to have any legitimacy it must
+> > attempt to apply SPDX identifiers correctly.
+> >
+> 
+> Since we're in language pedantic mode: it must do more than attempt,
+> it must apply them correctly, period.
+> 
+> Arguably, this is an 'attempt to apply SPDX identifiers correctly' on
+> Bagas's part, which apparently falls short (and I may be guilty of the
+> same for some arch crypto code)
+> 
+> So what is the ambition here: do we just leave the ambiguous ones as-is?
 
-What exactly does 'checking' entail here? There is no guidance in
-Documentation/process/license-rules.rst on how to perform this
-comparison.
+I recommend yes, leave them as-is until the legal people who actually
+care about having SPDX lines in all of the files take the time to do the
+work to resolve these issues.
 
-Also, checkpatch now complains about missing SPDX identifiers, which
-is what triggered this effort. Should it stop doing that?
+Remember, they are the ones asking for it, no need for us to do their
+work for them :)
 
-> Bagas, I urge that you learn more about the nature of SPDX identifiers
-> before submitting any further patches at least involving replacement
-> of non-GPL notices with SPDX identifiers. For this unprecedented
-> license notice replacement initiative to have any legitimacy it must
-> attempt to apply SPDX identifiers correctly.
->
+thanks,
 
-Since we're in language pedantic mode: it must do more than attempt,
-it must apply them correctly, period.
-
-Arguably, this is an 'attempt to apply SPDX identifiers correctly' on
-Bagas's part, which apparently falls short (and I may be guilty of the
-same for some arch crypto code)
-
-So what is the ambition here: do we just leave the ambiguous ones as-is?
+greg k-h
