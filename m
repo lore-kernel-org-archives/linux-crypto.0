@@ -2,132 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D84C7EE29
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 12:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DDE0C7EE23
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 13:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235905AbjFHMcc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jun 2023 08:32:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51694 "EHLO
+        id S233538AbjFHNk0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jun 2023 09:40:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235761AbjFHMcb (ORCPT
+        with ESMTP id S236123AbjFHNkZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2023 08:32:31 -0400
+        Thu, 8 Jun 2023 09:40:25 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7AAAE43;
-        Thu,  8 Jun 2023 05:32:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154BA1BE4;
+        Thu,  8 Jun 2023 06:40:24 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A54E61846;
-        Thu,  8 Jun 2023 12:32:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C42B0C433D2;
-        Thu,  8 Jun 2023 12:32:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A4FA64DB6;
+        Thu,  8 Jun 2023 13:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AACC1C4339B;
+        Thu,  8 Jun 2023 13:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686227549;
-        bh=r/4PkU/68uF7lKPzBCrmdgapCjizIDkg+xcFVkYgySA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bdFjKVnf5dbKmuzzaVnJeFbvAsXl9DObq6ABi1c57cMksyu32dwik3M6M90T2kncE
-         tavsbDVCuezHRFk0z4j7xUCi633VEdKXpErlip+5IvoyrYcqsqggbeEsdMrfCGrNZQ
-         IDUxuIR3vs6Id91ldSrCfohV/CPHbTyef74JXnDxjAZQeAV8cJBzyzxhI0d1zxylK0
-         gH8M6961qZzW5QmfZm/iy5WQGr0yhaOiLlOMlrCkFi/uaxlY/9MNpZQtgMGNNWAlDL
-         R3CDp3jghBlBF654pxVl2etHgbuFxYIHq9rt7kNa7QmyxoWnOUKQpoTYKT+Q8o6GeJ
-         6vTFRmrwQAKAA==
-Date:   Thu, 8 Jun 2023 18:02:25 +0530
-From:   Vinod Koul <vkoul@kernel.org>
-To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Cc:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        dmaengine@vger.kernel.org, agross@kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        andersson@kernel.org, bhupesh.linux@gmail.com,
-        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
-        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
-        stephan@gerhold.net, Rob Herring <robh@kernel.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: Re: [PATCH v8 01/11] dt-bindings: dma: Add support for SM6115 and
- QCM2290 SoCs
-Message-ID: <ZIHKWYMs1e/rOez0@matsya>
-References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
- <20230526192210.3146896-2-bhupesh.sharma@linaro.org>
- <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
+        s=k20201202; t=1686231623;
+        bh=bCCtO5GAnRN8vuPTl3yHQSzQO24lOgmzrklyKcrCYls=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Gjibf96VfNysk//y1AuyPVxS+sbIqPDhGaMJCDj/TxRAk1hfCQZyD9sxRV8uo0gF9
+         1Rkg6QadOHLy+ohDcHHAieiZTpbPngIdJF4YAB/7Yq+H3hEWxEXgb7/kN60xkpFTOM
+         oiPVjLUgKZQJUH0CIT1moWIZfEI7TrwOsB4sEp4wULUeTRUXynxVi6FvSXbJ1ONmRh
+         KT0fkMfNUHv3SWSLlV/o8HB2u+m7lMoNTzIZd7mA8v0XKmxmn4Z7OI00tZcoOIsdNr
+         eJ5U754Wki5m8iH7hSa0zwhEIZ/p+yFzGXGLoY3cALeRU/jWMmblni2ZuP5yMvhxoy
+         OXw+Z/Kwy5oIA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8DB35E87232;
+        Thu,  8 Jun 2023 13:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 00/10] crypto, splice,
+ net: Make AF_ALG handle sendmsg(MSG_SPLICE_PAGES)
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <168623162357.14295.11722855983065901274.git-patchwork-notify@kernel.org>
+Date:   Thu, 08 Jun 2023 13:40:23 +0000
+References: <20230606130856.1970660-1-dhowells@redhat.com>
+In-Reply-To: <20230606130856.1970660-1-dhowells@redhat.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
+        dsahern@kernel.org, willy@infradead.org, axboe@kernel.dk,
+        linux-crypto@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 29-05-23, 11:43, Bhupesh Sharma wrote:
-> Hi Vinod,
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue,  6 Jun 2023 14:08:46 +0100 you wrote:
+> Here are patches to make AF_ALG handle the MSG_SPLICE_PAGES internal
+> sendmsg flag.  MSG_SPLICE_PAGES is an internal hint that tells the protocol
+> that it should splice the pages supplied if it can.  The sendpage functions
+> are then turned into wrappers around that.
 > 
-> > On Sat, 27 May 2023 at 00:52, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
-> >
-> > Add new compatible for BAM DMA engine version v1.7.4 which is
-> > found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
-> > to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
-> > accordingly.
-> >
-> > While at it, also update qcom,bam-dma bindings to add comments
-> > which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
-> > This provides an easy reference for identifying the actual BAM DMA
-> > version available on Qualcomm SoCs.
-> >
-> > Acked-by: Rob Herring <robh@kernel.org>
-> > Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> > Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > ---
-> >  .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
-> >  1 file changed, 13 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
-> > index f1ddcf672261..c663b6102f50 100644
-> > --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
-> > +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
-> > @@ -15,13 +15,19 @@ allOf:
-> >
-> >  properties:
-> >    compatible:
-> > -    enum:
-> > -        # APQ8064, IPQ8064 and MSM8960
-> > -      - qcom,bam-v1.3.0
-> > -        # MSM8974, APQ8074 and APQ8084
-> > -      - qcom,bam-v1.4.0
-> > -        # MSM8916 and SDM845
-> > -      - qcom,bam-v1.7.0
-> > +    oneOf:
-> > +      - enum:
-> > +          # APQ8064, IPQ8064 and MSM8960
-> > +          - qcom,bam-v1.3.0
-> > +          # MSM8974, APQ8074 and APQ8084
-> > +          - qcom,bam-v1.4.0
-> > +          # MSM8916, SDM630
-> > +          - qcom,bam-v1.7.0
-> > +      - items:
-> > +          - enum:
-> > +              # SDM845, SM6115, SM8150, SM8250 and QCM2290
-> > +              - qcom,bam-v1.7.4
-> > +          - const: qcom,bam-v1.7.0
-> >
-> >    clocks:
-> >      maxItems: 1
-> > --
-> > 2.38.1
+> This set consists of the following parts:
 > 
-> Bjorn has applied the dts patches from this series to his tree.
-> As suggested by him, can you please pick patches [PATCH 1/11] and
-> [PATCH 2/11] from this series via the 'dmaengine' tree.
+> [...]
 
-I dont have this series in my inbox or dmaengine pw
+Here is the summary with links:
+  - [net-next,v3,01/10] Drop the netfs_ prefix from netfs_extract_iter_to_sg()
+    https://git.kernel.org/netdev/net-next/c/0d7aeb68700f
+  - [net-next,v3,02/10] Fix a couple of spelling mistakes
+    https://git.kernel.org/netdev/net-next/c/3b9e9f72badf
+  - [net-next,v3,03/10] Wrap lines at 80
+    https://git.kernel.org/netdev/net-next/c/936dc763c52e
+  - [net-next,v3,04/10] Move netfs_extract_iter_to_sg() to lib/scatterlist.c
+    https://git.kernel.org/netdev/net-next/c/f5f82cd18732
+  - [net-next,v3,05/10] crypto: af_alg: Pin pages rather than ref'ing if appropriate
+    https://git.kernel.org/netdev/net-next/c/f9e7a5fa51fb
+  - [net-next,v3,06/10] crypto: af_alg: Use extract_iter_to_sg() to create scatterlists
+    https://git.kernel.org/netdev/net-next/c/c1abe6f570af
+  - [net-next,v3,07/10] crypto: af_alg: Indent the loop in af_alg_sendmsg()
+    https://git.kernel.org/netdev/net-next/c/73d7409cfdad
+  - [net-next,v3,08/10] crypto: af_alg: Support MSG_SPLICE_PAGES
+    https://git.kernel.org/netdev/net-next/c/bf63e250c4b1
+  - [net-next,v3,09/10] crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+    https://git.kernel.org/netdev/net-next/c/fb800fa4c1f5
+  - [net-next,v3,10/10] crypto: af_alg/hash: Support MSG_SPLICE_PAGES
+    https://git.kernel.org/netdev/net-next/c/c662b043cdca
 
-> Seems some Cc fields got messed up while sending the patchset, so
-> Cc'ing the dmaengine list again.
-
-not just list but mine too..
-
-Please rebase and resend
-
+You are awesome, thank you!
 -- 
-~Vinod
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
