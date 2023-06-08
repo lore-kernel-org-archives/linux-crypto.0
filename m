@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E00E9C7EE45
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 19:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE5EC7EE29
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Jun 2023 19:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236574AbjFHTM6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Jun 2023 15:12:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
+        id S235038AbjFHTNA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 8 Jun 2023 15:13:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236344AbjFHTMw (ORCPT
+        with ESMTP id S229667AbjFHTMx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Jun 2023 15:12:52 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2043.outbound.protection.outlook.com [40.107.212.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A123330DC;
-        Thu,  8 Jun 2023 12:12:34 -0700 (PDT)
+        Thu, 8 Jun 2023 15:12:53 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33FD30E5;
+        Thu,  8 Jun 2023 12:12:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AZc2j9n6I9rF6aXD+7rpXO0QifACOJKuEQGdrWeZPGs3hL+ei4pvqxsEeNUBFfTY00F3q+4e3PF4ZpspUtew/w9UIvBBHvCrTCtFhO0/wwTFl4hXUGPnaHrwzOdt++uz0YYyNbmTAoCMB7VyKYICpXjNKgKb0dXDxZR/ofjARofOEUSidiVx3+I04dAkAVCwi94tK8IdxreGyP8u7OhH0WoGSe28k7zfmZ/OWVn3HDp9MZlWAl06BcwjD7I55FxPxOCb99ijK/5+AMUhAzngNFWZsTZEJrR16Qfe4+7VSL6AWtbySWukBDmFMx8a6AGEosYUAw1tWPb15tlCqUItqw==
+ b=aNgnxbE2CyrxYO7sqFlI8ve7IuOO2ZnaeV8tM1+Gp292WRHSgYhf0BCPsP3woLZdzzT+oJziCl+n2rKFE1sfi0NTBU33uT+zVHB7qX5sZ3koVDvRWs1r1siO4OKtLyXFsF/DblZ5aIciS0TAef/dR6BP1Tf9GNGq6dffD0eId5WXr5HV0soA73vI42FOLXQE/pxMLrMd/iGOTNkkuT2rovWKocIdJa/f8z7CtAlCZwiId/Eg9BANulyleUkfaPWwccXX7c2gdWG72vG9CZHXRu7yv6kiqpInjq+z4taPZNBJLQ3CIp+HZoTWpQkNkwLcwcaQf+mygf9itrfylzhd4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0E/zhW87o3zuytWivtmejN7CvDwRrb3jSLk1a/a7Hso=;
- b=hVlF26VD7BXvSnmcUm/AhVF17oOWNRVOv7o53IQew2mCK1jkh+C0bTH7mPw0orBwmZb/J2NDtAA1tdwDRO4KvXMPIBrawNPzrsfly73Z/pqYLFvYD+Iv/7TtuL14zh7w4eHt2wWKDzF3Tzk4JATcklUxUsdi2obn0KO6vtVvm0XNW1FXV9L0zsKGXuvbSeAWplytzctE6+R9MGQG81ljx51VdIgGqE2AiyrfKv7FHSAJf8xT4fYkT+3zFKuNwKBLtrma6RCulZwc9DDn591eu0f9R+7z4wId6ZALZKHFnwocKZ5WOUXbtMy1M5rGQ2XMPNeYfTv3z25vOtWg/DMtMA==
+ bh=7ykFk/3ZWZys6zoBv+TOKGD58LL6HOx/A6TINKmESTU=;
+ b=SSg36d3TRCKW+QWf0BPm7NQLGLe5mBUiMqY1ZVloFOyRTZzuxexYU5L3mBs1uhKfgYPquEL4TRc11D7z2gJ5bd1YyS5CPDw43lAEtRD0ZNya2dLH7E3jSqG3iBY9JTTGEPV4CjrNDTfkD/uWzarC0+l5cbiKoHDgxjEFOEA5FQKK+0Wm4LfJlaVnnnLHGywA1EyggCM+pKQEyD2cUcAhb85nz6LYfBm/H/UlWtWr9qvp7ZXfns3Innwcg4N7rS9u341bmKWxAvYi77+QSCBV4gfv/3rUB4GxCyIPbGRyHE3M4wZolKUP4rse7uph4Q/gvmYhyRlkZoOh2cMwDVvwZA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0E/zhW87o3zuytWivtmejN7CvDwRrb3jSLk1a/a7Hso=;
- b=3x6ALskTuI6QDYyRpEuIbY3Msv3/ZIeu8XvDSh7qy+TVi+MOJCBSc4MgJUAKtkaqmlaFccFe8/Q7qkqtboKE6m+kQg3b63vvjUEOZM2YTB0AT4sM5/4o05XLBlinUquZbdB8rKR/NvUtfnoOt8Xh0zwm4BCJWrP2QFXVepcp9BE=
-Received: from MW4PR04CA0259.namprd04.prod.outlook.com (2603:10b6:303:88::24)
- by DM8PR12MB5479.namprd12.prod.outlook.com (2603:10b6:8:38::18) with
+ bh=7ykFk/3ZWZys6zoBv+TOKGD58LL6HOx/A6TINKmESTU=;
+ b=RcNidzsu9AGrOB+OrY2u51qOvp0Ry9kSitoyk0UUIEicEq0UtP9pxeKwFxFojzlH4OqT7Pzs7ZYzFWQbQ0axcf0JoVQ9bBkDWQ12au1GatBVMdKryEib4gY4ZN+bo1R5F7Je8oKYU7JkzTsKgVcd6WTutMUlExt8QD/j3VSDM2k=
+Received: from MW4PR04CA0249.namprd04.prod.outlook.com (2603:10b6:303:88::14)
+ by SA1PR12MB8920.namprd12.prod.outlook.com (2603:10b6:806:38e::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Thu, 8 Jun
- 2023 19:12:31 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.41; Thu, 8 Jun
+ 2023 19:12:33 +0000
 Received: from CO1PEPF000044FC.namprd21.prod.outlook.com
- (2603:10b6:303:88:cafe::ca) by MW4PR04CA0259.outlook.office365.com
- (2603:10b6:303:88::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33 via Frontend
- Transport; Thu, 8 Jun 2023 19:12:31 +0000
+ (2603:10b6:303:88:cafe::e0) by MW4PR04CA0249.outlook.office365.com
+ (2603:10b6:303:88::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.26 via Frontend
+ Transport; Thu, 8 Jun 2023 19:12:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -49,11 +49,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CO1PEPF000044FC.mail.protection.outlook.com (10.167.241.202) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.0 via Frontend Transport; Thu, 8 Jun 2023 19:12:31 +0000
+ 15.20.6500.0 via Frontend Transport; Thu, 8 Jun 2023 19:12:33 +0000
 Received: from SITE-L-T34-2.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 8 Jun
- 2023 14:12:26 -0500
+ 2023 14:12:29 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>,
@@ -61,9 +61,9 @@ To:     Tom Lendacky <thomas.lendacky@amd.com>,
 CC:     "David S . Miller" <davem@davemloft.net>,
         <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH v4 05/11] crypto: ccp: Add support for fetching a nonce for dynamic boost control
-Date:   Thu, 8 Jun 2023 06:17:51 -0500
-Message-ID: <20230608111757.32054-6-mario.limonciello@amd.com>
+Subject: [PATCH v4 10/11] crypto: ccp: Add unit tests for dynamic boost control
+Date:   Thu, 8 Jun 2023 06:17:56 -0500
+Message-ID: <20230608111757.32054-11-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230608111757.32054-1-mario.limonciello@amd.com>
 References: <20230608111757.32054-1-mario.limonciello@amd.com>
@@ -75,480 +75,324 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|DM8PR12MB5479:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76fdfa58-2301-4a8a-3335-08db68544f28
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|SA1PR12MB8920:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38b6e2f9-8571-4035-9c5c-08db68545035
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pzpxwJkZ6vuhoHwurUyU+Z/p0wGIULUZo9OKk++/vNLofXb59cdgAODjK8TC+WuhErk46Ha9C7/rM78ZG/kd/VD5i2WWei4MiAu9fHfTk92QJuYmhPX2AjcIBR5P6bXy+XuDdBn4nL4DW3xbpmfwk5neMWc4rAlPuydObwEb6ho3ye/osdBZH8o4sFz/s6pCzQlr+pMAqWSy+PO828Cewt2nRGmBDhJmWrx9K/xP/0On3sEHl7ypSRnVZwl5zHQVyNUNrcxD8EqkTF2shcfgtbWMxlFWNtA5ln2nk9rck6K1ll/Xks9yNqt0WkbjeRtUBoUGYmpTNAJzmg+Ramd7CPaB7ZoiE54srAEph96U5YwPIyINbOpB8mLbfbO4Lqkrz1YOWVJdk/LU7M+VWoo0b4ftu+p6IZoH9wW5zSGwXgto7//Bv6V4v4s1+Vk4Nq4oUjCEeMvYBdbAWCAdoLQwOFB9py/ZefB7Wj4FPj0vDgP5nKuHcWMfTZHwzQXpp+G2Lk5twd50M/pwBn3F4mYOTKB0W9V2SBIQ5IekE/Z4vD3va6pdxh7E3M8l6LLzyEU3TeRg5aDPg8Byg3DknjEjlpbxyZZtxTb1lt0YXz9yTFdrR/9ajW6Sq4LaS2RwkHRuY4LlbBO9sLV9tMkDnKWufX9N2p/WHrwQ/9vXPrSwM359VqY99ycyHJxr3gJHJBQ2SnJ/8uFOyHLN0Y3/bPof1q+/8XipUezcyzufZXdrMkWewBoOC4+0E7pWHe2vkj/DZcfDdtsWS3qgWXFbo8JQiQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(136003)(376002)(39860400002)(451199021)(36840700001)(46966006)(40470700004)(86362001)(81166007)(83380400001)(82740400003)(54906003)(336012)(70206006)(4326008)(356005)(47076005)(6666004)(110136005)(426003)(82310400005)(7696005)(70586007)(478600001)(16526019)(186003)(36756003)(36860700001)(40460700003)(30864003)(8676002)(5660300002)(8936002)(41300700001)(2616005)(40480700001)(2906002)(316002)(44832011)(66899021)(1076003)(26005)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: gMKglQA0si8iFF5msk/fGN+33CwUr+blwA7aDiRsgfWegSokl6vz6qQhiW4IeQKgL9jiebIOd4sI7xZThnlO6pMAzjXPzSss1FQSrmuSPR1akDruKoW8aIJO10O+e81CrU1aX41wcbz59TUGiA9GrKTpIPlMjpl0/VMLawWaL0YkeEtN1Im1Uwm1M7M8G2fKmJihmw/r3Fq3facW8mJkfIEC7YLEl/qFZnIvsP4LYL/RpLXR0utz7y1WoRTNEKfpgncGxHA++28CgeEc2unhCZU2ISHj3pj5hRGgmlF6uml+U4ap8eZuiBmJ/MrOiHPpwSWdlMA8ZaPwLa+GCXaSQ4+Mgf9ZbHcJNhAcI7TDqHCoNgdDG42Dihk9pV+JSYpWyhUHTYTspVt1TP83xzedj+209+7Pvv8Z34XdmjqlvuuQvQ059PwQjgtEFLjsoQj3/GZyGS0dd6bjNPWaDiavVUBfp0iy8Z3doKyQZarzCSJaJtKod1Wt9cCUBKmVb7PJ/lLGgCO0kByakSvRtTqqYtu7LQwcxdIHMHMJR3vVI0AzgkOUzWrLh+tWhZKXiFUqulsIkJ+TcAuCRkgLYERUwY6ULpLVkCadZui0aWr6cioRmwqN9QI/tF0X+fzzkZrXli9dRM5MmJrQ6J+QAePZBi15e+0R+igusJdWKBcv77DXiN2hpaVIzG7Tsxj5YtSrqjwnJWT6o1/KUC9Dp5TNsRYO5w8vNfCEDMVAOgA7GXDqC3GJygX4Hg0DchJZAVwItIXk1w9t4pzv7sJdx2Af+g==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(136003)(396003)(346002)(451199021)(40470700004)(36840700001)(46966006)(70206006)(70586007)(8676002)(8936002)(36756003)(5660300002)(6666004)(4326008)(478600001)(110136005)(54906003)(41300700001)(40460700003)(7696005)(316002)(40480700001)(81166007)(356005)(82740400003)(16526019)(1076003)(44832011)(47076005)(26005)(186003)(83380400001)(426003)(336012)(36860700001)(86362001)(82310400005)(2616005)(2906002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 19:12:31.6227
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jun 2023 19:12:33.3883
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76fdfa58-2301-4a8a-3335-08db68544f28
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38b6e2f9-8571-4035-9c5c-08db68545035
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044FC.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5479
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8920
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dynamic Boost Control is a feature offered on AMD client platforms that
-allows software to request and set power or frequency limits.
+Interacting with dynamic boost control messages requires the caller
+to supply a signature. To allow validation of individual dynamic
+boost control components, introduce a set of tests that can be run.
 
-Only software that has authenticated with the PSP can retrieve or set
-these limits.
+The tests can be run in 3 distinct different environments, and so
+certain tests will be skipped depending on the environment.
 
-Create a character device and ioctl for fetching the nonce. This ioctl
-supports optionally passing authentication information which will influence
-how many calls the nonce is valid for.
+1. Systems that do not support DBC.
+2. Production systems that support DBC but are secured silicon.
+3. Pre-production systems that support DBC but are unsecured silicon.
+
+Unsecured silicon does not validate the signature, and so this allows
+testing more of the state machine and functionality.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/crypto/ccp/Makefile         |   3 +-
- drivers/crypto/ccp/dbc.c            | 191 ++++++++++++++++++++++++++++
- drivers/crypto/ccp/dbc.h            |  44 +++++++
- drivers/crypto/ccp/psp-dev.c        |   9 ++
- drivers/crypto/ccp/psp-dev.h        |   1 +
- drivers/crypto/ccp/sp-dev.h         |   5 +
- drivers/crypto/ccp/sp-pci.c         |   1 +
- include/linux/psp-platform-access.h |   1 +
- include/uapi/linux/psp-dbc.h        |  67 ++++++++++
- 9 files changed, 321 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/ccp/dbc.c
- create mode 100644 drivers/crypto/ccp/dbc.h
- create mode 100644 include/uapi/linux/psp-dbc.h
+v3->v4:
+ * Adjust for library changes
+v1->v2:
+    * Update commit message
+---
+ tools/crypto/ccp/test_dbc.py | 266 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 266 insertions(+)
+ create mode 100755 tools/crypto/ccp/test_dbc.py
 
-diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-index f6196495e862..aa0ba2d17e1e 100644
---- a/drivers/crypto/ccp/Makefile
-+++ b/drivers/crypto/ccp/Makefile
-@@ -11,7 +11,8 @@ ccp-$(CONFIG_PCI) += sp-pci.o
- ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
-                                    sev-dev.o \
-                                    tee-dev.o \
--                                   platform-access.o
-+                                   platform-access.o \
-+                                   dbc.o
- 
- obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
- ccp-crypto-objs := ccp-crypto-main.o \
-diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
-new file mode 100644
-index 000000000000..7afeca903136
+diff --git a/tools/crypto/ccp/test_dbc.py b/tools/crypto/ccp/test_dbc.py
+new file mode 100755
+index 000000000000..998bb3e3cd04
 --- /dev/null
-+++ b/drivers/crypto/ccp/dbc.c
-@@ -0,0 +1,191 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * AMD Secure Processor Dynamic Boost Control interface
-+ *
-+ * Copyright (C) 2023 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Mario Limonciello <mario.limonciello@amd.com>
-+ */
++++ b/tools/crypto/ccp/test_dbc.py
+@@ -0,0 +1,266 @@
++#!/usr/bin/python3
++# SPDX-License-Identifier: GPL-2.0
++import unittest
++import os
++import time
++import glob
++from dbc import *
 +
-+#include "dbc.h"
++# Artificial delay between set commands
++SET_DELAY = 0.5
 +
-+struct error_map {
-+	u32 psp;
-+	int ret;
-+};
 +
-+#define DBC_ERROR_ACCESS_DENIED		0x0001
-+#define DBC_ERROR_EXCESS_DATA		0x0004
-+#define DBC_ERROR_BAD_PARAMETERS	0x0006
-+#define DBC_ERROR_BAD_STATE		0x0007
-+#define DBC_ERROR_NOT_IMPLEMENTED	0x0009
-+#define DBC_ERROR_BUSY			0x000D
-+#define DBC_ERROR_MESSAGE_FAILURE	0x0307
-+#define DBC_ERROR_OVERFLOW		0x300F
-+#define DBC_ERROR_SIGNATURE_INVALID	0x3072
++class invalid_param(ctypes.Structure):
++    _fields_ = [
++        ("data", ctypes.c_uint8),
++    ]
 +
-+static struct error_map error_codes[] = {
-+	{DBC_ERROR_ACCESS_DENIED,	-EACCES},
-+	{DBC_ERROR_EXCESS_DATA,		-E2BIG},
-+	{DBC_ERROR_BAD_PARAMETERS,	-EINVAL},
-+	{DBC_ERROR_BAD_STATE,		-EAGAIN},
-+	{DBC_ERROR_MESSAGE_FAILURE,	-ENOENT},
-+	{DBC_ERROR_NOT_IMPLEMENTED,	-ENOENT},
-+	{DBC_ERROR_BUSY,		-EBUSY},
-+	{DBC_ERROR_OVERFLOW,		-ENFILE},
-+	{DBC_ERROR_SIGNATURE_INVALID,	-EPERM},
-+	{0x0,	0x0},
-+};
 +
-+static int send_dbc_cmd(struct psp_dbc_device *dbc_dev,
-+			enum psp_platform_access_msg msg)
-+{
-+	int ret;
++def system_is_secured() -> bool:
++    fused_part = glob.glob("/sys/bus/pci/drivers/ccp/**/fused_part")[0]
++    if os.path.exists(fused_part):
++        with open(fused_part, "r") as r:
++            return int(r.read()) == 1
++    return True
 +
-+	dbc_dev->mbox->req.header.status = 0;
-+	ret = psp_send_platform_access_msg(msg, (struct psp_request *)dbc_dev->mbox);
-+	if (ret == -EIO) {
-+		int i;
 +
-+		dev_dbg(dbc_dev->dev,
-+			 "msg 0x%x failed with PSP error: 0x%x\n",
-+			 msg, dbc_dev->mbox->req.header.status);
++class DynamicBoostControlTest(unittest.TestCase):
++    def __init__(self, data) -> None:
++        self.d = None
++        self.signature = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
++        self.uid = "1111111111111111"
++        super().__init__(data)
 +
-+		for (i = 0; error_codes[i].psp; i++) {
-+			if (dbc_dev->mbox->req.header.status == error_codes[i].psp)
-+				return error_codes[i].ret;
-+		}
-+	}
++    def setUp(self) -> None:
++        self.d = open(DEVICE_NODE)
++        return super().setUp()
 +
-+	return ret;
-+}
++    def tearDown(self) -> None:
++        if self.d:
++            self.d.close()
++        return super().tearDown()
 +
-+static int send_dbc_nonce(struct psp_dbc_device *dbc_dev)
-+{
-+	int ret;
 +
-+	dbc_dev->mbox->req.header.payload_size = sizeof(dbc_dev->mbox->dbc_nonce);
-+	ret = send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_GET_NONCE);
-+	if (ret == -EAGAIN) {
-+		dev_dbg(dbc_dev->dev, "retrying get nonce\n");
-+		ret = send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_GET_NONCE);
-+	}
++class TestUnsupportedSystem(DynamicBoostControlTest):
++    def setUp(self) -> None:
++        if os.path.exists(DEVICE_NODE):
++            self.skipTest("system is supported")
++        with self.assertRaises(FileNotFoundError) as error:
++            super().setUp()
++        self.assertEqual(error.exception.errno, 2)
 +
-+	return ret;
-+}
++    def test_unauthenticated_nonce(self) -> None:
++        """fetch unauthenticated nonce"""
++        with self.assertRaises(ValueError) as error:
++            get_nonce(self.d, None)
 +
-+void dbc_dev_destroy(struct psp_device *psp)
-+{
-+	struct psp_dbc_device *dbc_dev = psp->dbc_data;
 +
-+	if (!dbc_dev)
-+		return;
++class TestInvalidIoctls(DynamicBoostControlTest):
++    def __init__(self, data) -> None:
++        self.data = invalid_param()
++        self.data.data = 1
++        super().__init__(data)
 +
-+	misc_deregister(&dbc_dev->char_dev);
-+	mutex_destroy(&dbc_dev->ioctl_mutex);
-+	psp->dbc_data = NULL;
-+}
++    def setUp(self) -> None:
++        if not os.path.exists(DEVICE_NODE):
++            self.skipTest("system is unsupported")
++        return super().setUp()
 +
-+static long dbc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
-+{
-+	struct psp_device *psp_master = psp_get_master_device();
-+	void __user *argp = (void __user *)arg;
-+	struct psp_dbc_device *dbc_dev;
-+	int ret;
++    def test_invalid_nonce_ioctl(self) -> None:
++        """tries to call get_nonce ioctl with invalid data structures"""
 +
-+	if (!psp_master || !psp_master->dbc_data)
-+		return -ENODEV;
-+	dbc_dev = psp_master->dbc_data;
++        # 0x1 (get nonce), and invalid data
++        INVALID1 = IOWR(ord("D"), 0x01, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID1, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
 +
-+	mutex_lock(&dbc_dev->ioctl_mutex);
++    def test_invalid_setuid_ioctl(self) -> None:
++        """tries to call set_uid ioctl with invalid data structures"""
 +
-+	switch (cmd) {
-+	case DBCIOCNONCE:
-+		if (copy_from_user(&dbc_dev->mbox->dbc_nonce.user, argp,
-+				   sizeof(struct dbc_user_nonce))) {
-+			ret = -EFAULT;
-+			goto unlock;
-+		}
++        # 0x2 (set uid), and invalid data
++        INVALID2 = IOW(ord("D"), 0x02, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID2, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
 +
-+		ret = send_dbc_nonce(dbc_dev);
-+		if (ret)
-+			goto unlock;
++    def test_invalid_setuid_rw_ioctl(self) -> None:
++        """tries to call set_uid ioctl with invalid data structures"""
 +
-+		if (copy_to_user(argp, &dbc_dev->mbox->dbc_nonce.user,
-+				 sizeof(struct dbc_user_nonce))) {
-+			ret = -EFAULT;
-+			goto unlock;
-+		}
-+		break;
-+	default:
-+		ret = -EINVAL;
++        # 0x2 as RW (set uid), and invalid data
++        INVALID3 = IOWR(ord("D"), 0x02, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID3, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
 +
-+	}
-+unlock:
-+	mutex_unlock(&dbc_dev->ioctl_mutex);
++    def test_invalid_param_ioctl(self) -> None:
++        """tries to call param ioctl with invalid data structures"""
++        # 0x3 (param), and invalid data
++        INVALID4 = IOWR(ord("D"), 0x03, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID4, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
 +
-+	return ret;
-+}
++    def test_invalid_call_ioctl(self) -> None:
++        """tries to call the DBC ioctl with invalid data structures"""
++        # 0x4, and invalid data
++        INVALID5 = IOWR(ord("D"), 0x04, invalid_param)
++        with self.assertRaises(OSError) as error:
++            fcntl.ioctl(self.d, INVALID5, self.data, True)
++        self.assertEqual(error.exception.errno, 22)
 +
-+const struct file_operations dbc_fops = {
-+	.owner	= THIS_MODULE,
-+	.unlocked_ioctl = dbc_ioctl,
-+};
 +
-+int dbc_dev_init(struct psp_device *psp)
-+{
-+	struct device *dev = psp->dev;
-+	struct psp_dbc_device *dbc_dev;
-+	int ret;
++class TestInvalidSignature(DynamicBoostControlTest):
++    def setUp(self) -> None:
++        if not os.path.exists(DEVICE_NODE):
++            self.skipTest("system is unsupported")
++        if not system_is_secured():
++            self.skipTest("system is unfused")
++        return super().setUp()
 +
-+	if (!PSP_FEATURE(psp, DBC))
-+		return 0;
++    def test_unauthenticated_nonce(self) -> None:
++        """fetch unauthenticated nonce"""
++        get_nonce(self.d, None)
 +
-+	dbc_dev = devm_kzalloc(dev, sizeof(*dbc_dev), GFP_KERNEL);
-+	if (!dbc_dev)
-+		return -ENOMEM;
++    def test_multiple_unauthenticated_nonce(self) -> None:
++        """ensure state machine always returns nonce"""
++        for count in range(0, 2):
++            get_nonce(self.d, None)
 +
-+	BUILD_BUG_ON(sizeof(union dbc_buffer) > PAGE_SIZE);
-+	dbc_dev->mbox = (void *)devm_get_free_pages(dev, GFP_KERNEL, 0);
-+	if (!dbc_dev->mbox) {
-+		ret = -ENOMEM;
-+		goto cleanup_dev;
-+	}
++    def test_authenticated_nonce(self) -> None:
++        """fetch authenticated nonce"""
++        with self.assertRaises(OSError) as error:
++            get_nonce(self.d, self.signature)
++        self.assertEqual(error.exception.errno, 1)
 +
-+	psp->dbc_data = dbc_dev;
-+	dbc_dev->dev = dev;
++    def test_set_uid(self) -> None:
++        """set uid"""
++        with self.assertRaises(OSError) as error:
++            set_uid(self.d, self.uid, self.signature)
++        self.assertEqual(error.exception.errno, 1)
 +
-+	ret = send_dbc_nonce(dbc_dev);
-+	if (ret == -EACCES) {
-+		dev_dbg(dbc_dev->dev,
-+			"dynamic boost control was previously authenticated\n");
-+		ret = 0;
-+	}
-+	dev_dbg(dbc_dev->dev, "dynamic boost control is %savailable\n",
-+		ret ? "un" : "");
-+	if (ret) {
-+		ret = 0;
-+		goto cleanup_mbox;
-+	}
++    def test_get_param(self) -> None:
++        """fetch a parameter"""
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_GET_SOC_PWR_CUR, self.signature)
++        self.assertEqual(error.exception.errno, 1)
 +
-+	dbc_dev->char_dev.minor = MISC_DYNAMIC_MINOR;
-+	dbc_dev->char_dev.name = "dbc";
-+	dbc_dev->char_dev.fops = &dbc_fops;
-+	dbc_dev->char_dev.mode = 0600;
-+	ret = misc_register(&dbc_dev->char_dev);
-+	if (ret)
-+		goto cleanup_mbox;
++    def test_set_param(self) -> None:
++        """set a parameter"""
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_SET_PWR_CAP, self.signature, 1000)
++        self.assertEqual(error.exception.errno, 1)
 +
-+	mutex_init(&dbc_dev->ioctl_mutex);
 +
-+	return 0;
++class TestUnFusedSystem(DynamicBoostControlTest):
++    def setup_identity(self) -> None:
++        """sets up the identity of the caller"""
++        # if already authenticated these may fail
++        try:
++            get_nonce(self.d, None)
++        except PermissionError:
++            pass
++        try:
++            set_uid(self.d, self.uid, self.signature)
++        except BlockingIOError:
++            pass
++        try:
++            get_nonce(self.d, self.signature)
++        except PermissionError:
++            pass
 +
-+cleanup_mbox:
-+	devm_free_pages(dev, (unsigned long)dbc_dev->mbox);
++    def setUp(self) -> None:
++        if not os.path.exists(DEVICE_NODE):
++            self.skipTest("system is unsupported")
++        if system_is_secured():
++            self.skipTest("system is fused")
++        super().setUp()
++        self.setup_identity()
++        time.sleep(SET_DELAY)
 +
-+cleanup_dev:
-+	psp->dbc_data = NULL;
-+	devm_kfree(dev, dbc_dev);
++    def test_get_valid_param(self) -> None:
++        """fetch all possible parameters"""
++        # SOC power
++        soc_power_max = process_param(self.d, PARAM_GET_SOC_PWR_MAX, self.signature)
++        soc_power_min = process_param(self.d, PARAM_GET_SOC_PWR_MIN, self.signature)
++        self.assertGreater(soc_power_max.parameter, soc_power_min.parameter)
 +
-+	return ret;
-+}
-diff --git a/drivers/crypto/ccp/dbc.h b/drivers/crypto/ccp/dbc.h
-new file mode 100644
-index 000000000000..1c3a0a078d15
---- /dev/null
-+++ b/drivers/crypto/ccp/dbc.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * AMD Platform Security Processor (PSP) Dynamic Boost Control support
-+ *
-+ * Copyright (C) 2023 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Mario Limonciello <mario.limonciello@amd.com>
-+ */
++        # fmax
++        fmax_max = process_param(self.d, PARAM_GET_FMAX_MAX, self.signature)
++        fmax_min = process_param(self.d, PARAM_GET_FMAX_MIN, self.signature)
++        self.assertGreater(fmax_max.parameter, fmax_min.parameter)
 +
-+#ifndef __DBC_H__
-+#define __DBC_H__
++        # cap values
++        keys = {
++            "fmax-cap": PARAM_GET_FMAX_CAP,
++            "power-cap": PARAM_GET_PWR_CAP,
++            "current-temp": PARAM_GET_CURR_TEMP,
++            "soc-power-cur": PARAM_GET_SOC_PWR_CUR,
++        }
++        for k in keys:
++            result = process_param(self.d, keys[k], self.signature)
++            self.assertGreater(result.parameter, 0)
 +
-+#include <uapi/linux/psp-dbc.h>
++    def test_get_invalid_param(self) -> None:
++        """fetch an invalid parameter"""
++        try:
++            set_uid(self.d, self.uid, self.signature)
++        except OSError:
++            pass
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, (0xF,), self.signature)
++        self.assertEqual(error.exception.errno, 22)
 +
-+#include <linux/device.h>
-+#include <linux/miscdevice.h>
-+#include <linux/psp-platform-access.h>
++    def test_set_fmax(self) -> None:
++        """get/set fmax limit"""
++        # fetch current
++        original = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
 +
-+#include "psp-dev.h"
++        # set the fmax
++        target = original.parameter - 100
++        process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, target)
++        time.sleep(SET_DELAY)
++        new = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
++        self.assertEqual(new.parameter, target)
 +
-+struct psp_dbc_device {
-+	struct device *dev;
++        # revert back to current
++        process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, original.parameter)
++        time.sleep(SET_DELAY)
++        cur = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
++        self.assertEqual(cur.parameter, original.parameter)
 +
-+	union dbc_buffer *mbox;
++    def test_set_power_cap(self) -> None:
++        """get/set power cap limit"""
++        # fetch current
++        original = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
 +
-+	struct mutex ioctl_mutex;
++        # set the fmax
++        target = original.parameter - 10
++        process_param(self.d, PARAM_SET_PWR_CAP, self.signature, target)
++        time.sleep(SET_DELAY)
++        new = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
++        self.assertEqual(new.parameter, target)
 +
-+	struct miscdevice char_dev;
-+};
++        # revert back to current
++        process_param(self.d, PARAM_SET_PWR_CAP, self.signature, original.parameter)
++        time.sleep(SET_DELAY)
++        cur = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
++        self.assertEqual(cur.parameter, original.parameter)
 +
-+struct dbc_nonce {
-+	struct psp_req_buffer_hdr	header;
-+	struct dbc_user_nonce		user;
-+} __packed;
++    def test_set_3d_graphics_mode(self) -> None:
++        """set/get 3d graphics mode"""
++        # these aren't currently implemented but may be some day
++        # they are *expected* to fail
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_GET_GFX_MODE, self.signature)
++        self.assertEqual(error.exception.errno, 2)
 +
-+union dbc_buffer {
-+	struct psp_request		req;
-+	struct dbc_nonce		dbc_nonce;
-+};
++        time.sleep(SET_DELAY)
 +
-+void dbc_dev_destroy(struct psp_device *psp);
-+int dbc_dev_init(struct psp_device *psp);
++        with self.assertRaises(OSError) as error:
++            process_param(self.d, PARAM_SET_GFX_MODE, self.signature, 1)
++        self.assertEqual(error.exception.errno, 2)
 +
-+#endif /* __DBC_H */
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 3390f0bd6408..d42d7bc62352 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -15,6 +15,7 @@
- #include "sev-dev.h"
- #include "tee-dev.h"
- #include "platform-access.h"
-+#include "dbc.h"
- 
- struct psp_device *psp_master;
- 
-@@ -112,6 +113,12 @@ static void psp_init_platform_access(struct psp_device *psp)
- 		dev_warn(psp->dev, "platform access init failed: %d\n", ret);
- 		return;
- 	}
 +
-+	/* dbc must come after platform access as it tests the feature */
-+	ret = dbc_dev_init(psp);
-+	if (ret)
-+		dev_warn(psp->dev, "failed to init dynamic boost control: %d\n",
-+			 ret);
- }
- 
- static int psp_init(struct psp_device *psp)
-@@ -217,6 +224,8 @@ void psp_dev_destroy(struct sp_device *sp)
- 
- 	tee_dev_destroy(psp);
- 
-+	dbc_dev_destroy(psp);
-+
- 	platform_access_dev_destroy(psp);
- 
- 	sp_free_psp_irq(sp, psp);
-diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
-index 505e4bdeaca8..8a4de69399c5 100644
---- a/drivers/crypto/ccp/psp-dev.h
-+++ b/drivers/crypto/ccp/psp-dev.h
-@@ -40,6 +40,7 @@ struct psp_device {
- 	void *sev_data;
- 	void *tee_data;
- 	void *platform_access_data;
-+	void *dbc_data;
- 
- 	unsigned int capability;
- };
-diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-index 76c32ee6bd65..2329ad524b49 100644
---- a/drivers/crypto/ccp/sp-dev.h
-+++ b/drivers/crypto/ccp/sp-dev.h
-@@ -28,6 +28,10 @@
- #define CACHE_NONE			0x00
- #define CACHE_WB_NO_ALLOC		0xb7
- 
-+#define PLATFORM_FEATURE_DBC		0x1
-+
-+#define PSP_FEATURE(psp, feat)	(psp->vdata && psp->vdata->platform_features & PLATFORM_FEATURE_##feat)
-+
- /* Structure to hold CCP device data */
- struct ccp_device;
- struct ccp_vdata {
-@@ -71,6 +75,7 @@ struct psp_vdata {
- 	const unsigned int inten_reg;
- 	const unsigned int intsts_reg;
- 	const unsigned int bootloader_info_reg;
-+	const unsigned int platform_features;
- };
- 
- /* Structure to hold SP device data */
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 205b93d229a9..b6ab56abeb68 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -470,6 +470,7 @@ static const struct psp_vdata pspv3 = {
- 	.feature_reg		= 0x109fc,	/* C2PMSG_63 */
- 	.inten_reg		= 0x10690,	/* P2CMSG_INTEN */
- 	.intsts_reg		= 0x10694,	/* P2CMSG_INTSTS */
-+	.platform_features	= PLATFORM_FEATURE_DBC,
- };
- 
- static const struct psp_vdata pspv4 = {
-diff --git a/include/linux/psp-platform-access.h b/include/linux/psp-platform-access.h
-index 75da8f5f7ad8..53b4a1df5180 100644
---- a/include/linux/psp-platform-access.h
-+++ b/include/linux/psp-platform-access.h
-@@ -8,6 +8,7 @@
- enum psp_platform_access_msg {
- 	PSP_CMD_NONE = 0x0,
- 	PSP_I2C_REQ_BUS_CMD = 0x64,
-+	PSP_DYNAMIC_BOOST_GET_NONCE,
- };
- 
- struct psp_req_buffer_hdr {
-diff --git a/include/uapi/linux/psp-dbc.h b/include/uapi/linux/psp-dbc.h
-new file mode 100644
-index 000000000000..d032f78934e2
---- /dev/null
-+++ b/include/uapi/linux/psp-dbc.h
-@@ -0,0 +1,67 @@
-+/* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
-+/*
-+ * Userspace interface for AMD Dynamic Boost Control (DBC)
-+ *
-+ * Copyright (C) 2023 Advanced Micro Devices, Inc.
-+ *
-+ * Author: Mario Limonciello <mario.limonciello@amd.com>
-+ */
-+
-+#ifndef __PSP_DBC_USER_H__
-+#define __PSP_DBC_USER_H__
-+
-+#include <linux/types.h>
-+
-+/**
-+ * DOC: AMD Dynamic Boost Control (DBC) interface
-+ */
-+
-+#define DBC_NONCE_SIZE		16
-+#define DBC_SIG_SIZE		32
-+
-+/**
-+ * struct dbc_user_nonce - Nonce exchange structure (input/output).
-+ * @auth_needed: Whether the PSP should authenticate this request (input).
-+ *               0: no authentication, PSP will return single use nonce.
-+ *               1: authentication: PSP will return multi-use nonce.
-+ * @nonce:       8 byte value used for future authentication (output).
-+ * @signature:   Optional 32 byte signature created by software using a
-+ *               previous nonce (input).
-+ */
-+struct dbc_user_nonce {
-+	__u32	auth_needed;
-+	__u8	nonce[DBC_NONCE_SIZE];
-+	__u8	signature[DBC_SIG_SIZE];
-+} __packed;
-+
-+/**
-+ * Dynamic Boost Control (DBC) IOC
-+ *
-+ * possible return codes for all DBC IOCTLs:
-+ *  0:          success
-+ *  -EINVAL:    invalid input
-+ *  -E2BIG:     excess data passed
-+ *  -EFAULT:    failed to copy to/from userspace
-+ *  -EBUSY:     mailbox in recovery or in use
-+ *  -ENODEV:    driver not bound with PSP device
-+ *  -EACCES:    request isn't authorized
-+ *  -EINVAL:    invalid parameter
-+ *  -ETIMEDOUT: request timed out
-+ *  -EAGAIN:    invalid request for state machine
-+ *  -ENOENT:    not implemented
-+ *  -ENFILE:    overflow
-+ *  -EPERM:     invalid signature
-+ *  -EIO:       unknown error
-+ */
-+#define DBC_IOC_TYPE	'D'
-+
-+/**
-+ * DBCIOCNONCE - Fetch a nonce from the PSP for authenticating commands.
-+ *               If a nonce is fetched without authentication it can only
-+ *               be utilized for one command.
-+ *               If a nonce is fetched with authentication it can be used
-+ *               for multiple requests.
-+ */
-+#define DBCIOCNONCE	_IOWR(DBC_IOC_TYPE, 0x1, struct dbc_user_nonce)
-+
-+#endif /* __PSP_DBC_USER_H__ */
++if __name__ == "__main__":
++    unittest.main()
 -- 
 2.34.1
 
