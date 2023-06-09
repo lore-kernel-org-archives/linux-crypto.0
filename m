@@ -2,251 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A3FC7EE2E
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 17:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED28CC7EE29
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 18:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbjFIRGb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 13:06:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58222 "EHLO
+        id S230096AbjFISbP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 14:31:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjFIRGa (ORCPT
+        with ESMTP id S230141AbjFISbN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 13:06:30 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5965B1BD
-        for <linux-crypto@vger.kernel.org>; Fri,  9 Jun 2023 10:06:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686330389; x=1717866389;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3F4+6JlUaJXswln0W5Wql+Q+Rmx1OYen8cLhRB8PThw=;
-  b=TtcBAkeAUR0a3r4ydRWZXkyrC0EQYXgi4OjQv59X5TFeBpZKR46SxHt7
-   fzudnZtVYUjvrMIRyFiOGGZLoHb0snDi+K2qGOzXkNjTiFXFM1Xm96Kgb
-   a+3yqOCe5p4cLJ8lbJm+dBwgpxmbPBdL2b9bGQLFz2NMkkwwoNeANpRPv
-   dOknALei8RfQzMpzUB+mrJNrDZ0gYR6DCUuNPPsXAtL1YcY2SmferMhfi
-   kz4xnHXLnL0EL7maUkEzLXSzZgMqxO32jTAm+DTg/iXqv9DHcPNwUzsWz
-   iweqI+KK+q2jUExvsOMIDnhcOGYTSRQG1eH2vEXCyGbPyRz9AOMlAkD3y
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10736"; a="347290718"
-X-IronPort-AV: E=Sophos;i="6.00,229,1681196400"; 
-   d="scan'208";a="347290718"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2023 10:06:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10736"; a="834697438"
-X-IronPort-AV: E=Sophos;i="6.00,229,1681196400"; 
-   d="scan'208";a="834697438"
-Received: from sdpcloudhostegs034.jf.intel.com ([10.165.126.39])
-  by orsmga004.jf.intel.com with ESMTP; 09 Jun 2023 10:06:28 -0700
-From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH] crypto: qat - expose pm_idle_enabled through sysfs
-Date:   Fri,  9 Jun 2023 19:06:14 +0200
-Message-Id: <20230609170614.28237-1-lucas.segarra.fernandez@intel.com>
+        Fri, 9 Jun 2023 14:31:13 -0400
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FDA35BE;
+        Fri,  9 Jun 2023 11:31:11 -0700 (PDT)
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-33e585a0ca6so8761865ab.3;
+        Fri, 09 Jun 2023 11:31:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686335471; x=1688927471;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YDLRPgV5z509cyU5ssYH2N/H4F3/FnPUGl76en455c0=;
+        b=EmbGOi/GbLCiGxvtFEK8zQGQ5eAvoIKgXr/+hwaYX1lwyM756lQwSFavMCCMml7VTZ
+         vMYVSWDbSsPRuXB/Z1/tDaYJI1L1f2Ef0Tz34Du7z0ss0MLvbH5Ev6ruoUkveHWh/hUS
+         HDqYgHA5w2gNX4P1uXIIvqbEi9wCh4Fqy6ZvUQwsNmCjbHSlkbFTMRmBEyUVlmVBz4Vu
+         p0xqMOOxBY1CLkH9RmFMWNq/TMZPDj5WNz3ncyjxRxkTgrd++kk/yRUCul5kgDtPs340
+         S9Pz6jWRP7RjjRZbAiQKVlZ5cc9SB8ZtvHEOouKDGgIm/A9ehQo8EYcr49tHHoy9D+AQ
+         Jtxg==
+X-Gm-Message-State: AC+VfDyUPzdb+Yetu43OFq93/bX7+djMEfIWizcox33QJeWrpG1cWhx9
+        f4JeDZHu5NrsueIJzq3uIia6wLfGbw==
+X-Google-Smtp-Source: ACHHUZ6gs4iUOyrEkbjPXB9yem88PDea/e9/9fQbcxT07lu5mhWFHuK2Ix5E1FnOI4GSSTpjw2qFtw==
+X-Received: by 2002:a92:c852:0:b0:33b:1da8:a7d0 with SMTP id b18-20020a92c852000000b0033b1da8a7d0mr2326661ilq.29.1686335470707;
+        Fri, 09 Jun 2023 11:31:10 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id k1-20020a92c9c1000000b0033c01c407fbsm1239903ilq.31.2023.06.09.11.31.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jun 2023 11:31:09 -0700 (PDT)
+Received: (nullmailer pid 1765467 invoked by uid 1000);
+        Fri, 09 Jun 2023 18:31:08 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: n2: Use of_property_read_reg() to parse "reg"
+Date:   Fri,  9 Jun 2023 12:31:05 -0600
+Message-Id: <20230609183105.1765368-1-robh@kernel.org>
 X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Expose 'pm_idle_enabled' sysfs attribute. This attribute controls how
-idle conditions are handled. If it is set to 1 (idle support enabled)
-when the device detects an idle condition, the driver will transition
-the device to the 'MIN' power configuration.
+Use the recently added of_property_read_reg() helper to get the
+untranslated "reg" address value.
 
-In order to set the value of this attribute for a device, the device
-must be in the 'down' state.
-
-This only applies to qat_4xxx generation.
-
-Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- Documentation/ABI/testing/sysfs-driver-qat    | 35 ++++++++++++
- .../intel/qat/qat_common/adf_cfg_strings.h    |  1 +
- .../crypto/intel/qat/qat_common/adf_gen4_pm.c | 12 ++++-
- .../crypto/intel/qat/qat_common/adf_gen4_pm.h |  1 +
- .../crypto/intel/qat/qat_common/adf_sysfs.c   | 53 +++++++++++++++++++
- 5 files changed, 101 insertions(+), 1 deletion(-)
+ drivers/crypto/n2_core.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
-index 087842b1969e..ed4b7b2d1b6c 100644
---- a/Documentation/ABI/testing/sysfs-driver-qat
-+++ b/Documentation/ABI/testing/sysfs-driver-qat
-@@ -47,3 +47,38 @@ Description:	(RW) Reports the current configuration of the QAT device.
- 			dc
- 
- 		This attribute is only available for qat_4xxx devices.
-+
-+What:		/sys/bus/pci/devices/<BDF>/qat/pm_idle_enabled
-+Date:		June 2023
-+KernelVersion:	6.5
-+Contact:	qat-linux@intel.com
-+Description:	(RW) This configuration option provides a way to force the device into remaining in
-+		the MAX power state.
-+		If idle support is enabled the device will transition to the `MIN` power state when
-+		idle, otherwise will stay in the MAX power state.
-+		Write to the file to enable or disable idle support.
-+
-+		The values are:
-+
-+		* 0: idle support is disabled
-+		* 1: idle support is enabled
-+
-+		Default value is 1.
-+
-+		It is possible to set the pm_idle_enabled value only if the device
-+		is in the `down` state (see /sys/bus/pci/devices/<BDF>/qat/state)
-+
-+		The following example shows how to change the pm_idle_enabled of
-+		a device::
-+
-+			# cat /sys/bus/pci/devices/<BDF>/qat/state
-+			up
-+			# cat /sys/bus/pci/devices/<BDF>/qat/pm_idle_enabled
-+			1
-+			# echo down > /sys/bus/pci/devices/<BDF>/qat/state
-+			# echo 0 > /sys/bus/pci/devices/<BDF>/qat/pm_idle_enabled
-+			# echo up > /sys/bus/pci/devices/<BDF>/qat/state
-+			# cat /sys/bus/pci/devices/<BDF>/qat/pm_idle_enabled
-+			0
-+
-+		This attribute is only available for qat_4xxx devices.
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h b/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h
-index 5d8c3bdb258c..96d0db41f1e2 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h
-@@ -26,6 +26,7 @@
- #define ADF_CFG_DC "dc"
- #define ADF_CFG_CY "sym;asym"
- #define ADF_SERVICES_ENABLED "ServicesEnabled"
-+#define ADF_PM_IDLE_SUPPORT "PmIdleSupport"
- #define ADF_ETRMGR_COALESCING_ENABLED "InterruptCoalescingEnabled"
- #define ADF_ETRMGR_COALESCING_ENABLED_FORMAT \
- 	ADF_ETRMGR_BANK "%d" ADF_ETRMGR_COALESCING_ENABLED
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-index 7037c0892a8a..34c6cd8e27c0 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-@@ -23,15 +23,25 @@ struct adf_gen4_pm_data {
- 
- static int send_host_msg(struct adf_accel_dev *accel_dev)
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index 20d0dcd50344..4f6ca229ee5e 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -9,6 +9,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
++#include <linux/of_address.h>
+ #include <linux/of_device.h>
+ #include <linux/cpumask.h>
+ #include <linux/slab.h>
+@@ -1795,11 +1796,9 @@ static int grab_mdesc_irq_props(struct mdesc_handle *mdesc,
+ 				struct spu_mdesc_info *ip,
+ 				const char *node_name)
  {
-+	char pm_idle_support_cfg[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {};
- 	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	bool pm_idle_support;
- 	u32 msg;
-+	int ret;
+-	const unsigned int *reg;
+-	u64 node;
++	u64 node, reg;
  
- 	msg = ADF_CSR_RD(pmisc, ADF_GEN4_PM_HOST_MSG);
- 	if (msg & ADF_GEN4_PM_MSG_PENDING)
- 		return -EBUSY;
+-	reg = of_get_property(dev->dev.of_node, "reg", NULL);
+-	if (!reg)
++	if (of_property_read_reg(dev->dev.of_node, 0, &reg, NULL) < 0)
+ 		return -ENODEV;
  
-+	adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
-+				ADF_PM_IDLE_SUPPORT, pm_idle_support_cfg);
-+	ret = kstrtobool(pm_idle_support_cfg, &pm_idle_support);
-+	if (ret)
-+		pm_idle_support = true;
-+
- 	/* Send HOST_MSG */
--	msg = FIELD_PREP(ADF_GEN4_PM_MSG_PAYLOAD_BIT_MASK, PM_SET_MIN);
-+	msg = FIELD_PREP(ADF_GEN4_PM_MSG_PAYLOAD_BIT_MASK,
-+			 pm_idle_support ? PM_SET_MIN : PM_NO_CHANGE);
- 	msg |= ADF_GEN4_PM_MSG_PENDING;
- 	ADF_CSR_WR(pmisc, ADF_GEN4_PM_HOST_MSG, msg);
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-index f8f8a9ee29e5..dd112923e006 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-@@ -37,6 +37,7 @@
- 
- #define ADF_GEN4_PM_DEFAULT_IDLE_FILTER		(0x0)
- #define ADF_GEN4_PM_MAX_IDLE_FILTER		(0x7)
-+#define ADF_GEN4_PM_DEFAULT_IDLE_SUPPORT	(0x1)
- 
- int adf_gen4_enable_pm(struct adf_accel_dev *accel_dev);
- bool adf_gen4_handle_pm_interrupt(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-index 3eb6611ab1b1..9515da11deb7 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-@@ -145,12 +145,65 @@ static ssize_t cfg_services_store(struct device *dev, struct device_attribute *a
- 	return count;
- }
- 
-+static ssize_t pm_idle_enabled_show(struct device *dev, struct device_attribute *attr,
-+				    char *buf)
-+{
-+	char pm_idle_enabled[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {};
-+	struct adf_accel_dev *accel_dev;
-+	int ret;
-+
-+	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
-+	if (!accel_dev)
-+		return -EINVAL;
-+
-+	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
-+				      ADF_PM_IDLE_SUPPORT, pm_idle_enabled);
-+	if (ret)
-+		return sysfs_emit(buf, "1\n");
-+
-+	return sysfs_emit(buf, "%s\n", pm_idle_enabled);
-+}
-+
-+static ssize_t pm_idle_enabled_store(struct device *dev, struct device_attribute *attr,
-+				     const char *buf, size_t count)
-+{
-+	unsigned long pm_idle_enabled_cfg_val;
-+	struct adf_accel_dev *accel_dev;
-+	bool pm_idle_enabled;
-+	int ret;
-+
-+	ret = kstrtobool(buf, &pm_idle_enabled);
-+	if (ret)
-+		return ret;
-+
-+	pm_idle_enabled_cfg_val = pm_idle_enabled;
-+	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
-+	if (!accel_dev)
-+		return -EINVAL;
-+
-+	if (adf_dev_started(accel_dev)) {
-+		dev_info(dev, "Device qat_dev%d must be down to set pm_idle_enabled.\n",
-+			 accel_dev->accel_id);
-+		return -EINVAL;
-+	}
-+
-+	ret = adf_cfg_add_key_value_param(accel_dev, ADF_GENERAL_SEC,
-+					  ADF_PM_IDLE_SUPPORT, &pm_idle_enabled_cfg_val,
-+					  ADF_DEC);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+}
-+static DEVICE_ATTR_RW(pm_idle_enabled);
-+
- static DEVICE_ATTR_RW(state);
- static DEVICE_ATTR_RW(cfg_services);
- 
- static struct attribute *qat_attrs[] = {
- 	&dev_attr_state.attr,
- 	&dev_attr_cfg_services.attr,
-+	&dev_attr_pm_idle_enabled.attr,
- 	NULL,
- };
- 
-
-base-commit: 6b5755b35497de5e8ed17772f7b0dd1bbe19cbee
+ 	mdesc_for_each_node_by_name(mdesc, node, "virtual-device") {
+@@ -1810,7 +1809,7 @@ static int grab_mdesc_irq_props(struct mdesc_handle *mdesc,
+ 		if (!name || strcmp(name, node_name))
+ 			continue;
+ 		chdl = mdesc_get_property(mdesc, node, "cfg-handle", NULL);
+-		if (!chdl || (*chdl != *reg))
++		if (!chdl || (*chdl != reg))
+ 			continue;
+ 		ip->cfg_handle = *chdl;
+ 		return get_irq_props(mdesc, node, ip);
 -- 
 2.39.2
 
