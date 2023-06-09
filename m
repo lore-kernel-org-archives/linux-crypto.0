@@ -2,161 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F002C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 16:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8630C7EE29
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 16:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbjFIQDg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 12:03:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52878 "EHLO
+        id S239196AbjFIQGq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 12:06:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242043AbjFIQDf (ORCPT
+        with ESMTP id S229737AbjFIQGp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 12:03:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25EE30D6
-        for <linux-crypto@vger.kernel.org>; Fri,  9 Jun 2023 09:02:49 -0700 (PDT)
+        Fri, 9 Jun 2023 12:06:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D694326B9
+        for <linux-crypto@vger.kernel.org>; Fri,  9 Jun 2023 09:05:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686326569;
+        s=mimecast20190719; t=1686326759;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bDPqvNvCKDaRoxVabZXpCEaO3eFktyKlsug6+VBWhkY=;
-        b=BGSw7a49uwoT9nD7F0vGLR0yntGuBwyze6VgUUkkltVbSRAWnwq7i6gajfOXRSvWoVEAx+
-        265azM7pa8x6En3VnsWuMipfv+3TIRjtawrzNaFzSqav7eLun/bH3WXHvdc2KdAxacxLgQ
-        CGTu78N2Rgi3We3TN/49UWJxS56kPL8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=+M7az6Jbp6Oqou6iuD63oUNoAb5aXxDturRi9Hwe0gE=;
+        b=jCDzs+PXaDshP/35Sql5Gt51Rv/H27xNJSiPWuvs/4um6QcUB9MTIcBLuNNRydP4utajN2
+        Kmt00Chavm7Xm51LRs5LhaFyrYQHwPM6soF9IpGmYU5Xt5Q09ZKnnIrK5JUckvqxO8f4d5
+        T9k387yE1wilEXQUAnEnbEyIj+iFi+w=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-134-xqWomrh4OSGDW-oJJAojyw-1; Fri, 09 Jun 2023 12:02:42 -0400
-X-MC-Unique: xqWomrh4OSGDW-oJJAojyw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f611d31577so13443105e9.0
-        for <linux-crypto@vger.kernel.org>; Fri, 09 Jun 2023 09:02:41 -0700 (PDT)
+ us-mta-47-b9C02V1IMiap0yPBSMM6Ug-1; Fri, 09 Jun 2023 12:05:55 -0400
+X-MC-Unique: b9C02V1IMiap0yPBSMM6Ug-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-30e3ee8a42eso751584f8f.1
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Jun 2023 09:05:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686326561; x=1688918561;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bDPqvNvCKDaRoxVabZXpCEaO3eFktyKlsug6+VBWhkY=;
-        b=coZo+zkLltkLeTJ/j/+k/jAaryulfWVsnzGX1AQ3U5FxVD6GJoOI5JN0EKg03UwU8S
-         RKi22psD5N9Bi58kXF8eJyDK6tBJLQcptpKHfmQh1z3YvVncwGUOpR1hy1vtGSZipuuV
-         KVUcGBLFqVGXeW8E+UZnX1zsmKKAAhr+9JAOnQg3ifxl0kt1nONJoIfy5hcfPqfYLWuR
-         HmHkLn+4gG7kKqPdzk81lqulDBaiEEB4Ab77EbmKigsdFJsoMvmXly+OnVTPgH1ok5Ib
-         hq6ifefbWNJTcNh/V22Nsnd9MD/7EOBtQdUVVL8yEE90aUQebYxUzJsPUM9P92D2pWLe
-         WDog==
-X-Gm-Message-State: AC+VfDycoW3Hb9OIG2iIaWoXCd3QG9h8Snm/aBd5f6/ZgtgCg5rHDZ4L
-        wJ2vYav1kwN7mkw819dpIgZ8Ba2gqrZLLpHHwEyhgwnR0U6B8jYsYwxttjFWu3VgtqyGDoLcnYG
-        P6ozHlchOc9TmNJJRrWsXIEqT
-X-Received: by 2002:a05:600c:2041:b0:3f6:1b7:11f0 with SMTP id p1-20020a05600c204100b003f601b711f0mr1872766wmg.7.1686326560748;
-        Fri, 09 Jun 2023 09:02:40 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6+cTGEsumPbrhQKIm8DZ1NuiAlUbhAlNIbDxc4Q5231NUq4aWWlHrRMiiaodCaJ/J+lriS5Q==
-X-Received: by 2002:a05:600c:2041:b0:3f6:1b7:11f0 with SMTP id p1-20020a05600c204100b003f601b711f0mr1872735wmg.7.1686326560330;
-        Fri, 09 Jun 2023 09:02:40 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686326754; x=1688918754;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+M7az6Jbp6Oqou6iuD63oUNoAb5aXxDturRi9Hwe0gE=;
+        b=kI+PIY2pbqTt/UUOOjsVnIIzsPHn0+RloPXH6kN3plColtx+8iOBWfLyeGJVtpId6p
+         AG38io+J3wB9Ea2MoeW0HsH74SJvMEzogihsmYa2XzBC6uGGfQ1qJMp9j6yzBCYBuwWn
+         3MxobfL1+XiF94NAkTw/eCyQrxFYyb4pSWzH3pyU5UGnZ2WU2TL3N+K79rBJ/Mu8OzWo
+         yLyZnXOmZ2pI9ueQpr96lsVhpqYYTaMDPaCoGklGdB+HztWD5f8XGFN3ALvzEVPCHD4R
+         IbnNON0iiCrIa0h7w72xRtIrkROJGKywelVU5o4h/Gpe6Xfz0DmAqPScgkWQ76zPXLSE
+         YjvQ==
+X-Gm-Message-State: AC+VfDzBgI/C5ipKNMyzGiov2tHJfqjuCAyYrtliO5lscohFY/BKJQtX
+        WnR5z0I+NKB9mFeJyWPa5LVLXMAC38VnYLckn1gdePSv4UqCYH2aUQPOyX0J+W9dOLx7W4oAMkA
+        qUz7O3C6nQ3od8RHd6wgPu0KJ
+X-Received: by 2002:a5d:4e88:0:b0:309:41d8:eec4 with SMTP id e8-20020a5d4e88000000b0030941d8eec4mr1062155wru.39.1686326754291;
+        Fri, 09 Jun 2023 09:05:54 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ70iwfwN+298k3OOZDF7xlgm6Z2CMUhRp6FaLoDmzGdsg4L4C82nksLMOKVyP8jx0VshOn9wQ==
+X-Received: by 2002:a5d:4e88:0:b0:309:41d8:eec4 with SMTP id e8-20020a5d4e88000000b0030941d8eec4mr1062133wru.39.1686326753971;
+        Fri, 09 Jun 2023 09:05:53 -0700 (PDT)
 Received: from redhat.com ([2a06:c701:7403:2800:22a6:7656:500:4dab])
-        by smtp.gmail.com with ESMTPSA id f16-20020a1c6a10000000b003f60fb2addbsm3062327wmc.44.2023.06.09.09.02.38
+        by smtp.gmail.com with ESMTPSA id p13-20020a5d4e0d000000b002fb60c7995esm4841314wrt.8.2023.06.09.09.05.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 09:02:39 -0700 (PDT)
-Date:   Fri, 9 Jun 2023 12:02:36 -0400
+        Fri, 09 Jun 2023 09:05:53 -0700 (PDT)
+Date:   Fri, 9 Jun 2023 12:05:50 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Xianting Tian <xianting.tian@linux.alibaba.com>,
-        arei.gonglei@huawei.com, jasowang@redhat.com,
+To:     Xianting Tian <xianting.tian@linux.alibaba.com>
+Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
         xuanzhuo@linux.alibaba.com, herbert@gondor.apana.org.au,
         davem@davemloft.net, amit@kernel.org, arnd@arndb.de,
-        marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Xianting Tian <tianxianting.txt@alibaba-inc.com>
-Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] virtio_console: fixup potential cpu stall when free
  unused bufs
-Message-ID: <20230609115840-mutt-send-email-mst@kernel.org>
+Message-ID: <20230609120332-mutt-send-email-mst@kernel.org>
 References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
- <20230609131817.712867-2-xianting.tian@linux.alibaba.com>
- <2023060924-skinning-reset-e256@gregkh>
- <2023060940-wrongdoer-wince-5701@gregkh>
- <91aa6ce0-e8a3-21ac-d29e-b2a47f6386d1@linux.alibaba.com>
- <2023060924-onion-armhole-803e@gregkh>
+ <20230609131817.712867-3-xianting.tian@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2023060924-onion-armhole-803e@gregkh>
+In-Reply-To: <20230609131817.712867-3-xianting.tian@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 04:05:57PM +0200, Greg KH wrote:
-> On Fri, Jun 09, 2023 at 09:49:39PM +0800, Xianting Tian wrote:
-> > 
-> > 在 2023/6/9 下午9:41, Greg KH 写道:
-> > > On Fri, Jun 09, 2023 at 03:39:24PM +0200, Greg KH wrote:
-> > > > On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
-> > > > > From: Xianting Tian <tianxianting.txt@alibaba-inc.com>
-> > > > > 
-> > > > > Cpu stall issue may happen if device is configured with multi queues
-> > > > > and large queue depth, so fix it.
-> > > > > 
-> > > > > Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
-> > > > > ---
-> > > > >   drivers/crypto/virtio/virtio_crypto_core.c | 1 +
-> > > > >   1 file changed, 1 insertion(+)
-> > > > > 
-> > > > > diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
-> > > > > index 1198bd306365..94849fa3bd74 100644
-> > > > > --- a/drivers/crypto/virtio/virtio_crypto_core.c
-> > > > > +++ b/drivers/crypto/virtio/virtio_crypto_core.c
-> > > > > @@ -480,6 +480,7 @@ static void virtcrypto_free_unused_reqs(struct virtio_crypto *vcrypto)
-> > > > >   			kfree(vc_req->req_data);
-> > > > >   			kfree(vc_req->sgs);
-> > > > >   		}
-> > > > > +		cond_resched();
-> > > > that's not "fixing a stall", it is "call the scheduler because we are
-> > > > taking too long".  The CPU isn't stalled at all, just busy.
-> > > > 
-> > > > Are you sure this isn't just a bug in the code?  Why is this code taking
-> > > > so long that you have to force the scheduler to run?  This is almost
-> > > > always a sign that something else needs to be fixed instead.
-> > > And same comment on the other 2 patches, please fix this properly.
-> > > 
-> > > Also, this is a tight loop that is just freeing memory, why is it taking
-> > > so long?  Why do you want it to take longer (which is what you are doing
-> > > here), ideally it would be faster, not slower, so you are now slowing
-> > > down the system overall with this patchset, right?
-> > 
-> > yes, it is the similar fix with one for virtio-net
-> > 
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/net/virtio_net.c?h=v6.4-rc5&id=f8bb5104394560e29017c25bcade4c6b7aabd108 <https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/net/virtio_net.c?h=v6.4-rc5&id=f8bb5104394560e29017c25bcade4c6b7aabd108>
+On Fri, Jun 09, 2023 at 09:18:16PM +0800, Xianting Tian wrote:
+> Cpu stall issue may happen if device is configured with multi queues
+> and large queue depth, so fix it.
 
-Well that one actually at least describes the configuration:
+"may happen" is ambigous.
+
+So is this: "for virtio-net we were getting
+stall on CPU was observed message, this driver is similar
+so theoretically the same logic applies"
+
+or is this
+
+"the following error occured: ..... "
+
+?
 
 
-	For multi-queue and large ring-size use case, the following error
-	occurred when free_unused_bufs:
-	rcu: INFO: rcu_sched self-detected stall on CPU.
-
-So a similar fix but not a similar commit log, this one lacks Fixes tag and
-description of what the problem is and when does it trigger.
-
-> I would argue that this too is incorrect, because why does freeing
-> memory take so long?
-
-You are correct that even that one lacks detailed explanation
-why does the patch help.
-
-And the explanation why it takes so long is exactly that
-we have very deep queues and a very large number of queues.
-What the patch does is gives scheduler a chance
-to do some work between the queues.
-
-
-
-
-
->  And again, you are making it take longer, is that
-> ok?
+> Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
+> ---
+>  drivers/char/virtio_console.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> thanks,
-> 
-> greg k-h
+> diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
+> index b65c809a4e97..5ec4cf4ea919 100644
+> --- a/drivers/char/virtio_console.c
+> +++ b/drivers/char/virtio_console.c
+> @@ -1935,6 +1935,7 @@ static void remove_vqs(struct ports_device *portdev)
+>  		flush_bufs(vq, true);
+>  		while ((buf = virtqueue_detach_unused_buf(vq)))
+>  			free_buf(buf, true);
+> +		cond_resched();
+>  	}
+>  	portdev->vdev->config->del_vqs(portdev->vdev);
+>  	kfree(portdev->in_vqs);
+> -- 
+> 2.17.1
 
