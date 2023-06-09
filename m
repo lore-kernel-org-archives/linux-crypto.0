@@ -2,101 +2,81 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED28CC7EE29
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 18:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18828C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 19:10:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbjFISbP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 14:31:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44286 "EHLO
+        id S230061AbjFITKk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 15:10:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230141AbjFISbN (ORCPT
+        with ESMTP id S230526AbjFITKj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 14:31:13 -0400
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FDA35BE;
-        Fri,  9 Jun 2023 11:31:11 -0700 (PDT)
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-33e585a0ca6so8761865ab.3;
-        Fri, 09 Jun 2023 11:31:11 -0700 (PDT)
+        Fri, 9 Jun 2023 15:10:39 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220703A9D
+        for <linux-crypto@vger.kernel.org>; Fri,  9 Jun 2023 12:10:37 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-565e8d575cbso20207517b3.3
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Jun 2023 12:10:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1686337836; x=1688929836;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LJ900G5ij4y/xYDI1jpd13Sc6P2wvNe0duR8GNRArV8=;
+        b=QfyL3qoBJKLLtm2liQhJFd0F3QPq7oedhrkFEUG0a1S5VO1Ot5UrGcY+/I59134gVM
+         QazOr3Z9EvDQXGisE8NGyHHpnYlDDkNQOyZUY6m1xvSEEUp5Lu9PMykhY9Z9KYeswDQo
+         ofore2Ow0b98fAdDhaeBEoZDNcYdkzPlgSc0Mr+InFILD0wRvDUQIuFpcoInPudheOIx
+         AAGKV9tH7aIVB5uglcsCEGoQwp9IIJoCoZvuTCLoqpg9DCNjGhPHANkq8fq08i9/beQ7
+         3hP+fDzl0t82qvEguizUTJc/AS064FC5pSKpgreWcJpluswLT5bAT5c8J/YEn7HcSOFS
+         xYpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686335471; x=1688927471;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YDLRPgV5z509cyU5ssYH2N/H4F3/FnPUGl76en455c0=;
-        b=EmbGOi/GbLCiGxvtFEK8zQGQ5eAvoIKgXr/+hwaYX1lwyM756lQwSFavMCCMml7VTZ
-         vMYVSWDbSsPRuXB/Z1/tDaYJI1L1f2Ef0Tz34Du7z0ss0MLvbH5Ev6ruoUkveHWh/hUS
-         HDqYgHA5w2gNX4P1uXIIvqbEi9wCh4Fqy6ZvUQwsNmCjbHSlkbFTMRmBEyUVlmVBz4Vu
-         p0xqMOOxBY1CLkH9RmFMWNq/TMZPDj5WNz3ncyjxRxkTgrd++kk/yRUCul5kgDtPs340
-         S9Pz6jWRP7RjjRZbAiQKVlZ5cc9SB8ZtvHEOouKDGgIm/A9ehQo8EYcr49tHHoy9D+AQ
-         Jtxg==
-X-Gm-Message-State: AC+VfDyUPzdb+Yetu43OFq93/bX7+djMEfIWizcox33QJeWrpG1cWhx9
-        f4JeDZHu5NrsueIJzq3uIia6wLfGbw==
-X-Google-Smtp-Source: ACHHUZ6gs4iUOyrEkbjPXB9yem88PDea/e9/9fQbcxT07lu5mhWFHuK2Ix5E1FnOI4GSSTpjw2qFtw==
-X-Received: by 2002:a92:c852:0:b0:33b:1da8:a7d0 with SMTP id b18-20020a92c852000000b0033b1da8a7d0mr2326661ilq.29.1686335470707;
-        Fri, 09 Jun 2023 11:31:10 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id k1-20020a92c9c1000000b0033c01c407fbsm1239903ilq.31.2023.06.09.11.31.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 11:31:09 -0700 (PDT)
-Received: (nullmailer pid 1765467 invoked by uid 1000);
-        Fri, 09 Jun 2023 18:31:08 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: n2: Use of_property_read_reg() to parse "reg"
-Date:   Fri,  9 Jun 2023 12:31:05 -0600
-Message-Id: <20230609183105.1765368-1-robh@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20221208; t=1686337836; x=1688929836;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LJ900G5ij4y/xYDI1jpd13Sc6P2wvNe0duR8GNRArV8=;
+        b=ZQOFJOmJmgEr7ItR1cJIPfUQLnv4rqI4+qKLWOTDl2FvbwCfE4vfH53/+UiJ7tfbCr
+         kS8H6/LXwPrYBp4e19ePHPRwkqWZYRh7q54YewIVb8kHOEDx8D6Mp3oFSOyAQP9E8oQa
+         73brjTuesBJMgV73dxVm5576G9+2CwO6X817IDWZ9uLGhvEknS3V7mTK/hZMkf192keb
+         k0rOABh+zP08olMdmDc27nAzKQjkYtogTt20XCQ2ByooZo5whG1qX7UEBhewhNKT/H/d
+         5YDUvE7GUSGHkt48XnGV8sJ8nJjWeQk76hRyd+ITU6Xzxs5HTtzJAyc0cCiLl+TFLYOH
+         0hrA==
+X-Gm-Message-State: AC+VfDwETqXbBRjUMAHUw5XFIQBc/GkFDsId8o/FkXZA3tzhDDB5BpyJ
+        npC+q01Mi8GMdlv2VL6Yd/TCZ2kokQwFQTyPc93dbR8QxnD1zROR
+X-Google-Smtp-Source: ACHHUZ5ETmM9CNHbxrtXFT8B+QGPBNspHfep2ZhFRWOXUKhbuqUHQDU1oTD19drFiTgk70dOzTRUdOtEZ3nSfvaxFOs=
+X-Received: by 2002:a05:6902:149:b0:ba7:ad38:5707 with SMTP id
+ p9-20020a056902014900b00ba7ad385707mr1781664ybh.50.1686337836352; Fri, 09 Jun
+ 2023 12:10:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230609140745.65046-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230609140745.65046-1-krzysztof.kozlowski@linaro.org>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Fri, 9 Jun 2023 21:10:24 +0200
+Message-ID: <CACRpkdZzC7ttFbprrsaQgnUkdaEgSBA_Uw6fkhrHYi6LjJekjQ@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: crypto: intel,ixp4xx: drop unneeded quotes
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the recently added of_property_read_reg() helper to get the
-untranslated "reg" address value.
+On Fri, Jun 9, 2023 at 4:07=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- drivers/crypto/n2_core.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+> Cleanup bindings dropping unneeded quotes. Once all these are fixed,
+> checking for this can be enabled in yamllint.
+>
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
-index 20d0dcd50344..4f6ca229ee5e 100644
---- a/drivers/crypto/n2_core.c
-+++ b/drivers/crypto/n2_core.c
-@@ -9,6 +9,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of.h>
-+#include <linux/of_address.h>
- #include <linux/of_device.h>
- #include <linux/cpumask.h>
- #include <linux/slab.h>
-@@ -1795,11 +1796,9 @@ static int grab_mdesc_irq_props(struct mdesc_handle *mdesc,
- 				struct spu_mdesc_info *ip,
- 				const char *node_name)
- {
--	const unsigned int *reg;
--	u64 node;
-+	u64 node, reg;
- 
--	reg = of_get_property(dev->dev.of_node, "reg", NULL);
--	if (!reg)
-+	if (of_property_read_reg(dev->dev.of_node, 0, &reg, NULL) < 0)
- 		return -ENODEV;
- 
- 	mdesc_for_each_node_by_name(mdesc, node, "virtual-device") {
-@@ -1810,7 +1809,7 @@ static int grab_mdesc_irq_props(struct mdesc_handle *mdesc,
- 		if (!name || strcmp(name, node_name))
- 			continue;
- 		chdl = mdesc_get_property(mdesc, node, "cfg-handle", NULL);
--		if (!chdl || (*chdl != *reg))
-+		if (!chdl || (*chdl != reg))
- 			continue;
- 		ip->cfg_handle = *chdl;
- 		return get_irq_props(mdesc, node, ip);
--- 
-2.39.2
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
+Yours,
+Linus Walleij
