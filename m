@@ -2,122 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A14C7EE43
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Jun 2023 22:54:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E77BC7EE29
+	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 02:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230040AbjFIWyr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 18:54:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51848 "EHLO
+        id S229623AbjFJCOz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 22:14:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbjFIWyq (ORCPT
+        with ESMTP id S229497AbjFJCOy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 18:54:46 -0400
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C13199D;
-        Fri,  9 Jun 2023 15:54:45 -0700 (PDT)
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-777b4c9e341so102106639f.0;
-        Fri, 09 Jun 2023 15:54:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686351285; x=1688943285;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pT8d709lUwR0H+C5hIKfiTzNt8kqiCGgM0Vbs93RSBI=;
-        b=iVfnN24Gzrxa6cN2tsyP05ZbU5QbFBw0n0K6+9cCza2GZf2GG0QafUPAqajiP3SQA5
-         GVoByI+4Qjd7U9WnbnCGqYP5nmx9DjWGiS+b6KeRXyti0wVSC12Ms5B+FHpnHhfdvm7p
-         8IX7S+phQ6ukr4Zuao9Rm1VIzo8Ro+QYvMGpx3hpvl7wb/q4NI8jbiwNA2k1eJxE4HvG
-         FPn1BRn9WYqesWEOPBFJCXsIqlErOTWYDa6lP9rTKrPRP6kegO2x67SBYnaUMUBifHmw
-         uhkBVdHOIkOVXBe4k7FIa0YLWzVRdZ49h3dOKkWFLBJpzU/icKIUS0UySbj9H6V4R7NA
-         78NA==
-X-Gm-Message-State: AC+VfDwinI1aD2AA1cSKelwH9K7Hs3UIdbBG3Mf0eAh83u0xh/5niVT2
-        PajPRynLwK3C0Xqbf+rXPA==
-X-Google-Smtp-Source: ACHHUZ4hkrjWTx1JroAsVMcvyH4QcGLOHYyPwn37uUR6Q/8eLHeqERimu9M7VUet3JdIarbD7Tic1A==
-X-Received: by 2002:a5e:c017:0:b0:778:735c:9bed with SMTP id u23-20020a5ec017000000b00778735c9bedmr2869964iol.0.1686351284694;
-        Fri, 09 Jun 2023 15:54:44 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id p22-20020a02b396000000b00420af1d2ce0sm1241761jan.5.2023.06.09.15.54.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 15:54:43 -0700 (PDT)
-Received: (nullmailer pid 2601357 invoked by uid 1000);
-        Fri, 09 Jun 2023 22:54:42 -0000
-Date:   Fri, 9 Jun 2023 16:54:42 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: crypto: intel,ixp4xx: drop unneeded quotes
-Message-ID: <20230609225442.GA2588193-robh@kernel.org>
-References: <20230609140745.65046-1-krzysztof.kozlowski@linaro.org>
+        Fri, 9 Jun 2023 22:14:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F6C35A9;
+        Fri,  9 Jun 2023 19:14:53 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 298BB63C58;
+        Sat, 10 Jun 2023 02:14:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB02C433D2;
+        Sat, 10 Jun 2023 02:14:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686363292;
+        bh=Ud+eEivIcnu7J9J5nBUGtGRWTzlzjz0B2BcKWne/ues=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mKHYPpgIX1YTbNSfiw5A8f90UWlgWb7/IZVKZG+ABIYeb0KpqSLo9v8Vyupgb1Cfo
+         5PIBdSN09SlwRgnVzJFjq9axGkX9gGs34Ahgo9X2NtViYiPBbJ7Vr8Gx2zHQZhMpFV
+         t+QO8Jpf+5t9GfUoBfsreQQSHhGjJ30Z0WyxKdTdB7TUGmYE18TG0MAFvfgM/QqSp4
+         8mK0dhCy8VIz2iPrsdWAkTSn0Vj/XYd2wQMRvThVzG41AnwoTTpDX2ILBKru1KdQwh
+         jqDvO+LVYMbEVtoJ9WcOTrJ52ONIuDWoXrPrKWM2+I+6oBBXvTicEbtQAFkGSHd8ko
+         gWTn0I5xx9UiQ==
+Date:   Fri, 9 Jun 2023 19:14:50 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dongsoo Lee <letrhee@nsr.re.kr>
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, letrhee@gmail.com
+Subject: Re: [PATCH v2 0/2] crypto: LEA block cipher implementation
+Message-ID: <20230610021450.GA872@sol.localdomain>
+References: <20230525121301.722682-1-letrhee@nsr.re.kr>
+ <ZHh1H3yKPU68J7Uv@gondor.apana.org.au>
+ <008d01d99518$33db63f0$9b922bd0$@nsr.re.kr>
+ <20230602213946.GD628@quark.localdomain>
+ <005601d99ac9$954f0c70$bfed2550$@nsr.re.kr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230609140745.65046-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <005601d99ac9$954f0c70$bfed2550$@nsr.re.kr>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 04:07:45PM +0200, Krzysztof Kozlowski wrote:
-> Cleanup bindings dropping unneeded quotes. Once all these are fixed,
-> checking for this can be enabled in yamllint.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  .../devicetree/bindings/crypto/intel,ixp4xx-crypto.yaml         | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Jun 09, 2023 at 08:57:36PM +0900, Dongsoo Lee wrote:
+> Unfortunately, currently, vendors trying to supply Linux-based data-at-rest
+> encryption products by utilizing the dm-crypt or the fscrypt modules to
+> government agencies or public institutions in Korea are experiencing great
+> difficulties.
 
-You missed $id and $schema values.
+Why are they having "great difficulties" when the kernel already supports two
+other "KCMVP-approved block ciphers", ARIA and SEED?  Why aren't they using
+dm-crypt with ARIA or SEED?
 
-Within drivers/crypto, there's also:
+> According to Korean regulations, the data transmitted and stored by
+> government agencies and public institutions must be protected using KCMVP
+> validated cryptographic modules.
 
-diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bi
-ndings/crypto/amlogic,gxl-crypto.yaml
-index ecf98a9e72b2..948e11ebe4ee 100644
---- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-+++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-@@ -19,8 +19,8 @@ properties:
- 
-   interrupts:
-     items:
--      - description: "Interrupt for flow 0"
--      - description: "Interrupt for flow 1"
-+      - description: Interrupt for flow 0
-+      - description: Interrupt for flow 1
- 
-   clocks:
-     maxItems: 1
+And does LEA (or SEED or ARIA) support in Linux actually solve that problem?
+Just adding support for these algorithms to Linux does not mean that Linux
+automatically becomes a "KCMVP validated cryptographic module", right?  Do you
+have a complete plan that would actually solve the claimed problem?
 
-Can you add this in here. No reason to split this up more that 1 patch 
-per subsystem really. 
-
-As I mentioned, I have a WIP tree[1] with yamllint checks enabled and 
-I scripted many of the changes. It was clean, but there's some new ones 
-since rebasing to v6.4-rc1:
-
-../Documentation/devicetree/bindings/hwmon/starfive,jh71x0-temp.yaml:30:16: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/hwmon/starfive,jh71x0-temp.yaml:31:16: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/hwmon/starfive,jh71x0-temp.yaml:42:16: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/hwmon/starfive,jh71x0-temp.yaml:43:16: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-max9808x.yaml:38:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-max9808x.yaml:39:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-max9808x.yaml:40:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-max9808x.yaml:41:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-max9808x.yaml:42:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-max9808x.yaml:43:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5631.yaml:34:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5631.yaml:35:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5631.yaml:36:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5631.yaml:37:11: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/cirrus,cs35l45.yaml:65:15: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/cirrus,cs35l45.yaml:74:15: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/cirrus,cs35l45.yaml:83:15: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/cirrus,cs35l45.yaml:93:15: [error] string value is redundantly quoted with any quotes (quoted-strings)
-../Documentation/devicetree/bindings/sound/cirrus,cs35l45.yaml:117:15: [error] string value is redundantly quoted with any quotes (quoted-strings)
-
-Rob
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git/log/?h=dt/yamllint
+- Eric
