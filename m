@@ -2,114 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C366EC7EE25
-	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890EC7EE25
+	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233776AbjFJDMx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 23:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57776 "EHLO
+        id S232397AbjFJDTM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 23:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233520AbjFJDMv (ORCPT
+        with ESMTP id S230457AbjFJDTL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 23:12:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E243ABE
-        for <linux-crypto@vger.kernel.org>; Fri,  9 Jun 2023 20:12:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6341B614D7
-        for <linux-crypto@vger.kernel.org>; Sat, 10 Jun 2023 03:12:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA1C3C433D2;
-        Sat, 10 Jun 2023 03:12:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686366769;
-        bh=hDgLUE58CZZjcWdU0alB/OfGbFD3iQcCVZ+s4WpqbKI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HR6smhS+7xGAHZ6JeM3IT2St3Zr1PLhxsRTIU+dhPCN38GBpqjXznAj5JaaaTFued
-         /2M6BmTKKSrnqB1+cZchlLE5rnM0iJb8CcYYOjdZ/trhdlFqBXaTB54qZ7sse1kiAf
-         aKdRIcOJi2K8pzqoWGpPvh79NDTsXVeoraMD6GN7j6pzqQ4M1SOhCFgVEZzLkIMhkN
-         BjIJSjGEzWyQCkulyNKjjPzeV57XfcMBKm5o5Q0HEcb6jF5VTtgSt1znopdxo4mjJF
-         grG01WEkdDpwWnJurMBfrY3AnDkouWcGMtK/L3OKDYG2Q+ptCGLM1KJVb9Fv+0Jig8
-         c3hfLhmUsK+tQ==
-Date:   Fri, 9 Jun 2023 20:12:48 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Subject: Re: [PATCH 0/3] crypto - some SPDX cleanups for arch code
-Message-ID: <20230610031248.GC872@sol.localdomain>
-References: <20230606173127.4050254-1-ardb@kernel.org>
- <20230607043730.GB941@sol.localdomain>
+        Fri, 9 Jun 2023 23:19:11 -0400
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55548E1;
+        Fri,  9 Jun 2023 20:19:09 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0VkjxUgb_1686367143;
+Received: from 30.13.188.136(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0VkjxUgb_1686367143)
+          by smtp.aliyun-inc.com;
+          Sat, 10 Jun 2023 11:19:05 +0800
+Message-ID: <5149dde8-b6b2-e720-2e32-5c79684a99db@linux.alibaba.com>
+Date:   Sat, 10 Jun 2023 11:19:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230607043730.GB941@sol.localdomain>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Subject: Re: [PATCH 2/3] virtio_console: fixup potential cpu stall when free
+ unused bufs
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
+        xuanzhuo@linux.alibaba.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, amit@kernel.org, arnd@arndb.de,
+        gregkh@linuxfoundation.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
+ <20230609131817.712867-3-xianting.tian@linux.alibaba.com>
+ <20230609120332-mutt-send-email-mst@kernel.org>
+From:   Xianting Tian <xianting.tian@linux.alibaba.com>
+In-Reply-To: <20230609120332-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 06, 2023 at 09:37:30PM -0700, Eric Biggers wrote:
-> On Tue, Jun 06, 2023 at 07:31:24PM +0200, Ard Biesheuvel wrote:
-> > Some SPDX cleanups for the arch crypto code on ARM, arm64 and x86
-> > 
-> > Ard Biesheuvel (3):
-> >   crypto: arm64 - add some missing SPDX headers
-> >   crypto: arm - add some missing SPDX headers
-> >   crypto: x86 - add some missing SPDX headers
-> > 
-> >  arch/arm/crypto/chacha-neon-core.S          | 10 +----
-> >  arch/arm/crypto/crc32-ce-core.S             | 30 ++-----------
-> >  arch/arm/crypto/crct10dif-ce-core.S         | 40 +----------------
-> >  arch/arm64/crypto/chacha-neon-core.S        | 10 +----
-> >  arch/arm64/crypto/chacha-neon-glue.c        | 10 +----
-> >  arch/arm64/crypto/crct10dif-ce-core.S       | 40 +----------------
-> >  arch/x86/crypto/aesni-intel_avx-x86_64.S    | 36 +--------------
-> >  arch/x86/crypto/camellia-aesni-avx-asm_64.S |  7 +--
-> >  arch/x86/crypto/crc32-pclmul_glue.c         | 24 +---------
-> >  arch/x86/crypto/crc32c-pcl-intel-asm_64.S   | 29 +-----------
-> >  arch/x86/crypto/crct10dif-pcl-asm_64.S      | 36 +--------------
-> >  arch/x86/crypto/crct10dif-pclmul_glue.c     | 16 +------
-> >  arch/x86/crypto/sha1_avx2_x86_64_asm.S      | 46 +-------------------
-> >  arch/x86/crypto/sha1_ni_asm.S               | 46 +-------------------
-> >  arch/x86/crypto/sha256-avx-asm.S            | 28 +-----------
-> >  arch/x86/crypto/sha256-avx2-asm.S           | 29 +-----------
-> >  arch/x86/crypto/sha256-ssse3-asm.S          | 29 +-----------
-> >  arch/x86/crypto/sha256_ni_asm.S             | 46 +-------------------
-> >  arch/x86/crypto/sha256_ssse3_glue.c         | 15 +------
-> >  arch/x86/crypto/sha512-avx-asm.S            | 29 +-----------
-> >  arch/x86/crypto/sha512-avx2-asm.S           | 29 +-----------
-> >  arch/x86/crypto/sha512-ssse3-asm.S          | 29 +-----------
-> >  arch/x86/crypto/sha512_ssse3_glue.c         | 16 +------
-> >  arch/x86/crypto/twofish_glue.c              | 16 +------
-> >  24 files changed, 26 insertions(+), 620 deletions(-)
-> 
-> Reviewed-by: Eric Biggers <ebiggers@google.com>
-> 
 
-Actually, given the discussion on the other thread
-https://lore.kernel.org/r/20230607053940.39078-10-bagasdotme@gmail.com, maybe it
-would be best to hold off on this for now?  Or at least split this series into
-more patches, such that each patch does only one "type" of SPDX replacement.
+在 2023/6/10 上午12:05, Michael S. Tsirkin 写道:
+> On Fri, Jun 09, 2023 at 09:18:16PM +0800, Xianting Tian wrote:
+>> Cpu stall issue may happen if device is configured with multi queues
+>> and large queue depth, so fix it.
+> "may happen" is ambigous.
+>
+> So is this: "for virtio-net we were getting
+> stall on CPU was observed message, this driver is similar
+> so theoretically the same logic applies"
 
-I still think these conversions are probably fine, but some points that perhaps
-need an explicit explanation are:
+It is this one
 
-* Using GPL-2.0-only for files like chacha-neon-core.S whose file header says
-  GPL v2, but also says GPL v2 or later.
+  “this driver is similar so theoretically the same logic applies”
 
-* Replacing with SPDX on files that explicitly say "DO NOT ALTER OR REMOVE
-  COPYRIGHT NOTICES OR THIS FILE HEADER."
-
-* Using BSD-3-Clause when the license text in the file header has the copyright
-  holder name instead of "copyright holder", thus making it not an exact
-  word-for-word match with LICENSES/preferred/BSD-3-Clause.  (It seems there are
-  specific rules for variations that have been approved, e.g. see
-  https://github.com/spdx/license-list-XML/blob/main/src/BSD-3-Clause.xml and
-  https://spdx.github.io/spdx-spec/v2.2.2/license-matching-guidelines-and-templates)
-
-* Using "GPL-2.0-only OR BSD-3-Clause" for the two crct10dif-ce-core.S files.
-  They have an unusual file header, and it could be argued that some
-  contributions to those files were intended to be licensed under GPL-2.0-only.
-  FWIW, I am fine with either license for my contributions to those files.
-
-- Eric
+>
+> or is this
+>
+> "the following error occured: ....."
+>
+> ?
+>
+>
+>> Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
+>> ---
+>>   drivers/char/virtio_console.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
+>> index b65c809a4e97..5ec4cf4ea919 100644
+>> --- a/drivers/char/virtio_console.c
+>> +++ b/drivers/char/virtio_console.c
+>> @@ -1935,6 +1935,7 @@ static void remove_vqs(struct ports_device *portdev)
+>>   		flush_bufs(vq, true);
+>>   		while ((buf = virtqueue_detach_unused_buf(vq)))
+>>   			free_buf(buf, true);
+>> +		cond_resched();
+>>   	}
+>>   	portdev->vdev->config->del_vqs(portdev->vdev);
+>>   	kfree(portdev->in_vqs);
+>> -- 
+>> 2.17.1
