@@ -2,78 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5B7C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3DCC7EE25
+	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:31:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231279AbjFJDU7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 23:20:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59506 "EHLO
+        id S233894AbjFJDb5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 23:31:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjFJDU6 (ORCPT
+        with ESMTP id S229471AbjFJDby (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 23:20:58 -0400
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B61E1;
-        Fri,  9 Jun 2023 20:20:55 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VkjuBza_1686367249;
-Received: from 30.13.188.136(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0VkjuBza_1686367249)
-          by smtp.aliyun-inc.com;
-          Sat, 10 Jun 2023 11:20:51 +0800
-Message-ID: <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
-Date:   Sat, 10 Jun 2023 11:20:49 +0800
+        Fri, 9 Jun 2023 23:31:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2AE10EA;
+        Fri,  9 Jun 2023 20:31:53 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9FDFA63D18;
+        Sat, 10 Jun 2023 03:31:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48EA5C433D2;
+        Sat, 10 Jun 2023 03:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686367912;
+        bh=M2d5ZNsKDh43dcGKfm/+a42qhKgFtvwzkwCZa/pYhGY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Y+Y3dx2WbNFRh59OQWYi/ZB17i80nJePzherajKIkzcIWuPhUGWoyxkzBtv4uLstc
+         +qX1f8oMAR99wrkzvk+wlmCwX4xPHX+TV8eKMtbc1ZDbxt8tOYV7OHZGmBGbPuCwMv
+         eYYtuFy22/UrRTewPPiv4pRSoB+wyOiSlrCAzt15ojm8qRVstUufmRP6XzrRldL2hN
+         PgLJNT/g7+xaTbH2YfMcH7yyJMPCvbGbKJK8JxsdcxZa1UhD4kVEC+xIqpj3V639a/
+         0UwnbIGQuUue0HuZOAWj4oq1EuKoxULvdSBhQ/fV4Mvf/7Ds/eGpia7dmz1e4Vk4kl
+         EGteTnBzi7Oeg==
+Date:   Fri, 9 Jun 2023 20:31:49 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH v7 2/3] scsi: ufs: ufs-qcom: Switch to the new ICE API
+Message-ID: <20230610033149.GD872@sol.localdomain>
+References: <20230408214041.533749-1-abel.vesa@linaro.org>
+ <20230408214041.533749-3-abel.vesa@linaro.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
- unused bufs
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
-        xuanzhuo@linux.alibaba.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, amit@kernel.org, arnd@arndb.de,
-        gregkh@linuxfoundation.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Xianting Tian <tianxianting.txt@alibaba-inc.com>
-References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
- <20230609131817.712867-2-xianting.tian@linux.alibaba.com>
- <20230609115617-mutt-send-email-mst@kernel.org>
-From:   Xianting Tian <xianting.tian@linux.alibaba.com>
-In-Reply-To: <20230609115617-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230408214041.533749-3-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Abel,
 
-在 2023/6/9 下午11:57, Michael S. Tsirkin 写道:
-> On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
->> From: Xianting Tian <tianxianting.txt@alibaba-inc.com>
->>
->> Cpu stall issue may happen if device is configured with multi queues
->> and large queue depth, so fix it.
-> What does "may happen" imply exactly?
-> was this observed?
-I didn't met such issue, this patch set just a theoretical fix.
->
->> Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
->> ---
->>   drivers/crypto/virtio/virtio_crypto_core.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
->> index 1198bd306365..94849fa3bd74 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_core.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
->> @@ -480,6 +480,7 @@ static void virtcrypto_free_unused_reqs(struct virtio_crypto *vcrypto)
->>   			kfree(vc_req->req_data);
->>   			kfree(vc_req->sgs);
->>   		}
->> +		cond_resched();
->>   	}
->>   }
->>   
->> -- 
->> 2.17.1
+On Sun, Apr 09, 2023 at 12:40:40AM +0300, Abel Vesa wrote:
+> Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
+> use the new ICE api provided by the Qualcomm soc driver ice. The platforms
+> that already have ICE support will use the API as library since there will
+> not be a devicetree node, but instead they have reg range. In this case,
+> the of_qcom_ice_get will return an ICE instance created for the consumer's
+> device. But if there are platforms that do not have ice reg in the
+> consumer devicetree node and instead provide a dedicated ICE devicetree
+> node, the of_qcom_ice_get will look up the device based on qcom,ice
+> property and will get the ICE instance registered by the probe function
+> of the ice driver.
+> 
+> The ICE clock is now handle by the new driver. This is done by enabling
+> it on the creation of the ICE instance and then enabling/disabling it on
+> UFS runtime resume/suspend.
+> 
+> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+
+Are you planning to resend this now that its prerequisites are upstream?
+
+Thanks!
+
+- Eric
