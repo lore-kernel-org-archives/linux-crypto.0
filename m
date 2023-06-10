@@ -2,92 +2,75 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC3DCC7EE25
-	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C51CC7EE29
+	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 06:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233894AbjFJDb5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 23:31:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34382 "EHLO
+        id S229746AbjFJGvI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 10 Jun 2023 02:51:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjFJDby (ORCPT
+        with ESMTP id S229949AbjFJGvH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 23:31:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2AE10EA;
-        Fri,  9 Jun 2023 20:31:53 -0700 (PDT)
+        Sat, 10 Jun 2023 02:51:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107AE3C00;
+        Fri,  9 Jun 2023 23:51:05 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9FDFA63D18;
-        Sat, 10 Jun 2023 03:31:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48EA5C433D2;
-        Sat, 10 Jun 2023 03:31:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686367912;
-        bh=M2d5ZNsKDh43dcGKfm/+a42qhKgFtvwzkwCZa/pYhGY=;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A0B9862162;
+        Sat, 10 Jun 2023 06:51:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E12C433D2;
+        Sat, 10 Jun 2023 06:51:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1686379864;
+        bh=9+jSZur8kKMdp4QWKKR2gLKbPRbyGHjjK9ectU9UX8E=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Y+Y3dx2WbNFRh59OQWYi/ZB17i80nJePzherajKIkzcIWuPhUGWoyxkzBtv4uLstc
-         +qX1f8oMAR99wrkzvk+wlmCwX4xPHX+TV8eKMtbc1ZDbxt8tOYV7OHZGmBGbPuCwMv
-         eYYtuFy22/UrRTewPPiv4pRSoB+wyOiSlrCAzt15ojm8qRVstUufmRP6XzrRldL2hN
-         PgLJNT/g7+xaTbH2YfMcH7yyJMPCvbGbKJK8JxsdcxZa1UhD4kVEC+xIqpj3V639a/
-         0UwnbIGQuUue0HuZOAWj4oq1EuKoxULvdSBhQ/fV4Mvf/7Ds/eGpia7dmz1e4Vk4kl
-         EGteTnBzi7Oeg==
-Date:   Fri, 9 Jun 2023 20:31:49 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Abel Vesa <abel.vesa@linaro.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH v7 2/3] scsi: ufs: ufs-qcom: Switch to the new ICE API
-Message-ID: <20230610033149.GD872@sol.localdomain>
-References: <20230408214041.533749-1-abel.vesa@linaro.org>
- <20230408214041.533749-3-abel.vesa@linaro.org>
+        b=DLyNaTuBZQE7+MgYKCoxoCdQRA94X8bROaqvfbkU8gx0+NpwaPibZJk0l5oukkECv
+         8shxby16yQICGsI/X9KxsIYpcvuMmRmv7jmH1pproqP6uZLaxRNF6gfzkNeplAAhtY
+         PNYR16QU+v/DdQh80N9kmwlgVWWVSsxtRb62w5TA=
+Date:   Sat, 10 Jun 2023 08:51:02 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Xianting Tian <xianting.tian@linux.alibaba.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, arei.gonglei@huawei.com,
+        jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, amit@kernel.org,
+        arnd@arndb.de, marcel@holtmann.org, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xianting Tian <tianxianting.txt@alibaba-inc.com>
+Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
+ unused bufs
+Message-ID: <2023061036-lived-earflap-26ee@gregkh>
+References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
+ <20230609131817.712867-2-xianting.tian@linux.alibaba.com>
+ <20230609115617-mutt-send-email-mst@kernel.org>
+ <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230408214041.533749-3-abel.vesa@linaro.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Abel,
-
-On Sun, Apr 09, 2023 at 12:40:40AM +0300, Abel Vesa wrote:
-> Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
-> use the new ICE api provided by the Qualcomm soc driver ice. The platforms
-> that already have ICE support will use the API as library since there will
-> not be a devicetree node, but instead they have reg range. In this case,
-> the of_qcom_ice_get will return an ICE instance created for the consumer's
-> device. But if there are platforms that do not have ice reg in the
-> consumer devicetree node and instead provide a dedicated ICE devicetree
-> node, the of_qcom_ice_get will look up the device based on qcom,ice
-> property and will get the ICE instance registered by the probe function
-> of the ice driver.
+On Sat, Jun 10, 2023 at 11:20:49AM +0800, Xianting Tian wrote:
 > 
-> The ICE clock is now handle by the new driver. This is done by enabling
-> it on the creation of the ICE instance and then enabling/disabling it on
-> UFS runtime resume/suspend.
-> 
-> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> 在 2023/6/9 下午11:57, Michael S. Tsirkin 写道:
+> > On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
+> > > From: Xianting Tian <tianxianting.txt@alibaba-inc.com>
+> > > 
+> > > Cpu stall issue may happen if device is configured with multi queues
+> > > and large queue depth, so fix it.
+> > What does "may happen" imply exactly?
+> > was this observed?
+> I didn't met such issue, this patch set just a theoretical fix.
 
-Are you planning to resend this now that its prerequisites are upstream?
+Then I would not recommend adding it at this time, as you just slowed
+down the kernel for something that no one has reported :(
 
-Thanks!
+thanks,
 
-- Eric
+greg k-h
