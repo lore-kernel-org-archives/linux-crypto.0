@@ -2,29 +2,29 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890EC7EE25
-	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5B7C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Sat, 10 Jun 2023 03:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232397AbjFJDTM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Jun 2023 23:19:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
+        id S231279AbjFJDU7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 9 Jun 2023 23:20:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230457AbjFJDTL (ORCPT
+        with ESMTP id S229453AbjFJDU6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Jun 2023 23:19:11 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55548E1;
-        Fri,  9 Jun 2023 20:19:09 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0VkjxUgb_1686367143;
-Received: from 30.13.188.136(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0VkjxUgb_1686367143)
+        Fri, 9 Jun 2023 23:20:58 -0400
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B61E1;
+        Fri,  9 Jun 2023 20:20:55 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VkjuBza_1686367249;
+Received: from 30.13.188.136(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0VkjuBza_1686367249)
           by smtp.aliyun-inc.com;
-          Sat, 10 Jun 2023 11:19:05 +0800
-Message-ID: <5149dde8-b6b2-e720-2e32-5c79684a99db@linux.alibaba.com>
-Date:   Sat, 10 Jun 2023 11:19:03 +0800
+          Sat, 10 Jun 2023 11:20:51 +0800
+Message-ID: <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
+Date:   Sat, 10 Jun 2023 11:20:49 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH 2/3] virtio_console: fixup potential cpu stall when free
+Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
  unused bufs
 To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
@@ -34,12 +34,13 @@ Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xianting Tian <tianxianting.txt@alibaba-inc.com>
 References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
- <20230609131817.712867-3-xianting.tian@linux.alibaba.com>
- <20230609120332-mutt-send-email-mst@kernel.org>
+ <20230609131817.712867-2-xianting.tian@linux.alibaba.com>
+ <20230609115617-mutt-send-email-mst@kernel.org>
 From:   Xianting Tian <xianting.tian@linux.alibaba.com>
-In-Reply-To: <20230609120332-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230609115617-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -47,44 +48,32 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-在 2023/6/10 上午12:05, Michael S. Tsirkin 写道:
-> On Fri, Jun 09, 2023 at 09:18:16PM +0800, Xianting Tian wrote:
+在 2023/6/9 下午11:57, Michael S. Tsirkin 写道:
+> On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
+>> From: Xianting Tian <tianxianting.txt@alibaba-inc.com>
+>>
 >> Cpu stall issue may happen if device is configured with multi queues
 >> and large queue depth, so fix it.
-> "may happen" is ambigous.
->
-> So is this: "for virtio-net we were getting
-> stall on CPU was observed message, this driver is similar
-> so theoretically the same logic applies"
-
-It is this one
-
-  “this driver is similar so theoretically the same logic applies”
-
->
-> or is this
->
-> "the following error occured: ....."
->
-> ?
->
+> What does "may happen" imply exactly?
+> was this observed?
+I didn't met such issue, this patch set just a theoretical fix.
 >
 >> Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
 >> ---
->>   drivers/char/virtio_console.c | 1 +
+>>   drivers/crypto/virtio/virtio_crypto_core.c | 1 +
 >>   1 file changed, 1 insertion(+)
 >>
->> diff --git a/drivers/char/virtio_console.c b/drivers/char/virtio_console.c
->> index b65c809a4e97..5ec4cf4ea919 100644
->> --- a/drivers/char/virtio_console.c
->> +++ b/drivers/char/virtio_console.c
->> @@ -1935,6 +1935,7 @@ static void remove_vqs(struct ports_device *portdev)
->>   		flush_bufs(vq, true);
->>   		while ((buf = virtqueue_detach_unused_buf(vq)))
->>   			free_buf(buf, true);
+>> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+>> index 1198bd306365..94849fa3bd74 100644
+>> --- a/drivers/crypto/virtio/virtio_crypto_core.c
+>> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+>> @@ -480,6 +480,7 @@ static void virtcrypto_free_unused_reqs(struct virtio_crypto *vcrypto)
+>>   			kfree(vc_req->req_data);
+>>   			kfree(vc_req->sgs);
+>>   		}
 >> +		cond_resched();
 >>   	}
->>   	portdev->vdev->config->del_vqs(portdev->vdev);
->>   	kfree(portdev->in_vqs);
+>>   }
+>>   
 >> -- 
 >> 2.17.1
