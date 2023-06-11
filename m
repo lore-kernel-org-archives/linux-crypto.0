@@ -2,99 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 063D9C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jun 2023 10:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15995C77B7A
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jun 2023 14:56:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233335AbjFKKye (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Jun 2023 06:54:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60900 "EHLO
+        id S229749AbjFKO4N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 11 Jun 2023 10:56:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbjFKKyd (ORCPT
+        with ESMTP id S229683AbjFKO4M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Jun 2023 06:54:33 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E9F10A;
-        Sun, 11 Jun 2023 03:54:31 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-5149390b20aso5838883a12.3;
-        Sun, 11 Jun 2023 03:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1686480869; x=1689072869;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oS+p5K9ZPN0t2dIaNX3pw7GDSatTHt0gmgbi2hdXeic=;
-        b=VuZu2nQm1xyCRJsyaNE76XLoEb+0FMA2dFnTMH+wMewpClKYGhLUqZOsEByPbG00pf
-         23netPh0fTJT/hg4OY+PgIoE0JHZh+KsVauzuxvBMjMx8w12dz8v1zFIiccM3dprmw5f
-         C5izVu6nH7HxwlmcPI5DTvMw8CLwIP/qXdOBAVc/Ob5prHKaDmcYnkCs6zJzDw4ySRaz
-         klH2YtGFRPEAjPlCd9yhNxC3SKB//sbxZz9vHLwAu4Tm/Wtl+q5MGddIM7SSCxvFuNq6
-         gGS1fgFUdWswRoQut9faNrUrnjdVig2Yn8ENQer9k2PBTgD7i5xCBGf7TMGJULCleYAL
-         9Wag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686480869; x=1689072869;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oS+p5K9ZPN0t2dIaNX3pw7GDSatTHt0gmgbi2hdXeic=;
-        b=C4Z004DgTvZ4LgtZ9HuzB2uvKE1N6VdJOdZshDDVDG5pxUI0kbeYWKB33iwCVEvqcA
-         Fzp/qyglqqV25aESDkKeZG9NMmgIOtAK9pUFzFXETeVGXipVpJTjLE7LgDA2kyl7SvVe
-         H5xNLRUpoZnwCOkV518I7uZ3m/cqn2+Hjtpk/CgkGQZ5PT5nHuc54ba0qjwXixVpf7Tq
-         mcszloBnUQ8wB//BIjjHEjQDxiYhQYjILhGzRuYoSKpKFFLo87Y9fx2jnV7BuVe7Go51
-         yDu7JA0/u20I6jKk8pRsCxgd0StjC5x9uPSTdh5HiJPf/TO1WXUjo19iEwU/VPWpFi6a
-         2IQQ==
-X-Gm-Message-State: AC+VfDwbKeJgdVPhcPHdhg+LidiC7lHq/+m9SvdeoRseWDDu+eRFZ0ty
-        XQPJBd6fpZNOoBFoGk1csV4=
-X-Google-Smtp-Source: ACHHUZ6Rpaj4bofgZjbkn++4EsplD+KBgHKEoAj+vFUa042xtPz0Qg+q4mpy7vkE90YaU5vTbI/Tvw==
-X-Received: by 2002:a50:ef17:0:b0:516:4394:244f with SMTP id m23-20020a50ef17000000b005164394244fmr2840554eds.12.1686480869372;
-        Sun, 11 Jun 2023 03:54:29 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:810a:9640:26a8:84b0:69e6:a31a:4535])
-        by smtp.gmail.com with ESMTPSA id u13-20020a50eacd000000b005149b6ec1bdsm3795051edp.29.2023.06.11.03.54.28
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 11 Jun 2023 03:54:28 -0700 (PDT)
-From:   Franziska Naepelt <franziska.naepelt@googlemail.com>
-X-Google-Original-From: Franziska Naepelt <franziska.naepelt@gmail.com>
-To:     franziska.naepelt@googlemail.com
+        Sun, 11 Jun 2023 10:56:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAC1E73;
+        Sun, 11 Jun 2023 07:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=VHU0yG0KLgt9xY3b0m4xhDK4rKy+IHw9tgVCdD4Sx3M=; b=aIcmsvIN74KslwL3J9xVs9MAjH
+        9eMcXgSyocY4T0W1TzRlTides174S6JKaplLpy2Ugm5XlGAcEj4GpPSKIcGryZDrCYUkFRn7Q00/x
+        yCbknDyDShIsoagOJQJAlvV02jHJdPpkXgaSs+7G6g0B68CNxLjb3ez8yvYRS2cjSBSFq+reHj49W
+        5ertz3/GNdWsnOau5ZivUKAV4kPbFhZfYmWAtyXj9MX5g3lUTISXV0xicCpSA5QOAe5L8OfRNGZzf
+        pgXvuddRw3GfwomZ/MBb0Rse9pGJ3W/GvZsFZhHfBvB5ef1H8zA0vC56rUngi+ndDBCSDD9GrYZGW
+        eZiw0NSA==;
+Received: from [2601:1c2:980:9ec0::2764]
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q8MU9-001Aag-2D;
+        Sun, 11 Jun 2023 14:56:05 +0000
+Message-ID: <1c00f4aa-e696-a071-68a7-cdd62d8ba894@infradead.org>
+Date:   Sun, 11 Jun 2023 07:56:03 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v2] crypto: fcrypt: Fix block comment
+Content-Language: en-US
+To:     Franziska Naepelt <franziska.naepelt@googlemail.com>
 Cc:     davem@davemloft.net, franziska.naepelt@gmail.com,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, bagasdotme@gmail.com
-Subject: [PATCH v2] crypto: fcrypt: Fix block comment
-Date:   Sun, 11 Jun 2023 12:53:31 +0200
-Message-Id: <20230611105331.16570-1-franziska.naepelt@gmail.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
-In-Reply-To: <20230606111042.96855-1-franziska.naepelt@gmail.com>
 References: <20230606111042.96855-1-franziska.naepelt@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ <20230611105331.16570-1-franziska.naepelt@gmail.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230611105331.16570-1-franziska.naepelt@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix the following checkpatch issue:
-- WARNING: Block comments use a trailing */ on a separate line
+Hi--
 
-Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
----
-v2:
- - Revert SPDX change to address only one logical change
----
- crypto/fcrypt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 6/11/23 03:53, Franziska Naepelt wrote:
+> Fix the following checkpatch issue:
+> - WARNING: Block comments use a trailing */ on a separate line
+> 
+> Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
+> ---
+> v2:
+>  - Revert SPDX change to address only one logical change
+> ---
+>  crypto/fcrypt.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
+> index 95a16e88899b..e9e119bab784 100644
+> --- a/crypto/fcrypt.c
+> +++ b/crypto/fcrypt.c
+> @@ -303,7 +303,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
+>  
+>  #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
+>  			  * kernels - it seems to be faster but the code is
+> -			  * larger */
+> +			  * larger
+> +			  */
 
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index 95a16e88899b..e9e119bab784 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -303,7 +303,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
- 
- #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
- 			  * kernels - it seems to be faster but the code is
--			  * larger */
-+			  * larger
-+			  */
- 
- 	u64 k;	/* k holds all 56 non-parity bits */
- 
+The comment doesn't begin with a /* on a line by itself either.
 
-base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
+checkpatch isn't always correct.
+Maybe it isn't in this case.
+
+I would either make it a correct multi-line comment or not make a change
+at all here.
+
+>  
+>  	u64 k;	/* k holds all 56 non-parity bits */
+>  
+> 
+> base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
+
 -- 
-2.39.2 (Apple Git-143)
-
+~Randy
