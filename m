@@ -2,488 +2,498 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61137C7EE23
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 13:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01C8C7EE2F
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 14:27:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236502AbjFLN1P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 09:27:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54896 "EHLO
+        id S238925AbjFLO1M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 10:27:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236284AbjFLN1K (ORCPT
+        with ESMTP id S237245AbjFLO0t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 09:27:10 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97A1FDB
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 06:27:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686576428; x=1718112428;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2MjM/F9cSPF3rmLFbhMq2t7zClbMBYI9Rj7tuXmoAW0=;
-  b=LLwGkHwMPJMlTj0XypO8yb9gR3yM0k2RbZarJtAPGy5C7lqm8l66b6u1
-   teAE21UM0MbdjoGa8rhGkOU7HxLK86ytkcMCxHb551EKUOfqK862jQDnP
-   F+tf4ZnIdoMiUWvoSFlAIhePUKFRZkqwV3UiKekJa3BMVjR7DJ9+cT72I
-   uoz4IDW/dB0ME+vrUBxXK/fga6FJC5ydPf9chG4VJgfqg1ukVDK0TUVeO
-   FyE20KPN3gdeh62sUim8xky/uMEun2lDkYVMaB4foUze9cTtdmRiNhjxg
-   CFIHO0MH00nV83K6JUTuTW4DpibnfH6jAYgyGGqMbsy0oCc5vMzSOz38B
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="421627284"
-X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
-   d="scan'208";a="421627284"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 06:27:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="855627186"
-X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
-   d="scan'208";a="855627186"
-Received: from sdpcloudhostegs034.jf.intel.com ([10.165.126.39])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Jun 2023 06:27:03 -0700
-From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        Adam Guerin <adam.guerin@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH] crypto: qat - add fw_counters debugfs file
-Date:   Mon, 12 Jun 2023 15:26:31 +0200
-Message-Id: <20230612132631.96630-1-lucas.segarra.fernandez@intel.com>
-X-Mailer: git-send-email 2.39.2
+        Mon, 12 Jun 2023 10:26:49 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E212F1730
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 07:24:55 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-652328c18d5so3326347b3a.1
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 07:24:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1686579888; x=1689171888;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hX0dcqVCTAohNpIOdz9wfXXAKChOVi6O+vfG9huLBZ0=;
+        b=ZwXKRYNBWdxYAGv67c4Qjq4iDCliAPoi7LRVnfUaMnQ5lHxeN2QdEI2XVXjxcDLLGc
+         HwIeH812mrR0/3xirscha2uvplu94H4Jg20ga6bzKAstPBU8/sxC/7hOIBi7WXbCMHxK
+         vgI0ZRWrBK4fajjZWJJ/Qw+lDELMZJ9rTBnk2vY9OJEr8aVUTp3/zJa2019u+ahZaQQT
+         0RQKC908eMurDr+YjR+2GCsL1jmcMTOBszlYNAmELwedRVNKFyaFNOj/wujtQ6N9nnp5
+         w7FqI7SfLpICT2pxDAAN1FDItpFzAIMxqQB4J1CXLUMhPSzTbwR1S8mqT6rqK4tmAU0l
+         4BCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686579888; x=1689171888;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hX0dcqVCTAohNpIOdz9wfXXAKChOVi6O+vfG9huLBZ0=;
+        b=ZIek5w7b5dFcWQC4mlSN5X+OAAve9Yb9lKhPVc+r8DkcrG/Eo7cstq1kQuqQrHqK6V
+         uM8D8E3lvuKTBtjf7bP99d8cJlEXXTl678Yh25/HzgYWx0b9gtjrsmt1bG2boxpDF2/i
+         xU0SCtKTXHuB9NgChTnpbRLY4s8sg17t66WkOtDZUJESJVT/EGFM1ooV3OiYmht8D8tX
+         2BVOeIbM1eqWycvYxle89Srl/McqJwlaPdOioYXML7YCcwbDKaGM2HixhbHCQQG0OfNx
+         9kad/sxeO0It9U5IPOjov0OFlEbTPPgxOke5Eil8izhKW1rGg5ECoc15BnHhPhKP41FP
+         4TZQ==
+X-Gm-Message-State: AC+VfDxiMAsaXzzqXh+T9zkfITSYCMZDT8AXD+EcWQsDC8+Lizh6w/d8
+        JhRF9ok9GDSwMa1RBeF6qZYxKSNwXmBz7vHXh43iO6EyB+/8RrLq
+X-Google-Smtp-Source: ACHHUZ4Uccf+Zr1ETxNk/hfF6OldcR61PPT1Konr1kQaDGL/Th1VVsFCQzrWBhO3/XBS0VxHd+tYN1EOa7JaH+jB+vk=
+X-Received: by 2002:a25:8d09:0:b0:ba8:296c:e59c with SMTP id
+ n9-20020a258d09000000b00ba8296ce59cmr8243538ybl.53.1686579410449; Mon, 12 Jun
+ 2023 07:16:50 -0700 (PDT)
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+References: <20230408214041.533749-1-abel.vesa@linaro.org> <20230408214041.533749-4-abel.vesa@linaro.org>
+ <ZHbtTmEAnzZWbHnJ@linaro.org>
+In-Reply-To: <ZHbtTmEAnzZWbHnJ@linaro.org>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Mon, 12 Jun 2023 16:16:14 +0200
+Message-ID: <CAPDyKFr27G_aqgvCZdtJxcXypndPMcwhyVSifX1h4cYvBufZYA@mail.gmail.com>
+Subject: Re: [PATCH v7 3/3] mmc: sdhci-msm: Switch to the new ICE API
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Expose FW counters statistics by providing the "fw_counters" file
-under debugfs. Currently the statistics include the number of
-requests sent to the FW and the number of responses received
-from the FW for each Acceleration Engine, for all the QAT product
-line.
+On Wed, 31 May 2023 at 08:46, Abel Vesa <abel.vesa@linaro.org> wrote:
+>
+> On 23-04-09 00:40:41, Abel Vesa wrote:
+> > Now that there is a new dedicated ICE driver, drop the sdhci-msm ICE
+> > implementation and use the new ICE api provided by the Qualcomm soc
+> > driver ice. The platforms that already have ICE support will use the
+> > API as library since there will not be a devicetree node, but instead
+> > they have reg range. In this case, the of_qcom_ice_get will return an
+> > ICE instance created for the consumer's device. But if there are
+> > platforms that do not have ice reg in the consumer devicetree node
+> > and instead provide a dedicated ICE devicetree node, theof_qcom_ice_get
+> > will look up the device based on qcom,ice property and will get the ICE
+> > instance registered by the probe function of the ice driver.
+> >
+> > The ICE clock is now handle by the new driver. This is done by enabling
+> > it on the creation of the ICE instance and then enabling/disabling it on
+> > SDCC runtime resume/suspend.
+> >
+> > Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> > ---
+>
+> Hi Ulf,
+>
+> I think you can now apply this one again.
+>
+> The renaming of the ice module is part of -next now and it is:
+> 47820d3263a4 ("soc: qcom: Rename ice to qcom_ice to avoid module name conflict")
 
-This patch is based on earlier work done by Marco Chiappero.
+Having the commit in next doesn't really help when applying to my mmc
+tree. It will still be broken.
 
-Co-developed-by: Adam Guerin <adam.guerin@intel.com>
-Signed-off-by: Adam Guerin <adam.guerin@intel.com>
-Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- Documentation/ABI/testing/debugfs-driver-qat  |  10 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |   1 +
- .../crypto/intel/qat/qat_common/adf_admin.c   |  18 ++
- .../intel/qat/qat_common/adf_common_drv.h     |   1 +
- .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   7 +
- .../intel/qat/qat_common/adf_fw_counters.c    | 264 ++++++++++++++++++
- .../intel/qat/qat_common/adf_fw_counters.h    |  11 +
- 8 files changed, 313 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-driver-qat
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_fw_counters.h
+However, I found that the patch is now part of v6.4-rc6, which means I
+can base my tree on that and then apply it. So, applied for next,
+thanks!
 
-diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
-new file mode 100644
-index 000000000000..f75eeff4bc7a
---- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-driver-qat
-@@ -0,0 +1,10 @@
-+What:		/sys/kernel/debug/qat_<device>_<BDF>/qat/fw_counters
-+Date:		June 2023
-+KernelVersion:	6.5
-+Contact:	qat-linux@intel.com
-+Description:	(RO) Read returns the number of requests sent to the FW and the number of responses
-+		received from the FW for each Acceleration Engine
-+		Reported firmware counters::
-+
-+			<N>: Number of requests sent from Acceleration Engine N to FW and responses
-+			     Acceleration Engine N received from FW
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 0db463200495..6a82ef8df733 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -29,6 +29,7 @@ intel_qat-objs := adf_cfg.o \
- 	qat_bl.o
- 
- intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
-+				adf_fw_counters.o \
- 				adf_dbgfs.o
- 
- intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index 5240185a023e..2198b410b029 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -294,6 +294,7 @@ struct adf_accel_dev {
- 	unsigned long status;
- 	atomic_t ref_count;
- 	struct dentry *debugfs_dir;
-+	struct dentry *fw_cntr_dbgfile;
- 	struct list_head list;
- 	struct module *owner;
- 	struct adf_accel_pci accel_pci_dev;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-index f4f698ec3a4e..804c40768d21 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-@@ -235,6 +235,24 @@ int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt)
- 	return adf_send_admin(accel_dev, &req, &resp, ae_mask);
- }
- 
-+int adf_get_ae_fw_counters(struct adf_accel_dev *accel_dev, u16 ae, u64 *reqs, u64 *resps)
-+{
-+	struct icp_qat_fw_init_admin_resp resp = { };
-+	struct icp_qat_fw_init_admin_req req = { };
-+	int ret;
-+
-+	req.cmd_id = ICP_QAT_FW_COUNTERS_GET;
-+
-+	ret = adf_put_admin_msg_sync(accel_dev, ae, &req, &resp);
-+	if (ret || resp.status)
-+		return -EFAULT;
-+
-+	*reqs = resp.req_rec_count;
-+	*resps = resp.resp_sent_count;
-+
-+	return 0;
-+}
-+
- /**
-  * adf_send_admin_init() - Function sends init message to FW
-  * @accel_dev: Pointer to acceleration device.
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index 9976cfe65488..40e7ea95528b 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -94,6 +94,7 @@ void adf_exit_aer(void);
- int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
- void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
- int adf_send_admin_init(struct adf_accel_dev *accel_dev);
-+int adf_get_ae_fw_counters(struct adf_accel_dev *accel_dev, u16 ae, u64 *reqs, u64 *resps);
- int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay);
- int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
- int adf_init_arb(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-index d0a2f892e6eb..5080ecffab03 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-@@ -6,6 +6,7 @@
- #include "adf_cfg.h"
- #include "adf_common_drv.h"
- #include "adf_dbgfs.h"
-+#include "adf_fw_counters.h"
- 
- /**
-  * adf_dbgfs_init() - add persistent debugfs entries
-@@ -56,6 +57,9 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
- {
- 	if (!accel_dev->debugfs_dir)
- 		return;
-+
-+	if (!accel_dev->is_vf)
-+		adf_fw_counters_dbgfs_add(accel_dev);
- }
- 
- /**
-@@ -66,4 +70,7 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
- {
- 	if (!accel_dev->debugfs_dir)
- 		return;
-+
-+	if (!accel_dev->is_vf)
-+		adf_fw_counters_dbgfs_rm(accel_dev);
- }
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
-new file mode 100644
-index 000000000000..cb6e09ef5c9f
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
-@@ -0,0 +1,264 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
-+#include <linux/bitops.h>
-+#include <linux/debugfs.h>
-+#include <linux/err.h>
-+#include <linux/fs.h>
-+#include <linux/kernel.h>
-+#include <linux/seq_file.h>
-+#include <linux/types.h>
-+
-+#include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
-+#include "adf_fw_counters.h"
-+
-+#define ADF_FW_COUNTERS_MAX_PADDING 16
-+
-+enum adf_fw_counters_types {
-+	ADF_FW_REQUESTS,
-+	ADF_FW_RESPONSES,
-+	ADF_FW_COUNTERS_COUNT
-+};
-+
-+static const char * const adf_fw_counter_names[] = {
-+	[ADF_FW_REQUESTS] = "Requests",
-+	[ADF_FW_RESPONSES] = "Responses",
-+};
-+
-+static_assert(ARRAY_SIZE(adf_fw_counter_names) == ADF_FW_COUNTERS_COUNT);
-+
-+struct adf_ae_counters {
-+	u16 ae;
-+	u64 values[ADF_FW_COUNTERS_COUNT];
-+};
-+
-+struct adf_fw_counters {
-+	u16 ae_count;
-+	struct adf_ae_counters ae_counters[];
-+};
-+
-+static void adf_fw_counters_parse_ae_values(struct adf_ae_counters *ae_counters, u32 ae,
-+					    u64 req_count, u64 resp_count)
-+{
-+	ae_counters->ae = ae;
-+	ae_counters->values[ADF_FW_REQUESTS] = req_count;
-+	ae_counters->values[ADF_FW_RESPONSES] = resp_count;
-+}
-+
-+static int adf_fw_counters_load_from_device(struct adf_accel_dev *accel_dev,
-+					    struct adf_fw_counters *fw_counters)
-+{
-+	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
-+	unsigned long ae_mask;
-+	unsigned int i;
-+	unsigned long ae;
-+
-+	/* Ignore the admin AEs */
-+	ae_mask = hw_data->ae_mask & ~hw_data->admin_ae_mask;
-+
-+	if (hweight_long(ae_mask) > fw_counters->ae_count)
-+		return -EINVAL;
-+
-+	i = 0;
-+	for_each_set_bit(ae, &ae_mask, GET_MAX_ACCELENGINES(accel_dev)) {
-+		u64 req_count, resp_count;
-+		int ret;
-+
-+		ret = adf_get_ae_fw_counters(accel_dev, ae, &req_count, &resp_count);
-+		if (ret)
-+			return ret;
-+
-+		adf_fw_counters_parse_ae_values(&fw_counters->ae_counters[i++], ae,
-+						req_count, resp_count);
-+	}
-+
-+	return 0;
-+}
-+
-+static struct adf_fw_counters *adf_fw_counters_allocate(unsigned long ae_count)
-+{
-+	struct adf_fw_counters *fw_counters;
-+
-+	if (unlikely(!ae_count))
-+		return ERR_PTR(-EINVAL);
-+
-+	fw_counters = kmalloc(struct_size(fw_counters, ae_counters, ae_count), GFP_KERNEL);
-+	if (!fw_counters)
-+		return ERR_PTR(-ENOMEM);
-+
-+	fw_counters->ae_count = ae_count;
-+
-+	return fw_counters;
-+}
-+
-+/**
-+ * adf_fw_counters_get() - Return FW counters for the provided device.
-+ * @accel_dev: Pointer to a QAT acceleration device
-+ *
-+ * Allocates and returns a table of counters containing execution statistics
-+ * for each non-admin AE available through the supplied acceleration device.
-+ * The caller becomes the owner of such memory and is responsible for
-+ * the deallocation through a call to kfree().
-+ *
-+ * Returns: a pointer to a dynamically allocated struct adf_fw_counters
-+ *          on success, or a negative value on error.
-+ */
-+static struct adf_fw_counters *adf_fw_counters_get(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
-+	struct adf_fw_counters *fw_counters;
-+	unsigned long ae_count;
-+	int ret;
-+
-+	if (!adf_dev_started(accel_dev)) {
-+		dev_err(&GET_DEV(accel_dev), "QAT Device not started\n");
-+		return ERR_PTR(-EFAULT);
-+	}
-+
-+	/* Ignore the admin AEs */
-+	ae_count = hweight_long(hw_data->ae_mask & ~hw_data->admin_ae_mask);
-+
-+	fw_counters = adf_fw_counters_allocate(ae_count);
-+	if (IS_ERR(fw_counters))
-+		return fw_counters;
-+
-+	ret = adf_fw_counters_load_from_device(accel_dev, fw_counters);
-+	if (ret) {
-+		kfree(fw_counters);
-+		dev_err(&GET_DEV(accel_dev),
-+			"Failed to create QAT fw_counters file table [%d].\n", ret);
-+		return ERR_PTR(ret);
-+	}
-+
-+	return fw_counters;
-+}
-+
-+static void *qat_fw_counters_seq_start(struct seq_file *sfile, loff_t *pos)
-+{
-+	struct adf_fw_counters *fw_counters = sfile->private;
-+
-+	if (*pos == 0)
-+		return SEQ_START_TOKEN;
-+
-+	if (*pos > fw_counters->ae_count)
-+		return NULL;
-+
-+	return &fw_counters->ae_counters[*pos - 1];
-+}
-+
-+static void *qat_fw_counters_seq_next(struct seq_file *sfile, void *v, loff_t *pos)
-+{
-+	struct adf_fw_counters *fw_counters = sfile->private;
-+
-+	(*pos)++;
-+
-+	if (*pos > fw_counters->ae_count)
-+		return NULL;
-+
-+	return &fw_counters->ae_counters[*pos - 1];
-+}
-+
-+static void qat_fw_counters_seq_stop(struct seq_file *sfile, void *v) {}
-+
-+static int qat_fw_counters_seq_show(struct seq_file *sfile, void *v)
-+{
-+	int i;
-+
-+	if (v == SEQ_START_TOKEN) {
-+		seq_puts(sfile, "AE ");
-+		for (i = 0; i < ADF_FW_COUNTERS_COUNT; ++i)
-+			seq_printf(sfile, " %*s", ADF_FW_COUNTERS_MAX_PADDING,
-+				   adf_fw_counter_names[i]);
-+	} else {
-+		struct adf_ae_counters *ae_counters = (struct adf_ae_counters *)v;
-+
-+		seq_printf(sfile, "%2d:", ae_counters->ae);
-+		for (i = 0; i < ADF_FW_COUNTERS_COUNT; ++i)
-+			seq_printf(sfile, " %*llu", ADF_FW_COUNTERS_MAX_PADDING,
-+				   ae_counters->values[i]);
-+	}
-+	seq_putc(sfile, '\n');
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations qat_fw_counters_sops = {
-+	.start = qat_fw_counters_seq_start,
-+	.next = qat_fw_counters_seq_next,
-+	.stop = qat_fw_counters_seq_stop,
-+	.show = qat_fw_counters_seq_show,
-+};
-+
-+static int qat_fw_counters_file_open(struct inode *inode, struct file *file)
-+{
-+	struct adf_accel_dev *accel_dev = inode->i_private;
-+	struct seq_file *fw_counters_seq_file;
-+	struct adf_fw_counters *fw_counters;
-+	int ret;
-+
-+	fw_counters = adf_fw_counters_get(accel_dev);
-+	if (IS_ERR(fw_counters))
-+		return PTR_ERR(fw_counters);
-+
-+	ret = seq_open(file, &qat_fw_counters_sops);
-+	if (unlikely(ret)) {
-+		kfree(fw_counters);
-+		return ret;
-+	}
-+
-+	fw_counters_seq_file = file->private_data;
-+	fw_counters_seq_file->private = fw_counters;
-+	return ret;
-+}
-+
-+static int qat_fw_counters_file_release(struct inode *inode, struct file *file)
-+{
-+	struct seq_file *seq = file->private_data;
-+
-+	kfree(seq->private);
-+	seq->private = NULL;
-+
-+	return seq_release(inode, file); }
-+
-+static const struct file_operations qat_fw_counters_fops = {
-+	.owner = THIS_MODULE,
-+	.open = qat_fw_counters_file_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = qat_fw_counters_file_release,
-+};
-+
-+/**
-+ * adf_fw_counters_dbgfs_add() - Create a debugfs file containing FW
-+ * execution counters.
-+ * @accel_dev:  Pointer to a QAT acceleration device
-+ *
-+ * Function creates a file to display a table with statistics for the given
-+ * QAT acceleration device. The table stores device specific execution values
-+ * for each AE, such as the number of requests sent to the FW and responses
-+ * received from the FW.
-+ *
-+ * Return: void
-+ */
-+void adf_fw_counters_dbgfs_add(struct adf_accel_dev *accel_dev)
-+{
-+	accel_dev->fw_cntr_dbgfile = debugfs_create_file("fw_counters", 0400,
-+							 accel_dev->debugfs_dir,
-+							 accel_dev,
-+							 &qat_fw_counters_fops);
-+}
-+
-+/**
-+ * adf_fw_counters_dbgfs_rm() - Remove the debugfs file containing FW counters.
-+ * @accel_dev:  Pointer to a QAT acceleration device.
-+ *
-+ * Function removes the file providing the table of statistics for the given
-+ * QAT acceleration device.
-+ *
-+ * Return: void
-+ */
-+void adf_fw_counters_dbgfs_rm(struct adf_accel_dev *accel_dev)
-+{
-+	debugfs_remove(accel_dev->fw_cntr_dbgfile);
-+	accel_dev->fw_cntr_dbgfile = NULL;
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_fw_counters.h b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.h
-new file mode 100644
-index 000000000000..91b3b6a95f1f
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2023 Intel Corporation */
-+#ifndef ADF_FW_COUNTERS_H
-+#define ADF_FW_COUNTERS_H
-+
-+struct adf_accel_dev;
-+
-+void adf_fw_counters_dbgfs_add(struct adf_accel_dev *accel_dev);
-+void adf_fw_counters_dbgfs_rm(struct adf_accel_dev *accel_dev);
-+
-+#endif
+Kind regards
+Uffe
 
-base-commit: 029644bf0e67bade842496a5042605c8dd56a0b9
--- 
-2.39.2
 
+>
+> Thanks,
+> Abel
+>
+> >
+> > The v6 is here:
+> > https://lore.kernel.org/all/20230407105029.2274111-6-abel.vesa@linaro.org/
+> >
+> > Changes since v6:
+> >  * none
+> >
+> > Changes since v5:
+> >  * Reworded the commit message to add information about what happens
+> >    with the ICE clock and who handles it.
+> >  * Added temp ice variable to avoid setting the host ice to any value
+> >    until a valid one is provided.
+> >  * Dropped the qcom_scm.h include as it is not used anymore now that we
+> >    moved that to the new ICE driver
+> >
+> > Changes since v4:
+> >  * none
+> >
+> > Changes since v3:
+> >  * added back the checks for and the setting of MMC_CAP2_CRYPTO
+> >  * added enable/resume/suspend implementation for !CONFIG_MMC_CRYPTO
+> >  * dropped cfg->crypto_cap_idx argument from qcom_ice_program_key
+> >
+> > Changes since v2:
+> >  * added the suspend API call for ICE
+> >  * kept old wrappers over ICE API in
+> >
+> > Changes since v1:
+> >  * Added a check for supported algorithm and key size
+> >    and passed the ICE defined values for algorithm and key size
+> >  * Added call to evict function
+> >
+> >  drivers/mmc/host/Kconfig     |   2 +-
+> >  drivers/mmc/host/sdhci-msm.c | 223 ++++++++---------------------------
+> >  2 files changed, 48 insertions(+), 177 deletions(-)
+> >
+> > diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+> > index 4745fe217ade..09f837df5435 100644
+> > --- a/drivers/mmc/host/Kconfig
+> > +++ b/drivers/mmc/host/Kconfig
+> > @@ -549,7 +549,7 @@ config MMC_SDHCI_MSM
+> >       depends on MMC_SDHCI_PLTFM
+> >       select MMC_SDHCI_IO_ACCESSORS
+> >       select MMC_CQHCI
+> > -     select QCOM_SCM if MMC_CRYPTO
+> > +     select QCOM_INLINE_CRYPTO_ENGINE if MMC_CRYPTO
+> >       help
+> >         This selects the Secure Digital Host Controller Interface (SDHCI)
+> >         support present in Qualcomm SOCs. The controller supports
+> > diff --git a/drivers/mmc/host/sdhci-msm.c b/drivers/mmc/host/sdhci-msm.c
+> > index 8ac81d57a3df..98171bf5748c 100644
+> > --- a/drivers/mmc/host/sdhci-msm.c
+> > +++ b/drivers/mmc/host/sdhci-msm.c
+> > @@ -13,12 +13,13 @@
+> >  #include <linux/pm_opp.h>
+> >  #include <linux/slab.h>
+> >  #include <linux/iopoll.h>
+> > -#include <linux/firmware/qcom/qcom_scm.h>
+> >  #include <linux/regulator/consumer.h>
+> >  #include <linux/interconnect.h>
+> >  #include <linux/pinctrl/consumer.h>
+> >  #include <linux/reset.h>
+> >
+> > +#include <soc/qcom/ice.h>
+> > +
+> >  #include "sdhci-cqhci.h"
+> >  #include "sdhci-pltfm.h"
+> >  #include "cqhci.h"
+> > @@ -258,12 +259,14 @@ struct sdhci_msm_variant_info {
+> >  struct sdhci_msm_host {
+> >       struct platform_device *pdev;
+> >       void __iomem *core_mem; /* MSM SDCC mapped address */
+> > -     void __iomem *ice_mem;  /* MSM ICE mapped address (if available) */
+> >       int pwr_irq;            /* power irq */
+> >       struct clk *bus_clk;    /* SDHC bus voter clock */
+> >       struct clk *xo_clk;     /* TCXO clk needed for FLL feature of cm_dll*/
+> > -     /* core, iface, cal, sleep, and ice clocks */
+> > -     struct clk_bulk_data bulk_clks[5];
+> > +     /* core, iface, cal and sleep clocks */
+> > +     struct clk_bulk_data bulk_clks[4];
+> > +#ifdef CONFIG_MMC_CRYPTO
+> > +     struct qcom_ice *ice;
+> > +#endif
+> >       unsigned long clk_rate;
+> >       struct mmc_host *mmc;
+> >       bool use_14lpp_dll_reset;
+> > @@ -1804,164 +1807,51 @@ static void sdhci_msm_set_clock(struct sdhci_host *host, unsigned int clock)
+> >
+> >  #ifdef CONFIG_MMC_CRYPTO
+> >
+> > -#define AES_256_XTS_KEY_SIZE                 64
+> > -
+> > -/* QCOM ICE registers */
+> > -
+> > -#define QCOM_ICE_REG_VERSION                 0x0008
+> > -
+> > -#define QCOM_ICE_REG_FUSE_SETTING            0x0010
+> > -#define QCOM_ICE_FUSE_SETTING_MASK           0x1
+> > -#define QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK  0x2
+> > -#define QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK  0x4
+> > -
+> > -#define QCOM_ICE_REG_BIST_STATUS             0x0070
+> > -#define QCOM_ICE_BIST_STATUS_MASK            0xF0000000
+> > -
+> > -#define QCOM_ICE_REG_ADVANCED_CONTROL                0x1000
+> > -
+> > -#define sdhci_msm_ice_writel(host, val, reg) \
+> > -     writel((val), (host)->ice_mem + (reg))
+> > -#define sdhci_msm_ice_readl(host, reg)       \
+> > -     readl((host)->ice_mem + (reg))
+> > -
+> > -static bool sdhci_msm_ice_supported(struct sdhci_msm_host *msm_host)
+> > -{
+> > -     struct device *dev = mmc_dev(msm_host->mmc);
+> > -     u32 regval = sdhci_msm_ice_readl(msm_host, QCOM_ICE_REG_VERSION);
+> > -     int major = regval >> 24;
+> > -     int minor = (regval >> 16) & 0xFF;
+> > -     int step = regval & 0xFFFF;
+> > -
+> > -     /* For now this driver only supports ICE version 3. */
+> > -     if (major != 3) {
+> > -             dev_warn(dev, "Unsupported ICE version: v%d.%d.%d\n",
+> > -                      major, minor, step);
+> > -             return false;
+> > -     }
+> > -
+> > -     dev_info(dev, "Found QC Inline Crypto Engine (ICE) v%d.%d.%d\n",
+> > -              major, minor, step);
+> > -
+> > -     /* If fuses are blown, ICE might not work in the standard way. */
+> > -     regval = sdhci_msm_ice_readl(msm_host, QCOM_ICE_REG_FUSE_SETTING);
+> > -     if (regval & (QCOM_ICE_FUSE_SETTING_MASK |
+> > -                   QCOM_ICE_FORCE_HW_KEY0_SETTING_MASK |
+> > -                   QCOM_ICE_FORCE_HW_KEY1_SETTING_MASK)) {
+> > -             dev_warn(dev, "Fuses are blown; ICE is unusable!\n");
+> > -             return false;
+> > -     }
+> > -     return true;
+> > -}
+> > -
+> > -static inline struct clk *sdhci_msm_ice_get_clk(struct device *dev)
+> > -{
+> > -     return devm_clk_get(dev, "ice");
+> > -}
+> > -
+> >  static int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
+> >                             struct cqhci_host *cq_host)
+> >  {
+> >       struct mmc_host *mmc = msm_host->mmc;
+> >       struct device *dev = mmc_dev(mmc);
+> > -     struct resource *res;
+> > +     struct qcom_ice *ice;
+> >
+> >       if (!(cqhci_readl(cq_host, CQHCI_CAP) & CQHCI_CAP_CS))
+> >               return 0;
+> >
+> > -     res = platform_get_resource_byname(msm_host->pdev, IORESOURCE_MEM,
+> > -                                        "ice");
+> > -     if (!res) {
+> > -             dev_warn(dev, "ICE registers not found\n");
+> > -             goto disable;
+> > -     }
+> > -
+> > -     if (!qcom_scm_ice_available()) {
+> > -             dev_warn(dev, "ICE SCM interface not found\n");
+> > -             goto disable;
+> > +     ice = of_qcom_ice_get(dev);
+> > +     if (ice == ERR_PTR(-EOPNOTSUPP)) {
+> > +             dev_warn(dev, "Disabling inline encryption support\n");
+> > +             ice = NULL;
+> >       }
+> >
+> > -     msm_host->ice_mem = devm_ioremap_resource(dev, res);
+> > -     if (IS_ERR(msm_host->ice_mem))
+> > -             return PTR_ERR(msm_host->ice_mem);
+> > -
+> > -     if (!sdhci_msm_ice_supported(msm_host))
+> > -             goto disable;
+> > +     if (IS_ERR_OR_NULL(ice))
+> > +             return PTR_ERR_OR_ZERO(ice);
+> >
+> > +     msm_host->ice = ice;
+> >       mmc->caps2 |= MMC_CAP2_CRYPTO;
+> > -     return 0;
+> >
+> > -disable:
+> > -     dev_warn(dev, "Disabling inline encryption support\n");
+> >       return 0;
+> >  }
+> >
+> > -static void sdhci_msm_ice_low_power_mode_enable(struct sdhci_msm_host *msm_host)
+> > -{
+> > -     u32 regval;
+> > -
+> > -     regval = sdhci_msm_ice_readl(msm_host, QCOM_ICE_REG_ADVANCED_CONTROL);
+> > -     /*
+> > -      * Enable low power mode sequence
+> > -      * [0]-0, [1]-0, [2]-0, [3]-E, [4]-0, [5]-0, [6]-0, [7]-0
+> > -      */
+> > -     regval |= 0x7000;
+> > -     sdhci_msm_ice_writel(msm_host, regval, QCOM_ICE_REG_ADVANCED_CONTROL);
+> > -}
+> > -
+> > -static void sdhci_msm_ice_optimization_enable(struct sdhci_msm_host *msm_host)
+> > +static void sdhci_msm_ice_enable(struct sdhci_msm_host *msm_host)
+> >  {
+> > -     u32 regval;
+> > -
+> > -     /* ICE Optimizations Enable Sequence */
+> > -     regval = sdhci_msm_ice_readl(msm_host, QCOM_ICE_REG_ADVANCED_CONTROL);
+> > -     regval |= 0xD807100;
+> > -     /* ICE HPG requires delay before writing */
+> > -     udelay(5);
+> > -     sdhci_msm_ice_writel(msm_host, regval, QCOM_ICE_REG_ADVANCED_CONTROL);
+> > -     udelay(5);
+> > +     if (msm_host->mmc->caps2 & MMC_CAP2_CRYPTO)
+> > +             qcom_ice_enable(msm_host->ice);
+> >  }
+> >
+> > -/*
+> > - * Wait until the ICE BIST (built-in self-test) has completed.
+> > - *
+> > - * This may be necessary before ICE can be used.
+> > - *
+> > - * Note that we don't really care whether the BIST passed or failed; we really
+> > - * just want to make sure that it isn't still running.  This is because (a) the
+> > - * BIST is a FIPS compliance thing that never fails in practice, (b) ICE is
+> > - * documented to reject crypto requests if the BIST fails, so we needn't do it
+> > - * in software too, and (c) properly testing storage encryption requires testing
+> > - * the full storage stack anyway, and not relying on hardware-level self-tests.
+> > - */
+> > -static int sdhci_msm_ice_wait_bist_status(struct sdhci_msm_host *msm_host)
+> > +static __maybe_unused int sdhci_msm_ice_resume(struct sdhci_msm_host *msm_host)
+> >  {
+> > -     u32 regval;
+> > -     int err;
+> > +     if (msm_host->mmc->caps2 & MMC_CAP2_CRYPTO)
+> > +             return qcom_ice_resume(msm_host->ice);
+> >
+> > -     err = readl_poll_timeout(msm_host->ice_mem + QCOM_ICE_REG_BIST_STATUS,
+> > -                              regval, !(regval & QCOM_ICE_BIST_STATUS_MASK),
+> > -                              50, 5000);
+> > -     if (err)
+> > -             dev_err(mmc_dev(msm_host->mmc),
+> > -                     "Timed out waiting for ICE self-test to complete\n");
+> > -     return err;
+> > +     return 0;
+> >  }
+> >
+> > -static void sdhci_msm_ice_enable(struct sdhci_msm_host *msm_host)
+> > +static __maybe_unused int sdhci_msm_ice_suspend(struct sdhci_msm_host *msm_host)
+> >  {
+> > -     if (!(msm_host->mmc->caps2 & MMC_CAP2_CRYPTO))
+> > -             return;
+> > -     sdhci_msm_ice_low_power_mode_enable(msm_host);
+> > -     sdhci_msm_ice_optimization_enable(msm_host);
+> > -     sdhci_msm_ice_wait_bist_status(msm_host);
+> > -}
+> > +     if (msm_host->mmc->caps2 & MMC_CAP2_CRYPTO)
+> > +             return qcom_ice_suspend(msm_host->ice);
+> >
+> > -static int __maybe_unused sdhci_msm_ice_resume(struct sdhci_msm_host *msm_host)
+> > -{
+> > -     if (!(msm_host->mmc->caps2 & MMC_CAP2_CRYPTO))
+> > -             return 0;
+> > -     return sdhci_msm_ice_wait_bist_status(msm_host);
+> > +     return 0;
+> >  }
+> >
+> >  /*
+> > @@ -1972,48 +1862,28 @@ static int sdhci_msm_program_key(struct cqhci_host *cq_host,
+> >                                const union cqhci_crypto_cfg_entry *cfg,
+> >                                int slot)
+> >  {
+> > -     struct device *dev = mmc_dev(cq_host->mmc);
+> > +     struct sdhci_host *host = mmc_priv(cq_host->mmc);
+> > +     struct sdhci_pltfm_host *pltfm_host = sdhci_priv(host);
+> > +     struct sdhci_msm_host *msm_host = sdhci_pltfm_priv(pltfm_host);
+> >       union cqhci_crypto_cap_entry cap;
+> > -     union {
+> > -             u8 bytes[AES_256_XTS_KEY_SIZE];
+> > -             u32 words[AES_256_XTS_KEY_SIZE / sizeof(u32)];
+> > -     } key;
+> > -     int i;
+> > -     int err;
+> > -
+> > -     if (!(cfg->config_enable & CQHCI_CRYPTO_CONFIGURATION_ENABLE))
+> > -             return qcom_scm_ice_invalidate_key(slot);
+> >
+> >       /* Only AES-256-XTS has been tested so far. */
+> >       cap = cq_host->crypto_cap_array[cfg->crypto_cap_idx];
+> >       if (cap.algorithm_id != CQHCI_CRYPTO_ALG_AES_XTS ||
+> > -         cap.key_size != CQHCI_CRYPTO_KEY_SIZE_256) {
+> > -             dev_err_ratelimited(dev,
+> > -                                 "Unhandled crypto capability; algorithm_id=%d, key_size=%d\n",
+> > -                                 cap.algorithm_id, cap.key_size);
+> > +             cap.key_size != CQHCI_CRYPTO_KEY_SIZE_256)
+> >               return -EINVAL;
+> > -     }
+> >
+> > -     memcpy(key.bytes, cfg->crypto_key, AES_256_XTS_KEY_SIZE);
+> > -
+> > -     /*
+> > -      * The SCM call byte-swaps the 32-bit words of the key.  So we have to
+> > -      * do the same, in order for the final key be correct.
+> > -      */
+> > -     for (i = 0; i < ARRAY_SIZE(key.words); i++)
+> > -             __cpu_to_be32s(&key.words[i]);
+> > -
+> > -     err = qcom_scm_ice_set_key(slot, key.bytes, AES_256_XTS_KEY_SIZE,
+> > -                                QCOM_SCM_ICE_CIPHER_AES_256_XTS,
+> > -                                cfg->data_unit_size);
+> > -     memzero_explicit(&key, sizeof(key));
+> > -     return err;
+> > +     if (cfg->config_enable & CQHCI_CRYPTO_CONFIGURATION_ENABLE)
+> > +             return qcom_ice_program_key(msm_host->ice,
+> > +                                         QCOM_ICE_CRYPTO_ALG_AES_XTS,
+> > +                                         QCOM_ICE_CRYPTO_KEY_SIZE_256,
+> > +                                         cfg->crypto_key,
+> > +                                         cfg->data_unit_size, slot);
+> > +     else
+> > +             return qcom_ice_evict_key(msm_host->ice, slot);
+> >  }
+> > +
+> >  #else /* CONFIG_MMC_CRYPTO */
+> > -static inline struct clk *sdhci_msm_ice_get_clk(struct device *dev)
+> > -{
+> > -     return NULL;
+> > -}
+> >
+> >  static inline int sdhci_msm_ice_init(struct sdhci_msm_host *msm_host,
+> >                                    struct cqhci_host *cq_host)
+> > @@ -2025,11 +1895,17 @@ static inline void sdhci_msm_ice_enable(struct sdhci_msm_host *msm_host)
+> >  {
+> >  }
+> >
+> > -static inline int __maybe_unused
+> > +static inline __maybe_unused int
+> >  sdhci_msm_ice_resume(struct sdhci_msm_host *msm_host)
+> >  {
+> >       return 0;
+> >  }
+> > +
+> > +static inline __maybe_unused int
+> > +sdhci_msm_ice_suspend(struct sdhci_msm_host *msm_host)
+> > +{
+> > +     return 0;
+> > +}
+> >  #endif /* !CONFIG_MMC_CRYPTO */
+> >
+> >  /*****************************************************************************\
+> > @@ -2630,11 +2506,6 @@ static int sdhci_msm_probe(struct platform_device *pdev)
+> >               clk = NULL;
+> >       msm_host->bulk_clks[3].clk = clk;
+> >
+> > -     clk = sdhci_msm_ice_get_clk(&pdev->dev);
+> > -     if (IS_ERR(clk))
+> > -             clk = NULL;
+> > -     msm_host->bulk_clks[4].clk = clk;
+> > -
+> >       ret = clk_bulk_prepare_enable(ARRAY_SIZE(msm_host->bulk_clks),
+> >                                     msm_host->bulk_clks);
+> >       if (ret)
+> > @@ -2827,7 +2698,7 @@ static __maybe_unused int sdhci_msm_runtime_suspend(struct device *dev)
+> >       clk_bulk_disable_unprepare(ARRAY_SIZE(msm_host->bulk_clks),
+> >                                  msm_host->bulk_clks);
+> >
+> > -     return 0;
+> > +     return sdhci_msm_ice_suspend(msm_host);
+> >  }
+> >
+> >  static __maybe_unused int sdhci_msm_runtime_resume(struct device *dev)
+> > --
+> > 2.34.1
+> >
