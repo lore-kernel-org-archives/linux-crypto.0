@@ -2,113 +2,127 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9D9C88CB4
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 17:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B52CBC88CB2
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 19:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235659AbjFLRXs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 13:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35116 "EHLO
+        id S237901AbjFLT3D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 15:29:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235736AbjFLRXr (ORCPT
+        with ESMTP id S236807AbjFLT3B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 13:23:47 -0400
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A84E134;
-        Mon, 12 Jun 2023 10:23:46 -0700 (PDT)
-Received: by mail-ua1-x931.google.com with SMTP id a1e0cc1a2514c-78a57844f42so39373241.2;
-        Mon, 12 Jun 2023 10:23:46 -0700 (PDT)
+        Mon, 12 Jun 2023 15:29:01 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 219D81718
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 12:28:53 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3f6e68cc738so35826115e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 12:28:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1686590625; x=1689182625;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rA+ci5q7KngMrgSNRGMsKGeEczzZ7geqfDeJER8xBNU=;
-        b=poiTRiRKV+rQUvKEQWPCKkayUJeadCGisamTi5BFtvDxIxlIQLx4UD5tMOwWIKvhOz
-         D5gYNrHMuc8+4rTZa38ySlrWG2L150bP+zqM2guNpHEkwHNhX/Oaf/mu9P9z7tb9l0KY
-         2jAuuroPKezw3Giu32AUzcXh7QGK/YL+lNF/ckxr80Jj1CS2oF0xcZdUul7blyRoPRfS
-         3kv30pCcOsH7alX/S5c+RVbCjSUFLizgOtkdErc5Al4/0Y1Q2HjKUyuukjIigf9USjde
-         istDARceJt9S5N4oh+CXI+P+6zb6Y9cl/bhyOFZlYcby6tJAwblUnmCXQt48LQWrD+UO
-         4PfA==
+        d=linaro.org; s=google; t=1686598131; x=1689190131;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nJZJSaEZDg70TXbshUH3X07m1qzGMFDczgD0hVDQgVw=;
+        b=cp7o0HoGkxtGnWAvfPLUcigk1NXL22/mysLv2Xtu+BWI9J/YI7aKTBLHbf+4S4De4b
+         IJ3Qtv7wM6Mp4sN/lKa+Fo/8ldPIx23PT7wxeeBbZdZ+LJx8ULV8nTuWoKAiq3aGtWtB
+         cU5KBL+/AIJrdiRDrHJDK2+uHxSx/QePtYDhRp76VSJ/XozzWlcYGOkk5JahdeJRXLgD
+         RAdHnAFdjI4UjLTBzCLQqrbZzWasP271gPYWjPH35aaZ84rXWbqFi8RtsYKlAos/VRLl
+         yFN+YFWqZvuwtb/hvdK6GH/hNSHC6SrR/3Wn32b1FK10iZDlyfHUZljdNjgegR9bT+6S
+         HdoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686590625; x=1689182625;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1686598131; x=1689190131;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rA+ci5q7KngMrgSNRGMsKGeEczzZ7geqfDeJER8xBNU=;
-        b=d8NAxCGZUsKlmfjYSrh2kmzpwMqKdBJF3TOV13Qtig6zVnX1XTxSIVWmu7fP7yb6iw
-         VkrncCJZBmyrrBB9YAV6uJ7HgF7FQZaAtTx1QnOiS0T1udmUEnpVutaJlAuR7w3PPHuF
-         F+mTUrAzn/LNbhQvi5PUJEXddiApqAmZkmR9nwviwE1pyocTT/5u4Wcrlsqf6st1XiYj
-         Wi+/a8bLz5kYbsEJmXTxhiRa4Ue5/352f8F4wSMwUE7yhv9UWZN+cnVnrmrJUm4JDFiy
-         SvpO0DtbQtoHt0DOtjzWLhBXt+5X4KahscFBJfTeAGLh36AGWUi8Y3iI1ILdCHorgVuT
-         G7BA==
-X-Gm-Message-State: AC+VfDyA8bM5Zw3GKlvgX87Gy1WnU63iSu0f0z8blehrN+QtOnnDsAE1
-        BkEckbV+0mo9CuALwnjL36njkBJfrNry/b4vb6Q=
-X-Google-Smtp-Source: ACHHUZ5GqQIYYUOyKXLFbfhZ1XIZ3B3rcn4sOPD62BfndrT2VVq1FFCDEUHlCYWMi1ZI+6T+s2zZJ9xGwxJqlzpESdI=
-X-Received: by 2002:a67:e893:0:b0:43d:dfb3:5edb with SMTP id
- x19-20020a67e893000000b0043ddfb35edbmr3313502vsn.25.1686590625467; Mon, 12
- Jun 2023 10:23:45 -0700 (PDT)
+        bh=nJZJSaEZDg70TXbshUH3X07m1qzGMFDczgD0hVDQgVw=;
+        b=kps2KlCLr5TWSAI5TCHf3ScJOWK0fEZX55MuW4+3xVLiKaUhoEY7BytvSKlAFggjoK
+         PAro88Le48K13DCo6+84nc6XVmLSBAlGjXnBG92/185Xa4IhNeHui+JSsERkGbhY8udG
+         Sdr30ij7CnZlX+Z4o9WLSysSHy5oVlTU/QhOtOl9syX3xKh402BG6hiLsTb8ho0Wbjzl
+         PtFFZJD+MdVHEwwi1Fo5rorK45ldK0Yql++QMXO5EDzS4vneKKGG8POY+Xv1Dr1bh98+
+         I6WaoyMF/8++Ennl9dKqDPXMvHB+Nv7rsUD97zKGwL+oKR97lu2ZqMV+JnSVx4r6aNbP
+         LjSQ==
+X-Gm-Message-State: AC+VfDz9wB3XtiVRnpF9Lg7O+l79+Uklvp/QWo1sINIeGLqs9SHFS0nU
+        Y5uGsoSRlu3DWvVnVYrn4kQXQA==
+X-Google-Smtp-Source: ACHHUZ5OzKiW3U57XN0Htaa50N2NhdLd5CFniE1NlCW4kDpPPcqYy2HPZOQKXayyvEEZJhY+ya0Wwg==
+X-Received: by 2002:a05:600c:2190:b0:3f7:395e:46a2 with SMTP id e16-20020a05600c219000b003f7395e46a2mr6389324wme.16.1686598131498;
+        Mon, 12 Jun 2023 12:28:51 -0700 (PDT)
+Received: from hackbox.lan ([86.121.163.20])
+        by smtp.gmail.com with ESMTPSA id a7-20020a05600c224700b003f60a9ccd34sm12286861wmm.37.2023.06.12.12.28.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jun 2023 12:28:50 -0700 (PDT)
+From:   Abel Vesa <abel.vesa@linaro.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: [RESEND v7 0/3] Add dedicated Qcom ICE driver
+Date:   Mon, 12 Jun 2023 22:28:44 +0300
+Message-Id: <20230612192847.1599416-1-abel.vesa@linaro.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230606111042.96855-1-franziska.naepelt@gmail.com>
- <20230611105331.16570-1-franziska.naepelt@gmail.com> <1c00f4aa-e696-a071-68a7-cdd62d8ba894@infradead.org>
-In-Reply-To: <1c00f4aa-e696-a071-68a7-cdd62d8ba894@infradead.org>
-From:   =?UTF-8?Q?Franziska_N=C3=A4pelt?= 
-        <franziska.naepelt@googlemail.com>
-Date:   Mon, 12 Jun 2023 19:23:34 +0200
-Message-ID: <CAAUT3iN3fxN3OE5XB5H1C4xNwo91dF9QMmhDiviHmbwaD1KrVQ@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: fcrypt: Fix block comment
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        bagasdotme@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am So., 11. Juni 2023 um 16:56 Uhr schrieb Randy Dunlap <rdunlap@infradead.org>:
->
-> Hi--
->
-> On 6/11/23 03:53, Franziska Naepelt wrote:
-> > Fix the following checkpatch issue:
-> > - WARNING: Block comments use a trailing */ on a separate line
-> >
-> > Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
-> > ---
-> > v2:
-> >  - Revert SPDX change to address only one logical change
-> > ---
-> >  crypto/fcrypt.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-> > index 95a16e88899b..e9e119bab784 100644
-> > --- a/crypto/fcrypt.c
-> > +++ b/crypto/fcrypt.c
-> > @@ -303,7 +303,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
-> >
-> >  #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
-> >                         * kernels - it seems to be faster but the code is
-> > -                       * larger */
-> > +                       * larger
-> > +                       */
->
-> The comment doesn't begin with a /* on a line by itself either.
->
-> checkpatch isn't always correct.
-> Maybe it isn't in this case.
->
-> I would either make it a correct multi-line comment or not make a change
-> at all here.
->
-> >
-> >       u64 k;  /* k holds all 56 non-parity bits */
-> >
-> >
-> > base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
->
-> --
-> ~Randy
+As both SDCC and UFS drivers use the ICE with duplicated implementation,
+while none of the currently supported platforms make use concomitantly
+of the same ICE IP block instance, the new SM8550 allows both UFS and
+SDCC to do so. In order to support such scenario, there is a need for
+a unified implementation and a devicetree node to be shared between
+both types of storage devices. So lets drop the duplicate implementation
+of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
 
-Hi Randy,
-thanks for the heads up. I'll leave it for now and won't make a change.
-Thanks, Franziska
+The v7 is here:
+https://lore.kernel.org/all/20230408214041.533749-1-abel.vesa@linaro.org/
+
+Changes since v7:
+ * rebased on next-20230609
+
+Changes since v6:
+ * Dropped the patches 1, 3 and 6 as they are already in Bjorn's tree.
+ * Dropped the minItems for both the qcom,ice and the reg in the
+   qcom,ice compatile subschema, in the ufs schema file,
+   like Krzysztof suggested
+
+Changes since v5:
+ * See each individual patch for changelogs.
+
+Changes since v4:
+ * dropped the SDHCI dt-bindings patch as it will be added along
+   with the first use of qcom,ice property from an SDHCI DT node
+
+Abel Vesa (3):
+  dt-bindings: ufs: qcom: Add ICE phandle
+  scsi: ufs: ufs-qcom: Switch to the new ICE API
+  mmc: sdhci-msm: Switch to the new ICE API
+
+ .../devicetree/bindings/ufs/qcom,ufs.yaml     |  24 ++
+ drivers/mmc/host/Kconfig                      |   2 +-
+ drivers/mmc/host/sdhci-msm.c                  | 223 ++++------------
+ drivers/ufs/host/Kconfig                      |   2 +-
+ drivers/ufs/host/Makefile                     |   4 +-
+ drivers/ufs/host/ufs-qcom-ice.c               | 244 ------------------
+ drivers/ufs/host/ufs-qcom.c                   |  99 ++++++-
+ drivers/ufs/host/ufs-qcom.h                   |  32 +--
+ 8 files changed, 176 insertions(+), 454 deletions(-)
+ delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+
+-- 
+2.34.1
+
