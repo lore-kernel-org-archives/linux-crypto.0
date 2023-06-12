@@ -2,226 +2,254 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B057DC7EE43
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 08:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9578AC7EE2E
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 08:32:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231909AbjFLIah (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 04:30:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35660 "EHLO
+        id S232954AbjFLIcY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 04:32:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233265AbjFLI3v (ORCPT
+        with ESMTP id S232965AbjFLIcG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 04:29:51 -0400
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2049.outbound.protection.outlook.com [40.107.6.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A99910F4;
-        Mon, 12 Jun 2023 01:29:05 -0700 (PDT)
+        Mon, 12 Jun 2023 04:32:06 -0400
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2089.outbound.protection.outlook.com [40.107.13.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8A8420E;
+        Mon, 12 Jun 2023 01:31:04 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ihwqeKk3GchlKKxnl+jiHLmKF/YHbpkeZcqkKH3o1J7Z58Na1jNkFaJtakD/B+x0glwXCFDvATsXAfp7vNYq7lbgIIMrQKzK31NSqQvemL3HcWmFz5d4M1PRm/yxZELiIhMf56W91X8haysnWEGBezawnB2NBuv/FpKOfzF2xw0zQ+hkQp05Y1bh5ePgiwTpTeZgN8Ll5xUQgteUGgOt2IPNdQ5OHZkLVmwSaQswmOFKWz+Ipo2R7nZ168gBAnsakF0KXjqPcr8KQG0Y9Y2lwJbdkm44rQ5ISaEc4pjiMxVzS9Cs+MS+ALXoel+KWTcUciCS+CdHtGQR1BWnhOdfzw==
+ b=LKSRcY1S7K8BaZ8qCsuxC3yR2a2p40azwfSNpjGIcswFarm5cjECp/qNymJtFyWPUX27bUa/WhxKm0YHaYHmsg1CwCaJTRycgWELVgeaNxOapM0lQqabjzobsX0G4Yax1nToFn8pF/qIqTFJJmoM2YKaStaDqEPHGajx4n2rxRmQhjcPTvMXaJ5umUqnZ2OhsNoDFkXXuGWWBKYhgdO3+ibGiLSTs2O47YRz2TY6380/hEZ0Lqj2MVEul8UN4tqUAUKLq5O7lqjR2sJwsK+jk3jOTaZNcwV1mFBGd6qVJ10+2CovcNpO8APsM9MGUuxcYC3n4Zz6oGs2EePY9FIkng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZT20YquAVRG743V/0VbcgjKU/PYU914WrSUYqYN9gNY=;
- b=m18vAYcGb6u/6pS1EAOHOvrYdZTAmkHMUA3EP83UP5PAPoGRkZZ9dUEDetcdkETXSK+xIx/qQJkkWxgq0v7+17FcZh/Du+SGQ78AoySpvNXndZeqsGtfQ5hSfDVC9bP0LcFHliRbsVTmpZJTMgJNtwseKAtkhPAKTOBPBVm6zwdAUoLO4C/LdseRvmZlHxM7FbW6CIiQzz1nvcn5mnFwUO5fFYijr00yA4vFdeAQvVZ9yraBAm1rz2HZTuS9d16A2ALmuDlTeqpDB2V6yebiYhCB9GqoGUsUwVk5HZswV2AL9u1xs/X37t7OTzk48Z9qp8Ac2Fe5RTEXnKN6f+1ZXg==
+ bh=7LDj2rBEp5/c/c79dm6qOhCqF/RIWGMuy0fqzBVNyBY=;
+ b=dy2YQW90ZXkVGJFF0uv4sXbY0he1+1BzRqp/b2h9cXO0NM8WNxOzeTZINjcOqYit1DSiF9YOzjxi7tSx9dbkdf0a1xIm/svEJxo6ClQwLQ/MyavEptk5/TfbAqzbdJEAYWep48+qy6eDIs3A0vCVtiJEGhnZebIFgjVI332tOnH/aoLPhBvgcvWRcXDoWeW7Nb6LH9GMx+cUBJzD2xDTWgi2V04Ni+OUgcaCcNm68ktJ+RhuMebT8cmuhfyJVEsKg19+dKrP7Lv6HzZdrxuk9d8lOmY6OrVEPE6ha1NM+GD/5yDZgyfyQVC/N8VFFwfSPri8LI1mfaQWLP5oBEl7Zg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZT20YquAVRG743V/0VbcgjKU/PYU914WrSUYqYN9gNY=;
- b=pk2LQj8AyimR0LObYTF7O4y/QFeJnoN48xtx3Ih/y3pvG62F8MSpsH7pQlNPzTwvHzaj315DF7Bg6/zzmozgxzNOLXz5uqRli6TALz/OH3Z7ZQnOMWlC14VljcJ1VlIq3DL7MNryyCqEVCl6NP7d6MDbjMLREJA1lo6lHcjv3D8=
+ bh=7LDj2rBEp5/c/c79dm6qOhCqF/RIWGMuy0fqzBVNyBY=;
+ b=svWNpLRAEaWjre5YYa8hZdRwj5AtD5c4B+CdQm2BE7IMG5XN09ZbI007UPIvWxOVo5bhedzfnVkV4ZuO0BghZk0ok5vPwb60RZodxno30jChgYKQ29pINe5PQiM2t7aChQ+8w6Fylxzndik8xWJdSVIVimz/ktSDjNdzK5TXthk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by AS5PR04MB9971.eurprd04.prod.outlook.com (2603:10a6:20b:67f::13) with
+ by AS8PR04MB8930.eurprd04.prod.outlook.com (2603:10a6:20b:42d::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.38; Mon, 12 Jun
- 2023 08:29:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.44; Mon, 12 Jun
+ 2023 08:31:01 +0000
 Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
  ([fe80::adc3:90c7:4b37:392c]) by DU0PR04MB9563.eurprd04.prod.outlook.com
  ([fe80::adc3:90c7:4b37:392c%5]) with mapi id 15.20.6477.028; Mon, 12 Jun 2023
- 08:29:03 +0000
+ 08:31:01 +0000
 From:   meenakshi.aggarwal@nxp.com
 To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
         gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
         davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     "Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Vipul Kumar <vipul_kumar@mentor.com>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-Subject: [PATCH] crypto: caam - add a test for the RNG
-Date:   Mon, 12 Jun 2023 10:28:42 +0200
-Message-Id: <20230612082842.1256507-1-meenakshi.aggarwal@nxp.com>
+Cc:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+Subject: [PATCH] crypto: caam - optimize RNG sample size
+Date:   Mon, 12 Jun 2023 10:30:42 +0200
+Message-Id: <20230612083042.1256966-1-meenakshi.aggarwal@nxp.com>
 X-Mailer: git-send-email 2.25.1
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR01CA0115.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::20) To DU0PR04MB9563.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4P251CA0022.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d3::14) To DU0PR04MB9563.eurprd04.prod.outlook.com
  (2603:10a6:10:314::7)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS5PR04MB9971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3991e881-7de8-45b6-6f3b-08db6b1f1410
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS8PR04MB8930:EE_
+X-MS-Office365-Filtering-Correlation-Id: da55d51b-f565-49ca-8969-08db6b1f5aae
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ow2tlIGw0Okq+Ci3ywcx18PX7w6yJhnmL281wglw5KZb6yOjTCqYk+iXlXmn6c+wQHQMLNbR3V13uQ9wwdJmNfEERTt5C4MBfDILcGFICtNLzlyJdpFbPuyIH+utB9BoPMmIGI2B59DQGAqKiO0/4E2taZlOEw2doRc+dx9fhdLioiZZbhVmN3fXg1kPwZXFuz+TdPTDlcTuJdXvR/5N8kfO3TdsrxCy7fsDayKikCRXKaoAHI9ewfgEuVfKe2zsSpXMPuTciMMl4+TKPIeSz8KgEp6LnwKuqq1tM7988vQaUK/0bcFXlk+85IAr7bcEL0H+6jzQulhrZNYPQ8f1OCEwU/atyjxaA5fr9K3N3R9DfqJzDlkGvhKAydWHpa/Li+sk/6AKquU/K+LjTaUq/MEJiSEpJgeCZsk3+KmrKvOf2E3AsMQ5a6dGDUolWdrQ0Z4Y6GRmvmzE/u5ZIpdhGFdt6Nxsl/fOKKsLQSeEVJP6HfjSSb+4Cid0Rl+J7UEMFM5DEWYtryohXSHfnJcqWYdly7w47dKQiy2pS0IBrNsWTo/t+mAV1oLEbPcQMLjxLNkR24+Mup1HNz9O6/pEv0UhFi8o3DYQgvULF8UA0tGMaKi7TnlxgZBC/K1Q8XzQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(136003)(396003)(376002)(39860400002)(451199021)(9686003)(26005)(6506007)(6512007)(1076003)(2616005)(83380400001)(36756003)(86362001)(38100700002)(38350700002)(186003)(54906003)(478600001)(5660300002)(2906002)(41300700001)(66946007)(8936002)(8676002)(66556008)(66476007)(4326008)(52116002)(6486002)(6666004)(316002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: un3re87PFLck/Il8s0rrEDBGL8M90FZrumukPtvCeyaml9jqhF7opsheYIB+qtAQY+hr97T9bQc9RYGTvEl9+iSAqm+zUZWSmfXxujhTF6gpgOsUczzhhRZ7gDIAUzDdQRWiEuwTdPTZppg2VFPyaS4BUj6VvaAZnB4TZEY/7MdFZoRkJ1KOf4Q8XUTqVyZfOy3bX6UsqXnFzCDu/U0UHXy1YY//tN+i96+nKl2YGcssvZCf+LGcMe5JFBgpbemXB2yEutpZ3VjPICr1VLEpoBGgrv+S5JlYLwC6r/Iut4MHtOQwJtcF+/oaOrCqkf6Vwga2TxgFAF+pqYgZwDdcvbWkVYg6T4HAOG2GjnpO7k2ap9vVdEoWmKomA25UDFlUjHRQN2Jsb7jso+NkOGBXFzgKq2vO3/xfma2ZN/vmgr6232abt4zi9i0bv5SsSB6DtIX+dKzxyIl+/TOQ/NCFUNUMe1YJfNBxd/zjZeVG+RFWTIAhvB29T9z3zbYQ3fsmX12fLvJPadvYVFnmP85eIJ1pWmlt+fkTRgJ0DE7O+V1EPlt5mN7C2opZCIWO5JkdLJi7rhsuV/d7tl9mx/IBoOaYs5+J08s4zT/9PAY0ByC5U0R1Jvu9izCWWxSSvlEq
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(396003)(136003)(39860400002)(451199021)(83380400001)(66946007)(26005)(52116002)(6506007)(6666004)(6486002)(9686003)(6512007)(1076003)(478600001)(186003)(2616005)(86362001)(2906002)(8936002)(8676002)(5660300002)(36756003)(4326008)(41300700001)(38350700002)(38100700002)(316002)(66476007)(66556008);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmNVYWtkQVhaWXBzTnAySEE1UmVXWEtPejNJR1I4dVlyc0ZHQ2F3NGJ4Zlhy?=
- =?utf-8?B?ekdRcnpaeXM3eGd1S0x4ZHM2TmttVU45ajJZTFZ2RjFVdExSTmgzRitZNWZm?=
- =?utf-8?B?czQxOWFhQmNIdEI0RmF6cXVmcTBMUTArbkJnTjgzVHhMdTlrSVlublZ2VHRY?=
- =?utf-8?B?ejZkRWVzdGgvT0NuRHJIYytyRG9Yd2QvYnpVK1ZVS1AyODk2d1NYK1hnVU5n?=
- =?utf-8?B?TDByNjlOWmtUL25wTGluQ1BtMTc0QWdML3Iwak1QNGh3OGxCNkJNcC82a1pz?=
- =?utf-8?B?VlVzcnBmNG82L25CTW8xQU05UXZMOTZPRTloSUZkQytFdXY2d3ZGbzViYXdM?=
- =?utf-8?B?TC91RVBOU1Badm1YUTFYMUh6aEpiV01TdlJSeERzREhvbEFqYkhYLzhCL1Ju?=
- =?utf-8?B?UXFia1JLU1cySkdIbU0yeWFxMWZmNjcxNjJ0Vk1oNTNZSWhnS0ozMG53ZHdv?=
- =?utf-8?B?OElDNTV3cGF4ZDBHMDlIU3AyWnFpNjQ1Sjllc1JoSFpJQ2l6anF0WW5hSUF2?=
- =?utf-8?B?RFVuMTJCM2tyVEN4TGNQUDdGb1Myb1JNVFB4RVhrK09WZGxNVktqVldHYkth?=
- =?utf-8?B?WjdiVkxrU0ZLajFLVDdCREZWbWZvNjZST1FSYkd6WWFBL2JNNHZ0eWJOQmJ2?=
- =?utf-8?B?VE40TmU5VEN4MUpZR05FT3pjd2RMOExlaEpURVBrdTVxellKeTBWVjlkQ3VY?=
- =?utf-8?B?ZzNwVW9JbUV5czRaaW05bGQvRTRrNUdRUUdETTU2dVluOU81azViaUNYS0w1?=
- =?utf-8?B?eGV4NkJicHhqMVdxTEVpM1JjTjI5Q0QzTmxOTWtGcVZ2MExuSmVoT1BQM1VD?=
- =?utf-8?B?b3V1VUd2ekcwMEJKeFN0cmd6cUlRVG9XM2NJelFYNWlESjBUOUpTTHJmOVhs?=
- =?utf-8?B?UWpOSmlFbFBWRkIyYVJPTWVpeXd0dER6OXlIYnRWL0h1TUQxQVlLbXBnUFF0?=
- =?utf-8?B?Vk5QOWIxNDRxbGRGaWFwMTVOQTB6b0l2VWgxYy96S0pyMW5tR3YxRDFsSHNt?=
- =?utf-8?B?SjhpdEd5YjIyR1dadU90SE1KakE2SXpZajJhVmlXMkovV0FLNXl2N0NJOWxU?=
- =?utf-8?B?S0Z4aVVxTVdUSFNGQnNhaWFSMHhuckN0NW5rNzRUNmR1WVdMZndidGxFQUlQ?=
- =?utf-8?B?clVpQ1J0T20wNzZtZ2xKQ3VyWm13dTljem5sSHpHR1hBajRWeEhCTlkyYjBp?=
- =?utf-8?B?WkJVemhGTlo4SmQrZ0syTkJHSWhENWJIWmlMKzg2clYxTlNremphNERnMEpk?=
- =?utf-8?B?T2ZJVG5GUW9uY1p4YkNDZ0pIZmh0dEd0ZkczcW1GUDY3MGxGWmIrVlkrMEZp?=
- =?utf-8?B?SEwzZGdzS2xyRytLQXdGM1JCcHNBVVRTYWo3V01MZEk5cFVVQzFsVXVxdHRG?=
- =?utf-8?B?Z1p2V2Y1eHhELzVVa01tdUxNbzA3bjJWdElwZW9ybDN2cUF5S0tXQ0p4cmZH?=
- =?utf-8?B?WEVoekozWE5kZXlZcE81SUZzaS9pV0JtT3E1aWhOVW1acEtkbzNSeVVsSGRm?=
- =?utf-8?B?ZWJLRWtZM0xUZnU3Q1J5V3ZydTg2OGwzZFdxalM3dUdLcHI2eFFtWUFGcDJO?=
- =?utf-8?B?dGFFZkx5dURVU0lyRGdjdGxIaHl0UXN2a0FKSUp1am1tY2FENkI4T0VCcktx?=
- =?utf-8?B?dUlXK3VKZnE2U001ZklyZXZFVlJHM2s2NDZVVkMyMW5UQ3dESlU1ejdnaWc5?=
- =?utf-8?B?STVhK1REbVI5TUNkcHlVTU8yYXNGTjRhVkxNS1ZWUlRmdWc1T1I2aGZod2RJ?=
- =?utf-8?B?a3lIVjRVNWpRUy9zQUxFRFA1aWE0Yk83NTdJUFRPeUFtcWJoV05IRGE3ZUho?=
- =?utf-8?B?WW0vR293RXhQWDdoenhpRDVRZnNYVFNlSGNRZHRTdUZHRVMyNzlvNHpFTVds?=
- =?utf-8?B?Unl3a3pFUTg2RDM2Vm40SkpaMmZsQytMdlJaQVlFdFV0RUovTE1JZEw4bDly?=
- =?utf-8?B?UzdBSlR3LzNrM3g3ZzdSTWNkb0h1Z0dqS0VMcFMvNzlTTXZ5dnV2ZWtPSmlD?=
- =?utf-8?B?T2NOWDY3RHg3OUZobXRzdzB5QmN0YWZWK0RTWWVFcStWTlNYc2dBdHp2MHpI?=
- =?utf-8?B?T2ppL2phRTZNQlFVZy9BWXlYTW11QjAvRzRWbDJ2UXU1azQ5OXpJVXJBTlVB?=
- =?utf-8?B?djJleXFoMXpJUjVibkVRLzh4WDdJaExyWFVHTGpKN0EwRlROK0tFdm4xd043?=
- =?utf-8?B?b0E9PQ==?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TjFzUGpxUkd4R0hjQkc2ajhYK3JaSHN5ckxDazU3RnVDWEQ5V21XNno1ajYy?=
+ =?utf-8?B?dWdtYzlWS0FXcjJFdmxRdXdpbHo5UklsSGFzZ3NBcHN6cjdqbTBOTnRvSUdr?=
+ =?utf-8?B?SHZmY2xWbFdhcDlyZGVoWnBKTGltYUJzZDRNODRPQWRqTE1sVDVwSEZBRE1M?=
+ =?utf-8?B?Qk9sb2l5OEwwYVEvQy9qWXl5SWxYcjlnZVZFSlpoalVCNU9TaUxqNzJOTzQz?=
+ =?utf-8?B?eDFVbTEvVlZ0a2RMMHBKS0drcmZhOU9nc0JQcXc0OFpvUVBMeW9jRmdsMnd5?=
+ =?utf-8?B?NjhVMjFRRk5aT0gxdHNaYlNtRWxpSWpJY0VWb1pNa2JMOHBaaHhtbVNGbjVp?=
+ =?utf-8?B?WWpFeTRuR2xNdEl3TE4rbk9FRGFCMXZrYWFwbkJtZHRqd2FKRnlHbzlVdTB3?=
+ =?utf-8?B?Nm9yd250dS9tUy9Iak5kSGd1RXNleThyYk1USFdBZWhHV0Z6dUNmbW1LRWdr?=
+ =?utf-8?B?ekRweWRNL1M4azJEQ1JwdVZLWUY3MFBMMGtnd0IvTWlEa3dRVTQ1QlVzL2lw?=
+ =?utf-8?B?SXpJMkk2Wlo2eGYzTVd4enhKUVcxOUM4bERuWWVyMFovNWtpUHN2NHBMTWFC?=
+ =?utf-8?B?VC9WejlZL3VlR2NpY2dFS3RsTmRCT3R2QzRxbEVTa1dNR1NMZFBRN01tMFlY?=
+ =?utf-8?B?K3k4ZEJ5WDVhNE02T1hzRWIrWk9jUmc2bWs3dWt0UmpxQStzaStXKzNXYUlz?=
+ =?utf-8?B?Q0hDdVUzVTNyNVhHNFBxRE9NR2F5YTBNNlpsME9WVFZqaGlxNlViSDc1bFJL?=
+ =?utf-8?B?MUxqMlVVaHZwVi8yMGw5MGtic0ZxYTlxSDNUZmhqSjVWSWlnNlFETFFLN1lR?=
+ =?utf-8?B?VFltYUVMNHdyMkJ4Y1hUNW1NVjZLTGNuL2N5dTIvbjNmcjd1REk0cnlwT3Zn?=
+ =?utf-8?B?ZnMwdjJmSFBTdTBiK1dFWFowdnpmRlp5RVlLNTNKc0Ezb29qcEsvaU0rSEZp?=
+ =?utf-8?B?M3E4RXo4RUV3YnN6U3owMTh3cWdqNTNRaWFQUUZ3TDcwaG0xcHdHVVg5SlVH?=
+ =?utf-8?B?RGpaV2ZYZHlTVHFNdUR1WHBqS3N2VlhBaC95MEdPMVBnM2dQVE5XZjV1eE9t?=
+ =?utf-8?B?WFFhTU5EQlE4QXIzWW5XdlVwdllvbExhOVNVaEJ6R1l5SzFMOFc0UkxwVmlX?=
+ =?utf-8?B?VzgrcTJ0SFltU3FETFlRRlg3NXdCczZtTWFxcnY1OVhmb25WSHFtcjlFTGs0?=
+ =?utf-8?B?ZmlLMUJYZ0EwYVc0eVRUNFJnMUpROC9BbDhOWGV3V2t3OS8wa0d2dmpWSzBv?=
+ =?utf-8?B?ek1wZWpONWQ3WGRNdnNreHJlSkZwc2R0TmZOZ093bWRNZVNUV2xSa3hqVTFK?=
+ =?utf-8?B?enRBQVlLWEVLQnhNOHdLMjZyMnAyT09rVGtRc1M5NmVKU0J2d1l2M0dqK0xU?=
+ =?utf-8?B?RzVoNS82MS9ST0tGaEc2OGdqNHRDcEE1ZnA3TE1GTFpXdnp4WXBoNkc2TGdF?=
+ =?utf-8?B?SE5iZGYzSGFWdDY0VllVU2JMUE5wT1k4dEZsdFV1R0tKZTVYSWVXWTBJOHpa?=
+ =?utf-8?B?NEZmcDZLTkV3ZitvcDB6bUVROUJEc0NVaUNBSW40V0VaWHhrai9ya1BTNFl4?=
+ =?utf-8?B?QS9yclVBeHhnTnVEY3lVb1BNZlhib2ZwVTdrdTJwdzBzakg2UktzeUIxT2ht?=
+ =?utf-8?B?SkNrRTJhVzVheEdQRWdqSWNXUDhmcVJqV2VIVHoyTWxmS1FrdW1yMytVdWZX?=
+ =?utf-8?B?YW1COVNBdVNBRWFnYm45cEVodlV1Uk1ibFlvZzBJaGpkdmVxVFAvRnBIMzBZ?=
+ =?utf-8?B?YjkrZ3hDWGFudkJHQlAvOWhPeHJyTm9JQWpnRFVWRXhvbERZTEZkZ2RZTENu?=
+ =?utf-8?B?Y2FBZ21NNExoZ01XQy9jVk1IWkdwNDVYNWF2Z0prVjNnOGZqRjlUTnFOWjBX?=
+ =?utf-8?B?Q282ejA1cUplYktTTVFPUkw3YWRpVGVkMklLK25ONy9TV2l1MnpHMDd0eGFi?=
+ =?utf-8?B?WFVBTmdIeUdhTlJCV1IyVmx6M2Rtc3RRZTBiOVR5UW5hcDFsaEs0TG9uc0w3?=
+ =?utf-8?B?Y0dkTFJ2YTcxUTNIK3FWSVhyTmxUd1k2MFN3dkJXUDh5M3Yzc2RjN0lqSHp0?=
+ =?utf-8?B?a2F4b1B1eC9sSXliM0pxNlFFaG1nZkozdWs3L1JtT3NjcFpGaGpNT0ZMMnhC?=
+ =?utf-8?B?RjVMSjJBRGIxczhabXA2NWVDZW1VbVFCbmFYUW9BZjlwTEhTeklyejRib2p2?=
+ =?utf-8?B?M1E9PQ==?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3991e881-7de8-45b6-6f3b-08db6b1f1410
+X-MS-Exchange-CrossTenant-Network-Message-Id: da55d51b-f565-49ca-8969-08db6b1f5aae
 X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 08:29:02.9409
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 08:31:01.3910
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dp6W0xgr33cJEk0YwHABMmxVe5TODLqpTR0MwS5T7KRhp/8KI6owmCUJCszr2U8k+vw44cus3HZHtUHXQgwQdSlMcBN67pw10LE3TS9QUUE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB9971
+X-MS-Exchange-CrossTenant-UserPrincipalName: UpJIR0VVqL3493v/NMd5XaV+ClC+yVetAwEdPxR3Y78GCZj+k6NqKPbuD/MwbYL8XCLIduNpBL6vUBZpwjb9xw0n3ZirzoLTRbg+WZjAB8k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8930
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Victoria Milhoan (b42089)" <vicki.milhoan@freescale.com>
+From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
 
-CAAM includes a Random Number Generator.  This change adds
-a kernel configuration option to test the RNG's capabilities via the
-hw_random framework.
+TRNG "sample size" (the total number of entropy samples that will be taken
+during entropy generation) default / POR value is very conservatively
+set to 2500.
 
-Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
-Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
-Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
+Let's set it to 512, the same as the caam driver in U-boot
+(drivers/crypto/fsl_caam.c) does.
+
+This solves the issue of RNG performance dropping after a suspend/resume
+cycle on parts where caam loses power, since the initial U-boot setttings
+are lost and kernel does not restore them when resuming.
+
+Note: when changing the sample size, the self-test parameters need to be
+updated accordingly.
+
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 Signed-off-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
 ---
- drivers/crypto/caam/Kconfig   |  9 +++++++
- drivers/crypto/caam/caamrng.c | 48 +++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+ drivers/crypto/caam/ctrl.c | 52 +++++++++++++++++++++++---------------
+ drivers/crypto/caam/regs.h | 14 ++++++++--
+ 2 files changed, 44 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index ec6a9e6ad4d2..c631f99e415f 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -162,6 +162,15 @@ config CRYPTO_DEV_FSL_CAAM_PRNG_API
- config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
- 	bool
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 62dd069942e4..b06bb64c6c23 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -352,7 +352,7 @@ static void kick_trng(struct device *dev, int ent_delay)
+ 	struct caam_drv_private *ctrlpriv = dev_get_drvdata(dev);
+ 	struct caam_ctrl __iomem *ctrl;
+ 	struct rng4tst __iomem *r4tst;
+-	u32 val;
++	u32 val, rtsdctl;
  
-+config CRYPTO_DEV_FSL_CAAM_RNG_TEST
-+	bool "Test caam rng"
-+	select CRYPTO_DEV_FSL_CAAM_RNG_API
-+	help
-+	  Selecting this will enable a self-test to run for the
-+	  caam RNG.
-+	  This test is several minutes long and executes
-+	  just before the RNG is registered with the hw_random API.
-+
- endif # CRYPTO_DEV_FSL_CAAM_JR
- 
- endif # CRYPTO_DEV_FSL_CAAM
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 50eb55da45c2..b3d14a7f4dd1 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -172,6 +172,50 @@ static void caam_cleanup(struct hwrng *rng)
- 	kfifo_free(&ctx->fifo);
- }
- 
-+#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_TEST
-+static inline void test_len(struct hwrng *rng, size_t len, bool wait)
-+{
-+	u8 *buf;
-+	int read_len;
-+	struct caam_rng_ctx *ctx = to_caam_rng_ctx(rng);
-+	struct device *dev = ctx->ctrldev;
-+
-+	buf = kcalloc(CAAM_RNG_MAX_FIFO_STORE_SIZE, sizeof(u8), GFP_KERNEL);
-+
-+	while (len > 0) {
-+		read_len = rng->read(rng, buf, len, wait);
-+
-+		if (read_len < 0 || (read_len == 0 && wait)) {
-+			dev_err(dev, "RNG Read FAILED received %d bytes\n",
-+				read_len);
-+			kfree(buf);
-+			return;
-+		}
-+
-+		print_hex_dump_debug("random bytes@: ",
-+			DUMP_PREFIX_ADDRESS, 16, 4,
-+			buf, read_len, 1);
-+
-+		len = len - read_len;
+ 	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
+ 	r4tst = &ctrl->r4tst[0];
+@@ -368,26 +368,38 @@ static void kick_trng(struct device *dev, int ent_delay)
+ 	 * Performance-wise, it does not make sense to
+ 	 * set the delay to a value that is lower
+ 	 * than the last one that worked (i.e. the state handles
+-	 * were instantiated properly. Thus, instead of wasting
+-	 * time trying to set the values controlling the sample
+-	 * frequency, the function simply returns.
++	 * were instantiated properly).
+ 	 */
+-	val = (rd_reg32(&r4tst->rtsdctl) & RTSDCTL_ENT_DLY_MASK)
+-	      >> RTSDCTL_ENT_DLY_SHIFT;
+-	if (ent_delay <= val)
+-		goto start_rng;
+-
+-	val = rd_reg32(&r4tst->rtsdctl);
+-	val = (val & ~RTSDCTL_ENT_DLY_MASK) |
+-	      (ent_delay << RTSDCTL_ENT_DLY_SHIFT);
+-	wr_reg32(&r4tst->rtsdctl, val);
+-	/* min. freq. count, equal to 1/4 of the entropy sample length */
+-	wr_reg32(&r4tst->rtfrqmin, ent_delay >> 2);
+-	/* max. freq. count, equal to 16 times the entropy sample length */
+-	wr_reg32(&r4tst->rtfrqmax, ent_delay << 4);
+-	/* read the control register */
+-	val = rd_reg32(&r4tst->rtmctl);
+-start_rng:
++	rtsdctl = rd_reg32(&r4tst->rtsdctl);
++	val = (rtsdctl & RTSDCTL_ENT_DLY_MASK) >> RTSDCTL_ENT_DLY_SHIFT;
++	if (ent_delay > val) {
++		val = ent_delay;
++		/* min. freq. count, equal to 1/4 of the entropy sample length */
++		wr_reg32(&r4tst->rtfrqmin, val >> 2);
++		/* max. freq. count, equal to 16 times the entropy sample length */
++		wr_reg32(&r4tst->rtfrqmax, val << 4);
 +	}
 +
-+	kfree(buf);
-+}
++	wr_reg32(&r4tst->rtsdctl, (val << RTSDCTL_ENT_DLY_SHIFT) |
++		 RTSDCTL_SAMP_SIZE_VAL);
 +
-+static inline void test_mode_once(struct hwrng *rng, bool wait)
-+{
-+	test_len(rng, 32, wait);
-+	test_len(rng, 64, wait);
-+	test_len(rng, 128, wait);
-+}
++	/*
++	 * To avoid reprogramming the self-test parameters over and over again,
++	 * use RTSDCTL[SAMP_SIZE] as an indicator.
++	 */
++	if ((rtsdctl & RTSDCTL_SAMP_SIZE_MASK) != RTSDCTL_SAMP_SIZE_VAL) {
++		wr_reg32(&r4tst->rtscmisc, (2 << 16) | 32);
++		wr_reg32(&r4tst->rtpkrrng, 570);
++		wr_reg32(&r4tst->rtpkrmax, 1600);
++		wr_reg32(&r4tst->rtscml, (122 << 16) | 317);
++		wr_reg32(&r4tst->rtscrl[0], (80 << 16) | 107);
++		wr_reg32(&r4tst->rtscrl[1], (57 << 16) | 62);
++		wr_reg32(&r4tst->rtscrl[2], (39 << 16) | 39);
++		wr_reg32(&r4tst->rtscrl[3], (27 << 16) | 26);
++		wr_reg32(&r4tst->rtscrl[4], (19 << 16) | 18);
++		wr_reg32(&r4tst->rtscrl[5], (18 << 16) | 17);
++	}
 +
-+static void self_test(struct hwrng *rng)
-+{
-+	pr_info("Executing RNG SELF-TEST with wait\n");
-+	test_mode_once(rng, true);
-+}
-+#endif
-+
- static int caam_init(struct hwrng *rng)
- {
- 	struct caam_rng_ctx *ctx = to_caam_rng_ctx(rng);
-@@ -258,6 +302,10 @@ int caam_rng_init(struct device *ctrldev)
- 		return ret;
- 	}
+ 	/*
+ 	 * select raw sampling in both entropy shifter
+ 	 * and statistical checker; ; put RNG4 into run mode
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 66928f8a0c4b..189e74c21f0c 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -3,7 +3,7 @@
+  * CAAM hardware register-level view
+  *
+  * Copyright 2008-2011 Freescale Semiconductor, Inc.
+- * Copyright 2018 NXP
++ * Copyright 2018, 2023 NXP
+  */
  
-+#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_TEST
-+	self_test(&ctx->rng);
-+#endif
-+
- 	devres_close_group(ctrldev, caam_rng_init);
- 	return 0;
- }
+ #ifndef REGS_H
+@@ -523,6 +523,8 @@ struct rng4tst {
+ #define RTSDCTL_ENT_DLY_MASK (0xffff << RTSDCTL_ENT_DLY_SHIFT)
+ #define RTSDCTL_ENT_DLY_MIN 3200
+ #define RTSDCTL_ENT_DLY_MAX 12800
++#define RTSDCTL_SAMP_SIZE_MASK 0xffff
++#define RTSDCTL_SAMP_SIZE_VAL 512
+ 	u32 rtsdctl;		/* seed control register */
+ 	union {
+ 		u32 rtsblim;	/* PRGM=1: sparse bit limit register */
+@@ -534,7 +536,15 @@ struct rng4tst {
+ 		u32 rtfrqmax;	/* PRGM=1: freq. count max. limit register */
+ 		u32 rtfrqcnt;	/* PRGM=0: freq. count register */
+ 	};
+-	u32 rsvd1[40];
++	union {
++		u32 rtscmc;	/* statistical check run monobit count */
++		u32 rtscml;	/* statistical check run monobit limit */
++	};
++	union {
++		u32 rtscrc[6];	/* statistical check run length count */
++		u32 rtscrl[6];	/* statistical check run length limit */
++	};
++	u32 rsvd1[33];
+ #define RDSTA_SKVT 0x80000000
+ #define RDSTA_SKVN 0x40000000
+ #define RDSTA_PR0 BIT(4)
 -- 
 2.25.1
 
