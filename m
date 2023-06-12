@@ -2,165 +2,150 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8246C7EE25
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 08:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CA3C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 08:27:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232075AbjFLIXc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 04:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59352 "EHLO
+        id S232487AbjFLI13 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 04:27:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231825AbjFLIW7 (ORCPT
+        with ESMTP id S233236AbjFLI0p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 04:22:59 -0400
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2084.outbound.protection.outlook.com [40.107.13.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2828E71;
-        Mon, 12 Jun 2023 01:22:49 -0700 (PDT)
+        Mon, 12 Jun 2023 04:26:45 -0400
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2074.outbound.protection.outlook.com [40.107.105.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED4CE64;
+        Mon, 12 Jun 2023 01:26:44 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DgmvTaU7QtnezV6BMHQxHWVQJrS9OvMOv5zFNx9zZVRRtIt77gDh1Tvrr7xnFwD8RXBGOXE9x1tUzq3uAorjNJchsg0F6aCqLZDcJBqWY0MdnGSsr1iTmT2/E2Udsd0DJbqWCO3onI0JHraa+uc73d+xOPBLOo74ovAmMrG4hjvgDE5y5bj+Irbl3klcQ340hmPZ9+W31nQMobe7+i6c/6IL3lGlzQZnOHdftgBXuN2/v9Y0OSqaES+edWd8KiXYDKSCdk0A2OarwRWr1hWJ3hwnxgBZmiZjCjNEKx4PcWkTchkuSJZg87jp4afOoxFTcrtXICeyzoXX3flnu85mpQ==
+ b=Wka54C072L8Mzsi4FOpqq4GrL+krtB5/TeJeE/thcG2fjJIw5jbF6edD2gcjETAT7CrwUAqGr5foGT7mY6HuDa+4VGVAwoSTN2qFHkBI6qhORG3ONU8BSPc5rHiD/NTsP3no+Kkmox/IoN9npxIfCrQh+kjEdNHtUWjue2RmtjIG4HWEN3N/y9eJ4j6lCfJK/VLqmZAB4MQQyCbSL29Sf9/KCpPf4GVFNXJf6mtdfNc4e9tbQtCTTd1spWByrJpDN3+s10UYIyXv7mntOJZMPLd2C68CFWWKq8tEhglUrQKdEhOV91GFJefvNUlEjRhJ5iID46r2s2L1t9TObJTwIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HYe5dYUm3equ9D1SJaL/Y8frjz5bNKJ6H0lCj/ed6F8=;
- b=lpl5hxtU2Vgw9y76PXbMYtZozOUfw3+6u0hfTNFD8AJTVxHDMF6B0mllZfqUlGunAGxA9rn84mXjGsx5M4qNyXU7LCODaLJm5MGTR3bQ//pbJq1lSLunIVWZOzJtovaBA4RZkDoi/zhxaeFRp9X949ujsTifY+ZcoyVMBfeLhqUnGQGAfldm/z8W05++UHWuxl59qKbwJiqi1ZhBrz9DTzlM6LB+IpopwQNOTQxHjC/j1R2CpAMuBBbZb/qKv76gS/8g196r+msTcHkqU5CupzAs35eUfZ8IhNJCoiR8FWmnJ+M9u1jvfEncSedG99COSVN5jkom2JHyR06m1WctBw==
+ bh=2GUfq4DfF02m81H3rwkS5ZRgC/qEvG0Gr9SdoU6yEVc=;
+ b=iGTBtnQ1Hng6rCM1NcZq4zSTpkMnGiwWwbHVlm0uQ56uY2bXXzkD5FeSg2XWr8XnPdDKk27G5PffswypDIltr9njWeRx4alafuiqOnuwrqeuYTfW0MboN1dr1x+8hYNTx+CqzXtEcc3yKm9fkY/T+GtdqqKLuabGth0wdk88TynFWhOs1B4+DAJhHmXyqKOdL9ii78fX/wlidA3uzmH0xl5F8hnI19S+YZhAZdy5by1+BEb33q9g1DF3GDMhdzmU4kTXu9hqDfXbiVNcHG+DNhuxF7ZkabSIxpaeJgPd2JgPu/zAgWJbIOcrstXfxT7OmZOKL7qP4WIsf4a76l0kwQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HYe5dYUm3equ9D1SJaL/Y8frjz5bNKJ6H0lCj/ed6F8=;
- b=EkZKndGR7v8KhGhGxSzbucOOPx/iOkPB3yNBcRFS/lojewh2vkRXGAGybgeeAtCRW9Y4AzuLovE04tmPZ0VLCm+252sk5Bbq+7OZCsiiHk9SBrGxzEmkErN0FdlB/kcLgnOb6o9JNFJk+M4bU0wzLk7R6UQ0hMCswRAKwiSBLtw=
+ bh=2GUfq4DfF02m81H3rwkS5ZRgC/qEvG0Gr9SdoU6yEVc=;
+ b=a3IpqrWZvO3DyUsgzoaxSKqfClWqEZy0YS8kDXXBvFRVJoF9fd1MVXSn/qPCeI0CdWLtUox4khqMxYkCrbVQnHkS9XLZNv6Lk85jrK5v1j7yv8+LCBxgmm0hTvaEvrSoDyXXdN0b7WZdFHKurTXR1KBWCplN0ITymEw72eAVe9s=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by DBBPR04MB7595.eurprd04.prod.outlook.com (2603:10a6:10:20d::18) with
+ by AS1PR04MB9429.eurprd04.prod.outlook.com (2603:10a6:20b:4db::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.29; Mon, 12 Jun
- 2023 08:22:46 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Mon, 12 Jun
+ 2023 08:26:40 +0000
 Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
  ([fe80::adc3:90c7:4b37:392c]) by DU0PR04MB9563.eurprd04.prod.outlook.com
  ([fe80::adc3:90c7:4b37:392c%5]) with mapi id 15.20.6477.028; Mon, 12 Jun 2023
- 08:22:46 +0000
-From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     Horia Geanta <horia.geanta@nxp.com>, Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: RE: [PATCH v2 1/5] crypto:caam - avoid allocating memory at crypto
- request runtime for skcipher
-Thread-Topic: [PATCH v2 1/5] crypto:caam - avoid allocating memory at crypto
- request runtime for skcipher
-Thread-Index: AQHZmr6YL2tp4KlYrkWHE/h2xyHxZK+DTjqAgAOKPjA=
-Date:   Mon, 12 Jun 2023 08:22:46 +0000
-Message-ID: <DU0PR04MB95632454BBABC70B936925448E54A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-References: <20230523153421.1528359-1-meenakshi.aggarwal@nxp.com>
- <20230609103842.4159321-1-meenakshi.aggarwal@nxp.com>
- <20230609103842.4159321-2-meenakshi.aggarwal@nxp.com>
- <20230610021835.GB872@sol.localdomain>
-In-Reply-To: <20230610021835.GB872@sol.localdomain>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU0PR04MB9563:EE_|DBBPR04MB7595:EE_
-x-ms-office365-filtering-correlation-id: dc33f372-2baf-4832-62f3-08db6b1e33d1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8vIbz2SuaHbjqsLdSJTfukHEFZEEikKtMg98JKj9EPi3irHSXS72/jsU4tDQiuHvAw1KZGkp8XMQ8XpFNbiUb3d0FVP/BGCzjAw6q9W6aCTzYDNpD00WpzX3Pd6QBLV2bpvV09ErISXOW2syMwsrvaI4u6UV6fCIwaow6Xo1uWWNfwPAWY9JK3Iu+exQ1TKyiX6bw0mwpiIh8me480vlJapNUZUloyCT2/SRrcTZF96IskuiFclQ2vU/yr14onKhO/bmQ2Mwo+h83ajmgGgn5tdAnbjc74OIfrDCAd8M75Akr5LtynU6A6n9ygfBBPnjouhSDqjr9Uy7vBPqeCUthlK9v/UvJCq1W+x5eaY3j8PL4Fqkcx3O9ouUVRhSMrXj5mgolD6GAN/uZVdBPM9W9h1Utw1+5f5xRdltO+/93hExSMNsKE7XnoJdJ36cuVSam9JzD8vHxsw0VN50eo+2n/ZnPhLhKwhy7OIotlFeorcR71ZFg5/rXaXifp8pQaGhEs4MTwJ/RiF0r9WzAaJ53kn5oyzXwofHpD7SGjOdpB54C0VoCfu2QqqTK0vxhGj8hAq+Hr7XRLRthKPauuyDSJYkFBSN9f5lJ7mA/s+GUy0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(346002)(136003)(376002)(366004)(451199021)(7696005)(966005)(9686003)(83380400001)(38100700002)(86362001)(38070700005)(122000001)(33656002)(6506007)(55236004)(53546011)(26005)(55016003)(186003)(66446008)(2906002)(5660300002)(54906003)(44832011)(52536014)(8676002)(8936002)(316002)(41300700001)(6916009)(4326008)(66946007)(66556008)(76116006)(66476007)(45080400002)(71200400001)(64756008)(478600001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RZL5M0L8AqeRGjPsQ0W9nmppwyy7K6qlkOSxt76WSzORVuIYu/GR9pv+tALz?=
- =?us-ascii?Q?nZ+Pfn3j2YVnfBMuPk+RtopawpRBuAnXSlaQimIHaTOH3RWkc3BFb17T3K6l?=
- =?us-ascii?Q?Vje5DKWOa6EEzIW9U46RAEz0cgVryJEUuWZIUce0SFLtsD3bB0DyXcTG/ZsP?=
- =?us-ascii?Q?2k33gCfUb8dyW4u1buISq9qsj9S/x5tW6zdW8jqbzFHZOxNnOvs1N7LD9Tch?=
- =?us-ascii?Q?+sMxnG9GEQQmFCwRHl1pNzwmwbB68cwTJAuP13NnmI/y7j+ZYvENYzH7MUYR?=
- =?us-ascii?Q?a3CriFxsNjdlYEw7FoB9T9Tx0DXWUb78F2xjr3DHjeTDqx1sn5Fpzw09Umzq?=
- =?us-ascii?Q?SJMKitU5c2MQi1ot6wxqDpYr3/CqZx9Ad4lkBoIHIPcxlmDhEyCl24N2JTds?=
- =?us-ascii?Q?U8UbiHImpC4qCh7v0r3N5riP4J5Yn01Sp/nycnpOWH2D8wNZ9rjucojHpmqK?=
- =?us-ascii?Q?JXq70eOIMdwQfdqWCMkJi15v/bjWLgIfs7qlYIYftUm3+Jp3IHVyzu80Pjn7?=
- =?us-ascii?Q?0FrF6lBz3o7Lz1icKLC2mM6+F07bq3XZT6YGvemB0J5TCnLD6QwM5Te7wqGu?=
- =?us-ascii?Q?k+Lgmj4XZvGpVPgQIFwTbmkVAHLmDJD4VRYiHE4a76w22s/UySlHZvuAmq7q?=
- =?us-ascii?Q?yelT6rLi5fHGv4zpvub9l1huQX77Z/lQGmdmq/z58RBCEHhoEqx4Hw/eGBru?=
- =?us-ascii?Q?YjAtBimYdtMWD36mHVBQlLfHvlAhDHYYwxqBWoml2lcJHf/6oP5hU9ffuyCk?=
- =?us-ascii?Q?kMOUPQVwxc7ufFS3+/X4LdsNaEITj9rDYACKvHIKP2Y0THYlBkkRuKjjGc7m?=
- =?us-ascii?Q?KSjfmMHCfJFTiUAknAhjO4z/lrlOCU+u8rQYM9qv/DP6mNrohd5JIlJ33zfn?=
- =?us-ascii?Q?eRyg9CnAIv50sYa5rcDKO5WTG7bLJmIJx0jmrONpEl+QTDC8+SIu/Wv4y9l0?=
- =?us-ascii?Q?QZ7YjMbJ8zQaYJFxAfdUNEbccuWS00+54zrxN3+MrF6/v0M2PmVP95HJUix2?=
- =?us-ascii?Q?EDZAzq+xKupIOTlmTFAadf565JAkieG2TSpu4BH4HqgrFn7o75VYtXxR0tmV?=
- =?us-ascii?Q?ALxW8uwsBnOrih353nR/5FNKeS1GVekidLKAG02QhU9DqWD4QnGucmZWVoq6?=
- =?us-ascii?Q?mJ7CvW6M/SeZguClaUsHTTteAceYQuU2I68F5eBd4ZennNMiiU90qgWI5AWD?=
- =?us-ascii?Q?jnuiSoP3sf5RUBKuH37lHinKMpHhN5koxXNOsmf1vPVHpjTCn37d6fe9HoZU?=
- =?us-ascii?Q?Gf6ABXOniTCCucki6FI/5pAgzYb36hCN59UJvJmbiQlPf4unJefjvDnqPkkm?=
- =?us-ascii?Q?jHOIQBySLt3/yajY3OpjnbkPlyJSBGQKtMcUYYyxOWVq7Pqa5WgvEP+6VNmR?=
- =?us-ascii?Q?D6QpvqZfHYcOWIQTZsme4+lj+M9mKWWMGDilRhvG120W0U8ovCUB20Iw8SkA?=
- =?us-ascii?Q?ptjyh6KLvjhw023JUnMCyDCpzl40r/cRHgHfjn3R3ZwQVocNdd1+ImrOPGP0?=
- =?us-ascii?Q?cBSDHa3MTPLlHxUq6jC1BAkYC5Rrl1siOMwdFuOF568ijAz+20XXcYM9c++k?=
- =?us-ascii?Q?tKalDQnxpm8eXSX62r799dBFmlaYjRtlFWvGnw4r?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 08:26:40 +0000
+From:   meenakshi.aggarwal@nxp.com
+To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Victoria Milhoan <vicki.milhoan@freescale.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        Vipul Kumar <vipul_kumar@mentor.com>
+Subject: [PATCH] crypto: caam - adjust RNG timing to support more devices
+Date:   Mon, 12 Jun 2023 10:26:15 +0200
+Message-Id: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS4P190CA0014.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5de::18) To DU0PR04MB9563.eurprd04.prod.outlook.com
+ (2603:10a6:10:314::7)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS1PR04MB9429:EE_
+X-MS-Office365-Filtering-Correlation-Id: a316acff-5381-4344-3828-08db6b1ebf52
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: A08OUa4vPrUOCDWI3XmkvuGiQdAeFwHdV1b3QIkmcTvShg8ymQJipZ/2MPAu1pq8JGC1ygpAyPBjr9fBdqJc3JgbgcKYsHWx0KAo+bblGZgcQdtmPTyiW7OP2xXrgPXZV1d3YMwT92ks7AMgB3wEr/VS3ASSyk9NIM/PaznKM6VBxhE4P8/nkpqCvpCwq2jIwUrq+npg226M4Z6R8DUNXfXMmlvDUWn44utwDI98+SDhN8YIKkgeuyFeNSvepgQ4qg3T8JASPP/qUBfifU7ZzWjXozBzkbJxJfp8B1nnUfli1dQUBAF0bk9LR3owPwc/XQLkq4YKqCCmP9i6Csm3DyhdjHOQRvgWR4G1zaapUYas619bY3PgbBsvW3SW7U+V0W4fUD+07twvMddBSO+ZMSfsBbGLPYg27ti36g24vZmPQ3180vD75BiEfSX2HnLpUkwtf7Ks3MkcHCOyFLND6Iyhw2WKFCR9JksDZsqCihinMSTK67hRX2UzXc7XTsuXhfML698RtY5uwYWsxu2d14duW1AzDj+l+Gk++LuqwxVR5HZ8lvkpj5GtSltvcvCrS/pR4F8f8SaYBm6xsXsp492BwyTq7MhG7EXi+dm2lokEXADR8XVG8ac5P8xFcs2i
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(366004)(346002)(136003)(376002)(451199021)(36756003)(86362001)(6666004)(66556008)(54906003)(478600001)(4326008)(316002)(66946007)(66476007)(52116002)(6486002)(8936002)(8676002)(41300700001)(5660300002)(2906002)(38350700002)(38100700002)(2616005)(9686003)(6512007)(6506007)(1076003)(26005)(186003)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDhuZXFZZjVxUCt0V3hYUzQrVk5MdXRXbUNaTnBLVU5QQitwUmM5Wk5nZmFQ?=
+ =?utf-8?B?bnZzRTFaVmdWeWlWNmhGaW91U3o4bjNES0dUcGdnd0tmMEdlTXZnQTY3Wi9J?=
+ =?utf-8?B?QTloVnJPT3dmMGtjQkRpWmptdzVFVlZjcWdMUmdNa0tBSzVJM0QzWmJjN2w4?=
+ =?utf-8?B?TnNhV0xJd1FETkozUDRKcGZjKy9vUUZVVElaTWxIOVlrVS9oT1pzNkQxM2h5?=
+ =?utf-8?B?WVJVeU5hMjJXRkpHTGpKQTVNb1VNc3hqQjN4WlBMRW9DWk95amtCUnZvdXNX?=
+ =?utf-8?B?UXlsdWNSeUlyT1RMM21TK1Z0cHZsLzR1dS9wTDA0Q3E1NzB3SXFVcllPUVgr?=
+ =?utf-8?B?UHZ1WXExOXB6MlhhK3RMa3pGeURUVFdFYzRyRjN1YllVMUNmKzUzU3lTWWZi?=
+ =?utf-8?B?YUpvTnFNcktKMTFEUHcrZ2RRbS9uVWdIcWE1eTVjV3NnektoMXA2WWdEZXll?=
+ =?utf-8?B?NEtlTU93amxnQ1ltNlpFVTRMR2lIVFFoU2p0M3FacU94TXl3NHZxanJFcXg5?=
+ =?utf-8?B?YmJCN0FKMlNCNnFLV213Y3l1ZjlISFFldVVUQ0ppcHFOd0VPYy8ySS83SDR4?=
+ =?utf-8?B?cS80azk0UkduNEdXYVlpbDNnd25DSnhocXczZlJYdkR3WXR5WkRBN3RPem5P?=
+ =?utf-8?B?T0lVWXRnT2UzSm1aSkliVGNCWmIvQXZHQTc1WmRkQkhSRGRBOW5GS1hUcnlo?=
+ =?utf-8?B?dmRrUElaZHQzY1ppVi91N3pmQk5lY0lTQW4yWnVSd2c3VG9UTGFxT1dvTFJh?=
+ =?utf-8?B?bDVyVDZaRXVFcHNEUklXRUNsMEpOYTBkR3AwdDBTbmFuajRpclJ3K0J5N3c1?=
+ =?utf-8?B?ZGhYR2JZYmhDcHl6YnFyU2ZMS1BzWW1jRm5HcFJjRXVOYjhwSHVFbERZMDYz?=
+ =?utf-8?B?RnROWEZBOWwwbWNoM3AraUlQWHQ2ZVlsbDdwUHZiZENjK3laR0cza01NMTh0?=
+ =?utf-8?B?Qm85Nk9nZjlFOTdsblVIYURRaytmNWtINEkwMFlBNjN4R0dvRnUxekMvZFdC?=
+ =?utf-8?B?WGNybnNRVXdyK0dPYXdvUU44RWplcFlrTVhBTFQ0QlUwZFBybTVvcThJWDZ5?=
+ =?utf-8?B?SEw2N2NpUklkb3ZxUm9Ra1Y1RnJWYmdLUFU1a3NRYXlXNmhULzI0WXRMUGhG?=
+ =?utf-8?B?Q2JyUVpESGx0QnV4d2ZjeTM0eDZYYlc4dEZ3VGl3Vk0wZjFsMksyN0k4bFRR?=
+ =?utf-8?B?YktkNi9SZzB6c0NKVUtBWEdLbmRka2xjRUM0M2hmZmVDYkRWcUxJamRzV2Na?=
+ =?utf-8?B?YmJVU1Q2TzRQK0o4MWtGU3A1NFgvUjB3RDREWnp0K21LWEVxSCtjUGdEZ1dn?=
+ =?utf-8?B?bk9UeDBwUUR3YnBVSWk2WFRsM0lTNFFaSmJiMWRSQUtZUkR1WjNlUk1DSTIz?=
+ =?utf-8?B?YTFnMm50dzBjRDN0Wkp5ZUhjalBycVVKdE5kK21BWVE5MUJMZ05HbGhER1U3?=
+ =?utf-8?B?Kzl1KzhXZFlmdjNOck4xN3V3bmE5cEFiVkVQVmpWNUpHbGpNMm9QckxDUXRx?=
+ =?utf-8?B?bWZzOC9FRkk2enkrNS93c1ZZWWZFR3p2VkorOEh5RDZGbzZmdkx1eFBuZU5u?=
+ =?utf-8?B?d2lGUExhQ0tWVjFvRnl3cHpoVS9vNVY3OEpseE1UYk5OVW1XcXJRbjlRbnZ5?=
+ =?utf-8?B?RitBTmw2RHE3YnFGdlJRMlc5bVN6L0ZqZE1qc29XNDc1RDZvcnhHV0NTS1dX?=
+ =?utf-8?B?SS9mUkFDMytKMGR1TGI2R1ZybnE2b0lhYllwSHdBendYU2FXS3A5bzdXdnA2?=
+ =?utf-8?B?TkVyeFhYTUw5aWMxS1A3TzBNT2pCajZKMGprazkwNWFWNU9mMy8yc0l1M2xW?=
+ =?utf-8?B?dDIyZUZIUldMcHdmMXdPNkVTaSt6TmdUcXB6cW5xcFpMM0ZHdUwwRUthRkxY?=
+ =?utf-8?B?bEN6TUdRbkpYQXgvNVJnMWJuWEhVTUIvRnRZR3dVQklOK0NieDQveXdMUDE2?=
+ =?utf-8?B?NHM3WWRsOWt0NGsxM3R5RlBOSldhdVhEYVZRQy9Td1BTcUNUaVFvRGJKUFBV?=
+ =?utf-8?B?SWZIVVMxc1E4UHJNRWkrWlM3MEdlSUl1TkU1ZGJGd0QxcFE4d2xSUXlJR0dO?=
+ =?utf-8?B?WGpXWUxrTHdnTTZTTXJMMEpzaU5QRi93VkI4bWtnRHV2VFppYzA5SS9FWTRV?=
+ =?utf-8?B?WXo2b0lIU3ovNDhXaU9OMktxak90WjNHZ1YwSGRBUHA1NkJKWXRPL2FMU1Vi?=
+ =?utf-8?B?aFE9PQ==?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-Network-Message-Id: a316acff-5381-4344-3828-08db6b1ebf52
 X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc33f372-2baf-4832-62f3-08db6b1e33d1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2023 08:22:46.5407
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 08:26:40.7811
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qovH7UC3DUhkqzMijpmxa8ZbaxvB+IHguqoniz/bnT6KaAuU1Twm2W2mwwofxZQFEEsQ/dJjfrqe/3MmIVNw8dFaNXmw1Wh+hgliYaqDplg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7595
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sFAQJ6fwvfcHK3ZggkZE+kvPbr/mOfoPqH03rr5aiiJ8yPBdq7ECcw478Up/MW87cWa/tHecg9SetpZ1wRnh1+W4wJ1IEi60AHMm1Spr6Ok=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9429
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+From: Victoria Milhoan <vicki.milhoan@freescale.com>
 
+Adjust RNG timing parameters to support more i.MX6 devices.
 
-Because of CRYPTO_ALG_ALLOCATES_MEMORY flag, caam algorithms are currently =
-been skipped by dm-crypt, and we want to enable dm-crypt caam offload suppo=
-rt.
-As per earlier discussions, we are pre-allocating memory for 4 S/G entries =
-and, if needed, extra memory will be allocated at runtime.
+Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
+Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/ctrl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I suggest, we should update the documentation of CRYPTO_ALG_ALLOCATES_MEMOR=
-Y with above information.
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 5fed3cf354c0..62dd069942e4 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -383,8 +383,8 @@ static void kick_trng(struct device *dev, int ent_delay)
+ 	wr_reg32(&r4tst->rtsdctl, val);
+ 	/* min. freq. count, equal to 1/4 of the entropy sample length */
+ 	wr_reg32(&r4tst->rtfrqmin, ent_delay >> 2);
+-	/* disable maximum frequency count */
+-	wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
++	/* max. freq. count, equal to 16 times the entropy sample length */
++	wr_reg32(&r4tst->rtfrqmax, ent_delay << 4);
+ 	/* read the control register */
+ 	val = rd_reg32(&r4tst->rtmctl);
+ start_rng:
+-- 
+2.25.1
 
-Thanks,
-Meenakshi
-
-> -----Original Message-----
-> From: Eric Biggers <ebiggers@kernel.org>
-> Sent: Saturday, June 10, 2023 7:49 AM
-> To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Cc: Horia Geanta <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>;
-> Pankaj Gupta <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
-> herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Iuliana Prodan
-> <iuliana.prodan@nxp.com>
-> Subject: Re: [PATCH v2 1/5] crypto:caam - avoid allocating memory at cryp=
-to
-> request runtime for skcipher
->
-> On Fri, Jun 09, 2023 at 12:38:38PM +0200, meenakshi.aggarwal@nxp.com
-> wrote:
-> > If the driver needs more than the 4 entries maximum, the memory is
-> > dynamically allocated, at runtime.
->
-> Again, this is not currently allowed.  Please see my comment on v1:
-> https://lore.kern/
-> el.org%2Flinux-
-> crypto%2F20230523165503.GA864814%40google.com&data=3D05%7C01%7Cmee
-> nakshi.aggarwal%40nxp.com%7Cfb75f9f6a37346e27eef08db695903a2%7C686
-> ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C638219603267394331%7CUn
-> known%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1
-> haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DENoae4C6pFeMAIn%2B
-> GVDqK%2F3PfwiqM0HEvFjjGMUepeo%3D&reserved=3D0
->
-> - Eric
