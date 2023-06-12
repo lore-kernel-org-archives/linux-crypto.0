@@ -2,188 +2,171 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B69C7EE2E
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 10:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DB4C7EE25
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 11:02:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236492AbjFLKCL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 06:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38330 "EHLO
+        id S237610AbjFLLCz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 07:02:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236514AbjFLKAK (ORCPT
+        with ESMTP id S237573AbjFLLC2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 06:00:10 -0400
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A54DE2717
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 02:43:46 -0700 (PDT)
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-33d63df7cd7so47126545ab.0
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 02:43:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686563026; x=1689155026;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fgWuun5672+ORe3ttQrL6TxxbK5Uws3qICHATbMGm/o=;
-        b=c7ScGNqbM1M3kRx+fbrZpzVrl3SesHQL3/ERKv3YhyeH9BvgvyPPiq8fqbhWEzHyjX
-         i/ubmYyv2cGWexKJFa/+G9Qc4ZPi1VykhapEvWWb0tFZY/DA5u2Q6EOrKARs1zYjs35r
-         wcNyCDebl1vZtSTc6Cri9rbMffhCs+bKH+3e7z8Ul/dk7o8f+kwgppkfGFO14gILgQz1
-         v7+0NnEcMH2wtQRSFRNb/TzYM3syRUibpEtbZ/HcoDcCQJy/dJ32nDOzN70U/2wvicJo
-         1ZOBT+cG+0QXThtamOfpjpVKzRNpuVy4xCFeXjVidTYLkQGvzhuUQ30n7X0VqXPtBKLH
-         990A==
-X-Gm-Message-State: AC+VfDwmObMsHt48fMnA7KMq30X6Im4c5g12TgIr6da1cbF34xoIOpdi
-        dtYIvzlgBtkGqzkmsw2sGe24wqH4vt4k0aZOnuBIO9UZjw4e
-X-Google-Smtp-Source: ACHHUZ6CzjZUI1p1eZ09tKwTgjz0mJ/wA5KXMzNddXs78re7fSkOCOH6JtddvvRetOkKurNc2eVgLt0uqCuAH2lQsxLKVy9oCUJ7
+        Mon, 12 Jun 2023 07:02:28 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24C45FCB;
+        Mon, 12 Jun 2023 03:49:54 -0700 (PDT)
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C2A291EC064A;
+        Mon, 12 Jun 2023 12:49:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1686566992;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=HNvNkDQEJ4NeFu80fh8zSTZwGO0VQ8+2hvqiV1HA19E=;
+        b=ECTZefKK401QeBWbC2TMZGv1HwZo6E/eF6Xf8qNHTCiodkyfOIAgHrznnvJfF4yDLLDbfR
+        uXqar2YSbZ3mBBO6eY0bPQFgPpAx5RVLUAsgD5qb0TR/nZlft64jdSauyTfRGw/kkZjlkO
+        qIT1tCwwAJ9hbkLilT4cwLex4Idpb1E=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1686566991; bh=HNvNkDQEJ4NeFu80fh8zSTZwGO0VQ8+2hvqiV1HA19E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fzHKlyoDn2jIjrFPn3fXdIOHGew1ihpJ24xw/CcJG3TkZy17Yg3oiu1bnMbVq84UW
+         iNgouJVqXUIlprpLNT6jEYqwuCdIR4UyBqN0LLeppXZ6Zxnf/1zACTaax6OG6HN9O2
+         SOE2iUm4kVIsIWVAczbvD2b+xCOwZVkRo6KUyMxDLpXHsntacFHeddLoi5YIQ/XDLs
+         lej+epOiS2/P6jDOdqpPgXhgQXBnG+ufX6pIjXgBsksfc0NJNmcQHl9YYln/2cU41g
+         BwAiPcgtmQmzsCKNNWrhLfI+dBIbWHN+bDNFEfTBC6xTLSbAI9b2Cdiggf9B1ORMWL
+         WjTHJQvMY5uFZKSwRvPshA4OqL2czb3UjBcE9IaoQJUll3BgtWGF8D8Ix6+9qEVZQj
+         xAR1Mr8SRBHTUk4+Jn8/VYxtmea7lne8vuliylnzJa2ix4PRv3555QkY4Hvs+LLTjy
+         3DoXoLVlqLVpANXROF0gAKgiqwfA9ogDG+BlQKffdEePFS5jp6nvtK+Srd3JAllsfS
+         EY8ZUaaDvnGrDN96o+2/qkjV80LcPe+uPdEknjnOeIF08vAiQJNKvstI9NTfFuAZwV
+         oi00rtkB+AXh/hoxZHwCf+p5d0ljHivaOc1IxQkNzAaerWb25Vebzd0C9E+NzEMbGn
+         n7bRmxX/yzDrVN55Z4Y0J6bU=
+Received: from zn.tnic (p200300EA971DC508329c23FFfEa6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c508:329c:23ff:fea6:a903])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id F1CD040E01E2;
+        Mon, 12 Jun 2023 10:49:11 +0000 (UTC)
+Date:   Mon, 12 Jun 2023 12:49:05 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com
+Subject: Re: [PATCH RFC v9 02/51] KVM: x86: Add gmem hook for invalidating
+ private memory
+Message-ID: <20230612104905.GOZIb4ISN9gj9lWYNv@fat_crate.local>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-3-michael.roth@amd.com>
 MIME-Version: 1.0
-X-Received: by 2002:a92:d0c3:0:b0:33b:a:3234 with SMTP id y3-20020a92d0c3000000b0033b000a3234mr3854150ila.5.1686563025889;
- Mon, 12 Jun 2023 02:43:45 -0700 (PDT)
-Date:   Mon, 12 Jun 2023 02:43:45 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000cb2c305fdeb8e30@google.com>
-Subject: [syzbot] [crypto?] general protection fault in cryptd_hash_export
-From:   syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230612042559.375660-3-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Sun, Jun 11, 2023 at 11:25:10PM -0500, Michael Roth wrote:
+> TODO: add a CONFIG option that can be to completely skip arch
+> invalidation loop and avoid __weak references for arch/platforms that
+> don't need an additional invalidation hook.
+> 
+> In some cases, like with SEV-SNP, guest memory needs to be updated in a
+> platform-specific manner before it can be safely freed back to the host.
+> Add hooks to wire up handling of this sort when freeing memory in
+> response to FALLOC_FL_PUNCH_HOLE operations.
+> 
+> Also issue invalidations of all allocated pages when releasing the gmem
+> file so that the pages are not left in an unusable state when they get
+> freed back to the host.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  1 +
+>  arch/x86/kvm/x86.c                 |  6 ++++
+>  include/linux/kvm_host.h           |  3 ++
+>  virt/kvm/guest_mem.c               | 48 ++++++++++++++++++++++++++++--
+>  5 files changed, 57 insertions(+), 2 deletions(-)
 
-syzbot found the following issue on:
+ld: arch/x86/kvm/../../../virt/kvm/eventfd.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/binary_stats.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/arch/x86/kvm/../../../virt/kvm/binary_stats.c:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/vfio.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/coalesced_mmio.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/async_pf.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/irqchip.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/dirty_ring.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/../../../virt/kvm/pfncache.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/x86.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/emulate.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/i8259.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/irq.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/lapic.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/i8254.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/ioapic.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/irq_comm.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/cpuid.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/pmu.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/mtrr.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/hyperv.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/debugfs.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/mmu/mmu.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/mmu/page_track.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/mmu/spte.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/mmu/tdp_iter.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/arch/x86/kvm/mmu/tdp_iter.c:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/mmu/tdp_mmu.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+ld: arch/x86/kvm/smm.o: in function `kvm_arch_gmem_invalidate':
+/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+make[3]: *** [scripts/Makefile.build:452: arch/x86/kvm/kvm.o] Error 1
+make[3]: *** Waiting for unfinished jobs....
+make[2]: *** [scripts/Makefile.build:494: arch/x86/kvm] Error 2
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [scripts/Makefile.build:494: arch/x86] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:2028: .] Error 2
 
-HEAD commit:    ded5c1a16ec6 Merge branch 'tools-ynl-gen-code-gen-improvem..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=104cdef1280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
-dashboard link: https://syzkaller.appspot.com/bug?extid=e79818f5c12416aba9de
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c6193b280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c7a795280000
+-- 
+Regards/Gruss,
+    Boris.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ffd66beb6784/disk-ded5c1a1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e7336ae5a7bf/vmlinux-ded5c1a1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/10ded02dc7e2/bzImage-ded5c1a1.xz
-
-The issue was bisected to:
-
-commit c662b043cdca89bf0f03fc37251000ac69a3a548
-Author: David Howells <dhowells@redhat.com>
-Date:   Tue Jun 6 13:08:56 2023 +0000
-
-    crypto: af_alg/hash: Support MSG_SPLICE_PAGES
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11cfc8d9280000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13cfc8d9280000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15cfc8d9280000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com
-Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
-
-general protection fault, probably for non-canonical address 0xdffffc0000000004: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-CPU: 1 PID: 5003 Comm: syz-executor195 Not tainted 6.4.0-rc5-syzkaller-00929-gded5c1a16ec6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
-RIP: 0010:crypto_shash_alg include/crypto/hash.h:827 [inline]
-RIP: 0010:crypto_shash_export include/crypto/hash.h:956 [inline]
-RIP: 0010:cryptd_hash_export+0x47/0xa0 crypto/cryptd.c:636
-Code: 00 fc ff df 4c 89 e2 48 c1 ea 03 80 3c 02 00 75 4e 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 60 48 8d 7b 20 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 40 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 20 48 8d
-RSP: 0018:ffffc90003acfd48 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000004 RSI: ffffffff83e46723 RDI: 0000000000000020
-RBP: ffff888015a96528 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: ffffffff81d71db5 R12: ffff88802945bb08
-R13: 0000000000000001 R14: ffff88801aba6000 R15: ffff8880220c1648
-FS:  0000555556eb3300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020004e80 CR3: 0000000076861000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- crypto_ahash_export include/crypto/hash.h:523 [inline]
- hash_accept+0x229/0x670 crypto/algif_hash.c:286
- do_accept+0x380/0x510 net/socket.c:1871
- __sys_accept4_file net/socket.c:1912 [inline]
- __sys_accept4+0x9a/0x120 net/socket.c:1942
- __do_sys_accept4 net/socket.c:1953 [inline]
- __se_sys_accept4 net/socket.c:1950 [inline]
- __x64_sys_accept4+0x97/0x100 net/socket.c:1950
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f6a9d4eac09
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff241f3198 EFLAGS: 00000246 ORIG_RAX: 0000000000000120
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f6a9d4eac09
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
-RBP: 00007f6a9d4aedb0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f6a9d4aee40
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:crypto_shash_alg include/crypto/hash.h:827 [inline]
-RIP: 0010:crypto_shash_export include/crypto/hash.h:956 [inline]
-RIP: 0010:cryptd_hash_export+0x47/0xa0 crypto/cryptd.c:636
-Code: 00 fc ff df 4c 89 e2 48 c1 ea 03 80 3c 02 00 75 4e 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 60 48 8d 7b 20 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 40 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 20 48 8d
-RSP: 0018:ffffc90003acfd48 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000004 RSI: ffffffff83e46723 RDI: 0000000000000020
-RBP: ffff888015a96528 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: ffffffff81d71db5 R12: ffff88802945bb08
-R13: 0000000000000001 R14: ffff88801aba6000 R15: ffff8880220c1648
-FS:  0000555556eb3300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555a4edc6008 CR3: 0000000076861000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess), 3 bytes skipped:
-   0:	df 4c 89 e2          	fisttps -0x1e(%rcx,%rcx,4)
-   4:	48 c1 ea 03          	shr    $0x3,%rdx
-   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   c:	75 4e                	jne    0x5c
-   e:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  15:	fc ff df
-  18:	48 8b 5b 60          	mov    0x60(%rbx),%rbx
-  1c:	48 8d 7b 20          	lea    0x20(%rbx),%rdi
-  20:	48 89 fa             	mov    %rdi,%rdx
-  23:	48 c1 ea 03          	shr    $0x3,%rdx
-* 27:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2b:	75 40                	jne    0x6d
-  2d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  34:	fc ff df
-  37:	48 8b 5b 20          	mov    0x20(%rbx),%rbx
-  3b:	48                   	rex.W
-  3c:	8d                   	.byte 0x8d
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+https://people.kernel.org/tglx/notes-about-netiquette
