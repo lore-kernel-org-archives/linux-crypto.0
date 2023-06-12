@@ -2,97 +2,86 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B876EC7EE2F
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 14:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B59C7EE2F
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 15:34:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236015AbjFLOqT convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 10:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56282 "EHLO
+        id S235724AbjFLPeH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 11:34:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235508AbjFLOqT (ORCPT
+        with ESMTP id S234742AbjFLPeG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 10:46:19 -0400
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766F193;
-        Mon, 12 Jun 2023 07:46:14 -0700 (PDT)
-Received: from i53875b22.versanet.de ([83.135.91.34] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1q8inu-0003G3-9v; Mon, 12 Jun 2023 16:45:58 +0200
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     Eric Biggers <ebiggers@kernel.org>, christoph.muellner@vrull.eu
-Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
-        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, conor.dooley@microchip.com,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 4/4] RISC-V: crypto: add accelerated GCM GHASH implementation
-Date:   Mon, 12 Jun 2023 16:45:57 +0200
-Message-ID: <3745175.MHq7AAxBmi@diego>
-In-Reply-To: <45936818.fMDQidcC6G@diego>
-References: <20230329140642.2186644-1-heiko.stuebner@vrull.eu> <2102949.OBFZWjSADL@diego>
- <45936818.fMDQidcC6G@diego>
+        Mon, 12 Jun 2023 11:34:06 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191AB10C4;
+        Mon, 12 Jun 2023 08:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686584046; x=1718120046;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aLoW+RYLTRsrvR/PqFvoPQqxIv0H+SWrGX2+1z5WjgE=;
+  b=NTTDv1t92cXWMb2TiPJPz0H+53E+HP53JI2x0EHBWsuGL8Xmo7l1wmgJ
+   LBWkg1VQUcMQWSaPORFEq2pzm8vyuNrWc+Nk/AoeFEWWia0sCRlLkA9gS
+   h8kd+mNFRyHAGqb9nIULbZT28vwGcaUo/IB1NpWUkcmf9weLE9JbPlEEK
+   BBU57gq4ywjHKjqjHrOO810TpxSqcugcNXPq72M8EtUfXWSV44N4SPFWQ
+   6JcdrpenBYf5llq5ONpPU+ZBKgvRvkNkiQkVzzbdf+xRPUZmGgjgvFyv+
+   RxEaSG829HkL4nAbFGxy6F1+EsKiqjz157X3Hl41HC7bExsU/DLwaNAwF
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="358073199"
+X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
+   d="scan'208";a="358073199"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 08:34:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10739"; a="801061441"
+X-IronPort-AV: E=Sophos;i="6.00,236,1681196400"; 
+   d="scan'208";a="801061441"
+Received: from spmantha-mobl1.amr.corp.intel.com (HELO [10.209.43.2]) ([10.209.43.2])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2023 08:34:02 -0700
+Message-ID: <12f95b38-427c-6810-373a-ba2062c43882@intel.com>
+Date:   Mon, 12 Jun 2023 08:34:02 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="iso-8859-1"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP initialization
+ support
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-8-michael.roth@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230612042559.375660-8-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 5. April 2023, 17:04:57 CEST schrieb Heiko Stübner:
-> Hi again,
-> 
-> Am Mittwoch, 29. März 2023, 21:20:21 CEST schrieb Heiko Stübner:
-> > Am Mittwoch, 29. März 2023, 20:37:16 CEST schrieb Eric Biggers:
-> > > On Wed, Mar 29, 2023 at 04:06:42PM +0200, Heiko Stuebner wrote:
-> > > > diff --git a/arch/riscv/crypto/ghash-riscv64-zbc.pl b/arch/riscv/crypto/ghash-riscv64-zbc.pl
-> > > > new file mode 100644
-> > > > index 000000000000..691231ffa11c
-> > > > --- /dev/null
-> > > > +++ b/arch/riscv/crypto/ghash-riscv64-zbc.pl
-> > > > @@ -0,0 +1,400 @@
-> > > > +#! /usr/bin/env perl
-> > > > +# Copyright 2022 The OpenSSL Project Authors. All Rights Reserved.
-> > > > +#
-> > > > +# Licensed under the Apache License 2.0 (the "License").  You may not use
-> > > > +# this file except in compliance with the License.  You can obtain a copy
-> > > > +# in the file LICENSE in the source distribution or at
-> > > > +# https://www.openssl.org/source/license.html
-> > > 
-> > > My understanding is that code that is licensed under (only) the Apache License
-> > > 2.0 cannot be included in GPLv2 programs such as the Linux kernel.
-> > 
-> > Thanks a lot for pointing out that possible licensing issue.
-> > It seems I'm not touching enough non-GPL code most days to keep that
-> > in the front of my mind :-) .
-> > 
-> > 
-> > > Is this code written by Andy Polyakov?  What's been done in the past for his
-> > > code is that he re-releases it in CRYPTOGAMS at
-> > > https://github.com/dot-asm/cryptogams with a Linux kernel compatible license.
-> > > The Linux kernel then takes the code from there instead of from OpenSSL.
-> > 
-> > The git log for the original openssl ".pl" thankfully only contains
-> > @vrull.eu addresses, so getting this in a compatible license shouldn't be
-> > overly hard - I hope.
-> 
-> just to follow up with the current state.
-> 
-> We're currently trying to see if openSSL allows us to dual-license the
-> files inside openssl itself [0]. It looks a bit like we're the first to
-> try something like this, so the decision gets to be made by the OMC.
+On 6/11/23 21:25, Michael Roth wrote:
+> +	/*
+> +	 * Calculate the amount the memory that must be reserved by the BIOS to
+> +	 * address the whole RAM, including the bookkeeping area. The RMP itself
+> +	 * must also be covered.
+> +	 */
+> +	max_rmp_pfn = max_pfn;
+> +	if (PHYS_PFN(rmp_end) > max_pfn)
+> +		max_rmp_pfn = PHYS_PFN(rmp_end);
 
-Openssl merged the dual-licensing approach.
-So we get Apache + BSD licensed code which should be ok to simply merge
-over without needing additional repositories and also allows to import
-future improvements on the openssl side.
-
-
-> [0] https://github.com/openssl/openssl/pull/20649
-
-
-
-
+Could you say a little here about how this deals with memory hotplug?
 
