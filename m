@@ -2,45 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7A7C7EE45
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 09:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B69C7EE2E
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 10:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229528AbjFLJ7Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 05:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37004 "EHLO
+        id S236492AbjFLKCL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 06:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234942AbjFLJ5L (ORCPT
+        with ESMTP id S236514AbjFLKAK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 05:57:11 -0400
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A2D1BE9
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 02:42:00 -0700 (PDT)
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-77accdaa0e0so403672639f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 02:42:00 -0700 (PDT)
+        Mon, 12 Jun 2023 06:00:10 -0400
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A54DE2717
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 02:43:46 -0700 (PDT)
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-33d63df7cd7so47126545ab.0
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Jun 2023 02:43:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686562920; x=1689154920;
+        d=1e100.net; s=20221208; t=1686563026; x=1689155026;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=07KNzP3E6i3EPVULFtSRa0Vyl0F6K8FPQdxwSoWudsk=;
-        b=X9J6NXCNhosR9GchjWmTycnHPXGVDimJBhYrEosE2CGAz1BBgc1kBGvFYiN0SiciaR
-         YO5F5NAaNl/cI5lOnHehd9ezxS8me6U7ZfLhfzsb8JPsMman/QEYRGTwSfuYIe5e528q
-         nUqb/6m5ZDqxtDiX/2vp0qT03ghtNlW69q0C//m7P8+kM9hAiWy7lqFW4kQnc+Y5GQBe
-         cSi/0nyr9oMt7KD7DnlY16ndgQKBgSPClnUWlenZ9V1IdQGVFhrQi8NmuMK7znp51F5e
-         THWB2hhIsH31aBo6HeBsL1qZoJtLKlC7eBnJT2rdha0df3bF9yIxRYqZzFaGOyADdIqa
-         oltw==
-X-Gm-Message-State: AC+VfDzo+DgVKFCdFzfU+7Z0Vqz/Q3bLOfOPRstwy+gyJxvNbvidR4+m
-        ooxTBT9QdF8NdQoH7OL0B/EK58JmnV4hwx+FwcTRTPE9xpjo
-X-Google-Smtp-Source: ACHHUZ4Wset5wfbLTe3ritPtC+ON4nHU063N7X4sRf4uEZS8JMKZBYfgUE+nJPVRPe+A/oFwWu+MlciBZ1Dt2No0OoumITHzU0Gs
+        bh=fgWuun5672+ORe3ttQrL6TxxbK5Uws3qICHATbMGm/o=;
+        b=c7ScGNqbM1M3kRx+fbrZpzVrl3SesHQL3/ERKv3YhyeH9BvgvyPPiq8fqbhWEzHyjX
+         i/ubmYyv2cGWexKJFa/+G9Qc4ZPi1VykhapEvWWb0tFZY/DA5u2Q6EOrKARs1zYjs35r
+         wcNyCDebl1vZtSTc6Cri9rbMffhCs+bKH+3e7z8Ul/dk7o8f+kwgppkfGFO14gILgQz1
+         v7+0NnEcMH2wtQRSFRNb/TzYM3syRUibpEtbZ/HcoDcCQJy/dJ32nDOzN70U/2wvicJo
+         1ZOBT+cG+0QXThtamOfpjpVKzRNpuVy4xCFeXjVidTYLkQGvzhuUQ30n7X0VqXPtBKLH
+         990A==
+X-Gm-Message-State: AC+VfDwmObMsHt48fMnA7KMq30X6Im4c5g12TgIr6da1cbF34xoIOpdi
+        dtYIvzlgBtkGqzkmsw2sGe24wqH4vt4k0aZOnuBIO9UZjw4e
+X-Google-Smtp-Source: ACHHUZ6CzjZUI1p1eZ09tKwTgjz0mJ/wA5KXMzNddXs78re7fSkOCOH6JtddvvRetOkKurNc2eVgLt0uqCuAH2lQsxLKVy9oCUJ7
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:110a:b0:420:cdb2:a6cc with SMTP id
- n10-20020a056638110a00b00420cdb2a6ccmr3389707jal.3.1686562919988; Mon, 12 Jun
- 2023 02:41:59 -0700 (PDT)
-Date:   Mon, 12 Jun 2023 02:41:59 -0700
+X-Received: by 2002:a92:d0c3:0:b0:33b:a:3234 with SMTP id y3-20020a92d0c3000000b0033b000a3234mr3854150ila.5.1686563025889;
+ Mon, 12 Jun 2023 02:43:45 -0700 (PDT)
+Date:   Mon, 12 Jun 2023 02:43:45 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bcca3205fdeb87fb@google.com>
-Subject: [syzbot] [crypto?] general protection fault in crypto_shash_finup
-From:   syzbot <syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com>
+Message-ID: <0000000000000cb2c305fdeb8e30@google.com>
+Subject: [syzbot] [crypto?] general protection fault in cryptd_hash_export
+From:   syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
 To:     davem@davemloft.net, dhowells@redhat.com,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
@@ -54,19 +53,19 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    e431e712c836 Merge branch 'sfc-tc-encap-actions-offload'
+HEAD commit:    ded5c1a16ec6 Merge branch 'tools-ynl-gen-code-gen-improvem..
 git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17e7771b280000
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=104cdef1280000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
-dashboard link: https://syzkaller.appspot.com/bug?extid=4e2e47f32607d0f72d43
+dashboard link: https://syzkaller.appspot.com/bug?extid=e79818f5c12416aba9de
 compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12610c75280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171cdef1280000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c6193b280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c7a795280000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/35e2db144233/disk-e431e712.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ecf37a1cef2c/vmlinux-e431e712.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a3da92090562/bzImage-e431e712.xz
+disk image: https://storage.googleapis.com/syzbot-assets/ffd66beb6784/disk-ded5c1a1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e7336ae5a7bf/vmlinux-ded5c1a1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/10ded02dc7e2/bzImage-ded5c1a1.xz
 
 The issue was bisected to:
 
@@ -76,77 +75,91 @@ Date:   Tue Jun 6 13:08:56 2023 +0000
 
     crypto: af_alg/hash: Support MSG_SPLICE_PAGES
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12392407280000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11392407280000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16392407280000
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11cfc8d9280000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13cfc8d9280000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15cfc8d9280000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
+Reported-by: syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com
 Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
 
 general protection fault, probably for non-canonical address 0xdffffc0000000004: 0000 [#1] PREEMPT SMP KASAN
 KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-CPU: 0 PID: 9 Comm: kworker/0:1 Not tainted 6.4.0-rc5-syzkaller-01107-ge431e712c836 #0
+CPU: 1 PID: 5003 Comm: syz-executor195 Not tainted 6.4.0-rc5-syzkaller-00929-gded5c1a16ec6 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
-Workqueue: cryptd cryptd_queue_worker
 RIP: 0010:crypto_shash_alg include/crypto/hash.h:827 [inline]
-RIP: 0010:crypto_shash_finup+0x53/0x160 crypto/shash.c:198
-Code: fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 05 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b 5d 00 48 8d 7b 20 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b
-RSP: 0018:ffffc900000e7ba0 EFLAGS: 00010202
+RIP: 0010:crypto_shash_export include/crypto/hash.h:956 [inline]
+RIP: 0010:cryptd_hash_export+0x47/0xa0 crypto/cryptd.c:636
+Code: 00 fc ff df 4c 89 e2 48 c1 ea 03 80 3c 02 00 75 4e 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 60 48 8d 7b 20 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 40 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 20 48 8d
+RSP: 0018:ffffc90003acfd48 EFLAGS: 00010202
 RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000004 RSI: ffffffff83df35bf RDI: 0000000000000020
-RBP: ffff888028350b08 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 1ffffffff218470c R12: ffff8880123fa1c0
-R13: ffff888029582ac8 R14: 0000000000000014 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+RDX: 0000000000000004 RSI: ffffffff83e46723 RDI: 0000000000000020
+RBP: ffff888015a96528 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: ffffffff81d71db5 R12: ffff88802945bb08
+R13: 0000000000000001 R14: ffff88801aba6000 R15: ffff8880220c1648
+FS:  0000555556eb3300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f251034e440 CR3: 000000007cc84000 CR4: 00000000003506f0
+CR2: 0000000020004e80 CR3: 0000000076861000 CR4: 00000000003506e0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- shash_ahash_finup+0xdf/0x3a0 crypto/shash.c:333
- cryptd_hash_finup+0xce/0x120 crypto/cryptd.c:597
- crypto_request_complete include/crypto/algapi.h:272 [inline]
- cryptd_queue_worker+0x130/0x1d0 crypto/cryptd.c:181
- process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
- kthread+0x344/0x440 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ crypto_ahash_export include/crypto/hash.h:523 [inline]
+ hash_accept+0x229/0x670 crypto/algif_hash.c:286
+ do_accept+0x380/0x510 net/socket.c:1871
+ __sys_accept4_file net/socket.c:1912 [inline]
+ __sys_accept4+0x9a/0x120 net/socket.c:1942
+ __do_sys_accept4 net/socket.c:1953 [inline]
+ __se_sys_accept4 net/socket.c:1950 [inline]
+ __x64_sys_accept4+0x97/0x100 net/socket.c:1950
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f6a9d4eac09
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff241f3198 EFLAGS: 00000246 ORIG_RAX: 0000000000000120
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f6a9d4eac09
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00007f6a9d4aedb0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f6a9d4aee40
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
  </TASK>
 Modules linked in:
 ---[ end trace 0000000000000000 ]---
 RIP: 0010:crypto_shash_alg include/crypto/hash.h:827 [inline]
-RIP: 0010:crypto_shash_finup+0x53/0x160 crypto/shash.c:198
-Code: fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 05 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b 5d 00 48 8d 7b 20 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b
-RSP: 0018:ffffc900000e7ba0 EFLAGS: 00010202
+RIP: 0010:crypto_shash_export include/crypto/hash.h:956 [inline]
+RIP: 0010:cryptd_hash_export+0x47/0xa0 crypto/cryptd.c:636
+Code: 00 fc ff df 4c 89 e2 48 c1 ea 03 80 3c 02 00 75 4e 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 60 48 8d 7b 20 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 40 48 b8 00 00 00 00 00 fc ff df 48 8b 5b 20 48 8d
+RSP: 0018:ffffc90003acfd48 EFLAGS: 00010202
 RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000004 RSI: ffffffff83df35bf RDI: 0000000000000020
-RBP: ffff888028350b08 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 1ffffffff218470c R12: ffff8880123fa1c0
-R13: ffff888029582ac8 R14: 0000000000000014 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+RDX: 0000000000000004 RSI: ffffffff83e46723 RDI: 0000000000000020
+RBP: ffff888015a96528 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: ffffffff81d71db5 R12: ffff88802945bb08
+R13: 0000000000000001 R14: ffff88801aba6000 R15: ffff8880220c1648
+FS:  0000555556eb3300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f251034e440 CR3: 000000002aa8e000 CR4: 00000000003506f0
+CR2: 0000555a4edc6008 CR3: 0000000076861000 CR4: 00000000003506f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 ----------------
 Code disassembly (best guess), 3 bytes skipped:
-   0:	48 c1 ea 03          	shr    $0x3,%rdx
-   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   8:	0f 85 05 01 00 00    	jne    0x113
+   0:	df 4c 89 e2          	fisttps -0x1e(%rcx,%rcx,4)
+   4:	48 c1 ea 03          	shr    $0x3,%rdx
+   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   c:	75 4e                	jne    0x5c
    e:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
   15:	fc ff df
-  18:	48 8b 5d 00          	mov    0x0(%rbp),%rbx
+  18:	48 8b 5b 60          	mov    0x60(%rbx),%rbx
   1c:	48 8d 7b 20          	lea    0x20(%rbx),%rdi
   20:	48 89 fa             	mov    %rdi,%rdx
   23:	48 c1 ea 03          	shr    $0x3,%rdx
 * 27:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2b:	0f 85 d8 00 00 00    	jne    0x109
-  31:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  38:	fc ff df
-  3b:	4c                   	rex.WR
-  3c:	8b                   	.byte 0x8b
+  2b:	75 40                	jne    0x6d
+  2d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  34:	fc ff df
+  37:	48 8b 5b 20          	mov    0x20(%rbx),%rbx
+  3b:	48                   	rex.W
+  3c:	8d                   	.byte 0x8d
 
 
 ---
