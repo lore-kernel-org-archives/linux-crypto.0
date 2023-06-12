@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C656CCA466
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 21:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6944FCCA46B
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 21:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232304AbjFLVI3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 17:08:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58042 "EHLO
+        id S237637AbjFLVIb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 17:08:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238260AbjFLVHz (ORCPT
+        with ESMTP id S238277AbjFLVHz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 12 Jun 2023 17:07:55 -0400
 Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36C112A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C350698;
         Mon, 12 Jun 2023 14:05:01 -0700 (PDT)
 Received: from i53875b22.versanet.de ([83.135.91.34] helo=phil.lan)
         by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <heiko@sntech.de>)
-        id 1q8oib-0005fR-NU; Mon, 12 Jun 2023 23:04:53 +0200
+        id 1q8oia-0005fR-KP; Mon, 12 Jun 2023 23:04:52 +0200
 From:   Heiko Stuebner <heiko@sntech.de>
 To:     palmer@dabbelt.com, paul.walmsley@sifive.com
 Cc:     heiko@sntech.de, aou@eecs.berkeley.edu,
@@ -28,13 +28,12 @@ Cc:     heiko@sntech.de, aou@eecs.berkeley.edu,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         christoph.muellner@vrull.eu,
         Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: [PATCH v5 2/4] RISC-V: add Zbkb extension detection
-Date:   Mon, 12 Jun 2023 23:04:40 +0200
-Message-Id: <20230612210442.1805962-3-heiko.stuebner@vrull.eu>
+Subject: [PATCH v5 0/4] Implement GCM ghash using Zbc and Zbkb extensions
+Date:   Mon, 12 Jun 2023 23:04:38 +0200
+Message-Id: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
-References: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -42,60 +41,65 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-Add detection for Zbkb extension.
+This was originally part of my vector crypto series, but was part
+of a separate openssl merge request implementing GCM ghash as using
+non-vector extensions.
 
-Zbkb is part of the set of scalar cryptography extensions and provides
-bitmanip instructions for cryptography, with them being a "subset of the
-Zbb extension particularly useful for cryptography".
+As that pull-request
+    https://github.com/openssl/openssl/pull/20078
+got merged recently into openssl, we could also check if this could
+go into the kernel as well and provide a base for further accelerated
+cryptographic support.
 
-Zbkb was ratified in january 2022.
+Changes in v5:
+- rebased on top of 6.4-based riscv/next
+- code from openssl is now dual-licensed under Apache + BSD
+  see https://github.com/openssl/openssl/pull/20649
+- separate init functions instead of creating them with macros (Nathan)
 
-Expect code using the extension to pre-encode zbkb instructions, so
-don't introduce special toolchain requirements for now.
+Changes in v4:
+- rebase on top of riscv/for-next
+- split out the scalar crypto implementation from the vector series
+- refresh code from openSSL to match exactly
+- Remove RFC label, as Zbc and Zbkb are ratified and
+  the cryptographic code was merged into openSSL
 
-Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
----
- arch/riscv/include/asm/hwcap.h | 1 +
- arch/riscv/kernel/cpu.c        | 1 +
- arch/riscv/kernel/cpufeature.c | 1 +
- 3 files changed, 3 insertions(+)
+changes in v3:
+- rebase on top of 6.3-rc2
+- rebase on top of vector-v14 patchset
+- add the missing Co-developed-by mentions to showcase
+  the people that did the actual openSSL crypto code
 
-diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-index e48ac52b9174..3d4820648a14 100644
---- a/arch/riscv/include/asm/hwcap.h
-+++ b/arch/riscv/include/asm/hwcap.h
-@@ -48,6 +48,7 @@
- #define RISCV_ISA_EXT_SMAIA		35
- #define RISCV_ISA_EXT_SSAIA		36
- #define RISCV_ISA_EXT_ZBC		37
-+#define RISCV_ISA_EXT_ZBKB		38
- 
- #define RISCV_ISA_EXT_MAX		64
- #define RISCV_ISA_EXT_NAME_LEN_MAX	32
-diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-index bbff98d4712a..a4ee61c18578 100644
---- a/arch/riscv/kernel/cpu.c
-+++ b/arch/riscv/kernel/cpu.c
-@@ -188,6 +188,7 @@ static struct riscv_isa_ext_data isa_ext_arr[] = {
- 	__RISCV_ISA_EXT_DATA(zicboz, RISCV_ISA_EXT_ZICBOZ),
- 	__RISCV_ISA_EXT_DATA(zihintpause, RISCV_ISA_EXT_ZIHINTPAUSE),
- 	__RISCV_ISA_EXT_DATA(zbb, RISCV_ISA_EXT_ZBB),
-+	__RISCV_ISA_EXT_DATA(zbkb, RISCV_ISA_EXT_ZBKB),
- 	__RISCV_ISA_EXT_DATA(zbc, RISCV_ISA_EXT_ZBC),
- 	__RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
- 	__RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
-diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index f46281f1e439..fceec9c60e07 100644
---- a/arch/riscv/kernel/cpufeature.c
-+++ b/arch/riscv/kernel/cpufeature.c
-@@ -262,6 +262,7 @@ void __init riscv_fill_hwcap(void)
- 				SET_ISA_EXT_MAP("svpbmt", RISCV_ISA_EXT_SVPBMT);
- 				SET_ISA_EXT_MAP("zbb", RISCV_ISA_EXT_ZBB);
- 				SET_ISA_EXT_MAP("zbc", RISCV_ISA_EXT_ZBC);
-+				SET_ISA_EXT_MAP("zbkb", RISCV_ISA_EXT_ZBKB);
- 				SET_ISA_EXT_MAP("zicbom", RISCV_ISA_EXT_ZICBOM);
- 				SET_ISA_EXT_MAP("zicboz", RISCV_ISA_EXT_ZICBOZ);
- 				SET_ISA_EXT_MAP("zihintpause", RISCV_ISA_EXT_ZIHINTPAUSE);
+changes in v2:
+- rebased on 6.2 + zbb series, so don't include already
+  applied changes anymore
+- refresh code picked from openssl as that side matures
+- more algorithms (SHA512, AES, SM3, SM4)
+
+Heiko Stuebner (4):
+  RISC-V: add Zbc extension detection
+  RISC-V: add Zbkb extension detection
+  RISC-V: hook new crypto subdir into build-system
+  RISC-V: crypto: add accelerated GCM GHASH implementation
+
+ arch/riscv/Kbuild                      |   1 +
+ arch/riscv/Kconfig                     |  22 ++
+ arch/riscv/crypto/Kconfig              |  18 ++
+ arch/riscv/crypto/Makefile             |  18 ++
+ arch/riscv/crypto/ghash-riscv64-glue.c | 296 +++++++++++++++++
+ arch/riscv/crypto/ghash-riscv64-zbc.pl | 427 +++++++++++++++++++++++++
+ arch/riscv/crypto/riscv.pm             | 258 +++++++++++++++
+ arch/riscv/include/asm/hwcap.h         |   2 +
+ arch/riscv/kernel/cpu.c                |   2 +
+ arch/riscv/kernel/cpufeature.c         |   2 +
+ crypto/Kconfig                         |   3 +
+ 11 files changed, 1049 insertions(+)
+ create mode 100644 arch/riscv/crypto/Kconfig
+ create mode 100644 arch/riscv/crypto/Makefile
+ create mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/ghash-riscv64-zbc.pl
+ create mode 100644 arch/riscv/crypto/riscv.pm
+
 -- 
 2.39.0
 
