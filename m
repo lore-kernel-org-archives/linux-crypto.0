@@ -2,93 +2,290 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15995C77B7A
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Jun 2023 14:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F09C7EE23
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Jun 2023 04:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbjFKO4N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Jun 2023 10:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46612 "EHLO
+        id S233172AbjFLE1E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 00:27:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbjFKO4M (ORCPT
+        with ESMTP id S229455AbjFLE1C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Jun 2023 10:56:12 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAC1E73;
-        Sun, 11 Jun 2023 07:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=VHU0yG0KLgt9xY3b0m4xhDK4rKy+IHw9tgVCdD4Sx3M=; b=aIcmsvIN74KslwL3J9xVs9MAjH
-        9eMcXgSyocY4T0W1TzRlTides174S6JKaplLpy2Ugm5XlGAcEj4GpPSKIcGryZDrCYUkFRn7Q00/x
-        yCbknDyDShIsoagOJQJAlvV02jHJdPpkXgaSs+7G6g0B68CNxLjb3ez8yvYRS2cjSBSFq+reHj49W
-        5ertz3/GNdWsnOau5ZivUKAV4kPbFhZfYmWAtyXj9MX5g3lUTISXV0xicCpSA5QOAe5L8OfRNGZzf
-        pgXvuddRw3GfwomZ/MBb0Rse9pGJ3W/GvZsFZhHfBvB5ef1H8zA0vC56rUngi+ndDBCSDD9GrYZGW
-        eZiw0NSA==;
-Received: from [2601:1c2:980:9ec0::2764]
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8MU9-001Aag-2D;
-        Sun, 11 Jun 2023 14:56:05 +0000
-Message-ID: <1c00f4aa-e696-a071-68a7-cdd62d8ba894@infradead.org>
-Date:   Sun, 11 Jun 2023 07:56:03 -0700
+        Mon, 12 Jun 2023 00:27:02 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2059.outbound.protection.outlook.com [40.107.212.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76F6510A;
+        Sun, 11 Jun 2023 21:26:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BIG4ldRGetGcHHgn5DhjUD5JrTINL0kA4DtdJ7uu4HR58y1LBpLx/BFHt5N6zhbimhS1Prw1I6tKam6nKylAEgh6QcVnEqeEPisJoJYMPzNzmZ2ZD/XcyP8R8wiJi2KkmszntrUYeDNQ5ZQCmsv+v1O68PqOeYp5DbUxx0Bq2JVVWOQDC7XAT0visrLqsOiVuRr/qBAJHmZpI3Qsx+cCwGa1D9hv/GGhljAEbd672UTTmYZQzbcnlOm2n/lKenkFl1IQzB1vlRhuroQofV3dDtULaADBEf8ufTuiyIQei1jZtSwA3DOKpwhOovxNzCSWDXOLdbrgItgzO+odUVpVMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WlfUBo/FyI8IPg/IWyuoH/hWaTywD2b9n9I2Lt8R/Us=;
+ b=C1B94VZchwKv3F94bOkJ1tjmpUTzydlPwl0TqTip01c/qMWaHfisWKB237bbrUGeq2ttebcxmvrqvs36DRp520gSLmX1JXnjIFhI/ZY7HCIyiD78oo1uJNR3goh3CxkznLnHQadcGldg3rcOVDTWgfA7AAAM4dV3PTwMQZEh9sq9JSsQ2CYhnEOaC/bt15ZgpK0vQOap2/VnaXntLFVKTNcd7GNkknTmp4aD/hWmkQ+0vhwh/v7FS8HjDvWfT3KvP9uuoeqYs7vLZJQbbjMHUbXbFbSW3wXE6NDc/f9fM+xT7asluv5CH8iydSRIzEhzGGFcNt8Jq2SA55zwSRdULg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WlfUBo/FyI8IPg/IWyuoH/hWaTywD2b9n9I2Lt8R/Us=;
+ b=KZfhxEGHUCpzZv5AZWYn3o5O0rij1zTtcu2i4BA5BqMbWhvNygQqG8lylRaiGSdx0vav4dk6wOVOjd/mOnady979WlJu7+/OVxCz8EMJL0obXb9LI7JZ/YZT0gnXHvV+HAcUje+6qvEMEA4VBjC9vcnNMDN1dPAEAlnhhI5tjxU=
+Received: from MW2PR16CA0025.namprd16.prod.outlook.com (2603:10b6:907::38) by
+ CYYPR12MB8701.namprd12.prod.outlook.com (2603:10b6:930:bf::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6455.44; Mon, 12 Jun 2023 04:26:53 +0000
+Received: from CO1PEPF000044F1.namprd05.prod.outlook.com
+ (2603:10b6:907:0:cafe::f8) by MW2PR16CA0025.outlook.office365.com
+ (2603:10b6:907::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.33 via Frontend
+ Transport; Mon, 12 Jun 2023 04:26:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000044F1.mail.protection.outlook.com (10.167.241.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6500.22 via Frontend Transport; Mon, 12 Jun 2023 04:26:52 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Sun, 11 Jun
+ 2023 23:26:51 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: [PATCH RFC v9 09/51] x86/sev: Add RMP entry lookup helpers
+Date:   Sun, 11 Jun 2023 23:25:17 -0500
+Message-ID: <20230612042559.375660-10-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230612042559.375660-1-michael.roth@amd.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v2] crypto: fcrypt: Fix block comment
-Content-Language: en-US
-To:     Franziska Naepelt <franziska.naepelt@googlemail.com>
-Cc:     davem@davemloft.net, franziska.naepelt@gmail.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bagasdotme@gmail.com
-References: <20230606111042.96855-1-franziska.naepelt@gmail.com>
- <20230611105331.16570-1-franziska.naepelt@gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230611105331.16570-1-franziska.naepelt@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F1:EE_|CYYPR12MB8701:EE_
+X-MS-Office365-Filtering-Correlation-Id: 280b3df5-4843-4484-af1c-08db6afd3fa0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DQ826GZCtXMQmsxLj56srWSPkfqaN/BwIjmcqprxu/9TitlM1EnxxLdZ+Y0wVs1CkN2Hh90DoOcRGd8bsohMzUeSE4yTSPDz0ZTWwICEOA6jfG8/LuKq4lJGiSz5DdVo7qWY0xUP3gnPZ/hc0/UiPTV7etC3pdCa0KKOVD7VgBMi+1xN/YbGjNbkTWYQdd3aK3MJyqzKly77zGebHzESoTLUSL+NMAhy068J2leiQxXVgri9BtCeujf1y4CHsCPWiBRNX8WhAiNM2+8ImUOVJ6esEcuVUqTpjVWHruLjEtRkx4luX/dwl52tXHqdNFprwidKy475hsnEjHUnV6TPYyjHjiwhCZifVLqSeVAc+kxEKLSRmG9BhTounJEycTNPloHW1LeEuDesRbUV+5KOQgzn6W5Xzny8UIJm2oYBenz6j6mO4d5HXhu0Iok7LMDa+/7+XINUazJdATlbSKpjRMH4ikISkNlia2HVHnZm0xNeL9c2PqflRJv5hQeS+7xHkT/WLf1xden8OMwuo2L0/E+3YeF3fddy6hvYJRCoDE4ZXcvld+PZlmTAuGlt5k1Rg0D6KqXToKpvqw439zNfgfr3QNtbTq/xdgbjielwQ7Yt9A1QZYCmIwFHIxGaeyuKYmPcviXD7Kx4bkRGLp8G2X8fv/Y4mR+awrtRcmaAxnndFBmnSeypffoSrEdphccNfcCrK4QF8r+NfoCyXCqcTCKQKbXebGmqPeJQijt9P5Ypst2LwTGgS7Rd1IBVK8CYlBnzMVHsasGyhPgOEqEh3oXdy5nwUlxAD9ibKbkk3CY=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(136003)(376002)(396003)(451199021)(40470700004)(36840700001)(46966006)(7406005)(5660300002)(7416002)(47076005)(8936002)(2906002)(8676002)(41300700001)(83380400001)(336012)(36860700001)(44832011)(426003)(82740400003)(356005)(81166007)(6916009)(70206006)(82310400005)(316002)(2616005)(70586007)(40460700003)(4326008)(186003)(16526019)(40480700001)(26005)(86362001)(1076003)(54906003)(966005)(478600001)(36756003)(6666004)(36900700001)(309714004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2023 04:26:52.8260
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 280b3df5-4843-4484-af1c-08db6afd3fa0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1PEPF000044F1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8701
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi--
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-On 6/11/23 03:53, Franziska Naepelt wrote:
-> Fix the following checkpatch issue:
-> - WARNING: Block comments use a trailing */ on a separate line
-> 
-> Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
-> ---
-> v2:
->  - Revert SPDX change to address only one logical change
-> ---
->  crypto/fcrypt.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-> index 95a16e88899b..e9e119bab784 100644
-> --- a/crypto/fcrypt.c
-> +++ b/crypto/fcrypt.c
-> @@ -303,7 +303,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
->  
->  #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
->  			  * kernels - it seems to be faster but the code is
-> -			  * larger */
-> +			  * larger
-> +			  */
+The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
+entry for a given page. The RMP entry format is documented in AMD PPR, see
+https://bugzilla.kernel.org/attachment.cgi?id=296015.
 
-The comment doesn't begin with a /* on a line by itself either.
+Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+[mdr: separate 'assigned' indicator from return code]
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ arch/x86/coco/sev/host.c          | 85 +++++++++++++++++++++++++++++++
+ arch/x86/include/asm/sev-common.h |  4 ++
+ arch/x86/include/asm/sev-host.h   | 22 ++++++++
+ arch/x86/include/asm/sev.h        |  3 --
+ 4 files changed, 111 insertions(+), 3 deletions(-)
+ create mode 100644 arch/x86/include/asm/sev-host.h
 
-checkpatch isn't always correct.
-Maybe it isn't in this case.
-
-I would either make it a correct multi-line comment or not make a change
-at all here.
-
->  
->  	u64 k;	/* k holds all 56 non-parity bits */
->  
-> 
-> base-commit: 9561de3a55bed6bdd44a12820ba81ec416e705a7
-
+diff --git a/arch/x86/coco/sev/host.c b/arch/x86/coco/sev/host.c
+index 6907ce887b23..0cc5a6d11b25 100644
+--- a/arch/x86/coco/sev/host.c
++++ b/arch/x86/coco/sev/host.c
+@@ -30,11 +30,36 @@
+ #include <asm/cmdline.h>
+ #include <asm/iommu.h>
+ 
++/*
++ * The RMP entry format is not architectural. The format is defined in PPR
++ * Family 19h Model 01h, Rev B1 processor.
++ */
++struct rmpentry {
++	union {
++		struct {
++			u64	assigned	: 1,
++				pagesize	: 1,
++				immutable	: 1,
++				rsvd1		: 9,
++				gpa		: 39,
++				asid		: 10,
++				vmsa		: 1,
++				validated	: 1,
++				rsvd2		: 1;
++		} info;
++		u64 low;
++	};
++	u64 high;
++} __packed;
++
+ /*
+  * The first 16KB from the RMP_BASE is used by the processor for the
+  * bookkeeping, the range needs to be added during the RMP entry lookup.
+  */
+ #define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
++#define RMPENTRY_SHIFT			8
++#define rmptable_page_offset(x)	(RMPTABLE_CPU_BOOKKEEPING_SZ +		\
++				 (((unsigned long)x) >> RMPENTRY_SHIFT))
+ 
+ static unsigned long rmptable_start __ro_after_init;
+ static unsigned long rmptable_end __ro_after_init;
+@@ -210,3 +235,63 @@ static int __init snp_rmptable_init(void)
+  * the page(s) used for DMA are hypervisor owned.
+  */
+ fs_initcall(snp_rmptable_init);
++
++static inline unsigned int rmpentry_assigned(const struct rmpentry *e)
++{
++	return e->info.assigned;
++}
++
++static inline unsigned int rmpentry_pagesize(const struct rmpentry *e)
++{
++	return e->info.pagesize;
++}
++
++static int rmptable_entry(unsigned long paddr, struct rmpentry *entry)
++{
++	unsigned long vaddr;
++
++	vaddr = rmptable_start + rmptable_page_offset(paddr);
++	if (unlikely(vaddr > rmptable_end))
++		return -EFAULT;
++
++	*entry = *(struct rmpentry *)vaddr;
++
++	return 0;
++}
++
++static int __snp_lookup_rmpentry(u64 pfn, struct rmpentry *entry, int *level)
++{
++	unsigned long paddr = pfn << PAGE_SHIFT;
++	struct rmpentry large_entry;
++	int ret;
++
++	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
++		return -ENXIO;
++
++	ret = rmptable_entry(paddr, entry);
++	if (ret)
++		return ret;
++
++	/* Read a large RMP entry to get the correct page level used in RMP entry. */
++	ret = rmptable_entry(paddr & PMD_MASK, &large_entry);
++	if (ret)
++		return ret;
++
++	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(&large_entry));
++
++	return 0;
++}
++
++int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level)
++{
++	struct rmpentry e;
++	int ret;
++
++	ret = __snp_lookup_rmpentry(pfn, &e, level);
++	if (ret)
++		return ret;
++
++	*assigned = !!rmpentry_assigned(&e);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index b8357d6ecd47..bf0378136289 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -171,4 +171,8 @@ struct snp_psc_desc {
+ #define GHCB_ERR_INVALID_INPUT		5
+ #define GHCB_ERR_INVALID_EVENT		6
+ 
++/* RMP page size */
++#define RMP_PG_SIZE_4K			0
++#define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
++
+ #endif
+diff --git a/arch/x86/include/asm/sev-host.h b/arch/x86/include/asm/sev-host.h
+new file mode 100644
+index 000000000000..30d47e20081d
+--- /dev/null
++++ b/arch/x86/include/asm/sev-host.h
+@@ -0,0 +1,22 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * AMD SVM-SEV Host Support.
++ *
++ * Copyright (C) 2023 Advanced Micro Devices, Inc.
++ *
++ * Author: Ashish Kalra <ashish.kalra@amd.com>
++ *
++ */
++
++#ifndef __ASM_X86_SEV_HOST_H
++#define __ASM_X86_SEV_HOST_H
++
++#include <asm/sev-common.h>
++
++#ifdef CONFIG_KVM_AMD_SEV
++int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);
++#else
++static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return 0; }
++#endif
++
++#endif
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index d34c46db7dd1..446fc7a9f7b0 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -81,9 +81,6 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+ /* Software defined (when rFlags.CF = 1) */
+ #define PVALIDATE_FAIL_NOUPDATE		255
+ 
+-/* RMP page size */
+-#define RMP_PG_SIZE_4K			0
+-
+ #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
+ 
+ /* SNP Guest message request */
 -- 
-~Randy
+2.25.1
+
