@@ -2,101 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01C8C88CB7
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 02:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9773CC7EE43
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 03:05:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238419AbjFMCu3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Jun 2023 22:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
+        id S239282AbjFMDFA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 12 Jun 2023 23:05:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238036AbjFMCu3 (ORCPT
+        with ESMTP id S239405AbjFMDEM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Jun 2023 22:50:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7BC1726;
-        Mon, 12 Jun 2023 19:50:28 -0700 (PDT)
+        Mon, 12 Jun 2023 23:04:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB1BB2117;
+        Mon, 12 Jun 2023 20:03:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2311C62F76;
-        Tue, 13 Jun 2023 02:50:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5EAC4339B;
-        Tue, 13 Jun 2023 02:50:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 184E3630DF;
+        Tue, 13 Jun 2023 03:02:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F47C433EF;
+        Tue, 13 Jun 2023 03:02:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686624627;
-        bh=7W9U+eKYl0KSlX2mWiw+hamipckUREqq7kenoM24PBc=;
+        s=k20201202; t=1686625338;
+        bh=QE/bJwOrqp//Jql9+14/MwBTyhw4er96hvgONGtQRQA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=USvaVPPMj4eUpgKrLBEkNAhkOXLxlspXcqZaOvAcwlgQ933qCwlDYnkFQ2pTDXktO
-         1nABQ65OaVzLQrsi3iLwGX2BShh62BS/OcBa1JJSs3Cj287HbGiE/3HeZ80C7wu9nK
-         3xbd5RaChtKf2XVBY2frx6BDcBx7XD20cBLUdFptJBaNcBQKzJ2cORiEjnOqjmtRpk
-         M9EVHi78n9Y0AFjlEuTpK+LqfOmf3eN82hPk6ITGImCTTa3l+mnWYNH+0tziqykjEY
-         sNXcfFHutsGkx1DNhfotKHyRytzUp14mV56u7oSuQBvagncHINrfCxKKLpHuZ2AF3y
-         oo0S9YLHgGyTA==
-Date:   Mon, 12 Jun 2023 19:50:25 -0700
+        b=fmFutB7UJyIqIvyYtzg1AhRZiCqep9yi7UDUTZD+BRwy69iezaNkdsmMzjfXkNDkF
+         uq1944kIbErb3We3MTv2UfHDOJhnAakKbShcn8gxn9Ek6+a93OlDiNM3W8XbAOc5Mb
+         eACE/U6o9yjpFlxF02c7JlDOccZjNV8T9K/sg6ZWGR1paTU3AgwWRErDIhSBSkP7Z7
+         nBO64y9c/jjjL/RVX3c3kY1uym4Lh4PP4MACduOmXaZEEJqCEPU5xfBbC60Gj7xT0c
+         p5iL/yfQtr88Y2hO5W/gGWwB5jAKyTgwz9L6CUZmw6Tg78mKJQ7Aqnu89AETEYoJTZ
+         IHUWlMs3YxGIA==
+Date:   Mon, 12 Jun 2023 20:02:16 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Abel Vesa <abel.vesa@linaro.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [RESEND v7 2/3] scsi: ufs: ufs-qcom: Switch to the new ICE API
-Message-ID: <20230613025025.GB883@sol.localdomain>
-References: <20230612192847.1599416-1-abel.vesa@linaro.org>
- <20230612192847.1599416-3-abel.vesa@linaro.org>
+To:     Heiko Stuebner <heiko@sntech.de>
+Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, conor.dooley@microchip.com,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v5 0/4] Implement GCM ghash using Zbc and Zbkb extensions
+Message-ID: <20230613030216.GC883@sol.localdomain>
+References: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230612192847.1599416-3-abel.vesa@linaro.org>
+In-Reply-To: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 10:28:46PM +0300, Abel Vesa wrote:
-> Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
-> use the new ICE api provided by the Qualcomm soc driver ice. The platforms
-> that already have ICE support will use the API as library since there will
-> not be a devicetree node, but instead they have reg range. In this case,
-> the of_qcom_ice_get will return an ICE instance created for the consumer's
-> device. But if there are platforms that do not have ice reg in the
-> consumer devicetree node and instead provide a dedicated ICE devicetree
-> node, the of_qcom_ice_get will look up the device based on qcom,ice
-> property and will get the ICE instance registered by the probe function
-> of the ice driver.
-> 
-> The ICE clock is now handle by the new driver. This is done by enabling
-> it on the creation of the ICE instance and then enabling/disabling it on
-> UFS runtime resume/suspend.
-> 
-> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
-> ---
->  drivers/ufs/host/Kconfig        |   2 +-
->  drivers/ufs/host/Makefile       |   4 +-
->  drivers/ufs/host/ufs-qcom-ice.c | 244 --------------------------------
->  drivers/ufs/host/ufs-qcom.c     |  99 ++++++++++++-
->  drivers/ufs/host/ufs-qcom.h     |  32 +----
->  5 files changed, 104 insertions(+), 277 deletions(-)
->  delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
+Hi Heiko,
 
-My concern about this patch removing the ICE clock from UFS clock gating
-(https://lore.kernel.org/linux-scsi/ZDBSvVIIq6cMTf1Y@gmail.com) was not
-addressed.  But I guess this is good enough.  Maybe someone can do a fixup patch
-on top of this if they really care about the UFS clock gating.  You can add:
+On Mon, Jun 12, 2023 at 11:04:38PM +0200, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> 
+> This was originally part of my vector crypto series, but was part
+> of a separate openssl merge request implementing GCM ghash as using
+> non-vector extensions.
+> 
+> As that pull-request
+>     https://github.com/openssl/openssl/pull/20078
+> got merged recently into openssl, we could also check if this could
+> go into the kernel as well and provide a base for further accelerated
+> cryptographic support.
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+I'm still a bit skeptical of the usefulness of a standalone "ghash"
+implementation, when in practice it will only be used as part of "gcm(aes)".
+Directly implementing "gcm(aes)" (instead of relying on crypto/gcm.c to compose
+"ghash" and "ctr(aes)") also allows some performance optimizations.
+
+I asked about this on v4
+(https://lore.kernel.org/linux-crypto/ZCSG71bRuTzVutdm@gmail.com/),
+but I didn't receive a response.
+
+Any thoughts on this?
 
 - Eric
