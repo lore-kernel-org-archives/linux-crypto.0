@@ -2,124 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45318EB64D0
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 19:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE078EB64DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 20:13:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239622AbjFMTBu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 15:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48518 "EHLO
+        id S239777AbjFMUNT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 16:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231562AbjFMTBp (ORCPT
+        with ESMTP id S231129AbjFMUM5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 15:01:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8060BA7;
-        Tue, 13 Jun 2023 12:01:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 185346395C;
-        Tue, 13 Jun 2023 19:01:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D73EC433D9;
-        Tue, 13 Jun 2023 19:01:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686682902;
-        bh=/JuClQfiInF4E+biL4mmyBg4GdWaji39UK48z39WAK8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pkxj4anxa9SwIR1rVD3AliSkIE6TiUP+JPyhWPaTAMASCYImM6Cj69VqV/Mtcji38
-         PGGhjmgEOlhC598j3OTvAFk5BngXgPFozP4Q4rjUmM3OG+aIHzEvXXg8SimdzXAUQ5
-         2EcR1OLu9zIhtTwQPeKzlbcreooITMgSpR9vNE4TWLXXoR2Kzs8jL93mnkK+mWOUDi
-         4gHH94BmCUyqc83ZesZQPPROYwhrLM1wzbiz9gKngJGqnsSlCrAGZjsMGSoO7POMOK
-         7zMiVl0AM3IdDCm2wTfIHvHN9BGYuT1cD4elm9WPPCRXgB+FiOkefM+Q0iRZlrbo7A
-         3QHifX5W7No4g==
-Date:   Tue, 13 Jun 2023 12:01:40 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
-        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, conor.dooley@microchip.com,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu
-Subject: Re: [PATCH v5 4/4] RISC-V: crypto: add accelerated GCM GHASH
- implementation
-Message-ID: <20230613190140.GD1139@sol.localdomain>
-References: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
- <20230612210442.1805962-5-heiko.stuebner@vrull.eu>
- <20230613031006.GD883@sol.localdomain>
- <2236193.NgBsaNRSFp@diego>
+        Tue, 13 Jun 2023 16:12:57 -0400
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B98A61BFD;
+        Tue, 13 Jun 2023 13:12:38 -0700 (PDT)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-33d269dd56bso24792935ab.1;
+        Tue, 13 Jun 2023 13:12:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686687158; x=1689279158;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KOZIQBDKy2phoYWlHea2hom6JZXMO/IHjZv2PzErzXs=;
+        b=GyGf1dxDnZk0TcdSmIPkgD6lybFBS70ptDVsO7MxKMG6TYOe0VQEUMbnJRnMfHKoZk
+         C0TTzsNlSABc9DdD6Rv62qSowElEneQdQC5+BQsktP41wyPYtYgjaD9FE2sVsFvOsVsa
+         GSE+t/R+Tawls5KUVeMBPXrZDAL98t1fsc+Ar2G7xzWaajj4j4n4+0WxHi4goQfcBgOt
+         qMpy/ApZFCF8VXXu2CUp2J4LSgLJf7grfg7baKuPYGn2vZuZRHhH8QOilFMDiM+IbskB
+         R1G/ZTiJP5HX+0+fN/ZPzi2zJKpr7gHiHQm+XEr8r+01nObV/wktdVjG0tgVzVEQF3hO
+         mHCQ==
+X-Gm-Message-State: AC+VfDwmoAgct8kPpGMpBn2mVWfYeWqSmA7MrFmhge0assm6K+oszxl4
+        vLj2GWE0LEcy0V8SCY/flw==
+X-Google-Smtp-Source: ACHHUZ6t5H6H+OiQsJB+7wKd39zkkt23zsP4+mprng2W1w1AX/1fk0KlPe6jzlgXwI5G282HoUsx7w==
+X-Received: by 2002:a92:7302:0:b0:33d:3b69:2d28 with SMTP id o2-20020a927302000000b0033d3b692d28mr10183276ilc.29.1686687157940;
+        Tue, 13 Jun 2023 13:12:37 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id p13-20020a92da4d000000b0033549a5fb36sm4100057ilq.27.2023.06.13.13.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jun 2023 13:12:37 -0700 (PDT)
+Received: (nullmailer pid 2826488 invoked by uid 1000);
+        Tue, 13 Jun 2023 20:12:35 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] dt-bindings: crypto: fsl,sec-v4.0-mon: Add missing type for "linux,keycode"
+Date:   Tue, 13 Jun 2023 14:12:29 -0600
+Message-Id: <20230613201231.2826352-1-robh@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2236193.NgBsaNRSFp@diego>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 13, 2023 at 10:00:44AM +0200, Heiko Stübner wrote:
-> Am Dienstag, 13. Juni 2023, 05:10:06 CEST schrieb Eric Biggers:
-> > Hi Heiko,
-> > 
-> > On Mon, Jun 12, 2023 at 11:04:42PM +0200, Heiko Stuebner wrote:
-> > > diff --git a/arch/riscv/crypto/ghash-riscv64-zbc.pl b/arch/riscv/crypto/ghash-riscv64-zbc.pl
-> > > new file mode 100644
-> > > index 000000000000..677c438a44bf
-> > > --- /dev/null
-> > > +++ b/arch/riscv/crypto/ghash-riscv64-zbc.pl
-> > > @@ -0,0 +1,427 @@
-> > > +#! /usr/bin/env perl
-> > > +# Copyright 2022 The OpenSSL Project Authors. All Rights Reserved.
-> > > +#
-> > > +# Licensed under the Apache License 2.0 (the "License").  You may not use
-> > > +# this file except in compliance with the License.  You can obtain a copy
-> > > +# in the file LICENSE in the source distribution or at
-> > > +# https://www.openssl.org/source/license.html
-> > > +
-> > > +# This file is dual-licensed and is also available under the following
-> > > +# terms:
-> > > +#
-> > > +# Copyright (c) 2023, Christoph Müllner <christoph.muellner@vrull.eu>
-> > > +# All rights reserved.
-> > > +#
-> > > +# Redistribution and use in source and binary forms, with or without
-> > > +# modification, are permitted provided that the following conditions
-> > > +# are met:
-> > > +# 1. Redistributions of source code must retain the above copyright
-> > > +#    notice, this list of conditions and the following disclaimer.
-> > > +# 2. Redistributions in binary form must reproduce the above copyright
-> > > +#    notice, this list of conditions and the following disclaimer in the
-> > > +#    documentation and/or other materials provided with the distribution.
-> > 
-> > Is this worded properly for a dual license?  The paragraph about the Apache
-> > License makes it sound like the Apache License must always be complied with:
-> > "You may not use this file except in compliance with the License."
-> > 
-> > So I worry that this could be interpreted as:
-> > 
-> >     Apache-2.0 AND BSD-2-Clause
-> > 
-> > instead of
-> > 
-> >     Apache-2.0 OR BSD-2-Clause
-> > 
-> > It needs to be the latter.
-> > 
-> > So I think the file header needs to be clarified w.r.t. the dual license.
-> 
-> Hmm, I think the 
-> 	"This file is dual-licensed and is also available under the following terms"
-> should be pretty clear?
+The "linux,keycode" property is missing a type probably because it was
+confused with the common property "linux,keycodes".
 
-As I said, IMO the problem is that it contradicts the Apache license blurb just
-above it, specifically the part "You may not use this file except in compliance
-with the License".  So it's not clear what is meant.  That sentence does not
-appear in other common license blurbs; it seems to be unique to Apache's.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-I know that people often treat these blurbs as magic incantations, but I'm just
-looking at the plain English meaning here.
+diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
+index 286dffa0671b..6052129bf852 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
++++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
+@@ -103,6 +103,7 @@ properties:
+       wakeup-source: true
+ 
+       linux,keycode:
++        $ref: /schemas/types.yaml#/definitions/uint32
+         default: 116
+ 
+     required:
+-- 
+2.39.2
 
-To fix this ambiguity I think either that sentence should be removed, or the
-intent to dual license should be clearly described in the *first paragraph*
-before listing the two licenses.  (Or do both of those.)
-
-- Eric
