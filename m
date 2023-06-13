@@ -2,88 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3487EEB64D0
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 16:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45318EB64D0
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 19:01:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbjFMQzC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 12:55:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
+        id S239622AbjFMTBu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 15:01:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235106AbjFMQy7 (ORCPT
+        with ESMTP id S231562AbjFMTBp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 12:54:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7FF6123;
-        Tue, 13 Jun 2023 09:54:58 -0700 (PDT)
+        Tue, 13 Jun 2023 15:01:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8060BA7;
+        Tue, 13 Jun 2023 12:01:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F032162DA0;
-        Tue, 13 Jun 2023 16:54:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2DDEC433D9;
-        Tue, 13 Jun 2023 16:54:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 185346395C;
+        Tue, 13 Jun 2023 19:01:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D73EC433D9;
+        Tue, 13 Jun 2023 19:01:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686675296;
-        bh=/WwbLC4AYxFlsMo/0xwNj7aKWItsTMJMTTrgt7suMLA=;
+        s=k20201202; t=1686682902;
+        bh=/JuClQfiInF4E+biL4mmyBg4GdWaji39UK48z39WAK8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OiDZIQ9DvrTSHXBmlvlE3hmk08fcHHeb5fntXdJ2f/c7ZnPOdQO/cQRioloCJtqxp
-         masgstRdkhyb21iyTv17RA13o9TVNYDTfZa8asW9g3/dnpp+PLiDBD7sAUR2LJbxIA
-         lpZqNW8a6eCNYwM4s1gj+aoNM99MXc5rfDc0xRbWFnuSpX1RovPc9MQyPg37bF1xst
-         RwGGR5lSRUMWyJPqD1rpvqVTnfYyUQ8sUjFWYEAzfHyFIazYPzFFgRAecm/0TfB5eC
-         EMbMej55yC8eGLUVWxr5Gm7NuER+zKAUXa9nIsnSImx/xjK21ZjXFmf3nl+UnzO3H7
-         9jooWAaWxBJCw==
-Date:   Tue, 13 Jun 2023 17:54:51 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Heiko Stuebner <heiko@sntech.de>
+        b=pkxj4anxa9SwIR1rVD3AliSkIE6TiUP+JPyhWPaTAMASCYImM6Cj69VqV/Mtcji38
+         PGGhjmgEOlhC598j3OTvAFk5BngXgPFozP4Q4rjUmM3OG+aIHzEvXXg8SimdzXAUQ5
+         2EcR1OLu9zIhtTwQPeKzlbcreooITMgSpR9vNE4TWLXXoR2Kzs8jL93mnkK+mWOUDi
+         4gHH94BmCUyqc83ZesZQPPROYwhrLM1wzbiz9gKngJGqnsSlCrAGZjsMGSoO7POMOK
+         7zMiVl0AM3IdDCm2wTfIHvHN9BGYuT1cD4elm9WPPCRXgB+FiOkefM+Q0iRZlrbo7A
+         3QHifX5W7No4g==
+Date:   Tue, 13 Jun 2023 12:01:40 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>
 Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
         aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
         davem@davemloft.net, conor.dooley@microchip.com,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v5 3/4] RISC-V: hook new crypto subdir into build-system
-Message-ID: <20230613-wasp-energy-20e2cd8618b4@spud>
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu
+Subject: Re: [PATCH v5 4/4] RISC-V: crypto: add accelerated GCM GHASH
+ implementation
+Message-ID: <20230613190140.GD1139@sol.localdomain>
 References: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
- <20230612210442.1805962-4-heiko.stuebner@vrull.eu>
+ <20230612210442.1805962-5-heiko.stuebner@vrull.eu>
+ <20230613031006.GD883@sol.localdomain>
+ <2236193.NgBsaNRSFp@diego>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="1pvydtWQC18RdlEG"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230612210442.1805962-4-heiko.stuebner@vrull.eu>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2236193.NgBsaNRSFp@diego>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Jun 13, 2023 at 10:00:44AM +0200, Heiko Stübner wrote:
+> Am Dienstag, 13. Juni 2023, 05:10:06 CEST schrieb Eric Biggers:
+> > Hi Heiko,
+> > 
+> > On Mon, Jun 12, 2023 at 11:04:42PM +0200, Heiko Stuebner wrote:
+> > > diff --git a/arch/riscv/crypto/ghash-riscv64-zbc.pl b/arch/riscv/crypto/ghash-riscv64-zbc.pl
+> > > new file mode 100644
+> > > index 000000000000..677c438a44bf
+> > > --- /dev/null
+> > > +++ b/arch/riscv/crypto/ghash-riscv64-zbc.pl
+> > > @@ -0,0 +1,427 @@
+> > > +#! /usr/bin/env perl
+> > > +# Copyright 2022 The OpenSSL Project Authors. All Rights Reserved.
+> > > +#
+> > > +# Licensed under the Apache License 2.0 (the "License").  You may not use
+> > > +# this file except in compliance with the License.  You can obtain a copy
+> > > +# in the file LICENSE in the source distribution or at
+> > > +# https://www.openssl.org/source/license.html
+> > > +
+> > > +# This file is dual-licensed and is also available under the following
+> > > +# terms:
+> > > +#
+> > > +# Copyright (c) 2023, Christoph Müllner <christoph.muellner@vrull.eu>
+> > > +# All rights reserved.
+> > > +#
+> > > +# Redistribution and use in source and binary forms, with or without
+> > > +# modification, are permitted provided that the following conditions
+> > > +# are met:
+> > > +# 1. Redistributions of source code must retain the above copyright
+> > > +#    notice, this list of conditions and the following disclaimer.
+> > > +# 2. Redistributions in binary form must reproduce the above copyright
+> > > +#    notice, this list of conditions and the following disclaimer in the
+> > > +#    documentation and/or other materials provided with the distribution.
+> > 
+> > Is this worded properly for a dual license?  The paragraph about the Apache
+> > License makes it sound like the Apache License must always be complied with:
+> > "You may not use this file except in compliance with the License."
+> > 
+> > So I worry that this could be interpreted as:
+> > 
+> >     Apache-2.0 AND BSD-2-Clause
+> > 
+> > instead of
+> > 
+> >     Apache-2.0 OR BSD-2-Clause
+> > 
+> > It needs to be the latter.
+> > 
+> > So I think the file header needs to be clarified w.r.t. the dual license.
+> 
+> Hmm, I think the 
+> 	"This file is dual-licensed and is also available under the following terms"
+> should be pretty clear?
 
---1pvydtWQC18RdlEG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+As I said, IMO the problem is that it contradicts the Apache license blurb just
+above it, specifically the part "You may not use this file except in compliance
+with the License".  So it's not clear what is meant.  That sentence does not
+appear in other common license blurbs; it seems to be unique to Apache's.
 
-On Mon, Jun 12, 2023 at 11:04:41PM +0200, Heiko Stuebner wrote:
-> diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
-> new file mode 100644
-> index 000000000000..b3b6332c9f6d
-> --- /dev/null
-> +++ b/arch/riscv/crypto/Makefile
-> @@ -0,0 +1,4 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# linux/arch/riscv/crypto/Makefile
+I know that people often treat these blurbs as magic incantations, but I'm just
+looking at the plain English meaning here.
 
-This comment looks weird, why is the filename here w/ a "linux/" prefix?
+To fix this ambiguity I think either that sentence should be removed, or the
+intent to dual license should be clearly described in the *first paragraph*
+before listing the two licenses.  (Or do both of those.)
 
-> +#
-
-
---1pvydtWQC18RdlEG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZIifWwAKCRB4tDGHoIJi
-0k6XAP433CxHzezw6/n4IfsT2X7Tbsyw+MwsKbUyuc2LIAc9GAEAhu/lSLKbiPyM
-AUAtE5YU+LKaAdvAEttlqL/eAj4tyw0=
-=g3s1
------END PGP SIGNATURE-----
-
---1pvydtWQC18RdlEG--
+- Eric
