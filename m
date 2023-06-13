@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB959EB64DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 21:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CE2EB64DA
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 21:11:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235713AbjFMVJF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 17:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57978 "EHLO
+        id S230108AbjFMVLq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 17:11:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239782AbjFMVJD (ORCPT
+        with ESMTP id S229674AbjFMVLp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 17:09:03 -0400
+        Tue, 13 Jun 2023 17:11:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E03A19B1;
-        Tue, 13 Jun 2023 14:09:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43CBCD2;
+        Tue, 13 Jun 2023 14:11:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9884C61864;
-        Tue, 13 Jun 2023 21:09:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB3A1C433C0;
-        Tue, 13 Jun 2023 21:08:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CB68763B01;
+        Tue, 13 Jun 2023 21:11:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBA6FC433C8;
+        Tue, 13 Jun 2023 21:11:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686690542;
-        bh=bqw+fnsWgRC1cIqLeL3ZKw/47X3oSoMsy9jRxd3Knq0=;
+        s=k20201202; t=1686690704;
+        bh=/2DBzxw/VJp/qnkRIA18GUvvEiO24duySzvHczSOt4U=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cj5rIlkx/y4iVHQ7zIt7rbEzh5Hf0GNRIgAXi9rmE9njCXBEqdRxDbwCXgHWJjimy
-         29V9GHM5QwOzENSN1zv2hbgF9kozHmUTY2YfpehJoI+MhAEWM43svmWMJL5MoIUzYN
-         CShXm/I8ouQYNJE0++MNG++CCMPPwIkwfJDuiKt3C2oeIfIbUxMy8w8SKuD8qeEKt/
-         BVAkPj3Pacnd3UHtLNQuxj/lP3Jz7eDcEhllmwdLU3FaOga84yAsph+hUcDkcDqy5C
-         j2pEkSh54i4RV2hiPFg5eupWeTVvOeArPmIqtM8+TnaDKy+i/FDeHW0HMTOa38qhv1
-         OIvq6a3tuKfQg==
-Date:   Tue, 13 Jun 2023 22:08:57 +0100
+        b=JlZpXnfwb4tZyHNWcILFW0uqwQJSYSdzq2TKRmtzmTmEXTqMHIh2v8WOph2qH786F
+         SuqqTp3k4mkqmXmrqv/E66ZNy5jyZO0QbRUIZshtvA63H0Md1fDzKzVEgxpjz+ytS4
+         Y7+xIBsUY0BNEwKLHv0dU+6rJ7U01UbSHn2/+VtUXoNFQaS+p/xYkgWyY9RwOrZYzE
+         UZE5hEe8FycL8T6U0DrokXIu1FpqZlIAszws98fRzgFyTTMythlcouoAdjC8ClSFiF
+         vM3PGgvNc4q4S2j5yyPGapv2ny/UL7rYGx+bXzNb1B9b3vgZPLbrojItCenMomrSfg
+         vzz0laU7cdM7g==
+Date:   Tue, 13 Jun 2023 22:11:39 +0100
 From:   Conor Dooley <conor@kernel.org>
 To:     Rob Herring <robh@kernel.org>
 Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
@@ -45,45 +45,71 @@ Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
         Conor Dooley <conor+dt@kernel.org>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: fsl,sec-v4.0-mon: Add missing
- type for "linux,keycode"
-Message-ID: <20230613-shucking-diving-c6b0cbd08279@spud>
+Subject: Re: [PATCH 2/2] dt-bindings: crypto: fsl,sec-v4.0-mon: Add
+ "linux,keycodes" and deprecate "linux,keycode"
+Message-ID: <20230613-sculptor-prepaid-9dc5afcc2dcc@spud>
 References: <20230613201231.2826352-1-robh@kernel.org>
+ <20230613201231.2826352-2-robh@kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="pWnv3eskVAkn/R37"
+        protocol="application/pgp-signature"; boundary="8vgAm8btVIL4CtSR"
 Content-Disposition: inline
-In-Reply-To: <20230613201231.2826352-1-robh@kernel.org>
+In-Reply-To: <20230613201231.2826352-2-robh@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---pWnv3eskVAkn/R37
+--8vgAm8btVIL4CtSR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 13, 2023 at 02:12:29PM -0600, Rob Herring wrote:
-> The "linux,keycode" property is missing a type probably because it was
-> confused with the common property "linux,keycodes".
+On Tue, Jun 13, 2023 at 02:12:30PM -0600, Rob Herring wrote:
+> The "linux,keycode" property is non-standard. Add the common property
+> "linux,keycodes" and mark "linux,keycode" deprecated so that the mistake
+> is not propagated.
+
+This is actually used in the driver for this device, should the driver
+not also be updated to use the corrected property?
+
+
 >=20
 > Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>  .../devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml         | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.ya=
+ml b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
+> index 6052129bf852..e879bc0be8e2 100644
+> --- a/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/fsl,sec-v4.0-mon.yaml
+> @@ -105,6 +105,11 @@ properties:
+>        linux,keycode:
+>          $ref: /schemas/types.yaml#/definitions/uint32
+>          default: 116
+> +        deprecated: true
+> +
+> +      linux,keycodes:
+> +        maxItems: 1
+> +        default: 116
+> =20
+>      required:
+>        - compatible
+> --=20
+> 2.39.2
+>=20
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---pWnv3eskVAkn/R37
+--8vgAm8btVIL4CtSR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZIja6QAKCRB4tDGHoIJi
-0gPkAP0ev1/+5SIbyQi9nHSb51Hf84udINV5P2MOeiO7kBOygQD/d6hcqnsBZ1X3
-ersEc9MPuJjr+oz/46yTf90E4RmltgY=
-=Zwtp
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZIjbiwAKCRB4tDGHoIJi
+0m2wAP9t3oGT06mvMemB3F2BhB+dOCmjJBOhjNU4T2WMkAb3wAEA6s+s+cgEW9Us
+hWgaZipnuLNr1D2fxEgrlj5Kx2TkXQA=
+=n/nt
 -----END PGP SIGNATURE-----
 
---pWnv3eskVAkn/R37--
+--8vgAm8btVIL4CtSR--
