@@ -2,109 +2,68 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFABC77B7A
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 08:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A97CBC7EE29
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 08:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240829AbjFMICf convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 04:02:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50988 "EHLO
+        id S241816AbjFMIts (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 04:49:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240842AbjFMIBt (ORCPT
+        with ESMTP id S241759AbjFMItc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 04:01:49 -0400
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF6B2974;
-        Tue, 13 Jun 2023 01:01:02 -0700 (PDT)
-Received: from i53875b22.versanet.de ([83.135.91.34] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1q8yxK-0000QG-0v; Tue, 13 Jun 2023 10:00:46 +0200
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
-        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, conor.dooley@microchip.com,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu
-Subject: Re: [PATCH v5 4/4] RISC-V: crypto: add accelerated GCM GHASH implementation
-Date:   Tue, 13 Jun 2023 10:00:44 +0200
-Message-ID: <2236193.NgBsaNRSFp@diego>
-In-Reply-To: <20230613031006.GD883@sol.localdomain>
-References: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
- <20230612210442.1805962-5-heiko.stuebner@vrull.eu>
- <20230613031006.GD883@sol.localdomain>
+        Tue, 13 Jun 2023 04:49:32 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF18013A
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Jun 2023 01:49:30 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1q8ziO-002KWP-RX; Tue, 13 Jun 2023 16:49:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Jun 2023 16:49:24 +0800
+Date:   Tue, 13 Jun 2023 16:49:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: algboss - Add missing dependency on RNG2
+Message-ID: <ZIgtlD0VjQXT/ZU7@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 13. Juni 2023, 05:10:06 CEST schrieb Eric Biggers:
-> Hi Heiko,
-> 
-> On Mon, Jun 12, 2023 at 11:04:42PM +0200, Heiko Stuebner wrote:
-> > diff --git a/arch/riscv/crypto/ghash-riscv64-zbc.pl b/arch/riscv/crypto/ghash-riscv64-zbc.pl
-> > new file mode 100644
-> > index 000000000000..677c438a44bf
-> > --- /dev/null
-> > +++ b/arch/riscv/crypto/ghash-riscv64-zbc.pl
-> > @@ -0,0 +1,427 @@
-> > +#! /usr/bin/env perl
-> > +# Copyright 2022 The OpenSSL Project Authors. All Rights Reserved.
-> > +#
-> > +# Licensed under the Apache License 2.0 (the "License").  You may not use
-> > +# this file except in compliance with the License.  You can obtain a copy
-> > +# in the file LICENSE in the source distribution or at
-> > +# https://www.openssl.org/source/license.html
-> > +
-> > +# This file is dual-licensed and is also available under the following
-> > +# terms:
-> > +#
-> > +# Copyright (c) 2023, Christoph Müllner <christoph.muellner@vrull.eu>
-> > +# All rights reserved.
-> > +#
-> > +# Redistribution and use in source and binary forms, with or without
-> > +# modification, are permitted provided that the following conditions
-> > +# are met:
-> > +# 1. Redistributions of source code must retain the above copyright
-> > +#    notice, this list of conditions and the following disclaimer.
-> > +# 2. Redistributions in binary form must reproduce the above copyright
-> > +#    notice, this list of conditions and the following disclaimer in the
-> > +#    documentation and/or other materials provided with the distribution.
-> 
-> Is this worded properly for a dual license?  The paragraph about the Apache
-> License makes it sound like the Apache License must always be complied with:
-> "You may not use this file except in compliance with the License."
-> 
-> So I worry that this could be interpreted as:
-> 
->     Apache-2.0 AND BSD-2-Clause
-> 
-> instead of
-> 
->     Apache-2.0 OR BSD-2-Clause
-> 
-> It needs to be the latter.
-> 
-> So I think the file header needs to be clarified w.r.t. the dual license.
+The testmgr code uses crypto_rng without depending on it.  Add
+an explicit dependency to Kconfig.
 
-Hmm, I think the 
-	"This file is dual-licensed and is also available under the following terms"
-should be pretty clear?
+Also sort the MANAGER2 dependencies alphabetically.
 
-Also this is wording openSSL uses since 2004 in other parts like
-crypto/LPdir_*.c . So I'd guess any "issue" should've come up already
-in all these years?
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
+ crypto/Kconfig |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-> Side note: can you please also include a SPDX-License-Identifier?
-
-ok, will add them
-
-
-Heiko
-
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index fdf3742f1106..44292989d070 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -143,12 +143,13 @@ config CRYPTO_MANAGER
+ 
+ config CRYPTO_MANAGER2
+ 	def_tristate CRYPTO_MANAGER || (CRYPTO_MANAGER!=n && CRYPTO_ALGAPI=y)
++	select CRYPTO_ACOMP2
+ 	select CRYPTO_AEAD2
+-	select CRYPTO_HASH2
+-	select CRYPTO_SKCIPHER2
+ 	select CRYPTO_AKCIPHER2
++	select CRYPTO_HASH2
+ 	select CRYPTO_KPP2
+-	select CRYPTO_ACOMP2
++	select CRYPTO_RNG2
++	select CRYPTO_SKCIPHER2
+ 
+ config CRYPTO_USER
+ 	tristate "Userspace cryptographic algorithm configuration"
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
