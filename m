@@ -2,76 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6445C7EE29
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 12:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 414C6EB64D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 14:26:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240399AbjFMMyW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 08:54:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50178 "EHLO
+        id S242908AbjFMO0v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 10:26:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbjFMMyW (ORCPT
+        with ESMTP id S240612AbjFMO0u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 08:54:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0C510D9
-        for <linux-crypto@vger.kernel.org>; Tue, 13 Jun 2023 05:53:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686660817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y7DcASSObS+eRy1HQOSfVcPKlmOl64c+asQijp73BVQ=;
-        b=YY1bFHy/uVIRyRA6kvYg0O1SXRqKWPuhl/3NIqiPMx0GkL7oYaoW0JRJMuH97h5Ldk12Bw
-        21hLvdOA5q+djAfGK1IEbt3aVxSXD0Nn4aVmF1MS12Kc0nxXg/7wM/LYfTF6qOs4xey0b+
-        H/wrt39Or+i9gEyu02Tsu/1IROGzQoU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-629-rZO7NWkPOOukhFJsi6eg6Q-1; Tue, 13 Jun 2023 08:53:32 -0400
-X-MC-Unique: rZO7NWkPOOukhFJsi6eg6Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00D08101AA6D;
-        Tue, 13 Jun 2023 12:53:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CBC940C20F5;
-        Tue, 13 Jun 2023 12:53:28 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au>
-References: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, dmitry.kasatkin@gmail.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 0/5] crypto: Add akcipher interface without SGs
+        Tue, 13 Jun 2023 10:26:50 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722FC187;
+        Tue, 13 Jun 2023 07:26:49 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-30fc2b44281so2053118f8f.2;
+        Tue, 13 Jun 2023 07:26:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686666408; x=1689258408;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=konsMZ3reRTolwDihwoeXz+ajl61Wy3hEw0nKZVPrR4=;
+        b=Ft1H9IQWTXSL2y2ZrUczjSuzRl4su4gb15wZKYUOMvVxWS20PHDOlSK/8EdfQ5ZwcV
+         2KI58jAhhAaHKwfh4TNbzWF+vkKXt7KI2SGHeWZloffVM7FiT9e0cqFY6wfCPgtxlMN3
+         GRfM1TUcTCse+fHJdyylGho6Ahc/Y6mBLQ8wHma+0w5zqbyjQXUK+C3I/aalvyd5ceR3
+         quxe1y5KEScQTbEEOVMQS7dt/LPYZuzYO0bEGnnGLEa9dK9Eph94/nZacel1F0Qqm7UU
+         FhTo+QfoB6qDw0krrTZocEoWt+1E+b6RM3wDQHWH2wnABcXT3aAbSdb9JH8vJDmSf4KO
+         /pgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686666408; x=1689258408;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=konsMZ3reRTolwDihwoeXz+ajl61Wy3hEw0nKZVPrR4=;
+        b=NBm9cpp7RSf7ks5ORY93/EOSu3XcJB5XVI/mmUmfj8iIPKzv8X6dvJ0HM9Waw1t4f3
+         UqTJy5raUVA5crBGMpPa4T2hW9bwzLxqGT26/3IRawTlMLnkcidEoUy1kIdHyPFwoeQl
+         l/Y0PXFPe4O/7wTFDa2GS075v/AVeI3WiwYazuzFfJj0lfIz6gHK5uBSHL+HjxENJRPZ
+         aEGxgl3Paj3clyXukc9avzHnhgyYjZYTdStFvyox1BAEaZmWH+HJnqBeRVc8rCXngsf0
+         kNLd3UsSUUUTpIR80iVu2pdFLqOkyDX5a/Uw0PFFjUhQkxENGI5TuNcGcZ55LKyKbM/j
+         G+gw==
+X-Gm-Message-State: AC+VfDzYy5auzaO4tZSsLxQSW5ExzzRec7X4JhkD+nb8s+QnGRN9PMLA
+        aR9V0SgCM+GaPhZUmL02pctFZ+FnDl4m6nIEfcI=
+X-Google-Smtp-Source: ACHHUZ6JadTTqAeCgCM5YqUsgDckUplenez8GoP0ndjnKiMQzLiT8p1oSMB4KYzTrfQB/yYZpzSQYiE/MUuE3hkQO+I=
+X-Received: by 2002:adf:eece:0:b0:30f:b807:a632 with SMTP id
+ a14-20020adfeece000000b0030fb807a632mr7165447wrp.60.1686666407496; Tue, 13
+ Jun 2023 07:26:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <570801.1686660808.1@warthog.procyon.org.uk>
-Date:   Tue, 13 Jun 2023 13:53:28 +0100
-Message-ID: <570802.1686660808@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+References: <20230613002258.3535506-1-azeemshaikh38@gmail.com> <20230613023722.GA883@sol.localdomain>
+In-Reply-To: <20230613023722.GA883@sol.localdomain>
+From:   Azeem Shaikh <azeemshaikh38@gmail.com>
+Date:   Tue, 13 Jun 2023 10:26:35 -0400
+Message-ID: <CADmuW3Ubgg=sE05J4q3v0un-MqhgMdBW3fPTZ=B_WXyTRjEm5g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: Replace strlcpy with strscpy
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-hardening@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Mon, Jun 12, 2023 at 10:37=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
+ wrote:
+>
+> On Tue, Jun 13, 2023 at 12:22:58AM +0000, Azeem Shaikh wrote:
+> > diff --git a/crypto/lrw.c b/crypto/lrw.c
+> > index 1b0f76ba3eb5..bb8c1575645b 100644
+> > --- a/crypto/lrw.c
+> > +++ b/crypto/lrw.c
+> > @@ -359,8 +359,8 @@ static int lrw_create(struct crypto_template *tmpl,=
+ struct rtattr **tb)
+> >       if (!strncmp(cipher_name, "ecb(", 4)) {
+> >               unsigned len;
+> >
+> > -             len =3D strlcpy(ecb_name, cipher_name + 4, sizeof(ecb_nam=
+e));
+> > -             if (len < 2 || len >=3D sizeof(ecb_name))
+> > +             len =3D strscpy(ecb_name, cipher_name + 4, sizeof(ecb_nam=
+e));
+> > +             if (len < 2)
+> >                       goto err_free_inst;
+>
+> This is wrong because 'len' is unsigned.  So the -EFBIG return value is n=
+ot
+> being checked for, so this patch actually removes the overflow check.
+>
 
-> I've decided to split out signing and verification because most
-> (all but one) of our signature algorithms do not support encryption
-> or decryption.  These can now be accessed through the dsa interface:
+Thanks for catching this Eric. I can send over a v2 with "unsigned
+len" -> "int len" if that works?
 
-That feels wrongly named as there's a DSA public key algorithm.
+> It looks like you've sent over 60 strscpy conversion patches recently
+> (https://lore.kernel.org/linux-hardening/?q=3Df%3Aazeemshaikh38+s%3Astrsc=
+py).
+> That's concerning because this is the only one that I happened to review,=
+ and it
+> introduces a bug.  There are 60 others that could have this same bug.  Ca=
+n you
+> please review all your patches for this same bug?
+>
 
-David
+My previous patches replace strlcpy where the return value is ignored.
+So this same bug could not have occurred in those. This is the first
+set of patches where I'm attempting to replace strlcpy whose return
+value is used by callers. For reference below are all my patches where
+the return value of strlcpy is used. I have checked that none of these
+have the same bug as here.
 
+https://lore.kernel.org/all/20230613004402.3540432-1-azeemshaikh38@gmail.co=
+m/
+   // Uses int
+https://lore.kernel.org/all/20230613004341.3540325-1-azeemshaikh38@gmail.co=
+m/
+   // Uses int
+https://lore.kernel.org/all/20230613004125.3539934-1-azeemshaikh38@gmail.co=
+m/
+   // Replaces ">=3D buflen" with "=3D=3D -E2BIG"
+https://lore.kernel.org/all/20230613004054.3539554-1-azeemshaikh38@gmail.co=
+m/
+   // Uses int
