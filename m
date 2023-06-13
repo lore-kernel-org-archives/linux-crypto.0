@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96870C88CB7
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 09:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D205C88CB6
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 09:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239409AbjFMJif (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 05:38:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55904 "EHLO
+        id S239355AbjFMJij (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 05:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238497AbjFMJid (ORCPT
+        with ESMTP id S239967AbjFMJig (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 05:38:33 -0400
+        Tue, 13 Jun 2023 05:38:36 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0AFEC;
-        Tue, 13 Jun 2023 02:38:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF1DE3;
+        Tue, 13 Jun 2023 02:38:34 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q90Tb-002LQK-6x; Tue, 13 Jun 2023 17:38:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Jun 2023 17:38:11 +0800
+        id 1q90Tf-002LR5-F7; Tue, 13 Jun 2023 17:38:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Jun 2023 17:38:15 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Tue, 13 Jun 2023 17:38:11 +0800
-Subject: [PATCH 2/5] crypto: dsa - Add interface for sign/verify
+Date:   Tue, 13 Jun 2023 17:38:15 +0800
+Subject: [PATCH 4/5] KEYS: asymmetric: Move sm2 code into x509_public_key
 References: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au>
 To:     Linus Torvalds <torvalds@linux-foundation.org>,
         Roberto Sassu <roberto.sassu@huaweicloud.com>,
@@ -32,578 +32,392 @@ To:     Linus Torvalds <torvalds@linux-foundation.org>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Ard Biesheuvel <ardb@kernel.org>, keyrings@vger.kernel.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1q90Tb-002LQK-6x@formenos.hmeau.com>
+Message-Id: <E1q90Tf-002LR5-F7@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Split out the sign/verify functionality from the existing akcipher
-interface.  Most algorithms in akcipher either support encryption
-and decryption, or signing and verify.  Only one supports both.
-
-As a signature algorithm may not support encryption at all, these
-two should be spearated.
-
-For now dsa is simply a wrapper around akcipher as all algorithms
-remain unchanged.  This is a first step and allows users to start
-allocating dsa instead of akcipher.
+The sm2 certificate requires a modified digest.  Move the code
+for the hashing from the signature verification path into the
+code where we generate the digest.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/Kconfig                |   10 ++
- crypto/Makefile               |    1 
- crypto/akcipher.c             |   53 +++++++++-----
- crypto/dsa.c                  |  159 ++++++++++++++++++++++++++++++++++++++++++
- crypto/internal.h             |   20 +++++
- include/crypto/dsa.h          |  140 ++++++++++++++++++++++++++++++++++++
- include/crypto/internal/dsa.h |   17 ++++
- include/linux/crypto.h        |    3 
- 8 files changed, 385 insertions(+), 18 deletions(-)
+ crypto/asymmetric_keys/public_key.c      |   67 -------------------
+ crypto/asymmetric_keys/x509_public_key.c |   28 +++++---
+ crypto/sm2.c                             |  106 ++++++++++++++++++++-----------
+ include/crypto/public_key.h              |    2 
+ include/crypto/sm2.h                     |   12 ---
+ 5 files changed, 93 insertions(+), 122 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 8b8bb97d1d77..c3c7e1108c32 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -72,6 +72,15 @@ config CRYPTO_AEAD2
- 	tristate
- 	select CRYPTO_ALGAPI2
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index eca5671ad3f2..c795a12a3599 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -18,8 +18,6 @@
+ #include <keys/asymmetric-subtype.h>
+ #include <crypto/public_key.h>
+ #include <crypto/akcipher.h>
+-#include <crypto/sm2.h>
+-#include <crypto/sm3_base.h>
  
-+config CRYPTO_DSA
-+	tristate
-+	select CRYPTO_DSA2
-+	select CRYPTO_ALGAPI
-+
-+config CRYPTO_DSA2
-+	tristate
-+	select CRYPTO_ALGAPI2
-+
- config CRYPTO_SKCIPHER
- 	tristate
- 	select CRYPTO_SKCIPHER2
-@@ -143,6 +152,7 @@ config CRYPTO_MANAGER2
- 	select CRYPTO_ACOMP2
- 	select CRYPTO_AEAD2
- 	select CRYPTO_AKCIPHER2
-+	select CRYPTO_DSA2
- 	select CRYPTO_HASH2
- 	select CRYPTO_KPP2
- 	select CRYPTO_RNG2
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 155ab671a1b4..9bdb0af75f73 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -25,6 +25,7 @@ crypto_hash-y += shash.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- 
- obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
-+obj-$(CONFIG_CRYPTO_DSA2) += dsa.o
- obj-$(CONFIG_CRYPTO_KPP2) += kpp.o
- 
- dh_generic-y := dh.o
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 2d10b58c4010..76ab150b5df4 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -18,18 +18,7 @@
- 
- #include "internal.h"
- 
--struct crypto_akcipher_sync_data {
--	struct crypto_akcipher *tfm;
--	const void *src;
--	void *dst;
--	unsigned int slen;
--	unsigned int dlen;
--
--	struct akcipher_request *req;
--	struct crypto_wait cwait;
--	struct scatterlist sg;
--	u8 *buf;
--};
-+#define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000e
- 
- static int __maybe_unused crypto_akcipher_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
-@@ -119,7 +108,7 @@ static const struct crypto_type crypto_akcipher_type = {
- 	.report_stat = crypto_akcipher_report_stat,
- #endif
- 	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
--	.maskset = CRYPTO_ALG_TYPE_MASK,
-+	.maskset = CRYPTO_ALG_TYPE_AHASH_MASK,
- 	.type = CRYPTO_ALG_TYPE_AKCIPHER,
- 	.tfmsize = offsetof(struct crypto_akcipher, base),
- };
-@@ -200,7 +189,7 @@ int akcipher_register_instance(struct crypto_template *tmpl,
+ MODULE_DESCRIPTION("In-software asymmetric public-key subtype");
+ MODULE_AUTHOR("Red Hat, Inc.");
+@@ -312,65 +310,6 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(akcipher_register_instance);
  
--static int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
-+int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
+-#if IS_REACHABLE(CONFIG_CRYPTO_SM2)
+-static int cert_sig_digest_update(const struct public_key_signature *sig,
+-				  struct crypto_akcipher *tfm_pkey)
+-{
+-	struct crypto_shash *tfm;
+-	struct shash_desc *desc;
+-	size_t desc_size;
+-	unsigned char dgst[SM3_DIGEST_SIZE];
+-	int ret;
+-
+-	BUG_ON(!sig->data);
+-
+-	/* SM2 signatures always use the SM3 hash algorithm */
+-	if (!sig->hash_algo || strcmp(sig->hash_algo, "sm3") != 0)
+-		return -EINVAL;
+-
+-	ret = sm2_compute_z_digest(tfm_pkey, SM2_DEFAULT_USERID,
+-					SM2_DEFAULT_USERID_LEN, dgst);
+-	if (ret)
+-		return ret;
+-
+-	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
+-	if (IS_ERR(tfm))
+-		return PTR_ERR(tfm);
+-
+-	desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
+-	desc = kzalloc(desc_size, GFP_KERNEL);
+-	if (!desc) {
+-		ret = -ENOMEM;
+-		goto error_free_tfm;
+-	}
+-
+-	desc->tfm = tfm;
+-
+-	ret = crypto_shash_init(desc);
+-	if (ret < 0)
+-		goto error_free_desc;
+-
+-	ret = crypto_shash_update(desc, dgst, SM3_DIGEST_SIZE);
+-	if (ret < 0)
+-		goto error_free_desc;
+-
+-	ret = crypto_shash_finup(desc, sig->data, sig->data_size, sig->digest);
+-
+-error_free_desc:
+-	kfree(desc);
+-error_free_tfm:
+-	crypto_free_shash(tfm);
+-	return ret;
+-}
+-#else
+-static inline int cert_sig_digest_update(
+-	const struct public_key_signature *sig,
+-	struct crypto_akcipher *tfm_pkey)
+-{
+-	return -ENOTSUPP;
+-}
+-#endif /* ! IS_REACHABLE(CONFIG_CRYPTO_SM2) */
+-
+ /*
+  * Verify a signature using a public key.
+  */
+@@ -438,12 +377,6 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	if (ret)
+ 		goto error_free_key;
+ 
+-	if (strcmp(pkey->pkey_algo, "sm2") == 0 && sig->data_size) {
+-		ret = cert_sig_digest_update(sig, tfm);
+-		if (ret)
+-			goto error_free_key;
+-	}
+-
+ 	sg_init_table(src_sg, 2);
+ 	sg_set_buf(&src_sg[0], sig->s, sig->s_size);
+ 	sg_set_buf(&src_sg[1], sig->digest, sig->digest_size);
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 0b4943a4592b..2fca030a6290 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -6,13 +6,15 @@
+  */
+ 
+ #define pr_fmt(fmt) "X.509: "fmt
++#include <crypto/hash.h>
++#include <crypto/sm2.h>
++#include <keys/asymmetric-parser.h>
++#include <keys/asymmetric-subtype.h>
++#include <keys/system_keyring.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
+-#include <keys/asymmetric-subtype.h>
+-#include <keys/asymmetric-parser.h>
+-#include <keys/system_keyring.h>
+-#include <crypto/hash.h>
++#include <linux/string.h>
+ #include "asymmetric_keys.h"
+ #include "x509_parser.h"
+ 
+@@ -30,9 +32,6 @@ int x509_get_sig_params(struct x509_certificate *cert)
+ 
+ 	pr_devel("==>%s()\n", __func__);
+ 
+-	sig->data = cert->tbs;
+-	sig->data_size = cert->tbs_size;
+-
+ 	sig->s = kmemdup(cert->raw_sig, cert->raw_sig_size, GFP_KERNEL);
+ 	if (!sig->s)
+ 		return -ENOMEM;
+@@ -65,7 +64,20 @@ int x509_get_sig_params(struct x509_certificate *cert)
+ 
+ 	desc->tfm = tfm;
+ 
+-	ret = crypto_shash_digest(desc, cert->tbs, cert->tbs_size, sig->digest);
++	if (strcmp(cert->pub->pkey_algo, "sm2") == 0) {
++		ret = strcmp(sig->hash_algo, "sm3") != 0 ? -EINVAL :
++		      crypto_shash_init(desc) ?:
++		      sm2_compute_z_digest(desc, cert->pub->key,
++					   cert->pub->keylen, sig->digest) ?:
++		      crypto_shash_init(desc) ?:
++		      crypto_shash_update(desc, sig->digest,
++					  sig->digest_size) ?:
++		      crypto_shash_finup(desc, cert->tbs, cert->tbs_size,
++					 sig->digest);
++	} else
++		ret = crypto_shash_digest(desc, cert->tbs, cert->tbs_size,
++					  sig->digest);
++
+ 	if (ret < 0)
+ 		goto error_2;
+ 
+diff --git a/crypto/sm2.c b/crypto/sm2.c
+index ed9307dac3d1..285b3cb7c0bc 100644
+--- a/crypto/sm2.c
++++ b/crypto/sm2.c
+@@ -13,11 +13,14 @@
+ #include <crypto/internal/akcipher.h>
+ #include <crypto/akcipher.h>
+ #include <crypto/hash.h>
+-#include <crypto/sm3.h>
+ #include <crypto/rng.h>
+ #include <crypto/sm2.h>
+ #include "sm2signature.asn1.h"
+ 
++/* The default user id as specified in GM/T 0009-2012 */
++#define SM2_DEFAULT_USERID "1234567812345678"
++#define SM2_DEFAULT_USERID_LEN 16
++
+ #define MPI_NBYTES(m)   ((mpi_get_nbits(m) + 7) / 8)
+ 
+ struct ecc_domain_parms {
+@@ -60,6 +63,9 @@ static const struct ecc_domain_parms sm2_ecp = {
+ 	.h = 1
+ };
+ 
++static int __sm2_set_pub_key(struct mpi_ec_ctx *ec,
++			     const void *key, unsigned int keylen);
++
+ static int sm2_ec_ctx_init(struct mpi_ec_ctx *ec)
  {
- 	unsigned int reqsize = crypto_akcipher_reqsize(data->tfm);
- 	unsigned int mlen = max(data->slen, data->dlen);
-@@ -223,7 +212,7 @@ static int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
- 	data->buf = buf;
- 	memcpy(buf, data->src, data->slen);
- 
--	sg = &data->sg;
-+	sg = data->sg;
- 	sg_init_one(sg, buf, mlen);
- 	akcipher_request_set_crypt(req, sg, sg, data->slen, data->dlen);
- 
-@@ -233,9 +222,9 @@ static int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
- 
+ 	const struct ecc_domain_parms *ecp = &sm2_ecp;
+@@ -213,12 +219,13 @@ int sm2_get_signature_s(void *context, size_t hdrlen, unsigned char tag,
  	return 0;
  }
-+EXPORT_SYMBOL_GPL(crypto_akcipher_sync_prep);
  
--static int crypto_akcipher_sync_post(struct crypto_akcipher_sync_data *data,
--				     int err)
-+int crypto_akcipher_sync_post(struct crypto_akcipher_sync_data *data, int err)
+-static int sm2_z_digest_update(struct sm3_state *sctx,
+-			MPI m, unsigned int pbytes)
++static int sm2_z_digest_update(struct shash_desc *desc,
++			       MPI m, unsigned int pbytes)
  {
- 	err = crypto_wait_req(err, &data->cwait);
- 	memcpy(data->dst, data->buf, data->dlen);
-@@ -243,6 +232,7 @@ static int crypto_akcipher_sync_post(struct crypto_akcipher_sync_data *data,
- 	kfree_sensitive(data->req);
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(crypto_akcipher_sync_post);
- 
- int crypto_akcipher_sync_encrypt(struct crypto_akcipher *tfm,
- 				 const void *src, unsigned int slen,
-@@ -281,5 +271,34 @@ int crypto_akcipher_sync_decrypt(struct crypto_akcipher *tfm,
- }
- EXPORT_SYMBOL_GPL(crypto_akcipher_sync_decrypt);
- 
-+static void crypto_exit_akcipher_ops_dsa(struct crypto_tfm *tfm)
-+{
-+	struct crypto_akcipher **ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_akcipher(*ctx);
-+}
-+
-+int crypto_init_akcipher_ops_dsa(struct crypto_tfm *tfm)
-+{
-+	struct crypto_akcipher **ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_alg *calg = tfm->__crt_alg;
-+	struct crypto_akcipher *akcipher;
-+
-+	if (!crypto_mod_get(calg))
-+		return -EAGAIN;
-+
-+	akcipher = crypto_create_tfm(calg, &crypto_akcipher_type);
-+	if (IS_ERR(akcipher)) {
-+		crypto_mod_put(calg);
-+		return PTR_ERR(akcipher);
-+	}
-+
-+	*ctx = akcipher;
-+	tfm->exit = crypto_exit_akcipher_ops_dsa;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(crypto_init_akcipher_ops_dsa);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Generic public key cipher type");
-diff --git a/crypto/dsa.c b/crypto/dsa.c
-new file mode 100644
-index 000000000000..36ea2d0828b1
---- /dev/null
-+++ b/crypto/dsa.c
-@@ -0,0 +1,159 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Digital Signature Algorithm
-+ *
-+ * Copyright (c) 2023 Herbert Xu <herbert@gondor.apana.org.au>
-+ */
-+
-+#include <crypto/akcipher.h>
-+#include <crypto/internal/dsa.h>
-+#include <linux/cryptouser.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/scatterlist.h>
-+#include <linux/seq_file.h>
-+#include <linux/string.h>
-+#include <net/netlink.h>
-+
-+#include "internal.h"
-+
-+#define CRYPTO_ALG_TYPE_DSA_MASK	0x0000000e
-+
-+static const struct crypto_type crypto_dsa_type;
-+
-+static inline struct crypto_dsa *__crypto_dsa_tfm(struct crypto_tfm *tfm)
-+{
-+	return container_of(tfm, struct crypto_dsa, base);
-+}
-+
-+static int crypto_dsa_init_tfm(struct crypto_tfm *tfm)
-+{
-+	if (tfm->__crt_alg->cra_type != &crypto_dsa_type)
-+		return crypto_init_akcipher_ops_dsa(tfm);
-+
-+	return 0;
-+}
-+
-+static void __maybe_unused crypto_dsa_show(struct seq_file *m,
-+					   struct crypto_alg *alg)
-+{
-+	seq_puts(m, "type         : dsa\n");
-+}
-+
-+static int __maybe_unused crypto_dsa_report(struct sk_buff *skb,
-+					    struct crypto_alg *alg)
-+{
-+	struct crypto_report_akcipher rdsa = {};
-+
-+	strscpy(rdsa.type, "dsa", sizeof(rdsa.type));
-+
-+	return nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER, sizeof(rdsa), &rdsa);
-+}
-+
-+static int __maybe_unused crypto_dsa_report_stat(struct sk_buff *skb,
-+						 struct crypto_alg *alg)
-+{
-+	struct crypto_stat_akcipher rdsa = {};
-+
-+	strscpy(rdsa.type, "dsa", sizeof(rdsa.type));
-+
-+	return nla_put(skb, CRYPTOCFGA_STAT_AKCIPHER, sizeof(rdsa), &rdsa);
-+}
-+
-+static const struct crypto_type crypto_dsa_type = {
-+	.extsize = crypto_alg_extsize,
-+	.init_tfm = crypto_dsa_init_tfm,
-+#ifdef CONFIG_PROC_FS
-+	.show = crypto_dsa_show,
-+#endif
-+#if IS_ENABLED(CONFIG_CRYPTO_USER)
-+	.report = crypto_dsa_report,
-+#endif
-+#ifdef CONFIG_CRYPTO_STATS
-+	.report_stat = crypto_dsa_report_stat,
-+#endif
-+	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
-+	.maskset = CRYPTO_ALG_TYPE_DSA_MASK,
-+	.type = CRYPTO_ALG_TYPE_DSA,
-+	.tfmsize = offsetof(struct crypto_dsa, base),
-+};
-+
-+struct crypto_dsa *crypto_alloc_dsa(const char *alg_name, u32 type, u32 mask)
-+{
-+	return crypto_alloc_tfm(alg_name, &crypto_dsa_type, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_alloc_dsa);
-+
-+int crypto_dsa_maxsize(struct crypto_dsa *tfm)
-+{
-+	struct crypto_akcipher **ctx = crypto_dsa_ctx(tfm);
-+
-+	return crypto_akcipher_maxsize(*ctx);
-+}
-+EXPORT_SYMBOL_GPL(crypto_dsa_maxsize);
-+
-+int crypto_dsa_sign(struct crypto_dsa *tfm,
-+		    const void *src, unsigned int slen,
-+		    void *dst, unsigned int dlen)
-+{
-+	struct crypto_akcipher **ctx = crypto_dsa_ctx(tfm);
-+	struct crypto_akcipher_sync_data data = {
-+		.tfm = *ctx,
-+		.src = src,
-+		.dst = dst,
-+		.slen = slen,
-+		.dlen = dlen,
-+	};
-+
-+	return crypto_akcipher_sync_prep(&data) ?:
-+	       crypto_akcipher_sync_post(&data,
-+					 crypto_akcipher_sign(data.req));
-+}
-+EXPORT_SYMBOL_GPL(crypto_dsa_sign);
-+
-+int crypto_dsa_verify(struct crypto_dsa *tfm,
-+		      const void *src, unsigned int slen,
-+		      const void *digest, unsigned int dlen)
-+{
-+	struct crypto_akcipher **ctx = crypto_dsa_ctx(tfm);
-+	struct crypto_akcipher_sync_data data = {
-+		.tfm = *ctx,
-+		.src = src,
-+		.slen = slen,
-+		.dlen = dlen,
-+	};
+ 	static const unsigned char zero[32];
+ 	unsigned char *in;
+ 	unsigned int inlen;
 +	int err;
+ 
+ 	in = mpi_get_buffer(m, &inlen, NULL);
+ 	if (!in)
+@@ -226,21 +233,22 @@ static int sm2_z_digest_update(struct sm3_state *sctx,
+ 
+ 	if (inlen < pbytes) {
+ 		/* padding with zero */
+-		sm3_update(sctx, zero, pbytes - inlen);
+-		sm3_update(sctx, in, inlen);
++		err = crypto_shash_update(desc, zero, pbytes - inlen) ?:
++		      crypto_shash_update(desc, in, inlen);
+ 	} else if (inlen > pbytes) {
+ 		/* skip the starting zero */
+-		sm3_update(sctx, in + inlen - pbytes, pbytes);
++		err = crypto_shash_update(desc, in + inlen - pbytes, pbytes);
+ 	} else {
+-		sm3_update(sctx, in, inlen);
++		err = crypto_shash_update(desc, in, inlen);
+ 	}
+ 
+ 	kfree(in);
+-	return 0;
++	return err;
+ }
+ 
+-static int sm2_z_digest_update_point(struct sm3_state *sctx,
+-		MPI_POINT point, struct mpi_ec_ctx *ec, unsigned int pbytes)
++static int sm2_z_digest_update_point(struct shash_desc *desc,
++				     MPI_POINT point, struct mpi_ec_ctx *ec,
++				     unsigned int pbytes)
+ {
+ 	MPI x, y;
+ 	int ret = -EINVAL;
+@@ -248,50 +256,68 @@ static int sm2_z_digest_update_point(struct sm3_state *sctx,
+ 	x = mpi_new(0);
+ 	y = mpi_new(0);
+ 
+-	if (!mpi_ec_get_affine(x, y, point, ec) &&
+-	    !sm2_z_digest_update(sctx, x, pbytes) &&
+-	    !sm2_z_digest_update(sctx, y, pbytes))
+-		ret = 0;
++	ret = mpi_ec_get_affine(x, y, point, ec) ? -EINVAL :
++	      sm2_z_digest_update(desc, x, pbytes) ?:
++	      sm2_z_digest_update(desc, y, pbytes);
+ 
+ 	mpi_free(x);
+ 	mpi_free(y);
+ 	return ret;
+ }
+ 
+-int sm2_compute_z_digest(struct crypto_akcipher *tfm,
+-			const unsigned char *id, size_t id_len,
+-			unsigned char dgst[SM3_DIGEST_SIZE])
++int sm2_compute_z_digest(struct shash_desc *desc,
++			 const void *key, unsigned int keylen, void *dgst)
+ {
+-	struct mpi_ec_ctx *ec = akcipher_tfm_ctx(tfm);
+-	uint16_t bits_len;
+-	unsigned char entl[2];
+-	struct sm3_state sctx;
++	struct mpi_ec_ctx *ec;
++	unsigned int bits_len;
+ 	unsigned int pbytes;
++	u8 entl[2];
++	int err;
+ 
+-	if (id_len > (USHRT_MAX / 8) || !ec->Q)
+-		return -EINVAL;
++	ec = kmalloc(sizeof(*ec), GFP_KERNEL);
++	if (!ec)
++		return -ENOMEM;
 +
-+	err = crypto_akcipher_sync_prep(&data);
++	err = __sm2_set_pub_key(ec, key, keylen);
 +	if (err)
-+		return err;
-+
-+	sg_init_table(data.sg, 2);
-+	sg_set_buf(&data.sg[0], src, slen);
-+	sg_set_buf(&data.sg[1], digest, dlen);
-+
-+	return crypto_akcipher_sync_post(&data,
-+					 crypto_akcipher_verify(data.req));
-+}
-+EXPORT_SYMBOL_GPL(crypto_dsa_verify);
-+
-+int crypto_dsa_set_pubkey(struct crypto_dsa *tfm,
-+			  const void *key, unsigned int keylen)
-+{
-+	struct crypto_akcipher **ctx = crypto_dsa_ctx(tfm);
-+
-+	return crypto_akcipher_set_pub_key(*ctx, key, keylen);
-+}
-+EXPORT_SYMBOL_GPL(crypto_dsa_set_pubkey);
-+
-+int crypto_dsa_set_privkey(struct crypto_dsa *tfm,
-+			  const void *key, unsigned int keylen)
-+{
-+	struct crypto_akcipher **ctx = crypto_dsa_ctx(tfm);
-+
-+	return crypto_akcipher_set_priv_key(*ctx, key, keylen);
-+}
-+EXPORT_SYMBOL_GPL(crypto_dsa_set_privkey);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Digital Signature Algorithms");
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 8dd746b1130b..024c2c795f59 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -18,9 +18,12 @@
- #include <linux/numa.h>
- #include <linux/refcount.h>
- #include <linux/rwsem.h>
-+#include <linux/scatterlist.h>
- #include <linux/sched.h>
- #include <linux/types.h>
++		goto out_free_ec;
  
-+struct akcipher_request;
-+struct crypto_akcipher;
- struct crypto_instance;
- struct crypto_template;
+-	bits_len = (uint16_t)(id_len * 8);
++	bits_len = SM2_DEFAULT_USERID_LEN * 8;
+ 	entl[0] = bits_len >> 8;
+ 	entl[1] = bits_len & 0xff;
  
-@@ -32,6 +35,19 @@ struct crypto_larval {
- 	bool test_started;
+ 	pbytes = MPI_NBYTES(ec->p);
+ 
+ 	/* ZA = H256(ENTLA | IDA | a | b | xG | yG | xA | yA) */
+-	sm3_init(&sctx);
+-	sm3_update(&sctx, entl, 2);
+-	sm3_update(&sctx, id, id_len);
+-
+-	if (sm2_z_digest_update(&sctx, ec->a, pbytes) ||
+-	    sm2_z_digest_update(&sctx, ec->b, pbytes) ||
+-	    sm2_z_digest_update_point(&sctx, ec->G, ec, pbytes) ||
+-	    sm2_z_digest_update_point(&sctx, ec->Q, ec, pbytes))
+-		return -EINVAL;
++	err = crypto_shash_init(desc);
++	if (err)
++		goto out_deinit_ec;
+ 
+-	sm3_final(&sctx, dgst);
+-	return 0;
++	err = crypto_shash_update(desc, entl, 2);
++	if (err)
++		goto out_deinit_ec;
++
++	err = crypto_shash_update(desc, SM2_DEFAULT_USERID,
++				  SM2_DEFAULT_USERID_LEN);
++	if (err)
++		goto out_deinit_ec;
++
++	err = sm2_z_digest_update(desc, ec->a, pbytes) ?:
++	      sm2_z_digest_update(desc, ec->b, pbytes) ?:
++	      sm2_z_digest_update_point(desc, ec->G, ec, pbytes) ?:
++	      sm2_z_digest_update_point(desc, ec->Q, ec, pbytes);
++	if (err)
++		goto out_deinit_ec;
++
++	err = crypto_shash_final(desc, dgst);
++
++out_deinit_ec:
++	sm2_ec_ctx_deinit(ec);
++out_free_ec:
++	kfree(ec);
++	return err;
+ }
+-EXPORT_SYMBOL(sm2_compute_z_digest);
++EXPORT_SYMBOL_GPL(sm2_compute_z_digest);
+ 
+ static int _sm2_verify(struct mpi_ec_ctx *ec, MPI hash, MPI sig_r, MPI sig_s)
+ {
+@@ -391,6 +417,14 @@ static int sm2_set_pub_key(struct crypto_akcipher *tfm,
+ 			const void *key, unsigned int keylen)
+ {
+ 	struct mpi_ec_ctx *ec = akcipher_tfm_ctx(tfm);
++
++	return __sm2_set_pub_key(ec, key, keylen);
++
++}
++
++static int __sm2_set_pub_key(struct mpi_ec_ctx *ec,
++			     const void *key, unsigned int keylen)
++{
+ 	MPI a;
+ 	int rc;
+ 
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index 653992a6e941..8fadd561c50e 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -48,8 +48,6 @@ struct public_key_signature {
+ 	const char *pkey_algo;
+ 	const char *hash_algo;
+ 	const char *encoding;
+-	const void *data;
+-	unsigned int data_size;
  };
  
-+struct crypto_akcipher_sync_data {
-+	struct crypto_akcipher *tfm;
-+	const void *src;
-+	void *dst;
-+	unsigned int slen;
-+	unsigned int dlen;
-+
-+	struct akcipher_request *req;
-+	struct crypto_wait cwait;
-+	struct scatterlist sg[2];
-+	u8 *buf;
-+};
-+
- enum {
- 	CRYPTOA_UNSPEC,
- 	CRYPTOA_ALG,
-@@ -109,6 +125,10 @@ void *crypto_create_tfm_node(struct crypto_alg *alg,
- void *crypto_clone_tfm(const struct crypto_type *frontend,
- 		       struct crypto_tfm *otfm);
+ extern void public_key_signature_free(struct public_key_signature *sig);
+diff --git a/include/crypto/sm2.h b/include/crypto/sm2.h
+index af452556dcd4..7094d75ed54c 100644
+--- a/include/crypto/sm2.h
++++ b/include/crypto/sm2.h
+@@ -11,15 +11,9 @@
+ #ifndef _CRYPTO_SM2_H
+ #define _CRYPTO_SM2_H
  
-+int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data);
-+int crypto_akcipher_sync_post(struct crypto_akcipher_sync_data *data, int err);
-+int crypto_init_akcipher_ops_dsa(struct crypto_tfm *tfm);
-+
- static inline void *crypto_create_tfm(struct crypto_alg *alg,
- 			const struct crypto_type *frontend)
- {
-diff --git a/include/crypto/dsa.h b/include/crypto/dsa.h
-new file mode 100644
-index 000000000000..98ce39e9d054
---- /dev/null
-+++ b/include/crypto/dsa.h
-@@ -0,0 +1,140 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Digital Signature Algorithm
-+ *
-+ * Copyright (c) 2023 Herbert Xu <herbert@gondor.apana.org.au>
-+ */
-+#ifndef _CRYPTO_DSA_H
-+#define _CRYPTO_DSA_H
-+
-+#include <linux/crypto.h>
-+
-+/**
-+ * struct crypto_dsa - user-instantiated objects which encapsulate
-+ * algorithms and core processing logic
-+ *
-+ * @base:	Common crypto API algorithm data structure
-+ */
-+struct crypto_dsa {
-+	struct crypto_tfm base;
-+};
-+
-+/**
-+ * DOC: Generic Digital Signature API
-+ *
-+ * The Digital Signature API is used with the algorithms of type
-+ * CRYPTO_ALG_TYPE_DSA (listed as type "dsa" in /proc/crypto)
-+ */
-+
-+/**
-+ * crypto_alloc_dsa() - allocate DSA tfm handle
-+ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	      signing algorithm e.g. "ecdsa"
-+ * @type: specifies the type of the algorithm
-+ * @mask: specifies the mask for the algorithm
-+ *
-+ * Allocate a handle for digital signature algorithm. The returned struct
-+ * crypto_dsa is the handle that is required for any subsequent
-+ * API invocation for signature operations.
-+ *
-+ * Return: allocated handle in case of success; IS_ERR() is true in case
-+ *	   of an error, PTR_ERR() returns the error code.
-+ */
-+struct crypto_dsa *crypto_alloc_dsa(const char *alg_name, u32 type, u32 mask);
-+
-+static inline struct crypto_tfm *crypto_dsa_tfm(struct crypto_dsa *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+/**
-+ * crypto_free_dsa() - free DSA tfm handle
-+ *
-+ * @tfm: DSA tfm handle allocated with crypto_alloc_dsa()
-+ *
-+ * If @tfm is a NULL or error pointer, this function does nothing.
-+ */
-+static inline void crypto_free_dsa(struct crypto_dsa *tfm)
-+{
-+	crypto_destroy_tfm(tfm, crypto_dsa_tfm(tfm));
-+}
-+
-+/**
-+ * crypto_dsa_maxsize() - Get len for output buffer
-+ *
-+ * Function returns the dest buffer size required for a given key.
-+ * Function assumes that the key is already set in the transformation. If this
-+ * function is called without a setkey or with a failed setkey, you will end up
-+ * in a NULL dereference.
-+ *
-+ * @tfm:	DSA tfm handle allocated with crypto_alloc_dsa()
-+ */
-+int crypto_dsa_maxsize(struct crypto_dsa *tfm);
-+
-+/**
-+ * crypto_dsa_sign() - Invoke signing operation
-+ *
-+ * Function invokes the specific signing operation for a given DSA
-+ *
-+ * @tfm:	DSA tfm handle allocated with crypto_alloc_dsa()
-+ * @src:	source buffer
-+ * @slen:	source length
-+ * @dst:	destinatino obuffer
-+ * @dlen:	destination length
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+int crypto_dsa_sign(struct crypto_dsa *tfm,
-+		    const void *src, unsigned int slen,
-+		    void *dst, unsigned int dlen);
-+
-+/**
-+ * crypto_dsa_verify() - Invoke signature verification
-+ *
-+ * Function invokes the specific signature verification operation
-+ * for a given DSA.
-+ *
-+ * @tfm:	DSA tfm handle allocated with crypto_alloc_dsa()
-+ * @src:	source buffer
-+ * @slen:	source length
-+ * @digest:	digest
-+ * @dlen:	digest length
-+ *
-+ * Return: zero on verification success; error code in case of error.
-+ */
-+int crypto_dsa_verify(struct crypto_dsa *tfm,
-+		      const void *src, unsigned int slen,
-+		      const void *digest, unsigned int dlen);
-+
-+/**
-+ * crypto_dsa_set_pubkey() - Invoke set public key operation
-+ *
-+ * Function invokes the algorithm specific set key function, which knows
-+ * how to decode and interpret the encoded key and parameters
-+ *
-+ * @tfm:	tfm handle
-+ * @key:	BER encoded public key, algo OID, paramlen, BER encoded
-+ *		parameters
-+ * @keylen:	length of the key (not including other data)
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+int crypto_dsa_set_pubkey(struct crypto_dsa *tfm,
-+			  const void *key, unsigned int keylen);
-+
-+/**
-+ * crypto_dsa_set_privkey() - Invoke set private key operation
-+ *
-+ * Function invokes the algorithm specific set key function, which knows
-+ * how to decode and interpret the encoded key and parameters
-+ *
-+ * @tfm:	tfm handle
-+ * @key:	BER encoded private key, algo OID, paramlen, BER encoded
-+ *		parameters
-+ * @keylen:	length of the key (not including other data)
-+ *
-+ * Return: zero on success; error code in case of error
-+ */
-+int crypto_dsa_set_privkey(struct crypto_dsa *tfm,
-+			   const void *key, unsigned int keylen);
-+#endif
-diff --git a/include/crypto/internal/dsa.h b/include/crypto/internal/dsa.h
-new file mode 100644
-index 000000000000..5586551693e4
---- /dev/null
-+++ b/include/crypto/internal/dsa.h
-@@ -0,0 +1,17 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Digital Signature Algorithm
-+ *
-+ * Copyright (c) 2023 Herbert Xu <herbert@gondor.apana.org.au>
-+ */
-+#ifndef _CRYPTO_INTERNAL_DSA_H
-+#define _CRYPTO_INTERNAL_DSA_H
-+
-+#include <crypto/algapi.h>
-+#include <crypto/dsa.h>
-+
-+static inline void *crypto_dsa_ctx(struct crypto_dsa *tfm)
-+{
-+	return crypto_tfm_ctx(&tfm->base);
-+}
-+#endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index fa310ac1db59..fbf3139c11f0 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -25,11 +25,12 @@
- #define CRYPTO_ALG_TYPE_COMPRESS	0x00000002
- #define CRYPTO_ALG_TYPE_AEAD		0x00000003
- #define CRYPTO_ALG_TYPE_SKCIPHER	0x00000005
-+#define CRYPTO_ALG_TYPE_AKCIPHER	0x00000006
-+#define CRYPTO_ALG_TYPE_DSA		0x00000007
- #define CRYPTO_ALG_TYPE_KPP		0x00000008
- #define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
- #define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000b
- #define CRYPTO_ALG_TYPE_RNG		0x0000000c
--#define CRYPTO_ALG_TYPE_AKCIPHER	0x0000000d
- #define CRYPTO_ALG_TYPE_HASH		0x0000000e
- #define CRYPTO_ALG_TYPE_SHASH		0x0000000e
- #define CRYPTO_ALG_TYPE_AHASH		0x0000000f
+-#include <crypto/sm3.h>
+-#include <crypto/akcipher.h>
++struct shash_desc;
+ 
+-/* The default user id as specified in GM/T 0009-2012 */
+-#define SM2_DEFAULT_USERID "1234567812345678"
+-#define SM2_DEFAULT_USERID_LEN 16
+-
+-extern int sm2_compute_z_digest(struct crypto_akcipher *tfm,
+-			const unsigned char *id, size_t id_len,
+-			unsigned char dgst[SM3_DIGEST_SIZE]);
++int sm2_compute_z_digest(struct shash_desc *desc,
++			 const void *key, unsigned int keylen, void *dgst);
+ 
+ #endif /* _CRYPTO_SM2_H */
