@@ -2,25 +2,27 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C79EC77B7A
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 09:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A1FC7EE29
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Jun 2023 09:38:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241203AbjFMJg2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Jun 2023 05:36:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54272 "EHLO
+        id S234253AbjFMJid (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 13 Jun 2023 05:38:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241756AbjFMJgS (ORCPT
+        with ESMTP id S239355AbjFMJib (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Jun 2023 05:36:18 -0400
+        Tue, 13 Jun 2023 05:38:31 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075691BD3;
-        Tue, 13 Jun 2023 02:36:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE0D10D9;
+        Tue, 13 Jun 2023 02:38:30 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q90RD-002LN1-Ro; Tue, 13 Jun 2023 17:35:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Jun 2023 17:35:43 +0800
-Date:   Tue, 13 Jun 2023 17:35:43 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
+        id 1q90Td-002LQV-Ci; Tue, 13 Jun 2023 17:38:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Jun 2023 17:38:13 +0800
+From:   "Herbert Xu" <herbert@gondor.apana.org.au>
+Date:   Tue, 13 Jun 2023 17:38:13 +0800
+Subject: [PATCH 3/5] KEYS: Add forward declaration in asymmetric-parser.h
+References: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au>
 To:     Linus Torvalds <torvalds@linux-foundation.org>,
         Roberto Sassu <roberto.sassu@huaweicloud.com>,
         David Howells <dhowells@redhat.com>,
@@ -30,52 +32,30 @@ To:     Linus Torvalds <torvalds@linux-foundation.org>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         Ard Biesheuvel <ardb@kernel.org>, keyrings@vger.kernel.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH 0/5] crypto: Add akcipher interface without SGs
-Message-ID: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-Id: <E1q90Td-002LQV-Ci@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The crypto akcipher interface has exactly one user, the keyring
-subsystem.  That user only deals with kernel pointers, not SG lists.
-Therefore the use of SG lists in the akcipher interface is
-completely pointless.
+Add forward declaration for struct key_preparsed_payload so that
+this header file is self-contained.
 
-As there is only one user, changing it isn't that hard.  This
-patch series is a first step in that direction.  It introduces
-a new interface for encryption and decryption without SG lists:
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-int crypto_akcipher_sync_encrypt(struct crypto_akcipher *tfm,
-				 const void *src, unsigned int slen,
-				 void *dst, unsigned int dlen);
+ include/keys/asymmetric-parser.h |    2 ++
+ 1 file changed, 2 insertions(+)
 
-int crypto_akcipher_sync_decrypt(struct crypto_akcipher *tfm,
-				 const void *src, unsigned int slen,
-				 void *dst, unsigned int dlen);
-
-I've decided to split out signing and verification because most
-(all but one) of our signature algorithms do not support encryption
-or decryption.  These can now be accessed through the dsa interface:
-
-int crypto_dsa_sign(struct crypto_dsa *tfm,
-		    const void *src, unsigned int slen,
-		    void *dst, unsigned int dlen);
-
-int crypto_dsa_verify(struct crypto_dsa *tfm,
-		      const void *src, unsigned int slen,
-		      const void *digest, unsigned int dlen);
-
-The keyring system has been converted to this interface.
-
-The next step would be to convert the code within the Crypto API so
-that SG lists are not used at all on the software path.  This
-would eliminate the unnecessary copying that currently happens.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/include/keys/asymmetric-parser.h b/include/keys/asymmetric-parser.h
+index c47dc5405f79..516a3f51179e 100644
+--- a/include/keys/asymmetric-parser.h
++++ b/include/keys/asymmetric-parser.h
+@@ -10,6 +10,8 @@
+ #ifndef _KEYS_ASYMMETRIC_PARSER_H
+ #define _KEYS_ASYMMETRIC_PARSER_H
+ 
++struct key_preparsed_payload;
++
+ /*
+  * Key data parser.  Called during key instantiation.
+  */
