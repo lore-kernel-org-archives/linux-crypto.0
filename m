@@ -2,106 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F94EB64D9
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 17:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0474EB64D9
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 17:47:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229991AbjFNR1E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jun 2023 13:27:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49656 "EHLO
+        id S239281AbjFNRrM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jun 2023 13:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjFNR1D (ORCPT
+        with ESMTP id S237458AbjFNRqy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2023 13:27:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05B1CE;
-        Wed, 14 Jun 2023 10:27:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C4C164519;
-        Wed, 14 Jun 2023 17:27:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A045C433C8;
-        Wed, 14 Jun 2023 17:26:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686763621;
-        bh=tHs6KrXSqtk9yeuEJiqSNT/vtZdNW3ETcAB6guHg7WU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mYYtwnOitRVyLFNh5M+PzFRqn+W1WiWFify2Bm0q+klywjo1ZFBW6Rzv91a9b2xv9
-         rlmQvj3DhWSHfcZq040Krh0vzIeY2uFb5jonCb3/UFdQvwC6dfOTkkbgRIT60snI8z
-         SZ1p7+iSvoWiZRAyRwPhHi6kPtqcIQmbb413RZN2CE+lX04WLEW+nklEUiFtYyvuvR
-         F2wHUo+9ikx0en4SqiYGrYL1ZcK/1L/x+WicI+1vMAwrR1q2Heck+KVYZW+na+My20
-         8F1CzM+nV8RnYYGN5umL57RdQ1HUorbFVxXQdl2TWVWNjmqW3u6M3+Wp+H9I6y8H0B
-         fFG9yoEAkLpPA==
-Date:   Wed, 14 Jun 2023 18:26:56 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Rob Herring <robh@kernel.org>
-Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        Wed, 14 Jun 2023 13:46:54 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2A21BF0
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 10:46:53 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3f7fcdc7f7fso7402165e9.0
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 10:46:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1686764812; x=1689356812;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jpKktw2GOMmJzC6I0CuPo4dMIuJ2XtzOWEy+kYSxtr4=;
+        b=Dyad7FZhMwfiAfRmBkixVnagPSVRz8eheSxTFkov/8nLIhmyyvSvWPizdtZw2nA6Zc
+         7tpNRwPGmkfEvVsbvUwBdcmN+zSoRgfuxQ58Td9Agwejb2VIMPYeZhtQXmUERcUMJ1Jt
+         yhF4MIPwGbij+iXf0/vYCmc33Kqiao8OKcfmFjWIBLixqdHLN4NZaPv45x4EQlbqzeck
+         1LsiN5o8hMlVAk6WHV8GKI+JFZT/P+37GsAWAt3BBs9z94mX6BDO1bPQOi1oE88jhJoD
+         9th/ZbrjOEsiIPXnJ1MrZQ/P8zsx6FUlFzHduq0Xlh+rfpVcP2kQjVAiOk3QNzOOlhWJ
+         l7pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686764812; x=1689356812;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jpKktw2GOMmJzC6I0CuPo4dMIuJ2XtzOWEy+kYSxtr4=;
+        b=jbs1qDK8B+CykD077E9Z8xLmlU6xhn2nOuXROiNvg3TeGwcvOCNXgVH2j+jCDwe/IY
+         jvZ6EZ4SUNGx9NMxVejzpeXah7DoN95pMY3G9gINKDA+0ZStnPmC+OSfLemH9kVyBJMx
+         eGHNszkldshnTQzacmvOy2t61zd2nc4oxcDSAgbLUZrhIbXlDblgrQeF/uyTxmOPvulB
+         HXUbRyPfyIxkhO+T0+lu29w4jxUvYj6juUUtJUtbCDd+d3SYTSqIa4omggyRFaw4t0wC
+         xk5TBgaCCCbXz6H4n+qoflA2Cc83MrPXVPcqGEnKBSphJkehM66stTDmgKO8UA48yP3h
+         YyJA==
+X-Gm-Message-State: AC+VfDyJ2+dXSV0Lqs+Mtk7U+e+b0odDDXqdQnZ66ENv0Mey/ljLq/tH
+        pcY6JHs5oVO+1mXB3u+/NwgtjA==
+X-Google-Smtp-Source: ACHHUZ4tY7VFK/WQ07OvcIDpYAn/ug8h5uEtmcneDLElzLV6ReMtEengirK7m3oS4agXI0TCC3AT0Q==
+X-Received: by 2002:a5d:4846:0:b0:30f:bde3:aa6 with SMTP id n6-20020a5d4846000000b0030fbde30aa6mr1889121wrs.15.1686764812023;
+        Wed, 14 Jun 2023 10:46:52 -0700 (PDT)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id m4-20020a056000180400b0030633152664sm18738740wrh.87.2023.06.14.10.46.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jun 2023 10:46:51 -0700 (PDT)
+From:   Dmitry Safonov <dima@arista.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] dt-bindings: crypto: fsl,sec-v4.0-mon: Add
- "linux,keycodes" and deprecate "linux,keycode"
-Message-ID: <20230614-glutton-crispy-0d9588a97a1c@spud>
-References: <20230613201231.2826352-1-robh@kernel.org>
- <20230613201231.2826352-2-robh@kernel.org>
- <20230613-sculptor-prepaid-9dc5afcc2dcc@spud>
- <CAL_JsqJFT630XJ8xOrz47w5bMbGv12koCHc1NdhQQANdTrE4ow@mail.gmail.com>
+Cc:     Dmitry Safonov <dima@arista.com>,
+        Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Francesco Ruggeri <fruggeri05@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH-next 1/3] crypto: api - Remove crypto_init_ops()
+Date:   Wed, 14 Jun 2023 18:46:41 +0100
+Message-Id: <20230614174643.3836590-2-dima@arista.com>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230614174643.3836590-1-dima@arista.com>
+References: <20230614174643.3836590-1-dima@arista.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="VXxm4yyUB67FoBNX"
-Content-Disposition: inline
-In-Reply-To: <CAL_JsqJFT630XJ8xOrz47w5bMbGv12koCHc1NdhQQANdTrE4ow@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Purge crypto_type::init() as well.
+The last user seems to be gone with commit d63007eb954e ("crypto:
+ablkcipher - remove deprecated and unused ablkcipher support").
 
---VXxm4yyUB67FoBNX
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Dmitry Safonov <dima@arista.com>
+---
+ crypto/api.c            | 14 --------------
+ include/crypto/algapi.h |  1 -
+ 2 files changed, 15 deletions(-)
 
-On Wed, Jun 14, 2023 at 08:53:20AM -0600, Rob Herring wrote:
-> On Tue, Jun 13, 2023 at 3:11=E2=80=AFPM Conor Dooley <conor@kernel.org> w=
-rote:
-> >
-> > On Tue, Jun 13, 2023 at 02:12:30PM -0600, Rob Herring wrote:
-> > > The "linux,keycode" property is non-standard. Add the common property
-> > > "linux,keycodes" and mark "linux,keycode" deprecated so that the mist=
-ake
-> > > is not propagated.
-> >
-> > This is actually used in the driver for this device, should the driver
-> > not also be updated to use the corrected property?
->=20
-> Yes, but that doesn't have to be in sync with the binding change. I
-> mainly want to add this so it doesn't get propagated to new users
-> rather than move this case off of linux,keycode. Also, the input
-> subsystem should probably have a common function to read
-> linux,keycodes as right now every driver does it.
+diff --git a/crypto/api.c b/crypto/api.c
+index d375e8cd770d..a94bd0695719 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -345,15 +345,6 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alg_mod_lookup);
+ 
+-static int crypto_init_ops(struct crypto_tfm *tfm, u32 type, u32 mask)
+-{
+-	const struct crypto_type *type_obj = tfm->__crt_alg->cra_type;
+-
+-	if (type_obj)
+-		return type_obj->init(tfm, type, mask);
+-	return 0;
+-}
+-
+ static void crypto_exit_ops(struct crypto_tfm *tfm)
+ {
+ 	const struct crypto_type *type = tfm->__crt_alg->cra_type;
+@@ -410,10 +401,6 @@ struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
+ 	tfm->__crt_alg = alg;
+ 	refcount_set(&tfm->refcnt, 1);
+ 
+-	err = crypto_init_ops(tfm, type, mask);
+-	if (err)
+-		goto out_free_tfm;
+-
+ 	if (!tfm->exit && alg->cra_init && (err = alg->cra_init(tfm)))
+ 		goto cra_init_failed;
+ 
+@@ -421,7 +408,6 @@ struct crypto_tfm *__crypto_alloc_tfm(struct crypto_alg *alg, u32 type,
+ 
+ cra_init_failed:
+ 	crypto_exit_ops(tfm);
+-out_free_tfm:
+ 	if (err == -EAGAIN)
+ 		crypto_shoot_alg(alg);
+ 	kfree(tfm);
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 016d5a302b84..6156161b181f 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -56,7 +56,6 @@ struct sk_buff;
+ struct crypto_type {
+ 	unsigned int (*ctxsize)(struct crypto_alg *alg, u32 type, u32 mask);
+ 	unsigned int (*extsize)(struct crypto_alg *alg);
+-	int (*init)(struct crypto_tfm *tfm, u32 type, u32 mask);
+ 	int (*init_tfm)(struct crypto_tfm *tfm);
+ 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
+ 	int (*report)(struct sk_buff *skb, struct crypto_alg *alg);
+-- 
+2.40.0
 
-Perhaps one of the nxp folk in the audience should have a crack at that
-so.
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---VXxm4yyUB67FoBNX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZIn4YAAKCRB4tDGHoIJi
-0mYJAP9NnubJj0eeMfBXxo/XcEhHExe5uV2X4Jg0JhiJjuCw3QEAkatNfHZgwayd
-i52+9Wk5qljnuBEjJBHurt08neXyqAk=
-=Ke7L
------END PGP SIGNATURE-----
-
---VXxm4yyUB67FoBNX--
