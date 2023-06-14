@@ -2,100 +2,69 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED39EB64DC
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 19:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 685A6EB64D8
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 22:42:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232518AbjFNTVh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jun 2023 15:21:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47390 "EHLO
+        id S229453AbjFNWmj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jun 2023 18:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjFNTVf (ORCPT
+        with ESMTP id S235598AbjFNWmh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2023 15:21:35 -0400
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A0426B7;
-        Wed, 14 Jun 2023 12:21:16 -0700 (PDT)
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-33cb82122c7so29528265ab.1;
-        Wed, 14 Jun 2023 12:21:16 -0700 (PDT)
+        Wed, 14 Jun 2023 18:42:37 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178A41BF9
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 15:42:37 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-77a0fd9d2eeso789543739f.0
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 15:42:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686770476; x=1689362476;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sHiFqUH8Ns99cL4Q7Lgq6jxmGIJl/IBWeuGMsrbyXnU=;
-        b=bT5p3MIEHc53heYTrW6QWDnCa9Cf7EIJhU2CgyPBAP0G4M0EkSQxVi3bKErCD1g4cm
-         wV0oG8rlU+2mXrDq0rnZ8Y5YBiFq6pJkfrgJoSuW2oM1PuW1UyRztjqlg5G2UqcqIJAk
-         RHcZBvFOjUaKwiFlwo3aJva9HBsPElWmV//mR+qlnWvnAL3XdlLCi+NDtl99udyccLps
-         hJAy88cQOMozWCqqBJEmAcSqFzll4JR5z0Er43VfQYmg8Yo+7avQtGEPmEy3npUqMfSp
-         sqqNjD+emKSqhG/1zYLswm0aHR9HHgV0LuM0UOW0PXemC1IWtcx/PwujEJ7VJt7xwspp
-         KOXw==
-X-Gm-Message-State: AC+VfDyNPR+wwOL5pHMHIY8INXAhgqn7pJu8ep7mskZjynw3YwMdBUqM
-        XaTuvkXUA79deL1cOeCldg==
-X-Google-Smtp-Source: ACHHUZ4+oCaDJAL2TyNKe9N2ZuahMJpTVt2MjofPkLtQyNt9QOfQlpzr2x39gYaMHbPNmmJx9oNtlQ==
-X-Received: by 2002:a05:6e02:5c7:b0:33f:dfd1:fe49 with SMTP id l7-20020a056e0205c700b0033fdfd1fe49mr10449290ils.6.1686770475971;
-        Wed, 14 Jun 2023 12:21:15 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id i18-20020a02c612000000b004230e6377f3sm190722jan.177.2023.06.14.12.21.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jun 2023 12:21:15 -0700 (PDT)
-Received: (nullmailer pid 2591199 invoked by uid 1000);
-        Wed, 14 Jun 2023 19:21:12 -0000
-Date:   Wed, 14 Jun 2023 13:21:12 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Oleksij Rempel <o.rempel@pengutronix.de>
-Cc:     linux-arm-kernel@lists.infradead.org,
-        Michael Turquette <mturquette@baylibre.com>,
-        linux-mmc@vger.kernel.org, Abel Vesa <abelvesa@kernel.org>,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Fabio Estevam <festevam@gmail.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>, linux-input@vger.kernel.org,
-        Stephen Boyd <sboyd@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        linux-clk@vger.kernel.org, Anson Huang <Anson.Huang@nxp.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Mark Brown <broonie@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-        Thomas Gleixner <tglx@linutronix.de>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-        Peng Fan <peng.fan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Michael Trimarchi <michael@amarulasolutions.com>,
-        Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH v1 7/7] dt-bindings: input: touchscreen: edt-ft5x06: Add
- 'threshold' property
-Message-ID: <168677047226.2591141.8223363796946763544.robh@kernel.org>
-References: <20230601101451.357662-1-o.rempel@pengutronix.de>
- <20230601101451.357662-8-o.rempel@pengutronix.de>
+        d=1e100.net; s=20221208; t=1686782556; x=1689374556;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WE73eWAx50Q9c0pRDTsurXPQzo7ErFkWRWSNLKelXl8=;
+        b=E3XRTGV8AiMxhMHklREMVoX8tfu4jHY9Wz5qWYxyifnSf4nXtSdmUDTlAJvThYmqlG
+         h7cUIpOd9FBtfYUb2VGYwlswK73kszghRWZgTtvuBIUjATT0AvSK+TE2dt4FxG/EZrc2
+         T+5ota2UNs3MQ1WfZWQAKgIpsnVkt6LHM3HugLfZIG8gMYyFZ1Uxiq0n1+1J+oC9x4J3
+         u/IS/TEpmOY9NSnRx7vt7lazW1Ph4pYPK1AwwUvhVfCjawtvbnyrEDdbWLR2k2X6c5/v
+         Fvp0X8Y8fTe5IunlZhk8/baBt3IOTm2GuDI0LDmfidRPyZWGZd3zmAov57YctODGC88F
+         dwbA==
+X-Gm-Message-State: AC+VfDzrj90Kx7zblLfYmq0cP4o5B8Zg9DVIbBoc5uz5QNVFJrtvHorD
+        QHpJdqm1fBCyixQ+KDfkUazQfD1EN+B3IJep2jjTL9y85RtI
+X-Google-Smtp-Source: ACHHUZ5d+qMhMNOUFWZyzwX1QZfMj8e4pEaKvgbexuUfTL0QemYLd2k78ajcnQjdBEvahD4oj+jPD0jc4iq5zak1PLa3SgeT60kY
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230601101451.357662-8-o.rempel@pengutronix.de>
+X-Received: by 2002:a5e:880a:0:b0:76c:7d48:d798 with SMTP id
+ l10-20020a5e880a000000b0076c7d48d798mr6300645ioj.0.1686782556283; Wed, 14 Jun
+ 2023 15:42:36 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 15:42:36 -0700
+In-Reply-To: <1604628.1686754446@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000014bf4b05fe1eabfe@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in cryptd_hash_export
+From:   syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello,
 
-On Thu, 01 Jun 2023 12:14:51 +0200, Oleksij Rempel wrote:
-> Add a new property 'threshold' to the edt-ft5x06 touchscreen binding.
-> This property allows setting the "click"-threshold in the range from 0
-> to 255. This change addresses the following dtbs_check warning:
->   imx6dl-lanmcu.dtb: touchscreen@38: 'threshold' does not match any of the
->     regexes: 'pinctrl-[0-9]+'
->   From schema:
->     Documentation/devicetree/bindings/input/touchscreen/edt-ft5x06.yaml
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  .../devicetree/bindings/input/touchscreen/edt-ft5x06.yaml   | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Reported-and-tested-by: syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com
 
+Tested on:
+
+commit:         fa0e21fa rtnetlink: extend RTEXT_FILTER_SKIP_STATS to ..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+console output: https://syzkaller.appspot.com/x/log.txt?x=12ae3673280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
+dashboard link: https://syzkaller.appspot.com/bug?extid=e79818f5c12416aba9de
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=172d9e8b280000
+
+Note: testing is done by a robot and is best-effort only.
