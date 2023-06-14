@@ -2,191 +2,69 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AEAEB64D8
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 15:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 012B3EB64D8
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 16:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237143AbjFNPwl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jun 2023 11:52:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48046 "EHLO
+        id S230298AbjFNQN0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jun 2023 12:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235239AbjFNPwk (ORCPT
+        with ESMTP id S231429AbjFNQNZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2023 11:52:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41BD9193
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 08:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686757910;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VKzVYTJU+Kltp7JOyEJXeiIKJE1OQId0BQJZ+m/qLVY=;
-        b=AxpJavDuf+z9lLRIY+aA4yA/wcyLaZvlXZ+BTp1suaWWHNjAHlfeQM/Waq8ciPxI6DnkJZ
-        8snxld2FN6W/Ub0lTNI0Qwc0THxNUcSA+jY36L2tJqFZCNE9piaKj75EOqeKL8u9PofLyq
-        6IImDd5m+pIC0A/+JPlCJo8r6JE0MfI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-570-zSJIIBXQMm21haaGJSnpZA-1; Wed, 14 Jun 2023 11:51:48 -0400
-X-MC-Unique: zSJIIBXQMm21haaGJSnpZA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D07D3806738;
-        Wed, 14 Jun 2023 15:51:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02D01492CA6;
-        Wed, 14 Jun 2023 15:51:43 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <000000000000b2585a05fdeb8379@google.com>
-References: <000000000000b2585a05fdeb8379@google.com>
-To:     syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>
-Cc:     dhowells@redhat.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, kuba@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
+        Wed, 14 Jun 2023 12:13:25 -0400
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B321FE2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 09:13:24 -0700 (PDT)
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-77a1d6d2f7fso834965539f.2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 09:13:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686759204; x=1689351204;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zeyhKQmQJgmGwX9czunjxyhPF6/Uyh0HJoA+1LIdqE8=;
+        b=TRV+5gd5AK0dIAaaJ9JI/M4cAdKsjveO7hFMskYQvBsoozfs/zPUSw33m/KF9IHx3W
+         EyobSpW+rpdLRppdBZiaCiDgBP9USpTgV0lH99jC972q5wU4OzLlPisVHwI+MlgF1fHc
+         AUbTwczZeFFbcaLzoq4t3TO//7sQBcB80S3ZBJwZD6Hw6iuXhPOaaGTUv2Aew9ixdaRi
+         EhNqyLg0aFuxRJVlv8EeOKTKqixqBjkDVc9Lwljyc6oMTt6hOA50Hryrga2BAki7TNX3
+         ZdqS/JUIIzue91+TtOwfHEquSoA9LJvewviez0HddGLVFk+Rl/1+MHkPKxJj7a28kxx5
+         IBkQ==
+X-Gm-Message-State: AC+VfDywiJcDCS49M7mJ0mE3KKMTuPikjE1RW0+jJC1AS7EcEunwYmMB
+        D3fgaQZGurSoz4r5KLflbIxQ2uNYxw9dXTkKrWA0f4sysRp1
+X-Google-Smtp-Source: ACHHUZ4r58bUvl9LoPAOXo+B6/ljIZcwyo9JK7UM90Yqibs/UTgX1tiUUXTcfd0jBjqB48XmrgyKXZl5c+T2EAc/pq3qX0C1IjMx
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1657852.1686757902.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 14 Jun 2023 16:51:42 +0100
-Message-ID: <1657853.1686757902@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Received: by 2002:a5e:da05:0:b0:775:4f90:a4ce with SMTP id
+ x5-20020a5eda05000000b007754f90a4cemr6194252ioj.0.1686759203788; Wed, 14 Jun
+ 2023 09:13:23 -0700 (PDT)
+Date:   Wed, 14 Jun 2023 09:13:23 -0700
+In-Reply-To: <1604533.1686754299@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000029dd9c05fe193bf3@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in crypto_shash_final
+From:   syzbot <syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.g=
-it main
+Hello,
 
-    crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
-    =
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-    If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
-    message with MSG_MORE set and then recvmsg() is called without first
-    sending another message without MSG_MORE set to end the operation, an =
-oops
-    will occur because the crypto context and result doesn't now get set u=
-p in
-    advance because hash_sendmsg() now defers that as long as possible in =
-the
-    hope that it can use crypto_ahash_digest() - and then because the mess=
-age
-    is zero-length, it the data wrangling loop is skipped.
-    =
+Reported-and-tested-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
 
-    Fix this by always making a pass of the loop, even in the case that no=
- data
-    is provided to the sendmsg().
-    =
+Tested on:
 
-    Fix also extract_iter_to_sg() to handle a zero-length iterator by retu=
-rning
-    0 immediately.
-    =
+commit:         fa0e21fa rtnetlink: extend RTEXT_FILTER_SKIP_STATS to ..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+console output: https://syzkaller.appspot.com/x/log.txt?x=13b86427280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
+dashboard link: https://syzkaller.appspot.com/bug?extid=14234ccf6d0ef629ec1a
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=15bf213b280000
 
-    Whilst we're at it, remove the code to create a kvmalloc'd scatterlist=
- if
-    we get more than ALG_MAX_PAGES - this shouldn't happen.
-    =
-
-    Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
-    Reported-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
-    Link: https://lore.kernel.org/r/000000000000b928f705fdeb873a@google.co=
-m/
-    Signed-off-by: David Howells <dhowells@redhat.com>
-    cc: Herbert Xu <herbert@gondor.apana.org.au>
-    cc: "David S. Miller" <davem@davemloft.net>
-    cc: Eric Dumazet <edumazet@google.com>
-    cc: Jakub Kicinski <kuba@kernel.org>
-    cc: Paolo Abeni <pabeni@redhat.com>
-    cc: Jens Axboe <axboe@kernel.dk>
-    cc: Matthew Wilcox <willy@infradead.org>
-    cc: linux-crypto@vger.kernel.org
-    cc: netdev@vger.kernel.org
-
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index dfb048cefb60..1176533a55c9 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -83,26 +83,14 @@ static int hash_sendmsg(struct socket *sock, struct ms=
-ghdr *msg,
- =
-
- 	ctx->more =3D false;
- =
-
--	while (msg_data_left(msg)) {
-+	do {
- 		ctx->sgl.sgt.sgl =3D ctx->sgl.sgl;
- 		ctx->sgl.sgt.nents =3D 0;
- 		ctx->sgl.sgt.orig_nents =3D 0;
- =
-
- 		err =3D -EIO;
- 		npages =3D iov_iter_npages(&msg->msg_iter, max_pages);
--		if (npages =3D=3D 0)
--			goto unlock_free;
--
--		if (npages > ARRAY_SIZE(ctx->sgl.sgl)) {
--			err =3D -ENOMEM;
--			ctx->sgl.sgt.sgl =3D
--				kvmalloc(array_size(npages,
--						    sizeof(*ctx->sgl.sgt.sgl)),
--					 GFP_KERNEL);
--			if (!ctx->sgl.sgt.sgl)
--				goto unlock_free;
--		}
--		sg_init_table(ctx->sgl.sgl, npages);
-+		sg_init_table(ctx->sgl.sgl, max_t(size_t, npages, 1));
- =
-
- 		ctx->sgl.need_unpin =3D iov_iter_extract_will_pin(&msg->msg_iter);
- =
-
-@@ -111,7 +99,8 @@ static int hash_sendmsg(struct socket *sock, struct msg=
-hdr *msg,
- 		if (err < 0)
- 			goto unlock_free;
- 		len =3D err;
--		sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
-+		if (len > 0)
-+			sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
- =
-
- 		if (!msg_data_left(msg)) {
- 			err =3D hash_alloc_result(sk, ctx);
-@@ -148,7 +137,7 @@ static int hash_sendmsg(struct socket *sock, struct ms=
-ghdr *msg,
- =
-
- 		copied +=3D len;
- 		af_alg_free_sg(&ctx->sgl);
--	}
-+	} while (msg_data_left(msg));
- =
-
- 	ctx->more =3D msg->msg_flags & MSG_MORE;
- 	err =3D 0;
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index e97d7060329e..77a7b18ee751 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -1340,7 +1340,7 @@ ssize_t extract_iter_to_sg(struct iov_iter *iter, si=
-ze_t maxsize,
- 			   struct sg_table *sgtable, unsigned int sg_max,
- 			   iov_iter_extraction_t extraction_flags)
- {
--	if (maxsize =3D=3D 0)
-+	if (!maxsize || !iter->count)
- 		return 0;
- =
-
- 	switch (iov_iter_type(iter)) {
-
+Note: testing is done by a robot and is best-effort only.
