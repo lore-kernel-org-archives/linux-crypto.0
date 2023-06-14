@@ -2,218 +2,196 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0880EB64D8
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 23:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D0FEB64D8
+	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 23:28:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233075AbjFNXR7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jun 2023 19:17:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53890 "EHLO
+        id S234331AbjFNX2n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jun 2023 19:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjFNXR6 (ORCPT
+        with ESMTP id S229516AbjFNX2n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2023 19:17:58 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75562695
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 16:17:38 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-77d8bce6533so85749439f.2
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 16:17:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686784658; x=1689376658;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMfBDNZbm5MgpXMVDc7rVIdsLtVOMKaxZmrB5FMABlg=;
-        b=eviXEUssfJOvw6kI4UcZi/yNKIFP9rPln5IdwYGjQcaoexdK5WVC5jYhFiwLMl0e6C
-         WSuRJWMKv7FY8b/wU70CDeT+bO3gJ8TgL9lNcaavl9RvXOczCmfXa6+AcP8xD6+ddW1i
-         tRanViLGfNkN418Oj6Mhi5Qbt1T7wUrawlTRE08TodDj263okwDdzUZXJJsvDdM7KXr3
-         IESZt1dHmHS2icPU80cZ8iWQzLwmRWT7hp6A6fh9w78HHaiOC7BOkhhA6onNg2u0DVwa
-         pf0Fofqj7wzRgd0CQUp7FkNDrzEh5BOk+TF5+Vooyc8QcuFx1q446x2j0CxRSYdTOTiI
-         dJmQ==
-X-Gm-Message-State: AC+VfDy+utNE/SdSaws8Zf2kaO8zvIpHDVe0CR5XaA2OI9cAycOb1TrN
-        pz9u45YEdlMHLfQdSJ/EUZ81V09XpYPow4UrxzZy5BQu2SCu
-X-Google-Smtp-Source: ACHHUZ43IM3uK+pOWFPKlYjU/O2fe2jpz3Eni8pX2LLCePm6JP+4TSduhox/H1X4/3zQmOYpQimGSh45bdvyNmDZX7lQ1HkO9HUZ
+        Wed, 14 Jun 2023 19:28:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB0551BD2
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 16:28:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686785280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aH8zwLa8Ht2nXaE8fo3wqv7zLHm1tw4+70R/cDKjh3s=;
+        b=Pib7553m97gLDb/s0E3V+7jCoW58jZS1t2ygyRC3W7QMAac1p0Sq5dX/2Dl2zYWSUouRHl
+        y6nssujR7lIzBoi4HSx69+yp+7uUIAEugKCZzc1pZlqRo0ix07AtEinXcrul7CHlH7RP4N
+        LsA5s3QmdWxiYniv6S3TZ9b4qMWeA1s=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-85-n6p0z6GaO3ei54QFL73rZQ-1; Wed, 14 Jun 2023 19:27:56 -0400
+X-MC-Unique: n6p0z6GaO3ei54QFL73rZQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1504A296A603;
+        Wed, 14 Jun 2023 23:27:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 559E240C6F5E;
+        Wed, 14 Jun 2023 23:27:54 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+To:     netdev@vger.kernel.org
+cc:     dhowells@redhat.com,
+        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
+        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
+        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
+        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
 MIME-Version: 1.0
-X-Received: by 2002:a6b:4401:0:b0:777:b713:22b5 with SMTP id
- r1-20020a6b4401000000b00777b71322b5mr6759142ioa.4.1686784658158; Wed, 14 Jun
- 2023 16:17:38 -0700 (PDT)
-Date:   Wed, 14 Jun 2023 16:17:38 -0700
-In-Reply-To: <1657853.1686757902@warthog.procyon.org.uk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005cb8f605fe1f28ce@google.com>
-Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
-From:   syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, kuba@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1679811.1686785244.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+From:   David Howells <dhowells@redhat.com>
+Date:   Thu, 15 Jun 2023 00:27:53 +0100
+Message-ID: <1679829.1686785273@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+    =
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-KASAN: slab-out-of-bounds Read in extract_iter_to_sg
+If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
+message with MSG_MORE set and then recvmsg() is called without first
+sending another message without MSG_MORE set to end the operation, an oops
+will occur because the crypto context and result doesn't now get set up in
+advance because hash_sendmsg() now defers that as long as possible in the
+hope that it can use crypto_ahash_digest() - and then because the message
+is zero-length, it the data wrangling loop is skipped.
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in sg_assign_page include/linux/scatterlist.h:109 [inline]
-BUG: KASAN: slab-out-of-bounds in sg_set_page include/linux/scatterlist.h:139 [inline]
-BUG: KASAN: slab-out-of-bounds in extract_bvec_to_sg lib/scatterlist.c:1183 [inline]
-BUG: KASAN: slab-out-of-bounds in extract_iter_to_sg lib/scatterlist.c:1352 [inline]
-BUG: KASAN: slab-out-of-bounds in extract_iter_to_sg+0x180b/0x1970 lib/scatterlist.c:1339
-Read of size 8 at addr ffff8880282aaff8 by task syz-executor.0/5450
+Fix this by always making a pass of the loop, even in the case that no dat=
+a
+is provided to the sendmsg().
 
-CPU: 0 PID: 5450 Comm: syz-executor.0 Not tainted 6.4.0-rc5-syzkaller-gfa0e21fa4443-dirty #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
- print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
- print_report mm/kasan/report.c:462 [inline]
- kasan_report+0x11c/0x130 mm/kasan/report.c:572
- sg_assign_page include/linux/scatterlist.h:109 [inline]
- sg_set_page include/linux/scatterlist.h:139 [inline]
- extract_bvec_to_sg lib/scatterlist.c:1183 [inline]
- extract_iter_to_sg lib/scatterlist.c:1352 [inline]
- extract_iter_to_sg+0x180b/0x1970 lib/scatterlist.c:1339
- af_alg_sendmsg+0x1917/0x2990 crypto/af_alg.c:1045
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:747
- splice_to_socket+0x954/0xe30 fs/splice.c:917
- do_splice_from fs/splice.c:969 [inline]
- direct_splice_actor+0x114/0x180 fs/splice.c:1157
- splice_direct_to_actor+0x34a/0x9c0 fs/splice.c:1103
- do_splice_direct+0x1ad/0x280 fs/splice.c:1209
- do_sendfile+0xb19/0x12c0 fs/read_write.c:1254
- __do_sys_sendfile64 fs/read_write.c:1316 [inline]
- __se_sys_sendfile64 fs/read_write.c:1308 [inline]
- __x64_sys_sendfile64+0x14d/0x210 fs/read_write.c:1308
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f10eb08c169
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f10ebe5e168 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-RAX: ffffffffffffffda RBX: 00007f10eb1ac120 RCX: 00007f10eb08c169
-RDX: 0000000020000180 RSI: 0000000000000003 RDI: 0000000000000005
-RBP: 00007f10eb0e7ca1 R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000ffffffff R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffea268bd7f R14: 00007f10ebe5e300 R15: 0000000000022000
- </TASK>
+Fix also extract_iter_to_sg() to handle a zero-length iterator by returnin=
+g
+0 immediately.
 
-Allocated by task 5450:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- ____kasan_kmalloc mm/kasan/common.c:333 [inline]
- __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
- kasan_kmalloc include/linux/kasan.h:196 [inline]
- __do_kmalloc_node mm/slab_common.c:966 [inline]
- __kmalloc+0x5e/0x190 mm/slab_common.c:979
- kmalloc include/linux/slab.h:563 [inline]
- sock_kmalloc+0xb2/0x100 net/core/sock.c:2674
- af_alg_alloc_tsgl crypto/af_alg.c:614 [inline]
- af_alg_sendmsg+0x17a4/0x2990 crypto/af_alg.c:1028
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:747
- splice_to_socket+0x954/0xe30 fs/splice.c:917
- do_splice_from fs/splice.c:969 [inline]
- direct_splice_actor+0x114/0x180 fs/splice.c:1157
- splice_direct_to_actor+0x34a/0x9c0 fs/splice.c:1103
- do_splice_direct+0x1ad/0x280 fs/splice.c:1209
- do_sendfile+0xb19/0x12c0 fs/read_write.c:1254
- __do_sys_sendfile64 fs/read_write.c:1316 [inline]
- __se_sys_sendfile64 fs/read_write.c:1308 [inline]
- __x64_sys_sendfile64+0x14d/0x210 fs/read_write.c:1308
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Whilst we're at it, remove the code to create a kvmalloc'd scatterlist if
+we get more than ALG_MAX_PAGES - this shouldn't happen.
 
-The buggy address belongs to the object at ffff8880282aa000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 0 bytes to the right of
- allocated 4088-byte region [ffff8880282aa000, ffff8880282aaff8)
+Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
+Reported-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000b928f705fdeb873a@google.com/
+Reported-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000c047db05fdeb8790@google.com/
+Reported-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000bcca3205fdeb87fb@google.com/
+Reported-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000b55d8805fdeb8385@google.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+Tested-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
+Tested-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
+Tested-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
+Tested-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-crypto@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+ crypto/algif_hash.c |   21 +++++----------------
+ lib/scatterlist.c   |    2 +-
+ 2 files changed, 6 insertions(+), 17 deletions(-)
 
-The buggy address belongs to the physical page:
-page:ffffea0000a0aa00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x282a8
-head:ffffea0000a0aa00 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000010200 ffff888012442140 0000000000000000 0000000000000001
-raw: 0000000000000000 0000000080040004 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 5156, tgid 5156 (dhcpcd-run-hook), ts 68845362597, free_ts 68027991491
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x2db/0x350 mm/page_alloc.c:1731
- prep_new_page mm/page_alloc.c:1738 [inline]
- get_page_from_freelist+0xf41/0x2c00 mm/page_alloc.c:3502
- __alloc_pages+0x1cb/0x4a0 mm/page_alloc.c:4768
- alloc_pages+0x1aa/0x270 mm/mempolicy.c:2279
- alloc_slab_page mm/slub.c:1851 [inline]
- allocate_slab+0x25f/0x390 mm/slub.c:1998
- new_slab mm/slub.c:2051 [inline]
- ___slab_alloc+0xa91/0x1400 mm/slub.c:3192
- __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3291
- __slab_alloc_node mm/slub.c:3344 [inline]
- slab_alloc_node mm/slub.c:3441 [inline]
- __kmem_cache_alloc_node+0x136/0x320 mm/slub.c:3490
- __do_kmalloc_node mm/slab_common.c:965 [inline]
- __kmalloc+0x4e/0x190 mm/slab_common.c:979
- kmalloc include/linux/slab.h:563 [inline]
- tomoyo_realpath_from_path+0xc3/0x600 security/tomoyo/realpath.c:251
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_check_open_permission+0x29a/0x3a0 security/tomoyo/file.c:771
- tomoyo_file_open security/tomoyo/tomoyo.c:332 [inline]
- tomoyo_file_open+0xa1/0xc0 security/tomoyo/tomoyo.c:327
- security_file_open+0x49/0xb0 security/security.c:2797
- do_dentry_open+0x575/0x13f0 fs/open.c:907
- do_open fs/namei.c:3636 [inline]
- path_openat+0x1baa/0x2750 fs/namei.c:3791
- do_filp_open+0x1ba/0x410 fs/namei.c:3818
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1302 [inline]
- free_unref_page_prepare+0x62e/0xcb0 mm/page_alloc.c:2564
- free_unref_page+0x33/0x370 mm/page_alloc.c:2659
- qlink_free mm/kasan/quarantine.c:166 [inline]
- qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
- kasan_quarantine_reduce+0x195/0x220 mm/kasan/quarantine.c:292
- __kasan_slab_alloc+0x63/0x90 mm/kasan/common.c:305
- kasan_slab_alloc include/linux/kasan.h:186 [inline]
- slab_post_alloc_hook mm/slab.h:711 [inline]
- slab_alloc_node mm/slub.c:3451 [inline]
- slab_alloc mm/slub.c:3459 [inline]
- __kmem_cache_alloc_lru mm/slub.c:3466 [inline]
- kmem_cache_alloc+0x17c/0x3b0 mm/slub.c:3475
- vm_area_alloc+0x20/0x230 kernel/fork.c:489
- mmap_region+0x407/0x28d0 mm/mmap.c:2631
- do_mmap+0x831/0xf60 mm/mmap.c:1394
- vm_mmap_pgoff+0x1a2/0x3b0 mm/util.c:543
- ksys_mmap_pgoff+0x7d/0x5a0 mm/mmap.c:1440
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index dfb048cefb60..1176533a55c9 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -83,26 +83,14 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ =
 
-Memory state around the buggy address:
- ffff8880282aae80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff8880282aaf00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff8880282aaf80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc
-                                                                ^
- ffff8880282ab000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8880282ab080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+ 	ctx->more =3D false;
+ =
 
+-	while (msg_data_left(msg)) {
++	do {
+ 		ctx->sgl.sgt.sgl =3D ctx->sgl.sgl;
+ 		ctx->sgl.sgt.nents =3D 0;
+ 		ctx->sgl.sgt.orig_nents =3D 0;
+ =
 
-Tested on:
+ 		err =3D -EIO;
+ 		npages =3D iov_iter_npages(&msg->msg_iter, max_pages);
+-		if (npages =3D=3D 0)
+-			goto unlock_free;
+-
+-		if (npages > ARRAY_SIZE(ctx->sgl.sgl)) {
+-			err =3D -ENOMEM;
+-			ctx->sgl.sgt.sgl =3D
+-				kvmalloc(array_size(npages,
+-						    sizeof(*ctx->sgl.sgt.sgl)),
+-					 GFP_KERNEL);
+-			if (!ctx->sgl.sgt.sgl)
+-				goto unlock_free;
+-		}
+-		sg_init_table(ctx->sgl.sgl, npages);
++		sg_init_table(ctx->sgl.sgl, max_t(size_t, npages, 1));
+ =
 
-commit:         fa0e21fa rtnetlink: extend RTEXT_FILTER_SKIP_STATS to ..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=13c29b07280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
-dashboard link: https://syzkaller.appspot.com/bug?extid=6efc50cc1f8d718d6cb7
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=127f213b280000
+ 		ctx->sgl.need_unpin =3D iov_iter_extract_will_pin(&msg->msg_iter);
+ =
+
+@@ -111,7 +99,8 @@ static int hash_sendmsg(struct socket *sock, struct msg=
+hdr *msg,
+ 		if (err < 0)
+ 			goto unlock_free;
+ 		len =3D err;
+-		sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
++		if (len > 0)
++			sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
+ =
+
+ 		if (!msg_data_left(msg)) {
+ 			err =3D hash_alloc_result(sk, ctx);
+@@ -148,7 +137,7 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ =
+
+ 		copied +=3D len;
+ 		af_alg_free_sg(&ctx->sgl);
+-	}
++	} while (msg_data_left(msg));
+ =
+
+ 	ctx->more =3D msg->msg_flags & MSG_MORE;
+ 	err =3D 0;
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index e97d7060329e..77a7b18ee751 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -1340,7 +1340,7 @@ ssize_t extract_iter_to_sg(struct iov_iter *iter, si=
+ze_t maxsize,
+ 			   struct sg_table *sgtable, unsigned int sg_max,
+ 			   iov_iter_extraction_t extraction_flags)
+ {
+-	if (maxsize =3D=3D 0)
++	if (!maxsize || !iter->count)
+ 		return 0;
+ =
+
+ 	switch (iov_iter_type(iter)) {
 
