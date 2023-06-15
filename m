@@ -2,196 +2,192 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D0FEB64D8
-	for <linux-crypto@archiver.kernel.org>; Wed, 14 Jun 2023 23:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ADBEEB64D8
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 01:50:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbjFNX2n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 14 Jun 2023 19:28:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59842 "EHLO
+        id S237338AbjFOBuJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 14 Jun 2023 21:50:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjFNX2n (ORCPT
+        with ESMTP id S236932AbjFOBtw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 14 Jun 2023 19:28:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB0551BD2
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Jun 2023 16:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686785280;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=aH8zwLa8Ht2nXaE8fo3wqv7zLHm1tw4+70R/cDKjh3s=;
-        b=Pib7553m97gLDb/s0E3V+7jCoW58jZS1t2ygyRC3W7QMAac1p0Sq5dX/2Dl2zYWSUouRHl
-        y6nssujR7lIzBoi4HSx69+yp+7uUIAEugKCZzc1pZlqRo0ix07AtEinXcrul7CHlH7RP4N
-        LsA5s3QmdWxiYniv6S3TZ9b4qMWeA1s=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-85-n6p0z6GaO3ei54QFL73rZQ-1; Wed, 14 Jun 2023 19:27:56 -0400
-X-MC-Unique: n6p0z6GaO3ei54QFL73rZQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1504A296A603;
-        Wed, 14 Jun 2023 23:27:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 559E240C6F5E;
-        Wed, 14 Jun 2023 23:27:54 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-To:     netdev@vger.kernel.org
-cc:     dhowells@redhat.com,
-        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
-        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
-        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
-        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
+        Wed, 14 Jun 2023 21:49:52 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EE28DF;
+        Wed, 14 Jun 2023 18:49:50 -0700 (PDT)
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35EK5jjZ018120;
+        Thu, 15 Jun 2023 01:49:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2023-03-30;
+ bh=JDrJY6aHYZmQdbcWrElbvX00ReFGYL3paDSmsEREJmM=;
+ b=2wBAkAMwQJSxPO5tCaW/9qxwtdyBEm3yfF7oES8a8ItaMtV0VVnzy6A3wxceSM2c6jgr
+ Wl//Ksj12pj0JFl8alPNED1IEsEil2KD/+dyyOKY63hw9n8dxnBla+q2smQ9WX7nzAT1
+ kjv2JMWhI6zvVIwIinbkXXhkFittUY9e0RK3i97ua5Si6RSjxLanHOzQh/Drfku3CWgY
+ p23fVcVN3jL81ayy3uPNzQzES/U7XpKl2CfDatsyPKVHTIv7W591m/gSL0zZfLy9sg3Y
+ nfjzACnSU9qtkOCXqE2cLANE7QvonhZ/CimvpzpDhxCs+XnaiVcUCD3ijacMStyUQG9P kA== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3r4h7d8w16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Jun 2023 01:49:33 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35EMv5sV021623;
+        Thu, 15 Jun 2023 01:49:32 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2044.outbound.protection.outlook.com [104.47.66.44])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3r4fm6anvv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Jun 2023 01:49:32 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kfRstO/10GQmffT11+/hWrScjbwxzdxpgQUa2AEXLZec55QZuuuP2nfCycMH4XeHcgzy2gVPk0hxDFpaczlePiz8z6PwDiXGzytKBa1QMDAIb/TbC4hLp9SEoRllWBpeOkqkfpg8iplyNTUyCDGd56Xu89InEfZWpyzCgnmDurXy9EQlPROQaPi3mIGomJYUA1cEL/bQfstZ5edGodIgNe8Q02nXdUXFOcjFZwg6XKL6SAG6HCU11oXgetX6L8KzteiOuvPCnXgUG2AmpSn9tBhxi7PeTm1YNQm0+EgwXasH4V0qJbB8cT+n+XYuKH3jq+D2cqHhvNkny+rFiqhXkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JDrJY6aHYZmQdbcWrElbvX00ReFGYL3paDSmsEREJmM=;
+ b=PL55Wt1krzyamEbGJ+262lOqQjLPmQiU2ox7VZRsgZIRTn8DoELkD+DEGtLgPjfBLCHcdaQ37fD+8B9O5ioJc5yveJ8uUfYal/M2usxIKQmhda+Rq30xt8am36m9lW/qa0PyY5TIol5zBPxe3aQ+PXm75pYk3LcKCSiGGkKNcfx36Bp2Wd0a7n7U4mU8qDuKbRQGr4kMbeg8cJrouRu5IAl/NQHJxFWFHwWQp+k52HCBrbXqNKhx349qh/rwyTddNpjAe37USckhUJ6FDmY7Pl9D1txhp5pm6jvTKnB531diVZ0aSqHxbnDI2kLqE4SuSXABW92bK9zLw+dgN4gofA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JDrJY6aHYZmQdbcWrElbvX00ReFGYL3paDSmsEREJmM=;
+ b=N5uatdyeh3DsQ6biL0VJQdJDrx+YoruLgqUTVPBo/SAMAR5pfMo2Ry8BWKc8ut6mVMPF/zaqZUf00WmOE+Y1ensDRUOQ3BZ1XWo44yH9UKgKI74Ow6zvj/zPayjcYldUseXiuQtztesg4zuvNvX6LWlHnhZhlRI/XAZ227z2AiQ=
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by DS0PR10MB7398.namprd10.prod.outlook.com (2603:10b6:8:135::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.38; Thu, 15 Jun
+ 2023 01:49:30 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::b77c:5f48:7b34:39c0]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::b77c:5f48:7b34:39c0%7]) with mapi id 15.20.6477.037; Thu, 15 Jun 2023
+ 01:49:30 +0000
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [RESEND v7 0/3] Add dedicated Qcom ICE driver
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1a5x1wl4g.fsf@ca-mkp.ca.oracle.com>
+References: <20230612192847.1599416-1-abel.vesa@linaro.org>
+Date:   Wed, 14 Jun 2023 21:49:27 -0400
+In-Reply-To: <20230612192847.1599416-1-abel.vesa@linaro.org> (Abel Vesa's
+        message of "Mon, 12 Jun 2023 22:28:44 +0300")
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0209.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c3::34) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1679811.1686785244.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-From:   David Howells <dhowells@redhat.com>
-Date:   Thu, 15 Jun 2023 00:27:53 +0100
-Message-ID: <1679829.1686785273@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|DS0PR10MB7398:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2fb35929-44f0-4c60-e210-08db6d42c28e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vg38sL8Gpa0b0R5m1QAhgqA4fm7PQpjQFn5e2JHbHXGWvlResT4I2AVEKJJtTP4WhdItz7Bkm9pm43BdAO6BUmFfdFNV5/RZTZdWGm2vnW0roxvdXpTEpZimfrR8jLNM7JX2F0/zaPmv6R+xGHP6aHNutaOI5Z8RIacO9BRfRuwxvmXP+EXdMQecPzWTVPFfE78Jke67NMJd5LfAwmL4iT0fUV3R+C7ZXRaeuqIAor0ApQu9DQctefgrs/wzEWTmcmiJFfDLkFonUye7hHxKLTFEp07xVFvIlcpYWMBhxWxtdplsJJgAJJ03EkCPXUfxvHFwcOhDE0JQCzfPEy2iCEsl1WIkG3qaERYfbchYS/7oY5WEV2gw9tA8IiZ3kiKVjgQWrbChZq2KWz2QxMKcvLS6eotGtOPg8TzDyo+u9EjWaAn3HYBf7JBaVPhlJAe0BReVz19ssx473b/1vrCdaRgD9nZFE79osnGDazkDXC6wEEtzkHDUv9KfFAdkT6EkMiUA+kZKx/pktKu7kz4xmvk/g6CLDLxDjlLRtYqOxTxT+5t6Hjg1occqoF4xXRgF
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(376002)(366004)(396003)(39860400002)(451199021)(5660300002)(26005)(186003)(6512007)(41300700001)(6506007)(6486002)(83380400001)(7416002)(66476007)(6666004)(4326008)(66556008)(66946007)(54906003)(38100700002)(8676002)(8936002)(478600001)(2906002)(4744005)(6916009)(86362001)(316002)(36916002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rNWuUt3sKGT5DiHe3OVH0thbWqB6Qs+m6E0KVqXwUTLl/iATUGdjXJ2uYv2t?=
+ =?us-ascii?Q?XeZdh+eYEyzRbzoKyVebivM7oMgIym5l6KcbPztu/5z+NSKVOQutUMKx2oEZ?=
+ =?us-ascii?Q?BCqCA9Luct8leUShzeFCIscb6yl4l1Zu/G9gux/k0UJFJ8SjjHbSJoiKs7wG?=
+ =?us-ascii?Q?RXguoguoZNpKk+cRnlWQOrVDT+zwgCaVbbETpph1Vzu7KCXSWclFx5Fgn7wW?=
+ =?us-ascii?Q?TIKk9amvDthxt0X251hpOcj5/RbznMuoULnpWCm8KtGVyv0k66L3X2FSXYLd?=
+ =?us-ascii?Q?yNJs3FLlL0pLZD0rnu4Ef5yJhERLFLa5UTrbCgFri6PVFWATCgYNi2VUkzTm?=
+ =?us-ascii?Q?L+Kc6OeWDWMeg0lZCKOUB7gsEUcGP8RkczEUNCghcehugpikFLIgsNerpd4T?=
+ =?us-ascii?Q?iSIhsfb5DwnTZi97S4SlNvNrTtdeISbMNzzo9KYHpOckspEYw6khyAeWYbti?=
+ =?us-ascii?Q?AaOOpUQCqVr7HzHXdZYFdstYkyqqTpLPgnO/H3lsR/f/WUJTsxNuk3Ibv2Gi?=
+ =?us-ascii?Q?qw/xtXSo18OHVZG6EiyH8pLn2GucAxFZ0joatpV/qBVffU7xC2Fo+Fihgu75?=
+ =?us-ascii?Q?l9FFMC0DSQ37ExvyVkMJP5dstW0oV6wg5x0oLumOiOPOD3eqUQhl+SD11FWF?=
+ =?us-ascii?Q?l8vSK8Yh4adez35MRUxfWeumD6LR0/Z019+FH3b+9GZR/MN2HHMcsnakxXJh?=
+ =?us-ascii?Q?xyUTdNBXIa6wuP8kcSlx76yKDDiy8bOWBy7HQ1U5+TkL+v95zX5gFWJ6l0Yf?=
+ =?us-ascii?Q?HPBFFYbqaLWWex+lsZDZRYNIpoeVcuquAmjV3GnJMYuKEJ/INeozutQxZyMG?=
+ =?us-ascii?Q?/lLaWcl4G8CWoSgZPKykHmJjV5CGlBEvvkeIXWs1soxOCmwlYS1JrNz9wK+F?=
+ =?us-ascii?Q?xiE8VRy+o/dopv/CxGjnm9G28Of0Zc3zvO/hCMxeQo+6GD8Wxw6OxdNw3iOC?=
+ =?us-ascii?Q?lx1Iu0h3cTrK8akLJDIEa4FSjM83/b4wyDyWnNbpNgxmJ0zVXu33AKVfzDp7?=
+ =?us-ascii?Q?GzrbCY0O4yaAqh/236EqZGfcpzzx4wT5u38d8Qo1yekUgRDPOwQyg7E85zAK?=
+ =?us-ascii?Q?GuYqwKjpZIxpO8OgfxTaSlMt3oVBAzvoTB+DBdjPVRDiE2EZAaiZvioKc9GY?=
+ =?us-ascii?Q?UQQ601+3mF5H2u63D+56npGLWxUNJH18uSYCXozGHF++BlslpNKc63i1hkx6?=
+ =?us-ascii?Q?FR5PkkA2ArHup/w/3H3/BVRsZ6NZvXwhiZ+DmxI9md+nmWwM22H+AmnOvoLW?=
+ =?us-ascii?Q?KHeIffTP7aTGRJsmaAqYgPhdkdoB5I4RxC5Zhk50nN84kD7lScpcCvN6B+rT?=
+ =?us-ascii?Q?yG0rIdboCqmisHLCl4qNUJxOTNPjFelXyyYPUlKjsTgVmhXytJTPHx9ji5eE?=
+ =?us-ascii?Q?pt4yZvcox3aGAfUHoqGV7hICUh75qnXSfwRUN6qfPWT0Jj4uZpxNF8N6ukdM?=
+ =?us-ascii?Q?XMix/GvHGw2cCpKBALtMaxCkP5JLZLdCiJUsJRim0Hu4b1w+fLot58HKHy4m?=
+ =?us-ascii?Q?Ou/JKN30GkZiLtFhfDK75De0CQj78WciE8pPmTfOFvGpXW2gceSVIFlhK3gt?=
+ =?us-ascii?Q?MKda9QN52W2WryZW2o4xASMi+z6sKjY5aAcpAQhYZ9RmFtLjNqkpM5UCOkJq?=
+ =?us-ascii?Q?YQ=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?u7HAsCKY2w89FkPjXO1d+bwQG7thQmX/tzt2xyA1XZKlEFI6p4CHQ7NwxIvC?=
+ =?us-ascii?Q?Q4Az08YvGnzjwAv9Gq67YI3R2k9q/UmacNUPoYU+BQ+8c/C2EOURXa/+a3vF?=
+ =?us-ascii?Q?BIY7N+/Pm83tt5zzvsluMerAhNbsmLuQWepbY6EmLX1tuSyrIVWo0BxSBNs0?=
+ =?us-ascii?Q?gEAUyGwMQnohLZnvN2EZtrPTeFczaNRPvOmX+1DpCXguEM+x14juc74ml9sR?=
+ =?us-ascii?Q?t1KdBO9YGwAzrPeOJbnZAg9Rr1I/iC/5IUVOd28tWU/lbGpKiNQQB0F0xPpj?=
+ =?us-ascii?Q?5VhERybywycz39HBnfQZCL/ILnyAZxn2spwb7/n3O/GOz8TOlhl243u1fsV8?=
+ =?us-ascii?Q?1XFZ1y7Q83QnTDiPRTSiH7a+FcXCNUvoIzF9b7AiHC7Zx2Iwu3dbkSDH58Tm?=
+ =?us-ascii?Q?ePaduJNmLcRpV199TE4/NpqHbHezz5yHNW5kPKrm000Icv8oik7wAg2VN9RV?=
+ =?us-ascii?Q?Xc7UmSCYVEETQ/BfddKwMvMvwNf2ga/dd+aU8CIpf/dxijTgulZs1CJ1inYV?=
+ =?us-ascii?Q?Q9ZQbDVOx5Os0SXFYBFsCmQPk0RUOlnCstsGfcdCD55L7ScV924xfQU2NW0z?=
+ =?us-ascii?Q?LqpePpuo9SwieVqI53qu8r6uWIACFV9nBaO341QK2U6ghzthJXiFSeTH1ZKk?=
+ =?us-ascii?Q?8vr5/eeHmTTLfbV7rzOCR1pWSF73EOc1Cyafi8N7E/cJt3FI22ZP3IDDTlXr?=
+ =?us-ascii?Q?c0glf0yv5zjQCajpC2aH+QTD3V52FQRf+pZlLQcivu493NFhMKCWDidjEisk?=
+ =?us-ascii?Q?ACOmVYs9GI8ECxcTlgRa0gkmLeaDP+fjbH4jmVbBbutzce/rLpOnqkCcuHvN?=
+ =?us-ascii?Q?61pKPZPOn1TQ3vqOcMomLJO92h8zJg94W7GCsUEjkoFNU0ZP/MT/eTMlAvCf?=
+ =?us-ascii?Q?ngjM8eWcPg9lFr6aeHG1VViLwHFMPhFN1ddu0UViCQlOnWF6Wcioy81XJNhK?=
+ =?us-ascii?Q?MSKBLR/N8v2ATQ6nEIhT3GjNtu+SNS2kweYpQaC5rBGE+Jo/Us8ygD3ULqyT?=
+ =?us-ascii?Q?Ca0Bm2IIsifBZfFu83fIS8C+y9IgiJlgXvpFLYYbpAeRZMw=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2fb35929-44f0-4c60-e210-08db6d42c28e
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2023 01:49:30.3479
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4yh0KijBgRpRLPrqyp4cZWfBgVBv5aJfz3O8Rzm57yVsjxhUJH7YP8FkfCXAlm8nGH0ctll4GW+rlHQyEx+D3phrDuYfz7WwUOYZKkGALZU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB7398
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-14_14,2023-06-14_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
+ suspectscore=0 mlxlogscore=758 bulkscore=0 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306150014
+X-Proofpoint-ORIG-GUID: wWK41GV24OD2IwiloV6Nu_WzxuzCtX15
+X-Proofpoint-GUID: wWK41GV24OD2IwiloV6Nu_WzxuzCtX15
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-    =
 
-If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
-message with MSG_MORE set and then recvmsg() is called without first
-sending another message without MSG_MORE set to end the operation, an oops
-will occur because the crypto context and result doesn't now get set up in
-advance because hash_sendmsg() now defers that as long as possible in the
-hope that it can use crypto_ahash_digest() - and then because the message
-is zero-length, it the data wrangling loop is skipped.
+Abel,
 
-Fix this by always making a pass of the loop, even in the case that no dat=
-a
-is provided to the sendmsg().
+> As both SDCC and UFS drivers use the ICE with duplicated implementation,
+> while none of the currently supported platforms make use concomitantly
+> of the same ICE IP block instance, the new SM8550 allows both UFS and
+> SDCC to do so. In order to support such scenario, there is a need for
+> a unified implementation and a devicetree node to be shared between
+> both types of storage devices. So lets drop the duplicate implementation
+> of the ICE from both SDCC and UFS and make it a dedicated (soc) driver.
 
-Fix also extract_iter_to_sg() to handle a zero-length iterator by returnin=
-g
-0 immediately.
+Applied 1-2 to 6.5/scsi-staging, thanks!
 
-Whilst we're at it, remove the code to create a kvmalloc'd scatterlist if
-we get more than ALG_MAX_PAGES - this shouldn't happen.
-
-Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
-Reported-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/000000000000b928f705fdeb873a@google.com/
-Reported-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/000000000000c047db05fdeb8790@google.com/
-Reported-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/000000000000bcca3205fdeb87fb@google.com/
-Reported-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/000000000000b55d8805fdeb8385@google.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-Tested-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
-Tested-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
-Tested-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
-Tested-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-crypto@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- crypto/algif_hash.c |   21 +++++----------------
- lib/scatterlist.c   |    2 +-
- 2 files changed, 6 insertions(+), 17 deletions(-)
-
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index dfb048cefb60..1176533a55c9 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -83,26 +83,14 @@ static int hash_sendmsg(struct socket *sock, struct ms=
-ghdr *msg,
- =
-
- 	ctx->more =3D false;
- =
-
--	while (msg_data_left(msg)) {
-+	do {
- 		ctx->sgl.sgt.sgl =3D ctx->sgl.sgl;
- 		ctx->sgl.sgt.nents =3D 0;
- 		ctx->sgl.sgt.orig_nents =3D 0;
- =
-
- 		err =3D -EIO;
- 		npages =3D iov_iter_npages(&msg->msg_iter, max_pages);
--		if (npages =3D=3D 0)
--			goto unlock_free;
--
--		if (npages > ARRAY_SIZE(ctx->sgl.sgl)) {
--			err =3D -ENOMEM;
--			ctx->sgl.sgt.sgl =3D
--				kvmalloc(array_size(npages,
--						    sizeof(*ctx->sgl.sgt.sgl)),
--					 GFP_KERNEL);
--			if (!ctx->sgl.sgt.sgl)
--				goto unlock_free;
--		}
--		sg_init_table(ctx->sgl.sgl, npages);
-+		sg_init_table(ctx->sgl.sgl, max_t(size_t, npages, 1));
- =
-
- 		ctx->sgl.need_unpin =3D iov_iter_extract_will_pin(&msg->msg_iter);
- =
-
-@@ -111,7 +99,8 @@ static int hash_sendmsg(struct socket *sock, struct msg=
-hdr *msg,
- 		if (err < 0)
- 			goto unlock_free;
- 		len =3D err;
--		sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
-+		if (len > 0)
-+			sg_mark_end(ctx->sgl.sgt.sgl + ctx->sgl.sgt.nents - 1);
- =
-
- 		if (!msg_data_left(msg)) {
- 			err =3D hash_alloc_result(sk, ctx);
-@@ -148,7 +137,7 @@ static int hash_sendmsg(struct socket *sock, struct ms=
-ghdr *msg,
- =
-
- 		copied +=3D len;
- 		af_alg_free_sg(&ctx->sgl);
--	}
-+	} while (msg_data_left(msg));
- =
-
- 	ctx->more =3D msg->msg_flags & MSG_MORE;
- 	err =3D 0;
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index e97d7060329e..77a7b18ee751 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -1340,7 +1340,7 @@ ssize_t extract_iter_to_sg(struct iov_iter *iter, si=
-ze_t maxsize,
- 			   struct sg_table *sgtable, unsigned int sg_max,
- 			   iov_iter_extraction_t extraction_flags)
- {
--	if (maxsize =3D=3D 0)
-+	if (!maxsize || !iter->count)
- 		return 0;
- =
-
- 	switch (iov_iter_type(iter)) {
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
