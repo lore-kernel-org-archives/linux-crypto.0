@@ -2,444 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 378A9EB64DC
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 10:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A37EB64D9
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 11:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234621AbjFOK3f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 06:29:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40768 "EHLO
+        id S233256AbjFOL3W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 07:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238765AbjFOK3R (ORCPT
+        with ESMTP id S231159AbjFOL3W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 06:29:17 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E24E1273D;
-        Thu, 15 Jun 2023 03:29:11 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1q9kDn-003Hqk-42; Thu, 15 Jun 2023 18:28:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 15 Jun 2023 18:28:55 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Thu, 15 Jun 2023 18:28:55 +0800
-Subject: [PATCH 5/5] KEYS: asymmetric: Use new crypto interface without scatterlists
-References: <ZIrnPcPj9Zbq51jK@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        David Howells <dhowells@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, dmitry.kasatkin@gmail.com,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1q9kDn-003Hqk-42@formenos.hmeau.com>
+        Thu, 15 Jun 2023 07:29:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4E9270E
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 04:28:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686828513;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qyCBoM4N2aiuoQmn2+32hlRq3a7hiH/dLr9/SKDhV4I=;
+        b=FTjyCpP5RL8gS4qlkjHIevsZpMHGdDgDkO32ElrHjUsLlYMDHZKUgqBviSj8dRVPlp79HX
+        J6ylOtg+tclkCF7jX8MmVk7DCW62uP3Ai0SgCZWY73XWEgORG4mCihAedMYVKONKdkklq1
+        SURDtSdsiItnX3MzlK/U+Zntuep3xKQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-591-stO62m1XOT6sugztNaDFDQ-1; Thu, 15 Jun 2023 07:28:30 -0400
+X-MC-Unique: stO62m1XOT6sugztNaDFDQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 24E11101A529;
+        Thu, 15 Jun 2023 11:28:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 68AF5C1603B;
+        Thu, 15 Jun 2023 11:28:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZIrZoKSFTibdKa95@gondor.apana.org.au>
+References: <ZIrZoKSFTibdKa95@gondor.apana.org.au> <1679829.1686785273@warthog.procyon.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
+        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
+        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
+        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
+        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <20659.1686828504.1@warthog.procyon.org.uk>
+Date:   Thu, 15 Jun 2023 12:28:24 +0100
+Message-ID: <20660.1686828504@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the new akcipher and sig interfaces which no longer have
-scatterlists in them.
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> In any case, this patch doesn't fix all the syzbot reports.
 
- crypto/asymmetric_keys/public_key.c |  234 +++++++++++++++++++++---------------
- 1 file changed, 137 insertions(+), 97 deletions(-)
+One of them I can't actually reproduce locally, but I have two more patches
+that might fix it.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index c795a12a3599..e787598cb3f7 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -8,16 +8,17 @@
-  */
- 
- #define pr_fmt(fmt) "PKEY: "fmt
--#include <linux/module.h>
--#include <linux/export.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/public_key.h>
-+#include <crypto/sig.h>
-+#include <keys/asymmetric-subtype.h>
-+#include <linux/asn1.h>
-+#include <linux/err.h>
- #include <linux/kernel.h>
--#include <linux/slab.h>
-+#include <linux/module.h>
- #include <linux/seq_file.h>
--#include <linux/scatterlist.h>
--#include <linux/asn1.h>
--#include <keys/asymmetric-subtype.h>
--#include <crypto/public_key.h>
--#include <crypto/akcipher.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
- 
- MODULE_DESCRIPTION("In-software asymmetric public-key subtype");
- MODULE_AUTHOR("Red Hat, Inc.");
-@@ -65,10 +66,13 @@ static void public_key_destroy(void *payload0, void *payload3)
- static int
- software_key_determine_akcipher(const struct public_key *pkey,
- 				const char *encoding, const char *hash_algo,
--				char alg_name[CRYPTO_MAX_ALG_NAME])
-+				char alg_name[CRYPTO_MAX_ALG_NAME], bool *sig,
-+				enum kernel_pkey_operation op)
- {
- 	int n;
- 
-+	*sig = true;
-+
- 	if (!encoding)
- 		return -EINVAL;
- 
-@@ -77,14 +81,18 @@ software_key_determine_akcipher(const struct public_key *pkey,
- 		 * RSA signatures usually use EMSA-PKCS1-1_5 [RFC3447 sec 8.2].
- 		 */
- 		if (strcmp(encoding, "pkcs1") == 0) {
--			if (!hash_algo)
-+			if (!hash_algo) {
-+				*sig = false;
- 				n = snprintf(alg_name, CRYPTO_MAX_ALG_NAME,
- 					     "pkcs1pad(%s)",
- 					     pkey->pkey_algo);
--			else
-+			} else {
-+				*sig = op == kernel_pkey_sign ||
-+				       op == kernel_pkey_verify;
- 				n = snprintf(alg_name, CRYPTO_MAX_ALG_NAME,
- 					     "pkcs1pad(%s,%s)",
- 					     pkey->pkey_algo, hash_algo);
-+			}
- 			return n >= CRYPTO_MAX_ALG_NAME ? -EINVAL : 0;
- 		}
- 		if (strcmp(encoding, "raw") != 0)
-@@ -95,6 +103,7 @@ software_key_determine_akcipher(const struct public_key *pkey,
- 		 */
- 		if (hash_algo)
- 			return -EINVAL;
-+		*sig = false;
- 	} else if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
- 		if (strcmp(encoding, "x962") != 0)
- 			return -EINVAL;
-@@ -152,37 +161,70 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 	struct crypto_akcipher *tfm;
- 	struct public_key *pkey = params->key->payload.data[asym_crypto];
- 	char alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_sig *sig;
- 	u8 *key, *ptr;
- 	int ret, len;
-+	bool issig;
- 
- 	ret = software_key_determine_akcipher(pkey, params->encoding,
--					      params->hash_algo, alg_name);
-+					      params->hash_algo, alg_name,
-+					      &issig, kernel_pkey_sign);
- 	if (ret < 0)
- 		return ret;
- 
--	tfm = crypto_alloc_akcipher(alg_name, 0, 0);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
--
--	ret = -ENOMEM;
- 	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
- 		      GFP_KERNEL);
- 	if (!key)
--		goto error_free_tfm;
-+		return -ENOMEM;
-+
- 	memcpy(key, pkey->key, pkey->keylen);
- 	ptr = key + pkey->keylen;
- 	ptr = pkey_pack_u32(ptr, pkey->algo);
- 	ptr = pkey_pack_u32(ptr, pkey->paramlen);
- 	memcpy(ptr, pkey->params, pkey->paramlen);
- 
--	if (pkey->key_is_private)
--		ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
--	else
--		ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
--	if (ret < 0)
--		goto error_free_key;
-+	if (issig) {
-+		sig = crypto_alloc_sig(alg_name, 0, 0);
-+		if (IS_ERR(sig))
-+			goto error_free_key;
-+
-+		if (pkey->key_is_private)
-+			ret = crypto_sig_set_privkey(sig, key, pkey->keylen);
-+		else
-+			ret = crypto_sig_set_pubkey(sig, key, pkey->keylen);
-+		if (ret < 0)
-+			goto error_free_tfm;
-+
-+		len = crypto_sig_maxsize(sig);
-+
-+		info->supported_ops = KEYCTL_SUPPORTS_VERIFY;
-+		if (pkey->key_is_private)
-+			info->supported_ops |= KEYCTL_SUPPORTS_SIGN;
-+
-+		if (strcmp(params->encoding, "pkcs1") == 0) {
-+			info->supported_ops |= KEYCTL_SUPPORTS_ENCRYPT;
-+			if (pkey->key_is_private)
-+				info->supported_ops |= KEYCTL_SUPPORTS_DECRYPT;
-+		}
-+	} else {
-+		tfm = crypto_alloc_akcipher(alg_name, 0, 0);
-+		if (IS_ERR(tfm))
-+			goto error_free_key;
-+
-+		if (pkey->key_is_private)
-+			ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
-+		else
-+			ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
-+		if (ret < 0)
-+			goto error_free_tfm;
-+
-+		len = crypto_akcipher_maxsize(tfm);
-+
-+		info->supported_ops = KEYCTL_SUPPORTS_ENCRYPT;
-+		if (pkey->key_is_private)
-+			info->supported_ops |= KEYCTL_SUPPORTS_DECRYPT;
-+	}
- 
--	len = crypto_akcipher_maxsize(tfm);
- 	info->key_size = len * 8;
- 
- 	if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
-@@ -208,17 +250,16 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 
- 	info->max_enc_size = len;
- 	info->max_dec_size = len;
--	info->supported_ops = (KEYCTL_SUPPORTS_ENCRYPT |
--			       KEYCTL_SUPPORTS_VERIFY);
--	if (pkey->key_is_private)
--		info->supported_ops |= (KEYCTL_SUPPORTS_DECRYPT |
--					KEYCTL_SUPPORTS_SIGN);
-+
- 	ret = 0;
- 
-+error_free_tfm:
-+	if (issig)
-+		crypto_free_sig(sig);
-+	else
-+		crypto_free_akcipher(tfm);
- error_free_key:
- 	kfree(key);
--error_free_tfm:
--	crypto_free_akcipher(tfm);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
- 	return ret;
- }
-@@ -230,34 +271,26 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- 			       const void *in, void *out)
- {
- 	const struct public_key *pkey = params->key->payload.data[asym_crypto];
--	struct akcipher_request *req;
--	struct crypto_akcipher *tfm;
--	struct crypto_wait cwait;
--	struct scatterlist in_sg, out_sg;
- 	char alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_akcipher *tfm;
-+	struct crypto_sig *sig;
- 	char *key, *ptr;
-+	bool issig;
-+	int ksz;
- 	int ret;
- 
- 	pr_devel("==>%s()\n", __func__);
- 
- 	ret = software_key_determine_akcipher(pkey, params->encoding,
--					      params->hash_algo, alg_name);
-+					      params->hash_algo, alg_name,
-+					      &issig, params->op);
- 	if (ret < 0)
- 		return ret;
- 
--	tfm = crypto_alloc_akcipher(alg_name, 0, 0);
--	if (IS_ERR(tfm))
--		return PTR_ERR(tfm);
--
--	ret = -ENOMEM;
--	req = akcipher_request_alloc(tfm, GFP_KERNEL);
--	if (!req)
--		goto error_free_tfm;
--
- 	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
- 		      GFP_KERNEL);
- 	if (!key)
--		goto error_free_req;
-+		return -ENOMEM;
- 
- 	memcpy(key, pkey->key, pkey->keylen);
- 	ptr = key + pkey->keylen;
-@@ -265,47 +298,70 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- 	ptr = pkey_pack_u32(ptr, pkey->paramlen);
- 	memcpy(ptr, pkey->params, pkey->paramlen);
- 
--	if (pkey->key_is_private)
--		ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
--	else
--		ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
--	if (ret)
--		goto error_free_key;
-+	if (issig) {
-+		sig = crypto_alloc_sig(alg_name, 0, 0);
-+		if (IS_ERR(sig))
-+			goto error_free_key;
-+
-+		if (pkey->key_is_private)
-+			ret = crypto_sig_set_privkey(sig, key, pkey->keylen);
-+		else
-+			ret = crypto_sig_set_pubkey(sig, key, pkey->keylen);
-+		if (ret)
-+			goto error_free_tfm;
-+
-+		ksz = crypto_sig_maxsize(sig);
-+	} else {
-+		tfm = crypto_alloc_akcipher(alg_name, 0, 0);
-+		if (IS_ERR(tfm))
-+			goto error_free_key;
-+
-+		if (pkey->key_is_private)
-+			ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
-+		else
-+			ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
-+		if (ret)
-+			goto error_free_tfm;
-+
-+		ksz = crypto_akcipher_maxsize(tfm);
-+	}
- 
--	sg_init_one(&in_sg, in, params->in_len);
--	sg_init_one(&out_sg, out, params->out_len);
--	akcipher_request_set_crypt(req, &in_sg, &out_sg, params->in_len,
--				   params->out_len);
--	crypto_init_wait(&cwait);
--	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
--				      CRYPTO_TFM_REQ_MAY_SLEEP,
--				      crypto_req_done, &cwait);
-+	ret = -EINVAL;
- 
- 	/* Perform the encryption calculation. */
- 	switch (params->op) {
- 	case kernel_pkey_encrypt:
--		ret = crypto_akcipher_encrypt(req);
-+		if (issig)
-+			break;
-+		ret = crypto_akcipher_sync_encrypt(tfm, in, params->in_len,
-+						   out, params->out_len);
- 		break;
- 	case kernel_pkey_decrypt:
--		ret = crypto_akcipher_decrypt(req);
-+		if (issig)
-+			break;
-+		ret = crypto_akcipher_sync_decrypt(tfm, in, params->in_len,
-+						   out, params->out_len);
- 		break;
- 	case kernel_pkey_sign:
--		ret = crypto_akcipher_sign(req);
-+		if (!issig)
-+			break;
-+		ret = crypto_sig_sign(sig, in, params->in_len,
-+				      out, params->out_len);
- 		break;
- 	default:
- 		BUG();
- 	}
- 
--	ret = crypto_wait_req(ret, &cwait);
- 	if (ret == 0)
--		ret = req->dst_len;
-+		ret = ksz;
- 
-+error_free_tfm:
-+	if (issig)
-+		crypto_free_sig(sig);
-+	else
-+		crypto_free_akcipher(tfm);
- error_free_key:
- 	kfree(key);
--error_free_req:
--	akcipher_request_free(req);
--error_free_tfm:
--	crypto_free_akcipher(tfm);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
- 	return ret;
- }
-@@ -316,12 +372,10 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- int public_key_verify_signature(const struct public_key *pkey,
- 				const struct public_key_signature *sig)
- {
--	struct crypto_wait cwait;
--	struct crypto_akcipher *tfm;
--	struct akcipher_request *req;
--	struct scatterlist src_sg[2];
- 	char alg_name[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_sig *tfm;
- 	char *key, *ptr;
-+	bool issig;
- 	int ret;
- 
- 	pr_devel("==>%s()\n", __func__);
-@@ -346,23 +400,19 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	}
- 
- 	ret = software_key_determine_akcipher(pkey, sig->encoding,
--					      sig->hash_algo, alg_name);
-+					      sig->hash_algo, alg_name,
-+					      &issig, kernel_pkey_verify);
- 	if (ret < 0)
- 		return ret;
- 
--	tfm = crypto_alloc_akcipher(alg_name, 0, 0);
-+	tfm = crypto_alloc_sig(alg_name, 0, 0);
- 	if (IS_ERR(tfm))
- 		return PTR_ERR(tfm);
- 
--	ret = -ENOMEM;
--	req = akcipher_request_alloc(tfm, GFP_KERNEL);
--	if (!req)
--		goto error_free_tfm;
--
- 	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
- 		      GFP_KERNEL);
- 	if (!key)
--		goto error_free_req;
-+		goto error_free_tfm;
- 
- 	memcpy(key, pkey->key, pkey->keylen);
- 	ptr = key + pkey->keylen;
-@@ -371,29 +421,19 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	memcpy(ptr, pkey->params, pkey->paramlen);
- 
- 	if (pkey->key_is_private)
--		ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
-+		ret = crypto_sig_set_privkey(tfm, key, pkey->keylen);
- 	else
--		ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
-+		ret = crypto_sig_set_pubkey(tfm, key, pkey->keylen);
- 	if (ret)
- 		goto error_free_key;
- 
--	sg_init_table(src_sg, 2);
--	sg_set_buf(&src_sg[0], sig->s, sig->s_size);
--	sg_set_buf(&src_sg[1], sig->digest, sig->digest_size);
--	akcipher_request_set_crypt(req, src_sg, NULL, sig->s_size,
--				   sig->digest_size);
--	crypto_init_wait(&cwait);
--	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
--				      CRYPTO_TFM_REQ_MAY_SLEEP,
--				      crypto_req_done, &cwait);
--	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
-+	ret = crypto_sig_verify(tfm, sig->s, sig->s_size,
-+				sig->digest, sig->digest_size);
- 
- error_free_key:
- 	kfree(key);
--error_free_req:
--	akcipher_request_free(req);
- error_free_tfm:
--	crypto_free_akcipher(tfm);
-+	crypto_free_sig(tfm);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
- 	if (WARN_ON_ONCE(ret > 0))
- 		ret = -EINVAL;
+David
+
