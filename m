@@ -2,69 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B61ABEB64D9
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 21:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56ABCEB64DA
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 21:09:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbjFOVCb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 17:02:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55848 "EHLO
+        id S232912AbjFOVJz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 17:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbjFOVCa (ORCPT
+        with ESMTP id S231758AbjFOVJy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 17:02:30 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213C12945
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 14:02:26 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7773997237cso865630039f.1
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 14:02:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686862945; x=1689454945;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n4hXMNSzNgX9qcNCtjmUZbMdzYOaYR79wSe3L4m7Iq0=;
-        b=U1Wpfdqz4C6oCgJKufzc6W7+lFJ1CFNyfzqS2x8npOjy23ihTkoI83J2oKAw90F31E
-         UptG2U3/AtcbA+eJlIy/FNdk8GVW3W0lbpG5VPLNyWoVsgBQ2LG+3Yam+xBNjdVvjo5F
-         ig3VVsUmRM9XHXGxb+t+D42ci4SDaERl7fZVPcguHFWt1n0oU+ipKcPyxNdOHzBTX0VZ
-         t7AgFVCgR6BDPGaQOjs76+shffbBJHIJa9CFRlEgbIOpJm2I0B6xzYTXsWCBhVZX7hb2
-         2MFHnrUWneVCzKdETmx3JJl8qua2yvzwVCpnPL5Wb29sBmaEiqDitsVO/zptLHqCvpaP
-         fTbA==
-X-Gm-Message-State: AC+VfDx5HoDwmYmAA9Eut9vBYt4OqcXmNQM77el8S/nl6S35FTUpu6kg
-        qhER4UE//GVGPCHjioY20LC9hDhFpSQqSCgxvzXThufnhbpO
-X-Google-Smtp-Source: ACHHUZ6USDC6PDWcEo+gfpDJs9g2SM4qwmGn+hEQt8nQOfRMl2i2RpbGbn/LJN2jsjD6+hkn/9TTEE0EoYZWM6rU7UkLMOgtbQUB
+        Thu, 15 Jun 2023 17:09:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 947992952
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 14:09:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686863341;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mX2XFIZB9S1fYGd2DwrbphZcZCLwFW1XtlbFzEi1ERc=;
+        b=OeYRC6BaKPYbfnWcedBanpIQhwxiRHSKG1Yl4YH4zuc2B9bk0G/sFL3giIT/mAUZ2T0YyI
+        VE+qg35ZAJt3LThdqXvf8PVPsCSPxLai23rWRLJQR5uOOW8ezUWZcx3wUn2WV4vPGkQYHA
+        3zaaGTeyShLOq7zNIuXwWGm1x9xxMZY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-636-UPUnrRqUNlWJU3sYlyvwog-1; Thu, 15 Jun 2023 17:08:57 -0400
+X-MC-Unique: UPUnrRqUNlWJU3sYlyvwog-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07219185A78F;
+        Thu, 15 Jun 2023 21:08:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 80CED140EBB8;
+        Thu, 15 Jun 2023 21:08:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+cc:     dhowells@redhat.com,
+        syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] crypto: Fix af_alg_sendmsg(MSG_SPLICE_PAGES) sglist limit
 MIME-Version: 1.0
-X-Received: by 2002:a02:a18f:0:b0:420:d53f:2821 with SMTP id
- n15-20020a02a18f000000b00420d53f2821mr90094jah.5.1686862945444; Thu, 15 Jun
- 2023 14:02:25 -0700 (PDT)
-Date:   Thu, 15 Jun 2023 14:02:25 -0700
-In-Reply-To: <262282.1686860686@warthog.procyon.org.uk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a5e86b05fe316253@google.com>
-Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
-From:   syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, kuba@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <322882.1686863334.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 15 Jun 2023 22:08:54 +0100
+Message-ID: <322883.1686863334@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+When af_alg_sendmsg() calls extract_iter_to_sg(), it passes MAX_SGL_ENTS a=
+s
+the maximum number of elements that may be written to, but some of the
+elements may already have been used (as recorded in sgl->cur), so
+extract_iter_to_sg() may end up overrunning the scatterlist.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Fix this to limit the number of elements to "MAX_SGL_ENTS - sgl->cur".
 
-Reported-and-tested-by: syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com
+Note: It probably makes sense in future to alter the behaviour of
+extract_iter_to_sg() to stop if "sgtable->nents >=3D sg_max" instead, but
+this is a smaller fix for now.
 
-Tested on:
+The bug causes errors looking something like:
 
-commit:         97c5209b leds: trigger: netdev: uninitialized variable..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=13705753280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
-dashboard link: https://syzkaller.appspot.com/bug?extid=6efc50cc1f8d718d6cb7
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=10d19cbb280000
+BUG: KASAN: slab-out-of-bounds in sg_assign_page include/linux/scatterlist=
+.h:109 [inline]
+BUG: KASAN: slab-out-of-bounds in sg_set_page include/linux/scatterlist.h:=
+139 [inline]
+BUG: KASAN: slab-out-of-bounds in extract_bvec_to_sg lib/scatterlist.c:118=
+3 [inline]
+BUG: KASAN: slab-out-of-bounds in extract_iter_to_sg lib/scatterlist.c:135=
+2 [inline]
+BUG: KASAN: slab-out-of-bounds in extract_iter_to_sg+0x17a6/0x1960 lib/sca=
+tterlist.c:1339
 
-Note: testing is done by a robot and is best-effort only.
+Fixes: bf63e250c4b1 ("crypto: af_alg: Support MSG_SPLICE_PAGES")
+Reported-by: syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/000000000000b2585a05fdeb8379@google.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+Tested-by: syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-crypto@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+ crypto/af_alg.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 7d4b6016b83d..cdb1dcc5dd1a 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1043,7 +1043,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghd=
+r *msg, size_t size,
+ 			};
+ =
+
+ 			plen =3D extract_iter_to_sg(&msg->msg_iter, len, &sgtable,
+-						  MAX_SGL_ENTS, 0);
++						  MAX_SGL_ENTS - sgl->cur, 0);
+ 			if (plen < 0) {
+ 				err =3D plen;
+ 				goto unlock;
+
