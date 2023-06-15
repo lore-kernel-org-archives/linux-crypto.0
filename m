@@ -2,203 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7B3EB64DA
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 16:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 008E9EB64DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 16:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230410AbjFOQCv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 12:02:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49302 "EHLO
+        id S230144AbjFOQTe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 12:19:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbjFOQCu (ORCPT
+        with ESMTP id S234155AbjFOQTI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 12:02:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2671D273E
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 09:02:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686844924;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E6zeZ2Y3tf2OPH/rRcIX6GxS4cB2PEK5LsG9Q9HL7Ww=;
-        b=cePLoYbOl6gWo50dKqOKtJ6iWrDY6LmYwW33c3kU5l3qSeRC8UIsfU7Jj4kJa8M9Azvi5L
-        O/jiDrsq4x+L/b+vcZVbWWBoTVg37ucex+gy7xRKe9tuX/g274IOOIeoEISrevoD4TGEfN
-        /MHxFQv/VstLrvGVjLh2dXRGNS9meNA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-322-I4ftdIS-MyauR0oETNCk3w-1; Thu, 15 Jun 2023 12:01:59 -0400
-X-MC-Unique: I4ftdIS-MyauR0oETNCk3w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2882D857D10;
-        Thu, 15 Jun 2023 16:01:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7496C1603B;
-        Thu, 15 Jun 2023 16:01:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <000000000000b2585a05fdeb8379@google.com>
-References: <000000000000b2585a05fdeb8379@google.com>
-To:     syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>
-Cc:     dhowells@redhat.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, kuba@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
+        Thu, 15 Jun 2023 12:19:08 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8F62952
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 09:19:06 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3f8cec6641bso22266925e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 09:19:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1686845945; x=1689437945;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vYWBqB+lSwhG8wORrnHLWYrtimD2ZM+aCUIorOoeBDs=;
+        b=JIP18p220Cn8gTeeEDEWZ9vvN6ai5FZmR7HwbHVfknPADASswj8KY8eo3DQqEC6Siw
+         tGghDo8+MZoUnUHAjPSsJMsKB4hdKlAkGOCCOCktVDEab/EyyyG3RitjY3HR8eJEpZE0
+         k1SnS1gZ18dSfv2+70GLhmcq0wMVzZb1Zf/O71SC2+UNpnmZYQYYCbgim8iJf2AudYuy
+         Szg3tPMpM7jh2DCGhCcTBePit8eW1apYDr1SIkmdzpu3ix8NnapBMPK01xaBAhz2apzl
+         vnJ4ordrHGym2xfr0DqPjdlOi4towpcVpOpnI/4DELQdDnRNhyR34QDx1MjCObKhf3OW
+         oB2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686845945; x=1689437945;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vYWBqB+lSwhG8wORrnHLWYrtimD2ZM+aCUIorOoeBDs=;
+        b=BxVF4j9dye1b4xE58xo+lQzRnPQb0Xo6P4pfG6n3ZXQvq5TVgCh+ZuvNUYlUsRTTcp
+         OrYsADebDc5SMS6zgwAMaeVhDGgMFlHZh+G86SiW4Ck8/4A6lKNMZ6bta4dMcNZqdemK
+         rRwYn9hFbfkSNtRb1uQE37NcfguQTGMLoA3M67r3olHP1w639bTyZ2KGuALkVIjvRHA5
+         9AQJwGOMWPAc7TSWuyaQcdaLqt+eBoaNv51xdeTU8JfylGwoHx8iZj1rtDFpX24InTtt
+         pP18Rs/I5MIzk9EGj9NUTKbTo+RD5bTeoi/NBIyYk1nbnlLGjbK96Hp1WrecmCNGWyN2
+         j7YQ==
+X-Gm-Message-State: AC+VfDxf6+mPenyA1r5IOSGEGwFyH5VV7PyClE7XlBz1GchDn4aguOMk
+        JDwS+WplsWwOpFDvYKUPHj/Bwe+twLmMdXCOtGs=
+X-Google-Smtp-Source: ACHHUZ4xiHr1VKbX5NeyuOBIcDlSOCeMjQQ53SHspLWpdWC6Ufimksq4Zoqgb92AUWRxgzEufS7amg==
+X-Received: by 2002:a7b:c84c:0:b0:3f6:76e:604b with SMTP id c12-20020a7bc84c000000b003f6076e604bmr14882510wml.0.1686845944780;
+        Thu, 15 Jun 2023 09:19:04 -0700 (PDT)
+Received: from [10.83.37.24] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id ja15-20020a05600c556f00b003f61177faffsm11354104wmb.0.2023.06.15.09.19.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jun 2023 09:19:04 -0700 (PDT)
+Message-ID: <6aa4521f-e5d2-ed12-ab49-1132409ab358@arista.com>
+Date:   Thu, 15 Jun 2023 17:19:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <256754.1686844894.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 15 Jun 2023 17:01:34 +0100
-Message-ID: <256755.1686844894@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [v2 PATCH] crypto: api - Add __crypto_alloc_tfmgfp
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, Bob Gilligan <gilligan@arista.com>,
+        David Ahern <dsahern@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Safonov <0x7f454c46@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Francesco Ruggeri <fruggeri05@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Salam Noureddine <noureddine@arista.com>,
+        linux-crypto@vger.kernel.org
+References: <20230614174643.3836590-1-dima@arista.com>
+ <20230614174643.3836590-3-dima@arista.com>
+ <ZIrTQ1tN5LMuRB/5@gondor.apana.org.au>
+Content-Language: en-US
+From:   Dmitry Safonov <dima@arista.com>
+In-Reply-To: <ZIrTQ1tN5LMuRB/5@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.g=
-it main
+On 6/15/23 10:00, Herbert Xu wrote:
+[..]
+> 
+> Good catch.  Though I'd rather add the gfp argument to a separate
+> function because I'm in the process of replacing ciphers with
+> something that uses the new crypto_types API.
+> 
+> Once that happens ciphers will switch over to the normal cloning
+> call and this can be removed.
 
+LGTM, thanks!
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 38d2265c77fd..e97abe6055a1 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -4333,8 +4333,7 @@ static void *smb2_get_aead_req(struct crypto_aead *t=
-fm, struct smb_rqst *rqst,
- 		}
- 		sgtable.orig_nents =3D sgtable.nents;
- =
+> 
+> ---8<---
+> Use it straight away in crypto_clone_cipher(), as that is not meant to
+> sleep.
+> 
+> Fixes: 51d8d6d0f4be ("crypto: cipher - Add crypto_clone_cipher")
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/crypto/api.c b/crypto/api.c
+[..]
 
--		rc =3D extract_iter_to_sg(iter, count, &sgtable,
--					num_sgs - sgtable.nents, 0);
-+		rc =3D extract_iter_to_sg(iter, count, &sgtable, num_sgs, 0);
- 		iov_iter_revert(iter, rc);
- 		sgtable.orig_nents =3D sgtable.nents;
- 	}
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index e97d7060329e..6fd20bfc01a4 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -1120,7 +1120,8 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
-ter,
- 	pages -=3D sg_max;
- =
-
- 	do {
--		res =3D iov_iter_extract_pages(iter, &pages, maxsize, sg_max,
-+		res =3D iov_iter_extract_pages(iter, &pages, maxsize,
-+					     sg_max - sgtable->nents,
- 					     extraction_flags, &off);
- 		if (res < 0)
- 			goto failed;
-@@ -1129,7 +1130,6 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
-ter,
- 		maxsize -=3D len;
- 		ret +=3D len;
- 		npages =3D DIV_ROUND_UP(off + len, PAGE_SIZE);
--		sg_max -=3D npages;
- =
-
- 		for (; npages > 0; npages--) {
- 			struct page *page =3D *pages;
-@@ -1142,7 +1142,7 @@ static ssize_t extract_user_to_sg(struct iov_iter *i=
-ter,
- 			len -=3D seg;
- 			off =3D 0;
- 		}
--	} while (maxsize > 0 && sg_max > 0);
-+	} while (maxsize > 0 && sgtable->nents < sg_max);
- =
-
- 	return ret;
- =
-
-@@ -1183,11 +1183,10 @@ static ssize_t extract_bvec_to_sg(struct iov_iter =
-*iter,
- 		sg_set_page(sg, bv[i].bv_page, len, off);
- 		sgtable->nents++;
- 		sg++;
--		sg_max--;
- =
-
- 		ret +=3D len;
- 		maxsize -=3D len;
--		if (maxsize <=3D 0 || sg_max =3D=3D 0)
-+		if (maxsize <=3D 0 || sgtable->nents >=3D sg_max)
- 			break;
- 		start =3D 0;
- 	}
-@@ -1242,14 +1241,13 @@ static ssize_t extract_kvec_to_sg(struct iov_iter =
-*iter,
- 			sg_set_page(sg, page, len, off);
- 			sgtable->nents++;
- 			sg++;
--			sg_max--;
- =
-
- 			len -=3D seg;
- 			kaddr +=3D PAGE_SIZE;
- 			off =3D 0;
--		} while (len > 0 && sg_max > 0);
-+		} while (len > 0 && sgtable->nents < sg_max);
- =
-
--		if (maxsize <=3D 0 || sg_max =3D=3D 0)
-+		if (maxsize <=3D 0 || sgtable->nents >=3D sg_max)
- 			break;
- 		start =3D 0;
- 	}
-@@ -1294,11 +1292,10 @@ static ssize_t extract_xarray_to_sg(struct iov_ite=
-r *iter,
- 		sg_set_page(sg, folio_page(folio, 0), len, offset);
- 		sgtable->nents++;
- 		sg++;
--		sg_max--;
- =
-
- 		maxsize -=3D len;
- 		ret +=3D len;
--		if (maxsize <=3D 0 || sg_max =3D=3D 0)
-+		if (maxsize <=3D 0 || sgtable->nents >=3D sg_max)
- 			break;
- 	}
- =
-
-@@ -1318,7 +1315,8 @@ static ssize_t extract_xarray_to_sg(struct iov_iter =
-*iter,
-  *
-  * Extract the page fragments from the given amount of the source iterato=
-r and
-  * add them to a scatterlist that refers to all of those bits, to a maxim=
-um
-- * addition of @sg_max elements.
-+ * addition of @sg_max elements.  @sgtable->nents indicates how many of t=
-he
-+ * elements are already used.
-  *
-  * The pages referred to by UBUF- and IOVEC-type iterators are extracted =
-and
-  * pinned; BVEC-, KVEC- and XARRAY-type are extracted but aren't pinned; =
-PIPE-
-@@ -1343,6 +1341,11 @@ ssize_t extract_iter_to_sg(struct iov_iter *iter, s=
-ize_t maxsize,
- 	if (maxsize =3D=3D 0)
- 		return 0;
- =
-
-+	if (WARN_ON_ONCE(sg_max =3D=3D 0))
-+		return -EIO;
-+	if (WARN_ON_ONCE(sgtable->nents >=3D sg_max))
-+		return -EIO;
-+
- 	switch (iov_iter_type(iter)) {
- 	case ITER_UBUF:
- 	case ITER_IOVEC:
+Thanks,
+           Dmitry
 
