@@ -2,113 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5E5EB64DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 12:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB296EB64D9
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 14:22:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245697AbjFOM7I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 08:59:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53458 "EHLO
+        id S1344932AbjFOOWb (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 10:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343514AbjFOM7D (ORCPT
+        with ESMTP id S240015AbjFOOWa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 08:59:03 -0400
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 113372700;
-        Thu, 15 Jun 2023 05:58:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1686833937; x=1718369937;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=SngTreX9qafzwT80LSxBPU6C4pEnYSvfLSIgpOhMlis=;
-  b=OCc9YrxxCpNTmJiUvNaMseRwCHTP064lamkUIzYsZkIXZkqupnJqpWl9
-   Pwo/UqTunNk/1ldHKixTjwWThirpfP95In3BMnfEF5dQDsIw2xsMwij5J
-   k5J7yjML/ZQVTqs7uExRQePGaR4mm2z4vpd6FYE7LYR/gZ3NvRubtgZAd
-   s=;
-X-IronPort-AV: E=Sophos;i="6.00,244,1681171200"; 
-   d="scan'208";a="654379430"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 12:58:37 +0000
-Received: from EX19MTAUEB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 7D491A28B0;
-        Thu, 15 Jun 2023 12:58:34 +0000 (UTC)
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 15 Jun 2023 12:58:33 +0000
-Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (10.15.1.225)
- by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Thu, 15 Jun 2023 12:58:33 +0000
-Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
-        id 436D831E0; Thu, 15 Jun 2023 12:58:33 +0000 (UTC)
-From:   Mahmoud Adam <mngyadam@amazon.com>
-To:     <dhowells@redhat.com>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Mahmoud Adam <mngyadam@amazon.com>
-Subject: [PATCH v2] KEYS: use kfree_sensitive with key
-Date:   Thu, 15 Jun 2023 12:57:13 +0000
-Message-ID: <20230615125712.105873-1-mngyadam@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        Thu, 15 Jun 2023 10:22:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D45123
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 07:21:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686838903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WNUJrv1eNB4SMwqhnEsBfDZoOO86Im2l2qkR71QzBpA=;
+        b=g49m9gmFIbH5ApklcsSxQ8zUnFRCQT13RPaTnsrk9bXc6tz1PrZzeDDl4wYNyjRca5l91r
+        hKpWfORz7HMIroYIb3laX0QJEwqu9TUwyoDqxZ5qgNp3a+FqKzo9W1Yts4HRDpzt3NqCFm
+        6MWEVgF47fkwOm2QivnAHPcOM3MY1S8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-175-D2E1aklHMlapWqMh_9I3vw-1; Thu, 15 Jun 2023 10:21:35 -0400
+X-MC-Unique: D2E1aklHMlapWqMh_9I3vw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 03702806000;
+        Thu, 15 Jun 2023 14:21:35 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A8352166B25;
+        Thu, 15 Jun 2023 14:21:33 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <1657853.1686757902@warthog.procyon.org.uk>
+References: <1657853.1686757902@warthog.procyon.org.uk> <000000000000b2585a05fdeb8379@google.com>
+To:     herbert@gondor.apana.org.au
+Cc:     dhowells@redhat.com,
+        syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>,
+        davem@davemloft.net, kuba@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <189807.1686838892.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 15 Jun 2023 15:21:32 +0100
+Message-ID: <189808.1686838892@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-key might contain private part of the key, so better use
-kfree_sensitive to free it
+David Howells <dhowells@redhat.com> wrote:
 
-Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
----
-v2: kfree_sensitive only private key
+> @@ -83,26 +83,14 @@ static int hash_sendmsg(struct socket *sock, struct =
+msghdr *msg,
 
- crypto/asymmetric_keys/public_key.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Actually, this patch definitely won't fix this bug since the test is using=
+ an
+skcipher not a hash.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index eca5671ad3f2..cd8c4123d936 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -43,7 +43,10 @@ static void public_key_describe(const struct key *asymmetric_key,
- void public_key_free(struct public_key *key)
- {
- 	if (key) {
--		kfree(key->key);
-+		if(key->key_is_private)
-+			kfree_sensitive(key->key);
-+		else
-+			kfree(key->key);
- 		kfree(key->params);
- 		kfree(key);
- 	}
-@@ -218,7 +221,7 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 	ret = 0;
+David
 
- error_free_key:
--	kfree(key);
-+	kfree_sensitive(key);
- error_free_tfm:
- 	crypto_free_akcipher(tfm);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
-@@ -303,7 +306,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- 		ret = req->dst_len;
-
- error_free_key:
--	kfree(key);
-+	kfree_sensitive(key);
- error_free_req:
- 	akcipher_request_free(req);
- error_free_tfm:
-@@ -456,7 +459,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
-
- error_free_key:
--	kfree(key);
-+	kfree_sensitive(key);
- error_free_req:
- 	akcipher_request_free(req);
- error_free_tfm:
---
-2.40.1
