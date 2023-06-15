@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED3FEB64DA
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 23:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C41EB64D9
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 23:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239387AbjFOXcF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 19:32:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54758 "EHLO
+        id S229711AbjFOXiy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 19:38:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbjFOXcA (ORCPT
+        with ESMTP id S229600AbjFOXix (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 19:32:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82D85B3;
-        Thu, 15 Jun 2023 16:31:59 -0700 (PDT)
+        Thu, 15 Jun 2023 19:38:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0F8294E;
+        Thu, 15 Jun 2023 16:38:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0214C62CED;
-        Thu, 15 Jun 2023 23:31:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9C07C433C8;
-        Thu, 15 Jun 2023 23:31:57 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AE27262C63;
+        Thu, 15 Jun 2023 23:38:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB25C433C0;
+        Thu, 15 Jun 2023 23:38:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686871918;
-        bh=t+QI63HrVrYITHLWjMqCtcO/Gehz+b2j1pbFfeAxwsI=;
+        s=k20201202; t=1686872331;
+        bh=Fqi/K2Gf7K/Hp8uv0SoXSv+oUBt2a09UEToTLMpKZAU=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=j8YjWMm3BG13woqCmxETSdl8VSFNt+gRyz2TSTbj4d+zgUYGBDcvBIbq0ZJqTlz4f
-         6pyuJf1J3IKUCqbS4PPRQ57r2kSoCRiOmZ2a2zPTtmKpzcCmvqSLA3qzxdZIiXHnLN
-         m91/sI1BlT13ZUnDEzanf27QNwMjiS9eWyrK7tR0UDBHFCP5Wh+79B+EWYnYfBfckr
-         RbcA6/g5C56bzpWgEMTvVVVB90aQQH2whmU3udOM7737StCUGQNZfx5XtszD2bKVek
-         aPaQToLm3RFm3+L10CCV/fSD6r37jNUhLJ2oy0R6GgVb7rkjWPvfIU5ZhdoLLKqJ3O
-         FIj2XX/5vY7Ug==
-Date:   Thu, 15 Jun 2023 16:31:56 -0700
+        b=JNSeXOdAoDxAxc+XyTRJ4Nnp3IXYQg1jp8Tq9VNVbB4jpUTGrz1qdR2t0a/HNRUnh
+         tuGNQuQ1UZSBI6y/ESQWcL+dV5Nt6fUnRUCd8piqBa9t8OG2dfT+741FTon228RjIQ
+         eFyB2AjIJBTRZdAdbiLWgPJTso6HdXP6eYjC5AX0OoFsuC9TtxznJVTHuj1FVOHYna
+         1glW8sM9VWVmo2Y+cJgRJOlKxMSo9aixEnG+jQrqpDmsmBWMM7yBp0Gf+Qy4zhAFXf
+         jZVfyc/HCarUXQAlLB6p9xd0Z+eCu64Ns4FZj8tozsCFIriiK2CPCV9PI+PNuXGHya
+         wyiB8/zDRO7IA==
+Date:   Thu, 15 Jun 2023 16:38:49 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Dmitry Safonov <dima@arista.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -48,30 +48,42 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Paolo Abeni <pabeni@redhat.com>,
         Salam Noureddine <noureddine@arista.com>,
         linux-crypto@vger.kernel.org
-Subject: Re: [PATCH-next 1/3] crypto: api - Remove crypto_init_ops()
-Message-ID: <20230615233156.GA25295@sol.localdomain>
+Subject: Re: [PATCH-next 2/3] crypto: api - Provide gfp mask for tfm
+ allocation
+Message-ID: <20230615233849.GB25295@sol.localdomain>
 References: <20230614174643.3836590-1-dima@arista.com>
- <20230614174643.3836590-2-dima@arista.com>
+ <20230614174643.3836590-3-dima@arista.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230614174643.3836590-2-dima@arista.com>
+In-Reply-To: <20230614174643.3836590-3-dima@arista.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 06:46:41PM +0100, Dmitry Safonov wrote:
-> Purge crypto_type::init() as well.
-> The last user seems to be gone with commit d63007eb954e ("crypto:
-> ablkcipher - remove deprecated and unused ablkcipher support").
-> 
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> ---
->  crypto/api.c            | 14 --------------
->  include/crypto/algapi.h |  1 -
->  2 files changed, 15 deletions(-)
-> 
+On Wed, Jun 14, 2023 at 06:46:42PM +0100, Dmitry Safonov wrote:
+> diff --git a/crypto/cipher.c b/crypto/cipher.c
+> index d39ef5f72ab8..184188339a4a 100644
+> --- a/crypto/cipher.c
+> +++ b/crypto/cipher.c
+> @@ -102,7 +102,7 @@ struct crypto_cipher *crypto_clone_cipher(struct crypto_cipher *cipher)
+>  		return ERR_PTR(-ENOSYS);
+>  
+>  	ntfm = __crypto_alloc_tfm(alg, CRYPTO_ALG_TYPE_CIPHER,
+> -				  CRYPTO_ALG_TYPE_MASK);
+> +				  CRYPTO_ALG_TYPE_MASK, GFP_ATOMIC);
+>  	if (IS_ERR(ntfm))
+>  		return ERR_CAST(ntfm);
+>  
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Should crypto_clone_cipher() not have a gfp_t argument itself?
+
+I'm wondering if any users of the crypto_clone_*() functions will need anything
+other than GFP_ATOMIC, such as GFP_NOFS or GFP_NOIO.
+
+FWIW, btrfs's support for fscrypt is planned to use per-extent keys.  It's
+challenging to implement.  I've been thinking it might need a
+crypto_clone_skcipher() function that it can use during filesystem I/O.  That
+use case would want GFP_NOFS, I think.
 
 - Eric
