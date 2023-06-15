@@ -2,76 +2,75 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB296EB64D9
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 14:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B966EB64DA
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 14:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344932AbjFOOWb (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 10:22:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48088 "EHLO
+        id S240656AbjFOOvn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 10:51:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240015AbjFOOWa (ORCPT
+        with ESMTP id S245570AbjFOOvi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 10:22:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D45123
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 07:21:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686838903;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WNUJrv1eNB4SMwqhnEsBfDZoOO86Im2l2qkR71QzBpA=;
-        b=g49m9gmFIbH5ApklcsSxQ8zUnFRCQT13RPaTnsrk9bXc6tz1PrZzeDDl4wYNyjRca5l91r
-        hKpWfORz7HMIroYIb3laX0QJEwqu9TUwyoDqxZ5qgNp3a+FqKzo9W1Yts4HRDpzt3NqCFm
-        6MWEVgF47fkwOm2QivnAHPcOM3MY1S8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-175-D2E1aklHMlapWqMh_9I3vw-1; Thu, 15 Jun 2023 10:21:35 -0400
-X-MC-Unique: D2E1aklHMlapWqMh_9I3vw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 03702806000;
-        Thu, 15 Jun 2023 14:21:35 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A8352166B25;
-        Thu, 15 Jun 2023 14:21:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <1657853.1686757902@warthog.procyon.org.uk>
-References: <1657853.1686757902@warthog.procyon.org.uk> <000000000000b2585a05fdeb8379@google.com>
-To:     herbert@gondor.apana.org.au
-Cc:     dhowells@redhat.com,
-        syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>,
-        davem@davemloft.net, kuba@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
+        Thu, 15 Jun 2023 10:51:38 -0400
+Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26209273D;
+        Thu, 15 Jun 2023 07:51:36 -0700 (PDT)
+Received: from [94.118.13.74] (helo=martin-debian-2.paytec.ch)
+        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <martin@kaiser.cx>)
+        id 1q9oJx-0001fB-Iw; Thu, 15 Jun 2023 16:51:33 +0200
+From:   Martin Kaiser <martin@kaiser.cx>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>,
+        stable@vger.kernel.org
+Subject: [PATCH] hwrng: imx-rngc - fix the timeout for init and self check
+Date:   Thu, 15 Jun 2023 15:49:59 +0100
+Message-Id: <20230615144959.1171085-1-martin@kaiser.cx>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <189807.1686838892.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 15 Jun 2023 15:21:32 +0100
-Message-ID: <189808.1686838892@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+Fix the timeout that is used for the initialisation and for the self
+test. wait_for_completion_timeout expects a timeout in jiffies, but
+RNGC_TIMEOUT is in milliseconds. Call msecs_to_jiffies to do the
+conversion.
 
-> @@ -83,26 +83,14 @@ static int hash_sendmsg(struct socket *sock, struct =
-msghdr *msg,
+Cc: stable@vger.kernel.org
+Fixes: 1d5449445bd0 ("hwrng: mx-rngc - add a driver for Freescale RNGC")
+Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+---
+ drivers/char/hw_random/imx-rngc.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Actually, this patch definitely won't fix this bug since the test is using=
- an
-skcipher not a hash.
-
-David
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 1a6a5dd0a5a1..e5a9dee615c8 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -110,7 +110,7 @@ static int imx_rngc_self_test(struct imx_rngc *rngc)
+ 	cmd = readl(rngc->base + RNGC_COMMAND);
+ 	writel(cmd | RNGC_CMD_SELF_TEST, rngc->base + RNGC_COMMAND);
+ 
+-	ret = wait_for_completion_timeout(&rngc->rng_op_done, RNGC_TIMEOUT);
++	ret = wait_for_completion_timeout(&rngc->rng_op_done, msecs_to_jiffies(RNGC_TIMEOUT));
+ 	imx_rngc_irq_mask_clear(rngc);
+ 	if (!ret)
+ 		return -ETIMEDOUT;
+@@ -182,9 +182,7 @@ static int imx_rngc_init(struct hwrng *rng)
+ 		cmd = readl(rngc->base + RNGC_COMMAND);
+ 		writel(cmd | RNGC_CMD_SEED, rngc->base + RNGC_COMMAND);
+ 
+-		ret = wait_for_completion_timeout(&rngc->rng_op_done,
+-				RNGC_TIMEOUT);
+-
++		ret = wait_for_completion_timeout(&rngc->rng_op_done, msecs_to_jiffies(RNGC_TIMEOUT));
+ 		if (!ret) {
+ 			ret = -ETIMEDOUT;
+ 			goto err;
+-- 
+2.30.2
 
