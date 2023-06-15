@@ -2,126 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E36DEB64D9
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 12:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5E5EB64DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Jun 2023 12:59:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231163AbjFOMIu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 08:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53474 "EHLO
+        id S245697AbjFOM7I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 15 Jun 2023 08:59:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239056AbjFOMIs (ORCPT
+        with ESMTP id S1343514AbjFOM7D (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 08:08:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A731D1B2
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 05:08:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686830879;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BvRHsFB/oRi8HTtrrWbsQwfbB532rVXuG7TnMUDF+bc=;
-        b=ggkLwQPfJgNW3BV3KycExd8v2lhKIS/U3SY8aL7cq4OhiNaOAg9RQB+deZNajiVyHPUX59
-        56vfwWG7/qCPwJ19jj3JeS5QUf2hwKGyWFSHWrYMP+8B1YfgqHSL0RR8vtR6YOjQogLEVX
-        SDvELaEqQbS/OgkUn25TZ4QZA20VFnA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-45-z09Qo7_-MFOSQSQDj1rioA-1; Thu, 15 Jun 2023 08:07:57 -0400
-X-MC-Unique: z09Qo7_-MFOSQSQDj1rioA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D503101CC8D;
-        Thu, 15 Jun 2023 12:07:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 161092026D49;
-        Thu, 15 Jun 2023 12:07:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <000000000000b2585a05fdeb8379@google.com>
-References: <000000000000b2585a05fdeb8379@google.com>
-To:     syzbot <syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com>
-Cc:     dhowells@redhat.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, kuba@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] KASAN: slab-out-of-bounds Read in extract_iter_to_sg
+        Thu, 15 Jun 2023 08:59:03 -0400
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 113372700;
+        Thu, 15 Jun 2023 05:58:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1686833937; x=1718369937;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SngTreX9qafzwT80LSxBPU6C4pEnYSvfLSIgpOhMlis=;
+  b=OCc9YrxxCpNTmJiUvNaMseRwCHTP064lamkUIzYsZkIXZkqupnJqpWl9
+   Pwo/UqTunNk/1ldHKixTjwWThirpfP95In3BMnfEF5dQDsIw2xsMwij5J
+   k5J7yjML/ZQVTqs7uExRQePGaR4mm2z4vpd6FYE7LYR/gZ3NvRubtgZAd
+   s=;
+X-IronPort-AV: E=Sophos;i="6.00,244,1681171200"; 
+   d="scan'208";a="654379430"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 12:58:37 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 7D491A28B0;
+        Thu, 15 Jun 2023 12:58:34 +0000 (UTC)
+Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
+ EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 15 Jun 2023 12:58:33 +0000
+Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (10.15.1.225)
+ by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Thu, 15 Jun 2023 12:58:33 +0000
+Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
+        id 436D831E0; Thu, 15 Jun 2023 12:58:33 +0000 (UTC)
+From:   Mahmoud Adam <mngyadam@amazon.com>
+To:     <dhowells@redhat.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Mahmoud Adam <mngyadam@amazon.com>
+Subject: [PATCH v2] KEYS: use kfree_sensitive with key
+Date:   Thu, 15 Jun 2023 12:57:13 +0000
+Message-ID: <20230615125712.105873-1-mngyadam@amazon.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <89570.1686830867.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 15 Jun 2023 13:07:47 +0100
-Message-ID: <89571.1686830867@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.g=
-it main
+key might contain private part of the key, so better use
+kfree_sensitive to free it
 
-diff --git a/fs/splice.c b/fs/splice.c
-index 67ddaac1f5c5..17d692449e83 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -886,7 +886,6 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe,=
- struct file *out,
- 			}
- =
+Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
+---
+v2: kfree_sensitive only private key
 
- 			seg =3D min_t(size_t, remain, buf->len);
--			seg =3D min_t(size_t, seg, PAGE_SIZE);
- =
+ crypto/asymmetric_keys/public_key.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
- 			ret =3D pipe_buf_confirm(pipe, buf);
- 			if (unlikely(ret)) {
-@@ -897,10 +896,9 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe=
-, struct file *out,
- =
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index eca5671ad3f2..cd8c4123d936 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -43,7 +43,10 @@ static void public_key_describe(const struct key *asymmetric_key,
+ void public_key_free(struct public_key *key)
+ {
+ 	if (key) {
+-		kfree(key->key);
++		if(key->key_is_private)
++			kfree_sensitive(key->key);
++		else
++			kfree(key->key);
+ 		kfree(key->params);
+ 		kfree(key);
+ 	}
+@@ -218,7 +221,7 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	ret = 0;
 
- 			bvec_set_page(&bvec[bc++], buf->page, seg, buf->offset);
- 			remain -=3D seg;
--			if (seg >=3D buf->len)
--				tail++;
--			if (bc >=3D ARRAY_SIZE(bvec))
-+			if (remain =3D=3D 0 || bc >=3D ARRAY_SIZE(bvec))
- 				break;
-+			tail++;
- 		}
- =
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ error_free_tfm:
+ 	crypto_free_akcipher(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+@@ -303,7 +306,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 		ret = req->dst_len;
 
- 		if (!bc)
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 457598dfa128..6e70839257f7 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1041,7 +1041,8 @@ static int __ip_append_data(struct sock *sk,
- 	} else if ((flags & MSG_SPLICE_PAGES) && length) {
- 		if (inet->hdrincl)
- 			return -EPERM;
--		if (rt->dst.dev->features & NETIF_F_SG)
-+		if (rt->dst.dev->features & NETIF_F_SG &&
-+		    getfrag =3D=3D ip_generic_getfrag)
- 			/* We need an empty buffer to attach stuff to */
- 			paged =3D true;
- 		else
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index c06ff7519f19..1e8c90e97608 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1593,7 +1593,8 @@ static int __ip6_append_data(struct sock *sk,
- 	} else if ((flags & MSG_SPLICE_PAGES) && length) {
- 		if (inet_sk(sk)->hdrincl)
- 			return -EPERM;
--		if (rt->dst.dev->features & NETIF_F_SG)
-+		if (rt->dst.dev->features & NETIF_F_SG &&
-+		    getfrag =3D=3D ip_generic_getfrag)
- 			/* We need an empty buffer to attach stuff to */
- 			paged =3D true;
- 		else
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ error_free_req:
+ 	akcipher_request_free(req);
+ error_free_tfm:
+@@ -456,7 +459,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
 
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ error_free_req:
+ 	akcipher_request_free(req);
+ error_free_tfm:
+--
+2.40.1
