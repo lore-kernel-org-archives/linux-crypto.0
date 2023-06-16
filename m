@@ -2,69 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0798EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 05:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F42EB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 08:08:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235690AbjFPFBZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 01:01:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59142 "EHLO
+        id S229654AbjFPIIu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 04:08:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230171AbjFPFBY (ORCPT
+        with ESMTP id S229653AbjFPIIu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 01:01:24 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98853270E
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 22:01:22 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-77ac4aa24eeso25575439f.1
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 22:01:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686891682; x=1689483682;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eGnwxdo2DEMIi7tpDl/sj1NsuPf/fjo1eZwFLbHh/oc=;
-        b=OD5PaAfr9jDUkISyS5uu1uAw1xWDWVWMODK6UfnH6ySIj+lLygLFZgRFvfCY7KlHP4
-         ZUIQJq2//TVM05J4s/NCn25I7QX9Pz/h4Q4hmmRgIFP0BnBYnj5OK5sAZxw3X8Icz+5N
-         Ehi2kdbkj8NqAs/U2BrN5c4CVj3YiBUy+kwUTZqHxJmDcwoH0mnGRisVaYRu9WV+I5Mn
-         m/BmIIXGOpM7xaYTWOk9VnW6ZFZGlQ7MsFdaUvDFGlhFq3smB14zvk0y/DBff9XYcbp1
-         YOPoHovEi2XTQP8iRKOiW5XwlhEc+9AiUQi4A1P+gfw0q+iVnJfKce5nBtJ1PWO/TtzR
-         VxZg==
-X-Gm-Message-State: AC+VfDy3xMMgL/TNwnvlnhBsgYOoKwfghmcnAPWOpA3OrZzWvnHLoPla
-        em8j4HmWEf7MxVwI28QIDq7HE/s9DlvOcfULhdmvU3mINoNI
-X-Google-Smtp-Source: ACHHUZ6chEzs+H370XGbzmOcYS60hX1wyOhuKQHSGSvTc8wzvYQfpRdk/s8FYqZChd2H1Q8CFppxMqo46ogMdIqov/rMlSBJIyS+
+        Fri, 16 Jun 2023 04:08:50 -0400
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0371F212B;
+        Fri, 16 Jun 2023 01:08:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1686902797; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=s18rNC9hcygyzIoceGZhyJtVKhz786JZVGmaML1N0+o=; b=dgMiNXcXzZL5u5H+z+64RXu/MZeExHHcOdGKBC/UvwHdS58bbFLx5FZHDTtiV9sREOfjfHkVzFAsf+4maDYLFgQRPqR6BJXYPwWRu+al1GaGRfingeq00VNSqgd1YQl5XISxqpJw+udm3fz091DMm0QXD81YdueOplrPTebz5N52+3so2mn3EewwkeWQKth3XFJHh/6oAdC5zr6aJ7vv0vVFx5b/r/wag1IWC9X8dcP2bxhTsEG0TencUBOx/FfP5CehYAlbACQYWSyieNos1dnWnLp8+t1aDy2f6W6uPp/gaRkPSxPQe1fqlHYdemkSAnR3bXOY55fulJ7OO0NTSg==
+Received: from 210.104.33.70 (nsr.re.kr)
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+        by mail.nsr.re.kr with SMTP; Fri, 16 Jun 2023 17:06:22 +0900
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 855;
+          Fri, 16 Jun 2023 17:08:23 +0900 (KST)
+From:   Dongsoo Lee <letrhee@nsr.re.kr>
+To:     'Eric Biggers' <ebiggers@kernel.org>
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, davem@davemloft.net,
+        linux-kernel@vger.kernel.org, letrhee@gmail.com
+References: <20230525121301.722682-1-letrhee@nsr.re.kr> <ZHh1H3yKPU68J7Uv@gondor.apana.org.au> <008d01d99518$33db63f0$9b922bd0$@nsr.re.kr> <20230602213946.GD628@quark.localdomain> <005601d99ac9$954f0c70$bfed2550$@nsr.re.kr> <20230610021450.GA872@sol.localdomain>
+In-Reply-To: <20230610021450.GA872@sol.localdomain>
+Subject: RE: [PATCH v2 0/2] crypto: LEA block cipher implementation
+Date:   Fri, 16 Jun 2023 17:08:23 +0900
+Message-ID: <003801d9a029$b89228b0$29b67a10$@nsr.re.kr>
 MIME-Version: 1.0
-X-Received: by 2002:a02:3319:0:b0:423:141e:f20b with SMTP id
- c25-20020a023319000000b00423141ef20bmr303599jae.2.1686891681994; Thu, 15 Jun
- 2023 22:01:21 -0700 (PDT)
-Date:   Thu, 15 Jun 2023 22:01:21 -0700
-In-Reply-To: <415439.1686877276@warthog.procyon.org.uk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007adf2d05fe38132a@google.com>
-Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_final
-From:   syzbot <syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: ko
+Thread-Index: AQGzeUtGMegR59VrglJnt6HijaycHAEgJe7QAN4WbOYB+Jo+6wIyjprpAeW9SuivmOZGgA==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Hello.
 
-Reported-and-tested-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
+On Fri, 9 Jun 2023 19:14:50 -0700, Eric Biggers wrote:
+>Why are they having "great difficulties" when the kernel already supports
+two other "KCMVP-approved block ciphers", ARIA and SEED?  Why aren't they
+using dm-crypt with ARIA or SEED?
 
-Tested on:
+As you mentioned, the two KCMVP-approved block ciphers, ARIA and SEED, are
+supported by the kernel. Therefore, we can use dm-crypt with ARIA or SEED.
+However, LEA, being a relatively new algorithm, has distinct advantages over
+ARIA and SEED. LEA shows better performance, provides a clearer structure,
+and offers simpler implementation on SIMD, compared to ARIA and SEED.
+(Furthermore, SEED only provides up to 128-bit security.) Consequently,
+there are many products in Korea that use LEA as the default cipher.
 
-commit:         97c5209b leds: trigger: netdev: uninitialized variable..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=159c4d9b280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
-dashboard link: https://syzkaller.appspot.com/bug?extid=13a08c0bf4d212766c3c
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=16962727280000
+Considering these advantages, vendors may add LEA to the kernel of the Linux
+distribution by themselves to develop Linux products that supports LEA.
+(Some vendors are known to have already attempted this. However, definitely
+not all vendors have the capability to do so.) Furthermore, supporting the
+most recent and efficient KCMVP-approved block cipher, LEA, may be very
+helpful for the vendors to promote their products.
 
-Note: testing is done by a robot and is best-effort only.
+It would cause problems if each vendor implements LEA in the kernel on its
+own. It may lead to fragmentation in kernel implementations, potentially
+causing compatibility issues among vendors and posing challenges for system
+maintenance when faced with major kernel changes.
+
+In addition, the data-at-rest encryption market is just beginning to grow in
+South Korea. Therefore, vendors may prefer to use LEA as the default cipher
+for data-at-rest encryption, since it is the most recent and efficient one
+of the KCMVP approved block ciphers (as mentioned earlier) and they do not
+need to worry about the compatibility issues.
+
+Lastly, although LEA-XTS may not outperform AES-XTS or Adiantum, it is still
+worthwhile to add LEA to the kernel, as it can be implemented on various
+platforms that support SIMD instructions, and it is also an ISO/IEC standard
+lightweight cipher.
+
+On Fri, 9 Jun 2023 19:14:50 -0700, Eric Biggers wrote:
+>And does LEA (or SEED or ARIA) support in Linux actually solve that
+problem?
+>Just adding support for these algorithms to Linux does not mean that Linux
+automatically becomes a "KCMVP validated cryptographic module", right? Do
+you have a complete plan that would actually solve the claimed problem?
+
+As you said, simply adding support for LEA in the kernel doesn't
+automatically solve the problem. Of course, additional efforts are needed to
+solve it.
+
+As you may know, KCMVP validates cryptographic modules, which means that
+when KCMVP validates a Linux-based cryptographic module, it validates the
+entire module, not just the Linux kernel inside the module. To obtain
+validation for a product, vendors need to develop various tools that can be
+used for required testings and write down required documentations.
+
+If LEA becomes available in the Linux kernel, we plan to implement
+data-at-rest encryption using LEA on the previously mentioned Gooroom
+platform. Vendors can then use it as a reference. We will also develop
+backporting codes for several LTS kernels, enabling vendors to utilize LEA
+in the Linux distribution that their product runs on. Additionally, we will
+implement and provide the necessary tools for KCMVP validation. This series
+of efforts, starting with adding LEA to the kernel, will assist vendors in
+developing their own KCMVP-validated products, which means the problem can
+be solved.
+
+Thank you.
+
