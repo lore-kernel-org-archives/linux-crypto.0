@@ -2,92 +2,60 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9E7EB64D8
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 10:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A35EB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 10:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345514AbjFPKwA (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 06:52:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48576 "EHLO
+        id S240978AbjFPK61 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 06:58:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345520AbjFPKvg (ORCPT
+        with ESMTP id S244639AbjFPK6O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 06:51:36 -0400
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24735BAD;
-        Fri, 16 Jun 2023 03:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1686912213; x=1718448213;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=EiIlqK6AXKLA69qAfZC6rroRe+Mvb9mJJnlfOXkWQXg=;
-  b=PHL4boeud1axHcDmuSrxVAsJlEOYPkDr6ICJw65QnTznQyro/wbXNxR4
-   vPVgdZQHVQ1y4qr9TJJ9ULAiTJLD3gw16+fPZWrnwMHSBOPpekALj81fO
-   E87D1dCaCJK/kHGpLVESbwJA/dYt2kGnbJBcoWmkrE/fs8DB1aWVN6ydT
-   I=;
-X-IronPort-AV: E=Sophos;i="6.00,247,1681171200"; 
-   d="scan'208";a="1137920555"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-83883bdb.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 10:42:47 +0000
-Received: from EX19D003EUA003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2a-m6i4x-83883bdb.us-west-2.amazon.com (Postfix) with ESMTPS id 6909760A0C;
-        Fri, 16 Jun 2023 10:42:46 +0000 (UTC)
-Received: from EX19D039EUC002.ant.amazon.com (10.252.61.208) by
- EX19D003EUA003.ant.amazon.com (10.252.50.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 16 Jun 2023 10:42:44 +0000
-Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
- EX19D039EUC002.ant.amazon.com (10.252.61.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 16 Jun 2023 10:42:44 +0000
-Received: from EX19D039EUC004.ant.amazon.com ([fe80::5319:6fc9:8bde:8a4]) by
- EX19D039EUC004.ant.amazon.com ([fe80::5319:6fc9:8bde:8a4%3]) with mapi id
- 15.02.1118.026; Fri, 16 Jun 2023 10:42:44 +0000
-From:   "Adam, Mahmoud" <mngyadam@amazon.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Mahmoud Adam <mngyadam@amazon.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] KEYS: use kfree_sensitive with key
-Thread-Topic: [PATCH v2] KEYS: use kfree_sensitive with key
-Thread-Index: AQHZn4kY7Cu4TjVLJ0uBGHvJEhKlOa+NPD2AgAADNIA=
-Date:   Fri, 16 Jun 2023 10:42:44 +0000
-Message-ID: <09E6D7DF-8A97-4E18-BA22-CFEAC430996D@amazon.de>
-References: <20230615125712.105873-1-mngyadam@amazon.com>
- <ZIw56UTG3fPtp/DM@gondor.apana.org.au>
-In-Reply-To: <ZIw56UTG3fPtp/DM@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.1.212.23]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <78CC761A41CE68429138F3685EB80CAB@amazon.com>
+        Fri, 16 Jun 2023 06:58:14 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C30468E;
+        Fri, 16 Jun 2023 03:51:31 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qA6n9-003mBe-Da; Fri, 16 Jun 2023 18:34:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jun 2023 18:34:55 +0800
+Date:   Fri, 16 Jun 2023 18:34:55 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Heiko Stuebner <heiko@sntech.de>
+Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
+        aou@eecs.berkeley.edu, davem@davemloft.net,
+        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v5 4/4] RISC-V: crypto: add accelerated GCM GHASH
+ implementation
+Message-ID: <ZIw6z7MNJ8Nq1q+k@gondor.apana.org.au>
+References: <20230612210442.1805962-1-heiko.stuebner@vrull.eu>
+ <20230612210442.1805962-5-heiko.stuebner@vrull.eu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230612210442.1805962-5-heiko.stuebner@vrull.eu>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gT24gMTYuIEp1biAyMDIzLCBhdCAxMjozMSwgSGVyYmVydCBYdSA8aGVyYmVydEBnb25k
-b3IuYXBhbmEub3JnLmF1PiB3cm90ZToNCj4gDQo+IE9uIFRodSwgSnVuIDE1LCAyMDIzIGF0IDEy
-OjU3OjEzUE0gKzAwMDAsIE1haG1vdWQgQWRhbSB3cm90ZToNCj4+IGtleSBtaWdodCBjb250YWlu
-IHByaXZhdGUgcGFydCBvZiB0aGUga2V5LCBzbyBiZXR0ZXIgdXNlDQo+PiBrZnJlZV9zZW5zaXRp
-dmUgdG8gZnJlZSBpdA0KPj4gDQo+PiBTaWduZWQtb2ZmLWJ5OiBNYWhtb3VkIEFkYW0gPG1uZ3lh
-ZGFtQGFtYXpvbi5jb20+DQo+PiAtLS0NCj4+IHYyOiBrZnJlZV9zZW5zaXRpdmUgb25seSBwcml2
-YXRlIGtleQ0KPj4gDQo+PiBjcnlwdG8vYXN5bW1ldHJpY19rZXlzL3B1YmxpY19rZXkuYyB8IDEx
-ICsrKysrKystLS0tDQo+PiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA0IGRlbGV0
-aW9ucygtKQ0KPiANCj4gU29ycnksIEkgd2FzIGNvbmZ1c2VkIGJ5IHRoZSBuYW1pbmcgaW4gdGhp
-cyBmaWxlLiAgVGhlc2UgcHVibGljX2tleXMNCj4gY2FuIGluZGVlZCBiZSBwcml2YXRlLiAgU28g
-SSdsbCBqdXN0IHRha2UgeW91ciBvcmlnaW5hbCBwYXRjaC4NCg0KSXTigJlzIGluZGVlZCB2ZXJ5
-IGNvbmZ1c2luZy4NCg0KVGhhbmtzIGZvciB0aGUgcmV2aWV3Lg0KDQpNYWhtb3VkIEFkYW0KCgoK
-QW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAx
-MTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRo
-YW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIg
-SFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Mon, Jun 12, 2023 at 11:04:42PM +0200, Heiko Stuebner wrote:
+>
+> +struct riscv64_ghash_ctx {
+> +	void (*ghash_func)(u64 Xi[2], const u128 Htable[16],
+> +			   const u8 *inp, size_t len);
+> +
+> +	/* key used by vector asm */
+> +	u128 htable[16];
+> +	/* key used by software fallback */
+> +	be128 key;
 
+Where is the fallback?
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
