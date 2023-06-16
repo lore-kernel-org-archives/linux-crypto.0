@@ -2,77 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26086EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 10:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9E7EB64D8
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 10:52:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345204AbjFPKr3 (ORCPT
+        id S1345514AbjFPKwA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 06:47:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43066 "EHLO
+        Fri, 16 Jun 2023 06:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235124AbjFPKrP (ORCPT
+        with ESMTP id S1345520AbjFPKvg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 06:47:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4A322BAE
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jun 2023 03:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686911885;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eIOLShY/ZmsNAmLuX2YSma08DfvRfpLXlZqs26cgyEs=;
-        b=HYgwas27J9l9or546gHwnMc86cu2QV75slT0td4G/5ZBZPGrXJTQN4uezj84941avwGfvi
-        RR+ZA+mHLhGHHyHxWQfND+p/BwZ8GZJ1s/6LzJ68lmI9RGWe0RqZrffczW3bziT1tdUgt+
-        QcRaPTCZhq616CEqJCklIji46rzejDc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-189-CGjzTS8uMVWdy5Eg3ByHXw-1; Fri, 16 Jun 2023 06:38:01 -0400
-X-MC-Unique: CGjzTS8uMVWdy5Eg3ByHXw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2D5978028B2;
-        Fri, 16 Jun 2023 10:38:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C5E20492C38;
-        Fri, 16 Jun 2023 10:37:58 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZIw4+Go7ZIth+CsY@gondor.apana.org.au>
-References: <ZIw4+Go7ZIth+CsY@gondor.apana.org.au> <1679829.1686785273@warthog.procyon.org.uk>
+        Fri, 16 Jun 2023 06:51:36 -0400
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24735BAD;
+        Fri, 16 Jun 2023 03:43:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1686912213; x=1718448213;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=EiIlqK6AXKLA69qAfZC6rroRe+Mvb9mJJnlfOXkWQXg=;
+  b=PHL4boeud1axHcDmuSrxVAsJlEOYPkDr6ICJw65QnTznQyro/wbXNxR4
+   vPVgdZQHVQ1y4qr9TJJ9ULAiTJLD3gw16+fPZWrnwMHSBOPpekALj81fO
+   E87D1dCaCJK/kHGpLVESbwJA/dYt2kGnbJBcoWmkrE/fs8DB1aWVN6ydT
+   I=;
+X-IronPort-AV: E=Sophos;i="6.00,247,1681171200"; 
+   d="scan'208";a="1137920555"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-83883bdb.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 10:42:47 +0000
+Received: from EX19D003EUA003.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2a-m6i4x-83883bdb.us-west-2.amazon.com (Postfix) with ESMTPS id 6909760A0C;
+        Fri, 16 Jun 2023 10:42:46 +0000 (UTC)
+Received: from EX19D039EUC002.ant.amazon.com (10.252.61.208) by
+ EX19D003EUA003.ant.amazon.com (10.252.50.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 16 Jun 2023 10:42:44 +0000
+Received: from EX19D039EUC004.ant.amazon.com (10.252.61.190) by
+ EX19D039EUC002.ant.amazon.com (10.252.61.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 16 Jun 2023 10:42:44 +0000
+Received: from EX19D039EUC004.ant.amazon.com ([fe80::5319:6fc9:8bde:8a4]) by
+ EX19D039EUC004.ant.amazon.com ([fe80::5319:6fc9:8bde:8a4%3]) with mapi id
+ 15.02.1118.026; Fri, 16 Jun 2023 10:42:44 +0000
+From:   "Adam, Mahmoud" <mngyadam@amazon.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
-        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
-        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
-        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
-        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+CC:     Mahmoud Adam <mngyadam@amazon.com>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] KEYS: use kfree_sensitive with key
+Thread-Topic: [PATCH v2] KEYS: use kfree_sensitive with key
+Thread-Index: AQHZn4kY7Cu4TjVLJ0uBGHvJEhKlOa+NPD2AgAADNIA=
+Date:   Fri, 16 Jun 2023 10:42:44 +0000
+Message-ID: <09E6D7DF-8A97-4E18-BA22-CFEAC430996D@amazon.de>
+References: <20230615125712.105873-1-mngyadam@amazon.com>
+ <ZIw56UTG3fPtp/DM@gondor.apana.org.au>
+In-Reply-To: <ZIw56UTG3fPtp/DM@gondor.apana.org.au>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.1.212.23]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <78CC761A41CE68429138F3685EB80CAB@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <426352.1686911878.1@warthog.procyon.org.uk>
-Date:   Fri, 16 Jun 2023 11:37:58 +0100
-Message-ID: <426353.1686911878@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Can you have a look at:
-
-	https://lore.kernel.org/r/415439.1686877276@warthog.procyon.org.uk/
-
-I'm proposing that as an alternative to this patch.
-
-David
+DQoNCj4gT24gMTYuIEp1biAyMDIzLCBhdCAxMjozMSwgSGVyYmVydCBYdSA8aGVyYmVydEBnb25k
+b3IuYXBhbmEub3JnLmF1PiB3cm90ZToNCj4gDQo+IE9uIFRodSwgSnVuIDE1LCAyMDIzIGF0IDEy
+OjU3OjEzUE0gKzAwMDAsIE1haG1vdWQgQWRhbSB3cm90ZToNCj4+IGtleSBtaWdodCBjb250YWlu
+IHByaXZhdGUgcGFydCBvZiB0aGUga2V5LCBzbyBiZXR0ZXIgdXNlDQo+PiBrZnJlZV9zZW5zaXRp
+dmUgdG8gZnJlZSBpdA0KPj4gDQo+PiBTaWduZWQtb2ZmLWJ5OiBNYWhtb3VkIEFkYW0gPG1uZ3lh
+ZGFtQGFtYXpvbi5jb20+DQo+PiAtLS0NCj4+IHYyOiBrZnJlZV9zZW5zaXRpdmUgb25seSBwcml2
+YXRlIGtleQ0KPj4gDQo+PiBjcnlwdG8vYXN5bW1ldHJpY19rZXlzL3B1YmxpY19rZXkuYyB8IDEx
+ICsrKysrKystLS0tDQo+PiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA0IGRlbGV0
+aW9ucygtKQ0KPiANCj4gU29ycnksIEkgd2FzIGNvbmZ1c2VkIGJ5IHRoZSBuYW1pbmcgaW4gdGhp
+cyBmaWxlLiAgVGhlc2UgcHVibGljX2tleXMNCj4gY2FuIGluZGVlZCBiZSBwcml2YXRlLiAgU28g
+SSdsbCBqdXN0IHRha2UgeW91ciBvcmlnaW5hbCBwYXRjaC4NCg0KSXTigJlzIGluZGVlZCB2ZXJ5
+IGNvbmZ1c2luZy4NCg0KVGhhbmtzIGZvciB0aGUgcmV2aWV3Lg0KDQpNYWhtb3VkIEFkYW0KCgoK
+QW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAx
+MTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRo
+YW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIg
+SFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
