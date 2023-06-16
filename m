@@ -2,105 +2,130 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCB0EB64DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 17:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 869F5EB64DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 18:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbjFPRmi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 13:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35288 "EHLO
+        id S229670AbjFPSWN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 14:22:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344162AbjFPRmh (ORCPT
+        with ESMTP id S229521AbjFPSWM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 13:42:37 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914522D72
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jun 2023 10:42:35 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-982a99fda0dso135395466b.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Jun 2023 10:42:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1686937354; x=1689529354;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kzife/Ga92KPfU7PxiFcBGMF+Tc4zP+RIFWwh5m1s7c=;
-        b=YG+LJ62WNuMOGkE6EoEI92oUfLgdHJgX/EjN8Ld80jfUl3qvIpuHcDgeWC6/XEhr3O
-         h3HPKixTNv7Fz3j1bptLYcdX2mvA9RFci62+MiCmi+g1Xa1WKGCe1GPj3vBqEpVOnVwS
-         LPdLApPxHldnVRsZdm3q+Cw0BFB3K7dyy64wWq54vzhUMHCh4my2/IjxLhi2xZ75KBhX
-         nKKZet2AysRtYyOtEJZaBa6eOb50qF5TrB6qEUk8O37us/lOQiYOe/wwaXXdASn6z18O
-         rwnx21Qzu1CFiVM+kItVQ3zKRnJu3Z9vpIFxR2KHSYxquDSzjp0lAz6T9lPT/9YhYhIM
-         TMCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686937354; x=1689529354;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kzife/Ga92KPfU7PxiFcBGMF+Tc4zP+RIFWwh5m1s7c=;
-        b=f7yq0smINqbmRQmbgsgN8JOFtx/2h6R313+aIsX5aa7hHt4n8ea/rgQU3d+qpK0HhC
-         X6tqUYsET2O5NwpQ/9YAPNQGRq/y1afDI0Ctz6j8Fk1NHxw0yLx3yAN6iVa3JrgbsrH7
-         4iyv2Fy3SIpEreS58+P0V+QxZZRgAJ/175QXlW8ea3cQSoynbwITDZNj6USqiT52y08h
-         lR603mU3retJzhFakKaVV5/nbX97gMDXfy172o6qFtgYyYT3qT96jRhkKRVj8X3a0sal
-         tZGqGiG0ICstfZD5s+74ZMcgLbdDu7uUx+D1JlwGEC0zmCuumc8cEv9AOGYMvamn5U4q
-         ez1Q==
-X-Gm-Message-State: AC+VfDyy96mhI5rmB07+EJgJfhtNI+WplxrFklXThd7KJz5LakO6MGRl
-        brb+BlkwutZ83Ph2rxq8BwFvbA==
-X-Google-Smtp-Source: ACHHUZ4Y3n61KROIK4ccOC0xSeZQmjKQhp+TTdrpdIlIthZMT4ClAAb9Rw2x5HyJ0MEYGpLLlXWi6A==
-X-Received: by 2002:a17:906:a8f:b0:957:48c8:b081 with SMTP id y15-20020a1709060a8f00b0095748c8b081mr2181445ejf.24.1686937353847;
-        Fri, 16 Jun 2023 10:42:33 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id a13-20020a170906684d00b009828dac8425sm3043094ejs.105.2023.06.16.10.42.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jun 2023 10:42:33 -0700 (PDT)
-Message-ID: <fbe7d37d-8a22-6d34-660b-70f177c001d9@linaro.org>
-Date:   Fri, 16 Jun 2023 19:42:31 +0200
+        Fri, 16 Jun 2023 14:22:12 -0400
+Received: from sender4-of-o50.zoho.com (sender4-of-o50.zoho.com [136.143.188.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27ABDCD;
+        Fri, 16 Jun 2023 11:22:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1686939697; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=ffvSiDruYhLVJJGBcz4tQWNlfs6d5bauH+Ej2CpFSmpsU2USUfadAkTf61XiTUkuV/fwd6T4eN044PQ+mqv+bW8oGdYrENxv9+ZNEy4ZAHVgoGs/St8s/04QrDjVsEqiXT6OBT+HVzn9m0ylLfxZvopPb0cDCH30F5iNu5Ks9Tk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1686939697; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=8enOf0amLtvBhNkLA/XPa3bwYhCfY01qhBgRzZsYp4k=; 
+        b=iWf2gamft5I1tQafDe+wzLXebNQzYgTsFca9wWHDHLlU6KpTO1qpzty8hZCqVyulR8PbWnlFxsQR8fJqa+E4Y+zRng39F8z0DpD35pHI66jgZ80xzygN7M8x2Pkuv75gqryEQ5wEkTUJy0yFlI6jKwZWMqj/W73Q/cmZIzFzfuo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=apertussolutions.com;
+        spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+        dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1686939697;
+        s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+        h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:From:From:Subject:Subject:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+        bh=8enOf0amLtvBhNkLA/XPa3bwYhCfY01qhBgRzZsYp4k=;
+        b=qHykneBd3W/uQb3DdBB6UMoKU5vU2hAHAgTWfpyu0VTnkeKUnav9pYS2Lv2cPAAr
+        bEdoQSblbIGf34Wi35ucomsH+lyGq/exEwlUfLIru8FCcg0jLUx552Uf3IYYQESeI0f
+        rstR4wkctcFvn8BMkk0jayWtDQUD04axkQJGtfZA=
+Received: from [10.10.1.138] (static-72-81-132-2.bltmmd.fios.verizon.net [72.81.132.2]) by mx.zohomail.com
+        with SMTPS id 1686939696166530.3719741366886; Fri, 16 Jun 2023 11:21:36 -0700 (PDT)
+Message-ID: <81a0a2f3-e7b2-23e8-5c95-91c9a52df18a@apertussolutions.com>
+Date:   Fri, 16 Jun 2023 14:21:33 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v6 00/11] arm64: qcom: Enable Crypto Engine for a few
- Qualcomm SoCs
+ Thunderbird/102.11.0
 Content-Language: en-US
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        bhupesh.sharma@linaro.org
-Cc:     agross@kernel.org, andersson@kernel.org, bhupesh.linux@gmail.com,
-        devicetree@vger.kernel.org, djakov@kernel.org,
-        konrad.dybcio@linaro.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        neil.armstrong@linaro.org, rfoss@kernel.org, robh+dt@kernel.org,
-        vladimir.zapolskiy@linaro.org, lkft-triage@lists.linaro.org,
-        anders.roxell@linaro.org,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-References: <20230405072836.1690248-1-bhupesh.sharma@linaro.org>
- <20230412115532.300516-1-naresh.kamboju@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230412115532.300516-1-naresh.kamboju@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Matthew Garrett <mjg59@srcf.ucam.org>
+Cc:     Ross Philipson <ross.philipson@oracle.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        ardb@kernel.org, James.Bottomley@hansenpartnership.com,
+        luto@amacapital.net, nivedita@alum.mit.edu,
+        kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
+References: <20230504145023.835096-1-ross.philipson@oracle.com>
+ <20230504145023.835096-3-ross.philipson@oracle.com>
+ <20230512104753.GA14461@srcf.ucam.org>
+ <e7dcb85b-25bb-8d5a-3758-e4243bc6ffec@apertussolutions.com>
+ <20230616165415.GA28537@srcf.ucam.org>
+From:   "Daniel P. Smith" <dpsmith@apertussolutions.com>
+Subject: Re: [PATCH v6 02/14] Documentation/x86: Secure Launch kernel
+ documentation
+In-Reply-To: <20230616165415.GA28537@srcf.ucam.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/04/2023 13:55, Naresh Kamboju wrote:
+On 6/16/23 12:54, Matthew Garrett wrote:
+> On Fri, Jun 16, 2023 at 12:44:27PM -0400, Daniel P. Smith wrote:
+>>
+>> On 5/12/23 06:47, Matthew Garrett wrote:
+>>> On Thu, May 04, 2023 at 02:50:11PM +0000, Ross Philipson wrote:
+>>>> +Secure Launch does not interoperate with KASLR. If possible, the MLE should be
+>>>> +built with KASLR disabled::
+>>>
+>>> Why does Secure Launch not interoperate with KASLR?
+>>>
+>>> Re: IOMMUs
+>>
+>> Until the IOMMU driver comes online, memory is protected by the PMRs regions
+>> requested by the Preamble (pre-launch code) in accordance with Intel TXT
+>> specifications and configured by the ACM. The KASLR randomizer will run
+>> before the IOMMU driver is able to come online and ensure frames used by the
+>> kernel are protected as well as frames that a driver may registered in a BAR
+>> are not blocked.
 > 
->  > This patchset enables Crypto Engine support for Qualcomm SoCs like
->  > SM6115, SM8150, SM8250, SM8350 and SM8450.
->  > 
->  > Note that:
->  > - SM8250 crypto engine patch utilizes the work already done by myself and
->  >   Vladimir.
->  > - SM8350 crypto engine patch utilizes the work already done by Robert.
->  > - SM8450 crypto engine patch utilizes the work already done by Neil.
->  > 
->  > Also this patchset is rebased on linux-next/master.
+> This seems unfortunate. Presumably we're not able to modify the PMRs at
+> this point? This also seems like a potential issue for IOMMU config in
+> general - the presumption is that the firmware should be configuring the
+> IOMMU in such a way that DMA-capable devices can't attack the firmware
+> while we're in the boot environment, and if KASLR is leaving a window
+> there then it seems like we'd need to fix that?
+
+While unfortunate, it is a bit of the nature of the problem KASLR is 
+attempting to address. If you know in advance where kernel pages are 
+going to live and the frames that will be used for DMA, then have you 
+not defeated the purpose of the randomization? As for the firmware use 
+of the IOMMU, I am fairly certain those tables will get invalidated by 
+the ACM when it is setting up the PMRs.
+
+>>>> +It is recommended that no other command line options should be set to override
+>>>> +the defaults above.
+>>>
+>>> What happens if they are? Does doing so change the security posture of
+>>> the system? If so, will the measurements be different in a way that
+>>> demonstrates the system is in an insecure state?
+>>>
+>>
+>> In an early version of the patch series this was enforced when turning on
+>> Secure Launch, but concerns were raised over this approach and was asked to
+>> allow the user to be able to shoot themselves in the foot. Overriding these
+>> values could render either an insecure state and/or an unstable system.
 > 
-> These patches tested on top of Linux next-20230406.
-> 
-> 
-> Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> If we're in an insecure state, is that something that would show up in
+> the form of different measurements?
 
+Yes, you would get a different measurement for the commandline. If you 
+are thinking in terms of attestation, I would expect that the 
+attestation measurement db would have a record for an acceptable 
+commandline and would determine the system to be in an unknown state if 
+it did not match.
 
-You provided the tags for entire patchset but it includes different
-boards. On what boards did you test it?
-
-Best regards,
-Krzysztof
-
+While the idea could be explored to create measurements based on 
+configurations of kernel subsystems, this would likely entail 
+instrumentation in those subsystems to assert a measurement to their 
+configuration. Maybe IMA could cover something like this? It would 
+definitely enable the ability to make deeper assessments about the state 
+of a system, but I think this is out of the scope of what Secure Launch 
+is attempting to do.
