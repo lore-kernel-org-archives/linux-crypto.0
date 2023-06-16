@@ -2,89 +2,52 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD72EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 12:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F526EB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 12:23:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243634AbjFPMRz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 08:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56744 "EHLO
+        id S1344540AbjFPMXK (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 08:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243808AbjFPMRv (ORCPT
+        with ESMTP id S1344622AbjFPMXI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 08:17:51 -0400
+        Fri, 16 Jun 2023 08:23:08 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5313D30DF;
-        Fri, 16 Jun 2023 05:17:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0414730F2
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Jun 2023 05:23:04 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qA8OU-003oRS-HY; Fri, 16 Jun 2023 20:17:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jun 2023 20:17:34 +0800
-Date:   Fri, 16 Jun 2023 20:17:34 +0800
+        id 1qA8Ti-003oWp-Qm; Fri, 16 Jun 2023 20:22:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jun 2023 20:22:58 +0800
+Date:   Fri, 16 Jun 2023 20:22:58 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Franziska Naepelt <franziska.naepelt@googlemail.com>
-Cc:     bagasdotme@gmail.com, davem@davemloft.net,
-        franziska.naepelt@gmail.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        tim.c.chen@linux.intel.com
-Subject: Re: [PATCH v2] crypto: crct10dif_common Add SPDX-License-Identifier
- tag
-Message-ID: <ZIxS3pJ/GfTEGVtW@gondor.apana.org.au>
-References: <ZH8ntoGLJHQpZriL@debian.me>
- <20230606180713.99460-1-franziska.naepelt@gmail.com>
+To:     Damian Muszynski <damian.muszynski@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH] crypto: qat - add internal timer for qat 4xxx
+Message-ID: <ZIxUIjwZMHrZiDg6@gondor.apana.org.au>
+References: <20230601091340.12626-1-damian.muszynski@intel.com>
+ <ZILrxDmxkHyIZ1Sw@gondor.apana.org.au>
+ <ZIMVSDWXOcS6/Whg@dmuszyns-mobl.ger.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230606180713.99460-1-franziska.naepelt@gmail.com>
+In-Reply-To: <ZIMVSDWXOcS6/Whg@dmuszyns-mobl.ger.corp.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 06, 2023 at 08:07:13PM +0200, Franziska Naepelt wrote:
-> Fix the following checkpatch warning:
-> - WARNING: Missing or malformed SPDX-License-Identifier tag
-> 
-> Signed-off-by: Franziska Naepelt <franziska.naepelt@gmail.com>
-> ---
-> v2:
->  - Remove GPL license boilerplate
-> ---
->  crypto/crct10dif_common.c | 16 +---------------
->  1 file changed, 1 insertion(+), 15 deletions(-)
-> 
-> diff --git a/crypto/crct10dif_common.c b/crypto/crct10dif_common.c
-> index b2fab366f518..28a0cdde9449 100644
-> --- a/crypto/crct10dif_common.c
-> +++ b/crypto/crct10dif_common.c
-> @@ -1,3 +1,4 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
->  /*
->   * Cryptographic API.
->   *
-> @@ -7,21 +8,6 @@
->   * Written by Martin K. Petersen <martin.petersen@oracle.com>
->   * Copyright (C) 2013 Intel Corporation
->   * Author: Tim Chen <tim.c.chen@linux.intel.com>
-> - *
-> - * This program is free software; you can redistribute it and/or modify it
-> - * under the terms of the GNU General Public License as published by the Free
-> - * Software Foundation; either version 2 of the License, or (at your option)
-> - * any later version.
-> - *
-> - * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-> - * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-> - * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-> - * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-> - * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-> - * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-> - * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> - * SOFTWARE.
-> - *
->   */
+On Fri, Jun 09, 2023 at 02:04:24PM +0200, Damian Muszynski wrote:
+>
+> We considered the usage of delayed work when implementing this, but it will 
+> break functionality. Apart from scheduling the work queue, timer_handler() is 
+> incrementing a counter which keeps track of how many times the timer was scheduled.
 
-As the text you removed does not match GPLv2 exactly I'm dropping
-this patch for now.
+Please be more specific.  I don't understand why the counter can't
+be incremented in the delayed work instead of the timer.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
