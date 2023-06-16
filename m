@@ -2,86 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 919ECEB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 10:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6401CEB64D8
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 11:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345607AbjFPK7M (ORCPT
+        id S1344612AbjFPLB7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 06:59:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53500 "EHLO
+        Fri, 16 Jun 2023 07:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345512AbjFPK6i (ORCPT
+        with ESMTP id S1344586AbjFPLBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 06:58:38 -0400
+        Fri, 16 Jun 2023 07:01:40 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E855786AA;
-        Fri, 16 Jun 2023 03:51:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F06727282;
+        Fri, 16 Jun 2023 03:55:27 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qA6gR-003lHK-Cz; Fri, 16 Jun 2023 18:28:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jun 2023 18:27:59 +0800
-Date:   Fri, 16 Jun 2023 18:27:59 +0800
+        id 1qA76k-003mcA-3A; Fri, 16 Jun 2023 18:55:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jun 2023 18:55:10 +0800
+Date:   Fri, 16 Jun 2023 18:55:10 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     netdev@vger.kernel.org,
-        syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] crypto: Fix af_alg_sendmsg(MSG_SPLICE_PAGES)
- sglist limit
-Message-ID: <ZIw5L081E2GjdLrQ@gondor.apana.org.au>
-References: <322883.1686863334@warthog.procyon.org.uk>
+To:     Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
+        dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
+        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH v6 13/15] crypto: iaa - Add support for
+ deflate-iaa-canned compression algorithm
+Message-ID: <ZIw/jtxdg6O1O0j3@gondor.apana.org.au>
+References: <20230605201536.738396-1-tom.zanussi@linux.intel.com>
+ <20230605201536.738396-14-tom.zanussi@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <322883.1686863334@warthog.procyon.org.uk>
+In-Reply-To: <20230605201536.738396-14-tom.zanussi@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 10:08:54PM +0100, David Howells wrote:
-> When af_alg_sendmsg() calls extract_iter_to_sg(), it passes MAX_SGL_ENTS as
-> the maximum number of elements that may be written to, but some of the
-> elements may already have been used (as recorded in sgl->cur), so
-> extract_iter_to_sg() may end up overrunning the scatterlist.
+On Mon, Jun 05, 2023 at 03:15:34PM -0500, Tom Zanussi wrote:
+> Add support for a 'canned' compression mode using the IAA compression
+> mode in-kernel API.
 > 
-> Fix this to limit the number of elements to "MAX_SGL_ENTS - sgl->cur".
-> 
-> Note: It probably makes sense in future to alter the behaviour of
-> extract_iter_to_sg() to stop if "sgtable->nents >= sg_max" instead, but
-> this is a smaller fix for now.
-> 
-> The bug causes errors looking something like:
-> 
-> BUG: KASAN: slab-out-of-bounds in sg_assign_page include/linux/scatterlist.h:109 [inline]
-> BUG: KASAN: slab-out-of-bounds in sg_set_page include/linux/scatterlist.h:139 [inline]
-> BUG: KASAN: slab-out-of-bounds in extract_bvec_to_sg lib/scatterlist.c:1183 [inline]
-> BUG: KASAN: slab-out-of-bounds in extract_iter_to_sg lib/scatterlist.c:1352 [inline]
-> BUG: KASAN: slab-out-of-bounds in extract_iter_to_sg+0x17a6/0x1960 lib/scatterlist.c:1339
-> 
-> Fixes: bf63e250c4b1 ("crypto: af_alg: Support MSG_SPLICE_PAGES")
-> Reported-by: syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/000000000000b2585a05fdeb8379@google.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Tested-by: syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: linux-crypto@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> ---
->  crypto/af_alg.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The IAA 'canned' compression mode is added alongside the existing
+> 'fixed' compression mode and a crypto algorithm named
+> 'deflate-iaa-canned' is registered using it.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+So you said that canned is not compatible with the generic deflate
+algorithm.  Does that mean that there is no way for it to decompress
+something compressed by the generic deflate algorithm, and vice versa
+its compressed output cannot be decompressed by generic deflate?
+
+We don't add an algorithm to the Crypto API if the only implementation
+is by hardware.  IOW if you are adding a new algorithm, then a
+software version must be the first patch.
 
 Thanks,
 -- 
