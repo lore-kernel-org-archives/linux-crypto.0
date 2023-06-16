@@ -2,129 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4714EB64DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 09:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A45EB64DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 10:34:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245491AbjFPJAk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 05:00:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52394 "EHLO
+        id S1344913AbjFPKeB (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 06:34:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343928AbjFPI7t (ORCPT
+        with ESMTP id S1344993AbjFPKdO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 04:59:49 -0400
-Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFC530CF;
-        Fri, 16 Jun 2023 01:59:40 -0700 (PDT)
-Received: from [167.98.155.120] (helo=martin-debian-2.paytec.ch)
-        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <martin@kaiser.cx>)
-        id 1qA5Iw-0000d1-Op; Fri, 16 Jun 2023 10:59:38 +0200
-From:   Martin Kaiser <martin@kaiser.cx>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH v2 2/2] hwrng: st - keep clock enabled while hwrng is registered
-Date:   Fri, 16 Jun 2023 09:58:13 +0100
-Message-Id: <20230616085813.1323082-3-martin@kaiser.cx>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230616085813.1323082-1-martin@kaiser.cx>
-References: <20230616083618.1320824-1-martin@kaiser.cx>
- <20230616085813.1323082-1-martin@kaiser.cx>
+        Fri, 16 Jun 2023 06:33:14 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1888059C1;
+        Fri, 16 Jun 2023 03:28:19 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qA6fY-003lEH-TO; Fri, 16 Jun 2023 18:27:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 16 Jun 2023 18:27:04 +0800
+Date:   Fri, 16 Jun 2023 18:27:04 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org,
+        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
+        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
+        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
+        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after
+ sendmsg(MSG_MORE)
+Message-ID: <ZIw4+Go7ZIth+CsY@gondor.apana.org.au>
+References: <1679829.1686785273@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1679829.1686785273@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The st-rng driver uses devres to register itself with the hwrng core,
-the driver will be unregistered from hwrng when its device goes out of
-scope. This happens after the driver's remove function is called.
+On Thu, Jun 15, 2023 at 12:27:53AM +0100, David Howells wrote:
+>     
+> If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
+> message with MSG_MORE set and then recvmsg() is called without first
+> sending another message without MSG_MORE set to end the operation, an oops
+> will occur because the crypto context and result doesn't now get set up in
+> advance because hash_sendmsg() now defers that as long as possible in the
+> hope that it can use crypto_ahash_digest() - and then because the message
+> is zero-length, it the data wrangling loop is skipped.
+> 
+> Fix this by always making a pass of the loop, even in the case that no data
+> is provided to the sendmsg().
+> 
+> Fix also extract_iter_to_sg() to handle a zero-length iterator by returning
+> 0 immediately.
+> 
+> Whilst we're at it, remove the code to create a kvmalloc'd scatterlist if
+> we get more than ALG_MAX_PAGES - this shouldn't happen.
+> 
+> Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
+> Reported-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/r/000000000000b928f705fdeb873a@google.com/
+> Reported-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/r/000000000000c047db05fdeb8790@google.com/
+> Reported-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/r/000000000000bcca3205fdeb87fb@google.com/
+> Reported-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/r/000000000000b55d8805fdeb8385@google.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Tested-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
+> Tested-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
+> Tested-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
+> Tested-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-crypto@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  crypto/algif_hash.c |   21 +++++----------------
+>  lib/scatterlist.c   |    2 +-
+>  2 files changed, 6 insertions(+), 17 deletions(-)
 
-However, st-rng's clock is disabled in the remove function. There's a
-short timeframe where st-rng is still registered with the hwrng core
-although its clock is disabled. I suppose the clock must be active to
-access the hardware and serve requests from the hwrng core.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Switch to devm_clk_get_enabled and let devres disable the clock and
-unregister the hwrng. This avoids the race condition.
-
-Fixes: 3e75241be808 ("hwrng: drivers - Use device-managed registration API")
-Signed-off-by: Martin Kaiser <martin@kaiser.cx>
----
-v2:
-  - don't unprepare the clock if devm_hwrng_register fails
-  - don't set driver data, it was used only in the remove function that's
-    now gone
-  - rephrase the commit message, the clock is now disabled by devres
-
- drivers/char/hw_random/st-rng.c | 21 +--------------------
- 1 file changed, 1 insertion(+), 20 deletions(-)
-
-diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
-index 15ba1e6fae4d..6e9dfac9fc9f 100644
---- a/drivers/char/hw_random/st-rng.c
-+++ b/drivers/char/hw_random/st-rng.c
-@@ -42,7 +42,6 @@
- 
- struct st_rng_data {
- 	void __iomem	*base;
--	struct clk	*clk;
- 	struct hwrng	ops;
- };
- 
-@@ -85,26 +84,18 @@ static int st_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(base))
- 		return PTR_ERR(base);
- 
--	clk = devm_clk_get(&pdev->dev, NULL);
-+	clk = devm_clk_get_enabled(&pdev->dev, NULL);
- 	if (IS_ERR(clk))
- 		return PTR_ERR(clk);
- 
--	ret = clk_prepare_enable(clk);
--	if (ret)
--		return ret;
--
- 	ddata->ops.priv	= (unsigned long)ddata;
- 	ddata->ops.read	= st_rng_read;
- 	ddata->ops.name	= pdev->name;
- 	ddata->base	= base;
--	ddata->clk	= clk;
--
--	dev_set_drvdata(&pdev->dev, ddata);
- 
- 	ret = devm_hwrng_register(&pdev->dev, &ddata->ops);
- 	if (ret) {
- 		dev_err(&pdev->dev, "Failed to register HW RNG\n");
--		clk_disable_unprepare(clk);
- 		return ret;
- 	}
- 
-@@ -113,15 +104,6 @@ static int st_rng_probe(struct platform_device *pdev)
- 	return 0;
- }
- 
--static int st_rng_remove(struct platform_device *pdev)
--{
--	struct st_rng_data *ddata = dev_get_drvdata(&pdev->dev);
--
--	clk_disable_unprepare(ddata->clk);
--
--	return 0;
--}
--
- static const struct of_device_id st_rng_match[] __maybe_unused = {
- 	{ .compatible = "st,rng" },
- 	{},
-@@ -134,7 +116,6 @@ static struct platform_driver st_rng_driver = {
- 		.of_match_table = of_match_ptr(st_rng_match),
- 	},
- 	.probe = st_rng_probe,
--	.remove = st_rng_remove
- };
- 
- module_platform_driver(st_rng_driver);
+Thanks,
 -- 
-2.30.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
