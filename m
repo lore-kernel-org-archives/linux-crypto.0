@@ -2,228 +2,69 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C33BBEB64DA
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 01:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0798EB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 05:01:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232752AbjFPBEW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Jun 2023 21:04:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
+        id S235690AbjFPFBZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 01:01:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229581AbjFPBEU (ORCPT
+        with ESMTP id S230171AbjFPFBY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Jun 2023 21:04:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D5F2972
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 18:03:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686877414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kcEnbXGcWdas9JneXh0Lv5Rsvonbjggxw0qCFC163g8=;
-        b=ELyNMjV05NMOei3qp9wQLjMosL7cNVerTg0JUaMN0pmf8oqH/sTP0uSAbE0X8itAhIP2fU
-        sDVxyHH88831pDM5D2Q9hAXSXRgX093x/8BZCkW9mpvLV4NyObqrqsxFiw5jZn3a8ifzhh
-        WosFGx1lM+Yt/RvhhKmHJgnIft4/mv8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-209-5ATaZ5wBOeK4-I-YWKB-ew-1; Thu, 15 Jun 2023 21:03:30 -0400
-X-MC-Unique: 5ATaZ5wBOeK4-I-YWKB-ew-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1D04D85A58A;
-        Fri, 16 Jun 2023 01:03:30 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 03B47492C38;
-        Fri, 16 Jun 2023 01:03:28 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZIrWOe4pG7M3TJic@gondor.apana.org.au>
-References: <ZIrWOe4pG7M3TJic@gondor.apana.org.au> <000000000000b928f705fdeb873a@google.com> <1433015.1686741914@warthog.procyon.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com,
-        syzbot <syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        Fri, 16 Jun 2023 01:01:24 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98853270E
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 22:01:22 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-77ac4aa24eeso25575439f.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Jun 2023 22:01:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686891682; x=1689483682;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eGnwxdo2DEMIi7tpDl/sj1NsuPf/fjo1eZwFLbHh/oc=;
+        b=OD5PaAfr9jDUkISyS5uu1uAw1xWDWVWMODK6UfnH6ySIj+lLygLFZgRFvfCY7KlHP4
+         ZUIQJq2//TVM05J4s/NCn25I7QX9Pz/h4Q4hmmRgIFP0BnBYnj5OK5sAZxw3X8Icz+5N
+         Ehi2kdbkj8NqAs/U2BrN5c4CVj3YiBUy+kwUTZqHxJmDcwoH0mnGRisVaYRu9WV+I5Mn
+         m/BmIIXGOpM7xaYTWOk9VnW6ZFZGlQ7MsFdaUvDFGlhFq3smB14zvk0y/DBff9XYcbp1
+         YOPoHovEi2XTQP8iRKOiW5XwlhEc+9AiUQi4A1P+gfw0q+iVnJfKce5nBtJ1PWO/TtzR
+         VxZg==
+X-Gm-Message-State: AC+VfDy3xMMgL/TNwnvlnhBsgYOoKwfghmcnAPWOpA3OrZzWvnHLoPla
+        em8j4HmWEf7MxVwI28QIDq7HE/s9DlvOcfULhdmvU3mINoNI
+X-Google-Smtp-Source: ACHHUZ6chEzs+H370XGbzmOcYS60hX1wyOhuKQHSGSvTc8wzvYQfpRdk/s8FYqZChd2H1Q8CFppxMqo46ogMdIqov/rMlSBJIyS+
+MIME-Version: 1.0
+X-Received: by 2002:a02:3319:0:b0:423:141e:f20b with SMTP id
+ c25-20020a023319000000b00423141ef20bmr303599jae.2.1686891681994; Thu, 15 Jun
+ 2023 22:01:21 -0700 (PDT)
+Date:   Thu, 15 Jun 2023 22:01:21 -0700
+In-Reply-To: <415439.1686877276@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007adf2d05fe38132a@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_final
+From:   syzbot <syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_final
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <415468.1686877408.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 16 Jun 2023 02:03:28 +0100
-Message-ID: <415469.1686877408@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+Hello,
 
-Here's a slightly more comprehensive test program for the hashing code to
-exercise some combinations of sendmsg, sendmsg+MSG_MORE and recvmsg.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-David
----
-#define _GNU_SOURCE
-#include <endian.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#include <linux/if_alg.h>
+Reported-and-tested-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
 
-#define OSERROR(R, S) do { if ((long)(R) =3D=3D -1L) { perror((S)); exit(1=
-); } } while(0)
+Tested on:
 
-static int hashfd;
-static unsigned char buf[1024], sbuf[1024];
-static const unsigned char no_zeros[2]  =3D { 0xe3, 0xb0 };
-static const unsigned char one_zero[2]  =3D { 0x6e, 0x34 };
-static const unsigned char two_zeros[2] =3D { 0x96, 0xa2 };
+commit:         97c5209b leds: trigger: netdev: uninitialized variable..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+console output: https://syzkaller.appspot.com/x/log.txt?x=159c4d9b280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
+dashboard link: https://syzkaller.appspot.com/bug?extid=13a08c0bf4d212766c3c
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=16962727280000
 
-static void do_send(unsigned int n, unsigned int flags)
-{
-	struct msghdr msg;
-	struct iovec iov[1];
-	int res;
-
-	memset(&msg, 0, sizeof(msg));
-	iov[0].iov_base =3D sbuf;
-	iov[0].iov_len =3D n;
-	msg.msg_iov =3D iov;
-	msg.msg_iovlen =3D 1;
-	res =3D sendmsg(hashfd, &msg, flags);
-	OSERROR(res, "sendmsg");
-}
-
-static void do_recv(unsigned int ix, const unsigned char r[2])
-{
-	struct msghdr msg;
-	struct iovec iov[1];
-	int res, i;
-
-	memset(&msg, 0, sizeof(msg));
-	iov[0].iov_base =3D buf;
-	iov[0].iov_len =3D sizeof(buf);
-	msg.msg_iov =3D iov;
-	msg.msg_iovlen =3D 1;
-	res =3D recvmsg(hashfd, &msg, 0);
-	OSERROR(res, "recvmsg");
-
-	printf("%3u: ", ix);
-	for (i =3D 0; i < res; i++)
-		 printf("%02x", buf[i]);
-	printf("\n");
-
-	if (buf[0] !=3D r[0] || buf[1] !=3D r[1])
-		 fprintf(stderr, "     ^ Bad result!\n");
-}
-
-int main(void)
-{
-	struct sockaddr_alg salg;
-	int algfd, res;
-
-	algfd =3D socket(AF_ALG, SOCK_SEQPACKET, 0);
-	OSERROR(algfd, "socket");
-
-	memset(&salg, 0, sizeof(salg));
-	salg.salg_family =3D AF_ALG;
-	strcpy(salg.salg_type, "hash");
-	strcpy(salg.salg_name, "sha256");
-	res =3D bind(algfd, (struct sockaddr *)&salg, sizeof(salg));
-	OSERROR(res, "bind/alg");
-
-	hashfd =3D accept4(algfd, NULL, 0, 0);
-	OSERROR(hashfd, "accept/alg");
-
-	//res =3D setsockopt(3, SOL_ALG, ALG_SET_KEY, NULL, 0);
-	//OSERROR(res, "setsockopt/ALG_SET_KEY");
-	=
-
-	/* Test no send */
-	do_recv(__LINE__, no_zeros);
-
-	/* Test single send of 0 */
-	do_send(0, 0);
-	do_recv(__LINE__, no_zeros);
-
-	do_send(0, MSG_MORE);
-	do_recv(__LINE__, no_zeros);
-
-	/* Test single send of 1 */
-	do_send(1, 0);
-	do_recv(__LINE__, one_zero);
-
-	do_send(1, MSG_MORE);
-	do_recv(__LINE__, one_zero);
-
-	/* Test single send of 2 */
-	do_send(2, 0);
-	do_recv(__LINE__, two_zeros);
-
-	do_send(2, MSG_MORE);
-	do_recv(__LINE__, two_zeros);
-
-	/* Test two sends of 1 */
-	do_send(1, 0);
-	do_send(1, 0);
-	do_recv(__LINE__, one_zero);
-
-	do_send(1, 0);
-	do_send(1, MSG_MORE);
-	do_recv(__LINE__, one_zero);
-
-	do_send(1, MSG_MORE);
-	do_send(1, 0);
-	do_recv(__LINE__, two_zeros);
-
-	do_send(1, MSG_MORE);
-	do_send(1, MSG_MORE);
-	do_recv(__LINE__, two_zeros);
-
-	/* Test send of 0 then send of 2 */
-	do_send(0, 0);
-	do_send(2, 0);
-	do_recv(__LINE__, two_zeros);
-
-	do_send(0, 0);
-	do_send(2, MSG_MORE);
-	do_recv(__LINE__, two_zeros);
-
-	do_send(0, MSG_MORE);
-	do_send(2, 0);
-	do_recv(__LINE__, two_zeros);
-
-	do_send(0, MSG_MORE);
-	do_send(2, MSG_MORE);
-	do_recv(__LINE__, two_zeros);
-
-	/* Test send of 2 then send of 0 */
-	do_send(2, 0);
-	do_send(0, 0);
-	do_recv(__LINE__, no_zeros);
-
-	do_send(2, 0);
-	do_send(0, MSG_MORE);
-	do_recv(__LINE__, no_zeros);
-
-	do_send(2, MSG_MORE);
-	do_send(0, 0);
-	do_recv(__LINE__, two_zeros);
-
-	do_send(2, MSG_MORE);
-	do_send(0, MSG_MORE);
-	do_recv(__LINE__, two_zeros);
-
-	return 0;
-}
-
+Note: testing is done by a robot and is best-effort only.
