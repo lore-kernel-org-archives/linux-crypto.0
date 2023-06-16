@@ -2,115 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3D3EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 08:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 646ECEB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Jun 2023 09:01:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245682AbjFPIhq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Jun 2023 04:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
+        id S244732AbjFPJAj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 16 Jun 2023 05:00:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245619AbjFPIho (ORCPT
+        with ESMTP id S1343904AbjFPI7t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Jun 2023 04:37:44 -0400
+        Fri, 16 Jun 2023 04:59:49 -0400
 Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30672194;
-        Fri, 16 Jun 2023 01:37:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8115E30D5;
+        Fri, 16 Jun 2023 01:59:39 -0700 (PDT)
 Received: from [167.98.155.120] (helo=martin-debian-2.paytec.ch)
         by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.89)
         (envelope-from <martin@kaiser.cx>)
-        id 1qA4xg-0000Wd-Io; Fri, 16 Jun 2023 10:37:40 +0200
+        id 1qA5Iv-0000d1-Bl; Fri, 16 Jun 2023 10:59:37 +0200
 From:   Martin Kaiser <martin@kaiser.cx>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH 2/2] hwrng: st - keep clock enabled while hwrng is registered
-Date:   Fri, 16 Jun 2023 09:36:18 +0100
-Message-Id: <20230616083618.1320824-3-martin@kaiser.cx>
+Subject: [PATCH v2 1/2] hwrng: st - support compile-testing
+Date:   Fri, 16 Jun 2023 09:58:12 +0100
+Message-Id: <20230616085813.1323082-2-martin@kaiser.cx>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230616083618.1320824-1-martin@kaiser.cx>
+In-Reply-To: <20230616085813.1323082-1-martin@kaiser.cx>
 References: <20230616083618.1320824-1-martin@kaiser.cx>
+ <20230616085813.1323082-1-martin@kaiser.cx>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The st-rng driver uses devres to register itself with the hwrng core,
-the driver will be unregistered from hwrng when its device goes out of
-scope. This happens after the driver's remove function is called.
+Allow compile-testing the st-rng driver if we're not running on an ST
+chipset.
 
-However, st-rng's clock is disabled in the remove function. There's a
-short timeframe where st-rng is still registered with the hwrng core
-although its clock is disabled. I suppose the clock must be active to
-access the hardware and serve requests from the hwrng core.
-
-Switch to devm_clk_get_enabled and let devres handle both clock and hwrng
-registration. This avoids the race condition.
-
-Fixes: 3e75241be808 ("hwrng: drivers - Use device-managed registration API")
 Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 ---
- drivers/char/hw_random/st-rng.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
+ drivers/char/hw_random/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
-index 15ba1e6fae4d..7a4e439d34d7 100644
---- a/drivers/char/hw_random/st-rng.c
-+++ b/drivers/char/hw_random/st-rng.c
-@@ -42,7 +42,6 @@
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index baefa2e0edbc..e0b3786ca51b 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -348,7 +348,7 @@ config HW_RANDOM_HISTB
  
- struct st_rng_data {
- 	void __iomem	*base;
--	struct clk	*clk;
- 	struct hwrng	ops;
- };
- 
-@@ -85,19 +84,14 @@ static int st_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(base))
- 		return PTR_ERR(base);
- 
--	clk = devm_clk_get(&pdev->dev, NULL);
-+	clk = devm_clk_get_enabled(&pdev->dev, NULL);
- 	if (IS_ERR(clk))
- 		return PTR_ERR(clk);
- 
--	ret = clk_prepare_enable(clk);
--	if (ret)
--		return ret;
--
- 	ddata->ops.priv	= (unsigned long)ddata;
- 	ddata->ops.read	= st_rng_read;
- 	ddata->ops.name	= pdev->name;
- 	ddata->base	= base;
--	ddata->clk	= clk;
- 
- 	dev_set_drvdata(&pdev->dev, ddata);
- 
-@@ -113,15 +107,6 @@ static int st_rng_probe(struct platform_device *pdev)
- 	return 0;
- }
- 
--static int st_rng_remove(struct platform_device *pdev)
--{
--	struct st_rng_data *ddata = dev_get_drvdata(&pdev->dev);
--
--	clk_disable_unprepare(ddata->clk);
--
--	return 0;
--}
--
- static const struct of_device_id st_rng_match[] __maybe_unused = {
- 	{ .compatible = "st,rng" },
- 	{},
-@@ -134,7 +119,6 @@ static struct platform_driver st_rng_driver = {
- 		.of_match_table = of_match_ptr(st_rng_match),
- 	},
- 	.probe = st_rng_probe,
--	.remove = st_rng_remove
- };
- 
- module_platform_driver(st_rng_driver);
+ config HW_RANDOM_ST
+ 	tristate "ST Microelectronics HW Random Number Generator support"
+-	depends on HW_RANDOM && ARCH_STI
++	depends on HW_RANDOM && (ARCH_STI || COMPILE_TEST)
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator hardware found on STi series of SoCs.
 -- 
 2.30.2
 
