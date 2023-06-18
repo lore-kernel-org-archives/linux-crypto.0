@@ -2,120 +2,110 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12196EB64D7
-	for <linux-crypto@archiver.kernel.org>; Sun, 18 Jun 2023 06:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2DCEB64DB
+	for <linux-crypto@archiver.kernel.org>; Sun, 18 Jun 2023 08:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjFRGuE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 18 Jun 2023 02:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50628 "EHLO
+        id S229673AbjFRIhF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 18 Jun 2023 04:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbjFRGuD (ORCPT
+        with ESMTP id S229659AbjFRIhE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 18 Jun 2023 02:50:03 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38186E60
-        for <linux-crypto@vger.kernel.org>; Sat, 17 Jun 2023 23:50:01 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f8d258f203so16557675e9.1
-        for <linux-crypto@vger.kernel.org>; Sat, 17 Jun 2023 23:50:01 -0700 (PDT)
+        Sun, 18 Jun 2023 04:37:04 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9E418B
+        for <linux-crypto@vger.kernel.org>; Sun, 18 Jun 2023 01:37:02 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-983f499fc81so307042766b.3
+        for <linux-crypto@vger.kernel.org>; Sun, 18 Jun 2023 01:37:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687070999; x=1689662999;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kTbsJHJAIh6L3OpmlKEMiLQ8FVA+BH6GdkanOhtFItg=;
-        b=am0n7jcHfoIjQo2hsnQsbevfZPseixSmpo2SSFGzb5Hpphzcc0coNeq1wFtWFmCgPf
-         Gs7slH4VN0Xs09KXbj2Wznu4ZP/OzkmWqn4jEM25d26yjSovzt/fHh8Towa7WRWvoixs
-         WDKCkF2wsVgv13NcweE+ZHmnY3Id4s46yAdJM5yqccCVw9sjmeNfwBDvteOYlkP+dtxi
-         JWSn+LUoN2FbR/Ffu6h6spvadXl7WFwIIHLCdbVDLHs5+iiaieUab6SSmjiFvcY/Dbgl
-         ZQa018CeTpHP1ieINDU2k55V6OnfDwcBXuW42bbJSLDnR9X58XeHCN7wHrdEbM0j3vhe
-         AyKg==
+        d=linaro.org; s=google; t=1687077421; x=1689669421;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CqBu5wPBLSKpT6xKjTZPHEicExKCCi3BZO99th5vmu0=;
+        b=IfI28QAoO6Y19vMkOqSdshh/D7g51BT9PMVm9xXlg7mMo17+2bESmsKYK1I+u5OLB0
+         D0R4gNuEpTL6u1yDfAH7fKIOsBVZbhyf8oJtrmqSg4rkoyPwCRabJKDVMrgyCV5AK3xg
+         9wcXRyiPBHwjy4Tp616coNpDGxCe1xLvStRT46g6qtL6hGueMu0yjj1bUSVsperBa09t
+         NmJDXQvc3CPB5EVTx1/xraCuBi0P2wsxjD8XDJi9U40Pugpb00JwT5SkPy+p48VEYL6g
+         j2skJpK4AtNQiaYIGdul19ponWJc7BSXnvCWM8d0a42hOHuRk5U0WYd9duM+srSRSHyv
+         FnFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687070999; x=1689662999;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kTbsJHJAIh6L3OpmlKEMiLQ8FVA+BH6GdkanOhtFItg=;
-        b=EKUjytKkv+N+kKQA5a6N99aGcoWNZogFZa1RLi7ZXNrs1Kb5o+SXYsICzVK7h3JMJ6
-         3CDmhrpaoL9rXjYK3z/CFYo4M0KgsMAH9EbSYsvsGB5NFVAU6ARvfg1UYxyPjM+fJ9KQ
-         NqKmtJqBYv5HLhsQwsibC5KEXVWLTvvVcYoYJyMyHOKAxS40QdLl3ddcpedL8eaBfdM/
-         NJ/+uUeeQ9HV66djkSqhGBy98h7qQ9+sPY0pYrpXtj490IHHm2gt5VPUmiXLH1N4Uy4M
-         34mUbujOCJcUOjz57rCE3nDOlfoj5dArQbp0rWOV7Rn7PegrJkb84PloGmXC3nxPr0MO
-         AWcw==
-X-Gm-Message-State: AC+VfDxL8TspjQxKImi2W7Apl3sK05kXb+x3plkkvVjc5XokyyJTtzmX
-        kpy3LhDL/FXZ/axtERlNKhYGFhGi76zkwwRRMPxLJA==
-X-Google-Smtp-Source: ACHHUZ7S6ECk8uaphJNxTelZTmW4DZh6bWCMyhptboMmhW4e7hixs2RagJ/j3zTRKjShC7214bpopIgYhKQR4gMWn0c=
-X-Received: by 2002:a5d:6ad1:0:b0:311:18ce:152b with SMTP id
- u17-20020a5d6ad1000000b0031118ce152bmr3848340wrw.61.1687070999524; Sat, 17
- Jun 2023 23:49:59 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687077421; x=1689669421;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CqBu5wPBLSKpT6xKjTZPHEicExKCCi3BZO99th5vmu0=;
+        b=dhcNQRYxCm8oO1aXKU2fF1i1MCzp5aFYsg0LZ/mVNi1gFSngZsEqxDERZHJizjXcjW
+         d9aVg3YPeg9GDtL2V9oXAZ+X71iXEY91UwFxxQHMO3D00IycDoHIsXQoCGZXDY3APOoi
+         dk7P1MsnEMaSRRTPGV6ayJWFLG8uQvF6/OXVJV+IUv5Prb7erDUloezBg5T9uYnj9swV
+         FDgr2ChHZz3HT4kqL8n2NEIk5uiGp8VAPYxCRkifIrlkcgV2KKvnyrPQW4RKVUQ2bWpc
+         +SpP3zTgb9/AnQjUqus1Zd32Mv5uv0njgmKIt+xP1OMB1iacJXYC528YnX0Iwc6OQcCZ
+         h1KA==
+X-Gm-Message-State: AC+VfDxedLuPwhtifsbeA6eoztXYOBK0BrRFsYTuCQt6eptC3bhVi0Is
+        aGe5K1av17/LKgWodk7Ot4Pbhg==
+X-Google-Smtp-Source: ACHHUZ6D8tZRpKg4w9Sff05q/wAII4JkK1iFtnAjdeEIIbbZN0hkWuSpiteTsfq+osyb55Q4+XZMJw==
+X-Received: by 2002:a17:907:1b09:b0:974:771e:6bf0 with SMTP id mp9-20020a1709071b0900b00974771e6bf0mr5372268ejc.56.1687077420866;
+        Sun, 18 Jun 2023 01:37:00 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.26])
+        by smtp.gmail.com with ESMTPSA id cd10-20020a170906b34a00b0098696189722sm2578047ejb.192.2023.06.18.01.36.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Jun 2023 01:37:00 -0700 (PDT)
+Message-ID: <bfa97efc-cd3d-dee7-157f-02f2cd01ff46@linaro.org>
+Date:   Sun, 18 Jun 2023 10:36:58 +0200
 MIME-Version: 1.0
-References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
- <20230526192210.3146896-11-bhupesh.sharma@linaro.org> <d239ad07-fbdd-16fa-3555-5bcf33c67059@linaro.org>
- <11c3eb6c-823d-9688-ec53-e05c7bb557c5@linaro.org> <83807d70-c35c-6b66-e7f9-521bdfc6d1b4@linaro.org>
-In-Reply-To: <83807d70-c35c-6b66-e7f9-521bdfc6d1b4@linaro.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-Date:   Sun, 18 Jun 2023 12:19:48 +0530
-Message-ID: <CAH=2NtyNqbhY6B0orqyGvhOWs7M5z9tBQ05E7e7Fb1toamN95Q@mail.gmail.com>
-Subject: Re: [PATCH v8 10/11] arm64: dts: qcom: sm8350: Add Crypto Engine support
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Konrad Dybcio <konrad.dybcio@linaro.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        agross@kernel.org, linux-kernel@vger.kernel.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v8 02/11] dt-bindings: dma: Increase iommu maxItems for
+ BAM DMA
+Content-Language: en-US
+To:     Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, andersson@kernel.org,
         bhupesh.linux@gmail.com, robh+dt@kernel.org,
-        vladimir.zapolskiy@linaro.org, rfoss@kernel.org,
-        neil.armstrong@linaro.org, djakov@kernel.org, stephan@gerhold.net,
-        Anders Roxell <anders.roxell@linaro.org>,
+        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
+        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
+        stephan@gerhold.net, Anders Roxell <anders.roxell@linaro.org>,
         Linux Kernel Functional Testing <lkft@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
+ <20230526192210.3146896-3-bhupesh.sharma@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230526192210.3146896-3-bhupesh.sharma@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 17 Jun 2023 at 12:58, Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 17/06/2023 01:33, Konrad Dybcio wrote:
-> > On 16.06.2023 19:36, Krzysztof Kozlowski wrote:
-> >> On 26/05/2023 21:22, Bhupesh Sharma wrote:
-> >>> Add crypto engine (CE) and CE BAM related nodes and definitions to
-> >>> 'sm8350.dtsi'.
-> >>>
-> >>> Tested-by: Anders Roxell <anders.roxell@linaro.org>
-> >>> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >>> Co-developed-by and Signed-off-by: Robert Foss <rfoss@kernel.org>
-> >>> [Bhupesh: Switch to '#interconnect-cells = <2>', available since commit 4f287e31ff5f]
-> >>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> >>> ---
-> >>
-> >> #regzbot introduced: f1040a7fe8f069d2259ab3dab9190210005ceb33
-> >> #regzbot title: HDK8350 silently crashes early on boot
-> >>
-> >> Hi, this landed in the next but unfortunately it causes silent crash
-> >> (and reboot) of HDK8350. Reverting this commit helps.
-> > Downstream also references the following SIDs:
-> >
-> > iommus = <&apps_smmu 0x592 0>,
-> >        <&apps_smmu 0x598 0>,
-> >        <&apps_smmu 0x599 0>,
-> >        <&apps_smmu 0x59F 0>;
->
-> I already tried iommus from downstream from:
-> 1. qcrypto node (0x584, 0x594)
-> 2. qcedev (0x586, 0x596)
-> 3. qcom_cedev_ns_cb (0x592, 0x598, 0x599, 0x59F), although with 0x0011
-> last argument.
->
-> Same results, but indeed iommu would be nice reason here.
->
-> I also double checked the version of block (BAM DMA is v1.7.4) and other
-> properties. When I disabled crypto but left BAM DMA, the result was the
-> same, thus it is maybe the BAM who causes abort.
+On 26/05/2023 21:22, Bhupesh Sharma wrote:
+> Since SM8450 BAM DMA engine supports five iommu entries,
+> increase the maxItems in the iommu property section, without
+> which 'dtbs_check' reports the following error:
+> 
+>   arch/arm64/boot/dts/qcom/sm8450-sony-xperia-nagara-pdx224.dtb:
+>     dma-controller@1dc4000: iommus: is too long
+> 
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Tested-by: Anders Roxell <anders.roxell@linaro.org>
+> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> index c663b6102f50..5636d38f712a 100644
+> --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+> @@ -44,7 +44,7 @@ properties:
+>  
+>    iommus:
+>      minItems: 1
+> -    maxItems: 4
+> +    maxItems: 5
 
-I remember testing it on the sm8350-mtp and found no issues. Infact
-Robert (the original author of the patch) had also done some testing
-in the past.
+This needs at least 6 (sm8250).
 
-I am sure - mtp v/s hdk board variation would not cause this, so let
-me have a stab at it tomorrow.
+Best regards,
+Krzysztof
 
-Thanks,
-Bhupesh
