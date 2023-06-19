@@ -2,109 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A54EB64D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 16:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E767FEB64D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 18:39:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229895AbjFSQs0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 12:48:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46944 "EHLO
+        id S231466AbjFSSjb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 14:39:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229944AbjFSQsZ (ORCPT
+        with ESMTP id S229771AbjFSSja (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 12:48:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608DFFE
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 09:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687193256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i+a8DGHRj3jW50Valrkn+7VRWxzc0jyAL0po+eTjD1I=;
-        b=BxDjNUx51vK8CEsffq6+XEZuXA1E9eqWgnVX4x+/Whyi7z94vyZdHLvRinv1R+x8WWwTa9
-        9tayqfDSoO45F3P3ApVFUFbUwo2Qc0f9vd2EOq+cfHSK3oxRvSqdcaCNGmGkH7Db0ljtEu
-        qSjhLINTPDlmv5HmpBWY4XYD21POui0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-302-ojfv7mcJNBW2RxY_gMc9Ug-1; Mon, 19 Jun 2023 12:47:30 -0400
-X-MC-Unique: ojfv7mcJNBW2RxY_gMc9Ug-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A4C1B858287;
-        Mon, 19 Jun 2023 16:47:29 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B601112132D;
-        Mon, 19 Jun 2023 16:47:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZIw8y2w+A+t5u+IJ@gondor.apana.org.au>
-References: <ZIw8y2w+A+t5u+IJ@gondor.apana.org.au> <ZIw4+Go7ZIth+CsY@gondor.apana.org.au> <1679829.1686785273@warthog.procyon.org.uk> <426353.1686911878@warthog.procyon.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
-        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
-        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
-        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
-        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+        Mon, 19 Jun 2023 14:39:30 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6367D18C
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 11:39:29 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-77e45f12b5bso38131239f.0
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 11:39:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687199968; x=1689791968;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yovt+NBs+zN88mKTFmMiBGRNaqNl1IAEsWQ9bmrlOts=;
+        b=OqmjTEIWxneoIuK16ehNhdwfYFU8FhA8Kn842A0s/2qWEHHAj74++mKSqSbTs+vnHd
+         jyf21nCceSTv/0YfmKOMu4S0QJPn7sgkYkhl9GQtjT+1+yVC6NMCsff+cXROzI6yHqDw
+         xQWFHIrW+sdaIBg0RoFsO0vNPo+IrT4HVI/Ifwq4gtbJKW/0P9VNEPXlj8zPagFs/1oE
+         0mXsdG21i+W+Mf4adwp6UuMps712LfgOpAQpJkXXnh7joUbx1lvBOZVlGKbER45Ys3u0
+         e6CR9ltzaxybwoTEIEBTSpe5TSlaxGNTdKmtQ/fJevqgpiUH5Vg8nMXmtb+6QVeJvrXU
+         mpoA==
+X-Gm-Message-State: AC+VfDwwqTFPSALSMChQ25PJeNToAgYZH2f1e7533hUjA0b+fre/2PXi
+        t09XcjG5umDWVtlQEH5ZgJ0CzlT09Am7nsaSakKTXjpSxNjO
+X-Google-Smtp-Source: ACHHUZ6Zu1qOfU3n1nK17F8mRHVcVw++7U+FWtv+g1pIs1eCeFRAessPwU2LszmlMeaaiY97WhjTMdQEA9nxqde2iw2xAZuCWbTM
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1132300.1687193246.1@warthog.procyon.org.uk>
-Date:   Mon, 19 Jun 2023 17:47:26 +0100
-Message-ID: <1132301.1687193246@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Received: by 2002:a6b:3b8b:0:b0:777:b0ee:a512 with SMTP id
+ i133-20020a6b3b8b000000b00777b0eea512mr3574163ioa.2.1687199968282; Mon, 19
+ Jun 2023 11:39:28 -0700 (PDT)
+Date:   Mon, 19 Jun 2023 11:39:28 -0700
+In-Reply-To: <000000000000ada87505fe7cf809@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c6527105fe7fdab8@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in shash_ahash_update
+From:   syzbot <syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+syzbot has bisected this issue to:
 
-> Anyway, why did you remove the condition on hash_free_result?
-> We free the result if it's not needed, not to clear the previous
-> hash.  So by doing it uncondtionally you will simply end up
-> freeing and reallocating the result for no good reason.
+commit c662b043cdca89bf0f03fc37251000ac69a3a548
+Author: David Howells <dhowells@redhat.com>
+Date:   Tue Jun 6 13:08:56 2023 +0000
 
-The free here:
+    crypto: af_alg/hash: Support MSG_SPLICE_PAGES
 
-	if (!continuing) {
-		if ((msg->msg_flags & MSG_MORE))
-			hash_free_result(sk, ctx);
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14a7cbcf280000
+start commit:   9a94d764e9bc Merge tag 'mlx5-updates-2023-06-16' of git://..
+git tree:       net-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16a7cbcf280000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12a7cbcf280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4a7d74e6a7c3211
+dashboard link: https://syzkaller.appspot.com/bug?extid=88f4b1e6cf88da11f5cd
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1152c4ff280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1307cbcf280000
 
-only happens in the following case:
+Reported-by: syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com
+Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
 
-	send(hashfd, "", 0, 0);
-	send(hashfd, "", 0, MSG_MORE);  <--- by this
-
-and the patch changes how this case works if no data is given.  In Linus's
-tree, it will create a result, init the crypto and finalise it in
-hash_sendmsg(); with this patch that case is then handled by hash_recvmsg().
-If you consider the following sequence:
-
-	send(hashfd, "", 0, 0);
-	send(hashfd, "", 0, 0);
-	send(hashfd, "", 0, 0);
-	send(hashfd, "", 0, 0);
-
-Upstream, the first one will create a result and then each of them will init
-and finalise a hash, whereas with my patch, the first one will release any
-outstanding result and then none of them will do any crypto ops.
-
-However, as, with my patch hash_sendmsg() no longer calculated a result, it
-has to clear the result pointer because the logic inside hash_recvmsg() relies
-on the result pointer to indicate that there is a result.
-
-Instead, hash_recvmsg() concocts the result - something it has to be able to
-do anyway in case someone calls recvmsg() without first supplying data.
-
-David
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
