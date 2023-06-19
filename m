@@ -2,167 +2,488 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F27F8EB64D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 14:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B143EB64D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 14:56:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229448AbjFSOye (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 10:54:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47780 "EHLO
+        id S232024AbjFSO4t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 10:56:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232254AbjFSOyb (ORCPT
+        with ESMTP id S232249AbjFSO4t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 10:54:31 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0689CE78
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 07:54:28 -0700 (PDT)
+        Mon, 19 Jun 2023 10:56:49 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2864CB9
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 07:56:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687186467; x=1718722467;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=KEXprsmzpH2X0ZjcibHwkmFuRQM4H0ZN7mKEVXKbQ3Y=;
-  b=dAXpK+sJRbx19YsTeWE2c2J2rYZfiIvPMWcT2fw3EHMVmQFoFIhIWlmM
-   4rOuJ+Pnd6zBq/NLCBvKAagmSpIJvhY8L4obIYgXFwUfdbem9zoK1sKx9
-   33UYxe4jhtwHJcS08Bih7EoPx7mgopk4/Yl1b/PFEtlQYuHEfbl8o7t5H
-   VRvJpzb8NIONq81uXGL0OZwuyh6bipv+zbRObEEpu27Bq2lJEg6Miunbc
-   GeWzdO5TflamB7q8/59h2wGqElKVIKdJyW0ndFxwWHqCo7x6+xN1O5DrO
-   +Y319qlTshkDZUOGkOErbRHGe5q0bZ7kPQ+AXyCGZsOhEBhNaDg8wBWMG
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="423311935"
+  t=1687186607; x=1718722607;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VtStrhiMYlIBMN2tK8kAKp+dP9uIjQm3WUwlFOVjAaM=;
+  b=DTYvV6C19GskG+YuHwDPyzn/yx306zjce/B6x6NeSgQ5mlforBYj2S3k
+   Ez+fFH7508QWujy1naeFDsFI3iTVIozVPotAyXMT7SHXvu+tSesBQsENE
+   bltm7gweTQaR6hmKtYU6K9UPOmm9Mv8J7W0qn/EJqFF3XhZx7+0rom06c
+   KY0ksZadjYjsVKvyzVouH3rPI0CNGssDlsD4crrIYR8TZ+fFsmwTxsa+l
+   esJ8JBZKdJfxV+/qzMZ/+j1HKrQZOrIg9iXDDHpB9Q/+IUcRU3IaPUhng
+   wN0PABYJH5oUREUeUl9r8tiMwRVeT8C5vPFd+5tMttog6RA1HkQzbuANL
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="446025017"
 X-IronPort-AV: E=Sophos;i="6.00,254,1681196400"; 
-   d="scan'208";a="423311935"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2023 07:54:27 -0700
+   d="scan'208";a="446025017"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2023 07:56:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="837895770"
+X-IronPort-AV: E=McAfee;i="6600,9927,10746"; a="713711274"
 X-IronPort-AV: E=Sophos;i="6.00,254,1681196400"; 
-   d="scan'208";a="837895770"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga004.jf.intel.com with ESMTP; 19 Jun 2023 07:54:25 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 19 Jun 2023 07:54:26 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Mon, 19 Jun 2023 07:54:26 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.44) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Mon, 19 Jun 2023 07:54:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nyfzFx24B5qOTHYYdSj7p7FYntwAeImmjCY96uYlsUvvPnx5YF9CZn0QmtX5Ad8oszqV3lOFCqexfNJl0/r56RK9rkvOdaVbuqk2d7azkgna0YCDGgGpwqzQLA1EScJKG5n6xSofBjseIO0L9usiX5Kk7c1HHcGEbk6W2RIZgqImfiaT1YjoqKXWnu8QUmIlbKScV5aAIm3ayS0X4QKJDkMgl58eW1lOiW+Xd02S2IzfafPaPZQTrEPlfU2dJzqnVzrmPvm8b/1cAJ6K+NVxJ1D7vdigT7lHMcq1p+2U2RN+W65opjIV0ijC6Ta+kGaxHIHsC67UKT6syPKjkjZusw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vq95jv413ta10LWnQ4ZuGZguUIna5I0EdhwneQ2eFBg=;
- b=QYekMho0K3iuQ0/Rj+CYrtCrLjbfYFAYcrgkAwY0VTwYQIEQlwz3Zf1VgiB61aT24yd3nFkAIWrpFxayBuKW9HyHvOFIFo0GjsoJLZeIQghwBR2XBt5D9c1lxhyCLOVqACeN5zEee4TB2ERuDX5229nUeNkur4y8XUtXv10fcWI6ZXJeG62d6OGpt9N4YkZltm8roWHM02Op3viYy/VowNzMZ8LvMdJVO9Xz3UISX8MUmpaACu1igiecAAQYYDOhVNbvM4IGDaz2nk6UBm0ISsclYHh+LauVigi36zWemStXCaE4+HdNgBrC28pGsLr4Ta9MUswLhu5X5rXyOA7tcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by CH3PR11MB7249.namprd11.prod.outlook.com (2603:10b6:610:146::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.36; Mon, 19 Jun
- 2023 14:54:24 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::955a:2397:1402:c329]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::955a:2397:1402:c329%3]) with mapi id 15.20.6477.028; Mon, 19 Jun 2023
- 14:54:23 +0000
-Date:   Mon, 19 Jun 2023 15:54:17 +0100
+   d="scan'208";a="713711274"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.175])
+  by orsmga002.jf.intel.com with ESMTP; 19 Jun 2023 07:56:36 -0700
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
-        <qat-linux@intel.com>, Adam Guerin <adam.guerin@intel.com>,
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Adam Guerin <adam.guerin@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH] crypto: qat - add fw_counters debugfs file
-Message-ID: <ZJBsGZrHEVmTwsFX@gcabiddu-mobl1.ger.corp.intel.com>
-References: <20230612132631.96630-1-lucas.segarra.fernandez@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230612132631.96630-1-lucas.segarra.fernandez@intel.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: LO4P123CA0484.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:1a8::21) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+Subject: [RESEND] crypto: qat - add fw_counters debugfs file
+Date:   Mon, 19 Jun 2023 15:56:34 +0100
+Message-Id: <20230619145634.18963-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|CH3PR11MB7249:EE_
-X-MS-Office365-Filtering-Correlation-Id: f672c869-949d-4d3d-2754-08db70d511d4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4rMIUCz8R/LYRONgqAg1xBVZmC5S9ZW3D+7fDqbrFbD2sPh/pTVqFHAE7XpgnGsd2CrZmvPAVlzaOr26VRkxIpheH+e0EdY/GkiG0+fSaoKkBmHa3aUG/T7OTNUylUNL/ucH/zorwKQVaCe6YjsY7FA6KZ+bQrUZWYoSIbsWT57SOzdUpyeGMUkViDyNTw+YA1Qn0H7W4KatUXxqDl3O6RbojohMaW1eKcvARvo4zIpRGA6EWw4Ji69zxuMY6wItS7yoHRrr17x+XYK3PEAogIktHlYALMNXDIbjNne0s9wuwnLgIwbvlESc/h6mgXvcqMv0g+blWhCN6ckxCUzvfa+UAR+cpCYcCr0MHTe8t6cAHFnif8whws8sY8lSj4LBeizPmf+0IhJqDFZTd7tq1LPfQRvS0CBRSBv/GaOCP6NMbufJbpSVC6FfmiQHRaZdzI5b4PpnNn5d/OVo2B7BV74/AZy3srcjJ6P9cpcX6y1WPhchn6RBsYgt5pP2dgVaXcHnf8l+tEbkpH0xHZToVd5gBGSZFGxboMxOcEbaUmbqG5yV0p8TuxIIVBF7Wa24
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(396003)(376002)(136003)(346002)(451199021)(186003)(6506007)(6512007)(26005)(6486002)(36916002)(6666004)(83380400001)(478600001)(54906003)(82960400001)(4326008)(66556008)(66946007)(66476007)(316002)(38100700002)(6916009)(41300700001)(44832011)(8676002)(8936002)(5660300002)(4744005)(2906002)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Gxm9Yfz8lhjzYn8Ud1T9YtGVuomHiBV7bf2lm0PH9iYU45mfXdAvIsnG+7ph?=
- =?us-ascii?Q?MrOHrEhRti+IjkxcRZEEOmSALzcGR34yN8FDcar4spPlmy9F6hcnZ2/0tDaW?=
- =?us-ascii?Q?pg4Zliv/8Z27njtdlBohsYXDlVVxo3hBq1n8nrplN9tesRZ9sD/N1Kc54b90?=
- =?us-ascii?Q?HlIE53EuMPdrjQx/EGJ6gEzdY4s/wW9Ztj5l+MTmnkretrBlaJk1TZptDaBy?=
- =?us-ascii?Q?bccadscso4NQYplX0oMN/fX/3D76yTpCUWhB6bYpt3a00zF7K0Gdp1nmwNqU?=
- =?us-ascii?Q?A3zDFl52mwmD8JITZtfdPlW94nhjLIbNsl+t0QlaQaW/RMnUKYNayulIoY5p?=
- =?us-ascii?Q?TYUeZ7KvL1WQ12YsXMSr3rsD5haD7LwRHe/dxY0nLzh9W62USgs936tqYP3f?=
- =?us-ascii?Q?6LnY29jHTgkd39bvij2tRQ++LCjVWYT+EunQimmBznzSTBr017iXgwYx+cO5?=
- =?us-ascii?Q?v4veHfHR/R4NJvVEAXEJRpUKa5YA5qOz6lWH/lziA6qsjS2f/mf1zKjbInHZ?=
- =?us-ascii?Q?Z05YCJmy33nx84n3rmySQU5VQu8jWgjwSqAI1rX3aQ4kWPndOLQ8y4v0y3QC?=
- =?us-ascii?Q?7Jt5uecF79dj6gdizzbbkVpNWQ9nvsOPUP249hbIU3kai7QEPdHl3Y/wUQM5?=
- =?us-ascii?Q?oMonJvP8Z6N8OrLgTOSuUgc3/O+8j2vLGmXeuts4gk9h+KSHihcmPQWZwHFf?=
- =?us-ascii?Q?lI/GO/la71YGrrKIkRyvkV0J1W1H/Yq4kA1dW9IiO2DsVcpn/HxKbQNJpI8D?=
- =?us-ascii?Q?X0Z1HYDEa5ufsGRyq/C9xKkktP3wYWidKlLiKukTO2ikswBS8bqzgineGmWw?=
- =?us-ascii?Q?zMyyuAtt4jK6A0xh2PkG5fGPsECXWNlquvz7hJW2Sw+9VOM8q26pCnITu8BR?=
- =?us-ascii?Q?+Ry8gsGmxW+12ZDtUsoy4sY94PAMVYRQGasNlb7jX30Pb6yqBbKRgfZCzzSd?=
- =?us-ascii?Q?7LoWxhp5hI495pfbXyjl8JXV5TsozL/A/J3b6ICpLFU/BV0MkcAkEnXwt0pe?=
- =?us-ascii?Q?ZWuofxBcH3jy8xuUBHgEnIKXVu5HyeigQ1NsU/zd8Q3YtYDc61TZBEJamGyM?=
- =?us-ascii?Q?uad7KiPNmH5JqKAo+M4euSFEC0QxkFG7PRbzM6FxedtNJU4BmEDMK8awreUa?=
- =?us-ascii?Q?yxgDrbQMaIpbHJ4W5hj1aOCU6DEdCFkKn+qLWKu2N8IjvFOoX5/fHUoGr6XW?=
- =?us-ascii?Q?5Ikv94WUZ03qEMjuRoHs4EMK8btgXy5ouGoGeJkb4g1Vrrq4A/lRsoRhjeWE?=
- =?us-ascii?Q?I0A0RzvwEdrPq8eSPJ8XQg/l8zagzKV9djo5Ur5PN+ZTE+e/ljvf8M071KsM?=
- =?us-ascii?Q?zu1t+OUfdMPmpt6hJjl400KqBXC+m1dwvdvSSDDC4fkDlimILir+ZHGQBViy?=
- =?us-ascii?Q?I108GkerWg9KBKTJlPNv9wcFJU5R9Diw63QQqOJpQAiUgWyRfNM4lX2npTUq?=
- =?us-ascii?Q?t2sK1p8oNf58G8TiXhRxqe+eWAkOktHctWy5xCZXtu+J8Y2Q030pHsAOaUOx?=
- =?us-ascii?Q?Q+xGP3YV5ZsRQbw03wj4DRuFMDIYoXhz3M5GbWabfiCbc9WQmX1qGbBlQ3aA?=
- =?us-ascii?Q?fdE5HkjGU73z6Nf6ZJSYtOMNpJracK0JZWl4hdPGUWlZJ5kKOCkC3QsmySXr?=
- =?us-ascii?Q?SA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f672c869-949d-4d3d-2754-08db70d511d4
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2023 14:54:23.3934
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pnzEwCM/OuSObPte8VIm1VaRycPSSzABLyoeCn17K0KpwbkrxGyomwNcBHg9xEPymImMJAt2ap1kRMY5QkQWSOsqMoWc8ziLNh1otpWh22U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7249
-X-OriginatorOrg: intel.com
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+From: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
 
-On Mon, Jun 12, 2023 at 03:26:31PM +0200, Lucas Segarra Fernandez wrote:
-> Expose FW counters statistics by providing the "fw_counters" file
-> under debugfs. Currently the statistics include the number of
-> requests sent to the FW and the number of responses received
-> from the FW for each Acceleration Engine, for all the QAT product
-> line.
-> 
-> This patch is based on earlier work done by Marco Chiappero.
-> 
-> Co-developed-by: Adam Guerin <adam.guerin@intel.com>
-> Signed-off-by: Adam Guerin <adam.guerin@intel.com>
-> Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-This patch is rebased on top `crypto: qat - add internal timer for qat
-4xxx` which was not applied.
-I'm going to re-send it rebased on top of the last commit in your tree.
+Expose FW counters statistics by providing the "fw_counters" file
+under debugfs. Currently the statistics include the number of
+requests sent to the FW and the number of responses received
+from the FW for each Acceleration Engine, for all the QAT product
+line.
 
-Regards,
+This patch is based on earlier work done by Marco Chiappero.
 
+Co-developed-by: Adam Guerin <adam.guerin@intel.com>
+Signed-off-by: Adam Guerin <adam.guerin@intel.com>
+Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ Documentation/ABI/testing/debugfs-driver-qat  |  10 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   1 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  18 ++
+ .../intel/qat/qat_common/adf_common_drv.h     |   1 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   7 +
+ .../intel/qat/qat_common/adf_fw_counters.c    | 264 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_fw_counters.h    |  11 +
+ 8 files changed, 313 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-driver-qat
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_fw_counters.h
+
+diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
+new file mode 100644
+index 000000000000..f75eeff4bc7a
+--- /dev/null
++++ b/Documentation/ABI/testing/debugfs-driver-qat
+@@ -0,0 +1,10 @@
++What:		/sys/kernel/debug/qat_<device>_<BDF>/qat/fw_counters
++Date:		June 2023
++KernelVersion:	6.5
++Contact:	qat-linux@intel.com
++Description:	(RO) Read returns the number of requests sent to the FW and the number of responses
++		received from the FW for each Acceleration Engine
++		Reported firmware counters::
++
++			<N>: Number of requests sent from Acceleration Engine N to FW and responses
++			     Acceleration Engine N received from FW
+diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
+index 38de3aba6e8c..f541046cdf9a 100644
+--- a/drivers/crypto/intel/qat/qat_common/Makefile
++++ b/drivers/crypto/intel/qat/qat_common/Makefile
+@@ -28,6 +28,7 @@ intel_qat-objs := adf_cfg.o \
+ 	qat_bl.o
+ 
+ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
++				adf_fw_counters.o \
+ 				adf_dbgfs.o
+ 
+ intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index 0399417b91fc..a54a994b5e27 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -292,6 +292,7 @@ struct adf_accel_dev {
+ 	unsigned long status;
+ 	atomic_t ref_count;
+ 	struct dentry *debugfs_dir;
++	struct dentry *fw_cntr_dbgfile;
+ 	struct list_head list;
+ 	struct module *owner;
+ 	struct adf_accel_pci accel_pci_dev;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
+index 118775ee02f2..4716b82d48ec 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
+@@ -223,6 +223,24 @@ static int adf_get_dc_capabilities(struct adf_accel_dev *accel_dev,
+ 	return 0;
+ }
+ 
++int adf_get_ae_fw_counters(struct adf_accel_dev *accel_dev, u16 ae, u64 *reqs, u64 *resps)
++{
++	struct icp_qat_fw_init_admin_resp resp = { };
++	struct icp_qat_fw_init_admin_req req = { };
++	int ret;
++
++	req.cmd_id = ICP_QAT_FW_COUNTERS_GET;
++
++	ret = adf_put_admin_msg_sync(accel_dev, ae, &req, &resp);
++	if (ret || resp.status)
++		return -EFAULT;
++
++	*reqs = resp.req_rec_count;
++	*resps = resp.resp_sent_count;
++
++	return 0;
++}
++
+ /**
+  * adf_send_admin_init() - Function sends init message to FW
+  * @accel_dev: Pointer to acceleration device.
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
+index b8132eb9bc2a..4682be073c99 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
+@@ -94,6 +94,7 @@ void adf_exit_aer(void);
+ int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
+ void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
+ int adf_send_admin_init(struct adf_accel_dev *accel_dev);
++int adf_get_ae_fw_counters(struct adf_accel_dev *accel_dev, u16 ae, u64 *reqs, u64 *resps);
+ int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay);
+ int adf_init_arb(struct adf_accel_dev *accel_dev);
+ void adf_exit_arb(struct adf_accel_dev *accel_dev);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+index d0a2f892e6eb..5080ecffab03 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+@@ -6,6 +6,7 @@
+ #include "adf_cfg.h"
+ #include "adf_common_drv.h"
+ #include "adf_dbgfs.h"
++#include "adf_fw_counters.h"
+ 
+ /**
+  * adf_dbgfs_init() - add persistent debugfs entries
+@@ -56,6 +57,9 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
+ {
+ 	if (!accel_dev->debugfs_dir)
+ 		return;
++
++	if (!accel_dev->is_vf)
++		adf_fw_counters_dbgfs_add(accel_dev);
+ }
+ 
+ /**
+@@ -66,4 +70,7 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
+ {
+ 	if (!accel_dev->debugfs_dir)
+ 		return;
++
++	if (!accel_dev->is_vf)
++		adf_fw_counters_dbgfs_rm(accel_dev);
+ }
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
+new file mode 100644
+index 000000000000..cb6e09ef5c9f
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
+@@ -0,0 +1,264 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2023 Intel Corporation */
++#include <linux/bitops.h>
++#include <linux/debugfs.h>
++#include <linux/err.h>
++#include <linux/fs.h>
++#include <linux/kernel.h>
++#include <linux/seq_file.h>
++#include <linux/types.h>
++
++#include "adf_accel_devices.h"
++#include "adf_common_drv.h"
++#include "adf_fw_counters.h"
++
++#define ADF_FW_COUNTERS_MAX_PADDING 16
++
++enum adf_fw_counters_types {
++	ADF_FW_REQUESTS,
++	ADF_FW_RESPONSES,
++	ADF_FW_COUNTERS_COUNT
++};
++
++static const char * const adf_fw_counter_names[] = {
++	[ADF_FW_REQUESTS] = "Requests",
++	[ADF_FW_RESPONSES] = "Responses",
++};
++
++static_assert(ARRAY_SIZE(adf_fw_counter_names) == ADF_FW_COUNTERS_COUNT);
++
++struct adf_ae_counters {
++	u16 ae;
++	u64 values[ADF_FW_COUNTERS_COUNT];
++};
++
++struct adf_fw_counters {
++	u16 ae_count;
++	struct adf_ae_counters ae_counters[];
++};
++
++static void adf_fw_counters_parse_ae_values(struct adf_ae_counters *ae_counters, u32 ae,
++					    u64 req_count, u64 resp_count)
++{
++	ae_counters->ae = ae;
++	ae_counters->values[ADF_FW_REQUESTS] = req_count;
++	ae_counters->values[ADF_FW_RESPONSES] = resp_count;
++}
++
++static int adf_fw_counters_load_from_device(struct adf_accel_dev *accel_dev,
++					    struct adf_fw_counters *fw_counters)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	unsigned long ae_mask;
++	unsigned int i;
++	unsigned long ae;
++
++	/* Ignore the admin AEs */
++	ae_mask = hw_data->ae_mask & ~hw_data->admin_ae_mask;
++
++	if (hweight_long(ae_mask) > fw_counters->ae_count)
++		return -EINVAL;
++
++	i = 0;
++	for_each_set_bit(ae, &ae_mask, GET_MAX_ACCELENGINES(accel_dev)) {
++		u64 req_count, resp_count;
++		int ret;
++
++		ret = adf_get_ae_fw_counters(accel_dev, ae, &req_count, &resp_count);
++		if (ret)
++			return ret;
++
++		adf_fw_counters_parse_ae_values(&fw_counters->ae_counters[i++], ae,
++						req_count, resp_count);
++	}
++
++	return 0;
++}
++
++static struct adf_fw_counters *adf_fw_counters_allocate(unsigned long ae_count)
++{
++	struct adf_fw_counters *fw_counters;
++
++	if (unlikely(!ae_count))
++		return ERR_PTR(-EINVAL);
++
++	fw_counters = kmalloc(struct_size(fw_counters, ae_counters, ae_count), GFP_KERNEL);
++	if (!fw_counters)
++		return ERR_PTR(-ENOMEM);
++
++	fw_counters->ae_count = ae_count;
++
++	return fw_counters;
++}
++
++/**
++ * adf_fw_counters_get() - Return FW counters for the provided device.
++ * @accel_dev: Pointer to a QAT acceleration device
++ *
++ * Allocates and returns a table of counters containing execution statistics
++ * for each non-admin AE available through the supplied acceleration device.
++ * The caller becomes the owner of such memory and is responsible for
++ * the deallocation through a call to kfree().
++ *
++ * Returns: a pointer to a dynamically allocated struct adf_fw_counters
++ *          on success, or a negative value on error.
++ */
++static struct adf_fw_counters *adf_fw_counters_get(struct adf_accel_dev *accel_dev)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	struct adf_fw_counters *fw_counters;
++	unsigned long ae_count;
++	int ret;
++
++	if (!adf_dev_started(accel_dev)) {
++		dev_err(&GET_DEV(accel_dev), "QAT Device not started\n");
++		return ERR_PTR(-EFAULT);
++	}
++
++	/* Ignore the admin AEs */
++	ae_count = hweight_long(hw_data->ae_mask & ~hw_data->admin_ae_mask);
++
++	fw_counters = adf_fw_counters_allocate(ae_count);
++	if (IS_ERR(fw_counters))
++		return fw_counters;
++
++	ret = adf_fw_counters_load_from_device(accel_dev, fw_counters);
++	if (ret) {
++		kfree(fw_counters);
++		dev_err(&GET_DEV(accel_dev),
++			"Failed to create QAT fw_counters file table [%d].\n", ret);
++		return ERR_PTR(ret);
++	}
++
++	return fw_counters;
++}
++
++static void *qat_fw_counters_seq_start(struct seq_file *sfile, loff_t *pos)
++{
++	struct adf_fw_counters *fw_counters = sfile->private;
++
++	if (*pos == 0)
++		return SEQ_START_TOKEN;
++
++	if (*pos > fw_counters->ae_count)
++		return NULL;
++
++	return &fw_counters->ae_counters[*pos - 1];
++}
++
++static void *qat_fw_counters_seq_next(struct seq_file *sfile, void *v, loff_t *pos)
++{
++	struct adf_fw_counters *fw_counters = sfile->private;
++
++	(*pos)++;
++
++	if (*pos > fw_counters->ae_count)
++		return NULL;
++
++	return &fw_counters->ae_counters[*pos - 1];
++}
++
++static void qat_fw_counters_seq_stop(struct seq_file *sfile, void *v) {}
++
++static int qat_fw_counters_seq_show(struct seq_file *sfile, void *v)
++{
++	int i;
++
++	if (v == SEQ_START_TOKEN) {
++		seq_puts(sfile, "AE ");
++		for (i = 0; i < ADF_FW_COUNTERS_COUNT; ++i)
++			seq_printf(sfile, " %*s", ADF_FW_COUNTERS_MAX_PADDING,
++				   adf_fw_counter_names[i]);
++	} else {
++		struct adf_ae_counters *ae_counters = (struct adf_ae_counters *)v;
++
++		seq_printf(sfile, "%2d:", ae_counters->ae);
++		for (i = 0; i < ADF_FW_COUNTERS_COUNT; ++i)
++			seq_printf(sfile, " %*llu", ADF_FW_COUNTERS_MAX_PADDING,
++				   ae_counters->values[i]);
++	}
++	seq_putc(sfile, '\n');
++
++	return 0;
++}
++
++static const struct seq_operations qat_fw_counters_sops = {
++	.start = qat_fw_counters_seq_start,
++	.next = qat_fw_counters_seq_next,
++	.stop = qat_fw_counters_seq_stop,
++	.show = qat_fw_counters_seq_show,
++};
++
++static int qat_fw_counters_file_open(struct inode *inode, struct file *file)
++{
++	struct adf_accel_dev *accel_dev = inode->i_private;
++	struct seq_file *fw_counters_seq_file;
++	struct adf_fw_counters *fw_counters;
++	int ret;
++
++	fw_counters = adf_fw_counters_get(accel_dev);
++	if (IS_ERR(fw_counters))
++		return PTR_ERR(fw_counters);
++
++	ret = seq_open(file, &qat_fw_counters_sops);
++	if (unlikely(ret)) {
++		kfree(fw_counters);
++		return ret;
++	}
++
++	fw_counters_seq_file = file->private_data;
++	fw_counters_seq_file->private = fw_counters;
++	return ret;
++}
++
++static int qat_fw_counters_file_release(struct inode *inode, struct file *file)
++{
++	struct seq_file *seq = file->private_data;
++
++	kfree(seq->private);
++	seq->private = NULL;
++
++	return seq_release(inode, file); }
++
++static const struct file_operations qat_fw_counters_fops = {
++	.owner = THIS_MODULE,
++	.open = qat_fw_counters_file_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = qat_fw_counters_file_release,
++};
++
++/**
++ * adf_fw_counters_dbgfs_add() - Create a debugfs file containing FW
++ * execution counters.
++ * @accel_dev:  Pointer to a QAT acceleration device
++ *
++ * Function creates a file to display a table with statistics for the given
++ * QAT acceleration device. The table stores device specific execution values
++ * for each AE, such as the number of requests sent to the FW and responses
++ * received from the FW.
++ *
++ * Return: void
++ */
++void adf_fw_counters_dbgfs_add(struct adf_accel_dev *accel_dev)
++{
++	accel_dev->fw_cntr_dbgfile = debugfs_create_file("fw_counters", 0400,
++							 accel_dev->debugfs_dir,
++							 accel_dev,
++							 &qat_fw_counters_fops);
++}
++
++/**
++ * adf_fw_counters_dbgfs_rm() - Remove the debugfs file containing FW counters.
++ * @accel_dev:  Pointer to a QAT acceleration device.
++ *
++ * Function removes the file providing the table of statistics for the given
++ * QAT acceleration device.
++ *
++ * Return: void
++ */
++void adf_fw_counters_dbgfs_rm(struct adf_accel_dev *accel_dev)
++{
++	debugfs_remove(accel_dev->fw_cntr_dbgfile);
++	accel_dev->fw_cntr_dbgfile = NULL;
++}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_fw_counters.h b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.h
+new file mode 100644
+index 000000000000..91b3b6a95f1f
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2023 Intel Corporation */
++#ifndef ADF_FW_COUNTERS_H
++#define ADF_FW_COUNTERS_H
++
++struct adf_accel_dev;
++
++void adf_fw_counters_dbgfs_add(struct adf_accel_dev *accel_dev);
++void adf_fw_counters_dbgfs_rm(struct adf_accel_dev *accel_dev);
++
++#endif
 -- 
-Giovanni
+2.40.1
+
