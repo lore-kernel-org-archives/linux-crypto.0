@@ -2,174 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB83EB64DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 15:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FDEEB64D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 16:27:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbjFSPNK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 11:13:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34074 "EHLO
+        id S232287AbjFSQ1z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 12:27:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230081AbjFSPNK (ORCPT
+        with ESMTP id S230474AbjFSQ1y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 11:13:10 -0400
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DEEBD
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 08:13:05 -0700 (PDT)
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-76c5c78bc24so343325439f.2
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 08:13:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687187585; x=1689779585;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NtllAkZ32Xdq4j14poacviPx+rBPNHY5U0EDj1En0pE=;
-        b=RQcm3u5di+mgl7sDY4VEFaSlHUNBXgri0p/UzGXzhVY8N8Gku+CgrpmyXhr4+X5Lrj
-         2h+O8AIL4H+FhK47zWwc2YRLIobIOCkGn+gRD6+JiH9ay1vvvlDimVZF/bRL+Ud3RMK4
-         Jb4CZQQSDUNGHHczbwHFFmH4yjXPo9DB6E8sYoBraCOyXXzvunUNHhzm8rDF80BbN+8u
-         H03bcWeCz9ARHFzK7fTUFkzsps/5ruTqZM1MlmZu8CYYwmMP/4S24QYksHNoqyuqMblE
-         oES5eDrFeKAC94fZPfFkXZ2x85ffez4hUeiI/PWwDweX/S30wpj9Q9aS6G4GvCVZZl9j
-         PeeQ==
-X-Gm-Message-State: AC+VfDxysPWqIV+pY/ChfUzRkKL9LRefVdBlxPquEh0m3peUPBcsUzQP
-        Rf7bIQKlkLlwBizEAWQHOkDIMdHLNYOpfRhLAb0BhoDjIJKt
-X-Google-Smtp-Source: ACHHUZ57xDk+5ZZTI4rmcAPElGHV2O9pT/1piT7PyBvsH5ta/JpVjSIP0kahXE48oGQmUnrClwFuZkEX6ivb7UZgZgp2xc85AFr7
+        Mon, 19 Jun 2023 12:27:54 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466461A6;
+        Mon, 19 Jun 2023 09:27:53 -0700 (PDT)
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 411341EC008F;
+        Mon, 19 Jun 2023 18:27:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1687192071;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=6e+4J0KSePLpz6FTC4NhR5KUsm5UJTEw2Lw9R3X5YHA=;
+        b=AlSKdpxsOZ+nS/CPQc7yj9aY9ErEjrZRdMhJMlo0KWzMCXA8lu4hemnsr6Wk7EMTplJHdz
+        BrTTJbeWTiku5J954tWCM/j0/eX5IZ1NIuoRbFFSgP7WkYjyrGFakYVLkbJVCrarHUsxZM
+        8IVBvwxFHZaNX4SRuyz59DyFrFL8dTI=
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 5Q4p30cZ_o3g; Mon, 19 Jun 2023 16:27:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1687192068; bh=6e+4J0KSePLpz6FTC4NhR5KUsm5UJTEw2Lw9R3X5YHA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=T6CSex4pxxOUGcnUlWnR/Xo2F33N52ScuPqHkNW2AML76+OE1kyvEBc+bkQgzkv2Z
+         abCEhuwSxKm9DahUqUbwWWiHDz03B0y3jWZ7kKfcBHjBurfOCcLSzdw/ErxosX//jT
+         a6HCRZRcH0mhHJnXWcw4vo+mEIV4b0MuGHfzWU7ok4kEkrz6vzEIepFN2rYUuRRVic
+         9jQ0qHSyPlhjWGps9I3y2nYRoowminmkxMEKEGnK9wOZ1iQ4gOs4oHJqIg+XfAVPQs
+         18K3t6C5ezyd5ELZNBjTU1xnbeym37NDckXjBSulQ29B3bZGmKSwyfqbrWPpMjIoGF
+         me90GDFrVhvefpvCqhiF7VnHeC6I+eILSCoDXIAETTmckx1L+5TGd8jvp/ErOPykkM
+         pZFJhq7lpbKrJBg/69gqJ7Cvfk5hqxsuO3B//fF3eOknNI1u2yFz1WCF6pFXHVCJQp
+         Ocr6W3eQLJwDL8rxcUn9rINdGR11Nu9OQYNQWLdo1ZnlNEb5Y3Azw3z02Uio6aOfQE
+         SxGsaAcFNM+5159nfIj1gOkUm8M5aPJC75dCUsuHv7g0LqrM9x2dss0CIjPwI4sSOI
+         efmolVR3UXyphRlvCUhM7BwZuIewQCqrCKwn3nTW5K0dPSD0E6hWixJTCtyvwEG2CP
+         CMwbzzeMPkwPSGtYazpqAVag=
+Received: from zn.tnic (p200300Ea971dc5B2329C23fffEa6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c5b2:329c:23ff:fea6:a903])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B07E340E0034;
+        Mon, 19 Jun 2023 16:27:08 +0000 (UTC)
+Date:   Mon, 19 Jun 2023 18:27:03 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com
+Subject: Re: [PATCH RFC v9 04/51] KVM: x86: Determine shared/private faults
+ using a configurable mask
+Message-ID: <20230619162703.GRZJCB10+Xg8fn8XLx@fat_crate.local>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-5-michael.roth@amd.com>
 MIME-Version: 1.0
-X-Received: by 2002:a02:95a2:0:b0:420:f404:40b6 with SMTP id
- b31-20020a0295a2000000b00420f40440b6mr2628829jai.1.1687187585081; Mon, 19 Jun
- 2023 08:13:05 -0700 (PDT)
-Date:   Mon, 19 Jun 2023 08:13:05 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ada87505fe7cf809@google.com>
-Subject: [syzbot] [crypto?] general protection fault in shash_ahash_update
-From:   syzbot <syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230612042559.375660-5-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Sun, Jun 11, 2023 at 11:25:12PM -0500, Michael Roth wrote:
+> This will be used to determine whether or not an #NPF should be serviced
+> using a normal page vs. a guarded/gmem one.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  7 +++++++
+>  arch/x86/kvm/mmu/mmu_internal.h | 35 ++++++++++++++++++++++++++++++++-
+>  2 files changed, 41 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b3bd24f2a390..c26f76641121 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1445,6 +1445,13 @@ struct kvm_arch {
+>  	 */
+>  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+>  	struct kvm_mmu_memory_cache split_desc_cache;
+> +
+> +	/*
+> +	 * When set, used to determine whether a fault should be treated as
+	   ^^^^^^^^
 
-syzbot found the following issue on:
+And when not set? Invalid?
 
-HEAD commit:    9a94d764e9bc Merge tag 'mlx5-updates-2023-06-16' of git://..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14774987280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4a7d74e6a7c3211
-dashboard link: https://syzkaller.appspot.com/bug?extid=88f4b1e6cf88da11f5cd
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1152c4ff280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1307cbcf280000
+I guess so, judging by the code below.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/79cfaaedcd27/disk-9a94d764.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a22e22124e0b/vmlinux-9a94d764.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/fe2e1ce58898/bzImage-9a94d764.xz
+-- 
+Regards/Gruss,
+    Boris.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc0000000004: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
-CPU: 1 PID: 5004 Comm: syz-executor202 Not tainted 6.4.0-rc6-syzkaller-01333-g9a94d764e9bc #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-RIP: 0010:crypto_shash_alg include/crypto/hash.h:827 [inline]
-RIP: 0010:crypto_shash_update crypto/shash.c:124 [inline]
-RIP: 0010:shash_ahash_update+0x126/0x210 crypto/shash.c:306
-Code: 8c 00 00 00 e8 bb f7 a4 fd 48 8b 04 24 48 8b 6c 24 40 80 38 00 0f 85 c3 00 00 00 4d 8b 75 00 49 8d 7e 20 48 89 fa 48 c1 ea 03 <80> 3c 1a 00 0f 85 c1 00 00 00 4d 8b 7e 20 49 8d 7f 2c 48 89 fa 48
-RSP: 0018:ffffc900039df948 EFLAGS: 00010202
-RAX: ffffed1003ce8b6b RBX: dffffc0000000000 RCX: 0000000000000000
-RDX: 0000000000000004 RSI: ffffffff83df4f25 RDI: 0000000000000020
-RBP: ffff8880732a3100 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000f00 R11: 0000000000000009 R12: 0000000000000f00
-R13: ffff88801e745b58 R14: 0000000000000000 R15: 1ffff9200073bf2b
-FS:  00005555565db300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fccb3501440 CR3: 0000000021e60000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ghash_async_update+0x136/0x170 arch/x86/crypto/ghash-clmulni-intel_glue.c:206
- crypto_ahash_update include/crypto/hash.h:608 [inline]
- hash_sendmsg+0x434/0xde0 crypto/algif_hash.c:139
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:747
- ____sys_sendmsg+0x733/0x920 net/socket.c:2493
- ___sys_sendmsg+0x110/0x1b0 net/socket.c:2547
- __sys_sendmsg+0xf7/0x1c0 net/socket.c:2576
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f95e272ecb9
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd82939a68 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f95e272ecb9
-RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000004
-RBP: 00007f95e26f2e60 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f95e26f2ef0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:crypto_shash_alg include/crypto/hash.h:827 [inline]
-RIP: 0010:crypto_shash_update crypto/shash.c:124 [inline]
-RIP: 0010:shash_ahash_update+0x126/0x210 crypto/shash.c:306
-Code: 8c 00 00 00 e8 bb f7 a4 fd 48 8b 04 24 48 8b 6c 24 40 80 38 00 0f 85 c3 00 00 00 4d 8b 75 00 49 8d 7e 20 48 89 fa 48 c1 ea 03 <80> 3c 1a 00 0f 85 c1 00 00 00 4d 8b 7e 20 49 8d 7f 2c 48 89 fa 48
-RSP: 0018:ffffc900039df948 EFLAGS: 00010202
-RAX: ffffed1003ce8b6b RBX: dffffc0000000000 RCX: 0000000000000000
-RDX: 0000000000000004 RSI: ffffffff83df4f25 RDI: 0000000000000020
-RBP: ffff8880732a3100 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000f00 R11: 0000000000000009 R12: 0000000000000f00
-R13: ffff88801e745b58 R14: 0000000000000000 R15: 1ffff9200073bf2b
-FS:  00005555565db300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f29a2df2304 CR3: 0000000021e60000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	8c 00                	mov    %es,(%rax)
-   2:	00 00                	add    %al,(%rax)
-   4:	e8 bb f7 a4 fd       	callq  0xfda4f7c4
-   9:	48 8b 04 24          	mov    (%rsp),%rax
-   d:	48 8b 6c 24 40       	mov    0x40(%rsp),%rbp
-  12:	80 38 00             	cmpb   $0x0,(%rax)
-  15:	0f 85 c3 00 00 00    	jne    0xde
-  1b:	4d 8b 75 00          	mov    0x0(%r13),%r14
-  1f:	49 8d 7e 20          	lea    0x20(%r14),%rdi
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 1a 00          	cmpb   $0x0,(%rdx,%rbx,1) <-- trapping instruction
-  2e:	0f 85 c1 00 00 00    	jne    0xf5
-  34:	4d 8b 7e 20          	mov    0x20(%r14),%r15
-  38:	49 8d 7f 2c          	lea    0x2c(%r15),%rdi
-  3c:	48 89 fa             	mov    %rdi,%rdx
-  3f:	48                   	rex.W
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+https://people.kernel.org/tglx/notes-about-netiquette
