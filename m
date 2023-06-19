@@ -2,71 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68261EB64DA
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 13:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC19DEB64DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 13:40:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231942AbjFSNYf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 09:24:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33666 "EHLO
+        id S230149AbjFSNkn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 09:40:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231908AbjFSNYa (ORCPT
+        with ESMTP id S229771AbjFSNkm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 09:24:30 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A4EAA;
-        Mon, 19 Jun 2023 06:24:28 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Ql9Sy6RZtzTlY6;
-        Mon, 19 Jun 2023 21:23:46 +0800 (CST)
-Received: from cgs.huawei.com (10.244.148.83) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 19 Jun 2023 21:24:25 +0800
-From:   Gaosheng Cui <cuigaosheng1@huawei.com>
-To:     <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <cuigaosheng1@huawei.com>
-CC:     <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH -next] verify_pefile: fix kernel-doc warnings in verify_pefile
-Date:   Mon, 19 Jun 2023 21:24:24 +0800
-Message-ID: <20230619132424.80587-1-cuigaosheng1@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Mon, 19 Jun 2023 09:40:42 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6882A118;
+        Mon, 19 Jun 2023 06:40:40 -0700 (PDT)
+Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DB3D31EC0102;
+        Mon, 19 Jun 2023 15:40:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1687182038;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=NQcQ+a91rnEmxFtS6KIZWR6r/nd+aTVNBSnx9bM3XZo=;
+        b=MjZrI2Pb1EA97CsnjLQkLLYXnftqpz1BMSytwT2Fkcm79yTr7JlS3vbPHybZQGk2gNvBdV
+        7pJxq+Ljl/BYq/YNswcZLYfOeYT3BcOtdCS2ltKIotcJp6HYvURYcrmTpDMEIyanHuqgDd
+        H+X68i3UAmnnIDktOVRK7Y5dvsc0MIs=
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id xyc2kN7e7SI6; Mon, 19 Jun 2023 13:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1687182035; bh=NQcQ+a91rnEmxFtS6KIZWR6r/nd+aTVNBSnx9bM3XZo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Hhjq4sAwqpuXAjDZr0482mo+tJJ0h0offjDvdI0pCCoCQw2bDUcP8d1vbDkapw272
+         xVM5yjFjjoNovnJZSBbFHf8J20dy0BvYq3Lf5/6HRBdwil9v1Aobm+f2g/gfW4DXnM
+         b4YK0b1ne/U38dROisrBRRDzRlbXtYjRrFji1OTpCkEAnk7c+RPW9lAtONuYgZRerJ
+         I6+INtMP4DnSAZnjWraSMdu0T5EW08EU7cAYkC/Hha/niDr/F5MewITS/JqCLcCk2w
+         M4fJW5oXMRz9hZQzxEsZOb+8GOiaXrEPRugbBe8sJyskrr6Nh7FJhJjuPcsFYYypTU
+         hca7QInRQqaye2PTigrrCnFcm0WMOQp1goK0OxCGZ9Ing4TiGzBJOuvh74BZVr/Qmi
+         DdSTA2frFGKVeHBbStTjaynkbdb1FjWeT4A2xGYIok+FY/MvJPPnX/bv72T9u8DOue
+         fdyb1/BCxS9myr7OYuFisiuGoDRpYKpLCPZZzwC8xjY8OXaZXwAYoWmCwqI56wH0Js
+         TfJMAZ4TNRorAeiEzc0gIHq0u0T5lPm4dt0t754mvHOYYJYEaoCsQqHeC4Dy2RGzS1
+         aqKVArwd+i9hfQZM7ZM3g53aGg9SoCzbpCl/YgirQxJXdSuW99oJN7wrICWB1/lnJP
+         63A8a5ZQ59tJNZlWhFgkbgVs=
+Received: from zn.tnic (p200300ea971dC5b2329c23fFFEA6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c5b2:329c:23ff:fea6:a903])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 793DE40E0034;
+        Mon, 19 Jun 2023 13:39:55 +0000 (UTC)
+Date:   Mon, 19 Jun 2023 15:39:50 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com
+Subject: Re: [PATCH RFC v9 02/51] KVM: x86: Add gmem hook for invalidating
+ private memory
+Message-ID: <20230619133950.GBZJBapnJ3vD74ASAu@fat_crate.local>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-3-michael.roth@amd.com>
+ <20230612104905.GOZIb4ISN9gj9lWYNv@fat_crate.local>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.244.148.83]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500012.china.huawei.com (7.221.188.12)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230612104905.GOZIb4ISN9gj9lWYNv@fat_crate.local>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix kernel-doc warnings in verify_pefile:
+On Mon, Jun 12, 2023 at 12:49:05PM +0200, Borislav Petkov wrote:
+> ld: arch/x86/kvm/../../../virt/kvm/eventfd.o: in function `kvm_arch_gmem_invalidate':
+> /home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: multiple definition of `kvm_arch_gmem_invalidate'; arch/x86/kvm/../../../virt/kvm/kvm_main.o:/home/boris/kernel/2nd/linux/./include/linux/kvm_host.h:2356: first defined here
+> ld: arch/x86/kvm/../../../virt/kvm/binary_stats.o: in function `kvm_arch_gmem_invalidate':
 
-crypto/asymmetric_keys/verify_pefile.c:423: warning: Excess function
-parameter 'trust_keys' description in 'verify_pefile_signature'
+Fix is trivial:
 
-crypto/asymmetric_keys/verify_pefile.c:423: warning: Function parameter
-or member 'trusted_keys' not described in 'verify_pefile_signature'
-
-Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
 ---
- crypto/asymmetric_keys/verify_pefile.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7de06add2235..67fdfb683cb9 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2353,7 +2353,7 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
+ 	return -EIO;
+ }
+ 
+-void kvm_arch_gmem_invalidate(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end) { }
++static inline void kvm_arch_gmem_invalidate(struct kvm *kvm, kvm_pfn_t start, kvm_pfn_t end) { }
+ #endif /* CONFIG_KVM_PRIVATE_MEM */
+ 
+ #endif
 
-diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index 22beaf2213a2..f440767bd727 100644
---- a/crypto/asymmetric_keys/verify_pefile.c
-+++ b/crypto/asymmetric_keys/verify_pefile.c
-@@ -391,7 +391,7 @@ static int pefile_digest_pe(const void *pebuf, unsigned int pelen,
-  * verify_pefile_signature - Verify the signature on a PE binary image
-  * @pebuf: Buffer containing the PE binary image
-  * @pelen: Length of the binary image
-- * @trust_keys: Signing certificate(s) to use as starting points
-+ * @trusted_keys: Signing certificate(s) to use as starting points
-  * @usage: The use to which the key is being put.
-  *
-  * Validate that the certificate chain inside the PKCS#7 message inside the PE
 -- 
-2.25.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
