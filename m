@@ -2,74 +2,212 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E767FEB64D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 18:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD845EB64DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 21:46:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231466AbjFSSjb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 14:39:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54896 "EHLO
+        id S229663AbjFSVq1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 17:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbjFSSja (ORCPT
+        with ESMTP id S229601AbjFSVq1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 14:39:30 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6367D18C
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 11:39:29 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-77e45f12b5bso38131239f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 11:39:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687199968; x=1689791968;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yovt+NBs+zN88mKTFmMiBGRNaqNl1IAEsWQ9bmrlOts=;
-        b=OqmjTEIWxneoIuK16ehNhdwfYFU8FhA8Kn842A0s/2qWEHHAj74++mKSqSbTs+vnHd
-         jyf21nCceSTv/0YfmKOMu4S0QJPn7sgkYkhl9GQtjT+1+yVC6NMCsff+cXROzI6yHqDw
-         xQWFHIrW+sdaIBg0RoFsO0vNPo+IrT4HVI/Ifwq4gtbJKW/0P9VNEPXlj8zPagFs/1oE
-         0mXsdG21i+W+Mf4adwp6UuMps712LfgOpAQpJkXXnh7joUbx1lvBOZVlGKbER45Ys3u0
-         e6CR9ltzaxybwoTEIEBTSpe5TSlaxGNTdKmtQ/fJevqgpiUH5Vg8nMXmtb+6QVeJvrXU
-         mpoA==
-X-Gm-Message-State: AC+VfDwwqTFPSALSMChQ25PJeNToAgYZH2f1e7533hUjA0b+fre/2PXi
-        t09XcjG5umDWVtlQEH5ZgJ0CzlT09Am7nsaSakKTXjpSxNjO
-X-Google-Smtp-Source: ACHHUZ6Zu1qOfU3n1nK17F8mRHVcVw++7U+FWtv+g1pIs1eCeFRAessPwU2LszmlMeaaiY97WhjTMdQEA9nxqde2iw2xAZuCWbTM
-MIME-Version: 1.0
-X-Received: by 2002:a6b:3b8b:0:b0:777:b0ee:a512 with SMTP id
- i133-20020a6b3b8b000000b00777b0eea512mr3574163ioa.2.1687199968282; Mon, 19
- Jun 2023 11:39:28 -0700 (PDT)
-Date:   Mon, 19 Jun 2023 11:39:28 -0700
-In-Reply-To: <000000000000ada87505fe7cf809@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c6527105fe7fdab8@google.com>
-Subject: Re: [syzbot] [crypto?] general protection fault in shash_ahash_update
-From:   syzbot <syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dhowells@redhat.com,
+        Mon, 19 Jun 2023 17:46:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695581BB
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 14:45:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687211144;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RVS2CDGv8MXaquA/9hvN5l2wqMBpBpyGhN0hUvKYgmY=;
+        b=U3pgKASpcmVtSx3cmXkKHEDYGDE/X5ogelcWuMpK741SIimkyoZ7eTiu9+W7CjJkmA0jUU
+        MD7f28ecQ+xfhlFjXutQLz6xqBZlllGDKh5epk1DroTbOO5+agarXxx9KSrISfoOnABbc4
+        2NxAZHkPfE5ld8D03ED/ZBD86qDBMnk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-159-IGuhDMxKPTu8sl9GWRJ7Lw-1; Mon, 19 Jun 2023 17:45:43 -0400
+X-MC-Unique: IGuhDMxKPTu8sl9GWRJ7Lw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F3FDE8002BF;
+        Mon, 19 Jun 2023 21:45:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E81D540C20F5;
+        Mon, 19 Jun 2023 21:45:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <000000000000c6527105fe7fdab8@google.com>
+References: <000000000000c6527105fe7fdab8@google.com>
+To:     syzbot <syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com>
+Cc:     dhowells@redhat.com, davem@davemloft.net,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [syzbot] [crypto?] general protection fault in shash_ahash_update
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1167415.1687211141.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 19 Jun 2023 22:45:41 +0100
+Message-ID: <1167416.1687211141@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has bisected this issue to:
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.g=
+it main
 
-commit c662b043cdca89bf0f03fc37251000ac69a3a548
+commit c2996e733d4f2d93bdc0fed74022da082b2e6784
 Author: David Howells <dhowells@redhat.com>
-Date:   Tue Jun 6 13:08:56 2023 +0000
+Date:   Wed Jun 14 13:33:04 2023 +0100
 
-    crypto: af_alg/hash: Support MSG_SPLICE_PAGES
+    crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+    =
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14a7cbcf280000
-start commit:   9a94d764e9bc Merge tag 'mlx5-updates-2023-06-16' of git://..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16a7cbcf280000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a7cbcf280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4a7d74e6a7c3211
-dashboard link: https://syzkaller.appspot.com/bug?extid=88f4b1e6cf88da11f5cd
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1152c4ff280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1307cbcf280000
+    If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
+    message with MSG_MORE set and then recvmsg() is called without first
+    sending another message without MSG_MORE set to end the operation, an =
+oops
+    will occur because the crypto context and result doesn't now get set u=
+p in
+    advance because hash_sendmsg() now defers that as long as possible in =
+the
+    hope that it can use crypto_ahash_digest() - and then because the mess=
+age
+    is zero-length, it the data wrangling loop is skipped.
+    =
 
-Reported-by: syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com
-Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
+    Fix this by handling zero-length sends at the top of the hash_sendmsg(=
+)
+    function.  If we're not continuing the previous sendmsg(), then just i=
+gnore
+    the send (hash_recvmsg() will invent something when called); if we are
+    continuing, then we finalise the request at this point if MSG_MORE is =
+not
+    set to get any error here, otherwise the send is of no effect and can =
+be
+    ignored.
+    =
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+    Whilst we're at it, remove the code to create a kvmalloc'd scatterlist=
+ if
+    we get more than ALG_MAX_PAGES - this shouldn't happen.
+    =
+
+    Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
+    Reported-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
+    Link: https://lore.kernel.org/r/000000000000b928f705fdeb873a@google.co=
+m/
+    Reported-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
+    Link: https://lore.kernel.org/r/000000000000c047db05fdeb8790@google.co=
+m/
+    Reported-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
+    Link: https://lore.kernel.org/r/000000000000bcca3205fdeb87fb@google.co=
+m/
+    Reported-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
+    Link: https://lore.kernel.org/r/000000000000b55d8805fdeb8385@google.co=
+m/
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    cc: Herbert Xu <herbert@gondor.apana.org.au>
+    cc: "David S. Miller" <davem@davemloft.net>
+    cc: Eric Dumazet <edumazet@google.com>
+    cc: Jakub Kicinski <kuba@kernel.org>
+    cc: Paolo Abeni <pabeni@redhat.com>
+    cc: Jens Axboe <axboe@kernel.dk>
+    cc: Matthew Wilcox <willy@infradead.org>
+    cc: linux-crypto@vger.kernel.org
+    cc: netdev@vger.kernel.org
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index dfb048cefb60..0ab43e149f0e 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -76,13 +76,30 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ =
+
+ 	lock_sock(sk);
+ 	if (!continuing) {
+-		if ((msg->msg_flags & MSG_MORE))
+-			hash_free_result(sk, ctx);
++		/* Discard a previous request that wasn't marked MSG_MORE. */
++		hash_free_result(sk, ctx);
++		if (!msg_data_left(msg))
++			goto done; /* Zero-length; don't start new req */
+ 		need_init =3D true;
++	} else if (!msg_data_left(msg)) {
++		/*
++		 * No data - finalise the prev req if MSG_MORE so any error
++		 * comes out here.
++		 */
++		if (!(msg->msg_flags & MSG_MORE)) {
++			err =3D hash_alloc_result(sk, ctx);
++			if (err)
++				goto unlock_free;
++			ahash_request_set_crypt(&ctx->req, NULL,
++						ctx->result, 0);
++			err =3D crypto_wait_req(crypto_ahash_final(&ctx->req),
++					      &ctx->wait);
++			if (err)
++				goto unlock_free;
++		}
++		goto done_more;
+ 	}
+ =
+
+-	ctx->more =3D false;
+-
+ 	while (msg_data_left(msg)) {
+ 		ctx->sgl.sgt.sgl =3D ctx->sgl.sgl;
+ 		ctx->sgl.sgt.nents =3D 0;
+@@ -93,15 +110,6 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ 		if (npages =3D=3D 0)
+ 			goto unlock_free;
+ =
+
+-		if (npages > ARRAY_SIZE(ctx->sgl.sgl)) {
+-			err =3D -ENOMEM;
+-			ctx->sgl.sgt.sgl =3D
+-				kvmalloc(array_size(npages,
+-						    sizeof(*ctx->sgl.sgt.sgl)),
+-					 GFP_KERNEL);
+-			if (!ctx->sgl.sgt.sgl)
+-				goto unlock_free;
+-		}
+ 		sg_init_table(ctx->sgl.sgl, npages);
+ =
+
+ 		ctx->sgl.need_unpin =3D iov_iter_extract_will_pin(&msg->msg_iter);
+@@ -150,7 +158,9 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ 		af_alg_free_sg(&ctx->sgl);
+ 	}
+ =
+
++done_more:
+ 	ctx->more =3D msg->msg_flags & MSG_MORE;
++done:
+ 	err =3D 0;
+ unlock:
+ 	release_sock(sk);
+@@ -158,6 +168,8 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ =
+
+ unlock_free:
+ 	af_alg_free_sg(&ctx->sgl);
++	hash_free_result(sk, ctx);
++	ctx->more =3D false;
+ 	goto unlock;
+ }
+ =
+
