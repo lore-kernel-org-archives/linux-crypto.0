@@ -2,165 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B67EB64DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 12:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68261EB64DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 13:24:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbjFSMGa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 08:06:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38782 "EHLO
+        id S231942AbjFSNYf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 09:24:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjFSMG2 (ORCPT
+        with ESMTP id S231908AbjFSNYa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 08:06:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18AD4124
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 05:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687176341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=flv0m9IzvhIUpKnDIyrInh56vnSxXK9hbzXv0isFig8=;
-        b=hC2C5nBakueuwY1QWXcT03aewJ0kre+KdAcn2rpTR7C6XQKZD65MSUmGLFFMe/OpS1TLla
-        XRwkx+CrKFlxlYtg2vFvzxEp4v4qiyD7VkODqdzoNYgFU6dm43SXJIxH/r8C2jqMAa4tAE
-        BMy7XAAAF8LCuMQnwxIcRTcngf7tZ0c=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-98-6kJ1RmfDPwCBOHGN8dJYCQ-1; Mon, 19 Jun 2023 08:05:40 -0400
-X-MC-Unique: 6kJ1RmfDPwCBOHGN8dJYCQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7FC9A1C06EC1;
-        Mon, 19 Jun 2023 12:05:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 88C75C1603B;
-        Mon, 19 Jun 2023 12:05:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <648f36d02fe6e_33cfbc2944f@willemb.c.googlers.com.notmuch>
-References: <648f36d02fe6e_33cfbc2944f@willemb.c.googlers.com.notmuch> <20230617121146.716077-1-dhowells@redhat.com> <20230617121146.716077-18-dhowells@redhat.com>
-To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
-        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
-        tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH net-next v2 17/17] net: Kill MSG_SENDPAGE_NOTLAST
+        Mon, 19 Jun 2023 09:24:30 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A4EAA;
+        Mon, 19 Jun 2023 06:24:28 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Ql9Sy6RZtzTlY6;
+        Mon, 19 Jun 2023 21:23:46 +0800 (CST)
+Received: from cgs.huawei.com (10.244.148.83) by
+ kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 19 Jun 2023 21:24:25 +0800
+From:   Gaosheng Cui <cuigaosheng1@huawei.com>
+To:     <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <cuigaosheng1@huawei.com>
+CC:     <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH -next] verify_pefile: fix kernel-doc warnings in verify_pefile
+Date:   Mon, 19 Jun 2023 21:24:24 +0800
+Message-ID: <20230619132424.80587-1-cuigaosheng1@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <784657.1687176327.1@warthog.procyon.org.uk>
-Date:   Mon, 19 Jun 2023 13:05:27 +0100
-Message-ID: <784658.1687176327@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.244.148.83]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500012.china.huawei.com (7.221.188.12)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+Fix kernel-doc warnings in verify_pefile:
 
-> Is it intentional to add MSG_MORE here in this patch?
-> 
-> I do see that patch 3 removes this branch:
+crypto/asymmetric_keys/verify_pefile.c:423: warning: Excess function
+parameter 'trust_keys' description in 'verify_pefile_signature'
 
-Yeah.  I think I may have tcp_bpf a bit wrong with regard to handling
-MSG_MORE.
+crypto/asymmetric_keys/verify_pefile.c:423: warning: Function parameter
+or member 'trusted_keys' not described in 'verify_pefile_signature'
 
-How about the attached version of tcp_bpf_push()?
-
-I wonder if it's save to move the setting of MSG_SENDPAGE_NOPOLICY out of the
-loop as I've done here.  The caller holds the socket lock.
-
-Also, I'm not sure whether to take account of apply/apply_bytes when setting
-MSG_MORE mid-message, or whether to just go on whether we've reached
-sge->length yet.  (I'm not sure exactly how tcp_bpf works).
-
-David
+Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
 ---
+ crypto/asymmetric_keys/verify_pefile.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-static int tcp_bpf_push(struct sock *sk, struct sk_msg *msg, u32 apply_bytes,
-			int flags, bool uncharge)
-{
-	bool apply = apply_bytes;
-	struct scatterlist *sge;
-	struct page *page;
-	int size, ret = 0;
-	u32 off;
-
-	flags |= MSG_SPLICE_PAGES;
-	if (tls_sw_has_ctx_tx(sk))
-		msghdr.msg_flags |= MSG_SENDPAGE_NOPOLICY;
-
-	while (1) {
-		struct msghdr msghdr = {};
-		struct bio_vec bvec;
-
-		sge = sk_msg_elem(msg, msg->sg.start);
-		size = (apply && apply_bytes < sge->length) ?
-			apply_bytes : sge->length;
-		off  = sge->offset;
-		page = sg_page(sge);
-
-		tcp_rate_check_app_limited(sk);
-retry:
-		msghdr.msg_flags = flags;
-
-		/* Determine if we need to set MSG_MORE. */
-		if (!(msghdr.msg_flags & MSG_MORE)) {
-			if (apply && size < apply_bytes)
-				msghdr.msg_flags |= MSG_MORE;
-			else if (!apply && size < sge->length &&
-				 msg->sg.start != msg->sg.end)
-				msghdr.msg_flags |= MSG_MORE;
-		}
-
-		bvec_set_page(&bvec, page, size, off);
-		iov_iter_bvec(&msghdr.msg_iter, ITER_SOURCE, &bvec, 1, size);
-		ret = tcp_sendmsg_locked(sk, &msghdr, size);
-		if (ret <= 0)
-			return ret;
-
-		if (apply)
-			apply_bytes -= ret;
-		msg->sg.size -= ret;
-		sge->offset += ret;
-		sge->length -= ret;
-		if (uncharge)
-			sk_mem_uncharge(sk, ret);
-		if (ret != size) {
-			size -= ret;
-			off  += ret;
-			goto retry;
-		}
-		if (!sge->length) {
-			put_page(page);
-			sk_msg_iter_next(msg, start);
-			sg_init_table(sge, 1);
-			if (msg->sg.start == msg->sg.end)
-				break;
-		}
-		if (apply && !apply_bytes)
-			break;
-	}
-
-	return 0;
-}
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index 22beaf2213a2..f440767bd727 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -391,7 +391,7 @@ static int pefile_digest_pe(const void *pebuf, unsigned int pelen,
+  * verify_pefile_signature - Verify the signature on a PE binary image
+  * @pebuf: Buffer containing the PE binary image
+  * @pelen: Length of the binary image
+- * @trust_keys: Signing certificate(s) to use as starting points
++ * @trusted_keys: Signing certificate(s) to use as starting points
+  * @usage: The use to which the key is being put.
+  *
+  * Validate that the certificate chain inside the PKCS#7 message inside the PE
+-- 
+2.25.1
 
