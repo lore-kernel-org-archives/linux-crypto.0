@@ -2,119 +2,109 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FDEEB64D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 16:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A54EB64D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Jun 2023 16:48:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232287AbjFSQ1z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Jun 2023 12:27:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39290 "EHLO
+        id S229895AbjFSQs0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 19 Jun 2023 12:48:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230474AbjFSQ1y (ORCPT
+        with ESMTP id S229944AbjFSQsZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Jun 2023 12:27:54 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466461A6;
-        Mon, 19 Jun 2023 09:27:53 -0700 (PDT)
-Received: from mail.alien8.de (mail.alien8.de [IPv6:2a01:4f9:3051:3f93::2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 411341EC008F;
-        Mon, 19 Jun 2023 18:27:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1687192071;
+        Mon, 19 Jun 2023 12:48:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608DFFE
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Jun 2023 09:47:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687193256;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=6e+4J0KSePLpz6FTC4NhR5KUsm5UJTEw2Lw9R3X5YHA=;
-        b=AlSKdpxsOZ+nS/CPQc7yj9aY9ErEjrZRdMhJMlo0KWzMCXA8lu4hemnsr6Wk7EMTplJHdz
-        BrTTJbeWTiku5J954tWCM/j0/eX5IZ1NIuoRbFFSgP7WkYjyrGFakYVLkbJVCrarHUsxZM
-        8IVBvwxFHZaNX4SRuyz59DyFrFL8dTI=
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-        header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 5Q4p30cZ_o3g; Mon, 19 Jun 2023 16:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-        t=1687192068; bh=6e+4J0KSePLpz6FTC4NhR5KUsm5UJTEw2Lw9R3X5YHA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=T6CSex4pxxOUGcnUlWnR/Xo2F33N52ScuPqHkNW2AML76+OE1kyvEBc+bkQgzkv2Z
-         abCEhuwSxKm9DahUqUbwWWiHDz03B0y3jWZ7kKfcBHjBurfOCcLSzdw/ErxosX//jT
-         a6HCRZRcH0mhHJnXWcw4vo+mEIV4b0MuGHfzWU7ok4kEkrz6vzEIepFN2rYUuRRVic
-         9jQ0qHSyPlhjWGps9I3y2nYRoowminmkxMEKEGnK9wOZ1iQ4gOs4oHJqIg+XfAVPQs
-         18K3t6C5ezyd5ELZNBjTU1xnbeym37NDckXjBSulQ29B3bZGmKSwyfqbrWPpMjIoGF
-         me90GDFrVhvefpvCqhiF7VnHeC6I+eILSCoDXIAETTmckx1L+5TGd8jvp/ErOPykkM
-         pZFJhq7lpbKrJBg/69gqJ7Cvfk5hqxsuO3B//fF3eOknNI1u2yFz1WCF6pFXHVCJQp
-         Ocr6W3eQLJwDL8rxcUn9rINdGR11Nu9OQYNQWLdo1ZnlNEb5Y3Azw3z02Uio6aOfQE
-         SxGsaAcFNM+5159nfIj1gOkUm8M5aPJC75dCUsuHv7g0LqrM9x2dss0CIjPwI4sSOI
-         efmolVR3UXyphRlvCUhM7BwZuIewQCqrCKwn3nTW5K0dPSD0E6hWixJTCtyvwEG2CP
-         CMwbzzeMPkwPSGtYazpqAVag=
-Received: from zn.tnic (p200300Ea971dc5B2329C23fffEa6a903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c5b2:329c:23ff:fea6:a903])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+         in-reply-to:in-reply-to:references:references;
+        bh=i+a8DGHRj3jW50Valrkn+7VRWxzc0jyAL0po+eTjD1I=;
+        b=BxDjNUx51vK8CEsffq6+XEZuXA1E9eqWgnVX4x+/Whyi7z94vyZdHLvRinv1R+x8WWwTa9
+        9tayqfDSoO45F3P3ApVFUFbUwo2Qc0f9vd2EOq+cfHSK3oxRvSqdcaCNGmGkH7Db0ljtEu
+        qSjhLINTPDlmv5HmpBWY4XYD21POui0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-302-ojfv7mcJNBW2RxY_gMc9Ug-1; Mon, 19 Jun 2023 12:47:30 -0400
+X-MC-Unique: ojfv7mcJNBW2RxY_gMc9Ug-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B07E340E0034;
-        Mon, 19 Jun 2023 16:27:08 +0000 (UTC)
-Date:   Mon, 19 Jun 2023 18:27:03 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com
-Subject: Re: [PATCH RFC v9 04/51] KVM: x86: Determine shared/private faults
- using a configurable mask
-Message-ID: <20230619162703.GRZJCB10+Xg8fn8XLx@fat_crate.local>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-5-michael.roth@amd.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A4C1B858287;
+        Mon, 19 Jun 2023 16:47:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B601112132D;
+        Mon, 19 Jun 2023 16:47:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZIw8y2w+A+t5u+IJ@gondor.apana.org.au>
+References: <ZIw8y2w+A+t5u+IJ@gondor.apana.org.au> <ZIw4+Go7ZIth+CsY@gondor.apana.org.au> <1679829.1686785273@warthog.procyon.org.uk> <426353.1686911878@warthog.procyon.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
+        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
+        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
+        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
+        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230612042559.375660-5-michael.roth@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1132300.1687193246.1@warthog.procyon.org.uk>
+Date:   Mon, 19 Jun 2023 17:47:26 +0100
+Message-ID: <1132301.1687193246@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jun 11, 2023 at 11:25:12PM -0500, Michael Roth wrote:
-> This will be used to determine whether or not an #NPF should be serviced
-> using a normal page vs. a guarded/gmem one.
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  7 +++++++
->  arch/x86/kvm/mmu/mmu_internal.h | 35 ++++++++++++++++++++++++++++++++-
->  2 files changed, 41 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b3bd24f2a390..c26f76641121 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1445,6 +1445,13 @@ struct kvm_arch {
->  	 */
->  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
->  	struct kvm_mmu_memory_cache split_desc_cache;
-> +
-> +	/*
-> +	 * When set, used to determine whether a fault should be treated as
-	   ^^^^^^^^
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-And when not set? Invalid?
+> Anyway, why did you remove the condition on hash_free_result?
+> We free the result if it's not needed, not to clear the previous
+> hash.  So by doing it uncondtionally you will simply end up
+> freeing and reallocating the result for no good reason.
 
-I guess so, judging by the code below.
+The free here:
 
--- 
-Regards/Gruss,
-    Boris.
+	if (!continuing) {
+		if ((msg->msg_flags & MSG_MORE))
+			hash_free_result(sk, ctx);
 
-https://people.kernel.org/tglx/notes-about-netiquette
+only happens in the following case:
+
+	send(hashfd, "", 0, 0);
+	send(hashfd, "", 0, MSG_MORE);  <--- by this
+
+and the patch changes how this case works if no data is given.  In Linus's
+tree, it will create a result, init the crypto and finalise it in
+hash_sendmsg(); with this patch that case is then handled by hash_recvmsg().
+If you consider the following sequence:
+
+	send(hashfd, "", 0, 0);
+	send(hashfd, "", 0, 0);
+	send(hashfd, "", 0, 0);
+	send(hashfd, "", 0, 0);
+
+Upstream, the first one will create a result and then each of them will init
+and finalise a hash, whereas with my patch, the first one will release any
+outstanding result and then none of them will do any crypto ops.
+
+However, as, with my patch hash_sendmsg() no longer calculated a result, it
+has to clear the result pointer because the logic inside hash_recvmsg() relies
+on the result pointer to indicate that there is a result.
+
+Instead, hash_recvmsg() concocts the result - something it has to be able to
+do anyway in case someone calls recvmsg() without first supplying data.
+
+David
+
