@@ -2,114 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD212EB64D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 16:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED892EB64D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 19:09:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbjFTQ7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 12:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44520 "EHLO
+        id S230120AbjFTTJd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 15:09:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbjFTQ73 (ORCPT
+        with ESMTP id S230064AbjFTTJb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 12:59:29 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8010E68
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 09:59:27 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3113306a595so3716576f8f.1
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 09:59:27 -0700 (PDT)
+        Tue, 20 Jun 2023 15:09:31 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFC89B
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 12:09:30 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-25e89791877so2336803a91.2
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 12:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1687280366; x=1689872366;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iFGev71zOSbUwc9Ipdme/ZAxUB7isGkByEQJ4BO7RuU=;
-        b=csYtTXyre+3fJAdfsJmH5x4q253rZjhqSL6nkUR9EbWvn0z4eQn99DEpJcvyMz/N2B
-         xvG4xNctd5VW6P54WYaxari2Ksw/Ave6KKjVIMOXWEjYwEp4EAgNGjbI2i4/r1VBbRkj
-         XG2G6E50aTAUO1Y4YwUKTkNyDt7N3bTtRJzVzkoN/Fu0OYTxCfnna5U9lKomemVvAKqx
-         2iJAdKjqb5jcsva8gs+2WF9d4HVAcC6DdkSDx051c+yZRtucnwVj+2KL1P+A/FyU7uzA
-         U8zci+DmIAG6SJMR1QdzgOcLgS5VjIf4SXO0+XMjNhliHWaFN92HkwPt+gKTDJ1QnyfB
-         VUmw==
+        d=dabbelt-com.20221208.gappssmtp.com; s=20221208; t=1687288170; x=1689880170;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ytH528+6WpSb0dZHhh81EzPmGbD3lujTa1m5kVVR73U=;
+        b=Vg7aRJiobSB8vabvycHKxt9jE2Zod2WVtG+dK8ZV/AkXk074E7eGpkxQ8ePIp35vEh
+         pDsjlWfj3tK6z0wZ1HtQ8O9vrEklZ2CoKxKPcwPuA4QWzQySfxnycGv48wnVht6n8CvJ
+         Jnb8/hsYpeX2PHzTgFGK+NhgCTcZsLANNcuWlJbyPsMElPzb+C+K/8znFfqWHlQfiGaU
+         W8L7VIjSSTD9MJqC4BlkBIyfwMgVdyHOjJvo+EKKJdMZA1saAfIZ/vIYB0k6WoCIXKMM
+         u/LmeBaQIKzhff8qH3wnigbi9pDYb2AizucCgP+oYvfFdENBb4xiPdWRKh8DdlTNSCtd
+         ROfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687280366; x=1689872366;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iFGev71zOSbUwc9Ipdme/ZAxUB7isGkByEQJ4BO7RuU=;
-        b=E3HTf7b0ukf9RPB7zD2USFN/5Li1K3p7jArlUjLWbWJL76EG90ILQextnZ0oMSNfOT
-         rr9AIXbHa5H3s2ttLreWLa9hetn5+knglLdpl1CAO583Xz6m98qqqiC5fobAmWozyNS+
-         3QrEZMwHlWx5X7x/Qmve6mThkXsN4VNFHxR/9h4FCWPbGBtnImL+x8Spgc3koyVpYivG
-         xJi10BCCwGVH5uTXpKjAAp0iWl0z+oRBpwHVmwLpzsF5uxVZ3vqscPOX/BWyb2PLCB8m
-         q9N+wih9Sim1y8FpTssUR2zp3Xb0Oo18uayDUG+kxwoujffMV3jKCke7ZQcSzFe0cRLk
-         lbVg==
-X-Gm-Message-State: AC+VfDwUI1LsPzd6KFgBuLphEXKzhXkjSSqoo1er2/ZdxeI0Sr/QGpI6
-        47B1WbetS7g4XXjA2qxL6zuNBQ==
-X-Google-Smtp-Source: ACHHUZ4Od9jnD8B4wGHwa48B70g3JbHTkdUhQakX8BFWBVnF3ui5jOimXG0SRMmf1h+Z4StEnd5Prw==
-X-Received: by 2002:adf:e848:0:b0:311:15ae:2cd2 with SMTP id d8-20020adfe848000000b0031115ae2cd2mr12172066wrn.15.1687280366354;
-        Tue, 20 Jun 2023 09:59:26 -0700 (PDT)
-Received: from [10.83.37.24] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id t13-20020adff60d000000b003119633ecb5sm2364328wrp.88.2023.06.20.09.59.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Jun 2023 09:59:25 -0700 (PDT)
-Message-ID: <973f8619-15ff-608e-250b-356f5c140a2a@arista.com>
-Date:   Tue, 20 Jun 2023 17:59:24 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [v2 PATCH] crypto: api - Add __crypto_alloc_tfmgfp
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, Bob Gilligan <gilligan@arista.com>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Francesco Ruggeri <fruggeri05@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Salam Noureddine <noureddine@arista.com>,
-        linux-crypto@vger.kernel.org
-References: <20230614174643.3836590-1-dima@arista.com>
- <20230614174643.3836590-3-dima@arista.com>
- <ZIrTQ1tN5LMuRB/5@gondor.apana.org.au>
- <6aa4521f-e5d2-ed12-ab49-1132409ab358@arista.com>
-From:   Dmitry Safonov <dima@arista.com>
-In-Reply-To: <6aa4521f-e5d2-ed12-ab49-1132409ab358@arista.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        d=1e100.net; s=20221208; t=1687288170; x=1689880170;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ytH528+6WpSb0dZHhh81EzPmGbD3lujTa1m5kVVR73U=;
+        b=MmsVGTvJHu9vS2O/IpCbjEPkbzIgRygywC5f8aLsQNLw/cDdEVfoARmmVA4WRTtfrt
+         K4kdiJjXPUpHoAD3y7+e4H4ntyBdVUPkgCX6q3z6W03/Os6LMT306Qbl1PsjkKlK6b0e
+         jRnB+bq313GBOvOOFa4o7SyI9V1BmTddXbs+74SnNagKIZTnBInL9LOLWT+c7uCtac8U
+         XKADram6gmDZwx2nJiOoCPhNCR3zmb4uLeNW+6twr7rxTCs1cvaT0zeAyIHtxzd5ZlEv
+         dwo/p8Dcb4RpvjRs9uyMuTsNC3rikzr1lsOR8O1XKiEubmUDpKOIy57fSSEzQkXhaZW9
+         MN7A==
+X-Gm-Message-State: AC+VfDwJF6gl0SV5Z0Ew3tUnhHov0o3I0en0t7Cr4lpQBC2FMF9xQ9Or
+        Z/YpM0HoyL38cF5k3MKW2y1EVA==
+X-Google-Smtp-Source: ACHHUZ72JLPQLZAYpsNebvtJdqti/7re0M1kuGAadWiHswxLCmxzbR3HDZS0v6hY64vy34weYmzHGQ==
+X-Received: by 2002:a17:90a:43e5:b0:25e:d013:c22c with SMTP id r92-20020a17090a43e500b0025ed013c22cmr5639863pjg.47.1687288169637;
+        Tue, 20 Jun 2023 12:09:29 -0700 (PDT)
+Received: from localhost ([50.221.140.188])
+        by smtp.gmail.com with ESMTPSA id l2-20020a17090b078200b00259b53dccddsm1813287pjz.34.2023.06.20.12.09.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jun 2023 12:09:28 -0700 (PDT)
+Date:   Tue, 20 Jun 2023 12:09:28 -0700 (PDT)
+X-Google-Original-Date: Tue, 20 Jun 2023 12:08:47 PDT (-0700)
+Subject:     Re: [PATCH v5 1/4] RISC-V: add Zbc extension detection
+In-Reply-To: <20230612-unstable-tilt-1835f84363b1@spud>
+CC:     heiko@sntech.de, Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, Conor Dooley <conor.dooley@microchip.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
+        heiko.stuebner@vrull.eu
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     Conor Dooley <conor@kernel.org>
+Message-ID: <mhng-919a6ed5-c8b0-4311-9a8f-8c204b81a8e0@palmer-ri-x1c9a>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Mon, 12 Jun 2023 14:31:14 PDT (-0700), Conor Dooley wrote:
+> Hey Heiko,
+>
+> On Mon, Jun 12, 2023 at 11:04:39PM +0200, Heiko Stuebner wrote:
+>> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+>> 
+>> Add handling for Zbc extension.
+>> 
+>> Zbc provides instruction for carry-less multiplication.
+>> 
+>> Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+>> ---
+>>  arch/riscv/Kconfig             | 22 ++++++++++++++++++++++
+>>  arch/riscv/include/asm/hwcap.h |  1 +
+>>  arch/riscv/kernel/cpu.c        |  1 +
+>>  arch/riscv/kernel/cpufeature.c |  1 +
+>>  4 files changed, 25 insertions(+)
+>
+> Plumbing into the hwprobe stuff would be nice, but that's not a
+> requirement for getting stuff merged :)
 
-On 6/15/23 17:19, Dmitry Safonov wrote:
-> On 6/15/23 10:00, Herbert Xu wrote:
-> [..]
->>
->> Good catch.  Though I'd rather add the gfp argument to a separate
->> function because I'm in the process of replacing ciphers with
->> something that uses the new crypto_types API.
->>
->> Once that happens ciphers will switch over to the normal cloning
->> call and this can be removed.
-> 
-> LGTM, thanks!
+IIRC we talked about this on IRC, but IMO we shouldn't require something 
+be user visible for it to be merged in the kernel.
 
-Would you prefer me to resend this v2 or you're happy to apply with your
-proposed changes?
-
->> ---8<---
->> Use it straight away in crypto_clone_cipher(), as that is not meant to
->> sleep.
->>
->> Fixes: 51d8d6d0f4be ("crypto: cipher - Add crypto_clone_cipher")
->> Signed-off-by: Dmitry Safonov <dima@arista.com>
->> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->>
->> diff --git a/crypto/api.c b/crypto/api.c
-> [..]
-
-Thanks,
-          Dmitry
-
+>> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+>> index a3d54cd14fca..754cd154eca5 100644
+>> --- a/arch/riscv/Kconfig
+>> +++ b/arch/riscv/Kconfig
+>> @@ -523,6 +523,28 @@ config RISCV_ISA_ZBB
+>>  
+>>  	   If you don't know what to do here, say Y.
+>>  
+>> +config TOOLCHAIN_HAS_ZBC
+>> +	bool
+>> +	default y
+>> +	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbc)
+>> +	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbc)
+>> +	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
+>> +	depends on AS_IS_GNU
+>> +
+>> +config RISCV_ISA_ZBC
+>> +	bool "Zbc extension support for bit manipulation instructions"
+>> +	depends on TOOLCHAIN_HAS_ZBC
+>> +	depends on !XIP_KERNEL && MMU
+>> +	default y
+>> +	help
+>> +	   Adds support to dynamically detect the presence of the ZBC
+>
+> Nit: s/ZBC/Zbc/
+>
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+>
+> Cheers,
+> Conor.
