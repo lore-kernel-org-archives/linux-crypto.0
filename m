@@ -2,70 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A74EEB64D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 08:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F099EB64D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 12:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231145AbjFTIeY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 04:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45980 "EHLO
+        id S231966AbjFTMKN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 08:10:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbjFTIeX (ORCPT
+        with ESMTP id S231723AbjFTMKM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 04:34:23 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F6ADB;
-        Tue, 20 Jun 2023 01:34:22 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qBWoK-0051aU-PR; Tue, 20 Jun 2023 16:34:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 20 Jun 2023 16:34:00 +0800
-Date:   Tue, 20 Jun 2023 16:34:00 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     netdev@vger.kernel.org,
-        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
-        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
-        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
-        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] crypto: af_alg/hash: Fix recvmsg() after
- sendmsg(MSG_MORE)
-Message-ID: <ZJFkeLTP5nRGgxFL@gondor.apana.org.au>
-References: <ZJFhX3RYknrkcN0x@gondor.apana.org.au>
- <ZJEwPLudZlrInzYs@gondor.apana.org.au>
- <427646.1686913832@warthog.procyon.org.uk>
- <1220921.1687246935@warthog.procyon.org.uk>
- <1226381.1687249916@warthog.procyon.org.uk>
+        Tue, 20 Jun 2023 08:10:12 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62B7C6;
+        Tue, 20 Jun 2023 05:10:10 -0700 (PDT)
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 52D6D1EC0589;
+        Tue, 20 Jun 2023 14:10:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1687263009;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Ql+U7fdRXmA/T5FzVBClcEAj8T+8ofxD8UdRBhS4onc=;
+        b=WjEsimMgK0SDv+cwlHliRtOENHTrsh91vMlUj76a3SY0Rc6H+E1QML4j0hkmoDQidVH8Jo
+        iXeveYuyVhZCavOAbekzryJbODT1+1WzsAlpLWeLbvTXnmWdxcNWhwVhZgfkinI/0jEWz6
+        GPtY+3bfzVSiL0QsI9sT/GtaoNxGfp0=
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+        header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 18CQLNStf_-r; Tue, 20 Jun 2023 12:10:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+        t=1687263006; bh=Ql+U7fdRXmA/T5FzVBClcEAj8T+8ofxD8UdRBhS4onc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hfOUBxtBtBjPXF39oOF3ZUvN61XjQe3LmVhjKtWxJsHC/101LS7/ZwEAyCLXrtDos
+         6rV65BENcyyyWRLr06AnSLHuPXyYBP8k8Xku12SM1wyuoQ3Kt7xKdjkycFp66hKDeI
+         tFuA9sZRcDfWPUaFLFmL9M3d8fJU46JD2A9HhsxeXeaEyPL1MYk7jgUgshZnl0oZAw
+         OgRuwWp1I1HEPoirhwvgfY/c1X5by8s5P5gOw3pP8I8emQDdyYknlRJuLQgo31u10O
+         Jk+ojyM8mG0G6b2kJ5L0JpD5WSMAWgQ0sytpzO/R9X8XJt4S4PLWWkg6QpaXqhaO6+
+         X+XI3G+Wq8YDfZEGURuoru8FEWkLjNEwD6KAFabpurzjQPQbNuZOAMar3QqiqdycQ4
+         uDOihd2sUnMyBYqaLil+kQxq+50zc+tis817YK1HglsVOg/HvJeyupBjjO2cT+gHMM
+         dOR61duo+TRp5kxEpjcmIJQXulRbaURS/xFMoH7MoED/2Ky/h5xU7sUczEOG44CZFz
+         1bjOrgBSvWNgYLNzPwUoG+11pqfR/yFvht+38G03bd5wsnae6D/9ccuMfHQ64U5wZ4
+         tsmJXHXJbtLyApTEr6gMiQS/0RNFXcGdJzXW8hqDoM72Z/gUH4o1a2wvYS9PjVWPxB
+         DtXgq+0bY4yEUrlbXMaWY9ug=
+Received: from zn.tnic (p200300eA971dC592329C23ffFEa6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c592:329c:23ff:fea6:a903])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+        (No client certificate requested)
+        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1E74440E01DE;
+        Tue, 20 Jun 2023 12:09:26 +0000 (UTC)
+Date:   Tue, 20 Jun 2023 14:09:20 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [PATCH RFC v9 05/51] x86/coco: move CONFIG_HAS_CC_PLATFORM check
+ down into coco/Makefile
+Message-ID: <20230620120920.GAZJGW8B6XHrsoLGCJ@fat_crate.local>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-6-michael.roth@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1226381.1687249916@warthog.procyon.org.uk>
+In-Reply-To: <20230612042559.375660-6-michael.roth@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 09:31:56AM +0100, David Howells wrote:
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> 
-> > > However, given you want sendmsg() to do the init->digest cycle on zero length
-> > > data, I think we should revert to the previous version of the patch that makes
-> > > a pass of the loop even with no data.
-> > 
-> > Let's get this fixed ASAP and we can refine it later.
-> > 
-> > Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> Um.  Is that against this patch or the old version?
+On Sun, Jun 11, 2023 at 11:25:13PM -0500, Michael Roth wrote:
+> Currently CONFIG_HAS_CC_PLATFORM is a prereq for building anything in
+					^^^^^^
 
-This is against v2 which started this thread.
+Use proper english words pls.
 
-Cheers,
+> arch/x86/coco, but that is generally only applicable for guest support.
+> 
+> For SEV-SNP, helpers related purely to host support will also live in
+> arch/x86/coco. To allow for CoCo-related host support code in
+> arch/x86/coco, move that check down into the Makefile and check for it
+> specifically when needed.
+
+I have no clue what that means. Example?
+
+The last time we talked about paths, we ended up agreeing on:
+
+https://lore.kernel.org/all/Yg5nh1RknPRwIrb8@zn.tnic/
+
+So your "helpers related purely to host support" should go to
+
+arch/x86/virt/svm/sev*.c
+
+And just to keep it simple, that should be
+
+arch/x86/virt/svm/sev.c
+
+and if there's real need to split that, we can do that later.
+
+Thx.
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
