@@ -2,69 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD51DEB64D8
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 08:09:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8ABEB64D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 08:21:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231655AbjFTIJX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 04:09:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33386 "EHLO
+        id S231264AbjFTIVP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 04:21:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231560AbjFTIJW (ORCPT
+        with ESMTP id S229683AbjFTIVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 04:09:22 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B051B1
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 01:09:19 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-77b25d256aaso417681039f.0
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 01:09:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687248558; x=1689840558;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kPOmXK+JJS4XSvlfMU0a0e+c0GK1JCtS0fKF/mMBn1s=;
-        b=SRnowDs1hz8tykck+m+98Y9RrqfgJ+d+438pBJE54blavUekYzVCY2CjM3279q5vT5
-         qikq6kW9MAHr8GmlcD65jdo1qrViOloZmMjavoEON7IZR2F9ed8mOTVZVTwEflMietKJ
-         ZXomyAoBNPW55LEit/Uc00EtB0ARFUR82wfO8p+yFbTGtfxqx+DF1gixrdbrp1ZArUt8
-         KHZGCsGgIjV7VeFuQjXq+zRot0AKjxkbxo4MrL+HPWFhdyOoZmpwKztUlb0LRYmWPr6p
-         RI3fq2K0sA3ik+c19l94GmXzAu7eG8WFtpn1mhLA9IghR6lI/Vh8pqQ9733uQ57Lf8cN
-         GTSw==
-X-Gm-Message-State: AC+VfDyGrt81g44yyqaETcAULcOWEo9TDnTc/47/OKvLmft7AEOJmldm
-        MA+Hkg8QM0Hsc5DEzjHPxBjdYpfiAXAfnrEPpA21/9WfhJma
-X-Google-Smtp-Source: ACHHUZ47imoHu3Jlv7gSHJneCOAcUD5Sx26XyRsq93AybmIdKnUTNEssmEu5sY2CCI52QcBpBYoNLifZf2DdT28IgIIcEVk/2WfB
+        Tue, 20 Jun 2023 04:21:15 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B93619B;
+        Tue, 20 Jun 2023 01:21:12 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qBWbX-0051BY-9M; Tue, 20 Jun 2023 16:20:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 20 Jun 2023 16:20:47 +0800
+Date:   Tue, 20 Jun 2023 16:20:47 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org,
+        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
+        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
+        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
+        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] crypto: af_alg/hash: Fix recvmsg() after
+ sendmsg(MSG_MORE)
+Message-ID: <ZJFhX3RYknrkcN0x@gondor.apana.org.au>
+References: <ZJEwPLudZlrInzYs@gondor.apana.org.au>
+ <427646.1686913832@warthog.procyon.org.uk>
+ <1220921.1687246935@warthog.procyon.org.uk>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:9e58:0:b0:766:6741:8856 with SMTP id
- i24-20020a5d9e58000000b0076667418856mr3886774ioi.4.1687248558828; Tue, 20 Jun
- 2023 01:09:18 -0700 (PDT)
-Date:   Tue, 20 Jun 2023 01:09:18 -0700
-In-Reply-To: <1221049.1687246988@warthog.procyon.org.uk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ff364905fe8b2a25@google.com>
-Subject: Re: [syzbot] [crypto?] general protection fault in shash_ahash_update
-From:   syzbot <syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1220921.1687246935@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Tue, Jun 20, 2023 at 08:42:15AM +0100, David Howells wrote:
+>
+> Not so.  hash_recvmsg() will call crypto_ahash_init() first because ctx->more
+> is false (hence why we came down this branch in hash_sendmsg()) and the result
+> was released on the previous line (which you're objecting to).  If it goes to
+> the "done" label, it will skip setting ctx->more to true if MSG_MORE is
+> passed.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+I see, yes it should work.
 
-Reported-and-tested-by: syzbot+88f4b1e6cf88da11f5cd@syzkaller.appspotmail.com
+> However, given you want sendmsg() to do the init->digest cycle on zero length
+> data, I think we should revert to the previous version of the patch that makes
+> a pass of the loop even with no data.
 
-Tested on:
+Let's get this fixed ASAP and we can refine it later.
 
-commit:         49310624 Merge branch 'ipv6-random-cleanup-for-extensi..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=141473e3280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4a7d74e6a7c3211
-dashboard link: https://syzkaller.appspot.com/bug?extid=88f4b1e6cf88da11f5cd
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13365e5b280000
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Note: testing is done by a robot and is best-effort only.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
