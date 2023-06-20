@@ -2,27 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6AFEB64D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 04:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE8CEB64D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 07:43:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbjFTEvc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 00:51:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
+        id S231346AbjFTHnd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 03:43:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjFTEvb (ORCPT
+        with ESMTP id S231347AbjFTHnK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 00:51:31 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413EF10D2;
-        Mon, 19 Jun 2023 21:51:30 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qBTKe-004xnx-6L; Tue, 20 Jun 2023 12:51:09 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 20 Jun 2023 12:51:08 +0800
-Date:   Tue, 20 Jun 2023 12:51:08 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     netdev@vger.kernel.org,
+        Tue, 20 Jun 2023 03:43:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCB2E4D
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 00:42:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687246942;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+92FxVTjgy7f+sZL0/WEWN3/mD2r8Rpsadm+H0B45no=;
+        b=bRtYiPbeZlYCfAzLM1wd3uAoB8s0biMwBUqFDV1FB0id90e3cYsmT2hz13VRYM6U11X+zh
+        Lk7eaiMp0ill/T3l2TssbQo/iQKZewJT8Q21Glba5sy/oiKM0p9MLPzzoY5nz5XyuEUTG4
+        tOIVd2Z8wSERB4+kT3rxu1wj6O7FeGg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-650-7mogXHEzOlejoLY2g7uzpg-1; Tue, 20 Jun 2023 03:42:19 -0400
+X-MC-Unique: 7mogXHEzOlejoLY2g7uzpg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3AB02811E9E;
+        Tue, 20 Jun 2023 07:42:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 91756492CA6;
+        Tue, 20 Jun 2023 07:42:16 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZJEwPLudZlrInzYs@gondor.apana.org.au>
+References: <ZJEwPLudZlrInzYs@gondor.apana.org.au> <427646.1686913832@warthog.procyon.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
         syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
         syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
         syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
@@ -33,86 +56,40 @@ Cc:     netdev@vger.kernel.org,
         Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Matthew Wilcox <willy@infradead.org>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] crypto: af_alg/hash: Fix recvmsg() after
- sendmsg(MSG_MORE)
-Message-ID: <ZJEwPLudZlrInzYs@gondor.apana.org.au>
-References: <427646.1686913832@warthog.procyon.org.uk>
+Subject: Re: [PATCH net-next v2] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <427646.1686913832@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1220920.1687246935.1@warthog.procyon.org.uk>
+Date:   Tue, 20 Jun 2023 08:42:15 +0100
+Message-ID: <1220921.1687246935@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 12:10:32PM +0100, David Howells wrote:
-> If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
-> message with MSG_MORE set and then recvmsg() is called without first
-> sending another message without MSG_MORE set to end the operation, an oops
-> will occur because the crypto context and result doesn't now get set up in
-> advance because hash_sendmsg() now defers that as long as possible in the
-> hope that it can use crypto_ahash_digest() - and then because the message
-> is zero-length, it the data wrangling loop is skipped.
-> 
-> Fix this by handling zero-length sends at the top of the hash_sendmsg()
-> function.  If we're not continuing the previous sendmsg(), then just ignore
-> the send (hash_recvmsg() will invent something when called); if we are
-> continuing, then we finalise the request at this point if MSG_MORE is not
-> set to get any error here, otherwise the send is of no effect and can be
-> ignored.
-> 
-> Whilst we're at it, remove the code to create a kvmalloc'd scatterlist if
-> we get more than ALG_MAX_PAGES - this shouldn't happen.
-> 
-> Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
-> Reported-by: syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/000000000000b928f705fdeb873a@google.com/
-> Reported-by: syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/000000000000c047db05fdeb8790@google.com/
-> Reported-by: syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/000000000000bcca3205fdeb87fb@google.com/
-> Reported-by: syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/000000000000b55d8805fdeb8385@google.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reported-and-tested-by: syzbot+6efc50cc1f8d718d6cb7@syzkaller.appspotmail.com
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: linux-crypto@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> ---
->  crypto/algif_hash.c |   38 +++++++++++++++++++++++++-------------
->  1 file changed, 25 insertions(+), 13 deletions(-)
-> 
-> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-> index dfb048cefb60..0ab43e149f0e 100644
-> --- a/crypto/algif_hash.c
-> +++ b/crypto/algif_hash.c
-> @@ -76,13 +76,30 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
->  
->  	lock_sock(sk);
->  	if (!continuing) {
-> -		if ((msg->msg_flags & MSG_MORE))
-> -			hash_free_result(sk, ctx);
-> +		/* Discard a previous request that wasn't marked MSG_MORE. */
-> +		hash_free_result(sk, ctx);
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Please revert this change as I explained in the other message.
+> > +		hash_free_result(sk, ctx);
+> 
+> Please revert this change as I explained in the other message.
+> 
+> > +		if (!msg_data_left(msg))
+> > +			goto done; /* Zero-length; don't start new req */
+> 
+> This is still broken in the case of a zero-length message with
+> MSG_MORE set.  Here you will short-circuit out without ever calling
+> crypto_ahash_init.  However, hash_recvmsg will directly call
+> crypto_ahash_final on this, which is undefined.
 
-> +		if (!msg_data_left(msg))
-> +			goto done; /* Zero-length; don't start new req */
+Not so.  hash_recvmsg() will call crypto_ahash_init() first because ctx->more
+is false (hence why we came down this branch in hash_sendmsg()) and the result
+was released on the previous line (which you're objecting to).  If it goes to
+the "done" label, it will skip setting ctx->more to true if MSG_MORE is
+passed.
 
-This is still broken in the case of a zero-length message with
-MSG_MORE set.  Here you will short-circuit out without ever calling
-crypto_ahash_init.  However, hash_recvmsg will directly call
-crypto_ahash_final on this, which is undefined.
+However, given you want sendmsg() to do the init->digest cycle on zero length
+data, I think we should revert to the previous version of the patch that makes
+a pass of the loop even with no data.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David
+
