@@ -2,609 +2,1072 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE300EB64D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 13:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 766B4EB64D8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 13:24:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232970AbjFTNYJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:24:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56298 "EHLO
+        id S232897AbjFTNYL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:24:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232958AbjFTNXm (ORCPT
+        with ESMTP id S233015AbjFTNXw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:23:42 -0400
+        Tue, 20 Jun 2023 09:23:52 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A1119AA
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 06:23:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769A01716
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 06:23:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687267385; x=1718803385;
+  t=1687267387; x=1718803387;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Lb9cqkR0SILJlFUjruxGrneUk73DReFfJTIHh/uiWRU=;
-  b=WgQIWtPphxEoJ+DXzo0/BzVq0mFheTBSK8gWNUs9hsQNk93sz1AIzqaT
-   owCxtRDhvXV8m0URCefIhI+kS+ofSF1tow4ek0g6mpMj9TNAFAUmyZcHN
-   cMci5Bv3n88+5TwqQSvmnes/AwWhnt2oWmDmf4l+zUBUDj7xN3j1xUH71
-   O61A016UUx5WowD6sr4Kk91siLhNBaBcrzlGwaBLW+BFdjsGYWr4NVGyG
-   YjxditcuCZaTouBbFpleQ0ANtIwY8WMkEDkv5ANo3WUBADvJbImgOY7z2
-   ZRnuNEjLG0xv1SH7iMmHYkrxmlgmPbgoHEoUCIxNeXgTb5G4SwUKa7mhX
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446229759"
+  bh=sRlyPN8Jpo0hmGXW8oPcEMltQdrkUhFDXEW2bOQqdrc=;
+  b=asRjVe+LBeMDiy+0L5FewrGpMF/2voh7sn9VlJtFX2lY1CoEPwT3Y2sq
+   g1wY9LMO7VCdGg3WS0jP8sfO1xswduspVAkvGmcmBx1yfSKbEReiKBhEg
+   WoqIEEGMvoJeIfO9snEnjia+uQVoArsvc6VVmgdgZT0vZxi+XbKH1ARRI
+   Aa9Y9rfijzDoHog+7y7OP3BfxjmP9bvPHAiw5B6+82TewIts3jDX6JOr1
+   VFFWuRojPZKueRRZmF6mO06NfDI/wMzHSDWtE7//H1LIEDmYrmFGWyknn
+   lavoXNVf3sApkhCle+vOw3s2MvCYHpx29qUij+U3nTVWLduJI0h8KkYhS
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446229820"
 X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="446229759"
+   d="scan'208";a="446229820"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 06:22:25 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 06:22:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="743785456"
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="743785542"
 X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="743785456"
+   d="scan'208";a="743785542"
 Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by orsmga008.jf.intel.com with ESMTP; 20 Jun 2023 06:22:23 -0700
+  by orsmga008.jf.intel.com with ESMTP; 20 Jun 2023 06:22:50 -0700
 From:   Damian Muszynski <damian.muszynski@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Damian Muszynski <damian.muszynski@intel.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v2 3/5] crypto: qat - add measure clock frequency
-Date:   Tue, 20 Jun 2023 15:08:21 +0200
-Message-Id: <20230620130823.27004-4-damian.muszynski@intel.com>
+Subject: [PATCH v2 4/5] crypto: qat - add heartbeat feature
+Date:   Tue, 20 Jun 2023 15:08:22 +0200
+Message-Id: <20230620130823.27004-5-damian.muszynski@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230620130823.27004-1-damian.muszynski@intel.com>
 References: <20230620130823.27004-1-damian.muszynski@intel.com>
 MIME-Version: 1.0
 Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The QAT hardware does not expose a mechanism to report its clock
-frequency. This is required to implement the Heartbeat feature.
+Under some circumstances, firmware in the QAT devices could become
+unresponsive. The Heartbeat feature provides a mechanism to detect
+unresponsive devices.
 
-Add a clock measuring algorithm that estimates the frequency by
-comparing the internal timestamp counter incremented by the firmware
-with the time measured by the kernel.
-The frequency value is only used internally and not exposed to
-the user.
+The QAT FW periodically writes to memory a set of counters that allow
+to detect the liveness of a device. This patch adds logic to enable
+the reporting of those counters, analyze them and report if a device
+is alive or not.
+
+In particular this adds
+  (1) heartbeat enabling, reading and detection logic
+  (2) reporting of heartbeat status and configuration via debugfs
+  (3) documentation for the newly created sysfs entries
+  (4) configuration of FW settings related to heartbeat, e.g. tick period
+  (5) logic to convert time in ms (provided by the user) to clock ticks
+
+This patch introduces a new folder in debugfs called heartbeat with the
+following attributes:
+ - status
+ - queries_sent
+ - queries_failed
+ - config
+
+All attributes except config are reading only. In particular:
+ - `status` file returns 0 when device is operational and -1 otherwise.
+ - `queries_sent` returns the total number of heartbeat queries sent.
+ - `queries_failed` returns the total number of heartbeat queries failed.
+ - `config` allows to adjust the frequency at which the firmware writes
+   counters to memory. This period is given in milliseconds and it is
+   fixed for GEN4 devices.
 
 Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  10 ++
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   4 +
- .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  25 ++++
- .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h   |   7 +
- .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |  25 ++++
- .../intel/qat/qat_c62x/adf_c62x_hw_data.h     |   7 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |   2 +
- .../crypto/intel/qat/qat_common/adf_admin.c   |  17 +++
- .../crypto/intel/qat/qat_common/adf_clock.c   | 127 ++++++++++++++++++
- .../crypto/intel/qat/qat_common/adf_clock.h   |  14 ++
+ Documentation/ABI/testing/debugfs-driver-qat  |  51 ++++
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   1 +
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   |   3 +
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |   1 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |   1 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   2 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   7 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  14 +
+ .../intel/qat/qat_common/adf_cfg_strings.h    |   2 +
  .../intel/qat/qat_common/adf_common_drv.h     |   1 +
- .../crypto/intel/qat/qat_common/adf_init.c    |   8 ++
- .../qat/qat_common/icp_qat_fw_init_admin.h    |   1 +
- .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  10 ++
- .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   |   5 +
- 16 files changed, 264 insertions(+)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.h
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   9 +-
+ .../intel/qat/qat_common/adf_gen2_config.c    |   7 +
+ .../intel/qat/qat_common/adf_gen2_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_heartbeat.c      | 268 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_heartbeat.h      |  73 +++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.c      | 194 +++++++++++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.h      |  12 +
+ .../crypto/intel/qat/qat_common/adf_init.c    |   7 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |   4 +
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |   1 +
+ 21 files changed, 662 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h
 
+diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
+index f75eeff4bc7a..1c2ebb82fa41 100644
+--- a/Documentation/ABI/testing/debugfs-driver-qat
++++ b/Documentation/ABI/testing/debugfs-driver-qat
+@@ -8,3 +8,54 @@ Description:	(RO) Read returns the number of requests sent to the FW and the num
+ 
+ 			<N>: Number of requests sent from Acceleration Engine N to FW and responses
+ 			     Acceleration Engine N received from FW
++
++What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/config
++Date:		June 2023
++KernelVersion:	6.5
++Contact:	qat-linux@intel.com
++Description:	(RW) Read returns value of the Heartbeat update period.
++		Write to the file changes this period value.
++
++		This period should reflect planned polling interval of device
++		health status. High frequency Heartbeat monitoring wastes CPU cycles
++		but minimizes the customer’s system downtime. Also, if there are
++		large service requests that take some time to complete, high frequency
++		Heartbeat monitoring could result in false reports of unresponsiveness
++		and in those cases, period needs to be increased.
++
++		This parameter is effective only for c3xxx, c62x, dh895xcc devices.
++		4xxx has this value internally fixed to 200ms.
++
++		Default value is set to 500. Minimal allowed value is 200.
++		All values are expressed in milliseconds.
++
++What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/queries_failed
++Date:		June 2023
++KernelVersion:	6.5
++Contact:	qat-linux@intel.com
++Description:	(RO) Read returns the number of times the device became unresponsive.
++
++		Attribute returns value of the counter which is incremented when
++		status query results negative.
++
++What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/queries_sent
++Date:		June 2023
++KernelVersion:	6.5
++Contact:	qat-linux@intel.com
++Description:	(RO) Read returns the number of times the control process checked
++		if the device is responsive.
++
++		Attribute returns value of the counter which is incremented on
++		every status query.
++
++What:		/sys/kernel/debug/qat_<device>_<BDF>/heartbeat/status
++Date:		June 2023
++KernelVersion:	6.5
++Contact:	qat-linux@intel.com
++Description:	(RO) Read returns the device health status.
++
++		Returns 0 when device is healthy or -1 when is unresponsive
++		or the query failed to send.
++
++		The driver does not monitor for Heartbeat. It is left for a user
++		to poll the status periodically.
 diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 831d460bc503..9cda0c17992a 100644
+index 9cda0c17992a..268a1f7694fc 100644
 --- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -3,6 +3,7 @@
- #include <linux/iopoll.h>
- #include <adf_accel_devices.h>
- #include <adf_cfg.h>
-+#include <adf_clock.h>
- #include <adf_common_drv.h>
- #include <adf_gen4_dc.h>
- #include <adf_gen4_hw_data.h>
-@@ -318,6 +319,14 @@ static void get_admin_info(struct admin_info *admin_csrs_info)
- 	admin_csrs_info->admin_msg_lr = ADF_4XXX_ADMINMSGLR_OFFSET;
- }
- 
-+static u32 get_heartbeat_clock(struct adf_hw_device_data *self)
-+{
-+	/*
-+	 * 4XXX uses KPT counter for HB
-+	 */
-+	return ADF_4XXX_KPT_COUNTER_FREQ;
-+}
-+
- static void adf_enable_error_correction(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_bar *misc_bar = &GET_BARS(accel_dev)[ADF_4XXX_PMISC_BAR];
-@@ -511,6 +520,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
- 	hw_data->dev_config = adf_gen4_dev_config;
+@@ -521,6 +521,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
  	hw_data->start_timer = adf_gen4_timer_start;
  	hw_data->stop_timer = adf_gen4_timer_stop;
-+	hw_data->get_hb_clock = get_heartbeat_clock;
+ 	hw_data->get_hb_clock = get_heartbeat_clock;
++	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
  
  	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
  	adf_gen4_init_pf_pfvf_ops(&hw_data->pfvf_ops);
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.h b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.h
-index e5b314d2b60e..bb3d95a8fb21 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.h
-@@ -3,6 +3,7 @@
- #ifndef ADF_4XXX_HW_DATA_H_
- #define ADF_4XXX_HW_DATA_H_
+diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
+index 1a15600361d0..6d4e2e139ffa 100644
+--- a/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
+@@ -8,6 +8,7 @@
+ #include <adf_cfg.h>
+ #include <adf_common_drv.h>
+ #include <adf_dbgfs.h>
++#include <adf_heartbeat.h>
  
-+#include <linux/units.h>
- #include <adf_accel_devices.h>
+ #include "adf_4xxx_hw_data.h"
+ #include "qat_compression.h"
+@@ -77,6 +78,8 @@ static int adf_cfg_dev_init(struct adf_accel_dev *accel_dev)
+ 	if (ret)
+ 		return ret;
  
- /* PCIe configuration space */
-@@ -64,6 +65,9 @@
- #define ADF_402XX_ASYM_OBJ	"qat_402xx_asym.bin"
- #define ADF_402XX_ADMIN_OBJ	"qat_402xx_admin.bin"
- 
-+/* Clocks frequency */
-+#define ADF_4XXX_KPT_COUNTER_FREQ (100 * HZ_PER_MHZ)
++	adf_heartbeat_save_cfg_param(accel_dev, ADF_CFG_HB_TIMER_MIN_MS);
 +
- /* qat_4xxx fuse bits are different from old GENs, redefine them */
- enum icp_qat_4xxx_slice_mask {
- 	ICP_ACCEL_4XXX_MASK_CIPHER_SLICE = BIT(0),
+ 	return 0;
+ }
+ 
 diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-index 475643654e64..2c6a1dd9780c 100644
+index 2c6a1dd9780c..e81d11409426 100644
 --- a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
- /* Copyright(c) 2014 - 2021 Intel Corporation */
- #include <adf_accel_devices.h>
-+#include <adf_clock.h>
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-@@ -50,6 +51,28 @@ static u32 get_ae_mask(struct adf_hw_device_data *self)
- 	return ~(fuses | straps) & ADF_C3XXX_ACCELENGINES_MASK;
- }
- 
-+static u32 get_ts_clock(struct adf_hw_device_data *self)
-+{
-+	/*
-+	 * Timestamp update interval is 16 AE clock ticks for c3xxx.
-+	 */
-+	return self->clock_frequency / 16;
-+}
-+
-+static int measure_clock(struct adf_accel_dev *accel_dev)
-+{
-+	u32 frequency;
-+	int ret;
-+
-+	ret = adf_dev_measure_clock(accel_dev, &frequency, ADF_C3XXX_MIN_AE_FREQ,
-+				    ADF_C3XXX_MAX_AE_FREQ);
-+	if (ret)
-+		return ret;
-+
-+	accel_dev->hw_device->clock_frequency = frequency;
-+	return 0;
-+}
-+
- static u32 get_misc_bar_id(struct adf_hw_device_data *self)
- {
- 	return ADF_C3XXX_PMISC_BAR;
-@@ -127,6 +150,8 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->set_ssm_wdtimer = adf_gen2_set_ssm_wdtimer;
- 	hw_data->disable_iov = adf_disable_sriov;
+@@ -152,6 +152,7 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
  	hw_data->dev_config = adf_gen2_dev_config;
-+	hw_data->measure_clock = measure_clock;
-+	hw_data->get_hb_clock = get_ts_clock;
+ 	hw_data->measure_clock = measure_clock;
+ 	hw_data->get_hb_clock = get_ts_clock;
++	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
  
  	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
  	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h
-index 336a06f11dbd..690c6a1aa172 100644
---- a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h
-@@ -3,6 +3,8 @@
- #ifndef ADF_C3XXX_HW_DATA_H_
- #define ADF_C3XXX_HW_DATA_H_
- 
-+#include <linux/units.h>
-+
- /* PCIe configuration space */
- #define ADF_C3XXX_PMISC_BAR 0
- #define ADF_C3XXX_ETR_BAR 1
-@@ -19,6 +21,11 @@
- #define ADF_C3XXX_AE2FUNC_MAP_GRP_A_NUM_REGS 48
- #define ADF_C3XXX_AE2FUNC_MAP_GRP_B_NUM_REGS 6
- 
-+/* Clocks frequency */
-+#define ADF_C3XXX_AE_FREQ (685 * HZ_PER_MHZ)
-+#define ADF_C3XXX_MIN_AE_FREQ (533 * HZ_PER_MHZ)
-+#define ADF_C3XXX_MAX_AE_FREQ (685 * HZ_PER_MHZ)
-+
- /* Firmware Binary */
- #define ADF_C3XXX_FW "qat_c3xxx.bin"
- #define ADF_C3XXX_MMP "qat_c3xxx_mmp.bin"
 diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-index e14270703670..081702be839e 100644
+index 081702be839e..1a8c8e3a48e9 100644
 --- a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
- /* Copyright(c) 2014 - 2021 Intel Corporation */
- #include <adf_accel_devices.h>
-+#include <adf_clock.h>
- #include <adf_common_drv.h>
- #include <adf_gen2_config.h>
- #include <adf_gen2_dc.h>
-@@ -50,6 +51,28 @@ static u32 get_ae_mask(struct adf_hw_device_data *self)
- 	return ~(fuses | straps) & ADF_C62X_ACCELENGINES_MASK;
- }
- 
-+static u32 get_ts_clock(struct adf_hw_device_data *self)
-+{
-+	/*
-+	 * Timestamp update interval is 16 AE clock ticks for c62x.
-+	 */
-+	return self->clock_frequency / 16;
-+}
-+
-+static int measure_clock(struct adf_accel_dev *accel_dev)
-+{
-+	u32 frequency;
-+	int ret;
-+
-+	ret = adf_dev_measure_clock(accel_dev, &frequency, ADF_C62X_MIN_AE_FREQ,
-+				    ADF_C62X_MAX_AE_FREQ);
-+	if (ret)
-+		return ret;
-+
-+	accel_dev->hw_device->clock_frequency = frequency;
-+	return 0;
-+}
-+
- static u32 get_misc_bar_id(struct adf_hw_device_data *self)
- {
- 	return ADF_C62X_PMISC_BAR;
-@@ -129,6 +152,8 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
- 	hw_data->set_ssm_wdtimer = adf_gen2_set_ssm_wdtimer;
- 	hw_data->disable_iov = adf_disable_sriov;
+@@ -154,6 +154,7 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
  	hw_data->dev_config = adf_gen2_dev_config;
-+	hw_data->measure_clock = measure_clock;
-+	hw_data->get_hb_clock = get_ts_clock;
+ 	hw_data->measure_clock = measure_clock;
+ 	hw_data->get_hb_clock = get_ts_clock;
++	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
  
  	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
  	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.h b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.h
-index 008c0a3a9769..13e6ebf6fd91 100644
---- a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.h
-@@ -3,6 +3,8 @@
- #ifndef ADF_C62X_HW_DATA_H_
- #define ADF_C62X_HW_DATA_H_
- 
-+#include <linux/units.h>
-+
- /* PCIe configuration space */
- #define ADF_C62X_SRAM_BAR 0
- #define ADF_C62X_PMISC_BAR 1
-@@ -19,6 +21,11 @@
- #define ADF_C62X_AE2FUNC_MAP_GRP_A_NUM_REGS 80
- #define ADF_C62X_AE2FUNC_MAP_GRP_B_NUM_REGS 10
- 
-+/* Clocks frequency */
-+#define ADF_C62X_AE_FREQ (685 * HZ_PER_MHZ)
-+#define ADF_C62X_MIN_AE_FREQ (533 * HZ_PER_MHZ)
-+#define ADF_C62X_MAX_AE_FREQ (800 * HZ_PER_MHZ)
-+
- /* Firmware Binary */
- #define ADF_C62X_FW "qat_c62x.bin"
- #define ADF_C62X_MMP "qat_c62x_mmp.bin"
 diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 6a82ef8df733..b3e32d2abf45 100644
+index b3e32d2abf45..43622c7fca71 100644
 --- a/drivers/crypto/intel/qat/qat_common/Makefile
 +++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -18,6 +18,7 @@ intel_qat-objs := adf_cfg.o \
- 	adf_gen2_dc.o \
- 	adf_gen4_dc.o \
- 	adf_gen4_timer.o \
-+	adf_clock.o \
- 	qat_crypto.o \
- 	qat_compression.o \
- 	qat_comp_algs.o \
+@@ -31,6 +31,8 @@ intel_qat-objs := adf_cfg.o \
+ 
+ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
+ 				adf_fw_counters.o \
++				adf_heartbeat.o \
++				adf_heartbeat_dbgfs.o \
+ 				adf_dbgfs.o
+ 
+ intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index 2198b410b029..c96f59cb7de9 100644
+index c96f59cb7de9..ab897e1717e0 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
 +++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -190,6 +190,8 @@ struct adf_hw_device_data {
- 	int (*send_admin_init)(struct adf_accel_dev *accel_dev);
- 	int (*start_timer)(struct adf_accel_dev *accel_dev);
- 	void (*stop_timer)(struct adf_accel_dev *accel_dev);
-+	uint32_t (*get_hb_clock)(struct adf_hw_device_data *self);
-+	int (*measure_clock)(struct adf_accel_dev *accel_dev);
- 	int (*init_arb)(struct adf_accel_dev *accel_dev);
- 	void (*exit_arb)(struct adf_accel_dev *accel_dev);
- 	const u32 *(*get_arb_mapping)(struct adf_accel_dev *accel_dev);
+@@ -233,6 +233,7 @@ struct adf_hw_device_data {
+ 	u8 num_accel;
+ 	u8 num_logical_accel;
+ 	u8 num_engines;
++	u32 num_hb_ctrs;
+ };
+ 
+ /* CSR write macro */
+@@ -245,6 +246,11 @@ struct adf_hw_device_data {
+ #define ADF_CFG_NUM_SERVICES	4
+ #define ADF_SRV_TYPE_BIT_LEN	3
+ #define ADF_SRV_TYPE_MASK	0x7
++#define ADF_AE_ADMIN_THREAD	7
++#define ADF_NUM_THREADS_PER_AE	8
++#define ADF_NUM_PKE_STRAND	2
++#define ADF_AE_STRAND0_THREAD	8
++#define ADF_AE_STRAND1_THREAD	9
+ 
+ #define GET_DEV(accel_dev) ((accel_dev)->accel_pci_dev.pci_dev->dev)
+ #define GET_BARS(accel_dev) ((accel_dev)->accel_pci_dev.pci_bars)
+@@ -301,6 +307,7 @@ struct adf_accel_dev {
+ 	struct module *owner;
+ 	struct adf_accel_pci accel_pci_dev;
+ 	struct adf_timer *timer;
++	struct adf_heartbeat *heartbeat;
+ 	union {
+ 		struct {
+ 			/* protects VF2PF interrupts access */
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-index d6cb7f50bb5a..966e7ea271a2 100644
+index 966e7ea271a2..ff790823b868 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-@@ -15,6 +15,7 @@
- #define ADF_CONST_TABLE_SIZE 1024
- #define ADF_ADMIN_POLL_DELAY_US 20
- #define ADF_ADMIN_POLL_TIMEOUT_US (5 * USEC_PER_SEC)
-+#define ADF_ONE_AE 1
+@@ -8,6 +8,7 @@
+ #include <linux/dma-mapping.h>
+ #include "adf_accel_devices.h"
+ #include "adf_common_drv.h"
++#include "adf_heartbeat.h"
+ #include "icp_qat_fw_init_admin.h"
  
- static const u8 const_tab[1024] __aligned(1024) = {
- 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-@@ -194,6 +195,22 @@ static int adf_set_fw_constants(struct adf_accel_dev *accel_dev)
+ #define ADF_ADMIN_MAILBOX_STRIDE 0x1000
+@@ -270,6 +271,19 @@ int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt)
  	return adf_send_admin(accel_dev, &req, &resp, ae_mask);
  }
  
-+int adf_get_fw_timestamp(struct adf_accel_dev *accel_dev, u64 *timestamp)
++int adf_send_admin_hb_timer(struct adf_accel_dev *accel_dev, uint32_t ticks)
 +{
++	u32 ae_mask = accel_dev->hw_device->ae_mask;
 +	struct icp_qat_fw_init_admin_req req = { };
 +	struct icp_qat_fw_init_admin_resp resp;
-+	unsigned int ae_mask = ADF_ONE_AE;
-+	int ret;
 +
-+	req.cmd_id = ICP_QAT_FW_TIMER_GET;
-+	ret = adf_send_admin(accel_dev, &req, &resp, ae_mask);
-+	if (ret)
-+		return ret;
++	req.cmd_id = ICP_QAT_FW_HEARTBEAT_TIMER_SET;
++	req.init_cfg_ptr = accel_dev->heartbeat->dma.phy_addr;
++	req.heartbeat_ticks = ticks;
 +
-+	*timestamp = resp.timestamp;
-+	return 0;
++	return adf_send_admin(accel_dev, &req, &resp, ae_mask);
 +}
 +
- static int adf_get_dc_capabilities(struct adf_accel_dev *accel_dev,
- 				   u32 *capabilities)
- {
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_clock.c b/drivers/crypto/intel/qat/qat_common/adf_clock.c
-new file mode 100644
-index 000000000000..4002ba1c2ca1
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_clock.c
-@@ -0,0 +1,127 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
+ /**
+  * adf_send_admin_init() - Function sends init message to FW
+  * @accel_dev: Pointer to acceleration device.
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h b/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h
+index 3ae1e5caee0e..6066dc637352 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_cfg_strings.h
+@@ -47,4 +47,6 @@
+ #define ADF_ETRMGR_CORE_AFFINITY_FORMAT \
+ 	ADF_ETRMGR_BANK "%d" ADF_ETRMGR_CORE_AFFINITY
+ #define ADF_ACCEL_STR "Accelerator%d"
++#define ADF_HEARTBEAT_TIMER  "HeartbeatTimer"
 +
-+#include <linux/delay.h>
-+#include <linux/dev_printk.h>
-+#include <linux/export.h>
-+#include <linux/math.h>
-+#include <linux/minmax.h>
-+#include <linux/time64.h>
-+#include <linux/types.h>
-+#include <linux/units.h>
-+#include <asm/errno.h>
-+#include "adf_accel_devices.h"
-+#include "adf_clock.h"
-+#include "adf_common_drv.h"
-+
-+#define MEASURE_CLOCK_RETRIES 10
-+#define MEASURE_CLOCK_DELAY_US 10000
-+#define ME_CLK_DIVIDER 16
-+#define MEASURE_CLOCK_DELTA_THRESHOLD_US 100
-+
-+static inline u64 timespec_to_us(const struct timespec64 *ts)
-+{
-+	return (u64)DIV_ROUND_CLOSEST_ULL(timespec64_to_ns(ts), NSEC_PER_USEC);
-+}
-+
-+static inline u64 timespec_to_ms(const struct timespec64 *ts)
-+{
-+	return (u64)DIV_ROUND_CLOSEST_ULL(timespec64_to_ns(ts), NSEC_PER_MSEC);
-+}
-+
-+u64 adf_clock_get_current_time(void)
-+{
-+	struct timespec64 ts;
-+
-+	ktime_get_real_ts64(&ts);
-+	return timespec_to_ms(&ts);
-+}
-+
-+static int measure_clock(struct adf_accel_dev *accel_dev, u32 *frequency)
-+{
-+	struct timespec64 ts1, ts2, ts3, ts4;
-+	u64 timestamp1, timestamp2, temp;
-+	u32 delta_us, tries;
-+	int ret;
-+
-+	tries = MEASURE_CLOCK_RETRIES;
-+	do {
-+		ktime_get_real_ts64(&ts1);
-+		ret = adf_get_fw_timestamp(accel_dev, &timestamp1);
-+		if (ret) {
-+			dev_err(&GET_DEV(accel_dev),
-+				"Failed to get fw timestamp\n");
-+			return ret;
-+		}
-+		ktime_get_real_ts64(&ts2);
-+		delta_us = timespec_to_us(&ts2) - timespec_to_us(&ts1);
-+	} while (delta_us > MEASURE_CLOCK_DELTA_THRESHOLD_US && --tries);
-+
-+	if (!tries) {
-+		dev_err(&GET_DEV(accel_dev), "Excessive clock measure delay\n");
-+		return -ETIMEDOUT;
-+	}
-+
-+	fsleep(MEASURE_CLOCK_DELAY_US);
-+
-+	tries = MEASURE_CLOCK_RETRIES;
-+	do {
-+		ktime_get_real_ts64(&ts3);
-+		if (adf_get_fw_timestamp(accel_dev, &timestamp2)) {
-+			dev_err(&GET_DEV(accel_dev),
-+				"Failed to get fw timestamp\n");
-+			return -EIO;
-+		}
-+		ktime_get_real_ts64(&ts4);
-+		delta_us = timespec_to_us(&ts4) - timespec_to_us(&ts3);
-+	} while (delta_us > MEASURE_CLOCK_DELTA_THRESHOLD_US && --tries);
-+
-+	if (!tries) {
-+		dev_err(&GET_DEV(accel_dev), "Excessive clock measure delay\n");
-+		return -ETIMEDOUT;
-+	}
-+
-+	delta_us = timespec_to_us(&ts3) - timespec_to_us(&ts1);
-+	temp = (timestamp2 - timestamp1) * ME_CLK_DIVIDER * 10;
-+	temp = DIV_ROUND_CLOSEST_ULL(temp, delta_us);
-+	*frequency = temp * HZ_PER_MHZ / 10;
-+
-+	return 0;
-+}
-+
-+/**
-+ * adf_dev_measure_clock() - measures device clock frequency
-+ * @accel_dev: Pointer to acceleration device.
-+ * @frequency: Pointer to variable where result will be stored
-+ * @min: Minimal allowed frequency value
-+ * @max: Maximal allowed frequency value
-+ *
-+ * If the measurement result will go beyond the min/max thresholds the value
-+ * will take the value of the crossed threshold.
-+ *
-+ * This algorithm compares the device firmware timestamp with the kernel
-+ * timestamp. So we can't expect too high accuracy from this measurement.
-+ *
-+ * Return:
-+ * * 0 - measurement succeed
-+ * * -ETIMEDOUT - measurement failed
-+ */
-+int adf_dev_measure_clock(struct adf_accel_dev *accel_dev,
-+			  u32 *frequency, u32 min, u32 max)
-+{
-+	int ret;
-+	u32 freq;
-+
-+	ret = measure_clock(accel_dev, &freq);
-+	if (ret)
-+		return ret;
-+
-+	*frequency = clamp(freq, min, max);
-+
-+	if (*frequency != freq)
-+		dev_warn(&GET_DEV(accel_dev),
-+			 "Measured clock %d Hz is out of range, assuming %d\n",
-+			 freq, *frequency);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(adf_dev_measure_clock);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_clock.h b/drivers/crypto/intel/qat/qat_common/adf_clock.h
-new file mode 100644
-index 000000000000..e309bc0dc35c
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_clock.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2023 Intel Corporation */
-+#ifndef ADF_CLOCK_H
-+#define ADF_CLOCK_H
-+
-+#include <linux/types.h>
-+
-+struct adf_accel_dev;
-+
-+int adf_dev_measure_clock(struct adf_accel_dev *accel_dev, u32 *frequency,
-+			  u32 min, u32 max);
-+u64 adf_clock_get_current_time(void);
-+
-+#endif
+ #endif
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index e0d472071354..a9552832858f 100644
+index a9552832858f..799a2193d3e5 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
 +++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
 @@ -97,6 +97,7 @@ int adf_send_admin_init(struct adf_accel_dev *accel_dev);
  int adf_get_ae_fw_counters(struct adf_accel_dev *accel_dev, u16 ae, u64 *reqs, u64 *resps);
  int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay);
  int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
-+int adf_get_fw_timestamp(struct adf_accel_dev *accel_dev, u64 *timestamp);
++int adf_send_admin_hb_timer(struct adf_accel_dev *accel_dev, uint32_t ticks);
+ int adf_get_fw_timestamp(struct adf_accel_dev *accel_dev, u64 *timestamp);
  int adf_init_arb(struct adf_accel_dev *accel_dev);
  void adf_exit_arb(struct adf_accel_dev *accel_dev);
- void adf_update_ring_arb(struct adf_etr_ring_data *ring);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
-index 0acba0f988da..53fca6a7e2af 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
-@@ -178,6 +178,14 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- 		return -EFAULT;
- 	}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+index 5080ecffab03..04845f8d72be 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+@@ -7,6 +7,7 @@
+ #include "adf_common_drv.h"
+ #include "adf_dbgfs.h"
+ #include "adf_fw_counters.h"
++#include "adf_heartbeat_dbgfs.h"
  
-+	if (hw_data->measure_clock) {
-+		ret = hw_data->measure_clock(accel_dev);
-+		if (ret) {
-+			dev_err(&GET_DEV(accel_dev), "Failed measure device clock\n");
-+			return ret;
-+		}
+ /**
+  * adf_dbgfs_init() - add persistent debugfs entries
+@@ -58,8 +59,10 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
+ 	if (!accel_dev->debugfs_dir)
+ 		return;
+ 
+-	if (!accel_dev->is_vf)
++	if (!accel_dev->is_vf) {
+ 		adf_fw_counters_dbgfs_add(accel_dev);
++		adf_heartbeat_dbgfs_add(accel_dev);
++	}
+ }
+ 
+ /**
+@@ -71,6 +74,8 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
+ 	if (!accel_dev->debugfs_dir)
+ 		return;
+ 
+-	if (!accel_dev->is_vf)
++	if (!accel_dev->is_vf) {
++		adf_heartbeat_dbgfs_rm(accel_dev);
+ 		adf_fw_counters_dbgfs_rm(accel_dev);
++	}
+ }
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c
+index eeb30da7587a..c27ff6d18e11 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c
+@@ -7,6 +7,7 @@
+ #include "adf_common_drv.h"
+ #include "qat_crypto.h"
+ #include "qat_compression.h"
++#include "adf_heartbeat.h"
+ #include "adf_transport_access_macros.h"
+ 
+ static int adf_gen2_crypto_dev_config(struct adf_accel_dev *accel_dev)
+@@ -195,6 +196,12 @@ int adf_gen2_dev_config(struct adf_accel_dev *accel_dev)
+ 	if (ret)
+ 		goto err;
+ 
++	ret = adf_cfg_section_add(accel_dev, ADF_GENERAL_SEC);
++	if (ret)
++		goto err;
++
++	adf_heartbeat_save_cfg_param(accel_dev, ADF_CFG_HB_TIMER_DEFAULT_MS);
++
+ 	set_bit(ADF_STATUS_CONFIGURED, &accel_dev->status);
+ 
+ 	return ret;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
+index e4bc07529be4..6bd341061de4 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_hw_data.h
+@@ -145,6 +145,9 @@ do { \
+ #define ADF_GEN2_CERRSSMSH(i)		((i) * 0x4000 + 0x10)
+ #define ADF_GEN2_ERRSSMSH_EN		BIT(3)
+ 
++/* Number of heartbeat counter pairs */
++#define ADF_NUM_HB_CNT_PER_AE ADF_NUM_THREADS_PER_AE
++
+ /* Interrupts */
+ #define ADF_GEN2_SMIAPF0_MASK_OFFSET    (0x3A000 + 0x28)
+ #define ADF_GEN2_SMIAPF1_MASK_OFFSET    (0x3A000 + 0x30)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
+index 4fb4b3df5a18..02d7a019ebf8 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.h
+@@ -136,6 +136,9 @@ do { \
+ 
+ #define ADF_GEN4_VFLNOTIFY	BIT(7)
+ 
++/* Number of heartbeat counter pairs */
++#define ADF_NUM_HB_CNT_PER_AE ADF_NUM_THREADS_PER_AE
++
+ void adf_gen4_set_ssm_wdtimer(struct adf_accel_dev *accel_dev);
+ void adf_gen4_init_hw_csr_ops(struct adf_hw_csr_ops *csr_ops);
+ int adf_gen4_ring_pair_reset(struct adf_accel_dev *accel_dev, u32 bank_number);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
+new file mode 100644
+index 000000000000..7358aac8e56d
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
+@@ -0,0 +1,268 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2023 Intel Corporation */
++
++#include <linux/dev_printk.h>
++#include <linux/dma-mapping.h>
++#include <linux/export.h>
++#include <linux/kernel.h>
++#include <linux/kstrtox.h>
++#include <linux/overflow.h>
++#include <linux/string.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <asm/errno.h>
++#include "adf_accel_devices.h"
++#include "adf_cfg.h"
++#include "adf_cfg_strings.h"
++#include "adf_clock.h"
++#include "adf_common_drv.h"
++#include "adf_heartbeat.h"
++#include "adf_transport_internal.h"
++#include "icp_qat_fw_init_admin.h"
++
++/* Heartbeat counter pair */
++struct hb_cnt_pair {
++	__u16 resp_heartbeat_cnt;
++	__u16 req_heartbeat_cnt;
++};
++
++static int adf_hb_check_polling_freq(struct adf_accel_dev *accel_dev)
++{
++	u64 curr_time = adf_clock_get_current_time();
++	u64 polling_time = curr_time - accel_dev->heartbeat->last_hb_check_time;
++
++	if (polling_time < accel_dev->heartbeat->hb_timer) {
++		dev_warn(&GET_DEV(accel_dev),
++			 "HB polling too frequent. Configured HB timer %d ms\n",
++			 accel_dev->heartbeat->hb_timer);
++		return -EINVAL;
 +	}
 +
- 	/* Set ssm watch dog timer */
- 	if (hw_data->set_ssm_wdtimer)
- 		hw_data->set_ssm_wdtimer(accel_dev);
++	accel_dev->heartbeat->last_hb_check_time = curr_time;
++	return 0;
++}
++
++static int get_timer_ticks(struct adf_accel_dev *accel_dev, unsigned int *value)
++{
++	char timer_str[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = { };
++	u32 timer_ms = ADF_CFG_HB_TIMER_DEFAULT_MS;
++	int cfg_read_status;
++	u32 ticks;
++	int ret;
++
++	cfg_read_status = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
++						  ADF_HEARTBEAT_TIMER, timer_str);
++	if (cfg_read_status == 0) {
++		if (kstrtouint(timer_str, 10, &timer_ms))
++			dev_dbg(&GET_DEV(accel_dev),
++				"kstrtouint failed to parse the %s, param value",
++				ADF_HEARTBEAT_TIMER);
++	}
++
++	if (timer_ms < ADF_CFG_HB_TIMER_MIN_MS) {
++		dev_err(&GET_DEV(accel_dev), "Timer cannot be less than %u\n",
++			ADF_CFG_HB_TIMER_MIN_MS);
++		return -EINVAL;
++	}
++
++	/*
++	 * On 4xxx devices adf_timer is responsible for HB updates and
++	 * its period is fixed to 200ms
++	 */
++	if (accel_dev->timer)
++		timer_ms = ADF_CFG_HB_TIMER_MIN_MS;
++
++	ret = adf_heartbeat_ms_to_ticks(accel_dev, timer_ms, &ticks);
++	if (ret)
++		return ret;
++
++	adf_heartbeat_save_cfg_param(accel_dev, timer_ms);
++
++	accel_dev->heartbeat->hb_timer = timer_ms;
++	*value = ticks;
++
++	return 0;
++}
++
++static int check_ae(struct hb_cnt_pair *curr, struct hb_cnt_pair *prev,
++		    u16 *count, const size_t hb_ctrs)
++{
++	size_t thr;
++
++	/* loop through all threads in AE */
++	for (thr = 0; thr < hb_ctrs; thr++) {
++		u16 req = curr[thr].req_heartbeat_cnt;
++		u16 resp = curr[thr].resp_heartbeat_cnt;
++		u16 last = prev[thr].resp_heartbeat_cnt;
++
++		if ((thr == ADF_AE_ADMIN_THREAD || req != resp) && resp == last) {
++			u16 retry = ++count[thr];
++
++			if (retry >= ADF_CFG_HB_COUNT_THRESHOLD)
++				return -EIO;
++
++		} else {
++			count[thr] = 0;
++		}
++	}
++	return 0;
++}
++
++static int adf_hb_get_status(struct adf_accel_dev *accel_dev)
++{
++	struct adf_hw_device_data *hw_device = accel_dev->hw_device;
++	struct hb_cnt_pair *live_stats, *last_stats, *curr_stats;
++	const size_t hb_ctrs = hw_device->num_hb_ctrs;
++	const unsigned long ae_mask = hw_device->ae_mask;
++	const size_t max_aes = hw_device->num_engines;
++	const size_t dev_ctrs = size_mul(max_aes, hb_ctrs);
++	const size_t stats_size = size_mul(dev_ctrs, sizeof(*curr_stats));
++	struct hb_cnt_pair *ae_curr_p, *ae_prev_p;
++	u16 *count_fails, *ae_count_p;
++	size_t ae_offset;
++	size_t ae = 0;
++	int ret = 0;
++
++	live_stats = accel_dev->heartbeat->dma.virt_addr;
++	last_stats = live_stats + dev_ctrs;
++	count_fails = (u16 *)(last_stats + dev_ctrs);
++
++	curr_stats = kmemdup(live_stats, stats_size, GFP_KERNEL);
++	if (!curr_stats)
++		return -ENOMEM;
++
++	/* loop through active AEs */
++	for_each_set_bit(ae, &ae_mask, max_aes) {
++		ae_offset = size_mul(ae, hb_ctrs);
++		ae_curr_p = curr_stats + ae_offset;
++		ae_prev_p = last_stats + ae_offset;
++		ae_count_p = count_fails + ae_offset;
++
++		ret = check_ae(ae_curr_p, ae_prev_p, ae_count_p, hb_ctrs);
++		if (ret)
++			break;
++	}
++
++	/* Copy current stats for the next iteration */
++	memcpy(last_stats, curr_stats, stats_size);
++	kfree(curr_stats);
++
++	return ret;
++}
++
++void adf_heartbeat_status(struct adf_accel_dev *accel_dev,
++			  enum adf_device_heartbeat_status *hb_status)
++{
++	struct adf_heartbeat *hb;
++
++	if (!adf_dev_started(accel_dev) ||
++	    test_bit(ADF_STATUS_RESTARTING, &accel_dev->status)) {
++		*hb_status = HB_DEV_UNRESPONSIVE;
++		return;
++	}
++
++	if (adf_hb_check_polling_freq(accel_dev) == -EINVAL) {
++		*hb_status = HB_DEV_UNSUPPORTED;
++		return;
++	}
++
++	hb = accel_dev->heartbeat;
++	hb->hb_sent_counter++;
++
++	if (adf_hb_get_status(accel_dev)) {
++		dev_err(&GET_DEV(accel_dev),
++			"Heartbeat ERROR: QAT is not responding.\n");
++		*hb_status = HB_DEV_UNRESPONSIVE;
++		hb->hb_failed_counter++;
++		return;
++	}
++
++	*hb_status = HB_DEV_ALIVE;
++}
++
++int adf_heartbeat_ms_to_ticks(struct adf_accel_dev *accel_dev, unsigned int time_ms,
++			      u32 *value)
++{
++	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
++	u32 clk_per_sec;
++
++	/* HB clock may be different than AE clock */
++	if (!hw_data->get_hb_clock)
++		return -EINVAL;
++
++	clk_per_sec = hw_data->get_hb_clock(hw_data);
++	*value = time_ms * (clk_per_sec / MSEC_PER_SEC);
++
++	return 0;
++}
++
++int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
++				 unsigned int timer_ms)
++{
++	char timer_str[ADF_CFG_MAX_VAL_LEN_IN_BYTES];
++
++	snprintf(timer_str, sizeof(timer_str), "%u", timer_ms);
++	return adf_cfg_add_key_value_param(accel_dev, ADF_GENERAL_SEC,
++					  ADF_HEARTBEAT_TIMER, timer_str,
++					  ADF_STR);
++}
++EXPORT_SYMBOL_GPL(adf_heartbeat_save_cfg_param);
++
++int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
++{
++	struct adf_heartbeat *hb;
++
++	hb = kzalloc(sizeof(*hb), GFP_KERNEL);
++	if (!hb)
++		goto err_ret;
++
++	hb->dma.virt_addr = dma_alloc_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
++					       &hb->dma.phy_addr, GFP_KERNEL);
++	if (!hb->dma.virt_addr)
++		goto err_free;
++
++	accel_dev->heartbeat = hb;
++
++	return 0;
++
++err_free:
++	kfree(hb);
++err_ret:
++	return -ENOMEM;
++}
++
++int adf_heartbeat_start(struct adf_accel_dev *accel_dev)
++{
++	unsigned int timer_ticks;
++	int ret;
++
++	if (!accel_dev->heartbeat) {
++		dev_warn(&GET_DEV(accel_dev), "Heartbeat instance not found!");
++		return -EFAULT;
++	}
++
++	ret = get_timer_ticks(accel_dev, &timer_ticks);
++	if (ret)
++		return ret;
++
++	ret = adf_send_admin_hb_timer(accel_dev, timer_ticks);
++	if (ret)
++		dev_warn(&GET_DEV(accel_dev), "Heartbeat not supported!");
++
++	return ret;
++}
++
++void adf_heartbeat_shutdown(struct adf_accel_dev *accel_dev)
++{
++	struct adf_heartbeat *hb = accel_dev->heartbeat;
++
++	if (!hb)
++		return;
++
++	if (hb->dma.virt_addr)
++		dma_free_coherent(&GET_DEV(accel_dev), PAGE_SIZE,
++				  hb->dma.virt_addr, hb->dma.phy_addr);
++
++	kfree(hb);
++	accel_dev->heartbeat = NULL;
++}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
+new file mode 100644
+index 000000000000..297147f44150
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
+@@ -0,0 +1,73 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2023 Intel Corporation */
++
++#ifndef ADF_HEARTBEAT_H_
++#define ADF_HEARTBEAT_H_
++
++#include <linux/types.h>
++
++struct adf_accel_dev;
++struct dentry;
++
++#define ADF_CFG_HB_TIMER_MIN_MS 200
++#define ADF_CFG_HB_TIMER_DEFAULT_MS 500
++#define ADF_CFG_HB_COUNT_THRESHOLD 3
++
++enum adf_device_heartbeat_status {
++	HB_DEV_UNRESPONSIVE = 0,
++	HB_DEV_ALIVE,
++	HB_DEV_UNSUPPORTED,
++};
++
++struct adf_heartbeat {
++	unsigned int hb_sent_counter;
++	unsigned int hb_failed_counter;
++	unsigned int hb_timer;
++	u64 last_hb_check_time;
++	struct hb_dma_addr {
++		dma_addr_t phy_addr;
++		void *virt_addr;
++	} dma;
++	struct {
++		struct dentry *base_dir;
++		struct dentry *status;
++		struct dentry *cfg;
++		struct dentry *sent;
++		struct dentry *failed;
++	} dbgfs;
++};
++
++#ifdef CONFIG_DEBUG_FS
++int adf_heartbeat_init(struct adf_accel_dev *accel_dev);
++int adf_heartbeat_start(struct adf_accel_dev *accel_dev);
++void adf_heartbeat_shutdown(struct adf_accel_dev *accel_dev);
++
++int adf_heartbeat_ms_to_ticks(struct adf_accel_dev *accel_dev, unsigned int time_ms,
++			      uint32_t *value);
++int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
++				 unsigned int timer_ms);
++void adf_heartbeat_status(struct adf_accel_dev *accel_dev,
++			  enum adf_device_heartbeat_status *hb_status);
++
++#else
++static inline int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
++{
++	return 0;
++}
++
++static inline int adf_heartbeat_start(struct adf_accel_dev *accel_dev)
++{
++	return 0;
++}
++
++static inline void adf_heartbeat_shutdown(struct adf_accel_dev *accel_dev)
++{
++}
++
++static inline int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
++					       unsigned int timer_ms)
++{
++	return 0;
++}
++#endif
++#endif /* ADF_HEARTBEAT_H_ */
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
+new file mode 100644
+index 000000000000..803cbfd838f0
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
+@@ -0,0 +1,194 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2023 Intel Corporation */
++
++#include <linux/debugfs.h>
++#include <linux/errno.h>
++#include <linux/export.h>
++#include <linux/fs.h>
++#include <linux/kernel.h>
++#include <linux/kstrtox.h>
++#include <linux/types.h>
++#include "adf_cfg.h"
++#include "adf_common_drv.h"
++#include "adf_heartbeat.h"
++#include "adf_heartbeat_dbgfs.h"
++
++#define HB_OK 0
++#define HB_ERROR -1
++#define HB_STATUS_MAX_STRLEN 4
++#define HB_STATS_MAX_STRLEN 16
++
++static ssize_t adf_hb_stats_read(struct file *file, char __user *user_buffer,
++				 size_t count, loff_t *ppos)
++{
++	char buf[HB_STATS_MAX_STRLEN];
++	unsigned int *value;
++	int len;
++
++	if (*ppos > 0)
++		return 0;
++
++	value = file->private_data;
++	len = scnprintf(buf, sizeof(buf), "%u\n", *value);
++
++	return simple_read_from_buffer(user_buffer, count, ppos, buf, len + 1);
++}
++
++static const struct file_operations adf_hb_stats_fops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = adf_hb_stats_read,
++};
++
++static ssize_t adf_hb_status_read(struct file *file, char __user *user_buf,
++				  size_t count, loff_t *ppos)
++{
++	enum adf_device_heartbeat_status hb_status;
++	char ret_str[HB_STATUS_MAX_STRLEN];
++	struct adf_accel_dev *accel_dev;
++	int ret_code;
++	size_t len;
++
++	if (*ppos > 0)
++		return 0;
++
++	accel_dev = file->private_data;
++	ret_code = HB_OK;
++
++	adf_heartbeat_status(accel_dev, &hb_status);
++
++	if (hb_status != HB_DEV_ALIVE)
++		ret_code = HB_ERROR;
++
++	len = scnprintf(ret_str, sizeof(ret_str), "%d\n", ret_code);
++
++	return simple_read_from_buffer(user_buf, count, ppos, ret_str, len + 1);
++}
++
++static const struct file_operations adf_hb_status_fops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = adf_hb_status_read,
++};
++
++static ssize_t adf_hb_cfg_read(struct file *file, char __user *user_buf,
++			       size_t count, loff_t *ppos)
++{
++	char timer_str[ADF_CFG_MAX_VAL_LEN_IN_BYTES];
++	struct adf_accel_dev *accel_dev;
++	unsigned int timer_ms;
++	int len;
++
++	if (*ppos > 0)
++		return 0;
++
++	accel_dev = file->private_data;
++	timer_ms = accel_dev->heartbeat->hb_timer;
++	len = scnprintf(timer_str, sizeof(timer_str), "%u\n", timer_ms);
++
++	return simple_read_from_buffer(user_buf, count, ppos, timer_str,
++				       len + 1);
++}
++
++static ssize_t adf_hb_cfg_write(struct file *file, const char __user *user_buf,
++				size_t count, loff_t *ppos)
++{
++	char input_str[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = { };
++	struct adf_accel_dev *accel_dev;
++	int ret, written_chars;
++	unsigned int timer_ms;
++	u32 ticks;
++
++	accel_dev = file->private_data;
++	timer_ms = ADF_CFG_HB_TIMER_DEFAULT_MS;
++
++	/* last byte left as string termination */
++	if (count > sizeof(input_str) - 1)
++		return -EINVAL;
++
++	written_chars = simple_write_to_buffer(input_str, sizeof(input_str) - 1,
++					       ppos, user_buf, count);
++	if (written_chars > 0) {
++		ret = kstrtouint(input_str, 10, &timer_ms);
++		if (ret) {
++			dev_err(&GET_DEV(accel_dev),
++				"heartbeat_cfg: Invalid value\n");
++			return ret;
++		}
++
++		if (timer_ms < ADF_CFG_HB_TIMER_MIN_MS) {
++			dev_err(&GET_DEV(accel_dev),
++				"heartbeat_cfg: Invalid value\n");
++			return -EINVAL;
++		}
++
++		/*
++		 * On 4xxx devices adf_timer is responsible for HB updates and
++		 * its period is fixed to 200ms
++		 */
++		if (accel_dev->timer)
++			timer_ms = ADF_CFG_HB_TIMER_MIN_MS;
++
++		ret = adf_heartbeat_save_cfg_param(accel_dev, timer_ms);
++		if (ret)
++			return ret;
++
++		ret = adf_heartbeat_ms_to_ticks(accel_dev, timer_ms, &ticks);
++		if (ret)
++			return ret;
++
++		ret = adf_send_admin_hb_timer(accel_dev, ticks);
++		if (ret)
++			return ret;
++
++		accel_dev->heartbeat->hb_timer = timer_ms;
++	}
++
++	return written_chars;
++}
++
++static const struct file_operations adf_hb_cfg_fops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = adf_hb_cfg_read,
++	.write = adf_hb_cfg_write,
++};
++
++void adf_heartbeat_dbgfs_add(struct adf_accel_dev *accel_dev)
++{
++	struct adf_heartbeat *hb = accel_dev->heartbeat;
++
++	if (!hb)
++		return;
++
++	hb->dbgfs.base_dir = debugfs_create_dir("heartbeat", accel_dev->debugfs_dir);
++	hb->dbgfs.status = debugfs_create_file("status", 0400, hb->dbgfs.base_dir,
++					       accel_dev, &adf_hb_status_fops);
++	hb->dbgfs.sent = debugfs_create_file("queries_sent", 0400, hb->dbgfs.base_dir,
++					     &hb->hb_sent_counter, &adf_hb_stats_fops);
++	hb->dbgfs.failed = debugfs_create_file("queries_failed", 0400, hb->dbgfs.base_dir,
++					       &hb->hb_failed_counter, &adf_hb_stats_fops);
++	hb->dbgfs.cfg = debugfs_create_file("config", 0600, hb->dbgfs.base_dir,
++					    accel_dev, &adf_hb_cfg_fops);
++}
++EXPORT_SYMBOL_GPL(adf_heartbeat_dbgfs_add);
++
++void adf_heartbeat_dbgfs_rm(struct adf_accel_dev *accel_dev)
++{
++	struct adf_heartbeat *hb = accel_dev->heartbeat;
++
++	if (!hb)
++		return;
++
++	debugfs_remove(hb->dbgfs.status);
++	hb->dbgfs.status = NULL;
++	debugfs_remove(hb->dbgfs.sent);
++	hb->dbgfs.sent = NULL;
++	debugfs_remove(hb->dbgfs.failed);
++	hb->dbgfs.failed = NULL;
++	debugfs_remove(hb->dbgfs.cfg);
++	hb->dbgfs.cfg = NULL;
++	debugfs_remove(hb->dbgfs.base_dir);
++	hb->dbgfs.base_dir = NULL;
++}
++EXPORT_SYMBOL_GPL(adf_heartbeat_dbgfs_rm);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h
+new file mode 100644
+index 000000000000..84dd29ea6454
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2023 Intel Corporation */
++
++#ifndef ADF_HEARTBEAT_DBGFS_H_
++#define ADF_HEARTBEAT_DBGFS_H_
++
++struct adf_accel_dev;
++
++void adf_heartbeat_dbgfs_add(struct adf_accel_dev *accel_dev);
++void adf_heartbeat_dbgfs_rm(struct adf_accel_dev *accel_dev);
++
++#endif /* ADF_HEARTBEAT_DBGFS_H_ */
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
+index 53fca6a7e2af..89001fe92e76 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_init.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
+@@ -8,6 +8,7 @@
+ #include "adf_cfg.h"
+ #include "adf_common_drv.h"
+ #include "adf_dbgfs.h"
++#include "adf_heartbeat.h"
+ 
+ static LIST_HEAD(service_table);
+ static DEFINE_MUTEX(service_lock);
+@@ -129,6 +130,8 @@ static int adf_dev_init(struct adf_accel_dev *accel_dev)
+ 			return -EFAULT;
+ 	}
+ 
++	adf_heartbeat_init(accel_dev);
++
+ 	/*
+ 	 * Subservice initialisation is divided into two stages: init and start.
+ 	 * This is to facilitate any ordering dependencies between services
+@@ -204,6 +207,8 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
+ 		}
+ 	}
+ 
++	adf_heartbeat_start(accel_dev);
++
+ 	list_for_each(list_itr, &service_table) {
+ 		service = list_entry(list_itr, struct service_hndl, list);
+ 		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
+@@ -347,6 +352,8 @@ static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
+ 			clear_bit(accel_dev->accel_id, service->init_status);
+ 	}
+ 
++	adf_heartbeat_shutdown(accel_dev);
++
+ 	hw_data->disable_iov(accel_dev);
+ 
+ 	if (test_bit(ADF_STATUS_IRQ_ALLOCATED, &accel_dev->status)) {
 diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-index 6ea19b4fb0ce..e836fbaeec62 100644
+index e836fbaeec62..3e968a4bcc9c 100644
 --- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
 +++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
 @@ -16,6 +16,7 @@ enum icp_qat_fw_init_admin_cmd_id {
  	ICP_QAT_FW_HEARTBEAT_SYNC = 7,
  	ICP_QAT_FW_HEARTBEAT_GET = 8,
  	ICP_QAT_FW_COMP_CAPABILITY_GET = 9,
-+	ICP_QAT_FW_TIMER_GET = 19,
++	ICP_QAT_FW_HEARTBEAT_TIMER_SET = 13,
+ 	ICP_QAT_FW_TIMER_GET = 19,
  	ICP_QAT_FW_PM_STATE_CONFIG = 128,
  };
+@@ -41,6 +42,9 @@ struct icp_qat_fw_init_admin_req {
+ 		struct {
+ 			__u32 int_timer_ticks;
+ 		};
++		struct {
++			__u32 heartbeat_ticks;
++		};
+ 		__u32 idle_filter;
+ 	};
  
 diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index 1ebe0b351fae..c57403a6fbac 100644
+index c57403a6fbac..8fbab905c5cc 100644
 --- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
 +++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -44,6 +44,14 @@ static u32 get_misc_bar_id(struct adf_hw_device_data *self)
- 	return ADF_DH895XCC_PMISC_BAR;
- }
- 
-+static u32 get_ts_clock(struct adf_hw_device_data *self)
-+{
-+	/*
-+	 * Timestamp update interval is 16 AE clock ticks for dh895xcc.
-+	 */
-+	return self->clock_frequency / 16;
-+}
-+
- static u32 get_etr_bar_id(struct adf_hw_device_data *self)
- {
- 	return ADF_DH895XCC_ETR_BAR;
-@@ -237,6 +245,8 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
- 	hw_data->reset_device = adf_reset_sbr;
- 	hw_data->disable_iov = adf_disable_sriov;
+@@ -247,6 +247,7 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
  	hw_data->dev_config = adf_gen2_dev_config;
-+	hw_data->clock_frequency = ADF_DH895X_AE_FREQ;
-+	hw_data->get_hb_clock = get_ts_clock;
+ 	hw_data->clock_frequency = ADF_DH895X_AE_FREQ;
+ 	hw_data->get_hb_clock = get_ts_clock;
++	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
  
  	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
  	hw_data->pfvf_ops.enable_vf2pf_interrupts = enable_vf2pf_interrupts;
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-index 7b674bbe4192..cd3a21985455 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h
-@@ -3,6 +3,8 @@
- #ifndef ADF_DH895x_HW_DATA_H_
- #define ADF_DH895x_HW_DATA_H_
- 
-+#include <linux/units.h>
-+
- /* PCIe configuration space */
- #define ADF_DH895XCC_SRAM_BAR 0
- #define ADF_DH895XCC_PMISC_BAR 1
-@@ -30,6 +32,9 @@
- #define ADF_DH895XCC_AE2FUNC_MAP_GRP_A_NUM_REGS 96
- #define ADF_DH895XCC_AE2FUNC_MAP_GRP_B_NUM_REGS 12
- 
-+/* Clocks frequency */
-+#define ADF_DH895X_AE_FREQ (933 * HZ_PER_MHZ)
-+
- /* FW names */
- #define ADF_DH895XCC_FW "qat_895xcc.bin"
- #define ADF_DH895XCC_MMP "qat_895xcc_mmp.bin"
 -- 
 2.40.1
 
