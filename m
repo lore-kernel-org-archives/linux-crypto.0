@@ -2,296 +2,206 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0444EEB64DC
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 13:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C29EB64D8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 15:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232360AbjFTNYL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 09:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56352 "EHLO
+        id S233484AbjFTPAU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 11:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232445AbjFTNXx (ORCPT
+        with ESMTP id S233620AbjFTPAH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 09:23:53 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC7C1BC3
-        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 06:23:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687267388; x=1718803388;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UkvBzDfs02XhTEtfgb3b4jtKFXkM4YaMgh7b2eCJbJg=;
-  b=l0jZz7InOsfYFvZ3AavsMF6h3pLe3KEl3NBriO7Nvl/dDbnd+jMGaTjW
-   CtoSucLKdnhqziFiwiRAP/QFjMrXxTeKZbzx0uyW3HW/zR4Gfios7bXrD
-   tCpAtzqw4T6GyEhmg2cfKuJSNJ7PEtXsTtNgT8BAE0DIfheHaf5KEhR9b
-   jEy2hGhwK2djA2JiJ5/A7LAgXMZGK0FHCBoQFLJuxDQretnsQHOSyhLVF
-   UdSfF7619qRkQ3OkYzVi4XQrj6+OcGcDHaZW/Ib61iPpPONgRQTnnIGvI
-   0KKdfJu2aadg77fDtuW8j8KXCYdZ5lI/rFXz2zKIQftjBEoSxA1aM8XLB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446229853"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="446229853"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 06:23:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="743785570"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="743785570"
-Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by orsmga008.jf.intel.com with ESMTP; 20 Jun 2023 06:23:00 -0700
-From:   Damian Muszynski <damian.muszynski@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v2 5/5] crypto: qat - add heartbeat counters check
-Date:   Tue, 20 Jun 2023 15:08:23 +0200
-Message-Id: <20230620130823.27004-6-damian.muszynski@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230620130823.27004-1-damian.muszynski@intel.com>
-References: <20230620130823.27004-1-damian.muszynski@intel.com>
+        Tue, 20 Jun 2023 11:00:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B05E1FFB
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 07:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687273091;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=096kfvQCNbO3jjvPJlb61wpL4gpNse4m8jbz5dQcH+U=;
+        b=jJTRucX8EYRuvzYvlFnem3NIEIUK/eLoDELWDCnFK11LqFdhFZVjQIwjWsaYqIHH/d9LjC
+        9gzW0uOn7fUMyXJa+ujb8XAsy7GJwd365VOj1CyiR1M8czKxiMY1D6MburLrgBCRtYNK0/
+        32xVe/ZdG9eFt/WqT7tiLxDmXAM8Ljg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-246-cetdja7_MNaYUIl_PdTHIQ-1; Tue, 20 Jun 2023 10:58:01 -0400
+X-MC-Unique: cetdja7_MNaYUIl_PdTHIQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D63E710665CD;
+        Tue, 20 Jun 2023 14:54:49 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D321E40C6CD2;
+        Tue, 20 Jun 2023 14:54:46 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
+        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
+        tipc-discussion@lists.sourceforge.net,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH net-next v3 18/18] net: Kill MSG_SENDPAGE_NOTLAST
+Date:   Tue, 20 Jun 2023 15:53:37 +0100
+Message-ID: <20230620145338.1300897-19-dhowells@redhat.com>
+In-Reply-To: <20230620145338.1300897-1-dhowells@redhat.com>
+References: <20230620145338.1300897-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A firmware update for QAT GEN2 changed the format of a data
-structure used to report the heartbeat counters.
+Now that ->sendpage() has been removed, MSG_SENDPAGE_NOTLAST can be cleaned
+up.  Things were converted to use MSG_MORE instead, but the protocol
+sendpage stubs still convert MSG_SENDPAGE_NOTLAST to MSG_MORE, which is now
+unnecessary.
 
-To support all firmware versions, extend the heartbeat logic
-with an algorithm that detects the number of counters returned
-by firmware. The algorithm detects the number of counters to
-be used (and size of the corresponding data structure) by the
-comparison the expected size of the data in memory, with the data
-which was written by the firmware.
-
-Firmware detection is done one time during the first read of heartbeat
-debugfs file to avoid increasing the time needed to load the module.
-
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: bpf@vger.kernel.org
+cc: dccp@vger.kernel.org
+cc: linux-afs@lists.infradead.org
+cc: linux-arm-msm@vger.kernel.org
+cc: linux-can@vger.kernel.org
+cc: linux-crypto@vger.kernel.org
+cc: linux-doc@vger.kernel.org
+cc: linux-hams@vger.kernel.org
+cc: linux-perf-users@vger.kernel.org
+cc: linux-rdma@vger.kernel.org
+cc: linux-sctp@vger.kernel.org
+cc: linux-wpan@vger.kernel.org
+cc: linux-x25@vger.kernel.org
+cc: mptcp@lists.linux.dev
+cc: netdev@vger.kernel.org
+cc: rds-devel@oss.oracle.com
+cc: tipc-discussion@lists.sourceforge.net
+cc: virtualization@lists.linux-foundation.org
 ---
- .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  2 +
- .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |  2 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  1 +
- .../intel/qat/qat_common/adf_heartbeat.c      | 68 +++++++++++++++++++
- .../intel/qat/qat_common/adf_heartbeat.h      |  6 ++
- .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  2 +
- 6 files changed, 81 insertions(+)
 
-diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-index e81d11409426..9c00c441b602 100644
---- a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-@@ -8,6 +8,7 @@
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_c3xxx_hw_data.h"
-+#include "adf_heartbeat.h"
- #include "icp_qat_hw.h"
+Notes:
+    ver #3)
+     - tcp_bpf is now handled by an earlier patch.
+
+ include/linux/socket.h                         | 4 +---
+ net/tls/tls_device.c                           | 3 +--
+ net/tls/tls_main.c                             | 2 +-
+ net/tls/tls_sw.c                               | 2 +-
+ tools/perf/trace/beauty/include/linux/socket.h | 1 -
+ tools/perf/trace/beauty/msg_flags.c            | 3 ---
+ 6 files changed, 4 insertions(+), 11 deletions(-)
+
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index 58204700018a..39b74d83c7c4 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -319,7 +319,6 @@ struct ucred {
+ #define MSG_MORE	0x8000	/* Sender will send more */
+ #define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
+ #define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
+-#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
+ #define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
+ #define MSG_EOF         MSG_FIN
+ #define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
+@@ -341,8 +340,7 @@ struct ucred {
  
- /* Worker thread to service arbiter mappings */
-@@ -153,6 +154,7 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->measure_clock = measure_clock;
- 	hw_data->get_hb_clock = get_ts_clock;
- 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
-+	hw_data->check_hb_ctrs = adf_heartbeat_check_ctrs;
+ /* Flags to be cleared on entry by sendmsg and sendmmsg syscalls */
+ #define MSG_INTERNAL_SENDMSG_FLAGS \
+-	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_NOTLAST | \
+-	 MSG_SENDPAGE_DECRYPTED)
++	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED)
  
- 	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-index 1a8c8e3a48e9..355a781693eb 100644
---- a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-@@ -8,6 +8,7 @@
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_c62x_hw_data.h"
-+#include "adf_heartbeat.h"
- #include "icp_qat_hw.h"
+ /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
+ #define SOL_IP		0
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index 840ee06f1708..2021fe557e50 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -441,8 +441,7 @@ static int tls_push_data(struct sock *sk,
+ 	long timeo;
  
- /* Worker thread to service arbiter mappings */
-@@ -155,6 +156,7 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
- 	hw_data->measure_clock = measure_clock;
- 	hw_data->get_hb_clock = get_ts_clock;
- 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
-+	hw_data->check_hb_ctrs = adf_heartbeat_check_ctrs;
+ 	if (flags &
+-	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SENDPAGE_NOTLAST |
+-	      MSG_SPLICE_PAGES))
++	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SPLICE_PAGES))
+ 		return -EOPNOTSUPP;
  
- 	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index ab897e1717e0..e57abde66f4f 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -190,6 +190,7 @@ struct adf_hw_device_data {
- 	int (*send_admin_init)(struct adf_accel_dev *accel_dev);
- 	int (*start_timer)(struct adf_accel_dev *accel_dev);
- 	void (*stop_timer)(struct adf_accel_dev *accel_dev);
-+	void (*check_hb_ctrs)(struct adf_accel_dev *accel_dev);
- 	uint32_t (*get_hb_clock)(struct adf_hw_device_data *self);
- 	int (*measure_clock)(struct adf_accel_dev *accel_dev);
- 	int (*init_arb)(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-index 7358aac8e56d..beef9a5f6c75 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-@@ -20,6 +20,8 @@
- #include "adf_transport_internal.h"
- #include "icp_qat_fw_init_admin.h"
- 
-+#define ADF_HB_EMPTY_SIG 0xA5A5A5A5
-+
- /* Heartbeat counter pair */
- struct hb_cnt_pair {
- 	__u16 resp_heartbeat_cnt;
-@@ -42,6 +44,57 @@ static int adf_hb_check_polling_freq(struct adf_accel_dev *accel_dev)
- 	return 0;
- }
- 
-+/**
-+ * validate_hb_ctrs_cnt() - checks if the number of heartbeat counters should
-+ * be updated by one to support the currently loaded firmware.
-+ * @accel_dev: Pointer to acceleration device.
-+ *
-+ * Return:
-+ * * true - hb_ctrs must increased by ADF_NUM_PKE_STRAND
-+ * * false - no changes needed
-+ */
-+static bool validate_hb_ctrs_cnt(struct adf_accel_dev *accel_dev)
-+{
-+	const size_t hb_ctrs = accel_dev->hw_device->num_hb_ctrs;
-+	const size_t max_aes = accel_dev->hw_device->num_engines;
-+	const size_t hb_struct_size = sizeof(struct hb_cnt_pair);
-+	const size_t exp_diff_size = array3_size(ADF_NUM_PKE_STRAND, max_aes,
-+						 hb_struct_size);
-+	const size_t dev_ctrs = size_mul(max_aes, hb_ctrs);
-+	const size_t stats_size = size_mul(dev_ctrs, hb_struct_size);
-+	const u32 exp_diff_cnt = exp_diff_size / sizeof(u32);
-+	const u32 stats_el_cnt = stats_size / sizeof(u32);
-+	struct hb_cnt_pair *hb_stats = accel_dev->heartbeat->dma.virt_addr;
-+	const u32 *mem_to_chk = (u32 *)(hb_stats + dev_ctrs);
-+	u32 el_diff_cnt = 0;
-+	int i;
-+
-+	/* count how many bytes are different from pattern */
-+	for (i = 0; i < stats_el_cnt; i++) {
-+		if (mem_to_chk[i] == ADF_HB_EMPTY_SIG)
-+			break;
-+
-+		el_diff_cnt++;
-+	}
-+
-+	return el_diff_cnt && el_diff_cnt == exp_diff_cnt;
-+}
-+
-+void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev)
-+{
-+	struct hb_cnt_pair *hb_stats = accel_dev->heartbeat->dma.virt_addr;
-+	const size_t hb_ctrs = accel_dev->hw_device->num_hb_ctrs;
-+	const size_t max_aes = accel_dev->hw_device->num_engines;
-+	const size_t dev_ctrs = size_mul(max_aes, hb_ctrs);
-+	const size_t stats_size = size_mul(dev_ctrs, sizeof(struct hb_cnt_pair));
-+	const size_t mem_items_to_fill = size_mul(stats_size, 2) / sizeof(u32);
-+
-+	/* fill hb stats memory with pattern */
-+	memset32((uint32_t *)hb_stats, ADF_HB_EMPTY_SIG, mem_items_to_fill);
-+	accel_dev->heartbeat->ctrs_cnt_checked = false;
-+}
-+EXPORT_SYMBOL_GPL(adf_heartbeat_check_ctrs);
-+
- static int get_timer_ticks(struct adf_accel_dev *accel_dev, unsigned int *value)
+ 	if (unlikely(sk->sk_err))
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index d5ed4d47b16e..b6896126bb92 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -127,7 +127,7 @@ int tls_push_sg(struct sock *sk,
  {
- 	char timer_str[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = { };
-@@ -123,6 +176,13 @@ static int adf_hb_get_status(struct adf_accel_dev *accel_dev)
- 	size_t ae = 0;
+ 	struct bio_vec bvec;
+ 	struct msghdr msg = {
+-		.msg_flags = MSG_SENDPAGE_NOTLAST | MSG_SPLICE_PAGES | flags,
++		.msg_flags = MSG_SPLICE_PAGES | flags,
+ 	};
  	int ret = 0;
+ 	struct page *p;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 9b3aa89a4292..53f944e6d8ef 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1194,7 +1194,7 @@ int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
  
-+	if (!accel_dev->heartbeat->ctrs_cnt_checked) {
-+		if (validate_hb_ctrs_cnt(accel_dev))
-+			hw_device->num_hb_ctrs += ADF_NUM_PKE_STRAND;
-+
-+		accel_dev->heartbeat->ctrs_cnt_checked = true;
-+	}
-+
- 	live_stats = accel_dev->heartbeat->dma.virt_addr;
- 	last_stats = live_stats + dev_ctrs;
- 	count_fails = (u16 *)(last_stats + dev_ctrs);
-@@ -221,6 +281,11 @@ int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
- 	if (!hb->dma.virt_addr)
- 		goto err_free;
+ 	if (msg->msg_flags & ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
+ 			       MSG_CMSG_COMPAT | MSG_SPLICE_PAGES |
+-			       MSG_SENDPAGE_NOTLAST | MSG_SENDPAGE_NOPOLICY))
++			       MSG_SENDPAGE_NOPOLICY))
+ 		return -EOPNOTSUPP;
  
-+	/*
-+	 * Default set this flag as true to avoid unnecessary checks,
-+	 * it will be reset on platforms that need such a check
-+	 */
-+	hb->ctrs_cnt_checked = true;
- 	accel_dev->heartbeat = hb;
- 
- 	return 0;
-@@ -241,6 +306,9 @@ int adf_heartbeat_start(struct adf_accel_dev *accel_dev)
- 		return -EFAULT;
- 	}
- 
-+	if (accel_dev->hw_device->check_hb_ctrs)
-+		accel_dev->hw_device->check_hb_ctrs(accel_dev);
-+
- 	ret = get_timer_ticks(accel_dev, &timer_ticks);
- 	if (ret)
- 		return ret;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-index 297147f44150..b22e3cb29798 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-@@ -24,6 +24,7 @@ struct adf_heartbeat {
- 	unsigned int hb_failed_counter;
- 	unsigned int hb_timer;
- 	u64 last_hb_check_time;
-+	bool ctrs_cnt_checked;
- 	struct hb_dma_addr {
- 		dma_addr_t phy_addr;
- 		void *virt_addr;
-@@ -48,6 +49,7 @@ int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
- 				 unsigned int timer_ms);
- void adf_heartbeat_status(struct adf_accel_dev *accel_dev,
- 			  enum adf_device_heartbeat_status *hb_status);
-+void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev);
- 
- #else
- static inline int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
-@@ -69,5 +71,9 @@ static inline int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
- {
- 	return 0;
- }
-+
-+static inline void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev)
-+{
-+}
+ 	ret = mutex_lock_interruptible(&tls_ctx->tx_lock);
+diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
+index 13c3a237b9c9..3bef212a24d7 100644
+--- a/tools/perf/trace/beauty/include/linux/socket.h
++++ b/tools/perf/trace/beauty/include/linux/socket.h
+@@ -318,7 +318,6 @@ struct ucred {
+ #define MSG_MORE	0x8000	/* Sender will send more */
+ #define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
+ #define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
+-#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
+ #define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
+ #define MSG_EOF         MSG_FIN
+ #define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
+diff --git a/tools/perf/trace/beauty/msg_flags.c b/tools/perf/trace/beauty/msg_flags.c
+index ea68db08b8e7..b5b580e5a77e 100644
+--- a/tools/perf/trace/beauty/msg_flags.c
++++ b/tools/perf/trace/beauty/msg_flags.c
+@@ -8,9 +8,6 @@
+ #ifndef MSG_WAITFORONE
+ #define MSG_WAITFORONE		   0x10000
  #endif
- #endif /* ADF_HEARTBEAT_H_ */
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index 8fbab905c5cc..09551f949126 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -7,6 +7,7 @@
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_dh895xcc_hw_data.h"
-+#include "adf_heartbeat.h"
- #include "icp_qat_hw.h"
- 
- #define ADF_DH895XCC_VF_MSK	0xFFFFFFFF
-@@ -248,6 +249,7 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
- 	hw_data->clock_frequency = ADF_DH895X_AE_FREQ;
- 	hw_data->get_hb_clock = get_ts_clock;
- 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
-+	hw_data->check_hb_ctrs = adf_heartbeat_check_ctrs;
- 
- 	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	hw_data->pfvf_ops.enable_vf2pf_interrupts = enable_vf2pf_interrupts;
--- 
-2.40.1
+-#ifndef MSG_SENDPAGE_NOTLAST
+-#define MSG_SENDPAGE_NOTLAST	   0x20000
+-#endif
+ #ifndef MSG_FASTOPEN
+ #define MSG_FASTOPEN		0x20000000
+ #endif
 
