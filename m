@@ -2,134 +2,140 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23661C001B3
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 12:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7438EB64D8
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 13:23:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231975AbjFTM7X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 08:59:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40500 "EHLO
+        id S232950AbjFTNXl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 09:23:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231211AbjFTM7W (ORCPT
+        with ESMTP id S232949AbjFTNX0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 08:59:22 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF2810FF;
-        Tue, 20 Jun 2023 05:59:20 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-7624e8ceef7so346133885a.2;
-        Tue, 20 Jun 2023 05:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687265960; x=1689857960;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4RvNVFujZzQ9FH/nRDQhxgK8HOnuVe0ilksjI7/FigQ=;
-        b=V7CBqsvwa7HO9941Gx9rU48fbSNnkTARJq3hU0s4FJKqNq7uyQJvuWMi48BFYirjd9
-         Z+CSYTenkWtjPExrbuK55Lr4LajYIvMVcZS1i2H4hkmnnVf92/3eU5+256AdSIU7TTh1
-         xwVepNxy0+wSCXEIn2FLnq5fwolgWObqyrXGJD4a4dArZIDrRTCCQbOXeliLMdRNukOE
-         bfBqEL3D5v18ty2Fda4DTUDINVko/+/f9bRuKWlc9As/MXSXKCsqRSAvjLHgGSN+PYBz
-         OhKP930iRzIK8HICV0ZdtEG/GKM89Wb5av0m6K808diQPwrVMMP/ZUSrK2PjzRbzzuKs
-         Xiqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687265960; x=1689857960;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4RvNVFujZzQ9FH/nRDQhxgK8HOnuVe0ilksjI7/FigQ=;
-        b=TXgc61V4R/4/uHY2QZsPXgAX2Rf37It/aP8tEzZXkexa1Utxq2r8RE3sBLePmzTuoD
-         Dg/24MZVRUWEeB9qLSuWh9TxnBk3C9xAbLBjodnoCNHP4jSZs14NOCFeN5e5O5/OJJyU
-         9GE1yCOApc5CfQJxBmFnXVMD61xCjgHWd9RJT1do3WkwFPH0npMZTU3gKqWofrJdDGgu
-         qXndaATjAJrGxzyM2onxl5nsbdIT81r60FXCvnzC0rq/1EPneitwbOnIpJbj3rrubQw5
-         xJcJHr54Exltplonli1SVVhaeuevVfouQJAGylb1lVkNVADLArf5jY1csDryORRiJq3/
-         w1pg==
-X-Gm-Message-State: AC+VfDw+AvcpB+kzcrU2tO8dary8v4OzIEJ2EVlGXjUryXMHJcwWKhEV
-        ljMDIV+uw0uRJ28AUUbBK2o=
-X-Google-Smtp-Source: ACHHUZ5DO7ilI0HCjRl4Lbeq4UH3F7W+AS3gn0PcL1py6Hb93MUCpM1EgmXOFtEL5TVj5cEqHyVw6w==
-X-Received: by 2002:a05:6214:1306:b0:628:2e08:78b7 with SMTP id pn6-20020a056214130600b006282e0878b7mr5517848qvb.31.1687265959785;
-        Tue, 20 Jun 2023 05:59:19 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id m17-20020a0cf191000000b00631ecb1052esm1216204qvl.74.2023.06.20.05.59.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 05:59:19 -0700 (PDT)
-Date:   Tue, 20 Jun 2023 08:59:18 -0400
-From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To:     David Howells <dhowells@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc:     dhowells@redhat.com, netdev@vger.kernel.org,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
-        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
-        tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
-Message-ID: <6491a2a6f1488_3bcfec294d7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <784658.1687176327@warthog.procyon.org.uk>
-References: <648f36d02fe6e_33cfbc2944f@willemb.c.googlers.com.notmuch>
- <20230617121146.716077-1-dhowells@redhat.com>
- <20230617121146.716077-18-dhowells@redhat.com>
- <784658.1687176327@warthog.procyon.org.uk>
-Subject: Re: [PATCH net-next v2 17/17] net: Kill MSG_SENDPAGE_NOTLAST
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+        Tue, 20 Jun 2023 09:23:26 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA1295
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 06:22:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687267366; x=1718803366;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DBsshj8zPD0RwuetRjgBSSybmP0r0tlHF5tXEimYHm4=;
+  b=RtQtm0UtKhFTBO7acLFl/avddaP4N+g/2GPnCiHoCmnXcUgAZtXvOfGS
+   kysa19m1JILdPOE2JkXH6NZ4H2CY6vBTiwmUGLquchC4/uiXTc5/Y+u81
+   25GL6sA2u3sdq0Y6rr1eMkE8qP+WPBWhHm0gZzQVCcCv2igOgl9E0hvsN
+   uqAzzlsJr546BXwZlsaO0TOFZWSiSOasSDojnbQQk/aDuc97FMoYRcYx1
+   pilwu5ynCB1z5nfZ2celDbouzaq5OaygG9himVpuRcmZTWFZGqHpKbC8s
+   BpHSRcId2kGfa7woMq3YgJR4J87QYQoPyWLLmSxIa+QJIv7L86sXFfGVm
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446229721"
+X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
+   d="scan'208";a="446229721"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 06:22:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="743785377"
+X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
+   d="scan'208";a="743785377"
+Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by orsmga008.jf.intel.com with ESMTP; 20 Jun 2023 06:22:08 -0700
+From:   Damian Muszynski <damian.muszynski@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Damian Muszynski <damian.muszynski@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v2 0/5] crypto: qat - add heartbeat feature
+Date:   Tue, 20 Jun 2023 15:08:18 +0200
+Message-Id: <20230620130823.27004-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.40.1
+MIME-Version: 1.0
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-David Howells wrote:
-> Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
-> 
-> > Is it intentional to add MSG_MORE here in this patch?
-> > 
-> > I do see that patch 3 removes this branch:
-> 
-> Yeah.  I think I may have tcp_bpf a bit wrong with regard to handling
-> MSG_MORE.
-> 
-> How about the attached version of tcp_bpf_push()?
-> 
-> I wonder if it's save to move the setting of MSG_SENDPAGE_NOPOLICY out of the
-> loop as I've done here.  The caller holds the socket lock.
-> 
-> Also, I'm not sure whether to take account of apply/apply_bytes when setting
-> MSG_MORE mid-message, or whether to just go on whether we've reached
-> sge->length yet.  (I'm not sure exactly how tcp_bpf works).
+This set introduces support for the QAT heartbeat feature. It allows
+detection whenever device firmware or acceleration unit will hang.
+We're adding this feature to allow our clients having a tool with
+they could verify if all of the Quick Assist hardware resources are
+healthy and operational.
 
-I'm not very familiar with it either.
+QAT device firmware periodically writes counters to a specified physical
+memory location. A pair of counters per thread is incremented at
+the start and end of the main processing loop within the firmware.
+Checking for Heartbeat consists of checking the validity of the pair
+of counter values for each thread. Stagnant counters indicate
+a firmware hang.
 
-Instead of inferring whether MSG_MORE is safe to set, as below, sufficient to
-rely on the caller to pass it when appropriate?
+The first patch adds timestamp synchronization with the firmware.
+The second patch removes historical and never used HB definitions.
+Patch no. 3 is implementing the hardware clock frequency measuring
+interface.
+The fourth introduces the main heartbeat implementation with the debugfs
+interface.
+The last patch implements an algorithm that allows the code to detect
+which version of heartbeat API is used at the currently loaded firmware.
 
-size = min(apply_bytes, sge->length). I doubt that size < apply_bytes is
-ever intended.
+Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-And instead of this former branch
+Changes since v1:
+- fixed build errors on a few of architectures - replaced macro
+  DIV_ROUND_CLOSEST with DIV_ROUND_CLOSEST_ULL
+- included prerequisite patch "add internal timer for qat 4xxx" which initially
+  was sent separately as this patchset was still in developement.
+  - timer patch reworked to use delayed work as suggested by Herbert Xu
 
-                if (flags & MSG_SENDPAGE_NOTLAST)
-                        msghdr.msg_flags |= MSG_MORE;
+Damian Muszynski (5):
+  crypto: qat - add internal timer for qat 4xxx
+  crypto: qat - drop obsolete heartbeat interface
+  crypto: qat - add measure clock frequency
+  crypto: qat - add heartbeat feature
+  crypto: qat - add heartbeat counters check
 
-update any caller to pass MSG_MORE instead of MSG_SENDPAGE_NOTLAST, if not yet
-done so.
+ Documentation/ABI/testing/debugfs-driver-qat  |  51 +++
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  14 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   4 +
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   |   3 +
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  28 ++
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h   |   7 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |  28 ++
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.h     |   7 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   4 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  43 +++
+ .../intel/qat/qat_common/adf_cfg_strings.h    |   2 +
+ .../crypto/intel/qat/qat_common/adf_clock.c   | 127 +++++++
+ .../crypto/intel/qat/qat_common/adf_clock.h   |  14 +
+ .../intel/qat/qat_common/adf_common_drv.h     |   5 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   9 +-
+ .../intel/qat/qat_common/adf_gen2_config.c    |   7 +
+ .../intel/qat/qat_common/adf_gen2_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_timer.c     |  70 ++++
+ .../intel/qat/qat_common/adf_gen4_timer.h     |  21 ++
+ .../intel/qat/qat_common/adf_heartbeat.c      | 336 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_heartbeat.h      |  79 ++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.c      | 194 ++++++++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.h      |  12 +
+ .../crypto/intel/qat/qat_common/adf_init.c    |  28 ++
+ drivers/crypto/intel/qat/qat_common/adf_isr.c |   6 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |  23 +-
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  13 +
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   |   5 +
+ 30 files changed, 1143 insertions(+), 16 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h
 
-> 		msghdr.msg_flags = flags;
-> 
-> 		/* Determine if we need to set MSG_MORE. */
-> 		if (!(msghdr.msg_flags & MSG_MORE)) {
-> 			if (apply && size < apply_bytes)
-> 				msghdr.msg_flags |= MSG_MORE;
-> 			else if (!apply && size < sge->length &&
-> 				 msg->sg.start != msg->sg.end)
-> 				msghdr.msg_flags |= MSG_MORE;
-> 		}
+-- 
+2.40.1
+
