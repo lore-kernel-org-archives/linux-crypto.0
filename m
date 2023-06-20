@@ -2,163 +2,225 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DACD7EB64D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 20:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F164EB64DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 21:18:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbjFTUni (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 16:43:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40212 "EHLO
+        id S229786AbjFTVSv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 17:18:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbjFTUnh (ORCPT
+        with ESMTP id S229694AbjFTVSt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 16:43:37 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C93125;
-        Tue, 20 Jun 2023 13:43:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g9JADzDuirTzkC7AgMIjHRP6cy7Z5w3Hx1DTHJCWQV/VAGpTUQQZt5clWExcyzOGq2r0BAYMv/WBJflVnFoKgIArqocrrqC+sljNgnhrTQl1Kxx0SbF0o5dQT1fEBG5nrFYUlF729fCOyM+9Y4j67GL8JpCi2VTuSd/U76qswMOqpACPt3m22Y+WjfbSh/vhs0Nt3J2zPr2RQBm/5XuzD9wd+F9qntnu5dT2xY5LJ+YkAg70IKihcTmLrTGTyaMIMSqzMOFxoLuEWAl4cUOKVQRYw1I2a9JcIogUZWldw8fJt5DgWcxF+lCcby0Mwu4BxVYbuUy1R4eVljG7nC6a9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CwfQ/e8+tBEbHK2zEBAEbADi5TLtFWo+s3gGjkRKKUY=;
- b=CZ19TV+vtkmPAYGyLERQU3ZerlBV5v642q4T5pDd2BadMyqK7nmwez59uB88UFe4nrODlPf2k9oKnnEOcOoxBMR8G8h63OarVQdMSAAqzPmXcYa7uXv+DKwXOaqOmbE8IMsGAQbQZvu6KkbXcZwNO+CINh6TLBKzgqF81F1peDaPVQ/Q1esgsjSEgt685k4OvMObLTUwb2JlwqaOwizP1cid/tsBLr76TeMP3+04gsMx2o8Go9Ibb7EOahP3Rez95a5oiJDaSLi5cE+BoScyb3pFnn/4OYCLVJ6uQGEawZIVt+0PieQY99RLMcaR4wt5RsoyAjJzR7+6uVE+rDuEvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CwfQ/e8+tBEbHK2zEBAEbADi5TLtFWo+s3gGjkRKKUY=;
- b=jOrhUkERAcvHTz2Moeq6j7MsBildnvfoh/4jkvYd414kZQqni5OVCBmfnZ9LUVL39ABaifGDt2VYnrcBu4QuVWv5In4+gSynzByjztLUJy7btXeDyx9TUbJt/6fVPdJn5q5wrBk+1jSudmrtVvcyWL2YOqBgfTKkoYNU4qbEemo=
-Received: from SA1P222CA0179.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:3c4::9)
- by BY5PR12MB4999.namprd12.prod.outlook.com (2603:10b6:a03:1da::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Tue, 20 Jun
- 2023 20:43:30 +0000
-Received: from SN1PEPF0002636B.namprd02.prod.outlook.com
- (2603:10b6:806:3c4:cafe::f1) by SA1P222CA0179.outlook.office365.com
- (2603:10b6:806:3c4::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.45 via Frontend
- Transport; Tue, 20 Jun 2023 20:43:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002636B.mail.protection.outlook.com (10.167.241.136) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6521.17 via Frontend Transport; Tue, 20 Jun 2023 20:43:30 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 20 Jun
- 2023 15:43:29 -0500
-Date:   Tue, 20 Jun 2023 15:43:15 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
-        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
-        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
-        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <vbabka@suse.cz>,
-        <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [PATCH RFC v9 05/51] x86/coco: move CONFIG_HAS_CC_PLATFORM check
- down into coco/Makefile
-Message-ID: <20230620204315.xr7wtcrowc7oprka@amd.com>
+        Tue, 20 Jun 2023 17:18:49 -0400
+Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1724B132;
+        Tue, 20 Jun 2023 14:18:48 -0700 (PDT)
+Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-1a98a7fde3fso4923966fac.3;
+        Tue, 20 Jun 2023 14:18:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687295927; x=1689887927;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pPIrkDOEnetRxudGIQqwVRWbtrDT/RDlBKZ80849Peg=;
+        b=jYUxatN9gZBGTUs0XIxhoKSn1D5lt5Y5Vxr5pBmpTD1cGve3wFw3YrEJd1ECpInXH8
+         9gPsSUYOVuUc9i0Kah4UzDCbB/pFdnB47txwId6sW6GwBrUzT4vDUimtQmIO/XI4xuqp
+         NlJz8VrScTNqLft0nR6MYiSMpTkf8srTxaYuThtjytTPBqt6XNGURjV7pA0JHDQkg/v/
+         SsQZJrIfsWqTLEBF0CNxMCDzWSuR3ncxGKx1HJEDdpM38eCtXXI14KOsZVydct8SwggE
+         2Xbs7OJRYrqGD/0rBBj8kz7R1QdSRY+1A9vq/M8zFNga2fFJBkeo1w9T5JOsT0zPQXMQ
+         O7gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687295927; x=1689887927;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pPIrkDOEnetRxudGIQqwVRWbtrDT/RDlBKZ80849Peg=;
+        b=PnxrGcTy6F+WLAPat6AiH8Atr5dnk7rRyIs1QcGO3loXToi+E7Y8nqgijiNks3n7wi
+         SGZrE6GGwDHWA3oVsP5LLHJSRCq6OTttVK44aeIwEHBHidhHfXl0QhfDmQEKzv7JHCvj
+         Buu7VpaoWi4MmnJUhC4GTDSqnS2/PlcpucMuKUrYA0ksfa+uqBQV9vnkM4SyQEWGgqDk
+         0AR8kMQXeNWue5qQSCcXffkObjUWl7+POkKvGky1I9KNi/TH8dl8wNHYX1xO9R9E7T5m
+         yAFHoPXiF1jScKL435qGniEyZUlzR4EqzwyBpB196+cDYH3lepdRUmYuJN/EIzOoixyN
+         4qSQ==
+X-Gm-Message-State: AC+VfDxfmhC0E0QlkKc9v4eW5DZgUYwPe3kaSXigio+GvjtCaoi//Dqg
+        FHNyIBKTnwwAwY2eQ6CIJ00=
+X-Google-Smtp-Source: ACHHUZ5IJr0CXOlTtOybC0Ytm0ge2PHofa8ddUm0IVeq3u7zpfVE/i4EfefH19Y8S38FSxTm/LLAPw==
+X-Received: by 2002:a05:6870:ab84:b0:1a3:67a6:4676 with SMTP id gs4-20020a056870ab8400b001a367a64676mr13548407oab.29.1687295927231;
+        Tue, 20 Jun 2023 14:18:47 -0700 (PDT)
+Received: from localhost ([192.55.54.50])
+        by smtp.gmail.com with ESMTPSA id fs9-20020a17090af28900b00256504e0937sm7763908pjb.34.2023.06.20.14.18.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jun 2023 14:18:46 -0700 (PDT)
+Date:   Tue, 20 Jun 2023 14:18:45 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com
+Subject: Re: [PATCH RFC v9 04/51] KVM: x86: Determine shared/private faults
+ using a configurable mask
+Message-ID: <20230620211845.GV2244082@ls.amr.corp.intel.com>
 References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-6-michael.roth@amd.com>
- <20230620120920.GAZJGW8B6XHrsoLGCJ@fat_crate.local>
+ <20230612042559.375660-5-michael.roth@amd.com>
+ <20230614164709.GT2244082@ls.amr.corp.intel.com>
+ <20230620202841.7qizls3u3kcck45g@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230620120920.GAZJGW8B6XHrsoLGCJ@fat_crate.local>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636B:EE_|BY5PR12MB4999:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba0eb223-25c3-4014-2738-08db71cf0182
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QFJwbo8fmV8FuP8nhC59bSKnyQVLXUBBKPXdnrooa+wPHLQOm4bb0v4M8gJZT0DlwjyrqgtsLJLpk6U8aM5X1gGG9Sa4QvX52bwCXgFnyOHZxHAVCOIgzAFOL4gZJVqRxSVJnDSKsQIEByZDihILWfyR/zgJiyfTbxd+Yn1Mcb+M67vPWQLDJgOTWskdY4+r9TLGqP5P8wlUe0pKWyIRKZ6hxR6u8ySn8UHPHcg1WPiiWd9Lkp/4pTikrtfcjZ8nzkBMrskYeoNEKAyHvSE1W3/nbYxoHFjAEYsU+jngGVZvZ9a8d/cA9BEN7+wygiAGeLj3sLZfiKWCW2npqZuTiZCLePis/84qi1ALSi7i7DhZn964ciXbFwwIVXIRdZpAnOeeGx61gAiZhbb2Bqv7jvHRu9NXv+zrASFsBB1ahdVjrP6BFalbzYro56r/RzBCMA6oMqqD4J7VXAq6YOWM6nfXSfJQN9MIDuNtwD/+X66orc6LFzuRzOSvgThor5SrMnLJHxI+Pd1D6OpbsE5HJF5AroMJi+bKbmtpu5qTc7ReYue8AkFOto1kjFWAeKz9RtJn04Hgb+ZhjOTMdlxKy79iP70JkBFO7XcyQkJKnrr9cjqm+eOjh2vV8ttdvi1oroFXh8mXU6dmDRaiwNGW8KAAgpof8NKpkU142AhbWCe4oK97MQx6WYzPnIvBnQCxHwlqnyrZw07Eiog0rz33tT8931VmsOsftTS6TcWQQbksVJDGpMu2y+ejDVkp3wzcpu7eW/LNMwTpq+vUvDvcE0kz1PqtUNWfruJLEh2GJBk=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(39860400002)(451199021)(46966006)(36840700001)(40470700004)(478600001)(186003)(16526019)(966005)(6666004)(47076005)(86362001)(26005)(1076003)(54906003)(2616005)(316002)(336012)(426003)(82740400003)(70206006)(81166007)(6916009)(70586007)(4326008)(356005)(36860700001)(8936002)(5660300002)(7416002)(44832011)(7406005)(2906002)(40460700003)(8676002)(41300700001)(36756003)(40480700001)(82310400005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 20:43:30.0064
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba0eb223-25c3-4014-2738-08db71cf0182
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1PEPF0002636B.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4999
+In-Reply-To: <20230620202841.7qizls3u3kcck45g@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 20, 2023 at 02:09:20PM +0200, Borislav Petkov wrote:
-> On Sun, Jun 11, 2023 at 11:25:13PM -0500, Michael Roth wrote:
-> > Currently CONFIG_HAS_CC_PLATFORM is a prereq for building anything in
-> 					^^^^^^
-> 
-> Use proper english words pls.
-> 
-> > arch/x86/coco, but that is generally only applicable for guest support.
+On Tue, Jun 20, 2023 at 03:28:41PM -0500,
+Michael Roth <michael.roth@amd.com> wrote:
+
+> On Wed, Jun 14, 2023 at 09:47:09AM -0700, Isaku Yamahata wrote:
+> > On Sun, Jun 11, 2023 at 11:25:12PM -0500,
+> > Michael Roth <michael.roth@amd.com> wrote:
 > > 
-> > For SEV-SNP, helpers related purely to host support will also live in
-> > arch/x86/coco. To allow for CoCo-related host support code in
-> > arch/x86/coco, move that check down into the Makefile and check for it
-> > specifically when needed.
+> > > This will be used to determine whether or not an #NPF should be serviced
+> > > using a normal page vs. a guarded/gmem one.
+> > > 
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >  arch/x86/include/asm/kvm_host.h |  7 +++++++
+> > >  arch/x86/kvm/mmu/mmu_internal.h | 35 ++++++++++++++++++++++++++++++++-
+> > >  2 files changed, 41 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index b3bd24f2a390..c26f76641121 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1445,6 +1445,13 @@ struct kvm_arch {
+> > >  	 */
+> > >  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+> > >  	struct kvm_mmu_memory_cache split_desc_cache;
+> > > +
+> > > +	/*
+> > > +	 * When set, used to determine whether a fault should be treated as
+> > > +	 * private in the context of protected VMs which use a separate gmem
+> > > +	 * pool to back private guest pages.
+> > > +	 */
+> > > +	u64 mmu_private_fault_mask;
+> > >  };
+> > >  
+> > >  struct kvm_vm_stat {
+> > > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > > index 780b91e1da9f..9b9e75aa43f4 100644
+> > > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > > @@ -252,6 +252,39 @@ struct kvm_page_fault {
+> > >  
+> > >  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+> > >  
+> > > +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
+> > > +{
+> > > +	struct kvm_memory_slot *slot;
+> > > +	bool private_fault = false;
+> > > +	gfn_t gfn = gpa_to_gfn(gpa);
+> > > +
+> > > +	slot = gfn_to_memslot(kvm, gfn);
+> > > +	if (!slot) {
+> > > +		pr_debug("%s: no slot, GFN: 0x%llx\n", __func__, gfn);
+> > > +		goto out;
+> > > +	}
+> > > +
+> > > +	if (!kvm_slot_can_be_private(slot)) {
+> > > +		pr_debug("%s: slot is not private, GFN: 0x%llx\n", __func__, gfn);
+> > > +		goto out;
+> > > +	}
+> > > +
+> > > +	if (kvm->arch.mmu_private_fault_mask) {
+> > > +		private_fault = !!(err & kvm->arch.mmu_private_fault_mask);
+> > > +		goto out;
+> > > +	}
+> > 
+> > What's the convention of err? Can we abstract it by introducing a new bit
+> > PFERR_PRIVATE_MASK? The caller sets it based on arch specific value.
+> > the logic will be
+> >         .is_private = err & PFERR_PRIVATE_MASK;
 > 
-> I have no clue what that means. Example?
+> I'm not sure I understand the question. 'err' is just the page fault flags,
+> and arch.mmu_private_fault_mask is something that can be set on a
+> per-platform basis when running in a mode where shared/private access
+> is recorded in the page fault flags during a #NPF.
+> 
+> I'm not sure how we'd keep the handling cross-platform by moving to a macro,
+> since TDX uses a different bit, and we'd want to be able to build a
+> SNP+TDX kernel that could run on either type of hardware.
+> 
+> Are you suggesting to reverse that and have err be set in a platform-specific
+> way and then use a common PFERR_PRIVATE_MASK that's software-defined and
+> consistent across platforms? That could work, but existing handling seems
+> to use page fault flags as-is, keeping the hardware-set values, rather than
+> modifying them to pass additional metadata, so it seems like it might
+> make things more confusing to make an exception to that here. Or are
+> there other cases where it's done that way?
 
-Basically, arch/x86/coco/Makefile is never processed if arch/x86/Kbuild
-indicates that CONFIG_HAS_CC_PLATFORM is not set. So if we want to have
-stuff in arch/x86/coco/Makefile that build for !CONFIG_HAS_CC_PLATFORM,
-like SNP host support, which does not rely on CONFIG_HAS_CC_PLATFORM
-being set, that check needs to be moved down into arch/x86/coco/Makefile.
+I meant the latter, making PFERR_PRIVATE_MASK common software-defined.
 
-> 
-> The last time we talked about paths, we ended up agreeing on:
-> 
-> https://lore.kernel.org/all/Yg5nh1RknPRwIrb8@zn.tnic/
-> 
-> So your "helpers related purely to host support" should go to
-> 
-> arch/x86/virt/svm/sev*.c
-> 
-> And just to keep it simple, that should be
-> 
-> arch/x86/virt/svm/sev.c
-> 
-> and if there's real need to split that, we can do that later.
+I think the SVM fault handler can use hardware value directly by carefully
+defining those PFERR values.
 
-Ok, makes sense.
+TDX doesn't have architectural bit in error code to indicate the private fault.
+It's coded in faulted address as shared bit. GPA bit 51 or 47.
+PFERR_{USER, WRITE, FETCH, PRESENT} are already software-defined value for VMX
+(and TDX).  The fault handler for VMX, handle_ept_violation(), converts
+encoding.  For TDX, PFERR_PRIVATE_MASK is just one more software defined bit.
+
+I'm fine with either way, variable or macro. Which do you prefer?
+
+- Define variable mmu_private_fault_mask (global or per struct kvm)
+  The module initialization code, hardware_setup(), sets mmu_private_fault_mask.
+- Define the software defined value, PFERR_PRIVATE_MASK.
+  The caller of kvm_mmu_page_fault() parses the hardware value and construct
+  software defined error_code.
+- any other?
+  
+
+> > > +
+> > > +	/*
+> > > +	 * Handling below is for UPM self-tests and guests that treat userspace
+> > > +	 * as the authority on whether a fault should be private or not.
+> > > +	 */
+> > > +	private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
+> > 
+> > This code path is sad. One extra slot lookup and xarray look up.
+> > Without mmu lock, the result can change by other vcpu.
+> > Let's find a better way.
+> 
+> The intention was to rely on fault->mmu_seq to determine if a
+> KVM_SET_MEMORY_ATTRIBUTES update came in after .private_fault was set so
+> that fault handling could be retried, but that doesn't happen until
+> kvm_faultin_pfn() which is *after* this is logged. So yes, I think there
+> is a race here, and the approach you took in your Misc. series of
+> keeping the kvm_mem_is_private() check inside kvm_faultin_pfn() is more
+> efficient/correct.
+> 
+> If we can figure out a way to handle checking the fault flags in a way
+> that works for both TDX/SNP (and KVM self-test use-case) we can
+> consolidate around that.
+
+I can think of the following ways. I think the second option is better because
+we don't need exit bit for error code.
+
+- Introduce software defined error code
+- Add a flags to struct kvm_arch for self-test use-case VM_TYPE_PROTECTED_VM.
+  Set it to true for VM_TYPE_PROTECTED_VM case.
+- any other?
 
 Thanks,
-
-Mike
-
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
