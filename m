@@ -2,86 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D90EB64D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 19:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D10EB64DB
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Jun 2023 19:37:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbjFTTUW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Jun 2023 15:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55554 "EHLO
+        id S229650AbjFTThF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 20 Jun 2023 15:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjFTTUV (ORCPT
+        with ESMTP id S229521AbjFTThE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Jun 2023 15:20:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35931B6;
-        Tue, 20 Jun 2023 12:20:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 75B5C60F23;
-        Tue, 20 Jun 2023 19:20:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C47F9C433C9;
-        Tue, 20 Jun 2023 19:20:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687288819;
-        bh=PeHV3oGT0VbjGSMnLrUz89/gkbBxSRAPqn2lOdDUHlM=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=cGO05tnQitRpKUN5KECgilvaHe3rjXMd5JZ28O3A/t7meSlu82GpBRwmg8PP/7DSY
-         V+uSRyI37k9enStBv/QEXOV99+ZeWYb2Kjd1fIoH6u0UmP+cmDVLdYfoxedbMIu4cD
-         fbaZgJ/nP/GL5WWT/wm5QTcynAstW3WLpkk5GQ06lHbGTugQ1/W4vgOwaKj4Qg+sL2
-         QP33Y00cnl7r2CvvgiVz6wH4FBQe07d36ZEIbKn8yKO7uKo2dy+Vb9WP4d9lgiV7p2
-         VAOma4Xok923xWVAhUZ9zW4UvVbl5bfa4UdKFFMtVrwQom3dkFEuKc8rnrvmpIqUlJ
-         qg3ISEdbyVPTA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A7EC2C395D9;
-        Tue, 20 Jun 2023 19:20:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 20 Jun 2023 15:37:04 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E86681704
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 12:37:03 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1b5018cb4dcso24415905ad.2
+        for <linux-crypto@vger.kernel.org>; Tue, 20 Jun 2023 12:37:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1687289823; x=1689881823;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w6ZvEIvPRbw9YNSa9BHGX9FrNyDby/XoggIiNhXPl28=;
+        b=SdApUZ2IPk+Z6mxD9bFN0GFN1iJ7suUDIehCiJCdXHL8ldfd46S6J1UZsAE7iR7ZJU
+         izpY2GNrrEI44t9EM/b20YnXDICrn/D8moO/8NEpzGwCAY1agUTJl+UdfJ5+8QpelNv+
+         9K/j1tdea6Hu4niHWHT+P8KJGXmymypUFKnvQArKlpy2ea/+WMjZj3Ctz0BTjm2jg1va
+         4gY93UCcuTq5K+M+NtQze22SfMEpp5TbyWWC0mQWc2knBTZqQ+3Ee2rqVJ4UXLO7/jNO
+         04A2GOWTyfq0DDKKxvkII7dNF0kzyLukffby9J16G3VyQBOmXNpHq+pUsgDuRm2dqE6G
+         Gv8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687289823; x=1689881823;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w6ZvEIvPRbw9YNSa9BHGX9FrNyDby/XoggIiNhXPl28=;
+        b=Zce3gEoA0ItKxEnc7N9s+h2WyObG6G9sKfUSU1VeYRsyfSPByjsKivWb8j9bdVrEbz
+         /AlV6/OaiIHsF61bVMNkxG73lr1Gsksa8idN9IfJ5WUBGCp6sAylw4aGS7fCU20Zjoe+
+         /cK1+/xuGVh7RywpZudUqtMxo4NCleq2LVyu+qiobLuhG2D7OXWnmzSn1Z7ZzVb3F02w
+         UfiiZh9rweHKLXjMj3dCTTDMNbVqoN/8DMmG5Vvc7d7H4DlEP0dElxzdYhdGuKwVnc/W
+         qwOlbUhZQb/lZ6CwVpoxVy9buMfd0cmmz5UQcrzlxkxpJXziadMDWcbd75EMr7c1mlT/
+         ZpEg==
+X-Gm-Message-State: AC+VfDzQEv7Aqd59eoCzQIB8E/v43gG4ZbEJ90rw6m0cX0q3Muv5vLtE
+        5X0pYeiHKWIll0opE3suvNZDsg==
+X-Google-Smtp-Source: ACHHUZ4CTI6udmmYo/7mpA0VeK/ywfX4bUnFBYVGoDxs8EypawA8sKHygWNb2fbGKEDNZGXmOY1Gqw==
+X-Received: by 2002:a17:902:f7d2:b0:1b5:450a:4b5e with SMTP id h18-20020a170902f7d200b001b5450a4b5emr3161005plw.17.1687289823442;
+        Tue, 20 Jun 2023 12:37:03 -0700 (PDT)
+Received: from [172.31.0.109] ([136.36.130.248])
+        by smtp.gmail.com with ESMTPSA id i14-20020a170902c94e00b001ae2b94701fsm1996816pla.21.2023.06.20.12.37.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Jun 2023 12:37:03 -0700 (PDT)
+Message-ID: <75cf8335-af1f-e06c-c770-b2b540e812ed@ventanamicro.com>
+Date:   Tue, 20 Jun 2023 13:37:00 -0600
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 1/4] RISC-V: add Zbc extension detection
+Content-Language: en-US
+To:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Conor Dooley <conor@kernel.org>
+Cc:     heiko@sntech.de, Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, Conor Dooley <conor.dooley@microchip.com>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
+        heiko.stuebner@vrull.eu
+References: <mhng-919a6ed5-c8b0-4311-9a8f-8c204b81a8e0@palmer-ri-x1c9a>
+From:   Jeff Law <jlaw@ventanamicro.com>
+In-Reply-To: <mhng-919a6ed5-c8b0-4311-9a8f-8c204b81a8e0@palmer-ri-x1c9a>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] crypto: af_alg/hash: Fix recvmsg() after
- sendmsg(MSG_MORE)
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <168728881968.9715.9390991093529503679.git-patchwork-notify@kernel.org>
-Date:   Tue, 20 Jun 2023 19:20:19 +0000
-References: <427646.1686913832@warthog.procyon.org.uk>
-In-Reply-To: <427646.1686913832@warthog.procyon.org.uk>
-To:     David Howells <dhowells@redhat.com>
-Cc:     netdev@vger.kernel.org, herbert@gondor.apana.org.au,
-        syzbot+13a08c0bf4d212766c3c@syzkaller.appspotmail.com,
-        syzbot+14234ccf6d0ef629ec1a@syzkaller.appspotmail.com,
-        syzbot+4e2e47f32607d0f72d43@syzkaller.appspotmail.com,
-        syzbot+472626bb5e7c59fb768f@syzkaller.appspotmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, axboe@kernel.dk, willy@infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 16 Jun 2023 12:10:32 +0100 you wrote:
-> If an AF_ALG socket bound to a hashing algorithm is sent a zero-length
-> message with MSG_MORE set and then recvmsg() is called without first
-> sending another message without MSG_MORE set to end the operation, an oops
-> will occur because the crypto context and result doesn't now get set up in
-> advance because hash_sendmsg() now defers that as long as possible in the
-> hope that it can use crypto_ahash_digest() - and then because the message
-> is zero-length, it the data wrangling loop is skipped.
+On 6/20/23 13:09, Palmer Dabbelt wrote:
+> On Mon, 12 Jun 2023 14:31:14 PDT (-0700), Conor Dooley wrote:
+>> Hey Heiko,
+>>
+>> On Mon, Jun 12, 2023 at 11:04:39PM +0200, Heiko Stuebner wrote:
+>>> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+>>>
+>>> Add handling for Zbc extension.
+>>>
+>>> Zbc provides instruction for carry-less multiplication.
+>>>
+>>> Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+>>> ---
+>>>  arch/riscv/Kconfig             | 22 ++++++++++++++++++++++
+>>>  arch/riscv/include/asm/hwcap.h |  1 +
+>>>  arch/riscv/kernel/cpu.c        |  1 +
+>>>  arch/riscv/kernel/cpufeature.c |  1 +
+>>>  4 files changed, 25 insertions(+)
+>>
+>> Plumbing into the hwprobe stuff would be nice, but that's not a
+>> requirement for getting stuff merged :)
 > 
-> [...]
+> IIRC we talked about this on IRC, but IMO we shouldn't require something 
+> be user visible for it to be merged in the kernel.
+Note that exposing Zbc is potentially useful.  We've got GCC and LLVM 
+code that can detect and rewrite a bitwise CRC into clmul.
 
-Here is the summary with links:
-  - [net-next,v2] crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
-    https://git.kernel.org/netdev/net-next/c/b6d972f68983
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Jeff
