@@ -2,284 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27859EB64D7
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 11:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B83EB64D8
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 12:19:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232088AbjFULSG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jun 2023 07:18:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43768 "EHLO
+        id S231532AbjFUMTo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jun 2023 08:19:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbjFULSE (ORCPT
+        with ESMTP id S231750AbjFUMTm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2023 07:18:04 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06B7C184;
-        Wed, 21 Jun 2023 04:18:03 -0700 (PDT)
+        Wed, 21 Jun 2023 08:19:42 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B769D1FD3;
+        Wed, 21 Jun 2023 05:19:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687346282; x=1718882282;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=bNOOeYVCQ7poh+/POpUoy8h5Fc7oKKTV5NlBm31y8T8=;
-  b=UwWPAw+/N37hMw7X+nGZKpKlbKMwdZwvU+RQSpoKtcCgHwAHlhG1R0Bz
-   mdQuYCMMNAaFMEkH7GrE4t3WUk2LY/5Pcnf2XGALDNK9RwMDVImCbKHMg
-   qoOzDu8Gcpxdq/rZVd9n7TljpxDRVX4QNw/YfVDT6F30txm34vFMxXfrb
-   KOm3AeOH23cSslUWfXulopUv1Ymrabi373RGtL5NwNXUaKveRfwRjWum2
-   5UHnjpMjtR78BKPbQg5XHQQBYzvRvOHoG3xnfMxW2NmjyCJbH96j0tEg6
-   nOjpaqQe/fp4wEK6ZzsCO4YL+JCONvGwpYn8qdpKeL2Pwdr9aQXiY+jDK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="339758007"
+  t=1687349980; x=1718885980;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=H2On4BkiK842BWT2+FLgDrsxTV7abLUQsx5UxDHkU+U=;
+  b=Zvj1qvsC/h5Zl3wZyafQwYYRS71T+F71ToUTCy46KoQi9vMwN54IPG/4
+   B9dfPTv0IRM/UycXPcJoZtBEylFFQKvIXlmEFG7Ok8cpEd302QBOaF+yO
+   2AWDgPzjbb4vpjVlnb6XfxkCthS9twJ/lLxGGvAJ0QfXaqYjIk0gH4bnb
+   FqzUeREMbHxtROFQu3DRRD8KHcOChSU0GU72ulpbtQmEUkE9z8pSvXaEu
+   zO20VtJk7Ktm6shuilhjZPxZQ/OWKYiTxw6/N2ZhNTqK13zBSPxvq3owO
+   sQXVlhDAq8Kx8Jawd8gmNLNy/cHQ3OFBYCNbeFJkKo4HhfpKQMV0sQL88
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="349885595"
 X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="339758007"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 04:17:58 -0700
+   d="scan'208";a="349885595"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 05:19:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="664623042"
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="827411431"
 X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="664623042"
-Received: from unknown (HELO localhost) ([10.237.66.162])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 04:16:58 -0700
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Joel Granados <j.granados@samsung.com>, mcgrof@kernel.org,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Russ Weight <russell.h.weight@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Phillip Potter <phil@philpotter.co.uk>,
-        Clemens Ladisch <clemens@ladisch.de>,
-        Arnd Bergmann <arnd@arndb.de>, Corey Minyard <minyard@acm.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Song Liu <song@kernel.org>, Robin Holt <robinmholt@gmail.com>,
-        Steve Wahl <steve.wahl@hpe.com>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Benjamin LaHaise <bcrl@kvack.org>,
-        David Howells <dhowells@redhat.com>,
-        Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Jeff Layton <jlayton@kernel.org>, Jan Kara <jack@suse.cz>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Kees Cook <keescook@chromium.org>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Balbir Singh <bsingharora@gmail.com>,
-        Eric Biederman <ebiederm@xmission.com>,
-        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-        Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        John Stultz <jstultz@google.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Mike Kravetz <mike.kravetz@oracle.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Joerg Reuter <jreuter@yaina.de>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        Roopa Prabhu <roopa@nvidia.com>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Simon Horman <horms@verge.net.au>,
-        Julian Anastasov <ja@ssi.bg>,
-        Remi Denis-Courmont <courmisch@gmail.com>,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Xin Long <lucien.xin@gmail.com>,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Jan Karcher <jaka@linux.ibm.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Martin Schiller <ms@dev.tdt.de>,
-        John Johansen <john.johansen@canonical.com>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Joel Granados <j.granados@samsung.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Travis <mike.travis@hpe.com>,
-        Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Matthew Bobrowski <repnop@google.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        John Ogness <john.ogness@linutronix.de>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Will Drewry <wad@chromium.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-raid@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-cachefs@redhat.com, codalist@coda.cs.cmu.edu,
-        linux-mm@kvack.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
-        fsverity@lists.linux.dev, linux-xfs@vger.kernel.org,
-        bpf@vger.kernel.org, kexec@lists.infradead.org,
-        linux-trace-kernel@vger.kernel.org, linux-hams@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        bridge@lists.linux-foundation.org, dccp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
-        lvs-devel@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-afs@lists.infradead.org, linux-sctp@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org,
-        apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-        keyrings@vger.kernel.org
-Subject: Re: [PATCH 09/11] sysctl: Remove the end element in sysctl table
- arrays
-In-Reply-To: <20230621094817.433842-1-j.granados@samsung.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20230621091000.424843-1-j.granados@samsung.com>
- <CGME20230621094824eucas1p2b6adfbd3f15ff3665674917f419b25d3@eucas1p2.samsung.com>
- <20230621094817.433842-1-j.granados@samsung.com>
-Date:   Wed, 21 Jun 2023 14:16:55 +0300
-Message-ID: <87o7l92hg8.fsf@intel.com>
+   d="scan'208";a="827411431"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
+  by fmsmga002.fm.intel.com with ESMTP; 21 Jun 2023 05:19:38 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        ebiggers@kernel.org, x86@kernel.org, tglx@linutronix.de,
+        mingo@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com,
+        hpa@zytor.com, chang.seok.bae@intel.com
+Subject: [PATCH] crypto: x86/aesni: Align the address before aes_set_key_common()
+Date:   Wed, 21 Jun 2023 05:06:53 -0700
+Message-Id: <20230621120653.121759-1-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <f1093780-cdda-35ec-3ef1-e5fab4139bef@intel.com>
+References: <f1093780-cdda-35ec-3ef1-e5fab4139bef@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 21 Jun 2023, Joel Granados <j.granados@samsung.com> wrote:
-> Remove the empty end element from all the arrays that are passed to the
-> register sysctl calls. In some files this means reducing the explicit
-> array size by one. Also make sure that we are using the size in
-> ctl_table_header instead of evaluating the .procname element.
+aes_set_key_common() performs runtime alignment to the void *raw_ctx
+pointer. This facilitates consistent access to the 16byte-aligned
+address during key extension.
 
-Where's the harm in removing the end elements driver by driver? This is
-an unwieldy patch to handle.
+However, the alignment is already handlded in the GCM-related setkey
+functions before invoking the common function. Consequently, the
+alignment in the common function is unnecessary for those functions.
 
-> diff --git a/drivers/gpu/drm/i915/i915_perf.c b/drivers/gpu/drm/i915/i915_perf.c
-> index f43950219ffc..e4d7372afb10 100644
-> --- a/drivers/gpu/drm/i915/i915_perf.c
-> +++ b/drivers/gpu/drm/i915/i915_perf.c
-> @@ -4884,24 +4884,23 @@ int i915_perf_remove_config_ioctl(struct drm_device *dev, void *data,
->  
->  static struct ctl_table oa_table[] = {
->  	{
-> -	 .procname = "perf_stream_paranoid",
-> -	 .data = &i915_perf_stream_paranoid,
-> -	 .maxlen = sizeof(i915_perf_stream_paranoid),
-> -	 .mode = 0644,
-> -	 .proc_handler = proc_dointvec_minmax,
-> -	 .extra1 = SYSCTL_ZERO,
-> -	 .extra2 = SYSCTL_ONE,
-> -	 },
-> +		.procname = "perf_stream_paranoid",
-> +		.data = &i915_perf_stream_paranoid,
-> +		.maxlen = sizeof(i915_perf_stream_paranoid),
-> +		.mode = 0644,
-> +		.proc_handler = proc_dointvec_minmax,
-> +		.extra1 = SYSCTL_ZERO,
-> +		.extra2 = SYSCTL_ONE,
-> +	},
->  	{
-> -	 .procname = "oa_max_sample_rate",
-> -	 .data = &i915_oa_max_sample_rate,
-> -	 .maxlen = sizeof(i915_oa_max_sample_rate),
-> -	 .mode = 0644,
-> -	 .proc_handler = proc_dointvec_minmax,
-> -	 .extra1 = SYSCTL_ZERO,
-> -	 .extra2 = &oa_sample_rate_hard_limit,
-> -	 },
-> -	{}
-> +		.procname = "oa_max_sample_rate",
-> +		.data = &i915_oa_max_sample_rate,
-> +		.maxlen = sizeof(i915_oa_max_sample_rate),
-> +		.mode = 0644,
-> +		.proc_handler = proc_dointvec_minmax,
-> +		.extra1 = SYSCTL_ZERO,
-> +		.extra2 = &oa_sample_rate_hard_limit,
-> +	}
->  };
+To establish a consistent approach throughout the glue code, remove
+the aes_ctx() call from its current location. Instead, place it at
+each call site where the runtime alignment is currently absent.
 
-The existing indentation is off, but fixing it doesn't really belong in
-this patch.
+Link: https://lore.kernel.org/lkml/20230605024623.GA4653@quark.localdomain/
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+The need for this fix was discovered during Eric's review of the Key
+Locker series [1]. Considering the upstream code also requires this
+improvement, this is applicable regardless of the Key Locker enabling
+[2].
 
-BR,
-Jani.
+[1] https://lore.kernel.org/lkml/20230605024623.GA4653@quark.localdomain/
+[2] https://lore.kernel.org/lkml/f1093780-cdda-35ec-3ef1-e5fab4139bef@intel.com/
+---
+ arch/x86/crypto/aesni-intel_glue.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index a5b0cb3efeba..c4eea7e746e7 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -229,10 +229,10 @@ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
+ 	return (struct crypto_aes_ctx *)ALIGN(addr, align);
+ }
+ 
+-static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
++static int aes_set_key_common(struct crypto_tfm *tfm,
++			      struct crypto_aes_ctx *ctx,
+ 			      const u8 *in_key, unsigned int key_len)
+ {
+-	struct crypto_aes_ctx *ctx = aes_ctx(raw_ctx);
+ 	int err;
+ 
+ 	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
+@@ -253,7 +253,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
+ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 		       unsigned int key_len)
+ {
+-	return aes_set_key_common(tfm, crypto_tfm_ctx(tfm), in_key, key_len);
++	return aes_set_key_common(tfm, aes_ctx(crypto_tfm_ctx(tfm)), in_key, key_len);
+ }
+ 
+ static void aesni_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+@@ -286,7 +286,7 @@ static int aesni_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			         unsigned int len)
+ {
+ 	return aes_set_key_common(crypto_skcipher_tfm(tfm),
+-				  crypto_skcipher_ctx(tfm), key, len);
++				  aes_ctx(crypto_skcipher_ctx(tfm)), key, len);
+ }
+ 
+ static int ecb_encrypt(struct skcipher_request *req)
+@@ -893,13 +893,13 @@ static int xts_aesni_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	keylen /= 2;
+ 
+ 	/* first half of xts-key is for crypt */
+-	err = aes_set_key_common(crypto_skcipher_tfm(tfm), ctx->raw_crypt_ctx,
++	err = aes_set_key_common(crypto_skcipher_tfm(tfm), aes_ctx(ctx->raw_crypt_ctx),
+ 				 key, keylen);
+ 	if (err)
+ 		return err;
+ 
+ 	/* second half of xts-key is for tweak */
+-	return aes_set_key_common(crypto_skcipher_tfm(tfm), ctx->raw_tweak_ctx,
++	return aes_set_key_common(crypto_skcipher_tfm(tfm), aes_ctx(ctx->raw_tweak_ctx),
+ 				  key + keylen, keylen);
+ }
+ 
 -- 
-Jani Nikula, Intel Open Source Graphics Center
+2.34.1
+
