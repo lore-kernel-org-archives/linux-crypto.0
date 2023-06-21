@@ -2,142 +2,99 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B83EB64D8
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 12:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11CAFEB64D7
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 14:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231532AbjFUMTo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jun 2023 08:19:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44458 "EHLO
+        id S229514AbjFUObi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jun 2023 10:31:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231750AbjFUMTm (ORCPT
+        with ESMTP id S229513AbjFUObh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2023 08:19:42 -0400
+        Wed, 21 Jun 2023 10:31:37 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B769D1FD3;
-        Wed, 21 Jun 2023 05:19:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6279612E;
+        Wed, 21 Jun 2023 07:31:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687349980; x=1718885980;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=H2On4BkiK842BWT2+FLgDrsxTV7abLUQsx5UxDHkU+U=;
-  b=Zvj1qvsC/h5Zl3wZyafQwYYRS71T+F71ToUTCy46KoQi9vMwN54IPG/4
-   B9dfPTv0IRM/UycXPcJoZtBEylFFQKvIXlmEFG7Ok8cpEd302QBOaF+yO
-   2AWDgPzjbb4vpjVlnb6XfxkCthS9twJ/lLxGGvAJ0QfXaqYjIk0gH4bnb
-   FqzUeREMbHxtROFQu3DRRD8KHcOChSU0GU72ulpbtQmEUkE9z8pSvXaEu
-   zO20VtJk7Ktm6shuilhjZPxZQ/OWKYiTxw6/N2ZhNTqK13zBSPxvq3owO
-   sQXVlhDAq8Kx8Jawd8gmNLNy/cHQ3OFBYCNbeFJkKo4HhfpKQMV0sQL88
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="349885595"
+  t=1687357895; x=1718893895;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=O64wJ4h2FjMBRHsbamypZL1GWJNUE5Ay/zmz6Kb6Fbw=;
+  b=QhJVop2jENEPwjbKZntHyZiGNSZuKE3HfYuEE0+NAvFXXjcyocIRV88t
+   vZplUd9p33m6ayvnl9Lb1hBdc+VfbcbD92jJBsxXK6nKwId7LAzjXfgnc
+   ZdSdnmcy/KmnUWb7Mtc+HZvfvNBbnUlj/6uqmYhmy4/LUrByzEjmagPRo
+   MADNBAjNYtp5lQBdom4io7OSJVfsgLsX7TF4wY9pWCczkKP/wLmvgLvY3
+   T1H7T78oenkkDqvuwC9wljseueIpAdp8NOy1Ti1F2sAE6dAT62AAVWWfD
+   btQUaoxXudpNtliBp1xYMKcG+fpOAM5E/JHNAw/6jL0G+XEZ8Jy/NT40t
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="349921498"
 X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="349885595"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 05:19:39 -0700
+   d="scan'208";a="349921498"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:31:34 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="827411431"
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="714507270"
 X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="827411431"
-Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Jun 2023 05:19:38 -0700
-From:   "Chang S. Bae" <chang.seok.bae@intel.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        ebiggers@kernel.org, x86@kernel.org, tglx@linutronix.de,
-        mingo@kernel.org, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, chang.seok.bae@intel.com
-Subject: [PATCH] crypto: x86/aesni: Align the address before aes_set_key_common()
-Date:   Wed, 21 Jun 2023 05:06:53 -0700
-Message-Id: <20230621120653.121759-1-chang.seok.bae@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <f1093780-cdda-35ec-3ef1-e5fab4139bef@intel.com>
-References: <f1093780-cdda-35ec-3ef1-e5fab4139bef@intel.com>
+   d="scan'208";a="714507270"
+Received: from rmathew-mobl2.amr.corp.intel.com (HELO [10.212.134.235]) ([10.212.134.235])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 07:31:34 -0700
+Message-ID: <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
+Date:   Wed, 21 Jun 2023 07:31:34 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP initialization
+ support
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-8-michael.roth@amd.com>
+ <12f95b38-427c-6810-373a-ba2062c43882@intel.com>
+ <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-aes_set_key_common() performs runtime alignment to the void *raw_ctx
-pointer. This facilitates consistent access to the 16byte-aligned
-address during key extension.
+On 6/21/23 02:15, Borislav Petkov wrote:
+> On Mon, Jun 12, 2023 at 08:34:02AM -0700, Dave Hansen wrote:
+>> On 6/11/23 21:25, Michael Roth wrote:
+>>> +	/*
+>>> +	 * Calculate the amount the memory that must be reserved by the BIOS to
+>>> +	 * address the whole RAM, including the bookkeeping area. The RMP itself
+>>> +	 * must also be covered.
+>>> +	 */
+>>> +	max_rmp_pfn = max_pfn;
+>>> +	if (PHYS_PFN(rmp_end) > max_pfn)
+>>> +		max_rmp_pfn = PHYS_PFN(rmp_end);
+>> Could you say a little here about how this deals with memory hotplug?
+> Does SNP hw even support memory hotplug?
+> 
+> I think in order to support that, you'd need some special dance because
+> of the RMP table etc...
 
-However, the alignment is already handlded in the GCM-related setkey
-functions before invoking the common function. Consequently, the
-alignment in the common function is unnecessary for those functions.
+Yep, there's the hardware side and then there are fun nuggets like using
+mem= and then doing a software-only hot-add later after boot.
 
-To establish a consistent approach throughout the glue code, remove
-the aes_ctx() call from its current location. Instead, place it at
-each call site where the runtime alignment is currently absent.
-
-Link: https://lore.kernel.org/lkml/20230605024623.GA4653@quark.localdomain/
-Suggested-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: x86@kernel.org
-Cc: linux-kernel@vger.kernel.org
----
-The need for this fix was discovered during Eric's review of the Key
-Locker series [1]. Considering the upstream code also requires this
-improvement, this is applicable regardless of the Key Locker enabling
-[2].
-
-[1] https://lore.kernel.org/lkml/20230605024623.GA4653@quark.localdomain/
-[2] https://lore.kernel.org/lkml/f1093780-cdda-35ec-3ef1-e5fab4139bef@intel.com/
----
- arch/x86/crypto/aesni-intel_glue.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index a5b0cb3efeba..c4eea7e746e7 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -229,10 +229,10 @@ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
- 	return (struct crypto_aes_ctx *)ALIGN(addr, align);
- }
- 
--static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
-+static int aes_set_key_common(struct crypto_tfm *tfm,
-+			      struct crypto_aes_ctx *ctx,
- 			      const u8 *in_key, unsigned int key_len)
- {
--	struct crypto_aes_ctx *ctx = aes_ctx(raw_ctx);
- 	int err;
- 
- 	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
-@@ -253,7 +253,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
- static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 		       unsigned int key_len)
- {
--	return aes_set_key_common(tfm, crypto_tfm_ctx(tfm), in_key, key_len);
-+	return aes_set_key_common(tfm, aes_ctx(crypto_tfm_ctx(tfm)), in_key, key_len);
- }
- 
- static void aesni_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-@@ -286,7 +286,7 @@ static int aesni_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			         unsigned int len)
- {
- 	return aes_set_key_common(crypto_skcipher_tfm(tfm),
--				  crypto_skcipher_ctx(tfm), key, len);
-+				  aes_ctx(crypto_skcipher_ctx(tfm)), key, len);
- }
- 
- static int ecb_encrypt(struct skcipher_request *req)
-@@ -893,13 +893,13 @@ static int xts_aesni_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	keylen /= 2;
- 
- 	/* first half of xts-key is for crypt */
--	err = aes_set_key_common(crypto_skcipher_tfm(tfm), ctx->raw_crypt_ctx,
-+	err = aes_set_key_common(crypto_skcipher_tfm(tfm), aes_ctx(ctx->raw_crypt_ctx),
- 				 key, keylen);
- 	if (err)
- 		return err;
- 
- 	/* second half of xts-key is for tweak */
--	return aes_set_key_common(crypto_skcipher_tfm(tfm), ctx->raw_tweak_ctx,
-+	return aes_set_key_common(crypto_skcipher_tfm(tfm), aes_ctx(ctx->raw_tweak_ctx),
- 				  key + keylen, keylen);
- }
- 
--- 
-2.34.1
-
+Also, if the hardware doesn't support any kind of hotplug, it would be
+great to point to the place in the spec where it says that.
