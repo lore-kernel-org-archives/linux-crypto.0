@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D77DBC0015E
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 20:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93399EB64D7
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 20:57:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbjFUUsa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jun 2023 16:48:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60740 "EHLO
+        id S229681AbjFUU5l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jun 2023 16:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229740AbjFUUs3 (ORCPT
+        with ESMTP id S229652AbjFUU5k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2023 16:48:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E0710D2;
-        Wed, 21 Jun 2023 13:48:27 -0700 (PDT)
+        Wed, 21 Jun 2023 16:57:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164831FCF;
+        Wed, 21 Jun 2023 13:57:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C414616C9;
-        Wed, 21 Jun 2023 20:48:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 201D1C433C8;
-        Wed, 21 Jun 2023 20:48:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4E3D9616D6;
+        Wed, 21 Jun 2023 20:56:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16FDBC433C9;
+        Wed, 21 Jun 2023 20:56:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687380506;
-        bh=x/FU7pTH02A/OJPh+r4Bb3ys608yccmPQe4IL9IqKvs=;
+        s=k20201202; t=1687381011;
+        bh=uUMIRg6z98KEl6ZuwozW2mAxxkwDl0n2oYknJb1Q4cI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DanPLswI9+BpMshF3wm24UDTKIb+rxNjf3B8AGGAJ38uhda+PoVApZrxioMUt7mnQ
-         zjYU1ORGDTt/11TTt2SPFL3tbEaOPPz1FBGrGaTTnlKLzzc1si2hHt2vNlnNhBaFi8
-         1z4Ed7JLPNR5hr4e83cYeMU+I3qOyVrUDdV4AF75GBi7mohMxc1ghwZW7HGm+YYN+N
-         qhmX2BA32vwSNMvC+LNg0zqoZc/8GshmqljDh69yqYhiUn71+z7o+ABdg1W3rEc0fv
-         C7PC/dfNhB2sgphwYtoVDileXNiic63kgu/Je2JWCB5TRDIXCMEgBHY9tA0u7WtYPK
-         sELT2Bc+IsRVg==
-Date:   Wed, 21 Jun 2023 21:48:18 +0100
+        b=OcK4BpgOWQ2tti4tGUbSn+Hyepk8P6MyyKF2t8O+lYTg3R+UOn3BbBQP4G5bcRYBO
+         MbJyQpZjAq6bVAVK6n8+VW+yxP5upQtrlLGMAxTTQsauLt7VzceMBdHWrwTSjdMdnx
+         EyhxXMbK3Ol9zYh2g+h6pPs+4p/a6UWuAeQ/duhv3eJnBIhPhHbo38ZPp+pBeKKWHK
+         CG1ccGoJGdr0rb7gUVbSjeaestvIoN9gDuPJ1va4dweyFUF/8bXVCdIbKiV8ID4c5Q
+         TZ6w80ZMBlyNzqWZsQT/oItZB6+M3+tD/FhcAxlImmBGSmsd6H/76izpi2CdxUv8zW
+         I54HcBFG+8+NA==
+Date:   Wed, 21 Jun 2023 21:56:43 +0100
 From:   Conor Dooley <conor@kernel.org>
 To:     Oleksij Rempel <o.rempel@pengutronix.de>
 Cc:     Abel Vesa <abelvesa@kernel.org>,
@@ -60,50 +60,91 @@ Cc:     Abel Vesa <abelvesa@kernel.org>,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-input@vger.kernel.org, linux-mmc@vger.kernel.org
-Subject: Re: [PATCH v2 3/5] dt-bindings: timer: gpt: Support 3rd clock for
- i.MX6DL
-Message-ID: <20230621-reunion-unusual-7905860c9b14@spud>
+Subject: Re: [PATCH v2 4/5] dt-bindings: clock: imx6ul: Support optional
+ enet*_ref_pad clocks
+Message-ID: <20230621-upheld-numerous-b15d77f5b1e1@spud>
 References: <20230621093245.78130-1-o.rempel@pengutronix.de>
- <20230621093245.78130-4-o.rempel@pengutronix.de>
+ <20230621093245.78130-5-o.rempel@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="AX1gljKbRPqQ/JuA"
+        protocol="application/pgp-signature"; boundary="owWJ4crf85zQgxme"
 Content-Disposition: inline
-In-Reply-To: <20230621093245.78130-4-o.rempel@pengutronix.de>
+In-Reply-To: <20230621093245.78130-5-o.rempel@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---AX1gljKbRPqQ/JuA
+--owWJ4crf85zQgxme
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 21, 2023 at 11:32:43AM +0200, Oleksij Rempel wrote:
-> Add support for a 3rd clock, 'osc_per', for i.MX6DL to the 'fsl,imxgpt'
-> binding to resolve the following dtbs_check warning:
-> imx6dl-alti6p.dtb: timer@2098000: clocks: [[2, 119], [2, 120], [2, 237]] =
-is too long
-> imx6dl-alti6p.dtb: timer@2098000: clock-names: ['ipg', 'per', 'osc_per'] =
-is too long
+On Wed, Jun 21, 2023 at 11:32:44AM +0200, Oleksij Rempel wrote:
+> Extend the 'clocks' and 'clock-names' properties to support optional
+> 'enet1_ref_pad' and 'enet2_ref_pad' clocks to resolve the following
+> dtbs_check warning:
+> imx6ul-prti6g.dtb: clock-controller@20c4000: clocks: [[17], [18], [19], [=
+20], [21]] is too long
+> imx6ul-prti6g.dtb: clock-controller@20c4000: clock-names: ['ckil', 'osc',=
+ 'ipp_di0', 'ipp_di1', 'enet1_ref_pad'] is too long
 >=20
 > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
+> ---
+>  Documentation/devicetree/bindings/clock/imx6ul-clock.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml b/=
+Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
+> index be54d4df5afa2..3b71ebc100bf6 100644
+> --- a/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
+> +++ b/Documentation/devicetree/bindings/clock/imx6ul-clock.yaml
+> @@ -28,18 +28,24 @@ properties:
+>      const: 1
+> =20
+>    clocks:
+> +    minItems: 4
+>      items:
+>        - description: 32k osc
+>        - description: 24m osc
+>        - description: ipp_di0 clock input
+>        - description: ipp_di1 clock input
+> +      - description: Optional lenet1_ref_pad or enet2_ref_pad clocks
+> +      - description: Optional lenet1_ref_pad or enet2_ref_pad clocks
+                                 ^
+Is the l intentional?
+Otherwise,
 Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
 Cheers,
 Conor.
 
---AX1gljKbRPqQ/JuA
+> =20
+>    clock-names:
+> +    minItems: 4
+>      items:
+>        - const: ckil
+>        - const: osc
+>        - const: ipp_di0
+>        - const: ipp_di1
+> +      - pattern: '^enet[12]_ref_pad$'
+> +      - pattern: '^enet[12]_ref_pad$'
+> =20
+>  required:
+>    - compatible
+> --=20
+> 2.39.2
+>=20
+
+--owWJ4crf85zQgxme
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZJNiEgAKCRB4tDGHoIJi
-0ryPAQCIjKC9cEDRCqtFXCvRypza5RV7Z/2hT5yHVs/S4vdrigEAjx+v6VO3+K57
-LQu6u2ng9rECgETGDrHZESQ8LSz6MAk=
-=Qoem
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZJNkCwAKCRB4tDGHoIJi
+0k5nAP47t0q8ImnClSi84ieDatbmvbBowQPSfGluP2hK9UcplgEA4uEpQgHdKMoi
+vohLztlsb6xWY9kiRChHlJ2UoWINtw4=
+=5ZOK
 -----END PGP SIGNATURE-----
 
---AX1gljKbRPqQ/JuA--
+--owWJ4crf85zQgxme--
