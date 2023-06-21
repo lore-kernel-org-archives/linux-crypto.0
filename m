@@ -2,196 +2,361 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3A6EB64D7
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 20:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33857EB64DD
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 23:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbjFUU7f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jun 2023 16:59:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38986 "EHLO
+        id S229690AbjFUXA5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jun 2023 19:00:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbjFUU7e (ORCPT
+        with ESMTP id S229521AbjFUXA4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2023 16:59:34 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2078.outbound.protection.outlook.com [40.107.220.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB99010F2;
-        Wed, 21 Jun 2023 13:59:32 -0700 (PDT)
+        Wed, 21 Jun 2023 19:00:56 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2041.outbound.protection.outlook.com [40.107.237.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6848B19AC;
+        Wed, 21 Jun 2023 16:00:54 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aGdixf6/PXOjc9rS6Uhe96IuvusGXgEkysAHolYHnh+Ci9W6g5TlCEBV53CHELCmJ1uSXbAGVMOUdtlja0aiuZPywBHALEdFDq8TSn8KhPsLzhI8XkYCHxGfEkT/KuUOWmCILMxIiJ55AV0qOKGsFIAFsq66YsicLxNG+DXVplRPGlHG6a0rxcVVX9uaEfWQT57Swz0A7lm1PYLPYwpKThubCtEbGdSaWjYiaoEUxl4kjojld44isbgV0EZi0XA3LXvdWlVNwuo/GPOgH8/YGFTEeU6i5F/dGZMWawktSg1e2szkRwswoUXJOPOkt0UyWAIfcg7tEVJqCvS7SN0Iwg==
+ b=d+HKC9u5uzowVE8qzdkK09Wk5jnWZkiTfZ0wIzYAojIUpEm517vUQ64tTsyrifWNq/c9SHsltSthrd1Vyli90SpKOI3T5zIaMyNb0fAV8Kyu3D6LNjE03t1gTf0ZJEclnBiAEUQYWENDxj68IIoj6IVdC05P5FIikUTn1mKe7h/pbTDEL6ms1aCLOrYyiVjja7fL2Nih4PG2P9NRR9aG5400W58GNaMtxA9YOQn2Q0VB9zVdREM2PbYs4DCevL6mkrAaF24heHs3D4WlOmP2UOKBFfe61rjWeqoT3gx/cBcEeVqOegx0ME239gHzhH05fnto1v4ZBLK998Q7n+Ey4g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hMQ4UsIv0uonMaGo7ADQMJmJDk8v9Im7HugfJc1hesQ=;
- b=a4NUzkw6D7mP108DNXOK7ZBp5NzDFUB7Mq/7jBTQ3ViXSgbZcrnJzZ3+FynNW0MM8wxjjq84oV88nQ7T1bmBuKYm2O9oArLcGmbfx9TtJNUceaGdZt99qaY8pGT3U8bXN+opCEzdapnERk10M3qdfZ8AQkskzR+gljVApV4tdLdoRnlTZ3MUqmJAtbvC68TT5hnNQ6YUaJsSo9PQYpvr6mLHlUawqpE2tsptiQha8Pmgb0NaOWxTiH6lSAixiHcJ9/7y0ZsjJk4+abVAwgMlbIJc6Q05Jp+ueCRgYsh3pLccN7z87Qbp1raPS0I3HM1Glsx5lwgLcYw+tOfqEhDWnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=lPLngqNlgh8qSF2ge0kMqCLy6y+oKEC2AAVkGPr07ek=;
+ b=nRUd601Y3KKLRjc+sCIEN5vIq6PU0z6JiQJOoh1o+tXt5Zvk6hhM6daavvzP/gGjvk8fcKEGqK+/wDRYaBcljQ1mzyXXga1+5oVd1tWEa5Eq2yYf7jOb2Gt9QUdy/LL+IKac8dgy9vMonKR1c/jNuJ2rzQlikteal0nJ8vsDMaxU6SafZ6XsRuDUCnOQU+VRbRQjwS15xKSTBGhcEPHbSik+xUEYUagGuQ36PhuzYVESut9ETknnifEjrIjCoK7oFrZAcrPDPlbQioqxuJGFMScngfmX13q17YXahfHniWn7jxA454CjdyPOBLYzYqzf6VVdD3VFmSf22L4jadSKZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gmail.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hMQ4UsIv0uonMaGo7ADQMJmJDk8v9Im7HugfJc1hesQ=;
- b=uvmt/i5qSkpC1KlU8DWL3Gd41g1JXmyC+EZ4rAoqhUMyBngGWEUqcLqBY+SaPmfz59OcO5TU0qaU90Q5kr6SZtXmITD512kztZWEWNQiLeBbqOp+W39BkBTHX0ZyO4A35kwPqh10K3aMIzgL6bSxgBeZGAdxKQS9U3VXQ+QexM0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by SA1PR12MB7198.namprd12.prod.outlook.com (2603:10b6:806:2bf::21) with
+ bh=lPLngqNlgh8qSF2ge0kMqCLy6y+oKEC2AAVkGPr07ek=;
+ b=YfQj9Ck6Mj5PNjznYunp97ptPaDSL1OeqTiXyU27IEoqiQn+QL6D6+0zXuphFAO8Q4zsc02XBOHPLhWicTAOqzB/Pin6LmGfUbPPc/km2kR9igAUxx7HVgNqDswMQ381cavrudtSQRXUniubpSfW6/oWMmepjLLBnWiVf2u8YU4=
+Received: from DS7PR03CA0321.namprd03.prod.outlook.com (2603:10b6:8:2b::6) by
+ SA3PR12MB7782.namprd12.prod.outlook.com (2603:10b6:806:31c::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
- 2023 20:59:30 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1629:622f:93d0:f72f]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1629:622f:93d0:f72f%7]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
- 20:59:30 +0000
-Message-ID: <4a507dd3-620b-583e-2420-5bb28a377f6e@amd.com>
-Date:   Wed, 21 Jun 2023 15:59:28 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 00/11] Add dynamic boost control support
-Content-Language: en-US
-To:     Mario Limonciello <mario.limonciello@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20230608111757.32054-1-mario.limonciello@amd.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <20230608111757.32054-1-mario.limonciello@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0102.namprd05.prod.outlook.com
- (2603:10b6:803:42::19) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
+ 2023 23:00:51 +0000
+Received: from DM6NAM11FT046.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:2b:cafe::d1) by DS7PR03CA0321.outlook.office365.com
+ (2603:10b6:8:2b::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23 via Frontend
+ Transport; Wed, 21 Jun 2023 23:00:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT046.mail.protection.outlook.com (10.13.172.121) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6500.37 via Frontend Transport; Wed, 21 Jun 2023 23:00:51 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 21 Jun
+ 2023 18:00:50 -0500
+Date:   Wed, 21 Jun 2023 18:00:31 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+CC:     <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>,
+        <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH RFC v9 04/51] KVM: x86: Determine shared/private faults
+ using a configurable mask
+Message-ID: <20230621230031.37hdnymbjzwjgbo2@amd.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-5-michael.roth@amd.com>
+ <20230614164709.GT2244082@ls.amr.corp.intel.com>
+ <20230620202841.7qizls3u3kcck45g@amd.com>
+ <20230620211845.GV2244082@ls.amr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230620211845.GV2244082@ls.amr.corp.intel.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SA1PR12MB7198:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18a2229d-c9b8-4933-4dfb-08db729a6830
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT046:EE_|SA3PR12MB7782:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5075f13-e7e1-46f1-7e51-08db72ab5c1b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rQE+8a14YXIE1c7wWF0TKcWYssrz8N1P064//pUL8eNW6/jBwOgeDdC45HGNMddE0auzibyS4LyayUCErkYwLpJnd7nBQaYzasfnANv/o3Y/1YRLBNRvUQ4g2uyouhj+i+lRKY96A234+k2ZreytUfUW9YJd5U+A3BqoS+dHS5tNkmjg9rmnIb2kD3z1ELaMsD7Nj6TQmyHiEqcNsIVpGXy7WXBLkwYBqvPFYKRhkXwJAw+sBfmBHgY/lgeZsLtH0eMRrZ+n+tkkz7KPP+zSBXavKfLGdhZhyMYkWNvwuFEgYGkolzpdzfWGxzJJ2kTQeypp3SlwAEGANoWEANuycSQJ92QZaPUXHws/POlY0mBLTbfR8t1idnOH5dwLvruh9sR2IHDurrVhrf2HlfUbDAAtyyo372lG5Zz3kojNNqQLxY3Z4Rynf+EwjMR4s5GaXSr/dv40maoW+0ajqgnuxC5CXiQUGA0JRJaoP11Rv0rQm9jrMmKK5YVAFGRxuXaEEsinxHrRv5x7iPSvG5BEOuDVb1wgzj8nnt5lwzt7Qoav/vI5ml5Zs0cxrLdVWGVJfzkKrcuKEJWz+4K8+132cm7LShVDY/5HyhLnG3Vkl4EkRzNFnFTY8vtu3x0lrPBOTGF756wAMl2RMAvBIidSmw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(396003)(346002)(376002)(136003)(451199021)(2616005)(6512007)(83380400001)(6506007)(186003)(53546011)(26005)(38100700002)(110136005)(6486002)(478600001)(31686004)(36756003)(86362001)(31696002)(66556008)(66476007)(66946007)(8676002)(8936002)(4326008)(316002)(2906002)(41300700001)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmRHYWFBcFhkVzhYcExtQWQ3UlU5b0ZyK213NlBqbHg1TFdZVEp1TUJCdmF1?=
- =?utf-8?B?b01XWklaeStMTm5UcW03bXdXQXFzOU81QlY5TDhRRUNtQVFkWnNyaW51UlJY?=
- =?utf-8?B?eFRkOHI1bU5zRWg0YzBVcGRRWDFlMWU0ejJvUUkrUzh1RU81YnVaUTZEbm02?=
- =?utf-8?B?ZXpXckl5MVVIMFZOMCtZQ3VjU1Z3SUo3Y3pielVkUkJSQ2JOc011ZjNKYU4x?=
- =?utf-8?B?N0d2anIrenBjMm5qMjkvdlZYdDVMWGUyWkhmOG9kV0lDNmJ0cUJtSjY0dFk5?=
- =?utf-8?B?Z1dBMHJhL3oweHJvRTZKU0JzRmg3cmVLbnZyMUxYZnBXcDlOMVVkU1FMQ2FX?=
- =?utf-8?B?d1lDaGVEOGltSDhobVAzbWIwSXBvN0xCNmc5YU9SOEpRT0VDY09ab2ljRngz?=
- =?utf-8?B?bGdURng1eTZPT3ZJa0JYeWEvWGwycG9ZdU1MdXJaamphUXBCOWk3NFBTeGo0?=
- =?utf-8?B?TUpPY21kdytjS21UdXQ2NHlmZ2RlT1J5bUR4Z2xKcTFLOXNvUUJ4UHllbG5M?=
- =?utf-8?B?aTRhTjJRYmovOFRNU2E5OHc3Sy95dkZmM042T1BWNjVEZE9pY2NYcHB0bnVp?=
- =?utf-8?B?c0hGSzNHZTlzQ1hHejJ2Ni9PTFlVTVZ0Qmp2bi9KUko2U09pZ3hCQXBGMnZP?=
- =?utf-8?B?QzN1bXV6UnhVN2JSZjB0S3lGUHA2TnJMWjJQNURnQ0V0M0V6L2VXelVwa3o3?=
- =?utf-8?B?QXFoZGozb1g1TEJrRnQ3ZE85UnZGQVJRUlBiME9kNzdmM3pqUTRrUzlrck9G?=
- =?utf-8?B?dmdDenhvWUQxNndWOWpwN2MyWUNqT1hNWnpOd0N1N28wKzJWaEFPSzNBMnhC?=
- =?utf-8?B?ejVOWGRBcHFrMFEvR1dpMGFXWXNPcFprOCtGa1dPNjY4cjBWOVVDWGVpVUZJ?=
- =?utf-8?B?eEY5SFhTWHFTSThoc201ZUJ1RWd6OVNOamNYMG90OWhsMCtrT3FSaXVuUkhz?=
- =?utf-8?B?eUUxdmN2RXlrTUVyOTZBZ0kyUEdvTnNsZUxaNXh2dVFkcnk5dkU4d0R1cmV2?=
- =?utf-8?B?aW9LTUtUTnorbUtGdFJBWE5xV0pDQSs0MmFKeUEraWthUHlsQ01RMkFjeStZ?=
- =?utf-8?B?eUNFM2x6ck0xNVlLc09pMy9HQ0xtUzdKVHQ5aVhXdEhwN1BGNVgyVDF6V093?=
- =?utf-8?B?UU5VN0loY1NxdE5ucFlmMmU0d09PQSs4WUxCbFE2OWRDeEZrcnJxUUM4L3B5?=
- =?utf-8?B?ZnlvdUFaN0dDSGd1VnRuQXNmcFNVZksxYW5SUWhFa0NXcXRaajhtMDM0S0c3?=
- =?utf-8?B?aEQ3WTFlUUh1Qm9OeGVQUExOVTgvdHoyS1NlNWhheHU3TkliZjlSSmE2enox?=
- =?utf-8?B?RzJxRmIzYnRoakprQjJrNFlPNnNEUUp5ZHgyMDBmOXN0WmduU1lpM0tOenlq?=
- =?utf-8?B?Z1gwZVNjN0RIM3A3SDA5NUFhOExISkRyV3FpUGhHcnBQeWZ5MDZLeGczQ2ZC?=
- =?utf-8?B?a2F0T1JtMGlra1d3cTlvay9hbktRUE90b1drUFBZSkhFSGZNU3psanJNbDFK?=
- =?utf-8?B?aTFtMnEvU2dWME5HRG9XSXN6V054dnN4K2xER1dsazYxZllsc25tRFVqZHB6?=
- =?utf-8?B?d2VXbmNKS3F4L2pqbHJ0aWZub2cvR3dtSWx1RDBwNEZpTEd6TmhwajdReElr?=
- =?utf-8?B?MGFQdTJxVVZPR0lselhNcWh1em02bzUwam5aNGxScmN3SmdEbUFMV0FPcE43?=
- =?utf-8?B?dDlyczgxdGJlWTRvQlJQeVhHbGdzVlhETDE1RHo1OXZaeFVhY1l5SWNNY055?=
- =?utf-8?B?dDNGOEVpeGJMUHhOUVRDbjhtZ21TY1BtZUxwMkRGREVMNlJ1aElkVnJrRFhv?=
- =?utf-8?B?cjJnTUZwclhJTXdxZjRIS0t0bG9wNHZscEZNajlOZWdaeG5SNUlMdldma29Y?=
- =?utf-8?B?eTZ6UEt0dkVJMTJoWlozTU9QV01ZQWhpV3piUFlEU0xIc2hHT2NHT3lkalVQ?=
- =?utf-8?B?TExOSlNaK1B5MkJYWlB1NVJDQ0dVcEVKbDJaMmVSeDJENG1HTytZM1BhWGps?=
- =?utf-8?B?a200dUttRG1XZlFKL2E5bGduR3Bvd21HNjVqV255elhOd0VkaHphemlvRjNR?=
- =?utf-8?B?Y1ZWNjU0Q3orQ1JtK3JBSmg5S1pldGRPS0JvL08zSDlFOHdlV1V1VVJ0SEN6?=
- =?utf-8?Q?1K2Lwx13YWUkvzYQgOh034FL+?=
+X-Microsoft-Antispam-Message-Info: Sma25HMm6hodeWkb1Ta0H+ippelY1ho1iEzVy/8i9Ho46YdqWgmQ2zJpX0RHp/2xNovgiCIgzo5DlQLkOXZ8zVM9Isgd+M9bIYhi739cTwV6IVaX/I0ALzoLwE2QvVmujcUprODern5y5mAg0WlfBg2GfcZNjakU2freoKLJehMYOGB//hcgUk596Ak8qwA2kfSFbgJ0+pqVcsSbNAjxOi3JqIYrL5La2Xkp2vUxZq2SMXDHGqjdQG+Hw//WjWImxcr8lH2fYCkAJOOW/RvPfvcpBnXp487lGgfbRmauvhAongVQXZj23CinOf9XdRc0BfmAHRkv8J6hzJDfeEFiw4Yp8dhsaKci139WPGzeDLoRWo6KVUGMPXJIy2qjqjxE8pQtbHNV3igw+76xZxqaPgFKEv/BwhS2MibLf6KdE9lDKgshiiVfW0qu36xj0V8T4ePS89gl/dlunkm9DDGyJr6tGpA8E5GeTDeNKgyjyQgdtYrfZhvqRHNTAlCTJ2/HavgIfiiO/caGiKdwOmgyhwt3FTLoWp6chB03BwlYpIGC7ZEGUrzEbUXuBUV/+Zh/dHeRT0ua1Bf6ql0W9OEbmOBkRxpUHlIehA+z/s/dyP4MNxlgvcIVmcL73LIvoQD7A2NXrcTurDl5cE+VG8Q1p29fOq3BxWOqWmvbLlnH7GXPWhdOspBuMD2vWm2PGCFdSCf3UaCqY9XsiPrgUExRd8Etd/PMw2AtSaKjtMlA0JumSm07/i/P91Hkky19hYkXH4JxiK7vR+REgT9hbFWjYw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199021)(36840700001)(46966006)(40470700004)(40460700003)(5660300002)(44832011)(7416002)(7406005)(2906002)(40480700001)(82310400005)(70206006)(8676002)(356005)(81166007)(47076005)(83380400001)(426003)(36860700001)(36756003)(86362001)(82740400003)(6666004)(6916009)(4326008)(8936002)(478600001)(70586007)(54906003)(41300700001)(186003)(16526019)(26005)(336012)(2616005)(316002)(1076003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18a2229d-c9b8-4933-4dfb-08db729a6830
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 20:59:30.2986
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 23:00:51.2243
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5075f13-e7e1-46f1-7e51-08db72ab5c1b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c1ceIyk6q3ZVY3e3Q16HopohjKVkSRHNppcAhGTcCSSTi4BYrfzi2ePZL1AQznQoxwnlwYD+8zHQOUDgRyzHhQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7198
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT046.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7782
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/8/23 06:17, Mario Limonciello wrote:
-> Dynamic boost control is a feature of some SoCs that allows
-> an authenticated entity to send commands to the security processor
-> to control certain SOC characteristics with the intention to improve
-> performance.
+On Tue, Jun 20, 2023 at 02:18:45PM -0700, Isaku Yamahata wrote:
+> On Tue, Jun 20, 2023 at 03:28:41PM -0500,
+> Michael Roth <michael.roth@amd.com> wrote:
 > 
-> This is implemented via a mechanism that a userspace application would
-> authenticate using a nonce and key exchange over an IOCTL interface.
+> > On Wed, Jun 14, 2023 at 09:47:09AM -0700, Isaku Yamahata wrote:
+> > > On Sun, Jun 11, 2023 at 11:25:12PM -0500,
+> > > Michael Roth <michael.roth@amd.com> wrote:
+> > > 
+> > > > This will be used to determine whether or not an #NPF should be serviced
+> > > > using a normal page vs. a guarded/gmem one.
+> > > > 
+> > > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > > ---
+> > > >  arch/x86/include/asm/kvm_host.h |  7 +++++++
+> > > >  arch/x86/kvm/mmu/mmu_internal.h | 35 ++++++++++++++++++++++++++++++++-
+> > > >  2 files changed, 41 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > > index b3bd24f2a390..c26f76641121 100644
+> > > > --- a/arch/x86/include/asm/kvm_host.h
+> > > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > > @@ -1445,6 +1445,13 @@ struct kvm_arch {
+> > > >  	 */
+> > > >  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+> > > >  	struct kvm_mmu_memory_cache split_desc_cache;
+> > > > +
+> > > > +	/*
+> > > > +	 * When set, used to determine whether a fault should be treated as
+> > > > +	 * private in the context of protected VMs which use a separate gmem
+> > > > +	 * pool to back private guest pages.
+> > > > +	 */
+> > > > +	u64 mmu_private_fault_mask;
+> > > >  };
+> > > >  
+> > > >  struct kvm_vm_stat {
+> > > > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > > > index 780b91e1da9f..9b9e75aa43f4 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > > > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > > > @@ -252,6 +252,39 @@ struct kvm_page_fault {
+> > > >  
+> > > >  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+> > > >  
+> > > > +static bool kvm_mmu_fault_is_private(struct kvm *kvm, gpa_t gpa, u64 err)
+> > > > +{
+> > > > +	struct kvm_memory_slot *slot;
+> > > > +	bool private_fault = false;
+> > > > +	gfn_t gfn = gpa_to_gfn(gpa);
+> > > > +
+> > > > +	slot = gfn_to_memslot(kvm, gfn);
+> > > > +	if (!slot) {
+> > > > +		pr_debug("%s: no slot, GFN: 0x%llx\n", __func__, gfn);
+> > > > +		goto out;
+> > > > +	}
+> > > > +
+> > > > +	if (!kvm_slot_can_be_private(slot)) {
+> > > > +		pr_debug("%s: slot is not private, GFN: 0x%llx\n", __func__, gfn);
+> > > > +		goto out;
+> > > > +	}
+> > > > +
+> > > > +	if (kvm->arch.mmu_private_fault_mask) {
+> > > > +		private_fault = !!(err & kvm->arch.mmu_private_fault_mask);
+> > > > +		goto out;
+> > > > +	}
+> > > 
+> > > What's the convention of err? Can we abstract it by introducing a new bit
+> > > PFERR_PRIVATE_MASK? The caller sets it based on arch specific value.
+> > > the logic will be
+> > >         .is_private = err & PFERR_PRIVATE_MASK;
+> > 
+> > I'm not sure I understand the question. 'err' is just the page fault flags,
+> > and arch.mmu_private_fault_mask is something that can be set on a
+> > per-platform basis when running in a mode where shared/private access
+> > is recorded in the page fault flags during a #NPF.
+> > 
+> > I'm not sure how we'd keep the handling cross-platform by moving to a macro,
+> > since TDX uses a different bit, and we'd want to be able to build a
+> > SNP+TDX kernel that could run on either type of hardware.
+> > 
+> > Are you suggesting to reverse that and have err be set in a platform-specific
+> > way and then use a common PFERR_PRIVATE_MASK that's software-defined and
+> > consistent across platforms? That could work, but existing handling seems
+> > to use page fault flags as-is, keeping the hardware-set values, rather than
+> > modifying them to pass additional metadata, so it seems like it might
+> > make things more confusing to make an exception to that here. Or are
+> > there other cases where it's done that way?
 > 
-> After authentication is complete an application can exchange signed
-> messages with the security processor and both ends can validate the
-> data transmitted.
+> I meant the latter, making PFERR_PRIVATE_MASK common software-defined.
 > 
-> This series includes a test suite that can be run on real hardware
-> to ensure that the communication works as expected.  This can also be
-> used for an application to model the communication path.
+> I think the SVM fault handler can use hardware value directly by carefully
+> defining those PFERR values.
 > 
-> Two sysfs files are introduced for reading the PSP bootloader version
-> as well as TEE version which can be useful data points for debugging
-> communication problems.
+> TDX doesn't have architectural bit in error code to indicate the private fault.
+> It's coded in faulted address as shared bit. GPA bit 51 or 47.
+> PFERR_{USER, WRITE, FETCH, PRESENT} are already software-defined value for VMX
+> (and TDX).  The fault handler for VMX, handle_ept_violation(), converts
+> encoding.  For TDX, PFERR_PRIVATE_MASK is just one more software defined bit.
+> 
+> I'm fine with either way, variable or macro. Which do you prefer?
+> 
+> - Define variable mmu_private_fault_mask (global or per struct kvm)
+>   The module initialization code, hardware_setup(), sets mmu_private_fault_mask.
+> - Define the software defined value, PFERR_PRIVATE_MASK.
+>   The caller of kvm_mmu_page_fault() parses the hardware value and construct
+>   software defined error_code.
+> - any other?
+>   
+> 
+> > > > +
+> > > > +	/*
+> > > > +	 * Handling below is for UPM self-tests and guests that treat userspace
+> > > > +	 * as the authority on whether a fault should be private or not.
+> > > > +	 */
+> > > > +	private_fault = kvm_mem_is_private(kvm, gpa >> PAGE_SHIFT);
+> > > 
+> > > This code path is sad. One extra slot lookup and xarray look up.
+> > > Without mmu lock, the result can change by other vcpu.
+> > > Let's find a better way.
+> > 
+> > The intention was to rely on fault->mmu_seq to determine if a
+> > KVM_SET_MEMORY_ATTRIBUTES update came in after .private_fault was set so
+> > that fault handling could be retried, but that doesn't happen until
+> > kvm_faultin_pfn() which is *after* this is logged. So yes, I think there
+> > is a race here, and the approach you took in your Misc. series of
+> > keeping the kvm_mem_is_private() check inside kvm_faultin_pfn() is more
+> > efficient/correct.
+> > 
+> > If we can figure out a way to handle checking the fault flags in a way
+> > that works for both TDX/SNP (and KVM self-test use-case) we can
+> > consolidate around that.
+> 
+> I can think of the following ways. I think the second option is better because
+> we don't need exit bit for error code.
+> 
+> - Introduce software defined error code
+> - Add a flags to struct kvm_arch for self-test use-case VM_TYPE_PROTECTED_VM.
+>   Set it to true for VM_TYPE_PROTECTED_VM case.
+> - any other?
 
-For the series:
+Vishal: hoping to get your thoughts here as well from the perspective of
+the KVM self-test use-case.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+I was thinking that once we set fault->is_private, that sort of
+becomes our "software-defined" bit, and what KVM would use from that
+point forward to determine whether or not the access should be treated
+as a private one or not, and that whatever handler sets
+fault->is_private would encapsulate away all the platform-specific
+bit-checking needed to do that.
+
+So if we were to straight-forwardly implement that based on how TDX
+currently handles checking for the shared bit in GPA, paired with how
+SEV-SNP handles checking for private bit in fault flags, it would look
+something like:
+
+  bool kvm_fault_is_private(kvm, gpa, err)
+  {
+    /* SEV-SNP handling */
+    if (kvm->arch.mmu_private_fault_mask)
+      return !!(err & arch.mmu_private_fault_mask);
+
+    /* TDX handling */
+    if (kvm->arch.gfn_shared_mask)
+      return !!(gpa & arch.gfn_shared_mask);
+
+    return false;
+  }
+
+  kvm_mmu_do_page_fault(vcpu, gpa, err, ...)
+  {
+    struct kvm_page_fault fault = {
+      ...
+      .is_private = kvm_fault_is_private(vcpu->kvm, gpa, err)
+    };
+
+    ...
+  }
+
+And then arch.mmu_private_fault_mask and arch.gfn_shared_mask would be
+set per-KVM-instance, just like they are now with current SNP and TDX
+patchsets, since stuff like KVM self-test wouldn't be setting those
+masks, so it makes sense to do it per-instance in that regard.
+
+But that still gets a little awkward for the KVM self-test use-case where
+.is_private should sort of be ignored in favor of whatever the xarray
+reports via kvm_mem_is_private(). In your Misc. series I believe you
+handled this by introducing a PFERR_HASATTR_MASK bit so we can determine
+whether existing value of fault->is_private should be
+ignored/overwritten or not.
+
+So maybe kvm_fault_is_private() needs to return an integer value
+instead, like:
+
+  enum {
+    KVM_FAULT_VMM_DEFINED,
+    KVM_FAULT_SHARED,
+    KVM_FAULT_PRIVATE,
+  }
+
+  bool kvm_fault_is_private(kvm, gpa, err)
+  {
+    /* SEV-SNP handling */
+    if (kvm->arch.mmu_private_fault_mask)
+      (err & arch.mmu_private_fault_mask) ? KVM_FAULT_PRIVATE : KVM_FAULT_SHARED
+
+    /* TDX handling */
+    if (kvm->arch.gfn_shared_mask)
+      (gpa & arch.gfn_shared_mask) ? KVM_FAULT_SHARED : KVM_FAULT_PRIVATE
+
+    return KVM_FAULT_VMM_DEFINED;
+  }
+
+And then down in __kvm_faultin_pfn() we do:
+
+  if (fault->is_private == KVM_FAULT_VMM_DEFINED)
+    fault->is_private = kvm_mem_is_private(vcpu->kvm, fault->gfn);
+  else if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn))
+    return kvm_do_memory_fault_exit(vcpu, fault);
+
+  if (fault->is_private)
+    return kvm_faultin_pfn_private(vcpu, fault);
+
+Maybe kvm_fault_is_private() can be simplified based on what direction
+we end up taking WRT ongoing discussions like whether we decide to define
+KVM_X86_{SNP,TDX}_VM vm_types in addition to the KVM_X86_PROTECTED_VM
+type that the selftests uses, but hoping that for this path, any changes
+along that line can be encapsulated away in kvm_fault_is_private() without
+any/much further churn at the various call-sites like __kvm_faultin_pfn().
+
+We could even push all the above logic down into the KVM self-tests, but
+have:
+
+  bool kvm_fault_is_private(kvm, gpa, err) {
+    return KVM_FAULT_VMM_DEFINED;
+  }
+
+And that would be enough to run self-tests as standalone series, with
+TDX/SNP should filling in kvm_fault_is_private() with their
+platform-specific handling.
+
+Does that seem reasonable to you? At least as a starting point. 
+
+-Mike
 
 > 
-> ---
-> v3->v4:
->   * Pick up tags
->   * Move ioctl calls into a shared library used by python ctypes
-> 
-> Mario Limonciello (11):
->    crypto: ccp: Rename macro for security attributes
->    crypto: ccp: Add support for displaying PSP firmware versions
->    crypto: ccp: Add bootloader and TEE version offsets
->    crypto: ccp: move setting PSP master to earlier in the init
->    crypto: ccp: Add support for fetching a nonce for dynamic boost
->      control
->    crypto: ccp: Add support for setting user ID for dynamic boost control
->    crypto: ccp: Add support for getting and setting DBC parameters
->    crypto: ccp: Add a sample library for ioctl use
->    crypto: ccp: Add a sample python script for Dynamic Boost Control
->    crypto: ccp: Add unit tests for dynamic boost control
->    crypto: ccp: Add Mario to MAINTAINERS
-> 
->   Documentation/ABI/testing/sysfs-driver-ccp |  18 ++
->   MAINTAINERS                                |  12 +
->   drivers/crypto/ccp/Makefile                |   3 +-
->   drivers/crypto/ccp/dbc.c                   | 250 +++++++++++++++++++
->   drivers/crypto/ccp/dbc.h                   |  56 +++++
->   drivers/crypto/ccp/psp-dev.c               |  19 +-
->   drivers/crypto/ccp/psp-dev.h               |   1 +
->   drivers/crypto/ccp/sp-dev.h                |   7 +
->   drivers/crypto/ccp/sp-pci.c                |  96 +++++++-
->   include/linux/psp-platform-access.h        |   4 +
->   include/uapi/linux/psp-dbc.h               | 147 ++++++++++++
->   tools/crypto/ccp/.gitignore                |   1 +
->   tools/crypto/ccp/Makefile                  |  13 +
->   tools/crypto/ccp/dbc.c                     |  72 ++++++
->   tools/crypto/ccp/dbc.py                    |  64 +++++
->   tools/crypto/ccp/dbc_cli.py                | 134 +++++++++++
->   tools/crypto/ccp/test_dbc.py               | 266 +++++++++++++++++++++
->   17 files changed, 1146 insertions(+), 17 deletions(-)
->   create mode 100644 drivers/crypto/ccp/dbc.c
->   create mode 100644 drivers/crypto/ccp/dbc.h
->   create mode 100644 include/uapi/linux/psp-dbc.h
->   create mode 100644 tools/crypto/ccp/.gitignore
->   create mode 100644 tools/crypto/ccp/Makefile
->   create mode 100644 tools/crypto/ccp/dbc.c
->   create mode 100644 tools/crypto/ccp/dbc.py
->   create mode 100755 tools/crypto/ccp/dbc_cli.py
->   create mode 100755 tools/crypto/ccp/test_dbc.py
-> 
-> 
-> base-commit: 134e0dc6b73ab7e99464182356a8b3fa4ea3b499
+> Thanks,
+> -- 
+> Isaku Yamahata <isaku.yamahata@gmail.com>
