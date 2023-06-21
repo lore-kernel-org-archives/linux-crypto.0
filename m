@@ -2,109 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D520EB64DC
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 16:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F66AEB64D7
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Jun 2023 19:13:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232406AbjFUQBQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Jun 2023 12:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33478 "EHLO
+        id S230187AbjFUTN2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 21 Jun 2023 15:13:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233175AbjFUQBG (ORCPT
+        with ESMTP id S231357AbjFUTNT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Jun 2023 12:01:06 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A31D1718;
-        Wed, 21 Jun 2023 09:00:43 -0700 (PDT)
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 50DBA1EC0102;
-        Wed, 21 Jun 2023 18:00:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1687363232;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=Lkm1ovXF8w/3l1dQM0aqJCHQ40tS7jLprFLy/F9Ithw=;
-        b=Lv/JZdMzLJ1V/ja2qHoklv+xVmPUhC8fHl072kZMlMYUsq3+WHX3IUW39+KyB0t/lEw0qo
-        yqfLsMoXQiRo+HWEdgnUJ3Pl+2fgdjnYUCqaCSlI+WLK7F2BDjwp2JpGDREMwtSfbVfiUa
-        8E0ZABH+UD/wNOLXtZBnwgKVZtwnLGc=
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-        header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-        by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id c0Czf9ibAY93; Wed, 21 Jun 2023 16:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-        t=1687363227; bh=Lkm1ovXF8w/3l1dQM0aqJCHQ40tS7jLprFLy/F9Ithw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Dl+W+sUM4kesP9b6SzA+PpNwR05jkz42fZ+9E5uuznFcOUWKSEQ0dEqEq5BmRH0Mj
-         DJnzqmDQz4WQLjr5CbeV6gd9GDImmM0arCnGcOg6d6yLSo2KV3hzkYOeBVL/vuRnzV
-         j4sTA0/ymefYw+vms8mVJPf2jNH0zQL16wjEHaeVfAgKKPgadUd2w5GQXb2V1g6QRy
-         FOyY/4D0XXiM/UuG1KLYthVwx6ARpb/e/EKMzqFRKgsQw2zGPGGPLVkr/kgCqf79WN
-         1zvL2iZMvsIz3iceTKAD2jT8SUlgJ8tUBUwJsierdlrpkurUBS8LAy11xq9KwfxAKF
-         R5xQBVMcxygfMuPxx3r0s9FNB5vLMLlOY9uRBhxBU+Ie3dJZ0VoZBS/lq0qpBxF+l+
-         nY8UbSYcObQYoK/IxU6V4ELbJ5njZ+AHxdN9ao7qx9MtE+OSbu8+4PcWXmtte9+JvI
-         oyhXrFvpXDwoWnQpRttnENERDmZhWfz9XBVcEmKo4j/V8gNFWX2J93R0Yksojs0u9a
-         v4zHE95wsyF666l2fIGQqawT449BMG8eyaZagWA0V4Nanc/SkXz6BakXQHiyvwC/Az
-         b+2yK5E+sQ35wEtstMK47iRTNyP89w8xgn6ikSiEpk/YgbQeV5cugXbTQLkYGluFAO
-         x/Imc81hftUs+JTjh2qoQ0TE=
-Received: from zn.tnic (p200300ea971dc565329C23FFfeA6A903.dip0.t-ipconnect.de [IPv6:2003:ea:971d:c565:329c:23ff:fea6:a903])
+        Wed, 21 Jun 2023 15:13:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D161D19AC;
+        Wed, 21 Jun 2023 12:13:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1D60E40E019B;
-        Wed, 21 Jun 2023 15:59:46 +0000 (UTC)
-Date:   Wed, 21 Jun 2023 17:59:38 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v9 07/51] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <20230621155912.GKZJMeUHzKCFchhE5v@fat_crate.local>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-8-michael.roth@amd.com>
- <12f95b38-427c-6810-373a-ba2062c43882@intel.com>
- <20230621091541.GEZJK/veTnfhOnX8ci@fat_crate.local>
- <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 65AD3616A1;
+        Wed, 21 Jun 2023 19:13:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DB1BC433C8;
+        Wed, 21 Jun 2023 19:13:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687374790;
+        bh=5OJ7PjnlmhDlV9hG0fI5rCj/uuaQFZRsYGwvFMGaNM4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oFzVam4xfeCFvgQDEQznaCebTKZ3nPTBCYbYMXvRLSV77FRpOpakatq8LCKg74Lmz
+         DvBaRoY4R6n1mecKBSGKQ5SNlrwq+U1RbecDdD+XFxhm3znt0T9Ydx3lYFl6zUQseF
+         bI1HydeXmY3fi1WDA+mrd5AVOUy6KpfwzqAGn5qYIqU91AlecTc6RvP7Ef8bkP3lBF
+         jB3GMPzr2RnsCEwU9zvWIxXIshleCyIvlYm9XrFrRHkl3iD+HPAqzY5AbE55zJUfZD
+         dkmwuq8yf6Ko/7w11cFXNuzLsRIr5zWpq3l6mCVmZkbhs4kZTmw/L20kWhO0j63h+p
+         YdJnGp/A5A3Pg==
+Date:   Wed, 21 Jun 2023 20:13:06 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Corentin Labbe <clabbe@baylibre.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] dt-bindings: crypto: drop unneeded quotes
+Message-ID: <20230621-mongoose-trance-2d0b2bc7c8b2@spud>
+References: <20230621064403.9221-1-krzysztof.kozlowski@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="kMX+ppCtr/sMbNir"
 Content-Disposition: inline
-In-Reply-To: <23f400bc-9a62-be4a-6a24-0e2149d4491c@intel.com>
+In-Reply-To: <20230621064403.9221-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 07:31:34AM -0700, Dave Hansen wrote:
-> Yep, there's the hardware side and then there are fun nuggets like using
-> mem= and then doing a software-only hot-add later after boot.
 
-Ah, right, Mike, I think we need to check whether mem= has any effect on
-SNP.
+--kMX+ppCtr/sMbNir
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Also, if the hardware doesn't support any kind of hotplug, it would be
-> great to point to the place in the spec where it says that.
+On Wed, Jun 21, 2023 at 08:44:03AM +0200, Krzysztof Kozlowski wrote:
+> Cleanup bindings dropping unneeded quotes. Once all these are fixed,
+> checking for this can be enabled in yamllint.
+>=20
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-I honestly don't know. But I can't recall ever hearing about hardware
-memory hotplug so something worth to check too.
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
--- 
-Regards/Gruss,
-    Boris.
+Cheers,
+Conor.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+--kMX+ppCtr/sMbNir
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZJNLwgAKCRB4tDGHoIJi
+0nT0AP45U0MfyYBuBPROCFXmA1qKilOd/vpoavf+9UeUW+2mfwEA3h4J95HX9zJk
+n94VGpFRzO8GMY8MxF4qeY8esYgfDww=
+=v52S
+-----END PGP SIGNATURE-----
+
+--kMX+ppCtr/sMbNir--
