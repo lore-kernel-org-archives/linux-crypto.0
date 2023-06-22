@@ -2,85 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 637F6EB64D8
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 09:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2095EB64DA
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 09:36:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbjFVJdr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Jun 2023 05:33:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38544 "EHLO
+        id S232447AbjFVJgi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Jun 2023 05:36:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232408AbjFVJdP (ORCPT
+        with ESMTP id S229593AbjFVJfh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2023 05:33:15 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5731BC3
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 02:26:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687426008; x=1718962008;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1oR9R38eqvpZgm/7JAWq34x2KGCGiLRLr5vxygOX4Uc=;
-  b=Eel/B7tDsZl6D9XXfuj+0GIgSCKt9yeN8JBBXhV3IXU93cJl9VHVzy25
-   K+4G76WQmTevEHHHClv4BH3G9VyVtT55hcy2CcMJhFhilq3TOXc/tIBEq
-   ARZYq52/EmTItbiD9ls4D4UObRtqigvvro6++iUB7ti6dOckt+FS6zSo3
-   P1FuUvTnJSjjwcxq3vrRO5us2ZaGZRkXX7ckOq80zU4bhjMzmVdWMtPCh
-   ltjI53jcZ0HhCFTqjByLqgtOOW9jRMkJY6aUVgJtNV+ZnyWN62ZtZ5K4K
-   HKwOlRez3vYQPZAnel0Y52QKVexqX3K05jHWSn0dXa6vULIgmQk1MF7V+
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="390124029"
-X-IronPort-AV: E=Sophos;i="6.00,263,1681196400"; 
-   d="scan'208";a="390124029"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 02:26:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="784836913"
-X-IronPort-AV: E=Sophos;i="6.00,263,1681196400"; 
-   d="scan'208";a="784836913"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.175])
-  by fmsmga004.fm.intel.com with ESMTP; 22 Jun 2023 02:26:46 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Damian Muszynski <damian.muszynski@intel.com>
-Subject: [PATCH] crypto: qat - change value of default idle filter
-Date:   Thu, 22 Jun 2023 10:26:35 +0100
-Message-Id: <20230622092635.6175-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.40.1
+        Thu, 22 Jun 2023 05:35:37 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA132D45
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 02:28:52 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3112f5ab0b1so4846841f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 02:28:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687426131; x=1690018131;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a8I/X4DIkumE0o217fuyqlb4csZOvMDW/UlSifsV2GU=;
+        b=bYzxCtFqXPloCjCKlMFQWGOz34JRH3wCnPD3AX38cFSLTi6Cm/moRaAzr/P9UvW8yK
+         T1UlfaUEMwKRoiHsYP2AP1eNfAXLJpOw6fuiK9KovJ6TTbshtiNVn6qpKJwQbplR7OOg
+         cx6Tisg37W53vmqv5m1Z8lPI4korclfp1prU7mkLZhjPR9+rdDrp6MRwgW2Ncm7RM0tH
+         EKlfS2nMwEz3mW4p3CO9SV7SgitOCSSmw0Hb3yAyfNuhyh4ElkPZLngym63CKrx/nmnW
+         QWcMXIrvh+PraUYucMC8xzhBhv0/T9lnF2rJXI9ik824sFmQmQnBhTTJQeTPzfNemHg1
+         WgqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687426131; x=1690018131;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a8I/X4DIkumE0o217fuyqlb4csZOvMDW/UlSifsV2GU=;
+        b=cuSWx/mXZDmwymnbUw7YS5zOUiVDxtyKBXmmESRc0J5s0TNJT29+TSoB3k2S+aMaJW
+         bg2lfaB2+zugCIaIeyMYcE0h8iO46MpZKcLUboCiECehvFy6sHnyN8Uo2OePpZzM3Ocm
+         C077uEadMkkykx/x0MF/2SlGVAOSxBo+EdC8UsNLJOIJdQfjLnNX0yLsMkULWfAO5m+h
+         MgYEV2gFShb4HqMOvqqjUInIw+EMwKuqR/1d0whjCGqvSFE4JjYM2vCZsmlsW2cfDEYM
+         LTLyrrOi68a3sBb1P5PQqZ8mkWtomQMC1WKaRYNZFekKV3hY7+sEJNbYLJNRekk0SGcV
+         p9nw==
+X-Gm-Message-State: AC+VfDyVeiQC+NNsA8EBZaxpLdBn7PGlnTmZ3xv+oqDNG1mvysJiDIo8
+        ZHSCGlBtR/G+dzaq3g4dLG3znw==
+X-Google-Smtp-Source: ACHHUZ4T77alv8uvZQD/zqnC6VfvSZmzxDS+DYzTGDKhKFLEX9r7QGKfu+W2jacagsaCQjaDDoaMnw==
+X-Received: by 2002:a5d:591c:0:b0:311:1a9d:98e with SMTP id v28-20020a5d591c000000b003111a9d098emr11415672wrd.58.1687426131213;
+        Thu, 22 Jun 2023 02:28:51 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.26])
+        by smtp.gmail.com with ESMTPSA id c11-20020a056000104b00b003063a92bbf5sm6641190wrx.70.2023.06.22.02.28.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jun 2023 02:28:50 -0700 (PDT)
+Message-ID: <35253eaa-78b0-8976-aaf4-8917331e7823@linaro.org>
+Date:   Thu, 22 Jun 2023 11:28:47 +0200
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v7 1/3] dt-bindings: ufs: qcom: Add ICE phandle
+Content-Language: en-US
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <20230408214041.533749-1-abel.vesa@linaro.org>
+ <20230408214041.533749-2-abel.vesa@linaro.org>
+ <4aadaf24-11f6-5cc1-4fbd-addbef4f891b@linaro.org>
+ <yq1ilbgqoq6.fsf@ca-mkp.ca.oracle.com>
+ <80ca0da4-5243-9771-0c4c-62b956e97b2f@linaro.org>
+ <ZJPyGW2I4fHqFMRV@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <ZJPyGW2I4fHqFMRV@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The power management configuration of 4xxx devices is too aggressive
-and in some conditions the device might be prematurely put to a low
-power state.
-Increase the idle filter value to prevent that.
-In future, this will be set by firmware.
+On 22/06/2023 09:02, Abel Vesa wrote:
+> On 23-06-22 08:07:51, Krzysztof Kozlowski wrote:
+>> On 22/06/2023 03:19, Martin K. Petersen wrote:
+>>>
+>>> Abel,
+>>>
+>>>> Un-reviewed. This is broken and was never tested. After applying this
+>>>> patch, I can see many new warnings in all DTBs (so it is easy to spot
+>>>> that it was not actually tested).
+>>>>
+>>>> Your probably meant here:
+>>>>   if:
+>>>>     required:
+>>>
+>>> Please provide a fix for this. I don't want to rebase this late in the
+>>> cycle.
+>>
+>> AFAIK, this was not applied. At least as of next 20210621 and I
+>> commented on this few days ago. Anything changed here?
+> 
+> Check this one:
+> https://lore.kernel.org/all/yq1a5x1wl4g.fsf@ca-mkp.ca.oracle.com/
+> 
 
-Fixes: e5745f34113b ("crypto: qat - enable power management for QAT GEN4")
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
----
- drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So staging tree is not in next? If it cannot be rebased "that late in
+the cycle", this means it should be in the next. :/
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-index dd112923e006..c2768762cca3 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-@@ -35,7 +35,7 @@
- #define ADF_GEN4_PM_MSG_PENDING			BIT(0)
- #define ADF_GEN4_PM_MSG_PAYLOAD_BIT_MASK	GENMASK(28, 1)
- 
--#define ADF_GEN4_PM_DEFAULT_IDLE_FILTER		(0x0)
-+#define ADF_GEN4_PM_DEFAULT_IDLE_FILTER		(0x6)
- #define ADF_GEN4_PM_MAX_IDLE_FILTER		(0x7)
- #define ADF_GEN4_PM_DEFAULT_IDLE_SUPPORT	(0x1)
- 
--- 
-2.40.1
+Best regards,
+Krzysztof
 
