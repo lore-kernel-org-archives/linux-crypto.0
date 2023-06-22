@@ -2,355 +2,153 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C126EEB64DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 15:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E5EEB64DA
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 16:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbjFVPdm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Jun 2023 11:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35072 "EHLO
+        id S230308AbjFVQqt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Jun 2023 12:46:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232566AbjFVPda (ORCPT
+        with ESMTP id S229903AbjFVQqp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2023 11:33:30 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2053.outbound.protection.outlook.com [40.107.96.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A272C269A;
-        Thu, 22 Jun 2023 08:32:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h5tRdG/XBDLrYs3mGKpv0SLVhjkWxL+BMdGmvDND46NzHRsYjXaCafBrPGfNzk1+Ae7w/gl1TAAzalhh+qXU0vZLKpOcEDI1A0mqLdqSz3q/QIIcW9r9IkoKgtqfCAzHR0IUYpIDSJDwKxymBwbqsLfhe0suGDM/JGeEgMVWdxbgwNsZ1/E35EXhHvOau/o51iRmwkUBXcpQz3RbP0tAXIV5vgpiHLD87p0cMPWHP3d/Qh94iLxqtmMu0I9iRuezdO4pehRKIpjLD61HVuK2JYqkalOXVvCre+TG+EK37/v6F66SnAZXj2pk1XoJX2encbL4m/KlnoRCfPAsi3MyXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uOKQ4tLy4lmLfhUwKT8qUOQSzfRJe9PS7pk+tRc7/kQ=;
- b=FaPxzJRkezEgRQp0S7b9tdpxPdnGwA0J/gVMrNr53cQn9qxfqz0VaRNr9T8msI7Rm+WGh/Su+e2mZxBYZQmE0smwGx8LsmtXYDoTNrwOCrTrWbvX8SQdi4eoZw3OE3iuoVky7vSCApXSAXMOn8yphhSsIeVofqYmxQoAsT+slbFnu7sGftSL4dmHwwxRiB51okXsgYAOEBSZ8nErzW0xHn/JgUvlPtZshYNLbnW7AhnkxXQKr7NgSuRsEBdidoThsdqzoDeaAvnjIw1p5o20k9xzawofjoQicLgmGc8AAzzvONb01usFVAvWG8KPAOt/aOx8zIVRCcYw65V5ICljEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uOKQ4tLy4lmLfhUwKT8qUOQSzfRJe9PS7pk+tRc7/kQ=;
- b=qtJ/U/Yddn+08Usex8h9ajqPM1aCPw5uQjeBmacjI9eKctG6hopoCKCqtyMb56uA0DrQ7REfEQ9AuZtXsBQ6O7bbcLNRNs6OdT+OBxalPOIQTxNPEJOjsloIZlZqLo913YmhE7BBJDPJ3HTQcXjmXhPQTO+QSfUGoxvs63W8x2E=
-Received: from BN1PR14CA0025.namprd14.prod.outlook.com (2603:10b6:408:e3::30)
- by DM6PR12MB4909.namprd12.prod.outlook.com (2603:10b6:5:1ba::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
- 2023 15:32:48 +0000
-Received: from BN8NAM11FT084.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:e3:cafe::ca) by BN1PR14CA0025.outlook.office365.com
- (2603:10b6:408:e3::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24 via Frontend
- Transport; Thu, 22 Jun 2023 15:32:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT084.mail.protection.outlook.com (10.13.176.169) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.41 via Frontend Transport; Thu, 22 Jun 2023 15:32:48 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 22 Jun
- 2023 10:32:48 -0500
-Date:   Thu, 22 Jun 2023 10:32:29 -0500
-From:   Michael Roth <michael.roth@amd.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-CC:     "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "liam.merwick@oracle.com" <liam.merwick@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Lutomirski, Andy" <luto@kernel.org>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-        "Annapurve, Vishal" <vannapurve@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "nikunj.dadhania@amd.com" <nikunj.dadhania@amd.com>,
-        "Rodel, Jorg" <jroedel@suse.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-Subject: Re: [PATCH RFC v9 04/51] KVM: x86: Determine shared/private faults
- using a configurable mask
-Message-ID: <20230622153229.vjkrzi6rgiolstns@amd.com>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-5-michael.roth@amd.com>
- <20230614164709.GT2244082@ls.amr.corp.intel.com>
- <20230620202841.7qizls3u3kcck45g@amd.com>
- <20230620211845.GV2244082@ls.amr.corp.intel.com>
- <20230621230031.37hdnymbjzwjgbo2@amd.com>
- <c116b7ab8ca02116f2b8d19a8214161c3b30576c.camel@intel.com>
+        Thu, 22 Jun 2023 12:46:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7671FF2
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 09:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687452356;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=q6LLoDXAD0fPuc6AsW0BAVbjdcqFGmumwyZ+jo/wBt4=;
+        b=EAP0luXV8HS3pyarly0r2FpVdEmrbuF6Y6ZF5yYbviIT+LfW9xFnqYjES2Tha7w7GX5mdr
+        tmQMkk+yBcCLeJtXd9yaI1LFweZP+lzja15RUHvftL9R8qOL5FZWtuTOXzzmiFdIWzZbGW
+        sXRWINhhNVKlpaXCcRqB8mnE6o6YOxs=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-139-5GUktgdwPSe_2N5rlUk_9Q-1; Thu, 22 Jun 2023 12:45:55 -0400
+X-MC-Unique: 5GUktgdwPSe_2N5rlUk_9Q-1
+Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b5d654cd9dso1817357a34.3
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 09:45:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687452348; x=1690044348;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q6LLoDXAD0fPuc6AsW0BAVbjdcqFGmumwyZ+jo/wBt4=;
+        b=VSlS7Jx7gNnjCbrl5wMoZb3N9yc1nUcaQS64e0mGCCeoEvMxUMYnhl2cAJq0DIqyqh
+         06NsK7edacihqfGcUsQyJpfWPAO5ghNHROUPZtolmHnE0SILoR7S+5k4+rjAafsCKZuk
+         QxYC6iwa+VG5DTkEdcC9ArDNuRCDt9PYj/vs2OEh1v6c1qnSClHDi9wdE2tSl4y9Du3/
+         NlbA/Knyv4cQPmMBX+bdpKqRpwa9HJ+HtYJbW4QrRVogQfbjUxup9r85jQm+w8j9xATY
+         prN12Jk4I5wTcMcmLjYJwArkza7wSjXIQPxBRtqfhGrYtR0gaWTxrcPe4zU3FxORX000
+         Gw2A==
+X-Gm-Message-State: AC+VfDxC9JHpkbkQytUswx6qW6P0qD+mzP4mtQMWk5q0ALy1qhf2pFAY
+        4Ggce1eyLSr4NEqeENFiyV07LDun3zRxQpnrxAzhQcIi4pqCpnrdeRdG0W7s3ZRVBSZrDZ7QWZV
+        ZrUGOr+dX0q3C8m/XKks/yan3
+X-Received: by 2002:a9d:7cc9:0:b0:6b5:b654:6d52 with SMTP id r9-20020a9d7cc9000000b006b5b6546d52mr5972046otn.8.1687452348487;
+        Thu, 22 Jun 2023 09:45:48 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ58fV++PhlPXYEECuy/QGlkeVFyp9FOiUQFioQbIDyJnts066atIqJRXo+P+fhPbGGa+c0vZw==
+X-Received: by 2002:a9d:7cc9:0:b0:6b5:b654:6d52 with SMTP id r9-20020a9d7cc9000000b006b5b6546d52mr5972023otn.8.1687452348243;
+        Thu, 22 Jun 2023 09:45:48 -0700 (PDT)
+Received: from halaney-x13s ([2600:1700:1ff0:d0e0::f])
+        by smtp.gmail.com with ESMTPSA id p13-20020a056830130d00b006b469ace1b1sm3007058otq.22.2023.06.22.09.45.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 09:45:47 -0700 (PDT)
+Date:   Thu, 22 Jun 2023 11:45:44 -0500
+From:   Andrew Halaney <ahalaney@redhat.com>
+To:     Abel Vesa <abel.vesa@linaro.org>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [RESEND v7 2/3] scsi: ufs: ufs-qcom: Switch to the new ICE API
+Message-ID: <20230622164544.4exzdv2hoptgitdx@halaney-x13s>
+References: <20230612192847.1599416-1-abel.vesa@linaro.org>
+ <20230612192847.1599416-3-abel.vesa@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c116b7ab8ca02116f2b8d19a8214161c3b30576c.camel@intel.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT084:EE_|DM6PR12MB4909:EE_
-X-MS-Office365-Filtering-Correlation-Id: dd641d23-9e0d-4932-1878-08db7335ef3e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /H2gTV3W5ku2G3veUjbyBln7S6CRe4ifYof6M/ZC381fHcit92ekthbAwIqL/e5eUCIQknxQQpoGwQJ3FCUDIgXpT8LiCScRyZylJMOpZ+KLqGWvjoZs7b5KAqVYMKCNgp9EXlIG35eGgUEpsByNeKUQA4HKuc2iWGo8bw8KNpiDWtSeMJPV2QbPF2dHVYB4PTd4vZCYM/mzJkWOorcvX0+5gPT4cldt0GeHC2WVzDB68x0gKCQWFgR+VgsKNOhbQ00NEwtISQIFSGMO9XlF0t3aHHywPJPA32vUDf/NP4I2P6mc6WKPRGrQg26OQ6NpQ83azIN7IRk65ERlUd/EYpJsKWofUx4zAniTkqAxSkL5TuulqRUTNk0zTZayhrXkF0xzBE3qClWoalT8NNUCwvYLOB9c4oxo0BcUdtBhC4hPqwi+qZqcWaU8fiTplrw0aXHRSwpziaDmme873CyvpvjSjz/Z620XLGdEpoiBNpYlYYOiK3zVa2jhcsEKT9CQeI/Y0eK+hK7qTkrZM5e+vjss39/0s8wO+cPPf54fhXqd6JWIbnGu6w+89aGA+5Qf17qS0Y5aAJWD16LpEST0cJ0/P9O5/XMm7NU2bEVAMrjcAwoOr1hAToyeVg1reQskmGbqqFU1MfQfFSzPLcVP+HmWh4WLitnXLFP95Cn8C2+xR6yY4NUCNgnmf5KdZFBskaQv+iWebHcyFQoWmSBHHuZ1ah5S06MOW3aZnlJZ/oxlHbUopcCfqq04zbFun6vGIMHRMy+8lQiBIK+jMXsGlyr4TJVMU8Gu+dzQpwcmFHg=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(396003)(39860400002)(376002)(451199021)(46966006)(36840700001)(40470700004)(478600001)(6666004)(54906003)(4326008)(47076005)(40480700001)(336012)(83380400001)(426003)(86362001)(36756003)(36860700001)(40460700003)(2616005)(70586007)(2906002)(82310400005)(1076003)(26005)(966005)(16526019)(186003)(356005)(81166007)(82740400003)(41300700001)(8676002)(7416002)(8936002)(70206006)(6916009)(316002)(7406005)(44832011)(5660300002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 15:32:48.6717
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd641d23-9e0d-4932-1878-08db7335ef3e
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT084.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4909
+In-Reply-To: <20230612192847.1599416-3-abel.vesa@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 09:55:22AM +0000, Huang, Kai wrote:
+On Mon, Jun 12, 2023 at 10:28:46PM +0300, Abel Vesa wrote:
+> Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
+> use the new ICE api provided by the Qualcomm soc driver ice. The platforms
+> that already have ICE support will use the API as library since there will
+> not be a devicetree node, but instead they have reg range. In this case,
+> the of_qcom_ice_get will return an ICE instance created for the consumer's
+> device. But if there are platforms that do not have ice reg in the
+> consumer devicetree node and instead provide a dedicated ICE devicetree
+> node, the of_qcom_ice_get will look up the device based on qcom,ice
+> property and will get the ICE instance registered by the probe function
+> of the ice driver.
 > 
-> > 
-> > So if we were to straight-forwardly implement that based on how TDX
-> > currently handles checking for the shared bit in GPA, paired with how
-> > SEV-SNP handles checking for private bit in fault flags, it would look
-> > something like:
-> > 
-> >   bool kvm_fault_is_private(kvm, gpa, err)
-> >   {
-> >     /* SEV-SNP handling */
-> >     if (kvm->arch.mmu_private_fault_mask)
-> >       return !!(err & arch.mmu_private_fault_mask);
-> > 
-> >     /* TDX handling */
-> >     if (kvm->arch.gfn_shared_mask)
-> >       return !!(gpa & arch.gfn_shared_mask);
+> The ICE clock is now handle by the new driver. This is done by enabling
+> it on the creation of the ICE instance and then enabling/disabling it on
+> UFS runtime resume/suspend.
 > 
-> The logic of the two are identical.  I think they need to be converged.
-
-I think they're just different enough that trying too hard to converge
-them might obfuscate things. If the determination didn't come from 2
-completely different fields (gpa vs. fault flags) maybe it could be
-simplified a bit more, but have well-defined open-coded handler that
-gets called once to set fault->is_private during initial fault time so
-that that ugliness never needs to be looked at again by KVM MMU seems
-like a good way to keep things simple through the rest of the handling.
-
+> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+> ---
+>  drivers/ufs/host/Kconfig        |   2 +-
+>  drivers/ufs/host/Makefile       |   4 +-
+>  drivers/ufs/host/ufs-qcom-ice.c | 244 --------------------------------
+>  drivers/ufs/host/ufs-qcom.c     |  99 ++++++++++++-
+>  drivers/ufs/host/ufs-qcom.h     |  32 +----
+>  5 files changed, 104 insertions(+), 277 deletions(-)
+>  delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
 > 
-> Either SEV-SNP should convert the error code private bit to the gfn_shared_mask,
-> or TDX's shared bit should be converted to some private error bit.
+> diff --git a/drivers/ufs/host/Kconfig b/drivers/ufs/host/Kconfig
+> index 8793e3433580..16624ba08050 100644
+> --- a/drivers/ufs/host/Kconfig
+> +++ b/drivers/ufs/host/Kconfig
+> @@ -59,7 +59,7 @@ config SCSI_UFS_QCOM
+>  	depends on SCSI_UFSHCD_PLATFORM && ARCH_QCOM
+>  	depends on GENERIC_MSI_IRQ
+>  	depends on RESET_CONTROLLER
+> -	select QCOM_SCM if SCSI_UFS_CRYPTO
+> +	select QCOM_INLINE_CRYPTO_ENGINE if SCSI_UFS_CRYPTO
+>  	help
+>  	  This selects the QCOM specific additions to UFSHCD platform driver.
+>  	  UFS host on QCOM needs some vendor specific configuration before
+> diff --git a/drivers/ufs/host/Makefile b/drivers/ufs/host/Makefile
+> index d7c5bf7fa512..4573aead02eb 100644
+> --- a/drivers/ufs/host/Makefile
+> +++ b/drivers/ufs/host/Makefile
+> @@ -3,9 +3,7 @@
+>  obj-$(CONFIG_SCSI_UFS_DWC_TC_PCI) += tc-dwc-g210-pci.o ufshcd-dwc.o tc-dwc-g210.o
+>  obj-$(CONFIG_SCSI_UFS_DWC_TC_PLATFORM) += tc-dwc-g210-pltfrm.o ufshcd-dwc.o tc-dwc-g210.o
+>  obj-$(CONFIG_SCSI_UFS_CDNS_PLATFORM) += cdns-pltfrm.o
+> -obj-$(CONFIG_SCSI_UFS_QCOM) += ufs_qcom.o
+> -ufs_qcom-y += ufs-qcom.o
+> -ufs_qcom-$(CONFIG_SCSI_UFS_CRYPTO) += ufs-qcom-ice.o
+> +obj-$(CONFIG_SCSI_UFS_QCOM) += ufs-qcom.o
 
-struct kvm_page_fault seems to be the preferred way to pass additional
-params/metadata around, and .is_private field was introduced to track
-this private/shared state as part of UPM base series:
+The change from ufs_qcom.o to ufs-qcom.o here makes ufs_qcom.ko turn
+into ufs-qcom.ko.
 
-  https://lore.kernel.org/lkml/20221202061347.1070246-9-chao.p.peng@linux.intel.com/
+That broke a (fragile :P ) initramfs development script I play with. Not
+sure if that's any sort of contract with userspace or not, but thought
+I'd report it at least in case someone has a strong opinion.
 
-So it seems like unecessary complexity to track/encode that state into
-other additional places rather than just encapsulating it all in
-fault->is_private (or some similar field), and synthesizing all this
-platform-specific handling into a well-defined value that's conveyed
-by something like fault->is_private in a way where KVM MMU doesn't need
-to worry as much about platform-specific stuff seems like a good thing,
-and in line with what the UPM base series was trying to do by adding the
-fault->is_private field.
-
-So all I'm really proposing is that whatever SNP and TDX end up doing
-should center around setting that fault->is_private field and keeping
-everything contained there. If there are better ways to handle *how*
-that's done I don't have any complaints there, but moving/adding bits
-to GPA/error_flags after fault time just seems unecessary to me when
-fault->is_private field can serve that purpose just as well.
-
-> 
-> Perhaps converting SEV-SNP makes more sense because if I recall correctly SEV
-> guest also has a C-bit, correct?
-
-That's correct, but the C-bit doesn't show in the GPA that gets passed
-up to KVM during an #NPF, and instead gets encoded into the fault's
-error_flags.
-
-> 
-> Or, ...
-> 
-> > 
-> >     return false;
-> >   }
-> > 
-> >   kvm_mmu_do_page_fault(vcpu, gpa, err, ...)
-> >   {
-> >     struct kvm_page_fault fault = {
-> >       ...
-> >       .is_private = kvm_fault_is_private(vcpu->kvm, gpa, err)
-> 
-> ... should we do something like:
-> 
-> 	.is_private = static_call(kvm_x86_fault_is_private)(vcpu->kvm, gpa, 
-> 							    err);
-
-We actually had exactly this in v7 of SNP hypervisor patches:
-
-  https://lore.kernel.org/linux-coco/20221214194056.161492-7-michael.roth@amd.com/T/#m17841f5bfdfb8350d69d78c6831dd8f3a4748638
-
-but Sean was hoping to avoid a callback, which is why we ended up using
-a bitmask in this version since it basically all that callback would
-need to do. It's unfortunately that we don't have a common scheme
-between SNP/TDX, but maybe that's still possible, I just think that
-whatever that ends up being, it should live and be contained inside
-whatever helper ends up setting fault->is_private.
-
-There's some other awkwardness with a callback approach. It sort of ties
-into your question about selftests so I'll address it below...
-
-
-> 
-> ?
-> 
-> >     };
-> > 
-> >     ...
-> >   }
-> > 
-> > And then arch.mmu_private_fault_mask and arch.gfn_shared_mask would be
-> > set per-KVM-instance, just like they are now with current SNP and TDX
-> > patchsets, since stuff like KVM self-test wouldn't be setting those
-> > masks, so it makes sense to do it per-instance in that regard.
-> > 
-> > But that still gets a little awkward for the KVM self-test use-case where
-> > .is_private should sort of be ignored in favor of whatever the xarray
-> > reports via kvm_mem_is_private(). 
-> > 
-> 
-> I must have missed something.  Why does KVM self-test have impact to how does
-> KVM handles private fault? 
-
-The self-tests I'm referring to here are the ones from Vishal that shipped with
-v10 of Chao's UPM/fd-based private memory series, and also as part of Sean's
-gmem tree:
-
-  https://github.com/sean-jc/linux/commit/a0f5f8c911804f55935094ad3a277301704330a6
-
-These exercise gmem/UPM handling without the need for any SNP/TDX
-hardware support. They do so by "trusting" the shared/private state
-that the VMM sets via KVM_SET_MEMORY_ATTRIBUTES. So if VMM says it
-should be private, KVM MMU will treat it as private, so we'd never
-get a mismatch, so KVM_EXIT_MEMORY_FAULT will never be generated.
-
-> 
-> > In your Misc. series I believe you
-> > handled this by introducing a PFERR_HASATTR_MASK bit so we can determine
-> > whether existing value of fault->is_private should be
-> > ignored/overwritten or not.
-> > 
-> > So maybe kvm_fault_is_private() needs to return an integer value
-> > instead, like:
-> > 
-> >   enum {
-> >     KVM_FAULT_VMM_DEFINED,
-> >     KVM_FAULT_SHARED,
-> >     KVM_FAULT_PRIVATE,
-> >   }
-> > 
-> >   bool kvm_fault_is_private(kvm, gpa, err)
-> >   {
-> >     /* SEV-SNP handling */
-> >     if (kvm->arch.mmu_private_fault_mask)
-> >       (err & arch.mmu_private_fault_mask) ? KVM_FAULT_PRIVATE : KVM_FAULT_SHARED
-> > 
-> >     /* TDX handling */
-> >     if (kvm->arch.gfn_shared_mask)
-> >       (gpa & arch.gfn_shared_mask) ? KVM_FAULT_SHARED : KVM_FAULT_PRIVATE
-> > 
-> >     return KVM_FAULT_VMM_DEFINED;
-> >   }
-> > 
-> > And then down in __kvm_faultin_pfn() we do:
-> > 
-> >   if (fault->is_private == KVM_FAULT_VMM_DEFINED)
-> >     fault->is_private = kvm_mem_is_private(vcpu->kvm, fault->gfn);
-> >   else if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn))
-> >     return kvm_do_memory_fault_exit(vcpu, fault);
-> > 
-> >   if (fault->is_private)
-> >     return kvm_faultin_pfn_private(vcpu, fault);
-> 
-> 
-> What does KVM_FAULT_VMM_DEFINED mean, exactly?
-> 
-> Shouldn't the fault type come from _hardware_?
-
-In above self-test use-case, there is no reliance on hardware support,
-and fault->is_private should always be treated as being whatever was
-set by the VMM via KVM_SET_MEMORY_ATTRIBUTES, so that's why I proposed
-the KVM_FAULT_VMM_DEFINED value to encode that case into
-fault->is_private so KVM MMU and handle protected self-test VMs of this
-sort.
-
-In the future, this protected self-test VMs might become the basis of
-a new protected VM type where some sort of guest-issued hypercall can
-be used to set whether a fault should be treated as shared/private,
-rather than relying on VMM-defined value. There's some current discussion
-about that here:
-
-  https://lore.kernel.org/lkml/20230620190443.GU2244082@ls.amr.corp.intel.com/T/#me627bed3d9acf73ea882e8baa76dfcb27759c440
-
-Going back to your callback question above, that makes things a little
-awkward, since kvm_x86_ops is statically defined for both
-kvm_amd/kvm_intel modules, and either can run these self-tests guests as
-well as these proposed "non-CC VMs" which rely on enlightened guest
-kernels instead of TDX/SNPhardware support for managing private/shared
-access.
-
-So you either need to duplicate the handling for how to determine
-private/shared for these other types into the kvm_intel/kvm_amd callbacks,
-or have some way for the callback to say to "fall back to the common
-handling for self-tests and non-CC VMs". The latter is what we implemented
-in v8 of this series, but Isaku suggested it was a bit too heavyweight
-and proposed dropping the fall-back logic in favor of updating the
-kvm_x86_ops at run-time once we know whether or not it's a TDX/SNP guest:
-
-  https://lkml.iu.edu/hypermail/linux/kernel/2303.2/03009.html
-
-which could work, but it still doesn't address Sean's desire to avoid
-callbacks completely, and still amounts to a somewhat convulated way
-to hide away TDX/SNP-specific bit checks for shared/private. Rather
-than hide them away in callbacks that are already frowned upon by
-maintainer, I think it makes sense to "open-code" all these checks in a
-common handler like kvm_fault_is_private() to we can make some progress
-toward a consensus, and then iterate on it from there rather than
-refining what may already be a dead-end path.
-
--Mike
+Thanks,
+Andrew
 
