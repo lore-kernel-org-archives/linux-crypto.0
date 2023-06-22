@@ -2,99 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E01BEB64D8
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 12:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DEBEB64D8
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 12:49:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbjFVMCI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Jun 2023 08:02:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54476 "EHLO
+        id S231206AbjFVMtl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Jun 2023 08:49:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230358AbjFVMBz (ORCPT
+        with ESMTP id S229437AbjFVMtk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2023 08:01:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D51D21FF2
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 05:00:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687435151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fTTkA2sp2q9Z2LAXZ1QDFqA4SF11T5ulFHu3zl8eY5M=;
-        b=HKcWs6DPAhU6wfPnHBl6G6Jy2lxAo47NSLCmBXEfeoO9iYb2vuqc8aqpgKWA5HPgrcvnV+
-        saFjDIBqwl6RgNIDlRcw7k3z1ZPXrFs7namUC2su4EBicuGWq4G+hS35jVJEvKJSVAHjkB
-        bQ612WGXELIjTpKkJMoDMLcARRUFHX8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-122-6Z1yo4sGOmWQee1pLM60Cw-1; Thu, 22 Jun 2023 07:59:10 -0400
-X-MC-Unique: 6Z1yo4sGOmWQee1pLM60Cw-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-514a6909c35so4474354a12.3
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 04:59:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687435149; x=1690027149;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fTTkA2sp2q9Z2LAXZ1QDFqA4SF11T5ulFHu3zl8eY5M=;
-        b=UydW6eRzKz7iuaAihlM517CE5RiwHmKVnVGMor8Ny5OyG21fGQYsTldm0ReZ3Saska
-         +EsG0YdnGyBjeuQuKyhE2DU1L9smMlyggIe/ONpvAdipf3MgpmhOA8VGKGDgeiZi8TbP
-         CjUnqltNjL9AeUh9iw7k6VUrUN2wK+JqgiJ2kRgh0Xaa9XFxU1u/6KkGKQb6NB0OfAQa
-         TVJ0D+PJA5/K4tOf+9QyzOnDJdBN3iVyVjzbqxIdGHt8/ZlXUvzk5EVVrN1P+DcTAZxn
-         gGK102lhLxj21ATYpRYtZs65zo9jNLJJ3/calujCTG5LySOrZa7L+7hqF1n4p996vjED
-         SmBw==
-X-Gm-Message-State: AC+VfDyy8VnS6QACQ/4Qn+p0kNp2B9l0ffj3agSzosY8lKlZiQNKNSuH
-        HC5HjASinH29WuadcdeCY9NbXMQucc2EHx8z4M1sKcN8K8uPk6w6LsQLwDNIX2jj3A3lV0HkeXu
-        4lYI7B0C/PHR8y1HTqo+PYCon
-X-Received: by 2002:a17:907:da2:b0:988:e8e1:6360 with SMTP id go34-20020a1709070da200b00988e8e16360mr8670200ejc.8.1687435149350;
-        Thu, 22 Jun 2023 04:59:09 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ60H5p6tlUuyW+YXWTMB9vjFrAWl14WNSb9PT+fUHAJkRDpLgoKLJFf4fBEpXMrE8mEIpD8PQ==
-X-Received: by 2002:a17:907:da2:b0:988:e8e1:6360 with SMTP id go34-20020a1709070da200b00988e8e16360mr8670182ejc.8.1687435149020;
-        Thu, 22 Jun 2023 04:59:09 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1ef:2a1f:ee44:7b4f:4310:5b81])
-        by smtp.gmail.com with ESMTPSA id x17-20020a170906711100b009884f015a44sm4484108ejj.49.2023.06.22.04.59.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 04:59:08 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 07:59:03 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Xianting Tian <xianting.tian@linux.alibaba.com>
-Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
-        xuanzhuo@linux.alibaba.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, amit@kernel.org, arnd@arndb.de,
-        gregkh@linuxfoundation.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] fixup potential cpu stall
-Message-ID: <20230622075819-mutt-send-email-mst@kernel.org>
-References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
+        Thu, 22 Jun 2023 08:49:40 -0400
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C562193;
+        Thu, 22 Jun 2023 05:49:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1687438180; x=1718974180;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NlzD/CvLWWdttX4UrB2Vhmi3xDeUykPh+lPbouFV1UY=;
+  b=LHS2OFrFefCXSV/Vv1idO/jtFrbP5/OwlrmMohZS5l1rzZlJ+x+W0Ix9
+   2UIdm1wVzcSvfaiscVV2y/mbf/q2x23Vdm+okZv2S7nEwFdPoRGVg8rha
+   3YWat2HbJSYPZ2Cwy+5e5g846UBnuZbZvoRXxXYeuj+znTa8A1a0tBqQy
+   w=;
+X-IronPort-AV: E=Sophos;i="6.00,263,1681171200"; 
+   d="scan'208";a="656430713"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 12:49:33 +0000
+Received: from EX19MTAUEA001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id 2039F45F4A;
+        Thu, 22 Jun 2023 12:49:30 +0000 (UTC)
+Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
+ EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 22 Jun 2023 12:49:29 +0000
+Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (10.15.1.225)
+ by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Thu, 22 Jun 2023 12:49:29 +0000
+Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
+        id 0C35E2016; Thu, 22 Jun 2023 12:49:29 +0000 (UTC)
+From:   Mahmoud Adam <mngyadam@amazon.com>
+To:     <dhowells@redhat.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Mahmoud Adam <mngyadam@amazon.com>
+Subject: [PATCH v3] KEYS: use kfree_sensitive with key
+Date:   Thu, 22 Jun 2023 12:47:22 +0000
+Message-ID: <20230622124719.93393-1-mngyadam@amazon.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 09:18:14PM +0800, Xianting Tian wrote:
-> Cpu stall issue may happen if device is configured with multi queues
-> and large queue depth, so fix it.
+key might contain private part of the key, so better use
+kfree_sensitive to free it
+---
+v1: conflicts with c3d03e8e35e0:
+KEYS: asymmetric: Copy sig and digest in public_key_verify_signature()
+kfree_sensitive the buf variable also because it might has private
+part
 
+ crypto/asymmetric_keys/public_key.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I applied this after tweaking commit log to address Greg's comments.
-In the future I expect you guys to do such tweaks yourself.
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 50c933f86b21..170f06982381 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -43,7 +43,7 @@ static void public_key_describe(const struct key *asymmetric_key,
+ void public_key_free(struct public_key *key)
+ {
+ 	if (key) {
+-		kfree(key->key);
++		kfree_sensitive(key->key);
+ 		kfree(key->params);
+ 		kfree(key);
+ 	}
+@@ -218,7 +218,7 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	ret = 0;
 
-> Xianting Tian (3):
->   virtio-crypto: fixup potential cpu stall when free unused bufs
->   virtio_console: fixup potential cpu stall when free unused bufs
->   virtio_bt: fixup potential cpu stall when free unused bufs
-> 
->  drivers/bluetooth/virtio_bt.c              | 1 +
->  drivers/char/virtio_console.c              | 1 +
->  drivers/crypto/virtio/virtio_crypto_core.c | 1 +
->  3 files changed, 3 insertions(+)
-> 
-> -- 
-> 2.17.1
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ error_free_tfm:
+ 	crypto_free_akcipher(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+@@ -303,7 +303,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 		ret = req->dst_len;
 
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ error_free_req:
+ 	akcipher_request_free(req);
+ error_free_tfm:
+@@ -460,7 +460,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
+
+ error_free_buf:
+-	kfree(buf);
++	kfree_sensitive(buf);
+ error_free_req:
+ 	akcipher_request_free(req);
+ error_free_tfm:
+--
+2.40.1
