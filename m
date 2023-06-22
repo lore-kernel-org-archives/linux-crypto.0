@@ -2,153 +2,146 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E5EEB64DA
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 16:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA58EB64D8
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Jun 2023 18:18:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230308AbjFVQqt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Jun 2023 12:46:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
+        id S229914AbjFVSSm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 22 Jun 2023 14:18:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229903AbjFVQqp (ORCPT
+        with ESMTP id S229726AbjFVSSl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Jun 2023 12:46:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7671FF2
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 09:45:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687452356;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=q6LLoDXAD0fPuc6AsW0BAVbjdcqFGmumwyZ+jo/wBt4=;
-        b=EAP0luXV8HS3pyarly0r2FpVdEmrbuF6Y6ZF5yYbviIT+LfW9xFnqYjES2Tha7w7GX5mdr
-        tmQMkk+yBcCLeJtXd9yaI1LFweZP+lzja15RUHvftL9R8qOL5FZWtuTOXzzmiFdIWzZbGW
-        sXRWINhhNVKlpaXCcRqB8mnE6o6YOxs=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-139-5GUktgdwPSe_2N5rlUk_9Q-1; Thu, 22 Jun 2023 12:45:55 -0400
-X-MC-Unique: 5GUktgdwPSe_2N5rlUk_9Q-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6b5d654cd9dso1817357a34.3
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 09:45:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687452348; x=1690044348;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q6LLoDXAD0fPuc6AsW0BAVbjdcqFGmumwyZ+jo/wBt4=;
-        b=VSlS7Jx7gNnjCbrl5wMoZb3N9yc1nUcaQS64e0mGCCeoEvMxUMYnhl2cAJq0DIqyqh
-         06NsK7edacihqfGcUsQyJpfWPAO5ghNHROUPZtolmHnE0SILoR7S+5k4+rjAafsCKZuk
-         QxYC6iwa+VG5DTkEdcC9ArDNuRCDt9PYj/vs2OEh1v6c1qnSClHDi9wdE2tSl4y9Du3/
-         NlbA/Knyv4cQPmMBX+bdpKqRpwa9HJ+HtYJbW4QrRVogQfbjUxup9r85jQm+w8j9xATY
-         prN12Jk4I5wTcMcmLjYJwArkza7wSjXIQPxBRtqfhGrYtR0gaWTxrcPe4zU3FxORX000
-         Gw2A==
-X-Gm-Message-State: AC+VfDxC9JHpkbkQytUswx6qW6P0qD+mzP4mtQMWk5q0ALy1qhf2pFAY
-        4Ggce1eyLSr4NEqeENFiyV07LDun3zRxQpnrxAzhQcIi4pqCpnrdeRdG0W7s3ZRVBSZrDZ7QWZV
-        ZrUGOr+dX0q3C8m/XKks/yan3
-X-Received: by 2002:a9d:7cc9:0:b0:6b5:b654:6d52 with SMTP id r9-20020a9d7cc9000000b006b5b6546d52mr5972046otn.8.1687452348487;
-        Thu, 22 Jun 2023 09:45:48 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ58fV++PhlPXYEECuy/QGlkeVFyp9FOiUQFioQbIDyJnts066atIqJRXo+P+fhPbGGa+c0vZw==
-X-Received: by 2002:a9d:7cc9:0:b0:6b5:b654:6d52 with SMTP id r9-20020a9d7cc9000000b006b5b6546d52mr5972023otn.8.1687452348243;
-        Thu, 22 Jun 2023 09:45:48 -0700 (PDT)
-Received: from halaney-x13s ([2600:1700:1ff0:d0e0::f])
-        by smtp.gmail.com with ESMTPSA id p13-20020a056830130d00b006b469ace1b1sm3007058otq.22.2023.06.22.09.45.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 09:45:47 -0700 (PDT)
-Date:   Thu, 22 Jun 2023 11:45:44 -0500
-From:   Andrew Halaney <ahalaney@redhat.com>
-To:     Abel Vesa <abel.vesa@linaro.org>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>, linux-mmc@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [RESEND v7 2/3] scsi: ufs: ufs-qcom: Switch to the new ICE API
-Message-ID: <20230622164544.4exzdv2hoptgitdx@halaney-x13s>
-References: <20230612192847.1599416-1-abel.vesa@linaro.org>
- <20230612192847.1599416-3-abel.vesa@linaro.org>
+        Thu, 22 Jun 2023 14:18:41 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CAB62111
+        for <linux-crypto@vger.kernel.org>; Thu, 22 Jun 2023 11:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687457918; x=1718993918;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WOXLwbpspXIPnu+jJKFEjF5871fcUCDBxoU4M4XPyb4=;
+  b=nqGyaR42EORQ9alngy7H+rVLU/HT09iB9naVOrXCVwVNtld76CHdOOHB
+   /gJHeBpSvs87bPvf9GTuxlHZJZr8dyY8mzx8pKgUy8XTpAlU+K/4TPdbZ
+   VXz/opK2vbdfpTUShnBMeHG6eMKlyvTlR7qXtZhiOs/CQOhtf7f2OG5GN
+   T7JfU+9Q+YDYCtB1HorAESuoEaHj3ZLrmvDuZq55li+/wWNyyPedNOvag
+   Kz0z8qp7YcA6STqbpb5alhd156cgmiCQQqYXm72ohzdwqk9aWp6OG880v
+   OBqZnXOk6SwpoxCyMs0fWQ6iRLXfXOaT/YG33kGNt5IOlJr79RKPvwwEM
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="340175882"
+X-IronPort-AV: E=Sophos;i="6.01,149,1684825200"; 
+   d="scan'208";a="340175882"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 11:18:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="665162941"
+X-IronPort-AV: E=Sophos;i="6.01,149,1684825200"; 
+   d="scan'208";a="665162941"
+Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by orsmga003.jf.intel.com with ESMTP; 22 Jun 2023 11:18:22 -0700
+From:   Damian Muszynski <damian.muszynski@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Damian Muszynski <damian.muszynski@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v3 0/5] crypto: qat - add heartbeat feature
+Date:   Thu, 22 Jun 2023 20:04:01 +0200
+Message-Id: <20230622180405.133298-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230612192847.1599416-3-abel.vesa@linaro.org>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 10:28:46PM +0300, Abel Vesa wrote:
-> Now that there is a new dedicated ICE driver, drop the ufs-qcom-ice and
-> use the new ICE api provided by the Qualcomm soc driver ice. The platforms
-> that already have ICE support will use the API as library since there will
-> not be a devicetree node, but instead they have reg range. In this case,
-> the of_qcom_ice_get will return an ICE instance created for the consumer's
-> device. But if there are platforms that do not have ice reg in the
-> consumer devicetree node and instead provide a dedicated ICE devicetree
-> node, the of_qcom_ice_get will look up the device based on qcom,ice
-> property and will get the ICE instance registered by the probe function
-> of the ice driver.
-> 
-> The ICE clock is now handle by the new driver. This is done by enabling
-> it on the creation of the ICE instance and then enabling/disabling it on
-> UFS runtime resume/suspend.
-> 
-> Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
-> ---
->  drivers/ufs/host/Kconfig        |   2 +-
->  drivers/ufs/host/Makefile       |   4 +-
->  drivers/ufs/host/ufs-qcom-ice.c | 244 --------------------------------
->  drivers/ufs/host/ufs-qcom.c     |  99 ++++++++++++-
->  drivers/ufs/host/ufs-qcom.h     |  32 +----
->  5 files changed, 104 insertions(+), 277 deletions(-)
->  delete mode 100644 drivers/ufs/host/ufs-qcom-ice.c
-> 
-> diff --git a/drivers/ufs/host/Kconfig b/drivers/ufs/host/Kconfig
-> index 8793e3433580..16624ba08050 100644
-> --- a/drivers/ufs/host/Kconfig
-> +++ b/drivers/ufs/host/Kconfig
-> @@ -59,7 +59,7 @@ config SCSI_UFS_QCOM
->  	depends on SCSI_UFSHCD_PLATFORM && ARCH_QCOM
->  	depends on GENERIC_MSI_IRQ
->  	depends on RESET_CONTROLLER
-> -	select QCOM_SCM if SCSI_UFS_CRYPTO
-> +	select QCOM_INLINE_CRYPTO_ENGINE if SCSI_UFS_CRYPTO
->  	help
->  	  This selects the QCOM specific additions to UFSHCD platform driver.
->  	  UFS host on QCOM needs some vendor specific configuration before
-> diff --git a/drivers/ufs/host/Makefile b/drivers/ufs/host/Makefile
-> index d7c5bf7fa512..4573aead02eb 100644
-> --- a/drivers/ufs/host/Makefile
-> +++ b/drivers/ufs/host/Makefile
-> @@ -3,9 +3,7 @@
->  obj-$(CONFIG_SCSI_UFS_DWC_TC_PCI) += tc-dwc-g210-pci.o ufshcd-dwc.o tc-dwc-g210.o
->  obj-$(CONFIG_SCSI_UFS_DWC_TC_PLATFORM) += tc-dwc-g210-pltfrm.o ufshcd-dwc.o tc-dwc-g210.o
->  obj-$(CONFIG_SCSI_UFS_CDNS_PLATFORM) += cdns-pltfrm.o
-> -obj-$(CONFIG_SCSI_UFS_QCOM) += ufs_qcom.o
-> -ufs_qcom-y += ufs-qcom.o
-> -ufs_qcom-$(CONFIG_SCSI_UFS_CRYPTO) += ufs-qcom-ice.o
-> +obj-$(CONFIG_SCSI_UFS_QCOM) += ufs-qcom.o
+This set introduces support for the QAT heartbeat feature. It allows
+detection whenever device firmware or acceleration unit will hang.
+We're adding this feature to allow our clients having a tool with
+they could verify if all of the Quick Assist hardware resources are
+healthy and operational.
 
-The change from ufs_qcom.o to ufs-qcom.o here makes ufs_qcom.ko turn
-into ufs-qcom.ko.
+QAT device firmware periodically writes counters to a specified physical
+memory location. A pair of counters per thread is incremented at
+the start and end of the main processing loop within the firmware.
+Checking for Heartbeat consists of checking the validity of the pair
+of counter values for each thread. Stagnant counters indicate
+a firmware hang.
 
-That broke a (fragile :P ) initramfs development script I play with. Not
-sure if that's any sort of contract with userspace or not, but thought
-I'd report it at least in case someone has a strong opinion.
+The first patch adds timestamp synchronization to the firmware.
+The second patch removes historical and never used HB definitions.
+Patch no. 3 is implementing the hardware clock frequency measuring
+interface.
+The fourth introduces the main heartbeat implementation with the debugfs
+interface.
+The last patch implements an algorithm that allows the code to detect
+which version of heartbeat API is used at the currently loaded firmware.
 
-Thanks,
-Andrew
+Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+
+Changes since v2:
+- fixed build error on a few of architectures - reduced unnecessary 
+  64bit division.
+
+Changes since v1:
+- fixed build errors on a few of architectures - replaced macro
+  DIV_ROUND_CLOSEST with DIV_ROUND_CLOSEST_ULL
+- included prerequisite patch "add internal timer for qat 4xxx" which initially
+  was sent separately as this patchset was still in developement.
+  - timer patch reworked to use delayed work as suggested by Herbert Xu
+
+Damian Muszynski (5):
+  crypto: qat - add internal timer for qat 4xxx
+  crypto: qat - drop obsolete heartbeat interface
+  crypto: qat - add measure clock frequency
+  crypto: qat - add heartbeat feature
+  crypto: qat - add heartbeat counters check
+
+ Documentation/ABI/testing/debugfs-driver-qat  |  51 +++
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  14 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   4 +
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   |   3 +
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  28 ++
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h   |   7 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |  28 ++
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.h     |   7 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   4 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  43 +++
+ .../intel/qat/qat_common/adf_cfg_strings.h    |   2 +
+ .../crypto/intel/qat/qat_common/adf_clock.c   | 131 +++++++
+ .../crypto/intel/qat/qat_common/adf_clock.h   |  14 +
+ .../intel/qat/qat_common/adf_common_drv.h     |   5 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   9 +-
+ .../intel/qat/qat_common/adf_gen2_config.c    |   7 +
+ .../intel/qat/qat_common/adf_gen2_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_timer.c     |  70 ++++
+ .../intel/qat/qat_common/adf_gen4_timer.h     |  21 ++
+ .../intel/qat/qat_common/adf_heartbeat.c      | 336 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_heartbeat.h      |  79 ++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.c      | 194 ++++++++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.h      |  12 +
+ .../crypto/intel/qat/qat_common/adf_init.c    |  28 ++
+ drivers/crypto/intel/qat/qat_common/adf_isr.c |   6 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |  23 +-
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  13 +
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   |   5 +
+ 30 files changed, 1147 insertions(+), 16 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h
+
+
+base-commit: 0e2456dbf11f1d5427fc6c585ac149b3e9b816e7
+-- 
+2.40.1
 
