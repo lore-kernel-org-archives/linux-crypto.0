@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D8BFC001DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 20:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E913C001B1
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 20:47:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232609AbjFWUrA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 16:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
+        id S231675AbjFWUrf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 16:47:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232666AbjFWUqc (ORCPT
+        with ESMTP id S231629AbjFWUrU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 16:46:32 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71B4E3AAE;
-        Fri, 23 Jun 2023 13:45:19 -0700 (PDT)
+        Fri, 23 Jun 2023 16:47:20 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F36E2D7C;
+        Fri, 23 Jun 2023 13:45:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687553120; x=1719089120;
+  t=1687553154; x=1719089154;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LDWBjvnTTsLcekUwxDRyJLu3Qkm1EGGjQgrSvTcjXhI=;
-  b=TigqLGeMvqaGTQAz6AjR80magC8Z8Ucksi95l8I84ONonbyc1fQ25m1+
-   98/Q2yjGbocbgpxs7Id3JQMf805+F17OKi1bdUsOPzPSnzQKGvuuQsBzA
-   Q2pHAgnv86EoFXOzzfWRqG7SUkYY6OMriw7DXS+JEWWGCVdukNp+AboJY
-   arfCFsjnth9RNDdHxkpToCnVOk0cXDcZNL8OlUDPnHIt1WCiMFQ1k7Fg2
-   7WiGKChasTrR/s8bDalVuCgdHavARxgfOG5PQc88Rt7Q3+/oRBgIhB3xr
-   xadaLba3L4TlQEQX1KJOE++NEfe7E1EAQXdK6b7x35I6WYGdWm6twwiAF
-   A==;
+  bh=wbDKJvws7DHEcqSVmZREfaRKSyZQlG7Jb80ahWLRLHI=;
+  b=kqyOkM4vNWPW5IIhRNL6DP86SLYygE3c6HKNetFjnGbwwPrO700VhF57
+   EYsaYbt1xC6KpqhZXdK2YgLZJdAhVPJVZuPh6oYPhnBLOZy7CWAPpjEB3
+   RtKholcbLX50goQUjRbKn/kWtqw3Y1peMGwhT2o0Yi9Lwks6NE7IBgz0f
+   BiVQz2kfB3YOMs/qCcB1e0BCXdvn2aXhM5g/jcXirKOalmrwm455r6YaE
+   FQoaLEbjoHZl6NMlkTV8Ydna4pso0yD78KQzK/H7tf49R1vRyBacZIQpD
+   LyXCEnyhxhhIqNhYJKVmx7vt7qKY5TlVVPd9yD5Ww0Co7XCTTmYME8FJ0
+   w==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="217419517"
+   d="scan'208";a="231891135"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 13:44:21 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 13:45:12 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:44:07 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:45:05 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:43:38 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:44:38 -0700
 From:   Varshini Rajendran <varshini.rajendran@microchip.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -76,9 +76,9 @@ CC:     <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
         <balamanikandan.gunasundar@microchip.com>,
         <manikandan.m@microchip.com>, <dharma.b@microchip.com>,
         <nayabbasha.sayed@microchip.com>, <balakrishnan.s@microchip.com>
-Subject: [PATCH v2 26/45] dt-bindings: pinctrl: at91: add bindings for SAM9X7
-Date:   Sat, 24 Jun 2023 02:00:37 +0530
-Message-ID: <20230623203056.689705-27-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 28/45] dt-bindings: rtc: at91rm9200: add sam9x7 compatible
+Date:   Sat, 24 Jun 2023 02:00:39 +0530
+Message-ID: <20230623203056.689705-29-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -89,34 +89,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add device tree binding for SAM9X7 pin controller.
+Add compatible for SAM9X7 RTC.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- .../devicetree/bindings/pinctrl/atmel,at91-pinctrl.txt         | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/rtc/atmel,at91rm9200-rtc.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/pinctrl/atmel,at91-pinctrl.txt b/Documentation/devicetree/bindings/pinctrl/atmel,at91-pinctrl.txt
-index e8abbdad7b5d..5a3be10dcbfb 100644
---- a/Documentation/devicetree/bindings/pinctrl/atmel,at91-pinctrl.txt
-+++ b/Documentation/devicetree/bindings/pinctrl/atmel,at91-pinctrl.txt
-@@ -20,6 +20,7 @@ such as pull-up, multi drive, etc.
- Required properties for iomux controller:
- - compatible: "atmel,at91rm9200-pinctrl" or "atmel,at91sam9x5-pinctrl"
- 		or "atmel,sama5d3-pinctrl" or "microchip,sam9x60-pinctrl"
-+		or "microchip,sam9x7-pinctrl"
- - atmel,mux-mask: array of mask (periph per bank) to describe if a pin can be
-   configured in this periph mode. All the periph and bank need to be describe.
+diff --git a/Documentation/devicetree/bindings/rtc/atmel,at91rm9200-rtc.yaml b/Documentation/devicetree/bindings/rtc/atmel,at91rm9200-rtc.yaml
+index 4d2bef15fb7a..e15872bbdd7e 100644
+--- a/Documentation/devicetree/bindings/rtc/atmel,at91rm9200-rtc.yaml
++++ b/Documentation/devicetree/bindings/rtc/atmel,at91rm9200-rtc.yaml
+@@ -20,6 +20,7 @@ properties:
+       - atmel,sama5d4-rtc
+       - atmel,sama5d2-rtc
+       - microchip,sam9x60-rtc
++      - microchip,sam9x7-rtc
+       - microchip,sama7g5-rtc
  
-@@ -119,7 +120,7 @@ Some requirements for using atmel,at91rm9200-pinctrl binding:
- 
- For each bank the required properties are:
- - compatible: "atmel,at91sam9x5-gpio" or "atmel,at91rm9200-gpio" or
--  "microchip,sam9x60-gpio"
-+  "microchip,sam9x60-gpio" or "microchip,sam9x7-gpio"
- - reg: physical base address and length of the controller's registers
- - interrupts: interrupt outputs from the controller
- - interrupt-controller: marks the device node as an interrupt controller
+   reg:
 -- 
 2.25.1
 
