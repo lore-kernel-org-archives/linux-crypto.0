@@ -2,93 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A5BC001B3
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 11:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DD4C0015E
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 12:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbjFWL4C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 07:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
+        id S231808AbjFWMyH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 08:54:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjFWL4B (ORCPT
+        with ESMTP id S231644AbjFWMyG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 07:56:01 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608B991;
-        Fri, 23 Jun 2023 04:56:00 -0700 (PDT)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35NBDZJn025775;
-        Fri, 23 Jun 2023 11:55:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=qcppdkim1;
- bh=EMYcB5EQMk7xfxoD5jZL7SCS7GloqAQ/+Tu1J86+LpQ=;
- b=NZy6bGFulUZ12QdAXr4mNWuVBCdZ/ObG+VD/DB+pwH1w5HouEsEsImUfkC8l7oxo7JAg
- f/JWWKGBKF+Am14b6K5AkFpJVbxaiVx5Nf/K2TauNl7aydUccpO4LWNh55FVsQb0+t4G
- jU7sdxck4yGaUBWnM2N392kQEXJZ/I7lNQ+az3e3loObzYApjb1FKtKFrXcGtm8iQ4W0
- LDG924xmxGe9Y+y+4Ftl6Iq3XCkfnonZqwbV+nevxPfzitGmMUto/D0WHxQkQ3Rwb+6t
- 1RRojD3fiyqd6mxhL58Hh86NgUT5bqfm2gk/2mLLWiMeeU6oKp/feqOA1Ljp1P+YAaO+ Ww== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rc6b2cjc4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jun 2023 11:55:48 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 35NBtlb2007364
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 23 Jun 2023 11:55:47 GMT
-Received: from anusha-linux.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Fri, 23 Jun 2023 04:55:39 -0700
-From:   Anusha Rao <quic_anusha@quicinc.com>
-To:     <quic_anusha@quicinc.com>
-CC:     <agross@kernel.org>, <andersson@kernel.org>,
-        <bhupesh.sharma@linaro.org>, <conor+dt@kernel.org>,
-        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <konrad.dybcio@linaro.org>,
-        <krzysztof.kozlowski+dt@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <mturquette@baylibre.com>, <p.zabel@pengutronix.de>,
-        <quic_arajkuma@quicinc.com>, <quic_gokulsri@quicinc.com>,
-        <quic_kathirav@quicinc.com>, <quic_poovendh@quicinc.com>,
-        <quic_sjaganat@quicinc.com>, <quic_srichara@quicinc.com>,
-        <robh+dt@kernel.org>, <sboyd@kernel.org>,
-        <thara.gopinath@gmail.com>
-Subject: Re: [PATCH V4 3/4] dt-bindings: qcom-qce: add SoC compatible string for ipq9574
-Date:   Fri, 23 Jun 2023 17:25:25 +0530
-Message-ID: <20230623115525.7300-1-quic_anusha@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230526161129.1454-4-quic_anusha@quicinc.com>
-References: <20230526161129.1454-4-quic_anusha@quicinc.com>
+        Fri, 23 Jun 2023 08:54:06 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F322132
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Jun 2023 05:53:50 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3f90b4ac529so7920045e9.0
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Jun 2023 05:53:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687524829; x=1690116829;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ANudvaWzKociGmeQc/Hjbj55D7g4D5N/1vRViCm6qwo=;
+        b=iM15FSmBc4l2w2InncDGMQZLLlCk4y4CdgRqe/uD2EFb3FAwHLjz+ELDCjYY+CGXEz
+         HYtPLq+B9P0Ak4dzVlaZF+vlGaIYfjT6X504bk98lm8qaMR0cpfWISyJHvmd1mGx3TN7
+         Tedvr5AqajDzl9xCtHCZXWji1vTVRZP7GKs4JuPB5ZQF7x0OsSnASCOyA3tHS8lO6nqq
+         yqRbx8RBvy3zuaGN8xhhB7zD+lxUqcmngQOpiopHYAXOWR1YJtdtdGNvL2BrdfMR1LwI
+         e/1gTThgnItFYfKdL4q65cuMXRBolKgpt5NYvwCLzCMbA+9y1vrUeOQjZsAYb1m6cM4V
+         yyQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687524829; x=1690116829;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ANudvaWzKociGmeQc/Hjbj55D7g4D5N/1vRViCm6qwo=;
+        b=Ml9++jje0cEtCWGO3nvBnXa7FdTXWRQGlHaYDyIw8x9XkxGhaG+LXHvrPAXyLzPZlZ
+         f5FBzE9IXHKC2zr69aJq6Zodz1nvyDQWDCgDY5+Kc/5T4TjWrCd0LoXN3Tjl8GAoY8z/
+         /L5iimeplxpskBARiCoZzNz3Lcm/PxFUxoFzyrOXFikgCv12T/jWer28eG1GsNWejxk+
+         Yq5yx17MZtEroqFFtsstHytlNZwmEW2bFFpWBDqJG0129v3hYZyv9brZehUk9Ls/cBRn
+         Uf3tqUtGtjZhwXZKVIxZXzSFVFH54a38eutyoCnp5jhkEnV7RtASMnVe/2EPUy4rQdyi
+         GZMA==
+X-Gm-Message-State: AC+VfDwmFDaxzFik59Qz942Txlwhizdia84yIRRzCNH5njYgnqqFFIAq
+        NwsTgD350p5IWrb++/v2hyK/RA==
+X-Google-Smtp-Source: ACHHUZ4lM0hS9LoQWbVrzEU7Ux8cRPL7TId8Ngjq8cDakd+c79pbBTpR63tRY6dauxYKb6u9GfM32g==
+X-Received: by 2002:a05:600c:231a:b0:3f9:b430:199b with SMTP id 26-20020a05600c231a00b003f9b430199bmr10028918wmo.15.1687524828997;
+        Fri, 23 Jun 2023 05:53:48 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.26])
+        by smtp.gmail.com with ESMTPSA id m6-20020a7bcb86000000b003f80946116dsm2219346wmi.45.2023.06.23.05.53.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jun 2023 05:53:48 -0700 (PDT)
+Message-ID: <7ceba3df-bee8-9f1d-a27d-85e0b5f35d83@linaro.org>
+Date:   Fri, 23 Jun 2023 14:53:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 43NMBdc0BsON7s9os7zyfujjANOw3q6T
-X-Proofpoint-GUID: 43NMBdc0BsON7s9os7zyfujjANOw3q6T
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-23_06,2023-06-22_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- malwarescore=0 spamscore=0 phishscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=384 lowpriorityscore=0 impostorscore=0 mlxscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306230107
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH V4 3/4] dt-bindings: qcom-qce: add SoC compatible string
+ for ipq9574
+Content-Language: en-US
+To:     Anusha Rao <quic_anusha@quicinc.com>
+Cc:     agross@kernel.org, andersson@kernel.org, bhupesh.sharma@linaro.org,
+        conor+dt@kernel.org, davem@davemloft.net,
+        devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+        konrad.dybcio@linaro.org, krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mturquette@baylibre.com, p.zabel@pengutronix.de,
+        quic_arajkuma@quicinc.com, quic_gokulsri@quicinc.com,
+        quic_kathirav@quicinc.com, quic_poovendh@quicinc.com,
+        quic_sjaganat@quicinc.com, quic_srichara@quicinc.com,
+        robh+dt@kernel.org, sboyd@kernel.org, thara.gopinath@gmail.com
+References: <20230526161129.1454-4-quic_anusha@quicinc.com>
+ <20230623115525.7300-1-quic_anusha@quicinc.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230623115525.7300-1-quic_anusha@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> Document the compatible string for ipq9574.
->
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> Signed-off-by: Anusha Rao <quic_anusha@quicinc.com>
-> ---
->  Changes in V4:
->	- Picked up Reviewed-by tag.
+On 23/06/2023 13:55, Anusha Rao wrote:
+>> Document the compatible string for ipq9574.
+>>
+>> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+>> Reviewed-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>> Signed-off-by: Anusha Rao <quic_anusha@quicinc.com>
+>> ---
+>>  Changes in V4:
+>> 	- Picked up Reviewed-by tag.
+> 
+> A gentle reminder to pick the dt-binding patch.
+> As the dts change is picked, this patch is required to resolve dt-bindings check issues.
 
-A gentle reminder to pick the dt-binding patch.
-As the dts change is picked, this patch is required to resolve dt-bindings check issues.
+One patchset with four patches targeting three different subsystems, so
+no wonder it gets missed. You will usually receive better results with
+splitting such patchsets per subsystems.
+
+One more thing is lack of proper subject prefix which indicates the
+subsystem. Without it why anyone would pick it up? For example me, I
+would just ignore it for my subsystem...
+
+Best regards,
+Krzysztof
+
