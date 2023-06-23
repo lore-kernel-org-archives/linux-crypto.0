@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7E1C001DE
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D88AC001DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:07:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231896AbjFWVGc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 17:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44550 "EHLO
+        id S232085AbjFWVHZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 17:07:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232302AbjFWVG3 (ORCPT
+        with ESMTP id S230171AbjFWVHY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 17:06:29 -0400
+        Fri, 23 Jun 2023 17:07:24 -0400
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D59269A;
-        Fri, 23 Jun 2023 14:06:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50ACF2114;
+        Fri, 23 Jun 2023 14:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687554387; x=1719090387;
+  t=1687554443; x=1719090443;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lqDl2qv8oW6JjrVycxP7PCqyNjHBaQIvP6CwSvpsy4A=;
-  b=rxS1NLZuSx9JMor5CmNHza3GA+kxyPJBKKvxcKlf6jgkDZc3oErPjufq
-   clGWTLKlLVCDhCQTIwyKwl3P1JsOdtBh+rhgXKNE5dGqqW/RxT7umEkf5
-   08PXgXomgbbP1GAm7c1AHd/w21d4bwnrcYAluduBh7LOyoyYFxJfAs/WE
-   vlzSJitSyrmLsVYRDlyTth9rsbUG07HQ+vS1dq1iqopg3e11z1xmp8foE
-   AzMYCdh5v72FrbsipM8mwMnakOom9gMDdl8YEI6McI9DqTW79vCTYP75P
-   Q+yO9j4iIDemboLPim0dRgUQzLD0T+Js+3tGnRwiDzm/DRog0cqQ4g3BI
-   g==;
+  bh=VSgJEaXGE5mC5+J5yXqmr6+eX6G4aP7h1/R3eyDsTQg=;
+  b=MD4aIlYbYeMZGw43NDgORvAaJr5F7xOrQbJLHfxY9Az/viOTQ9cmN4kV
+   iCS3JbEmt8NQlyuOFGiVuJmZjWiqV7CFDkWbXOiIF1dsxTJSHg6m4qAFe
+   ZYWKopSk1NGhk/anLiubEK/EOAAEs55wQ0q8ptsIoYpU6QALJ9nqmXvVb
+   eLvKd1qsGIZ9cUSUecpfA/q5xzva99D+yHmfyuutsuIZ7WCV1tKhF4QUf
+   wbQMhYXlns88XR3bw3dibpx60QMjcurhSO/b5mDeYawy8wQOtSbRqBXjP
+   4s4pwuWKBS6qy9AdFopU2GDTDiq4ZDybhFynDn6KPVO8ttgznumz5OHxq
+   Q==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="221704946"
+   d="scan'208";a="221705070"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:06:25 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:07:11 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:50:27 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:51:56 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:49:59 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:51:26 -0700
 From:   Varshini Rajendran <varshini.rajendran@microchip.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -76,9 +76,9 @@ CC:     <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
         <balamanikandan.gunasundar@microchip.com>,
         <manikandan.m@microchip.com>, <dharma.b@microchip.com>,
         <nayabbasha.sayed@microchip.com>, <balakrishnan.s@microchip.com>
-Subject: [PATCH v2 39/45] power: reset: at91-reset: add reset support for sam9x7 SoC
-Date:   Sat, 24 Jun 2023 02:00:50 +0530
-Message-ID: <20230623203056.689705-40-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 42/45] ARM: configs: at91: enable config flags for sam9x7 SoC family
+Date:   Sat, 24 Jun 2023 02:00:53 +0530
+Message-ID: <20230623203056.689705-43-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -89,26 +89,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add power reset support for SAM9X7 SoC.
+Enable config flags for SAM9X7 SoC for the sam9x7 SoC family.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- drivers/power/reset/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/configs/at91_dt_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/power/reset/Kconfig b/drivers/power/reset/Kconfig
-index 8c87eeda0fec..6c4ad81a0059 100644
---- a/drivers/power/reset/Kconfig
-+++ b/drivers/power/reset/Kconfig
-@@ -26,7 +26,7 @@ config POWER_RESET_AT91_POWEROFF
- config POWER_RESET_AT91_RESET
- 	tristate "Atmel AT91 reset driver"
- 	depends on ARCH_AT91
--	default SOC_AT91SAM9 || SOC_SAM9X60 || SOC_SAMA5
-+	default SOC_AT91SAM9 || SOC_SAM9X60 || SOC_SAM9X7 || SOC_SAMA5
- 	help
- 	  This driver supports restart for Atmel AT91SAM9 and SAMA5
- 	  SoCs
+diff --git a/arch/arm/configs/at91_dt_defconfig b/arch/arm/configs/at91_dt_defconfig
+index 82bcf4dc7f54..6266a000736b 100644
+--- a/arch/arm/configs/at91_dt_defconfig
++++ b/arch/arm/configs/at91_dt_defconfig
+@@ -15,6 +15,7 @@ CONFIG_ARCH_AT91=y
+ CONFIG_SOC_AT91RM9200=y
+ CONFIG_SOC_AT91SAM9=y
+ CONFIG_SOC_SAM9X60=y
++CONFIG_SOC_SAM9X7=y
+ # CONFIG_ATMEL_CLOCKSOURCE_PIT is not set
+ CONFIG_AEABI=y
+ CONFIG_UACCESS_WITH_MEMCPY=y
 -- 
 2.25.1
 
