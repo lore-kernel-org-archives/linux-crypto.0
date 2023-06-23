@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400D2C001DD
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7E1C001DE
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:06:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231577AbjFWVGT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 17:06:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44446 "EHLO
+        id S231896AbjFWVGc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 17:06:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjFWVGS (ORCPT
+        with ESMTP id S232302AbjFWVG3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 17:06:18 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4634212C;
-        Fri, 23 Jun 2023 14:06:17 -0700 (PDT)
+        Fri, 23 Jun 2023 17:06:29 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D59269A;
+        Fri, 23 Jun 2023 14:06:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687554377; x=1719090377;
+  t=1687554387; x=1719090387;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=A4JJ970+JDUrGSsn6dpso6f3wPC0KethZaGyorgxcZw=;
-  b=DCIURaEaI0LfAoKNvOV5Ud8n7iwvg/Ks/Uao3m+pA/rauYw/dv018ELS
-   ShgtNGz4/P0XtPRZB4dl58Noa/Hg1KHhKIjI2IlUg+oeRs5nRdGjRyYZe
-   sr7kdhoLXiyNUotR7rYJI4ec3zs25Jit2ohfqUhO4QMEcg8lb8fv0ZM8m
-   YNx6kyrleub+9BSUmkVylRlL54OJylR6WV2sDdQYlWy0CxhLXFT2r1XjR
-   4eyUhw6yZ9ToXE4+giXnAL/HR+P4gFgVj+WfqZ8djP0RB6jdLbRNRuVeR
-   B9ehNvKoY5SHvLcZYeiWvGi/2Iruho6mKypmjlggFZbMwV9ugL8VhvPMp
+  bh=lqDl2qv8oW6JjrVycxP7PCqyNjHBaQIvP6CwSvpsy4A=;
+  b=rxS1NLZuSx9JMor5CmNHza3GA+kxyPJBKKvxcKlf6jgkDZc3oErPjufq
+   clGWTLKlLVCDhCQTIwyKwl3P1JsOdtBh+rhgXKNE5dGqqW/RxT7umEkf5
+   08PXgXomgbbP1GAm7c1AHd/w21d4bwnrcYAluduBh7LOyoyYFxJfAs/WE
+   vlzSJitSyrmLsVYRDlyTth9rsbUG07HQ+vS1dq1iqopg3e11z1xmp8foE
+   AzMYCdh5v72FrbsipM8mwMnakOom9gMDdl8YEI6McI9DqTW79vCTYP75P
+   Q+yO9j4iIDemboLPim0dRgUQzLD0T+Js+3tGnRwiDzm/DRog0cqQ4g3BI
    g==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="231893990"
+   d="scan'208";a="221704946"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:06:16 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:06:25 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:50:57 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:50:27 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:50:28 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:49:59 -0700
 From:   Varshini Rajendran <varshini.rajendran@microchip.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -76,9 +76,9 @@ CC:     <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
         <balamanikandan.gunasundar@microchip.com>,
         <manikandan.m@microchip.com>, <dharma.b@microchip.com>,
         <nayabbasha.sayed@microchip.com>, <balakrishnan.s@microchip.com>
-Subject: [PATCH v2 40/45] power: reset: at91-reset: add sdhwc support for sam9x7 SoC
-Date:   Sat, 24 Jun 2023 02:00:51 +0530
-Message-ID: <20230623203056.689705-41-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 39/45] power: reset: at91-reset: add reset support for sam9x7 SoC
+Date:   Sat, 24 Jun 2023 02:00:50 +0530
+Message-ID: <20230623203056.689705-40-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -89,7 +89,7 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add shutdown controller support for SAM9X7 SoC.
+Add power reset support for SAM9X7 SoC.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
@@ -97,18 +97,18 @@ Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/power/reset/Kconfig b/drivers/power/reset/Kconfig
-index 6c4ad81a0059..59459f5abbed 100644
+index 8c87eeda0fec..6c4ad81a0059 100644
 --- a/drivers/power/reset/Kconfig
 +++ b/drivers/power/reset/Kconfig
-@@ -34,7 +34,7 @@ config POWER_RESET_AT91_RESET
- config POWER_RESET_AT91_SAMA5D2_SHDWC
- 	tristate "Atmel AT91 SAMA5D2-Compatible shutdown controller driver"
+@@ -26,7 +26,7 @@ config POWER_RESET_AT91_POWEROFF
+ config POWER_RESET_AT91_RESET
+ 	tristate "Atmel AT91 reset driver"
  	depends on ARCH_AT91
--	default SOC_SAM9X60 || SOC_SAMA5
-+	default SOC_SAM9X60 || SOC_SAM9X7 || SOC_SAMA5
+-	default SOC_AT91SAM9 || SOC_SAM9X60 || SOC_SAMA5
++	default SOC_AT91SAM9 || SOC_SAM9X60 || SOC_SAM9X7 || SOC_SAMA5
  	help
- 	  This driver supports the alternate shutdown controller for some Atmel
- 	  SAMA5 SoCs. It is present for example on SAMA5D2 SoC.
+ 	  This driver supports restart for Atmel AT91SAM9 and SAMA5
+ 	  SoCs
 -- 
 2.25.1
 
