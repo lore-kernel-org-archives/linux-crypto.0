@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34874C001DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0652C001DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:47:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231856AbjFWV22 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 17:28:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32800 "EHLO
+        id S232382AbjFWVr3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 17:47:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231770AbjFWV21 (ORCPT
+        with ESMTP id S231784AbjFWVr2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 17:28:27 -0400
+        Fri, 23 Jun 2023 17:47:28 -0400
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20B88FE;
-        Fri, 23 Jun 2023 14:28:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED4D2686;
+        Fri, 23 Jun 2023 14:47:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687555707; x=1719091707;
+  t=1687556847; x=1719092847;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LaFuLsEGQ6mxqfpcSL/WdyF7cpNwZFZOEiL/qzQcsPg=;
-  b=CxErQ1qJclMCftQcjZGz0O5BCuzEeD1wFwhXRv4OVwsGSs/kur9nadNS
-   Q4kEjmxBFnaPwP2q9Ur2ZaJGo4AnZylRGi/DNHVoTJza3jIdsSujuhoo1
-   1K3IS88yks6aIlA6brfvoURK9TLuYn8cHqLWN1ClztN70fwDsf1BXTJAV
-   GHAWy/YYrbKWDVGcpIa5kCZn4Oa+nkeR1B2obIzo9W7+6XX9ydPMRgYnM
-   OwFKNpEwDfHCxkZ+djj+NstH5LCQ8gbRiXT9dq24AJePknoFgSUeN9kIG
-   PsAauitZ2MIcLEVEJX4Nh7OFnsp02aEdCEhxw6qRqzlu0kUX3IpKaV0oo
+  bh=fNyeswamikUAfj8qMnAnax4MsblCkT848RthFZXCwQM=;
+  b=ZEypV6wvB8i4cNjSQCRfY4OkMX0CJP1cH6mu5hEZezqpB+L/tMh6LiCb
+   aT3qkTZU3YXtIiBLdrC8QRwBT0ZREekM48yvlhPs+VnXN/hw7iFN144od
+   EKmLy9JkVPW0n+8Yt0LSiV47aTmbQcLWQrbkHo+FJlPC8WgYjc4P9I04x
+   D/bVQhUKPaqkyFgGRr9EV0gggqYy8sNr+dNYCnptJY7TC7KrL2nL3JmLw
+   EstK2ulJaO6zSzW0QUsOOZULpuO1QbyK8m/3Ux7wpdxSGA0kC8tk87dVX
+   FsFSaADQY2sp6qtt99U41Pivddc+cBMzxQtIWYEmY1MXMvnQsEjXa2w/M
    Q==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="220223109"
+   d="scan'208";a="219560210"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:28:25 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:47:25 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:43:08 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:47:03 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:42:40 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:46:34 -0700
 From:   Varshini Rajendran <varshini.rajendran@microchip.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -76,9 +76,9 @@ CC:     <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
         <balamanikandan.gunasundar@microchip.com>,
         <manikandan.m@microchip.com>, <dharma.b@microchip.com>,
         <nayabbasha.sayed@microchip.com>, <balakrishnan.s@microchip.com>
-Subject: [PATCH v2 24/45] dt-bindings: sdhci-of-at91: add microchip,sam9x7-sdhci
-Date:   Sat, 24 Jun 2023 02:00:35 +0530
-Message-ID: <20230623203056.689705-25-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 32/45] spi: dt-bindings: atmel,at91rm9200-spi: add sam9x7 compatible
+Date:   Sat, 24 Jun 2023 02:00:43 +0530
+Message-ID: <20230623203056.689705-33-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -89,32 +89,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add microchip,sam9x7-sdhci to DT bindings documentation.
+Add sam9x7 compatible to DT bindings documentation.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- Documentation/devicetree/bindings/mmc/sdhci-atmel.txt | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt b/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt
-index 69edfd4d3922..b8df78fbc00f 100644
---- a/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt
-+++ b/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt
-@@ -5,11 +5,13 @@ Documentation/devicetree/bindings/mmc/mmc.txt and the properties used by the
- sdhci-of-at91 driver.
+diff --git a/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml b/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml
+index 6c57dd6c3a36..bdc42eeacba4 100644
+--- a/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml
++++ b/Documentation/devicetree/bindings/spi/atmel,at91rm9200-spi.yaml
+@@ -19,6 +19,7 @@ properties:
+       - const: atmel,at91rm9200-spi
+       - items:
+           - const: microchip,sam9x60-spi
++          - const: microchip,sam9x7-spi
+           - const: atmel,at91rm9200-spi
  
- Required properties:
--- compatible:		Must be "atmel,sama5d2-sdhci" or "microchip,sam9x60-sdhci".
-+- compatible:		Must be "atmel,sama5d2-sdhci" or "microchip,sam9x60-sdhci"
-+			or "microchip,sam9x7-sdhci"
- - clocks:		Phandlers to the clocks.
- - clock-names:		Must be "hclock", "multclk", "baseclk" for
- 			"atmel,sama5d2-sdhci".
- 			Must be "hclock", "multclk" for "microchip,sam9x60-sdhci".
-+			Must be "hclock", "multclk" for "microchip,sam9x7-sdhci".
- 
- Optional properties:
- - assigned-clocks:	The same with "multclk".
+   reg:
 -- 
 2.25.1
 
