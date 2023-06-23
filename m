@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 114A3C001DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 20:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F34C001B1
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 21:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232573AbjFWUyj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 16:54:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
+        id S231925AbjFWVDJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 17:03:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232779AbjFWUyQ (ORCPT
+        with ESMTP id S231129AbjFWVDI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 16:54:16 -0400
+        Fri, 23 Jun 2023 17:03:08 -0400
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43D926B0;
-        Fri, 23 Jun 2023 13:52:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D717F212C;
+        Fri, 23 Jun 2023 14:03:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687553578; x=1719089578;
+  t=1687554187; x=1719090187;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1g44sE6+Od6SMEJPDEyOlmg+p5HZYIyXIwcF8EJ/S8U=;
-  b=A0wc+R7dyyGyZWzXPllhvqTxARy3vyKhTTDlUiQCbmmFcHBrucnX/u8O
-   b3Tgw+m5ZIHQnKBOO5rtppyf9gaIuL2KJzzMWNbgU+olhPcMCn/UnC/K1
-   p913ZSXlSlCU6v5Zta8zQHCnF+HbJz088YJoolBT4zL3zpcXpjLV03q/9
-   WiZXtbUBmkM13fMQUeLrY+S3TMTd8EFhCBWgtWNV3Tj/6b1b7XyyC0Eqt
-   Hs9w9O9j0c6bZBdu0zIwdzsHM5jXJ6u7DzecuWnRSkGATkBS+iBxlquAz
-   ecUqHTKMSCv4ZsZ7kJvC+hL5HU4pbgIdAhmAXOxrSpRq9rGqLfFcciOmT
-   w==;
+  bh=JbsGFsYlFyr7Htiazu4hc2TYcucQMiz4ks01lMK9mTI=;
+  b=qBZKtutK+JuAGdynbyYdpkkEqqBXjg/STPOo76xe7V7VHBrVZHK1S+H/
+   mNNdmeMvuAycV3vOg4di57QRXaQaR36ok060xw6CQMN0VVBuxPy09MTKP
+   fuQ4mGwuAKckg8wzJmcKjra5lGcAjvVQSDdu7mjUdwofwG5+xmBqy5Nw9
+   pF4nqPa5s2U1uTuJyb4vuEhJof+yFHRwrniVAhwHFa9lygyNChbLFrEQK
+   DFesI3Rq7ZHVTf2iiBf2hW68joMBDSDMs1/ZT4HDD3SoLC0yi12j6AOla
+   bVWlU9jKBVYMVJ5L+9150QO/buWJd+meSu82SE1qxdHcVvaWArfgpo4WU
+   g==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="231891816"
+   d="scan'208";a="231893588"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 13:52:57 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:03:06 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:52:56 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:48:02 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:52:29 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:47:32 -0700
 From:   Varshini Rajendran <varshini.rajendran@microchip.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -76,9 +76,9 @@ CC:     <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
         <balamanikandan.gunasundar@microchip.com>,
         <manikandan.m@microchip.com>, <dharma.b@microchip.com>,
         <nayabbasha.sayed@microchip.com>, <balakrishnan.s@microchip.com>
-Subject: [PATCH v2 44/45] dt-bindings: arm: add sam9x75 curiosity board
-Date:   Sat, 24 Jun 2023 02:00:55 +0530
-Message-ID: <20230623203056.689705-45-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 34/45] dt-bindings: watchdog: sama5d4-wdt: add compatible for sam9x7-wdt
+Date:   Sat, 24 Jun 2023 02:00:45 +0530
+Message-ID: <20230623203056.689705-35-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -89,30 +89,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add documentation for SAM9X75 Curiosity board.
+Add compatible microchip,sam9x7-wdt to DT bindings documentation.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- Documentation/devicetree/bindings/arm/atmel-at91.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml          | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/arm/atmel-at91.yaml b/Documentation/devicetree/bindings/arm/atmel-at91.yaml
-index dfb8fd089197..15b11feae46a 100644
---- a/Documentation/devicetree/bindings/arm/atmel-at91.yaml
-+++ b/Documentation/devicetree/bindings/arm/atmel-at91.yaml
-@@ -99,6 +99,12 @@ properties:
-           - const: microchip,sam9x60
-           - const: atmel,at91sam9
+diff --git a/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml b/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
+index 816f85ee2c77..216e64dfddb2 100644
+--- a/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
++++ b/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
+@@ -17,6 +17,7 @@ properties:
+     enum:
+       - atmel,sama5d4-wdt
+       - microchip,sam9x60-wdt
++      - microchip,sam9x7-wdt
+       - microchip,sama7g5-wdt
  
-+      - description: Microchip SAM9X7 Evaluation Boards
-+        items:
-+          - const: microchip,sam9x75-curiosity
-+          - const: microchip,sam9x7
-+          - const: atmel,at91sam9
-+
-       - description: Nattis v2 board with Natte v2 power board
-         items:
-           - const: axentia,nattis-2
+   reg:
 -- 
 2.25.1
 
