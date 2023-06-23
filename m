@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913FDC001DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 20:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A7F2EB64DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 20:44:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232588AbjFWUnY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 16:43:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56968 "EHLO
+        id S232502AbjFWUoc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 23 Jun 2023 16:44:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbjFWUm6 (ORCPT
+        with ESMTP id S232515AbjFWUoM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 16:42:58 -0400
+        Fri, 23 Jun 2023 16:44:12 -0400
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69AA130DB;
-        Fri, 23 Jun 2023 13:42:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2906C26AF;
+        Fri, 23 Jun 2023 13:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687552937; x=1719088937;
+  t=1687552999; x=1719088999;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WJBpuftmPHFybU78SZYRP8gNMygbTHITWb0Sy8SV9r0=;
-  b=rRoUc6p2QLc0dAdxam2PFz/WZvxMOryie5MCmKx67SAc3QDfi2IOWaC0
-   a8ep0OiwB2qO9+qWVdcTvD8q+q5b9T/bHuQwZmZCGn0ayYdMdzy37LTu1
-   Vbi1Qp6lTD0nol9mdpmxF0X8DGAacHWTe+0UyGXehkDd7K5T1Tli84XqR
-   0w7sjQBy7lORV+yYzNn1RHYYmEc5LBwUlQMeaAerct7WChNV5YWtU439b
-   X1dGH/DrXmiEr0lbdakYIvefqRWhk6iJw/N/9062AcgcIxEN4w2PXqI6N
-   UIIYbXHV+/C9D/ySVJx19JqVhhrjRn9li8KcjJ5TNF7AvFKl6wYdOeQ0I
-   w==;
+  bh=a5/m7TTlJ8XMalnbV6/Tcw8Q0FeNDH1xvWljMF6nhyo=;
+  b=nfyneqt2DnXcljN3nwVQe8osdDPuVfW3UmNY4a/SO/0CRsDkZe/iAACl
+   rrPINDErXhQdZ3q8xuBw86mroYGkLr/JczHAhW+JfrdRB2UQlyc4vsGun
+   nNt8NJifcuZQxc8X0x5SFqKUOx60u+kXXJgSUIOPUPodrqSVDabZ7jWQs
+   /RcjMnB1Qo3eyZGmYTIqdvg34TXxwho6FipzxqKmvNTZF0WR6VgOGheNA
+   rxO78VLGPjn3Jd3MOh8OTZ1V/xtVyuCv73aTjx7GYgu9alKKJI1PFg0CJ
+   AjDKXp55WMafK+N5jFX18SLyxLz/cNWnMFT2QmF+BsR4IY+7bk/F/tvcG
+   g==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="221702532"
+   d="scan'208";a="158362850"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 13:41:14 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 13:42:15 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:41:13 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:42:11 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:40:43 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:41:43 -0700
 From:   Varshini Rajendran <varshini.rajendran@microchip.com>
 To:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
         <conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -76,9 +76,9 @@ CC:     <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
         <balamanikandan.gunasundar@microchip.com>,
         <manikandan.m@microchip.com>, <dharma.b@microchip.com>,
         <nayabbasha.sayed@microchip.com>, <balakrishnan.s@microchip.com>
-Subject: [PATCH v2 20/45] dt-bindings: atmel-gpbr: add microchip,sam9x7-gpbr
-Date:   Sat, 24 Jun 2023 02:00:31 +0530
-Message-ID: <20230623203056.689705-21-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 22/45] dt-bindings: atmel-smc: add microchip,sam9x7-smc
+Date:   Sat, 24 Jun 2023 02:00:33 +0530
+Message-ID: <20230623203056.689705-23-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -89,23 +89,23 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add microchip,sam9x7-gpbr to DT bindings documentation.
+Add microchip,sam9x7-smc to DT bindings documentation.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- Documentation/devicetree/bindings/mfd/atmel-gpbr.txt | 1 +
+ Documentation/devicetree/bindings/mfd/atmel-smc.txt | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/mfd/atmel-gpbr.txt b/Documentation/devicetree/bindings/mfd/atmel-gpbr.txt
-index e8c525569f10..2cc39524af8c 100644
---- a/Documentation/devicetree/bindings/mfd/atmel-gpbr.txt
-+++ b/Documentation/devicetree/bindings/mfd/atmel-gpbr.txt
-@@ -6,6 +6,7 @@ Required properties:
- - compatible:		Should be one of the following:
- 			"atmel,at91sam9260-gpbr", "syscon"
- 			"microchip,sam9x60-gpbr", "syscon"
-+			"microchip,sam9x7-gpbr", "syscon"
- - reg:			contains offset/length value of the GPBR memory
+diff --git a/Documentation/devicetree/bindings/mfd/atmel-smc.txt b/Documentation/devicetree/bindings/mfd/atmel-smc.txt
+index 5696d9fcb5dc..1eb2606820a5 100644
+--- a/Documentation/devicetree/bindings/mfd/atmel-smc.txt
++++ b/Documentation/devicetree/bindings/mfd/atmel-smc.txt
+@@ -10,6 +10,7 @@ Required properties:
+ 			"atmel,sama5d3-smc", "syscon"
+ 			"atmel,sama5d2-smc", "syscon"
+ 			"microchip,sam9x60-smc", "syscon"
++			"microchip,sam9x7-smc", "syscon"
+ - reg:			Contains offset/length value of the SMC memory
  			region.
  
 -- 
