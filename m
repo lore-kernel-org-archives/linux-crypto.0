@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755DFC0015E
-	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jun 2023 08:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B251C001B1
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jun 2023 08:23:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232366AbjFXIXn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 24 Jun 2023 04:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34242 "EHLO
+        id S232494AbjFXIXr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 24 Jun 2023 04:23:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232457AbjFXIXc (ORCPT
+        with ESMTP id S232807AbjFXIXk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 24 Jun 2023 04:23:32 -0400
+        Sat, 24 Jun 2023 04:23:40 -0400
 Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED032133
-        for <linux-crypto@vger.kernel.org>; Sat, 24 Jun 2023 01:23:29 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51be5db4e35so1368571a12.1
-        for <linux-crypto@vger.kernel.org>; Sat, 24 Jun 2023 01:23:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2B82735
+        for <linux-crypto@vger.kernel.org>; Sat, 24 Jun 2023 01:23:36 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51a2de3385fso1757934a12.0
+        for <linux-crypto@vger.kernel.org>; Sat, 24 Jun 2023 01:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687595008; x=1690187008;
+        d=linaro.org; s=google; t=1687595015; x=1690187015;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yGCuLOrcQg1CRlpQSfVcmvKebFGyaZsdxYX9CXcfLZM=;
-        b=xFKigBdV83Jd1qUsH05hPiIU1P7h6ll6on3yqFhMjrYPwiCXFC0e303zASaD1ZqqKd
-         Ndiy0iOYjUF8YhQxuAkR8Nx1s9PjpApJ0TyNtB1b5gwgsCvZs0iajX45ENiiPCQcPY96
-         g4S9zr1214rNmDdio/oKh2DCVClan9uYvQlB4qQl0yjuKnXTLTRyO6dOXqyvfX0Ge8of
-         8DruxxWJt1OJ2iHb05QqWeR0WDztLvfZd6ajx/RAVn5knbq8nIzSWIixJylIR/D0BwLR
-         irpLdb/TPiW3i6BbsRoMZNvBM8AZ4+ztRJOKNPudJyzZ1WNXldj3Z+N3OczkwWUKt0K3
-         5mrQ==
+        bh=iw/ywJG51HUTwkPghusRkjWUXteVCmP/Fv5gaFgQqkU=;
+        b=IsOfPPALsc6kgiSVlUoR59ZJkgFCtFF5TGUwt1sbTFoWRMQOqCvWPTIR5S4VBZ7wwO
+         U+Tfcj6D2UZWfSg6R9maL5SVaczzgRsCGFn3w3hx97Rmn0RbCb+dz8mN7fo1OhBYO1YQ
+         54oNjUFMACNKqmgtbF97PqAckUG/2az/K+ImnC3CequpWgOAVohV3SkCnVPNu1hfXpIY
+         qSBKOgbw6rHxDUkAQDvMik5GXkFpd4yw9FALSXz9sR/ZAgWV+QM0FhTv8QIuM4SSMc+2
+         /nbK/R/EUUxlTLqExeuaZfJ7NLx2+2g0GulfxjKCtNGXlBg5sxnH4072KmidxffszrB8
+         88VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687595008; x=1690187008;
+        d=1e100.net; s=20221208; t=1687595015; x=1690187015;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yGCuLOrcQg1CRlpQSfVcmvKebFGyaZsdxYX9CXcfLZM=;
-        b=DSYKjsEerzf5sW+5u6IyGGri5j5k3Wpz3i5AUg2QWILdTFk9OD2TCj1smNz7eGSvHV
-         aBmoSkMYoHg6G1GaMlzASBlbfBsvafTNg/38eX4sXqqHgD95ZDHOKHEN2AwGXL7LT9ji
-         S2eLn7TGUNmSpFLlGgcjEijk1L/XAsUlFt3hmeflR0MCdZ/EYHQItOGW0cdvc1adljhU
-         zmTe4V7S10HVEOU10I3Q0jJoUV+CFtOieRw3zEKBdruGh7FRsmhQnq/XYjDTsaNgRMty
-         R5h4BxlKSS1kHjs+FH5I8pkrcF2DwpHvePTzGInG2SMR/MoDUg5GBSGigJpGiT9rvjDn
-         dKRQ==
-X-Gm-Message-State: AC+VfDx8ySq09/9oUbK9SKuJFWozkxFvZNrZTltdNj8Q+7RpDqFwe2Pn
-        w4DBqGPCEcPNLupw5C+eqIqq7g==
-X-Google-Smtp-Source: ACHHUZ5rxUhuZrDxVobS5SDmzvY5J2k9KNpHXKQzE6cA0gPVXDKAPA/JRUBn5KncILCak4yP/Iurig==
-X-Received: by 2002:aa7:d281:0:b0:51b:e89e:a848 with SMTP id w1-20020aa7d281000000b0051be89ea848mr4981862edq.17.1687595007953;
-        Sat, 24 Jun 2023 01:23:27 -0700 (PDT)
+        bh=iw/ywJG51HUTwkPghusRkjWUXteVCmP/Fv5gaFgQqkU=;
+        b=I7lBmqOjza+pFo4H0d8EMLxJDLcn8RZjPOI2qFNCtuzynx+ZXUusccN4RGwS55avpT
+         av5Pyvmy7+FDkNw/12bR9WO3w816aZC3os8KpGAvs3AQ6WismMLA1Gp40JO5CCNOgS3L
+         qCiGVSEvcPmyVgLuubL0tT5jwxpmwi/8maDo/RiKU+IeRA30W130nLwGypU9In+gAe2F
+         sTOEsIB3C0NMBSmjGEkZP6vvVV3d17SJ//aQ5CKwiXB9bKFSTuvlaKlujazz7pSTyA9w
+         4W4yTJAPRXdbCGf3lY9hfuVnLpIDJauiRCw3qg3M9gRY22j4CMH226MbbazwCsk2QIBx
+         sAJg==
+X-Gm-Message-State: AC+VfDwSqGbzX/2IiXD3UEyaRF8ELQto1HpIQV63Kf+jBL+//SqhtlG1
+        8u9inLgHJTZcGjceVo9xr7Be+w==
+X-Google-Smtp-Source: ACHHUZ43qIJ7DSZr3vq3pOJ8EpVNA3z/s2kop3/I0gBWTVNNyPwlCA/pGa/4aeeS2b9dek8ZmCoz3A==
+X-Received: by 2002:a05:6402:550:b0:51a:543b:2c8c with SMTP id i16-20020a056402055000b0051a543b2c8cmr11889190edx.35.1687595015160;
+        Sat, 24 Jun 2023 01:23:35 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id g19-20020a056402115300b0051873c201a0sm436026edw.26.2023.06.24.01.23.22
+        by smtp.gmail.com with ESMTPSA id m16-20020aa7c490000000b005187d2ba7c1sm419224edq.91.2023.06.24.01.23.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 01:23:27 -0700 (PDT)
-Message-ID: <2b6ee66b-b2d1-23c3-9b26-d44fce7fd6bd@linaro.org>
-Date:   Sat, 24 Jun 2023 10:23:21 +0200
+        Sat, 24 Jun 2023 01:23:34 -0700 (PDT)
+Message-ID: <e7f7eab2-7fbc-99ae-641b-075ff0610127@linaro.org>
+Date:   Sat, 24 Jun 2023 10:23:28 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v2 35/45] dt-bindings: irqchip/atmel-aic5: Add support for
- sam9x7 aic
+Subject: Re: [PATCH v2 19/45] dt-bindings: mfd: at91: Add SAM9X7 compatible
+ string
 Content-Language: en-US
 To:     Varshini Rajendran <varshini.rajendran@microchip.com>,
         robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
@@ -93,9 +93,9 @@ Cc:     Hari.PrasathGE@microchip.com, cristian.birsan@microchip.com,
         manikandan.m@microchip.com, dharma.b@microchip.com,
         nayabbasha.sayed@microchip.com, balakrishnan.s@microchip.com
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
- <20230623203056.689705-36-varshini.rajendran@microchip.com>
+ <20230623203056.689705-20-varshini.rajendran@microchip.com>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230623203056.689705-36-varshini.rajendran@microchip.com>
+In-Reply-To: <20230623203056.689705-20-varshini.rajendran@microchip.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -103,24 +103,23 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 23/06/2023 22:30, Varshini Rajendran wrote:
-> Document the support added for the Advanced interrupt controller(AIC)
-> chip in the sam9x7 SoC family.
+> Document sam9x7 DT for flexcom.
 > 
 > Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 > ---
->  .../devicetree/bindings/interrupt-controller/atmel,aic.txt      | 2 +-
+>  Documentation/devicetree/bindings/mfd/atmel-flexcom.txt | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt b/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt
-> index 7079d44bf3ba..2c267a66a3ea 100644
-> --- a/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt
-> +++ b/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt
-> @@ -4,7 +4,7 @@ Required properties:
->  - compatible: Should be:
->      - "atmel,<chip>-aic" where  <chip> can be "at91rm9200", "sama5d2",
->        "sama5d3" or "sama5d4"
-> -    - "microchip,<chip>-aic" where <chip> can be "sam9x60"
-> +    - "microchip,<chip>-aic" where <chip> can be "sam9x60", "sam9x7"
+> diff --git a/Documentation/devicetree/bindings/mfd/atmel-flexcom.txt b/Documentation/devicetree/bindings/mfd/atmel-flexcom.txt
+> index 9d837535637b..449e0af93a13 100644
+> --- a/Documentation/devicetree/bindings/mfd/atmel-flexcom.txt
+> +++ b/Documentation/devicetree/bindings/mfd/atmel-flexcom.txt
+> @@ -5,7 +5,7 @@ controller and an USART. Only one function can be used at a time and is chosen
+>  at boot time according to the device tree.
+>  
+>  Required properties:
+> -- compatible:		Should be "atmel,sama5d2-flexcom"
+> +- compatible:		Should be "atmel,sama5d2-flexcom" or "microchip,sam9x7-flexcom"
 
 That's not what your DTS is saying. NAK.
 
