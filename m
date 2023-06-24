@@ -2,128 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3F4C001DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Jun 2023 23:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6215FEB64DA
+	for <linux-crypto@archiver.kernel.org>; Sat, 24 Jun 2023 05:20:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231663AbjFWXnT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Jun 2023 19:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55270 "EHLO
+        id S229451AbjFXFUR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 24 Jun 2023 01:20:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230010AbjFWXnS (ORCPT
+        with ESMTP id S229566AbjFXFUP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Jun 2023 19:43:18 -0400
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EF02703;
-        Fri, 23 Jun 2023 16:43:17 -0700 (PDT)
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-78333585d28so32790139f.1;
-        Fri, 23 Jun 2023 16:43:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687563796; x=1690155796;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fTiyezCl+ncjMsIOOS0sUB9bYyrGCDjIJOvndxohyZs=;
-        b=JsAIoLHPQR83cIFWCg7WWq9dOFpHwbGPHK2yoY125gC8xVqx2+ttlxJX+sxoETmQlV
-         0nzPjnhz39qU6o87QsXUo3XE8rc8xVe1tCFq0v/HUv/SqKNKfCrP1E1R7lgXcGuOx6y2
-         Ye3G6ypunxQdjQzz2ukdGGZuVQNU006TpPpL8MAHc+uIiGpnV85+2gp/WvADNQ/2sRCU
-         AoLsbcQUu6qTlfBlobD2G6x4CJs0P6/7LAU5AFlr+R6jVOZVLv1PoQKKkeOqS1a/I5G5
-         iHh6o5EBG3JC2u0sVTRVWCc72uLnf7/POT8WGjwChV0ytJvnTeM9K3NQ4zI7JypbiFa8
-         xFfg==
-X-Gm-Message-State: AC+VfDw5DExrdMCkSqQcgXx602OXDOFT2Gsg8bbCY0m4jzAMeRS+bMz2
-        HjkFdCKixSxi9ODyQ8CMJA==
-X-Google-Smtp-Source: ACHHUZ704nUo/Qe+1L5BBq/vh9K03eeZluxsw6d51akGW3mbLVGxB1UGHdSEiXEdc5xMZV7l5fDOHg==
-X-Received: by 2002:a5d:9483:0:b0:760:e308:107e with SMTP id v3-20020a5d9483000000b00760e308107emr15001057ioj.0.1687563796356;
-        Fri, 23 Jun 2023 16:43:16 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id r27-20020a02c85b000000b0041407c67451sm72416jao.165.2023.06.23.16.43.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 16:43:15 -0700 (PDT)
-Received: (nullmailer pid 1606691 invoked by uid 1000);
-        Fri, 23 Jun 2023 23:43:09 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Sat, 24 Jun 2023 01:20:15 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7C92703
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Jun 2023 22:20:11 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qCvgi-006fz8-0O; Sat, 24 Jun 2023 13:19:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Jun 2023 13:19:56 +0800
+Date:   Sat, 24 Jun 2023 13:19:56 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     kernel test robot <lkp@intel.com>
+Cc:     oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: sm2 - Provide sm2_compute_z_digest when sm2 is
+ disabled
+Message-ID: <ZJZ8/JifEeygojAq@gondor.apana.org.au>
+References: <202306231917.utO12sx8-lkp@intel.com>
 MIME-Version: 1.0
-From:   Rob Herring <robh@kernel.org>
-To:     Varshini Rajendran <varshini.rajendran@microchip.com>
-Cc:     ulf.hansson@linaro.org, krzysztof.kozlowski+dt@linaro.org,
-        edumazet@google.com, broonie@kernel.org, arnd@arndb.de,
-        maz@kernel.org, lgirdwood@gmail.com, alexandre.belloni@bootlin.com,
-        alain.volmat@foss.st.com, p.zabel@pengutronix.de,
-        mihai.sain@microchip.com, soc@kernel.org,
-        linux-mtd@lists.infradead.org, cristian.birsan@microchip.com,
-        jerry.ray@microchip.com, tudor.ambarus@linaro.org,
-        miquel.raynal@bootlin.com, richard@nod.at,
-        gregkh@linuxfoundation.org, linux-usb@vger.kernel.org,
-        balamanikandan.gunasundar@microchip.com, lee@kernel.org,
-        olivia@selenic.com, sboyd@kernel.org, mturquette@baylibre.com,
-        kuba@kernel.org, Hari.PrasathGE@microchip.com,
-        linux-kernel@vger.kernel.org, balakrishnan.s@microchip.com,
-        alsa-devel@alsa-project.org, durai.manickamkr@microchip.com,
-        sre@kernel.org, vkoul@kernel.org, linux-rtc@vger.kernel.org,
-        linux-serial@vger.kernel.org, andrew@lunn.ch,
-        devicetree@vger.kernel.org, nayabbasha.sayed@microchip.com,
-        linux-gpio@vger.kernel.org, nicolas.ferre@microchip.com,
-        davem@davemloft.net, pabeni@redhat.com,
-        linux-arm-kernel@lists.infradead.org, linux@roeck-us.net,
-        wim@linux-watchdog.org, tglx@linutronix.de,
-        horatiu.vultur@microchip.com, radu_nicolae.pirea@upb.ro,
-        dharma.b@microchip.com, a.zummo@towertech.it,
-        linux-mmc@vger.kernel.org, richard.genoud@gmail.com,
-        claudiu.beznea@microchip.com, linus.walleij@linaro.org,
-        conor+dt@kernel.org, herbert@gondor.apana.org.au,
-        eugen.hristev@collabora.com, dmaengine@vger.kernel.org,
-        netdev@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux@armlinux.org.uk, linux-watchdog@vger.kernel.org,
-        linux-pm@vger.kernel.org, robh+dt@kernel.org,
-        linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
-        neil.armstrong@linaro.org, vigneshr@ti.com,
-        manikandan.m@microchip.com, linux-clk@vger.kernel.org,
-        olof@lixom.net
-In-Reply-To: <20230623203056.689705-32-varshini.rajendran@microchip.com>
-References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
- <20230623203056.689705-32-varshini.rajendran@microchip.com>
-Message-Id: <168756378936.1606652.14221929175769628362.robh@kernel.org>
-Subject: Re: [PATCH v2 31/45] dt-bindings: atmel-classd: add sam9x7
- compatible
-Date:   Fri, 23 Jun 2023 17:43:09 -0600
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202306231917.utO12sx8-lkp@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, Jun 23, 2023 at 07:22:29PM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   b335f258e8ddafec0e8ae2201ca78d29ed8f85eb
+> commit: e5221fa6a355112ddcc29dc82a94f7c3a1aacc0b [76/81] KEYS: asymmetric: Move sm2 code into x509_public_key
+> config: nios2-randconfig-r031-20230622 (https://download.01.org/0day-ci/archive/20230623/202306231917.utO12sx8-lkp@intel.com/config)
+> compiler: nios2-linux-gcc (GCC) 12.3.0
+> reproduce: (https://download.01.org/0day-ci/archive/20230623/202306231917.utO12sx8-lkp@intel.com/reproduce)
 
-On Sat, 24 Jun 2023 02:00:42 +0530, Varshini Rajendran wrote:
-> Add sam9x7 compatible to DT bindings documentation.
-> 
-> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-> ---
->  .../devicetree/bindings/sound/atmel,sama5d2-classd.yaml      | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
+---8<---
+When sm2 is disabled we need to provide an implementation of
+sm2_compute_z_digest.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Fixes: e5221fa6a355 ("KEYS: asymmetric: Move sm2 code into x509_public_key")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202306231917.utO12sx8-lkp@intel.com/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/atmel,sama5d2-classd.example.dtb: sound@fc048000: compatible: 'oneOf' conditional failed, one must be fixed:
-	['atmel,sama5d2-classd'] is too short
-	from schema $id: http://devicetree.org/schemas/sound/atmel,sama5d2-classd.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230623203056.689705-32-varshini.rajendran@microchip.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+diff --git a/include/crypto/sm2.h b/include/crypto/sm2.h
+index 7094d75ed54c..04a92c1013c8 100644
+--- a/include/crypto/sm2.h
++++ b/include/crypto/sm2.h
+@@ -13,7 +13,16 @@
+ 
+ struct shash_desc;
+ 
++#if IS_REACHABLE(CONFIG_CRYPTO_SM2)
+ int sm2_compute_z_digest(struct shash_desc *desc,
+ 			 const void *key, unsigned int keylen, void *dgst);
++#else
++static inline int sm2_compute_z_digest(struct shash_desc *desc,
++				       const void *key, unsigned int keylen,
++				       void *dgst)
++{
++	return -ENOTSUPP;
++}
++#endif
+ 
+ #endif /* _CRYPTO_SM2_H */
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
