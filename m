@@ -2,20 +2,20 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64990EB64DC
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 08:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60729EB64DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 09:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjFZItT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jun 2023 04:49:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40154 "EHLO
+        id S229661AbjFZJAU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jun 2023 05:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230471AbjFZIsg (ORCPT
+        with ESMTP id S230359AbjFZI77 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jun 2023 04:48:36 -0400
+        Mon, 26 Jun 2023 04:59:59 -0400
 Received: from mail.nsr.re.kr (unknown [210.104.33.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C3A10E2;
-        Mon, 26 Jun 2023 01:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1687769154; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=DyrfY0crg++/09jon1RFZl0ms2Mo5gm3lj4/Yg6if8A=; b=JZqEocwr89SrJWgT9XpYUcsO0hpZVR+K2HkMNYsKyzguFCzpgkKrsst4qeue2jiMNfTPmmpMNLgzVXGgnOFtn8QmbLZk9n9KLw5Ndwr+39G1aNaPYJwrBx+avkv0oSqtlndideAAyQvZxwb7j3MYlI5Da1qokWni/o/C7LvmHRjdWauDJDhSuUuaxugWsAXz4IM9FIYNIzG/UF8/v+Ll3W+6tH6Ezg3FEe5ldzsJdV2r1nnAUE3SBj2kXDhey0eQzgFuEuO7mJZ+V5RIzHsh8jYUu3O5JYFNJEYfECeqZY1hZ/9ABG6QCm6BEzUugvx9MmrUeqRnbWxhsWhuX/ZLpQ==
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A59D4EC4
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Jun 2023 01:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1687769580; c=relaxed/relaxed; h=date:from:message-id:mime-version:subject:to; bh=zuuP2jIe0pZPqoUtxjvL55N6OHfrTkFefMjYKKtwGHs=; b=P/GTSFUjdhT93uRcZ7N5Mf9yKfeZyDvDZoOOoVztHt5bqdnITZyXFbaflivWQnF6QIFzDHXsavJ57MQJugO8IeZvpobCKYgiY/URyNXHEgHYBxiQ/8itIaoISKY3S3T7bYfv5SniSzspsJJMMucbCQFHnUuPMr3v60zCz+RHEyDK5v/GSWyjmZmD3NvtmYCLj0+5RMq2j2NngJIfjanZrGScZux3Hp21GZiTgGHvcDa/bZC6o3A7beodxPw3bVl2zLLK6zK9IgVFWX3UFoBIKB9kDtf8pxZxlMBmNMMsy+ss2owpZBwdPGHct1Z9vWN8NXNjMNo4Zi6JfG6OJk44Ig==
 Received: from 210.104.33.70 (nsr.re.kr)
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
         by mail.nsr.re.kr with SMTP; Mon, 26 Jun 2023 17:45:39 +0900
@@ -32,97 +32,154 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
         Dongsoo Lee <letrhee@nsr.re.kr>
-Subject: [PATCH v3 0/4] crypto: LEA block cipher implementation
-Date:   Mon, 26 Jun 2023 17:46:59 +0900
-Message-Id: <20230626084703.907331-1-letrhee@nsr.re.kr>
+Subject: [PATCH v3 4/4] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
+Date:   Mon, 26 Jun 2023 17:47:03 +0900
+Message-Id: <20230626084703.907331-5-letrhee@nsr.re.kr>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230626084703.907331-1-letrhee@nsr.re.kr>
+References: <20230626084703.907331-1-letrhee@nsr.re.kr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This submission contains a generic C implementation of the LEA cipher algorithm and test vectors for it. It also includes modifications to use the LEA in fscrypt.
+Add LEA-256-XTS, LEA-256-CTS fscrypt support.
 
-The LEA algorithm is a lightweight block cipher that processes data blocks of 128-bits and has three different key lengths, each with a different number of rounds:
+LEA is a South Korean 128-bit block cipher (with 128/192/256-bit keys)
+included in the ISO/IEC 29192-2:2019 standard (Information security -
+Lightweight cryptography - Part 2: Block ciphers). It shows fast
+performance and, when SIMD instructions are available, it performs even
+faster. Particularly, it outperforms AES when the dedicated crypto
+instructions for AES are unavailable, regardless of the presence of SIMD
+instructions. However, it is not recommended to use LEA unless there is
+a clear reason (such as the absence of dedicated crypto instructions for
+AES or a mandatory requirement) to do so. Also, to enable LEA support,
+it needs to be enabled in the kernel crypto API.
 
-- LEA-128: 128-bit key, 24 rounds,
-- LEA-192: 192-bit key, 28 rounds, and
-- LEA-256: 256-bit key, 32 rounds.
+Signed-off-by: Dongsoo Lee <letrhee@nsr.re.kr>
+---
+ Documentation/filesystems/fscrypt.rst | 12 ++++++++++++
+ fs/crypto/fscrypt_private.h           |  2 +-
+ fs/crypto/keysetup.c                  | 15 +++++++++++++++
+ fs/crypto/policy.c                    |  4 ++++
+ include/uapi/linux/fscrypt.h          |  4 +++-
+ tools/include/uapi/linux/fscrypt.h    |  4 +++-
+ 6 files changed, 38 insertions(+), 3 deletions(-)
 
-The round function of LEA consists of 32-bit ARX(modular Addition, bitwise Rotation, and bitwise XOR) operations. See [2, 5, 7] for details.
-
-LEA is a Korean national standard block cipher, described in "KS X 3246"[1] and is also included in the international standard, "ISO/IEC 29192-2:2019 standard"[2].
-
-It is one of the approved block ciphers for the current Korean Cryptographic Module Validation Program (KCMVP).
-
-We expect that the first application of the patch would be disk encryption on the Gooroom platform ('Gooroom' is a Korean word, meaning 'cloud') [3]. Currently, the Gooroom platform uses AES-XTS for disk encryption. The main reason for submitting this patch is to make disk encryption with LEA (e.g. LEA-XTS) available on there. It is possible to use LEA without any additional modifications in dm-crypt, a module that provides disk encryption functionality within the kernel.
-
-This patch also includes a modification to enable LEA for use in fscrypt, another data-at-rest method available within the kernel, and a modification to blk-crypto-fallback to enable the "inlinecrypt" mount option in fscrypt.
-
-The Gooroom platform is a government-driven Debian-based Linux distribution in South Korea. In Korea, there are many crypto companies that want to bundle Linux into their products and sell them. They create their own Gooroom platforms by modifying the original Gooroom platform for their services. (Of course, the Gooroom platform is not mandatory, and companies wishing to use Linux are free to choose an appropriate distribution.) BTW, in Korea, many crypto companies want to use LEA, because LEA is one of the block ciphers of the KCMVP, a validation program for commercial crypto S/W to be delivered to the Korean government.
-
-The Linux Crypto API already has another Korean block cipher, ARIA, also one of the block ciphers of the KCVMP. However, LEA is more widely used than ARIA in industry nowadays, because LEA is one of the lightweight cryptography standard of ISO/IEC [2] and performs well on low-end devices that support 32-bit operations. So we think they are complementary to each other.
-
-In general, it's obvious that the hardware-accelerated AES is the best performer. However, there exist not only environments where the hardware-accelerated AES is not supported, but also situations where AES is not preferred for various reasons. In these cases, if someone wants to encrypt using a block cipher, LEA could be an alternative.
-
-There are also SIMD implementations for efficiently using LEA, which is not included in this patch. We have SSE2 and AVX2 assembly implementations, some of which were included in the previous version of the patch. The SIMD implementations are being re-implemented to support a wider range of environments.
-
-Apart from this, we also have implemented LEA in lightweight environments such as 8-bit AVR, 16-bit MSP and 32-bit ARM [4]. If LEA were to be included in the Linux kernel, it would be possible to modify and supplement the submission with lightweight implementations to provide efficient encryption on embedded linux devices.
-
-Although the designers of LEA did not provide test vectors in their paper [5], the ISO/IEC standard [2] and the KS standard [1] do. Furthermore, the Block Cipher LEA Specification("블록암호 LEA 규격서", written in Korean) document on the LEA introduction page [6] and the Wikipedia article on LEA [7] show the same test vectors as in the standards.
-
-The test vectors for ECB, CBC, CTR, and GCM modes included in the testmgr module are taken from the KCMVP Cryptographic Algorithm Verification Criteria V3.0("KCMVP 검증대상 암호알고리즘 검증기준 V3.0", written in Korean) [8]. Test vectors for the XTS mode were generated by ourselves, and we crosschecked them using Crypto++ [9] and testmgr on Linux.
-
-The implementation has been tested with kernel module tcrypt.ko and has passed the selftest using above-mentioned test vectors. It also has been tested with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS. The fscrypt patch was tested using a modified tool by forking https://github.com/google/fscrypt.
-
-[1] KS X 3246, 128-bit block cipher LEA.
-[2] ISO/IEC 29192-2:2019, Information security — Lightweight cryptography — Part 2: Block ciphers.
-[3] https://github.com/gooroom https://www.gooroom.kr/
-[4] https://github.com/cryptolu/FELICS/tree/master/block_ciphers/source/ciphers/LEA_128_128_v01/source
-[5] Hong, Deukjo, et al. "LEA: A 128-bit block cipher for fast encryption on common processors.", WISA 2013.
-[6] https://seed.kisa.or.kr/kisa/algorithm/EgovLeaInfo.do
-[7] https://en.wikipedia.org/wiki/LEA_(cipher)
-[8] https://seed.kisa.or.kr/kisa/kcmvp/EgovVerification.do
-[9] https://www.cryptopp.com/
-
-Changelog:
-v3:
-- Added implementations to enable LEA in fscrypt and blk-crypt.
-v2:
-- Reimplemented the Generic C implementation as a Loop version.
-  - The decryption code was adapted from an optimized implementation by Eric Biggers.
-    https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/commit/?h=old/wip-lea&id=1d1cbba14380f8a1abc76baf939b9e51de047fb6
-- Removed AVX2 SIMD implementation.
-- Added comments for functions.
-- Improved the description in Kconfig.
-- Added test vectors from the standard documentation.
-
-Dongsoo Lee (4):
-  crypto: LEA block cipher implementation
-  crypto: add LEA testmgr tests
-  blk-crypto: Add LEA-256-XTS blk-crypto support
-  fscrypt: Add LEA-256-XTS, LEA-256-CTS support
-
- Documentation/filesystems/fscrypt.rst |   12 +
- block/blk-crypto.c                    |    6 +
- crypto/Kconfig                        |   18 +
- crypto/Makefile                       |    1 +
- crypto/lea_generic.c                  |  410 ++++++++
- crypto/tcrypt.c                       |   73 ++
- crypto/testmgr.c                      |   32 +
- crypto/testmgr.h                      | 1241 +++++++++++++++++++++++++
- fs/crypto/fscrypt_private.h           |    2 +-
- fs/crypto/keysetup.c                  |   15 +
- fs/crypto/policy.c                    |    4 +
- include/crypto/lea.h                  |   44 +
- include/linux/blk-crypto.h            |    1 +
- include/uapi/linux/fscrypt.h          |    4 +-
- tools/include/uapi/linux/fscrypt.h    |    4 +-
- 15 files changed, 1864 insertions(+), 3 deletions(-)
- create mode 100644 crypto/lea_generic.c
- create mode 100644 include/crypto/lea.h
-
+diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
+index eccd327e6df5..60fb82c3382e 100644
+--- a/Documentation/filesystems/fscrypt.rst
++++ b/Documentation/filesystems/fscrypt.rst
+@@ -339,6 +339,7 @@ Currently, the following pairs of encryption modes are supported:
+ - Adiantum for both contents and filenames
+ - AES-256-XTS for contents and AES-256-HCTR2 for filenames (v2 policies only)
+ - SM4-XTS for contents and SM4-CTS-CBC for filenames (v2 policies only)
++- LEA-256-XTS for contents and LEA-256-CTS-CBC for filenames (v2 policies only)
+ 
+ If unsure, you should use the (AES-256-XTS, AES-256-CTS-CBC) pair.
+ 
+@@ -376,6 +377,17 @@ size.  It may be useful in cases where its use is mandated.
+ Otherwise, it should not be used.  For SM4 support to be available, it
+ also needs to be enabled in the kernel crypto API.
+ 
++LEA is a South Korean 128-bit block cipher (with 128/192/256-bit keys)
++included in the ISO/IEC 29192-2:2019 standard (Information security -
++Lightweight cryptography - Part 2: Block ciphers). It shows fast
++performance and, when SIMD instructions are available, it performs even
++faster. Particularly, it outperforms AES when the dedicated crypto
++instructions for AES are unavailable, regardless of the presence of SIMD
++instructions. However, it is not recommended to use LEA unless there is
++a clear reason (such as the absence of dedicated crypto instructions for
++AES or a mandatory requirement) to do so. Also, to enable LEA support,
++it needs to be enabled in the kernel crypto API.
++
+ New encryption modes can be added relatively easily, without changes
+ to individual filesystems.  However, authenticated encryption (AE)
+ modes are not currently supported because of the difficulty of dealing
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 7ab5a7b7eef8..400238057219 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -31,7 +31,7 @@
+ #define FSCRYPT_CONTEXT_V2	2
+ 
+ /* Keep this in sync with include/uapi/linux/fscrypt.h */
+-#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_AES_256_HCTR2
++#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_LEA_256_CTS
+ 
+ struct fscrypt_context_v1 {
+ 	u8 version; /* FSCRYPT_CONTEXT_V1 */
+diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
+index 361f41ef46c7..fa82579e56eb 100644
+--- a/fs/crypto/keysetup.c
++++ b/fs/crypto/keysetup.c
+@@ -74,6 +74,21 @@ struct fscrypt_mode fscrypt_modes[] = {
+ 		.security_strength = 32,
+ 		.ivsize = 32,
+ 	},
++	[FSCRYPT_MODE_LEA_256_XTS] = {
++		.friendly_name = "LEA-256-XTS",
++		.cipher_str = "xts(lea)",
++		.keysize = 64,
++		.security_strength = 32,
++		.ivsize = 16,
++		.blk_crypto_mode = BLK_ENCRYPTION_MODE_LEA_256_XTS,
++	},
++	[FSCRYPT_MODE_LEA_256_CTS] = {
++		.friendly_name = "LEA-256-CTS-CBC",
++		.cipher_str = "cts(cbc(lea))",
++		.keysize = 32,
++		.security_strength = 32,
++		.ivsize = 16,
++	},
+ };
+ 
+ static DEFINE_MUTEX(fscrypt_mode_key_setup_mutex);
+diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
+index f4456ecb3f87..9d1e80c43c6d 100644
+--- a/fs/crypto/policy.c
++++ b/fs/crypto/policy.c
+@@ -94,6 +94,10 @@ static bool fscrypt_valid_enc_modes_v2(u32 contents_mode, u32 filenames_mode)
+ 	    filenames_mode == FSCRYPT_MODE_SM4_CTS)
+ 		return true;
+ 
++	if (contents_mode == FSCRYPT_MODE_LEA_256_XTS &&
++	    filenames_mode == FSCRYPT_MODE_LEA_256_CTS)
++		return true;
++
+ 	return fscrypt_valid_enc_modes_v1(contents_mode, filenames_mode);
+ }
+ 
+diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
+index fd1fb0d5389d..df3c8af98210 100644
+--- a/include/uapi/linux/fscrypt.h
++++ b/include/uapi/linux/fscrypt.h
+@@ -30,7 +30,9 @@
+ #define FSCRYPT_MODE_SM4_CTS			8
+ #define FSCRYPT_MODE_ADIANTUM			9
+ #define FSCRYPT_MODE_AES_256_HCTR2		10
+-/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
++#define FSCRYPT_MODE_LEA_256_XTS		11
++#define FSCRYPT_MODE_LEA_256_CTS		12
++/* If adding a mode number > 12, update FSCRYPT_MODE_MAX in fscrypt_private.h */
+ 
+ /*
+  * Legacy policy version; ad-hoc KDF and no key verification.
+diff --git a/tools/include/uapi/linux/fscrypt.h b/tools/include/uapi/linux/fscrypt.h
+index fd1fb0d5389d..df3c8af98210 100644
+--- a/tools/include/uapi/linux/fscrypt.h
++++ b/tools/include/uapi/linux/fscrypt.h
+@@ -30,7 +30,9 @@
+ #define FSCRYPT_MODE_SM4_CTS			8
+ #define FSCRYPT_MODE_ADIANTUM			9
+ #define FSCRYPT_MODE_AES_256_HCTR2		10
+-/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
++#define FSCRYPT_MODE_LEA_256_XTS		11
++#define FSCRYPT_MODE_LEA_256_CTS		12
++/* If adding a mode number > 12, update FSCRYPT_MODE_MAX in fscrypt_private.h */
+ 
+ /*
+  * Legacy policy version; ad-hoc KDF and no key verification.
 -- 
 2.34.1
