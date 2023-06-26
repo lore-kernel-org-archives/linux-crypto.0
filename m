@@ -2,54 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE4CEEB64D7
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 14:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FDEEB64D7
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 16:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230351AbjFZOLr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jun 2023 10:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33042 "EHLO
+        id S231649AbjFZQKM convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jun 2023 12:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230242AbjFZOLq (ORCPT
+        with ESMTP id S231699AbjFZQKL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jun 2023 10:11:46 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9386B194;
-        Mon, 26 Jun 2023 07:11:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687788704; x=1719324704;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KygZpeRTiodO2Whd/iRJqDkdLnCLMCcUOUpq4IvWVMo=;
-  b=bRJKf8eOz7I7H8KSY79Q9nXJ5y9zJ1xvjw4em0eQupLfKtLWGF8AFwNk
-   xN4PS5yaUWNgbiQXRB1VOBdRWg5+vuxryu6DLYv7PJ/uXsY3P8ZgxzlLj
-   viC4D+F+svaIJFSjPpAlZ1nbMH+MmSA7V6Y1adKdvzteYOWFGaiAcwC/i
-   luPkH2lP2j5w72aLvhqpaIY69q7Mg8zFu2CZ8yE7qiYyWY+q+lLQkpVu5
-   7qJwQh+uXqwUzCf/ucPZhxc4tNbi7T3KbqrplGMKQSqBJN06xvd/quW1C
-   WmFCRJ3LZHZjjY/XVf35SAutcghrtVwYiuTNxgXlT0J6X8ZUwUjkGoXL0
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="346032875"
-X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="346032875"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 07:11:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="666317742"
-X-IronPort-AV: E=Sophos;i="6.01,159,1684825200"; 
-   d="scan'208";a="666317742"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 26 Jun 2023 07:11:10 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qDmvt-000Aj3-2c;
-        Mon, 26 Jun 2023 14:11:09 +0000
-Date:   Mon, 26 Jun 2023 22:10:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     You Kangren <youkangren@vivo.com>,
+        Mon, 26 Jun 2023 12:10:11 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157E9C6
+        for <linux-crypto@vger.kernel.org>; Mon, 26 Jun 2023 09:10:09 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-190-znHz0X3HMcKVclPaaTyJRg-1; Mon, 26 Jun 2023 17:10:06 +0100
+X-MC-Unique: znHz0X3HMcKVclPaaTyJRg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 26 Jun
+ 2023 17:10:05 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 26 Jun 2023 17:10:05 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'kernel test robot' <lkp@intel.com>,
+        You Kangren <youkangren@vivo.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Adam Guerin <adam.guerin@intel.com>,
+        "Adam Guerin" <adam.guerin@intel.com>,
         Wojciech Ziemba <wojciech.ziemba@intel.com>,
         Tom Zanussi <tom.zanussi@linux.intel.com>,
         Damian Muszynski <damian.muszynski@intel.com>,
@@ -57,102 +40,58 @@ To:     You Kangren <youkangren@vivo.com>,
         "open list:QAT DRIVER" <qat-linux@intel.com>,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        netdev@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH] crypto: qat - Replace the if statement with min()
-Message-ID: <202306262110.NCIrjtZF-lkp@intel.com>
+CC:     "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+        "oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "opensource.kernel@vivo.com" <opensource.kernel@vivo.com>
+Subject: RE: [PATCH] crypto: qat - Replace the if statement with min()
+Thread-Topic: [PATCH] crypto: qat - Replace the if statement with min()
+Thread-Index: AQHZqDgnNJK5CqqW/0m8bCwEEBu4Za+dQI0w
+Date:   Mon, 26 Jun 2023 16:10:05 +0000
+Message-ID: <cac421069f384432a66c50701655f445@AcuMS.aculab.com>
 References: <20230626091541.1064-1-youkangren@vivo.com>
+ <202306262110.NCIrjtZF-lkp@intel.com>
+In-Reply-To: <202306262110.NCIrjtZF-lkp@intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230626091541.1064-1-youkangren@vivo.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi You,
+From: kernel test robot
+> Sent: 26 June 2023 15:11
+> 
+> Hi You,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on herbert-cryptodev-2.6/master]
+> [also build test WARNING on herbert-crypto-2.6/master linus/master v6.4 next-20230626]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+...
+> >> drivers/crypto/intel/qat/qat_common/qat_uclo.c:1989:12: warning: comparison of distinct pointer
+> types ('typeof (words_num) *' (aka 'unsigned int *') and 'typeof (1024) *' (aka 'int *')) [-Wcompare-
+> distinct-pointer-types]
+>                    cpylen = min(words_num, UWORD_CPYBUF_SIZE);
+>                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-kernel test robot noticed the following build warnings:
+UWORD_CPYBUF_SIZE needs to be defined as an unsigned constant.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v6.4 next-20230626]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+	David
 
-url:    https://github.com/intel-lab-lkp/linux/commits/You-Kangren/crypto-qat-Replace-the-if-statement-with-min/20230626-172132
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20230626091541.1064-1-youkangren%40vivo.com
-patch subject: [PATCH] crypto: qat - Replace the if statement with min()
-config: i386-randconfig-i001-20230626 (https://download.01.org/0day-ci/archive/20230626/202306262110.NCIrjtZF-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project.git 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce: (https://download.01.org/0day-ci/archive/20230626/202306262110.NCIrjtZF-lkp@intel.com/reproduce)
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306262110.NCIrjtZF-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/crypto/intel/qat/qat_common/qat_uclo.c:1989:12: warning: comparison of distinct pointer types ('typeof (words_num) *' (aka 'unsigned int *') and 'typeof (1024) *' (aka 'int *')) [-Wcompare-distinct-pointer-types]
-                   cpylen = min(words_num, UWORD_CPYBUF_SIZE);
-                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:67:19: note: expanded from macro 'min'
-   #define min(x, y)       __careful_cmp(x, y, <)
-                           ^~~~~~~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:36:24: note: expanded from macro '__careful_cmp'
-           __builtin_choose_expr(__safe_cmp(x, y), \
-                                 ^~~~~~~~~~~~~~~~
-   include/linux/minmax.h:26:4: note: expanded from macro '__safe_cmp'
-                   (__typecheck(x, y) && __no_side_effects(x, y))
-                    ^~~~~~~~~~~~~~~~~
-   include/linux/minmax.h:20:28: note: expanded from macro '__typecheck'
-           (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
-                      ~~~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~
-   1 warning generated.
-
-
-vim +1989 drivers/crypto/intel/qat/qat_common/qat_uclo.c
-
-  1972	
-  1973	static void qat_uclo_wr_uimage_raw_page(struct icp_qat_fw_loader_handle *handle,
-  1974						struct icp_qat_uclo_encap_page
-  1975						*encap_page, unsigned int ae)
-  1976	{
-  1977		unsigned int uw_physical_addr, uw_relative_addr, i, words_num, cpylen;
-  1978		struct icp_qat_uclo_objhandle *obj_handle = handle->obj_handle;
-  1979		u64 fill_pat;
-  1980	
-  1981		/* load the page starting at appropriate ustore address */
-  1982		/* get fill-pattern from an image -- they are all the same */
-  1983		memcpy(&fill_pat, obj_handle->ae_uimage[0].img_ptr->fill_pattern,
-  1984		       sizeof(u64));
-  1985		uw_physical_addr = encap_page->beg_addr_p;
-  1986		uw_relative_addr = 0;
-  1987		words_num = encap_page->micro_words_num;
-  1988		while (words_num) {
-> 1989			cpylen = min(words_num, UWORD_CPYBUF_SIZE);
-  1990	
-  1991			/* load the buffer */
-  1992			for (i = 0; i < cpylen; i++)
-  1993				qat_uclo_fill_uwords(obj_handle, encap_page,
-  1994						     &obj_handle->uword_buf[i],
-  1995						     uw_physical_addr + i,
-  1996						     uw_relative_addr + i, fill_pat);
-  1997	
-  1998			/* copy the buffer to ustore */
-  1999			qat_hal_wr_uwords(handle, (unsigned char)ae,
-  2000					  uw_physical_addr, cpylen,
-  2001					  obj_handle->uword_buf);
-  2002	
-  2003			uw_physical_addr += cpylen;
-  2004			uw_relative_addr += cpylen;
-  2005			words_num -= cpylen;
-  2006		}
-  2007	}
-  2008	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
