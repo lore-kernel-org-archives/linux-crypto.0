@@ -2,99 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A813CEB64DC
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 02:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47426EB64DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 06:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbjFZCkQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 25 Jun 2023 22:40:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42380 "EHLO
+        id S229683AbjFZG4n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jun 2023 02:56:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229776AbjFZCkO (ORCPT
+        with ESMTP id S229647AbjFZG4m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Jun 2023 22:40:14 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6D110D;
-        Sun, 25 Jun 2023 19:39:54 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QqBrh51X0z4wb1;
-        Mon, 26 Jun 2023 12:39:48 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1687747188;
-        bh=YRYS5rodKLDM5QmZrejVxwridNiZjtQfoMD2mlp31Fg=;
-        h=Date:From:To:Cc:Subject:From;
-        b=Y2toNPQXtCZS6Aq1VDMwO7TuL0/HldJ/+//NbHVcOFRqE0bPf+QgWXu7OKR3YZkUk
-         ZC+l4bepQYRf3F0LrIxbFTSKa/1O0/nQ/R9ZN52deFSKkDC2eaOf6hA31bYhNsRZsW
-         7Tmc0zP8qHBKMoycSHXYP+xAYa9/ydaYYEe8inxlFQ+8TLbXZZ4J2aLMhNTH2e1by4
-         yjwKVK9AvCEJNF7IMnM5CX4dxgTJAnpjAJfjI87j/6qiH2CML6h5n2jMVlIG4aMRHP
-         Pm36ogGtZIonvyhH5y+NvkI57qHNkp4oHmTsvLQEoTMCvwQhDWZ3gXyPBwbVMmLUj7
-         9UHsv2lIa6ddw==
-Date:   Mon, 26 Jun 2023 12:39:46 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        PowerPC <linuxppc-dev@lists.ozlabs.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the crypto tree
-Message-ID: <20230626123946.6de22527@canb.auug.org.au>
+        Mon, 26 Jun 2023 02:56:42 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173B9AC;
+        Sun, 25 Jun 2023 23:56:42 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1b7fb1a82c4so3799195ad.1;
+        Sun, 25 Jun 2023 23:56:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687762601; x=1690354601;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u58j1CoFhNAAP0kPknc/GhPhE9N5OmJCD1ZWCCtRRgc=;
+        b=WDPKuhXalnGPckp2TpIKynsO8ZnokkfdhiarQXI1U9VrqORX/RqI+YQ6iOzudxuYfh
+         4q6XXJOoyqqR6QwbktPcLn3j/Hia6cNtm2Nrhm3yJiWc7JcKmjD3tVjEuADNSmK2GgDV
+         xk8ovnwV1ONicO1yc5JYu90NJCKD2g0I+aPJlJcB+YR5HHSFgftpBca8XhiVusEZTmu+
+         +qlUGGQiGJiMT1OVUk9z8yv0fpOv85eDrKiCyXaOhKgjcvScYC6P8FrVEMhdjE7n32Sn
+         iHlKwHWwvll89VW7GKPNxJvK15XueSQ8E1WR4TpisHG4FV0/OHjFbqUI8/raDxp23ahg
+         j18A==
+X-Gm-Message-State: AC+VfDzH7/LQdst87G9Hu9Qbm2z58jPxCzQv6It28ppNG805JMr6LwXE
+        0lNQtVHRiUvsINC/V/q86Hk=
+X-Google-Smtp-Source: ACHHUZ6OtbsuuY2aXoeHYGi4XSA3mdaoGOU6p/4pXML9TF8F1ADk58bPj18ptJOfaGu5YjoBFEMRig==
+X-Received: by 2002:a17:903:1250:b0:1b5:3c7f:1b3b with SMTP id u16-20020a170903125000b001b53c7f1b3bmr5150508plh.35.1687762601317;
+        Sun, 25 Jun 2023 23:56:41 -0700 (PDT)
+Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
+        by smtp.gmail.com with ESMTPSA id jg3-20020a17090326c300b001a2104d706fsm2559571plb.225.2023.06.25.23.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 23:56:40 -0700 (PDT)
+Date:   Mon, 26 Jun 2023 15:56:39 +0900
+From:   Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>,
+        Helge Deller <deller@gmx.de>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Henrik Rydberg <rydberg@bitmath.org>,
+        Karsten Keil <isdn@linux-pingi.de>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        =?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Stafford Horne <shorne@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Paul Moore <paul@paul-moore.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Daniel Bristot de Oliveira <bristot@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Evgeniy Polyakov <zbr@ioremap.net>,
+        Fenghua Yu <fenghua.yu@intel.com>,
+        Reinette Chatre <reinette.chatre@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>, coresight@lists.linaro.org,
+        dri-devel@lists.freedesktop.org, keyrings@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-trace-devel@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-mm@kvack.org,
+        openrisc@lists.librecores.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
+        x86@kernel.org
+Subject: Re: [PATCH 00/24 v2] Documentation: correct lots of spelling errors
+ (series 1)
+Message-ID: <20230626065639.GA3403711@rocinante>
+References: <20230209071400.31476-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/HScrxUH+i7hEBmNz4NBuy6A";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209071400.31476-1-rdunlap@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/HScrxUH+i7hEBmNz4NBuy6A
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-Hi all,
+> Correct many spelling errors in Documentation/ as reported by codespell.
+> 
+> Maintainers of specific kernel subsystems are only Cc-ed on their
+> respective patches, not the entire series.
+> 
+> These patches are based on linux-next-20230209.
+> 
+[...]
+>  [PATCH 13/24] Documentation: PCI: correct spelling
+[...]
 
-After merging the crypto tree, today's linux-next build (powerpc
-ppc64_defconfig) failed like this:
+Applied to misc, thank you!
 
-ld: warning: discarding dynamic section .glink
-ld: warning: discarding dynamic section .plt
-ld: linkage table error against `sm2_compute_z_digest'
-ld: stubs don't match calculated size
-ld: can not build stubs: bad value
-ld: crypto/asymmetric_keys/x509_public_key.o: in function `x509_get_sig_par=
-ams':
-x509_public_key.c:(.text+0x474): undefined reference to `sm2_compute_z_dige=
-st'
+[1/1] Documentation: PCI: correct spelling
+      https://git.kernel.org/pci/pci/c/b58d6d89ae02
 
-Possibly caused by commit
-
-  e5221fa6a355 ("KEYS: asymmetric: Move sm2 code into x509_public_key")
-
-This looks like it may be a compiler bug?  Maybe the deep ternary
-expressions may be contributing to that? (cc'ing the ppc guys in case
-they have any ideas.)
-
-I have reverted that commit (and the following one) for today.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/HScrxUH+i7hEBmNz4NBuy6A
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSY+nIACgkQAVBC80lX
-0Gxhugf/db+U5ipJ0TNqttnNlAMQqUTTN6HE01Vl/VDq2ZBVWgJGhiUEBsc6Hypa
-a1vHn4xFm/A9z7sEeoiBJDzcnq/89LimWAquEQLhGlcyxcN7GUGyuNsuOL3TYktV
-Kg6WpMSXTWbfmltvNKBVyr0cRe1TFGXgs2afNce8E9i24i+D6MLQUFIKfJv61cIB
-nnd9swDUqJLCRjLVwRx/rV3Fsd0sRRuexOACVsfv+wN+Wy4qQWxAW90MakfyyQ1y
-pPleqCBsmsxOpdE5qKcvy4SWm2KkdTODyZ/wQ/f+lSVM22xqiWLihhnzrc4Qe0jF
-4GXxbymZqmfZl9QNJt4poJCD/gO4Dw==
-=uP7F
------END PGP SIGNATURE-----
-
---Sig_/HScrxUH+i7hEBmNz4NBuy6A--
+	Krzysztof
