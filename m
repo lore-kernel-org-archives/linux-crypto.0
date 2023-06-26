@@ -2,108 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C65EB64D7
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 10:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E3EEB64DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Jun 2023 10:52:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbjFZKeE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Jun 2023 06:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60822 "EHLO
+        id S229529AbjFZKwF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 26 Jun 2023 06:52:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjFZKd5 (ORCPT
+        with ESMTP id S229712AbjFZKwD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Jun 2023 06:33:57 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CB2710D8
-        for <linux-crypto@vger.kernel.org>; Mon, 26 Jun 2023 03:33:49 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qDjXU-007Jl5-7v; Mon, 26 Jun 2023 18:33:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 26 Jun 2023 18:33:44 +0800
-Date:   Mon, 26 Jun 2023 18:33:44 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: sig - Fix verify call
-Message-ID: <ZJlpiMTIR3cKcY7D@gondor.apana.org.au>
+        Mon, 26 Jun 2023 06:52:03 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD07FB8;
+        Mon, 26 Jun 2023 03:51:58 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qDjp1-0003fK-4l; Mon, 26 Jun 2023 12:51:51 +0200
+Message-ID: <d32ff584-ccee-a619-6c7e-2f38945c8ba5@leemhuis.info>
+Date:   Mon, 26 Jun 2023 12:51:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: [PATCH v8 10/11] arm64: dts: qcom: sm8350: Add Crypto Engine
+ support
+Content-Language: en-US, de-DE
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
+Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, andersson@kernel.org,
+        bhupesh.linux@gmail.com, robh+dt@kernel.org,
+        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
+        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
+        stephan@gerhold.net, Anders Roxell <anders.roxell@linaro.org>,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
+ <20230526192210.3146896-11-bhupesh.sharma@linaro.org>
+ <d239ad07-fbdd-16fa-3555-5bcf33c67059@linaro.org>
+From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+In-Reply-To: <d239ad07-fbdd-16fa-3555-5bcf33c67059@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1687776719;a67439c1;
+X-HE-SMSGID: 1qDjp1-0003fK-4l
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The dst SG list needs to be set to NULL for verify calls.  Do
-this as otherwise the underlying algorithm may fail.
+[TLDR: This mail in primarily relevant for Linux kernel regression
+tracking. See link in footer if these mails annoy you.]
 
-Furthermore the digest needs to be copied just like the source.
+On 16.06.23 19:36, Krzysztof Kozlowski wrote:
+> On 26/05/2023 21:22, Bhupesh Sharma wrote:
+>> Add crypto engine (CE) and CE BAM related nodes and definitions to
+>> 'sm8350.dtsi'.
+>>
+>> Tested-by: Anders Roxell <anders.roxell@linaro.org>
+>> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>> Co-developed-by and Signed-off-by: Robert Foss <rfoss@kernel.org>
+>> [Bhupesh: Switch to '#interconnect-cells = <2>', available since commit 4f287e31ff5f]
+>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>> ---
+> 
+> #regzbot introduced: f1040a7fe8f069d2259ab3dab9190210005ceb33
+> #regzbot title: HDK8350 silently crashes early on boot
+> 
+> Hi, this landed in the next but unfortunately it causes silent crash
+> (and reboot) of HDK8350. Reverting this commit helps.
 
-Fixes: 6cb8815f41a9 ("crypto: sig - Add interface for sign/verify")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+#regzbot fix: arm64: dts: qcom: sm8350: fix BAM DMA crash and reboot
+#regzbot monitor:
+https://lore.kernel.org/all/20230621143627.189134-1-krzysztof.kozlowski@linaro.org/
+#regzbot ignore-activity
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 152cfba1346c..0eb8f78751d5 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -192,12 +192,17 @@ EXPORT_SYMBOL_GPL(akcipher_register_instance);
- int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
- {
- 	unsigned int reqsize = crypto_akcipher_reqsize(data->tfm);
--	unsigned int mlen = max(data->slen, data->dlen);
- 	struct akcipher_request *req;
- 	struct scatterlist *sg;
-+	unsigned int mlen;
- 	unsigned int len;
- 	u8 *buf;
- 
-+	if (data->dst)
-+		mlen = max(data->slen, data->dlen);
-+	else
-+		mlen = data->slen + data->dlen;
-+
- 	len = sizeof(*req) + reqsize + mlen;
- 	if (len < mlen)
- 		return -EOVERFLOW;
-@@ -212,9 +217,10 @@ int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
- 	data->buf = buf;
- 	memcpy(buf, data->src, data->slen);
- 
--	sg = data->sg;
-+	sg = &data->sg;
- 	sg_init_one(sg, buf, mlen);
--	akcipher_request_set_crypt(req, sg, sg, data->slen, data->dlen);
-+	akcipher_request_set_crypt(req, sg, data->dst ? sg : NULL,
-+				   data->slen, data->dlen);
- 
- 	crypto_init_wait(&data->cwait);
- 	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-diff --git a/crypto/internal.h b/crypto/internal.h
-index e3cf5a658d51..63e59240d5fb 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -44,7 +44,7 @@ struct crypto_akcipher_sync_data {
- 
- 	struct akcipher_request *req;
- 	struct crypto_wait cwait;
--	struct scatterlist sg[2];
-+	struct scatterlist sg;
- 	u8 *buf;
- };
- 
-diff --git a/crypto/sig.c b/crypto/sig.c
-index d812555c88af..b48c18ec65cd 100644
---- a/crypto/sig.c
-+++ b/crypto/sig.c
-@@ -128,9 +128,7 @@ int crypto_sig_verify(struct crypto_sig *tfm,
- 	if (err)
- 		return err;
- 
--	sg_init_table(data.sg, 2);
--	sg_set_buf(&data.sg[0], src, slen);
--	sg_set_buf(&data.sg[1], digest, dlen);
-+	memcpy(data.buf + slen, digest, dlen);
- 
- 	return crypto_akcipher_sync_post(&data,
- 					 crypto_akcipher_verify(data.req));
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
