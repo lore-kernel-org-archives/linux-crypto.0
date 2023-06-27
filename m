@@ -2,61 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F6DC001B0
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jun 2023 07:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA536EB64D9
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jun 2023 10:03:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230337AbjF0Hcq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Jun 2023 03:32:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37422 "EHLO
+        id S231685AbjF0KDx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Jun 2023 06:03:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230308AbjF0Hco (ORCPT
+        with ESMTP id S231940AbjF0KDP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2023 03:32:44 -0400
-Received: from mail.ettrick.pl (mail.ettrick.pl [141.94.21.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E48131
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Jun 2023 00:32:43 -0700 (PDT)
-Received: by mail.ettrick.pl (Postfix, from userid 1002)
-        id 53E3BA4B91; Tue, 27 Jun 2023 07:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ettrick.pl; s=mail;
-        t=1687851035; bh=ZOVeXw1jXE9TbyZP9aLdRwM96AORcRfum8b+rry5JMw=;
-        h=Date:From:To:Subject:From;
-        b=WeEFgWPK9T8Sm/cW2S8DRlNOt+WAGI9bZPcaspvY77T9rCZoSXbgO8ic2gqyPpu8P
-         7Pk9z/FoAwZk8OwqkTerCfTdnno+GewO+bx8PSJfP4O1Xeze2wQWkMKETI8TW1pPqX
-         IGBa21LvUX35sy2+3pcNO9OCFLOWNtX2OcO1DuZ/q4PD1ZJfv3DaPqp0VdcUw766X1
-         JHw7Dwn1Ykh0LQvMldQXWgS1qFDaI9OiPirmOzOAO5rfU10awJCneOWvgEONR161es
-         gI0yy8fZ/v6IH3BmWTdbd4a5nrBytxZo6qql3czEWpDhjs+7DPJ6k0jalw/dEqdJRe
-         OhvSGVNCmy39Q==
-Received: by mail.ettrick.pl for <linux-crypto@vger.kernel.org>; Tue, 27 Jun 2023 07:30:16 GMT
-Message-ID: <20230627064500-0.1.bh.4nars.0.3whpfzbmd2@ettrick.pl>
-Date:   Tue, 27 Jun 2023 07:30:16 GMT
-From:   "Norbert Karecki" <norbert.karecki@ettrick.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Fotowoltaika- propozycja instalacji
-X-Mailer: mail.ettrick.pl
+        Tue, 27 Jun 2023 06:03:15 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C76133C32
+        for <linux-crypto@vger.kernel.org>; Tue, 27 Jun 2023 03:00:00 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qE5Tw-007kCb-IG; Tue, 27 Jun 2023 17:59:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 27 Jun 2023 17:59:32 +0800
+Date:   Tue, 27 Jun 2023 17:59:32 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: akcipher - Do not copy dst if it is NULL
+Message-ID: <ZJqzBNpwyanNHLE9@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
-=20
-Czy rozwa=C5=BCali Pa=C5=84stwo monta=C5=BC systemu fotowoltaicznego?
-=20
-Instalacja fotowoltaiczna jest najlepszym sposobem na obni=C5=BCenie wyso=
-ko=C5=9Bci rachunk=C3=B3w za pr=C4=85d (pozostaj=C4=85 tylko op=C5=82aty =
-sta=C5=82e) i zabezpieczenie si=C4=99 przed rosn=C4=85cymi cenami energii=
- elektrycznej. Jest to w pe=C5=82ni odnawialne i bezemisyjne =C5=BAr=C3=B3=
-d=C5=82o energii, dzi=C4=99ki czemu przyczyniamy si=C4=99 do ochrony =C5=9B=
-rodowiska naturalnego.
-=20
-Dzia=C5=82amy od wielu lat na rynku energetycznym. Przygotujemy projekt, =
-wycen=C4=99 oraz kompleksowo wykonamy i zg=C5=82osimy realizacj=C4=99 do =
-zak=C5=82adu energetycznego.=20
-=20
-Czy chc=C4=85 Pa=C5=84stwo pozna=C4=87 nasz=C4=85 propozycj=C4=99? =20
+As signature verification has a NULL destination buffer, the pointer
+needs to be checked before the memcpy is done.
 
+Fixes: addde1f2c966 ("crypto: akcipher - Add sync interface without SG lists")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Pozdrawiam,
-Norbert Karecki
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index e9b6ddcdf124..52813f0b19e4 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -234,7 +234,8 @@ EXPORT_SYMBOL_GPL(crypto_akcipher_sync_prep);
+ int crypto_akcipher_sync_post(struct crypto_akcipher_sync_data *data, int err)
+ {
+ 	err = crypto_wait_req(err, &data->cwait);
+-	memcpy(data->dst, data->buf, data->dlen);
++	if (data->dst)
++		memcpy(data->dst, data->buf, data->dlen);
+ 	data->dlen = data->req->dst_len;
+ 	kfree_sensitive(data->req);
+ 	return err;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
