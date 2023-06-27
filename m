@@ -2,165 +2,140 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08393EB64DD
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jun 2023 07:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9B8EB64D9
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Jun 2023 07:17:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbjF0HCp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Jun 2023 03:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50752 "EHLO
+        id S229909AbjF0HRq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 27 Jun 2023 03:17:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjF0HCn (ORCPT
+        with ESMTP id S229568AbjF0HRp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2023 03:02:43 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73EB4198C;
-        Tue, 27 Jun 2023 00:02:41 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4QqwdS1Cp5z4wZr;
-        Tue, 27 Jun 2023 17:02:36 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1687849356;
-        bh=i4SxaP8a9T9btoMtZq2VYnR+kHKIACZI6GHyyd4NwV8=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ZF+KLwN6g0tFkqTKxcu9Nr/t9PsfyvmOZAqcz7JpWHCQsHyAv9Z7bii5q1nLWS/Tk
-         b9BvIDp/8DCegNMoYhR99ahSxuIPJGG6JyTsU4QfQvpTA3Qg92tK7ASlwkdS0IFnGF
-         0lZa2O+8JmLuYLR2oBwFqm9taUiBFDk7/1Y7UPVcY8E0hEZ+6NjLeDCSKJADpsfLfW
-         9xPGMOFly3bMa+EHnpglRrpWM83eRYW3N4gFPGgFfj+RRJoMLRdMgddhadV9Awy6va
-         86V1fRsSJ+Ieeh2dyai27CG/ArbmwmylE/UiOCwSf7i5RQCD9m+xzBeipr7SdxpqHE
-         nLAgqxwRVIPiA==
-Date:   Tue, 27 Jun 2023 17:02:34 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: boot failure after merge of the crypto tree
-Message-ID: <20230627170234.1c86ecdc@canb.auug.org.au>
+        Tue, 27 Jun 2023 03:17:45 -0400
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2133.outbound.protection.outlook.com [40.107.215.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976851FC4;
+        Tue, 27 Jun 2023 00:17:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eCRlaEMxrVtX1bNBmZU35++zgVUW2gsfBASZFunkyuP4yIwdT/exWgeXSzZRYZOulvLTl5ndJF/OlaDQzfWvcBsapG82LGDGeK6Xb5TMQz+opIbrwEZ/MbzKz5b8nMiLr3272JtKUXSJlkNDjOMjasjLghtI6u3LtxI5QD5xlQ08tEVXiuZQyzarSjYT8mCxvuN5yk04yfNoVKPC5QwAAwXPcFdLGxNdstYzs/w0NH/1Nehk39FkoBirQSjIlXo0nY0w1/OfjNyqtnERvuOuTFk1wZwGB7Wa8IPdk/ngGXx8NkslMjqgWbcSnge0qoElsl+BqzofugVh+9MmbDjR6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TdY9ViiKU3jb+D9rWMWV5YCpwmMPpqUqtJSh7ply6w0=;
+ b=SVdbDPlZyhkLumFE4Wb9lJafG1AiQVcQTB0gjSXEIjGfrj6d1GrQHasMes71ZN+8barCXUbi3YFF4BOQn3WM5I/V0xbTSskPsr9iwLvBKw4lhsxrI1B34bcINEPJPXQ8OsIIBG9nWsqWjVKr01MOtmrlihQ7G1SKQUhr+mO89GObes4oQBAi+d99m/buldedh9p30rKqGR7Bdm7077if0NU1Rn3SUSHEq6Z3gvDVJ0LMnApVxojfuOQYZxmqJ9SYC1RSiHSN9/gRoCkCepqxVkbO6TFKJusB0N9QzS1TEzKnDRztpy/ixstuy98h3A/zT69VGa2+6p77R0TVSpFPMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TdY9ViiKU3jb+D9rWMWV5YCpwmMPpqUqtJSh7ply6w0=;
+ b=Y++Ju77qsKvgtFrJ9Ta8bNh8iyUDGIcrZMWQPzDGFs8t6M//GZ24PvFj9B5jeJlEkc1/Yoc3ip/yzXf0bIFjd7Q/6Cb4/evC5g66/jgX4tjiHybBNfxZIS8x5l1WLlxh18jvMyltOnpzxn1UTWUQPazi0r/rHubS3q9iipD9dzVv07cilaUHtZdIIRbFiPx30JhH8Vg1ny/hysPqfuzX1mw+EV4KLwdTRM0Bjz9EDB4lUigoAnidcU12Bfjjwtxcff9n5aqTggvKH/k1cJyn83AKVbsTejWZ8CExEJOQYnCPgJwuxVNT/3Wg87JsA4MvFcLJnn9Kk4cI6vzpP8oUUg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from PUZPR06MB5936.apcprd06.prod.outlook.com (2603:1096:301:11d::13)
+ by SI2PR06MB4155.apcprd06.prod.outlook.com (2603:1096:4:f9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Tue, 27 Jun
+ 2023 07:17:34 +0000
+Received: from PUZPR06MB5936.apcprd06.prod.outlook.com
+ ([fe80::adc0:c22:ffae:227b]) by PUZPR06MB5936.apcprd06.prod.outlook.com
+ ([fe80::adc0:c22:ffae:227b%6]) with mapi id 15.20.6500.045; Tue, 27 Jun 2023
+ 07:17:34 +0000
+From:   You Kangren <youkangren@vivo.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        You Kangren <youkangren@vivo.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Tom Zanussi <tom.zanussi@linux.intel.com>,
+        Damian Muszynski <damian.muszynski@intel.com>,
+        Srinivas Kerekare <srinivas.kerekare@intel.com>,
+        qat-linux@intel.com (open list:QAT DRIVER),
+        linux-crypto@vger.kernel.org (open list:CRYPTO API),
+        linux-kernel@vger.kernel.org (open list)
+Cc:     opensource.kernel@vivo.com
+Subject: [PATCH v2] crypto: qat - Replace the if statement with min()
+Date:   Tue, 27 Jun 2023 15:17:24 +0800
+Message-Id: <20230627071726.20578-1-youkangren@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG3P274CA0011.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::23)
+ To PUZPR06MB5936.apcprd06.prod.outlook.com (2603:1096:301:11d::13)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/WDv.au+H.QsfR2zGT_5WaN=";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PUZPR06MB5936:EE_|SI2PR06MB4155:EE_
+X-MS-Office365-Filtering-Correlation-Id: ead73a88-2683-4fe9-b106-08db76de93c4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AmwPmJzaX4CLpgbEOjb7QmM/LnDrgSu+0rABLUmW0ZQ0uDSrTbfJ/z1f7MOIvmw0x/zunVyE7L0ThHvzmoMYGj/UZDUF9t9Ah2NtZS603VUiR9mLh14mO5/DMAceRlcyQJxSehxWCZCF10E8rbP98nuHTzUB1GumSWRgVSdmwo+ndL8XTRki5QtzLsSh1PXMTC3o8j0OuzW26HSbj4zp6kt8d5BZliQ7LP62o5q0CxmiX6MXST4im42z6mXufH1R7f39eiaE98J/Vt7KtoYbb38rxO4BfXQwCu3n3T0vIGQnwa9fEsZQ00zE3OD9KPWfAEOmN8j1YQdKGWEMsBDU5FsbRO9VP9e5BTX9hzt0GkcI4xuQJU+zdF+ahIR2Dl6B6WUXspqJKr/X77HPmvIRX16sdsRvZa/svYCZFliYECpjIisn8pwGPyhoZbJlkXmpJD1N4527/6XeGn5Di5z7rG8eptMoWQ5/fPEUBQpLkMaKm15oPwyW3zVMDl0KSYSBUL9RhuvdXEJOzf72HwWM3sndNpos6YtsqHcZWbgpWDeFgk+vRkdOTPcKgjBrmvkPUckl8JYt/3M3t6Qgc+5uykHEFGoMmXXkPTR/XwiSHBnhH3RuL9aGL2gM4b0goaBY
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PUZPR06MB5936.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(39860400002)(346002)(366004)(451199021)(316002)(107886003)(66476007)(7416002)(110136005)(66556008)(8676002)(5660300002)(478600001)(52116002)(8936002)(66946007)(38100700002)(38350700002)(4326008)(36756003)(921005)(6486002)(6666004)(2906002)(41300700001)(2616005)(186003)(26005)(1076003)(6512007)(4744005)(83380400001)(6506007)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3VFi7IsNpHHOTaLLv/7cJdtgOIMctZ97O/5O+Z8lpzMY8kg4Qh/+TDzIznVS?=
+ =?us-ascii?Q?kne96ogynDfGOD3auOjIBKjI+Lw5fPme++STBpiM6kKywEejsSPQqHsE0dES?=
+ =?us-ascii?Q?mjwyX/o/Jnt+9jKIgBZ3yPeEJFK/h9LZzkeYhU1wYbbvfZZuyNoNPUAOSkNU?=
+ =?us-ascii?Q?nYq44EZtC2/OlAyc071g66ytLfw+n93fNI7WmBgJe+EAyRMCK1ng3qX0jXp4?=
+ =?us-ascii?Q?SBRSu5kz9qr0DxVPc63yPsxcIVOtDMOBSZgn1v6GXtVKVbvTLopYYbpTRlsB?=
+ =?us-ascii?Q?i8HOsRYEKq+07brf43MMV+ecqvhJe2kqCyaGDUYHcZINPdG/DkdO+eM6nGqQ?=
+ =?us-ascii?Q?rarUmd26X4mSemDcZThjwz8WjSGygqCp4PtZp9FVmrTMDP5R9bCWw1SPTNMG?=
+ =?us-ascii?Q?6xVSEPRRaC4LemtsVtXrddh5LR2j28mK962sS1DZG2WspXqB4wW7eQiYB8+H?=
+ =?us-ascii?Q?gUZczavrUmM167t3G8F4n+dNDIXnCnFvxRM4iiK8yhe21c8pR9ofHELkd6XI?=
+ =?us-ascii?Q?rZKfKuu2Evbr9ZayA6GHJFSD7FP2rHMxBG3B+v5Mvy/WJf6ErufV+38bgcQT?=
+ =?us-ascii?Q?IuQtjRrDv1n+aw2gbvZcfL53aQTfTuN9n7dNAXW7MgdbkEjUZDeY4JMNOWlc?=
+ =?us-ascii?Q?QC/PrE5jduZn7p5kRH2AzyEFU9wB8VQU/MzWZCy//wnopv7wk56NSpUE8N9R?=
+ =?us-ascii?Q?K/s7qzxmmIIG4ENN98zBDLueBio+OHWCmP+093VmC83AHHLCVrunZpz7t0sj?=
+ =?us-ascii?Q?IoAGegdm+DSiA44XGDrCF5jXlF66/DNxeS0eHuIf1CJXW6JXl3g3pjWdIZb7?=
+ =?us-ascii?Q?hx/lbPy8zGMTktZyd0SjEd8cIr4w3EJNTdChMLmb1OmY9AT0f6QJege/2Bqx?=
+ =?us-ascii?Q?WA3wmQPRmJ5BLPu1Eig3sPNfaYPBDWfSoUz4C/a+HxYf/gCU+K0/BxqYbIob?=
+ =?us-ascii?Q?ZWeABpRWQuj0MYd6egwtXW/sLWq6YGzC1HADVJxlpp4ybsVTGsxyELkvd9ua?=
+ =?us-ascii?Q?okbMEhJijvhv+X4lpkCFrnqRVzCPmd7LOiEVdoy7O34468c2TRlIJ7Jo+MMu?=
+ =?us-ascii?Q?h56UjSS92jUd2pci7SfpqaxN8XybZHpZ9q+xpgAWVJ/VvCP05Npj0UF7rkJz?=
+ =?us-ascii?Q?BYroF5GOcjzWCXFUu6se+eh9OUPtyRgLwbAlp/6RKAKGoPl+CmjdJTczw28/?=
+ =?us-ascii?Q?c8sx492B8aOu1G9jl86UIyNx5+BdLCah4zJ9ER8HYv3lc/8ur7m9BnJDBJ08?=
+ =?us-ascii?Q?R9wRX1BAVtn+d+UqOzITtJiaOybOUjthXQH9JwWD6LiKTCQw79dhCG1jEzcc?=
+ =?us-ascii?Q?Fh/J+WiZtEiGXJFG1DFHVP+9ZozJB4q4y1A96pquO0fu5Ddi9RNazQXGDfM6?=
+ =?us-ascii?Q?b0kr8Y8tJMXuENk9dysHuwhfkGsEHUwNowMOfDlZCYvkb9tR2iWtoyw8mN7X?=
+ =?us-ascii?Q?efNXQe5GumS4ofajutW6TCfRnP8hN4P5p9U6gHrlcpdXGXP00LziVKp0ST9e?=
+ =?us-ascii?Q?RF9G5Kb5fqRgzNmaPq70H/Ca39qI0LVyEkY6Z1Fsud5u4tOkqh3LiMevriw2?=
+ =?us-ascii?Q?YMcIOBVmXulpAE90SuuajYL98my1CXda98MguTku?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ead73a88-2683-4fe9-b106-08db76de93c4
+X-MS-Exchange-CrossTenant-AuthSource: PUZPR06MB5936.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 07:17:33.9765
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PQTARyZKZYhIqZN+eYcmAWlyBymVWSPk3wbLXn5Gn4o1k2q4XIZjJM+s/hhMk/gkgW+A5UT6Vq84seDDIB6/vQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2PR06MB4155
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/WDv.au+H.QsfR2zGT_5WaN=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Replace the if statement with min_t() to simplify the code
 
-Hi all,
+Signed-off-by: You Kangren <youkangren@vivo.com>
+---
+ drivers/crypto/intel/qat/qat_common/qat_uclo.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-After merging the crypto tree, today's linux-next qemu boot test
-(powerpc pseries_le_defconfig) failed like this:
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+index ce837bcc1cab..b42a4d22b9d2 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+@@ -1986,10 +1986,7 @@ static void qat_uclo_wr_uimage_raw_page(struct icp_qat_fw_loader_handle *handle,
+ 	uw_relative_addr = 0;
+ 	words_num = encap_page->micro_words_num;
+ 	while (words_num) {
+-		if (words_num < UWORD_CPYBUF_SIZE)
+-			cpylen = words_num;
+-		else
+-			cpylen = UWORD_CPYBUF_SIZE;
++		cpylen = min_t(unsigned int, words_num, UWORD_CPYBUF_SIZE);
+ 
+ 		/* load the buffer */
+ 		for (i = 0; i < cpylen; i++)
+-- 
+2.39.0
 
- Loading compiled-in X.509 certificates
- BUG: Kernel NULL pointer dereference at 0x00000018
- Faulting instruction address: 0xc00000000092a054
- Oops: Kernel access of bad area, sig: 11 [#1]
- LE PAGE_SIZE=3D64K MMU=3DHash SMP NR_CPUS=3D2048 NUMA pSeries
- Modules linked in:
- CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.4.0-12597-g59adf7c9b6b4 #1
- Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf000=
-004 of:SLOF,HEAD pSeries
- NIP:  c00000000092a054 LR: c000000000929fdc CTR: 0000000000000000
- REGS: c00000000478f450 TRAP: 0380   Not tainted  (6.4.0-12597-g59adf7c9b6b=
-4)
- MSR:  8000000002009033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24002420  XER: 2000=
-0000
- CFAR: c0000000009b30c0 IRQMASK: 0=20
- GPR00: c000000000929fdc c00000000478f6f0 c000000001568f00 c000000006819800=
-=20
- GPR04: 0000000000000000 0000000000000000 0000000000000000 0000000000010100=
-=20
- GPR08: 0000000000000000 0000000000000000 0000000000000002 bc0793dad8bdf255=
-=20
- GPR12: 2e12589b9abeba33 c000000002b00000 c0000000000111a8 0000000000000000=
-=20
- GPR16: 0000000000000000 0000000000000000 c0000000028d1280 c000000002808a88=
-=20
- GPR20: c000000004764900 0000000000000000 0000000000000001 000000001f030000=
-=20
- GPR24: 000000000000052c c000000002139b00 000000000000000e 0000000000000040=
-=20
- GPR28: 000000000000dac0 c00000000404db00 0000000000000200 000000000000a400=
-=20
- NIP [c00000000092a054] crypto_sig_verify+0x114/0x180
- LR [c000000000929fdc] crypto_sig_verify+0x9c/0x180
- Call Trace:
- [c00000000478f6f0] [c000000000929fdc] crypto_sig_verify+0x9c/0x180 (unreli=
-able)
- [c00000000478f7e0] [c0000000009361c0] public_key_verify_signature+0x3c0/0x=
-590
- [c00000000478f8c0] [c0000000009393f0] x509_check_for_self_signed+0xc0/0x1b0
- [c00000000478f8f0] [c000000000937618] x509_cert_parse+0x1c8/0x270
- [c00000000478f970] [c000000000938c48] x509_key_preparse+0x38/0x260
- [c00000000478f9c0] [c00000000093262c] asymmetric_key_preparse+0x8c/0xe0
- [c00000000478fa10] [c0000000008af11c] __key_create_or_update+0x3cc/0x770
- [c00000000478fb40] [c000000000938b30] x509_load_certificate_list+0xb0/0x190
- [c00000000478fbe0] [c00000000203dac0] load_system_certificate_list+0x4c/0x=
-60
- [c00000000478fc40] [c000000000010bc0] do_one_initcall+0x80/0x320
- [c00000000478fd20] [c000000002004994] kernel_init_freeable+0x304/0x3ac
- [c00000000478fdf0] [c0000000000111d0] kernel_init+0x30/0x1a0
- [c00000000478fe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x1c
- --- interrupt: 0 at 0x0
- NIP:  0000000000000000 LR: 0000000000000000 CTR: 0000000000000000
- REGS: c00000000478fe80 TRAP: 0000   Not tainted  (6.4.0-12597-g59adf7c9b6b=
-4)
- MSR:  0000000000000000 <>  CR: 00000000  XER: 00000000
- CFAR: 0000000000000000 IRQMASK: 0=20
- GPR00: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR04: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR08: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR12: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR24: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- GPR28: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
-=20
- NIP [0000000000000000] 0x0
- LR [0000000000000000] 0x0
- --- interrupt: 0
- Code: 7d4a4378 f9410070 0b060000 579c043e 9361009c e9410090 e8610040 93810=
-098 794a07a0 7d295378 f9210090 e9230020 <e9290018> e989ffc0 7d8903a6 4e8004=
-21=20
- ---[ end trace 0000000000000000 ]---
-
-Reverting the following commits made it boot fine again:
-
-  3867caee497e ("crypto: sm2 - Provide sm2_compute_z_digest when sm2 is dis=
-abled")
-  63ba4d67594a ("KEYS: asymmetric: Use new crypto interface without scatter=
-lists")
-  e5221fa6a355 ("KEYS: asymmetric: Move sm2 code into x509_public_key")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/WDv.au+H.QsfR2zGT_5WaN=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSaiYoACgkQAVBC80lX
-0GwsTQgAkOFNf6+M2g3F2R92OmewbDK70U6cg2vgehyi9yvdY1aSn2zT8nvJEdon
-dHThazapHCywazZNRMvBFt5ehalF+GQqcDElrN/a1XMxyQeagmPOC+fsP7qg5+SQ
-C8t1WiLThm3cEgcLv2IDhCizFJ8uoJjwPv0bR2+RJGW3xQWF5pXHO6exAd1Gr3/U
-xDv4cOTYX8jh9G1Cj1GjUni0Gc5yDBOnB/M6lORNBPJqMiY3LhaZZG7YVE3EUrLz
-8N3vhuWMst9ISiZqd8C4IZxeQiJeHD/YhPg+rGp3BQGQWkT/Zi5nFsnN+ykCUHrj
-IrShM9d5IBaUqAz51E2VXJqJ0P11YQ==
-=uHjx
------END PGP SIGNATURE-----
-
---Sig_/WDv.au+H.QsfR2zGT_5WaN=--
