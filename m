@@ -2,165 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 186A6EB64D7
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 18:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 540B6EB64DC
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 20:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbjF1S7Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Jun 2023 14:59:25 -0400
-Received: from mga03.intel.com ([134.134.136.65]:10254 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229645AbjF1S5u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2023 14:57:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687978670; x=1719514670;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=tqSaGg/x+0pYMu8N0aigk6yCv/LZ/esxOgiIrlihxn0=;
-  b=TA3/KV8KkunJ9V46suPSv4IvsKI2XZUvM45dwsza4lAd39mb7WGS3aJr
-   c2xgM8vY2Lzz7cZqp8ubSGQtKrszX+bjik82JEoMMIG/7eFJc/QM2STer
-   zeSm/4RfiIXrRFjD8hKDpeit66++J86zfrJgFQN3etoIB6YEIfjhrQHu9
-   WiPuL3lxCGkumYJlijS+RiXldpVwvpD93PQ0rBCj60gZI07mc+PmqwXwu
-   QadK7lWkQmqqjieVLK+pmj4+wcWqbIFvFQJraFA2OXHd/LgXR6+3n66fr
-   PFtMPBeCFVFuZ8KOAg0bQR8mo6GU7rYP73VDLkmQgbTwo3+EsIyy3paWa
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="365394220"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="365394220"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 11:57:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="841200981"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="841200981"
-Received: from nagarw3-mobl1.amr.corp.intel.com ([10.212.93.40])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 11:57:47 -0700
-Message-ID: <8f2dd87ad58d5920e7bae4fea4cbe592074406c1.camel@linux.intel.com>
-Subject: Re: [PATCH v6 13/15] crypto: iaa - Add support for
- deflate-iaa-canned compression algorithm
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
-        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Date:   Wed, 28 Jun 2023 13:57:45 -0500
-In-Reply-To: <ZIw/jtxdg6O1O0j3@gondor.apana.org.au>
-References: <20230605201536.738396-1-tom.zanussi@linux.intel.com>
-         <20230605201536.738396-14-tom.zanussi@linux.intel.com>
-         <ZIw/jtxdg6O1O0j3@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1-0ubuntu1 
+        id S232108AbjF1UK0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Jun 2023 16:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60276 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231865AbjF1UKW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Jun 2023 16:10:22 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9C01BEA
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 13:10:21 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b6a152a933so3599401fa.1
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 13:10:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1687983019; x=1690575019;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qSvBLBYpZuuz4eEfb9EgOEcdzuOPHgtqP5O4l7UwFR4=;
+        b=TMW3VGndLImf+jYiCOseUyyX2GF8rDxPCjsUsg4RQIFkABsPUOhI7D6pDNpB5/29qa
+         VVkjTcOP+xlPfupfAiVmWpb7oZ8UiSRzDIBxYvyPhlqIb2LxAdTz97INO+gCvfVgvb8L
+         1U1/FZ6jtWNTZgWQucJHkJ3Q3p1NlihbkeWu0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687983019; x=1690575019;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qSvBLBYpZuuz4eEfb9EgOEcdzuOPHgtqP5O4l7UwFR4=;
+        b=H7ubA6ayUaBriunEl8IPaW3njHbsXXlxozqzJMTf8gA7KfHgFkTAJc0zRHMjSUhdVn
+         SVayfCWc/m/y9HL1ZMsDKeDQ+gc0VDlnk/Xd+AchwoIfYHewrOV/roie9cKf/N8t0RdY
+         czvdYXG4EZzjDFE9EqoxuaiERRXBps95gkUISSUMwqlHzZdWNU/NQjS24GhygFypHeE7
+         wD18CfTJucgxTDk3Trl5sTxCDF/3rB89NwvA3AeyPrhHNc7IyanSE7s452ZIZeUMHgQO
+         BBaT99iEIk4tEwvGYImdIHgMhGbFQ3QO/rEhKJANnbR+cubGR3Jvcfh7LFTXym/Kwk/P
+         kUKQ==
+X-Gm-Message-State: AC+VfDwY8fqWx/xMKVm+vpFgpvmKUGFS/o6pktFeLVhyh07EaDYTC9SH
+        As7qb4l/6kA9fpqt1rkUJwgqbr1gx5QF8qiAwburegkl
+X-Google-Smtp-Source: ACHHUZ6+bk3hob1D/VjHi9I60KB1UiGpfH2LcFijHSaVOFpUvTSx8bE3lmHmDu4Jf2SEdDJhVk9Qiw==
+X-Received: by 2002:a2e:2c0f:0:b0:2b4:765b:f6f0 with SMTP id s15-20020a2e2c0f000000b002b4765bf6f0mr20767501ljs.28.1687983019607;
+        Wed, 28 Jun 2023 13:10:19 -0700 (PDT)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
+        by smtp.gmail.com with ESMTPSA id bo8-20020a0564020b2800b005184165f1fasm4957942edb.5.2023.06.28.13.10.18
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Jun 2023 13:10:19 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-51d7f350758so6602861a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 13:10:18 -0700 (PDT)
+X-Received: by 2002:a05:6402:148e:b0:51d:7fa6:62ca with SMTP id
+ e14-20020a056402148e00b0051d7fa662camr10124675edv.14.1687983018674; Wed, 28
+ Jun 2023 13:10:18 -0700 (PDT)
 MIME-Version: 1.0
+References: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au> <570802.1686660808@warthog.procyon.org.uk>
+ <ZIrnPcPj9Zbq51jK@gondor.apana.org.au> <CAMj1kXHcDrL5YexGjwvHHY0UE1ES-KG=68ZJr7U=Ub5gzbaePg@mail.gmail.com>
+ <ZJlf6VoKRf+OZJEo@gondor.apana.org.au> <CAMj1kXHQKN+mkXavvR1A57nXWpDBTiqZ+H3T65CSkJN0NmjfrQ@mail.gmail.com>
+ <ZJlk2GkN8rp093q9@gondor.apana.org.au> <20230628062120.GA7546@sol.localdomain>
+ <CAMj1kXEki6pK+6Gm-oHLVU3t=GzF8Kfz9QebTMKQcwtuqCsUgw@mail.gmail.com>
+ <20230628173346.GA6052@sol.localdomain> <CAMj1kXGBrNZ6-WCGH7Bbw_T_2Og8JGErZPdLHLQVB58z+vrZ8A@mail.gmail.com>
+ <CAHk-=wi5D7drbmMrdA+8rMGGvA-R1fUK3ZqZ=r1ccNMiDT8atA@mail.gmail.com> <3695542.1687977261@warthog.procyon.org.uk>
+In-Reply-To: <3695542.1687977261@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 28 Jun 2023 13:10:02 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg2-sXtHKGTsKfcMXLkvHRDiU1nQBYwB8sLo3jXfzq+cw@mail.gmail.com>
+Message-ID: <CAHk-=wg2-sXtHKGTsKfcMXLkvHRDiU1nQBYwB8sLo3jXfzq+cw@mail.gmail.com>
+Subject: Re: [v2 PATCH 0/5] crypto: Add akcipher interface without SGs
+To:     David Howells <dhowells@redhat.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Roberto Sassu <roberto.sassu@huaweicloud.com>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>, dmitry.kasatkin@gmail.com,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
-=20
-Sorry for the delayed response, I was out on vacation.
+On Wed, 28 Jun 2023 at 11:34, David Howells <dhowells@redhat.com> wrote:
+>
+> What about something like the Intel on-die accelerators (e.g. IAA and QAT)?  I
+> think they can do async compression.
 
-On Fri, 2023-06-16 at 18:55 +0800, Herbert Xu wrote:
-> On Mon, Jun 05, 2023 at 03:15:34PM -0500, Tom Zanussi wrote:
-> > Add support for a 'canned' compression mode using the IAA
-> > compression
-> > mode in-kernel API.
-> >=20
-> > The IAA 'canned' compression mode is added alongside the existing
-> > 'fixed' compression mode and a crypto algorithm named
-> > 'deflate-iaa-canned' is registered using it.
->=20
-> So you said that canned is not compatible with the generic deflate
-> algorithm.=C2=A0 Does that mean that there is no way for it to decompress
-> something compressed by the generic deflate algorithm, and vice versa
-> its compressed output cannot be decompressed by generic deflate?
->=20
+I'm sure they can. And for some made-up benchmark it might even help.
+Do people use it in real life?
 
-Yes, for the most part...
+The *big* wins come from being able to do compression/encryption
+inline, when you don't need to do double-buffering etc.
 
-In canned mode, the header portion of the deflate block is stored
-separately from the body of the compressed data, but the header and
-body are both compliant with the deflate standard.  It can be
-decompressed with any software deflate decompressor by performing
-a	pre-processing step (basically prepending a deflate block header and
-the description of the codes before the first symbol).  The current
-code doesn=E2=80=99t do that, but it could.
-=20
-IAA canned mode can=E2=80=99t however decompress output generated by generi=
-c
-deflate, that is true.
-=20
-Below [1] are some more clarifying details in case you=E2=80=99re intereste=
-d.
+Anything else is completely broken, imnsho. Once you need to
+double-buffer your IO, you've already lost the whole point.
 
-> We don't add an algorithm to the Crypto API if the only
-> implementation
-> is by hardware.=C2=A0 IOW if you are adding a new algorithm, then a
-> software version must be the first patch.
->=20
-=20
-One possibility for supporting canned mode might be to, as mentioned
-above, change the code to prepend the deflate block header and
-description of the codes before the first symbol so that it could be
-decompressed using only generic deflate in software; in that case,
-there would never be a worry about the canned data compressed by the
-IAA hardware being unrecoverable in case of hardware failure.  I=E2=80=99m =
-not
-sure if that would be acceptable or how that would work within the
-crypto framework - please let us know your thoughts on that.
-=20
-If that=E2=80=99s not an option, then I=E2=80=99d propose just dropping the=
- canned
-algorithm for now and resubmitting with fixed mode only for a v7 of
-this series, and later following up with an additional series
-consisting of this patch and a software-only implementation of canned
-mode, as you suggest. Does that make sense?  Please let us know your
-thoughts...
-=20
-Thanks,
-=20
-Tom
-=20
-=20
-[1] [From Vinodh Gopal] Deflate https://www.ietf.org/rfc/rfc1951.txt is
-an LZ77 style algorithm combined with Huffman encoding. LZ77 algorithms
-look for matching strings within a history-window. Deflate defines that
-maximal window to be 32KB. A typical software implementation such as
-zlib/gzip with default settings, would use 32KB as the history-window.
-IAA is a light-weight implementation that only supports a history-
-window of 4KB. There are advanced settings in many Software
-libraries/applications to limit history when compressing; if we limit a
-Software compressor to 4KB history, then any input compressed with such
-Software can always be decompressed by IAA. A special exception is that
-Software compression with default settings that works on a data input
-whose size is <=3D 4KB will always generate an output that can be
-decompressed with IAA; since the original input itself is no bigger
-than 4KB, the larger window of 32KB becomes irrelevant. This is the
-case with the ZSWAP/ZRAM usage and 4KB page compression.
-=20
-The LZ77 symbols in a deflate block can be encoded with 2 styles of
-Huffman codes. In the fixed mode, a predefined Huffman code from the
-standard is used for the encoding. The deflate block header specifies
-the type of block as fixed or dynamic (or stored, for incompressible
-data stored as raw bytes). Dynamic Huffman codes require a compact
-description of the code used for that block, before the encoded symbols
-representing the compressed data. IAA supports these types of codes.
-The choice of codes is made during the compression; the decompressor
-parses the deflate block header to determine the type of codes and does
-not need such information from another context.
-=20
-In addition, IAA defines a "canned mode", where the code is stored
-separately from the compressed bitstream. Here the compressed blob
-would start at the very first encoded symbol. The decompressor needs
-additional context to know what codes were used by the compressor. This
-context is provided to the IAA decompressor when it needs to process a
-canned-mode compressed stream. This can also be decompressed with any
-software deflate decompressor, by performing a pre-processing step
-(basically prepending a deflate block header and the description of the
-codes before the first symbol)
-
-> Thanks,
-
+           Linus
