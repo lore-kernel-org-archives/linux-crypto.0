@@ -2,88 +2,116 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345FDEB64DC
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 14:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F1DEB64DD
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 16:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231414AbjF1Oiz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Jun 2023 10:38:55 -0400
-Received: from mga03.intel.com ([134.134.136.65]:51261 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229832AbjF1Oix (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2023 10:38:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687963133; x=1719499133;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hbL6+8IOydZgwh2S4eqQZSEu5o5novv5z8EuQf1SO+U=;
-  b=lkBm+CyGpLQDq53PJIKoapOZaIT6HhHzbM/KUdE9fPGLUmrEFT2cQztJ
-   xc9rR0hVVhZF7lBtHnDEH3B0istq/d7XmkVxrR6wILTNV45i7iKUymHur
-   6FmY1cO8OGxDwQor1LUd6XKaIGsftSV8ifWd+5+m66A8v8KbPBWgEPuvj
-   8VLNXRjv8a8Lfvs+x4480jAgldkJqdITwcMD9/6IWwSb5vri+N7b8wsnF
-   TAkFglEewpryxh4DW+MXzaUo34tfARFmRU8CFbDaVXKAuVP4JvbxgTctu
-   j9DhQnCrVsswge452I6syOp79/+GlmdDwGincGXxAZPe7ZXOh+SamYszA
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="365323111"
-X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
-   d="scan'208";a="365323111"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 07:38:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10754"; a="711062902"
-X-IronPort-AV: E=Sophos;i="6.01,165,1684825200"; 
-   d="scan'208";a="711062902"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga007.jf.intel.com with ESMTP; 28 Jun 2023 07:38:41 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1qEWJb-000clN-2U;
-        Wed, 28 Jun 2023 17:38:39 +0300
-Date:   Wed, 28 Jun 2023 17:38:39 +0300
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     You Kangren <youkangren@vivo.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Tom Zanussi <tom.zanussi@linux.intel.com>,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Srinivas Kerekare <srinivas.kerekare@intel.com>,
-        "open list:QAT DRIVER" <qat-linux@intel.com>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        opensource.kernel@vivo.com
-Subject: Re: [PATCH] crypto: qat - use min() in fw loader
-Message-ID: <ZJxF77bNAQ79OpWs@smile.fi.intel.com>
-References: <20230627071726.20578-1-youkangren@vivo.com>
- <ZJwPlLC7/sJP8U7u@smile.fi.intel.com>
- <ZJwxmUGPsIlTv+TG@gcabiddu-mobl1.ger.corp.intel.com>
+        id S231349AbjF1Q7O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Jun 2023 12:59:14 -0400
+Received: from dfw.source.kernel.org ([139.178.84.217]:50382 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229645AbjF1Q7N (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Jun 2023 12:59:13 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 44DF36140C;
+        Wed, 28 Jun 2023 16:59:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6551C433CD;
+        Wed, 28 Jun 2023 16:59:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687971552;
+        bh=LrHjHQSwdNQGHtEkQVYKmKzA2tViYdbwAogYEXzqJgY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=ViZotiUikf8kR4aXhy6Fx7TM60HL9xoKUeFSb9rfe40DnzMZFpl4p/pvwgN7mvCdY
+         OoK0QvtLBWGYAHeBlK5xBeuvyTYhXLt7VDSuf4BsaWjkUBKPWw8n+badIIjUndx/y9
+         Lf9zB4QCwLUI6XHl9HyIjJmYz8t6je8nkmd4M0HXcAIVext6D28tI4OChPUCK4ScG8
+         UBWLRusPo7DCBA/4zm+cYRFvd5kmmZ5OAKxAIJT8fFwDQUmDwK2C5VWwE471R6sOcj
+         6/6UIvVRsGJ+8c2waF8w3aznKu7ZPHZ0b2NqXTg0cDGnfC3L4/X5t/ZIz1qmgrJ/Bk
+         xRzrb8i2V0dZg==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-4fb7373dd35so1559303e87.1;
+        Wed, 28 Jun 2023 09:59:12 -0700 (PDT)
+X-Gm-Message-State: AC+VfDxW5NTVN53s0Sqk+i5wWWqPg4wrVFbKN0PTIX5dweFvLyTX5a4k
+        T9av2RjAfchBkQGsobOTNB9DlK6UBSTWOKkIjIo=
+X-Google-Smtp-Source: ACHHUZ6B9VuLFedt2FPDopT5YybzuVpL7NvxjigsX/gYx/x/LWLNG9Mo/GkszeeihYDbmQmu6PdSzNDRjLuJ6Yg4Cys=
+X-Received: by 2002:a05:6512:239a:b0:4f8:6ac4:1aa9 with SMTP id
+ c26-20020a056512239a00b004f86ac41aa9mr864855lfv.21.1687971550606; Wed, 28 Jun
+ 2023 09:59:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJwxmUGPsIlTv+TG@gcabiddu-mobl1.ger.corp.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au> <570802.1686660808@warthog.procyon.org.uk>
+ <ZIrnPcPj9Zbq51jK@gondor.apana.org.au> <CAMj1kXHcDrL5YexGjwvHHY0UE1ES-KG=68ZJr7U=Ub5gzbaePg@mail.gmail.com>
+ <ZJlf6VoKRf+OZJEo@gondor.apana.org.au> <CAMj1kXHQKN+mkXavvR1A57nXWpDBTiqZ+H3T65CSkJN0NmjfrQ@mail.gmail.com>
+ <ZJlk2GkN8rp093q9@gondor.apana.org.au> <20230628062120.GA7546@sol.localdomain>
+In-Reply-To: <20230628062120.GA7546@sol.localdomain>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 28 Jun 2023 18:58:58 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEki6pK+6Gm-oHLVU3t=GzF8Kfz9QebTMKQcwtuqCsUgw@mail.gmail.com>
+Message-ID: <CAMj1kXEki6pK+6Gm-oHLVU3t=GzF8Kfz9QebTMKQcwtuqCsUgw@mail.gmail.com>
+Subject: Re: [v2 PATCH 0/5] crypto: Add akcipher interface without SGs
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        David Howells <dhowells@redhat.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Roberto Sassu <roberto.sassu@huaweicloud.com>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>, dmitry.kasatkin@gmail.com,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 02:11:53PM +0100, Giovanni Cabiddu wrote:
-> On Wed, Jun 28, 2023 at 01:46:44PM +0300, Andy Shevchenko wrote:
-> > On Tue, Jun 27, 2023 at 03:17:24PM +0800, You Kangren wrote:
+On Wed, 28 Jun 2023 at 08:21, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Mon, Jun 26, 2023 at 06:13:44PM +0800, Herbert Xu wrote:
+> > On Mon, Jun 26, 2023 at 12:03:04PM +0200, Ard Biesheuvel wrote:
+> > >
+> > > In any case, what I would like to see addressed is the horrid scomp to
+> > > acomp layer that ties up megabytes of memory in scratch space, just to
+> > > emulate the acomp interface on top of scomp drivers, while no code
+> > > exists that makes use of the async nature. Do you have an idea on how
+> > > we might address this particular issue?
+> >
+> > The whole reason why need to allocate megabytes of memory is because
+> > of the lack of SG lists in the underlying algorithm.  If they
+> > actually used SG lists and allocated pages as they went during
+> > decompression, then we wouldn't need to pre-allocate any memory
+> > at all.
+>
+> I don't think that is a realistic expectation.  Decompressors generally need a
+> contiguous buffer for decompressed data anyway, up to a certain size which is
+> 32KB for DEFLATE but can be much larger for the more modern algorithms.  This is
+> because they decode "matches" that refer to previously decompressed data by
+> offset, and it has to be possible to index the data efficiently.
+>
+> (Some decompressors, e.g. zlib, provide "streaming" APIs where you can read
+> arbitrary amounts.  But that works by actually decompressing into an internal
+> buffer that has sufficient size, then copying to the user provided buffer.)
+>
+> The same applies to compressors too, with regards to the original data.
+>
+> I think the "input/output is a list of pages" model just fundamentally does not
+> work well for software compression and decompression.  To support it, either
+> large temporary buffers are needed (they might be hidden inside the
+> (de)compressor, but they are there), or vmap() or vm_map_ram() is needed.
+>
+> FWIW, f2fs compression uses vm_map_ram() and skips the crypto API entirely...
+>
+> If acomp has to be kept for the hardware support, then maybe its scomp backend
+> should use vm_map_ram() instead of scratch buffers?
+>
 
-...
+Yeah, but we'll run into similar issues related to the fact that
+scatterlists can describe arbitrary sequences of sub-page size memory
+chunks, which means vmap()ing the pages may not be sufficient to get a
+virtual linear representation of the buffers.
 
-> > min_t() can be dangerous some times.
-> > 
-> > To make it robust I would suggest to use min() and mark UWORD_CPYBUF_SIZE
-> > with U suffix to make the type the same.
-> Thanks. I reworked it, added a missing include and ordered the includes
-> in the file.
-
-I think it should be two patches then, but it's up to you and subsystem
-maintainer.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+With zswap being the only current user, which uses a single contiguous
+buffers for decompression out of place, and blocks on the completion,
+the level of additional complexity we have in the acomp stack is mind
+boggling. And the scomp-to-acomp adaptation layer, with its fixed size
+per-CPU in and output buffer (implying that acomp in/output has a
+hardcoded size limit) which are never freed makes it rather
+unpalatable to me tbh.
