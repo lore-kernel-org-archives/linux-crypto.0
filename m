@@ -2,96 +2,73 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 540B6EB64DC
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 20:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D19ABEB64D7
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 21:03:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232108AbjF1UK0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Jun 2023 16:10:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60276 "EHLO
+        id S231944AbjF1VDY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Jun 2023 17:03:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231865AbjF1UKW (ORCPT
+        with ESMTP id S230499AbjF1VDV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Jun 2023 16:10:22 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9C01BEA
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 13:10:21 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b6a152a933so3599401fa.1
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 13:10:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1687983019; x=1690575019;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qSvBLBYpZuuz4eEfb9EgOEcdzuOPHgtqP5O4l7UwFR4=;
-        b=TMW3VGndLImf+jYiCOseUyyX2GF8rDxPCjsUsg4RQIFkABsPUOhI7D6pDNpB5/29qa
-         VVkjTcOP+xlPfupfAiVmWpb7oZ8UiSRzDIBxYvyPhlqIb2LxAdTz97INO+gCvfVgvb8L
-         1U1/FZ6jtWNTZgWQucJHkJ3Q3p1NlihbkeWu0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687983019; x=1690575019;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qSvBLBYpZuuz4eEfb9EgOEcdzuOPHgtqP5O4l7UwFR4=;
-        b=H7ubA6ayUaBriunEl8IPaW3njHbsXXlxozqzJMTf8gA7KfHgFkTAJc0zRHMjSUhdVn
-         SVayfCWc/m/y9HL1ZMsDKeDQ+gc0VDlnk/Xd+AchwoIfYHewrOV/roie9cKf/N8t0RdY
-         czvdYXG4EZzjDFE9EqoxuaiERRXBps95gkUISSUMwqlHzZdWNU/NQjS24GhygFypHeE7
-         wD18CfTJucgxTDk3Trl5sTxCDF/3rB89NwvA3AeyPrhHNc7IyanSE7s452ZIZeUMHgQO
-         BBaT99iEIk4tEwvGYImdIHgMhGbFQ3QO/rEhKJANnbR+cubGR3Jvcfh7LFTXym/Kwk/P
-         kUKQ==
-X-Gm-Message-State: AC+VfDwY8fqWx/xMKVm+vpFgpvmKUGFS/o6pktFeLVhyh07EaDYTC9SH
-        As7qb4l/6kA9fpqt1rkUJwgqbr1gx5QF8qiAwburegkl
-X-Google-Smtp-Source: ACHHUZ6+bk3hob1D/VjHi9I60KB1UiGpfH2LcFijHSaVOFpUvTSx8bE3lmHmDu4Jf2SEdDJhVk9Qiw==
-X-Received: by 2002:a2e:2c0f:0:b0:2b4:765b:f6f0 with SMTP id s15-20020a2e2c0f000000b002b4765bf6f0mr20767501ljs.28.1687983019607;
-        Wed, 28 Jun 2023 13:10:19 -0700 (PDT)
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
-        by smtp.gmail.com with ESMTPSA id bo8-20020a0564020b2800b005184165f1fasm4957942edb.5.2023.06.28.13.10.18
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jun 2023 13:10:19 -0700 (PDT)
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-51d7f350758so6602861a12.3
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 13:10:18 -0700 (PDT)
-X-Received: by 2002:a05:6402:148e:b0:51d:7fa6:62ca with SMTP id
- e14-20020a056402148e00b0051d7fa662camr10124675edv.14.1687983018674; Wed, 28
- Jun 2023 13:10:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <ZIg4b8kAeW7x/oM1@gondor.apana.org.au> <570802.1686660808@warthog.procyon.org.uk>
- <ZIrnPcPj9Zbq51jK@gondor.apana.org.au> <CAMj1kXHcDrL5YexGjwvHHY0UE1ES-KG=68ZJr7U=Ub5gzbaePg@mail.gmail.com>
- <ZJlf6VoKRf+OZJEo@gondor.apana.org.au> <CAMj1kXHQKN+mkXavvR1A57nXWpDBTiqZ+H3T65CSkJN0NmjfrQ@mail.gmail.com>
- <ZJlk2GkN8rp093q9@gondor.apana.org.au> <20230628062120.GA7546@sol.localdomain>
- <CAMj1kXEki6pK+6Gm-oHLVU3t=GzF8Kfz9QebTMKQcwtuqCsUgw@mail.gmail.com>
- <20230628173346.GA6052@sol.localdomain> <CAMj1kXGBrNZ6-WCGH7Bbw_T_2Og8JGErZPdLHLQVB58z+vrZ8A@mail.gmail.com>
- <CAHk-=wi5D7drbmMrdA+8rMGGvA-R1fUK3ZqZ=r1ccNMiDT8atA@mail.gmail.com> <3695542.1687977261@warthog.procyon.org.uk>
-In-Reply-To: <3695542.1687977261@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 28 Jun 2023 13:10:02 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg2-sXtHKGTsKfcMXLkvHRDiU1nQBYwB8sLo3jXfzq+cw@mail.gmail.com>
-Message-ID: <CAHk-=wg2-sXtHKGTsKfcMXLkvHRDiU1nQBYwB8sLo3jXfzq+cw@mail.gmail.com>
-Subject: Re: [v2 PATCH 0/5] crypto: Add akcipher interface without SGs
-To:     David Howells <dhowells@redhat.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Wed, 28 Jun 2023 17:03:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651781BC5
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 14:03:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 679466146A
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Jun 2023 21:03:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B592C433C0;
+        Wed, 28 Jun 2023 21:03:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687986198;
+        bh=taogyxlxQ+1K0qg3OBjrm+rufktyEbtN8eOpF9xqVs4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=LFfWFIv7+YiMyacNyyYzut9KsthSQqThgNliTfbLNy4YZ+9+Ol5Ik3KRG5yVNSOGW
+         76Wfao5gzVsy3J4lDOLwd6VHbBSgBiqCmLAgQuKikHqGOqhSxcegMILVA9AFFqGVzg
+         NhyUQzAz4YhEN0OA4tzMM5MKDF/60+8OqpuOJBzCb1Sf0nPe0w8008JW1C7Tg+0uRr
+         c9DTXcNIHuM8L+QyABiMyPjOZTNniK4x9+Rj6Exs6QAKIXxXLR84zwAG2krgiTOWFZ
+         PM54kYMGxDztyH1eB6OeODcSiNUN/JCPvDHnaQIulyl+IXjiKupUlQByQhs+Uwd16j
+         QjOAu8FvPd6fg==
+Date:   Wed, 28 Jun 2023 14:03:17 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>, glider@google.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
         Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, dmitry.kasatkin@gmail.com,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Aviad Yehezkel <aviadye@nvidia.com>,
+        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
+Message-ID: <20230628140317.756e61d3@kernel.org>
+In-Reply-To: <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+References: <0000000000008a7ae505aef61db1@google.com>
+        <20200911170150.GA889@sol.localdomain>
+        <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 28 Jun 2023 at 11:34, David Howells <dhowells@redhat.com> wrote:
->
-> What about something like the Intel on-die accelerators (e.g. IAA and QAT)?  I
-> think they can do async compression.
+On Wed, 28 Jun 2023 22:48:01 +0900 Tetsuo Handa wrote:
+> syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
+> that bytes to encrypt/decrypt is multiple of block size for that cipher but
+> tls_alloc_encrypted_msg() is not initializing padding bytes when
+> required_size is not multiple of block cipher's block size.
 
-I'm sure they can. And for some made-up benchmark it might even help.
-Do people use it in real life?
+Sounds odd, so crypto layer reads beyond what we submitted as 
+the buffer? I don't think the buffer needs to be aligned, so
+the missing bits may well fall into a different (unmapped?) page.
 
-The *big* wins come from being able to do compression/encryption
-inline, when you don't need to do double-buffering etc.
-
-Anything else is completely broken, imnsho. Once you need to
-double-buffer your IO, you've already lost the whole point.
-
-           Linus
+This needs more careful investigation. Always zeroing the input 
+is just covering up the real issue.
