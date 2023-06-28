@@ -2,52 +2,81 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFE6C001B0
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 00:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D208EB64DA
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Jun 2023 09:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbjF1Aju (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Jun 2023 20:39:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35728 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230340AbjF1Ajq (ORCPT
+        id S237083AbjF1JI3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 28 Jun 2023 05:08:29 -0400
+Received: from dfw.source.kernel.org ([139.178.84.217]:34600 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234200AbjF1JEt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Jun 2023 20:39:46 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9968D296D;
-        Tue, 27 Jun 2023 17:39:43 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qEJDe-007zum-4E; Wed, 28 Jun 2023 08:39:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 28 Jun 2023 08:39:38 +0800
-Date:   Wed, 28 Jun 2023 08:39:38 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: boot failure after merge of the crypto tree
-Message-ID: <ZJuBSgrJWr/4c3eQ@gondor.apana.org.au>
-References: <20230627170234.1c86ecdc@canb.auug.org.au>
+        Wed, 28 Jun 2023 05:04:49 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BEA926130E;
+        Wed, 28 Jun 2023 06:38:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFBDEC433C8;
+        Wed, 28 Jun 2023 06:38:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687934312;
+        bh=hIaK5MMZGhPP0WIwXVhK5SME6ZluWkRCOQFxos9q7yo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=I8ua108wM9nVnxl66nOGDyuQnEeDyCv1Lt9xUx3PvvrSFEyRKVVsoCEhtZe5OkjJj
+         K8PV1w6/2hv7iFGo9RIXX4tJ65+EOyV/k1I5pDcWGlCR1xSfvx++iL7DcAu4Lww9wl
+         4UMPqtN8Mfr+9RAAJ72Oen2S6f9NBtKagv3+F/GbYc9NyuyXDkH8j8pSKsxtmZ53ug
+         cYMwpr9SeoYocFqOd3gccdDDwqFMy4UbNYX88v1uFnfJehK0wgikDju1OEy//LzXLo
+         IpAyRn0Fnyz3YMYboSJJ92ReN/WU6M2Vw8rpeN/oYMZxWucdGEe1xctpK6zN+2bG+5
+         aXhcdu7sDEPbg==
+Date:   Tue, 27 Jun 2023 23:38:30 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dongsoo Lee <letrhee@nsr.re.kr>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/4] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
+Message-ID: <20230628063830.GA7920@sol.localdomain>
+References: <20230626084703.907331-1-letrhee@nsr.re.kr>
+ <20230626084703.907331-5-letrhee@nsr.re.kr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230627170234.1c86ecdc@canb.auug.org.au>
+In-Reply-To: <20230626084703.907331-5-letrhee@nsr.re.kr>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 05:02:34PM +1000, Stephen Rothwell wrote:
-> Hi all,
-> 
-> After merging the crypto tree, today's linux-next qemu boot test
-> (powerpc pseries_le_defconfig) failed like this:
+On Mon, Jun 26, 2023 at 05:47:03PM +0900, Dongsoo Lee wrote:
+> when SIMD instructions are available, it performs even faster.
 
-Hi Stephen:
+This will only be true once there is actually an applicable implementation of
+LEA-XTS and LEA-CTS using SIMD instructions included in the kernel.
 
-I've just pushed out an update which should fix this crash.
+Perhaps it is your plan to go through and accelerate LEA-XTS and LEA-CTS for the
+common CPU architectures.  However, it is not included in this patchset yet, so
+it should not be claimed in the documentation yet.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Particularly, it outperforms AES when the dedicated crypto
+> +instructions for AES are unavailable, regardless of the presence of SIMD
+> +instructions. However, it is not recommended to use LEA unless there is
+> +a clear reason (such as the absence of dedicated crypto instructions for
+> +AES or a mandatory requirement) to do so. Also, to enable LEA support,
+> +it needs to be enabled in the kernel crypto API.
+
+I think I'd prefer that you omit the mention of the "absence of dedicated crypto
+instructions" use case for now.  fscrypt already supports another algorithm that
+fulfills exactly that use case (Adiantum), and that algorithm already has
+optimized implementations for arm32, arm64, and x86_64.  LEA does not have that
+yet.  So it does not really bring anything new to the table.  I'm also unsure it
+would be appropriate to recommend a "lightweight" cipher at this point...
+
+That would leave "mandatory requirement" as the rationale, at least for now,
+similar to SM4.
+
+- Eric
