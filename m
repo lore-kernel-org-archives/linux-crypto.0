@@ -2,93 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75126EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 15:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F03CDEB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 17:14:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231956AbjF3PvM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 11:51:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56564 "EHLO
+        id S232768AbjF3ROE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 13:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232502AbjF3PvL (ORCPT
+        with ESMTP id S229738AbjF3ROD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 11:51:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9458F35A5
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 08:51:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2B81B61775
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 15:51:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89D8EC433D9;
-        Fri, 30 Jun 2023 15:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688140269;
-        bh=o+HQ6sKOLOmf9NJpSPsWFmx92fmjlFfWr9D3EoklLi8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=jHffzW9mVEhnx1vyn2AqZf5LL+zIBS/Fs/Cilynv8kMBaoJPC/L0mO8gkSH4wa9C7
-         TzFQ6M8ouxTdZyX2eL8agbFrKVKOHxkraVuVKUg8wZMUVKEzQ6TJvZzRfTLad3abQZ
-         /EkJu5MoHfqasGxByyrNqF/w249qqWuCvlokWkPAZ64NAxx70LWWY3qyj2MnkvRSSS
-         n7cm1F2X+mKVMIhYwXA11c0RjkrAdVhShvzs4hbpz4ijrugYfSkSIArFTV8Riv2GC/
-         of8L/DUGLlrJlfnbWetYpiCIvF/9yS7p0s+6SyAptGHRbz3euuE6hc23utAsaA0s/i
-         IoDByBRQ7H5vg==
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so3302924e87.3;
-        Fri, 30 Jun 2023 08:51:09 -0700 (PDT)
-X-Gm-Message-State: ABy/qLYlpwkV1iabXoTBm7GPqhGbZWRgRXNt1O3ruzhsCm2vrTjJCC1c
-        o42AZ2lvp/Gu3At9whENjnhDX4xRxZSVjQLsRl0=
-X-Google-Smtp-Source: APBJJlHeM6BWV3muIjxnacs7zjjB0XKOeozxgRkAM5i8VKs9paqzZF7WBIi4waH6K6drUKfYMfm79y4EELrsxUS4wqA=
-X-Received: by 2002:a05:6512:3da5:b0:4f8:6e6e:3f42 with SMTP id
- k37-20020a0565123da500b004f86e6e3f42mr4240856lfv.14.1688140267474; Fri, 30
- Jun 2023 08:51:07 -0700 (PDT)
+        Fri, 30 Jun 2023 13:14:03 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C11D7DF
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 10:14:01 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-82-24.bstnma.fios.verizon.net [173.48.82.24])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 35UHDgXR012238
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 30 Jun 2023 13:13:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1688145225; bh=eRkiqUCEclG9KgZecVs1P0Wzt0tTZDVD/MSUDf9IzBY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=dFFHXNePbIQJpb2yYz32mHlzqBti0NQXFuVoitWpMlKrj4nhtfFzhBy+z18UrGMh+
+         BStLvAxp8o+GwVDvCHXuVglZ47YUrqk3SZzk/Lrxt0tYZWYfrQ35XkufbYrRUDV+oF
+         Ra4R/quxfVZ13jfAa30FiJTgSUcWVcll2SeaWiY8KOZn1ojO67BGq74sPTxrTHDmfp
+         UqkvcoyjO/ckIP7HgvV+4M0X9Eipk36ne6EZnRSAaRKArqrLwDDTPoDZsn5GPxVBFd
+         N9DYdrTU0R7XmPjr8CyiZ5ia0CKsverjzw/CPat5gsmuf/YDcAgWTctNV/h1ZHI/AX
+         I85PBlKTpPrlA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 36D6715C027F; Fri, 30 Jun 2023 13:13:42 -0400 (EDT)
+Date:   Fri, 30 Jun 2023 13:13:42 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     syzbot <syzbot+94a8c779c6b238870393@syzkaller.appspotmail.com>,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        David Howells <dhowells@redhat.com>
+Subject: Re: [syzbot] [ext4?] general protection fault in
+ ext4_put_io_end_defer
+Message-ID: <20230630171342.GC591635@mit.edu>
+References: <0000000000002a0b1305feeae5db@google.com>
+ <20230629035714.GJ8954@mit.edu>
+ <20230630074111.GB36542@sol.localdomain>
+ <20230630074614.GC36542@sol.localdomain>
 MIME-Version: 1.0
-References: <0000000000008a7ae505aef61db1@google.com> <20200911170150.GA889@sol.localdomain>
- <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
- <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
- <59e1d5c0-aedb-7b5b-f37f-0c20185d7e9b@I-love.SAKURA.ne.jp>
- <CAMj1kXGHRUUFYL09Lm-mO6MfGc19rC=-7mSJ1eDTcbw7QuEkaw@mail.gmail.com>
- <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
- <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
- <CAG_fn=VFa2yeiZmdyuVRmZYtWn6Tkox8UVrOrCv4tEec3BFYbQ@mail.gmail.com>
- <CAMj1kXEdwjN7Q8tKVxHz98zQ4EsWVSdLZ5tQaV-nXxc9hwRYjQ@mail.gmail.com>
- <CAG_fn=UWZWc+FZ_shCr+T9Y3gV9Bue-ZFHKJj78YXBq3JfnUKA@mail.gmail.com>
- <CAMj1kXE_PjQT6+A9a0Y=ZfbOr_H+umYSqHuRrM6AT_gFJxxP1w@mail.gmail.com> <20230630082733.4250175b@kernel.org>
-In-Reply-To: <20230630082733.4250175b@kernel.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 30 Jun 2023 17:50:55 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXE9a399_CiXNHMqpNk+Fz=4YPd0s-5B0gU66wYbEhiiZQ@mail.gmail.com>
-Message-ID: <CAMj1kXE9a399_CiXNHMqpNk+Fz=4YPd0s-5B0gU66wYbEhiiZQ@mail.gmail.com>
-Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Alexander Potapenko <glider@google.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Aviad Yehezkel <aviadye@nvidia.com>,
-        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630074614.GC36542@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 30 Jun 2023 at 17:27, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Fri, 30 Jun 2023 17:16:06 +0200 Ard Biesheuvel wrote:
-> > Note that this is the *input* scatterlist containing the AAD
-> > (additional authenticated data) and the crypto input, and so there is
-> > definitely a bug here that shouldn't be papered over by zero'ing the
-> > allocation.
->
-> Noob question, it's not the tag / AAD, right? We definitely don't init
-> that..
+On Fri, Jun 30, 2023 at 12:46:14AM -0700, Eric Biggers wrote:
+> > AF_ALG has existed since 2010.  My understanding that its original purpose was
+> > to expose hardware crypto accelerators to userspace.  Unfortunately, support for
+> > exposing *any* crypto algorithm was included as well, which IMO was a mistake.
 
-assoclen + cryptlen does not cover the tag on encryption, so it would
-be omitted here regardless of whether it was covered in the input
-scatterlist or not.
++1000....
+
+> > There are quite a few different userspace programs that use AF_ALG purely to get
+> > at the CPU-based algorithm implementations, without any sort of intention to use
+> > hardware crypto accelerator.  Probably because it seemed "easy".  Or "better"
+> > because everything in the kernel is better, right?
+
+Do we know if any to standard crypto libraries are using AF_ALG?  All
+aside from whether it's a good idea for userspace programs to be using
+kernel code because "everything is better in the kernel", I'm
+wondering how solicitous we should be for programs who are very likely
+rolling their own crypto, as opposed to using crypto library that has
+been written and vetted and tested for vulnerability by experts...
+
+> > It's controlled by the CONFIG_CRYPTO_USER_API_* options, with the hash support
+> > in particular controlled by CONFIG_CRYPTO_USER_API_HASH.  Though good luck
+> > disabling it on most systems, as systemd depends on it...
+> > 
+> 
+> Actually it turns out systemd has finally seen the light:
+> https://github.com/systemd/systemd/commit/2c3794f4228162c9bfd9e10886590d9f5b1920d7
+
+Aside from those PCI-attached crypto accelerators where you have to go
+through the kernel (although my experience has been that most of the
+time, the overhead for key scheduling, etc., is such that unless
+you're doing bulk crypto on large chunks of data, using external
+crypto hardware acclerators no longer makes sense 99.99% of the time
+in the 21st century), I wonder if we should consider having the kernel
+print a warning, "WARNING: [comm] is using AF_ALG; please consider
+using a real crypto library instead of rolling your own crypto".
+
+(Only half kidding.)
+
+					- Ted
