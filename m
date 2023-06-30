@@ -2,296 +2,66 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E2AEB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 17:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CE2EB64DA
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 19:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232311AbjF3RVD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 13:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39000 "EHLO
+        id S232125AbjF3TuO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 15:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232285AbjF3RU6 (ORCPT
+        with ESMTP id S230364AbjF3TuN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 13:20:58 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895211996
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 10:20:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688145654; x=1719681654;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UkvBzDfs02XhTEtfgb3b4jtKFXkM4YaMgh7b2eCJbJg=;
-  b=lKxQnIc1PIlZcsztNNkX1E8QK0wOBpMcy2asHkKNLyWggfIOr3CjwqW8
-   RpDwo1oWRzB6FJnTGvxXhmV0XYHuxL6jtsCWUMsTNEcLJbcFt/7UNH0CL
-   rpLRfzRGSrGfdEHWdQS6JTxOuPKFtNcx8EyGHGI6qLaSJI5x2rSLSTPgn
-   4bqGnFwNLyn9OoQ72442T996wS3EhXMig4Cayl3tQUYsVSK7VA09ik+BE
-   04KcAx67WFlXpWTpFrcyeVhUuLS6g2EOx5CTN1NmHYqy7Rau7cLYuBXEf
-   Bd/pOsNiMCQ3cmbBQTfPQ47uFe91p17DaeUYaW2x6JuRIz+GGZrqYKH4y
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="359922984"
-X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
-   d="scan'208";a="359922984"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 10:20:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="721038767"
-X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
-   d="scan'208";a="721038767"
-Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
-  by fmsmga007.fm.intel.com with ESMTP; 30 Jun 2023 10:20:53 -0700
-From:   Damian Muszynski <damian.muszynski@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v4 5/5] crypto: qat - add heartbeat counters check
-Date:   Fri, 30 Jun 2023 19:03:58 +0200
-Message-Id: <20230630170356.177654-6-damian.muszynski@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230630170356.177654-1-damian.muszynski@intel.com>
-References: <20230630170356.177654-1-damian.muszynski@intel.com>
+        Fri, 30 Jun 2023 15:50:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB47F19A9;
+        Fri, 30 Jun 2023 12:50:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 78B286179C;
+        Fri, 30 Jun 2023 19:50:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8295EC433C0;
+        Fri, 30 Jun 2023 19:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1688154611;
+        bh=RjHGfeGug/am7KllmZcNTHDBJHShpxNwhkWbu6BH2v0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JYevyD02g6Ftcod4VsIaeKkyzHK3p5fB47QQEQo+KavRrD04fHATBcrvo1SGTpJ2+
+         3FFCi1tF6ENa7og7CwQO/imnFT/ZARBAU4/I7zbDGN13yFCrB2V+jTftgvZaMBVUCJ
+         3Nx8d5zHbmnNDkiw5dZxiEqgoC6X9lh7/HgdcBHM=
+Date:   Fri, 30 Jun 2023 21:50:09 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Benno Lossin <benno.lossin@proton.me>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        FUJITA Tomonori <fujita.tomonori@gmail.com>,
+        rust-for-linux@vger.kernel.org, Gary Guo <gary@garyguo.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 1/2] rust: add synchronous message digest support
+Message-ID: <2023063045-slightly-scribe-6d09@gregkh>
+References: <20230615142311.4055228-1-fujita.tomonori@gmail.com>
+ <20230615142311.4055228-2-fujita.tomonori@gmail.com>
+ <udHI3v-OLUqHQt3fwnH71QuRJjzGxexw2rkIYEfnsChCmrLoJTIL_GL1wLCARf-UotY51jkPT6tC8nVDvjf8LkY2zvddpgeRQ5owysZwJos=@proton.me>
+ <20230622.111419.241422502377572827.ubuntu@gmail.com>
+ <0a9af5fa-4df2-11da-b3cb-0a6b1d27fdc2@proton.me>
+ <o6lMzg30KAx1IKuGUzjTWb8ciTkkb_vbseDHu2u5nqLeijQ0vX1QgDOij0HGjQkW4NhJcOMoXHvMCstcByEzjq_CjMuN61l1rUo9DaIf97Y=@proton.me>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <o6lMzg30KAx1IKuGUzjTWb8ciTkkb_vbseDHu2u5nqLeijQ0vX1QgDOij0HGjQkW4NhJcOMoXHvMCstcByEzjq_CjMuN61l1rUo9DaIf97Y=@proton.me>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A firmware update for QAT GEN2 changed the format of a data
-structure used to report the heartbeat counters.
+On Fri, Jun 30, 2023 at 02:48:37PM +0000, Benno Lossin wrote:
+> We came up with the following solutions, but could not come to a consensus on any
+> particular one, could you please assist us in making this decision?
+> 
+> 2. panic
 
-To support all firmware versions, extend the heartbeat logic
-with an algorithm that detects the number of counters returned
-by firmware. The algorithm detects the number of counters to
-be used (and size of the corresponding data structure) by the
-comparison the expected size of the data in memory, with the data
-which was written by the firmware.
+Never an option in kernel code, sorry, please don't even suggest it.
 
-Firmware detection is done one time during the first read of heartbeat
-debugfs file to avoid increasing the time needed to load the module.
+thanks,
 
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  2 +
- .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |  2 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  1 +
- .../intel/qat/qat_common/adf_heartbeat.c      | 68 +++++++++++++++++++
- .../intel/qat/qat_common/adf_heartbeat.h      |  6 ++
- .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  2 +
- 6 files changed, 81 insertions(+)
-
-diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-index e81d11409426..9c00c441b602 100644
---- a/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c
-@@ -8,6 +8,7 @@
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_c3xxx_hw_data.h"
-+#include "adf_heartbeat.h"
- #include "icp_qat_hw.h"
- 
- /* Worker thread to service arbiter mappings */
-@@ -153,6 +154,7 @@ void adf_init_hw_data_c3xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->measure_clock = measure_clock;
- 	hw_data->get_hb_clock = get_ts_clock;
- 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
-+	hw_data->check_hb_ctrs = adf_heartbeat_check_ctrs;
- 
- 	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-index 1a8c8e3a48e9..355a781693eb 100644
---- a/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_c62x/adf_c62x_hw_data.c
-@@ -8,6 +8,7 @@
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_c62x_hw_data.h"
-+#include "adf_heartbeat.h"
- #include "icp_qat_hw.h"
- 
- /* Worker thread to service arbiter mappings */
-@@ -155,6 +156,7 @@ void adf_init_hw_data_c62x(struct adf_hw_device_data *hw_data)
- 	hw_data->measure_clock = measure_clock;
- 	hw_data->get_hb_clock = get_ts_clock;
- 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
-+	hw_data->check_hb_ctrs = adf_heartbeat_check_ctrs;
- 
- 	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	adf_gen2_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index ab897e1717e0..e57abde66f4f 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -190,6 +190,7 @@ struct adf_hw_device_data {
- 	int (*send_admin_init)(struct adf_accel_dev *accel_dev);
- 	int (*start_timer)(struct adf_accel_dev *accel_dev);
- 	void (*stop_timer)(struct adf_accel_dev *accel_dev);
-+	void (*check_hb_ctrs)(struct adf_accel_dev *accel_dev);
- 	uint32_t (*get_hb_clock)(struct adf_hw_device_data *self);
- 	int (*measure_clock)(struct adf_accel_dev *accel_dev);
- 	int (*init_arb)(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-index 7358aac8e56d..beef9a5f6c75 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
-@@ -20,6 +20,8 @@
- #include "adf_transport_internal.h"
- #include "icp_qat_fw_init_admin.h"
- 
-+#define ADF_HB_EMPTY_SIG 0xA5A5A5A5
-+
- /* Heartbeat counter pair */
- struct hb_cnt_pair {
- 	__u16 resp_heartbeat_cnt;
-@@ -42,6 +44,57 @@ static int adf_hb_check_polling_freq(struct adf_accel_dev *accel_dev)
- 	return 0;
- }
- 
-+/**
-+ * validate_hb_ctrs_cnt() - checks if the number of heartbeat counters should
-+ * be updated by one to support the currently loaded firmware.
-+ * @accel_dev: Pointer to acceleration device.
-+ *
-+ * Return:
-+ * * true - hb_ctrs must increased by ADF_NUM_PKE_STRAND
-+ * * false - no changes needed
-+ */
-+static bool validate_hb_ctrs_cnt(struct adf_accel_dev *accel_dev)
-+{
-+	const size_t hb_ctrs = accel_dev->hw_device->num_hb_ctrs;
-+	const size_t max_aes = accel_dev->hw_device->num_engines;
-+	const size_t hb_struct_size = sizeof(struct hb_cnt_pair);
-+	const size_t exp_diff_size = array3_size(ADF_NUM_PKE_STRAND, max_aes,
-+						 hb_struct_size);
-+	const size_t dev_ctrs = size_mul(max_aes, hb_ctrs);
-+	const size_t stats_size = size_mul(dev_ctrs, hb_struct_size);
-+	const u32 exp_diff_cnt = exp_diff_size / sizeof(u32);
-+	const u32 stats_el_cnt = stats_size / sizeof(u32);
-+	struct hb_cnt_pair *hb_stats = accel_dev->heartbeat->dma.virt_addr;
-+	const u32 *mem_to_chk = (u32 *)(hb_stats + dev_ctrs);
-+	u32 el_diff_cnt = 0;
-+	int i;
-+
-+	/* count how many bytes are different from pattern */
-+	for (i = 0; i < stats_el_cnt; i++) {
-+		if (mem_to_chk[i] == ADF_HB_EMPTY_SIG)
-+			break;
-+
-+		el_diff_cnt++;
-+	}
-+
-+	return el_diff_cnt && el_diff_cnt == exp_diff_cnt;
-+}
-+
-+void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev)
-+{
-+	struct hb_cnt_pair *hb_stats = accel_dev->heartbeat->dma.virt_addr;
-+	const size_t hb_ctrs = accel_dev->hw_device->num_hb_ctrs;
-+	const size_t max_aes = accel_dev->hw_device->num_engines;
-+	const size_t dev_ctrs = size_mul(max_aes, hb_ctrs);
-+	const size_t stats_size = size_mul(dev_ctrs, sizeof(struct hb_cnt_pair));
-+	const size_t mem_items_to_fill = size_mul(stats_size, 2) / sizeof(u32);
-+
-+	/* fill hb stats memory with pattern */
-+	memset32((uint32_t *)hb_stats, ADF_HB_EMPTY_SIG, mem_items_to_fill);
-+	accel_dev->heartbeat->ctrs_cnt_checked = false;
-+}
-+EXPORT_SYMBOL_GPL(adf_heartbeat_check_ctrs);
-+
- static int get_timer_ticks(struct adf_accel_dev *accel_dev, unsigned int *value)
- {
- 	char timer_str[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = { };
-@@ -123,6 +176,13 @@ static int adf_hb_get_status(struct adf_accel_dev *accel_dev)
- 	size_t ae = 0;
- 	int ret = 0;
- 
-+	if (!accel_dev->heartbeat->ctrs_cnt_checked) {
-+		if (validate_hb_ctrs_cnt(accel_dev))
-+			hw_device->num_hb_ctrs += ADF_NUM_PKE_STRAND;
-+
-+		accel_dev->heartbeat->ctrs_cnt_checked = true;
-+	}
-+
- 	live_stats = accel_dev->heartbeat->dma.virt_addr;
- 	last_stats = live_stats + dev_ctrs;
- 	count_fails = (u16 *)(last_stats + dev_ctrs);
-@@ -221,6 +281,11 @@ int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
- 	if (!hb->dma.virt_addr)
- 		goto err_free;
- 
-+	/*
-+	 * Default set this flag as true to avoid unnecessary checks,
-+	 * it will be reset on platforms that need such a check
-+	 */
-+	hb->ctrs_cnt_checked = true;
- 	accel_dev->heartbeat = hb;
- 
- 	return 0;
-@@ -241,6 +306,9 @@ int adf_heartbeat_start(struct adf_accel_dev *accel_dev)
- 		return -EFAULT;
- 	}
- 
-+	if (accel_dev->hw_device->check_hb_ctrs)
-+		accel_dev->hw_device->check_hb_ctrs(accel_dev);
-+
- 	ret = get_timer_ticks(accel_dev, &timer_ticks);
- 	if (ret)
- 		return ret;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-index 297147f44150..b22e3cb29798 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
-@@ -24,6 +24,7 @@ struct adf_heartbeat {
- 	unsigned int hb_failed_counter;
- 	unsigned int hb_timer;
- 	u64 last_hb_check_time;
-+	bool ctrs_cnt_checked;
- 	struct hb_dma_addr {
- 		dma_addr_t phy_addr;
- 		void *virt_addr;
-@@ -48,6 +49,7 @@ int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
- 				 unsigned int timer_ms);
- void adf_heartbeat_status(struct adf_accel_dev *accel_dev,
- 			  enum adf_device_heartbeat_status *hb_status);
-+void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev);
- 
- #else
- static inline int adf_heartbeat_init(struct adf_accel_dev *accel_dev)
-@@ -69,5 +71,9 @@ static inline int adf_heartbeat_save_cfg_param(struct adf_accel_dev *accel_dev,
- {
- 	return 0;
- }
-+
-+static inline void adf_heartbeat_check_ctrs(struct adf_accel_dev *accel_dev)
-+{
-+}
- #endif
- #endif /* ADF_HEARTBEAT_H_ */
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index 8fbab905c5cc..09551f949126 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -7,6 +7,7 @@
- #include <adf_gen2_hw_data.h>
- #include <adf_gen2_pfvf.h>
- #include "adf_dh895xcc_hw_data.h"
-+#include "adf_heartbeat.h"
- #include "icp_qat_hw.h"
- 
- #define ADF_DH895XCC_VF_MSK	0xFFFFFFFF
-@@ -248,6 +249,7 @@ void adf_init_hw_data_dh895xcc(struct adf_hw_device_data *hw_data)
- 	hw_data->clock_frequency = ADF_DH895X_AE_FREQ;
- 	hw_data->get_hb_clock = get_ts_clock;
- 	hw_data->num_hb_ctrs = ADF_NUM_HB_CNT_PER_AE;
-+	hw_data->check_hb_ctrs = adf_heartbeat_check_ctrs;
- 
- 	adf_gen2_init_pf_pfvf_ops(&hw_data->pfvf_ops);
- 	hw_data->pfvf_ops.enable_vf2pf_interrupts = enable_vf2pf_interrupts;
--- 
-2.40.1
-
+greg k-h
