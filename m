@@ -2,95 +2,146 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F03CDEB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 17:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFF6EB64DA
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 17:20:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232768AbjF3ROE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 13:14:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36270 "EHLO
+        id S229476AbjF3RUU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 13:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbjF3ROD (ORCPT
+        with ESMTP id S229957AbjF3RUT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 13:14:03 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C11D7DF
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 10:14:01 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-82-24.bstnma.fios.verizon.net [173.48.82.24])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 35UHDgXR012238
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Jun 2023 13:13:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1688145225; bh=eRkiqUCEclG9KgZecVs1P0Wzt0tTZDVD/MSUDf9IzBY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=dFFHXNePbIQJpb2yYz32mHlzqBti0NQXFuVoitWpMlKrj4nhtfFzhBy+z18UrGMh+
-         BStLvAxp8o+GwVDvCHXuVglZ47YUrqk3SZzk/Lrxt0tYZWYfrQ35XkufbYrRUDV+oF
-         Ra4R/quxfVZ13jfAa30FiJTgSUcWVcll2SeaWiY8KOZn1ojO67BGq74sPTxrTHDmfp
-         UqkvcoyjO/ckIP7HgvV+4M0X9Eipk36ne6EZnRSAaRKArqrLwDDTPoDZsn5GPxVBFd
-         N9DYdrTU0R7XmPjr8CyiZ5ia0CKsverjzw/CPat5gsmuf/YDcAgWTctNV/h1ZHI/AX
-         I85PBlKTpPrlA==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 36D6715C027F; Fri, 30 Jun 2023 13:13:42 -0400 (EDT)
-Date:   Fri, 30 Jun 2023 13:13:42 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     syzbot <syzbot+94a8c779c6b238870393@syzkaller.appspotmail.com>,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        David Howells <dhowells@redhat.com>
-Subject: Re: [syzbot] [ext4?] general protection fault in
- ext4_put_io_end_defer
-Message-ID: <20230630171342.GC591635@mit.edu>
-References: <0000000000002a0b1305feeae5db@google.com>
- <20230629035714.GJ8954@mit.edu>
- <20230630074111.GB36542@sol.localdomain>
- <20230630074614.GC36542@sol.localdomain>
+        Fri, 30 Jun 2023 13:20:19 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E2D3A87
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 10:20:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688145618; x=1719681618;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XTZPnJjdnjXw8FHJZXlEOmJsQjEUds0KqC5D3/sYiKM=;
+  b=fy2X9TKC2kfwNzCgsodD6ettLTM8Wea1CXUCuXWWPEdxblLrYyNb84ZV
+   Z9h7P8D4dROYY/YDxJKP4dlwxIyw8BLki8nzOqvoctDZBe6jrWBrJNlxW
+   G8+L1nAa2jUfQctVt3+UY3M7mwyVptqSCfElDduE/f3ZGQ4ILxd6wtvKy
+   +YDLmnr7xNiRLXCoJlMEi3M8DWgwXmBqkN3y7f4x0XteyxjsEWNG8iZNh
+   gej8cNF4yrWGNwkFpod3NPdtcoSYPZXRHco57u+xFgi0bV4AqSxWsfIBV
+   TRUOEXYmZIRcP8PHhZBxygB7KiINbX2RaVBWuyV7izQlQXFLWes7Rp9BN
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="359922819"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="359922819"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 10:20:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="721038628"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="721038628"
+Received: from r031s002_zp31l10c01.gv.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by fmsmga007.fm.intel.com with ESMTP; 30 Jun 2023 10:20:17 -0700
+From:   Damian Muszynski <damian.muszynski@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Damian Muszynski <damian.muszynski@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v4 0/5] crypto: qat - add heartbeat feature
+Date:   Fri, 30 Jun 2023 19:03:53 +0200
+Message-Id: <20230630170356.177654-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230630074614.GC36542@sol.localdomain>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 12:46:14AM -0700, Eric Biggers wrote:
-> > AF_ALG has existed since 2010.  My understanding that its original purpose was
-> > to expose hardware crypto accelerators to userspace.  Unfortunately, support for
-> > exposing *any* crypto algorithm was included as well, which IMO was a mistake.
+This set introduces support for the QAT heartbeat feature. It allows
+detection whenever device firmware or acceleration unit will hang.
+We're adding this feature to allow our clients having a tool with
+they could verify if all of the Quick Assist hardware resources are
+healthy and operational.
 
-+1000....
+QAT device firmware periodically writes counters to a specified physical
+memory location. A pair of counters per thread is incremented at
+the start and end of the main processing loop within the firmware.
+Checking for Heartbeat consists of checking the validity of the pair
+of counter values for each thread. Stagnant counters indicate
+a firmware hang.
 
-> > There are quite a few different userspace programs that use AF_ALG purely to get
-> > at the CPU-based algorithm implementations, without any sort of intention to use
-> > hardware crypto accelerator.  Probably because it seemed "easy".  Or "better"
-> > because everything in the kernel is better, right?
+The first patch adds timestamp synchronization to the firmware.
+The second patch removes historical and never used HB definitions.
+Patch no. 3 is implementing the hardware clock frequency measuring
+interface.
+The fourth introduces the main heartbeat implementation with the debugfs
+interface.
+The last patch implements an algorithm that allows the code to detect
+which version of heartbeat API is used at the currently loaded firmware.
 
-Do we know if any to standard crypto libraries are using AF_ALG?  All
-aside from whether it's a good idea for userspace programs to be using
-kernel code because "everything is better in the kernel", I'm
-wondering how solicitous we should be for programs who are very likely
-rolling their own crypto, as opposed to using crypto library that has
-been written and vetted and tested for vulnerability by experts...
+Changes since v3:
+- improved comment in measure_clock() as suggested by Andy Shevchenko
+- changed release date and version for 6.6 in interface documentation
 
-> > It's controlled by the CONFIG_CRYPTO_USER_API_* options, with the hash support
-> > in particular controlled by CONFIG_CRYPTO_USER_API_HASH.  Though good luck
-> > disabling it on most systems, as systemd depends on it...
-> > 
-> 
-> Actually it turns out systemd has finally seen the light:
-> https://github.com/systemd/systemd/commit/2c3794f4228162c9bfd9e10886590d9f5b1920d7
+Changes since v2:
+- fixed build error on a few of architectures - reduced unnecessary
+  64bit division.
 
-Aside from those PCI-attached crypto accelerators where you have to go
-through the kernel (although my experience has been that most of the
-time, the overhead for key scheduling, etc., is such that unless
-you're doing bulk crypto on large chunks of data, using external
-crypto hardware acclerators no longer makes sense 99.99% of the time
-in the 21st century), I wonder if we should consider having the kernel
-print a warning, "WARNING: [comm] is using AF_ALG; please consider
-using a real crypto library instead of rolling your own crypto".
+Changes since v1:
+- fixed build errors on a few of architectures - replaced macro
+  DIV_ROUND_CLOSEST with DIV_ROUND_CLOSEST_ULL
+- included prerequisite patch "add internal timer for qat 4xxx" which initially
+  was sent separately as this patchset was still in development.
+  - timer patch reworked to use delayed work as suggested by Herbert Xu
 
-(Only half kidding.)
+Damian Muszynski (5):
+  crypto: qat - add internal timer for qat 4xxx
+  crypto: qat - drop obsolete heartbeat interface
+  crypto: qat - add measure clock frequency
+  crypto: qat - add heartbeat feature
+  crypto: qat - add heartbeat counters check
 
-					- Ted
+ Documentation/ABI/testing/debugfs-driver-qat  |  51 +++
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  14 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   4 +
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   |   3 +
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  28 ++
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.h   |   7 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |  28 ++
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.h     |   7 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   4 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  43 +++
+ .../intel/qat/qat_common/adf_cfg_strings.h    |   2 +
+ .../crypto/intel/qat/qat_common/adf_clock.c   | 131 +++++++
+ .../crypto/intel/qat/qat_common/adf_clock.h   |  14 +
+ .../intel/qat/qat_common/adf_common_drv.h     |   5 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   9 +-
+ .../intel/qat/qat_common/adf_gen2_config.c    |   7 +
+ .../intel/qat/qat_common/adf_gen2_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   3 +
+ .../intel/qat/qat_common/adf_gen4_timer.c     |  70 ++++
+ .../intel/qat/qat_common/adf_gen4_timer.h     |  21 ++
+ .../intel/qat/qat_common/adf_heartbeat.c      | 336 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_heartbeat.h      |  79 ++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.c      | 194 ++++++++++
+ .../qat/qat_common/adf_heartbeat_dbgfs.h      |  12 +
+ .../crypto/intel/qat/qat_common/adf_init.c    |  28 ++
+ drivers/crypto/intel/qat/qat_common/adf_isr.c |   6 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |  23 +-
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |  13 +
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.h   |   5 +
+ 30 files changed, 1147 insertions(+), 16 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_clock.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_timer.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_heartbeat_dbgfs.h
+
+
+base-commit: 67b9bc0df80cfa241fe7a9c2b857c3e3efde982a
+-- 
+2.40.1
+
