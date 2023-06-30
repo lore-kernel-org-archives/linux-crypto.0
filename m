@@ -2,252 +2,140 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1DFC001DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 06:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03BDAEB64DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 06:59:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbjF3GtF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 02:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
+        id S230207AbjF3G76 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 02:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230009AbjF3Gs7 (ORCPT
+        with ESMTP id S229967AbjF3G75 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 02:48:59 -0400
+        Fri, 30 Jun 2023 02:59:57 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3842E30F6;
-        Thu, 29 Jun 2023 23:48:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379EB10F8;
+        Thu, 29 Jun 2023 23:59:56 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AD390616D2;
-        Fri, 30 Jun 2023 06:48:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00052C433C9;
-        Fri, 30 Jun 2023 06:48:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BCF5C616B7;
+        Fri, 30 Jun 2023 06:59:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5DF7C433C0;
+        Fri, 30 Jun 2023 06:59:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688107736;
-        bh=DfWuOBR9K4rvCO7QX3b8VowNL+xIbvXG7I8WafSQ+v8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=krUDSGCcPBsiWXAUcwpPB702MfeaQafZy/5jlqBGSC0P8nXwCpzRokDdVsBUHjA5E
-         p9beHQW7pFU65LsgzVHZDB2ucN6nQaxeyG4MomxZM7xI6TkZecjeIuiMEMkrnNLYq2
-         bTsUKCTTf4pgDXGNLxEkwr5yo9IqdNN4Pt6vcuETlOu6QpfzoGbtdiObSojXGoVUgW
-         b8vuRpKCes9kjiNg8BcAb5KQ4p/Q2A6GkE6R70dx/oQKAXX14J/0OMQ7uIcR7fJ4iI
-         /VBp5JiGUlSIcewDz6fNaK/CdTPaLw5Z/j1mXK0qK1AR8er8e1YtwU0YuK8oGGjywQ
-         kaxj+YFJVUsRA==
+        s=k20201202; t=1688108395;
+        bh=OHVwB6AqoCRWSUdVLQgpPTx6eiqexiT0q7Vmk/ufVo4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Tsn+BTw0Hw74U1V97NJdAkIInwS7ZwrpnA2CLB8z2V0ZU0NZ2C5SVji8USvD/PlFH
+         PWnRPaskwErJvX9nGu0pd3P9G1oV2k5RCqRFaQX5jw3C1dxYx8eG0hoDIDpFjS8E3f
+         nmTLe7IjAd2fLj2a0rVG7meoPGqqHxyzafwdqQz0He9QZk6U8KVsv+maxhVS+f7yLD
+         OylWO48fIDJ4fZJH1dAK2nWVA/llQM19zJ52lhF7Jvnp1wHiAzUwtCaQYQ4xfhazGB
+         /ZlONoxZNF5u+Zbrfvu47rL0Kxywt8LPw3wMBCivXfFw1krRCtaD4kMPtJcfV1bt+Z
+         DqrNepJz78YJw==
+Date:   Thu, 29 Jun 2023 23:59:53 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-fscrypt@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, Dongsoo Lee <letrhee@nsr.re.kr>
-Subject: [PATCH 1/2] fscrypt: improve the "Encryption modes and usage" section
-Date:   Thu, 29 Jun 2023 23:48:10 -0700
-Message-ID: <20230630064811.22569-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230630064811.22569-1-ebiggers@kernel.org>
-References: <20230630064811.22569-1-ebiggers@kernel.org>
+To:     Dongsoo Lee <letrhee@nsr.re.kr>
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        'Jens Axboe' <axboe@kernel.dk>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        'Jaegeuk Kim' <jaegeuk@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 4/4] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
+Message-ID: <20230630065953.GA36542@sol.localdomain>
+References: <20230626084703.907331-1-letrhee@nsr.re.kr>
+ <20230626084703.907331-5-letrhee@nsr.re.kr>
+ <20230628063830.GA7920@sol.localdomain>
+ <000901d9aa70$a228c420$e67a4c60$@nsr.re.kr>
+ <20230630025914.GB1088@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630025914.GB1088@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, Jun 29, 2023 at 07:59:14PM -0700, Eric Biggers wrote:
+> On Thu, Jun 29, 2023 at 07:01:11PM +0900, Dongsoo Lee wrote:
+> > On Tue, Jun 27, 2023 at 23:38:30 -0700, Eric Biggers wrote:
+> > >On Mon, Jun 26, 2023 at 05:47:03PM +0900, Dongsoo Lee wrote:
+> > >> when SIMD instructions are available, it performs even faster.
+> > >
+> > >This will only be true once there is actually an applicable implementation
+> > of
+> > >LEA-XTS and LEA-CTS using SIMD instructions included in the kernel.
+> > >
+> > >Perhaps it is your plan to go through and accelerate LEA-XTS and LEA-CTS
+> > for the
+> > >common CPU architectures.  However, it is not included in this patchset
+> > yet, so
+> > >it should not be claimed in the documentation yet.
+> > >
+> > >> Particularly, it outperforms AES when the dedicated crypto
+> > >> +instructions for AES are unavailable, regardless of the presence of SIMD
+> > >> +instructions. However, it is not recommended to use LEA unless there is
+> > >> +a clear reason (such as the absence of dedicated crypto instructions for
+> > >> +AES or a mandatory requirement) to do so. Also, to enable LEA support,
+> > >> +it needs to be enabled in the kernel crypto API.
+> > >
+> > >I think I'd prefer that you omit the mention of the "absence of dedicated
+> > crypto
+> > >instructions" use case for now.  fscrypt already supports another algorithm
+> > that
+> > >fulfills exactly that use case (Adiantum), and that algorithm already has
+> > >optimized implementations for arm32, arm64, and x86_64.  LEA does not have
+> > that
+> > >yet.  So it does not really bring anything new to the table.  I'm also
+> > unsure it
+> > >would be appropriate to recommend a "lightweight" cipher at this point...
+> > >
+> > >That would leave "mandatory requirement" as the rationale, at least for
+> > now,
+> > >similar to SM4.
+> > >
+> > >- Eric
+> > 
+> > As you might expect, we are working on a SIMD implementation of LEA in a
+> > general-purpose CPU environment. However, since no such implementation has
+> > been submitted yet, we agree that it's right to leave it out for now.
+> > 
+> > In the next version, we would like to change the description to the
+> > following:
+> > 
+> > LEA is a South Korean 128-bit block cipher (with 128/192/256-bit keys)
+> > included in the ISO/IEC 29192-2:2019 standard (Information security -
+> > Lightweight cryptography - Part 2: Block ciphers). If dedicated cipher
+> > instructions are available, or other options with performance benefits
+> > are available, using LEA is likely not a suitable choice. Therefore,
+> > it is not recommended to use LEA-256-XTS unless there is a clear reason
+> > to do so, such as if there is a mandate. Also, to enable LEA support,
+> > it needs to be enabled in the kernel crypto API.
+> 
+> I don't think that really addresses my comment, due to the second sentence.  I
+> understand that you would like to advertise the performance of LEA.  But as I
+> mentioned, it's not yet realized in the kernel crypto API, and in the context of
+> fscrypt it won't really bring anything new to the table anyway.  For now I think
+> LEA is best described as a "national pride cipher" alongside SM4...  Keep in
+> mind, it can always be changed later if new use cases come up.
+> 
+> Could you just omit the documentation update from your patch?  I actually need
+> to rework the whole "Encryption modes and usage" section anyway since it's
+> growing a bit unwieldy, with 6 different combinations of encryption modes now
+> supported.  The information needs to be organized better.  It currently reads
+> like a list, and it might be hard for users to understand which setting to use.
+> 
+> I'll add on a patch that does that and adds the mention of LEA support.
+> 
+> - Eric
 
-As the number of supported encryption modes has grown, the part of the
-"Encryption modes and usage" section that describes the supported
-encryption modes has gotten a bit messy.  It presents useful
-information, but it's a bit lacking in high-level context.
+I've sent out
+https://lore.kernel.org/linux-fscrypt/20230630064811.22569-1-ebiggers@kernel.org/T/#u.
+One of the things it does is add a nice list for the "national pride ciphers".
+So we can just add ciphers like SM4 and LEA, and any that people might insist on
+adding in the future like Camellia, Kuznyechik, SEED, ARIA, etc., to that list,
+and not have to waste time with each one individually...
 
-Rework the section to hopefully be much more useful.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- Documentation/filesystems/fscrypt.rst | 164 +++++++++++++++++++-------
- 1 file changed, 119 insertions(+), 45 deletions(-)
-
-diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
-index eccd327e6df50..a624e92f2687f 100644
---- a/Documentation/filesystems/fscrypt.rst
-+++ b/Documentation/filesystems/fscrypt.rst
-@@ -332,54 +332,121 @@ Encryption modes and usage
- fscrypt allows one encryption mode to be specified for file contents
- and one encryption mode to be specified for filenames.  Different
- directory trees are permitted to use different encryption modes.
-+
-+Supported modes
-+---------------
-+
- Currently, the following pairs of encryption modes are supported:
- 
- - AES-256-XTS for contents and AES-256-CTS-CBC for filenames
--- AES-128-CBC for contents and AES-128-CTS-CBC for filenames
-+- AES-256-XTS for contents and AES-256-HCTR2 for filenames
- - Adiantum for both contents and filenames
--- AES-256-XTS for contents and AES-256-HCTR2 for filenames (v2 policies only)
--- SM4-XTS for contents and SM4-CTS-CBC for filenames (v2 policies only)
--
--If unsure, you should use the (AES-256-XTS, AES-256-CTS-CBC) pair.
--
--AES-128-CBC was added only for low-powered embedded devices with
--crypto accelerators such as CAAM or CESA that do not support XTS.  To
--use AES-128-CBC, CONFIG_CRYPTO_ESSIV and CONFIG_CRYPTO_SHA256 (or
--another SHA-256 implementation) must be enabled so that ESSIV can be
--used.
--
--Adiantum is a (primarily) stream cipher-based mode that is fast even
--on CPUs without dedicated crypto instructions.  It's also a true
--wide-block mode, unlike XTS.  It can also eliminate the need to derive
--per-file encryption keys.  However, it depends on the security of two
--primitives, XChaCha12 and AES-256, rather than just one.  See the
--paper "Adiantum: length-preserving encryption for entry-level
--processors" (https://eprint.iacr.org/2018/720.pdf) for more details.
--To use Adiantum, CONFIG_CRYPTO_ADIANTUM must be enabled.  Also, fast
--implementations of ChaCha and NHPoly1305 should be enabled, e.g.
--CONFIG_CRYPTO_CHACHA20_NEON and CONFIG_CRYPTO_NHPOLY1305_NEON for ARM.
--
--AES-256-HCTR2 is another true wide-block encryption mode that is intended for
--use on CPUs with dedicated crypto instructions.  AES-256-HCTR2 has the property
--that a bitflip in the plaintext changes the entire ciphertext.  This property
--makes it desirable for filename encryption since initialization vectors are
--reused within a directory.  For more details on AES-256-HCTR2, see the paper
--"Length-preserving encryption with HCTR2"
--(https://eprint.iacr.org/2021/1441.pdf).  To use AES-256-HCTR2,
--CONFIG_CRYPTO_HCTR2 must be enabled.  Also, fast implementations of XCTR and
--POLYVAL should be enabled, e.g. CRYPTO_POLYVAL_ARM64_CE and
--CRYPTO_AES_ARM64_CE_BLK for ARM64.
--
--SM4 is a Chinese block cipher that is an alternative to AES.  It has
--not seen as much security review as AES, and it only has a 128-bit key
--size.  It may be useful in cases where its use is mandated.
--Otherwise, it should not be used.  For SM4 support to be available, it
--also needs to be enabled in the kernel crypto API.
--
--New encryption modes can be added relatively easily, without changes
--to individual filesystems.  However, authenticated encryption (AE)
--modes are not currently supported because of the difficulty of dealing
--with ciphertext expansion.
-+- AES-128-CBC-ESSIV for contents and AES-128-CTS-CBC for filenames
-+- SM4-XTS for contents and SM4-CTS-CBC for filenames
-+
-+Authenticated encryption modes are not currently supported because of
-+the difficulty of dealing with ciphertext expansion.  Therefore,
-+contents encryption uses a block cipher in `XTS mode
-+<https://en.wikipedia.org/wiki/Disk_encryption_theory#XTS>`_ or
-+`CBC-ESSIV mode
-+<https://en.wikipedia.org/wiki/Disk_encryption_theory#Encrypted_salt-sector_initialization_vector_(ESSIV)>`_,
-+or a wide-block cipher.  Filenames encryption uses a
-+block cipher in `CTS-CBC mode
-+<https://en.wikipedia.org/wiki/Ciphertext_stealing>`_ or a wide-block
-+cipher.
-+
-+The (AES-256-XTS, AES-256-CTS-CBC) pair is the recommended default.
-+It is also the only option that is *guaranteed* to always be supported
-+if the kernel supports fscrypt at all; see `Kernel config options`_.
-+
-+The (AES-256-XTS, AES-256-HCTR2) pair is also a good choice that
-+upgrades the filenames encryption to use a wide-block cipher.  (A
-+*wide-block cipher*, also called a tweakable super-pseudorandom
-+permutation, has the property that changing one bit scrambles the
-+entire result.)  As described in `Filenames encryption`_, a wide-block
-+cipher is the ideal mode for the problem domain, though CTS-CBC is the
-+"least bad" choice among the alternatives.  For more information about
-+HCTR2, see `the HCTR2 paper <https://eprint.iacr.org/2021/1441.pdf>`_.
-+
-+Adiantum is recommended on systems where AES is too slow due to lack
-+of hardware acceleration for AES.  Adiantum is a wide-block cipher
-+that uses XChaCha12 and AES-256 as its underlying components.  Most of
-+the work is done by XChaCha12, which is much faster than AES when AES
-+acceleration is unavailable.  For more information about Adiantum, see
-+`the Adiantum paper <https://eprint.iacr.org/2018/720.pdf>`_.
-+
-+The (AES-128-CBC-ESSIV, AES-128-CTS-CBC) pair exists only to support
-+systems whose only form of AES acceleration is an off-CPU crypto
-+accelerator such as CAAM or CESA that does not support XTS.
-+
-+The remaining mode pairs are the "national pride ciphers":
-+
-+- (SM4-XTS, SM4-CTS-CBC)
-+
-+Generally speaking, these ciphers aren't "bad" per se, but they
-+receive limited security review compared to the usual choices such as
-+AES and ChaCha.  They also don't bring much new to the table.  It is
-+suggested to only use these ciphers where their use is mandated.
-+
-+Kernel config options
-+---------------------
-+
-+Enabling fscrypt support (CONFIG_FS_ENCRYPTION) automatically pulls in
-+only the basic support from the crypto API needed to use AES-256-XTS
-+and AES-256-CTS-CBC encryption.  For optimal performance, it is
-+strongly recommended to also enable any available platform-specific
-+kconfig options that provide acceleration for the algorithm(s) you
-+wish to use.  Support for any "non-default" encryption modes typically
-+requires extra kconfig options as well.
-+
-+Below, some relevant options are listed by encryption mode.  Note,
-+acceleration options not listed below may be available for your
-+platform; refer to the kconfig menus.  File contents encryption can
-+also be configured to use inline encryption hardware instead of the
-+kernel crypto API (see `Inline encryption support`_); in that case,
-+the file contents mode doesn't need to supported in the kernel crypto
-+API, but the filenames mode still does.
-+
-+- AES-256-XTS and AES-256-CTS-CBC
-+    - Recommended:
-+        - arm64: CONFIG_CRYPTO_AES_ARM64_CE_BLK
-+        - x86: CONFIG_CRYPTO_AES_NI_INTEL
-+
-+- AES-256-HCTR2
-+    - Mandatory:
-+        - CONFIG_CRYPTO_HCTR2
-+    - Recommended:
-+        - arm64: CONFIG_CRYPTO_AES_ARM64_CE_BLK
-+        - arm64: CONFIG_CRYPTO_POLYVAL_ARM64_CE
-+        - x86: CONFIG_CRYPTO_AES_NI_INTEL
-+        - x86: CONFIG_CRYPTO_POLYVAL_CLMUL_NI
-+
-+- Adiantum
-+    - Mandatory:
-+        - CONFIG_CRYPTO_ADIANTUM
-+    - Recommended:
-+        - arm32: CONFIG_CRYPTO_CHACHA20_NEON
-+        - arm32: CONFIG_CRYPTO_NHPOLY1305_NEON
-+        - arm64: CONFIG_CRYPTO_CHACHA20_NEON
-+        - arm64: CONFIG_CRYPTO_NHPOLY1305_NEON
-+        - x86: CONFIG_CRYPTO_CHACHA20_X86_64
-+        - x86: CONFIG_CRYPTO_NHPOLY1305_SSE2
-+        - x86: CONFIG_CRYPTO_NHPOLY1305_AVX2
-+
-+- AES-128-CBC-ESSIV and AES-128-CTS-CBC:
-+    - Mandatory:
-+        - CONFIG_CRYPTO_ESSIV
-+        - CONFIG_CRYPTO_SHA256 or another SHA-256 implementation
-+    - Recommended:
-+        - AES-CBC acceleration
-+
-+fscrypt also uses HMAC-SHA512 for key derivation, so enabling SHA-512
-+acceleration is recommended:
-+
-+- SHA-512
-+    - Recommended:
-+        - arm64: CONFIG_CRYPTO_SHA512_ARM64_CE
-+        - x86: CONFIG_CRYPTO_SHA512_SSSE3
- 
- Contents encryption
- -------------------
-@@ -493,7 +560,14 @@ This structure must be initialized as follows:
-   be set to constants from ``<linux/fscrypt.h>`` which identify the
-   encryption modes to use.  If unsure, use FSCRYPT_MODE_AES_256_XTS
-   (1) for ``contents_encryption_mode`` and FSCRYPT_MODE_AES_256_CTS
--  (4) for ``filenames_encryption_mode``.
-+  (4) for ``filenames_encryption_mode``.  For details, see `Encryption
-+  modes and usage`_.
-+
-+  v1 encryption policies only support three combinations of modes:
-+  (FSCRYPT_MODE_AES_256_XTS, FSCRYPT_MODE_AES_256_CTS),
-+  (FSCRYPT_MODE_AES_128_CBC, FSCRYPT_MODE_AES_128_CTS), and
-+  (FSCRYPT_MODE_ADIANTUM, FSCRYPT_MODE_ADIANTUM).  v2 policies support
-+  all combinations documented in `Supported modes`_.
- 
- - ``flags`` contains optional flags from ``<linux/fscrypt.h>``:
- 
--- 
-2.41.0
-
+- Eric
