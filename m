@@ -2,104 +2,126 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC059EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 08:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5586EB64D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 09:37:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232173AbjF3Ifo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 04:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44200 "EHLO
+        id S232658AbjF3Jhm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 05:37:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232585AbjF3Ifb (ORCPT
+        with ESMTP id S232822AbjF3Jhi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 04:35:31 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E681997
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 01:35:26 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-1b06c978946so1492184fac.0
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 01:35:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688114125; x=1690706125;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X1Gp5Gg4BNunXsleMrsnw5ZYlJcOJJdlLO0f4lwUvf4=;
-        b=Xrs9VFWohqyU/H8LwH8zZ3T5PJKsE4qUa3nULVa/uzwCY3jburveYZTEQGU4h2OdVi
-         2gpznjZeJwZ+mFFYBwJ0DuOwGEnxevyhmtLIj3blRjllRP2SefPyXkWFsyjYV3Hm2vSg
-         zlffKwvxP2wyofstAyEnWxEDKW3X/n+QDpZrLL6dy4BOFhzijd7OCF9tEsdZMjaSKRWQ
-         DRvbj0i2QDuKvdaYibY11rt1Q87SAy+LUHvraBoa5i1Emc/eb2Rjc4I7PwiArtUP8Ufy
-         gYP88iMeno5kWSJ7doGeZLv0z0fzsjGAOpLsx6/tAlrndvy6WOdHzmUz8eH2sIPBfZX6
-         1s9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688114125; x=1690706125;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X1Gp5Gg4BNunXsleMrsnw5ZYlJcOJJdlLO0f4lwUvf4=;
-        b=R3y159XBRqLMwSu80UUyCkzHWYHBgHUl6GPTBT+YLv6DIwmCFQkhqYBsqramGSiasO
-         cy7RpcPe+kT2OzQaOmQWBt/kyo34ZY1tZ5sTVqOHQtp6MEbeLQwtNyaAhoO8e5fJMriu
-         xcFCkTWY1jJYwbIn2sra2Pilb+kqqoF2OLpK8TC1WHaq7gMaYjmYDBZibICQnzChTSyM
-         k5cEP8OmBiJGRVCZVOyv8MM4pYT6gbIrnovJ5Y6bPclo75rIBpugKWro8TP9VY2+kSTK
-         4qPBHPUCP+IyNrxA27V416o+4kijZk3eZdsujz4xtxenWAi/PDaOae6zd3cv/wNS8J74
-         hVhA==
-X-Gm-Message-State: ABy/qLYhOEoAX4UexX/lC1Dr8h1IoyFz/L8JhSObzBDWujSCFWipSNRA
-        9vP48xfZafvaqara4rWfFY/GSw==
-X-Google-Smtp-Source: ACHHUZ41dWBdoUrDVQNrZIPi2FWG8gSP1Rq8A5pKSjChQLo4+ZXNFCQAZ1VAvbvoSvq0q3MAE0kRvQ==
-X-Received: by 2002:a05:6871:8a2:b0:1b0:38f1:841d with SMTP id r34-20020a05687108a200b001b038f1841dmr2814289oaq.45.1688114125620;
-        Fri, 30 Jun 2023 01:35:25 -0700 (PDT)
-Received: from [192.168.1.4] ([223.233.68.54])
-        by smtp.gmail.com with ESMTPSA id jx15-20020a17090b46cf00b00262e914169csm8495370pjb.12.2023.06.30.01.35.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jun 2023 01:35:25 -0700 (PDT)
-Message-ID: <2dcfd994-2729-8780-a7aa-9a051d2fa047@linaro.org>
-Date:   Fri, 30 Jun 2023 14:05:18 +0530
+        Fri, 30 Jun 2023 05:37:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FCB3C0C
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 02:37:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7C37A61711
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 09:37:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1E58C433AB;
+        Fri, 30 Jun 2023 09:37:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688117825;
+        bh=NvISiXV+qNhfVjOdFA0oj/36t4SVSoQAe2nCdjSVIMg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=dQspoZx13mxkWw3Lj4TBmT6UEUkj+SCv8Lmn23Y2WXcTo7qawU2gZLhMYxLeHyL/F
+         OULv8gwNTiagnBLymK7EMKrKDZEopP41CuIpG2r68c6URM9GKbUnmfoeYf9NVlIYql
+         gkOY6yJVKPA76AieVNAkBmz1Amfq0ge30ZdcZd2f3RnnEbwkjFI2C8jMhRObfOoZUa
+         NFzIL96E8xyd0NjgyyCTFityDy+M41QpYRrqmGucuEMS9L2RCRspPw3aeoYSZ7AGIW
+         7iEGmNvLx8bYw+cDslC1evuby/g5lBAdBt+flwtgeK6/3/N5Z5n/E1E98g5HPMPF+q
+         9ZVrVQ0PZxTrQ==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-4fb7dc16ff0so2626843e87.2;
+        Fri, 30 Jun 2023 02:37:05 -0700 (PDT)
+X-Gm-Message-State: ABy/qLaDAhv7g968syhRI69IwNTTUFmIKGKtBhcICZ4QQ4QO1Oy8lz9F
+        TwAVHSL6S2U5PdJzwq/N8Ggv6boW/pvNtYgapZk=
+X-Google-Smtp-Source: APBJJlGbO447UI8+8twcUUt9AmQN1aCCqPJVZYCruX+uaMq5bRXMYi1QAyHd0C/pXRJJ1RP9glerAKI5vjKUrkxacqE=
+X-Received: by 2002:a05:6512:55c:b0:4fb:8603:f6aa with SMTP id
+ h28-20020a056512055c00b004fb8603f6aamr1466400lfl.11.1688117823714; Fri, 30
+ Jun 2023 02:37:03 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v8 02/11] dt-bindings: dma: Increase iommu maxItems for
- BAM DMA
-Content-Language: en-US
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org
-Cc:     agross@kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, andersson@kernel.org,
-        bhupesh.linux@gmail.com, robh+dt@kernel.org,
-        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
-        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
-        stephan@gerhold.net, Anders Roxell <anders.roxell@linaro.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
- <20230526192210.3146896-3-bhupesh.sharma@linaro.org>
- <27b85110-9eb8-84dc-17a9-908e312e2e22@linaro.org>
-From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
-In-Reply-To: <27b85110-9eb8-84dc-17a9-908e312e2e22@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <0000000000008a7ae505aef61db1@google.com> <20200911170150.GA889@sol.localdomain>
+ <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+In-Reply-To: <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Fri, 30 Jun 2023 11:36:51 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
+Message-ID: <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
+Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, glider@google.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Aviad Yehezkel <aviadye@nvidia.com>,
+        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Krzysztof,
+On Wed, 28 Jun 2023 at 15:49, Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+>
+> syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
+> that bytes to encrypt/decrypt is multiple of block size for that cipher but
+> tls_alloc_encrypted_msg() is not initializing padding bytes when
+> required_size is not multiple of block cipher's block size.
+>
+> In order to make sure that padding bytes are automatically initialized,
+> enable __GFP_ZERO flag when setsockopt(SOL_TCP, TCP_ULP, "tls") is called.
+>
+> Reported-by: syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>
+> Closes: https://syzkaller.appspot.com/bug?extid=828dfc12440b4f6f305d
 
-On 6/18/23 2:09 PM, Krzysztof Kozlowski wrote:
-> On 26/05/2023 21:22, Bhupesh Sharma wrote:
->> Since SM8450 BAM DMA engine supports five iommu entries,
->> increase the maxItems in the iommu property section, without
->> which 'dtbs_check' reports the following error:
->>
->>    arch/arm64/boot/dts/qcom/sm8450-sony-xperia-nagara-pdx224.dtb:
->>      dma-controller@1dc4000: iommus: is too long
-> 
-> Also, please drop error message, because it is not true. The files do
-> not have such device node, so you cannot have such warning.
-> 
-> Please rewrite the commit msg to explain that certain devices, e.g.
-> sm8250, use more iommus.
+Maybe I am missing something, but this syzkaller report appears to b a
+huge collection of uninit-value reports, of which only one is related
+to bpx_tx_verdict(), and that one has nor reproducer.
 
-I have sent a v9 (which can be seen here: 
-<https://lore.kernel.org/linux-arm-msm/20230630082230.2264698-1-bhupesh.sharma@linaro.org/>), 
-which addresses your review comments shared on v8.
+So even if this would be the right fix, I don't think closing that
+issue makes sense, so? The issue refers to a couple of other
+occcurences of uninit-value in aesti_encrypt, which do seem related.
 
-Please help review.
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> ---
+> According to C reproducer, this problem happens when bpf_exec_tx_verdict() is
+> called with lower 4 bits of required_size being 0001 and does not happen when
+> being 0100. Thus, I assumed that this problem is caused by lack of initializing
+> padding bytes.
+> But I couldn't figure out why KMSAN reports this problem when bpf_exec_tx_verdict()
+> is called with lower 4 bits of required_size being 0001 for the second time and
+> does not report this problem when bpf_exec_tx_verdict() is called with lower
+> 4 bits of required_size being 0001 for the first time. More deeper problem exists?
+> KMSAN reporting this problem when accessing u64 relevant?
+>
 
-Thanks,
-Bhupesh
+As Eric pointed out as well, zeroing the allocation papers over the problem.
+
+Why are you sending this now? Do you have a reproducer for this issue?
+
+>  net/tls/tls_main.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+> index f2e7302a4d96..cd5366966864 100644
+> --- a/net/tls/tls_main.c
+> +++ b/net/tls/tls_main.c
+> @@ -1025,6 +1025,7 @@ static int tls_init(struct sock *sk)
+>         struct tls_context *ctx;
+>         int rc = 0;
+>
+> +       sk->sk_allocation |= __GFP_ZERO;
+>         tls_build_proto(sk);
+>
+>  #ifdef CONFIG_TLS_TOE
+> --
+> 2.34.1
+>
