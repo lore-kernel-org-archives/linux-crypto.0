@@ -2,137 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8CAC00528
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 07:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C16D7EB64DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 07:53:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231650AbjF3Hq2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 03:46:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55410 "EHLO
+        id S230415AbjF3Hxm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 03:53:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232357AbjF3HqZ (ORCPT
+        with ESMTP id S230046AbjF3Hxl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 03:46:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42EE619B5;
-        Fri, 30 Jun 2023 00:46:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C55E0616EC;
-        Fri, 30 Jun 2023 07:46:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD814C433C8;
-        Fri, 30 Jun 2023 07:46:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688111176;
-        bh=FEyFCEh9AVWYVR5/3aJ4Wq2M5vu3WP7EgYsC+YbQcXU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jCPcaVZGkOE/wdNx6lzkn6tm0El2fEy6PYCEevjGu10ZsFRHzHJIovamvvMhvarN3
-         dv6DXzwZsM9uCZ2/GuPATK9gFi3HWzOJUelhZHTHQ8+Z+3oMJUwElLTkaJqGfPzxcW
-         6fvQDdIEcZtfLGz8R/j1OSkPb5WsYABSiiggqMs9rVIMtiovXuHO5DgWWQl5ugx+ey
-         dHus8JVOF8QMBRnF/UbmYu6zS7ln3hk8MajwN9rnazSba/PhUILtr//l0u/gvph2Bp
-         CGEk4FKGFsziIaregYiPbwu1BXpv7jMp+ixpzIe+TUNWDIwz/7IkAy0a8XMJq1O6tm
-         +knllFsylLZdQ==
-Date:   Fri, 30 Jun 2023 00:46:14 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     syzbot <syzbot+94a8c779c6b238870393@syzkaller.appspotmail.com>,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        David Howells <dhowells@redhat.com>
-Subject: Re: [syzbot] [ext4?] general protection fault in
- ext4_put_io_end_defer
-Message-ID: <20230630074614.GC36542@sol.localdomain>
-References: <0000000000002a0b1305feeae5db@google.com>
- <20230629035714.GJ8954@mit.edu>
- <20230630074111.GB36542@sol.localdomain>
+        Fri, 30 Jun 2023 03:53:41 -0400
+Received: from mail.nsr.re.kr (unknown [210.104.33.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BBA1B5;
+        Fri, 30 Jun 2023 00:53:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; s=LIY0OQ3MUMW6182UNI14; d=nsr.re.kr; t=1688111482; c=relaxed/relaxed; h=content-type:date:from:message-id:mime-version:subject:to; bh=Olcp/merrmy+oOHLlTFT/5Sfiagah7Ht2pr+7Tldn3Q=; b=MO9J3prFxRDDPMxKhf2rU8PfEqSGPy9xSABvHSXEeLvfD9vrFhKQJ0cHKAR81TE2nq5kmuBrPMVAflMc9X9yC2ACtJCY8WKXm48MISKrQDxP5oeyfq9k9j8n8lyoeKI7RWCky7CPJ41jJshLXa4a3sb9C16DYNpMNfg2DMhaUdRITBXOPtyViZXh8EuUj8FVqmrgDVU0YsNROJp6o9nMSB+XXVnTbDDmrIs3aBm8TxM6xpd2j90dXWNU+J/+npvlcf7y/2EO/HAJid6e1i1yvbLEhDi53bklwfun2GTmYlee9kr1ssZGrG6nR3gCv9FrIiVYooSVWI70hQQp4G2cEw==
+Received: from 210.104.33.70 (nsr.re.kr)
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128 bits))
+        by mail.nsr.re.kr with SMTP; Fri, 30 Jun 2023 16:51:07 +0900
+Received: from 192.168.155.188 ([192.168.155.188])
+          by mail.nsr.re.kr (Crinity Message Backbone-7.0.1) with SMTP ID 289;
+          Fri, 30 Jun 2023 16:53:15 +0900 (KST)
+From:   Dongsoo Lee <letrhee@nsr.re.kr>
+To:     'Eric Biggers' <ebiggers@kernel.org>
+Cc:     'Herbert Xu' <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        'Jens Axboe' <axboe@kernel.dk>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        'Jaegeuk Kim' <jaegeuk@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230626084703.907331-1-letrhee@nsr.re.kr> <20230626084703.907331-5-letrhee@nsr.re.kr> <20230628063830.GA7920@sol.localdomain> <000901d9aa70$a228c420$e67a4c60$@nsr.re.kr> <20230630025914.GB1088@sol.localdomain> <20230630065953.GA36542@sol.localdomain>
+In-Reply-To: <20230630065953.GA36542@sol.localdomain>
+Subject: RE: [PATCH v3 4/4] fscrypt: Add LEA-256-XTS, LEA-256-CTS support
+Date:   Fri, 30 Jun 2023 16:53:16 +0900
+Message-ID: <003901d9ab27$edc44f00$c94ced00$@nsr.re.kr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230630074111.GB36542@sol.localdomain>
+Content-Type: text/plain;
+        charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHHxDRlmstc7qqNSJFY4M8BkkyX4gFqzZG4AcdR3rkCVVeuvQFbPgFSAXy6NAOvg8kA8A==
+Content-Language: ko
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 30, 2023 at 12:41:11AM -0700, Eric Biggers wrote:
-> On Wed, Jun 28, 2023 at 11:57:14PM -0400, Theodore Ts'o wrote:
-> > #syz set subsystems: crypto
-> > 
-> > On Sat, Jun 24, 2023 at 07:21:44PM -0700, syzbot wrote:
-> > > Hello,
-> > > 
-> > > syzbot found the following issue on:
-> > > 
-> > > HEAD commit:    f7efed9f38f8 Add linux-next specific files for 20230616
-> > > git tree:       linux-next
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=152e89f3280000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=60b1a32485a77c16
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=94a8c779c6b238870393
-> > > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=116af1eb280000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14e22d2f280000
-> > 
-> > If you look at the reproducer, it's creating an AF_ALG (algorithm)
-> > socket and messing with it.  This is easier to see in the syz
-> > reproducer, but you can see exactly what it's doing in the C
-> > reproducer above:
-> > 
-> > # https://syzkaller.appspot.com/bug?id=4ee7656695de92cbd5820111379ae0698af0f475
-> > # See https://goo.gl/kgGztJ for information about syzkaller reproducers.
-> > #{"threaded":true,"repeat":true,"procs":1,"slowdown":1,"sandbox":"none","sandbox_arg":0,"netdev":true,"binfmt_misc":true,"close_fds":true,"vhci":true,"ieee802154":true,"sysctl":true,"swap":true,"tmpdir":true}
-> > r0 = socket$alg(0x26, 0x5, 0x0)
-> > bind$alg(r0, &(0x7f0000000280)={0x26, 'hash\x00', 0x0, 0x0, 'sha3-256-generic\x00'}, 0x58)
-> > r1 = accept4(r0, 0x0, 0x0, 0x0)
-> > recvmmsg$unix(r1, &(0x7f0000003700)=[{{0x0, 0x700, 0x0}}], 0x600, 0x0, 0x0)
-> > sendmsg$can_bcm(r1, &(0x7f0000000180)={0x0, 0x0, &(0x7f0000000140)={0x0}}, 0x400c800)
-> > 
-> > (0x26 is 38, or AF_ALG)
-> > 
-> > From looking at the stack trace, it looks like this is triggering a
-> > coredump, which presumably is the ext4 write that triggers the GPF in
-> > ext4_put_io_end_defer.  But given that the syz and C reproducer isn't
-> > doing anything ext4 related at all, and it's purely trying to use the
-> > AF_ALG socket to calculate SHA3 in the kernel (and the greek chorus
-> > cries out, "WHY?"[1]), I'm going to send this over to the crypto folks to
-> > investigate.
+On Thu, Jun 29, 2023 at 23:59:53 -0700, Eric Biggers wrote:
+> I've sent out
+> https://lore.kernel.org/linux-fscrypt/20230630064811.22569-1-ebiggers@kernel.org/T/#u.
+> One of the things it does is add a nice list for the "national pride ciphers".
+> So we can just add ciphers like SM4 and LEA, and any that people might insist on
+> adding in the future like Camellia, Kuznyechik, SEED, ARIA, etc., to that list,
+> and not have to waste time with each one individually...
 > 
-> Just a couple weeks ago, commit c662b043cdca ("crypto: af_alg/hash: Support
-> MSG_SPLICE_PAGES") had many syzbot reports against it.  This particular report
-> is against next-20230616 which didn't include the fix commit b6d972f68983
-> ("crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)").  So there's a
-> high chance this report is no longer valid.  I'll go ahead and invalidate it:
-> 
-> #syz invalid
-> 
-> > 
-> > Cheers,
-> > 
-> > 					- Ted
-> > 
-> > [1] TIL that AF_ALG exists.  Inquiring minds want to know:
-> >    * Why do we expose the AF_ALG userspace interface?
-> >    * Who uses it?
-> >    * Why do they use it?
-> >    * Is there a CONFIG option to disable it in the name of decreasing
-> >      the attack surface of the kernel?
-> >    * If not, should we add one?  :-)
-> 
-> AF_ALG has existed since 2010.  My understanding that its original purpose was
-> to expose hardware crypto accelerators to userspace.  Unfortunately, support for
-> exposing *any* crypto algorithm was included as well, which IMO was a mistake.
-> 
-> There are quite a few different userspace programs that use AF_ALG purely to get
-> at the CPU-based algorithm implementations, without any sort of intention to use
-> hardware crypto accelerator.  Probably because it seemed "easy".  Or "better"
-> because everything in the kernel is better, right?
-> 
-> It's controlled by the CONFIG_CRYPTO_USER_API_* options, with the hash support
-> in particular controlled by CONFIG_CRYPTO_USER_API_HASH.  Though good luck
-> disabling it on most systems, as systemd depends on it...
-> 
+> - Eric
 
-Actually it turns out systemd has finally seen the light:
-https://github.com/systemd/systemd/commit/2c3794f4228162c9bfd9e10886590d9f5b1920d7
+That seems reasonable enough to us.
 
-- Eric
+Thank you for your consideration.
+
