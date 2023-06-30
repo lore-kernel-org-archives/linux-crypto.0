@@ -2,106 +2,159 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CD7EB64D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 08:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91112C0015E
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 08:30:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbjF3IPl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 04:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35110 "EHLO
+        id S232537AbjF3Ia1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 30 Jun 2023 04:30:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbjF3IPk (ORCPT
+        with ESMTP id S232516AbjF3IaZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 04:15:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E491997
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 01:15:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0FB2E616E7
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 08:15:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00EBEC433C8;
-        Fri, 30 Jun 2023 08:15:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688112938;
-        bh=xFT58AgnoEdvrriMPFKIYVP3VSxYOuXQiVLAb8fkBuA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dtNuvpkjstdh+XtSqjulDd69wa1F83pXwB0q02RcGditu6uhdmt4jWh8L4DVV0nLN
-         MYUE16jyGN4yV/7yaeKEi7RHgb4js2iiR2BdmYTcb1w7PjfC0jbiXjJzR/wB5wpRQ8
-         iCaAWw8vbUomvbqr2+c5faJWOgSyq1tkIGGgX3ajb9YRyVBhnyHDcyX77y8YAn3cQc
-         8TlmyC17VOOLkw87V75NOClVFsLwCN1OPZnYrmPFK1681aTbbihHE1FFopbEtpiug2
-         Rh8+w0Y7o5l655cXA4ve29yTDBJ0itchVj1fZvPOYEBblKwYzsBJCOIAFRsVRYm4oa
-         HjzR1iKDhT9SA==
-Date:   Fri, 30 Jun 2023 01:15:36 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Jakub Kicinski <kuba@kernel.org>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>, glider@google.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
-        Aviad Yehezkel <aviadye@nvidia.com>,
-        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-Message-ID: <20230630081536.GD36542@sol.localdomain>
-References: <0000000000008a7ae505aef61db1@google.com>
- <20200911170150.GA889@sol.localdomain>
- <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
- <20230628140317.756e61d3@kernel.org>
- <ada9b995-8d67-0375-f153-b434d48bd253@I-love.SAKURA.ne.jp>
+        Fri, 30 Jun 2023 04:30:25 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3941D1FE3
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 01:30:21 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-55b5a3915f5so680933a12.0
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 01:30:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1688113820; x=1690705820;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IylOOlS5ad80V9wYkTvlltIZ1alSaalCsW6vNzoqxCE=;
+        b=w1n2X6SwuQTGf40ACuJOa3mBnZ6ZkpTXgN9WgWekcgA9wX8DhnWHIvrr/ntVep8Wfx
+         xxgnSrGUku9qrt5TAFiqidVe8dfAzB7z8BGj0BthdVH6Fk7veTxovV3SqntFhLwev/Xa
+         eUnJHfSZnVCkgbMzzE26Gxlda3H0ztt2I/95FfE803JDRp7pjeSO9jnZ3BLSXJludS5H
+         yQtKkttWWKnagkVjdx8eHyDXlneyKqjT6bWj5R/9iUy1xW+l0s6qCRI+zleuBgi9kTQn
+         U6yVyv6y2eeuryVrYLzfAODmlTygbytKVYCG0m/woa92+yDWDiaLEU2bdxcTFVaqGJz+
+         AhUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688113820; x=1690705820;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IylOOlS5ad80V9wYkTvlltIZ1alSaalCsW6vNzoqxCE=;
+        b=fOuqiHVI5CbJUsAe7RFFRJc9Fx512hhAsdX4/SzPALGKnDbSniAubhxznWFpBIC0BA
+         mSjA8Hde2CH+I/fXL32GV1lu5/G6CboMHfVqI/JBqGPAYxTdVcjYiAo/n/bWLe6GDGpX
+         3/mNMk9yPomVgQAAHFhggojkrNjup3xxRmQUkUxoVwqFqLV+5yTzHKL0QqMJ8p10sILV
+         2OuP1FDN0AGqyU8r27b5TdLGqKzfINzeoLeQYfumJdRSHtRQkFz+OQDBbj080e9ousAj
+         sRx8l4sLkLW+SXC7xaqWSfjrXaqtQiHMX6R7vSVd+eFWoHPSwSIp6j4T4/Oy/mYAXu+o
+         4FSA==
+X-Gm-Message-State: ABy/qLY84BncNf02nRYLm2ncE9EcjDnGsfWfYW47Ku2xjMAMKMYj1yFe
+        e5XcoqmeLnBYaU9n7E4+s3Kd/w==
+X-Google-Smtp-Source: APBJJlFwGdFpxh5lh0GMjOfiQCZJY9c+/4qoU0guVGErEKUDZanZB/3Rl1aCMaiF991mJDNpY11l/w==
+X-Received: by 2002:a17:90b:954:b0:262:fc42:c7bc with SMTP id dw20-20020a17090b095400b00262fc42c7bcmr1366282pjb.32.1688113820036;
+        Fri, 30 Jun 2023 01:30:20 -0700 (PDT)
+Received: from [192.168.1.4] ([223.233.68.54])
+        by smtp.gmail.com with ESMTPSA id x8-20020a17090a6b4800b002635db431a0sm2023231pjl.45.2023.06.30.01.30.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jun 2023 01:30:19 -0700 (PDT)
+Message-ID: <f14c00e4-d0d2-17cd-da8c-5632558f53b9@linaro.org>
+Date:   Fri, 30 Jun 2023 14:00:00 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ada9b995-8d67-0375-f153-b434d48bd253@I-love.SAKURA.ne.jp>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH v8 01/11] dt-bindings: dma: Add support for SM6115 and
+ QCM2290 SoCs
+To:     Vinod Koul <vkoul@kernel.org>
+Cc:     linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        dmaengine@vger.kernel.org, agross@kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        andersson@kernel.org, bhupesh.linux@gmail.com,
+        krzysztof.kozlowski@linaro.org, robh+dt@kernel.org,
+        konrad.dybcio@linaro.org, vladimir.zapolskiy@linaro.org,
+        rfoss@kernel.org, neil.armstrong@linaro.org, djakov@kernel.org,
+        stephan@gerhold.net, Rob Herring <robh@kernel.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        Linux Kernel Functional Testing <lkft@linaro.org>
+References: <20230526192210.3146896-1-bhupesh.sharma@linaro.org>
+ <20230526192210.3146896-2-bhupesh.sharma@linaro.org>
+ <CAH=2Ntx+4F+ZP_Y+=e4p9rdTRQV8FHaepJCyqVFtWUPjDehoNg@mail.gmail.com>
+ <ZIHKWYMs1e/rOez0@matsya>
+Content-Language: en-US
+From:   Bhupesh Sharma <bhupesh.sharma@linaro.org>
+In-Reply-To: <ZIHKWYMs1e/rOez0@matsya>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 29, 2023 at 07:15:21AM +0900, Tetsuo Handa wrote:
-> On 2023/06/29 6:03, Jakub Kicinski wrote:
-> > On Wed, 28 Jun 2023 22:48:01 +0900 Tetsuo Handa wrote:
-> >> syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
-> >> that bytes to encrypt/decrypt is multiple of block size for that cipher but
-> >> tls_alloc_encrypted_msg() is not initializing padding bytes when
-> >> required_size is not multiple of block cipher's block size.
-> > 
-> > Sounds odd, so crypto layer reads beyond what we submitted as 
-> > the buffer? I don't think the buffer needs to be aligned, so
-> > the missing bits may well fall into a different (unmapped?) page.
+On 6/8/23 6:02 PM, Vinod Koul wrote:
+> On 29-05-23, 11:43, Bhupesh Sharma wrote:
+>> Hi Vinod,
+>>
+>>> On Sat, 27 May 2023 at 00:52, Bhupesh Sharma <bhupesh.sharma@linaro.org> wrote:
+>>>
+>>> Add new compatible for BAM DMA engine version v1.7.4 which is
+>>> found on Qualcomm SM6115 and QCM2290 SoCs. Since its very similar
+>>> to v1.7.0 used on SM8150 like SoCs, mark the comptible scheme
+>>> accordingly.
+>>>
+>>> While at it, also update qcom,bam-dma bindings to add comments
+>>> which describe the BAM DMA versions used in SM8150 and SM8250 SoCs.
+>>> This provides an easy reference for identifying the actual BAM DMA
+>>> version available on Qualcomm SoCs.
+>>>
+>>> Acked-by: Rob Herring <robh@kernel.org>
+>>> Tested-by: Anders Roxell <anders.roxell@linaro.org>
+>>> Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>>> Signed-off-by: Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>>> ---
+>>>   .../devicetree/bindings/dma/qcom,bam-dma.yaml | 20 ++++++++++++-------
+>>>   1 file changed, 13 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+>>> index f1ddcf672261..c663b6102f50 100644
+>>> --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+>>> +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+>>> @@ -15,13 +15,19 @@ allOf:
+>>>
+>>>   properties:
+>>>     compatible:
+>>> -    enum:
+>>> -        # APQ8064, IPQ8064 and MSM8960
+>>> -      - qcom,bam-v1.3.0
+>>> -        # MSM8974, APQ8074 and APQ8084
+>>> -      - qcom,bam-v1.4.0
+>>> -        # MSM8916 and SDM845
+>>> -      - qcom,bam-v1.7.0
+>>> +    oneOf:
+>>> +      - enum:
+>>> +          # APQ8064, IPQ8064 and MSM8960
+>>> +          - qcom,bam-v1.3.0
+>>> +          # MSM8974, APQ8074 and APQ8084
+>>> +          - qcom,bam-v1.4.0
+>>> +          # MSM8916, SDM630
+>>> +          - qcom,bam-v1.7.0
+>>> +      - items:
+>>> +          - enum:
+>>> +              # SDM845, SM6115, SM8150, SM8250 and QCM2290
+>>> +              - qcom,bam-v1.7.4
+>>> +          - const: qcom,bam-v1.7.0
+>>>
+>>>     clocks:
+>>>       maxItems: 1
+>>> --
+>>> 2.38.1
+>>
+>> Bjorn has applied the dts patches from this series to his tree.
+>> As suggested by him, can you please pick patches [PATCH 1/11] and
+>> [PATCH 2/11] from this series via the 'dmaengine' tree.
 > 
-> Since passing __GFP_ZERO to skb_page_frag_refill() hides this problem,
-> I think that crypto layer is reading up to block size when requested
-> size is not multiple of block size.
+> I dont have this series in my inbox or dmaengine pw
 > 
-> > 
-> > This needs more careful investigation. Always zeroing the input 
-> > is just covering up the real issue.
+>> Seems some Cc fields got messed up while sending the patchset, so
+>> Cc'ing the dmaengine list again.
 > 
-> Since block cipher needs to read up to block size, someone has to initialize
-> padding bytes. I guess that crypto API caller is responsible for allocating
-> and initializing padding bytes, otherwise such crypto API caller will fail to
-> encrypt/decrypt last partial bytes which are not multiple of cipher's block
-> size.
+> not just list but mine too..
 > 
-> Which function in this report is responsible for initializing padding bytes?
+> Please rebase and resend
 
-According to the sample crash report from
-https://syzkaller.appspot.com/bug?extid=828dfc12440b4f6f305d, the uninitialized
-memory access happens while the TLS layer is doing an AES-CCM encryption
-operation.  CCM supports arbitrarily-aligned additional authenticated data and
-plaintext/ciphertext.  Also, an encryption with crypto_aead_encrypt() reads
-exactly 'assoclen + cryptlen' bytes from the 'src' scatterlist; it's not
-supposed to ever go past that, even if the data isn't "block aligned".
+Sure, I have sent a v9, which can be seen here: 
+<https://lore.kernel.org/linux-arm-msm/20230630082230.2264698-1-bhupesh.sharma@linaro.org/>
+Please help review.
 
-The "aead" API (include/crypto/aead.h) is still confusing and hard to use
-correctly, though, mainly because of the weird scatterlist layout it expects
-with the AAD and plaintext/ciphertext concatenated to each other.  I wouldn't be
-surprised if the TLS layer is making some error.  What is the exact sequence of
-crypto_aead_* calls that results in this issue?
-
-- Eric
+Thanks,
+Bhupesh
