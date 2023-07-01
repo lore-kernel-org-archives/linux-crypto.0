@@ -2,210 +2,210 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA72EB64DD
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Jun 2023 22:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FC3EB64DC
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jul 2023 04:12:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232622AbjF3WaO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Jun 2023 18:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55420 "EHLO
+        id S229480AbjGAEMl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 1 Jul 2023 00:12:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233070AbjF3WaK (ORCPT
+        with ESMTP id S229452AbjGAEMl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Jun 2023 18:30:10 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4373C38;
-        Fri, 30 Jun 2023 15:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688164198; x=1719700198;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=kmxjEdY/oS9OgHs4b5rew7Czs0b9e7jAaSHy4XBU38o=;
-  b=UAs25VDhQWJ0Hf4V6Xy4yWiJA9WGd8sCzoKC5FMuvX0QDH84x9O3ZIKC
-   uHbljP4OyvNLR3gd8MV19Z9IWA6fCPNmxDsKcJnBXqHaBWr4dRdRCyPg7
-   e1rw7+cjFqXGpZYPfJDCDNH+n+tRDQQMp8mXpVZBtGo24HHCJGUXZn7OD
-   GRIAAYW1NMGOR37EBoE6wfszMmUPPaxFG1ZoocX1PJU3mSSfeexH0bhz2
-   66UN8gjT8TqwrF/Qg8OtMGqromdfpOkNjNjXgLdXMj3eYhYpVXF8Wo+4X
-   vwIg9vI6lAUJhwm62itHpMpGQ7lAk+/50mECW4P/ALtrD1ypq0XiPujVg
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="428552774"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="428552774"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 15:29:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="747558521"
-X-IronPort-AV: E=Sophos;i="6.01,172,1684825200"; 
-   d="scan'208";a="747558521"
-Received: from amuruge1-mobl.amr.corp.intel.com (HELO [10.252.133.96]) ([10.252.133.96])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 15:29:55 -0700
-Message-ID: <522b0954-749e-33be-59a7-4ce28e8c4d5c@intel.com>
-Date:   Fri, 30 Jun 2023 15:29:54 -0700
+        Sat, 1 Jul 2023 00:12:41 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89B392
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Jun 2023 21:12:38 -0700 (PDT)
+Received: from fsav112.sakura.ne.jp (fsav112.sakura.ne.jp [27.133.134.239])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 3614Cb31069421;
+        Sat, 1 Jul 2023 13:12:37 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav112.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp);
+ Sat, 01 Jul 2023 13:12:37 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 3614CaW8069416
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 1 Jul 2023 13:12:36 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <8c989395-0f20-a957-6611-8a356badcf3c@I-love.SAKURA.ne.jp>
+Date:   Sat, 1 Jul 2023 13:12:36 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH RFC v9 09/51] x86/sev: Add RMP entry lookup helpers
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
 Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
-        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
-References: <20230612042559.375660-1-michael.roth@amd.com>
- <20230612042559.375660-10-michael.roth@amd.com>
- <59d5ca67-6a31-1929-8d2f-0e3314626893@intel.com>
- <20230630215709.owobzb5cr2wtkqhd@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230630215709.owobzb5cr2wtkqhd@amd.com>
+To:     Ard Biesheuvel <ardb@kernel.org>,
+        Alexander Potapenko <glider@google.com>
+Cc:     Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Aviad Yehezkel <aviadye@nvidia.com>,
+        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>
+References: <0000000000008a7ae505aef61db1@google.com>
+ <20200911170150.GA889@sol.localdomain>
+ <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+ <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
+ <59e1d5c0-aedb-7b5b-f37f-0c20185d7e9b@I-love.SAKURA.ne.jp>
+ <CAMj1kXGHRUUFYL09Lm-mO6MfGc19rC=-7mSJ1eDTcbw7QuEkaw@mail.gmail.com>
+ <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
+ <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
+ <CAG_fn=VFa2yeiZmdyuVRmZYtWn6Tkox8UVrOrCv4tEec3BFYbQ@mail.gmail.com>
+ <CAMj1kXEdwjN7Q8tKVxHz98zQ4EsWVSdLZ5tQaV-nXxc9hwRYjQ@mail.gmail.com>
+ <CAG_fn=UWZWc+FZ_shCr+T9Y3gV9Bue-ZFHKJj78YXBq3JfnUKA@mail.gmail.com>
+ <CAMj1kXE_PjQT6+A9a0Y=ZfbOr_H+umYSqHuRrM6AT_gFJxxP1w@mail.gmail.com>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <CAMj1kXE_PjQT6+A9a0Y=ZfbOr_H+umYSqHuRrM6AT_gFJxxP1w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/30/23 14:57, Michael Roth wrote:
-> On Mon, Jun 12, 2023 at 09:08:58AM -0700, Dave Hansen wrote:
->> On 6/11/23 21:25, Michael Roth wrote:
->>> +/*
->>> + * The RMP entry format is not architectural. The format is defined in PPR
->>> + * Family 19h Model 01h, Rev B1 processor.
->>> + */
->>> +struct rmpentry {
->>> +	union {
->>> +		struct {
->>> +			u64	assigned	: 1,
->>> +				pagesize	: 1,
->>> +				immutable	: 1,
->>> +				rsvd1		: 9,
->>> +				gpa		: 39,
->>> +				asid		: 10,
->>> +				vmsa		: 1,
->>> +				validated	: 1,
->>> +				rsvd2		: 1;
->>> +		} info;
->>> +		u64 low;
->>> +	};
->>> +	u64 high;
->>> +} __packed;
->>
->> What's 'high' used for?  The PPR says it's reserved.  Why not call it
->> reserved?
->>
->> It _looks_ like it's only used for a debugging pr_info().  It makes the
->> struct look kinda goofy.  I'd much rather limit the goofiness to the
->> "dumping" code, like:
->>
->>      u64 *__e = (void *)e;
->>      ....
->>      pr_info("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
->>                                pfn << PAGE_SHIFT, __e[0], __e[1]);
->>
->> BTW, why does it do any good to dump all these reserved fields?
->>
-> 
-> The reserved bits sometimes contain information that can be useful to
-> pass along to folks on the firmware side, so would definitely be helpful
-> to provide the full raw contents of the RMP entry.
+I'm trying to write a simplified reproducer that reproduces
 
-Ahh, OK.  Could you include a comment to that effect, please?
+----------------------------------------
+[  162.905919][ T3399] required_size=2461 ret=0
+[  162.916796][ T3399] required_size=6557 ret=0
+[  162.919587][ T3399] required_size=10653 ret=0
+[  162.923090][ T3399] required_size=14749 ret=0
+[  162.928686][ T3399] required_size=16413 ret=0
+[  162.936894][ T3399] full_record=1 eor=0 sk_msg_full(msg_pl)=0 copied=1664
+[  162.962097][ T3399] required_size=2461 ret=0
+[  162.967270][ T3399] required_size=6557 ret=0
+[  162.992866][ T3399] required_size=10653 ret=0
+[  162.999962][ T3399] required_size=14765 ret=0
+[  163.006420][ T3399] required_size=16413 ret=0
+[  163.012163][ T3399] full_record=1 eor=0 sk_msg_full(msg_pl)=0 copied=1648
+----------------------------------------
 
-> So maybe something like this better captures the intended usage:
-> 
->     struct rmpentry {
->         union {
->             struct {
->                 u64 assigned        : 1,
->                     pagesize        : 1,
->                     immutable       : 1,
->                     rsvd1           : 9,
->                     gpa             : 39,
->                     asid            : 10,
->                     vmsa            : 1,
->                     validated       : 1,
->                     rsvd2           : 1;
->                 u64 rsvd3;
->             } info;
->             u64 data[2];
->         };
->     } __packed;
-> 
-> But dropping the union and casting to u64[] locally in the debug/dumping
-> routine should work fine as well.
+part, and came to wonder if serialization between splice() and sendmsg() is correct.
 
-Yeah, I'd suggest doing the nasty casting in the debug function.  That
-makes it much more clear what the hardware is doing with the entries.
-The hardware doesn't treat the struct as 2*u64's at all.
+A program where splice() and sendmsg() cannot run in parallel due to single-threaded
+is shown below.
 
-...
->>> +	ret = rmptable_entry(paddr, entry);
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	/* Read a large RMP entry to get the correct page level used in RMP entry. */
->>> +	ret = rmptable_entry(paddr & PMD_MASK, &large_entry);
->>> +	if (ret)
->>> +		return ret;
->>> +
->>> +	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(&large_entry));
->>> +
->>> +	return 0;
->>> +}
->>
->> This is a bit weird.  Should it say something like this?
->>
->> To do an 4k RMP lookup the hardware looks at two places in the RMP:
-> 
-> I'd word this as:
-> 
->   "To query all the relevant bit of an 4k RMP entry, the kernel must access
->    2 entries in the RMP table:"
-> 
-> Because it's possible hardware only looks at the 2M entry for
-> hardware-based lookups, depending on where the access is coming from, or
-> how the memory at the PFN range is mapped.
-> 
-> But otherwise it seems like an accurate description.
+----------------------------------------
+#define _GNU_SOURCE
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#define SOL_TCP 6
+#define TCP_REPAIR 19
+#define TCP_ULP 31
+#define TLS_TX 1
 
-The wording you suggest is a bit imprecise.  For a 2M-aligned 4k page,
-there is only *one* location, *one* entry.
+int main(int argc, char *argv[])
+{
+	struct iovec iov = {
+		.iov_base = "@@@@@@@@@@@@@@@@",
+		.iov_len = 16
+	};
+	struct msghdr hdr = {
+		.msg_iov = &iov,
+		.msg_iovlen = 1,
+		.msg_flags = MSG_FASTOPEN
+	};
+	const struct sockaddr_in6 addr = { .sin6_family = AF_INET6, .sin6_addr = in6addr_loopback };
+	const int one = 1;
+	int ret_ignored = 0;
+	const int fd = socket(PF_INET6, SOCK_STREAM, IPPROTO_IP);
+	int pipe_fds[2] = { -1, -1 };
+	static char buf[32768] = { };
 
-Also, we're not doing a lookup for an RMP entry.  We're doing it for a
-_pfn_ that results in an RMP entry.
+	ret_ignored += pipe(pipe_fds);
+	setsockopt(fd, SOL_TCP, TCP_REPAIR, &one, sizeof(one));
+	connect(fd, (struct sockaddr *) &addr, sizeof(addr));
+	setsockopt(fd, SOL_TCP, TCP_ULP, "tls", 4);
+	setsockopt(fd, SOL_TLS, TLS_TX,"\3\0035\0%T\244\205\333\f0\362B\221\243\234\206\216\220\243u\347\342P|1\24}Q@\377\227\353\222B\354\264u[\346", 40);
+	ret_ignored += write(pipe_fds[1], buf, 2432);
+	ret_ignored += write(pipe_fds[1], buf, 10676);
+	ret_ignored += write(pipe_fds[1], buf, 17996);
+	if (argc == 1) {
+		ret_ignored += splice(pipe_fds[0], NULL, fd, NULL, 1048576, 0);
+		ret_ignored += sendmsg(fd, &hdr, MSG_DONTWAIT | MSG_MORE);
+	} else {
+		ret_ignored += sendmsg(fd, &hdr, MSG_DONTWAIT | MSG_MORE);
+		ret_ignored += splice(pipe_fds[0], NULL, fd, NULL, 1048576, 0);
+	}
+	return ret_ignored * 0;
+}
+----------------------------------------
 
-How about this:
+If you run this program with argc == 1, you will get below output.
 
-/*
- * Find the authoritative RMP entry for a PFN.  This can be either a 4k
- * RMP entry or a special large RMP entry that is authoritative for a
- * whole 2M area.
- */
-...
->>> +#ifdef CONFIG_KVM_AMD_SEV
->>> +int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level);
->>> +#else
->>> +static inline int snp_lookup_rmpentry(u64 pfn, bool *assigned, int *level) { return 0; }
->>> +#endif
->>
->> Above, -ENXIO was returned when SEV-SNP was not supported.  Here, 0 is
->> returned when it is compiled out.  That inconsistent.
->>
->> Is snp_lookup_rmpentry() acceptable when SEV-SNP is in play?  I'd like
->> to see consistency between when it is compiled out and when it is
->> compiled in but unsupported on the CPU.
-> 
-> I really don't think anything in the kernel should be calling
-> snp_lookup_rmpentry(), so I think it makes sense to adoption the -ENXIO
-> convention here and in any other stubs where that applies.
+----------------------------------------
+[ 4030.292376] [ T3896] required_size=2461 ret=0
+[ 4030.292376] [ T3896] required_size=6557 ret=0
+[ 4030.292376] [ T3896] required_size=10653 ret=0
+[ 4030.292376] [ T3896] required_size=14749 ret=0
+[ 4030.292376] [ T3896] required_size=16413 ret=0
+[ 4030.292376] [ T3896] full_record=1 eor=0 sk_msg_full(msg_pl)=0 copied=1664
+[ 4030.330185] [ T3896] required_size=2461 ret=0
+[ 4030.330185] [ T3896] required_size=6557 ret=0
+[ 4030.330185] [ T3896] required_size=10653 ret=0
+[ 4030.335443] [ T3896] required_size=14749 ret=0
+[ 4030.335443] [ T3896] full_record=0 eor=1 sk_msg_full(msg_pl)=0 copied=4096
+----------------------------------------
 
-Sounds good to me.  Just please make them consistent.
+If you run this program with argc != 1, you will get below output.
+
+----------------------------------------
+[ 4044.312696] [ T3898] required_size=2477 ret=0
+[ 4044.312696] [ T3898] required_size=6573 ret=0
+[ 4044.312696] [ T3898] required_size=10669 ret=0
+[ 4044.312696] [ T3898] required_size=14765 ret=0
+[ 4044.312696] [ T3898] required_size=16413 ret=0
+[ 4044.312696] [ T3898] full_record=1 eor=0 sk_msg_full(msg_pl)=0 copied=1648
+[ 4044.340425] [ T3898] required_size=2477 ret=0
+[ 4044.350515] [ T3898] required_size=6573 ret=0
+[ 4044.350515] [ T3898] required_size=10669 ret=0
+[ 4044.350515] [ T3898] required_size=14765 ret=0
+[ 4044.350515] [ T3898] full_record=0 eor=1 sk_msg_full(msg_pl)=0 copied=4096
+----------------------------------------
+
+The difference is that the required_size= value differs by "struct iovec"->iov_len
+bytes which is the value passed to sendmsg().
+
+If splice() happens before sendmsg() happens, the output does not include
+bytes passed to sendmsg(). If sendmsg() happens before splice() happens,
+the output includes bytes passed to sendmsg(). 
+
+Then, where does the difference between
+
+----------------------------------------
+[  162.919587][ T3399] required_size=10653 ret=0
+[  162.923090][ T3399] required_size=14749 ret=0
+[  162.928686][ T3399] required_size=16413 ret=0
+----------------------------------------
+
+and
+
+----------------------------------------
+[  162.992866][ T3399] required_size=10653 ret=0
+[  162.999962][ T3399] required_size=14765 ret=0
+[  163.006420][ T3399] required_size=16413 ret=0
+----------------------------------------
+
+come from? Both output had the same values until 10653, but
+the next value differs by 16. This might suggest that a race between
+splice() and sendmsg() caused unexpected required_size= value...
+
+This could explain "for the second time" part below.
+
+  >   4125+8221+12317+16413=41076 (the lower 4 bits are 0100)
+  >   2461+6557+10653+14749+16413=50833 (the lower 4 bits are 0001)
+  >   2461+6573+10669+14765+16413=50881 (the lower 4 bits are 0001)
+  > 
+  > KMSAN reports this problem when the lower 4 bits became 0001 for the second time.
+  > Unless KMSAN's reporting is asynchronous, maybe the reason of "for the second time"
+  > part is that the previous state is relevant...
+
