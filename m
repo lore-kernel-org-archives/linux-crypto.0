@@ -2,127 +2,116 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB2DEB64DD
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jul 2023 23:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18BAFEB64D9
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Jul 2023 17:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbjGAXFo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 1 Jul 2023 19:05:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60764 "EHLO
+        id S229825AbjGBRhB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 2 Jul 2023 13:37:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjGAXFo (ORCPT
+        with ESMTP id S229764AbjGBRhA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Jul 2023 19:05:44 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E3310DC;
-        Sat,  1 Jul 2023 16:05:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CB7A260A72;
-        Sat,  1 Jul 2023 23:05:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD2E7C433C7;
-        Sat,  1 Jul 2023 23:05:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688252742;
-        bh=CtjmbMV6hgSJLwjZdBZjw6qZiEGab/wtFzurXmkUtsw=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=cxwWM7J5w6vVG7bnFAhc1D+5ZPOy3GciLuv39i8XnQeYgxxZfDApxabmegBcnNK6O
-         vXHtFK7Jx6qqd2F5KA9Lt2TCosxuB4kvfrzaNsXpmuS55EZsJyi/dDcq7atfrMtfSk
-         R+ccQSiMwJBdHVOHHYtZtMgkvmYf6bKypyehNR1el9uIhd8CYzZPgsGsP/VaseALTH
-         wraRgIyo9hoN5z7oNWnOBeFjTjQrCGuH4VJXRceR1qykGCGLLVZ/uYtuynHKBwyMyo
-         RwS83XFaDhwl0/hXddrTEP+sIjCJKzSB/XQ8ImetN6bGWp9KSXZS6vgsLuYSmuoL0q
-         yxy5EwsSjmGsg==
-Date:   Sun, 2 Jul 2023 00:05:37 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     jiajie.ho@starfivetech.com, Palmer Dabbelt <palmer@rivosinc.com>,
-        olivia@selenic.com, herbert@gondor.apana.org.au,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        kernel@esmil.dk, Conor Dooley <conor.dooley@microchip.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v5 3/3] riscv: dts: starfive: Add TRNG node for
- VisionFive 2
-Message-ID: <20230702-ajar-stingy-3eb04f334575@spud>
-References: <20230117015445.32500-4-jiajie.ho@starfivetech.com>
- <mhng-348475f1-5880-4951-9692-78210a17acd3@palmer-ri-x1c9a>
- <ZKCgXvcbWBGWZnsU@aurel32.net>
+        Sun, 2 Jul 2023 13:37:00 -0400
+Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31413E48;
+        Sun,  2 Jul 2023 10:36:58 -0700 (PDT)
+Received: from dslb-188-097-041-125.188.097.pools.vodafone-ip.de ([188.97.41.125] helo=martin-debian-2.paytec.ch)
+        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <martin@kaiser.cx>)
+        id 1qG10L-0007s9-4K; Sun, 02 Jul 2023 19:36:57 +0200
+From:   Martin Kaiser <martin@kaiser.cx>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
+Subject: [PATCH 1/2] hwrng: nomadik - keep clock enabled while hwrng is registered
+Date:   Sun,  2 Jul 2023 19:35:02 +0200
+Message-Id: <20230702173503.163152-2-martin@kaiser.cx>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230702173503.163152-1-martin@kaiser.cx>
+References: <20230702173503.163152-1-martin@kaiser.cx>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ej1htFhOe1EwGlXT"
-Content-Disposition: inline
-In-Reply-To: <ZKCgXvcbWBGWZnsU@aurel32.net>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The nomadik driver uses devres to register itself with the hwrng core,
+the driver will be unregistered from hwrng when its device goes out of
+scope. This happens after the driver's remove function is called.
 
---ej1htFhOe1EwGlXT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+However, nomadik's clock is disabled in the remove function. There's a
+short timeframe where nomadik is still registered with the hwrng core
+although its clock is disabled. I suppose the clock must be active to
+access the hardware and serve requests from the hwrng core.
 
-On Sat, Jul 01, 2023 at 11:53:34PM +0200, Aurelien Jarno wrote:
-> On 2023-03-14 18:45, Palmer Dabbelt wrote:
-> > On Mon, 16 Jan 2023 17:54:45 PST (-0800), jiajie.ho@starfivetech.com wr=
-ote:
-> > > Adding StarFive TRNG controller node to VisionFive 2 SoC.
-> > >=20
-> > > Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-> > > Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
-> > > Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
-> > > ---
-> > >  arch/riscv/boot/dts/starfive/jh7110.dtsi | 10 ++++++++++
-> > >  1 file changed, 10 insertions(+)
-> > >=20
-> > > diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi b/arch/riscv/bo=
-ot/dts/starfive/jh7110.dtsi
-> > > index 4ac159d79d66..3c29e0bc6246 100644
-> > > --- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
-> > > +++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
-> > > @@ -455,5 +455,15 @@ uart5: serial@12020000 {
-> > >  			reg-shift =3D <2>;
-> > >  			status =3D "disabled";
-> > >  		};
-> > > +
-> > > +		rng: rng@1600c000 {
-> > > +			compatible =3D "starfive,jh7110-trng";
-> > > +			reg =3D <0x0 0x1600C000 0x0 0x4000>;
-> > > +			clocks =3D <&stgcrg JH7110_STGCLK_SEC_HCLK>,
-> > > +				 <&stgcrg JH7110_STGCLK_SEC_MISCAHB>;
-> > > +			clock-names =3D "hclk", "ahb";
-> > > +			resets =3D <&stgcrg JH7110_STGRST_SEC_TOP_HRESETN>;
-> > > +			interrupts =3D <30>;
-> > > +		};
-> > >  	};
-> > >  };
-> >=20
-> > Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
->=20
-> It appears that this patch has never been applied, although the rest of
-> the series has already been merged.
+Switch to devm_clk_get_enabled and let devres disable the clock and
+unregister the hwrng. This avoids the race condition.
 
-Ditto here, depends on the stgcrg, so it can't be applied yet.
+Fixes: 3e75241be808 ("hwrng: drivers - Use device-managed registration API")
+Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+---
+I know that the handling of the amba regions has the same problem as
+the clk. We release the regions while the driver is still registered
+with the hwrng core...
 
-> Unfortunately it doesn't apply
-> anymore due to other changes to that file.
->=20
-> Could you please rebase and resend it?
+ drivers/char/hw_random/nomadik-rng.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-No harm in a resend of course, given it doesn't apply.
+diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
+index e8f9621e7954..3774adf903a8 100644
+--- a/drivers/char/hw_random/nomadik-rng.c
++++ b/drivers/char/hw_random/nomadik-rng.c
+@@ -13,8 +13,6 @@
+ #include <linux/clk.h>
+ #include <linux/err.h>
+ 
+-static struct clk *rng_clk;
+-
+ static int nmk_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ {
+ 	void __iomem *base = (void __iomem *)rng->priv;
+@@ -36,21 +34,20 @@ static struct hwrng nmk_rng = {
+ 
+ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
+ {
++	struct clk *rng_clk;
+ 	void __iomem *base;
+ 	int ret;
+ 
+-	rng_clk = devm_clk_get(&dev->dev, NULL);
++	rng_clk = devm_clk_get_enabled(&dev->dev, NULL);
+ 	if (IS_ERR(rng_clk)) {
+ 		dev_err(&dev->dev, "could not get rng clock\n");
+ 		ret = PTR_ERR(rng_clk);
+ 		return ret;
+ 	}
+ 
+-	clk_prepare_enable(rng_clk);
+-
+ 	ret = amba_request_regions(dev, dev->dev.init_name);
+ 	if (ret)
+-		goto out_clk;
++		return ret;
+ 	ret = -ENOMEM;
+ 	base = devm_ioremap(&dev->dev, dev->res.start,
+ 			    resource_size(&dev->res));
+@@ -64,15 +61,12 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
+ 
+ out_release:
+ 	amba_release_regions(dev);
+-out_clk:
+-	clk_disable_unprepare(rng_clk);
+ 	return ret;
+ }
+ 
+ static void nmk_rng_remove(struct amba_device *dev)
+ {
+ 	amba_release_regions(dev);
+-	clk_disable_unprepare(rng_clk);
+ }
+ 
+ static const struct amba_id nmk_rng_ids[] = {
+-- 
+2.30.2
 
-Cheers,
-Conor.
-
---ej1htFhOe1EwGlXT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZKCxQQAKCRB4tDGHoIJi
-0lmZAP0SNjqkT8s0n5wtApbSeSzlCFqL+QWYwc90EmHZ2nvUAAD6AyyO6yS2S+0w
-9vMPZEB+a1Y4AmHnkfKGkzunks9MQw8=
-=Mc7t
------END PGP SIGNATURE-----
-
---ej1htFhOe1EwGlXT--
