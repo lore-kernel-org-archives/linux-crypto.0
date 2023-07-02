@@ -2,66 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB348EB64DD
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Jul 2023 17:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FA1C0015E
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Jul 2023 17:55:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbjGBRhD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Jul 2023 13:37:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39396 "EHLO
+        id S229709AbjGBRz0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 2 Jul 2023 13:55:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbjGBRhC (ORCPT
+        with ESMTP id S229679AbjGBRz0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Jul 2023 13:37:02 -0400
-Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DE0183;
-        Sun,  2 Jul 2023 10:37:01 -0700 (PDT)
-Received: from dslb-188-097-041-125.188.097.pools.vodafone-ip.de ([188.97.41.125] helo=martin-debian-2.paytec.ch)
-        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <martin@kaiser.cx>)
-        id 1qG10N-0007s9-Rs; Sun, 02 Jul 2023 19:36:59 +0200
-From:   Martin Kaiser <martin@kaiser.cx>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH 2/2] hwrng: nomadik - use dev_err_probe
-Date:   Sun,  2 Jul 2023 19:35:03 +0200
-Message-Id: <20230702173503.163152-3-martin@kaiser.cx>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230702173503.163152-1-martin@kaiser.cx>
-References: <20230702173503.163152-1-martin@kaiser.cx>
+        Sun, 2 Jul 2023 13:55:26 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1808E5E;
+        Sun,  2 Jul 2023 10:55:24 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-c13cb2cb428so622377276.0;
+        Sun, 02 Jul 2023 10:55:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688320524; x=1690912524;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=B/346nUIZErMaap4Xzifysw7agxmNBKblpAJllVen+8=;
+        b=HS1Xpu8RutGjzNf2cNefIvO40PuyEyyWN1lXpuUm3Zm6tYXGDXwbDrBzDuJeX7KOHr
+         q1UGGgd94SVTRefQw+1rgl1gQ50uEoBHL2OdSUILUjvF+1ATH9gvheGUN++hFOwLNLid
+         1XMjRZLU+9Ge2en4fJbD50bjnQdqOwyoXZfvhIPbUVY/sq6Vm6BAvUYZPRqmTRzyIG2n
+         JWXOYS2flIDtpE0mu19bw1MyMQp5M6uow+iO1HWzOXqc6Z90+aO2nBs6Bf+FGR5IBS25
+         laBmv/H9uClBFT1isqMjJFlPY+WcanwzxZg1N8ZxZIN6sqfmOEIBN1yT1YF0buNY5Ya/
+         4xig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688320524; x=1690912524;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B/346nUIZErMaap4Xzifysw7agxmNBKblpAJllVen+8=;
+        b=jXMzier0L+uA9uqJKLdm5TIwgOAhgiAZeSAf6CZ7pSDwvbckdaLE4/JtIdDJA73YLg
+         M1yROHqCUDtrY/d6QM/kLYRfUMkUW39C0xSaijLtk7V/6zkIUKaSdF0bTK5xqzYUOJ21
+         XdMwBdozbMKoKy2GJxu60H09R/zh+jyWANP2/OE6fKdooaiTPggHcKUuaA3MLv/3Jdhv
+         xMdFlk1Uq/jTYzBbOIYSGt4uTRVsHD+zsMsyHJ8qfP+m6a89VPqNNafySDtenOEE0PPW
+         z4AOUwPm5Bd/e0kORptURQp1sAqAxIRYTkl4iPL8RY0mSaU+4n/TgsVND+Kb7gqbxopG
+         V32Q==
+X-Gm-Message-State: ABy/qLbXBRFGQ9vXsWtEkPvP85QWn0z0iO+Pv2E4bf3Lh+XyNrNrqZim
+        170QS63XFk2rmFh6OnNwDK/RIGMcXish1f07JoJTnJKPmcUzgQ==
+X-Google-Smtp-Source: APBJJlGKLhOT4Bu7qJ+9PV6J1mFibevhHpEsj9SgVNCYM6WTAos06S2LRQMzHrHXF1fE6Av0kYh7XbCZNh0JTIxm3q8=
+X-Received: by 2002:a25:2b88:0:b0:bd6:6e3e:3af3 with SMTP id
+ r130-20020a252b88000000b00bd66e3e3af3mr4285143ybr.3.1688320523798; Sun, 02
+ Jul 2023 10:55:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Askar Safin <safinaskar@gmail.com>
+Date:   Sun, 2 Jul 2023 20:54:47 +0300
+Message-ID: <CAPnZJGB6gk47Hw-OE2_9eSKJ0DwOzEiL+tncMJyiOD6arw6xag@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 17/18] sock: Remove ->sendpage*() in favour of sendmsg(MSG_SPLICE_PAGES)
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        Marc Kleine-Budde <mkl@pengutronix.de>, bpf@vger.kernel.org,
+        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-x25@vger.kernel.org, mptcp@lists.linux.dev,
+        rds-devel@oss.oracle.com, tipc-discussion@lists.sourceforge.net,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use dev_err_probe to print a message and return an error. This makes the
-code a tiny bit shorter.
+> -/* In some cases, both sendpage() and sendmsg() could have added
+> - * an skb to the write queue, but failed adding payload on it.
+> - * We need to remove it to consume less memory, but more
+> - * importantly be able to generate EPOLLOUT for Edge Trigger epoll()
+> - * users.
+> +/* In some cases, both sendmsg() could have added an skb to the write queue,
+> + * but failed adding payload on it.  We need to remove it to consume less
+> + * memory, but more importantly be able to generate EPOLLOUT for Edge Trigger
+> + * epoll() users.
+>   */
 
-Signed-off-by: Martin Kaiser <martin@kaiser.cx>
----
- drivers/char/hw_random/nomadik-rng.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+There is a typo here. "Both" is redundant now
 
-diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
-index 3774adf903a8..8c6a40d6ce3d 100644
---- a/drivers/char/hw_random/nomadik-rng.c
-+++ b/drivers/char/hw_random/nomadik-rng.c
-@@ -39,11 +39,8 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
- 	int ret;
- 
- 	rng_clk = devm_clk_get_enabled(&dev->dev, NULL);
--	if (IS_ERR(rng_clk)) {
--		dev_err(&dev->dev, "could not get rng clock\n");
--		ret = PTR_ERR(rng_clk);
--		return ret;
--	}
-+	if (IS_ERR(rng_clk))
-+		return dev_err_probe(&dev->dev, PTR_ERR(rng_clk), "could not get rng clock\n");
- 
- 	ret = amba_request_regions(dev, dev->dev.init_name);
- 	if (ret)
 -- 
-2.30.2
-
+Askar Safin
