@@ -2,141 +2,91 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C711DC001B1
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jul 2023 14:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577AFEB64DC
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jul 2023 15:21:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230421AbjGCOSR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jul 2023 10:18:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
+        id S230063AbjGCPVs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Jul 2023 11:21:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbjGCOSQ (ORCPT
+        with ESMTP id S230034AbjGCPVr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jul 2023 10:18:16 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA3BE5F
-        for <linux-crypto@vger.kernel.org>; Mon,  3 Jul 2023 07:18:14 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-307d20548adso5005471f8f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Jul 2023 07:18:14 -0700 (PDT)
+        Mon, 3 Jul 2023 11:21:47 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89C0FD;
+        Mon,  3 Jul 2023 08:21:45 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-57722942374so55785377b3.1;
+        Mon, 03 Jul 2023 08:21:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688393893; x=1690985893;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k7CiJPEXfB/mPmolwvUH6t7dx6TKSOIIJmAn9VAkdqw=;
-        b=BT3omfXSB3tnc4/9PQPsSKSw7cx/qjf/1NXY1wt3Q4TvbbFW5ekgxa0mQcUZPMjfeV
-         nM8RiwzvvoyJ8YKGKT5FlbFzg6VWUe1ppRtzVXStYS92HDR9bLci298+IUiKjgbWycmj
-         357oGZdMtDCWBYAB3AC5EYdouPZuszAUAOjyrrzu4g4lQyE137pUUFAat5oP7luo0Ffd
-         jeAu+K0XLk+mez5brGbWDwfh7yPI0sxUcG5bCkgcHR9FchvUxSe8xNCRVHoDfY3ZvY60
-         eDIevhPL5HNFOTVeUEmDvudJGjbpjklwSJ4RYoBNeujQKVpYijBpMHecavNIWLClwfUB
-         qzoA==
+        d=gmail.com; s=20221208; t=1688397705; x=1690989705;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1nlFNiWBGjT79s+TDoJWb+KEl6wO2BXh4mDpz1hVVgI=;
+        b=cD0QycFMhoG5IKwO+t0fCr/obn7kNO1vRLruJ/TF6q5RPjPPOoe2z0M5+XJego18zC
+         TfV1NUsOHD40U0oePG5zVkXoD7MnR+WVMyjbGnFsIxqZdehGDhJN8sCPrS6jpF2budPY
+         8ZqZHl5KhQ8pq4M+C2gUyjNJaVPi/9pjuJM6xHOIXTkQs7R1YmxxMyVygAdlGwYlOpEI
+         6nesyOQs31WS+YYrL6i4JqZkstM08//QfIU3PrseYV9TKfgP0BzDVo5XsPEpqd+NYSKz
+         ER+xBiIM1Xo3yJN8OoxrPIOf0+/NRKclPndDvC5V2FcGYbztQV93DML2OgbzV4rIexmt
+         wodw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688393893; x=1690985893;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k7CiJPEXfB/mPmolwvUH6t7dx6TKSOIIJmAn9VAkdqw=;
-        b=QmclNN+x2x9tUm7vcv1vXL5i7LHb/Q+0KBF9HNc0iP1jo2i2Hgt8c3lwqkC/BsPYy7
-         7x1vwEMh0oKB3M9ucpPGIfcI0rQtTXwz10eo9L6SN7/m5GWsCzQsqR7rt4Bgb/XCtGng
-         NoDGlO1Ikny4n8C+aROXiDrLpXj7Wr7meZEJa2B6qi4H/ZyFIkMOOAeeJvtsYWJhbjmW
-         8oZmgQaM4gstZlFShK5ma61iHlpiG7vA4YzAYObjFkEOBLUv9ixd9CbfWhxBCDz1hc5M
-         zjRh3BLD1dR2vYTs+RV6ZXtGMCX/bmJmelBOrtMC22JMcaSLfzSEb8yOsAzyPZeudTpu
-         10xw==
-X-Gm-Message-State: ABy/qLa7g0zBON5Vyj278whr9pXhzeg0MCV4a8I2Amu6DQ+hO8ZEiTtr
-        Aig6//kfNrBUWf+evP+GfEpxDQ==
-X-Google-Smtp-Source: APBJJlEfnqKOoSS2ucE8MaIOcLJR/x7mdTN0VM771Waqqjt25CgAaEUgofxqr6Xluv6cSjS6uVAUEA==
-X-Received: by 2002:a5d:4f86:0:b0:30f:c42e:3299 with SMTP id d6-20020a5d4f86000000b0030fc42e3299mr7758185wru.60.1688393892860;
-        Mon, 03 Jul 2023 07:18:12 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id q10-20020adfdfca000000b003141e629cb6sm9813243wrn.101.2023.07.03.07.18.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 07:18:11 -0700 (PDT)
-Date:   Mon, 3 Jul 2023 17:18:08 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     David Howells <dhowells@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] KEYS: asymmetric: Fix error codes
-Message-ID: <c5e34c6a-da1e-4585-98c4-14701b0e093e@moroto.mountain>
+        d=1e100.net; s=20221208; t=1688397705; x=1690989705;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1nlFNiWBGjT79s+TDoJWb+KEl6wO2BXh4mDpz1hVVgI=;
+        b=C4WjBJ3s3C4KIed+VL/B6QhfNGz4ndnAPtMNV4Uj89XDzcIhF9C6RscUkwBzQkdyZs
+         EXppOINOYR9LWPHwERa+aQ4Ip749/bxf63K8FrWo8CtD2kM/OfTihWE3rSpmBk39AmOi
+         LJFgoK8fVzk51R7H30+XTngTniBK4EWzaSwI8t3sbor/j5QnFYV+QA6Z7b/ZPKB7kPb0
+         rQVcCB+sMjdlW37cIkjrj1rffmJNYC0u3/mpQO1TkFCiTZ5UfhQdUEcBo+JwfB2jcq7K
+         Vcymnm7vKIvxLYUf+Z7kYYwfuSUr5BacOZOyaDwFBV7EvkHYxEoJfrQmsMJdR3800wX8
+         Nduw==
+X-Gm-Message-State: ABy/qLZZoaYlIcpM4OAeZOCHvLAfsfrVCqYjwWnvxBq0/Df1etXHnNXH
+        LAtnNZxzUctAou+zbzM/cI4c7kqHalWyltFUwuWuxp14acc=
+X-Google-Smtp-Source: APBJJlE3cUSMFqsEKEGQdOQOsSRokmJ99kCBJs7x0Wvucr81LXIuVRDDGEbRETCuJYh9y/c/8I93tLIn6A8rqZYLcjQ=
+X-Received: by 2002:a25:69c8:0:b0:ba8:6c1f:f5ad with SMTP id
+ e191-20020a2569c8000000b00ba86c1ff5admr10660205ybc.29.1688397704856; Mon, 03
+ Jul 2023 08:21:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+From:   =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date:   Mon, 3 Jul 2023 17:21:34 +0200
+Message-ID: <CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com>
+Subject: Regression bisected to "crypto: af_alg: Convert af_alg_sendpage() to
+ use MSG_SPLICE_PAGES"
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-These error paths should return the appropriate error codes instead of
-returning success.
+Hello,
 
-Fixes: 63ba4d67594a ("KEYS: asymmetric: Use new crypto interface without scatterlists")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- crypto/asymmetric_keys/public_key.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+It seems that the commit:
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index e787598cb3f7..773e159dbbcb 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -185,8 +185,10 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 
- 	if (issig) {
- 		sig = crypto_alloc_sig(alg_name, 0, 0);
--		if (IS_ERR(sig))
-+		if (IS_ERR(sig)) {
-+			ret = PTR_ERR(sig);
- 			goto error_free_key;
-+		}
- 
- 		if (pkey->key_is_private)
- 			ret = crypto_sig_set_privkey(sig, key, pkey->keylen);
-@@ -208,8 +210,10 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 		}
- 	} else {
- 		tfm = crypto_alloc_akcipher(alg_name, 0, 0);
--		if (IS_ERR(tfm))
-+		if (IS_ERR(tfm)) {
-+			ret = PTR_ERR(tfm);
- 			goto error_free_key;
-+		}
- 
- 		if (pkey->key_is_private)
- 			ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
-@@ -300,8 +304,10 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- 
- 	if (issig) {
- 		sig = crypto_alloc_sig(alg_name, 0, 0);
--		if (IS_ERR(sig))
-+		if (IS_ERR(sig)) {
-+			ret = PTR_ERR(sig);
- 			goto error_free_key;
-+		}
- 
- 		if (pkey->key_is_private)
- 			ret = crypto_sig_set_privkey(sig, key, pkey->keylen);
-@@ -313,8 +319,10 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- 		ksz = crypto_sig_maxsize(sig);
- 	} else {
- 		tfm = crypto_alloc_akcipher(alg_name, 0, 0);
--		if (IS_ERR(tfm))
-+		if (IS_ERR(tfm)) {
-+			ret = PTR_ERR(tfm);
- 			goto error_free_key;
-+		}
- 
- 		if (pkey->key_is_private)
- 			ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
-@@ -411,8 +419,10 @@ int public_key_verify_signature(const struct public_key *pkey,
- 
- 	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
- 		      GFP_KERNEL);
--	if (!key)
-+	if (!key) {
-+		ret = -ENOMEM;
- 		goto error_free_tfm;
-+	}
- 
- 	memcpy(key, pkey->key, pkey->keylen);
- 	ptr = key + pkey->keylen;
--- 
-2.39.2
+commit fb800fa4c1f5aee1238267252e88a7837e645c02
+Author: David Howells <dhowells@redhat.com>
+Date:   Tue Jun 6 14:08:55 2023 +0100
 
+   crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES
+
+...causes a segfault in libkcapi's test suite. A simplified reproducer:
+
+git clone https://github.com/smuellerDD/libkcapi/
+cd libkcapi
+autoreconf -i
+./configure --enable-kcapi-test
+make
+./bin/kcapi -x 2 -s  -c "gcm(aes)" -i aac774c39e399e7d6371ec1d \
+    -k 38bd9eb2cb29cc42ac38d6cdbe116760 \
+    -a 5dbb2884f3fe93664613e863c3bd2572855cf808765880ef1fa5787ceef8c793 \
+    -t 34a21cc3562f0ba141d73242e5a3b666 \
+    -q d127b39d365d16246d2866b2ebabd201
+
+The last command prints the result and then segfaults in a cleanup
+free(3) call. Before the mentioned commit it printed the result and
+completed successfully. I haven't dug any deeper to figure out the
+root cause.
+
+Cheers,
+Ondrej
