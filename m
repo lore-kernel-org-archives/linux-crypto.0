@@ -2,93 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FA1C0015E
-	for <linux-crypto@archiver.kernel.org>; Sun,  2 Jul 2023 17:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C124EB64DD
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jul 2023 07:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbjGBRz0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Jul 2023 13:55:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44384 "EHLO
+        id S229608AbjGCHwX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 3 Jul 2023 03:52:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229679AbjGBRz0 (ORCPT
+        with ESMTP id S229653AbjGCHwW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Jul 2023 13:55:26 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1808E5E;
-        Sun,  2 Jul 2023 10:55:24 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-c13cb2cb428so622377276.0;
-        Sun, 02 Jul 2023 10:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688320524; x=1690912524;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=B/346nUIZErMaap4Xzifysw7agxmNBKblpAJllVen+8=;
-        b=HS1Xpu8RutGjzNf2cNefIvO40PuyEyyWN1lXpuUm3Zm6tYXGDXwbDrBzDuJeX7KOHr
-         q1UGGgd94SVTRefQw+1rgl1gQ50uEoBHL2OdSUILUjvF+1ATH9gvheGUN++hFOwLNLid
-         1XMjRZLU+9Ge2en4fJbD50bjnQdqOwyoXZfvhIPbUVY/sq6Vm6BAvUYZPRqmTRzyIG2n
-         JWXOYS2flIDtpE0mu19bw1MyMQp5M6uow+iO1HWzOXqc6Z90+aO2nBs6Bf+FGR5IBS25
-         laBmv/H9uClBFT1isqMjJFlPY+WcanwzxZg1N8ZxZIN6sqfmOEIBN1yT1YF0buNY5Ya/
-         4xig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688320524; x=1690912524;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B/346nUIZErMaap4Xzifysw7agxmNBKblpAJllVen+8=;
-        b=jXMzier0L+uA9uqJKLdm5TIwgOAhgiAZeSAf6CZ7pSDwvbckdaLE4/JtIdDJA73YLg
-         M1yROHqCUDtrY/d6QM/kLYRfUMkUW39C0xSaijLtk7V/6zkIUKaSdF0bTK5xqzYUOJ21
-         XdMwBdozbMKoKy2GJxu60H09R/zh+jyWANP2/OE6fKdooaiTPggHcKUuaA3MLv/3Jdhv
-         xMdFlk1Uq/jTYzBbOIYSGt4uTRVsHD+zsMsyHJ8qfP+m6a89VPqNNafySDtenOEE0PPW
-         z4AOUwPm5Bd/e0kORptURQp1sAqAxIRYTkl4iPL8RY0mSaU+4n/TgsVND+Kb7gqbxopG
-         V32Q==
-X-Gm-Message-State: ABy/qLbXBRFGQ9vXsWtEkPvP85QWn0z0iO+Pv2E4bf3Lh+XyNrNrqZim
-        170QS63XFk2rmFh6OnNwDK/RIGMcXish1f07JoJTnJKPmcUzgQ==
-X-Google-Smtp-Source: APBJJlGKLhOT4Bu7qJ+9PV6J1mFibevhHpEsj9SgVNCYM6WTAos06S2LRQMzHrHXF1fE6Av0kYh7XbCZNh0JTIxm3q8=
-X-Received: by 2002:a25:2b88:0:b0:bd6:6e3e:3af3 with SMTP id
- r130-20020a252b88000000b00bd66e3e3af3mr4285143ybr.3.1688320523798; Sun, 02
- Jul 2023 10:55:23 -0700 (PDT)
+        Mon, 3 Jul 2023 03:52:22 -0400
+Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF573A6;
+        Mon,  3 Jul 2023 00:52:19 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by ex01.ufhost.com (Postfix) with ESMTP id 46C3B24E268;
+        Mon,  3 Jul 2023 15:52:17 +0800 (CST)
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 3 Jul
+ 2023 15:52:17 +0800
+Received: from [192.168.155.85] (202.188.176.82) by EXMBX068.cuchost.com
+ (172.16.6.68) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 3 Jul
+ 2023 15:52:12 +0800
+Message-ID: <017dd7a1-302b-b4be-6b3d-3da0021a9b32@starfivetech.com>
+Date:   Mon, 3 Jul 2023 15:52:12 +0800
 MIME-Version: 1.0
-From:   Askar Safin <safinaskar@gmail.com>
-Date:   Sun, 2 Jul 2023 20:54:47 +0300
-Message-ID: <CAPnZJGB6gk47Hw-OE2_9eSKJ0DwOzEiL+tncMJyiOD6arw6xag@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 17/18] sock: Remove ->sendpage*() in favour of sendmsg(MSG_SPLICE_PAGES)
-To:     David Howells <dhowells@redhat.com>
-Cc:     netdev@vger.kernel.org,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Marc Kleine-Budde <mkl@pengutronix.de>, bpf@vger.kernel.org,
-        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-x25@vger.kernel.org, mptcp@lists.linux.dev,
-        rds-devel@oss.oracle.com, tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v5 3/3] riscv: dts: starfive: Add TRNG node for VisionFive
+ 2
+Content-Language: en-US
+To:     Aurelien Jarno <aurelien@aurel32.net>,
+        Palmer Dabbelt <palmer@rivosinc.com>, <olivia@selenic.com>,
+        <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <kernel@esmil.dk>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>
+References: <20230117015445.32500-4-jiajie.ho@starfivetech.com>
+ <mhng-348475f1-5880-4951-9692-78210a17acd3@palmer-ri-x1c9a>
+ <ZKCgXvcbWBGWZnsU@aurel32.net>
+From:   Jia Jie Ho <jiajie.ho@starfivetech.com>
+In-Reply-To: <ZKCgXvcbWBGWZnsU@aurel32.net>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [202.188.176.82]
+X-ClientProxiedBy: EXCAS062.cuchost.com (172.16.6.22) To EXMBX068.cuchost.com
+ (172.16.6.68)
+X-YovoleRuleAgent: yovoleflag
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -/* In some cases, both sendpage() and sendmsg() could have added
-> - * an skb to the write queue, but failed adding payload on it.
-> - * We need to remove it to consume less memory, but more
-> - * importantly be able to generate EPOLLOUT for Edge Trigger epoll()
-> - * users.
-> +/* In some cases, both sendmsg() could have added an skb to the write queue,
-> + * but failed adding payload on it.  We need to remove it to consume less
-> + * memory, but more importantly be able to generate EPOLLOUT for Edge Trigger
-> + * epoll() users.
->   */
+On 2/7/2023 5:53 am, Aurelien Jarno wrote:
+> On 2023-03-14 18:45, Palmer Dabbelt wrote:
+>> On Mon, 16 Jan 2023 17:54:45 PST (-0800), jiajie.ho@starfivetech.com wrote:
+>> > Adding StarFive TRNG controller node to VisionFive 2 SoC.
+>> > 
+>> > Co-developed-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+>> > Signed-off-by: Jenny Zhang <jenny.zhang@starfivetech.com>
+>> > Signed-off-by: Jia Jie Ho <jiajie.ho@starfivetech.com>
+>> > ---
+>> >  arch/riscv/boot/dts/starfive/jh7110.dtsi | 10 ++++++++++
+>> >  1 file changed, 10 insertions(+)
+>> > 
+>> > diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+>> > index 4ac159d79d66..3c29e0bc6246 100644
+>> > --- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
+>> > +++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+>> > @@ -455,5 +455,15 @@ uart5: serial@12020000 {
+>> >  			reg-shift = <2>;
+>> >  			status = "disabled";
+>> >  		};
+>> > +
+>> > +		rng: rng@1600c000 {
+>> > +			compatible = "starfive,jh7110-trng";
+>> > +			reg = <0x0 0x1600C000 0x0 0x4000>;
+>> > +			clocks = <&stgcrg JH7110_STGCLK_SEC_HCLK>,
+>> > +				 <&stgcrg JH7110_STGCLK_SEC_MISCAHB>;
+>> > +			clock-names = "hclk", "ahb";
+>> > +			resets = <&stgcrg JH7110_STGRST_SEC_TOP_HRESETN>;
+>> > +			interrupts = <30>;
+>> > +		};
+>> >  	};
+>> >  };
+>> 
+>> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+> 
+> It appears that this patch has never been applied, although the rest of
+> the series has already been merged. Unfortunately it doesn't apply
+> anymore due to other changes to that file.
+> 
+> Could you please rebase and resend it?
+> 
 
-There is a typo here. "Both" is redundant now
+Hi Aurelien,
 
--- 
-Askar Safin
+This patch is dependent on
+https://patchwork.kernel.org/project/linux-riscv/patch/20230518101234.143748-2-xingyu.wu@starfivetech.com/
+
+I'll send a new patch for this dts node after all dependencies have been merged.
+
+Thanks,
+Jia Jie
