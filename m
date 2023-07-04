@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDA5EB64DD
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jul 2023 07:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2C2EB64D9
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jul 2023 07:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbjGDHQB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jul 2023 03:16:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42708 "EHLO
+        id S230216AbjGDH4v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jul 2023 03:56:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbjGDHQA (ORCPT
+        with ESMTP id S230526AbjGDH4c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jul 2023 03:16:00 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3513130;
-        Tue,  4 Jul 2023 00:15:59 -0700 (PDT)
+        Tue, 4 Jul 2023 03:56:32 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46634171C;
+        Tue,  4 Jul 2023 00:56:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688454959; x=1719990959;
+  t=1688457377; x=1719993377;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KxiOKK8ZtnUQMHJugLP3SqpKmfaT0o8tDXBooxFv9EA=;
-  b=GNZZl6/B2XpOIWBxwNGfgXH5SIth4sZuxXvaLEWTwTmLIsoWBNEyW79w
-   4fl197afjYeqwq3lTc912jeV0nCMo5IuhJY9ZmJEngf3rBDRZl/xpSO23
-   HA6RB+pBmkteA3OVmffzYQzVKBlOjDoiM5mJpslxLFMPjCDttg5T24+e8
-   cVua+T/SF94lwsl78970QzXnLitQLC8ZAHpqfhezi6WxcwOpLIYp46inA
-   LAuBIgOEwqFwEp8Scv7vA6JgS6UxrAiNwAOG7fGjrvORqlMOE6QI4KI30
-   6kuP7v7cnuN329VCyWm2wHDctALyCs0Azma/+v6OzPP+G0sH9xXKIN5E0
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="342646738"
-X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="342646738"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 00:15:59 -0700
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=pY7UO1dW1lF5ty9U5RtleFnvnVJOmebuE8AT5wlps04=;
+  b=aOn2pb2yAexvTtgAeppdB4uHTK5Z88Ud7o2oxzVHIlKq58Zr72pg69Er
+   xb2eVfsSAtSQplJcLHxNiy2SEUfP5Hd5Z6I5JYrdBGUZs9fGHisfc9rQw
+   jPWFD7cgGqhAkjnGpAzFaoTu4G7MWm+ThWZVuT0oH2zgArVUZRUMGWFra
+   70HBCGA7HVYNckMtJIwjhZXLYETyYi+yCLMjWAPz/9bnbJP3govdZ25YG
+   FgZ0VBUAAaFjNyFIa960uC6mRUh1DHvzRosNo4z2DUeoUm/jzYWvNW4Yi
+   FXsFMVnCv5HeK8J+2Xe1ffaVyuck7PO+cGOum7ZRllCYk6YoXz8mIUISU
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="347854585"
+X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
+   d="scan'208";a="347854585"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 00:56:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="842899636"
-X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="842899636"
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="808838387"
+X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
+   d="scan'208";a="808838387"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga004.jf.intel.com with ESMTP; 04 Jul 2023 00:15:31 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 04 Jul 2023 00:55:57 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.96)
         (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1qGaG1-0024BQ-2o;
-        Tue, 04 Jul 2023 10:15:29 +0300
-Date:   Tue, 4 Jul 2023 10:15:29 +0300
+        id 1qGatA-0024jp-0X;
+        Tue, 04 Jul 2023 10:55:56 +0300
+Date:   Tue, 4 Jul 2023 10:55:55 +0300
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     You Kangren <youkangren@vivo.com>
+To:     =?utf-8?B?5bCk5bq35LuB?= <youkangren@vivo.com>
 Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -56,41 +56,59 @@ Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         "open list:QAT DRIVER" <qat-linux@intel.com>,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>,
-        opensource.kernel@vivo.com, luhongfei@vivo.com
+        "opensource.kernel" <opensource.kernel@vivo.com>,
+        =?utf-8?B?6Lev57qi6aOe?= <luhongfei@vivo.com>
 Subject: Re: [PATCH v4] crypto: qat - Replace the if statement with min()
-Message-ID: <ZKPHEYxkBeFbIBeR@smile.fi.intel.com>
-References: <20230704065643.32220-1-youkangren@vivo.com>
+Message-ID: <ZKPQi+C/9ibEVTfa@smile.fi.intel.com>
+References: <PUZPR06MB5936BE4F5D5353CF2A08A07BAA2EA@PUZPR06MB5936.apcprd06.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230704065643.32220-1-youkangren@vivo.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PUZPR06MB5936BE4F5D5353CF2A08A07BAA2EA@PUZPR06MB5936.apcprd06.prod.outlook.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 02:56:39PM +0800, You Kangren wrote:
-> mark UWORD_CPYBUF_SIZE with U suffix to make the type the same with
+On Tue, Jul 04, 2023 at 07:45:42AM +0000, 尤康仁 wrote:
+> Hi Andy,
+> 
+> Can you tell me what is your tag? I haven't found it in Re: [PATCH v3]
+> crypto: qat - Replace the if statement with min()
 
-You need to respect English grammar and punctuation.
-Here should be
+Please, avoid top-postings.
 
-  Mark...
+Tag in this case is the line started with Reviewed-by:.
 
-> words_num and replace the if statement with min() in 
+Please, read this [1] to get familiar with the tags and process.
+And be respectful to the reviewers in the future.
 
-(drop trailing space)
+[1]: https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
 
-> qat_uclo_wr_uimage_raw_page() to make code shorter
-
-...and here the period is missing.
-
-Also, Haven't I given my tag? Why it's not added?
-
-> Signed-off-by: You Kangren <youkangren@vivo.com>
-> ---
-
-Where is the changelog from v3? What had been changed so far?
+> -----Original email-----
+> On Tue, Jul 04, 2023 at 02:56:39PM +0800, You Kangren wrote:
+> > mark UWORD_CPYBUF_SIZE with U suffix to make the type the same with
+> 
+> You need to respect English grammar and punctuation.
+> Here should be
+> 
+>   Mark...
+> 
+> > words_num and replace the if statement with min() in
+> 
+> (drop trailing space)
+> 
+> > qat_uclo_wr_uimage_raw_page() to make code shorter
+> 
+> ...and here the period is missing.
+> 
+> Also, Haven't I given my tag? Why it's not added?
+> 
+> > Signed-off-by: You Kangren <youkangren@vivo.com>
+> > ---
+> 
+> Where is the changelog from v3? What had been changed so far?
 
 -- 
 With Best Regards,
