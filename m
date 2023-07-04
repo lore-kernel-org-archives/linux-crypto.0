@@ -2,116 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2C2EB64D9
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jul 2023 07:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A906EB64D9
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jul 2023 08:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230216AbjGDH4v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jul 2023 03:56:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35110 "EHLO
+        id S229994AbjGDIvu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jul 2023 04:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230526AbjGDH4c (ORCPT
+        with ESMTP id S229708AbjGDIvt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jul 2023 03:56:32 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46634171C;
-        Tue,  4 Jul 2023 00:56:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688457377; x=1719993377;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=pY7UO1dW1lF5ty9U5RtleFnvnVJOmebuE8AT5wlps04=;
-  b=aOn2pb2yAexvTtgAeppdB4uHTK5Z88Ud7o2oxzVHIlKq58Zr72pg69Er
-   xb2eVfsSAtSQplJcLHxNiy2SEUfP5Hd5Z6I5JYrdBGUZs9fGHisfc9rQw
-   jPWFD7cgGqhAkjnGpAzFaoTu4G7MWm+ThWZVuT0oH2zgArVUZRUMGWFra
-   70HBCGA7HVYNckMtJIwjhZXLYETyYi+yCLMjWAPz/9bnbJP3govdZ25YG
-   FgZ0VBUAAaFjNyFIa960uC6mRUh1DHvzRosNo4z2DUeoUm/jzYWvNW4Yi
-   FXsFMVnCv5HeK8J+2Xe1ffaVyuck7PO+cGOum7ZRllCYk6YoXz8mIUISU
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="347854585"
-X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="347854585"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 00:56:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="808838387"
-X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="808838387"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by FMSMGA003.fm.intel.com with ESMTP; 04 Jul 2023 00:55:57 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1qGatA-0024jp-0X;
-        Tue, 04 Jul 2023 10:55:56 +0300
-Date:   Tue, 4 Jul 2023 10:55:55 +0300
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     =?utf-8?B?5bCk5bq35LuB?= <youkangren@vivo.com>
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Tue, 4 Jul 2023 04:51:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C610D10DF
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Jul 2023 01:51:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1688460661;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zdyxwyfyCuKz7/7BHOPg3TNF1zFyGIHGDllKl8O41gE=;
+        b=jWLJsInSvF2oQRYBtZVnQXYo9ad8f3p/vbrHwX22TaNyURQwDp3CAakXpet1GOrR6vl5Lx
+        2/E1HvdC13vRogDhmmIfberkUnhEQUO7qIV8SA9sAwEaKGY/+7ez5GtY2e7m8YiPMSZFIF
+        /AxUbjnbd0wnYF6BxGVyY4TGIjYJ6Ik=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-472-75wUcZQuO5O7AiS-mVACww-1; Tue, 04 Jul 2023 04:50:58 -0400
+X-MC-Unique: 75wUcZQuO5O7AiS-mVACww-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5FE6F1044590;
+        Tue,  4 Jul 2023 08:50:58 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 14DE62166B34;
+        Tue,  4 Jul 2023 08:50:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com>
+References: <CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com>
+To:     Ondrej Mosnacek <omosnacek@gmail.com>
+Cc:     dhowells@redhat.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Damian Muszynski <damian.muszynski@intel.com>,
-        Adam Guerin <adam.guerin@intel.com>,
-        Tom Zanussi <tom.zanussi@linux.intel.com>,
-        Srinivas Kerekare <srinivas.kerekare@intel.com>,
-        "open list:QAT DRIVER" <qat-linux@intel.com>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "opensource.kernel" <opensource.kernel@vivo.com>,
-        =?utf-8?B?6Lev57qi6aOe?= <luhongfei@vivo.com>
-Subject: Re: [PATCH v4] crypto: qat - Replace the if statement with min()
-Message-ID: <ZKPQi+C/9ibEVTfa@smile.fi.intel.com>
-References: <PUZPR06MB5936BE4F5D5353CF2A08A07BAA2EA@PUZPR06MB5936.apcprd06.prod.outlook.com>
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: Regression bisected to "crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <PUZPR06MB5936BE4F5D5353CF2A08A07BAA2EA@PUZPR06MB5936.apcprd06.prod.outlook.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1357759.1688460637.1@warthog.procyon.org.uk>
+Date:   Tue, 04 Jul 2023 09:50:37 +0100
+Message-ID: <1357760.1688460637@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 04, 2023 at 07:45:42AM +0000, 尤康仁 wrote:
-> Hi Andy,
-> 
-> Can you tell me what is your tag? I haven't found it in Re: [PATCH v3]
-> crypto: qat - Replace the if statement with min()
+One problem with libkcapi is that it's abusing vmsplice().  It must not use
+vmsplice(SPLICE_F_GIFT) on a buffer that's in the heap.  To quote the manual
+page:
 
-Please, avoid top-postings.
+	      The user pages are a gift to the kernel.   The  application  may
+              not  modify  this  memory ever, otherwise the page cache and on-
+              disk data may differ.  Gifting pages to the kernel means that  a
+              subsequent  splice(2)  SPLICE_F_MOVE  can  successfully move the
+              pages;  if  this  flag  is  not  specified,  then  a  subsequent
+              splice(2)  SPLICE_F_MOVE must copy the pages.  Data must also be
+              properly page aligned, both in memory and length.
 
-Tag in this case is the line started with Reviewed-by:.
+Basically, this can destroy the integrity of the process's heap as the
+allocator may have metadata there that then gets excised.
 
-Please, read this [1] to get familiar with the tags and process.
-And be respectful to the reviewers in the future.
+If I remove the flag, it still crashes, so that's not the only problem.
 
-[1]: https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
-
-> -----Original email-----
-> On Tue, Jul 04, 2023 at 02:56:39PM +0800, You Kangren wrote:
-> > mark UWORD_CPYBUF_SIZE with U suffix to make the type the same with
-> 
-> You need to respect English grammar and punctuation.
-> Here should be
-> 
->   Mark...
-> 
-> > words_num and replace the if statement with min() in
-> 
-> (drop trailing space)
-> 
-> > qat_uclo_wr_uimage_raw_page() to make code shorter
-> 
-> ...and here the period is missing.
-> 
-> Also, Haven't I given my tag? Why it's not added?
-> 
-> > Signed-off-by: You Kangren <youkangren@vivo.com>
-> > ---
-> 
-> Where is the changelog from v3? What had been changed so far?
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+David
 
