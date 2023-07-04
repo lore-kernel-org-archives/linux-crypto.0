@@ -2,171 +2,174 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9F7EB64D9
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jul 2023 09:19:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AEFAEB64D9
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jul 2023 09:43:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjGDJTe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jul 2023 05:19:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
+        id S229938AbjGDJnb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 4 Jul 2023 05:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbjGDJTc (ORCPT
+        with ESMTP id S232297AbjGDJnI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jul 2023 05:19:32 -0400
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2048.outbound.protection.outlook.com [40.107.14.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E451B6;
-        Tue,  4 Jul 2023 02:19:31 -0700 (PDT)
+        Tue, 4 Jul 2023 05:43:08 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2120.outbound.protection.outlook.com [40.107.255.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FBA71BF3;
+        Tue,  4 Jul 2023 02:42:20 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MDkz15Uqujtg/WReiGJXvwcW2us0FmcFxUVawH+iLScsZ3XUmVdSVhmhaLicUvXX7BsBzIqvu/R8iD4MWJbrdQyY2ePejwwSNGbba4Lbd3K5ZNAMhCq5iniOv3bR87bjrVZs6m4R9qFZcKaVDJIDVITS4DYNrh6/vVxww12G6fCTZ/6Yy3bgLITU98ntgn6MMEAbC4l0q+kH413Z4ta7YpHtmBuZHY7sQh2v/anNmaX2S/zCijr8fK0ZwbZY5vycDQ4TXaaNlMEPPtBYSUiLD1kiiJGMxAldpHiz/MtNsOASa8qpaYAsbJ4M7Dp53kun3cIYVT5MQ4Tuy43aBYlaPw==
+ b=CtbyvFBWOjcuB2N7+gjRmX4JG8FZCwJpxROFwrbbHeRI5Iy0RZbfN/XoS+xCPAVdjxCs3Q5pYi5CK1FOLO7mNebrK0eO9VBBisjmQPvmQS6zlKJMXfCikv95FkrofJ5R27gjST+MduKZjPaQXEhHJHk+gWmIJjUeYj69Mcss+5mhA643bXRsahFbyvzeVOVYQQ/UQ8MWBc1CuNcWT+JQTJTrr9CwERxng7Bfa82D1x6uPNil7Gi3YSbcM8ripB3ChDBoFpo3fPD2LbuhQVSZOV1v4n8v4rJUGb5Fy0MTUDWQ2hBLzk1mpK7sVbzrbfUjSQ1w5tQI7B6qT6FqDNyk2A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Df/h4p4/juRmfBurT2EocIANESX6I4IN3WaH3yJu7QA=;
- b=JnOW+kRzBrR6k2gNUsSB+0fl8Zx8UYYNyLsF/ppdKSnkRvva1xQ/QMEnT8Y1vBL5L36jtR8s/chIzatHnXAlak56J1c25V2iIJ8xEbTjgFzTGkRwZ7XhVi644GoQT7EBj1hxFVa9R40eNni6alUdxlbflaiLGKUWWNZporm51MgO/SzQBYqAHXFv43tmhPvPXqdJBE82gMPTGbPrqEPEG9i9pE15EjlDthcDQoB12uNKf3vFYA66WoIw6AahYrJJMMg5zEGoGj106fN9kHPdA07Mp1McCLRQeRqImpz+IePhbbmbaXhpKTy6qqrD/eF2u7HHSmpHgtcN0GRS1Kp98w==
+ bh=SToyjRJvmFXNJXEA97mByE9Emzul0j4TBfmMECCccnM=;
+ b=OuMn30hqRRIRkOeq2flzVhidhhV2pjCcljJJQaSJ0kwQJbpTgdg8QCx4yBIpC9U2MkW6UzLUG7yO5pycRD2ibu4Q2E8xaRAA5nUV9PXYnZNee5VoErYxzDfLMBjm6HCCYUr4omcud+mNvJLDOtY4KPMT/CeWEoNoRnH4zc/X5cC287DpHooMEZJIyUVNacNB1ePUaZ9iR8Mc888gCOCUSTM3zmOv1v6Sx8eo/OdT13aMM1xe+tSlwDEoPf+3TG0Kka2gyxQaJ5wD+Fhg18pjTXJlP5qwOdPW8Lg5/Sgrg9oAhQo27Mi+0G2YUjuWaDO4LQvQjSq4fZY52GLeO51jiA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Df/h4p4/juRmfBurT2EocIANESX6I4IN3WaH3yJu7QA=;
- b=lAFzm32YkWxkgOiNJfVAWeWs/Ds9X3jQXoEHSx348C9tRqoHasUMHtgqqgiQXvDGw6ChTq8TjuYmZpRH81nuXLCDoKLy05ltpa63z7wD87eE6SsW1xoRHDCKtUUbtcCbcl2azRokwBCKLCFU7lSDPLPZKBMk91x8ghliXV1rckQ=
-Received: from PAXPR04MB9571.eurprd04.prod.outlook.com (2603:10a6:102:24e::7)
- by AS8PR04MB8182.eurprd04.prod.outlook.com (2603:10a6:20b:3b2::5) with
+ bh=SToyjRJvmFXNJXEA97mByE9Emzul0j4TBfmMECCccnM=;
+ b=dJw4LcLOgxnRASA7WaZF5lHxP7A9D/uA7qYku+S4DfC2n0GNAtdbDdvkbJZ08tEgeKh+u0eWA8UV1RwEjSTBh4TZauySUdDRZW8wTOTuYdpQh3XVQxRu58SyDjs3+5BFQNnvxUSqF4RhRSYE5hj8gtKT1rliZjqqEFXDDZA811gEpjnszuwJiG6oPQv4I0cvzAGjkaPF/q7iAnLnC+VTZ+Wcsc1znOjz/gJVHi+htCZdGYgQReJrTj6PTMxQMBcaURzcm5kga7TYvVPimBuA/jWn/tmZO+ZA0BExgg8zrlK/moADbycSWa4IDwPTFCT0coyQfVA01oAia+JG5wtJUw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from PUZPR06MB5936.apcprd06.prod.outlook.com (2603:1096:301:11d::13)
+ by TY0PR06MB5683.apcprd06.prod.outlook.com (2603:1096:400:273::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
- 2023 09:19:28 +0000
-Received: from PAXPR04MB9571.eurprd04.prod.outlook.com
- ([fe80::b92f:c3da:fe42:8605]) by PAXPR04MB9571.eurprd04.prod.outlook.com
- ([fe80::b92f:c3da:fe42:8605%6]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 09:19:28 +0000
-From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-CC:     Eric Biggers <ebiggers@kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "lucas.segarra.fernandez@intel.com" 
-        <lucas.segarra.fernandez@intel.com>
-Subject: RE: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-Thread-Topic: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-Thread-Index: AQHZjYweUt32QHpmXkqlWZrZU7kmVa9oE4qAgA26dgCAAA4FAIAMcSYAgAGGbgCABlwxgIAfZkXQ
-Date:   Tue, 4 Jul 2023 09:19:28 +0000
-Message-ID: <PAXPR04MB957111A43069E2658BCA818F8E2EA@PAXPR04MB9571.eurprd04.prod.outlook.com>
-References: <20230523153421.1528359-1-meenakshi.aggarwal@nxp.com>
- <20230523165503.GA864814@google.com> <ZHh0DF4meU2ze+g7@gondor.apana.org.au>
- <ZHh/zqNu7XzwJTl5@gcabiddu-mobl1.ger.corp.intel.com>
- <ZILvtASXQKLG43y9@gondor.apana.org.au>
- <ZIQ3OKYyOcwRIOLR@gcabiddu-mobl1.ger.corp.intel.com>
- <ZImNC6KUNHquVAnZ@gondor.apana.org.au>
-In-Reply-To: <ZImNC6KUNHquVAnZ@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9571:EE_|AS8PR04MB8182:EE_
-x-ms-office365-filtering-correlation-id: 9a33c2e5-4f4a-4347-a06f-08db7c6fc4af
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZMOT90oPhfYC++EO110jA9Y77VxZpFoCKtODZ1bAmsLMsZY/8/3p9uOuX1pvBq/U67RIUrpFePHxLf58flZzr9GX9+gmZ+2xl4E3/wUbnbqDpVFm3S0aGSbf32fiFdQB43VidPzjMuBxujb+awv92ajf21iCgbkaF0gp96duceXHKhdfFnRo2qrDGPhqT+9yk+efeOrZVQ5LUoMSLHV5HO7t4R08ywreo+Ucmryu1QBLCtT9RFnIrve7qyGYu6l88EpbHbLecP5csKjBZskZKqPpAjZHOtvlAbs2Wq3jAS4oTMMbWZ9mjXdiaWgrS/5ds2jStj/UnupcTTrexENsYvAiosdrbICBvrdGZKX6jWtjNE044FMheap55mqvPdRya2Uey2/OPgoFN5N7TAV/XZIKoonPGKTU2SIqgSmtP+Jc0l/3yu2JAJ77XUUTeJAOK6FhBnFxgJkkpzmE1djLzlpARcUDFjFgmH9bjSj8s5Yhhmlh5/q7kRxOkMoENcVcni0nYNNpIsMIt7DpMAkAF80ivfYUKy4mE7UrVpquaRzSXyI3/2mK8HeQzlqHutCsfV2FtCakHmLbqMdSG+WKomZf3DyK08CjNSXRYIh0HTA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9571.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(346002)(39860400002)(366004)(396003)(451199021)(122000001)(71200400001)(45080400002)(478600001)(110136005)(54906003)(52536014)(5660300002)(8676002)(8936002)(38070700005)(86362001)(2906002)(33656002)(44832011)(38100700002)(66476007)(4326008)(76116006)(66946007)(66446008)(66556008)(64756008)(55016003)(316002)(41300700001)(83380400001)(26005)(53546011)(55236004)(186003)(9686003)(6506007)(966005)(7696005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+o1/jAYkUB8n5y549T+j4NL9bjFY2+pzJ+NokgidEJByX+ofGIbF7RNVID2l?=
- =?us-ascii?Q?e57OZef/aDCL6w+81y1mXfEZaI5vqySsiolRQy/nv7QOuLXzy7te8chAtwOH?=
- =?us-ascii?Q?V5qYCv/XEgGwDVpTXdfY2u4XlqHpvONopbkF2I77AZ8maq0b8NfHi3xnazMv?=
- =?us-ascii?Q?LcMYDXMOPzZberz0xpwnYJSltWmZJPfnnfRX4exIukfLtpEXkyv6uBJzsmPg?=
- =?us-ascii?Q?Z0vjp+cX8iThLTzMijFMlQ76bNqtvCTSw9SflwCh3qHAL79h+ml3geOuyJyJ?=
- =?us-ascii?Q?hh+uI7ao5SjjYWkzSBTh6iRBHV8oGOKMW/lnQiu+gDm1qN9x3xgsrONrz8ZV?=
- =?us-ascii?Q?y1KyY8/YRe9LlxehofkVeyjo/NsVpp6EpM6TtBMZ++O7H/ZRBZpHDgUBqxgJ?=
- =?us-ascii?Q?wB1Ml+bq4xHLHBVCcOXWns9Lyd8fI+L1P+Q7FpmCNuJkwO+jCco/ERaT8TH3?=
- =?us-ascii?Q?EkkcqLy29W7gXoUZI4TtXGZuk6pg3j3AxCefXJAD5epl1RYNr4SWJdifIRHu?=
- =?us-ascii?Q?wVhGnkJPHA1vIMIi+BWLRtzWNWxXneGb5s+Z7Kjv2BrENgLacKrkhFV8IpXk?=
- =?us-ascii?Q?CPYwovcJyA80PKA7sFom8jRnvxYMZDSZ3lV/wI5oVtnFQxb6eyjdryaGE1Bw?=
- =?us-ascii?Q?3BiRvyOLr6M+z09Vbbl7AHp5/wNEDkf3jGbs0SxhNIEPxmSQihrDX6099Us0?=
- =?us-ascii?Q?TUxVUPh5TTvyAzZCz0qGp0QnmedfP2/KLZtzAH7AtR5J0G/Dpo/CnpD8Xl6u?=
- =?us-ascii?Q?JERHnMiKaKsKV5+QCabHNYwhOKluksPADWT3DISElLcXlIzPrIikcqLwcPn9?=
- =?us-ascii?Q?UYoM+dc5K98bEmOdhTlGfry42oGwpijBnZNmrtkSYbYDxkWB0j00UlLG/wZR?=
- =?us-ascii?Q?kob1upCLphvzy0wZJ3UmoIBCENu0FjKfyEtkzeis/h+82bia8VfRXCmUeeao?=
- =?us-ascii?Q?gDmwX76BHTpsYvErpSALxwgyKy6a5e7pia+erLzfp+hlCsFn4KQU5atlFYkb?=
- =?us-ascii?Q?f8+E5SBZjUMJfdMP00DvULKJdC2YZVxxY3HRInE+8akkq3H6uxsLpu2h0OzI?=
- =?us-ascii?Q?ti1TjpwBMUuLPNo/I0HBBPzEoP9ijbjj452e0gCI9ljD1dM21itGsAOhCl/+?=
- =?us-ascii?Q?wfK0EEbLFexCDzgzciorG/622UHU3QYr4NBo6JOIkWonKfOpusFbOKiTd+4h?=
- =?us-ascii?Q?tceMoktrk5INhdtfkxbUA4BrL8E3Ku58QWpMtsTCxFzsIQbS4DSrSYPqaJEb?=
- =?us-ascii?Q?WZ9SNlRC6LIhmsyA+n6aTkk4gfgta0JsUGgJvjnwroBT5QerqFng1Esqw5KG?=
- =?us-ascii?Q?2PvwcTASofJioXfqi7ZJWiZ/e++F20w257p5ptIJIjMmcjznS2Jca/1qdeud?=
- =?us-ascii?Q?ZcVYOV0vqOQ0fMb5mI+Nb1FZYI2pZ//ttZuuaPDPhHD9UZsZD0U7ivCK5r9V?=
- =?us-ascii?Q?IabY3cMpOsTDgaHQldKKY6608Y+VOQhVa5e2deok9c+OKIoXxIHdC5/D4399?=
- =?us-ascii?Q?YnRCL2ZJh/i6iNXGdoRsS7GvrQvRwBg7BjytMsgkAIK+4Rpw8ggyKYxpd8rw?=
- =?us-ascii?Q?aXnOlhXVRypcrFVexsQ2yLIO/25f61goGIfMq6pexYbpkEcWPzA+FgspvklF?=
- =?us-ascii?Q?cw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 2023 09:42:14 +0000
+Received: from PUZPR06MB5936.apcprd06.prod.outlook.com
+ ([fe80::5c03:58ad:fb2b:49d9]) by PUZPR06MB5936.apcprd06.prod.outlook.com
+ ([fe80::5c03:58ad:fb2b:49d9%7]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 09:42:13 +0000
+From:   You Kangren <youkangren@vivo.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tom Zanussi <tom.zanussi@linux.intel.com>,
+        Adam Guerin <adam.guerin@intel.com>,
+        Damian Muszynski <damian.muszynski@intel.com>,
+        Srinivas Kerekare <srinivas.kerekare@intel.com>,
+        "Bruce W. Allan" <bruce.w.allan@intel.com>,
+        Pingchaox Yang <pingchaox.yang@intel.com>,
+        Bo Cui <bo.cui@intel.com>, Karen Xiang <karen.xiang@intel.com>,
+        qat-linux@intel.com (open list:QAT DRIVER),
+        linux-crypto@vger.kernel.org (open list:CRYPTO API),
+        linux-kernel@vger.kernel.org (open list)
+Cc:     opensource.kernel@vivo.com, youkangren@vivo.com,
+        luhongfei@vivo.com,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v5] crypto: qat - Replace the if statement with min()
+Date:   Tue,  4 Jul 2023 17:42:07 +0800
+Message-Id: <20230704094208.642-1-youkangren@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCP286CA0303.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:38b::11) To PUZPR06MB5936.apcprd06.prod.outlook.com
+ (2603:1096:301:11d::13)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PUZPR06MB5936:EE_|TY0PR06MB5683:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8f59d386-24ba-441d-2ba0-08db7c72f200
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: t2qfV4KZAOUtVoJ3bec3JPjekPa0dMQpsYiRK5QYOvIc8PqspKVHtWrr24vos/qqCKdHF3RwyFPe9KLbNemilZV4JzuUjA8SoPnBDJAl9wKF44rJWeWcMh6ee0eYrVHyk9vh0xhleGxYEfUG16V5nH9YwkJ45SZBF2/92/YmEnBw730vFaEgArmqGCIuR2418ky3Rd+k6TVwYP3Y8FzffIm6aVjnd3M1SgjWzjSOLDzkasOBDnWUFvWvTzLSteUU4HKBmSDlFxHLflhaYYfx2ujQHo75S5wQ26onu+f9gSRIwV+Ph/DZOEznDdcXtNwfl0p5XbRuhczzKzFxe3I+jamsJCHUfQyHihaEXn9kup3fqYCuYFdzD88qZ+r6NtKMRfV+Vk4TTgRjFWD+3xtBDZVm3N+sV9tnIqb90NU7IK3lhWY1VDLtsdIGOL9Q3GsGpNS+lbHoiIOugsJrcrX9VtBnC3wclAYeyXHRoMMiXRK3dIutHq2es/HcUNbWJEvdcCa1GLRe7a8UrMhaNirD2G14Fij4GoQthseccCfUB3e9Iaf9x+ZafKQRu3QjG6vwKcHPoG/MKTGft7HR3QpxpcfD5Q6Uetn5x0HkJHug1wjzMBWsrrJ3kbSWB5Eytes8hK8MkgdefbhucJ9K3q2gTw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PUZPR06MB5936.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(366004)(39860400002)(376002)(396003)(451199021)(4326008)(316002)(66946007)(66556008)(86362001)(186003)(26005)(6512007)(66476007)(1076003)(6506007)(83380400001)(2616005)(921005)(2906002)(6486002)(38100700002)(6666004)(52116002)(38350700002)(7416002)(5660300002)(478600001)(8676002)(110136005)(8936002)(41300700001)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jB6c531nUquJTJAtBuJV2stm8e84yi6FQoS46y1CRyBiNtOMGbGQx9ZWV4iS?=
+ =?us-ascii?Q?dF+TyYYPTrwLx7ut7LFKEvgna+eJk/lSAKqOmTYUkdJaj9DJFEX7qXQUfOWq?=
+ =?us-ascii?Q?ZMJQqZ0H5a0sBggnp+Np0yY6G/h6xIOtrTQPbZYfn7yGlL3HHH/NvcvQiiro?=
+ =?us-ascii?Q?NoxmDwusiQ3+52muwLVRhj4PuRpHPWVbgEFUiHhNtwSyLcYkwFsWtyLWIuTt?=
+ =?us-ascii?Q?nlHiq/4dyevrW3JmWNuj8wDjTiQPq5uvzx3nTEqhxjwYTW7ZODTIgkM3RUWP?=
+ =?us-ascii?Q?pcO5OXFqJAJvUtvzbljRt5PoB/3rsveptX5dfL4AErn0ItGW1KG2bWijYTdw?=
+ =?us-ascii?Q?YA2gSnOPS9bMPkrVRLv/DYuVrfrE69ASiHKGBliVnv2Frj+pQGtdMrZ/vQGp?=
+ =?us-ascii?Q?qe7sGZL9LJEfLNGAm5HUbBIamU8W2u6PSvBnxY1YvQgE9oVlLLLnKfq/x6Ns?=
+ =?us-ascii?Q?ZPsn0yZvmoAfhWSQE6crIqJNlr8kSQbFFd/4yhgalGnTpM2qdG+ADBhsRWBW?=
+ =?us-ascii?Q?9g47qCu5e9PbdctZMzl+IDw6yfHXwyBZQ7BVWLzOuMFrXHxx94Rd//oYBv8O?=
+ =?us-ascii?Q?lqsuKF+SN4pneX6j6SkQ5VNYCfUP4vdhVF3AJf5DmCiANH8CE9yVaZAWrvAF?=
+ =?us-ascii?Q?xUQxiwfuYY151b+gADIMrhqwQIAy7Sc7JVdVbwHgsYSPVOxYs7vfGsO/aPBB?=
+ =?us-ascii?Q?3z2mIBCM4I8DCMw6A5SNXAZ3ug/dNegeREdTJ236OWlMvgNEfrz6/VmZg7uE?=
+ =?us-ascii?Q?ZtqAvRegROOtpYpGi/oCKF2b0USg0k+KZ1T/WmKpm4/7ye+ofIZPi0N7TnyX?=
+ =?us-ascii?Q?qZN8u13Jgb8wZRPzz9seRTHreA5tuT3YBmKLZ5nUYpubdQW4R2XNioqyWXtx?=
+ =?us-ascii?Q?dVBz7z+vubt9EOOPvvlBs0U6HEL2VHf3FE60N5LhwMq+tDMrpIiI0TEIV1Jw?=
+ =?us-ascii?Q?2cWB26PFCxWWvPlkk/Pb5zF/lATgo8PPczh9LoaMbetsEFtxVoCQRMJ5YxK0?=
+ =?us-ascii?Q?55+f+0dPY3Eq7qotnKv0gD6hQIgODA8sKkbE3Y4uf2ryx7YySgR6d/sPVy9n?=
+ =?us-ascii?Q?PZ+Lhlu1jcDqq5Ugx8QtbCf9Iruaf6zBLRgsiIdCxDT31pRoU/DKjppxc6ko?=
+ =?us-ascii?Q?1tdjiE72A7dda7DliV58s219oSaHEZu2yKVv0kIByFUe8zTPj5jC2lGb2L4O?=
+ =?us-ascii?Q?Af09leaCDb+NpP9ZJ9sisvrgRvDy3p3EKaX+Et74WjWntoC8etnLLDD+sZLf?=
+ =?us-ascii?Q?IQh0HOCelmuqfZK1+vQBoEwNo7yW4FKU0eMMOnNhaP2Nuke8RysyjRF+Zb27?=
+ =?us-ascii?Q?OrE2WQFjR3/qq/2TOHVdjtkoM7AvIaymglMRaipLxp8PU2mFjs93ThGDHL1o?=
+ =?us-ascii?Q?ccB2Z47Dzle5/baEEblGxRLcUK9IXI2VhgZqahDZ7dnISjGW7omhpit1z93d?=
+ =?us-ascii?Q?m9Ed+2lDBpYkKwo994wMKCAYxS+1K+bFf4x5rJvlzo8b5YFqqjob4PQmBl1f?=
+ =?us-ascii?Q?FIvBsjbHyDrBXgh8ky0qUdDc9yvSsMHzPkUboJ+ISyFeJJyRcuXGuaI/vvQQ?=
+ =?us-ascii?Q?w0lQS8Ovi5HfTyZ9VXcuhuLOOKFryNu61KWVz1wK?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f59d386-24ba-441d-2ba0-08db7c72f200
+X-MS-Exchange-CrossTenant-AuthSource: PUZPR06MB5936.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9571.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a33c2e5-4f4a-4347-a06f-08db7c6fc4af
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2023 09:19:28.5525
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 09:42:13.3599
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KcbwkkKbyYyxdXFIRQEJb+EOvBp/jFXhzRSXZCMMbxZYNpOTRr/jqi6BP4+a2Bq0285PCrRZyit0NuHZzuGIUVL4krKVkBTsTDPKkDh6jC0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8182
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rEEcM4lGYnP/fGrgIQhW+bylxpUgPlqQ9V3YLzfZE2FBX6MaRPK5PqKd0Xu7CZ6FmuM52O4h9fhDjElJWMCuWg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB5683
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Giovanni,
+Mark UWORD_CPYBUF_SIZE with U suffix to make its type the same with
+words_num and replace the if statement with min() in
+qat_uclo_wr_uimage_raw_page() to make code shorter.
 
-When are you planning to send the patches?
+Fixes: b4b7e67c917f ("crypto: qat - Intel(R) QAT ucode part of fw loader")
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: You Kangren <youkangren@vivo.com>
+---
+Changelog:
+v4->v5: 
+- Add the Fixes and Reviewed-by tags of the patch
+- Add the version update information of the patch
 
-Thanks,
-Meenakshi
+v3->v4:
+- Remove the header file <linux/minmax.h> in v3
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Wednesday, June 14, 2023 3:19 PM
-> To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>; Meenakshi Aggarwal
-> <meenakshi.aggarwal@nxp.com>; Horia Geanta <horia.geanta@nxp.com>;
-> Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>;
-> Gaurav Jain <gaurav.jain@nxp.com>; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Iuliana Prodan
-> <iuliana.prodan@nxp.com>; lucas.segarra.fernandez@intel.com
-> Subject: Re: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
->
-> On Sat, Jun 10, 2023 at 09:41:28AM +0100, Giovanni Cabiddu wrote:
-> >
-> > If you all agree, I can send a patch to remove
-> > CRYPTO_ALG_ALLOCATES_MEMORY from dm-integrity and update the
-> documentation in crypto.h.
->
-> Yes please.
->
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.ap/
-> ana.org.au%2F~herbert%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.co
-> m%7C6af00291047c46f2325e08db6cbca189%7C686ea1d3bc2b4c6fa92cd99c5c
-> 301635%7C0%7C0%7C638223329655306217%7CUnknown%7CTWFpbGZsb3d8e
-> yJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7
-> C3000%7C%7C%7C&sdata=3DNrj0YEjJrFUNWY25h0iy5sF7tUnHSDun8KhHxnhUhh0
-> %3D&reserved=3D0
-> PGP Key:
-> http://gondor.ap/
-> ana.org.au%2F~herbert%2Fpubkey.txt&data=3D05%7C01%7Cmeenakshi.aggarwal
-> %40nxp.com%7C6af00291047c46f2325e08db6cbca189%7C686ea1d3bc2b4c6fa
-> 92cd99c5c301635%7C0%7C0%7C638223329655306217%7CUnknown%7CTWFp
-> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
-> Mn0%3D%7C3000%7C%7C%7C&sdata=3DlBaQiOM%2BXaax2lMroHtqbtBbjXBlkkKj
-> ms8mgBnou%2BU%3D&reserved=3D0
+v2->v3:
+- Add a header file <linux/minmax.h>
+- Mark UWORD_CPYBUF_SIZE with U suffix
+- Change min_t() to min() in qat_uclo_wr_uimage_raw_page()
+
+v1->v2:
+- Change min() to min_t() in qat_uclo_wr_uimage_raw_page()
+ 
+ drivers/crypto/intel/qat/qat_common/qat_uclo.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+index ce837bcc1cab..4bd150d1441a 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+@@ -11,7 +11,7 @@
+ #include "icp_qat_hal.h"
+ #include "icp_qat_fw_loader_handle.h"
+ 
+-#define UWORD_CPYBUF_SIZE 1024
++#define UWORD_CPYBUF_SIZE 1024U
+ #define INVLD_UWORD 0xffffffffffull
+ #define PID_MINOR_REV 0xf
+ #define PID_MAJOR_REV (0xf << 4)
+@@ -1986,10 +1986,7 @@ static void qat_uclo_wr_uimage_raw_page(struct icp_qat_fw_loader_handle *handle,
+ 	uw_relative_addr = 0;
+ 	words_num = encap_page->micro_words_num;
+ 	while (words_num) {
+-		if (words_num < UWORD_CPYBUF_SIZE)
+-			cpylen = words_num;
+-		else
+-			cpylen = UWORD_CPYBUF_SIZE;
++		cpylen = min(words_num, UWORD_CPYBUF_SIZE);
+ 
+ 		/* load the buffer */
+ 		for (i = 0; i < cpylen; i++)
+-- 
+2.39.0
+
