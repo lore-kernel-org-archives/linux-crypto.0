@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07267EB64DA
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jul 2023 16:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33981EB64DA
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jul 2023 16:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232027AbjGEQka (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jul 2023 12:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54988 "EHLO
+        id S232330AbjGEQkh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Jul 2023 12:40:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230513AbjGEQk3 (ORCPT
+        with ESMTP id S230513AbjGEQkd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jul 2023 12:40:29 -0400
+        Wed, 5 Jul 2023 12:40:33 -0400
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6A010EA;
-        Wed,  5 Jul 2023 09:40:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74F7E10EA;
+        Wed,  5 Jul 2023 09:40:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688575228; x=1720111228;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+VSubnhebtlgoHhSLBc0KlFYiEEy9KGoyXqa32bmzwE=;
-  b=QL940ZmLcVZKxTTMseXrjVlXouj2n1astk3OxzfgMap0LmUfQVwl51Ny
-   qReAhDxCOgfKQOse2VarT9gpbcXRsm+p1wWgJ05KnHa1ci4iXVuyp8JGB
-   hzAyMfeNs3HGdoQ6UKwiT8jFChvQkv/K2J8Od0Ln6HaJ5scPnkOg1vYjs
-   sRV45RSsURil9AlMNsrU6bPik6VMk24bm10DuLVzGcrhPaAWW8LMonR9l
-   c2gY21EBV7i2cvATMQ5SNtpIgRr4gSe2r9gwWJ2zqrbHSG0sCjQKihoBI
-   hRy1fvunx/xxsdJoCpzD/HiMG/it0fwwTSJAAFq+6wX1mfC7B5fBLzJnJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="362258234"
+  t=1688575232; x=1720111232;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=R0L33/36rdLS6aViuBmvGQXiDgu8r0FRSWMucXF1m6U=;
+  b=CHO5mBKw1YehsCwEQ/r6QMrERVmfYJH89XKeTVt9iTYXQ3/AhTV+zSt8
+   ODtCUua++OjVu3IMq7NXWPld0HoNWIWvGmLfbfm9z1odfyoNeIWhbj3tC
+   GZE55B+EUzlshKTULxJeC/5VrnnmMtYj9aYoi/VLndOz+AX1sdw29m0mv
+   4B0z/P86qkZQkwUrE3hhS21llPT2HPVSh+Iacxs60f/KEMyolNVe5uznO
+   Vw+hIagWXU88IbAqhxv/aEJqZDA7uSOPb/foDO1sflIi9Xh/CBss+60vn
+   Urn+a5C5ivqz1ZcFBDNwZP4vP1ha4mxPG+lm6fWHlJYwbItcCYqVXEO2g
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="362258259"
 X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="362258234"
+   d="scan'208";a="362258259"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 09:40:28 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 09:40:31 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="893241756"
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="893241761"
 X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="893241756"
+   d="scan'208";a="893241761"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
-  by orsmga005.jf.intel.com with ESMTP; 05 Jul 2023 09:40:24 -0700
+  by orsmga005.jf.intel.com with ESMTP; 05 Jul 2023 09:40:28 -0700
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au, agk@redhat.com, snitzer@kernel.org
 Cc:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
@@ -46,11 +46,14 @@ Cc:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
         heinzm@redhat.com, meenakshi.aggarwal@nxp.com, ebiggers@kernel.org,
         horia.geanta@nxp.com, V.Sethi@nxp.com, pankaj.gupta@nxp.com,
         gaurav.jain@nxp.com, davem@davemloft.net, iuliana.prodan@nxp.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 0/3] crypto: adjust meaning of CRYPTO_ALG_ALLOCATES_MEMORY
-Date:   Wed,  5 Jul 2023 17:40:06 +0100
-Message-Id: <20230705164009.58351-1-giovanni.cabiddu@intel.com>
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>
+Subject: [PATCH 1/3] dm integrity: do not filter algos with CRYPTO_ALG_ALLOCATES_MEMORY
+Date:   Wed,  5 Jul 2023 17:40:07 +0100
+Message-Id: <20230705164009.58351-2-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230705164009.58351-1-giovanni.cabiddu@intel.com>
+References: <20230705164009.58351-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
@@ -58,42 +61,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit fbb6cda44190 introduced the flag CRYPTO_ALG_ALLOCATES_MEMORY.
-This allows to mark algorithms that allocate memory during the datapath
-so they are not used for disk encryption.
-Following that, cd74693870fb limited dm-crypt to use only
-implementations that don't set that flag.
+The flag CRYPTO_ALG_ALLOCATES_MEMORY indicates that an algorithm might
+allocate memory in the datapath and therefore sleep.
+Dm-integrity is filtering out implementations of skcipher algorithms
+that have this flag set. However, in the same function it does
+allocations with GFP_KERNEL.
+As dm-integrity is re-entrant and capable of handling sleeps that could
+occur during allocations with GFP_KERNEL, then it is also capable of
+using skcipher algorithm implementations that have
+CRYPTO_ALG_ALLOCATES_MEMORY set.
 
-After discussions in the crypto mailing list [1][2][3] about how we
-could re-enable algorithms to be used by dm-crypt, we came to the
-conclusion that we can change slightly the meaning of the flag
-!CRYPTO_ALG_ALLOCATES_MEMORY. If an algorithm does not allocate
-memory for requests with a scatterlist of 4 or less entries
-(the typical case for dm-crypt), then it can avoid marking the
-implementation with the flag CRYPTO_ALG_ALLOCATES_MEMORY.
+Remove the filtering of skcipher implementations with the flag
+CRYPTO_ALG_ALLOCATES_MEMORY set.
 
-This set adjusts the meaning of CRYPTO_ALG_ALLOCATES_MEMORY in the
-documentation, removes the filtering for algorithms that do not
-allocate memory in dm-integrity and removes the
-CRYPTO_ALG_ALLOCATES_MEMORY from the algorithms registered in the QAT
-driver as this is not allocating memory in the datapath for requests
-with 4 or less entries in the source and destination scatterlists.
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Link: https://lore.kernel.org/linux-crypto/ZILvtASXQKLG43y9@gondor.apana.org.au/
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+---
+ drivers/md/dm-integrity.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[1] https://lore.kernel.org/linux-crypto/20200722072932.GA27544@gondor.apana.org.au/
-[2] https://lore.kernel.org/linux-crypto/20230523165503.GA864814@google.com/
-[3] https://lore.kernel.org/linux-crypto/Ysw9E2Az2oK4jfCf@lucas-Virtual-Machine/
-
-Giovanni Cabiddu (3):
-  dm integrity: do not filter algos with CRYPTO_ALG_ALLOCATES_MEMORY
-  crypto: api - adjust meaning of CRYPTO_ALG_ALLOCATES_MEMORY
-  crypto: qat - remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-
- drivers/crypto/intel/qat/qat_common/qat_algs.c | 13 ++++++-------
- .../intel/qat/qat_common/qat_comp_algs.c       |  2 +-
- drivers/md/dm-integrity.c                      |  2 +-
- include/linux/crypto.h                         | 18 ++++++++++++++++--
- 4 files changed, 24 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
+index 31838b13ea54..a1013eff01b4 100644
+--- a/drivers/md/dm-integrity.c
++++ b/drivers/md/dm-integrity.c
+@@ -3785,7 +3785,7 @@ static int create_journal(struct dm_integrity_c *ic, char **error)
+ 		struct journal_completion comp;
+ 
+ 		comp.ic = ic;
+-		ic->journal_crypt = crypto_alloc_skcipher(ic->journal_crypt_alg.alg_string, 0, CRYPTO_ALG_ALLOCATES_MEMORY);
++		ic->journal_crypt = crypto_alloc_skcipher(ic->journal_crypt_alg.alg_string, 0, 0);
+ 		if (IS_ERR(ic->journal_crypt)) {
+ 			*error = "Invalid journal cipher";
+ 			r = PTR_ERR(ic->journal_crypt);
 -- 
 2.40.1
 
