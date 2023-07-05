@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EDEFC001DF
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jul 2023 17:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C77EB64DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jul 2023 17:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232229AbjGER3l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jul 2023 13:29:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47128 "EHLO
+        id S232370AbjGERcF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 5 Jul 2023 13:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232128AbjGER3a (ORCPT
+        with ESMTP id S232394AbjGERcE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jul 2023 13:29:30 -0400
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEBF01995;
-        Wed,  5 Jul 2023 10:29:14 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365F7wr6011031;
-        Wed, 5 Jul 2023 19:28:32 +0200
+        Wed, 5 Jul 2023 13:32:04 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5431BEF;
+        Wed,  5 Jul 2023 10:31:23 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365ELHiM007736;
+        Wed, 5 Jul 2023 19:29:48 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=selector1;
- bh=0cp0phFAXBpBnqUWpQvooHZl0xVcG7c1RiTscXT/M+o=;
- b=oykazVaiSgS7Ds6UFk9nS1pYtqiKZbjUXBkbNDpPe3Lrqf1OzDClGBQ/fhX2ODBc3dcI
- pcW7HhsM3J3slbVHYCNBzGOnmhTWXqUT6CgFV3NZSVHpTfVEq6PDhyuBSfoOZzyoij5Z
- fGIwAOFLVViLIkZeTIdykx1WjcC+xlce8eXsw8jRHeK+cbbK79oL7yuzRXHhViNpf8NC
- aog7j73knzF+bE0M06Nn6R2svhLS8DZNwo6fB4oNPWw6bfqXrmZr50/MIdQxYAJw/aH+
- hFO2BRk6Fvp/BkXo+ZeGpI0UZJY1qwX0YBKq0F8Qey263oZpmBwRYH2Lx+AZ/E3UBMio YA== 
+ bh=oxvOgEF9cvRzCwfkDelwx7si1C+N2VuboXigLVR2SWA=;
+ b=xvOY8m0QodXwBZhsM5T5ELcmsFzBcK0qMv6Qs6hI88hnRwBkFB/ysw0DZwZNS/iobXNl
+ I0cYXFRnIZz7I/iEDI3bpcPn+zk0PitWpNNMHMe0z06nqOKI3FuLJP+y5wWrLgSLg7HH
+ vfyeYlPA0S1CbOrphhlesXe6Lq0BftoFErxYR1F0L7yKWHqkK4+67PQghl8QfA1lyrIr
+ JCnNAxreYxI5KIMus4YvhsJQHutLzJY9o/98Z2fqQyGMNquLhuUjHd2+wU+ouZea00Qi
+ 5Cp9uxFBXQMIASgwij832gWHVXXvMJU4x5pqoJyREDktLaQBWkv3VHl/9R9P+8Os4giD mQ== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rn7wp29a4-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rna75h45d-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Jul 2023 19:28:32 +0200
+        Wed, 05 Jul 2023 19:29:48 +0200
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id A822010005E;
-        Wed,  5 Jul 2023 19:28:30 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 4F782100057;
+        Wed,  5 Jul 2023 19:29:48 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 9AE9524C432;
-        Wed,  5 Jul 2023 19:28:30 +0200 (CEST)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4659024C434;
+        Wed,  5 Jul 2023 19:29:48 +0200 (CEST)
 Received: from localhost (10.201.21.121) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 5 Jul
- 2023 19:28:30 +0200
+ 2023 19:29:47 +0200
 From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
 To:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -63,10 +63,10 @@ CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
         <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
         <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        Oleksii Moisieiev <oleksii_moisieiev@epam.com>
-Subject: [IGNORE][PATCH 01/10] dt-bindings: Document common device controller bindings
-Date:   Wed, 5 Jul 2023 19:27:50 +0200
-Message-ID: <20230705172759.1610753-2-gatien.chevallier@foss.st.com>
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH 08/10] bus: etzpc: introduce ETZPC firewall controller driver
+Date:   Wed, 5 Jul 2023 19:27:57 +0200
+Message-ID: <20230705172759.1610753-9-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
 References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
@@ -83,112 +83,186 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+ETZPC is a peripheral and memory firewall controller that filter accesses
+based on Arm TrustZone secure state and Arm CPU privilege execution level.
+It handles MCU isolation as well.
 
-Introducing of the common device controller bindings for the controller
-provider and consumer devices. Those bindings are intended to allow
-divided system on chip into muliple domains, that can be used to
-configure hardware permissions.
-
-Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
+ MAINTAINERS               |   1 +
+ drivers/bus/Makefile      |   2 +-
+ drivers/bus/stm32_etzpc.c | 137 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 139 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/bus/stm32_etzpc.c
 
-Depends-on: https://lore.kernel.org/lkml/c869d2751125181a55bc8a88c96e3a892b42f37a.1668070216.git.oleksii_moisieiev@epam.com/
-
- .../feature-domain-controller.yaml            | 84 +++++++++++++++++++
- 1 file changed, 84 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
-
-diff --git a/Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml b/Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1ea2f9f60b43..51f5bced7b9b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -20126,6 +20126,7 @@ F:	drivers/media/i2c/st-mipid02.c
+ ST STM32 FIREWALL
+ M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
+ S:	Maintained
++F:	drivers/bus/stm32_etzpc.c
+ F:	drivers/bus/stm32_firewall.c
+ F:	drivers/bus/stm32_rifsc.c
+ 
+diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
+index e50d18e1d141..cddd4984d6af 100644
+--- a/drivers/bus/Makefile
++++ b/drivers/bus/Makefile
+@@ -26,7 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
+ obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
+ obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
+ obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
+-obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o stm32_rifsc.o
++obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o stm32_rifsc.o stm32_etzpc.o
+ obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
+ obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
+ obj-$(CONFIG_OF)		+= simple-pm-bus.o
+diff --git a/drivers/bus/stm32_etzpc.c b/drivers/bus/stm32_etzpc.c
 new file mode 100644
-index 000000000000..90a7c38c833c
+index 000000000000..2ef5ab738f87
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
-@@ -0,0 +1,84 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/feature-controllers/feature-domain-controller.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/drivers/bus/stm32_etzpc.c
+@@ -0,0 +1,137 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
++ */
 +
-+title: Generic Domain Controller bindings
++#include <linux/bitfield.h>
++#include <linux/bits.h>
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/init.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
++#include <linux/types.h>
 +
-+maintainers:
-+  - Oleksii Moisieiev <oleksii_moisieiev@epam.com>
++#include "stm32_firewall.h"
 +
-+description: |+
-+  Common Feature Domains Controller bindings properties
++/*
++ * ETZPC registers
++ */
++#define ETZPC_DECPROT			0x10
++#define ETZPC_HWCFGR			0x3F0
 +
-+  Domain controllers allow to divided system on chip into multiple feature
-+  domains that can be used to select by who hardware blocks could be accessed.
-+  A feature domain could be a cluster of CPUs (or coprocessors), a range of
-+  addresses or a group of hardware blocks.
++/*
++ * HWCFGR register
++ */
++#define ETZPC_HWCFGR_NUM_TZMA		GENMASK(7, 0)
++#define ETZPC_HWCFGR_NUM_PER_SEC	GENMASK(15, 8)
++#define ETZPC_HWCFGR_NUM_AHB_SEC	GENMASK(23, 16)
++#define ETZPC_HWCFGR_CHUNKS1N4		GENMASK(31, 24)
 +
-+  This device tree bindings can be used to bind feature domain consumer devices
-+  with their feature domains provided by feature-domains controllers.
-+  Feature omain controller provider can be represened by any node in the
-+  device tree and can provide one or more configuration parameters, needed to
-+  control parameters of the consumer device. A consumer node can refer to the
-+  provider by phandle and a set of phandle arguments, specified by
-+  '#feature-domain-cells' property in the device controller provider node.
++/*
++ * ETZPC miscellaneous
++ */
++#define ETZPC_PROT_MASK			GENMASK(1, 0)
++#define ETZPC_PROT_A7NS			0x3
++#define ETZPC_DECPROT_SHIFT		1
 +
-+  Device controllers are typically used to set the permissions of the hardware
-+  block. The contents of the feature-domains configuration properties are
-+  defined by the binding for the individual feature-domains controller device.
++#define IDS_PER_DECPROT_REGS		16
 +
-+  Each node can be a consumer for the several providers. The first
-+  configuration of 'feature-domains' or the one named 'default' is applied
-+  before probing the device itself.
++static int stm32_etzpc_grant_access(struct stm32_firewall_controller *ctrl, u32 firewall_id)
++{
++	u32 offset, reg_offset, sec_val;
 +
-+# always select the core schema
-+select: true
++	if (firewall_id >= ctrl->max_entries) {
++		dev_err(ctrl->dev, "Invalid sys bus ID %u", firewall_id);
++		return -EINVAL;
++	}
 +
-+properties:
-+  '#feature-domain-cells':
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      Number of cells in a feature-domains controller specifier;
-+      Can be any value as specified by device tree binding documentation
-+      of a particular provider.
++	/* Check access configuration, 16 peripherals per register */
++	reg_offset = ETZPC_DECPROT + 0x4 * (firewall_id / IDS_PER_DECPROT_REGS);
++	offset = (firewall_id % IDS_PER_DECPROT_REGS) << ETZPC_DECPROT_SHIFT;
 +
-+  feature-domain-controller:
-+    description:
-+      Indicates that the node is feature-domain-controller provider.
++	/* Verify peripheral is non-secure and attributed to cortex A7 */
++	sec_val = (readl(ctrl->mmio + reg_offset) >> offset) & ETZPC_PROT_MASK;
++	if (sec_val != ETZPC_PROT_A7NS) {
++		dev_dbg(ctrl->dev, "Invalid bus configuration: reg_offset %#x, value %d\n",
++			reg_offset, sec_val);
++		return -EACCES;
++	}
 +
-+  feature-domain-names:
-+    $ref: '/schemas/types.yaml#/definitions/string-array'
-+    description:
-+      A list of feature-domains names, sorted in the same order as
-+      feature-domains entries. Consumer drivers will use feature-domain-names
-+      to match with existing feature-domains entries.
++	return 0;
++}
 +
-+  feature-domains:
-+    $ref: "/schemas/types.yaml#/definitions/phandle-array"
-+    description:
-+      A list of feature-domains controller specifiers, as defined by the
-+      bindings of the feature-domain-controller provider.
++static void stm32_etzpc_release_access(struct stm32_firewall_controller *ctrl __maybe_unused,
++				       u32 firewall_id __maybe_unused)
++{
++}
 +
-+additionalProperties: true
++static int stm32_etzpc_probe(struct platform_device *pdev)
++{
++	struct stm32_firewall_controller *etzpc_controller;
++	struct device_node *np = pdev->dev.of_node;
++	u32 nb_per, nb_master;
++	struct resource *res;
++	void __iomem *mmio;
++	int rc;
 +
-+examples:
-+  - |
-+    ctrl0: ctrl@100 {
-+        feature-domain-controller;
-+        reg = <0x100 0x10>;
-+        #feature-domain-cells = <2>;
-+    };
++	etzpc_controller = devm_kzalloc(&pdev->dev, sizeof(*etzpc_controller), GFP_KERNEL);
++	if (!etzpc_controller)
++		return -ENOMEM;
 +
-+    ctrl1: ctrl@110 {
-+        feature-domain-controller;
-+        reg = <0x110 0x10>;
-+        #feature-domain-cells = <3>;
-+    };
++	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	mmio = devm_ioremap_resource(&pdev->dev, res);
++	if (IS_ERR(mmio))
++		return PTR_ERR(mmio);
 +
-+    foo@0 {
-+        reg = <0x0 0x1>;
-+        feature-domains = <&ctrl0 1 2>, <&ctrl1 3 4 5>;
-+        feature-domain-names = "default", "unbind";
-+    };
++	etzpc_controller->dev = &pdev->dev;
++	etzpc_controller->mmio = mmio;
++	etzpc_controller->type = STM32_PERIPHERAL_FIREWALL | STM32_MEMORY_FIREWALL;
++	etzpc_controller->grant_access = stm32_etzpc_grant_access;
++	etzpc_controller->release_access = stm32_etzpc_release_access;
++
++	/* Get number of etzpc entries*/
++	nb_per = FIELD_GET(ETZPC_HWCFGR_NUM_PER_SEC,
++			   readl(etzpc_controller->mmio + ETZPC_HWCFGR));
++	nb_master = FIELD_GET(ETZPC_HWCFGR_NUM_AHB_SEC,
++			      readl(etzpc_controller->mmio + ETZPC_HWCFGR));
++	etzpc_controller->max_entries = nb_per + nb_master;
++
++	platform_set_drvdata(pdev, etzpc_controller);
++
++	rc = stm32_firewall_controller_register(etzpc_controller);
++	if (rc) {
++		dev_err(etzpc_controller->dev, "Couldn't register as a firewall controller: %d",
++			rc);
++		return rc;
++	}
++
++	stm32_firewall_populate_bus(etzpc_controller);
++
++	/* Populate all allowed nodes */
++	return of_platform_populate(np, NULL, NULL, &pdev->dev);
++}
++
++static const struct of_device_id stm32_etzpc_of_match[] = {
++	{ .compatible = "st,stm32-etzpc" },
++	{}
++};
++MODULE_DEVICE_TABLE(of, stm32_etzpc_of_match);
++
++static struct platform_driver stm32_etzpc_driver = {
++	.probe  = stm32_etzpc_probe,
++	.driver = {
++		.name = "stm32-etzpc",
++		.of_match_table = stm32_etzpc_of_match,
++	},
++};
++
++static int __init stm32_etzpc_init(void)
++{
++	return platform_driver_register(&stm32_etzpc_driver);
++}
++arch_initcall(stm32_etzpc_init);
 -- 
 2.25.1
 
