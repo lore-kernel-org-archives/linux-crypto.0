@@ -2,143 +2,257 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB793C001DE
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 09:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3A0C001DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 14:45:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231149AbjGFJbt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jul 2023 05:31:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42966 "EHLO
+        id S233274AbjGFOpO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Jul 2023 10:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231835AbjGFJbq (ORCPT
+        with ESMTP id S231895AbjGFOpN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2023 05:31:46 -0400
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD7A51FF0;
-        Thu,  6 Jul 2023 02:31:15 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3667J8tL028476;
-        Thu, 6 Jul 2023 11:30:49 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=QjdN1V/hI6Mx6jHfQb/2NbbcyfO5P8v8g9k00xWpqD4=;
- b=DYCthB7alQTQ3lrROhg7wOy4r1QjzIouOx6L/IhrmzziUxxOXE/SAY/s3xl5nbC6MKjP
- yKTOupwej1UZTT1NzllCw19pAI/ozfW4DzFp93ABJK04vmnrhUVTRSeHfQBMiFRmMCS6
- RE6I1Z7cJ131NjJJcG1uMwLxnvvWKLJSrY1Ldr2zQqHHRB5gF6YmNXEW5uDS8b7ASW9K
- 9NavX8kCT/YO35Q8WUwtoqHl0/n1GZUt3sDcUAgcu4R4+QK48NXobdWd0egzTTMZmYXB
- Fcl1NvDUv2WloUvJGVEtMGRv5s06I3e2+JLxzO7J8eoNhgBH/rQgPUF5qHlO3YrPxajT yQ== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rns47s4ud-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Jul 2023 11:30:49 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id F3A43100052;
-        Thu,  6 Jul 2023 11:30:47 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E997C216ED4;
-        Thu,  6 Jul 2023 11:30:47 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 6 Jul
- 2023 11:30:46 +0200
-Message-ID: <997780a9-1cbc-46a2-2743-7fd493682278@foss.st.com>
-Date:   Thu, 6 Jul 2023 11:30:46 +0200
+        Thu, 6 Jul 2023 10:45:13 -0400
+Received: from frasgout13.his.huawei.com (unknown [14.137.139.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F62D199F;
+        Thu,  6 Jul 2023 07:45:10 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.18.147.227])
+        by frasgout13.his.huawei.com (SkyGuard) with ESMTP id 4QxfDL74Rpz9xFGL;
+        Thu,  6 Jul 2023 22:34:10 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.204.63.22])
+        by APP1 (Coremail) with SMTP id LxC2BwAHQg0y06ZkPxkwBA--.58122S2;
+        Thu, 06 Jul 2023 15:44:25 +0100 (CET)
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko@kernel.org, song@kernel.org, jolsa@kernel.org,
+        ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+        martin.lau@linux.dev, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
+        rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com,
+        shuah@kernel.org
+Cc:     linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbrobinson@gmail.com,
+        zbyszek@in.waw.pl, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org, paul@paul-moore.com,
+        linux-security-module@vger.kernel.org, wiktor@metacode.biz,
+        devel@lists.sequoia-pgp.org, gnupg-devel@gnupg.org,
+        ebiggers@kernel.org, Jason@zx2c4.com, mail@maciej.szmigiero.name,
+        antony@vennard.ch, konstantin@linuxfoundation.org,
+        James.Bottomley@HansenPartnership.com,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Subject: [RFC][PATCH 00/10] KEYS: Introduce user asymmetric keys and signatures
+Date:   Thu,  6 Jul 2023 16:42:13 +0200
+Message-Id: <20230706144225.1046544-1-roberto.sassu@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 07/10] arm64: dts: st: add RIFSC as a domain controller
- for STM32MP25x boards
-Content-Language: en-US
-To:     Alexandre TORGUE <alexandre.torgue@foss.st.com>,
-        <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>
-CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-8-gatien.chevallier@foss.st.com>
- <61d93738-4ffd-411d-d32c-912c14eea56d@foss.st.com>
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <61d93738-4ffd-411d-d32c-912c14eea56d@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-06_06,2023-07-06_01,2023-05-22_02
+X-CM-TRANSID: LxC2BwAHQg0y06ZkPxkwBA--.58122S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3JFyDJFyUWrW7XryxWF13CFg_yoW3Xw15pF
+        Z5KrWrtryktr1xKayrAw4Iga1rZr1Fyay3Kwnakw15AasIqr18ArWIkF45ur9ayF48WF1F
+        vrsav34UKw18t3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkqb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
+        rVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
+        IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k2
+        0xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI
+        8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Wrv_Gr1UMIIYrxkI7VAKI48J
+        MIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMI
+        IF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY
+        6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1c4S7UUUUU==
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAKBF1jj4-V4AAAsE
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Alex,
+From: Roberto Sassu <roberto.sassu@huawei.com>
 
-On 7/6/23 11:25, Alexandre TORGUE wrote:
-> Hi Gatien
-> 
-> On 7/5/23 19:27, Gatien Chevallier wrote:
->> RIFSC is a firewall controller. Change its compatible so that is matches
->> the documentation and reference RIFSC as a feature-domain-controller.
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>   arch/arm64/boot/dts/st/stm32mp251.dtsi | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi 
->> b/arch/arm64/boot/dts/st/stm32mp251.dtsi
->> index 5268a4321841..62101084cab8 100644
->> --- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
->> +++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
->> @@ -106,17 +106,20 @@ soc@0 {
->>           ranges = <0x0 0x0 0x0 0x80000000>;
->>           rifsc: rifsc-bus@42080000 {
->> -            compatible = "simple-bus";
->> +            compatible = "st,stm32mp25-rifsc";
-> 
-> You could keep "simple-bus" compatible (in second position). In case of 
-> the RIFSC is not probed, the platform will be able to boot. If you agree 
-> you can use the same for ETZPC.
-> 
-> Cheers
-> Alex
+Define a new TLV-based format for keys and signatures, aiming to store and
+use in the kernel the crypto material from other unsupported formats
+(e.g. PGP).
 
-Sure, good point.
+TLV fields have been defined to fill the corresponding kernel structures
+public_key, public_key_signature and key_preparsed_payload.
 
-I'll change that in V2
+Keys:
+                struct public_key {     struct key_preparsed_payload {
+KEY_PUB       -->  void *key;
+                   u32 keylen;         --> prep->payload.data[asym_crypto]
+KEY_ALGO      -->  const char *pkey_algo;
+KEY_KID0
+KEY_KID1                               --> prep->payload.data[asym_key_ids]
+KEY_KID2  
+KEY_DESC                               --> prep->description
 
-Best regards,
-Gatien
-> 
->>               reg = <0x42080000 0x1000>;
->>               #address-cells = <1>;
->>               #size-cells = <1>;
->>               ranges;
->> +            feature-domain-controller;
->> +            #feature-domain-cells = <1>;
->>               usart2: serial@400e0000 {
->>                   compatible = "st,stm32h7-uart";
->>                   reg = <0x400e0000 0x400>;
->>                   interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
->>                   clocks = <&ck_flexgen_08>;
->> +                feature-domains = <&rifsc 32>;
->>                   status = "disabled";
->>               };
->>           };
-> 
+
+Signatures:
+                struct public_key_signature {
+SIG_S         -->  u8 *s;
+                   u32 s_size;
+SIG_KEY_ALGO  -->  const char *pkey_algo;
+SIG_HASH_ALGO -->  const char *hash_algo;
+                   u32 digest_size;
+SIG_ENC       -->  const char *encoding;   
+SIG_KID0
+SIG_KID1      -->  struct asymmetric_key_id *auth_ids[3];
+SIG_KID2  
+
+
+For keys, since the format conversion has to be done in user space, user
+space is assumed to be trusted, in this proposal. Without this assumption,
+a malicious conversion tool could make a user load to the kernel a
+different key than the one expected.
+
+That should not be a particular problem for keys that are embedded in the
+kernel image and loaded at boot, since the conversion happens in a trusted
+environment such as the building infrastructure of the Linux distribution
+vendor.
+
+In the other cases, such as enrolling a key through the Machine Owner Key
+(MOK) mechanism, the user is responsible to ensure that the crypto material
+carried in the original format remains the same after the conversion.
+
+For signatures, assuming the strength of the crypto algorithms, altering
+the crypto material is simply a Denial-of-Service (DoS), as data can be
+validated only with the right signature.
+
+
+This patch set also offers the following contributions:
+
+- An API similar to the PKCS#7 one, to verify the authenticity of system
+  data through user asymmetric keys and signatures
+
+- A mechanism to store a keyring blob in the kernel image and to extract
+  and load the keys at system boot
+  
+- eBPF binding, so that data authenticity verification with user asymmetric
+  keys and signatures can be carried out also with eBPF programs
+
+- A new command for gnupg (in user space), to convert keys and signatures
+  from PGP to the new kernel format
+
+
+The primary use case for this patch set is to verify the authenticity of
+RPM package headers with the PGP keys of the Linux distribution. Once their
+authenticity is verified, file digests can be extracted from those RPM
+headers and used as reference values for IMA Appraisal.
+
+
+Compared to the previous patch set, the main difference is not relying on
+User Mode Drivers (UMDs) for the conversion from the original format to the
+kernel format, due to the concern that full isolation of the UMD process
+cannot be achieved against a fully privileged system user (root).
+
+The discussion is still ongoing here:
+
+https://lore.kernel.org/linux-integrity/eb31920bd00e2c921b0aa6ebed8745cb0130b0e1.camel@huaweicloud.com/
+
+This however does not prevent the goal mentioned above of verifying the
+authenticity of RPM headers to be achieved. The fact that Linux
+distribution vendors do the conversion in their infrastructure is a good
+enough guarantee.
+
+
+A very quick way to test the patch set is to execute:
+
+# gpg --conv-kernel /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-primary | keyctl padd asymmetric "" @u
+
+# keyctl show @u
+Keyring
+ 762357580 --alswrv      0 65534  keyring: _uid.0
+ 567216072 --als--v      0     0   \_ asymmetric: PGP: 18b8e74c
+
+
+Patches 1-2 preliminarly export some definitions to user space so that
+conversion tools can specify the right public key algorithms and signature
+encodings (digest algorithms are already exported).
+
+Patches 3-5 introduce the user asymmetric keys and signatures.
+
+Patches 6 introduces a system API for verifying the authenticity of system
+data through user asymmetric keys and signatures.
+
+Patch 7-8 introduce a mechanism to store a keyring blob with user
+asymmetric keys in the kernel image, and load them at system boot.
+
+Patches 9-10 introduce the eBPF binding and corresponding test (which can
+be enabled only after the gnupg patches are upstreamed).
+
+Patches 1-2 [GNUPG] introduce the new gpg command --conv-kernel to convert
+PGP keys and signatures to the new kernel format.
+
+Changelog
+
+v1:
+- Remove useless check in validate_key() (suggested by Yonghong)
+- Don't rely on User Mode Drivers for the conversion from the original
+  format to the kernel format
+- Use the more extensible TLV format, instead of a fixed structure
+
+Roberto Sassu (10):
+  crypto: Export public key algorithm information
+  crypto: Export signature encoding information
+  KEYS: asymmetric: Introduce a parser for user asymmetric keys and sigs
+  KEYS: asymmetric: Introduce the user asymmetric key parser
+  KEYS: asymmetric: Introduce the user asymmetric key signature parser
+  verification: Add verify_uasym_signature() and
+    verify_uasym_sig_message()
+  KEYS: asymmetric: Preload user asymmetric keys from a keyring blob
+  KEYS: Introduce load_uasym_keyring()
+  bpf: Introduce bpf_verify_uasym_signature() kfunc
+  selftests/bpf: Prepare a test for user asymmetric key signatures
+
+ MAINTAINERS                                   |   1 +
+ certs/Kconfig                                 |  11 +
+ certs/Makefile                                |   7 +
+ certs/system_certificates.S                   |  18 +
+ certs/system_keyring.c                        | 166 +++++-
+ crypto/Kconfig                                |   6 +
+ crypto/Makefile                               |   2 +
+ crypto/asymmetric_keys/Kconfig                |  14 +
+ crypto/asymmetric_keys/Makefile               |  10 +
+ crypto/asymmetric_keys/asymmetric_type.c      |   3 +-
+ crypto/asymmetric_keys/uasym_key_parser.c     | 229 ++++++++
+ crypto/asymmetric_keys/uasym_key_preload.c    |  99 ++++
+ crypto/asymmetric_keys/uasym_parser.c         | 201 +++++++
+ crypto/asymmetric_keys/uasym_parser.h         |  43 ++
+ crypto/asymmetric_keys/uasym_sig_parser.c     | 491 ++++++++++++++++++
+ crypto/pub_key_info.c                         |  20 +
+ crypto/sig_enc_info.c                         |  16 +
+ include/crypto/pub_key_info.h                 |  15 +
+ include/crypto/sig_enc_info.h                 |  15 +
+ include/crypto/uasym_keys_sigs.h              |  82 +++
+ include/keys/asymmetric-type.h                |   1 +
+ include/linux/verification.h                  |  50 ++
+ include/uapi/linux/pub_key_info.h             |  22 +
+ include/uapi/linux/sig_enc_info.h             |  18 +
+ include/uapi/linux/uasym_parser.h             | 107 ++++
+ kernel/trace/bpf_trace.c                      |  68 ++-
+ ...y_pkcs7_sig.c => verify_pkcs7_uasym_sig.c} | 159 +++++-
+ ...s7_sig.c => test_verify_pkcs7_uasym_sig.c} |  18 +-
+ .../testing/selftests/bpf/verify_sig_setup.sh |  82 ++-
+ 29 files changed, 1924 insertions(+), 50 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/uasym_key_parser.c
+ create mode 100644 crypto/asymmetric_keys/uasym_key_preload.c
+ create mode 100644 crypto/asymmetric_keys/uasym_parser.c
+ create mode 100644 crypto/asymmetric_keys/uasym_parser.h
+ create mode 100644 crypto/asymmetric_keys/uasym_sig_parser.c
+ create mode 100644 crypto/pub_key_info.c
+ create mode 100644 crypto/sig_enc_info.c
+ create mode 100644 include/crypto/pub_key_info.h
+ create mode 100644 include/crypto/sig_enc_info.h
+ create mode 100644 include/crypto/uasym_keys_sigs.h
+ create mode 100644 include/uapi/linux/pub_key_info.h
+ create mode 100644 include/uapi/linux/sig_enc_info.h
+ create mode 100644 include/uapi/linux/uasym_parser.h
+ rename tools/testing/selftests/bpf/prog_tests/{verify_pkcs7_sig.c => verify_pkcs7_uasym_sig.c} (69%)
+ rename tools/testing/selftests/bpf/progs/{test_verify_pkcs7_sig.c => test_verify_pkcs7_uasym_sig.c} (82%)
+
+-- 
+2.34.1
+
