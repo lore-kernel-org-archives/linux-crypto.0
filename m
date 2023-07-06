@@ -2,81 +2,90 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B99FEB64D9
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 20:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F3BEB64D9
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 21:42:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbjGFUxX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jul 2023 16:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
+        id S231570AbjGFVmr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Jul 2023 17:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbjGFUxX (ORCPT
+        with ESMTP id S232052AbjGFVmp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2023 16:53:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34831999
-        for <linux-crypto@vger.kernel.org>; Thu,  6 Jul 2023 13:53:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 58002612E4
-        for <linux-crypto@vger.kernel.org>; Thu,  6 Jul 2023 20:53:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30CCFC433C8;
-        Thu,  6 Jul 2023 20:53:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688676800;
-        bh=qcAxweDPq39L5npJuVAnsu8iW7yg61iPw5U4c+tnzj0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=RxhYD7pxdvhLtmloT+u6LMKjgIUU7dIx+enmhalOc81qCOo5Hz+4RFuthAvsWT1E/
-         kUAaMR1lMiSRs55uVmSEfHeFa1pyjfPj1VX9JW75rfa5S/zqB0IR8lSzNLOfLvuqtD
-         69BwaJGpiUsYnvYvR2gr927E8ecpHIzkYAtXM2uHPN1UfX/LfdCWGQSvbfEGlDW35Y
-         3arIn7vx0GBRTFMZLsRCJD8zt2E/K9djoL8PxeHasRyE3w1jtWajQHE58oeRqGHwNY
-         Z79b6DhSbc4+1a7S+tnd21wWND84yk1TfOkaODFn4k4vqqVg4mFApB2XmxMx1sqCrP
-         WHbxLFg/M1Urg==
-Date:   Thu, 6 Jul 2023 13:53:19 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Alexander Potapenko <glider@google.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Aviad Yehezkel <aviadye@nvidia.com>,
-        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-Message-ID: <20230706135319.66d3cb78@kernel.org>
-In-Reply-To: <35970e3b-8142-8e00-c12a-da8c6925c12c@I-love.SAKURA.ne.jp>
-References: <0000000000008a7ae505aef61db1@google.com>
-        <20200911170150.GA889@sol.localdomain>
-        <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
-        <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
-        <59e1d5c0-aedb-7b5b-f37f-0c20185d7e9b@I-love.SAKURA.ne.jp>
-        <CAMj1kXGHRUUFYL09Lm-mO6MfGc19rC=-7mSJ1eDTcbw7QuEkaw@mail.gmail.com>
-        <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
-        <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
-        <CAG_fn=VFa2yeiZmdyuVRmZYtWn6Tkox8UVrOrCv4tEec3BFYbQ@mail.gmail.com>
-        <CAMj1kXEdwjN7Q8tKVxHz98zQ4EsWVSdLZ5tQaV-nXxc9hwRYjQ@mail.gmail.com>
-        <CAG_fn=UWZWc+FZ_shCr+T9Y3gV9Bue-ZFHKJj78YXBq3JfnUKA@mail.gmail.com>
-        <CAMj1kXE_PjQT6+A9a0Y=ZfbOr_H+umYSqHuRrM6AT_gFJxxP1w@mail.gmail.com>
-        <8c989395-0f20-a957-6611-8a356badcf3c@I-love.SAKURA.ne.jp>
-        <35970e3b-8142-8e00-c12a-da8c6925c12c@I-love.SAKURA.ne.jp>
+        Thu, 6 Jul 2023 17:42:45 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCA891FE0
+        for <linux-crypto@vger.kernel.org>; Thu,  6 Jul 2023 14:42:39 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id 3f1490d57ef6-c4d04d50c4cso1278612276.1
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Jul 2023 14:42:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1688679759; x=1691271759;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+0rENF/WeQpydVVWV122fwfebKo12jRQ+NnRzPzQpr8=;
+        b=W/SqLqzt3wFk2cSOkuV+T+EczeUwl3oqInbbKRlT4oXgXFrFobMBlM88wjGhpBU253
+         svEE5aOAjYqWkryCcUlYCJuW/m+di6FIaiJdkPSLXboETkhHC3BqRDKKtq5bJ+z2BQAX
+         tDRwXpY2Zu8qlvHrtOjOLSelcVKmsuZzTuHdm7lS3OG7eM9MV8j4FMWUa9k76kaFjp4l
+         wTkR+KszaKH45YQVXRN0pki6hALtHmL2LxxUYcW8xQ8wZxekpk7FpjKP1bU83cyW7mgg
+         7E+XipZ1JacoQzxN0opR0dm1UCUR98tPuw1W2nAmN68HRALf7+hWg4az4Y7dGQ8+p5ya
+         pbjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688679759; x=1691271759;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+0rENF/WeQpydVVWV122fwfebKo12jRQ+NnRzPzQpr8=;
+        b=FDPEGCLUnDE/Phm8BMKq+z9sW6ClBhGb0pvKVx6w7SCwwNAoDW0YWI7Xcw/+qLL75T
+         mN6yzBhnBc8H2QvwQIPmMmwKo0E2pkSM5zXZluVToNhf/NVOYfsiZnPT4J1RXVDzprcd
+         +aBxkOoA6PuKoYgHH4G4OV0/cPO0zqLN27pfs6fpny9FAaZ7u9UxRxi6qOUp8QTd8lIU
+         gWkffFKm3DcKrgTPxqpTzm6KDGizDxxT01dpwfTaVsBdqNT7UIqQ4wjowOt7/sKwE0f/
+         vAX2ItrMGCH5IrcK+tVs/e4MdcK43Yv0ciQROexhaRp01rgleaC85euhP/XJlgu6MWeE
+         LPNw==
+X-Gm-Message-State: ABy/qLag4zhuc+ez9OEL018zDzKpxIo0GSE0KMUeBnZMeaEWZQBlkftL
+        xPRY4u+IwN/3/9wGyKzg9z+U/4dfzH+UfaOzAZkdwg==
+X-Google-Smtp-Source: APBJJlEAXANJaCshopEoGTyGyT4USXSJCsyd2uuiYqc82UYDe7R2DDGSeNcDz1Nv2iylOJfJTRv7yTcuFYW4NiENZ/k=
+X-Received: by 2002:a25:6085:0:b0:c18:1300:6339 with SMTP id
+ u127-20020a256085000000b00c1813006339mr2997998ybb.52.1688679758872; Thu, 06
+ Jul 2023 14:42:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230706073719.1156288-1-thomas.bourgoin@foss.st.com> <20230706073719.1156288-7-thomas.bourgoin@foss.st.com>
+In-Reply-To: <20230706073719.1156288-7-thomas.bourgoin@foss.st.com>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Thu, 6 Jul 2023 23:42:27 +0200
+Message-ID: <CACRpkdaF59sJQMc9ZuEM=YFJPaw-oAmvt=s4GYjchEGWQ=yWCw@mail.gmail.com>
+Subject: Re: [PATCH 6/7] crypto: stm32 - fix MDMAT condition
+To:     Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 4 Jul 2023 22:32:00 +0900 Tetsuo Handa wrote:
-> I found a simplified reproducer.
-> This problem happens when splice() and sendmsg() run in parallel.
+On Thu, Jul 6, 2023 at 9:39=E2=80=AFAM Thomas BOURGOIN
+<thomas.bourgoin@foss.st.com> wrote:
 
-Could you retry with the upstream (tip of Linus's tree) and see if it
-still repros? I tried to get a KMSAN kernel to boot on QEMU but it
-the kernel doesn't want to start, no idea what's going on :(
+> From: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
+>
+> If IP has MDMAT support, set or reset the bit MDMAT in Control Register.
+>
+> Fixes: b56403a25af7 ("crypto: stm32/hash - Support Ux500 hash")
+> Signed-off-by: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
+
+Oops probably my fault.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+This should probably be applied for fixes/stable.
+
+Yours,
+Linus Walleij
