@@ -2,162 +2,155 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB54EB64DD
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 22:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 745EBC001B0
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 23:27:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjGFWKO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jul 2023 18:10:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41150 "EHLO
+        id S229748AbjGFX1x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Jul 2023 19:27:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231796AbjGFWKM (ORCPT
+        with ESMTP id S229555AbjGFX1w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2023 18:10:12 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061BE1FC4
-        for <linux-crypto@vger.kernel.org>; Thu,  6 Jul 2023 15:10:09 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-c6ae08ebfa2so1040799276.1
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Jul 2023 15:10:09 -0700 (PDT)
+        Thu, 6 Jul 2023 19:27:52 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B9D42139;
+        Thu,  6 Jul 2023 16:27:29 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-262e839647eso998832a91.2;
+        Thu, 06 Jul 2023 16:27:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688681409; x=1691273409;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EaRYPoQhBK/4tB9AkHrTvbi+01+8KyCJD5rHLEiLHRY=;
-        b=tLbPe+XrraaPfIPZdRWkBh4e/SEhaJ9Zet06Uc7NH7vYFPUiPvihQ28EwpKzizoBic
-         K26L9OPHDDM8n/oHVUDe1QtWNv8R2OrMAYAXYNM7k5HgzlIYdhprUG1DtSkdLWxfIoJr
-         8/wbGP7bKMj+Z0PEdlbeo4XCMhBmQytubsI7/a2FC4x7Jz6H0cn0JOj0uc5edhe9GGIt
-         U+JbC5EHcOv86SFMYTn8jpSJIjbP67uauBA1Q4a89QiahN0gbbjFseLsAWa6faOlUnwv
-         0BLZlTU+50dCRKCWw1bcr3XtH3H+Mh63ALt87w5A/KP8Att4hvINACztwUzYiyOkBjX9
-         riDw==
+        d=gmail.com; s=20221208; t=1688686035; x=1691278035;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bshFgcOle4AtCEA8BTrEZy72fJQG+YZaemfgC6JBXtM=;
+        b=IOWiwnyWZ8b/Gees9+bG/u0x39WWkdTCEFwE5s22SnFW0XqC5rvrUBYyTAMCmPKnJI
+         4qgrjSpARX+HgWz9r6G2mSEL12oNVjQzOzkJqh3SzPGRq+dOdz2w69HGJqAgtWs3B+FF
+         T6HW7smfo85Kiy1q9wyrh5thmF1HeIclKjwIH6EhYa02ctmARHBhKmOapagUI9oe+V7q
+         uoPvVu9uynFN4Sr5hgnBSuTuO3OcHkSwGSiZFHxXBsK82s4HjycRFyZstD5Yw4wGvRYw
+         1QoXQABJKLn0yVKHJ9xKaDeEnTkTKYmmzeS96+jpOAiqhUnv1SaL0yR9rZHub1JRR4EU
+         /sYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688681409; x=1691273409;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EaRYPoQhBK/4tB9AkHrTvbi+01+8KyCJD5rHLEiLHRY=;
-        b=c6RmrT7vVJDlrNqJg9aoEP8EzRsQPqYjhZFz7rwUTVN7cQu1LL//9u0OyMlYzxkXjI
-         3+I/+t2ZdzAHX1rDNlUXex/Cg68t5jTaE1/IvAk8Bq8foukOdd1CqEC9vPDT+F5FjmJN
-         ZayZGOKqXAjE4hky0kRIrvzd7wQBHaUT/b0Ws3vOjtVrT7HbPGmZyE7S25v2gXb/BXV+
-         nuaqli5zNTyG1+hqlmYzxP56jtUz2mrvgYWc+w8wDizHorcyvBKexdJuQF8kmvA2lgH2
-         VWxW39DSgoqdvMm81dSQbB8f5QVfr1pK10rMvNA9U2V+HDQ0a7Otm8/ehsVkl5ARY+12
-         vJog==
-X-Gm-Message-State: ABy/qLblg/fK3tH2DVrldG/JcqENSsWWh1THcCzZ/JYzB7rD87MMw7oG
-        shM6iGBcTla1VWV4yGpmnoKN102+BK3S4Qu4/a/5rA==
-X-Google-Smtp-Source: APBJJlFzm1sQUiz398ok7Tkvc/xWGg74bFGoqYKbyjqE426nRYq1ut4c9nhjvrnp43q+sujH7LVMZmtIAuk8p0V3e7k=
-X-Received: by 2002:a5b:611:0:b0:c1c:e037:1379 with SMTP id
- d17-20020a5b0611000000b00c1ce0371379mr3138042ybq.1.1688681409016; Thu, 06 Jul
- 2023 15:10:09 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688686035; x=1691278035;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bshFgcOle4AtCEA8BTrEZy72fJQG+YZaemfgC6JBXtM=;
+        b=MHWeUiwqxpYZcakCqf3PvdRNUg2pOpaY9zc2APg1NoPf24mmi9AqGRy1VHiNAPmZtO
+         ePgx1UUD7oAudjizDx0voVDY/zA5uTlRknqncr8F0THC9W8BUz08hPhUzotm+3p6sfjA
+         6oCjD9cZJT+/xfKVWQdSG490UQwXs6JvpyxnScyhqJugb7MSCDs74A1iX+aYPEmPk7OJ
+         HapNR2d6mGYJ4t6CnXJalznW48KQxkgYHMMWcl7dMXhlb2DXdMHFiru4jVcITms6jJYN
+         Tp1ttSmGRh4sSD/EJjlgHVvOSyrXcdiFcJVqk6p6Ug6RfGVH2TS1QP13QvQsnXdEY7mb
+         Z1QQ==
+X-Gm-Message-State: ABy/qLZRDiZ/qHwVbRXiF0Xg8NMMjNqaRGNNxKG4NuPgm1vmYgLE57n5
+        tHllK1GWlUMhiYDsPgRJH2s=
+X-Google-Smtp-Source: APBJJlFvuQWESuYnnmEsR9Q/RlJxwVOHx3CZ7iqj95A72EuTZBpzNQR7aSAdAsIzLqTLdZ3dQSY+iQ==
+X-Received: by 2002:a17:90a:bb84:b0:25b:e07f:4c43 with SMTP id v4-20020a17090abb8400b0025be07f4c43mr3123081pjr.10.1688686035098;
+        Thu, 06 Jul 2023 16:27:15 -0700 (PDT)
+Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:400::5:9b44])
+        by smtp.gmail.com with ESMTPSA id bk15-20020a17090b080f00b0025bf1ea918asm270552pjb.55.2023.07.06.16.27.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 16:27:14 -0700 (PDT)
+Date:   Thu, 6 Jul 2023 16:27:09 -0700
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To:     Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc:     dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko@kernel.org, song@kernel.org, jolsa@kernel.org,
+        ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+        martin.lau@linux.dev, yhs@fb.com, john.fastabend@gmail.com,
+        kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
+        rostedt@goodmis.org, mhiramat@kernel.org, mykolal@fb.com,
+        shuah@kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bpf@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbrobinson@gmail.com,
+        zbyszek@in.waw.pl, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org, paul@paul-moore.com,
+        linux-security-module@vger.kernel.org, wiktor@metacode.biz,
+        devel@lists.sequoia-pgp.org, gnupg-devel@gnupg.org,
+        ebiggers@kernel.org, Jason@zx2c4.com, mail@maciej.szmigiero.name,
+        antony@vennard.ch, konstantin@linuxfoundation.org,
+        James.Bottomley@hansenpartnership.com,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Subject: Re: [RFC][PATCH 00/10] KEYS: Introduce user asymmetric keys and
+ signatures
+Message-ID: <20230706232709.t6imkh3q234b3dlm@macbook-pro-8.dhcp.thefacebook.com>
+References: <20230706144225.1046544-1-roberto.sassu@huaweicloud.com>
 MIME-Version: 1.0
-References: <20230706073719.1156288-1-thomas.bourgoin@foss.st.com> <20230706073719.1156288-3-thomas.bourgoin@foss.st.com>
-In-Reply-To: <20230706073719.1156288-3-thomas.bourgoin@foss.st.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Fri, 7 Jul 2023 00:09:57 +0200
-Message-ID: <CACRpkdaHn8fhZtuhU4sXHK1xoxO3-xYg_Xb=3=bX8i-uJM9KDA@mail.gmail.com>
-Subject: Re: [PATCH 2/7] crypto: stm32 - add new algorithms support
-To:     Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230706144225.1046544-1-roberto.sassu@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+On Thu, Jul 06, 2023 at 04:42:13PM +0200, Roberto Sassu wrote:
+> From: Roberto Sassu <roberto.sassu@huawei.com>
+> 
+> Define a new TLV-based format for keys and signatures, aiming to store and
+> use in the kernel the crypto material from other unsupported formats
+> (e.g. PGP).
+> 
+> TLV fields have been defined to fill the corresponding kernel structures
+> public_key, public_key_signature and key_preparsed_payload.
+> 
+> Keys:
+>                 struct public_key {     struct key_preparsed_payload {
+> KEY_PUB       -->  void *key;
+>                    u32 keylen;         --> prep->payload.data[asym_crypto]
+> KEY_ALGO      -->  const char *pkey_algo;
+> KEY_KID0
+> KEY_KID1                               --> prep->payload.data[asym_key_ids]
+> KEY_KID2  
+> KEY_DESC                               --> prep->description
+> 
+> 
+> Signatures:
+>                 struct public_key_signature {
+> SIG_S         -->  u8 *s;
+>                    u32 s_size;
+> SIG_KEY_ALGO  -->  const char *pkey_algo;
+> SIG_HASH_ALGO -->  const char *hash_algo;
+>                    u32 digest_size;
+> SIG_ENC       -->  const char *encoding;   
+> SIG_KID0
+> SIG_KID1      -->  struct asymmetric_key_id *auth_ids[3];
+> SIG_KID2  
+> 
+> 
+> For keys, since the format conversion has to be done in user space, user
+> space is assumed to be trusted, in this proposal. Without this assumption,
+> a malicious conversion tool could make a user load to the kernel a
+> different key than the one expected.
+> 
+> That should not be a particular problem for keys that are embedded in the
+> kernel image and loaded at boot, since the conversion happens in a trusted
+> environment such as the building infrastructure of the Linux distribution
+> vendor.
+> 
+> In the other cases, such as enrolling a key through the Machine Owner Key
+> (MOK) mechanism, the user is responsible to ensure that the crypto material
+> carried in the original format remains the same after the conversion.
+> 
+> For signatures, assuming the strength of the crypto algorithms, altering
+> the crypto material is simply a Denial-of-Service (DoS), as data can be
+> validated only with the right signature.
+> 
+> 
+> This patch set also offers the following contributions:
+> 
+> - An API similar to the PKCS#7 one, to verify the authenticity of system
+>   data through user asymmetric keys and signatures
+> 
+> - A mechanism to store a keyring blob in the kernel image and to extract
+>   and load the keys at system boot
+>   
+> - eBPF binding, so that data authenticity verification with user asymmetric
+>   keys and signatures can be carried out also with eBPF programs
 
-thanks for your patch! I overall like the looks of
-the end result.
+Nack to bpf bits.
+You've convinced us that bpf_verify_pkcs7_signature() is what you need.
+Yet, 9 month later there are no users of it and you came back with this new
+bpf_verify_uasym_signature() helper that practically not much different.
 
-On Thu, Jul 6, 2023 at 9:38=E2=80=AFAM Thomas BOURGOIN
-<thomas.bourgoin@foss.st.com> wrote:
-
-> From: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
->
-> Add the all SHA-2 (up to 512) and SHA-3 algorithm support.
-> Update compatible table to add stm32mp13.
->
-> Signed-off-by: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
-
-I testes to apply this and boot the Skomer (U8500, Samsung
-GT-S7710) This patch regresses the ux500 hash like this:
-
-[    3.612426] stm32-hash a03c2000.hash: allocated hmac(sha256) fallback
-[    4.236755] stm32-hash a03c2000.hash: allocated sha256 fallback
-[    4.269287] alg: ahash: stm32-sha256 test failed (wrong result) on
-test vector 4, cfg=3D"init+update+final aligned buffer"
-[    4.280273] alg: self-tests for sha256 using stm32-sha256 failed (rc=3D-=
-22)
-[    4.280273] ------------[ cut here ]------------
-[    4.291748] WARNING: CPU: 0 PID: 100 at crypto/testmgr.c:5936
-alg_test.part.0+0x4d0/0x4e0
-[    4.299987] alg: self-tests for sha256 using stm32-sha256 failed (rc=3D-=
-22)
-[    4.299987] Modules linked in:
-[    4.309906] CPU: 0 PID: 100 Comm: cryptomgr_test Not tainted
-6.4.0-rc1-00014-g3c85f4ad9472 #274
-[    4.318603] Hardware name: ST-Ericsson Ux5x0 platform (Device Tree Suppo=
-rt)
-[    4.325561]  unwind_backtrace from show_stack+0x10/0x14
-[    4.330810]  show_stack from dump_stack_lvl+0x40/0x4c
-[    4.335876]  dump_stack_lvl from __warn+0x94/0xc0
-[    4.340606]  __warn from warn_slowpath_fmt+0x118/0x164
-[    4.345733]  warn_slowpath_fmt from alg_test.part.0+0x4d0/0x4e0
-[    4.351684]  alg_test.part.0 from cryptomgr_test+0x18/0x38
-[    4.357177]  cryptomgr_test from kthread+0xd0/0xd4
-[    4.361968]  kthread from ret_from_fork+0x14/0x2c
-[    4.366668] Exception stack(0xf0df5fb0 to 0xf0df5ff8)
-[    4.371734] 5fa0:                                     00000000
-00000000 00000000 00000000
-[    4.379913] 5fc0: 00000000 00000000 00000000 00000000 00000000
-00000000 00000000 00000000
-[    4.388061] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[    4.394744] ---[ end trace 0000000000000000 ]---
-[    4.669372] stm32-hash a03c2000.hash: allocated hmac(sha1) fallback
-[    5.131622] stm32-hash a03c2000.hash: allocated sha1 fallback
-[    5.156005] alg: ahash: stm32-sha1 test failed (wrong result) on
-test vector 3, cfg=3D"init+update+final aligned buffer"
-[    5.166778] alg: self-tests for sha1 using stm32-sha1 failed (rc=3D-22)
-[    5.166778] ------------[ cut here ]------------
-[    5.177947] WARNING: CPU: 0 PID: 115 at crypto/testmgr.c:5936
-alg_test.part.0+0x4d0/0x4e0
-[    5.186187] alg: self-tests for sha1 using stm32-sha1 failed (rc=3D-22)
-[    5.186187] Modules linked in:
-[    5.195739] CPU: 0 PID: 115 Comm: cryptomgr_test Tainted: G
-W          6.4.0-rc1-00014-g3c85f4ad9472 #274
-[    5.205902] Hardware name: ST-Ericsson Ux5x0 platform (Device Tree Suppo=
-rt)
-[    5.212860]  unwind_backtrace from show_stack+0x10/0x14
-[    5.218109]  show_stack from dump_stack_lvl+0x40/0x4c
-[    5.223175]  dump_stack_lvl from __warn+0x94/0xc0
-[    5.227874]  __warn from warn_slowpath_fmt+0x118/0x164
-[    5.233032]  warn_slowpath_fmt from alg_test.part.0+0x4d0/0x4e0
-[    5.238952]  alg_test.part.0 from cryptomgr_test+0x18/0x38
-[    5.244445]  cryptomgr_test from kthread+0xd0/0xd4
-[    5.249267]  kthread from ret_from_fork+0x14/0x2c
-[    5.253967] Exception stack(0xf0f21fb0 to 0xf0f21ff8)
-[    5.259002] 1fa0:                                     00000000
-00000000 00000000 00000000
-[    5.267181] 1fc0: 00000000 00000000 00000000 00000000 00000000
-00000000 00000000 00000000
-[    5.275360] 1fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[    5.282012] ---[ end trace 0000000000000000 ]---
-
-This worked before the patch (verified).
-
->  drivers/crypto/stm32/Kconfig      |   2 +
->  drivers/crypto/stm32/stm32-hash.c | 666 ++++++++++++++++++++++++------
-
-The patch is a bit big so it is hard to see the problem, do you
-think you can break it into increments?
-
-Yours,
-Linus Walleij
+Instead of brand new "public key info" format sign your rpms via
+existing pkcs7 mechanism and verify with bpf_verify_pkcs7_signature().
