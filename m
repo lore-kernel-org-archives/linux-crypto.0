@@ -2,137 +2,133 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE20EEB64DC
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 07:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E729EB64DC
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 09:26:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233860AbjGFHkV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jul 2023 03:40:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53644 "EHLO
+        id S231777AbjGFJ01 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Jul 2023 05:26:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233770AbjGFHkR (ORCPT
+        with ESMTP id S230477AbjGFJ00 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2023 03:40:17 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11CF1FED;
-        Thu,  6 Jul 2023 00:39:53 -0700 (PDT)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3666e8eF007738;
-        Thu, 6 Jul 2023 09:39:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=selector1;
- bh=FZKwpNeBGlxN/ZIvsZPy3W+zmOhekBrbZPOvSP0D2ZU=;
- b=5HoHR1oPoBJr9gIwXYu4497yaPXosZDZhQAFns8q982Yx6JJ+PT3xIsoJcnnzV2uHulv
- sZbWceX1qPdmPPbA+8r966N8nIJPklZ/Mf6p8HYJNItaqeSSlRDAn+28Kzl6e88InyVw
- D4a6CGMP7ngYcSAZV3VuDqcfSqC3BNSlFedlAIF2Q3qd+uA6auhVNUaAaWC5d8HWyuVw
- t1RZvFGezisqQMAaoaxeJeHGQkWYjhIiv7yhOVPZqP/DWaY0BCvd2bXK6Jsi/MZb4aDM
- eMCr3xfIIkR4vCKezKi8GwhzG1tpBTY1WL4AUYqeaJ2THQiGMJpHj9kOpoe7GPPUCEU1 ag== 
+        Thu, 6 Jul 2023 05:26:26 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5691BF0;
+        Thu,  6 Jul 2023 02:25:56 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3668EjRL026984;
+        Thu, 6 Jul 2023 11:25:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=7t4eCU5gGbd6E2c3Byzad523u0UnY/0NWeRLFMO8wqQ=;
+ b=oOHQUk7YHvsQeSB7NLsvfkez0kTZlUCcLBgh3hS4SMD5Wr3XtDTxiKvSKowNqENq4C8s
+ /288tIqKzXTGt4S2InHB2hb0Amk1CNtGQGYBfWaqN77e7cTrA1nCFp/hXvhbko3GdqKF
+ L/MzEPCBqP4GZU1Fn/yzQ5JE4cj8OgCenJ0wWY5nRviDPqiXVJho5qJfaAY9qEtW3ldq
+ WNfUylY6/Hwr6gUEHKjKBvvikQWSeI38uHh3/etreV3Px9tW0l50odh6QdLz+VrpwnEn
+ 3Em2pZ9kmrlRUa/Y7HiINICLumd7trhKCCWuff7jg/l/hOAVnY6ZeQv4znQLx1ghbUAx 6w== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rna75nd2j-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rnsxd0je3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 06 Jul 2023 09:39:37 +0200
+        Thu, 06 Jul 2023 11:25:24 +0200
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B880C10005B;
-        Thu,  6 Jul 2023 09:39:36 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node3.st.com [10.75.129.71])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id ACAF8212FB7;
-        Thu,  6 Jul 2023 09:39:36 +0200 (CEST)
-Received: from localhost (10.201.22.9) by SHFDAG1NODE3.st.com (10.75.129.71)
- with Microsoft SMTP Server (version=TLS1_2,
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id BB767100052;
+        Thu,  6 Jul 2023 11:25:21 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C615521685E;
+        Thu,  6 Jul 2023 11:25:21 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 6 Jul
- 2023 09:39:36 +0200
-From:   Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
-To:     Thomas BOURGOIN <thomas.bourgoin@foss.st.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        Linus Walleij <linus.walleij@linaro.org>
+ 2023 11:25:19 +0200
+Message-ID: <61d93738-4ffd-411d-d32c-912c14eea56d@foss.st.com>
+Date:   Thu, 6 Jul 2023 11:25:18 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 07/10] arm64: dts: st: add RIFSC as a domain controller
+ for STM32MP25x boards
+To:     Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>
 CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH 7/7] crypto: stm32 - remove flag HASH_FLAGS_DMA_READY
-Date:   Thu, 6 Jul 2023 09:37:19 +0200
-Message-ID: <20230706073719.1156288-8-thomas.bourgoin@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230706073719.1156288-1-thomas.bourgoin@foss.st.com>
-References: <20230706073719.1156288-1-thomas.bourgoin@foss.st.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.201.22.9]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE3.st.com
- (10.75.129.71)
+        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-8-gatien.chevallier@foss.st.com>
+Content-Language: en-US
+From:   Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20230705172759.1610753-8-gatien.chevallier@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-06_04,2023-07-06_01,2023-05-22_02
+ definitions=2023-07-06_06,2023-07-06_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
+Hi Gatien
 
-Remove flag HASH_FLAGS_DMA_READY as it can put the driver in a deadlock
-state.
-If the DMA automatically set the DCAL bit, the interrupt indicating the
-end of a computation can be raised before the DMA complete sequence.
+On 7/5/23 19:27, Gatien Chevallier wrote:
+> RIFSC is a firewall controller. Change its compatible so that is matches
+> the documentation and reference RIFSC as a feature-domain-controller.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+>   arch/arm64/boot/dts/st/stm32mp251.dtsi | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi b/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> index 5268a4321841..62101084cab8 100644
+> --- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> +++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> @@ -106,17 +106,20 @@ soc@0 {
+>   		ranges = <0x0 0x0 0x0 0x80000000>;
+>   
+>   		rifsc: rifsc-bus@42080000 {
+> -			compatible = "simple-bus";
+> +			compatible = "st,stm32mp25-rifsc";
 
-Signed-off-by: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
----
- drivers/crypto/stm32/stm32-hash.c | 21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+You could keep "simple-bus" compatible (in second position). In case of 
+the RIFSC is not probed, the platform will be able to boot. If you agree 
+you can use the same for ETZPC.
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index 0b5e580efbba..a50d73c18d5c 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -84,12 +84,11 @@
- #define HASH_FLAGS_INIT			BIT(0)
- #define HASH_FLAGS_OUTPUT_READY		BIT(1)
- #define HASH_FLAGS_CPU			BIT(2)
--#define HASH_FLAGS_DMA_READY		BIT(3)
--#define HASH_FLAGS_DMA_ACTIVE		BIT(4)
--#define HASH_FLAGS_HMAC_INIT		BIT(5)
--#define HASH_FLAGS_HMAC_FINAL		BIT(6)
--#define HASH_FLAGS_HMAC_KEY		BIT(7)
--#define HASH_FLAGS_SHA3_MODE		BIT(8)
-+#define HASH_FLAGS_DMA_ACTIVE		BIT(3)
-+#define HASH_FLAGS_HMAC_INIT		BIT(4)
-+#define HASH_FLAGS_HMAC_FINAL		BIT(5)
-+#define HASH_FLAGS_HMAC_KEY		BIT(6)
-+#define HASH_FLAGS_SHA3_MODE		BIT(7)
- #define HASH_FLAGS_FINAL		BIT(15)
- #define HASH_FLAGS_FINUP		BIT(16)
- #define HASH_FLAGS_ALGO_MASK		GENMASK(20, 17)
-@@ -585,8 +584,6 @@ static void stm32_hash_dma_callback(void *param)
- 	struct stm32_hash_dev *hdev = param;
- 
- 	complete(&hdev->dma_completion);
--
--	hdev->flags |= HASH_FLAGS_DMA_READY;
- }
- 
- static int stm32_hash_hmac_dma_send(struct stm32_hash_dev *hdev)
-@@ -1241,11 +1238,9 @@ static irqreturn_t stm32_hash_irq_thread(int irq, void *dev_id)
- 			hdev->flags &= ~HASH_FLAGS_OUTPUT_READY;
- 			goto finish;
- 		}
--	} else if (HASH_FLAGS_DMA_READY & hdev->flags) {
--		if (HASH_FLAGS_DMA_ACTIVE & hdev->flags) {
--			hdev->flags &= ~HASH_FLAGS_DMA_ACTIVE;
--				goto finish;
--		}
-+	} else if (HASH_FLAGS_DMA_ACTIVE & hdev->flags) {
-+		hdev->flags &= ~HASH_FLAGS_DMA_ACTIVE;
-+			goto finish;
- 	}
- 
- 	return IRQ_HANDLED;
--- 
-2.25.1
+Cheers
+Alex
+
+>   			reg = <0x42080000 0x1000>;
+>   			#address-cells = <1>;
+>   			#size-cells = <1>;
+>   			ranges;
+> +			feature-domain-controller;
+> +			#feature-domain-cells = <1>;
+>   
+>   			usart2: serial@400e0000 {
+>   				compatible = "st,stm32h7-uart";
+>   				reg = <0x400e0000 0x400>;
+>   				interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
+>   				clocks = <&ck_flexgen_08>;
+> +				feature-domains = <&rifsc 32>;
+>   				status = "disabled";
+>   			};
+>   		};
 
