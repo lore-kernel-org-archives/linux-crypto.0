@@ -2,240 +2,230 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 046DBEB64D9
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 05:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89BF6C001DD
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jul 2023 06:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229793AbjGFFFv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jul 2023 01:05:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49398 "EHLO
+        id S233603AbjGFG2f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 6 Jul 2023 02:28:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjGFFFv (ORCPT
+        with ESMTP id S233386AbjGFG2f (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jul 2023 01:05:51 -0400
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2084.outbound.protection.outlook.com [40.107.14.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7510C10EC;
-        Wed,  5 Jul 2023 22:05:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oRQdNoAwrD6Ji8ky//HOvDutr0O/TuVMUAh7qqb3oVYbADmwkT+7hkf22bTRNV71r1DEq34wQz7+x6ulHNSpZP1RWeKZ09EwALk1eOBOG+cuggQs/w/VsRJhZConJg3rP+FPIZZEt6QkfzyqPZGaCHjBsfOJjHoN2rWXyg6w609+FW2bVWmTeG6bngsXMEv/HhAaW/6EoolfqbdZBLJATNdF2kbGo+OflVX8CNh57zTXijIVQ0hF5Lp+3qCPRwFqGo0HcQ4EdOOUyfnrj0Guz5+Dy/zpZnLYkUP0w3ACII9zqjR4IEMqnJx/pGzmAq/dh6yN/23ulH6+uj05rbDWjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KbgWqFIVw2IbFVhJdks+HvYBYmf6CO0nyU1l3y2W5RM=;
- b=aNT17nVuEa5/9BQrRK6ApdftY3q/zlYqiq/e4cpQGaejUCNneZKr2Sgk2a88X0Hs3VpKbe/oXSEoWb6NxxQxvTw2QVa4QaDtbdEK7ZMzt4jOHvjo/x1IqcfpY3d56DNoQOp4cc7kqZu2HbyfmT2zZ4QKVkoPoEojOHBEWa/AgYACQbZc9cLuxEJR3jrWAH1kBW55rUEGw+sxxdLwam4tRsSYGy7KkucWN6H/waQPobStbJ6JC2zgJUt+IaM7w1xLdpUUyy7TQytXTXdcJ6zXQeKGUWMoRnbBHswJI4e9veYqOzBTenCIwTSRhXU4cuguGvGpKlmZRTNX3I8y6XgN8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KbgWqFIVw2IbFVhJdks+HvYBYmf6CO0nyU1l3y2W5RM=;
- b=kRGPczcry+OZPCixv92a/JO80dgESROr8ewMGblFe7zcB2xdgZ7sqEBR3fmA6n2znmEyl4sZozfsxInaL2sVgzLcxI3aNzgHVp1To+bJ86jWRAt3et9GjYUjnXFYclqSeLBwFvbWDFnNztTzFrbRNMOMBnOtWkdhPSzAEt5vq7E=
-Received: from PAXPR04MB9571.eurprd04.prod.outlook.com (2603:10a6:102:24e::7)
- by AS8PR04MB9512.eurprd04.prod.outlook.com (2603:10a6:20b:40f::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
- 2023 05:05:42 +0000
-Received: from PAXPR04MB9571.eurprd04.prod.outlook.com
- ([fe80::b92f:c3da:fe42:8605]) by PAXPR04MB9571.eurprd04.prod.outlook.com
- ([fe80::b92f:c3da:fe42:8605%6]) with mapi id 15.20.6544.024; Thu, 6 Jul 2023
- 05:05:42 +0000
-From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "lucas.segarra.fernandez@intel.com" 
-        <lucas.segarra.fernandez@intel.com>
-Subject: RE: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-Thread-Topic: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-Thread-Index: AQHZjYweUt32QHpmXkqlWZrZU7kmVa9oE4qAgA26dgCAAA4FAIAMcSYAgAGGbgCABlwxgIAfZkXQgAIhYoCAALxuYA==
-Date:   Thu, 6 Jul 2023 05:05:42 +0000
-Message-ID: <PAXPR04MB9571D97F2019D5171D38F6D08E2CA@PAXPR04MB9571.eurprd04.prod.outlook.com>
-References: <20230523153421.1528359-1-meenakshi.aggarwal@nxp.com>
- <20230523165503.GA864814@google.com> <ZHh0DF4meU2ze+g7@gondor.apana.org.au>
- <ZHh/zqNu7XzwJTl5@gcabiddu-mobl1.ger.corp.intel.com>
- <ZILvtASXQKLG43y9@gondor.apana.org.au>
- <ZIQ3OKYyOcwRIOLR@gcabiddu-mobl1.ger.corp.intel.com>
- <ZImNC6KUNHquVAnZ@gondor.apana.org.au>
- <PAXPR04MB957111A43069E2658BCA818F8E2EA@PAXPR04MB9571.eurprd04.prod.outlook.com>
- <ZKWtiRcyUP8OQNSa@gcabiddu-mobl1.ger.corp.intel.com>
-In-Reply-To: <ZKWtiRcyUP8OQNSa@gcabiddu-mobl1.ger.corp.intel.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB9571:EE_|AS8PR04MB9512:EE_
-x-ms-office365-filtering-correlation-id: c935c35c-6280-4a98-16d9-08db7ddea5f5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 7P/4SG4o0RThJFfBH0tU9vYpFHhthoQS4WkqrzFlRC+2d4xtfoFoXZIaI5Dkjujo/AjieTAmFydZVG169VKcuUUAd4sGENM8HFJGVUcuJdetAKsDfAQtY3GjspQ3ZAxbIQrDUppNKpZ7uVGzw/RARArOfdAXaPE4KaV59g7PjBGVgY9uGW71iwANinApSukJEqgrfv5pr1grAWE4VcBYFMGNUEf0r+REvaPSZqZm7ZMk4bd9j2PLWcDpoQyY/cn9QxM1nZobZfgsh53cQEPMrIFmFNFlm0klGr6QZecbFiXgOdV7QhJ8+KjK4/WScOs+KMOQO+jG4uJC7MBpfcHYZh24jzqURldyIYGF6aGGYAoCC/BXQNWrK7hHKpUhiKcq3/KRRIGopAWM2IwJMTaiexiAiiqCNZ4GuUpmQs4oYHZQIzHPcubCgK5Gq4MfLZtGBxlI2hoHRKDiKJAyDLk8EEibiCNVaOHfg5D0RToAn/+gVBR9apnCDh8Sg6tYoH7sxkSWyxMtYEBhWFgq0+deTkiecCkI8ajJIAsoEPj5Tr5VaJHCR8cyogXHdCJ4m9Te5+ssFc8hf/EQpBEY0FX6kcr3XCOmOL0mwrWeFXVHb1HZ4il9Nf+bpbJVgsB788GV
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9571.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(346002)(376002)(39860400002)(451199021)(76116006)(4326008)(66946007)(6916009)(38100700002)(66556008)(64756008)(66476007)(66446008)(122000001)(55016003)(186003)(86362001)(478600001)(33656002)(55236004)(966005)(71200400001)(7696005)(38070700005)(9686003)(26005)(6506007)(54906003)(53546011)(45080400002)(52536014)(44832011)(8936002)(8676002)(316002)(5660300002)(2906002)(41300700001)(83380400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?e4XdGH5c6r4PbKifKjhtPA15mt7uKeLwQbhmDfWFPzAQUFuwDxXO9lgFOpQF?=
- =?us-ascii?Q?DVdscL5+FNE+KGOgDNlCw3ggb/l41uaLI1gMSeBI4KCs/V04XbKFr5De13YD?=
- =?us-ascii?Q?X6mZfEc7mLscF8ej0ZrxEkJddsdDKaTQUhNSoJte9iNf7Jgo+Avn7EFJtk5j?=
- =?us-ascii?Q?YKb30x1SLHuIJnAnRpVhwxT4PnNEFnVngJmXI78Yn2wT+quycJy5O5fxFimc?=
- =?us-ascii?Q?xc7UJ6Moum9F9+RNIzn3BuJ4ea/9D2PscUnU41qhcLfO5+2Zo3pBQ/0+vQdm?=
- =?us-ascii?Q?KVIgNrCnfqLUDo6/eNIWn56TBr/VdXzCaHI+asWOmLCk6KZKaUdT0XF5oQIr?=
- =?us-ascii?Q?9S6Sx2X1SqfoHZy73NBH8k3UMW0GedfeL0nstZOC5yuYwwFpWowdSBm4kaox?=
- =?us-ascii?Q?Uw5IayzdJyQslEjqDzUAwDela1TZMLP7ubOxrSIrwWDsBWVZ0gJwbJ+GkSYw?=
- =?us-ascii?Q?Hyhup9paUQlQSKXbod37XB4h6BISQ1jwd6ApLpq8sa+M2F1wCsWYSDhi9CfV?=
- =?us-ascii?Q?LWe1h0qWUvLQUQnNfUCZAn4iB3Mhe2YxxmZ58AkVgYifIxS1WgUuPst1I6OK?=
- =?us-ascii?Q?QD9XBxssGCeE/BIN5R4GUf2mCyp72ZA4OnbCQ9WOJ9NiINbTqmDB/vpJCayI?=
- =?us-ascii?Q?hRrU/DNXmfKidVYAwd4BP7Z2m7U4mIn4s2AW8cdEySn73l1xMU+WqHnGUkqF?=
- =?us-ascii?Q?9LyjlYfsAQnSranEx3b5Ff354Cmdpw6B482pI4//6UKDz9e1Hkk/MObgEYPj?=
- =?us-ascii?Q?CpJT9ZaZtPyOrd9pdt/TZ9YmRoVh2t/QtiXQk7vrTPGdEu8geXxVWA/Z/a8/?=
- =?us-ascii?Q?IS1nzg9bwzJKJsFGNjUDPyyJFuS49VyPB6kELIpRPA3dF5iUpv7K9pFiQ6fR?=
- =?us-ascii?Q?WvdZemlWgNjFpwRn6oNRYnGXNxddFQCO0tYNssqMlVUm1aI55VsoKcN8O+bb?=
- =?us-ascii?Q?51XkVZshurvUO49WOemryhSNbzB1TGiFIPaiQgJKDprnphkUy6bbiIQiNSP5?=
- =?us-ascii?Q?DuEzOZjYgF3rGDRcnOBQbTWXiaQktFAmK23oB6GFJSCPzXbp5FibNL42/kiF?=
- =?us-ascii?Q?SC4kxswlS5MRAis5NJbimTUwrRKvJcGDo7O+p3raLqT33eyo5+wLsFimWkjS?=
- =?us-ascii?Q?2h6iad877oL7j1LwdRYyJ6goi5UEHDAm3t1l+nBgzabCr61IueLO45SnEpVt?=
- =?us-ascii?Q?y7wQF8oPnluYTweflJA+JM6i1A4caUg4SZq47FKWZ7k9M/8+QEPAqeoA46O8?=
- =?us-ascii?Q?XuotCKkZUmS5ZN387msxXKPpHv4vDawXG5dvrvMSd9WRpN7ys2ymhXRrupoS?=
- =?us-ascii?Q?gKTJSENfy9xD5DP9n7kJTEPDsDlms87yTfuYgwPptdO508h2IPxP4PINVZJF?=
- =?us-ascii?Q?P14GPyn7Apv4BPYiP1Z/SpcBba3Z2dLUm6TpPHN6piVp5yEJyzyZb7CNjRIe?=
- =?us-ascii?Q?a+S1LyjbS2RkrF0gS+DXGulmGHCQfD3OhCaapgLd3nGv7Do2/TC1Yw18RCbF?=
- =?us-ascii?Q?KFIUU099xNimTHRlFE3nZ4j6w58oLhOHKh4RUeLcVoAAvqFhrH0BrL8hz3h/?=
- =?us-ascii?Q?z+F+Zc+E+5LUU8mYLWfoNLn36cCiKvnyW6Hy04n504y3qRnDgU1Er8BZgJF4?=
- =?us-ascii?Q?iA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 6 Jul 2023 02:28:35 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E0881B6
+        for <linux-crypto@vger.kernel.org>; Wed,  5 Jul 2023 23:28:32 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99384a80af7so31034366b.2
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Jul 2023 23:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1688624910; x=1691216910;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pqu4vTxoeW2yTwRCEetSQZvh47NKMtjn0RrXMB1JAGg=;
+        b=IMm0i5vst50fxhAZuaHOTFSeWrHCZJmzOQXq5fOhXu+9uQCvIB9O7TT34TXrIdSe3Y
+         cnP9xeFqhrL8cIlCb42uuzkarigw/qjWBTcPQ3/VxZUa8JeYXFP/AQgK0HryW/h65huJ
+         DqaJOkv9C4Y9VEbUxH/JiwjH8iwIGllme0bQTt1rJgive4qogrJHvgYlMGy/VN4PmUOO
+         pHiwJtL+3nTeZfTEpyZLrLS4DN0XG8RwL6pGKp+Tw1PcFI0GQcD+cuqEMZGZwQu2N5va
+         ODXvyEUV63nanS3AeixIksRLBwWHN2OvMN9Mk6q264SOOa6D5p8+HUXIKEAOjNXLyjhp
+         rYpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688624910; x=1691216910;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pqu4vTxoeW2yTwRCEetSQZvh47NKMtjn0RrXMB1JAGg=;
+        b=bpKx89NvBff5/1ZZS0TX8MFta38VBsbC8grGPJdh61aP/pv1gtEYpUuKMyWtequ+Sk
+         j1l7QW3GSChpVQBjcFC0UPmijc1RYnhgXK1EI7XAQYy6NK8WoRPSlKHVO4R3FxxmKpaf
+         HqxiVsO8LRWQNTRQmqgvGaZ0NwkwB8chtyo/J192WF8lSctXIVWp0HZdB1fj1zVeDsZe
+         YqHEGKknoSorf7RtnhWuNWBi5JAzb9vudf70DBTX67Tlv2A/+5IbvpV8pjQYegcT58pA
+         hop8pKcGFAD9HiHeaWCL3pIqLbrxSiSdyOVtM4ZSfKhwSMKa7VMoQ8CddKm5WA85gEyb
+         i86g==
+X-Gm-Message-State: ABy/qLaJOvVUzqei7UOa6FsuoNVyMV9lM9JXolU7Am/NaJlolmnTo0Ng
+        wpbZn611Jiqtp48cJmBxrbSUWQ==
+X-Google-Smtp-Source: APBJJlEu2RGF4uBuUPfkX4wlSxPa3Cu2L5C0YRWwOysyPz8/vFYVscoSMwhTBIDQpkpak+dxq034Sw==
+X-Received: by 2002:a17:906:10cf:b0:991:8328:50e3 with SMTP id v15-20020a17090610cf00b00991832850e3mr696668ejv.9.1688624910680;
+        Wed, 05 Jul 2023 23:28:30 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.26])
+        by smtp.gmail.com with ESMTPSA id lf20-20020a170906ae5400b009920e9a3a73sm372590ejb.115.2023.07.05.23.28.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jul 2023 23:28:30 -0700 (PDT)
+Message-ID: <e871ad32-dfa4-067d-4f2c-207ffd42aafd@linaro.org>
+Date:   Thu, 6 Jul 2023 08:28:25 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9571.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c935c35c-6280-4a98-16d9-08db7ddea5f5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 05:05:42.3347
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rFmKFgG/Gghf42TzP1MYp/HwRBf4fWJI7Wr4ulGPtIWOyiWy87VyalrNWxztAxIFBFag142vx9BHgtYB0wA2zf7Pi0HFdGSgS24Xo8GFoGU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9512
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 02/10] dt-bindings: bus: add device tree bindings for
+ RIFSC
+Content-Language: en-US
+To:     Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, alexandre.torgue@foss.st.com,
+        vkoul@kernel.org, jic23@kernel.org, olivier.moysan@foss.st.com,
+        arnaud.pouliquen@foss.st.com, mchehab@kernel.org,
+        fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
+        ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
+        richardcochran@gmail.com
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-usb@vger.kernel.org
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thank You
+On 05/07/2023 19:27, Gatien Chevallier wrote:
+> Document RIFSC (RIF security controller). RIFSC is a firewall controller
+> composed of different kinds of hardware resources.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 
-> -----Original Message-----
-> From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Sent: Wednesday, July 5, 2023 11:21 PM
-> To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>; Eric Biggers
-> <ebiggers@kernel.org>; Horia Geanta <horia.geanta@nxp.com>; Varun Sethi
-> <V.Sethi@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Gaurav Jain
-> <gaurav.jain@nxp.com>; davem@davemloft.net; linux-crypto@vger.kernel.org;
-> linux-kernel@vger.kernel.org; Iuliana Prodan <iuliana.prodan@nxp.com>;
-> lucas.segarra.fernandez@intel.com
-> Subject: Re: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
->=20
-> On Tue, Jul 04, 2023 at 09:19:28AM +0000, Meenakshi Aggarwal wrote:
-> > When are you planning to send the patches?
-> Done today.
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fpatch=
-wo
-> rk.kernel.org%2Fproject%2Flinux-
-> crypto%2Flist%2F%3Fseries%3D762772&data=3D05%7C01%7Cmeenakshi.aggarwa
-> l%40nxp.com%7C7bf37c3fd13e41b6a45408db7d807937%7C686ea1d3bc2b4c6f
-> a92cd99c5c301635%7C0%7C0%7C638241762971432376%7CUnknown%7CTWF
-> pbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
-> Mn0%3D%7C3000%7C%7C%7C&sdata=3DHa8TNlFgKo4sten%2BQ8wIe2z%2FzvbjI
-> npuLwxHAdLVcS4%3D&reserved=3D0
->=20
-> Regards,
->=20
-> --
-> Giovanni
->=20
-> >
-> > Thanks,
-> > Meenakshi
-> >
-> > > -----Original Message-----
-> > > From: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Sent: Wednesday, June 14, 2023 3:19 PM
-> > > To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > > Cc: Eric Biggers <ebiggers@kernel.org>; Meenakshi Aggarwal
-> > > <meenakshi.aggarwal@nxp.com>; Horia Geanta <horia.geanta@nxp.com>;
-> > > Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>;
-> > > Gaurav Jain <gaurav.jain@nxp.com>; davem@davemloft.net; linux-
-> > > crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Iuliana Prodan
-> > > <iuliana.prodan@nxp.com>; lucas.segarra.fernandez@intel.com
-> > > Subject: Re: [PATCH 0/5] Remove CRYPTO_ALG_ALLOCATES_MEMORY flag
-> > >
-> > > On Sat, Jun 10, 2023 at 09:41:28AM +0100, Giovanni Cabiddu wrote:
-> > > >
-> > > > If you all agree, I can send a patch to remove
-> > > > CRYPTO_ALG_ALLOCATES_MEMORY from dm-integrity and update the
-> > > documentation in crypto.h.
-> > >
-> > > Yes please.
-> > >
-> > > Cheers,
-> > > --
-> > > Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> > > https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fgo=
-n
-> > >
-> dor.ap%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C7bf37c3fd
-> 13e
-> > >
-> 41b6a45408db7d807937%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%
-> 7C63
-> > >
-> 8241762971432376%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiL
-> CJQIjo
-> > >
-> iV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DED3
-> Qi5
-> > > P0i31gXXPgUOcpVD8YcPhaT1gir3lzZT6C0L8%3D&reserved=3D0
-> > >
-> ana.org.au%2F~herbert%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.co
-> > >
-> m%7C6af00291047c46f2325e08db6cbca189%7C686ea1d3bc2b4c6fa92cd99c5c
-> > >
-> 301635%7C0%7C0%7C638223329655306217%7CUnknown%7CTWFpbGZsb3d8e
-> > >
-> yJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7
-> > >
-> C3000%7C%7C%7C&sdata=3DNrj0YEjJrFUNWY25h0iy5sF7tUnHSDun8KhHxnhUhh0
-> > > %3D&reserved=3D0
-> > > PGP Key:
-> > > https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fgo=
-n
-> > >
-> dor.ap%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C7bf37c3fd
-> 13e
-> > >
-> 41b6a45408db7d807937%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%
-> 7C63
-> > >
-> 8241762971432376%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiL
-> CJQIjo
-> > >
-> iV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DED3
-> Qi5
-> > > P0i31gXXPgUOcpVD8YcPhaT1gir3lzZT6C0L8%3D&reserved=3D0
-> > >
-> ana.org.au%2F~herbert%2Fpubkey.txt&data=3D05%7C01%7Cmeenakshi.aggarwal
-> > > %40nxp.com%7C6af00291047c46f2325e08db6cbca189%7C686ea1d3bc2b4c
-> 6fa
-> > >
-> 92cd99c5c301635%7C0%7C0%7C638223329655306217%7CUnknown%7CTWFp
-> > >
-> bGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6
-> > >
-> Mn0%3D%7C3000%7C%7C%7C&sdata=3DlBaQiOM%2BXaax2lMroHtqbtBbjXBlkkKj
-> > > ms8mgBnou%2BU%3D&reserved=3D0
+A nit, subject: drop second/last, redundant "device tree bindings for".
+The "dt-bindings" prefix is already stating that these are bindings. 4
+words of your 6 word subject is meaningless...
+
+> ---
+>  .../bindings/bus/st,stm32-rifsc.yaml          | 101 ++++++++++++++++++
+>  1 file changed, 101 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml b/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
+> new file mode 100644
+> index 000000000000..68d585ed369c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
+
+Filename like compatible, unless you know list of compatibles will
+grow... but then add them.
+
+> @@ -0,0 +1,101 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/bus/st,stm32-rifsc.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: STM32 Resource isolation framework security controller bindings
+
+Drop bindings
+
+> +
+> +maintainers:
+> +  - Gatien Chevallier <gatien.chevallier@foss.st.com>
+> +
+> +description: |
+> +  Resource isolation framework (RIF) is a comprehensive set of hardware blocks
+> +  designed to enforce and manage isolation of STM32 hardware resources like
+> +  memory and peripherals.
+> +
+> +  The RIFSC (RIF security controller) is composed of three sets of registers,
+> +  each managing a specific set of hardware resources:
+> +    - RISC registers associated with RISUP logic (resource isolation device unit
+> +      for peripherals), assign all non-RIF aware peripherals to zero, one or
+> +      any security domains (secure, privilege, compartment).
+> +    - RIMC registers: associated with RIMU logic (resource isolation master
+> +      unit), assign all non RIF-aware bus master to one security domain by
+> +      setting secure, privileged and compartment information on the system bus.
+> +      Alternatively, the RISUP logic controlling the device port access to a
+> +      peripheral can assign target bus attributes to this peripheral master port
+> +      (supported attribute: CID).
+> +    - RISC registers associated with RISAL logic (resource isolation device unit
+> +      for address space - Lite version), assign address space subregions to one
+> +      security domains (secure, privilege, compartment).
+> +
+> +properties:
+> +  compatible:
+> +    const: st,stm32mp25-rifsc
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  "#address-cells":
+> +    const: 1
+> +
+> +  "#size-cells":
+> +    const: 1
+> +
+> +  "#feature-domain-cells":
+> +    const: 1
+> +
+> +  ranges: true
+> +
+> +  feature-domain-controller: true
+> +
+> +patternProperties:
+> +  "^.*@[0-9a-f]+$":
+> +    description: Peripherals
+> +    type: object
+> +    properties:
+> +      feature-domains:
+> +        minItems: 1
+> +        maxItems: 2
+> +        description:
+> +          The first argument must always be a phandle that references to the
+> +          firewall controller of the peripheral. The second can contain the
+> +          platform specific firewall ID of the peripheral.
+
+It does not make much sense to me to have hierarchy parent-child and via
+phandle at the same time. You express the similar relationship twice.
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - "#address-cells"
+> +  - "#size-cells"
+> +  - feature-domain-controller
+> +  - "#feature-domain-cells"
+> +  - ranges
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    // In this example, the usart2 device refers to rifsc as its domain
+> +    // controller.
+> +    // Access rights are verified before creating devices.
+> +
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +
+> +    rifsc: rifsc-bus@42080000 {
+> +        compatible = "st,stm32mp25-rifsc";
+> +        reg = <0x42080000 0x1000>;
+> +        #address-cells = <1>;
+> +        #size-cells = <1>;
+> +        ranges;
+> +        feature-domain-controller;
+> +        #feature-domain-cells = <1>;
+> +
+> +        usart2: serial@400e0000 {
+> +            compatible = "st,stm32h7-uart";
+> +            reg = <0x400e0000 0x400>;
+> +            interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
+> +            clocks = <&ck_flexgen_08>;
+> +            feature-domains = <&rifsc 32>;
+> +            status = "disabled";
+
+No status in the examples.
+
+> +        };
+> +    };
+
+Best regards,
+Krzysztof
+
