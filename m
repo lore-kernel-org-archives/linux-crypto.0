@@ -2,137 +2,250 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6988C001DD
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jul 2023 19:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5EF8C001DF
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jul 2023 20:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbjGGTi5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jul 2023 15:38:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60410 "EHLO
+        id S230163AbjGGUdW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Jul 2023 16:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232808AbjGGTgB (ORCPT
+        with ESMTP id S229571AbjGGUdV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2023 15:36:01 -0400
-Received: from sender4-of-o50.zoho.com (sender4-of-o50.zoho.com [136.143.188.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9060E269F;
-        Fri,  7 Jul 2023 12:32:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1688758303; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=EwVRDfNxcmQnOtFGleOVrjIkgKRwh7y52cIfKN0GFaKN0OBxQFBpkW0gztPv2rTPKlsHRlXNwqX0V7X/g+5tbnDalixwm2P/depB+msJkqw/5QsMvebiIudbxXZcK1IbibAsD9T0IWr/xFfu3sBT8tHUKltieu6YOTNc2Jmrb0Y=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1688758303; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=fHoswupnpLAD4heKyuTd/2GZhFPZ+XaZr9DP5UrvceM=; 
-        b=DqSq9DCKsV8NNFqKvMsP7CH363mjfejdsBrrzQySj2V3OvRaWyj+oqjlPq7Epav31II3NSHM/7frG+F6Y1XfRgBLU0KRRwB9dW4hauAHB+OjLS5TlBRetCewMpONDWbHiwkl967kv0nYSIzxfV2EGWvZw+ADN9A1drGyDR7Yv1E=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=apertussolutions.com;
-        spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
-        dmarc=pass header.from=<dpsmith@apertussolutions.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1688758303;
-        s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
-        h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:From:From:Subject:Subject:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-        bh=fHoswupnpLAD4heKyuTd/2GZhFPZ+XaZr9DP5UrvceM=;
-        b=HoM7R2M40mW1tdXIy+g2mlEdzq4NQsxSZwuCWYH0mXFXkpb8z1J7gKkVr6gGnG0W
-        ThRDcJKAEMQPpH/O0wwTDLv9oL/6evwho0H4lNX1iHqyRIe2OeOj97Jr0LvSCMlnL99
-        foaIXq91NT2RQ/qveQIN7YXB140UETdVegWIRZHg=
-Received: from [10.10.1.138] (static-72-81-132-2.bltmmd.fios.verizon.net [72.81.132.2]) by mx.zohomail.com
-        with SMTPS id 1688758300880456.56534128910005; Fri, 7 Jul 2023 12:31:40 -0700 (PDT)
-Message-ID: <df033b7b-54ce-504a-47d6-1b92ea1038f7@apertussolutions.com>
-Date:   Fri, 7 Jul 2023 15:31:38 -0400
+        Fri, 7 Jul 2023 16:33:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67B1B1986;
+        Fri,  7 Jul 2023 13:33:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 05BCF61A71;
+        Fri,  7 Jul 2023 20:33:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B4ABC433C8;
+        Fri,  7 Jul 2023 20:33:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1688761999;
+        bh=6QgMyrqXqeI6SEHa107HdWgEq35vmLXVAeALwcT+lDs=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Gx9KJf9fL/mmok1L7S1JEw98F7rQhqcE0z1w8BHJD17srLItsZuymDl+Vh6LuOMqc
+         4alUEBZ5opvgHkrhgxf7bnhwEXvTA+lJ+2wjTvLnBj5RIOrUBEqvzoLMwkvr5kKOo5
+         yISOGrruanfS4vCw4yBo4KjJkpCqE5P53NTnagcHPGIOblr6h6cNsX8ys6OcsyQ0H4
+         qrXgMrqCQhWJISUHikJ+H6A9Rt5IkKe3q5S7a3IgZXRpoKmUEEfF3davdWD0SEJOLF
+         x6HLSMnKxFc6bNn9fzW5yjsdHLXCNjC5gVSA2oPohD58IIKPy37fpI2og6S7rvH4ES
+         9S5gMKOibrioQ==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2b703a0453fso37141861fa.3;
+        Fri, 07 Jul 2023 13:33:19 -0700 (PDT)
+X-Gm-Message-State: ABy/qLZo43p2l+JUdXdAHHLr7x5By9lULZ0gvScQBahF8NzkZ7iGjFNj
+        nBPFbytml/9kUDxgrPNEkwvjdPZ6fJwFGxB1DQ==
+X-Google-Smtp-Source: APBJJlG4YuPBi7t5aJDihdeDntOW9LxmDKsR0D/L3YobFTVh86nYL2PgWf1QDLA9jOV+N7/XaSZs5aykFPftRmtwQjM=
+X-Received: by 2002:a2e:8706:0:b0:2b2:104d:8f89 with SMTP id
+ m6-20020a2e8706000000b002b2104d8f89mr5474388lji.0.1688761997303; Fri, 07 Jul
+ 2023 13:33:17 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US
-To:     Matthew Garrett <mjg59@srcf.ucam.org>
-Cc:     Ross Philipson <ross.philipson@oracle.com>,
-        linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        ardb@kernel.org, James.Bottomley@hansenpartnership.com,
-        luto@amacapital.net, nivedita@alum.mit.edu,
-        kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
-References: <20230504145023.835096-1-ross.philipson@oracle.com>
- <20230504145023.835096-5-ross.philipson@oracle.com>
- <20230512105554.GB14461@srcf.ucam.org>
- <30d5891d-4747-8d67-2667-ff07628740bd@apertussolutions.com>
- <20230515212206.GA2162@srcf.ucam.org>
- <df9d1260-41dd-034b-9dc6-14173c6c0d25@apertussolutions.com>
- <20230516014310.GA5403@srcf.ucam.org>
- <eda6da3a-00fe-21c5-5a3d-3e06d21179f4@apertussolutions.com>
- <20230616201513.GA30963@srcf.ucam.org>
-From:   "Daniel P. Smith" <dpsmith@apertussolutions.com>
-Subject: Re: [PATCH v6 04/14] x86: Secure Launch Resource Table header file
-In-Reply-To: <20230616201513.GA30963@srcf.ucam.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-5-gatien.chevallier@foss.st.com> <875y6vzuga.fsf@epam.com>
+ <20230707152724.GA329615-robh@kernel.org> <87sf9zya79.fsf@epam.com>
+In-Reply-To: <87sf9zya79.fsf@epam.com>
+From:   Rob Herring <robh@kernel.org>
+Date:   Fri, 7 Jul 2023 14:33:04 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJkkT4SZcHj-RLPpDpX+t3Oe6RHyjeBNh4arWbMx-J0Og@mail.gmail.com>
+Message-ID: <CAL_JsqJkkT4SZcHj-RLPpDpX+t3Oe6RHyjeBNh4arWbMx-J0Og@mail.gmail.com>
+Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
+ description in binding files
+To:     Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>,
+        Peng Fan <peng.fan@nxp.com>
+Cc:     Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "conor+dt@kernel.org" <conor+dt@kernel.org>,
+        "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "jic23@kernel.org" <jic23@kernel.org>,
+        "olivier.moysan@foss.st.com" <olivier.moysan@foss.st.com>,
+        "arnaud.pouliquen@foss.st.com" <arnaud.pouliquen@foss.st.com>,
+        "mchehab@kernel.org" <mchehab@kernel.org>,
+        "fabrice.gasnier@foss.st.com" <fabrice.gasnier@foss.st.com>,
+        "andi.shyti@kernel.org" <andi.shyti@kernel.org>,
+        "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "hugues.fruchet@foss.st.com" <hugues.fruchet@foss.st.com>,
+        "lee@kernel.org" <lee@kernel.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "arnd@kernel.org" <arnd@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com" 
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-i2c@vger.kernel.org" <linux-i2c@vger.kernel.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-phy@lists.infradead.org" <linux-phy@lists.infradead.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "linux-spi@vger.kernel.org" <linux-spi@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/16/23 16:15, Matthew Garrett wrote:
-> On Fri, Jun 16, 2023 at 04:01:09PM -0400, Daniel P. Smith wrote:
->> On 5/15/23 21:43, Matthew Garrett wrote:
->>> On Mon, May 15, 2023 at 08:41:00PM -0400, Daniel P. Smith wrote:
->>>> On 5/15/23 17:22, Matthew Garrett wrote:
->>>>> What if I don't use grub, but use something that behaves equivalently?
->>>>> Which value should be used here?
->>>>
->>>> Generally we would request that the bootloader submit a request to register
->>>> for a value to be reserved in the spec. That aside, the intent here is to
->>>> allow for the possibility for the DLE handler to be independent from the
->>>> bootloader, but this does not have to be this way. If a non-open entity
->>>> decides to produce their own implementation, they can freely use a
->>>> unallocated value at their own risk that it could be allocated to another
->>>> bootloader in the future. Though in this scenario it likely would not matter
->>>> as the non-open DLE handler would only be present when the non-open
->>>> bootloader was present.
->>>
->>> Is the expectation that the DLE will always be shipped with the
->>> bootloader? I think I'm not entirely clear on what's consuming this and
->>> why.
->>>
->>
->> No, in fact, an early idea proposed by a pair of us in the TrenchBoot
->> community was to have it live either as a Runtime Service that was loaded by
->> a UEFI app or in the coreboot UEFI payload.
-> 
-> Ok, then I think I'm still confused. If I want to write a new bootloader
-> but make use of the existing DLE, what contract am I establishing and
-> what value should I be putting in here?
+On Fri, Jul 7, 2023 at 10:10=E2=80=AFAM Oleksii Moisieiev
+<Oleksii_Moisieiev@epam.com> wrote:
+>
+>
+> Hi Rob,
+>
+> Rob Herring <robh@kernel.org> writes:
+>
+> > On Fri, Jul 07, 2023 at 02:07:18PM +0000, Oleksii Moisieiev wrote:
+> >>
+> >> Gatien Chevallier <gatien.chevallier@foss.st.com> writes:
+> >>
+> >> > feature-domains is an optional property that allows a peripheral to
+> >> > refer to one or more feature domain controller(s).
+> >> >
+> >> > Description of this property is added to all peripheral binding file=
+s of
+> >> > the peripheral under the STM32 firewall controllers. It allows an ac=
+curate
+> >> > representation of the hardware, where various peripherals are connec=
+ted
+> >> > to this firewall bus. The firewall can then check the peripheral acc=
+esses
+> >> > before allowing it to probe.
+> >> >
+> >> > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> >> > ---
+> >> >
+> >> > Disclaimer: Some error with dtbs_check will be observed as I've
+> >> > considered the property to be generic, as Rob asked
+> >> >
+> >> >  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++=
+++
+> >> >  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++=
+++
+> >> >  .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++=
+++
+> >> >  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 ++=
++++
+> >> >  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++=
+++
+> >> >  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++=
+++
+> >> >  .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++=
+++
+> >> >  Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++=
+++
+> >> >  24 files changed, 97 insertions(+)
+> >> >
+> >> > diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.=
+yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> >> > index b767ec72a999..daf8dcaef627 100644
+> >> > --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> >> > +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> >> > @@ -50,6 +50,10 @@ properties:
+> >> >    power-domains:
+> >> >      maxItems: 1
+> >> >
+> >> > +  feature-domains:
+> >> > +    minItems: 1
+> >> > +    maxItems: 3
+> >> > +
+> >>
+> >> I beliewe feature-domains is generic binding. This means that maxItems
+> >> can be implementation dependend. I would rather drop maxItems so the
+> >> following format will be possible:
+> >>
+> >>           feature-domains =3D <&etzpc 1>, <&etzpc 2>, <&some_other_dom=
+ain 1 2 3 4>
+> >>           feature-domain-names =3D "firewall 1", "firewall 2", "other_=
+domain"
+> >
+> > The above already allows this (not -names, but the number of entries).
+> >>
+> >> Also I beliewe driver will handle feature-domain-names property so it
+> >> will parse feature-domains only related to the firewall.
+> >
+> > Now I'm curious. What's an example that's not a firewall?
+> >
+> > (Note I'm still not happy with the naming of 'feature' as anything is a
+> > feature, but that's the least of the issues really.)
+> >
+>
+> The alternative usages of feature-domains was originally proposed by me
+> here:
+> https://lore.kernel.org/lkml/c869d2751125181a55bc8a88c96e3a892b42f37a.166=
+8070216.git.oleksii_moisieiev@epam.com/
+>
+> Also I remember Peng Fan also was interested in those bindings.
 
-Apologies on the delayed response, vacation and what not.
+It helps to Cc people when you talk about them.
 
-I believe I know where the confusion is coming from, let me see if I can 
-explain better by why that field came about. The motivation for the SLRT 
-came out of our agreement to use a callback mechanism to support 
-entering efi-stub and then going back to a dynamic launch aware hook to 
-complete the initiation of the dynamic launch. The SLRT was devised as a 
-platform and kernel agnostic means to handle the launch. As such, there 
-was a desire to use that interface, and the underlying DLE code, whether 
-GRUB was launching the kernel via the UEFI interface or the traditional 
-interface. Skipping the details, but it boils down to the fact that in 
-the non-UEFI case, functionality from core GRUB was needed. As a result, 
-to provide maximum flexibility for other bootloaders, and to make it 
-easier on us, we add the ability to pass a context object across the 
-interface. Thus allowing GRUB's DLE handler to have a single entry that 
-could be called externally by efi-stub or directly from GRUB proper.
+If the parties interested in this want to see progress on this, you
+all must work together and show this is a solution for multiple
+platforms.
 
-IOW, the bootloader context is a means to provide a bootloader with them 
-means to implement a private interface between the bootloader proper and 
-a DLE handler that it installed into memory should its implementation 
-require it.
+> I think the use-case when one node is protected by firewall and also is
+> controlled by scmi feature-domain-controller (As was proposed in my
+> patch series) may take place.
 
-There is an underlying question within your question, and that is of 
-reuse. In this case, we wrote GRUB's DLE handler was written 
-specifically to be used by GRUB. It was written to provide a stable and 
-demonstrable implementation of the SL interface. In the future it may 
-get refactored or a common standalone implementation, e.g., the 
-previously mentioned UEFI runtime service, may arise that would be 
-reusable by multiple bootloaders.
+But isn't the SCMI device protection interface the same thing? Some
+interface to say "can I access this device?" and/or control access to
+it.
 
-I hope this helped explain the purpose and use of this area of the 
-table. Please let me know if it did not.
+The other possible use I'm aware of is system partitioning. OpenAMP or
+similar where an SoC is partitioned into multiple OS instances and
+peripherals are assigned to different partitions.
 
-V/r,
-DPS
+> As for the naming maybe you have some thoughts about better name?
+
+If I did, I would have. Something with 'access' in it is as far as I've got=
+ten.
+
+Rob
