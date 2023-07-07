@@ -2,186 +2,390 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1ED1C001E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jul 2023 11:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C64CAEB64D9
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jul 2023 11:52:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231594AbjGGLYv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jul 2023 07:24:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        id S230040AbjGGLw5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 7 Jul 2023 07:52:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjGGLYu (ORCPT
+        with ESMTP id S232159AbjGGLwy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2023 07:24:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80D91FF7;
-        Fri,  7 Jul 2023 04:24:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2BCE761947;
-        Fri,  7 Jul 2023 11:24:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5956EC433C7;
-        Fri,  7 Jul 2023 11:24:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1688729088;
-        bh=LOgGo2S8J0W/3urW+Ti0fTdtCUZF8vgQbegkxehA2Nw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=V6pm8aS+Hqo30H+UfcDWPK9FUel6+CEaeLnbsqjg5FNFn7kS9vpsV/yUffNtNtN4r
-         eYj8wPa9jFaESU9qYfLPXkEq1P+y26NKM033eo6Tum/YGx4QnFqAodrRTvrUgwxjd+
-         Hb0ygjCLtz/yNG4DLd9KU6K45+rum5O927EybD2I=
-Date:   Fri, 7 Jul 2023 11:37:39 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc:     Oleksii_Moisieiev@epam.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
-        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
-        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
-        andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
-        lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
-        arnd@kernel.org, richardcochran@gmail.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org
-Subject: Re: [PATCH 05/10] firewall: introduce stm32_firewall framework
-Message-ID: <2023070748-false-enroll-e5dc@gregkh>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
+        Fri, 7 Jul 2023 07:52:54 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482B62106
+        for <linux-crypto@vger.kernel.org>; Fri,  7 Jul 2023 04:52:51 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4fb9fd28025so2691605e87.2
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Jul 2023 04:52:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1688730769; x=1691322769;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Y+w5MWn1C4WePLmVKNCgDBxYp/cgybF0xRRwrd/3RQ=;
+        b=OuMo2BMxADQbrsKT0W8wGl73KWgm8hjySdTfGMs8oYzmrITQ+lupJ2k3/OySL706m8
+         f5RGlVwK/2rCu6q7w36wY/BKMCXvKLtp1rrT95c9a23/ZmIuBBU328exBDzFqd1btFoO
+         bLiCr4okVXEQwd7oYKtFiHvDKhwc+uhEEMINaOn0RbbbKztOhed6gub/VO+IB/EU6ruL
+         KWMvFvLphPW3G1fVkDQEjP2DhPIVycY+D1Jg2B4jAzxdWfVAfHYgTFhSMETI1JtiG8xl
+         rVNhZiapjjVbCG/dmoS/5CpX8s73ZM3DzzefTqL/63HxIcPNPFtUIyBuKAkWlGSY48xs
+         3ECA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688730769; x=1691322769;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6Y+w5MWn1C4WePLmVKNCgDBxYp/cgybF0xRRwrd/3RQ=;
+        b=JItD/9OMid+lNiou8RhYI0lza7TcgqUV2sH24t8khyXfkIBbeC/QaYlZ+9T1364N7c
+         xVFIYB8a+WCUHUzGF3Lkl+f6VhkOtQ0X+R/SHP7ADzPUKa8k+6aBFXzn1RKsCenE1dIR
+         uVFNfTUwLTMyMPp8jjsJIiqfrGhGnBw2FR72lcIsktU5o/wMxfCYUOKHef7GNLvHKkbj
+         4PYEgCEOiMYwED4fwd+PJGFzu7bjE6epkzP4uQ40VAzFs4dUWckrWOmFXhYqn008xNmy
+         ERwmxJ0VJ4G1OMwYeegJcgMjxUKS0F5OJxetB2fov1tCzsN2qvPH0zVDHezu55IEOW12
+         96jQ==
+X-Gm-Message-State: ABy/qLYrciGIAgdHzkzlG+ze0KHFYCYIcMVj5TlSSgOPooDoVmE4cmXv
+        f+Q6hpFWRxQOLoMF53f8k4OB/9l8ikGOx1djoME=
+X-Google-Smtp-Source: APBJJlGOl2VA+2ZazmcSGkNBJZj6EcraqSmx1XdKxrhA5LS4C165elUeY/Wqemgx4Z8WpL2bFc317A==
+X-Received: by 2002:a05:6512:3297:b0:4fb:c740:326 with SMTP id p23-20020a056512329700b004fbc7400326mr3399631lfe.55.1688730769012;
+        Fri, 07 Jul 2023 04:52:49 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id 23-20020a05600c025700b003fbc9371193sm2243284wmj.13.2023.07.07.04.52.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jul 2023 04:52:48 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, heiko@sntech.de, herbert@gondor.apana.org.au
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        mike.rudenko@gmail.com, Jason@zx2c4.com,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH RFC/RFT] crypto: rk3288: enable support for TRNG
+Date:   Fri,  7 Jul 2023 11:52:42 +0000
+Message-Id: <20230707115242.3411259-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 05, 2023 at 07:27:54PM +0200, Gatien Chevallier wrote:
-> Introduce a firewall framework that offers to firewall consumers different
-> firewall services such as the ability to check their access rights against
-> their firewall controller(s).
-> 
-> The firewall framework offers a generic API that is defined in firewall
-> controllers drivers to best fit the specificity of each firewall.
+The rockchip IP has a TRNG which could be used as a hwrng.
+Since TRNG is only failling rngtests on rk3328 and does not work on
+rk3288, the TRNG is enabled only on rk3399 via a variant.
+But this is not a surprise since when vendor tried to add support for TRNG upstream,
+rk3288 was not handled, and rk3328 was added "disabled", so I conclude
+this is a known problem.
+Anyway the quality of rk3399 TRNG is low, so a dedicated kconfig option
+is done to not enabled it by default.
 
-But you aren't defining a "generic" api here, you are defining a
-specific one for your specific hardware.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+Hello
 
-Or am I missing something?
+All rk3288 compatible crypto IP have a TRNG and supporting it was awaited for
+some time (https://bugzilla.kernel.org/show_bug.cgi?id=216502)
 
-> 
-> There are various types of firewalls:
-> -Peripheral firewalls that filter accesses to peripherals
-> -Memory firewalls that filter accesses to memories or memory regions
-> -Resource firewalls that filter accesses to internal resources such as
-> reset and clock controllers
-> 
-> A firewall controller must be probed at arch_initcall level and register
-> to the framework so that consumers can use their services.
+I has some problem with this one, it was the first time I hit so many 100% failure on rngtest.
 
-Why must it happen at arch_initcall?  So it can never be a module?  That
-feels wrong.
+I finally bisected a RNG_SAMPLE value (1200) which lead to "only" 50-70% failure.
+The calcul of fail rate is done with (FIPS 140-2 successes/FIPS 140-2 failures) of rngtest.
+Since it is the first time I hit that case, does setting rng_quality to 300 is
+what to do (using the worst succes rate of 30%) ?
 
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
->  MAINTAINERS                               |   5 +
->  arch/arm64/Kconfig.platforms              |   1 +
->  drivers/bus/Kconfig                       |  10 +
->  drivers/bus/Makefile                      |   1 +
->  drivers/bus/stm32_firewall.c              | 252 ++++++++++++++++++++++
->  drivers/bus/stm32_firewall.h              |  83 +++++++
->  include/linux/bus/stm32_firewall_device.h | 134 ++++++++++++
->  7 files changed, 486 insertions(+)
->  create mode 100644 drivers/bus/stm32_firewall.c
->  create mode 100644 drivers/bus/stm32_firewall.h
->  create mode 100644 include/linux/bus/stm32_firewall_device.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 41385f01fa98..fabf95ba9b86 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20123,6 +20123,11 @@ T:	git git://linuxtv.org/media_tree.git
->  F:	Documentation/devicetree/bindings/media/i2c/st,st-mipid02.yaml
->  F:	drivers/media/i2c/st-mipid02.c
->  
-> +ST STM32 FIREWALL
-> +M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
-> +S:	Maintained
-> +F:	drivers/bus/stm32_firewall.c
-> +
->  ST STM32 I2C/SMBUS DRIVER
->  M:	Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>
->  M:	Alain Volmat <alain.volmat@foss.st.com>
-> diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
-> index 6069120199bb..5a46e90f1e4e 100644
-> --- a/arch/arm64/Kconfig.platforms
-> +++ b/arch/arm64/Kconfig.platforms
-> @@ -293,6 +293,7 @@ config ARCH_STM32
->  	select ARM_SMC_MBOX
->  	select ARM_SCMI_PROTOCOL
->  	select COMMON_CLK_SCMI
-> +	select STM32_FIREWALL
->  	help
->  	  This enables support for ARMv8 based STMicroelectronics
->  	  STM32 family, including:
-> diff --git a/drivers/bus/Kconfig b/drivers/bus/Kconfig
-> index fcfa280df98a..4d54a7ea52b2 100644
-> --- a/drivers/bus/Kconfig
-> +++ b/drivers/bus/Kconfig
-> @@ -163,6 +163,16 @@ config QCOM_SSC_BLOCK_BUS
->  	  i2c/spi/uart controllers, a hexagon core, and a clock controller
->  	  which provides clocks for the above.
->  
-> +config STM32_FIREWALL
-> +	bool "STM32 Firewall framework"
-> +	depends on ARCH_STM32
+But I am really puzzled why vendor default is to use RNG_SAMPLE=100 which is total failure (according to rngtest).
+Unfortunatly all my try to have more answer from them seems to have been forwarded to /dev/null.
 
-Why this dependency?
+Thanks
+Regards
+ drivers/crypto/Kconfig                        |  8 ++
+ drivers/crypto/rockchip/Makefile              |  1 +
+ drivers/crypto/rockchip/rk3288_crypto.c       | 18 +++-
+ drivers/crypto/rockchip/rk3288_crypto.h       | 18 ++++
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c |  2 +
+ .../crypto/rockchip/rk3288_crypto_skcipher.c  |  2 +
+ drivers/crypto/rockchip/rk3288_crypto_trng.c  | 92 +++++++++++++++++++
+ 7 files changed, 140 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/rockchip/rk3288_crypto_trng.c
 
-> +	default MACH_STM32MP157 || MACH_STM32MP13 || MACH_STM32MP25
-> +	help
-> +	  Say y to enable firewall framework and its services. Firewall
-> +	  controllers will be able to register to the framework. Firewall
-> +	  controllers must be initialized and register to the firewall framework
-> +	  at arch_initcall level.
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 44e44b8d9ce6..7226d441686c 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -650,6 +650,14 @@ config CRYPTO_DEV_ROCKCHIP
+ 	  This driver interfaces with the hardware crypto accelerator.
+ 	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
+ 
++config CRYPTO_DEV_ROCKCHIP_TRNG
++	bool "Support for Rockchip TRNG"
++	depends on CRYPTO_DEV_ROCKCHIP
++	select HW_RANDOM
++	help
++	  Select this option if you want to provide kernel-side support for
++	  the True Random Number Generator found in the Crypto IP.
++
+ config CRYPTO_DEV_ROCKCHIP_DEBUG
+ 	bool "Enable Rockchip crypto stats"
+ 	depends on CRYPTO_DEV_ROCKCHIP
+diff --git a/drivers/crypto/rockchip/Makefile b/drivers/crypto/rockchip/Makefile
+index 785277aca71e..11910f0e6a62 100644
+--- a/drivers/crypto/rockchip/Makefile
++++ b/drivers/crypto/rockchip/Makefile
+@@ -3,3 +3,4 @@ obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) += rk_crypto.o
+ rk_crypto-objs := rk3288_crypto.o \
+ 		  rk3288_crypto_skcipher.o \
+ 		  rk3288_crypto_ahash.o
++rk_crypto-$(CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG) += rk3288_crypto_trng.o
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 9f6ba770a90a..880e4db812a2 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -40,15 +40,18 @@ static const struct rk_variant rk3288_variant = {
+ 	.num_clks = 4,
+ 	.rkclks = {
+ 		{ "sclk", 150000000},
+-	}
++	},
++	.trng = false,
+ };
+ 
+ static const struct rk_variant rk3328_variant = {
+ 	.num_clks = 3,
++	.trng = false,
+ };
+ 
+ static const struct rk_variant rk3399_variant = {
+ 	.num_clks = 3,
++	.trng = true,
+ };
+ 
+ static int rk_crypto_get_clks(struct rk_crypto_info *dev)
+@@ -195,6 +198,10 @@ static int rk_crypto_debugfs_show(struct seq_file *seq, void *v)
+ 		seq_printf(seq, "%s %s requests: %lu\n",
+ 			   dev_driver_string(dd->dev), dev_name(dd->dev),
+ 			   dd->nreq);
++#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG
++		seq_printf(seq, "HWRNG: %lu %lu\n",
++			   dd->hwrng_stat_req, dd->hwrng_stat_bytes);
++#endif
+ 	}
+ 	spin_unlock(&rocklist.lock);
+ 
+@@ -381,6 +388,10 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 			dev_err(dev, "Fail to register crypto algorithms");
+ 			goto err_register_alg;
+ 		}
++#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG
++		if (crypto_info->variant->trng)
++			rk3288_hwrng_register(crypto_info);
++#endif
+ 
+ 		register_debugfs(crypto_info);
+ 	}
+@@ -411,6 +422,11 @@ static int rk_crypto_remove(struct platform_device *pdev)
+ #ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_DEBUG
+ 		debugfs_remove_recursive(rocklist.dbgfs_dir);
+ #endif
++#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG
++		if (crypto_tmp->variant->trng)
++			rk3288_hwrng_unregister(crypto_tmp);
++#endif
++
+ 		rk_crypto_unregister();
+ 	}
+ 	rk_crypto_pm_exit(crypto_tmp);
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+index b2695258cade..016c3b72c19c 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.h
++++ b/drivers/crypto/rockchip/rk3288_crypto.h
+@@ -9,6 +9,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/debugfs.h>
+ #include <linux/delay.h>
++#include <linux/hw_random.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/scatterlist.h>
+ #include <crypto/engine.h>
+@@ -183,6 +184,16 @@
+ #define RK_CRYPTO_HASH_DOUT_6		0x01a4
+ #define RK_CRYPTO_HASH_DOUT_7		0x01a8
+ 
++#define RK_CRYPTO_TRNG_CTRL		0x0200
++#define RK_CRYPTO_OSC_ENABLE		BIT(16)
++#define RK_CRYPTO_TRNG_DOUT_0		0x0204
++/* sample < 1000 lead to 100% failure on rngtest,
++ * using more than 1200 does not increase success.
++ */
++#define RK_CRYPTO_RNG_SAMPLE		1200
++
++#define RK_CRYPTO_MAX_TRNG_BYTE		32
++
+ #define CRYPTO_READ(dev, offset)		  \
+ 		readl_relaxed(((dev)->reg + (offset)))
+ #define CRYPTO_WRITE(dev, offset, val)	  \
+@@ -212,6 +223,7 @@ struct rk_clks {
+ struct rk_variant {
+ 	int num_clks;
+ 	struct rk_clks rkclks[RK_MAX_CLKS];
++	bool trng;
+ };
+ 
+ struct rk_crypto_info {
+@@ -222,11 +234,15 @@ struct rk_crypto_info {
+ 	struct reset_control		*rst;
+ 	void __iomem			*reg;
+ 	int				irq;
++	struct mutex			lock;
++	struct hwrng			hwrng;
+ 	const struct rk_variant *variant;
+ 	unsigned long nreq;
+ 	struct crypto_engine *engine;
+ 	struct completion complete;
+ 	int status;
++	unsigned long hwrng_stat_req;
++	unsigned long hwrng_stat_bytes;
+ };
+ 
+ /* the private variable of hash */
+@@ -288,3 +304,5 @@ extern struct rk_crypto_tmp rk_ahash_md5;
+ 
+ struct rk_crypto_info *get_rk_crypto(void);
+ #endif
++int rk3288_hwrng_register(struct rk_crypto_info *rk);
++void rk3288_hwrng_unregister(struct rk_crypto_info *rk);
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+index a78ff3dcd0b1..67ed3a54bc7b 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+@@ -287,6 +287,7 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
+ 		goto theend;
+ 	}
+ 
++	mutex_lock(&rkc->lock);
+ 	rk_ahash_reg_init(areq, rkc);
+ 
+ 	while (sg) {
+@@ -321,6 +322,7 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
+ 	}
+ 
+ theend:
++	mutex_unlock(&rkc->lock);
+ 	pm_runtime_put_autosuspend(rkc->dev);
+ 
+ 	local_bh_disable();
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+index 59069457582b..304c2c44fea0 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+@@ -357,6 +357,7 @@ static int rk_cipher_run(struct crypto_engine *engine, void *async_req)
+ 			}
+ 		}
+ 		err = 0;
++		mutex_unlock(&rkc->lock);
+ 		rk_cipher_hw_init(rkc, areq);
+ 		if (ivsize) {
+ 			if (ivsize == DES_BLOCK_SIZE)
+@@ -372,6 +373,7 @@ static int rk_cipher_run(struct crypto_engine *engine, void *async_req)
+ 		crypto_dma_start(rkc, sgs, sgd, todo / 4);
+ 		wait_for_completion_interruptible_timeout(&rkc->complete,
+ 							  msecs_to_jiffies(2000));
++		mutex_unlock(&rkc->lock);
+ 		if (!rkc->status) {
+ 			dev_err(rkc->dev, "DMA timeout\n");
+ 			err = -EFAULT;
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_trng.c b/drivers/crypto/rockchip/rk3288_crypto_trng.c
+new file mode 100644
+index 000000000000..7a0e1300d0e8
+--- /dev/null
++++ b/drivers/crypto/rockchip/rk3288_crypto_trng.c
+@@ -0,0 +1,92 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * rk3288_crypto_trng.c - hardware cryptographic offloader for rockchip
++ *
++ * Copyright (C) 2022-2023 Corentin Labbe <clabbe@baylibre.com>
++ *
++ * This file handle the TRNG
++ */
++#include "rk3288_crypto.h"
++#include <linux/hw_random.h>
++#include <linux/iopoll.h>
++#include <linux/pm_runtime.h>
++
++static int rk3288_trng_read(struct hwrng *hwrng, void *data, size_t max, bool wait)
++{
++	struct rk_crypto_info *rk;
++	unsigned int todo;
++	int err = 0;
++	int i;
++	u32 v;
++
++	rk = container_of(hwrng, struct rk_crypto_info, hwrng);
++
++	todo = min_t(size_t, max, RK_CRYPTO_MAX_TRNG_BYTE);
++
++#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_DEBUG
++	rk->hwrng_stat_req++;
++	rk->hwrng_stat_bytes += todo;
++#endif
++
++	err = pm_runtime_resume_and_get(rk->dev);
++	if (err < 0)
++		goto err_pm;
++
++	mutex_lock(&rk->lock);
++
++#define HIWORD_UPDATE(val, mask, shift) \
++			((val) << (shift) | (mask) << ((shift) + 16))
++	v = RK_CRYPTO_OSC_ENABLE | RK_CRYPTO_RNG_SAMPLE;
++	CRYPTO_WRITE(rk, RK_CRYPTO_TRNG_CTRL, v);
++
++	v = HIWORD_UPDATE(RK_CRYPTO_TRNG_START, RK_CRYPTO_TRNG_START, 0);
++	CRYPTO_WRITE(rk, RK_CRYPTO_CTRL, v);
++	wmb();
++
++	err = readl_poll_timeout(rk->reg + RK_CRYPTO_CTRL, v,
++				 !(v & RK_CRYPTO_TRNG_START),
++				 100, 2000);
++	if (err) {
++		dev_err(rk->dev, "HWRNG read timeout");
++		goto readfail;
++	}
++
++	for (i = 0; i < todo / 4; i++) {
++		v = readl(rk->reg + RK_CRYPTO_TRNG_DOUT_0 + i * 4);
++		put_unaligned_le32(v, data + i * 4);
++	}
++
++	err = todo;
++
++	v = HIWORD_UPDATE(0, RK_CRYPTO_TRNG_START, 0);
++	CRYPTO_WRITE(rk, RK_CRYPTO_CTRL, v);
++
++readfail:
++	mutex_unlock(&rk->lock);
++
++	pm_runtime_put(rk->dev);
++
++err_pm:
++	return err;
++}
++
++int rk3288_hwrng_register(struct rk_crypto_info *rk)
++{
++	int ret;
++
++	dev_info(rk->dev, "Register TRNG with sample=%d\n", RK_CRYPTO_RNG_SAMPLE);
++
++	rk->hwrng.name = "Rockchip rk3288 TRNG";
++	rk->hwrng.read = rk3288_trng_read;
++	rk->hwrng.quality = 300;
++
++	ret = hwrng_register(&rk->hwrng);
++	if (ret)
++		dev_err(rk->dev, "Fail to register the TRNG\n");
++	return ret;
++}
++
++void rk3288_hwrng_unregister(struct rk_crypto_info *rk)
++{
++	hwrng_unregister(&rk->hwrng);
++}
+-- 
+2.39.3
 
-This needs better wording saying it is only for stm32 devices.
-
-> +
->  config SUN50I_DE2_BUS
->  	bool "Allwinner A64 DE2 Bus Driver"
->  	  default ARM64
-> diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
-> index d90eed189a65..fc0511450ec2 100644
-> --- a/drivers/bus/Makefile
-> +++ b/drivers/bus/Makefile
-> @@ -26,6 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
->  obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
->  obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
->  obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
-> +obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o
->  obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
->  obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
->  obj-$(CONFIG_OF)		+= simple-pm-bus.o
-> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
-> new file mode 100644
-> index 000000000000..510db5bc6eaf
-> --- /dev/null
-> +++ b/drivers/bus/stm32_firewall.c
-> @@ -0,0 +1,252 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-
-Are you _SURE_ this needs to be "or later"?  Sorry, I have to ask.
-
-thanks,
-
-greg k-h
