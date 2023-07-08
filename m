@@ -2,103 +2,92 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3782C001DE
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Jul 2023 00:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E7CEB64DA
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Jul 2023 10:34:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232785AbjGHAG3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jul 2023 20:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49802 "EHLO
+        id S230031AbjGHKet (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 8 Jul 2023 06:34:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232454AbjGHAG2 (ORCPT
+        with ESMTP id S229458AbjGHKes (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jul 2023 20:06:28 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7532123;
-        Fri,  7 Jul 2023 17:06:27 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id 46e09a7af769-6b74e2d8c98so2257875a34.2;
-        Fri, 07 Jul 2023 17:06:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688774786; x=1691366786;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uxQ9ORFt2KalpWVPLln/XeJlZQtOLOl2gBwuEluzJqk=;
-        b=ih/x/XN1N1IP8D9qyTD4drevI8/8TWIA770S5KgG7qcDE+qdzprHBGX1oqGrMEt8ZE
-         JSzTfGSyBRGn/OstUnawSgSa1XXD72WLa+Dl9Sga4r+/JatWMLX8SXMm3kCyU7Gw+SGw
-         owjWuWQFTxD8MpGyTsq0eQAgCXIqQyaes6pnO+bfKVCGci+i6xgyKrTivQVrNNepFXFZ
-         UwfvnbYB+CkbjCrKUG73gZ0DiRxGen+8CRlj7E9wL8ivurWIq8Ku6yhfYPlA1aLABlRE
-         ZeaO3iAdnRFmUbCQk9CMSNK86ZtoCRdeHAv1ST2Xu2croQBTb1cROTaJBEVTaYVHuwBy
-         L7kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688774786; x=1691366786;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uxQ9ORFt2KalpWVPLln/XeJlZQtOLOl2gBwuEluzJqk=;
-        b=F0UOQUctJ3cZcNVluwYrcYGRmxwEG9OK79h4sS2g/NaXN/61S9t+b9difaS2UBa6ri
-         K8PsNr2dl+RpIHVaPVjUTAPMTKS7pq5ocZvXruMqo1RdP+i2y64vku86e04hWpVni4vq
-         MKEKELF6w/jkB7S6u7hnVo/mYFMZdUy2+/ZSfVdoSVC+92LXY2oVrIzedEVHiurFEJE/
-         jYqTz+Wr8dMBDCvlvI82C6JpenNZKBE63hlzhChX8VlBDWW8mQQMl7oyzBYaLg3k7Lxr
-         PBxZ00V8tA+/xavkXRx8UEzT2c4zbQoemBoWH6MwPTPvHyZN/w1f1VZoVqRdOlkxuDM6
-         8DdQ==
-X-Gm-Message-State: ABy/qLbbaGXsVPWgz8b1MQJXcsQBDDplS/tfrei6CQGuBr2VaB7jbBGW
-        d9uz2P8HWDxCGo3Y1H1SKewu1cUjRL4=
-X-Google-Smtp-Source: APBJJlH+LJYi6W8fj+k19PKYvMadG7yFuvSejenF+WQtpYGeIrYZwfvXgtsbMl+ZRQ2wzQ5k5TzNUQ==
-X-Received: by 2002:a05:6870:a68f:b0:1b3:e896:9bfa with SMTP id i15-20020a056870a68f00b001b3e8969bfamr8470718oam.25.1688774786484;
-        Fri, 07 Jul 2023 17:06:26 -0700 (PDT)
-Received: from google.com ([2620:15c:9d:2:38de:2bd4:8f55:60cd])
-        by smtp.gmail.com with ESMTPSA id q3-20020a170902dac300b001b66a71a4a0sm3805403plx.32.2023.07.07.17.06.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 17:06:26 -0700 (PDT)
-Date:   Fri, 7 Jul 2023 17:06:22 -0700
-From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
-To:     Oleksij Rempel <o.rempel@pengutronix.de>
-Cc:     Abel Vesa <abelvesa@kernel.org>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Rob Herring <robh@kernel.org>, kernel@pengutronix.de,
-        Peng Fan <peng.fan@nxp.com>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Michael Trimarchi <michael@amarulasolutions.com>,
-        Mark Brown <broonie@kernel.org>,
-        Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-        Marek Vasut <marex@denx.de>, linux-clk@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] dt-bindings: input: touchscreen: edt-ft5x06: Add
- 'threshold' property
-Message-ID: <ZKiofhzbBD2hIzmv@google.com>
-References: <20230621093245.78130-1-o.rempel@pengutronix.de>
- <20230621093245.78130-6-o.rempel@pengutronix.de>
+        Sat, 8 Jul 2023 06:34:48 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136751BE8
+        for <linux-crypto@vger.kernel.org>; Sat,  8 Jul 2023 03:34:46 -0700 (PDT)
+Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 368AYjAe047715;
+        Sat, 8 Jul 2023 19:34:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
+ Sat, 08 Jul 2023 19:34:45 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 368AYi74047708
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 8 Jul 2023 19:34:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <f70b043f-3444-a6d3-81cf-66af515a8b3c@I-love.SAKURA.ne.jp>
+Date:   Sat, 8 Jul 2023 19:34:43 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621093245.78130-6-o.rempel@pengutronix.de>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Alexander Potapenko <glider@google.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Aviad Yehezkel <aviadye@nvidia.com>,
+        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>
+References: <0000000000008a7ae505aef61db1@google.com>
+ <20200911170150.GA889@sol.localdomain>
+ <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+ <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
+ <59e1d5c0-aedb-7b5b-f37f-0c20185d7e9b@I-love.SAKURA.ne.jp>
+ <CAMj1kXGHRUUFYL09Lm-mO6MfGc19rC=-7mSJ1eDTcbw7QuEkaw@mail.gmail.com>
+ <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
+ <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
+ <CAG_fn=VFa2yeiZmdyuVRmZYtWn6Tkox8UVrOrCv4tEec3BFYbQ@mail.gmail.com>
+ <CAMj1kXEdwjN7Q8tKVxHz98zQ4EsWVSdLZ5tQaV-nXxc9hwRYjQ@mail.gmail.com>
+ <CAG_fn=UWZWc+FZ_shCr+T9Y3gV9Bue-ZFHKJj78YXBq3JfnUKA@mail.gmail.com>
+ <CAMj1kXE_PjQT6+A9a0Y=ZfbOr_H+umYSqHuRrM6AT_gFJxxP1w@mail.gmail.com>
+ <8c989395-0f20-a957-6611-8a356badcf3c@I-love.SAKURA.ne.jp>
+ <35970e3b-8142-8e00-c12a-da8c6925c12c@I-love.SAKURA.ne.jp>
+ <20230706135319.66d3cb78@kernel.org>
+ <63006262-f808-50ab-97b8-c2193c7a9ba1@I-love.SAKURA.ne.jp>
+In-Reply-To: <63006262-f808-50ab-97b8-c2193c7a9ba1@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 11:32:45AM +0200, Oleksij Rempel wrote:
-> Add a new property 'threshold' to the edt-ft5x06 touchscreen binding.
-> This property allows setting the "click"-threshold in the range from 0
-> to 255. This change addresses the following dtbs_check warning:
-> imx6dl-lanmcu.dtb: touchscreen@38: 'threshold' does not match any of the regexes: 'pinctrl-[0-9]+'
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Rob Herring <robh@kernel.org>
+On 2023/07/07 18:41, Tetsuo Handa wrote:
+> On 2023/07/07 5:53, Jakub Kicinski wrote:
+>> On Tue, 4 Jul 2023 22:32:00 +0900 Tetsuo Handa wrote:
+>>> I found a simplified reproducer.
+>>> This problem happens when splice() and sendmsg() run in parallel.
+>>
+>> Could you retry with the upstream (tip of Linus's tree) and see if it
+>> still repros? I tried to get a KMSAN kernel to boot on QEMU but it
+>> the kernel doesn't want to start, no idea what's going on :(
 
-Applied, thank you.
+(Returned from https://lkml.kernel.org/r/20230707180901.34c17465@kernel.org .)
 
--- 
-Dmitry
+It seems that a series of changes that was merged in this merge window
+made this problem no longer reproducible. ;-)
+
+Which commit should we mark as a fix for this problem?
+
