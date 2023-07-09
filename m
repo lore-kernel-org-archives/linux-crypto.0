@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76510C001B0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 116E9EB64DC
 	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jul 2023 15:43:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231208AbjGIPnD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S230519AbjGIPnD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 9 Jul 2023 11:43:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53094 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbjGIPnC (ORCPT
+        with ESMTP id S230293AbjGIPnC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 9 Jul 2023 11:43:02 -0400
 Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB34FDD;
-        Sun,  9 Jul 2023 08:42:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C764114;
+        Sun,  9 Jul 2023 08:42:55 -0700 (PDT)
 Received: from i53875a50.versanet.de ([83.135.90.80] helo=phil.fritz.box)
         by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <heiko@sntech.de>)
-        id 1qIWYh-0002yG-3V; Sun, 09 Jul 2023 17:42:47 +0200
+        id 1qIWYg-0002yG-Ge; Sun, 09 Jul 2023 17:42:46 +0200
 From:   Heiko Stuebner <heiko@sntech.de>
 To:     palmer@dabbelt.com, paul.walmsley@sifive.com
 Cc:     aou@eecs.berkeley.edu, heiko@sntech.de,
@@ -28,9 +28,9 @@ Cc:     aou@eecs.berkeley.edu, heiko@sntech.de,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         christoph.muellner@vrull.eu, ebiggers@kernel.org,
         Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: [PATCH v6 2/3] RISC-V: hook new crypto subdir into build-system
-Date:   Sun,  9 Jul 2023 17:42:42 +0200
-Message-Id: <20230709154243.1582671-3-heiko@sntech.de>
+Subject: [PATCH v6 1/3] RISC-V: expose Zbc as Kconfig option
+Date:   Sun,  9 Jul 2023 17:42:41 +0200
+Message-Id: <20230709154243.1582671-2-heiko@sntech.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230709154243.1582671-1-heiko@sntech.de>
 References: <20230709154243.1582671-1-heiko@sntech.de>
@@ -42,66 +42,48 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-Create a crypto subdirectory for added accelerated cryptography routines
-and hook it into the riscv Kbuild and the main crypto Kconfig.
+Similar to Zbb add a Zbc option to allow making further functionality
+depend on it.
 
 Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 ---
- arch/riscv/Kbuild          | 1 +
- arch/riscv/crypto/Kconfig  | 5 +++++
- arch/riscv/crypto/Makefile | 4 ++++
- crypto/Kconfig             | 3 +++
- 4 files changed, 13 insertions(+)
- create mode 100644 arch/riscv/crypto/Kconfig
- create mode 100644 arch/riscv/crypto/Makefile
+ arch/riscv/Kconfig | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
-index afa83e307a2e..250d1fd38618 100644
---- a/arch/riscv/Kbuild
-+++ b/arch/riscv/Kbuild
-@@ -2,6 +2,7 @@
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 4c07b9189c86..cb5bd47c50c9 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -531,6 +531,29 @@ config RISCV_ISA_ZBB
  
- obj-y += kernel/ mm/ net/
- obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
-+obj-$(CONFIG_CRYPTO) += crypto/
- obj-y += errata/
- obj-$(CONFIG_KVM) += kvm/
+ 	   If you don't know what to do here, say Y.
  
-diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
-new file mode 100644
-index 000000000000..10d60edc0110
---- /dev/null
-+++ b/arch/riscv/crypto/Kconfig
-@@ -0,0 +1,5 @@
-+# SPDX-License-Identifier: GPL-2.0
++config TOOLCHAIN_HAS_ZBC
++	bool
++	default y
++	depends on !64BIT || $(cc-option,-mabi=lp64 -march=rv64ima_zbc)
++	depends on !32BIT || $(cc-option,-mabi=ilp32 -march=rv32ima_zbc)
++	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
++	depends on AS_HAS_OPTION_ARCH
 +
-+menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
++config RISCV_ISA_ZBC
++	bool "Zbc extension support for bit manipulation instructions"
++	depends on TOOLCHAIN_HAS_ZBC
++	depends on MMU
++	depends on RISCV_ALTERNATIVE
++	default y
++	help
++	   Adds support to dynamically detect the presence of the ZBC
++	   extension (carry-less multiplication) and enable its usage.
 +
-+endmenu
-diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
-new file mode 100644
-index 000000000000..b3b6332c9f6d
---- /dev/null
-+++ b/arch/riscv/crypto/Makefile
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+#
-+# linux/arch/riscv/crypto/Makefile
-+#
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 650b1b3620d8..c7b23d2c58e4 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1436,6 +1436,9 @@ endif
- if PPC
- source "arch/powerpc/crypto/Kconfig"
- endif
-+if RISCV
-+source "arch/riscv/crypto/Kconfig"
-+endif
- if S390
- source "arch/s390/crypto/Kconfig"
- endif
++	   The Zbc extension provides instructions clmul, clmulh and clmulr
++	   to accelerate carry-less multiplications.
++
++	   If you don't know what to do here, say Y.
++
+ config RISCV_ISA_ZICBOM
+ 	bool "Zicbom extension support for non-coherent DMA operation"
+ 	depends on MMU
 -- 
 2.39.2
 
