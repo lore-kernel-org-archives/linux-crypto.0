@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39F1EB64DC
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 19:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C4EC0015E
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 19:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbjGJTIu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jul 2023 15:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59824 "EHLO
+        id S231874AbjGJTJX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jul 2023 15:09:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231258AbjGJTIF (ORCPT
+        with ESMTP id S232081AbjGJTIl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jul 2023 15:08:05 -0400
+        Mon, 10 Jul 2023 15:08:41 -0400
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA221AA;
-        Mon, 10 Jul 2023 12:07:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E301BC;
+        Mon, 10 Jul 2023 12:07:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689016049; x=1720552049;
+  t=1689016073; x=1720552073;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=s749hV2cG8QjwVJFsDpv54QK8I1TXwPz5zms2JhjWZc=;
-  b=ScATBEhlF9Zvn41r3O+WyuhNztpeXT+r8BuhSgqETb4KebqaGLFJ8JOs
-   YNdD3Q2a+e40KZcNTVEP/OZcAJXVebKdZtIaq+zSzwKbqP1wPZk9pINjq
-   DVvc/N9S7FdCBfOzj0czmDue+oy8rPnEhJWHK8V/z8o0Ip9dVGkfht/XS
-   f301GCdGYIx4LwaRxwatphOgiyENV4A5iNbVGbreB/z0mBqcF16P/jLqs
-   yWXGCrk2pXrdqx1B3c8qzB4V4iIYTI6x2yUfIvdnmxtVhAF2Ji80DYLzr
-   JGbjSyolm0a1OzXCemlUvczYlcxvu2AoSs0GkpGSzwjAYiaH5MPUNxudF
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="354290853"
+  bh=kLFsPIfoYVyZHAIlhWoQV8IjWr5RC2i0oPin/DhC63M=;
+  b=ZFxvWM12XLMaww0thXvyw0hd74VkxQDDk3EM2zvV4jxFoRg7axQJvvZU
+   KtJP+bsi56VHLd7V4BW5fOm8zuLOik/r89iYFd973JVx5ByQEfJT25yPC
+   8cnmgDKXkoWEw+bIvr1ROzEgt54iqW1RL5mKzNTX7r24A627mSyqcaslJ
+   u43NLQQ1Vw0fjIrxyDwirGMup9YpcVfbyqYXRSG69iG5PDOTXkYPWt8Mh
+   BklRyaukfMC9vtiNLI6BbjZppNv0YVKn3NG7qWAbLou3eWg/A/r7AQnBy
+   fr2A5XscRnqsyVtIYWEP1oIFOJpa19CHX4eQAnyQzkaKb6K0SpZREa38l
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="354290892"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="354290853"
+   d="scan'208";a="354290892"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 12:07:26 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 12:07:32 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="844991161"
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="844991217"
 X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
-   d="scan'208";a="844991161"
+   d="scan'208";a="844991217"
 Received: from jdmillsx-mobl1.amr.corp.intel.com (HELO tzanussi-mobl1.intel.com) ([10.212.107.12])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 12:07:24 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 12:07:30 -0700
 From:   Tom Zanussi <tom.zanussi@linux.intel.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         fenghua.yu@intel.com, vkoul@kernel.org
@@ -47,9 +47,9 @@ Cc:     dave.jiang@intel.com, tony.luck@intel.com,
         kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
         giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Subject: [PATCH v7 12/14] crypto: iaa - Add support for deflate-iaa compression algorithm
-Date:   Mon, 10 Jul 2023 14:06:52 -0500
-Message-Id: <20230710190654.299639-13-tom.zanussi@linux.intel.com>
+Subject: [PATCH v7 14/14] crypto: iaa - Add IAA Compression Accelerator stats
+Date:   Mon, 10 Jul 2023 14:06:54 -0500
+Message-Id: <20230710190654.299639-15-tom.zanussi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
 References: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
@@ -59,1196 +59,594 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch registers the deflate-iaa deflate compression algorithm and
-hooks it up to the IAA hardware using the 'fixed' compression mode
-introduced in the previous patch.
+Add support for optional debugfs statistics support for the IAA
+Compression Accelerator.  This is enabled by the kernel config item:
 
-Because the IAA hardware has a 4k history-window limitation, only
-buffers <= 4k, or that have been compressed using a <= 4k history
-window, are technically compliant with the deflate spec, which allows
-for a window of up to 32k.  Because of this limitation, the IAA fixed
-mode deflate algorithm is given its own algorithm name, 'deflate-iaa'.
+  CRYPTO_DEV_IAA_CRYPTO_STATS
 
-With this change, the deflate-iaa crypto algorithm is registered and
-operational, and compression and decompression operations are fully
-enabled following the successful binding of the first IAA workqueue
-to the iaa_crypto sub-driver.
+When enabled, the IAA crypto driver will generate statistics which can
+be accessed at /sys/kernel/debug/iaa-crypto/.
 
-when there are no IAA workqueues bound to the driver, the IAA crypto
-algorithm can be unregistered by removing the module.
-
-A new iaa_crypto 'verify_compress' driver attribute is also added,
-allowing the user to toggle compression verification.  If set, each
-compress will be internally decompressed and the contents verified,
-returning error codes if unsuccessful.  This can be toggled with 0/1:
-
-  echo 0 > /sys/bus/dsa/drivers/crypto/verify_compress
-
-The default setting is '1' - verify all compresses.
-
-The verify_compress value setting at the time the algorithm is
-registered is captured in the algorithm's crypto_ctx and used for all
-compresses when using the algorithm.
-
-[ Based on work originally by George Powley, Jing Lin and Kyung Min
-Park ]
+See Documentation/driver-api/crypto/iax/iax-crypto.rst for details.
 
 Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
 ---
- crypto/testmgr.c                           |  10 +
- drivers/crypto/intel/iaa/iaa_crypto.h      |  36 +
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 921 ++++++++++++++++++++-
- 3 files changed, 950 insertions(+), 17 deletions(-)
+ drivers/crypto/intel/iaa/Kconfig            |   9 +
+ drivers/crypto/intel/iaa/Makefile           |   2 +
+ drivers/crypto/intel/iaa/iaa_crypto.h       |  22 ++
+ drivers/crypto/intel/iaa/iaa_crypto_main.c  |  65 +++++
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c | 271 ++++++++++++++++++++
+ drivers/crypto/intel/iaa/iaa_crypto_stats.h |  58 +++++
+ 6 files changed, 427 insertions(+)
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.h
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 216878c8bc3d..b6d924e0ff59 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4819,6 +4819,16 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.decomp = __VECS(deflate_decomp_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "deflate-iaa",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = __VECS(deflate_comp_tv_template),
-+				.decomp = __VECS(deflate_decomp_tv_template)
-+			}
-+		}
- 	}, {
- 		.alg = "dh",
- 		.test = alg_test_kpp,
+diff --git a/drivers/crypto/intel/iaa/Kconfig b/drivers/crypto/intel/iaa/Kconfig
+index fcccb6ff7e29..d53f4b1d494f 100644
+--- a/drivers/crypto/intel/iaa/Kconfig
++++ b/drivers/crypto/intel/iaa/Kconfig
+@@ -8,3 +8,12 @@ config CRYPTO_DEV_IAA_CRYPTO
+ 	  decompression with the Intel Analytics Accelerator (IAA)
+ 	  hardware using the cryptographic API.  If you choose 'M'
+ 	  here, the module will be called iaa_crypto.
++
++config CRYPTO_DEV_IAA_CRYPTO_STATS
++	bool "Enable Intel(R) IAA Compression Accelerator Statistics"
++	depends on CRYPTO_DEV_IAA_CRYPTO
++	default n
++	help
++	  Enable statistics for the IAA compression accelerator.
++	  These include per-device and per-workqueue statistics in
++	  addition to global driver statistics.
+diff --git a/drivers/crypto/intel/iaa/Makefile b/drivers/crypto/intel/iaa/Makefile
+index cc87feffd059..b64b208d2344 100644
+--- a/drivers/crypto/intel/iaa/Makefile
++++ b/drivers/crypto/intel/iaa/Makefile
+@@ -8,3 +8,5 @@ ccflags-y += -I $(srctree)/drivers/dma/idxd -DDEFAULT_SYMBOL_NAMESPACE=IDXD
+ obj-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO) := iaa_crypto.o
+ 
+ iaa_crypto-y := iaa_crypto_main.o iaa_crypto_comp_fixed.o
++
++iaa_crypto-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS) += iaa_crypto_stats.o
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto.h b/drivers/crypto/intel/iaa/iaa_crypto.h
-index 33e68f9d3d02..4c6b0f5a6b50 100644
+index de014ac53adb..e0fee392a43a 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto.h
 +++ b/drivers/crypto/intel/iaa/iaa_crypto.h
-@@ -10,15 +10,42 @@
- 
- #define IDXD_SUBDRIVER_NAME		"crypto"
- 
-+#define IAA_DECOMP_ENABLE		BIT(0)
-+#define IAA_DECOMP_FLUSH_OUTPUT		BIT(1)
-+#define IAA_DECOMP_CHECK_FOR_EOB	BIT(2)
-+#define IAA_DECOMP_STOP_ON_EOB		BIT(3)
-+#define IAA_DECOMP_SUPPRESS_OUTPUT	BIT(9)
-+
-+#define IAA_COMP_FLUSH_OUTPUT		BIT(1)
-+#define IAA_COMP_APPEND_EOB		BIT(2)
-+
-+#define IAA_COMPLETION_TIMEOUT		1000000
-+
-+#define IAA_ANALYTICS_ERROR		0x0a
-+#define IAA_ERROR_DECOMP_BUF_OVERFLOW	0x0b
-+#define IAA_ERROR_COMP_BUF_OVERFLOW	0x19
-+#define IAA_ERROR_WATCHDOG_EXPIRED	0x24
-+
- #define IAA_COMP_MODES_MAX		2
- 
- #define FIXED_HDR			0x2
- #define FIXED_HDR_SIZE			3
- 
-+#define IAA_COMP_FLAGS			(IAA_COMP_FLUSH_OUTPUT | \
-+					 IAA_COMP_APPEND_EOB)
-+
-+#define IAA_DECOMP_FLAGS		(IAA_DECOMP_ENABLE |	   \
-+					 IAA_DECOMP_FLUSH_OUTPUT | \
-+					 IAA_DECOMP_CHECK_FOR_EOB | \
-+					 IAA_DECOMP_STOP_ON_EOB)
-+
- /* Representation of IAA workqueue */
- struct iaa_wq {
- 	struct list_head	list;
-+
- 	struct idxd_wq		*wq;
-+	int			ref;
-+	bool			remove;
+@@ -48,6 +48,11 @@ struct iaa_wq {
+ 	bool			remove;
  
  	struct iaa_device	*iaa_device;
- };
-@@ -119,4 +146,13 @@ int add_iaa_compression_mode(const char *name,
- 
- void remove_iaa_compression_mode(const char *name);
- 
-+enum iaa_mode {
-+	IAA_MODE_FIXED,
-+};
 +
-+struct iaa_compression_ctx {
-+	enum iaa_mode	mode;
-+	bool		verify_compress;
-+};
++	u64			comp_calls;
++	u64			comp_bytes;
++	u64			decomp_calls;
++	u64			decomp_bytes;
+ };
+ 
+ struct iaa_device_compression_mode {
+@@ -69,6 +74,11 @@ struct iaa_device {
+ 
+ 	int				n_wq;
+ 	struct list_head		wqs;
++
++	u64				comp_calls;
++	u64				comp_bytes;
++	u64				decomp_calls;
++	u64				decomp_bytes;
+ };
+ 
+ struct wq_table_entry {
+@@ -157,4 +167,16 @@ struct iaa_compression_ctx {
+ 	bool		use_irq;
+ };
+ 
++#if defined(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS)
++void	global_stats_show(struct seq_file *m);
++void	device_stats_show(struct seq_file *m, struct iaa_device *iaa_device);
++void	reset_iaa_crypto_stats(void);
++void	reset_device_stats(struct iaa_device *iaa_device);
++#else
++static inline void	global_stats_show(struct seq_file *m) {}
++static inline void	device_stats_show(struct seq_file *m, struct iaa_device *iaa_device) {}
++static inline void	reset_iaa_crypto_stats(void) {}
++static inline void	reset_device_stats(struct iaa_device *iaa_device) {}
++#endif
 +
  #endif
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 0c59332456f0..9b4acc343582 100644
+index 02adf65186e8..17f3992ab450 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -10,6 +10,7 @@
- #include <uapi/linux/idxd.h>
- #include <linux/highmem.h>
- #include <linux/sched/smt.h>
-+#include <crypto/internal/acompress.h>
+@@ -14,6 +14,7 @@
  
  #include "idxd.h"
  #include "iaa_crypto.h"
-@@ -32,6 +33,20 @@ static unsigned int cpus_per_iaa;
- /* Per-cpu lookup table for balanced wqs */
- static struct wq_table_entry __percpu *wq_table;
++#include "iaa_crypto_stats.h"
  
-+static struct idxd_wq *wq_table_next_wq(int cpu)
-+{
-+	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
-+
-+	if (++entry->cur_wq >= entry->n_wqs)
-+		entry->cur_wq = 0;
-+
-+	pr_debug("%s: returning wq at idx %d (iaa wq %d.%d) from cpu %d\n", __func__,
-+		 entry->cur_wq, entry->wqs[entry->cur_wq]->idxd->id,
-+		 entry->wqs[entry->cur_wq]->id, cpu);
-+
-+	return entry->wqs[entry->cur_wq];
-+}
-+
- static void wq_table_add(int cpu, struct idxd_wq *wq)
- {
- 	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
-@@ -66,6 +81,40 @@ static void wq_table_clear_entry(int cpu)
- static LIST_HEAD(iaa_devices);
- static DEFINE_MUTEX(iaa_devices_lock);
+ #ifdef pr_fmt
+ #undef pr_fmt
+@@ -1044,6 +1045,7 @@ static inline int check_completion(struct device *dev,
+ 			ret = -ETIMEDOUT;
+ 			dev_dbg(dev, "%s timed out, size=0x%x\n",
+ 				op_str, comp->output_size);
++			update_completion_timeout_errs();
+ 			goto out;
+ 		}
  
-+/* If enabled, IAA hw crypto algos are registered, unavailable otherwise */
-+static bool iaa_crypto_enabled;
-+static bool iaa_crypto_registered;
+@@ -1053,6 +1055,7 @@ static inline int check_completion(struct device *dev,
+ 			dev_dbg(dev, "compressed > uncompressed size,"
+ 				" not compressing, size=0x%x\n",
+ 				comp->output_size);
++			update_completion_comp_buf_overflow_errs();
+ 			goto out;
+ 		}
+ 
+@@ -1065,6 +1068,7 @@ static inline int check_completion(struct device *dev,
+ 		dev_dbg(dev, "iaa %s status=0x%x, error=0x%x, size=0x%x\n",
+ 			op_str, comp->status, comp->error_code, comp->output_size);
+ 		print_hex_dump(KERN_INFO, "cmp-rec: ", DUMP_PREFIX_OFFSET, 8, 1, comp, 64, 0);
++		update_completion_einval_errs();
+ 
+ 		goto out;
+ 	}
+@@ -1118,6 +1122,15 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
+ 
+ 	ctx->req->dlen = idxd_desc->iax_completion->output_size;
+ 
++	/* Update stats */
++	if (ctx->compress) {
++		update_total_comp_bytes_out(ctx->req->dlen);
++		update_wq_comp_bytes(iaa_wq->wq, ctx->req->dlen);
++	} else {
++		update_total_decomp_bytes_in(ctx->req->dlen);
++		update_wq_decomp_bytes(iaa_wq->wq, ctx->req->dlen);
++	}
 +
-+/* Verify results of IAA compress or not */
-+static bool iaa_verify_compress = true;
+ 	if (ctx->compress && compression_ctx->verify_compress) {
+ 		u32 compression_crc;
+ 
+@@ -1225,6 +1238,10 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
+ 		goto err;
+ 	}
+ 
++	/* Update stats */
++	update_total_comp_calls();
++	update_wq_comp_calls(wq);
 +
-+static ssize_t verify_compress_show(struct device_driver *driver, char *buf)
+ 	if (ctx->async_mode && !disable_async) {
+ 		ret = -EINPROGRESS;
+ 		dev_dbg(dev, "%s: returning -EINPROGRESS\n", __func__);
+@@ -1239,6 +1256,10 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
+ 
+ 	*dlen = idxd_desc->iax_completion->output_size;
+ 
++	/* Update stats */
++	update_total_comp_bytes_out(*dlen);
++	update_wq_comp_bytes(wq, *dlen);
++
+ 	*compression_crc = idxd_desc->iax_completion->crc;
+ 
+ 	if (!ctx->async_mode)
+@@ -1415,6 +1436,10 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 		goto err;
+ 	}
+ 
++	/* Update stats */
++	update_total_decomp_calls();
++	update_wq_decomp_calls(wq);
++
+ 	if (ctx->async_mode && !disable_async) {
+ 		ret = -EINPROGRESS;
+ 		dev_dbg(dev, "%s: returning -EINPROGRESS\n", __func__);
+@@ -1431,6 +1456,10 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 
+ 	if (!ctx->async_mode)
+ 		idxd_free_desc(wq, idxd_desc);
++
++	/* Update stats */
++	update_total_decomp_bytes_in(slen);
++	update_wq_decomp_bytes(wq, slen);
+ out:
+ 	return ret;
+ err:
+@@ -1917,6 +1946,38 @@ static struct idxd_device_driver iaa_crypto_driver = {
+ 	.desc_complete = iaa_desc_complete,
+ };
+ 
++int wq_stats_show(struct seq_file *m, void *v)
 +{
-+	return sprintf(buf, "%d\n", iaa_verify_compress);
-+}
-+
-+static ssize_t verify_compress_store(struct device_driver *driver,
-+				     const char *buf, size_t count)
-+{
-+	int ret = -EBUSY;
++	struct iaa_device *iaa_device;
 +
 +	mutex_lock(&iaa_devices_lock);
 +
-+	if (iaa_crypto_enabled)
-+		goto out;
++	global_stats_show(m);
 +
-+	ret = kstrtobool(buf, &iaa_verify_compress);
-+	if (ret)
-+		goto out;
++	list_for_each_entry(iaa_device, &iaa_devices, list)
++		device_stats_show(m, iaa_device);
 +
-+	ret = count;
-+out:
 +	mutex_unlock(&iaa_devices_lock);
 +
-+	return ret;
-+}
-+static DRIVER_ATTR_RW(verify_compress);
-+
- static struct iaa_compression_mode *iaa_compression_modes[IAA_COMP_MODES_MAX];
- 
- static int find_empty_iaa_compression_mode(void)
-@@ -250,6 +299,12 @@ int add_iaa_compression_mode(const char *name,
- }
- EXPORT_SYMBOL_GPL(add_iaa_compression_mode);
- 
-+static struct iaa_device_compression_mode *
-+get_iaa_device_compression_mode(struct iaa_device *iaa_device, int idx)
-+{
-+	return iaa_device->compression_modes[idx];
++	return 0;
 +}
 +
- static void free_device_compression_mode(struct iaa_device *iaa_device,
- 					 struct iaa_device_compression_mode *device_mode)
- {
-@@ -268,6 +323,86 @@ static void free_device_compression_mode(struct iaa_device *iaa_device,
- 	kfree(device_mode);
- }
- 
-+#define IDXD_OP_FLAG_AECS_RW_TGLS       0x400000
-+#define IAX_AECS_DEFAULT_FLAG (IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR | IDXD_OP_FLAG_CC)
-+#define IAX_AECS_COMPRESS_FLAG	(IAX_AECS_DEFAULT_FLAG | IDXD_OP_FLAG_RD_SRC2_AECS)
-+#define IAX_AECS_DECOMPRESS_FLAG (IAX_AECS_DEFAULT_FLAG | IDXD_OP_FLAG_RD_SRC2_AECS)
-+#define IAX_AECS_GEN_FLAG (IAX_AECS_DEFAULT_FLAG | \
-+						IDXD_OP_FLAG_WR_SRC2_AECS_COMP | \
-+						IDXD_OP_FLAG_AECS_RW_TGLS)
-+
-+static int check_completion(struct device *dev,
-+			    struct iax_completion_record *comp,
-+			    bool compress,
-+			    bool only_once);
-+
-+static int decompress_header(struct iaa_device_compression_mode *device_mode,
-+			     struct iaa_compression_mode *mode,
-+			     struct idxd_wq *wq)
-+{
-+	dma_addr_t src_addr, src2_addr;
-+	struct idxd_desc *idxd_desc;
-+	struct iax_hw_desc *desc;
-+	struct device *dev;
-+	int ret = 0;
-+
-+	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	if (IS_ERR(idxd_desc))
-+		return PTR_ERR(idxd_desc);
-+
-+	desc = idxd_desc->iax_hw;
-+
-+	dev = &wq->idxd->pdev->dev;
-+
-+	src_addr = dma_map_single(dev, (void *)mode->header_table,
-+				  mode->header_table_size, DMA_TO_DEVICE);
-+	dev_dbg(dev, "%s: mode->name %s, src_addr %llx, dev %p, src %p, slen %d\n",
-+		__func__, mode->name, src_addr,	dev,
-+		mode->header_table, mode->header_table_size);
-+	if (unlikely(dma_mapping_error(dev, src_addr))) {
-+		dev_dbg(dev, "dma_map_single err, exiting\n");
-+		ret = -ENOMEM;
-+		return ret;
-+	}
-+
-+	desc->flags = IAX_AECS_GEN_FLAG;
-+	desc->opcode = IAX_OPCODE_DECOMPRESS;
-+
-+	desc->src1_addr = (u64)src_addr;
-+	desc->src1_size = mode->header_table_size;
-+
-+	src2_addr = device_mode->aecs_decomp_table_dma_addr;
-+	desc->src2_addr = (u64)src2_addr;
-+	desc->src2_size = 1088;
-+	dev_dbg(dev, "%s: mode->name %s, src2_addr %llx, dev %p, src2_size %d\n",
-+		__func__, mode->name, desc->src2_addr, dev, desc->src2_size);
-+	desc->max_dst_size = 0; // suppressed output
-+
-+	desc->decompr_flags = mode->gen_decomp_table_flags;
-+
-+	desc->priv = 1;
-+
-+	desc->completion_addr = idxd_desc->compl_dma;
-+
-+	ret = idxd_submit_desc(wq, idxd_desc);
-+	if (ret) {
-+		pr_err("%s: submit_desc failed ret=0x%x\n", __func__, ret);
-+		goto out;
-+	}
-+
-+	ret = check_completion(dev, idxd_desc->iax_completion, false, false);
-+	if (ret)
-+		dev_dbg(dev, "%s: mode->name %s check_completion failed ret=%d\n",
-+			__func__, mode->name, ret);
-+	else
-+		dev_dbg(dev, "%s: mode->name %s succeeded\n", __func__,
-+			mode->name);
-+out:
-+	dma_unmap_single(dev, src_addr, 1088, DMA_TO_DEVICE);
-+
-+	return ret;
-+}
-+
- static int init_device_compression_mode(struct iaa_device *iaa_device,
- 					struct iaa_compression_mode *mode,
- 					int idx, struct idxd_wq *wq)
-@@ -300,6 +435,14 @@ static int init_device_compression_mode(struct iaa_device *iaa_device,
- 	memcpy(device_mode->aecs_comp_table->ll_sym, mode->ll_table, mode->ll_table_size);
- 	memcpy(device_mode->aecs_comp_table->d_sym, mode->d_table, mode->d_table_size);
- 
-+	if (mode->header_table) {
-+		ret = decompress_header(device_mode, mode, wq);
-+		if (ret) {
-+			pr_debug("iaa header decompression failed: ret=%d\n", ret);
-+			goto free;
-+		}
-+	}
-+
- 	if (mode->init) {
- 		ret = mode->init(device_mode);
- 		if (ret)
-@@ -372,18 +515,6 @@ static struct iaa_device *iaa_device_alloc(void)
- 	return iaa_device;
- }
- 
--static void iaa_device_free(struct iaa_device *iaa_device)
--{
--	struct iaa_wq *iaa_wq, *next;
--
--	list_for_each_entry_safe(iaa_wq, next, &iaa_device->wqs, list) {
--		list_del(&iaa_wq->list);
--		kfree(iaa_wq);
--	}
--
--	kfree(iaa_device);
--}
--
- static bool iaa_has_wq(struct iaa_device *iaa_device, struct idxd_wq *wq)
- {
- 	struct iaa_wq *iaa_wq;
-@@ -426,12 +557,8 @@ static int init_iaa_device(struct iaa_device *iaa_device, struct iaa_wq *iaa_wq)
- 
- static void del_iaa_device(struct iaa_device *iaa_device)
- {
--	remove_device_compression_modes(iaa_device);
--
- 	list_del(&iaa_device->list);
- 
--	iaa_device_free(iaa_device);
--
- 	nr_iaa--;
- }
- 
-@@ -497,6 +624,82 @@ static void clear_wq_table(void)
- 	pr_debug("cleared wq table\n");
- }
- 
-+static void free_iaa_device(struct iaa_device *iaa_device)
-+{
-+	if (!iaa_device)
-+		return;
-+
-+	remove_device_compression_modes(iaa_device);
-+	kfree(iaa_device);
-+}
-+
-+static void __free_iaa_wq(struct iaa_wq *iaa_wq)
++int iaa_crypto_stats_reset(void *data, u64 value)
 +{
 +	struct iaa_device *iaa_device;
 +
-+	if (!iaa_wq)
-+		return;
++	reset_iaa_crypto_stats();
 +
-+	iaa_device = iaa_wq->iaa_device;
-+	if (iaa_device->n_wq == 0)
-+		free_iaa_device(iaa_wq->iaa_device);
-+}
++	mutex_lock(&iaa_devices_lock);
 +
-+static void free_iaa_wq(struct iaa_wq *iaa_wq)
-+{
-+	struct idxd_wq *wq;
++	list_for_each_entry(iaa_device, &iaa_devices, list)
++		reset_device_stats(iaa_device);
 +
-+	__free_iaa_wq(iaa_wq);
-+
-+	wq = iaa_wq->wq;
-+
-+	kfree(iaa_wq);
-+	idxd_wq_set_private(wq, NULL);
-+}
-+
-+static int iaa_wq_get(struct idxd_wq *wq)
-+{
-+	struct idxd_device *idxd = wq->idxd;
-+	struct iaa_wq *iaa_wq;
-+	int ret = 0;
-+
-+	spin_lock(&idxd->dev_lock);
-+	iaa_wq = idxd_wq_get_private(wq);
-+	if (iaa_wq && !iaa_wq->remove)
-+		iaa_wq->ref++;
-+	else
-+		ret = -ENODEV;
-+	spin_unlock(&idxd->dev_lock);
-+
-+	return ret;
-+}
-+
-+static int iaa_wq_put(struct idxd_wq *wq)
-+{
-+	struct idxd_device *idxd = wq->idxd;
-+	struct iaa_wq *iaa_wq;
-+	bool free = false;
-+	int ret = 0;
-+
-+	spin_lock(&idxd->dev_lock);
-+	iaa_wq = idxd_wq_get_private(wq);
-+	if (iaa_wq) {
-+		iaa_wq->ref--;
-+		if (iaa_wq->ref == 0 && iaa_wq->remove) {
-+			__free_iaa_wq(iaa_wq);
-+			idxd_wq_set_private(wq, NULL);
-+			free = true;
-+		}
-+	} else {
-+		ret = -ENODEV;
-+	}
-+	spin_unlock(&idxd->dev_lock);
-+	if (free)
-+		kfree(iaa_wq);
-+
-+	return ret;
-+}
-+
- static void free_wq_table(void)
- {
- 	int cpu;
-@@ -580,6 +783,7 @@ static int save_iaa_wq(struct idxd_wq *wq)
- 		ret = add_iaa_wq(new_device, wq, &new_wq);
- 		if (ret) {
- 			del_iaa_device(new_device);
-+			free_iaa_device(new_device);
- 			goto out;
- 		}
- 
-@@ -587,6 +791,7 @@ static int save_iaa_wq(struct idxd_wq *wq)
- 		if (ret) {
- 			del_iaa_wq(new_device, new_wq->wq);
- 			del_iaa_device(new_device);
-+			free_iaa_wq(new_wq);
- 			goto out;
- 		}
- 	}
-@@ -724,6 +929,624 @@ static void rebalance_wq_table(void)
- 	}
- }
- 
-+static inline int check_completion(struct device *dev,
-+				   struct iax_completion_record *comp,
-+				   bool compress,
-+				   bool only_once)
-+{
-+	char *op_str = compress ? "compress" : "decompress";
-+	int ret = 0;
-+
-+	while (!comp->status) {
-+		if (only_once)
-+			return -EAGAIN;
-+		cpu_relax();
-+	}
-+
-+	if (comp->status != IAX_COMP_SUCCESS) {
-+		if (comp->status == IAA_ERROR_WATCHDOG_EXPIRED) {
-+			ret = -ETIMEDOUT;
-+			dev_dbg(dev, "%s timed out, size=0x%x\n",
-+				op_str, comp->output_size);
-+			goto out;
-+		}
-+
-+		if (comp->status == IAA_ANALYTICS_ERROR &&
-+		    comp->error_code == IAA_ERROR_COMP_BUF_OVERFLOW && compress) {
-+			ret = -E2BIG;
-+			dev_dbg(dev, "compressed > uncompressed size,"
-+				" not compressing, size=0x%x\n",
-+				comp->output_size);
-+			goto out;
-+		}
-+
-+		if (comp->status == IAA_ERROR_DECOMP_BUF_OVERFLOW) {
-+			ret = -EOVERFLOW;
-+			goto out;
-+		}
-+
-+		ret = -EINVAL;
-+		dev_dbg(dev, "iaa %s status=0x%x, error=0x%x, size=0x%x\n",
-+			op_str, comp->status, comp->error_code, comp->output_size);
-+		print_hex_dump(KERN_INFO, "cmp-rec: ", DUMP_PREFIX_OFFSET, 8, 1, comp, 64, 0);
-+
-+		goto out;
-+	}
-+out:
-+	return ret;
-+}
-+
-+static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
-+			struct idxd_wq *wq,
-+			dma_addr_t src_addr, unsigned int slen,
-+			dma_addr_t dst_addr, unsigned int *dlen,
-+			u32 *compression_crc,
-+			bool disable_async)
-+{
-+	struct iaa_device_compression_mode *active_compression_mode;
-+	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct iaa_device *iaa_device;
-+	struct idxd_desc *idxd_desc;
-+	struct iax_hw_desc *desc;
-+	struct idxd_device *idxd;
-+	struct iaa_wq *iaa_wq;
-+	struct pci_dev *pdev;
-+	struct device *dev;
-+	int ret = 0;
-+
-+	iaa_wq = idxd_wq_get_private(wq);
-+	iaa_device = iaa_wq->iaa_device;
-+	idxd = iaa_device->idxd;
-+	pdev = idxd->pdev;
-+	dev = &pdev->dev;
-+
-+	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
-+
-+	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	if (IS_ERR(idxd_desc)) {
-+		dev_dbg(dev, "idxd descriptor allocation failed\n");
-+		dev_dbg(dev, "iaa compress failed: ret=%ld\n", PTR_ERR(idxd_desc));
-+		return PTR_ERR(idxd_desc);
-+	}
-+	desc = idxd_desc->iax_hw;
-+
-+	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR |
-+		IDXD_OP_FLAG_RD_SRC2_AECS | IDXD_OP_FLAG_CC;
-+	desc->opcode = IAX_OPCODE_COMPRESS;
-+	desc->compr_flags = IAA_COMP_FLAGS;
-+	desc->priv = 1;
-+
-+	desc->src1_addr = (u64)src_addr;
-+	desc->src1_size = slen;
-+	desc->dst_addr = (u64)dst_addr;
-+	desc->max_dst_size = *dlen;
-+	desc->src2_addr = active_compression_mode->aecs_comp_table_dma_addr;
-+	desc->src2_size = sizeof(struct aecs_comp_table_record);
-+	desc->completion_addr = idxd_desc->compl_dma;
-+
-+	dev_dbg(dev, "%s: compression mode %s,"
-+		" desc->src1_addr %llx, desc->src1_size %d,"
-+		" desc->dst_addr %llx, desc->max_dst_size %d,"
-+		" desc->src2_addr %llx, desc->src2_size %d\n", __func__,
-+		active_compression_mode->name,
-+		desc->src1_addr, desc->src1_size, desc->dst_addr,
-+		desc->max_dst_size, desc->src2_addr, desc->src2_size);
-+
-+	ret = idxd_submit_desc(wq, idxd_desc);
-+	if (ret) {
-+		dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
-+		goto err;
-+	}
-+
-+	ret = check_completion(dev, idxd_desc->iax_completion, true, false);
-+	if (ret) {
-+		dev_dbg(dev, "check_completion failed ret=%d\n", ret);
-+		goto err;
-+	}
-+
-+	*dlen = idxd_desc->iax_completion->output_size;
-+
-+	*compression_crc = idxd_desc->iax_completion->crc;
-+
-+	idxd_free_desc(wq, idxd_desc);
-+out:
-+	return ret;
-+err:
-+	idxd_free_desc(wq, idxd_desc);
-+	dev_dbg(dev, "iaa compress failed: ret=%d\n", ret);
-+
-+	goto out;
-+}
-+
-+static int iaa_compress_verify(struct crypto_tfm *tfm, struct acomp_req *req,
-+			       struct idxd_wq *wq,
-+			       dma_addr_t src_addr, unsigned int slen,
-+			       dma_addr_t dst_addr, unsigned int *dlen,
-+			       u32 compression_crc)
-+{
-+	struct iaa_device_compression_mode *active_compression_mode;
-+	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct iaa_device *iaa_device;
-+	struct idxd_desc *idxd_desc;
-+	struct iax_hw_desc *desc;
-+	struct idxd_device *idxd;
-+	struct iaa_wq *iaa_wq;
-+	struct pci_dev *pdev;
-+	struct device *dev;
-+	int ret = 0;
-+
-+	iaa_wq = idxd_wq_get_private(wq);
-+	iaa_device = iaa_wq->iaa_device;
-+	idxd = iaa_device->idxd;
-+	pdev = idxd->pdev;
-+	dev = &pdev->dev;
-+
-+	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
-+
-+	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	if (IS_ERR(idxd_desc)) {
-+		dev_dbg(dev, "idxd descriptor allocation failed\n");
-+		dev_dbg(dev, "iaa compress failed: ret=%ld\n",
-+			PTR_ERR(idxd_desc));
-+		return PTR_ERR(idxd_desc);
-+	}
-+	desc = idxd_desc->iax_hw;
-+
-+	/* Verify (optional) - decompress and check crc, suppress dest write */
-+
-+	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR | IDXD_OP_FLAG_CC;
-+	desc->opcode = IAX_OPCODE_DECOMPRESS;
-+	desc->decompr_flags = IAA_DECOMP_FLAGS | IAA_DECOMP_SUPPRESS_OUTPUT;
-+	desc->priv = 1;
-+
-+	desc->src1_addr = (u64)dst_addr;
-+	desc->src1_size = *dlen;
-+	desc->dst_addr = (u64)src_addr;
-+	desc->max_dst_size = slen;
-+	desc->completion_addr = idxd_desc->compl_dma;
-+
-+	dev_dbg(dev, "(verify) compression mode %s,"
-+		" desc->src1_addr %llx, desc->src1_size %d,"
-+		" desc->dst_addr %llx, desc->max_dst_size %d,"
-+		" desc->src2_addr %llx, desc->src2_size %d\n",
-+		active_compression_mode->name,
-+		desc->src1_addr, desc->src1_size, desc->dst_addr,
-+		desc->max_dst_size, desc->src2_addr, desc->src2_size);
-+
-+	ret = idxd_submit_desc(wq, idxd_desc);
-+	if (ret) {
-+		dev_dbg(dev, "submit_desc (verify) failed ret=%d\n", ret);
-+		goto err;
-+	}
-+
-+	ret = check_completion(dev, idxd_desc->iax_completion, false, false);
-+	if (ret) {
-+		dev_dbg(dev, "(verify) check_completion failed ret=%d\n", ret);
-+		goto err;
-+	}
-+
-+	if (compression_crc != idxd_desc->iax_completion->crc) {
-+		ret = -EINVAL;
-+		dev_dbg(dev, "(verify) iaa comp/decomp crc mismatch:"
-+			" comp=0x%x, decomp=0x%x\n", compression_crc,
-+			idxd_desc->iax_completion->crc);
-+		print_hex_dump(KERN_INFO, "cmp-rec: ", DUMP_PREFIX_OFFSET,
-+			       8, 1, idxd_desc->iax_completion, 64, 0);
-+		goto err;
-+	}
-+
-+	idxd_free_desc(wq, idxd_desc);
-+out:
-+	return ret;
-+err:
-+	idxd_free_desc(wq, idxd_desc);
-+	dev_dbg(dev, "iaa compress failed: ret=%d\n", ret);
-+
-+	goto out;
-+}
-+
-+static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
-+			  struct idxd_wq *wq,
-+			  dma_addr_t src_addr, unsigned int slen,
-+			  dma_addr_t dst_addr, unsigned int *dlen,
-+			  bool disable_async)
-+{
-+	struct iaa_device_compression_mode *active_compression_mode;
-+	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct iaa_device *iaa_device;
-+	struct idxd_desc *idxd_desc;
-+	struct iax_hw_desc *desc;
-+	struct idxd_device *idxd;
-+	struct iaa_wq *iaa_wq;
-+	struct pci_dev *pdev;
-+	struct device *dev;
-+	int ret = 0;
-+
-+	iaa_wq = idxd_wq_get_private(wq);
-+	iaa_device = iaa_wq->iaa_device;
-+	idxd = iaa_device->idxd;
-+	pdev = idxd->pdev;
-+	dev = &pdev->dev;
-+
-+	active_compression_mode = get_iaa_device_compression_mode(iaa_device, ctx->mode);
-+
-+	idxd_desc = idxd_alloc_desc(wq, IDXD_OP_BLOCK);
-+	if (IS_ERR(idxd_desc)) {
-+		dev_dbg(dev, "idxd descriptor allocation failed\n");
-+		dev_dbg(dev, "iaa decompress failed: ret=%ld\n",
-+			PTR_ERR(idxd_desc));
-+		return PTR_ERR(idxd_desc);
-+	}
-+	desc = idxd_desc->iax_hw;
-+
-+	desc->flags = IDXD_OP_FLAG_CRAV | IDXD_OP_FLAG_RCR | IDXD_OP_FLAG_CC;
-+	desc->opcode = IAX_OPCODE_DECOMPRESS;
-+	desc->max_dst_size = PAGE_SIZE;
-+	desc->decompr_flags = IAA_DECOMP_FLAGS;
-+	desc->priv = 1;
-+
-+	desc->src1_addr = (u64)src_addr;
-+	desc->dst_addr = (u64)dst_addr;
-+	desc->max_dst_size = *dlen;
-+	desc->src1_size = slen;
-+	desc->completion_addr = idxd_desc->compl_dma;
-+
-+	dev_dbg(dev, "%s: decompression mode %s,"
-+		" desc->src1_addr %llx, desc->src1_size %d,"
-+		" desc->dst_addr %llx, desc->max_dst_size %d,"
-+		" desc->src2_addr %llx, desc->src2_size %d\n", __func__,
-+		active_compression_mode->name,
-+		desc->src1_addr, desc->src1_size, desc->dst_addr,
-+		desc->max_dst_size, desc->src2_addr, desc->src2_size);
-+
-+	ret = idxd_submit_desc(wq, idxd_desc);
-+	if (ret) {
-+		dev_dbg(dev, "submit_desc failed ret=%d\n", ret);
-+		goto err;
-+	}
-+
-+	ret = check_completion(dev, idxd_desc->iax_completion, false, false);
-+	if (ret) {
-+		dev_dbg(dev, "check_completion failed ret=%d\n", ret);
-+		goto err;
-+	}
-+
-+	*dlen = idxd_desc->iax_completion->output_size;
-+
-+	idxd_free_desc(wq, idxd_desc);
-+out:
-+	return ret;
-+err:
-+	idxd_free_desc(wq, idxd_desc);
-+	dev_dbg(dev, "iaa decompress failed: ret=%d\n", ret);
-+
-+	goto out;
-+}
-+
-+static int iaa_comp_acompress(struct acomp_req *req)
-+{
-+	struct iaa_compression_ctx *compression_ctx;
-+	struct crypto_tfm *tfm = req->base.tfm;
-+	dma_addr_t src_addr, dst_addr;
-+	int nr_sgs, cpu, ret = 0;
-+	struct iaa_wq *iaa_wq;
-+	u32 compression_crc;
-+	struct idxd_wq *wq;
-+	struct device *dev;
-+
-+	compression_ctx = crypto_tfm_ctx(tfm);
-+
-+	if (!iaa_crypto_enabled) {
-+		pr_debug("iaa_crypto disabled, not compressing\n");
-+		return -ENODEV;
-+	}
-+
-+	if (!req->src || !req->slen) {
-+		pr_debug("invalid src, not compressing\n");
-+		return -EINVAL;
-+	}
-+
-+	cpu = get_cpu();
-+	wq = wq_table_next_wq(cpu);
-+	put_cpu();
-+	if (!wq) {
-+		pr_debug("no wq configured for cpu=%d\n", cpu);
-+		return -ENODEV;
-+	}
-+
-+	ret = iaa_wq_get(wq);
-+	if (ret) {
-+		pr_debug("no wq available for cpu=%d\n", cpu);
-+		return -ENODEV;
-+	}
-+
-+	iaa_wq = idxd_wq_get_private(wq);
-+
-+	if (!req->dst) {
-+		gfp_t flags = req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
-+		/* incompressible data will always be < 2 * slen */
-+		req->dlen = 2 * req->slen;
-+		req->dst = sgl_alloc(req->dlen, flags, NULL);
-+		if (!req->dst) {
-+			ret = -ENOMEM;
-+			goto out;
-+		}
-+	}
-+
-+	dev = &wq->idxd->pdev->dev;
-+
-+	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+	if (nr_sgs <= 0 || nr_sgs > 1) {
-+		dev_dbg(dev, "couldn't map src sg for iaa device %d,"
-+			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
-+			iaa_wq->wq->id, ret);
-+		ret = -EIO;
-+		goto out;
-+	}
-+	src_addr = sg_dma_address(req->src);
-+	dev_dbg(dev, "dma_map_sg, src_addr %llx, nr_sgs %d, req->src %p,"
-+		" req->slen %d, sg_dma_len(sg) %d\n", src_addr, nr_sgs,
-+		req->src, req->slen, sg_dma_len(req->src));
-+
-+	nr_sgs = dma_map_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+	if (nr_sgs <= 0 || nr_sgs > 1) {
-+		dev_dbg(dev, "couldn't map dst sg for iaa device %d,"
-+			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
-+			iaa_wq->wq->id, ret);
-+		ret = -EIO;
-+		goto err_map_dst;
-+	}
-+	dst_addr = sg_dma_address(req->dst);
-+	dev_dbg(dev, "dma_map_sg, dst_addr %llx, nr_sgs %d, req->dst %p,"
-+		" req->dlen %d, sg_dma_len(sg) %d\n", dst_addr, nr_sgs,
-+		req->dst, req->dlen, sg_dma_len(req->dst));
-+
-+	ret = iaa_compress(tfm, req, wq, src_addr, req->slen, dst_addr,
-+			   &req->dlen, &compression_crc, false);
-+	if (ret == -EINPROGRESS)
-+		return ret;
-+
-+	if (!ret && compression_ctx->verify_compress) {
-+		dma_sync_sg_for_device(dev, req->dst, 1, DMA_FROM_DEVICE);
-+		dma_sync_sg_for_device(dev, req->src, 1, DMA_TO_DEVICE);
-+		ret = iaa_compress_verify(tfm, req, wq, src_addr, req->slen,
-+					  dst_addr, &req->dlen, compression_crc);
-+	}
-+
-+	if (ret)
-+		dev_dbg(dev, "asynchronous compress failed ret=%d\n", ret);
-+
-+	dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+err_map_dst:
-+	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+out:
-+	iaa_wq_put(wq);
-+
-+	return ret;
-+}
-+
-+static int iaa_comp_adecompress_alloc_dest(struct acomp_req *req)
-+{
-+	gfp_t flags = req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
-+		GFP_KERNEL : GFP_ATOMIC;
-+	struct crypto_tfm *tfm = req->base.tfm;
-+	dma_addr_t src_addr, dst_addr;
-+	int nr_sgs, cpu, ret = 0;
-+	struct iaa_wq *iaa_wq;
-+	struct device *dev;
-+	struct idxd_wq *wq;
-+
-+	cpu = get_cpu();
-+	wq = wq_table_next_wq(cpu);
-+	put_cpu();
-+	if (!wq) {
-+		pr_debug("no wq configured for cpu=%d\n", cpu);
-+		return -ENODEV;
-+	}
-+
-+	ret = iaa_wq_get(wq);
-+	if (ret) {
-+		pr_debug("no wq available for cpu=%d\n", cpu);
-+		return -ENODEV;
-+	}
-+
-+	iaa_wq = idxd_wq_get_private(wq);
-+
-+	dev = &wq->idxd->pdev->dev;
-+
-+	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+	if (nr_sgs <= 0 || nr_sgs > 1) {
-+		dev_dbg(dev, "couldn't map src sg for iaa device %d,"
-+			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
-+			iaa_wq->wq->id, ret);
-+		ret = -EIO;
-+		goto out;
-+	}
-+	src_addr = sg_dma_address(req->src);
-+	dev_dbg(dev, "dma_map_sg, src_addr %llx, nr_sgs %d, req->src %p,"
-+		" req->slen %d, sg_dma_len(sg) %d\n", src_addr, nr_sgs,
-+		req->src, req->slen, sg_dma_len(req->src));
-+
-+	req->dlen = 4 * req->slen; /* start with ~avg comp rato */
-+alloc_dest:
-+	req->dst = sgl_alloc(req->dlen, flags, NULL);
-+	if (!req->dst) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	nr_sgs = dma_map_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+	if (nr_sgs <= 0 || nr_sgs > 1) {
-+		dev_dbg(dev, "couldn't map dst sg for iaa device %d,"
-+			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
-+			iaa_wq->wq->id, ret);
-+		ret = -EIO;
-+		goto err_map_dst;
-+	}
-+
-+	dst_addr = sg_dma_address(req->dst);
-+	dev_dbg(dev, "dma_map_sg, dst_addr %llx, nr_sgs %d, req->dst %p,"
-+		" req->dlen %d, sg_dma_len(sg) %d\n", dst_addr, nr_sgs,
-+		req->dst, req->dlen, sg_dma_len(req->dst));
-+	ret = iaa_decompress(tfm, req, wq, src_addr, req->slen,
-+			     dst_addr, &req->dlen, true);
-+	if (ret == -EOVERFLOW) {
-+		dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+		sgl_free(req->dst);
-+		req->dlen *= 2;
-+		if (req->dlen > CRYPTO_ACOMP_DST_MAX)
-+			goto err_map_dst;
-+		goto alloc_dest;
-+	}
-+
-+	if (ret != 0)
-+		dev_dbg(dev, "asynchronous decompress failed ret=%d\n", ret);
-+
-+	dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+err_map_dst:
-+	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+out:
-+	iaa_wq_put(wq);
-+
-+	return ret;
-+}
-+
-+static int iaa_comp_adecompress(struct acomp_req *req)
-+{
-+	struct crypto_tfm *tfm = req->base.tfm;
-+	dma_addr_t src_addr, dst_addr;
-+	int nr_sgs, cpu, ret = 0;
-+	struct iaa_wq *iaa_wq;
-+	struct device *dev;
-+	struct idxd_wq *wq;
-+
-+	if (!iaa_crypto_enabled) {
-+		pr_debug("iaa_crypto disabled, not decompressing\n");
-+		return -ENODEV;
-+	}
-+
-+	if (!req->src || !req->slen) {
-+		pr_debug("invalid src, not decompressing\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!req->dst)
-+		return iaa_comp_adecompress_alloc_dest(req);
-+
-+	cpu = get_cpu();
-+	wq = wq_table_next_wq(cpu);
-+	put_cpu();
-+	if (!wq) {
-+		pr_debug("no wq configured for cpu=%d\n", cpu);
-+		return -ENODEV;
-+	}
-+
-+	ret = iaa_wq_get(wq);
-+	if (ret) {
-+		pr_debug("no wq available for cpu=%d\n", cpu);
-+		return -ENODEV;
-+	}
-+
-+	iaa_wq = idxd_wq_get_private(wq);
-+
-+	dev = &wq->idxd->pdev->dev;
-+
-+	nr_sgs = dma_map_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+	if (nr_sgs <= 0 || nr_sgs > 1) {
-+		dev_dbg(dev, "couldn't map src sg for iaa device %d,"
-+			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
-+			iaa_wq->wq->id, ret);
-+		ret = -EIO;
-+		goto out;
-+	}
-+	src_addr = sg_dma_address(req->src);
-+	dev_dbg(dev, "dma_map_sg, src_addr %llx, nr_sgs %d, req->src %p,"
-+		" req->slen %d, sg_dma_len(sg) %d\n", src_addr, nr_sgs,
-+		req->src, req->slen, sg_dma_len(req->src));
-+
-+	nr_sgs = dma_map_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+	if (nr_sgs <= 0 || nr_sgs > 1) {
-+		dev_dbg(dev, "couldn't map dst sg for iaa device %d,"
-+			" wq %d: ret=%d\n", iaa_wq->iaa_device->idxd->id,
-+			iaa_wq->wq->id, ret);
-+		ret = -EIO;
-+		goto err_map_dst;
-+	}
-+	dst_addr = sg_dma_address(req->dst);
-+	dev_dbg(dev, "dma_map_sg, dst_addr %llx, nr_sgs %d, req->dst %p,"
-+		" req->dlen %d, sg_dma_len(sg) %d\n", dst_addr, nr_sgs,
-+		req->dst, req->dlen, sg_dma_len(req->dst));
-+
-+	ret = iaa_decompress(tfm, req, wq, src_addr, req->slen,
-+			     dst_addr, &req->dlen, false);
-+	if (ret == -EINPROGRESS)
-+		return ret;
-+
-+	if (ret != 0)
-+		dev_dbg(dev, "asynchronous decompress failed ret=%d\n", ret);
-+
-+	dma_unmap_sg(dev, req->dst, sg_nents(req->dst), DMA_FROM_DEVICE);
-+err_map_dst:
-+	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_TO_DEVICE);
-+out:
-+	iaa_wq_put(wq);
-+
-+	return ret;
-+}
-+
-+static void compression_ctx_init(struct iaa_compression_ctx *ctx)
-+{
-+	ctx->verify_compress = iaa_verify_compress;
-+}
-+
-+static int iaa_comp_init_fixed(struct crypto_acomp *acomp_tfm)
-+{
-+	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
-+	struct iaa_compression_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	compression_ctx_init(ctx);
-+
-+	ctx->mode = IAA_MODE_FIXED;
++	mutex_unlock(&iaa_devices_lock);
 +
 +	return 0;
 +}
 +
-+static struct acomp_alg iaa_acomp_fixed_deflate = {
-+	.init			= iaa_comp_init_fixed,
-+	.compress		= iaa_comp_acompress,
-+	.decompress		= iaa_comp_adecompress,
-+	.dst_free		= sgl_free,
-+	.base			= {
-+		.cra_name		= "deflate-iaa",
-+		.cra_driver_name	= "deflate_iaa",
-+		.cra_ctxsize		= sizeof(struct iaa_compression_ctx),
-+		.cra_module		= THIS_MODULE,
-+	}
-+};
-+
-+static int iaa_register_compression_device(void)
-+{
-+	int ret;
-+
-+	ret = crypto_register_acomp(&iaa_acomp_fixed_deflate);
-+	if (ret) {
-+		pr_err("deflate algorithm acomp fixed registration failed (%d)\n", ret);
-+		goto out;
-+	}
-+
-+	iaa_crypto_registered = true;
-+out:
-+	return ret;
-+}
-+
-+static int iaa_unregister_compression_device(void)
-+{
-+	if (iaa_crypto_registered)
-+		crypto_unregister_acomp(&iaa_acomp_fixed_deflate);
-+
-+	return 0;
-+}
-+
- static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
+ static int __init iaa_crypto_init_module(void)
  {
- 	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
-@@ -741,6 +1564,11 @@ static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
- 
- 	mutex_lock(&wq->wq_lock);
- 
-+	if (idxd_wq_get_private(wq)) {
-+		mutex_unlock(&wq->wq_lock);
-+		return -EBUSY;
-+	}
-+
- 	if (!idxd_wq_driver_name_match(wq, dev)) {
- 		dev_dbg(dev, "wq %d.%d driver_name match failed: wq driver_name %s, dev driver name %s\n",
- 			idxd->id, wq->id, wq->driver_name, dev->driver->name);
-@@ -774,12 +1602,28 @@ static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
- 
- 	rebalance_wq_table();
- 
-+	if (first_wq) {
-+		iaa_crypto_enabled = true;
-+		ret = iaa_register_compression_device();
-+		if (ret != 0) {
-+			iaa_crypto_enabled = false;
-+			dev_dbg(dev, "IAA compression device registration failed\n");
-+			goto err_register;
-+		}
-+		try_module_get(THIS_MODULE);
-+
-+		pr_info("iaa_crypto now ENABLED\n");
-+	}
-+
- 	mutex_unlock(&iaa_devices_lock);
- out:
- 	mutex_unlock(&wq->wq_lock);
- 
- 	return ret;
- 
-+err_register:
-+	remove_iaa_wq(wq);
-+	free_iaa_wq(idxd_wq_get_private(wq));
- err_save:
- 	if (first_wq)
- 		free_wq_table();
-@@ -795,6 +1639,9 @@ static int iaa_crypto_probe(struct idxd_dev *idxd_dev)
- static void iaa_crypto_remove(struct idxd_dev *idxd_dev)
- {
- 	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
-+	struct idxd_device *idxd = wq->idxd;
-+	struct iaa_wq *iaa_wq;
-+	bool free = false;
- 
- 	idxd_wq_quiesce(wq);
- 
-@@ -802,11 +1649,37 @@ static void iaa_crypto_remove(struct idxd_dev *idxd_dev)
- 	mutex_lock(&iaa_devices_lock);
- 
- 	remove_iaa_wq(wq);
-+
-+	spin_lock(&idxd->dev_lock);
-+	iaa_wq = idxd_wq_get_private(wq);
-+	if (!iaa_wq) {
-+		pr_err("%s: no iaa_wq available to remove\n", __func__);
-+		return;
-+	}
-+
-+	if (iaa_wq->ref) {
-+		iaa_wq->remove = true;
-+	} else {
-+		wq = iaa_wq->wq;
-+		__free_iaa_wq(iaa_wq);
-+		idxd_wq_set_private(wq, NULL);
-+		free = true;
-+	}
-+	spin_unlock(&idxd->dev_lock);
-+
-+	if (free)
-+		kfree(iaa_wq);
-+
- 	drv_disable_wq(wq);
- 	rebalance_wq_table();
- 
--	if (nr_iaa == 0)
-+	if (nr_iaa == 0) {
-+		iaa_crypto_enabled = false;
- 		free_wq_table();
-+		module_put(THIS_MODULE);
-+
-+		pr_info("iaa_crypto now DISABLED\n");
-+	}
- 
- 	mutex_unlock(&iaa_devices_lock);
- 	mutex_unlock(&wq->wq_lock);
-@@ -844,10 +1717,19 @@ static int __init iaa_crypto_init_module(void)
- 		goto err_driver_reg;
+ 	int ret = 0;
+@@ -1951,6 +2012,9 @@ static int __init iaa_crypto_init_module(void)
+ 		goto err_sync_attr_create;
  	}
  
-+	ret = driver_create_file(&iaa_crypto_driver.drv,
-+				 &driver_attr_verify_compress);
-+	if (ret) {
-+		pr_debug("IAA verify_compress attr creation failed\n");
-+		goto err_verify_attr_create;
-+	}
++	if (iaa_crypto_debugfs_init())
++		pr_warn("debugfs init failed, stats not available\n");
 +
  	pr_debug("initialized\n");
  out:
  	return ret;
+@@ -1971,6 +2035,7 @@ static void __exit iaa_crypto_cleanup_module(void)
+ 	if (iaa_unregister_compression_device())
+ 		pr_debug("IAA compression device unregister failed\n");
  
-+err_verify_attr_create:
-+	idxd_driver_unregister(&iaa_crypto_driver);
- err_driver_reg:
- 	iaa_aecs_cleanup_fixed();
- 
-@@ -856,6 +1738,11 @@ static int __init iaa_crypto_init_module(void)
- 
- static void __exit iaa_crypto_cleanup_module(void)
- {
-+	if (iaa_unregister_compression_device())
-+		pr_debug("IAA compression device unregister failed\n");
++	iaa_crypto_debugfs_cleanup();
+ 	driver_remove_file(&iaa_crypto_driver.drv,
+ 			   &driver_attr_sync_mode);
+ 	driver_remove_file(&iaa_crypto_driver.drv,
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.c b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
+new file mode 100644
+index 000000000000..6ad2171bc5d9
+--- /dev/null
++++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
+@@ -0,0 +1,271 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
 +
-+	driver_remove_file(&iaa_crypto_driver.drv,
-+			   &driver_attr_verify_compress);
- 	idxd_driver_unregister(&iaa_crypto_driver);
- 	iaa_aecs_cleanup_fixed();
- 
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/highmem.h>
++#include <linux/mm.h>
++#include <linux/slab.h>
++#include <linux/delay.h>
++#include <linux/smp.h>
++#include <uapi/linux/idxd.h>
++#include <linux/idxd.h>
++#include <linux/dmaengine.h>
++#include "../../dma/idxd/idxd.h"
++#include <linux/debugfs.h>
++#include <crypto/internal/acompress.h>
++#include "iaa_crypto.h"
++#include "iaa_crypto_stats.h"
++
++static u64 total_comp_calls;
++static u64 total_decomp_calls;
++static u64 max_comp_delay_ns;
++static u64 max_decomp_delay_ns;
++static u64 max_acomp_delay_ns;
++static u64 max_adecomp_delay_ns;
++static u64 total_comp_bytes_out;
++static u64 total_decomp_bytes_in;
++static u64 total_completion_einval_errors;
++static u64 total_completion_timeout_errors;
++static u64 total_completion_comp_buf_overflow_errors;
++
++static struct dentry *iaa_crypto_debugfs_root;
++
++void update_total_comp_calls(void)
++{
++	total_comp_calls++;
++}
++
++void update_total_comp_bytes_out(int n)
++{
++	total_comp_bytes_out += n;
++}
++
++void update_total_decomp_calls(void)
++{
++	total_decomp_calls++;
++}
++
++void update_total_decomp_bytes_in(int n)
++{
++	total_decomp_bytes_in += n;
++}
++
++void update_completion_einval_errs(void)
++{
++	total_completion_einval_errors++;
++}
++
++void update_completion_timeout_errs(void)
++{
++	total_completion_timeout_errors++;
++}
++
++void update_completion_comp_buf_overflow_errs(void)
++{
++	total_completion_comp_buf_overflow_errors++;
++}
++
++void update_max_comp_delay_ns(u64 start_time_ns)
++{
++	u64 time_diff;
++
++	time_diff = ktime_get_ns() - start_time_ns;
++
++	if (time_diff > max_comp_delay_ns)
++		max_comp_delay_ns = time_diff;
++}
++
++void update_max_decomp_delay_ns(u64 start_time_ns)
++{
++	u64 time_diff;
++
++	time_diff = ktime_get_ns() - start_time_ns;
++
++	if (time_diff > max_decomp_delay_ns)
++		max_decomp_delay_ns = time_diff;
++}
++
++void update_max_acomp_delay_ns(u64 start_time_ns)
++{
++	u64 time_diff;
++
++	time_diff = ktime_get_ns() - start_time_ns;
++
++	if (time_diff > max_acomp_delay_ns)
++		max_acomp_delay_ns = time_diff;
++}
++
++void update_max_adecomp_delay_ns(u64 start_time_ns)
++{
++	u64 time_diff;
++
++	time_diff = ktime_get_ns() - start_time_ns;
++
++	if (time_diff > max_adecomp_delay_ns)
++
++		max_adecomp_delay_ns = time_diff;
++}
++
++void update_wq_comp_calls(struct idxd_wq *idxd_wq)
++{
++	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
++
++	wq->comp_calls++;
++	wq->iaa_device->comp_calls++;
++}
++
++void update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n)
++{
++	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
++
++	wq->comp_bytes += n;
++	wq->iaa_device->comp_bytes += n;
++}
++
++void update_wq_decomp_calls(struct idxd_wq *idxd_wq)
++{
++	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
++
++	wq->decomp_calls++;
++	wq->iaa_device->decomp_calls++;
++}
++
++void update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n)
++{
++	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
++
++	wq->decomp_bytes += n;
++	wq->iaa_device->decomp_bytes += n;
++}
++
++void reset_iaa_crypto_stats(void)
++{
++	total_comp_calls = 0;
++	total_decomp_calls = 0;
++	max_comp_delay_ns = 0;
++	max_decomp_delay_ns = 0;
++	max_acomp_delay_ns = 0;
++	max_adecomp_delay_ns = 0;
++	total_comp_bytes_out = 0;
++	total_decomp_bytes_in = 0;
++	total_completion_einval_errors = 0;
++	total_completion_timeout_errors = 0;
++	total_completion_comp_buf_overflow_errors = 0;
++}
++
++static void reset_wq_stats(struct iaa_wq *wq)
++{
++	wq->comp_calls = 0;
++	wq->comp_bytes = 0;
++	wq->decomp_calls = 0;
++	wq->decomp_bytes = 0;
++}
++
++void reset_device_stats(struct iaa_device *iaa_device)
++{
++	struct iaa_wq *iaa_wq;
++
++	iaa_device->comp_calls = 0;
++	iaa_device->comp_bytes = 0;
++	iaa_device->decomp_calls = 0;
++	iaa_device->decomp_bytes = 0;
++
++	list_for_each_entry(iaa_wq, &iaa_device->wqs, list)
++		reset_wq_stats(iaa_wq);
++}
++
++static void wq_show(struct seq_file *m, struct iaa_wq *iaa_wq)
++{
++	seq_printf(m, "    name: %s\n", iaa_wq->wq->name);
++	seq_printf(m, "    comp_calls: %llu\n", iaa_wq->comp_calls);
++	seq_printf(m, "    comp_bytes: %llu\n", iaa_wq->comp_bytes);
++	seq_printf(m, "    decomp_calls: %llu\n", iaa_wq->decomp_calls);
++	seq_printf(m, "    decomp_bytes: %llu\n\n", iaa_wq->decomp_bytes);
++}
++
++void device_stats_show(struct seq_file *m, struct iaa_device *iaa_device)
++{
++	struct iaa_wq *iaa_wq;
++
++	seq_puts(m, "iaa device:\n");
++	seq_printf(m, "  id: %d\n", iaa_device->idxd->id);
++	seq_printf(m, "  n_wqs: %d\n", iaa_device->n_wq);
++	seq_printf(m, "  comp_calls: %llu\n", iaa_device->comp_calls);
++	seq_printf(m, "  comp_bytes: %llu\n", iaa_device->comp_bytes);
++	seq_printf(m, "  decomp_calls: %llu\n", iaa_device->decomp_calls);
++	seq_printf(m, "  decomp_bytes: %llu\n", iaa_device->decomp_bytes);
++	seq_puts(m, "  wqs:\n");
++
++	list_for_each_entry(iaa_wq, &iaa_device->wqs, list)
++		wq_show(m, iaa_wq);
++}
++
++void global_stats_show(struct seq_file *m)
++{
++	seq_puts(m, "global stats:\n");
++	seq_printf(m, "  total_comp_calls: %llu\n", total_comp_calls);
++	seq_printf(m, "  total_decomp_calls: %llu\n", total_decomp_calls);
++	seq_printf(m, "  total_comp_bytes_out: %llu\n", total_comp_bytes_out);
++	seq_printf(m, "  total_decomp_bytes_in: %llu\n", total_decomp_bytes_in);
++	seq_printf(m, "  total_completion_einval_errors: %llu\n",
++		   total_completion_einval_errors);
++	seq_printf(m, "  total_completion_timeout_errors: %llu\n",
++		   total_completion_timeout_errors);
++	seq_printf(m, "  total_completion_comp_buf_overflow_errors: %llu\n\n",
++		   total_completion_comp_buf_overflow_errors);
++}
++
++static int wq_stats_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, wq_stats_show, file);
++}
++
++const struct file_operations wq_stats_fops = {
++	.open = wq_stats_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = single_release,
++};
++
++DEFINE_DEBUGFS_ATTRIBUTE(wq_stats_reset_fops, NULL, iaa_crypto_stats_reset, "%llu\n");
++
++int __init iaa_crypto_debugfs_init(void)
++{
++	if (!debugfs_initialized())
++		return -ENODEV;
++
++	iaa_crypto_debugfs_root = debugfs_create_dir("iaa_crypto", NULL);
++	if (!iaa_crypto_debugfs_root)
++		return -ENOMEM;
++
++	debugfs_create_u64("max_comp_delay_ns", 0644,
++			   iaa_crypto_debugfs_root, &max_comp_delay_ns);
++	debugfs_create_u64("max_decomp_delay_ns", 0644,
++			   iaa_crypto_debugfs_root, &max_decomp_delay_ns);
++	debugfs_create_u64("max_acomp_delay_ns", 0644,
++			   iaa_crypto_debugfs_root, &max_comp_delay_ns);
++	debugfs_create_u64("max_adecomp_delay_ns", 0644,
++			   iaa_crypto_debugfs_root, &max_decomp_delay_ns);
++	debugfs_create_u64("total_comp_calls", 0644,
++			   iaa_crypto_debugfs_root, &total_comp_calls);
++	debugfs_create_u64("total_decomp_calls", 0644,
++			   iaa_crypto_debugfs_root, &total_decomp_calls);
++	debugfs_create_u64("total_comp_bytes_out", 0644,
++			   iaa_crypto_debugfs_root, &total_comp_bytes_out);
++	debugfs_create_u64("total_decomp_bytes_in", 0644,
++			   iaa_crypto_debugfs_root, &total_decomp_bytes_in);
++	debugfs_create_file("wq_stats", 0644, iaa_crypto_debugfs_root, NULL,
++			    &wq_stats_fops);
++	debugfs_create_file("stats_reset", 0644, iaa_crypto_debugfs_root, NULL,
++			    &wq_stats_reset_fops);
++
++	return 0;
++}
++
++void __exit iaa_crypto_debugfs_cleanup(void)
++{
++	debugfs_remove_recursive(iaa_crypto_debugfs_root);
++}
++
++MODULE_LICENSE("GPL");
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.h b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
+new file mode 100644
+index 000000000000..ad8333329fa6
+--- /dev/null
++++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
+@@ -0,0 +1,58 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
++
++#ifndef __CRYPTO_DEV_IAA_CRYPTO_STATS_H__
++#define __CRYPTO_DEV_IAA_CRYPTO_STATS_H__
++
++#if defined(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS)
++int	iaa_crypto_debugfs_init(void);
++void	iaa_crypto_debugfs_cleanup(void);
++
++void	update_total_comp_calls(void);
++void	update_total_comp_bytes_out(int n);
++void	update_total_decomp_calls(void);
++void	update_total_decomp_bytes_in(int n);
++void	update_max_comp_delay_ns(u64 start_time_ns);
++void	update_max_decomp_delay_ns(u64 start_time_ns);
++void	update_max_acomp_delay_ns(u64 start_time_ns);
++void	update_max_adecomp_delay_ns(u64 start_time_ns);
++void	update_completion_einval_errs(void);
++void	update_completion_timeout_errs(void);
++void	update_completion_comp_buf_overflow_errs(void);
++
++void	update_wq_comp_calls(struct idxd_wq *idxd_wq);
++void	update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n);
++void	update_wq_decomp_calls(struct idxd_wq *idxd_wq);
++void	update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n);
++
++int	wq_stats_show(struct seq_file *m, void *v);
++int	iaa_crypto_stats_reset(void *data, u64 value);
++
++static inline u64	iaa_get_ts(void) { return ktime_get_ns(); }
++
++#else
++static inline int	iaa_crypto_debugfs_init(void) { return 0; }
++static inline void	iaa_crypto_debugfs_cleanup(void) {}
++
++static inline void	update_total_comp_calls(void) {}
++static inline void	update_total_comp_bytes_out(int n) {}
++static inline void	update_total_decomp_calls(void) {}
++static inline void	update_total_decomp_bytes_in(int n) {}
++static inline void	update_max_comp_delay_ns(u64 start_time_ns) {}
++static inline void	update_max_decomp_delay_ns(u64 start_time_ns) {}
++static inline void	update_max_acomp_delay_ns(u64 start_time_ns) {}
++static inline void	update_max_adecomp_delay_ns(u64 start_time_ns) {}
++static inline void	update_completion_einval_errs(void) {}
++static inline void	update_completion_timeout_errs(void) {}
++static inline void	update_completion_comp_buf_overflow_errs(void) {}
++
++static inline void	update_wq_comp_calls(struct idxd_wq *idxd_wq) {}
++static inline void	update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n) {}
++static inline void	update_wq_decomp_calls(struct idxd_wq *idxd_wq) {}
++static inline void	update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n) {}
++
++static inline u64	iaa_get_ts(void) { return 0; }
++
++#endif // CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS
++
++#endif
 -- 
 2.34.1
 
