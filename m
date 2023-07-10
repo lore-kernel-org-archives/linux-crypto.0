@@ -2,76 +2,65 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EEE0EB64DA
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 19:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B0EEB64DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 20:29:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjGJT7S (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jul 2023 15:59:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55380 "EHLO
+        id S232124AbjGJU3g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jul 2023 16:29:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjGJT7R (ORCPT
+        with ESMTP id S231217AbjGJU3d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jul 2023 15:59:17 -0400
-Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 541C413E;
-        Mon, 10 Jul 2023 12:59:13 -0700 (PDT)
-Date:   Mon, 10 Jul 2023 19:59:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-        s=protonmail; t=1689019149; x=1689278349;
-        bh=fwTczJjO5YIeWHPdb8frxed9Xwy/RsdVULIpyuRV/9s=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=UiBU+YqZ/zP8STxUEcG9HzxFvjnSZ/IB9Z+cX4tsBK9DgeQfUYVdVy74mkR+30PoA
-         Wf6pPdd3n9Fo7KuplCxZwt6KZNh4MOdKq9Eb42BdnLPz95ogZXZLarSBuhpPWCGvI0
-         O/k+LV0yWi0M6ZYdaZx1y09Qv+xDeuo0EUSi1xkss/y3G1auJMqFSV90QevDXTqVSQ
-         Y9M12ogkB5eZzg5mzWLrPfd5pZadkgKIhJUkLA/ajA1vdKpDYiqCDBIjyBezKNh1qr
-         92ntvXovlJxeJNR8uJ9QJEvegwNZAzb2qUgr7NF1H2ovSbctDXarXJaXa2kjs2NHsH
-         z2Dw4HsKemJlw==
+        Mon, 10 Jul 2023 16:29:33 -0400
+Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A0D31B9;
+        Mon, 10 Jul 2023 13:29:28 -0700 (PDT)
+Received: from 250.57.4.146.static.wline.lns.sme.cust.swisscom.ch ([146.4.57.250] helo=martin-debian-2.paytec.ch)
+        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.89)
+        (envelope-from <martin@kaiser.cx>)
+        id 1qIxVd-0002mg-ET; Mon, 10 Jul 2023 22:29:25 +0200
+From:   Martin Kaiser <martin@kaiser.cx>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-From:   Benno Lossin <benno.lossin@proton.me>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        FUJITA Tomonori <fujita.tomonori@gmail.com>,
-        rust-for-linux@vger.kernel.org, Gary Guo <gary@garyguo.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 1/2] rust: add synchronous message digest support
-Message-ID: <35ylz3z7b7bamGPbpNxUZiu46bLTDm374XORwrK3O18N408p9yPyMAWfnFJOuiEkT6booUB4dx-X7V4vjGPyA_uIA7o4_tS8-l23OCGmiY4=@proton.me>
-In-Reply-To: <ZKNXcYXacvP8vyom@gondor.apana.org.au>
-References: <20230615142311.4055228-1-fujita.tomonori@gmail.com> <20230615142311.4055228-2-fujita.tomonori@gmail.com> <udHI3v-OLUqHQt3fwnH71QuRJjzGxexw2rkIYEfnsChCmrLoJTIL_GL1wLCARf-UotY51jkPT6tC8nVDvjf8LkY2zvddpgeRQ5owysZwJos=@proton.me> <20230622.111419.241422502377572827.ubuntu@gmail.com> <0a9af5fa-4df2-11da-b3cb-0a6b1d27fdc2@proton.me> <o6lMzg30KAx1IKuGUzjTWb8ciTkkb_vbseDHu2u5nqLeijQ0vX1QgDOij0HGjQkW4NhJcOMoXHvMCstcByEzjq_CjMuN61l1rUo9DaIf97Y=@proton.me> <ZKNXcYXacvP8vyom@gondor.apana.org.au>
-Feedback-ID: 71780778:user:proton
+Cc:     aric.pzqi@ingenic.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Martin Kaiser <martin@kaiser.cx>
+Subject: [PATCH 1/7] hwrng: ingenic - enable compile testing
+Date:   Mon, 10 Jul 2023 22:27:27 +0200
+Message-Id: <20230710202733.116133-2-martin@kaiser.cx>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230710202733.116133-1-martin@kaiser.cx>
+References: <20230710202733.116133-1-martin@kaiser.cx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-------- Original Message -------
-On Tuesday, July 4th, 2023 at 01:19, Herbert Xu <herbert@gondor.apana.org.a=
-u> wrote:
-> On Fri, Jun 30, 2023 at 02:48:37PM +0000, Benno Lossin wrote:
->=20
-> > 4. return an error
->=20
->=20
-> This would seem to make the most sense.
->=20
-> If there is ever a need to hash more than 4G of data, we would
-> be adding this to C first.
->=20
-> At this point I can't see why we would need to do that so an
-> error would be the appropriate response.
->=20
-> Thanks,
-> --
-> Email: Herbert Xu herbert@gondor.apana.org.au
->=20
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Enable compile testing for the ingenic-trng driver.
 
-Thanks a lot for taking a look!
+Remove the dependency on HW_RANDOM. The ingenic-trng config section is
+under "if HW_RANDOM".
 
---
-Cheers,
-Benno
+Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+---
+ drivers/char/hw_random/Kconfig | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 1aeba12391a1..5d72b8da3c36 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -271,8 +271,7 @@ config HW_RANDOM_INGENIC_RNG
+ 
+ config HW_RANDOM_INGENIC_TRNG
+ 	tristate "Ingenic True Random Number Generator support"
+-	depends on HW_RANDOM
+-	depends on MACH_X1830
++	depends on MACH_X1830 || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the True Random Number Generator
+-- 
+2.30.2
 
