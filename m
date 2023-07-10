@@ -2,82 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A2FEB64DC
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jul 2023 23:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10796C001DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 02:36:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbjGIXvX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Jul 2023 19:51:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43856 "EHLO
+        id S229983AbjGJCg5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 9 Jul 2023 22:36:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbjGIXvW (ORCPT
+        with ESMTP id S229554AbjGJCg4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Jul 2023 19:51:22 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D1210C;
-        Sun,  9 Jul 2023 16:51:20 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qIeBK-000zRi-PC; Mon, 10 Jul 2023 09:51:11 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Jul 2023 09:51:03 +1000
-Date:   Mon, 10 Jul 2023 09:51:03 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.5
-Message-ID: <ZKtH5zrS4pR22PGT@gondor.apana.org.au>
-References: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
- <ZARrt99wJb7IhoY4@gondor.apana.org.au>
- <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
- <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
+        Sun, 9 Jul 2023 22:36:56 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1FC0E0;
+        Sun,  9 Jul 2023 19:36:55 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-c5f98fc4237so3773307276.2;
+        Sun, 09 Jul 2023 19:36:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688956615; x=1691548615;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W3XEg4q7KHiIFxw+vZ9TCJt73U1Opkr0tChPrvQjUrw=;
+        b=piUG3eNNngUZ5OivMBd56VnDb7ZVpVgDcp5zmA3oWTAjtGTSEVzmBrFnmNJ7f75aKc
+         GFieFnE58F29a7GgRRkVRTsEuczvcBvg7MegkvgjSXbWtZxGq5b+2XpssKUEbfgJ9NhA
+         tOcQ+j99cxSR0PYV6tHQ9wZ2Ja8k/q8vuHK+myhKSKWZLVbOnqPVmR+ahvyHSaOhjRKm
+         IwMGPV2HzLNHsISosPCgAnYb1mUTgIxyWAspy/3A1331Xv/VzwFTRdXndsbeNMq+1Ov6
+         OUW/kw9+QCeq3teFHV+EoYMgokRoHYPjJU3ornzKXdM9Q7v+LKFee2r2060CJDi7ib8C
+         EpIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688956615; x=1691548615;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W3XEg4q7KHiIFxw+vZ9TCJt73U1Opkr0tChPrvQjUrw=;
+        b=DUjldnsaAqpwn5B+HnQL6BgFJGo0srBJESFgKvHZFbODEzcL8ywcCBEAndLxwauJW7
+         T90HveAdTruUyGqk57Wnc2mphxfSWCV4VOOREaOqSDZ9E+o//yT5S0FYUpjtAFoFB+Tn
+         8SxlzeqBpbpnBR1eey/Ce+amESv/owNCE2g0k3/8OUgr5ishlfRdjnEdcVtJMpf6hpLW
+         Pxyn8CxAFVcaOw4ROqaSITgH5JczIL9EnpQOswWD985C12Oc533bR7D8lEdgvMWJEEWF
+         C8MI19akGqaNEPHo6ONImJ/rsHu58jyCiwfdSM7+c8CE5higkDp4csPNzYPyjHcBWi3a
+         QUTQ==
+X-Gm-Message-State: ABy/qLYRttZBWsGnTyuoUmbeh+qELyR/0pND6dH0U7E0JyhftqmQBLoL
+        yZDyZQjxDmTmVPJ/x4zQvo4JaM7QGW4rseSsKeY=
+X-Google-Smtp-Source: APBJJlGmgkn41KVGmJK6jmsL7u3NDJiDfMPK2soV0sGV2ONvwwz/30etSudifomZNq+dEI80vgCg58Empf256F4zsM4=
+X-Received: by 2002:a05:6902:87:b0:c5d:d6cd:fade with SMTP id
+ h7-20020a056902008700b00c5dd6cdfademr5535414ybs.50.1688956614808; Sun, 09 Jul
+ 2023 19:36:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
+References: <20230620200832.3379741-1-azeemshaikh38@gmail.com> <202306201311.862B05981F@keescook>
+In-Reply-To: <202306201311.862B05981F@keescook>
+From:   Azeem Shaikh <azeemshaikh38@gmail.com>
+Date:   Sun, 9 Jul 2023 22:36:44 -0400
+Message-ID: <CADmuW3XKZkYB4dKPa2Bsoj96CK4hT_8cwV++7rEFP=Wxw7hGvQ@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: Replace strlcpy with strscpy
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>,
+        linux-hardening@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Tue, Jun 20, 2023 at 4:12=E2=80=AFPM Kees Cook <keescook@chromium.org> w=
+rote:
+>
+> On Tue, Jun 20, 2023 at 08:08:32PM +0000, Azeem Shaikh wrote:
+> > strlcpy() reads the entire source buffer first.
+> > This read may exceed the destination size limit.
+> > This is both inefficient and can lead to linear read
+> > overflows if a source string is not NUL-terminated [1].
+> > In an effort to remove strlcpy() completely [2], replace
+> > strlcpy() here with strscpy().
+> >
+> > Direct replacement is safe here since return value of -errno
+> > is used to check for truncation instead of sizeof(dest).
+> >
+> > [1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strl=
+cpy
+> > [2] https://github.com/KSPP/linux/issues/89
+> >
+> > Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
+>
+> Thanks for fixing up the variable type. (And thank you Eric for catching
+> the signedness problem!)
+>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+>
 
-The following changes since commit 5d95ff84e62be914b4a4dabfa814e4096b05b1b0:
-
-  Merge tag 'v6.5-p1' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 (2023-06-30 21:27:13 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 v6.5-p2 
-
-for you to fetch changes up to 0b7ec177b589842c0abf9e91459c83ba28d32452:
-
-  crypto: algif_hash - Fix race between MORE and non-MORE sends (2023-07-08 22:48:42 +1000)
-
-----------------------------------------------------------------
-This push fixes a couple of regressions in af_alg and incorrect
-return values in crypto/asymmetric_keys/public_key.
-----------------------------------------------------------------
-
-Dan Carpenter (1):
-      KEYS: asymmetric: Fix error codes
-
-David Howells (2):
-      crypto: af_alg - Fix merging of written data into spliced pages
-      crypto: algif_hash - Fix race between MORE and non-MORE sends
-
- crypto/af_alg.c                     |  7 ++++---
- crypto/algif_hash.c                 |  4 +++-
- crypto/asymmetric_keys/public_key.c | 20 +++++++++++++++-----
- 3 files changed, 22 insertions(+), 9 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Friendly ping on this.
