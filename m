@@ -2,199 +2,233 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1865CEB64D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 18:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E82B2C001DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jul 2023 19:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbjGJS0u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jul 2023 14:26:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44992 "EHLO
+        id S229710AbjGJTHD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jul 2023 15:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjGJS0t (ORCPT
+        with ESMTP id S229468AbjGJTHD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jul 2023 14:26:49 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2048.outbound.protection.outlook.com [40.107.100.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B2BAB;
-        Mon, 10 Jul 2023 11:26:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GnJnEJxMhRWt7XuxEpHU1sXM4P0qFKx/czul1Wb1xhMSSzandU97Ark8vGRrjHkWEh9o/wVqPN9QOkF1bdsrOBSK7005fa+cuwe0xmHcT6OhY78kM6hIYmIUiokbNUS2YqJvg1QnSWkZyRoiW5cp39gVSwz2TbmG3h5T81AMwrQEP+08Vm0ALKDaiFiDXMHfYEpsIKMRrMW2YOsTkFrWUmsqq76kRTxCEELOQEuwajCQJuurVYO/5IVlUHVc0H2weCR6RlUn4MRNDnsDKTMBV3IK45idgFXAGEaFHm52wiuav9UAXhtXgMhNVATSUG3NfDa+DTauDrFhug+R9onzFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3FWsILRdPotKQYzhlsXC8KcjHd0YWNrZi1b71MoUum8=;
- b=lM1EIkkIpmWb/3iuxgNmDEx1q2Ix90CGmuaCrZdLbpzLFAA+AQvykAVmTDg6wIBt+AJo7evhJp8F2bihEnLuUlpj4yR9ioh0YXX52Kx3DzX0NPBev05XIZLdotYx5pBC9bz5035FUgXAeRO1/1jWdzRvMDALdk1Ds+zUhyGyg+2IpycAwG4G9NnLeo/Esm3R1zKOVg08JR0FO1iNnAAMCW7DEemfDMLbAz6AkU9lLeFKGRzcborNQzHWvRreiA2kDBkqdlm6mOE2b09gED3DbODnagc0GKK8ttjTG5tSaL6Wo2LDk4JzAGzwR004U4bHUjRW+AmoBEPGeN/C+rllGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3FWsILRdPotKQYzhlsXC8KcjHd0YWNrZi1b71MoUum8=;
- b=MsbHauKgM/qQB3hI43e7LT/4j/p8KxRVzHmnG6PdTgv4XBRz3DLW+liecmuVnZrw/oT3WFVE35iadWqNs71i4ESLZspodUwBEQ6HHriyn46AbfU6fI4JothH52kWjmKausW3d5cK7aNB1UBv4ngUr7Ews8GCNr4eoiI+n+fI3Fk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
- by SA0PR12MB4558.namprd12.prod.outlook.com (2603:10b6:806:72::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.31; Mon, 10 Jul
- 2023 18:26:44 +0000
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::bce4:716a:8303:efcf]) by MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::bce4:716a:8303:efcf%4]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
- 18:26:44 +0000
-Message-ID: <580858e8-27c8-ca3c-cb3d-61041298eb44@amd.com>
-Date:   Mon, 10 Jul 2023 13:26:41 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v5 00/11] Add dynamic boost control support
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        John Allen <john.allen@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20230623135001.18672-1-mario.limonciello@amd.com>
-From:   "Limonciello, Mario" <mario.limonciello@amd.com>
-In-Reply-To: <20230623135001.18672-1-mario.limonciello@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DS7PR03CA0313.namprd03.prod.outlook.com
- (2603:10b6:8:2b::18) To MN0PR12MB6101.namprd12.prod.outlook.com
- (2603:10b6:208:3cb::10)
+        Mon, 10 Jul 2023 15:07:03 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED209D;
+        Mon, 10 Jul 2023 12:07:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1689016022; x=1720552022;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=7wHyUQOkzK8BGn6NRiVl1TNuSnOG57CjWfmL7W1+UkQ=;
+  b=fmh8XupGPV0dSkTTduJZdTEwBG71Nsel6RzRrhRm+0mHR9grJSpErYPC
+   o6ZgET+CoQb6BvB4qqcBBAH9RmJdRXmgjzfToSiV3dhozBJcXqKJhKHqI
+   HdodTKDrVF5J6zwrQe0wUwc6Cly02HenLanu2uLBKUbJ7QZ6brIpkpR+b
+   tmwLRpTJX78u/mPws9O5n4j0WCL43G4f+HW69lPM9GU3WBZmeQz2ayxzN
+   tyQAKE5W2XjysbxEGwjAcvzgo+Jkh0796AhAdRxhH5+8uDAJs0jsBjDdb
+   2535GernuKUXdMLiClzuhTsb2U4NO5n4j3/CC5ZxTx8ApHwV/HGD2G8el
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="354290736"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="354290736"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 12:07:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10767"; a="844990983"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="844990983"
+Received: from jdmillsx-mobl1.amr.corp.intel.com (HELO tzanussi-mobl1.intel.com) ([10.212.107.12])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2023 12:06:59 -0700
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        fenghua.yu@intel.com, vkoul@kernel.org
+Cc:     dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
+        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: [PATCH v7 01/14] dmaengine: idxd: add wq driver name support for accel-config user tool
+Date:   Mon, 10 Jul 2023 14:06:41 -0500
+Message-Id: <20230710190654.299639-2-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
+References: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|SA0PR12MB4558:EE_
-X-MS-Office365-Filtering-Correlation-Id: 346d9fea-a6b6-4f9b-98a1-08db8173368a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: urASjH7dGx3CheY18ky6xUkNHheKA6yDPCgZIi1mo1ZxDGvvnNOdcTahdwaStTEm5jQ3kAWMC0PzkQgjCddswooATtHM48lsCphqKf923krXK5kW4r8zqbWTyJCLnEralZB5ES7LBVxRk9cDJDyIX9rW+/fXXXB+MhUSHf5cLez3PmMTQh8QPf1RIrYTXNbMUGR+dyNZTDrb4F/r+QHD9uNCZeVuphFyhD7HX/1fjFznj4H9pk9Rw2r9D3WMIF8J36qddJ2Jo1UjE59TqAqlWhal/zNyTnztfuLtMNxG2uaqi/+e4ctqElhSAyVx7eV7aM9+vxwixO7x2a3Zrw0PyOW8dDOPv1dhnjueaiy4rtyuHnRjk+i91vLcUQuL2OOE3/Xpf3fkiZ4g9GscEiZNycLIBh4DhT9rmBA0FNwGIuCRp9nANdQUyM2bk/lAvBqgIWGJQdK/NAKarzsgWrsiIz1TEBkG5PGfyfKrNSxdr9ycbWIAt+rEz08aHDDKUZlFScFkHDaJH1vKF0QKdZrogA0XY7kjKojcJ1++dfQJ+HwmBTp0o6jOi8ne1mgmM5SaX6y5KciJbPo1IyW+RSHIZHCL6lbu1zNdOsehXZdM1ENdChn7+nFQ6qVvvG5RUqt+bAl99wx7r5WPOLzAI6PfVQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(39860400002)(346002)(366004)(451199021)(36756003)(86362001)(31696002)(38100700002)(478600001)(6666004)(54906003)(6486002)(6512007)(8676002)(8936002)(316002)(5660300002)(2906002)(4326008)(66476007)(6916009)(66556008)(66946007)(31686004)(41300700001)(2616005)(26005)(6506007)(53546011)(186003)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SC8rRjl3TDB5Ky9mMEJqWGYyOU8rUE04SVAyMy9VOWVDYXN3R2Z2VCtiajRz?=
- =?utf-8?B?VSs3SWhMUmZORVp0MTNXWmd1OE9xcWVXUkdTZXRDTm4xOGhlYVFsalVVN3Ri?=
- =?utf-8?B?T0I4bWo1a1piR0VCSER1U2xOZmZnUTh0azExTTBpRjZUbWpjTHBoQm5XREQ3?=
- =?utf-8?B?Q0ZZRnZVY2ZXUURjTjUzYzB6UW9nbXFxLzFtdUNFeGlTTHBjL3UzTXI0NjIw?=
- =?utf-8?B?cm4rVkVsOFUyc3hub28xeUd2alN0SjNranRyQXJ5UUw5MHhtMTlTR0RaSG9a?=
- =?utf-8?B?YUZob3ZiM0dHZnFaRi90bEFBaTYyVG90SHY0WFQ2U1JtcWt1dm4ycWk5NS9j?=
- =?utf-8?B?QzgrTmd0VVhNb2Z0N204Tzl1MkpCNDBOYmRvalVLejBDczVZeXpjTDFQaXNB?=
- =?utf-8?B?OEk4TWFydUdDTW55ckY2TDZyZjlZMStEM3ZJKzl3OEowVXFOVDB4cXA5Qzhh?=
- =?utf-8?B?Q00ydXd1dWtYZ1lWUmZsMys2aEg2SmorTkhaSWRoSnpWMUNtU0YwQXdGOXlD?=
- =?utf-8?B?RTdxN24xeGhxenEySk1jRUFkamZaRGxKVm1xaU1hSm4vSUlCTm1vQXQ5WlZI?=
- =?utf-8?B?SmpPd0tqcElHZUVIYzM5UmFtT1NBako0VUdMUmVpTFNIeUlXWmFjWXJSeGFD?=
- =?utf-8?B?MVA2ZmRNTVRyblZJS3pxVWk4Vy8xMG0vYXhyR1I3RVZlZGRaVTE4REVhSnZU?=
- =?utf-8?B?QzlWZDN5S21yTXJCVStQdERPRlVqdDdlc1NIbDJVUUFxaVgzUEtnd0RVbVd4?=
- =?utf-8?B?ZzU4MkFQNEUyN0dPemU0eGxnUnBGOVIzeWhyMmlaa1pwUGRrNFJFdFZXempE?=
- =?utf-8?B?dGlXaFg3RnNld1Rka0VPeHpQKzUxWndJMTJXT2EyQzlEblB5Qm9hS0E2d21w?=
- =?utf-8?B?MXd1d1pBcTdZcEhoNEZVV2JuSG4rL3BnY1FRaDcrM3VDTWdtY1JoemgrNE9i?=
- =?utf-8?B?Y3ZzeUxSWTZZYklvUmtRckFXeTRBSkU5ZU4yRDU0SmZPOElWOW0xQVJ1akVE?=
- =?utf-8?B?YkRzUkRnN2VOTkN3T3czYWFyVC9XOVlEUThDLzVqV2JaR0R2RjFOM25vdXc0?=
- =?utf-8?B?cFNYN0Z2SGtpYkxOZ01BNVhGV0Flak1WMnUxcFdFREFVOWppUERYOXV0aSty?=
- =?utf-8?B?eERGcWtWc1VXSisvaDBacnNmY1pvS1NrNjJuTVB5eUhlUGRjK3FtT2ZUUFMy?=
- =?utf-8?B?WXdEdEdhQktLbU1RN3dkcS92VHVEcElZd0hpRko2TDJMcjNmd3MwWDJMWmJw?=
- =?utf-8?B?VlB2VEhTSDFqQ3FUenArczA2TjZvcWYyc0Y1R3VGRnJBMG1oU2ZKeFdlMDhl?=
- =?utf-8?B?ZzF4VktTNERtRk9vTm1PVGhzY1U2b2hTa0poLzZZZURwOFJYU3BjYUM0ZTFw?=
- =?utf-8?B?ZGE2c0FkUk9TNHFzaEdEaVRnMEtGVnF3OWZDZ1RwUXh6aG1iQ1pVSmVJdUlk?=
- =?utf-8?B?dU83bi9sWDZSZzRtVFNqUVdtRWNGbU5NUEJwOEhZS29DWUdtMW5vOTY4SDlw?=
- =?utf-8?B?anRtME1uYTBZVW42bnlmZkx6dFpvSWxYejZaMzBpbkFHVnhkS3o4YWdxaGJ6?=
- =?utf-8?B?SHNnUHAxbmFvZTBRMnViRUZnZU5rbzR1cWNGSFNpd2ZqY3JVc0lkM1ptd3dG?=
- =?utf-8?B?eE5FT2tEeExmVU1INHVVZEhtVGl3ZllVaGtmTFJrNURnZUdjSVNYYlh3VG1t?=
- =?utf-8?B?Nnc5UWJLT0Y1aHpId2JMaHo0SlN3WGhEQnpNWlV6SFQvTEdJdTl3eGJmc1pM?=
- =?utf-8?B?TFRNV0NoQmFiS3AzT09HV01DOG9WWXNzTXl4ZmZydi9GQTlsVGkrQzFtZ1dH?=
- =?utf-8?B?SWw4Z0FFbEN6WjFPWENLalhwUGpnU1p0eWliejc4MzdLd01JRUJpTWtNdDBC?=
- =?utf-8?B?VmtxSGN5aEJPenVFR0IvUUJOTlZoek1hYjkyZkRRVEVRekkvMHNVcTVOR1hn?=
- =?utf-8?B?cDVJOXZKSk03WHRMem1Uam1qaTBTUFlxZlVONW04NU1rTVJ1Ump5ZVQvSy9J?=
- =?utf-8?B?TG5uZzZpM0FEN0hkMEdvT3d2bmRINFczckxtbmVsSkJxYk1MVmxTZjNrcDVV?=
- =?utf-8?B?enhYZFJVeTBDc0RmbWNGYVR1ZE1IUEduUHhRTUprWWlKUlUvcy93VGlqY0FW?=
- =?utf-8?Q?uQ1+mEZnCsdWxAesmtr5UxwiY?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 346d9fea-a6b6-4f9b-98a1-08db8173368a
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 18:26:44.1344
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bhpjDEQhuQTDNkNMR1j/UpKKSvM+p9pXZsrgTS/wsldhsh5bb+aPKHuwWYA6S6gZrT8Qli8XApg3vicdTjOf8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4558
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/23/2023 08:49, Mario Limonciello wrote:
-> Dynamic boost control is a feature of some SoCs that allows
-> an authenticated entity to send commands to the security processor
-> to control certain SOC characteristics with the intention to improve
-> performance.
-> 
-> This is implemented via a mechanism that a userspace application would
-> authenticate using a nonce and key exchange over an IOCTL interface.
-> 
-> After authentication is complete an application can exchange signed
-> messages with the security processor and both ends can validate the
-> data transmitted.
-> 
-> This series includes a test suite that can be run on real hardware
-> to ensure that the communication works as expected.  This can also be
-> used for an application to model the communication path.
-> 
-> Two sysfs files are introduced for reading the PSP bootloader version
-> as well as TEE version which can be useful data points for debugging
-> communication problems.
-> 
-> v4->v5:
->   * Pick up tags
->   * Pick up a static fix
->   * Fix a mistake found in dbc_cli
-> 
-> Mario Limonciello (11):
->    crypto: ccp: Rename macro for security attributes
->    crypto: ccp: Add support for displaying PSP firmware versions
->    crypto: ccp: Add bootloader and TEE version offsets
->    crypto: ccp: move setting PSP master to earlier in the init
->    crypto: ccp: Add support for fetching a nonce for dynamic boost
->      control
->    crypto: ccp: Add support for setting user ID for dynamic boost control
->    crypto: ccp: Add support for getting and setting DBC parameters
->    crypto: ccp: Add a sample library for ioctl use
->    crypto: ccp: Add a sample python script for Dynamic Boost Control
->    crypto: ccp: Add unit tests for dynamic boost control
->    crypto: ccp: Add Mario to MAINTAINERS
-> 
->   Documentation/ABI/testing/sysfs-driver-ccp |  18 ++
->   MAINTAINERS                                |  12 +
->   drivers/crypto/ccp/Makefile                |   3 +-
->   drivers/crypto/ccp/dbc.c                   | 250 +++++++++++++++++++
->   drivers/crypto/ccp/dbc.h                   |  56 +++++
->   drivers/crypto/ccp/psp-dev.c               |  19 +-
->   drivers/crypto/ccp/psp-dev.h               |   1 +
->   drivers/crypto/ccp/sp-dev.h                |   7 +
->   drivers/crypto/ccp/sp-pci.c                |  96 +++++++-
->   include/linux/psp-platform-access.h        |   4 +
->   include/uapi/linux/psp-dbc.h               | 147 ++++++++++++
->   tools/crypto/ccp/.gitignore                |   1 +
->   tools/crypto/ccp/Makefile                  |  13 +
->   tools/crypto/ccp/dbc.c                     |  72 ++++++
->   tools/crypto/ccp/dbc.py                    |  64 +++++
->   tools/crypto/ccp/dbc_cli.py                | 134 +++++++++++
->   tools/crypto/ccp/test_dbc.py               | 266 +++++++++++++++++++++
->   17 files changed, 1146 insertions(+), 17 deletions(-)
->   create mode 100644 drivers/crypto/ccp/dbc.c
->   create mode 100644 drivers/crypto/ccp/dbc.h
->   create mode 100644 include/uapi/linux/psp-dbc.h
->   create mode 100644 tools/crypto/ccp/.gitignore
->   create mode 100644 tools/crypto/ccp/Makefile
->   create mode 100644 tools/crypto/ccp/dbc.c
->   create mode 100644 tools/crypto/ccp/dbc.py
->   create mode 100755 tools/crypto/ccp/dbc_cli.py
->   create mode 100755 tools/crypto/ccp/test_dbc.py
-> 
-> 
-> base-commit: b335f258e8ddafec0e8ae2201ca78d29ed8f85eb
+From: Dave Jiang <dave.jiang@intel.com>
 
-Herbert,
+With the possibility of multiple wq drivers that can be bound to the wq,
+the user config tool accel-config needs a way to know which wq driver to
+bind to the wq. Introduce per wq driver_name sysfs attribute where the user
+can indicate the driver to be bound to the wq. This allows accel-config to
+just bind to the driver using wq->driver_name.
 
-Any other concerns on this series?  It has acks from Tom and John both now.
+Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+---
+ .../ABI/stable/sysfs-driver-dma-idxd          |  6 ++++
+ drivers/dma/idxd/cdev.c                       |  7 +++++
+ drivers/dma/idxd/dma.c                        |  6 ++++
+ drivers/dma/idxd/idxd.h                       |  9 ++++++
+ drivers/dma/idxd/sysfs.c                      | 28 +++++++++++++++++++
+ include/uapi/linux/idxd.h                     |  1 +
+ 6 files changed, 57 insertions(+)
 
-Do you want me to rebase on 6.5-rc1?
+diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+index 534b7a3d59fc..0e577209bee2 100644
+--- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
++++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+@@ -270,6 +270,12 @@ Description:	Shows the operation capability bits displayed in bitmap format
+ 		correlates to the operations allowed. It's visible only
+ 		on platforms that support the capability.
+ 
++What:		/sys/bus/dsa/devices/wq<m>.<n>/driver_name
++Date:		Mar 27, 2023
++KernelVersion:	6.6.0
++Contact:	dmaengine@vger.kernel.org
++Description:	Name of driver to be bounded to the wq.
++
+ What:           /sys/bus/dsa/devices/engine<m>.<n>/group_id
+ Date:           Oct 25, 2019
+ KernelVersion:  5.6.0
+diff --git a/drivers/dma/idxd/cdev.c b/drivers/dma/idxd/cdev.c
+index ecbf67c2ad2b..b1ecfb71d95e 100644
+--- a/drivers/dma/idxd/cdev.c
++++ b/drivers/dma/idxd/cdev.c
+@@ -510,6 +510,7 @@ void idxd_wq_del_cdev(struct idxd_wq *wq)
+ 
+ static int idxd_user_drv_probe(struct idxd_dev *idxd_dev)
+ {
++	struct device *dev = &idxd_dev->conf_dev;
+ 	struct idxd_wq *wq = idxd_dev_to_wq(idxd_dev);
+ 	struct idxd_device *idxd = wq->idxd;
+ 	int rc;
+@@ -537,6 +538,12 @@ static int idxd_user_drv_probe(struct idxd_dev *idxd_dev)
+ 
+ 	mutex_lock(&wq->wq_lock);
+ 
++	if (!idxd_wq_driver_name_match(wq, dev)) {
++		idxd->cmd_status = IDXD_SCMD_WQ_NO_DRV_NAME;
++		rc = -ENODEV;
++		goto wq_err;
++	}
++
+ 	wq->wq = create_workqueue(dev_name(wq_confdev(wq)));
+ 	if (!wq->wq) {
+ 		rc = -ENOMEM;
+diff --git a/drivers/dma/idxd/dma.c b/drivers/dma/idxd/dma.c
+index eb35ca313684..8bb7e7ff8d6a 100644
+--- a/drivers/dma/idxd/dma.c
++++ b/drivers/dma/idxd/dma.c
+@@ -305,6 +305,12 @@ static int idxd_dmaengine_drv_probe(struct idxd_dev *idxd_dev)
+ 		return -ENXIO;
+ 
+ 	mutex_lock(&wq->wq_lock);
++	if (!idxd_wq_driver_name_match(wq, dev)) {
++		idxd->cmd_status = IDXD_SCMD_WQ_NO_DRV_NAME;
++		rc = -ENODEV;
++		goto err;
++	}
++
+ 	wq->type = IDXD_WQT_KERNEL;
+ 
+ 	rc = drv_enable_wq(wq);
+diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+index 5428a2e1b1ec..c62c78e1c9fa 100644
+--- a/drivers/dma/idxd/idxd.h
++++ b/drivers/dma/idxd/idxd.h
+@@ -159,6 +159,8 @@ struct idxd_cdev {
+ 	int minor;
+ };
+ 
++#define DRIVER_NAME_SIZE		128
++
+ #define IDXD_ALLOCATED_BATCH_SIZE	128U
+ #define WQ_NAME_SIZE   1024
+ #define WQ_TYPE_SIZE   10
+@@ -227,6 +229,8 @@ struct idxd_wq {
+ 	/* Lock to protect upasid_xa access. */
+ 	struct mutex uc_lock;
+ 	struct xarray upasid_xa;
++
++	char driver_name[DRIVER_NAME_SIZE + 1];
+ };
+ 
+ struct idxd_engine {
+@@ -637,6 +641,11 @@ static inline void idxd_wqcfg_set_max_batch_shift(int idxd_type, union wqcfg *wq
+ 		wqcfg->max_batch_shift = max_batch_shift;
+ }
+ 
++static inline int idxd_wq_driver_name_match(struct idxd_wq *wq, struct device *dev)
++{
++	return (strncmp(wq->driver_name, dev->driver->name, strlen(dev->driver->name)) == 0);
++}
++
+ int __must_check __idxd_driver_register(struct idxd_device_driver *idxd_drv,
+ 					struct module *module, const char *mod_name);
+ #define idxd_driver_register(driver) \
+diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
+index 293739ac5596..6caad044f506 100644
+--- a/drivers/dma/idxd/sysfs.c
++++ b/drivers/dma/idxd/sysfs.c
+@@ -1266,6 +1266,33 @@ static ssize_t wq_op_config_store(struct device *dev, struct device_attribute *a
+ static struct device_attribute dev_attr_wq_op_config =
+ 		__ATTR(op_config, 0644, wq_op_config_show, wq_op_config_store);
+ 
++static ssize_t wq_driver_name_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct idxd_wq *wq = confdev_to_wq(dev);
++
++	return sysfs_emit(buf, "%s\n", wq->driver_name);
++}
++
++static ssize_t wq_driver_name_store(struct device *dev, struct device_attribute *attr,
++				    const char *buf, size_t count)
++{
++	struct idxd_wq *wq = confdev_to_wq(dev);
++
++	if (wq->state != IDXD_WQ_DISABLED)
++		return -EPERM;
++
++	if (strlen(buf) > DRIVER_NAME_SIZE || strlen(buf) == 0)
++		return -EINVAL;
++
++	memset(wq->driver_name, 0, DRIVER_NAME_SIZE + 1);
++	strncpy(wq->driver_name, buf, DRIVER_NAME_SIZE);
++	strreplace(wq->name, '\n', '\0');
++	return count;
++}
++
++static struct device_attribute dev_attr_wq_driver_name =
++		__ATTR(driver_name, 0644, wq_driver_name_show, wq_driver_name_store);
++
+ static struct attribute *idxd_wq_attributes[] = {
+ 	&dev_attr_wq_clients.attr,
+ 	&dev_attr_wq_state.attr,
+@@ -1285,6 +1312,7 @@ static struct attribute *idxd_wq_attributes[] = {
+ 	&dev_attr_wq_occupancy.attr,
+ 	&dev_attr_wq_enqcmds_retries.attr,
+ 	&dev_attr_wq_op_config.attr,
++	&dev_attr_wq_driver_name.attr,
+ 	NULL,
+ };
+ 
+diff --git a/include/uapi/linux/idxd.h b/include/uapi/linux/idxd.h
+index 606b52e88ce3..3d1987e1bb2d 100644
+--- a/include/uapi/linux/idxd.h
++++ b/include/uapi/linux/idxd.h
+@@ -31,6 +31,7 @@ enum idxd_scmd_stat {
+ 	IDXD_SCMD_WQ_IRQ_ERR = 0x80100000,
+ 	IDXD_SCMD_WQ_USER_NO_IOMMU = 0x80110000,
+ 	IDXD_SCMD_DEV_EVL_ERR = 0x80120000,
++	IDXD_SCMD_WQ_NO_DRV_NAME = 0x80200000,
+ };
+ 
+ #define IDXD_SCMD_SOFTERR_MASK	0x80000000
+-- 
+2.34.1
 
-Thanks,
