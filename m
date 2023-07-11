@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEED9EB64DD
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jul 2023 15:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F74C001DD
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jul 2023 15:39:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232858AbjGKPjm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jul 2023 11:39:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51088 "EHLO
+        id S232859AbjGKPjq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jul 2023 11:39:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232859AbjGKPjG (ORCPT
+        with ESMTP id S232876AbjGKPjH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jul 2023 11:39:06 -0400
+        Tue, 11 Jul 2023 11:39:07 -0400
 Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445E2198A;
-        Tue, 11 Jul 2023 08:38:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99F2D1982;
+        Tue, 11 Jul 2023 08:38:09 -0700 (PDT)
 Received: from i53875a50.versanet.de ([83.135.90.80] helo=phil.lan)
         by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <heiko@sntech.de>)
-        id 1qJFQz-0000g0-M6; Tue, 11 Jul 2023 17:37:49 +0200
+        id 1qJFR2-0000g0-39; Tue, 11 Jul 2023 17:37:52 +0200
 From:   Heiko Stuebner <heiko@sntech.de>
 To:     palmer@dabbelt.com, paul.walmsley@sifive.com
 Cc:     aou@eecs.berkeley.edu, heiko@sntech.de,
@@ -27,10 +27,11 @@ Cc:     aou@eecs.berkeley.edu, heiko@sntech.de,
         conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         christoph.muellner@vrull.eu, ebiggers@kernel.org,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: [PATCH v4 05/12] RISC-V: crypto: update perl include with helpers for vector (crypto) instructions
-Date:   Tue, 11 Jul 2023 17:37:36 +0200
-Message-Id: <20230711153743.1970625-6-heiko@sntech.de>
+        Heiko Stuebner <heiko.stuebner@vrull.eu>,
+        Charalampos Mitrodimas <charalampos.mitrodimas@vrull.eu>
+Subject: [PATCH v4 09/12] RISC-V: crypto: add a vector-crypto-accelerated SHA512 implementation
+Date:   Tue, 11 Jul 2023 17:37:40 +0200
+Message-Id: <20230711153743.1970625-10-heiko@sntech.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230711153743.1970625-1-heiko@sntech.de>
 References: <20230711153743.1970625-1-heiko@sntech.de>
@@ -43,465 +44,560 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-The openSSL scripts use a number of helpers for handling vector
-instructions and instructions from the vector-crypto-extensions.
+This adds an accelerated SHA512 algorithm using either the Zvknhb
+vector crypto extension.
 
-Therefore port these over from openSSL.
-
-Co-developed-by: Christoph Müllner <christoph.muellner@vrull.eu>
-Signed-off-by: Christoph Müllner <christoph.muellner@vrull.eu>
+Co-developed-by: Charalampos Mitrodimas <charalampos.mitrodimas@vrull.eu>
+Signed-off-by: Charalampos Mitrodimas <charalampos.mitrodimas@vrull.eu>
 Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 ---
- arch/riscv/crypto/riscv.pm | 433 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 432 insertions(+), 1 deletion(-)
+ arch/riscv/crypto/Kconfig                     |  11 +
+ arch/riscv/crypto/Makefile                    |   8 +-
+ arch/riscv/crypto/sha512-riscv64-glue.c       | 106 +++++
+ .../crypto/sha512-riscv64-zvbb-zvknhb.pl      | 377 ++++++++++++++++++
+ 4 files changed, 501 insertions(+), 1 deletion(-)
+ create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
+ create mode 100644 arch/riscv/crypto/sha512-riscv64-zvbb-zvknhb.pl
 
-diff --git a/arch/riscv/crypto/riscv.pm b/arch/riscv/crypto/riscv.pm
-index a44edc68d1a6..89e4cb7cfd8c 100644
---- a/arch/riscv/crypto/riscv.pm
-+++ b/arch/riscv/crypto/riscv.pm
-@@ -79,6 +79,29 @@ sub read_reg {
-     return $1;
- }
+diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+index 860919d230aa..e564f861d95e 100644
+--- a/arch/riscv/crypto/Kconfig
++++ b/arch/riscv/crypto/Kconfig
+@@ -28,4 +28,15 @@ config CRYPTO_SHA256_RISCV64
+ 	  Architecture: riscv64 using
+ 	  - Zvknha or Zvknhb vector crypto extensions
  
-+my @vregs = map("v$_",(0..31));
-+my %vreglookup;
-+@vreglookup{@vregs} = @vregs;
++config CRYPTO_SHA512_RISCV64
++	tristate "Hash functions: SHA-512"
++	depends on 64BIT && RISCV_ISA_V
++	select CRYPTO_HASH
++	select CRYPTO_SHA512
++	help
++	  SHA-512 secure hash algorithm (FIPS 180)
 +
-+sub read_vreg {
-+    my $vreg = lc shift;
-+    if (!exists($vreglookup{$vreg})) {
-+        my $trace = "";
-+        if ($have_stacktrace) {
-+            $trace = Devel::StackTrace->new->as_string;
-+        }
-+        die("Unknown vector register ".$vreg."\n".$trace);
-+    }
-+    if (!($vreg =~ /^v([0-9]+)$/)) {
-+        my $trace = "";
-+        if ($have_stacktrace) {
-+            $trace = Devel::StackTrace->new->as_string;
-+        }
-+        die("Could not process vector register ".$vreg."\n".$trace);
-+    }
-+    return $1;
-+}
++	  Architecture: riscv64
++	  - Zvknhb vector crypto extension
 +
- # Helper functions
+ endmenu
+diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+index cae2f255ceae..b12c925172db 100644
+--- a/arch/riscv/crypto/Makefile
++++ b/arch/riscv/crypto/Makefile
+@@ -15,6 +15,9 @@ endif
+ obj-$(CONFIG_CRYPTO_SHA256_RISCV64) += sha256-riscv64.o
+ sha256-riscv64-y := sha256-riscv64-glue.o sha256-riscv64-zvbb-zvknha.o
  
- sub brev8_rv64i {
-@@ -258,4 +281,412 @@ sub rev8 {
-     return ".word ".($template | ($rs << 15) | ($rd << 7));
- }
++obj-$(CONFIG_CRYPTO_SHA512_RISCV64) += sha512-riscv64.o
++sha512-riscv64-y := sha512-riscv64-glue.o sha512-riscv64-zvbb-zvknhb.o
++
+ quiet_cmd_perlasm = PERLASM $@
+       cmd_perlasm = $(PERL) $(<) void $(@)
  
-+# Vector instructions
+@@ -30,5 +33,8 @@ $(obj)/ghash-riscv64-zvkg.S: $(src)/ghash-riscv64-zvkg.pl
+ $(obj)/sha256-riscv64-zvbb-zvknha.S: $(src)/sha256-riscv64-zvbb-zvknha.pl
+ 	$(call cmd,perlasm)
+ 
++$(obj)/sha512-riscv64-zvbb-zvknhb.S: $(src)/sha512-riscv64-zvbb-zvknhb.pl
++	$(call cmd,perlasm)
 +
-+sub vadd_vv {
-+    # vadd.vv vd, vs2, vs1
-+    my $template = 0b0000001_00000_00000_000_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
+ clean-files += ghash-riscv64-zbc.S ghash-riscv64-zvkb.S ghash-riscv64-zvkg.S
+-clean-files += sha256-riscv64-zvknha.S
++clean-files += sha256-riscv64-zvknha.S sha512-riscv64-zvknhb.S
+diff --git a/arch/riscv/crypto/sha512-riscv64-glue.c b/arch/riscv/crypto/sha512-riscv64-glue.c
+new file mode 100644
+index 000000000000..92ea1542c22a
+--- /dev/null
++++ b/arch/riscv/crypto/sha512-riscv64-glue.c
+@@ -0,0 +1,106 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Linux/riscv64 port of the OpenSSL SHA512 implementation for RISCV64
++ *
++ * Copyright (C) 2023 VRULL GmbH
++ * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
++ */
++
++#include <linux/module.h>
++#include <linux/types.h>
++#include <asm/simd.h>
++#include <asm/vector.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
++#include <crypto/sha2.h>
++#include <crypto/sha512_base.h>
++
++asmlinkage void sha512_block_data_order_zvbb_zvknhb(u64 *digest, const void *data,
++					unsigned int num_blks);
++
++
++static void __sha512_block_data_order(struct sha512_state *sst, u8 const *src,
++				      int blocks)
++{
++	sha512_block_data_order_zvbb_zvknhb(sst->state, src, blocks);
 +}
 +
-+sub vid_v {
-+    # vid.v vd
-+    my $template = 0b0101001_00000_10001_010_00000_1010111;
-+    my $vd = read_vreg shift;
-+    return ".word ".($template | ($vd << 7));
++static int sha512_update(struct shash_desc *desc, const u8 *data,
++			 unsigned int len)
++{
++	if (crypto_simd_usable()) {
++		int ret;
++
++		kernel_rvv_begin();
++		ret = sha512_base_do_update(desc, data, len,
++					    __sha512_block_data_order);
++		kernel_rvv_end();
++		return ret;
++	} else {
++		return crypto_sha512_update(desc, data, len);
++	}
 +}
 +
-+sub vle32_v {
-+    # vle32.v vd, (rs1)
-+    my $template = 0b0000001_00000_00000_110_00000_0000111;
-+    my $vd = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($rs1 << 15) | ($vd << 7));
++static int sha512_finup(struct shash_desc *desc, const u8 *data,
++			unsigned int len, u8 *out)
++{
++	if (!crypto_simd_usable())
++		return crypto_sha512_finup(desc, data, len, out);
++
++	kernel_rvv_begin();
++	if (len)
++		sha512_base_do_update(desc, data, len,
++				      __sha512_block_data_order);
++
++	sha512_base_do_finalize(desc, __sha512_block_data_order);
++	kernel_rvv_end();
++
++	return sha512_base_finish(desc, out);
 +}
 +
-+sub vle64_v {
-+    # vle64.v vd, (rs1)
-+    my $template = 0b0000001_00000_00000_111_00000_0000111;
-+    my $vd = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($rs1 << 15) | ($vd << 7));
++static int sha512_final(struct shash_desc *desc, u8 *out)
++{
++	return sha512_finup(desc, NULL, 0, out);
 +}
 +
-+sub vlse32_v {
-+    # vlse32.v vd, (rs1), rs2
-+    my $template = 0b0000101_00000_00000_110_00000_0000111;
-+    my $vd = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    my $rs2 = read_reg shift;
-+    return ".word ".($template | ($rs2 << 20) | ($rs1 << 15) | ($vd << 7));
++static struct shash_alg sha512_alg = {
++	.digestsize		= SHA512_DIGEST_SIZE,
++	.init			= sha512_base_init,
++	.update			= sha512_update,
++	.final			= sha512_final,
++	.finup			= sha512_finup,
++	.descsize		= sizeof(struct sha512_state),
++	.base.cra_name		= "sha512",
++	.base.cra_driver_name	= "sha512-riscv64-zvknhb",
++	.base.cra_priority	= 150,
++	.base.cra_blocksize	= SHA512_BLOCK_SIZE,
++	.base.cra_module	= THIS_MODULE,
++};
++
++static int __init sha512_mod_init(void)
++{
++	/* sha512 needs at least a vlen of 256 to work correctly */
++	if (riscv_isa_extension_available(NULL, ZVKNHB) &&
++	    riscv_isa_extension_available(NULL, ZVBB) &&
++	    riscv_vector_vlen() >= 256)
++		return crypto_register_shash(&sha512_alg);
++
++	return 0;
 +}
 +
-+sub vlse64_v {
-+    # vlse64.v vd, (rs1), rs2
-+    my $template = 0b0000101_00000_00000_111_00000_0000111;
-+    my $vd = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    my $rs2 = read_reg shift;
-+    return ".word ".($template | ($rs2 << 20) | ($rs1 << 15) | ($vd << 7));
++static void __exit sha512_mod_fini(void)
++{
++	if (riscv_isa_extension_available(NULL, ZVKNHB) &&
++	    riscv_isa_extension_available(NULL, ZVBB) &&
++	    riscv_vector_vlen() >= 256)
++		crypto_unregister_shash(&sha512_alg);
 +}
 +
-+sub vmerge_vim {
-+    # vmerge.vim vd, vs2, imm, v0
-+    my $template = 0b0101110_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $imm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($imm << 15) | ($vd << 7));
-+}
++module_init(sha512_mod_init);
++module_exit(sha512_mod_fini);
 +
-+sub vmerge_vvm {
-+    # vmerge.vvm vd vs2 vs1
-+    my $template = 0b0101110_00000_00000_000_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 <<   15) | ($vd << 7))
-+}
++MODULE_DESCRIPTION("SHA-512 secure hash for riscv64");
++MODULE_AUTHOR("Andy Polyakov <appro@openssl.org>");
++MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_CRYPTO("sha512");
+diff --git a/arch/riscv/crypto/sha512-riscv64-zvbb-zvknhb.pl b/arch/riscv/crypto/sha512-riscv64-zvbb-zvknhb.pl
+new file mode 100644
+index 000000000000..4bd09443dcdd
+--- /dev/null
++++ b/arch/riscv/crypto/sha512-riscv64-zvbb-zvknhb.pl
+@@ -0,0 +1,377 @@
++#! /usr/bin/env perl
++# SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause
++#
++# This file is dual-licensed, meaning that you can use it under your
++# choice of either of the following two licenses:
++#
++# Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License"). You can obtain
++# a copy in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++#
++# or
++#
++# Copyright (c) 2023, Christoph Müllner <christoph.muellner@vrull.eu>
++# All rights reserved.
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions
++# are met:
++# 1. Redistributions of source code must retain the above copyright
++#    notice, this list of conditions and the following disclaimer.
++# 2. Redistributions in binary form must reproduce the above copyright
++#    notice, this list of conditions and the following disclaimer in the
++#    documentation and/or other materials provided with the distribution.
++#
++# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 +
-+sub vmseq_vi {
-+    # vmseq vd vs1, imm
-+    my $template = 0b0110001_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    my $imm = shift;
-+    return ".word ".($template | ($vs1 << 20) | ($imm <<   15) | ($vd << 7))
-+}
++# The generated code of this file depends on the following RISC-V extensions:
++# - RV64I
++# - RISC-V vector ('V') with VLEN >= 256
++# - Vector Bit-manipulation used in Cryptography ('Zvbb')
++# - Vector SHA-2 Secure Hash ('Zvknhb')
 +
-+sub vmv_v_i {
-+    # vmv.v.i vd, imm
-+    my $template = 0b0101111_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $imm = shift;
-+    return ".word ".($template | ($imm << 15) | ($vd << 7));
-+}
++use strict;
++use warnings;
 +
-+sub vmv_v_v {
-+    # vmv.v.v vd, vs1
-+    my $template = 0b0101111_00000_00000_000_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs1 << 15) | ($vd << 7));
-+}
++use FindBin qw($Bin);
++use lib "$Bin";
++use lib "$Bin/../../perlasm";
++use riscv;
 +
-+sub vor_vv_v0t {
-+    # vor.vv vd, vs2, vs1, v0.t
-+    my $template = 0b0010100_00000_00000_000_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
-+}
++# $output is the last argument if it looks like a file (it has an extension)
++# $flavour is the first argument if it doesn't look like a file
++my $output = $#ARGV >= 0 && $ARGV[$#ARGV] =~ m|\.\w+$| ? pop : undef;
++my $flavour = $#ARGV >= 0 && $ARGV[0] !~ m|\.| ? shift : undef;
 +
-+sub vse32_v {
-+    # vse32.v vd, (rs1)
-+    my $template = 0b0000001_00000_00000_110_00000_0100111;
-+    my $vd = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($rs1 << 15) | ($vd << 7));
-+}
++$output and open STDOUT,">$output";
 +
-+sub vse64_v {
-+    # vse64.v vd, (rs1)
-+    my $template = 0b0000001_00000_00000_111_00000_0100111;
-+    my $vd = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($rs1 << 15) | ($vd << 7));
-+}
++my $code=<<___;
++.text
++___
 +
-+sub vsetivli__x0_2_e64_m1_ta_ma {
-+    # vsetivli x0, 2, e64, m1, ta, ma
-+    return ".word 0xcd817057";
-+}
++my ($V0, $V10, $V11, $V12, $V13, $V14, $V15, $V16, $V17) = ("v0", "v10", "v11", "v12", "v13", "v14","v15", "v16", "v17");
++my ($V26, $V27) = ("v26", "v27");
 +
-+sub vsetivli__x0_4_e32_m1_ta_ma {
-+    # vsetivli x0, 4, e32, m1, ta, ma
-+    return ".word 0xcd027057";
-+}
++my $K512 = "K512";
 +
-+sub vsetivli__x0_4_e64_m1_ta_ma {
-+    # vsetivli x0,4,e64,m1,ta,ma
-+    return ".word 0xcd827057";
-+}
++# Function arguments
++my ($H, $INP, $LEN, $KT, $STRIDE) = ("a0", "a1", "a2", "a3", "t3");
 +
-+sub vsetivli__x0_8_e32_m1_ta_ma {
-+    return ".word 0xcd047057";
-+}
++################################################################################
++# void sha512_block_data_order_zvbb_zvknhb(void *c, const void *p, size_t len)
++$code .= <<___;
++.p2align 2
++.globl sha512_block_data_order_zvbb_zvknhb
++.type sha512_block_data_order_zvbb_zvknhb,\@function
++sha512_block_data_order_zvbb_zvknhb:
++    @{[vsetivli__x0_4_e64_m1_ta_ma]}
 +
-+sub vslidedown_vi {
-+    # vslidedown.vi vd, vs2, uimm
-+    my $template = 0b0011111_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15) | ($vd << 7));
-+}
++    # H is stored as {a,b,c,d},{e,f,g,h}, but we need {f,e,b,a},{h,g,d,c}
++    # We achieve this by reading with a negative stride followed by
++    # element sliding.
++    li $STRIDE, -8
++    addi $H, $H, 24
++    @{[vlse64_v $V16, $H, $STRIDE]} # {d,c,b,a}
++    addi $H, $H, 32
++    @{[vlse64_v $V17, $H, $STRIDE]} # {h,g,f,e}
++    # Keep H advanced by 24
++    addi $H, $H, -32
 +
-+sub vslideup_vi_v0t {
-+    # vslideup.vi vd, vs2, uimm, v0.t
-+    my $template = 0b0011100_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15) | ($vd << 7));
-+}
++    @{[vmv_v_v $V27, $V16]} # {d,c,b,a}
++    @{[vslidedown_vi $V26, $V16, 2]} # {b,a,X,X}
++    @{[vslidedown_vi $V16, $V17, 2]} # {f,e,X,X}
++    @{[vslideup_vi $V16, $V26, 2]} # {f,e,b,a}
++    @{[vslideup_vi $V17, $V27, 2]} # {h,g,d,c}
 +
-+sub vslideup_vi {
-+    # vslideup.vi vd, vs2, uimm
-+    my $template = 0b0011101_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15) | ($vd << 7));
-+}
++    # Keep the old state as we need it later: H' = H+{a',b',c',...,h'}.
++    @{[vmv_v_v $V26, $V16]}
++    @{[vmv_v_v $V27, $V17]}
 +
-+sub vsll_vi {
-+    # vsll.vi vd, vs2, uimm, vm
-+    my $template = 0b1001011_00000_00000_011_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15) | ($vd << 7));
-+}
++L_round_loop:
++    la $KT, $K512 # Load round constants K512
 +
-+sub vsrl_vx {
-+    # vsrl.vx vd, vs2, rs1
-+    my $template = 0b1010001_00000_00000_100_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($rs1 << 15) | ($vd << 7));
-+}
++    # Load the 1024-bits of the message block in v10-v13 and perform
++    # an endian swap on each 4 bytes element.
++    @{[vle64_v $V10, $INP]}
++    @{[vrev8_v $V10, $V10]}
++    add $INP, $INP, 32
++    @{[vle64_v $V11, $INP]}
++    @{[vrev8_v $V11, $V11]}
++    add $INP, $INP, 32
++    @{[vle64_v $V12, $INP]}
++    @{[vrev8_v $V12, $V12]}
++    add $INP, $INP, 32
++    @{[vle64_v $V13, $INP]}
++    @{[vrev8_v $V13, $V13]}
++    add $INP, $INP, 32
 +
-+sub vsse32_v {
-+    # vse32.v vs3, (rs1), rs2
-+    my $template = 0b0000101_00000_00000_110_00000_0100111;
-+    my $vs3 = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    my $rs2 = read_reg shift;
-+    return ".word ".($template | ($rs2 << 20) | ($rs1 << 15) | ($vs3 << 7));
-+}
++    # Decrement length by 1
++    add $LEN, $LEN, -1
 +
-+sub vsse64_v {
-+    # vsse64.v vs3, (rs1), rs2
-+    my $template = 0b0000101_00000_00000_111_00000_0100111;
-+    my $vs3 = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    my $rs2 = read_reg shift;
-+    return ".word ".($template | ($rs2 << 20) | ($rs1 << 15) | ($vs3 << 7));
-+}
++    # Set v0 up for the vmerge that replaces the first word (idx==0)
++    @{[vid_v $V0]}
++    @{[vmseq_vi $V0, $V0, 0x0]} # v0.mask[i] = (i == 0 ? 1 : 0)
 +
-+sub vxor_vv_v0t {
-+    # vxor.vv vd, vs2, vs1, v0.t
-+    my $template = 0b0010110_00000_00000_000_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
-+}
++    # Quad-round 0 (+0, v10->v11->v12->v13)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V10]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V12, $V11, $V0]}
++    @{[vsha2ms_vv $V10, $V14, $V13]}
 +
-+sub vxor_vv {
-+    # vxor.vv vd, vs2, vs1
-+    my $template = 0b0010111_00000_00000_000_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
-+}
++    # Quad-round 1 (+1, v11->v12->v13->v10)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V11]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V13, $V12, $V0]}
++    @{[vsha2ms_vv $V11, $V14, $V10]}
 +
-+# Vector crypto instructions
++    # Quad-round 2 (+2, v12->v13->v10->v11)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V12]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V10, $V13, $V0]}
++    @{[vsha2ms_vv $V12, $V14, $V11]}
 +
-+## Zvbb instructions
++    # Quad-round 3 (+3, v13->v10->v11->v12)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V13]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V11, $V10, $V0]}
++    @{[vsha2ms_vv $V13, $V14, $V12]}
 +
-+sub vrev8_v {
-+    # vrev8.v vd, vs2
-+    my $template = 0b0100101_00000_01001_010_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 4 (+0, v10->v11->v12->v13)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V10]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V12, $V11, $V0]}
++    @{[vsha2ms_vv $V10, $V14, $V13]}
 +
-+## Zvbc instructions
++    # Quad-round 5 (+1, v11->v12->v13->v10)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V11]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V13, $V12, $V0]}
++    @{[vsha2ms_vv $V11, $V14, $V10]}
 +
-+sub vclmulh_vx {
-+    # vclmulh.vx vd, vs2, rs1
-+    my $template = 0b0011011_00000_00000_110_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($rs1 << 15) | ($vd << 7));
-+}
++    # Quad-round 6 (+2, v12->v13->v10->v11)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V12]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V10, $V13, $V0]}
++    @{[vsha2ms_vv $V12, $V14, $V11]}
 +
-+sub vclmul_vx_v0t {
-+    # vclmul.vx vd, vs2, rs1, v0.t
-+    my $template = 0b0011000_00000_00000_110_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($rs1 << 15) | ($vd << 7));
-+}
++    # Quad-round 7 (+3, v13->v10->v11->v12)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V13]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V11, $V10, $V0]}
++    @{[vsha2ms_vv $V13, $V14, $V12]}
 +
-+sub vclmul_vx {
-+    # vclmul.vx vd, vs2, rs1
-+    my $template = 0b0011001_00000_00000_110_00000_1010111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $rs1 = read_reg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($rs1 << 15) | ($vd << 7));
-+}
++    # Quad-round 8 (+0, v10->v11->v12->v13)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V10]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V12, $V11, $V0]}
++    @{[vsha2ms_vv $V10, $V14, $V13]}
 +
-+## Zvkg instructions
++    # Quad-round 9 (+1, v11->v12->v13->v10)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V11]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V13, $V12, $V0]}
++    @{[vsha2ms_vv $V11, $V14, $V10]}
 +
-+sub vghsh_vv {
-+    # vghsh.vv vd, vs2, vs1
-+    my $template = 0b1011001_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15) | ($vd << 7));
-+}
++    # Quad-round 10 (+2, v12->v13->v10->v11)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V12]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V10, $V13, $V0]}
++    @{[vsha2ms_vv $V12, $V14, $V11]}
 +
-+sub vgmul_vv {
-+    # vgmul.vv vd, vs2
-+    my $template = 0b1010001_00000_10001_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 11 (+3, v13->v10->v11->v12)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V13]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V11, $V10, $V0]}
++    @{[vsha2ms_vv $V13, $V14, $V12]}
 +
-+## Zvkned instructions
++    # Quad-round 12 (+0, v10->v11->v12->v13)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V10]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V12, $V11, $V0]}
++    @{[vsha2ms_vv $V10, $V14, $V13]}
 +
-+sub vaesdf_vs {
-+    # vaesdf.vs vd, vs2
-+    my $template = 0b101001_1_00000_00001_010_00000_1110111;
-+    my $vd = read_vreg  shift;
-+    my $vs2 = read_vreg  shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 13 (+1, v11->v12->v13->v10)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V11]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V13, $V12, $V0]}
++    @{[vsha2ms_vv $V11, $V14, $V10]}
 +
-+sub vaesdm_vs {
-+    # vaesdm.vs vd, vs2
-+    my $template = 0b101001_1_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 14 (+2, v12->v13->v10->v11)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V12]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V10, $V13, $V0]}
++    @{[vsha2ms_vv $V12, $V14, $V11]}
 +
-+sub vaesef_vs {
-+    # vaesef.vs vd, vs2
-+    my $template = 0b101001_1_00000_00011_010_00000_1110111;
-+    my $vd = read_vreg  shift;
-+    my $vs2 = read_vreg  shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 15 (+3, v13->v10->v11->v12)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V13]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V11, $V10, $V0]}
++    @{[vsha2ms_vv $V13, $V14, $V12]}
 +
-+sub vaesem_vs {
-+    # vaesem.vs vd, vs2
-+    my $template = 0b101001_1_00000_00010_010_00000_1110111;
-+    my $vd = read_vreg  shift;
-+    my $vs2 = read_vreg  shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 16 (+0, v10->v11->v12->v13)
++    # Note that we stop generating new message schedule words (Wt, v10-13)
++    # as we already generated all the words we end up consuming (i.e., W[79:76]).
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V10]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V12, $V11, $V0]}
 +
-+sub vaeskf1_vi {
-+    # vaeskf1.vi vd, vs2, uimmm
-+    my $template = 0b100010_1_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg  shift;
-+    my $vs2 = read_vreg  shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($uimm << 15) | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 17 (+1, v11->v12->v13->v10)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V11]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V13, $V12, $V0]}
 +
-+sub vaeskf2_vi {
-+    # vaeskf2.vi vd, vs2, uimm
-+    my $template = 0b101010_1_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15) | ($vd << 7));
-+}
++    # Quad-round 18 (+2, v12->v13->v10->v11)
++    @{[vle64_v $V15, ($KT)]}
++    addi $KT, $KT, 32
++    @{[vadd_vv $V14, $V15, $V12]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
++    @{[vmerge_vvm $V14, $V10, $V13, $V0]}
 +
-+sub vaesz_vs {
-+    # vaesz.vs vd, vs2
-+    my $template = 0b101001_1_00000_00111_010_00000_1110111;
-+    my $vd = read_vreg  shift;
-+    my $vs2 = read_vreg  shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++    # Quad-round 19 (+3, v13->v10->v11->v12)
++    @{[vle64_v $V15, ($KT)]}
++    # No t1 increment needed.
++    @{[vadd_vv $V14, $V15, $V13]}
++    @{[vsha2cl_vv $V17, $V16, $V14]}
++    @{[vsha2ch_vv $V16, $V17, $V14]}
 +
-+## Zvknha and Zvknhb instructions
++    # H' = H+{a',b',c',...,h'}
++    @{[vadd_vv $V16, $V26, $V16]}
++    @{[vadd_vv $V17, $V27, $V17]}
++    @{[vmv_v_v $V26, $V16]}
++    @{[vmv_v_v $V27, $V17]}
++    bnez $LEN, L_round_loop
 +
-+sub vsha2ms_vv {
-+    # vsha2ms.vv vd, vs2, vs1
-+    my $template = 0b1011011_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20)| ($vs1 << 15 )| ($vd << 7));
-+}
++    # v26 = v16 = {f,e,b,a}
++    # v27 = v17 = {h,g,d,c}
++    # Let's do the opposit transformation like on entry.
 +
-+sub vsha2ch_vv {
-+    # vsha2ch.vv vd, vs2, vs1
-+    my $template = 0b101110_10000_00000_001_00000_01110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20)| ($vs1 << 15 )| ($vd << 7));
-+}
++    @{[vslideup_vi $V17, $V16, 2]} # {h,g,f,e}
 +
-+sub vsha2cl_vv {
-+    # vsha2cl.vv vd, vs2, vs1
-+    my $template = 0b101111_10000_00000_001_00000_01110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20)| ($vs1 << 15 )| ($vd << 7));
-+}
++    @{[vslidedown_vi $V16, $V27, 2]} # {d,c,X,X}
++    @{[vslidedown_vi $V26, $V26, 2]} # {b,a,X,X}
++    @{[vslideup_vi $V16, $V26, 2]} # {d,c,b,a}
 +
-+## Zvksed instructions
++    # H is already advanced by 24
++    @{[vsse64_v $V16, $H, $STRIDE]} # {a,b,c,d}
++    addi $H, $H, 32
++    @{[vsse64_v $V17, $H, $STRIDE]} # {e,f,g,h}
 +
-+sub vsm4k_vi {
-+    # vsm4k.vi vd, vs2, uimm
-+    my $template = 0b1000011_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15) | ($vd << 7));
-+}
++    ret
++.size sha512_block_data_order_zvbb_zvknhb,.-sha512_block_data_order_zvbb_zvknhb
 +
-+sub vsm4r_vs {
-+    # vsm4r.vs vd, vs2
-+    my $template = 0b1010011_00000_10000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vd << 7));
-+}
++.p2align 3
++.type $K512,\@object
++$K512:
++    .dword 0x428a2f98d728ae22, 0x7137449123ef65cd
++    .dword 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc
++    .dword 0x3956c25bf348b538, 0x59f111f1b605d019
++    .dword 0x923f82a4af194f9b, 0xab1c5ed5da6d8118
++    .dword 0xd807aa98a3030242, 0x12835b0145706fbe
++    .dword 0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2
++    .dword 0x72be5d74f27b896f, 0x80deb1fe3b1696b1
++    .dword 0x9bdc06a725c71235, 0xc19bf174cf692694
++    .dword 0xe49b69c19ef14ad2, 0xefbe4786384f25e3
++    .dword 0x0fc19dc68b8cd5b5, 0x240ca1cc77ac9c65
++    .dword 0x2de92c6f592b0275, 0x4a7484aa6ea6e483
++    .dword 0x5cb0a9dcbd41fbd4, 0x76f988da831153b5
++    .dword 0x983e5152ee66dfab, 0xa831c66d2db43210
++    .dword 0xb00327c898fb213f, 0xbf597fc7beef0ee4
++    .dword 0xc6e00bf33da88fc2, 0xd5a79147930aa725
++    .dword 0x06ca6351e003826f, 0x142929670a0e6e70
++    .dword 0x27b70a8546d22ffc, 0x2e1b21385c26c926
++    .dword 0x4d2c6dfc5ac42aed, 0x53380d139d95b3df
++    .dword 0x650a73548baf63de, 0x766a0abb3c77b2a8
++    .dword 0x81c2c92e47edaee6, 0x92722c851482353b
++    .dword 0xa2bfe8a14cf10364, 0xa81a664bbc423001
++    .dword 0xc24b8b70d0f89791, 0xc76c51a30654be30
++    .dword 0xd192e819d6ef5218, 0xd69906245565a910
++    .dword 0xf40e35855771202a, 0x106aa07032bbd1b8
++    .dword 0x19a4c116b8d2d0c8, 0x1e376c085141ab53
++    .dword 0x2748774cdf8eeb99, 0x34b0bcb5e19b48a8
++    .dword 0x391c0cb3c5c95a63, 0x4ed8aa4ae3418acb
++    .dword 0x5b9cca4f7763e373, 0x682e6ff3d6b2b8a3
++    .dword 0x748f82ee5defb2fc, 0x78a5636f43172f60
++    .dword 0x84c87814a1f0ab72, 0x8cc702081a6439ec
++    .dword 0x90befffa23631e28, 0xa4506cebde82bde9
++    .dword 0xbef9a3f7b2c67915, 0xc67178f2e372532b
++    .dword 0xca273eceea26619c, 0xd186b8c721c0c207
++    .dword 0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178
++    .dword 0x06f067aa72176fba, 0x0a637dc5a2c898a6
++    .dword 0x113f9804bef90dae, 0x1b710b35131c471b
++    .dword 0x28db77f523047d84, 0x32caab7b40c72493
++    .dword 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c
++    .dword 0x4cc5d4becb3e42b6, 0x597f299cfc657e2a
++    .dword 0x5fcb6fab3ad6faec, 0x6c44198c4a475817
++.size $K512,.-$K512
++___
 +
-+## zvksh instructions
++print $code;
 +
-+sub vsm3c_vi {
-+    # vsm3c.vi vd, vs2, uimm
-+    my $template = 0b1010111_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $uimm = shift;
-+    return ".word ".($template | ($vs2 << 20) | ($uimm << 15 ) | ($vd << 7));
-+}
-+
-+sub vsm3me_vv {
-+    # vsm3me.vv vd, vs2, vs1
-+    my $template = 0b1000001_00000_00000_010_00000_1110111;
-+    my $vd = read_vreg shift;
-+    my $vs2 = read_vreg shift;
-+    my $vs1 = read_vreg shift;
-+    return ".word ".($template | ($vs2 << 20) | ($vs1 << 15 ) | ($vd << 7));
-+}
-+
- 1;
++close STDOUT or die "error closing STDOUT: $!";
 -- 
 2.39.2
 
