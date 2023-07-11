@@ -2,195 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EAEC001B0
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jul 2023 18:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DCFEB64DD
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jul 2023 21:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbjGKS5j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jul 2023 14:57:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
+        id S231741AbjGKVvv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jul 2023 17:51:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231148AbjGKS5f (ORCPT
+        with ESMTP id S231431AbjGKVvu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jul 2023 14:57:35 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65DEF1724;
-        Tue, 11 Jul 2023 11:57:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689101851; x=1720637851;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=QYwIY1sUmVsKmyy+j/2tt7xny7CiDWMopnaRr8wNQLQ=;
-  b=XHhMfPm4tQhccIOekvY/YiBwYDeLk5NI//b1pafco7hq4orGAwf1wS+8
-   gOWVkCTrDDSbYKilXOGLn2AQJbiZALa7e0eHKkDV2PVYl5DtMbeSAbErd
-   aclJjlLsOySI78+NgaCvzFGVc2Eg+N71TB1fM/DSChqch9WR7PHigizb0
-   Le13azRT3LQjEqeQjxpsbSd6NMkohUG3gWsm/yVaurxwoPE8NcZRTiVN6
-   yQncZdqsUZNJqFltz9ftmuDst93IbuV0rlFxZ5LojkZvHD6Cv5/uAtmuS
-   X2g6C9X61EqRQBA13bjwxC0s8eK1sGpFSGSJKgOg8B570eUVO9QUAkaA0
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="349543215"
-X-IronPort-AV: E=Sophos;i="6.01,197,1684825200"; 
-   d="scan'208";a="349543215"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 11:57:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10768"; a="724556099"
-X-IronPort-AV: E=Sophos;i="6.01,197,1684825200"; 
-   d="scan'208";a="724556099"
-Received: from jestevez-mobl1.amr.corp.intel.com ([10.212.29.246])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2023 11:57:29 -0700
-Message-ID: <fd472a246013a6b30884f6d279c232b47c9de8db.camel@linux.intel.com>
-Subject: Re: [PATCH v7 01/14] dmaengine: idxd: add wq driver name support
- for accel-config user tool
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Fenghua Yu <fenghua.yu@intel.com>, herbert@gondor.apana.org.au,
-        davem@davemloft.net, vkoul@kernel.org
-Cc:     dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
-        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Date:   Tue, 11 Jul 2023 13:57:28 -0500
-In-Reply-To: <8e51fc0d-1c5c-e1d2-b8fb-e7c6c247c74c@intel.com>
-References: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
-         <20230710190654.299639-2-tom.zanussi@linux.intel.com>
-         <8e51fc0d-1c5c-e1d2-b8fb-e7c6c247c74c@intel.com>
+        Tue, 11 Jul 2023 17:51:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7AD10C7;
+        Tue, 11 Jul 2023 14:51:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D3FDB6162C;
+        Tue, 11 Jul 2023 21:51:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD49C433C8;
+        Tue, 11 Jul 2023 21:51:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689112309;
+        bh=IBl7aehCSnCPoVnNRSfjfv1AkBfMdFKSR8grRojSvhs=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=k+GaiHNmLhw6p19hf4A6c/wO5Pev+akQat8HZC//H+GoPx/qqZ/X8r+b9WZhw0/q2
+         l7CkrYQ6TrCZ9debibXW/grJ2uS6MiOvb1F18Pq5ynAerGFhEH3PY5/IKtLdm6X+YX
+         v0Xt3wjyZrreIVTVL9J8VJvv9/Sx2QV4HIJxp4gjEn0RSsSebZdLJq7KENEICeMeuQ
+         1jQD/1UKlLWe8iMoa15ldIalb8THdV3P3+baNjyYf4eTq0j2A57nhPjaC54lhLhwaI
+         NscETzyEgQaAHp4E9UOw9NSyv0T4bd4GtKeaE369k+2KW6WwnxxS/zkDX+SMDInLxn
+         vLI5xo4DbLg/w==
+Message-ID: <93959358dc48d45b98aa598feae7307fa32c00d0.camel@kernel.org>
+Subject: Re: [PATCH] KEYS: asymmetric: Fix error codes
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Dan Carpenter <dan.carpenter@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Date:   Wed, 12 Jul 2023 00:51:45 +0300
+In-Reply-To: <15340a35-2400-43dd-9f50-fcbcb3c4986d@kadam.mountain>
+References: <c5e34c6a-da1e-4585-98c4-14701b0e093e@moroto.mountain>
+         <CTYVE0G0D53P.Y8A7V3C9BW9O@suppilovahvero>
+         <CTYVFFFI0SE9.2QXXQPRJW3AA3@suppilovahvero>
+         <15340a35-2400-43dd-9f50-fcbcb3c4986d@kadam.mountain>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.1-0ubuntu1 
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.1-0ubuntu1 
 MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgRmVuZ2h1YSwKCk9uIFR1ZSwgMjAyMy0wNy0xMSBhdCAxMDo0OSAtMDcwMCwgRmVuZ2h1YSBZ
-dSB3cm90ZToKPiBIaSwgVG9tLAo+IAo+IE9uIDcvMTAvMjMgMTI6MDYsIFRvbSBaYW51c3NpIHdy
-b3RlOgo+ID4gRnJvbTogRGF2ZSBKaWFuZyA8ZGF2ZS5qaWFuZ0BpbnRlbC5jb20+Cj4gPiAKPiA+
-IFdpdGggdGhlIHBvc3NpYmlsaXR5IG9mIG11bHRpcGxlIHdxIGRyaXZlcnMgdGhhdCBjYW4gYmUg
-Ym91bmQgdG8gdGhlIHdxLAo+ID4gdGhlIHVzZXIgY29uZmlnIHRvb2wgYWNjZWwtY29uZmlnIG5l
-ZWRzIGEgd2F5IHRvIGtub3cgd2hpY2ggd3EgZHJpdmVyIHRvCj4gPiBiaW5kIHRvIHRoZSB3cS4g
-SW50cm9kdWNlIHBlciB3cSBkcml2ZXJfbmFtZSBzeXNmcyBhdHRyaWJ1dGUgd2hlcmUgdGhlIHVz
-ZXIKPiA+IGNhbiBpbmRpY2F0ZSB0aGUgZHJpdmVyIHRvIGJlIGJvdW5kIHRvIHRoZSB3cS4gVGhp
-cyBhbGxvd3MgYWNjZWwtY29uZmlnIHRvCj4gPiBqdXN0IGJpbmQgdG8gdGhlIGRyaXZlciB1c2lu
-ZyB3cS0+ZHJpdmVyX25hbWUuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IERhdmUgSmlhbmcgPGRh
-dmUuamlhbmdAaW50ZWwuY29tPgo+ID4gU2lnbmVkLW9mZi1ieTogVG9tIFphbnVzc2kgPHRvbS56
-YW51c3NpQGxpbnV4LmludGVsLmNvbT4KPiA+IC0tLQo+ID4gwqAgLi4uL0FCSS9zdGFibGUvc3lz
-ZnMtZHJpdmVyLWRtYS1pZHhkwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA2ICsrKysKPiA+IMKgIGRy
-aXZlcnMvZG1hL2lkeGQvY2Rldi5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgfMKgIDcgKysrKysKPiA+IMKgIGRyaXZlcnMvZG1hL2lkeGQvZG1hLmPCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA2ICsrKysKPiA+IMKg
-IGRyaXZlcnMvZG1hL2lkeGQvaWR4ZC5owqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgfMKgIDkgKysrKysrCj4gPiDCoCBkcml2ZXJzL2RtYS9pZHhkL3N5c2ZzLmPC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAyOCArKysrKysrKysr
-KysrKysrKysrCj4gPiDCoCBpbmNsdWRlL3VhcGkvbGludXgvaWR4ZC5owqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMSArCj4gPiDCoCA2IGZpbGVzIGNoYW5nZWQs
-IDU3IGluc2VydGlvbnMoKykKPiA+IAo+ID4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vQUJJ
-L3N0YWJsZS9zeXNmcy1kcml2ZXItZG1hLWlkeGQgYi9Eb2N1bWVudGF0aW9uL0FCSS9zdGFibGUv
-c3lzZnMtZHJpdmVyLWRtYS1pZHhkCj4gPiBpbmRleCA1MzRiN2EzZDU5ZmMuLjBlNTc3MjA5YmVl
-MiAxMDA2NDQKPiA+IC0tLSBhL0RvY3VtZW50YXRpb24vQUJJL3N0YWJsZS9zeXNmcy1kcml2ZXIt
-ZG1hLWlkeGQKPiA+ICsrKyBiL0RvY3VtZW50YXRpb24vQUJJL3N0YWJsZS9zeXNmcy1kcml2ZXIt
-ZG1hLWlkeGQKPiA+IEBAIC0yNzAsNiArMjcwLDEyIEBAIERlc2NyaXB0aW9uOsKgwqDCoMKgwqDC
-oMKgU2hvd3MgdGhlIG9wZXJhdGlvbiBjYXBhYmlsaXR5IGJpdHMgZGlzcGxheWVkIGluIGJpdG1h
-cCBmb3JtYXQKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgY29ycmVsYXRlcyB0
-byB0aGUgb3BlcmF0aW9ucyBhbGxvd2VkLiBJdCdzIHZpc2libGUgb25seQo+ID4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBvbiBwbGF0Zm9ybXMgdGhhdCBzdXBwb3J0IHRoZSBjYXBh
-YmlsaXR5Lgo+ID4gwqAgCj4gPiArV2hhdDrCoMKgwqDCoMKgwqDCoMKgwqDCoC9zeXMvYnVzL2Rz
-YS9kZXZpY2VzL3dxPG0+LjxuPi9kcml2ZXJfbmFtZQo+ID4gK0RhdGU6wqDCoMKgwqDCoMKgwqDC
-oMKgwqBNYXIgMjcsIDIwMjMKPiA+ICtLZXJuZWxWZXJzaW9uOsKgNi42LjAKPiA+ICtDb250YWN0
-OsKgwqDCoMKgwqDCoMKgZG1hZW5naW5lQHZnZXIua2VybmVsLm9yZwo+ID4gK0Rlc2NyaXB0aW9u
-OsKgwqDCoE5hbWUgb2YgZHJpdmVyIHRvIGJlIGJvdW5kZWQgdG8gdGhlIHdxLgo+ID4gKwo+ID4g
-wqAgV2hhdDrCoMKgwqDCoMKgwqDCoMKgwqDCoCAvc3lzL2J1cy9kc2EvZGV2aWNlcy9lbmdpbmU8
-bT4uPG4+L2dyb3VwX2lkCj4gPiDCoCBEYXRlOsKgwqDCoMKgwqDCoMKgwqDCoMKgIE9jdCAyNSwg
-MjAxOQo+ID4gwqAgS2VybmVsVmVyc2lvbjrCoCA1LjYuMAo+ID4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvZG1hL2lkeGQvY2Rldi5jIGIvZHJpdmVycy9kbWEvaWR4ZC9jZGV2LmMKPiA+IGluZGV4IGVj
-YmY2N2MyYWQyYi4uYjFlY2ZiNzFkOTVlIDEwMDY0NAo+ID4gLS0tIGEvZHJpdmVycy9kbWEvaWR4
-ZC9jZGV2LmMKPiA+ICsrKyBiL2RyaXZlcnMvZG1hL2lkeGQvY2Rldi5jCj4gPiBAQCAtNTEwLDYg
-KzUxMCw3IEBAIHZvaWQgaWR4ZF93cV9kZWxfY2RldihzdHJ1Y3QgaWR4ZF93cSAqd3EpCj4gPiDC
-oCAKPiA+IMKgIHN0YXRpYyBpbnQgaWR4ZF91c2VyX2Rydl9wcm9iZShzdHJ1Y3QgaWR4ZF9kZXYg
-KmlkeGRfZGV2KQo+ID4gwqAgewo+ID4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IGRldmljZSAqZGV2
-ID0gJmlkeGRfZGV2LT5jb25mX2RldjsKPiA+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgaWR4ZF93
-cSAqd3EgPSBpZHhkX2Rldl90b193cShpZHhkX2Rldik7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgc3Ry
-dWN0IGlkeGRfZGV2aWNlICppZHhkID0gd3EtPmlkeGQ7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgaW50
-IHJjOwo+ID4gQEAgLTUzNyw2ICs1MzgsMTIgQEAgc3RhdGljIGludCBpZHhkX3VzZXJfZHJ2X3By
-b2JlKHN0cnVjdCBpZHhkX2RldiAqaWR4ZF9kZXYpCj4gPiDCoCAKPiA+IMKgwqDCoMKgwqDCoMKg
-wqBtdXRleF9sb2NrKCZ3cS0+d3FfbG9jayk7Cj4gPiDCoCAKPiA+ICvCoMKgwqDCoMKgwqDCoGlm
-ICghaWR4ZF93cV9kcml2ZXJfbmFtZV9tYXRjaCh3cSwgZGV2KSkgewo+ID4gK8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoGlkeGQtPmNtZF9zdGF0dXMgPSBJRFhEX1NDTURfV1FfTk9fRFJW
-X05BTUU7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmMgPSAtRU5PREVWOwo+
-ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gd3FfZXJyOwo+ID4gK8KgwqDC
-oMKgwqDCoMKgfQo+ID4gKwo+ID4gwqDCoMKgwqDCoMKgwqDCoHdxLT53cSA9IGNyZWF0ZV93b3Jr
-cXVldWUoZGV2X25hbWUod3FfY29uZmRldih3cSkpKTsKPiA+IMKgwqDCoMKgwqDCoMKgwqBpZiAo
-IXdxLT53cSkgewo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqByYyA9IC1FTk9N
-RU07Cj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9kbWEvaWR4ZC9kbWEuYyBiL2RyaXZlcnMvZG1h
-L2lkeGQvZG1hLmMKPiA+IGluZGV4IGViMzVjYTMxMzY4NC4uOGJiN2U3ZmY4ZDZhIDEwMDY0NAo+
-ID4gLS0tIGEvZHJpdmVycy9kbWEvaWR4ZC9kbWEuYwo+ID4gKysrIGIvZHJpdmVycy9kbWEvaWR4
-ZC9kbWEuYwo+ID4gQEAgLTMwNSw2ICszMDUsMTIgQEAgc3RhdGljIGludCBpZHhkX2RtYWVuZ2lu
-ZV9kcnZfcHJvYmUoc3RydWN0IGlkeGRfZGV2ICppZHhkX2RldikKPiA+IMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIC1FTlhJTzsKPiA+IMKgIAo+ID4gwqDCoMKgwqDCoMKg
-wqDCoG11dGV4X2xvY2soJndxLT53cV9sb2NrKTsKPiA+ICvCoMKgwqDCoMKgwqDCoGlmICghaWR4
-ZF93cV9kcml2ZXJfbmFtZV9tYXRjaCh3cSwgZGV2KSkgewo+ID4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoGlkeGQtPmNtZF9zdGF0dXMgPSBJRFhEX1NDTURfV1FfTk9fRFJWX05BTUU7
-Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmMgPSAtRU5PREVWOwo+ID4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gZXJyOwo+ID4gK8KgwqDCoMKgwqDCoMKg
-fQo+ID4gKwo+ID4gwqDCoMKgwqDCoMKgwqDCoHdxLT50eXBlID0gSURYRF9XUVRfS0VSTkVMOwo+
-ID4gwqAgCj4gPiDCoMKgwqDCoMKgwqDCoMKgcmMgPSBkcnZfZW5hYmxlX3dxKHdxKTsKPiA+IGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL2RtYS9pZHhkL2lkeGQuaCBiL2RyaXZlcnMvZG1hL2lkeGQvaWR4
-ZC5oCj4gPiBpbmRleCA1NDI4YTJlMWIxZWMuLmM2MmM3OGUxYzlmYSAxMDA2NDQKPiA+IC0tLSBh
-L2RyaXZlcnMvZG1hL2lkeGQvaWR4ZC5oCj4gPiArKysgYi9kcml2ZXJzL2RtYS9pZHhkL2lkeGQu
-aAo+ID4gQEAgLTE1OSw2ICsxNTksOCBAQCBzdHJ1Y3QgaWR4ZF9jZGV2IHsKPiA+IMKgwqDCoMKg
-wqDCoMKgwqBpbnQgbWlub3I7Cj4gPiDCoCB9Owo+ID4gwqAgCj4gPiArI2RlZmluZSBEUklWRVJf
-TkFNRV9TSVpFwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgMTI4Cj4gPiArCj4gPiDCoCAj
-ZGVmaW5lIElEWERfQUxMT0NBVEVEX0JBVENIX1NJWkXCoMKgwqDCoMKgMTI4VQo+ID4gwqAgI2Rl
-ZmluZSBXUV9OQU1FX1NJWkXCoMKgIDEwMjQKPiA+IMKgICNkZWZpbmUgV1FfVFlQRV9TSVpFwqDC
-oCAxMAo+ID4gQEAgLTIyNyw2ICsyMjksOCBAQCBzdHJ1Y3QgaWR4ZF93cSB7Cj4gPiDCoMKgwqDC
-oMKgwqDCoMKgLyogTG9jayB0byBwcm90ZWN0IHVwYXNpZF94YSBhY2Nlc3MuICovCj4gPiDCoMKg
-wqDCoMKgwqDCoMKgc3RydWN0IG11dGV4IHVjX2xvY2s7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgc3Ry
-dWN0IHhhcnJheSB1cGFzaWRfeGE7Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgwqBjaGFyIGRyaXZl
-cl9uYW1lW0RSSVZFUl9OQU1FX1NJWkUgKyAxXTsKPiA+IMKgIH07Cj4gPiDCoCAKPiA+IMKgIHN0
-cnVjdCBpZHhkX2VuZ2luZSB7Cj4gPiBAQCAtNjM3LDYgKzY0MSwxMSBAQCBzdGF0aWMgaW5saW5l
-IHZvaWQgaWR4ZF93cWNmZ19zZXRfbWF4X2JhdGNoX3NoaWZ0KGludCBpZHhkX3R5cGUsIHVuaW9u
-IHdxY2ZnICp3cQo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqB3cWNmZy0+bWF4
-X2JhdGNoX3NoaWZ0ID0gbWF4X2JhdGNoX3NoaWZ0Owo+ID4gwqAgfQo+ID4gwqAgCj4gPiArc3Rh
-dGljIGlubGluZSBpbnQgaWR4ZF93cV9kcml2ZXJfbmFtZV9tYXRjaChzdHJ1Y3QgaWR4ZF93cSAq
-d3EsIHN0cnVjdCBkZXZpY2UgKmRldikKPiA+ICt7Cj4gPiArwqDCoMKgwqDCoMKgwqByZXR1cm4g
-KHN0cm5jbXAod3EtPmRyaXZlcl9uYW1lLCBkZXYtPmRyaXZlci0+bmFtZSwgc3RybGVuKGRldi0+
-ZHJpdmVyLT5uYW1lKSkgPT0gMCk7Cj4gPiArfQo+ID4gKwo+ID4gwqAgaW50IF9fbXVzdF9jaGVj
-ayBfX2lkeGRfZHJpdmVyX3JlZ2lzdGVyKHN0cnVjdCBpZHhkX2RldmljZV9kcml2ZXIgKmlkeGRf
-ZHJ2LAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbW9kdWxlICptb2R1bGUsIGNv
-bnN0IGNoYXIgKm1vZF9uYW1lKTsKPiA+IMKgICNkZWZpbmUgaWR4ZF9kcml2ZXJfcmVnaXN0ZXIo
-ZHJpdmVyKSBcCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9kbWEvaWR4ZC9zeXNmcy5jIGIvZHJp
-dmVycy9kbWEvaWR4ZC9zeXNmcy5jCj4gPiBpbmRleCAyOTM3MzlhYzU1OTYuLjZjYWFkMDQ0ZjUw
-NiAxMDA2NDQKPiA+IC0tLSBhL2RyaXZlcnMvZG1hL2lkeGQvc3lzZnMuYwo+ID4gKysrIGIvZHJp
-dmVycy9kbWEvaWR4ZC9zeXNmcy5jCj4gPiBAQCAtMTI2Niw2ICsxMjY2LDMzIEBAIHN0YXRpYyBz
-c2l6ZV90IHdxX29wX2NvbmZpZ19zdG9yZShzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCBkZXZp
-Y2VfYXR0cmlidXRlICphCj4gPiDCoCBzdGF0aWMgc3RydWN0IGRldmljZV9hdHRyaWJ1dGUgZGV2
-X2F0dHJfd3Ffb3BfY29uZmlnID0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-X19BVFRSKG9wX2NvbmZpZywgMDY0NCwgd3Ffb3BfY29uZmlnX3Nob3csIHdxX29wX2NvbmZpZ19z
-dG9yZSk7Cj4gPiDCoCAKPiA+ICtzdGF0aWMgc3NpemVfdCB3cV9kcml2ZXJfbmFtZV9zaG93KHN0
-cnVjdCBkZXZpY2UgKmRldiwgc3RydWN0IGRldmljZV9hdHRyaWJ1dGUgKmF0dHIsIGNoYXIgKmJ1
-ZikKPiA+ICt7Cj4gPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgaWR4ZF93cSAqd3EgPSBjb25mZGV2
-X3RvX3dxKGRldik7Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgwqByZXR1cm4gc3lzZnNfZW1pdChi
-dWYsICIlc1xuIiwgd3EtPmRyaXZlcl9uYW1lKTsKPiA+ICt9Cj4gPiArCj4gPiArc3RhdGljIHNz
-aXplX3Qgd3FfZHJpdmVyX25hbWVfc3RvcmUoc3RydWN0IGRldmljZSAqZGV2LCBzdHJ1Y3QgZGV2
-aWNlX2F0dHJpYnV0ZSAqYXR0ciwKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjb25zdCBjaGFyICpidWYsIHNp
-emVfdCBjb3VudCkKPiA+ICt7Cj4gPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgaWR4ZF93cSAqd3Eg
-PSBjb25mZGV2X3RvX3dxKGRldik7Cj4gPiArCj4gPiArwqDCoMKgwqDCoMKgwqBpZiAod3EtPnN0
-YXRlICE9IElEWERfV1FfRElTQUJMRUQpCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgcmV0dXJuIC1FUEVSTTsKPiA+ICsKPiA+ICvCoMKgwqDCoMKgwqDCoGlmIChzdHJsZW4oYnVm
-KSA+IERSSVZFUl9OQU1FX1NJWkUgfHwgc3RybGVuKGJ1ZikgPT0gMCkKPiA+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gLUVJTlZBTDsKPiA+ICsKPiA+ICvCoMKgwqDCoMKg
-wqDCoG1lbXNldCh3cS0+ZHJpdmVyX25hbWUsIDAsIERSSVZFUl9OQU1FX1NJWkUgKyAxKTsKPiA+
-ICvCoMKgwqDCoMKgwqDCoHN0cm5jcHkod3EtPmRyaXZlcl9uYW1lLCBidWYsIERSSVZFUl9OQU1F
-X1NJWkUpOwo+ID4gK8KgwqDCoMKgwqDCoMKgc3RycmVwbGFjZSh3cS0+bmFtZSwgJ1xuJywgJ1ww
-Jyk7Cj4gCj4gSWYgdXNlciBpbnB1dHMgImRtYWVuZ2luZcKgwqDCoCAiICh3aXRoIHRoZSB0cmFp
-bGluZyB3aGl0ZSBzcGFjZXMpLCB0aGUgCj4gdHJhaWxpbmcgd2hpdGUgc3BhY2VzIHdpbGwgYmUg
-Y29waWVkIHRvIHdxLT5kcml2ZXJfbmFtZS4gTGF0ZXIgZHJpdmVyCj4gbmFtZSBtYXRjaCB3aWxs
-IGFsd2F5cyBmYWlsLgo+IAo+IEEgYmV0dGVyIHdheSBpcyB1c2luZyBzdHJpbSgpIHRvIHJlbW92
-ZSB0aGUgdHJhaWxpbmcgd2hpdGUgc3BhY2VzIGJlZm9yZSAKPiBjb3B5aW5nIHRoZSBidWZmZXIg
-dG8gd3EtPmRyaXZlcl9uYW1lLiBTbyB3cS0+ZHJpdmVyX25hbWUgaXMgImRtYWVuZ2luZSIgCj4g
-KHdpdGhvdXQgdGhlIHRyYWlsaW5nIHdoaXRlIHNwYWNlcykuCj4gCgpZZXMsIGdvb2QgcG9pbnQs
-IEknbGwgYWRkIHRoYXQuICBUaGFua3MgZm9yIHBvaW50aW5nIHRoYXQgb3V0IQoKVG9tCgoKPiBU
-aGFua3MuCj4gCj4gLUZlbmdodWEKCg==
+On Tue, 2023-07-11 at 11:40 +0300, Dan Carpenter wrote:
+> On Tue, Jul 11, 2023 at 02:12:22AM +0300, Jarkko Sakkinen wrote:
+> > > > Fixes: 63ba4d67594a ("KEYS: asymmetric: Use new crypto interface wi=
+thout scatterlists")
+>=20
+> [ snip ]
+>=20
+> > >=20
+> > > I'll pick this as I'm late with 6.5 PR.
+> > >=20
+> > > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+> >=20
+> > Causes merge conflicts with my tree:
+> >=20
+> > https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/
+>=20
+> Your master branch doesn't include the "Use new crypto interface" commit
+> so it doesn't have the bug.
+>=20
+> (I'm just testing against linux-next and I don't know how the crypto
+> trees work).
+>=20
+> regards,
+> dan carpenter
+
+It is unfortunately based on Linus' tree :-/
+
+BR, Jarkko
 
