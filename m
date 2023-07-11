@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B95C001DD
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jul 2023 15:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F13A5EB64DD
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jul 2023 15:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233044AbjGKPjS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jul 2023 11:39:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51676 "EHLO
+        id S233130AbjGKPjk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jul 2023 11:39:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233038AbjGKPjA (ORCPT
+        with ESMTP id S232772AbjGKPjE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jul 2023 11:39:00 -0400
+        Tue, 11 Jul 2023 11:39:04 -0400
 Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8155ED;
-        Tue, 11 Jul 2023 08:38:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582F410EA;
+        Tue, 11 Jul 2023 08:38:08 -0700 (PDT)
 Received: from i53875a50.versanet.de ([83.135.90.80] helo=phil.lan)
         by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <heiko@sntech.de>)
-        id 1qJFQx-0000g0-T5; Tue, 11 Jul 2023 17:37:47 +0200
+        id 1qJFQz-0000g0-33; Tue, 11 Jul 2023 17:37:49 +0200
 From:   Heiko Stuebner <heiko@sntech.de>
 To:     palmer@dabbelt.com, paul.walmsley@sifive.com
 Cc:     aou@eecs.berkeley.edu, heiko@sntech.de,
@@ -27,12 +27,10 @@ Cc:     aou@eecs.berkeley.edu, heiko@sntech.de,
         conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         christoph.muellner@vrull.eu, ebiggers@kernel.org,
-        Greentime Hu <greentime.hu@sifive.com>,
-        Han-Kuan Chen <hankuan.chen@sifive.com>,
         Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: [PATCH v4 02/12] riscv: Add vector extension XOR implementation
-Date:   Tue, 11 Jul 2023 17:37:33 +0200
-Message-Id: <20230711153743.1970625-3-heiko@sntech.de>
+Subject: [PATCH v4 04/12] RISC-V: add vector crypto extension detection
+Date:   Tue, 11 Jul 2023 17:37:35 +0200
+Message-Id: <20230711153743.1970625-5-heiko@sntech.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230711153743.1970625-1-heiko@sntech.de>
 References: <20230711153743.1970625-1-heiko@sntech.de>
@@ -42,207 +40,127 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Greentime Hu <greentime.hu@sifive.com>
+From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 
-This patch adds support for vector optimized XOR and it is tested in
-qemu.
+Add detection for some extensions of the vector-crypto specification:
+- Zvkb: Vector Bit-manipulation used in Cryptography
+- Zvkg: Vector GCM/GMAC
+- Zvknha and Zvknhb: NIST Algorithm Suite
+- Zvkns: AES-128, AES-256 Single Round Suite
+- Zvksed: ShangMi Algorithm Suite
+- Zvksh: ShangMi Algorithm Suite
 
-Co-developed-by: Han-Kuan Chen <hankuan.chen@sifive.com>
-Signed-off-by: Han-Kuan Chen <hankuan.chen@sifive.com>
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+As their use is very specific and will likely be limited to special places
+we expect current code to just pre-encode those instructions, so right now
+we don't introduce toolchain requirements.
+
 Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
 ---
- arch/riscv/include/asm/xor.h | 82 ++++++++++++++++++++++++++++++++++++
- arch/riscv/lib/Makefile      |  1 +
- arch/riscv/lib/xor.S         | 81 +++++++++++++++++++++++++++++++++++
- 3 files changed, 164 insertions(+)
- create mode 100644 arch/riscv/include/asm/xor.h
- create mode 100644 arch/riscv/lib/xor.S
+ arch/riscv/include/asm/hwcap.h |  9 ++++++
+ arch/riscv/kernel/cpu.c        |  8 ++++++
+ arch/riscv/kernel/cpufeature.c | 50 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 67 insertions(+)
 
-diff --git a/arch/riscv/include/asm/xor.h b/arch/riscv/include/asm/xor.h
-new file mode 100644
-index 000000000000..74867c7fd955
---- /dev/null
-+++ b/arch/riscv/include/asm/xor.h
-@@ -0,0 +1,82 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Copyright (C) 2021 SiFive
-+ */
-+
-+#include <linux/hardirq.h>
-+#include <asm-generic/xor.h>
-+#ifdef CONFIG_VECTOR
-+#include <asm/vector.h>
-+#include <asm/switch_to.h>
-+
-+void xor_regs_2_(unsigned long bytes, unsigned long *__restrict p1,
-+		 const unsigned long *__restrict p2);
-+void xor_regs_3_(unsigned long bytes, unsigned long *__restrict p1,
-+		 const unsigned long *__restrict p2,
-+		 const unsigned long *__restrict p3);
-+void xor_regs_4_(unsigned long bytes, unsigned long *__restrict p1,
-+		 const unsigned long *__restrict p2,
-+		 const unsigned long *__restrict p3,
-+		 const unsigned long *__restrict p4);
-+void xor_regs_5_(unsigned long bytes, unsigned long *__restrict p1,
-+		 const unsigned long *__restrict p2,
-+		 const unsigned long *__restrict p3,
-+		 const unsigned long *__restrict p4,
-+		 const unsigned long *__restrict p5);
-+
-+static void xor_rvv_2(unsigned long bytes, unsigned long *__restrict p1,
-+		      const unsigned long *__restrict p2)
-+{
-+	kernel_rvv_begin();
-+	xor_regs_2_(bytes, p1, p2);
-+	kernel_rvv_end();
-+}
-+
-+static void xor_rvv_3(unsigned long bytes, unsigned long *__restrict p1,
-+		      const unsigned long *__restrict p2,
-+		      const unsigned long *__restrict p3)
-+{
-+	kernel_rvv_begin();
-+	xor_regs_3_(bytes, p1, p2, p3);
-+	kernel_rvv_end();
-+}
-+
-+static void xor_rvv_4(unsigned long bytes, unsigned long *__restrict p1,
-+		      const unsigned long *__restrict p2,
-+		      const unsigned long *__restrict p3,
-+		      const unsigned long *__restrict p4)
-+{
-+	kernel_rvv_begin();
-+	xor_regs_4_(bytes, p1, p2, p3, p4);
-+	kernel_rvv_end();
-+}
-+
-+static void xor_rvv_5(unsigned long bytes, unsigned long *__restrict p1,
-+		      const unsigned long *__restrict p2,
-+		      const unsigned long *__restrict p3,
-+		      const unsigned long *__restrict p4,
-+		      const unsigned long *__restrict p5)
-+{
-+	kernel_rvv_begin();
-+	xor_regs_5_(bytes, p1, p2, p3, p4, p5);
-+	kernel_rvv_end();
-+}
-+
-+static struct xor_block_template xor_block_rvv = {
-+	.name = "rvv",
-+	.do_2 = xor_rvv_2,
-+	.do_3 = xor_rvv_3,
-+	.do_4 = xor_rvv_4,
-+	.do_5 = xor_rvv_5
-+};
-+
-+#undef XOR_TRY_TEMPLATES
-+#define XOR_TRY_TEMPLATES           \
-+	do {        \
-+		xor_speed(&xor_block_8regs);    \
-+		xor_speed(&xor_block_32regs);    \
-+		if (has_vector()) { \
-+			xor_speed(&xor_block_rvv);\
-+		} \
-+	} while (0)
-+#endif
-diff --git a/arch/riscv/lib/Makefile b/arch/riscv/lib/Makefile
-index 26cb2502ecf8..3164112680f1 100644
---- a/arch/riscv/lib/Makefile
-+++ b/arch/riscv/lib/Makefile
-@@ -11,3 +11,4 @@ lib-$(CONFIG_64BIT)	+= tishift.o
- lib-$(CONFIG_RISCV_ISA_ZICBOZ)	+= clear_page.o
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+index b80ca6e77088..0f5172fa87b0 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -64,6 +64,15 @@
+ #define RISCV_ISA_EXT_ZKSED		51
+ #define RISCV_ISA_EXT_ZKSH		52
+ #define RISCV_ISA_EXT_ZKT		53
++#define RISCV_ISA_EXT_ZVBB		54
++#define RISCV_ISA_EXT_ZVBC		55
++#define RISCV_ISA_EXT_ZVKG		56
++#define RISCV_ISA_EXT_ZVKNED		57
++#define RISCV_ISA_EXT_ZVKNHA		58
++#define RISCV_ISA_EXT_ZVKNHB		59
++#define RISCV_ISA_EXT_ZVKSED		60
++#define RISCV_ISA_EXT_ZVKSH		61
++#define RISCV_ISA_EXT_ZVKT		62
  
- obj-$(CONFIG_FUNCTION_ERROR_INJECTION) += error-inject.o
-+lib-$(CONFIG_VECTOR)	+= xor.o
-diff --git a/arch/riscv/lib/xor.S b/arch/riscv/lib/xor.S
-new file mode 100644
-index 000000000000..3bc059e18171
---- /dev/null
-+++ b/arch/riscv/lib/xor.S
-@@ -0,0 +1,81 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Copyright (C) 2021 SiFive
-+ */
-+#include <linux/linkage.h>
-+#include <asm-generic/export.h>
-+#include <asm/asm.h>
+ #define RISCV_ISA_EXT_MAX		64
+ #define RISCV_ISA_EXT_NAME_LEN_MAX	32
+diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
+index 10524322a4c0..925241e25db2 100644
+--- a/arch/riscv/kernel/cpu.c
++++ b/arch/riscv/kernel/cpu.c
+@@ -227,6 +227,14 @@ static struct riscv_isa_ext_data isa_ext_arr[] = {
+ 	__RISCV_ISA_EXT_DATA(zksed, RISCV_ISA_EXT_ZKSED),
+ 	__RISCV_ISA_EXT_DATA(zksh, RISCV_ISA_EXT_ZKSH),
+ 	__RISCV_ISA_EXT_DATA(zkt, RISCV_ISA_EXT_ZKT),
++	__RISCV_ISA_EXT_DATA(zvbb, RISCV_ISA_EXT_ZVBB),
++	__RISCV_ISA_EXT_DATA(zvbc, RISCV_ISA_EXT_ZVBC),
++	__RISCV_ISA_EXT_DATA(zvkg, RISCV_ISA_EXT_ZVKG),
++	__RISCV_ISA_EXT_DATA(zvkned, RISCV_ISA_EXT_ZVKNED),
++	__RISCV_ISA_EXT_DATA(zvknha, RISCV_ISA_EXT_ZVKNHA),
++	__RISCV_ISA_EXT_DATA(zvknhb, RISCV_ISA_EXT_ZVKNHB),
++	__RISCV_ISA_EXT_DATA(zvksed, RISCV_ISA_EXT_ZVKSED),
++	__RISCV_ISA_EXT_DATA(zvksh, RISCV_ISA_EXT_ZVKSH),
+ 	__RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
+ 	__RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
+ 	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 9a872a2007a5..13556fd16bf6 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -343,6 +343,56 @@ void __init riscv_fill_hwcap(void)
+ 				SET_ISA_EXT_MAP("zksh", RISCV_ISA_EXT_ZKSH);
+ 				SET_ISA_EXT_MAP("zkr", RISCV_ISA_EXT_ZKR);
+ 				SET_ISA_EXT_MAP("zkt", RISCV_ISA_EXT_ZKT);
++				SET_ISA_EXT_MAP("zvbb", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvbc", RISCV_ISA_EXT_ZVBC);
++				SET_ISA_EXT_MAP("zvkg", RISCV_ISA_EXT_ZVKG);
++				SET_ISA_EXT_MAP("zvkned", RISCV_ISA_EXT_ZVKNED);
++				SET_ISA_EXT_MAP("zvknha", RISCV_ISA_EXT_ZVKNHA);
++				SET_ISA_EXT_MAP("zvknhb", RISCV_ISA_EXT_ZVKNHB);
++				SET_ISA_EXT_MAP("zvksed", RISCV_ISA_EXT_ZVKSED);
++				SET_ISA_EXT_MAP("zvksh", RISCV_ISA_EXT_ZVKSH);
++				SET_ISA_EXT_MAP("zvkt", RISCV_ISA_EXT_ZVKT);
 +
-+ENTRY(xor_regs_2_)
-+	vsetvli a3, a0, e8, m8, ta, ma
-+	vle8.v v0, (a1)
-+	vle8.v v8, (a2)
-+	sub a0, a0, a3
-+	vxor.vv v16, v0, v8
-+	add a2, a2, a3
-+	vse8.v v16, (a1)
-+	add a1, a1, a3
-+	bnez a0, xor_regs_2_
-+	ret
-+END(xor_regs_2_)
-+EXPORT_SYMBOL(xor_regs_2_)
++				/* NIST Algorithm Suite */
++				SET_ISA_EXT_MAP("zvkn", RISCV_ISA_EXT_ZVKNED);
++				SET_ISA_EXT_MAP("zvkn", RISCV_ISA_EXT_ZVKNHB);
++				SET_ISA_EXT_MAP("zvkn", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvkn", RISCV_ISA_EXT_ZVKT);
 +
-+ENTRY(xor_regs_3_)
-+	vsetvli a4, a0, e8, m8, ta, ma
-+	vle8.v v0, (a1)
-+	vle8.v v8, (a2)
-+	sub a0, a0, a4
-+	vxor.vv v0, v0, v8
-+	vle8.v v16, (a3)
-+	add a2, a2, a4
-+	vxor.vv v16, v0, v16
-+	add a3, a3, a4
-+	vse8.v v16, (a1)
-+	add a1, a1, a4
-+	bnez a0, xor_regs_3_
-+	ret
-+END(xor_regs_3_)
-+EXPORT_SYMBOL(xor_regs_3_)
++				/* NIST Algorithm Suite with carryless multiply */
++				SET_ISA_EXT_MAP("zvknc", RISCV_ISA_EXT_ZVKNED);
++				SET_ISA_EXT_MAP("zvknc", RISCV_ISA_EXT_ZVKNHB);
++				SET_ISA_EXT_MAP("zvknc", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvknc", RISCV_ISA_EXT_ZVKT);
++				SET_ISA_EXT_MAP("zvknc", RISCV_ISA_EXT_ZVBC);
 +
-+ENTRY(xor_regs_4_)
-+	vsetvli a5, a0, e8, m8, ta, ma
-+	vle8.v v0, (a1)
-+	vle8.v v8, (a2)
-+	sub a0, a0, a5
-+	vxor.vv v0, v0, v8
-+	vle8.v v16, (a3)
-+	add a2, a2, a5
-+	vxor.vv v0, v0, v16
-+	vle8.v v24, (a4)
-+	add a3, a3, a5
-+	vxor.vv v16, v0, v24
-+	add a4, a4, a5
-+	vse8.v v16, (a1)
-+	add a1, a1, a5
-+	bnez a0, xor_regs_4_
-+	ret
-+END(xor_regs_4_)
-+EXPORT_SYMBOL(xor_regs_4_)
++				/* NIST Algorithm Suite with GCM */
++				SET_ISA_EXT_MAP("zvkng", RISCV_ISA_EXT_ZVKNED);
++				SET_ISA_EXT_MAP("zvkng", RISCV_ISA_EXT_ZVKNHB);
++				SET_ISA_EXT_MAP("zvkng", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvkng", RISCV_ISA_EXT_ZVKT);
++				SET_ISA_EXT_MAP("zvkng", RISCV_ISA_EXT_ZVKG);
 +
-+ENTRY(xor_regs_5_)
-+	vsetvli a6, a0, e8, m8, ta, ma
-+	vle8.v v0, (a1)
-+	vle8.v v8, (a2)
-+	sub a0, a0, a6
-+	vxor.vv v0, v0, v8
-+	vle8.v v16, (a3)
-+	add a2, a2, a6
-+	vxor.vv v0, v0, v16
-+	vle8.v v24, (a4)
-+	add a3, a3, a6
-+	vxor.vv v0, v0, v24
-+	vle8.v v8, (a5)
-+	add a4, a4, a6
-+	vxor.vv v16, v0, v8
-+	add a5, a5, a6
-+	vse8.v v16, (a1)
-+	add a1, a1, a6
-+	bnez a0, xor_regs_5_
-+	ret
-+END(xor_regs_5_)
-+EXPORT_SYMBOL(xor_regs_5_)
++				/*  ShangMi Algorithm Suite */
++				SET_ISA_EXT_MAP("zvks", RISCV_ISA_EXT_ZVKSED);
++				SET_ISA_EXT_MAP("zvks", RISCV_ISA_EXT_ZVKSH);
++				SET_ISA_EXT_MAP("zvks", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvks", RISCV_ISA_EXT_ZVKT);
++
++				/* ShangMi Algorithm Suite with carryless multiply */
++				SET_ISA_EXT_MAP("zvksc", RISCV_ISA_EXT_ZVKSED);
++				SET_ISA_EXT_MAP("zvksc", RISCV_ISA_EXT_ZVKSH);
++				SET_ISA_EXT_MAP("zvksc", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvksc", RISCV_ISA_EXT_ZVKT);
++				SET_ISA_EXT_MAP("zvksc", RISCV_ISA_EXT_ZVBC);
++
++				/* ShangMi Algorithm Suite with GCM */
++				SET_ISA_EXT_MAP("zvksg", RISCV_ISA_EXT_ZVKSED);
++				SET_ISA_EXT_MAP("zvksg", RISCV_ISA_EXT_ZVKSH);
++				SET_ISA_EXT_MAP("zvksg", RISCV_ISA_EXT_ZVBB);
++				SET_ISA_EXT_MAP("zvksg", RISCV_ISA_EXT_ZVKT);
++				SET_ISA_EXT_MAP("zvksg", RISCV_ISA_EXT_ZVKG);
++
+ 			}
+ #undef SET_ISA_EXT_MAP
+ 		}
 -- 
 2.39.2
 
