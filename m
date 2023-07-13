@@ -2,80 +2,91 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD4AEB64DD
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jul 2023 08:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F630C001B0
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jul 2023 09:44:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234653AbjGMI7V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Jul 2023 04:59:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58056 "EHLO
+        id S234532AbjGMJoq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Jul 2023 05:44:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234641AbjGMI7U (ORCPT
+        with ESMTP id S233256AbjGMJo3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jul 2023 04:59:20 -0400
-Received: from mail.208.org (unknown [183.242.55.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE69D12E
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Jul 2023 01:59:18 -0700 (PDT)
-Received: from mail.208.org (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTP id 4R1pSh1R1JzBRRLl
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Jul 2023 16:59:16 +0800 (CST)
-Authentication-Results: mail.208.org (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)" header.d=208.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=208.org; h=
-        content-transfer-encoding:content-type:message-id:user-agent
-        :references:in-reply-to:subject:to:from:date:mime-version; s=
-        dkim; t=1689238756; x=1691830757; bh=DM6p6Pwx/AqL6NEMfpivdDxc+8P
-        TOaK9hs3yovJiDmY=; b=M92cRi6UJV1brNSVIXEaYUhmT/aL3Qfb6jED6mZnqhb
-        OAff45ooadK29fiAMX3p2/oubm2SnyJPZAasR0+x1wzXkrXLO1MtyaTttbtLfYGn
-        uy93/kuTxFgxnzteRus/YzX/xf+bSn4Z0hcvJxoY/ICDzlFCO88kvPUEwjJq9FHP
-        TTi1keUtBHHLWJd82tR//WexY0xr7vnR3wELL2/qKPnYlMSyP4wmBQ+dN0y7aqHw
-        26ziL70aolI5mk7C42I23B9dp+cuvISpeZL3U4mgsnaSWx7Xmu0uDKFCEyMZ0Mcb
-        3FmY/h96V2fjT+hYarzKVve30X+p+QpLEmmS2ycjwTQ==
-X-Virus-Scanned: amavisd-new at mail.208.org
-Received: from mail.208.org ([127.0.0.1])
-        by mail.208.org (mail.208.org [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 8L_x7UKqCu95 for <linux-crypto@vger.kernel.org>;
-        Thu, 13 Jul 2023 16:59:16 +0800 (CST)
-Received: from localhost (email.208.org [127.0.0.1])
-        by mail.208.org (Postfix) with ESMTPSA id 4R1pSg5pQZzBJTFd;
-        Thu, 13 Jul 2023 16:59:15 +0800 (CST)
+        Thu, 13 Jul 2023 05:44:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF9FC4214;
+        Thu, 13 Jul 2023 02:42:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3030B61AD8;
+        Thu, 13 Jul 2023 09:42:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FACAC433CA;
+        Thu, 13 Jul 2023 09:42:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689241370;
+        bh=ORLqydtVMM+8rB9hFmMafDUI3s1uL+5DcG+3sInL+9Y=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=jAG4H0o3rgs8CaGEFPo3CY2gdh+2RpQpyZwKMcK7xRHYpzn9UklAVZRZhsxtUusOm
+         2d94ZUobSdlc+h6ESf/qLgNqdZrXiXiLT9u4o19qZ2A3EU2sa9KiYkJ3NJBXsUlJyW
+         9jfM82t+wO4egp7Kjf9LvFkeqRrzr9nRt6oreO2A4bJX9tVEIqUDCcNemcikrNS/Hi
+         bmKtjwHC+anUUB6zzurOqIWmCC4ghjiaMM0T8mm8Ny5IA0VueObyYUJ1vs8zZ41bR1
+         h5VT2E3gnEOsV11AIy4YTIM6qcci3dJij5ujDleWqQXXRxGha9afz3URCwV/KHm4df
+         FQUZYwiph7uyw==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2b703cbfaf5so6710461fa.1;
+        Thu, 13 Jul 2023 02:42:50 -0700 (PDT)
+X-Gm-Message-State: ABy/qLYsMeLspvI3MfnHjcULN0IzLT6jis/iG8DLWyUreM+7Z2+CIFyN
+        x1aBhf7VCGsrYH6gwqv2I/XqzzlRSpD2akz8jOw=
+X-Google-Smtp-Source: APBJJlEvvKmCxhCjOsdBb4l+vHb6SbHZlkQVchTGXMqcq0ZPY9+mNSyWmawnS+Hv6wj2rs0hdv4lEyZJw38ajqmA3Yo=
+X-Received: by 2002:a2e:878b:0:b0:2b6:dc50:19ac with SMTP id
+ n11-20020a2e878b000000b002b6dc5019acmr1071789lji.31.1689241368585; Thu, 13
+ Jul 2023 02:42:48 -0700 (PDT)
 MIME-Version: 1.0
-Date:   Thu, 13 Jul 2023 16:59:15 +0800
-From:   chenqingyun001@208suo.com
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        catalin.marinas@arm.com, will@kernel.org
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto:space required before the open brace '{'
-In-Reply-To: <tencent_0DF4FE9D6A06DCE7069F936CA2A8154EC105@qq.com>
-References: <tencent_0DF4FE9D6A06DCE7069F936CA2A8154EC105@qq.com>
-User-Agent: Roundcube Webmail
-Message-ID: <e6744137bd60578811fa763b39f50cf0@208suo.com>
-X-Sender: chenqingyun001@208suo.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+References: <tencent_0DF4FE9D6A06DCE7069F936CA2A8154EC105@qq.com> <e6744137bd60578811fa763b39f50cf0@208suo.com>
+In-Reply-To: <e6744137bd60578811fa763b39f50cf0@208suo.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 13 Jul 2023 11:42:37 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFWQ1=mKytEpVxuKvV=vqqKtZqM+g3FkW35md9FYspe-Q@mail.gmail.com>
+Message-ID: <CAMj1kXFWQ1=mKytEpVxuKvV=vqqKtZqM+g3FkW35md9FYspe-Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto:space required before the open brace '{'
+To:     chenqingyun001@208suo.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        catalin.marinas@arm.com, will@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Maintain code readability and style consistency
+On Thu, 13 Jul 2023 at 10:59, <chenqingyun001@208suo.com> wrote:
+>
+> Maintain code readability and style consistency
+>
+> Signed-off-by: Qingyun Chen <chenqingyun001@208suo.com>
 
-Signed-off-by: Qingyun Chen <chenqingyun001@208suo.com>
----
-  arch/arm64/crypto/ghash-ce-glue.c | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
+NAK
 
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c 
-b/arch/arm64/crypto/ghash-ce-glue.c
-index 97331b454ea8..cb1cd161c022 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -241,7 +241,7 @@ static int gcm_aes_setkey(struct crypto_aead *tfm, 
-const u8 *inkey,
-      if (ret)
-          return -EINVAL;
+This is a cast operation, which doesn't require a trailing space.
 
--    aes_encrypt(&ctx->aes_key, key, (u8[AES_BLOCK_SIZE]){});
-+    aes_encrypt(&ctx->aes_key, key, (u8[AES_BLOCK_SIZE]) {});
+If the tool you are using misidentifies this, please fix the tool instead.
 
-      /* needed for the fallback */
-      memcpy(&ctx->ghash_key.k, key, GHASH_BLOCK_SIZE);
+
+> ---
+>   arch/arm64/crypto/ghash-ce-glue.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/crypto/ghash-ce-glue.c
+> b/arch/arm64/crypto/ghash-ce-glue.c
+> index 97331b454ea8..cb1cd161c022 100644
+> --- a/arch/arm64/crypto/ghash-ce-glue.c
+> +++ b/arch/arm64/crypto/ghash-ce-glue.c
+> @@ -241,7 +241,7 @@ static int gcm_aes_setkey(struct crypto_aead *tfm,
+> const u8 *inkey,
+>       if (ret)
+>           return -EINVAL;
+>
+> -    aes_encrypt(&ctx->aes_key, key, (u8[AES_BLOCK_SIZE]){});
+> +    aes_encrypt(&ctx->aes_key, key, (u8[AES_BLOCK_SIZE]) {});
+>
+>       /* needed for the fallback */
+>       memcpy(&ctx->ghash_key.k, key, GHASH_BLOCK_SIZE);
