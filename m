@@ -2,175 +2,499 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F762C001B0
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jul 2023 23:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CFAEB64DD
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jul 2023 06:26:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbjGLXOJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jul 2023 19:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33458 "EHLO
+        id S233685AbjGMG0D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Jul 2023 02:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232452AbjGLXNv (ORCPT
+        with ESMTP id S229768AbjGMG0C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jul 2023 19:13:51 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C682268D;
-        Wed, 12 Jul 2023 16:13:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689203603; x=1720739603;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=n2NaEeDR2OwIALDSSHu9LXHA2bmh356UsgChcigYQ8o=;
-  b=AOYswIhpCEgMinRbrNAsaandKqzGFlNb+wPHpLCBmB1ObjympO4hEIFv
-   xlIZcRJT5KZQ4EKR2W9PYcPmCPw1CdsZ2aXLYlXOWQTgAcqBApD4HU8Vl
-   lY1W7BbPJ2V+EimbWHhcuFm+/WeAI8yTkOUkmVwEU9O2hKDIn0IHUH60Q
-   nJMahOzZ9msOYXR7lL1DIZFf6ts2ktPsrd4LozCjRdc+g6It+y9HPWhUQ
-   xyNQ7czy2dVj4HtDUgKLZkbsvQFKuErc3W+xo0wRDgOBRIfV7LETQ9RMW
-   hwOipOgEVBAipVyL+0vzY9gKSBDmdYe4D9IRqBo0uJvIDlSHIFtAMYnck
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="367655433"
-X-IronPort-AV: E=Sophos;i="6.01,200,1684825200"; 
-   d="scan'208";a="367655433"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2023 16:13:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10769"; a="895772875"
-X-IronPort-AV: E=Sophos;i="6.01,200,1684825200"; 
-   d="scan'208";a="895772875"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga005.jf.intel.com with ESMTP; 12 Jul 2023 16:13:10 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 12 Jul 2023 16:13:10 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 12 Jul 2023 16:13:09 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 12 Jul 2023 16:13:09 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.109)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 12 Jul 2023 16:13:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bpSlqnJuvIouPbBYwKO/FeSwsexF0HXlYN2O/qAm9yM5NBJWM7pRQA5X8rfoPuYFhxMFrlA2R02uN9apKQCX+92Y2vZtWpA54f20PddFIdTIuMFPlgC7LSbglfWW1btXFXI2AsGB1NFnFyvhsd+TQlQgALvSMuLHV3Cc7w7IR29int6RRkJb4AcwUm/EN+cbMwNeOQC30oPmILZPuDx6/DTCoqww/i+/ekAD53V1z3cjlWarQOkAs244N0fNSTffWE3ipKHawLS3SNVdM//Hu1ZCIfF73+czokHxcN0vtp6MFqKISeEZWktTvRGVgToSOBJ6xAfkcqLmqdJd3PCbxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n2NaEeDR2OwIALDSSHu9LXHA2bmh356UsgChcigYQ8o=;
- b=B6pV9dK7PdMzJTC/B5NcNdj/XX4vO6l7kbjSTFmtPjw4H/mCRYTRTxsnLZ9Nw8yzBjuOHA6dSrE3EN7rHz1dPluztJG2HTy02/NwKDRVD5nQs7JqcQp8Qh4lugZp8wLIvx3zGctB4aSvyD9S2aH0MksYOHwFixrNXkJSp5FeVXqc9WFc7KkZ7UKVM/9hfj2YakmpA6UOAHhS5CZpeIpWo8VCqkvLqbxrsmJONHZQ9aOFoMwEOj9KZs8JzgpCjelXD9Q/KtwQHc4+42l4iQctINpBAofFc7TWqzhCOoCCL5hCY0s+t2Z4oLWbHxjgmeaySmQnYxSSgjDOePQinAIxxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6097.namprd11.prod.outlook.com (2603:10b6:208:3d7::17)
- by SA2PR11MB4955.namprd11.prod.outlook.com (2603:10b6:806:fa::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.32; Wed, 12 Jul
- 2023 23:13:07 +0000
-Received: from IA1PR11MB6097.namprd11.prod.outlook.com
- ([fe80::724:7e04:8501:228d]) by IA1PR11MB6097.namprd11.prod.outlook.com
- ([fe80::724:7e04:8501:228d%7]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
- 23:13:07 +0000
-From:   "Yu, Fenghua" <fenghua.yu@intel.com>
-To:     Tom Zanussi <tom.zanussi@linux.intel.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "vkoul@kernel.org" <vkoul@kernel.org>
-CC:     "Jiang, Dave" <dave.jiang@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-        "Guilford, James" <james.guilford@intel.com>,
-        "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
-        "Gopal, Vinodh" <vinodh.gopal@intel.com>,
-        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>
-Subject: RE: [PATCH v7 02/14] dmaengine: idxd: add external module driver
- support for dsa_bus_type
-Thread-Topic: [PATCH v7 02/14] dmaengine: idxd: add external module driver
- support for dsa_bus_type
-Thread-Index: AQHZs2HAZYzmJNKunEibFlATGiXQ/K+2xeMg
-Date:   Wed, 12 Jul 2023 23:13:07 +0000
-Message-ID: <IA1PR11MB609789B3076DAB33C4A9039A9B36A@IA1PR11MB6097.namprd11.prod.outlook.com>
-References: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
- <20230710190654.299639-3-tom.zanussi@linux.intel.com>
-In-Reply-To: <20230710190654.299639-3-tom.zanussi@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6097:EE_|SA2PR11MB4955:EE_
-x-ms-office365-filtering-correlation-id: 4fed3b69-e278-425d-9b69-08db832d8da7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fdcoeuds1RM4b2ifu74Ze5wES56WmIIoogQyfaUmCcQdkpPI5vw8UoXrn0U4c9N9XYGuB1xaxTj0wSoqLlI20F3V7o+Ir51lbDIKmZa0WT4rVXHQsLYkTnIt+gCxFJBw6LOhwu+t9kS+GvMJ2QiVUCwmEHz22pjb+RJwzWkO2+94zG93ZbwseQKEIV4nJZT0AZLKOZqU5twZU0lgBXpX3Ae1meXCHOIfA/iOpbQiflwpB0v6wou18b0FIRRNY+nZ2Jn3TENqiTDDTAOU3EXYQWvseqC2qxmc+SpGe7jS+pCOcd6cn/VOcjXLTCcVeT7Av4A7Kgs0xHTS1USQwOIyT5rEv7Etm6/VIoBx2wtCofDYqrbHiA1mtQoE2JbLryqSQo8/Zw4l7fBppO7LeGDJWc1fqLj72W3ZqUbKTqjRXG/3K/rrwc43xepUEAeU7FaXhOh4p3ZUzd+ZZFbMzhaCOKW398Mslkam/9CPv0Qm8nLtAOmXUYLUudFSJqQrntVg97v36CJwwl5E5CYlDe3AD4Y2+gfk52S0DAY0k6WcRnVqG0d0ary9RM5c0xhK8e6SMwJl14fFsOGru6NAD6EZDPMPqpCDo7n1sOXF7Je7p95g+Ksknp99xHMzhbqLDnGq
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6097.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(396003)(346002)(39860400002)(366004)(451199021)(71200400001)(7696005)(82960400001)(478600001)(110136005)(122000001)(54906003)(76116006)(558084003)(8676002)(52536014)(5660300002)(8936002)(2906002)(33656002)(86362001)(38070700005)(4326008)(316002)(66476007)(66946007)(55016003)(64756008)(66446008)(66556008)(38100700002)(41300700001)(26005)(9686003)(6506007)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?FeeTnjBFfY0kdyKwe1j3NRd4vHCS5qDVy3tpe18NNnOxOW8CRMMJ7MxNos/S?=
- =?us-ascii?Q?DP/4XOAFS/NCDU1FtQaE180zGFRZefvmrlAKi13W71fuA5uWnsm+YEktUle3?=
- =?us-ascii?Q?5fDNXPlG+yBY9WbUKlWdFCGPKMS0JD8dkqobPvzv8CcfsHeQisN+nP+zYNqq?=
- =?us-ascii?Q?2oZJbtpZECLiD6M2pXFhmIpllNjO1LTfkukPZFk7wfyFm7gM3+uyGsT8bn2y?=
- =?us-ascii?Q?0iVKX9TjLKKnV1sduTAVu2m5QSJ+aScD05UUmpia1UYNrFLas3oAo5i/Uja3?=
- =?us-ascii?Q?Npl3IhaEuM6k+m7iOnYXVDBMgwFCjEHzyAeW3bb+S66+QQ2Cr6aO6mhcGDLi?=
- =?us-ascii?Q?+UOLZSAhLM0iUCP01kqSd0xBRQ2jwhzrruHl6YHKMzWtxJfTrUlLJO+qavdC?=
- =?us-ascii?Q?F6GNcvVywUexK5Ew+RBhyF5zkcO3rlSQGH9L5muKv3xTMlx4cCljJQLz2hsH?=
- =?us-ascii?Q?axHfgFKC6+L2ufedWS6TG60r7fwQLRAz9/B/Qe6KE5NxwBtCEUHnLQeorKOg?=
- =?us-ascii?Q?r2brYVpcD0UeQPxLj5gPUNAdwYfZHnDLrRyIGaB0ULjzjHokD2UimdZaOOy/?=
- =?us-ascii?Q?3gymbYP8GcEmgpmMDhjHdmWgCdcmO2+qD4O1gDDtZYH2+KnaUdozJk4ScAQS?=
- =?us-ascii?Q?I+cywVsczuAiqbCNC5qGMics7FkSciyn5v3bnDW9C3u/EK2WRSgLUzw0Bh6f?=
- =?us-ascii?Q?Ud2a1N3AWumBsjwqKIQJDTDsAkRE2psZjXY7V7rd9Vw/zdBnUyFS+hbNcvgn?=
- =?us-ascii?Q?AHKRv2fNUgrAQUEx2bALnvnD7WISxr6DcuxxLLQ6k0IGyCYFrje/cKSKK1Qp?=
- =?us-ascii?Q?LiQHjlAjlcsb+BmCdzpDQUJTkzGKR49Nosekz44HrQ2eWr7xh/nUr/eRu3vb?=
- =?us-ascii?Q?j1UDgrTWGGCXbCPqSQP9Xx9NQpr6L4RBgBnL2qbXtRn2j8iHjB+tEbDm7Qmx?=
- =?us-ascii?Q?GPzW0+QcYfrdWAuxAvlLxOzdq0QDuoUK2EDXNEoz64QHTY3ia2jMT50w+49w?=
- =?us-ascii?Q?dBaWRTBhR0GPvbEZOHE1uIUFdJZTMugPtyRNnRHBHIMqrxun+qv+8KcSfmH9?=
- =?us-ascii?Q?/sqzCU3H4jVuqJKqsE5El4MfCwZvlc6aWLmj5tQs5NqHG6BWif/0FWovTzI8?=
- =?us-ascii?Q?NEMTddtLA7oqA7VsV4DKBFnz8ydGf8WikcxMN+OySTpyyNRb7Ca1k/4RoUmk?=
- =?us-ascii?Q?hxGbaphe2BIQ5UHRoVuI6fRcgPIAYOkNPQP4RuvYA72cO/2gp5f6Y1GUeKnC?=
- =?us-ascii?Q?D3m3/WXIJpRncdC0MeLLGEB2K60TIGQ0j+lM4YeMZpZGtT3Cep/iXEGxZaS2?=
- =?us-ascii?Q?MojtAtzwI8Z/ZqlErTZYRMC2x5dASPC4418bLMKAw024qM944jgSE+MKZ+N6?=
- =?us-ascii?Q?wrEmXOmCzQ5s2ZiQH/nKQ6y3ZsfYprXLQvfg6lb38YTkkiBUUJQ9KZm/L1MP?=
- =?us-ascii?Q?wAxlyJgXod/5BBYtwAwVyJ/KvOEQvjilh4qB/amMeV3PL2h9HSwnqlj1OjwU?=
- =?us-ascii?Q?FF/uHs/5bE33C+Az2bpUYmxPZYb/F87o4y1rxRKpjw5KYc3QVuRtAPdLbpCU?=
- =?us-ascii?Q?hdQggc2sezgKnk0TjV6/EAKoY1tsKwHZsGBiECMu?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6097.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fed3b69-e278-425d-9b69-08db832d8da7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2023 23:13:07.5811
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zYR3r+tN2kry+TEWl5h/alKnlXsmVKgFLw9S8ZIHRQ7LkwFrqFDO5q7vZGjr2QmieJNqwClzGX716Yti3vPP1g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4955
-X-OriginatorOrg: intel.com
+        Thu, 13 Jul 2023 02:26:02 -0400
+X-Greylist: delayed 978 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Jul 2023 23:25:59 PDT
+Received: from www522.your-server.de (www522.your-server.de [195.201.215.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 802E3A2;
+        Wed, 12 Jul 2023 23:25:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=folker-schwesinger.de; s=default2212; h=In-Reply-To:References:Message-Id:
+        To:From:Cc:Subject:Date:Content-Type:Sender:Reply-To:MIME-Version:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+        bh=YxdXRsHV5gvkgalTYn7OFaGTXn3eE6f7fK2e6o6WgVY=; b=NPKoB/g3UlWB8hI3tLw4ORjuQm
+        tdAmpdEz7Ly2PNX0bzCDAEgyRo9g7rhW0wJMxyOnRUBAQnDlYACRAeivpu/iiKM/O8vsaCc53ZbgZ
+        acTPR2N73GK/gySlt5Z/qx3Scc0naszeOT1+eC8P8FYTgS/weoTNQZOP6KUtk3uwD5SbyEGvVEJss
+        UIuRuGG/0A+AM8KZfkQ8YrgQcOZ73LtVZktxWu65qnfPrwFaKgmxjtdcgbzecccJj4Y5mGA8xiNC0
+        6eT7rBLiauQFqhAVC0Q/T+MBfTIMrNGFOEBD2j84veWLnh5/suYBpX0OZxY/4VThAq/DrOAib+jTD
+        YoezECkA==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+        by www522.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <dev@folker-schwesinger.de>)
+        id 1qJpW5-0000Gm-Fr; Thu, 13 Jul 2023 08:09:29 +0200
+Received: from [193.138.218.160] (helo=localhost)
+        by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <dev@folker-schwesinger.de>)
+        id 1qJpW0-000NOO-W3; Thu, 13 Jul 2023 08:09:29 +0200
+Content-Type: multipart/signed;
+ boundary=88f15712e0a333f8a9bd02b43aed3c93591977f24a2d039f7f62a6aa0587;
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+Date:   Thu, 13 Jul 2023 06:09:24 +0000
+Subject: Re: [PATCH RFC/RFT] crypto: rk3288: enable support for TRNG
+Cc:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-rockchip@lists.infradead.org>, <mike.rudenko@gmail.com>,
+        <Jason@zx2c4.com>
+From:   "Folker Schwesinger" <dev@folker-schwesinger.de>
+To:     "Corentin Labbe" <clabbe@baylibre.com>, <davem@davemloft.net>,
+        <heiko@sntech.de>, <herbert@gondor.apana.org.au>
+Message-Id: <CU0TGMZYXNCJ.3RU1TPFHFOZNM@homedev>
+X-Mailer: aerc 0.15.2-83-gab3debc1fad9
+References: <20230707115242.3411259-1-clabbe@baylibre.com>
+In-Reply-To: <20230707115242.3411259-1-clabbe@baylibre.com>
+X-Authenticated-Sender: dev@folker-schwesinger.de
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26967/Wed Jul 12 09:28:32 2023)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> From: Tom Zanussi <tom.zanussi@linux.intel.com>
-> From: Dave Jiang <dave.jiang@intel.com>
->=20
-> Add support to allow an external driver to be registered to the dsa_bus_t=
-ype and
-> also auto-loaded.
->=20
-> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
-> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
+--88f15712e0a333f8a9bd02b43aed3c93591977f24a2d039f7f62a6aa0587
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
+Hi,
 
-Thanks.
+On Fri Jul 7, 2023 at 1:52 PM CEST, Corentin Labbe wrote:
+> The rockchip IP has a TRNG which could be used as a hwrng.
+> Since TRNG is only failling rngtests on rk3328 and does not work on
+> rk3288, the TRNG is enabled only on rk3399 via a variant.
+> But this is not a surprise since when vendor tried to add support for TRN=
+G upstream,
+> rk3288 was not handled, and rk3328 was added "disabled", so I conclude
+> this is a known problem.
+> Anyway the quality of rk3399 TRNG is low, so a dedicated kconfig option
+> is done to not enabled it by default.
+>
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+> Hello
+>
+> All rk3288 compatible crypto IP have a TRNG and supporting it was awaited=
+ for
+> some time (https://bugzilla.kernel.org/show_bug.cgi?id=3D216502)
+>
+> I has some problem with this one, it was the first time I hit so many 100=
+% failure on rngtest.
+>
+> I finally bisected a RNG_SAMPLE value (1200) which lead to "only" 50-70% =
+failure.
+> The calcul of fail rate is done with (FIPS 140-2 successes/FIPS 140-2 fai=
+lures) of rngtest.
+> Since it is the first time I hit that case, does setting rng_quality to 3=
+00 is
+> what to do (using the worst succes rate of 30%) ?
+>
+> But I am really puzzled why vendor default is to use RNG_SAMPLE=3D100 whi=
+ch is total failure (according to rngtest).
+> Unfortunatly all my try to have more answer from them seems to have been =
+forwarded to /dev/null.
+>
+> Thanks
+> Regards
 
--Fenghua
+I tested this on a rk3399-rock-pi-4b with the following results:
+
+# uname -a
+Linux rockpi-bookworm 6.4.3-dirty #83 SMP PREEMPT Wed Jul 12 09:07:12 CEST =
+2023 aarch64 GNU/Linux
+
+# sudo ls -l /dev/hwrng
+crw------- 1 root root 10, 183 Jan 18 09:52 /dev/hwrng
+
+# cat /sys/devices/virtual/misc/hw_random/rng_current
+Rockchip rk3288 TRNG
+
+# sudo dd if=3D/dev/hwrng count=3D100 bs=3D2048 | rngtest
+rngtest 5
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO =
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rngtest: starting FIPS tests...
+100+0 records in
+100+0 records out
+204800 bytes (205 kB, 200 KiB) copied, 10.1847 s, 20.1 kB/s
+rngtest: entropy source drained
+rngtest: bits received from input: 1638400
+rngtest: FIPS 140-2 successes: 54
+rngtest: FIPS 140-2 failures: 27
+rngtest: FIPS 140-2(2001-10-10) Monobit: 27
+rngtest: FIPS 140-2(2001-10-10) Poker: 3
+rngtest: FIPS 140-2(2001-10-10) Runs: 1
+rngtest: FIPS 140-2(2001-10-10) Long run: 0
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=3D94.195; avg=3D159.504; max=3D195.252)K=
+ibits/s
+rngtest: FIPS tests speed: (min=3D17.826; avg=3D25.180; max=3D38.377)Mibits=
+/s
+rngtest: Program run time: 10221628 microseconds
+
+# sudo dd if=3D/dev/hwrng count=3D200 bs=3D2048 | rngtest
+rngtest 5
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO =
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rngtest: starting FIPS tests...
+200+0 records in
+200+0 records out
+409600 bytes (410 kB, 400 KiB) copied, 20.2624 s, 20.2 kB/s
+rngtest: entropy source drained
+rngtest: bits received from input: 3276800
+rngtest: FIPS 140-2 successes: 115
+rngtest: FIPS 140-2 failures: 48
+rngtest: FIPS 140-2(2001-10-10) Monobit: 48
+rngtest: FIPS 140-2(2001-10-10) Poker: 1
+rngtest: FIPS 140-2(2001-10-10) Runs: 0
+rngtest: FIPS 140-2(2001-10-10) Long run: 0
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=3D94.636; avg=3D159.621; max=3D195.400)K=
+ibits/s
+rngtest: FIPS tests speed: (min=3D25.031; avg=3D27.258; max=3D28.639)Mibits=
+/s
+rngtest: Program run time: 20297102 microseconds
+
+
+
+Tested-by: Folker Schwesinger <dev@folker-schwesinger.de>
+
+Kind regards,
+
+Folker
+
+
+>  drivers/crypto/Kconfig                        |  8 ++
+>  drivers/crypto/rockchip/Makefile              |  1 +
+>  drivers/crypto/rockchip/rk3288_crypto.c       | 18 +++-
+>  drivers/crypto/rockchip/rk3288_crypto.h       | 18 ++++
+>  drivers/crypto/rockchip/rk3288_crypto_ahash.c |  2 +
+>  .../crypto/rockchip/rk3288_crypto_skcipher.c  |  2 +
+>  drivers/crypto/rockchip/rk3288_crypto_trng.c  | 92 +++++++++++++++++++
+>  7 files changed, 140 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/crypto/rockchip/rk3288_crypto_trng.c
+>
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 44e44b8d9ce6..7226d441686c 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -650,6 +650,14 @@ config CRYPTO_DEV_ROCKCHIP
+>  	  This driver interfaces with the hardware crypto accelerator.
+>  	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
+> =20
+> +config CRYPTO_DEV_ROCKCHIP_TRNG
+> +	bool "Support for Rockchip TRNG"
+> +	depends on CRYPTO_DEV_ROCKCHIP
+> +	select HW_RANDOM
+> +	help
+> +	  Select this option if you want to provide kernel-side support for
+> +	  the True Random Number Generator found in the Crypto IP.
+> +
+>  config CRYPTO_DEV_ROCKCHIP_DEBUG
+>  	bool "Enable Rockchip crypto stats"
+>  	depends on CRYPTO_DEV_ROCKCHIP
+> diff --git a/drivers/crypto/rockchip/Makefile b/drivers/crypto/rockchip/M=
+akefile
+> index 785277aca71e..11910f0e6a62 100644
+> --- a/drivers/crypto/rockchip/Makefile
+> +++ b/drivers/crypto/rockchip/Makefile
+> @@ -3,3 +3,4 @@ obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) +=3D rk_crypto.o
+>  rk_crypto-objs :=3D rk3288_crypto.o \
+>  		  rk3288_crypto_skcipher.o \
+>  		  rk3288_crypto_ahash.o
+> +rk_crypto-$(CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG) +=3D rk3288_crypto_trng.o
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/roc=
+kchip/rk3288_crypto.c
+> index 9f6ba770a90a..880e4db812a2 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.c
+> @@ -40,15 +40,18 @@ static const struct rk_variant rk3288_variant =3D {
+>  	.num_clks =3D 4,
+>  	.rkclks =3D {
+>  		{ "sclk", 150000000},
+> -	}
+> +	},
+> +	.trng =3D false,
+>  };
+> =20
+>  static const struct rk_variant rk3328_variant =3D {
+>  	.num_clks =3D 3,
+> +	.trng =3D false,
+>  };
+> =20
+>  static const struct rk_variant rk3399_variant =3D {
+>  	.num_clks =3D 3,
+> +	.trng =3D true,
+>  };
+> =20
+>  static int rk_crypto_get_clks(struct rk_crypto_info *dev)
+> @@ -195,6 +198,10 @@ static int rk_crypto_debugfs_show(struct seq_file *s=
+eq, void *v)
+>  		seq_printf(seq, "%s %s requests: %lu\n",
+>  			   dev_driver_string(dd->dev), dev_name(dd->dev),
+>  			   dd->nreq);
+> +#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG
+> +		seq_printf(seq, "HWRNG: %lu %lu\n",
+> +			   dd->hwrng_stat_req, dd->hwrng_stat_bytes);
+> +#endif
+>  	}
+>  	spin_unlock(&rocklist.lock);
+> =20
+> @@ -381,6 +388,10 @@ static int rk_crypto_probe(struct platform_device *p=
+dev)
+>  			dev_err(dev, "Fail to register crypto algorithms");
+>  			goto err_register_alg;
+>  		}
+> +#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG
+> +		if (crypto_info->variant->trng)
+> +			rk3288_hwrng_register(crypto_info);
+> +#endif
+> =20
+>  		register_debugfs(crypto_info);
+>  	}
+> @@ -411,6 +422,11 @@ static int rk_crypto_remove(struct platform_device *=
+pdev)
+>  #ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_DEBUG
+>  		debugfs_remove_recursive(rocklist.dbgfs_dir);
+>  #endif
+> +#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_TRNG
+> +		if (crypto_tmp->variant->trng)
+> +			rk3288_hwrng_unregister(crypto_tmp);
+> +#endif
+> +
+>  		rk_crypto_unregister();
+>  	}
+>  	rk_crypto_pm_exit(crypto_tmp);
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/roc=
+kchip/rk3288_crypto.h
+> index b2695258cade..016c3b72c19c 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto.h
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+> @@ -9,6 +9,7 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/debugfs.h>
+>  #include <linux/delay.h>
+> +#include <linux/hw_random.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/scatterlist.h>
+>  #include <crypto/engine.h>
+> @@ -183,6 +184,16 @@
+>  #define RK_CRYPTO_HASH_DOUT_6		0x01a4
+>  #define RK_CRYPTO_HASH_DOUT_7		0x01a8
+> =20
+> +#define RK_CRYPTO_TRNG_CTRL		0x0200
+> +#define RK_CRYPTO_OSC_ENABLE		BIT(16)
+> +#define RK_CRYPTO_TRNG_DOUT_0		0x0204
+> +/* sample < 1000 lead to 100% failure on rngtest,
+> + * using more than 1200 does not increase success.
+> + */
+> +#define RK_CRYPTO_RNG_SAMPLE		1200
+> +
+> +#define RK_CRYPTO_MAX_TRNG_BYTE		32
+> +
+>  #define CRYPTO_READ(dev, offset)		  \
+>  		readl_relaxed(((dev)->reg + (offset)))
+>  #define CRYPTO_WRITE(dev, offset, val)	  \
+> @@ -212,6 +223,7 @@ struct rk_clks {
+>  struct rk_variant {
+>  	int num_clks;
+>  	struct rk_clks rkclks[RK_MAX_CLKS];
+> +	bool trng;
+>  };
+> =20
+>  struct rk_crypto_info {
+> @@ -222,11 +234,15 @@ struct rk_crypto_info {
+>  	struct reset_control		*rst;
+>  	void __iomem			*reg;
+>  	int				irq;
+> +	struct mutex			lock;
+> +	struct hwrng			hwrng;
+>  	const struct rk_variant *variant;
+>  	unsigned long nreq;
+>  	struct crypto_engine *engine;
+>  	struct completion complete;
+>  	int status;
+> +	unsigned long hwrng_stat_req;
+> +	unsigned long hwrng_stat_bytes;
+>  };
+> =20
+>  /* the private variable of hash */
+> @@ -288,3 +304,5 @@ extern struct rk_crypto_tmp rk_ahash_md5;
+> =20
+>  struct rk_crypto_info *get_rk_crypto(void);
+>  #endif
+> +int rk3288_hwrng_register(struct rk_crypto_info *rk);
+> +void rk3288_hwrng_unregister(struct rk_crypto_info *rk);
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/cryp=
+to/rockchip/rk3288_crypto_ahash.c
+> index a78ff3dcd0b1..67ed3a54bc7b 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+> @@ -287,6 +287,7 @@ static int rk_hash_run(struct crypto_engine *engine, =
+void *breq)
+>  		goto theend;
+>  	}
+> =20
+> +	mutex_lock(&rkc->lock);
+>  	rk_ahash_reg_init(areq, rkc);
+> =20
+>  	while (sg) {
+> @@ -321,6 +322,7 @@ static int rk_hash_run(struct crypto_engine *engine, =
+void *breq)
+>  	}
+> =20
+>  theend:
+> +	mutex_unlock(&rkc->lock);
+>  	pm_runtime_put_autosuspend(rkc->dev);
+> =20
+>  	local_bh_disable();
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/c=
+rypto/rockchip/rk3288_crypto_skcipher.c
+> index 59069457582b..304c2c44fea0 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> @@ -357,6 +357,7 @@ static int rk_cipher_run(struct crypto_engine *engine=
+, void *async_req)
+>  			}
+>  		}
+>  		err =3D 0;
+> +		mutex_unlock(&rkc->lock);
+>  		rk_cipher_hw_init(rkc, areq);
+>  		if (ivsize) {
+>  			if (ivsize =3D=3D DES_BLOCK_SIZE)
+> @@ -372,6 +373,7 @@ static int rk_cipher_run(struct crypto_engine *engine=
+, void *async_req)
+>  		crypto_dma_start(rkc, sgs, sgd, todo / 4);
+>  		wait_for_completion_interruptible_timeout(&rkc->complete,
+>  							  msecs_to_jiffies(2000));
+> +		mutex_unlock(&rkc->lock);
+>  		if (!rkc->status) {
+>  			dev_err(rkc->dev, "DMA timeout\n");
+>  			err =3D -EFAULT;
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_trng.c b/drivers/crypt=
+o/rockchip/rk3288_crypto_trng.c
+> new file mode 100644
+> index 000000000000..7a0e1300d0e8
+> --- /dev/null
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_trng.c
+> @@ -0,0 +1,92 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * rk3288_crypto_trng.c - hardware cryptographic offloader for rockchip
+> + *
+> + * Copyright (C) 2022-2023 Corentin Labbe <clabbe@baylibre.com>
+> + *
+> + * This file handle the TRNG
+> + */
+> +#include "rk3288_crypto.h"
+> +#include <linux/hw_random.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/pm_runtime.h>
+> +
+> +static int rk3288_trng_read(struct hwrng *hwrng, void *data, size_t max,=
+ bool wait)
+> +{
+> +	struct rk_crypto_info *rk;
+> +	unsigned int todo;
+> +	int err =3D 0;
+> +	int i;
+> +	u32 v;
+> +
+> +	rk =3D container_of(hwrng, struct rk_crypto_info, hwrng);
+> +
+> +	todo =3D min_t(size_t, max, RK_CRYPTO_MAX_TRNG_BYTE);
+> +
+> +#ifdef CONFIG_CRYPTO_DEV_ROCKCHIP_DEBUG
+> +	rk->hwrng_stat_req++;
+> +	rk->hwrng_stat_bytes +=3D todo;
+> +#endif
+> +
+> +	err =3D pm_runtime_resume_and_get(rk->dev);
+> +	if (err < 0)
+> +		goto err_pm;
+> +
+> +	mutex_lock(&rk->lock);
+> +
+> +#define HIWORD_UPDATE(val, mask, shift) \
+> +			((val) << (shift) | (mask) << ((shift) + 16))
+> +	v =3D RK_CRYPTO_OSC_ENABLE | RK_CRYPTO_RNG_SAMPLE;
+> +	CRYPTO_WRITE(rk, RK_CRYPTO_TRNG_CTRL, v);
+> +
+> +	v =3D HIWORD_UPDATE(RK_CRYPTO_TRNG_START, RK_CRYPTO_TRNG_START, 0);
+> +	CRYPTO_WRITE(rk, RK_CRYPTO_CTRL, v);
+> +	wmb();
+> +
+> +	err =3D readl_poll_timeout(rk->reg + RK_CRYPTO_CTRL, v,
+> +				 !(v & RK_CRYPTO_TRNG_START),
+> +				 100, 2000);
+> +	if (err) {
+> +		dev_err(rk->dev, "HWRNG read timeout");
+> +		goto readfail;
+> +	}
+> +
+> +	for (i =3D 0; i < todo / 4; i++) {
+> +		v =3D readl(rk->reg + RK_CRYPTO_TRNG_DOUT_0 + i * 4);
+> +		put_unaligned_le32(v, data + i * 4);
+> +	}
+> +
+> +	err =3D todo;
+> +
+> +	v =3D HIWORD_UPDATE(0, RK_CRYPTO_TRNG_START, 0);
+> +	CRYPTO_WRITE(rk, RK_CRYPTO_CTRL, v);
+> +
+> +readfail:
+> +	mutex_unlock(&rk->lock);
+> +
+> +	pm_runtime_put(rk->dev);
+> +
+> +err_pm:
+> +	return err;
+> +}
+> +
+> +int rk3288_hwrng_register(struct rk_crypto_info *rk)
+> +{
+> +	int ret;
+> +
+> +	dev_info(rk->dev, "Register TRNG with sample=3D%d\n", RK_CRYPTO_RNG_SAM=
+PLE);
+> +
+> +	rk->hwrng.name =3D "Rockchip rk3288 TRNG";
+> +	rk->hwrng.read =3D rk3288_trng_read;
+> +	rk->hwrng.quality =3D 300;
+> +
+> +	ret =3D hwrng_register(&rk->hwrng);
+> +	if (ret)
+> +		dev_err(rk->dev, "Fail to register the TRNG\n");
+> +	return ret;
+> +}
+> +
+> +void rk3288_hwrng_unregister(struct rk_crypto_info *rk)
+> +{
+> +	hwrng_unregister(&rk->hwrng);
+> +}
+
+
+--88f15712e0a333f8a9bd02b43aed3c93591977f24a2d039f7f62a6aa0587
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJAEABYIADgWIQQFbmi0A2l3pTuK+esCQHEyPYq7fQUCZK+VFRocZGV2QGZvbGtl
+ci1zY2h3ZXNpbmdlci5kZQAKCRACQHEyPYq7fZ/QAQCzKrEJP4tzXBQutnXUDLsD
+D8NSaydBNhhoPflg/qOJxwEAzHbunl1pGYf4lrRF50bKL6lCjYJaGdTN+7SJv4Mc
+kAU=
+=SQrv
+-----END PGP SIGNATURE-----
+
+--88f15712e0a333f8a9bd02b43aed3c93591977f24a2d039f7f62a6aa0587--
