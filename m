@@ -2,90 +2,52 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E5AEB64DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 07:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED11EEB64DA
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 07:59:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233172AbjGNHDG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jul 2023 03:03:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46050 "EHLO
+        id S235503AbjGNH7P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jul 2023 03:59:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235114AbjGNHDB (ORCPT
+        with ESMTP id S235647AbjGNH5t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2023 03:03:01 -0400
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917C01727;
-        Fri, 14 Jul 2023 00:02:58 -0700 (PDT)
-Received: from i53875a50.versanet.de ([83.135.90.80] helo=phil.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1qKCp8-0001dj-Am; Fri, 14 Jul 2023 09:02:42 +0200
-From:   Heiko Stuebner <heiko@sntech.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
-        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, conor.dooley@microchip.com,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
-Date:   Fri, 14 Jul 2023 09:02:41 +0200
-Message-ID: <5036521.5fSG56mABF@phil>
-In-Reply-To: <20230714062708.GH913@sol.localdomain>
-References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230713074042.GF2199@sol.localdomain>
- <20230714062708.GH913@sol.localdomain>
+        Fri, 14 Jul 2023 03:57:49 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4BBB46A8
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 00:55:49 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qKDcL-001ROL-P1; Fri, 14 Jul 2023 17:53:34 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Jul 2023 17:53:26 +1000
+Date:   Fri, 14 Jul 2023 17:53:26 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     GUO Zihua <guozihua@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH RFC v3 3/3] crypto: Introduce SM9 key exchange algorithm
+Message-ID: <ZLD+9pRFQdSpfMog@gondor.apana.org.au>
+References: <20230625014958.32631-1-guozihua@huawei.com>
+ <20230625014958.32631-4-guozihua@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230625014958.32631-4-guozihua@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
-
-Am Freitag, 14. Juli 2023, 08:27:08 CEST schrieb Eric Biggers:
-> On Thu, Jul 13, 2023 at 12:40:42AM -0700, Eric Biggers wrote:
-> > On Tue, Jul 11, 2023 at 05:37:31PM +0200, Heiko Stuebner wrote:
-> > > From: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> > > 
-> > > This series provides cryptographic implementations using the vector
-> > > crypto extensions.
-> > > 
-> > > v13 of the vector patchset dropped the patches for in-kernel usage of
-> > > vector instructions, I picked the ones from v12 over into this series
-> > > for now.
-> > > 
-> > > My basic goal was to not re-invent cryptographic code, so the heavy
-> > > lifting is done by those perl-asm scripts used in openssl and the perl
-> > > code used here-in stems from code that is targetted at openssl [0] and is
-> > > unmodified from there to limit needed review effort.
-> > > 
-> > > With a matching qemu (there are patches for vector-crypto flying around)
-> > > the in-kernel crypto-selftests (also the extended ones) are very happy
-> > > so far.
-> > 
-> > Where does this patchset apply to?  I tried torvalds/master, linux-next/master,
-> > riscv/for-next, and cryptodev/master.  Nothing worked.  When sending a
-> > patch(set), please always use the '--base' option to 'git format-patch', or
-> > explicitly mention where it applies to, or provide a link to a git repo.
-> > 
+On Sun, Jun 25, 2023 at 09:49:58AM +0800, GUO Zihua wrote:
+> This patch introduces a generic implementation of SM9 (ShangMi 9) key
+> exchange algorithm.
 > 
-> Hi Heiko, any update on this?  I would like to review, and maybe test, this
-> patchset but there's no way for me to do so.
+> SM9 is an ID-based cryptography algorithm within the ShangMi family whose
+> key exchange algorithm was accepted in ISO/IEC 11770-3 as an
+> international standard.
 
-sorry about that. As you said, this should've been mentioned in the
-cover-letter.
+For each new algorithm we require an in-kernel user.  Where is the
+in-kernel user for this?
 
-This patchset goes on top of the v6 scalar one [0] which in turn
-goes on top of the arch-random patchset [1] and that in turn sits
-on top of 6.5-rc1 for me.
-
-
-Heiko
-
-
-[0] https://lore.kernel.org/r/20230709154243.1582671-1-heiko@sntech.de
-[1] https://lore.kernel.org/r/20230709115549.2666557-1-sameo@rivosinc.com
-
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
