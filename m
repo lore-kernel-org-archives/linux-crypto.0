@@ -2,51 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1A3C001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 09:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD586C001B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 09:14:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235763AbjGNJBM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:01:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36202 "EHLO
+        id S235772AbjGNJOB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:14:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235779AbjGNJBD (ORCPT
+        with ESMTP id S234819AbjGNJN7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:01:03 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF66C270D;
-        Fri, 14 Jul 2023 02:00:43 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qKEfI-001Rit-8M; Fri, 14 Jul 2023 19:00:41 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Jul 2023 19:00:33 +1000
-Date:   Fri, 14 Jul 2023 19:00:33 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Weili Qian <qianweili@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        liulongfang@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/hpre - ensure private key less than n
-Message-ID: <ZLEOsQ4RhUI8xAiQ@gondor.apana.org.au>
-References: <20230707131819.50016-1-qianweili@huawei.com>
+        Fri, 14 Jul 2023 05:13:59 -0400
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61ADE2D47;
+        Fri, 14 Jul 2023 02:13:57 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36E9DdBm028503;
+        Fri, 14 Jul 2023 04:13:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1689326019;
+        bh=mKtCUPgaud8pjCzNSvAn4kZizjOxNjiafARqukJWj+8=;
+        h=From:Date:Subject:References:In-Reply-To:To:CC;
+        b=wU8Iqipd8rz5A6Oh2r/fpzTsUZhuw6/l9SXit/XsUAyw+B3CmKzj32OHZuP6GGwZQ
+         1NXKAFjgsWI8GaOiAQrHTF1bz/JEK3QiFsCJS55C4ebbrQorB8SluVnvcd2YQafTFW
+         OGU8we2N+yKHQAGB0Wf7vlLWXPTIejKNUqWCAwbI=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36E9DdKP097414
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 14 Jul 2023 04:13:39 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 14
+ Jul 2023 04:13:38 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 14 Jul 2023 04:13:38 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36E9DcdL015114;
+        Fri, 14 Jul 2023 04:13:38 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+Date:   Fri, 14 Jul 2023 14:42:42 +0530
+Subject: [PATCH v5 2/2] arm64: dts: ti: k3-am62-main: Remove power-domains
+ from crypto node
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230707131819.50016-1-qianweili@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20230614-sa3ul-v5-2-29dd2366fba3@ti.com>
+References: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
+In-Reply-To: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
+To:     Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        "Tero Kristo" <kristo@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Jayesh Choudhary <j-choudhary@ti.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Tero Kristo" <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh@kernel.org>, <linux-crypto@vger.kernel.org>,
+        Kamlesh Gurudasani <kamlesh@ti.com>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326014; l=1080;
+ i=kamlesh@ti.com; s=20230614; h=from:subject:message-id;
+ bh=twkydDeRPS5AYQfyYZRmDOCh79DoQ65SqFyXWQK4qeQ=;
+ b=AJ+VVQIeJ4KLEgtk9OggCVRkJHfne+ozX+EGKZP58f9RMR7lSGudpeCVhbp6M52B+CA0hqKDl
+ kBA1p40Gac7AmpUAewZ8Ge9HYWANvn+FDOYtlz26ZCQXkdTb2N9cPbx
+X-Developer-Key: i=kamlesh@ti.com; a=ed25519;
+ pk=db9XKPVWDGJVqj2jDqgnPQd6uQf3GZ3oaQa4bq1odGo=
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 07, 2023 at 09:18:19PM +0800, Weili Qian wrote:
-> The private key of the curve key size generated by stdrng, which maybe
-> not less than n. Therefore, the private key with the curve key size
-> minus 1 is generated to ensure that the private key is less than n.
-> 
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_crypto.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+Only SYSFW has control of SA3UL power.
+From SYSFW 08.04.00.002, for security reasons, device ID for power
+management of SA3UL has been removed.
 
-Patch applied.  Thanks.
+"power-domains" property in crypto node tries to access
+the SA3UL, for which it gets NACK and hence, SA3UL driver doesn't
+probe properly.
+
+Fixes: 8af893654c02 ("arm64: dts: ti: k3-am62-main: Enable crypto accelerator")
+
+Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
+---
+ arch/arm64/boot/dts/ti/k3-am62-main.dtsi | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
+index b3e4857bbbe4..18a6e9ffaf58 100644
+--- a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
+@@ -174,7 +174,6 @@ k3_reset: reset-controller {
+ 	crypto: crypto@40900000 {
+ 		compatible = "ti,am62-sa3ul";
+ 		reg = <0x00 0x40900000 0x00 0x1200>;
+-		power-domains = <&k3_pds 70 TI_SCI_PD_SHARED>;
+ 		#address-cells = <2>;
+ 		#size-cells = <2>;
+ 		ranges = <0x00 0x40900000 0x00 0x40900000 0x00 0x30000>;
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
