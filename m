@@ -2,52 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18CA6C0015E
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 08:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 946BFC0015E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 08:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235659AbjGNIwf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jul 2023 04:52:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58038 "EHLO
+        id S235809AbjGNIxL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jul 2023 04:53:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235688AbjGNIwa (ORCPT
+        with ESMTP id S235727AbjGNIw4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2023 04:52:30 -0400
+        Fri, 14 Jul 2023 04:52:56 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B64DF2719
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 01:52:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B443C1FC8;
+        Fri, 14 Jul 2023 01:52:55 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qKEXK-001Rdn-39; Fri, 14 Jul 2023 18:52:27 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Jul 2023 18:52:19 +1000
-Date:   Fri, 14 Jul 2023 18:52:19 +1000
+        id 1qKEXd-001Rdy-Ls; Fri, 14 Jul 2023 18:52:46 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Jul 2023 18:52:38 +1000
+Date:   Fri, 14 Jul 2023 18:52:38 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Damian Muszynski <damian.muszynski@intel.com>
-Subject: Re: [PATCH] crypto: qat - change value of default idle filter
-Message-ID: <ZLEMw9BZty9zVej2@gondor.apana.org.au>
-References: <20230622092635.6175-1-giovanni.cabiddu@intel.com>
+To:     Mahmoud Adam <mngyadam@amazon.com>
+Cc:     dhowells@redhat.com, davem@davemloft.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KEYS: use kfree_sensitive with key
+Message-ID: <ZLEM1gNhynPTgsLq@gondor.apana.org.au>
+References: <20230622124719.93393-1-mngyadam@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230622092635.6175-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20230622124719.93393-1-mngyadam@amazon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 22, 2023 at 10:26:35AM +0100, Giovanni Cabiddu wrote:
-> The power management configuration of 4xxx devices is too aggressive
-> and in some conditions the device might be prematurely put to a low
-> power state.
-> Increase the idle filter value to prevent that.
-> In future, this will be set by firmware.
-> 
-> Fixes: e5745f34113b ("crypto: qat - enable power management for QAT GEN4")
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
+On Thu, Jun 22, 2023 at 12:47:22PM +0000, Mahmoud Adam wrote:
+> key might contain private part of the key, so better use
+> kfree_sensitive to free it
 > ---
->  drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v1: conflicts with c3d03e8e35e0:
+> KEYS: asymmetric: Copy sig and digest in public_key_verify_signature()
+> kfree_sensitive the buf variable also because it might has private
+> part
+> 
+>  crypto/asymmetric_keys/public_key.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
