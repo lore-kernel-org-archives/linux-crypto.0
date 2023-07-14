@@ -2,54 +2,56 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD586C001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 09:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D06C001E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 09:14:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235772AbjGNJOB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45088 "EHLO
+        id S235660AbjGNJOC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jul 2023 05:14:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234819AbjGNJN7 (ORCPT
+        with ESMTP id S235744AbjGNJOA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:13:59 -0400
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61ADE2D47;
-        Fri, 14 Jul 2023 02:13:57 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36E9DdBm028503;
-        Fri, 14 Jul 2023 04:13:39 -0500
+        Fri, 14 Jul 2023 05:14:00 -0400
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F331E65;
+        Fri, 14 Jul 2023 02:13:58 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36E9Da89084096;
+        Fri, 14 Jul 2023 04:13:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1689326019;
-        bh=mKtCUPgaud8pjCzNSvAn4kZizjOxNjiafARqukJWj+8=;
-        h=From:Date:Subject:References:In-Reply-To:To:CC;
-        b=wU8Iqipd8rz5A6Oh2r/fpzTsUZhuw6/l9SXit/XsUAyw+B3CmKzj32OHZuP6GGwZQ
-         1NXKAFjgsWI8GaOiAQrHTF1bz/JEK3QiFsCJS55C4ebbrQorB8SluVnvcd2YQafTFW
-         OGU8we2N+yKHQAGB0Wf7vlLWXPTIejKNUqWCAwbI=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36E9DdKP097414
+        s=ti-com-17Q1; t=1689326016;
+        bh=j4EkMF4Pjjv7iuXkk/zZUvSKBOA0j30IjXIINbCappE=;
+        h=From:Subject:Date:To:CC;
+        b=ALy4N+XRi//xsNClgF7/bPGUvPT/wRW0f9Ie+pdr/pJOm+BZZO6h/4DtRkmHyMsqb
+         CbeUNQvWf98W7UQFWAELdclNru5gzSwK0xU2yedwlSZudwniyWoZbJqTYl47a287kW
+         JfAM9V9kp3PfK4miFdRbKoufLGtgjCTOa2wBSQ6w=
+Received: from DLEE101.ent.ti.com (dlee101.ent.ti.com [157.170.170.31])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36E9Dap1016125
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 14 Jul 2023 04:13:39 -0500
-Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+        Fri, 14 Jul 2023 04:13:36 -0500
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE101.ent.ti.com
+ (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 14
- Jul 2023 04:13:38 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ Jul 2023 04:13:36 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 14 Jul 2023 04:13:38 -0500
+ Frontend Transport; Fri, 14 Jul 2023 04:13:36 -0500
 Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36E9DcdL015114;
-        Fri, 14 Jul 2023 04:13:38 -0500
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36E9DZD8015096;
+        Fri, 14 Jul 2023 04:13:35 -0500
 From:   Kamlesh Gurudasani <kamlesh@ti.com>
-Date:   Fri, 14 Jul 2023 14:42:42 +0530
-Subject: [PATCH v5 2/2] arm64: dts: ti: k3-am62-main: Remove power-domains
- from crypto node
+Subject: [PATCH v5 0/2] Remove power-domains property for devices with
+ compatible ti,am62-sa3ul
+Date:   Fri, 14 Jul 2023 14:42:40 +0530
+Message-ID: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20230614-sa3ul-v5-2-29dd2366fba3@ti.com>
-References: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
-In-Reply-To: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
+X-B4-Tracking: v=1; b=H4sIAIgRsWQC/22NQQ6CMBBFr2K6tqadqQVceQ/joi2DNBEwLTYaw
+ t0tLEw0LN+f/+ZPLFLwFNlpN7FAyUc/9BmO+x1zrelvxH2dmYEAFFoqHg0+79xZZWtprapFyXL
+ XmkjcBtO7dml3Jo4UlsMjUONf68Dlmrn1cRzCe91LsKT/rxNwydGUCLYExMqdR39wQ8cWPeGmg
+ lxwILKlFAiFkT+K2lRUVgpX6arRoItKf5V5nj+R0wNFFgEAAA==
 To:     Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
         "Tero Kristo" <kristo@kernel.org>,
         Rob Herring <robh+dt@kernel.org>,
@@ -62,13 +64,14 @@ To:     Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
 CC:     <linux-arm-kernel@lists.infradead.org>,
         <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Rob Herring <robh@kernel.org>, <linux-crypto@vger.kernel.org>,
-        Kamlesh Gurudasani <kamlesh@ti.com>
+        Kamlesh Gurudasani <kamlesh@ti.com>,
+        "Conor Dooley" <conor.dooley@microchip.com>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326014; l=1080;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1689326014; l=1452;
  i=kamlesh@ti.com; s=20230614; h=from:subject:message-id;
- bh=twkydDeRPS5AYQfyYZRmDOCh79DoQ65SqFyXWQK4qeQ=;
- b=AJ+VVQIeJ4KLEgtk9OggCVRkJHfne+ozX+EGKZP58f9RMR7lSGudpeCVhbp6M52B+CA0hqKDl
- kBA1p40Gac7AmpUAewZ8Ge9HYWANvn+FDOYtlz26ZCQXkdTb2N9cPbx
+ bh=cMEtn7syDJk05mLKWZYBMYri9aARdatmDTdlRFB1Je4=;
+ b=5keEHyBcGyt4U7UDBo+ojS99vbW0xZyvS64B+oUXWuTlxPRC9dJJqTp6Pusw0mnlVseVei42H
+ iVjUr6FdG9KD3QC1fh+6oBEFhhx0SjM1E1OEZolbwO/bpejSQb9g3TI
 X-Developer-Key: i=kamlesh@ti.com; a=ed25519;
  pk=db9XKPVWDGJVqj2jDqgnPQd6uQf3GZ3oaQa4bq1odGo=
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
@@ -76,34 +79,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Only SYSFW has control of SA3UL power.
-From SYSFW 08.04.00.002, for security reasons, device ID for power
-management of SA3UL has been removed.
+SYSFW don't allow access to power of devices with compatible ti,am62-sa3ul
+from main domain.
 
-"power-domains" property in crypto node tries to access
-the SA3UL, for which it gets NACK and hence, SA3UL driver doesn't
-probe properly.
+Power-domains property, if present will try to access the power of the
+device, which will result into failure in probing of driver for that
+device.
 
-Fixes: 8af893654c02 ("arm64: dts: ti: k3-am62-main: Enable crypto accelerator")
+Make power-domains property as false for devices with compatible
+ti,am62-sa3ul.
 
 Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- arch/arm64/boot/dts/ti/k3-am62-main.dtsi | 1 -
- 1 file changed, 1 deletion(-)
+Changes in v5:
+- Update recipient list
+- Link to v4: https://lore.kernel.org/r/20230614-sa3ul-v4-0-7c969f626796@ti.com
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-index b3e4857bbbe4..18a6e9ffaf58 100644
---- a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-@@ -174,7 +174,6 @@ k3_reset: reset-controller {
- 	crypto: crypto@40900000 {
- 		compatible = "ti,am62-sa3ul";
- 		reg = <0x00 0x40900000 0x00 0x1200>;
--		power-domains = <&k3_pds 70 TI_SCI_PD_SHARED>;
- 		#address-cells = <2>;
- 		#size-cells = <2>;
- 		ranges = <0x00 0x40900000 0x00 0x40900000 0x00 0x30000>;
+Changes in v4:
+- s/items/contains/ for dt-binding patch
+- Added "fixes commit" for dt-binding patch
+- Link to v3: https://lore.kernel.org/r/20230614-sa3ul-v3-0-2eeb810327a1@ti.com
 
+Changes in v3:
+- Add patch dt-bindings: crypto: ti,sa2ul: make power-domains conditional
+- Link to v2: https://lore.kernel.org/r/20230614-sa3ul-v2-1-3a832b82339c@ti.com
+
+Changes in v2:
+- Make commit message clearer
+
+---
+Kamlesh Gurudasani (2):
+      dt-bindings: crypto: ti,sa2ul: make power-domains conditional
+      arm64: dts: ti: k3-am62-main: Remove power-domains from crypto node
+
+ Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml | 14 +++++++++++++-
+ arch/arm64/boot/dts/ti/k3-am62-main.dtsi               |  1 -
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+---
+base-commit: 53ab6975c12d1ad86c599a8927e8c698b144d669
+change-id: 20230614-sa3ul-cb4bd1bb4d08
+
+Best regards,
 -- 
-2.34.1
+Kamlesh Gurudasani <kamlesh@ti.com>
 
