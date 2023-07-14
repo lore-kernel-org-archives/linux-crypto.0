@@ -2,140 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C769EB64DA
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 12:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDFBEB64DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 14:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235811AbjGNMdz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jul 2023 08:33:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
+        id S236156AbjGNO5K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jul 2023 10:57:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235423AbjGNMdo (ORCPT
+        with ESMTP id S236246AbjGNO5J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2023 08:33:44 -0400
-Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299AA1FC8
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 05:33:43 -0700 (PDT)
-Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-39ecef7a101so2917255b6e.2
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 05:33:43 -0700 (PDT)
+        Fri, 14 Jul 2023 10:57:09 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F22359F;
+        Fri, 14 Jul 2023 07:56:58 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b83969d625so13571811fa.1;
+        Fri, 14 Jul 2023 07:56:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689346616; x=1691938616;
+        h=in-reply-to:from:references:to:content-language:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4ZEmcmnPKVyQByO618jb6eb3a7gSnqqcu00C8M1jvmA=;
+        b=Dg1UJ8dYzY601p2JNpTJauqatYXYKV/p2+JqBL9TdFB4QKExv6C7QiHCdmMbbQJan0
+         HYLWG6lOAt64JbMWhjp8Lb+XljPa4cPtm9UgWIz5KZ3wuBruM8eiYZYWndvKj2LV7TL5
+         Vkoow1Rq/G8CzFCvBf7J8vrCDl3X1xQnj3rtKRYjXp+lj9+O5RlTFq22IrHbP01G2J+T
+         g1fgfOeerqZj1NAopQuz674FsDcuhRsl+lkc1vThmyUMb8t3yJE4swCJOYkt/BB5w9mx
+         FyvpqKk+TP2qhm34UlCWjUzFYk/u/QSOSG2t4kQME/mdiIYq7qNN5RnctF0EhefUIzkR
+         DOmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689338022; x=1691930022;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=a/PtvzxIas2zR1ya8bd5qiSh+Ju/22GKnM05TIFi9sA=;
-        b=dP5ofHoV/oLR4B9NmEactf0FV5oIXg9SRPOWrYdYKZAH8JyI5mG2dyUu59fXpkXSLu
-         loCZeOaPZXyM9V8w004tKts/VJsm2H6uTC/fj9P+Dz9cN9jxbiBbonJFi9zG86COEk5E
-         1qIVqEkF3MVGb0AEFmDjatxrOlxvlkvdgsOISIhufbLplHYfcwzKB61bPRwP/90Uj70S
-         lIrnEjMTNGR/lYRo5ywRUQiFRYF6QP/Gocpw1rpuMArd5rbk0N+l0siNVucIxYywRixL
-         o/Z/bXkhPSBDoUVcp/Ln7RL47zr39AD+7J1HsRrc0927YbKAg9XOCMXGhJGNfjJx0XUP
-         73xw==
-X-Gm-Message-State: ABy/qLbONzN+QjRQJ34Pu1DIQbdIaChhazJfVyzr/XKJrd+RWcPVMivz
-        wQk7FgzCbE9km3wu3TVpx3qfVfTC8qI6+n2vrx+0wPlEOYMa
-X-Google-Smtp-Source: APBJJlHLvOcL6iCTX34qlHFrOnRO9iN4WebS97Ae10RYVI9fSHmlaDKYPARf+F/In8VOIyTdLvssnN3HESdSnB4MQK77WeWf+/Ij
+        d=1e100.net; s=20221208; t=1689346616; x=1691938616;
+        h=in-reply-to:from:references:to:content-language:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4ZEmcmnPKVyQByO618jb6eb3a7gSnqqcu00C8M1jvmA=;
+        b=RmVhQs7/QYXKFiGvqNsclYNU4ZNi/IZwwhVk+5lBdz2lXaj3Kwy345bAs6PUd4SeSP
+         aFDm8ITXjVUkubWOH3x/FvCtYpprfAL5cQjUGxshUXuJVvBAjC1LHzjVEQrhD7xAzc5R
+         kjPBzYDfvNktD0g5gkS8DcT0432EBsWsrAyE5NvWdnw9Ait+8yJnEUkh/OT/WkKbGm0p
+         nYAK3aaZZtno5J7mhk2e27g5VA+Gxl+1zkIOH/p3qOyDh92VDL5W/FQePaKJP1h8zJq8
+         DSv3xAH6+nohJHfHDT7cWAyK+EKdvWOvDHRCT1lXnx/YDkCkJqjU59qqscevgJ0eb59S
+         z8hw==
+X-Gm-Message-State: ABy/qLYkT8JAxY13noyVbkz7D4i21144hpIERapanWeNIY7buWIX90P+
+        xdkU3973Y3WWbNZX12/k20mbhy1/6jJT+g==
+X-Google-Smtp-Source: APBJJlEf3KLRAD+1U56dLeqZJsyYvhjxdom7LDxUZFOUgLIIJm1m4YBnIjCqeBIAak0MFEiYeEx8Bw==
+X-Received: by 2002:a2e:b0ef:0:b0:2b6:eceb:9b8 with SMTP id h15-20020a2eb0ef000000b002b6eceb09b8mr1208719ljl.10.1689346616181;
+        Fri, 14 Jul 2023 07:56:56 -0700 (PDT)
+Received: from ?IPV6:2a00:1370:8180:6b00:a1a8:4887:1af4:637a? ([2a00:1370:8180:6b00:a1a8:4887:1af4:637a])
+        by smtp.gmail.com with ESMTPSA id j5-20020a2eb705000000b002a7746800d0sm2025273ljo.130.2023.07.14.07.56.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jul 2023 07:56:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------WS1iwDWS0LHmbVFGzfdOwRnK"
+Message-ID: <9f0365cb-413f-2395-2219-748f77dd95a4@gmail.com>
+Date:   Fri, 14 Jul 2023 17:56:54 +0300
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:e82:b0:3a4:1e93:8988 with SMTP id
- k2-20020a0568080e8200b003a41e938988mr6542129oil.10.1689338022584; Fri, 14 Jul
- 2023 05:33:42 -0700 (PDT)
-Date:   Fri, 14 Jul 2023 05:33:42 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bde775060071a8d7@google.com>
-Subject: [syzbot] [crypto?] KMSAN: uninit-value in af_alg_free_resources
-From:   syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in af_alg_free_resources
+Content-Language: en-US
+To:     syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com>,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+References: <000000000000bde775060071a8d7@google.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <000000000000bde775060071a8d7@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+This is a multi-part message in MIME format.
+--------------WS1iwDWS0LHmbVFGzfdOwRnK
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+Hi Syzbot,
 
-HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bac16aa80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1542573e31cfbec5
-dashboard link: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15dd215aa80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14530318a80000
+Syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com> says:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bac16aa80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=1542573e31cfbec5
+> dashboard link: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
+> compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15dd215aa80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14530318a80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/4f212a7e36fe/disk-3f01e9fe.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/de6b12daf908/vmlinux-3f01e9fe.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/2c1992ff2aaa/bzImage-3f01e9fe.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4f212a7e36fe/disk-3f01e9fe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/de6b12daf908/vmlinux-3f01e9fe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2c1992ff2aaa/bzImage-3f01e9fe.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in af_alg_free_sg crypto/af_alg.c:545 [inline]
-BUG: KMSAN: uninit-value in af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
-BUG: KMSAN: uninit-value in af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
- af_alg_free_sg crypto/af_alg.c:545 [inline]
- af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
- af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
- _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
- skcipher_recvmsg+0x6a0/0x1a20 crypto/algif_skcipher.c:157
- sock_recvmsg_nosec net/socket.c:1020 [inline]
- sock_recvmsg net/socket.c:1041 [inline]
- __sys_recvfrom+0x505/0x810 net/socket.c:2186
- __do_sys_recvfrom net/socket.c:2204 [inline]
- __se_sys_recvfrom net/socket.c:2200 [inline]
- __x64_sys_recvfrom+0x126/0x1d0 net/socket.c:2200
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Uninit was created at:
- slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
- slab_alloc_node mm/slub.c:3470 [inline]
- __kmem_cache_alloc_node+0x536/0x8d0 mm/slub.c:3509
- __do_kmalloc_node mm/slab_common.c:984 [inline]
- __kmalloc+0x121/0x3c0 mm/slab_common.c:998
- kmalloc include/linux/slab.h:586 [inline]
- sock_kmalloc+0x128/0x1c0 net/core/sock.c:2683
- af_alg_alloc_areq+0x41/0x2a0 crypto/af_alg.c:1188
- _skcipher_recvmsg crypto/algif_skcipher.c:71 [inline]
- skcipher_recvmsg+0x514/0x1a20 crypto/algif_skcipher.c:157
- sock_recvmsg_nosec net/socket.c:1020 [inline]
- sock_recvmsg net/socket.c:1041 [inline]
- __sys_recvfrom+0x505/0x810 net/socket.c:2186
- __do_sys_recvfrom net/socket.c:2204 [inline]
- __se_sys_recvfrom net/socket.c:2200 [inline]
- __x64_sys_recvfrom+0x126/0x1d0 net/socket.c:2200
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-CPU: 0 PID: 5031 Comm: syz-executor370 Not tainted 6.5.0-rc1-syzkaller-00006-g3f01e9fed845 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/03/2023
-=====================================================
+#syz test
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+With regards,
+Pavel Skripkin
+--------------WS1iwDWS0LHmbVFGzfdOwRnK
+Content-Type: text/plain; charset=UTF-8; name="ph1"
+Content-Disposition: attachment; filename="ph1"
+Content-Transfer-Encoding: base64
 
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ZGlmZiAtLWdpdCBhL2NyeXB0by9hZl9hbGcuYyBiL2NyeXB0by9hZl9hbGcuYwppbmRleCAw
+NmIxNWI5ZjY2MWMuLjRlNGYyZDgzNzQ4MSAxMDA2NDQKLS0tIGEvY3J5cHRvL2FmX2FsZy5j
+CisrKyBiL2NyeXB0by9hZl9hbGcuYwpAQCAtMTI0MSw2ICsxMjQxLDggQEAgaW50IGFmX2Fs
+Z19nZXRfcnNnbChzdHJ1Y3Qgc29jayAqc2ssIHN0cnVjdCBtc2doZHIgKm1zZywgaW50IGZs
+YWdzLAogCQkJCXJldHVybiAtRU5PTUVNOwogCQl9CiAKKwkJcnNnbC0+c2dsLm5lZWRfdW5w
+aW4gPSAwOworCiAJCXJzZ2wtPnNnbC5zZ3Quc2dsID0gcnNnbC0+c2dsLnNnbDsKIAkJcnNn
+bC0+c2dsLnNndC5uZW50cyA9IDA7CiAJCXJzZ2wtPnNnbC5zZ3Qub3JpZ19uZW50cyA9IDA7
+Cg==
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--------------WS1iwDWS0LHmbVFGzfdOwRnK--
