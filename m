@@ -2,123 +2,68 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDFBEB64DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 14:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71844C0015E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jul 2023 15:31:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236156AbjGNO5K (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jul 2023 10:57:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34228 "EHLO
+        id S235856AbjGNPbY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jul 2023 11:31:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236246AbjGNO5J (ORCPT
+        with ESMTP id S235481AbjGNPbX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jul 2023 10:57:09 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F22359F;
-        Fri, 14 Jul 2023 07:56:58 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b83969d625so13571811fa.1;
-        Fri, 14 Jul 2023 07:56:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689346616; x=1691938616;
-        h=in-reply-to:from:references:to:content-language:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ZEmcmnPKVyQByO618jb6eb3a7gSnqqcu00C8M1jvmA=;
-        b=Dg1UJ8dYzY601p2JNpTJauqatYXYKV/p2+JqBL9TdFB4QKExv6C7QiHCdmMbbQJan0
-         HYLWG6lOAt64JbMWhjp8Lb+XljPa4cPtm9UgWIz5KZ3wuBruM8eiYZYWndvKj2LV7TL5
-         Vkoow1Rq/G8CzFCvBf7J8vrCDl3X1xQnj3rtKRYjXp+lj9+O5RlTFq22IrHbP01G2J+T
-         g1fgfOeerqZj1NAopQuz674FsDcuhRsl+lkc1vThmyUMb8t3yJE4swCJOYkt/BB5w9mx
-         FyvpqKk+TP2qhm34UlCWjUzFYk/u/QSOSG2t4kQME/mdiIYq7qNN5RnctF0EhefUIzkR
-         DOmg==
+        Fri, 14 Jul 2023 11:31:23 -0400
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C970E2D65
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 08:31:22 -0700 (PDT)
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3a44a32d3b5so270228b6e.1
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 08:31:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689346616; x=1691938616;
-        h=in-reply-to:from:references:to:content-language:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4ZEmcmnPKVyQByO618jb6eb3a7gSnqqcu00C8M1jvmA=;
-        b=RmVhQs7/QYXKFiGvqNsclYNU4ZNi/IZwwhVk+5lBdz2lXaj3Kwy345bAs6PUd4SeSP
-         aFDm8ITXjVUkubWOH3x/FvCtYpprfAL5cQjUGxshUXuJVvBAjC1LHzjVEQrhD7xAzc5R
-         kjPBzYDfvNktD0g5gkS8DcT0432EBsWsrAyE5NvWdnw9Ait+8yJnEUkh/OT/WkKbGm0p
-         nYAK3aaZZtno5J7mhk2e27g5VA+Gxl+1zkIOH/p3qOyDh92VDL5W/FQePaKJP1h8zJq8
-         DSv3xAH6+nohJHfHDT7cWAyK+EKdvWOvDHRCT1lXnx/YDkCkJqjU59qqscevgJ0eb59S
-         z8hw==
-X-Gm-Message-State: ABy/qLYkT8JAxY13noyVbkz7D4i21144hpIERapanWeNIY7buWIX90P+
-        xdkU3973Y3WWbNZX12/k20mbhy1/6jJT+g==
-X-Google-Smtp-Source: APBJJlEf3KLRAD+1U56dLeqZJsyYvhjxdom7LDxUZFOUgLIIJm1m4YBnIjCqeBIAak0MFEiYeEx8Bw==
-X-Received: by 2002:a2e:b0ef:0:b0:2b6:eceb:9b8 with SMTP id h15-20020a2eb0ef000000b002b6eceb09b8mr1208719ljl.10.1689346616181;
-        Fri, 14 Jul 2023 07:56:56 -0700 (PDT)
-Received: from ?IPV6:2a00:1370:8180:6b00:a1a8:4887:1af4:637a? ([2a00:1370:8180:6b00:a1a8:4887:1af4:637a])
-        by smtp.gmail.com with ESMTPSA id j5-20020a2eb705000000b002a7746800d0sm2025273ljo.130.2023.07.14.07.56.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jul 2023 07:56:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="------------WS1iwDWS0LHmbVFGzfdOwRnK"
-Message-ID: <9f0365cb-413f-2395-2219-748f77dd95a4@gmail.com>
-Date:   Fri, 14 Jul 2023 17:56:54 +0300
+        d=1e100.net; s=20221208; t=1689348682; x=1691940682;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w7sSZHfmPmMwSnKDeS/LYNRFHMjooDKw3TKG4ZxrK+w=;
+        b=XumR1JizLyYn5vwPE5aoRc9sIj5KUsUXg7da/U014LqXvATBxBxIgm6xKqE3Q6S4wW
+         05cqUmsMUrSQYoae4ZANZBfuana8SgZewcQCxCLk3Y2ugV3I1RrmPhi1/1sSZhoBCWaW
+         M0cH+G6IOsDkSyDlmGh0RXbO23A5ra+JbATj5sDKJNS4WM2XTKq0Ug+MWOz6N4u3MSF+
+         mwrOtufhJY4XIH8T0szujilO08lnA0TOzKn0iUWTX+hZjuivefXlMd8Mak4nGydIg5rT
+         gFc6C7BQzFmeQITv9QW15GDMjQbGzI4AzS7vRbyGKOO3rYwOSssvTWxhl4Ad3I7V4gDC
+         4LXg==
+X-Gm-Message-State: ABy/qLbX72hT1+s+7x0vX5XkIODkAT8/z3b0RsEI940nJTkpOCBGZdB/
+        Fgaj+0LJ2/NOgGmd4NPprgdpc/H58uU/yJ84gVrmoHTVF48M
+X-Google-Smtp-Source: APBJJlEO7SDJzBanjllHj0OMQaarkOBoeRSZBRQYOWiHUr5A816YDqucajDumEt8SgiTfLBkERkeNjV6wMiR4iwf4GZGQhd4Xxyy
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
+X-Received: by 2002:a05:6808:208a:b0:3a4:1e93:8984 with SMTP id
+ s10-20020a056808208a00b003a41e938984mr7270461oiw.1.1689348682197; Fri, 14 Jul
+ 2023 08:31:22 -0700 (PDT)
+Date:   Fri, 14 Jul 2023 08:31:22 -0700
+In-Reply-To: <9f0365cb-413f-2395-2219-748f77dd95a4@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001aaf4d06007424f4@google.com>
 Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in af_alg_free_resources
-Content-Language: en-US
-To:     syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com>,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
+From:   syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-References: <000000000000bde775060071a8d7@google.com>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <000000000000bde775060071a8d7@google.com>
+        paskripkin@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------WS1iwDWS0LHmbVFGzfdOwRnK
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hello,
 
-Hi Syzbot,
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com> says:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    3f01e9fed845 Merge tag 'linux-watchdog-6.5-rc2' of git://w..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=14bac16aa80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1542573e31cfbec5
-> dashboard link: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
-> compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15dd215aa80000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14530318a80000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/4f212a7e36fe/disk-3f01e9fe.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/de6b12daf908/vmlinux-3f01e9fe.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/2c1992ff2aaa/bzImage-3f01e9fe.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+Reported-and-tested-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
 
-#syz test
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+Tested on:
 
+commit:         4b810bf0 Merge tag 'erofs-for-6.5-rc2-fixes' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1584e7d4a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=81133937a108454e
+dashboard link: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1305e904a80000
 
-
-
-
-With regards,
-Pavel Skripkin
---------------WS1iwDWS0LHmbVFGzfdOwRnK
-Content-Type: text/plain; charset=UTF-8; name="ph1"
-Content-Disposition: attachment; filename="ph1"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2NyeXB0by9hZl9hbGcuYyBiL2NyeXB0by9hZl9hbGcuYwppbmRleCAw
-NmIxNWI5ZjY2MWMuLjRlNGYyZDgzNzQ4MSAxMDA2NDQKLS0tIGEvY3J5cHRvL2FmX2FsZy5j
-CisrKyBiL2NyeXB0by9hZl9hbGcuYwpAQCAtMTI0MSw2ICsxMjQxLDggQEAgaW50IGFmX2Fs
-Z19nZXRfcnNnbChzdHJ1Y3Qgc29jayAqc2ssIHN0cnVjdCBtc2doZHIgKm1zZywgaW50IGZs
-YWdzLAogCQkJCXJldHVybiAtRU5PTUVNOwogCQl9CiAKKwkJcnNnbC0+c2dsLm5lZWRfdW5w
-aW4gPSAwOworCiAJCXJzZ2wtPnNnbC5zZ3Quc2dsID0gcnNnbC0+c2dsLnNnbDsKIAkJcnNn
-bC0+c2dsLnNndC5uZW50cyA9IDA7CiAJCXJzZ2wtPnNnbC5zZ3Qub3JpZ19uZW50cyA9IDA7
-Cg==
-
---------------WS1iwDWS0LHmbVFGzfdOwRnK--
+Note: testing is done by a robot and is best-effort only.
