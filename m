@@ -2,133 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA99EB64DC
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jul 2023 05:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FDBEB64DC
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jul 2023 06:28:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbjGOFCa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Jul 2023 01:02:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48728 "EHLO
+        id S229530AbjGOGXg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 15 Jul 2023 02:23:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjGOFC3 (ORCPT
+        with ESMTP id S229482AbjGOGXf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Jul 2023 01:02:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8245E3589
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jul 2023 22:02:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C7F38602E2
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Jul 2023 05:02:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A47DC433C8;
-        Sat, 15 Jul 2023 05:02:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689397347;
-        bh=2jKUlk/iFBrBtBN9Ne0SL4hRkQ0yRf9CJjfjD/3gUXE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=KNboAbX1P9JAG/zULiJHN2kz2Zab3ZOn8OpJcdzIkfR40ULLRP5DXl2ZTLt6q4LhR
-         pV1rCz7phTx1rhsiZCI04wjF0Gyh1CyoEw8DpD5771/NLERYtzs6l8JFdgzqWKKdop
-         pSmbWlSD3/l/EwNGOxCV9p0/Nq19/zUqn3rhe8rIA0joFer/j84OfIwcru04XY3DpY
-         kDkhDMo6uaUIkiZfnSfPHyinPyGw9pd6sjhVVEPEFUFudOappoySg84nxHBGJsHb1o
-         pybY/HayQtown+rdxGd5du67iFEOP2YQfYCIjhnSlP+Kb7mp4lZsodiB6ACXFxZzu5
-         rheh50eVeV+/g==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     "Chang S . Bae" <chang.seok.bae@intel.com>
-Subject: [PATCH] crypto: x86/aesni - remove unused parameter to aes_set_key_common()
-Date:   Fri, 14 Jul 2023 22:01:04 -0700
-Message-ID: <20230715050104.35945-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.41.0
+        Sat, 15 Jul 2023 02:23:35 -0400
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A73D4107;
+        Fri, 14 Jul 2023 23:23:33 -0700 (PDT)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id F3F771C0DC0; Sat, 15 Jul 2023 08:23:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
+        t=1689402211;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h3LfdKGs0UxPjzB0BynU4i+zXf5U8uBunZusMAra21g=;
+        b=LSLSS9A97dd9uMgAE65BakTS7lZ91g6yS/VGEcPg9pI2t8StKF/F6T+gpZQX7xBPwT9bM7
+        3q5JmGTlicHewhE7yBDaIUWe2206dct+xIFvW7R2mBsEimcBXORu0a+STYjj2wyLiRRfq/
+        gm0rlVliRJ2WFoxFYEOHVEwJNN4zaag=
+Date:   Sat, 15 Jul 2023 08:23:30 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        John Allen <john.allen@amd.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/10] Add dynamic boost control support
+Message-ID: <ZLI7YpMhJjU7Xe0g@duo.ucw.cz>
+References: <20230420163140.14940-1-mario.limonciello@amd.com>
+ <ZEkrZ83fFwiweCTz@localhost>
+ <e3e2d438-6d97-57c8-90e0-8fec874ad43d@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="ZvntLkCFVhX5QPPV"
+Content-Disposition: inline
+In-Reply-To: <e3e2d438-6d97-57c8-90e0-8fec874ad43d@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
 
-The 'tfm' parameter to aes_set_key_common() is never used, so remove it.
+--ZvntLkCFVhX5QPPV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/aesni-intel_glue.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+On Wed 2023-04-26 09:43:43, Mario Limonciello wrote:
+>=20
+> On 4/26/23 08:47, Pavel Machek wrote:
+> > Hi!
+> >=20
+> > > Dynamic boost control is a feature of some SoCs that allows
+> > > an authenticated entity to send commands to the security processor
+> > > to control certain SOC characteristics with the intention to improve
+> > > performance.
+> > >=20
+> > > This is implemented via a mechanism that a userspace application would
+> > > authenticate using a nonce and key exchange over an IOCTL interface.
+> > >=20
+> > > After authentication is complete an application can exchange signed
+> > > messages with the security processor and both ends can validate the
+> > > data transmitted.
+> > Why is this acceptable? This precludes cross-platform interfaces,
+> > right? Why would application want to validate data from PSP? That
+> > precludes virtualization, right?
+> >=20
+> > Just put the key in kernel. Users have right to control their own
+> > hardware.
+> > 							Pavel
+>=20
+> This matches exactly how the interface works in Windows as well.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index c4eea7e746e79..39d6a62ac6277 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -229,8 +229,7 @@ static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
- 	return (struct crypto_aes_ctx *)ALIGN(addr, align);
- }
- 
--static int aes_set_key_common(struct crypto_tfm *tfm,
--			      struct crypto_aes_ctx *ctx,
-+static int aes_set_key_common(struct crypto_aes_ctx *ctx,
- 			      const u8 *in_key, unsigned int key_len)
- {
- 	int err;
-@@ -253,7 +252,8 @@ static int aes_set_key_common(struct crypto_tfm *tfm,
- static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 		       unsigned int key_len)
- {
--	return aes_set_key_common(tfm, aes_ctx(crypto_tfm_ctx(tfm)), in_key, key_len);
-+	return aes_set_key_common(aes_ctx(crypto_tfm_ctx(tfm)), in_key,
-+				  key_len);
- }
- 
- static void aesni_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-@@ -285,8 +285,7 @@ static void aesni_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- static int aesni_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			         unsigned int len)
- {
--	return aes_set_key_common(crypto_skcipher_tfm(tfm),
--				  aes_ctx(crypto_skcipher_ctx(tfm)), key, len);
-+	return aes_set_key_common(aes_ctx(crypto_skcipher_ctx(tfm)), key, len);
- }
- 
- static int ecb_encrypt(struct skcipher_request *req)
-@@ -627,8 +626,7 @@ static int common_rfc4106_set_key(struct crypto_aead *aead, const u8 *key,
- 
- 	memcpy(ctx->nonce, key + key_len, sizeof(ctx->nonce));
- 
--	return aes_set_key_common(crypto_aead_tfm(aead),
--				  &ctx->aes_key_expanded, key, key_len) ?:
-+	return aes_set_key_common(&ctx->aes_key_expanded, key, key_len) ?:
- 	       rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
- }
- 
-@@ -893,14 +891,13 @@ static int xts_aesni_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	keylen /= 2;
- 
- 	/* first half of xts-key is for crypt */
--	err = aes_set_key_common(crypto_skcipher_tfm(tfm), aes_ctx(ctx->raw_crypt_ctx),
--				 key, keylen);
-+	err = aes_set_key_common(aes_ctx(ctx->raw_crypt_ctx), key, keylen);
- 	if (err)
- 		return err;
- 
- 	/* second half of xts-key is for tweak */
--	return aes_set_key_common(crypto_skcipher_tfm(tfm), aes_ctx(ctx->raw_tweak_ctx),
--				  key + keylen, keylen);
-+	return aes_set_key_common(aes_ctx(ctx->raw_tweak_ctx), key + keylen,
-+				  keylen);
- }
- 
- static int xts_crypt(struct skcipher_request *req, bool encrypt)
-@@ -1150,8 +1147,7 @@ static int generic_gcmaes_set_key(struct crypto_aead *aead, const u8 *key,
- {
- 	struct generic_gcmaes_ctx *ctx = generic_gcmaes_ctx_get(aead);
- 
--	return aes_set_key_common(crypto_aead_tfm(aead),
--				  &ctx->aes_key_expanded, key, key_len) ?:
-+	return aes_set_key_common(&ctx->aes_key_expanded, key, key_len) ?:
- 	       rfc4106_set_hash_subkey(ctx->hash_subkey, key, key_len);
- }
- 
+Windows has different design constrants.
 
-base-commit: 635e4674e184442d300278beb6c8b609b897b6c3
--- 
-2.41.0
+> The reason for validating the data from the PSP is because the data
+> crosses multiple trust boundaries and this ensures that the application
+> can trust it to make informed decisions.
 
+If the application can not trust kernel, you are already doomed on
+Linux.
+
+									Pavel
+
+--=20
+People of Russia, stop Putin before his war on Ukraine escalates.
+
+--ZvntLkCFVhX5QPPV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCZLI7YgAKCRAw5/Bqldv6
+8h10AJ9TRbzD34klcp52yn4ZUhUWuRE2nACdG7WaPnyMrL14KJu0Hm/iFjkn3IY=
+=NzZ5
+-----END PGP SIGNATURE-----
+
+--ZvntLkCFVhX5QPPV--
