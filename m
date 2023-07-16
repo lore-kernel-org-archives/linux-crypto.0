@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39233C001E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jul 2023 20:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2901BC001DE
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jul 2023 20:46:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231636AbjGPUQU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jul 2023 16:16:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41978 "EHLO
+        id S232692AbjGPUqG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 16 Jul 2023 16:46:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231626AbjGPUQT (ORCPT
+        with ESMTP id S232686AbjGPUqF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jul 2023 16:16:19 -0400
+        Sun, 16 Jul 2023 16:46:05 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D60FE43;
-        Sun, 16 Jul 2023 13:16:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4FE3D9;
+        Sun, 16 Jul 2023 13:46:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0A89960EAE;
-        Sun, 16 Jul 2023 20:16:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E407BC433C8;
-        Sun, 16 Jul 2023 20:16:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 48AB360DFD;
+        Sun, 16 Jul 2023 20:46:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B8E1C433C8;
+        Sun, 16 Jul 2023 20:46:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1689538576;
+        s=korg; t=1689540363;
         bh=Oc4BTr5K3vTeSxq00miA1QYT23jOa88djcW0k/clk4w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bGe9napxUyK/4tdwao8Ae0nlmRu8cUIHeGLMfCpCr7ZKkCeySuWJr5K4YVpA28qUB
-         05N+GvS6GuaPl2r/KaQChWPhC6pJ7YaUVJfgeCbVbgKmFRfoV9ydzuK7VfasySDEZ4
-         kj9DtzAILC/lvl83hekEBnG1NUpHvBeAkGnXOU/4=
+        b=uU0ehauIWTAfzIUh3lo+GLcKlOsv9n5oGhFCw/HWiqf8vdAMgfQw0KGh9isGz1kkd
+         tyuawZPKTaAasKXj0vdpVBGhvA/B1Lt0FC4D5E5CapLOUcbtvpEIuUGm7qsldbXwYH
+         4j/mBpI7301zn4g/ypUQuOkt+wFrbE+SYu1qQeF8=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -44,12 +44,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Nicholas Piggin <npiggin@gmail.com>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         linuxppc-dev@lists.ozlabs.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.4 501/800] crypto: nx - fix build warnings when DEBUG_FS is not enabled
-Date:   Sun, 16 Jul 2023 21:45:54 +0200
-Message-ID: <20230716195000.731459159@linuxfoundation.org>
+Subject: [PATCH 6.1 336/591] crypto: nx - fix build warnings when DEBUG_FS is not enabled
+Date:   Sun, 16 Jul 2023 21:47:55 +0200
+Message-ID: <20230716194932.590657421@linuxfoundation.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230716194949.099592437@linuxfoundation.org>
-References: <20230716194949.099592437@linuxfoundation.org>
+In-Reply-To: <20230716194923.861634455@linuxfoundation.org>
+References: <20230716194923.861634455@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
