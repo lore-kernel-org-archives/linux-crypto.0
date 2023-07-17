@@ -2,81 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AEEAC001E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jul 2023 21:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90BFCC0015E
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 02:06:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230520AbjGPV6h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jul 2023 17:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53070 "EHLO
+        id S230239AbjGQCGc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 16 Jul 2023 22:06:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231251AbjGPV6O (ORCPT
+        with ESMTP id S229591AbjGQCGc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jul 2023 17:58:14 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08D7420E;
-        Sun, 16 Jul 2023 14:56:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1689544547;
-        bh=bLb+FBPLIr0nP7ot9E/P9XaP1FCuz12sXy/ptqijBRw=;
-        h=Date:From:To:Cc:Subject:From;
-        b=aqUXlBlYgsA4f6IHE3f76UBDn9wdAu01ydlpFbZ9OUY+bT+P13JmQO8mQ4ckpX0Gb
-         Jq9G+CnWP/FZG/8wSzPfwzgHFQk9FmDMmy7Doz3GY6u5r379S0EjUKJ7cnfpfTUPIi
-         NGL+V8XRJ4RKYJWUKxR3u4T7pNPKmlnhezdYUJMcNU2hmfIRxVwgdm3SQ+k/GVYIPe
-         yol3IMFzG9pwTgGwf+NsRkoRQv4SdEiaJJb1XC88gMKnFeSgiA+YdE399GaaE67Es/
-         5zndPbHbA4nQO7HqB/tyF0PQYHtaZ91FrurKYBED9INLgE8n4W9UBrVAEerzPSGNR4
-         4l8jl7Jt24Nfw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4R3zYG6V15z4wyL;
-        Mon, 17 Jul 2023 07:55:46 +1000 (AEST)
-Date:   Mon, 17 Jul 2023 07:55:45 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Mahmoud Adam <mngyadam@amazon.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the crypto tree
-Message-ID: <20230717075545.28f93630@canb.auug.org.au>
+        Sun, 16 Jul 2023 22:06:32 -0400
+Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022E6E56;
+        Sun, 16 Jul 2023 19:06:29 -0700 (PDT)
+Received: from EXMBX166.cuchost.com (unknown [175.102.18.54])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (Client CN "EXMBX166", Issuer "EXMBX166" (not verified))
+        by ex01.ufhost.com (Postfix) with ESMTP id DF55924E2E2;
+        Mon, 17 Jul 2023 10:06:26 +0800 (CST)
+Received: from EXMBX164.cuchost.com (172.16.7.74) by EXMBX166.cuchost.com
+ (172.16.6.76) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 17 Jul
+ 2023 09:47:59 +0800
+Received: from EXMBX068.cuchost.com (172.16.6.68) by EXMBX164.cuchost.com
+ (172.16.6.74) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Mon, 17 Jul
+ 2023 09:47:59 +0800
+Received: from EXMBX068.cuchost.com ([fe80::e99c:4abb:32f:d650]) by
+ EXMBX068.cuchost.com ([fe80::e99c:4abb:32f:d650%16]) with mapi id
+ 15.00.1497.044; Mon, 17 Jul 2023 09:47:58 +0800
+From:   JiaJie Ho <jiajie.ho@starfivetech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "David S . Miller" <davem@davemloft.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH] crypto: starfive - Add AES skcipher and aead support
+Thread-Topic: [PATCH] crypto: starfive - Add AES skcipher and aead support
+Thread-Index: AQHZr7n26FgQfZeJP0WRHsOf15OHD6+4eR8AgATG1yA=
+Date:   Mon, 17 Jul 2023 01:47:58 +0000
+Message-ID: <1cd932eb3234436394bf46cfebc1df39@EXMBX068.cuchost.com>
+References: <20230706032737.424378-1-jiajie.ho@starfivetech.com>
+ <ZLEK1AYMmj24rIph@gondor.apana.org.au>
+In-Reply-To: <ZLEK1AYMmj24rIph@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [161.142.156.125]
+x-yovoleruleagent: yovoleflag
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_//.eB+WlZw4O2_AHYMbaV7q.";
- protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_//.eB+WlZw4O2_AHYMbaV7q.
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-Commit
-
-  a0459d277b1b ("KEYS: use kfree_sensitive with key")
-
-is missing a Signed-off-by from its author.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_//.eB+WlZw4O2_AHYMbaV7q.
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmS0Z2IACgkQAVBC80lX
-0GxlgAf+KLN4hqJTHWyLjgChlDaSdDSeDDcCQxHJlByaRefUWDd7Q1zmj+XdAIy2
-Nn6UwaWaZh0rPbdS9SAikub3gWTzCzsY1HC95lotkwJqiGJeR+h3zJMsLm2BOgbc
-h74S+gtXIm/D9gbDgk7OVkeBje5acy4AgI4qBKuaReQwS4qp3iAeB+tA1hut6vC5
-bkWMBu5J4mZT1no6FwcWQEaHuxmQq5eRQAX8SQIDtQE+CbAylOoPTMeIs0SPPyKU
-rT5A8vam9t3yctMg/+SKMpv4hS2vm+Rot71vs+3dYFNU+zCjFR+rvu9uqTn6u/Nq
-IDbfVcoeAltv8vAOrsARMya8n1Pmcw==
-=4mKc
------END PGP SIGNATURE-----
-
---Sig_//.eB+WlZw4O2_AHYMbaV7q.--
+PiBUaGlzIGRvZXNuJ3QgY29tcGlsZToNCj4gDQo+ICAgQ0MgW01dICBkcml2ZXJzL2NyeXB0by9z
+dGFyZml2ZS9qaDcxMTAtY3J5cC5vDQo+ICAgQ0MgW01dICBkcml2ZXJzL2NyeXB0by9zdGFyZml2
+ZS9qaDcxMTAtaGFzaC5vDQo+ICAgQ0MgW01dICBkcml2ZXJzL2NyeXB0by9zdGFyZml2ZS9qaDcx
+MTAtcnNhLm8NCj4gICBDQyBbTV0gIGRyaXZlcnMvY3J5cHRvL3N0YXJmaXZlL2poNzExMC1hZXMu
+bw0KPiBJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi4vZHJpdmVycy9jcnlwdG8vc3RhcmZpdmUvamg3
+MTEwLWFlcy5jOjEzOg0KPiAuLi9kcml2ZXJzL2NyeXB0by9zdGFyZml2ZS9qaDcxMTAtY3J5cC5o
+OjE4NDo0OTogZXJyb3I6IGZpZWxkIOKAmGFlc19kb25l4oCZIGhhcw0KPiBpbmNvbXBsZXRlIHR5
+cGUNCj4gICAxODQgfCAgICAgICAgIHN0cnVjdCB0YXNrbGV0X3N0cnVjdCAgICAgICAgICAgICAg
+ICAgICBhZXNfZG9uZTsNCj4gICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBefn5+fn5+fg0KPiAuLi9kcml2ZXJzL2NyeXB0by9zdGFyZml2ZS9q
+aDcxMTAtY3J5cC5oOjE4NTo0OTogZXJyb3I6IGZpZWxkIOKAmGhhc2hfZG9uZeKAmSBoYXMNCj4g
+aW5jb21wbGV0ZSB0eXBlDQo+ICAgMTg1IHwgICAgICAgICBzdHJ1Y3QgdGFza2xldF9zdHJ1Y3Qg
+ICAgICAgICAgICAgICAgICAgaGFzaF9kb25lOw0KPiAgICAgICB8ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fg0KPiBtYWtlWzZdOiAqKiog
+Wy4uL3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjQzOiBkcml2ZXJzL2NyeXB0by9zdGFyZml2ZS9q
+aDcxMTAtDQo+IGFlcy5vXSBFcnJvciAxDQo+IG1ha2VbNl06ICoqKiBXYWl0aW5nIGZvciB1bmZp
+bmlzaGVkIGpvYnMuLi4uDQo+IA0KDQpIaSBIZXJiZXJ0LA0KVGhhbmtzIGZvciByZXZpZXdpbmcg
+dGhlIHBhdGNoLg0KSSBmb3VuZCBvdXQgdGhhdCBpdCdzIG1pc3NpbmcgaW50ZXJydXB0LmggaW5j
+bHVkZS4gDQpJdCBpcyB3ZWlyZCB0aGF0IHRoZSBjb21waWxlIGVycm9yIGRpZCBub3Qgc2hvdyBp
+biB0aGUgb3JpZ2luYWwgZHJpdmVyIGFuZCBvbiBteSBsb2NhbCBidWlsZC4NCkknbGwgZml4IHRo
+aXMgaW4gdGhlIG5leHQgdmVyc2lvbi4NCg0KVGhhbmtzLA0KSmlhIEppZQ0K
