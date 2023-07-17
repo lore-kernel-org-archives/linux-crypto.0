@@ -2,113 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD03C001B0
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 12:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50760C001DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 13:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjGQM4j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jul 2023 08:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
+        id S229732AbjGQNBA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Jul 2023 09:01:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbjGQM4g (ORCPT
+        with ESMTP id S229823AbjGQNA7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2023 08:56:36 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A724B19A8;
-        Mon, 17 Jul 2023 05:56:07 -0700 (PDT)
+        Mon, 17 Jul 2023 09:00:59 -0400
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9CAAE47;
+        Mon, 17 Jul 2023 06:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1689598568; x=1721134568;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=6fIrxn0+T/UT77ovNwjs4GlglBbK1dzH+ora1KGfoUw=;
-  b=jlAm9MvaR5RA4UisvBmcadCDym3Dzh+PSKNIikjOL8FvEy7z5VMIhMG8
-   qPtv3svgkKiEAbQdTWweSsfCix53glwYrnLAjCnHU7ksmnmwVygTFPUvI
-   gnnNwNelILJGepYT5dkEkwk1taCFMn2zA2fI73I0kaAUFRFue8iHxdn2e
-   4=;
+  t=1689598833; x=1721134833;
+  h=from:to:cc:subject:references:date:in-reply-to:
+   message-id:mime-version;
+  bh=V2IvuJXOfmhoPksJdsTV2u6WeOptT8UYUa+NgoJE45M=;
+  b=t2cwfzSrRvelu9EQ+le8JKPKDKumIXfw24lsrkNo+zQO3Qy+qXdVMvr4
+   eEmfHfqhw6ffDZL/hBhHoKGw2jxxJN+42XOfGve30Dtndw+NIQ9MIkyFZ
+   FeXhi3umyjOtDaqnBhL5jbUIpjkHWkzVtx/IgHngzOUKU+d826WODrZIL
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.01,211,1684800000"; 
-   d="scan'208";a="227224119"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 12:55:51 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 52530A42D5;
-        Mon, 17 Jul 2023 12:55:39 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+   d="scan'208";a="593338174"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-93c3b254.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 13:00:31 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1a-m6i4x-93c3b254.us-east-1.amazon.com (Postfix) with ESMTPS id 4FDFFE0E21;
+        Mon, 17 Jul 2023 13:00:30 +0000 (UTC)
+Received: from EX19MTAUWC001.ant.amazon.com (10.250.64.174) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 17 Jul 2023 12:55:36 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 17 Jul 2023 12:55:36 +0000
+ 15.2.1118.30; Mon, 17 Jul 2023 13:00:29 +0000
 Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (10.15.1.225)
- by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP Server id
- 15.2.1118.30 via Frontend Transport; Mon, 17 Jul 2023 12:55:36 +0000
+ by mail-relay.amazon.com (10.250.64.145) with Microsoft SMTP Server id
+ 15.2.1118.30 via Frontend Transport; Mon, 17 Jul 2023 13:00:29 +0000
 Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
-        id BECC0DCC; Mon, 17 Jul 2023 12:55:35 +0000 (UTC)
+        id 341BE200A; Mon, 17 Jul 2023 13:00:29 +0000 (UTC)
 From:   Mahmoud Adam <mngyadam@amazon.com>
-To:     <dhowells@redhat.com>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Mahmoud Adam <mngyadam@amazon.com>
-Subject: [PATCH v4] KEYS: use kfree_sensitive with key
-Date:   Mon, 17 Jul 2023 12:55:09 +0000
-Message-ID: <20230717125509.105015-1-mngyadam@amazon.com>
-X-Mailer: git-send-email 2.40.1
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: Signed-off-by missing for commit in the crypto tree
+References: <20230717075545.28f93630@canb.auug.org.au>
+Date:   Mon, 17 Jul 2023 13:00:29 +0000
+In-Reply-To: <20230717075545.28f93630@canb.auug.org.au> (Stephen Rothwell's
+        message of "Mon, 17 Jul 2023 07:55:45 +1000")
+Message-ID: <lrkyqmszuitg2.fsf@dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-key might contain private part of the key, so better use
-kfree_sensitive to free it
+Stephen Rothwell <sfr@canb.auug.org.au> writes:
 
-Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
----
- crypto/asymmetric_keys/public_key.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> Hi all,
+>
+> Commit
+>
+>   a0459d277b1b ("KEYS: use kfree_sensitive with key")
+>
+> is missing a Signed-off-by from its author.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 773e159dbbcb..abeecb8329b3 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -42,7 +42,7 @@ static void public_key_describe(const struct key *asymmetric_key,
- void public_key_free(struct public_key *key)
- {
- 	if (key) {
--		kfree(key->key);
-+		kfree_sensitive(key->key);
- 		kfree(key->params);
- 		kfree(key);
- 	}
-@@ -263,7 +263,7 @@ static int software_key_query(const struct kernel_pkey_params *params,
- 	else
- 		crypto_free_akcipher(tfm);
- error_free_key:
--	kfree(key);
-+	kfree_sensitive(key);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
- 	return ret;
- }
-@@ -369,7 +369,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
- 	else
- 		crypto_free_akcipher(tfm);
- error_free_key:
--	kfree(key);
-+	kfree_sensitive(key);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
- 	return ret;
- }
-@@ -441,7 +441,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 				sig->digest, sig->digest_size);
- 
- error_free_key:
--	kfree(key);
-+	kfree_sensitive(key);
- error_free_tfm:
- 	crypto_free_sig(tfm);
- 	pr_devel("<==%s() = %d\n", __func__, ret);
--- 
-2.40.1
-
+Sorry for that, sent Patch v4 with the correction
