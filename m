@@ -2,45 +2,60 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F9DC0015E
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 09:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4995EB64DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 10:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229956AbjGQJqE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jul 2023 05:46:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48714 "EHLO
+        id S229984AbjGQKrK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Jul 2023 06:47:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbjGQJp5 (ORCPT
+        with ESMTP id S229827AbjGQKrJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2023 05:45:57 -0400
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2093.outbound.protection.outlook.com [40.107.215.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C67E10DF;
-        Mon, 17 Jul 2023 02:45:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OiYPa/4HBmdt5yttXKU3cy3D5oXFSknTuzFiuhsPa+6/Ou6AYcGFixBG9bP3HNtXEIc3gnrlJeWL6ujPQpQOK3scJRJ/lUCPu3ZLmQUdVvyhvmIXoiWyl5hOLhC9Y7emQ69A7XXA1l7NE99EQe+S8lZKUJYRaj0of1eQ7k3rKCvvvHbwjUbPrwoeme9SW+ATCwFlVVNFFrjhaoenYT6/M9F1WYwl9yhalK10f49+tbbhTN5UL/blPyN0M1BM++paRcW/JrifljtgmeU9spIMJf3ZC4QZHVG3TUYWWhePx1YJH1sdgOn6jJyp8rWAP3F1JeuHdqkIE8ivzFq6ROXGDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3gOBMSoaFRL42fRxNox6CQjI0vRRa/AnK5OG9CdtoW0=;
- b=boTj2hiUgLLVHjaz6zYI+Fa/YI9x77nDm23YL+6FMDFw13W+IZ1PGgU9sI1wXWnUfeWAnLiKpPIj0qWbu72OfC1s0yc4446Y+BFOcOu7RrFmsDtcLCu/TI7brhcSToIOQeGhzej2bB0VWlGW7ezUViAr8polgqBMd3HyRiCH3zSmfaxd67glpLXExVf3rUFvPCoHlHUcYgHlpWPHMiE/gQsChuc4kX+wdKie4uWGM5b+sABjevlztNvatlViohKWutmH6pbactoZubB5Q9DjA+qwq0qiKe1CnyoQHzcb9QlfThmlVjOgu5VVlXjAGPGcWvITyRpLif28IGVm7ZbFbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3gOBMSoaFRL42fRxNox6CQjI0vRRa/AnK5OG9CdtoW0=;
- b=PkmpWGTrqkEUjpWCiwXXQaKIG/u3hNJX6AGGBtNGf3Ev5SY+dO3MHDmQUlOKcfLvvYgThpFXoyg61xK/3eGwqPD9K5u5yw20Pess9y+HL9AVE3Lv42ItEkS0GF1dP4RrUHQ6t4Tx2ZQuCmgBmRWR6XnPWHvtGY1i4dFWpUhDXkj4NODNSG8LDvpJirGnI9Nl/369df1DsWHp+E96RWI7Z4lrWcERpGA6rs1W/I+DKmux/0XRY0StOi+N/OLvdJN15miQduYGzq6fjM5vM60gfspSFRTvUZ6P8/+ByXoqDB0rUjedcmAxWWAST5vTvxVzGoPZhQTgGTrWp4jLqE5JxA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
- TYZPR06MB5002.apcprd06.prod.outlook.com (2603:1096:400:1cd::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6588.31; Mon, 17 Jul 2023 09:45:51 +0000
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6588.031; Mon, 17 Jul 2023
- 09:45:51 +0000
-From:   Wang Ming <machel@vivo.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Mon, 17 Jul 2023 06:47:09 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B388E11C;
+        Mon, 17 Jul 2023 03:47:08 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36HAgXqt025251;
+        Mon, 17 Jul 2023 10:47:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
+ from : to : cc : subject : reply-to : in-reply-to : references :
+ message-id : content-type : content-transfer-encoding; s=pp1;
+ bh=jFBFqpnfhUVJbxNc05QJz/994Fw3API3ZNvD1L+WRO4=;
+ b=KM5g+UDUKrg3KzV9wIGVg7jvVlSp/TYvfWHcnu+6i2nH5ZgatSC2ynvciUuQhizjmT7S
+ vNX6FQTmqkdEMmMg3j5n5u3pzdr1tUvxrd3xEQjTZeBhm4p4fjuw8KksEdv4Ma3gtV66
+ cjG60CpvsrK/gU1SKr0MB6Dx0D1jDKs+Qnblqr3gupFK8orqdEwQ8iXsS2M3MenEGJ0Z
+ Z9NTHNd5PXpzq4Roun48kcQL44/1dI7D7kFj8F+BrFvyBUTCshTLfXXWi9NnUcBebgl7
+ p3odkvYjzG0RC0V1H1B75fH7ZdavV3KP0LtL/0JuFW4Nce+lBDZV/qUJZ+X1a/kvnNUe Nw== 
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rw3t68cvu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jul 2023 10:47:03 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36H8nO3E016229;
+        Mon, 17 Jul 2023 10:47:03 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([9.208.129.114])
+        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3ruk35jarq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 17 Jul 2023 10:47:03 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+        by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36HAl15C34275660
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jul 2023 10:47:01 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E29658061;
+        Mon, 17 Jul 2023 10:47:01 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A9E405805A;
+        Mon, 17 Jul 2023 10:47:00 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 17 Jul 2023 10:47:00 +0000 (GMT)
+MIME-Version: 1.0
+Date:   Mon, 17 Jul 2023 12:47:00 +0200
+From:   Harald Freudenberger <freude@linux.ibm.com>
+To:     Wang Ming <machel@vivo.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -48,90 +63,55 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>,
         linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     opensource.kernel@vivo.com, Wang Ming <machel@vivo.com>
-Subject: [PATCH v1] arch: s390: Use kfree_sensitive instead of kfree
-Date:   Mon, 17 Jul 2023 17:45:19 +0800
-Message-Id: <20230717094533.18418-1-machel@vivo.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TY2PR01CA0018.jpnprd01.prod.outlook.com
- (2603:1096:404:a::30) To SG2PR06MB3743.apcprd06.prod.outlook.com
- (2603:1096:4:d0::18)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|TYZPR06MB5002:EE_
-X-MS-Office365-Filtering-Correlation-Id: a035b591-e75e-4073-72ec-08db86aa9ad5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WRhjkV2gpwoe16BWrPEqispuk2X2WN+nRPgvtfPT16cal1J5GTBOs0WyS4FURnGVprIUz17eyJOfohFHP18dmmly2yUK52cNMt69VFrp11wmEUf6+4PckYaJq7Nz6IfeUNF6roZBBis6pNezdjtg/fhftogXTf/LIjVD+XN4hsqbcS9oC+NfgFbXAuUxrAlHw2LDz+TjSbLimd/vTmIpOf/O14h/FRVh0YmYKISpT+NhKYP4V3B5DAiv3XlhTmOWjsiNEjcs61yIWhlkXXT0zW1epqyiJTv/8U/8OjPHUEGVAi6nHN0JaeBiZM1LA78cchat2XRYuMJbHvDJxQK9ySyn9fqzu4+OJgGcSRfsmBsrPdbSP+SA0ukMJS/osBodZ5fjIm8OL4Rj/x6s6qgraPnteVunewG9lgc8LsCtwLCJBpjJ3L3W+5cuRSeA1kadIps45+d1AP1crnXBx2BnVjlHrd0LMXI7DbjAnjhziq7Vig72aHA0dBxsI6F+bkkfQvKyT13xLfhWwycioeIsKcw6O7IgLpeZHHfvlkoYki9CzllBA35L0fS7nDT0navzVnF+y/ZIbKTIU5EMSQNklpZkdho0zSTfj1YGZO/b6XsNLXZ/zroVG53qBTsvVx6EIKGElokR6GZggCvwbCOKOA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(39850400004)(346002)(376002)(451199021)(2906002)(110136005)(478600001)(6486002)(6666004)(52116002)(8936002)(36756003)(4744005)(8676002)(7416002)(41300700001)(66476007)(316002)(66946007)(66556008)(4326008)(83380400001)(38100700002)(86362001)(921005)(38350700002)(6512007)(5660300002)(1076003)(26005)(107886003)(2616005)(186003)(6506007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rdaMsDGKpokxV3I/lcz7Nmy2hyfysmErfEE8S6myb4sadXoi+Yi74CCyc4ns?=
- =?us-ascii?Q?vN+PGoCIo4LY2Y5BFHl1NAu6UBd65ItET3OeOMObS5cAqUNHTEVK78CnX7Om?=
- =?us-ascii?Q?6IqrXBfjcr7huw1hvnrxoqT++LSHWidDTt8QG7tueeD+tvlbmgzaXdJINTfW?=
- =?us-ascii?Q?GFLPsidIE2Z1JR4z/rmNUj9lgdk8yQa9WbRre4YuyRpJmhOu6OOidsGgjCRs?=
- =?us-ascii?Q?X4J5nMiCfuG13ELbPRugXdsEHdJWmgKiBC5Bd3V24vs5ZFTTQao0TBUIDTIc?=
- =?us-ascii?Q?4/ejuzXzHcxJKxRwJjluK4bMYdKgImnXIeMcwKqoJ6BjyyiqOsVNGuMspGuw?=
- =?us-ascii?Q?xv4DqMuvCAbcBKFXkeU49AVCJlhwh2Bqu7Wf1+y8s0FtrypgTKU9kqqkWT3w?=
- =?us-ascii?Q?neCO8awhHM2p8Pu9hXDp0gNoQE9X3Y1ME0pP0rrf31MpV/GovwG9ntT2LGh3?=
- =?us-ascii?Q?bmJlvIZsPoXzC97N3craW302Ff6p0rr7k/wMUob+aXwSptOUAhDxieCIZXfa?=
- =?us-ascii?Q?LRIN3C6chFG/8W3Ew18nVOqLPBh5/wNcPfbGTPkGwFUaspIE1+8Oz+zYKGHi?=
- =?us-ascii?Q?BySgRK4lyssaG6t4M36wXFQlUJfEBeAXtm5plqppK8vpq3hM/ZhSSDaUlqAu?=
- =?us-ascii?Q?jdRQ2bHHuKsiHmht1udQawQcvwy1vcLLiNri4ChkPD885m0xjo+4cYKW6+jp?=
- =?us-ascii?Q?q1NU+xsexBijyeBDne2JU4wIOSv3AX6E0feVEMy68fTW5n4FAoW+ROq3TSWN?=
- =?us-ascii?Q?lXCUwiIpMtueXH9YdK1tugdwg3pPT6194752UQmZZYJWRVcxHzyjJ8A/ntTK?=
- =?us-ascii?Q?M0jnsf1kDfyttQgRDeWLHTBnVB+MCLG/QRbzCAGlyJpKZtmK9LUPzBP5Uzw6?=
- =?us-ascii?Q?vBGbW6ivc4OprC7092hiWkfBoIdYuGsiHa87/TZVN83/zUbEoEb1ejSQ0PH0?=
- =?us-ascii?Q?ANeRm0zkZk8y/e3XdMBwa/DcDbrC0/wlMqym0pRdfUOdMLVbGcdRVqaaKe0g?=
- =?us-ascii?Q?19cV8aAMMJrfM7GRElsjeEWxUos6BZ/ACCgtlJMS8DFTUArCOffw+28RfkQS?=
- =?us-ascii?Q?gkYpoYQhtBPqcGkL79LSs6HsapI3AgcEArEH5m7n7iaZJdS9zm4Lz3nANmJP?=
- =?us-ascii?Q?VeaTlJDKzar929mMxGYW4aLJAqPyj5X22BMQp49Vowm88W6fhncAmZU+RsMu?=
- =?us-ascii?Q?JKkP5WxIH66pYXvbFOhC9EN8KFdSHLzqAKxfIB0KBEO2F7lLf4Ji35iM9LyU?=
- =?us-ascii?Q?y8gqySGemYFKUJSf3zt6qh0/s2zlefTvlh7lDWZQpJFfYg5M8c/7VQrQKwpI?=
- =?us-ascii?Q?fIi8Rrcui1bAfWmi+9Sum1buQvpq/4aEvVvlmD81mwrOVm7uca7+GalWgmhM?=
- =?us-ascii?Q?NNQMnUVALurTnp/KMMUPOa0nMvGeHoTAGWpGeRL3fF2WV5Bp92P8HVnmsaMN?=
- =?us-ascii?Q?7ayLDY9mMxg7Fz0Xalx7BYo4Kzbnls2boWPK+WFsFK8h9rm947mrZrrgKAr8?=
- =?us-ascii?Q?h7Cwhr24nuLmWPZawh1BhK5Q7OV6f3dOcCmxcwG50WlB5bEoUYzycoGgOrzW?=
- =?us-ascii?Q?S0qXWoY1l/B2ZsumlPVlXYr1DPKKusikPw7jVDeX?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a035b591-e75e-4073-72ec-08db86aa9ad5
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2023 09:45:51.1776
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2/QMi4luglGsj4NUJUcdvkw/mXbraSbyVda8QX7bgZA7jz6GuyN+sWsvtCpy5XUJ+/TAjlBThNXjBTUeh+Wx8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB5002
+        linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
+Subject: Re: [PATCH v1] arch: s390: Use kfree_sensitive instead of kfree
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <20230717094533.18418-1-machel@vivo.com>
+References: <20230717094533.18418-1-machel@vivo.com>
+Message-ID: <4206a7e79f32538e2505722ef4b57386@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: yDQNnVg5SQF2hi25htKSmEYUYcDQBXHD
+X-Proofpoint-ORIG-GUID: yDQNnVg5SQF2hi25htKSmEYUYcDQBXHD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-17_08,2023-07-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 mlxlogscore=485 phishscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 adultscore=0 priorityscore=1501 impostorscore=0 clxscore=1011
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307170096
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-key might contain private part of the key, so better use
-kfree_sensitive to free it.
+On 2023-07-17 11:45, Wang Ming wrote:
+> key might contain private part of the key, so better use
+> kfree_sensitive to free it.
+> 
+> Signed-off-by: Wang Ming <machel@vivo.com>
+> ---
+>  arch/s390/crypto/paes_s390.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/crypto/paes_s390.c 
+> b/arch/s390/crypto/paes_s390.c
+> index d29a9d908797..38349150c96e 100644
+> --- a/arch/s390/crypto/paes_s390.c
+> +++ b/arch/s390/crypto/paes_s390.c
+> @@ -103,7 +103,7 @@ static inline void _free_kb_keybuf(struct key_blob 
+> *kb)
+>  {
+>  	if (kb->key && kb->key != kb->keybuf
+>  	    && kb->keylen > sizeof(kb->keybuf)) {
+> -		kfree(kb->key);
+> +		kfree_sensitive(kb->key);
+>  		kb->key = NULL;
+>  	}
+>  }
 
-Signed-off-by: Wang Ming <machel@vivo.com>
----
- arch/s390/crypto/paes_s390.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/s390/crypto/paes_s390.c b/arch/s390/crypto/paes_s390.c
-index d29a9d908797..38349150c96e 100644
---- a/arch/s390/crypto/paes_s390.c
-+++ b/arch/s390/crypto/paes_s390.c
-@@ -103,7 +103,7 @@ static inline void _free_kb_keybuf(struct key_blob *kb)
- {
- 	if (kb->key && kb->key != kb->keybuf
- 	    && kb->keylen > sizeof(kb->keybuf)) {
--		kfree(kb->key);
-+		kfree_sensitive(kb->key);
- 		kb->key = NULL;
- 	}
- }
--- 
-2.25.1
-
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
