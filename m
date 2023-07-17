@@ -2,113 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E491C0015E
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 12:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD03C001B0
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jul 2023 12:56:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbjGQMn4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jul 2023 08:43:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57592 "EHLO
+        id S229863AbjGQM4j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Jul 2023 08:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230295AbjGQMnu (ORCPT
+        with ESMTP id S229935AbjGQM4g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jul 2023 08:43:50 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5E991
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jul 2023 05:43:48 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <bst@pengutronix.de>)
-        id 1qLNZm-0003ul-21; Mon, 17 Jul 2023 14:43:42 +0200
-Message-ID: <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
-Date:   Mon, 17 Jul 2023 14:43:34 +0200
+        Mon, 17 Jul 2023 08:56:36 -0400
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A724B19A8;
+        Mon, 17 Jul 2023 05:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1689598568; x=1721134568;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6fIrxn0+T/UT77ovNwjs4GlglBbK1dzH+ora1KGfoUw=;
+  b=jlAm9MvaR5RA4UisvBmcadCDym3Dzh+PSKNIikjOL8FvEy7z5VMIhMG8
+   qPtv3svgkKiEAbQdTWweSsfCix53glwYrnLAjCnHU7ksmnmwVygTFPUvI
+   gnnNwNelILJGepYT5dkEkwk1taCFMn2zA2fI73I0kaAUFRFue8iHxdn2e
+   4=;
+X-IronPort-AV: E=Sophos;i="6.01,211,1684800000"; 
+   d="scan'208";a="227224119"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2023 12:55:51 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 52530A42D5;
+        Mon, 17 Jul 2023 12:55:39 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 17 Jul 2023 12:55:36 +0000
+Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 17 Jul 2023 12:55:36 +0000
+Received: from dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (10.15.1.225)
+ by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP Server id
+ 15.2.1118.30 via Frontend Transport; Mon, 17 Jul 2023 12:55:36 +0000
+Received: by dev-dsk-mngyadam-1c-a2602c62.eu-west-1.amazon.com (Postfix, from userid 23907357)
+        id BECC0DCC; Mon, 17 Jul 2023 12:55:35 +0000 (UTC)
+From:   Mahmoud Adam <mngyadam@amazon.com>
+To:     <dhowells@redhat.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Mahmoud Adam <mngyadam@amazon.com>
+Subject: [PATCH v4] KEYS: use kfree_sensitive with key
+Date:   Mon, 17 Jul 2023 12:55:09 +0000
+Message-ID: <20230717125509.105015-1-mngyadam@amazon.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] crypto: caam - adjust RNG timing to support more devices
-Content-Language: en-US
-To:     meenakshi.aggarwal@nxp.com, horia.geanta@nxp.com, V.sethi@nxp.com,
-        pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Victoria Milhoan <vicki.milhoan@freescale.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Vipul Kumar <vipul_kumar@mentor.com>, kernel@pengutronix.de
-References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
-From:   Bastian Krause <bst@pengutronix.de>
-In-Reply-To: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: bst@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/12/23 10:26, meenakshi.aggarwal@nxp.com wrote:
-> From: Victoria Milhoan <vicki.milhoan@freescale.com>
-> 
-> Adjust RNG timing parameters to support more i.MX6 devices.
-> 
-> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
-> Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
-> Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-> ---
->   drivers/crypto/caam/ctrl.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+key might contain private part of the key, so better use
+kfree_sensitive to free it
 
-This patch seems to breaks CAAM RNG instantiation on an i.MX8MM at my end:
+Signed-off-by: Mahmoud Adam <mngyadam@amazon.com>
+---
+ crypto/asymmetric_keys/public_key.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-caam 30900000.crypto: Entropy delay = 3200
-caam 30900000.crypto: Entropy delay = 3600
-[...]
-caam 30900000.crypto: Entropy delay = 12400
-caam 30900000.crypto: failed to instantiate RNG
-caam: probe of 30900000.crypto failed with error -11
-
-If I revert this patch or increase RTSDCTL_ENT_DLY_MAX to a value > 
-66800, it works again:
-
-caam 30900000.crypto: Entropy delay = 32800
-caam 30900000.crypto: Entropy delay = 33200
-[...]
-caam 30900000.crypto: Entropy delay = 66800
-caam 30900000.crypto: Instantiated RNG4 SH0
-caam 30900000.crypto: Instantiated RNG4 SH1
-caam 30900000.crypto: device ID = 0x0a16040100000000 (Era 9)
-caam 30900000.crypto: job rings = 2, qi = 0
-caam algorithms registered in /proc/crypto
-caam 30900000.crypto: caam pkc algorithms registered in /proc/crypto
-caam 30900000.crypto: registering rng-caam
-Executing RNG SELF-TEST with wait
-random: crng init done
-caam 30900000.crypto: rng crypto API alg registered prng-caam
-
-Regards,
-Bastian
-
-> 
-> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-> index 5fed3cf354c0..62dd069942e4 100644
-> --- a/drivers/crypto/caam/ctrl.c
-> +++ b/drivers/crypto/caam/ctrl.c
-> @@ -383,8 +383,8 @@ static void kick_trng(struct device *dev, int ent_delay)
->   	wr_reg32(&r4tst->rtsdctl, val);
->   	/* min. freq. count, equal to 1/4 of the entropy sample length */
->   	wr_reg32(&r4tst->rtfrqmin, ent_delay >> 2);
-> -	/* disable maximum frequency count */
-> -	wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
-> +	/* max. freq. count, equal to 16 times the entropy sample length */
-> +	wr_reg32(&r4tst->rtfrqmax, ent_delay << 4);
->   	/* read the control register */
->   	val = rd_reg32(&r4tst->rtmctl);
->   start_rng:
-
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 773e159dbbcb..abeecb8329b3 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -42,7 +42,7 @@ static void public_key_describe(const struct key *asymmetric_key,
+ void public_key_free(struct public_key *key)
+ {
+ 	if (key) {
+-		kfree(key->key);
++		kfree_sensitive(key->key);
+ 		kfree(key->params);
+ 		kfree(key);
+ 	}
+@@ -263,7 +263,7 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	else
+ 		crypto_free_akcipher(tfm);
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+ 	return ret;
+ }
+@@ -369,7 +369,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 	else
+ 		crypto_free_akcipher(tfm);
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+ 	return ret;
+ }
+@@ -441,7 +441,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 				sig->digest, sig->digest_size);
+ 
+ error_free_key:
+-	kfree(key);
++	kfree_sensitive(key);
+ error_free_tfm:
+ 	crypto_free_sig(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.40.1
 
