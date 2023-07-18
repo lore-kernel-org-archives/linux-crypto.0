@@ -2,94 +2,163 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B750BEB64DD
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 07:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7105EB64DA
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 09:43:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbjGRHiw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 03:38:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47002 "EHLO
+        id S229831AbjGRJnR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 05:43:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjGRHiv (ORCPT
+        with ESMTP id S229972AbjGRJnQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 03:38:51 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A54198;
-        Tue, 18 Jul 2023 00:38:50 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36I7Osnl014391;
-        Tue, 18 Jul 2023 07:38:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=32InxsPJC+q1pq44FtbN1Nmf3gbhoM2dKizSnMtxqJE=;
- b=olSFM+N8pfNmav1wL3r93rWw61Z2WnqyngIeawkyn06y1P1RfofBI8bJRr/NR0Nsp5kP
- iZhZG39FvOHX/4j5nvr5VgmW93qeA8dbC1mk++cy5tRZWP/L+hOf+8NdICt54eKk6fQj
- 8lo2r9zUAtBmlkbTnS1VXZzmqNkexMa5GFTGzBq5HWqIrbJ/JPbnvBpC4RqD5k/p4Owc
- pVL5zlIl7+QQ1e5I1r23R8i7/QFLsh2C9h3Dn67dUxT+Mbx2Kz0buJqFMi+AwZJ2zXOC
- jJCuZpe4gfJFRzyUES7gObydipA+tRUWdCRRE52jO4qeFIG/drrPC5R9mnm3f+OdvLuY XA== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rwpaugd72-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 07:38:47 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36I51uN4007106;
-        Tue, 18 Jul 2023 07:38:46 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3rv80j24qa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 18 Jul 2023 07:38:46 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36I7chov11141874
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jul 2023 07:38:43 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C711201A4;
-        Tue, 18 Jul 2023 07:38:43 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3883201A3;
-        Tue, 18 Jul 2023 07:38:42 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.233])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 18 Jul 2023 07:38:42 +0000 (GMT)
-Date:   Tue, 18 Jul 2023 09:38:42 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Wang Ming <machel@vivo.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] arch: s390: Use kfree_sensitive instead of kfree
-Message-ID: <ZLZBgocu7f2u+2j8@osiris>
-References: <20230717094533.18418-1-machel@vivo.com>
+        Tue, 18 Jul 2023 05:43:16 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF6FCA
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jul 2023 02:43:15 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <bst@pengutronix.de>)
+        id 1qLhEa-0003t9-Bj; Tue, 18 Jul 2023 11:43:08 +0200
+Message-ID: <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
+Date:   Tue, 18 Jul 2023 11:43:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230717094533.18418-1-machel@vivo.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: foG5Ej1fuh2k90gbTaMpq8-6guRWHawx
-X-Proofpoint-ORIG-GUID: foG5Ej1fuh2k90gbTaMpq8-6guRWHawx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-17_15,2023-07-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- adultscore=0 priorityscore=1501 impostorscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 mlxlogscore=287 malwarescore=0 clxscore=1011
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307180067
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH] crypto: caam - adjust RNG timing to support more devices
+Content-Language: en-US
+From:   Bastian Krause <bst@pengutronix.de>
+To:     meenakshi.aggarwal@nxp.com, horia.geanta@nxp.com, V.sethi@nxp.com,
+        pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Victoria Milhoan <vicki.milhoan@freescale.com>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        Vipul Kumar <vipul_kumar@mentor.com>, kernel@pengutronix.de
+References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
+ <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
+In-Reply-To: <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: bst@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 17, 2023 at 05:45:19PM +0800, Wang Ming wrote:
-> key might contain private part of the key, so better use
-> kfree_sensitive to free it.
+On 7/17/23 14:43, Bastian Krause wrote:
+> On 6/12/23 10:26, meenakshi.aggarwal@nxp.com wrote:
+>> From: Victoria Milhoan <vicki.milhoan@freescale.com>
+>>
+>> Adjust RNG timing parameters to support more i.MX6 devices.
+>>
+>> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
+>> Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
+>> Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
+>> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+>> ---
+>>   drivers/crypto/caam/ctrl.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Signed-off-by: Wang Ming <machel@vivo.com>
-> ---
->  arch/s390/crypto/paes_s390.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This patch seems to breaks CAAM RNG instantiation on an i.MX8MM at my end:
+> 
+> caam 30900000.crypto: Entropy delay = 3200
+> caam 30900000.crypto: Entropy delay = 3600
+> [...]
+> caam 30900000.crypto: Entropy delay = 12400
+> caam 30900000.crypto: failed to instantiate RNG
+> caam: probe of 30900000.crypto failed with error -11
+> 
+> If I revert this patch or increase RTSDCTL_ENT_DLY_MAX to a value > 
+> 66800, it works again:
+> 
+> caam 30900000.crypto: Entropy delay = 32800
+> caam 30900000.crypto: Entropy delay = 33200
+> [...]
+> caam 30900000.crypto: Entropy delay = 66800
+> caam 30900000.crypto: Instantiated RNG4 SH0
+> caam 30900000.crypto: Instantiated RNG4 SH1
+> caam 30900000.crypto: device ID = 0x0a16040100000000 (Era 9)
+> caam 30900000.crypto: job rings = 2, qi = 0
+> caam algorithms registered in /proc/crypto
+> caam 30900000.crypto: caam pkc algorithms registered in /proc/crypto
+> caam 30900000.crypto: registering rng-caam
+> Executing RNG SELF-TEST with wait
+> random: crng init done
+> caam 30900000.crypto: rng crypto API alg registered prng-caam
 
-Applied, thanks.
+This ^ was the kernel log for..
+
+
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@@ -522,7 -522,7 +522,7 @@@ struct rng4tst
+   #define RTSDCTL_ENT_DLY_SHIFT 16
+   #define RTSDCTL_ENT_DLY_MASK (0xffff << RTSDCTL_ENT_DLY_SHIFT)
+   #define RTSDCTL_ENT_DLY_MIN 3200
+--#define RTSDCTL_ENT_DLY_MAX 12800
+++#define RTSDCTL_ENT_DLY_MAX 70000
+   #define RTSDCTL_SAMP_SIZE_MASK 0xffff
+   #define RTSDCTL_SAMP_SIZE_VAL 512
+         u32 rtsdctl;            /* seed control register */
+
+
+For completion's sake: Reverting this patch..
+
+
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -383,7 +383,7 @@ static void kick_trng(struct device *dev, int ent_delay)
+                 /* min. freq. count, equal to 1/4 of the entropy sample length */
+                 wr_reg32(&r4tst->rtfrqmin, val >> 2);
+                 /* max. freq. count, equal to 16 times the entropy sample length */
+-               wr_reg32(&r4tst->rtfrqmax, val << 4);
++               wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
+         }
+  
+         wr_reg32(&r4tst->rtsdctl, (val << RTSDCTL_ENT_DLY_SHIFT) |
+
+
+..produces this kernel log (without RNG SELF-TEST):
+
+caam 30900000.crypto: Entropy delay = 3200
+caam 30900000.crypto: Entropy delay = 3600
+caam 30900000.crypto: Instantiated RNG4 SH0
+caam 30900000.crypto: Instantiated RNG4 SH1
+caam 30900000.crypto: device ID = 0x0a16040100000000 (Era 9)
+caam 30900000.crypto: job rings = 2, qi = 0
+caam algorithms registered in /proc/crypto
+caam 30900000.crypto: caam pkc algorithms registered in /proc/crypto
+caam 30900000.crypto: registering rng-caam
+caam 30900000.crypto: rng crypto API alg registered prng-caam
+random: crng init done
+
+Regards,
+Bastian
+
+>>
+>> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+>> index 5fed3cf354c0..62dd069942e4 100644
+>> --- a/drivers/crypto/caam/ctrl.c
+>> +++ b/drivers/crypto/caam/ctrl.c
+>> @@ -383,8 +383,8 @@ static void kick_trng(struct device *dev, int 
+>> ent_delay)
+>>       wr_reg32(&r4tst->rtsdctl, val);
+>>       /* min. freq. count, equal to 1/4 of the entropy sample length */
+>>       wr_reg32(&r4tst->rtfrqmin, ent_delay >> 2);
+>> -    /* disable maximum frequency count */
+>> -    wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
+>> +    /* max. freq. count, equal to 16 times the entropy sample length */
+>> +    wr_reg32(&r4tst->rtfrqmax, ent_delay << 4);
+>>       /* read the control register */
+>>       val = rd_reg32(&r4tst->rtmctl);
+>>   start_rng:
+> 
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
