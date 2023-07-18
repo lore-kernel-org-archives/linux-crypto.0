@@ -2,106 +2,198 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCA9EB64DC
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 22:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7680FEB64DC
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 22:34:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbjGRWdD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 18:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50898 "EHLO
+        id S230046AbjGRWet (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 18:34:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbjGRWdC (ORCPT
+        with ESMTP id S229573AbjGRWes (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 18:33:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34BB19A1;
-        Tue, 18 Jul 2023 15:32:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 77B5E61298;
-        Tue, 18 Jul 2023 22:32:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41861C433C7;
-        Tue, 18 Jul 2023 22:32:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689719561;
-        bh=7Gbf5E8xcaK5OEKWGb4CHdLczRMlJnuQEgylfRoJijU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ufuwLPWCK8dWV8FkCqtCEz1epizX5iOUu9r0pzjEB8rAo3vv70aUHG7DaVTyC0KRg
-         9GffXUB6RPQfiH4Pwwly5QDNxRzp24n52b7+3LD9ARpF8rJiXrkrBeyyZXIPCRwCL3
-         YnFduPkPfkN/Xgp87N8DLRjyb4cFcZH/W6xsrlYbCUBOsPO7LPaSINVyNCf7nN7z43
-         VbtnrwxtgFI9aorRlk+A+3KII5/Vn0DPycSXnFotjqn6aFg9SWYv2fXiVGJgnhvXsX
-         jEkhDeNqSzOymSxwFCvBFlJkeTEmz1CT/UJjdF6RKWm+b8SD1lfeb02J5lyYQ8cZJU
-         KTXuktmKYxzVQ==
-Date:   Tue, 18 Jul 2023 15:32:39 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for
- deflate rfc1950 (zlib)"
-Message-ID: <20230718223239.GB1005@sol.localdomain>
-References: <20230718125847.3869700-1-ardb@kernel.org>
- <20230718125847.3869700-2-ardb@kernel.org>
+        Tue, 18 Jul 2023 18:34:48 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2085.outbound.protection.outlook.com [40.107.237.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB33CBD;
+        Tue, 18 Jul 2023 15:34:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=frYhNuwFTiUkHUp0pVoo49Fh2zSygWpfk/+hESePeINE/E9sgW/n0rClBSg1y+QC0IzBUBEjyIxB5//OLrdZ/Ed6p8SUxnH51B8dP59uNATm8tSsQfG0jEjOSOR82ox/Z9Uxs7eSA01ZSmn7d2ehPTLk80M0bip3cDSb95BJkshOMjOTVG+RYgV5NzUgjjwKEydQ0nXWI53LN+WL60HH0hmJRmWPTQhhpbCwtxAqku6V+gRKKS0e4MZBXqtDbyjcVrOFkZysKcgFeFOprbXDuOYCTu7sqw5pRaCiloMQ54JDUKnXQigrgO0UsN7LDYxLye1LeUOYH4vSSebCX3hZeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+QL+QCEmAvI9Or2D2l7WCdz3umSrHHc1RZyajJt49EE=;
+ b=ks6eJzX+0yFvo+5Ypbd79qb0P2Y4tXV0pBS01geEIWvk6lEU6RQ+7JeKsF86VNwubqviUb4GZIyp9OqegpPtwK05JcbtT9TVk9WZM6DaHUyWgOsxsM2VSE7ZEHSlTvay3KTuRRPeuQMKAH1gUCNrWnRQXlO/65HCVrBpQ+ohrCh98vn1Mu5FUKEgQUNeqNIMWOzehIj7a+CN4dYmDwIX4jBEI/ErsF9woqCDKrV7HOSqJlUnDmUba2Qf9ArqcykHmMAGCflo3+bzWwIqpP1/6+QBUdsAcEfipW4AnGMYNctgZ2YsHVA7/aOVZpOpiXBT8TObwwxjM1d3YnMTcLHhpg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+QL+QCEmAvI9Or2D2l7WCdz3umSrHHc1RZyajJt49EE=;
+ b=lrqws8lX08rGB28cIof1xp1kGdrzJjtkhvrMtvKtgCph2WNpn+QDVvjHG5pavqEfRGuBJwHeE+a0xtm8Zf0xWdSXmsgSzpyz2XBowQSqaD99iOrzHy+nX3QL5p6AIaOCJDG9KM3Jk9Lld/mdT7iJVUPS6KRzTP881bZ5gpFXdnU=
+Received: from DM6PR03CA0052.namprd03.prod.outlook.com (2603:10b6:5:100::29)
+ by CH0PR12MB5387.namprd12.prod.outlook.com (2603:10b6:610:d6::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33; Tue, 18 Jul
+ 2023 22:34:42 +0000
+Received: from DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:100:cafe::58) by DM6PR03CA0052.outlook.office365.com
+ (2603:10b6:5:100::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6588.33 via Frontend
+ Transport; Tue, 18 Jul 2023 22:34:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT113.mail.protection.outlook.com (10.13.173.5) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6588.34 via Frontend Transport; Tue, 18 Jul 2023 22:34:42 +0000
+Received: from [10.236.30.70] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Tue, 18 Jul
+ 2023 17:34:40 -0500
+Message-ID: <b8eeb557-0a6b-3aff-0f31-1c5e3e965a50@amd.com>
+Date:   Tue, 18 Jul 2023 17:34:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230718125847.3869700-2-ardb@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
+        <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+References: <20230612042559.375660-1-michael.roth@amd.com>
+ <20230612042559.375660-9-michael.roth@amd.com>
+ <696ea7fe-3294-f21b-3bc0-3f8cc0a718e9@intel.com>
+Content-Language: en-US
+From:   Kim Phillips <kim.phillips@amd.com>
+Subject: Re: [PATCH RFC v9 08/51] x86/speculation: Do not enable Automatic
+ IBRS if SEV SNP is enabled
+In-Reply-To: <696ea7fe-3294-f21b-3bc0-3f8cc0a718e9@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT113:EE_|CH0PR12MB5387:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11c184ce-03f5-410b-282e-08db87df2e12
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: d1YYsrP0hQ/P27PiAe6epnE6OnoMtqCki7F1wqrZsbwM0qyfOKbzc3LE8nJW/YtltaL1u1X9hkkXPAHqCRaHNNGPuS893yHD8vJPUJdF2HvxkDGnZQ28lTU5w2/F8gRzsm4iihymWVzQcELpeeVG9xp6vQwZNCqK2VnRnLg4ASbRVAaAqD4dnnbQY8SLdqJ18t6iXJSw0FzZf1LM3wpanXlqcV5XcMwOWxgZ05HjCKyyY81Q/+EcTApTABsi8DHONzPOdRU1P7/4szdg5lpV3mniRhJOajDdIu+YfhgIETJDTHB4GVKB9YnYehjGbuKPf+uFldviP3JZEc2wsZ3TA9qxDObYSVhoi0e1ibj4dKEnhtpeyWD9gHKovezu6qwjfhwxB4dvJJSfWJpYB6TFQokAhgLAaxoURgRjGKrLDLCppr3caWOjN5/MMnnIwJrwpfUlT6PzU7hiQX3KXYWMoXhtgo7SRZw2hBLiYHAPTOqngCre66S4idqrEob7Zwji6TgHuYGo33hRPzIOOFkf5IEoOzstTwBvegGh5CXOcBXRKtwnAXK7lt4C93m/nVfsaZ7DzOovqo4VE4k5uLQK7uDDxl4JnO6ocNh5kjeqdNMkBa88Uc/f2edgKpaDqEqg2fXbV5t9vaud4tg/SVZA4rkPRr7vK/ZOqrGtrnXRD6Yo2aqhsSmuUxRkJwIiPsjZDkbwix8HGxlUTnAOV6hn4MhQIGKfZxZ2YsT3DSXYBA2ytnN6mkVQGeUnp2UjwcHr/AkJ3SDJxYZvjpFAIyjd1JRCXW4es7Md+mR//cKZqU0=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(136003)(346002)(376002)(451199021)(82310400008)(46966006)(40470700004)(36840700001)(82740400003)(478600001)(81166007)(356005)(26005)(40480700001)(53546011)(966005)(40460700003)(4326008)(83380400001)(426003)(8676002)(44832011)(7416002)(5660300002)(16576012)(2616005)(47076005)(316002)(41300700001)(7406005)(86362001)(31696002)(2906002)(8936002)(36860700001)(31686004)(186003)(16526019)(336012)(70206006)(36756003)(70586007)(54906003)(110136005)(36900700001)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2023 22:34:42.2518
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11c184ce-03f5-410b-282e-08db87df2e12
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT113.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5387
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 02:58:27PM +0200, Ard Biesheuvel wrote:
-> This reverts commit a368f43d6e3a001e684e9191a27df384fbff12f5.
+On 6/12/23 10:39 AM, Dave Hansen wrote:
+> On 6/11/23 21:25, Michael Roth wrote:
+>> A hardware limitation prevents the host from enabling Automatic IBRS
+>> when SNP is enabled.  Instead, fall back to retpolines.
 > 
-> "zlib-deflate" was introduced 6 years ago, but it does not have any
-> users. So let's remove the generic implementation and the test vectors,
-> but retain the "zlib-deflate" entry in the testmgr code to avoid
-> introducing warning messages on systems that implement zlib-deflate in
-> hardware.
+> "Hardware limitation"?  As in, it is a documented, architectural
+> restriction?  Or, it's a CPU bug?
+
+It's a documented, architectural restriction:  When Secure Nested Paging
+(SEV-SNP) is enabled, processes running as host are protected, but
+those running with a non-zero ASID, are not.
+
+>> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+>> index f9d060e71c3e..3fba3623ff64 100644
+>> --- a/arch/x86/kernel/cpu/bugs.c
+>> +++ b/arch/x86/kernel/cpu/bugs.c
+>> @@ -1507,7 +1507,12 @@ static void __init spectre_v2_select_mitigation(void)
+>>   
+>>   	if (spectre_v2_in_ibrs_mode(mode)) {
+>>   		if (boot_cpu_has(X86_FEATURE_AUTOIBRS)) {
+>> -			msr_set_bit(MSR_EFER, _EFER_AUTOIBRS);
+>> +			if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+>> +				msr_set_bit(MSR_EFER, _EFER_AUTOIBRS);
+>> +			} else {
+>> +				pr_err("SNP feature available, not enabling AutoIBRS on the host.\n");
+>> +				mode = spectre_v2_select_retpoline();
+>> +			}
 > 
-> Note that RFC 1950 which forms the basis of this algorithm dates back to
-> 1996, and predates RFC 1951, on which the existing IPcomp is based and
-> which we have supported in the kernel since 2003. So it seems rather
-> unlikely that we will ever grow the need to support zlib-deflate.
+> I think this would be nicer if you did something like:
 > 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  crypto/deflate.c | 61 +++++-----------
->  crypto/testmgr.c |  8 +--
->  crypto/testmgr.h | 75 --------------------
->  3 files changed, 18 insertions(+), 126 deletions(-)
+> 	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> 		setup_clear_cpu_cap(X86_FEATURE_AUTOIBRS);
+> 
+> somewhere _else_ in the code instead of smack-dab in the middle of the
+> mitigation selection.
 
-So if this is really unused, it's probably fair to remove it on that basis.
-However, it's not correct to claim that DEFLATE is obsoleted by zlib (the data
-format).  zlib is just DEFLATE plus a checksum, as is gzip.
+Good idea.  How about this?:
 
-Many users of zlib or gzip use an external checksum and therefore would be
-better served by DEFLATE, avoiding a redundant builtin checksum.  Typically,
-people have chosen zlib or gzip simply because their compression library
-defaulted to it, they didn't understand the difference, and they overlooked that
-they're paying the price for a redundant builtin checksum.
+ From 6cf32e8d8426190b1bf1b1e04ceb35bf0bac784b Mon Sep 17 00:00:00 2001
+From: Kim Phillips <kim.phillips@amd.com>
+Date: Mon, 17 Jul 2023 14:08:15 -0500
+Subject: [PATCH] x86/speculation: Do not enable Automatic IBRS if SEV SNP is
+  enabled
 
-An example of someone doing it right is EROFS, which is working on adding
-DEFLATE support (not zlib or gzip!):
-https://lore.kernel.org/r/20230713001441.30462-1-hsiangkao@linux.alibaba.com
+Automatic IBRS provides protection to [1]:
 
-Of course, they are using the library API instead of the clumsy crypto API.
+  - Processes running at CPL=0
+  - Processes running as host when Secure Nested Paging (SEV-SNP) is enabled
 
-- Eric
+i.e.,
+
+	(CPL < 3) || ((ASID == 0) && SNP)
+
+Because of this limitation, do not enable Automatic IBRS when SNP is enabled.
+Instead, fall back to retpolines.
+
+Note that the AutoIBRS feature may continue to be used within the guest.
+
+[1] "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
+     Pub. 24593, rev. 3.41, June 2023, Part 1, Section 3.1.7 "Extended Feature
+     Enable Register (EFER)", Automatic IBRS Enable (AIBRSE) Bit.
+
+Link: https://bugzilla.kernel.org/attachment.cgi?id=304652
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+---
+  arch/x86/kernel/cpu/common.c | 3 ++-
+  1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 8cd4126d8253..311c0a6422b5 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -1348,7 +1348,8 @@ static void __init cpu_set_bug_bits(struct cpuinfo_x86 *c)
+  	 * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel feature
+  	 * flag and protect from vendor-specific bugs via the whitelist.
+  	 */
+-	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || cpu_has(c, X86_FEATURE_AUTOIBRS)) {
++	if ((ia32_cap & ARCH_CAP_IBRS_ALL) || (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
++	    !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+  		setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+  		if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+  		    !(ia32_cap & ARCH_CAP_PBRSB_NO))
+-- 
+2.34.1
