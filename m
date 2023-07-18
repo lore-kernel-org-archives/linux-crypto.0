@@ -2,566 +2,154 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B99C001DC
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 14:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA45FEB64DA
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 14:55:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233282AbjGROdR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 10:33:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52374 "EHLO
+        id S231739AbjGROzd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 10:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233343AbjGROc4 (ORCPT
+        with ESMTP id S231636AbjGROzc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 10:32:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ACE61FED;
-        Tue, 18 Jul 2023 07:32:20 -0700 (PDT)
+        Tue, 18 Jul 2023 10:55:32 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35BBDF9;
+        Tue, 18 Jul 2023 07:55:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 831DC615FD;
-        Tue, 18 Jul 2023 14:32:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66DBBC433C7;
-        Tue, 18 Jul 2023 14:32:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C80E3615E0;
+        Tue, 18 Jul 2023 14:55:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2CEFC433C7;
+        Tue, 18 Jul 2023 14:55:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689690736;
-        bh=CvXNh/V0SLE1LcnbZrcODS7C8vIG914MVnRAYa+fhbA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=KJkN9kUC3OUuf2US9ZpB+uKJtFSYZ69Pk1Us/bpaP5enqoSe/pTOTHBbbg3Y34A/b
-         oa8fFhSXONO+2nDRLX+2UtccmAsMcUuYnF+t84U6SdfRJjjrq+/lbfavJVgYtabQyQ
-         TTbQQiJuIuhTNv1doSXLVR9iPq2urJlDK4Dje/ssd5uSZwOU55ps9rSQgFfCwIYPL3
-         snsM+Ge6q847oNM0qsKoZjV7WqCMng6tHozKkf81Ru8Fi8BVvmuPck/c6Bbm92NbRs
-         HSVwfl7IMxye4VxWQuUQvSMEIEwuRUyoLNhXu8d2jotzigKmYUEHt8zQNhh7OnlESo
-         lN+NOtU3GjODw==
-Received: (nullmailer pid 1066942 invoked by uid 1000);
-        Tue, 18 Jul 2023 14:32:14 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     devicetree@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>,
-        linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] sparc: Explicitly include correct DT includes
-Date:   Tue, 18 Jul 2023 08:32:08 -0600
-Message-Id: <20230718143211.1066810-1-robh@kernel.org>
-X-Mailer: git-send-email 2.40.1
+        s=k20201202; t=1689692130;
+        bh=fdekGA583gB2J0NLQfIQ21KSthQ1S9fIdLfU2PzPdJM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=endu9Fe+8olkfUD5V+sCOj02eDLxV8bpVyVv0CYN66ZkWx/E+fB7v0H2nF+4IblBK
+         XVc1jQxhyHM+IWvwgjAvpJmW3pYAoWP+APV+U0onWFoBQV8p4HrVLWZqnJfPjpLRM8
+         Xu4DD4C3ergG80wocFy2zXdXXsythAe/UXEKR1TjmMxLseoWzWjEMrudj7/gO4U7NG
+         RDFxQVk/OZorT3S9z9JzLfrQOHRVqnRbKF6C/Njg1Mrsn3hCfyOSSdwCqMBjJJK/i/
+         uMxi5mYmw1mpR+Uq3Qq2FHbStwJ1Wphhj4ztU3rivYqDYYB2oTePUn22hQ0WES8NHE
+         YE6PMJXec4LUQ==
+Date:   Tue, 18 Jul 2023 15:55:25 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Heiko Stuebner <heiko@sntech.de>
+Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, conor.dooley@microchip.com,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
+        ebiggers@kernel.org, Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v4 04/12] RISC-V: add vector crypto extension detection
+Message-ID: <20230718-jittery-unwashed-cd2781c74351@spud>
+References: <20230711153743.1970625-1-heiko@sntech.de>
+ <20230711153743.1970625-5-heiko@sntech.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="N/lcl/YjF4hhSyY+"
+Content-Disposition: inline
+In-Reply-To: <20230711153743.1970625-5-heiko@sntech.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The DT of_device.h and of_platform.h date back to the separate
-of_platform_bus_type before it as merged into the regular platform bus.
-As part of that merge prepping Arm DT support 13 years ago, they
-"temporarily" include each other. They also include platform_device.h
-and of.h. As a result, there's a pretty much random mix of those include
-files used throughout the tree. In order to detangle these headers and
-replace the implicit includes with struct declarations, users need to
-explicitly include the correct includes.
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Rob Herring <robh@kernel.org>
----
-v2:
-- Fix double include of of.h
----
- arch/sparc/crypto/crop_devid.c       | 2 +-
- arch/sparc/include/asm/floppy_32.h   | 2 +-
- arch/sparc/include/asm/floppy_64.h   | 2 +-
- arch/sparc/include/asm/parport.h     | 3 ++-
- arch/sparc/kernel/apc.c              | 2 +-
- arch/sparc/kernel/auxio_32.c         | 1 -
- arch/sparc/kernel/auxio_64.c         | 3 ++-
- arch/sparc/kernel/central.c          | 2 +-
- arch/sparc/kernel/chmc.c             | 3 ++-
- arch/sparc/kernel/ioport.c           | 2 +-
- arch/sparc/kernel/leon_kernel.c      | 2 --
- arch/sparc/kernel/leon_pci.c         | 3 ++-
- arch/sparc/kernel/leon_pci_grpci1.c  | 3 ++-
- arch/sparc/kernel/leon_pci_grpci2.c  | 4 +++-
- arch/sparc/kernel/of_device_32.c     | 1 +
- arch/sparc/kernel/of_device_64.c     | 3 ++-
- arch/sparc/kernel/of_device_common.c | 4 ++--
- arch/sparc/kernel/pci.c              | 3 ++-
- arch/sparc/kernel/pci_common.c       | 3 ++-
- arch/sparc/kernel/pci_fire.c         | 3 ++-
- arch/sparc/kernel/pci_impl.h         | 1 -
- arch/sparc/kernel/pci_msi.c          | 2 ++
- arch/sparc/kernel/pci_psycho.c       | 4 +++-
- arch/sparc/kernel/pci_sun4v.c        | 3 ++-
- arch/sparc/kernel/pmc.c              | 2 +-
- arch/sparc/kernel/power.c            | 3 ++-
- arch/sparc/kernel/prom_irqtrans.c    | 1 +
- arch/sparc/kernel/psycho_common.c    | 1 +
- arch/sparc/kernel/sbus.c             | 3 ++-
- arch/sparc/kernel/time_32.c          | 1 -
- arch/sparc/mm/io-unit.c              | 3 ++-
- arch/sparc/mm/iommu.c                | 5 +++--
- 32 files changed, 49 insertions(+), 31 deletions(-)
+--N/lcl/YjF4hhSyY+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/sparc/crypto/crop_devid.c b/arch/sparc/crypto/crop_devid.c
-index 83fc4536dcd5..93f4e0fdd38c 100644
---- a/arch/sparc/crypto/crop_devid.c
-+++ b/arch/sparc/crypto/crop_devid.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
-+#include <linux/mod_devicetable.h>
- #include <linux/module.h>
--#include <linux/of_device.h>
- 
- /* This is a dummy device table linked into all of the crypto
-  * opcode drivers.  It serves to trigger the module autoloading
-diff --git a/arch/sparc/include/asm/floppy_32.h b/arch/sparc/include/asm/floppy_32.h
-index e10ab9ad3097..836f6575aa1d 100644
---- a/arch/sparc/include/asm/floppy_32.h
-+++ b/arch/sparc/include/asm/floppy_32.h
-@@ -8,7 +8,7 @@
- #define __ASM_SPARC_FLOPPY_H
- 
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
- #include <linux/pgtable.h>
- 
- #include <asm/idprom.h>
-diff --git a/arch/sparc/include/asm/floppy_64.h b/arch/sparc/include/asm/floppy_64.h
-index 070c8c1f5c8f..6efeb24b0a92 100644
---- a/arch/sparc/include/asm/floppy_64.h
-+++ b/arch/sparc/include/asm/floppy_64.h
-@@ -11,7 +11,7 @@
- #define __ASM_SPARC64_FLOPPY_H
- 
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
- #include <linux/dma-mapping.h>
- 
- #include <asm/auxio.h>
-diff --git a/arch/sparc/include/asm/parport.h b/arch/sparc/include/asm/parport.h
-index 03b27090c0c8..0a7ffcfd59cd 100644
---- a/arch/sparc/include/asm/parport.h
-+++ b/arch/sparc/include/asm/parport.h
-@@ -7,7 +7,8 @@
- #ifndef _ASM_SPARC64_PARPORT_H
- #define _ASM_SPARC64_PARPORT_H 1
- 
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/ebus_dma.h>
- #include <asm/ns87303.h>
-diff --git a/arch/sparc/kernel/apc.c b/arch/sparc/kernel/apc.c
-index ecd05bc0a104..d44725d37e30 100644
---- a/arch/sparc/kernel/apc.c
-+++ b/arch/sparc/kernel/apc.c
-@@ -13,7 +13,7 @@
- #include <linux/miscdevice.h>
- #include <linux/pm.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/platform_device.h>
- #include <linux/module.h>
- 
- #include <asm/io.h>
-diff --git a/arch/sparc/kernel/auxio_32.c b/arch/sparc/kernel/auxio_32.c
-index a32d588174f2..989860e890c4 100644
---- a/arch/sparc/kernel/auxio_32.c
-+++ b/arch/sparc/kernel/auxio_32.c
-@@ -8,7 +8,6 @@
- #include <linux/init.h>
- #include <linux/spinlock.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/export.h>
- 
- #include <asm/oplib.h>
-diff --git a/arch/sparc/kernel/auxio_64.c b/arch/sparc/kernel/auxio_64.c
-index 774a82b0c649..2a2800d21325 100644
---- a/arch/sparc/kernel/auxio_64.c
-+++ b/arch/sparc/kernel/auxio_64.c
-@@ -10,7 +10,8 @@
- #include <linux/kernel.h>
- #include <linux/init.h>
- #include <linux/ioport.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/prom.h>
- #include <asm/io.h>
-diff --git a/arch/sparc/kernel/central.c b/arch/sparc/kernel/central.c
-index 23f8838dd96e..a1a6485c9183 100644
---- a/arch/sparc/kernel/central.c
-+++ b/arch/sparc/kernel/central.c
-@@ -10,7 +10,7 @@
- #include <linux/export.h>
- #include <linux/string.h>
- #include <linux/init.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- 
- #include <asm/fhc.h>
-diff --git a/arch/sparc/kernel/chmc.c b/arch/sparc/kernel/chmc.c
-index 6ff43df740e0..d5fad5fb04c1 100644
---- a/arch/sparc/kernel/chmc.c
-+++ b/arch/sparc/kernel/chmc.c
-@@ -15,7 +15,8 @@
- #include <linux/errno.h>
- #include <linux/init.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <asm/spitfire.h>
- #include <asm/chmctrl.h>
- #include <asm/cpudata.h>
-diff --git a/arch/sparc/kernel/ioport.c b/arch/sparc/kernel/ioport.c
-index a8cbe403301f..5ebca5c7af1e 100644
---- a/arch/sparc/kernel/ioport.c
-+++ b/arch/sparc/kernel/ioport.c
-@@ -39,7 +39,7 @@
- #include <linux/seq_file.h>
- #include <linux/scatterlist.h>
- #include <linux/dma-map-ops.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
- 
- #include <asm/io.h>
- #include <asm/vaddrs.h>
-diff --git a/arch/sparc/kernel/leon_kernel.c b/arch/sparc/kernel/leon_kernel.c
-index 39229940d725..4c61da491fee 100644
---- a/arch/sparc/kernel/leon_kernel.c
-+++ b/arch/sparc/kernel/leon_kernel.c
-@@ -8,9 +8,7 @@
- #include <linux/errno.h>
- #include <linux/mutex.h>
- #include <linux/of.h>
--#include <linux/of_platform.h>
- #include <linux/interrupt.h>
--#include <linux/of_device.h>
- #include <linux/clocksource.h>
- #include <linux/clockchips.h>
- 
-diff --git a/arch/sparc/kernel/leon_pci.c b/arch/sparc/kernel/leon_pci.c
-index b6663a3fbae9..8de6646e9ce8 100644
---- a/arch/sparc/kernel/leon_pci.c
-+++ b/arch/sparc/kernel/leon_pci.c
-@@ -7,7 +7,8 @@
-  * Code is partially derived from pcic.c
-  */
- 
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/kernel.h>
- #include <linux/pci.h>
- #include <linux/export.h>
-diff --git a/arch/sparc/kernel/leon_pci_grpci1.c b/arch/sparc/kernel/leon_pci_grpci1.c
-index e6935d0ac1ec..8700a0e3b0df 100644
---- a/arch/sparc/kernel/leon_pci_grpci1.c
-+++ b/arch/sparc/kernel/leon_pci_grpci1.c
-@@ -13,10 +13,11 @@
-  * Contributors: Daniel Hellstrom <daniel@gaisler.com>
-  */
- 
--#include <linux/of_device.h>
- #include <linux/export.h>
- #include <linux/kernel.h>
-+#include <linux/of.h>
- #include <linux/of_irq.h>
-+#include <linux/platform_device.h>
- #include <linux/delay.h>
- #include <linux/pci.h>
- 
-diff --git a/arch/sparc/kernel/leon_pci_grpci2.c b/arch/sparc/kernel/leon_pci_grpci2.c
-index ca22f93d9045..60b6bdf7761f 100644
---- a/arch/sparc/kernel/leon_pci_grpci2.c
-+++ b/arch/sparc/kernel/leon_pci_grpci2.c
-@@ -6,12 +6,14 @@
-  *
-  */
- 
--#include <linux/of_device.h>
- #include <linux/kernel.h>
- #include <linux/pci.h>
- #include <linux/slab.h>
- #include <linux/delay.h>
- #include <linux/export.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+
- #include <asm/io.h>
- #include <asm/leon.h>
- #include <asm/vaddrs.h>
-diff --git a/arch/sparc/kernel/of_device_32.c b/arch/sparc/kernel/of_device_32.c
-index fa05b29fa051..06012e68bdca 100644
---- a/arch/sparc/kernel/of_device_32.c
-+++ b/arch/sparc/kernel/of_device_32.c
-@@ -8,6 +8,7 @@
- #include <linux/errno.h>
- #include <linux/irq.h>
- #include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/dma-mapping.h>
- #include <asm/leon.h>
- #include <asm/leon_amba.h>
-diff --git a/arch/sparc/kernel/of_device_64.c b/arch/sparc/kernel/of_device_64.c
-index c41aa82a9af3..d3842821a5a0 100644
---- a/arch/sparc/kernel/of_device_64.c
-+++ b/arch/sparc/kernel/of_device_64.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <linux/string.h>
- #include <linux/kernel.h>
--#include <linux/of.h>
- #include <linux/dma-mapping.h>
- #include <linux/init.h>
- #include <linux/export.h>
-@@ -9,7 +8,9 @@
- #include <linux/slab.h>
- #include <linux/errno.h>
- #include <linux/irq.h>
-+#include <linux/of.h>
- #include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <asm/spitfire.h>
- 
- #include "of_device_common.h"
-diff --git a/arch/sparc/kernel/of_device_common.c b/arch/sparc/kernel/of_device_common.c
-index 60f86b837658..ba2a6ae23508 100644
---- a/arch/sparc/kernel/of_device_common.c
-+++ b/arch/sparc/kernel/of_device_common.c
-@@ -1,15 +1,15 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include <linux/string.h>
- #include <linux/kernel.h>
--#include <linux/of.h>
- #include <linux/export.h>
- #include <linux/mod_devicetable.h>
- #include <linux/errno.h>
- #include <linux/irq.h>
-+#include <linux/of.h>
- #include <linux/of_platform.h>
- #include <linux/of_address.h>
--#include <linux/of_device.h>
- #include <linux/of_irq.h>
-+#include <linux/platform_device.h>
- 
- #include "of_device_common.h"
- 
-diff --git a/arch/sparc/kernel/pci.c b/arch/sparc/kernel/pci.c
-index a948a49817c7..f66005ce4cb5 100644
---- a/arch/sparc/kernel/pci.c
-+++ b/arch/sparc/kernel/pci.c
-@@ -20,8 +20,9 @@
- #include <linux/irq.h>
- #include <linux/init.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
- #include <linux/pgtable.h>
-+#include <linux/platform_device.h>
- 
- #include <linux/uaccess.h>
- #include <asm/irq.h>
-diff --git a/arch/sparc/kernel/pci_common.c b/arch/sparc/kernel/pci_common.c
-index 4759ccd542fe..5eeec9ad6845 100644
---- a/arch/sparc/kernel/pci_common.c
-+++ b/arch/sparc/kernel/pci_common.c
-@@ -8,7 +8,8 @@
- #include <linux/slab.h>
- #include <linux/pci.h>
- #include <linux/device.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/prom.h>
- #include <asm/oplib.h>
-diff --git a/arch/sparc/kernel/pci_fire.c b/arch/sparc/kernel/pci_fire.c
-index 0ca08d455e80..0b91bde80fdc 100644
---- a/arch/sparc/kernel/pci_fire.c
-+++ b/arch/sparc/kernel/pci_fire.c
-@@ -10,7 +10,8 @@
- #include <linux/msi.h>
- #include <linux/export.h>
- #include <linux/irq.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/numa.h>
- 
- #include <asm/prom.h>
-diff --git a/arch/sparc/kernel/pci_impl.h b/arch/sparc/kernel/pci_impl.h
-index 4e3d15189fa9..f31761f51757 100644
---- a/arch/sparc/kernel/pci_impl.h
-+++ b/arch/sparc/kernel/pci_impl.h
-@@ -11,7 +11,6 @@
- #include <linux/spinlock.h>
- #include <linux/pci.h>
- #include <linux/msi.h>
--#include <linux/of_device.h>
- #include <asm/io.h>
- #include <asm/prom.h>
- #include <asm/iommu.h>
-diff --git a/arch/sparc/kernel/pci_msi.c b/arch/sparc/kernel/pci_msi.c
-index 9ed11985768e..fc7402948b7b 100644
---- a/arch/sparc/kernel/pci_msi.c
-+++ b/arch/sparc/kernel/pci_msi.c
-@@ -5,6 +5,8 @@
-  */
- #include <linux/kernel.h>
- #include <linux/interrupt.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/irq.h>
- 
-diff --git a/arch/sparc/kernel/pci_psycho.c b/arch/sparc/kernel/pci_psycho.c
-index f413371da387..1efc98305ec7 100644
---- a/arch/sparc/kernel/pci_psycho.c
-+++ b/arch/sparc/kernel/pci_psycho.c
-@@ -13,7 +13,9 @@
- #include <linux/export.h>
- #include <linux/slab.h>
- #include <linux/interrupt.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/iommu.h>
- #include <asm/irq.h>
-diff --git a/arch/sparc/kernel/pci_sun4v.c b/arch/sparc/kernel/pci_sun4v.c
-index 7d91ca6aa675..c80b0a21d709 100644
---- a/arch/sparc/kernel/pci_sun4v.c
-+++ b/arch/sparc/kernel/pci_sun4v.c
-@@ -15,7 +15,8 @@
- #include <linux/msi.h>
- #include <linux/export.h>
- #include <linux/log2.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- #include <linux/dma-map-ops.h>
- #include <asm/iommu-common.h>
- 
-diff --git a/arch/sparc/kernel/pmc.c b/arch/sparc/kernel/pmc.c
-index b5c1eb33b951..69a0206e56f0 100644
---- a/arch/sparc/kernel/pmc.c
-+++ b/arch/sparc/kernel/pmc.c
-@@ -11,7 +11,7 @@
- #include <linux/init.h>
- #include <linux/pm.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/platform_device.h>
- #include <linux/module.h>
- 
- #include <asm/io.h>
-diff --git a/arch/sparc/kernel/power.c b/arch/sparc/kernel/power.c
-index 8147985a1dc4..db8a3f9e3d40 100644
---- a/arch/sparc/kernel/power.c
-+++ b/arch/sparc/kernel/power.c
-@@ -9,7 +9,8 @@
- #include <linux/init.h>
- #include <linux/interrupt.h>
- #include <linux/reboot.h>
--#include <linux/of_device.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/prom.h>
- #include <asm/io.h>
-diff --git a/arch/sparc/kernel/prom_irqtrans.c b/arch/sparc/kernel/prom_irqtrans.c
-index 28aff1c524b5..426bd08cb2ab 100644
---- a/arch/sparc/kernel/prom_irqtrans.c
-+++ b/arch/sparc/kernel/prom_irqtrans.c
-@@ -4,6 +4,7 @@
- #include <linux/init.h>
- #include <linux/of.h>
- #include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/oplib.h>
- #include <asm/prom.h>
-diff --git a/arch/sparc/kernel/psycho_common.c b/arch/sparc/kernel/psycho_common.c
-index e90bcb6bad7f..5ee74b4c0cf4 100644
---- a/arch/sparc/kernel/psycho_common.c
-+++ b/arch/sparc/kernel/psycho_common.c
-@@ -6,6 +6,7 @@
- #include <linux/kernel.h>
- #include <linux/interrupt.h>
- #include <linux/numa.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/upa.h>
- 
-diff --git a/arch/sparc/kernel/sbus.c b/arch/sparc/kernel/sbus.c
-index 32141e1006c4..0bababf6f2bc 100644
---- a/arch/sparc/kernel/sbus.c
-+++ b/arch/sparc/kernel/sbus.c
-@@ -14,7 +14,8 @@
- #include <linux/init.h>
- #include <linux/interrupt.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- #include <linux/numa.h>
- 
- #include <asm/page.h>
-diff --git a/arch/sparc/kernel/time_32.c b/arch/sparc/kernel/time_32.c
-index 958c2cf4479b..08bbdc458596 100644
---- a/arch/sparc/kernel/time_32.c
-+++ b/arch/sparc/kernel/time_32.c
-@@ -33,7 +33,6 @@
- #include <linux/ioport.h>
- #include <linux/profile.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/platform_device.h>
- 
- #include <asm/mc146818rtc.h>
-diff --git a/arch/sparc/mm/io-unit.c b/arch/sparc/mm/io-unit.c
-index 133dd42570d6..d8376f61b4d0 100644
---- a/arch/sparc/mm/io-unit.c
-+++ b/arch/sparc/mm/io-unit.c
-@@ -13,7 +13,8 @@
- #include <linux/bitops.h>
- #include <linux/dma-map-ops.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/io.h>
- #include <asm/io-unit.h>
-diff --git a/arch/sparc/mm/iommu.c b/arch/sparc/mm/iommu.c
-index 3a6caef68348..5a5080db800f 100644
---- a/arch/sparc/mm/iommu.c
-+++ b/arch/sparc/mm/iommu.c
-@@ -7,14 +7,15 @@
-  * Copyright (C) 1996 Eddie C. Dost    (ecd@skynet.be)
-  * Copyright (C) 1997,1998 Jakub Jelinek    (jj@sunsite.mff.cuni.cz)
-  */
-- 
-+
- #include <linux/kernel.h>
- #include <linux/init.h>
- #include <linux/mm.h>
- #include <linux/slab.h>
- #include <linux/dma-map-ops.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
- 
- #include <asm/io.h>
- #include <asm/mxcc.h>
--- 
-2.40.1
+Hey Heiko,
 
+On Tue, Jul 11, 2023 at 05:37:35PM +0200, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+>=20
+> Add detection for some extensions of the vector-crypto specification:
+> - Zvkb: Vector Bit-manipulation used in Cryptography
+> - Zvkg: Vector GCM/GMAC
+> - Zvknha and Zvknhb: NIST Algorithm Suite
+> - Zvkns: AES-128, AES-256 Single Round Suite
+> - Zvksed: ShangMi Algorithm Suite
+> - Zvksh: ShangMi Algorithm Suite
+>=20
+> As their use is very specific and will likely be limited to special places
+> we expect current code to just pre-encode those instructions, so right now
+> we don't introduce toolchain requirements.
+>=20
+> Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> ---
+>  arch/riscv/include/asm/hwcap.h |  9 ++++++
+>  arch/riscv/kernel/cpu.c        |  8 ++++++
+>  arch/riscv/kernel/cpufeature.c | 50 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 67 insertions(+)
+>=20
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwca=
+p.h
+> index b80ca6e77088..0f5172fa87b0 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -64,6 +64,15 @@
+>  #define RISCV_ISA_EXT_ZKSED		51
+>  #define RISCV_ISA_EXT_ZKSH		52
+>  #define RISCV_ISA_EXT_ZKT		53
+> +#define RISCV_ISA_EXT_ZVBB		54
+> +#define RISCV_ISA_EXT_ZVBC		55
+> +#define RISCV_ISA_EXT_ZVKG		56
+> +#define RISCV_ISA_EXT_ZVKNED		57
+> +#define RISCV_ISA_EXT_ZVKNHA		58
+> +#define RISCV_ISA_EXT_ZVKNHB		59
+> +#define RISCV_ISA_EXT_ZVKSED		60
+> +#define RISCV_ISA_EXT_ZVKSH		61
+> +#define RISCV_ISA_EXT_ZVKT		62
+> =20
+>  #define RISCV_ISA_EXT_MAX		64
+>  #define RISCV_ISA_EXT_NAME_LEN_MAX	32
+> diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
+> index 10524322a4c0..925241e25db2 100644
+> --- a/arch/riscv/kernel/cpu.c
+> +++ b/arch/riscv/kernel/cpu.c
+> @@ -227,6 +227,14 @@ static struct riscv_isa_ext_data isa_ext_arr[] =3D {
+>  	__RISCV_ISA_EXT_DATA(zksed, RISCV_ISA_EXT_ZKSED),
+>  	__RISCV_ISA_EXT_DATA(zksh, RISCV_ISA_EXT_ZKSH),
+>  	__RISCV_ISA_EXT_DATA(zkt, RISCV_ISA_EXT_ZKT),
+> +	__RISCV_ISA_EXT_DATA(zvbb, RISCV_ISA_EXT_ZVBB),
+> +	__RISCV_ISA_EXT_DATA(zvbc, RISCV_ISA_EXT_ZVBC),
+> +	__RISCV_ISA_EXT_DATA(zvkg, RISCV_ISA_EXT_ZVKG),
+> +	__RISCV_ISA_EXT_DATA(zvkned, RISCV_ISA_EXT_ZVKNED),
+> +	__RISCV_ISA_EXT_DATA(zvknha, RISCV_ISA_EXT_ZVKNHA),
+> +	__RISCV_ISA_EXT_DATA(zvknhb, RISCV_ISA_EXT_ZVKNHB),
+> +	__RISCV_ISA_EXT_DATA(zvksed, RISCV_ISA_EXT_ZVKSED),
+> +	__RISCV_ISA_EXT_DATA(zvksh, RISCV_ISA_EXT_ZVKSH),
+>  	__RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
+>  	__RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
+>  	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeatur=
+e.c
+> index 9a872a2007a5..13556fd16bf6 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -343,6 +343,56 @@ void __init riscv_fill_hwcap(void)
+
+All of these need to be documented in dt-bindings.
+
+At least one of these lists will go away iff Palmer merges my rework of
+this stuff & hopefully we'll get one of the ways to avoid repeating the
+SET_ISA_EXT_MAP stuff ad nauseam.
+
+Cheers,
+Conor.
+
+--N/lcl/YjF4hhSyY+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZLan3QAKCRB4tDGHoIJi
+0nR6AQD+C1pKTvPcCyHR4byAsK4aADmAqre/etI69jkZYRvW0AD9FZrbcgUCbpyE
+/zlL/+i+mICAk4upff5+MFvKZxM6QQE=
+=1eeh
+-----END PGP SIGNATURE-----
+
+--N/lcl/YjF4hhSyY+--
