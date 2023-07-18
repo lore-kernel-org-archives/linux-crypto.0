@@ -2,77 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EEAC0015E
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 14:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20578C001DE
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 19:06:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232807AbjGRO4a convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 10:56:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40680 "EHLO
+        id S229636AbjGRTGl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 15:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230518AbjGRO4a (ORCPT
+        with ESMTP id S229504AbjGRTGl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 10:56:30 -0400
-Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04359B5;
-        Tue, 18 Jul 2023 07:56:26 -0700 (PDT)
-Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
-          by outpost.zedat.fu-berlin.de (Exim 4.95)
-          with esmtps (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@zedat.fu-berlin.de>)
-          id 1qLm7V-000wcH-MK; Tue, 18 Jul 2023 16:56:09 +0200
-Received: from p57bd98fd.dip0.t-ipconnect.de ([87.189.152.253] helo=[192.168.178.81])
-          by inpost2.zedat.fu-berlin.de (Exim 4.95)
-          with esmtpsa (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@physik.fu-berlin.de>)
-          id 1qLm7V-002uyA-Eu; Tue, 18 Jul 2023 16:56:09 +0200
-Message-ID: <6e037c2051816deaa0e4361c4fb517ba7d33dc0b.camel@physik.fu-berlin.de>
+        Tue, 18 Jul 2023 15:06:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1B8F4;
+        Tue, 18 Jul 2023 12:06:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DDD00616C7;
+        Tue, 18 Jul 2023 19:06:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4576AC433C8;
+        Tue, 18 Jul 2023 19:06:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689707199;
+        bh=6AXogDUObuussgbwgLBOjpBMuZcG50s+2gM5QKLJIqg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=iaLVsbZAR/GfygYGkBHWzIMBF7N1x8Nr8LGivpj1n+JZWnZ+nGsTPk67WqJIjihQK
+         OE7DGc6RD80/KIKre86+t4lqPxliDquvH/5QHfClJ9ab0c7O8U8PgGMMhsjA0jhwsm
+         K0mF1ux8h13VYVw4LcCGKKi1psKXfCwFmIzReE1e0EydCrdroXovIV4kkPYSmWvQiF
+         LIGp2ScDbmqglOoT5ao83vh0Q17Ln7oAEyUP9/QT+pNN09ieItiumdSqwoYlji8nrb
+         P3PDgeAwFLJ20zbG5JyE8wIV38OS9aWwMq+XQwTEHbhb+Dg0HvK0nZs5iABOiH6K9X
+         qHML4IOBzvnyg==
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4fb5bcb9a28so9752400e87.3;
+        Tue, 18 Jul 2023 12:06:39 -0700 (PDT)
+X-Gm-Message-State: ABy/qLZv+TSeF5nE28BlnfiWwmNQ4FE8Rubkp62f8uNNxTV/PPSa+93e
+        0E/f/KA55CROql7TfoXM1fQGNKzAZHuwr6UDOA==
+X-Google-Smtp-Source: APBJJlGB0bgDqyP6XJYTdEPy8Mz0doXTrM6SRrUuM5btq//xema+oxLHuID3ymZr1d5lAuSQSbfnZ8Wrr107kQc+0p8=
+X-Received: by 2002:ac2:4c2c:0:b0:4f8:71cc:2b6e with SMTP id
+ u12-20020ac24c2c000000b004f871cc2b6emr10819539lfq.33.1689707197305; Tue, 18
+ Jul 2023 12:06:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230718143211.1066810-1-robh@kernel.org> <6e037c2051816deaa0e4361c4fb517ba7d33dc0b.camel@physik.fu-berlin.de>
+In-Reply-To: <6e037c2051816deaa0e4361c4fb517ba7d33dc0b.camel@physik.fu-berlin.de>
+From:   Rob Herring <robh@kernel.org>
+Date:   Tue, 18 Jul 2023 13:06:25 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+vrAhG0FqqH-_rBtL2nEbJ+v=c3QfmjzOC=1A+Qi3KdQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+vrAhG0FqqH-_rBtL2nEbJ+v=c3QfmjzOC=1A+Qi3KdQ@mail.gmail.com>
 Subject: Re: [PATCH v2] sparc: Explicitly include correct DT includes
-From:   John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-To:     Rob Herring <robh@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     devicetree@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>,
+To:     John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>,
         linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Tue, 18 Jul 2023 16:56:08 +0200
-In-Reply-To: <20230718143211.1066810-1-robh@kernel.org>
-References: <20230718143211.1066810-1-robh@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.48.4 
-MIME-Version: 1.0
-X-Original-Sender: glaubitz@physik.fu-berlin.de
-X-Originating-IP: 87.189.152.253
-X-ZEDAT-Hint: PO
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rob!
+On Tue, Jul 18, 2023 at 8:56=E2=80=AFAM John Paul Adrian Glaubitz
+<glaubitz@physik.fu-berlin.de> wrote:
+>
+> Hi Rob!
+>
+> On Tue, 2023-07-18 at 08:32 -0600, Rob Herring wrote:
+> > The DT of_device.h and of_platform.h date back to the separate
+> > of_platform_bus_type before it as merged into the regular platform bus.
+> > As part of that merge prepping Arm DT support 13 years ago, they
+> > "temporarily" include each other. They also include platform_device.h
+> > and of.h. As a result, there's a pretty much random mix of those includ=
+e
+> > files used throughout the tree. In order to detangle these headers and
+> > replace the implicit includes with struct declarations, users need to
+> > explicitly include the correct includes.
+>
+> I would suggest rephrasing the subject to
+>
+>         sparc: Explicitly include correct DT headers
+>
+> as " ... include ... includes" sounds a bit awkward ;-).
 
-On Tue, 2023-07-18 at 08:32 -0600, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
+Probably would have been better, but there's ~100 other patches with
+the same subject. Some of those have been applied already.
 
-I would suggest rephrasing the subject to
-
-	sparc: Explicitly include correct DT headers
-
-as " ... include ... includes" sounds a bit awkward ;-).
-
-Adrian
-
--- 
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer
-`. `'   Physicist
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
+Rob
