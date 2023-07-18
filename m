@@ -2,324 +2,566 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E94C001DC
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 13:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B99C001DC
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 14:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231543AbjGRNDU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 09:03:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40380 "EHLO
+        id S233282AbjGROdR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 10:33:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232488AbjGRNCu (ORCPT
+        with ESMTP id S233343AbjGROc4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:02:50 -0400
+        Tue, 18 Jul 2023 10:32:56 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E019D212F;
-        Tue, 18 Jul 2023 06:01:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ACE61FED;
+        Tue, 18 Jul 2023 07:32:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 31C0B614FB;
-        Tue, 18 Jul 2023 13:01:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1ECC433C7;
-        Tue, 18 Jul 2023 13:01:03 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 831DC615FD;
+        Tue, 18 Jul 2023 14:32:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66DBBC433C7;
+        Tue, 18 Jul 2023 14:32:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689685268;
-        bh=pBS4evmuojvGZNpkpvZA6FWxaaRdlIHQ6sTGa/XNWCs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GAgLfbJOtr+4I7rn52XFmVGRiSEZGY7xOoxXJ1EQxCHe8l/oD5LehpTXCm3JdU8ET
-         00euiRXw07Qk3I4eEEdfmMMjTsSPj2ml/HIpJxGiPqIQrY14+lOMg2eLmflyiEB6Dq
-         375ucDgl6JZJKZwqAQOJ4H1ZjCdq7n20z4QrRVb0Pb3ms7M/rRB5Hq3VfKVdi2+QWD
-         ygHX4ro1tUjT04KIb23Tj92+dxSmjILwUZng92A1L7nibXGC2cKf03Nwf+VJQCSna8
-         2Of8CuSbkv+f6mVIZm433GfUcB2FXO3yZKza0xpOc1TWl8OJhk1XlMee6YU++ijUqC
-         5L4T/+H8ExINw==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: [RFC PATCH 21/21] crypto: scompress - Drop the use of per-cpu scratch buffers
-Date:   Tue, 18 Jul 2023 14:58:47 +0200
-Message-Id: <20230718125847.3869700-22-ardb@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230718125847.3869700-1-ardb@kernel.org>
-References: <20230718125847.3869700-1-ardb@kernel.org>
+        s=k20201202; t=1689690736;
+        bh=CvXNh/V0SLE1LcnbZrcODS7C8vIG914MVnRAYa+fhbA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=KJkN9kUC3OUuf2US9ZpB+uKJtFSYZ69Pk1Us/bpaP5enqoSe/pTOTHBbbg3Y34A/b
+         oa8fFhSXONO+2nDRLX+2UtccmAsMcUuYnF+t84U6SdfRJjjrq+/lbfavJVgYtabQyQ
+         TTbQQiJuIuhTNv1doSXLVR9iPq2urJlDK4Dje/ssd5uSZwOU55ps9rSQgFfCwIYPL3
+         snsM+Ge6q847oNM0qsKoZjV7WqCMng6tHozKkf81Ru8Fi8BVvmuPck/c6Bbm92NbRs
+         HSVwfl7IMxye4VxWQuUQvSMEIEwuRUyoLNhXu8d2jotzigKmYUEHt8zQNhh7OnlESo
+         lN+NOtU3GjODw==
+Received: (nullmailer pid 1066942 invoked by uid 1000);
+        Tue, 18 Jul 2023 14:32:14 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     devicetree@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>,
+        linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] sparc: Explicitly include correct DT includes
+Date:   Tue, 18 Jul 2023 08:32:08 -0600
+Message-Id: <20230718143211.1066810-1-robh@kernel.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7664; i=ardb@kernel.org; h=from:subject; bh=pBS4evmuojvGZNpkpvZA6FWxaaRdlIHQ6sTGa/XNWCs=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIWVbT3tLmkjv/s0bnUUz6+YWqHyfYPrt30PrH4wvXi9gu zB/Y2xYRykLgxgHg6yYIovA7L/vdp6eKFXrPEsWZg4rE8gQBi5OAZiIRz7DX9kVFbWr6oI67P7v F1mXlcX/zKa5g+2W38JQdYu2A2ZBpxkZrpf3PBfVDpm+YdPJA28zyi5tefKQvYLzLLfrcyn7Rsa DLAA=
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The scomp to acomp adaptation layer allocates 256k of scratch buffers
-per CPU in order to be able to present the input provided by the caller
-via scatterlists as linear byte arrays to the underlying synchronous
-compression drivers, most of which are thin wrappers around the various
-compression algorithm library implementations we have in the kernel.
+The DT of_device.h and of_platform.h date back to the separate
+of_platform_bus_type before it as merged into the regular platform bus.
+As part of that merge prepping Arm DT support 13 years ago, they
+"temporarily" include each other. They also include platform_device.h
+and of.h. As a result, there's a pretty much random mix of those include
+files used throughout the tree. In order to detangle these headers and
+replace the implicit includes with struct declarations, users need to
+explicitly include the correct includes.
 
-This sucks. With high core counts and SMT, this easily adds up to
-multiple megabytes that are permanently tied up for this purpose, and
-given that all acomp users pass either single pages or contiguous
-buffers in lowmem, we can optimize for this pattern and just pass the
-buffer directly if we can. This removes the need for scratch buffers,
-and along with it, the arbitrary 128k upper bound on the input and
-output size of the acomp API when the implementation happens to be scomp
-based.
-
-So add a scomp_map_sg() helper to try and obtain the virtual addresses
-associated with the scatterlists, which is guaranteed to be successful
-100% of the time given the existing users, which all fit the prerequisite
-pattern. And as a fallback for other cases, use kvmalloc with GFP_KERNEL
-to allocate buffers on the fly and free them again right after.
-
-This puts the burden on future callers to either use a contiguous
-buffer, or deal with the potentially blocking nature of GFP_KERNEL.
-For IPcomp in particular, the only relevant compression algorithm is
-'deflate' which is no longer implemented as an scomp, and so this change
-will not affect it even if we decide to convert it to take advantage of
-the ability to pass discontiguous scatterlists.
-
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- crypto/scompress.c                  | 159 ++++++++++----------
- include/crypto/internal/scompress.h |   2 -
- 2 files changed, 76 insertions(+), 85 deletions(-)
+v2:
+- Fix double include of of.h
+---
+ arch/sparc/crypto/crop_devid.c       | 2 +-
+ arch/sparc/include/asm/floppy_32.h   | 2 +-
+ arch/sparc/include/asm/floppy_64.h   | 2 +-
+ arch/sparc/include/asm/parport.h     | 3 ++-
+ arch/sparc/kernel/apc.c              | 2 +-
+ arch/sparc/kernel/auxio_32.c         | 1 -
+ arch/sparc/kernel/auxio_64.c         | 3 ++-
+ arch/sparc/kernel/central.c          | 2 +-
+ arch/sparc/kernel/chmc.c             | 3 ++-
+ arch/sparc/kernel/ioport.c           | 2 +-
+ arch/sparc/kernel/leon_kernel.c      | 2 --
+ arch/sparc/kernel/leon_pci.c         | 3 ++-
+ arch/sparc/kernel/leon_pci_grpci1.c  | 3 ++-
+ arch/sparc/kernel/leon_pci_grpci2.c  | 4 +++-
+ arch/sparc/kernel/of_device_32.c     | 1 +
+ arch/sparc/kernel/of_device_64.c     | 3 ++-
+ arch/sparc/kernel/of_device_common.c | 4 ++--
+ arch/sparc/kernel/pci.c              | 3 ++-
+ arch/sparc/kernel/pci_common.c       | 3 ++-
+ arch/sparc/kernel/pci_fire.c         | 3 ++-
+ arch/sparc/kernel/pci_impl.h         | 1 -
+ arch/sparc/kernel/pci_msi.c          | 2 ++
+ arch/sparc/kernel/pci_psycho.c       | 4 +++-
+ arch/sparc/kernel/pci_sun4v.c        | 3 ++-
+ arch/sparc/kernel/pmc.c              | 2 +-
+ arch/sparc/kernel/power.c            | 3 ++-
+ arch/sparc/kernel/prom_irqtrans.c    | 1 +
+ arch/sparc/kernel/psycho_common.c    | 1 +
+ arch/sparc/kernel/sbus.c             | 3 ++-
+ arch/sparc/kernel/time_32.c          | 1 -
+ arch/sparc/mm/io-unit.c              | 3 ++-
+ arch/sparc/mm/iommu.c                | 5 +++--
+ 32 files changed, 49 insertions(+), 31 deletions(-)
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 3155cdce9116e092..1c050aa864bd604d 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -18,24 +18,11 @@
- #include <linux/seq_file.h>
- #include <linux/slab.h>
+diff --git a/arch/sparc/crypto/crop_devid.c b/arch/sparc/crypto/crop_devid.c
+index 83fc4536dcd5..93f4e0fdd38c 100644
+--- a/arch/sparc/crypto/crop_devid.c
++++ b/arch/sparc/crypto/crop_devid.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+-#include <linux/of_device.h>
+ 
+ /* This is a dummy device table linked into all of the crypto
+  * opcode drivers.  It serves to trigger the module autoloading
+diff --git a/arch/sparc/include/asm/floppy_32.h b/arch/sparc/include/asm/floppy_32.h
+index e10ab9ad3097..836f6575aa1d 100644
+--- a/arch/sparc/include/asm/floppy_32.h
++++ b/arch/sparc/include/asm/floppy_32.h
+@@ -8,7 +8,7 @@
+ #define __ASM_SPARC_FLOPPY_H
+ 
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
+ #include <linux/pgtable.h>
+ 
+ #include <asm/idprom.h>
+diff --git a/arch/sparc/include/asm/floppy_64.h b/arch/sparc/include/asm/floppy_64.h
+index 070c8c1f5c8f..6efeb24b0a92 100644
+--- a/arch/sparc/include/asm/floppy_64.h
++++ b/arch/sparc/include/asm/floppy_64.h
+@@ -11,7 +11,7 @@
+ #define __ASM_SPARC64_FLOPPY_H
+ 
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
+ #include <linux/dma-mapping.h>
+ 
+ #include <asm/auxio.h>
+diff --git a/arch/sparc/include/asm/parport.h b/arch/sparc/include/asm/parport.h
+index 03b27090c0c8..0a7ffcfd59cd 100644
+--- a/arch/sparc/include/asm/parport.h
++++ b/arch/sparc/include/asm/parport.h
+@@ -7,7 +7,8 @@
+ #ifndef _ASM_SPARC64_PARPORT_H
+ #define _ASM_SPARC64_PARPORT_H 1
+ 
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/ebus_dma.h>
+ #include <asm/ns87303.h>
+diff --git a/arch/sparc/kernel/apc.c b/arch/sparc/kernel/apc.c
+index ecd05bc0a104..d44725d37e30 100644
+--- a/arch/sparc/kernel/apc.c
++++ b/arch/sparc/kernel/apc.c
+@@ -13,7 +13,7 @@
+ #include <linux/miscdevice.h>
+ #include <linux/pm.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/platform_device.h>
+ #include <linux/module.h>
+ 
+ #include <asm/io.h>
+diff --git a/arch/sparc/kernel/auxio_32.c b/arch/sparc/kernel/auxio_32.c
+index a32d588174f2..989860e890c4 100644
+--- a/arch/sparc/kernel/auxio_32.c
++++ b/arch/sparc/kernel/auxio_32.c
+@@ -8,7 +8,6 @@
+ #include <linux/init.h>
+ #include <linux/spinlock.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/export.h>
+ 
+ #include <asm/oplib.h>
+diff --git a/arch/sparc/kernel/auxio_64.c b/arch/sparc/kernel/auxio_64.c
+index 774a82b0c649..2a2800d21325 100644
+--- a/arch/sparc/kernel/auxio_64.c
++++ b/arch/sparc/kernel/auxio_64.c
+@@ -10,7 +10,8 @@
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+ #include <linux/ioport.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/prom.h>
+ #include <asm/io.h>
+diff --git a/arch/sparc/kernel/central.c b/arch/sparc/kernel/central.c
+index 23f8838dd96e..a1a6485c9183 100644
+--- a/arch/sparc/kernel/central.c
++++ b/arch/sparc/kernel/central.c
+@@ -10,7 +10,7 @@
+ #include <linux/export.h>
  #include <linux/string.h>
--#include <linux/vmalloc.h>
- #include <net/netlink.h>
+ #include <linux/init.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
  
- #include "compress.h"
+ #include <asm/fhc.h>
+diff --git a/arch/sparc/kernel/chmc.c b/arch/sparc/kernel/chmc.c
+index 6ff43df740e0..d5fad5fb04c1 100644
+--- a/arch/sparc/kernel/chmc.c
++++ b/arch/sparc/kernel/chmc.c
+@@ -15,7 +15,8 @@
+ #include <linux/errno.h>
+ #include <linux/init.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ #include <asm/spitfire.h>
+ #include <asm/chmctrl.h>
+ #include <asm/cpudata.h>
+diff --git a/arch/sparc/kernel/ioport.c b/arch/sparc/kernel/ioport.c
+index a8cbe403301f..5ebca5c7af1e 100644
+--- a/arch/sparc/kernel/ioport.c
++++ b/arch/sparc/kernel/ioport.c
+@@ -39,7 +39,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/scatterlist.h>
+ #include <linux/dma-map-ops.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
  
--struct scomp_scratch {
--	spinlock_t	lock;
--	void		*src;
--	void		*dst;
--};
--
--static DEFINE_PER_CPU(struct scomp_scratch, scomp_scratch) = {
--	.lock = __SPIN_LOCK_UNLOCKED(scomp_scratch.lock),
--};
--
- static const struct crypto_type crypto_scomp_type;
--static int scomp_scratch_users;
--static DEFINE_MUTEX(scomp_lock);
+ #include <asm/io.h>
+ #include <asm/vaddrs.h>
+diff --git a/arch/sparc/kernel/leon_kernel.c b/arch/sparc/kernel/leon_kernel.c
+index 39229940d725..4c61da491fee 100644
+--- a/arch/sparc/kernel/leon_kernel.c
++++ b/arch/sparc/kernel/leon_kernel.c
+@@ -8,9 +8,7 @@
+ #include <linux/errno.h>
+ #include <linux/mutex.h>
+ #include <linux/of.h>
+-#include <linux/of_platform.h>
+ #include <linux/interrupt.h>
+-#include <linux/of_device.h>
+ #include <linux/clocksource.h>
+ #include <linux/clockchips.h>
  
- static int __maybe_unused crypto_scomp_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
-@@ -58,56 +45,45 @@ static void crypto_scomp_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_puts(m, "type         : scomp\n");
- }
+diff --git a/arch/sparc/kernel/leon_pci.c b/arch/sparc/kernel/leon_pci.c
+index b6663a3fbae9..8de6646e9ce8 100644
+--- a/arch/sparc/kernel/leon_pci.c
++++ b/arch/sparc/kernel/leon_pci.c
+@@ -7,7 +7,8 @@
+  * Code is partially derived from pcic.c
+  */
  
--static void crypto_scomp_free_scratches(void)
--{
--	struct scomp_scratch *scratch;
--	int i;
--
--	for_each_possible_cpu(i) {
--		scratch = per_cpu_ptr(&scomp_scratch, i);
--
--		vfree(scratch->src);
--		vfree(scratch->dst);
--		scratch->src = NULL;
--		scratch->dst = NULL;
--	}
--}
--
--static int crypto_scomp_alloc_scratches(void)
--{
--	struct scomp_scratch *scratch;
--	int i;
--
--	for_each_possible_cpu(i) {
--		void *mem;
--
--		scratch = per_cpu_ptr(&scomp_scratch, i);
--
--		mem = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
--		if (!mem)
--			goto error;
--		scratch->src = mem;
--		mem = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
--		if (!mem)
--			goto error;
--		scratch->dst = mem;
--	}
--	return 0;
--error:
--	crypto_scomp_free_scratches();
--	return -ENOMEM;
--}
--
- static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- {
--	int ret = 0;
-+	return 0;
-+}
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ #include <linux/kernel.h>
+ #include <linux/pci.h>
+ #include <linux/export.h>
+diff --git a/arch/sparc/kernel/leon_pci_grpci1.c b/arch/sparc/kernel/leon_pci_grpci1.c
+index e6935d0ac1ec..8700a0e3b0df 100644
+--- a/arch/sparc/kernel/leon_pci_grpci1.c
++++ b/arch/sparc/kernel/leon_pci_grpci1.c
+@@ -13,10 +13,11 @@
+  * Contributors: Daniel Hellstrom <daniel@gaisler.com>
+  */
  
--	mutex_lock(&scomp_lock);
--	if (!scomp_scratch_users++)
--		ret = crypto_scomp_alloc_scratches();
--	mutex_unlock(&scomp_lock);
-+/**
-+ * scomp_map_sg - Return virtual address of memory described by a scatterlist
-+ *
-+ * @sg:		The address of the scatterlist in memory
-+ * @len:	The length of the buffer described by the scatterlist
-+ *
-+ * If the memory region described by scatterlist @sg consists of @len
-+ * contiguous bytes in memory and is accessible via the linear mapping or via a
-+ * single kmap(), return its virtual address.  Otherwise, return NULL.
-+ */
-+static void *scomp_map_sg(struct scatterlist *sg, unsigned int len)
-+{
-+	struct page *page;
-+	unsigned int offset;
+-#include <linux/of_device.h>
+ #include <linux/export.h>
+ #include <linux/kernel.h>
++#include <linux/of.h>
+ #include <linux/of_irq.h>
++#include <linux/platform_device.h>
+ #include <linux/delay.h>
+ #include <linux/pci.h>
  
--	return ret;
-+	while (sg_is_chain(sg))
-+		sg = sg_next(sg);
+diff --git a/arch/sparc/kernel/leon_pci_grpci2.c b/arch/sparc/kernel/leon_pci_grpci2.c
+index ca22f93d9045..60b6bdf7761f 100644
+--- a/arch/sparc/kernel/leon_pci_grpci2.c
++++ b/arch/sparc/kernel/leon_pci_grpci2.c
+@@ -6,12 +6,14 @@
+  *
+  */
+ 
+-#include <linux/of_device.h>
+ #include <linux/kernel.h>
+ #include <linux/pci.h>
+ #include <linux/slab.h>
+ #include <linux/delay.h>
+ #include <linux/export.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
 +
-+	if (!sg || sg_nents_for_len(sg, len) != 1)
-+		return NULL;
-+
-+	page   = sg_page(sg) + (sg->offset >> PAGE_SHIFT);
-+	offset = offset_in_page(sg->offset);
-+
-+	if (PageHighMem(page) && (offset + sg->length) > PAGE_SIZE)
-+		return NULL;
-+
-+	return kmap_local_page(page) + offset;
-+}
-+
-+static void scomp_unmap_sg(const void *addr)
-+{
-+	if (is_kmap_addr(addr))
-+		kunmap_local(addr);
- }
+ #include <asm/io.h>
+ #include <asm/leon.h>
+ #include <asm/vaddrs.h>
+diff --git a/arch/sparc/kernel/of_device_32.c b/arch/sparc/kernel/of_device_32.c
+index fa05b29fa051..06012e68bdca 100644
+--- a/arch/sparc/kernel/of_device_32.c
++++ b/arch/sparc/kernel/of_device_32.c
+@@ -8,6 +8,7 @@
+ #include <linux/errno.h>
+ #include <linux/irq.h>
+ #include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ #include <linux/dma-mapping.h>
+ #include <asm/leon.h>
+ #include <asm/leon_amba.h>
+diff --git a/arch/sparc/kernel/of_device_64.c b/arch/sparc/kernel/of_device_64.c
+index c41aa82a9af3..d3842821a5a0 100644
+--- a/arch/sparc/kernel/of_device_64.c
++++ b/arch/sparc/kernel/of_device_64.c
+@@ -1,7 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+-#include <linux/of.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/init.h>
+ #include <linux/export.h>
+@@ -9,7 +8,9 @@
+ #include <linux/slab.h>
+ #include <linux/errno.h>
+ #include <linux/irq.h>
++#include <linux/of.h>
+ #include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ #include <asm/spitfire.h>
  
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
-@@ -116,30 +92,52 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	void **tfm_ctx = acomp_tfm_ctx(tfm);
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
--	struct scomp_scratch *scratch;
-+	void *src_alloc = NULL;
-+	void *dst_alloc = NULL;
-+	const u8 *src;
-+	u8 *dst;
- 	int ret;
+ #include "of_device_common.h"
+diff --git a/arch/sparc/kernel/of_device_common.c b/arch/sparc/kernel/of_device_common.c
+index 60f86b837658..ba2a6ae23508 100644
+--- a/arch/sparc/kernel/of_device_common.c
++++ b/arch/sparc/kernel/of_device_common.c
+@@ -1,15 +1,15 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+-#include <linux/of.h>
+ #include <linux/export.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/errno.h>
+ #include <linux/irq.h>
++#include <linux/of.h>
+ #include <linux/of_platform.h>
+ #include <linux/of_address.h>
+-#include <linux/of_device.h>
+ #include <linux/of_irq.h>
++#include <linux/platform_device.h>
  
--	if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
-+	if (!req->src || !req->slen || !req->dst || !req->dlen)
- 		return -EINVAL;
+ #include "of_device_common.h"
  
--	if (!req->dst || !req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
--		return -EINVAL;
--
--	scratch = raw_cpu_ptr(&scomp_scratch);
--	spin_lock(&scratch->lock);
--
--	scatterwalk_map_and_copy(scratch->src, req->src, 0, req->slen, 0);
--	if (dir)
--		ret = crypto_scomp_compress(scomp, scratch->src, req->slen,
--					    scratch->dst, &req->dlen, *ctx);
--	else
--		ret = crypto_scomp_decompress(scomp, scratch->src, req->slen,
--					      scratch->dst, &req->dlen, *ctx);
--	if (!ret) {
--		scatterwalk_map_and_copy(scratch->dst, req->dst, 0, req->dlen,
--					 1);
-+	dst = scomp_map_sg(req->dst, req->dlen);
-+	if (!dst) {
-+		dst = dst_alloc = kvmalloc(req->dlen, GFP_KERNEL);
-+		if (!dst_alloc)
-+			return -ENOMEM;
- 	}
--	spin_unlock(&scratch->lock);
+diff --git a/arch/sparc/kernel/pci.c b/arch/sparc/kernel/pci.c
+index a948a49817c7..f66005ce4cb5 100644
+--- a/arch/sparc/kernel/pci.c
++++ b/arch/sparc/kernel/pci.c
+@@ -20,8 +20,9 @@
+ #include <linux/irq.h>
+ #include <linux/init.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
+ #include <linux/pgtable.h>
++#include <linux/platform_device.h>
+ 
+ #include <linux/uaccess.h>
+ #include <asm/irq.h>
+diff --git a/arch/sparc/kernel/pci_common.c b/arch/sparc/kernel/pci_common.c
+index 4759ccd542fe..5eeec9ad6845 100644
+--- a/arch/sparc/kernel/pci_common.c
++++ b/arch/sparc/kernel/pci_common.c
+@@ -8,7 +8,8 @@
+ #include <linux/slab.h>
+ #include <linux/pci.h>
+ #include <linux/device.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/prom.h>
+ #include <asm/oplib.h>
+diff --git a/arch/sparc/kernel/pci_fire.c b/arch/sparc/kernel/pci_fire.c
+index 0ca08d455e80..0b91bde80fdc 100644
+--- a/arch/sparc/kernel/pci_fire.c
++++ b/arch/sparc/kernel/pci_fire.c
+@@ -10,7 +10,8 @@
+ #include <linux/msi.h>
+ #include <linux/export.h>
+ #include <linux/irq.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ #include <linux/numa.h>
+ 
+ #include <asm/prom.h>
+diff --git a/arch/sparc/kernel/pci_impl.h b/arch/sparc/kernel/pci_impl.h
+index 4e3d15189fa9..f31761f51757 100644
+--- a/arch/sparc/kernel/pci_impl.h
++++ b/arch/sparc/kernel/pci_impl.h
+@@ -11,7 +11,6 @@
+ #include <linux/spinlock.h>
+ #include <linux/pci.h>
+ #include <linux/msi.h>
+-#include <linux/of_device.h>
+ #include <asm/io.h>
+ #include <asm/prom.h>
+ #include <asm/iommu.h>
+diff --git a/arch/sparc/kernel/pci_msi.c b/arch/sparc/kernel/pci_msi.c
+index 9ed11985768e..fc7402948b7b 100644
+--- a/arch/sparc/kernel/pci_msi.c
++++ b/arch/sparc/kernel/pci_msi.c
+@@ -5,6 +5,8 @@
+  */
+ #include <linux/kernel.h>
+ #include <linux/interrupt.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/irq.h>
+ 
+diff --git a/arch/sparc/kernel/pci_psycho.c b/arch/sparc/kernel/pci_psycho.c
+index f413371da387..1efc98305ec7 100644
+--- a/arch/sparc/kernel/pci_psycho.c
++++ b/arch/sparc/kernel/pci_psycho.c
+@@ -13,7 +13,9 @@
+ #include <linux/export.h>
+ #include <linux/slab.h>
+ #include <linux/interrupt.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/iommu.h>
+ #include <asm/irq.h>
+diff --git a/arch/sparc/kernel/pci_sun4v.c b/arch/sparc/kernel/pci_sun4v.c
+index 7d91ca6aa675..c80b0a21d709 100644
+--- a/arch/sparc/kernel/pci_sun4v.c
++++ b/arch/sparc/kernel/pci_sun4v.c
+@@ -15,7 +15,8 @@
+ #include <linux/msi.h>
+ #include <linux/export.h>
+ #include <linux/log2.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ #include <linux/dma-map-ops.h>
+ #include <asm/iommu-common.h>
+ 
+diff --git a/arch/sparc/kernel/pmc.c b/arch/sparc/kernel/pmc.c
+index b5c1eb33b951..69a0206e56f0 100644
+--- a/arch/sparc/kernel/pmc.c
++++ b/arch/sparc/kernel/pmc.c
+@@ -11,7 +11,7 @@
+ #include <linux/init.h>
+ #include <linux/pm.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/platform_device.h>
+ #include <linux/module.h>
+ 
+ #include <asm/io.h>
+diff --git a/arch/sparc/kernel/power.c b/arch/sparc/kernel/power.c
+index 8147985a1dc4..db8a3f9e3d40 100644
+--- a/arch/sparc/kernel/power.c
++++ b/arch/sparc/kernel/power.c
+@@ -9,7 +9,8 @@
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/reboot.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/prom.h>
+ #include <asm/io.h>
+diff --git a/arch/sparc/kernel/prom_irqtrans.c b/arch/sparc/kernel/prom_irqtrans.c
+index 28aff1c524b5..426bd08cb2ab 100644
+--- a/arch/sparc/kernel/prom_irqtrans.c
++++ b/arch/sparc/kernel/prom_irqtrans.c
+@@ -4,6 +4,7 @@
+ #include <linux/init.h>
+ #include <linux/of.h>
+ #include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/oplib.h>
+ #include <asm/prom.h>
+diff --git a/arch/sparc/kernel/psycho_common.c b/arch/sparc/kernel/psycho_common.c
+index e90bcb6bad7f..5ee74b4c0cf4 100644
+--- a/arch/sparc/kernel/psycho_common.c
++++ b/arch/sparc/kernel/psycho_common.c
+@@ -6,6 +6,7 @@
+ #include <linux/kernel.h>
+ #include <linux/interrupt.h>
+ #include <linux/numa.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/upa.h>
+ 
+diff --git a/arch/sparc/kernel/sbus.c b/arch/sparc/kernel/sbus.c
+index 32141e1006c4..0bababf6f2bc 100644
+--- a/arch/sparc/kernel/sbus.c
++++ b/arch/sparc/kernel/sbus.c
+@@ -14,7 +14,8 @@
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ #include <linux/numa.h>
+ 
+ #include <asm/page.h>
+diff --git a/arch/sparc/kernel/time_32.c b/arch/sparc/kernel/time_32.c
+index 958c2cf4479b..08bbdc458596 100644
+--- a/arch/sparc/kernel/time_32.c
++++ b/arch/sparc/kernel/time_32.c
+@@ -33,7 +33,6 @@
+ #include <linux/ioport.h>
+ #include <linux/profile.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ 
+ #include <asm/mc146818rtc.h>
+diff --git a/arch/sparc/mm/io-unit.c b/arch/sparc/mm/io-unit.c
+index 133dd42570d6..d8376f61b4d0 100644
+--- a/arch/sparc/mm/io-unit.c
++++ b/arch/sparc/mm/io-unit.c
+@@ -13,7 +13,8 @@
+ #include <linux/bitops.h>
+ #include <linux/dma-map-ops.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ 
+ #include <asm/io.h>
+ #include <asm/io-unit.h>
+diff --git a/arch/sparc/mm/iommu.c b/arch/sparc/mm/iommu.c
+index 3a6caef68348..5a5080db800f 100644
+--- a/arch/sparc/mm/iommu.c
++++ b/arch/sparc/mm/iommu.c
+@@ -7,14 +7,15 @@
+  * Copyright (C) 1996 Eddie C. Dost    (ecd@skynet.be)
+  * Copyright (C) 1997,1998 Jakub Jelinek    (jj@sunsite.mff.cuni.cz)
+  */
+- 
 +
-+	src = scomp_map_sg(req->src, req->slen);
-+	if (!src) {
-+		src = src_alloc = kvmalloc(req->slen, GFP_KERNEL);
-+		if (!src_alloc) {
-+			ret = -ENOMEM;
-+			goto out;
-+		}
-+		scatterwalk_map_and_copy(src_alloc, req->src, 0, req->slen, 0);
-+	}
-+
-+	if (dir)
-+		ret = crypto_scomp_compress(scomp, src, req->slen, dst,
-+					    &req->dlen, *ctx);
-+	else
-+		ret = crypto_scomp_decompress(scomp, src, req->slen, dst,
-+					      &req->dlen, *ctx);
-+
-+	if (src_alloc)
-+		kvfree(src_alloc);
-+	else
-+		scomp_unmap_sg(src);
-+
-+	if (!ret && dst == dst_alloc)
-+		scatterwalk_map_and_copy(dst, req->dst, 0, req->dlen, 1);
-+out:
-+	if (dst_alloc)
-+		kvfree(dst_alloc);
-+	else
-+		scomp_unmap_sg(dst);
-+
- 	return ret;
- }
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+ #include <linux/mm.h>
+ #include <linux/slab.h>
+ #include <linux/dma-map-ops.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
  
-@@ -158,11 +156,6 @@ static void crypto_exit_scomp_ops_async(struct crypto_tfm *tfm)
- 	struct crypto_scomp **ctx = crypto_tfm_ctx(tfm);
- 
- 	crypto_free_scomp(*ctx);
--
--	mutex_lock(&scomp_lock);
--	if (!--scomp_scratch_users)
--		crypto_scomp_free_scratches();
--	mutex_unlock(&scomp_lock);
- }
- 
- int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 858fe3965ae347ef..69e593d72cbdaa99 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -12,8 +12,6 @@
- #include <crypto/acompress.h>
- #include <crypto/algapi.h>
- 
--#define SCOMP_SCRATCH_SIZE	131072
--
- struct acomp_req;
- 
- struct crypto_scomp {
+ #include <asm/io.h>
+ #include <asm/mxcc.h>
 -- 
-2.39.2
+2.40.1
 
