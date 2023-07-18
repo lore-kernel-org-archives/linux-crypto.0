@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A657EB64DD
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 13:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA02FEB64DC
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 13:03:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232417AbjGRNCl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 09:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
+        id S232563AbjGRNC4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 09:02:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232462AbjGRNBv (ORCPT
+        with ESMTP id S232560AbjGRNB6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 09:01:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3339B2100;
-        Tue, 18 Jul 2023 06:00:45 -0700 (PDT)
+        Tue, 18 Jul 2023 09:01:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB8441736;
+        Tue, 18 Jul 2023 06:00:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0751E61568;
-        Tue, 18 Jul 2023 13:00:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19995C433C8;
-        Tue, 18 Jul 2023 13:00:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 994B76157F;
+        Tue, 18 Jul 2023 13:00:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA35DC433C7;
+        Tue, 18 Jul 2023 13:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689685244;
-        bh=peXwgO2lyNmi+9SzG2/BdcMLN+f3eLd+y3jKWWgC8aQ=;
+        s=k20201202; t=1689685254;
+        bh=XPV4TqBofI5Mv/9FxSzW2w9wDpjRH3FBmnl+elNmQmI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TdkMaJKDTq+zIO7n8GZ1p6h2kCkWyoQVZH6lj/cGZHSgU+hRHEGX2iJAp83rnSOSw
-         7z9yGPVhvdymwCEL/bh89Q8SPgY4CGLXiUiwegZaO9RFiOtmVHD620zWrulzIqz5Fb
-         oq/U8LcSSgYAhLAOktz0OpCjr70/kOCmzLQ6DxPxetv6QlNyKsHj+iXub0jCsLR1Sm
-         IJDQqMIEunRPZAZFwtvCBglfCVX835YwoD6m9c1UhYZ7Kvl4djZ1iyX/sb4o3m+kkP
-         je/3k07aXFsZyASrqrqqy4HUICL9jUliyuYYU7ZL7rFU5X0e1s0NlXXKEc8+v7E88r
-         3gw+gyBOgIZzA==
+        b=ISjla2n56YlijkAfztYf+g/V55gbC1NwHuZxMobak7dzq1xFYwC2FOjLzG7BhGk39
+         WElaQlZCvERhLtfdZN6U1NTa89maaiB/EROatQGBz3Tf+2R0fxGm7Mz2CwC19whuMX
+         ujukHX5uc0QUGdmNauZEsgc+XRWigo+HTrRhHh/XQV3Lg2DIjDtQD7ngcClNZQzThu
+         Ko41ly0UE0C9pfmRdwaPFsb6Gf5mwmNkCbbova/2+c4P5r9ZHJoRynlewW/aQwNEdd
+         +wNcHpk9se26dAHR8lWvDp9i/MsFjfKPDw90Z4ePMA82jrNu75a/IUzbYcr5SjzBcx
+         Au5HmuXBKW+SQ==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
@@ -54,14 +54,14 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
         linux-mtd@lists.infradead.org, netdev@vger.kernel.org
-Subject: [RFC PATCH 16/21] crypto: zstd - drop obsolete 'comp' implementation
-Date:   Tue, 18 Jul 2023 14:58:42 +0200
-Message-Id: <20230718125847.3869700-17-ardb@kernel.org>
+Subject: [RFC PATCH 18/21] crypto: compress_null - drop obsolete 'comp' implementation
+Date:   Tue, 18 Jul 2023 14:58:44 +0200
+Message-Id: <20230718125847.3869700-19-ardb@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230718125847.3869700-1-ardb@kernel.org>
 References: <20230718125847.3869700-1-ardb@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3114; i=ardb@kernel.org; h=from:subject; bh=peXwgO2lyNmi+9SzG2/BdcMLN+f3eLd+y3jKWWgC8aQ=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIWVbT8NRrezVU4/VCR9T1G2en+U6PT268mNR7qltf/yWr W6dw1vRUcrCIMbBICumyCIw+++7nacnStU6z5KFmcPKBDKEgYtTACZysIDhD+duhXelu1kOWUzm bLrUfPHM98LuO2wvAxnCS2eFBF6LbGFkmFyxW636Xq/aoeVKTyexvWCOycrYJXNa+3NcRWVSweN 3LAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3053; i=ardb@kernel.org; h=from:subject; bh=XPV4TqBofI5Mv/9FxSzW2w9wDpjRH3FBmnl+elNmQmI=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIWVbT/O57bKCxz/9vLss0pfr+Jm/e61X1XTMfSsSULYue u/2p0xfOkpZGMQ4GGTFFFkEZv99t/P0RKla51myMHNYmUCGMHBxCsBE+MwY/odZ3Irasizr+IVT X0s6Prw8+Ytn0b/OLRkMdSdmL343SdCNkWHWzl16hVIP5jypnaLLdu2tadOnOdt63cPaO1PuCd/ ZfJQNAA==
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -73,115 +73,101 @@ implementation.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/zstd.c | 56 +-------------------
- 1 file changed, 1 insertion(+), 55 deletions(-)
+ crypto/crypto_null.c | 31 ++++----------------
+ crypto/testmgr.c     |  3 --
+ 2 files changed, 5 insertions(+), 29 deletions(-)
 
-diff --git a/crypto/zstd.c b/crypto/zstd.c
-index 154a969c83a82277..c6e6f135c5812c9c 100644
---- a/crypto/zstd.c
-+++ b/crypto/zstd.c
-@@ -121,13 +121,6 @@ static void *zstd_alloc_ctx(struct crypto_scomp *tfm)
- 	return ctx;
- }
+diff --git a/crypto/crypto_null.c b/crypto/crypto_null.c
+index 5b84b0f7cc178fcd..75e73b1d6df01cc6 100644
+--- a/crypto/crypto_null.c
++++ b/crypto/crypto_null.c
+@@ -24,16 +24,6 @@ static DEFINE_MUTEX(crypto_default_null_skcipher_lock);
+ static struct crypto_sync_skcipher *crypto_default_null_skcipher;
+ static int crypto_default_null_skcipher_refcnt;
  
--static int zstd_init(struct crypto_tfm *tfm)
--{
--	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	return __zstd_init(ctx);
--}
--
- static void __zstd_exit(void *ctx)
- {
- 	zstd_comp_exit(ctx);
-@@ -140,13 +133,6 @@ static void zstd_free_ctx(struct crypto_scomp *tfm, void *ctx)
- 	kfree_sensitive(ctx);
- }
- 
--static void zstd_exit(struct crypto_tfm *tfm)
--{
--	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	__zstd_exit(ctx);
--}
--
- static int __zstd_compress(const u8 *src, unsigned int slen,
- 			   u8 *dst, unsigned int *dlen, void *ctx)
- {
-@@ -161,14 +147,6 @@ static int __zstd_compress(const u8 *src, unsigned int slen,
- 	return 0;
- }
- 
--static int zstd_compress(struct crypto_tfm *tfm, const u8 *src,
+-static int null_compress(struct crypto_tfm *tfm, const u8 *src,
 -			 unsigned int slen, u8 *dst, unsigned int *dlen)
 -{
--	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	return __zstd_compress(src, slen, dst, dlen, ctx);
+-	if (slen > *dlen)
+-		return -EINVAL;
+-	memcpy(dst, src, slen);
+-	*dlen = slen;
+-	return 0;
 -}
 -
- static int zstd_scompress(struct crypto_scomp *tfm, const u8 *src,
- 			  unsigned int slen, u8 *dst, unsigned int *dlen,
- 			  void *ctx)
-@@ -189,14 +167,6 @@ static int __zstd_decompress(const u8 *src, unsigned int slen,
+ static int null_init(struct shash_desc *desc)
+ {
  	return 0;
- }
+@@ -121,7 +111,7 @@ static struct skcipher_alg skcipher_null = {
+ 	.decrypt		=	null_skcipher_crypt,
+ };
  
--static int zstd_decompress(struct crypto_tfm *tfm, const u8 *src,
--			   unsigned int slen, u8 *dst, unsigned int *dlen)
--{
--	struct zstd_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	return __zstd_decompress(src, slen, dst, dlen, ctx);
--}
--
- static int zstd_sdecompress(struct crypto_scomp *tfm, const u8 *src,
- 			    unsigned int slen, u8 *dst, unsigned int *dlen,
- 			    void *ctx)
-@@ -204,19 +174,6 @@ static int zstd_sdecompress(struct crypto_scomp *tfm, const u8 *src,
- 	return __zstd_decompress(src, slen, dst, dlen, ctx);
- }
+-static struct crypto_alg null_algs[] = { {
++static struct crypto_alg cipher_null = {
+ 	.cra_name		=	"cipher_null",
+ 	.cra_driver_name	=	"cipher_null-generic",
+ 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+@@ -134,19 +124,8 @@ static struct crypto_alg null_algs[] = { {
+ 	.cia_setkey		= 	null_setkey,
+ 	.cia_encrypt		=	null_crypt,
+ 	.cia_decrypt		=	null_crypt } }
+-}, {
+-	.cra_name		=	"compress_null",
+-	.cra_driver_name	=	"compress_null-generic",
+-	.cra_flags		=	CRYPTO_ALG_TYPE_COMPRESS,
+-	.cra_blocksize		=	NULL_BLOCK_SIZE,
+-	.cra_ctxsize		=	0,
+-	.cra_module		=	THIS_MODULE,
+-	.cra_u			=	{ .compress = {
+-	.coa_compress		=	null_compress,
+-	.coa_decompress		=	null_compress } }
+-} };
++};
  
--static struct crypto_alg alg = {
--	.cra_name		= "zstd",
--	.cra_driver_name	= "zstd-generic",
--	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct zstd_ctx),
--	.cra_module		= THIS_MODULE,
--	.cra_init		= zstd_init,
--	.cra_exit		= zstd_exit,
--	.cra_u			= { .compress = {
--	.coa_compress		= zstd_compress,
--	.coa_decompress		= zstd_decompress } }
--};
--
- static struct scomp_alg scomp = {
- 	.alloc_ctx		= zstd_alloc_ctx,
- 	.free_ctx		= zstd_free_ctx,
-@@ -231,22 +188,11 @@ static struct scomp_alg scomp = {
+-MODULE_ALIAS_CRYPTO("compress_null");
+ MODULE_ALIAS_CRYPTO("digest_null");
+ MODULE_ALIAS_CRYPTO("cipher_null");
  
- static int __init zstd_mod_init(void)
+@@ -189,7 +168,7 @@ static int __init crypto_null_mod_init(void)
  {
--	int ret;
--
--	ret = crypto_register_alg(&alg);
--	if (ret)
--		return ret;
--
--	ret = crypto_register_scomp(&scomp);
--	if (ret)
--		crypto_unregister_alg(&alg);
--
--	return ret;
-+	return crypto_register_scomp(&scomp);
+ 	int ret = 0;
+ 
+-	ret = crypto_register_algs(null_algs, ARRAY_SIZE(null_algs));
++	ret = crypto_register_alg(&cipher_null);
+ 	if (ret < 0)
+ 		goto out;
+ 
+@@ -206,14 +185,14 @@ static int __init crypto_null_mod_init(void)
+ out_unregister_shash:
+ 	crypto_unregister_shash(&digest_null);
+ out_unregister_algs:
+-	crypto_unregister_algs(null_algs, ARRAY_SIZE(null_algs));
++	crypto_unregister_alg(&cipher_null);
+ out:
+ 	return ret;
  }
  
- static void __exit zstd_mod_fini(void)
+ static void __exit crypto_null_mod_fini(void)
  {
--	crypto_unregister_alg(&alg);
- 	crypto_unregister_scomp(&scomp);
+-	crypto_unregister_algs(null_algs, ARRAY_SIZE(null_algs));
++	crypto_unregister_alg(&cipher_null);
+ 	crypto_unregister_shash(&digest_null);
+ 	crypto_unregister_skcipher(&skcipher_null);
  }
- 
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 4971351f55dbabb9..e4b6d67233763193 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4633,9 +4633,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.hash = __VECS(sm4_cmac128_tv_template)
+ 		}
+-	}, {
+-		.alg = "compress_null",
+-		.test = alg_test_null,
+ 	}, {
+ 		.alg = "crc32",
+ 		.test = alg_test_hash,
 -- 
 2.39.2
 
