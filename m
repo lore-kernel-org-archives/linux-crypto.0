@@ -2,88 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20578C001DE
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 19:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCA9EB64DC
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jul 2023 22:33:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbjGRTGl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jul 2023 15:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
+        id S230367AbjGRWdD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 18 Jul 2023 18:33:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjGRTGl (ORCPT
+        with ESMTP id S230046AbjGRWdC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jul 2023 15:06:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1B8F4;
-        Tue, 18 Jul 2023 12:06:40 -0700 (PDT)
+        Tue, 18 Jul 2023 18:33:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E34BB19A1;
+        Tue, 18 Jul 2023 15:32:42 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DDD00616C7;
-        Tue, 18 Jul 2023 19:06:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4576AC433C8;
-        Tue, 18 Jul 2023 19:06:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 77B5E61298;
+        Tue, 18 Jul 2023 22:32:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41861C433C7;
+        Tue, 18 Jul 2023 22:32:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689707199;
-        bh=6AXogDUObuussgbwgLBOjpBMuZcG50s+2gM5QKLJIqg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=iaLVsbZAR/GfygYGkBHWzIMBF7N1x8Nr8LGivpj1n+JZWnZ+nGsTPk67WqJIjihQK
-         OE7DGc6RD80/KIKre86+t4lqPxliDquvH/5QHfClJ9ab0c7O8U8PgGMMhsjA0jhwsm
-         K0mF1ux8h13VYVw4LcCGKKi1psKXfCwFmIzReE1e0EydCrdroXovIV4kkPYSmWvQiF
-         LIGp2ScDbmqglOoT5ao83vh0Q17Ln7oAEyUP9/QT+pNN09ieItiumdSqwoYlji8nrb
-         P3PDgeAwFLJ20zbG5JyE8wIV38OS9aWwMq+XQwTEHbhb+Dg0HvK0nZs5iABOiH6K9X
-         qHML4IOBzvnyg==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4fb5bcb9a28so9752400e87.3;
-        Tue, 18 Jul 2023 12:06:39 -0700 (PDT)
-X-Gm-Message-State: ABy/qLZv+TSeF5nE28BlnfiWwmNQ4FE8Rubkp62f8uNNxTV/PPSa+93e
-        0E/f/KA55CROql7TfoXM1fQGNKzAZHuwr6UDOA==
-X-Google-Smtp-Source: APBJJlGB0bgDqyP6XJYTdEPy8Mz0doXTrM6SRrUuM5btq//xema+oxLHuID3ymZr1d5lAuSQSbfnZ8Wrr107kQc+0p8=
-X-Received: by 2002:ac2:4c2c:0:b0:4f8:71cc:2b6e with SMTP id
- u12-20020ac24c2c000000b004f871cc2b6emr10819539lfq.33.1689707197305; Tue, 18
- Jul 2023 12:06:37 -0700 (PDT)
+        s=k20201202; t=1689719561;
+        bh=7Gbf5E8xcaK5OEKWGb4CHdLczRMlJnuQEgylfRoJijU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ufuwLPWCK8dWV8FkCqtCEz1epizX5iOUu9r0pzjEB8rAo3vv70aUHG7DaVTyC0KRg
+         9GffXUB6RPQfiH4Pwwly5QDNxRzp24n52b7+3LD9ARpF8rJiXrkrBeyyZXIPCRwCL3
+         YnFduPkPfkN/Xgp87N8DLRjyb4cFcZH/W6xsrlYbCUBOsPO7LPaSINVyNCf7nN7z43
+         VbtnrwxtgFI9aorRlk+A+3KII5/Vn0DPycSXnFotjqn6aFg9SWYv2fXiVGJgnhvXsX
+         jEkhDeNqSzOymSxwFCvBFlJkeTEmz1CT/UJjdF6RKWm+b8SD1lfeb02J5lyYQ8cZJU
+         KTXuktmKYxzVQ==
+Date:   Tue, 18 Jul 2023 15:32:39 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kees Cook <keescook@chromium.org>,
+        Haren Myneni <haren@us.ibm.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 01/21] crypto: scomp - Revert "add support for
+ deflate rfc1950 (zlib)"
+Message-ID: <20230718223239.GB1005@sol.localdomain>
+References: <20230718125847.3869700-1-ardb@kernel.org>
+ <20230718125847.3869700-2-ardb@kernel.org>
 MIME-Version: 1.0
-References: <20230718143211.1066810-1-robh@kernel.org> <6e037c2051816deaa0e4361c4fb517ba7d33dc0b.camel@physik.fu-berlin.de>
-In-Reply-To: <6e037c2051816deaa0e4361c4fb517ba7d33dc0b.camel@physik.fu-berlin.de>
-From:   Rob Herring <robh@kernel.org>
-Date:   Tue, 18 Jul 2023 13:06:25 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+vrAhG0FqqH-_rBtL2nEbJ+v=c3QfmjzOC=1A+Qi3KdQ@mail.gmail.com>
-Message-ID: <CAL_Jsq+vrAhG0FqqH-_rBtL2nEbJ+v=c3QfmjzOC=1A+Qi3KdQ@mail.gmail.com>
-Subject: Re: [PATCH v2] sparc: Explicitly include correct DT includes
-To:     John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        devicetree@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>,
-        linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718125847.3869700-2-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 18, 2023 at 8:56=E2=80=AFAM John Paul Adrian Glaubitz
-<glaubitz@physik.fu-berlin.de> wrote:
->
-> Hi Rob!
->
-> On Tue, 2023-07-18 at 08:32 -0600, Rob Herring wrote:
-> > The DT of_device.h and of_platform.h date back to the separate
-> > of_platform_bus_type before it as merged into the regular platform bus.
-> > As part of that merge prepping Arm DT support 13 years ago, they
-> > "temporarily" include each other. They also include platform_device.h
-> > and of.h. As a result, there's a pretty much random mix of those includ=
-e
-> > files used throughout the tree. In order to detangle these headers and
-> > replace the implicit includes with struct declarations, users need to
-> > explicitly include the correct includes.
->
-> I would suggest rephrasing the subject to
->
->         sparc: Explicitly include correct DT headers
->
-> as " ... include ... includes" sounds a bit awkward ;-).
+On Tue, Jul 18, 2023 at 02:58:27PM +0200, Ard Biesheuvel wrote:
+> This reverts commit a368f43d6e3a001e684e9191a27df384fbff12f5.
+> 
+> "zlib-deflate" was introduced 6 years ago, but it does not have any
+> users. So let's remove the generic implementation and the test vectors,
+> but retain the "zlib-deflate" entry in the testmgr code to avoid
+> introducing warning messages on systems that implement zlib-deflate in
+> hardware.
+> 
+> Note that RFC 1950 which forms the basis of this algorithm dates back to
+> 1996, and predates RFC 1951, on which the existing IPcomp is based and
+> which we have supported in the kernel since 2003. So it seems rather
+> unlikely that we will ever grow the need to support zlib-deflate.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  crypto/deflate.c | 61 +++++-----------
+>  crypto/testmgr.c |  8 +--
+>  crypto/testmgr.h | 75 --------------------
+>  3 files changed, 18 insertions(+), 126 deletions(-)
 
-Probably would have been better, but there's ~100 other patches with
-the same subject. Some of those have been applied already.
+So if this is really unused, it's probably fair to remove it on that basis.
+However, it's not correct to claim that DEFLATE is obsoleted by zlib (the data
+format).  zlib is just DEFLATE plus a checksum, as is gzip.
 
-Rob
+Many users of zlib or gzip use an external checksum and therefore would be
+better served by DEFLATE, avoiding a redundant builtin checksum.  Typically,
+people have chosen zlib or gzip simply because their compression library
+defaulted to it, they didn't understand the difference, and they overlooked that
+they're paying the price for a redundant builtin checksum.
+
+An example of someone doing it right is EROFS, which is working on adding
+DEFLATE support (not zlib or gzip!):
+https://lore.kernel.org/r/20230713001441.30462-1-hsiangkao@linux.alibaba.com
+
+Of course, they are using the library API instead of the clumsy crypto API.
+
+- Eric
