@@ -2,31 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37824EB64DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jul 2023 14:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DA4EB64DA
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jul 2023 14:39:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231566AbjGSOYd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jul 2023 10:24:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55060 "EHLO
+        id S230513AbjGSOig (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jul 2023 10:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231250AbjGSOY2 (ORCPT
+        with ESMTP id S231684AbjGSOi2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2023 10:24:28 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4C2F2690;
-        Wed, 19 Jul 2023 07:24:08 -0700 (PDT)
-Received: from kwepemm600013.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4R5dJQ0gzxzNmKd;
-        Wed, 19 Jul 2023 22:20:22 +0800 (CST)
-Received: from [10.174.178.46] (10.174.178.46) by
- kwepemm600013.china.huawei.com (7.193.23.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 19 Jul 2023 22:23:40 +0800
+        Wed, 19 Jul 2023 10:38:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1A3C7;
+        Wed, 19 Jul 2023 07:38:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 292816171E;
+        Wed, 19 Jul 2023 14:38:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A69AC433C8;
+        Wed, 19 Jul 2023 14:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689777506;
+        bh=GezNb42kEpgmegboqOOBAyzMgqyuAvFtS/mLgu3jRUg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=JQGGh5TFecokR/YKhLaMZWg52yo4ZZ3M1avMllGsOMgEUKzc/OUk3I392cKcffGbF
+         OMwzv1r99z3uGG/O+qT0B88iGlu5vx56jVkkni5i8KUC2HPPZ3p90oE1s4nYFjg/0L
+         yhZ34YIsrHnwHZH6L6D59sGcRpi1RG33m+tXVrMD6gDQlHRQMf1wAKXtKsQoF683rg
+         dVYJ9CKiNUKdy92GNh8DmNn8MpQZoqlGhP5kq2k8jJR36tDit2xDdksKkszaf/mOpu
+         JjZQdo5olGWa1rCh677vPUAak9wQVdTqxZdO2AyOyg9Hobi8BzRyS9L781CjQ/Edy1
+         ibmQ54otiiz/A==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2b701e1ca63so108065781fa.1;
+        Wed, 19 Jul 2023 07:38:26 -0700 (PDT)
+X-Gm-Message-State: ABy/qLaNdY6QrmIO68C8tGl5L7tBqy01RaI07ts6nY0vsB+JPSmd6VNJ
+        DuEWA6HxIdx4LguZDAA2VYb1Jpn2NKbAbyx+VQo=
+X-Google-Smtp-Source: APBJJlED2jiKRWrm/tbkjsu0sNov4aKWyhqBk9Z1aEui4cjKtLxhvU+nz2Q0ttRwt0rpd3EDFIeTI764n9rYrpoAI4M=
+X-Received: by 2002:a2e:7a09:0:b0:2b5:95a8:4126 with SMTP id
+ v9-20020a2e7a09000000b002b595a84126mr23133ljc.52.1689777504291; Wed, 19 Jul
+ 2023 07:38:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-6-ardb@kernel.org>
+ <20230718223813.GC1005@sol.localdomain> <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
+ <3330004f-acac-81b4-e382-a17221a0a128@huawei.com>
+In-Reply-To: <3330004f-acac-81b4-e382-a17221a0a128@huawei.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 19 Jul 2023 16:38:13 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGq=WiJXsQG6R0jEFYu_Mdom_KY+DE=NGqVSF6QmqhKeA@mail.gmail.com>
+Message-ID: <CAMj1kXGq=WiJXsQG6R0jEFYu_Mdom_KY+DE=NGqVSF6QmqhKeA@mail.gmail.com>
 Subject: Re: [RFC PATCH 05/21] ubifs: Pass worst-case buffer size to
  compression routines
-To:     Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     <linux-crypto@vger.kernel.org>,
+To:     Zhihao Cheng <chengzhihao1@huawei.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Kees Cook <keescook@chromium.org>,
         Haren Myneni <haren@us.ibm.com>,
@@ -41,91 +68,70 @@ CC:     <linux-crypto@vger.kernel.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Steffen Klassert <steffen.klassert@secunet.com>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <qat-linux@intel.com>, <linuxppc-dev@lists.ozlabs.org>,
-        <linux-mtd@lists.infradead.org>, <netdev@vger.kernel.org>
-References: <20230718125847.3869700-1-ardb@kernel.org>
- <20230718125847.3869700-6-ardb@kernel.org>
- <20230718223813.GC1005@sol.localdomain>
- <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
-From:   Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <3330004f-acac-81b4-e382-a17221a0a128@huawei.com>
-Date:   Wed, 19 Jul 2023 22:23:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.178.46]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600013.china.huawei.com (7.193.23.68)
-X-CFilter-Loop: Reflected
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-在 2023/7/19 16:33, Ard Biesheuvel 写道:
-> On Wed, 19 Jul 2023 at 00:38, Eric Biggers <ebiggers@kernel.org> wrote:
->>
->> On Tue, Jul 18, 2023 at 02:58:31PM +0200, Ard Biesheuvel wrote:
->>> Currently, the ubifs code allocates a worst case buffer size to
->>> recompress a data node, but does not pass the size of that buffer to the
->>> compression code. This means that the compression code will never use
+On Wed, 19 Jul 2023 at 16:23, Zhihao Cheng <chengzhihao1@huawei.com> wrote:
+>
+> =E5=9C=A8 2023/7/19 16:33, Ard Biesheuvel =E5=86=99=E9=81=93:
+> > On Wed, 19 Jul 2023 at 00:38, Eric Biggers <ebiggers@kernel.org> wrote:
+> >>
+> >> On Tue, Jul 18, 2023 at 02:58:31PM +0200, Ard Biesheuvel wrote:
+> >>> Currently, the ubifs code allocates a worst case buffer size to
+> >>> recompress a data node, but does not pass the size of that buffer to =
+the
+> >>> compression code. This means that the compression code will never use
+>
+> I think you mean the 'out_len' which describes the lengh of 'buf' is
+> passed into ubifs_decompress, which effects the result of
+> decompressor(eg. lz4 uses length to calculate the buffer end pos).
+> So, we should pass the real lenghth of 'buf'.
+>
 
-I think you mean the 'out_len' which describes the lengh of 'buf' is 
-passed into ubifs_decompress, which effects the result of 
-decompressor(eg. lz4 uses length to calculate the buffer end pos).
-So, we should pass the real lenghth of 'buf'.
+Yes, that is what I meant.
 
-Reviewed-by: Zhihao Cheng <chengzhihao1@huawei.com>
+But Eric makes a good point, and looking a bit more closely, there is
+really no need for the multiplication here: we know the size of the
+decompressed data, so we don't need the additional space.
 
->>> the additional space, and might fail spuriously due to lack of space.
->>>
->>> So let's multiply out_len by WORST_COMPR_FACTOR after allocating the
->>> buffer. Doing so is guaranteed not to overflow, given that the preceding
->>> kmalloc_array() call would have failed otherwise.
->>>
->>> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
->>> ---
->>>   fs/ubifs/journal.c | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
->>> index dc52ac0f4a345f30..4e5961878f336033 100644
->>> --- a/fs/ubifs/journal.c
->>> +++ b/fs/ubifs/journal.c
->>> @@ -1493,6 +1493,8 @@ static int truncate_data_node(const struct ubifs_info *c, const struct inode *in
->>>        if (!buf)
->>>                return -ENOMEM;
->>>
->>> +     out_len *= WORST_COMPR_FACTOR;
->>> +
->>>        dlen = le32_to_cpu(dn->ch.len) - UBIFS_DATA_NODE_SZ;
->>>        data_size = dn_size - UBIFS_DATA_NODE_SZ;
->>>        compr_type = le16_to_cpu(dn->compr_type);
->>
->> This looks like another case where data that would be expanded by compression
->> should just be stored uncompressed instead.
->>
->> In fact, it seems that UBIFS does that already.  ubifs_compress() has this:
->>
->>          /*
->>           * If the data compressed only slightly, it is better to leave it
->>           * uncompressed to improve read speed.
->>           */
->>          if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF)
->>                  goto no_compr;
->>
->> So it's unclear why the WORST_COMPR_FACTOR thing is needed at all.
->>
-> 
-> It is not. The buffer is used for decompression in the truncation
-> path, so none of this logic even matters. Even if the subsequent
-> recompression of the truncated data node could result in expansion
-> beyond the uncompressed size of the original data (which seems
-> impossible to me), increasing the size of this buffer would not help
-> as it is the input buffer for the compression not the output buffer.
-> .
-> 
+I intend to drop this patch, and replace it with the following:
 
+----------------8<--------------
+
+Currently, when truncating a data node, a decompression buffer is
+allocated that is twice the size of the data node's uncompressed size.
+However, the fact that this space is available is not communicated to
+the compression routines, as out_len itself is not updated.
+
+The additional space is not needed even in the theoretical worst case
+where compression might lead to inadvertent expansion: first of all,
+increasing the size of the input buffer does not help mitigate that
+issue. And given the truncation of the data node and the fact that the
+original data compressed well enough to pass the UBIFS_MIN_COMPRESS_DIFF
+test, there is no way on this particular code path that compression
+could result in expansion beyond the original decompressed size, and so
+no mitigation is necessary to begin with.
+
+So let's just drop WORST_COMPR_FACTOR here.
+
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+
+diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
+index dc52ac0f4a345f30..0b55cbfe0c30505e 100644
+--- a/fs/ubifs/journal.c
++++ b/fs/ubifs/journal.c
+@@ -1489,7 +1489,7 @@ static int truncate_data_node(const struct
+ubifs_info *c, const struct inode *in
+        int err, dlen, compr_type, out_len, data_size;
+
+        out_len =3D le32_to_cpu(dn->size);
+-       buf =3D kmalloc_array(out_len, WORST_COMPR_FACTOR, GFP_NOFS);
++       buf =3D kmalloc(out_len, GFP_NOFS);
+        if (!buf)
+                return -ENOMEM;
