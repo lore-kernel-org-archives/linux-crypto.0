@@ -2,112 +2,128 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27E2AEB64DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jul 2023 07:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C8CEB64DA
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jul 2023 08:34:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbjGSHU0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jul 2023 03:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52036 "EHLO
+        id S230079AbjGSIeL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jul 2023 04:34:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbjGSHUQ (ORCPT
+        with ESMTP id S229461AbjGSIeL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jul 2023 03:20:16 -0400
-Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14164E43;
-        Wed, 19 Jul 2023 00:20:15 -0700 (PDT)
-Received: from ipservice-092-217-093-053.092.217.pools.vodafone-ip.de ([92.217.93.53] helo=martin-debian-2.paytec.ch)
-        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <martin@kaiser.cx>)
-        id 1qM1Tp-0008I7-LB; Wed, 19 Jul 2023 09:20:13 +0200
-From:   Martin Kaiser <martin@kaiser.cx>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH 4/4] hwrng: cctrng - use dev_err_probe in error paths
-Date:   Wed, 19 Jul 2023 09:18:06 +0200
-Message-Id: <20230719071806.335718-5-martin@kaiser.cx>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230719071806.335718-1-martin@kaiser.cx>
-References: <20230719071806.335718-1-martin@kaiser.cx>
+        Wed, 19 Jul 2023 04:34:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476B4171D;
+        Wed, 19 Jul 2023 01:34:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D48B56130B;
+        Wed, 19 Jul 2023 08:34:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E0F4C433A9;
+        Wed, 19 Jul 2023 08:34:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689755649;
+        bh=WMX//Zd4vQHTl2wSNqngG3i/KSedW7bESZCEVdywQQg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=npivonAoU/JLz34y+sU/NQYHPvNpLVQT+U0/+j+878TThXUt2K/EknBClxtbnhFJS
+         GgrvtoIgMqCqeZGw7UEkZRjZzrsr5BhPFx3T8EdDuxBipmyDyGB+J1ClvT1lOAsDgr
+         l5rDJbQBqAualqYJ7CgBqQKBilcA8larUuWgBBWmi4RO7OMatAn8VPgF7/bNLiAq9E
+         S5HIMsTnGT0sdXVOVV1YkwWJl72Whv/nA8r38/EWZNq9VEjelxvff1tKjzTSSewPmh
+         yorAW1NVYQIVtHiKYhZZKK8eyOcxMZhZfC43m6ucmTjEhDqTWGtIEiLMM7Q9gcFSrC
+         bEYx1FSSR02sQ==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-4fbb281eec6so10747014e87.1;
+        Wed, 19 Jul 2023 01:34:08 -0700 (PDT)
+X-Gm-Message-State: ABy/qLZQxaAo2aRTG1tPmJJrznKOb0zoMb9tC5ONuZ5Bd0FnPWdk5VlO
+        3hehMzVw/e4Vv9DdPYaYR2gv9J8DQtDGcIHsAWA=
+X-Google-Smtp-Source: APBJJlGeSF5V0ZncchYeqcmkqwpUY28YQJ5DiF5w2vBv40Stfz5hfjtiPkQFB2dDWAAbFdheF+NmWD6HTwZKJ8tR1ic=
+X-Received: by 2002:ac2:4db2:0:b0:4fd:c8dc:2f55 with SMTP id
+ h18-20020ac24db2000000b004fdc8dc2f55mr3519001lfe.66.1689755647078; Wed, 19
+ Jul 2023 01:34:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-6-ardb@kernel.org>
+ <20230718223813.GC1005@sol.localdomain>
+In-Reply-To: <20230718223813.GC1005@sol.localdomain>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 19 Jul 2023 10:33:55 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
+Message-ID: <CAMj1kXE1fND2h8ts6Xtfn19wkt=vAnj1TumxvoBCuEn7z3V4Aw@mail.gmail.com>
+Subject: Re: [RFC PATCH 05/21] ubifs: Pass worst-case buffer size to
+ compression routines
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Kees Cook <keescook@chromium.org>,
+        Haren Myneni <haren@us.ibm.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use dev_err_probe in error paths to make the code a bit shorter.
+On Wed, 19 Jul 2023 at 00:38, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Tue, Jul 18, 2023 at 02:58:31PM +0200, Ard Biesheuvel wrote:
+> > Currently, the ubifs code allocates a worst case buffer size to
+> > recompress a data node, but does not pass the size of that buffer to the
+> > compression code. This means that the compression code will never use
+> > the additional space, and might fail spuriously due to lack of space.
+> >
+> > So let's multiply out_len by WORST_COMPR_FACTOR after allocating the
+> > buffer. Doing so is guaranteed not to overflow, given that the preceding
+> > kmalloc_array() call would have failed otherwise.
+> >
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > ---
+> >  fs/ubifs/journal.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
+> > index dc52ac0f4a345f30..4e5961878f336033 100644
+> > --- a/fs/ubifs/journal.c
+> > +++ b/fs/ubifs/journal.c
+> > @@ -1493,6 +1493,8 @@ static int truncate_data_node(const struct ubifs_info *c, const struct inode *in
+> >       if (!buf)
+> >               return -ENOMEM;
+> >
+> > +     out_len *= WORST_COMPR_FACTOR;
+> > +
+> >       dlen = le32_to_cpu(dn->ch.len) - UBIFS_DATA_NODE_SZ;
+> >       data_size = dn_size - UBIFS_DATA_NODE_SZ;
+> >       compr_type = le16_to_cpu(dn->compr_type);
+>
+> This looks like another case where data that would be expanded by compression
+> should just be stored uncompressed instead.
+>
+> In fact, it seems that UBIFS does that already.  ubifs_compress() has this:
+>
+>         /*
+>          * If the data compressed only slightly, it is better to leave it
+>          * uncompressed to improve read speed.
+>          */
+>         if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF)
+>                 goto no_compr;
+>
+> So it's unclear why the WORST_COMPR_FACTOR thing is needed at all.
+>
 
-Signed-off-by: Martin Kaiser <martin@kaiser.cx>
----
- drivers/char/hw_random/cctrng.c | 30 ++++++++++--------------------
- 1 file changed, 10 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
-index 2a1887f6483f..1abbff04a015 100644
---- a/drivers/char/hw_random/cctrng.c
-+++ b/drivers/char/hw_random/cctrng.c
-@@ -485,10 +485,8 @@ static int cctrng_probe(struct platform_device *pdev)
- 	drvdata->circ.buf = (char *)drvdata->data_buf;
- 
- 	drvdata->cc_base = devm_platform_ioremap_resource(pdev, 0);
--	if (IS_ERR(drvdata->cc_base)) {
--		dev_err(dev, "Failed to ioremap registers");
--		return PTR_ERR(drvdata->cc_base);
--	}
-+	if (IS_ERR(drvdata->cc_base))
-+		return dev_err_probe(dev, PTR_ERR(drvdata->cc_base), "Failed to ioremap registers");
- 
- 	/* Then IRQ */
- 	irq = platform_get_irq(pdev, 0);
-@@ -497,10 +495,8 @@ static int cctrng_probe(struct platform_device *pdev)
- 
- 	/* parse sampling rate from device tree */
- 	rc = cc_trng_parse_sampling_ratio(drvdata);
--	if (rc) {
--		dev_err(dev, "Failed to get legal sampling ratio for rosc\n");
--		return rc;
--	}
-+	if (rc)
-+		return dev_err_probe(dev, rc, "Failed to get legal sampling ratio for rosc\n");
- 
- 	drvdata->clk = devm_clk_get_optional_enabled(dev, NULL);
- 	if (IS_ERR(drvdata->clk))
-@@ -513,10 +509,8 @@ static int cctrng_probe(struct platform_device *pdev)
- 
- 	/* register the driver isr function */
- 	rc = devm_request_irq(dev, irq, cc_isr, IRQF_SHARED, "cctrng", drvdata);
--	if (rc) {
--		dev_err(dev, "Could not register to interrupt %d\n", irq);
--		return rc;
--	}
-+	if (rc)
-+		return dev_err_probe(dev, rc, "Could not register to interrupt %d\n", irq);
- 	dev_dbg(dev, "Registered to IRQ: %d\n", irq);
- 
- 	/* Clear all pending interrupts */
-@@ -531,17 +525,13 @@ static int cctrng_probe(struct platform_device *pdev)
- 
- 	/* init PM */
- 	rc = cc_trng_pm_init(drvdata);
--	if (rc) {
--		dev_err(dev, "cc_trng_pm_init failed\n");
--		return rc;
--	}
-+	if (rc)
-+		return dev_err_probe(dev, rc, "cc_trng_pm_init failed\n");
- 
- 	/* increment device's usage counter */
- 	rc = cc_trng_pm_get(dev);
--	if (rc) {
--		dev_err(dev, "cc_trng_pm_get returned %x\n", rc);
--		return rc;
--	}
-+	if (rc)
-+		return dev_err_probe(dev, rc, "cc_trng_pm_get returned %x\n", rc);
- 
- 	/* set pending_hw to verify that HW won't be triggered from read */
- 	atomic_set(&drvdata->pending_hw, 1);
--- 
-2.30.2
-
+It is not. The buffer is used for decompression in the truncation
+path, so none of this logic even matters. Even if the subsequent
+recompression of the truncated data node could result in expansion
+beyond the uncompressed size of the original data (which seems
+impossible to me), increasing the size of this buffer would not help
+as it is the input buffer for the compression not the output buffer.
