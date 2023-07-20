@@ -2,320 +2,265 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECBB9C0015E
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jul 2023 14:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 732ADC00528
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jul 2023 15:34:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232331AbjGTO7b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Jul 2023 10:59:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43332 "EHLO
+        id S232601AbjGTPek (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Jul 2023 11:34:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjGTO7a (ORCPT
+        with ESMTP id S231748AbjGTPej (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jul 2023 10:59:30 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE7841BC6;
-        Thu, 20 Jul 2023 07:59:28 -0700 (PDT)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36KDEMW4005310;
-        Thu, 20 Jul 2023 16:58:45 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=SYqAZNLeldZI4p+biE8tneewU0+ZDnqH4LOdjLzjgN8=;
- b=jUavRcjf10fWnyG/wp+8u2MmRxgf7Nau1Hi8Vx5pJPGO2qt4zchHRsjOF4JN/Ye8bku8
- 3z6aslHsYvo40WzBDaJ77ggRurfKGzanxCkxsq6qXRHHTN9fD7yxaf7D76Hft81ji7Ye
- jKqVn9+yrsNxpMk1A4g44p0AulYO2GKb4Hns+c+GcNX/C6Ev0zwsz89HNZ3EnnsiTAbr
- Jtsiq2Fbk3fLE+YQbV3HfTb3AETmZ4kU8CnVfudntwk4xkNL6LQRHBJK4M+FXWQSfHJz
- qrmW3p1PsXqtjzXcU+1i/XqL4Rnw7iVkHEuJ0i1ibEAAKP794mz2ceHz//xwuY2kAW6r mA== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ry5mt0nem-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Jul 2023 16:58:45 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id E0FE210003A;
-        Thu, 20 Jul 2023 16:58:42 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8024A23C698;
-        Thu, 20 Jul 2023 16:58:42 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 20 Jul
- 2023 16:58:40 +0200
-Message-ID: <6edb1d1e-ae6b-486a-9548-4b2e0353f3dc@foss.st.com>
-Date:   Thu, 20 Jul 2023 16:58:35 +0200
+        Thu, 20 Jul 2023 11:34:39 -0400
+Received: from frasgout12.his.huawei.com (unknown [14.137.139.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C5C8189;
+        Thu, 20 Jul 2023 08:34:23 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.18.147.227])
+        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4R6GcB0LRgz9xGWX;
+        Thu, 20 Jul 2023 23:21:14 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.204.63.22])
+        by APP1 (Coremail) with SMTP id LxC2BwBHquXFU7lkGHDRBA--.21759S2;
+        Thu, 20 Jul 2023 16:33:41 +0100 (CET)
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko@kernel.org, zohar@linux.ibm.com, dmitry.kasatkin@gmail.com,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com
+Cc:     linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, pbrobinson@gmail.com,
+        zbyszek@in.waw.pl, wiktor@metacode.biz,
+        devel@lists.sequoia-pgp.org, gnupg-devel@gnupg.org,
+        ebiggers@kernel.org, Jason@zx2c4.com, mail@maciej.szmigiero.name,
+        antony@vennard.ch, konstantin@linuxfoundation.org,
+        James.Bottomley@HansenPartnership.com,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Subject: [RFC][PATCH v3 0/9] KEYS: Introduce user asymmetric keys and signatures
+Date:   Thu, 20 Jul 2023 17:32:36 +0200
+Message-Id: <20230720153247.3755856-1-roberto.sassu@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 02/10] dt-bindings: bus: add device tree bindings for
- RIFSC
-Content-Language: en-US
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
-        <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>
-CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
- <e871ad32-dfa4-067d-4f2c-207ffd42aafd@linaro.org>
- <1ac0f2e0-4ec1-3871-d0a3-3ccc2eb687e5@foss.st.com>
-In-Reply-To: <1ac0f2e0-4ec1-3871-d0a3-3ccc2eb687e5@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-20_08,2023-07-20_01,2023-05-22_02
+X-CM-TRANSID: LxC2BwBHquXFU7lkGHDRBA--.21759S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3JFyDJF47ZFy5JF15KFy7Awb_yoW3Aw17pF
+        s5K3yftryktryIk395Jw1Igw1rZr1rAFW3Kw1fuw1rAasIqr18ArZ2kF4fur9IyFW0gF1F
+        qr4Yvw1jkw1UtaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+        AFwI0_Gr1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28I
+        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+        IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E
+        87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU1c4S7UUUUU==
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAEBF1jj5C8mgACsE
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Krzysztof,
+From: Roberto Sassu <roberto.sassu@huawei.com>
 
-On 7/6/23 11:29, Gatien CHEVALLIER wrote:
-> Hello Krzysztof,
-> 
-> Firstly, I will correct the bindings error pointed by Rob's robot.
-> Obviously, I did not pass the bindings check the proper way or maybe I'm 
-> running an old version.
-> 
-> On 7/6/23 08:28, Krzysztof Kozlowski wrote:
->> On 05/07/2023 19:27, Gatien Chevallier wrote:
->>> Document RIFSC (RIF security controller). RIFSC is a firewall controller
->>> composed of different kinds of hardware resources.
->>>
->>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>
->> A nit, subject: drop second/last, redundant "device tree bindings for".
->> The "dt-bindings" prefix is already stating that these are bindings. 4
->> words of your 6 word subject is meaningless...
-> 
-> Ack, I will rephrase, it is indeed redundant
-> 
->>
->>> ---
->>>   .../bindings/bus/st,stm32-rifsc.yaml          | 101 ++++++++++++++++++
->>>   1 file changed, 101 insertions(+)
->>>   create mode 100644 
->>> Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
->>>
->>> diff --git 
->>> a/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml 
->>> b/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
->>> new file mode 100644
->>> index 000000000000..68d585ed369c
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
->>
->> Filename like compatible, unless you know list of compatibles will
->> grow... but then add them.
->>
->>> @@ -0,0 +1,101 @@
->>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->>> +%YAML 1.2
->>> +---
->>> +$id: http://devicetree.org/schemas/bus/st,stm32-rifsc.yaml#
->>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>> +
->>> +title: STM32 Resource isolation framework security controller bindings
->>
->> Drop bindings
-> 
-> Ack
-> 
->>
->>> +
->>> +maintainers:
->>> +  - Gatien Chevallier <gatien.chevallier@foss.st.com>
->>> +
->>> +description: |
->>> +  Resource isolation framework (RIF) is a comprehensive set of 
->>> hardware blocks
->>> +  designed to enforce and manage isolation of STM32 hardware 
->>> resources like
->>> +  memory and peripherals.
->>> +
->>> +  The RIFSC (RIF security controller) is composed of three sets of 
->>> registers,
->>> +  each managing a specific set of hardware resources:
->>> +    - RISC registers associated with RISUP logic (resource isolation 
->>> device unit
->>> +      for peripherals), assign all non-RIF aware peripherals to 
->>> zero, one or
->>> +      any security domains (secure, privilege, compartment).
->>> +    - RIMC registers: associated with RIMU logic (resource isolation 
->>> master
->>> +      unit), assign all non RIF-aware bus master to one security 
->>> domain by
->>> +      setting secure, privileged and compartment information on the 
->>> system bus.
->>> +      Alternatively, the RISUP logic controlling the device port 
->>> access to a
->>> +      peripheral can assign target bus attributes to this peripheral 
->>> master port
->>> +      (supported attribute: CID).
->>> +    - RISC registers associated with RISAL logic (resource isolation 
->>> device unit
->>> +      for address space - Lite version), assign address space 
->>> subregions to one
->>> +      security domains (secure, privilege, compartment).
->>> +
->>> +properties:
->>> +  compatible:
->>> +    const: st,stm32mp25-rifsc
->>> +
->>> +  reg:
->>> +    maxItems: 1
->>> +
->>> +  "#address-cells":
->>> +    const: 1
->>> +
->>> +  "#size-cells":
->>> +    const: 1
->>> +
->>> +  "#feature-domain-cells":
->>> +    const: 1
->>> +
->>> +  ranges: true
->>> +
->>> +  feature-domain-controller: true
->>> +
->>> +patternProperties:
->>> +  "^.*@[0-9a-f]+$":
->>> +    description: Peripherals
->>> +    type: object
->>> +    properties:
->>> +      feature-domains:
->>> +        minItems: 1
->>> +        maxItems: 2
->>> +        description:
->>> +          The first argument must always be a phandle that 
->>> references to the
->>> +          firewall controller of the peripheral. The second can 
->>> contain the
->>> +          platform specific firewall ID of the peripheral.
->>
->> It does not make much sense to me to have hierarchy parent-child and via
->> phandle at the same time. You express the similar relationship twice
-> Thank you for pointing this out.
-> 
-> About the parent-child relation:
-> 
-> The bus-like device tree architecture allows a bus-probe mechanism with 
-> which we want to check accesses of peripherals before probing their 
-> driver. This has several advantages:
-> -This bus architecture provides a clearer view of the hardware.
-> -No peripheral driver modifications as it is fully handled by the 
-> firewall drivers.
-> -Drivers for devices that aren't accessible will not even be probed => 
-> no probe fail.
-> 
-> It would be possible to manage this mechanism another way by handling 
-> probe deferrals in drivers. But it would mean modifying every driver 
-> with a check on ST firewall that we probe and some of them aren't from 
-> STMicroelectronics.
-> 
-> About the phandle relation:
-> 
-> I agree on the fact that this double expression of the relationship is 
-> redundant.
-> 
-> I've done it this way because there will be other nodes outside the 
-> RIFSC node that will need to reference it as their feature-domain 
-> controller. I kept the same information in the property to be coherent 
-> between all.
-> 
-> For nodes under the RIFSC, the phandle is indeed useless and could be 
-> removed, just to leave the firewall ID. And I'm inclined to do so. I 
-> just have one worry on the YAML binding files where I will have a 
-> pattern property in the RIFSC that will state something and maybe 
-> another description in the peripheral YAML files. What is your take on 
-> that?
-> 
+Define a new TLV-based format for keys and signatures, aiming to store and
+use in the kernel the crypto material from other unsupported formats
+(e.g. PGP).
 
-Looking back at it, feature-domains is a phandle-array. I guess I can't
-derogate to the following architecture:
+TLV fields have been defined to fill the corresponding kernel structures
+public_key, public_key_signature and key_preparsed_payload.
 
-items:
-   - items:
-       - description: A phandle
-       - description: 1st arg cell
-       - description: 2nd arg cell
+Keys:
+                struct public_key {     struct key_preparsed_payload {
+KEY_PUB       -->  void *key;
+                   u32 keylen;         --> prep->payload.data[asym_crypto]
+KEY_ALGO      -->  const char *pkey_algo;
+KEY_KID0
+KEY_KID1      ---------------------------> prep->payload.data[asym_key_ids]
+KEY_KID2  
+KEY_DESC      ---------------------------> prep->description
 
-can I?
 
-Some devices' nodes that are not subnodes of the firewall controllers
-will need the phandle reference. Should I keep the redundant information
-then?
+Signatures:
+                struct public_key_signature {
+SIG_S         -->  u8 *s;
+                   u32 s_size;
+SIG_KEY_ALGO  -->  const char *pkey_algo;
+SIG_HASH_ALGO -->  const char *hash_algo;
+                   u32 digest_size;
+SIG_ENC       -->  const char *encoding;   
+SIG_KID0
+SIG_KID1      -->  struct asymmetric_key_id *auth_ids[3];
+SIG_KID2  
 
-Best regards,
-Gatien
 
->>
->>> +
->>> +required:
->>> +  - compatible
->>> +  - reg
->>> +  - "#address-cells"
->>> +  - "#size-cells"
->>> +  - feature-domain-controller
->>> +  - "#feature-domain-cells"
->>> +  - ranges
->>> +
->>> +additionalProperties: false
->>> +
->>> +examples:
->>> +  - |
->>> +    // In this example, the usart2 device refers to rifsc as its domain
->>> +    // controller.
->>> +    // Access rights are verified before creating devices.
->>> +
->>> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
->>> +
->>> +    rifsc: rifsc-bus@42080000 {
->>> +        compatible = "st,stm32mp25-rifsc";
->>> +        reg = <0x42080000 0x1000>;
->>> +        #address-cells = <1>;
->>> +        #size-cells = <1>;
->>> +        ranges;
->>> +        feature-domain-controller;
->>> +        #feature-domain-cells = <1>;
->>> +
->>> +        usart2: serial@400e0000 {
->>> +            compatible = "st,stm32h7-uart";
->>> +            reg = <0x400e0000 0x400>;
->>> +            interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
->>> +            clocks = <&ck_flexgen_08>;
->>> +            feature-domains = <&rifsc 32>;
->>> +            status = "disabled";
->>
->> No status in the examples.
->>
->>> +        };
->>> +    };
->>
->> Best regards,
->> Krzysztof
->>
-> 
-> Best regards,
-> Gatien
+For keys, since the format conversion has to be done in user space, user
+space is assumed to be trusted, in this proposal. Without this assumption,
+a malicious conversion tool could make a user load to the kernel a
+different key than the one expected.
+
+That should not be a particular problem for keys that are embedded in the
+kernel image and loaded at boot, since the conversion happens in a trusted
+environment such as the building infrastructure of the Linux distribution
+vendor.
+
+In the other cases, such as enrolling a key through the Machine Owner Key
+(MOK) mechanism, the user is responsible to ensure that the crypto material
+carried in the original format remains the same after the conversion.
+
+For signatures, assuming the strength of the crypto algorithms, altering
+the crypto material is simply a Denial-of-Service (DoS), as data can be
+validated only with the right signature.
+
+
+This patch set also offers the following contributions:
+
+- A library for parsing TLV-formatted data, usable also by other kernel
+  subsystems
+
+- An API similar to the PKCS#7 one, to verify the authenticity of system
+  data through user asymmetric keys and signatures
+
+- IMA support for user asymmetric keys and signatures embedded in a
+  module-style appended signature (through the new API)
+
+- A mechanism to store a keyring blob in the kernel image and to extract
+  and load the keys at system boot
+  
+- A new command for gnupg (in user space), to convert keys and signatures
+  from PGP to the new kernel format
+
+
+The primary use case for this patch set is to verify the authenticity of
+RPM package headers with the PGP keys of the Linux distribution. Once their
+authenticity is verified, file digests can be extracted from those RPM
+headers and used as reference values for IMA Appraisal.
+
+
+Compared to the previous patch set, the main difference is not relying on
+User Mode Drivers (UMDs) for the conversion from the original format to the
+kernel format, due to the concern that full isolation of the UMD process
+cannot be achieved against a fully privileged system user (root).
+
+The discussion is still ongoing here:
+
+https://lore.kernel.org/linux-integrity/eb31920bd00e2c921b0aa6ebed8745cb0130b0e1.camel@huaweicloud.com/
+
+This however does not prevent the goal mentioned above of verifying the
+authenticity of RPM headers to be achieved. The fact that Linux
+distribution vendors do the conversion in their infrastructure is a good
+enough guarantee.
+
+
+A very quick way to test the patch set is to execute:
+
+$ gpg --conv-kernel /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-rawhide-primary | keyctl padd asymmetric "" @u
+
+$ keyctl show @u
+Keyring
+ 762357580 --alswrv      0 65534  keyring: _uid.0
+ 567216072 --als--v      0     0   \_ asymmetric: PGP: 18b8e74c
+
+
+Patch 1 introduces a common library for parsing TLV-formatted data. It is
+generic enough to support other use cases other than this one.
+
+Patches 2-3 preliminarly export some definitions to user space so that
+conversion tools can specify the right public key algorithms and signature
+encodings (digest algorithms are already exported).
+
+Patches 4-5 introduce the user asymmetric keys and signatures.
+
+Patches 6 introduces a system API for verifying the authenticity of system
+data through user asymmetric keys and signatures.
+
+Patch 7-8 introduce a mechanism to store a keyring blob with user
+asymmetric keys in the kernel image, and load them at system boot.
+
+Patch 9 adds support for verifying user asymmetric key signatures with IMA.
+
+Patches 1-2 [GNUPG] introduce the new gpg command --conv-kernel to convert
+PGP keys and signatures to the new kernel format.
+
+Changelog
+
+v2:
+- Make the TLV parser a generic library and use it for user asymmetric keys
+  and signatures
+- Modify types in TLV header and data to u64 (future-proof)
+- Move struct uasym_sig_message definition to uasym_sig_parser.c
+- Remove eBPF patches (nacked by Alexei)
+- Add IMA patch to support modsigs with a user asymmetric key signature
+
+v1:
+- Remove useless check in validate_key() (suggested by Yonghong)
+- Don't rely on User Mode Drivers for the conversion from the original
+  format to the kernel format
+- Use the more extensible TLV format, instead of a fixed structure
+
+Roberto Sassu (9):
+  lib: Add TLV parser
+  crypto: Export public key algorithm information
+  crypto: Export signature encoding information
+  KEYS: asymmetric: Introduce the user asymmetric key parser
+  KEYS: asymmetric: Introduce the user asymmetric key signature parser
+  verification: Add verify_uasym_signature() and
+    verify_uasym_sig_message()
+  KEYS: asymmetric: Preload user asymmetric keys from a keyring blob
+  KEYS: Introduce load_uasym_keyring()
+  ima: Support non-PKCS#7 modsig types
+
+ MAINTAINERS                                |   9 +
+ certs/Kconfig                              |  11 +
+ certs/Makefile                             |   7 +
+ certs/system_certificates.S                |  18 +
+ certs/system_keyring.c                     | 166 ++++++-
+ crypto/Kconfig                             |   6 +
+ crypto/Makefile                            |   2 +
+ crypto/asymmetric_keys/Kconfig             |  14 +
+ crypto/asymmetric_keys/Makefile            |   8 +
+ crypto/asymmetric_keys/asymmetric_type.c   |   3 +-
+ crypto/asymmetric_keys/uasym_key_parser.c  | 240 ++++++++++
+ crypto/asymmetric_keys/uasym_key_preload.c | 102 +++++
+ crypto/asymmetric_keys/uasym_parser.h      |  26 ++
+ crypto/asymmetric_keys/uasym_sig_parser.c  | 497 +++++++++++++++++++++
+ crypto/pub_key_info.c                      |  20 +
+ crypto/sig_enc_info.c                      |  16 +
+ include/crypto/pub_key_info.h              |  15 +
+ include/crypto/sig_enc_info.h              |  15 +
+ include/crypto/uasym_keys_sigs.h           |  81 ++++
+ include/keys/asymmetric-type.h             |   1 +
+ include/linux/tlv_parser.h                 |  28 ++
+ include/linux/verification.h               |  46 ++
+ include/uapi/linux/pub_key_info.h          |  22 +
+ include/uapi/linux/sig_enc_info.h          |  18 +
+ include/uapi/linux/tlv_parser.h            |  59 +++
+ include/uapi/linux/uasym_parser.h          |  59 +++
+ lib/Kconfig                                |   3 +
+ lib/Makefile                               |   3 +
+ lib/tlv_parser.c                           | 203 +++++++++
+ lib/tlv_parser.h                           |  17 +
+ security/integrity/ima/ima_modsig.c        |  79 +++-
+ 31 files changed, 1771 insertions(+), 23 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/uasym_key_parser.c
+ create mode 100644 crypto/asymmetric_keys/uasym_key_preload.c
+ create mode 100644 crypto/asymmetric_keys/uasym_parser.h
+ create mode 100644 crypto/asymmetric_keys/uasym_sig_parser.c
+ create mode 100644 crypto/pub_key_info.c
+ create mode 100644 crypto/sig_enc_info.c
+ create mode 100644 include/crypto/pub_key_info.h
+ create mode 100644 include/crypto/sig_enc_info.h
+ create mode 100644 include/crypto/uasym_keys_sigs.h
+ create mode 100644 include/linux/tlv_parser.h
+ create mode 100644 include/uapi/linux/pub_key_info.h
+ create mode 100644 include/uapi/linux/sig_enc_info.h
+ create mode 100644 include/uapi/linux/tlv_parser.h
+ create mode 100644 include/uapi/linux/uasym_parser.h
+ create mode 100644 lib/tlv_parser.c
+ create mode 100644 lib/tlv_parser.h
+
+-- 
+2.34.1
+
