@@ -2,101 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923B8EB64DD
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 05:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5882AC001DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 07:05:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjGUFt0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jul 2023 01:49:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36498 "EHLO
+        id S230029AbjGUHFE convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Jul 2023 03:05:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjGUFst (ORCPT
+        with ESMTP id S229846AbjGUHFD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2023 01:48:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB753AB1;
-        Thu, 20 Jul 2023 22:48:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 889B961185;
-        Fri, 21 Jul 2023 05:48:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D86CC433C8;
-        Fri, 21 Jul 2023 05:48:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689918494;
-        bh=ahkbJ+oFoqBo9wkehSm+Ve4k00bHUAb6i7Wno4IX6Gw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LOZhr7pfzyu3qz3dL57XPyWiK6pGctPlMOpLvIjeU99BEqoj84ejDo8SeZbGpmzmY
-         g+sn0SuRHWCf2yKoF1VLYxFRFGBeegFJMq71mrfu/pwq02Y0fJqWZ5d2YwcoKwx73g
-         qMXj2iy2JFGYSLyf6IG3vxhXIaRsbBSPDGvN3Iv9Nu0t+/EeuAJTrQF0P4yoYhd6bk
-         xBQzvwBwn/aSymiDVnzMhxaEa5OF5v/CPUvd6yRGeCKtOXetPfcwZlpUWold+EszSe
-         g5Egt94NgK97Upf9lc6SR1XewlxKGbBiHS+EEz+T7KCBCG2cNqzvx2mYtvABy4vJAO
-         kdgfU25pLczMA==
-Date:   Thu, 20 Jul 2023 22:48:12 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Heiko Stuebner <heiko@sntech.de>
-Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
-        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, conor.dooley@microchip.com,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v4 04/12] RISC-V: add vector crypto extension detection
-Message-ID: <20230721054812.GE847@sol.localdomain>
-References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230711153743.1970625-5-heiko@sntech.de>
+        Fri, 21 Jul 2023 03:05:03 -0400
+Received: from frasgout12.his.huawei.com (ecs-14-137-139-154.compute.hwclouds-dns.com [14.137.139.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9757A270B;
+        Fri, 21 Jul 2023 00:05:01 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.18.147.227])
+        by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4R6gFz4FnMz9xtVW;
+        Fri, 21 Jul 2023 14:51:51 +0800 (CST)
+Received: from [127.0.0.1] (unknown [10.204.63.22])
+        by APP2 (Coremail) with SMTP id GxC2BwAn3ELoLbpkla7NBA--.21454S2;
+        Fri, 21 Jul 2023 08:04:22 +0100 (CET)
+Message-ID: <21cd4127cee2d920ffab7576e9a6359ec0988b8d.camel@huaweicloud.com>
+Subject: Re: [RFC][PATCH v3 0/9] KEYS: Introduce user asymmetric keys and
+ signatures
+From:   Roberto Sassu <roberto.sassu@huaweicloud.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>, dhowells@redhat.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, zohar@linux.ibm.com,
+        dmitry.kasatkin@gmail.com, paul@paul-moore.com, jmorris@namei.org,
+        serge@hallyn.com
+Cc:     linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, pbrobinson@gmail.com,
+        zbyszek@in.waw.pl, wiktor@metacode.biz,
+        devel@lists.sequoia-pgp.org, gnupg-devel@gnupg.org,
+        ebiggers@kernel.org, Jason@zx2c4.com, mail@maciej.szmigiero.name,
+        antony@vennard.ch, konstantin@linuxfoundation.org,
+        James.Bottomley@HansenPartnership.com,
+        Roberto Sassu <roberto.sassu@huawei.com>
+Date:   Fri, 21 Jul 2023 09:04:04 +0200
+In-Reply-To: <CU76KX3XPZN9.V9GU2ZZKVKO@suppilovahvero>
+References: <20230720153247.3755856-1-roberto.sassu@huaweicloud.com>
+         <CU76KX3XPZN9.V9GU2ZZKVKO@suppilovahvero>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230711153743.1970625-5-heiko@sntech.de>
+X-CM-TRANSID: GxC2BwAn3ELoLbpkla7NBA--.21454S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF47Zry8XF1DXF48KFWrGrg_yoW8uF13pa
+        yrKr93GFyktw1fAr9rJw4qy3y5Cwn3Jw45G3s8t3yFvw4YgFyIvryfK3WYgFZ0kws3Wryj
+        vrW3Wry7Xa98Z3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxV
+        AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAkuxUUUUU=
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAFBF1jj5DBXwAAs-
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 05:37:35PM +0200, Heiko Stuebner wrote:
-> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+On Thu, 2023-07-20 at 20:38 +0300, Jarkko Sakkinen wrote:
+> On Thu Jul 20, 2023 at 6:32 PM EEST, Roberto Sassu wrote:
+> > From: Roberto Sassu <roberto.sassu@huawei.com>
+> > 
+> > Define a new TLV-based format for keys and signatures, aiming to store and
 > 
-> Add detection for some extensions of the vector-crypto specification:
-> - Zvkb: Vector Bit-manipulation used in Cryptography
-> - Zvkg: Vector GCM/GMAC
-> - Zvknha and Zvknhb: NIST Algorithm Suite
-> - Zvkns: AES-128, AES-256 Single Round Suite
-> - Zvksed: ShangMi Algorithm Suite
-> - Zvksh: ShangMi Algorithm Suite
-> 
-> As their use is very specific and will likely be limited to special places
-> we expect current code to just pre-encode those instructions, so right now
-> we don't introduce toolchain requirements.
-> 
-> Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> ---
->  arch/riscv/include/asm/hwcap.h |  9 ++++++
->  arch/riscv/kernel/cpu.c        |  8 ++++++
->  arch/riscv/kernel/cpufeature.c | 50 ++++++++++++++++++++++++++++++++++
->  3 files changed, 67 insertions(+)
-> 
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index b80ca6e77088..0f5172fa87b0 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -64,6 +64,15 @@
->  #define RISCV_ISA_EXT_ZKSED		51
->  #define RISCV_ISA_EXT_ZKSH		52
->  #define RISCV_ISA_EXT_ZKT		53
-> +#define RISCV_ISA_EXT_ZVBB		54
-> +#define RISCV_ISA_EXT_ZVBC		55
-> +#define RISCV_ISA_EXT_ZVKG		56
-> +#define RISCV_ISA_EXT_ZVKNED		57
-> +#define RISCV_ISA_EXT_ZVKNHA		58
-> +#define RISCV_ISA_EXT_ZVKNHB		59
-> +#define RISCV_ISA_EXT_ZVKSED		60
-> +#define RISCV_ISA_EXT_ZVKSH		61
-> +#define RISCV_ISA_EXT_ZVKT		62
+> "type-length-value (TLV) based"
 
-It would be helpful if each RISCV_ISA_EXT_* definition had a comment that spells
-out what it stands for, similar to what arch/x86/include/asm/cpufeatures.h does.
-I know they can all be looked up, and they're sort of mnemonic, but it would be
-helpful.
+Ok.
 
-- Eric
+> > use in the kernel the crypto material from other unsupported formats
+> > (e.g. PGP).
+> 
+> Where's the motivation part and where is this defined?
+
+Ah, thanks for the reminder. Will add it in the next version.
+
+The motivations are:
+
+- Avoid adding complex parsers in the kernel that might introduce
+  vulnerabilities
+- Avoid adding support for key and signature formats that some consider
+  weak
+
+That was basically the summary of the review of my attempt to add
+support for PGP keys and signatures in the kernel.
+
+This patch set adds support for only one format, which other formats
+are converted from.
+
+This is useful for the mere extraction of crypto material, and use it
+with the kernel crypto API.
+
+If there is a trust relationships between the original keys, converting
+keys would lose the ability to verify that trust relationship.
+
+
+Example
+
+Suppose that there is a PGP key in the built-in keyring, and that
+signed another PGP key.
+
+If I want to add the second PGP key to the secondary keyring, I would
+have to verify the signature of that key with the first key.
+
+But the signature is on a PGP packet, so if the kernel verifies that
+signature it would have also to ensure that the public key extracted
+from the signed packet is the same as the converted key.
+
+Originally I thought that we could do the conversion in a fully
+isolated user space process (trustworthy User Mode Driver), so that
+there is the guarantee that the key has not been modified during the
+conversion. However, since it is difficult to achieve perfect
+isolation, that approach has been put on hold.
+
+So, at the moment, verifying trust with user asymmetric keys is not
+possible, but this is not a problem with my use case, as a Linux
+distributions can embed in the kernel all their (converted) public keys
+directly usable for signature verification.
+
+Thanks
+
+Roberto
+
