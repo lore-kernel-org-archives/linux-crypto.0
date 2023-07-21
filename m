@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C424EB64DD
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 04:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 935DCEB64DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 05:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbjGUEm5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jul 2023 00:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49048 "EHLO
+        id S229477AbjGUFNB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Jul 2023 01:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbjGUEm4 (ORCPT
+        with ESMTP id S229450AbjGUFNA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2023 00:42:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30BBC10E5;
-        Thu, 20 Jul 2023 21:42:55 -0700 (PDT)
+        Fri, 21 Jul 2023 01:13:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550C4CC;
+        Thu, 20 Jul 2023 22:12:56 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A2A8F61083;
-        Fri, 21 Jul 2023 04:42:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3232C433C7;
-        Fri, 21 Jul 2023 04:42:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DF11260C8E;
+        Fri, 21 Jul 2023 05:12:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD864C433C7;
+        Fri, 21 Jul 2023 05:12:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689914574;
-        bh=JF0Y6sohRAoq9IsPXejZVN/uvgFs0TOdJTkY2sOlxYE=;
+        s=k20201202; t=1689916375;
+        bh=WPeEnFdfCBLOPdp6eea7RsY9spio4gTJNjv/KaXILgM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rZiCzFUxEeXA8Jo7Yd+wrp9lgbS/8O03w/Oro7QIsGrWKMqPVvIZhKFlYwC3exVar
-         waZEgrnmoW63XKKQqe6K7JjsToA1uagznAoH2vchElZYBY35Zxj52bIOl5r3SoVl7F
-         0nt265dTsWVfZbUu4sU4pA88AlbfplBQOo1+ec9Vanh+6jxmmqKxaa7sZwWK6ekjNC
-         bzxQfc/2LRgNBYqto5plaAqbvFj7+naB/scCkjngytI4GCgb9UkLIZuSemtrRxlJJg
-         wTWUmB36BoMzAhWlamAq304/fsVvhr//iEdpp4/fhM5+/7XxPXCIQgTE2YIsz/wq2U
-         4Mh6HRoJ5WDbQ==
-Date:   Thu, 20 Jul 2023 21:42:52 -0700
+        b=HY5vQyF/dWt+90AINhxoO3ErLd9GcWTIakKly9JVxzWJ0C6zfFvrIe/DE0hJVGBOp
+         7wo6mQMj5x6B/ugcgr7Zb/sjR7+TbGiTkbgErOblnvpEyXzD3AjkAvwRUDKcxw4bhP
+         dpLezp7X3XoDMiejvCbms8dE37rmLI+6+4hyTKs6DkqtaHDO9AN7VGVe8h0ZEzxp6v
+         xQOjGmBsK/kATw1PlXfYOwlccNMrV4DbHIRncc2slu4yfgYp8hvo1qBwWCxOK5Gema
+         NN+N+GgT8Ls8JpZoAc/KiG7MbT58VMSK9Ax6zpR6fJBVi9lCojHOjKzCetqaXpPQmH
+         CGXcVEq1Nwm0w==
+Date:   Thu, 20 Jul 2023 22:12:53 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Heiko Stuebner <heiko@sntech.de>
 Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
@@ -41,132 +41,140 @@ Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
         davem@davemloft.net, conor.dooley@microchip.com,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>,
-        Charalampos Mitrodimas <charalampos.mitrodimas@vrull.eu>
-Subject: Re: [PATCH v4 08/12] RISC-V: crypto: add a vector-crypto-accelerated
- SHA256 implementation
-Message-ID: <20230721044252.GB847@sol.localdomain>
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
+Message-ID: <20230721051253.GC847@sol.localdomain>
 References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230711153743.1970625-9-heiko@sntech.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230711153743.1970625-9-heiko@sntech.de>
+In-Reply-To: <20230711153743.1970625-1-heiko@sntech.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 05:37:39PM +0200, Heiko Stuebner wrote:
-> diff --git a/arch/riscv/crypto/sha256-riscv64-glue.c b/arch/riscv/crypto/sha256-riscv64-glue.c
-> new file mode 100644
-> index 000000000000..1c9c88029f60
-> --- /dev/null
-> +++ b/arch/riscv/crypto/sha256-riscv64-glue.c
-> @@ -0,0 +1,115 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Linux/riscv64 port of the OpenSSL SHA256 implementation for RISCV64
-> + *
-> + * Copyright (C) 2022 VRULL GmbH
-> + * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> + */
-> +
-> +#include <linux/module.h>
-> +#include <linux/types.h>
-> +#include <asm/simd.h>
-> +#include <asm/vector.h>
-> +#include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
-> +#include <crypto/sha2.h>
-> +#include <crypto/sha256_base.h>
-> +
-> +asmlinkage void sha256_block_data_order_zvbb_zvknha(u32 *digest, const void *data,
-> +					unsigned int num_blks);
-> +
-> +static void __sha256_block_data_order(struct sha256_state *sst, u8 const *src,
-> +				      int blocks)
-> +{
-> +	sha256_block_data_order_zvbb_zvknha(sst->state, src, blocks);
-> +}
+Hi Heiko,
 
-Having a double-underscored function wrap around a non-underscored one like this
-isn't conventional for Linux kernel code.  IIRC some of the other crypto code
-happens to do this, but it really is supposed to be the other way around.
+On Tue, Jul 11, 2023 at 05:37:31PM +0200, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> 
+> This series provides cryptographic implementations using the vector
+> crypto extensions.
+> 
+> v13 of the vector patchset dropped the patches for in-kernel usage of
+> vector instructions, I picked the ones from v12 over into this series
+> for now.
+> 
+> My basic goal was to not re-invent cryptographic code, so the heavy
+> lifting is done by those perl-asm scripts used in openssl and the perl
+> code used here-in stems from code that is targetted at openssl [0] and is
+> unmodified from there to limit needed review effort.
+> 
+> With a matching qemu (there are patches for vector-crypto flying around)
+> the in-kernel crypto-selftests (also the extended ones) are very happy
+> so far.
+> 
+> 
+> changes in v4:
+> - split off from scalar crypto patches but base on top of them
+> - adapt to pending openssl code [0] using the now frozen vector crypto
+>   extensions - with all its changes
+>   [0] https://github.com/openssl/openssl/pull/20149
+> 
+> changes in v3:
+> - rebase on top of 6.3-rc2
+> - rebase on top of vector-v14 patchset
+> - add the missing Co-developed-by mentions to showcase
+>   the people that did the actual openSSL crypto code
+> 
+> changes in v2:
+> - rebased on 6.2 + zbb series, so don't include already
+>   applied changes anymore
+> - refresh code picked from openssl as that side matures
+> - more algorithms (SHA512, AES, SM3, SM4)
+> 
+> Greentime Hu (2):
+>   riscv: Add support for kernel mode vector
+>   riscv: Add vector extension XOR implementation
+> 
+> Heiko Stuebner (10):
+>   RISC-V: add helper function to read the vector VLEN
+>   RISC-V: add vector crypto extension detection
+>   RISC-V: crypto: update perl include with helpers for vector (crypto)
+>     instructions
+>   RISC-V: crypto: add Zvbb+Zvbc accelerated GCM GHASH implementation
+>   RISC-V: crypto: add Zvkg accelerated GCM GHASH implementation
+>   RISC-V: crypto: add a vector-crypto-accelerated SHA256 implementation
+>   RISC-V: crypto: add a vector-crypto-accelerated SHA512 implementation
+>   RISC-V: crypto: add Zvkned accelerated AES encryption implementation
+>   RISC-V: crypto: add Zvksed accelerated SM4 encryption implementation
+>   RISC-V: crypto: add Zvksh accelerated SM3 hash implementation
+> 
+>  arch/riscv/crypto/Kconfig                     |  68 ++-
+>  arch/riscv/crypto/Makefile                    |  44 +-
+>  arch/riscv/crypto/aes-riscv-glue.c            | 168 ++++++
+>  arch/riscv/crypto/aes-riscv64-zvkned.pl       | 530 ++++++++++++++++++
+>  arch/riscv/crypto/ghash-riscv64-glue.c        | 245 ++++++++
+>  arch/riscv/crypto/ghash-riscv64-zvbb-zvbc.pl  | 380 +++++++++++++
+>  arch/riscv/crypto/ghash-riscv64-zvkg.pl       | 168 ++++++
+>  arch/riscv/crypto/riscv.pm                    | 433 +++++++++++++-
+>  arch/riscv/crypto/sha256-riscv64-glue.c       | 115 ++++
+>  .../crypto/sha256-riscv64-zvbb-zvknha.pl      | 314 +++++++++++
+>  arch/riscv/crypto/sha512-riscv64-glue.c       | 106 ++++
+>  .../crypto/sha512-riscv64-zvbb-zvknhb.pl      | 377 +++++++++++++
+>  arch/riscv/crypto/sm3-riscv64-glue.c          | 112 ++++
+>  arch/riscv/crypto/sm3-riscv64-zvksh.pl        | 225 ++++++++
+>  arch/riscv/crypto/sm4-riscv64-glue.c          | 162 ++++++
+>  arch/riscv/crypto/sm4-riscv64-zvksed.pl       | 300 ++++++++++
+>  arch/riscv/include/asm/hwcap.h                |   9 +
+>  arch/riscv/include/asm/vector.h               |  28 +
+>  arch/riscv/include/asm/xor.h                  |  82 +++
+>  arch/riscv/kernel/Makefile                    |   1 +
+>  arch/riscv/kernel/cpu.c                       |   8 +
+>  arch/riscv/kernel/cpufeature.c                |  50 ++
+>  arch/riscv/kernel/kernel_mode_vector.c        | 132 +++++
+>  arch/riscv/lib/Makefile                       |   1 +
+>  arch/riscv/lib/xor.S                          |  81 +++
+>  25 files changed, 4136 insertions(+), 3 deletions(-)
+>  create mode 100644 arch/riscv/crypto/aes-riscv-glue.c
+>  create mode 100644 arch/riscv/crypto/aes-riscv64-zvkned.pl
+>  create mode 100644 arch/riscv/crypto/ghash-riscv64-zvbb-zvbc.pl
+>  create mode 100644 arch/riscv/crypto/ghash-riscv64-zvkg.pl
+>  create mode 100644 arch/riscv/crypto/sha256-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sha256-riscv64-zvbb-zvknha.pl
+>  create mode 100644 arch/riscv/crypto/sha512-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sha512-riscv64-zvbb-zvknhb.pl
+>  create mode 100644 arch/riscv/crypto/sm3-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sm3-riscv64-zvksh.pl
+>  create mode 100644 arch/riscv/crypto/sm4-riscv64-glue.c
+>  create mode 100644 arch/riscv/crypto/sm4-riscv64-zvksed.pl
+>  create mode 100644 arch/riscv/include/asm/xor.h
+>  create mode 100644 arch/riscv/kernel/kernel_mode_vector.c
+>  create mode 100644 arch/riscv/lib/xor.S
+> 
 
-I think you should just declare the assembly function to take a 'struct
-sha256_state', with a comment mentioning that only the 'u32 state[8]' at the
-beginning is actually used.  That's what arch/x86/crypto/sha256_ssse3_glue.c
-does, for example.  Then, __sha256_block_data_order() would be unneeded.
+Thanks for working on this patchset!  I'm glad to see that you and others are
+working on this and the code in OpenSSL.  And thanks for running all the kernel
+crypto self-tests and verifying that they pass.
 
-> +static int riscv64_sha256_update(struct shash_desc *desc, const u8 *data,
-> +			 unsigned int len)
-> +{
-> +	if (crypto_simd_usable()) {
+I'm still a bit worried about there being two competing sets of crypto
+extensions for RISC-V: scalar and vector.
 
-crypto_simd_usable() uses may_use_simd() which isn't wired up for RISC-V, so it
-gets the default implementation of '!in_interrupt()'.  RISC-V does have
-may_use_vector() which looks like right thing.  I think RISC-V needs a header
-arch/riscv/include/asm/simd.h which defines may_use_simd() as a wrapper around
-may_use_vector().
+However the vector crypto extensions are moving forwards (they were recently
+frozen), from what I've heard are being implemented in CPUs, and based on this
+patchset implementations of most algorithms are ready already.
 
-> +		int ret;
-> +
-> +		kernel_rvv_begin();
-> +		ret = sha256_base_do_update(desc, data, len,
-> +					    __sha256_block_data_order);
-> +		kernel_rvv_end();
-> +		return ret;
-> +	} else {
-> +		sha256_update(shash_desc_ctx(desc), data, len);
-> +		return 0;
-> +	}
-> +}
-> +
-> +static int riscv64_sha256_finup(struct shash_desc *desc, const u8 *data,
-> +			unsigned int len, u8 *out)
-> +{
-> +	if (!crypto_simd_usable()) {
-> +		sha256_update(shash_desc_ctx(desc), data, len);
-> +		sha256_final(shash_desc_ctx(desc), out);
-> +		return 0;
-> +	}
+So I'm wondering: do you still think that it's valuable to continue with your
+other patchset that adds GHASH acceleration using the scalar extensions (which
+this patchset is still based on)?  
 
-Keep things consistent please.  riscv64_sha256_update() could use
-!crypto_simd_usable() and an early return too.
+I'm wondering if we should be 100% focused on the vector extensions for now to
+avoid fragmentation of effort.
 
-> +static int __init sha256_mod_init(void)
-
-riscv64_sha256_mod_init()
-
-> +{
-> +	/*
-> +	 * From the spec:
-> +	 * Zvknhb supports SHA-256 and SHA-512. Zvknha supports only SHA-256.
-> +	 */
-> +	if ((riscv_isa_extension_available(NULL, ZVKNHA) ||
-> +	     riscv_isa_extension_available(NULL, ZVKNHB)) &&
-> +	     riscv_isa_extension_available(NULL, ZVBB) &&
-> +	     riscv_vector_vlen() >= 128)
-> +
-> +		return crypto_register_shash(&sha256_alg);
-> +
-> +	return 0;
-> +}
-> +
-> +static void __exit sha256_mod_fini(void)
-
-riscv64_sha256_mod_exit()
-
-> +{
-> +	if ((riscv_isa_extension_available(NULL, ZVKNHA) ||
-> +	     riscv_isa_extension_available(NULL, ZVKNHB)) &&
-> +	     riscv_isa_extension_available(NULL, ZVBB) &&
-> +	     riscv_vector_vlen() >= 128)
-> +		crypto_unregister_shash(&sha256_alg);
-> +}
-
-If the needed CPU features aren't present, return -ENODEV from the module_init
-function instead of 0.  Then, the module_exit function can unconditionally
-unregister the algorithm.
+It's just not super clear to me what is driving the scalar crypto support right
+now.  Maybe embedded systems?  Maybe it was just a mistep, perhaps due to being
+started before the CPU even had a vector unit?  I don't know.  If you do indeed
+have a strong reason for it, then you can go ahead -- I just wanted to make sure
+we don't end up doing twice as much work unnecessarily.
 
 - Eric
