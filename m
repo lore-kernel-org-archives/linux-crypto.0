@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0407FEB64DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 05:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 923B8EB64DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 05:49:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbjGUFkm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jul 2023 01:40:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60452 "EHLO
+        id S229977AbjGUFt0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Jul 2023 01:49:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbjGUFkl (ORCPT
+        with ESMTP id S229884AbjGUFst (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2023 01:40:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF2AC1FED;
-        Thu, 20 Jul 2023 22:40:39 -0700 (PDT)
+        Fri, 21 Jul 2023 01:48:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB753AB1;
+        Thu, 20 Jul 2023 22:48:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 75C44610A0;
-        Fri, 21 Jul 2023 05:40:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61FC3C433C9;
-        Fri, 21 Jul 2023 05:40:38 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 889B961185;
+        Fri, 21 Jul 2023 05:48:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D86CC433C8;
+        Fri, 21 Jul 2023 05:48:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689918038;
-        bh=6woljF56EtGa36LjBB3B2sNwJQN8DkkmcmlzgApu4Sg=;
+        s=k20201202; t=1689918494;
+        bh=ahkbJ+oFoqBo9wkehSm+Ve4k00bHUAb6i7Wno4IX6Gw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vAOs35R/eyd+HK5UWNBpYRfZHI9b0+IzsTRKRrl2A6mGThbnVEdEk1D7CXQwb/l5h
-         H6zfH8hXAILEvg7woMboLuY62seV4GFsSq0WkG8URUbLLkTyEWMKZMQeoTl/8Eh+Gg
-         TowgGcFj3Kx+QYVZ9M6vx8Djp3zxgijWDCsaLA2JS7fQf2AQ39CyUeVj+jqwixX3rK
-         edJxrS6NwFbvINVDVSS+LIoEw2RTcYtluixH9mSYDnIBRQEireDYykqkCC7GpVS3/h
-         +jdsEziyDvcEkg2O1RCxaAY/xxkehV6I7URYj6+loKJ7bJ6vsRRox4TabYwYyVpJ8q
-         eZlCqwjSvNcrg==
-Date:   Thu, 20 Jul 2023 22:40:36 -0700
+        b=LOZhr7pfzyu3qz3dL57XPyWiK6pGctPlMOpLvIjeU99BEqoj84ejDo8SeZbGpmzmY
+         g+sn0SuRHWCf2yKoF1VLYxFRFGBeegFJMq71mrfu/pwq02Y0fJqWZ5d2YwcoKwx73g
+         qMXj2iy2JFGYSLyf6IG3vxhXIaRsbBSPDGvN3Iv9Nu0t+/EeuAJTrQF0P4yoYhd6bk
+         xBQzvwBwn/aSymiDVnzMhxaEa5OF5v/CPUvd6yRGeCKtOXetPfcwZlpUWold+EszSe
+         g5Egt94NgK97Upf9lc6SR1XewlxKGbBiHS+EEz+T7KCBCG2cNqzvx2mYtvABy4vJAO
+         kdgfU25pLczMA==
+Date:   Thu, 20 Jul 2023 22:48:12 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Heiko Stuebner <heiko@sntech.de>
 Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
@@ -42,189 +42,61 @@ Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
         linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
         Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
- encryption implementation
-Message-ID: <20230721054036.GD847@sol.localdomain>
+Subject: Re: [PATCH v4 04/12] RISC-V: add vector crypto extension detection
+Message-ID: <20230721054812.GE847@sol.localdomain>
 References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230711153743.1970625-11-heiko@sntech.de>
+ <20230711153743.1970625-5-heiko@sntech.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230711153743.1970625-11-heiko@sntech.de>
+In-Reply-To: <20230711153743.1970625-5-heiko@sntech.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 11, 2023 at 05:37:41PM +0200, Heiko Stuebner wrote:
-> +config CRYPTO_AES_RISCV
-> +	tristate "Ciphers: AES (RISCV)"
-> +	depends on 64BIT && RISCV_ISA_V
-> +	select CRYPTO_AES
-> +	help
-> +	  Block ciphers: AES cipher algorithms (FIPS-197)
-> +	  Length-preserving ciphers: AES with ECB, CBC, CTR, CTS,
-> +	    XCTR, and XTS modes
-> +	  AEAD cipher: AES with CBC, ESSIV, and SHA-256
-> +	    for fscrypt and dm-crypt
-> +
-> +	  Architecture: riscv using one of
-> +	  - Zvkns
+On Tue, Jul 11, 2023 at 05:37:35PM +0200, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> 
+> Add detection for some extensions of the vector-crypto specification:
+> - Zvkb: Vector Bit-manipulation used in Cryptography
+> - Zvkg: Vector GCM/GMAC
+> - Zvknha and Zvknhb: NIST Algorithm Suite
+> - Zvkns: AES-128, AES-256 Single Round Suite
+> - Zvksed: ShangMi Algorithm Suite
+> - Zvksh: ShangMi Algorithm Suite
+> 
+> As their use is very specific and will likely be limited to special places
+> we expect current code to just pre-encode those instructions, so right now
+> we don't introduce toolchain requirements.
+> 
+> Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> ---
+>  arch/riscv/include/asm/hwcap.h |  9 ++++++
+>  arch/riscv/kernel/cpu.c        |  8 ++++++
+>  arch/riscv/kernel/cpufeature.c | 50 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 67 insertions(+)
+> 
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> index b80ca6e77088..0f5172fa87b0 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -64,6 +64,15 @@
+>  #define RISCV_ISA_EXT_ZKSED		51
+>  #define RISCV_ISA_EXT_ZKSH		52
+>  #define RISCV_ISA_EXT_ZKT		53
+> +#define RISCV_ISA_EXT_ZVBB		54
+> +#define RISCV_ISA_EXT_ZVBC		55
+> +#define RISCV_ISA_EXT_ZVKG		56
+> +#define RISCV_ISA_EXT_ZVKNED		57
+> +#define RISCV_ISA_EXT_ZVKNHA		58
+> +#define RISCV_ISA_EXT_ZVKNHB		59
+> +#define RISCV_ISA_EXT_ZVKSED		60
+> +#define RISCV_ISA_EXT_ZVKSH		61
+> +#define RISCV_ISA_EXT_ZVKT		62
 
-I'm looking forward to having direct support for these AES modes, especially the
-modes needed for storage encryption: XTS, and CBC or CTS!  None of these AES
-modes is actually implemented in this patch yet, though, so they can't be
-claimed in the kconfig help text yet.  This patch is just a starting point, as
-it just adds support for the bare AES block cipher ("aes" in the crypto API).
-
-(BTW, I'm much more interested in, say, AES-XTS support than SM4 support, which
-this patchset does include.  SM4 is a "national pride cipher" which is somewhat
-of a niche thing.  I suppose there are already people pushing it for RISC-V
-though, as they are everywhere else, so that's to be expected...)
-
-> diff --git a/arch/riscv/crypto/aes-riscv-glue.c b/arch/riscv/crypto/aes-riscv-glue.c
-> new file mode 100644
-> index 000000000000..85e1187aee22
-> --- /dev/null
-> +++ b/arch/riscv/crypto/aes-riscv-glue.c
-> @@ -0,0 +1,168 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Linux/riscv port of the OpenSSL AES implementation for RISCV
-> + *
-> + * Copyright (C) 2023 VRULL GmbH
-> + * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> + */
-> +
-> +#include <linux/crypto.h>
-> +#include <linux/delay.h>
-> +#include <linux/err.h>
-> +#include <linux/module.h>
-> +#include <linux/types.h>
-> +#include <asm/simd.h>
-> +#include <asm/vector.h>
-> +#include <crypto/aes.h>
-> +#include <crypto/internal/cipher.h>
-> +#include <crypto/internal/simd.h>
-> +
-> +struct aes_key {
-> +	u8 key[AES_MAX_KEYLENGTH];
-> +	int rounds;
-> +};
-> +
-> +/* variant using the zvkned vector crypto extension */
-> +void rv64i_zvkned_encrypt(const u8 *in, u8 *out, const struct aes_key *key);
-> +void rv64i_zvkned_decrypt(const u8 *in, u8 *out, const struct aes_key *key);
-> +int rv64i_zvkned_set_encrypt_key(const u8 *userKey, const int bits,
-> +				struct aes_key *key);
-> +int rv64i_zvkned_set_decrypt_key(const u8 *userKey, const int bits,
-> +				struct aes_key *key);
-> +
-> +struct riscv_aes_ctx {
-> +	struct crypto_cipher *fallback;
-> +	struct aes_key enc_key;
-> +	struct aes_key dec_key;
-> +	unsigned int keylen;
-> +};
-
-Can it just use 'struct crypto_aes_ctx'?  That's what most of the other AES
-implementations use.
-
-> +static int riscv64_aes_init_zvkned(struct crypto_tfm *tfm)
-> +{
-> +	struct riscv_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	const char *alg = crypto_tfm_alg_name(tfm);
-> +	struct crypto_cipher *fallback;
-> +
-> +	fallback = crypto_alloc_cipher(alg, 0, CRYPTO_ALG_NEED_FALLBACK);
-> +	if (IS_ERR(fallback)) {
-> +		pr_err("Failed to allocate transformation for '%s': %ld\n",
-> +		       alg, PTR_ERR(fallback));
-> +		return PTR_ERR(fallback);
-> +	}
-> +
-> +	crypto_cipher_set_flags(fallback,
-> +				crypto_cipher_get_flags((struct
-> +							 crypto_cipher *)
-> +							tfm));
-> +	ctx->fallback = fallback;
-> +
-> +	return 0;
-> +}
-> +
-> +static void riscv_aes_exit(struct crypto_tfm *tfm)
-> +{
-> +	struct riscv_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> +
-> +	if (ctx->fallback) {
-> +		crypto_free_cipher(ctx->fallback);
-> +		ctx->fallback = NULL;
-> +	}
-> +}
-> +
-> +static int riscv64_aes_setkey_zvkned(struct crypto_tfm *tfm, const u8 *key,
-> +			 unsigned int keylen)
-> +{
-> +	struct riscv_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> +	int ret;
-> +
-> +	ctx->keylen = keylen;
-> +
-> +	if (keylen == 16 || keylen == 32) {
-> +		kernel_rvv_begin();
-> +		ret = rv64i_zvkned_set_encrypt_key(key, keylen * 8, &ctx->enc_key);
-> +		if (ret != 1) {
-> +			kernel_rvv_end();
-> +			return -EINVAL;
-> +		}
-> +
-> +		ret = rv64i_zvkned_set_decrypt_key(key, keylen * 8, &ctx->dec_key);
-> +		kernel_rvv_end();
-> +		if (ret != 1)
-> +			return -EINVAL;
-> +	}
-> +
-> +	ret = crypto_cipher_setkey(ctx->fallback, key, keylen);
-> +
-> +	return ret ? -EINVAL : 0;
-> +}
-
-It's a bit annoying that RISC-V doesn't support AES-192, though also not
-particularly surprising, seeing as AES-192 is almost never used.  (Intel's Key
-Locker, for example, is another recent CPU feature that doesn't support
-AES-192.)  IMO the issue here is really with the kernel crypto API -- it should
-treat AES-128, AES-192, and AES-256 as separate algorithms so that
-implementations aren't forced to support all three key sizes...
-
-Anyway, for now, as you noticed you do need a fallback to handle AES-192 to make
-the kernel crypto API happy.
-
-But, the fallback doesn't have to be a 'crypto_cipher' as you've implemented.
-You could just use the AES library.  See what arch/arm64/crypto/aes-ce-glue.c
-does, for example.  Have you considered that?  It would be simpler than the
-crypto_cipher based approach.
-
-> +
-> +static void riscv64_aes_encrypt_zvkned(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-> +{
-> +	struct riscv_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-
-Always use 'const' for the tfm_ctx in encrypt and decrypt functions, please, as
-it must never be modified there.
-
-> +struct crypto_alg riscv64_aes_zvkned_alg = {
-
-static
-
-> +	.cra_type = NULL,
-
-Omit that line
-
-> +	.cra_alignmask = 0,
-
-Omit that line
-
-> +MODULE_DESCRIPTION("AES (accelerated)");
-
-Maybe "RISC-V accelerated"?
+It would be helpful if each RISCV_ISA_EXT_* definition had a comment that spells
+out what it stands for, similar to what arch/x86/include/asm/cpufeatures.h does.
+I know they can all be looked up, and they're sort of mnemonic, but it would be
+helpful.
 
 - Eric
