@@ -2,176 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2413BC001DC
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 11:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2089EB64DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 11:39:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229450AbjGULS1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jul 2023 07:18:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35322 "EHLO
+        id S229570AbjGULjt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Jul 2023 07:39:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231210AbjGULSN (ORCPT
+        with ESMTP id S229536AbjGULjt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2023 07:18:13 -0400
+        Fri, 21 Jul 2023 07:39:49 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205E61715;
-        Fri, 21 Jul 2023 04:18:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E602D75;
+        Fri, 21 Jul 2023 04:39:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 768BC61A32;
-        Fri, 21 Jul 2023 11:18:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 961CAC433CA;
-        Fri, 21 Jul 2023 11:18:10 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 258D961A32;
+        Fri, 21 Jul 2023 11:39:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 466C6C43391;
+        Fri, 21 Jul 2023 11:39:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689938290;
-        bh=+1pRznIJZVGaXfyHrneWrC6bYAtsOlit/tS0KrtG2yM=;
+        s=k20201202; t=1689939584;
+        bh=ixcyPI+tRpHz9AI3BMtu2lOFnZGfsu9wB3fa27jasCs=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZkemUooeRUEBMXoT+eZuwXtiItz8nm/fDLuhMM6XoA0+EU916wGv+BgIRm9/xgMuX
-         SHioymbBApSyxanIRzsRJlh1H1xIrmrEecxMCb2eiIpMa2MDza+a4Lq7s8MEmglIDe
-         ez4c8dEMJ4yU8fNNE27hJRQDS67tU5s8hkkkchIZQ2TJUr2H0Pp5kPNTLBrZ7BE1tE
-         XtM4lvoh9Le7pYU5tDl1ZWsi1wmd04lf2V4ROGk/Ku3L6+VkMgVjYdls3FN1H/kiR2
-         xtTShhij+hbZh33BcJIHIG5mmO1W021HSeM9yzvPFkgCtgYQYflWAvK86K6XkJEDCq
-         e88ULpSvyQglQ==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-4fcd615d7d6so2891849e87.3;
-        Fri, 21 Jul 2023 04:18:10 -0700 (PDT)
-X-Gm-Message-State: ABy/qLb6/q4WRjT4XwdfpkRnqdmVnGhq3BwMzyUEwNPjp3RI6y+k+JvW
-        V37nq1skh4rnl+G7VU76euusfgRNlpu94+0Gjsk=
-X-Google-Smtp-Source: APBJJlGgzNV4bS4ZImEmRoMMfW0jhmUui+8qThAJBRzr+dpV1Qj1REJCRGaubl5KmDySuU4gh04KMBTQZciuHQWvik4=
-X-Received: by 2002:a05:6512:6d4:b0:4f9:58ed:7bba with SMTP id
- u20-20020a05651206d400b004f958ed7bbamr1221034lff.16.1689938288556; Fri, 21
- Jul 2023 04:18:08 -0700 (PDT)
+        b=byMPQs+WrmgchWqISNjIN7asmtO1iXkgIlVIsv+Xdnz7Qc7VZQTXRaVacoAwAgZSw
+         tXdHLLnn3dYw907IDn39Ql4ucmZlH1ZCmKTJBXSAMM7PeinD2wFawWwbXD/de+S5UY
+         bcfFAu7M4bGRTV1Sbbdp2XqXc1YRP+HBIe5U8v7TxJBTXdiqLxSY/rVIk79bjzCevH
+         ib6tGgNhWifxjtPh88ZOE7Yxxo6uJlAZpZQXQyKwuUgX1aNTX+MbErMDd03vJYlp0T
+         CRtKYI6c8dWrhuymV5H6f4tXPr1XgrpxoCQsvLND3iPHpwCVeQ5pEYhRwcKq6rRDql
+         37fyiury4Mk1Q==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-4fbf1f6c771so2950108e87.1;
+        Fri, 21 Jul 2023 04:39:44 -0700 (PDT)
+X-Gm-Message-State: ABy/qLa2xFQKt/NfslRj/w6O1L7eKmU8KfYamNk8oVIqZTrqHfp39VWq
+        RhMM7OswcLXKudd6LNNH0FrKA4Wp1x+9ZGqmo6I=
+X-Google-Smtp-Source: APBJJlFezRKIZgJimN3FDD+tyYMlmqo8uIRe1cDw4B8uo9Xt83FU0WZLGjAZLyP+5rUYx5qfU75Xll2qGWNV8aOTYXo=
+X-Received: by 2002:a05:6512:4022:b0:4fd:d016:c2dd with SMTP id
+ br34-20020a056512402200b004fdd016c2ddmr1315548lfb.12.1689939582014; Fri, 21
+ Jul 2023 04:39:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230718125847.3869700-1-ardb@kernel.org> <20230718125847.3869700-21-ardb@kernel.org>
- <ZLpoDumeF/+xax/V@corigine.com>
-In-Reply-To: <ZLpoDumeF/+xax/V@corigine.com>
+References: <20230711153743.1970625-1-heiko@sntech.de> <20230711153743.1970625-11-heiko@sntech.de>
+ <20230721054036.GD847@sol.localdomain>
+In-Reply-To: <20230721054036.GD847@sol.localdomain>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Fri, 21 Jul 2023 13:17:57 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXE4BFjracdzsM87Kq40t683RnT4VXEZjU0d0gRVwso=vA@mail.gmail.com>
-Message-ID: <CAMj1kXE4BFjracdzsM87Kq40t683RnT4VXEZjU0d0gRVwso=vA@mail.gmail.com>
-Subject: Re: [RFC PATCH 20/21] crypto: deflate - implement acomp API directly
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Haren Myneni <haren@us.ibm.com>,
-        Nick Terrell <terrelln@fb.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Richard Weinberger <richard@nod.at>,
-        David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
-        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Date:   Fri, 21 Jul 2023 13:39:30 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFqs9v1Ao1RQRXiccKEMhXpy9O=Ng8TQ--vdOkTz5Yc5Q@mail.gmail.com>
+Message-ID: <CAMj1kXFqs9v1Ao1RQRXiccKEMhXpy9O=Ng8TQ--vdOkTz5Yc5Q@mail.gmail.com>
+Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
+ encryption implementation
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 21 Jul 2023 at 13:12, Simon Horman <simon.horman@corigine.com> wrote:
+On Fri, 21 Jul 2023 at 07:40, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Tue, Jul 18, 2023 at 02:58:46PM +0200, Ard Biesheuvel wrote:
->
-> ...
->
-> > -static int deflate_comp_init(struct deflate_ctx *ctx)
-> > +static int deflate_process(struct acomp_req *req, struct z_stream_s *stream,
-> > +                        int (*process)(struct z_stream_s *, int))
-> >  {
-> > -     int ret = 0;
-> > -     struct z_stream_s *stream = &ctx->comp_stream;
-> > +     unsigned int slen = req->slen;
-> > +     unsigned int dlen = req->dlen;
-> > +     struct scatter_walk src, dst;
-> > +     unsigned int scur, dcur;
+> On Tue, Jul 11, 2023 at 05:37:41PM +0200, Heiko Stuebner wrote:
+...
+> > +static int riscv64_aes_setkey_zvkned(struct crypto_tfm *tfm, const u8 *key,
+> > +                      unsigned int keylen)
+> > +{
+> > +     struct riscv_aes_ctx *ctx = crypto_tfm_ctx(tfm);
 > > +     int ret;
-> >
-> > -     stream->workspace = vzalloc(zlib_deflate_workspacesize(
-> > -                             -DEFLATE_DEF_WINBITS, DEFLATE_DEF_MEMLEVEL));
-> > -     if (!stream->workspace) {
-> > -             ret = -ENOMEM;
-> > -             goto out;
-> > -     }
-> > +     stream->avail_in = stream->avail_out = 0;
 > > +
-> > +     scatterwalk_start(&src, req->src);
-> > +     scatterwalk_start(&dst, req->dst);
+> > +     ctx->keylen = keylen;
 > > +
-> > +     scur = dcur = 0;
-> > +
-> > +     do {
-> > +             if (stream->avail_in == 0) {
-> > +                     if (scur) {
-> > +                             slen -= scur;
-> > +
-> > +                             scatterwalk_unmap(stream->next_in - scur);
-> > +                             scatterwalk_advance(&src, scur);
-> > +                             scatterwalk_done(&src, 0, slen);
-> > +                     }
-> > +
-> > +                     scur = scatterwalk_clamp(&src, slen);
-> > +                     if (scur) {
-> > +                             stream->next_in = scatterwalk_map(&src);
-> > +                             stream->avail_in = scur;
-> > +                     }
+> > +     if (keylen == 16 || keylen == 32) {
+> > +             kernel_rvv_begin();
+> > +             ret = rv64i_zvkned_set_encrypt_key(key, keylen * 8, &ctx->enc_key);
+> > +             if (ret != 1) {
+> > +                     kernel_rvv_end();
+> > +                     return -EINVAL;
 > > +             }
 > > +
-> > +             if (stream->avail_out == 0) {
-> > +                     if (dcur) {
-> > +                             dlen -= dcur;
-> > +
-> > +                             scatterwalk_unmap(stream->next_out - dcur);
-> > +                             scatterwalk_advance(&dst, dcur);
-> > +                             scatterwalk_done(&dst, 1, dlen);
-> > +                     }
-> > +
-> > +                     dcur = scatterwalk_clamp(&dst, dlen);
-> > +                     if (!dcur)
-> > +                             break;
->
-> Hi Ard,
->
-> I'm unsure if this can happen. But if this break occurs in the first
-> iteration of this do loop, then ret will be used uninitialised below.
->
-> Smatch noticed this.
->
+> > +             ret = rv64i_zvkned_set_decrypt_key(key, keylen * 8, &ctx->dec_key);
 
-Thanks.
+The asm suggests that the encryption and decryption key schedules are
+the same, and the decryption algorithm does not implement the
+Equivalent Inverse Cipher, but simply iterates over they key schedule
+in reverse order. This makes much more sense for instruction based
+AES, so it doesn't surprise me but it does mean you can just drop this
+part, and pass enc_key everywhere.
 
-This should not happen - it would mean req->dlen == 0, which is
-rejected before this function is even called.
-
-Whether or not it might ever happen in practice is a different matter,
-of course, so I should probably initialize 'ret' to something sane.
-
-
-
+> > +             kernel_rvv_end();
+> > +             if (ret != 1)
+> > +                     return -EINVAL;
+> > +     }
 > > +
-> > +                     stream->next_out = scatterwalk_map(&dst);
-> > +                     stream->avail_out = dcur;
-> > +             }
+> > +     ret = crypto_cipher_setkey(ctx->fallback, key, keylen);
 > > +
-> > +             ret = process(stream, (slen == scur) ? Z_FINISH : Z_SYNC_FLUSH);
-> > +     } while (ret == Z_OK);
-> > +
-> > +     if (scur)
-> > +             scatterwalk_unmap(stream->next_in - scur);
-> > +     if (dcur)
-> > +             scatterwalk_unmap(stream->next_out - dcur);
-> > +
-> > +     if (ret != Z_STREAM_END)
-> > +             return -EINVAL;
-> > +
-> > +     req->dlen = stream->total_out;
-> > +     return 0;
+> > +     return ret ? -EINVAL : 0;
 > > +}
 >
-> ...
+> It's a bit annoying that RISC-V doesn't support AES-192, though also not
+> particularly surprising, seeing as AES-192 is almost never used.  (Intel's Key
+> Locker, for example, is another recent CPU feature that doesn't support
+> AES-192.)  IMO the issue here is really with the kernel crypto API -- it should
+> treat AES-128, AES-192, and AES-256 as separate algorithms so that
+> implementations aren't forced to support all three key sizes...
+>
+
+Why is this a fundamental limitation? AES-192 uses the same AES block
+size and round structure, the only difference is the number of rounds
+and how the round keys are calculated.
+
+Creating the key schedule should never be performance critical, so if
+the lack of AES-192 support is due to a limitation in the key schedule
+generation instructions, I'd suggest to avoid those if possible and
+just use the generic library code to derive the key schedule. If that
+works, I'm pretty sure AES-192 support is just a matter of
+implementing a 12-round variant modeled after the existing 10/14 round
+ones.
