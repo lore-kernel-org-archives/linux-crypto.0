@@ -2,141 +2,64 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE82C0015E
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jul 2023 19:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D66C001DF
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jul 2023 01:23:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231598AbjGUTDG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jul 2023 15:03:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56198 "EHLO
+        id S230228AbjGVBXb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Jul 2023 21:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231587AbjGUTDF (ORCPT
+        with ESMTP id S229534AbjGVBXa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jul 2023 15:03:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7FC330DD;
-        Fri, 21 Jul 2023 12:03:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5AD3061D84;
-        Fri, 21 Jul 2023 19:03:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BE28C433C8;
-        Fri, 21 Jul 2023 19:03:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1689966182;
-        bh=Oc4BTr5K3vTeSxq00miA1QYT23jOa88djcW0k/clk4w=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M5WZTEzx99ih1ZcJPzeiH5aNbddQlPCxwehpNmaY8riwpjgl/b75FQFuYnjbcvJPC
-         NYPOYezbOJq2ajKD5Py8KfoTH7ty8KCYieEj5iyE5tjj/qsTzvn/kg7F5J8dkz7y8N
-         wDQbFEoA/kdxHeqgx38dLG1Rybs613K1Fab10iXU=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     stable@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        patches@lists.linux.dev, Randy Dunlap <rdunlap@infradead.org>,
-        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linuxppc-dev@lists.ozlabs.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15 225/532] crypto: nx - fix build warnings when DEBUG_FS is not enabled
-Date:   Fri, 21 Jul 2023 18:02:09 +0200
-Message-ID: <20230721160626.586030526@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230721160614.695323302@linuxfoundation.org>
-References: <20230721160614.695323302@linuxfoundation.org>
-User-Agent: quilt/0.67
+        Fri, 21 Jul 2023 21:23:30 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D7E30C4;
+        Fri, 21 Jul 2023 18:23:29 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qN1Kt-002CvY-Tq; Sat, 22 Jul 2023 11:23:09 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Jul 2023 13:23:01 +1200
+Date:   Sat, 22 Jul 2023 13:23:01 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
+        dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
+        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH v7 12/14] crypto: iaa - Add support for deflate-iaa
+ compression algorithm
+Message-ID: <ZLsvdS6NbaetDFe1@gondor.apana.org.au>
+References: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
+ <20230710190654.299639-13-tom.zanussi@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230710190654.299639-13-tom.zanussi@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+On Mon, Jul 10, 2023 at 02:06:52PM -0500, Tom Zanussi wrote:
+>
+> Because the IAA hardware has a 4k history-window limitation, only
+> buffers <= 4k, or that have been compressed using a <= 4k history
+> window, are technically compliant with the deflate spec, which allows
+> for a window of up to 32k.  Because of this limitation, the IAA fixed
+> mode deflate algorithm is given its own algorithm name, 'deflate-iaa'.
 
-[ Upstream commit b04b076fb56560b39d695ac3744db457e12278fd ]
+So compressed results produced by this can always be decompressed
+by the generic algorithm, right?
 
-Fix build warnings when DEBUG_FS is not enabled by using an empty
-do-while loop instead of a value:
+If it's only when you decompress that you may encounter failures,
+then I suggest that we still use the same algorithm name, but fall
+back at run-time if the result cannot be decompressed by the
+hardware.  Is it possible to fail gracefully and then retry the
+decompression in this case?
 
-In file included from ../drivers/crypto/nx/nx.c:27:
-../drivers/crypto/nx/nx.c: In function 'nx_register_algs':
-../drivers/crypto/nx/nx.h:173:33: warning: statement with no effect [-Wunused-value]
-  173 | #define NX_DEBUGFS_INIT(drv)    (0)
-../drivers/crypto/nx/nx.c:573:9: note: in expansion of macro 'NX_DEBUGFS_INIT'
-  573 |         NX_DEBUGFS_INIT(&nx_driver);
-../drivers/crypto/nx/nx.c: In function 'nx_remove':
-../drivers/crypto/nx/nx.h:174:33: warning: statement with no effect [-Wunused-value]
-  174 | #define NX_DEBUGFS_FINI(drv)    (0)
-../drivers/crypto/nx/nx.c:793:17: note: in expansion of macro 'NX_DEBUGFS_FINI'
-  793 |                 NX_DEBUGFS_FINI(&nx_driver);
-
-Also, there is no need to build nx_debugfs.o when DEBUG_FS is not
-enabled, so change the Makefile to accommodate that.
-
-Fixes: ae0222b7289d ("powerpc/crypto: nx driver code supporting nx encryption")
-Fixes: aef7b31c8833 ("powerpc/crypto: Build files for the nx device driver")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Breno Leitão <leitao@debian.org>
-Cc: Nayna Jain <nayna@linux.ibm.com>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/nx/Makefile | 2 +-
- drivers/crypto/nx/nx.h     | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index d00181a26dd65..483cef62acee8 100644
---- a/drivers/crypto/nx/Makefile
-+++ b/drivers/crypto/nx/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_NX_ENCRYPT) += nx-crypto.o
- nx-crypto-objs := nx.o \
--		  nx_debugfs.o \
- 		  nx-aes-cbc.o \
- 		  nx-aes-ecb.o \
- 		  nx-aes-gcm.o \
-@@ -11,6 +10,7 @@ nx-crypto-objs := nx.o \
- 		  nx-sha256.o \
- 		  nx-sha512.o
- 
-+nx-crypto-$(CONFIG_DEBUG_FS) += nx_debugfs.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_PSERIES) += nx-compress-pseries.o nx-compress.o
- obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o nx-compress.o
- nx-compress-objs := nx-842.o
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index c6233173c612e..2697baebb6a35 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -170,8 +170,8 @@ struct nx_sg *nx_walk_and_build(struct nx_sg *, unsigned int,
- void nx_debugfs_init(struct nx_crypto_driver *);
- void nx_debugfs_fini(struct nx_crypto_driver *);
- #else
--#define NX_DEBUGFS_INIT(drv)	(0)
--#define NX_DEBUGFS_FINI(drv)	(0)
-+#define NX_DEBUGFS_INIT(drv)	do {} while (0)
-+#define NX_DEBUGFS_FINI(drv)	do {} while (0)
- #endif
- 
- #define NX_PAGE_NUM(x)		((u64)(x) & 0xfffffffffffff000ULL)
+Thanks,
 -- 
-2.39.2
-
-
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
