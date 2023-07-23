@@ -2,97 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B93CC001DF
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jul 2023 17:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B50A7C001DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jul 2023 22:37:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbjGVROd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 22 Jul 2023 13:14:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34072 "EHLO
+        id S229823AbjGWWhJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 23 Jul 2023 18:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjGVROc (ORCPT
+        with ESMTP id S229470AbjGWWhI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Jul 2023 13:14:32 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D567E67;
-        Sat, 22 Jul 2023 10:14:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690046071; x=1721582071;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=/NqgA0E24iFKqv6TOSZM3Z4tMvI5XUmHE6RDNtykCIo=;
-  b=i6EQxJQ4T2ohQ8ML37NC1saU/Tky9ftlyhPyAS95W8iNQAtZuHHHHFxi
-   MSHXRDRkZvcUM+X4agTVIiXQl2Mw0qozCOm53lda6FXFGYAYQvO3P4pe9
-   5POCcC6b+We4w92lZgcM4Smk3F4cvwbybLt+YsS9CSB8DhmqUBGqQFqFu
-   Ope28M2GFzZ9SyC4b+eDlrdrwR+yjRTi4T5mwIn9PcOAb014vYCLWFtM6
-   rTQ7FTs7dYY9bIlu4Iul8uMS8vBdz7bhuhlmYXUq3QOLxQ+iMvHmlHQm2
-   nZ8z/3qCuQkiljQCkEeV17uB9K+rrnXheMNRyBp8cnwr1GZcxbXeohifh
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10779"; a="346815030"
-X-IronPort-AV: E=Sophos;i="6.01,224,1684825200"; 
-   d="scan'208";a="346815030"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2023 10:14:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10779"; a="702386602"
-X-IronPort-AV: E=Sophos;i="6.01,224,1684825200"; 
-   d="scan'208";a="702386602"
-Received: from maggieya-mobl1.amr.corp.intel.com ([10.212.61.70])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2023 10:14:29 -0700
-Message-ID: <6ba5b58f637e3ec8c4b00e407e18dd426db6086f.camel@linux.intel.com>
-Subject: Re: [PATCH v7 12/14] crypto: iaa - Add support for deflate-iaa
- compression algorithm
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
-        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Date:   Sat, 22 Jul 2023 12:14:28 -0500
-In-Reply-To: <ZLsvdS6NbaetDFe1@gondor.apana.org.au>
-References: <20230710190654.299639-1-tom.zanussi@linux.intel.com>
-         <20230710190654.299639-13-tom.zanussi@linux.intel.com>
-         <ZLsvdS6NbaetDFe1@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1-0ubuntu1 
+        Sun, 23 Jul 2023 18:37:08 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3794F1B0;
+        Sun, 23 Jul 2023 15:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1690151825;
+        bh=LxW6JJ6AtaorYpCXyS2NzoLc0u4P3By4MVniWy6RjsM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=HCtX4+qEOZJ3f+2EJqfRdiWE3e26kIoZm5IQxoWmLoNYrj2Bz8cPNvTFmEeatzygN
+         ibgJUI8QmDahETT2muZAx+ISaza5k8YDFUWlwpXv00F/r3ns27KjVZDQzcr8mOAhb2
+         Uv0Yz8OQ+1v9MPsq9xsoNAzM91BT4AJkxObag3XztqYHlG8LLGEv8Z764HynlHrNMn
+         eS1nSf2gl5dKQp/IBvi3EUriuSzvBPwgelHoOoH2FXRAgoY7jm1mkouWryXIwpYpPL
+         2AGvODwUezU6yr+pmIphd/osLWvdy0O3/7rtFRuiIqsQqbRf9TGw07e2togL6+WBfr
+         ceU0u3kV/xwjQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4R8J7h6LD3z4wZn;
+        Mon, 24 Jul 2023 08:37:04 +1000 (AEST)
+Date:   Mon, 24 Jul 2023 08:37:03 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Weili Qian <qianweili@huawei.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the crypto tree
+Message-ID: <20230724083703.5d995fb4@canb.auug.org.au>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/d1vHiiYsJxy71g3tmV1270v";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 2023-07-22 at 13:23 +1200, Herbert Xu wrote:
-> On Mon, Jul 10, 2023 at 02:06:52PM -0500, Tom Zanussi wrote:
-> >=20
-> > Because the IAA hardware has a 4k history-window limitation, only
-> > buffers <=3D 4k, or that have been compressed using a <=3D 4k history
-> > window, are technically compliant with the deflate spec, which
-> > allows
-> > for a window of up to 32k.=C2=A0 Because of this limitation, the IAA
-> > fixed
-> > mode deflate algorithm is given its own algorithm name, 'deflate-
-> > iaa'.
->=20
-> So compressed results produced by this can always be decompressed
-> by the generic algorithm, right?
->=20
+--Sig_/d1vHiiYsJxy71g3tmV1270v
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Right.
+Hi all,
 
-> If it's only when you decompress that you may encounter failures,
-> then I suggest that we still use the same algorithm name, but fall
-> back at run-time if the result cannot be decompressed by the
-> hardware.=C2=A0 Is it possible to fail gracefully and then retry the
-> decompression in this case?
->=20
+In commit
 
-Yeah, I think that should be possible. I'll try it out and add it to
-the next version.  Thanks for the suggestion!
+  5cd4ed98cfb7 ("crypto: hisilicon/qm - flush all work before driver remove=
+d")
 
-Tom
+Fixes tag
 
+  Fixes: ("crypto: hisilicon/qm - enable PF and VFs communication")
 
-> Thanks,
+has these problem(s):
 
+  - No SHA1 recognised
+
+Maybe you meant
+
+Fixes: e3ac4d20e936 ("crypto: hisilicon/qm - enable PF and VFs communicatio=
+n")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/d1vHiiYsJxy71g3tmV1270v
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmS9q48ACgkQAVBC80lX
+0Gwrtgf9FhOKwL0Q0OrSI5uoroI2Y0FXt8g0dKfYBdItKQ2/KZTDfjng8NR9bX7g
+g+HfGUJ9HaeAqoF0pqMbeldVqZ1N2ta64y1LcUnfB6ChxInJg9g1KwI3xs5R97Fy
+BRHW8XF2pnYnkiZU1A2IYkQzErtW2wjbNN+8et7ajbMJbDhginZEN6hiOWc6DDb7
+Y9X4Ha5eqpGyjfNjQJ12U503A53bpDF7Lo+FeggTKf3Kq0Z23EmqJHqJ33sjvRjR
+FPfY1ARsMT4UWLbg3+Pb3BXHl3cP4YK81kcWjGOEOX+m4BSSXtwXjIcsxv7iJMxc
+2ujLJfIVrvbOlZulEa32jYn0JAFm5Q==
+=ytar
+-----END PGP SIGNATURE-----
+
+--Sig_/d1vHiiYsJxy71g3tmV1270v--
