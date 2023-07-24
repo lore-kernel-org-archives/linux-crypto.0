@@ -2,151 +2,132 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 710D7C0015E
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jul 2023 13:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F13C41513
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jul 2023 16:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230292AbjGXNzT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jul 2023 09:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55510 "EHLO
+        id S231712AbjGXQpr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Jul 2023 12:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbjGXNzF (ORCPT
+        with ESMTP id S231680AbjGXQpk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2023 09:55:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277E510C1;
-        Mon, 24 Jul 2023 06:53:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9501E611DE;
-        Mon, 24 Jul 2023 13:53:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17424C433C8;
-        Mon, 24 Jul 2023 13:53:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690206814;
-        bh=GcqqK+LiddjQxr47IifyNeabGtVWcJ8dLE0tnOoG+mg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ot8DzcsZjDhAnNrPQUetSgHF6Mi5aFoqafosoAaRgvQlqcwmstkqlc3jCVTt8l7L9
-         ePasp7Ma/20H837s6X9vI05N2rLCZtlfvUjPXfMZXHxQHqPXFRx521KCWHd0VVf6Rz
-         4WKMdyWq934zbAqS95PeOl48EG4LWhLjwuEqv8Xuw1cAKZ5HOzpg22DmrUlp9lmqGc
-         Ch81Ya0EHf6IZylS1IIo5GrzN0ubgdGn1b39/CqEtl1+VRPR41P2chM6jCPrcMx8v2
-         Ith2Pyka/C+Igv93wBbHAyiIASCDCJREhF1bmJwHZThc7Vls7fEu6pJlyFLXYTYxpA
-         0NwVUI6tgeDbA==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Mon, 24 Jul 2023 12:45:40 -0400
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD04210FD;
+        Mon, 24 Jul 2023 09:45:36 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36OGjMDL014257;
+        Mon, 24 Jul 2023 11:45:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1690217122;
+        bh=J/1A54UrbnLwjoFDugLDlJ2Tk5ZoBNw19JPk+14nDnc=;
+        h=Date:From:To:CC:Subject:References:In-Reply-To;
+        b=p4YnrqcxOJIObrcxUaMUcbN+rp4yajyI1LSykNv8TAI2LYHBp/Z1H4xoIYTiMupa+
+         1/XIH3P8d4a+edwwXU1OuPpmwjb1j2UMpV1/zgK6QhEZZl4SaXKIV8bxJYZkTdVrm4
+         zRC5V6coW1VE4xrK0ET24wcAdhNDNAxO8WZdFZ+Y=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36OGjMSq119754
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 24 Jul 2023 11:45:22 -0500
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 24
+ Jul 2023 11:45:21 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 24 Jul 2023 11:45:21 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36OGjMwE102315;
+        Mon, 24 Jul 2023 11:45:22 -0500
+Date:   Mon, 24 Jul 2023 11:45:21 -0500
+From:   Nishanth Menon <nm@ti.com>
+To:     Kamlesh Gurudasani <kamlesh@ti.com>
+CC:     Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Jayesh Choudhary <j-choudhary@ti.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Yangtao Li <frank.li@vivo.com>,
-        Sergiu Moga <sergiu.moga@microchip.com>,
-        Ryan Wanner <Ryan.Wanner@microchip.com>,
-        Gaosheng Cui <cuigaosheng1@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
-Date:   Mon, 24 Jul 2023 15:53:01 +0200
-Message-Id: <20230724135327.1173309-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        "Tero Kristo" <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh@kernel.org>, <linux-crypto@vger.kernel.org>,
+        Conor Dooley <conor.dooley@microchip.com>
+Subject: Re: [PATCH v5 1/2] dt-bindings: crypto: ti,sa2ul: make power-domains
+ conditional
+Message-ID: <20230724164521.tkyxpivqtsf222hb@litigator>
+References: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
+ <20230614-sa3ul-v5-1-29dd2366fba3@ti.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230614-sa3ul-v5-1-29dd2366fba3@ti.com>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+On 14:42-20230714, Kamlesh Gurudasani wrote:
+> Devices specific to compatible ti,am62-sa3ul don't have control over
+> power of SA3UL from main domain.
+> 
+> "power-domains" property in crypto node tries to access
+> the SA3UL power, for which it gets NACK and hence, driver doesn't
+> probe properly for those particular devices.
+> 
+> Make "power-domains" property as false for devices with
+> compatible ti,am62-sa3ul.
+> 
+> Fixes: 2ce9a7299bf6 ("dt-bindings: crypto: Add TI SA2UL crypto accelerator documentation")
+> 
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
 
-Some configurations with gcc-12 or gcc-13 produce a warning for the source
-and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
-overlapping:
+Herbert, Do you see a problem if I pick this patch via TI SoC Tree?
 
-In file included from include/linux/string.h:254,
-                 from drivers/crypto/atmel-sha.c:15:
-drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
-include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
-   57 | #define __underlying_memcpy     __builtin_memcpy
-      |                                 ^
-include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
-  648 |         __underlying_##op(p, q, __fortify_size);                        \
-      |         ^~~~~~~~~~~~~
-include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
-  693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-      |                          ^~~~~~~~~~~~~~~~~~~~
-drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
- 1773 |         memcpy(hmac->opad, hmac->ipad, bs);
-      |         ^~~~~~
+if you are OK, I'd like to take the series to keep it clean.
 
-The same thing happens in two more drivers that have the same logic:
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+> index 77ec8bc70bf7..f0ef7685550a 100644
+> --- a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+> @@ -66,10 +66,22 @@ patternProperties:
+>  required:
+>    - compatible
+>    - reg
+> -  - power-domains
+>    - dmas
+>    - dma-names
+>  
+> +allOf:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: ti,am62-sa3ul
+> +    then:
+> +      properties:
+> +        power-domains: false
+> +    else:
+> +      required:
+> +        - power-domains
+> +
+>  additionalProperties: false
+>  
+>  examples:
+> 
+> -- 
+> 2.34.1
+> 
 
-drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_ahash_setkey':
-include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 260 and 132 overlaps 1 or more bytes at offset 260 [-Werror=restrict]
-drivers/crypto/bcm/cipher.c: In function 'ahash_hmac_setkey':
-include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing between 129 and 4294967295 bytes at offsets 840 and 712 overlaps between 1 and 4294967167 bytes at offset 840 [-Werror=restrict]
-
-I don't think it can actually happen because the size is strictly bounded
-to the available block sizes, at most 128 bytes, though inlining decisions
-could lead gcc to not see that.
-
-Add an explicit size check to make sure gcc also sees this function is safe
-regardless of inlining.
-
-Note that the -Wrestrict warning is currently disabled by default, but it
-would be nice to finally enable it, and these are the only false
-postives that I see at the moment. There are 9 other crypto drivers that
-also use an identical memcpy() but don't show up in randconfig build
-warnings for me, presumably because of different inlining decisions.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/atmel-sha.c         | 3 +++
- drivers/crypto/bcm/cipher.c        | 3 +++
- drivers/crypto/chelsio/chcr_algo.c | 3 +++
- 3 files changed, 9 insertions(+)
-
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index f2031f934be95..52a3c81b3a05a 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1770,6 +1770,9 @@ static int atmel_sha_hmac_compute_ipad_hash(struct atmel_sha_dev *dd)
- 	size_t bs = ctx->block_size;
- 	size_t i, num_words = bs / sizeof(u32);
- 
-+	if (bs > sizeof(hmac->opad))
-+		return -EINVAL;
-+
- 	memcpy(hmac->opad, hmac->ipad, bs);
- 	for (i = 0; i < num_words; ++i) {
- 		hmac->ipad[i] ^= 0x36363636;
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 70b911baab26d..8633ca0286a10 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -2327,6 +2327,9 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
- 		 __func__, ahash, key, keylen, blocksize, digestsize);
- 	flow_dump("  key: ", key, keylen);
- 
-+	if (blocksize > sizeof(ctx->opad))
-+		return -EINVAL;
-+
- 	if (keylen > blocksize) {
- 		switch (ctx->auth.alg) {
- 		case HASH_ALG_MD5:
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 0eade4fa6695b..5c8e10ee010ff 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2201,6 +2201,9 @@ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 
- 	SHASH_DESC_ON_STACK(shash, hmacctx->base_hash);
- 
-+	if (bs > sizeof(hmacctx->opad))
-+		return -EINVAL;
-+
- 	/* use the key to calculate the ipad and opad. ipad will sent with the
- 	 * first request's data. opad will be sent with the final hash result
- 	 * ipad in hmacctx->ipad and opad in hmacctx->opad location
 -- 
-2.39.2
-
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
