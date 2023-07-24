@@ -2,317 +2,149 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18274EB64DD
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jul 2023 05:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39068C0015E
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jul 2023 06:52:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbjGXFNa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jul 2023 01:13:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58356 "EHLO
+        id S229821AbjGXGwz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Jul 2023 02:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjGXFN3 (ORCPT
+        with ESMTP id S231264AbjGXGwy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jul 2023 01:13:29 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2089.outbound.protection.outlook.com [40.107.8.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B754E6;
-        Sun, 23 Jul 2023 22:13:27 -0700 (PDT)
+        Mon, 24 Jul 2023 02:52:54 -0400
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2081.outbound.protection.outlook.com [40.107.6.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEA0812A;
+        Sun, 23 Jul 2023 23:52:46 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gQEGpqhoC9/R6p10oMsTDbwajVBN61ulNRBe1Imb2C3+jzOZo0f3d5bAf9PVOQDNiMm32moFWG+SYTuBe5NIqF/Xlhox4tMP9csB6+MPfQdkOAqXbuEXHVMxvyOhjI5/NzzT6gIv2Uyk4qXemk4jlq8TTAraZAuNFoKJgZwerIm0LXYPuvfP0hsaQToTiADOO2rtiaiQ4Pgyf40mfn6PiSdoI1mDGPQ6HuvAwgYHAFSo0E6B/pqKIvEWrLgnff540HRM2DEH930WIGqVBrPbV5MxUJDxmSfsi1DDQlg3F80FlB6JmQc6ZMDL8zxJ2YCa+pe9wfnlft69jCSn+ZuNdw==
+ b=H3SS1w8AavPO2Axe4pt3B6edsyZ6iGGEP2s60/Bn1EEohemXfZC2UKV2yb/KLoRaY1GkTW7DxEBLvUh2c/sZ0IWsCwbXDXBT/YjzhVYuddzgifYyzHtoVLB1j0OCM+zh/GC1em7wbbqEkWC8E+NV/tcfauue15qe3I0HW58geAPt7+D3C57n+jbY6d3Dj5a8igkcB9P8uBrlQ2/g12neBd9B38pLezqzas+Pfmt/4ax4GD5NY4j5hKu/9DBFhtWFsHC0hKHxFUEpoyI9rXTpAb/E977HA6Bxz/1cC7NHKzsO3Scb4KZcfn2GU0o04wfuLbSDz4hj7m/V9WFRNp6ZOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b6SzSl+m8HOw8hSYJ4CsM+a65aGT8BSEnB2zOPssa94=;
- b=SZLRpmjIvFQ2jlzwofdLawvaMlc5YRjzCoxwXZBXKE7DLcLmHAqwoUZyHLpZJF64adU7yVkboB2x99pikpbb4mauJYiFLus5IEc70QuXZ4SIcORA9AIZcmFTgcc4UQAZGjm5Q0rpdkx2Ez+AzY1T531qCZcBlmofzixxMp+1HJ3ztAmOtNP8Eu0C7ZemuTxXu34YiHAafi11a5tVWF9dB0nLIm358Dk1JRwZLwYXtiAQ+wT/Uw/ySsxfjpOurRjCQdRs8EEv5H24U4Qjf9quYsIHBb2+8eYch9dzhLtcqB6bpN571DMUWXv72/n3x+NqbB30Ad1jgWl9Zm30wTySPg==
+ bh=54yKY+C8k4Miq8KeOUe7T2DpFtEBFBtlGA/kLMZHRvQ=;
+ b=GXtTgC7ciErV5c11Jd1fl0YJwIatGjARQpbZqNYFFAM945dbvYHmI66hvwN3TQ/Gnad5Ls1Fi8kXmtq7PfL1/YZMkCX0FmOhpa+KIuvxYrEF5Vcc2CrIz9/cGlh+xVHd7R9JAOL0fB481iNWP3YzM0jPJBeJDc4h6DwCNHqiJzZQDo9aLFQCiW48flfNYXlubnyhtfrzXBorfyQsSsldiK+yG/4lqR9umQSThBlBnxuR4/8/g72qgP+x2oES0QCX/JBN1AZNlMjF74/QThBZQrXhvZSVazy12CIxXUZdqga3MnrzyLC7snVti90oDbML62+vyiD3QGSmCg9SN7XNgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b6SzSl+m8HOw8hSYJ4CsM+a65aGT8BSEnB2zOPssa94=;
- b=m+dqdKkaBU5hkaVboxwuWjCf7Y1vlBg6s8NtFjuU92sCxwOLBbchLf2cXZkiezjCjhZ88Ee0EqqscqFFkNyfjdHETgZKAngjd2D3/6IItMcEjsHKZwZOygdCp7OM1d+gKWj4NF/7emUQNC0PugvOIVL7hQ8EeC3ifsUFyFaSxZs=
+ bh=54yKY+C8k4Miq8KeOUe7T2DpFtEBFBtlGA/kLMZHRvQ=;
+ b=cKnK/J7wf6VrmIfjfkaApmlbxETolVwxGPP8CZ3IxYXeZJxxzSdUOrn+Jc6FEAZdhcCJC8pc+2lMiF5jekC3LTrDr2jzg/SAGqP23yQQ75TCLU00al6A251Rxc+q+q8OJTeG4jOkSdlOlDTk7pJs921zHaRHm58fN2dsY6em5tQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by PAXPR04MB9422.eurprd04.prod.outlook.com (2603:10a6:102:2b4::21) with
+ by AS4PR04MB9266.eurprd04.prod.outlook.com (2603:10a6:20b:4e1::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.31; Mon, 24 Jul
- 2023 05:13:24 +0000
+ 2023 06:52:44 +0000
 Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
  ([fe80::15ed:8451:b0a2:ec64]) by DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::15ed:8451:b0a2:ec64%4]) with mapi id 15.20.6609.031; Mon, 24 Jul 2023
- 05:13:24 +0000
-From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-To:     Bastian Krause <bst@pengutronix.de>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Dan Douglass <dan.douglass@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>
-Subject: RE: [PATCH] crypto: caam - adjust RNG timing to support more devices
-Thread-Topic: [PATCH] crypto: caam - adjust RNG timing to support more devices
-Thread-Index: AQHZnQeck2v36DTv3UmJ9e2grSaJgq++HokAgAFf5ACAAWGXIIAHwLJg
-Date:   Mon, 24 Jul 2023 05:13:23 +0000
-Message-ID: <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
- <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
- <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
- <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-In-Reply-To: <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU0PR04MB9563:EE_|PAXPR04MB9422:EE_
-x-ms-office365-filtering-correlation-id: 3e34b8c4-0cc8-4674-99c1-08db8c04b47b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xCWhCQds88nEP5EGfkRltcMdhofn9ir0Wn+HWH5ndEq73qswx2/sBMCEgJ/Zse/hrsPqWtqezqsgzx6SDRx9x95ze2u4g1Nxk2GXe2eTovqGDkGEnYvQ+twHtHtwfWKQHHJ3rc9+vJeNsnV2kFJvnCvugAZ4FEEu2IosiPc96rCXCmxR68RJ0QKjaLglkxMumWYLwJ9CKII+Xxk9SG86yob7heXqfRY9TJTplWG/rJpOyVIIQGiMoVoYGdXs1l9uakCteGJWutS/u3h9mepWtMAfBMmvLpehFBD1ZrmN2owH+E4ceGiUM4/BY8YwPb5LlLLfHN4D6RqUTQp11IX0GJzCOx1mPmQNQb7Wy3+md99vfSHrvOu9pMv0SCVCBX++gwurPSEBuWmF/ZRSBe/PFflk3t8zO9bDv681NJL9g3aKLT8yXVbxBw9QOx/bugUiUnBNYd5ZS0PulsmbNcAOpjGIlWJd7Ya1qS9/DfKOpK+anLkk3RR9UXcl0PQwzFol/R8FZXbMX4W+zanlSyOMCzKTsmwIlURE64tK3myKdYEoeCn7gepoiraEjcsQzlsfBY/9+Y4nijfEhyWXVaopBRvp+kXw5bvEGI6OwsjKK5E=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(451199021)(33656002)(86362001)(38100700002)(55016003)(122000001)(71200400001)(2906002)(7696005)(966005)(9686003)(53546011)(6506007)(186003)(38070700005)(26005)(110136005)(5660300002)(41300700001)(66556008)(66476007)(76116006)(66446008)(64756008)(66946007)(4326008)(316002)(45080400002)(478600001)(8936002)(44832011)(52536014)(54906003)(83380400001)(8676002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-2?Q?wFYgkma1EBe+OhEgEMjUfHPJPHhljftSNt8OWNc203451yNCYD2ryvhqMY?=
- =?iso-8859-2?Q?93s2Qmb9H6Fo4GlesgFzdilR6pw3hTpqZ53fMlqzouZ9HUm/tCofi4pqCa?=
- =?iso-8859-2?Q?pKKzrtfKR3otJnqElc7ILfEEL0MDRLO4FIWLRYm8+QFkunQTF/FVgGa8P5?=
- =?iso-8859-2?Q?KpAVP4EDFlEuUh03z6gCI2vrBu/OHiJ8m5PuBxnQYzPwUpUC1SYDSzkQqk?=
- =?iso-8859-2?Q?z/gaD5nvSdFSn/qrKPu07lyjF1uCgZG85PIYwq0av5PeyPaMdc2+IVeJ0m?=
- =?iso-8859-2?Q?53QGDC21m9dp9bgmmvSxgxfra8nbZu4A6bVl7engm8ZFAJESFe4t008ndY?=
- =?iso-8859-2?Q?vIrOa7P49GaDURC51rgt30XFtS4g30Ednzq4pbemvO2s8K02xfv7wulxcM?=
- =?iso-8859-2?Q?gvd9vQ82yKkcMOsn1EcfU/QqOfWzbX1DiN1+827Ct2ECJ/ioqZJ9p2KWis?=
- =?iso-8859-2?Q?ZGxWvlyQVIRobYGTK5GGMI//+ShLYacK3jLCbjS9LYp0Aqcqki/9dlscGm?=
- =?iso-8859-2?Q?bOKOilIkUcGKwJi14nBjv6NxQ+BfphYTwS/CedoRcWQN6eKfZhctSbtmqw?=
- =?iso-8859-2?Q?+O3f0X9yLe4NRjFD+CZTmxOz0/qSC+mqNljGbQUftf6CZC9rA0Xn1k1F9Q?=
- =?iso-8859-2?Q?ZDJ492N1GGwxSPhOL+KrdbNY+YNNGOKSomP70+z6yehT1kMUR4woSUtrx0?=
- =?iso-8859-2?Q?pHfnLXk0lVYcuKnUaHpvTMiNDHtHHMcS99Rh9qnbpo9aTbl2hxvKWbjDoY?=
- =?iso-8859-2?Q?Yv0ja1RWhNGgBRI5BP4DXvdRac/UU2fHcIWk0UozPB92oNGoYkebcPiWj2?=
- =?iso-8859-2?Q?H1auFtqLXpluj9qXzWyqh4yzDNfcUGdUq5zXr/gvokpDCcrmFJeCprCVH1?=
- =?iso-8859-2?Q?cHO0AfM7jpLD1GEqh5BJyQJ3fyTsWg4lOD8v3BoDjd6K1dheUSyKKHO4SX?=
- =?iso-8859-2?Q?cN0OMVXNr3Ag1qHbrsJ7dRloM61HqbCPneOZ67Vj2SsXi47QKXJBfcyZTO?=
- =?iso-8859-2?Q?84ZMMnbCGaCy/sOmR8cR0Xfdt4S7uwPy2AzQUIRXLnwLJZo75HCRme3Bgz?=
- =?iso-8859-2?Q?94ZYZLAr6MeMIgOHOiietwzxlsRJCO5iu6E2sncHqjnVVP2DYywEW9jw8d?=
- =?iso-8859-2?Q?1KOZIDBwdwgfmLSHggbPCq3vQc7ypJxkD49v6Te0P2B/EDRvaNJBNxqUG3?=
- =?iso-8859-2?Q?bXSHWldpfc0a0UWDUcTDFP/RjUU/miTg2dQ1E+fxbUHMD4kTsPuYB+r9bC?=
- =?iso-8859-2?Q?ELsxGNL5C99Dbso2yY25Hg/CoDJGcaMhXcdhDB7MAM+dBfkK9UMYvpapzz?=
- =?iso-8859-2?Q?2/6csbYwKa8bJAk/OBGMzFATbifDSiAHDWPhuoCkjaiAxcXnXvtXQsHGUs?=
- =?iso-8859-2?Q?/2WiL4w+VVgyBhJEAiCveWY7vNqzMdUTVmWWpr+7lLYuIkvq34zZkbRFtH?=
- =?iso-8859-2?Q?UfuyvC5InF0e90CaSFCKMCd6ER9bNvKSB4kn9GJvcaU8E6KyB4t98hBxjp?=
- =?iso-8859-2?Q?JeWPZlIYuReOHYTFgMHIwfD1ihovrlUbRDKHcFeOMupWTatenwlBIHrugK?=
- =?iso-8859-2?Q?h+k73wtUlRLc9ziTbTrRqnDdZX5Y0JLkrzjiVnL4G+/3zWXXB5Mzf7rjr8?=
- =?iso-8859-2?Q?Zv1/fIs0RWbAH7oNWVc6M3vrzcGpXno8jrHfs44pualRP9kfkcWKtIJw?=
- =?iso-8859-2?Q?=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+ ([fe80::15ed:8451:b0a2:ec64%4]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
+ 06:52:44 +0000
+From:   meenakshi.aggarwal@nxp.com
+To:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+Subject: [PATCH v2 0/2] Add power management support in CAAM driver 
+Date:   Mon, 24 Jul 2023 08:52:28 +0200
+Message-Id: <20230724065230.83017-1-meenakshi.aggarwal@nxp.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230712060728.3562376-1-meenakshi.aggarwal@nxp.com>
+References: <20230712060728.3562376-1-meenakshi.aggarwal@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PR1P264CA0024.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:102:19f::11) To DU0PR04MB9563.eurprd04.prod.outlook.com
+ (2603:10a6:10:314::7)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9563:EE_|AS4PR04MB9266:EE_
+X-MS-Office365-Filtering-Correlation-Id: 02e770ec-3c2e-44c8-1c26-08db8c129535
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oIhLaWXFPMPVRdhZFe+Wle2eMKQbh629qt8m0JZn76JGkqJQxS7Qn+jvl4X625iReZLOY6tb96Ef5EdwotjSwZ0pObAU75hmizdQN/Mqlx3sYZMunW/eEld+fcb5xndD96kWLzuJrs6RB8maHt/Vk+XPzI3+2qD1ggiclGjFMB700W/QPox4KVsJPK5qDjBGMC6fvft9Rt7xNeNy/8zwm3dV2VxG0Q8dWsLeGURwQbi4/VvUWp0oiO1pTlJ+5oKBlAeGUWY5YIDvW2Bw8O6jJI/1OVP4xNA4RvSf5SLCcsszGHTstxAT0AbyblV+ktE7i5NFYIFJjLKslbI9oC/oR/cEQCt+uFV8ENL/cDm3y0JMz6I+ve73fVnuFNJQbW1CuUYZD2Jy1ZCX4h3F/DgmT2qY3d7y0ZhAw6bPyNQcBzdhA0UdCatKBWbtZl4dh5pdpH0DLI70W/JBc9qAtOw6Mcyuoij6M2bON4GYJyAUwNAGawT2QXt2qlJ58Qb/O8DTDuxDOCC/CNxsqMKdocn90tmH75SSYvt0N+9VFk+GaSGI2W2mmJgk5xTU7VYx6uT7o2IPhNgsQ9SvUjmqIVYVyT/9LlZtD+m8g2ECLsnzyhKM2UOIjq+lABkP2HI9xTdi
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(39860400002)(346002)(366004)(451199021)(36756003)(5660300002)(26005)(6506007)(186003)(1076003)(4743002)(66476007)(4326008)(316002)(66946007)(66556008)(41300700001)(52116002)(6486002)(2616005)(9686003)(4744005)(2906002)(6512007)(6666004)(8676002)(478600001)(8936002)(83380400001)(86362001)(38350700002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZTgwSURtZVRBd3E0a0wrUklDb2FqV2FtTkJYT1pWdElDVEhyNGtrbjRrUUI1?=
+ =?utf-8?B?aTY5TFU5aFhBMzFTTzdjRm52NUMrZWorKzFTL3c4bmlLOTlVcUl0USsyMHQx?=
+ =?utf-8?B?QmpsWUg5Y0JKc1NoV2syWlAwaVNRcGJXbDNtb0N1Rzl5Y0dKbG1KNkpETko3?=
+ =?utf-8?B?SWpaR2NESG9ISDhrNkZ2cVZsMHlGT3hkcmdwOWpEZUZHTWsrZllBZ0pYeUdy?=
+ =?utf-8?B?dnBMZUNHOXJncmxKcDBtblZXWVJLK1N5ZDg2SFVDOXBER2dVNXJqd1BvS3p6?=
+ =?utf-8?B?QlJ3dDZ3VWcwWjl5WTdnMnN4OElmamFjbE82YkIxMUhBY0dWS1RZNDJvSUww?=
+ =?utf-8?B?TVBPbDdNQVdSMFdrcXZWUklrOXR1aWFQd2Q1d3pjdFp4eVhvNnVzMmptREhZ?=
+ =?utf-8?B?UDFUckpJVWdEeTFDMVpleDkrRmZBWG1UZVJMRTBCalVTdk9tTmk2T2t6a1NX?=
+ =?utf-8?B?Y083dVJ5UkhLWHI5Q3c3a2kzVzhMekhJditMb2dhTjJ3MzdXZVErMkZ5RUdU?=
+ =?utf-8?B?bXlpei9XM2ZrNlRkYWhvUU9mMTFZV2dBM2FYZ2VmbWdHMWRBZ1V2MHhjWm5Q?=
+ =?utf-8?B?dDVCYjZKWExncHNuc0Nhc2lTTGJWbi92MjJBd2hUenFyVVR5cjVsVFZrbVV0?=
+ =?utf-8?B?MWw3R1RNa004eHJxZ3M1eFZLKzNFNmFFRmVta3pZaU9uck9lYWZFZldVa1o3?=
+ =?utf-8?B?K3dqTlppK1BzSnBDbmFEWmtObThPME00NVphajBuNDI4akY1cDNrUGtUMTJV?=
+ =?utf-8?B?UEwzTGllUGpFMG5TYWZ6Mk9LeGFyMHZ0WnlwN3V6YXdtTHl3Vk9pNTdUamYy?=
+ =?utf-8?B?WGZVNjdJZ1lGWmN1M1NGbWVmYVRaekd5Wnh5ODZiR3RxMnpTYzlPeEY4Wkpj?=
+ =?utf-8?B?K2MwU2NyOVpZTEVLRitvVWN3V05wOWVieExJeGZyV0FIZEIwMzNOckZwTEs4?=
+ =?utf-8?B?UXNYYTEzMW1VUHpGQnRMR0JqaTl2a3N6T1pRK0ZRNVpaLzMzckZiS2UyM2wx?=
+ =?utf-8?B?b2Job1dzd1A2d2JEVk51TUVkemNEVGx3U0t2aWw0RjY1dms0VUJNakVvZ3Nm?=
+ =?utf-8?B?eG9WZFpNb1c2Y2oyamdQeGEzRjFYVUJwdGlHL1NEb2g1NmthUnNhSjBYWTRo?=
+ =?utf-8?B?bmd3bTZ2TVhmZ0dJM0liOTB0TVBFUmxKd2Qwdk0waGZBaEthYzVON25TZ1E0?=
+ =?utf-8?B?SVg0MHNMUDNpWWxNQUU2YWlhRjlEb3ZLR2tPU2ZGN3NTaklNY0xJNitncDNr?=
+ =?utf-8?B?Rjk3M2xOTWlrejEzODErb3ZFSkIxQUdRbGt3aUIxcks2NnVWNVJlcldwS3No?=
+ =?utf-8?B?QWoxYisrUlVleVg1ZjNnc3pQMTRyUXVIYlFjQVQ5VmJBeGFncjRoeDIzQU1J?=
+ =?utf-8?B?OER1ekZzSGN2cERUcHZXS2F1SXpVTzlrQ0dHUG11SnRyMCswcjF0YnJyQWpr?=
+ =?utf-8?B?UVNqRmVremEzSURySGgxMHZTUHNOVWF2THlEWlk5MW9yWVRuSThPdW41MTY1?=
+ =?utf-8?B?NEVQTnJTSG01R1I2d0xxeVVJYVJGU3ovdWQwU0QvVXlmMGtVcGRvYUZ6OXU2?=
+ =?utf-8?B?eGdhRlZoSWxaN0JJbEE2UWJUb3g1VmRrM1daU2lDOWMrOG94YkUzMWVBRmJZ?=
+ =?utf-8?B?UFZBcGgrOWpZWjNaNjQvcC9MRXV5WkFJZ00xNVR0MjFjdDh6QXJnWDU3VS9z?=
+ =?utf-8?B?SXRvbk1QTjhKWGVYR1A3ZCs2L1BBVHk0VWNNTVllQXM2TnNKN0lrbUxRbzBH?=
+ =?utf-8?B?R0JVL0tkbmltc2wwelFxSEI3d0pNOExWUkIxOC9ROUFNNTBIWWQ1TFBJdVFv?=
+ =?utf-8?B?LzZkL3c3OGNsZC80WmJsL1hlekJlMnEwbHdFT0ttdUFMMlpnS3BKeWt0Nzc2?=
+ =?utf-8?B?RHF6UTVkWndnVU13eFFjUFBnbE5jQTVpZmVVajBoV1dwdVM5R0xKbEVhSExB?=
+ =?utf-8?B?YkhSQTNjSndvZkJxZHA1NTdJOVplSjJlN0dIMkpyT21RNjBMejVsdE16Rllo?=
+ =?utf-8?B?ZmFXeFc5ZmdwZ2t4a0ZmdDRTKzR1TG9aSDY2eGo1SWZPUzJoVHA2K1Z6RE1R?=
+ =?utf-8?B?eUZwcEtNbVVRYk1zVlBzRHdtKy9JVlF0TVMxYzJMT2JZaHV4c3l0dGE3VG5O?=
+ =?utf-8?B?S0RyWnY4TUVGV3JqUFRobHVDa2lBWXlrd1lRQnRYTmFkYUx2bmU5NlhjdWhP?=
+ =?utf-8?B?Z3c9PQ==?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02e770ec-3c2e-44c8-1c26-08db8c129535
 X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e34b8c4-0cc8-4674-99c1-08db8c04b47b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2023 05:13:23.8647
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 06:52:44.5730
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ++By0QJC5v04ULrkLEXi0SpKo0Ud56RCac9lCAfE5fxU43/r9m5TYn79m9zH38/kvS0gCGzKThWva2mYu4KemjgF+N2TEg7dkDZQouXlIwg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9422
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4KNqEG/dtO6T44wgVnri4bsgupLdMjfux2MbLBjUG/i0fHNT80xouLCvif9sbeCJKCqh+X7utiUlejdnMo450veuEYyEFAPRhCctJYNqzS4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9266
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Bastian,
+From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
 
-Please share the required information.
+This patch set add support of Power Management in CAAM driver
 
-Thanks,
-Meenakshi
+We are saving the state of the CAAM:
+ - JRs MID
+ - Address of input and output rings
+in suspend function and getting same state in resume function
+on platforms where power of CAAM is turned off.
 
-> -----Original Message-----
-> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Sent: Wednesday, July 19, 2023 12:31 PM
-> To: Bastian Krause <bst@pengutronix.de>; Horia Geanta
-> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
-> <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
-> herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-> Cc: Victoria Milhoan <vicki.milhoan@freescale.com>; Dan Douglass
-> <dan.douglass@nxp.com>; Vipul Kumar <vipul_kumar@mentor.com>;
-> kernel@pengutronix.de
-> Subject: RE: [PATCH] crypto: caam - adjust RNG timing to support more dev=
-ices
->
-> Hi Bastian,
->
-> We have tested the patch on i.mx8mm board and we did not face any issue w=
-ith
-> the patch.
->
-> Please share your imx8mm board revision and complete logs (including
-> bootloader logs), It will help in investigating the issue you are facing.
->
-> Thanks,
-> Meenakshi
->
-> > -----Original Message-----
-> > From: Bastian Krause <bst@pengutronix.de>
-> > Sent: Tuesday, July 18, 2023 3:13 PM
-> > To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>; Horia Geanta
-> > <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
-> > <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
-> > herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> > crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-> > Cc: Victoria Milhoan <vicki.milhoan@freescale.com>; Dan Douglass
-> > <dan.douglass@nxp.com>; Vipul Kumar <vipul_kumar@mentor.com>;
-> > kernel@pengutronix.de
-> > Subject: Re: [PATCH] crypto: caam - adjust RNG timing to support more
-> > devices
-> >
-> > On 7/17/23 14:43, Bastian Krause wrote:
-> > > On 6/12/23 10:26, meenakshi.aggarwal@nxp.com wrote:
-> > >> From: Victoria Milhoan <vicki.milhoan@freescale.com>
-> > >>
-> > >> Adjust RNG timing parameters to support more i.MX6 devices.
-> > >>
-> > >> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
-> > >> Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
-> > >> Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
-> > >> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>
-> > >> ---
-> > >>   drivers/crypto/caam/ctrl.c | 4 ++--
-> > >>   1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > This patch seems to breaks CAAM RNG instantiation on an i.MX8MM at my
-> end:
-> > >
-> > > caam 30900000.crypto: Entropy delay =3D 3200 caam 30900000.crypto:
-> > > Entropy delay =3D 3600 [...] caam 30900000.crypto: Entropy delay =3D
-> > > 12400 caam 30900000.crypto: failed to instantiate RNG
-> > > caam: probe of 30900000.crypto failed with error -11
-> > >
-> > > If I revert this patch or increase RTSDCTL_ENT_DLY_MAX to a value >
-> > > 66800, it works again:
-> > >
-> > > caam 30900000.crypto: Entropy delay =3D 32800 caam 30900000.crypto:
-> > > Entropy delay =3D 33200 [...] caam 30900000.crypto: Entropy delay =3D
-> > > 66800 caam 30900000.crypto: Instantiated RNG4 SH0 caam
-> > > 30900000.crypto: Instantiated RNG4 SH1 caam 30900000.crypto: device
-> > > ID =3D 0x0a16040100000000 (Era 9) caam 30900000.crypto: job rings =3D=
- 2,
-> > > qi =3D
-> > > 0 caam algorithms registered in /proc/crypto caam 30900000.crypto:
-> > > caam pkc algorithms registered in /proc/crypto caam 30900000.crypto:
-> > > registering rng-caam Executing RNG SELF-TEST with wait
-> > > random: crng init done
-> > > caam 30900000.crypto: rng crypto API alg registered prng-caam
-> >
-> > This ^ was the kernel log for..
-> >
-> >
-> > --- a/drivers/crypto/caam/regs.h
-> > +++ b/drivers/crypto/caam/regs.h
-> > @@@ -522,7 -522,7 +522,7 @@@ struct rng4tst
-> >    #define RTSDCTL_ENT_DLY_SHIFT 16
-> >    #define RTSDCTL_ENT_DLY_MASK (0xffff << RTSDCTL_ENT_DLY_SHIFT)
-> >    #define RTSDCTL_ENT_DLY_MIN 3200
-> > --#define RTSDCTL_ENT_DLY_MAX 12800
-> > ++#define RTSDCTL_ENT_DLY_MAX 70000
-> >    #define RTSDCTL_SAMP_SIZE_MASK 0xffff
-> >    #define RTSDCTL_SAMP_SIZE_VAL 512
-> >          u32 rtsdctl;            /* seed control register */
-> >
-> >
-> > For completion's sake: Reverting this patch..
-> >
-> >
-> > --- a/drivers/crypto/caam/ctrl.c
-> > +++ b/drivers/crypto/caam/ctrl.c
-> > @@ -383,7 +383,7 @@ static void kick_trng(struct device *dev, int ent_d=
-elay)
-> >                  /* min. freq. count, equal to 1/4 of the entropy sampl=
-e length */
-> >                  wr_reg32(&r4tst->rtfrqmin, val >> 2);
-> >                  /* max. freq. count, equal to 16 times the entropy sam=
-ple length */
-> > -               wr_reg32(&r4tst->rtfrqmax, val << 4);
-> > +               wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
-> >          }
-> >
-> >          wr_reg32(&r4tst->rtsdctl, (val << RTSDCTL_ENT_DLY_SHIFT) |
-> >
-> >
-> > ..produces this kernel log (without RNG SELF-TEST):
-> >
-> > caam 30900000.crypto: Entropy delay =3D 3200 caam 30900000.crypto:
-> > Entropy delay =3D 3600 caam 30900000.crypto: Instantiated RNG4 SH0 caam
-> > 30900000.crypto: Instantiated RNG4 SH1 caam 30900000.crypto: device ID
-> > =3D
-> > 0x0a16040100000000 (Era 9) caam 30900000.crypto: job rings =3D 2, qi =
-=3D 0
-> > caam algorithms registered in /proc/crypto caam 30900000.crypto: caam
-> > pkc algorithms registered in /proc/crypto caam 30900000.crypto:
-> > registering rng- caam caam 30900000.crypto: rng crypto API alg
-> > registered prng-caam
-> > random: crng init done
-> >
-> > Regards,
-> > Bastian
-> >
-> > >>
-> > >> diff --git a/drivers/crypto/caam/ctrl.c
-> > >> b/drivers/crypto/caam/ctrl.c index 5fed3cf354c0..62dd069942e4
-> > >> 100644
-> > >> --- a/drivers/crypto/caam/ctrl.c
-> > >> +++ b/drivers/crypto/caam/ctrl.c
-> > >> @@ -383,8 +383,8 @@ static void kick_trng(struct device *dev, int
-> > >> ent_delay)
-> > >>       wr_reg32(&r4tst->rtsdctl, val);
-> > >>       /* min. freq. count, equal to 1/4 of the entropy sample
-> > >> length */
-> > >>       wr_reg32(&r4tst->rtfrqmin, ent_delay >> 2);
-> > >> -    /* disable maximum frequency count */
-> > >> -    wr_reg32(&r4tst->rtfrqmax, RTFRQMAX_DISABLE);
-> > >> +    /* max. freq. count, equal to 16 times the entropy sample
-> > >> +length */
-> > >> +    wr_reg32(&r4tst->rtfrqmax, ent_delay << 4);
-> > >>       /* read the control register */
-> > >>       val =3D rd_reg32(&r4tst->rtmctl);
-> > >>   start_rng:
-> > >
-> >
-> > --
-> > Pengutronix e.K.                           |                           =
-  |
-> > Steuerwalder Str. 21                       |
-> > http://www.p/
-> >
-> en%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C3e036baed8c9
-> 4cf104
-> >
-> 4008db8825e5ce%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C6382
-> 534685
-> >
-> 76971721%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2l
-> uMzIiL
-> >
-> CJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DvbtE1IciakfHjf
-> JQiB
-> > VxOGN%2Bm7JBlT%2B1obDRf0eyOuM%3D&reserved=3D0
-> >
-> gutronix.de%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C1f556
-> >
-> d6802434c00ef4f08db87736527%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C
-> >
-> 0%7C0%7C638252701909887583%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4
-> >
-> wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C
-> > %7C%7C&sdata=3D2vCBBdo%2FAkyz%2BaLXcDyeursw3Gle%2FKosiO%2FdPysOd
-> 3
-> > Q%3D&reserved=3D0  |
-> > 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0  =
-  |
-> > Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-555=
-5 |
+Changes in v2:
+	- not protecting PM code under macro CONFIG_PM_SLEEP
+	as CONFIG_PM_SLEEP is on by default
+
+Franck LENORMAND (1):
+  crypto: caam - Change structure type representing DECO MID
+
+Horia Geanta (1):
+  crypto: caam - add power management support
+
+ drivers/crypto/caam/ctrl.c   | 106 +++++++++++++++++++
+ drivers/crypto/caam/intern.h |  25 ++++-
+ drivers/crypto/caam/jr.c     | 193 +++++++++++++++++++++++++++++++----
+ drivers/crypto/caam/regs.h   |   9 +-
+ 4 files changed, 306 insertions(+), 27 deletions(-)
+
+-- 
+2.25.1
 
