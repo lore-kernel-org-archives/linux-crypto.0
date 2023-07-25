@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B1FC001DE
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 16:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C820C41513
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 16:47:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232499AbjGYQqi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 12:46:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40604 "EHLO
+        id S232582AbjGYQrW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 12:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232297AbjGYQqR (ORCPT
+        with ESMTP id S232408AbjGYQrD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 12:46:17 -0400
+        Tue, 25 Jul 2023 12:47:03 -0400
 Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95EEE271B;
-        Tue, 25 Jul 2023 09:45:42 -0700 (PDT)
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PELblT027164;
-        Tue, 25 Jul 2023 18:43:55 +0200
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2350D26B0;
+        Tue, 25 Jul 2023 09:46:21 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PEbpZC017351;
+        Tue, 25 Jul 2023 18:45:09 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=selector1;
- bh=UHtxTxC9v7GUZaYkAug21X34neeLMcdx4gODrURlYJ0=;
- b=qELCnL5DyqQ8Bn2ke19VigY8lhHcJX6z8RIC8Oo1t7hygtlFviNRsp9JFprGX2F/sUv1
- bcL4iaknHBRz26+c1oHyibPYQdgb9E8rH5ZU6DcE10Z/0dgD2J3WAXRs/fg0EEv5w2eX
- oPouyGzWy0f8y1fbSgc3xCsqiby9eR5eobiXLVRLATLL42MP1+4cNsHVXNqhUSoiVHZT
- M5JMRxkmRhjwZWGh1akbFIacw5Q+tSPMVIzKh4MEfB7zdDVTMsYqERuoOiWxSstL4Wci
- aqBseH3ZVI6gqzMX39HrPlXNdGdMhyMZ1QV28bkTJUDqDrJBoJ18rOeHfViop5Skm/+H 9g== 
+ bh=t93XaA2OQPupelSA6mAiLz7MlonAwGPXTGgYUp2zEoo=;
+ b=U/mZ3hQjXl340yu+pv95gj7J4HlCrhb0m87Sp9hxF/MsXKHdd+c8cE1E3yzKSqzA5A0M
+ 4WRfs1Z0imMPUtoskMsF5u6dhnHFD6CFBf0OZzvDuj21FoNZc+Os3oMHdMMjBT5Y0K08
+ 2h8NZCixNpnQnzkHLwdRmu66yFBzGMfboEEiJchzvWclqcrkWL4TfPm7TM07hOu7yxw7
+ xLvpDtINPMlRir5p6BNN1gD0fJHs9t2pT5jUhImPFnw7Xs5e2INGrkwHKsLRXf4ha7In
+ SnjnVVB7v+47oCi34PnG7iXwTVODbHJLXEw2/uipE8UuEF1ZI3ns4c+suDzVz+at/gm9 /g== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s2g3a0rsu-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s2cabja78-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 18:43:55 +0200
+        Tue, 25 Jul 2023 18:45:08 +0200
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 064AD10002A;
-        Tue, 25 Jul 2023 18:43:54 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 6BF26100048;
+        Tue, 25 Jul 2023 18:45:08 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id EB31127FAB5;
-        Tue, 25 Jul 2023 18:43:53 +0200 (CEST)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 5DA9327FABB;
+        Tue, 25 Jul 2023 18:45:08 +0200 (CEST)
 Received: from localhost (10.201.21.121) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 25 Jul
- 2023 18:43:53 +0200
+ 2023 18:45:07 +0200
 From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
 To:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -64,9 +64,9 @@ CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
         <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
         Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v2 05/11] firewall: introduce stm32_firewall framework
-Date:   Tue, 25 Jul 2023 18:40:58 +0200
-Message-ID: <20230725164104.273965-6-gatien.chevallier@foss.st.com>
+Subject: [PATCH v2 11/11] ARM: dts: stm32: add ETZPC as a system bus for STM32MP13x boards
+Date:   Tue, 25 Jul 2023 18:41:04 +0200
+Message-ID: <20230725164104.273965-12-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
 References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
@@ -83,648 +83,1219 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Introduce a STM32 firewall framework that offers to firewall consumers
-different firewall services such as the ability to check their access
-rights against their firewall controller(s).
+ETZPC is a firewall controller. Put all peripherals filtered by the
+ETZPC as ETZPC subnodes and reference ETZPC as a
+feature-domain-controller.
 
-The STM32 firewall framework offers a generic API for STM32 firewall
-controllers that is defined in their drivers to best fit the
-specificity of each firewall.
-
-There are various types of firewalls:
--Peripheral firewalls that filter accesses to peripherals
--Memory firewalls that filter accesses to memories or memory regions
--No type for undefined type of firewall
+For more information on which peripheral is securable or supports MCU
+isolation, please read the STM32MP13 reference manual.
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
+ arch/arm/boot/dts/st/stm32mp131.dtsi  | 1027 +++++++++++++------------
+ arch/arm/boot/dts/st/stm32mp133.dtsi  |   51 +-
+ arch/arm/boot/dts/st/stm32mp13xc.dtsi |   19 +-
+ arch/arm/boot/dts/st/stm32mp13xf.dtsi |   19 +-
+ 4 files changed, 576 insertions(+), 540 deletions(-)
 
-Changes in V2:
-	- Support multiple entries for "feature-domains"
-	  property. Change stm32_firewall_get_firewall()
-	  to do so.
-	- Better handle the device-tree parsing using
-	  phandle+args APIs and phandle iterator.
-	- Remove "resource firewall" type
-	- Rephrase STM32_FIREWALL description in the bus
-	  Kconfig and remove useless default value
-	- Add missing EXPORT_SYMBOL_GPL
-	- Remove useless stm32_firewall_get_id() API
-	- Add a field for the name of the firewall entry
-	  in the stm32_firewall_controller structure
-	- Minor fixes on some traces level (err -> debug)
-	- Fix licenses to GPL-2.0-only
-	- Fix stm32_firewall_get_firewall() description
-	- Rephrase some sentences to better emphasize this
-	  is STM32-specific
-	- Switch to list_for_each_entry() in
-	  stm32_firewall_controller_unregister() as we only
-	  expect one firewall controller instance per device.
-	  The loop just breaks when found
-	- Do not register the firewall controller if it is
-	  already registered to the framework 
-
- MAINTAINERS                               |   5 +
- arch/arm64/Kconfig.platforms              |   1 +
- drivers/bus/Kconfig                       |   9 +
- drivers/bus/Makefile                      |   1 +
- drivers/bus/stm32_firewall.c              | 288 ++++++++++++++++++++++
- drivers/bus/stm32_firewall.h              |  83 +++++++
- include/linux/bus/stm32_firewall_device.h | 140 +++++++++++
- 7 files changed, 527 insertions(+)
- create mode 100644 drivers/bus/stm32_firewall.c
- create mode 100644 drivers/bus/stm32_firewall.h
- create mode 100644 include/linux/bus/stm32_firewall_device.h
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d516295978a4..17559ed17a11 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20137,6 +20137,11 @@ T:	git git://linuxtv.org/media_tree.git
- F:	Documentation/devicetree/bindings/media/i2c/st,st-mipid02.yaml
- F:	drivers/media/i2c/st-mipid02.c
+diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
+index d163c267e34c..0bd9494cafa2 100644
+--- a/arch/arm/boot/dts/st/stm32mp131.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
+@@ -757,340 +757,6 @@ dmamux1: dma-router@48002000 {
+ 			dma-channels = <16>;
+ 		};
  
-+ST STM32 FIREWALL
-+M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
-+S:	Maintained
-+F:	drivers/bus/stm32_firewall.c
-+
- ST STM32 I2C/SMBUS DRIVER
- M:	Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>
- M:	Alain Volmat <alain.volmat@foss.st.com>
-diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
-index 6069120199bb..5a46e90f1e4e 100644
---- a/arch/arm64/Kconfig.platforms
-+++ b/arch/arm64/Kconfig.platforms
-@@ -293,6 +293,7 @@ config ARCH_STM32
- 	select ARM_SMC_MBOX
- 	select ARM_SCMI_PROTOCOL
- 	select COMMON_CLK_SCMI
-+	select STM32_FIREWALL
- 	help
- 	  This enables support for ARMv8 based STMicroelectronics
- 	  STM32 family, including:
-diff --git a/drivers/bus/Kconfig b/drivers/bus/Kconfig
-index fcfa280df98a..7ac904363a28 100644
---- a/drivers/bus/Kconfig
-+++ b/drivers/bus/Kconfig
-@@ -163,6 +163,15 @@ config QCOM_SSC_BLOCK_BUS
- 	  i2c/spi/uart controllers, a hexagon core, and a clock controller
- 	  which provides clocks for the above.
+-		adc_2: adc@48004000 {
+-			compatible = "st,stm32mp13-adc-core";
+-			reg = <0x48004000 0x400>;
+-			interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc ADC2>, <&rcc ADC2_K>;
+-			clock-names = "bus", "adc";
+-			interrupt-controller;
+-			#interrupt-cells = <1>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			status = "disabled";
+-
+-			adc2: adc@0 {
+-				compatible = "st,stm32mp13-adc";
+-				#io-channel-cells = <1>;
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-				reg = <0x0>;
+-				interrupt-parent = <&adc_2>;
+-				interrupts = <0>;
+-				dmas = <&dmamux1 10 0x400 0x80000001>;
+-				dma-names = "rx";
+-				status = "disabled";
+-
+-				channel@13 {
+-					reg = <13>;
+-					label = "vrefint";
+-				};
+-				channel@14 {
+-					reg = <14>;
+-					label = "vddcore";
+-				};
+-				channel@16 {
+-					reg = <16>;
+-					label = "vddcpu";
+-				};
+-				channel@17 {
+-					reg = <17>;
+-					label = "vddq_ddr";
+-				};
+-			};
+-		};
+-
+-		usbotg_hs: usb@49000000 {
+-			compatible = "st,stm32mp15-hsotg", "snps,dwc2";
+-			reg = <0x49000000 0x40000>;
+-			clocks = <&rcc USBO_K>;
+-			clock-names = "otg";
+-			resets = <&rcc USBO_R>;
+-			reset-names = "dwc2";
+-			interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
+-			g-rx-fifo-size = <512>;
+-			g-np-tx-fifo-size = <32>;
+-			g-tx-fifo-size = <256 16 16 16 16 16 16 16>;
+-			dr_mode = "otg";
+-			otg-rev = <0x200>;
+-			usb33d-supply = <&usb33>;
+-			status = "disabled";
+-		};
+-
+-		usart1: serial@4c000000 {
+-			compatible = "st,stm32h7-uart";
+-			reg = <0x4c000000 0x400>;
+-			interrupts-extended = <&exti 26 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc USART1_K>;
+-			resets = <&rcc USART1_R>;
+-			wakeup-source;
+-			dmas = <&dmamux1 41 0x400 0x5>,
+-			       <&dmamux1 42 0x400 0x1>;
+-			dma-names = "rx", "tx";
+-			status = "disabled";
+-		};
+-
+-		usart2: serial@4c001000 {
+-			compatible = "st,stm32h7-uart";
+-			reg = <0x4c001000 0x400>;
+-			interrupts-extended = <&exti 27 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc USART2_K>;
+-			resets = <&rcc USART2_R>;
+-			wakeup-source;
+-			dmas = <&dmamux1 43 0x400 0x5>,
+-			       <&dmamux1 44 0x400 0x1>;
+-			dma-names = "rx", "tx";
+-			status = "disabled";
+-		};
+-
+-		i2s4: audio-controller@4c002000 {
+-			compatible = "st,stm32h7-i2s";
+-			reg = <0x4c002000 0x400>;
+-			#sound-dai-cells = <0>;
+-			interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+-			dmas = <&dmamux1 83 0x400 0x01>,
+-			       <&dmamux1 84 0x400 0x01>;
+-			dma-names = "rx", "tx";
+-			status = "disabled";
+-		};
+-
+-		spi4: spi@4c002000 {
+-			compatible = "st,stm32h7-spi";
+-			reg = <0x4c002000 0x400>;
+-			interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc SPI4_K>;
+-			resets = <&rcc SPI4_R>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			dmas = <&dmamux1 83 0x400 0x01>,
+-			       <&dmamux1 84 0x400 0x01>;
+-			dma-names = "rx", "tx";
+-			status = "disabled";
+-		};
+-
+-		spi5: spi@4c003000 {
+-			compatible = "st,stm32h7-spi";
+-			reg = <0x4c003000 0x400>;
+-			interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc SPI5_K>;
+-			resets = <&rcc SPI5_R>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			dmas = <&dmamux1 85 0x400 0x01>,
+-			       <&dmamux1 86 0x400 0x01>;
+-			dma-names = "rx", "tx";
+-			status = "disabled";
+-		};
+-
+-		i2c3: i2c@4c004000 {
+-			compatible = "st,stm32mp13-i2c";
+-			reg = <0x4c004000 0x400>;
+-			interrupt-names = "event", "error";
+-			interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>,
+-				     <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc I2C3_K>;
+-			resets = <&rcc I2C3_R>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			dmas = <&dmamux1 73 0x400 0x1>,
+-			       <&dmamux1 74 0x400 0x1>;
+-			dma-names = "rx", "tx";
+-			st,syscfg-fmp = <&syscfg 0x4 0x4>;
+-			i2c-analog-filter;
+-			status = "disabled";
+-		};
+-
+-		i2c4: i2c@4c005000 {
+-			compatible = "st,stm32mp13-i2c";
+-			reg = <0x4c005000 0x400>;
+-			interrupt-names = "event", "error";
+-			interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
+-				     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc I2C4_K>;
+-			resets = <&rcc I2C4_R>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			dmas = <&dmamux1 75 0x400 0x1>,
+-			       <&dmamux1 76 0x400 0x1>;
+-			dma-names = "rx", "tx";
+-			st,syscfg-fmp = <&syscfg 0x4 0x8>;
+-			i2c-analog-filter;
+-			status = "disabled";
+-		};
+-
+-		i2c5: i2c@4c006000 {
+-			compatible = "st,stm32mp13-i2c";
+-			reg = <0x4c006000 0x400>;
+-			interrupt-names = "event", "error";
+-			interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>,
+-				     <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc I2C5_K>;
+-			resets = <&rcc I2C5_R>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			dmas = <&dmamux1 115 0x400 0x1>,
+-			       <&dmamux1 116 0x400 0x1>;
+-			dma-names = "rx", "tx";
+-			st,syscfg-fmp = <&syscfg 0x4 0x10>;
+-			i2c-analog-filter;
+-			status = "disabled";
+-		};
+-
+-		timers12: timer@4c007000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-timers";
+-			reg = <0x4c007000 0x400>;
+-			interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "global";
+-			clocks = <&rcc TIM12_K>;
+-			clock-names = "int";
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			timer@11 {
+-				compatible = "st,stm32h7-timer-trigger";
+-				reg = <11>;
+-				status = "disabled";
+-			};
+-		};
+-
+-		timers13: timer@4c008000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-timers";
+-			reg = <0x4c008000 0x400>;
+-			interrupts = <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "global";
+-			clocks = <&rcc TIM13_K>;
+-			clock-names = "int";
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			timer@12 {
+-				compatible = "st,stm32h7-timer-trigger";
+-				reg = <12>;
+-				status = "disabled";
+-			};
+-		};
+-
+-		timers14: timer@4c009000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-timers";
+-			reg = <0x4c009000 0x400>;
+-			interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "global";
+-			clocks = <&rcc TIM14_K>;
+-			clock-names = "int";
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			timer@13 {
+-				compatible = "st,stm32h7-timer-trigger";
+-				reg = <13>;
+-				status = "disabled";
+-			};
+-		};
+-
+-		timers15: timer@4c00a000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-timers";
+-			reg = <0x4c00a000 0x400>;
+-			interrupts = <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "global";
+-			clocks = <&rcc TIM15_K>;
+-			clock-names = "int";
+-			dmas = <&dmamux1 105 0x400 0x1>,
+-			       <&dmamux1 106 0x400 0x1>,
+-			       <&dmamux1 107 0x400 0x1>,
+-			       <&dmamux1 108 0x400 0x1>;
+-			dma-names = "ch1", "up", "trig", "com";
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			timer@14 {
+-				compatible = "st,stm32h7-timer-trigger";
+-				reg = <14>;
+-				status = "disabled";
+-			};
+-		};
+-
+-		timers16: timer@4c00b000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-timers";
+-			reg = <0x4c00b000 0x400>;
+-			interrupts = <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "global";
+-			clocks = <&rcc TIM16_K>;
+-			clock-names = "int";
+-			dmas = <&dmamux1 109 0x400 0x1>,
+-			       <&dmamux1 110 0x400 0x1>;
+-			dma-names = "ch1", "up";
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			timer@15 {
+-				compatible = "st,stm32h7-timer-trigger";
+-				reg = <15>;
+-				status = "disabled";
+-			};
+-		};
+-
+-		timers17: timer@4c00c000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-timers";
+-			reg = <0x4c00c000 0x400>;
+-			interrupts = <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
+-			interrupt-names = "global";
+-			clocks = <&rcc TIM17_K>;
+-			clock-names = "int";
+-			dmas = <&dmamux1 111 0x400 0x1>,
+-			       <&dmamux1 112 0x400 0x1>;
+-			dma-names = "ch1", "up";
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			timer@16 {
+-				compatible = "st,stm32h7-timer-trigger";
+-				reg = <16>;
+-				status = "disabled";
+-			};
+-		};
+-
+ 		rcc: rcc@50000000 {
+ 			compatible = "st,stm32mp13-rcc", "syscon";
+ 			reg = <0x50000000 0x1000>;
+@@ -1117,69 +783,6 @@ syscfg: syscon@50020000 {
+ 			clocks = <&rcc SYSCFG>;
+ 		};
  
-+config STM32_FIREWALL
-+	bool "STM32 Firewall framework"
-+	depends on ARCH_STM32 || COMPILE_TEST
-+	help
-+	  Say y to enable STM32 firewall framework and its services. Firewall
-+	  controllers will be able to register to the framework. Access for
-+	  hardware resources linked to a firewall controller can be requested
-+	  through this STM32 framework.
-+
- config SUN50I_DE2_BUS
- 	bool "Allwinner A64 DE2 Bus Driver"
- 	  default ARM64
-diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
-index d90eed189a65..fc0511450ec2 100644
---- a/drivers/bus/Makefile
-+++ b/drivers/bus/Makefile
-@@ -26,6 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
- obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
- obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
- obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
-+obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o
- obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
- obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
- obj-$(CONFIG_OF)		+= simple-pm-bus.o
-diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
-new file mode 100644
-index 000000000000..4a8e44b732b1
---- /dev/null
-+++ b/drivers/bus/stm32_firewall.c
-@@ -0,0 +1,288 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
-+#include <linux/bus/stm32_firewall_device.h>
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
-+#include <linux/types.h>
-+#include <linux/slab.h>
-+
-+#include "stm32_firewall.h"
-+
-+/* Corresponds to STM32_FIREWALL_MAX_EXTRA_ARGS + firewall ID */
-+#define STM32_FIREWALL_MAX_ARGS		(STM32_FIREWALL_MAX_EXTRA_ARGS + 1)
-+
-+static LIST_HEAD(firewall_controller_list);
-+static DEFINE_MUTEX(firewall_controller_list_lock);
-+
-+/* Firewall device API */
-+
-+int stm32_firewall_get_firewall(struct device_node *np, struct stm32_firewall *firewall,
-+				unsigned int nb_firewall)
-+{
-+	struct stm32_firewall_controller *ctrl;
-+	struct of_phandle_iterator it;
-+	unsigned int i, j = 0;
-+	int err;
-+
-+	if (!firewall || !nb_firewall)
-+		return -EINVAL;
-+
-+	/* Parse property with phandle parsed out */
-+	of_for_each_phandle(&it, err, np, "feature-domains", "#feature-domain-cells", 0) {
-+		struct of_phandle_args provider_args;
-+		struct device_node *provider = it.node;
-+		const char *fw_entry;
-+		bool match = false;
-+
-+		if (err) {
-+			pr_err("Unable to get feature-domains property for node %s\n, err: %d",
-+			       np->full_name, err);
-+			of_node_put(provider);
-+			return err;
-+		}
-+
-+		if (j > nb_firewall) {
-+			pr_err("Too many firewall controllers");
-+			of_node_put(provider);
-+			return -EINVAL;
-+		}
-+
-+		provider_args.args_count = of_phandle_iterator_args(&it, provider_args.args,
-+								    STM32_FIREWALL_MAX_ARGS);
-+
-+		/* Check if the parsed phandle corresponds to a registered firewall controller */
-+		mutex_lock(&firewall_controller_list_lock);
-+		list_for_each_entry(ctrl, &firewall_controller_list, entry) {
-+			if (ctrl->dev->of_node->phandle == it.phandle) {
-+				match = true;
-+				firewall[j].firewall_ctrl = ctrl;
-+				break;
-+			}
-+		}
-+		mutex_unlock(&firewall_controller_list_lock);
-+
-+		if (!match) {
-+			firewall[j].firewall_ctrl = NULL;
-+			pr_err("No firewall controller registered for %s\n", np->full_name);
-+			of_node_put(provider);
-+			return -ENODEV;
-+		}
-+
-+		err = of_property_read_string_index(np, "feature-domain-names", j, &fw_entry);
-+		if (err == 0)
-+			firewall[j].entry = fw_entry;
-+
-+		/* Handle the case when there are no arguments given along with the phandle */
-+		if (provider_args.args_count < 0 ||
-+		    provider_args.args_count > STM32_FIREWALL_MAX_ARGS) {
-+			of_node_put(provider);
-+			return -EINVAL;
-+		} else if (provider_args.args_count == 0) {
-+			firewall[j].extra_args_size = 0;
-+			firewall[j].firewall_id = U32_MAX;
-+			j++;
-+			continue;
-+		}
-+
-+		/* The firewall ID is always the first argument */
-+		firewall[j].firewall_id = provider_args.args[0];
-+
-+		/* Extra args start at the third argument */
-+		for (i = 0; i < provider_args.args_count; i++)
-+			firewall[j].extra_args[i] = provider_args.args[i + 1];
-+
-+		/* Remove the firewall ID arg that is not an extra argument */
-+		firewall[j].extra_args_size = provider_args.args_count - 1;
-+
-+		j++;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_get_firewall);
-+
-+int stm32_firewall_grant_access(struct stm32_firewall *firewall)
-+{
-+	struct stm32_firewall_controller *firewall_controller;
-+
-+	if (!firewall || firewall->firewall_id == U32_MAX)
-+		return -EINVAL;
-+
-+	firewall_controller = firewall->firewall_ctrl;
-+
-+	if (!firewall_controller)
-+		return -ENODEV;
-+
-+	return firewall_controller->grant_access(firewall_controller, firewall->firewall_id);
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_grant_access);
-+
-+int stm32_firewall_grant_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id)
-+{
-+	struct stm32_firewall_controller *firewall_controller;
-+
-+	if (!firewall || subsystem_id == U32_MAX || firewall->firewall_id == U32_MAX)
-+		return -EINVAL;
-+
-+	firewall_controller = firewall->firewall_ctrl;
-+
-+	if (!firewall_controller)
-+		return -ENODEV;
-+
-+	return firewall_controller->grant_access(firewall_controller, subsystem_id);
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_grant_access_by_id);
-+
-+void stm32_firewall_release_access(struct stm32_firewall *firewall)
-+{
-+	struct stm32_firewall_controller *firewall_controller;
-+
-+	if (!firewall || firewall->firewall_id == U32_MAX) {
-+		pr_debug("Incorrect arguments when releasing a firewall access\n");
-+		return;
-+	}
-+
-+	firewall_controller = firewall->firewall_ctrl;
-+
-+	if (!firewall_controller) {
-+		pr_debug("No firewall controller to release\n");
-+		return;
-+	}
-+
-+	firewall_controller->release_access(firewall_controller, firewall->firewall_id);
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_release_access);
-+
-+void stm32_firewall_release_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id)
-+{
-+	struct stm32_firewall_controller *firewall_controller;
-+
-+	if (!firewall || subsystem_id == U32_MAX || firewall->firewall_id == U32_MAX) {
-+		pr_debug("Incorrect arguments when releasing a firewall access");
-+		return;
-+	}
-+
-+	firewall_controller = firewall->firewall_ctrl;
-+
-+	if (!firewall_controller) {
-+		pr_debug("No firewall controller to release");
-+		return;
-+	}
-+
-+	firewall_controller->release_access(firewall_controller, subsystem_id);
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_release_access_by_id);
-+
-+/* Firewall controller API */
-+
-+int stm32_firewall_controller_register(struct stm32_firewall_controller *firewall_controller)
-+{
-+	struct stm32_firewall_controller *ctrl;
-+
-+	pr_info("Registering %s firewall controller\n", firewall_controller->name);
-+
-+	if (!firewall_controller)
-+		return -ENODEV;
-+
-+	mutex_lock(&firewall_controller_list_lock);
-+	list_for_each_entry(ctrl, &firewall_controller_list, entry) {
-+		if (ctrl == firewall_controller) {
-+			pr_debug("%s firewall controller already registered\n",
-+				 firewall_controller->name);
-+			mutex_unlock(&firewall_controller_list_lock);
-+			return 0;
-+		}
-+	}
-+	list_add_tail(&firewall_controller->entry, &firewall_controller_list);
-+	mutex_unlock(&firewall_controller_list_lock);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_controller_register);
-+
-+void stm32_firewall_controller_unregister(struct stm32_firewall_controller *firewall_controller)
-+{
-+	struct stm32_firewall_controller *ctrl;
-+	bool controller_removed = false;
-+
-+	if (!firewall_controller) {
-+		pr_debug("Null reference while unregistering firewall controller\n");
-+		return;
-+	}
-+
-+	mutex_lock(&firewall_controller_list_lock);
-+	list_for_each_entry(ctrl, &firewall_controller_list, entry) {
-+		if (ctrl == firewall_controller) {
-+			controller_removed = true;
-+			list_del_init(&ctrl->entry);
-+			break;
-+		}
-+	}
-+	mutex_unlock(&firewall_controller_list_lock);
-+
-+	if (!controller_removed)
-+		pr_debug("There was no firewall controller named %s to unregister\n",
-+			 firewall_controller->name);
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_controller_unregister);
-+
-+int stm32_firewall_populate_bus(struct stm32_firewall_controller *firewall_controller)
-+{
-+	struct stm32_firewall *firewalls;
-+	struct device_node *child;
-+	struct device *parent;
-+	unsigned int i;
-+	int len;
-+	int err;
-+
-+	parent = firewall_controller->dev;
-+
-+	dev_dbg(parent, "Populating %s system bus\n", dev_name(firewall_controller->dev));
-+
-+	for_each_available_child_of_node(dev_of_node(parent), child) {
-+		/* The feature-domains property is mandatory for firewall bus devices */
-+		len = of_count_phandle_with_args(child, "feature-domains", "#feature-domain-cells");
-+		if (len <= 0)
-+			return -EINVAL;
-+
-+		firewalls = kcalloc(len, sizeof(*firewalls), GFP_KERNEL);
-+		if (!firewalls)
-+			return -ENOMEM;
-+
-+		err = stm32_firewall_get_firewall(child, firewalls, (unsigned int)len);
-+		if (err) {
-+			kfree(firewalls);
-+			return err;
-+		}
-+
-+		for (i = 0; i < len; i++) {
-+			if (firewall_controller->grant_access(firewall_controller,
-+							      firewalls[i].firewall_id)) {
-+				/*
-+				 * Peripheral access not allowed or not defined.
-+				 * Mark the node as populated so platform bus won't probe it
-+				 */
-+				of_node_set_flag(child, OF_POPULATED);
-+				dev_err(parent, "%s: Device driver will not be probed\n",
-+					child->full_name);
-+			}
-+		}
-+
-+		kfree(firewalls);
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(stm32_firewall_populate_bus);
-diff --git a/drivers/bus/stm32_firewall.h b/drivers/bus/stm32_firewall.h
-new file mode 100644
-index 000000000000..eed089a0acc0
---- /dev/null
-+++ b/drivers/bus/stm32_firewall.h
-@@ -0,0 +1,83 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-+ */
-+
-+#ifndef _STM32_FIREWALL_H
-+#define _STM32_FIREWALL_H
-+
-+#include <linux/kernel.h>
-+#include <linux/list.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/types.h>
-+
-+/**
-+ * STM32_PERIPHERAL_FIREWALL:		This type of firewall protects peripherals
-+ * STM32_MEMORY_FIREWALL:		This type of firewall protects memories/subsets of memory
-+ *					zones
-+ * STM32_NOTYPE_FIREWALL:		Undefined firewall type
-+ */
-+
-+#define STM32_PERIPHERAL_FIREWALL	BIT(1)
-+#define STM32_MEMORY_FIREWALL		BIT(2)
-+#define STM32_NOTYPE_FIREWALL		BIT(3)
-+
-+/**
-+ * struct stm32_firewall_controller - Information on firewall controller supplying services
-+ *
-+ * @name			Name of the firewall controller
-+ * @dev				Device reference of the firewall controller
-+ * @mmio			Base address of the firewall controller
-+ * @entry			List entry of the firewall controller list
-+ * @type			Type of firewall
-+ * @max_entries			Number of entries covered by the firewall
-+ * @grant_access		Callback used to grant access for a device access against a
-+ *				firewall controller
-+ * @release_access		Callback used to release resources taken by a device when access was
-+ *				granted
-+ * @grant_memory_range_access	Callback used to grant access for a device to a given memory region
-+ */
-+struct stm32_firewall_controller {
-+	const char *name;
-+	struct device *dev;
-+	void __iomem *mmio;
-+	struct list_head entry;
-+	unsigned int type;
-+	unsigned int max_entries;
-+
-+	int (*grant_access)(struct stm32_firewall_controller *ctrl, u32 id);
-+	void (*release_access)(struct stm32_firewall_controller *ctrl, u32 id);
-+	int (*grant_memory_range_access)(struct stm32_firewall_controller *ctrl, phys_addr_t paddr,
-+					 size_t size);
+-		lptimer2: timer@50021000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-lptimer";
+-			reg = <0x50021000 0x400>;
+-			interrupts-extended = <&exti 48 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc LPTIM2_K>;
+-			clock-names = "mux";
+-			wakeup-source;
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm-lp";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			trigger@1 {
+-				compatible = "st,stm32-lptimer-trigger";
+-				reg = <1>;
+-				status = "disabled";
+-			};
+-
+-			counter {
+-				compatible = "st,stm32-lptimer-counter";
+-				status = "disabled";
+-			};
+-
+-			timer {
+-				compatible = "st,stm32-lptimer-timer";
+-				status = "disabled";
+-			};
+-		};
+-
+-		lptimer3: timer@50022000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			compatible = "st,stm32-lptimer";
+-			reg = <0x50022000 0x400>;
+-			interrupts-extended = <&exti 50 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc LPTIM3_K>;
+-			clock-names = "mux";
+-			wakeup-source;
+-			status = "disabled";
+-
+-			pwm {
+-				compatible = "st,stm32-pwm-lp";
+-				#pwm-cells = <3>;
+-				status = "disabled";
+-			};
+-
+-			trigger@2 {
+-				compatible = "st,stm32-lptimer-trigger";
+-				reg = <2>;
+-				status = "disabled";
+-			};
+-
+-			timer {
+-				compatible = "st,stm32-lptimer-timer";
+-				status = "disabled";
+-			};
+-		};
+-
+ 		lptimer4: timer@50023000 {
+ 			compatible = "st,stm32-lptimer";
+ 			reg = <0x50023000 0x400>;
+@@ -1232,82 +835,6 @@ mdma: dma-controller@58000000 {
+ 			dma-requests = <48>;
+ 		};
+ 
+-		fmc: memory-controller@58002000 {
+-			compatible = "st,stm32mp1-fmc2-ebi";
+-			reg = <0x58002000 0x1000>;
+-			ranges = <0 0 0x60000000 0x04000000>, /* EBI CS 1 */
+-				 <1 0 0x64000000 0x04000000>, /* EBI CS 2 */
+-				 <2 0 0x68000000 0x04000000>, /* EBI CS 3 */
+-				 <3 0 0x6c000000 0x04000000>, /* EBI CS 4 */
+-				 <4 0 0x80000000 0x10000000>; /* NAND */
+-			#address-cells = <2>;
+-			#size-cells = <1>;
+-			clocks = <&rcc FMC_K>;
+-			resets = <&rcc FMC_R>;
+-			status = "disabled";
+-
+-			nand-controller@4,0 {
+-				compatible = "st,stm32mp1-fmc2-nfc";
+-				reg = <4 0x00000000 0x1000>,
+-				      <4 0x08010000 0x1000>,
+-				      <4 0x08020000 0x1000>,
+-				      <4 0x01000000 0x1000>,
+-				      <4 0x09010000 0x1000>,
+-				      <4 0x09020000 0x1000>;
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-				interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
+-				dmas = <&mdma 24 0x2 0x12000a02 0x0 0x0>,
+-				       <&mdma 24 0x2 0x12000a08 0x0 0x0>,
+-				       <&mdma 25 0x2 0x12000a0a 0x0 0x0>;
+-				dma-names = "tx", "rx", "ecc";
+-				status = "disabled";
+-			};
+-		};
+-
+-		qspi: spi@58003000 {
+-			compatible = "st,stm32f469-qspi";
+-			reg = <0x58003000 0x1000>, <0x70000000 0x10000000>;
+-			reg-names = "qspi", "qspi_mm";
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
+-			dmas = <&mdma 26 0x2 0x10100002 0x0 0x0>,
+-			       <&mdma 26 0x2 0x10100008 0x0 0x0>;
+-			dma-names = "tx", "rx";
+-			clocks = <&rcc QSPI_K>;
+-			resets = <&rcc QSPI_R>;
+-			status = "disabled";
+-		};
+-
+-		sdmmc1: mmc@58005000 {
+-			compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
+-			arm,primecell-periphid = <0x20253180>;
+-			reg = <0x58005000 0x1000>, <0x58006000 0x1000>;
+-			interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc SDMMC1_K>;
+-			clock-names = "apb_pclk";
+-			resets = <&rcc SDMMC1_R>;
+-			cap-sd-highspeed;
+-			cap-mmc-highspeed;
+-			max-frequency = <130000000>;
+-			status = "disabled";
+-		};
+-
+-		sdmmc2: mmc@58007000 {
+-			compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
+-			arm,primecell-periphid = <0x20253180>;
+-			reg = <0x58007000 0x1000>, <0x58008000 0x1000>;
+-			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc SDMMC2_K>;
+-			clock-names = "apb_pclk";
+-			resets = <&rcc SDMMC2_R>;
+-			cap-sd-highspeed;
+-			cap-mmc-highspeed;
+-			max-frequency = <130000000>;
+-			status = "disabled";
+-		};
+-
+ 		usbh_ohci: usb@5800c000 {
+ 			compatible = "generic-ohci";
+ 			reg = <0x5800c000 0x1000>;
+@@ -1335,29 +862,6 @@ iwdg2: watchdog@5a002000 {
+ 			status = "disabled";
+ 		};
+ 
+-		usbphyc: usbphyc@5a006000 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			#clock-cells = <0>;
+-			compatible = "st,stm32mp1-usbphyc";
+-			reg = <0x5a006000 0x1000>;
+-			clocks = <&rcc USBPHY_K>;
+-			resets = <&rcc USBPHY_R>;
+-			vdda1v1-supply = <&reg11>;
+-			vdda1v8-supply = <&reg18>;
+-			status = "disabled";
+-
+-			usbphyc_port0: usb-phy@0 {
+-				#phy-cells = <0>;
+-				reg = <0>;
+-			};
+-
+-			usbphyc_port1: usb-phy@1 {
+-				#phy-cells = <1>;
+-				reg = <1>;
+-			};
+-		};
+-
+ 		rtc: rtc@5c004000 {
+ 			compatible = "st,stm32mp1-rtc";
+ 			reg = <0x5c004000 0x400>;
+@@ -1386,6 +890,536 @@ ts_cal2: calib@5e {
+ 			};
+ 		};
+ 
++		etzpc: bus@5c007000 {
++			compatible = "st,stm32-etzpc";
++			reg = <0x5c007000 0x400>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			feature-domain-controller;
++			#feature-domain-cells = <1>;
++			ranges;
++
++			adc_2: adc@48004000 {
++				compatible = "st,stm32mp13-adc-core";
++				reg = <0x48004000 0x400>;
++				interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc ADC2>, <&rcc ADC2_K>;
++				clock-names = "bus", "adc";
++				interrupt-controller;
++				#interrupt-cells = <1>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				feature-domains = <&etzpc 33>;
++				status = "disabled";
++
++				adc2: adc@0 {
++					compatible = "st,stm32mp13-adc";
++					#io-channel-cells = <1>;
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0x0>;
++					interrupt-parent = <&adc_2>;
++					interrupts = <0>;
++					dmas = <&dmamux1 10 0x400 0x80000001>;
++					dma-names = "rx";
++					status = "disabled";
++
++					channel@13 {
++						reg = <13>;
++						label = "vrefint";
++					};
++					channel@14 {
++						reg = <14>;
++						label = "vddcore";
++					};
++					channel@16 {
++						reg = <16>;
++						label = "vddcpu";
++					};
++					channel@17 {
++						reg = <17>;
++						label = "vddq_ddr";
++					};
++				};
++			};
++
++			usbotg_hs: usb@49000000 {
++				compatible = "st,stm32mp15-hsotg", "snps,dwc2";
++				reg = <0x49000000 0x40000>;
++				clocks = <&rcc USBO_K>;
++				clock-names = "otg";
++				resets = <&rcc USBO_R>;
++				reset-names = "dwc2";
++				interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
++				g-rx-fifo-size = <512>;
++				g-np-tx-fifo-size = <32>;
++				g-tx-fifo-size = <256 16 16 16 16 16 16 16>;
++				dr_mode = "otg";
++				otg-rev = <0x200>;
++				usb33d-supply = <&usb33>;
++				feature-domains = <&etzpc 34>;
++				status = "disabled";
++			};
++
++			usart1: serial@4c000000 {
++				compatible = "st,stm32h7-uart";
++				reg = <0x4c000000 0x400>;
++				interrupts-extended = <&exti 26 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc USART1_K>;
++				resets = <&rcc USART1_R>;
++				wakeup-source;
++				dmas = <&dmamux1 41 0x400 0x5>,
++				<&dmamux1 42 0x400 0x1>;
++				dma-names = "rx", "tx";
++				feature-domains = <&etzpc 16>;
++				status = "disabled";
++			};
++
++			usart2: serial@4c001000 {
++				compatible = "st,stm32h7-uart";
++				reg = <0x4c001000 0x400>;
++				interrupts-extended = <&exti 27 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc USART2_K>;
++				resets = <&rcc USART2_R>;
++				wakeup-source;
++				dmas = <&dmamux1 43 0x400 0x5>,
++				<&dmamux1 44 0x400 0x1>;
++				dma-names = "rx", "tx";
++				feature-domains = <&etzpc 17>;
++				status = "disabled";
++			};
++
++			i2s4: audio-controller@4c002000 {
++				compatible = "st,stm32h7-i2s";
++				reg = <0x4c002000 0x400>;
++				#sound-dai-cells = <0>;
++				interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&dmamux1 83 0x400 0x01>,
++				<&dmamux1 84 0x400 0x01>;
++				dma-names = "rx", "tx";
++				feature-domains = <&etzpc 13>;
++				status = "disabled";
++			};
++
++			spi4: spi@4c002000 {
++				compatible = "st,stm32h7-spi";
++				reg = <0x4c002000 0x400>;
++				interrupts = <GIC_SPI 85 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc SPI4_K>;
++				resets = <&rcc SPI4_R>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				dmas = <&dmamux1 83 0x400 0x01>,
++				       <&dmamux1 84 0x400 0x01>;
++				dma-names = "rx", "tx";
++				feature-domains = <&etzpc 18>;
++				status = "disabled";
++			};
++
++			spi5: spi@4c003000 {
++				compatible = "st,stm32h7-spi";
++				reg = <0x4c003000 0x400>;
++				interrupts = <GIC_SPI 86 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc SPI5_K>;
++				resets = <&rcc SPI5_R>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				dmas = <&dmamux1 85 0x400 0x01>,
++				       <&dmamux1 86 0x400 0x01>;
++				dma-names = "rx", "tx";
++				feature-domains = <&etzpc 19>;
++				status = "disabled";
++			};
++
++			i2c3: i2c@4c004000 {
++				compatible = "st,stm32mp13-i2c";
++				reg = <0x4c004000 0x400>;
++				interrupt-names = "event", "error";
++				interrupts = <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 74 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc I2C3_K>;
++				resets = <&rcc I2C3_R>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				dmas = <&dmamux1 73 0x400 0x1>,
++				       <&dmamux1 74 0x400 0x1>;
++				dma-names = "rx", "tx";
++				st,syscfg-fmp = <&syscfg 0x4 0x4>;
++				i2c-analog-filter;
++				feature-domains = <&etzpc 20>;
++				status = "disabled";
++			};
++
++			i2c4: i2c@4c005000 {
++				compatible = "st,stm32mp13-i2c";
++				reg = <0x4c005000 0x400>;
++				interrupt-names = "event", "error";
++				interrupts = <GIC_SPI 93 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc I2C4_K>;
++				resets = <&rcc I2C4_R>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				dmas = <&dmamux1 75 0x400 0x1>,
++				       <&dmamux1 76 0x400 0x1>;
++				dma-names = "rx", "tx";
++				st,syscfg-fmp = <&syscfg 0x4 0x8>;
++				i2c-analog-filter;
++				feature-domains = <&etzpc 21>;
++				status = "disabled";
++			};
++
++			i2c5: i2c@4c006000 {
++				compatible = "st,stm32mp13-i2c";
++				reg = <0x4c006000 0x400>;
++				interrupt-names = "event", "error";
++				interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>,
++					     <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc I2C5_K>;
++				resets = <&rcc I2C5_R>;
++				#address-cells = <1>;
++				#size-cells = <0>;
++				dmas = <&dmamux1 115 0x400 0x1>,
++				       <&dmamux1 116 0x400 0x1>;
++				dma-names = "rx", "tx";
++				st,syscfg-fmp = <&syscfg 0x4 0x10>;
++				i2c-analog-filter;
++				feature-domains = <&etzpc 22>;
++				status = "disabled";
++			};
++
++			timers12: timer@4c007000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-timers";
++				reg = <0x4c007000 0x400>;
++				interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "global";
++				clocks = <&rcc TIM12_K>;
++				clock-names = "int";
++				feature-domains = <&etzpc 23>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				timer@11 {
++					compatible = "st,stm32h7-timer-trigger";
++					reg = <11>;
++					status = "disabled";
++				};
++			};
++
++			timers13: timer@4c008000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-timers";
++				reg = <0x4c008000 0x400>;
++				interrupts = <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "global";
++				clocks = <&rcc TIM13_K>;
++				clock-names = "int";
++				feature-domains = <&etzpc 24>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				timer@12 {
++					compatible = "st,stm32h7-timer-trigger";
++					reg = <12>;
++					status = "disabled";
++				};
++			};
++
++			timers14: timer@4c009000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-timers";
++				reg = <0x4c009000 0x400>;
++				interrupts = <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "global";
++				clocks = <&rcc TIM14_K>;
++				clock-names = "int";
++				feature-domains = <&etzpc 25>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				timer@13 {
++					compatible = "st,stm32h7-timer-trigger";
++					reg = <13>;
++					status = "disabled";
++				};
++			};
++
++			timers15: timer@4c00a000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-timers";
++				reg = <0x4c00a000 0x400>;
++				interrupts = <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "global";
++				clocks = <&rcc TIM15_K>;
++				clock-names = "int";
++				dmas = <&dmamux1 105 0x400 0x1>,
++				<&dmamux1 106 0x400 0x1>,
++				<&dmamux1 107 0x400 0x1>,
++				<&dmamux1 108 0x400 0x1>;
++				dma-names = "ch1", "up", "trig", "com";
++				feature-domains = <&etzpc 26>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				timer@14 {
++					compatible = "st,stm32h7-timer-trigger";
++					reg = <14>;
++					status = "disabled";
++				};
++			};
++
++			timers16: timer@4c00b000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-timers";
++				reg = <0x4c00b000 0x400>;
++				interrupts = <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "global";
++				clocks = <&rcc TIM16_K>;
++				clock-names = "int";
++				dmas = <&dmamux1 109 0x400 0x1>,
++				<&dmamux1 110 0x400 0x1>;
++				dma-names = "ch1", "up";
++				feature-domains = <&etzpc 27>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				timer@15 {
++					compatible = "st,stm32h7-timer-trigger";
++					reg = <15>;
++					status = "disabled";
++				};
++			};
++
++			timers17: timer@4c00c000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-timers";
++				reg = <0x4c00c000 0x400>;
++				interrupts = <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
++				interrupt-names = "global";
++				clocks = <&rcc TIM17_K>;
++				clock-names = "int";
++				dmas = <&dmamux1 111 0x400 0x1>,
++				       <&dmamux1 112 0x400 0x1>;
++				dma-names = "ch1", "up";
++				feature-domains = <&etzpc 28>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				timer@16 {
++					compatible = "st,stm32h7-timer-trigger";
++					reg = <16>;
++					status = "disabled";
++				};
++			};
++
++			lptimer2: timer@50021000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-lptimer";
++				reg = <0x50021000 0x400>;
++				interrupts-extended = <&exti 48 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc LPTIM2_K>;
++				clock-names = "mux";
++				wakeup-source;
++				feature-domains = <&etzpc 1>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm-lp";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				trigger@1 {
++					compatible = "st,stm32-lptimer-trigger";
++					reg = <1>;
++					status = "disabled";
++				};
++
++				counter {
++					compatible = "st,stm32-lptimer-counter";
++					status = "disabled";
++				};
++
++				timer {
++					compatible = "st,stm32-lptimer-timer";
++					status = "disabled";
++				};
++			};
++
++			lptimer3: timer@50022000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				compatible = "st,stm32-lptimer";
++				reg = <0x50022000 0x400>;
++				interrupts-extended = <&exti 50 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc LPTIM3_K>;
++				clock-names = "mux";
++				wakeup-source;
++				feature-domains = <&etzpc 2>;
++				status = "disabled";
++
++				pwm {
++					compatible = "st,stm32-pwm-lp";
++					#pwm-cells = <3>;
++					status = "disabled";
++				};
++
++				trigger@2 {
++					compatible = "st,stm32-lptimer-trigger";
++					reg = <2>;
++					status = "disabled";
++				};
++
++				timer {
++					compatible = "st,stm32-lptimer-timer";
++					status = "disabled";
++				};
++			};
++
++			fmc: memory-controller@58002000 {
++				compatible = "st,stm32mp1-fmc2-ebi";
++				reg = <0x58002000 0x1000>;
++				ranges = <0 0 0x60000000 0x04000000>, /* EBI CS 1 */
++					 <1 0 0x64000000 0x04000000>, /* EBI CS 2 */
++					 <2 0 0x68000000 0x04000000>, /* EBI CS 3 */
++					 <3 0 0x6c000000 0x04000000>, /* EBI CS 4 */
++					 <4 0 0x80000000 0x10000000>; /* NAND */
++				#address-cells = <2>;
++				#size-cells = <1>;
++				clocks = <&rcc FMC_K>;
++				resets = <&rcc FMC_R>;
++				feature-domains = <&etzpc 54>;
++				status = "disabled";
++
++				nand-controller@4,0 {
++					compatible = "st,stm32mp1-fmc2-nfc";
++					reg = <4 0x00000000 0x1000>,
++					      <4 0x08010000 0x1000>,
++					      <4 0x08020000 0x1000>,
++					      <4 0x01000000 0x1000>,
++					      <4 0x09010000 0x1000>,
++					      <4 0x09020000 0x1000>;
++					#address-cells = <1>;
++					#size-cells = <0>;
++					interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
++					dmas = <&mdma 24 0x2 0x12000a02 0x0 0x0>,
++					       <&mdma 24 0x2 0x12000a08 0x0 0x0>,
++					       <&mdma 25 0x2 0x12000a0a 0x0 0x0>;
++					dma-names = "tx", "rx", "ecc";
++					status = "disabled";
++				};
++			};
++
++			qspi: spi@58003000 {
++				compatible = "st,stm32f469-qspi";
++				reg = <0x58003000 0x1000>, <0x70000000 0x10000000>;
++				reg-names = "qspi", "qspi_mm";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
++				dmas = <&mdma 26 0x2 0x10100002 0x0 0x0>,
++				       <&mdma 26 0x2 0x10100008 0x0 0x0>;
++				dma-names = "tx", "rx";
++				clocks = <&rcc QSPI_K>;
++				resets = <&rcc QSPI_R>;
++				feature-domains = <&etzpc 55>;
++				status = "disabled";
++			};
++
++			sdmmc1: mmc@58005000 {
++				compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
++				arm,primecell-periphid = <0x20253180>;
++				reg = <0x58005000 0x1000>, <0x58006000 0x1000>;
++				interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc SDMMC1_K>;
++				clock-names = "apb_pclk";
++				resets = <&rcc SDMMC1_R>;
++				cap-sd-highspeed;
++				cap-mmc-highspeed;
++				max-frequency = <130000000>;
++				feature-domains = <&etzpc 50>;
++				status = "disabled";
++			};
++
++			sdmmc2: mmc@58007000 {
++				compatible = "st,stm32-sdmmc2", "arm,pl18x", "arm,primecell";
++				arm,primecell-periphid = <0x20253180>;
++				reg = <0x58007000 0x1000>, <0x58008000 0x1000>;
++				interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&rcc SDMMC2_K>;
++				clock-names = "apb_pclk";
++				resets = <&rcc SDMMC2_R>;
++				cap-sd-highspeed;
++				cap-mmc-highspeed;
++				max-frequency = <130000000>;
++				feature-domains = <&etzpc 51>;
++				status = "disabled";
++			};
++
++			usbphyc: usbphyc@5a006000 {
++				#address-cells = <1>;
++				#size-cells = <0>;
++				#clock-cells = <0>;
++				compatible = "st,stm32mp1-usbphyc";
++				reg = <0x5a006000 0x1000>;
++				clocks = <&rcc USBPHY_K>;
++				resets = <&rcc USBPHY_R>;
++				vdda1v1-supply = <&reg11>;
++				vdda1v8-supply = <&reg18>;
++				feature-domains = <&etzpc 5>;
++				status = "disabled";
++
++				usbphyc_port0: usb-phy@0 {
++					#phy-cells = <0>;
++					reg = <0>;
++				};
++
++				usbphyc_port1: usb-phy@1 {
++					#phy-cells = <1>;
++					reg = <1>;
++				};
++			};
++
++		};
++
+ 		/*
+ 		 * Break node order to solve dependency probe issue between
+ 		 * pinctrl and exti.
+@@ -1397,6 +1431,7 @@ pinctrl: pinctrl@50002000 {
+ 			ranges = <0 0x50002000 0x8400>;
+ 			interrupt-parent = <&exti>;
+ 			st,syscfg = <&exti 0x60 0xff>;
++			pins-are-numbered;
+ 
+ 			gpioa: gpio@50002000 {
+ 				gpio-controller;
+diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi b/arch/arm/boot/dts/st/stm32mp133.dtsi
+index df451c3c2a26..be6061552683 100644
+--- a/arch/arm/boot/dts/st/stm32mp133.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
+@@ -33,35 +33,38 @@ m_can2: can@4400f000 {
+ 			bosch,mram-cfg = <0x1400 0 0 32 0 0 2 2>;
+ 			status = "disabled";
+ 		};
++	};
 +};
+ 
+-		adc_1: adc@48003000 {
+-			compatible = "st,stm32mp13-adc-core";
+-			reg = <0x48003000 0x400>;
+-			interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc ADC1>, <&rcc ADC1_K>;
+-			clock-names = "bus", "adc";
+-			interrupt-controller;
+-			#interrupt-cells = <1>;
++&etzpc {
++	adc_1: adc@48003000 {
++		compatible = "st,stm32mp13-adc-core";
++		reg = <0x48003000 0x400>;
++		interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&rcc ADC1>, <&rcc ADC1_K>;
++		clock-names = "bus", "adc";
++		interrupt-controller;
++		#interrupt-cells = <1>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++		feature-domains = <&etzpc 32>;
++		status = "disabled";
 +
-+/**
-+ * int stm32_firewall_controller_register - Register a firewall controller to the STM32 firewall
-+ *					    framework
-+ * @firewall_controller		Firewall controller to register
-+ *
-+ * Returns 0 in case of success or -ENODEV if no controller was given.
-+ */
-+int stm32_firewall_controller_register(struct stm32_firewall_controller *firewall_controller);
-+
-+/**
-+ * int stm32_firewall_controller_unregister - Unregister a firewall controller from the STM32
-+ *					      firewall framework
-+ * @firewall_controller		Firewall controller to unregister
-+ */
-+void stm32_firewall_controller_unregister(struct stm32_firewall_controller *firewall_controller);
-+
-+/**
-+ * stm32_firewall_populate_bus - Populate device tree nodes that have a correct firewall
-+ *				 configuration. This is used at boot-time only, as a sanity check
-+ *				 between device tree and firewalls hardware configurations to
-+ *				 prevent a kernel crash when a device driver is not granted access
-+ *
-+ * @firewall_controller		Firewall controller which nodes will be populated or not
-+ *
-+ * Returns 0 in case of success or appropriate errno code if error occurred.
-+ */
-+int stm32_firewall_populate_bus(struct stm32_firewall_controller *firewall_controller);
-+
-+#endif /* _STM32_FIREWALL_H */
-diff --git a/include/linux/bus/stm32_firewall_device.h b/include/linux/bus/stm32_firewall_device.h
-new file mode 100644
-index 000000000000..9bdc4060154c
---- /dev/null
-+++ b/include/linux/bus/stm32_firewall_device.h
-@@ -0,0 +1,140 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-+ */
-+
-+#ifndef STM32_FIREWALL_DEVICE_H
-+#define STM32_FIREWALL_DEVICE_H
-+
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/types.h>
-+
-+#define STM32_FIREWALL_MAX_EXTRA_ARGS		5
-+
-+/* Opaque reference to stm32_firewall_controller */
-+struct stm32_firewall_controller;
-+
-+/**
-+ * stm32_firewall - Information on a device's firewall. Each device can have more than one firewall.
-+ *
-+ * @firewall_ctrl		Pointer referencing a firewall controller of the device. It is
-+ *				opaque so a device cannot manipulate the controller's ops or access
-+ *				the controller's data
-+ * @extra_args			Extra arguments that are implementation dependent
-+ * @entry			Name of the firewall entry
-+ * @extra_args_size		Number of extra arguments
-+ * @firewall_id			Firewall ID associated the device for this firewall controller
-+ */
-+struct stm32_firewall {
-+	struct stm32_firewall_controller *firewall_ctrl;
-+	u32 extra_args[STM32_FIREWALL_MAX_EXTRA_ARGS];
-+	const char *entry;
-+	size_t extra_args_size;
-+	u32 firewall_id;
-+};
-+
-+#if IS_ENABLED(CONFIG_STM32_FIREWALL)
-+/**
-+ * stm32_firewall_get_firewall - Get the firewall(s) associated to given device.
-+ *				 The firewall controller reference is always the first argument
-+ *				 of each of the feature-domains property entries.
-+ *				 The firewall ID is always the second argument of each of the
-+ *				 feature-domains property entries.
-+ *				 If there's no argument linked to the phandle, then the firewall ID
-+ *				 field is set to U32_MAX, which is an invalid ID.
-+ *
-+ * @np				Device node to parse
-+ * @firewall			Array of firewall references
-+ * @nb_firewall			Number of firewall references to get. Must be at least 1.
-+ *
-+ * Returns 0 on success, -ENODEV if there's no match with a firewall controller or appropriate errno
-+ * code if error occurred.
-+ */
-+int stm32_firewall_get_firewall(struct device_node *np, struct stm32_firewall *firewall,
-+				unsigned int nb_firewall);
-+
-+/**
-+ * stm32_firewall_grant_access - Request firewall access rights and grant access.
-+ *
-+ * @firewall			Firewall reference containing the ID to check against its firewall
-+ *				controller
-+ *
-+ * Returns 0 if access is granted, -EACCES if access is denied, -ENODEV if firewall is null or
-+ * appropriate errno code if error occurred
-+ */
-+int stm32_firewall_grant_access(struct stm32_firewall *firewall);
-+
-+/**
-+ * stm32_firewall_release_access - Release access granted from a call to
-+ *				   stm32_firewall_grant_access().
-+ *
-+ * @firewall			Firewall reference containing the ID to check against its firewall
-+ *				controller
-+ */
-+void stm32_firewall_release_access(struct stm32_firewall *firewall);
-+
-+/**
-+ * stm32_firewall_grant_access_by_id - Request firewall access rights of a given device
-+ *				       based on a specific firewall ID
-+ *
-+ * Warnings:
-+ * There is no way to ensure that the given ID will correspond to the firewall referenced in the
-+ * device node if the ID did not come from stm32_firewall_get_firewall(). In that case, this
-+ * function must be used with caution.
-+ * This function should be used for subsystem resources that do not have the same firewall ID
-+ * as their parent.
-+ * U32_MAX is an invalid ID.
-+ *
-+ * @firewall			Firewall reference containing the firewall controller
-+ * @subsystem_id		Firewall ID of the subsystem resource
-+ *
-+ * Returns 0 if access is granted, -EACCES if access is denied, -ENODEV if firewall is null or
-+ * appropriate errno code if error occurred
-+ */
-+int stm32_firewall_grant_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id);
-+
-+/**
-+ * stm32_firewall_release_access_by_id - Release access granted from a call to
-+ *					 stm32_firewall_grant_access_by_id().
-+ *
-+ * Warnings:
-+ * There is no way to ensure that the given ID will correspond to the firewall referenced in the
-+ * device node if the ID did not come from stm32_firewall_get_firewall(). In that case, this
-+ * function must be used with caution.
-+ * This function should be used for subsystem resources that do not have the same firewall ID
-+ * as their parent.
-+ * U32_MAX is an invalid ID.
-+ *
-+ * @firewall			Firewall reference containing the firewall controller
-+ * @subsystem_id		Firewall ID of the subsystem resource
-+ */
-+void stm32_firewall_release_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id);
-+
-+#else /* CONFIG_STM32_FIREWALL */
-+
-+int stm32_firewall_get_firewall(struct device_node *np, struct stm32_firewall *firewall)
-+{
-+	return -ENODEV;
-+}
-+
-+int stm32_firewall_grant_access(struct stm32_firewall *firewall)
-+{
-+	return -ENODEV;
-+}
-+
-+void stm32_firewall_release_access(struct stm32_firewall *firewall)
-+{
-+}
-+
-+int stm32_firewall_grant_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id)
-+{
-+	return -ENODEV;
-+}
-+
-+void stm32_firewall_release_access_by_id(struct stm32_firewall *firewall, u32 subsystem_id)
-+{
-+}
-+
-+#endif /* CONFIG_STM32_FIREWALL */
-+#endif /* STM32_FIREWALL_DEVICE_H */
++		adc1: adc@0 {
++			compatible = "st,stm32mp13-adc";
++			#io-channel-cells = <1>;
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
++			reg = <0x0>;
++			interrupt-parent = <&adc_1>;
++			interrupts = <0>;
++			dmas = <&dmamux1 9 0x400 0x80000001>;
++			dma-names = "rx";
+ 			status = "disabled";
+ 
+-			adc1: adc@0 {
+-				compatible = "st,stm32mp13-adc";
+-				#io-channel-cells = <1>;
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-				reg = <0x0>;
+-				interrupt-parent = <&adc_1>;
+-				interrupts = <0>;
+-				dmas = <&dmamux1 9 0x400 0x80000001>;
+-				dma-names = "rx";
+-				status = "disabled";
+-
+-				channel@18 {
+-					reg = <18>;
+-					label = "vrefint";
+-				};
++			channel@18 {
++				reg = <18>;
++				label = "vrefint";
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm/boot/dts/st/stm32mp13xc.dtsi b/arch/arm/boot/dts/st/stm32mp13xc.dtsi
+index 4d00e7592882..a1a7a40c2a3e 100644
+--- a/arch/arm/boot/dts/st/stm32mp13xc.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp13xc.dtsi
+@@ -4,15 +4,14 @@
+  * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
+  */
+ 
+-/ {
+-	soc {
+-		cryp: crypto@54002000 {
+-			compatible = "st,stm32mp1-cryp";
+-			reg = <0x54002000 0x400>;
+-			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc CRYP1>;
+-			resets = <&rcc CRYP1_R>;
+-			status = "disabled";
+-		};
++&etzpc {
++	cryp: crypto@54002000 {
++		compatible = "st,stm32mp1-cryp";
++		reg = <0x54002000 0x400>;
++		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&rcc CRYP1>;
++		resets = <&rcc CRYP1_R>;
++		feature-domains = <&etzpc 42>;
++		status = "disabled";
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/st/stm32mp13xf.dtsi b/arch/arm/boot/dts/st/stm32mp13xf.dtsi
+index 4d00e7592882..a1a7a40c2a3e 100644
+--- a/arch/arm/boot/dts/st/stm32mp13xf.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp13xf.dtsi
+@@ -4,15 +4,14 @@
+  * Author: Alexandre Torgue <alexandre.torgue@foss.st.com> for STMicroelectronics.
+  */
+ 
+-/ {
+-	soc {
+-		cryp: crypto@54002000 {
+-			compatible = "st,stm32mp1-cryp";
+-			reg = <0x54002000 0x400>;
+-			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
+-			clocks = <&rcc CRYP1>;
+-			resets = <&rcc CRYP1_R>;
+-			status = "disabled";
+-		};
++&etzpc {
++	cryp: crypto@54002000 {
++		compatible = "st,stm32mp1-cryp";
++		reg = <0x54002000 0x400>;
++		interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++		clocks = <&rcc CRYP1>;
++		resets = <&rcc CRYP1_R>;
++		feature-domains = <&etzpc 42>;
++		status = "disabled";
+ 	};
+ };
 -- 
 2.35.3
 
