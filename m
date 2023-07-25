@@ -2,118 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7ECC04A6A
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 11:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5ECC001DE
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 12:57:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234931AbjGYLkG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 07:40:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
+        id S232032AbjGYM51 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 08:57:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234930AbjGYLkF (ORCPT
+        with ESMTP id S232005AbjGYM5Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 07:40:05 -0400
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F383D10C7;
-        Tue, 25 Jul 2023 04:40:04 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36PBdnOS130110;
-        Tue, 25 Jul 2023 06:39:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1690285189;
-        bh=/fa+z+CUWBeCBalWhS3n0PD609rlDIlHp3Fx7siEkOY=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=PtHM3Him0DVTFvhELrCAh/ohVkHl3IRsCQtYyytH1r117BXkyftmeroDOzpssBqcj
-         rG3DLKwHrXeonYH1nqpnG7TEPFIU3wLmDZtSEWzlrWYSFp/0e5WVA/+01fHCKDNm3J
-         LnNdHk/QnfsHGbH+NHaG8wx35oKcxmEAecUso4NE=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36PBdnFO002980
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 25 Jul 2023 06:39:49 -0500
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 25
- Jul 2023 06:39:49 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 25 Jul 2023 06:39:49 -0500
-Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36PBdnIZ045291;
-        Tue, 25 Jul 2023 06:39:49 -0500
-From:   Nishanth Menon <nm@ti.com>
-To:     Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Jayesh Choudhary <j-choudhary@ti.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Tero Kristo" <t-kristo@ti.com>, Keerthy <j-keerthy@ti.com>,
-        Kamlesh Gurudasani <kamlesh@ti.com>
-CC:     Nishanth Menon <nm@ti.com>, <linux-arm-kernel@lists.infradead.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Rob Herring <robh@kernel.org>, <linux-crypto@vger.kernel.org>,
-        Conor Dooley <conor.dooley@microchip.com>
-Subject: Re: [PATCH v5 0/2] Remove power-domains property for devices with compatible ti,am62-sa3ul
-Date:   Tue, 25 Jul 2023 06:39:48 -0500
-Message-ID: <169028509342.1718778.15078093695331558450.b4-ty@ti.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
-References: <20230614-sa3ul-v5-0-29dd2366fba3@ti.com>
+        Tue, 25 Jul 2023 08:57:25 -0400
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4534DA
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jul 2023 05:57:22 -0700 (PDT)
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3a5b92b4b63so4123436b6e.1
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jul 2023 05:57:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690289842; x=1690894642;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cOw8M5MEfuKWRaEOU1htxwvLHkFjQE/8NWsGwEPUhhQ=;
+        b=lgA2pukqMCWaLoY/OVOGbxJ/0Zm0Y2OxH2twQU+RlVyDDGMisIEdJAccascyg9x482
+         kUO+mYPdgi/HHNI1brUEqaILR/0GtUee8pXw1LdcsuMfqA0hQxnODCchHfqT28HY3osW
+         DhXSpAwWAlo4S+C7p4SptyHx647VtTiKV3cqTZOpSwAZ8pesh4fxocT3QYszJjwLhl/F
+         RQSavvjLnfjncgABjR9J/H/UnZqBpHxp9yIryEa7k+4vA3G/WXVm9d75sGO+Fxt6/dp3
+         X4aVdbp0QZ1Fw35e5w+IXkx8fyesCkd15861hkhnsPSC8tM0loWFu+B/NsuX0ePAjnl4
+         6yAg==
+X-Gm-Message-State: ABy/qLaA2lkNaC0txWZSNZsZXMHAvyL+eSRKtVSpCTlyoSt6PQ5ScICk
+        NtZIm3hNxyHzWr2l4vZOLWrJfcub6GKwYo7Em+BZ9FqcE/1W
+X-Google-Smtp-Source: APBJJlGT5ZLlw0oGMTwCLMxeRVwuZL4LAuQ2BEQbUtmWWbEDKq21tCrSij87dhru4aCbHfthAYp+54z2UOiiNwEt9tNqBfQ6biJk
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Received: by 2002:a05:6808:13cf:b0:3a5:a925:80a0 with SMTP id
+ d15-20020a05680813cf00b003a5a92580a0mr18099491oiw.2.1690289842333; Tue, 25
+ Jul 2023 05:57:22 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 05:57:22 -0700
+In-Reply-To: <0000000000000cb2c305fdeb8e30@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009eae2406014f451d@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in cryptd_hash_export
+From:   syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
+To:     alexander.deucher@amd.com, davem@davemloft.net,
+        dhowells@redhat.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mario.limonciello@amd.com, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert,
+syzbot suspects this issue was fixed by commit:
 
-I am going to assume that you are ok with me picking this series up as this
-results in a few broken boots for various boards. Let me know if that is not
-the case, and I will drop the series from my tree.
+commit 30c3d3b70aba2464ee8c91025e91428f92464077
+Author: Mario Limonciello <mario.limonciello@amd.com>
+Date:   Tue May 30 16:57:59 2023 +0000
 
-Hi Kamlesh Gurudasani,
+    drm/amd: Disallow s0ix without BIOS support again
 
-On Fri, 14 Jul 2023 14:42:40 +0530, Kamlesh Gurudasani wrote:
-> SYSFW don't allow access to power of devices with compatible ti,am62-sa3ul
-> from main domain.
-> 
-> Power-domains property, if present will try to access the power of the
-> device, which will result into failure in probing of driver for that
-> device.
-> 
-> [...]
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13ad506ea80000
+start commit:   ded5c1a16ec6 Merge branch 'tools-ynl-gen-code-gen-improvem..
+git tree:       net-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=526f919910d4a671
+dashboard link: https://syzkaller.appspot.com/bug?extid=e79818f5c12416aba9de
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c6193b280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c7a795280000
 
-I have applied the following to branch ti-k3-dts-next on [1].
-Thank you!
+If the result looks correct, please mark the issue as fixed by replying with:
 
-[1/2] dt-bindings: crypto: ti,sa2ul: make power-domains conditional
-      commit: e1f7d17a734c5c617d05c3d188939d5032d3d5a2
-[2/2] arm64: dts: ti: k3-am62-main: Remove power-domains from crypto node
-      commit: b573bf35ef3f113c1717fa22cefdfdfbb83aec70
+#syz fix: drm/amd: Disallow s0ix without BIOS support again
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent up the chain during
-the next merge window (or sooner if it is a relevant bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/ti/linux.git
--- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
