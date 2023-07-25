@@ -2,165 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD80C04E69
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 14:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA1CC001DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 14:13:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232290AbjGYOIu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 10:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55782 "EHLO
+        id S232372AbjGYONK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 10:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232298AbjGYOIs (ORCPT
+        with ESMTP id S230298AbjGYONJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 10:08:48 -0400
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF82D1FD7;
-        Tue, 25 Jul 2023 07:08:46 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36PDXDMu010531;
-        Tue, 25 Jul 2023 16:08:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=aKox1fifr/MD7CscnSNaYClzgh1MKEowYV/1CFbHY8Q=;
- b=4sFWeFLREgJioc9H+rODp72hj3AVdLAeXn//m7QoqBPjLcHM3h6ErPmn4WA399Y/aITY
- Es+zEl+7c1OuNWP/mY/sYFUWBgIrS0ZnwoA5voqLfap1MOnNtJ/zdQsJH70zP6mKb4It
- up4nrSg6m/QvGFbwtP1STGuEVZLJ00BGoK2EjvjlEjCcZJFyhQQwWBxUeAAPCbeV4q3h
- 6aBJcowFMNfbDdrNiVfgGpJZ6jk6/MU4C0knjVH4EQXo3oCJXoEvofraY3JZmoYetI5I
- ZcYWT0tL9hA+ODD+fHxyfM0nlDUmDa3FOMio5gfyLhC4I0CiM1Tbi4NIEhA6R3rIQpjx iw== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s2bkbhv00-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 16:08:01 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B9F8E100048;
-        Tue, 25 Jul 2023 16:07:56 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 5ACB4241EF6;
-        Tue, 25 Jul 2023 16:07:56 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Tue, 25 Jul
- 2023 16:07:54 +0200
-Message-ID: <1faa5511-a341-9c17-5e2a-974f8139d1d6@foss.st.com>
-Date:   Tue, 25 Jul 2023 16:07:49 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 07/10] arm64: dts: st: add RIFSC as a domain controller
- for STM32MP25x boards
-Content-Language: en-US
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-To:     Alexandre TORGUE <alexandre.torgue@foss.st.com>,
-        <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        Tue, 25 Jul 2023 10:13:09 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FBFE4;
+        Tue, 25 Jul 2023 07:13:07 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 8607F12002B;
+        Tue, 25 Jul 2023 17:13:04 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 8607F12002B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1690294384;
+        bh=hZFB0w5NSFKiON9JVJJaIk3Acr9yVPgY1wcvAHY5Duc=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=CJEFm2ZWRx8lrVAm9wxl6AfLtykmVYShFRdsZTMP8JMx40N2vbmkkJqbGepKdCFf7
+         bUrwTtWDeZdr0NK/vkeeDxdUjCyo0T+qqtEIbT7wIQkciGpdvzeg7TDehmMXX7UYDr
+         GlB+6HYN6bzc+U2/1LBBnMtbt9EYa+hCpdk1Ty/u0EThfgo1YGSnzKLFNEK3d4n/NB
+         c1i97zb2s2/P/1ELVwvEmzsMMv0YfwR+qYQ83UJClm0xGTFKF2hnJONvmbG0SPXBOJ
+         3ihkk4z6u1FxYEsdf9NoqNHzkxrvp/prq3uT5eNEcXtb8qRwWUk1ZWShG/a3i/Qhh1
+         MsZOImSkFsstA==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Tue, 25 Jul 2023 17:13:04 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 25 Jul 2023 17:13:03 +0300
+From:   Alexey Romanov <avromanov@sberdevices.ru>
+To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
+        <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
         <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>
-CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-8-gatien.chevallier@foss.st.com>
- <61d93738-4ffd-411d-d32c-912c14eea56d@foss.st.com>
- <997780a9-1cbc-46a2-2743-7fd493682278@foss.st.com>
-In-Reply-To: <997780a9-1cbc-46a2-2743-7fd493682278@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+        <conor+dt@kernel.org>, <khilman@baylibre.com>,
+        <jbrunet@baylibre.com>, <martin.blumenstingl@googlemail.com>,
+        <f.fainelli@gmail.com>, <hkallweit1@gmail.com>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-amlogic@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
+        Alexey Romanov <avromanov@sberdevices.ru>
+Subject: [PATCH v1 0/3] Meson S4 HW RNG Support
+Date:   Tue, 25 Jul 2023 17:12:49 +0300
+Message-ID: <20230725141252.98848-1-avromanov@sberdevices.ru>
+X-Mailer: git-send-email 2.33.0
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-25_08,2023-07-25_01,2023-05-22_02
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVRomanov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Tracking_from_domain_doesnt_match_to}, sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Alex,
+Hello!
 
-On 7/6/23 11:30, Gatien CHEVALLIER wrote:
-> Hi Alex,
-> 
-> On 7/6/23 11:25, Alexandre TORGUE wrote:
->> Hi Gatien
->>
->> On 7/5/23 19:27, Gatien Chevallier wrote:
->>> RIFSC is a firewall controller. Change its compatible so that is matches
->>> the documentation and reference RIFSC as a feature-domain-controller.
->>>
->>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>> ---
->>>   arch/arm64/boot/dts/st/stm32mp251.dtsi | 5 ++++-
->>>   1 file changed, 4 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi 
->>> b/arch/arm64/boot/dts/st/stm32mp251.dtsi
->>> index 5268a4321841..62101084cab8 100644
->>> --- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
->>> +++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
->>> @@ -106,17 +106,20 @@ soc@0 {
->>>           ranges = <0x0 0x0 0x0 0x80000000>;
->>>           rifsc: rifsc-bus@42080000 {
->>> -            compatible = "simple-bus";
->>> +            compatible = "st,stm32mp25-rifsc";
->>
->> You could keep "simple-bus" compatible (in second position). In case 
->> of the RIFSC is not probed, the platform will be able to boot. If you 
->> agree you can use the same for ETZPC.
->>
->> Cheers
->> Alex
-> 
-> Sure, good point.
-> 
-> I'll change that in V2
-> 
-> Best regards,
-> Gatien
+This patch series adds hwrng support for Amlogic S4-series.
+Now, S4 uses a new random number generation algorithm.
+This changes implemnents new algo and also adds description
+to meson-s4.dtsi.
 
-Actually, it would be a bad idea to keep "simple-bus" as a compatible.
+Alexey Romanov (3):
+  drivers: rng: add check status bit feature
+  dt-bindings: rng: meson: add meson-rng-s4 compatible
+  arch/arm64: dts: meson-s4: add hwrng node
 
-Practical example:
-1) Firewall controller forbids a device probe by marking the device's
-node as populated (OF_POPULATED flag).
-2) The simple-bus, which is simple, populates all the devices
-from the device tree data, overriding what the firewall bus has done.
-3)=>Forbidden device's driver will be probed.
+ .../bindings/rng/amlogic,meson-rng.yaml       |  1 +
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |  5 ++
+ drivers/char/hw_random/meson-rng.c            | 77 ++++++++++++++++++-
+ 3 files changed, 80 insertions(+), 3 deletions(-)
 
-I think it's best to keep one compatible. If someone wants these drivers
-as external modules, then it'll be best to handle this differently.
-I'll resubmit with a single compatible for V2, please do not
-hesitate to comment on the V2 if you're not okay with this.
+-- 
+2.38.1
 
-Best regards,
-Gatien
-
->>
->>>               reg = <0x42080000 0x1000>;
->>>               #address-cells = <1>;
->>>               #size-cells = <1>;
->>>               ranges;
->>> +            feature-domain-controller;
->>> +            #feature-domain-cells = <1>;
->>>               usart2: serial@400e0000 {
->>>                   compatible = "st,stm32h7-uart";
->>>                   reg = <0x400e0000 0x400>;
->>>                   interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
->>>                   clocks = <&ck_flexgen_08>;
->>> +                feature-domains = <&rifsc 32>;
->>>                   status = "disabled";
->>>               };
->>>           };
->>
