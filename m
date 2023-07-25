@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D21CC04FDF
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 11:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 369D3C41513
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 11:39:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234385AbjGYLUJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 07:20:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57126 "EHLO
+        id S234883AbjGYLjl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 07:39:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234392AbjGYLUH (ORCPT
+        with ESMTP id S234896AbjGYLjj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 07:20:07 -0400
+        Tue, 25 Jul 2023 07:39:39 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A8A11B;
-        Tue, 25 Jul 2023 04:20:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD22119A0;
+        Tue, 25 Jul 2023 04:39:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 940436166E;
-        Tue, 25 Jul 2023 11:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784AEC433C8;
-        Tue, 25 Jul 2023 11:20:04 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 534A961655;
+        Tue, 25 Jul 2023 11:39:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D190C433C7;
+        Tue, 25 Jul 2023 11:39:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1690284005;
-        bh=CgiuK9I3YI0uxFOMhmBdUXNbzlMsnQSu8zwOcF8YLwk=;
+        s=korg; t=1690285174;
+        bh=ZQnNCjT640KReZzz3zUGH4VsxqTdjx4LYaEPd5aJNJM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nviX72SGDOEV0oze2drmxS3Wa5PmVRNeOeneYjN8IiE8seY0q18nDrRG0pNcWtJXg
-         j2tK7RQwTkm45Ji20p9bjabNDfwzelFFXWnOAFEPtb2d0Rn5RLkjCDFI5Ilo29MNBu
-         kdQYG3Ym3hIJ5SojI9r9gfpoi8HljYihPklhUnqk=
+        b=0yrcpIbIHuSBfn+W6XgxA/FJyS6QbdXzmAqBIZHdFV2JZ96mLoZtpFTC734cHx1FA
+         hX5qozwDVfhRrsVaMODXmH4Ak4rsf+QQNtyRLj0mlD1FGlbPsUodLlBGUTsrKBQ2lS
+         OJHjTeiWP7bP9yOmpGauASHq1pwJdzz+Os219LU8=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -44,12 +44,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Nicholas Piggin <npiggin@gmail.com>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         linuxppc-dev@lists.ozlabs.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 201/509] crypto: nx - fix build warnings when DEBUG_FS is not enabled
-Date:   Tue, 25 Jul 2023 12:42:20 +0200
-Message-ID: <20230725104602.959346642@linuxfoundation.org>
+Subject: [PATCH 5.4 110/313] crypto: nx - fix build warnings when DEBUG_FS is not enabled
+Date:   Tue, 25 Jul 2023 12:44:23 +0200
+Message-ID: <20230725104525.764856542@linuxfoundation.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230725104553.588743331@linuxfoundation.org>
-References: <20230725104553.588743331@linuxfoundation.org>
+In-Reply-To: <20230725104521.167250627@linuxfoundation.org>
+References: <20230725104521.167250627@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -101,7 +101,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/nx/Makefile b/drivers/crypto/nx/Makefile
-index bc89a20e5d9d8..351822a598f97 100644
+index 015155da59c29..76139865d7fa1 100644
 --- a/drivers/crypto/nx/Makefile
 +++ b/drivers/crypto/nx/Makefile
 @@ -1,7 +1,6 @@
@@ -121,10 +121,10 @@ index bc89a20e5d9d8..351822a598f97 100644
  obj-$(CONFIG_CRYPTO_DEV_NX_COMPRESS_POWERNV) += nx-compress-powernv.o nx-compress.o
  nx-compress-objs := nx-842.o
 diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index c6233173c612e..2697baebb6a35 100644
+index 7ecca168f8c48..5c77aba450cf8 100644
 --- a/drivers/crypto/nx/nx.h
 +++ b/drivers/crypto/nx/nx.h
-@@ -170,8 +170,8 @@ struct nx_sg *nx_walk_and_build(struct nx_sg *, unsigned int,
+@@ -169,8 +169,8 @@ struct nx_sg *nx_walk_and_build(struct nx_sg *, unsigned int,
  void nx_debugfs_init(struct nx_crypto_driver *);
  void nx_debugfs_fini(struct nx_crypto_driver *);
  #else
