@@ -2,155 +2,122 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B28C0015E
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 08:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C90C001DE
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 09:15:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229496AbjGYIlL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 04:41:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57122 "EHLO
+        id S230271AbjGYJPV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 05:15:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232410AbjGYIk4 (ORCPT
+        with ESMTP id S229445AbjGYJPU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 04:40:56 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136EC2738;
-        Tue, 25 Jul 2023 01:40:14 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36P89UE1001171;
-        Tue, 25 Jul 2023 08:40:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : references : date : in-reply-to : message-id : mime-version :
- content-type; s=pp1; bh=YpMfjlyQgTmUu011PhrrXIzGn0RzY6sAMyIcfyZXEN8=;
- b=fphE6e7+IDGH3LDgdMr7Ymd99l4IS6ju1RoOxUTde+ByZYB5CGK1E+dz86TuvRepFf05
- b37SRGx/Ipi7bWpeFMGU7Okxlnvs5t1LbBjD8J8aVduwRwarW1EkfasNvgdSo2kAcJ51
- oQCroLk6L96Fw7TXFfkgzmOhiXrcpbTAY7k7PNXwYRo2tD+306uVKcNL3408nOY0h7Fp
- MrRJLrJEpsFjf8+qzfXSl+qcNOIB7wsbwb4joBLQGZAk9TkuaezYV5k2cgu1gTarrc+f
- J/3f0GkjSfjiAOE7VK2yA6DWt6oGX5vntnE+Uu/6YBtZb0cnZYvCd3Ghn3+yBFu5Ho+j kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s261derky-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 08:39:59 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36P8Xiu5024365;
-        Tue, 25 Jul 2023 08:38:37 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s261depue-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 08:38:37 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36P6UT9H003634;
-        Tue, 25 Jul 2023 08:36:56 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3s0txjtas4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jul 2023 08:36:56 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36P8asLs22217026
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jul 2023 08:36:54 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 81D2220040;
-        Tue, 25 Jul 2023 08:36:54 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2851220043;
-        Tue, 25 Jul 2023 08:36:54 +0000 (GMT)
-Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Tue, 25 Jul 2023 08:36:54 +0000 (GMT)
-From:   Sven Schnelle <svens@linux.ibm.com>
-To:     syzbot <syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com>
-Cc:     akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, syzkaller-bugs@googlegroups.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [syzbot] [mm?] WARNING in try_grab_page
-References: <000000000000273d0105ff97bf56@google.com>
-Date:   Tue, 25 Jul 2023 10:36:53 +0200
-In-Reply-To: <000000000000273d0105ff97bf56@google.com> (syzbot's message of
-        "Mon, 03 Jul 2023 09:34:55 -0700")
-Message-ID: <yt9d8rb44cbe.fsf@linux.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
+        Tue, 25 Jul 2023 05:15:20 -0400
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AEE8E
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jul 2023 02:15:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1690276504; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=R4rIuvP7QwugOCU1XGx4gXzv1wfAJwpLm9jazWPws19B1VCZ84d2Kc0zwoAcuO8amu
+    PI/elMetMUPjkKKONYxxc7hhlFL4s9hlvssF4HxhrbzmngC+0kZ3/cNDPQ/vXdO5ODGj
+    zRRkoWil61go1kSnXMKwnKGyFoVGhy8+kFwZPgtc3PnUC9NpQyZwiE2DuBKZKfqaQK6F
+    OlI2m6BR2qXm8rXxlaibcvP/Odm3lnA9w2qgt8q44Og0luVQawAKjdyhPHy7Q0bmztZS
+    VbCb6FVH8xRKI7jQ/6ceu5FqE9QBoYtbr0HrcoMAVrD/Yvj3iFOgIcmJ7M/B/goxj5VL
+    wMhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1690276504;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=5Ty3actpIKOzXOT3h43HeDnVLX2pUdaRur3TOP3VrlQ=;
+    b=RX/xRj6mXG6HwHvybubpfPASn24r51soS0U07L4AmfFiyK2jrK7gT2pjhDvnVnCG6N
+    TI6WuN+1AXRTNkCgrKIiG/UEwMGzGBSD31GcnIUtnxGK+AmWian7Ark2BNX2WENUVHCx
+    MVMlh+bO0al52eKL9He+3dNHDm4MkiT6Q3W345BBkJENknrz2NOn4d0o2nK9e9jHy2qN
+    9rEbPMxrxLqavqARX4zST5kjmqkTL1gFKFEGPlBCOlGm9q4pky3y9vzk5Yxd7qr823kO
+    gcMTPEs88lZXIsXr+mxkqDRu0RxxoqXWdV8/ZuRPe1qVMZdV6kBhs5Xn7Q4B4hWw3Hds
+    5WUQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1690276504;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=5Ty3actpIKOzXOT3h43HeDnVLX2pUdaRur3TOP3VrlQ=;
+    b=kdjlezXOkWo+yuN1YTbMxvvw7FuDQ1mLJHU5Vy7CMdLCTcAQ+mkm5C1NIjpbIcyPWf
+    kgNhEw9j1Hade5Os5KUSE3W8MOSRRGlOdo9y0zcorocQC0hDbZl87vBPgkSyN4Z8rd1Q
+    xFA02G0Tc8DVPYfbSAqvYJHa/lfzVcP3Yo8pieTcRewh6XPgSJgxFK7mXrxAwgO1LVRG
+    46gkMr8NgkXmpViY4GYXLEn9CEpApkmarnvpWhOdxOr28GobV2rMtkLeMps+mZmngM6R
+    NUnYJ5oHN8Tm7xb3PJJa50B1t5l353llMC67TIrhpGE5Kbby/oqGVLzGI0EYYqyY+Sv0
+    cIRw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1690276504;
+    s=strato-dkim-0003; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=5Ty3actpIKOzXOT3h43HeDnVLX2pUdaRur3TOP3VrlQ=;
+    b=1RTfSd7Jqs8a3sm0kUnDPdeHURdyLjrXg4fwpSCXQA89HwVXLrYqqkKSyOOID99Q5t
+    R0ht2lUovtCcxtfhtrCA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zW8BKRp5UFiyGZZ4jof7Xg=="
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 49.6.6 AUTH)
+    with ESMTPSA id N24d58z6P9F250Q
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Tue, 25 Jul 2023 11:15:02 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Stefan Wahren <stefan.wahren@i2se.com>
+Cc:     linux-crypto@vger.kernel.org, Vladis Dronov <vdronov@redhat.com>,
+        Marcelo Cerri <marcelo.cerri@canonical.com>,
+        Joachim Vandersmissen <git@jvdsn.com>,
+        John Cabaj <john.cabaj@canonical.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: Bug: jitter entropy health test unreliable on Rpi 4 (arm64)
+Date:   Tue, 25 Jul 2023 11:15:02 +0200
+Message-ID: <1951595.QhWbZbYsJX@tauon.chronox.de>
+In-Reply-To: <68c6b70a-8d6c-08b5-46ce-243607479d5c@i2se.com>
+References: <68c6b70a-8d6c-08b5-46ce-243607479d5c@i2se.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4ZLu9JTO1OClaft3megPbrIW3nkFVM0c
-X-Proofpoint-ORIG-GUID: oSnf5RvCyGQtaBDlq0FTZRZNRhtf8TSO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-25_04,2023-07-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=1 mlxscore=1 impostorscore=0
- phishscore=0 malwarescore=0 clxscore=1011 spamscore=1 adultscore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=209 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307250075
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot <syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com> writes:
+Am Freitag, 21. Juli 2023, 14:28:29 CEST schrieb Stefan Wahren:
 
-> [..]
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
-> WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
-> WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
-> WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
-> WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 try_grab_page+0x108/0x160 mm/gup.c:252
-> Modules linked in:
-> CPU: 1 PID: 20384 Comm: syz-executor.1 Not tainted 6.4.0-syzkaller-04247-g3a8a670eeeaa #0
-> Hardware name: linux,dummy-virt (DT)
-> pstate: a0400009 (NzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> pc : try_grab_page+0x108/0x160 mm/gup.c:229
-> lr : follow_page_pte+0x174/0x3e4 mm/gup.c:651
-> [..]
-> Call trace:
->  __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
->  arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
->  raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inline]
->  atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
->  try_grab_page+0x108/0x160 mm/gup.c:252
->  follow_pmd_mask mm/gup.c:734 [inline]
->  follow_pud_mask mm/gup.c:765 [inline]
->  follow_p4d_mask mm/gup.c:782 [inline]
->  follow_page_mask+0x12c/0x2e4 mm/gup.c:839
->  __get_user_pages+0x174/0x30c mm/gup.c:1217
->  __get_user_pages_locked mm/gup.c:1448 [inline]
->  __gup_longterm_locked+0x94/0x8f4 mm/gup.c:2142
->  internal_get_user_pages_fast+0x970/0xb60 mm/gup.c:3140
->  pin_user_pages_fast+0x4c/0x60 mm/gup.c:3246
->  iov_iter_extract_user_pages lib/iov_iter.c:1768 [inline]
->  iov_iter_extract_pages+0xc8/0x54c lib/iov_iter.c:1831
->  extract_user_to_sg lib/scatterlist.c:1123 [inline]
->  extract_iter_to_sg lib/scatterlist.c:1349 [inline]
->  extract_iter_to_sg+0x26c/0x6fc lib/scatterlist.c:1339
->  hash_sendmsg+0xc0/0x43c crypto/algif_hash.c:117
->  sock_sendmsg_nosec net/socket.c:725 [inline]
->  sock_sendmsg+0x54/0x60 net/socket.c:748
->  ____sys_sendmsg+0x270/0x2ac net/socket.c:2494
->  ___sys_sendmsg+0x80/0xdc net/socket.c:2548
->  __sys_sendmsg+0x68/0xc4 net/socket.c:2577
->  __do_sys_sendmsg net/socket.c:2586 [inline]
->  __se_sys_sendmsg net/socket.c:2584 [inline]
->  __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2584
->  __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
->  invoke_syscall+0x48/0x114 arch/arm64/kernel/syscall.c:52
->  el0_svc_common.constprop.0+0x44/0xe4 arch/arm64/kernel/syscall.c:142
->  do_el0_svc+0x38/0xa4 arch/arm64/kernel/syscall.c:191
->  el0_svc+0x2c/0xb0 arch/arm64/kernel/entry-common.c:647
->  el0t_64_sync_handler+0xc0/0xc4 arch/arm64/kernel/entry-common.c:665
->  el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:591
-> ---[ end trace 0000000000000000 ]---
+Hi Stefan,
 
-I looked into this issue. What syzkaller is doing is opening an AF_ALG
-socket, and sending a large message which will eventually end in -EFAULT.
-Looking at the code in crypto/algif_hash.c i see that hash_sendmsg is
-calling extract_iter_to_sg() -> extract_user_to_sg(). In the -EFAULT
-case, this function is calling put_page(), which looks like a leftover
-from the old pinning interface. I think this should be a
-unpin_user_page() call now.
+sorry for the delay.
 
-However, hash_sendmsg() also unpins via af_alg_free_sg() in the error
-path. From an API perspective, i would prefer if extract_user_to_sg()
-does the unpinning on error. Any thoughts?
+> Hi,
+> 
+> i recently tested Linux 6.5-rc2 on the Raspberry Pi 4 (arm64/defconfig)
+> and noticed the following message:
+> 
+> [    0.136349] jitterentropy: Initialization failed with host not
+> compliant with requirements: 9
+> 
+> Since Linux 6.5-rc2 this message occurs in around about 1 of 2 cases
+> during boot. In Linux 6.4 this message i never saw this message.
+
+This system has not that much entropy. A short-term fix would be to set the 
+oversampling rate to a higher value than 1, the current value.
+
+See jent_entropy_collector_alloc:
+
+        /* verify and set the oversampling rate */
+        if (osr == 0)
+                osr = 1; /* minimum sampling rate is 1 */
+
+The osr could be set to 3, for example. This makes the Jitter RNG slower, but 
+it can now handle lower-entropy environments.
+
+Let me see how this can be fixed.
+
+Thanks for the report.
+
+Ciao
+Stephan
+
+
