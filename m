@@ -2,66 +2,69 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0045C001DE
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 15:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECCEC0015E
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 16:02:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230089AbjGYPaC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 11:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52722 "EHLO
+        id S230343AbjGYQC2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 12:02:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230000AbjGYPaB (ORCPT
+        with ESMTP id S230005AbjGYQC1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 11:30:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2551619AF
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Jul 2023 08:29:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1690298954;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LbqsLIkGShHuil5PLSxaVfXhTRQLAs653axfRAT5yC0=;
-        b=N4hywV7lPNY9CNxBL28pmH5nSzMqw+DxQK9LOrPNAhu5vS642K9Dct3CVQq4j62zr22nJp
-        phTlyMHM5I3OMQamVF22/4xpkOPYeUNmR5ZOzNS9ZAOxlfQ0HZY8oEh8bYGtbeHRCSsOUw
-        kA8aobim1yGXF2R1eoCD1PNzdscV1ag=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-48-hhpy8Cq1NDGZylDbFVrJRg-1; Tue, 25 Jul 2023 11:29:12 -0400
-X-MC-Unique: hhpy8Cq1NDGZylDbFVrJRg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E0FA1C07827;
-        Tue, 25 Jul 2023 15:29:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.242])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AFAE1121330;
-        Tue, 25 Jul 2023 15:29:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <0000000000000cb2c305fdeb8e30@google.com>
-References: <0000000000000cb2c305fdeb8e30@google.com>
-To:     syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
-Cc:     dhowells@redhat.com, davem@davemloft.net,
+        Tue, 25 Jul 2023 12:02:27 -0400
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761E1E4D
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jul 2023 09:02:25 -0700 (PDT)
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3a5ab2d2a31so5177009b6e.2
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Jul 2023 09:02:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690300945; x=1690905745;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OYrN+166SJjRTzPRLQqH1H2WZ+LKvtSBI3v/6mM3uCU=;
+        b=gy6outcREKp0tguZN/cjKpIQ5nQwc9INIFJ2OqkkhSkz77Z0QejYTNs4VqVOJrPBdw
+         /xkyT+JjnQcONA8RXNMXbkOIsJUCLigHeaumDbXKhQwX5qHZq3HIlhauJJIQ4+obndSr
+         FBupC15nZ66scKC1mkYr2r86x8uEs02bhLZruExiBPCjM8AR6sC+UQ4J/DkERlZ0FzQc
+         X4SxXWcUbFoHma9ZpTVBPy3+AmmRkILb5/uMbK0gKRN5fWWrU6C1qAZe9x2qRxgcdjnE
+         lzNltgYzmSuY2AZgIxrxjo8IEwsU0UG9UDs1x/IdfKatRi+ZYYz2Iv2smBfT70sNtQKc
+         It2g==
+X-Gm-Message-State: ABy/qLZ0+fwTg1c2t0syHR26eluP8o6tftuqrHo5qSQabCAmujcI2YGy
+        C7MAts5ewg3+W064KJJ7ofAlEean9H4zj66N0r40UfM2ADxA
+X-Google-Smtp-Source: APBJJlGXkX52G4eXyHWloF4CzCkRRIJE2m4tcBzyC92qEloDbaeV+IlGYdkjXcsjD5bzKsqPKNjZ3k70G1Mkz2BGwHGW0DFNLB8H
+MIME-Version: 1.0
+X-Received: by 2002:a05:6808:2025:b0:399:e5c2:f7d3 with SMTP id
+ q37-20020a056808202500b00399e5c2f7d3mr27685378oiw.7.1690300944879; Tue, 25
+ Jul 2023 09:02:24 -0700 (PDT)
+Date:   Tue, 25 Jul 2023 09:02:24 -0700
+In-Reply-To: <104261.1690298950@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000621765060151db5e@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in cryptd_hash_export
+From:   syzbot <syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, dhowells@redhat.com,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
         pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [crypto?] general protection fault in cryptd_hash_export
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <104260.1690298950.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 25 Jul 2023 16:29:10 +0100
-Message-ID: <104261.1690298950@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
-t b6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
+Hello,
 
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+
+Reported-and-tested-by: syzbot+e79818f5c12416aba9de@syzkaller.appspotmail.com
+
+Tested on:
+
+commit:         b6d972f6 crypto: af_alg/hash: Fix recvmsg() after send..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=11736cbea80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2cdac84c489b934f
+dashboard link: https://syzkaller.appspot.com/bug?extid=e79818f5c12416aba9de
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Note: no patches were applied.
+Note: testing is done by a robot and is best-effort only.
