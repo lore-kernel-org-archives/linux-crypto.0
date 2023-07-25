@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA1CC001DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 14:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1192AC0015E
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 14:13:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232372AbjGYONK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 10:13:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58606 "EHLO
+        id S232398AbjGYONM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 10:13:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbjGYONJ (ORCPT
+        with ESMTP id S232360AbjGYONK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 10:13:09 -0400
+        Tue, 25 Jul 2023 10:13:10 -0400
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FBFE4;
-        Tue, 25 Jul 2023 07:13:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA9A187;
+        Tue, 25 Jul 2023 07:13:09 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 8607F12002B;
-        Tue, 25 Jul 2023 17:13:04 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 8607F12002B
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 233BE12002C;
+        Tue, 25 Jul 2023 17:13:08 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 233BE12002C
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1690294384;
-        bh=hZFB0w5NSFKiON9JVJJaIk3Acr9yVPgY1wcvAHY5Duc=;
+        s=mail; t=1690294388;
+        bh=6myps1HXZYmue0aJgbKQCN4BRm8x3qGkis7uH4bm6UY=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=CJEFm2ZWRx8lrVAm9wxl6AfLtykmVYShFRdsZTMP8JMx40N2vbmkkJqbGepKdCFf7
-         bUrwTtWDeZdr0NK/vkeeDxdUjCyo0T+qqtEIbT7wIQkciGpdvzeg7TDehmMXX7UYDr
-         GlB+6HYN6bzc+U2/1LBBnMtbt9EYa+hCpdk1Ty/u0EThfgo1YGSnzKLFNEK3d4n/NB
-         c1i97zb2s2/P/1ELVwvEmzsMMv0YfwR+qYQ83UJClm0xGTFKF2hnJONvmbG0SPXBOJ
-         3ihkk4z6u1FxYEsdf9NoqNHzkxrvp/prq3uT5eNEcXtb8qRwWUk1ZWShG/a3i/Qhh1
-         MsZOImSkFsstA==
+        b=ON6BmYwlpB7VAb1NJeOhtAIQl2WrX8fPTc/3DWQnh4+4iBdJovlmUd3Hmzc814zwt
+         A6VIr3dCqTT8A7AvL3MUOYpSTHyyf0Gx92iSpfvfMouxkIrde7ykdLsxIzaU1aQ/vr
+         kfby2J+g39dXmurX9+uhGa+lq1OY/8VySPYad81dlpcRT22xAkiLZhKwTPs22QZGoM
+         N0Y+ttlZXz7RVGA+M+2bScCERxPynyAvWCew93Hbtp+wRXsxytR0NlugjjiNv6VFfE
+         5CqbX6qpBRcv8zH63Vay7m6aG86Ng51sAIpnPHGz4pZjFv0kutdvsyxaMh8146XR73
+         zMUCL9V+mNiYw==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Tue, 25 Jul 2023 17:13:04 +0300 (MSK)
+        Tue, 25 Jul 2023 17:13:07 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 25 Jul 2023 17:13:03 +0300
+ 15.2.1118.30; Tue, 25 Jul 2023 17:13:06 +0300
 From:   Alexey Romanov <avromanov@sberdevices.ru>
 To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
         <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
@@ -50,10 +50,12 @@ CC:     <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
         Alexey Romanov <avromanov@sberdevices.ru>
-Subject: [PATCH v1 0/3] Meson S4 HW RNG Support
-Date:   Tue, 25 Jul 2023 17:12:49 +0300
-Message-ID: <20230725141252.98848-1-avromanov@sberdevices.ru>
+Subject: [PATCH v1 2/3] dt-bindings: rng: meson: add meson-rng-s4 compatible
+Date:   Tue, 25 Jul 2023 17:12:51 +0300
+Message-ID: <20230725141252.98848-3-avromanov@sberdevices.ru>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20230725141252.98848-1-avromanov@sberdevices.ru>
+References: <20230725141252.98848-1-avromanov@sberdevices.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -80,23 +82,25 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello!
+Now the driver has a separate algo for S4 SoC.
 
-This patch series adds hwrng support for Amlogic S4-series.
-Now, S4 uses a new random number generation algorithm.
-This changes implemnents new algo and also adds description
-to meson-s4.dtsi.
+Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+---
+ Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-Alexey Romanov (3):
-  drivers: rng: add check status bit feature
-  dt-bindings: rng: meson: add meson-rng-s4 compatible
-  arch/arm64: dts: meson-s4: add hwrng node
-
- .../bindings/rng/amlogic,meson-rng.yaml       |  1 +
- arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |  5 ++
- drivers/char/hw_random/meson-rng.c            | 77 ++++++++++++++++++-
- 3 files changed, 80 insertions(+), 3 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+index 457a6e43d810..6f51506c0f65 100644
+--- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+@@ -14,6 +14,7 @@ properties:
+   compatible:
+     enum:
+       - amlogic,meson-rng
++      - amlogic,meson-rng-s4
+ 
+   reg:
+     maxItems: 1
 -- 
 2.38.1
 
