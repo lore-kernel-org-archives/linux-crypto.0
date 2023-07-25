@@ -2,42 +2,42 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D1FC04E69
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 14:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6DFC001DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 14:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230298AbjGYONN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 10:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58622 "EHLO
+        id S232460AbjGYONQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 10:13:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232382AbjGYONL (ORCPT
+        with ESMTP id S231861AbjGYONM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 10:13:11 -0400
+        Tue, 25 Jul 2023 10:13:12 -0400
 Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CDC188;
-        Tue, 25 Jul 2023 07:13:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FCDE4;
+        Tue, 25 Jul 2023 07:13:11 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id C6133100029;
-        Tue, 25 Jul 2023 17:13:06 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru C6133100029
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 27C5110002A;
+        Tue, 25 Jul 2023 17:13:10 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 27C5110002A
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1690294386;
-        bh=4FOlV1wq6XHoXw00Qlh2v00hYQ5BBSmstePHbANhbRY=;
+        s=mail; t=1690294390;
+        bh=mawpPFaFDwTi16n2aaHJjeloGu7ded/mpqmM2zhRfcg=;
         h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=pGK6rr0Mycmtl4l0xKzo0fk+nDlF3L9mZGlqyX9lwkgy7IfZ2MENm45+gX2Noe1Gl
-         qjA1rWW45Ix3YTia3vBHm+/NF73c6RbEd0er7QW1Z3l9OuO8pKWhwjTdh83Fy4qmgd
-         lNOSLgVXSJG/viL0HV7kiYBt/SbYRv75Jt7/qarKdUbfDL+FlZxAtaWuseGa9BAVQ8
-         HpyNsHkuGjIgD6EL8H3wOFVut0Oy1owgh+UJjw2QpuWNRm01e7rfWH3m397wAFFoqJ
-         NcT2D88JH2N8wsX7v1e8QR+x37w1maQWrwjgSdGhV2SrCuMNV5Z3gtEDscLe9/E0P4
-         k+/gqTR2hIYBw==
+        b=WWDcaoW/ck2ethiGWAsJOvPOfBp2HU57+a7LvmKR1ZwoQCPNZOD6uwnZfIjg2SwiI
+         ZV4C9jOwV+3IxvWDeKPlZ2W2WMexwYN19IRsUIEb2f+oWebP+a5lg5TGeSGogn6TcL
+         kDBclWGwiFXO8BfRc8d9/4ojpm4woPGwr0vZMTeorXYgFKNMCZhxsMresaFbO9oSZ+
+         BwSZN5NpfwbhsK9DJ3nnM3fvM9jEhZ7AmGvkStQMIGIdtZmSY6AR4bXB7tJwxlaeSK
+         XJCMxi76mBkbIKIkEbOaF6IPzw+ywLGLWWhnODsYACjY6QSaPIeYa7ChNgHXlM2pFr
+         ReYCKeAgezT5A==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
         by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Tue, 25 Jul 2023 17:13:06 +0300 (MSK)
+        Tue, 25 Jul 2023 17:13:10 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 25 Jul 2023 17:13:05 +0300
+ 15.2.1118.30; Tue, 25 Jul 2023 17:13:08 +0300
 From:   Alexey Romanov <avromanov@sberdevices.ru>
 To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
         <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
@@ -50,9 +50,9 @@ CC:     <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
         Alexey Romanov <avromanov@sberdevices.ru>
-Subject: [PATCH v1 1/3] drivers: rng: add check status bit feature
-Date:   Tue, 25 Jul 2023 17:12:50 +0300
-Message-ID: <20230725141252.98848-2-avromanov@sberdevices.ru>
+Subject: [PATCH v1 3/3] arch/arm64: dts: meson-s4: add hwrng node
+Date:   Tue, 25 Jul 2023 17:12:52 +0300
+Message-ID: <20230725141252.98848-4-avromanov@sberdevices.ru>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20230725141252.98848-1-avromanov@sberdevices.ru>
 References: <20230725141252.98848-1-avromanov@sberdevices.ru>
@@ -82,131 +82,30 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For some Amlogic SOC's, mechanism to obtain random number
-has been changed. For example, S4 now uses status bit waiting algo.
+Using this node, we can obtain random numbers via
+hardware random number generator.
 
 Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
 ---
- drivers/char/hw_random/meson-rng.c | 77 ++++++++++++++++++++++++++++--
- 1 file changed, 74 insertions(+), 3 deletions(-)
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-index a4eb8e35f13d..c6d7349630a1 100644
---- a/drivers/char/hw_random/meson-rng.c
-+++ b/drivers/char/hw_random/meson-rng.c
-@@ -14,19 +14,65 @@
- #include <linux/of.h>
- #include <linux/clk.h>
- 
--#define RNG_DATA 0x00
-+struct meson_rng_priv {
-+	bool check_status_bit;
-+	unsigned int data_offset;
-+	unsigned int cfg_offset;
-+};
- 
- struct meson_rng_data {
- 	void __iomem *base;
- 	struct hwrng rng;
-+	struct device *dev;
-+	const struct meson_rng_priv *priv;
+diff --git a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+index f24460186d3d..3e3348cc6c06 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-s4.dtsi
+@@ -133,6 +133,11 @@ reset: reset-controller@2000 {
+ 				reg = <0x0 0x2000 0x0 0x98>;
+ 				#reset-cells = <1>;
+ 			};
++
++			hwrng: rng@440788 {
++				compatible = "amlogic,meson-rng-s4";
++				reg = <0x0 0x440788 0x0 0x0c>;
++			};
+ 		};
+ 	};
  };
- 
-+#define RUN_BIT			0
-+#define SEED_READY_STS_BIT	31
-+#define RETRY_CNT		100
-+
-+static int meson_rng_wait_status(void __iomem *cfg_addr, int bit)
-+{
-+	u32 status;
-+	u32 cnt = 0;
-+
-+	do {
-+		status = readl_relaxed(cfg_addr) & BIT(bit);
-+		cpu_relax();
-+	} while (status && (cnt++ < RETRY_CNT));
-+
-+	if (status)
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
- static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- {
- 	struct meson_rng_data *data =
- 			container_of(rng, struct meson_rng_data, rng);
-+	const struct meson_rng_priv *priv = data->priv;
-+
-+	if (priv->check_status_bit) {
-+		void __iomem *cfg_addr = data->base + priv->cfg_offset;
-+		int err;
-+
-+		writel_relaxed(readl_relaxed(cfg_addr) | BIT(SEED_READY_STS_BIT), cfg_addr);
- 
--	*(u32 *)buf = readl_relaxed(data->base + RNG_DATA);
-+		err = meson_rng_wait_status(cfg_addr, SEED_READY_STS_BIT);
-+		if (err) {
-+			dev_err(data->dev, "Seed isn't ready, try again\n");
-+			return err;
-+		}
-+
-+		err = meson_rng_wait_status(cfg_addr, RUN_BIT);
-+		if (err) {
-+			dev_err(data->dev, "Can't get random number, try again\n");
-+			return err;
-+		}
-+	}
-+
-+	*(u32 *)buf = readl_relaxed(data->base + priv->data_offset);
- 
- 	return sizeof(u32);
- }
-@@ -41,6 +87,10 @@ static int meson_rng_probe(struct platform_device *pdev)
- 	if (!data)
- 		return -ENOMEM;
- 
-+	data->priv = device_get_match_data(&pdev->dev);
-+	if (!data->priv)
-+		return -ENODEV;
-+
- 	data->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(data->base))
- 		return PTR_ERR(data->base);
-@@ -53,11 +103,32 @@ static int meson_rng_probe(struct platform_device *pdev)
- 	data->rng.name = pdev->name;
- 	data->rng.read = meson_rng_read;
- 
-+	data->dev = &pdev->dev;
-+
- 	return devm_hwrng_register(dev, &data->rng);
- }
- 
-+static const struct meson_rng_priv meson_rng_priv = {
-+	.check_status_bit = false,
-+	.data_offset = 0x0,
-+	.cfg_offset = 0x0,
-+};
-+
-+static const struct meson_rng_priv meson_rng_priv_s4 = {
-+	.check_status_bit = true,
-+	.data_offset = 0x8,
-+	.cfg_offset = 0x0,
-+};
-+
- static const struct of_device_id meson_rng_of_match[] = {
--	{ .compatible = "amlogic,meson-rng", },
-+	{
-+		.compatible = "amlogic,meson-rng",
-+		.data = (void *)&meson_rng_priv,
-+	},
-+	{
-+		.compatible = "amlogic,meson-rng-s4",
-+		.data = (void *)&meson_rng_priv_s4,
-+	},
- 	{},
- };
- MODULE_DEVICE_TABLE(of, meson_rng_of_match);
 -- 
 2.38.1
 
