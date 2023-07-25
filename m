@@ -2,121 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E7C7C04A6A
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 17:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175A2C001DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jul 2023 18:14:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232335AbjGYRtq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jul 2023 13:49:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45910 "EHLO
+        id S231177AbjGYSOI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 25 Jul 2023 14:14:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232032AbjGYRtl (ORCPT
+        with ESMTP id S230005AbjGYSOH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jul 2023 13:49:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346D31FEF;
-        Tue, 25 Jul 2023 10:49:36 -0700 (PDT)
+        Tue, 25 Jul 2023 14:14:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D95E9;
+        Tue, 25 Jul 2023 11:14:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BB8206184A;
-        Tue, 25 Jul 2023 17:49:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6AB4C433CA;
-        Tue, 25 Jul 2023 17:49:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E744461826;
+        Tue, 25 Jul 2023 18:14:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A83D9C433C8;
+        Tue, 25 Jul 2023 18:14:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690307375;
-        bh=WJL53er2hn/3EEx4DOJfAbOjXZnKjKBtRagFrtg05jg=;
-        h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-        b=CPO6RMRPaMRtVah/1RA1wO5FXxmP2DhlHptZXjtjeJZn524snzFNmGkI4PM2ckIo6
-         7FXzBD4qXePRo3PzLIkOFhZGyDj+4aolBAs7lhubS+/sugRBmEv5uwY2APQucc4EIz
-         1nGGt64bGnlel2IpehCbvoOPhAXT8wnt5XPyu8AhkROpI7dA7thAncucJtelJljMnw
-         atiZpLOBvBZ0F/r5WTJZfurX5L65y1q7LeSvDTjmcEUXR6SWW06bn+O1CXh/QQgkcV
-         FpqLMVfkRM4VMT0UlbHKmPRIUz4d0EWFPpNeyuIHEERTM60aZDTVat5SY/xyjqL5hf
-         qQXqITOBkCDlA==
-Received: (nullmailer pid 3497939 invoked by uid 1000);
-        Tue, 25 Jul 2023 17:49:25 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        s=k20201202; t=1690308845;
+        bh=WmpVtUDAaFLbImnOsO4tYnjeeSG53usXX5FWGAehNd4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=T8ezkXSL801Ko1HRqyb2qFQK+UcKw2H641PFM/9vIeVLmyMou0D106OI4NFQEZ1p4
+         /DyaNKE7Pu9FX4QwH+vN2thu5DgN8Ve3dcfVdsTAbbAcF8cFvgNG7tcVZYGbcD1t9G
+         6Smtu8orEyPEEtHy2IvTwqzpX2nDqTPRbppjr56cFMvBvmC6cJvl95eXVzMmkijGJS
+         WBfCddw8V6I5gL/NKfbrUHm+EWR1cWx4UiKo3hzuTBTAsTxqIxIlzMRart3cB6u0qw
+         XGW6A39OoBneYneYBP2svNPamPUHWn2T3O5Mf58gx+eYVfHx5ZjnVUbNdVkwrWDLYd
+         lh/xvOv3VWQ3w==
+Date:   Tue, 25 Jul 2023 19:13:59 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Alexey Romanov <avromanov@sberdevices.ru>
+Cc:     narmstrong@baylibre.com, neil.armstrong@linaro.org,
+        olivia@selenic.com, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
+        martin.blumenstingl@googlemail.com, f.fainelli@gmail.com,
+        hkallweit1@gmail.com, linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kernel@sberdevices.ru
+Subject: Re: [PATCH v1 2/3] dt-bindings: rng: meson: add meson-rng-s4
+ compatible
+Message-ID: <20230725-transport-pension-533b598260d0@spud>
+References: <20230725141252.98848-1-avromanov@sberdevices.ru>
+ <20230725141252.98848-3-avromanov@sberdevices.ru>
 MIME-Version: 1.0
-From:   Rob Herring <robh@kernel.org>
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc:     kuba@kernel.org, lee@kernel.org, andi.shyti@kernel.org,
-        alsa-devel@alsa-project.org, linux-i2c@vger.kernel.org,
-        richardcochran@gmail.com, linux-mmc@vger.kernel.org,
-        arnaud.pouliquen@foss.st.com, olivier.moysan@foss.st.com,
-        vkoul@kernel.org, linux-serial@vger.kernel.org, robh+dt@kernel.org,
-        alexandre.torgue@foss.st.com, krzysztof.kozlowski+dt@linaro.org,
-        ulf.hansson@linaro.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, hugues.fruchet@foss.st.com,
-        mchehab@kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-phy@lists.infradead.org, pabeni@redhat.com,
-        devicetree@vger.kernel.org, gregkh@linuxfoundation.org,
-        linux-kernel@vger.kernel.org, edumazet@google.com,
-        linux-crypto@vger.kernel.org, jic23@kernel.org,
-        Frank Rowand <frowand.list@gmail.com>, arnd@kernel.org,
-        linux-usb@vger.kernel.org, catalin.marinas@arm.com,
-        linux-iio@vger.kernel.org, davem@davemloft.net,
-        Oleksii_Moisieiev@epam.com, will@kernel.org,
-        dmaengine@vger.kernel.org, netdev@vger.kernel.org,
-        fabrice.gasnier@foss.st.com, linux-spi@vger.kernel.org,
-        conor+dt@kernel.org, herbert@gondor.apana.org.au
-In-Reply-To: <20230725164104.273965-4-gatien.chevallier@foss.st.com>
-References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
- <20230725164104.273965-4-gatien.chevallier@foss.st.com>
-Message-Id: <169030736534.3497905.9507005013968358402.robh@kernel.org>
-Subject: Re: [PATCH v2 03/11] dt-bindings: bus: document ETZPC
-Date:   Tue, 25 Jul 2023 11:49:25 -0600
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ns9HxazCpuYhnvR0"
+Content-Disposition: inline
+In-Reply-To: <20230725141252.98848-3-avromanov@sberdevices.ru>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-On Tue, 25 Jul 2023 18:40:56 +0200, Gatien Chevallier wrote:
-> Document ETZPC (Extended TrustZone protection controller). ETZPC is a
-> firewall controller.
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+--ns9HxazCpuYhnvR0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jul 25, 2023 at 05:12:51PM +0300, Alexey Romanov wrote:
+> Now the driver has a separate algo for S4 SoC.
+>=20
+> Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
 > ---
-> 
-> Changes in V2:
-> 	- Corrected errors highlighted by Rob's robot
-> 	- No longer define the maxItems for the "feature-domains"
-> 	  property
-> 	- Fix example (node name, status)
-> 	- Declare "feature-domain-names" as an optional
-> 	  property for child nodes
-> 	- Fix description of "feature-domains" property
-> 	- Reorder the properties so it matches RIFSC
-> 	- Add missing "feature-domain-controller" property
-> 
->  .../bindings/bus/st,stm32-etzpc.yaml          | 96 +++++++++++++++++++
->  1 file changed, 96 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
-> 
+>  Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml=
+ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+> index 457a6e43d810..6f51506c0f65 100644
+> --- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+> +++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+> @@ -14,6 +14,7 @@ properties:
+>    compatible:
+>      enum:
+>        - amlogic,meson-rng
+> +      - amlogic,meson-rng-s4
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Usually, the "s4" would come before the peripheral's name, as s4 is the
+name of the SoC.
 
-yamllint warnings/errors:
+> =20
+>    reg:
+>      maxItems: 1
+> --=20
+> 2.38.1
+>=20
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32-etzpc.example.dtb: serial@4c001000: Unevaluated properties are not allowed ('feature-domains' was unexpected)
-	from schema $id: http://devicetree.org/schemas/serial/st,stm32-uart.yaml#
+--ns9HxazCpuYhnvR0
+Content-Type: application/pgp-signature; name="signature.asc"
 
-doc reference errors (make refcheckdocs):
+-----BEGIN PGP SIGNATURE-----
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230725164104.273965-4-gatien.chevallier@foss.st.com
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZMAQ5wAKCRB4tDGHoIJi
+0jQbAQD8az1AUWrNfWLQKH1A3YTesxjJXWzaUqgk5/77Cs01kAD/V9hsEIFEGFh3
+KyJSju0f1Motr7Y45NVuek+l3js+DgI=
+=LMAU
+-----END PGP SIGNATURE-----
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+--ns9HxazCpuYhnvR0--
