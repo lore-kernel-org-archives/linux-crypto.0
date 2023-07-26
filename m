@@ -2,262 +2,150 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B117BC001E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 08:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0538EC001DE
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 08:08:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbjGZIB1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 04:01:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48754 "EHLO
+        id S230205AbjGZIIW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 04:08:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231391AbjGZIBC (ORCPT
+        with ESMTP id S230486AbjGZIHe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 04:01:02 -0400
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B491C196;
-        Wed, 26 Jul 2023 00:52:53 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 800F6100006;
-        Wed, 26 Jul 2023 10:52:50 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 800F6100006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1690357970;
-        bh=vTUqR02g7CyzGcKZgu+ckB967aCBxpLWQ1Cp4fR5GdI=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
-        b=pcG+Peusb9E7FOmULN3LDYHt7fYVVlcAsgLW8ggdEqWHTiBjoOaw2BO9n+Hf7uWSK
-         5gavGbOwHqAv2oNew4cLJA7pTNW3hHANNoHySLymoHWmQfsGmj4xdz+jh6P++jTYXW
-         cXxYFgov4JCOVGddTQc8PU4JinFOG0t/HiteN5SjU8pmUb4j+RwJunFnc5Q/GOwwSn
-         GWxSXNsvDW/H5sTbQ7dvw9xeM6Xs+2QbnwHU2SJl49x2m1fhS9kTTkqavlfRhhLjUw
-         xeDl0/bgLvLcjY+MdKFteQzfMpQ/60Uq7KF2jqnzq7ooq88frKaWQE0puMS7VfWNgD
-         rlnRK89r5r17A==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Wed, 26 Jul 2023 10:52:50 +0300 (MSK)
-Received: from p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 26 Jul 2023 10:52:43 +0300
-Received: from p-i-exch-sc-m01.sberdevices.ru ([::1]) by
- p-i-exch-sc-m01.sberdevices.ru ([fe80::80e5:bab:4999:4480%7]) with mapi id
- 15.02.1118.030; Wed, 26 Jul 2023 10:52:43 +0300
-From:   Alexey Romanov <AVRomanov@sberdevices.ru>
-To:     Martin Kaiser <lists@kaiser.cx>
-CC:     "narmstrong@baylibre.com" <narmstrong@baylibre.com>,
-        "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-        "olivia@selenic.com" <olivia@selenic.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "conor+dt@kernel.org" <conor+dt@kernel.org>,
-        "khilman@baylibre.com" <khilman@baylibre.com>,
-        "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-        "martin.blumenstingl@googlemail.com" 
-        <martin.blumenstingl@googlemail.com>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-amlogic@lists.infradead.org" 
-        <linux-amlogic@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v1 1/3] drivers: rng: add check status bit feature
-Thread-Topic: [PATCH v1 1/3] drivers: rng: add check status bit feature
-Thread-Index: AQHZvwIhgAdKkj3BKkSqydzslBnXI6/KtJqAgADHaIA=
-Date:   Wed, 26 Jul 2023 07:52:43 +0000
-Message-ID: <20230726075243.f37sjcurmog3eunh@cab-wsm-0029881>
-References: <20230725141252.98848-1-avromanov@sberdevices.ru>
- <20230725141252.98848-2-avromanov@sberdevices.ru>
- <20230725195901.n2klvgz7outqaatk@viti.kaiser.cx>
-In-Reply-To: <20230725195901.n2klvgz7outqaatk@viti.kaiser.cx>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.18.93]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <5A8C49A7B982AD4AA50B334FB89BE21D@sberdevices.ru>
-Content-Transfer-Encoding: quoted-printable
+        Wed, 26 Jul 2023 04:07:34 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDCC730D7
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 00:59:48 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qOZQs-00061t-R5; Wed, 26 Jul 2023 09:59:42 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qOZQr-002BYz-0m; Wed, 26 Jul 2023 09:59:41 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qOZQp-007sRJ-Vl; Wed, 26 Jul 2023 09:59:39 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, kernel@pengutronix.de
+Subject: [PATCH] crypto: caam/jr - Convert to platform remove callback returning void
+Date:   Wed, 26 Jul 2023 09:59:38 +0200
+Message-Id: <20230726075938.448673-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 178796 [Jul 22 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: AVRomanov@sberdevices.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 525 525 723604743bfbdb7e16728748c3fa45e9eba05f7d, {Track_E25351}, {Tracking_internal2}, {Tracking_from_domain_doesnt_match_to}, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/07/23 08:49:00 #21663637
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3348; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=NQC1IAtK5ynljTgAHm6y5tPdyrnjokGAndzNf8mbbbU=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBkwNJpWdCswpin/KRi2YV8SWohKew6fst+tYOs/ sVZl3W4lLyJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZMDSaQAKCRCPgPtYfRL+ Tn5VB/0dCDg2nRAhey5ytJdXDRGiytLW1BmgKd4aKB85LMf7+5ndVyDIrhijAUVUBDLeK/vF+ak ly2oXQRUpjXwYcHWJSsU+PH+R+sIBNA9fBT3tkXdL5UjqIanwyi3Of+herH+aR5QULV6tRFG0bF ot/zURCOQ5NwLa7Sslse3XBgivUX2m9zJyF7RaNObT5dg9kvPN+Ovy0jeIzThczZIjdU0h2fFV5 ohwFAcYap3MBvKmP26Zh+q7WyOwGCAzuWREWmqjynPfKwKuFYBrSyihdjaIrzlftahAwyyknZuG ZJX4GGrAFYxKxnvSCumXwNngFcix58iaZL/B9DTynE/EEMMm
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Martin,
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is (mostly) ignored
+and this typically results in resource leaks. To improve here there is a
+quest to make the remove callback return void. In the first step of this
+quest all drivers are converted to .remove_new() which already returns
+void.
 
-On Tue, Jul 25, 2023 at 09:59:01PM +0200, Martin Kaiser wrote:
-> Alexey Romanov (avromanov@sberdevices.ru) wrote:
->=20
-> > For some Amlogic SOC's, mechanism to obtain random number
-> > has been changed. For example, S4 now uses status bit waiting algo.
->=20
-> > Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-> > ---
-> >  drivers/char/hw_random/meson-rng.c | 77 ++++++++++++++++++++++++++++--
-> >  1 file changed, 74 insertions(+), 3 deletions(-)
->=20
-> > diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_rando=
-m/meson-rng.c
-> > index a4eb8e35f13d..c6d7349630a1 100644
-> > --- a/drivers/char/hw_random/meson-rng.c
-> > +++ b/drivers/char/hw_random/meson-rng.c
-> > @@ -14,19 +14,65 @@
-> >  #include <linux/of.h>
-> >  #include <linux/clk.h>
->=20
-> > -#define RNG_DATA 0x00
-> > +struct meson_rng_priv {
-> > +	bool check_status_bit;
-> > +	unsigned int data_offset;
-> > +	unsigned int cfg_offset;
-> > +};
->=20
-> >  struct meson_rng_data {
-> >  	void __iomem *base;
-> >  	struct hwrng rng;
-> > +	struct device *dev;
-> > +	const struct meson_rng_priv *priv;
-> >  };
->=20
-> > +#define RUN_BIT			0
-> > +#define SEED_READY_STS_BIT	31
-> > +#define RETRY_CNT		100
-> > +
-> > +static int meson_rng_wait_status(void __iomem *cfg_addr, int bit)
-> > +{
-> > +	u32 status;
-> > +	u32 cnt =3D 0;
-> > +
-> > +	do {
-> > +		status =3D readl_relaxed(cfg_addr) & BIT(bit);
-> > +		cpu_relax();
-> > +	} while (status && (cnt++ < RETRY_CNT));
-> > +
->=20
-> Could you use readl_relaxed_poll_timeout here instead of open coding the
-> loop?
+The driver adapted here suffers from this wrong assumption. Returning
+-EBUSY if there are still users results in resource leaks and probably a
+crash. Also further down passing the error code of caam_jr_shutdown() to
+the caller only results in another error message and has no further
+consequences compared to returning zero.
 
-At first I also thought about this API. But later I came to the
-conclusion that it is inappropriate here:
+Still convert the driver to return no value in the remove callback. This
+also allows to drop caam_jr_platform_shutdown() as the only function
+called by it now has the same prototype.
 
-1. We can't call rng_read from an atomic context.
-2. RNG for me looks like a very lightweight primitive to me that=20
-should work quiclky.
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+Hello,
 
-But, now I looked again at the API and realized that we can use=20
-readl_relaxed_poll_timeout_atomic() instead of
-readl_relaxed_poll_timeout(). What do you think?
+note that the problems described above and in the extended comment isn't
+introduced by this patch. It's as old as
+313ea293e9c4d1eabcaddd2c0800f083b03c2a2e at least.
 
->=20
-> > +	if (status)
-> > +		return -EBUSY;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bo=
-ol wait)
-> >  {
-> >  	struct meson_rng_data *data =3D
-> >  			container_of(rng, struct meson_rng_data, rng);
-> > +	const struct meson_rng_priv *priv =3D data->priv;
-> > +
-> > +	if (priv->check_status_bit) {
-> > +		void __iomem *cfg_addr =3D data->base + priv->cfg_offset;
-> > +		int err;
-> > +
-> > +		writel_relaxed(readl_relaxed(cfg_addr) | BIT(SEED_READY_STS_BIT), cf=
-g_addr);
->=20
-> > -	*(u32 *)buf =3D readl_relaxed(data->base + RNG_DATA);
-> > +		err =3D meson_rng_wait_status(cfg_addr, SEED_READY_STS_BIT);
-> > +		if (err) {
-> > +			dev_err(data->dev, "Seed isn't ready, try again\n");
-> > +			return err;
-> > +		}
-> > +
-> > +		err =3D meson_rng_wait_status(cfg_addr, RUN_BIT);
-> > +		if (err) {
-> > +			dev_err(data->dev, "Can't get random number, try again\n");
-> > +			return err;
-> > +		}
-> > +	}
-> > +
-> > +	*(u32 *)buf =3D readl_relaxed(data->base + priv->data_offset);
->=20
-> >  	return sizeof(u32);
-> >  }
-> > @@ -41,6 +87,10 @@ static int meson_rng_probe(struct platform_device *p=
-dev)
-> >  	if (!data)
-> >  		return -ENOMEM;
->=20
-> > +	data->priv =3D device_get_match_data(&pdev->dev);
-> > +	if (!data->priv)
-> > +		return -ENODEV;
-> > +
-> >  	data->base =3D devm_platform_ioremap_resource(pdev, 0);
-> >  	if (IS_ERR(data->base))
-> >  		return PTR_ERR(data->base);
-> > @@ -53,11 +103,32 @@ static int meson_rng_probe(struct platform_device =
-*pdev)
-> >  	data->rng.name =3D pdev->name;
-> >  	data->rng.read =3D meson_rng_read;
->=20
-> > +	data->dev =3D &pdev->dev;
-> > +
-> >  	return devm_hwrng_register(dev, &data->rng);
-> >  }
->=20
-> > +static const struct meson_rng_priv meson_rng_priv =3D {
-> > +	.check_status_bit =3D false,
-> > +	.data_offset =3D 0x0,
-> > +	.cfg_offset =3D 0x0,
-> > +};
-> > +
-> > +static const struct meson_rng_priv meson_rng_priv_s4 =3D {
-> > +	.check_status_bit =3D true,
-> > +	.data_offset =3D 0x8,
-> > +	.cfg_offset =3D 0x0,
-> > +};
-> > +
-> >  static const struct of_device_id meson_rng_of_match[] =3D {
-> > -	{ .compatible =3D "amlogic,meson-rng", },
-> > +	{
-> > +		.compatible =3D "amlogic,meson-rng",
-> > +		.data =3D (void *)&meson_rng_priv,
-> > +	},
-> > +	{
-> > +		.compatible =3D "amlogic,meson-rng-s4",
-> > +		.data =3D (void *)&meson_rng_priv_s4,
-> > +	},
-> >  	{},
-> >  };
-> >  MODULE_DEVICE_TABLE(of, meson_rng_of_match);
-> > --=20
-> > 2.38.1
->=20
+Also orthogonal to this patch I wonder about the use of a shutdown
+callback. What makes this driver special to require extra handling at
+shutdown time?
 
---=20
-Thank you,
-Alexey=
+Best regards
+Uwe
+
+ drivers/crypto/caam/jr.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 96dea5304d22..66b1eb3eb4a4 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -162,7 +162,7 @@ static int caam_jr_shutdown(struct device *dev)
+ 	return ret;
+ }
+ 
+-static int caam_jr_remove(struct platform_device *pdev)
++static void caam_jr_remove(struct platform_device *pdev)
+ {
+ 	int ret;
+ 	struct device *jrdev;
+@@ -175,11 +175,14 @@ static int caam_jr_remove(struct platform_device *pdev)
+ 		caam_rng_exit(jrdev->parent);
+ 
+ 	/*
+-	 * Return EBUSY if job ring already allocated.
++	 * If a job ring is still allocated there is trouble ahead. Once
++	 * caam_jr_remove() returned, jrpriv will be freed and the registers
++	 * will get unmapped. So any user of such a job ring will probably
++	 * crash.
+ 	 */
+ 	if (atomic_read(&jrpriv->tfm_count)) {
+-		dev_err(jrdev, "Device is busy\n");
+-		return -EBUSY;
++		dev_warn(jrdev, "Device is busy, fasten your seat belts, a crash is ahead.\n");
++		return;
+ 	}
+ 
+ 	/* Unregister JR-based RNG & crypto algorithms */
+@@ -194,13 +197,6 @@ static int caam_jr_remove(struct platform_device *pdev)
+ 	ret = caam_jr_shutdown(jrdev);
+ 	if (ret)
+ 		dev_err(jrdev, "Failed to shut down job ring\n");
+-
+-	return ret;
+-}
+-
+-static void caam_jr_platform_shutdown(struct platform_device *pdev)
+-{
+-	caam_jr_remove(pdev);
+ }
+ 
+ /* Main per-ring interrupt handler */
+@@ -657,8 +653,8 @@ static struct platform_driver caam_jr_driver = {
+ 		.of_match_table = caam_jr_match,
+ 	},
+ 	.probe       = caam_jr_probe,
+-	.remove      = caam_jr_remove,
+-	.shutdown    = caam_jr_platform_shutdown,
++	.remove_new  = caam_jr_remove,
++	.shutdown    = caam_jr_remove,
+ };
+ 
+ static int __init jr_driver_init(void)
+
+base-commit: dd105461ad15ea930d88aec1e4fcfc1f3186da43
+-- 
+2.39.2
+
