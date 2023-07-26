@@ -2,289 +2,189 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CC8C0015E
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 11:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ECCCC001DC
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 11:42:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233131AbjGZLgD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 07:36:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34670 "EHLO
+        id S234306AbjGZLmA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 07:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbjGZLgC (ORCPT
+        with ESMTP id S234329AbjGZLlr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 07:36:02 -0400
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33CFABF
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 04:36:00 -0700 (PDT)
-X-ASG-Debug-ID: 1690371356-1eb14e179e330d0001-Xm9f1P
-Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id WGmg1bykYAgTvdrg (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Wed, 26 Jul 2023 19:35:56 +0800 (CST)
-X-Barracuda-Envelope-From: LeoLiu-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from ZXBJMBX03.zhaoxin.com (10.29.252.7) by ZXSHMBX2.zhaoxin.com
- (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Wed, 26 Jul
- 2023 19:35:56 +0800
-Received: from xin.lan (10.32.64.1) by ZXBJMBX03.zhaoxin.com (10.29.252.7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Wed, 26 Jul
- 2023 19:35:54 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-From:   LeoLiu-oc <LeoLiu-oc@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.29.252.7
-To:     <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
-        <jiajie.ho@starfivetech.com>, <conor.dooley@microchip.com>,
-        <martin@kaiser.cx>, <mmyangfl@gmail.com>,
-        <jenny.zhang@starfivetech.com>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <leoliu@zhaoxin.com>, <CobeChen@zhaoxin.com>,
-        <YunShen@zhaoxin.com>, <TonyWWang@zhaoxin.com>,
-        leoliu-oc <leoliu-oc@zhaoxin.com>
-Subject: [PATCH] hwrng: add Zhaoxin HW RNG driver
-Date:   Wed, 26 Jul 2023 19:35:53 +0800
-X-ASG-Orig-Subj: [PATCH] hwrng: add Zhaoxin HW RNG driver
-Message-ID: <20230726113553.1965627-1-LeoLiu-oc@zhaoxin.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 26 Jul 2023 07:41:47 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2131.outbound.protection.outlook.com [40.107.93.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082C030D4;
+        Wed, 26 Jul 2023 04:41:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZNsro9aUEs6ZbKyaXLiA+gswIv7a2lcMuAswNicDEMiUA9Tzy92LkfM20KewQ4u3tNxN97c35wpBEdGuhfjeoov/oed64aMGMpnV3BmUIaeeb8NNzdc6/abWNYPh1ONMktLTM6p6crplKLIpI9YyP0WTezB7knDgMsuPMJZ0lhZgNbv7uSWekwX8ihLlLy4brTp54z14vSmvPMNGw4TA2ljsrReUTupV59vHog5lhj6Wk/4Ts47dCRAquEp47kWyc1e2/hHXuF3zbhlITDgf/KAN7WLOPMoE7HKkaCVsNTboQ3NdVYgmnB8L3I+LUOdwrx43+E0UTtHdFMvNM9Yo5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kZUnMVmQLBV4bTnL9CjrsKKcIJZbAARjqDlzlLUaUps=;
+ b=W2Yn4aiKzsHk6Voaqx/52mxYisxDyK13kenOb1H2Jt3AXlZ8sX6OQVrWMOJfsXVZbM929UShb5JhirZTu7XVnCkYO77fBASXOXef8Evdq1sUhU+2dqSH08c1RfBx65RP4/cozZY8hJCYM89n1K6UhdaHnyfI9CZJU8i9B8wHdNoWdmJ8xwfI9/DsKH9e/Byqm6I0eA/C4NDDBl6Cg7ObqhuPOMhtsSVp1pp3MnKgWKTp2ovZEkvtU3S6p7twM16t8iQUz+VK6GgoTD3R88RzeUXC7dXygsGtvbA7EVS5q38ec1/KTSmwE8kefT3ftH+jrt5m/uDHUUjSrE0fYtm12A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kZUnMVmQLBV4bTnL9CjrsKKcIJZbAARjqDlzlLUaUps=;
+ b=m2O/m2iQGJt4T2lBI4wTf97trB/3IUdZNKeTWbMkBClbzfzOG4o7KIe3PL0YPTT2zcRVBa43bApLIXNsIZ1KLZCb1Gi6DZ8BkgeuItySY/7wN7+tcBUD2IzMpbXQkRXwMEJdazAas4ZOWE03RTvOrrAKC/6NQ4F4RgqRormswsg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by LV8PR13MB6374.namprd13.prod.outlook.com (2603:10b6:408:184::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
+ 2023 11:39:54 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Wed, 26 Jul 2023
+ 11:39:54 +0000
+Date:   Wed, 26 Jul 2023 13:39:42 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, alexandre.torgue@foss.st.com,
+        vkoul@kernel.org, jic23@kernel.org, olivier.moysan@foss.st.com,
+        arnaud.pouliquen@foss.st.com, mchehab@kernel.org,
+        fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
+        ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
+        richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-usb@vger.kernel.org
+Subject: Re: [PATCH v2 05/11] firewall: introduce stm32_firewall framework
+Message-ID: <ZMEF/gR6fmmC7jhF@corigine.com>
+References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
+ <20230725164104.273965-6-gatien.chevallier@foss.st.com>
+ <ZMDzNSkRvvVsxUto@corigine.com>
+ <d228e17b-4f5f-d5e0-1c59-d247cbc0693e@foss.st.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d228e17b-4f5f-d5e0-1c59-d247cbc0693e@foss.st.com>
+X-ClientProxiedBy: AM8P190CA0003.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:219::8) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.32.64.1]
-X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
- ZXBJMBX03.zhaoxin.com (10.29.252.7)
-X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
-X-Barracuda-Start-Time: 1690371356
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 7018
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.111893
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|LV8PR13MB6374:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfcf071b-66d3-44d3-d6a6-08db8dcd079d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nfJ7ovTEuLjanvbwdpgNEZf9fP3AWqtOYFY7WSzgqJaVXYY5FbpiFOH9tKYLFVSxxqhgQXrYEzblLMny94JuLmunblwhC/B8xF+v2VExIIGQ2UNUlS8Gh6s58SaS0b8dpe5g6QyRwBjtUr6a6HnjWQXIzSqrKhiXi5yVus5+OBH5Zuz8PHvfV5AXD//d9ylqZTUcxbISwE6T9afiefwOGVQxT6sRpMfcNsKfm2eHV90qFOmAp+RXG60QYb48r61OeErDZPuJgO3gNFw8og++C4X7IRE6TQYtpxowV4r4++93gZ29G88GsAQ1hztwoEO5GjtTNrjX2yBE7XyR3YcVcRZxIvuT5Lnn46CI+cGtoWZE+46NX9/s2jo+eOWbptQHVu3D4hej6L1Jf7T52XFC5deOV2/fEjW/qZIUqEGI7D80ttwlqz3m0O6KDkJhZ1SsJ+vAOJLONUHSMx/84GWRUdezdE2i9wds0TaS9+uhU/G7VZcjLIFYRi3HdhAZ++5P60NdNd6bgDGL/UxZvw7/jIO2VZp8L+RoEds8Ie1HmsMbxJmvcch7ahcmrE6EJoFRhAeY8S7G6dmjK6Ck8obMardZFnF0BjEZdyc7yTkmitE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(376002)(396003)(39850400004)(366004)(451199021)(6486002)(6512007)(6666004)(478600001)(5660300002)(41300700001)(66946007)(4326008)(8936002)(6916009)(2616005)(66476007)(38100700002)(66556008)(316002)(8676002)(186003)(83380400001)(6506007)(53546011)(86362001)(2906002)(44832011)(7406005)(7416002)(36756003)(66899021);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TGQl7mVRxaTxJ+3bVtDax8teVs4m6PNXepPFejACxH0k+H4dhsmI44VTexVd?=
+ =?us-ascii?Q?svzUuipuHtq8WoevsfE0A+QhchBKeYZpyIaB8Ip7HUPzNI60oJLLti9dKcXl?=
+ =?us-ascii?Q?ab83P3JBT5Jxgei4G+OkZdheN9Cq+sNio/HrEJZ7OkxnHvcuE1yr5clpA2Kd?=
+ =?us-ascii?Q?BzhgPuIVK/KHJYQ0p8dEOtVZ8cBvSKv0r0kR9VtjPDWXlwS3g4LkF8FfjPMy?=
+ =?us-ascii?Q?IvXSJIXc0HB0/ePK5XuFS46Fmd/eUrtoic+AdbJIiZPdrCik4IbhbtVYafWC?=
+ =?us-ascii?Q?dcGnENcR0MnASOb+L+cvYUlSToQUM3nae3aZ9YpnJ3ZWshDVt+c7vPaaq/7k?=
+ =?us-ascii?Q?HzoxBdQfn0aNB9z+qOaswBeymtZAK3EJid1xc1k2aZsSBfNNnEbAngYYwuOT?=
+ =?us-ascii?Q?1ySwBeLSEWdsI74I+UgK3m0124ZP4klnNw4tofYgYzEiAQHPWvDM1NeCXzpY?=
+ =?us-ascii?Q?IF8TReNrAghEpSeCsY8zNk+IECEIzd60HCbStPcz+XFZQV5XmCK+066NENeC?=
+ =?us-ascii?Q?qGK/8aEhsB+NHc+ZE5uL/GvdNWlLKVZ3P+nIl1dfobTp/6GFAAFPcTc8t2BN?=
+ =?us-ascii?Q?N8mqhy3nEBD1cW6PeVEGDUCj4Wl/MLAPQlkNzVxOKPxhMmXg8RBltBHAzAgF?=
+ =?us-ascii?Q?jWE0qicgTXuvdMkpeu2E2tYPZK85wcHnOf2KM/wLZezOv5ufcp+aUpX81t8D?=
+ =?us-ascii?Q?wGdNsVlAKkzI3BHAKtotyBCqMFYncjzvULGH8AimXG+hRNVFb6mmso2ZlwJC?=
+ =?us-ascii?Q?OPh4UaBt824Sq/nqj96W4QVDKynxQUZF4uQWigWLI8yFRjBouJVHcFCB/jh7?=
+ =?us-ascii?Q?4ehlLbUNybseXnnxrWa2KX8B1Pst2vqoE+jYYMjGzL6QT+9v0buF5hvDjhvw?=
+ =?us-ascii?Q?rNCnQ4BONQpc3MiX39YMRtWjzFfymyLcIN4cyG1bijBuQm9S0jGv6BOUZiPK?=
+ =?us-ascii?Q?Qejwc40rshdSj/GE7dMTYhUIddFU/+t0mgfuZOUYywuf9wgensPjcKNnnrrN?=
+ =?us-ascii?Q?1d66WqBjjgiw34oV60L3kiDwskL0GreH07OpX82kjv42FtmPxMRnUAnEqko+?=
+ =?us-ascii?Q?rIicz0UBpXQJ/tv19OyXd5sp0wl8aDwSN3bB0WB+K+vxvu2Lp4IJBibnd/sR?=
+ =?us-ascii?Q?DJVT/JgPcGihKaYNAGogmD+8BtCOecSS5lLbkvgraG1RG7IumP6JDdMuXt/t?=
+ =?us-ascii?Q?UCtaOghdr4OWQMG1W6wLardc/9QUQH55ddnEChtbaiiXxAoPJfKtL/7PJ81g?=
+ =?us-ascii?Q?BiMfiLJn+quyYaSEXr8ru/E/Y3pFx9HRdEfyO6hO1Y7hnuhZKmLylpFtl6Pf?=
+ =?us-ascii?Q?XM5Hb9NPDOiQyIPbOue5l3w1MJq/fIYF3wlCkoKTtdFevHJ8ExPEQddhVr4H?=
+ =?us-ascii?Q?48OGCqz7/dSEboFuhlLZJ3NbY7LC/pl9Xqe8bONn1kTDOOqUSb2gq9iaHDqh?=
+ =?us-ascii?Q?paMMyB7DxyzmT6flrt4ihJDXBd3+rBe+jpy0bzgS5LTuyiMkOmX3wi+uelpC?=
+ =?us-ascii?Q?OuyynxYQJ26hiMGwRUT7hVg2Y5dfI7y9sCBCFO523Q8GF6ny4P1tVt0rGcRH?=
+ =?us-ascii?Q?I1F2anD6p1MJE3xPrI9pid/eFysz9JbxmYbPcNp6tARG2oTUG3buFMUj2kis?=
+ =?us-ascii?Q?VTvJxEOp2ItaeI6Z38D10gsKW0Umy8arIBRaAxIpZk3gKub/qIcWKeun68CO?=
+ =?us-ascii?Q?u5bCuA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfcf071b-66d3-44d3-d6a6-08db8dcd079d
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 11:39:54.1901
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n6HC+aqUjPQ4PZO/KobawzEOttxjgPhQjDlUKOoJMOJagd2ws+iUa9Ko2vi5YW+PS2GFrHfz1Hu6+yUA7NqjaHeBkNCc3fqoxXfPjwOhf3M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR13MB6374
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: leoliu-oc <leoliu-oc@zhaoxin.com>
+On Wed, Jul 26, 2023 at 12:38:00PM +0200, Gatien CHEVALLIER wrote:
+> 
+> 
+> On 7/26/23 12:19, Simon Horman wrote:
+> > On Tue, Jul 25, 2023 at 06:40:58PM +0200, Gatien Chevallier wrote:
+> > > Introduce a STM32 firewall framework that offers to firewall consumers
+> > > different firewall services such as the ability to check their access
+> > > rights against their firewall controller(s).
+> > > 
+> > > The STM32 firewall framework offers a generic API for STM32 firewall
+> > > controllers that is defined in their drivers to best fit the
+> > > specificity of each firewall.
+> > > 
+> > > There are various types of firewalls:
+> > > -Peripheral firewalls that filter accesses to peripherals
+> > > -Memory firewalls that filter accesses to memories or memory regions
+> > > -No type for undefined type of firewall
+> > > 
+> > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
+> > 
+> > ...
+> > 
+> > > +int stm32_firewall_populate_bus(struct stm32_firewall_controller *firewall_controller)
+> > > +{
+> > > +	struct stm32_firewall *firewalls;
+> > > +	struct device_node *child;
+> > > +	struct device *parent;
+> > > +	unsigned int i;
+> > > +	int len;
+> > > +	int err;
+> > > +
+> > > +	parent = firewall_controller->dev;
+> > > +
+> > > +	dev_dbg(parent, "Populating %s system bus\n", dev_name(firewall_controller->dev));
+> > > +
+> > > +	for_each_available_child_of_node(dev_of_node(parent), child) {
+> > > +		/* The feature-domains property is mandatory for firewall bus devices */
+> > > +		len = of_count_phandle_with_args(child, "feature-domains", "#feature-domain-cells");
+> > > +		if (len <= 0)
+> > 
+> > Coccinelle says that, due to breaking out of a
+> > for_each_available_child_of_node() loop, a call to of_node_put()
+> > is needed here
+> > 
+> 
+> Hi Simon,
+> 
+> Thank you, I already sent a V3 correcting the patch ordering issue. I
+> will implement this for V4.
 
-Add support for Zhaoxin HW RNG.
+Hi Gatien,
 
-Signed-off-by: leoliu-oc <leoliu-oc@zhaoxin.com>
----
- drivers/char/hw_random/Kconfig       |  13 +++
- drivers/char/hw_random/Makefile      |   1 +
- drivers/char/hw_random/via-rng.c     |  17 ++--
- drivers/char/hw_random/zhaoxin-rng.c | 116 +++++++++++++++++++++++++++
- 4 files changed, 139 insertions(+), 8 deletions(-)
- create mode 100644 drivers/char/hw_random/zhaoxin-rng.c
-
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index e0b3786ca51b..3b3c00e87b7b 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -150,6 +150,19 @@ config HW_RANDOM_VIA
- 
- 	  If unsure, say Y.
- 
-+config HW_RANDOM_ZHAOXIN
-+	tristate "Zhaoxin HW Random Number Generator support"
-+	depends on X86
-+	default HW_RANDOM
-+	help
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on Zhaoxin based motherboards.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called zhaoxin-rng.
-+
-+	  If unsure, say Y.
-+
- config HW_RANDOM_IXP4XX
- 	tristate "Intel IXP4xx NPU HW Pseudo-Random Number Generator support"
- 	depends on ARCH_IXP4XX || COMPILE_TEST
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 32549a1186dc..ef5b3ae0794d 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -14,6 +14,7 @@ obj-$(CONFIG_HW_RANDOM_GEODE) += geode-rng.o
- obj-$(CONFIG_HW_RANDOM_N2RNG) += n2-rng.o
- n2-rng-y := n2-drv.o n2-asm.o
- obj-$(CONFIG_HW_RANDOM_VIA) += via-rng.o
-+obj-$(CONFIG_HW_RANDOM_ZHAOXIN) += zhaoxin-rng.o
- obj-$(CONFIG_HW_RANDOM_EXYNOS) += exynos-trng.o
- obj-$(CONFIG_HW_RANDOM_IXP4XX) += ixp4xx-rng.o
- obj-$(CONFIG_HW_RANDOM_OMAP) += omap-rng.o
-diff --git a/drivers/char/hw_random/via-rng.c b/drivers/char/hw_random/via-rng.c
-index a9a0a3b09c8b..33a6e2fdacd1 100644
---- a/drivers/char/hw_random/via-rng.c
-+++ b/drivers/char/hw_random/via-rng.c
-@@ -135,7 +135,7 @@ static int via_rng_init(struct hwrng *rng)
- 	 * is always enabled if CPUID rng_en is set.  There is no
- 	 * RNG configuration like it used to be the case in this
- 	 * register */
--	if (((c->x86 == 6) && (c->x86_model >= 0x0f))  || (c->x86 > 6)){
-+	if ((c->x86 == 6) && (c->x86_model >= 0x0f)) {
- 		if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
- 			pr_err(PFX "can't enable hardware RNG "
- 				"if XSTORE is not enabled\n");
-@@ -191,13 +191,20 @@ static struct hwrng via_rng = {
- 	.data_read	= via_rng_data_read,
- };
- 
-+static const struct x86_cpu_id via_rng_cpu_ids[] = {
-+	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 6, X86_FEATURE_XSTORE, NULL),
-+	{}
-+};
-+MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_ids);
- 
- static int __init via_rng_mod_init(void)
- {
- 	int err;
- 
--	if (!boot_cpu_has(X86_FEATURE_XSTORE))
-+	if (!x86_match_cpu(via_rng_cpu_ids)) {
-+		pr_err(PFX "The CPU isn't support XSTORE.\n");
- 		return -ENODEV;
-+	}
- 
- 	pr_info("VIA RNG detected\n");
- 	err = hwrng_register(&via_rng);
-@@ -217,11 +224,5 @@ static void __exit via_rng_mod_exit(void)
- }
- module_exit(via_rng_mod_exit);
- 
--static struct x86_cpu_id __maybe_unused via_rng_cpu_id[] = {
--	X86_MATCH_FEATURE(X86_FEATURE_XSTORE, NULL),
--	{}
--};
--MODULE_DEVICE_TABLE(x86cpu, via_rng_cpu_id);
--
- MODULE_DESCRIPTION("H/W RNG driver for VIA CPU with PadLock");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/char/hw_random/zhaoxin-rng.c b/drivers/char/hw_random/zhaoxin-rng.c
-new file mode 100644
-index 000000000000..2e657b227c5b
---- /dev/null
-+++ b/drivers/char/hw_random/zhaoxin-rng.c
-@@ -0,0 +1,116 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RNG driver for Zhaoxin RNGs
-+ *
-+ * Copyright 2005 (c) MontaVista Software, Inc.
-+ *
-+ * with the majority of the code coming from:
-+ *
-+ * Hardware driver for the Intel/AMD/VIA Random Number Generators (RNG)
-+ * (c) Copyright 2003 Red Hat Inc <jgarzik@redhat.com>
-+ *
-+ * derived from
-+ *
-+ * Hardware driver for the AMD 768 Random Number Generator (RNG)
-+ * (c) Copyright 2001 Red Hat Inc
-+ *
-+ * derived from
-+ *
-+ * Hardware driver for Intel i810 Random Number Generator (RNG)
-+ * Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
-+ * Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
-+ *
-+ * This file is licensed under  the terms of the GNU General Public
-+ * License version 2. This program is licensed "as is" without any
-+ * warranty of any kind, whether express or implied.
-+ */
-+
-+#include <crypto/padlock.h>
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/hw_random.h>
-+#include <linux/delay.h>
-+#include <linux/io.h>
-+#include <linux/cpufeature.h>
-+#include <asm/cpu_device_id.h>
-+#include <asm/fpu/api.h>
-+
-+enum {
-+	ZHAOXIN_RNG_CHUNK_8		= 0x00, /* 64 rand bits, 64 stored bits*/
-+	ZHAOXIN_RNG_CHUNK_4		= 0x01, /* 32 rand bits, 32 stored bits */
-+	ZHAOXIN_RNG_CHUNK_2		= 0x02, /* 16 rand bits, 32 stored bits */
-+	ZHAOXIN_RNG_CHUNK_1		= 0x03, /* 8 rand bits, 32 stored bits */
-+	ZHAOXIN_RNG_MAX_SIZE		= (128*1024),
-+};
-+
-+static int zhaoxin_rng_init(struct hwrng *rng)
-+{
-+	if (!boot_cpu_has(X86_FEATURE_XSTORE_EN)) {
-+		pr_err(PFX "can't enable hardware RNG if XSTORE is not enabled\n");
-+		return -ENODEV;
-+	}
-+	return 0;
-+}
-+
-+static inline int rep_xstore(size_t size, size_t factor, void *result)
-+{
-+	__asm__ __volatile__ (
-+	"movq %0, %%rcx\n"
-+	"movq %1, %%rdx\n"
-+	"movq %2, %%rdi\n"
-+	".byte 0xf3, 0x0f, 0xa7, 0xc0"
-+	:
-+	: "r"(size), "r"(factor), "r"(result)
-+	: "%rcx", "%rdx", "%rdi", "memory");
-+
-+	return 0;
-+}
-+
-+static int zhaoxin_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
-+{
-+	if (max > ZHAOXIN_RNG_MAX_SIZE)
-+		max = ZHAOXIN_RNG_MAX_SIZE;
-+	rep_xstore(max, ZHAOXIN_RNG_CHUNK_1, data);
-+	return max;
-+}
-+
-+static struct hwrng zhaoxin_rng = {
-+	.name   = "zhaoxin",
-+	.init   = zhaoxin_rng_init,
-+	.read   = zhaoxin_rng_read,
-+};
-+
-+static const struct x86_cpu_id zhaoxin_rng_cpu_ids[] = {
-+	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 6, X86_FEATURE_XSTORE, NULL),
-+	X86_MATCH_VENDOR_FAM_FEATURE(ZHAOXIN, 7, X86_FEATURE_XSTORE, NULL),
-+	X86_MATCH_VENDOR_FAM_FEATURE(CENTAUR, 7, X86_FEATURE_XSTORE, NULL),
-+	{}
-+};
-+MODULE_DEVICE_TABLE(x86cpu, zhaoxin_rng_cpu_ids);
-+
-+static int __init zhaoxin_rng_mod_init(void)
-+{
-+	int err;
-+
-+	if (!x86_match_cpu(zhaoxin_rng_cpu_ids)) {
-+		pr_err(PFX "The CPU isn't support XSTORE.\n");
-+		return -ENODEV;
-+	}
-+
-+	pr_info("Zhaoxin RNG detected\n");
-+	err = hwrng_register(&zhaoxin_rng);
-+	if (err)
-+		pr_err(PFX "RNG registering failed (%d)\n", err);
-+
-+	return err;
-+}
-+module_init(zhaoxin_rng_mod_init);
-+
-+static void __exit zhaoxin_rng_mod_exit(void)
-+{
-+	hwrng_unregister(&zhaoxin_rng);
-+}
-+module_exit(zhaoxin_rng_mod_exit);
-+MODULE_DESCRIPTION("H/W RNG driver for Zhaoxin CPU");
-+MODULE_AUTHOR("YunShen@zhaoxin.com");
-+MODULE_LICENSE("GPL");
--- 
-2.34.1
-
+Thanks and sorry for not noticing v3 - I think it arrived while
+I was in the middle of reviewing v2.
