@@ -2,119 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C517AC001E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 09:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF0C9C0015E
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 09:46:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232553AbjGZJIQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 05:08:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33240 "EHLO
+        id S231367AbjGZJq5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 05:46:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232257AbjGZJHL (ORCPT
+        with ESMTP id S229502AbjGZJq4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 05:07:11 -0400
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E080188;
-        Wed, 26 Jul 2023 02:04:42 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36Q8fK2J008196;
-        Wed, 26 Jul 2023 11:04:20 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=mHlSDUHrC46OTsxrd1MgTw0c0UTb8rmL5Uuj7fDW+n0=;
- b=zO3V27RgKExY/q85tnvfYLxhy2slSf7Knw1gPHQf1WoyeM7uiF8GSo1HznFiPyivKlq4
- L6CKD1U051jxT89xFuqjU/17wMDs9euvT7E9nzje/VEkTvWeYLOCZ6cGOXYOCNFYYfFZ
- 5/xEUkV7rFy/XBYdkTEq6JpgOFqOWREZgROdss/Mt2JSe0VWdZSCuM2agejgclldDvuF
- bCBjlpm6D7UbVjE5CUgrTIKrckaEo9oaPGeIbr9rw5b8vbc4Yi80Jy/IuujGL9AEBH4E
- 29bz4VSinulO+vTqLeac2u1LjXFK0Jqfr53vxDsceG483W5WzuNtgT2Co+XpVgDPakkq ww== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s306u876r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jul 2023 11:04:20 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 8659710002A;
-        Wed, 26 Jul 2023 11:04:19 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 7C2052115FC;
-        Wed, 26 Jul 2023 11:04:19 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 26 Jul
- 2023 11:04:17 +0200
-Message-ID: <5458d1d3-6c4c-738c-6dec-8b7ff78a5431@foss.st.com>
-Date:   Wed, 26 Jul 2023 11:04:16 +0200
+        Wed, 26 Jul 2023 05:46:56 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C19897
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 02:46:55 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fd28ae8b90so46995e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 02:46:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1690364814; x=1690969614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sVk3D2Ovs0OQVitdb5xswV9gYU6xHuGerRDbOGRGHI8=;
+        b=YtbGpl+bbWM3rTcDg4aZUCnuzhi5Xj+jW4e9Tx1UvYMbD5ctmqWK4dlB0+FcLsuEw+
+         iSYIB/XmLE/wG9/TtL2NQlGEdSMI83+1h0DcpUcFBdQYpoOiI/aQCuU+kkS20yGjMnxv
+         eoTOdLdUH7W0ZwLHvdeE/+I24/wJzt9nzZacXoOk1BD6Bn+dPMdCzWXrk2GqceioFr+w
+         CARCA7YRVNjzvqqXrpqi9Wg+nqiVi7LxV2OA+sIJvhe9Jr0IEjl2WCTpc7/Z4I4NU3td
+         186/8uB0yXTnbWkcmn6rqLmJcINHjDtkQezb4zswDpljftvJnOuf6fFt8Ut92IXDCYWU
+         7/eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690364814; x=1690969614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sVk3D2Ovs0OQVitdb5xswV9gYU6xHuGerRDbOGRGHI8=;
+        b=jpoDbVL1WxJAd0xZv7fF6FVevRkOS3vKAioezj5lHu8FMtpUYW29mnWAfYhBbgNGiH
+         4LbOLIeh8nzAfnq6D/j8MJr7Gy4/rA4Cs6y9eO0XGFkgpmswmXrKrd5dAFWl+lpTXONJ
+         XmDC7/6hLffNoZbX3+TINSn0+vqaG30wE/JdE4kKGpQ9mBsjBTwFDcYbsetnGurzPMMQ
+         n58T2UfA5NnKQXHZk+nKR5uC3jUJUymOt4EmiDYhT8c6oayao+IDHzAuFwSsECi15/eM
+         SGs0Kd3hZM9TFL2RlRWmJ1NLEZOF99z007n/A+eQYahiTNmCzkRGeJLlAv9KNI9I05ET
+         Xd4A==
+X-Gm-Message-State: ABy/qLa4t1AQrQW+lqdOx1M8ZSI7xyNGEUzJQSaffqUj91qS0ssUqHPD
+        qJhl031gIp0TSfMigvUBEUpxe6gIYKDj7GQTOP9mXg==
+X-Google-Smtp-Source: APBJJlHzycgPSHCO7xhc73QYvhqdiMVjY11q/GUx1ttiW2v8T+9YQxSks0t8zGKVP7VjXEpaJRkGP+VJ9bfKjR9IYqU=
+X-Received: by 2002:a05:600c:1c82:b0:3f7:e4d8:2569 with SMTP id
+ k2-20020a05600c1c8200b003f7e4d82569mr176062wms.5.1690364813965; Wed, 26 Jul
+ 2023 02:46:53 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [IGNORE][PATCH v3 01/11] dt-bindings: Document common device
- controller bindings
-Content-Language: en-US
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     <Oleksii_Moisieiev@epam.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
-        <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>,
-        <lee@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
-        <arnd@kernel.org>, <richardcochran@gmail.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20230726083810.232100-1-gatien.chevallier@foss.st.com>
- <20230726083810.232100-2-gatien.chevallier@foss.st.com>
- <2023072605-removed-pacemaker-faff@gregkh>
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <2023072605-removed-pacemaker-faff@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-26_03,2023-07-25_01,2023-05-22_02
+References: <0000000000000ced8905fecceeba@google.com> <00000000000002c74d0601582595@google.com>
+In-Reply-To: <00000000000002c74d0601582595@google.com>
+From:   Aleksandr Nogikh <nogikh@google.com>
+Date:   Wed, 26 Jul 2023 11:46:42 +0200
+Message-ID: <CANp29Y5cQX3eOo+rB5bWcqn38bcPY7o12wcJ_WmAY6D+UxGTcw@mail.gmail.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_update
+To:     syzbot <syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com>
+Cc:     alexander.deucher@amd.com, davem@davemloft.net,
+        dhowells@redhat.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mario.limonciello@amd.com, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Greg,
+On Wed, Jul 26, 2023 at 1:32=E2=80=AFAM syzbot
+<syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com> wrote:
+>
+> syzbot suspects this issue was fixed by commit:
+>
+> commit 30c3d3b70aba2464ee8c91025e91428f92464077
+> Author: Mario Limonciello <mario.limonciello@amd.com>
+> Date:   Tue May 30 16:57:59 2023 +0000
+>
+>     drm/amd: Disallow s0ix without BIOS support again
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D122e2c31a8=
+0000
+> start commit:   [unknown]
+> git tree:       net-next
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D526f919910d4a=
+671
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D0bc501b7bf9e1bc=
+09958
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D13f71275280=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1108105528000=
+0
+>
+> If the result looks correct, please mark the issue as fixed by replying w=
+ith:
 
-On 7/26/23 10:48, Greg KH wrote:
-> On Wed, Jul 26, 2023 at 10:38:00AM +0200, Gatien Chevallier wrote:
->> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
->>
->> Introducing of the common device controller bindings for the controller
->> provider and consumer devices. Those bindings are intended to allow
->> divided system on chip into muliple domains, that can be used to
->> configure hardware permissions.
->>
->> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
->> ---
->>   .../feature-domain-controller.yaml            | 84 +++++++++++++++++++
->>   1 file changed, 84 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
-> 
-> What is the [IGNORE] prefix for?
-> 
+No, that's unlikely.
 
-I put this prefix to specify that the review for this patch should
-not be done on this thread.
-
-It is still under review on the thread linked in the cover-letter.
-
-This series aims to provide a use-case for this binding so its scope
-can be better defined.
-
-Best regards,
-Gatien
+>
+> #syz fix: drm/amd: Disallow s0ix without BIOS support again
+>
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
+>
