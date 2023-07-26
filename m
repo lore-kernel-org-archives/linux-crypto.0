@@ -2,175 +2,334 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B3DC001B0
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 15:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2E8C0015E
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 17:30:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233325AbjGZPy7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 11:54:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53662 "EHLO
+        id S232450AbjGZRaO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 13:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231165AbjGZPy6 (ORCPT
+        with ESMTP id S232435AbjGZRaN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 11:54:58 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A27C2109;
-        Wed, 26 Jul 2023 08:54:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1690386897; x=1721922897;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=IgYaEELOfh5Lw+3mlkQhRNlPSdFzk5JOB8Akc3Itmug=;
-  b=AaHkm2wfUwLda/H5pyQ1eLI6Phv6BoiKEGbq6V80MrZeK3W+PmhdHi8p
-   xCpzTUWuudEZ4awLpMJPYVIAsU2hYAG7cSH9qLS0xIDsu6o9mIKcyhcMr
-   MXtuGkpdP6nxhUcRTa9w4l9vPM+Tv3nuDmqUrUqOoLtsrkLhgt+3iGRcm
-   rzmKFFfhi3W7sO6lXgTEY+JXuB9QZ8560QI+k2k+7iMaWaiQFu4IjEf4p
-   jpC89fL3brdDXQR/rdQozxZImYGg3Dlvarfs8gdQrpZosdF2gEAT7BRcx
-   4t9SVZxhkKnrbCzmiKSQgfWC6ZsFLgrNLH2GEyPo1r0EQhUFP5ImErGuf
-   w==;
-X-IronPort-AV: E=Sophos;i="6.01,232,1684825200"; 
-   d="scan'208";a="163340225"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 26 Jul 2023 08:54:56 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 26 Jul 2023 08:54:41 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21 via Frontend Transport; Wed, 26 Jul 2023 08:54:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QDdqUU/00NQE47O3x+45yI+NjwZyz+ifVB+1QXSLjzsxRUu+8kmvVYIPDb4RvVgA/nx6gUGlYlR37V/wHPewkd+z8lX72vixmLaXeLV35PhLX2NUZfZ02Z3M5P2IhgYyPbrrf/ayC4DrTNWvt2GDroMtE6Vo3sa4yHDchlVp5AP/8c7GHUT1/NIpxtvV0b8W6DInBpnivSyK/nz2DMEYBJQTSh5goDm1xXcjvpOprVVsoT5UFeJ3D9KGQylW0a+/6JlJny4Mjq0QopoUgy9Rd7iTRZr3ovr6OG1RK2Gb5TSJk9v8PZswI1DqJT6ric/xXwFyCOc3+2OGlySFnanq/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IgYaEELOfh5Lw+3mlkQhRNlPSdFzk5JOB8Akc3Itmug=;
- b=fQQ+q4SdIEwDdHsX0fK1ucg5ATOMH7olhjQgyzXigtkjQtqiGBp77JSuP7GPDXicPyKfH3mSC+afWgs84R/EL3tZJb1bNvh/Jxs9kKHiJkfAjJze0TzfIW2Aa9B9n5MsboPpMTLyeLBAbvZXc9X++RD6uCWrM+KRfx+0F6by5nol0EwwAmo8U5vg1tmLj5V7GPY6Dzk0X1rdhs9egbl8OAJSCVg6Wyjcd+8HrW3ll+LHoCRubg7xS6Zx7oph4FHILXw1im/JfM/QXnYVgdCCT8OSvHfR4wC4iQ362klDSORihBsMmEw8bDS92yWbTXlCRJZzcFSs+kDtegGqeo+m8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=microchiptechnology.onmicrosoft.com;
- s=selector2-microchiptechnology-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IgYaEELOfh5Lw+3mlkQhRNlPSdFzk5JOB8Akc3Itmug=;
- b=dA2+TXPmSv0dNFi78+K4Rnyuqa+S0JVqhdiPlY9iNrqvNMFO4F2aZj4LUErp4bmAVvM4e01FibnIdCWm1eVOtN+vtpUOHoMwBJoStk0wVKw6agQVTEreywO5k9yGt8tnmMxAUhKcdzCCarRouogUfllJClQZLK84RTTadsOuWp0=
-Received: from BN7PR11MB2657.namprd11.prod.outlook.com (2603:10b6:406:b1::19)
- by CH3PR11MB7770.namprd11.prod.outlook.com (2603:10b6:610:129::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Wed, 26 Jul
- 2023 15:54:39 +0000
-Received: from BN7PR11MB2657.namprd11.prod.outlook.com
- ([fe80::8da1:a89a:df1d:ffc8]) by BN7PR11MB2657.namprd11.prod.outlook.com
- ([fe80::8da1:a89a:df1d:ffc8%4]) with mapi id 15.20.6631.026; Wed, 26 Jul 2023
- 15:54:39 +0000
-From:   <Ryan.Wanner@microchip.com>
-To:     <machel@vivo.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <Nicolas.Ferre@microchip.com>,
-        <alexandre.belloni@bootlin.com>, <Claudiu.Beznea@microchip.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <opensource.kernel@vivo.com>
-Subject: Re: [PATCH v2] crypto: atmel: Use dev_err_probe instead of dev_err
-Thread-Topic: [PATCH v2] crypto: atmel: Use dev_err_probe instead of dev_err
-Thread-Index: AQHZv7mSMZ1QQhWivkCDKCUA5SV5ka/MM4MA
-Date:   Wed, 26 Jul 2023 15:54:39 +0000
-Message-ID: <48f16656-af30-cd6f-5adf-8b7dac0818a0@microchip.com>
-References: <20230726120451.6099-1-machel@vivo.com>
-In-Reply-To: <20230726120451.6099-1-machel@vivo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN7PR11MB2657:EE_|CH3PR11MB7770:EE_
-x-ms-office365-filtering-correlation-id: 0d7add35-c1b2-4628-db91-08db8df09e5f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +IJ4ppijzCJsL2UyEVdziGGVquLrKFb8CZi85NbSdFyEna4Cxwh4cVkiBwm5LqaZzX8/F0utGWw1z0qvc9YgKyZj8LM5/MqKlCH5BGierDguVMc5tl46f1DOqktlvb6rylcuO09NkSNXKUJMJ2wg8LFN0jI/gj/yVKtt/Wf1ak/sYPo4le/jIymdKOXIp0RnRquavYmr8dr3ISFCU873wSgugtMSFUCJUWqAwTD3tlT+xWfaHVNXtK5KT6YsAcUNjNJxyxvI6OtsHI2dJehFBYUI0gbJspnkqsLszNhyySOkifB/bNciHfnz5nShdips1Gqr5F+3twuPt1iL1e2zegZ3rJC6erVs+Y2KFG4c3RVW12l/CMltttB86q9XasMYYKd5CvaKecA2l7NSnmTJoVLfuKagkMJKAYI3CSA4DK2LiBqYwOXWEkh+IfqIg+wmx5Dpeh5MoAWZZwjpKQZKLAbszwEK/jgRZxihBiLIxpIO7MHfmWs3yjvXtfaiBpyqSxQDmsGXv6UYTm/YVUiyurPSa6pfV+9cshyT+fWIO5KCyHswA7QeuIEt6huymtS6wBjU3UljYcG/B5jSIiXKl2oz0UpH2Ek+By0e35pPv57stGdxmDRfJIPxqO/7LJB8m4DD75k3PWVNwGVwlI20wA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN7PR11MB2657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(39860400002)(136003)(376002)(346002)(366004)(451199021)(316002)(41300700001)(83380400001)(31686004)(6512007)(4326008)(478600001)(122000001)(66476007)(66556008)(91956017)(76116006)(64756008)(66446008)(110136005)(38100700002)(86362001)(31696002)(6506007)(53546011)(26005)(2906002)(38070700005)(186003)(66946007)(71200400001)(6486002)(8676002)(36756003)(5660300002)(2616005)(8936002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?c1hpcFNrOUNxbWt6UDZqa2N3N0FyRGtFTzIrSWtTTWsyN0tGVy9JNVlNclR3?=
- =?utf-8?B?eGs2ZXBDbmxvOUxWcjh2UHpFL0JjSXhDVDF1Z244dko1QnVSRHkxSXdDdHRO?=
- =?utf-8?B?RGxnbnE3VFlQaUdyRU1ySlBkVkZsQnB0WS8xWXFnN3VtMkVkVkREajB3YTRl?=
- =?utf-8?B?U1JwYndpV01Ud2NobFJGaUd2NlhSM0ovNGNHZW1mZjY5aGFwQmVoK3JMMHQ1?=
- =?utf-8?B?SURRM05CU3lWQVBzZzBuZnE5ZStkSlBEMW50c2xQWXV0SFpHZW1UWUtsYTdR?=
- =?utf-8?B?R3F2eTYvMDA5N3F4MjBxOEJneWJOK3pVM0hTenRpMWFkMkphVmluYXBxRm1y?=
- =?utf-8?B?d21EZ3pxdXhZZ1kydXk0Z054VE9YVlZuTnBvS0RqdlZZdC9ya1ltK3J2Tlhy?=
- =?utf-8?B?U0ZVYzFQMDUvYmxXUzBrUE9hMFdBME02cHBIVVl2NGp6T2R6RnN0WXh3MnZW?=
- =?utf-8?B?eENZQnVpMXFOWmlFZlArUlZVeDJ3YlpoekNRWXJCQTRoM003T1pRVmZiZ1VC?=
- =?utf-8?B?ZFBjWnpZRUdWS2FPdWpZNkp3d0R2MFE4dmZXclNCVXlic2FhZmY0VGdzdjda?=
- =?utf-8?B?bUMrSXVseXRGMUlTTGxGYUlsUFdaRVovbjh6eHJ4ZFVWVWd4VlhRYlMvR2xW?=
- =?utf-8?B?RXVKMkk3RzE5cXowcFdyaDk3Z0g0eXRPNzRudjQxazhaNjF5Wkh3d2czUGRq?=
- =?utf-8?B?MHFhWG9vZlRGR3gyL25wYzB5ZWx5aERHTUlhOHBPKzE4b1VEelFUVzVlbTBy?=
- =?utf-8?B?M291aDlWZnJxOExrRkg1bUJUNVM5K0FSenNBMnFHa0ZuU0tGMWV0d2ErQkJn?=
- =?utf-8?B?U2VqZmtDQWVOYlZmQ0xzdlpudk41dFkwK1E1M2wzaU1VZEpPdDZrRXZOUG9N?=
- =?utf-8?B?RG1WelVDVnJHeEx1ZTJKTFRQMXMyRUR0OE5sSmNBUkZob2ZrNGRLWk5vNnA4?=
- =?utf-8?B?bXlGOUszQXEvRk1scXlNVzQ1bUg2SHZEaUQvMWUxZjgrZEx6aVY4YlVZU01O?=
- =?utf-8?B?RHlrSjZKODV6eVh5QlRML1BvOHptd2N5THBHNFpJNCtZYzBteHJDeHpLM1R3?=
- =?utf-8?B?SVBTQ0NtbjV2TUt3ODN0VGVMVEw4R0NnRmFqaFBiYmFid0lyYmtnRzNGMVc3?=
- =?utf-8?B?Wi9sQ291Q3B0alhQUGwzY2NUWHZ4ZWtEeXlMK1owTk8wM0c5QmkxZUJRTGVZ?=
- =?utf-8?B?UTQ0UEdXMjFkNmpjK2NDcVZTcmtRMGJFcHRUNnBrYnM5M1Fmc05HTkhtYnZI?=
- =?utf-8?B?cHIvMW51dHJ1c25oVU1Xc1B5M0RtNjhXam5VWnNsZlBEQmh1bHIvQW05blNn?=
- =?utf-8?B?ZmZrOEw0Um9GOWhYREkrc25NNlA3Q0QySFJscUNraFhhMWI5UHJGcUN6dTJB?=
- =?utf-8?B?amc3VXA4ZUMrOFdJYTNRUGlmYWNtQUxrK21sVGd5eVVEc1hBb29YdWk0Yy9V?=
- =?utf-8?B?Vnc3eFliUFk0OHN1WVpoY2kwaEhhMnhLZXNLcnVTNUU1WElueUQrRDRQclIy?=
- =?utf-8?B?N0Z1ZGp5K3pNVzhJdlZ2OVo0cjNZbjNBell6Rnc4amVnblBKei9PN3BPdEEw?=
- =?utf-8?B?RDJnejVYdlh5U2ZiYzIvODdUL01aNmRrTEo4eVJScFZFQWowc0ZzNWphWFp2?=
- =?utf-8?B?ZnBwYkFxTWczRWQxRldlU01FcEMvcDVQdzVnb0ZzU3pYU0U2dVgyd0ZMbFVo?=
- =?utf-8?B?NlhVbllDdXQ2US9VRmZxTHY3YkdHSFVYQTJtOVFHQ2VOTVpuL1BSeXZoRlht?=
- =?utf-8?B?UGV0NmxzVWhCa21KTWhkUTRqcHMvaU9Wdkg4dDF5aVFOSFkyc0drcWtueTY3?=
- =?utf-8?B?MzZnVDV6cEU0MnYwWmtjbkhMY0dRWG1YN0xzWkdJOCs2UGlub2NoMGx3TlB1?=
- =?utf-8?B?QXRvcEJzOVhWNS9XQTh5a1Q3RHdnbkoyQUhPczVSL2FKb25kaW1sVnVTeFRS?=
- =?utf-8?B?SWFTM0FZTUlUbGhEZGhlYVVFR2pjeVY4RFlDSVRNOG96emRJbkpMUEd6cXJl?=
- =?utf-8?B?eFJ1djRCSVlDcWtWbEFnNmcveG9PSTY0bkM5eWFnRWFjd1FiWU5jLytiWEc4?=
- =?utf-8?B?TlN2VEJDa3RKRjAwL0tNdGR2YWk0ck84Y2dmd0ZVWmRyS1ZSQ1ArWnZPUnJv?=
- =?utf-8?Q?ckzUT7HEfcD+akoWYI8l1Ydp9?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <70E6E9CF3073AE45A381730207EEF50B@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 26 Jul 2023 13:30:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41021BE2
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 10:30:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3932B61BE3
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 17:30:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89277C433C8;
+        Wed, 26 Jul 2023 17:30:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690392611;
+        bh=irpEcK2hViWhMC6eJYNN+kDzd1Lu4XfH2c+CFE61cEY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=jVeCArQpCWaTOxRvV6JVbpoNLKw8uax30+FykVwVORxEY8bNgye7o0H79AkmVINaL
+         fvbjuBitkcBkFC10+mga7yUYICzRcZuPjXEslQqtcKC07fVSooNuSI2TW+eZ9rpAg0
+         6fN+3E9BC7rpSXLPhGhXvRT6LrgZIe4xU2He2H6x2eo91HsJm3NCMMo1OXI7yjWCin
+         KGivsIhCaLHH57GQygZ4MDUuuABul28RTkVkTjtJPWBKTiCoPYRxp53bShSLJVs3Z9
+         g8uP4XE538xVq7PlGi7q4zOTSU6RokFT/h10IBAfGn0E9VNKlTF9FHV3Rw1JeHu9HV
+         SoDSYRvT7tOUA==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        linux-riscv@lists.infradead.org, Ard Biesheuvel <ardb@kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        =?UTF-8?q?Christoph=20M=C3=BCllner?= <christoph.muellner@vrull.eu>,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: [PATCH] crypto: riscv/aes - Implement scalar Zkn version for RV32
+Date:   Wed, 26 Jul 2023 19:29:58 +0200
+Message-Id: <20230726172958.1215472-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN7PR11MB2657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d7add35-c1b2-4628-db91-08db8df09e5f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2023 15:54:39.1253
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NabKo4f5g1pctO7VbBnsL1kKWZkoII3+TCgsC8lVx0C3PNpi3L6JU6st3THf6PbO0nrbEPF6FXsLTnMHMb5lyUxmngnhnfVsa3W2u5uZY60=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7770
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8501; i=ardb@kernel.org; h=from:subject; bh=irpEcK2hViWhMC6eJYNN+kDzd1Lu4XfH2c+CFE61cEY=; b=owGbwMvMwCFmkMcZplerG8N4Wi2JIeVghOg1Kxsj1TNeCY0Fr+ZpHTHv+WfmISLaEMjhncKR8 EfvtWtHKQuDGAeDrJgii8Dsv+92np4oVes8SxZmDisTyBAGLk4BmMiSWYwMZxIPX/Nd8jt6VtXl Bvv1iQq3JjMw3bwfuZznZU+34KwGPkaGRW8lGtY9Xs29XW5JiV/Qpj/mzq9X7zuq5ZqxUilbrv8 oPwA=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gNy8yNi8yMyAwNTowNCwgV2FuZyBNaW5nIHdyb3RlOg0KPiBFWFRFUk5BTCBFTUFJTDogRG8g
-bm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBrbm93IHRoZSBj
-b250ZW50IGlzIHNhZmUNCj4gDQo+IEl0IGlzIHBvc3NpYmxlIHRoYXQgZG1hX3JlcXVlc3RfY2hh
-biB3aWxsIHJldHVybiBFUFJPQkVfREVGRVIsDQo+IHdoaWNoIG1lYW5zIHRoYXQgZGQtPmRldiBp
-cyBub3QgcmVhZHkgeWV0LiBJbiB0aGlzIGNhc2UsDQo+IGRldl9lcnIoZGQtPmRldiksIHRoZXJl
-IHdpbGwgYmUgbm8gb3V0cHV0LiBUaGlzIHBhdGNoIGZpeGVzIHRoZSBidWcuDQo+IA0KPiBTaWdu
-ZWQtb2ZmLWJ5OiBXYW5nIE1pbmcgPG1hY2hlbEB2aXZvLmNvbT4NClJldmlld2VkLWJ5OiBSeWFu
-IFdhbm5lciA8Unlhbi5XYW5uZXJAbWljcm9jaGlwLmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2Ny
-eXB0by9hdG1lbC1zaGEuYyB8IDQgKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9u
-cygrKSwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9h
-dG1lbC1zaGEuYyBiL2RyaXZlcnMvY3J5cHRvL2F0bWVsLXNoYS5jDQo+IGluZGV4IDZiZWY2MzRk
-M2M4Ni4uNTY4Mjk1N2Y4MDVkIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2NyeXB0by9hdG1lbC1z
-aGEuYw0KPiArKysgYi9kcml2ZXJzL2NyeXB0by9hdG1lbC1zaGEuYw0KPiBAQCAtMjQ5OSw4ICsy
-NDk5LDggQEAgc3RhdGljIGludCBhdG1lbF9zaGFfZG1hX2luaXQoc3RydWN0IGF0bWVsX3NoYV9k
-ZXYgKmRkKQ0KPiAgew0KPiAgICAgICAgIGRkLT5kbWFfbGNoX2luLmNoYW4gPSBkbWFfcmVxdWVz
-dF9jaGFuKGRkLT5kZXYsICJ0eCIpOw0KPiAgICAgICAgIGlmIChJU19FUlIoZGQtPmRtYV9sY2hf
-aW4uY2hhbikpIHsNCj4gLSAgICAgICAgICAgICAgIGRldl9lcnIoZGQtPmRldiwgIkRNQSBjaGFu
-bmVsIGlzIG5vdCBhdmFpbGFibGVcbiIpOw0KPiAtICAgICAgICAgICAgICAgcmV0dXJuIFBUUl9F
-UlIoZGQtPmRtYV9sY2hfaW4uY2hhbik7DQo+ICsgICAgICAgICAgICAgICByZXR1cm4gZGV2X2Vy
-cl9wcm9iZShkZC0+ZGV2LCBQVFJfRVJSKGRkLT5kbWFfbGNoX2luLmNoYW4pLA0KPiArICAgICAg
-ICAgICAgICAgICAgICAgICAiRE1BIGNoYW5uZWwgaXMgbm90IGF2YWlsYWJsZVxuIik7DQo+ICAg
-ICAgICAgfQ0KPiANCj4gICAgICAgICBkZC0+ZG1hX2xjaF9pbi5kbWFfY29uZi5kc3RfYWRkciA9
-IGRkLT5waHlzX2Jhc2UgKw0KPiAtLQ0KPiAyLjI1LjENCj4gDQoNCg==
+The generic AES implementation we rely on if no architecture specific
+one is available relies on lookup tables that are relatively large with
+respect to the typical L1 D-cache size, which not only affects
+performance, it may also result in timing variances that correlate with
+the encryption keys.
+
+So we tend to avoid the generic code if we can, usually by using a
+driver that makes use of special AES instructions which supplant most of
+the logic of the table based implementation the AES algorithm.
+
+The Zkn RISC-V extension provides another interesting take on this: it
+defines instructions operating on scalar registers that implement the
+table lookups without relying on tables in memory. Those tables carry
+32-bit quantities, making them a natural fit for a 32-bit architecture.
+And given the use of scalars, we don't have to rely in in-kernel SIMD,
+which is a bonus.
+
+So let's use the instructions to implement the core AES cipher for RV32.
+
+Cc: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>
+Cc: Christoph Müllner <christoph.muellner@vrull.eu>
+Cc: Heiko Stuebner <heiko.stuebner@vrull.eu>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/riscv/crypto/Kconfig             |  12 ++
+ arch/riscv/crypto/Makefile            |   3 +
+ arch/riscv/crypto/aes-riscv32-glue.c  |  75 ++++++++++++
+ arch/riscv/crypto/aes-riscv32-zkned.S | 119 ++++++++++++++++++++
+ 4 files changed, 209 insertions(+)
+
+diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+index 7542330916079447..fa3917859c2bbbc3 100644
+--- a/arch/riscv/crypto/Kconfig
++++ b/arch/riscv/crypto/Kconfig
+@@ -2,6 +2,18 @@
+ 
+ menu "Accelerated Cryptographic Algorithms for CPU (riscv)"
+ 
++config CRYPTO_AES_RISCV32
++	tristate "Scalar AES using the Zkn extension"
++	depends on !64BIT
++	select CRYPTO_LIB_AES
++	help
++	  Implement scalar AES using the RV32 instructions specified by the Zkn
++	  extension. These instructions replace the table lookups used by the
++	  generic implementation, making this implementation time invariant
++	  (provided that the instructions themselves are). It also reduces the
++	  D-cache footprint substantially, as the AES lookup tables are quite
++	  large.
++
+ config CRYPTO_AES_RISCV
+ 	tristate "Ciphers: AES (RISCV)"
+ 	depends on 64BIT && RISCV_ISA_V
+diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+index f7faba6c12c9d863..d073b18d2a0bbba3 100644
+--- a/arch/riscv/crypto/Makefile
++++ b/arch/riscv/crypto/Makefile
+@@ -3,6 +3,9 @@
+ # linux/arch/riscv/crypto/Makefile
+ #
+ 
++obj-$(CONFIG_CRYPTO_AES_RISCV32) += aes-riscv32.o
++aes-riscv32-y := aes-riscv32-glue.o aes-riscv32-zkned.o
++
+ obj-$(CONFIG_CRYPTO_AES_RISCV) += aes-riscv.o
+ aes-riscv-y := aes-riscv-glue.o aes-riscv64-zvkned.o
+ 
+diff --git a/arch/riscv/crypto/aes-riscv32-glue.c b/arch/riscv/crypto/aes-riscv32-glue.c
+new file mode 100644
+index 0000000000000000..2055213304e21829
+--- /dev/null
++++ b/arch/riscv/crypto/aes-riscv32-glue.c
+@@ -0,0 +1,75 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Scalar AES core transform
++ *
++ * Copyright (C) 2023 Google, LLC.
++ * Author: Ard Biesheuvel <ardb@kernel.org>
++ */
++
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <linux/module.h>
++
++asmlinkage void __aes_riscv32_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
++asmlinkage void __aes_riscv32_decrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
++
++static int aes_riscv32_set_key(struct crypto_tfm *tfm, const u8 *in_key,
++			       unsigned int key_len)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	return aes_expandkey(ctx, in_key, key_len);
++}
++
++static void aes_riscv32_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	int rounds = 6 + ctx->key_length / 4;
++
++	__aes_riscv32_encrypt(ctx->key_enc, out, in, rounds);
++}
++
++static void aes_riscv32_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++{
++	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	int rounds = 6 + ctx->key_length / 4;
++
++	__aes_riscv32_decrypt(ctx->key_dec, out, in, rounds);
++}
++
++static struct crypto_alg aes_alg = {
++	.cra_name			= "aes",
++	.cra_driver_name		= "aes-riscv32",
++	.cra_priority			= 200,
++	.cra_flags			= CRYPTO_ALG_TYPE_CIPHER,
++	.cra_blocksize			= AES_BLOCK_SIZE,
++	.cra_ctxsize			= sizeof(struct crypto_aes_ctx),
++	.cra_module			= THIS_MODULE,
++
++	.cra_cipher.cia_min_keysize	= AES_MIN_KEY_SIZE,
++	.cra_cipher.cia_max_keysize	= AES_MAX_KEY_SIZE,
++	.cra_cipher.cia_setkey		= aes_riscv32_set_key,
++	.cra_cipher.cia_encrypt		= aes_riscv32_encrypt,
++	.cra_cipher.cia_decrypt		= aes_riscv32_decrypt
++};
++
++static int __init riscv32_aes_init(void)
++{
++	if (!riscv_isa_extension_available(NULL, ZKNE) ||
++	    !riscv_isa_extension_available(NULL, ZKND))
++		return -ENODEV;
++	return crypto_register_alg(&aes_alg);
++}
++
++static void __exit riscv32_aes_fini(void)
++{
++	crypto_unregister_alg(&aes_alg);
++}
++
++module_init(riscv32_aes_init);
++module_exit(riscv32_aes_fini);
++
++MODULE_DESCRIPTION("Scalar AES cipher for riscv32");
++MODULE_AUTHOR("Ard Biesheuvel <ardb@kernel.org>");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_CRYPTO("aes");
+diff --git a/arch/riscv/crypto/aes-riscv32-zkned.S b/arch/riscv/crypto/aes-riscv32-zkned.S
+new file mode 100644
+index 0000000000000000..89276bdc57b0045f
+--- /dev/null
++++ b/arch/riscv/crypto/aes-riscv32-zkned.S
+@@ -0,0 +1,119 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Scalar AES core transform
++ *
++ * Copyright (C) 2023 Google, LLC.
++ * Author: Ard Biesheuvel <ardb@kernel.org>
++ */
++
++#include <linux/linkage.h>
++
++	.irpc	r, 23456789
++	.set	.Ls\r, \r + 16
++	.endr
++
++	// Zkn RV32 opcodes
++	.macro	aes32esmi, rd, rs1, rs2, bs
++	.long	0x26000033 | (\bs << 30) | (.L\rd << 7) | (.L\rs1 << 15) | (.L\rs2 << 20)
++	.endm
++
++	.macro	aes32esi, rd, rs1, rs2, bs
++	.long	0x22000033 | (\bs << 30) | (.L\rd << 7) | (.L\rs1 << 15) | (.L\rs2 << 20)
++	.endm
++
++	.macro	aes32dsmi, rd, rs1, rs2, bs
++	.long	0x2e000033 | (\bs << 30) | (.L\rd << 7) | (.L\rs1 << 15) | (.L\rs2 << 20)
++	.endm
++
++	.macro	aes32dsi, rd, rs1, rs2, bs
++	.long	0x2a000033 | (\bs << 30) | (.L\rd << 7) | (.L\rs1 << 15) | (.L\rs2 << 20)
++	.endm
++
++	// AES quarter round
++	.macro		qround, op, o0, o1, o2, o3, i0, i1, i2, i3, bs
++	aes32\op	\o0, \o0, \i0, \bs
++	aes32\op	\o1, \o1, \i1, \bs
++	aes32\op	\o2, \o2, \i2, \bs
++	aes32\op	\o3, \o3, \i3, \bs
++	.endm
++
++	// One AES round
++	.macro		round, ed, op, o0, o1, o2, o3, i0, i1, i2, i3
++	.ifc		\ed,e
++	qround		e\op, \o0, \o1, \o2, \o3, \i0, \i1, \i2, \i3, 0
++	qround		e\op, \o0, \o1, \o2, \o3, \i1, \i2, \i3, \i0, 1
++	qround		e\op, \o0, \o1, \o2, \o3, \i2, \i3, \i0, \i1, 2
++	qround		e\op, \o0, \o1, \o2, \o3, \i3, \i0, \i1, \i2, 3
++	.else
++	qround		d\op, \o0, \o1, \o2, \o3, \i0, \i1, \i2, \i3, 0
++	qround		d\op, \o0, \o1, \o2, \o3, \i3, \i0, \i1, \i2, 1
++	qround		d\op, \o0, \o1, \o2, \o3, \i2, \i3, \i0, \i1, 2
++	qround		d\op, \o0, \o1, \o2, \o3, \i1, \i2, \i3, \i0, 3
++	.endif
++	.endm
++
++	// Load next round key and advance round key pointer
++	.macro		next_rk, rk, out0, out1, out2, out3
++	lw		\out0, 0(\rk)
++	lw		\out1, 4(\rk)
++	lw		\out2, 8(\rk)
++	lw		\out3, 12(\rk)
++	add		\rk, \rk, 16
++	.endm
++
++	.macro		crypt, ed
++	add		sp, sp, -32
++	sw		s2, 0(sp)
++	sw		s3, 4(sp)
++	sw		s4, 8(sp)
++	sw		s5, 12(sp)
++	sw		s6, 16(sp)
++	sw		s7, 20(sp)
++	sw		s8, 24(sp)
++	sw		s9, 28(sp)
++
++	lw		s2, 0(a2)
++	lw		s3, 4(a2)
++	lw		s4, 8(a2)
++	lw		s5, 12(a2)
++
++	next_rk		a0, s6, s7, s8, s9
++
++	xor		s2, s2, s6
++	xor		s3, s3, s7
++	xor		s4, s4, s8
++	xor		s5, s5, s9
++
++0:	add		a3, a3, -2
++	next_rk		a0, s6, s7, s8, s9
++	round		\ed, smi, s6, s7, s8, s9, s2, s3, s4, s5
++	next_rk		a0, s2, s3, s4, s5
++	beqz		a3, 1f
++	round		\ed, smi, s2, s3, s4, s5, s6, s7, s8, s9
++	j		0b
++1:	round		\ed, si, s2, s3, s4, s5, s6, s7, s8, s9
++
++	sw		s2, 0(a1)
++	sw		s3, 4(a1)
++	sw		s4, 8(a1)
++	sw		s5, 12(a1)
++
++	lw		s2, 0(sp)
++	lw		s3, 4(sp)
++	lw		s4, 8(sp)
++	lw		s5, 12(sp)
++	lw		s6, 16(sp)
++	lw		s7, 20(sp)
++	lw		s8, 24(sp)
++	lw		s9, 28(sp)
++	add		sp, sp, 32
++	ret
++	.endm
++
++SYM_FUNC_START(__aes_riscv32_encrypt)
++	crypt	e
++SYM_FUNC_END(__aes_riscv32_encrypt)
++
++SYM_FUNC_START(__aes_riscv32_decrypt)
++	crypt	d
++SYM_FUNC_END(__aes_riscv32_decrypt)
+-- 
+2.39.2
+
