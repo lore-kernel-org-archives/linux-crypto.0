@@ -2,124 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E18FC001E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 10:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF903C001DC
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 10:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233911AbjGZKkF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 06:40:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33348 "EHLO
+        id S233960AbjGZKny (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 06:43:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbjGZKkE (ORCPT
+        with ESMTP id S233999AbjGZKnx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 06:40:04 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC511BCB;
-        Wed, 26 Jul 2023 03:40:03 -0700 (PDT)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36Q7VZaZ007966;
-        Wed, 26 Jul 2023 12:39:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=W8GLfB17+jUE7Nw68o8tScgzzDDgHpp5NKWkRxESZlI=;
- b=qLRE5+KmvbKk5B/UW10nGEjBoDKipiB1flNkgDwSQYqmZMZdBpctbst7Vwt4EUF87UAQ
- lGs1OpG9iWa7NPx/eqb8ySrQnjHJTDAhdOqjGv8LVHdxJLHd4/JhOqgzW88/jAn5GpJe
- /9sWA3Z+uL0eH5JViXAbOVXN00Amp02Tix6WttAS9w4R9wAmpstvy5KIJGiwDfWDgPWe
- 7Ll7vUdK2tWD46wDK1zTVYHE+KrDhr1nsi10XJw0x7tkd+qwL727Kpu0HqUADsa0lQkG
- 4pxFNpRPxpJfDasvoPH+WokzK6DrXEtEA/wNoEISShjpOySH6a8QFdhtHwnQ+A4I7C3/ 6g== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3s2y641c6j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jul 2023 12:39:37 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id C13A210002A;
-        Wed, 26 Jul 2023 12:39:36 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id B6D7C21787E;
-        Wed, 26 Jul 2023 12:39:36 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 26 Jul
- 2023 12:39:34 +0200
-Message-ID: <9f34d34b-911a-c064-9e44-34e030b76786@foss.st.com>
-Date:   Wed, 26 Jul 2023 12:39:31 +0200
+        Wed, 26 Jul 2023 06:43:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5331B0
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 03:43:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690368188;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=h2bZ6fkGnjjiUXO0kDMBnPkuhQcio8YOy+L/LeFNu98=;
+        b=gdcfP9Sp53D/dO1xJ8aI3nVomSPacy7Q1Q3B7wxx6jocQMRzRvloxF6qlBWyHPgLLmZDMd
+        xWFktEClqiI+4bIyFDrhWC13pIOU1EFPN+YcT5CXEn1z/6uMrVJnEGpbbSpBfNekGm/Qzf
+        D/OhAegGR2ovjEQqNUMB7Xd/O6jZCo0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-376-KcvHA5d_Ni-_yRXPlaRE9g-1; Wed, 26 Jul 2023 06:43:05 -0400
+X-MC-Unique: KcvHA5d_Ni-_yRXPlaRE9g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E937388D7FA;
+        Wed, 26 Jul 2023 10:43:04 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 856E2C2C85C;
+        Wed, 26 Jul 2023 10:43:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <31ddce1d-6014-bf9f-95da-97deb3240606@leemhuis.info>
+References: <31ddce1d-6014-bf9f-95da-97deb3240606@leemhuis.info> <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+To:     Linux regressions mailing list <regressions@lists.linux.dev>
+Cc:     dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: Another regression in the af_alg series (s390x-specific)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v2 05/11] firewall: introduce stm32_firewall framework
-Content-Language: en-US
-To:     Simon Horman <simon.horman@corigine.com>
-CC:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
-        <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20230725164104.273965-1-gatien.chevallier@foss.st.com>
- <20230725164104.273965-6-gatien.chevallier@foss.st.com>
- <ZMDz1AhlEeZTM/vi@corigine.com>
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <ZMDz1AhlEeZTM/vi@corigine.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-26_04,2023-07-25_01,2023-05-22_02
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <20078.1690368182.1@warthog.procyon.org.uk>
+Date:   Wed, 26 Jul 2023 11:43:02 +0100
+Message-ID: <20079.1690368182@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+"Linux regression tracking (Thorsten Leemhuis)" wrote:
 
+> What's the status wrt to this regression (caused by c1abe6f570af from
+> David)? It looks like there never was a real reply and the regression
+> still is unresolved. But maybe I missed something, which can easily
+> happen in my position.
 
-On 7/26/23 12:22, Simon Horman wrote:
-> On Tue, Jul 25, 2023 at 06:40:58PM +0200, Gatien Chevallier wrote:
-> 
-> ...
-> 
->> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
-> 
-> ...
-> 
->> +int stm32_firewall_controller_register(struct stm32_firewall_controller *firewall_controller)
->> +{
->> +	struct stm32_firewall_controller *ctrl;
->> +
->> +	pr_info("Registering %s firewall controller\n", firewall_controller->name);
->> +
->> +	if (!firewall_controller)
->> +		return -ENODEV;
-> 
-> HI Gatien,
-> 
-> Sorry, one more on this patch, that I missed before sending my previous
-> email.
-> 
-> firewall_controller is checked for NULL here.
-> But it is already dereferenced on the line above the check.
-> 
-> Flagged by Smatch.
-> 
-> ...
+I was on holiday when the regression was posted.  This week I've been working
+through various things raised during the last couple of weeks whilst fighting
+an intermittent apparent bug on my desktop kernel somewhere in ext4, the mm
+subsys, md or dm-crypt.
 
-Indeed, thank you. I will change this for V4
+I'll get round to it, but I'll I don't have s390x h/w immediately to hand.
 
-Best regards,
-Gatien
+David
+
