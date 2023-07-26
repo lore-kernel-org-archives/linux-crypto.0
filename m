@@ -2,142 +2,701 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D98A6C001DC
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 19:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBC9C0015E
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 19:38:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjGZTUg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 15:20:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58546 "EHLO
+        id S229500AbjGZTiS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 15:38:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjGZTUg (ORCPT
+        with ESMTP id S229447AbjGZTiR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 15:20:36 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E04A271C;
-        Wed, 26 Jul 2023 12:20:34 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36QJDju9014729;
-        Wed, 26 Jul 2023 19:20:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : references : date : in-reply-to : message-id : mime-version :
- content-type; s=pp1; bh=ULMQmjsjYc30tFAsSDGfTwUEtxmLnFVMNahNtH53+Lk=;
- b=F96ixHS6BPhHO4lQmmVer/GPurx42EFg/eR5AJcqCAK+0qFzk3Itx99mpxslZLORuT/3
- MUD5gvajYpcxyKT62eBg8llT7XWTZE3hjDDUwZrG6SMcmP+qtLsDBSI4LjjwhvmNNOoO
- GYRlNfiUm5gMPmPxTfjq1ow8FHI4zZmcewcpmMJv5xERuql7faRSpxjOX1l0JW0b6yu3
- wSdkwPZKjblhpageWE9ZHGpPi0PcLiLUjhLs4M+Ro6MY5QSjfOGZnUV3J+RmJm2YkYOy
- MZXhlXaCOvx7h/z5Ja76aWYz/vtdY57Oea+l/VKCjW2MCCSvPqI+nq4k+Mcpdi98lDif 5A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s39f9r5wb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jul 2023 19:20:24 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36QJEVpk016128;
-        Wed, 26 Jul 2023 19:20:23 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s39f9r5vx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jul 2023 19:20:23 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36QINM3g002181;
-        Wed, 26 Jul 2023 19:20:22 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0unjq0bj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Jul 2023 19:20:22 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36QJKLCm18285264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Jul 2023 19:20:21 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 027DB20040;
-        Wed, 26 Jul 2023 19:20:21 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A7BB820043;
-        Wed, 26 Jul 2023 19:20:20 +0000 (GMT)
-Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 26 Jul 2023 19:20:20 +0000 (GMT)
-From:   Sven Schnelle <svens@linux.ibm.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        regressions@lists.linux.dev,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>
-Subject: Re: Another regression in the af_alg series (s390x-specific)
-References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
-        <15125.1690385912@warthog.procyon.org.uk>
-Date:   Wed, 26 Jul 2023 21:20:20 +0200
-In-Reply-To: <15125.1690385912@warthog.procyon.org.uk> (David Howells's
-        message of "Wed, 26 Jul 2023 16:38:32 +0100")
-Message-ID: <yt9dsf9abhu3.fsf@linux.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
+        Wed, 26 Jul 2023 15:38:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D9CC19BF
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 12:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690400250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xCZ4b6Vub8LugWoFvo9pw2CaH7zo38gmItiKMFWRby4=;
+        b=e1wamuN/3lQIVudOaG7y8ogf1ZA4vN2kOaZpi9GnwsalWviTAXnpeaUkNG5uqqxi/2PwV7
+        uT2Z/FFm7+mA9054rUT+s/GPd/k94TNvKeXf2P+7ILEu8gIlMqLJiBG9T4RidsgDBoeQij
+        EgfZix7dlvzkjGSA3oL4R2v4lhlBpiw=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-74-dgMXKelTOVGcPoPGevKNYQ-1; Wed, 26 Jul 2023 15:37:29 -0400
+X-MC-Unique: dgMXKelTOVGcPoPGevKNYQ-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-345e7434a79so609665ab.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 12:37:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690400248; x=1691005048;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xCZ4b6Vub8LugWoFvo9pw2CaH7zo38gmItiKMFWRby4=;
+        b=bnefemCcgi1H583ZN0kIVarY3YGBOp0hWEvmQTl2BjgSd0+X9ccnc8olm0CNwzwIqX
+         zbxWdAJzVoKeq9XV45X8jXYqZp3cIkk1URyfRQ9hertDMgw1/9TFEZkA0nxgiZqBj15z
+         aCuE6fxyk0+/54THVR86h5DtKGY5Et+6a5N1G2+YAFY9Y1VFwjIfcwzw5dL+r/ZKHozo
+         PR6ehSClTOtSNGUz77oMphI0eSZpt7ZktT1U1lYsEXCgFE6hutGzLaJU7ZTFjV3wFHD3
+         yCClFXmQPycgjIT5KmaT+S0pwaXuBKiFLcDMpn3JxKOlAOqSyKVmnuIFtfH+jXWv4V2S
+         loZA==
+X-Gm-Message-State: ABy/qLb4B7eeT2kAdMPC39MhJ1kglqlrZ3uiY++UGITCCcm+pLCEwvPS
+        jl14V4usFYdgfTk7vlC7rlueZka3Q7t/l/pnlHFniAByLCluChgN0/Y5ouYATb2586nop/Mx6Hm
+        IWF+LORkJBgc7Et6xY+zrm5yt2WIcvr4b
+X-Received: by 2002:a05:6e02:1aa7:b0:348:d52a:8f8 with SMTP id l7-20020a056e021aa700b00348d52a08f8mr3542231ilv.25.1690400248190;
+        Wed, 26 Jul 2023 12:37:28 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGOLQoFCf3j2FW671lUu5W13tiiWmuRE4IYy/RuwNInzW2K82wOSzmZiJnff0g6ntEcMcyKgw==
+X-Received: by 2002:a05:6e02:1aa7:b0:348:d52a:8f8 with SMTP id l7-20020a056e021aa700b00348d52a08f8mr3542217ilv.25.1690400247885;
+        Wed, 26 Jul 2023 12:37:27 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id a3-20020a92c703000000b00348c6dc6d87sm3077124ilp.73.2023.07.26.12.37.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jul 2023 12:37:27 -0700 (PDT)
+Date:   Wed, 26 Jul 2023 13:37:26 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Xin Zeng <xin.zeng@intel.com>
+Cc:     linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        giovanni.cabiddu@intel.com, andriy.shevchenko@linux.intel.com,
+        Yahui Cao <yahui.cao@intel.com>, jgg@nvidia.com,
+        yishaih@nvidia.com, shameerali.kolothum.thodi@huawei.com,
+        kevin.tian@intel.com
+Subject: Re: [RFC 5/5] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Message-ID: <20230726133726.7e2cf1e8.alex.williamson@redhat.com>
+In-Reply-To: <20230630131304.64243-6-xin.zeng@intel.com>
+References: <20230630131304.64243-1-xin.zeng@intel.com>
+        <20230630131304.64243-6-xin.zeng@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CXFDiluuVty54R36xuRWSL3pcgzLR6cH
-X-Proofpoint-ORIG-GUID: nw-JBIwxoc_g9VInTnoRyxFLBqafpeHa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-26_08,2023-07-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=790
- lowpriorityscore=0 bulkscore=0 spamscore=0 malwarescore=0 adultscore=0
- mlxscore=0 suspectscore=0 priorityscore=1501 clxscore=1011 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307260171
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-David Howells <dhowells@redhat.com> writes:
 
-> Well, I can reproduce it fairly easily.  It seems to be:
->
-> 	static inline void scatterwalk_start(struct scatter_walk *walk,
-> 					     struct scatterlist *sg)
-> 	{
-> 		walk->sg = sg;
-> 		walk->offset = sg->offset;  <----
-> 	}
->
-> Presumably sg is rubbish.
->
-> Dump of assembler code for function gcm_walk_start:
->    0x0000000000000038 <+0>:     jgnop   0x38 <gcm_walk_start>
->    0x000000000000003e <+6>:     xc      8(64,%r2),8(%r2)
->    0x0000000000000044 <+12>:    st      %r4,32(%r2)
->    0x0000000000000048 <+16>:    stg     %r3,0(%r2)
->    0x000000000000004e <+22>:    l       %r1,8(%r3)
->    0x0000000000000052 <+26>:    st      %r1,8(%r2)
->    0x0000000000000056 <+30>:    jg      0x56 <gcm_walk_start+30>
->
-> I'm don't know much about s390x assembly, but I'm guessing %r2 has "walk" and
-> %r3 has "sg".
+Please Cc the vfio-pci variant driver reviewers listed in MAINTAINERS.
+Also useful to put the subsystem maintainer on the cc rather than just
+the list.
 
-Correct. I looked into this today, and it happens with c1abe6f570af
-("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists"),
-but not with the commit before. It also only happens with
-arch/s390/crypto/aes_s390.c, but not with a generic aes implementation.
-I also see the s390 aes driver returning EBADMSG even when it's not
-crashing the kernel, so i wonder wether it's another problem in some
-error path.
+On Fri, 30 Jun 2023 21:13:04 +0800
+Xin Zeng <xin.zeng@intel.com> wrote:
 
-I tried to understand the patch mentioned above, but i never worked with
-the crypto API in recent years, so that would require some learning on
-my side. Adding Harald, maybe he has some more insight.
+> Add vfio pci driver for Intel QAT VF devices.
+> 
+> This driver uses vfio_pci_core to register to the VFIO subsystem. It
+> acts as a vfio agent and interacts with the QAT PF driver to implement
+> VF live migration.
+> 
+> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> ---
+>  drivers/vfio/pci/Kconfig                 |   2 +
+>  drivers/vfio/pci/Makefile                |   1 +
+>  drivers/vfio/pci/qat/Kconfig             |  13 +
+>  drivers/vfio/pci/qat/Makefile            |   4 +
+>  drivers/vfio/pci/qat/qat_vfio_pci_main.c | 518 +++++++++++++++++++++++
 
-> AS:0000000116d50007 R3:0000000000000024 
-> Fault in home space mode while using kernel ASCE.
-> Failing address: 0026070200000000 TEID: 0026070200000803
-> Unable to handle kernel pointer dereference in virtual kernel address space
->
-> Krnl GPRS: 000000000000000c 0000038000000310 00000380002a7938 0026070200000000
->            0000000000000000 0000000115593cb4 0000000000000000 0000000000000010
->            0000000100000000 000000017e984690 000000000000000c 0000000000000000
->            000003ffaf12cf98 0000000000000000 000003ff7fc536ba 00000380002a77e0
->
-> I'm not sure what to make of the 0026070200000000.
+Rename to main.c.
 
-Well, propbably just an arbitry value loaded from corrupted memory.
+>  5 files changed, 538 insertions(+)
+>  create mode 100644 drivers/vfio/pci/qat/Kconfig
+>  create mode 100644 drivers/vfio/pci/qat/Makefile
+>  create mode 100644 drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> 
+> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> index f9d0c908e738..47c9773cf0c7 100644
+> --- a/drivers/vfio/pci/Kconfig
+> +++ b/drivers/vfio/pci/Kconfig
+> @@ -59,4 +59,6 @@ source "drivers/vfio/pci/mlx5/Kconfig"
+>  
+>  source "drivers/vfio/pci/hisilicon/Kconfig"
+>  
+> +source "drivers/vfio/pci/qat/Kconfig"
+> +
+>  endif
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index 24c524224da5..dcc6366df8fa 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -11,3 +11,4 @@ obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+>  obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+>  
+>  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+> +obj-$(CONFIG_QAT_VFIO_PCI) += qat/
+> diff --git a/drivers/vfio/pci/qat/Kconfig b/drivers/vfio/pci/qat/Kconfig
+> new file mode 100644
+> index 000000000000..38e5b4a0ca9c
+> --- /dev/null
+> +++ b/drivers/vfio/pci/qat/Kconfig
+> @@ -0,0 +1,13 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +config QAT_VFIO_PCI
+> +	tristate "VFIO support for QAT VF PCI devices"
+> +	depends on X86
+
+What specific X86 dependency exists here?  CRYPTO_DEV_QAT and the
+various versions of the QAT driver don't seem to have an explicit arch
+dependency, therefore this shouldn't either.
+
+> +	depends on VFIO_PCI_CORE
+
+select VFIO_PCI_CORE, this was updated for all vfio-pci variant drivers
+for v6.5.
+
+> +	depends on CRYPTO_DEV_QAT
+> +	help
+> +	  This provides migration support for Intel(R) QAT Virtual Function
+> +	  using the VFIO framework.
+> +
+> +	  To compile this as a module, choose M here: the module
+> +	  will be called qat_vfio_pci. If you don't know what to do here,
+> +	  say N.
+> diff --git a/drivers/vfio/pci/qat/Makefile b/drivers/vfio/pci/qat/Makefile
+> new file mode 100644
+> index 000000000000..106791887b91
+> --- /dev/null
+> +++ b/drivers/vfio/pci/qat/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +obj-$(CONFIG_QAT_VFIO_PCI) += qat_vfio_pci.o
+> +qat_vfio_pci-y := qat_vfio_pci_main.o
+> +
+> diff --git a/drivers/vfio/pci/qat/qat_vfio_pci_main.c b/drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> new file mode 100644
+> index 000000000000..af971fd05fd2
+> --- /dev/null
+> +++ b/drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> @@ -0,0 +1,518 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright(c) 2023 Intel Corporation */
+> +#include <linux/anon_inodes.h>
+> +#include <linux/container_of.h>
+> +#include <linux/device.h>
+> +#include <linux/file.h>
+> +#include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/pci.h>
+> +#include <linux/sizes.h>
+> +#include <linux/types.h>
+> +#include <linux/uaccess.h>
+> +#include <linux/vfio_pci_core.h>
+> +#include <linux/qat/qat_vf_mig.h>
+> +
+> +struct qat_vf_mig_data {
+> +	u8 state[SZ_4K];
+> +};
+> +
+> +struct qat_vf_migration_file {
+> +	struct file *filp;
+> +	struct mutex lock; /* protect migration region context */
+> +	bool disabled;
+> +
+> +	size_t total_length;
+> +	struct qat_vf_mig_data mig_data;
+> +};
+> +
+> +struct qat_vf_core_device {
+> +	struct vfio_pci_core_device core_device;
+> +	struct pci_dev *parent;
+> +	int vf_id;
+> +
+> +	struct mutex state_mutex; /* protect migration state */
+> +	enum vfio_device_mig_state mig_state;
+> +	struct qat_vf_migration_file *resuming_migf;
+> +	struct qat_vf_migration_file *saving_migf;
+> +};
+> +
+> +static int qat_vf_init(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	return qat_vfmig_init_device(qat_vdev->parent, qat_vdev->vf_id);
+> +}
+> +
+> +static void qat_vf_cleanup(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	qat_vfmig_shutdown_device(qat_vdev->parent, qat_vdev->vf_id);
+> +}
+> +
+> +static int qat_vf_pci_open_device(struct vfio_device *core_vdev)
+> +{
+> +	int ret;
+> +	struct qat_vf_core_device *qat_vdev =
+> +		container_of(core_vdev, struct qat_vf_core_device,
+> +			     core_device.vdev);
+> +	struct vfio_pci_core_device *vdev = &qat_vdev->core_device;
+> +
+> +	ret = vfio_pci_core_enable(vdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = qat_vf_init(qat_vdev);
+> +	if (ret) {
+> +		vfio_pci_core_disable(vdev);
+> +		return ret;
+> +	}
+> +	qat_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+> +
+> +	vfio_pci_core_finish_enable(vdev);
+> +
+> +	return 0;
+> +}
+> +
+> +static void qat_vf_disable_fd(struct qat_vf_migration_file *migf)
+> +{
+> +	mutex_lock(&migf->lock);
+> +	migf->disabled = true;
+> +	migf->total_length = 0;
+> +	migf->filp->f_pos = 0;
+> +	mutex_unlock(&migf->lock);
+> +}
+> +
+> +static void qat_vf_disable_fds(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	if (qat_vdev->resuming_migf) {
+> +		qat_vf_disable_fd(qat_vdev->resuming_migf);
+> +		fput(qat_vdev->resuming_migf->filp);
+> +		qat_vdev->resuming_migf = NULL;
+> +	}
+> +
+> +	if (qat_vdev->saving_migf) {
+> +		qat_vf_disable_fd(qat_vdev->saving_migf);
+> +		fput(qat_vdev->saving_migf->filp);
+> +		qat_vdev->saving_migf = NULL;
+> +	}
+> +}
+> +
+> +static void qat_vf_pci_close_device(struct vfio_device *core_vdev)
+> +{
+> +	struct qat_vf_core_device *qat_vdev = container_of(core_vdev,
+> +			struct qat_vf_core_device, core_device.vdev);
+> +
+> +	qat_vf_cleanup(qat_vdev);
+> +	qat_vf_disable_fds(qat_vdev);
+> +	vfio_pci_core_close_device(core_vdev);
+> +}
+> +
+> +static int qat_vf_stop_device(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	return qat_vfmig_suspend_device(qat_vdev->parent, qat_vdev->vf_id);
+> +}
+> +
+> +static ssize_t qat_vf_save_read(struct file *filp, char __user *buf,
+> +				size_t len, loff_t *pos)
+> +{
+> +	struct qat_vf_migration_file *migf = filp->private_data;
+> +	ssize_t done = 0;
+> +	loff_t *offs;
+> +	int ret;
+> +
+> +	if (pos)
+> +		return -ESPIPE;
+> +	offs = &filp->f_pos;
+> +
+> +	mutex_lock(&migf->lock);
+> +	if (*offs > migf->total_length || *offs < 0) {
+> +		done = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	if (migf->disabled) {
+> +		done = -ENODEV;
+> +		goto out_unlock;
+> +	}
+> +
+> +	len = min_t(size_t, migf->total_length - *offs, len);
+> +	if (len) {
+> +		ret = copy_to_user(buf, &migf->mig_data + *offs, len);
+> +		if (ret) {
+> +			done = -EFAULT;
+> +			goto out_unlock;
+> +		}
+> +		*offs += len;
+> +		done = len;
+> +	}
+> +
+> +out_unlock:
+> +	mutex_unlock(&migf->lock);
+> +	return done;
+> +}
+> +
+> +static int qat_vf_release_file(struct inode *inode, struct file *filp)
+> +{
+> +	struct qat_vf_migration_file *migf = filp->private_data;
+> +
+> +	qat_vf_disable_fd(migf);
+> +	mutex_destroy(&migf->lock);
+> +	kfree(migf);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct file_operations qat_vf_save_fops = {
+> +	.owner = THIS_MODULE,
+> +	.read = qat_vf_save_read,
+> +	.release = qat_vf_release_file,
+> +	.llseek = no_llseek,
+> +};
+> +
+> +static int qat_vf_save_state(struct qat_vf_core_device *qat_vdev,
+> +			     struct qat_vf_migration_file *migf)
+> +{
+> +	struct qat_vf_mig_data *mig_data = &migf->mig_data;
+> +	int ret;
+> +
+> +	ret = qat_vfmig_save_state(qat_vdev->parent, qat_vdev->vf_id,
+> +				   mig_data->state,
+> +				   sizeof(mig_data->state));
+> +	if (ret)
+> +		return ret;
+> +
+> +	migf->total_length = sizeof(struct qat_vf_mig_data);
+> +
+> +	return 0;
+> +}
+> +
+> +static struct qat_vf_migration_file *
+> +qat_vf_save_device_data(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	struct qat_vf_migration_file *migf;
+> +	int ret;
+> +
+> +	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
+> +	if (!migf)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	migf->filp = anon_inode_getfile("qat_vf_mig", &qat_vf_save_fops,
+> +					migf, O_RDONLY);
+> +	ret = PTR_ERR_OR_ZERO(migf->filp);
+> +	if (ret) {
+> +		kfree(migf);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	stream_open(migf->filp->f_inode, migf->filp);
+> +	mutex_init(&migf->lock);
+> +
+> +	ret = qat_vf_save_state(qat_vdev, migf);
+> +	if (ret) {
+> +		fput(migf->filp);
+> +		kfree(migf);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	return migf;
+> +}
+> +
+> +static ssize_t qat_vf_resume_write(struct file *filp, const char __user *buf,
+> +				   size_t len, loff_t *pos)
+> +{
+> +	struct qat_vf_migration_file *migf = filp->private_data;
+> +	loff_t requested_length;
+> +	ssize_t done = 0;
+> +	loff_t *offs;
+> +	int ret;
+> +
+> +	if (pos)
+> +		return -ESPIPE;
+> +	offs = &filp->f_pos;
+> +
+> +	if (*offs < 0 ||
+> +	    check_add_overflow((loff_t)len, *offs, &requested_length))
+> +		return -EOVERFLOW;
+> +
+> +	if (requested_length > sizeof(struct qat_vf_mig_data))
+> +		return -ENOMEM;
+> +
+> +	mutex_lock(&migf->lock);
+> +	if (migf->disabled) {
+> +		done = -ENODEV;
+> +		goto out_unlock;
+> +	}
+> +
+> +	ret = copy_from_user(&migf->mig_data + *offs, buf, len);
+> +	if (ret) {
+> +		done = -EFAULT;
+> +		goto out_unlock;
+> +	}
+> +	*offs += len;
+> +	done = len;
+> +	migf->total_length += len;
+> +
+> +out_unlock:
+> +	mutex_unlock(&migf->lock);
+> +	return done;
+> +}
+> +
+> +static const struct file_operations qat_vf_resume_fops = {
+> +	.owner = THIS_MODULE,
+> +	.write = qat_vf_resume_write,
+> +	.release = qat_vf_release_file,
+> +	.llseek = no_llseek,
+> +};
+> +
+> +static struct qat_vf_migration_file *
+> +qat_vf_resume_device_data(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	struct qat_vf_migration_file *migf;
+> +	int ret;
+> +
+> +	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
+> +	if (!migf)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	migf->filp = anon_inode_getfile("qat_vf_mig", &qat_vf_resume_fops,
+> +					migf, O_WRONLY);
+> +	ret = PTR_ERR_OR_ZERO(migf->filp);
+> +	if (ret) {
+> +		kfree(migf);
+> +		return ERR_PTR(ret);
+> +	}
+> +	stream_open(migf->filp->f_inode, migf->filp);
+> +	mutex_init(&migf->lock);
+> +
+> +	return migf;
+> +}
+> +
+> +static int qat_vf_load_state(struct qat_vf_core_device *qat_vdev,
+> +			     struct qat_vf_migration_file *migf)
+> +{
+> +	struct qat_vf_mig_data *mig_data = &migf->mig_data;
+> +
+> +	return qat_vfmig_load_state(qat_vdev->parent, qat_vdev->vf_id,
+> +				    mig_data->state,
+> +				    sizeof(mig_data->state));
+> +}
+> +
+> +static int qat_vf_load_device_data(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	return qat_vf_load_state(qat_vdev, qat_vdev->resuming_migf);
+> +}
+> +
+> +static int qat_vf_start_device(struct qat_vf_core_device *qat_vdev)
+> +{
+> +	return qat_vfmig_resume_device(qat_vdev->parent, qat_vdev->vf_id);
+> +}
+> +
+> +static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_device *qat_vdev, u32 new)
+> +{
+> +	u32 cur = qat_vdev->mig_state;
+> +	int ret;
+> +
+> +	if (cur == VFIO_DEVICE_STATE_RUNNING  && new == VFIO_DEVICE_STATE_STOP) {
+> +		ret = qat_vf_stop_device(qat_vdev);
+> +		if (ret)
+> +			return ERR_PTR(ret);
+> +		return NULL;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_STOP_COPY) {
+> +		struct qat_vf_migration_file *migf;
+> +
+> +		migf = qat_vf_save_device_data(qat_vdev);
+> +		if (IS_ERR(migf))
+> +			return ERR_CAST(migf);
+> +		get_file(migf->filp);
+> +		qat_vdev->saving_migf = migf;
+> +		return migf->filp;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) {
+> +		qat_vf_disable_fds(qat_vdev);
+> +		return NULL;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RESUMING) {
+> +		struct qat_vf_migration_file *migf;
+> +
+> +		migf = qat_vf_resume_device_data(qat_vdev);
+> +		if (IS_ERR(migf))
+> +			return ERR_CAST(migf);
+> +		get_file(migf->filp);
+> +		qat_vdev->resuming_migf = migf;
+> +		return migf->filp;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP) {
+> +		ret = qat_vf_load_device_data(qat_vdev);
+> +		if (ret)
+> +			return ERR_PTR(ret);
+> +
+> +		qat_vf_disable_fds(qat_vdev);
+> +		return NULL;
+> +	}
+> +
+> +	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RUNNING) {
+> +		qat_vf_start_device(qat_vdev);
+> +		return NULL;
+> +	}
+> +
+> +	/* vfio_mig_get_next_state() does not use arcs other than the above */
+> +	WARN_ON(true);
+> +	return ERR_PTR(-EINVAL);
+> +}
+> +
+> +static struct file *qat_vf_pci_set_device_state(struct vfio_device *vdev,
+> +						enum vfio_device_mig_state new_state)
+> +{
+> +	struct qat_vf_core_device *qat_vdev = container_of(vdev,
+> +			struct qat_vf_core_device, core_device.vdev);
+> +	enum vfio_device_mig_state next_state;
+> +	struct file *res = NULL;
+> +	int ret;
+> +
+> +	mutex_lock(&qat_vdev->state_mutex);
+> +	while (new_state != qat_vdev->mig_state) {
+> +		ret = vfio_mig_get_next_state(vdev, qat_vdev->mig_state,
+> +					      new_state, &next_state);
+> +		if (ret) {
+> +			res = ERR_PTR(-EINVAL);
+> +			break;
+> +		}
+> +
+> +		res = qat_vf_pci_step_device_state(qat_vdev, next_state);
+> +		if (IS_ERR(res))
+> +			break;
+> +		qat_vdev->mig_state = next_state;
+> +		if (WARN_ON(res && new_state != qat_vdev->mig_state)) {
+> +			fput(res);
+> +			res = ERR_PTR(-EINVAL);
+> +			break;
+> +		}
+> +	}
+> +	mutex_unlock(&qat_vdev->state_mutex);
+> +
+> +	return res;
+> +}
+> +
+> +static int qat_vf_pci_get_device_state(struct vfio_device *vdev,
+> +				       enum vfio_device_mig_state *curr_state)
+> +{
+> +	struct qat_vf_core_device *qat_vdev = container_of(vdev,
+> +			struct qat_vf_core_device, core_device.vdev);
+> +
+> +	mutex_lock(&qat_vdev->state_mutex);
+> +	*curr_state = qat_vdev->mig_state;
+> +	mutex_unlock(&qat_vdev->state_mutex);
+> +
+> +	return 0;
+> +}
+> +
+> +static int qat_vf_pci_get_data_size(struct vfio_device *vdev,
+> +				    unsigned long *stop_copy_length)
+> +{
+> +	*stop_copy_length = sizeof(struct qat_vf_mig_data);
+> +	return 0;
+> +}
+> +
+> +static const struct vfio_migration_ops qat_vf_pci_mig_ops = {
+> +	.migration_set_state = qat_vf_pci_set_device_state,
+> +	.migration_get_state = qat_vf_pci_get_device_state,
+> +	.migration_get_data_size = qat_vf_pci_get_data_size,
+> +};
+> +
+> +static int qat_vf_pci_init_dev(struct vfio_device *core_vdev)
+> +{
+> +	struct qat_vf_core_device *qat_vdev = container_of(core_vdev,
+> +			struct qat_vf_core_device, core_device.vdev);
+> +
+> +	mutex_init(&qat_vdev->state_mutex);
+> +
+> +	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY;
+> +	core_vdev->mig_ops = &qat_vf_pci_mig_ops;
+> +
+> +	return vfio_pci_core_init_dev(core_vdev);
+> +}
+> +
+> +static const struct vfio_device_ops qat_vf_pci_ops = {
+> +	.name = "qat-vf-vfio-pci",
+> +	.init = qat_vf_pci_init_dev,
+> +	.release = vfio_pci_core_release_dev,
+> +	.open_device = qat_vf_pci_open_device,
+> +	.close_device = qat_vf_pci_close_device,
+> +	.ioctl = vfio_pci_core_ioctl,
+> +	.read = vfio_pci_core_read,
+> +	.write = vfio_pci_core_write,
+> +	.mmap = vfio_pci_core_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +	.bind_iommufd = vfio_iommufd_physical_bind,
+> +	.unbind_iommufd = vfio_iommufd_physical_unbind,
+> +	.attach_ioas = vfio_iommufd_physical_attach_ioas,
+> +};
+> +
+> +static int
+> +qat_vf_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct qat_vf_core_device *qat_vdev;
+> +	int ret;
+> +
+> +	qat_vdev = vfio_alloc_device(qat_vf_core_device, core_device.vdev, dev, &qat_vf_pci_ops);
+> +	if (IS_ERR(qat_vdev))
+> +		return PTR_ERR(qat_vdev);
+> +
+> +	qat_vdev->vf_id = pci_iov_vf_id(pdev);
+> +	qat_vdev->parent = pdev->physfn;
+> +	if (!qat_vdev->parent || qat_vdev->vf_id < 0)
+> +		return -EINVAL;
+> +
+> +	pci_set_drvdata(pdev, &qat_vdev->core_device);
+> +	ret = vfio_pci_core_register_device(&qat_vdev->core_device);
+> +	if (ret)
+> +		goto out_put_device;
+> +
+> +	return 0;
+> +
+> +out_put_device:
+> +	vfio_put_device(&qat_vdev->core_device.vdev);
+> +	return ret;
+> +}
+> +
+> +static struct qat_vf_core_device *qat_vf_drvdata(struct pci_dev *pdev)
+> +{
+> +	struct vfio_pci_core_device *core_device = pci_get_drvdata(pdev);
+> +
+> +	return container_of(core_device, struct qat_vf_core_device, core_device);
+> +}
+> +
+> +static void qat_vf_vfio_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct qat_vf_core_device *qat_vdev = qat_vf_drvdata(pdev);
+> +
+> +	vfio_pci_core_unregister_device(&qat_vdev->core_device);
+> +	vfio_put_device(&qat_vdev->core_device.vdev);
+> +}
+> +
+> +static const struct pci_device_id qat_vf_vfio_pci_table[] = {
+> +	/* Intel QAT GEN4 4xxx VF device */
+> +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4941) },
+
+Should this driver depend on CRYPTO_DEV_QAT_4XXX if that's the only
+supported PF driver?
+
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(pci, qat_vf_vfio_pci_table);
+> +
+> +static struct pci_driver qat_vf_vfio_pci_driver = {
+> +	.name = "qat_vfio_pci",
+> +	.id_table = qat_vf_vfio_pci_table,
+> +	.probe = qat_vf_vfio_pci_probe,
+> +	.remove = qat_vf_vfio_pci_remove,
+> +	.driver_managed_dma = true,
+> +};
+> +module_pci_driver(qat_vf_vfio_pci_driver)
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Intel Corporation");
+> +MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live migration support for Intel(R) QAT device family");
+
+Or at least one version of the QAT device family ;)  Thanks,
+
+Alex
+
