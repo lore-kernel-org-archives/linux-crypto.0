@@ -2,205 +2,137 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF72C001E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 20:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2B3C41513
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jul 2023 21:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230232AbjGZUh2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 16:37:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59132 "EHLO
+        id S229506AbjGZVyQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jul 2023 17:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbjGZUh1 (ORCPT
+        with ESMTP id S229907AbjGZVyQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 16:37:27 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40952701;
-        Wed, 26 Jul 2023 13:37:25 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9ba3d6157so2527171fa.3;
-        Wed, 26 Jul 2023 13:37:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690403844; x=1691008644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0lwD0XW5XNFFxl46sPGBkyRuR0c2+TXyAF+CGil8NRI=;
-        b=WBqtUarSorotOYNCJWkNReSAf19CXEDpnJUFPGIYyvbDGPlIhT1+vr65mlLeyLiFth
-         GmCuACdJUKmp+aXMjQJaPSWfUyQzmfkXHGzk1XVUCq+ELSSJcCrHrh6NujIUxHhB+pw6
-         nrYhrtteDJSDiCNTnF299w8Z9/ab/lCPugj6dQRq2KaUlgPuKoQROhjcGJ8gNM13Bqq6
-         HXJ0oEeCTipLRP3OmuZJqKsKtZxr2J8MAGrlTNRyxx+TIF/yZUzVNn9X44NDKlLi5I1l
-         PROjUW0OkV6M0DhbGgLHOtqYwRlhKYlkumzwjTCDK8bK1/gq+2Hvl44iae7i0AeSagm4
-         dsUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690403844; x=1691008644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0lwD0XW5XNFFxl46sPGBkyRuR0c2+TXyAF+CGil8NRI=;
-        b=KIeyFqN3IrEPVStL8fHKKTBEc61YjKglY7MV8QLhdRs4w3hHd+BIJd/rGgpRtteHeM
-         ULe/wPZ/s22nwauGlOPb/0omYiRFlZTiV+m9BOCEAKxGO/wQtKBhHFd86jipOmVAWmKj
-         3WL83AaYdrIZ+GSblrFyYfWz2N5BFlyHHnOfzYdD2Xp7C/9inJ4AAMaQIzEffzmanCp4
-         wy2hQSCglKo7ievZpjeCKBLQzEp5LQbg6+eMF4XowBuA0W9vdFr0AvVu/00xJx+1e1bu
-         Qv/nEDV28WiypPjauHBQg2owMGaWSMiQZHlnD87S+Z9B3T6awYKQlBqyWpDvlBJdmsja
-         K0mA==
-X-Gm-Message-State: ABy/qLYXjZhn3ocZZW+AaEQCCUHyP+dx46werLhdSdWxqzC766UPg8aJ
-        ha2HAcPhnB+pzl2PHOCHAnUDSWA8p00vyg/hMI4=
-X-Google-Smtp-Source: APBJJlEBZjUVEWmH37ptqLNcNX8TxOf/NsFag9dWp+iIhP+gTcIv5RvFOUu1qEFSS9+AlBqg9RVIEdg2dS0OjOpUZFE=
-X-Received: by 2002:a2e:8490:0:b0:2b6:9afe:191c with SMTP id
- b16-20020a2e8490000000b002b69afe191cmr129103ljh.7.1690403843955; Wed, 26 Jul
- 2023 13:37:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20571.1690369076@warthog.procyon.org.uk> <416eca24-6baf-69d9-21a2-c434a9744596@redhat.com>
-In-Reply-To: <416eca24-6baf-69d9-21a2-c434a9744596@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 26 Jul 2023 15:37:12 -0500
-Message-ID: <CAH2r5mtMLQ91znvYP71s_K7uS_HibC_yOpkZea-f=+NteFJyPg@mail.gmail.com>
-Subject: Re: [PATCH] crypto, cifs: Fix error handling in extract_iter_to_sg()
-To:     David Hildenbrand <david@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steve French <sfrench@samba.org>, akpm@linux-foundation.org,
+        Wed, 26 Jul 2023 17:54:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E61B21BD5
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 14:53:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1690408406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IYYNLALC24HXACra46BapqSwKx6bYQvG9NeNwuOaFoA=;
+        b=C9+uZo9JnZo00eC+K2XureZa/PCrUW9cvNvI4dXZLcGs3pHcg0S4Ss90T8iZv1oBwFeFIT
+        6dLgTU2ll8XLdrvDQvpbXXNz61Qnxs14WyzP8eYFVLV14thVRJFT4kUCGW7cUGk1vXwIq2
+        rAs9lfmJEGSecO2mXphKH3FYn8ex9Ng=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-593-BPv7HgEGMKuBxzs7DOfL6Q-1; Wed, 26 Jul 2023 17:53:22 -0400
+X-MC-Unique: BPv7HgEGMKuBxzs7DOfL6Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E9FF71C0754A;
+        Wed, 26 Jul 2023 21:53:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.131])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0FC262166B25;
+        Wed, 26 Jul 2023 21:53:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+To:     =?us-ascii?Q?=3D=3FUTF-8=3FB=3FT25kcmVqIE1vc27DocSNZWs=3D=3F=3D?= 
+        <omosnacek@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     dhowells@redhat.com, Paolo Abeni <pabeni@redhat.com>,
         Sven Schnelle <svens@linux.ibm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jeff Layton <jlayton@kernel.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, linux-cachefs@redhat.com,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, regressions@lists.linux.dev,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 26 Jul 2023 22:53:19 +0100
+Message-ID: <97730.1690408399@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Acked-off-by: Steve French <stfrench@microsoft.com>
+=20=20=20=20
+Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to point
+to the scatterlist array in areq->first_rsgl.sgl.sgl.
 
-On Wed, Jul 26, 2023 at 8:56=E2=80=AFAM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> On 26.07.23 12:57, David Howells wrote:
-> >
-> > Fix error handling in extract_iter_to_sg().  Pages need to be unpinned,=
- not
-> > put in extract_user_to_sg() when handling IOVEC/UBUF sources.
-> >
-> > The bug may result in a warning like the following:
-> >
-> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 __lse_atomic_add arch/arm=
-64/include/asm/atomic_lse.h:27 [inline]
-> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 arch_atomic_add arch/arm6=
-4/include/asm/atomic.h:28 [inline]
-> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 raw_atomic_add include/li=
-nux/atomic/atomic-arch-fallback.h:537 [inline]
-> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 atomic_add include/linux/=
-atomic/atomic-instrumented.h:105 [inline]
-> >    WARNING: CPU: 1 PID: 20384 at mm/gup.c:229 try_grab_page+0x108/0x160=
- mm/gup.c:252
-> >    ...
-> >    pc : try_grab_page+0x108/0x160 mm/gup.c:229
-> >    lr : follow_page_pte+0x174/0x3e4 mm/gup.c:651
-> >    ...
-> >    Call trace:
-> >     __lse_atomic_add arch/arm64/include/asm/atomic_lse.h:27 [inline]
-> >     arch_atomic_add arch/arm64/include/asm/atomic.h:28 [inline]
-> >     raw_atomic_add include/linux/atomic/atomic-arch-fallback.h:537 [inl=
-ine]
-> >     atomic_add include/linux/atomic/atomic-instrumented.h:105 [inline]
-> >     try_grab_page+0x108/0x160 mm/gup.c:252
-> >     follow_pmd_mask mm/gup.c:734 [inline]
-> >     follow_pud_mask mm/gup.c:765 [inline]
-> >     follow_p4d_mask mm/gup.c:782 [inline]
-> >     follow_page_mask+0x12c/0x2e4 mm/gup.c:839
-> >     __get_user_pages+0x174/0x30c mm/gup.c:1217
-> >     __get_user_pages_locked mm/gup.c:1448 [inline]
-> >     __gup_longterm_locked+0x94/0x8f4 mm/gup.c:2142
-> >     internal_get_user_pages_fast+0x970/0xb60 mm/gup.c:3140
-> >     pin_user_pages_fast+0x4c/0x60 mm/gup.c:3246
-> >     iov_iter_extract_user_pages lib/iov_iter.c:1768 [inline]
-> >     iov_iter_extract_pages+0xc8/0x54c lib/iov_iter.c:1831
-> >     extract_user_to_sg lib/scatterlist.c:1123 [inline]
-> >     extract_iter_to_sg lib/scatterlist.c:1349 [inline]
-> >     extract_iter_to_sg+0x26c/0x6fc lib/scatterlist.c:1339
-> >     hash_sendmsg+0xc0/0x43c crypto/algif_hash.c:117
-> >     sock_sendmsg_nosec net/socket.c:725 [inline]
-> >     sock_sendmsg+0x54/0x60 net/socket.c:748
-> >     ____sys_sendmsg+0x270/0x2ac net/socket.c:2494
-> >     ___sys_sendmsg+0x80/0xdc net/socket.c:2548
-> >     __sys_sendmsg+0x68/0xc4 net/socket.c:2577
-> >     __do_sys_sendmsg net/socket.c:2586 [inline]
-> >     __se_sys_sendmsg net/socket.c:2584 [inline]
-> >     __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2584
-> >     __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
-> >     invoke_syscall+0x48/0x114 arch/arm64/kernel/syscall.c:52
-> >     el0_svc_common.constprop.0+0x44/0xe4 arch/arm64/kernel/syscall.c:14=
-2
-> >     do_el0_svc+0x38/0xa4 arch/arm64/kernel/syscall.c:191
-> >     el0_svc+0x2c/0xb0 arch/arm64/kernel/entry-common.c:647
-> >     el0t_64_sync_handler+0xc0/0xc4 arch/arm64/kernel/entry-common.c:665
-> >     el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:591
-> >
-> > Fixes: 018584697533 ("netfs: Add a function to extract an iterator into=
- a scatterlist")
-> > Reported-by: syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com
-> > Link: https://lore.kernel.org/linux-mm/000000000000273d0105ff97bf56@goo=
-gle.com/
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > cc: Sven Schnelle <svens@linux.ibm.com>
-> > cc: akpm@linux-foundation.org
-> > cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > cc: "David S. Miller" <davem@davemloft.net>
-> > cc: Jeff Layton <jlayton@kernel.org>
-> > cc: Steve French <sfrench@samba.org>
-> > cc: Shyam Prasad N <nspmangalore@gmail.com>
-> > cc: Rohith Surabattula <rohiths.msft@gmail.com>
-> > cc: Jens Axboe <axboe@kernel.dk>
-> > cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > cc: "David S. Miller" <davem@davemloft.net>
-> > cc: Eric Dumazet <edumazet@google.com>
-> > cc: Jakub Kicinski <kuba@kernel.org>
-> > cc: Paolo Abeni <pabeni@redhat.com>
-> > cc: Matthew Wilcox <willy@infradead.org>
-> > cc: linux-mm@kvack.org
-> > cc: linux-crypto@vger.kernel.org
-> > cc: linux-cachefs@redhat.com
-> > cc: linux-cifs@vger.kernel.org
-> > cc: linux-fsdevel@vger.kernel.org
-> > cc: netdev@vger.kernel.org
-> > ---
-> >   lib/scatterlist.c |    2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-> > index e86231a44c3d..c65566b4dc66 100644
-> > --- a/lib/scatterlist.c
-> > +++ b/lib/scatterlist.c
-> > @@ -1148,7 +1148,7 @@ static ssize_t extract_user_to_sg(struct iov_iter=
- *iter,
-> >
-> >   failed:
-> >       while (sgtable->nents > sgtable->orig_nents)
-> > -             put_page(sg_page(&sgtable->sgl[--sgtable->nents]));
-> > +             unpin_user_page(sg_page(&sgtable->sgl[--sgtable->nents]))=
-;
-> >       return res;
-> >   }
-> >
-> >
->
-> Reviewed-by: David Hildenbrand <david@redhat.com>
->
-> --
-> Cheers,
->
-> David / dhildenb
->
+Without this, the gcm-aes-s390 driver will oops when it tries to do
+gcm_walk_start() on req->dst because req->dst is set to the value of
+areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
+aead_request_set_crypt().
 
+The problem comes if an empty ciphertext is passed: the loop in
+af_alg_get_rsgl() just passes straight out and doesn't set areq->first_rsgl
+up.
 
---=20
-Thanks,
+This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as far
+as I can tell, that ignores req->dst and only uses req->src[*].
 
-Steve
+[*] Is this a bug in aesni-intel_glue.c?
+
+The s390x oops looks something like:
+
+ Unable to handle kernel pointer dereference in virtual kernel address space
+ Failing address: 0000000a00000000 TEID: 0000000a00000803
+ Fault in home space mode while using kernel ASCE.
+ AS:00000000a43a0007 R3:0000000000000024
+ Oops: 003b ilc:2 [#1] SMP
+ ...
+ Call Trace:
+  [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
+  [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
+  [<00000000a2a60888>] aead_recvmsg+0x478/0x698
+  [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
+  [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
+  [<00000000a273e066>] vfs_read+0x26e/0x2a8
+  [<00000000a273e8c4>] ksys_read+0xbc/0x100
+  [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
+  [<00000000a312ff30>] system_call+0x70/0x98
+ Last Breaking-Event-Address:
+  [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
+
+Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create sc=
+atterlists")
+Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqB=
+hubxyk_A@mail.gmail.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: Sven Schnelle <svens@linux.ibm.com>
+cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-crypto@vger.kernel.org
+cc: linux-s390@vger.kernel.org
+cc: regressions@lists.linux.dev
+---
+ crypto/af_alg.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 06b15b9f661c..9ee8575d3b1a 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct soc=
+k *sk,
+=20
+ 	areq->areqlen =3D areqlen;
+ 	areq->sk =3D sk;
++	areq->first_rsgl.sgl.sgt.sgl =3D areq->first_rsgl.sgl.sgl;
+ 	areq->last_rsgl =3D NULL;
+ 	INIT_LIST_HEAD(&areq->rsgl_list);
+ 	areq->tsgl =3D NULL;
+
