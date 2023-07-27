@@ -2,132 +2,177 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 692A8C0015E
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jul 2023 02:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35CCC001DC
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jul 2023 05:47:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbjG0CY4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jul 2023 22:24:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43872 "EHLO
+        id S232505AbjG0FrQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jul 2023 01:47:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbjG0CYz (ORCPT
+        with ESMTP id S231548AbjG0Fq6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jul 2023 22:24:55 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5842685;
-        Wed, 26 Jul 2023 19:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690424693; x=1721960693;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=C264Jlx7omC2IGbVFzDmPqjvhYuKy5hrLHi7x8Hv+9c=;
-  b=Vki36Vsu7/8gw7GL9qR60DP29aPUgksJuoGStuI4EG8FAZUKbfs+50Bd
-   Pk1EXxDxloB6YRPMGeipNkkXtrXc76rlsPZls5nuGVsFEz9WhXHny1zwJ
-   idpVqJAOnpVRTkj0U5O7a9kwqm2AVX3XnlmtD4XyHNQ4+lZNKB00Lc0Nt
-   qad571F/KQ+wUKyevLkll1N/+6F+YpMpAJZ59y9Y2TFj2sb29wD7Ofxh5
-   VrCHCKrzenTNMVivz0Ff5Iuc68xIXQF4eb6erfKfCZPFaRGui7ADXGkKV
-   HMCvtBx13dSewZRIRah+RDFNvFzszbKV1Mjx27qf64HJSzuSJ9jVHUxqW
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="371794980"
-X-IronPort-AV: E=Sophos;i="6.01,233,1684825200"; 
-   d="scan'208";a="371794980"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2023 19:24:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10783"; a="850685813"
-X-IronPort-AV: E=Sophos;i="6.01,233,1684825200"; 
-   d="scan'208";a="850685813"
-Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 26 Jul 2023 19:24:48 -0700
-Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qOqgJ-0001aK-1P;
-        Thu, 27 Jul 2023 02:24:47 +0000
-Date:   Thu, 27 Jul 2023 10:24:30 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     LeoLiu-oc <LeoLiu-oc@zhaoxin.com>, olivia@selenic.com,
-        herbert@gondor.apana.org.au, jiajie.ho@starfivetech.com,
-        conor.dooley@microchip.com, martin@kaiser.cx, mmyangfl@gmail.com,
-        jenny.zhang@starfivetech.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        leoliu@zhaoxin.com, CobeChen@zhaoxin.com, YunShen@zhaoxin.com,
-        TonyWWang@zhaoxin.com, leoliu-oc <leoliu-oc@zhaoxin.com>
-Subject: Re: [PATCH] hwrng: add Zhaoxin HW RNG driver
-Message-ID: <202307271008.RbzxDGux-lkp@intel.com>
-References: <20230726113553.1965627-1-LeoLiu-oc@zhaoxin.com>
+        Thu, 27 Jul 2023 01:46:58 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145ED3C00
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 22:46:16 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bbc7b2133fso3515565ad.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 22:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1690436775; x=1691041575;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EUn9yYpipOsPEKP8WCT3aJstBvAywf03drnVcolpjFQ=;
+        b=T0m50/Ab2Zy9M/PiC+pYMHYO68NQ8ZURcm02JQndKWBBa5y5sZNk5CBcNEshS5mD1n
+         3kp82ZVL3VL2TaBNU7kE6X1JB8CXnCzmpOhquDiQw/4sAqwh1S84fXd0Il9ihjO6A7T9
+         CH1SxbDnOjBqMFaKEzYT9PY/VxS1fIv1FkSXcN+eC200RaqVn2cJ/l1SAZj/iP+EPguh
+         76ZeAF3KtsB0HIXSCHaSxdL6dn68SZ/N7K4bnD/eCg4izDDP3BR+Ry4EveGb1V6ALBS+
+         sliowhwvrgWtsoTYdGFcpGUBBVeS1pkkw+moKE+WK5jaefGvvkogR+VuPdlcsyEGEf4R
+         8mdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690436775; x=1691041575;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EUn9yYpipOsPEKP8WCT3aJstBvAywf03drnVcolpjFQ=;
+        b=aSIiWT6rGi+erDVE+/mRATtA9JzOdO5T7ThwVG10Sy8b0ZEy3TZHKzByRtmlnXNnl4
+         aOGXdWD//7slvZgNkqAq7xLCO/9wePRJSQrK6TbDCuC6HHlP+SPdGlBQ/erU/EgCyy7P
+         enploWiRpzA6yqd0kIe1n5wz7YCG7+iY/HvhXli0QEz5OUH/+VrSFWAR7YgOgKn/JBlY
+         gN8NvUx33A8Jcnd0d0C1c1uGbcbv17BbQhoih0+LYt93TnMl6SqDiAGOOqDfhipTzdkW
+         z1u441a6iTsKdRc84yLn2CN2vQrlWD2K899gzVBXwuUUU1YZAsMxKp+kFe+WiSPUXBfv
+         NtjQ==
+X-Gm-Message-State: ABy/qLYvRxN2dSFp1/DZnTO3wYzDHssFqzqySQ1bly5F7lSMpR5sEZ6N
+        IrMJSn9UVOJB3wSRrajvwm9soA==
+X-Google-Smtp-Source: APBJJlE3Ta64vctib96xNN471wnaq/5n6QG87YGVu++oTzT/S44ftJCxLMUGZn/ELwioFYqemFntnQ==
+X-Received: by 2002:a17:902:7882:b0:1b8:59f0:c748 with SMTP id q2-20020a170902788200b001b859f0c748mr3620942pll.2.1690436774805;
+        Wed, 26 Jul 2023 22:46:14 -0700 (PDT)
+Received: from [10.0.2.15] ([82.78.167.79])
+        by smtp.gmail.com with ESMTPSA id jn13-20020a170903050d00b001b895a17429sm560862plb.280.2023.07.26.22.46.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jul 2023 22:46:14 -0700 (PDT)
+Message-ID: <3202ac5b-a697-64b0-375c-d2ae2aa9ffdd@tuxon.dev>
+Date:   Thu, 27 Jul 2023 08:46:00 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230726113553.1965627-1-LeoLiu-oc@zhaoxin.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
+Content-Language: en-US
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Yangtao Li <frank.li@vivo.com>,
+        Sergiu Moga <sergiu.moga@microchip.com>,
+        Ryan Wanner <Ryan.Wanner@microchip.com>,
+        Gaosheng Cui <cuigaosheng1@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <20230724135327.1173309-1-arnd@kernel.org>
+From:   claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20230724135327.1173309-1-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi LeoLiu-oc,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master linus/master v6.5-rc3 next-20230726]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/LeoLiu-oc/hwrng-add-Zhaoxin-HW-RNG-driver/20230726-193710
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20230726113553.1965627-1-LeoLiu-oc%40zhaoxin.com
-patch subject: [PATCH] hwrng: add Zhaoxin HW RNG driver
-config: i386-randconfig-i014-20230726 (https://download.01.org/0day-ci/archive/20230727/202307271008.RbzxDGux-lkp@intel.com/config)
-compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
-reproduce: (https://download.01.org/0day-ci/archive/20230727/202307271008.RbzxDGux-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307271008.RbzxDGux-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/char/hw_random/zhaoxin-rng.c:58:2: error: register %rcx is only available in 64-bit mode
-           "movq %0, %%rcx\n"
-           ^
-   <inline asm>:1:13: note: instantiated into assembly here
-           movq %eax, %rcx
-                      ^~~~
->> drivers/char/hw_random/zhaoxin-rng.c:59:3: error: register %rdx is only available in 64-bit mode
-           "movq %1, %%rdx\n"
-            ^
-   <inline asm>:2:12: note: instantiated into assembly here
-   movq %ecx, %rdx
-              ^~~~
->> drivers/char/hw_random/zhaoxin-rng.c:60:3: error: register %rdi is only available in 64-bit mode
-           "movq %2, %%rdi\n"
-            ^
-   <inline asm>:3:12: note: instantiated into assembly here
-   movq %edx, %rdi
-              ^~~~
-   3 errors generated.
 
 
-vim +58 drivers/char/hw_random/zhaoxin-rng.c
+On 24.07.2023 16:53, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Some configurations with gcc-12 or gcc-13 produce a warning for the source
+> and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
+> overlapping:
+> 
+> In file included from include/linux/string.h:254,
+>                   from drivers/crypto/atmel-sha.c:15:
+> drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
+> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
+>     57 | #define __underlying_memcpy     __builtin_memcpy
+>        |                                 ^
+> include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
+>    648 |         __underlying_##op(p, q, __fortify_size);                        \
+>        |         ^~~~~~~~~~~~~
+> include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
+>    693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+>        |                          ^~~~~~~~~~~~~~~~~~~~
+> drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
+>   1773 |         memcpy(hmac->opad, hmac->ipad, bs);
+>        |         ^~~~~~
+> 
+> The same thing happens in two more drivers that have the same logic:
+> 
+> drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_ahash_setkey':
+> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 260 and 132 overlaps 1 or more bytes at offset 260 [-Werror=restrict]
+> drivers/crypto/bcm/cipher.c: In function 'ahash_hmac_setkey':
+> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing between 129 and 4294967295 bytes at offsets 840 and 712 overlaps between 1 and 4294967167 bytes at offset 840 [-Werror=restrict]
+> 
+> I don't think it can actually happen because the size is strictly bounded
+> to the available block sizes, at most 128 bytes, though inlining decisions
+> could lead gcc to not see that.
+> 
+> Add an explicit size check to make sure gcc also sees this function is safe
+> regardless of inlining.
+> 
+> Note that the -Wrestrict warning is currently disabled by default, but it
+> would be nice to finally enable it, and these are the only false
+> postives that I see at the moment. There are 9 other crypto drivers that
+> also use an identical memcpy() but don't show up in randconfig build
+> warnings for me, presumably because of different inlining decisions.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-    54	
-    55	static inline int rep_xstore(size_t size, size_t factor, void *result)
-    56	{
-    57		__asm__ __volatile__ (
-  > 58		"movq %0, %%rcx\n"
-  > 59		"movq %1, %%rdx\n"
-  > 60		"movq %2, %%rdi\n"
-    61		".byte 0xf3, 0x0f, 0xa7, 0xc0"
-    62		:
-    63		: "r"(size), "r"(factor), "r"(result)
-    64		: "%rcx", "%rdx", "%rdi", "memory");
-    65	
-    66		return 0;
-    67	}
-    68	
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev> # atmel-sha
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> ---
+>   drivers/crypto/atmel-sha.c         | 3 +++
+>   drivers/crypto/bcm/cipher.c        | 3 +++
+>   drivers/crypto/chelsio/chcr_algo.c | 3 +++
+>   3 files changed, 9 insertions(+)
+> 
+> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+> index f2031f934be95..52a3c81b3a05a 100644
+> --- a/drivers/crypto/atmel-sha.c
+> +++ b/drivers/crypto/atmel-sha.c
+> @@ -1770,6 +1770,9 @@ static int atmel_sha_hmac_compute_ipad_hash(struct atmel_sha_dev *dd)
+>   	size_t bs = ctx->block_size;
+>   	size_t i, num_words = bs / sizeof(u32);
+>   
+> +	if (bs > sizeof(hmac->opad))
+> +		return -EINVAL;
+> +
+>   	memcpy(hmac->opad, hmac->ipad, bs);
+>   	for (i = 0; i < num_words; ++i) {
+>   		hmac->ipad[i] ^= 0x36363636;
+> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+> index 70b911baab26d..8633ca0286a10 100644
+> --- a/drivers/crypto/bcm/cipher.c
+> +++ b/drivers/crypto/bcm/cipher.c
+> @@ -2327,6 +2327,9 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
+>   		 __func__, ahash, key, keylen, blocksize, digestsize);
+>   	flow_dump("  key: ", key, keylen);
+>   
+> +	if (blocksize > sizeof(ctx->opad))
+> +		return -EINVAL;
+> +
+>   	if (keylen > blocksize) {
+>   		switch (ctx->auth.alg) {
+>   		case HASH_ALG_MD5:
+> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+> index 0eade4fa6695b..5c8e10ee010ff 100644
+> --- a/drivers/crypto/chelsio/chcr_algo.c
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -2201,6 +2201,9 @@ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
+>   
+>   	SHASH_DESC_ON_STACK(shash, hmacctx->base_hash);
+>   
+> +	if (bs > sizeof(hmacctx->opad))
+> +		return -EINVAL;
+> +
+>   	/* use the key to calculate the ipad and opad. ipad will sent with the
+>   	 * first request's data. opad will be sent with the final hash result
+>   	 * ipad in hmacctx->ipad and opad in hmacctx->opad location
