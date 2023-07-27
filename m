@@ -2,94 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72712C0015E
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jul 2023 12:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00201C04A94
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jul 2023 19:15:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231403AbjG0M70 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jul 2023 08:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50696 "EHLO
+        id S230055AbjG0TPG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jul 2023 15:15:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjG0M70 (ORCPT
+        with ESMTP id S229445AbjG0TPF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jul 2023 08:59:26 -0400
-X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 27 Jul 2023 05:59:24 PDT
-Received: from out-72.mta0.migadu.com (out-72.mta0.migadu.com [91.218.175.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7551FF3
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jul 2023 05:59:24 -0700 (PDT)
-Message-ID: <fd31dc60-67b2-8ed8-c941-2b5be777070a@metacode.biz>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=metacode.biz;
-        s=key1; t=1690462310;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=5Ea2gmz0MdCBxa+HEcK95BhQfrehkp+yw528Jq3QupU=;
-        b=nheMZ5tz/yEszU0lRdFelm6Pn+g+fAZMbxqRgri0XCOYaQj1oiVTOQi8Ib7Jf7UESnqMKC
-        HmCqfO44uNTsWAbVbKdscrJ+98B917aycd7wDyJQXp+MtAl5Mfqa8t+I2VAmfS/BhfwdrN
-        I2+YInB1JIPdtXGpVPY61VjOP/BNaCI=
-Date:   Thu, 27 Jul 2023 14:51:47 +0200
+        Thu, 27 Jul 2023 15:15:05 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A28962735;
+        Thu, 27 Jul 2023 12:15:03 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99b9161b94aso174696066b.1;
+        Thu, 27 Jul 2023 12:15:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20221208; t=1690485302; x=1691090102;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S3mLrIEj6i09sZTd8OZW9bqC9iQyhJ5LXxHWMM4QrZY=;
+        b=Ed3WOFVlxxamSM13Mr4fMTkJyvhgXdfRjANj6CrginYJFyFM41FDvfaK2vEJ5lwNc0
+         GCkIfkbG9ZzIQwucDgCEIA7MmvO+nPemT0JAPfHH9B8cDGWSFaPuX9GjHJc8r6fiF0kn
+         c0J2EhpZMe7ibv9H00kQN/D+KPpdnbpTq3ISAInV0aj6BJMX6+Pxd6jbQeiVObPG/t0Y
+         I2q5Fq01wTc26v18AQLeyxsN7Nyk7CFrdsz0KsgLwEL5dZ5o7QZ/SdhRZ+ikg/qXYtJQ
+         5S1SS6l0X9C0fjahWw+fRxzAs2LRucCLwD9x7LSR5Hbvtetua/jA+LA+qtNO13QNZK+j
+         BwPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690485302; x=1691090102;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S3mLrIEj6i09sZTd8OZW9bqC9iQyhJ5LXxHWMM4QrZY=;
+        b=ca7LUv5yqL4cBmb115mh98kzekTU0Qpgkfb2GVC0Dko8zfj1YB5noyz7G5BDTSrU3d
+         B1pafNxNoDWaZeW2Y7t2UECsARAdDke87EQgWXzT4jcbDsvXuh2DH/B7cElOZBZm4+I7
+         yMhn+5KGz+ZisrzMWnKeiVlc7DGfpgRPvZLniSvuJtfXNxeto2TgMqXUGD+lIngdavbE
+         HGCs6cUHfomyxCdk62iaol3ILAVnj6t8vt1ZiBT7hy4so6jxasfGPXhpOZD4hVkOtiBm
+         PrdcpnPiSj8+axcWQZXsSgjhL4eG+dwaxyNFYmXktd0oI6YXLz8jBuOTTCOS5MZEWYxw
+         Cf6w==
+X-Gm-Message-State: ABy/qLZQcC5zeB+JuF6eHLVugxTH2mRrMbIxIWugAAZfaia0aFkFZVwz
+        1qFrkTHs9DocT5UDDGGEqalmfXXMcn51+BQ6ynw=
+X-Google-Smtp-Source: APBJJlHqe8Db9+ktxLkIwQKQ2FJd+P31M6a8NsywGTFbag00ryYo1w0bdwp358gbe5zeurhcoNMOkxR2lEulMI9JAmU=
+X-Received: by 2002:a17:906:3189:b0:99b:c35a:8865 with SMTP id
+ 9-20020a170906318900b0099bc35a8865mr113365ejy.1.1690485301887; Thu, 27 Jul
+ 2023 12:15:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Language: en-US, pl-PL
-To:     linux-crypto@vger.kernel.org
-Cc:     Puru Kulkarni <puruk@protonmail.com>,
-        Puru Kulkarni <puruk@juniper.net>,
-        Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        devel@lists.sequoia-pgp.org
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Wiktor Kwapisiewicz <wiktor@metacode.biz>
-Subject: Kernel Crypto exposing asymmetric operations to userland via libkcapi
-Organization: Metacode
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20230725141252.98848-1-avromanov@sberdevices.ru> <20230725141252.98848-2-avromanov@sberdevices.ru>
+In-Reply-To: <20230725141252.98848-2-avromanov@sberdevices.ru>
+From:   Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Thu, 27 Jul 2023 21:14:51 +0200
+Message-ID: <CAFBinCBLjE051KeFzFZzjc=0ZuMHOQwRfWasxWRUOSwQO3jqYg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] drivers: rng: add check status bit feature
+To:     Alexey Romanov <avromanov@sberdevices.ru>
+Cc:     narmstrong@baylibre.com, neil.armstrong@linaro.org,
+        olivia@selenic.com, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, khilman@baylibre.com, jbrunet@baylibre.com,
+        f.fainelli@gmail.com, hkallweit1@gmail.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        kernel@sberdevices.ru
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Kernel Crypto folks,
+Hello Alexey,
 
-I've got a question about the Kernel Crypto API.
+On Tue, Jul 25, 2023 at 4:13=E2=80=AFPM Alexey Romanov <avromanov@sberdevic=
+es.ru> wrote:
+[...]
+>  static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool=
+ wait)
+>  {
+>         struct meson_rng_data *data =3D
+>                         container_of(rng, struct meson_rng_data, rng);
+> +       const struct meson_rng_priv *priv =3D data->priv;
+> +
+> +       if (priv->check_status_bit) {
+> +               void __iomem *cfg_addr =3D data->base + priv->cfg_offset;
+> +               int err;
+Have you considered just creating two separate functions:
+- meson_rng_read
+- meson_s4_rng_read
 
-I'm working on adding a cryptographic backend based on the Kernel Crypto 
-API to Sequoia PGP [0][1]. Sequoia supports several cryptographical 
-backends already but using Kernel Crypto would allow us to significantly 
-reduce dependencies when running on Linux.
+Then you don't need all of these if/else.
+You can even skip the whole offset description in your new struct
+meson_rng_priv.
+All of this can make the code easier to understand.
 
-After implementing hashes, AEAD encryption and symmetric ciphers, I 
-noticed that the libkcapi API for asymmetric ciphers (and ECDH) is not 
-working. The libkcapi maintainer kindly explained [2] that the patches 
-that they proposed for inclusion in the kernel [3] were not merged.
+> +               writel_relaxed(readl_relaxed(cfg_addr) | BIT(SEED_READY_S=
+TS_BIT), cfg_addr);
+Why not just #define SEED_READY_STS as BIT(...) right away?
 
-I looked up the relevant thread [4], read it thoroughly and from what I 
-can see most of the arguments are about private keys not being 
-sufficiently protected and extensibility concerns with regards to keys 
-stored in hardware security modules (TPMs etc.).
 
-However, these are mostly irrelevant to the Sequoia PGP use case, since 
-private keys in software that we read do not need additional protection 
-(as they are available for software anyway). We'd still like to use them 
-for signing, decryption, verification and encryption. As for keys stored 
-in HSMs we handle access to them in userland via our keystore module [5].
-
-My question is: Would it be possible to revisit the decision to expose 
-operations with asymmetric keys (including ECDH) in Linux Crypto thus 
-allowing libkcapi to work with non-patched kernels?
-
-I'd like to help make this happen and I think there are other projects 
-that are interested in a complete cryptographic suite of Kernel Crypto 
-functions available in user-land.
-
-Thank you for your time!
-
-Kind regards,
-Wiktor
-
-[0]: https://gitlab.com/sequoia-pgp/sequoia/-/issues/1030
-[1]: 
-https://lists.sequoia-pgp.org/hyperkitty/list/devel@lists.sequoia-pgp.org/thread/ZU64CWYZ26OH5TH6PR3BBLDYDDZ6COLH/
-[2]: https://github.com/smuellerDD/libkcapi/issues/164
-[3]: 
-https://github.com/smuellerDD/libkcapi/blob/master/kernel-patches/4.15-rc3/asym/v10-0000-cover-letter.patch
-[4]: 
-https://lkml.kernel.org/lkml/9859277.cZClo5B21s@tauon.atsec.com/T/#m0dfdbd363d4419c7a2470ef884a33dbb250b6df1
-[5]: https://gitlab.com/sequoia-pgp/sequoia-keystore
+Best regards,
+Martin
