@@ -2,177 +2,175 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35CCC001DC
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jul 2023 05:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C0FC0015E
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jul 2023 05:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232505AbjG0FrQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jul 2023 01:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34922 "EHLO
+        id S232537AbjG0F4w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jul 2023 01:56:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231548AbjG0Fq6 (ORCPT
+        with ESMTP id S232753AbjG0F43 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jul 2023 01:46:58 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 145ED3C00
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 22:46:16 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bbc7b2133fso3515565ad.1
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jul 2023 22:46:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1690436775; x=1691041575;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EUn9yYpipOsPEKP8WCT3aJstBvAywf03drnVcolpjFQ=;
-        b=T0m50/Ab2Zy9M/PiC+pYMHYO68NQ8ZURcm02JQndKWBBa5y5sZNk5CBcNEshS5mD1n
-         3kp82ZVL3VL2TaBNU7kE6X1JB8CXnCzmpOhquDiQw/4sAqwh1S84fXd0Il9ihjO6A7T9
-         CH1SxbDnOjBqMFaKEzYT9PY/VxS1fIv1FkSXcN+eC200RaqVn2cJ/l1SAZj/iP+EPguh
-         76ZeAF3KtsB0HIXSCHaSxdL6dn68SZ/N7K4bnD/eCg4izDDP3BR+Ry4EveGb1V6ALBS+
-         sliowhwvrgWtsoTYdGFcpGUBBVeS1pkkw+moKE+WK5jaefGvvkogR+VuPdlcsyEGEf4R
-         8mdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690436775; x=1691041575;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EUn9yYpipOsPEKP8WCT3aJstBvAywf03drnVcolpjFQ=;
-        b=aSIiWT6rGi+erDVE+/mRATtA9JzOdO5T7ThwVG10Sy8b0ZEy3TZHKzByRtmlnXNnl4
-         aOGXdWD//7slvZgNkqAq7xLCO/9wePRJSQrK6TbDCuC6HHlP+SPdGlBQ/erU/EgCyy7P
-         enploWiRpzA6yqd0kIe1n5wz7YCG7+iY/HvhXli0QEz5OUH/+VrSFWAR7YgOgKn/JBlY
-         gN8NvUx33A8Jcnd0d0C1c1uGbcbv17BbQhoih0+LYt93TnMl6SqDiAGOOqDfhipTzdkW
-         z1u441a6iTsKdRc84yLn2CN2vQrlWD2K899gzVBXwuUUU1YZAsMxKp+kFe+WiSPUXBfv
-         NtjQ==
-X-Gm-Message-State: ABy/qLYvRxN2dSFp1/DZnTO3wYzDHssFqzqySQ1bly5F7lSMpR5sEZ6N
-        IrMJSn9UVOJB3wSRrajvwm9soA==
-X-Google-Smtp-Source: APBJJlE3Ta64vctib96xNN471wnaq/5n6QG87YGVu++oTzT/S44ftJCxLMUGZn/ELwioFYqemFntnQ==
-X-Received: by 2002:a17:902:7882:b0:1b8:59f0:c748 with SMTP id q2-20020a170902788200b001b859f0c748mr3620942pll.2.1690436774805;
-        Wed, 26 Jul 2023 22:46:14 -0700 (PDT)
-Received: from [10.0.2.15] ([82.78.167.79])
-        by smtp.gmail.com with ESMTPSA id jn13-20020a170903050d00b001b895a17429sm560862plb.280.2023.07.26.22.46.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jul 2023 22:46:14 -0700 (PDT)
-Message-ID: <3202ac5b-a697-64b0-375c-d2ae2aa9ffdd@tuxon.dev>
-Date:   Thu, 27 Jul 2023 08:46:00 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
-Content-Language: en-US
-To:     Arnd Bergmann <arnd@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Yangtao Li <frank.li@vivo.com>,
-        Sergiu Moga <sergiu.moga@microchip.com>,
-        Ryan Wanner <Ryan.Wanner@microchip.com>,
-        Gaosheng Cui <cuigaosheng1@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Thu, 27 Jul 2023 01:56:29 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA03130D7;
+        Wed, 26 Jul 2023 22:55:46 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36R5qxTj018845;
+        Thu, 27 Jul 2023 05:55:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : references : date : in-reply-to : message-id : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=o+EIBjujxUgUO2otmKEQSeb4Vv3m4Ywk+cFlo5Tu4sc=;
+ b=RPw1QxQsDTWZXKUS044YRNVdeBGnJCTiLuvsu510FNjN2gvNYa52pIcRXAvkhhsSwbmh
+ IWK1sEja39IoBLMsUO8kL8JWMysL9jpAOj+GcHo9uPcatI4nmnNufi5taVnW5xe7GDnE
+ 3VhBlKiPhrHeX/GqbZFLjiKvxTFPxyFuqqfq0Vy/jBX4JWRNOGYyFfb7nDSnb+rIlBST
+ xH1t6RYrxsGgC5ElTqIIg11wX4vissuyFXxboyHOeW5h1hKh63GdARGmOHE2NrfAzbOO
+ mBP5On0Opi5f9AS7S+28Nvkgv+RdQ0JQ2DySY9oji9LtRZthsGgd2uNmRSqSH8Az/3+h PQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3jtp011v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 05:55:22 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 36R5sHW5021175;
+        Thu, 27 Jul 2023 05:55:22 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s3jtp0119-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 05:55:22 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 36R5AEXP026209;
+        Thu, 27 Jul 2023 05:55:21 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s0sesbecd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 05:55:21 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 36R5tJX619595956
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jul 2023 05:55:19 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A7E3D2004B;
+        Thu, 27 Jul 2023 05:55:19 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4CB1020040;
+        Thu, 27 Jul 2023 05:55:19 +0000 (GMT)
+Received: from tuxmaker.linux.ibm.com (unknown [9.152.85.9])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu, 27 Jul 2023 05:55:19 +0000 (GMT)
+From:   Sven Schnelle <svens@linux.ibm.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     =?us-ascii?Q?=3D=3FUTF-8=3FB=3FT25kcmVqIE1vc27DocSNZWs=3D=3F=3D?= 
+        <omosnacek@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, regressions@lists.linux.dev,
         linux-kernel@vger.kernel.org
-References: <20230724135327.1173309-1-arnd@kernel.org>
-From:   claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <20230724135327.1173309-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
+References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+        <97730.1690408399@warthog.procyon.org.uk>
+Date:   Thu, 27 Jul 2023 07:55:18 +0200
+In-Reply-To: <97730.1690408399@warthog.procyon.org.uk> (David Howells's
+        message of "Wed, 26 Jul 2023 22:53:19 +0100")
+Message-ID: <yt9dbkfxsxtl.fsf@linux.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.0.50 (gnu/linux)
+Content-Type: text/plain; charset=utf-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jEHmCZ_RSXWAXdm5e4N3Lm_egRSNPA8H
+X-Proofpoint-GUID: w2jNjsW5JfH-1HDwdVHh2Yyp_g7YSTeI
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-26_08,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 priorityscore=1501
+ malwarescore=0 spamscore=0 bulkscore=0 impostorscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307270049
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+David Howells <dhowells@redhat.com> writes:
 
-
-On 24.07.2023 16:53, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Some configurations with gcc-12 or gcc-13 produce a warning for the source
-> and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
-> overlapping:
-> 
-> In file included from include/linux/string.h:254,
->                   from drivers/crypto/atmel-sha.c:15:
-> drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
-> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
->     57 | #define __underlying_memcpy     __builtin_memcpy
->        |                                 ^
-> include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
->    648 |         __underlying_##op(p, q, __fortify_size);                        \
->        |         ^~~~~~~~~~~~~
-> include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
->    693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
->        |                          ^~~~~~~~~~~~~~~~~~~~
-> drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
->   1773 |         memcpy(hmac->opad, hmac->ipad, bs);
->        |         ^~~~~~
-> 
-> The same thing happens in two more drivers that have the same logic:
-> 
-> drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_ahash_setkey':
-> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 260 and 132 overlaps 1 or more bytes at offset 260 [-Werror=restrict]
-> drivers/crypto/bcm/cipher.c: In function 'ahash_hmac_setkey':
-> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing between 129 and 4294967295 bytes at offsets 840 and 712 overlaps between 1 and 4294967167 bytes at offset 840 [-Werror=restrict]
-> 
-> I don't think it can actually happen because the size is strictly bounded
-> to the available block sizes, at most 128 bytes, though inlining decisions
-> could lead gcc to not see that.
-> 
-> Add an explicit size check to make sure gcc also sees this function is safe
-> regardless of inlining.
-> 
-> Note that the -Wrestrict warning is currently disabled by default, but it
-> would be nice to finally enable it, and these are the only false
-> postives that I see at the moment. There are 9 other crypto drivers that
-> also use an identical memcpy() but don't show up in randconfig build
-> warnings for me, presumably because of different inlining decisions.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-
-Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev> # atmel-sha
-
+>=20=20=20=20=20
+> Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to poi=
+nt
+> to the scatterlist array in areq->first_rsgl.sgl.sgl.
+>
+> Without this, the gcm-aes-s390 driver will oops when it tries to do
+> gcm_walk_start() on req->dst because req->dst is set to the value of
+> areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
+> aead_request_set_crypt().
+>
+> The problem comes if an empty ciphertext is passed: the loop in
+> af_alg_get_rsgl() just passes straight out and doesn't set areq->first_rs=
+gl
+> up.
+>
+> This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as far
+> as I can tell, that ignores req->dst and only uses req->src[*].
+>
+> [*] Is this a bug in aesni-intel_glue.c?
+>
+> The s390x oops looks something like:
+>
+>  Unable to handle kernel pointer dereference in virtual kernel address sp=
+ace
+>  Failing address: 0000000a00000000 TEID: 0000000a00000803
+>  Fault in home space mode while using kernel ASCE.
+>  AS:00000000a43a0007 R3:0000000000000024
+>  Oops: 003b ilc:2 [#1] SMP
+>  ...
+>  Call Trace:
+>   [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
+>   [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
+>   [<00000000a2a60888>] aead_recvmsg+0x478/0x698
+>   [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
+>   [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
+>   [<00000000a273e066>] vfs_read+0x26e/0x2a8
+>   [<00000000a273e8c4>] ksys_read+0xbc/0x100
+>   [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
+>   [<00000000a312ff30>] system_call+0x70/0x98
+>  Last Breaking-Event-Address:
+>   [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
+>
+> Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create =
+scatterlists")
+> Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+> Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStP=
+qBhubxyk_A@mail.gmail.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: Sven Schnelle <svens@linux.ibm.com>
+> cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: linux-crypto@vger.kernel.org
+> cc: linux-s390@vger.kernel.org
+> cc: regressions@lists.linux.dev
 > ---
->   drivers/crypto/atmel-sha.c         | 3 +++
->   drivers/crypto/bcm/cipher.c        | 3 +++
->   drivers/crypto/chelsio/chcr_algo.c | 3 +++
->   3 files changed, 9 insertions(+)
-> 
-> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-> index f2031f934be95..52a3c81b3a05a 100644
-> --- a/drivers/crypto/atmel-sha.c
-> +++ b/drivers/crypto/atmel-sha.c
-> @@ -1770,6 +1770,9 @@ static int atmel_sha_hmac_compute_ipad_hash(struct atmel_sha_dev *dd)
->   	size_t bs = ctx->block_size;
->   	size_t i, num_words = bs / sizeof(u32);
->   
-> +	if (bs > sizeof(hmac->opad))
-> +		return -EINVAL;
-> +
->   	memcpy(hmac->opad, hmac->ipad, bs);
->   	for (i = 0; i < num_words; ++i) {
->   		hmac->ipad[i] ^= 0x36363636;
-> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-> index 70b911baab26d..8633ca0286a10 100644
-> --- a/drivers/crypto/bcm/cipher.c
-> +++ b/drivers/crypto/bcm/cipher.c
-> @@ -2327,6 +2327,9 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
->   		 __func__, ahash, key, keylen, blocksize, digestsize);
->   	flow_dump("  key: ", key, keylen);
->   
-> +	if (blocksize > sizeof(ctx->opad))
-> +		return -EINVAL;
-> +
->   	if (keylen > blocksize) {
->   		switch (ctx->auth.alg) {
->   		case HASH_ALG_MD5:
-> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-> index 0eade4fa6695b..5c8e10ee010ff 100644
-> --- a/drivers/crypto/chelsio/chcr_algo.c
-> +++ b/drivers/crypto/chelsio/chcr_algo.c
-> @@ -2201,6 +2201,9 @@ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
->   
->   	SHASH_DESC_ON_STACK(shash, hmacctx->base_hash);
->   
-> +	if (bs > sizeof(hmacctx->opad))
-> +		return -EINVAL;
-> +
->   	/* use the key to calculate the ipad and opad. ipad will sent with the
->   	 * first request's data. opad will be sent with the final hash result
->   	 * ipad in hmacctx->ipad and opad in hmacctx->opad location
+>  crypto/af_alg.c |    1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> index 06b15b9f661c..9ee8575d3b1a 100644
+> --- a/crypto/af_alg.c
+> +++ b/crypto/af_alg.c
+> @@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct s=
+ock *sk,
+>=20=20
+>  	areq->areqlen =3D areqlen;
+>  	areq->sk =3D sk;
+> +	areq->first_rsgl.sgl.sgt.sgl =3D areq->first_rsgl.sgl.sgl;
+>  	areq->last_rsgl =3D NULL;
+>  	INIT_LIST_HEAD(&areq->rsgl_list);
+>  	areq->tsgl =3D NULL;
+
+Just tested, with this fix the kernel no longer crashes. Thanks!
+
+Tested-by: Sven Schnelle <svens@linux.ibm.com>
