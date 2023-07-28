@@ -2,88 +2,289 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 315CBC001E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 11:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EB5C41513
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 13:49:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236328AbjG1Lwf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jul 2023 07:52:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47256 "EHLO
+        id S236901AbjG1NtB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jul 2023 09:49:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236085AbjG1Lwf (ORCPT
+        with ESMTP id S235955AbjG1Ns4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2023 07:52:35 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F193ABA
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Jul 2023 04:52:33 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-98e011f45ffso274667766b.3
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Jul 2023 04:52:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1690545152; x=1691149952;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iiua700OASvsqx+4N6h+76MQoIGha7eYc6GZhNCHoSg=;
-        b=zP6ATR3sH7pclpk8xF0g/e7n9NSYW+DyV1gKVzZ2V3cTxBzlPpZRL8DQR/JRF0/lU1
-         Niw9y4ADhCkzQqqQINcCHKXTmafHkV6sJcG5i8DdYVyjteUEIUjs4O2Dkv0QBvl3aa7h
-         eCGei7kTQ9ri/Ip5bfqT9UWnpBRwZUP900ACSNTD9CoMORZF/GrF/Sn8eUr44L+Ij/xg
-         3221NlFXn7HDv/N0CsTp4WrKj/LAWXh2QWfMd7U1dBl0yGHRA6iQAaOA1HyfR6QQRrRz
-         +xkFQJK76bUPrQ3k2fRfckKQH44Rf4XGQoeUQ90bubiN+YxiUTQxZNDCrJ4EpBJWs2iv
-         vF+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690545152; x=1691149952;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iiua700OASvsqx+4N6h+76MQoIGha7eYc6GZhNCHoSg=;
-        b=YHAqn174nJG45fCmTjAOlY7ML6LqLLjBXLP1P3fauoP5ISa6ZL+d8iYUXU4BfTnvLm
-         9RxBMX4YAU2Ds93QPuIe9NekoBnKnicO615FZUJWC1cQpGpFQBifiVEef/yWOWFGYJ7r
-         vpdQ2qtD3MG0YleHwR/8A4tVjEua1en9R1bQK74IlGuN+UQIbWMrkdyagp+MjPUfIBOM
-         XL4Qh7tYgknQSvpbklWluSoJ1fDn0Qtn+Q67OGnehFUjbHJonkN7kr0jXXbcMA8aUsIn
-         6yr43UVrNcUbyOWUlg2sH9Kw3XCBbEsQOlMxOPPk3epbRVjBlUm0uWJNJgFc6G3BadSA
-         QRoA==
-X-Gm-Message-State: ABy/qLZAtlnQXAcuA4xHqQm6X7LllBRahtJGjoQtV5aRVLwuU74SZJbX
-        Z7z3CdMtwPSei1nkcYbNewQa8w==
-X-Google-Smtp-Source: APBJJlHNFxtHHADT5A5mi91qIiLOJkthz65ykm4RsB2Iw1LptVsPGrHt6ovpSdG+WRxjW7mSwhw02g==
-X-Received: by 2002:a17:907:781a:b0:993:ea6b:edf6 with SMTP id la26-20020a170907781a00b00993ea6bedf6mr1865674ejc.0.1690545152266;
-        Fri, 28 Jul 2023 04:52:32 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.223.104])
-        by smtp.gmail.com with ESMTPSA id t7-20020a1709063e4700b0098d15d170a0sm1960002eji.202.2023.07.28.04.52.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Jul 2023 04:52:31 -0700 (PDT)
-Message-ID: <234b1c9e-728b-3c24-a03d-c068a1d75b52@linaro.org>
-Date:   Fri, 28 Jul 2023 13:52:30 +0200
+        Fri, 28 Jul 2023 09:48:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF3A4495;
+        Fri, 28 Jul 2023 06:48:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 97D0161F9C;
+        Fri, 28 Jul 2023 13:48:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C30CDC433C8;
+        Fri, 28 Jul 2023 13:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690552125;
+        bh=7lriKnjSzsL6NUBoZ2qDUpXUnUvaQF/GYKBnxTvTZ5w=;
+        h=From:To:Cc:Subject:Date:From;
+        b=aNF07MRBOHTU8baIAQfyAHkKYGZGnf+FSa/gKNQYfAZzBsyJmp+PZNRbrIJ436+ZD
+         FC6YWvl06ztVQ1PjoCqQsp8yFTGvciP/noD1f6rHrOTjfx25nfbkbVpmVNJzkHtNH7
+         LLOhJa7gBxAWsS8KFBJgQyRq/czHc3oU5swwWt5YXLVksykwYZ2T7miNjJvC565of+
+         WFPr2ulhkWVyRrPpoxP0ou4q3O9KOPoLiDYJnSOhlSPdbwBaE/UILM0bODo2VhBvNS
+         chz22/Sm2QMGPCUknt9Y/UesPLdtj5pDHrG6TdBGLxXsHyPm8FuBcZLrIBSZTdV3p3
+         PmT89LTND8sng==
+Received: (nullmailer pid 3224486 invoked by uid 1000);
+        Fri, 28 Jul 2023 13:48:41 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        Florian Fainelli <florian.fainelli@broadcom.com>,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        Avi Fishman <avifishman70@gmail.com>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Tali Perry <tali.perry1@gmail.com>,
+        Patrick Venture <venture@google.com>,
+        Nancy Yuen <yuenn@google.com>,
+        Benjamin Fair <benjaminfair@google.com>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc:     devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, openbmc@lists.ozlabs.org,
+        linuxppc-dev@lists.ozlabs.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Subject: [PATCH v3] hwrng: Explicitly include correct DT includes
+Date:   Fri, 28 Jul 2023 07:48:27 -0600
+Message-Id: <20230728134828.3224218-1-robh@kernel.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3 22/50] dt-bindings: rng: atmel,at91-trng: add sam9x7
- TRNG
-Content-Language: en-US
-To:     Varshini Rajendran <varshini.rajendran@microchip.com>,
-        olivia@selenic.com, herbert@gondor.apana.org.au,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, nicolas.ferre@microchip.com,
-        alexandre.belloni@bootlin.com, claudiu.beznea@microchip.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20230728102701.266408-1-varshini.rajendran@microchip.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230728102701.266408-1-varshini.rajendran@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 28/07/2023 12:27, Varshini Rajendran wrote:
-> Add compatbile for Microchip sam9x7 TRNG.
-> 
-> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-> ---
->  Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml | 4 ++++
->  1 file changed, 4 insertions(+)
+The DT of_device.h and of_platform.h date back to the separate
+of_platform_bus_type before it was merged into the regular platform bus.
+As part of that merge prepping Arm DT support 13 years ago, they
+"temporarily" include each other. They also include platform_device.h
+and of.h. As a result, there's a pretty much random mix of those include
+files used throughout the tree. In order to detangle these headers and
+replace the implicit includes with struct declarations, users need to
+explicitly include the correct includes.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+v3:
+ - Split out hw_random, ipmi and tpm
+v2:
+ - Fix build for pic32-rng.c dropping of_match_ptr()
+---
+ drivers/char/hw_random/atmel-rng.c     | 2 +-
+ drivers/char/hw_random/bcm2835-rng.c   | 3 +--
+ drivers/char/hw_random/ingenic-trng.c  | 2 +-
+ drivers/char/hw_random/iproc-rng200.c  | 3 +--
+ drivers/char/hw_random/npcm-rng.c      | 3 +--
+ drivers/char/hw_random/omap-rng.c      | 2 --
+ drivers/char/hw_random/omap3-rom-rng.c | 1 -
+ drivers/char/hw_random/pasemi-rng.c    | 3 +--
+ drivers/char/hw_random/pic32-rng.c     | 5 ++---
+ drivers/char/hw_random/stm32-rng.c     | 3 ++-
+ drivers/char/hw_random/xgene-rng.c     | 5 ++---
+ drivers/char/hw_random/xiphera-trng.c  | 1 -
+ 12 files changed, 12 insertions(+), 21 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index b8effe77d80f..a37367ebcbac 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -15,7 +15,7 @@
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+ #include <linux/hw_random.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
+ 
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index e98fcac578d6..e19b0f9f48b9 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -8,8 +8,7 @@
+ #include <linux/io.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/of_address.h>
+-#include <linux/of_platform.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/printk.h>
+ #include <linux/clk.h>
+diff --git a/drivers/char/hw_random/ingenic-trng.c b/drivers/char/hw_random/ingenic-trng.c
+index 0eb80f786f4d..759445d4f65a 100644
+--- a/drivers/char/hw_random/ingenic-trng.c
++++ b/drivers/char/hw_random/ingenic-trng.c
+@@ -11,8 +11,8 @@
+ #include <linux/hw_random.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ 
+diff --git a/drivers/char/hw_random/iproc-rng200.c b/drivers/char/hw_random/iproc-rng200.c
+index 06bc060534d8..34df3f0d3e45 100644
+--- a/drivers/char/hw_random/iproc-rng200.c
++++ b/drivers/char/hw_random/iproc-rng200.c
+@@ -12,8 +12,7 @@
+ #include <linux/io.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/of_address.h>
+-#include <linux/of_platform.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
+ #include <linux/delay.h>
+ 
+diff --git a/drivers/char/hw_random/npcm-rng.c b/drivers/char/hw_random/npcm-rng.c
+index 9903d0357e06..8a304b754217 100644
+--- a/drivers/char/hw_random/npcm-rng.c
++++ b/drivers/char/hw_random/npcm-rng.c
+@@ -8,12 +8,11 @@
+ #include <linux/init.h>
+ #include <linux/random.h>
+ #include <linux/err.h>
++#include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/hw_random.h>
+ #include <linux/delay.h>
+-#include <linux/of_irq.h>
+ #include <linux/pm_runtime.h>
+-#include <linux/of_device.h>
+ 
+ #define NPCM_RNGCS_REG		0x00	/* Control and status register */
+ #define NPCM_RNGD_REG		0x04	/* Data register */
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index 00ff96703dd2..be03f76a2a80 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -26,8 +26,6 @@
+ #include <linux/slab.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+-#include <linux/of_address.h>
+ #include <linux/interrupt.h>
+ #include <linux/clk.h>
+ #include <linux/io.h>
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index f06e4f95114f..18dc46b1b58e 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -20,7 +20,6 @@
+ #include <linux/err.h>
+ #include <linux/io.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
+ 
+diff --git a/drivers/char/hw_random/pasemi-rng.c b/drivers/char/hw_random/pasemi-rng.c
+index 2498d4ef9fe2..6959d6edd44c 100644
+--- a/drivers/char/hw_random/pasemi-rng.c
++++ b/drivers/char/hw_random/pasemi-rng.c
+@@ -9,11 +9,10 @@
+ 
+ #include <linux/module.h>
+ #include <linux/kernel.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/platform_device.h>
+ #include <linux/hw_random.h>
+ #include <linux/delay.h>
+-#include <linux/of_address.h>
+-#include <linux/of_platform.h>
+ #include <linux/io.h>
+ 
+ #define SDCRNG_CTL_REG			0x00
+diff --git a/drivers/char/hw_random/pic32-rng.c b/drivers/char/hw_random/pic32-rng.c
+index 99c8bd0859a1..b314d994afcf 100644
+--- a/drivers/char/hw_random/pic32-rng.c
++++ b/drivers/char/hw_random/pic32-rng.c
+@@ -12,9 +12,8 @@
+ #include <linux/hw_random.h>
+ #include <linux/io.h>
+ #include <linux/kernel.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+-#include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ 
+@@ -129,7 +128,7 @@ static struct platform_driver pic32_rng_driver = {
+ 	.remove		= pic32_rng_remove,
+ 	.driver		= {
+ 		.name	= "pic32-rng",
+-		.of_match_table = of_match_ptr(pic32_rng_of_match),
++		.of_match_table = pic32_rng_of_match,
+ 	},
+ };
+ 
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index a6731cf0627a..efb6a9f9a11b 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -10,8 +10,9 @@
+ #include <linux/iopoll.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/of_address.h>
+-#include <linux/of_platform.h>
++#include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/reset.h>
+ #include <linux/slab.h>
+diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
+index 7c8f3cb7c6af..c25bb169563d 100644
+--- a/drivers/char/hw_random/xgene-rng.c
++++ b/drivers/char/hw_random/xgene-rng.c
+@@ -15,9 +15,8 @@
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/module.h>
+-#include <linux/of_platform.h>
+-#include <linux/of_irq.h>
+-#include <linux/of_address.h>
++#include <linux/mod_devicetable.h>
++#include <linux/platform_device.h>
+ #include <linux/timer.h>
+ 
+ #define RNG_MAX_DATUM			4
+diff --git a/drivers/char/hw_random/xiphera-trng.c b/drivers/char/hw_random/xiphera-trng.c
+index 2a9fea72b2e0..2c586d1fe8a9 100644
+--- a/drivers/char/hw_random/xiphera-trng.c
++++ b/drivers/char/hw_random/xiphera-trng.c
+@@ -7,7 +7,6 @@
+ #include <linux/err.h>
+ #include <linux/io.h>
+ #include <linux/hw_random.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ #include <linux/delay.h>
+ 
+-- 
+2.40.1
 
