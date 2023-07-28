@@ -2,56 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34D1AC001DE
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 10:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFE5C001DE
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 10:23:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235220AbjG1KWn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jul 2023 06:22:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50068 "EHLO
+        id S234296AbjG1KX0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jul 2023 06:23:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235429AbjG1KWj (ORCPT
+        with ESMTP id S235885AbjG1KXJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2023 06:22:39 -0400
+        Fri, 28 Jul 2023 06:23:09 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12263A9B;
-        Fri, 28 Jul 2023 03:22:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD96F3A81;
+        Fri, 28 Jul 2023 03:23:07 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qPKc3-0011rQ-PY; Fri, 28 Jul 2023 18:22:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jul 2023 18:22:23 +0800
-Date:   Fri, 28 Jul 2023 18:22:23 +0800
+        id 1qPKcc-0011sJ-4x; Fri, 28 Jul 2023 18:22:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jul 2023 18:22:58 +0800
+Date:   Fri, 28 Jul 2023 18:22:58 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Martin Kaiser <martin@kaiser.cx>
 Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/4] hwrng: cctrng - simplify the code a bit
-Message-ID: <ZMOW3+cl6hnWqInN@gondor.apana.org.au>
-References: <20230719071806.335718-1-martin@kaiser.cx>
+Subject: Re: [PATCH 0/2] hwrng: cn10k - trivial cleanups
+Message-ID: <ZMOXAuksGr6p7iA7@gondor.apana.org.au>
+References: <20230721085444.496863-1-martin@kaiser.cx>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230719071806.335718-1-martin@kaiser.cx>
+In-Reply-To: <20230721085444.496863-1-martin@kaiser.cx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 19, 2023 at 09:18:02AM +0200, Martin Kaiser wrote:
-> We can use module_platform_driver and devm_clk_get_optional_enabled in the
-> cctrng driver to make its code simpler.
+On Fri, Jul 21, 2023 at 10:54:42AM +0200, Martin Kaiser wrote:
+> Two trivial cleanups of the cn10k driver. Compile tested only.
 > 
-> The patches were compile tested only.
+> Martin Kaiser (2):
+>   hwrng: cn10k - delete empty remove function
+>   hwrng: cn10k - use dev_err_probe
 > 
-> Martin Kaiser (4):
->   hwrng: cctrng - don't open code init and exit functions
->   hwrng: cctrng - let devres enable the clock
->   hwrng: cctrng - merge cc_trng_clk_init into its only caller
->   hwrng: cctrng - use dev_err_probe in error paths
-> 
->  drivers/char/hw_random/cctrng.c | 93 +++++++--------------------------
->  1 file changed, 19 insertions(+), 74 deletions(-)
+>  drivers/char/hw_random/cn10k-rng.c | 18 ++++--------------
+>  1 file changed, 4 insertions(+), 14 deletions(-)
 
 All applied.  Thanks.
---
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
