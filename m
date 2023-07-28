@@ -2,93 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AFFC0015E
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 09:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA51FC0015E
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 09:56:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235276AbjG1JHI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jul 2023 05:07:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57052 "EHLO
+        id S234002AbjG1J40 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jul 2023 05:56:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235216AbjG1JGo (ORCPT
+        with ESMTP id S234678AbjG1J4Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2023 05:06:44 -0400
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6815B3AA5;
-        Fri, 28 Jul 2023 02:06:34 -0700 (PDT)
-Received: from prodtpl.icoremail.net (unknown [10.12.1.20])
-        by hzbj-icmmx-6 (Coremail) with SMTP id AQAAfwA3cUcPhcNkLUSWBA--.43291S2;
-        Fri, 28 Jul 2023 17:06:23 +0800 (CST)
-Received: from zhangyiqun$phytium.com.cn ( [60.27.159.40] ) by
- ajax-webmail-mail (Coremail) ; Fri, 28 Jul 2023 17:06:21 +0800 (GMT+08:00)
-X-Originating-IP: [60.27.159.40]
-Date:   Fri, 28 Jul 2023 17:06:21 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   =?UTF-8?B?5byg6L22576k?= <zhangyiqun@phytium.com.cn>
-To:     "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH] crypto: all - alloc and init all req alloc as zero
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.1-cmXT6 build
- 20230428(d6537451) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-76b96e3b-3ecc-44d5-9200-de81e6d4c242-
-In-Reply-To: <ZMIl1vSitJBU3UJS@gondor.apana.org.au>
-References: <20230727080548.8666-1-zhangyiqun@phytium.com.cn>
- <ZMIl1vSitJBU3UJS@gondor.apana.org.au>
-Content-Transfer-Encoding: base64
-X-CM-CTRLDATA: zjxeZmZvb3Rlcl90eHQ9MTUwNzozODM=
-Content-Type: text/plain; charset=UTF-8
+        Fri, 28 Jul 2023 05:56:25 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D532430E1;
+        Fri, 28 Jul 2023 02:56:19 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qPKBs-0011CA-9u; Fri, 28 Jul 2023 17:55:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jul 2023 17:55:20 +0800
+Date:   Fri, 28 Jul 2023 17:55:20 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Haren Myneni <haren@us.ibm.com>,
+        Nick Terrell <terrelln@fb.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Richard Weinberger <richard@nod.at>,
+        David Ahern <dsahern@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        qat-linux@intel.com, linuxppc-dev@lists.ozlabs.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 00/21] crypto: consolidate and clean up compression
+ APIs
+Message-ID: <ZMOQiPadP2jggZ2i@gondor.apana.org.au>
+References: <20230718125847.3869700-1-ardb@kernel.org>
 MIME-Version: 1.0
-Message-ID: <6c3f5deb.197.1899bbfbd6f.Coremail.zhangyiqun@phytium.com.cn>
-X-Coremail-Locale: en_US
-X-CM-TRANSID: AQAAfwDHTU4NhcNksIsAAA--.326W
-X-CM-SenderInfo: x2kd0wp1lt30o6sk53xlxphulrpou0/1tbiAQAOCGTCwasCFwABsf
-Authentication-Results: hzbj-icmmx-6; spf=neutral smtp.mail=zhangyiqun
-        @phytium.com.cn;
-X-Coremail-Antispam: 1Uk129KBjvJXoW7ZFW3AF4DWw45WF15Cr17KFg_yoW8Xw13pF
-        ZxCr15GF4Yg3y8Ca47u3WxCryrW395uFyrtrW5X3s2yr43Zry7KasFkw4fuFyDJryrXw45
-        uFW7K3WYqF1UArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUj1kv1TuYvTs0mT0YCTnIWj
-        DUYxn0WfASr-VFAU7a7-sFnT9fnUUIcSsGvfJ3UbIYCTnIWIevJa73UjIFyTuYvj4RJUUU
-        UUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230718125847.3869700-1-ardb@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-QWN0dWFsbHksIEkgbWV0IGEgcHJvYmxlbSBpbiBteSBvd24gZGV2ZWxvcG1lbnQuIEJlY2F1c2Ug
-c29tZSBtZW1iZXJzIGluIHJlcQpzdHJ1Y3QgaXMgbm90IGludGlhbGl6ZWQsIHRoZXkgY2F1c2Ug
-c29tZSBlcnJvcnMgaW4gdGVzdC4gSWYgd2UgY2hhbmdlIGttYWxsb2MKdG8ga3phbGxvYywgaXQg
-Y2FuIGZhY2lsaXRhdGUgYWxsIGRldmVsb3BlcnMgdG8gY2FyZSBhYm91dCBpbmlhbGl6ZWQgYWxs
-IAptZW1iZXJzLiBJIGhvcGUgbXkgaWRlYSBjYW4gY29udmluY2UgeW91LiBCdXQgSSB0aGluayB5
-b3UgaGF2ZSBvdGhlcgppbXBvcnRhbnQgY29uc2lkZXJhdGlvbi4KClRoYW5rcywKCj4gLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlcy0tLS0tCj4gRnJvbTogIkhlcmJlcnQgWHUiIDxoZXJiZXJ0QGdvbmRv
-ci5hcGFuYS5vcmcuYXU+Cj4gU2VuZCB0aW1lOlRodXJzZGF5LCAwNy8yNy8yMDIzIDE2OjA3OjUw
-Cj4gVG86ICJaaGFuZyBZaXF1biIgPHpoYW5neWlxdW5AcGh5dGl1bS5jb20uY24+Cj4gQ2M6IGRh
-dmVtQGRhdmVtbG9mdC5uZXQsIGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcsIGxpbnV4LWtl
-cm5lbEB2Z2VyLmtlcm5lbC5vcmcKPiBTdWJqZWN0OiBSZTogW1BBVENIXSBjcnlwdG86IGFsbCAt
-IGFsbG9jIGFuZCBpbml0IGFsbCByZXEgYWxsb2MgYXMgemVybwo+IAo+IE9uIFRodSwgSnVsIDI3
-LCAyMDIzIGF0IDA0OjA1OjQ4UE0gKzA4MDAsIFpoYW5nIFlpcXVuIHdyb3RlOgo+ID4gVGhpcyBw
-YXRjaCBpcyB0byBjaGFuZ2UgYWxsIHJlcSBzdHJ1Y3QgYWxsb2MgZnVuY3Rpb24gZnJvbSBrbWFs
-bG9jCj4gPiB0byBremFsbG9jLiBTb21ldGltZXMsIGl0IHdpbGwgaW5jdXIgc29tZSBlcnJvcnMg
-d2l0aG91dCBpbml0aWFsaXplZAo+ID4gemVyby4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogWmhh
-bmcgWWlxdW4gPHpoYW5neWlxdW5AcGh5dGl1bS5jb20uY24+Cj4gPiAtLS0KPiA+ICBpbmNsdWRl
-L2NyeXB0by9ha2NpcGhlci5oIHwgMiArLQo+ID4gIGluY2x1ZGUvY3J5cHRvL2hhc2guaCAgICAg
-fCAyICstCj4gPiAgaW5jbHVkZS9jcnlwdG8va3BwLmggICAgICB8IDIgKy0KPiA+ICBpbmNsdWRl
-L2NyeXB0by9za2NpcGhlci5oIHwgMiArLQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRp
-b25zKCspLCA0IGRlbGV0aW9ucygtKQo+IAo+IE5hY2suICBVbmxlc3MgeW91IGhhdmUgYSBzcGVj
-aWZpYyBpc3N1ZSBwbGVhc2UgZG9uJ3Qgc3VibWl0IHZhZ3VlCj4gcGF0Y2hlcyBsaWtlIHRoaXMu
-ICBZb3Ugc2hvdWxkIGFsd2F5cyBzdGF0ZSB3aGF0IGlzc3VlIGxlZCB5b3UgdG8KPiBtYWtlIGEg
-Y2hhbmdlIGxpa2UgdGhpcy4KPiAKPiBUaGFua3MsCj4gLS0gCj4gRW1haWw6IEhlcmJlcnQgWHUg
-PGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4KPiBIb21lIFBhZ2U6IGh0dHA6Ly9nb25kb3Iu
-YXBhbmEub3JnLmF1L35oZXJiZXJ0Lwo+IFBHUCBLZXk6IGh0dHA6Ly9nb25kb3IuYXBhbmEub3Jn
-LmF1L35oZXJiZXJ0L3B1YmtleS50eHQKCg0KDQrkv6Hmga/lronlhajlo7DmmI7vvJrmnKzpgq7k
-u7bljIXlkKvkv6Hmga/lvZLlj5Hku7bkurrmiYDlnKjnu4Tnu4fmiYDmnIks5Y+R5Lu25Lq65omA
-5Zyo57uE57uH5a+56K+l6YKu5Lu25oul5pyJ5omA5pyJ5p2D5Yip44CC6K+35o6l5pS26ICF5rOo
-5oSP5L+d5a+GLOacque7j+WPkeS7tuS6uuS5pumdouiuuOWPryzkuI3lvpflkJHku7vkvZXnrKzk
-uInmlrnnu4Tnu4flkozkuKrkurrpgI/pnLLmnKzpgq7ku7bmiYDlkKvkv6Hmga/jgIINCkluZm9y
-bWF0aW9uIFNlY3VyaXR5IE5vdGljZTogVGhlIGluZm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlz
-IG1haWwgaXMgc29sZWx5IHByb3BlcnR5IG9mIHRoZSBzZW5kZXIncyBvcmdhbml6YXRpb24uVGhp
-cyBtYWlsIGNvbW11bmljYXRpb24gaXMgY29uZmlkZW50aWFsLlJlY2lwaWVudHMgbmFtZWQgYWJv
-dmUgYXJlIG9ibGlnYXRlZCB0byBtYWludGFpbiBzZWNyZWN5IGFuZCBhcmUgbm90IHBlcm1pdHRl
-ZCB0byBkaXNjbG9zZSB0aGUgY29udGVudHMgb2YgdGhpcyBjb21tdW5pY2F0aW9uIHRvIG90aGVy
-cy4=
+On Tue, Jul 18, 2023 at 02:58:26PM +0200, Ard Biesheuvel wrote:
+>
+> Patch #2 removes the support for on-the-fly allocation of destination
+> buffers and scatterlists from the Intel QAT driver. This is never used,
+> and not even implemented by all drivers (the HiSilicon ZIP driver does
+> not support it). The diffstat of this patch makes a good case why the
+> caller should be in charge of allocating the memory, not the driver.
 
+The implementation in qat may not be optimal, but being able to
+allocate memory in the algorithm is a big plus for IPComp at least.
+
+Being able to allocate memory page by page as you decompress
+means that:
+
+1. We're not affected by memory fragmentation.
+2. We don't waste memory by always allocating for the worst case.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
