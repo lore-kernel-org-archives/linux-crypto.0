@@ -2,69 +2,240 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD211C001DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 17:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF76C001E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 19:50:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbjG1Rjs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jul 2023 13:39:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36416 "EHLO
+        id S234471AbjG1TuY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jul 2023 15:50:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232284AbjG1Rjr (ORCPT
+        with ESMTP id S229680AbjG1TuX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2023 13:39:47 -0400
+        Fri, 28 Jul 2023 15:50:23 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EF562D4D;
-        Fri, 28 Jul 2023 10:39:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E51E3C1D;
+        Fri, 28 Jul 2023 12:50:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 35B2B621B9;
-        Fri, 28 Jul 2023 17:39:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70CD0C433C8;
-        Fri, 28 Jul 2023 17:39:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B61BF621B1;
+        Fri, 28 Jul 2023 19:50:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D0C8C433C8;
+        Fri, 28 Jul 2023 19:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690565984;
-        bh=RnyiRDGe8sr5exbmJAcAawkOFhbk5z8TLN6R9p+ZT3M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qg3v2LnTBt0EZr7gZBzzJaabEIuUd2iZWmHIOkTlpowzwViFShsi0ED3+OGiNY5Mg
-         h5NC6ILShm5fcplSBvvax7rUbp0cEw/3/+MbLJCJS9efFUaK1gxcInV5bB6wzdhxPm
-         e12+1MZCYyru0UJV3moUiLTKiUYIIYCuQRcacWLsCi4A/C1Lg4vZZ16tbq6U5njUo7
-         4Fgme9LN6UMYxJflWYhuABtdFA8WLXaZ6S5KYUHmYPXI4fhhc/AfEv6rybqEXUdUMO
-         vKzTfhkQPmsYQoPZEjbOBX0YFKFRkn8kCYNDjDD8RFZGGN6WrD7VQi/WF7cA5aO3wv
-         O9WL9BYcNQW2w==
-Received: (nullmailer pid 325463 invoked by uid 1000);
-        Fri, 28 Jul 2023 17:39:41 -0000
-Date:   Fri, 28 Jul 2023 11:39:41 -0600
+        s=k20201202; t=1690573821;
+        bh=8A1fFoi2i3ClsvIaTPCzChy1Ou5AvBRLB5R1quDdZ5Y=;
+        h=From:To:Cc:Subject:Date:From;
+        b=NPeFfzhmU9NNpWg7TVewexSPClWcgfQuxg1LISNtMMfJKfTi2LxD8KLfXZGVGye8J
+         wKWIboAtbqNbEejlJIPncR1GwomPHaxXdk4uomC62vzIXp+UmYRv7Cb/0H7PmyUnjM
+         gwEwi0sDPppgOv3lxEk+VOmLJNMESFv+42pSDUyMkRaDsIrta0yLYRpXgT2rzU2UqS
+         qHQJEbb8a1lbDxkN30J4vY2ooKc2E0ZJnNRV8uGdDAlHY5j4CPtkfYElWPmtVRmO1i
+         DXZ0tdEvQgStZ0Uy32Dz1pabSJqgxa/tM0dLdZJ4L3+kSSnb5ZhZ8eFzhNLqNpNZn0
+         meTEFg8jwtSzw==
+Received: (nullmailer pid 1198518 invoked by uid 1000);
+        Fri, 28 Jul 2023 19:50:19 -0000
 From:   Rob Herring <robh@kernel.org>
-To:     Varshini Rajendran <varshini.rajendran@microchip.com>
-Cc:     krzysztof.kozlowski+dt@linaro.org, davem@davemloft.net,
-        linux-arm-kernel@lists.infradead.org,
-        alexandre.belloni@bootlin.com, herbert@gondor.apana.org.au,
-        claudiu.beznea@microchip.com, linux-crypto@vger.kernel.org,
-        tudor.ambarus@linaro.org, devicetree@vger.kernel.org,
-        conor+dt@kernel.org, linux-kernel@vger.kernel.org,
-        robh+dt@kernel.org, nicolas.ferre@microchip.com
-Subject: Re: [PATCH v3 10/50] dt-bindings: crypto: add sam9x7 in Atmel SHA
-Message-ID: <169056598062.325408.11078837975857093343.robh@kernel.org>
-References: <20230728102433.265772-1-varshini.rajendran@microchip.com>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org
+Subject: [PATCH] hwrng: Enable COMPILE_TEST for more drivers
+Date:   Fri, 28 Jul 2023 13:50:15 -0600
+Message-Id: <20230728195015.1198427-1-robh@kernel.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728102433.265772-1-varshini.rajendran@microchip.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+There's quite a few hwrng drivers which are easily enabled for
+COMPILE_TEST, so let's enable them.
 
-On Fri, 28 Jul 2023 15:54:33 +0530, Varshini Rajendran wrote:
-> Add DT bindings for atmel SHA.
-> 
-> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-> ---
->  .../devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml   | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
+The dependency on HW_RANDOM is redundant, so drop that while we're here.
 
-Acked-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+Passed allyesconfig builds on arm, arm64, x86, riscv, powerpc, sparc
+---
+ drivers/char/hw_random/Kconfig       | 35 ++++++++++++++--------------
+ drivers/char/hw_random/amd-rng.c     |  1 +
+ drivers/char/hw_random/ingenic-rng.c |  2 +-
+ 3 files changed, 20 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index e0b3786ca51b..b82733759e60 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -37,7 +37,7 @@ config HW_RANDOM_TIMERIOMEM
+ 
+ config HW_RANDOM_INTEL
+ 	tristate "Intel HW Random Number Generator support"
+-	depends on (X86 || IA64) && PCI
++	depends on (X86 || IA64 || COMPILE_TEST) && PCI
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -50,7 +50,8 @@ config HW_RANDOM_INTEL
+ 
+ config HW_RANDOM_AMD
+ 	tristate "AMD HW Random Number Generator support"
+-	depends on (X86 || PPC_MAPLE) && PCI
++	depends on (X86 || PPC_MAPLE || COMPILE_TEST)
++	depends on PCI && HAS_IOPORT_MAP
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -63,7 +64,7 @@ config HW_RANDOM_AMD
+ 
+ config HW_RANDOM_ATMEL
+ 	tristate "Atmel Random Number Generator support"
+-	depends on (ARCH_AT91 || COMPILE_TEST) && HAVE_CLK && OF
++	depends on (ARCH_AT91 || COMPILE_TEST)
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -113,7 +114,8 @@ config HW_RANDOM_IPROC_RNG200
+ 
+ config HW_RANDOM_GEODE
+ 	tristate "AMD Geode HW Random Number Generator support"
+-	depends on X86_32 && PCI
++	depends on (X86_32 || COMPILE_TEST)
++	depends on PCI
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -205,7 +207,7 @@ config HW_RANDOM_OCTEON
+ 
+ config HW_RANDOM_PASEMI
+ 	tristate "PA Semi HW Random Number Generator support"
+-	depends on PPC_PASEMI
++	depends on PPC_PASEMI || (PPC && COMPILE_TEST)
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -228,7 +230,7 @@ config HW_RANDOM_VIRTIO
+ 
+ config HW_RANDOM_MXC_RNGA
+ 	tristate "Freescale i.MX RNGA Random Number Generator"
+-	depends on SOC_IMX31
++	depends on SOC_IMX31 || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -241,7 +243,7 @@ config HW_RANDOM_MXC_RNGA
+ 
+ config HW_RANDOM_IMX_RNGC
+ 	tristate "Freescale i.MX RNGC Random Number Generator"
+-	depends on HAS_IOMEM && HAVE_CLK
++	depends on HAS_IOMEM
+ 	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+@@ -256,8 +258,7 @@ config HW_RANDOM_IMX_RNGC
+ 
+ config HW_RANDOM_INGENIC_RNG
+ 	tristate "Ingenic Random Number Generator support"
+-	depends on HW_RANDOM
+-	depends on MACH_JZ4780 || MACH_X1000
++	depends on MACH_JZ4780 || MACH_X1000 || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number Generator
+@@ -271,8 +272,7 @@ config HW_RANDOM_INGENIC_RNG
+ 
+ config HW_RANDOM_INGENIC_TRNG
+ 	tristate "Ingenic True Random Number Generator support"
+-	depends on HW_RANDOM
+-	depends on MACH_X1830
++	depends on MACH_X1830 || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the True Random Number Generator
+@@ -324,7 +324,7 @@ config HW_RANDOM_POWERNV
+ 
+ config HW_RANDOM_HISI
+ 	tristate "Hisilicon Random Number Generator support"
+-	depends on HW_RANDOM && ARCH_HISI
++	depends on ARCH_HISI || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -348,7 +348,7 @@ config HW_RANDOM_HISTB
+ 
+ config HW_RANDOM_ST
+ 	tristate "ST Microelectronics HW Random Number Generator support"
+-	depends on HW_RANDOM && (ARCH_STI || COMPILE_TEST)
++	depends on ARCH_STI || COMPILE_TEST
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+ 	  Generator hardware found on STi series of SoCs.
+@@ -358,7 +358,7 @@ config HW_RANDOM_ST
+ 
+ config HW_RANDOM_XGENE
+ 	tristate "APM X-Gene True Random Number Generator (TRNG) support"
+-	depends on HW_RANDOM && ARCH_XGENE
++	depends on ARCH_XGENE || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -371,7 +371,7 @@ config HW_RANDOM_XGENE
+ 
+ config HW_RANDOM_STM32
+ 	tristate "STMicroelectronics STM32 random number generator"
+-	depends on HW_RANDOM && (ARCH_STM32 || COMPILE_TEST)
++	depends on ARCH_STM32 || COMPILE_TEST
+ 	depends on HAS_IOMEM
+ 	default HW_RANDOM
+ 	help
+@@ -385,7 +385,7 @@ config HW_RANDOM_STM32
+ 
+ config HW_RANDOM_PIC32
+ 	tristate "Microchip PIC32 Random Number Generator support"
+-	depends on HW_RANDOM && MACH_PIC32
++	depends on MACH_PIC32 || COMPILE_TEST
+ 	default y
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+@@ -425,7 +425,8 @@ config HW_RANDOM_MESON
+ 
+ config HW_RANDOM_CAVIUM
+ 	tristate "Cavium ThunderX Random Number Generator support"
+-	depends on HW_RANDOM && PCI && ARCH_THUNDER
++	depends on PCI
++	depends on ARCH_THUNDER || (ARM64 && COMPILE_TEST)
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the Random Number
+diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
+index 0555e3838bce..86162a13681e 100644
+--- a/drivers/char/hw_random/amd-rng.c
++++ b/drivers/char/hw_random/amd-rng.c
+@@ -26,6 +26,7 @@
+ 
+ #include <linux/delay.h>
+ #include <linux/hw_random.h>
++#include <linux/io.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/pci.h>
+diff --git a/drivers/char/hw_random/ingenic-rng.c b/drivers/char/hw_random/ingenic-rng.c
+index 055cfe59f519..4f18c3fa5427 100644
+--- a/drivers/char/hw_random/ingenic-rng.c
++++ b/drivers/char/hw_random/ingenic-rng.c
+@@ -95,7 +95,7 @@ static int ingenic_rng_probe(struct platform_device *pdev)
+ 		return PTR_ERR(priv->base);
+ 	}
+ 
+-	priv->version = (enum ingenic_rng_version)of_device_get_match_data(&pdev->dev);
++	priv->version = (enum ingenic_rng_version)(uintptr_t)of_device_get_match_data(&pdev->dev);
+ 
+ 	priv->rng.name = pdev->name;
+ 	priv->rng.init = ingenic_rng_init;
+-- 
+2.40.1
 
