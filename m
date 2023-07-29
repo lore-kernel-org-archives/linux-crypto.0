@@ -2,240 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF76C001E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jul 2023 19:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89882C001DC
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jul 2023 08:41:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234471AbjG1TuY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jul 2023 15:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
+        id S229777AbjG2IlR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 29 Jul 2023 04:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjG1TuX (ORCPT
+        with ESMTP id S231477AbjG2Iku (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jul 2023 15:50:23 -0400
+        Sat, 29 Jul 2023 04:40:50 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E51E3C1D;
-        Fri, 28 Jul 2023 12:50:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91231448D
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 01:40:40 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B61BF621B1;
-        Fri, 28 Jul 2023 19:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D0C8C433C8;
-        Fri, 28 Jul 2023 19:50:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 22C0460A50
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 08:40:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81732C433C9
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 08:40:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690573821;
-        bh=8A1fFoi2i3ClsvIaTPCzChy1Ou5AvBRLB5R1quDdZ5Y=;
-        h=From:To:Cc:Subject:Date:From;
-        b=NPeFfzhmU9NNpWg7TVewexSPClWcgfQuxg1LISNtMMfJKfTi2LxD8KLfXZGVGye8J
-         wKWIboAtbqNbEejlJIPncR1GwomPHaxXdk4uomC62vzIXp+UmYRv7Cb/0H7PmyUnjM
-         gwEwi0sDPppgOv3lxEk+VOmLJNMESFv+42pSDUyMkRaDsIrta0yLYRpXgT2rzU2UqS
-         qHQJEbb8a1lbDxkN30J4vY2ooKc2E0ZJnNRV8uGdDAlHY5j4CPtkfYElWPmtVRmO1i
-         DXZ0tdEvQgStZ0Uy32Dz1pabSJqgxa/tM0dLdZJ4L3+kSSnb5ZhZ8eFzhNLqNpNZn0
-         meTEFg8jwtSzw==
-Received: (nullmailer pid 1198518 invoked by uid 1000);
-        Fri, 28 Jul 2023 19:50:19 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org
-Subject: [PATCH] hwrng: Enable COMPILE_TEST for more drivers
-Date:   Fri, 28 Jul 2023 13:50:15 -0600
-Message-Id: <20230728195015.1198427-1-robh@kernel.org>
-X-Mailer: git-send-email 2.40.1
+        s=k20201202; t=1690620039;
+        bh=butziwcCrCR0u+L9b0oHe8nH4RZWDpy+vNmO2LQONCA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=YkVSgJk1Tzfe3Zafmi/9gPIyFPI6b9JQmmuW73m68ZMyfWlabru5LnSk12J1iDGN6
+         bTx9t8QJLspwyEnZqev6dGA4kwGQS1wKSBJlsMgEzrG4+UvcZv3uxzhTzOyqsbJTNT
+         2qqr43Cd8McilWPE/vwFRXfhJ+LFFYrAdYBdAq/9n+hOn80kr7BK9Mv/xTYK5zZcV/
+         OoebD9FiIkUcbYql6u+7fKpRzZlslJ3jIqZs9uNBIAlJmjPDd/Tdw1q3mkOzJtSpaf
+         a6kenkoq+/40Pdlvy7vP7uzlNhy/Oa2+flQS37kfXuvWGI+2TEQ1F89OBamp7jsthD
+         9894TtQjxElPg==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-4fe1b00fce2so3857650e87.3
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 01:40:39 -0700 (PDT)
+X-Gm-Message-State: ABy/qLYnun/jQg9Vq6EwOkuUT+M2hxE7KE3RIcc4jf7jrPSOtG/YlUWj
+        CmOeCkaOtr5lBr4cMgck2JS4ejNLhzJS9OCLlrw=
+X-Google-Smtp-Source: APBJJlFq3d/NtD4UmFTFGPl1iUnedfD+O6WuCQbzO5uGeuFxzQmHEbGwYUhV/Dq644ig2uqio3ZPN69g7yFXCEfZUAc=
+X-Received: by 2002:ac2:5f9c:0:b0:4f9:92c7:401d with SMTP id
+ r28-20020ac25f9c000000b004f992c7401dmr3089312lfe.30.1690620037547; Sat, 29
+ Jul 2023 01:40:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <fd31dc60-67b2-8ed8-c941-2b5be777070a@metacode.biz>
+In-Reply-To: <fd31dc60-67b2-8ed8-c941-2b5be777070a@metacode.biz>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sat, 29 Jul 2023 10:40:25 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFDH+84WJiecBk+nJ+Ko6KuCZMUrbyspP7SrSEjMEYurw@mail.gmail.com>
+Message-ID: <CAMj1kXFDH+84WJiecBk+nJ+Ko6KuCZMUrbyspP7SrSEjMEYurw@mail.gmail.com>
+Subject: Re: Kernel Crypto exposing asymmetric operations to userland via libkcapi
+To:     Wiktor Kwapisiewicz <wiktor@metacode.biz>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, Puru Kulkarni <puruk@protonmail.com>,
+        Puru Kulkarni <puruk@juniper.net>,
+        Roberto Sassu <roberto.sassu@huaweicloud.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        devel@lists.sequoia-pgp.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There's quite a few hwrng drivers which are easily enabled for
-COMPILE_TEST, so let's enable them.
+On Thu, 27 Jul 2023 at 14:59, Wiktor Kwapisiewicz <wiktor@metacode.biz> wrote:
+>
+> Hi Kernel Crypto folks,
+>
+> I've got a question about the Kernel Crypto API.
+>
+> I'm working on adding a cryptographic backend based on the Kernel Crypto
+> API to Sequoia PGP [0][1]. Sequoia supports several cryptographical
+> backends already but using Kernel Crypto would allow us to significantly
+> reduce dependencies when running on Linux.
+>
+> After implementing hashes, AEAD encryption and symmetric ciphers, I
+> noticed that the libkcapi API for asymmetric ciphers (and ECDH) is not
+> working. The libkcapi maintainer kindly explained [2] that the patches
+> that they proposed for inclusion in the kernel [3] were not merged.
+>
+> I looked up the relevant thread [4], read it thoroughly and from what I
+> can see most of the arguments are about private keys not being
+> sufficiently protected and extensibility concerns with regards to keys
+> stored in hardware security modules (TPMs etc.).
+>
+> However, these are mostly irrelevant to the Sequoia PGP use case, since
+> private keys in software that we read do not need additional protection
+> (as they are available for software anyway). We'd still like to use them
+> for signing, decryption, verification and encryption. As for keys stored
+> in HSMs we handle access to them in userland via our keystore module [5].
+>
+> My question is: Would it be possible to revisit the decision to expose
+> operations with asymmetric keys (including ECDH) in Linux Crypto thus
+> allowing libkcapi to work with non-patched kernels?
+>
+> I'd like to help make this happen and I think there are other projects
+> that are interested in a complete cryptographic suite of Kernel Crypto
+> functions available in user-land.
+>
 
-The dependency on HW_RANDOM is redundant, so drop that while we're here.
+AF_ALG was never intended to provide a general purpose crypto library
+to user space, but only to expose asynchronous hardware crypto
+accelerators that are DMA based and managed by the OS.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
-Passed allyesconfig builds on arm, arm64, x86, riscv, powerpc, sparc
----
- drivers/char/hw_random/Kconfig       | 35 ++++++++++++++--------------
- drivers/char/hw_random/amd-rng.c     |  1 +
- drivers/char/hw_random/ingenic-rng.c |  2 +-
- 3 files changed, 20 insertions(+), 18 deletions(-)
+Exposing the pure-software crypto implementations via AF_ALG was a
+mistake IMHO. Making system calls into a privileged environment just
+to run some algorithm that could easily run unprivileged as well is a
+bad idea both for performance as well as for security/robustness. (On
+top of that, SIMD based implementations need to execute with
+preemption disabled, increasing scheduling jitter)
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index e0b3786ca51b..b82733759e60 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -37,7 +37,7 @@ config HW_RANDOM_TIMERIOMEM
- 
- config HW_RANDOM_INTEL
- 	tristate "Intel HW Random Number Generator support"
--	depends on (X86 || IA64) && PCI
-+	depends on (X86 || IA64 || COMPILE_TEST) && PCI
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -50,7 +50,8 @@ config HW_RANDOM_INTEL
- 
- config HW_RANDOM_AMD
- 	tristate "AMD HW Random Number Generator support"
--	depends on (X86 || PPC_MAPLE) && PCI
-+	depends on (X86 || PPC_MAPLE || COMPILE_TEST)
-+	depends on PCI && HAS_IOPORT_MAP
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -63,7 +64,7 @@ config HW_RANDOM_AMD
- 
- config HW_RANDOM_ATMEL
- 	tristate "Atmel Random Number Generator support"
--	depends on (ARCH_AT91 || COMPILE_TEST) && HAVE_CLK && OF
-+	depends on (ARCH_AT91 || COMPILE_TEST)
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -113,7 +114,8 @@ config HW_RANDOM_IPROC_RNG200
- 
- config HW_RANDOM_GEODE
- 	tristate "AMD Geode HW Random Number Generator support"
--	depends on X86_32 && PCI
-+	depends on (X86_32 || COMPILE_TEST)
-+	depends on PCI
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -205,7 +207,7 @@ config HW_RANDOM_OCTEON
- 
- config HW_RANDOM_PASEMI
- 	tristate "PA Semi HW Random Number Generator support"
--	depends on PPC_PASEMI
-+	depends on PPC_PASEMI || (PPC && COMPILE_TEST)
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -228,7 +230,7 @@ config HW_RANDOM_VIRTIO
- 
- config HW_RANDOM_MXC_RNGA
- 	tristate "Freescale i.MX RNGA Random Number Generator"
--	depends on SOC_IMX31
-+	depends on SOC_IMX31 || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -241,7 +243,7 @@ config HW_RANDOM_MXC_RNGA
- 
- config HW_RANDOM_IMX_RNGC
- 	tristate "Freescale i.MX RNGC Random Number Generator"
--	depends on HAS_IOMEM && HAVE_CLK
-+	depends on HAS_IOMEM
- 	depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL || COMPILE_TEST
- 	default HW_RANDOM
- 	help
-@@ -256,8 +258,7 @@ config HW_RANDOM_IMX_RNGC
- 
- config HW_RANDOM_INGENIC_RNG
- 	tristate "Ingenic Random Number Generator support"
--	depends on HW_RANDOM
--	depends on MACH_JZ4780 || MACH_X1000
-+	depends on MACH_JZ4780 || MACH_X1000 || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number Generator
-@@ -271,8 +272,7 @@ config HW_RANDOM_INGENIC_RNG
- 
- config HW_RANDOM_INGENIC_TRNG
- 	tristate "Ingenic True Random Number Generator support"
--	depends on HW_RANDOM
--	depends on MACH_X1830
-+	depends on MACH_X1830 || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the True Random Number Generator
-@@ -324,7 +324,7 @@ config HW_RANDOM_POWERNV
- 
- config HW_RANDOM_HISI
- 	tristate "Hisilicon Random Number Generator support"
--	depends on HW_RANDOM && ARCH_HISI
-+	depends on ARCH_HISI || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -348,7 +348,7 @@ config HW_RANDOM_HISTB
- 
- config HW_RANDOM_ST
- 	tristate "ST Microelectronics HW Random Number Generator support"
--	depends on HW_RANDOM && (ARCH_STI || COMPILE_TEST)
-+	depends on ARCH_STI || COMPILE_TEST
- 	help
- 	  This driver provides kernel-side support for the Random Number
- 	  Generator hardware found on STi series of SoCs.
-@@ -358,7 +358,7 @@ config HW_RANDOM_ST
- 
- config HW_RANDOM_XGENE
- 	tristate "APM X-Gene True Random Number Generator (TRNG) support"
--	depends on HW_RANDOM && ARCH_XGENE
-+	depends on ARCH_XGENE || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -371,7 +371,7 @@ config HW_RANDOM_XGENE
- 
- config HW_RANDOM_STM32
- 	tristate "STMicroelectronics STM32 random number generator"
--	depends on HW_RANDOM && (ARCH_STM32 || COMPILE_TEST)
-+	depends on ARCH_STM32 || COMPILE_TEST
- 	depends on HAS_IOMEM
- 	default HW_RANDOM
- 	help
-@@ -385,7 +385,7 @@ config HW_RANDOM_STM32
- 
- config HW_RANDOM_PIC32
- 	tristate "Microchip PIC32 Random Number Generator support"
--	depends on HW_RANDOM && MACH_PIC32
-+	depends on MACH_PIC32 || COMPILE_TEST
- 	default y
- 	help
- 	  This driver provides kernel-side support for the Random Number
-@@ -425,7 +425,8 @@ config HW_RANDOM_MESON
- 
- config HW_RANDOM_CAVIUM
- 	tristate "Cavium ThunderX Random Number Generator support"
--	depends on HW_RANDOM && PCI && ARCH_THUNDER
-+	depends on PCI
-+	depends on ARCH_THUNDER || (ARM64 && COMPILE_TEST)
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-diff --git a/drivers/char/hw_random/amd-rng.c b/drivers/char/hw_random/amd-rng.c
-index 0555e3838bce..86162a13681e 100644
---- a/drivers/char/hw_random/amd-rng.c
-+++ b/drivers/char/hw_random/amd-rng.c
-@@ -26,6 +26,7 @@
- 
- #include <linux/delay.h>
- #include <linux/hw_random.h>
-+#include <linux/io.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/pci.h>
-diff --git a/drivers/char/hw_random/ingenic-rng.c b/drivers/char/hw_random/ingenic-rng.c
-index 055cfe59f519..4f18c3fa5427 100644
---- a/drivers/char/hw_random/ingenic-rng.c
-+++ b/drivers/char/hw_random/ingenic-rng.c
-@@ -95,7 +95,7 @@ static int ingenic_rng_probe(struct platform_device *pdev)
- 		return PTR_ERR(priv->base);
- 	}
- 
--	priv->version = (enum ingenic_rng_version)of_device_get_match_data(&pdev->dev);
-+	priv->version = (enum ingenic_rng_version)(uintptr_t)of_device_get_match_data(&pdev->dev);
- 
- 	priv->rng.name = pdev->name;
- 	priv->rng.init = ingenic_rng_init;
--- 
-2.40.1
-
+Due to the kernel's rigid 'no regressions' policy, AF_ALG will retain
+support for the modes and algorithms it supports today, but I don't
+think we should extend this support unless we limit it to
+implementations provided by hardware accelerators. If it can be done
+in software, it should be done in user space, not in the kernel.
