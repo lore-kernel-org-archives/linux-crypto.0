@@ -2,33 +2,33 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86620C001DC
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jul 2023 12:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4474AC04A6A
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jul 2023 12:55:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230456AbjG2Mzl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S231777AbjG2Mzl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 29 Jul 2023 08:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60360 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231149AbjG2Mzb (ORCPT
+        with ESMTP id S231389AbjG2Mzb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 29 Jul 2023 08:55:31 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0673C30CD;
-        Sat, 29 Jul 2023 05:55:26 -0700 (PDT)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RCkwf3HnlzrRtF;
-        Sat, 29 Jul 2023 20:54:26 +0800 (CST)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089D930C0;
+        Sat, 29 Jul 2023 05:55:29 -0700 (PDT)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RCkvw3dZqzVjlp;
+        Sat, 29 Jul 2023 20:53:48 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sat, 29 Jul 2023 20:55:23 +0800
+ 15.1.2507.27; Sat, 29 Jul 2023 20:55:26 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 1/7] crypto: hisilicon/qm - obtain the mailbox configuration at one time
-Date:   Sat, 29 Jul 2023 20:52:33 +0800
-Message-ID: <20230729125239.25337-2-qianweili@huawei.com>
+Subject: [PATCH 4/7] crypto: hisilicon/qm - check function qp num before alg register
+Date:   Sat, 29 Jul 2023 20:52:36 +0800
+Message-ID: <20230729125239.25337-5-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20230729125239.25337-1-qianweili@huawei.com>
 References: <20230729125239.25337-1-qianweili@huawei.com>
@@ -43,263 +43,476 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The mailbox configuration(128 bits) needs to be obtained from the
-hardware at one time. If the mailbox configuration is obtained for
-multiple times, the read value may be incorrect. Use the instruction
-to read mailbox data instead of readl().
+When the Kunpeng accelerator executes tasks such as encryption
+and decryption have minimum requirements on the number of device
+queues. If the number of queues does not meet the requirement,
+the process initialization will fail. Therefore, the driver checks
+the number of queues on the device before registering the algorithm.
+If the number does not meet the requirements, the driver does not register
+the algorithm to crypto subsystem.
 
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 152 ++++++++++++++++++++++------------
- include/linux/hisi_acc_qm.h   |   1 -
- 2 files changed, 99 insertions(+), 54 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 25 ++++++++++-
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 14 +++---
+ drivers/crypto/hisilicon/qm.c               | 47 +++++++--------------
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  | 31 ++++++++++++--
+ drivers/crypto/hisilicon/sec2/sec_main.c    | 24 +++++------
+ drivers/crypto/hisilicon/zip/zip_crypto.c   | 29 ++++++++++++-
+ drivers/crypto/hisilicon/zip/zip_main.c     | 10 +++--
+ include/linux/hisi_acc_qm.h                 | 18 +++++++-
+ 8 files changed, 136 insertions(+), 62 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index a99fd589445c..ef807a90946b 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -33,6 +33,8 @@
- #define QM_MB_CMD_DATA_SHIFT		32
- #define QM_MB_CMD_DATA_MASK		GENMASK(31, 0)
- #define QM_MB_STATUS_MASK		GENMASK(12, 9)
-+#define QM_MB_MAX_WAIT_CNT		6000
-+#define QM_MB_WAIT_READY_CNT		10
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 9a1c61be32cc..764532a6ca82 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -57,6 +57,9 @@ struct hpre_ctx;
+ #define HPRE_DRV_ECDH_MASK_CAP		BIT(2)
+ #define HPRE_DRV_X25519_MASK_CAP	BIT(5)
  
- /* sqc shift */
- #define QM_SQ_HOP_NUM_SHIFT		0
-@@ -597,17 +599,6 @@ static void qm_mb_pre_init(struct qm_mailbox *mailbox, u8 cmd,
- 	mailbox->rsvd = 0;
- }
++static DEFINE_MUTEX(hpre_algs_lock);
++static unsigned int hpre_available_devs;
++
+ typedef void (*hpre_cb)(struct hpre_ctx *ctx, void *sqe);
  
--/* return 0 mailbox ready, -ETIMEDOUT hardware timeout */
--int hisi_qm_wait_mb_ready(struct hisi_qm *qm)
--{
--	u32 val;
--
--	return readl_relaxed_poll_timeout(qm->io_base + QM_MB_CMD_SEND_BASE,
--					  val, !((val >> QM_MB_BUSY_SHIFT) &
--					  0x1), POLL_PERIOD, POLL_TIMEOUT);
--}
--EXPORT_SYMBOL_GPL(hisi_qm_wait_mb_ready);
--
- /* 128 bit should be written to hardware at one time to trigger a mailbox */
- static void qm_mb_write(struct hisi_qm *qm, const void *src)
- {
-@@ -635,35 +626,93 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
- #endif
- }
+ struct hpre_rsa_ctx {
+@@ -2202,11 +2205,17 @@ static void hpre_unregister_x25519(struct hisi_qm *qm)
  
--static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
-+/* 128 bit should be read from hardware at one time */
-+static void qm_mb_read(struct hisi_qm *qm, void *dst)
+ int hpre_algs_register(struct hisi_qm *qm)
  {
 -	int ret;
--	u32 val;
-+	const void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
- 
--	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
--		dev_err(&qm->pdev->dev, "QM mailbox is busy to start!\n");
--		ret = -EBUSY;
--		goto mb_busy;
-+#if IS_ENABLED(CONFIG_ARM64)
-+	unsigned long tmp0 = 0, tmp1 = 0;
-+#endif
-+	if (!IS_ENABLED(CONFIG_ARM64)) {
-+		memcpy_fromio(dst, fun_base, 16);
-+		dma_wmb();
-+		return;
- 	}
- 
--	qm_mb_write(qm, mailbox);
-+#if IS_ENABLED(CONFIG_ARM64)
-+	asm volatile("ldp %0, %1, %3\n"
-+		     "stp %0, %1, %2\n"
-+		     "dmb oshst\n"
-+		     : "=&r" (tmp0),
-+		       "=&r" (tmp1),
-+		       "+Q" (*((char *)dst))
-+		     : "Q" (*((char __iomem *)fun_base))
-+		     : "memory");
-+#endif
-+}
++	int ret = 0;
 +
-+int hisi_qm_wait_mb_ready(struct hisi_qm *qm)
-+{
-+	struct qm_mailbox mailbox;
-+	int i = 0;
-+
-+	while (i++ < QM_MB_WAIT_READY_CNT) {
-+		qm_mb_read(qm, &mailbox);
-+		if (!((le16_to_cpu(mailbox.w0) >> QM_MB_BUSY_SHIFT) & 0x1))
-+			return 0;
- 
--	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
--		dev_err(&qm->pdev->dev, "QM mailbox operation timeout!\n");
--		ret = -ETIMEDOUT;
--		goto mb_busy;
-+		usleep_range(WAIT_PERIOD_US_MIN, WAIT_PERIOD_US_MAX);
- 	}
- 
--	val = readl(qm->io_base + QM_MB_CMD_SEND_BASE);
--	if (val & QM_MB_STATUS_MASK) {
-+	dev_err(&qm->pdev->dev, "QM mailbox is busy to start!\n");
-+
-+	return -EBUSY;
-+}
-+EXPORT_SYMBOL_GPL(hisi_qm_wait_mb_ready);
-+
-+static int qm_wait_mb_finish(struct hisi_qm *qm, struct qm_mailbox *mailbox)
-+{
-+	int i = 0;
-+
-+	while (++i) {
-+		qm_mb_read(qm, mailbox);
-+		if (!((le16_to_cpu(mailbox->w0) >> QM_MB_BUSY_SHIFT) & 0x1))
-+			break;
-+
-+		if (i == QM_MB_MAX_WAIT_CNT) {
-+			dev_err(&qm->pdev->dev, "QM mailbox operation timeout!\n");
-+			return -ETIMEDOUT;
-+		}
-+
-+		usleep_range(WAIT_PERIOD_US_MIN, WAIT_PERIOD_US_MAX);
++	mutex_lock(&hpre_algs_lock);
++	if (hpre_available_devs) {
++		hpre_available_devs++;
++		goto unlock;
 +	}
-+
-+	if (le16_to_cpu(mailbox->w0) & QM_MB_STATUS_MASK) {
- 		dev_err(&qm->pdev->dev, "QM mailbox operation failed!\n");
--		ret = -EIO;
--		goto mb_busy;
-+		return -EIO;
- 	}
  
- 	return 0;
-+}
-+
-+static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
-+{
-+	int ret;
-+
-+	ret = hisi_qm_wait_mb_ready(qm);
-+	if (ret)
-+		goto mb_err_cnt_increase;
-+
-+	qm_mb_write(qm, mailbox);
+ 	ret = hpre_register_rsa(qm);
+ 	if (ret)
+-		return ret;
++		goto unlock;
  
--mb_busy:
-+	ret = qm_wait_mb_finish(qm, mailbox);
-+	if (ret)
-+		goto mb_err_cnt_increase;
+ 	ret = hpre_register_dh(qm);
+ 	if (ret)
+@@ -2220,6 +2229,9 @@ int hpre_algs_register(struct hisi_qm *qm)
+ 	if (ret)
+ 		goto unreg_ecdh;
+ 
++	hpre_available_devs++;
++	mutex_unlock(&hpre_algs_lock);
 +
-+	return 0;
-+
-+mb_err_cnt_increase:
- 	atomic64_inc(&qm->debug.dfx.mb_err_cnt);
+ 	return ret;
+ 
+ unreg_ecdh:
+@@ -2228,13 +2240,22 @@ int hpre_algs_register(struct hisi_qm *qm)
+ 	hpre_unregister_dh(qm);
+ unreg_rsa:
+ 	hpre_unregister_rsa(qm);
++unlock:
++	mutex_unlock(&hpre_algs_lock);
  	return ret;
  }
-@@ -687,6 +736,24 @@ int hisi_qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
- }
- EXPORT_SYMBOL_GPL(hisi_qm_mb);
  
-+static int hisi_qm_mb_read(struct hisi_qm *qm, u64 *base, u8 cmd, u16 queue)
-+{
-+	struct qm_mailbox mailbox;
-+	int ret;
+ void hpre_algs_unregister(struct hisi_qm *qm)
+ {
++	mutex_lock(&hpre_algs_lock);
++	if (--hpre_available_devs)
++		goto unlock;
 +
-+	qm_mb_pre_init(&mailbox, cmd, 0, queue, 1);
-+	mutex_lock(&qm->mailbox_lock);
-+	ret = qm_mb_nolock(qm, &mailbox);
-+	mutex_unlock(&qm->mailbox_lock);
-+	if (ret)
-+		return ret;
+ 	hpre_unregister_x25519(qm);
+ 	hpre_unregister_ecdh(qm);
+ 	hpre_unregister_dh(qm);
+ 	hpre_unregister_rsa(qm);
 +
-+	*base = le32_to_cpu(mailbox.base_l) |
-+		((u64)le32_to_cpu(mailbox.base_h) << 32);
++unlock:
++	mutex_unlock(&hpre_algs_lock);
+ }
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 1709e649f0d1..b02fdd5b2df8 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -107,6 +107,7 @@
+ #define HPRE_VIA_MSI_DSM		1
+ #define HPRE_SQE_MASK_OFFSET		8
+ #define HPRE_SQE_MASK_LEN		24
++#define HPRE_CTX_Q_NUM_DEF		1
+ 
+ #define HPRE_DFX_BASE		0x301000
+ #define HPRE_DFX_COMMON1		0x301400
+@@ -1399,10 +1400,11 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (ret)
+ 		dev_warn(&pdev->dev, "init debugfs fail!\n");
+ 
+-	ret = hisi_qm_alg_register(qm, &hpre_devices);
++	hisi_qm_add_list(qm, &hpre_devices);
++	ret = hisi_qm_alg_register(qm, &hpre_devices, HPRE_CTX_Q_NUM_DEF);
+ 	if (ret < 0) {
+ 		pci_err(pdev, "fail to register algs to crypto!\n");
+-		goto err_with_qm_start;
++		goto err_qm_del_list;
+ 	}
+ 
+ 	if (qm->uacce) {
+@@ -1424,9 +1426,10 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return 0;
+ 
+ err_with_alg_register:
+-	hisi_qm_alg_unregister(qm, &hpre_devices);
++	hisi_qm_alg_unregister(qm, &hpre_devices, HPRE_CTX_Q_NUM_DEF);
+ 
+-err_with_qm_start:
++err_qm_del_list:
++	hisi_qm_del_list(qm, &hpre_devices);
+ 	hpre_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
+ 
+@@ -1446,7 +1449,8 @@ static void hpre_remove(struct pci_dev *pdev)
+ 
+ 	hisi_qm_pm_uninit(qm);
+ 	hisi_qm_wait_task_finish(qm, &hpre_devices);
+-	hisi_qm_alg_unregister(qm, &hpre_devices);
++	hisi_qm_alg_unregister(qm, &hpre_devices, HPRE_CTX_Q_NUM_DEF);
++	hisi_qm_del_list(qm, &hpre_devices);
+ 	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
+ 		hisi_qm_sriov_disable(pdev, true);
+ 
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index a114114228a5..2d0080b546e8 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -4834,63 +4834,48 @@ static void qm_cmd_process(struct work_struct *cmd_process)
+ }
+ 
+ /**
+- * hisi_qm_alg_register() - Register alg to crypto and add qm to qm_list.
++ * hisi_qm_alg_register() - Register alg to crypto.
+  * @qm: The qm needs add.
+  * @qm_list: The qm list.
++ * @guard: Guard of qp_num.
+  *
+- * This function adds qm to qm list, and will register algorithm to
+- * crypto when the qm list is empty.
++ * Register algorithm to crypto when the device is satisfy guard.
+  */
+-int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
++int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list, int guard)
+ {
+ 	struct device *dev = &qm->pdev->dev;
+-	int flag = 0;
+-	int ret = 0;
+-
+-	mutex_lock(&qm_list->lock);
+-	if (list_empty(&qm_list->list))
+-		flag = 1;
+-	list_add_tail(&qm->list, &qm_list->list);
+-	mutex_unlock(&qm_list->lock);
+ 
+ 	if (qm->ver <= QM_HW_V2 && qm->use_sva) {
+ 		dev_info(dev, "HW V2 not both use uacce sva mode and hardware crypto algs.\n");
+ 		return 0;
+ 	}
+ 
+-	if (flag) {
+-		ret = qm_list->register_to_crypto(qm);
+-		if (ret) {
+-			mutex_lock(&qm_list->lock);
+-			list_del(&qm->list);
+-			mutex_unlock(&qm_list->lock);
+-		}
++	if (qm->qp_num < guard) {
++		dev_info(dev, "qp_num is less than task need.\n");
++		return 0;
+ 	}
+ 
+-	return ret;
++	return qm_list->register_to_crypto(qm);
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_alg_register);
+ 
+ /**
+- * hisi_qm_alg_unregister() - Unregister alg from crypto and delete qm from
+- * qm list.
++ * hisi_qm_alg_unregister() - Unregister alg from crypto.
+  * @qm: The qm needs delete.
+  * @qm_list: The qm list.
++ * @guard: Guard of qp_num.
+  *
+- * This function deletes qm from qm list, and will unregister algorithm
+- * from crypto when the qm list is empty.
++ * Unregister algorithm from crypto when the last function is satisfy guard.
+  */
+-void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
++void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list, int guard)
+ {
+-	mutex_lock(&qm_list->lock);
+-	list_del(&qm->list);
+-	mutex_unlock(&qm_list->lock);
+-
+ 	if (qm->ver <= QM_HW_V2 && qm->use_sva)
+ 		return;
+ 
+-	if (list_empty(&qm_list->list))
+-		qm_list->unregister_from_crypto(qm);
++	if (qm->qp_num < guard)
++		return;
++
++	qm_list->unregister_from_crypto(qm);
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_alg_unregister);
+ 
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 074e50ef512c..99a28a132f8a 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -104,6 +104,9 @@
+ #define IV_CTR_INIT		0x1
+ #define IV_BYTE_OFFSET		0x8
+ 
++static DEFINE_MUTEX(sec_algs_lock);
++static unsigned int sec_available_devs;
++
+ struct sec_skcipher {
+ 	u64 alg_msk;
+ 	struct skcipher_alg alg;
+@@ -2544,16 +2547,31 @@ static int sec_register_aead(u64 alg_mask)
+ int sec_register_to_crypto(struct hisi_qm *qm)
+ {
+ 	u64 alg_mask = sec_get_alg_bitmap(qm, SEC_DRV_ALG_BITMAP_HIGH, SEC_DRV_ALG_BITMAP_LOW);
+-	int ret;
++	int ret = 0;
++
++	mutex_lock(&sec_algs_lock);
++	if (sec_available_devs) {
++		sec_available_devs++;
++		goto unlock;
++	}
+ 
+ 	ret = sec_register_skcipher(alg_mask);
+ 	if (ret)
+-		return ret;
++		goto unlock;
+ 
+ 	ret = sec_register_aead(alg_mask);
+ 	if (ret)
+-		sec_unregister_skcipher(alg_mask, ARRAY_SIZE(sec_skciphers));
++		goto unreg_skcipher;
+ 
++	sec_available_devs++;
++	mutex_unlock(&sec_algs_lock);
 +
 +	return 0;
-+}
 +
- static void qm_db_v1(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
- {
- 	u64 doorbell;
-@@ -1308,12 +1375,10 @@ static int qm_get_vft_v2(struct hisi_qm *qm, u32 *base, u32 *number)
- 	u64 sqc_vft;
- 	int ret;
- 
--	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_VFT_V2, 0, 0, 1);
-+	ret = hisi_qm_mb_read(qm, &sqc_vft, QM_MB_CMD_SQC_VFT_V2, 0);
- 	if (ret)
- 		return ret;
- 
--	sqc_vft = readl(qm->io_base + QM_MB_CMD_DATA_ADDR_L) |
--		  ((u64)readl(qm->io_base + QM_MB_CMD_DATA_ADDR_H) << 32);
- 	*base = QM_SQC_VFT_BASE_MASK_V2 & (sqc_vft >> QM_SQC_VFT_BASE_SHIFT_V2);
- 	*number = (QM_SQC_VFT_NUM_MASK_V2 &
- 		   (sqc_vft >> QM_SQC_VFT_NUM_SHIFT_V2)) + 1;
-@@ -1484,25 +1549,6 @@ static enum acc_err_result qm_hw_error_handle_v2(struct hisi_qm *qm)
- 	return ACC_ERR_RECOVERED;
++unreg_skcipher:
++	sec_unregister_skcipher(alg_mask, ARRAY_SIZE(sec_skciphers));
++unlock:
++	mutex_unlock(&sec_algs_lock);
+ 	return ret;
  }
  
--static int qm_get_mb_cmd(struct hisi_qm *qm, u64 *msg, u16 fun_num)
--{
--	struct qm_mailbox mailbox;
--	int ret;
--
--	qm_mb_pre_init(&mailbox, QM_MB_CMD_DST, 0, fun_num, 0);
--	mutex_lock(&qm->mailbox_lock);
--	ret = qm_mb_nolock(qm, &mailbox);
--	if (ret)
--		goto err_unlock;
--
--	*msg = readl(qm->io_base + QM_MB_CMD_DATA_ADDR_L) |
--		  ((u64)readl(qm->io_base + QM_MB_CMD_DATA_ADDR_H) << 32);
--
--err_unlock:
--	mutex_unlock(&qm->mailbox_lock);
--	return ret;
--}
--
- static void qm_clear_cmd_interrupt(struct hisi_qm *qm, u64 vf_mask)
+@@ -2561,6 +2579,13 @@ void sec_unregister_from_crypto(struct hisi_qm *qm)
  {
- 	u32 val;
-@@ -1522,7 +1568,7 @@ static void qm_handle_vf_msg(struct hisi_qm *qm, u32 vf_id)
- 	u64 msg;
- 	int ret;
+ 	u64 alg_mask = sec_get_alg_bitmap(qm, SEC_DRV_ALG_BITMAP_HIGH, SEC_DRV_ALG_BITMAP_LOW);
  
--	ret = qm_get_mb_cmd(qm, &msg, vf_id);
-+	ret = hisi_qm_mb_read(qm, &msg, QM_MB_CMD_DST, vf_id);
- 	if (ret) {
- 		dev_err(dev, "failed to get msg from VF(%u)!\n", vf_id);
- 		return;
-@@ -4755,7 +4801,7 @@ static int qm_wait_pf_reset_finish(struct hisi_qm *qm)
- 	 * Whether message is got successfully,
- 	 * VF needs to ack PF by clearing the interrupt.
- 	 */
--	ret = qm_get_mb_cmd(qm, &msg, 0);
-+	ret = hisi_qm_mb_read(qm, &msg, QM_MB_CMD_DST, 0);
- 	qm_clear_cmd_interrupt(qm, 0);
- 	if (ret) {
- 		dev_err(dev, "failed to get msg from PF in reset done!\n");
-@@ -4809,7 +4855,7 @@ static void qm_handle_cmd_msg(struct hisi_qm *qm, u32 fun_num)
- 	 * Get the msg from source by sending mailbox. Whether message is got
- 	 * successfully, destination needs to ack source by clearing the interrupt.
- 	 */
--	ret = qm_get_mb_cmd(qm, &msg, fun_num);
-+	ret = hisi_qm_mb_read(qm, &msg, QM_MB_CMD_DST, fun_num);
- 	qm_clear_cmd_interrupt(qm, BIT(fun_num));
- 	if (ret) {
- 		dev_err(dev, "failed to get msg from source!\n");
++	mutex_lock(&sec_algs_lock);
++	if (--sec_available_devs)
++		goto unlock;
++
+ 	sec_unregister_aead(alg_mask, ARRAY_SIZE(sec_aeads));
+ 	sec_unregister_skcipher(alg_mask, ARRAY_SIZE(sec_skciphers));
++
++unlock:
++	mutex_unlock(&sec_algs_lock);
+ }
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 62bd8936a915..0e56a47eb862 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -1234,15 +1234,11 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (ret)
+ 		pci_warn(pdev, "Failed to init debugfs!\n");
+ 
+-	if (qm->qp_num >= ctx_q_num) {
+-		ret = hisi_qm_alg_register(qm, &sec_devices);
+-		if (ret < 0) {
+-			pr_err("Failed to register driver to crypto.\n");
+-			goto err_qm_stop;
+-		}
+-	} else {
+-		pci_warn(qm->pdev,
+-			"Failed to use kernel mode, qp not enough!\n");
++	hisi_qm_add_list(qm, &sec_devices);
++	ret = hisi_qm_alg_register(qm, &sec_devices, ctx_q_num);
++	if (ret < 0) {
++		pr_err("Failed to register driver to crypto.\n");
++		goto err_qm_del_list;
+ 	}
+ 
+ 	if (qm->uacce) {
+@@ -1264,9 +1260,9 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return 0;
+ 
+ err_alg_unregister:
+-	if (qm->qp_num >= ctx_q_num)
+-		hisi_qm_alg_unregister(qm, &sec_devices);
+-err_qm_stop:
++	hisi_qm_alg_unregister(qm, &sec_devices, ctx_q_num);
++err_qm_del_list:
++	hisi_qm_del_list(qm, &sec_devices);
+ 	sec_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
+ err_probe_uninit:
+@@ -1283,8 +1279,8 @@ static void sec_remove(struct pci_dev *pdev)
+ 
+ 	hisi_qm_pm_uninit(qm);
+ 	hisi_qm_wait_task_finish(qm, &sec_devices);
+-	if (qm->qp_num >= ctx_q_num)
+-		hisi_qm_alg_unregister(qm, &sec_devices);
++	hisi_qm_alg_unregister(qm, &sec_devices, ctx_q_num);
++	hisi_qm_del_list(qm, &sec_devices);
+ 
+ 	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
+ 		hisi_qm_sriov_disable(pdev, true);
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 6608971d10cd..0443205cd45c 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -42,6 +42,9 @@
+ #define HZIP_ALG_ZLIB				GENMASK(1, 0)
+ #define HZIP_ALG_GZIP				GENMASK(3, 2)
+ 
++static DEFINE_MUTEX(zip_algs_lock);
++static unsigned int zip_available_devs;
++
+ static const u8 zlib_head[HZIP_ZLIB_HEAD_SIZE] = {0x78, 0x9c};
+ static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {
+ 	0x1f, 0x8b, 0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x03
+@@ -821,19 +824,41 @@ int hisi_zip_register_to_crypto(struct hisi_qm *qm)
+ {
+ 	int ret = 0;
+ 
++	mutex_lock(&zip_algs_lock);
++	if (zip_available_devs) {
++		zip_available_devs++;
++		goto unlock;
++	}
++
+ 	ret = hisi_zip_register_zlib(qm);
+ 	if (ret)
+-		return ret;
++		goto unlock;
+ 
+ 	ret = hisi_zip_register_gzip(qm);
+ 	if (ret)
+-		hisi_zip_unregister_zlib(qm);
++		goto unreg_zlib;
++
++	zip_available_devs++;
++	mutex_unlock(&zip_algs_lock);
+ 
++	return 0;
++
++unreg_zlib:
++	hisi_zip_unregister_zlib(qm);
++unlock:
++	mutex_unlock(&zip_algs_lock);
+ 	return ret;
+ }
+ 
+ void hisi_zip_unregister_from_crypto(struct hisi_qm *qm)
+ {
++	mutex_lock(&zip_algs_lock);
++	if (--zip_available_devs)
++		goto unlock;
++
+ 	hisi_zip_unregister_zlib(qm);
+ 	hisi_zip_unregister_gzip(qm);
++
++unlock:
++	mutex_unlock(&zip_algs_lock);
+ }
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 84dbaeb07ea8..73e9d91ca716 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -66,6 +66,7 @@
+ #define HZIP_SQE_SIZE			128
+ #define HZIP_PF_DEF_Q_NUM		64
+ #define HZIP_PF_DEF_Q_BASE		0
++#define HZIP_CTX_Q_NUM_DEF		2
+ 
+ #define HZIP_SOFT_CTRL_CNT_CLR_CE	0x301000
+ #define HZIP_SOFT_CTRL_CNT_CLR_CE_BIT	BIT(0)
+@@ -1231,7 +1232,8 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (ret)
+ 		pci_err(pdev, "failed to init debugfs (%d)!\n", ret);
+ 
+-	ret = hisi_qm_alg_register(qm, &zip_devices);
++	hisi_qm_add_list(qm, &zip_devices);
++	ret = hisi_qm_alg_register(qm, &zip_devices, HZIP_CTX_Q_NUM_DEF);
+ 	if (ret < 0) {
+ 		pci_err(pdev, "failed to register driver to crypto!\n");
+ 		goto err_qm_stop;
+@@ -1256,9 +1258,10 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return 0;
+ 
+ err_qm_alg_unregister:
+-	hisi_qm_alg_unregister(qm, &zip_devices);
++	hisi_qm_alg_unregister(qm, &zip_devices, HZIP_CTX_Q_NUM_DEF);
+ 
+ err_qm_stop:
++	hisi_qm_del_list(qm, &zip_devices);
+ 	hisi_zip_debugfs_exit(qm);
+ 	hisi_qm_stop(qm, QM_NORMAL);
+ 
+@@ -1278,7 +1281,8 @@ static void hisi_zip_remove(struct pci_dev *pdev)
+ 
+ 	hisi_qm_pm_uninit(qm);
+ 	hisi_qm_wait_task_finish(qm, &zip_devices);
+-	hisi_qm_alg_unregister(qm, &zip_devices);
++	hisi_qm_alg_unregister(qm, &zip_devices, HZIP_CTX_Q_NUM_DEF);
++	hisi_qm_del_list(qm, &zip_devices);
+ 
+ 	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
+ 		hisi_qm_sriov_disable(pdev, true);
 diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 39fbfb4be944..0f83c19a8f36 100644
+index 576a0601c72e..1b5082ed48d9 100644
 --- a/include/linux/hisi_acc_qm.h
 +++ b/include/linux/hisi_acc_qm.h
-@@ -52,7 +52,6 @@
- #define QM_MB_OP_SHIFT			14
- #define QM_MB_CMD_DATA_ADDR_L		0x304
- #define QM_MB_CMD_DATA_ADDR_H		0x308
--#define QM_MB_MAX_WAIT_CNT		6000
+@@ -490,6 +490,20 @@ static inline void hisi_qm_init_list(struct hisi_qm_list *qm_list)
+ 	mutex_init(&qm_list->lock);
+ }
  
- /* doorbell */
- #define QM_DOORBELL_CMD_SQ              0
++static inline void hisi_qm_add_list(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
++{
++	mutex_lock(&qm_list->lock);
++	list_add_tail(&qm->list, &qm_list->list);
++	mutex_unlock(&qm_list->lock);
++}
++
++static inline void hisi_qm_del_list(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
++{
++	mutex_lock(&qm_list->lock);
++	list_del(&qm->list);
++	mutex_unlock(&qm_list->lock);
++}
++
+ int hisi_qm_init(struct hisi_qm *qm);
+ void hisi_qm_uninit(struct hisi_qm *qm);
+ int hisi_qm_start(struct hisi_qm *qm);
+@@ -535,8 +549,8 @@ int hisi_qm_alloc_qps_node(struct hisi_qm_list *qm_list, int qp_num,
+ void hisi_qm_free_qps(struct hisi_qp **qps, int qp_num);
+ void hisi_qm_dev_shutdown(struct pci_dev *pdev);
+ void hisi_qm_wait_task_finish(struct hisi_qm *qm, struct hisi_qm_list *qm_list);
+-int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list);
+-void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list);
++int hisi_qm_alg_register(struct hisi_qm *qm, struct hisi_qm_list *qm_list, int guard);
++void hisi_qm_alg_unregister(struct hisi_qm *qm, struct hisi_qm_list *qm_list, int guard);
+ int hisi_qm_resume(struct device *dev);
+ int hisi_qm_suspend(struct device *dev);
+ void hisi_qm_pm_uninit(struct hisi_qm *qm);
 -- 
 2.33.0
 
