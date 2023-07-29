@@ -2,115 +2,514 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89882C001DC
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jul 2023 08:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC705C05051
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jul 2023 11:16:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbjG2IlR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 Jul 2023 04:41:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35794 "EHLO
+        id S229950AbjG2LQi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 29 Jul 2023 07:16:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231477AbjG2Iku (ORCPT
+        with ESMTP id S229510AbjG2LQi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Jul 2023 04:40:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91231448D
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 01:40:40 -0700 (PDT)
+        Sat, 29 Jul 2023 07:16:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A45BEB;
+        Sat, 29 Jul 2023 04:16:36 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 22C0460A50
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 08:40:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81732C433C9
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 08:40:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9A57660B98;
+        Sat, 29 Jul 2023 11:16:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 950F7C433C8;
+        Sat, 29 Jul 2023 11:16:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690620039;
-        bh=butziwcCrCR0u+L9b0oHe8nH4RZWDpy+vNmO2LQONCA=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=YkVSgJk1Tzfe3Zafmi/9gPIyFPI6b9JQmmuW73m68ZMyfWlabru5LnSk12J1iDGN6
-         bTx9t8QJLspwyEnZqev6dGA4kwGQS1wKSBJlsMgEzrG4+UvcZv3uxzhTzOyqsbJTNT
-         2qqr43Cd8McilWPE/vwFRXfhJ+LFFYrAdYBdAq/9n+hOn80kr7BK9Mv/xTYK5zZcV/
-         OoebD9FiIkUcbYql6u+7fKpRzZlslJ3jIqZs9uNBIAlJmjPDd/Tdw1q3mkOzJtSpaf
-         a6kenkoq+/40Pdlvy7vP7uzlNhy/Oa2+flQS37kfXuvWGI+2TEQ1F89OBamp7jsthD
-         9894TtQjxElPg==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-4fe1b00fce2so3857650e87.3
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Jul 2023 01:40:39 -0700 (PDT)
-X-Gm-Message-State: ABy/qLYnun/jQg9Vq6EwOkuUT+M2hxE7KE3RIcc4jf7jrPSOtG/YlUWj
-        CmOeCkaOtr5lBr4cMgck2JS4ejNLhzJS9OCLlrw=
-X-Google-Smtp-Source: APBJJlFq3d/NtD4UmFTFGPl1iUnedfD+O6WuCQbzO5uGeuFxzQmHEbGwYUhV/Dq644ig2uqio3ZPN69g7yFXCEfZUAc=
-X-Received: by 2002:ac2:5f9c:0:b0:4f9:92c7:401d with SMTP id
- r28-20020ac25f9c000000b004f992c7401dmr3089312lfe.30.1690620037547; Sat, 29
- Jul 2023 01:40:37 -0700 (PDT)
+        s=k20201202; t=1690629395;
+        bh=jxNIB8O572fEJmMf7g6dPY/36mLF2jOEBJ8DivAd/vg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=OglWkqAc3nL+qzC116wCncti+8oDXY9UrXFFeOsy8ag0eoZZIqyHpgA94xwIbafpN
+         sD7aNXJVmJSwQ6s5lcDX3kT44+S35QVTpG0TLdSPP37HA/WwP9CdtdRlMmLXrlATTD
+         axPZ7m6uMR5Di9+Vq0GJCVV65vgTZvEEe8d1ax335PrPaW1qCpTHAoh5R9hZEdeNSS
+         BkR136ogbml6j2zt19eHtjDvcKPJgyOk7P6kWF+mXYNw1TW5wwlFLEaFLMTF8VVAF1
+         1iu6P1CgWRLFgnDPluNjTI7pahk/QocaEdLW4i9CZxeqLRxQEf2ufp+Bj/p9wtMG7D
+         vE19mUAaQEO9w==
+Date:   Sat, 29 Jul 2023 12:16:29 +0100
+From:   Jonathan Cameron <jic23@kernel.org>
+To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
+        <vkoul@kernel.org>, <olivier.moysan@foss.st.com>,
+        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
+        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
+        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>,
+        <lee@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
+        <arnd@kernel.org>, <richardcochran@gmail.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
+Subject: Re: [PATCH v3 02/11] dt-bindings: treewide: add feature-domains
+ description
+Message-ID: <20230729121629.79ac3d9b@jic23-huawei>
+In-Reply-To: <20230726083810.232100-3-gatien.chevallier@foss.st.com>
+References: <20230726083810.232100-1-gatien.chevallier@foss.st.com>
+        <20230726083810.232100-3-gatien.chevallier@foss.st.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <fd31dc60-67b2-8ed8-c941-2b5be777070a@metacode.biz>
-In-Reply-To: <fd31dc60-67b2-8ed8-c941-2b5be777070a@metacode.biz>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 29 Jul 2023 10:40:25 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFDH+84WJiecBk+nJ+Ko6KuCZMUrbyspP7SrSEjMEYurw@mail.gmail.com>
-Message-ID: <CAMj1kXFDH+84WJiecBk+nJ+Ko6KuCZMUrbyspP7SrSEjMEYurw@mail.gmail.com>
-Subject: Re: Kernel Crypto exposing asymmetric operations to userland via libkcapi
-To:     Wiktor Kwapisiewicz <wiktor@metacode.biz>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, Puru Kulkarni <puruk@protonmail.com>,
-        Puru Kulkarni <puruk@juniper.net>,
-        Roberto Sassu <roberto.sassu@huaweicloud.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        devel@lists.sequoia-pgp.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 27 Jul 2023 at 14:59, Wiktor Kwapisiewicz <wiktor@metacode.biz> wrote:
->
-> Hi Kernel Crypto folks,
->
-> I've got a question about the Kernel Crypto API.
->
-> I'm working on adding a cryptographic backend based on the Kernel Crypto
-> API to Sequoia PGP [0][1]. Sequoia supports several cryptographical
-> backends already but using Kernel Crypto would allow us to significantly
-> reduce dependencies when running on Linux.
->
-> After implementing hashes, AEAD encryption and symmetric ciphers, I
-> noticed that the libkcapi API for asymmetric ciphers (and ECDH) is not
-> working. The libkcapi maintainer kindly explained [2] that the patches
-> that they proposed for inclusion in the kernel [3] were not merged.
->
-> I looked up the relevant thread [4], read it thoroughly and from what I
-> can see most of the arguments are about private keys not being
-> sufficiently protected and extensibility concerns with regards to keys
-> stored in hardware security modules (TPMs etc.).
->
-> However, these are mostly irrelevant to the Sequoia PGP use case, since
-> private keys in software that we read do not need additional protection
-> (as they are available for software anyway). We'd still like to use them
-> for signing, decryption, verification and encryption. As for keys stored
-> in HSMs we handle access to them in userland via our keystore module [5].
->
-> My question is: Would it be possible to revisit the decision to expose
-> operations with asymmetric keys (including ECDH) in Linux Crypto thus
-> allowing libkcapi to work with non-patched kernels?
->
-> I'd like to help make this happen and I think there are other projects
-> that are interested in a complete cryptographic suite of Kernel Crypto
-> functions available in user-land.
->
+On Wed, 26 Jul 2023 10:38:01 +0200
+Gatien Chevallier <gatien.chevallier@foss.st.com> wrote:
 
-AF_ALG was never intended to provide a general purpose crypto library
-to user space, but only to expose asynchronous hardware crypto
-accelerators that are DMA based and managed by the OS.
+> feature-domains is an optional property that allows a peripheral to
+> refer to one or more feature domain controller(s).
+> 
+> Description of this property is added to all peripheral binding files of
+> the peripheral under the STM32 firewall controllers. It allows an accurate
+> representation of the hardware, where various peripherals are connected
+> to this firewall bus. The firewall can then check the peripheral accesses
+> before allowing it to probe.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 
-Exposing the pure-software crypto implementations via AF_ALG was a
-mistake IMHO. Making system calls into a privileged environment just
-to run some algorithm that could easily run unprivileged as well is a
-bad idea both for performance as well as for security/robustness. (On
-top of that, SIMD based implementations need to execute with
-preemption disabled, increasing scheduling jitter)
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> #for IIO
 
-Due to the kernel's rigid 'no regressions' policy, AF_ALG will retain
-support for the modes and algorithms it supports today, but I don't
-think we should extend this support unless we limit it to
-implementations provided by hardware accelerators. If it can be done
-in software, it should be done in user space, not in the kernel.
+> ---
+> 
+> Changes in V2: 
+> 	- Add missing "feature-domains" property declaration
+> 	  in bosch,m_can.yaml and st,stm32-cryp.yaml files
+> 
+>  Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
+>  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
+>  .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
+>  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
+>  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
+>  Documentation/devicetree/bindings/net/can/bosch,m_can.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
+>  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
+>  .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
+>  26 files changed, 105 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+> index 0ddeb8a9a7a0..87a578327fc0 100644
+> --- a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+> @@ -46,6 +46,10 @@ properties:
+>    power-domains:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> index b767ec72a999..042a1e005ab2 100644
+> --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> @@ -50,6 +50,10 @@ properties:
+>    power-domains:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml b/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml
+> index 329847ef096a..9f60915e6130 100644
+> --- a/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml
+> +++ b/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml
+> @@ -82,6 +82,10 @@ properties:
+>      description: if defined, it indicates that the controller
+>        supports memory-to-memory transfer
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml b/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
+> index e722fbcd8a5f..15d33d41098f 100644
+> --- a/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
+> +++ b/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
+> @@ -28,6 +28,10 @@ properties:
+>    resets:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml b/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml
+> index 94b75d9f66cd..8a1a21faab8c 100644
+> --- a/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml
+> +++ b/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml
+> @@ -99,6 +99,10 @@ properties:
+>  
+>    wakeup-source: true
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml b/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml
+> index 995cbf8cefc6..d59ac9282a28 100644
+> --- a/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml
+> +++ b/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml
+> @@ -93,6 +93,10 @@ properties:
+>    '#size-cells':
+>      const: 0
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  allOf:
+>    - if:
+>        properties:
+> diff --git a/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml b/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml
+> index 1970503389aa..39ee55aa4dd8 100644
+> --- a/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml
+> +++ b/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml
+> @@ -59,6 +59,10 @@ properties:
+>        If not, SPI CLKOUT frequency will not be accurate.
+>      maximum: 20000000
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml b/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml
+> index 04045b932bd2..184d0a44d1de 100644
+> --- a/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml
+> +++ b/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml
+> @@ -45,6 +45,10 @@ properties:
+>    '#size-cells':
+>      const: 0
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  additionalProperties: false
+>  
+>  required:
+> diff --git a/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml b/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml
+> index 2314a9a14650..41db21373301 100644
+> --- a/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml
+> +++ b/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml
+> @@ -29,6 +29,10 @@ properties:
+>        - const: cec
+>        - const: hdmi-cec
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml b/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml
+> index 6b3e413cedb2..81e1cd5e30cc 100644
+> --- a/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml
+> +++ b/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml
+> @@ -36,6 +36,10 @@ properties:
+>    resets:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>    port:
+>      $ref: /schemas/graph.yaml#/$defs/port-base
+>      unevaluatedProperties: false
+> diff --git a/Documentation/devicetree/bindings/memory-controllers/st,stm32-fmc2-ebi.yaml b/Documentation/devicetree/bindings/memory-controllers/st,stm32-fmc2-ebi.yaml
+> index 14f1833d37c9..4ef01ee4a5e5 100644
+> --- a/Documentation/devicetree/bindings/memory-controllers/st,stm32-fmc2-ebi.yaml
+> +++ b/Documentation/devicetree/bindings/memory-controllers/st,stm32-fmc2-ebi.yaml
+> @@ -45,6 +45,10 @@ properties:
+>        Reflects the memory layout with four integer values per bank. Format:
+>        <bank-number> 0 <address of the bank> <size>
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  patternProperties:
+>    "^.*@[0-4],[a-f0-9]+$":
+>      additionalProperties: true
+> diff --git a/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml b/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml
+> index 27329c5dc38e..156aed282fb8 100644
+> --- a/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml
+> @@ -44,6 +44,10 @@ properties:
+>  
+>    wakeup-source: true
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>    pwm:
+>      type: object
+>      additionalProperties: false
+> diff --git a/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml b/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
+> index f84e09a5743b..d19981ef3fce 100644
+> --- a/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
+> @@ -67,6 +67,11 @@ properties:
+>    "#size-cells":
+>      const: 0
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+> +
+>    pwm:
+>      type: object
+>      additionalProperties: false
+> diff --git a/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml b/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml
+> index 2459a55ed540..5a8b53d5c35f 100644
+> --- a/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml
+> +++ b/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml
+> @@ -79,6 +79,10 @@ properties:
+>            - const: rx
+>            - const: tx
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>    power-domains: true
+>  
+>    resets:
+> diff --git a/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml b/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
+> index 67879aab623b..144cbcbefa37 100644
+> --- a/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
+> +++ b/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
+> @@ -118,6 +118,10 @@ properties:
+>    phys:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> index fc8c96b08d7d..133e1edbd561 100644
+> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> @@ -93,6 +93,10 @@ properties:
+>        select RCC clock instead of ETH_REF_CLK.
+>      type: boolean
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - clocks
+> diff --git a/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml b/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml
+> index 24a3dbde223b..89fa65f31d20 100644
+> --- a/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml
+> +++ b/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml
+> @@ -55,6 +55,10 @@ properties:
+>      description: number of clock cells for ck_usbo_48m consumer
+>      const: 0
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  # Required child nodes:
+>  
+>  patternProperties:
+> diff --git a/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml b/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
+> index 05f4ad2c7d3a..b73a97f89fe4 100644
+> --- a/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
+> +++ b/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
+> @@ -30,6 +30,10 @@ properties:
+>    vdda-supply:
+>      description: phandle to the vdda input analog voltage.
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+> index 187b172d0cca..c45e6285653c 100644
+> --- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+> +++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+> @@ -30,6 +30,10 @@ properties:
+>      type: boolean
+>      description: If set enable the clock detection management
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml b/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml
+> index 1df8ffe95fc6..b80d5a8ff4e8 100644
+> --- a/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml
+> +++ b/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml
+> @@ -70,6 +70,10 @@ properties:
+>      enum: [1, 2, 4, 8, 12, 14, 16]
+>      default: 8
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  allOf:
+>    - $ref: rs485.yaml#
+>    - $ref: serial.yaml#
+> diff --git a/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml b/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml
+> index b9111d375b93..30339447cc24 100644
+> --- a/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml
+> +++ b/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml
+> @@ -65,6 +65,10 @@ properties:
+>      $ref: audio-graph-port.yaml#
+>      unevaluatedProperties: false
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - "#sound-dai-cells"
+> diff --git a/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml b/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml
+> index 56d206f97a96..f59770ead3e3 100644
+> --- a/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml
+> +++ b/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml
+> @@ -48,6 +48,10 @@ properties:
+>    clock-names:
+>      maxItems: 3
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml b/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml
+> index bc48151b9adb..480ce8704fda 100644
+> --- a/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml
+> +++ b/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml
+> @@ -50,6 +50,10 @@ properties:
+>    resets:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - "#sound-dai-cells"
+> diff --git a/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml b/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml
+> index 8bba965a9ae6..3331f6cd1b75 100644
+> --- a/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml
+> +++ b/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml
+> @@ -46,6 +46,10 @@ properties:
+>        - const: tx
+>        - const: rx
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml b/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml
+> index 9ca1a843c820..a0664a0fcabf 100644
+> --- a/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml
+> +++ b/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml
+> @@ -59,6 +59,10 @@ properties:
+>        - const: rx
+>        - const: tx
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  patternProperties:
+>    "^[a-zA-Z][a-zA-Z0-9,+\\-._]{0,63}@[0-9a-f]+$":
+>      type: object
+> diff --git a/Documentation/devicetree/bindings/usb/dwc2.yaml b/Documentation/devicetree/bindings/usb/dwc2.yaml
+> index 0a5c98ea711d..95b615ee3a07 100644
+> --- a/Documentation/devicetree/bindings/usb/dwc2.yaml
+> +++ b/Documentation/devicetree/bindings/usb/dwc2.yaml
+> @@ -172,6 +172,10 @@ properties:
+>  
+>    tpl-support: true
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 2
+> +
+>  dependencies:
+>    port: [ usb-role-switch ]
+>    role-switch-default-mode: [ usb-role-switch ]
+
