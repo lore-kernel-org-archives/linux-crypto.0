@@ -2,84 +2,152 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F372CC001E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jul 2023 12:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E18DC04A94
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jul 2023 18:56:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230515AbjG2Mzp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 Jul 2023 08:55:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60576 "EHLO
+        id S229961AbjG3S4f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 30 Jul 2023 14:56:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230190AbjG2Mzl (ORCPT
+        with ESMTP id S229865AbjG3S4e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Jul 2023 08:55:41 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D513430EF;
-        Sat, 29 Jul 2023 05:55:29 -0700 (PDT)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RCktn4rnjzLnsw;
-        Sat, 29 Jul 2023 20:52:49 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sat, 29 Jul 2023 20:55:27 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 5/7] crypto: hisilicon/qm - prevent soft lockup in qm_poll_req_cb()'s loop
-Date:   Sat, 29 Jul 2023 20:52:37 +0800
-Message-ID: <20230729125239.25337-6-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20230729125239.25337-1-qianweili@huawei.com>
-References: <20230729125239.25337-1-qianweili@huawei.com>
+        Sun, 30 Jul 2023 14:56:34 -0400
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE57810F2;
+        Sun, 30 Jul 2023 11:56:30 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuEsC009246;
+        Sun, 30 Jul 2023 13:56:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1690743374;
+        bh=zmwtTE6Gn6FNjNpT8WsRSK0fWmC4JdsvgzmFXO27aBk=;
+        h=From:Date:Subject:References:In-Reply-To:To:CC;
+        b=oJb3+4/ht7j7N4ODjJoudToJOAuM7po7ANGvpVqG7RHlSnBLgubSLOoBp7FbV6rI0
+         tZ91sb2F+W1YhmrLyc4NsCRrx9jR95tyqPbpSons0JZTLxctKCVLjSNgPELoEcJhHf
+         qaaKa7CvRr9DjwSRbr73Cz5WFcNJcnIMhcjwjJpA=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36UIuEsm017897
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Sun, 30 Jul 2023 13:56:14 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 30
+ Jul 2023 13:56:13 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Sun, 30 Jul 2023 13:56:13 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuCSx005654;
+        Sun, 30 Jul 2023 13:56:13 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+Date:   Mon, 31 Jul 2023 00:25:55 +0530
+Subject: [PATCH 2/5] dt-bindings: crypto: Add binding for TI MCRC64 driver
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20230719-mcrc-upstream-v1-2-dc8798a24c47@ti.com>
+References: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
+In-Reply-To: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        Kamlesh Gurudasani <kamlesh@ti.com>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1690743369; l=2012;
+ i=kamlesh@ti.com; s=20230614; h=from:subject:message-id;
+ bh=bspN7GCCxGmD1lRLV3s1YXzpsokel2Qe0EdKzXaB178=;
+ b=MI2u6vmuU39rWuNOYq3IyMDCY4UIcUDDKtw9vSLIxims5KFxSZWBzCp3SI+4Ly7+wyC1Z1ddD
+ f7hbTnhdnWoCd6OoZ06HYCw2c8aP2FuodvKOROcX5KVwM8Mha0qrnR/
+X-Developer-Key: i=kamlesh@ti.com; a=ed25519;
+ pk=db9XKPVWDGJVqj2jDqgnPQd6uQf3GZ3oaQa4bq1odGo=
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The function qm_poll_req_cb() may take a while due to complex req_cb,
-so soft lockup may occur in kernel with preemption disabled.
+Add binding for Texas Instruments MCRC64 driver
 
-The error logs:
-watchdog: BUG: soft lockup - CPU#23 stuck for 23s! [kworker/u262:1:1407]
-[ 1461.978428][   C23] Call trace:
-[ 1461.981890][   C23]  complete+0x8c/0xf0
-[ 1461.986031][   C23]  kcryptd_async_done+0x154/0x1f4 [dm_crypt]
-[ 1461.992154][   C23]  sec_skcipher_callback+0x7c/0xf4 [hisi_sec2]
-[ 1461.998446][   C23]  sec_req_cb+0x104/0x1f4 [hisi_sec2]
-[ 1462.003950][   C23]  qm_poll_req_cb+0xcc/0x150 [hisi_qm]
-[ 1462.009531][   C23]  qm_work_process+0x60/0xc0 [hisi_qm]
-[ 1462.015101][   C23]  process_one_work+0x1c4/0x470
-[ 1462.020052][   C23]  worker_thread+0x150/0x3c4
-[ 1462.024735][   C23]  kthread+0x108/0x13c
-[ 1462.028889][   C23]  ret_from_fork+0x10/0x18
-
-Add a cond_resched() to prevent that.
-
-Signed-off-by: Weili Qian <qianweili@huawei.com>
+Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- drivers/crypto/hisilicon/qm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 42 ++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                                             |  5 +++++
+ 2 files changed, 47 insertions(+)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 2d0080b546e8..cc2caa08966d 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -954,6 +954,8 @@ static void qm_poll_req_cb(struct hisi_qp *qp)
- 		qm_db(qm, qp->qp_id, QM_DOORBELL_CMD_CQ,
- 		      qp->qp_status.cq_head, 0);
- 		atomic_dec(&qp->qp_status.used);
+diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+new file mode 100644
+index 000000000000..1d1e3f87638c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+@@ -0,0 +1,42 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/ti,mcrc64.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+		cond_resched();
- 	}
++title: Texas Instruments MCRC64 bindings
++
++maintainers:
++  - Kamlesh Gurudasani <kamlesh@ti.com>
++
++properties:
++  compatible:
++    const: ti,mcrc64
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  power-domains:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - power-domains
++
++additionalProperties: false
++
++examples:
++  - |
++    mcrc64: mcrc64@30300000 {
++      compatible = "ti,mcrc64";
++      reg = <0x00 0x30300000 0x00 0x1000>;
++      clocks = <&k3_clks 116 0>;
++      power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
++      };
++
++...
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 733bcfa0209a..d8680f6969e3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21462,6 +21462,11 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/iio/adc/ti,lmp92064.yaml
+ F:	drivers/iio/adc/ti-lmp92064.c
  
- 	/* set c_flag */
++TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
++M:	Kamlesh Gurudasani <kamlesh@ti.com>
++S:	Maintained
++F:	Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
++
+ TI PCM3060 ASoC CODEC DRIVER
+ M:	Kirill Marinushkin <kmarinushkin@birdec.com>
+ L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
+
 -- 
-2.33.0
+2.34.1
 
