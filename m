@@ -2,53 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E18DC04A94
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jul 2023 18:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E511C04E69
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jul 2023 18:56:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbjG3S4f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Jul 2023 14:56:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
+        id S229981AbjG3S4h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 30 Jul 2023 14:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbjG3S4e (ORCPT
+        with ESMTP id S229972AbjG3S4f (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jul 2023 14:56:34 -0400
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE57810F2;
-        Sun, 30 Jul 2023 11:56:30 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuEsC009246;
-        Sun, 30 Jul 2023 13:56:14 -0500
+        Sun, 30 Jul 2023 14:56:35 -0400
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97A3910F5;
+        Sun, 30 Jul 2023 11:56:31 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuAst001274;
+        Sun, 30 Jul 2023 13:56:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1690743374;
-        bh=zmwtTE6Gn6FNjNpT8WsRSK0fWmC4JdsvgzmFXO27aBk=;
-        h=From:Date:Subject:References:In-Reply-To:To:CC;
-        b=oJb3+4/ht7j7N4ODjJoudToJOAuM7po7ANGvpVqG7RHlSnBLgubSLOoBp7FbV6rI0
-         tZ91sb2F+W1YhmrLyc4NsCRrx9jR95tyqPbpSons0JZTLxctKCVLjSNgPELoEcJhHf
-         qaaKa7CvRr9DjwSRbr73Cz5WFcNJcnIMhcjwjJpA=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36UIuEsm017897
+        s=ti-com-17Q1; t=1690743370;
+        bh=yG/C1vbEErBlqYLn5hHGKIm0ols70MLrcZtSkgmvJic=;
+        h=From:Subject:Date:To:CC;
+        b=ZCttN7hdARyCLRCqFTy1CyIY73o2EWl9QxW8BVe1DppRtKQZFAwsAp/3Z/D2amwYX
+         QG+e08SOw9DF6b7uBrx6ox0Fxmu0A/f7GB1nniBgovWa86mc2qDQmH2h2E18gTjOBu
+         lNJ/Dbk8TJEeONFZX1g3Zi6MFloC/ADGqc9xbM3I=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36UIuA6L124302
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sun, 30 Jul 2023 13:56:14 -0500
-Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+        Sun, 30 Jul 2023 13:56:10 -0500
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 30
- Jul 2023 13:56:13 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ Jul 2023 13:56:10 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 30 Jul 2023 13:56:13 -0500
-Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuCSx005654;
-        Sun, 30 Jul 2023 13:56:13 -0500
+ Frontend Transport; Sun, 30 Jul 2023 13:56:10 -0500
+Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36UIu9Zg015546;
+        Sun, 30 Jul 2023 13:56:10 -0500
 From:   Kamlesh Gurudasani <kamlesh@ti.com>
-Date:   Mon, 31 Jul 2023 00:25:55 +0530
-Subject: [PATCH 2/5] dt-bindings: crypto: Add binding for TI MCRC64 driver
+Subject: [PATCH 0/5] Add support for Texas Instruments MCRC64 engine
+Date:   Mon, 31 Jul 2023 00:25:53 +0530
+Message-ID: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20230719-mcrc-upstream-v1-2-dc8798a24c47@ti.com>
-References: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
-In-Reply-To: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
+X-B4-Tracking: v=1; b=H4sIADmyxmQC/x2NywqDQAwAf0VyNuCDsthfEQ/ZNNUcdiuJloL47
+ 649DsMwB7iYisOzOsDkq66fXKCtK+CF8iyor8LQNV3fhHbAxMa4r76ZUMJAMlB4MMU+QGkiuWA
+ 0yrzcVSLfxG6xmrz19x+N03leeUoT6XgAAAA=
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
@@ -63,11 +64,11 @@ CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         Kamlesh Gurudasani <kamlesh@ti.com>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1690743369; l=2012;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1690743368; l=1888;
  i=kamlesh@ti.com; s=20230614; h=from:subject:message-id;
- bh=bspN7GCCxGmD1lRLV3s1YXzpsokel2Qe0EdKzXaB178=;
- b=MI2u6vmuU39rWuNOYq3IyMDCY4UIcUDDKtw9vSLIxims5KFxSZWBzCp3SI+4Ly7+wyC1Z1ddD
- f7hbTnhdnWoCd6OoZ06HYCw2c8aP2FuodvKOROcX5KVwM8Mha0qrnR/
+ bh=6RXzhJuPKeQVT8yLoZOXGWG94dhuDQSE8rTpk961348=;
+ b=jwvxNJyk0a+aMYzVanzcXvyehNYsQJdWePIz/+o/sCCT/07HIFTvMa3m8AQqkwx6Yyfvpzk1e
+ DQ+nUXijCgADfC/XP1BL70vN4fklgYGgaJYGvN1tyJRlThAriGWPSLT
 X-Developer-Key: i=kamlesh@ti.com; a=ed25519;
  pk=db9XKPVWDGJVqj2jDqgnPQd6uQf3GZ3oaQa4bq1odGo=
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
@@ -75,79 +76,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add binding for Texas Instruments MCRC64 driver
+Add support for MCRC64 engine to calculate 64-bit CRC in Full-CPU mode
+
+MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
+according to the ISO 3309 standard.
+
+Generator polynomial: x^64 + x^4 + x^3 + x + 1
+Polynomial value: 0x000000000000001b
+
+Tested with
+
+and tcrypt,
+sudo modprobe tcrypt mode=329 sec=1
 
 Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 42 ++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS                                             |  5 +++++
- 2 files changed, 47 insertions(+)
+Kamlesh Gurudasani (5):
+      crypto: crc64 - add crc64-iso test vectors
+      dt-bindings: crypto: Add binding for TI MCRC64 driver
+      crypto: ti - add driver for MCRC64 engine
+      arm64: dts: ti: k3-am62: Add dt node, cbass_main ranges for MCRC64
+      arm64: defconfig: enable MCRC module
 
-diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-new file mode 100644
-index 000000000000..1d1e3f87638c
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-@@ -0,0 +1,42 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/ti,mcrc64.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Texas Instruments MCRC64 bindings
-+
-+maintainers:
-+  - Kamlesh Gurudasani <kamlesh@ti.com>
-+
-+properties:
-+  compatible:
-+    const: ti,mcrc64
-+
-+  reg:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  power-domains:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+  - power-domains
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    mcrc64: mcrc64@30300000 {
-+      compatible = "ti,mcrc64";
-+      reg = <0x00 0x30300000 0x00 0x1000>;
-+      clocks = <&k3_clks 116 0>;
-+      power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
-+      };
-+
-+...
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 733bcfa0209a..d8680f6969e3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21462,6 +21462,11 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/iio/adc/ti,lmp92064.yaml
- F:	drivers/iio/adc/ti-lmp92064.c
- 
-+TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
-+M:	Kamlesh Gurudasani <kamlesh@ti.com>
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-+
- TI PCM3060 ASoC CODEC DRIVER
- M:	Kirill Marinushkin <kmarinushkin@birdec.com>
- L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
+ Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml |  42 +++++++
+ MAINTAINERS                                             |   7 ++
+ arch/arm64/boot/dts/ti/k3-am62-main.dtsi                |   7 ++
+ arch/arm64/boot/dts/ti/k3-am62.dtsi                     |   1 +
+ arch/arm64/configs/defconfig                            |   2 +
+ crypto/tcrypt.c                                         |   5 +
+ crypto/testmgr.c                                        |   7 ++
+ crypto/testmgr.h                                        | 401 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/Kconfig                                  |   1 +
+ drivers/crypto/Makefile                                 |   1 +
+ drivers/crypto/ti/Kconfig                               |  10 ++
+ drivers/crypto/ti/Makefile                              |   2 +
+ drivers/crypto/ti/mcrc64.c                              | 360 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 846 insertions(+)
+---
+base-commit: d7b3af5a77e8d8da28f435f313e069aea5bcf172
+change-id: 20230719-mcrc-upstream-7ae9a75cab37
 
+Best regards,
 -- 
-2.34.1
+Kamlesh Gurudasani <kamlesh@ti.com>
 
