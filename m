@@ -2,54 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6334C04E69
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jul 2023 18:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1AC9C001DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jul 2023 19:15:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbjG3S4s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Jul 2023 14:56:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34926 "EHLO
+        id S229995AbjG3TP6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 30 Jul 2023 15:15:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbjG3S4h (ORCPT
+        with ESMTP id S229487AbjG3TP6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jul 2023 14:56:37 -0400
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6655B10FA;
-        Sun, 30 Jul 2023 11:56:32 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuCMG124820;
-        Sun, 30 Jul 2023 13:56:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1690743372;
-        bh=kbbubdhTt2f5y5oChnGvbOZh7LriUB9XCUR91AjhkjI=;
-        h=From:Date:Subject:References:In-Reply-To:To:CC;
-        b=Vu8pqcyFpk0w3XL5l4al36uPwWQ/ed7re2RS+4iJqaR589lVSubS7vSIMN0LBWDws
-         IsjPEfUIt75u3CphboIj7BJ986IzbhtoYiqvMxNq6wBg56U5uH6jfDit5g2Hhc4RdL
-         QC4yqRYUKRSSaOkw7gPpANq86O5ITuJbSuK18b/g=
-Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 36UIuC7Q017890
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Sun, 30 Jul 2023 13:56:12 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 30
- Jul 2023 13:56:11 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 30 Jul 2023 13:56:11 -0500
-Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 36UIuBNE041348;
-        Sun, 30 Jul 2023 13:56:11 -0500
-From:   Kamlesh Gurudasani <kamlesh@ti.com>
-Date:   Mon, 31 Jul 2023 00:25:54 +0530
-Subject: [PATCH 1/5] crypto: crc64 - add crc64-iso test vectors
+        Sun, 30 Jul 2023 15:15:58 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63811709
+        for <linux-crypto@vger.kernel.org>; Sun, 30 Jul 2023 12:15:53 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-991da766865so603876866b.0
+        for <linux-crypto@vger.kernel.org>; Sun, 30 Jul 2023 12:15:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1690744552; x=1691349352;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bAdDlvNo2vLdfcsDPkJen+iBi4ac4UvVpMaDLLPdBg4=;
+        b=N5KWFa365inzuu97p0Hlj4dphVbT6YW8++Knq7ZXcnWyZzQQI5zb708SBazsItYwTs
+         LXpt7ztZ1aU1ZYgnlHORxIJ8YVy9nKS+bjQsRcX4reXTAQGSCXnclXT9VFAd3a6UH14t
+         HL95/2YSY2m1L2Ai/bIqbP1xOcNFuOE9GMQwCTQFzBGZyAuopL7u6JT/NThigc7Gxjtc
+         IKUI6CkPg4A/5q7P7+xlMFFENsOAN67u6q2p+qrm8Fo/Wj56snPiESkmXcmSqlqSQhn6
+         RY479HdpB9pYphd0gpJei6BfxDeJxAET4ScdRVFDEwVG9znT8Qig5RlX4ac11nnRglvr
+         EtqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690744552; x=1691349352;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bAdDlvNo2vLdfcsDPkJen+iBi4ac4UvVpMaDLLPdBg4=;
+        b=O3x7vd0tow0fOO9gZCJF7T3aie/rh7zUbQPpC1E9zC+Q9qW2EZzV984s9qxzwBdyJ0
+         ydqXvNruOZmp2GvFa3cBbdVkUV16AAUeg5PVxVvKm7/Jw4ueFLXs/qmy5Yn8ZGvQmtqQ
+         YXaBs+AGWui0385AvWD1i3BLwQ0BvK8XcnYhb5+hC22ELRhq5ySQwpKbgJ9iLozOKp6h
+         Oo5IWREQZg3nDmnsbHXazA9ui3h5M/i6aMAPYCPnGxkYee3MJTBE+p2q7QvaKeb7t6oQ
+         Sze7Fx5HiqL6spBW6cEyk3ZNeOUzdSNgj/bxDjTGmN3+MPs2HtlgMhEf1M2ksnRAejff
+         YofQ==
+X-Gm-Message-State: ABy/qLZoD/dNZ56DQGmMGwMZ/AEUXpJWGgZM2sXX7z1C56AE2Hnc1pKe
+        UDcHrgSdUqJ5cKUqoSVXzXiH1w==
+X-Google-Smtp-Source: APBJJlENFI8r0s0dm1vmxCNCtoyiiHZ+kTqoFDnQ/fMkWAclhRP5VUEXkQcU3Cpdq2nz8a5eXAyvtA==
+X-Received: by 2002:a17:907:2712:b0:97e:aace:b6bc with SMTP id w18-20020a170907271200b0097eaaceb6bcmr4961797ejk.53.1690744551930;
+        Sun, 30 Jul 2023 12:15:51 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.183])
+        by smtp.gmail.com with ESMTPSA id dk8-20020a170906f0c800b00992f2befcbcsm5006941ejb.180.2023.07.30.12.15.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Jul 2023 12:15:51 -0700 (PDT)
+Message-ID: <8ea4f777-5645-96ae-164f-ff9f7b736eda@linaro.org>
+Date:   Sun, 30 Jul 2023 21:15:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20230719-mcrc-upstream-v1-1-dc8798a24c47@ti.com>
-References: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
-In-Reply-To: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH 2/5] dt-bindings: crypto: Add binding for TI MCRC64 driver
+Content-Language: en-US
+To:     Kamlesh Gurudasani <kamlesh@ti.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
@@ -58,483 +67,103 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Tero Kristo <kristo@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Kamlesh Gurudasani <kamlesh@ti.com>
-X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1690743369; l=18508;
- i=kamlesh@ti.com; s=20230614; h=from:subject:message-id;
- bh=xR1LPlTeDpWeiZlUOTacD4BFkFFLB5r6obl8wFm/y1k=;
- b=o//A/db7fTytRceS8At1XChatESzfXjC/ZDgUPs0DaqbFojfz+KSX7m8X23rNPBWFm+xqlQyo
- l3dOcwV7XSYDxWIMl3mddfEOARPmQ5dJlpaq32htHDcddcg+Vmzq8fY
-X-Developer-Key: i=kamlesh@ti.com; a=ed25519;
- pk=db9XKPVWDGJVqj2jDqgnPQd6uQf3GZ3oaQa4bq1odGo=
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com>
+ <20230719-mcrc-upstream-v1-2-dc8798a24c47@ti.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230719-mcrc-upstream-v1-2-dc8798a24c47@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add testmgr, tcrypt tests and vectors for 64-bit cyclic
-redundancy checks (CRC) according to the ISO 3309 standard.
+On 30/07/2023 20:55, Kamlesh Gurudasani wrote:
+> Add binding for Texas Instruments MCRC64 driver
 
-Generator polynomial: x^64 + x^4 + x^3 + x + 1
-Polynomial value: 0x000000000000001b
+A nit, subject: drop second/last, redundant "binding for". The
+"dt-bindings" prefix is already stating that these are bindings.
 
-Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
----
- crypto/tcrypt.c  |   5 ++
- crypto/testmgr.c |   7 ++
- crypto/testmgr.h | 401 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 413 insertions(+)
+Here and subject: drop driver. Bindings are for hardware.
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 202ca1a3105d..a41d52a879d6 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -2327,6 +2327,11 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 				generic_hash_speed_template);
- 		if (mode > 300 && mode < 400) break;
- 		fallthrough;
-+	case 329:
-+		test_hash_speed("crc64-iso", sec, generic_hash_speed_template);
-+		if (mode > 300 && mode < 400)
-+			break;
-+		fallthrough;
- 	case 399:
- 		break;
- 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 216878c8bc3d..bd0414b99287 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4679,6 +4679,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.hash = __VECS(crc32c_tv_template)
- 		}
-+	}, {
-+		.alg = "crc64-iso",
-+		.test = alg_test_hash,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.hash = __VECS(crc64_iso_tv_template)
-+		}
- 	}, {
- 		.alg = "crc64-rocksoft",
- 		.test = alg_test_hash,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 5ca7a412508f..54d0b03e3228 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -5209,6 +5209,407 @@ static const struct hash_testvec rmd160_tv_template[] = {
- 	}
- };
- 
-+static const struct hash_testvec crc64_iso_tv_template[] = {
-+	{
-+		.plaintext = "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.psize = 8,
-+		.digest = "\x00\x00\x00\x00\x00\x00\x00\x00",
-+	},
-+	{
-+		.plaintext = "\x01\x02\x03\x04\x05\x06\x07\x08"
-+			     "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
-+			     "\x11\x12\x13\x14\x15\x16\x17\x18"
-+			     "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
-+			     "\x21\x22\x23\x24\x25\x26\x27\x28",
-+		.psize = 40,
-+		.digest = "\xaf\x45\xba\x7d\xf2\xda\xa0\xaa",
-+	},
-+	{
-+		.plaintext = "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
-+			     "\x31\x32\x33\x34\x35\x36\x37\x38"
-+			     "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
-+			     "\x41\x42\x43\x44\x45\x46\x47\x48"
-+			     "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50",
-+		.psize = 40,
-+		.digest = "\x81\x55\x2e\x76\xf8\xd0\xaa\xa0",
-+	},
-+	{
-+		.plaintext = "\x51\x52\x53\x54\x55\x56\x57\x58"
-+			     "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
-+			     "\x61\x62\x63\x64\x65\x66\x67\x68"
-+			     "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
-+			     "\x71\x72\x73\x74\x75\x76\x77\x78",
-+		.psize = 40,
-+		.digest = "\xc6\xb6\x26\x82\x0d\x25\x5f\x55",
-+	},
-+	{
-+		.plaintext = "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
-+			     "\x81\x82\x83\x84\x85\x86\x87\x88"
-+			     "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
-+			     "\x91\x92\x93\x94\x95\x96\x97\x98"
-+			     "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0",
-+		.psize = 40,
-+		.digest = "\x20\x8a\xe6\x59\xdf\xf7\x8d\x87",
-+	},
-+	{
-+		.plaintext = "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
-+			     "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
-+			     "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
-+			     "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
-+			     "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8",
-+		.psize = 40,
-+		.digest = "\x19\x9e\xba\xff\x70\x58\x22\x28",
-+
-+	},
-+	{
-+		.plaintext = "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
-+			     "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
-+			     "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
-+			     "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
-+			     "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
-+		.psize = 40,
-+		.digest = "\xa3\xdc\x11\x98\x16\x3e\x44\x4e",
-+	},
-+	{
-+		.plaintext = "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
-+			     "\x31\x32\x33\x34\x35\x36\x37\x38"
-+			     "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
-+			     "\x41\x42\x43\x44\x45\x46\x47\x48"
-+			     "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50",
-+		.psize = 40,
-+		.digest = "\x81\x55\x2e\x76\xf8\xd0\xaa\xa0",
-+	},
-+	{
-+		.plaintext = "\x51\x52\x53\x54\x55\x56\x57\x58"
-+			     "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
-+			     "\x61\x62\x63\x64\x65\x66\x67\x68"
-+			     "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
-+			     "\x71\x72\x73\x74\x75\x76\x77\x78",
-+		.psize = 40,
-+		.digest = "\xc6\xb6\x26\x82\x0d\x25\x5f\x55",
-+	},
-+	{
-+		.plaintext = "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
-+			     "\x81\x82\x83\x84\x85\x86\x87\x88"
-+			     "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
-+			     "\x91\x92\x93\x94\x95\x96\x97\x98"
-+			     "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0",
-+		.psize = 40,
-+		.digest = "\x20\x8a\xe6\x59\xdf\xf7\x8d\x87",
-+	},
-+	{
-+		.plaintext = "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
-+			     "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
-+			     "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
-+			     "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
-+			     "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8",
-+		.psize = 40,
-+		.digest = "\x19\x9e\xba\xff\x70\x58\x22\x28",
-+	},
-+	{
-+		.plaintext = "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
-+			     "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
-+			     "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
-+			     "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
-+			     "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
-+		.psize = 40,
-+		.digest = "\xa3\xdc\x11\x98\x16\x3e\x44\x4e",
-+	},
-+	{
-+		.plaintext = "\x01\x02\x03\x04\x05\x06\x07\x08"
-+			     "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
-+			     "\x11\x12\x13\x14\x15\x16\x17\x18"
-+			     "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
-+			     "\x21\x22\x23\x24\x25\x26\x27\x28"
-+			     "\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30"
-+			     "\x31\x32\x33\x34\x35\x36\x37\x38"
-+			     "\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40"
-+			     "\x41\x42\x43\x44\x45\x46\x47\x48"
-+			     "\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50"
-+			     "\x51\x52\x53\x54\x55\x56\x57\x58"
-+			     "\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60"
-+			     "\x61\x62\x63\x64\x65\x66\x67\x68"
-+			     "\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70"
-+			     "\x71\x72\x73\x74\x75\x76\x77\x78"
-+			     "\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80"
-+			     "\x81\x82\x83\x84\x85\x86\x87\x88"
-+			     "\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90"
-+			     "\x91\x92\x93\x94\x95\x96\x97\x98"
-+			     "\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0"
-+			     "\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8"
-+			     "\xa9\xaa\xab\xac\xad\xae\xaf\xb0"
-+			     "\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8"
-+			     "\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0"
-+			     "\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8"
-+			     "\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0"
-+			     "\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8"
-+			     "\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0"
-+			     "\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
-+			     "\xe9\xea\xeb\xec\xed\xee\xef\xf0",
-+		.psize = 240,
-+		.digest = "\x19\x0f\xb1\x04\x11\x22\xfc\x21",
-+	}, {
-+		.plaintext = "\x6e\x05\x79\x10\xa7\x1b\xb2\x49"
-+			     "\xe0\x54\xeb\x82\x19\x8d\x24\xbb"
-+			     "\x2f\xc6\x5d\xf4\x68\xff\x96\x0a"
-+			     "\xa1\x38\xcf\x43\xda\x71\x08\x7c"
-+			     "\x13\xaa\x1e\xb5\x4c\xe3\x57\xee"
-+			     "\x85\x1c\x90\x27\xbe\x32\xc9\x60"
-+			     "\xf7\x6b\x02\x99\x0d\xa4\x3b\xd2"
-+			     "\x46\xdd\x74\x0b\x7f\x16\xad\x21"
-+			     "\xb8\x4f\xe6\x5a\xf1\x88\x1f\x93"
-+			     "\x2a\xc1\x35\xcc\x63\xfa\x6e\x05"
-+			     "\x9c\x10\xa7\x3e\xd5\x49\xe0\x77"
-+			     "\x0e\x82\x19\xb0\x24\xbb\x52\xe9"
-+			     "\x5d\xf4\x8b\x22\x96\x2d\xc4\x38"
-+			     "\xcf\x66\xfd\x71\x08\x9f\x13\xaa"
-+			     "\x41\xd8\x4c\xe3\x7a\x11\x85\x1c"
-+			     "\xb3\x27\xbe\x55\xec\x60\xf7\x8e"
-+			     "\x02\x99\x30\xc7\x3b\xd2\x69\x00"
-+			     "\x74\x0b\xa2\x16\xad\x44\xdb\x4f"
-+			     "\xe6\x7d\x14\x88\x1f\xb6\x2a\xc1"
-+			     "\x58\xef\x63\xfa\x91\x05\x9c\x33"
-+			     "\xca\x3e\xd5\x6c\x03\x77\x0e\xa5"
-+			     "\x19\xb0\x47\xde\x52\xe9\x80\x17"
-+			     "\x8b\x22\xb9\x2d\xc4\x5b\xf2\x66"
-+			     "\xfd\x94\x08\x9f\x36\xcd\x41\xd8"
-+			     "\x6f\x06\x7a\x11\xa8\x1c\xb3\x4a"
-+			     "\xe1\x55\xec\x83\x1a\x8e\x25\xbc"
-+			     "\x30\xc7\x5e\xf5\x69\x00\x97\x0b"
-+			     "\xa2\x39\xd0\x44\xdb\x72\x09\x7d"
-+			     "\x14\xab\x1f\xb6\x4d\xe4\x58\xef"
-+			     "\x86\x1d\x91\x28\xbf\x33\xca\x61"
-+			     "\xf8\x6c\x03\x9a\x0e\xa5\x3c\xd3"
-+			     "\x47\xde\x75\x0c\x80\x17\xae\x22"
-+			     "\xb9\x50\xe7\x5b\xf2\x89\x20\x94"
-+			     "\x2b\xc2\x36\xcd\x64\xfb\x6f\x06"
-+			     "\x9d\x11\xa8\x3f\xd6\x4a\xe1\x78"
-+			     "\x0f\x83\x1a\xb1\x25\xbc\x53\xea"
-+			     "\x5e\xf5\x8c\x00\x97\x2e\xc5\x39"
-+			     "\xd0\x67\xfe\x72\x09\xa0\x14\xab"
-+			     "\x42\xd9\x4d\xe4\x7b\x12\x86\x1d"
-+			     "\xb4\x28\xbf\x56\xed\x61\xf8\x8f"
-+			     "\x03\x9a\x31\xc8\x3c\xd3\x6a\x01"
-+			     "\x75\x0c\xa3\x17\xae\x45\xdc\x50"
-+			     "\xe7\x7e\x15\x89\x20\xb7\x2b\xc2"
-+			     "\x59\xf0\x64\xfb\x92\x06\x9d\x34"
-+			     "\xcb\x3f\xd6\x6d\x04\x78\x0f\xa6"
-+			     "\x1a\xb1\x48\xdf\x53\xea\x81\x18"
-+			     "\x8c\x23\xba\x2e\xc5\x5c\xf3\x67"
-+			     "\xfe\x95\x09\xa0\x37\xce\x42\xd9"
-+			     "\x70\x07\x7b\x12\xa9\x1d\xb4\x4b"
-+			     "\xe2\x56\xed\x84\x1b\x8f\x26\xbd"
-+			     "\x31\xc8\x5f\xf6\x6a\x01\x98\x0c"
-+			     "\xa3\x3a\xd1\x45\xdc\x73\x0a\x7e"
-+			     "\x15\xac\x20\xb7\x4e\xe5\x59\xf0"
-+			     "\x87\x1e\x92\x29\xc0\x34\xcb\x62"
-+			     "\xf9\x6d\x04\x9b\x0f\xa6\x3d\xd4"
-+			     "\x48\xdf\x76\x0d\x81\x18\xaf\x23"
-+			     "\xba\x51\xe8\x5c\xf3\x8a\x21\x95"
-+			     "\x2c\xc3\x37\xce\x65\xfc\x70\x07"
-+			     "\x9e\x12\xa9\x40\xd7\x4b\xe2\x79"
-+			     "\x10\x84\x1b\xb2\x26\xbd\x54\xeb"
-+			     "\x5f\xf6\x8d\x01\x98\x2f\xc6\x3a"
-+			     "\xd1\x68\xff\x73\x0a\xa1\x15\xac"
-+			     "\x43\xda\x4e\xe5\x7c\x13\x87\x1e"
-+			     "\xb5\x29\xc0\x57\xee\x62\xf9\x90"
-+			     "\x04\x9b\x32\xc9\x3d\xd4\x6b\x02"
-+			     "\x76\x0d\xa4\x18\xaf\x46\xdd\x51"
-+			     "\xe8\x7f\x16\x8a\x21\xb8\x2c\xc3"
-+			     "\x5a\xf1\x65\xfc\x93\x07\x9e\x35"
-+			     "\xcc\x40\xd7\x6e\x05\x79\x10\xa7"
-+			     "\x1b\xb2\x49\xe0\x54\xeb\x82\x19"
-+			     "\x8d\x24\xbb\x2f\xc6\x5d\xf4\x68"
-+			     "\xff\x96\x0a\xa1\x38\xcf\x43\xda"
-+			     "\x71\x08\x7c\x13\xaa\x1e\xb5\x4c"
-+			     "\xe3\x57\xee\x85\x1c\x90\x27\xbe"
-+			     "\x32\xc9\x60\xf7\x6b\x02\x99\x0d"
-+			     "\xa4\x3b\xd2\x46\xdd\x74\x0b\x7f"
-+			     "\x16\xad\x21\xb8\x4f\xe6\x5a\xf1"
-+			     "\x88\x1f\x93\x2a\xc1\x35\xcc\x63"
-+			     "\xfa\x6e\x05\x9c\x10\xa7\x3e\xd5"
-+			     "\x49\xe0\x77\x0e\x82\x19\xb0\x24"
-+			     "\xbb\x52\xe9\x5d\xf4\x8b\x22\x96"
-+			     "\x2d\xc4\x38\xcf\x66\xfd\x71\x08"
-+			     "\x9f\x13\xaa\x41\xd8\x4c\xe3\x7a"
-+			     "\x11\x85\x1c\xb3\x27\xbe\x55\xec"
-+			     "\x60\xf7\x8e\x02\x99\x30\xc7\x3b"
-+			     "\xd2\x69\x00\x74\x0b\xa2\x16\xad"
-+			     "\x44\xdb\x4f\xe6\x7d\x14\x88\x1f"
-+			     "\xb6\x2a\xc1\x58\xef\x63\xfa\x91"
-+			     "\x05\x9c\x33\xca\x3e\xd5\x6c\x03"
-+			     "\x77\x0e\xa5\x19\xb0\x47\xde\x52"
-+			     "\xe9\x80\x17\x8b\x22\xb9\x2d\xc4"
-+			     "\x5b\xf2\x66\xfd\x94\x08\x9f\x36"
-+			     "\xcd\x41\xd8\x6f\x06\x7a\x11\xa8"
-+			     "\x1c\xb3\x4a\xe1\x55\xec\x83\x1a"
-+			     "\x8e\x25\xbc\x30\xc7\x5e\xf5\x69"
-+			     "\x00\x97\x0b\xa2\x39\xd0\x44\xdb"
-+			     "\x72\x09\x7d\x14\xab\x1f\xb6\x4d"
-+			     "\xe4\x58\xef\x86\x1d\x91\x28\xbf"
-+			     "\x33\xca\x61\xf8\x6c\x03\x9a\x0e"
-+			     "\xa5\x3c\xd3\x47\xde\x75\x0c\x80"
-+			     "\x17\xae\x22\xb9\x50\xe7\x5b\xf2"
-+			     "\x89\x20\x94\x2b\xc2\x36\xcd\x64"
-+			     "\xfb\x6f\x06\x9d\x11\xa8\x3f\xd6"
-+			     "\x4a\xe1\x78\x0f\x83\x1a\xb1\x25"
-+			     "\xbc\x53\xea\x5e\xf5\x8c\x00\x97"
-+			     "\x2e\xc5\x39\xd0\x67\xfe\x72\x09"
-+			     "\xa0\x14\xab\x42\xd9\x4d\xe4\x7b"
-+			     "\x12\x86\x1d\xb4\x28\xbf\x56\xed"
-+			     "\x61\xf8\x8f\x03\x9a\x31\xc8\x3c"
-+			     "\xd3\x6a\x01\x75\x0c\xa3\x17\xae"
-+			     "\x45\xdc\x50\xe7\x7e\x15\x89\x20"
-+			     "\xb7\x2b\xc2\x59\xf0\x64\xfb\x92"
-+			     "\x06\x9d\x34\xcb\x3f\xd6\x6d\x04"
-+			     "\x78\x0f\xa6\x1a\xb1\x48\xdf\x53"
-+			     "\xea\x81\x18\x8c\x23\xba\x2e\xc5"
-+			     "\x5c\xf3\x67\xfe\x95\x09\xa0\x37"
-+			     "\xce\x42\xd9\x70\x07\x7b\x12\xa9"
-+			     "\x1d\xb4\x4b\xe2\x56\xed\x84\x1b"
-+			     "\x8f\x26\xbd\x31\xc8\x5f\xf6\x6a"
-+			     "\x01\x98\x0c\xa3\x3a\xd1\x45\xdc"
-+			     "\x73\x0a\x7e\x15\xac\x20\xb7\x4e"
-+			     "\xe5\x59\xf0\x87\x1e\x92\x29\xc0"
-+			     "\x34\xcb\x62\xf9\x6d\x04\x9b\x0f"
-+			     "\xa6\x3d\xd4\x48\xdf\x76\x0d\x81"
-+			     "\x18\xaf\x23\xba\x51\xe8\x5c\xf3"
-+			     "\x8a\x21\x95\x2c\xc3\x37\xce\x65"
-+			     "\xfc\x70\x07\x9e\x12\xa9\x40\xd7"
-+			     "\x4b\xe2\x79\x10\x84\x1b\xb2\x26"
-+			     "\xbd\x54\xeb\x5f\xf6\x8d\x01\x98"
-+			     "\x2f\xc6\x3a\xd1\x68\xff\x73\x0a"
-+			     "\xa1\x15\xac\x43\xda\x4e\xe5\x7c"
-+			     "\x13\x87\x1e\xb5\x29\xc0\x57\xee"
-+			     "\x62\xf9\x90\x04\x9b\x32\xc9\x3d"
-+			     "\xd4\x6b\x02\x76\x0d\xa4\x18\xaf"
-+			     "\x46\xdd\x51\xe8\x7f\x16\x8a\x21"
-+			     "\xb8\x2c\xc3\x5a\xf1\x65\xfc\x93"
-+			     "\x07\x9e\x35\xcc\x40\xd7\x6e\x05"
-+			     "\x79\x10\xa7\x1b\xb2\x49\xe0\x54"
-+			     "\xeb\x82\x19\x8d\x24\xbb\x2f\xc6"
-+			     "\x5d\xf4\x68\xff\x96\x0a\xa1\x38"
-+			     "\xcf\x43\xda\x71\x08\x7c\x13\xaa"
-+			     "\x1e\xb5\x4c\xe3\x57\xee\x85\x1c"
-+			     "\x90\x27\xbe\x32\xc9\x60\xf7\x6b"
-+			     "\x02\x99\x0d\xa4\x3b\xd2\x46\xdd"
-+			     "\x74\x0b\x7f\x16\xad\x21\xb8\x4f"
-+			     "\xe6\x5a\xf1\x88\x1f\x93\x2a\xc1"
-+			     "\x35\xcc\x63\xfa\x6e\x05\x9c\x10"
-+			     "\xa7\x3e\xd5\x49\xe0\x77\x0e\x82"
-+			     "\x19\xb0\x24\xbb\x52\xe9\x5d\xf4"
-+			     "\x8b\x22\x96\x2d\xc4\x38\xcf\x66"
-+			     "\xfd\x71\x08\x9f\x13\xaa\x41\xd8"
-+			     "\x4c\xe3\x7a\x11\x85\x1c\xb3\x27"
-+			     "\xbe\x55\xec\x60\xf7\x8e\x02\x99"
-+			     "\x30\xc7\x3b\xd2\x69\x00\x74\x0b"
-+			     "\xa2\x16\xad\x44\xdb\x4f\xe6\x7d"
-+			     "\x14\x88\x1f\xb6\x2a\xc1\x58\xef"
-+			     "\x63\xfa\x91\x05\x9c\x33\xca\x3e"
-+			     "\xd5\x6c\x03\x77\x0e\xa5\x19\xb0"
-+			     "\x47\xde\x52\xe9\x80\x17\x8b\x22"
-+			     "\xb9\x2d\xc4\x5b\xf2\x66\xfd\x94"
-+			     "\x08\x9f\x36\xcd\x41\xd8\x6f\x06"
-+			     "\x7a\x11\xa8\x1c\xb3\x4a\xe1\x55"
-+			     "\xec\x83\x1a\x8e\x25\xbc\x30\xc7"
-+			     "\x5e\xf5\x69\x00\x97\x0b\xa2\x39"
-+			     "\xd0\x44\xdb\x72\x09\x7d\x14\xab"
-+			     "\x1f\xb6\x4d\xe4\x58\xef\x86\x1d"
-+			     "\x91\x28\xbf\x33\xca\x61\xf8\x6c"
-+			     "\x03\x9a\x0e\xa5\x3c\xd3\x47\xde"
-+			     "\x75\x0c\x80\x17\xae\x22\xb9\x50"
-+			     "\xe7\x5b\xf2\x89\x20\x94\x2b\xc2"
-+			     "\x36\xcd\x64\xfb\x6f\x06\x9d\x11"
-+			     "\xa8\x3f\xd6\x4a\xe1\x78\x0f\x83"
-+			     "\x1a\xb1\x25\xbc\x53\xea\x5e\xf5"
-+			     "\x8c\x00\x97\x2e\xc5\x39\xd0\x67"
-+			     "\xfe\x72\x09\xa0\x14\xab\x42\xd9"
-+			     "\x4d\xe4\x7b\x12\x86\x1d\xb4\x28"
-+			     "\xbf\x56\xed\x61\xf8\x8f\x03\x9a"
-+			     "\x31\xc8\x3c\xd3\x6a\x01\x75\x0c"
-+			     "\xa3\x17\xae\x45\xdc\x50\xe7\x7e"
-+			     "\x15\x89\x20\xb7\x2b\xc2\x59\xf0"
-+			     "\x64\xfb\x92\x06\x9d\x34\xcb\x3f"
-+			     "\xd6\x6d\x04\x78\x0f\xa6\x1a\xb1"
-+			     "\x48\xdf\x53\xea\x81\x18\x8c\x23"
-+			     "\xba\x2e\xc5\x5c\xf3\x67\xfe\x95"
-+			     "\x09\xa0\x37\xce\x42\xd9\x70\x07"
-+			     "\x7b\x12\xa9\x1d\xb4\x4b\xe2\x56"
-+			     "\xed\x84\x1b\x8f\x26\xbd\x31\xc8"
-+			     "\x5f\xf6\x6a\x01\x98\x0c\xa3\x3a"
-+			     "\xd1\x45\xdc\x73\x0a\x7e\x15\xac"
-+			     "\x20\xb7\x4e\xe5\x59\xf0\x87\x1e"
-+			     "\x92\x29\xc0\x34\xcb\x62\xf9\x6d"
-+			     "\x04\x9b\x0f\xa6\x3d\xd4\x48\xdf"
-+			     "\x76\x0d\x81\x18\xaf\x23\xba\x51"
-+			     "\xe8\x5c\xf3\x8a\x21\x95\x2c\xc3"
-+			     "\x37\xce\x65\xfc\x70\x07\x9e\x12"
-+			     "\xa9\x40\xd7\x4b\xe2\x79\x10\x84"
-+			     "\x1b\xb2\x26\xbd\x54\xeb\x5f\xf6"
-+			     "\x8d\x01\x98\x2f\xc6\x3a\xd1\x68"
-+			     "\xff\x73\x0a\xa1\x15\xac\x43\xda"
-+			     "\x4e\xe5\x7c\x13\x87\x1e\xb5\x29"
-+			     "\xc0\x57\xee\x62\xf9\x90\x04\x9b"
-+			     "\x32\xc9\x3d\xd4\x6b\x02\x76\x0d"
-+			     "\xa4\x18\xaf\x46\xdd\x51\xe8\x7f"
-+			     "\x16\x8a\x21\xb8\x2c\xc3\x5a\xf1"
-+			     "\x65\xfc\x93\x07\x9e\x35\xcc\x40"
-+			     "\xd7\x6e\x05\x79\x10\xa7\x1b\xb2"
-+			     "\x49\xe0\x54\xeb\x82\x19\x8d\x24"
-+			     "\xbb\x2f\xc6\x5d\xf4\x68\xff\x96"
-+			     "\x0a\xa1\x38\xcf\x43\xda\x71\x08"
-+			     "\x7c\x13\xaa\x1e\xb5\x4c\xe3\x57"
-+			     "\xee\x85\x1c\x90\x27\xbe\x32\xc9"
-+			     "\x60\xf7\x6b\x02\x99\x0d\xa4\x3b"
-+			     "\xd2\x46\xdd\x74\x0b\x7f\x16\xad"
-+			     "\x21\xb8\x4f\xe6\x5a\xf1\x88\x1f"
-+			     "\x93\x2a\xc1\x35\xcc\x63\xfa\x6e"
-+			     "\x05\x9c\x10\xa7\x3e\xd5\x49\xe0"
-+			     "\x77\x0e\x82\x19\xb0\x24\xbb\x52"
-+			     "\xe9\x5d\xf4\x8b\x22\x96\x2d\xc4"
-+			     "\x38\xcf\x66\xfd\x71\x08\x9f\x13"
-+			     "\xaa\x41\xd8\x4c\xe3\x7a\x11\x85"
-+			     "\x1c\xb3\x27\xbe\x55\xec\x60\xf7"
-+			     "\x8e\x02\x99\x30\xc7\x3b\xd2\x69"
-+			     "\x00\x74\x0b\xa2\x16\xad\x44\xdb"
-+			     "\x4f\xe6\x7d\x14\x88\x1f\xb6\x2a"
-+			     "\xc1\x58\xef\x63\xfa\x91\x05\x9c"
-+			     "\x33\xca\x3e\xd5\x6c\x03\x77\x0e"
-+			     "\xa5\x19\xb0\x47\xde\x52\xe9\x80"
-+			     "\x17\x8b\x22\xb9\x2d\xc4\x5b\xf2"
-+			     "\x66\xfd\x94\x08\x9f\x36\xcd\x41"
-+			     "\xd8\x6f\x06\x7a\x11\xa8\x1c\xb3"
-+			     "\x4a\xe1\x55\xec\x83\x1a\x8e\x25"
-+			     "\xbc\x30\xc7\x5e\xf5\x69\x00\x97"
-+			     "\x0b\xa2\x39\xd0\x44\xdb\x72\x09"
-+			     "\x7d\x14\xab\x1f\xb6\x4d\xe4\x58"
-+			     "\xef\x86\x1d\x91\x28\xbf\x33\xca"
-+			     "\x61\xf8\x6c\x03\x9a\x0e\xa5\x3c"
-+			     "\xd3\x47\xde\x75\x0c\x80\x17\xae"
-+			     "\x22\xb9\x50\xe7\x5b\xf2\x89\x20"
-+			     "\x94\x2b\xc2\x36\xcd\x64\xfb\x6f"
-+			     "\x06\x9d\x11\xa8\x3f\xd6\x4a\xe1"
-+			     "\x78\x0f\x83\x1a\xb1\x25\xbc\x53"
-+			     "\xea\x5e\xf5\x8c\x00\x97\x2e\xc5"
-+			     "\x39\xd0\x67\xfe\x72\x09\xa0\x14"
-+			     "\xab\x42\xd9\x4d\xe4\x7b\x12\x86"
-+			     "\x1d\xb4\x28\xbf\x56\xed\x61\xf8"
-+			     "\x8f\x03\x9a\x31\xc8\x3c\xd3\x6a"
-+			     "\x01\x75\x0c\xa3\x17\xae\x45\xdc"
-+			     "\x50\xe7\x7e\x15\x89\x20\xb7\x2b"
-+			     "\xc2\x59\xf0\x64\xfb\x92\x06\x9d"
-+			     "\x34\xcb\x3f\xd6\x6d\x04\x78\x0f"
-+			     "\xa6\x1a\xb1\x48\xdf\x53\xea\x81"
-+			     "\x18\x8c\x23\xba\x2e\xc5\x5c\xf3"
-+			     "\x67\xfe\x95\x09\xa0\x37\xce\x42"
-+			     "\xd9\x70\x07\x7b\x12\xa9\x1d\xb4"
-+			     "\x4b\xe2\x56\xed\x84\x1b\x8f\x26"
-+			     "\xbd\x31\xc8\x5f\xf6\x6a\x01\x98",
-+		.psize = 2048,
-+		.digest = "\x81\x14\x33\x6e\x7b\x97\x0b\xc6",
-+	}
-+};
-+
- static const u8 zeroes[4096] = { [0 ... 4095] = 0 };
- static const u8 ones[4096] = { [0 ... 4095] = 0xff };
- 
+Neither commit nor bindings in description: field explain what is this
+hardware.
 
--- 
-2.34.1
+> 
+> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  MAINTAINERS                                             |  5 +++++
+>  2 files changed, 47 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+> new file mode 100644
+> index 000000000000..1d1e3f87638c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+> @@ -0,0 +1,42 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/ti,mcrc64.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Texas Instruments MCRC64 bindings
+
+Drop bindings. If you tested your code, you would see a warning, so:
+
+It does not look like you tested the bindings, at least after quick
+look. Please run `make dt_binding_check` (see
+Documentation/devicetree/bindings/writing-schema.rst for instructions).
+Maybe you need to update your dtschema and yamllint.
+
+> +
+> +maintainers:
+> +  - Kamlesh Gurudasani <kamlesh@ti.com>
+> +
+> +properties:
+> +  compatible:
+> +    const: ti,mcrc64
+
+What's this? Part of SoC? Then the compatible is not correct.
+
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  power-domains:
+> +    maxItems: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - power-domains
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    mcrc64: mcrc64@30300000 {
+
+Node names should be generic. See also an explanation and list of
+examples (not exhaustive) in DT specification:
+https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
+
+
+> +      compatible = "ti,mcrc64";
+> +      reg = <0x00 0x30300000 0x00 0x1000>;
+> +      clocks = <&k3_clks 116 0>;
+> +      power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
+> +      };
+
+Indentation is messed up.
+> 
+
+Best regards,
+Krzysztof
 
