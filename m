@@ -2,59 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0047C001DC
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 10:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41E5C001DC
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 12:04:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbjGaKXQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jul 2023 06:23:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54828 "EHLO
+        id S232252AbjGaMEn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Jul 2023 08:04:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232651AbjGaKXD (ORCPT
+        with ESMTP id S232244AbjGaMEm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2023 06:23:03 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C34F4;
-        Mon, 31 Jul 2023 03:22:45 -0700 (PDT)
+        Mon, 31 Jul 2023 08:04:42 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49DA910E0;
+        Mon, 31 Jul 2023 05:04:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690798965; x=1722334965;
+  t=1690805080; x=1722341080;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=PCMtkKQspwiJhUzhgqFCwoHLXmi/Ay0Pc3VA0Pbub2g=;
-  b=DhmFmBS3Z2NwZUj7vD0rU0l9mMqBCckcIa6XQ2KuNP6qocx2uloD3/Fc
-   rRwsfWibwPbTnap6rvMZYqXE1QhF+oMGMqvgdgYaztkUb0/+hq+hXPoJT
-   CnHXi3wAFaWxmPc8563TWnc02Yb+S4Q24vjBSWeSbpaLS+nI2DNRy+ZPz
-   uxxMq0T5N7LiA7taLqTH5Zh73Afd33ky3jhRxAYNN74ooQkhslxXCKAV/
-   iR+9Xnl9LEO9kIJ/X4y+gQ0+ebNFP12P+SGfb3fCNW0oJ+LpTtGPFb93i
-   fk7A8pCxMAAMXDlaYYl7fBYGa6s3LMQQ5dmdZufFUnjlmYFTF2ZXj1EUY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="349283039"
+  bh=Scbc1k97nOjYXKL92XVgiWyP02TWnisk0n+vpo+gYPk=;
+  b=Du5vLpMD3P20Icw+Tn/XCWDJRUQ+hZRUN/OkKtJgG75wBD13nyJZdsew
+   RtlUDxqAW37uV5/G8JsifAKMfYXih4AC42Z4ssgHaaomcUcCU4jprl+cx
+   HXWIX2HyTOcA15h3pEdqYTVR+gokWAhwWP086n1XIztPJbClnbXf33FNQ
+   Br3DcGwcFemv6TMPncxuNiZv/VzIX6QSDgKBnZBIUbzhu/uHQjMEBeCzR
+   CsN1UGQk4j5Ygm1YDxAMkDrJuOeaY1L2Q3D+seHSriMGQ1dR5Et2dyr3e
+   f8PgvUYPRqufEn9EiQjBiYreOkGXJOinKPdL/Am2Vt+X/TXC+yxh1i+vR
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="432816281"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="349283039"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 03:22:38 -0700
+   d="scan'208";a="432816281"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 05:04:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="722013538"
+X-IronPort-AV: E=McAfee;i="6600,9927,10787"; a="678311425"
 X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="722013538"
+   d="scan'208";a="678311425"
 Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 31 Jul 2023 03:22:35 -0700
+  by orsmga003.jf.intel.com with ESMTP; 31 Jul 2023 05:04:34 -0700
 Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1qQQ2s-00053j-1g;
-        Mon, 31 Jul 2023 10:22:34 +0000
-Date:   Mon, 31 Jul 2023 18:22:12 +0800
+        id 1qQRdZ-00056n-2a;
+        Mon, 31 Jul 2023 12:04:33 +0000
+Date:   Mon, 31 Jul 2023 20:04:23 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     LeoLiu-oc <LeoLiu-oc@zhaoxin.com>, olivia@selenic.com,
         herbert@gondor.apana.org.au, jiajie.ho@starfivetech.com,
         conor.dooley@microchip.com, martin@kaiser.cx, mmyangfl@gmail.com,
         jenny.zhang@starfivetech.com, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, leoliu@zhaoxin.com,
-        CobeChen@zhaoxin.com, YunShen@zhaoxin.com, TonyWWang@zhaoxin.com,
-        leoliu-oc <leoliu-oc@zhaoxin.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        leoliu@zhaoxin.com, CobeChen@zhaoxin.com, YunShen@zhaoxin.com,
+        TonyWWang@zhaoxin.com, leoliu-oc <leoliu-oc@zhaoxin.com>
 Subject: Re: [PATCH v2 2/2] hwrng: add Zhaoxin HW RNG driver
-Message-ID: <202307311838.VQTSuKH4-lkp@intel.com>
+Message-ID: <202307311920.0ZdHwXvk-lkp@intel.com>
 References: <20230731084515.2057375-3-LeoLiu-oc@zhaoxin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -66,10 +66,10 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi LeoLiu-oc,
 
-kernel test robot noticed the following build warnings:
+kernel test robot noticed the following build errors:
 
-[auto build test WARNING on char-misc/char-misc-testing]
-[also build test WARNING on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master linus/master v6.5-rc4 next-20230731]
+[auto build test ERROR on char-misc/char-misc-testing]
+[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master linus/master v6.5-rc4 next-20230731]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -78,45 +78,61 @@ url:    https://github.com/intel-lab-lkp/linux/commits/LeoLiu-oc/hwrng-via-rng-c
 base:   char-misc/char-misc-testing
 patch link:    https://lore.kernel.org/r/20230731084515.2057375-3-LeoLiu-oc%40zhaoxin.com
 patch subject: [PATCH v2 2/2] hwrng: add Zhaoxin HW RNG driver
-config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20230731/202307311838.VQTSuKH4-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230731/202307311838.VQTSuKH4-lkp@intel.com/reproduce)
+config: hexagon-randconfig-r024-20230731 (https://download.01.org/0day-ci/archive/20230731/202307311920.0ZdHwXvk-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project.git f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce: (https://download.01.org/0day-ci/archive/20230731/202307311920.0ZdHwXvk-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307311838.VQTSuKH4-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307311920.0ZdHwXvk-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
-   In file included from arch/loongarch/include/asm/inst.h:10,
-                    from arch/loongarch/include/asm/uprobes.h:5,
-                    from include/linux/uprobes.h:49,
-                    from include/linux/mm_types.h:16,
-                    from include/linux/buildid.h:5,
-                    from include/linux/module.h:14,
-                    from drivers/char/hw_random/zhaoxin-rng.c:10:
->> arch/loongarch/include/asm/asm.h:35: warning: "STACK_ALIGN" redefined
-      35 | #define STACK_ALIGN     ~(0xf)
-         | 
-   In file included from drivers/char/hw_random/zhaoxin-rng.c:9:
-   include/crypto/padlock.h:19: note: this is the location of the previous definition
-      19 | #define STACK_ALIGN 16
-         | 
-   drivers/char/hw_random/zhaoxin-rng.c:16:10: fatal error: asm/cpu_device_id.h: No such file or directory
-      16 | #include <asm/cpu_device_id.h>
-         |          ^~~~~~~~~~~~~~~~~~~~~
-   compilation terminated.
+   In file included from drivers/char/hw_random/zhaoxin-rng.c:14:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __raw_readb(PCI_IOBASE + addr);
+                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+                                                           ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+   #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+                                                     ^
+   In file included from drivers/char/hw_random/zhaoxin-rng.c:14:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+                                                           ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+   #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+                                                     ^
+   In file included from drivers/char/hw_random/zhaoxin-rng.c:14:
+   In file included from include/linux/io.h:13:
+   In file included from arch/hexagon/include/asm/io.h:334:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writeb(value, PCI_IOBASE + addr);
+                               ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+                                                         ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+           __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+                                                         ~~~~~~~~~~ ^
+>> drivers/char/hw_random/zhaoxin-rng.c:16:10: fatal error: 'asm/cpu_device_id.h' file not found
+   #include <asm/cpu_device_id.h>
+            ^~~~~~~~~~~~~~~~~~~~~
+   6 warnings and 1 error generated.
 
 
-vim +/STACK_ALIGN +35 arch/loongarch/include/asm/asm.h
+vim +16 drivers/char/hw_random/zhaoxin-rng.c
 
-b738c106f7355e Huacai Chen 2022-05-31  31  
-b738c106f7355e Huacai Chen 2022-05-31  32  /*
-b738c106f7355e Huacai Chen 2022-05-31  33   * Stack alignment
-b738c106f7355e Huacai Chen 2022-05-31  34   */
-b738c106f7355e Huacai Chen 2022-05-31 @35  #define STACK_ALIGN	~(0xf)
-b738c106f7355e Huacai Chen 2022-05-31  36  
+  > 16	#include <asm/cpu_device_id.h>
+    17	#include <asm/fpu/api.h>
+    18	
 
 -- 
 0-DAY CI Kernel Test Service
