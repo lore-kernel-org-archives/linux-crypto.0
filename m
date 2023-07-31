@@ -2,105 +2,158 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3311BC001DC
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 13:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 600B0C001E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 13:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231133AbjGaNIN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jul 2023 09:08:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47336 "EHLO
+        id S232356AbjGaNgC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Jul 2023 09:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231774AbjGaNHs (ORCPT
+        with ESMTP id S232261AbjGaNgB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2023 09:07:48 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641AF1FD7;
-        Mon, 31 Jul 2023 06:07:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690808833; x=1722344833;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dxI4YScDLo8YpeDgT4DDfRErG18F4mdrsXlfYWF5Ri0=;
-  b=m1Da1eb93WmmvLXy4/VJkk9UZwtyc7I/r2gbOjanrxiLy4akDvqVF0Vv
-   ld6r398oRxDrxKrU2r+pZQwekQMbzKAlEs8bro0/Wa5WFO6mckzS5km5G
-   sCejbvOnT5PnqPblLA5m3BgYpxmFWiMKjNkmXbiRr6aKwJeoSgGLsIPAQ
-   km7gHUl7U2knEVDuk5oIByVqi/Ss9uGzkeXEN/hp0DSZ6gRIJgS5Pfcqq
-   VPNTo7xE5Q0/XsDNUxZr/QhUMms+KkqdaVE+cBzaI6D+A5HU51sts1+LU
-   d+t5L1co+hsHBh2m0G7ltBEnSTGjtzdptupGA/6dWUNwnM0Rey9zE8XAM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="366495603"
-X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="366495603"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 06:06:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="678334713"
-X-IronPort-AV: E=Sophos;i="6.01,244,1684825200"; 
-   d="scan'208";a="678334713"
-Received: from lkp-server02.sh.intel.com (HELO 953e8cd98f7d) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 31 Jul 2023 06:06:44 -0700
-Received: from kbuild by 953e8cd98f7d with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qQSbS-00057z-1S;
-        Mon, 31 Jul 2023 13:06:29 +0000
-Date:   Mon, 31 Jul 2023 21:06:10 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     LeoLiu-oc <LeoLiu-oc@zhaoxin.com>, olivia@selenic.com,
-        herbert@gondor.apana.org.au, jiajie.ho@starfivetech.com,
-        conor.dooley@microchip.com, martin@kaiser.cx, mmyangfl@gmail.com,
-        jenny.zhang@starfivetech.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, leoliu@zhaoxin.com,
-        CobeChen@zhaoxin.com, YunShen@zhaoxin.com, TonyWWang@zhaoxin.com,
-        leoliu-oc <leoliu-oc@zhaoxin.com>
-Subject: Re: [PATCH v2 2/2] hwrng: add Zhaoxin HW RNG driver
-Message-ID: <202307312040.d5kTGcBX-lkp@intel.com>
-References: <20230731084515.2057375-3-LeoLiu-oc@zhaoxin.com>
+        Mon, 31 Jul 2023 09:36:01 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A0B1708;
+        Mon, 31 Jul 2023 06:35:56 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d09ba80fbcaso4675013276.2;
+        Mon, 31 Jul 2023 06:35:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690810555; x=1691415355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oAyXH6ekoTa05SAgzmQb3wllKwSfvfzCrLBBn4jkkW4=;
+        b=gLyC++uMA73NEwRZEkud6ZUJY1Dsimw7XhAv41TwiKC98Ik61qftRevUzwfUiCxVuh
+         3uiAbaiSuFE3ZrDVAso6i83lCKnNJ+FPzNkyVtSgjHfQuoGXYydiYmckIJwB5OfK2reR
+         Pb/ym26WIkf73+Jgbx8ZvnV6cQU6id7zSxbjIZ9J584vqeqvMDGbk7CdMrtKp2LdVAx+
+         /1Ey3DbxGLl4U2VVP0YYA9XL79GU50m5t/jyuaca5rfNmOP1DYjW5RCNVUo4QUPNoi4p
+         DY6ghdxqzyynDLBHa49ou/WG4Q/DI01xGlCKNv3htUCiMk0QXakVvdWP6f5gVqx6O9Gq
+         x7IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690810555; x=1691415355;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oAyXH6ekoTa05SAgzmQb3wllKwSfvfzCrLBBn4jkkW4=;
+        b=kjmaaDsSoJS6xiBmRZMIpu53NaUsr+kbubPhYDT9JVt3aNc7xsNHVdW51XwGP4msfp
+         AbO+QHNLIA3p83MjYHQLNx5ipnhepZHQs1jDdogdf4kLaAoZ5weCzJ4PJd2WbvLBoyuQ
+         PD/ze1ywR3Z8XMftJj/Jt7860Zw9YHu53xLe+G0VF2A3z+WutpffY+8c9uvg7Upspp8v
+         p+Zd9fYJLKNvgYAtjWnn3f7TRFBFHZEeuce752LvshQVEmhEa7JHPfoyW+4lsb5JrEBR
+         JVLfQ/m3Mp+YNxtuYu2A+NJykkDivwVDA7GV8HKc0zHwR1cHFxLbSlqZGZk6V4Ep0HMr
+         XANg==
+X-Gm-Message-State: ABy/qLYxp1SPB37NA2iCO99Cfk4oHZcpJawpbHpRnSIMrp5Mxsal8S3X
+        D4t/o1xgirPX7UeyaNwkIG95ytV3JtYl2lYXrqo=
+X-Google-Smtp-Source: APBJJlHlKQxquau9vHbub3enl9P4TMStwyjPMWusF11iwrzgObp/yDS37tRQeizN7EUqGRl1cyuLrJAbgaz0DyI7iTQ=
+X-Received: by 2002:a25:ce04:0:b0:d0c:9ab2:72d3 with SMTP id
+ x4-20020a25ce04000000b00d0c9ab272d3mr9716417ybe.14.1690810555377; Mon, 31 Jul
+ 2023 06:35:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230731084515.2057375-3-LeoLiu-oc@zhaoxin.com>
+References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
+ <97730.1690408399@warthog.procyon.org.uk> <yt9dbkfxsxtl.fsf@linux.ibm.com>
+In-Reply-To: <yt9dbkfxsxtl.fsf@linux.ibm.com>
+From:   =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date:   Mon, 31 Jul 2023 15:35:44 +0200
+Message-ID: <CAAUqJDvk0y4x=fzfe8GX_t7Qj4WcRBfTOK2Za718wki9h-XkjA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
+To:     Sven Schnelle <svens@linux.ibm.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, regressions@lists.linux.dev,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi LeoLiu-oc,
+On Thu, Jul 27, 2023 at 7:55=E2=80=AFAM Sven Schnelle <svens@linux.ibm.com>=
+ wrote:
+>
+> David Howells <dhowells@redhat.com> writes:
+>
+> >
+> > Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to p=
+oint
+> > to the scatterlist array in areq->first_rsgl.sgl.sgl.
+> >
+> > Without this, the gcm-aes-s390 driver will oops when it tries to do
+> > gcm_walk_start() on req->dst because req->dst is set to the value of
+> > areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
+> > aead_request_set_crypt().
+> >
+> > The problem comes if an empty ciphertext is passed: the loop in
+> > af_alg_get_rsgl() just passes straight out and doesn't set areq->first_=
+rsgl
+> > up.
+> >
+> > This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as f=
+ar
+> > as I can tell, that ignores req->dst and only uses req->src[*].
+> >
+> > [*] Is this a bug in aesni-intel_glue.c?
+> >
+> > The s390x oops looks something like:
+> >
+> >  Unable to handle kernel pointer dereference in virtual kernel address =
+space
+> >  Failing address: 0000000a00000000 TEID: 0000000a00000803
+> >  Fault in home space mode while using kernel ASCE.
+> >  AS:00000000a43a0007 R3:0000000000000024
+> >  Oops: 003b ilc:2 [#1] SMP
+> >  ...
+> >  Call Trace:
+> >   [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
+> >   [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
+> >   [<00000000a2a60888>] aead_recvmsg+0x478/0x698
+> >   [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
+> >   [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
+> >   [<00000000a273e066>] vfs_read+0x26e/0x2a8
+> >   [<00000000a273e8c4>] ksys_read+0xbc/0x100
+> >   [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
+> >   [<00000000a312ff30>] system_call+0x70/0x98
+> >  Last Breaking-Event-Address:
+> >   [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
+> >
+> > Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to creat=
+e scatterlists")
+> > Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+> > Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmS=
+tPqBhubxyk_A@mail.gmail.com/
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > cc: Sven Schnelle <svens@linux.ibm.com>
+> > cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
+> > cc: "David S. Miller" <davem@davemloft.net>
+> > cc: Paolo Abeni <pabeni@redhat.com>
+> > cc: linux-crypto@vger.kernel.org
+> > cc: linux-s390@vger.kernel.org
+> > cc: regressions@lists.linux.dev
+> > ---
+> >  crypto/af_alg.c |    1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+> > index 06b15b9f661c..9ee8575d3b1a 100644
+> > --- a/crypto/af_alg.c
+> > +++ b/crypto/af_alg.c
+> > @@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct=
+ sock *sk,
+> >
+> >       areq->areqlen =3D areqlen;
+> >       areq->sk =3D sk;
+> > +     areq->first_rsgl.sgl.sgt.sgl =3D areq->first_rsgl.sgl.sgl;
+> >       areq->last_rsgl =3D NULL;
+> >       INIT_LIST_HEAD(&areq->rsgl_list);
+> >       areq->tsgl =3D NULL;
+>
+> Just tested, with this fix the kernel no longer crashes. Thanks!
+>
+> Tested-by: Sven Schnelle <svens@linux.ibm.com>
 
-kernel test robot noticed the following build errors:
+Same here. Thanks for the fix!
 
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus herbert-cryptodev-2.6/master linus/master v6.5-rc4 next-20230731]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/LeoLiu-oc/hwrng-via-rng-convert-to-x86_cpu_id-probing/20230731-164950
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20230731084515.2057375-3-LeoLiu-oc%40zhaoxin.com
-patch subject: [PATCH v2 2/2] hwrng: add Zhaoxin HW RNG driver
-config: openrisc-randconfig-r003-20230731 (https://download.01.org/0day-ci/archive/20230731/202307312040.d5kTGcBX-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230731/202307312040.d5kTGcBX-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307312040.d5kTGcBX-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/char/hw_random/zhaoxin-rng.c:16:10: fatal error: asm/cpu_device_id.h: No such file or directory
-      16 | #include <asm/cpu_device_id.h>
-         |          ^~~~~~~~~~~~~~~~~~~~~
-   compilation terminated.
-
-
-vim +16 drivers/char/hw_random/zhaoxin-rng.c
-
-  > 16	#include <asm/cpu_device_id.h>
-    17	#include <asm/fpu/api.h>
-    18	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Tested-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
