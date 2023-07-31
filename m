@@ -2,158 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 600B0C001E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 13:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B4AC001E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 14:07:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232356AbjGaNgC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jul 2023 09:36:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37210 "EHLO
+        id S231573AbjGaOHq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Jul 2023 10:07:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232261AbjGaNgB (ORCPT
+        with ESMTP id S231938AbjGaOH0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2023 09:36:01 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A0B1708;
-        Mon, 31 Jul 2023 06:35:56 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d09ba80fbcaso4675013276.2;
-        Mon, 31 Jul 2023 06:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690810555; x=1691415355;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oAyXH6ekoTa05SAgzmQb3wllKwSfvfzCrLBBn4jkkW4=;
-        b=gLyC++uMA73NEwRZEkud6ZUJY1Dsimw7XhAv41TwiKC98Ik61qftRevUzwfUiCxVuh
-         3uiAbaiSuFE3ZrDVAso6i83lCKnNJ+FPzNkyVtSgjHfQuoGXYydiYmckIJwB5OfK2reR
-         Pb/ym26WIkf73+Jgbx8ZvnV6cQU6id7zSxbjIZ9J584vqeqvMDGbk7CdMrtKp2LdVAx+
-         /1Ey3DbxGLl4U2VVP0YYA9XL79GU50m5t/jyuaca5rfNmOP1DYjW5RCNVUo4QUPNoi4p
-         DY6ghdxqzyynDLBHa49ou/WG4Q/DI01xGlCKNv3htUCiMk0QXakVvdWP6f5gVqx6O9Gq
-         x7IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690810555; x=1691415355;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oAyXH6ekoTa05SAgzmQb3wllKwSfvfzCrLBBn4jkkW4=;
-        b=kjmaaDsSoJS6xiBmRZMIpu53NaUsr+kbubPhYDT9JVt3aNc7xsNHVdW51XwGP4msfp
-         AbO+QHNLIA3p83MjYHQLNx5ipnhepZHQs1jDdogdf4kLaAoZ5weCzJ4PJd2WbvLBoyuQ
-         PD/ze1ywR3Z8XMftJj/Jt7860Zw9YHu53xLe+G0VF2A3z+WutpffY+8c9uvg7Upspp8v
-         p+Zd9fYJLKNvgYAtjWnn3f7TRFBFHZEeuce752LvshQVEmhEa7JHPfoyW+4lsb5JrEBR
-         JVLfQ/m3Mp+YNxtuYu2A+NJykkDivwVDA7GV8HKc0zHwR1cHFxLbSlqZGZk6V4Ep0HMr
-         XANg==
-X-Gm-Message-State: ABy/qLYxp1SPB37NA2iCO99Cfk4oHZcpJawpbHpRnSIMrp5Mxsal8S3X
-        D4t/o1xgirPX7UeyaNwkIG95ytV3JtYl2lYXrqo=
-X-Google-Smtp-Source: APBJJlHlKQxquau9vHbub3enl9P4TMStwyjPMWusF11iwrzgObp/yDS37tRQeizN7EUqGRl1cyuLrJAbgaz0DyI7iTQ=
-X-Received: by 2002:a25:ce04:0:b0:d0c:9ab2:72d3 with SMTP id
- x4-20020a25ce04000000b00d0c9ab272d3mr9716417ybe.14.1690810555377; Mon, 31 Jul
- 2023 06:35:55 -0700 (PDT)
+        Mon, 31 Jul 2023 10:07:26 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47BF3C39
+        for <linux-crypto@vger.kernel.org>; Mon, 31 Jul 2023 07:05:29 -0700 (PDT)
+Received: from dggpemm100020.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RF0Mh6hK3zVjkb;
+        Mon, 31 Jul 2023 22:03:44 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm100020.china.huawei.com (7.185.36.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 31 Jul 2023 22:05:26 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 31 Jul
+ 2023 22:05:26 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-crypto@vger.kernel.org>
+CC:     <jiajie.ho@starfivetech.com>, <william.qiu@starfivetech.com>,
+        <herbert@gondor.apana.org.au>, <huan.feng@starfivetech.com>,
+        <davem@davemloft.net>, <yangyingliang@huawei.com>
+Subject: [PATCH -next] crypto: starfive - fix return value check in starfive_aes_prepare_req()
+Date:   Mon, 31 Jul 2023 22:02:49 +0800
+Message-ID: <20230731140249.2691001-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
- <97730.1690408399@warthog.procyon.org.uk> <yt9dbkfxsxtl.fsf@linux.ibm.com>
-In-Reply-To: <yt9dbkfxsxtl.fsf@linux.ibm.com>
-From:   =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Date:   Mon, 31 Jul 2023 15:35:44 +0200
-Message-ID: <CAAUqJDvk0y4x=fzfe8GX_t7Qj4WcRBfTOK2Za718wki9h-XkjA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
-To:     Sven Schnelle <svens@linux.ibm.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, regressions@lists.linux.dev,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 7:55=E2=80=AFAM Sven Schnelle <svens@linux.ibm.com>=
- wrote:
->
-> David Howells <dhowells@redhat.com> writes:
->
-> >
-> > Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to p=
-oint
-> > to the scatterlist array in areq->first_rsgl.sgl.sgl.
-> >
-> > Without this, the gcm-aes-s390 driver will oops when it tries to do
-> > gcm_walk_start() on req->dst because req->dst is set to the value of
-> > areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
-> > aead_request_set_crypt().
-> >
-> > The problem comes if an empty ciphertext is passed: the loop in
-> > af_alg_get_rsgl() just passes straight out and doesn't set areq->first_=
-rsgl
-> > up.
-> >
-> > This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as f=
-ar
-> > as I can tell, that ignores req->dst and only uses req->src[*].
-> >
-> > [*] Is this a bug in aesni-intel_glue.c?
-> >
-> > The s390x oops looks something like:
-> >
-> >  Unable to handle kernel pointer dereference in virtual kernel address =
-space
-> >  Failing address: 0000000a00000000 TEID: 0000000a00000803
-> >  Fault in home space mode while using kernel ASCE.
-> >  AS:00000000a43a0007 R3:0000000000000024
-> >  Oops: 003b ilc:2 [#1] SMP
-> >  ...
-> >  Call Trace:
-> >   [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
-> >   [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
-> >   [<00000000a2a60888>] aead_recvmsg+0x478/0x698
-> >   [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
-> >   [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
-> >   [<00000000a273e066>] vfs_read+0x26e/0x2a8
-> >   [<00000000a273e8c4>] ksys_read+0xbc/0x100
-> >   [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
-> >   [<00000000a312ff30>] system_call+0x70/0x98
-> >  Last Breaking-Event-Address:
-> >   [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
-> >
-> > Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to creat=
-e scatterlists")
-> > Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
-> > Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmS=
-tPqBhubxyk_A@mail.gmail.com/
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > cc: Sven Schnelle <svens@linux.ibm.com>
-> > cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
-> > cc: "David S. Miller" <davem@davemloft.net>
-> > cc: Paolo Abeni <pabeni@redhat.com>
-> > cc: linux-crypto@vger.kernel.org
-> > cc: linux-s390@vger.kernel.org
-> > cc: regressions@lists.linux.dev
-> > ---
-> >  crypto/af_alg.c |    1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> > index 06b15b9f661c..9ee8575d3b1a 100644
-> > --- a/crypto/af_alg.c
-> > +++ b/crypto/af_alg.c
-> > @@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct=
- sock *sk,
-> >
-> >       areq->areqlen =3D areqlen;
-> >       areq->sk =3D sk;
-> > +     areq->first_rsgl.sgl.sgt.sgl =3D areq->first_rsgl.sgl.sgl;
-> >       areq->last_rsgl =3D NULL;
-> >       INIT_LIST_HEAD(&areq->rsgl_list);
-> >       areq->tsgl =3D NULL;
->
-> Just tested, with this fix the kernel no longer crashes. Thanks!
->
-> Tested-by: Sven Schnelle <svens@linux.ibm.com>
+kzalloc() returns NULL pointer not PTR_ERR() when it fails,
+so replace the IS_ERR() check with NULL pointer check.
 
-Same here. Thanks for the fix!
+Fixes: e22471c2331c ("crypto: starfive - Add AES skcipher and aead support")
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+---
+ drivers/crypto/starfive/jh7110-aes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Tested-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+diff --git a/drivers/crypto/starfive/jh7110-aes.c b/drivers/crypto/starfive/jh7110-aes.c
+index 04dd7958054f..278dfa4aa743 100644
+--- a/drivers/crypto/starfive/jh7110-aes.c
++++ b/drivers/crypto/starfive/jh7110-aes.c
+@@ -496,8 +496,8 @@ static int starfive_aes_prepare_req(struct skcipher_request *req,
+ 
+ 	if (cryp->assoclen) {
+ 		rctx->adata = kzalloc(ALIGN(cryp->assoclen, AES_BLOCK_SIZE), GFP_KERNEL);
+-		if (IS_ERR(rctx->adata))
+-			return dev_err_probe(cryp->dev, PTR_ERR(rctx->adata),
++		if (!rctx->adata)
++			return dev_err_probe(cryp->dev, -ENOMEM,
+ 					     "Failed to alloc memory for adata");
+ 
+ 		scatterwalk_copychunks(rctx->adata, &cryp->in_walk, cryp->assoclen, 0);
+-- 
+2.25.1
+
