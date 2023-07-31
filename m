@@ -2,528 +2,421 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B634CC001DE
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 17:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C012BC04A94
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 21:29:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231288AbjGaRur (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jul 2023 13:50:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33278 "EHLO
+        id S230016AbjGaV3r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Jul 2023 17:29:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbjGaRur (ORCPT
+        with ESMTP id S229437AbjGaV3q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2023 13:50:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 561E995;
-        Mon, 31 Jul 2023 10:50:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ABFE161265;
-        Mon, 31 Jul 2023 17:50:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0C4AC43391;
-        Mon, 31 Jul 2023 17:50:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690825837;
-        bh=yWKGZpq/+KlEiVpsQJNfxvQ7UA5Sm8iHfPI9KfQO9s4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=tRyAhL3YwXZ0rUUdSxMGDzJfJSLs7GUgYJ7dUZm61tZ3KdSL5a5/pEzOx/95xu3kn
-         l9KoCpk8XT73JeGqa/2Q4oS2LEC91zcxD6DkIsZsAzn2FEHW0307m0EBKeuQCkIwdS
-         1TjZxARbx/wbqCMXNI3Ij5my3Nkuw9rqFHpPpvaninQUROt/lEpfulnT6cTuIcsLV+
-         z+qfpcxARim6VGFc786BnV63J9AAh9AVyOGx4jXet2Sy8jMfrK+V9L2yqgLhwgl5qI
-         UgIpG9iBRG5QyUQo1Kdw7La5OYpi9G3E4gm/b82WwiVANrCMWAdJYCclevhYItQPBJ
-         IgK4wz9QWHQRQ==
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2b9cdba1228so54737351fa.2;
-        Mon, 31 Jul 2023 10:50:36 -0700 (PDT)
-X-Gm-Message-State: ABy/qLZs6pxVeiFP81gWgJ9QR+sejw/ZxtJucc/ofqgwQIEAbF24mUK1
-        ezgeaD5RG0Mm4U7Bn42bfgs/xES43cMRigJ4bWk=
-X-Google-Smtp-Source: APBJJlGawuiG3+hdVed8tBfx9F1ZlXAQCAlN4eYkU/Y7f1S1t10pKbn4gYh2VqCZKlCoKOdbgwm7/VbzrcEPKGkiIWs=
-X-Received: by 2002:a2e:80d7:0:b0:2b6:d63d:cc1e with SMTP id
- r23-20020a2e80d7000000b002b6d63dcc1emr477626ljg.51.1690825834895; Mon, 31 Jul
- 2023 10:50:34 -0700 (PDT)
+        Mon, 31 Jul 2023 17:29:46 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C84F5126;
+        Mon, 31 Jul 2023 14:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1690838984; x=1722374984;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vlD3ghSYdOlduES8CW22KqvYGGsE1X0XcCEYgz6LHlI=;
+  b=b5UqgHaShI+kg2NdJuwNRlsM/+ZBjOv6hS59BRCGgBSacb+Qj39I2m7f
+   JAhQZf96CJFnaeK6yndCRykNfjbp66cv6RNyiPEyoWkcyeW5x10+Fjphp
+   7BZM+GmJ0dbXOwaPCf3B4PH1+zcd+zggNrKWfCTvpvZCtjZICX6eNQtNs
+   5I2wkOlw8sTt3qjr+Ul2aobdt6MTUodR1yXQ4NJxwelQzljbm7LZwirpt
+   lEK8lDKaQDeqi2aQib/rDrdVnNZP6uje83DZSSzti970LQihaqWa7OQrK
+   o04uKdB34Ova1HP0SVvBvo5qDMtF7HC66FDYw4JW+GCnYP0eAKKE6Zs9H
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="349425710"
+X-IronPort-AV: E=Sophos;i="6.01,245,1684825200"; 
+   d="scan'208";a="349425710"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 14:29:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="728428360"
+X-IronPort-AV: E=Sophos;i="6.01,245,1684825200"; 
+   d="scan'208";a="728428360"
+Received: from sgimmeke-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.intel.com) ([10.212.91.213])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 14:29:41 -0700
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        fenghua.yu@intel.com, vkoul@kernel.org
+Cc:     dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
+        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: [PATCH v8 00/14] crypto: Add Intel Analytics Accelerator (IAA) crypto compression driver
+Date:   Mon, 31 Jul 2023 16:29:25 -0500
+Message-Id: <20230731212939.1391453-1-tom.zanussi@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230719-mcrc-upstream-v1-0-dc8798a24c47@ti.com> <20230719-mcrc-upstream-v1-3-dc8798a24c47@ti.com>
-In-Reply-To: <20230719-mcrc-upstream-v1-3-dc8798a24c47@ti.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 31 Jul 2023 19:50:23 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHpLsPU1p0eoW0meCx-NGP7bgD2ZzQkgX4OUssGdONSnA@mail.gmail.com>
-Message-ID: <CAMj1kXHpLsPU1p0eoW0meCx-NGP7bgD2ZzQkgX4OUssGdONSnA@mail.gmail.com>
-Subject: Re: [PATCH 3/5] crypto: ti - add driver for MCRC64 engine
-To:     Kamlesh Gurudasani <kamlesh@ti.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 30 Jul 2023 at 20:56, Kamlesh Gurudasani <kamlesh@ti.com> wrote:
->
-> Add support for MCRC64 engine to calculate 64-bit CRC in Full-CPU mode.
->
-> In Full-CPU mode, the CPU does the data patterns transfer and signature
-> verification all by itself, only CRC calculation is being done by MCRC64
-> engine.
->
-> MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
-> according to the ISO 3309 standard.
->
-> Generator polynomial: x^64 + x^4 + x^3 + x + 1
-> Polynomial value: 0x000000000000001b
->
-> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
-> ---
->  MAINTAINERS                |   2 +
->  drivers/crypto/Kconfig     |   1 +
->  drivers/crypto/Makefile    |   1 +
->  drivers/crypto/ti/Kconfig  |  10 +++
->  drivers/crypto/ti/Makefile |   2 +
->  drivers/crypto/ti/mcrc64.c | 360 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  6 files changed, 376 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d8680f6969e3..a2f50adb51ac 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -21464,8 +21464,10 @@ F:     drivers/iio/adc/ti-lmp92064.c
->
->  TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
->  M:     Kamlesh Gurudasani <kamlesh@ti.com>
-> +L:     linux-crypto@vger.kernel.org
->  S:     Maintained
->  F:     Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-> +F:     drivers/crypto/ti/mcrc64.c
->
->  TI PCM3060 ASoC CODEC DRIVER
->  M:     Kirill Marinushkin <kmarinushkin@birdec.com>
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index c761952f0dc6..2101f92ead66 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -796,5 +796,6 @@ config CRYPTO_DEV_SA2UL
->
->  source "drivers/crypto/aspeed/Kconfig"
->  source "drivers/crypto/starfive/Kconfig"
-> +source "drivers/crypto/ti/Kconfig"
->
->  endif # CRYPTO_HW
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index d859d6a5f3a4..f1a151b73ff1 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -41,6 +41,7 @@ obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
->  obj-$(CONFIG_CRYPTO_DEV_SL3516) += gemini/
->  obj-y += stm32/
->  obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
-> +obj-$(CONFIG_ARCH_K3) += ti/
->  obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio/
->  obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
->  obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
-> diff --git a/drivers/crypto/ti/Kconfig b/drivers/crypto/ti/Kconfig
-> new file mode 100644
-> index 000000000000..8e3b2b8b7623
-> --- /dev/null
-> +++ b/drivers/crypto/ti/Kconfig
-> @@ -0,0 +1,10 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +config CRYPTO_DEV_TI_MCRC64
-> +       tristate "Support for TI MCRC64 crc64 accelerators"
-> +       depends on ARCH_K3
-> +       select CRYPTO_HASH
-> +       help
-> +         This enables support for the MCRC64 hw accelerator
-> +         which can be found on TI SOC.
-> +         MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
-> +         according to the ISO 3309 standard using Full-CPU mode.
-> \ No newline at end of file
-> diff --git a/drivers/crypto/ti/Makefile b/drivers/crypto/ti/Makefile
-> new file mode 100644
-> index 000000000000..94ffc2576137
-> --- /dev/null
-> +++ b/drivers/crypto/ti/Makefile
-> @@ -0,0 +1,2 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-$(CONFIG_CRYPTO_DEV_TI_MCRC64) += mcrc64.o
-> diff --git a/drivers/crypto/ti/mcrc64.c b/drivers/crypto/ti/mcrc64.c
-> new file mode 100644
-> index 000000000000..45f8ae6078ff
-> --- /dev/null
-> +++ b/drivers/crypto/ti/mcrc64.c
-> @@ -0,0 +1,360 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) Texas Instruments 2023 - http://www.ti.com
-> + * Author: Kamlesh Gurudasani <kamlesh@ti.com>
-> + */
-> +
-> +#include <linux/io.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/pm_runtime.h>
-> +
-> +#include <crypto/internal/hash.h>
-> +
-> +#include <asm/unaligned.h>
-> +
-> +#define DRIVER_NAME            "mcrc64"
-> +#define CHKSUM_DIGEST_SIZE     8
-> +#define CHKSUM_BLOCK_SIZE      1
-> +
-> +/* Registers */
-> +#define CRC_CTRL0 0x0000 /* CRC Global Control Register 0 */
-> +#define CH_PSA_SWRE(ch) BIT(((ch) - 1) << 3) /* PSA Software Reset  */
-> +
-> +#define CRC_CTRL1 0x0008 /* CRC Global Control Register 1 */
-> +#define PWDN BIT(0) /* Power Down  */
-> +
-> +#define CRC_CTRL2 0x0010 /* CRC Global Control Register 2 */
-> +#define CH_MODE(ch, m) ((m) << (((ch) - 1) << 3))
-> +
-> +#define PSA_SIGREGL(ch) ((0x6 + (4 * ((ch) - 1))) << 4) /* Signature register */
-> +
-> +#define MCRC64_ALG_MASK 0x8000000000000000
-> +#define MCRC64_CRC64_POLY 0x000000000000001b
-> +
-> +#define MCRC64_AUTOSUSPEND_DELAY       50
-> +
-> +static struct device *mcrc64_k3_dev;
-> +
-> +enum mcrc64_mode {
-> +       MCRC64_MODE_DATA_CAPTURE = 0,
-> +       MCRC64_MODE_AUTO,
-> +       MCRC64_MODE_SEMI_CPU,
-> +       MCRC64_MODE_FULL_CPU,
-> +       MCRC64_MODE_INVALID,
-> +};
-> +
-> +enum mcrc64_channel {
-> +       MCRC64_CHANNEL_1 = 1,
-> +       MCRC64_CHANNEL_2,
-> +       MCRC64_CHANNEL_3,
-> +       MCRC64_CHANNEL_4,
-> +       MCRC64_CHANNEL_INVALID,
-> +};
-> +
-> +struct mcrc64_data {
-> +       struct device    *dev;
-> +       void __iomem     *regs;
-> +};
-> +
-> +struct mcrc64_ctx {
-> +       u32 key;
-> +};
-> +
-> +struct mcrc64_desc_ctx {
-> +       u64    signature;
-> +};
-> +
-> +static int mcrc64_set_mode(void __iomem *regs, u32 channel, u32 mode)
-> +{
-> +       u32 mode_set_val;
-> +       u32 crc_ctrl2_reg = 0;
-> +
-> +       if (mode < 0 || mode >= MCRC64_MODE_INVALID)
-> +               return -EINVAL;
-> +
-> +       if (channel <= 0 || channel >= MCRC64_CHANNEL_INVALID)
-> +               return -EINVAL;
-> +
-> +       mode_set_val = crc_ctrl2_reg | CH_MODE(channel, mode);
-> +
-> +       /* Write CRC_CTRL2, set mode */
-> +       writel_relaxed(mode_set_val, regs + CRC_CTRL2);
-> +
-> +       return 0;
-> +}
-> +
-> +static int mcrc64_reset_signature(void __iomem *regs, u32 channel)
-> +{
-> +       u32 crc_ctrl0_reg, reset_val, reset_undo_val;
-> +
-> +       if (channel <= 0 || channel >= MCRC64_CHANNEL_INVALID)
-> +               return -EINVAL;
-> +
-> +       /* reset PSA */
-> +       crc_ctrl0_reg = readl_relaxed(regs + CRC_CTRL0);
-> +
-> +       reset_val = crc_ctrl0_reg | CH_PSA_SWRE(channel);
-> +       reset_undo_val = crc_ctrl0_reg & ~CH_PSA_SWRE(channel);
-> +
-> +       /* Write CRC_CTRL0 register, reset PSA register */
-> +       writel_relaxed(reset_val, regs + CRC_CTRL0);
-> +       writel_relaxed(reset_undo_val, regs + CRC_CTRL0);
-> +
-> +       return 0;
-> +}
-> +
-> +/* This helper implements crc64 calculation using CPU */
-> +static u64 mcrc64_calculate_sw_crc(u64 crc, u8 byte)
-> +{
-> +       u64 bit = 0;
-> +       u8 j;
-> +
-> +       for (j = 0; j < 8; j++) {
-> +               bit = crc & MCRC64_ALG_MASK;
-> +               crc <<= 1;
-> +               if (byte & (0x80 >> j))
-> +                       bit ^= MCRC64_ALG_MASK;
-> +               if (bit)
-> +                       crc ^= MCRC64_CRC64_POLY;
-> +       }
-> +
-> +       return crc;
-> +}
-> +
-> +static int mcrc64_calculate_crc(void __iomem *regs, u32 channel,
-> +                               const u8 *d8, size_t length, u64 *crc64)
-> +{
-> +       void __iomem *psa_reg;
-> +       u64 signature = 0;
-> +
-> +       if (channel <= 0 || channel >= MCRC64_CHANNEL_INVALID)
-> +               return -EINVAL;
-> +
-> +       psa_reg = regs + PSA_SIGREGL(channel);
-> +
-> +       for (; length >= sizeof(u64); d8 += sizeof(u64), length -= sizeof(u64))
-> +               writeq_relaxed(cpu_to_be64p((u64 *)d8), psa_reg);
-> +
-> +       signature = readq_relaxed(psa_reg);
-> +
-> +       if (length) {
-> +               while (length--)
-> +                       signature = mcrc64_calculate_sw_crc(signature, *d8++);
-> +
-> +               /* set capture mode */
-> +               int ret = mcrc64_set_mode(regs, MCRC64_CHANNEL_1,
-> +                                       MCRC64_MODE_DATA_CAPTURE);
-> +               if (ret)
-> +                       return ret;
-> +
-> +               ret = mcrc64_reset_signature(regs, MCRC64_CHANNEL_1);
-> +               if (ret)
-> +                       return ret;
-> +
-> +               writeq_relaxed(signature, psa_reg);
-> +
-> +               ret = mcrc64_set_mode(regs, MCRC64_CHANNEL_1,
-> +                                     MCRC64_MODE_FULL_CPU);
-> +               if (ret)
-> +                       return ret;
-> +       }
-> +
-> +       *crc64 = signature;
-> +
-> +       return 0;
-> +}
-> +
-> +static int mcrc64_cra_init(struct crypto_tfm *tfm)
-> +{
-> +       struct mcrc64_ctx *mctx = crypto_tfm_ctx(tfm);
-> +
-> +       struct mcrc64_data *dev_data = dev_get_drvdata(mcrc64_k3_dev);
-> +
-> +       pm_runtime_get_sync(dev_data->dev);
-> +
-> +       mctx->key = 0;
-> +
-> +       return 0;
-> +}
-> +
-> +static void mcrc64_cra_exit(struct crypto_tfm *tfm)
-> +{
-> +       struct mcrc64_data *dev_data = dev_get_drvdata(mcrc64_k3_dev);
-> +
-> +       pm_runtime_mark_last_busy(dev_data->dev);
-> +       pm_runtime_put_autosuspend(dev_data->dev);
-> +}
-> +
-> +static int mcrc64_setkey(struct crypto_shash *tfm, const u8 *key,
-> +                        unsigned int keylen)
-> +{
-> +       struct mcrc64_ctx *mctx = crypto_shash_ctx(tfm);
-> +
-> +       if (keylen != sizeof(u32))
-> +               return -EINVAL;
-> +
-> +       mctx->key = get_unaligned_le32(key);
-> +
+Hi, this is v8 of the IAA crypto driver, incorporating feedback from
+v7.
 
-What is the point of this key?
+v8 changes:
+
+  - Rebased to current cryptodev tree.
+
+  - Added generic-deflate software fallback for decompression
+    in cases where there's a hardware failure that would
+    otherwise prevent the data being recovered.
+  
+  - Changed the driver_name code to use strim().
+
+  - Changed the null-destination cases to use sgl_alloc_order() rather
+    than sgl_alloc().
+
+  - Added more Reviewed-by tags.
 
 
-> +       return 0;
-> +}
-> +
-> +static int mcrc64_init(struct shash_desc *desc)
-> +{
-> +       struct mcrc64_data *dev_data = dev_get_drvdata(mcrc64_k3_dev);
-> +
-> +       /* set full cpu mode */
-> +       int ret = mcrc64_set_mode(dev_data->regs, MCRC64_CHANNEL_1,
-> +                               MCRC64_MODE_FULL_CPU);
-> +       if (ret)
-> +               return ret;
-> +
-> +       /* reset PSA */
-> +       return mcrc64_reset_signature(dev_data->regs, MCRC64_CHANNEL_1);
-> +}
-> +
-> +static int mcrc64_update(struct shash_desc *desc, const u8 *d8,
-> +                        unsigned int length)
-> +{
-> +       struct mcrc64_desc_ctx *ctx = shash_desc_ctx(desc);
-> +       struct mcrc64_data *dev_data = dev_get_drvdata(mcrc64_k3_dev);
-> +
-> +       return mcrc64_calculate_crc(dev_data->regs, MCRC64_CHANNEL_1,
-> +                                 d8, length, &ctx->signature);
-> +}
-> +
-> +static int mcrc64_final(struct shash_desc *desc, u8 *out)
-> +{
-> +       struct mcrc64_desc_ctx *ctx = shash_desc_ctx(desc);
-> +
-> +       /* Send computed CRC */
-> +       put_unaligned_le64(ctx->signature, out);
-> +       return 0;
-> +}
-> +
-> +static int mcrc64_finup(struct shash_desc *desc, const u8 *data,
-> +                       unsigned int length, u8 *out)
-> +{
-> +       return mcrc64_update(desc, data, length) ?:
-> +               mcrc64_final(desc, out);
-> +}
-> +
-> +static int mcrc64_digest(struct shash_desc *desc, const u8 *data,
-> +                        unsigned int length, u8 *out)
-> +{
-> +       return mcrc64_init(desc) ?: mcrc64_finup(desc, data, length, out);
-> +}
-> +
-> +static struct shash_alg algs[] = {
-> +       /* CRC-64 */
-> +       {
-> +               .setkey         = mcrc64_setkey,
-> +               .init           = mcrc64_init,
-> +               .update         = mcrc64_update,
-> +               .final          = mcrc64_final,
-> +               .finup          = mcrc64_finup,
-> +               .digest         = mcrc64_digest,
-> +               .descsize       = sizeof(struct mcrc64_desc_ctx),
-> +               .digestsize     = CHKSUM_DIGEST_SIZE,
-> +               .base           = {
-> +                       .cra_name               = "crc64-iso",
-> +                       .cra_driver_name        = "mcrc64",
-> +                       .cra_priority           = 200,
-> +                       .cra_flags              = CRYPTO_ALG_OPTIONAL_KEY,
-> +                       .cra_blocksize          = CHKSUM_BLOCK_SIZE,
-> +                       .cra_alignmask          = 7,
-> +                       .cra_ctxsize            = sizeof(struct mcrc64_ctx),
-> +                       .cra_module             = THIS_MODULE,
-> +                       .cra_init               = mcrc64_cra_init,
-> +                       .cra_exit               = mcrc64_cra_exit,
-> +               }
-> +       }
-> +};
-> +
-> +static int mcrc64_probe(struct platform_device *pdev)
-> +{
-> +       struct device *dev = &pdev->dev;
-> +       struct mcrc64_data *dev_data;
-> +
-> +       dev_data = devm_kzalloc(dev, sizeof(*dev_data), GFP_KERNEL);
-> +       if (!dev_data)
-> +               return -ENOMEM;
-> +
-> +       mcrc64_k3_dev = dev;
-> +       dev_data->dev = dev;
-> +       dev_data->regs = devm_platform_ioremap_resource(pdev, 0);
-> +
-> +       platform_set_drvdata(pdev, dev_data);
-> +       dev_set_drvdata(mcrc64_k3_dev, dev_data);
-> +
-> +       crypto_register_shashes(algs, ARRAY_SIZE(algs));
-> +
-> +       pm_runtime_set_autosuspend_delay(dev, MCRC64_AUTOSUSPEND_DELAY);
-> +       pm_runtime_use_autosuspend(dev);
-> +
-> +       pm_runtime_get_noresume(dev);
-> +       pm_runtime_set_active(dev);
-> +       pm_runtime_enable(dev);
-> +
-> +       pm_runtime_put_sync(dev);
-> +
-> +       return 0;
-> +}
-> +
-> +static int mcrc64_remove(struct platform_device *pdev)
-> +{
-> +       struct mcrc64_data *dev_data = platform_get_drvdata(pdev);
-> +
-> +       int ret = pm_runtime_get_sync(dev_data->dev);
-> +
-> +       if (ret < 0) {
-> +               pm_runtime_put_noidle(dev_data->dev);
-> +               return ret;
-> +       }
-> +
-> +       crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
-> +
-> +       pm_runtime_disable(dev_data->dev);
-> +       pm_runtime_put_noidle(dev_data->dev);
-> +
-> +       return 0;
-> +}
-> +
-> +static int __maybe_unused mcrc64_suspend(struct device *dev)
-> +{
-> +       return  pm_runtime_force_suspend(dev);
-> +}
-> +
-> +static int __maybe_unused mcrc64_resume(struct device *dev)
-> +{
-> +       return pm_runtime_force_resume(dev);
-> +}
-> +
-> +static const struct dev_pm_ops mcrc64_pm_ops = {
-> +       SET_SYSTEM_SLEEP_PM_OPS(mcrc64_suspend,
-> +                               mcrc64_resume)
-> +};
-> +
-> +static const struct of_device_id of_match[] = {
-> +       { .compatible = "ti,mcrc64", },
-> +       {},
-> +};
-> +MODULE_DEVICE_TABLE(of, of_match);
-> +
-> +static struct platform_driver mcrc64_driver = {
-> +       .probe  = mcrc64_probe,
-> +       .remove = mcrc64_remove,
-> +       .driver = {
-> +               .name           = DRIVER_NAME,
-> +               .pm             = &mcrc64_pm_ops,
-> +               .of_match_table = of_match,
-> +       },
-> +};
-> +
-> +module_platform_driver(mcrc64_driver);
-> +
-> +MODULE_AUTHOR("Kamlesh Gurudasani <kamlesh@ti.com>");
-> +MODULE_DESCRIPTION("Texas Instruments MCRC64 hardware driver");
-> +MODULE_LICENSE("GPL");
->
-> --
-> 2.34.1
->
+v7 changes:
+
+  - Rebased to current cryptodev tree.
+
+  - Removed 'canned' compression mode (deflate-iaa-canned) and fixed
+    up dependencies in other patches and Documentation.
+  
+  - Removed op_block checks.
+
+  - Removed a stray debugging #ifdef.
+
+  - Changed sysfs-driver-dma-idxd driver_name version to 6.6.0.
+
+
+v6 changes:
+
+  - Rebased to current cryptodev tree.
+
+  - Changed code to create/register separate algorithms for each
+    compression mode - one for 'fixed' (deflate-iaa) and one for
+    'canned' (deflate-iaa-canned).
+  
+  - Got rid of 'compression_mode' attribute and all the compression
+    mode code that deals with 'active' compression modes, since
+    there's no longer a single active compression mode.
+
+  - Use crypto_ctx to allow common compress/decompress code to
+    distinguish between the different compression modes.  Also use it
+    to capture settings such as verify_compress, use_irq, etc.  In
+    addition to being cleaner, this will allow for easier performance
+    comparisons using different modes/settings.
+
+  - Update Documentation and comments to reflect the changes.
+
+  - Fixed a bug found by Rex Zhang in decompress_header() which
+    unmapped src2 rather than src as it should have.  Thanks, Rex!
+
+
+v5 changes:
+
+  - Rebased to current cryptodev tree.
+
+  - Changed sysfs-driver-dma-idxd driver_name version to 6.5.0.
+
+  - Renamed wq private accessor functions to idxd_wq_set/get_private().
+
+v4 changes:
+
+  - Added and used DRIVER_NAME_SIZE for wq driver_name.
+
+  - Changed all spaces to tabs in CRYPTO_DEV_IAA_CRYPTO_STATS config
+    menu.
+
+  - Removed the private_data void * from wq and replaced with
+    wq_confdev() instead, as suggested by Dave Jiang.
+
+  - Added  more Reviewed-by tags.
+
+v3 changes:
+
+  - Reworked the code to only allow the registered crypto alg to be
+    unregistered by removing the module.  Also added an iaa_wq_get()
+    and iaa_wq_put() to take/give up a reference to the work queue
+    while there are compresses/decompresses in flight.  This is
+    synchronized with the wq remove function, so that the
+    iaa_wq/iaa_devices can't go away beneath active operations.  This
+    was tested by removing/disabling the iaa wqs/devices while
+    operations were in flight.
+
+  - Simplified the rebalance code and removed cpu_to_iaa() function
+    since it was overly complicated and wasn't actually working as
+    advertised.
+
+  - As a result of reworking the above code, fixed several bugs such
+    as possibly unregistering an unregistered crypto alg, a memory
+    leak where iaa_wqs weren't being freed, and making sure the
+    compression schemes were registered before registering the driver.
+
+  - Added set_/idxd_wq_private() accessors for wq private data.
+
+  - Added missing XPORT_SYMBOL_NS_GPL() to [PATCH 04/15] dmaengine:
+    idxd: Export descriptor management functions
+
+  - Added Dave's Reviewed-by: tags from v2.
+
+  - Updated Documentation and commit messages to reflect the changes
+    above.
+  
+  - Rebased to to cryptodev tree, since that has the earlier changes
+    that moved the intel drivers to crypto/intel.
+
+v2 changes:
+
+  - Removed legacy interface and all related code; merged async
+    interface into main deflate patch.
+
+  - Added support for the null destination case.  Thanks to Giovanni
+    Cabiddu for making me aware of this as well as the selftests for
+    it.
+
+  - Had to do some rearrangement of the code in order to pass all the
+    selftests.  Also added a testcase for 'canned'.
+
+  - Moved the iaa crypto driver to drivers/crypto/intel, and moved all
+    the other intel drivers there as well (which will be posted as a
+    separate series immediately following this one).
+
+  - Added an iaa crypto section to MAINTAINERS.
+
+  - Updated the documenation and commit messages to reflect the removal
+    of the legacy interface.
+
+  - Changed kernel version from 6.3.0 to 6.4.0 in patch 01/15 (wq
+    driver name support)
+
+v1:
+
+This series adds Linux crypto algorithm support for Intel® In-memory
+Analytics Accelerator (Intel IAA) [1] hardware compression and
+decompression, which is available on Sapphire Rapids systems.
+
+The IAA crypto support is implemented as an IDXD sub-driver.  The IDXD
+driver already present in the kernel provides discovery and management
+of the IAA devices on a system, as well as all the functionality
+needed to manage, submit, and wait for completion of work executed on
+them.  The first 7 patches (patches starting with dmaengine:) add
+small bits of underlying IDXD plumbing needed to allow external
+sub-drivers to take advantage of this support and claim ownership of
+specific IAA devices and workqueues.
+
+The remaining patches add the main support for this feature via the
+crypto API, making it transparently accessible to kernel features that
+can make use of it such as zswap and zram (patches starting with
+crypto – iaa:).
+
+These include both sync/async support for the deflate algorithm
+implemented by the IAA hardware, as well as an additional option for
+driver statistics and Documentation.
+
+Patch 8 ('[PATCH 08/15] crypto: iaa - Add IAA Compression Accelerator
+Documentation') describes the IAA crypto driver in detail; the
+following is just a high-level synopsis meant to aid the following
+discussion.
+
+The IAA hardware is fairly complex and generally requires a
+knowledgeable administrator with sufficiently detailed understanding
+of the hardware to set it up before it can be used.  As mentioned in
+the Documentation, this typically requires using a special tool called
+accel-config to enumerate and configure IAA workqueues, engines, etc,
+although this can also be done using only sysfs files.
+
+The operation of the driver mirrors this requirement and only allows
+the hardware to be accessed via the crypto layer once the hardware has
+been configured and bound to the the IAA crypto driver.  As an IDXD
+sub-driver, the IAA crypto driver essentially takes ownership of the
+hardware until it is given up explicitly by the administrator.  This
+occurs automatically when the administrator enables the first IAA
+workqueue or disables the last one; the iaa_crypto (sync and async)
+algorithms are registered when the first workqueue is enabled, and
+deregistered when the last one is disabled.
+
+The normal sequence of operations would normally be: 
+
+  < configure the hardware using accel-config or sysfs > 
+
+  < configure the iaa crypto driver (see below) > 
+
+  < configure the subsystem e.g. zswap/zram to use the iaa_crypto algo >  
+
+  < run the workload > 
+
+There are a small number of iaa_crypto driver attributes that the
+administrator can configure, and which also need to be configured
+before the algorithm is enabled:
+
+compression_mode: 
+
+  The IAA crypto driver supports an extensible interface supporting
+  any number of different compression modes that can be tailored to
+  specific types of workloads.  These are implemented as tables and
+  given arbitrary names describing their intent.
+
+  There are currently only 2 compression modes, “canned” and “fixed”.
+  In order to set a compression mode, echo the mode’s name to the
+  compression_mode driver attribute:
+ 
+    echo "canned" > /sys/bus/dsa/drivers/crypto/compression_mode
+
+There are a few other available iaa_crypto driver attributes (see
+Documentation for details) but the main one we want to consider in
+detail for now is the ‘sync_mode’ attribute.
+
+The ‘sync_mode’ attribute has 3 possible settings: ‘sync’, ‘async’,
+and ‘async_irq’.
+
+The context for these different modes is that although the iaa_crypto
+driver implements the asynchronous crypto interface, the async
+interface is currently only used in a synchronous way by facilities
+like zswap that make use of it.
+
+This is fine for software compress/decompress algorithms, since
+there’s no real benefit in being able to use a truly asynchronous
+interface with them.  This isn’t the case, though, for hardware
+compress/decompress engines such as IAA, where truly asynchronous
+behavior is beneficial if not completely necessary to make optimal use
+of the hardware.
+
+The IAA crypto driver ‘sync_mode’ support should allow facilities such
+as zswap to ‘support async (de)compression in some way [2]’ once
+they are modified to actually make use of it.
+
+When the ‘async_irq’ sync_mode is specified, the driver sets the bits
+in the IAA work descriptor to generate an irq when the work completes.
+So for every compression or decompression, the IAA acomp_alg
+implementations called by crypto_acomp_compress/decompress() simply
+set up the descriptor, turn on the 'request irq' bit and return
+immediately with -EINPROGRESS.  When the work completes, the irq fires
+and the IDXD driver’s irq thread for that irq invokes the callback the
+iaa_crypto module registered with IDXD.  When the irq thread gets
+scheduled, it wakes up the caller, which could be for instance zswap,
+waiting synchronously via crypto_wait_req().
+
+Using the simple madvise test program in '[PATCH 08/15] crypto: iaa -
+Add IAA Compression Accelerator Documentation' along with a set of
+pages from the spec17 benchmark and tracepoint instrumentation
+measuring the time taken between the start and end of each compress
+and decompress, this case, async_irq, takes on average 6,847 ns for
+compression and 5,840 ns for decompression. (See Table 1 below for a
+summary of all the tests.)
+
+When sync_mode is set to ‘sync’, the interrupt bit is not set and the
+work descriptor is submitted in the same way it was for the previous
+case.  In this case the call doesn’t return but rather loops around
+waiting in the iaa_crypto driver’s check_completion() function which
+continually checks the descriptor’s completion bit until it finds it
+set to ‘completed’.  It then returns to the caller, again for example
+zswap waiting in crypto_wait_req().  From the standpoint of zswap,
+this case is exactly the same as the previous case, the difference
+seen only in the crypto layer and the iaa_crypto driver internally;
+from its standpoint they’re both synchronous calls.  There is however
+a large performance difference: an average of 3,177 ns for compress
+and 2,235 ns for decompress.
+
+The final sync_mode is ‘async’.  In this case also the interrupt bit
+is not set and the work descriptor is submitted, returning immediately
+to the caller with -EINPROGRESS.  Because there’s no interrupt set to
+notify anyone when the work completes, the caller needs to somehow
+check for work completion.  Because core code like zswap can’t do this
+directly by for example calling iaa_crypto’s check_completion(), there
+would need to be some changes made to code like zswap and the crypto
+layer in order to take advantage of this mode.  As such, there are no
+numbers to share for this mode.
+
+Finally, just a quick discussion of the remaining numbers in Table 1,
+those comparing the iaa_crypto sync and async irq cases to software
+deflate.  Software deflate took average of 108,978 ns for compress and
+14,485 ns for decompress.
+
+As can be seen from Table 1, the numbers using the iaa_crypto driver
+for deflate as compared to software are so much better that merging it
+would seem to make sense on its own merits.  The 'async' sync_mode
+described above, however, offers the possibility of even greater gains
+to be had against higher-performing algorithms such as lzo, via
+parallelization, once the calling facilities are modified to take
+advantage of it.  Follow-up patchsets to this one will demonstrate
+concretely how that might be accomplished.
+
+Thanks, 
+
+Tom  
+
+
+  Table 1. Zswap latency and compression numbers (in ns): 
+
+  Algorithm                    compress      decompress
+  ----------------------------------------------------------
+  iaa sync			3,177		2,235
+  iaa async irq   		6,847		5,840
+  software deflate	      108,978	       14,485
+
+[1] https://cdrdv2.intel.com/v1/dl/getContent/721858
+
+[2] https://lore.kernel.org/lkml/20201107065332.26992-1-song.bao.hua@hisilicon.com/
+
+
+Dave Jiang (2):
+  dmaengine: idxd: add wq driver name support for accel-config user tool
+  dmaengine: idxd: add external module driver support for dsa_bus_type
+
+Tom Zanussi (12):
+  dmaengine: idxd: Export drv_enable/disable and related functions
+  dmaengine: idxd: Export descriptor management functions
+  dmaengine: idxd: Export wq resource management functions
+  dmaengine: idxd: Add wq private data accessors
+  dmaengine: idxd: add callback support for iaa crypto
+  crypto: iaa - Add IAA Compression Accelerator Documentation
+  crypto: iaa - Add Intel IAA Compression Accelerator crypto driver core
+  crypto: iaa - Add per-cpu workqueue table with rebalancing
+  crypto: iaa - Add compression mode management along with fixed mode
+  crypto: iaa - Add support for deflate-iaa compression algorithm
+  crypto: iaa - Add irq support for the crypto async interface
+  crypto: iaa - Add IAA Compression Accelerator stats
+
+ .../ABI/stable/sysfs-driver-dma-idxd          |    6 +
+ .../driver-api/crypto/iaa/iaa-crypto.rst      |  645 +++++
+ Documentation/driver-api/crypto/iaa/index.rst |   20 +
+ Documentation/driver-api/crypto/index.rst     |   20 +
+ Documentation/driver-api/index.rst            |    1 +
+ MAINTAINERS                                   |    7 +
+ crypto/testmgr.c                              |   10 +
+ drivers/crypto/intel/Kconfig                  |    1 +
+ drivers/crypto/intel/Makefile                 |    1 +
+ drivers/crypto/intel/iaa/Kconfig              |   19 +
+ drivers/crypto/intel/iaa/Makefile             |   12 +
+ drivers/crypto/intel/iaa/iaa_crypto.h         |  182 ++
+ .../crypto/intel/iaa/iaa_crypto_comp_fixed.c  |   92 +
+ drivers/crypto/intel/iaa/iaa_crypto_main.c    | 2142 +++++++++++++++++
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c   |  281 +++
+ drivers/crypto/intel/iaa/iaa_crypto_stats.h   |   60 +
+ drivers/dma/idxd/bus.c                        |    6 +
+ drivers/dma/idxd/cdev.c                       |    7 +
+ drivers/dma/idxd/device.c                     |    9 +-
+ drivers/dma/idxd/dma.c                        |    9 +-
+ drivers/dma/idxd/idxd.h                       |   84 +-
+ drivers/dma/idxd/irq.c                        |   12 +-
+ drivers/dma/idxd/submit.c                     |    9 +-
+ drivers/dma/idxd/sysfs.c                      |   34 +
+ include/uapi/linux/idxd.h                     |    1 +
+ 25 files changed, 3650 insertions(+), 20 deletions(-)
+ create mode 100644 Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+ create mode 100644 Documentation/driver-api/crypto/iaa/index.rst
+ create mode 100644 Documentation/driver-api/crypto/index.rst
+ create mode 100644 drivers/crypto/intel/iaa/Kconfig
+ create mode 100644 drivers/crypto/intel/iaa/Makefile
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto.h
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_main.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.c
+ create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.h
+
+-- 
+2.34.1
+
