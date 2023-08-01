@@ -2,672 +2,208 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 350ACC001E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jul 2023 21:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 635F8EB64DD
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Aug 2023 05:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231181AbjGaVcK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jul 2023 17:32:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45698 "EHLO
+        id S229938AbjHAFBG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Aug 2023 01:01:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231509AbjGaVba (ORCPT
+        with ESMTP id S229887AbjHAFBF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jul 2023 17:31:30 -0400
-Received: from mgamail.intel.com (unknown [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB042122;
-        Mon, 31 Jul 2023 14:30:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690839052; x=1722375052;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=b8SdYePbPNCqnD03kAMwQs1OqlQzsKnDE9rj7BfUCDw=;
-  b=KEIVL3cwcE9YJvz47Nstm768iZ6XQWB9OK1imwacEbPKsDjx1hPqwGq4
-   8BacFCefrJvn8A/5aOyJQEOdNDfx7/BchwskZ9wLY4vBobGHI7MXq1ScL
-   QWAxn7guLTtANNeF02cmZgqDW0BC/SfudoOeefCdwI22AtEybOuLQSCpH
-   Ueam3rr7v/seM7glTskU5WDmghg2z+KsH1YNNYbKftHv9xDC1DIk5/sAe
-   nM1aPY+e0woP5Nrr98xtWBIjAsgpFETBefMfdBpsUiWprmZ+FSUmB5GSu
-   Fl68aVSF+SjcwCnc4o5b8jAodcRkh0bAZ+9WMbv5uAtkZGEMai9myNBYW
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="349425991"
-X-IronPort-AV: E=Sophos;i="6.01,245,1684825200"; 
-   d="scan'208";a="349425991"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 14:30:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10788"; a="728428886"
-X-IronPort-AV: E=Sophos;i="6.01,245,1684825200"; 
-   d="scan'208";a="728428886"
-Received: from sgimmeke-mobl.amr.corp.intel.com (HELO tzanussi-mobl1.intel.com) ([10.212.91.213])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2023 14:30:17 -0700
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        fenghua.yu@intel.com, vkoul@kernel.org
-Cc:     dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
-        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Subject: [PATCH v8 14/14] crypto: iaa - Add IAA Compression Accelerator stats
-Date:   Mon, 31 Jul 2023 16:29:39 -0500
-Message-Id: <20230731212939.1391453-15-tom.zanussi@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230731212939.1391453-1-tom.zanussi@linux.intel.com>
-References: <20230731212939.1391453-1-tom.zanussi@linux.intel.com>
+        Tue, 1 Aug 2023 01:01:05 -0400
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2040.outbound.protection.outlook.com [40.107.6.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BEE31FC0
+        for <linux-crypto@vger.kernel.org>; Mon, 31 Jul 2023 22:01:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i4NJWZ8jww6K3yu1xzQYwH8NLxvGf2FVOVIcsEOASh3HOfjbj78PFW9Ihz/ZrwTw0GawWOTwKCddRUMmGy2CYFmARC++xHGrqLu8b20zAAXi4MQKlI2n1hyO9Al9bvyFm2507QLwrpC+nyNrE+FXgGxMto0snTOg/Z3JFfQXXO8sJcrNdjYTiWdEigEzzJECRNAgNcEDqSa6JbLdQxd6Gt3jjumZAAOA5iUhExqB4ojR25P1laqRErqpHDSUt1hDzBc7J/1V2N9Brfq7USd8DO0zZUpkP4T0XzTk+IdGaiRGDQk9o5F4IEVQ6lZneIjPmes77btub7kTiykUpPOmuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+4pks9PErO1THSJif9EaepEoew+7+0yDgH4GwPGfY6E=;
+ b=n0NXSzE51UOfAWJN/s1aOLeTsXnMvFRmXhxbIORXD0ntOzT7/9jDqT+/ApnpkpKWl8GmTNh9hLK8gG7nhiq1GexNf0mJ0czhmE29QDtyrClAgVwODiOrj2z0aoAJVSTISaCT9pq2awl0wgLbLBtn+afPAknt6gZqdA6ayWr81udzO0LArOc5w/fzk83ceNnOMqqzQ++OkqT9nvy1PaYU62q2+3e525XexvlNdd3WMVX73gHqvoirDgCsIhnRfqn8qh5NMNzJz2IByWRPz51izRmc0vIirq7kthlLgC/gCqEehjmiyYno/JXe1RrR+4oHgELto9EZeYxdL7H70sct6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+4pks9PErO1THSJif9EaepEoew+7+0yDgH4GwPGfY6E=;
+ b=jVp6l6xVzvPN6zePbo52PBUBLTbkEo5fhQywmRcYwKo4bk0cN2jgpcyRIvPUjVKSHqb874586qJwIYPW4SZ6UAIh6RwOEQAZ06k6B50FS2EqMzTkj+RBYtzday8BF6qP82G1Jl5MZhYQw+3iWebE8fSwQRKhrbyWyWxd0FIG7Bs=
+Received: from VI1PR04MB6013.eurprd04.prod.outlook.com (2603:10a6:803:cb::15)
+ by PAXPR04MB9106.eurprd04.prod.outlook.com (2603:10a6:102:227::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.44; Tue, 1 Aug
+ 2023 05:01:01 +0000
+Received: from VI1PR04MB6013.eurprd04.prod.outlook.com
+ ([fe80::4cb3:bbe0:20f9:3bc9]) by VI1PR04MB6013.eurprd04.prod.outlook.com
+ ([fe80::4cb3:bbe0:20f9:3bc9%4]) with mapi id 15.20.6631.043; Tue, 1 Aug 2023
+ 05:01:01 +0000
+From:   Gaurav Jain <gaurav.jain@nxp.com>
+To:     =?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?= 
+        <u.kleine-koenig@pengutronix.de>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: RE: [EXT] [PATCH] crypto: caam/jr - Convert to platform remove
+ callback returning void
+Thread-Topic: [EXT] [PATCH] crypto: caam/jr - Convert to platform remove
+ callback returning void
+Thread-Index: AQHZv5ckURa4X/GUU0ad7ZXQL63KoK/U6quQ
+Date:   Tue, 1 Aug 2023 05:01:01 +0000
+Message-ID: <VI1PR04MB601384609ABB421E1BAB915BE70AA@VI1PR04MB6013.eurprd04.prod.outlook.com>
+References: <20230726075938.448673-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230726075938.448673-1-u.kleine-koenig@pengutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: VI1PR04MB6013:EE_|PAXPR04MB9106:EE_
+x-ms-office365-filtering-correlation-id: a74e6728-8367-47d6-8464-08db924c4d41
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xwfhA2IgY4kvD2cyxzpQIXwstUaguQT7Npt9hRgSNbiuJxHk8uqHuvaJYECswQcMfBMU4WMvG/kNmemVKuV6jdXH58v3j1S5sLp0kK3fZX4dXQ/HIIY6wpp6/UYd3gppYOxKYSnwE0ZLCkJFAKKwhMNqZaw5doBLhcHw1lkpfE2KrBK+y/qbnDrNoAXkqIckAgpY2AZRhe4Fw/hygweaOyRETdi15sNIsIwPBGHi9rMUT/PNLKTttWPlhUMJQfka0kaLQLVSkJFQRSLVT8MQYW95bPuGOTaKjC7DQAO0XfnEXgJWPke2pfwLDwE9NX5LL6jYTYIPuJfo3CRRvbQ7cbA+KC0Y9YfhSJTAXvXVHLerWNJUbk3+miUnVPetBJCGbtkwDwFuVUAtjS6OKSi0NrMJf9E3QxfpY93xPSFfFpA6PuvAPbq7QzyfxFTnV/kr8WmS9myQgYADhcrNdV5/+4UQTXFKyWw12j5J3m0mKf1oW/D5Qc8gzkGoVp8cV9DLAvtUXTesKdt+x7AqybVdH2YF5Jcz+u22AKQM9l9ApeMW2qImDact9TSnkItR2cZVD42aVsPLTM17ObzmIaBzoPBqOdHzboaMR4mik0jOzSw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB6013.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(346002)(366004)(376002)(451199021)(966005)(9686003)(71200400001)(5660300002)(55016003)(52536014)(186003)(44832011)(33656002)(66946007)(76116006)(66446008)(66476007)(66556008)(4326008)(64756008)(478600001)(54906003)(110136005)(7696005)(316002)(38070700005)(41300700001)(8936002)(8676002)(122000001)(26005)(38100700002)(86362001)(53546011)(66574015)(2906002)(83380400001)(6506007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?R0RjQ29hazFCYXp3RVlkblhwNkxjVWxyOVg0dDBRTlNhc2xQYWhObHZ6Zk5E?=
+ =?utf-8?B?Unh5eFZmM09oQSsvSUxKQzBrc2kraUM0RTA5WWxOU3JFMlc1Tk5VbzNQT0dY?=
+ =?utf-8?B?NDlpRnFUMmJkL2dsQjNXVmNHZFVIRjg5alQvSWtBV2lXQ3dkU0VhZ1JzMkRT?=
+ =?utf-8?B?NlVKRnNQbU4wMitMdDYwc3lLbnpUWExMKzk4aDNaMW1mcjljTTZjUmhhNDV1?=
+ =?utf-8?B?UW1YTFJTQzVCN1A3L0ZZQjh4blVpRkhwc1dWRGphcUI4OE8xN09Rd3o1Z0ow?=
+ =?utf-8?B?OGs2Wlkyc0FHZktweTdDVXZxOTBSVEJicFBTaHgrQ3lnREpSbms5SGNmWjVq?=
+ =?utf-8?B?cVpnZDZSZTN3Qjh3YXlzc1lZaDRyWktTcDBJUWdWUzRPYitoRmlVTFpMWk1a?=
+ =?utf-8?B?UndMN3JYK1d0WDdNN1VpT0s1NzJoajY1NXlqSFdvL3JORld1SW91YmFLRStr?=
+ =?utf-8?B?cE9oNjc1NU1MMHlJRkZLdzVOTWtWVjlJV0JvTU9jZkw1OGpGZlMvNFhXa25R?=
+ =?utf-8?B?NmtmM3Vob3VRWDFHM0NCRjU2eGFZSy9xOEhKcy8rTmIyVUN6WU11c2RHOXBB?=
+ =?utf-8?B?M3A2TzlYN2k3MC94WU05TG9IMm1uZEQrUmZuNm9pVk91bjcyZXVqY2pZa2ZO?=
+ =?utf-8?B?bUJSTkd4ZzdCUWpPR1JzYWJINWgwSnJ4R1psS1QzcFFpTVpRK095dXhmS0hm?=
+ =?utf-8?B?M29ZK1FVVTNoaW5EYTRVQ0UzZnBXQUZyWDZVa1R0eCsxb291QlZJRXc1M1JO?=
+ =?utf-8?B?cENPUUFsaThuQVRDMEJwY1FmSHJla3JFN0JRN2pQRnI0SHdZUFNVNXFKck00?=
+ =?utf-8?B?eU1Gb0hlYlRNSExnZ0RTS3Q0RHlxWDNZamt4NlJqbXBlaVoyTHlTNUNITDJH?=
+ =?utf-8?B?Z1J3WDZjMFhHOHR5U0Q3MTF0MHNsNWFReDVMbUdHdDJUSEd3eHduQ0NlMGJa?=
+ =?utf-8?B?eTUwMUZwdm5VREIxd2t1dGR6azJ6NTNZTmw4OTdZUFVidDl3elhmUld0ejBz?=
+ =?utf-8?B?T2FmVmNLc0hsRTRkVFZTdEs2T2s3aldmcDdCRXZtR1VpUzVKQ1FvNmFxVmdZ?=
+ =?utf-8?B?dllIcGhXZXlaWDRaUUJ1aWpJdDBnTG92aXBMWG5BcWVrbnN1OCtDZUtOS1lX?=
+ =?utf-8?B?dHB0RU41ZTlNT2pqWFVQdUpnaHo4eEtWREw4QU11UkxMUzdYRW1pZ1dPc0hP?=
+ =?utf-8?B?VThBQko4b1pPeUpsTUE3UWZ1MXRXeHk3b3M0Q1gwUnVlQnM3eWcvY2MwMEtQ?=
+ =?utf-8?B?Rk5hNm9DUW1uT3NzYUk2OGEvNy9kdXo5Ym5iVTVzUVhjdGZJYTFVazl4NHNU?=
+ =?utf-8?B?MnFrZEpTdTZySUphRG0yQjYvMXM4U1JmZ3ZRYjQzSExlOUFGVUhUd1BCRUJu?=
+ =?utf-8?B?bFg3K21iRUd6THJDUitGWTF2VnlEaHBuaWFEd3ByVzNyc1N5bEtQOXUvNFo1?=
+ =?utf-8?B?cU1Ba0VBbS9aQTMxMnVURk8wSmF0cjZsOUJsY2orNXkyU0lyalY3czhOY1VP?=
+ =?utf-8?B?UWdzdFpsdjVqQ1Evb1V0Y01wZnRrQmN1OExadXJDVXN4bndiLzBkSHFNWU00?=
+ =?utf-8?B?K2RqdXMyMEk2MzVvQUV4dWVoQ1BhZnNnejREcmloeW9TV2xabnd4TUlIN2s5?=
+ =?utf-8?B?SnZrc3NXWTdVeTN2MG1WZTVHeHg4WnFMMWhoVDBac0ErTXhkQkJ2d3o1SU1w?=
+ =?utf-8?B?QW9kZmN1akRKeUdOZ3JpTlFNdG00M0xEdFJyeVB5Nzl1eG5uMldpeExyNzNm?=
+ =?utf-8?B?cDZadUM3UmJ2MlBBcjNWajFIcS8reGoyOXprYWJLeDUwWWtXOW9tQ1crQk1P?=
+ =?utf-8?B?YU95ZkRka0hyWEVHUjMyY3ZrL1NVdzFiK0xKOUIyUTI5czNnM1N1MDVha2tw?=
+ =?utf-8?B?eEcxK3NYUG1ZNXpoNDVEVnpZRHZvOFZIY3YzSGl1TTUzdCtqaTM2MjJ4V1N4?=
+ =?utf-8?B?VEo4VkxGLzdsbWNBKzlYWXNZeVBOSTczWExjT2ZmL296WUFNTUlMLzNrSWZ6?=
+ =?utf-8?B?ZmRTcjF4Z2pIM0RQMWlHTGZSOTIwWHc1eUpERnByT3QyZDNETFozU09nSWcr?=
+ =?utf-8?B?bllqK0lMYmpyeHpzT0ZjdzNrMmV3NTkvVjd0UnF3ZVl3M3RHbjg5VU16ajQz?=
+ =?utf-8?Q?FtQk37fzPVW3J6Y/pP3uaWqen?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB6013.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a74e6728-8367-47d6-8464-08db924c4d41
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2023 05:01:01.3908
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mCur2LThnrpuvr73g7ciEUccjYSiKMSCYVgvrlKgIHx8sDavoL+6Cb8Pd7mOuTZLXqjydvgNLQA0rkKl6erNgA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9106
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for optional debugfs statistics support for the IAA
-Compression Accelerator.  This is enabled by the kernel config item:
-
-  CRYPTO_DEV_IAA_CRYPTO_STATS
-
-When enabled, the IAA crypto driver will generate statistics which can
-be accessed at /sys/kernel/debug/iaa-crypto/.
-
-See Documentation/driver-api/crypto/iax/iax-crypto.rst for details.
-
-Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
----
- drivers/crypto/intel/iaa/Kconfig            |   9 +
- drivers/crypto/intel/iaa/Makefile           |   2 +
- drivers/crypto/intel/iaa/iaa_crypto.h       |  22 ++
- drivers/crypto/intel/iaa/iaa_crypto_main.c  |  67 +++++
- drivers/crypto/intel/iaa/iaa_crypto_stats.c | 281 ++++++++++++++++++++
- drivers/crypto/intel/iaa/iaa_crypto_stats.h |  60 +++++
- 6 files changed, 441 insertions(+)
- create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.c
- create mode 100644 drivers/crypto/intel/iaa/iaa_crypto_stats.h
-
-diff --git a/drivers/crypto/intel/iaa/Kconfig b/drivers/crypto/intel/iaa/Kconfig
-index fcccb6ff7e29..d53f4b1d494f 100644
---- a/drivers/crypto/intel/iaa/Kconfig
-+++ b/drivers/crypto/intel/iaa/Kconfig
-@@ -8,3 +8,12 @@ config CRYPTO_DEV_IAA_CRYPTO
- 	  decompression with the Intel Analytics Accelerator (IAA)
- 	  hardware using the cryptographic API.  If you choose 'M'
- 	  here, the module will be called iaa_crypto.
-+
-+config CRYPTO_DEV_IAA_CRYPTO_STATS
-+	bool "Enable Intel(R) IAA Compression Accelerator Statistics"
-+	depends on CRYPTO_DEV_IAA_CRYPTO
-+	default n
-+	help
-+	  Enable statistics for the IAA compression accelerator.
-+	  These include per-device and per-workqueue statistics in
-+	  addition to global driver statistics.
-diff --git a/drivers/crypto/intel/iaa/Makefile b/drivers/crypto/intel/iaa/Makefile
-index cc87feffd059..b64b208d2344 100644
---- a/drivers/crypto/intel/iaa/Makefile
-+++ b/drivers/crypto/intel/iaa/Makefile
-@@ -8,3 +8,5 @@ ccflags-y += -I $(srctree)/drivers/dma/idxd -DDEFAULT_SYMBOL_NAMESPACE=IDXD
- obj-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO) := iaa_crypto.o
- 
- iaa_crypto-y := iaa_crypto_main.o iaa_crypto_comp_fixed.o
-+
-+iaa_crypto-$(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS) += iaa_crypto_stats.o
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto.h b/drivers/crypto/intel/iaa/iaa_crypto.h
-index de014ac53adb..e0fee392a43a 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto.h
-+++ b/drivers/crypto/intel/iaa/iaa_crypto.h
-@@ -48,6 +48,11 @@ struct iaa_wq {
- 	bool			remove;
- 
- 	struct iaa_device	*iaa_device;
-+
-+	u64			comp_calls;
-+	u64			comp_bytes;
-+	u64			decomp_calls;
-+	u64			decomp_bytes;
- };
- 
- struct iaa_device_compression_mode {
-@@ -69,6 +74,11 @@ struct iaa_device {
- 
- 	int				n_wq;
- 	struct list_head		wqs;
-+
-+	u64				comp_calls;
-+	u64				comp_bytes;
-+	u64				decomp_calls;
-+	u64				decomp_bytes;
- };
- 
- struct wq_table_entry {
-@@ -157,4 +167,16 @@ struct iaa_compression_ctx {
- 	bool		use_irq;
- };
- 
-+#if defined(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS)
-+void	global_stats_show(struct seq_file *m);
-+void	device_stats_show(struct seq_file *m, struct iaa_device *iaa_device);
-+void	reset_iaa_crypto_stats(void);
-+void	reset_device_stats(struct iaa_device *iaa_device);
-+#else
-+static inline void	global_stats_show(struct seq_file *m) {}
-+static inline void	device_stats_show(struct seq_file *m, struct iaa_device *iaa_device) {}
-+static inline void	reset_iaa_crypto_stats(void) {}
-+static inline void	reset_device_stats(struct iaa_device *iaa_device) {}
-+#endif
-+
- #endif
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index 17568c9440c2..b73bebb0e1cc 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -14,6 +14,7 @@
- 
- #include "idxd.h"
- #include "iaa_crypto.h"
-+#include "iaa_crypto_stats.h"
- 
- #ifdef pr_fmt
- #undef pr_fmt
-@@ -1048,6 +1049,7 @@ static inline int check_completion(struct device *dev,
- 			ret = -ETIMEDOUT;
- 			dev_dbg(dev, "%s timed out, size=0x%x\n",
- 				op_str, comp->output_size);
-+			update_completion_timeout_errs();
- 			goto out;
- 		}
- 
-@@ -1057,6 +1059,7 @@ static inline int check_completion(struct device *dev,
- 			dev_dbg(dev, "compressed > uncompressed size,"
- 				" not compressing, size=0x%x\n",
- 				comp->output_size);
-+			update_completion_comp_buf_overflow_errs();
- 			goto out;
- 		}
- 
-@@ -1069,6 +1072,7 @@ static inline int check_completion(struct device *dev,
- 		dev_dbg(dev, "iaa %s status=0x%x, error=0x%x, size=0x%x\n",
- 			op_str, comp->status, comp->error_code, comp->output_size);
- 		print_hex_dump(KERN_INFO, "cmp-rec: ", DUMP_PREFIX_OFFSET, 8, 1, comp, 64, 0);
-+		update_completion_einval_errs();
- 
- 		goto out;
- 	}
-@@ -1090,6 +1094,8 @@ static int deflate_generic_decompress(struct acomp_req *req)
- 	kunmap_local(src);
- 	kunmap_local(dst);
- 
-+	update_total_sw_decomp_calls();
-+
- 	return ret;
- }
- 
-@@ -1153,6 +1159,15 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
- 		ctx->req->dlen = idxd_desc->iax_completion->output_size;
- 	}
- 
-+	/* Update stats */
-+	if (ctx->compress) {
-+		update_total_comp_bytes_out(ctx->req->dlen);
-+		update_wq_comp_bytes(iaa_wq->wq, ctx->req->dlen);
-+	} else {
-+		update_total_decomp_bytes_in(ctx->req->dlen);
-+		update_wq_decomp_bytes(iaa_wq->wq, ctx->req->dlen);
-+	}
-+
- 	if (ctx->compress && compression_ctx->verify_compress) {
- 		u32 compression_crc;
- 
-@@ -1260,6 +1275,10 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
- 		goto err;
- 	}
- 
-+	/* Update stats */
-+	update_total_comp_calls();
-+	update_wq_comp_calls(wq);
-+
- 	if (ctx->async_mode && !disable_async) {
- 		ret = -EINPROGRESS;
- 		dev_dbg(dev, "%s: returning -EINPROGRESS\n", __func__);
-@@ -1274,6 +1293,10 @@ static int iaa_compress(struct crypto_tfm *tfm,	struct acomp_req *req,
- 
- 	*dlen = idxd_desc->iax_completion->output_size;
- 
-+	/* Update stats */
-+	update_total_comp_bytes_out(*dlen);
-+	update_wq_comp_bytes(wq, *dlen);
-+
- 	*compression_crc = idxd_desc->iax_completion->crc;
- 
- 	if (!ctx->async_mode)
-@@ -1450,6 +1473,10 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 		goto err;
- 	}
- 
-+	/* Update stats */
-+	update_total_decomp_calls();
-+	update_wq_decomp_calls(wq);
-+
- 	if (ctx->async_mode && !disable_async) {
- 		ret = -EINPROGRESS;
- 		dev_dbg(dev, "%s: returning -EINPROGRESS\n", __func__);
-@@ -1480,6 +1507,10 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
- 
- 	if (!ctx->async_mode)
- 		idxd_free_desc(wq, idxd_desc);
-+
-+	/* Update stats */
-+	update_total_decomp_bytes_in(slen);
-+	update_wq_decomp_bytes(wq, slen);
- out:
- 	return ret;
- err:
-@@ -1989,6 +2020,38 @@ static struct idxd_device_driver iaa_crypto_driver = {
- 	.desc_complete = iaa_desc_complete,
- };
- 
-+int wq_stats_show(struct seq_file *m, void *v)
-+{
-+	struct iaa_device *iaa_device;
-+
-+	mutex_lock(&iaa_devices_lock);
-+
-+	global_stats_show(m);
-+
-+	list_for_each_entry(iaa_device, &iaa_devices, list)
-+		device_stats_show(m, iaa_device);
-+
-+	mutex_unlock(&iaa_devices_lock);
-+
-+	return 0;
-+}
-+
-+int iaa_crypto_stats_reset(void *data, u64 value)
-+{
-+	struct iaa_device *iaa_device;
-+
-+	reset_iaa_crypto_stats();
-+
-+	mutex_lock(&iaa_devices_lock);
-+
-+	list_for_each_entry(iaa_device, &iaa_devices, list)
-+		reset_device_stats(iaa_device);
-+
-+	mutex_unlock(&iaa_devices_lock);
-+
-+	return 0;
-+}
-+
- static int __init iaa_crypto_init_module(void)
- {
- 	int ret = 0;
-@@ -2032,6 +2095,9 @@ static int __init iaa_crypto_init_module(void)
- 		goto err_sync_attr_create;
- 	}
- 
-+	if (iaa_crypto_debugfs_init())
-+		pr_warn("debugfs init failed, stats not available\n");
-+
- 	pr_debug("initialized\n");
- out:
- 	return ret;
-@@ -2054,6 +2120,7 @@ static void __exit iaa_crypto_cleanup_module(void)
- 	if (iaa_unregister_compression_device())
- 		pr_debug("IAA compression device unregister failed\n");
- 
-+	iaa_crypto_debugfs_cleanup();
- 	driver_remove_file(&iaa_crypto_driver.drv,
- 			   &driver_attr_sync_mode);
- 	driver_remove_file(&iaa_crypto_driver.drv,
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.c b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-new file mode 100644
-index 000000000000..738eeb7f44ed
---- /dev/null
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.c
-@@ -0,0 +1,281 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
-+
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/highmem.h>
-+#include <linux/mm.h>
-+#include <linux/slab.h>
-+#include <linux/delay.h>
-+#include <linux/smp.h>
-+#include <uapi/linux/idxd.h>
-+#include <linux/idxd.h>
-+#include <linux/dmaengine.h>
-+#include "../../dma/idxd/idxd.h"
-+#include <linux/debugfs.h>
-+#include <crypto/internal/acompress.h>
-+#include "iaa_crypto.h"
-+#include "iaa_crypto_stats.h"
-+
-+static u64 total_comp_calls;
-+static u64 total_decomp_calls;
-+static u64 total_sw_decomp_calls;
-+static u64 max_comp_delay_ns;
-+static u64 max_decomp_delay_ns;
-+static u64 max_acomp_delay_ns;
-+static u64 max_adecomp_delay_ns;
-+static u64 total_comp_bytes_out;
-+static u64 total_decomp_bytes_in;
-+static u64 total_completion_einval_errors;
-+static u64 total_completion_timeout_errors;
-+static u64 total_completion_comp_buf_overflow_errors;
-+
-+static struct dentry *iaa_crypto_debugfs_root;
-+
-+void update_total_comp_calls(void)
-+{
-+	total_comp_calls++;
-+}
-+
-+void update_total_comp_bytes_out(int n)
-+{
-+	total_comp_bytes_out += n;
-+}
-+
-+void update_total_decomp_calls(void)
-+{
-+	total_decomp_calls++;
-+}
-+
-+void update_total_sw_decomp_calls(void)
-+{
-+	total_sw_decomp_calls++;
-+}
-+
-+void update_total_decomp_bytes_in(int n)
-+{
-+	total_decomp_bytes_in += n;
-+}
-+
-+void update_completion_einval_errs(void)
-+{
-+	total_completion_einval_errors++;
-+}
-+
-+void update_completion_timeout_errs(void)
-+{
-+	total_completion_timeout_errors++;
-+}
-+
-+void update_completion_comp_buf_overflow_errs(void)
-+{
-+	total_completion_comp_buf_overflow_errors++;
-+}
-+
-+void update_max_comp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_comp_delay_ns)
-+		max_comp_delay_ns = time_diff;
-+}
-+
-+void update_max_decomp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_decomp_delay_ns)
-+		max_decomp_delay_ns = time_diff;
-+}
-+
-+void update_max_acomp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_acomp_delay_ns)
-+		max_acomp_delay_ns = time_diff;
-+}
-+
-+void update_max_adecomp_delay_ns(u64 start_time_ns)
-+{
-+	u64 time_diff;
-+
-+	time_diff = ktime_get_ns() - start_time_ns;
-+
-+	if (time_diff > max_adecomp_delay_ns)
-+
-+		max_adecomp_delay_ns = time_diff;
-+}
-+
-+void update_wq_comp_calls(struct idxd_wq *idxd_wq)
-+{
-+	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
-+
-+	wq->comp_calls++;
-+	wq->iaa_device->comp_calls++;
-+}
-+
-+void update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n)
-+{
-+	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
-+
-+	wq->comp_bytes += n;
-+	wq->iaa_device->comp_bytes += n;
-+}
-+
-+void update_wq_decomp_calls(struct idxd_wq *idxd_wq)
-+{
-+	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
-+
-+	wq->decomp_calls++;
-+	wq->iaa_device->decomp_calls++;
-+}
-+
-+void update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n)
-+{
-+	struct iaa_wq *wq = idxd_wq_get_private(idxd_wq);
-+
-+	wq->decomp_bytes += n;
-+	wq->iaa_device->decomp_bytes += n;
-+}
-+
-+void reset_iaa_crypto_stats(void)
-+{
-+	total_comp_calls = 0;
-+	total_decomp_calls = 0;
-+	total_sw_decomp_calls = 0;
-+	max_comp_delay_ns = 0;
-+	max_decomp_delay_ns = 0;
-+	max_acomp_delay_ns = 0;
-+	max_adecomp_delay_ns = 0;
-+	total_comp_bytes_out = 0;
-+	total_decomp_bytes_in = 0;
-+	total_completion_einval_errors = 0;
-+	total_completion_timeout_errors = 0;
-+	total_completion_comp_buf_overflow_errors = 0;
-+}
-+
-+static void reset_wq_stats(struct iaa_wq *wq)
-+{
-+	wq->comp_calls = 0;
-+	wq->comp_bytes = 0;
-+	wq->decomp_calls = 0;
-+	wq->decomp_bytes = 0;
-+}
-+
-+void reset_device_stats(struct iaa_device *iaa_device)
-+{
-+	struct iaa_wq *iaa_wq;
-+
-+	iaa_device->comp_calls = 0;
-+	iaa_device->comp_bytes = 0;
-+	iaa_device->decomp_calls = 0;
-+	iaa_device->decomp_bytes = 0;
-+
-+	list_for_each_entry(iaa_wq, &iaa_device->wqs, list)
-+		reset_wq_stats(iaa_wq);
-+}
-+
-+static void wq_show(struct seq_file *m, struct iaa_wq *iaa_wq)
-+{
-+	seq_printf(m, "    name: %s\n", iaa_wq->wq->name);
-+	seq_printf(m, "    comp_calls: %llu\n", iaa_wq->comp_calls);
-+	seq_printf(m, "    comp_bytes: %llu\n", iaa_wq->comp_bytes);
-+	seq_printf(m, "    decomp_calls: %llu\n", iaa_wq->decomp_calls);
-+	seq_printf(m, "    decomp_bytes: %llu\n\n", iaa_wq->decomp_bytes);
-+}
-+
-+void device_stats_show(struct seq_file *m, struct iaa_device *iaa_device)
-+{
-+	struct iaa_wq *iaa_wq;
-+
-+	seq_puts(m, "iaa device:\n");
-+	seq_printf(m, "  id: %d\n", iaa_device->idxd->id);
-+	seq_printf(m, "  n_wqs: %d\n", iaa_device->n_wq);
-+	seq_printf(m, "  comp_calls: %llu\n", iaa_device->comp_calls);
-+	seq_printf(m, "  comp_bytes: %llu\n", iaa_device->comp_bytes);
-+	seq_printf(m, "  decomp_calls: %llu\n", iaa_device->decomp_calls);
-+	seq_printf(m, "  decomp_bytes: %llu\n", iaa_device->decomp_bytes);
-+	seq_puts(m, "  wqs:\n");
-+
-+	list_for_each_entry(iaa_wq, &iaa_device->wqs, list)
-+		wq_show(m, iaa_wq);
-+}
-+
-+void global_stats_show(struct seq_file *m)
-+{
-+	seq_puts(m, "global stats:\n");
-+	seq_printf(m, "  total_comp_calls: %llu\n", total_comp_calls);
-+	seq_printf(m, "  total_decomp_calls: %llu\n", total_decomp_calls);
-+	seq_printf(m, "  total_sw_decomp_calls: %llu\n", total_sw_decomp_calls);
-+	seq_printf(m, "  total_comp_bytes_out: %llu\n", total_comp_bytes_out);
-+	seq_printf(m, "  total_decomp_bytes_in: %llu\n", total_decomp_bytes_in);
-+	seq_printf(m, "  total_completion_einval_errors: %llu\n",
-+		   total_completion_einval_errors);
-+	seq_printf(m, "  total_completion_timeout_errors: %llu\n",
-+		   total_completion_timeout_errors);
-+	seq_printf(m, "  total_completion_comp_buf_overflow_errors: %llu\n\n",
-+		   total_completion_comp_buf_overflow_errors);
-+}
-+
-+static int wq_stats_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, wq_stats_show, file);
-+}
-+
-+const struct file_operations wq_stats_fops = {
-+	.open = wq_stats_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = single_release,
-+};
-+
-+DEFINE_DEBUGFS_ATTRIBUTE(wq_stats_reset_fops, NULL, iaa_crypto_stats_reset, "%llu\n");
-+
-+int __init iaa_crypto_debugfs_init(void)
-+{
-+	if (!debugfs_initialized())
-+		return -ENODEV;
-+
-+	iaa_crypto_debugfs_root = debugfs_create_dir("iaa_crypto", NULL);
-+	if (!iaa_crypto_debugfs_root)
-+		return -ENOMEM;
-+
-+	debugfs_create_u64("max_comp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_comp_delay_ns);
-+	debugfs_create_u64("max_decomp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_decomp_delay_ns);
-+	debugfs_create_u64("max_acomp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_comp_delay_ns);
-+	debugfs_create_u64("max_adecomp_delay_ns", 0644,
-+			   iaa_crypto_debugfs_root, &max_decomp_delay_ns);
-+	debugfs_create_u64("total_comp_calls", 0644,
-+			   iaa_crypto_debugfs_root, &total_comp_calls);
-+	debugfs_create_u64("total_decomp_calls", 0644,
-+			   iaa_crypto_debugfs_root, &total_decomp_calls);
-+	debugfs_create_u64("total_sw_decomp_calls", 0644,
-+			   iaa_crypto_debugfs_root, &total_sw_decomp_calls);
-+	debugfs_create_u64("total_comp_bytes_out", 0644,
-+			   iaa_crypto_debugfs_root, &total_comp_bytes_out);
-+	debugfs_create_u64("total_decomp_bytes_in", 0644,
-+			   iaa_crypto_debugfs_root, &total_decomp_bytes_in);
-+	debugfs_create_file("wq_stats", 0644, iaa_crypto_debugfs_root, NULL,
-+			    &wq_stats_fops);
-+	debugfs_create_file("stats_reset", 0644, iaa_crypto_debugfs_root, NULL,
-+			    &wq_stats_reset_fops);
-+
-+	return 0;
-+}
-+
-+void __exit iaa_crypto_debugfs_cleanup(void)
-+{
-+	debugfs_remove_recursive(iaa_crypto_debugfs_root);
-+}
-+
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_stats.h b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-new file mode 100644
-index 000000000000..0b2fb517a997
---- /dev/null
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_stats.h
-@@ -0,0 +1,60 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright(c) 2021 Intel Corporation. All rights rsvd. */
-+
-+#ifndef __CRYPTO_DEV_IAA_CRYPTO_STATS_H__
-+#define __CRYPTO_DEV_IAA_CRYPTO_STATS_H__
-+
-+#if defined(CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS)
-+int	iaa_crypto_debugfs_init(void);
-+void	iaa_crypto_debugfs_cleanup(void);
-+
-+void	update_total_comp_calls(void);
-+void	update_total_comp_bytes_out(int n);
-+void	update_total_decomp_calls(void);
-+void	update_total_sw_decomp_calls(void);
-+void	update_total_decomp_bytes_in(int n);
-+void	update_max_comp_delay_ns(u64 start_time_ns);
-+void	update_max_decomp_delay_ns(u64 start_time_ns);
-+void	update_max_acomp_delay_ns(u64 start_time_ns);
-+void	update_max_adecomp_delay_ns(u64 start_time_ns);
-+void	update_completion_einval_errs(void);
-+void	update_completion_timeout_errs(void);
-+void	update_completion_comp_buf_overflow_errs(void);
-+
-+void	update_wq_comp_calls(struct idxd_wq *idxd_wq);
-+void	update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n);
-+void	update_wq_decomp_calls(struct idxd_wq *idxd_wq);
-+void	update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n);
-+
-+int	wq_stats_show(struct seq_file *m, void *v);
-+int	iaa_crypto_stats_reset(void *data, u64 value);
-+
-+static inline u64	iaa_get_ts(void) { return ktime_get_ns(); }
-+
-+#else
-+static inline int	iaa_crypto_debugfs_init(void) { return 0; }
-+static inline void	iaa_crypto_debugfs_cleanup(void) {}
-+
-+static inline void	update_total_comp_calls(void) {}
-+static inline void	update_total_comp_bytes_out(int n) {}
-+static inline void	update_total_decomp_calls(void) {}
-+static inline void	update_total_sw_decomp_calls(void) {}
-+static inline void	update_total_decomp_bytes_in(int n) {}
-+static inline void	update_max_comp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_max_decomp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_max_acomp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_max_adecomp_delay_ns(u64 start_time_ns) {}
-+static inline void	update_completion_einval_errs(void) {}
-+static inline void	update_completion_timeout_errs(void) {}
-+static inline void	update_completion_comp_buf_overflow_errs(void) {}
-+
-+static inline void	update_wq_comp_calls(struct idxd_wq *idxd_wq) {}
-+static inline void	update_wq_comp_bytes(struct idxd_wq *idxd_wq, int n) {}
-+static inline void	update_wq_decomp_calls(struct idxd_wq *idxd_wq) {}
-+static inline void	update_wq_decomp_bytes(struct idxd_wq *idxd_wq, int n) {}
-+
-+static inline u64	iaa_get_ts(void) { return 0; }
-+
-+#endif // CONFIG_CRYPTO_DEV_IAA_CRYPTO_STATS
-+
-+#endif
--- 
-2.34.1
-
+SGkNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBVd2UgS2xlaW5lLUvD
+tm5pZyA8dS5rbGVpbmUta29lbmlnQHBlbmd1dHJvbml4LmRlPg0KPiBTZW50OiBXZWRuZXNkYXks
+IEp1bHkgMjYsIDIwMjMgMTozMCBQTQ0KPiBUbzogSG9yaWEgR2VhbnRhIDxob3JpYS5nZWFudGFA
+bnhwLmNvbT47IFBhbmthaiBHdXB0YQ0KPiA8cGFua2FqLmd1cHRhQG54cC5jb20+OyBHYXVyYXYg
+SmFpbiA8Z2F1cmF2LmphaW5AbnhwLmNvbT47IEhlcmJlcnQgWHUNCj4gPGhlcmJlcnRAZ29uZG9y
+LmFwYW5hLm9yZy5hdT47IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD4NCj4g
+Q2M6IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IGtlcm5lbEBwZW5ndXRyb25peC5kZQ0K
+PiBTdWJqZWN0OiBbRVhUXSBbUEFUQ0hdIGNyeXB0bzogY2FhbS9qciAtIENvbnZlcnQgdG8gcGxh
+dGZvcm0gcmVtb3ZlIGNhbGxiYWNrDQo+IHJldHVybmluZyB2b2lkDQo+IA0KPiBDYXV0aW9uOiBU
+aGlzIGlzIGFuIGV4dGVybmFsIGVtYWlsLiBQbGVhc2UgdGFrZSBjYXJlIHdoZW4gY2xpY2tpbmcg
+bGlua3Mgb3INCj4gb3BlbmluZyBhdHRhY2htZW50cy4gV2hlbiBpbiBkb3VidCwgcmVwb3J0IHRo
+ZSBtZXNzYWdlIHVzaW5nIHRoZSAnUmVwb3J0IHRoaXMNCj4gZW1haWwnIGJ1dHRvbg0KPiANCj4g
+DQo+IFRoZSAucmVtb3ZlKCkgY2FsbGJhY2sgZm9yIGEgcGxhdGZvcm0gZHJpdmVyIHJldHVybnMg
+YW4gaW50IHdoaWNoIG1ha2VzIG1hbnkNCj4gZHJpdmVyIGF1dGhvcnMgd3JvbmdseSBhc3N1bWUg
+aXQncyBwb3NzaWJsZSB0byBkbyBlcnJvciBoYW5kbGluZyBieSByZXR1cm5pbmcgYW4NCj4gZXJy
+b3IgY29kZS4gSG93ZXZlciB0aGUgdmFsdWUgcmV0dXJuZWQgaXMgKG1vc3RseSkgaWdub3JlZCBh
+bmQgdGhpcyB0eXBpY2FsbHkNCj4gcmVzdWx0cyBpbiByZXNvdXJjZSBsZWFrcy4gVG8gaW1wcm92
+ZSBoZXJlIHRoZXJlIGlzIGEgcXVlc3QgdG8gbWFrZSB0aGUgcmVtb3ZlDQo+IGNhbGxiYWNrIHJl
+dHVybiB2b2lkLiBJbiB0aGUgZmlyc3Qgc3RlcCBvZiB0aGlzIHF1ZXN0IGFsbCBkcml2ZXJzIGFy
+ZSBjb252ZXJ0ZWQNCj4gdG8gLnJlbW92ZV9uZXcoKSB3aGljaCBhbHJlYWR5IHJldHVybnMgdm9p
+ZC4NCj4gDQo+IFRoZSBkcml2ZXIgYWRhcHRlZCBoZXJlIHN1ZmZlcnMgZnJvbSB0aGlzIHdyb25n
+IGFzc3VtcHRpb24uIFJldHVybmluZyAtRUJVU1kNCj4gaWYgdGhlcmUgYXJlIHN0aWxsIHVzZXJz
+IHJlc3VsdHMgaW4gcmVzb3VyY2UgbGVha3MgYW5kIHByb2JhYmx5IGEgY3Jhc2guIEFsc28gZnVy
+dGhlcg0KPiBkb3duIHBhc3NpbmcgdGhlIGVycm9yIGNvZGUgb2YgY2FhbV9qcl9zaHV0ZG93bigp
+IHRvIHRoZSBjYWxsZXIgb25seSByZXN1bHRzIGluDQo+IGFub3RoZXIgZXJyb3IgbWVzc2FnZSBh
+bmQgaGFzIG5vIGZ1cnRoZXIgY29uc2VxdWVuY2VzIGNvbXBhcmVkIHRvIHJldHVybmluZw0KPiB6
+ZXJvLg0KPiANCj4gU3RpbGwgY29udmVydCB0aGUgZHJpdmVyIHRvIHJldHVybiBubyB2YWx1ZSBp
+biB0aGUgcmVtb3ZlIGNhbGxiYWNrLiBUaGlzIGFsc28gYWxsb3dzDQo+IHRvIGRyb3AgY2FhbV9q
+cl9wbGF0Zm9ybV9zaHV0ZG93bigpIGFzIHRoZSBvbmx5IGZ1bmN0aW9uIGNhbGxlZCBieSBpdCBu
+b3cgaGFzDQo+IHRoZSBzYW1lIHByb3RvdHlwZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFV3ZSBL
+bGVpbmUtS8O2bmlnIDx1LmtsZWluZS1rb2VuaWdAcGVuZ3V0cm9uaXguZGU+DQo+IC0tLQ0KPiBI
+ZWxsbywNCj4gDQo+IG5vdGUgdGhhdCB0aGUgcHJvYmxlbXMgZGVzY3JpYmVkIGFib3ZlIGFuZCBp
+biB0aGUgZXh0ZW5kZWQgY29tbWVudCBpc24ndA0KPiBpbnRyb2R1Y2VkIGJ5IHRoaXMgcGF0Y2gu
+IEl0J3MgYXMgb2xkIGFzDQo+IDMxM2VhMjkzZTljNGQxZWFiY2FkZGQyYzA4MDBmMDgzYjAzYzJh
+MmUgYXQgbGVhc3QuDQo+IA0KPiBBbHNvIG9ydGhvZ29uYWwgdG8gdGhpcyBwYXRjaCBJIHdvbmRl
+ciBhYm91dCB0aGUgdXNlIG9mIGEgc2h1dGRvd24gY2FsbGJhY2suDQo+IFdoYXQgbWFrZXMgdGhp
+cyBkcml2ZXIgc3BlY2lhbCB0byByZXF1aXJlIGV4dHJhIGhhbmRsaW5nIGF0IHNodXRkb3duIHRp
+bWU/DQpUaGlzIGlzIGludHJvZHVjZWQgZm9yIGtleGVjIGJvb3QuDQpTZWUgdGhpcyBodHRwczov
+L3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbGludXgtY3J5cHRvL3BhdGNoLzIwMjMwMzE2
+MDYwNzM0LjgxODU0OS0xLW1lZW5ha3NoaS5hZ2dhcndhbEBueHAuY29tLw0KDQpSZWdhcmRzDQpH
+YXVyYXYgSmFpbg0KPiANCj4gQmVzdCByZWdhcmRzDQo+IFV3ZQ0KPiANCj4gIGRyaXZlcnMvY3J5
+cHRvL2NhYW0vanIuYyB8IDIyICsrKysrKysrKy0tLS0tLS0tLS0tLS0NCj4gIDEgZmlsZSBjaGFu
+Z2VkLCA5IGluc2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBh
+L2RyaXZlcnMvY3J5cHRvL2NhYW0vanIuYyBiL2RyaXZlcnMvY3J5cHRvL2NhYW0vanIuYyBpbmRl
+eA0KPiA5NmRlYTUzMDRkMjIuLjY2YjFlYjNlYjRhNCAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9j
+cnlwdG8vY2FhbS9qci5jDQo+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2NhYW0vanIuYw0KPiBAQCAt
+MTYyLDcgKzE2Miw3IEBAIHN0YXRpYyBpbnQgY2FhbV9qcl9zaHV0ZG93bihzdHJ1Y3QgZGV2aWNl
+ICpkZXYpDQo+ICAgICAgICAgcmV0dXJuIHJldDsNCj4gIH0NCj4gDQo+IC1zdGF0aWMgaW50IGNh
+YW1fanJfcmVtb3ZlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+ICtzdGF0aWMgdm9p
+ZCBjYWFtX2pyX3JlbW92ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiAgew0KPiAg
+ICAgICAgIGludCByZXQ7DQo+ICAgICAgICAgc3RydWN0IGRldmljZSAqanJkZXY7DQo+IEBAIC0x
+NzUsMTEgKzE3NSwxNCBAQCBzdGF0aWMgaW50IGNhYW1fanJfcmVtb3ZlKHN0cnVjdCBwbGF0Zm9y
+bV9kZXZpY2UNCj4gKnBkZXYpDQo+ICAgICAgICAgICAgICAgICBjYWFtX3JuZ19leGl0KGpyZGV2
+LT5wYXJlbnQpOw0KPiANCj4gICAgICAgICAvKg0KPiAtICAgICAgICAqIFJldHVybiBFQlVTWSBp
+ZiBqb2IgcmluZyBhbHJlYWR5IGFsbG9jYXRlZC4NCj4gKyAgICAgICAgKiBJZiBhIGpvYiByaW5n
+IGlzIHN0aWxsIGFsbG9jYXRlZCB0aGVyZSBpcyB0cm91YmxlIGFoZWFkLiBPbmNlDQo+ICsgICAg
+ICAgICogY2FhbV9qcl9yZW1vdmUoKSByZXR1cm5lZCwganJwcml2IHdpbGwgYmUgZnJlZWQgYW5k
+IHRoZSByZWdpc3RlcnMNCj4gKyAgICAgICAgKiB3aWxsIGdldCB1bm1hcHBlZC4gU28gYW55IHVz
+ZXIgb2Ygc3VjaCBhIGpvYiByaW5nIHdpbGwgcHJvYmFibHkNCj4gKyAgICAgICAgKiBjcmFzaC4N
+Cj4gICAgICAgICAgKi8NCj4gICAgICAgICBpZiAoYXRvbWljX3JlYWQoJmpycHJpdi0+dGZtX2Nv
+dW50KSkgew0KPiAtICAgICAgICAgICAgICAgZGV2X2VycihqcmRldiwgIkRldmljZSBpcyBidXN5
+XG4iKTsNCj4gLSAgICAgICAgICAgICAgIHJldHVybiAtRUJVU1k7DQo+ICsgICAgICAgICAgICAg
+ICBkZXZfd2FybihqcmRldiwgIkRldmljZSBpcyBidXN5LCBmYXN0ZW4geW91ciBzZWF0IGJlbHRz
+LCBhIGNyYXNoIGlzDQo+IGFoZWFkLlxuIik7DQo+ICsgICAgICAgICAgICAgICByZXR1cm47DQo+
+ICAgICAgICAgfQ0KPiANCj4gICAgICAgICAvKiBVbnJlZ2lzdGVyIEpSLWJhc2VkIFJORyAmIGNy
+eXB0byBhbGdvcml0aG1zICovIEBAIC0xOTQsMTMgKzE5Nyw2DQo+IEBAIHN0YXRpYyBpbnQgY2Fh
+bV9qcl9yZW1vdmUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikNCj4gICAgICAgICByZXQg
+PSBjYWFtX2pyX3NodXRkb3duKGpyZGV2KTsNCj4gICAgICAgICBpZiAocmV0KQ0KPiAgICAgICAg
+ICAgICAgICAgZGV2X2VycihqcmRldiwgIkZhaWxlZCB0byBzaHV0IGRvd24gam9iIHJpbmdcbiIp
+Ow0KPiAtDQo+IC0gICAgICAgcmV0dXJuIHJldDsNCj4gLX0NCj4gLQ0KPiAtc3RhdGljIHZvaWQg
+Y2FhbV9qcl9wbGF0Zm9ybV9zaHV0ZG93bihzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KSAt
+ew0KPiAtICAgICAgIGNhYW1fanJfcmVtb3ZlKHBkZXYpOw0KPiAgfQ0KPiANCj4gIC8qIE1haW4g
+cGVyLXJpbmcgaW50ZXJydXB0IGhhbmRsZXIgKi8NCj4gQEAgLTY1Nyw4ICs2NTMsOCBAQCBzdGF0
+aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBjYWFtX2pyX2RyaXZlciA9IHsNCj4gICAgICAgICAg
+ICAgICAgIC5vZl9tYXRjaF90YWJsZSA9IGNhYW1fanJfbWF0Y2gsDQo+ICAgICAgICAgfSwNCj4g
+ICAgICAgICAucHJvYmUgICAgICAgPSBjYWFtX2pyX3Byb2JlLA0KPiAtICAgICAgIC5yZW1vdmUg
+ICAgICA9IGNhYW1fanJfcmVtb3ZlLA0KPiAtICAgICAgIC5zaHV0ZG93biAgICA9IGNhYW1fanJf
+cGxhdGZvcm1fc2h1dGRvd24sDQo+ICsgICAgICAgLnJlbW92ZV9uZXcgID0gY2FhbV9qcl9yZW1v
+dmUsDQo+ICsgICAgICAgLnNodXRkb3duICAgID0gY2FhbV9qcl9yZW1vdmUsDQo+ICB9Ow0KPiAN
+Cj4gIHN0YXRpYyBpbnQgX19pbml0IGpyX2RyaXZlcl9pbml0KHZvaWQpDQo+IA0KPiBiYXNlLWNv
+bW1pdDogZGQxMDU0NjFhZDE1ZWE5MzBkODhhZWMxZTRmY2ZjMWYzMTg2ZGE0Mw0KPiAtLQ0KPiAy
+LjM5LjINCg0K
