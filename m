@@ -2,158 +2,152 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF40BC04A6A
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Aug 2023 17:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6952C001DF
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Aug 2023 17:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232735AbjHBRJy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Aug 2023 13:09:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34714 "EHLO
+        id S233143AbjHBRKL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Aug 2023 13:10:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232518AbjHBRJq (ORCPT
+        with ESMTP id S232622AbjHBRJs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Aug 2023 13:09:46 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06A5530E3
-        for <linux-crypto@vger.kernel.org>; Wed,  2 Aug 2023 10:09:35 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3fbea14700bso782705e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Aug 2023 10:09:35 -0700 (PDT)
+        Wed, 2 Aug 2023 13:09:48 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA2F30F4
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Aug 2023 10:09:37 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-314417861b9so50487f8f.0
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Aug 2023 10:09:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1690996173; x=1691600973;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BnnEIIbrY5FsJeRKunlnyzI9oBmYX1hBh5P9hRMui1I=;
-        b=Yz8ivhBcbzYRSMLpZKsz1IqPAOf6WuhIdSL/zLG8hM22k5Jxj+maiKpECHgpI5m8yB
-         Li681THl05E/qavu2AtvDb6iNPMTAQSPZ6TMlbmRaoTWCpe+2OpVvgIoipCBfZvqUtdn
-         wphHenQ5DbbYRDnBspieCR0rvsIxWprbh290E=
+        d=chromium.org; s=google; t=1690996175; x=1691600975;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9JXyrEikc3QRlWp5ZDjTpySdvtRjTtey3fpa/M0v9NY=;
+        b=geuk+efyXZZ7bJlsEuhZfXB544jaiq13WtOYQ6V5CYcHjBb8P/eXLF5AwO0V+qSh8A
+         lq7n9a+FxHXrJy9SaszDJzeDo2R6OQ8roA4Bus4J9eYKE8jEiNL13YWPWr65cmNvMlp4
+         NbsBhU91qq33U40eqEa8UeOs3GBNeoSXSo4ME=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690996173; x=1691600973;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BnnEIIbrY5FsJeRKunlnyzI9oBmYX1hBh5P9hRMui1I=;
-        b=bLfUGLyARWORe1T9XiGoIyHTaBkpQvCkvcD/It2CnY1ZAsD7fFdKz+MaFFOI2Yt54g
-         MBIchrvvEq//okaxRohSp0Dv9VkR829YA9zsBTjtDWyxMX90MJnYK6HhPL5GfER3AjeD
-         2+dylczROFIXixykuzUJukfuEEOIMLiM93vP61h/UU9A02r/nRyn/bKMrSNOwmXkZYiJ
-         MyxNkM7hcuPTvAC3Z0NmwS7yFwrsuXeqKPUB8I/cUYGBrwkgu98qBk9eD37g+n3zIKMH
-         IrGFdLNpiT3REJDMfJhate7llv09kkywgvOC7Pr5PvjXwsgT4E6XsQDU1H1swT3+SI1K
-         hfrg==
-X-Gm-Message-State: ABy/qLZ0Ex1zC5GgGD3islbqyOy/KO7OSk/CuQCYcBW87gVYIPB0iseC
-        AmvGUtHM41DibEiEVpMGUQ79oBfLeU3kiqVSDEc=
-X-Google-Smtp-Source: APBJJlHci9uBvsEo4MEGhHBA+RJT88066Y+QYNCdSobEy02rNfkd2ZeOviM16csEZTGqQRaC3t/DTg==
-X-Received: by 2002:a05:600c:2907:b0:3fb:a62d:1992 with SMTP id i7-20020a05600c290700b003fba62d1992mr5392990wmd.0.1690996172976;
-        Wed, 02 Aug 2023 10:09:32 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690996175; x=1691600975;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9JXyrEikc3QRlWp5ZDjTpySdvtRjTtey3fpa/M0v9NY=;
+        b=KuPp8ryg0p6VnFPUy/DN3Ev9BxBAQiw8kq3IXyJw18TzSZ/wuuXsyAuhjbXArLBn8T
+         27XGt0qm3FsmiYYJNmvR4zUl8byPzJ0AG1j3M3V8+zXxRaS5Eb80uUanv1iJF9vUe4pY
+         iV1R4NRkWVX4gcAFSr+wkSVIb4Iaaq6XszembWK663Z45Ump9+D1R1+k/CQNrspRih/3
+         fPwoRLqxAS5eDixzxHJiaeGQ43yZ8UWe4gcsJDjpu4+CgisdbyZ7hKV/xoz9KYEdKRD9
+         ZTwif/wFBh2sGmT1kIb0+32Mzpo4TohNXkEP+gkira98fmnSUEEEB6DOu3GOtnT29Tos
+         9sRg==
+X-Gm-Message-State: ABy/qLbLztFAXo9JBuOk2yZNljnjsoRe3FGgD89yfpRRYmAfTzMr5gWZ
+        ew2eC2qn74MY/wLDW9tG0ye9dKXHzMiMCOpK6Co=
+X-Google-Smtp-Source: APBJJlEHrrXECtPdvO8iK3tMF69agBXEGUdVPex6vTfKSLGX0OejbkIg0UJ3blbMa5bYKZ6k1f1rvA==
+X-Received: by 2002:adf:fc90:0:b0:317:6cca:a68a with SMTP id g16-20020adffc90000000b003176ccaa68amr5572520wrr.41.1690996174731;
+        Wed, 02 Aug 2023 10:09:34 -0700 (PDT)
 Received: from revest.zrh.corp.google.com ([2a00:79e0:9d:6:4fa6:1e54:d09:5ba3])
-        by smtp.gmail.com with ESMTPSA id s1-20020a5d4ec1000000b003063db8f45bsm19508396wrv.23.2023.08.02.10.09.31
+        by smtp.gmail.com with ESMTPSA id s1-20020a5d4ec1000000b003063db8f45bsm19508396wrv.23.2023.08.02.10.09.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Aug 2023 10:09:32 -0700 (PDT)
+        Wed, 02 Aug 2023 10:09:33 -0700 (PDT)
 From:   Florent Revest <revest@chromium.org>
 To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-sctp@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         hillf.zj@alibaba-inc.com, marcelo.leitner@gmail.com,
-        lucien.xin@gmail.com, Florent Revest <revest@chromium.org>
-Subject: [RFC 0/1] crypto: Avoid a sleepable operation when freeing a SCTP socket
-Date:   Wed,  2 Aug 2023 19:09:22 +0200
-Message-ID: <20230802170923.1151605-1-revest@chromium.org>
+        lucien.xin@gmail.com, Florent Revest <revest@chromium.org>,
+        syzbot+d769eed29cc42d75e2a3@syzkaller.appspotmail.com,
+        syzbot+610ec0671f51e838436e@syzkaller.appspotmail.com
+Subject: [RFC 1/1] crypto: Defer transforms destruction to a worker function
+Date:   Wed,  2 Aug 2023 19:09:23 +0200
+Message-ID: <20230802170923.1151605-2-revest@chromium.org>
 X-Mailer: git-send-email 2.41.0.585.gd2178a4bd4-goog
+In-Reply-To: <20230802170923.1151605-1-revest@chromium.org>
+References: <20230802170923.1151605-1-revest@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi!
+Currently, crypto spawns can be freed in a softirq context (eg: from
+sctp socket destruction's rcu callbacks). In that context, grabbing the
+crypto_alg_sem is dangerous and makes CONFIG_DEBUG_ATOMIC_SLEEP scream.
 
-I found that the following program reliably reproduces a "BUG: sleeping function
-called from invalid context" backtrace in crypto code:
+Defer transform destruction to a worker function so they don't use that
+semaphore in a softirq.
 
-#include <sys/socket.h>
-#include <linux/in.h>
-#include <linux/if_alg.h>
-
-int main(void)
-{
-	int fd1 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SCTP);
-	if (fd1 == -1)
-		return 1;
-	listen(fd1, 1);
-
-	int fd2 = socket(AF_ALG, SOCK_SEQPACKET, 0);
-	if (fd2 == -1)
-		return 2;
-	struct sockaddr_alg addr = {
-		.salg_family = AF_ALG,
-		.salg_type = "hash",
-		.salg_name = "cryptd(md5-generic)",
-	};
-	bind(fd2, &addr, sizeof(addr));
-
-	return 0;
-}
-
-The backtraces look like:
-
-...
- __might_sleep+0x8f/0xe0 kernel/sched/core.c:7260
- down_write+0x78/0x180 kernel/locking/rwsem.c:1556
- crypto_drop_spawn+0x50/0x220 crypto/algapi.c:709
- shash_free_singlespawn_instance+0x19/0x30 crypto/shash.c:621
- crypto_shash_free_instance+0x35/0x40 crypto/shash.c:458
- crypto_free_instance crypto/algapi.c:68 [inline]
- crypto_destroy_instance+0x7d/0xb0 crypto/algapi.c:76
- crypto_alg_put crypto/internal.h:108 [inline]
- crypto_mod_put crypto/api.c:45 [inline]
- crypto_destroy_tfm+0x1f7/0x250 crypto/api.c:573
- crypto_free_shash include/crypto/hash.h:734 [inline]
- sctp_destruct_common net/sctp/socket.c:5003 [inline]
- sctp_v6_destruct_sock+0x40/0x50 net/sctp/socket.c:9436
- __sk_destruct+0x56/0x780 net/core/sock.c:1784
- sk_destruct net/core/sock.c:1829 [inline]
- __sk_free+0x36c/0x470 net/core/sock.c:1840
- sk_free+0x51/0x90 net/core/sock.c:1851
- sock_put include/net/sock.h:1815 [inline]
- sctp_endpoint_destroy_rcu+0xa6/0xf0 net/sctp/endpointola.c:193
- rcu_do_batch kernel/rcu/tree.c:2492 [inline]
- rcu_core+0x7cc/0x1260 kernel/rcu/tree.c:2733
- rcu_core_si+0x9/0x10 kernel/rcu/tree.c:2746
- __do_softirq+0x3dc/0x93b kernel/softirq.c:298
-...
-
-My analysis is that, when the process dies, the socket freeing is done in a RCU
-callback, therefore under softirq context, therefore sleeping is disabled. As
-part of freeing a SCTP socket, we free a cryptographical transform that frees a
-"spawn" and this grabs a semaphore which triggers this BUG under
-CONFIG_DEBUG_ATOMIC_SLEEP=y.
-
-I believe that we could solve this problem by defering any part of this
-backtrace into a worker function. Unfortunately, I have no clue about anything
-SCTP nor anything crypto/ so I took a stab at defering... something. :) I marked
-this as RFC to make it clear I don't hold strong opinions about what should be
-defered exactly and expect this will probably change as a result of code review.
-
-I believe that the same bug has been reported by syzbot twice in the past,
-without reproducers and once with a slight twist:
-- Once, upon freeing a sctp socket (the backtraces are very similar)
-  https://lore.kernel.org/all/00000000000060f19905a74b6825@google.com/T/
-  but as far as I can tell the conversation focused on the safety of kfree()
-  rather than the semaphore protecting the spawns list (maybe I'm missing
-  something here ?)
-- Once, upon freeing a tipc socket:
-  https://lore.kernel.org/all/000000000000c9257305c61c742c@google.com/T/
-  Hillf proposed a fix but, as far as I can tell, it didn't get much attention
-  and focused solely on addressing the bug for tipc sockets.
-  My fix is inspired by this but further down the backtrace to make the fix work
-  for both tipc and sctp (and potentially more ?) sockets freeing.
-
-This patch should apply cleanly on v6.5-rc3.
-
-Florent Revest (1):
-  crypto: Defer transforms destruction to a worker function
-
+Reported-by: syzbot+d769eed29cc42d75e2a3@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d769eed29cc42d75e2a3
+Reported-by: syzbot+610ec0671f51e838436e@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=610ec0671f51e838436e
+Signed-off-by: Florent Revest <revest@chromium.org>
+---
  crypto/api.c           | 26 ++++++++++++++++++--------
  include/linux/crypto.h |  3 +++
  2 files changed, 21 insertions(+), 8 deletions(-)
 
+diff --git a/crypto/api.c b/crypto/api.c
+index b9cc0c906efe..f877251954d5 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -640,6 +640,21 @@ void *crypto_alloc_tfm_node(const char *alg_name,
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_tfm_node);
+ 
++void crypto_destroy_tfm_workfn(struct work_struct *w)
++{
++	struct crypto_alg *alg;
++	struct crypto_tfm *tfm;
++
++	tfm = container_of(w, struct crypto_tfm, free_work);
++	alg = tfm->__crt_alg;
++
++	if (!tfm->exit && alg->cra_exit)
++		alg->cra_exit(tfm);
++	crypto_exit_ops(tfm);
++	crypto_mod_put(alg);
++	kfree_sensitive(tfm->to_free);
++}
++
+ /*
+  *	crypto_destroy_tfm - Free crypto transform
+  *	@mem: Start of tfm slab
+@@ -650,20 +665,15 @@ EXPORT_SYMBOL_GPL(crypto_alloc_tfm_node);
+  */
+ void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
+ {
+-	struct crypto_alg *alg;
+-
+ 	if (IS_ERR_OR_NULL(mem))
+ 		return;
+ 
+ 	if (!refcount_dec_and_test(&tfm->refcnt))
+ 		return;
+-	alg = tfm->__crt_alg;
+ 
+-	if (!tfm->exit && alg->cra_exit)
+-		alg->cra_exit(tfm);
+-	crypto_exit_ops(tfm);
+-	crypto_mod_put(alg);
+-	kfree_sensitive(mem);
++	tfm->to_free = mem;
++	INIT_WORK(&tfm->free_work, crypto_destroy_tfm_workfn);
++	queue_work(system_unbound_wq, &tfm->free_work);
+ }
+ EXPORT_SYMBOL_GPL(crypto_destroy_tfm);
+ 
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 31f6fee0c36c..34ff2e1dca2b 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -430,6 +430,9 @@ struct crypto_tfm {
+ 	
+ 	struct crypto_alg *__crt_alg;
+ 
++	struct work_struct free_work;
++	void *to_free;
++
+ 	void *__crt_ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+ 
 -- 
 2.41.0.585.gd2178a4bd4-goog
 
