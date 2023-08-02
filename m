@@ -2,193 +2,181 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F161C001E0
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Aug 2023 14:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC77C04E69
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Aug 2023 15:22:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232549AbjHBO2I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Aug 2023 10:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33858 "EHLO
+        id S235100AbjHBPWf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Aug 2023 11:22:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234007AbjHBO2A (ORCPT
+        with ESMTP id S235101AbjHBPWM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Aug 2023 10:28:00 -0400
-Received: from mgamail.intel.com (unknown [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC201728;
-        Wed,  2 Aug 2023 07:27:58 -0700 (PDT)
+        Wed, 2 Aug 2023 11:22:12 -0400
+Received: from mgamail.intel.com (unknown [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5C73C05;
+        Wed,  2 Aug 2023 08:18:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1690986479; x=1722522479;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=p/SGJRV93Cj6BkuM7fuzVQ4z+KIw1N5smHREmEpUMUg=;
-  b=T+apWSPdyK+p0TBkR1pHIvn4pke3d3m0oYsqGhPeWwYR5J/UW2A0O3tq
-   syoJ686Ut+OAW8n/N+aWiTT1MYVP2jh8/jMb7kjRpP2Xvo+hTIOmMkNmy
-   V63XXLIWKGg6a/Reek0vuvMypZPB3c7iN7KT+1LGxocGidhrVuK6XTxIc
-   uG3lkkBkGisy018QAUNwR+pbg0dVyK/LXtVzVFUTIooDI0SyROlLdqS06
-   MwaMAeta1ZOQEWXLq6Y5VouEg3G6j10kW2gin8oJdwiNlOzxkIaZx2Edt
-   Ylc+wsaq4SFfsx6Ts/UVz7cjsx0VQWMSZo1Wbf8GOYWxgnV3Jd9RvBSdQ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="435922197"
+  t=1690989530; x=1722525530;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=5Y6vZdrpEuRqCGKT2qxnJbGiST+Vn8iwEdziufTppyU=;
+  b=CqYvvO2u/werY7KCaPirwJaTYCftfIP5ukFxJEhj4J6dtYEw0qxfbF96
+   BG61XwjZprSZpvljkn6mEUoaPTmr8Sw+62oBQVhF6AMDdzfV/Fdx3NNqA
+   GHyV8p+BnTQHU5TDJ2xWFLeh9zS/CSbGViyKhBIdNEk7P47p50aoZpvUg
+   MviiSaCvob2xqxM92gLf7sR1qX6HQkljBKXnkT9Lh3UZwBpztC50Mj4W7
+   XBgRfcmyLIKw7BmBp5Tfa4rzZ5I3Rw6iHr3D29YZFO+2cDzI/WofPxDUY
+   XaMoaIsZV/eW8IitFeec6OmCdIuVKA26VZWNtaoXWNcfMXH+7BunDQ3Ld
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="433453837"
 X-IronPort-AV: E=Sophos;i="6.01,249,1684825200"; 
-   d="scan'208";a="435922197"
+   d="scan'208";a="433453837"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 07:20:23 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 08:17:47 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10789"; a="706200507"
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="706211787"
 X-IronPort-AV: E=Sophos;i="6.01,249,1684825200"; 
-   d="scan'208";a="706200507"
-Received: from rbstewar-mobl1.amr.corp.intel.com (HELO [10.212.249.107]) ([10.212.249.107])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2023 07:20:22 -0700
-Message-ID: <bc950efd-b7f7-5fc9-b41d-ebddcf4a459e@intel.com>
-Date:   Wed, 2 Aug 2023 07:20:22 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] crypto: Zhaoxin: Hardware Engine Driver for
- SHA1/256/384/512
+   d="scan'208";a="706211787"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 02 Aug 2023 08:17:47 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 2 Aug 2023 08:17:46 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 2 Aug 2023 08:17:46 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 2 Aug 2023 08:17:46 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 2 Aug 2023 08:17:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EZM99w5TYkcQQ+X/yXcIXfaAl7LASLbaoTi6Ww/vj56oGo7dMJSauG8St2s0FYWjDuvJoBQLKzSqqj0P/mBoiyuEyQ85esEcaO38g7MMV36/w22IEhXDztOitcDS3NPeJDLikbzDwi1qgDq9A9FOx0Jq8s0vIAZV+2wj2sxE5BwDZNShDGyOBspOUUhqcjqS9Y8UPO3E6Dg9UC7Jrbc8SZOPreePEguWS1rmMwq2ejwe4vkVoB6JrJfypOVm/K6hBMwjodADz9j5fZbzZ8kMwzuH+ML1P1QJpRtbD91rFwpI9013VCBdsVN7MOfU1w9lf/+TXCCm5Sn7xHB0V+1eQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7qnGuMmppvfMmd88X6IgfDbcW/XDUloaKZl0b7E8bw4=;
+ b=HjBOuN6sBlzhmM9nnuztVEDYW7uFreA6+9iikK56XIyzlf9AuyJhcrP3XJVy3FH24AqL8a/QD5IPIzubM3pLevjJVlAQTF7yta02njot+VkuNLLxiTVhUq0E99cA1spVAq07tteCZrk2/uuMBbTFSRxbLDnyFNeZKZDYBjZARxUKTV+kAG0zOHU9bIKkmJxtsA39z9a8GZ6Os+MWJ5Qs1a/jT7H/uTu31VWEAH9jOCsA1dcOMBsNB0GeVKHA96JBMyTUTtNPDRb+AOQ3J8CHga+BH3C6D5GFDCqp+EMoZ6tHbrbPG37zvuIBanpEZOZiaFi430winqc9t14WOOawRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB6097.namprd11.prod.outlook.com (2603:10b6:208:3d7::17)
+ by SN7PR11MB7114.namprd11.prod.outlook.com (2603:10b6:806:299::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.29; Wed, 2 Aug
+ 2023 15:17:44 +0000
+Received: from IA1PR11MB6097.namprd11.prod.outlook.com
+ ([fe80::7109:4aa5:6a6d:c3d4]) by IA1PR11MB6097.namprd11.prod.outlook.com
+ ([fe80::7109:4aa5:6a6d:c3d4%5]) with mapi id 15.20.6631.045; Wed, 2 Aug 2023
+ 15:17:44 +0000
+Message-ID: <ee824cb3-ad6a-01d0-90a5-aebc9fb4b12e@intel.com>
+Date:   Wed, 2 Aug 2023 08:17:55 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.11.0
+Subject: Re: [PATCH v8 01/14] dmaengine: idxd: add wq driver name support for
+ accel-config user tool
 Content-Language: en-US
-To:     Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        seanjc@google.com, kim.phillips@amd.com, peterz@infradead.org,
-        pbonzini@redhat.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jiaxi.chen@linux.intel.com,
-        jmattson@google.com, sandipan.das@amd.com,
-        linux-crypto@vger.kernel.org
-Cc:     CobeChen@zhaoxin.com, TimGuo@zhaoxin.com, LeoLiu-oc@zhaoxin.com
-References: <20230802110741.4077-1-TonyWWang-oc@zhaoxin.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20230802110741.4077-1-TonyWWang-oc@zhaoxin.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Tom Zanussi <tom.zanussi@linux.intel.com>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <vkoul@kernel.org>
+CC:     <dave.jiang@intel.com>, <tony.luck@intel.com>,
+        <wajdi.k.feghali@intel.com>, <james.guilford@intel.com>,
+        <kanchana.p.sridhar@intel.com>, <vinodh.gopal@intel.com>,
+        <giovanni.cabiddu@intel.com>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>
+References: <20230731212939.1391453-1-tom.zanussi@linux.intel.com>
+ <20230731212939.1391453-2-tom.zanussi@linux.intel.com>
+From:   Fenghua Yu <fenghua.yu@intel.com>
+In-Reply-To: <20230731212939.1391453-2-tom.zanussi@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR16CA0012.namprd16.prod.outlook.com
+ (2603:10b6:a03:1a0::25) To IA1PR11MB6097.namprd11.prod.outlook.com
+ (2603:10b6:208:3d7::17)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB6097:EE_|SN7PR11MB7114:EE_
+X-MS-Office365-Filtering-Correlation-Id: a421f279-9b3b-4550-26b3-08db936b9ecd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lncqw9moBw6Cb9JqNUF7tscGSTa/60+gIn/4s0mJbprEqvhuaXnSk8Bjj7AWRE9A8BGlYR2q1u+H+Ae6ncQogC0nSxSKHivs+juDD77ETpfUZKa9q/sMH8lKmJzlPLgqYX0oWpSf3MtFuOFne9FawsT1KGb6JOFvnaionTO56q3Yg0ohPZ0hcb/rHMEgHI+vzX2pabb1XV7xl7vk5YxmyX++7aXcpCzqqo4TSYkcqMK/mLKRLMUaq4lNZiiZKrfdcUaRMhbl5WivM5TcLX35jV5+0tSrWrtbwAOJGh6LVP5xJv1XTRzxNsudOIhDWLvzV91rHF41KeAlbmCcFIxW82IO3hxR6K6O5e5DDTzJgg96CmG5TGNLia11vNNPUNbPX/IdOq3BRutP2+U8v/hzTeeRZ15pY66pecVQU0L17ZjFqMTMUQBRUKhbKiuh1RZ8kEkMHy0Yah7WZF3wnTa38F3MFYvANwfn6KvCqxDQ5FCckunOz5BLTOGQ9InrxGmkDgQ3QrFeFxW5RKUXgNZ0RP1qBNzf/Jsrm74ebwCvfkkX6rngcFYnphbSC5sXfaU8ib3JmSSiYb6mOFyoFupyfIv3WJoFrJwT4Bw76ZrWvcQB/Jf+TdDWrShCOvtPJou8YShDYjvyzV5kt3sv6apRBg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6097.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(376002)(346002)(136003)(39860400002)(396003)(451199021)(44832011)(82960400001)(2906002)(2616005)(4744005)(6666004)(6486002)(53546011)(26005)(6512007)(86362001)(478600001)(38100700002)(5660300002)(41300700001)(66556008)(6506007)(66946007)(316002)(31696002)(31686004)(8936002)(36756003)(4326008)(8676002)(186003)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TWpRNjlQVXIzK2RVREhrZExpZURPYS81cytYNG80OTI1TktNenpoUkFWelFw?=
+ =?utf-8?B?RHMvVm9EalBiNlBZeE45dzk1Y2NuK1FLUFA3dnJsWnlvYmIxM3Z2WXJtUUlP?=
+ =?utf-8?B?STdhcENFYWI1a1loMTdDRTloYnJ2TkZJMHBrRDV3UFlwK2lKcTVjOTRwWGhj?=
+ =?utf-8?B?Y2w5Y2V2bW9HREtja3JaZ1dMSUtTY2VOZWFKbVlPQy9hUnlTeGdDZ3N3UXZH?=
+ =?utf-8?B?R2ltcVIrYTBOT3RLc3FHUnR0dDdScXVEMkdXcFNUSWNYWkdiU3Y3ODY3VDRq?=
+ =?utf-8?B?OXlKaXplaWRMYU8xTWZVallwN2ZPR05ZUWVLd3BaTkU1SUVkZVRUY2NuVE0w?=
+ =?utf-8?B?bTNjNVVvNWdHTHMxbTNwa0dSNHo0S3ZYYUszSTl3eExYZGtLQTN4RUdQZDFl?=
+ =?utf-8?B?NlVreWsrYVlyNGh2VG5DNUFBS1lXSVRBSGo4R2JOSnB1cVUwa2lOMTRlQk1s?=
+ =?utf-8?B?Nll5dmhQU2lOdHZYZE5xb3FpWmhLMndjOWc2Q21tcWZHOENDT2JlNUtqb05D?=
+ =?utf-8?B?OW5oYnppWXpQUXVyVDc4dGtUWkNRYlZoeS9EdlIzZW5CTEwyUFIyaUhQcGJU?=
+ =?utf-8?B?YzBUbUhwR2cxVnRsOGVETS9zbHlHVDcxWEpxbTVkWTlDQlBmSGlLSDU5UU9P?=
+ =?utf-8?B?aXk0WVdIK0lJY2xmYWlPQ0U3OHhwZ1ZtQWN5VGJ3OTRlZlh0TGIwYVVCeFpZ?=
+ =?utf-8?B?d0dFUktvbHBZS2JpeDJBamRGZXpYSElNaW15RWR5K0JGMGM0cVFHVE53Ky92?=
+ =?utf-8?B?QkkvZGp1R1g4ZXZSNFExMHVKWGUvZ3Y0Zmk5OVlObkpMNVpUVGpBMWZaZFIr?=
+ =?utf-8?B?VGtzcm1qR2xlTlBTLzJrNTVnMHo0V0xoMjIwQWM5bVFhcGpTZWJKM1RyT2c0?=
+ =?utf-8?B?MmtkVVY3UENTRVd2bUpSdjFYaHB6dU91am5CMXJXa1QwNXZPY2tPZm1CcVBl?=
+ =?utf-8?B?MitMM0prcmgweFRoV3NNT1pTYWQxS3BMTTNaSUlZd2F0MzgzY3NUb3ZYVXBS?=
+ =?utf-8?B?cnJWUXE3azJvQXV0T3BWaWV2cU03QXF6NUN2YU5TQW1KRmRhY093dVJJWGRr?=
+ =?utf-8?B?OE5SbnVpcWN1VFVYYnFZajhlY2NIY1ExSnUzWmZ1MnJTd1FBVHJjMW40UjJ4?=
+ =?utf-8?B?VWw2VWl6NjFDN3BLYWtRVFdDOWJHcjNPby9hWWc4cy9UNmFNK2xiVXJ6c1Nj?=
+ =?utf-8?B?TTV6bUNMeHZodnUvQ1U4dWhQZUZtOHh0eU9qRjRKRWJhMUpyS1R0OUtsZnZT?=
+ =?utf-8?B?ZXdBbHh6SVdhblBST1Bhb1ZYQlZLU1ArYUtNdVVoREZIbXVuelFWb0xLUjhS?=
+ =?utf-8?B?bXQrUTQ2QW1GYzlKa1VvL2E5MmdSeTFrcTdHc3IrRVVvM3kvRWIrVXBHL1o2?=
+ =?utf-8?B?VlVPS2NReDAvZURnWFdOTVp1MW5oYmthSmdjR3FHdjlWKzgycTMwVmU0K2o1?=
+ =?utf-8?B?QVI5SHM2eldEanpmcXhNaHBVS3I0M0tLRlhrQUlJYXVpSlNXU2IrTkJac2Q4?=
+ =?utf-8?B?blZ4TTFUaGlNaUdLcVdsaEhjZnZWQk5NdStSMHNCd3E4ZDNlMzV6OUs2Vjg2?=
+ =?utf-8?B?MENKQUw2SlRWWTVKK3NLVEtqWVpaUEtOdjNDV2ZvZjBMdXcvRmtTcVBOYXNU?=
+ =?utf-8?B?YU9aUHd3K1ZDakxmNmtZdUJ4TlorK1dmSmV2OGZpYkZhdGx1UWdYQ1hubVNF?=
+ =?utf-8?B?Zi83R1UvWEJyKzhCQlJlOEQxNXlDVE9vcEZySStKaFltVkRGWjVidDVJZm1B?=
+ =?utf-8?B?UlZuVTBLbWdHU0J1dWFGK1FLYnI5N2xkVk5pQktjeFRLNnIrekZWWW9IMnl3?=
+ =?utf-8?B?YTBJVUhQeERJY2lBd1oyUmc1cWhkOHloYlhHWXBEREl6ZDJqNFpOb1pqek5q?=
+ =?utf-8?B?YkFHVkVFOXdVT2tpMU1mVlFjcEloM05wSlJlYjFLSmhuMGZhVWdMTlBNN3A3?=
+ =?utf-8?B?ekNwTEEwRmVWdGJQZ1NZRzhQeTFWTTVvTmtZd3NSWit4T0NVSkhwQno4eGVm?=
+ =?utf-8?B?OXhWOVBoeXR2Y29hWUtIMkE0L0hhNG8zM2o0b09xNmcwZWhVaFpsbkdPRDdL?=
+ =?utf-8?B?TDRaRWNJVzBXTHl6UFVON2ptaGpLUU84cklLRTJPYzRzQXUydWJqeDdnQUh2?=
+ =?utf-8?Q?w5eU0vG9qD1hl5Fz6Ga/FNgWh?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a421f279-9b3b-4550-26b3-08db936b9ecd
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6097.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Aug 2023 15:17:44.0892
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XL/t1BY5YEfK92lDHm/5lEnvbK9zXQ5aG1WkwGoXlqDn/v+Wqlk/NnvKy4ojr4RGklExcatgmRl4FKdB8aQVBQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7114
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This code looks pretty rough.
 
-> +static int zhaoxin_sha1_update(struct shash_desc *desc,
-> +			const u8 *data,	unsigned int len)
-> +{
-> +	struct sha1_state *sctx = shash_desc_ctx(desc);
-> +	unsigned int partial, done;
-> +	const u8 *src;
-> +	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
-> +	u8 buf[128 + ZHAOXIN_SHA_ALIGNMENT - STACK_ALIGN] __attribute__
-> +		((aligned(STACK_ALIGN)));
-> +	u8 *dst = PTR_ALIGN(&buf[0], ZHAOXIN_SHA_ALIGNMENT);
 
-All of the different alignments here are pretty dazzling.
+On 7/31/23 14:29, Tom Zanussi wrote:
+> From: Dave Jiang <dave.jiang@intel.com>
+> 
+> With the possibility of multiple wq drivers that can be bound to the wq,
+> the user config tool accel-config needs a way to know which wq driver to
+> bind to the wq. Introduce per wq driver_name sysfs attribute where the user
+> can indicate the driver to be bound to the wq. This allows accel-config to
+> just bind to the driver using wq->driver_name.
+> 
+> Signed-off-by: Dave Jiang <dave.jiang@intel.com>
+> Signed-off-by: Tom Zanussi <tom.zanussi@linux.intel.com>
 
-> +	partial = sctx->count & 0x3f;
+Reviewed-by: Fenghua Yu <fenghua.yu@intel.com>
 
-"0x3f" is a random magic number.
+Thanks.
 
-> +	sctx->count += len;
-> +	done = 0;
-> +	src = data;
-> +	memcpy(dst, (u8 *)(sctx->state), SHA1_DIGEST_SIZE);
-> +
-> +	if ((partial + len) >= SHA1_BLOCK_SIZE) {
-> +
-> +		/* Append the bytes in state's buffer to a block to handle */
-> +		if (partial) {
-> +			done = -partial;
-> +			memcpy(sctx->buffer + partial, data,
-> +				done + SHA1_BLOCK_SIZE);
-> +			src = sctx->buffer;
-> +			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
-> +			: "+S"(src), "+D"(dst)
-> +			: "a"((long)-1), "c"(1UL));
-
-Please look around the codebase for examples on how to do this.  We
-usually try to use real instructions when binutils supports them and
-also don't repeatedly open-code the ".byte ...".
-
-> +			done += SHA1_BLOCK_SIZE;
-> +			src = data + done;
-> +		}
-> +
-> +		/* Process the left bytes from the input data */
-> +		if (len - done >= SHA1_BLOCK_SIZE) {
-> +			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
-> +			: "+S"(src), "+D"(dst)
-> +			: "a"((long)-1),
-> +			"c"((unsigned long)((len - done) / SHA1_BLOCK_SIZE)));
-> +			done += ((len - done) - (len - done) % SHA1_BLOCK_SIZE);
-> +			src = data + done;
-> +		}
-> +		partial = 0;
-> +	}
-> +	memcpy((u8 *)(sctx->state), dst, SHA1_DIGEST_SIZE);
-
-What's the purpose of the cast?
-
-> +	memcpy(sctx->buffer + partial, src, len - done);
-> +
-> +	return 0;
-> +}
-> +
-> +static int zhaoxin_sha1_final(struct shash_desc *desc, u8 *out)
-> +{
-> +	struct sha1_state *state = (struct sha1_state *)shash_desc_ctx(desc);
-
-What's the purpose of *this* cast?
-
-> +	unsigned int partial, padlen;
-> +	__be64 bits;
-> +	static const u8 padding[64] = { 0x80, };
-> +
-> +	bits = cpu_to_be64(state->count << 3);
-> +
-> +	/* Pad out to 56 mod 64 */
-> +	partial = state->count & 0x3f;
-> +	padlen = (partial < 56) ? (56 - partial) : ((64+56) - partial);
-> +	zhaoxin_sha1_update(desc, padding, padlen);
-> +
-> +	/* Append length field bytes */
-> +	zhaoxin_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
-> +
-> +	/* Swap to output */
-> +	zhaoxin_output_block((uint32_t *)(state->state), (uint32_t *)out, 5);
-> +
-> +	return 0;
-> +}
-> +
-> +static int zhaoxin_sha256_init(struct shash_desc *desc)
-> +{
-> +	struct sha256_state *sctx = shash_desc_ctx(desc);
-> +
-> +	*sctx = (struct sha256_state){
-> +		.state = { SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
-> +				SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7},
-> +	};
-> +
-> +	return 0;
-> +}
-> +
-> +static int zhaoxin_sha256_update(struct shash_desc *desc, const u8 *data,
-> +			  unsigned int len)
-> +{
-> +	struct sha256_state *sctx = shash_desc_ctx(desc);
-> +	unsigned int partial, done;
-> +	const u8 *src;
-> +	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
-> +	u8 buf[128 + ZHAOXIN_SHA_ALIGNMENT - STACK_ALIGN] __attribute__
-> +		((aligned(STACK_ALIGN)));
-> +	u8 *dst = PTR_ALIGN(&buf[0], ZHAOXIN_SHA_ALIGNMENT);
-> +
-> +	partial = sctx->count & 0x3f;
-> +	sctx->count += len;
-> +	done = 0;
-> +	src = data;
-> +	memcpy(dst, (u8 *)(sctx->state), SHA256_DIGEST_SIZE);
-
-That looks familiar.
-
-This patch needs some serious cleanups and refactoring.  It seems to be
-missing even the basics like avoiding copy-and-pasting code.  The
-changelog is quite sparse.
-
-Could you spend some more time on this and give it another go, please?
+-Fenghua
