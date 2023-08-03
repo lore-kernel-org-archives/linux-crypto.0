@@ -2,174 +2,66 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B3E4C04A6A
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Aug 2023 12:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1662FC41513
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Aug 2023 13:16:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235838AbjHCMNU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Aug 2023 08:13:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
+        id S236255AbjHCNQn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Aug 2023 09:16:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235832AbjHCMNS (ORCPT
+        with ESMTP id S236215AbjHCNQ3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Aug 2023 08:13:18 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B273581
-        for <linux-crypto@vger.kernel.org>; Thu,  3 Aug 2023 05:13:17 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3a426e70575so540686b6e.0
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Aug 2023 05:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1691064796; x=1691669596;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aN3/UY6RCA2oDcAiQC4DSHQmT3J1AIJKbAMvJpn19R4=;
-        b=ZuhuqSedVHSX8Rkghnf9yMCrQ17yyZVxBEC3uzV0zJO+V276F4NU5ImZmz/JdV9sSw
-         OEW31RYv+BA02Bql8u+Ig91T/X6xNMl5lVTulhi++RJdhph5U2uen2lnC48c90I8RBOS
-         dyMKAV3mpaqXbGZoVVaV/SaBeuYagidIW7uAE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691064796; x=1691669596;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aN3/UY6RCA2oDcAiQC4DSHQmT3J1AIJKbAMvJpn19R4=;
-        b=PD7mvflBzAc5Un15ltENFyq5oBogdjNMuNqFSeZnwprmhGKDL4wOanKyBLGPvMYOGS
-         mE5OwUBOtZwHOzpFoCiDK5xblnJnukGKXVxkd0l2muUHSlELH/om8XIctYiXv/DJj5V4
-         Dh/DW+XURz6qiCmukjPu9E9Ja/obfGNjZtK2NIl/6Ei/oHQkTsH38AkvPNi4qdH46k9z
-         o7YhYmaxh4HZCLC8ktF0q/4HgbzkjoMWOXQY1nyHboPb6QiOrIPckKlnWxwX4OVZIKrt
-         X26Dkp26VXjvbU80GUiXoXeQINpJDF0hbmZ7QUphDQawAIxI5HtqXDm5FM4YXveNREL+
-         oHfg==
-X-Gm-Message-State: ABy/qLZMNC5TaAF7FpwZmGFp7wKsfDGe12+empeFDE2RwvzwHf4wc1cJ
-        qcxwkHrwhujgiPttVtK0aN3FNkAgEOLhG3s9orNs/Q==
-X-Google-Smtp-Source: APBJJlF6igdQxu72feGlaDQq0qUrV6zp5MLXIJoLpPjEOM7vQe1ZnK/UnpmtMvtZn/oxeI7XQ1adQK2jOBQ+oDgR+DY=
-X-Received: by 2002:a05:6808:14cd:b0:3a6:fb15:399b with SMTP id
- f13-20020a05680814cd00b003a6fb15399bmr19380000oiw.36.1691064796306; Thu, 03
- Aug 2023 05:13:16 -0700 (PDT)
+        Thu, 3 Aug 2023 09:16:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA8F448E;
+        Thu,  3 Aug 2023 06:15:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1CE2661D99;
+        Thu,  3 Aug 2023 13:14:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08908C433C7;
+        Thu,  3 Aug 2023 13:14:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691068494;
+        bh=9tXX2FIKE8MOIWXd1K+8WbPOQ/m7uwCnkCQGt0+g8AQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XMc7NS4BuZ8tlExBuYyg/arego0CELq+F5mMOUrtFOaQ8rSdgn6CGYFS7bBdYirVK
+         fUF3GyXwd4pQon3H/B7tpMxNstuyYwM/S4IYQmq/r8wZ+nTxJfOOpiwfoq/Nc3Nt3z
+         WE+ETcBAVsI8rtm9Rt+uylHd2P7ohw/0ye1sD5F+96FaBff/0hNShho5Ice/ZY9cr+
+         TxdWUUqVFlLN5g8cSGsXt8l2437Kfb7qJFsU4RF4qMwZg107C77DF+D/A6x3lDdMM3
+         eB5GVF23kBseUH4KrUm1JE8aE+k1FsUMLNd4sinkWoERW3Y1boEvoKHaWh4igxFT/n
+         JGZwDAiLfUZ8Q==
+Date:   Thu, 3 Aug 2023 18:44:50 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        fenghua.yu@intel.com, dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
+        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH v8 02/14] dmaengine: idxd: add external module driver
+ support for dsa_bus_type
+Message-ID: <ZMuoSvB84KaN6wuh@matsya>
+References: <20230731212939.1391453-1-tom.zanussi@linux.intel.com>
+ <20230731212939.1391453-3-tom.zanussi@linux.intel.com>
 MIME-Version: 1.0
-References: <20230802170923.1151605-1-revest@chromium.org> <ZMt6gH4FSHsDetkU@gondor.apana.org.au>
-In-Reply-To: <ZMt6gH4FSHsDetkU@gondor.apana.org.au>
-From:   Florent Revest <revest@chromium.org>
-Date:   Thu, 3 Aug 2023 14:13:05 +0200
-Message-ID: <CABRcYmLWYr19MVsnrw2OEkmkpJLUNjPULgwooKxYO=R2J2mLww@mail.gmail.com>
-Subject: Re: crypto: api - Use work queue in crypto_destroy_instance
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sctp@vger.kernel.org, davem@davemloft.net,
-        hillf.zj@alibaba-inc.com, marcelo.leitner@gmail.com,
-        lucien.xin@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230731212939.1391453-3-tom.zanussi@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 3, 2023 at 11:59=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Wed, Aug 02, 2023 at 07:09:22PM +0200, Florent Revest wrote:
-> >
-> > I found that the following program reliably reproduces a "BUG: sleeping=
- function
-> > called from invalid context" backtrace in crypto code:
->
-> Great detective work! And thanks for cc'ing me :)
+On 31-07-23, 16:29, Tom Zanussi wrote:
+> From: Dave Jiang <dave.jiang@intel.com>
+> 
+> Add support to allow an external driver to be registered to the
+> dsa_bus_type and also auto-loaded.
 
-Thank you!
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-> This is definitely a bug in the Crypto API.  Although it's hard to
-> trigger because you need to unregister the instance before the last
-> user frees it in atomic context.  The fact that it triggers for your
-> test program probably means that we're not creating the template
-> correctly and it gets unregistered as soon as it's created.
->
-> As to the fix I think we should move the work into crypto_destroy_instanc=
-e
-> since that's the function that is being called from atomic context
-> and then does something that should only be done from process context.
-
-Sounds good to me :)
-
-> So here's my patch based on your work:
-
-FWIW,
-
-Tested-by: Florent Revest <revest@chromium.org>
-Acked-by: Florent Revest <revest@chromium.org>
-
-> ---8<---
-> The function crypto_drop_spawn expects to be called in process
-> context.  However, when an instance is unregistered while it still
-> has active users, the last user may cause the instance to be freed
-> in atomic context.
->
-> Fix this by delaying the freeing to a work queue.
->
-> Fixes: 6bfd48096ff8 ("[CRYPTO] api: Added spawns")
-> Reported-by: Florent Revest <revest@chromium.org>
-> Reported-by: syzbot+d769eed29cc42d75e2a3@syzkaller.appspotmail.com
-> Reported-by: syzbot+610ec0671f51e838436e@syzkaller.appspotmail.com
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->
-> diff --git a/crypto/algapi.c b/crypto/algapi.c
-> index 5e7cd603d489..4fe95c448047 100644
-> --- a/crypto/algapi.c
-> +++ b/crypto/algapi.c
-> @@ -17,6 +17,7 @@
->  #include <linux/rtnetlink.h>
->  #include <linux/slab.h>
->  #include <linux/string.h>
-> +#include <linux/workqueue.h>
->
->  #include "internal.h"
->
-> @@ -74,15 +75,26 @@ static void crypto_free_instance(struct crypto_instan=
-ce *inst)
->         inst->alg.cra_type->free(inst);
->  }
->
-> -static void crypto_destroy_instance(struct crypto_alg *alg)
-> +static void crypto_destroy_instance_workfn(struct work_struct *w)
->  {
-> -       struct crypto_instance *inst =3D (void *)alg;
-> +       struct crypto_instance *inst =3D container_of(w, struct crypto_in=
-stance,
-> +                                                   free_work);
->         struct crypto_template *tmpl =3D inst->tmpl;
->
->         crypto_free_instance(inst);
->         crypto_tmpl_put(tmpl);
->  }
->
-> +static void crypto_destroy_instance(struct crypto_alg *alg)
-> +{
-> +       struct crypto_instance *inst =3D container_of(alg,
-> +                                                   struct crypto_instanc=
-e,
-> +                                                   alg);
-> +
-> +       INIT_WORK(&inst->free_work, crypto_destroy_instance_workfn);
-> +       schedule_work(&inst->free_work);
-> +}
-> +
->  /*
->   * This function adds a spawn to the list secondary_spawns which
->   * will be used at the end of crypto_remove_spawns to unregister
-> diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-> index 6156161b181f..ca86f4c6ba43 100644
-> --- a/include/crypto/algapi.h
-> +++ b/include/crypto/algapi.h
-> @@ -12,6 +12,7 @@
->  #include <linux/cache.h>
->  #include <linux/crypto.h>
->  #include <linux/types.h>
-> +#include <linux/workqueue.h>
->
->  /*
->   * Maximum values for blocksize and alignmask, used to allocate
-> @@ -82,6 +83,8 @@ struct crypto_instance {
->                 struct crypto_spawn *spawns;
->         };
->
-> +       struct work_struct free_work;
-> +
->         void *__ctx[] CRYPTO_MINALIGN_ATTR;
->  };
+-- 
+~Vinod
