@@ -2,208 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BFF8C001DE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Aug 2023 01:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E56C41513
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Aug 2023 08:57:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232744AbjHCBuI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Aug 2023 21:50:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60652 "EHLO
+        id S234572AbjHCI5l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Aug 2023 04:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbjHCBtL (ORCPT
+        with ESMTP id S234900AbjHCI5j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Aug 2023 21:49:11 -0400
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8B630D1
-        for <linux-crypto@vger.kernel.org>; Wed,  2 Aug 2023 18:49:07 -0700 (PDT)
-X-ASG-Debug-ID: 1691027343-1eb14e747a09830001-Xm9f1P
-Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id aqJqCZXaJSdejAKn (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Thu, 03 Aug 2023 09:49:03 +0800 (CST)
-X-Barracuda-Envelope-From: TonyWWang-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX2.zhaoxin.com
- (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Thu, 3 Aug
- 2023 09:49:03 +0800
-Received: from [10.32.65.162] (10.32.65.162) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Thu, 3 Aug
- 2023 09:49:01 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Message-ID: <771b24c2-1cc3-94b4-739c-56ff461b4f32@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.32.65.162
-Date:   Thu, 3 Aug 2023 09:49:02 +0800
+        Thu, 3 Aug 2023 04:57:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27DA51981;
+        Thu,  3 Aug 2023 01:57:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8406661CE4;
+        Thu,  3 Aug 2023 08:57:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2F04C433C7;
+        Thu,  3 Aug 2023 08:57:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691053053;
+        bh=cEup0wu+FTQabkNencKL1iEruNbJ9YJHffpEK2p5Ps4=;
+        h=From:Date:Subject:To:Cc:From;
+        b=ev3+96Evo0EFilg5h4Da7301Lt4UuD9zddIDfdlAOgbSNRz24p8bLuYTU0CG1P383
+         HmwUCv16LT5zkjyfzAmLqCg+yHNZYPWFllY0Lp1B/btQiS40iWUE8SpJHMF58JYY53
+         tqzrCsXOHkgWJpFM9sm63zG50BFuIXOpHAKK/N2oGJTL2P3SovgfLMDWRGs9WtVlQ7
+         F9briyjhIz9lnZA/s1PcRFOMyp0aBhB6fq4eBU2j9gM5UiHUGr81vDr0lq46ZuDYJz
+         g9OzNX2nucz8VqteW9gH7059bm/iZ0rXcNx6P7TeHbGydmS5Ch4uvthWTp3rpQEq67
+         v6GHjCbVmytag==
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6bcae8c4072so580133a34.1;
+        Thu, 03 Aug 2023 01:57:33 -0700 (PDT)
+X-Gm-Message-State: ABy/qLavrl9d0K9sPj3wQaV6aRN8FYp26jPhG8En/gnqWSlLvl2udfaw
+        unEiudZYEe2Ygl9Znrj25UJkdpFpM092BkHHuw0=
+X-Google-Smtp-Source: APBJJlFBCNBxoVqvlv1SiiLW6E4ZDF2QUkI8ECycVltZa6EwlGT3PrFREjSRmobsGwDA9UnRNimB+V0tXybgkq+JUeE=
+X-Received: by 2002:a05:6871:823:b0:1bf:597b:2343 with SMTP id
+ q35-20020a056871082300b001bf597b2343mr3096974oap.30.1691053053078; Thu, 03
+ Aug 2023 01:57:33 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] crypto: Zhaoxin: Hardware Engine Driver for
- SHA1/256/384/512
-Content-Language: en-US
-X-ASG-Orig-Subj: Re: [PATCH] crypto: Zhaoxin: Hardware Engine Driver for
- SHA1/256/384/512
-To:     Dave Hansen <dave.hansen@intel.com>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-        <hpa@zytor.com>, <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <seanjc@google.com>, <kim.phillips@amd.com>,
-        <peterz@infradead.org>, <pbonzini@redhat.com>,
-        <pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
-        <jiaxi.chen@linux.intel.com>, <jmattson@google.com>,
-        <sandipan.das@amd.com>, <linux-crypto@vger.kernel.org>
-CC:     <CobeChen@zhaoxin.com>, <TimGuo@zhaoxin.com>,
-        <LeoLiu-oc@zhaoxin.com>, <GeorgeXue@zhaoxin.com>
-References: <20230802110741.4077-1-TonyWWang-oc@zhaoxin.com>
- <bc950efd-b7f7-5fc9-b41d-ebddcf4a459e@intel.com>
-From:   Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
-In-Reply-To: <bc950efd-b7f7-5fc9-b41d-ebddcf4a459e@intel.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Thu, 3 Aug 2023 17:56:56 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASvTLTj3hKkjsWBwm8++nXqMpomjZd6QbpmrfR+3iveNg@mail.gmail.com>
+Message-ID: <CAK7LNASvTLTj3hKkjsWBwm8++nXqMpomjZd6QbpmrfR+3iveNg@mail.gmail.com>
+Subject: Wake up sequence of crypto - atmel-i2c
+To:     Jianhui Zhao <zhaojh329@gmail.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-i2c@vger.kernel.org, Wolfram Sang <wsa@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.32.65.162]
-X-ClientProxiedBy: ZXSHCAS2.zhaoxin.com (10.28.252.162) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
-X-Barracuda-Start-Time: 1691027343
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 4190
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.112238
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dear Dave,
-Thanks for your review. will refactor this patch per your suggestions.
+Hi Jianhui,
+(CC: crypto and i2c sub-systems)
 
-On 8/2/23 22:20, Dave Hansen wrote:
-> This code looks pretty rough.
-> 
->> +static int zhaoxin_sha1_update(struct shash_desc *desc,
->> +			const u8 *data,	unsigned int len)
->> +{
->> +	struct sha1_state *sctx = shash_desc_ctx(desc);
->> +	unsigned int partial, done;
->> +	const u8 *src;
->> +	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
->> +	u8 buf[128 + ZHAOXIN_SHA_ALIGNMENT - STACK_ALIGN] __attribute__
->> +		((aligned(STACK_ALIGN)));
->> +	u8 *dst = PTR_ALIGN(&buf[0], ZHAOXIN_SHA_ALIGNMENT);
-> 
-> All of the different alignments here are pretty dazzling.
-> 
->> +	partial = sctx->count & 0x3f;
-> 
-> "0x3f" is a random magic number.
-> 
->> +	sctx->count += len;
->> +	done = 0;
->> +	src = data;
->> +	memcpy(dst, (u8 *)(sctx->state), SHA1_DIGEST_SIZE);
->> +
->> +	if ((partial + len) >= SHA1_BLOCK_SIZE) {
->> +
->> +		/* Append the bytes in state's buffer to a block to handle */
->> +		if (partial) {
->> +			done = -partial;
->> +			memcpy(sctx->buffer + partial, data,
->> +				done + SHA1_BLOCK_SIZE);
->> +			src = sctx->buffer;
->> +			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
->> +			: "+S"(src), "+D"(dst)
->> +			: "a"((long)-1), "c"(1UL));
-> 
-> Please look around the codebase for examples on how to do this.  We
-> usually try to use real instructions when binutils supports them and
-> also don't repeatedly open-code the ".byte ...".
-> 
->> +			done += SHA1_BLOCK_SIZE;
->> +			src = data + done;
->> +		}
->> +
->> +		/* Process the left bytes from the input data */
->> +		if (len - done >= SHA1_BLOCK_SIZE) {
->> +			asm volatile (".byte 0xf3,0x0f,0xa6,0xc8"
->> +			: "+S"(src), "+D"(dst)
->> +			: "a"((long)-1),
->> +			"c"((unsigned long)((len - done) / SHA1_BLOCK_SIZE)));
->> +			done += ((len - done) - (len - done) % SHA1_BLOCK_SIZE);
->> +			src = data + done;
->> +		}
->> +		partial = 0;
->> +	}
->> +	memcpy((u8 *)(sctx->state), dst, SHA1_DIGEST_SIZE);
-> 
-> What's the purpose of the cast?
-> 
->> +	memcpy(sctx->buffer + partial, src, len - done);
->> +
->> +	return 0;
->> +}
->> +
->> +static int zhaoxin_sha1_final(struct shash_desc *desc, u8 *out)
->> +{
->> +	struct sha1_state *state = (struct sha1_state *)shash_desc_ctx(desc);
-> 
-> What's the purpose of *this* cast?
-> 
->> +	unsigned int partial, padlen;
->> +	__be64 bits;
->> +	static const u8 padding[64] = { 0x80, };
->> +
->> +	bits = cpu_to_be64(state->count << 3);
->> +
->> +	/* Pad out to 56 mod 64 */
->> +	partial = state->count & 0x3f;
->> +	padlen = (partial < 56) ? (56 - partial) : ((64+56) - partial);
->> +	zhaoxin_sha1_update(desc, padding, padlen);
->> +
->> +	/* Append length field bytes */
->> +	zhaoxin_sha1_update(desc, (const u8 *)&bits, sizeof(bits));
->> +
->> +	/* Swap to output */
->> +	zhaoxin_output_block((uint32_t *)(state->state), (uint32_t *)out, 5);
->> +
->> +	return 0;
->> +}
->> +
->> +static int zhaoxin_sha256_init(struct shash_desc *desc)
->> +{
->> +	struct sha256_state *sctx = shash_desc_ctx(desc);
->> +
->> +	*sctx = (struct sha256_state){
->> +		.state = { SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
->> +				SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7},
->> +	};
->> +
->> +	return 0;
->> +}
->> +
->> +static int zhaoxin_sha256_update(struct shash_desc *desc, const u8 *data,
->> +			  unsigned int len)
->> +{
->> +	struct sha256_state *sctx = shash_desc_ctx(desc);
->> +	unsigned int partial, done;
->> +	const u8 *src;
->> +	/*The PHE require the out buffer must 128 bytes and 16-bytes aligned*/
->> +	u8 buf[128 + ZHAOXIN_SHA_ALIGNMENT - STACK_ALIGN] __attribute__
->> +		((aligned(STACK_ALIGN)));
->> +	u8 *dst = PTR_ALIGN(&buf[0], ZHAOXIN_SHA_ALIGNMENT);
->> +
->> +	partial = sctx->count & 0x3f;
->> +	sctx->count += len;
->> +	done = 0;
->> +	src = data;
->> +	memcpy(dst, (u8 *)(sctx->state), SHA256_DIGEST_SIZE);
-> 
-> That looks familiar.
-> 
-> This patch needs some serious cleanups and refactoring.  It seems to be
-> missing even the basics like avoiding copy-and-pasting code.  The
-> changelog is quite sparse.
-> 
-> Could you spend some more time on this and give it another go, please?
+
+I am trying to use ATECC608B chip
+(it is compatible with ATECC508), but no luck so far.
+
+Specifically, it fails in atmel_i2c_wakeup() in
+drivers/crypto/atmel-i2c.c
+
+
+I have a question about your commit.
+
+
+commit 2638268fa9ebe4f13a8aee89044719f2084f80c8
+Author: Jianhui Zhao <zhaojh329@gmail.com>
+Date:   Tue Mar 10 20:25:51 2020 +0800
+
+    crypto: atmel-i2c - Fix wakeup fail
+
+
+
+
+Datasheet [1] page 40 says this:
+ The Wake condition requires that either the system processor manually
+ drives the SDA pin low for tWLO, or a data byte of 0x00 be transmitted
+ at a clock rate sufficiently slow so that SDA is low for a minimum
+ period of tWLO. When the device is awake, the normal processor I2C
+ hardware and/or software can be used for device communications up to
+ and including the I/O sequence required, thus putting the device
+ back into low power (i.e. sleep) mode.
+
+
+
+
+To pull down the SDA pin for the period of tWLO,
+atmel_i2c_wakeup() sends long enough zero data.
+(3 byte for 400KHz, 1 byte for 100kHz)
+
+However, it relies on the i2c controller understanding
+I2C_M_IGNORE_NAK, correct?
+
+Not all i2c controllers can do I2C_M_IGNORE_NAK.
+
+In my case, the SoC is IMX8MM, and the driver is
+drivers/i2c/busses/i2c-imx.c, which does not handle
+I2C_M_IGNORE_NAK flag.
+
+If I2C_M_IGNORE_NAK is not recognized, the controller
+sends the slave address and nobody responds
+(as the ATECC chip is in the sleep state), then the
+controller quits without sending zero data.
+
+I guess that is the reason why atmel_i2c_wakeup()
+does not work for me.
+
+Am I correct?
+
+
+[1] https://content.arduino.cc/assets/mkr-microchip_atecc508a_cryptoauthentication_device_summary_datasheet-20005927a.pdf
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
