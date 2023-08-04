@@ -2,182 +2,208 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A79C001DB
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 12:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D83C001DB
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 12:14:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbjHDMCX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Aug 2023 08:02:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54702 "EHLO
+        id S229634AbjHDMO3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Aug 2023 08:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229759AbjHDMCW (ORCPT
+        with ESMTP id S229463AbjHDMO2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Aug 2023 08:02:22 -0400
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2050.outbound.protection.outlook.com [40.107.14.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC57139;
-        Fri,  4 Aug 2023 05:02:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ahrHB5ByvPYG2yQkkm19+H0iFgg/scfpbevea09ZpkAhIrkg8eoY6F9CZZHBipk24clY9h8Phj5AcFlHoAlQ1dI9F6p2SkDbEBA+OBnyrb+8+yvuW+ZXuCtTr/YefRkG97T7jHcHGcyh8olVzpjJ5rv0X42BV2qq8ouju2oEPGdZ8eSkz52PYk/BuABcsTM8LImI4KFGzNEsx83TE2anTk5mi7gZdkuAbpEzXmvL+VGWYSAB5hTDQZiEYz+3ooFvnWCbwOWjb7K0fYV3MOwlPvsQSsJVgI550byof0Bepxcc29Btlu6Orqtd9Jdkrj/Rx61ALQtWBWH8MhArneAdeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5uLEhLA8yF384aOB40ihXyQbB94b3DxVtX5UpFgPkSY=;
- b=ZQxo2QcGUmh0tYXbuZ6EITzgVXA6aM6jSd64YTgugS0Haqo4aiUkgMcO1D562rulRDkwdtzPA8DrsYgn+IfC9tH1ny8d+6oVNaVfp1CNV2H/GLCDrqRGzWqXSI7Ev6loNRWSRofIKgj4IIIkIWANIob35IcpOSAMb1K3s/Db0sdvccCAj+VhkL61rNUcxIaCcKHpoau0flQ9EJow0u93a1LXUJP5o0yEFXtrKzKHpGLc3yiqxt9KLhFWrnvHTCNhGEH43lqwCi1oCM4qXCMBn0AWb28EYsfrrgnutDQtBI3JQ4wBn8ZjrBrpZO8CKiY76zxe09g48PxPAnzJ6zY2WQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5uLEhLA8yF384aOB40ihXyQbB94b3DxVtX5UpFgPkSY=;
- b=bDUqZoGIw31irBLNQ+3bxT4WCBE8jrZOuPxYJGf6Bvptl+WWbV6Z8Mmnuf0qP2+P2oA2IZGVaGSsKc6DXTvv0E22ZmhmBVyvF4e4AJDcl9GK0glskcR1Y6TEGPQagpMJUSGeKsxKA0eZNqW2TtwMMTE7mFNa1KPRJKvY+nSHo7Y=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by AM9PR04MB7650.eurprd04.prod.outlook.com (2603:10a6:20b:281::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.20; Fri, 4 Aug
- 2023 12:02:15 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::1392:7c78:1b43:769f]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::1392:7c78:1b43:769f%3]) with mapi id 15.20.6631.046; Fri, 4 Aug 2023
- 12:02:15 +0000
-From:   Gaurav Jain <gaurav.jain@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-CC:     Bastian Krause <bst@pengutronix.de>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>
-Subject: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
- more devices
-Thread-Topic: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
- more devices
-Thread-Index: AQHZug6+BPzkkhdXaUqEPx5hGyrmMK/IZwWAgBGM4YCAACoJkA==
-Date:   Fri, 4 Aug 2023 12:02:15 +0000
-Message-ID: <AM0PR04MB60046B045B5965A61BA1CA91E709A@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
- <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
- <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
- <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
-In-Reply-To: <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|AM9PR04MB7650:EE_
-x-ms-office365-filtering-correlation-id: cf984c69-1fec-458f-b6a2-08db94e2a50d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rLvPxarjEjrDyz+/TCLnXHQXwkFVkdfq3zz12yP4ZdzXUTE3lKkaRbamoNcYx6a+btAsuTtHlDll381cmMcxFNH2x2K02L7OaxD1Xrn6BRRK1PN6j6BH67ZWfBrnFOXwcudbPVS5q+K63DB5tWOptKHwD1RVv7h4XwKgYsmTv3c1uVYG2HLlDsdu9KbkVAMTPE2UxJYgoLb+mariJUD5+RaJx3zKw+O3bP1eYBctnvRNiLd4kPtCbdaRCtwVxiyru+Uo/9qRemKmilevnRf3GqkaKJqF8nHlq19q1wxGLp7T58CkMQQiuqrSppXnIQdgOcfnepNxFvEzuOaMMrWWGa3r5QHj0uBxBKyODeQURdAdXb7gcKa9s/fLgP1dRvSKS/pWZMCbInvpZthzPxmj6NqfCUYXxWhDnVf22WFVWk16eO1OOjL49rJXsvfuiFFrK1ZNInd2CIi20+YZ46CrFj33Z9CtgPX97u0lQjK/C+xwdDn/mPofoLBPPo6p/Z42i3NaPYakfpdJGoO9ROQzo+PKzpORr9pxuBYGIJ3cBKND+V5YUEaZJlOFvnVStyYlRDr90oCQ8FfUGDa8WzY8bNeSMOxI55iq53lc5kp+tU0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(376002)(366004)(346002)(396003)(451199021)(1800799003)(186006)(53546011)(55236004)(8676002)(26005)(6506007)(83380400001)(4326008)(2906002)(66476007)(316002)(76116006)(6636002)(66946007)(5660300002)(66446008)(64756008)(66556008)(44832011)(8936002)(41300700001)(966005)(7696005)(71200400001)(52536014)(9686003)(45080400002)(110136005)(478600001)(55016003)(122000001)(54906003)(38100700002)(33656002)(86362001)(38070700005);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hCLQoVHjZo86yrwA9Z4qV80b0RqbTrxR+ThzT7io9vAQFPvakl0u3jtqb5p0?=
- =?us-ascii?Q?FbPgh1qAKXU5OXRDd9tiFTVjtwfg9uYkUg7fV5TTnixYUiaQuZzrxhE9u/TN?=
- =?us-ascii?Q?o+VhKY/cF8Vy/PYi8aLg1qbBEg/FxQo8wDhPOc1n//UOsTECnwxErkR436dQ?=
- =?us-ascii?Q?3WGXu+RtL9yBD5Kq32S9L54XG3xcsirnC/lEDkXKwTDf15Nfdwvkupxzhj/e?=
- =?us-ascii?Q?0U8690bOpVzKQn3p46lPqh62FkM7kQ39maWu4GwDePmBO/XgGXSGehfp4uSf?=
- =?us-ascii?Q?pm6O+KQ/7I89jx5/WLxF7JYIVEjaLWv3ncTfBIic/bLfqqmgLc4DjZLueB3k?=
- =?us-ascii?Q?lmYSRhK+drrUK7pGTNgKh63KMoXOJURnSKBIETU0f8L6+80zEPrDEDToJO2s?=
- =?us-ascii?Q?YhH43Br56OKUJSNivVLuJCcOUqe9M73ue6xUDSsOIQsnFXIOr5r4SvcLObyr?=
- =?us-ascii?Q?ANKWECoLpCuWfuJweBzbrIK30nTDrzss+pZHrz1p8N4I4E7+n6g99mHkXyh+?=
- =?us-ascii?Q?1hVmoD8pDYZoipBELlbrpFUvCnKizBeo/HaCdpteFhiZo3gGyi1kkoJZzRdV?=
- =?us-ascii?Q?RuY4xyyi7DYqaQF4/AOrM6bkweJ0HJpFPyCcmpRpv2JbCzxy6CqB6G/vV93Y?=
- =?us-ascii?Q?iW8ZqEs/IQXUcRfZRmzKJAGFp5fRM/DFojrDA1ln/OW1ePOVVVM1kWJFZNpu?=
- =?us-ascii?Q?AJ1Xg7+lrUKILxUjqPo952QF+t+9zNpSi94yNZO52Dja193GNDv6p8qd7YOD?=
- =?us-ascii?Q?Dh7wIr7vjdd7u8OZlmCk8jMZhz0XCdKq0+oC+f6EiXtPqFAwmDEmy4rDrNXX?=
- =?us-ascii?Q?/gi32CInFBKQu5/GjbM/5NbSy4eyhTHMTJ5JS4A1YJyyiqsOnlZ6Sh4PqYYi?=
- =?us-ascii?Q?+xcEx1nHEVNYTotYGRRhiB09roCju8IpbrqkKKpWoWoik7O5WnXNDX7A9O3W?=
- =?us-ascii?Q?JX1UHWFQJWpvag0g/Uzaesfq7aZIHEgyLKzCeAzLXxAivmE0CQFm++rpi6mD?=
- =?us-ascii?Q?BLc1srEh0MEgb38nh9kvwU7qR3tnS9tfFtVqkNVRlB9Rwwj51sQ119NFJoxO?=
- =?us-ascii?Q?yLIJA9cpWyLThXOibhSX7nXI3xVAXqc8RgfJiRPEIMKJa4+y+v2R507He0Uz?=
- =?us-ascii?Q?FQpk9cuNZRFlYkwvTK6/RwkcG3CzuspqXqNOK9GUfr0iADsTLDvQR7+xk3QM?=
- =?us-ascii?Q?gfE4wyxzQI0liUlC/pROzpwffddvLPZimj3lxaMVcrnZU3hmFzOuzvuL/f+4?=
- =?us-ascii?Q?kggM1zxR9XA38/OoX5NL5y53E8+4MhBM1PejwZd5cEloFxkXIGvKYej0eP5Y?=
- =?us-ascii?Q?+unS064/S4rwblLBJuXXcEs1me4PEerxByaVUAvTRbk8hWl5a0isIVVnL/iS?=
- =?us-ascii?Q?Ct3GDPMU/sX5dOBnbUdAXnZmZHPX+A3PKiL8cZB0GkqKxxSMIyqs69FDmiLs?=
- =?us-ascii?Q?KLrJcP+WREdOMgC+44PBeuiUChSfVrkalBcf72HYnAjzA4m39t0c6nyDT++U?=
- =?us-ascii?Q?maS0FW7The82AWJgA0eaemt5mVTJub/cz9+rZxOiudawkiXdILOtHnkk7Ib8?=
- =?us-ascii?Q?YF7CaQJEgRqm4mCofTX6CVpWF7f4C3YDS6e+9/Dk?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 4 Aug 2023 08:14:28 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8086246AA
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Aug 2023 05:14:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691151267; x=1722687267;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=o0H+lB4Rk6RDirf2lIgh9LS32KH7E9uhgY3k8BxKG0g=;
+  b=Al4UuZkJpn6U6JtN1CtEPEPNMD+HgKWsUp+0/q5Xh0ixK0ITZRruBM8k
+   fkFokRLEfUXyL6Y/8uyNuRfFuFXClFE3wAmJYTP5BzsklfE920Zxo9X7q
+   xXu7pJzrPobXnzw+sFnVq+pz2yqz6g6Hdk1ku4Xy/7m47NoyqdhLnVq+s
+   f8xNiiUsR+o54cQHKOdj8k0QZO85rji3FE7aJm4MHF2viDTwmKIdCeRka
+   HnC5NqUL7IiZbg1dndM2Lb8GYeqjzViLZFCC/W5Lf0BPj9lpIzAUZ+WYU
+   ew7xCePi+wA7P1RDMuWn1uIGtHdU1RyAzIIkA3dlysRlLMP41VhpR9b2R
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10792"; a="370126469"
+X-IronPort-AV: E=Sophos;i="6.01,255,1684825200"; 
+   d="scan'208";a="370126469"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2023 05:14:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10792"; a="723640417"
+X-IronPort-AV: E=Sophos;i="6.01,255,1684825200"; 
+   d="scan'208";a="723640417"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 04 Aug 2023 05:14:25 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qRthI-0002pv-1O;
+        Fri, 04 Aug 2023 12:14:24 +0000
+Date:   Fri, 4 Aug 2023 20:14:10 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Rob Herring <robh@kernel.org>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [herbert-cryptodev-2.6:master 83/83]
+ drivers/char/hw_random/xgene-rng.c:110:2: error: call to undeclared function
+ 'writel'; ISO C99 and later do not support implicit function declarations
+Message-ID: <202308042049.8R2tNRoo-lkp@intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf984c69-1fec-458f-b6a2-08db94e2a50d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Aug 2023 12:02:15.5246
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fX1nmP6plivaIS4ko26j4GNbvDT+UdNXk3xsPddQRZkPDUkrDcV5Cl653YLwlmDPeKMGTxXzXNrjdli1sSOpcA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7650
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   1ce1cd8208ad6060e4fcf6e09068c8954687c127
+commit: 1ce1cd8208ad6060e4fcf6e09068c8954687c127 [83/83] hwrng: Enable COMPILE_TEST for more drivers
+config: s390-randconfig-r015-20230801 (https://download.01.org/0day-ci/archive/20230804/202308042049.8R2tNRoo-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230804/202308042049.8R2tNRoo-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308042049.8R2tNRoo-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/char/hw_random/xgene-rng.c:110:2: error: call to undeclared function 'writel'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     110 |         writel(fro_val, ctx->csr_base + RNG_FRODETUNE);
+         |         ^
+>> drivers/char/hw_random/xgene-rng.c:120:8: error: call to undeclared function 'readl'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     120 |         val = readl(ctx->csr_base + RNG_INTR_STS_ACK);
+         |               ^
+   drivers/char/hw_random/xgene-rng.c:196:2: error: call to undeclared function 'writel'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     196 |         writel(val, ctx->csr_base + RNG_INTR_STS_ACK);
+         |         ^
+   drivers/char/hw_random/xgene-rng.c:215:9: error: call to undeclared function 'readl'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     215 |                 val = readl(ctx->csr_base + RNG_INTR_STS_ACK);
+         |                       ^
+   drivers/char/hw_random/xgene-rng.c:230:13: error: call to undeclared function 'readl'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     230 |                 data[i] = readl(ctx->csr_base + RNG_INOUT_0 + i * 4);
+         |                           ^
+   drivers/char/hw_random/xgene-rng.c:233:2: error: call to undeclared function 'writel'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     233 |         writel(READY_MASK, ctx->csr_base + RNG_INTR_STS_ACK);
+         |         ^
+   drivers/char/hw_random/xgene-rng.c:242:2: error: call to undeclared function 'writel'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     242 |         writel(0x00000000, ctx->csr_base + RNG_CONTROL);
+         |         ^
+   drivers/char/hw_random/xgene-rng.c:280:18: error: call to undeclared function 'readl'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     280 |         ctx->revision = readl(ctx->csr_base + RNG_EIP_REV);
+         |                         ^
+   8 errors generated.
 
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Friday, August 4, 2023 2:44 PM
-> To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
-> <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
-> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
-> <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>
-> Subject: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support mo=
-re
-> devices
->
-> Caution: This is an external email. Please take care when clicking links =
-or
-> opening attachments. When in doubt, report the message using the 'Report =
-this
-> email' button
->
->
-> On Mon, Jul 24, 2023 at 05:13:23AM +0000, Meenakshi Aggarwal wrote:
-> > Hi Bastian,
-> >
-> > Please share the required information.
->
-> Any progress on this?
->
-> Should we revert the offending patch?
+vim +/writel +110 drivers/char/hw_random/xgene-rng.c
 
-Debugging is in progress. There should be some mismatch in TRNG configurati=
-on in customer board.
-Will be sharing a patch to dump the same.
+a91ae4eba9f9977 Feng Kan 2014-08-22  104  
+a91ae4eba9f9977 Feng Kan 2014-08-22  105  /*
+a91ae4eba9f9977 Feng Kan 2014-08-22  106   * Initialize or reinit free running oscillators (FROs)
+a91ae4eba9f9977 Feng Kan 2014-08-22  107   */
+a91ae4eba9f9977 Feng Kan 2014-08-22  108  static void xgene_rng_init_fro(struct xgene_rng_dev *ctx, u32 fro_val)
+a91ae4eba9f9977 Feng Kan 2014-08-22  109  {
+a91ae4eba9f9977 Feng Kan 2014-08-22 @110  	writel(fro_val, ctx->csr_base + RNG_FRODETUNE);
+a91ae4eba9f9977 Feng Kan 2014-08-22  111  	writel(0x00000000, ctx->csr_base + RNG_ALARMMASK);
+a91ae4eba9f9977 Feng Kan 2014-08-22  112  	writel(0x00000000, ctx->csr_base + RNG_ALARMSTOP);
+a91ae4eba9f9977 Feng Kan 2014-08-22  113  	writel(0xFFFFFFFF, ctx->csr_base + RNG_FROENABLE);
+a91ae4eba9f9977 Feng Kan 2014-08-22  114  }
+a91ae4eba9f9977 Feng Kan 2014-08-22  115  
+a91ae4eba9f9977 Feng Kan 2014-08-22  116  static void xgene_rng_chk_overflow(struct xgene_rng_dev *ctx)
+a91ae4eba9f9977 Feng Kan 2014-08-22  117  {
+a91ae4eba9f9977 Feng Kan 2014-08-22  118  	u32 val;
+a91ae4eba9f9977 Feng Kan 2014-08-22  119  
+a91ae4eba9f9977 Feng Kan 2014-08-22 @120  	val = readl(ctx->csr_base + RNG_INTR_STS_ACK);
+a91ae4eba9f9977 Feng Kan 2014-08-22  121  	if (val & MONOBIT_FAIL_MASK)
+a91ae4eba9f9977 Feng Kan 2014-08-22  122  		/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  123  		 * LFSR detected an out-of-bounds number of 1s after
+a91ae4eba9f9977 Feng Kan 2014-08-22  124  		 * checking 20,000 bits (test T1 as specified in the
+a91ae4eba9f9977 Feng Kan 2014-08-22  125  		 * AIS-31 standard)
+a91ae4eba9f9977 Feng Kan 2014-08-22  126  		 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  127  		dev_err(ctx->dev, "test monobit failure error 0x%08X\n", val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  128  	if (val & POKER_FAIL_MASK)
+a91ae4eba9f9977 Feng Kan 2014-08-22  129  		/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  130  		 * LFSR detected an out-of-bounds value in at least one
+a91ae4eba9f9977 Feng Kan 2014-08-22  131  		 * of the 16 poker_count_X counters or an out of bounds sum
+a91ae4eba9f9977 Feng Kan 2014-08-22  132  		 * of squares value after checking 20,000 bits (test T2 as
+a91ae4eba9f9977 Feng Kan 2014-08-22  133  		 * specified in the AIS-31 standard)
+a91ae4eba9f9977 Feng Kan 2014-08-22  134  		 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  135  		dev_err(ctx->dev, "test poker failure error 0x%08X\n", val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  136  	if (val & LONG_RUN_FAIL_MASK)
+a91ae4eba9f9977 Feng Kan 2014-08-22  137  		/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  138  		 * LFSR detected a sequence of 34 identical bits
+a91ae4eba9f9977 Feng Kan 2014-08-22  139  		 * (test T4 as specified in the AIS-31 standard)
+a91ae4eba9f9977 Feng Kan 2014-08-22  140  		 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  141  		dev_err(ctx->dev, "test long run failure error 0x%08X\n", val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  142  	if (val & RUN_FAIL_MASK)
+a91ae4eba9f9977 Feng Kan 2014-08-22  143  		/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  144  		 * LFSR detected an outof-bounds value for at least one
+a91ae4eba9f9977 Feng Kan 2014-08-22  145  		 * of the running counters after checking 20,000 bits
+a91ae4eba9f9977 Feng Kan 2014-08-22  146  		 * (test T3 as specified in the AIS-31 standard)
+a91ae4eba9f9977 Feng Kan 2014-08-22  147  		 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  148  		dev_err(ctx->dev, "test run failure error 0x%08X\n", val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  149  	if (val & NOISE_FAIL_MASK)
+a91ae4eba9f9977 Feng Kan 2014-08-22  150  		/* LFSR detected a sequence of 48 identical bits */
+a91ae4eba9f9977 Feng Kan 2014-08-22  151  		dev_err(ctx->dev, "noise failure error 0x%08X\n", val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  152  	if (val & STUCK_OUT_MASK)
+a91ae4eba9f9977 Feng Kan 2014-08-22  153  		/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  154  		 * Detected output data registers generated same value twice
+a91ae4eba9f9977 Feng Kan 2014-08-22  155  		 * in a row
+a91ae4eba9f9977 Feng Kan 2014-08-22  156  		 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  157  		dev_err(ctx->dev, "stuck out failure error 0x%08X\n", val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  158  
+a91ae4eba9f9977 Feng Kan 2014-08-22  159  	if (val & SHUTDOWN_OFLO_MASK) {
+a91ae4eba9f9977 Feng Kan 2014-08-22  160  		u32 frostopped;
+a91ae4eba9f9977 Feng Kan 2014-08-22  161  
+a91ae4eba9f9977 Feng Kan 2014-08-22  162  		/* FROs shut down after a second error event. Try recover. */
+a91ae4eba9f9977 Feng Kan 2014-08-22  163  		if (++ctx->failure_cnt == 1) {
+a91ae4eba9f9977 Feng Kan 2014-08-22  164  			/* 1st time, just recover */
+a91ae4eba9f9977 Feng Kan 2014-08-22  165  			ctx->failure_ts = jiffies;
+a91ae4eba9f9977 Feng Kan 2014-08-22  166  			frostopped = readl(ctx->csr_base + RNG_ALARMSTOP);
+a91ae4eba9f9977 Feng Kan 2014-08-22  167  			xgene_rng_init_fro(ctx, frostopped);
+a91ae4eba9f9977 Feng Kan 2014-08-22  168  
+a91ae4eba9f9977 Feng Kan 2014-08-22  169  			/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  170  			 * We must start a timer to clear out this error
+a91ae4eba9f9977 Feng Kan 2014-08-22  171  			 * in case the system timer wrap around
+a91ae4eba9f9977 Feng Kan 2014-08-22  172  			 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  173  			xgene_rng_start_timer(ctx);
+a91ae4eba9f9977 Feng Kan 2014-08-22  174  		} else {
+a91ae4eba9f9977 Feng Kan 2014-08-22  175  			/* 2nd time failure in lesser than 1 minute? */
+a91ae4eba9f9977 Feng Kan 2014-08-22  176  			if (time_after(ctx->failure_ts + 60 * HZ, jiffies)) {
+a91ae4eba9f9977 Feng Kan 2014-08-22  177  				dev_err(ctx->dev,
+a91ae4eba9f9977 Feng Kan 2014-08-22  178  					"FRO shutdown failure error 0x%08X\n",
+a91ae4eba9f9977 Feng Kan 2014-08-22  179  					val);
+a91ae4eba9f9977 Feng Kan 2014-08-22  180  			} else {
+a91ae4eba9f9977 Feng Kan 2014-08-22  181  				/* 2nd time failure after 1 minutes, recover */
+a91ae4eba9f9977 Feng Kan 2014-08-22  182  				ctx->failure_ts = jiffies;
+a91ae4eba9f9977 Feng Kan 2014-08-22  183  				ctx->failure_cnt = 1;
+a91ae4eba9f9977 Feng Kan 2014-08-22  184  				/*
+a91ae4eba9f9977 Feng Kan 2014-08-22  185  				 * We must start a timer to clear out this
+a91ae4eba9f9977 Feng Kan 2014-08-22  186  				 * error in case the system timer wrap
+a91ae4eba9f9977 Feng Kan 2014-08-22  187  				 * around
+a91ae4eba9f9977 Feng Kan 2014-08-22  188  				 */
+a91ae4eba9f9977 Feng Kan 2014-08-22  189  				xgene_rng_start_timer(ctx);
+a91ae4eba9f9977 Feng Kan 2014-08-22  190  			}
+a91ae4eba9f9977 Feng Kan 2014-08-22  191  			frostopped = readl(ctx->csr_base + RNG_ALARMSTOP);
+a91ae4eba9f9977 Feng Kan 2014-08-22  192  			xgene_rng_init_fro(ctx, frostopped);
+a91ae4eba9f9977 Feng Kan 2014-08-22  193  		}
+a91ae4eba9f9977 Feng Kan 2014-08-22  194  	}
+a91ae4eba9f9977 Feng Kan 2014-08-22  195  	/* Clear them all */
+a91ae4eba9f9977 Feng Kan 2014-08-22  196  	writel(val, ctx->csr_base + RNG_INTR_STS_ACK);
+a91ae4eba9f9977 Feng Kan 2014-08-22  197  }
+a91ae4eba9f9977 Feng Kan 2014-08-22  198  
 
-Regards
-Gaurav Jain
+:::::: The code at line 110 was first introduced by commit
+:::::: a91ae4eba9f9977863b57f2ac61e2e8e780375a8 hwrng: xgene - add support for APM X-Gene SoC RNG support
 
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> http://gondor.ap/
-> ana.org.au%2F~herbert%2F&data=3D05%7C01%7Cgaurav.jain%40nxp.com%7C3d
-> b657e628254a7a992a08db94cb2ba6%7C686ea1d3bc2b4c6fa92cd99c5c301635
-> %7C0%7C0%7C638267372562927851%7CUnknown%7CTWFpbGZsb3d8eyJWIjoi
-> MC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000
-> %7C%7C%7C&sdata=3DkypjQ4eyWAw1NNMvnZ7bbF7cMdFUmU6PFWFSaOanw6
-> w%3D&reserved=3D0
-> PGP Key:
-> http://gondor.ap/
-> ana.org.au%2F~herbert%2Fpubkey.txt&data=3D05%7C01%7Cgaurav.jain%40nxp.c
-> om%7C3db657e628254a7a992a08db94cb2ba6%7C686ea1d3bc2b4c6fa92cd99c
-> 5c301635%7C0%7C0%7C638267372562927851%7CUnknown%7CTWFpbGZsb3d
-> 8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D
-> %7C3000%7C%7C%7C&sdata=3DWsPJZj%2BGnC0CJoZS0YPNA6TxsN%2BAIXeuvRh
-> nDY%2FPouQ%3D&reserved=3D0
+:::::: TO: Feng Kan <fkan@apm.com>
+:::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
