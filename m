@@ -2,104 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FED9C001DE
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 09:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FE5C001DE
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 09:17:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230280AbjHDJOr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Aug 2023 05:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58496 "EHLO
+        id S230189AbjHDJQ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Aug 2023 05:16:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbjHDJOR (ORCPT
+        with ESMTP id S230202AbjHDJQZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Aug 2023 05:14:17 -0400
+        Fri, 4 Aug 2023 05:16:25 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E14C49EC;
-        Fri,  4 Aug 2023 02:11:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FFBA5BBC;
+        Fri,  4 Aug 2023 02:14:07 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qRqqT-003ayv-PZ; Fri, 04 Aug 2023 17:11:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Aug 2023 17:11:41 +0800
-Date:   Fri, 4 Aug 2023 17:11:41 +0800
+        id 1qRqsj-003b2H-K5; Fri, 04 Aug 2023 17:14:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Aug 2023 17:14:01 +0800
+Date:   Fri, 4 Aug 2023 17:14:01 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     =?us-ascii?B?PT9VVEYtOD9CP1QyNWtjbVZxSUUxdmMyN0RvY1NOWldzPT89?= 
-        <omosnacek@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.vnet.ibm.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, regressions@lists.linux.dev,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: Fix missing initialisation affecting gcm-aes-s390
-Message-ID: <ZMzAzX3WQn3ZT2N+@gondor.apana.org.au>
-References: <CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com>
- <97730.1690408399@warthog.procyon.org.uk>
+To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+Cc:     Bastian Krause <bst@pengutronix.de>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>
+Subject: Re: [PATCH] crypto: caam - adjust RNG timing to support more devices
+Message-ID: <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
+References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
+ <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
+ <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
+ <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+ <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <97730.1690408399@warthog.procyon.org.uk>
+In-Reply-To: <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 26, 2023 at 10:53:19PM +0100, David Howells wrote:
->     
-> Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to point
-> to the scatterlist array in areq->first_rsgl.sgl.sgl.
+On Mon, Jul 24, 2023 at 05:13:23AM +0000, Meenakshi Aggarwal wrote:
+> Hi Bastian,
 > 
-> Without this, the gcm-aes-s390 driver will oops when it tries to do
-> gcm_walk_start() on req->dst because req->dst is set to the value of
-> areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
-> aead_request_set_crypt().
-> 
-> The problem comes if an empty ciphertext is passed: the loop in
-> af_alg_get_rsgl() just passes straight out and doesn't set areq->first_rsgl
-> up.
-> 
-> This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as far
-> as I can tell, that ignores req->dst and only uses req->src[*].
-> 
-> [*] Is this a bug in aesni-intel_glue.c?
-> 
-> The s390x oops looks something like:
-> 
->  Unable to handle kernel pointer dereference in virtual kernel address space
->  Failing address: 0000000a00000000 TEID: 0000000a00000803
->  Fault in home space mode while using kernel ASCE.
->  AS:00000000a43a0007 R3:0000000000000024
->  Oops: 003b ilc:2 [#1] SMP
->  ...
->  Call Trace:
->   [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
->   [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
->   [<00000000a2a60888>] aead_recvmsg+0x478/0x698
->   [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
->   [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
->   [<00000000a273e066>] vfs_read+0x26e/0x2a8
->   [<00000000a273e8c4>] ksys_read+0xbc/0x100
->   [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
->   [<00000000a312ff30>] system_call+0x70/0x98
->  Last Breaking-Event-Address:
->   [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
-> 
-> Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists")
-> Reported-by: Ondrej Mosnáček <omosnacek@gmail.com>
-> Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Herbert Xu <herbert@gondor.apana.org.au>
-> cc: Sven Schnelle <svens@linux.ibm.com>
-> cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: linux-crypto@vger.kernel.org
-> cc: linux-s390@vger.kernel.org
-> cc: regressions@lists.linux.dev
-> ---
->  crypto/af_alg.c |    1 +
->  1 file changed, 1 insertion(+)
+> Please share the required information.
 
-Patch applied.  Thanks.
+Any progress on this?
+
+Should we revert the offending patch?
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
