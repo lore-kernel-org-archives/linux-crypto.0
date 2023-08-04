@@ -2,100 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA3DC001DB
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 14:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB67C04A6A
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 14:26:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbjHDOZG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Aug 2023 10:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50620 "EHLO
+        id S231572AbjHDO01 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Aug 2023 10:26:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229736AbjHDOZF (ORCPT
+        with ESMTP id S231616AbjHDO00 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Aug 2023 10:25:05 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB24ECC;
-        Fri,  4 Aug 2023 07:25:04 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 374EFYJW002076;
-        Fri, 4 Aug 2023 14:25:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=+u/eLI9gfCUlanLl7aINXPZVZoCJsLmRPU0DfLIfGmc=;
- b=hBkXyiJzURyGiqhfUCRIrwUR/tJ17yvIGb9rGCGqjCW+3It7v0pjj2MEgcumztIf6eaD
- wEwUL/NibpNTjmpcgZvzR2njt+3Sjz78NVkyXJlRrYVkmPdVO6VoScOzqUz/5O7O8xWz
- XAYhwdQrbSbTPn8+/LWfsDQloidA8pgjPcU/ocFxwNZ+vqTn6q1+V6QBMna7MaSmk5cA
- At0bXbkpGhFO78LxnSYdQUzs6z/HqV9oPuswpVy3/jrWAFvMDV2WQH9PQsqOR5TKD02U
- +RhOwCG6Piq+/+A2tOYQaKso2Utv8mXC2tnnOlDp6DtpSEcwuHwvdiHNNJRgl1dVwbQn RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s92xfg9du-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 14:25:01 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 374EGiZ7005369;
-        Fri, 4 Aug 2023 14:25:00 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3s92xfg9d1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 14:25:00 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 374Dvqlm018450;
-        Fri, 4 Aug 2023 14:24:59 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3s8kp4xb18-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Aug 2023 14:24:59 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 374EOwp165339764
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Aug 2023 14:24:58 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6D19C58051;
-        Fri,  4 Aug 2023 14:24:58 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0270958060;
-        Fri,  4 Aug 2023 14:24:58 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.61.12.187])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Aug 2023 14:24:57 +0000 (GMT)
-Message-ID: <7c288bb1bdc0a7c48ce5bd92c180f95ecbffcef9.camel@linux.ibm.com>
-Subject: Re: [PATCH] crypto: lib - Move mpi into lib/crypto
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc:     linux-integrity@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-Date:   Fri, 04 Aug 2023 10:24:57 -0400
-In-Reply-To: <ZMzD0q52dbeXNeaM@gondor.apana.org.au>
-References: <ZMzD0q52dbeXNeaM@gondor.apana.org.au>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q__wxrnP4mi1lbFp874iOakc_EXeKV5F
-X-Proofpoint-GUID: WIU3Jjlz9ZZbcpKvUicq7Cb8HkFjAyu7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-04_13,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 impostorscore=0 priorityscore=1501 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
- definitions=main-2308040125
+        Fri, 4 Aug 2023 10:26:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 999F619A4
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Aug 2023 07:26:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 10E7F62049
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Aug 2023 14:26:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C3DC433C8
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Aug 2023 14:26:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691159183;
+        bh=E3e/RrfDh8oIx0OZAQHQ+IDfpwQVMEWdT14roAUdV4Y=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=OCLpdh7eoaScz11goFs38Ng2rtjJ8uzfmOnQpOygNjtun+9bMnKoH4phYDWX16uez
+         cEwhoXE7qL3uSHw+F6qQZusKpKc4KX8Eg9xvUVcGUK98ifBK66kSV+yGQheeDOyd1a
+         ijczwVMBK3ex69WwTknCblUC7NcJ0zOEHy2hitxdrVMR86N4ihKqMfGAWXjxXAtp2z
+         zkkETMsadN400FO2EoH6wIeZMkX7F3RoLU1c4C3LF5DNEF5tyN5yxwm3aiV1B31soX
+         eB8fTzK4Etphyl18h5khS5HxJx3cD6L16J4tJqHVP92rvE7OwkAnvtBfOgi5QAODIS
+         sMCsuFf2cQF2Q==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2b9c66e2e36so27081451fa.1
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Aug 2023 07:26:23 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yx710q93D1KPRDf6OgBNTqZJWIz1JE0Z47hYOv2z0wKErk/1v9U
+        Dg3FpU7unfgAl9L5+JrSgl0mnsBICS88tjr0IQ==
+X-Google-Smtp-Source: AGHT+IGVwA3t/rc+I8YxkRQqV7zrIm/I886EhP+qYvTae2ciEnvfPlYw7WitcST/wmTl7QqZA9FKIl0ERIQIB+2ZgeU=
+X-Received: by 2002:a2e:b5c8:0:b0:2b9:b1fb:5ff4 with SMTP id
+ g8-20020a2eb5c8000000b002b9b1fb5ff4mr667905ljn.21.1691159181464; Fri, 04 Aug
+ 2023 07:26:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <202308042049.8R2tNRoo-lkp@intel.com>
+In-Reply-To: <202308042049.8R2tNRoo-lkp@intel.com>
+From:   Rob Herring <robh@kernel.org>
+Date:   Fri, 4 Aug 2023 08:26:08 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKn3vm_LQ64eo-fgQ09RBPtSH=CdC-u=ezyOQs=kMHmBQ@mail.gmail.com>
+Message-ID: <CAL_JsqKn3vm_LQ64eo-fgQ09RBPtSH=CdC-u=ezyOQs=kMHmBQ@mail.gmail.com>
+Subject: Re: [herbert-cryptodev-2.6:master 83/83] drivers/char/hw_random/xgene-rng.c:110:2:
+ error: call to undeclared function 'writel'; ISO C99 and later do not support
+ implicit function declarations
+To:     kernel test robot <lkp@intel.com>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2023-08-04 at 17:24 +0800, Herbert Xu wrote:
-> As lib/mpi is mostly used by crypto code, move it under lib/crypto
-> so that patches touching it get directed to the right mailing list.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Fri, Aug 4, 2023 at 6:14=E2=80=AFAM kernel test robot <lkp@intel.com> wr=
+ote:
+>
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev=
+-2.6.git master
+> head:   1ce1cd8208ad6060e4fcf6e09068c8954687c127
+> commit: 1ce1cd8208ad6060e4fcf6e09068c8954687c127 [83/83] hwrng: Enable CO=
+MPILE_TEST for more drivers
+> config: s390-randconfig-r015-20230801 (https://download.01.org/0day-ci/ar=
+chive/20230804/202308042049.8R2tNRoo-lkp@intel.com/config)
+> compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git =
+4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+> reproduce: (https://download.01.org/0day-ci/archive/20230804/202308042049=
+.8R2tNRoo-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202308042049.8R2tNRoo-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+> >> drivers/char/hw_random/xgene-rng.c:110:2: error: call to undeclared fu=
+nction 'writel'; ISO C99 and later do not support implicit function declara=
+tions [-Wimplicit-function-declaration]
+>      110 |         writel(fro_val, ctx->csr_base + RNG_FRODETUNE);
+>          |         ^
 
-Thanks, Herbert.
+Looks like my DT header clean-up patch collides with this one. An
+explicit io.h include is needed.
 
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-
+Rob
