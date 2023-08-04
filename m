@@ -2,96 +2,79 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFE7C41513
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 09:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3A7C00528
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Aug 2023 09:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbjHDJgq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Aug 2023 05:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44938 "EHLO
+        id S230179AbjHDJmM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Aug 2023 05:42:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230521AbjHDJgf (ORCPT
+        with ESMTP id S230144AbjHDJmK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Aug 2023 05:36:35 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C4C349E0;
-        Fri,  4 Aug 2023 02:36:32 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qRrDk-003baN-9J; Fri, 04 Aug 2023 17:35:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Aug 2023 17:35:44 +0800
-Date:   Fri, 4 Aug 2023 17:35:44 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Rob Herring <robh@kernel.org>
-Cc:     Olivia Mackall <olivia@selenic.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Broadcom internal kernel review list 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        Avi Fishman <avifishman70@gmail.com>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Tali Perry <tali.perry1@gmail.com>,
-        Patrick Venture <venture@google.com>,
-        Nancy Yuen <yuenn@google.com>,
-        Benjamin Fair <benjaminfair@google.com>,
-        Deepak Saxena <dsaxena@plexity.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, openbmc@lists.ozlabs.org,
-        linuxppc-dev@lists.ozlabs.org,
-        linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v3] hwrng: Explicitly include correct DT includes
-Message-ID: <ZMzGcMJh6TA+V+p5@gondor.apana.org.au>
-References: <20230728134828.3224218-1-robh@kernel.org>
+        Fri, 4 Aug 2023 05:42:10 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B21330EB
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Aug 2023 02:42:09 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 0E78924002A
+        for <linux-crypto@vger.kernel.org>; Fri,  4 Aug 2023 11:42:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+        t=1691142127; bh=Hg8+Ie5zk1+PShUsC8fZxv3X5pNkB2BeLLwMP1rWmCU=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:
+         Content-Transfer-Encoding:From;
+        b=rOyCoJouUzqfpz1lQTwVMzRESTjBh5ZtloRWZTUOBM++GKBubjut+ihoPMF3VUhh/
+         3Wo9oulQ/uVUmC/X3bgzSrGjXGLxN2u36kHRDi91WUZMMngngnm8u/YYguqd8wAT1N
+         3rHl0oOoM3jm3xgCztFoebcbbsKGcy5oXH3GYBRK+JjGPC9QUvB7wH+e6oFikoAj4V
+         3Ra9QvPGtGB72xfxp7hdFlGb6JhoFjF1cOXauMSESJtcY+vukmTYyk5YcCEdkAMD9j
+         jn2/LOpwDNEiISj4yN5ihalN9E2zux4THVesyuI8C0/ZijoyOv3cz6k2apPg137ikO
+         9TC8MbZVEU55Q==
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4RHLMx1w9tz6twV;
+        Fri,  4 Aug 2023 11:42:05 +0200 (CEST)
+From:   Mark O'Donovan <shiftee@posteo.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, ebiggers@google.com,
+        herbert@gondor.apana.org.au, Mark O'Donovan <shiftee@posteo.net>
+Subject: [PATCH RESEND] lib/mpi: avoid null pointer deref in mpi_cmp_ui()
+Date:   Fri,  4 Aug 2023 09:32:18 +0000
+Message-Id: <20230804093218.418276-1-shiftee@posteo.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230728134828.3224218-1-robh@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 28, 2023 at 07:48:27AM -0600, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it was merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-> v3:
->  - Split out hw_random, ipmi and tpm
-> v2:
->  - Fix build for pic32-rng.c dropping of_match_ptr()
-> ---
->  drivers/char/hw_random/atmel-rng.c     | 2 +-
->  drivers/char/hw_random/bcm2835-rng.c   | 3 +--
->  drivers/char/hw_random/ingenic-trng.c  | 2 +-
->  drivers/char/hw_random/iproc-rng200.c  | 3 +--
->  drivers/char/hw_random/npcm-rng.c      | 3 +--
->  drivers/char/hw_random/omap-rng.c      | 2 --
->  drivers/char/hw_random/omap3-rom-rng.c | 1 -
->  drivers/char/hw_random/pasemi-rng.c    | 3 +--
->  drivers/char/hw_random/pic32-rng.c     | 5 ++---
->  drivers/char/hw_random/stm32-rng.c     | 3 ++-
->  drivers/char/hw_random/xgene-rng.c     | 5 ++---
->  drivers/char/hw_random/xiphera-trng.c  | 1 -
->  12 files changed, 12 insertions(+), 21 deletions(-)
+During NVMeTCP Authentication a controller can trigger a kernel
+oops by specifying the 8192 bit Diffie Hellman group and passing
+a correctly sized, but zeroed Diffie Hellamn value.
+mpi_cmp_ui() was detecting this if the second parameter was 0,
+but 1 is passed from dh_is_pubkey_valid(). This causes the null
+pointer u->d to be dereferenced towards the end of mpi_cmp_ui()
 
-Patch applied.  Thanks.
+Signed-off-by: Mark O'Donovan <shiftee@posteo.net>
+---
+ lib/mpi/mpi-cmp.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/lib/mpi/mpi-cmp.c b/lib/mpi/mpi-cmp.c
+index c4cfa3ff0581..0835b6213235 100644
+--- a/lib/mpi/mpi-cmp.c
++++ b/lib/mpi/mpi-cmp.c
+@@ -25,8 +25,12 @@ int mpi_cmp_ui(MPI u, unsigned long v)
+ 	mpi_limb_t limb = v;
+ 
+ 	mpi_normalize(u);
+-	if (!u->nlimbs && !limb)
+-		return 0;
++	if (u->nlimbs == 0) {
++		if (v == 0)
++			return 0;
++		else
++			return -1;
++	}
+ 	if (u->sign)
+ 		return -1;
+ 	if (u->nlimbs > 1)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.2
+
