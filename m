@@ -2,98 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE65C001DB
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Aug 2023 13:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71036C00528
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Aug 2023 19:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbjHENE0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Aug 2023 09:04:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38610 "EHLO
+        id S230382AbjHFT3p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 6 Aug 2023 15:29:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjHENEZ (ORCPT
+        with ESMTP id S229436AbjHFT3o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Aug 2023 09:04:25 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4632CE70;
-        Sat,  5 Aug 2023 06:04:24 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qSGx9-0006Nn-V8; Sat, 05 Aug 2023 15:04:20 +0200
-Message-ID: <0ca063c6-eaa2-0123-21cb-65d4a33550f4@leemhuis.info>
-Date:   Sat, 5 Aug 2023 15:04:19 +0200
+        Sun, 6 Aug 2023 15:29:44 -0400
+X-Greylist: delayed 605 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Aug 2023 12:29:42 PDT
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [IPv6:2603:c020:1:bd00::1:3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC43E1719
+        for <linux-crypto@vger.kernel.org>; Sun,  6 Aug 2023 12:29:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+        t=1691349577; bh=4o2p4GOxYIDvcvcYKzRsf4b2twXDZVXQo9TkvKb93Hw=;
+        h=From:To:Cc:Subject:Date;
+        b=brZhzRPSTKkXezRyHNFTGRIUMb4+u8CR5LbLcuPfSaAjytirXNE1aWW84KwRkrCe4
+         G1kGqVno87CuosSPH8f9axEBekOAQoxQOxlmGzwNGSyaWZzpZJjuavMiP5GvsUNUld
+         2WX9vP+G28i+CveO7st853GQXT1CKHcxPIp3g9lXRFdL6zb/aM3ErCSD8KlfcjYYxa
+         IwpRVTw9onyUO/jjOItnaQeyiEVL4ESnwg9Uqr8HwYYwna2MlvNzz7D5+f/QxtS0Bo
+         BH2TNt5mW1vvKYnV0gVlZ2lRObgRVgBgf02z0G0snFgaWrG7ZaUrcLAhw+9W541nd7
+         RDWKwcNoEwbhw==
+From:   Joachim Vandersmissen <git@jvdsn.com>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
+        Joachim Vandersmissen <git@jvdsn.com>
+Subject: [PATCH] Add clarifying comments to Jitter Entropy RCT cutoff values.
+Date:   Sun,  6 Aug 2023 14:19:03 -0500
+Message-ID: <20230806191903.83423-1-git@jvdsn.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: [PATCH] crypto: caam - adjust RNG timing to support more devices
-Content-Language: en-US, de-DE
-To:     Bastian Krause <bst@pengutronix.de>, meenakshi.aggarwal@nxp.com,
-        horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
-        gaurav.jain@nxp.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Victoria Milhoan <vicki.milhoan@freescale.com>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        Vipul Kumar <vipul_kumar@mentor.com>, kernel@pengutronix.de,
-        Linux kernel regressions list <regressions@lists.linux.dev>
-References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
- <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
-From:   "Linux regression tracking #adding (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-In-Reply-To: <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691240664;c7d254f9;
-X-HE-SMSGID: 1qSGx9-0006Nn-V8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[CCing the regression list, as it should be in the loop for regressions:
-https://docs.kernel.org/admin-guide/reporting-regressions.html]
+The RCT cutoff values are correct, but they don't exactly match the ones
+one would expect when computing them using the formula in SP800-90B. This
+discrepancy is due to the fact that the Jitter Entropy RCT starts at 1. To
+avoid any confusion by future reviewers, add some comments and explicitly
+subtract 1 from the "correct" cutoff values in the definitions.
 
-[TLDR: I'm adding this report to the list of tracked Linux kernel
-regressions; the text you find below is based on a few templates
-paragraphs you might have encountered already in similar form.
-See link in footer if these mails annoy you.]
+Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+---
+ crypto/jitterentropy.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-On 17.07.23 14:43, Bastian Krause wrote:
-> On 6/12/23 10:26, meenakshi.aggarwal@nxp.com wrote:
->> From: Victoria Milhoan <vicki.milhoan@freescale.com>
->>
->> Adjust RNG timing parameters to support more i.MX6 devices.
->>
->> Signed-off-by: Victoria Milhoan <vicki.milhoan@freescale.com>
->> Signed-off-by: Dan Douglass <dan.douglass@nxp.com>
->> Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
->> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
->> ---
->>   drivers/crypto/caam/ctrl.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> This patch seems to breaks CAAM RNG instantiation on an i.MX8MM at my end:
-> [...]
-
-Thanks for the report. I see that people are working on it already. But
-to be sure the issue doesn't fall through the cracks unnoticed, I'm
-adding it to regzbot, the Linux kernel regression tracking bot:
-
-#regzbot ^introduced ef492d08030
-#regzbot title crypto: broke CAAM RNG instantiation on an i.MX8MM
-#regzbot ignore-activity
-
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply and tell me -- ideally
-while also telling regzbot about it, as explained by the page listed in
-the footer of this mail.
-
-Developers: When fixing the issue, remember to add 'Link:' tags pointing
-to the report (the parent of this mail). See page linked in footer for
-details.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index c7d7f2caa779..fe9c233ec769 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -89,10 +89,14 @@ struct rand_data {
+ 	unsigned int rct_count;			/* Number of stuck values */
+ 
+ 	/* Intermittent health test failure threshold of 2^-30 */
+-#define JENT_RCT_CUTOFF		30	/* Taken from SP800-90B sec 4.4.1 */
+-#define JENT_APT_CUTOFF		325	/* Taken from SP800-90B sec 4.4.2 */
++	/* From an SP800-90B perspective, this RCT cutoff value is equal to 31. */
++	/* However, our RCT implementation starts at 1, so we subtract 1 here. */
++#define JENT_RCT_CUTOFF		(31 - 1)	/* Taken from SP800-90B sec 4.4.1 */
++#define JENT_APT_CUTOFF		325			/* Taken from SP800-90B sec 4.4.2 */
+ 	/* Permanent health test failure threshold of 2^-60 */
+-#define JENT_RCT_CUTOFF_PERMANENT	60
++	/* From an SP800-90B perspective, this RCT cutoff value is equal to 61. */
++	/* However, our RCT implementation starts at 1, so we subtract 1 here. */
++#define JENT_RCT_CUTOFF_PERMANENT	(61 - 1)
+ #define JENT_APT_CUTOFF_PERMANENT	355
+ #define JENT_APT_WINDOW_SIZE	512	/* Data window size */
+ 	/* LSB of time stamp to process */
+-- 
+2.41.0
 
