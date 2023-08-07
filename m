@@ -2,170 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38554EB64DD
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Aug 2023 12:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6CBC001DB
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Aug 2023 13:06:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231204AbjHGMFB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Aug 2023 08:05:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41416 "EHLO
+        id S233792AbjHGNG3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Aug 2023 09:06:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233206AbjHGME7 (ORCPT
+        with ESMTP id S229894AbjHGNG1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Aug 2023 08:04:59 -0400
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EFD1BF3;
-        Mon,  7 Aug 2023 05:04:38 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailout.west.internal (Postfix) with ESMTP id 01489320095B;
-        Mon,  7 Aug 2023 08:04:27 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Mon, 07 Aug 2023 08:04:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1691409867; x=1691496267; bh=4q
-        R2S2MtVT1gufffbhUzZeedkipKDGuTgchxc/0LCac=; b=QlwvjflpzuAEvaxUPL
-        +xZACfpn+GmIuZBxQGWdiykq/If49cEKM3odstW87to7HaMsjBdJj/n7VaWROGQ7
-        TUoPbXbrVHQjWQDlF0oMsDdBg0vGp69LpEU2E5b/PTBRSEA3UDM2BB9jvoQgkPUb
-        aG1M234zfAj6O0RII4crLzOysHHC/q4JalH1LARDz5k4fhwPNI+pMSKLN8jQ3vp9
-        IimMQPpcCqQAJkjXQhoHBdTSrhSu+jC1372MDfz/Jo5c8BfdibO7jS5zSj4U9ay5
-        kli2ojMD7diVeG5rQKj6CVyedZePp32L+4H9dgUgkSM8QmCjqs1IBr4Jn1hButSA
-        hSnw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1691409867; x=1691496267; bh=4qR2S2MtVT1gu
-        fffbhUzZeedkipKDGuTgchxc/0LCac=; b=Qk4VLf08hmFsYsFFSdEgCtC7I+HwG
-        lshWiDjV7R/mJbnTfX0SQsva2CiqE+cEiFnmQA/KGAyT43veeaCLTxzSgvyA8NIF
-        Mj+TnNTKt6YCVhIreek36gUKPWNVp3jb72fr589LKsc8XiAr220AoFaMroc6v3dh
-        138JWbOavi65y2guLY9jjx1OO0VRNQu/R+tim0kEHjwjvjLiEjSNJIlhYJ3GiBFe
-        4cbEwkSEPLUNMrm19SqARBI2+WyhNAT7mm4kz8+bE3TIcCukylVga4O8FGxn8VLV
-        2P1u0BO1PpD6XAdTQiDGrGyslDPhu5yxG4EIKWDAgvIXWgtKIFXeA7H6A==
-X-ME-Sender: <xms:yt3QZPbSU21E0WaikpEfNTThLwrot25PH7X8Zdm2-CFE9aBleETSFA>
-    <xme:yt3QZOby9_LQfDmnq9s07tSc9vZvsvzfHW8ieJIvsOgB97dAQMfPg-10B41NS-ha-
-    5NOnxbJCVBSHud3k9Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrledtgdegiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpefgtedtvedufefgffetgefgheefudehteeggffgheeukeevffdvfeeifeevjeef
-    ieenucffohhmrghinhepphgrshhtvggsihhnrdgtohhmpdehqdhrtgdurdhinhenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghr
-    nhgusgdruggv
-X-ME-Proxy: <xmx:yt3QZB9oNY-80EfHEonmjj-pF7oVazaVp_IB7wIdNiWMWPmkRrw_JQ>
-    <xmx:yt3QZFqbwBhBauYc2rr3TgBtyrjoG5FYvT5AQCfiooliZlLcNY6yLA>
-    <xmx:yt3QZKrF0BQTZoXLt82IhA1hQ8jObDeiYHBkEk6Q-zLT7-002wV46A>
-    <xmx:y93QZHRpo1HxVlPVMDZ8ROUD0G1BtbAIEzRhPivHBWWr2XyzJR6vBw>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 27325B60089; Mon,  7 Aug 2023 08:04:26 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-624-g7714e4406d-fm-20230801.001-g7714e440
-Mime-Version: 1.0
-Message-Id: <d9184ad7-7d34-45bf-81e3-db053bf7425c@app.fastmail.com>
-In-Reply-To: <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
-References: <20230724135327.1173309-1-arnd@kernel.org>
- <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
-Date:   Mon, 07 Aug 2023 14:04:05 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Arnd Bergmann" <arnd@kernel.org>
-Cc:     "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
-        "Ryan Wanner" <Ryan.Wanner@microchip.com>,
-        "Yangtao Li" <frank.li@vivo.com>, linux-kernel@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        "Sergiu Moga" <sergiu.moga@microchip.com>,
-        "Ayush Sawal" <ayush.sawal@chelsio.com>,
-        "Gaosheng Cui" <cuigaosheng1@huawei.com>,
-        "Claudiu Beznea" <claudiu.beznea@microchip.com>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        "Kees Cook" <keescook@chromium.org>
-Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
+        Mon, 7 Aug 2023 09:06:27 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6AA99;
+        Mon,  7 Aug 2023 06:06:25 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id B302E100009;
+        Mon,  7 Aug 2023 16:06:21 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru B302E100009
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1691413581;
+        bh=KKKzrKIwXHkSy5iweyJO5KiiQOThLktg97Wb/xfwR1w=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=lSeOE25frMru7IO0AjXLUrVLKM/he/9NAK+9H7ty3BMTctNhBOwiYwug1/4cQosve
+         uZfRDPk58vnznTrKhFxlyXnYOF/38dP8CBlo9Gf0MGiWvWYVNKWnxD864viGfTgvrZ
+         TyhwamT6HRLa7lKNZLXYn3YhLIcfN48O0zC6/C6iWb0YDPwYSxbkRUv4dSLetO6cEI
+         eP9BRTuI2yf3Ftpfx3Fi7JzFzN1wvZ+TjXSVg16GpULHN3P0qnI10Bmvb9FIxgk+KJ
+         zj9YLi58R1jifolDD+B/0R6Z2+sR4XoQaCVD5QbMVqarJ5ih/mM5EuCmyoQmqAu8/z
+         ExfvKOxmDNruQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Mon,  7 Aug 2023 16:06:21 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 7 Aug 2023 16:05:55 +0300
+From:   Alexey Romanov <avromanov@sberdevices.ru>
+To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
+        <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <conor@kernel.org>, <khilman@baylibre.com>,
+        <jbrunet@baylibre.com>, <martin.blumenstingl@googlemail.com>,
+        <f.fainelli@gmail.com>, <hkallweit1@gmail.com>, <lists@kaiser.cx>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-amlogic@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
+        Alexey Romanov <avromanov@sberdevices.ru>
+Subject: [PATCH v2 0/3]  Meson S4 HW RNG Support
+Date:   Mon, 7 Aug 2023 16:06:08 +0300
+Message-ID: <20230807130611.63914-1-avromanov@sberdevices.ru>
+X-Mailer: git-send-email 2.33.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179098 [Aug 07 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: AVRomanov@sberdevices.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 526 526 7a6a9b19f6b9b3921b5701490f189af0e0cd5310, {Tracking_from_domain_doesnt_match_to}, sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, {Tracking_white_helo}, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/07 09:29:00 #21554951
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 4, 2023, at 10:16, Herbert Xu wrote:
-> On Mon, Jul 24, 2023 at 03:53:01PM +0200, Arnd Bergmann wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->> 
->> Some configurations with gcc-12 or gcc-13 produce a warning for the source
->> and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
->> overlapping:
->> 
->> In file included from include/linux/string.h:254,
->>                  from drivers/crypto/atmel-sha.c:15:
->> drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
->> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
->>    57 | #define __underlying_memcpy     __builtin_memcpy
->>       |                                 ^
->> include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
->>   648 |         __underlying_##op(p, q, __fortify_size);                        \
->>       |         ^~~~~~~~~~~~~
->> include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
->>   693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
->>       |                          ^~~~~~~~~~~~~~~~~~~~
->> drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
->>  1773 |         memcpy(hmac->opad, hmac->ipad, bs);
->>       |         ^~~~~~
->> 
->> The same thing happens in two more drivers that have the same logic:
->
-> Please send me the configurations which triggers these warnings.
-> As these are false positives, I'd like to enable them only on the
-> configurations where they actually cause a problem.
+Hello!
 
-See https://pastebin.com/raw/ip3tfpJF for a config that triggers this
-on x86 with the chelsio and atmel drivers. The bcm driver is only
-available on arm64, so you won't hit that one here. I also
-see this with allmodconfig, as well as defconfig after enabling
-CONFIG_FORTIFY_SOURCE and the three crypto drivers.
+This patch series adds hwrng support for Amlogic S4-series.
+Now, S4 uses a new random number generation algorithm.
+This changes implemnents new algo and also adds description
+to meson-s4.dtsi.
 
-I see that commit df8fc4e934c12 ("kbuild: Enable -fstrict-flex-arrays=3")
-turned on the strict flex-array behavior that triggers the
-warning, so this did not show up until linux-6.5-rc1.
-In linux-next, I see no other code hit this warning after all
-my other patches for it got merged, regardless strict flex
-arrays.
+V2:
 
-At the moment, -Wrestrict is completely disabled in all builds,
-so you have to add a patch to enable it in the build system,
-this is what I use locally to enable it at the W=1 level,
-though you can probably just replace the cc-disable-warning
-line with a -Wrestrict line.
+- Use readl_relaxed_poll_timeout_atomic() function instead of loop.
+- Use two different functions: meson_rng_read() and meson_s4_rng_read().
+- Fix naming in DT schema (meson-s4-hwrng instead of meson-hwrng-s4).
+- A little code style fixes.
 
-     Arnd
+Alexey Romanov (3):
+  drivers: rng: meson: add support for S4
+  dt-bindings: rng: meson: add meson-rng-s4 compatible
+  arch/arm64: dts: meson-s4: add hwrng node
 
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -49,9 +49,6 @@ KBUILD_CFLAGS += -Wno-pointer-sign
- # globally built with -Wcast-function-type.
- KBUILD_CFLAGS += $(call cc-option, -Wcast-function-type)
- 
--# Another good warning that we'll want to enable eventually
--KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
--
- # The allocators already balk at large sizes, so silence the compiler
- # warnings for bounds checks involving those possible values. While
- # -Wno-alloc-size-larger-than would normally be used here, earlier versions
-@@ -93,6 +90,7 @@ export KBUILD_EXTRA_WARN
- ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
- 
- KBUILD_CFLAGS += -Wextra -Wunused -Wno-unused-parameter
-+KBUILD_CFLAGS += $(call cc-option, -Wrestrict)
- KBUILD_CFLAGS += -Wmissing-format-attribute
- KBUILD_CFLAGS += -Wold-style-definition
- KBUILD_CFLAGS += -Wmissing-include-dirs
-@@ -105,6 +103,7 @@ else
- 
- # Some diagnostics enabled by default are noisy.
- # Suppress them by using -Wno... except for W=1.
-+KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
- KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
- 
- ifdef CONFIG_CC_IS_CLANG
+ .../bindings/rng/amlogic,meson-rng.yaml       |  1 +
+ arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |  5 ++
+ drivers/char/hw_random/meson-rng.c            | 80 ++++++++++++++++++-
+ 3 files changed, 83 insertions(+), 3 deletions(-)
+
+-- 
+2.38.1
 
