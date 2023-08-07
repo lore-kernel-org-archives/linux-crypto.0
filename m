@@ -2,77 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71036C00528
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Aug 2023 19:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB0DC0015E
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Aug 2023 02:23:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230382AbjHFT3p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 6 Aug 2023 15:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55738 "EHLO
+        id S229587AbjHGCXT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 6 Aug 2023 22:23:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjHFT3o (ORCPT
+        with ESMTP id S229459AbjHGCXR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Aug 2023 15:29:44 -0400
-X-Greylist: delayed 605 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Aug 2023 12:29:42 PDT
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [IPv6:2603:c020:1:bd00::1:3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC43E1719
-        for <linux-crypto@vger.kernel.org>; Sun,  6 Aug 2023 12:29:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-        t=1691349577; bh=4o2p4GOxYIDvcvcYKzRsf4b2twXDZVXQo9TkvKb93Hw=;
-        h=From:To:Cc:Subject:Date;
-        b=brZhzRPSTKkXezRyHNFTGRIUMb4+u8CR5LbLcuPfSaAjytirXNE1aWW84KwRkrCe4
-         G1kGqVno87CuosSPH8f9axEBekOAQoxQOxlmGzwNGSyaWZzpZJjuavMiP5GvsUNUld
-         2WX9vP+G28i+CveO7st853GQXT1CKHcxPIp3g9lXRFdL6zb/aM3ErCSD8KlfcjYYxa
-         IwpRVTw9onyUO/jjOItnaQeyiEVL4ESnwg9Uqr8HwYYwna2MlvNzz7D5+f/QxtS0Bo
-         BH2TNt5mW1vvKYnV0gVlZ2lRObgRVgBgf02z0G0snFgaWrG7ZaUrcLAhw+9W541nd7
-         RDWKwcNoEwbhw==
-From:   Joachim Vandersmissen <git@jvdsn.com>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
-        Joachim Vandersmissen <git@jvdsn.com>
-Subject: [PATCH] Add clarifying comments to Jitter Entropy RCT cutoff values.
-Date:   Sun,  6 Aug 2023 14:19:03 -0500
-Message-ID: <20230806191903.83423-1-git@jvdsn.com>
-X-Mailer: git-send-email 2.41.0
+        Sun, 6 Aug 2023 22:23:17 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22FD95;
+        Sun,  6 Aug 2023 19:23:16 -0700 (PDT)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RK0S220BKzVjsm;
+        Mon,  7 Aug 2023 10:21:22 +0800 (CST)
+Received: from [10.67.101.184] (10.67.101.184) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 7 Aug 2023 10:23:13 +0800
+Subject: Re: [PATCH 1/7] crypto: hisilicon/qm - obtain the mailbox
+ configuration at one time
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+References: <20230729125239.25337-1-qianweili@huawei.com>
+ <20230729125239.25337-2-qianweili@huawei.com>
+ <ZMy2LQckr/OtS1ZG@gondor.apana.org.au>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <liulongfang@huawei.com>
+From:   Weili Qian <qianweili@huawei.com>
+Message-ID: <6af919d6-755e-4cc3-794d-2684e58d01fe@huawei.com>
+Date:   Mon, 7 Aug 2023 10:23:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <ZMy2LQckr/OtS1ZG@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.101.184]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The RCT cutoff values are correct, but they don't exactly match the ones
-one would expect when computing them using the formula in SP800-90B. This
-discrepancy is due to the fact that the Jitter Entropy RCT starts at 1. To
-avoid any confusion by future reviewers, add some comments and explicitly
-subtract 1 from the "correct" cutoff values in the definitions.
 
-Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
----
- crypto/jitterentropy.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
-index c7d7f2caa779..fe9c233ec769 100644
---- a/crypto/jitterentropy.c
-+++ b/crypto/jitterentropy.c
-@@ -89,10 +89,14 @@ struct rand_data {
- 	unsigned int rct_count;			/* Number of stuck values */
- 
- 	/* Intermittent health test failure threshold of 2^-30 */
--#define JENT_RCT_CUTOFF		30	/* Taken from SP800-90B sec 4.4.1 */
--#define JENT_APT_CUTOFF		325	/* Taken from SP800-90B sec 4.4.2 */
-+	/* From an SP800-90B perspective, this RCT cutoff value is equal to 31. */
-+	/* However, our RCT implementation starts at 1, so we subtract 1 here. */
-+#define JENT_RCT_CUTOFF		(31 - 1)	/* Taken from SP800-90B sec 4.4.1 */
-+#define JENT_APT_CUTOFF		325			/* Taken from SP800-90B sec 4.4.2 */
- 	/* Permanent health test failure threshold of 2^-60 */
--#define JENT_RCT_CUTOFF_PERMANENT	60
-+	/* From an SP800-90B perspective, this RCT cutoff value is equal to 61. */
-+	/* However, our RCT implementation starts at 1, so we subtract 1 here. */
-+#define JENT_RCT_CUTOFF_PERMANENT	(61 - 1)
- #define JENT_APT_CUTOFF_PERMANENT	355
- #define JENT_APT_WINDOW_SIZE	512	/* Data window size */
- 	/* LSB of time stamp to process */
--- 
-2.41.0
+On 2023/8/4 16:26, Herbert Xu wrote:
+> Your patch description makes no sense to me.  Please explain more
+> clearly why you're replacing generic IO primitives with hand-rolled
+> assembly.
 
+Sorry，I will re-describe the problem that this patch fixes.
+
+Thanks,
+Weili
