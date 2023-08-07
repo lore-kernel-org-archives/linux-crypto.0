@@ -2,133 +2,170 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE76EB64DD
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Aug 2023 11:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38554EB64DD
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Aug 2023 12:05:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232764AbjHGL3J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Aug 2023 07:29:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37274 "EHLO
+        id S231204AbjHGMFB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Aug 2023 08:05:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233264AbjHGL2p (ORCPT
+        with ESMTP id S233206AbjHGME7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Aug 2023 07:28:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8595FEE;
-        Mon,  7 Aug 2023 04:26:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B4F161841;
-        Mon,  7 Aug 2023 11:17:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CEE0C433C9;
-        Mon,  7 Aug 2023 11:16:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691407019;
-        bh=cwBHdp29+KXQfhU6rSZ1ufJNDTKuC3zk0WO2z1hIGTU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ovLaOhv55dh0aszjTH7N+AmnC6NtCKA1MaMN6DtSqOb4+qGiNHGFCd0A00AcqKMyU
-         h40D/SMMZ+e3lTxmoIMos96ZTo6TEtpaNgeLbKi7xHaD81H2V7MNKjGvCrEP1iwMnJ
-         3gzb8cXzdHrNItXddvlAJQBQOM+hn0H4NHOFlKgXhXWwIUUaxz97/Nb3XOrPFG8H7U
-         IAJVqSZfkZQfJHBmhrigpCyMjIW6C5tB6z9P0ojdH3NBqCwqewApHfEdn33S0YXfix
-         CBqdPm/gxqDbUG/GsEHkBz6IydLT/Ob+SsWszlHWftyXOcKh0MQXzKHCHA1qL5P8wo
-         FiG/hRjIkciyw==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Victoria Milhoan <vicki.milhoan@freescale.com>,
-        Franck LENORMAND <franck.lenormand@nxp.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Vipul Kumar <vipul_kumar@mentor.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: caam: fix PM operations definition
-Date:   Mon,  7 Aug 2023 13:16:43 +0200
-Message-Id: <20230807111653.1794160-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Mon, 7 Aug 2023 08:04:59 -0400
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EFD1BF3;
+        Mon,  7 Aug 2023 05:04:38 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.west.internal (Postfix) with ESMTP id 01489320095B;
+        Mon,  7 Aug 2023 08:04:27 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Mon, 07 Aug 2023 08:04:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1691409867; x=1691496267; bh=4q
+        R2S2MtVT1gufffbhUzZeedkipKDGuTgchxc/0LCac=; b=QlwvjflpzuAEvaxUPL
+        +xZACfpn+GmIuZBxQGWdiykq/If49cEKM3odstW87to7HaMsjBdJj/n7VaWROGQ7
+        TUoPbXbrVHQjWQDlF0oMsDdBg0vGp69LpEU2E5b/PTBRSEA3UDM2BB9jvoQgkPUb
+        aG1M234zfAj6O0RII4crLzOysHHC/q4JalH1LARDz5k4fhwPNI+pMSKLN8jQ3vp9
+        IimMQPpcCqQAJkjXQhoHBdTSrhSu+jC1372MDfz/Jo5c8BfdibO7jS5zSj4U9ay5
+        kli2ojMD7diVeG5rQKj6CVyedZePp32L+4H9dgUgkSM8QmCjqs1IBr4Jn1hButSA
+        hSnw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; t=1691409867; x=1691496267; bh=4qR2S2MtVT1gu
+        fffbhUzZeedkipKDGuTgchxc/0LCac=; b=Qk4VLf08hmFsYsFFSdEgCtC7I+HwG
+        lshWiDjV7R/mJbnTfX0SQsva2CiqE+cEiFnmQA/KGAyT43veeaCLTxzSgvyA8NIF
+        Mj+TnNTKt6YCVhIreek36gUKPWNVp3jb72fr589LKsc8XiAr220AoFaMroc6v3dh
+        138JWbOavi65y2guLY9jjx1OO0VRNQu/R+tim0kEHjwjvjLiEjSNJIlhYJ3GiBFe
+        4cbEwkSEPLUNMrm19SqARBI2+WyhNAT7mm4kz8+bE3TIcCukylVga4O8FGxn8VLV
+        2P1u0BO1PpD6XAdTQiDGrGyslDPhu5yxG4EIKWDAgvIXWgtKIFXeA7H6A==
+X-ME-Sender: <xms:yt3QZPbSU21E0WaikpEfNTThLwrot25PH7X8Zdm2-CFE9aBleETSFA>
+    <xme:yt3QZOby9_LQfDmnq9s07tSc9vZvsvzfHW8ieJIvsOgB97dAQMfPg-10B41NS-ha-
+    5NOnxbJCVBSHud3k9Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrledtgdegiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpefgtedtvedufefgffetgefgheefudehteeggffgheeukeevffdvfeeifeevjeef
+    ieenucffohhmrghinhepphgrshhtvggsihhnrdgtohhmpdehqdhrtgdurdhinhenucevlh
+    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghr
+    nhgusgdruggv
+X-ME-Proxy: <xmx:yt3QZB9oNY-80EfHEonmjj-pF7oVazaVp_IB7wIdNiWMWPmkRrw_JQ>
+    <xmx:yt3QZFqbwBhBauYc2rr3TgBtyrjoG5FYvT5AQCfiooliZlLcNY6yLA>
+    <xmx:yt3QZKrF0BQTZoXLt82IhA1hQ8jObDeiYHBkEk6Q-zLT7-002wV46A>
+    <xmx:y93QZHRpo1HxVlPVMDZ8ROUD0G1BtbAIEzRhPivHBWWr2XyzJR6vBw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 27325B60089; Mon,  7 Aug 2023 08:04:26 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-624-g7714e4406d-fm-20230801.001-g7714e440
+Mime-Version: 1.0
+Message-Id: <d9184ad7-7d34-45bf-81e3-db053bf7425c@app.fastmail.com>
+In-Reply-To: <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
+References: <20230724135327.1173309-1-arnd@kernel.org>
+ <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
+Date:   Mon, 07 Aug 2023 14:04:05 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Arnd Bergmann" <arnd@kernel.org>
+Cc:     "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
+        "Ryan Wanner" <Ryan.Wanner@microchip.com>,
+        "Yangtao Li" <frank.li@vivo.com>, linux-kernel@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        "Sergiu Moga" <sergiu.moga@microchip.com>,
+        "Ayush Sawal" <ayush.sawal@chelsio.com>,
+        "Gaosheng Cui" <cuigaosheng1@huawei.com>,
+        "Claudiu Beznea" <claudiu.beznea@microchip.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        "Kees Cook" <keescook@chromium.org>
+Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Fri, Aug 4, 2023, at 10:16, Herbert Xu wrote:
+> On Mon, Jul 24, 2023 at 03:53:01PM +0200, Arnd Bergmann wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> Some configurations with gcc-12 or gcc-13 produce a warning for the source
+>> and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
+>> overlapping:
+>> 
+>> In file included from include/linux/string.h:254,
+>>                  from drivers/crypto/atmel-sha.c:15:
+>> drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
+>> include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
+>>    57 | #define __underlying_memcpy     __builtin_memcpy
+>>       |                                 ^
+>> include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
+>>   648 |         __underlying_##op(p, q, __fortify_size);                        \
+>>       |         ^~~~~~~~~~~~~
+>> include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
+>>   693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+>>       |                          ^~~~~~~~~~~~~~~~~~~~
+>> drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
+>>  1773 |         memcpy(hmac->opad, hmac->ipad, bs);
+>>       |         ^~~~~~
+>> 
+>> The same thing happens in two more drivers that have the same logic:
+>
+> Please send me the configurations which triggers these warnings.
+> As these are false positives, I'd like to enable them only on the
+> configurations where they actually cause a problem.
 
-The newly added PM operations use the deprecated SIMPLE_DEV_PM_OPS() macro,
-causing a warning in some configurations:
+See https://pastebin.com/raw/ip3tfpJF for a config that triggers this
+on x86 with the chelsio and atmel drivers. The bcm driver is only
+available on arm64, so you won't hit that one here. I also
+see this with allmodconfig, as well as defconfig after enabling
+CONFIG_FORTIFY_SOURCE and the three crypto drivers.
 
-drivers/crypto/caam/ctrl.c:828:12: error: 'caam_ctrl_resume' defined but not used [-Werror=unused-function]
-  828 | static int caam_ctrl_resume(struct device *dev)
-      |            ^~~~~~~~~~~~~~~~
-drivers/crypto/caam/ctrl.c:818:12: error: 'caam_ctrl_suspend' defined but not used [-Werror=unused-function]
-  818 | static int caam_ctrl_suspend(struct device *dev)
-      |            ^~~~~~~~~~~~~~~~~
-drivers/crypto/caam/jr.c:732:12: error: 'caam_jr_resume' defined but not used [-Werror=unused-function]
-  732 | static int caam_jr_resume(struct device *dev)
-      |            ^~~~~~~~~~~~~~
-drivers/crypto/caam/jr.c:687:12: error: 'caam_jr_suspend' defined but not used [-Werror=unused-function]
-  687 | static int caam_jr_suspend(struct device *dev)
-      |            ^~~~~~~~~~~~~~~
+I see that commit df8fc4e934c12 ("kbuild: Enable -fstrict-flex-arrays=3")
+turned on the strict flex-array behavior that triggers the
+warning, so this did not show up until linux-6.5-rc1.
+In linux-next, I see no other code hit this warning after all
+my other patches for it got merged, regardless strict flex
+arrays.
 
-Use the normal DEFINE_SIMPLE_DEV_PM_OPS() variant now, and use pm_ptr() to
-completely eliminate the structure in configs without CONFIG_PM.
+At the moment, -Wrestrict is completely disabled in all builds,
+so you have to add a patch to enable it in the build system,
+this is what I use locally to enable it at the W=1 level,
+though you can probably just replace the cc-disable-warning
+line with a -Wrestrict line.
 
-Fixes: 322d74752c28a ("crypto: caam - add power management support")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/caam/ctrl.c | 4 ++--
- drivers/crypto/caam/jr.c   | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+     Arnd
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index a7a4583107f41..2a228a36fa15a 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -841,7 +841,7 @@ static int caam_ctrl_resume(struct device *dev)
- 	return ret;
- }
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -49,9 +49,6 @@ KBUILD_CFLAGS += -Wno-pointer-sign
+ # globally built with -Wcast-function-type.
+ KBUILD_CFLAGS += $(call cc-option, -Wcast-function-type)
  
--static SIMPLE_DEV_PM_OPS(caam_ctrl_pm_ops, caam_ctrl_suspend, caam_ctrl_resume);
-+static DEFINE_SIMPLE_DEV_PM_OPS(caam_ctrl_pm_ops, caam_ctrl_suspend, caam_ctrl_resume);
+-# Another good warning that we'll want to enable eventually
+-KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
+-
+ # The allocators already balk at large sizes, so silence the compiler
+ # warnings for bounds checks involving those possible values. While
+ # -Wno-alloc-size-larger-than would normally be used here, earlier versions
+@@ -93,6 +90,7 @@ export KBUILD_EXTRA_WARN
+ ifneq ($(findstring 1, $(KBUILD_EXTRA_WARN)),)
  
- /* Probe routine for CAAM top (controller) level */
- static int caam_probe(struct platform_device *pdev)
-@@ -1138,7 +1138,7 @@ static struct platform_driver caam_driver = {
- 	.driver = {
- 		.name = "caam",
- 		.of_match_table = caam_match,
--		.pm = &caam_ctrl_pm_ops,
-+		.pm = pm_ptr(&caam_ctrl_pm_ops),
- 	},
- 	.probe       = caam_probe,
- };
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 316180d26f8ae..767fbf052536a 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -794,7 +794,7 @@ static int caam_jr_resume(struct device *dev)
- 	return 0;
- }
+ KBUILD_CFLAGS += -Wextra -Wunused -Wno-unused-parameter
++KBUILD_CFLAGS += $(call cc-option, -Wrestrict)
+ KBUILD_CFLAGS += -Wmissing-format-attribute
+ KBUILD_CFLAGS += -Wold-style-definition
+ KBUILD_CFLAGS += -Wmissing-include-dirs
+@@ -105,6 +103,7 @@ else
  
--static SIMPLE_DEV_PM_OPS(caam_jr_pm_ops, caam_jr_suspend, caam_jr_resume);
-+static DEFINE_SIMPLE_DEV_PM_OPS(caam_jr_pm_ops, caam_jr_suspend, caam_jr_resume);
+ # Some diagnostics enabled by default are noisy.
+ # Suppress them by using -Wno... except for W=1.
++KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
+ KBUILD_CFLAGS += $(call cc-disable-warning, packed-not-aligned)
  
- static const struct of_device_id caam_jr_match[] = {
- 	{
-@@ -811,7 +811,7 @@ static struct platform_driver caam_jr_driver = {
- 	.driver = {
- 		.name = "caam_jr",
- 		.of_match_table = caam_jr_match,
--		.pm = &caam_jr_pm_ops,
-+		.pm = pm_ptr(&caam_jr_pm_ops),
- 	},
- 	.probe       = caam_jr_probe,
- 	.remove      = caam_jr_remove,
--- 
-2.39.2
+ ifdef CONFIG_CC_IS_CLANG
 
