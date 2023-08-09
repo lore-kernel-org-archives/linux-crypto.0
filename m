@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 505EDC04A94
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Aug 2023 11:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CE6EB64DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Aug 2023 11:16:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233068AbjHILFP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Aug 2023 07:05:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33870 "EHLO
+        id S233410AbjHILQC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Aug 2023 07:16:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233071AbjHILFO (ORCPT
+        with ESMTP id S233407AbjHILQC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Aug 2023 07:05:14 -0400
+        Wed, 9 Aug 2023 07:16:02 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF721BFF;
-        Wed,  9 Aug 2023 04:05:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E181B10F3;
+        Wed,  9 Aug 2023 04:16:01 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 69D406309F;
-        Wed,  9 Aug 2023 11:05:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D71CC433C8;
-        Wed,  9 Aug 2023 11:05:12 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7D8526283A;
+        Wed,  9 Aug 2023 11:16:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66084C433C7;
+        Wed,  9 Aug 2023 11:16:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1691579112;
+        s=korg; t=1691579760;
         bh=96sKNmtnIIK64djcwh9/3Dm4kxWk2IB64DUJ1ZVgN8g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=os2fqJN3oEisS1i/HMnOsx7lVfODtTXoQ12ex6i7WyTK1vOluhsxD5lTqTcpFFpOS
-         Ksj+hzmmyB/gSiSwgA8GJfpt1vYgWH1bMTik68xS2l7G3ODvNs68Xft11zdg/1/TvW
-         RWsfAY4W0wonSSWOuOGIGOGz5KNwShq6zJs/Bi2g=
+        b=LcnHYKgGL2rJmh849MfWLBdVcUihFAkjlY0x3q5OQnBZa1JcomKpuRnki694FaAV2
+         E69NtBqiMO5ImoMRwHsTzmvL5yGA/ULsolZtlkDbTiRrq/IyF4qV/o8f4hmzwXJwJz
+         +a+IBxKjmbDkNP3FnCEA1tIIZmssDYaMuW8Up1Ls=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     stable@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -44,12 +44,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Nicholas Piggin <npiggin@gmail.com>,
         Christophe Leroy <christophe.leroy@csgroup.eu>,
         linuxppc-dev@lists.ozlabs.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.14 050/204] crypto: nx - fix build warnings when DEBUG_FS is not enabled
-Date:   Wed,  9 Aug 2023 12:39:48 +0200
-Message-ID: <20230809103644.259113045@linuxfoundation.org>
+Subject: [PATCH 4.19 077/323] crypto: nx - fix build warnings when DEBUG_FS is not enabled
+Date:   Wed,  9 Aug 2023 12:38:35 +0200
+Message-ID: <20230809103701.669183900@linuxfoundation.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230809103642.552405807@linuxfoundation.org>
-References: <20230809103642.552405807@linuxfoundation.org>
+In-Reply-To: <20230809103658.104386911@linuxfoundation.org>
+References: <20230809103658.104386911@linuxfoundation.org>
 User-Agent: quilt/0.67
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
