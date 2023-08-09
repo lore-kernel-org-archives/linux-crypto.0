@@ -2,79 +2,131 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DE8C001DB
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Aug 2023 03:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B1FEEB64DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Aug 2023 07:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbjHIDQp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Aug 2023 23:16:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43388 "EHLO
+        id S229512AbjHIHpU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Aug 2023 03:45:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjHIDQp (ORCPT
+        with ESMTP id S229504AbjHIHpT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Aug 2023 23:16:45 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA8A1BEF
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Aug 2023 20:16:44 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RLFWh5fxyz1hwMV;
-        Wed,  9 Aug 2023 11:13:52 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 9 Aug
- 2023 11:16:42 +0800
-From:   Yue Haibing <yuehaibing@huawei.com>
-To:     <giovanni.cabiddu@intel.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-CC:     <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
-        <yuehaibing@huawei.com>
-Subject: [PATCH -next] crypto: qat - Remove unused function declarations
-Date:   Wed, 9 Aug 2023 11:16:14 +0800
-Message-ID: <20230809031614.9704-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        Wed, 9 Aug 2023 03:45:19 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42011172A
+        for <linux-crypto@vger.kernel.org>; Wed,  9 Aug 2023 00:45:18 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3795L1ge008160;
+        Wed, 9 Aug 2023 09:44:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=nz0H1Z+OBWW1YMb0cFHjQXSIrxZdBeUAIrANTmveQkI=; b=UR
+        Rc7iEG20nYN3g8UCo6wRUif/BuGIWfLp8pg1OUPuMJcQQmBFZJCj/Yu7JdomTuvH
+        f3FMNMGNaWic1Yxr+NPqKRyyIEHGlBUns+oV8WHCIL3XZu1QC6EbK7yKee7Zr2Dr
+        A4CUPdhdsx0UBnDtzwywFuL311Pjh68iQIehTA8gOF0cfSG9D19w3PMPARdNwmeL
+        OkoBHa5tVFooPAvxXzsC077iAzSbcC80U85o88WHju9603wBrkZ5R0D0aWMFhD1d
+        6XOp1SJtTslWknrSbPy+SO8HZya+DitI/DbptG7Jj93cFXPw7pmnGLDkxRuKH8kU
+        Zir/WGSJ+Ikfwd8yzC0w==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sbjfn6yx5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 09 Aug 2023 09:44:52 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id D1A05100061;
+        Wed,  9 Aug 2023 09:44:47 +0200 (CEST)
+Received: from Webmail-eu.st.com (eqndag1node6.st.com [10.75.129.135])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 9463E212FAA;
+        Wed,  9 Aug 2023 09:44:47 +0200 (CEST)
+Received: from [10.201.21.98] (10.201.21.98) by EQNDAG1NODE6.st.com
+ (10.75.129.135) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 9 Aug
+ 2023 09:44:46 +0200
+Message-ID: <f9ddac2f-28c0-1804-a1de-b8c8e9972638@foss.st.com>
+Date:   Wed, 9 Aug 2023 09:44:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.0
+Subject: Re: [PATCH 1/3] crypto: stm32/hash - Properly handle pm_runtime_get
+ failing
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Lionel Debieve <lionel.debieve@foss.st.com>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <kernel@pengutronix.de>
+References: <20230731165456.799784-1-u.kleine-koenig@pengutronix.de>
+ <20230731165456.799784-2-u.kleine-koenig@pengutronix.de>
+From:   Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
+In-Reply-To: <20230731165456.799784-2-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.201.21.98]
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To EQNDAG1NODE6.st.com
+ (10.75.129.135)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-09_06,2023-08-08_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
-declared but never implemented these functions.
+Hello,
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- drivers/crypto/intel/qat/qat_common/adf_common_drv.h | 8 --------
- 1 file changed, 8 deletions(-)
+Thanks for the modification.
+This should be applied for fixes/stable.
+Please add Cc: stable@vger.kernel.org in your commit message.
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index 799a2193d3e5..673b5044c62a 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -58,12 +58,6 @@ int adf_dev_restart(struct adf_accel_dev *accel_dev);
- 
- void adf_devmgr_update_class_index(struct adf_hw_device_data *hw_data);
- void adf_clean_vf_map(bool);
--
--int adf_ctl_dev_register(void);
--void adf_ctl_dev_unregister(void);
--int adf_processes_dev_register(void);
--void adf_processes_dev_unregister(void);
--
- int adf_devmgr_add_dev(struct adf_accel_dev *accel_dev,
- 		       struct adf_accel_dev *pf);
- void adf_devmgr_rm_dev(struct adf_accel_dev *accel_dev,
-@@ -182,8 +176,6 @@ int qat_hal_init_rd_xfer(struct icp_qat_fw_loader_handle *handle,
- int qat_hal_init_nn(struct icp_qat_fw_loader_handle *handle,
- 		    unsigned char ae, unsigned long ctx_mask,
- 		    unsigned short reg_num, unsigned int regdata);
--int qat_hal_wr_lm(struct icp_qat_fw_loader_handle *handle,
--		  unsigned char ae, unsigned short lm_addr, unsigned int value);
- void qat_hal_set_ae_tindex_mode(struct icp_qat_fw_loader_handle *handle,
- 				unsigned char ae, unsigned char mode);
- int qat_uclo_wr_all_uimage(struct icp_qat_fw_loader_handle *handle);
--- 
-2.34.1
+Best regards,
 
+Thomas
+
+On 7/31/23 18:54, Uwe Kleine-König wrote:
+> If pm_runtime_get() (disguised as pm_runtime_resume_and_get()) fails, this
+> means the clk wasn't prepared and enabled. Returning early in this case
+> however is wrong as then the following resource frees are skipped and this
+> is never catched up. So do all the cleanups but clk_disable_unprepare().
+> 
+> Also don't emit a warning, as stm32_hash_runtime_resume() already emitted
+> one.
+> 
+> Note that the return value of stm32_hash_remove() is mostly ignored by
+> the device core. The only effect of returning zero instead of an error
+> value is to suppress another warning in platform_remove(). So return 0
+> even if pm_runtime_resume_and_get() failed.
+> 
+> Fixes: 8b4d566de6a5 ("crypto: stm32/hash - Add power management support")
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>   drivers/crypto/stm32/stm32-hash.c | 7 +++----
+>   1 file changed, 3 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+> index 88a186c3dd78..75d281edae2a 100644
+> --- a/drivers/crypto/stm32/stm32-hash.c
+> +++ b/drivers/crypto/stm32/stm32-hash.c
+> @@ -2121,9 +2121,7 @@ static int stm32_hash_remove(struct platform_device *pdev)
+>   	if (!hdev)
+>   		return -ENODEV;
+>   
+> -	ret = pm_runtime_resume_and_get(hdev->dev);
+> -	if (ret < 0)
+> -		return ret;
+> +	ret = pm_runtime_get_sync(hdev->dev);
+>   
+>   	stm32_hash_unregister_algs(hdev);
+>   
+> @@ -2139,7 +2137,8 @@ static int stm32_hash_remove(struct platform_device *pdev)
+>   	pm_runtime_disable(hdev->dev);
+>   	pm_runtime_put_noidle(hdev->dev);
+>   
+> -	clk_disable_unprepare(hdev->clk);
+> +	if (ret >= 0)
+> +		clk_disable_unprepare(hdev->clk);
+>   
+>   	return 0;
+>   }
