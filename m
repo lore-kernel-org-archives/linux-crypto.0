@@ -2,59 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AA0C0015E
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Aug 2023 08:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A038C001DE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Aug 2023 10:58:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230501AbjHII0t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Aug 2023 04:26:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36260 "EHLO
+        id S232762AbjHIK6e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Aug 2023 06:58:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbjHII0t (ORCPT
+        with ESMTP id S232788AbjHIK6e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Aug 2023 04:26:49 -0400
-X-Greylist: delayed 401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Aug 2023 01:26:48 PDT
-Received: from mail.profitpathwaygo.com (mail.profitpathwaygo.com [141.94.21.238])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D5B10FF
-        for <linux-crypto@vger.kernel.org>; Wed,  9 Aug 2023 01:26:48 -0700 (PDT)
-Received: by mail.profitpathwaygo.com (Postfix, from userid 1002)
-        id 80B514E363; Wed,  9 Aug 2023 08:16:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=profitpathwaygo.com;
-        s=mail; t=1691569113;
-        bh=qp3Ofokho6Ql+WtI8ZPVilyHYhskXL7fod7u9CWs8W4=;
-        h=Date:From:To:Subject:From;
-        b=PMRay9L2wq9G9ZtVtRZdNn5MbUR+6K4jtAMcn31JMiG08koNZBCKXwwu8Dv+cXYEL
-         UdrQA6wLbSdXHZl8hhpf7TBPMwO8K2ONR7Z02cNejrV6mysv0Kxmh80YmbseJP/6++
-         tReWcsYL46O30UQIg9piSlugtjCP3Vq2P3NiuEGufYRzQFGTOrS5zKKlqfRarmbWKv
-         ELlO8+A73JsUNHUFYSJDLbIxcdWnQ3FZtsnRS4B8vXlOfF5Jw7iMXsuXYNxOT5y6fp
-         VEHpgwJUwSBu0Kwqh+XNVwIjORyXVlprZ4lkJ5FQx/RwnK7Ouh+yAN40DYHfZv8ErL
-         QxiI/3esuwIgw==
-Received: by mail.profitpathwaygo.com for <linux-crypto@vger.kernel.org>; Wed,  9 Aug 2023 08:16:11 GMT
-Message-ID: <20230809064500-0.1.10.4szd.0.bhvrvo26jl@profitpathwaygo.com>
-Date:   Wed,  9 Aug 2023 08:16:11 GMT
-From:   "Adam Charachuta" <adam.charachuta@profitpathwaygo.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania_?=
-X-Mailer: mail.profitpathwaygo.com
+        Wed, 9 Aug 2023 06:58:34 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFAE1736
+        for <linux-crypto@vger.kernel.org>; Wed,  9 Aug 2023 03:58:33 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qTgtW-0006mz-0e; Wed, 09 Aug 2023 12:58:26 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qTgtQ-002Btt-Vi; Wed, 09 Aug 2023 12:58:20 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qTgtQ-00Benj-6W; Wed, 09 Aug 2023 12:58:20 +0200
+Date:   Wed, 9 Aug 2023 12:58:20 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Thomas BOURGOIN <thomas.bourgoin@foss.st.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        kernel@pengutronix.de, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 1/3] crypto: stm32/hash - Properly handle pm_runtime_get
+ failing
+Message-ID: <20230809105820.5yp3jzv4spe47qb4@pengutronix.de>
+References: <20230731165456.799784-1-u.kleine-koenig@pengutronix.de>
+ <20230731165456.799784-2-u.kleine-koenig@pengutronix.de>
+ <f9ddac2f-28c0-1804-a1de-b8c8e9972638@foss.st.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="qnbrkttfbi4cwbot"
+Content-Disposition: inline
+In-Reply-To: <f9ddac2f-28c0-1804-a1de-b8c8e9972638@foss.st.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+--qnbrkttfbi4cwbot
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+Hello,
 
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
+On Wed, Aug 09, 2023 at 09:44:30AM +0200, Thomas BOURGOIN wrote:
+> Thanks for the modification.
+> This should be applied for fixes/stable.
+> Please add Cc: stable@vger.kernel.org in your commit message.
 
+I usually let maintainers decide if they want this Cc line and in
+practise the Fixes: line seems to be enough for the stable team to pick
+up a commit for backporting.
 
-Pozdrawiam serdecznie
-Adam Charachuta
+If your mail means I should resend the patch just to add the Cc: line,
+please tell me again. Should I resent patches 2 and 3 then, too?
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--qnbrkttfbi4cwbot
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmTTcUsACgkQj4D7WH0S
+/k4PvAf+NtyM4693UO7qpqnYA6x60QAg/Awzi4N9QfoT8iWI23vi8dSDyXDE5+iy
+ReRoSY5fCiP+cJA7NBIx/Vnt7PRvfwXHYqNffsXFkhc9fg4cOZ4iAKtohB5ZkxXz
++YknmR6hUmJVfSvKOacTAGVWCt7axVXCBO2srn+QAN2QdYB8e1zSLE9Eb9jtIMq8
+tm/akmS6Wqx1qcba2lrVtLmnSbp9leBtCWX9A8nZzHKD/mTjsAiASu4mvL2iLiPa
+eJNSmmklJ2/nRFty2vRA46dNQaGEdbvRFqHeyKlsmh39MBQqUK4s8RgVziNzAUa+
+ixIGXyq03yhMu2e3EOpTuV+yw1713Q==
+=eSvF
+-----END PGP SIGNATURE-----
+
+--qnbrkttfbi4cwbot--
