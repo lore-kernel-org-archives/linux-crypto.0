@@ -2,52 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A550C04FE0
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Aug 2023 19:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C919C05051
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Aug 2023 19:29:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233486AbjHJT3w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Aug 2023 15:29:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
+        id S233757AbjHJT3y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Aug 2023 15:29:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236372AbjHJT3v (ORCPT
+        with ESMTP id S236471AbjHJT3x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2023 15:29:51 -0400
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0819126A0;
-        Thu, 10 Aug 2023 12:29:50 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37AJTadt001587;
-        Thu, 10 Aug 2023 14:29:36 -0500
+        Thu, 10 Aug 2023 15:29:53 -0400
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20411728;
+        Thu, 10 Aug 2023 12:29:51 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37AJTXEl014293;
+        Thu, 10 Aug 2023 14:29:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1691695776;
-        bh=FiJCR7yJLEMZTDpeB2yH3hbmht/9ZbSgRee+Gj9dwVo=;
+        s=ti-com-17Q1; t=1691695773;
+        bh=lGqX1kNuw/bIIn91AVvS6yetet/Ki0uuXEkiyMlh1QQ=;
         h=From:Date:Subject:References:In-Reply-To:To:CC;
-        b=uFyHWTKLbdkGiEi/0UY0hJctRuoYzzJd3Nq44xV6Nyh1pG711awSDBiDN3Y9x6NZg
-         5dIleBOL2KcHCvXG88DFMESmfrFYLpQauUQb3RnqNNIvruBLKUmVG9W114XwpzDejz
-         +bbLc0sLHjYG5doy16E9ojh68OQvf+8ATzmBihJM=
-Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37AJTaE9109005
+        b=kSFKPKLp3FORdxg/QQuG2GWduJQOmll0is5Q11L652oWoNzjk9tDjQR+y3yLUI1xj
+         NMoCGoKBXNH1bkS4va0q96hDhk8cniFO2FRsXDOEPJAWOZ+e8JDeifJPuinkyjvBrM
+         m0eg9aErIQ4+/ZMrSpi4NEs4nO4cbPGFklk8UXnI=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37AJTXX2008397
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Aug 2023 14:29:36 -0500
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+        Thu, 10 Aug 2023 14:29:33 -0500
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 10
- Aug 2023 14:29:36 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ Aug 2023 14:29:33 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 10 Aug 2023 14:29:36 -0500
+ Frontend Transport; Thu, 10 Aug 2023 14:29:33 -0500
 Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37AJTZI0021444;
-        Thu, 10 Aug 2023 14:29:35 -0500
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37AJTWZ0021412;
+        Thu, 10 Aug 2023 14:29:33 -0500
 From:   Kamlesh Gurudasani <kamlesh@ti.com>
-Date:   Fri, 11 Aug 2023 00:58:52 +0530
-Subject: [PATCH v2 5/6] arm64: dts: ti: k3-am62: Add dt node, cbass_main
- ranges for MCRC64
+Date:   Fri, 11 Aug 2023 00:58:50 +0530
+Subject: [PATCH v2 3/6] dt-bindings: crypto: Add Texas Instruments MCRC64
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20230719-mcrc-upstream-v2-5-4152b987e4c2@ti.com>
+Message-ID: <20230719-mcrc-upstream-v2-3-4152b987e4c2@ti.com>
 References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
 In-Reply-To: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -67,11 +66,11 @@ CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         Kamlesh Gurudasani <kamlesh@ti.com>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1691695767; l=1736;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1691695767; l=2556;
  i=kamlesh@ti.com; s=20230614; h=from:subject:message-id;
- bh=PQ29srS8CIAyTw2SOnS1apCZNWSsj0TeJse9EG6sII0=;
- b=e3NaQlbAGavNqr96O6W3XUWbMY4N2girHX5Bj4vY7jvMXMwQScUHclwVFvZeKRBBzOFxgrhgV
- sNZBdP75OMcDyWI6dCEhtO1WxlOMbpWSkaE7llveTIcZyVJmMHALvaB
+ bh=/LLW6Kt8hKHcCDBDMh4ZLatVHlvY99JTcrS11iXF92Q=;
+ b=QAiGHrrUXCFcvkOJiB1SjSy/6++4XYHeiT8zb0bOyW48+JCWXp80jbX3m93QwhnqWPI9h7hI7
+ IXdAfwnI9YdBIHWUapCYudmteTuxXBb8HzKSCJxrdlKb8rTf3TjB1Aq
 X-Developer-Key: i=kamlesh@ti.com; a=ed25519;
  pk=db9XKPVWDGJVqj2jDqgnPQd6uQf3GZ3oaQa4bq1odGo=
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
@@ -79,45 +78,94 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the address space for MCRC64 to the ranges property of the
-cbass_main node and add dt node for MCRC64 engine
+Add binding for Texas Instruments MCRC64
+
+MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
+according to the ISO 3309 standard.
+
+The ISO 3309 64-bit CRC model parameters are as follows:
+    Generator Polynomial: x^64 + x^4 + x^3 + x + 1
+    Polynomial Value: 0x000000000000001B
+    Initial value: 0x0000000000000000
+    Reflected Input: False
+    Reflected Output: False
+    Xor Final: 0x0000000000000000
 
 Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- arch/arm64/boot/dts/ti/k3-am62-main.dtsi | 7 +++++++
- arch/arm64/boot/dts/ti/k3-am62.dtsi      | 1 +
- 2 files changed, 8 insertions(+)
+ Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS                                             |  5 +++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-index 5f19ef46d44c..84a7e7d43d02 100644
---- a/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62-main.dtsi
-@@ -201,6 +201,13 @@ crypto: crypto@40900000 {
- 		dma-names = "tx", "rx1", "rx2";
- 	};
- 
-+	crc: crc@30300000 {
-+		compatible = "ti,am62-mcrc64";
-+		reg = <0x00 0x30300000 0x00 0x1000>;
-+		clocks = <&k3_clks 116 0>;
-+		power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
-+	};
+diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+new file mode 100644
+index 000000000000..38bc7efebd68
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
+@@ -0,0 +1,47 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/ti,mcrc64.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- 	secure_proxy_sa3: mailbox@43600000 {
- 		compatible = "ti,am654-secure-proxy";
- 		#mbox-cells = <1>;
-diff --git a/arch/arm64/boot/dts/ti/k3-am62.dtsi b/arch/arm64/boot/dts/ti/k3-am62.dtsi
-index 5e72c445f37a..7acd8009aa28 100644
---- a/arch/arm64/boot/dts/ti/k3-am62.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62.dtsi
-@@ -65,6 +65,7 @@ cbass_main: bus@f0000 {
- 			 <0x00 0x30040000 0x00 0x30040000 0x00 0x00080000>, /* PRUSS-M */
- 			 <0x00 0x30101000 0x00 0x30101000 0x00 0x00010100>, /* CSI window */
- 			 <0x00 0x30200000 0x00 0x30200000 0x00 0x00010000>, /* DSS */
-+			 <0x00 0x30300000 0x00 0x30300000 0x00 0x00001000>, /* MCRC64 */
- 			 <0x00 0x31000000 0x00 0x31000000 0x00 0x00050000>, /* USB0 DWC3 Core window */
- 			 <0x00 0x31100000 0x00 0x31100000 0x00 0x00050000>, /* USB1 DWC3 Core window */
- 			 <0x00 0x40900000 0x00 0x40900000 0x00 0x00030000>, /* SA3UL */
++title: Texas Instruments MCRC64
++
++description: The MCRC64 engine calculates 64-bit cyclic redundancy checks
++  (CRC) according to the ISO 3309 standard.
++
++maintainers:
++  - Kamlesh Gurudasani <kamlesh@ti.com>
++
++properties:
++  compatible:
++    const: ti,am62-mcrc64
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  power-domains:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - power-domains
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/soc/ti,sci_pm_domain.h>
++
++    crc@30300000 {
++      compatible = "ti,am62-mcrc64";
++      reg = <0x30300000 0x1000>;
++      clocks = <&k3_clks 116 0>;
++      power-domains = <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
++    };
++
++...
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 02a3192195af..66b51f43d196 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21481,6 +21481,11 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/iio/adc/ti,lmp92064.yaml
+ F:	drivers/iio/adc/ti-lmp92064.c
+ 
++TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
++M:	Kamlesh Gurudasani <kamlesh@ti.com>
++S:	Maintained
++F:	Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
++
+ TI PCM3060 ASoC CODEC DRIVER
+ M:	Kirill Marinushkin <kmarinushkin@birdec.com>
+ L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
 
 -- 
 2.34.1
