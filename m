@@ -2,129 +2,147 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042A9C001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 13:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8044BC001B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 13:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230217AbjHKNi1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 09:38:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40744 "EHLO
+        id S234343AbjHKNrN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 09:47:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbjHKNi1 (ORCPT
+        with ESMTP id S229543AbjHKNrN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 09:38:27 -0400
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB022ED;
-        Fri, 11 Aug 2023 06:38:25 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailout.nyi.internal (Postfix) with ESMTP id 386155C0099;
-        Fri, 11 Aug 2023 09:38:22 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Fri, 11 Aug 2023 09:38:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1691761102; x=1691847502; bh=FS
-        1HpjgV5XWBmUntM3Uxn3bym8vCanuc3UC0yqx/KW8=; b=PjWFWT7UYzW6ZfAj/J
-        +Fv0hoZeXq1YPNcyENya6gIijy0/PaUqhYLzhnJOSUDkE516eFZoBAGizkzTJnfy
-        lEx7X0vVkxfxe042X95w84QlYp7eTFHTyQFdsBEBUU3hOzJt6sdD1kE579iQkcze
-        V35ou5vqgW8N59ufIH4nyi56/4Hp6pq9c9R5LOksMs8XiO1cebkdaUbzqnlgVwff
-        AF+N9/nHH8zdURpPexWi49qaOUx6xfCO1xkEN3EhLgVb43OTJcKQkc3s00dvsi7n
-        /JRzdsAEaEpopFdezS8gO0767iVhG+dHmKjVBj/9D3wFbJU5O3TFNWpCg+KMtUpF
-        JDIg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1691761102; x=1691847502; bh=FS1HpjgV5XWBm
-        UntM3Uxn3bym8vCanuc3UC0yqx/KW8=; b=TQQbf3Mu01WkJwzGpHKzbchWQj16P
-        I+klZ0U7DlPXKh1YREsN8OgtsU+H/J/Yg0yorNWJQnwHTokM4qgHBJA4sy1tpY3R
-        FMtfBrqNyGSawXBMSkJ2YpW9rAZuy4cs+ba0XntzIji73wPOU4WJiSbngxU2zgNM
-        nMvvxWjWD36dbDxvhWb2RgcpvIB+nR84VsbzhUP1GZSdehRyyo0395Pi3urK4f7F
-        w8meh4ysQ7QYZvrB5721d+sd6euOXKlkCZzVlq5lOLQ+Itx8DH5dDk/9beIOflAK
-        wt61ohFhF7UC5YmboL4WcaCWyaTIZV+0dJys/3D4GxLbr3gGoeEwmpG9w==
-X-ME-Sender: <xms:zDnWZP0mnJDANDj0MfLmJ_fpTZfDXH8Iasyp5io9ZiW9qaUur57opQ>
-    <xme:zDnWZOEDtnxKvb-paTYhrkPb44MfK-8NQRhnfKXNQlPI0UhR_gUxvkHFqdaCbfr9s
-    25maaUJnAKoGiVCMYs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrleekgdeihecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:zDnWZP4kyEkgMmwOZ6cOHuKg2CKyjQ5cpLotp9x43ll21PF8cDomjA>
-    <xmx:zDnWZE1gf95ogYQrj7s3dqr6BfyQU4fqHV2Te9uDldrl3bulhwqxCw>
-    <xmx:zDnWZCHzAPbr4aoW0j33YTfeeL21WZw0S1SgW5sJp8nDgkSjv_y7cw>
-    <xmx:zjnWZPceAKh_hczubs1YVb754fJvuV5IXdK3We5yN3avfb9RhFYtMQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id AB450B60089; Fri, 11 Aug 2023 09:38:20 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-624-g7714e4406d-fm-20230801.001-g7714e440
-Mime-Version: 1.0
-Message-Id: <8c3b242f-7d6f-4bec-9a44-61ac65a26637@app.fastmail.com>
-In-Reply-To: <ZNYSFWA3WNAdRqfg@gondor.apana.org.au>
-References: <20230724135327.1173309-1-arnd@kernel.org>
- <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
- <d9184ad7-7d34-45bf-81e3-db053bf7425c@app.fastmail.com>
- <ZNYSFWA3WNAdRqfg@gondor.apana.org.au>
-Date:   Fri, 11 Aug 2023 15:38:00 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Linus Torvalds" <torvalds@linux-foundation.org>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>
-Cc:     "Arnd Bergmann" <arnd@kernel.org>,
-        "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
-        "Ryan Wanner" <Ryan.Wanner@microchip.com>,
-        "Yangtao Li" <frank.li@vivo.com>, linux-kernel@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        "Sergiu Moga" <sergiu.moga@microchip.com>,
-        "Ayush Sawal" <ayush.sawal@chelsio.com>,
-        "Gaosheng Cui" <cuigaosheng1@huawei.com>,
-        "Claudiu Beznea" <claudiu.beznea@microchip.com>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        "Kees Cook" <keescook@chromium.org>
-Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
-Content-Type: text/plain
+        Fri, 11 Aug 2023 09:47:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD356ED;
+        Fri, 11 Aug 2023 06:47:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 59C6B652B4;
+        Fri, 11 Aug 2023 13:47:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DA38C433C7;
+        Fri, 11 Aug 2023 13:47:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691761631;
+        bh=m+dHKeCOyfldrelbfFz9R7hBuqKctkP1BqoAT6/0PyY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=nYa2mNHPKNfSnuFKw7NHYN4XlDi7Uqas9nWnWhLr/zgt2Pu3Y/16KP7UmQRI5NTxK
+         5kYddeJK7hdxuBwRThnoSxPwFMubH4JNotpfdWYFfNd5Bq1lMeNvhICFrPDwY5dTIn
+         TFDljzE+TWGO4sb9yDQ/tSIjPkIt8ibFcDbQ3ydcQdquwUQgk6Sm9AERkAwiPGq11I
+         mttZq7B93LgneVZUWHLKSxOuN4UsIzJc8INzqaDl1O9O/+mzg0+YM+NUuZPtp4z6b2
+         drNUXzgq1fBZb0zZ+J4nw3nPKcAZmX/debxlw+w/lTdPc/AIJWqGx7dq+XQmuHGUv4
+         DxjMBuomkFoOA==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Ryan Wanner <Ryan.Wanner@microchip.com>,
+        Yangtao Li <frank.li@vivo.com>, Wang Ming <machel@vivo.com>,
+        Sergiu Moga <sergiu.moga@microchip.com>,
+        Gaosheng Cui <cuigaosheng1@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] [v2] crypto: drivers - avoid memcpy size warning
+Date:   Fri, 11 Aug 2023 15:46:33 +0200
+Message-Id: <20230811134704.3252535-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 11, 2023, at 12:48, Herbert Xu wrote:
-> On Mon, Aug 07, 2023 at 02:04:05PM +0200, Arnd Bergmann wrote:
+From: Arnd Bergmann <arnd@arndb.de>
 
->
-> 	struct atmel_sha_hmac_ctx *hmac = crypto_ahash_ctx(tfm);
-> 	size_t bs = ctx->block_size;
->
-> 	memcpy(hmac->opad, hmac->ipad, bs);
->
-> The block_size is set by the algorithm, you can easily grep for
-> it in atmel-sha.c and the biggest one there is SHA512_BLOCK_SIZE,
-> which is how big hmac->ipad/hmac->opad are.
->
-> So logically this code is perfectly fine.
+Some configurations with gcc-12 or gcc-13 produce a warning for the source
+and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
+overlapping:
 
-Right, that was my conclusion as well.
+In file included from include/linux/string.h:254,
+                 from drivers/crypto/atmel-sha.c:15:
+drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
+include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
+   57 | #define __underlying_memcpy     __builtin_memcpy
+      |                                 ^
+include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
+  648 |         __underlying_##op(p, q, __fortify_size);                        \
+      |         ^~~~~~~~~~~~~
+include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
+  693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+      |                          ^~~~~~~~~~~~~~~~~~~~
+drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
+ 1773 |         memcpy(hmac->opad, hmac->ipad, bs);
+      |         ^~~~~~
 
-> There is no way for the compiler to know how big ctx->block_size is.
-> So why do we expect it to make deductions on how big bs can be?
->
-> This warning looks broken to me.
+The same thing happens in two more drivers that have the same logic:
 
-I'm still unsure how exactly it goes wrong here, but I suspect
-it works as designed and just happens to run into a case in these
-drivers that is just not that common. I also see that the kernel's
-memcpy() declaration is missing the "restrict" annotation,
-but the fortified version calls the __builtin_memcpy() variant
-that has an implicit prototype with those annotations.
+drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_ahash_setkey':
+include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 260 and 132 overlaps 1 or more bytes at offset 260 [-Werror=restrict]
+drivers/crypto/bcm/cipher.c: In function 'ahash_hmac_setkey':
+include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing between 129 and 4294967295 bytes at offsets 840 and 712 overlaps between 1 and 4294967167 bytes at offset 840 [-Werror=restrict]
 
-> It looks like there is already a solution to this though.  Just use
-> unsafe_memcpy and be done with it.
+I don't think it can actually happen because the size is strictly bounded
+to the available block sizes, at most 128 bytes, though inlining decisions
+could lead gcc to not see that.
 
-Fine with me, I'll send a new version doing that.
+Use the unsafe_memcpy() helper instead of memcpy(), with the only difference
+being that this skips the hardening checks that produce the warning.
 
-     Arnd
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/crypto/atmel-sha.c         | 3 ++-
+ drivers/crypto/bcm/cipher.c        | 3 ++-
+ drivers/crypto/chelsio/chcr_algo.c | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 54fec72dfba27..99a9ff8e743f2 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -1770,7 +1770,8 @@ static int atmel_sha_hmac_compute_ipad_hash(struct atmel_sha_dev *dd)
+ 	size_t bs = ctx->block_size;
+ 	size_t i, num_words = bs / sizeof(u32);
+ 
+-	memcpy(hmac->opad, hmac->ipad, bs);
++	unsafe_memcpy(hmac->opad, hmac->ipad, bs,
++		      "fortified memcpy causes -Wrestrict warning");
+ 	for (i = 0; i < num_words; ++i) {
+ 		hmac->ipad[i] ^= 0x36363636;
+ 		hmac->opad[i] ^= 0x5c5c5c5c;
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index 70b911baab26d..4c46357e2570e 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -2397,7 +2397,8 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
+ 		memset(ctx->ipad + ctx->authkeylen, 0,
+ 		       blocksize - ctx->authkeylen);
+ 		ctx->authkeylen = 0;
+-		memcpy(ctx->opad, ctx->ipad, blocksize);
++		unsafe_memcpy(ctx->opad, ctx->ipad, blocksize,
++			      "fortified memcpy causes -Wrestrict warning");
+ 
+ 		for (index = 0; index < blocksize; index++) {
+ 			ctx->ipad[index] ^= HMAC_IPAD_VALUE;
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 0eade4fa6695b..16298ae4a00bf 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -2216,7 +2216,8 @@ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 		memcpy(hmacctx->ipad, key, keylen);
+ 	}
+ 	memset(hmacctx->ipad + keylen, 0, bs - keylen);
+-	memcpy(hmacctx->opad, hmacctx->ipad, bs);
++	unsafe_memcpy(hmacctx->opad, hmacctx->ipad, bs,
++		      "fortified memcpy causes -Wrestrict warning");
+ 
+ 	for (i = 0; i < bs / sizeof(int); i++) {
+ 		*((unsigned int *)(&hmacctx->ipad) + i) ^= IPAD_DATA;
+-- 
+2.39.2
+
