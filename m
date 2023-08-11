@@ -2,120 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D05DC04A6A
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 06:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6C1EB64DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 08:48:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231406AbjHKGkg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 02:40:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
+        id S229709AbjHKIr5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 04:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjHKGkf (ORCPT
+        with ESMTP id S234487AbjHKIrz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 02:40:35 -0400
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C9D2694;
-        Thu, 10 Aug 2023 23:40:34 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37B6eBOd021185;
-        Fri, 11 Aug 2023 01:40:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1691736011;
-        bh=jF7veAJCg7xxofNq8kFXr6on39XUtII8DDbN01UPOg8=;
-        h=From:To:CC:Subject:In-Reply-To:References:Date;
-        b=MhHDCWrW7h5mBgJXO24FHVkVesCB2J1yMupcXIKgKUUEhjv0ANFaSIFdhoq1W+EBh
-         riNtETxC2Mrr0SMFPYC2wRJZR0jNszh/ZCbWKD1aapk+XXLq+7HX0+ZOjm0EVuJyBb
-         LqskMROLcAzz3aYAD+h86I8WyRXq65Engmxb/tMA=
-Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37B6eBpO122620
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 11 Aug 2023 01:40:11 -0500
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 11
- Aug 2023 01:40:10 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 11 Aug 2023 01:40:10 -0500
-Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37B6e914007531;
-        Fri, 11 Aug 2023 01:40:09 -0500
-From:   Kamlesh Gurudasani <kamlesh@ti.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-Subject: Re: [EXTERNAL] Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso
- framework
-In-Reply-To: <20230811042423.GA1295@sol.localdomain>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230719-mcrc-upstream-v2-2-4152b987e4c2@ti.com>
- <20230811042423.GA1295@sol.localdomain>
-Date:   Fri, 11 Aug 2023 12:10:09 +0530
-Message-ID: <87r0oadquu.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+        Fri, 11 Aug 2023 04:47:55 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDD330CA;
+        Fri, 11 Aug 2023 01:47:53 -0700 (PDT)
+Received: from 46.183.103.8.relaix.net ([46.183.103.8] helo=[172.18.99.178]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qUNoD-0000Xs-E4; Fri, 11 Aug 2023 10:47:49 +0200
+Message-ID: <f9e34f8a-5a7b-8223-c672-4fcb2bb23c0a@leemhuis.info>
+Date:   Fri, 11 Aug 2023 10:47:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
+ more devices
+Content-Language: en-US, de-DE
+To:     Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+Cc:     Bastian Krause <bst@pengutronix.de>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Linux kernel regressions list <regressions@lists.linux.dev>
+References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
+ <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
+ <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
+ <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+ <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+ <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
+ <AM0PR04MB60046B045B5965A61BA1CA91E709A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+From:   "Linux regression tracking (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+In-Reply-To: <AM0PR04MB60046B045B5965A61BA1CA91E709A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691743673;28c26b7b;
+X-HE-SMSGID: 1qUNoD-0000Xs-E4
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> writes:
+[CCing the regression list, as it should be in the loop for regressions:
+https://docs.kernel.org/admin-guide/reporting-regressions.html]
 
-> On Fri, Aug 11, 2023 at 12:58:49AM +0530, Kamlesh Gurudasani wrote:
->> diff --git a/lib/crc64-iso.c b/lib/crc64-iso.c
->> new file mode 100644
->> index 000000000000..d6e803124fa0
-> [...]
->> +u64 crc64_iso_update(u64 crc, const unsigned char *buffer, size_t len)
->> +{
->> +	struct {
->> +		struct shash_desc shash;
->> +		u64 crc;
->> +	} desc;
->> +	int err;
->> +
->> +	if (static_branch_unlikely(&crc64_iso_fallback))
->> +		return crc64_iso_generic(crc, buffer, len);
->> +
->> +	rcu_read_lock();
->> +	desc.shash.tfm = rcu_dereference(crc64_iso_tfm);
->> +	desc.crc = crc;
->> +	err = crypto_shash_update(&desc.shash, buffer, len);
->> +	rcu_read_unlock();
->> +
->> +	WARN_ON_ONCE(err);
->> +
->> +	return desc.crc;
->> +}
->> +EXPORT_SYMBOL_GPL(crc64_iso_update);
->> +
->> +u64 crc64_iso(const unsigned char *buffer, size_t len)
->> +{
->> +	return crc64_iso_update(0, buffer, len);
->> +}
->> +EXPORT_SYMBOL_GPL(crc64_iso);
->
-> These functions are never called.
->
-> Why are you trying to add unused code to the kernel?
->
-> - Eric
-Thanks for the review, Eric.
+On 04.08.23 14:02, Gaurav Jain wrote:
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+>> On Mon, Jul 24, 2023 at 05:13:23AM +0000, Meenakshi Aggarwal wrote:
+>>> Please share the required information.
+>> Any progress on this?
+>>
+>> Should we revert the offending patch?
+> 
+> Debugging is in progress. There should be some mismatch in TRNG configuration in customer board.
+> Will be sharing a patch to dump the same.
 
-Will remove this in next revision.
+Any progress on this? Afaics would be good to have either the fix or the
+revert in by -rc7 to ensure things get at least one week of proper
+testing before the final release.
 
-Regards,
-Kamlesh
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
+
+#regzbot poke
