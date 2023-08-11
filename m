@@ -2,33 +2,33 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40EEAC001DE
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 14:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC251C001DE
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 14:10:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbjHKOKs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 10:10:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47104 "EHLO
+        id S232548AbjHKOKw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 10:10:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbjHKOKr (ORCPT
+        with ESMTP id S234713AbjHKOKv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 10:10:47 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A51D510E4
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 07:10:46 -0700 (PDT)
-Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RMlxN4gYbzqSgG
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 22:07:52 +0800 (CST)
+        Fri, 11 Aug 2023 10:10:51 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A6910E4
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 07:10:49 -0700 (PDT)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RMlwg1cH2zcd4L
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 22:07:15 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 11 Aug 2023 22:10:44 +0800
+ 15.1.2507.27; Fri, 11 Aug 2023 22:10:46 +0800
 From:   Weili Qian <qianweili@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <shenyang39@huawei.com>,
         <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
-Subject: [PATCH v2 1/7] crypto: hisilicon/qm - obtain the mailbox configuration at one time
-Date:   Fri, 11 Aug 2023 22:07:43 +0800
-Message-ID: <20230811140749.5202-2-qianweili@huawei.com>
+Subject: [PATCH v2 3/7] crypto: hisilicon/qm - fix PF queue parameter issue
+Date:   Fri, 11 Aug 2023 22:07:45 +0800
+Message-ID: <20230811140749.5202-4-qianweili@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20230811140749.5202-1-qianweili@huawei.com>
 References: <20230811140749.5202-1-qianweili@huawei.com>
@@ -43,284 +43,191 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The malibox needs to be triggered by a 128bit atomic operation. The
-reason is that one QM hardware entity in one accelerator servers QM
-mailbox MMIO interfaces in related PF and VFs. A mutex cannot lock
-mailbox processes in different functions. When multiple functions access
-the mailbox simultaneously, if the generic IO interface readq/writeq
-is used to access the mailbox, the data read from mailbox or written to
-mailbox is unpredictable. Therefore, the generic IO interface is changed
-to a 128bit atomic operation.
+From: Longfang Liu <liulongfang@huawei.com>
 
+If the queue isolation feature is enabled, the number of queues
+supported by the device changes. When PF is enabled using the
+current default number of queues, the default number of queues may
+be greater than the number supported by the device. As a result,
+the PF fails to be bound to the driver.
+
+After modification, if queue isolation feature is enabled, when
+the default queue parameter is greater than the number supported
+by the device, the number of enabled queues will be changed to
+the number supported by the device, so that the PF and driver
+can be properly bound.
+
+Fixes: 8bbecfb402f7 ("crypto: hisilicon/qm - add queue isolation support for Kunpeng930")
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Weili Qian <qianweili@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 160 ++++++++++++++++++++++------------
- include/linux/hisi_acc_qm.h   |   1 -
- 2 files changed, 105 insertions(+), 56 deletions(-)
- mode change 100644 => 100755 drivers/crypto/hisilicon/qm.c
+ drivers/crypto/hisilicon/hpre/hpre_main.c |  5 +++++
+ drivers/crypto/hisilicon/qm.c             | 18 ++++++++++++------
+ drivers/crypto/hisilicon/qm_common.h      |  1 -
+ drivers/crypto/hisilicon/sec2/sec_main.c  |  5 +++++
+ drivers/crypto/hisilicon/zip/zip_main.c   |  5 +++++
+ include/linux/hisi_acc_qm.h               |  7 +++++++
+ 6 files changed, 34 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 39297ce70f44..1709e649f0d1 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -433,8 +433,11 @@ static u32 uacce_mode = UACCE_MODE_NOUACCE;
+ module_param_cb(uacce_mode, &hpre_uacce_mode_ops, &uacce_mode, 0444);
+ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+ 
++static bool pf_q_num_flag;
+ static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+ {
++	pf_q_num_flag = true;
++
+ 	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
+ }
+ 
+@@ -1157,6 +1160,8 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 		qm->qp_num = pf_q_num;
+ 		qm->debug.curr_qm_qp_num = pf_q_num;
+ 		qm->qm_list = &hpre_devices;
++		if (pf_q_num_flag)
++			set_bit(QM_MODULE_PARAM, &qm->misc_ctl);
+ 	}
+ 
+ 	ret = hisi_qm_init(qm);
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-old mode 100644
-new mode 100755
-index a99fd589445c..13cd2617170e
+index d0b923dc5415..6623707363bb 100755
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -33,6 +33,10 @@
- #define QM_MB_CMD_DATA_SHIFT		32
- #define QM_MB_CMD_DATA_MASK		GENMASK(31, 0)
- #define QM_MB_STATUS_MASK		GENMASK(12, 9)
-+#define QM_MB_BUSY_MASK			BIT(13)
-+#define QM_MB_SIZE			16
-+#define QM_MB_MAX_WAIT_CNT		6000
-+#define QM_MB_WAIT_READY_CNT		10
+@@ -210,8 +210,6 @@
+ #define WAIT_PERIOD			20
+ #define REMOVE_WAIT_DELAY		10
  
- /* sqc shift */
- #define QM_SQ_HOP_NUM_SHIFT		0
-@@ -597,17 +601,6 @@ static void qm_mb_pre_init(struct qm_mailbox *mailbox, u8 cmd,
- 	mailbox->rsvd = 0;
- }
+-#define QM_DRIVER_REMOVING		0
+-#define QM_RST_SCHED			1
+ #define QM_QOS_PARAM_NUM		2
+ #define QM_QOS_MAX_VAL			1000
+ #define QM_QOS_RATE			100
+@@ -2826,7 +2824,6 @@ static void hisi_qm_pre_init(struct hisi_qm *qm)
+ 	mutex_init(&qm->mailbox_lock);
+ 	init_rwsem(&qm->qps_lock);
+ 	qm->qp_in_used = 0;
+-	qm->misc_ctl = false;
+ 	if (test_bit(QM_SUPPORT_RPM, &qm->caps)) {
+ 		if (!acpi_device_power_manageable(ACPI_COMPANION(&pdev->dev)))
+ 			dev_info(&pdev->dev, "_PS0 and _PR0 are not defined");
+@@ -5068,6 +5065,7 @@ static int qm_irqs_register(struct hisi_qm *qm)
  
--/* return 0 mailbox ready, -ETIMEDOUT hardware timeout */
--int hisi_qm_wait_mb_ready(struct hisi_qm *qm)
--{
--	u32 val;
--
--	return readl_relaxed_poll_timeout(qm->io_base + QM_MB_CMD_SEND_BASE,
--					  val, !((val >> QM_MB_BUSY_SHIFT) &
--					  0x1), POLL_PERIOD, POLL_TIMEOUT);
--}
--EXPORT_SYMBOL_GPL(hisi_qm_wait_mb_ready);
--
- /* 128 bit should be written to hardware at one time to trigger a mailbox */
- static void qm_mb_write(struct hisi_qm *qm, const void *src)
+ static int qm_get_qp_num(struct hisi_qm *qm)
  {
-@@ -618,7 +611,7 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
- #endif
- 
- 	if (!IS_ENABLED(CONFIG_ARM64)) {
--		memcpy_toio(fun_base, src, 16);
-+		memcpy_toio(fun_base, src, QM_MB_SIZE);
- 		dma_wmb();
- 		return;
- 	}
-@@ -635,35 +628,95 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
- #endif
- }
- 
--static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
-+/* 128 bit should be read from hardware at one time */
-+static void qm_mb_read(struct hisi_qm *qm, void *dst)
- {
--	int ret;
--	u32 val;
-+	const void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
-+
-+#if IS_ENABLED(CONFIG_ARM64)
-+	unsigned long tmp0 = 0, tmp1 = 0;
-+#endif
- 
--	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
--		dev_err(&qm->pdev->dev, "QM mailbox is busy to start!\n");
--		ret = -EBUSY;
--		goto mb_busy;
-+	if (!IS_ENABLED(CONFIG_ARM64)) {
-+		memcpy_fromio(dst, fun_base, QM_MB_SIZE);
-+		dma_wmb();
-+		return;
- 	}
- 
--	qm_mb_write(qm, mailbox);
-+#if IS_ENABLED(CONFIG_ARM64)
-+	asm volatile("ldp %0, %1, %3\n"
-+		     "stp %0, %1, %2\n"
-+		     "dmb oshst\n"
-+		     : "=&r" (tmp0),
-+		       "=&r" (tmp1),
-+		       "+Q" (*((char *)dst))
-+		     : "Q" (*((char __iomem *)fun_base))
-+		     : "memory");
-+#endif
-+}
-+
-+int hisi_qm_wait_mb_ready(struct hisi_qm *qm)
-+{
-+	struct qm_mailbox mailbox;
-+	int i = 0;
-+
-+	while (i++ < QM_MB_WAIT_READY_CNT) {
-+		qm_mb_read(qm, &mailbox);
-+		if (!(le16_to_cpu(mailbox.w0) & QM_MB_BUSY_MASK))
-+			return 0;
- 
--	if (unlikely(hisi_qm_wait_mb_ready(qm))) {
--		dev_err(&qm->pdev->dev, "QM mailbox operation timeout!\n");
--		ret = -ETIMEDOUT;
--		goto mb_busy;
-+		usleep_range(WAIT_PERIOD_US_MIN, WAIT_PERIOD_US_MAX);
- 	}
- 
--	val = readl(qm->io_base + QM_MB_CMD_SEND_BASE);
--	if (val & QM_MB_STATUS_MASK) {
--		dev_err(&qm->pdev->dev, "QM mailbox operation failed!\n");
--		ret = -EIO;
--		goto mb_busy;
-+	dev_err(&qm->pdev->dev, "QM mailbox is busy to start!\n");
-+
-+	return -EBUSY;
-+}
-+EXPORT_SYMBOL_GPL(hisi_qm_wait_mb_ready);
-+
-+static int qm_wait_mb_finish(struct hisi_qm *qm, struct qm_mailbox *mailbox)
-+{
 +	struct device *dev = &qm->pdev->dev;
-+	int i = 0;
+ 	bool is_db_isolation;
+ 
+ 	/* VF's qp_num assigned by PF in v2, and VF can get qp_num by vft. */
+@@ -5084,13 +5082,21 @@ static int qm_get_qp_num(struct hisi_qm *qm)
+ 	qm->max_qp_num = hisi_qm_get_hw_info(qm, qm_basic_info,
+ 					     QM_FUNC_MAX_QP_CAP, is_db_isolation);
+ 
+-	/* check if qp number is valid */
+-	if (qm->qp_num > qm->max_qp_num) {
+-		dev_err(&qm->pdev->dev, "qp num(%u) is more than max qp num(%u)!\n",
++	if (qm->qp_num <= qm->max_qp_num)
++		return 0;
 +
-+	while (++i) {
-+		qm_mb_read(qm, mailbox);
-+		if (!(le16_to_cpu(mailbox->w0) & QM_MB_BUSY_MASK))
-+			break;
-+
-+		if (i == QM_MB_MAX_WAIT_CNT) {
-+			dev_err(dev, "QM mailbox operation timeout!\n");
-+			return -ETIMEDOUT;
-+		}
-+
-+		usleep_range(WAIT_PERIOD_US_MIN, WAIT_PERIOD_US_MAX);
-+	}
-+
-+	if (le16_to_cpu(mailbox->w0) & QM_MB_STATUS_MASK) {
-+		dev_err(dev, "QM mailbox operation failed!\n");
-+		return -EIO;
++	if (test_bit(QM_MODULE_PARAM, &qm->misc_ctl)) {
++		/* Check whether the set qp number is valid */
++		dev_err(dev, "qp num(%u) is more than max qp num(%u)!\n",
+ 			qm->qp_num, qm->max_qp_num);
+ 		return -EINVAL;
  	}
  
++	dev_info(dev, "Default qp num(%u) is too big, reset it to Function's max qp num(%u)!\n",
++		 qm->qp_num, qm->max_qp_num);
++	qm->qp_num = qm->max_qp_num;
++	qm->debug.curr_qm_qp_num = qm->qp_num;
++
  	return 0;
-+}
-+
-+static int qm_mb_nolock(struct hisi_qm *qm, struct qm_mailbox *mailbox)
-+{
-+	int ret;
- 
--mb_busy:
-+	ret = hisi_qm_wait_mb_ready(qm);
-+	if (ret)
-+		goto mb_err_cnt_increase;
-+
-+	qm_mb_write(qm, mailbox);
-+
-+	ret = qm_wait_mb_finish(qm, mailbox);
-+	if (ret)
-+		goto mb_err_cnt_increase;
-+
-+	return 0;
-+
-+mb_err_cnt_increase:
- 	atomic64_inc(&qm->debug.dfx.mb_err_cnt);
- 	return ret;
  }
-@@ -687,6 +740,24 @@ int hisi_qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
- }
- EXPORT_SYMBOL_GPL(hisi_qm_mb);
  
-+static int hisi_qm_mb_read(struct hisi_qm *qm, u64 *base, u8 cmd, u16 queue)
-+{
-+	struct qm_mailbox mailbox;
-+	int ret;
-+
-+	qm_mb_pre_init(&mailbox, cmd, 0, queue, 1);
-+	mutex_lock(&qm->mailbox_lock);
-+	ret = qm_mb_nolock(qm, &mailbox);
-+	mutex_unlock(&qm->mailbox_lock);
-+	if (ret)
-+		return ret;
-+
-+	*base = le32_to_cpu(mailbox.base_l) |
-+		((u64)le32_to_cpu(mailbox.base_h) << 32);
-+
-+	return 0;
-+}
-+
- static void qm_db_v1(struct hisi_qm *qm, u16 qn, u8 cmd, u16 index, u8 priority)
+diff --git a/drivers/crypto/hisilicon/qm_common.h b/drivers/crypto/hisilicon/qm_common.h
+index db96c8bf9692..7b0b15c83ec1 100644
+--- a/drivers/crypto/hisilicon/qm_common.h
++++ b/drivers/crypto/hisilicon/qm_common.h
+@@ -4,7 +4,6 @@
+ #define QM_COMMON_H
+ 
+ #define QM_DBG_READ_LEN		256
+-#define QM_RESETTING		2
+ 
+ struct qm_cqe {
+ 	__le32 rsvd0;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 77f9f131b850..62bd8936a915 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -311,8 +311,11 @@ static int sec_diff_regs_show(struct seq_file *s, void *unused)
+ }
+ DEFINE_SHOW_ATTRIBUTE(sec_diff_regs);
+ 
++static bool pf_q_num_flag;
+ static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
  {
- 	u64 doorbell;
-@@ -1308,12 +1379,10 @@ static int qm_get_vft_v2(struct hisi_qm *qm, u32 *base, u32 *number)
- 	u64 sqc_vft;
- 	int ret;
- 
--	ret = hisi_qm_mb(qm, QM_MB_CMD_SQC_VFT_V2, 0, 0, 1);
-+	ret = hisi_qm_mb_read(qm, &sqc_vft, QM_MB_CMD_SQC_VFT_V2, 0);
- 	if (ret)
- 		return ret;
- 
--	sqc_vft = readl(qm->io_base + QM_MB_CMD_DATA_ADDR_L) |
--		  ((u64)readl(qm->io_base + QM_MB_CMD_DATA_ADDR_H) << 32);
- 	*base = QM_SQC_VFT_BASE_MASK_V2 & (sqc_vft >> QM_SQC_VFT_BASE_SHIFT_V2);
- 	*number = (QM_SQC_VFT_NUM_MASK_V2 &
- 		   (sqc_vft >> QM_SQC_VFT_NUM_SHIFT_V2)) + 1;
-@@ -1484,25 +1553,6 @@ static enum acc_err_result qm_hw_error_handle_v2(struct hisi_qm *qm)
- 	return ACC_ERR_RECOVERED;
++	pf_q_num_flag = true;
++
+ 	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
  }
  
--static int qm_get_mb_cmd(struct hisi_qm *qm, u64 *msg, u16 fun_num)
--{
--	struct qm_mailbox mailbox;
--	int ret;
--
--	qm_mb_pre_init(&mailbox, QM_MB_CMD_DST, 0, fun_num, 0);
--	mutex_lock(&qm->mailbox_lock);
--	ret = qm_mb_nolock(qm, &mailbox);
--	if (ret)
--		goto err_unlock;
--
--	*msg = readl(qm->io_base + QM_MB_CMD_DATA_ADDR_L) |
--		  ((u64)readl(qm->io_base + QM_MB_CMD_DATA_ADDR_H) << 32);
--
--err_unlock:
--	mutex_unlock(&qm->mailbox_lock);
--	return ret;
--}
--
- static void qm_clear_cmd_interrupt(struct hisi_qm *qm, u64 vf_mask)
- {
- 	u32 val;
-@@ -1522,7 +1572,7 @@ static void qm_handle_vf_msg(struct hisi_qm *qm, u32 vf_id)
- 	u64 msg;
- 	int ret;
+@@ -1120,6 +1123,8 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 		qm->qp_num = pf_q_num;
+ 		qm->debug.curr_qm_qp_num = pf_q_num;
+ 		qm->qm_list = &sec_devices;
++		if (pf_q_num_flag)
++			set_bit(QM_MODULE_PARAM, &qm->misc_ctl);
+ 	} else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V1) {
+ 		/*
+ 		 * have no way to get qm configure in VM in v1 hardware,
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index f3ce34198775..84dbaeb07ea8 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -364,8 +364,11 @@ static u32 uacce_mode = UACCE_MODE_NOUACCE;
+ module_param_cb(uacce_mode, &zip_uacce_mode_ops, &uacce_mode, 0444);
+ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
  
--	ret = qm_get_mb_cmd(qm, &msg, vf_id);
-+	ret = hisi_qm_mb_read(qm, &msg, QM_MB_CMD_DST, vf_id);
- 	if (ret) {
- 		dev_err(dev, "failed to get msg from VF(%u)!\n", vf_id);
- 		return;
-@@ -4755,7 +4805,7 @@ static int qm_wait_pf_reset_finish(struct hisi_qm *qm)
- 	 * Whether message is got successfully,
- 	 * VF needs to ack PF by clearing the interrupt.
- 	 */
--	ret = qm_get_mb_cmd(qm, &msg, 0);
-+	ret = hisi_qm_mb_read(qm, &msg, QM_MB_CMD_DST, 0);
- 	qm_clear_cmd_interrupt(qm, 0);
- 	if (ret) {
- 		dev_err(dev, "failed to get msg from PF in reset done!\n");
-@@ -4809,7 +4859,7 @@ static void qm_handle_cmd_msg(struct hisi_qm *qm, u32 fun_num)
- 	 * Get the msg from source by sending mailbox. Whether message is got
- 	 * successfully, destination needs to ack source by clearing the interrupt.
- 	 */
--	ret = qm_get_mb_cmd(qm, &msg, fun_num);
-+	ret = hisi_qm_mb_read(qm, &msg, QM_MB_CMD_DST, fun_num);
- 	qm_clear_cmd_interrupt(qm, BIT(fun_num));
- 	if (ret) {
- 		dev_err(dev, "failed to get msg from source!\n");
++static bool pf_q_num_flag;
+ static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+ {
++	pf_q_num_flag = true;
++
+ 	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
+ }
+ 
+@@ -1139,6 +1142,8 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 		qm->qp_num = pf_q_num;
+ 		qm->debug.curr_qm_qp_num = pf_q_num;
+ 		qm->qm_list = &zip_devices;
++		if (pf_q_num_flag)
++			set_bit(QM_MODULE_PARAM, &qm->misc_ctl);
+ 	} else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V1) {
+ 		/*
+ 		 * have no way to get qm configure in VM in v1 hardware,
 diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 39fbfb4be944..0f83c19a8f36 100644
+index 3f33d6d99999..576a0601c72e 100644
 --- a/include/linux/hisi_acc_qm.h
 +++ b/include/linux/hisi_acc_qm.h
-@@ -52,7 +52,6 @@
- #define QM_MB_OP_SHIFT			14
- #define QM_MB_CMD_DATA_ADDR_L		0x304
- #define QM_MB_CMD_DATA_ADDR_H		0x308
--#define QM_MB_MAX_WAIT_CNT		6000
+@@ -143,6 +143,13 @@ enum qm_vf_state {
+ 	QM_NOT_READY,
+ };
  
- /* doorbell */
- #define QM_DOORBELL_CMD_SQ              0
++enum qm_mist_ctl_bits {
++	QM_DRIVER_REMOVING = 0x0,
++	QM_RST_SCHED,
++	QM_RESETTING,
++	QM_MODULE_PARAM,
++};
++
+ enum qm_cap_bits {
+ 	QM_SUPPORT_DB_ISOLATION = 0x0,
+ 	QM_SUPPORT_FUNC_QOS,
 -- 
 2.33.0
 
