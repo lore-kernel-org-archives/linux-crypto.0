@@ -2,52 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D6FC001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 09:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C09DC001B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 09:29:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234897AbjHKJ1o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 05:27:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48276 "EHLO
+        id S233624AbjHKJ3q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 05:29:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233925AbjHKJ1n (ORCPT
+        with ESMTP id S232779AbjHKJ3p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 05:27:43 -0400
+        Fri, 11 Aug 2023 05:29:45 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F8D7110
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 02:27:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C6A26B2
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 02:29:44 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qUOQh-0020V0-EN; Fri, 11 Aug 2023 17:27:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 17:27:35 +0800
-Date:   Fri, 11 Aug 2023 17:27:35 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Gaurav Jain <gaurav.jain@nxp.com>
-Subject: [PATCH 0/36] Move crypto_engine callback into algorithm object
-Message-ID: <ZNX/BwEkV3SDpsAS@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        id 1qUOSh-0020X9-Qr; Fri, 11 Aug 2023 17:29:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 17:29:40 +0800
+From:   "Herbert Xu" <herbert@gondor.apana.org.au>
+Date:   Fri, 11 Aug 2023 17:29:40 +0800
+Subject: [PATCH 1/36] crypto: sun8i-ce - Remove prepare/unprepare request
+References: <ZNX/BwEkV3SDpsAS@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Gaurav Jain <gaurav.jain@nxp.com>
+Message-Id: <E1qUOSh-0020X9-Qr@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As it stands, every crypto_engine user sets up callbacks in struct
-crypto_engine_ctx which is stored at the head of the tfm context.
+The callbacks for prepare and unprepare request in crypto_engine
+is superfluous.  They can be done directly from do_one_request.
 
-This is error-prone because there is no guarantee for that callback
-to be there at all.  In fact this is exactly what happened when the
-tfm context was moved for DMA alignment.
+Move the code into do_one_request and remove the unused callbacks.
 
-The first part of this series eliminates the unnecessary prepare
-and unprepare callbacks so that only one function remains.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-Then that last callback is moved into the algorithm object.  This
-is checked by using special register/unregister functions that are
-specific to crypto_engine.
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c |   20 ++++++++++++++------
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   |    2 --
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index c13550090785..573a08fa7afa 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -294,7 +294,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	return err;
+ }
+ 
+-static int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
++static void sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
+ {
+ 	struct skcipher_request *breq = container_of(areq, struct skcipher_request, base);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(breq);
+@@ -308,10 +308,10 @@ static int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
+ 	local_bh_disable();
+ 	crypto_finalize_skcipher_request(engine, breq, err);
+ 	local_bh_enable();
+-	return 0;
+ }
+ 
+-static int sun8i_ce_cipher_unprepare(struct crypto_engine *engine, void *async_req)
++static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
++				      void *async_req)
+ {
+ 	struct skcipher_request *areq = container_of(async_req, struct skcipher_request, base);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
+@@ -353,7 +353,17 @@ static int sun8i_ce_cipher_unprepare(struct crypto_engine *engine, void *async_r
+ 	}
+ 
+ 	dma_unmap_single(ce->dev, rctx->addr_key, op->keylen, DMA_TO_DEVICE);
++}
++
++static int sun8i_ce_cipher_do_one(struct crypto_engine *engine, void *areq)
++{
++	int err = sun8i_ce_cipher_prepare(engine, areq);
++
++	if (err)
++		return err;
+ 
++	sun8i_ce_cipher_run(engine, areq);
++	sun8i_ce_cipher_unprepare(engine, areq);
+ 	return 0;
+ }
+ 
+@@ -423,9 +433,7 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
+ 	       crypto_tfm_alg_driver_name(crypto_skcipher_tfm(op->fallback_tfm)),
+ 	       CRYPTO_MAX_ALG_NAME);
+ 
+-	op->enginectx.op.do_one_request = sun8i_ce_cipher_run;
+-	op->enginectx.op.prepare_request = sun8i_ce_cipher_prepare;
+-	op->enginectx.op.unprepare_request = sun8i_ce_cipher_unprepare;
++	op->enginectx.op.do_one_request = sun8i_ce_cipher_do_one;
+ 
+ 	err = pm_runtime_get_sync(op->ce->dev);
+ 	if (err < 0)
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+index 930ad157004c..04d7d890de58 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+@@ -32,8 +32,6 @@ int sun8i_ce_hash_crainit(struct crypto_tfm *tfm)
+ 	op->ce = algt->ce;
+ 
+ 	op->enginectx.op.do_one_request = sun8i_ce_hash_run;
+-	op->enginectx.op.prepare_request = NULL;
+-	op->enginectx.op.unprepare_request = NULL;
+ 
+ 	/* FALLBACK */
+ 	op->fallback_tfm = crypto_alloc_ahash(crypto_tfm_alg_name(tfm), 0,
