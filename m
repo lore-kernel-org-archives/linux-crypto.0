@@ -2,89 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B55CC04E69
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 10:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA22C001B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 10:52:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233517AbjHKKQs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 06:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46646 "EHLO
+        id S235776AbjHKKwV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 06:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbjHKKQr (ORCPT
+        with ESMTP id S235573AbjHKKvx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 06:16:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9838BB4;
-        Fri, 11 Aug 2023 03:16:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2D3C266E04;
-        Fri, 11 Aug 2023 10:16:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C666C433C7;
-        Fri, 11 Aug 2023 10:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1691749006;
-        bh=p0874zC3P/4HkNA+wVRJkLg0l75K8zpw30iVncdc3hA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZnbEJxBBvvyRVrrgqaUgZZHjXTQaaVvRcmnG+Kw6tY0jW8JMLnEntCAan1/Jv/IwK
-         7S2gJZ1TdIKGrRy6ZexEARpp7JOigKWp2EyHIPnSQm30nHkGgawvRoW4h7JlKMa6bW
-         B9VZPDYj7V1mJVZxUoasRspo2Tk97FQH9M1olZHQ=
-Date:   Fri, 11 Aug 2023 12:16:44 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc:     Oleksii_Moisieiev@epam.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
-        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
-        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
-        andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
-        lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
-        arnd@kernel.org, richardcochran@gmail.com,
-        Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org
-Subject: Re: [IGNORE][PATCH v4 01/11] dt-bindings: Document common device
- controller bindings
-Message-ID: <2023081117-sprout-cruncher-862c@gregkh>
-References: <20230811100731.108145-1-gatien.chevallier@foss.st.com>
- <20230811100731.108145-2-gatien.chevallier@foss.st.com>
+        Fri, 11 Aug 2023 06:51:53 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555CEE5D;
+        Fri, 11 Aug 2023 03:50:05 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qUPhM-0023FO-Tp; Fri, 11 Aug 2023 18:48:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 18:48:53 +0800
+Date:   Fri, 11 Aug 2023 18:48:53 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Arnd Bergmann <arnd@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Ryan Wanner <Ryan.Wanner@microchip.com>,
+        Yangtao Li <frank.li@vivo.com>, linux-kernel@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Sergiu Moga <sergiu.moga@microchip.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>,
+        Gaosheng Cui <cuigaosheng1@huawei.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
+Message-ID: <ZNYSFWA3WNAdRqfg@gondor.apana.org.au>
+References: <20230724135327.1173309-1-arnd@kernel.org>
+ <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
+ <d9184ad7-7d34-45bf-81e3-db053bf7425c@app.fastmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230811100731.108145-2-gatien.chevallier@foss.st.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d9184ad7-7d34-45bf-81e3-db053bf7425c@app.fastmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 12:07:21PM +0200, Gatien Chevallier wrote:
-> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
-> 
-> Introducing of the common device controller bindings for the controller
-> provider and consumer devices. Those bindings are intended to allow
-> divided system on chip into multiple domains, that can be used to
-> configure hardware permissions.
-> 
-> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
-> [Gatien: Fix typos and YAML error]
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
-> 
-> Changes in V4: 
-> 	Corrected typos and YAML errors	
+On Mon, Aug 07, 2023 at 02:04:05PM +0200, Arnd Bergmann wrote:
+>
+> See https://pastebin.com/raw/ip3tfpJF for a config that triggers this
+> on x86 with the chelsio and atmel drivers. The bcm driver is only
+> available on arm64, so you won't hit that one here. I also
+> see this with allmodconfig, as well as defconfig after enabling
+> CONFIG_FORTIFY_SOURCE and the three crypto drivers.
 
-Why are we supposed to ignore the first patch in this series, but pay
-attention to the 10 after this that depend on it?
+OK I can reproduce this now:
 
-totally confused,
+In file included from ../include/linux/string.h:254,
+                 from ../arch/x86/include/asm/page_32.h:18,
+                 from ../arch/x86/include/asm/page.h:14,
+                 from ../arch/x86/include/asm/processor.h:20,
+                 from ../arch/x86/include/asm/timex.h:5,
+                 from ../include/linux/timex.h:67,
+                 from ../include/linux/time32.h:13,
+                 from ../include/linux/time.h:60,
+                 from ../include/linux/stat.h:19,
+                 from ../include/linux/module.h:13,
+                 from ../drivers/crypto/atmel-sha.c:15:
+../drivers/crypto/atmel-sha.c: In function ‘atmel_sha_hmac_compute_ipad_hash’:
+../include/linux/fortify-string.h:57:33: error: ‘__builtin_memcpy’ accessing 129 or more bytes at offsets 304 and 176 overlaps 1 or more bytes at offset 304 [-Werror=restrict]
+   57 | #define __underlying_memcpy     __builtin_memcpy
+      |                                 ^
+../include/linux/fortify-string.h:648:9: note: in expansion of macro ‘__underlying_memcpy’
+  648 |         __underlying_##op(p, q, __fortify_size);                        \
+      |         ^~~~~~~~~~~~~
+../include/linux/fortify-string.h:693:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+  693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+      |                          ^~~~~~~~~~~~~~~~~~~~
+../drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro ‘memcpy’
+ 1773 |         memcpy(hmac->opad, hmac->ipad, bs);
+      |         ^~~~~~
+../include/linux/fortify-string.h:57:33: error: ‘__builtin_memcpy’ accessing 129 or more bytes at offsets 304 and 176 overlaps 1 or more bytes at offset 304 [-Werror=restrict]
+   57 | #define __underlying_memcpy     __builtin_memcpy
+      |                                 ^
+../include/linux/fortify-string.h:648:9: note: in expansion of macro ‘__underlying_memcpy’
+  648 |         __underlying_##op(p, q, __fortify_size);                        \
+      |         ^~~~~~~~~~~~~
+../include/linux/fortify-string.h:693:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+  693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+      |                          ^~~~~~~~~~~~~~~~~~~~
+../drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro ‘memcpy’
+ 1773 |         memcpy(hmac->opad, hmac->ipad, bs);
+      |         ^~~~~~
+cc1: all warnings being treated as errors
 
-greg k-h
+But why are we turning these warnings on if they're giving completely
+bogus false positives like this?
+
+	struct atmel_sha_hmac_ctx {
+		struct atmel_sha_ctx	base;
+
+		struct atmel_sha_hmac_key	hkey;
+		u32			ipad[SHA512_BLOCK_SIZE / sizeof(u32)];
+		u32			opad[SHA512_BLOCK_SIZE / sizeof(u32)];
+		atmel_sha_fn_t		resume;
+	};
+
+	struct atmel_sha_hmac_ctx *hmac = crypto_ahash_ctx(tfm);
+	size_t bs = ctx->block_size;
+
+	memcpy(hmac->opad, hmac->ipad, bs);
+
+The block_size is set by the algorithm, you can easily grep for
+it in atmel-sha.c and the biggest one there is SHA512_BLOCK_SIZE,
+which is how big hmac->ipad/hmac->opad are.
+
+So logically this code is perfectly fine.
+
+There is no way for the compiler to know how big ctx->block_size is.
+So why do we expect it to make deductions on how big bs can be?
+
+This warning looks broken to me.
+
+It looks like there is already a solution to this though.  Just use
+unsafe_memcpy and be done with it.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
