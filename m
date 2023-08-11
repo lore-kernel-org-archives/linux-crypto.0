@@ -2,30 +2,30 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 004DEC001DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 09:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FF5C001B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 09:30:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234961AbjHKJaC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 05:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S234989AbjHKJaI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 05:30:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234959AbjHKJaA (ORCPT
+        with ESMTP id S234919AbjHKJaC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 05:30:00 -0400
+        Fri, 11 Aug 2023 05:30:02 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE42D2D5B
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 02:29:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C820E2D5B
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 02:30:01 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qUOSw-0020Zm-I2; Fri, 11 Aug 2023 17:29:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 17:29:54 +0800
+        id 1qUOSy-0020aL-QU; Fri, 11 Aug 2023 17:29:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 17:29:56 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Fri, 11 Aug 2023 17:29:54 +0800
-Subject: [PATCH 8/36] crypto: rk3288 - Remove prepare/unprepare request
+Date:   Fri, 11 Aug 2023 17:29:56 +0800
+Subject: [PATCH 9/36] crypto: jh1100 - Remove prepare/unprepare request
 References: <ZNX/BwEkV3SDpsAS@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Gaurav Jain <gaurav.jain@nxp.com>
-Message-Id: <E1qUOSw-0020Zm-I2@formenos.hmeau.com>
+Message-Id: <E1qUOSy-0020aL-QU@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -38,64 +38,182 @@ Move the code into do_one_request and remove the unused callbacks.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/rockchip/rk3288_crypto_ahash.c |   13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/crypto/starfive/jh7110-aes.c  |   54 ++++++----------------------------
+ drivers/crypto/starfive/jh7110-hash.c |    7 ----
+ 2 files changed, 11 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index a78ff3dcd0b1..1519aa0a0f7c 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -240,14 +240,13 @@ static int rk_hash_prepare(struct crypto_engine *engine, void *breq)
- 	return 0;
- }
- 
--static int rk_hash_unprepare(struct crypto_engine *engine, void *breq)
-+static void rk_hash_unprepare(struct crypto_engine *engine, void *breq)
- {
- 	struct ahash_request *areq = container_of(breq, struct ahash_request, base);
- 	struct rk_ahash_rctx *rctx = ahash_request_ctx(areq);
- 	struct rk_crypto_info *rkc = rctx->dev;
- 
- 	dma_unmap_sg(rkc->dev, areq->src, rctx->nrsg, DMA_TO_DEVICE);
--	return 0;
- }
- 
- static int rk_hash_run(struct crypto_engine *engine, void *breq)
-@@ -259,7 +258,7 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
- 	struct rk_crypto_tmp *algt = container_of(alg, struct rk_crypto_tmp, alg.hash);
- 	struct scatterlist *sg = areq->src;
- 	struct rk_crypto_info *rkc = rctx->dev;
--	int err = 0;
+diff --git a/drivers/crypto/starfive/jh7110-aes.c b/drivers/crypto/starfive/jh7110-aes.c
+index 04dd7958054f..fea846ea9173 100644
+--- a/drivers/crypto/starfive/jh7110-aes.c
++++ b/drivers/crypto/starfive/jh7110-aes.c
+@@ -518,8 +518,13 @@ static int starfive_aes_do_one_req(struct crypto_engine *engine, void *areq)
+ 	struct starfive_cryp_dev *cryp = ctx->cryp;
+ 	u32 block[AES_BLOCK_32];
+ 	u32 stat;
 +	int err;
  	int i;
- 	u32 v;
  
-@@ -267,6 +266,10 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
- 	if (err)
- 		return err;
- 
-+	err = rk_hash_prepare(engine, breq);
++	err = starfive_aes_prepare_req(req, NULL);
 +	if (err)
-+		goto theend;
++		return err;
 +
- 	rctx->mode = 0;
- 
- 	algt->stat_req++;
-@@ -327,6 +330,8 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
- 	crypto_finalize_hash_request(engine, breq, err);
- 	local_bh_enable();
- 
-+	rk_hash_unprepare(engine, breq);
-+
+ 	/*
+ 	 * Write first plain/ciphertext block to start the module
+ 	 * then let irq tasklet handle the rest of the data blocks.
+@@ -538,15 +543,6 @@ static int starfive_aes_do_one_req(struct crypto_engine *engine, void *areq)
  	return 0;
  }
  
-@@ -350,8 +355,6 @@ static int rk_cra_hash_init(struct crypto_tfm *tfm)
- 				 crypto_ahash_reqsize(tctx->fallback_tfm));
+-static int starfive_aes_skcipher_prepare_req(struct crypto_engine *engine,
+-					     void *areq)
+-{
+-	struct skcipher_request *req =
+-		container_of(areq, struct skcipher_request, base);
+-
+-	return starfive_aes_prepare_req(req, NULL);
+-}
+-
+ static int starfive_aes_init_tfm(struct crypto_skcipher *tfm)
+ {
+ 	struct starfive_cryp_ctx *ctx = crypto_skcipher_ctx(tfm);
+@@ -559,21 +555,10 @@ static int starfive_aes_init_tfm(struct crypto_skcipher *tfm)
+ 				    sizeof(struct skcipher_request));
  
- 	tctx->enginectx.op.do_one_request = rk_hash_run;
--	tctx->enginectx.op.prepare_request = rk_hash_prepare;
--	tctx->enginectx.op.unprepare_request = rk_hash_unprepare;
+ 	ctx->enginectx.op.do_one_request = starfive_aes_do_one_req;
+-	ctx->enginectx.op.prepare_request = starfive_aes_skcipher_prepare_req;
+-	ctx->enginectx.op.unprepare_request = NULL;
  
  	return 0;
  }
+ 
+-static void starfive_aes_exit_tfm(struct crypto_skcipher *tfm)
+-{
+-	struct starfive_cryp_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	ctx->enginectx.op.do_one_request = NULL;
+-	ctx->enginectx.op.prepare_request = NULL;
+-	ctx->enginectx.op.unprepare_request = NULL;
+-}
+-
+ static int starfive_aes_aead_do_one_req(struct crypto_engine *engine, void *areq)
+ {
+ 	struct aead_request *req =
+@@ -584,8 +569,13 @@ static int starfive_aes_aead_do_one_req(struct crypto_engine *engine, void *areq
+ 	struct starfive_cryp_request_ctx *rctx = ctx->rctx;
+ 	u32 block[AES_BLOCK_32];
+ 	u32 stat;
++	int err;
+ 	int i;
+ 
++	err = starfive_aes_prepare_req(NULL, req);
++	if (err)
++		return err;
++
+ 	if (!cryp->assoclen)
+ 		goto write_text;
+ 
+@@ -625,14 +615,6 @@ static int starfive_aes_aead_do_one_req(struct crypto_engine *engine, void *areq
+ 	return 0;
+ }
+ 
+-static int starfive_aes_aead_prepare_req(struct crypto_engine *engine, void *areq)
+-{
+-	struct aead_request *req =
+-		container_of(areq, struct aead_request, base);
+-
+-	return starfive_aes_prepare_req(NULL, req);
+-}
+-
+ static int starfive_aes_aead_init_tfm(struct crypto_aead *tfm)
+ {
+ 	struct starfive_cryp_ctx *ctx = crypto_aead_ctx(tfm);
+@@ -657,8 +639,6 @@ static int starfive_aes_aead_init_tfm(struct crypto_aead *tfm)
+ 				sizeof(struct aead_request));
+ 
+ 	ctx->enginectx.op.do_one_request = starfive_aes_aead_do_one_req;
+-	ctx->enginectx.op.prepare_request = starfive_aes_aead_prepare_req;
+-	ctx->enginectx.op.unprepare_request = NULL;
+ 
+ 	return 0;
+ }
+@@ -667,14 +647,7 @@ static void starfive_aes_aead_exit_tfm(struct crypto_aead *tfm)
+ {
+ 	struct starfive_cryp_ctx *ctx = crypto_aead_ctx(tfm);
+ 
+-	if (ctx->aead_fbk) {
+-		crypto_free_aead(ctx->aead_fbk);
+-		ctx->aead_fbk = NULL;
+-	}
+-
+-	ctx->enginectx.op.do_one_request = NULL;
+-	ctx->enginectx.op.prepare_request = NULL;
+-	ctx->enginectx.op.unprepare_request = NULL;
++	crypto_free_aead(ctx->aead_fbk);
+ }
+ 
+ static int starfive_aes_crypt(struct skcipher_request *req, unsigned long flags)
+@@ -874,7 +847,6 @@ static int starfive_aes_ccm_decrypt(struct aead_request *req)
+ static struct skcipher_alg skcipher_algs[] = {
+ {
+ 	.init				= starfive_aes_init_tfm,
+-	.exit				= starfive_aes_exit_tfm,
+ 	.setkey				= starfive_aes_setkey,
+ 	.encrypt			= starfive_aes_ecb_encrypt,
+ 	.decrypt			= starfive_aes_ecb_decrypt,
+@@ -892,7 +864,6 @@ static struct skcipher_alg skcipher_algs[] = {
+ 	},
+ }, {
+ 	.init				= starfive_aes_init_tfm,
+-	.exit				= starfive_aes_exit_tfm,
+ 	.setkey				= starfive_aes_setkey,
+ 	.encrypt			= starfive_aes_cbc_encrypt,
+ 	.decrypt			= starfive_aes_cbc_decrypt,
+@@ -911,7 +882,6 @@ static struct skcipher_alg skcipher_algs[] = {
+ 	},
+ }, {
+ 	.init				= starfive_aes_init_tfm,
+-	.exit				= starfive_aes_exit_tfm,
+ 	.setkey				= starfive_aes_setkey,
+ 	.encrypt			= starfive_aes_ctr_encrypt,
+ 	.decrypt			= starfive_aes_ctr_decrypt,
+@@ -930,7 +900,6 @@ static struct skcipher_alg skcipher_algs[] = {
+ 	},
+ }, {
+ 	.init				= starfive_aes_init_tfm,
+-	.exit				= starfive_aes_exit_tfm,
+ 	.setkey				= starfive_aes_setkey,
+ 	.encrypt			= starfive_aes_cfb_encrypt,
+ 	.decrypt			= starfive_aes_cfb_decrypt,
+@@ -949,7 +918,6 @@ static struct skcipher_alg skcipher_algs[] = {
+ 	},
+ }, {
+ 	.init				= starfive_aes_init_tfm,
+-	.exit				= starfive_aes_exit_tfm,
+ 	.setkey				= starfive_aes_setkey,
+ 	.encrypt			= starfive_aes_ofb_encrypt,
+ 	.decrypt			= starfive_aes_ofb_decrypt,
+diff --git a/drivers/crypto/starfive/jh7110-hash.c b/drivers/crypto/starfive/jh7110-hash.c
+index 5064150b8a1c..7fe89cd13336 100644
+--- a/drivers/crypto/starfive/jh7110-hash.c
++++ b/drivers/crypto/starfive/jh7110-hash.c
+@@ -434,8 +434,6 @@ static int starfive_hash_init_tfm(struct crypto_ahash *hash,
+ 	ctx->hash_mode = mode;
+ 
+ 	ctx->enginectx.op.do_one_request = starfive_hash_one_request;
+-	ctx->enginectx.op.prepare_request = NULL;
+-	ctx->enginectx.op.unprepare_request = NULL;
+ 
+ 	return 0;
+ }
+@@ -445,11 +443,6 @@ static void starfive_hash_exit_tfm(struct crypto_ahash *hash)
+ 	struct starfive_cryp_ctx *ctx = crypto_ahash_ctx(hash);
+ 
+ 	crypto_free_ahash(ctx->ahash_fbk);
+-
+-	ctx->ahash_fbk = NULL;
+-	ctx->enginectx.op.do_one_request = NULL;
+-	ctx->enginectx.op.prepare_request = NULL;
+-	ctx->enginectx.op.unprepare_request = NULL;
+ }
+ 
+ static int starfive_hash_long_setkey(struct starfive_cryp_ctx *ctx,
