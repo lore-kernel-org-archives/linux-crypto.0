@@ -2,284 +2,285 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A29C04A94
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 09:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBA5C001DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 09:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbjHKJbA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S233922AbjHKJbA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 11 Aug 2023 05:31:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52174 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235022AbjHKJam (ORCPT
+        with ESMTP id S232555AbjHKJai (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 05:30:42 -0400
+        Fri, 11 Aug 2023 05:30:38 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C1330DC
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 02:30:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3A430D5
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 02:30:37 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qUOTc-0020ip-Gy; Fri, 11 Aug 2023 17:30:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 17:30:36 +0800
+        id 1qUOTY-0020hp-CR; Fri, 11 Aug 2023 17:30:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 17:30:32 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Fri, 11 Aug 2023 17:30:36 +0800
-Subject: [PATCH 28/36] crypto: sl3516 - Use new crypto_engine_op interface
+Date:   Fri, 11 Aug 2023 17:30:32 +0800
+Subject: [PATCH 26/36] crypto: aspeed - Remove non-standard sha512 algorithms
 References: <ZNX/BwEkV3SDpsAS@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Gaurav Jain <gaurav.jain@nxp.com>
-Message-Id: <E1qUOTc-0020ip-Gy@formenos.hmeau.com>
+Message-Id: <E1qUOTY-0020hp-CR@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the new crypto_engine_op interface where the callback is stored
-in the algorithm object.
+Algorithms must never be added to a driver unless there is a generic
+implementation.  These truncated versions of sha512 slipped through.
+Remove them as they are useless.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- drivers/crypto/gemini/sl3516-ce-cipher.c |   20 ++++++------
- drivers/crypto/gemini/sl3516-ce-core.c   |   49 ++++++++++++++++++-------------
- drivers/crypto/gemini/sl3516-ce.h        |    8 +----
- 3 files changed, 43 insertions(+), 34 deletions(-)
+ drivers/crypto/aspeed/aspeed-hace-hash.c |  212 -------------------------------
+ 1 file changed, 212 deletions(-)
 
-diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
-index 0232f847785a..49dce9e0a834 100644
---- a/drivers/crypto/gemini/sl3516-ce-cipher.c
-+++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
-@@ -8,13 +8,17 @@
-  * ECB mode.
-  */
- 
--#include <linux/crypto.h>
-+#include <crypto/engine.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/scatterwalk.h>
- #include <linux/dma-mapping.h>
- #include <linux/delay.h>
-+#include <linux/err.h>
- #include <linux/io.h>
-+#include <linux/kernel.h>
- #include <linux/pm_runtime.h>
--#include <crypto/scatterwalk.h>
--#include <crypto/internal/skcipher.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
- #include "sl3516-ce.h"
- 
- /* sl3516_ce_need_fallback - check if a request can be handled by the CE */
-@@ -105,7 +109,7 @@ static int sl3516_ce_cipher_fallback(struct skcipher_request *areq)
- 	struct sl3516_ce_alg_template *algt;
- 	int err;
- 
--	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher);
-+	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher.base);
- 	algt->stat_fb++;
- 
- 	skcipher_request_set_tfm(&rctx->fallback_req, op->fallback_tfm);
-@@ -136,7 +140,7 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
- 	int err = 0;
- 	int i;
- 
--	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher);
-+	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher.base);
- 
- 	dev_dbg(ce->dev, "%s %s %u %x IV(%p %u) key=%u\n", __func__,
- 		crypto_tfm_alg_name(areq->base.tfm),
-@@ -258,7 +262,7 @@ static int sl3516_ce_cipher(struct skcipher_request *areq)
- 	return err;
- }
- 
--static int sl3516_ce_handle_cipher_request(struct crypto_engine *engine, void *areq)
-+int sl3516_ce_handle_cipher_request(struct crypto_engine *engine, void *areq)
- {
- 	int err;
- 	struct skcipher_request *breq = container_of(areq, struct skcipher_request, base);
-@@ -318,7 +322,7 @@ int sl3516_ce_cipher_init(struct crypto_tfm *tfm)
- 
- 	memset(op, 0, sizeof(struct sl3516_ce_cipher_tfm_ctx));
- 
--	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher);
-+	algt = container_of(alg, struct sl3516_ce_alg_template, alg.skcipher.base);
- 	op->ce = algt->ce;
- 
- 	op->fallback_tfm = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
-@@ -335,8 +339,6 @@ int sl3516_ce_cipher_init(struct crypto_tfm *tfm)
- 		 crypto_tfm_alg_driver_name(&sktfm->base),
- 		 crypto_tfm_alg_driver_name(crypto_skcipher_tfm(op->fallback_tfm)));
- 
--	op->enginectx.op.do_one_request = sl3516_ce_handle_cipher_request;
--
- 	err = pm_runtime_get_sync(op->ce->dev);
- 	if (err < 0)
- 		goto error_pm;
-diff --git a/drivers/crypto/gemini/sl3516-ce-core.c b/drivers/crypto/gemini/sl3516-ce-core.c
-index b7524b649068..0fd47ab9df5c 100644
---- a/drivers/crypto/gemini/sl3516-ce-core.c
-+++ b/drivers/crypto/gemini/sl3516-ce-core.c
-@@ -6,22 +6,25 @@
-  *
-  * Core file which registers crypto algorithms supported by the CryptoEngine
-  */
-+
-+#include <crypto/engine.h>
-+#include <crypto/internal/rng.h>
-+#include <crypto/internal/skcipher.h>
- #include <linux/clk.h>
--#include <linux/crypto.h>
- #include <linux/debugfs.h>
- #include <linux/dev_printk.h>
- #include <linux/dma-mapping.h>
-+#include <linux/err.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/irq.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/reset.h>
--#include <crypto/internal/rng.h>
--#include <crypto/internal/skcipher.h>
- 
- #include "sl3516-ce.h"
- 
-@@ -217,7 +220,7 @@ static struct sl3516_ce_alg_template ce_algs[] = {
- {
- 	.type = CRYPTO_ALG_TYPE_SKCIPHER,
- 	.mode = ECB_AES,
--	.alg.skcipher = {
-+	.alg.skcipher.base = {
- 		.base = {
- 			.cra_name = "ecb(aes)",
- 			.cra_driver_name = "ecb-aes-sl3516",
-@@ -236,11 +239,13 @@ static struct sl3516_ce_alg_template ce_algs[] = {
- 		.setkey		= sl3516_ce_aes_setkey,
- 		.encrypt	= sl3516_ce_skencrypt,
- 		.decrypt	= sl3516_ce_skdecrypt,
--	}
-+	},
-+	.alg.skcipher.op = {
-+		.do_one_request = sl3516_ce_handle_cipher_request,
-+	},
- },
+diff --git a/drivers/crypto/aspeed/aspeed-hace-hash.c b/drivers/crypto/aspeed/aspeed-hace-hash.c
+index abc459af2ac8..0b6e49c06eff 100644
+--- a/drivers/crypto/aspeed/aspeed-hace-hash.c
++++ b/drivers/crypto/aspeed/aspeed-hace-hash.c
+@@ -59,28 +59,6 @@ static const __be64 sha512_iv[8] = {
+ 	cpu_to_be64(SHA512_H6), cpu_to_be64(SHA512_H7)
  };
  
--#ifdef CONFIG_CRYPTO_DEV_SL3516_DEBUG
- static int sl3516_ce_debugfs_show(struct seq_file *seq, void *v)
- {
- 	struct sl3516_ce_dev *ce = seq->private;
-@@ -264,8 +269,8 @@ static int sl3516_ce_debugfs_show(struct seq_file *seq, void *v)
- 		switch (ce_algs[i].type) {
- 		case CRYPTO_ALG_TYPE_SKCIPHER:
- 			seq_printf(seq, "%s %s reqs=%lu fallback=%lu\n",
--				   ce_algs[i].alg.skcipher.base.cra_driver_name,
--				   ce_algs[i].alg.skcipher.base.cra_name,
-+				   ce_algs[i].alg.skcipher.base.base.cra_driver_name,
-+				   ce_algs[i].alg.skcipher.base.base.cra_name,
- 				   ce_algs[i].stat_req, ce_algs[i].stat_fb);
- 			break;
- 		}
-@@ -274,7 +279,6 @@ static int sl3516_ce_debugfs_show(struct seq_file *seq, void *v)
+-static const __be32 sha512_224_iv[16] = {
+-	cpu_to_be32(0xC8373D8CUL), cpu_to_be32(0xA24D5419UL),
+-	cpu_to_be32(0x6699E173UL), cpu_to_be32(0xD6D4DC89UL),
+-	cpu_to_be32(0xAEB7FA1DUL), cpu_to_be32(0x829CFF32UL),
+-	cpu_to_be32(0x14D59D67UL), cpu_to_be32(0xCF9F2F58UL),
+-	cpu_to_be32(0x692B6D0FUL), cpu_to_be32(0xA84DD47BUL),
+-	cpu_to_be32(0x736FE377UL), cpu_to_be32(0x4289C404UL),
+-	cpu_to_be32(0xA8859D3FUL), cpu_to_be32(0xC8361D6AUL),
+-	cpu_to_be32(0xADE61211UL), cpu_to_be32(0xA192D691UL)
+-};
+-
+-static const __be32 sha512_256_iv[16] = {
+-	cpu_to_be32(0x94213122UL), cpu_to_be32(0x2CF72BFCUL),
+-	cpu_to_be32(0xA35F559FUL), cpu_to_be32(0xC2644CC8UL),
+-	cpu_to_be32(0x6BB89323UL), cpu_to_be32(0x51B1536FUL),
+-	cpu_to_be32(0x19773896UL), cpu_to_be32(0xBDEA4059UL),
+-	cpu_to_be32(0xE23E2896UL), cpu_to_be32(0xE3FF8EA8UL),
+-	cpu_to_be32(0x251E5EBEUL), cpu_to_be32(0x92398653UL),
+-	cpu_to_be32(0xFC99012BUL), cpu_to_be32(0xAAB8852CUL),
+-	cpu_to_be32(0xDC2DB70EUL), cpu_to_be32(0xA22CC581UL)
+-};
+-
+ /* The purpose of this padding is to ensure that the padded message is a
+  * multiple of 512 bits (SHA1/SHA224/SHA256) or 1024 bits (SHA384/SHA512).
+  * The bit "1" is appended at the end of the message followed by
+@@ -765,62 +743,6 @@ static int aspeed_sham_init(struct ahash_request *req)
+ 	return 0;
  }
  
- DEFINE_SHOW_ATTRIBUTE(sl3516_ce_debugfs);
--#endif
- 
- static int sl3516_ce_register_algs(struct sl3516_ce_dev *ce)
+-static int aspeed_sha512s_init(struct ahash_request *req)
+-{
+-	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct aspeed_sham_ctx *tctx = crypto_ahash_ctx(tfm);
+-	struct aspeed_hace_dev *hace_dev = tctx->hace_dev;
+-	struct aspeed_sha_hmac_ctx *bctx = tctx->base;
+-
+-	AHASH_DBG(hace_dev, "digest size: %d\n", crypto_ahash_digestsize(tfm));
+-
+-	rctx->cmd = HASH_CMD_ACC_MODE;
+-	rctx->flags = 0;
+-
+-	switch (crypto_ahash_digestsize(tfm)) {
+-	case SHA224_DIGEST_SIZE:
+-		rctx->cmd |= HASH_CMD_SHA512_SER | HASH_CMD_SHA512_224 |
+-			     HASH_CMD_SHA_SWAP;
+-		rctx->flags |= SHA_FLAGS_SHA512_224;
+-		rctx->digsize = SHA224_DIGEST_SIZE;
+-		rctx->block_size = SHA512_BLOCK_SIZE;
+-		rctx->sha_iv = sha512_224_iv;
+-		rctx->ivsize = 64;
+-		memcpy(rctx->digest, sha512_224_iv, rctx->ivsize);
+-		break;
+-	case SHA256_DIGEST_SIZE:
+-		rctx->cmd |= HASH_CMD_SHA512_SER | HASH_CMD_SHA512_256 |
+-			     HASH_CMD_SHA_SWAP;
+-		rctx->flags |= SHA_FLAGS_SHA512_256;
+-		rctx->digsize = SHA256_DIGEST_SIZE;
+-		rctx->block_size = SHA512_BLOCK_SIZE;
+-		rctx->sha_iv = sha512_256_iv;
+-		rctx->ivsize = 64;
+-		memcpy(rctx->digest, sha512_256_iv, rctx->ivsize);
+-		break;
+-	default:
+-		dev_warn(tctx->hace_dev->dev, "digest size %d not support\n",
+-			 crypto_ahash_digestsize(tfm));
+-		return -EINVAL;
+-	}
+-
+-	rctx->bufcnt = 0;
+-	rctx->total = 0;
+-	rctx->digcnt[0] = 0;
+-	rctx->digcnt[1] = 0;
+-
+-	/* HMAC init */
+-	if (tctx->flags & SHA_FLAGS_HMAC) {
+-		rctx->digcnt[0] = rctx->block_size;
+-		rctx->bufcnt = rctx->block_size;
+-		memcpy(rctx->buffer, bctx->ipad, rctx->block_size);
+-		rctx->flags |= SHA_FLAGS_HMAC;
+-	}
+-
+-	return 0;
+-}
+-
+ static int aspeed_sham_digest(struct ahash_request *req)
  {
-@@ -286,11 +290,11 @@ static int sl3516_ce_register_algs(struct sl3516_ce_dev *ce)
- 		switch (ce_algs[i].type) {
- 		case CRYPTO_ALG_TYPE_SKCIPHER:
- 			dev_info(ce->dev, "DEBUG: Register %s\n",
--				 ce_algs[i].alg.skcipher.base.cra_name);
--			err = crypto_register_skcipher(&ce_algs[i].alg.skcipher);
-+				 ce_algs[i].alg.skcipher.base.base.cra_name);
-+			err = crypto_engine_register_skcipher(&ce_algs[i].alg.skcipher);
- 			if (err) {
- 				dev_err(ce->dev, "Fail to register %s\n",
--					ce_algs[i].alg.skcipher.base.cra_name);
-+					ce_algs[i].alg.skcipher.base.base.cra_name);
- 				ce_algs[i].ce = NULL;
- 				return err;
- 			}
-@@ -313,8 +317,8 @@ static void sl3516_ce_unregister_algs(struct sl3516_ce_dev *ce)
- 		switch (ce_algs[i].type) {
- 		case CRYPTO_ALG_TYPE_SKCIPHER:
- 			dev_info(ce->dev, "Unregister %d %s\n", i,
--				 ce_algs[i].alg.skcipher.base.cra_name);
--			crypto_unregister_skcipher(&ce_algs[i].alg.skcipher);
-+				 ce_algs[i].alg.skcipher.base.base.cra_name);
-+			crypto_engine_unregister_skcipher(&ce_algs[i].alg.skcipher);
- 			break;
- 		}
- 	}
-@@ -473,13 +477,20 @@ static int sl3516_ce_probe(struct platform_device *pdev)
+ 	return aspeed_sham_init(req) ? : aspeed_sham_finup(req);
+@@ -1195,70 +1117,6 @@ static struct aspeed_hace_alg aspeed_ahash_algs_g6[] = {
+ 			.do_one_request = aspeed_ahash_do_one,
+ 		},
+ 	},
+-	{
+-		.alg.ahash.base = {
+-			.init	= aspeed_sha512s_init,
+-			.update	= aspeed_sham_update,
+-			.final	= aspeed_sham_final,
+-			.finup	= aspeed_sham_finup,
+-			.digest	= aspeed_sham_digest,
+-			.export	= aspeed_sham_export,
+-			.import	= aspeed_sham_import,
+-			.halg = {
+-				.digestsize = SHA224_DIGEST_SIZE,
+-				.statesize = sizeof(struct aspeed_sham_reqctx),
+-				.base = {
+-					.cra_name		= "sha512_224",
+-					.cra_driver_name	= "aspeed-sha512_224",
+-					.cra_priority		= 300,
+-					.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
+-								  CRYPTO_ALG_ASYNC |
+-								  CRYPTO_ALG_KERN_DRIVER_ONLY,
+-					.cra_blocksize		= SHA512_BLOCK_SIZE,
+-					.cra_ctxsize		= sizeof(struct aspeed_sham_ctx),
+-					.cra_alignmask		= 0,
+-					.cra_module		= THIS_MODULE,
+-					.cra_init		= aspeed_sham_cra_init,
+-					.cra_exit		= aspeed_sham_cra_exit,
+-				}
+-			}
+-		},
+-		.alg.ahash.op = {
+-			.do_one_request = aspeed_ahash_do_one,
+-		},
+-	},
+-	{
+-		.alg.ahash.base = {
+-			.init	= aspeed_sha512s_init,
+-			.update	= aspeed_sham_update,
+-			.final	= aspeed_sham_final,
+-			.finup	= aspeed_sham_finup,
+-			.digest	= aspeed_sham_digest,
+-			.export	= aspeed_sham_export,
+-			.import	= aspeed_sham_import,
+-			.halg = {
+-				.digestsize = SHA256_DIGEST_SIZE,
+-				.statesize = sizeof(struct aspeed_sham_reqctx),
+-				.base = {
+-					.cra_name		= "sha512_256",
+-					.cra_driver_name	= "aspeed-sha512_256",
+-					.cra_priority		= 300,
+-					.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
+-								  CRYPTO_ALG_ASYNC |
+-								  CRYPTO_ALG_KERN_DRIVER_ONLY,
+-					.cra_blocksize		= SHA512_BLOCK_SIZE,
+-					.cra_ctxsize		= sizeof(struct aspeed_sham_ctx),
+-					.cra_alignmask		= 0,
+-					.cra_module		= THIS_MODULE,
+-					.cra_init		= aspeed_sham_cra_init,
+-					.cra_exit		= aspeed_sham_cra_exit,
+-				}
+-			}
+-		},
+-		.alg.ahash.op = {
+-			.do_one_request = aspeed_ahash_do_one,
+-		},
+-	},
+ 	{
+ 		.alg_base = "sha384",
+ 		.alg.ahash.base = {
+@@ -1329,76 +1187,6 @@ static struct aspeed_hace_alg aspeed_ahash_algs_g6[] = {
+ 			.do_one_request = aspeed_ahash_do_one,
+ 		},
+ 	},
+-	{
+-		.alg_base = "sha512_224",
+-		.alg.ahash.base = {
+-			.init	= aspeed_sha512s_init,
+-			.update	= aspeed_sham_update,
+-			.final	= aspeed_sham_final,
+-			.finup	= aspeed_sham_finup,
+-			.digest	= aspeed_sham_digest,
+-			.setkey	= aspeed_sham_setkey,
+-			.export	= aspeed_sham_export,
+-			.import	= aspeed_sham_import,
+-			.halg = {
+-				.digestsize = SHA224_DIGEST_SIZE,
+-				.statesize = sizeof(struct aspeed_sham_reqctx),
+-				.base = {
+-					.cra_name		= "hmac(sha512_224)",
+-					.cra_driver_name	= "aspeed-hmac-sha512_224",
+-					.cra_priority		= 300,
+-					.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
+-								  CRYPTO_ALG_ASYNC |
+-								  CRYPTO_ALG_KERN_DRIVER_ONLY,
+-					.cra_blocksize		= SHA512_BLOCK_SIZE,
+-					.cra_ctxsize		= sizeof(struct aspeed_sham_ctx) +
+-								sizeof(struct aspeed_sha_hmac_ctx),
+-					.cra_alignmask		= 0,
+-					.cra_module		= THIS_MODULE,
+-					.cra_init		= aspeed_sham_cra_init,
+-					.cra_exit		= aspeed_sham_cra_exit,
+-				}
+-			}
+-		},
+-		.alg.ahash.op = {
+-			.do_one_request = aspeed_ahash_do_one,
+-		},
+-	},
+-	{
+-		.alg_base = "sha512_256",
+-		.alg.ahash.base = {
+-			.init	= aspeed_sha512s_init,
+-			.update	= aspeed_sham_update,
+-			.final	= aspeed_sham_final,
+-			.finup	= aspeed_sham_finup,
+-			.digest	= aspeed_sham_digest,
+-			.setkey	= aspeed_sham_setkey,
+-			.export	= aspeed_sham_export,
+-			.import	= aspeed_sham_import,
+-			.halg = {
+-				.digestsize = SHA256_DIGEST_SIZE,
+-				.statesize = sizeof(struct aspeed_sham_reqctx),
+-				.base = {
+-					.cra_name		= "hmac(sha512_256)",
+-					.cra_driver_name	= "aspeed-hmac-sha512_256",
+-					.cra_priority		= 300,
+-					.cra_flags		= CRYPTO_ALG_TYPE_AHASH |
+-								  CRYPTO_ALG_ASYNC |
+-								  CRYPTO_ALG_KERN_DRIVER_ONLY,
+-					.cra_blocksize		= SHA512_BLOCK_SIZE,
+-					.cra_ctxsize		= sizeof(struct aspeed_sham_ctx) +
+-								sizeof(struct aspeed_sha_hmac_ctx),
+-					.cra_alignmask		= 0,
+-					.cra_module		= THIS_MODULE,
+-					.cra_init		= aspeed_sham_cra_init,
+-					.cra_exit		= aspeed_sham_cra_exit,
+-				}
+-			}
+-		},
+-		.alg.ahash.op = {
+-			.do_one_request = aspeed_ahash_do_one,
+-		},
+-	},
+ };
  
- 	pm_runtime_put_sync(ce->dev);
- 
-+	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SL3516_DEBUG)) {
-+		struct dentry *dbgfs_dir __maybe_unused;
-+		struct dentry *dbgfs_stats __maybe_unused;
-+
-+		/* Ignore error of debugfs */
-+		dbgfs_dir = debugfs_create_dir("sl3516", NULL);
-+		dbgfs_stats = debugfs_create_file("stats", 0444,
-+						  dbgfs_dir, ce,
-+						  &sl3516_ce_debugfs_fops);
- #ifdef CONFIG_CRYPTO_DEV_SL3516_DEBUG
--	/* Ignore error of debugfs */
--	ce->dbgfs_dir = debugfs_create_dir("sl3516", NULL);
--	ce->dbgfs_stats = debugfs_create_file("stats", 0444,
--					      ce->dbgfs_dir, ce,
--					      &sl3516_ce_debugfs_fops);
-+		ce->dbgfs_dir = dbgfs_dir;
-+		ce->dbgfs_stats = dbgfs_stats;
- #endif
-+	}
- 
- 	return 0;
- error_pmuse:
-diff --git a/drivers/crypto/gemini/sl3516-ce.h b/drivers/crypto/gemini/sl3516-ce.h
-index 4c0ec6c920d1..9e1a7e7f8961 100644
---- a/drivers/crypto/gemini/sl3516-ce.h
-+++ b/drivers/crypto/gemini/sl3516-ce.h
-@@ -17,7 +17,6 @@
- #include <crypto/engine.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/skcipher.h>
--#include <linux/crypto.h>
- #include <linux/debugfs.h>
- #include <linux/hw_random.h>
- 
-@@ -292,16 +291,12 @@ struct sl3516_ce_cipher_req_ctx {
- 
- /*
-  * struct sl3516_ce_cipher_tfm_ctx - context for a skcipher TFM
-- * @enginectx:		crypto_engine used by this TFM
-  * @key:		pointer to key data
-  * @keylen:		len of the key
-  * @ce:			pointer to the private data of driver handling this TFM
-  * @fallback_tfm:	pointer to the fallback TFM
-- *
-- * enginectx must be the first element
-  */
- struct sl3516_ce_cipher_tfm_ctx {
--	struct crypto_engine_ctx enginectx;
- 	u32 *key;
- 	u32 keylen;
- 	struct sl3516_ce_dev *ce;
-@@ -324,7 +319,7 @@ struct sl3516_ce_alg_template {
- 	u32 mode;
- 	struct sl3516_ce_dev *ce;
- 	union {
--		struct skcipher_alg skcipher;
-+		struct skcipher_engine_alg skcipher;
- 	} alg;
- 	unsigned long stat_req;
- 	unsigned long stat_fb;
-@@ -345,3 +340,4 @@ int sl3516_ce_run_task(struct sl3516_ce_dev *ce,
- 
- int sl3516_ce_rng_register(struct sl3516_ce_dev *ce);
- void sl3516_ce_rng_unregister(struct sl3516_ce_dev *ce);
-+int sl3516_ce_handle_cipher_request(struct crypto_engine *engine, void *areq);
+ void aspeed_unregister_hace_hash_algs(struct aspeed_hace_dev *hace_dev)
