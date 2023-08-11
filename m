@@ -2,128 +2,73 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F97C04A94
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Aug 2023 20:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACCEC04A94
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 03:25:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234910AbjHJUZX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Aug 2023 16:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36554 "EHLO
+        id S231338AbjHKDZb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Aug 2023 23:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235758AbjHJUZV (ORCPT
+        with ESMTP id S231645AbjHKDZa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Aug 2023 16:25:21 -0400
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34A12735;
-        Thu, 10 Aug 2023 13:25:20 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37AKP4hU027029;
-        Thu, 10 Aug 2023 15:25:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1691699104;
-        bh=LlM4ebmHJM3OSNZTcjpf5OxbeJgDHb88khhaM1SpUmk=;
-        h=Date:From:To:CC:Subject:References:In-Reply-To;
-        b=W7rrHvPZ6yLGXjVOAjztdXjjgJIPcYxSE7MuWdtGiJ7LM+Aqty4PiPEpDUupWSPUv
-         hoX3fkShO6po+Kics77kcBhOEKqtovu5KmlNnY9/FRAiWWi/QhoR1AE2xtW1hLkrub
-         4Jh9LeLoKF9Tq4WmJkwop8k5BRl/hEv/lACkcjoI=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37AKP4I4012077
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 10 Aug 2023 15:25:04 -0500
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 10
- Aug 2023 15:25:04 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 10 Aug 2023 15:25:04 -0500
-Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37AKP4HT021038;
-        Thu, 10 Aug 2023 15:25:04 -0500
-Date:   Thu, 10 Aug 2023 15:25:04 -0500
-From:   Nishanth Menon <nm@ti.com>
-To:     Kamlesh Gurudasani <kamlesh@ti.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-Subject: Re: [PATCH v2 6/6] arm64: defconfig: enable TI MCRC64 module
-Message-ID: <20230810202504.ujmjaqos5tfqlmna@plentiful>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230719-mcrc-upstream-v2-6-4152b987e4c2@ti.com>
+        Thu, 10 Aug 2023 23:25:30 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FBAE2D66
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Aug 2023 20:25:29 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RMTcq4L4FzqSdR;
+        Fri, 11 Aug 2023 11:22:35 +0800 (CST)
+Received: from [10.67.110.173] (10.67.110.173) by
+ dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 11 Aug 2023 11:25:27 +0800
+Message-ID: <1bcf580b-3a19-c0aa-b3cb-1f9f183b61e4@huawei.com>
+Date:   Fri, 11 Aug 2023 11:25:27 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230719-mcrc-upstream-v2-6-4152b987e4c2@ti.com>
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 3/3] crypto: Introduce SM9 key exchange algorithm
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
+References: <20230625014958.32631-1-guozihua@huawei.com>
+ <20230625014958.32631-4-guozihua@huawei.com>
+ <ZLD+9pRFQdSpfMog@gondor.apana.org.au>
+From:   "Guozihua (Scott)" <guozihua@huawei.com>
+In-Reply-To: <ZLD+9pRFQdSpfMog@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.110.173]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500024.china.huawei.com (7.185.36.203)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 00:58-20230811, Kamlesh Gurudasani wrote:
-> K3 devices include MCRC64 engine for crc64 calculation.
-> Enable module to be built for K3 devices.
+On 2023/7/14 15:53, Herbert Xu wrote:
+> On Sun, Jun 25, 2023 at 09:49:58AM +0800, GUO Zihua wrote:
+>> This patch introduces a generic implementation of SM9 (ShangMi 9) key
+>> exchange algorithm.
+>>
+>> SM9 is an ID-based cryptography algorithm within the ShangMi family whose
+>> key exchange algorithm was accepted in ISO/IEC 11770-3 as an
+>> international standard.
 > 
-> Also enable algif_hash module, which is needed to access MCRC64 module
-> from userspace.
+> For each new algorithm we require an in-kernel user.  Where is the
+> in-kernel user for this?
 > 
-> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
-> ---
+> Thanks,
+Hi Herbert,
 
-There are few things to improve in this series, but we can discuss this
-as part of defconfig merge
+Unfortunately we don't have such usage right now and we are researching
+into it.
 
-See thread: https://lore.kernel.org/linux-arm-kernel/ae2ad056-96de-41b7-8df4-1d9c0f5c469b@app.fastmail.com/
-for additional info.
-
-K3 devices is too broad, you want to specify specific boards that will
-benefit out of this.
-
-I suggest to keep this as "DONOTMERGE" to indicate this should'nt go via
-subsystem maintainer tree (most maintainers are  aware of it, but
-explicitly calling it out helps keep things sane)
-
-
->  arch/arm64/configs/defconfig | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-> index bf13d5c46578..4d555a125315 100644
-> --- a/arch/arm64/configs/defconfig
-> +++ b/arch/arm64/configs/defconfig
-> @@ -1535,6 +1535,7 @@ CONFIG_CRYPTO_TEST=m
->  CONFIG_CRYPTO_ECHAINIV=y
->  CONFIG_CRYPTO_MICHAEL_MIC=m
->  CONFIG_CRYPTO_ANSI_CPRNG=y
-> +CONFIG_CRYPTO_USER_API_HASH=m
->  CONFIG_CRYPTO_USER_API_RNG=m
->  CONFIG_CRYPTO_CHACHA20_NEON=m
->  CONFIG_CRYPTO_GHASH_ARM64_CE=y
-> @@ -1558,6 +1559,7 @@ CONFIG_CRYPTO_DEV_HISI_ZIP=m
->  CONFIG_CRYPTO_DEV_HISI_HPRE=m
->  CONFIG_CRYPTO_DEV_HISI_TRNG=m
->  CONFIG_CRYPTO_DEV_SA2UL=m
-> +CONFIG_CRYPTO_DEV_TI_MCRC64=m
->  CONFIG_DMA_RESTRICTED_POOL=y
->  CONFIG_CMA_SIZE_MBYTES=32
->  CONFIG_PRINTK_TIME=y
-> 
-> -- 
-> 2.34.1
-> 
+Just while we are here, do you think it's a good idea to also introduce
+a new crypto algorithm type for IBCs to better support their
+functionality if there are usage within kernel and we are to port this
+algorithm in?
 
 -- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+Best
+GUO Zihua
+
