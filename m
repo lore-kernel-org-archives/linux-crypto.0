@@ -2,201 +2,109 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFB1C001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 15:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A195C04A6A
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 20:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234235AbjHKPhC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 11:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37742 "EHLO
+        id S234919AbjHKUvB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 16:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230419AbjHKPhB (ORCPT
+        with ESMTP id S233728AbjHKUvB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 11:37:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F1BB127;
-        Fri, 11 Aug 2023 08:37:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E9F3E6119C;
-        Fri, 11 Aug 2023 15:37:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D04ACC433C8;
-        Fri, 11 Aug 2023 15:36:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691768220;
-        bh=IwOupUYX4uwoK+O9WEdepYooynfek5GkO6Od3LDdjAc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BI6tLwYsm/mibN4q/5jKOlxwgQh6m0Wn8lC4eZwJZ4nvEIHRHLsvQieg8qZcfWMDe
-         tSD7XyPgEtXeUsVZbxWOlJHpXStb5D4LK7/QFTsks9LyCXkaKWjxgntIKJO714QKg8
-         XYqKupscCU+jdlz1FQh5pr9X+ke75OJl6FA27MguxGkQjxpXUWpAWC9hryXOsLN0ms
-         96/Piq6UBnaO9hqIrE2ECj2l2jZXkSC0Pm855wpUQMovvdeSMInxFdubciIaGPY4Sh
-         U5AhvmwaL2l32Z4bS3dXTdvBE99hv+qyAtHiyEwgIUO+yCLfzbqxHZoUjfSAYQQd6o
-         ztQAQQ+zxVuyw==
-Date:   Fri, 11 Aug 2023 16:36:54 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Kamlesh Gurudasani <kamlesh@ti.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Fri, 11 Aug 2023 16:51:01 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096F02D54
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 13:51:00 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fe2de785e7so3853697e87.1
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 13:50:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1691787058; x=1692391858;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jqJojQwGIq+MbCn3Pj9qfGFrLvfGPKUQcVkXP9fboM=;
+        b=FoBWDVFKaSuMp8L5zWplC149YlqCLDO46D2o+bG3qHyrOIrUyanu9nfaBq5Z9u6OX+
+         Bu8wIpp27FYsMOBb/aNtjx3k120YqgfNF8w4wqV7nWka7och4jugEJP9w1WqK9AdjxlT
+         /hOifF0TchdYcSXU4NdE1of49eaK2HxwUF4V7WZhrt+nhHPk6Nb5NzEPR6BZ39JJMt7R
+         lY0PR/Ypkr8qmXT7glrlNwnDSuTNwODJ1smlmjYwW24+gW1VKRJBl/GvyGG7RvEXwnpj
+         PofHeCdPETrCIXVBFyM6CRGFxfHWdcGypLFq+aUI+r5HJwt6BxqGQr/NkbR11YZaexbe
+         BIbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691787058; x=1692391858;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3jqJojQwGIq+MbCn3Pj9qfGFrLvfGPKUQcVkXP9fboM=;
+        b=DSEYywLBdpdxmm2NTkucKVyIpj9O3U/4XN/EAidCN+iIfSFh1YzbU2muDmM3+Ep+97
+         CJZZLG42XXYT11+2KvTrpsBWkEBd0GAGT+HyC0kQHLfm9SfYGu+S8GePGesL6FJWrBCz
+         3lxpDOWpq0B627OggyR2gPDy4/fMw760zWTg1YEjEE+a8UK1mdEWnXIOTAeGtUZ0YM6S
+         smFiBYfKJxEUYsWfEoHrI7FRCrO60+iQqaPcVUlVkAQeT7O7DDRxXA+1bO+OzPhcZ+s7
+         OSh591imVu+Q1I+OyIUchdER9DEQspBH76nfQlx9wGTMUsnXzdBefrq/QeNqpxQS9R71
+         VJlA==
+X-Gm-Message-State: AOJu0YyzW/t8RRq8VgqaMorOwvwCophNyseNhIHT0MMkOBvU05+Xxy5+
+        e+GuugOwoAUdvme1mfbK49mxlA==
+X-Google-Smtp-Source: AGHT+IH0hhbtty9vT+TeG2QntORrbeXlcZhcz/Q6BxEU88bKOnfFh8w4K3jurXe77Op8sXmuYkKT0Q==
+X-Received: by 2002:a05:6512:3452:b0:4fe:15b5:a5f9 with SMTP id j18-20020a056512345200b004fe15b5a5f9mr2048837lfr.54.1691787058307;
+        Fri, 11 Aug 2023 13:50:58 -0700 (PDT)
+Received: from [192.168.1.101] (abyj188.neoplus.adsl.tpnet.pl. [83.9.29.188])
+        by smtp.gmail.com with ESMTPSA id w26-20020a19c51a000000b004fb964d48e6sm858285lfe.95.2023.08.11.13.50.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Aug 2023 13:50:57 -0700 (PDT)
+From:   Konrad Dybcio <konrad.dybcio@linaro.org>
+Subject: [PATCH 0/3] Introduce PRNG on SM8450
+Date:   Fri, 11 Aug 2023 22:50:55 +0200
+Message-Id: <20230811-topic-8450_prng-v1-0-01becceeb1ee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC+f1mQC/x2NWwrCQAwAr1LybSDbVl28iojsI20DJV2yKkLp3
+ V38nIFhdqhswhVu3Q7GH6myaQN36iAtQWdGyY2hp34g7xy+tiIJ/XimZzGd8RImIn8dchwztCq
+ GyhgtaFpap+91bbIYT/L9b+6P4/gBWBV7FnYAAAA=
+To:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v2 3/6] dt-bindings: crypto: Add Texas Instruments MCRC64
-Message-ID: <20230811-imminent-fancied-89663c373ab5@spud>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230719-mcrc-upstream-v2-3-4152b987e4c2@ti.com>
- <20230811-crestless-gratify-21c9bb422375@spud>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="yk7Io+ad3L2jbO+M"
-Content-Disposition: inline
-In-Reply-To: <20230811-crestless-gratify-21c9bb422375@spud>
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+Cc:     Marijn Suijten <marijn.suijten@somainline.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Konrad Dybcio <konrad.dybcio@linaro.org>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1691787056; l=888;
+ i=konrad.dybcio@linaro.org; s=20230215; h=from:subject:message-id;
+ bh=achINi13s2oBouycijFvJmTS8jFnC3XtwNFEu/25/9I=;
+ b=TsC/xrTi+lazROIHVs6x9cO4a9GqYA13OfLaqe0W1JMsaPXXxGezBGPM3CTF2/X4nRy1nnK3z
+ YIZ4j8k9kj1CGBz8wPh0gQjRphAFSgXMOlp99Vur885oeRRtRbzjxEF
+X-Developer-Key: i=konrad.dybcio@linaro.org; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+SM8450's PRNG seems to be the same good ol' IP, except without a core
+clock.
 
---yk7Io+ad3L2jbO+M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For a lack of a better idea on how to test it, /proc/crypto reports that
+the selftest has gone through..
 
-On Fri, Aug 11, 2023 at 04:34:33PM +0100, Conor Dooley wrote:
-> On Fri, Aug 11, 2023 at 12:58:50AM +0530, Kamlesh Gurudasani wrote:
-> > Add binding for Texas Instruments MCRC64
-> >=20
-> > MCRC64 engine calculates 64-bit cyclic redundancy checks (CRC)
-> > according to the ISO 3309 standard.
-> >=20
-> > The ISO 3309 64-bit CRC model parameters are as follows:
-> >     Generator Polynomial: x^64 + x^4 + x^3 + x + 1
-> >     Polynomial Value: 0x000000000000001B
-> >     Initial value: 0x0000000000000000
-> >     Reflected Input: False
-> >     Reflected Output: False
-> >     Xor Final: 0x0000000000000000
-> >=20
-> > Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
-> > ---
-> >  Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml | 47 +++++++++=
-++++++++++++++++++++++++++++++++++++++
-> >  MAINTAINERS                                             |  5 +++++
-> >  2 files changed, 52 insertions(+)
-> >=20
-> > diff --git a/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml b/=
-Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-> > new file mode 100644
-> > index 000000000000..38bc7efebd68
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-> > @@ -0,0 +1,47 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/ti,mcrc64.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Texas Instruments MCRC64
-> > +
-> > +description: The MCRC64 engine calculates 64-bit cyclic redundancy che=
-cks
->=20
-> A newline after "description" please.
->=20
-> > +  (CRC) according to the ISO 3309 standard.
-> > +
-> > +maintainers:
-> > +  - Kamlesh Gurudasani <kamlesh@ti.com>
-> > +
-> > +properties:
-> > +  compatible:
-> > +    const: ti,am62-mcrc64
->=20
-> Is the am62 an SoC or a family of SoCs? I googled a wee bit for am62 &
-> there seems to be an am625 and an am623?
+Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+---
+Konrad Dybcio (3):
+      dt-bindings: crypto: qcom,prng: Add SM8450
+      crypto: qcom-rng: Make the core clock optional regardless of ACPI presence
+      arm64: dts: qcom: sm8450: Add PRNG
 
-Or is it an am62p5, in which case the compatible should contain
-ti,am62p5 I suppose. Sorry for my confusion here, its not really clear
-me too since I've been seeing many different-but-similar product names
-the last few days.
+ .../devicetree/bindings/crypto/qcom,prng.yaml      | 24 +++++++++++++++++-----
+ arch/arm64/boot/dts/qcom/sm8450.dtsi               |  5 +++++
+ drivers/crypto/qcom-rng.c                          | 10 +++------
+ 3 files changed, 27 insertions(+), 12 deletions(-)
+---
+base-commit: 21ef7b1e17d039053edaeaf41142423810572741
+change-id: 20230811-topic-8450_prng-6af00873db4d
 
-Thanks,
-Conor.
+Best regards,
+-- 
+Konrad Dybcio <konrad.dybcio@linaro.org>
 
->=20
-> Otherwise, this looks good to me.
->=20
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +  power-domains:
-> > +    maxItems: 1
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - power-domains
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/soc/ti,sci_pm_domain.h>
-> > +
-> > +    crc@30300000 {
-> > +      compatible =3D "ti,am62-mcrc64";
-> > +      reg =3D <0x30300000 0x1000>;
-> > +      clocks =3D <&k3_clks 116 0>;
-> > +      power-domains =3D <&k3_pds 116 TI_SCI_PD_EXCLUSIVE>;
-> > +    };
-> > +
-> > +...
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 02a3192195af..66b51f43d196 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -21481,6 +21481,11 @@ S:	Maintained
-> >  F:	Documentation/devicetree/bindings/iio/adc/ti,lmp92064.yaml
-> >  F:	drivers/iio/adc/ti-lmp92064.c
-> > =20
-> > +TI MEMORY CYCLIC REDUNDANCY CHECK (MCRC64) DRIVER
-> > +M:	Kamlesh Gurudasani <kamlesh@ti.com>
-> > +S:	Maintained
-> > +F:	Documentation/devicetree/bindings/crypto/ti,mcrc64.yaml
-> > +
-> >  TI PCM3060 ASoC CODEC DRIVER
-> >  M:	Kirill Marinushkin <kmarinushkin@birdec.com>
-> >  L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
-> >=20
-> > --=20
-> > 2.34.1
-> >=20
-
-
-
---yk7Io+ad3L2jbO+M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNZVlgAKCRB4tDGHoIJi
-0uHpAP4hfYrFNPj0CkA40P9EKD3r/FKiAc6X2K23ePY3vww/XAEA6WukF13gDiEn
-uOcZZtE+v9yuqJykNIKHzEe9ishk3gI=
-=Qk3W
------END PGP SIGNATURE-----
-
---yk7Io+ad3L2jbO+M--
