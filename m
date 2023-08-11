@@ -2,147 +2,101 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8044BC001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 13:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DC8C0015E
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 14:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234343AbjHKNrN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 09:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35944 "EHLO
+        id S230509AbjHKOKq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 10:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjHKNrN (ORCPT
+        with ESMTP id S229580AbjHKOKq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 09:47:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD356ED;
-        Fri, 11 Aug 2023 06:47:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 59C6B652B4;
-        Fri, 11 Aug 2023 13:47:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DA38C433C7;
-        Fri, 11 Aug 2023 13:47:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691761631;
-        bh=m+dHKeCOyfldrelbfFz9R7hBuqKctkP1BqoAT6/0PyY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=nYa2mNHPKNfSnuFKw7NHYN4XlDi7Uqas9nWnWhLr/zgt2Pu3Y/16KP7UmQRI5NTxK
-         5kYddeJK7hdxuBwRThnoSxPwFMubH4JNotpfdWYFfNd5Bq1lMeNvhICFrPDwY5dTIn
-         TFDljzE+TWGO4sb9yDQ/tSIjPkIt8ibFcDbQ3ydcQdquwUQgk6Sm9AERkAwiPGq11I
-         mttZq7B93LgneVZUWHLKSxOuN4UsIzJc8INzqaDl1O9O/+mzg0+YM+NUuZPtp4z6b2
-         drNUXzgq1fBZb0zZ+J4nw3nPKcAZmX/debxlw+w/lTdPc/AIJWqGx7dq+XQmuHGUv4
-         DxjMBuomkFoOA==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-        Ayush Sawal <ayush.sawal@chelsio.com>,
-        Ryan Wanner <Ryan.Wanner@microchip.com>,
-        Yangtao Li <frank.li@vivo.com>, Wang Ming <machel@vivo.com>,
-        Sergiu Moga <sergiu.moga@microchip.com>,
-        Gaosheng Cui <cuigaosheng1@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] crypto: drivers - avoid memcpy size warning
-Date:   Fri, 11 Aug 2023 15:46:33 +0200
-Message-Id: <20230811134704.3252535-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+        Fri, 11 Aug 2023 10:10:46 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F39D7
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 07:10:44 -0700 (PDT)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RMlxL1V2NzqSgQ
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 22:07:50 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 11 Aug 2023 22:10:42 +0800
+From:   Weili Qian <qianweili@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <shenyang39@huawei.com>,
+        <liulongfang@huawei.com>, Weili Qian <qianweili@huawei.com>
+Subject: [PATCH v2 0/7] crypto: hisilicon - fix some issues in hisilicon drivers
+Date:   Fri, 11 Aug 2023 22:07:42 +0800
+Message-ID: <20230811140749.5202-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+This patchset fixes some issues of the HiSilicon accelerator drivers.
 
-Some configurations with gcc-12 or gcc-13 produce a warning for the source
-and destination of a memcpy() in atmel_sha_hmac_compute_ipad_hash() potentially
-overlapping:
+The first patch uses 128bit atomic operations to access mailbox instead of
+the generic IO interface. The reason is that one QM hardware entity in
+one accelerator servers QM mailbox MMIO interfaces in related PF and VFs.
+A mutex cannot lock mailbox processes in different functions.
 
-In file included from include/linux/string.h:254,
-                 from drivers/crypto/atmel-sha.c:15:
-drivers/crypto/atmel-sha.c: In function 'atmel_sha_hmac_compute_ipad_hash':
-include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 408 and 280 overlaps 1 or more bytes at offset 408 [-Werror=restrict]
-   57 | #define __underlying_memcpy     __builtin_memcpy
-      |                                 ^
-include/linux/fortify-string.h:648:9: note: in expansion of macro '__underlying_memcpy'
-  648 |         __underlying_##op(p, q, __fortify_size);                        \
-      |         ^~~~~~~~~~~~~
-include/linux/fortify-string.h:693:26: note: in expansion of macro '__fortify_memcpy_chk'
-  693 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-      |                          ^~~~~~~~~~~~~~~~~~~~
-drivers/crypto/atmel-sha.c:1773:9: note: in expansion of macro 'memcpy'
- 1773 |         memcpy(hmac->opad, hmac->ipad, bs);
-      |         ^~~~~~
+The second patch allocs memory for mailbox openration when the driver is
+bound to the device. The software directly returns after waiting for the
+mailbox times out, but the hardware does not cancel the operation. If the
+temporary memory is used, the hardware may access the memory after it is
+released.
 
-The same thing happens in two more drivers that have the same logic:
+The third patch enables the maximum number of queues supported by the
+device instead of returning error, when the maximum number of queues is
+less than the default value.
 
-drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_ahash_setkey':
-include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing 129 or more bytes at offsets 260 and 132 overlaps 1 or more bytes at offset 260 [-Werror=restrict]
-drivers/crypto/bcm/cipher.c: In function 'ahash_hmac_setkey':
-include/linux/fortify-string.h:57:33: error: '__builtin_memcpy' accessing between 129 and 4294967295 bytes at offsets 840 and 712 overlaps between 1 and 4294967167 bytes at offset 840 [-Werror=restrict]
+The fourth patch checks the number of queues on the function before
+algorithm registering to crypto subsystem. If the number of queues
+does not meet the minimum number of queues for task execution, the
+function is not registered to crypto to avoid process initialization
+failure.
 
-I don't think it can actually happen because the size is strictly bounded
-to the available block sizes, at most 128 bytes, though inlining decisions
-could lead gcc to not see that.
+The fifth patch adds a cond_resched() to prevent soft lockup.
+The sixth patch fixes aeq type value. 
+The last patch increases function communication waiting time so that the
+PF can communicate with all VFs.
 
-Use the unsafe_memcpy() helper instead of memcpy(), with the only difference
-being that this skips the hardening checks that produce the warning.
+v2:
+ - Re-describe the issues resolved by these patches.
+ - Fix some code styles.
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/atmel-sha.c         | 3 ++-
- drivers/crypto/bcm/cipher.c        | 3 ++-
- drivers/crypto/chelsio/chcr_algo.c | 3 ++-
- 3 files changed, 6 insertions(+), 3 deletions(-)
+Longfang Liu (1):
+  crypto: hisilicon/qm - fix PF queue parameter issue
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 54fec72dfba27..99a9ff8e743f2 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1770,7 +1770,8 @@ static int atmel_sha_hmac_compute_ipad_hash(struct atmel_sha_dev *dd)
- 	size_t bs = ctx->block_size;
- 	size_t i, num_words = bs / sizeof(u32);
- 
--	memcpy(hmac->opad, hmac->ipad, bs);
-+	unsafe_memcpy(hmac->opad, hmac->ipad, bs,
-+		      "fortified memcpy causes -Wrestrict warning");
- 	for (i = 0; i < num_words; ++i) {
- 		hmac->ipad[i] ^= 0x36363636;
- 		hmac->opad[i] ^= 0x5c5c5c5c;
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 70b911baab26d..4c46357e2570e 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -2397,7 +2397,8 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
- 		memset(ctx->ipad + ctx->authkeylen, 0,
- 		       blocksize - ctx->authkeylen);
- 		ctx->authkeylen = 0;
--		memcpy(ctx->opad, ctx->ipad, blocksize);
-+		unsafe_memcpy(ctx->opad, ctx->ipad, blocksize,
-+			      "fortified memcpy causes -Wrestrict warning");
- 
- 		for (index = 0; index < blocksize; index++) {
- 			ctx->ipad[index] ^= HMAC_IPAD_VALUE;
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 0eade4fa6695b..16298ae4a00bf 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2216,7 +2216,8 @@ static int chcr_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 		memcpy(hmacctx->ipad, key, keylen);
- 	}
- 	memset(hmacctx->ipad + keylen, 0, bs - keylen);
--	memcpy(hmacctx->opad, hmacctx->ipad, bs);
-+	unsafe_memcpy(hmacctx->opad, hmacctx->ipad, bs,
-+		      "fortified memcpy causes -Wrestrict warning");
- 
- 	for (i = 0; i < bs / sizeof(int); i++) {
- 		*((unsigned int *)(&hmacctx->ipad) + i) ^= IPAD_DATA;
+Weili Qian (6):
+  crypto: hisilicon/qm - obtain the mailbox configuration at one time
+  crypto: hisilicon/qm - alloc buffer to set and get xqc
+  crypto: hisilicon/qm - check function qp num before alg register
+  crypto: hisilicon/qm - prevent soft lockup in qm_poll_req_cb()'s loop
+  crypto: hisilicon/qm - fix the type value of aeq
+  crypto: hisilicon/qm - increase function communication waiting time
+
+ drivers/crypto/hisilicon/debugfs.c          |  75 ++-
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c |  25 +-
+ drivers/crypto/hisilicon/hpre/hpre_main.c   |  19 +-
+ drivers/crypto/hisilicon/qm.c               | 567 ++++++++++----------
+ drivers/crypto/hisilicon/qm_common.h        |   6 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  |  31 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c    |  29 +-
+ drivers/crypto/hisilicon/zip/zip_crypto.c   |  29 +-
+ drivers/crypto/hisilicon/zip/zip_main.c     |  19 +-
+ include/linux/hisi_acc_qm.h                 |  39 +-
+ 10 files changed, 475 insertions(+), 364 deletions(-)
+ mode change 100644 => 100755 drivers/crypto/hisilicon/qm.c
+
 -- 
-2.39.2
+2.33.0
 
