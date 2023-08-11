@@ -2,54 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB32EB64DD
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 04:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D05DC04A6A
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 06:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbjHKEk7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 00:40:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44822 "EHLO
+        id S231406AbjHKGkg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 02:40:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjHKEk6 (ORCPT
+        with ESMTP id S229459AbjHKGkf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 00:40:58 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748F8270F
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Aug 2023 21:40:54 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qUJx1-001wBr-8G; Fri, 11 Aug 2023 12:40:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 12:40:39 +0800
-Date:   Fri, 11 Aug 2023 12:40:39 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Guozihua (Scott)" <guozihua@huawei.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH RFC v3 3/3] crypto: Introduce SM9 key exchange algorithm
-Message-ID: <ZNW7xzDM+WttXeUT@gondor.apana.org.au>
-References: <20230625014958.32631-1-guozihua@huawei.com>
- <20230625014958.32631-4-guozihua@huawei.com>
- <ZLD+9pRFQdSpfMog@gondor.apana.org.au>
- <1bcf580b-3a19-c0aa-b3cb-1f9f183b61e4@huawei.com>
+        Fri, 11 Aug 2023 02:40:35 -0400
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C9D2694;
+        Thu, 10 Aug 2023 23:40:34 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37B6eBOd021185;
+        Fri, 11 Aug 2023 01:40:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1691736011;
+        bh=jF7veAJCg7xxofNq8kFXr6on39XUtII8DDbN01UPOg8=;
+        h=From:To:CC:Subject:In-Reply-To:References:Date;
+        b=MhHDCWrW7h5mBgJXO24FHVkVesCB2J1yMupcXIKgKUUEhjv0ANFaSIFdhoq1W+EBh
+         riNtETxC2Mrr0SMFPYC2wRJZR0jNszh/ZCbWKD1aapk+XXLq+7HX0+ZOjm0EVuJyBb
+         LqskMROLcAzz3aYAD+h86I8WyRXq65Engmxb/tMA=
+Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37B6eBpO122620
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 11 Aug 2023 01:40:11 -0500
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 11
+ Aug 2023 01:40:10 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 11 Aug 2023 01:40:10 -0500
+Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37B6e914007531;
+        Fri, 11 Aug 2023 01:40:09 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso
+ framework
+In-Reply-To: <20230811042423.GA1295@sol.localdomain>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230719-mcrc-upstream-v2-2-4152b987e4c2@ti.com>
+ <20230811042423.GA1295@sol.localdomain>
+Date:   Fri, 11 Aug 2023 12:10:09 +0530
+Message-ID: <87r0oadquu.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1bcf580b-3a19-c0aa-b3cb-1f9f183b61e4@huawei.com>
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 11:25:27AM +0800, Guozihua (Scott) wrote:
+Eric Biggers <ebiggers@kernel.org> writes:
+
+> On Fri, Aug 11, 2023 at 12:58:49AM +0530, Kamlesh Gurudasani wrote:
+>> diff --git a/lib/crc64-iso.c b/lib/crc64-iso.c
+>> new file mode 100644
+>> index 000000000000..d6e803124fa0
+> [...]
+>> +u64 crc64_iso_update(u64 crc, const unsigned char *buffer, size_t len)
+>> +{
+>> +	struct {
+>> +		struct shash_desc shash;
+>> +		u64 crc;
+>> +	} desc;
+>> +	int err;
+>> +
+>> +	if (static_branch_unlikely(&crc64_iso_fallback))
+>> +		return crc64_iso_generic(crc, buffer, len);
+>> +
+>> +	rcu_read_lock();
+>> +	desc.shash.tfm = rcu_dereference(crc64_iso_tfm);
+>> +	desc.crc = crc;
+>> +	err = crypto_shash_update(&desc.shash, buffer, len);
+>> +	rcu_read_unlock();
+>> +
+>> +	WARN_ON_ONCE(err);
+>> +
+>> +	return desc.crc;
+>> +}
+>> +EXPORT_SYMBOL_GPL(crc64_iso_update);
+>> +
+>> +u64 crc64_iso(const unsigned char *buffer, size_t len)
+>> +{
+>> +	return crc64_iso_update(0, buffer, len);
+>> +}
+>> +EXPORT_SYMBOL_GPL(crc64_iso);
 >
-> Just while we are here, do you think it's a good idea to also introduce
-> a new crypto algorithm type for IBCs to better support their
-> functionality if there are usage within kernel and we are to port this
-> algorithm in?
+> These functions are never called.
+>
+> Why are you trying to add unused code to the kernel?
+>
+> - Eric
+Thanks for the review, Eric.
 
-If there is a general need for a new type then it will be considered.
-I cannot answer your question as I have no idea what you have in mind
-and how generally applicable it is.
+Will remove this in next revision.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+Kamlesh
