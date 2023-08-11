@@ -2,50 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3908CC001B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 11:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B1F0C001DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 11:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbjHKLaX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 07:30:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48870 "EHLO
+        id S232228AbjHKLak (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 07:30:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbjHKLaW (ORCPT
+        with ESMTP id S229576AbjHKLak (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 07:30:22 -0400
+        Fri, 11 Aug 2023 07:30:40 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C4DE73
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Aug 2023 04:30:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DA6E62;
+        Fri, 11 Aug 2023 04:30:39 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qUQLQ-0024CX-Uh; Fri, 11 Aug 2023 19:30:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 19:30:17 +0800
-Date:   Fri, 11 Aug 2023 19:30:17 +0800
+        id 1qUQLi-0024D2-Co; Fri, 11 Aug 2023 19:30:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 11 Aug 2023 19:30:34 +0800
+Date:   Fri, 11 Aug 2023 19:30:34 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ruan Jinjie <ruanjinjie@huawei.com>
-Cc:     linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH -next] crypto: hisilicon/sec - Do not check for 0 return
- after calling platform_get_irq()
-Message-ID: <ZNYbyUDvxzHJet+p@gondor.apana.org.au>
-References: <20230803092933.720749-1-ruanjinjie@huawei.com>
+To:     Mark O'Donovan <shiftee@posteo.net>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ebiggers@google.com
+Subject: Re: [PATCH RESEND] lib/mpi: avoid null pointer deref in mpi_cmp_ui()
+Message-ID: <ZNYb2p2hWH1aUyKO@gondor.apana.org.au>
+References: <20230804093218.418276-1-shiftee@posteo.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230803092933.720749-1-ruanjinjie@huawei.com>
+In-Reply-To: <20230804093218.418276-1-shiftee@posteo.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 03, 2023 at 05:29:33PM +0800, Ruan Jinjie wrote:
-> Since commit ce753ad1549c ("platform: finally disallow IRQ0 in
-> platform_get_irq() and its ilk"), there is no possible for
-> platform_get_irq() to return 0. Use the return value
-> from platform_get_irq().
+On Fri, Aug 04, 2023 at 09:32:18AM +0000, Mark O'Donovan wrote:
+> During NVMeTCP Authentication a controller can trigger a kernel
+> oops by specifying the 8192 bit Diffie Hellman group and passing
+> a correctly sized, but zeroed Diffie Hellamn value.
+> mpi_cmp_ui() was detecting this if the second parameter was 0,
+> but 1 is passed from dh_is_pubkey_valid(). This causes the null
+> pointer u->d to be dereferenced towards the end of mpi_cmp_ui()
 > 
-> Signed-off-by: Ruan Jinjie <ruanjinjie@huawei.com>
+> Signed-off-by: Mark O'Donovan <shiftee@posteo.net>
 > ---
->  drivers/crypto/hisilicon/sec/sec_drv.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  lib/mpi/mpi-cmp.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
