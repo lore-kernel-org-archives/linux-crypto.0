@@ -2,246 +2,129 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E796DC0015E
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 12:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 042A9C001B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Aug 2023 13:38:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbjHKM6G (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Aug 2023 08:58:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44486 "EHLO
+        id S230217AbjHKNi1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Aug 2023 09:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjHKM6F (ORCPT
+        with ESMTP id S229645AbjHKNi1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Aug 2023 08:58:05 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2073.outbound.protection.outlook.com [40.107.8.73])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA0B26A0;
-        Fri, 11 Aug 2023 05:58:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m8zat9OrROUrBbzp4kkPA1FZYXt8YnoTUKS7YjMFj6NUiqf0h4+c9KWvtoCEH0vvsFnjCAOdjPZWUzsDUZM5D5M0qvA3hldFGxsirCys+6Ee98oFxjKqUMKcC5VOQOWK36SgenTkhe2exkM7rVGvXYkWSzpfA2/68or/uIsZQG7n5fFH1IZSV/PDMbbMeMf8Y6/o9p3Q3KeKZXvI8SLQ3f55p9IcN6aNth+F3XOYWEXrt6D3TSB1kOGmDi5ADwRNjrL2W1sHOp4TLQe2lHPtpAD14AxnNhKPPs1XC811PBpRjJKppjFKA4AN5uXeCitJ4BJzh2D5u6taFpa1gypYtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j7UcXP7IPTBWc5ptFAGbDCeQ9XdsD/nzplAN5Bdxomc=;
- b=faN+SlZaBhOcaVRakn5SOJheNNAaXfy3HOi6e4K+SzJqroimfNaOp0WITWVU2NGnzkfSpOYnq69V6mAqEx6v350bMeSe4vISzf/h0RhWAQxcJrl+RAh5gv+Qs6obc5AzKB56Jdy+T6J7VzrccWIVuXtqm6pmaH50QkTga2Zi0etyJj0LL3hW1WALe+oWH5CIkEAAjujWvhvr51zY+QhHhaYoQSBOBki9kaL65gPsgZnAB/l2eLGoZUeEIXhCbvaOw1UZOGbNdbY1ieIeSiQFCPPlgVxhovCbN0/Kd3uspZt0yPsIWvV5skxvadXEd2MvDl/cSwnvOj9uyOClFdoYpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j7UcXP7IPTBWc5ptFAGbDCeQ9XdsD/nzplAN5Bdxomc=;
- b=JpSEThfVUxvp8U/WXbGxnP4iDk1wtv4LCfpxZj4np0YPn9q4cEEZ4WaZPd8qQD1RKVisgDluJRnLsOHsvoHthzlH69Z6n68RPZ2VsvzzBa7JS4Gq4UiW51XjRVsU85DmiefCF/wLY2JkKDhraKy7I2dIjAkNkqwDX25wfA/EdyY=
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com (2603:10a6:10:314::7)
- by PA4PR04MB7616.eurprd04.prod.outlook.com (2603:10a6:102:e7::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.30; Fri, 11 Aug
- 2023 12:58:01 +0000
-Received: from DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::15ed:8451:b0a2:ec64]) by DU0PR04MB9563.eurprd04.prod.outlook.com
- ([fe80::15ed:8451:b0a2:ec64%4]) with mapi id 15.20.6652.029; Fri, 11 Aug 2023
- 12:58:01 +0000
-From:   Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Linux regressions mailing list <regressions@lists.linux.dev>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Bastian Krause <bst@pengutronix.de>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>
-Subject: RE: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
- more devices
-Thread-Topic: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to
- support more devices
-Thread-Index: AQHZnQeck2v36DTv3UmJ9e2grSaJgq++HokAgAFf5ACAAWGXIIAHwLJggBGNPoCAAC8BgIAKyfWAgAAvDSCAABYvkA==
-Date:   Fri, 11 Aug 2023 12:58:01 +0000
-Message-ID: <DU0PR04MB95637DD95D05179F36AFAF958E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
- <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
- <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
- <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
- <AM0PR04MB60046B045B5965A61BA1CA91E709A@AM0PR04MB6004.eurprd04.prod.outlook.com>
- <f9e34f8a-5a7b-8223-c672-4fcb2bb23c0a@leemhuis.info>
- <DU0PR04MB95639E903580457856250C008E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-In-Reply-To: <DU0PR04MB95639E903580457856250C008E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU0PR04MB9563:EE_|PA4PR04MB7616:EE_
-x-ms-office365-filtering-correlation-id: de03c170-0e44-4c64-0844-08db9a6a980c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: opKeszmZYZ4t71i61Xm7JS0OpniwHciZNqd5f8ZELQ4Ha8y/rf53ZhdeLIWxzkDbZKSSg/GyIsZ9jdyLnTfZhGXJ3T5YC7xfzt6b99idK+8Wl4E8eYi8BS57ELWGAZIHI8PdvswP3chBRP2hqtWdeoj34bno+aqoReveGI29c00SO9BOSUuNrgFPiV5S/4pDg9Y6BRPklm7BDweGWlP+zEpkLLXwZ8nN66NvfZiG2FFj/d7N5srQkK+//BdFa6kse0+rMRh2x5NyZwOFdHGw08i9XuBumM6H91Lm3N2X8AlTcCDM2RheVKjq/8irwwYOSoLZ4sGtchONqnfrMNBVE3GZZ8vYNwgzq+tWQmtX1KYrK2Nksa8QN7Tga5ogmsiKPj8wCEscvUG8BlcIB02Z9rbESSCcaFFn0tBGQ5eJu8aPrmuQ9u7YAs834kviu6QssKCh6254XFl8uSK4BITF1ZQpFOIo2/LJ8u1gr5/jOwW68vaj6guUjejN86ruwEzRHJ3s/jv+Qqg0b1cmv2Umlj79GbhMeLiG6FdXKulcG3WR76dXvDrEfSyN78EXFfAi8Dk+0yg/vszAoQUCDSd46rOpQ+SKDOGHs7O/pCPBclVP6TpMWnpMW/bf6V0SovmX
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9563.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(376002)(39860400002)(366004)(1800799006)(186006)(451199021)(8676002)(26005)(53546011)(86362001)(966005)(38100700002)(54906003)(33656002)(9686003)(110136005)(45080400002)(2940100002)(2906002)(122000001)(7696005)(6506007)(478600001)(66446008)(76116006)(66946007)(66476007)(64756008)(4326008)(66556008)(71200400001)(316002)(44832011)(8936002)(41300700001)(5660300002)(38070700005)(52536014)(83380400001)(55016003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yg5AqnAaYIfRQKR+QEhOwKbok+eoI2G6iGpGJ0JAaUVTvt8iCA5RQlf+vtb/?=
- =?us-ascii?Q?XEd45xSXlKLBMdrmfxlhUZIT0nmIpQ/x4QlWcDQNqpGKFoDMcu7gQ8rYc0Wy?=
- =?us-ascii?Q?H1IbHA/OZfrYt9wvHoUbt745ubEXuwEYKNdfPQQYj6J++n+tIY9/9Gbsf1Qt?=
- =?us-ascii?Q?jFngX0M9FEBITf9LQEiulW+iBa5zVGKEVBJSzLuF8rHV4Hpu9yM5dJCfLVHo?=
- =?us-ascii?Q?K4GQHy4RLfSD2whP3Sfc5ONt+U09t8+PVsqPZc4ZeYxhMrggrD8KjK1fSK5D?=
- =?us-ascii?Q?PDneqxyF4yFns1O5IHjBlrZdx/JOySPSgi5BhBvje2mXiQ3nvBRRsU/TCPR1?=
- =?us-ascii?Q?2ZdD/9eMYokjX/7VdWcB1KPbpjVCDf5iWo9JFoMggrgoW/5vNenTx5/9JNtR?=
- =?us-ascii?Q?yqjNOX3gkD+IHTGO3tYkT8xh1IfKQCsHckQTgsyD/T4DNg2fx3UOozex8Ri5?=
- =?us-ascii?Q?ywtnrpiNRaDi2tryDT+9ziZEdjUvZhS8L9Vi7BR6+c1SSgHC8C4//SI+nAIf?=
- =?us-ascii?Q?5Ul9qepBqEfwyNoljxvEPUua6jZXumkv9sxVY4TH3IrmJh2u776l93ekQ1MJ?=
- =?us-ascii?Q?/lre3QOP8lS2nQ4aN3nX9HeiEgT2w+k9hXqbvTbVd/dL4A0wQ8YICygE+Hjj?=
- =?us-ascii?Q?5aeVOYVzfUVXgzN3ASLp+6Gwq4xQvN9SFTzDmdMFU58Ox3b+IDw7aLhJdbP9?=
- =?us-ascii?Q?7rencZE+GoExIO6k4qzszXeuDdSguEWcxpSjNObqeHAGWpfS3TuUsrj4/IeW?=
- =?us-ascii?Q?0gizKOJGBf1Y+klBcVs6bNrusyTUI+74Y7uU8QmucaP9yqUS3o28gfi3fl47?=
- =?us-ascii?Q?KD28r/aTuVdDGNIQOYNr78slOViUDqtrrjTDS5eHLtshIiGW0CxEq4FA8C+O?=
- =?us-ascii?Q?siT+Yyvxwp39oO/sP0IVB3pszRO13ANwZaoxWyskVgQ2YznZX7uodWH3/dYd?=
- =?us-ascii?Q?yehTHYF27gceE0tE12WOAjSkcxEauuYPkFaFo/W3iq5JYfTkh65iWyoMDPPc?=
- =?us-ascii?Q?csVKvJ0y/KTNs0slb/VNVEEjkgnXCghIqrtPxoEteYvSyxYf7hznL/ZrVxFe?=
- =?us-ascii?Q?OG9TDMlQRI8KCLYVurNbsitgiPy5TvILUE7qmDOckECgYpHk3tNycs7l9NnR?=
- =?us-ascii?Q?1a0g2N+0EbDdwqm4e4rVBNTwTsgDpPya6VRLONIyGU4dKVW+AkJCAIrMIY2s?=
- =?us-ascii?Q?UCd6U2bKNwL/jqXEbCQDkAJcXLT5RTZhvT4Q4BmNEUXIfPsbkNe4sSDFc4r8?=
- =?us-ascii?Q?yzvKH4rX9vCEqiqQ1Vz3he8VgWpueJ71FEXCYjJo7MwlAIFZzerkzqytqoiY?=
- =?us-ascii?Q?/D3aVzTo2gxbH7MCdt8UtERCkMkHVxEA3EzBdyRWZOLu9S24itOm5TbDRM1B?=
- =?us-ascii?Q?TehCG/ZZu9Hx6URspYEAF5Tbl1rXoLB1pLrkwhQRSiDLwpDq18MgP1MfRNDU?=
- =?us-ascii?Q?QbuJuNjL9ZlGrJZAuWSs2vLWIAuwGTqOy1YOHWnt4+x19EMkJUliDhCtRxUl?=
- =?us-ascii?Q?uXQQamN1QKjbwoX9I76CQ0JmYlk4VYnm2/qVrTOaUbMWsf+cgWI+RKEFNF1r?=
- =?us-ascii?Q?qbeZQJz3P4+VSqasFqBFZBp3p7WVOKObQ8J6BQwhjAT/52U0Elarypz/LH2A?=
- =?us-ascii?Q?nA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9563.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de03c170-0e44-4c64-0844-08db9a6a980c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Aug 2023 12:58:01.1103
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bYCBmu0EE0Hpl2drtTWdX6F9VxjbK5/dh4toNzZz9rc/wYAEvQ0prcyquX4zHFEp9saFzKm2OHlkbGb5B/5OBr6C/eUqqo3KTKh14z26qQo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7616
+        Fri, 11 Aug 2023 09:38:27 -0400
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB022ED;
+        Fri, 11 Aug 2023 06:38:25 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 386155C0099;
+        Fri, 11 Aug 2023 09:38:22 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Fri, 11 Aug 2023 09:38:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1691761102; x=1691847502; bh=FS
+        1HpjgV5XWBmUntM3Uxn3bym8vCanuc3UC0yqx/KW8=; b=PjWFWT7UYzW6ZfAj/J
+        +Fv0hoZeXq1YPNcyENya6gIijy0/PaUqhYLzhnJOSUDkE516eFZoBAGizkzTJnfy
+        lEx7X0vVkxfxe042X95w84QlYp7eTFHTyQFdsBEBUU3hOzJt6sdD1kE579iQkcze
+        V35ou5vqgW8N59ufIH4nyi56/4Hp6pq9c9R5LOksMs8XiO1cebkdaUbzqnlgVwff
+        AF+N9/nHH8zdURpPexWi49qaOUx6xfCO1xkEN3EhLgVb43OTJcKQkc3s00dvsi7n
+        /JRzdsAEaEpopFdezS8gO0767iVhG+dHmKjVBj/9D3wFbJU5O3TFNWpCg+KMtUpF
+        JDIg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; t=1691761102; x=1691847502; bh=FS1HpjgV5XWBm
+        UntM3Uxn3bym8vCanuc3UC0yqx/KW8=; b=TQQbf3Mu01WkJwzGpHKzbchWQj16P
+        I+klZ0U7DlPXKh1YREsN8OgtsU+H/J/Yg0yorNWJQnwHTokM4qgHBJA4sy1tpY3R
+        FMtfBrqNyGSawXBMSkJ2YpW9rAZuy4cs+ba0XntzIji73wPOU4WJiSbngxU2zgNM
+        nMvvxWjWD36dbDxvhWb2RgcpvIB+nR84VsbzhUP1GZSdehRyyo0395Pi3urK4f7F
+        w8meh4ysQ7QYZvrB5721d+sd6euOXKlkCZzVlq5lOLQ+Itx8DH5dDk/9beIOflAK
+        wt61ohFhF7UC5YmboL4WcaCWyaTIZV+0dJys/3D4GxLbr3gGoeEwmpG9w==
+X-ME-Sender: <xms:zDnWZP0mnJDANDj0MfLmJ_fpTZfDXH8Iasyp5io9ZiW9qaUur57opQ>
+    <xme:zDnWZOEDtnxKvb-paTYhrkPb44MfK-8NQRhnfKXNQlPI0UhR_gUxvkHFqdaCbfr9s
+    25maaUJnAKoGiVCMYs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrleekgdeihecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:zDnWZP4kyEkgMmwOZ6cOHuKg2CKyjQ5cpLotp9x43ll21PF8cDomjA>
+    <xmx:zDnWZE1gf95ogYQrj7s3dqr6BfyQU4fqHV2Te9uDldrl3bulhwqxCw>
+    <xmx:zDnWZCHzAPbr4aoW0j33YTfeeL21WZw0S1SgW5sJp8nDgkSjv_y7cw>
+    <xmx:zjnWZPceAKh_hczubs1YVb754fJvuV5IXdK3We5yN3avfb9RhFYtMQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id AB450B60089; Fri, 11 Aug 2023 09:38:20 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-624-g7714e4406d-fm-20230801.001-g7714e440
+Mime-Version: 1.0
+Message-Id: <8c3b242f-7d6f-4bec-9a44-61ac65a26637@app.fastmail.com>
+In-Reply-To: <ZNYSFWA3WNAdRqfg@gondor.apana.org.au>
+References: <20230724135327.1173309-1-arnd@kernel.org>
+ <ZMyz27awrVJ8QHzA@gondor.apana.org.au>
+ <d9184ad7-7d34-45bf-81e3-db053bf7425c@app.fastmail.com>
+ <ZNYSFWA3WNAdRqfg@gondor.apana.org.au>
+Date:   Fri, 11 Aug 2023 15:38:00 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Linus Torvalds" <torvalds@linux-foundation.org>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>
+Cc:     "Arnd Bergmann" <arnd@kernel.org>,
+        "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
+        "Ryan Wanner" <Ryan.Wanner@microchip.com>,
+        "Yangtao Li" <frank.li@vivo.com>, linux-kernel@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        "Sergiu Moga" <sergiu.moga@microchip.com>,
+        "Ayush Sawal" <ayush.sawal@chelsio.com>,
+        "Gaosheng Cui" <cuigaosheng1@huawei.com>,
+        "Claudiu Beznea" <claudiu.beznea@microchip.com>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        "Kees Cook" <keescook@chromium.org>
+Subject: Re: [PATCH 1/2] crypto: drivers - avoid memcpy size warning
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Fri, Aug 11, 2023, at 12:48, Herbert Xu wrote:
+> On Mon, Aug 07, 2023 at 02:04:05PM +0200, Arnd Bergmann wrote:
 
-We discussed about it and lets revert the patch for now, as the tag is to b=
-e applied this weekend.
+>
+> 	struct atmel_sha_hmac_ctx *hmac = crypto_ahash_ctx(tfm);
+> 	size_t bs = ctx->block_size;
+>
+> 	memcpy(hmac->opad, hmac->ipad, bs);
+>
+> The block_size is set by the algorithm, you can easily grep for
+> it in atmel-sha.c and the biggest one there is SHA512_BLOCK_SIZE,
+> which is how big hmac->ipad/hmac->opad are.
+>
+> So logically this code is perfectly fine.
 
-Thanks,
-Meenakshi
+Right, that was my conclusion as well.
 
-> -----Original Message-----
-> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Sent: Friday, August 11, 2023 5:25 PM
-> To: Linux regressions mailing list <regressions@lists.linux.dev>; Gaurav =
-Jain
-> <gaurav.jain@nxp.com>; Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
-> <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
-> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
-> <pankaj.gupta@nxp.com>
-> Subject: RE: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to su=
-pport
-> more devices
->=20
-> Hi,
->=20
-> we have tested this patch on multiple variants of imx board and it is wor=
-king fine.
->=20
-> We are actively debugging the issue, it is taking time as we are not able=
- to
-> reproduce it at our end.
->=20
-> Thanks,
-> Meenakshi
->=20
-> > -----Original Message-----
-> > From: Linux regression tracking (Thorsten Leemhuis)
-> > <regressions@leemhuis.info>
-> > Sent: Friday, August 11, 2023 2:18 PM
-> > To: Gaurav Jain <gaurav.jain@nxp.com>; Herbert Xu
-> > <herbert@gondor.apana.org.au>; Meenakshi Aggarwal
-> > <meenakshi.aggarwal@nxp.com>
-> > Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
-> > crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
-> > <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
-> > <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
-> > <pankaj.gupta@nxp.com>; Linux kernel regressions list
-> > <regressions@lists.linux.dev>
-> > Subject: Re: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to
-> > support more devices
-> >
-> > [CCing the regression list, as it should be in the loop for regressions=
-:
-> > https://eur01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fdoc=
-s
-> > .ker%2F&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C84b2ed6da
-> ac44625
-> >
-> 779408db9a61d801%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63
-> 827351
-> >
-> 7248142302%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoi
-> V2luMzI
-> >
-> iLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DOWH18Cwu
-> h8zyAFqn
-> > I6iiL3Kewpj5NiWaQorKcmiYrr0%3D&reserved=3D0
-> > nel.org%2Fadmin-guide%2Freporting-
-> >
-> regressions.html&data=3D05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7Cfde9
-> >
-> ceeb9e0d40d4f77d08db9a47a5e1%7C686ea1d3bc2b4c6fa92cd99c5c301635%7
-> >
-> C0%7C0%7C638273404742560069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC
-> >
-> 4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C
-> > %7C%7C&sdata=3Dlt7nphOXYXc3GRfOquvM5jmqNszQkDd%2BuSRdAbJd8Ec%3D
-> &r
-> > eserved=3D0]
-> >
-> > On 04.08.23 14:02, Gaurav Jain wrote:
-> > > From: Herbert Xu <herbert@gondor.apana.org.au>
-> > >> On Mon, Jul 24, 2023 at 05:13:23AM +0000, Meenakshi Aggarwal wrote:
-> > >>> Please share the required information.
-> > >> Any progress on this?
-> > >>
-> > >> Should we revert the offending patch?
-> > >
-> > > Debugging is in progress. There should be some mismatch in TRNG
-> > configuration in customer board.
-> > > Will be sharing a patch to dump the same.
-> >
-> > Any progress on this? Afaics would be good to have either the fix or
-> > the revert in by -rc7 to ensure things get at least one week of proper
-> > testing before the final release.
-> >
-> > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker'
-> > hat)
-> > --
-> > Everything you wanna know about Linux kernel regression tracking:
-> > https://linux-/
-> >
-> regtracking.leemhuis.info%2Fabout%2F%23tldr&data=3D05%7C01%7Cmeenakshi.
-> >
-> aggarwal%40nxp.com%7Cfde9ceeb9e0d40d4f77d08db9a47a5e1%7C686ea1d3b
-> >
-> c2b4c6fa92cd99c5c301635%7C0%7C0%7C638273404742560069%7CUnknown
-> > %7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haW
-> wi
-> >
-> LCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3DXg3ZCWObptmF6xLKO7dpaIYB
-> > A17eKK5wNhlPZ6FR2XA%3D&reserved=3D0
-> > If I did something stupid, please tell me, as explained on that page.
-> >
-> > #regzbot poke
+> There is no way for the compiler to know how big ctx->block_size is.
+> So why do we expect it to make deductions on how big bs can be?
+>
+> This warning looks broken to me.
+
+I'm still unsure how exactly it goes wrong here, but I suspect
+it works as designed and just happens to run into a case in these
+drivers that is just not that common. I also see that the kernel's
+memcpy() declaration is missing the "restrict" annotation,
+but the fortified version calls the __builtin_memcpy() variant
+that has an implicit prototype with those annotations.
+
+> It looks like there is already a solution to this though.  Just use
+> unsafe_memcpy and be done with it.
+
+Fine with me, I'll send a new version doing that.
+
+     Arnd
