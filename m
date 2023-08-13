@@ -2,85 +2,167 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A32FC04E69
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 06:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BD9C001DE
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 06:56:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbjHMG4C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Aug 2023 02:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49992 "EHLO
+        id S230499AbjHMG4B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 02:56:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230332AbjHMGzX (ORCPT
+        with ESMTP id S230327AbjHMGzV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Aug 2023 02:55:23 -0400
+        Sun, 13 Aug 2023 02:55:21 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 801E2172D
-        for <linux-crypto@vger.kernel.org>; Sat, 12 Aug 2023 23:55:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482CA1726
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Aug 2023 23:55:23 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qV50S-002bx0-LS; Sun, 13 Aug 2023 14:55:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Aug 2023 14:55:20 +0800
+        id 1qV50Q-002bwo-Iz; Sun, 13 Aug 2023 14:55:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Aug 2023 14:55:18 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Sun, 13 Aug 2023 14:55:20 +0800
-Subject: [v2 PATCH 36/36] crypto: engine - Remove crypto_engine_ctx
+Date:   Sun, 13 Aug 2023 14:55:18 +0800
+Subject: [v2 PATCH 35/36] crypto: zynqmp - Use new crypto_engine_op interface
 References: <ZNh94a7YYnvx0l8C@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Gaurav Jain <gaurav.jain@nxp.com>
-Message-Id: <E1qV50S-002bx0-LS@formenos.hmeau.com>
+Message-Id: <E1qV50Q-002bwo-Iz@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove the obsolete crypto_engine_ctx structure.
+Use the new crypto_engine_op interface where the callback is stored
+in the algorithm object.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/crypto_engine.c  |   12 +++---------
- include/crypto/engine.h |    4 ----
- 2 files changed, 3 insertions(+), 13 deletions(-)
+ drivers/crypto/xilinx/zynqmp-aes-gcm.c |   35 ++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index abfb1e6bfa48..108d9d55c509 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -79,7 +79,6 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	unsigned long flags;
- 	bool was_busy = false;
- 	int ret;
--	struct crypto_engine_ctx *enginectx;
- 
- 	spin_lock_irqsave(&engine->queue_lock, flags);
- 
-@@ -154,14 +153,9 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 				   struct crypto_engine_alg, base);
- 		op = &alg->op;
- 	} else {
--		enginectx = crypto_tfm_ctx(async_req->tfm);
--		op = &enginectx->op;
+diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+index ae7dd82abea1..42fe2b7afef2 100644
+--- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
++++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+@@ -9,13 +9,14 @@
+ #include <crypto/gcm.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/scatterwalk.h>
 -
--		if (!op->do_one_request) {
--			dev_err(engine->dev, "failed to do request\n");
--			ret = -EINVAL;
--			goto req_err_1;
--		}
-+		dev_err(engine->dev, "failed to do request\n");
-+		ret = -EINVAL;
-+		goto req_err_1;
- 	}
+ #include <linux/dma-mapping.h>
++#include <linux/err.h>
++#include <linux/firmware/xlnx-zynqmp.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
+-
+-#include <linux/firmware/xlnx-zynqmp.h>
++#include <linux/string.h>
  
- 	ret = op->do_one_request(engine, async_req);
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index cf57e732566b..2835069c5997 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -26,10 +26,6 @@ struct crypto_engine_op {
- 			      void *areq);
+ #define ZYNQMP_DMA_BIT_MASK	32U
+ 
+@@ -43,7 +44,7 @@ enum zynqmp_aead_keysrc {
+ 
+ struct zynqmp_aead_drv_ctx {
+ 	union {
+-		struct aead_alg aead;
++		struct aead_engine_alg aead;
+ 	} alg;
+ 	struct device *dev;
+ 	struct crypto_engine *engine;
+@@ -60,7 +61,6 @@ struct zynqmp_aead_hw_req {
  };
  
--struct crypto_engine_ctx {
--	struct crypto_engine_op op;
--};
+ struct zynqmp_aead_tfm_ctx {
+-	struct crypto_engine_ctx engine_ctx;
+ 	struct device *dev;
+ 	u8 key[ZYNQMP_AES_KEY_SIZE];
+ 	u8 *iv;
+@@ -286,7 +286,7 @@ static int zynqmp_aes_aead_encrypt(struct aead_request *req)
+ 	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
+ 
+ 	rq_ctx->op = ZYNQMP_AES_ENCRYPT;
+-	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead);
++	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead.base);
+ 
+ 	return crypto_transfer_aead_request_to_engine(drv_ctx->engine, req);
+ }
+@@ -299,7 +299,7 @@ static int zynqmp_aes_aead_decrypt(struct aead_request *req)
+ 	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
+ 
+ 	rq_ctx->op = ZYNQMP_AES_DECRYPT;
+-	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead);
++	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead.base);
+ 
+ 	return crypto_transfer_aead_request_to_engine(drv_ctx->engine, req);
+ }
+@@ -312,18 +312,16 @@ static int zynqmp_aes_aead_init(struct crypto_aead *aead)
+ 	struct zynqmp_aead_drv_ctx *drv_ctx;
+ 	struct aead_alg *alg = crypto_aead_alg(aead);
+ 
+-	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead);
++	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead.base);
+ 	tfm_ctx->dev = drv_ctx->dev;
+ 
+-	tfm_ctx->engine_ctx.op.do_one_request = zynqmp_handle_aes_req;
 -
- struct aead_engine_alg {
- 	struct aead_alg base;
- 	struct crypto_engine_op op;
+-	tfm_ctx->fbk_cipher = crypto_alloc_aead(drv_ctx->alg.aead.base.cra_name,
++	tfm_ctx->fbk_cipher = crypto_alloc_aead(drv_ctx->alg.aead.base.base.cra_name,
+ 						0,
+ 						CRYPTO_ALG_NEED_FALLBACK);
+ 
+ 	if (IS_ERR(tfm_ctx->fbk_cipher)) {
+ 		pr_err("%s() Error: failed to allocate fallback for %s\n",
+-		       __func__, drv_ctx->alg.aead.base.cra_name);
++		       __func__, drv_ctx->alg.aead.base.base.cra_name);
+ 		return PTR_ERR(tfm_ctx->fbk_cipher);
+ 	}
+ 
+@@ -348,7 +346,7 @@ static void zynqmp_aes_aead_exit(struct crypto_aead *aead)
+ }
+ 
+ static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
+-	.alg.aead = {
++	.alg.aead.base = {
+ 		.setkey		= zynqmp_aes_aead_setkey,
+ 		.setauthsize	= zynqmp_aes_aead_setauthsize,
+ 		.encrypt	= zynqmp_aes_aead_encrypt,
+@@ -370,7 +368,10 @@ static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
+ 		.cra_ctxsize		= sizeof(struct zynqmp_aead_tfm_ctx),
+ 		.cra_module		= THIS_MODULE,
+ 		}
+-	}
++	},
++	.alg.aead.op = {
++		.do_one_request = zynqmp_handle_aes_req,
++	},
+ };
+ 
+ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
+@@ -403,7 +404,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
+ 		goto err_engine;
+ 	}
+ 
+-	err = crypto_register_aead(&aes_drv_ctx.alg.aead);
++	err = crypto_engine_register_aead(&aes_drv_ctx.alg.aead);
+ 	if (err < 0) {
+ 		dev_err(dev, "Failed to register AEAD alg.\n");
+ 		goto err_aead;
+@@ -411,7 +412,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_aead:
+-	crypto_unregister_aead(&aes_drv_ctx.alg.aead);
++	crypto_engine_unregister_aead(&aes_drv_ctx.alg.aead);
+ 
+ err_engine:
+ 	if (aes_drv_ctx.engine)
+@@ -423,7 +424,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
+ static int zynqmp_aes_aead_remove(struct platform_device *pdev)
+ {
+ 	crypto_engine_exit(aes_drv_ctx.engine);
+-	crypto_unregister_aead(&aes_drv_ctx.alg.aead);
++	crypto_engine_unregister_aead(&aes_drv_ctx.alg.aead);
+ 
+ 	return 0;
+ }
