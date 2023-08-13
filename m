@@ -2,143 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6A9C001E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 09:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC84EB64DD
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 12:10:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230499AbjHMJsm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Aug 2023 05:48:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50626 "EHLO
+        id S229614AbjHMMJ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 08:09:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjHMJsk (ORCPT
+        with ESMTP id S229506AbjHMMJ5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Aug 2023 05:48:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C696410CE;
-        Sun, 13 Aug 2023 02:48:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 632336227B;
-        Sun, 13 Aug 2023 09:48:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07DBAC433C8;
-        Sun, 13 Aug 2023 09:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691920121;
-        bh=MA2+PJqOeFmwFTlNJcRp71uT1hWwf5woRDqJwXhaHMo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Q+WHGTVquOf/ckiSKobRJ5wScQSNFvIY1LaVLpN6w0Fa6X7x9IzpNCpE3Piosk/bI
-         A4rMXam+DF0xUHDWesbB/vFghPLBx8ySWheDDlBTmIZ07icF+qPN0w/uIODJwkUfyM
-         aUoUbWynTck/Jzu2aA3sLFR2AtwSUGCelcbUQBRgwqEhtcL20mAGUFIpJLEvuZG/A2
-         8o9tPc/YLtR8QahlAKjRjYuf3tM/tqm9tOYcNurrAiSv9iOEyVlncOpIGa6gW6BI3a
-         GcJN5bxTiVPxppfx7hMYd95NUx+o8VQ+0knKk8puNPWkg2tqidmqRP9ELuibna0IYG
-         +LP+5j+mBCTYQ==
-Date:   Sun, 13 Aug 2023 10:48:36 +0100
-From:   Conor Dooley <conor@kernel.org>
-To:     Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Marijn Suijten <marijn.suijten@somainline.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Add SM8450
-Message-ID: <20230813-velvet-folic-10625075aedd@spud>
-References: <20230811-topic-8450_prng-v1-0-01becceeb1ee@linaro.org>
- <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
+        Sun, 13 Aug 2023 08:09:57 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DC010D0;
+        Sun, 13 Aug 2023 05:09:58 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4fe1b00fce2so5056245e87.3;
+        Sun, 13 Aug 2023 05:09:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691928596; x=1692533396;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ka4/Ei76gmsVCMM5bKIvKDlQA9OUfg+fkP/SBEdRDso=;
+        b=rhrNSFlZ5A9m8MLQghOzNq+vbRCPTRCVnYJVrIzdB1r7OVBt5HV66ArUTkpPrVpHlP
+         VnyxijZagAOHb+2QIqyfMIo4fAKjDyW72BJk1nCqKyLkVllYZlY72BcarIP9Q4CSj9Iu
+         RkjK4WtrgRA23Dp3+tn2WezAzW7i6u2UbiavDInn8Shic2xkxJUjC9cSzITkH3AxLzwJ
+         aBPULwItLbaHjpf98e5gxUiqgt1+4Fd0FeZW9FL/NTx6u7aa4+h++GFFXkuNiZnYPChX
+         31DAbifEBO3EEyLkGRqKjskz3WSFJXEl4K165FmW/MpCeZ0JK2776m55T/z61zFKRxMp
+         cdHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691928596; x=1692533396;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ka4/Ei76gmsVCMM5bKIvKDlQA9OUfg+fkP/SBEdRDso=;
+        b=Q0/Wu5RF1vItBfpGY+UnNZF35pcV8BEQGn1ZzKQeC6/IFmyI4VyV4fLGClOChPUPlq
+         2l0MWHC5v5RztSBO3/n9wgSapYTvI59VNg5p7joPeKJHxo8mIWniheH2kqknktA/IMIv
+         1nlMS30L4b8aeFXhDRExrqzDlCqFQLDE7AWeuwEjefiRfNH68eHPeJTvGdrSbuFQKeGK
+         YSh1uTP8iXrY+zY3Q10JeQ0oORrXiylZ16VUfy0VAIizKRja0zKm82LKhPcbyXNfzpJN
+         uOOqPuq1cqfYgOrODqzcUiOF9W7bFSPvkgekOAK4kUGHkMuMKtq3EHGrcuyx9yR5ksMV
+         zYiw==
+X-Gm-Message-State: AOJu0YxTZSh++f8DCI9/UmLSo5vdex4+cEympsm6DniMBhlBoCKWMRvs
+        yt2N/waPSbg5HaEORvfTvfY=
+X-Google-Smtp-Source: AGHT+IG5RLIucS4hxOvSsT7tE3i1mUE/4Tau8c5bMSEYrzAiOrrIowOdha9FTP4FgWGyr3FDF90tLg==
+X-Received: by 2002:a05:6512:b84:b0:4f9:dac6:2f41 with SMTP id b4-20020a0565120b8400b004f9dac62f41mr5607938lfv.2.1691928596138;
+        Sun, 13 Aug 2023 05:09:56 -0700 (PDT)
+Received: from ?IPV6:2a00:1370:8180:6b00:a1a8:4887:1af4:637a? ([2a00:1370:8180:6b00:a1a8:4887:1af4:637a])
+        by smtp.gmail.com with ESMTPSA id w26-20020a19c51a000000b004fb964d48e6sm1520629lfe.95.2023.08.13.05.09.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Aug 2023 05:09:55 -0700 (PDT)
+Message-ID: <d0331f81-0307-db2e-5b78-73afe1f3339b@gmail.com>
+Date:   Sun, 13 Aug 2023 15:09:55 +0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Ayu4EmJnvOAjxhgj"
-Content-Disposition: inline
-In-Reply-To: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in af_alg_free_resources
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     syzbot <syzbot+cba21d50095623218389@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <000000000000bde775060071a8d7@google.com>
+ <9f0365cb-413f-2395-2219-748f77dd95a4@gmail.com>
+ <ZNYbArdy+2egdD9m@gondor.apana.org.au>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <ZNYbArdy+2egdD9m@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Herbert,
 
---Ayu4EmJnvOAjxhgj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Herbert Xu <herbert@gondor.apana.org.au> says:
+> On Fri, Jul 14, 2023 at 05:56:54PM +0300, Pavel Skripkin wrote:
+>>
+>> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> > Reported-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+>> 
+>> #syz test
+>> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> 
+> Will you be submitting this patch?
+> 
 
-On Fri, Aug 11, 2023 at 10:50:56PM +0200, Konrad Dybcio wrote:
-> SM8450's PRNG does not require a core clock reference. Add a new
-> compatible with a qcom,prng-ee fallback and handle that.
->=20
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+Yeah, will do it shortly. This bug got lost in my todo list...
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-Thanks,
-Conor.
 
-> ---
->  .../devicetree/bindings/crypto/qcom,prng.yaml      | 24 ++++++++++++++++=
-+-----
->  1 file changed, 19 insertions(+), 5 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Do=
-cumentation/devicetree/bindings/crypto/qcom,prng.yaml
-> index bb42f4588b40..36b0ebd9a44b 100644
-> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> @@ -11,9 +11,13 @@ maintainers:
-> =20
->  properties:
->    compatible:
-> -    enum:
-> -      - qcom,prng  # 8916 etc.
-> -      - qcom,prng-ee  # 8996 and later using EE
-> +    oneOf:
-> +      - enum:
-> +          - qcom,prng  # 8916 etc.
-> +          - qcom,prng-ee  # 8996 and later using EE
-> +      - items:
-> +          - const: qcom,sm8450-prng-ee
-> +          - const: qcom,prng-ee
-> =20
->    reg:
->      maxItems: 1
-> @@ -28,8 +32,18 @@ properties:
->  required:
->    - compatible
->    - reg
-> -  - clocks
-> -  - clock-names
-> +
-> +allOf:
-> +  - if:
-> +      not:
-> +        properties:
-> +          compatible:
-> +            contains:
-> +              const: qcom,sm8450-prng-ee
-> +    then:
-> +      required:
-> +        - clocks
-> +        - clock-names
-> =20
->  additionalProperties: false
-> =20
->=20
-> --=20
-> 2.41.0
->=20
-
---Ayu4EmJnvOAjxhgj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNim9AAKCRB4tDGHoIJi
-0gpPAP9xK4CE35RqLQN5w2zN+bQ2RtZFfGU2Rd+iS2cXdKx7MAD8CZwhnVxeDnWh
-ehZFdNmoaPawbCYAclmBc7ISspdejgA=
-=6i5X
------END PGP SIGNATURE-----
-
---Ayu4EmJnvOAjxhgj--
+With regards,
+Pavel Skripkin
