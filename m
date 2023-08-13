@@ -2,167 +2,143 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BD9C001DE
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 06:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6A9C001E0
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 09:48:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230499AbjHMG4B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Aug 2023 02:56:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
+        id S230499AbjHMJsm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 05:48:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230327AbjHMGzV (ORCPT
+        with ESMTP id S229484AbjHMJsk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Aug 2023 02:55:21 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482CA1726
-        for <linux-crypto@vger.kernel.org>; Sat, 12 Aug 2023 23:55:23 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qV50Q-002bwo-Iz; Sun, 13 Aug 2023 14:55:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Aug 2023 14:55:18 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Sun, 13 Aug 2023 14:55:18 +0800
-Subject: [v2 PATCH 35/36] crypto: zynqmp - Use new crypto_engine_op interface
-References: <ZNh94a7YYnvx0l8C@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Gaurav Jain <gaurav.jain@nxp.com>
-Message-Id: <E1qV50Q-002bwo-Iz@formenos.hmeau.com>
+        Sun, 13 Aug 2023 05:48:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C696410CE;
+        Sun, 13 Aug 2023 02:48:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 632336227B;
+        Sun, 13 Aug 2023 09:48:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07DBAC433C8;
+        Sun, 13 Aug 2023 09:48:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691920121;
+        bh=MA2+PJqOeFmwFTlNJcRp71uT1hWwf5woRDqJwXhaHMo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Q+WHGTVquOf/ckiSKobRJ5wScQSNFvIY1LaVLpN6w0Fa6X7x9IzpNCpE3Piosk/bI
+         A4rMXam+DF0xUHDWesbB/vFghPLBx8ySWheDDlBTmIZ07icF+qPN0w/uIODJwkUfyM
+         aUoUbWynTck/Jzu2aA3sLFR2AtwSUGCelcbUQBRgwqEhtcL20mAGUFIpJLEvuZG/A2
+         8o9tPc/YLtR8QahlAKjRjYuf3tM/tqm9tOYcNurrAiSv9iOEyVlncOpIGa6gW6BI3a
+         GcJN5bxTiVPxppfx7hMYd95NUx+o8VQ+0knKk8puNPWkg2tqidmqRP9ELuibna0IYG
+         +LP+5j+mBCTYQ==
+Date:   Sun, 13 Aug 2023 10:48:36 +0100
+From:   Conor Dooley <conor@kernel.org>
+To:     Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Marijn Suijten <marijn.suijten@somainline.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Add SM8450
+Message-ID: <20230813-velvet-folic-10625075aedd@spud>
+References: <20230811-topic-8450_prng-v1-0-01becceeb1ee@linaro.org>
+ <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Ayu4EmJnvOAjxhgj"
+Content-Disposition: inline
+In-Reply-To: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the new crypto_engine_op interface where the callback is stored
-in the algorithm object.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+--Ayu4EmJnvOAjxhgj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- drivers/crypto/xilinx/zynqmp-aes-gcm.c |   35 ++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+On Fri, Aug 11, 2023 at 10:50:56PM +0200, Konrad Dybcio wrote:
+> SM8450's PRNG does not require a core clock reference. Add a new
+> compatible with a qcom,prng-ee fallback and handle that.
+>=20
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
-diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-index ae7dd82abea1..42fe2b7afef2 100644
---- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-+++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-@@ -9,13 +9,14 @@
- #include <crypto/gcm.h>
- #include <crypto/internal/aead.h>
- #include <crypto/scatterwalk.h>
--
- #include <linux/dma-mapping.h>
-+#include <linux/err.h>
-+#include <linux/firmware/xlnx-zynqmp.h>
-+#include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
--
--#include <linux/firmware/xlnx-zynqmp.h>
-+#include <linux/string.h>
- 
- #define ZYNQMP_DMA_BIT_MASK	32U
- 
-@@ -43,7 +44,7 @@ enum zynqmp_aead_keysrc {
- 
- struct zynqmp_aead_drv_ctx {
- 	union {
--		struct aead_alg aead;
-+		struct aead_engine_alg aead;
- 	} alg;
- 	struct device *dev;
- 	struct crypto_engine *engine;
-@@ -60,7 +61,6 @@ struct zynqmp_aead_hw_req {
- };
- 
- struct zynqmp_aead_tfm_ctx {
--	struct crypto_engine_ctx engine_ctx;
- 	struct device *dev;
- 	u8 key[ZYNQMP_AES_KEY_SIZE];
- 	u8 *iv;
-@@ -286,7 +286,7 @@ static int zynqmp_aes_aead_encrypt(struct aead_request *req)
- 	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
- 
- 	rq_ctx->op = ZYNQMP_AES_ENCRYPT;
--	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead);
-+	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead.base);
- 
- 	return crypto_transfer_aead_request_to_engine(drv_ctx->engine, req);
- }
-@@ -299,7 +299,7 @@ static int zynqmp_aes_aead_decrypt(struct aead_request *req)
- 	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(req);
- 
- 	rq_ctx->op = ZYNQMP_AES_DECRYPT;
--	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead);
-+	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead.base);
- 
- 	return crypto_transfer_aead_request_to_engine(drv_ctx->engine, req);
- }
-@@ -312,18 +312,16 @@ static int zynqmp_aes_aead_init(struct crypto_aead *aead)
- 	struct zynqmp_aead_drv_ctx *drv_ctx;
- 	struct aead_alg *alg = crypto_aead_alg(aead);
- 
--	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead);
-+	drv_ctx = container_of(alg, struct zynqmp_aead_drv_ctx, alg.aead.base);
- 	tfm_ctx->dev = drv_ctx->dev;
- 
--	tfm_ctx->engine_ctx.op.do_one_request = zynqmp_handle_aes_req;
--
--	tfm_ctx->fbk_cipher = crypto_alloc_aead(drv_ctx->alg.aead.base.cra_name,
-+	tfm_ctx->fbk_cipher = crypto_alloc_aead(drv_ctx->alg.aead.base.base.cra_name,
- 						0,
- 						CRYPTO_ALG_NEED_FALLBACK);
- 
- 	if (IS_ERR(tfm_ctx->fbk_cipher)) {
- 		pr_err("%s() Error: failed to allocate fallback for %s\n",
--		       __func__, drv_ctx->alg.aead.base.cra_name);
-+		       __func__, drv_ctx->alg.aead.base.base.cra_name);
- 		return PTR_ERR(tfm_ctx->fbk_cipher);
- 	}
- 
-@@ -348,7 +346,7 @@ static void zynqmp_aes_aead_exit(struct crypto_aead *aead)
- }
- 
- static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
--	.alg.aead = {
-+	.alg.aead.base = {
- 		.setkey		= zynqmp_aes_aead_setkey,
- 		.setauthsize	= zynqmp_aes_aead_setauthsize,
- 		.encrypt	= zynqmp_aes_aead_encrypt,
-@@ -370,7 +368,10 @@ static struct zynqmp_aead_drv_ctx aes_drv_ctx = {
- 		.cra_ctxsize		= sizeof(struct zynqmp_aead_tfm_ctx),
- 		.cra_module		= THIS_MODULE,
- 		}
--	}
-+	},
-+	.alg.aead.op = {
-+		.do_one_request = zynqmp_handle_aes_req,
-+	},
- };
- 
- static int zynqmp_aes_aead_probe(struct platform_device *pdev)
-@@ -403,7 +404,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
- 		goto err_engine;
- 	}
- 
--	err = crypto_register_aead(&aes_drv_ctx.alg.aead);
-+	err = crypto_engine_register_aead(&aes_drv_ctx.alg.aead);
- 	if (err < 0) {
- 		dev_err(dev, "Failed to register AEAD alg.\n");
- 		goto err_aead;
-@@ -411,7 +412,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
- 	return 0;
- 
- err_aead:
--	crypto_unregister_aead(&aes_drv_ctx.alg.aead);
-+	crypto_engine_unregister_aead(&aes_drv_ctx.alg.aead);
- 
- err_engine:
- 	if (aes_drv_ctx.engine)
-@@ -423,7 +424,7 @@ static int zynqmp_aes_aead_probe(struct platform_device *pdev)
- static int zynqmp_aes_aead_remove(struct platform_device *pdev)
- {
- 	crypto_engine_exit(aes_drv_ctx.engine);
--	crypto_unregister_aead(&aes_drv_ctx.alg.aead);
-+	crypto_engine_unregister_aead(&aes_drv_ctx.alg.aead);
- 
- 	return 0;
- }
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+Thanks,
+Conor.
+
+> ---
+>  .../devicetree/bindings/crypto/qcom,prng.yaml      | 24 ++++++++++++++++=
++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Do=
+cumentation/devicetree/bindings/crypto/qcom,prng.yaml
+> index bb42f4588b40..36b0ebd9a44b 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> @@ -11,9 +11,13 @@ maintainers:
+> =20
+>  properties:
+>    compatible:
+> -    enum:
+> -      - qcom,prng  # 8916 etc.
+> -      - qcom,prng-ee  # 8996 and later using EE
+> +    oneOf:
+> +      - enum:
+> +          - qcom,prng  # 8916 etc.
+> +          - qcom,prng-ee  # 8996 and later using EE
+> +      - items:
+> +          - const: qcom,sm8450-prng-ee
+> +          - const: qcom,prng-ee
+> =20
+>    reg:
+>      maxItems: 1
+> @@ -28,8 +32,18 @@ properties:
+>  required:
+>    - compatible
+>    - reg
+> -  - clocks
+> -  - clock-names
+> +
+> +allOf:
+> +  - if:
+> +      not:
+> +        properties:
+> +          compatible:
+> +            contains:
+> +              const: qcom,sm8450-prng-ee
+> +    then:
+> +      required:
+> +        - clocks
+> +        - clock-names
+> =20
+>  additionalProperties: false
+> =20
+>=20
+> --=20
+> 2.41.0
+>=20
+
+--Ayu4EmJnvOAjxhgj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZNim9AAKCRB4tDGHoIJi
+0gpPAP9xK4CE35RqLQN5w2zN+bQ2RtZFfGU2Rd+iS2cXdKx7MAD8CZwhnVxeDnWh
+ehZFdNmoaPawbCYAclmBc7ISspdejgA=
+=6i5X
+-----END PGP SIGNATURE-----
+
+--Ayu4EmJnvOAjxhgj--
