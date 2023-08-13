@@ -2,385 +2,850 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BC5C001B0
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 06:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB49C04A6A
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 06:55:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbjHMGzO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Aug 2023 02:55:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43406 "EHLO
+        id S230188AbjHMGzP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 02:55:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230299AbjHMGyw (ORCPT
+        with ESMTP id S230313AbjHMGyz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Aug 2023 02:54:52 -0400
+        Sun, 13 Aug 2023 02:54:55 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEDA11720
-        for <linux-crypto@vger.kernel.org>; Sat, 12 Aug 2023 23:54:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EBC51733
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Aug 2023 23:54:56 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qV4zx-002bn0-1N; Sun, 13 Aug 2023 14:54:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Aug 2023 14:54:49 +0800
+        id 1qV4zz-002bnC-4h; Sun, 13 Aug 2023 14:54:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 13 Aug 2023 14:54:51 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Sun, 13 Aug 2023 14:54:49 +0800
-Subject: [v2 PATCH 21/36] crypto: engine - Move crypto_engine_ops from request into crypto_alg
+Date:   Sun, 13 Aug 2023 14:54:51 +0800
+Subject: [v2 PATCH 22/36] crypto: sun8i-ce - Use new crypto_engine_op interface
 References: <ZNh94a7YYnvx0l8C@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Gaurav Jain <gaurav.jain@nxp.com>
-Message-Id: <E1qV4zx-002bn0-1N@formenos.hmeau.com>
+Message-Id: <E1qV4zz-002bnC-4h@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rather than having the callback in the request, move it into the
-crypto_alg object.  This avoids having crypto_engine look into the
-request context is private to the driver.
+Use the new crypto_engine_op interface where the callback is stored
+in the algorithm object.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- crypto/crypto_engine.c  |  215 +++++++++++++++++++++++++++++++++++++++++++++---
- include/crypto/engine.h |   59 ++++++++++++-
- 2 files changed, 257 insertions(+), 17 deletions(-)
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c |   25 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   |  171 ++++++++++++--------
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   |   96 ++++++-----
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h        |   13 -
+ 4 files changed, 180 insertions(+), 125 deletions(-)
 
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index a75162bc1bf4..abfb1e6bfa48 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -7,20 +7,30 @@
-  * Author: Baolin Wang <baolin.wang@linaro.org>
-  */
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index 573a08fa7afa..8d4c42863a62 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -29,7 +29,7 @@ static int sun8i_ce_cipher_need_fallback(struct skcipher_request *areq)
+ 	struct sun8i_ce_alg_template *algt;
+ 	unsigned int todo, len;
  
--#include <crypto/aead.h>
--#include <crypto/akcipher.h>
--#include <crypto/hash.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/internal/akcipher.h>
- #include <crypto/internal/engine.h>
--#include <crypto/kpp.h>
--#include <crypto/skcipher.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/internal/kpp.h>
-+#include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/delay.h>
- #include <linux/device.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
- #include <uapi/linux/sched/types.h>
- #include "internal.h"
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher.base);
  
- #define CRYPTO_ENGINE_MAX_QLEN 10
+ 	if (sg_nents_for_len(areq->src, areq->cryptlen) > MAX_SG ||
+ 	    sg_nents_for_len(areq->dst, areq->cryptlen) > MAX_SG) {
+@@ -92,13 +92,18 @@ static int sun8i_ce_cipher_fallback(struct skcipher_request *areq)
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
+ 	int err;
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+-	struct sun8i_ce_alg_template *algt;
  
-+/* Temporary algorithm flag used to indicate an updated driver. */
-+#define CRYPTO_ALG_ENGINE 0x200
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher);
+-	algt->stat_fb++;
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
++		struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++		struct sun8i_ce_alg_template *algt __maybe_unused;
 +
-+struct crypto_engine_alg {
-+	struct crypto_alg base;
-+	struct crypto_engine_op op;
-+};
++		algt = container_of(alg, struct sun8i_ce_alg_template,
++				    alg.skcipher.base);
 +
- /**
-  * crypto_finalize_request - finalize one request if the request is done
-  * @engine: the hardware engine
-@@ -64,6 +74,8 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 				 bool in_kthread)
- {
- 	struct crypto_async_request *async_req, *backlog;
-+	struct crypto_engine_alg *alg;
-+	struct crypto_engine_op *op;
- 	unsigned long flags;
- 	bool was_busy = false;
- 	int ret;
-@@ -137,15 +149,22 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 		}
- 	}
++#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
++		algt->stat_fb++;
+ #endif
++	}
  
--	enginectx = crypto_tfm_ctx(async_req->tfm);
--
--	if (!enginectx->op.do_one_request) {
--		dev_err(engine->dev, "failed to do request\n");
--		ret = -EINVAL;
--		goto req_err_1;
-+	if (async_req->tfm->__crt_alg->cra_flags & CRYPTO_ALG_ENGINE) {
-+		alg = container_of(async_req->tfm->__crt_alg,
-+				   struct crypto_engine_alg, base);
-+		op = &alg->op;
-+	} else {
-+		enginectx = crypto_tfm_ctx(async_req->tfm);
-+		op = &enginectx->op;
-+
-+		if (!op->do_one_request) {
-+			dev_err(engine->dev, "failed to do request\n");
-+			ret = -EINVAL;
-+			goto req_err_1;
-+		}
- 	}
+ 	skcipher_request_set_tfm(&rctx->fallback_req, op->fallback_tfm);
+ 	skcipher_request_set_callback(&rctx->fallback_req, areq->base.flags,
+@@ -133,7 +138,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
+ 	int ns = sg_nents_for_len(areq->src, areq->cryptlen);
+ 	int nd = sg_nents_for_len(areq->dst, areq->cryptlen);
  
--	ret = enginectx->op.do_one_request(engine, async_req);
-+	ret = op->do_one_request(engine, async_req);
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher.base);
  
- 	/* Request unsuccessfully executed by hardware */
- 	if (ret < 0) {
-@@ -556,5 +575,177 @@ int crypto_engine_exit(struct crypto_engine *engine)
+ 	dev_dbg(ce->dev, "%s %s %u %x IV(%p %u) key=%u\n", __func__,
+ 		crypto_tfm_alg_name(areq->base.tfm),
+@@ -355,7 +360,7 @@ static void sun8i_ce_cipher_unprepare(struct crypto_engine *engine,
+ 	dma_unmap_single(ce->dev, rctx->addr_key, op->keylen, DMA_TO_DEVICE);
  }
- EXPORT_SYMBOL_GPL(crypto_engine_exit);
  
-+int crypto_engine_register_aead(struct aead_engine_alg *alg)
-+{
-+	if (!alg->op.do_one_request)
-+		return -EINVAL;
-+
-+	alg->base.base.cra_flags |= CRYPTO_ALG_ENGINE;
-+
-+	return crypto_register_aead(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_aead);
-+
-+void crypto_engine_unregister_aead(struct aead_engine_alg *alg)
-+{
-+	crypto_unregister_aead(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_aead);
-+
-+int crypto_engine_register_aeads(struct aead_engine_alg *algs, int count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < count; i++) {
-+		ret = crypto_engine_register_aead(&algs[i]);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	crypto_engine_unregister_aeads(algs, i);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_aeads);
-+
-+void crypto_engine_unregister_aeads(struct aead_engine_alg *algs, int count)
-+{
-+	int i;
-+
-+	for (i = count - 1; i >= 0; --i)
-+		crypto_engine_unregister_aead(&algs[i]);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_aeads);
-+
-+int crypto_engine_register_ahash(struct ahash_engine_alg *alg)
-+{
-+	if (!alg->op.do_one_request)
-+		return -EINVAL;
-+
-+	alg->base.halg.base.cra_flags |= CRYPTO_ALG_ENGINE;
-+
-+	return crypto_register_ahash(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_ahash);
-+
-+void crypto_engine_unregister_ahash(struct ahash_engine_alg *alg)
-+{
-+	crypto_unregister_ahash(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_ahash);
-+
-+int crypto_engine_register_ahashes(struct ahash_engine_alg *algs, int count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < count; i++) {
-+		ret = crypto_engine_register_ahash(&algs[i]);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	crypto_engine_unregister_ahashes(algs, i);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_ahashes);
-+
-+void crypto_engine_unregister_ahashes(struct ahash_engine_alg *algs,
-+				      int count)
-+{
-+	int i;
-+
-+	for (i = count - 1; i >= 0; --i)
-+		crypto_engine_unregister_ahash(&algs[i]);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_ahashes);
-+
-+int crypto_engine_register_akcipher(struct akcipher_engine_alg *alg)
-+{
-+	if (!alg->op.do_one_request)
-+		return -EINVAL;
-+
-+	alg->base.base.cra_flags |= CRYPTO_ALG_ENGINE;
-+
-+	return crypto_register_akcipher(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_akcipher);
-+
-+void crypto_engine_unregister_akcipher(struct akcipher_engine_alg *alg)
-+{
-+	crypto_unregister_akcipher(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_akcipher);
-+
-+int crypto_engine_register_kpp(struct kpp_engine_alg *alg)
-+{
-+	if (!alg->op.do_one_request)
-+		return -EINVAL;
-+
-+	alg->base.base.cra_flags |= CRYPTO_ALG_ENGINE;
-+
-+	return crypto_register_kpp(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_kpp);
-+
-+void crypto_engine_unregister_kpp(struct kpp_engine_alg *alg)
-+{
-+	crypto_unregister_kpp(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_kpp);
-+
-+int crypto_engine_register_skcipher(struct skcipher_engine_alg *alg)
-+{
-+	if (!alg->op.do_one_request)
-+		return -EINVAL;
-+
-+	alg->base.base.cra_flags |= CRYPTO_ALG_ENGINE;
-+
-+	return crypto_register_skcipher(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_skcipher);
-+
-+void crypto_engine_unregister_skcipher(struct skcipher_engine_alg *alg)
-+{
-+	return crypto_unregister_skcipher(&alg->base);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_skcipher);
-+
-+int crypto_engine_register_skciphers(struct skcipher_engine_alg *algs,
-+				     int count)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < count; i++) {
-+		ret = crypto_engine_register_skcipher(&algs[i]);
-+		if (ret)
-+			goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	crypto_engine_unregister_skciphers(algs, i);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_register_skciphers);
-+
-+void crypto_engine_unregister_skciphers(struct skcipher_engine_alg *algs,
-+					int count)
-+{
-+	int i;
-+
-+	for (i = count - 1; i >= 0; --i)
-+		crypto_engine_unregister_skcipher(&algs[i]);
-+}
-+EXPORT_SYMBOL_GPL(crypto_engine_unregister_skciphers);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Crypto hardware engine framework");
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index cc9c7fd1c4d9..cf57e732566b 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -7,15 +7,15 @@
- #ifndef _CRYPTO_ENGINE_H
- #define _CRYPTO_ENGINE_H
+-static int sun8i_ce_cipher_do_one(struct crypto_engine *engine, void *areq)
++int sun8i_ce_cipher_do_one(struct crypto_engine *engine, void *areq)
+ {
+ 	int err = sun8i_ce_cipher_prepare(engine, areq);
  
-+#include <crypto/aead.h>
-+#include <crypto/akcipher.h>
-+#include <crypto/hash.h>
-+#include <crypto/kpp.h>
-+#include <crypto/skcipher.h>
- #include <linux/types.h>
+@@ -416,7 +421,7 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
  
--struct aead_request;
--struct ahash_request;
--struct akcipher_request;
- struct crypto_engine;
- struct device;
--struct kpp_request;
--struct skcipher_request;
+ 	memset(op, 0, sizeof(struct sun8i_cipher_tfm_ctx));
  
- /*
-  * struct crypto_engine_op - crypto hardware engine operations
-@@ -30,6 +30,31 @@ struct crypto_engine_ctx {
- 	struct crypto_engine_op op;
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher.base);
+ 	op->ce = algt->ce;
+ 
+ 	op->fallback_tfm = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
+@@ -433,8 +438,6 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
+ 	       crypto_tfm_alg_driver_name(crypto_skcipher_tfm(op->fallback_tfm)),
+ 	       CRYPTO_MAX_ALG_NAME);
+ 
+-	op->enginectx.op.do_one_request = sun8i_ce_cipher_do_one;
+-
+ 	err = pm_runtime_get_sync(op->ce->dev);
+ 	if (err < 0)
+ 		goto error_pm;
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 07ea0cc82b16..1c2c32d0568e 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -9,21 +9,25 @@
+  *
+  * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
+  */
++
++#include <crypto/engine.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/rng.h>
++#include <crypto/internal/skcipher.h>
+ #include <linux/clk.h>
+-#include <linux/crypto.h>
+ #include <linux/delay.h>
+ #include <linux/dma-mapping.h>
++#include <linux/err.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+ #include <linux/irq.h>
++#include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/reset.h>
+-#include <crypto/internal/rng.h>
+-#include <crypto/internal/skcipher.h>
+ 
+ #include "sun8i-ce.h"
+ 
+@@ -277,7 +281,7 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+ 	.ce_algo_id = CE_ID_CIPHER_AES,
+ 	.ce_blockmode = CE_ID_OP_CBC,
+-	.alg.skcipher = {
++	.alg.skcipher.base = {
+ 		.base = {
+ 			.cra_name = "cbc(aes)",
+ 			.cra_driver_name = "cbc-aes-sun8i-ce",
+@@ -298,13 +302,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.setkey		= sun8i_ce_aes_setkey,
+ 		.encrypt	= sun8i_ce_skencrypt,
+ 		.decrypt	= sun8i_ce_skdecrypt,
+-	}
++	},
++	.alg.skcipher.op = {
++		.do_one_request = sun8i_ce_cipher_do_one,
++	},
+ },
+ {
+ 	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+ 	.ce_algo_id = CE_ID_CIPHER_AES,
+ 	.ce_blockmode = CE_ID_OP_ECB,
+-	.alg.skcipher = {
++	.alg.skcipher.base = {
+ 		.base = {
+ 			.cra_name = "ecb(aes)",
+ 			.cra_driver_name = "ecb-aes-sun8i-ce",
+@@ -324,13 +331,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.setkey		= sun8i_ce_aes_setkey,
+ 		.encrypt	= sun8i_ce_skencrypt,
+ 		.decrypt	= sun8i_ce_skdecrypt,
+-	}
++	},
++	.alg.skcipher.op = {
++		.do_one_request = sun8i_ce_cipher_do_one,
++	},
+ },
+ {
+ 	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+ 	.ce_algo_id = CE_ID_CIPHER_DES3,
+ 	.ce_blockmode = CE_ID_OP_CBC,
+-	.alg.skcipher = {
++	.alg.skcipher.base = {
+ 		.base = {
+ 			.cra_name = "cbc(des3_ede)",
+ 			.cra_driver_name = "cbc-des3-sun8i-ce",
+@@ -351,13 +361,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.setkey		= sun8i_ce_des3_setkey,
+ 		.encrypt	= sun8i_ce_skencrypt,
+ 		.decrypt	= sun8i_ce_skdecrypt,
+-	}
++	},
++	.alg.skcipher.op = {
++		.do_one_request = sun8i_ce_cipher_do_one,
++	},
+ },
+ {
+ 	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+ 	.ce_algo_id = CE_ID_CIPHER_DES3,
+ 	.ce_blockmode = CE_ID_OP_ECB,
+-	.alg.skcipher = {
++	.alg.skcipher.base = {
+ 		.base = {
+ 			.cra_name = "ecb(des3_ede)",
+ 			.cra_driver_name = "ecb-des3-sun8i-ce",
+@@ -377,12 +390,15 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.setkey		= sun8i_ce_des3_setkey,
+ 		.encrypt	= sun8i_ce_skencrypt,
+ 		.decrypt	= sun8i_ce_skdecrypt,
+-	}
++	},
++	.alg.skcipher.op = {
++		.do_one_request = sun8i_ce_cipher_do_one,
++	},
+ },
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_HASH
+ {	.type = CRYPTO_ALG_TYPE_AHASH,
+ 	.ce_algo_id = CE_ID_HASH_MD5,
+-	.alg.hash = {
++	.alg.hash.base = {
+ 		.init = sun8i_ce_hash_init,
+ 		.update = sun8i_ce_hash_update,
+ 		.final = sun8i_ce_hash_final,
+@@ -390,6 +406,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.digest = sun8i_ce_hash_digest,
+ 		.export = sun8i_ce_hash_export,
+ 		.import = sun8i_ce_hash_import,
++		.init_tfm = sun8i_ce_hash_init_tfm,
++		.exit_tfm = sun8i_ce_hash_exit_tfm,
+ 		.halg = {
+ 			.digestsize = MD5_DIGEST_SIZE,
+ 			.statesize = sizeof(struct md5_state),
+@@ -404,15 +422,17 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct sun8i_ce_hash_tfm_ctx),
+ 				.cra_module = THIS_MODULE,
+-				.cra_init = sun8i_ce_hash_crainit,
+-				.cra_exit = sun8i_ce_hash_craexit,
+ 			}
+ 		}
+-	}
++	},
++	.alg.hash.op = {
++		.do_one_request = sun8i_ce_hash_run,
++	},
++
+ },
+ {	.type = CRYPTO_ALG_TYPE_AHASH,
+ 	.ce_algo_id = CE_ID_HASH_SHA1,
+-	.alg.hash = {
++	.alg.hash.base = {
+ 		.init = sun8i_ce_hash_init,
+ 		.update = sun8i_ce_hash_update,
+ 		.final = sun8i_ce_hash_final,
+@@ -420,6 +440,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.digest = sun8i_ce_hash_digest,
+ 		.export = sun8i_ce_hash_export,
+ 		.import = sun8i_ce_hash_import,
++		.init_tfm = sun8i_ce_hash_init_tfm,
++		.exit_tfm = sun8i_ce_hash_exit_tfm,
+ 		.halg = {
+ 			.digestsize = SHA1_DIGEST_SIZE,
+ 			.statesize = sizeof(struct sha1_state),
+@@ -434,15 +456,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct sun8i_ce_hash_tfm_ctx),
+ 				.cra_module = THIS_MODULE,
+-				.cra_init = sun8i_ce_hash_crainit,
+-				.cra_exit = sun8i_ce_hash_craexit,
+ 			}
+ 		}
+-	}
++	},
++	.alg.hash.op = {
++		.do_one_request = sun8i_ce_hash_run,
++	},
+ },
+ {	.type = CRYPTO_ALG_TYPE_AHASH,
+ 	.ce_algo_id = CE_ID_HASH_SHA224,
+-	.alg.hash = {
++	.alg.hash.base = {
+ 		.init = sun8i_ce_hash_init,
+ 		.update = sun8i_ce_hash_update,
+ 		.final = sun8i_ce_hash_final,
+@@ -450,6 +473,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.digest = sun8i_ce_hash_digest,
+ 		.export = sun8i_ce_hash_export,
+ 		.import = sun8i_ce_hash_import,
++		.init_tfm = sun8i_ce_hash_init_tfm,
++		.exit_tfm = sun8i_ce_hash_exit_tfm,
+ 		.halg = {
+ 			.digestsize = SHA224_DIGEST_SIZE,
+ 			.statesize = sizeof(struct sha256_state),
+@@ -464,15 +489,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct sun8i_ce_hash_tfm_ctx),
+ 				.cra_module = THIS_MODULE,
+-				.cra_init = sun8i_ce_hash_crainit,
+-				.cra_exit = sun8i_ce_hash_craexit,
+ 			}
+ 		}
+-	}
++	},
++	.alg.hash.op = {
++		.do_one_request = sun8i_ce_hash_run,
++	},
+ },
+ {	.type = CRYPTO_ALG_TYPE_AHASH,
+ 	.ce_algo_id = CE_ID_HASH_SHA256,
+-	.alg.hash = {
++	.alg.hash.base = {
+ 		.init = sun8i_ce_hash_init,
+ 		.update = sun8i_ce_hash_update,
+ 		.final = sun8i_ce_hash_final,
+@@ -480,6 +506,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.digest = sun8i_ce_hash_digest,
+ 		.export = sun8i_ce_hash_export,
+ 		.import = sun8i_ce_hash_import,
++		.init_tfm = sun8i_ce_hash_init_tfm,
++		.exit_tfm = sun8i_ce_hash_exit_tfm,
+ 		.halg = {
+ 			.digestsize = SHA256_DIGEST_SIZE,
+ 			.statesize = sizeof(struct sha256_state),
+@@ -494,15 +522,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct sun8i_ce_hash_tfm_ctx),
+ 				.cra_module = THIS_MODULE,
+-				.cra_init = sun8i_ce_hash_crainit,
+-				.cra_exit = sun8i_ce_hash_craexit,
+ 			}
+ 		}
+-	}
++	},
++	.alg.hash.op = {
++		.do_one_request = sun8i_ce_hash_run,
++	},
+ },
+ {	.type = CRYPTO_ALG_TYPE_AHASH,
+ 	.ce_algo_id = CE_ID_HASH_SHA384,
+-	.alg.hash = {
++	.alg.hash.base = {
+ 		.init = sun8i_ce_hash_init,
+ 		.update = sun8i_ce_hash_update,
+ 		.final = sun8i_ce_hash_final,
+@@ -510,6 +539,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.digest = sun8i_ce_hash_digest,
+ 		.export = sun8i_ce_hash_export,
+ 		.import = sun8i_ce_hash_import,
++		.init_tfm = sun8i_ce_hash_init_tfm,
++		.exit_tfm = sun8i_ce_hash_exit_tfm,
+ 		.halg = {
+ 			.digestsize = SHA384_DIGEST_SIZE,
+ 			.statesize = sizeof(struct sha512_state),
+@@ -524,15 +555,16 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct sun8i_ce_hash_tfm_ctx),
+ 				.cra_module = THIS_MODULE,
+-				.cra_init = sun8i_ce_hash_crainit,
+-				.cra_exit = sun8i_ce_hash_craexit,
+ 			}
+ 		}
+-	}
++	},
++	.alg.hash.op = {
++		.do_one_request = sun8i_ce_hash_run,
++	},
+ },
+ {	.type = CRYPTO_ALG_TYPE_AHASH,
+ 	.ce_algo_id = CE_ID_HASH_SHA512,
+-	.alg.hash = {
++	.alg.hash.base = {
+ 		.init = sun8i_ce_hash_init,
+ 		.update = sun8i_ce_hash_update,
+ 		.final = sun8i_ce_hash_final,
+@@ -540,6 +572,8 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 		.digest = sun8i_ce_hash_digest,
+ 		.export = sun8i_ce_hash_export,
+ 		.import = sun8i_ce_hash_import,
++		.init_tfm = sun8i_ce_hash_init_tfm,
++		.exit_tfm = sun8i_ce_hash_exit_tfm,
+ 		.halg = {
+ 			.digestsize = SHA512_DIGEST_SIZE,
+ 			.statesize = sizeof(struct sha512_state),
+@@ -554,11 +588,12 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
+ 				.cra_ctxsize = sizeof(struct sun8i_ce_hash_tfm_ctx),
+ 				.cra_module = THIS_MODULE,
+-				.cra_init = sun8i_ce_hash_crainit,
+-				.cra_exit = sun8i_ce_hash_craexit,
+ 			}
+ 		}
+-	}
++	},
++	.alg.hash.op = {
++		.do_one_request = sun8i_ce_hash_run,
++	},
+ },
+ #endif
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_PRNG
+@@ -582,14 +617,18 @@ static struct sun8i_ce_alg_template ce_algs[] = {
+ #endif
  };
  
-+struct aead_engine_alg {
-+	struct aead_alg base;
-+	struct crypto_engine_op op;
-+};
-+
-+struct ahash_engine_alg {
-+	struct ahash_alg base;
-+	struct crypto_engine_op op;
-+};
-+
-+struct akcipher_engine_alg {
-+	struct akcipher_alg base;
-+	struct crypto_engine_op op;
-+};
-+
-+struct kpp_engine_alg {
-+	struct kpp_alg base;
-+	struct crypto_engine_op op;
-+};
-+
-+struct skcipher_engine_alg {
-+	struct skcipher_alg base;
-+	struct crypto_engine_op op;
-+};
-+
- int crypto_transfer_aead_request_to_engine(struct crypto_engine *engine,
- 					   struct aead_request *req);
- int crypto_transfer_akcipher_request_to_engine(struct crypto_engine *engine,
-@@ -59,4 +84,28 @@ struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
- 						       bool rt, int qlen);
- int crypto_engine_exit(struct crypto_engine *engine);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+ static int sun8i_ce_debugfs_show(struct seq_file *seq, void *v)
+ {
+-	struct sun8i_ce_dev *ce = seq->private;
++	struct sun8i_ce_dev *ce __maybe_unused = seq->private;
+ 	unsigned int i;
  
-+int crypto_engine_register_aead(struct aead_engine_alg *alg);
-+void crypto_engine_unregister_aead(struct aead_engine_alg *alg);
-+int crypto_engine_register_aeads(struct aead_engine_alg *algs, int count);
-+void crypto_engine_unregister_aeads(struct aead_engine_alg *algs, int count);
+ 	for (i = 0; i < MAXFLOW; i++)
+-		seq_printf(seq, "Channel %d: nreq %lu\n", i, ce->chanlist[i].stat_req);
++		seq_printf(seq, "Channel %d: nreq %lu\n", i,
++#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
++			   ce->chanlist[i].stat_req);
++#else
++			   0ul);
++#endif
+ 
+ 	for (i = 0; i < ARRAY_SIZE(ce_algs); i++) {
+ 		if (!ce_algs[i].ce)
+@@ -597,8 +636,8 @@ static int sun8i_ce_debugfs_show(struct seq_file *seq, void *v)
+ 		switch (ce_algs[i].type) {
+ 		case CRYPTO_ALG_TYPE_SKCIPHER:
+ 			seq_printf(seq, "%s %s reqs=%lu fallback=%lu\n",
+-				   ce_algs[i].alg.skcipher.base.cra_driver_name,
+-				   ce_algs[i].alg.skcipher.base.cra_name,
++				   ce_algs[i].alg.skcipher.base.base.cra_driver_name,
++				   ce_algs[i].alg.skcipher.base.base.cra_name,
+ 				   ce_algs[i].stat_req, ce_algs[i].stat_fb);
+ 			seq_printf(seq, "\tLast fallback is: %s\n",
+ 				   ce_algs[i].fbname);
+@@ -621,8 +660,8 @@ static int sun8i_ce_debugfs_show(struct seq_file *seq, void *v)
+ 			break;
+ 		case CRYPTO_ALG_TYPE_AHASH:
+ 			seq_printf(seq, "%s %s reqs=%lu fallback=%lu\n",
+-				   ce_algs[i].alg.hash.halg.base.cra_driver_name,
+-				   ce_algs[i].alg.hash.halg.base.cra_name,
++				   ce_algs[i].alg.hash.base.halg.base.cra_driver_name,
++				   ce_algs[i].alg.hash.base.halg.base.cra_name,
+ 				   ce_algs[i].stat_req, ce_algs[i].stat_fb);
+ 			seq_printf(seq, "\tLast fallback is: %s\n",
+ 				   ce_algs[i].fbname);
+@@ -643,7 +682,8 @@ static int sun8i_ce_debugfs_show(struct seq_file *seq, void *v)
+ 			break;
+ 		}
+ 	}
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG
++#if defined(CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG) && \
++    defined(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)
+ 	seq_printf(seq, "HWRNG %lu %lu\n",
+ 		   ce->hwrng_stat_req, ce->hwrng_stat_bytes);
+ #endif
+@@ -651,7 +691,6 @@ static int sun8i_ce_debugfs_show(struct seq_file *seq, void *v)
+ }
+ 
+ DEFINE_SHOW_ATTRIBUTE(sun8i_ce_debugfs);
+-#endif
+ 
+ static void sun8i_ce_free_chanlist(struct sun8i_ce_dev *ce, int i)
+ {
+@@ -839,7 +878,7 @@ static int sun8i_ce_register_algs(struct sun8i_ce_dev *ce)
+ 			if (ce_method == CE_ID_NOTSUPP) {
+ 				dev_dbg(ce->dev,
+ 					"DEBUG: Algo of %s not supported\n",
+-					ce_algs[i].alg.skcipher.base.cra_name);
++					ce_algs[i].alg.skcipher.base.base.cra_name);
+ 				ce_algs[i].ce = NULL;
+ 				break;
+ 			}
+@@ -847,16 +886,16 @@ static int sun8i_ce_register_algs(struct sun8i_ce_dev *ce)
+ 			ce_method = ce->variant->op_mode[id];
+ 			if (ce_method == CE_ID_NOTSUPP) {
+ 				dev_dbg(ce->dev, "DEBUG: Blockmode of %s not supported\n",
+-					ce_algs[i].alg.skcipher.base.cra_name);
++					ce_algs[i].alg.skcipher.base.base.cra_name);
+ 				ce_algs[i].ce = NULL;
+ 				break;
+ 			}
+ 			dev_info(ce->dev, "Register %s\n",
+-				 ce_algs[i].alg.skcipher.base.cra_name);
+-			err = crypto_register_skcipher(&ce_algs[i].alg.skcipher);
++				 ce_algs[i].alg.skcipher.base.base.cra_name);
++			err = crypto_engine_register_skcipher(&ce_algs[i].alg.skcipher);
+ 			if (err) {
+ 				dev_err(ce->dev, "ERROR: Fail to register %s\n",
+-					ce_algs[i].alg.skcipher.base.cra_name);
++					ce_algs[i].alg.skcipher.base.base.cra_name);
+ 				ce_algs[i].ce = NULL;
+ 				return err;
+ 			}
+@@ -867,16 +906,16 @@ static int sun8i_ce_register_algs(struct sun8i_ce_dev *ce)
+ 			if (ce_method == CE_ID_NOTSUPP) {
+ 				dev_info(ce->dev,
+ 					 "DEBUG: Algo of %s not supported\n",
+-					 ce_algs[i].alg.hash.halg.base.cra_name);
++					 ce_algs[i].alg.hash.base.halg.base.cra_name);
+ 				ce_algs[i].ce = NULL;
+ 				break;
+ 			}
+ 			dev_info(ce->dev, "Register %s\n",
+-				 ce_algs[i].alg.hash.halg.base.cra_name);
+-			err = crypto_register_ahash(&ce_algs[i].alg.hash);
++				 ce_algs[i].alg.hash.base.halg.base.cra_name);
++			err = crypto_engine_register_ahash(&ce_algs[i].alg.hash);
+ 			if (err) {
+ 				dev_err(ce->dev, "ERROR: Fail to register %s\n",
+-					ce_algs[i].alg.hash.halg.base.cra_name);
++					ce_algs[i].alg.hash.base.halg.base.cra_name);
+ 				ce_algs[i].ce = NULL;
+ 				return err;
+ 			}
+@@ -916,13 +955,13 @@ static void sun8i_ce_unregister_algs(struct sun8i_ce_dev *ce)
+ 		switch (ce_algs[i].type) {
+ 		case CRYPTO_ALG_TYPE_SKCIPHER:
+ 			dev_info(ce->dev, "Unregister %d %s\n", i,
+-				 ce_algs[i].alg.skcipher.base.cra_name);
+-			crypto_unregister_skcipher(&ce_algs[i].alg.skcipher);
++				 ce_algs[i].alg.skcipher.base.base.cra_name);
++			crypto_engine_unregister_skcipher(&ce_algs[i].alg.skcipher);
+ 			break;
+ 		case CRYPTO_ALG_TYPE_AHASH:
+ 			dev_info(ce->dev, "Unregister %d %s\n", i,
+-				 ce_algs[i].alg.hash.halg.base.cra_name);
+-			crypto_unregister_ahash(&ce_algs[i].alg.hash);
++				 ce_algs[i].alg.hash.base.halg.base.cra_name);
++			crypto_engine_unregister_ahash(&ce_algs[i].alg.hash);
+ 			break;
+ 		case CRYPTO_ALG_TYPE_RNG:
+ 			dev_info(ce->dev, "Unregister %d %s\n", i,
+@@ -1007,13 +1046,21 @@ static int sun8i_ce_probe(struct platform_device *pdev)
+ 
+ 	pm_runtime_put_sync(ce->dev);
+ 
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
++		struct dentry *dbgfs_dir __maybe_unused;
++		struct dentry *dbgfs_stats __maybe_unused;
 +
-+int crypto_engine_register_ahash(struct ahash_engine_alg *alg);
-+void crypto_engine_unregister_ahash(struct ahash_engine_alg *alg);
-+int crypto_engine_register_ahashes(struct ahash_engine_alg *algs, int count);
-+void crypto_engine_unregister_ahashes(struct ahash_engine_alg *algs,
-+				      int count);
++		/* Ignore error of debugfs */
++		dbgfs_dir = debugfs_create_dir("sun8i-ce", NULL);
++		dbgfs_stats = debugfs_create_file("stats", 0444,
++						  dbgfs_dir, ce,
++						  &sun8i_ce_debugfs_fops);
 +
-+int crypto_engine_register_akcipher(struct akcipher_engine_alg *alg);
-+void crypto_engine_unregister_akcipher(struct akcipher_engine_alg *alg);
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	/* Ignore error of debugfs */
+-	ce->dbgfs_dir = debugfs_create_dir("sun8i-ce", NULL);
+-	ce->dbgfs_stats = debugfs_create_file("stats", 0444,
+-					      ce->dbgfs_dir, ce,
+-					      &sun8i_ce_debugfs_fops);
++		ce->dbgfs_dir = dbgfs_dir;
++		ce->dbgfs_stats = dbgfs_stats;
+ #endif
++	}
+ 
+ 	return 0;
+ error_alg:
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+index 04d7d890de58..d358334e5981 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+@@ -9,46 +9,46 @@
+  *
+  * You could find the datasheet in Documentation/arch/arm/sunxi.rst
+  */
 +
-+int crypto_engine_register_kpp(struct kpp_engine_alg *alg);
-+void crypto_engine_unregister_kpp(struct kpp_engine_alg *alg);
++#include <crypto/internal/hash.h>
++#include <crypto/md5.h>
++#include <crypto/sha1.h>
++#include <crypto/sha2.h>
+ #include <linux/bottom_half.h>
+ #include <linux/dma-mapping.h>
++#include <linux/kernel.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/scatterlist.h>
+-#include <crypto/internal/hash.h>
+-#include <crypto/sha1.h>
+-#include <crypto/sha2.h>
+-#include <crypto/md5.h>
++#include <linux/slab.h>
++#include <linux/string.h>
+ #include "sun8i-ce.h"
+ 
+-int sun8i_ce_hash_crainit(struct crypto_tfm *tfm)
++int sun8i_ce_hash_init_tfm(struct crypto_ahash *tfm)
+ {
+-	struct sun8i_ce_hash_tfm_ctx *op = crypto_tfm_ctx(tfm);
+-	struct ahash_alg *alg = __crypto_ahash_alg(tfm->__crt_alg);
++	struct sun8i_ce_hash_tfm_ctx *op = crypto_ahash_ctx(tfm);
++	struct ahash_alg *alg = crypto_ahash_alg(tfm);
+ 	struct sun8i_ce_alg_template *algt;
+ 	int err;
+ 
+-	memset(op, 0, sizeof(struct sun8i_ce_hash_tfm_ctx));
+-
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
+ 	op->ce = algt->ce;
+ 
+-	op->enginectx.op.do_one_request = sun8i_ce_hash_run;
+-
+ 	/* FALLBACK */
+-	op->fallback_tfm = crypto_alloc_ahash(crypto_tfm_alg_name(tfm), 0,
++	op->fallback_tfm = crypto_alloc_ahash(crypto_ahash_alg_name(tfm), 0,
+ 					      CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(op->fallback_tfm)) {
+ 		dev_err(algt->ce->dev, "Fallback driver could no be loaded\n");
+ 		return PTR_ERR(op->fallback_tfm);
+ 	}
+ 
+-	if (algt->alg.hash.halg.statesize < crypto_ahash_statesize(op->fallback_tfm))
+-		algt->alg.hash.halg.statesize = crypto_ahash_statesize(op->fallback_tfm);
++	crypto_ahash_set_statesize(tfm,
++				   crypto_ahash_statesize(op->fallback_tfm));
+ 
+-	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++	crypto_ahash_set_reqsize(tfm,
+ 				 sizeof(struct sun8i_ce_hash_reqctx) +
+ 				 crypto_ahash_reqsize(op->fallback_tfm));
+ 
+-	memcpy(algt->fbname, crypto_tfm_alg_driver_name(&op->fallback_tfm->base),
++	memcpy(algt->fbname, crypto_ahash_driver_name(op->fallback_tfm),
+ 	       CRYPTO_MAX_ALG_NAME);
+ 
+ 	err = pm_runtime_get_sync(op->ce->dev);
+@@ -61,9 +61,9 @@ int sun8i_ce_hash_crainit(struct crypto_tfm *tfm)
+ 	return err;
+ }
+ 
+-void sun8i_ce_hash_craexit(struct crypto_tfm *tfm)
++void sun8i_ce_hash_exit_tfm(struct crypto_ahash *tfm)
+ {
+-	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_tfm_ctx(tfm);
++	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+ 
+ 	crypto_free_ahash(tfmctx->fallback_tfm);
+ 	pm_runtime_put_sync_suspend(tfmctx->ce->dev);
+@@ -112,20 +112,22 @@ int sun8i_ce_hash_final(struct ahash_request *areq)
+ 	struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
+-	struct sun8i_ce_alg_template *algt;
+-#endif
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
+ 	rctx->fallback_req.base.flags = areq->base.flags &
+ 					CRYPTO_TFM_REQ_MAY_SLEEP;
+ 	rctx->fallback_req.result = areq->result;
+ 
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
++		struct sun8i_ce_alg_template *algt __maybe_unused;
++		struct ahash_alg *alg = crypto_ahash_alg(tfm);
 +
-+int crypto_engine_register_skcipher(struct skcipher_engine_alg *alg);
-+void crypto_engine_unregister_skcipher(struct skcipher_engine_alg *alg);
-+int crypto_engine_register_skciphers(struct skcipher_engine_alg *algs,
-+				     int count);
-+void crypto_engine_unregister_skciphers(struct skcipher_engine_alg *algs,
-+					int count);
++		algt = container_of(alg, struct sun8i_ce_alg_template,
++				    alg.hash.base);
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
+-	algt->stat_fb++;
++		algt->stat_fb++;
+ #endif
++	}
+ 
+ 	return crypto_ahash_final(&rctx->fallback_req);
+ }
+@@ -150,10 +152,6 @@ int sun8i_ce_hash_finup(struct ahash_request *areq)
+ 	struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
+-	struct sun8i_ce_alg_template *algt;
+-#endif
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
+ 	rctx->fallback_req.base.flags = areq->base.flags &
+@@ -162,10 +160,17 @@ int sun8i_ce_hash_finup(struct ahash_request *areq)
+ 	rctx->fallback_req.nbytes = areq->nbytes;
+ 	rctx->fallback_req.src = areq->src;
+ 	rctx->fallback_req.result = areq->result;
 +
- #endif /* _CRYPTO_ENGINE_H */
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
++		struct sun8i_ce_alg_template *algt __maybe_unused;
++		struct ahash_alg *alg = crypto_ahash_alg(tfm);
++
++		algt = container_of(alg, struct sun8i_ce_alg_template,
++				    alg.hash.base);
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
+-	algt->stat_fb++;
++		algt->stat_fb++;
+ #endif
++	}
+ 
+ 	return crypto_ahash_finup(&rctx->fallback_req);
+ }
+@@ -175,10 +180,6 @@ static int sun8i_ce_hash_digest_fb(struct ahash_request *areq)
+ 	struct sun8i_ce_hash_reqctx *rctx = ahash_request_ctx(areq);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun8i_ce_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+-#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	struct ahash_alg *alg = __crypto_ahash_alg(tfm->base.__crt_alg);
+-	struct sun8i_ce_alg_template *algt;
+-#endif
+ 
+ 	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
+ 	rctx->fallback_req.base.flags = areq->base.flags &
+@@ -187,10 +188,17 @@ static int sun8i_ce_hash_digest_fb(struct ahash_request *areq)
+ 	rctx->fallback_req.nbytes = areq->nbytes;
+ 	rctx->fallback_req.src = areq->src;
+ 	rctx->fallback_req.result = areq->result;
++
++	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG)) {
++		struct sun8i_ce_alg_template *algt __maybe_unused;
++		struct ahash_alg *alg = crypto_ahash_alg(tfm);
++
++		algt = container_of(alg, struct sun8i_ce_alg_template,
++				    alg.hash.base);
+ #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
+-	algt->stat_fb++;
++		algt->stat_fb++;
+ #endif
++	}
+ 
+ 	return crypto_ahash_digest(&rctx->fallback_req);
+ }
+@@ -202,7 +210,7 @@ static bool sun8i_ce_hash_need_fallback(struct ahash_request *areq)
+ 	struct sun8i_ce_alg_template *algt;
+ 	struct scatterlist *sg;
+ 
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
+ 
+ 	if (areq->nbytes == 0) {
+ 		algt->stat_fb_len0++;
+@@ -251,7 +259,7 @@ int sun8i_ce_hash_digest(struct ahash_request *areq)
+ 			return sun8i_ce_hash_digest_fb(areq);
+ 	}
+ 
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
+ 	ce = algt->ce;
+ 
+ 	e = sun8i_ce_get_engine_number(ce);
+@@ -343,11 +351,11 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 	dma_addr_t addr_res, addr_pad;
+ 	int ns = sg_nents_for_len(areq->src, areq->nbytes);
+ 
+-	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash);
++	algt = container_of(alg, struct sun8i_ce_alg_template, alg.hash.base);
+ 	ce = algt->ce;
+ 
+-	bs = algt->alg.hash.halg.base.cra_blocksize;
+-	digestsize = algt->alg.hash.halg.digestsize;
++	bs = algt->alg.hash.base.halg.base.cra_blocksize;
++	digestsize = algt->alg.hash.base.halg.digestsize;
+ 	if (digestsize == SHA224_DIGEST_SIZE)
+ 		digestsize = SHA256_DIGEST_SIZE;
+ 	if (digestsize == SHA384_DIGEST_SIZE)
+@@ -452,14 +460,14 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
+ 
+ 	chan->timeout = areq->nbytes;
+ 
+-	err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(areq->base.tfm));
++	err = sun8i_ce_run_task(ce, flow, crypto_ahash_alg_name(tfm));
+ 
+ 	dma_unmap_single(ce->dev, addr_pad, j * 4, DMA_TO_DEVICE);
+ 	dma_unmap_sg(ce->dev, areq->src, ns, DMA_TO_DEVICE);
+ 	dma_unmap_single(ce->dev, addr_res, digestsize, DMA_FROM_DEVICE);
+ 
+ 
+-	memcpy(areq->result, result, algt->alg.hash.halg.digestsize);
++	memcpy(areq->result, result, algt->alg.hash.base.halg.digestsize);
+ theend:
+ 	kfree(buf);
+ 	kfree(result);
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 27029fb77e29..9e0847fffd05 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -265,14 +265,12 @@ struct sun8i_cipher_req_ctx {
+ 
+ /*
+  * struct sun8i_cipher_tfm_ctx - context for a skcipher TFM
+- * @enginectx:		crypto_engine used by this TFM
+  * @key:		pointer to key data
+  * @keylen:		len of the key
+  * @ce:			pointer to the private data of driver handling this TFM
+  * @fallback_tfm:	pointer to the fallback TFM
+  */
+ struct sun8i_cipher_tfm_ctx {
+-	struct crypto_engine_ctx enginectx;
+ 	u32 *key;
+ 	u32 keylen;
+ 	struct sun8i_ce_dev *ce;
+@@ -281,12 +279,10 @@ struct sun8i_cipher_tfm_ctx {
+ 
+ /*
+  * struct sun8i_ce_hash_tfm_ctx - context for an ahash TFM
+- * @enginectx:		crypto_engine used by this TFM
+  * @ce:			pointer to the private data of driver handling this TFM
+  * @fallback_tfm:	pointer to the fallback TFM
+  */
+ struct sun8i_ce_hash_tfm_ctx {
+-	struct crypto_engine_ctx enginectx;
+ 	struct sun8i_ce_dev *ce;
+ 	struct crypto_ahash *fallback_tfm;
+ };
+@@ -329,8 +325,8 @@ struct sun8i_ce_alg_template {
+ 	u32 ce_blockmode;
+ 	struct sun8i_ce_dev *ce;
+ 	union {
+-		struct skcipher_alg skcipher;
+-		struct ahash_alg hash;
++		struct skcipher_engine_alg skcipher;
++		struct ahash_engine_alg hash;
+ 		struct rng_alg rng;
+ 	} alg;
+ 	unsigned long stat_req;
+@@ -355,6 +351,7 @@ int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			 unsigned int keylen);
+ int sun8i_ce_cipher_init(struct crypto_tfm *tfm);
+ void sun8i_ce_cipher_exit(struct crypto_tfm *tfm);
++int sun8i_ce_cipher_do_one(struct crypto_engine *engine, void *areq);
+ int sun8i_ce_skdecrypt(struct skcipher_request *areq);
+ int sun8i_ce_skencrypt(struct skcipher_request *areq);
+ 
+@@ -362,8 +359,8 @@ int sun8i_ce_get_engine_number(struct sun8i_ce_dev *ce);
+ 
+ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name);
+ 
+-int sun8i_ce_hash_crainit(struct crypto_tfm *tfm);
+-void sun8i_ce_hash_craexit(struct crypto_tfm *tfm);
++int sun8i_ce_hash_init_tfm(struct crypto_ahash *tfm);
++void sun8i_ce_hash_exit_tfm(struct crypto_ahash *tfm);
+ int sun8i_ce_hash_init(struct ahash_request *areq);
+ int sun8i_ce_hash_export(struct ahash_request *areq, void *out);
+ int sun8i_ce_hash_import(struct ahash_request *areq, const void *in);
