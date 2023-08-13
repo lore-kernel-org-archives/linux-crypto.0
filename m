@@ -2,117 +2,176 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C09EB64DD
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 12:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48053EB64DD
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 14:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjHMMXu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Aug 2023 08:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49230 "EHLO
+        id S229736AbjHMOFE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 10:05:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjHMMXt (ORCPT
+        with ESMTP id S229506AbjHMOFE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Aug 2023 08:23:49 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 847D11709;
-        Sun, 13 Aug 2023 05:23:51 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4fe457ec6e7so5433393e87.3;
-        Sun, 13 Aug 2023 05:23:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691929430; x=1692534230;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S9aOwELJQ+F+xl9knJbQEprQYGdN9bqzH4UAwE44Iy8=;
-        b=L1Rd643b/O6Pz8sYs7YuWESy2LE3bR1U5qzHhWc/Psq/p4ZeMX7cuvRBCZMP9XwuZC
-         qdpMUoPVVOIo67AGHQR1bIRHXWC7EbtlVPhf+tvA7cnlNrJWnIKM2MATx6oSc7unI3Ym
-         E5L/xECrn+9qCRgCCe0voCkx2Q5OpI3bbEzzDzQpGCeNIUzEhZvn7w8oQjIKV9LHM+ES
-         MrYZLRBXFIizjZ6kWcjyCXHsMNB0803FC3CRqeQdPv6WBKyZ8i1py+twJZ1sxArNmkB1
-         Sm9n6i5lXO4dNCIeUnAjR9nIUFn+NJMP0hcr/5NJe0avegLc+5Md+vLr1Knb5ZEb+lM9
-         aedw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691929430; x=1692534230;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S9aOwELJQ+F+xl9knJbQEprQYGdN9bqzH4UAwE44Iy8=;
-        b=T8RR31koiA1rH30REmrkXteg/64FGEvPyCLfVLq0OWYb4mzHsHqVE2d6jxwjpQnr/l
-         XmBcxTh6QZ6hUmcExqSu7MPg4PlHfAAcfdzD1nE5mbTJaX+WlY7nDKa6YUorIfZhzf72
-         ucqn6mA7q8bEmSLxbnq/eH5U6ufhaSLL2tWQmY1PkJF6f0UiTsw1F/V33+bTxqEYZQ/1
-         HH7mzaFDrHWzBWtYZfSKuAC6GLJqAhA2/QQ+6mVQ+yTSI1cvuI3py7zNZjhUSq1iKAm9
-         ijfu3f2C6ib7opyDQnN8zmeLlJj82O0MhTKRVYsAA6xaBomeRv5N2mPRYQ3sivbvRlCw
-         amRg==
-X-Gm-Message-State: AOJu0YxteMTCMQuy21mfOqBkm0KbMIXPqoibMu5Q2EaSFVQnJe97NEGP
-        mivj07fsfrO/A6IUI6ebHa8=
-X-Google-Smtp-Source: AGHT+IGzWwCAV2smT1cQu4c6Bc23bJIrbp2XC0beYhSpUgyALr+CNHoJ6M0cFJ4URfABqU+gFe2zzw==
-X-Received: by 2002:a05:6512:3287:b0:4fe:1dc8:7ec with SMTP id p7-20020a056512328700b004fe1dc807ecmr4218969lfe.37.1691929429355;
-        Sun, 13 Aug 2023 05:23:49 -0700 (PDT)
-Received: from fedora.. ([2a00:1370:8180:6b00:a1a8:4887:1af4:637a])
-        by smtp.gmail.com with ESMTPSA id t9-20020ac25489000000b004fe36bae2d6sm1500488lfk.81.2023.08.13.05.23.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Aug 2023 05:23:49 -0700 (PDT)
-From:   Pavel Skripkin <paskripkin@gmail.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        dhowells@redhat.com, pabeni@redhat.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pavel Skripkin <paskripkin@gmail.com>,
-        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
-Subject: [PATCH] crypto: fix uninit-value in af_alg_free_resources
-Date:   Sun, 13 Aug 2023 15:23:44 +0300
-Message-Id: <20230813122344.14142-1-paskripkin@gmail.com>
-X-Mailer: git-send-email 2.40.1
+        Sun, 13 Aug 2023 10:05:04 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746EBEA;
+        Sun, 13 Aug 2023 07:05:05 -0700 (PDT)
+Received: from p200300cf17418700333267be2b9ea1d1.dip0.t-ipconnect.de ([2003:cf:1741:8700:3332:67be:2b9e:a1d1]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qVBiF-0004o8-Jy; Sun, 13 Aug 2023 16:04:59 +0200
+Message-ID: <cd15c23c-e237-25e3-d2a6-79113945a2d7@leemhuis.info>
+Date:   Sun, 13 Aug 2023 16:04:58 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
+ more devices
+Content-Language: en-US, de-DE
+To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+        Linux regressions mailing list <regressions@lists.linux.dev>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Bastian Krause <bst@pengutronix.de>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Dan Douglass <dan.douglass@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>
+References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
+ <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
+ <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
+ <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+ <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+ <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
+ <AM0PR04MB60046B045B5965A61BA1CA91E709A@AM0PR04MB6004.eurprd04.prod.outlook.com>
+ <f9e34f8a-5a7b-8223-c672-4fcb2bb23c0a@leemhuis.info>
+ <DU0PR04MB95639E903580457856250C008E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+ <DU0PR04MB95637DD95D05179F36AFAF958E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+From:   "Linux regression tracking (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <DU0PR04MB95637DD95D05179F36AFAF958E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691935505;1bec62a4;
+X-HE-SMSGID: 1qVBiF-0004o8-Jy
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Syzbot was able to trigger use of uninitialized memory in
-af_alg_free_resources.
+On 11.08.23 14:58, Meenakshi Aggarwal wrote:
+> 
+> We discussed about it and lets revert the patch for now,
 
-Bug is caused by missing initialization of rsgl->sgl.need_unpin before
-adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
-is left with uninitialized need_unpin which is read during clean up
+Okay. So who will submit the revert?
 
-BUG: KMSAN: uninit-value in af_alg_free_sg crypto/af_alg.c:545 [inline]
-BUG: KMSAN: uninit-value in af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
-BUG: KMSAN: uninit-value in af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
- af_alg_free_sg crypto/af_alg.c:545 [inline]
- af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
- af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
- _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
-...
+> as the tag is to be applied this weekend.
 
-Uninit was created at:
- slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
- slab_alloc_node mm/slub.c:3470 [inline]
- __kmem_cache_alloc_node+0x536/0x8d0 mm/slub.c:3509
- __do_kmalloc_node mm/slab_common.c:984 [inline]
- __kmalloc+0x121/0x3c0 mm/slab_common.c:998
- kmalloc include/linux/slab.h:586 [inline]
- sock_kmalloc+0x128/0x1c0 net/core/sock.c:2683
- af_alg_alloc_areq+0x41/0x2a0 crypto/af_alg.c:1188
- _skcipher_recvmsg crypto/algif_skcipher.c:71 [inline]
+/me can't follow, but whatever, likely not that imporant
 
-Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists")
-Reported-and-tested-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
-Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
----
- crypto/af_alg.c | 2 ++
- 1 file changed, 2 insertions(+)
+Ciao, Thorsten
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 06b15b9f661c..4e4f2d837481 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1241,6 +1241,8 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
- 				return -ENOMEM;
- 		}
- 
-+		rsgl->sgl.need_unpin = 0;
-+
- 		rsgl->sgl.sgt.sgl = rsgl->sgl.sgl;
- 		rsgl->sgl.sgt.nents = 0;
- 		rsgl->sgl.sgt.orig_nents = 0;
--- 
-2.40.1
-
+>> -----Original Message-----
+>> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+>> Sent: Friday, August 11, 2023 5:25 PM
+>> To: Linux regressions mailing list <regressions@lists.linux.dev>; Gaurav Jain
+>> <gaurav.jain@nxp.com>; Herbert Xu <herbert@gondor.apana.org.au>
+>> Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
+>> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
+>> <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
+>> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
+>> <pankaj.gupta@nxp.com>
+>> Subject: RE: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
+>> more devices
+>>
+>> Hi,
+>>
+>> we have tested this patch on multiple variants of imx board and it is working fine.
+>>
+>> We are actively debugging the issue, it is taking time as we are not able to
+>> reproduce it at our end.
+>>
+>> Thanks,
+>> Meenakshi
+>>
+>>> -----Original Message-----
+>>> From: Linux regression tracking (Thorsten Leemhuis)
+>>> <regressions@leemhuis.info>
+>>> Sent: Friday, August 11, 2023 2:18 PM
+>>> To: Gaurav Jain <gaurav.jain@nxp.com>; Herbert Xu
+>>> <herbert@gondor.apana.org.au>; Meenakshi Aggarwal
+>>> <meenakshi.aggarwal@nxp.com>
+>>> Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
+>>> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
+>>> <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
+>>> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
+>>> <pankaj.gupta@nxp.com>; Linux kernel regressions list
+>>> <regressions@lists.linux.dev>
+>>> Subject: Re: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to
+>>> support more devices
+>>>
+>>> [CCing the regression list, as it should be in the loop for regressions:
+>>> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdocs
+>>> .ker%2F&data=05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C84b2ed6da
+>> ac44625
+>>>
+>> 779408db9a61d801%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63
+>> 827351
+>>>
+>> 7248142302%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoi
+>> V2luMzI
+>>>
+>> iLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=OWH18Cwu
+>> h8zyAFqn
+>>> I6iiL3Kewpj5NiWaQorKcmiYrr0%3D&reserved=0
+>>> nel.org%2Fadmin-guide%2Freporting-
+>>>
+>> regressions.html&data=05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7Cfde9
+>>>
+>> ceeb9e0d40d4f77d08db9a47a5e1%7C686ea1d3bc2b4c6fa92cd99c5c301635%7
+>>>
+>> C0%7C0%7C638273404742560069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC
+>>>
+>> 4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C
+>>> %7C%7C&sdata=lt7nphOXYXc3GRfOquvM5jmqNszQkDd%2BuSRdAbJd8Ec%3D
+>> &r
+>>> eserved=0]
+>>>
+>>> On 04.08.23 14:02, Gaurav Jain wrote:
+>>>> From: Herbert Xu <herbert@gondor.apana.org.au>
+>>>>> On Mon, Jul 24, 2023 at 05:13:23AM +0000, Meenakshi Aggarwal wrote:
+>>>>>> Please share the required information.
+>>>>> Any progress on this?
+>>>>>
+>>>>> Should we revert the offending patch?
+>>>>
+>>>> Debugging is in progress. There should be some mismatch in TRNG
+>>> configuration in customer board.
+>>>> Will be sharing a patch to dump the same.
+>>>
+>>> Any progress on this? Afaics would be good to have either the fix or
+>>> the revert in by -rc7 to ensure things get at least one week of proper
+>>> testing before the final release.
+>>>
+>>> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker'
+>>> hat)
+>>> --
+>>> Everything you wanna know about Linux kernel regression tracking:
+>>> https://linux-/
+>>>
+>> regtracking.leemhuis.info%2Fabout%2F%23tldr&data=05%7C01%7Cmeenakshi.
+>>>
+>> aggarwal%40nxp.com%7Cfde9ceeb9e0d40d4f77d08db9a47a5e1%7C686ea1d3b
+>>>
+>> c2b4c6fa92cd99c5c301635%7C0%7C0%7C638273404742560069%7CUnknown
+>>> %7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haW
+>> wi
+>>>
+>> LCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Xg3ZCWObptmF6xLKO7dpaIYB
+>>> A17eKK5wNhlPZ6FR2XA%3D&reserved=0
+>>> If I did something stupid, please tell me, as explained on that page.
+>>>
+>>> #regzbot poke
+> 
+> 
