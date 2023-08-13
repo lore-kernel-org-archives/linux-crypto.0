@@ -2,259 +2,198 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 826C0C04A94
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Aug 2023 14:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E45C001DE
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 06:03:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236936AbjHLOJW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Aug 2023 10:09:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53932 "EHLO
+        id S229520AbjHMGDc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 02:03:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233514AbjHLOJU (ORCPT
+        with ESMTP id S229478AbjHMGDc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Aug 2023 10:09:20 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FA81FEE;
-        Sat, 12 Aug 2023 07:09:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 248D362493;
-        Sat, 12 Aug 2023 14:09:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB08C433C8;
-        Sat, 12 Aug 2023 14:09:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691849362;
-        bh=z+m4uxf5uQXSYdBR7XRst5uEUqfj5OU0THhKy2Pgzw0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NRcuuSwRkCingBsl/vsEZbgeFFYLrf1y+jccW0/5Yc5HDj+1VoVAME8JmLoRwatmv
-         cq9vWxL4zAE9ZVUJLta84Dvv5Inw/EfKSi/yAs63VyBxmpmvFYbATcUsu77nljsk2A
-         aA3VJilGgMOpA/ket7dhpg569WOR9pO165Aa92NCsdjCCxPdIgZY5ieRy7nbUuFLnh
-         5IcBP4Gl/p7TKLadf1jSNE+GDBp+0bp0kFtLguMP/b1EWW/an8byu12FnBRohiFL9c
-         uRJrWRUhrLp3tNfyj4R8So0k0XxPic0tJx3E0PAmnu0wkeyaegTrtitZo78/ruaSpI
-         fW6TnxXPQeEnQ==
-Date:   Sat, 12 Aug 2023 16:09:12 +0200
-From:   Simon Horman <horms@kernel.org>
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, alexandre.torgue@foss.st.com,
-        vkoul@kernel.org, jic23@kernel.org, olivier.moysan@foss.st.com,
-        arnaud.pouliquen@foss.st.com, mchehab@kernel.org,
-        fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
-        ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
-        richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>,
-        peng.fan@oss.nxp.com, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org
-Subject: Re: [PATCH v4 05/11] firewall: introduce stm32_firewall framework
-Message-ID: <ZNeSiFQGdOXbR+2S@vergenet.net>
-References: <20230811100731.108145-1-gatien.chevallier@foss.st.com>
- <20230811100731.108145-6-gatien.chevallier@foss.st.com>
+        Sun, 13 Aug 2023 02:03:32 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9027A1702
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Aug 2023 23:03:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691906614; x=1723442614;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=pvKqSBXVcIi5rdCuEE9QV59yf+xrYBkFTXBgBff81jU=;
+  b=i5oa5s0vWx+c36knJXUSoUXcLstzScDqpnwDeXIjDrrA73jS1lnQrVf7
+   jiiu0cR2ZTwL5giO6l1iMPttBEowE5XITte7PIZk0wd1mWUX+L/slVNRv
+   oJuMHHjgRSTSO2BZFdEkd4ibof+t5WLaLVm5c5vD+S52Rcebi/oGishzF
+   GP8pIOV1E/vZ2fzWTmPm/zj1Nh3gG5QCxQTNvoJQ+ApDJUUdDY5n+7jle
+   lFQxPD+/aftgiqWRgtm92juNUIlEtSCArupW2FNKYoZmBQkyMlneKQBeg
+   alFXKZkrqg6AE3eEMSp6Yx9jAQmmSPO2hcVsLwIYMoNgfNj3C+ghgAhd7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="352195968"
+X-IronPort-AV: E=Sophos;i="6.01,169,1684825200"; 
+   d="scan'208";a="352195968"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2023 23:03:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10800"; a="906857115"
+X-IronPort-AV: E=Sophos;i="6.01,169,1684825200"; 
+   d="scan'208";a="906857115"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 12 Aug 2023 23:03:32 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qV4CJ-0008yk-2q;
+        Sun, 13 Aug 2023 06:03:31 +0000
+Date:   Sun, 13 Aug 2023 14:03:17 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Rob Herring <robh@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [herbert-cryptodev-2.6:master 83/96]
+ drivers/char/hw_random/xgene-rng.c:110:9: error: implicit declaration of
+ function 'writel'
+Message-ID: <202308131309.7UK6Fvhe-lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230811100731.108145-6-gatien.chevallier@foss.st.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 12:07:25PM +0200, Gatien Chevallier wrote:
+Hi Rob,
 
-...
+First bad commit (maybe != root cause):
 
-> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
-> new file mode 100644
-> index 000000000000..900f3b052a66
-> --- /dev/null
-> +++ b/drivers/bus/stm32_firewall.c
-> @@ -0,0 +1,293 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-> + */
-> +
-> +#include <linux/bitfield.h>
-> +#include <linux/bits.h>
-> +#include <linux/bus/stm32_firewall_device.h>
-> +#include <linux/device.h>
-> +#include <linux/err.h>
-> +#include <linux/init.h>
-> +#include <linux/io.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/of_platform.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/types.h>
-> +#include <linux/slab.h>
-> +
-> +#include "stm32_firewall.h"
-> +
-> +/* Corresponds to STM32_FIREWALL_MAX_EXTRA_ARGS + firewall ID */
-> +#define STM32_FIREWALL_MAX_ARGS		(STM32_FIREWALL_MAX_EXTRA_ARGS + 1)
-> +
-> +static LIST_HEAD(firewall_controller_list);
-> +static DEFINE_MUTEX(firewall_controller_list_lock);
-> +
-> +/* Firewall device API */
-> +int stm32_firewall_get_firewall(struct device_node *np, struct stm32_firewall *firewall,
-> +				unsigned int nb_firewall)
-> +{
-> +	struct stm32_firewall_controller *ctrl;
-> +	struct of_phandle_iterator it;
-> +	unsigned int i, j = 0;
-> +	int err;
-> +
-> +	if (!firewall || !nb_firewall)
-> +		return -EINVAL;
-> +
-> +	/* Parse property with phandle parsed out */
-> +	of_for_each_phandle(&it, err, np, "feature-domains", "#feature-domain-cells", 0) {
-> +		struct of_phandle_args provider_args;
-> +		struct device_node *provider = it.node;
-> +		const char *fw_entry;
-> +		bool match = false;
-> +
-> +		if (err) {
-> +			pr_err("Unable to get feature-domains property for node %s\n, err: %d",
-> +			       np->full_name, err);
-> +			of_node_put(provider);
-> +			return err;
-> +		}
-> +
-> +		if (j > nb_firewall) {
-> +			pr_err("Too many firewall controllers");
-> +			of_node_put(provider);
-> +			return -EINVAL;
-> +		}
-> +
-> +		provider_args.args_count = of_phandle_iterator_args(&it, provider_args.args,
-> +								    STM32_FIREWALL_MAX_ARGS);
-> +
-> +		/* Check if the parsed phandle corresponds to a registered firewall controller */
-> +		mutex_lock(&firewall_controller_list_lock);
-> +		list_for_each_entry(ctrl, &firewall_controller_list, entry) {
-> +			if (ctrl->dev->of_node->phandle == it.phandle) {
-> +				match = true;
-> +				firewall[j].firewall_ctrl = ctrl;
-> +				break;
-> +			}
-> +		}
-> +		mutex_unlock(&firewall_controller_list_lock);
-> +
-> +		if (!match) {
-> +			firewall[j].firewall_ctrl = NULL;
-> +			pr_err("No firewall controller registered for %s\n", np->full_name);
-> +			of_node_put(provider);
-> +			return -ENODEV;
-> +		}
-> +
-> +		err = of_property_read_string_index(np, "feature-domain-names", j, &fw_entry);
-> +		if (err == 0)
-> +			firewall[j].entry = fw_entry;
-> +
-> +		/* Handle the case when there are no arguments given along with the phandle */
-> +		if (provider_args.args_count < 0 ||
-> +		    provider_args.args_count > STM32_FIREWALL_MAX_ARGS) {
-> +			of_node_put(provider);
-> +			return -EINVAL;
-> +		} else if (provider_args.args_count == 0) {
-> +			firewall[j].extra_args_size = 0;
-> +			firewall[j].firewall_id = U32_MAX;
-> +			j++;
-> +			continue;
-> +		}
-> +
-> +		/* The firewall ID is always the first argument */
-> +		firewall[j].firewall_id = provider_args.args[0];
-> +
-> +		/* Extra args start at the third argument */
-> +		for (i = 0; i < provider_args.args_count; i++)
-> +			firewall[j].extra_args[i] = provider_args.args[i + 1];
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   91cb1e1432b3d873a0c8831d0dd8022db98ac8b8
+commit: 1ce1cd8208ad6060e4fcf6e09068c8954687c127 [83/96] hwrng: Enable COMPILE_TEST for more drivers
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20230813/202308131309.7UK6Fvhe-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230813/202308131309.7UK6Fvhe-lkp@intel.com/reproduce)
 
-Hi Gatien,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202308131309.7UK6Fvhe-lkp@intel.com/
 
-Above it is checked that the maximum value of provider_args.args_count is
-STM32_FIREWALL_MAX_ARGS.
-So here the maximum value of i is STM32_FIREWALL_MAX_ARGS - 1.
+Note: the herbert-cryptodev-2.6/master HEAD 91cb1e1432b3d873a0c8831d0dd8022db98ac8b8 builds fine.
+      It only hurts bisectability.
 
-STM32_FIREWALL_MAX_ARGS is defined as STM32_FIREWALL_MAX_EXTRA_ARGS + 1
-And STM32_FIREWALL_MAX_EXTRA_ARGS is defined as 5.
-So the maximum value of i is (5 + 1 - 1) = 5.
+All errors (new ones prefixed by >>):
 
-firewall[j] is of type struct stm32_firewall.
-And its args field has STM32_FIREWALL_MAX_EXTRA_ARGS (5) elements.
-Thus the maximum valid index is (5 - 1) = 4.
+   drivers/char/hw_random/xgene-rng.c: In function 'xgene_rng_init_fro':
+>> drivers/char/hw_random/xgene-rng.c:110:9: error: implicit declaration of function 'writel' [-Werror=implicit-function-declaration]
+     110 |         writel(fro_val, ctx->csr_base + RNG_FRODETUNE);
+         |         ^~~~~~
+   drivers/char/hw_random/xgene-rng.c: In function 'xgene_rng_chk_overflow':
+>> drivers/char/hw_random/xgene-rng.c:120:15: error: implicit declaration of function 'readl' [-Werror=implicit-function-declaration]
+     120 |         val = readl(ctx->csr_base + RNG_INTR_STS_ACK);
+         |               ^~~~~
+   cc1: some warnings being treated as errors
 
-But the line above may access index 5.
 
-Flagged by Smatch.
+vim +/writel +110 drivers/char/hw_random/xgene-rng.c
 
-> +
-> +		/* Remove the firewall ID arg that is not an extra argument */
-> +		firewall[j].extra_args_size = provider_args.args_count - 1;
-> +
-> +		j++;
-> +	}
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(stm32_firewall_get_firewall);
+a91ae4eba9f997 Feng Kan 2014-08-22  104  
+a91ae4eba9f997 Feng Kan 2014-08-22  105  /*
+a91ae4eba9f997 Feng Kan 2014-08-22  106   * Initialize or reinit free running oscillators (FROs)
+a91ae4eba9f997 Feng Kan 2014-08-22  107   */
+a91ae4eba9f997 Feng Kan 2014-08-22  108  static void xgene_rng_init_fro(struct xgene_rng_dev *ctx, u32 fro_val)
+a91ae4eba9f997 Feng Kan 2014-08-22  109  {
+a91ae4eba9f997 Feng Kan 2014-08-22 @110  	writel(fro_val, ctx->csr_base + RNG_FRODETUNE);
+a91ae4eba9f997 Feng Kan 2014-08-22  111  	writel(0x00000000, ctx->csr_base + RNG_ALARMMASK);
+a91ae4eba9f997 Feng Kan 2014-08-22  112  	writel(0x00000000, ctx->csr_base + RNG_ALARMSTOP);
+a91ae4eba9f997 Feng Kan 2014-08-22  113  	writel(0xFFFFFFFF, ctx->csr_base + RNG_FROENABLE);
+a91ae4eba9f997 Feng Kan 2014-08-22  114  }
+a91ae4eba9f997 Feng Kan 2014-08-22  115  
+a91ae4eba9f997 Feng Kan 2014-08-22  116  static void xgene_rng_chk_overflow(struct xgene_rng_dev *ctx)
+a91ae4eba9f997 Feng Kan 2014-08-22  117  {
+a91ae4eba9f997 Feng Kan 2014-08-22  118  	u32 val;
+a91ae4eba9f997 Feng Kan 2014-08-22  119  
+a91ae4eba9f997 Feng Kan 2014-08-22 @120  	val = readl(ctx->csr_base + RNG_INTR_STS_ACK);
+a91ae4eba9f997 Feng Kan 2014-08-22  121  	if (val & MONOBIT_FAIL_MASK)
+a91ae4eba9f997 Feng Kan 2014-08-22  122  		/*
+a91ae4eba9f997 Feng Kan 2014-08-22  123  		 * LFSR detected an out-of-bounds number of 1s after
+a91ae4eba9f997 Feng Kan 2014-08-22  124  		 * checking 20,000 bits (test T1 as specified in the
+a91ae4eba9f997 Feng Kan 2014-08-22  125  		 * AIS-31 standard)
+a91ae4eba9f997 Feng Kan 2014-08-22  126  		 */
+a91ae4eba9f997 Feng Kan 2014-08-22  127  		dev_err(ctx->dev, "test monobit failure error 0x%08X\n", val);
+a91ae4eba9f997 Feng Kan 2014-08-22  128  	if (val & POKER_FAIL_MASK)
+a91ae4eba9f997 Feng Kan 2014-08-22  129  		/*
+a91ae4eba9f997 Feng Kan 2014-08-22  130  		 * LFSR detected an out-of-bounds value in at least one
+a91ae4eba9f997 Feng Kan 2014-08-22  131  		 * of the 16 poker_count_X counters or an out of bounds sum
+a91ae4eba9f997 Feng Kan 2014-08-22  132  		 * of squares value after checking 20,000 bits (test T2 as
+a91ae4eba9f997 Feng Kan 2014-08-22  133  		 * specified in the AIS-31 standard)
+a91ae4eba9f997 Feng Kan 2014-08-22  134  		 */
+a91ae4eba9f997 Feng Kan 2014-08-22  135  		dev_err(ctx->dev, "test poker failure error 0x%08X\n", val);
+a91ae4eba9f997 Feng Kan 2014-08-22  136  	if (val & LONG_RUN_FAIL_MASK)
+a91ae4eba9f997 Feng Kan 2014-08-22  137  		/*
+a91ae4eba9f997 Feng Kan 2014-08-22  138  		 * LFSR detected a sequence of 34 identical bits
+a91ae4eba9f997 Feng Kan 2014-08-22  139  		 * (test T4 as specified in the AIS-31 standard)
+a91ae4eba9f997 Feng Kan 2014-08-22  140  		 */
+a91ae4eba9f997 Feng Kan 2014-08-22  141  		dev_err(ctx->dev, "test long run failure error 0x%08X\n", val);
+a91ae4eba9f997 Feng Kan 2014-08-22  142  	if (val & RUN_FAIL_MASK)
+a91ae4eba9f997 Feng Kan 2014-08-22  143  		/*
+a91ae4eba9f997 Feng Kan 2014-08-22  144  		 * LFSR detected an outof-bounds value for at least one
+a91ae4eba9f997 Feng Kan 2014-08-22  145  		 * of the running counters after checking 20,000 bits
+a91ae4eba9f997 Feng Kan 2014-08-22  146  		 * (test T3 as specified in the AIS-31 standard)
+a91ae4eba9f997 Feng Kan 2014-08-22  147  		 */
+a91ae4eba9f997 Feng Kan 2014-08-22  148  		dev_err(ctx->dev, "test run failure error 0x%08X\n", val);
+a91ae4eba9f997 Feng Kan 2014-08-22  149  	if (val & NOISE_FAIL_MASK)
+a91ae4eba9f997 Feng Kan 2014-08-22  150  		/* LFSR detected a sequence of 48 identical bits */
+a91ae4eba9f997 Feng Kan 2014-08-22  151  		dev_err(ctx->dev, "noise failure error 0x%08X\n", val);
+a91ae4eba9f997 Feng Kan 2014-08-22  152  	if (val & STUCK_OUT_MASK)
+a91ae4eba9f997 Feng Kan 2014-08-22  153  		/*
+a91ae4eba9f997 Feng Kan 2014-08-22  154  		 * Detected output data registers generated same value twice
+a91ae4eba9f997 Feng Kan 2014-08-22  155  		 * in a row
+a91ae4eba9f997 Feng Kan 2014-08-22  156  		 */
+a91ae4eba9f997 Feng Kan 2014-08-22  157  		dev_err(ctx->dev, "stuck out failure error 0x%08X\n", val);
+a91ae4eba9f997 Feng Kan 2014-08-22  158  
+a91ae4eba9f997 Feng Kan 2014-08-22  159  	if (val & SHUTDOWN_OFLO_MASK) {
+a91ae4eba9f997 Feng Kan 2014-08-22  160  		u32 frostopped;
+a91ae4eba9f997 Feng Kan 2014-08-22  161  
+a91ae4eba9f997 Feng Kan 2014-08-22  162  		/* FROs shut down after a second error event. Try recover. */
+a91ae4eba9f997 Feng Kan 2014-08-22  163  		if (++ctx->failure_cnt == 1) {
+a91ae4eba9f997 Feng Kan 2014-08-22  164  			/* 1st time, just recover */
+a91ae4eba9f997 Feng Kan 2014-08-22  165  			ctx->failure_ts = jiffies;
+a91ae4eba9f997 Feng Kan 2014-08-22  166  			frostopped = readl(ctx->csr_base + RNG_ALARMSTOP);
+a91ae4eba9f997 Feng Kan 2014-08-22  167  			xgene_rng_init_fro(ctx, frostopped);
+a91ae4eba9f997 Feng Kan 2014-08-22  168  
+a91ae4eba9f997 Feng Kan 2014-08-22  169  			/*
+a91ae4eba9f997 Feng Kan 2014-08-22  170  			 * We must start a timer to clear out this error
+a91ae4eba9f997 Feng Kan 2014-08-22  171  			 * in case the system timer wrap around
+a91ae4eba9f997 Feng Kan 2014-08-22  172  			 */
+a91ae4eba9f997 Feng Kan 2014-08-22  173  			xgene_rng_start_timer(ctx);
+a91ae4eba9f997 Feng Kan 2014-08-22  174  		} else {
+a91ae4eba9f997 Feng Kan 2014-08-22  175  			/* 2nd time failure in lesser than 1 minute? */
+a91ae4eba9f997 Feng Kan 2014-08-22  176  			if (time_after(ctx->failure_ts + 60 * HZ, jiffies)) {
+a91ae4eba9f997 Feng Kan 2014-08-22  177  				dev_err(ctx->dev,
+a91ae4eba9f997 Feng Kan 2014-08-22  178  					"FRO shutdown failure error 0x%08X\n",
+a91ae4eba9f997 Feng Kan 2014-08-22  179  					val);
+a91ae4eba9f997 Feng Kan 2014-08-22  180  			} else {
+a91ae4eba9f997 Feng Kan 2014-08-22  181  				/* 2nd time failure after 1 minutes, recover */
+a91ae4eba9f997 Feng Kan 2014-08-22  182  				ctx->failure_ts = jiffies;
+a91ae4eba9f997 Feng Kan 2014-08-22  183  				ctx->failure_cnt = 1;
+a91ae4eba9f997 Feng Kan 2014-08-22  184  				/*
+a91ae4eba9f997 Feng Kan 2014-08-22  185  				 * We must start a timer to clear out this
+a91ae4eba9f997 Feng Kan 2014-08-22  186  				 * error in case the system timer wrap
+a91ae4eba9f997 Feng Kan 2014-08-22  187  				 * around
+a91ae4eba9f997 Feng Kan 2014-08-22  188  				 */
+a91ae4eba9f997 Feng Kan 2014-08-22  189  				xgene_rng_start_timer(ctx);
+a91ae4eba9f997 Feng Kan 2014-08-22  190  			}
+a91ae4eba9f997 Feng Kan 2014-08-22  191  			frostopped = readl(ctx->csr_base + RNG_ALARMSTOP);
+a91ae4eba9f997 Feng Kan 2014-08-22  192  			xgene_rng_init_fro(ctx, frostopped);
+a91ae4eba9f997 Feng Kan 2014-08-22  193  		}
+a91ae4eba9f997 Feng Kan 2014-08-22  194  	}
+a91ae4eba9f997 Feng Kan 2014-08-22  195  	/* Clear them all */
+a91ae4eba9f997 Feng Kan 2014-08-22  196  	writel(val, ctx->csr_base + RNG_INTR_STS_ACK);
+a91ae4eba9f997 Feng Kan 2014-08-22  197  }
+a91ae4eba9f997 Feng Kan 2014-08-22  198  
 
-...
+:::::: The code at line 110 was first introduced by commit
+:::::: a91ae4eba9f9977863b57f2ac61e2e8e780375a8 hwrng: xgene - add support for APM X-Gene SoC RNG support
 
-> diff --git a/include/linux/bus/stm32_firewall_device.h b/include/linux/bus/stm32_firewall_device.h
-> new file mode 100644
-> index 000000000000..7b4450a8ec15
-> --- /dev/null
-> +++ b/include/linux/bus/stm32_firewall_device.h
-> @@ -0,0 +1,141 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-> + */
-> +
-> +#ifndef STM32_FIREWALL_DEVICE_H
-> +#define STM32_FIREWALL_DEVICE_H
-> +
-> +#include <linux/of.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/types.h>
-> +
-> +#define STM32_FIREWALL_MAX_EXTRA_ARGS		5
-> +
-> +/* Opaque reference to stm32_firewall_controller */
-> +struct stm32_firewall_controller;
-> +
-> +/**
-> + * struct stm32_firewall - Information on a device's firewall. Each device can have more than one
-> + *			   firewall.
-> + *
-> + * @firewall_ctrl:		Pointer referencing a firewall controller of the device. It is
-> + *				opaque so a device cannot manipulate the controller's ops or access
-> + *				the controller's data
-> + * @extra_args:			Extra arguments that are implementation dependent
-> + * @entry:			Name of the firewall entry
-> + * @extra_args_size:		Number of extra arguments
-> + * @firewall_id:		Firewall ID associated the device for this firewall controller
-> + */
-> +struct stm32_firewall {
-> +	struct stm32_firewall_controller *firewall_ctrl;
-> +	u32 extra_args[STM32_FIREWALL_MAX_EXTRA_ARGS];
-> +	const char *entry;
-> +	size_t extra_args_size;
-> +	u32 firewall_id;
-> +};
+:::::: TO: Feng Kan <fkan@apm.com>
+:::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
 
-...
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
