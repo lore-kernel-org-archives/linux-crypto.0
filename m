@@ -2,164 +2,87 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A9E7C001B0
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 06:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 882D3C001B0
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 08:28:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231397AbjHNGgp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Aug 2023 02:36:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50278 "EHLO
+        id S232459AbjHNI2V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Aug 2023 04:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233918AbjHNGgf (ORCPT
+        with ESMTP id S234930AbjHNI1s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2023 02:36:35 -0400
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2072.outbound.protection.outlook.com [40.107.6.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEA52E5D;
-        Sun, 13 Aug 2023 23:36:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AuFyG/ur1Km5RF6zzawl7od2hc8eLvxxEHcu5J9y6jA0talcoECzM3cehuNWK6n5lh9FKsUyXrF+Z/rW5S7HAbMU0uUxS+mgXnx/xzdH0h4F/IZpNCsuiAXb2pTGIhQZRbAhzb4xdQTQnmEVMIYzRtlfeCwdmWDxUs3IJzoQi/yQGD5btDNmwytQfXcwdQbhr9OsnRI6JEgFWPAqO1LsqMFEvS74G0S7BVJvIWeT56/uRsM0xdS9SjRQLNpUBATMRnN3p+vP18bFTh5+ZrGAN2vnF3MEV8DSw/RN5j+KeXm9d47R1j0ix1iEcALlX2k5VLmAUCyTc9uqKueWVmG9Bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TlQ2L6ojf2F5WBCVU9WinSpkvSXQbjwKC5qGvBqpFhg=;
- b=XkTrSfUWXhiIj9ZpV6k+roi2S5DPI7fWvm4qm/x6UZHY+9+HzKxDkLu4IIaOQm/MTJnMcYh+NFC1SMwXgC3Ysbi3uMZti06p05vomaSG1t+n6XN7X2x4z3PT9dLuZCcZ4OYerbmt1DxZx9xfkWHkUtzFPgb8SykPsdD8a6x9REj1EplPcU4xd+WEodSZ2NfZsjTObeKvk55iDELvzswOxwR0sFNbOCsZmqoSXs39FVxbAn0a4VJcSWzbcwV03wJxemGeMWAuEICXMVO6hH7WpNzqAyGcg151VVy27a4+aRzd5SH/Ga/GGE9dYs3ha7wakBvhY/7yMjTFiFGt3q31xw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TlQ2L6ojf2F5WBCVU9WinSpkvSXQbjwKC5qGvBqpFhg=;
- b=Bj0+V5Ll/HnBgGCZ/+5QDb6XhyLus1bst/z5XJ7Tk9LbY8R1Iiv6M2D1Yjj3u88Wprr+PmowXO5YbWKCJf263UBPqsLFoeOSrAaEvT1Bb1f6ap71l/8i6D5MBDRi+GJdS33w1q1QtiEKIykgDb67Lq345BK0q6JRFKFwHOUIs6I=
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by PA4PR04MB9566.eurprd04.prod.outlook.com (2603:10a6:102:26c::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6678.24; Mon, 14 Aug
- 2023 06:36:31 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::1392:7c78:1b43:769f]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::1392:7c78:1b43:769f%4]) with mapi id 15.20.6678.022; Mon, 14 Aug 2023
- 06:36:31 +0000
-From:   Gaurav Jain <gaurav.jain@nxp.com>
-To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] crypto: caam: fix unchecked return value error
-Thread-Topic: [PATCH] crypto: caam: fix unchecked return value error
-Thread-Index: AQHZyebilpxXMyMRNkuEfBm3sxlVsa/pX3eQ
-Date:   Mon, 14 Aug 2023 06:36:31 +0000
-Message-ID: <AM0PR04MB6004181BD078ABD918D4D008E717A@AM0PR04MB6004.eurprd04.prod.outlook.com>
-References: <20230808105527.1707039-1-meenakshi.aggarwal@nxp.com>
-In-Reply-To: <20230808105527.1707039-1-meenakshi.aggarwal@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM0PR04MB6004:EE_|PA4PR04MB9566:EE_
-x-ms-office365-filtering-correlation-id: 7e85866f-be15-448a-7a91-08db9c90cbe9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UBhS3mTlCYOW9kxjmOI4njN4rkMb9NXJ/dfgkTUWWGmxpCVCwNwwsoqgPUemHvbTHzgGE47sCB+dwfVlLgSlEmtzkxE1FuoOt1F806GY+k1FM93GhcUct4TOebYDM3tamXnfJZs0JU7yeSuVJUnctdN1gGK6KOQEZHGXvT8vfVP2hHZNOGRhM1V+enYY3mPq8IoczitGk6YUCz271NUhu2uIyDmbQd5rNEoIYIII29HdAxErdkd0MBlZ9Uk4sEL3jtBzW3zqXL8wQaDVuxsZwrIr9hZKMydRPpuRXR8OQiFSVyaTozFZUF1T4wHP5lKyjnaIA+fhhRrCAoI+4+1WbDFPoSDFnz69QtVHiHvN09RI/bpbv3hQYvNABw8vOtOGHHjkITKkIjwnZuEHDUZDxL3EAeUNZ21VNiENAzvEqvWp4y8u5OjwO4N3/29vgX0ufxpTkuQjenMWw8+jeeGef+8sH9+xqHiq6MpcmQlYcYyWXDBvR7hBqIlIgeD87FNDBmmNzKY5MIJOvrP2+sGB0wHUBP9JeUjYjFDI3FEHnjj8eIE9K4Syt9s6HnFN68GPoB27XZFHC57PZ8Eh3suA56Ya1e9YTdPGK9atRzdY8lI87rspSjIaOaZHiN0OgNC9
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(376002)(136003)(396003)(39860400002)(366004)(186006)(1800799006)(451199021)(7696005)(9686003)(33656002)(71200400001)(86362001)(38070700005)(38100700002)(83380400001)(122000001)(26005)(6506007)(2906002)(55016003)(110136005)(478600001)(53546011)(55236004)(64756008)(8676002)(66556008)(66476007)(8936002)(52536014)(5660300002)(41300700001)(66446008)(66946007)(316002)(44832011)(76116006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?0iJTVFbrMPvgjKcWM3LUpp5GZRuwF8BXM2XDQzm/A5dPF8Dd89EYYVJb0o1Q?=
- =?us-ascii?Q?19pjBn//W8C7DotLzNurDVa+c27OucuXj2cjTRrID58QQ+NrbSxOckCiJ7YN?=
- =?us-ascii?Q?8+r+lBHrTj+c058ZKowkfEXnDNW8K66GyMtmGbwWWWlGDDHB5aCXPVLt0p+U?=
- =?us-ascii?Q?v3HbCp9qF1IvFHAfhToFOX4ffvoTP8yKwpNK2tqPElSSdcTdkBp1SES91mLF?=
- =?us-ascii?Q?q8SDw8WNtQAtAvFAtR4/QTdEpr4O/s7J/JrWeThbOkl7wXe6L28vS/XrVXyT?=
- =?us-ascii?Q?zQfaCsDlqzk+dxHleTaXnZVz9KbBvdNYa20312NKdIyzbAazYF/PMrFyqBaq?=
- =?us-ascii?Q?nsjXlNUk7HN7LMcQLYO13gm+n7t4WH+3j+5lfEKeg1FEi9Os+6tq/+KOFSyV?=
- =?us-ascii?Q?dWh2rgZYDDCz/+y/4BSJhhOgQm/iytx17Uykx5Kheo79LKNR1yJ6ClKX0TAx?=
- =?us-ascii?Q?/tkIqB3am+LJfLK+4wTN4rInFoYBF+REPvrrI8YEr5FwzsK3wsfZpRlejVWw?=
- =?us-ascii?Q?Q/T4SFUhOK2RvAHfFm0Af7lk3EK9W+O/SkynTExEXBVHgjx0vmxmC8n3Prjl?=
- =?us-ascii?Q?TMNythuIqJWQWEUmLBQbySHEeSbO/3/ITfJCtjlIXTnc292S824MSKrtwqIN?=
- =?us-ascii?Q?b+3f843p1iCEgGsMBS+3mqFSwtwFKrMSrLXSgW9diWOD0kHnwVWdWN8k2GUo?=
- =?us-ascii?Q?ntRvKJsM5U4ei1+HZyIIHMwoCmIRXqWKSidqibhwSW1FBw8AqD/zG/suUIs9?=
- =?us-ascii?Q?bRpvwC9Vz36z3DAZw1SU3MWl55Y5W7SRwxh33RZse8JSW6ussJp44dBfRAjY?=
- =?us-ascii?Q?Z/xUKflcGxsru/Ev2AzqCGrpfHy5iByNIngtfO3NMnJmeNzwBeTnGuvmZu3V?=
- =?us-ascii?Q?nBGQqy85oArsZRwMUv2m7LtfflIbUqAKs1Z91BO/usL+gfsmShM7bnqJiTSO?=
- =?us-ascii?Q?TsziPKAVrwS7X+Ue9ZPwn7Ew2d9EGr/5AhphR1os/K1GuEqsABnpHeTXTCC9?=
- =?us-ascii?Q?WZDNctzshqTLZoIT4VwMsFUPVLmspb/5IRGqLDdEOsdahSc9YeySqjFzJyDv?=
- =?us-ascii?Q?SQSThb2kdjv42HAFrJn6gfU7xcoLbOxJeudN3AXYWUg2Ck3BXGsSWUPUqbrD?=
- =?us-ascii?Q?rvMtfex22c3Qo9/OymeGEUicWDbMji4YJorTIzAKKA6uXMEthqfZS8md8mUg?=
- =?us-ascii?Q?//DMAW4WuYnkS0/z05R77lk23qhxpoz9gUKxqJZstkfvGBL0OWboPeNCCCFI?=
- =?us-ascii?Q?B5oxtmVwa0x7PQj5br/Wox1p5qIkciXFY9o6QdhS+Ah7VxwuMNEPNsQdIjSf?=
- =?us-ascii?Q?nMnSmTFpfYAv8KpC6BDH1ml3yiiyoIWVABmxFaG16I2MzR1tKV0KlaDQd76g?=
- =?us-ascii?Q?RnMtesGkigZjCPbhdR+qrshhP1FcsJkG7UZB79qXi+QazqJgoF3XgWNiC3Qk?=
- =?us-ascii?Q?h4jiG15EUhQKjOQYGJvMy9VaFZXmi8c3h8FvXlmvu/+86brUlYpqCLC1UgZX?=
- =?us-ascii?Q?X+jbVsnNZ3AVjf25TN0RFrPET2nkiaJkB4A5ugoPqQtkj4cfI/iX/MgUAZFA?=
- =?us-ascii?Q?X5KAiJ5yibM9VY1a1VAd4uy6DGTJACvgZa+XRNf2?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 14 Aug 2023 04:27:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 134B110B
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 01:26:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692001614;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H33gECP+9hXyb+EizpAzFVTxGWbGL8MsN4gYGXEf7/Q=;
+        b=MMvrviWMD3qHlkzdgt46YDVKHYQEEJ1XI5SPpWyJdFau2BA3wOpxHdyJF2u4ROgAiZiKT+
+        eFSG6FpDr3AgbsYrHRXIm38PcPQutf2zCkPk9YCWBw6NCdwYTXfrkn7ZRpQOaQHJQFC/yJ
+        Dq98gUrb6wpztBvMyNSm2fC98G8JVz4=
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-478-UZ9e3W2COM-03RqOQaRmKA-1; Mon, 14 Aug 2023 04:26:52 -0400
+X-MC-Unique: UZ9e3W2COM-03RqOQaRmKA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 174012A59575;
+        Mon, 14 Aug 2023 08:26:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C4FB41121315;
+        Mon, 14 Aug 2023 08:26:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230813122344.14142-1-paskripkin@gmail.com>
+References: <20230813122344.14142-1-paskripkin@gmail.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     dhowells@redhat.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, pabeni@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+Subject: Re: [PATCH] crypto: fix uninit-value in af_alg_free_resources
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e85866f-be15-448a-7a91-08db9c90cbe9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2023 06:36:31.2753
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2G6nNt9fIFkc5JGQIlAfn5aZ7wfCZINHZl2pIrn8slfcRnHZ4VszQjA5C1QltBrOXRY2S9PmdETh0ltR4DqahA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9566
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3954479.1692001609.1@warthog.procyon.org.uk>
+Date:   Mon, 14 Aug 2023 09:26:49 +0100
+Message-ID: <3954480.1692001609@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reviewed-by: Gaurav Jain <gaurav.jain@nxp.com>
+Pavel Skripkin <paskripkin@gmail.com> wrote:
 
-> -----Original Message-----
-> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Sent: Tuesday, August 8, 2023 4:25 PM
-> To: Horia Geanta <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>;
-> Pankaj Gupta <pankaj.gupta@nxp.com>; Gaurav Jain <gaurav.jain@nxp.com>;
-> herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-> Cc: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> Subject: [PATCH] crypto: caam: fix unchecked return value error
->=20
-> From: Gaurav Jain <gaurav.jain@nxp.com>
->=20
-> error:
-> Unchecked return value (CHECKED_RETURN)
-> check_return: Calling sg_miter_next without checking return value
->=20
-> fix:
-> added check if(!sg_miter_next)
->=20
-> Fixes: 8a2a0dd35f2e ("crypto: caam - strip input zeros from RSA input buf=
-fer")
-> Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
-> Signed-off-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-> ---
->  drivers/crypto/caam/caampkc.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.=
-c
-> index 72afc249d42f..7e08af751e4e 100644
-> --- a/drivers/crypto/caam/caampkc.c
-> +++ b/drivers/crypto/caam/caampkc.c
-> @@ -225,7 +225,9 @@ static int caam_rsa_count_leading_zeros(struct
-> scatterlist *sgl,
->  		if (len && *buff)
->  			break;
->=20
-> -		sg_miter_next(&miter);
-> +		if (!sg_miter_next(&miter))
-> +			break;
+> Syzbot was able to trigger use of uninitialized memory in
+> af_alg_free_resources.
+> 
+> Bug is caused by missing initialization of rsgl->sgl.need_unpin before
+> adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
+> is left with uninitialized need_unpin which is read during clean up
+
+Looks feasible :-).
+
+> +		rsgl->sgl.need_unpin = 0;
 > +
->  		buff =3D miter.addr;
->  		len =3D miter.length;
->=20
-> --
-> 2.25.1
+
+The blank line isn't really necessary and it's a bool, so can you use 'false'
+rather than '0'?
+
+Alternatively, it might be better to move:
+
+		rsgl->sgl.need_unpin =
+			iov_iter_extract_will_pin(&msg->msg_iter);
+
+up instead.
+
+David
 
