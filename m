@@ -2,176 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48053EB64DD
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Aug 2023 14:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12987C04FE0
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 02:37:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbjHMOFE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Aug 2023 10:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53924 "EHLO
+        id S232550AbjHNCgs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Aug 2023 22:36:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjHMOFE (ORCPT
+        with ESMTP id S232605AbjHNCgr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Aug 2023 10:05:04 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746EBEA;
-        Sun, 13 Aug 2023 07:05:05 -0700 (PDT)
-Received: from p200300cf17418700333267be2b9ea1d1.dip0.t-ipconnect.de ([2003:cf:1741:8700:3332:67be:2b9e:a1d1]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qVBiF-0004o8-Jy; Sun, 13 Aug 2023 16:04:59 +0200
-Message-ID: <cd15c23c-e237-25e3-d2a6-79113945a2d7@leemhuis.info>
-Date:   Sun, 13 Aug 2023 16:04:58 +0200
+        Sun, 13 Aug 2023 22:36:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74BAEE5C;
+        Sun, 13 Aug 2023 19:36:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1363E629A2;
+        Mon, 14 Aug 2023 02:36:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AAA8C433C8;
+        Mon, 14 Aug 2023 02:36:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691980605;
+        bh=hi915NBfBCKS64KEf5vxcDeHuhJzn5+iEohPYSmXYts=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LBaiDI9PfZtUGj1yFDII4GFd94r7KgetraiTnaXNGfWNwrI4igtM32kbUpklOlRCD
+         QzHh6rbuwqQshdwW859vd7xdJ2+OnC9afwDzExlwuSg/P4DjWICIu6iqN8Cp3xl7oo
+         ydCyPrkSwyw/eV1dpIog8q34emKXw9elHQviqqRDl2ynGrmW/+MB2qLBF+OWQcQELJ
+         XAERa8Knab6qymKWNn8iaTewfQI9ypNDWtyEblcpeu9b9OvI0mnAjGZL0BybAESx9J
+         l0EkhJuQ2i31WFp/NFLHBtPsbbsK+mih6Fd61/iZQIIk0JOGT32N+oeRcWRSK6HE4w
+         Ze0G6yfAWPhNg==
+Date:   Sun, 13 Aug 2023 19:39:32 -0700
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Marijn Suijten <marijn.suijten@somainline.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] crypto: qcom-rng: Make the core clock optional
+ regardless of ACPI presence
+Message-ID: <ugwcpepkje53oujb626n6he5cfkhkwbm4tm6skc3ur7xdzcmhg@wh24p5rld2pq>
+References: <20230811-topic-8450_prng-v1-0-01becceeb1ee@linaro.org>
+ <20230811-topic-8450_prng-v1-2-01becceeb1ee@linaro.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
- more devices
-Content-Language: en-US, de-DE
-To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Linux regressions mailing list <regressions@lists.linux.dev>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Bastian Krause <bst@pengutronix.de>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Dan Douglass <dan.douglass@nxp.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>
-References: <20230612082615.1255357-1-meenakshi.aggarwal@nxp.com>
- <e1f3f073-9d5e-1bae-f4f8-08dc48adad62@pengutronix.de>
- <f673a09e-e212-ee7b-15c3-78afe8c70916@pengutronix.de>
- <DU0PR04MB9563E31E69F93B63EE83DD378E39A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <DU0PR04MB95637D86F0134DC26EF955DB8E02A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <ZMzBWXpvdW5YB8bt@gondor.apana.org.au>
- <AM0PR04MB60046B045B5965A61BA1CA91E709A@AM0PR04MB6004.eurprd04.prod.outlook.com>
- <f9e34f8a-5a7b-8223-c672-4fcb2bb23c0a@leemhuis.info>
- <DU0PR04MB95639E903580457856250C008E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
- <DU0PR04MB95637DD95D05179F36AFAF958E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <DU0PR04MB95637DD95D05179F36AFAF958E10A@DU0PR04MB9563.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691935505;1bec62a4;
-X-HE-SMSGID: 1qVBiF-0004o8-Jy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230811-topic-8450_prng-v1-2-01becceeb1ee@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11.08.23 14:58, Meenakshi Aggarwal wrote:
+On Fri, Aug 11, 2023 at 10:50:57PM +0200, Konrad Dybcio wrote:
+> Some newer SoCs (like SM8450) do not require a clock vote for the PRNG
+> to function. Make it entirely optional and rely on the bindings checker
+> to ensure platforms that need it, consume one.
 > 
-> We discussed about it and lets revert the patch for now,
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
-Okay. So who will submit the revert?
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
 
-> as the tag is to be applied this weekend.
-
-/me can't follow, but whatever, likely not that imporant
-
-Ciao, Thorsten
-
->> -----Original Message-----
->> From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
->> Sent: Friday, August 11, 2023 5:25 PM
->> To: Linux regressions mailing list <regressions@lists.linux.dev>; Gaurav Jain
->> <gaurav.jain@nxp.com>; Herbert Xu <herbert@gondor.apana.org.au>
->> Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
->> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
->> <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
->> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
->> <pankaj.gupta@nxp.com>
->> Subject: RE: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to support
->> more devices
->>
->> Hi,
->>
->> we have tested this patch on multiple variants of imx board and it is working fine.
->>
->> We are actively debugging the issue, it is taking time as we are not able to
->> reproduce it at our end.
->>
->> Thanks,
->> Meenakshi
->>
->>> -----Original Message-----
->>> From: Linux regression tracking (Thorsten Leemhuis)
->>> <regressions@leemhuis.info>
->>> Sent: Friday, August 11, 2023 2:18 PM
->>> To: Gaurav Jain <gaurav.jain@nxp.com>; Herbert Xu
->>> <herbert@gondor.apana.org.au>; Meenakshi Aggarwal
->>> <meenakshi.aggarwal@nxp.com>
->>> Cc: Bastian Krause <bst@pengutronix.de>; davem@davemloft.net; linux-
->>> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Dan Douglass
->>> <dan.douglass@nxp.com>; kernel@pengutronix.de; Horia Geanta
->>> <horia.geanta@nxp.com>; Varun Sethi <V.Sethi@nxp.com>; Pankaj Gupta
->>> <pankaj.gupta@nxp.com>; Linux kernel regressions list
->>> <regressions@lists.linux.dev>
->>> Subject: Re: RE: [EXT] Re: [PATCH] crypto: caam - adjust RNG timing to
->>> support more devices
->>>
->>> [CCing the regression list, as it should be in the loop for regressions:
->>> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdocs
->>> .ker%2F&data=05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7C84b2ed6da
->> ac44625
->>>
->> 779408db9a61d801%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63
->> 827351
->>>
->> 7248142302%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoi
->> V2luMzI
->>>
->> iLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=OWH18Cwu
->> h8zyAFqn
->>> I6iiL3Kewpj5NiWaQorKcmiYrr0%3D&reserved=0
->>> nel.org%2Fadmin-guide%2Freporting-
->>>
->> regressions.html&data=05%7C01%7Cmeenakshi.aggarwal%40nxp.com%7Cfde9
->>>
->> ceeb9e0d40d4f77d08db9a47a5e1%7C686ea1d3bc2b4c6fa92cd99c5c301635%7
->>>
->> C0%7C0%7C638273404742560069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC
->>>
->> 4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C
->>> %7C%7C&sdata=lt7nphOXYXc3GRfOquvM5jmqNszQkDd%2BuSRdAbJd8Ec%3D
->> &r
->>> eserved=0]
->>>
->>> On 04.08.23 14:02, Gaurav Jain wrote:
->>>> From: Herbert Xu <herbert@gondor.apana.org.au>
->>>>> On Mon, Jul 24, 2023 at 05:13:23AM +0000, Meenakshi Aggarwal wrote:
->>>>>> Please share the required information.
->>>>> Any progress on this?
->>>>>
->>>>> Should we revert the offending patch?
->>>>
->>>> Debugging is in progress. There should be some mismatch in TRNG
->>> configuration in customer board.
->>>> Will be sharing a patch to dump the same.
->>>
->>> Any progress on this? Afaics would be good to have either the fix or
->>> the revert in by -rc7 to ensure things get at least one week of proper
->>> testing before the final release.
->>>
->>> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker'
->>> hat)
->>> --
->>> Everything you wanna know about Linux kernel regression tracking:
->>> https://linux-/
->>>
->> regtracking.leemhuis.info%2Fabout%2F%23tldr&data=05%7C01%7Cmeenakshi.
->>>
->> aggarwal%40nxp.com%7Cfde9ceeb9e0d40d4f77d08db9a47a5e1%7C686ea1d3b
->>>
->> c2b4c6fa92cd99c5c301635%7C0%7C0%7C638273404742560069%7CUnknown
->>> %7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haW
->> wi
->>>
->> LCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=Xg3ZCWObptmF6xLKO7dpaIYB
->>> A17eKK5wNhlPZ6FR2XA%3D&reserved=0
->>> If I did something stupid, please tell me, as explained on that page.
->>>
->>> #regzbot poke
-> 
-> 
+Regards,
+Bjorn
