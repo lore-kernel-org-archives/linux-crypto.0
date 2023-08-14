@@ -2,130 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D52CC001B0
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 16:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C34F3EB64DD
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 18:04:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbjHNQPm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Aug 2023 12:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
+        id S229509AbjHNSD4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Aug 2023 14:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232424AbjHNQPh (ORCPT
+        with ESMTP id S231418AbjHNSDq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2023 12:15:37 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA048F1
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 09:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692029736; x=1723565736;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=AEyunAH/E6DdwmVRTMX9+4wuVQe5/PGuYqA1Y7WHY/k=;
-  b=jHBEd8C0YIqGhnbeLd6a8kF1cctgZR2yAVASUG/mujer8N7t8ncsXI4E
-   DPcY4jXs2fNFc3DNIscOwtyc24c+KA3wM7CIhO3G2/n5Mfe63IIG77dv9
-   RLqtmW8C3dd2sOVXlx7l/xkCuLMMZa1CJMCgxAjyyApoKE3WSX9t7fxKY
-   0gLs30iilPph2n+osh40MHlv2H5/2BacuBBVwu8v6UTOjEYUpEjiOp1w3
-   SH0aWN4VhyM8v7WaP86kl5TpWN/X3IjLKeTewF9caBmQkgrcotnVFHo+b
-   urul0+GUdjbtayEJqDZ1Rhj0TDwbUo84vSrf6qIk3hLJfydVxPwoyxI7y
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="369546386"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="369546386"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 09:07:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="823499408"
-X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
-   d="scan'208";a="823499408"
-Received: from silpixa00400295.ir.intel.com ([10.237.213.194])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 Aug 2023 09:07:44 -0700
-From:   Adam Guerin <adam.guerin@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Adam Guerin <adam.guerin@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>
-Subject: [PATCH] crypto: qat - fix crypto capability detection for 4xxx
-Date:   Mon, 14 Aug 2023 16:52:30 +0100
-Message-Id: <20230814155230.232672-1-adam.guerin@intel.com>
+        Mon, 14 Aug 2023 14:03:46 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE8010DE;
+        Mon, 14 Aug 2023 11:03:45 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9bf52cd08so67904551fa.2;
+        Mon, 14 Aug 2023 11:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692036224; x=1692641024;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mC2VXhQU4CT2VksXFrqMrSWVDm6lE1KSTIG6MCJKlyQ=;
+        b=B8d6JJ6vW2JP8DGhMzF0cTe3zGMnkA4RxRa1jsozlrNhPTyVmQ5SAwEoO9bNgk2w7v
+         1ms1nzq7zCAtDzuvEYwNaev7Z1+luCvPIeln/Wc/JTfSBQ/qTaO1lxeLFjhaySwZMjYX
+         ayGiCT2+rlBFHjDkF2hPapu8aItQ+uGLFc2VLvHwF4iFNS1RNHUEHcDFTPZXhhd1O+72
+         ZGlmZseLXq5bilRyskGf38w8iCfFkMtHxic7DwzIcTRZEqSPZQ2ULzp9rubTzkd50EJY
+         YGo+JD7yeNg7q3USjyqULjhQ1RVkppodbSfOctTMTgDFfKEjYq+knnoiPVHLMyIf0HD7
+         PmNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692036224; x=1692641024;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mC2VXhQU4CT2VksXFrqMrSWVDm6lE1KSTIG6MCJKlyQ=;
+        b=CUQ8jRBmrDL9OWczQoJgmhI2qRPZvE4+LgpvXFpBwkvUEgyijqTdRZgzxiFOHfzPOD
+         37IHU7MKT7SL6tzbD2Gu7veu2x0Qqrw1mBitCalFpHCpjppzc94FvvhPML6TKAuhpHhV
+         LLWmx9JSoBHn2mzJD8oZKkNJcBOb7ycwSRWQtbuoaD86YDqZpcyDedNyF1TPF8xWsbMG
+         VkUrOoeh0YcHGtMqILTY7wkWN/fIYUFLnl0zOmwbRimEiEOv8aex0JEh2tQPqiwt7RE6
+         qCN+LaEL4t8Fjwetf+VrDDENDpxrHCSKlfJ5X/dg9YwJJFiN6h/86Z+zra+tQWUrWz6V
+         DAYA==
+X-Gm-Message-State: AOJu0YwnjWQdhbnd98zw7lVK6axNqNPi+IAejhrZ1SQBeT+pCW5TRnmf
+        cTsM2Huwx5kTFWmgHLHaKII=
+X-Google-Smtp-Source: AGHT+IF7gMEe3vJFVMtOlRZ218BSwotA2DoAUSs7z9Qnop0AdryTgdrg8UGTSqHeqnJrfyGq70r//g==
+X-Received: by 2002:a2e:930d:0:b0:2b9:f27f:e491 with SMTP id e13-20020a2e930d000000b002b9f27fe491mr7567188ljh.42.1692036223664;
+        Mon, 14 Aug 2023 11:03:43 -0700 (PDT)
+Received: from fedora.. ([2a00:1370:8180:6b00:a1a8:4887:1af4:637a])
+        by smtp.gmail.com with ESMTPSA id p24-20020a2ea418000000b002b1b92910c8sm2552460ljn.86.2023.08.14.11.03.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 11:03:43 -0700 (PDT)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        dhowells@redhat.com, pabeni@redhat.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+Subject: [PATCH v2] crypto: fix uninit-value in af_alg_free_resources
+Date:   Mon, 14 Aug 2023 21:03:41 +0300
+Message-Id: <20230814180341.8621-1-paskripkin@gmail.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230813122344.14142-1-paskripkin@gmail.com>
+References: <20230813122344.14142-1-paskripkin@gmail.com>
 MIME-Version: 1.0
-Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When extending the capability detection logic for 4xxx devices the
-SMx algorithms were accidentally missed.
-Enable these SMx capabilities by default for QAT GEN4 devices.
+Syzbot was able to trigger use of uninitialized memory in
+af_alg_free_resources.
 
-Check for device variants where the SMx algorithms are explicitly
-disabled by the GEN4 hardware. This is indicated in fusectl1
-register.
-Mask out SM3 and SM4 based on a bit specific to those algorithms.
-Mask out SM2 if the PKE slice is not present.
+Bug is caused by missing initialization of rsgl->sgl.need_unpin before
+adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
+is left with uninitialized need_unpin which is read during clean up
 
-Fixes: 4b44d28c715d ("crypto: qat - extend crypto capability detection for 4xxx")
-Signed-off-by: Adam Guerin <adam.guerin@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+BUG: KMSAN: uninit-value in af_alg_free_sg crypto/af_alg.c:545 [inline]
+BUG: KMSAN: uninit-value in af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
+BUG: KMSAN: uninit-value in af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
+ af_alg_free_sg crypto/af_alg.c:545 [inline]
+ af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
+ af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
+ _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
+...
+
+Uninit was created at:
+ slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+ slab_alloc_node mm/slub.c:3470 [inline]
+ __kmem_cache_alloc_node+0x536/0x8d0 mm/slub.c:3509
+ __do_kmalloc_node mm/slab_common.c:984 [inline]
+ __kmalloc+0x121/0x3c0 mm/slab_common.c:998
+ kmalloc include/linux/slab.h:586 [inline]
+ sock_kmalloc+0x128/0x1c0 net/core/sock.c:2683
+ af_alg_alloc_areq+0x41/0x2a0 crypto/af_alg.c:1188
+ _skcipher_recvmsg crypto/algif_skcipher.c:71 [inline]
+
+Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists")
+Reported-and-tested-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
 ---
- drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c | 9 +++++++++
- drivers/crypto/intel/qat/qat_common/icp_qat_hw.h     | 5 ++++-
- 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 268a1f7694fc..dd4464b7e00b 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -225,6 +225,8 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
- 			  ICP_ACCEL_CAPABILITIES_HKDF |
- 			  ICP_ACCEL_CAPABILITIES_CHACHA_POLY |
- 			  ICP_ACCEL_CAPABILITIES_AESGCM_SPC |
-+			  ICP_ACCEL_CAPABILITIES_SM3 |
-+			  ICP_ACCEL_CAPABILITIES_SM4 |
- 			  ICP_ACCEL_CAPABILITIES_AES_V2;
- 
- 	/* A set bit in fusectl1 means the feature is OFF in this SKU */
-@@ -248,12 +250,19 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
- 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_CIPHER;
- 	}
- 
-+	if (fusectl1 & ICP_ACCEL_4XXX_MASK_SMX_SLICE) {
-+		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_SM3;
-+		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_SM4;
-+	}
-+
- 	capabilities_asym = ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC |
- 			  ICP_ACCEL_CAPABILITIES_CIPHER |
-+			  ICP_ACCEL_CAPABILITIES_SM2 |
- 			  ICP_ACCEL_CAPABILITIES_ECEDMONT;
- 
- 	if (fusectl1 & ICP_ACCEL_4XXX_MASK_PKE_SLICE) {
- 		capabilities_asym &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC;
-+		capabilities_asym &= ~ICP_ACCEL_CAPABILITIES_SM2;
- 		capabilities_asym &= ~ICP_ACCEL_CAPABILITIES_ECEDMONT;
- 	}
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h b/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
-index a65059e56248..0c8883e2ccc6 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
-@@ -97,7 +97,10 @@ enum icp_qat_capabilities_mask {
- 	ICP_ACCEL_CAPABILITIES_SHA3_EXT = BIT(15),
- 	ICP_ACCEL_CAPABILITIES_AESGCM_SPC = BIT(16),
- 	ICP_ACCEL_CAPABILITIES_CHACHA_POLY = BIT(17),
--	/* Bits 18-21 are currently reserved */
-+	ICP_ACCEL_CAPABILITIES_SM2 = BIT(18),
-+	ICP_ACCEL_CAPABILITIES_SM3 = BIT(19),
-+	ICP_ACCEL_CAPABILITIES_SM4 = BIT(20),
-+	/* Bit 21 is currently reserved */
- 	ICP_ACCEL_CAPABILITIES_CNV_INTEGRITY = BIT(22),
- 	ICP_ACCEL_CAPABILITIES_CNV_INTEGRITY64 = BIT(23),
- 	ICP_ACCEL_CAPABILITIES_LZ4_COMPRESSION = BIT(24),
+Changes since v1:
+	- Move sgl.need_unpin initialization upper instead of
+	  pre-initializing it with false as suggested by David
 
-base-commit: 39d44d7baae3379954cefc4982939f5e2b61ca60
+---
+ crypto/af_alg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 06b15b9f661c..10efb56d8b48 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1241,6 +1241,8 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
+ 				return -ENOMEM;
+ 		}
+ 
++		rsgl->sgl.need_unpin =
++			iov_iter_extract_will_pin(&msg->msg_iter);
+ 		rsgl->sgl.sgt.sgl = rsgl->sgl.sgl;
+ 		rsgl->sgl.sgt.nents = 0;
+ 		rsgl->sgl.sgt.orig_nents = 0;
+@@ -1255,8 +1257,6 @@ int af_alg_get_rsgl(struct sock *sk, struct msghdr *msg, int flags,
+ 		}
+ 
+ 		sg_mark_end(rsgl->sgl.sgt.sgl + rsgl->sgl.sgt.nents - 1);
+-		rsgl->sgl.need_unpin =
+-			iov_iter_extract_will_pin(&msg->msg_iter);
+ 
+ 		/* chain the new scatterlist with previous one */
+ 		if (areq->last_rsgl)
 -- 
 2.40.1
 
