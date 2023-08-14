@@ -2,62 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEFAC07E8F
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 10:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1819FC10F19
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 10:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236453AbjHNKOo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Aug 2023 06:14:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48882 "EHLO
+        id S236356AbjHNKOn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Aug 2023 06:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236722AbjHNKO2 (ORCPT
+        with ESMTP id S236684AbjHNKO1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2023 06:14:28 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD28110DB
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 03:14:26 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b9c0391749so65040161fa.0
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 03:14:26 -0700 (PDT)
+        Mon, 14 Aug 2023 06:14:27 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D040A10EA
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 03:14:24 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-99c1f6f3884so566589266b.0
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 03:14:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1692008065; x=1692612865;
+        d=fairphone.com; s=fair; t=1692008063; x=1692612863;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=I83KyFDhUVnCPx9y366vR3xpO/5sGGkMxv/PQ7v8Fw0=;
-        b=rO2zGjR9Va+S5MUXy6gxgaDEzcGHw9OuD6aMVa1xPlHQBpgF3GuCn9VpyJTDONmG2u
-         UOf71K5log6TLInqx8u72GbDaAYyM0Tk8/ftOi9cvdal8R21w7/nCGu+ag+QgE5K8ucw
-         Ix5/8fvA5YW+FyY7lWGDJ6UUzNEXifq6fIs3T01Ou5kFgIgUWwIJ9PYCFbQF//g6Xa0v
-         K0p4rLBvySrf3lgBkTSFQ29223fuuyONzolRtVe9qwpJyuu3sI1xSC7exemn3PcrJhsY
-         Yr8yz3NzwitFgrs/Lk8AacFyoJRUrWUDS+QQisoH2F4xQwbK6Ij5bKc49If8yuPl6rzj
-         Fqyg==
+        bh=tmievXtIctu/+ybkBLI3TuLZaNyu3VYe3/9M8wY7rGY=;
+        b=YEXYiLN4MiXDAN+PnkgwHu8fM1V089UultUVA2sft6OfrcEoVvSU6iQOTMMuRdLWWk
+         jxhzqsTOqFQ8iJNJjeDQDPBRExjAjh1cXfe/J8vfU0eXXAITmoWd/tugvBsLeKj83h04
+         llWWlAkm7rZPZOyuhf/C2EARYxNxLuVIF6d4UZPwXeRfVcT/VuUb0uUkvHHNP6at35BR
+         3d/85SsUbBO+gkVzNlpYcWpk99bs9lXe3+TFKeDyd4/esEZGOmfe4pHpqGzquGBscg0q
+         h1lRRz8T4j4hDNHcN4yLjgZgrojotQ/Y+nNhNlY8L/+1qyfi16bkuSKdZfkugkeRYLVw
+         YpXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692008065; x=1692612865;
+        d=1e100.net; s=20221208; t=1692008063; x=1692612863;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I83KyFDhUVnCPx9y366vR3xpO/5sGGkMxv/PQ7v8Fw0=;
-        b=c2j33Kp5+oFYvnpf3UxcNUJIOS8yIJkwG9d8ILISd7bq/mI+jWWVm1wE3qkojzRKRe
-         IE+nBjW3RwdsM7Q6vhXJvcXrf8gZjnJTCntKjqlrLRuS2ndXFV5BuCSlbx3UQnCmEnNh
-         FyGY6Nc5Br8lCQZZn8Bqb7afz6E/a6sdBSZosR54hEz0FdjmvcJflmfH8gfY8Iv5DQC+
-         AJilhKQUVqWbonqdjrbL06knumj1d/AsK9ljNQkSrcxNJx0fZxEntZqEnXuEhcLtLu5k
-         Fc+BiF3M7fn9iYoCsERnp6O9i40jjX4iTj4KBr3vOpSNXMEJaED13NWouj00aw2+U63K
-         LhFA==
-X-Gm-Message-State: AOJu0Yx98xBnR9eUO5buBv2KxtCwZ/YvXMyRAGdGD284Rz6t5FUAc7+7
-        NyY61L35lZkZm8OZ0ShIIUQhrQ==
-X-Google-Smtp-Source: AGHT+IE+cNjSLZKnX1joMZVDOUeJz9XLWS7JFmYF2fGu2r3hV8E8pwivCDMNZ9yIdROEghBe2azAmw==
-X-Received: by 2002:a2e:808f:0:b0:2b9:ec57:c330 with SMTP id i15-20020a2e808f000000b002b9ec57c330mr6261247ljg.7.1692008065036;
-        Mon, 14 Aug 2023 03:14:25 -0700 (PDT)
+        bh=tmievXtIctu/+ybkBLI3TuLZaNyu3VYe3/9M8wY7rGY=;
+        b=eWURwjhmnAjz9IbogSr4WDm+tlHY03sthOpB1hN/5kxtAzaPfwoW+XLrT07VnPnrd6
+         wDHNB+NEqKW64KdtALBVbFN/dXON0H6Re3p3bLmcnvq6M5M+88Kr/0gnrCVXCEs27VsS
+         5msDqrY1C3w2EvJViJPXlDMYUWqJ1rK9YroWklI/ZJogIEA3rRwLajUYdC10uPcL6XB7
+         SgyjQmvjO2Kg4yyfp5tQZiK7E6yHMm+mcsrTvu8sADgdm/6c9JyjN5ES69F7DfoMdn69
+         pDvifRzhxxWFzf1XudnYpIMK4+23NigZjSI0QgFBrkXzJYtUm6ZjlAo6YgGYoRL8ppH5
+         L//A==
+X-Gm-Message-State: AOJu0YzUMrbaw93jWPWOSFjoBjVPwOjxDne4ftWEcj6AJdBg70rrty1B
+        /9mHJQ8B6nYYnMrbFkagmPl7Ww==
+X-Google-Smtp-Source: AGHT+IEVgwvO/dKriPsv+vdgRRyCY4UXV0TtWrF8Ahp+OdMvoW2pra4Vy6xR+oHZ0p68/sWIkeVa6A==
+X-Received: by 2002:a17:906:5a4b:b0:99c:8906:4b25 with SMTP id my11-20020a1709065a4b00b0099c89064b25mr7412624ejc.74.1692008063479;
+        Mon, 14 Aug 2023 03:14:23 -0700 (PDT)
 Received: from otso.luca.vpn.lucaweiss.eu (212095005216.public.telering.at. [212.95.5.216])
-        by smtp.gmail.com with ESMTPSA id os5-20020a170906af6500b00993a37aebc5sm5472870ejb.50.2023.08.14.03.14.23
+        by smtp.gmail.com with ESMTPSA id os5-20020a170906af6500b00993a37aebc5sm5472870ejb.50.2023.08.14.03.14.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Aug 2023 03:14:24 -0700 (PDT)
+        Mon, 14 Aug 2023 03:14:23 -0700 (PDT)
 From:   Luca Weiss <luca.weiss@fairphone.com>
-Date:   Mon, 14 Aug 2023 12:14:16 +0200
-Subject: [PATCH v6 4/4] dt-bindings: crypto: ice: Document sm8450 inline
- crypto engine
+Date:   Mon, 14 Aug 2023 12:14:15 +0200
+Subject: [PATCH v6 3/4] dt-bindings: ufs: qcom: Add ICE to sm8450 example
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230814-dt-binding-ufs-v6-4-fd94845adeda@fairphone.com>
+Message-Id: <20230814-dt-binding-ufs-v6-3-fd94845adeda@fairphone.com>
 References: <20230814-dt-binding-ufs-v6-0-fd94845adeda@fairphone.com>
 In-Reply-To: <20230814-dt-binding-ufs-v6-0-fd94845adeda@fairphone.com>
 To:     Andy Gross <agross@kernel.org>,
@@ -79,33 +78,32 @@ Cc:     linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
         ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
         linux-crypto@vger.kernel.org,
         Luca Weiss <luca.weiss@fairphone.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+        Rob Herring <robh@kernel.org>
 X-Mailer: b4 0.12.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Document the compatible used for the inline crypto engine found on
-SM8450.
+SM8450 actually supports ICE (Inline Crypto Engine) so adjust the
+example to match.
 
 Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Rob Herring <robh@kernel.org>
 ---
- Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+ Documentation/devicetree/bindings/ufs/qcom,ufs.yaml | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-index 92e1d76e29ee..7da9aa82d837 100644
---- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-@@ -13,6 +13,7 @@ properties:
-   compatible:
-     items:
-       - enum:
-+          - qcom,sm8450-inline-crypto-engine
-           - qcom,sm8550-inline-crypto-engine
-       - const: qcom,inline-crypto-engine
- 
+diff --git a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
+index 2b0831622cf0..462ead5a1cec 100644
+--- a/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
++++ b/Documentation/devicetree/bindings/ufs/qcom,ufs.yaml
+@@ -317,5 +317,6 @@ examples:
+                             <0 0>,
+                             <0 0>,
+                             <0 0>;
++            qcom,ice = <&ice>;
+         };
+     };
 
 -- 
 2.41.0
