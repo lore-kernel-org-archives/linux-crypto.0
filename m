@@ -2,87 +2,148 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 882D3C001B0
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 08:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA24DC04A94
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 10:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232459AbjHNI2V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Aug 2023 04:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42374 "EHLO
+        id S232958AbjHNKOl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Aug 2023 06:14:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234930AbjHNI1s (ORCPT
+        with ESMTP id S236519AbjHNKOV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2023 04:27:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 134B110B
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 01:26:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692001614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=H33gECP+9hXyb+EizpAzFVTxGWbGL8MsN4gYGXEf7/Q=;
-        b=MMvrviWMD3qHlkzdgt46YDVKHYQEEJ1XI5SPpWyJdFau2BA3wOpxHdyJF2u4ROgAiZiKT+
-        eFSG6FpDr3AgbsYrHRXIm38PcPQutf2zCkPk9YCWBw6NCdwYTXfrkn7ZRpQOaQHJQFC/yJ
-        Dq98gUrb6wpztBvMyNSm2fC98G8JVz4=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-478-UZ9e3W2COM-03RqOQaRmKA-1; Mon, 14 Aug 2023 04:26:52 -0400
-X-MC-Unique: UZ9e3W2COM-03RqOQaRmKA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 174012A59575;
-        Mon, 14 Aug 2023 08:26:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C4FB41121315;
-        Mon, 14 Aug 2023 08:26:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230813122344.14142-1-paskripkin@gmail.com>
-References: <20230813122344.14142-1-paskripkin@gmail.com>
-To:     Pavel Skripkin <paskripkin@gmail.com>
-Cc:     dhowells@redhat.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, pabeni@redhat.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
-Subject: Re: [PATCH] crypto: fix uninit-value in af_alg_free_resources
+        Mon, 14 Aug 2023 06:14:21 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C0F10D1
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 03:14:19 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99c3d3c3db9so554154866b.3
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 03:14:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1692008058; x=1692612858;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OaliXMOmH9SU1C2DkaplWarCzA0RpYIWvO0eSAY4J5I=;
+        b=vhCN3qS28z+GMKAMta2CsJCod5E7MyhhhaMf8cj9l8nCIRSTLPjLvlnMVZEAmZkgZC
+         yKZrsq0jgS11wzSOqKQh1GTzxApFlOVH/VwbQ32oInbjMF6eDt8eC6pH0Z72biW/Bnid
+         aHu5GAx8MzjyGI0j8xBURqGZyfYML1egsi2pHUNiDqqBHm/Zka0fL6Bya2jjdbGuKZb0
+         KR6hRXDM+ZaSXYLvb5jkxxYHE892EGSjXnxtoTMYwwi5s2KqFzbplyidMBAY8v/xkY5z
+         tzwOTnhRjdDlrRGRU+iSYJFhzv2KbqrgFh2zsNlv3Z/dCiDdrcX3yp10SJkf2DswHOEQ
+         1IxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692008058; x=1692612858;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OaliXMOmH9SU1C2DkaplWarCzA0RpYIWvO0eSAY4J5I=;
+        b=UoXC6za48m3XNgv2fJHU/zvKVZBlrfM4vsIlyQfddGd8S8bCReIRNCYmNu2rhYBW8j
+         +tOaue0zMIuAZlS/FKMSV2GSiuVSUbUuCfCiAhKwDDC1DuRJXMjBx2ErXKlZZENSgQ0R
+         sxuSxhfYjSjAcdVUkqfihLKi1iSIEqRG2YPCp3tZCCIh1AuhjPqJA/2X04MVRsVZLqkZ
+         f/3qWR3OJP3U+AfvbV5aMbthSAygCN02UwoJ9FiYr5H13TL80f3pQ2ZX/Q3Ut5+ykNP8
+         pPQUWseIj+TzPZzFu+llfsvtaIRwaBjOJY0zRn0iwcwZrVHC5fG9D/C/kAsrvlWnNblM
+         Ri1w==
+X-Gm-Message-State: AOJu0YybV4M32duNZT5D95O1hAhFbdPXVzS+YzA0yldS6oeGItYjtFNT
+        avz1YqFVLhqtVa1u0t6uKdHQVQ==
+X-Google-Smtp-Source: AGHT+IFAjrefQcQM3SmBv83W2ILzm+6amDEF8zNjt221YcLaHgS5StgoYPz3Ya4i5UynFBXurtVucw==
+X-Received: by 2002:a17:906:2ce:b0:99c:aa43:b20c with SMTP id 14-20020a17090602ce00b0099caa43b20cmr7183610ejk.33.1692008058483;
+        Mon, 14 Aug 2023 03:14:18 -0700 (PDT)
+Received: from otso.luca.vpn.lucaweiss.eu (212095005216.public.telering.at. [212.95.5.216])
+        by smtp.gmail.com with ESMTPSA id os5-20020a170906af6500b00993a37aebc5sm5472870ejb.50.2023.08.14.03.14.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Aug 2023 03:14:18 -0700 (PDT)
+From:   Luca Weiss <luca.weiss@fairphone.com>
+Subject: [PATCH v6 0/4] Fix some issues in QCOM UFS bindings
+Date:   Mon, 14 Aug 2023 12:14:12 +0200
+Message-Id: <20230814-dt-binding-ufs-v6-0-fd94845adeda@fairphone.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3954479.1692001609.1@warthog.procyon.org.uk>
-Date:   Mon, 14 Aug 2023 09:26:49 +0100
-Message-ID: <3954480.1692001609@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHT+2WQC/33QzW7DIAwA4FepOJfJGAilp77HtAPB0CC1pII20
+ lTl3Wftuiwn/0j+LPstemoldXE+vEVLS+llrlwMx4OIU6jXJAtxLRAQFYKX9JRjqVTqVb5yl0g
+ uD8Z5lzMKHhpDT3JsocaJx+rrduPmVPpzbt+/SxbF4fNfb1ES5IksYIakOLnkUNpjmmv6iPNdf
+ DG34D6BTFB0AczgvXV+i9D7hGbCeE98lQ6g4xZh9gnDhDIx0QBZkxq3CLtPWCaiD/YUIVid//x
+ iXdcf5L0meMEBAAA=
+To:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Iskren Chernev <me@iskren.info>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Rob Herring <robh@kernel.org>, Iskren Chernev <me@iskren.info>
+X-Mailer: b4 0.12.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pavel Skripkin <paskripkin@gmail.com> wrote:
+This series aims to solve the dtbs_check errors from the qcom ufs
+bindings. It has changed in scope a bit since v1, so it may be a bit all
+over the place.
 
-> Syzbot was able to trigger use of uninitialized memory in
-> af_alg_free_resources.
-> 
-> Bug is caused by missing initialization of rsgl->sgl.need_unpin before
-> adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
-> is left with uninitialized need_unpin which is read during clean up
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+---
+Changes in v6:
+- Rebase on linux-next
+- Drop applied dts patch
+- Pick up tags
+- Link to v5: https://lore.kernel.org/r/20221209-dt-binding-ufs-v5-0-c9a58c0a53f5@fairphone.com
 
-Looks feasible :-).
+Changes in v5:
+- Convert sm8450.dtsi to use qcom,ice property, so stop modifying schema
+  for sm8450 and only add qcom,ice property.
+- Move reg-names names to top-level with only minItems/maxItems in the
+  'if'
+- Link to v4: https://lore.kernel.org/r/20221209-dt-binding-ufs-v4-0-14ced60f3d1b@fairphone.com
 
-> +		rsgl->sgl.need_unpin = 0;
-> +
+Changes in v4:
+- Pick up tags
+- Rebase on linux-next (again)
+- Link to v3: https://lore.kernel.org/r/20221209-dt-binding-ufs-v3-0-499dff23a03c@fairphone.com
 
-The blank line isn't really necessary and it's a bool, so can you use 'false'
-rather than '0'?
+Changes in v3:
+- Drop applied patch
+- Pick up sm6115 patch from v5 https://lore.kernel.org/all/20221030094258.486428-2-iskren.chernev@gmail.com/
+- Rebase on linux-next
+- Link to v2: https://lore.kernel.org/r/20221209-dt-binding-ufs-v2-0-dc7a04699579@fairphone.com
 
-Alternatively, it might be better to move:
+Changes in v2:
+- Add new patch adding reg-names to sm6115 & rebase series on top of sm6115
+  addition
+- Fix binding example after sm8450 move, split this patch from original patch
+  since it became too big
+- Move reg-names definition to top-level
+- Link to v1: https://lore.kernel.org/r/20221209-dt-binding-ufs-v1-0-8d502f0e18d5@fairphone.com
 
-		rsgl->sgl.need_unpin =
-			iov_iter_extract_will_pin(&msg->msg_iter);
+---
+Iskren Chernev (1):
+      dt-bindings: ufs: qcom: Add sm6115 binding
 
-up instead.
+Luca Weiss (3):
+      dt-bindings: ufs: qcom: Add reg-names property for ICE
+      dt-bindings: ufs: qcom: Add ICE to sm8450 example
+      dt-bindings: crypto: ice: Document sm8450 inline crypto engine
 
-David
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
+ .../devicetree/bindings/ufs/qcom,ufs.yaml          | 44 ++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
+---
+base-commit: 13055cce6d3df0a2704721d6e2fd9011e973f53d
+change-id: 20221209-dt-binding-ufs-2d7f64797ff2
+
+Best regards,
+-- 
+Luca Weiss <luca.weiss@fairphone.com>
 
