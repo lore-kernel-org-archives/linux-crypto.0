@@ -2,141 +2,130 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 202C0C05052
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 13:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D52CC001B0
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 16:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbjHNNp7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Aug 2023 09:45:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35652 "EHLO
+        id S229723AbjHNQPm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Aug 2023 12:15:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231637AbjHNNpp (ORCPT
+        with ESMTP id S232424AbjHNQPh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2023 09:45:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F374106;
-        Mon, 14 Aug 2023 06:45:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B7E7761FB6;
-        Mon, 14 Aug 2023 13:45:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 918D8C433C8;
-        Mon, 14 Aug 2023 13:45:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692020744;
-        bh=3GWUGU3sn/mG21fzGuyMqh51zJlW4hGxN9JOTvBoYEc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YqD2U0V2tuxKZqxWonJYrqzUtF4LVqwXLZtE4B/8QCGUXmjMdi5/Vy3RG8+ny68FW
-         9ZLD41a9bVbdV5626Qbkc/m8Uff5zw0x3RRPyGBxZkf5FqceOXnFOniggixG/FtXs6
-         GTb8FSPkQ/TjyNtQqcbkB8/Vs87Sb3YosijuXHfP248tR4OnTyh9h+Rw6iqoHSK2Cq
-         LVLf9nAXZ6pYHSUxJccABK8IUTTPy7LQ2PxZLrKJqjt8lQhVMxPWYnPt5631xOPHoH
-         vnppiFo25hGzBQ89EK/NfqwgiG7yy+nKN3EVUWjBwbz9h4gWtTs1H/GF89huUiwnVw
-         KHfaLNQ7ni+YQ==
-Date:   Mon, 14 Aug 2023 15:45:41 +0200
-From:   Wolfram Sang <wsa@kernel.org>
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, alexandre.torgue@foss.st.com,
-        vkoul@kernel.org, jic23@kernel.org, olivier.moysan@foss.st.com,
-        arnaud.pouliquen@foss.st.com, mchehab@kernel.org,
-        fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
-        ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
-        richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>,
-        peng.fan@oss.nxp.com, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH v4 02/11] dt-bindings: treewide: add feature-domains
- description
-Message-ID: <ZNowBaT2nLj4jEm3@shikoro>
-Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
-        Gatien Chevallier <gatien.chevallier@foss.st.com>,
-        Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, alexandre.torgue@foss.st.com, vkoul@kernel.org,
-        jic23@kernel.org, olivier.moysan@foss.st.com,
-        arnaud.pouliquen@foss.st.com, mchehab@kernel.org,
-        fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
-        ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
-        richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>,
-        peng.fan@oss.nxp.com, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20230811100731.108145-1-gatien.chevallier@foss.st.com>
- <20230811100731.108145-3-gatien.chevallier@foss.st.com>
+        Mon, 14 Aug 2023 12:15:37 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA048F1
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Aug 2023 09:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692029736; x=1723565736;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AEyunAH/E6DdwmVRTMX9+4wuVQe5/PGuYqA1Y7WHY/k=;
+  b=jHBEd8C0YIqGhnbeLd6a8kF1cctgZR2yAVASUG/mujer8N7t8ncsXI4E
+   DPcY4jXs2fNFc3DNIscOwtyc24c+KA3wM7CIhO3G2/n5Mfe63IIG77dv9
+   RLqtmW8C3dd2sOVXlx7l/xkCuLMMZa1CJMCgxAjyyApoKE3WSX9t7fxKY
+   0gLs30iilPph2n+osh40MHlv2H5/2BacuBBVwu8v6UTOjEYUpEjiOp1w3
+   SH0aWN4VhyM8v7WaP86kl5TpWN/X3IjLKeTewF9caBmQkgrcotnVFHo+b
+   urul0+GUdjbtayEJqDZ1Rhj0TDwbUo84vSrf6qIk3hLJfydVxPwoyxI7y
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="369546386"
+X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
+   d="scan'208";a="369546386"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2023 09:07:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10802"; a="823499408"
+X-IronPort-AV: E=Sophos;i="6.01,173,1684825200"; 
+   d="scan'208";a="823499408"
+Received: from silpixa00400295.ir.intel.com ([10.237.213.194])
+  by FMSMGA003.fm.intel.com with ESMTP; 14 Aug 2023 09:07:44 -0700
+From:   Adam Guerin <adam.guerin@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Adam Guerin <adam.guerin@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>
+Subject: [PATCH] crypto: qat - fix crypto capability detection for 4xxx
+Date:   Mon, 14 Aug 2023 16:52:30 +0100
+Message-Id: <20230814155230.232672-1-adam.guerin@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="W69stkuq3CQIl/r9"
-Content-Disposition: inline
-In-Reply-To: <20230811100731.108145-3-gatien.chevallier@foss.st.com>
+Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+When extending the capability detection logic for 4xxx devices the
+SMx algorithms were accidentally missed.
+Enable these SMx capabilities by default for QAT GEN4 devices.
 
---W69stkuq3CQIl/r9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Check for device variants where the SMx algorithms are explicitly
+disabled by the GEN4 hardware. This is indicated in fusectl1
+register.
+Mask out SM3 and SM4 based on a bit specific to those algorithms.
+Mask out SM2 if the PKE slice is not present.
 
-On Fri, Aug 11, 2023 at 12:07:22PM +0200, Gatien Chevallier wrote:
-> feature-domains is an optional property that allows a peripheral to
-> refer to one or more feature domain controller(s).
->=20
-> Description of this property is added to all peripheral binding files of
-> the peripheral under the STM32 firewall controllers. It allows an accurate
-> representation of the hardware, where various peripherals are connected
-> to this firewall bus. The firewall can then check the peripheral accesses
-> before allowing it to probe.
->=20
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Fixes: 4b44d28c715d ("crypto: qat - extend crypto capability detection for 4xxx")
+Signed-off-by: Adam Guerin <adam.guerin@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
+---
+ drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c | 9 +++++++++
+ drivers/crypto/intel/qat/qat_common/icp_qat_hw.h     | 5 ++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-Acked-by: Wolfram Sang <wsa@kernel.org> # for I2C (once the rest is accepte=
-d)
+diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
+index 268a1f7694fc..dd4464b7e00b 100644
+--- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
+@@ -225,6 +225,8 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
+ 			  ICP_ACCEL_CAPABILITIES_HKDF |
+ 			  ICP_ACCEL_CAPABILITIES_CHACHA_POLY |
+ 			  ICP_ACCEL_CAPABILITIES_AESGCM_SPC |
++			  ICP_ACCEL_CAPABILITIES_SM3 |
++			  ICP_ACCEL_CAPABILITIES_SM4 |
+ 			  ICP_ACCEL_CAPABILITIES_AES_V2;
+ 
+ 	/* A set bit in fusectl1 means the feature is OFF in this SKU */
+@@ -248,12 +250,19 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
+ 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_CIPHER;
+ 	}
+ 
++	if (fusectl1 & ICP_ACCEL_4XXX_MASK_SMX_SLICE) {
++		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_SM3;
++		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_SM4;
++	}
++
+ 	capabilities_asym = ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC |
+ 			  ICP_ACCEL_CAPABILITIES_CIPHER |
++			  ICP_ACCEL_CAPABILITIES_SM2 |
+ 			  ICP_ACCEL_CAPABILITIES_ECEDMONT;
+ 
+ 	if (fusectl1 & ICP_ACCEL_4XXX_MASK_PKE_SLICE) {
+ 		capabilities_asym &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_ASYMMETRIC;
++		capabilities_asym &= ~ICP_ACCEL_CAPABILITIES_SM2;
+ 		capabilities_asym &= ~ICP_ACCEL_CAPABILITIES_ECEDMONT;
+ 	}
+ 
+diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h b/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
+index a65059e56248..0c8883e2ccc6 100644
+--- a/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
++++ b/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
+@@ -97,7 +97,10 @@ enum icp_qat_capabilities_mask {
+ 	ICP_ACCEL_CAPABILITIES_SHA3_EXT = BIT(15),
+ 	ICP_ACCEL_CAPABILITIES_AESGCM_SPC = BIT(16),
+ 	ICP_ACCEL_CAPABILITIES_CHACHA_POLY = BIT(17),
+-	/* Bits 18-21 are currently reserved */
++	ICP_ACCEL_CAPABILITIES_SM2 = BIT(18),
++	ICP_ACCEL_CAPABILITIES_SM3 = BIT(19),
++	ICP_ACCEL_CAPABILITIES_SM4 = BIT(20),
++	/* Bit 21 is currently reserved */
+ 	ICP_ACCEL_CAPABILITIES_CNV_INTEGRITY = BIT(22),
+ 	ICP_ACCEL_CAPABILITIES_CNV_INTEGRITY64 = BIT(23),
+ 	ICP_ACCEL_CAPABILITIES_LZ4_COMPRESSION = BIT(24),
 
+base-commit: 39d44d7baae3379954cefc4982939f5e2b61ca60
+-- 
+2.40.1
 
---W69stkuq3CQIl/r9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmTaMAUACgkQFA3kzBSg
-KbaUdQ//dzd+zVw4+lLQfMm5N9CAHnO3jRuJqiYQmp/rDIgsZY8CClGeuNYuiFGQ
-sJAlf9Vh2aH2qFbq7TJkPelVMPe97mgjxKZDJjrpGUe6CTcLGpK4P5dx0bQmxrDV
-X9wg54/VUPmf92H5LDELCgEQBUpxE2M9kMMYXubSN+gyCYDo+RZFOw+aOfRcqKkT
-jyWMjSPQsNYTIn/u+DiQidjJYYW3Y1NwiUufKoBCbTUDkmUkBsIAkqq5dYf1he96
-cDBjQz4aQzw8q9mITHh1GI3MX5AGpxJc8XmUwD2PwcshkDb57FJkTElHQIhKJW2R
-+BPM4dGmzfvtj6G7+/7/E0CWVymbxnEkOVK46qPYw00tD2C7Khm0kRLEbwEcenS3
-SlXgrYoVcGf73cxfYrShbSvV32GuQZ9onZxIbgdFMjtiCO7E2WKqPUkNt1hDecEf
-WoMbKLXvmxdcRjmmkRJRBGeUwKThDjHDvfYtURQ3+31TVkqxLDLoHE8gF78pL3yw
-LW4HQwfekpHvSObQssYoMM2mJrM7yidifx+OCmWywsvmYM3MlJklqapPTI+IVwdm
-CxMb+ZhS+C8HJfNS/5Q7AY4N4Qav0cG8Kdk2xTS2hBurkQ87PGjXdpkKPRIG6/wD
-02vyuQVUcnLNDqAwXkEORXxqaidoTN/suDmNhiHszczHfBZ/X0o=
-=VsN7
------END PGP SIGNATURE-----
-
---W69stkuq3CQIl/r9--
