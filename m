@@ -2,115 +2,126 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABDDEC41513
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Aug 2023 11:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53727C0015E
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Aug 2023 16:02:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236854AbjHOLnH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Aug 2023 07:43:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40796 "EHLO
+        id S233952AbjHOQBb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Aug 2023 12:01:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236614AbjHOLmd (ORCPT
+        with ESMTP id S238383AbjHOQBA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Aug 2023 07:42:33 -0400
-X-Greylist: delayed 723 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Aug 2023 04:42:14 PDT
-Received: from mo6-p00-ob.smtp.rzone.de (mo6-p00-ob.smtp.rzone.de [IPv6:2a01:238:400:100::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C954B1FE8;
-        Tue, 15 Aug 2023 04:42:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1692099005; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=N/tMZQXGF94jY4PM/7LwlDMaYaSPAE+Uvk36HIabKvBc22ejafm7henAJmdrHtBaj8
-    V+gZm54BOrdAaZvDctZ6TCUf1zOzHpS9oTKyQKuZN82BWCRo4iRzOoRG98a4EauwjYFg
-    2Tv5GmURapsAi0OMHXTZ19yDuuHI6CjPviL+f9AjXQm5MvB+awckzo5OkobzZmaPiWp5
-    H967VbhjI476QiCEpryJwhpx2qeGxTodDA+AD+qDbZp+NB7rjI8oO1pnFAubtQ2MUf7G
-    yxg/fE6KGSRVSqO5k+MEjQ0HA+tRI4wbVijYcxj68R2MdAF1EAwLA7G6bdJoS9hpxVbA
-    AWPg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1692099005;
-    s=strato-dkim-0002; d=strato.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=0fArIV/skXXqwvM6vu5sx+WDXinHkC9gAI6MI712b8g=;
-    b=Y62S1fBOzIHkg+kxAoN6IHHxgov9CS3gVAd02EFgHuSSaR4MNtLWG+DABqCJ0/O2pw
-    BSLaid1ipLhFm75/D6N6ufqgA/xUbwrR3JgXhXZvGuMNIvzrbI6YqYXxmtN2eVbVrXlO
-    k6KLLPDvwMo7TVi818I8fPh6mCYy4btqp6ZIkqwRi5rhWNULLeFvtq/Wyhpxw+38SYis
-    l9Q25XY0BTeBbJjZpRiYSkgumPqYMp+hdeO6ETuUa+ei9emqeGjzaQKSViCvlvMammU7
-    jH7GQX6Rud1Pq5hiNn8eq/o5P6ITLr4U+nbXBhPBOysxsYx05Fm/9QPx/jBB29ksDfI4
-    7x+w==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1692099005;
-    s=strato-dkim-0002; d=thson.de;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=0fArIV/skXXqwvM6vu5sx+WDXinHkC9gAI6MI712b8g=;
-    b=QHwwvnr6dCsvZilLvr2M0jFuHnyZyhHTa2DDyq3bgAj5EpiFzxVRI0AOrmsZcgQp2k
-    cBXuK0WV/2Bxt94FUoDdoZAIQ1ca9t0JItUaBzocB6s0krI2E7YMZXzhyYAVZw75gcdj
-    rZrr8M2fa3v1sBdIFCVSzBMu5BB7gYBEyQzv6BaBBkK42m0QdQ2M7MmIE2TqPQzUbVQZ
-    14LNF+rslo5i4GCkEX3w3+paUqYlMlMMQ2ExFSj0T9EgwFKgaeOCnIwiAUx8F4uXKOq1
-    qvxFvMVgLLWwAvpsZpl6dPxQJLJnSXIZ/RNFFDz0yCgWLZTIE7rTNV+FWoPszVB6FREM
-    5oqg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1692099005;
-    s=strato-dkim-0003; d=thson.de;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=0fArIV/skXXqwvM6vu5sx+WDXinHkC9gAI6MI712b8g=;
-    b=9GOt/JgphwB1P22CbzR7UHsC72OJx4YSCFTYhsKaYus/t2EiGqzVFV0YbIgamjzsPe
-    9R2FAcpIkuJ5fu7jlyCw==
-X-RZG-AUTH: ":PHkGeUmrW+uCZmxs998QJRUX30nOwJd7nOD9sw/xoau6coP/7eWf7ZtI5bftmbs="
-Received: from USER-PC.adm.ds.fhnw.ch
-    by smtp.strato.de (RZmta 49.6.6 AUTH)
-    with ESMTPSA id jd2f5az7FBU3Des
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Tue, 15 Aug 2023 13:30:03 +0200 (CEST)
-From:   Thore Sommer <public@thson.de>
-To:     dhowells@redhat.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Thore Sommer <public@thson.de>
-Subject: [PATCH] X.509: if signature is unsupported skip validation
-Date:   Tue, 15 Aug 2023 14:29:42 +0300
-Message-ID: <20230815112942.392572-1-public@thson.de>
-X-Mailer: git-send-email 2.41.0
+        Tue, 15 Aug 2023 12:01:00 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A937110B
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Aug 2023 09:00:58 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5257d67368bso4828a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Aug 2023 09:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1692115257; x=1692720057;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XpJb+OJfG+8YyFrgPemLQHLQMcBP2sLxedbL+4WkyQI=;
+        b=12OED/nj8x27vkzaTPH4huvtjj1jVfmU0hALhPhRV6AHmDCTdQhEw61qFu0CiIfn5o
+         xv23dzfwiXjilKF2V4mskgtYOlyAItz4mGPTN2wpAueITgQOP78cOJbBTI5T+qpxeb1D
+         i+enASWV3RDnzBDsM9sJhV1dKddbywFKKUa61O57PtAiIAuwyGiXXM14LOto23UpYAxE
+         PGemjOd/8RRrs6Lx5h5wH0joSWfAVxRthE6BXEwns8z2BhGRUhYJtOemEbyDvBnO44s/
+         oV7zywqJBfWLvArDGYmw2b/xFekU2Hy5QZ25lKkvn+5v2YLe42/YEkzYEm+UrksNlC2f
+         uQYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692115257; x=1692720057;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XpJb+OJfG+8YyFrgPemLQHLQMcBP2sLxedbL+4WkyQI=;
+        b=W92B9i+tXZjiLNhkWPcGWuSZwsbat0NwTWLcId5OvgI17K1omCgAM/6SG1Uwvj0jq8
+         C4mVEHf9wlNTDggrUKDn72bVQEG4MBHImwtSeHrgKr7UqKyZtD4kz+biIX+mgwIRlMOP
+         adjZL1O1/COitbbJ7qu0ol8UZDN3SMiHiiiUc8xfSEs1asQ8lwWEwqhqW8+BLUndcmqO
+         xJ2i1zcBH42ZUXGifA3e8ZgcJzRbON6vgX2+91RvZtDoxMK3ht7PBtatenrS4UVNecD3
+         xtuJ8xvw5UFhopGY69/ilj/x/7c5e9EISeFSVlla7BbmZlYZ8qsjimeP89F/OQnkcgfG
+         yV/Q==
+X-Gm-Message-State: AOJu0YxJlaTNJST29F+DiOusU2+1vyLG8uDSlzZdYieS1ceKkgDkU8qp
+        2fOmgz4DKJbiX3zaD0VFxS3npdwSG8zWsrxNE8NWzA==
+X-Google-Smtp-Source: AGHT+IEdGhK9M3JtHIkjAkwh3xNQNLfzowgWF508z3Uj0qlA890h/RB4apOdF96xxD3sICYqpWEaeKcnTbjgLEFFWtk=
+X-Received: by 2002:a50:9fa4:0:b0:506:b280:4993 with SMTP id
+ c33-20020a509fa4000000b00506b2804993mr363704edf.2.1692115256934; Tue, 15 Aug
+ 2023 09:00:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20230612042559.375660-1-michael.roth@amd.com> <20230612042559.375660-43-michael.roth@amd.com>
+In-Reply-To: <20230612042559.375660-43-michael.roth@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 15 Aug 2023 10:00:45 -0600
+Message-ID: <CAMkAt6r9noa7NCukf213cpmTOFgUSvowEOoGwRaGH+E4vxL20g@mail.gmail.com>
+Subject: Re: [PATCH RFC v9 42/51] KVM: SVM: Support SEV-SNP AP Creation NAE event
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        nikunj.dadhania@amd.com, liam.merwick@oracle.com,
+        zhi.a.wang@intel.com, Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When the hash algorithm for the signature is not available the digest size
-is 0 and the signature in the certificate is marked as unsupported.
+> +
+> +       switch (request) {
+> +       case SVM_VMGEXIT_AP_CREATE_ON_INIT:
+> +               kick = false;
+> +               fallthrough;
+> +       case SVM_VMGEXIT_AP_CREATE:
+> +               if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
+> +                       vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
+> +                                   svm->vmcb->control.exit_info_2);
+> +                       ret = -EINVAL;
+> +                       goto out;
+> +               }
+> +
+> +               /*
+> +                * Malicious guest can RMPADJUST a large page into VMSA which
+> +                * will hit the SNP erratum where the CPU will incorrectly signal
+> +                * an RMP violation #PF if a hugepage collides with the RMP entry
+> +                * of VMSA page, reject the AP CREATE request if VMSA address from
+> +                * guest is 2M aligned.
+> +                */
+> +               if (IS_ALIGNED(svm->vmcb->control.exit_info_2, PMD_SIZE)) {
+> +                       vcpu_unimpl(vcpu,
+> +                                   "vmgexit: AP VMSA address [%llx] from guest is unsafe as it is 2M aligned\n",
+> +                                   svm->vmcb->control.exit_info_2);
 
-When validating a self-signed certificate, this needs to be checked,
-because otherwise trying to validate the signature will fail with an
-warning:
+In this case and maybe the above case can we instead return an error
+to the guest instead of a #GP?
 
-Loading compiled-in X.509 certificates
-WARNING: CPU: 0 PID: 1 at crypto/rsa-pkcs1pad.c:537 \
-pkcs1pad_verify+0x46/0x12c
-...
-Problem loading in-kernel X.509 certificate (-22)
+I think Tom suggested: SW_EXITINFO1[31:0] to 2 (meaning there was an
+error with the VMGEXIT request) and SW_EXITINFO2 to 5 (The NAE event
+input was not valid (e.g., an invalid SW_EXITINFO1 value for the AP
+Jump Table NAE event).
 
-Signed-off-by: Thore Sommer <public@thson.de>
----
- crypto/asymmetric_keys/x509_public_key.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This way a non-malicious but buggy or naive guest gets a little more
+information and a chance to retry the request?
 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 6fdfc82e23a8..7c71db3ac23d 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -130,6 +130,11 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
- 			goto out;
- 	}
- 
-+	if (cert->unsupported_sig) {
-+		ret = 0;
-+		goto out;
-+	}
-+
- 	ret = public_key_verify_signature(cert->pub, cert->sig);
- 	if (ret < 0) {
- 		if (ret == -ENOPKG) {
--- 
-2.41.0
-
+> +                       ret = -EINVAL;
+> +                       goto out;
+> +               }
+> +
+> +               target_svm->sev_es.snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
+> +               break;
+> +       case SVM_VMGEXIT_AP_DESTROY:
+> +               break;
+> +       default:
+> +               vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
+> +                           request);
+> +               ret = -EINVAL;
+> +               break;
+> +       }
+> +
