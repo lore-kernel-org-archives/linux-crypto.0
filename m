@@ -2,107 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F901EB64DD
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Aug 2023 18:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABDDEC41513
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Aug 2023 11:43:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229821AbjHNSE3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Aug 2023 14:04:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48808 "EHLO
+        id S236854AbjHOLnH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Aug 2023 07:43:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231499AbjHNSEV (ORCPT
+        with ESMTP id S236614AbjHOLmd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Aug 2023 14:04:21 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A883110F0;
-        Mon, 14 Aug 2023 11:04:18 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fe44955decso5353855e87.1;
-        Mon, 14 Aug 2023 11:04:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692036257; x=1692641057;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EwKZNNozHZ+Il8fPOfH+Jl4RZxqiP6+ZQxkumA1ZNZ8=;
-        b=NnZy32KQijyIfMmpb8IZAIxhcBOcASo6kkWF++uNQNglrGcISSKUuxUM/emEhpIZmL
-         IkMysiBhGHdJW/K0pzmjdwomWfDGQRslv/nS0lKe6D/KYqerr0nrK52/RpO7yo/ztCfo
-         2+7/GS8fSSP0UbPxRa0QLhczDxouHZ4zfTXcJCgOBFf1ykTN65zplqAiHFpTnMoW4vF4
-         XKq4nkrG/CKjz0EUvN+VsMq9tuNxeKczINYO9Bst+WP7kkXDqLkVJiTcUmYSfZ7u73D0
-         vRB2AmSQcqci/yVaB3pkWWAkbpF19OQGKmjR6xuHacxkAZvxTApl4R0lTVKWde98h0wb
-         aayQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692036257; x=1692641057;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EwKZNNozHZ+Il8fPOfH+Jl4RZxqiP6+ZQxkumA1ZNZ8=;
-        b=eQDz6hqx6A/GtekuUtHIkhWEgr1SSxnKYyLytNjp60QMHd3R5GDH5bImphiWQO4SBH
-         uvtnVv7u5bWzu8qeskUB+ov2IgmnbHIK/TIPTo9ZKZnlYX+IMnI1vh56cZoBXloxTymc
-         IHEG+qyyqYALd5mTE/r3dUB5yaSC6mmHie72Hp6PP3PuxJXbIiY1q7lzDRZsLWyOEXfz
-         swNukgv5J3He06Z/Wl8TbGBLMBH884zEnZgSCzwYy7IX+Y3RJCqo9Sdld1aB0R6Wx+vU
-         9NhVP32G+KIucydnJ8MaPYd/jWQFtX5k5PZisDHc0vFdq0LacFG7brmLbZCzzPyH/pmC
-         X/KQ==
-X-Gm-Message-State: AOJu0YwQmJnZSXJ1x7IatpZb463opGxksFxnNR5HbInkHZQl3qj4/hFt
-        C3Ke5B/uR3ejQKrKJFDYOug=
-X-Google-Smtp-Source: AGHT+IGBafs4A+Xan6sFQYjKy//bN2Ej7Zphd5x7sYO6bBtNZrIH2ISpFDVM1uszz2Kb/MeZ6Jex8A==
-X-Received: by 2002:ac2:4e14:0:b0:4f8:6831:fd70 with SMTP id e20-20020ac24e14000000b004f86831fd70mr4100545lfr.3.1692036256652;
-        Mon, 14 Aug 2023 11:04:16 -0700 (PDT)
-Received: from ?IPV6:2a00:1370:8180:6b00:a1a8:4887:1af4:637a? ([2a00:1370:8180:6b00:a1a8:4887:1af4:637a])
-        by smtp.gmail.com with ESMTPSA id t4-20020ac243a4000000b004fe061269edsm2077622lfl.249.2023.08.14.11.04.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Aug 2023 11:04:16 -0700 (PDT)
-Message-ID: <a3721585-c38f-f222-9a0e-4b268a48491b@gmail.com>
-Date:   Mon, 14 Aug 2023 21:04:15 +0300
+        Tue, 15 Aug 2023 07:42:33 -0400
+X-Greylist: delayed 723 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Aug 2023 04:42:14 PDT
+Received: from mo6-p00-ob.smtp.rzone.de (mo6-p00-ob.smtp.rzone.de [IPv6:2a01:238:400:100::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C954B1FE8;
+        Tue, 15 Aug 2023 04:42:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1692099005; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=N/tMZQXGF94jY4PM/7LwlDMaYaSPAE+Uvk36HIabKvBc22ejafm7henAJmdrHtBaj8
+    V+gZm54BOrdAaZvDctZ6TCUf1zOzHpS9oTKyQKuZN82BWCRo4iRzOoRG98a4EauwjYFg
+    2Tv5GmURapsAi0OMHXTZ19yDuuHI6CjPviL+f9AjXQm5MvB+awckzo5OkobzZmaPiWp5
+    H967VbhjI476QiCEpryJwhpx2qeGxTodDA+AD+qDbZp+NB7rjI8oO1pnFAubtQ2MUf7G
+    yxg/fE6KGSRVSqO5k+MEjQ0HA+tRI4wbVijYcxj68R2MdAF1EAwLA7G6bdJoS9hpxVbA
+    AWPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1692099005;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=0fArIV/skXXqwvM6vu5sx+WDXinHkC9gAI6MI712b8g=;
+    b=Y62S1fBOzIHkg+kxAoN6IHHxgov9CS3gVAd02EFgHuSSaR4MNtLWG+DABqCJ0/O2pw
+    BSLaid1ipLhFm75/D6N6ufqgA/xUbwrR3JgXhXZvGuMNIvzrbI6YqYXxmtN2eVbVrXlO
+    k6KLLPDvwMo7TVi818I8fPh6mCYy4btqp6ZIkqwRi5rhWNULLeFvtq/Wyhpxw+38SYis
+    l9Q25XY0BTeBbJjZpRiYSkgumPqYMp+hdeO6ETuUa+ei9emqeGjzaQKSViCvlvMammU7
+    jH7GQX6Rud1Pq5hiNn8eq/o5P6ITLr4U+nbXBhPBOysxsYx05Fm/9QPx/jBB29ksDfI4
+    7x+w==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1692099005;
+    s=strato-dkim-0002; d=thson.de;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=0fArIV/skXXqwvM6vu5sx+WDXinHkC9gAI6MI712b8g=;
+    b=QHwwvnr6dCsvZilLvr2M0jFuHnyZyhHTa2DDyq3bgAj5EpiFzxVRI0AOrmsZcgQp2k
+    cBXuK0WV/2Bxt94FUoDdoZAIQ1ca9t0JItUaBzocB6s0krI2E7YMZXzhyYAVZw75gcdj
+    rZrr8M2fa3v1sBdIFCVSzBMu5BB7gYBEyQzv6BaBBkK42m0QdQ2M7MmIE2TqPQzUbVQZ
+    14LNF+rslo5i4GCkEX3w3+paUqYlMlMMQ2ExFSj0T9EgwFKgaeOCnIwiAUx8F4uXKOq1
+    qvxFvMVgLLWwAvpsZpl6dPxQJLJnSXIZ/RNFFDz0yCgWLZTIE7rTNV+FWoPszVB6FREM
+    5oqg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1692099005;
+    s=strato-dkim-0003; d=thson.de;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=0fArIV/skXXqwvM6vu5sx+WDXinHkC9gAI6MI712b8g=;
+    b=9GOt/JgphwB1P22CbzR7UHsC72OJx4YSCFTYhsKaYus/t2EiGqzVFV0YbIgamjzsPe
+    9R2FAcpIkuJ5fu7jlyCw==
+X-RZG-AUTH: ":PHkGeUmrW+uCZmxs998QJRUX30nOwJd7nOD9sw/xoau6coP/7eWf7ZtI5bftmbs="
+Received: from USER-PC.adm.ds.fhnw.ch
+    by smtp.strato.de (RZmta 49.6.6 AUTH)
+    with ESMTPSA id jd2f5az7FBU3Des
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Tue, 15 Aug 2023 13:30:03 +0200 (CEST)
+From:   Thore Sommer <public@thson.de>
+To:     dhowells@redhat.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Thore Sommer <public@thson.de>
+Subject: [PATCH] X.509: if signature is unsupported skip validation
+Date:   Tue, 15 Aug 2023 14:29:42 +0300
+Message-ID: <20230815112942.392572-1-public@thson.de>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] crypto: fix uninit-value in af_alg_free_resources
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        pabeni@redhat.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
-References: <20230813122344.14142-1-paskripkin@gmail.com>
- <3954480.1692001609@warthog.procyon.org.uk>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <3954480.1692001609@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+When the hash algorithm for the signature is not available the digest size
+is 0 and the signature in the certificate is marked as unsupported.
 
-David Howells <dhowells@redhat.com> says:
-> Pavel Skripkin <paskripkin@gmail.com> wrote:
-> 
->> Syzbot was able to trigger use of uninitialized memory in
->> af_alg_free_resources.
->> 
->> Bug is caused by missing initialization of rsgl->sgl.need_unpin before
->> adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
->> is left with uninitialized need_unpin which is read during clean up
-> 
-> Looks feasible :-).
-> 
->> +		rsgl->sgl.need_unpin = 0;
->> +
-> 
-> The blank line isn't really necessary and it's a bool, so can you use 'false'
-> rather than '0'?
-> 
-> Alternatively, it might be better to move:
-> 
-> 		rsgl->sgl.need_unpin =
-> 			iov_iter_extract_will_pin(&msg->msg_iter);
-> 
-> up instead.
-> 
+When validating a self-signed certificate, this needs to be checked,
+because otherwise trying to validate the signature will fail with an
+warning:
 
-Thank you for review! I've just posted v2 :)
+Loading compiled-in X.509 certificates
+WARNING: CPU: 0 PID: 1 at crypto/rsa-pkcs1pad.c:537 \
+pkcs1pad_verify+0x46/0x12c
+...
+Problem loading in-kernel X.509 certificate (-22)
 
+Signed-off-by: Thore Sommer <public@thson.de>
+---
+ crypto/asymmetric_keys/x509_public_key.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 6fdfc82e23a8..7c71db3ac23d 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -130,6 +130,11 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
+ 			goto out;
+ 	}
+ 
++	if (cert->unsupported_sig) {
++		ret = 0;
++		goto out;
++	}
++
+ 	ret = public_key_verify_signature(cert->pub, cert->sig);
+ 	if (ret < 0) {
+ 		if (ret == -ENOPKG) {
+-- 
+2.41.0
 
-With regards,
-Pavel Skripkin
