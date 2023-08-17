@@ -2,113 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9957C3062B
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Aug 2023 14:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B521C30630
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Aug 2023 14:36:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351955AbjHQOf1 (ORCPT
+        id S1351966AbjHQOf3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Aug 2023 10:35:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51620 "EHLO
+        Thu, 17 Aug 2023 10:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351958AbjHQOfM (ORCPT
+        with ESMTP id S1352026AbjHQOfY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Aug 2023 10:35:12 -0400
+        Thu, 17 Aug 2023 10:35:24 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 801A12D73;
-        Thu, 17 Aug 2023 07:35:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7B92D73;
+        Thu, 17 Aug 2023 07:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692282910; x=1723818910;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ULX7WCNz8+e7JhTCrh7iqp4Awl93HQg0jq2Qt7qguCc=;
-  b=JF2Fwl2qcTql+roSsvagOnHNm9jeWay8Q/r3RRiHbFXU8Q+DgglUXYu2
-   s0IIrTXIjctjKjkX3UvEfrJrdwkG9dxerQH3CZ78CTBBTnrAZVCEdnRMu
-   1c+vP3MMTxUZPoYstB6ALpLZvUImwmTb2RNprlR0kaVGWklvp6FgkdSob
-   L2D80Mw15yqrRSblQM8zxrE2bh2Qfr5Wjir19okQLc343Dd+fTK/TsRhi
-   GOeZYBYtZWrseR5l82EB1m5o9K+6QyQwWdvq7FXpzudKQ/6w1R9j9DYfC
-   gPX5Yq92ZuDv6nJuTH05E3pzC1TgTFlVecuJA8BaOQFmcU9oEIwM9tJKw
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="357799587"
+  t=1692282923; x=1723818923;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6GOZRnnTv/AEn9mQ5g+PvGF5giAyxd4CVceSUAjlf8o=;
+  b=EwxPqQB+4FsnsOp7hJgzflSzjHpcIB0IgW/cAThgztgVmGoj0PZHHSMO
+   5xpbgRSRjAIwVBRRcp7xI4jhReFswoRRrthfpDYzXy6acud4ChUHeQ7GS
+   iviN/du3RQoWT6urWHafK8SpXCHe1Klf5lNx7tykdAMI7NYEs9mx6Qfvn
+   5KFsiD3tUXQ1qT2Vr9l49+Au9iqK2bgvgyTrsq9lKmviov576a41aabWp
+   kZlwKCMuZ2d05aITyHBvBljeNXhVDBvQGv+PPBoE/Fz2gM1XuMfU3fvZl
+   r6a3yjx2bsKMAKw3WMHJeznUiXYzCbPZW73HrzQG4FfQS7XPdOOlh63jk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="357799614"
 X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="357799587"
+   d="scan'208";a="357799614"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 07:35:09 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 07:35:23 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="848897987"
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="848898022"
 X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="848897987"
+   d="scan'208";a="848898022"
 Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
-  by fmsmga002.fm.intel.com with ESMTP; 17 Aug 2023 07:35:08 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 17 Aug 2023 07:35:22 -0700
 From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
 To:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         andriy.shevchenko@intel.com, alx.manpages@gmail.com,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Subject: [PATCH 0/4] Add debugfs pm_status for qat driver
-Date:   Thu, 17 Aug 2023 16:33:13 +0200
-Message-ID: <20230817143352.132583-1-lucas.segarra.fernandez@intel.com>
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: [PATCH 3/4] crypto: qat - refactor included headers
+Date:   Thu, 17 Aug 2023 16:33:16 +0200
+Message-ID: <20230817143352.132583-4-lucas.segarra.fernandez@intel.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230817143352.132583-1-lucas.segarra.fernandez@intel.com>
+References: <20230817143352.132583-1-lucas.segarra.fernandez@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add debugfs pm_status.
+Include missing headeers for GENMASK(), kstrtobool and types.
 
-Expose power management info by providing the "pm_status" file under
-debugfs.
+Add forward declaration for struct adf_accel_dev. Remove unneeded
+include.
 
-Patch #1 has been added to this pathcset in order to add
-ARRAY_SIZE_OF_FIELD() (Patch #2) without expanding kernel.h
+This change doesn't introduce any function change.
 
+Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
 ---
+ drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c | 3 +++
+ drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-Alejandro Colomar (1):
-  linux/array_size.h: Move ARRAY_SIZE(arr) to a separate header
-
-Lucas Segarra Fernandez (3):
-  linux/array_size.h: Add ARRAY_SIZE_OF_FIELD()
-  crypto: qat - refactor included headers
-  crypto: qat - add pm_status debugfs file
-
- Documentation/ABI/testing/debugfs-driver-qat  |   9 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
- .../crypto/intel/qat/qat_common/adf_admin.c   |  25 ++
- .../intel/qat/qat_common/adf_common_drv.h     |   1 +
- .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
- .../crypto/intel/qat/qat_common/adf_gen4_pm.c | 265 ++++++++++++++++++
- .../crypto/intel/qat/qat_common/adf_gen4_pm.h |  38 ++-
- .../intel/qat/qat_common/adf_pm_dbgfs.c       |  47 ++++
- .../intel/qat/qat_common/adf_pm_dbgfs.h       |  12 +
- .../qat/qat_common/icp_qat_fw_init_admin.h    |  33 +++
- include/linux/array_size.h                    |  21 ++
- include/linux/clk-provider.h                  |   1 +
- include/linux/counter.h                       |   1 +
- include/linux/genl_magic_func.h               |   1 +
- include/linux/hashtable.h                     |   1 +
- include/linux/kernel.h                        |   7 +-
- include/linux/kfifo.h                         |   1 +
- include/linux/kvm_host.h                      |   1 +
- include/linux/moduleparam.h                   |   2 +
- include/linux/mtd/rawnand.h                   |   1 +
- include/linux/netfilter.h                     |   1 +
- include/linux/pagemap.h                       |   1 +
- include/linux/phy.h                           |   1 +
- include/linux/pinctrl/machine.h               |   2 +-
- include/linux/property.h                      |   1 +
- include/linux/rcupdate_wait.h                 |   1 +
- include/linux/regmap.h                        |   1 +
- include/linux/skmsg.h                         |   1 +
- include/linux/string.h                        |   1 +
- include/linux/surface_aggregator/controller.h |   1 +
- 31 files changed, 487 insertions(+), 8 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h
- create mode 100644 include/linux/array_size.h
-
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+index 34c6cd8e27c0..3bde8759c2a2 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+@@ -2,6 +2,9 @@
+ /* Copyright(c) 2022 Intel Corporation */
+ #include <linux/bitfield.h>
+ #include <linux/iopoll.h>
++#include <linux/kstrtox.h>
++#include <linux/types.h>
++
+ #include "adf_accel_devices.h"
+ #include "adf_common_drv.h"
+ #include "adf_gen4_pm.h"
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
+index c2768762cca3..39d37b352b45 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
+@@ -3,7 +3,9 @@
+ #ifndef ADF_GEN4_PM_H
+ #define ADF_GEN4_PM_H
+ 
+-#include "adf_accel_devices.h"
++#include <linux/bits.h>
++
++struct adf_accel_dev;
+ 
+ /* Power management registers */
+ #define ADF_GEN4_PM_HOST_MSG (0x50A01C)
 -- 
 2.41.0
 
