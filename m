@@ -2,99 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F71AC05052
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 06:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B08BC05052
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 07:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241040AbjHRGDZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 02:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34344 "EHLO
+        id S1358162AbjHRH0u (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Aug 2023 03:26:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357744AbjHRGDD (ORCPT
+        with ESMTP id S1358171AbjHRH0W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 02:03:03 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F4230E1
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Aug 2023 23:02:59 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qWsZH-005C35-Ih; Fri, 18 Aug 2023 14:02:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 14:02:44 +0800
-Date:   Fri, 18 Aug 2023 14:02:44 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Lu Jialin <lujialin4@huawei.com>
-Cc:     steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-        lujialin4@huawei.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto:padata: Fix return err for PADATA_RESET
-Message-ID: <ZN8JhAGuYlz3B+9j@gondor.apana.org.au>
+        Fri, 18 Aug 2023 03:26:22 -0400
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C9030E6;
+        Fri, 18 Aug 2023 00:26:20 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37I7Pgwj016351;
+        Fri, 18 Aug 2023 02:25:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1692343542;
+        bh=bm4x7kxqWvWv3qzJzqySj6fmSFubOtRfgMiZakk91HU=;
+        h=From:To:CC:Subject:In-Reply-To:References:Date;
+        b=QrdPfjdTnJ3toEmR05ynqxTJNyXv2WwWNY9iqNKI5ZFikSVIzBqXWCiawp34x8gv+
+         q9ZOlSy14oa7NSbs74lPmlzUEun8L6d9cg+dyi4woQpGHnYbIIQ8v4jjz/wS/h0Sew
+         1Goe9HX9BfhtVSaISpEEynKj6eLUjPqbAUTFqAyI=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37I7PgPS006923
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 18 Aug 2023 02:25:42 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 18
+ Aug 2023 02:25:42 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 18 Aug 2023 02:25:42 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37I7Pf40110519;
+        Fri, 18 Aug 2023 02:25:41 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 2/6] crypto: crc64 - add crc64-iso
+ framework
+In-Reply-To: <20230812025520.GE971@sol.localdomain>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230719-mcrc-upstream-v2-2-4152b987e4c2@ti.com>
+ <20230812025520.GE971@sol.localdomain>
+Date:   Fri, 18 Aug 2023 12:55:40 +0530
+Message-ID: <87jztserrf.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230809125048.503619-1-lujialin4@huawei.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Lu Jialin <lujialin4@huawei.com> wrote:
-> We found a hungtask bug in test_aead_vec_cfg as follows:
-> 
-> INFO: task cryptomgr_test:391009 blocked for more than 120 seconds.
-> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> Call trace:
-> __switch_to+0x98/0xe0
-> __schedule+0x6c4/0xf40
-> schedule+0xd8/0x1b4
-> schedule_timeout+0x474/0x560
-> wait_for_common+0x368/0x4e0
-> wait_for_completion+0x20/0x30
-> test_aead_vec_cfg+0xab4/0xd50
-> test_aead+0x144/0x1f0
-> alg_test_aead+0xd8/0x1e0
-> alg_test+0x634/0x890
-> cryptomgr_test+0x40/0x70
-> kthread+0x1e0/0x220
-> ret_from_fork+0x10/0x18
-> Kernel panic - not syncing: hung_task: blocked tasks
-> 
-> For padata_do_parallel, when the return err is 0 or -EBUSY, it will call
-> wait_for_completion(&wait->completion) in test_aead_vec_cfg. In normal
-> case, aead_request_complete() will be called in pcrypt_aead_serial and the
-> return err is 0 for padata_do_parallel. But, when pinst->flags is
-> PADATA_RESET, the return err is -EBUSY for padata_do_parallel, and it
-> won't call aead_request_complete(). Therefore, test_aead_vec_cfg will
-> hung at wait_for_completion(&wait->completion), which will cause
-> hungtask.
-> 
-> The problem comes as following:
-> (padata_do_parallel)                 |
->    rcu_read_lock_bh();              |
->    err = -EINVAL;                   |   (padata_replace)
->                                     |     pinst->flags |= PADATA_RESET;
->    err = -EBUSY                     |
->    if (pinst->flags & PADATA_RESET) |
->        rcu_read_unlock_bh()         |
->        return err                   |
-> 
-> In order to resolve the problem, change the return err to -EINVAL when
-> pinst->flags is set PADATA_RESET.
-> 
-> Signed-off-by: Lu Jialin <lujialin4@huawei.com>
-> ---
-> kernel/padata.c | 1 -
-> 1 file changed, 1 deletion(-)
+Eric Biggers <ebiggers@kernel.org> writes:
 
-Thanks for the patch.
+> On Fri, Aug 11, 2023 at 12:58:49AM +0530, Kamlesh Gurudasani wrote:
+>> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
+>> index 70202da51c2c..10b792080374 100644
+>> --- a/include/linux/crc64.h
+>> +++ b/include/linux/crc64.h
+>> @@ -8,11 +8,15 @@
+>>  #include <linux/types.h>
+>>  
+>>  #define CRC64_ROCKSOFT_STRING "crc64-rocksoft"
+>> +#define CRC64_ISO_STRING "crc64-iso"
+>>  
+>>  u64 __pure crc64_be(u64 crc, const void *p, size_t len);
+>>  u64 __pure crc64_iso_generic(u64 crc, const void *p, size_t len);
+>>  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
+>>  
+>> +u64 crc64_iso(const unsigned char *buffer, size_t len);
+>> +u64 crc64_iso_update(u64 crc, const unsigned char *buffer, size_t len);
+>> +
+>>  u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
+>>  u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
+>
+> Is "crc64-iso" clear enough, or should it be "crc64-iso3309"?  There are
+> thousands of ISO standards.  Different CRC variants are specified by different
+> ISO standards.  Is this particular variant indeed commonly referred to as simply
+> the "ISO" CRC-64?  Even if it's currently the case that all other CRCs in ISO
+> standards are different widths than 64 bits (which may be unlikely?), I'm not
+> sure we should count on no CRC-64 variant ever being standardized by ISO.
+>
+> - Eric
+https://en.wikipedia.org/wiki/Cyclic_redundancy_check
 
-So the issue here is that the Crypto API uses EBUSY for a specific
-purpose but padata uses it too and they're getting confused with
-each other.
+Last entry CRC-64-ISO in the table.
+It is mentioned as crc64-iso and that's the
+only 64-bit CRC standardized by ISO. But I do agree that crc64-iso3309 would
+be more specific, will change it to crc64-iso3309 in next
+revision. Thanks.
 
-I think what we should do is get pcrypt to check the error value from
-padata_do_parallel, and if it's EBUSY then change it to something
-else.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+Kamlesh
