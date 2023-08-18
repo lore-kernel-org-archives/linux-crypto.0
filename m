@@ -2,81 +2,146 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEA4C7EE24
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 16:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4296EEE498F
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 19:58:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357413AbjHRQSL (ORCPT
+        id S1379835AbjHRT6F (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 12:18:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
+        Fri, 18 Aug 2023 15:58:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378614AbjHRQSA (ORCPT
+        with ESMTP id S1377351AbjHRT5g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 12:18:00 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFCB43C0F;
-        Fri, 18 Aug 2023 09:17:56 -0700 (PDT)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37IEF1nY027431;
-        Fri, 18 Aug 2023 16:17:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=j9c1MjBvndUUD0TxkCug1qPVfaYbpXY3IoHMvL5w/sY=;
- b=WuGYNq+ygsXOuG1Qv4TY2Gp4lNEQPb261Jl9+b0fUcJDaoOBmfzjWxps2wmBW6b5ZnzP
- V+DFgNcZgVnkdajVGVFox7JINsq8qwQ4Srf7QcfmqJ1cDn4yVMc25A9lYEe/wz90OlTG
- egiWcRFtRjQytAVpiUFBYYwEicRltfi5wIa1eZouL3ugizqt6kilKUiMC6U6cruWyxyh
- Mu4Vt/oMjDyK/W/Yw6TA2pMWNg6jUNBYooU/Pu/2IhwmKJKW8bQqd0ZhtrsB0zwjUcL1
- VVSbUsrsgWqgZ3ENxet0FSsrN6rRv78WSzFO/2aO4p7JYp7gMXqFxmb3DT/7ujZi4Fxo WA== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3she6puu9v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 16:17:41 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37IGHeg8023145
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Aug 2023 16:17:40 GMT
-Received: from hu-omprsing-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.36; Fri, 18 Aug 2023 09:17:36 -0700
-From:   Om Prakash Singh <quic_omprsing@quicinc.com>
-To:     <konrad.dybcio@linaro.org>
-CC:     <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
-        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
-        <robh+dt@kernel.org>, <vkoul@kernel.org>
-Subject: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Add SM8450
-Date:   Fri, 18 Aug 2023 21:47:20 +0530
-Message-ID: <20230818161720.3644424-1-quic_omprsing@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
-References: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
+        Fri, 18 Aug 2023 15:57:36 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E891706;
+        Fri, 18 Aug 2023 12:57:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692388655; x=1723924655;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=V4WpW+rF1CDAGv0xoSmYLLBjIk4md8XlrKmIlkSmnMA=;
+  b=eGNXFKWSQHjVQV3IFjctfDLlSXXiELSR9HWz/LYQXAdhmkdNmXFGXZsj
+   k5PMYFsz1yLGVdiAqiAScENeqOLJ81WU86b4mAfXGUwWoNLwlHqD8TINy
+   LtwhdeZUGpJIpZ0RGNLHaVWP2XXJQRDKmX1yCXzqH26OvuzrCrbml69hN
+   CkIjTnPVHz4ZsGliC4KuzK1V7dHsQQCcZTIu7ghY2faT4/mVz9fOhv8dx
+   gCm9RHbcD+l11NQaiH4zj2PEBEkw6g0YvVLD8u7+perknNFfjfQdwjjTc
+   YC1K4wH8YCH1oqhysV0y2r5Kr4TpBq/cPzp28PEkoyB5MVbkIP3u86HVC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="358161871"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="358161871"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 12:57:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="825260926"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="825260926"
+Received: from ttkhuong-mobl5.amr.corp.intel.com ([10.212.75.44])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 12:56:53 -0700
+Message-ID: <cbdaea86776bae824f34e3f81193a3e0a4d84270.camel@linux.intel.com>
+Subject: Re: [PATCH v9 00/14] crypto: Add Intel Analytics Accelerator (IAA)
+ crypto compression driver
+From:   Tom Zanussi <tom.zanussi@linux.intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
+        dave.jiang@intel.com, tony.luck@intel.com,
+        wajdi.k.feghali@intel.com, james.guilford@intel.com,
+        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
+        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Date:   Fri, 18 Aug 2023 14:56:43 -0500
+In-Reply-To: <ZN8yujTWN42vd2cF@gondor.apana.org.au>
+References: <20230807203726.1682123-1-tom.zanussi@linux.intel.com>
+         <ZN8yujTWN42vd2cF@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: P6NqFDmgGxE9u9dndGXxY_OvX-K5PqC0
-X-Proofpoint-ORIG-GUID: P6NqFDmgGxE9u9dndGXxY_OvX-K5PqC0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-18_20,2023-08-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 clxscore=1011 spamscore=0 suspectscore=0 bulkscore=0
- adultscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0
- mlxlogscore=587 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308180149
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of having SoC name "qcom,sm8450-prng-ee" we could use "qcom,rng-ee" as
-new IP core is not longer pseudo random number generator. so "prng" can be
-changed to "rng". Clock configuration is not needed on sm8550 as well. So it is
-better to use generic compatible string.
+Hi Herbert,
+
+On Fri, 2023-08-18 at 16:58 +0800, Herbert Xu wrote:
+> On Mon, Aug 07, 2023 at 03:37:12PM -0500, Tom Zanussi wrote:
+> > Hi, this is v9 of the IAA crypto driver, incorporating feedback from
+> > v8.
+> >=20
+> > v9 changes:
+> >=20
+> > =C2=A0 - Renamed drv_enable/disable_wq() to idxd_drv_enable/disable_wq(=
+)
+> > =C2=A0=C2=A0=C2=A0 and exported it, changing all existing callers as we=
+ll as the
+> > =C2=A0=C2=A0=C2=A0 iaa_crypto driver.
+> >=20
+> > =C2=A0 - While testing, ran into a use-after-free bug in the irq suppor=
+t
+> > =C2=A0=C2=A0=C2=A0 flagged by KASAN so fixed that up in iaa_compress() =
+(added missing
+> > =C2=A0=C2=A0=C2=A0 disable_async check).
+> >=20
+> > =C2=A0 - Also, while fixing the use-after-free bug, rearranged the out:
+> > =C2=A0=C2=A0=C2=A0 part of iaa_desc_complete() to make it cleaner.
+> >=20
+> > =C2=A0 - Also for the verify cases, reversed the dma mapping by adding =
+and
+> > =C2=A0=C2=A0=C2=A0 calling a new iaa_remap_for_verify() function, since=
+ verify
+> > =C2=A0=C2=A0=C2=A0 basically does a decompress after reversing the src =
+and dst
+> > =C2=A0=C2=A0=C2=A0 buffers.
+> >=20
+> > =C2=A0 - Added new Acked-by and Reviewed-by tags.
+>=20
+> This adds a bunch of warnings for me:
+>=20
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2090:5: warning: no previou=
+s prototype for =E2=80=98wq_stats_show=E2=80=99 [-Wmissing-prototypes]
+> =C2=A02090 | int wq_stats_show(struct seq_file *m, void *v)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2106:5: warning: no previou=
+s prototype for =E2=80=98iaa_crypto_stats_reset=E2=80=99 [-Wmissing-prototy=
+pes]
+> =C2=A02106 | int iaa_crypto_stats_reset(void *data, u64 value)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~~~=
+~~~~~~
+>=20
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:38: warning: incorrect =
+type in argument 1 (different base types)
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:38:=C2=A0=C2=A0=C2=A0 e=
+xpected unsigned long [usertype] size
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:38:=C2=A0=C2=A0=C2=A0 g=
+ot restricted gfp_t
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:58: warning: incorrect =
+type in argument 2 (different base types)
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:58:=C2=A0=C2=A0=C2=A0 e=
+xpected restricted gfp_t [usertype] flags
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:58:=C2=A0=C2=A0=C2=A0 g=
+ot unsigned long
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2090:5: warning: symbol 'wq=
+_stats_show' was not declared. Should it be static?
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2106:5: warning: symbol 'ia=
+a_crypto_stats_reset' was not declared. Should it be static?
+> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2028:13: warning: context i=
+mbalance in 'iaa_crypto_remove' - different lock contexts for basic block
+>=20
+> ../drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c:10:11: warning: symbo=
+l 'fixed_ll_sym' was not declared. Should it be static?
+> ../drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c:49:11: warning: symbo=
+l 'fixed_d_sym' was not declared. Should it be static?
+>=20
+> Please fix before resubmitting.
+>=20
+> Thanks,
+
+OK, yeah, looks like I needed to do a make W=3D1 C=3D1 at least to catch th=
+ese.
+Will resubmit after doing that...
+
+Thanks,
+
+Tom=20
