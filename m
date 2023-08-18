@@ -2,88 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99CAC7112B
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 10:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE86C678DC
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 10:25:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358751AbjHRKYi (ORCPT
+        id S1359078AbjHRKZK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 06:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51066 "EHLO
+        Fri, 18 Aug 2023 06:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358918AbjHRKYb (ORCPT
+        with ESMTP id S1359056AbjHRKYl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 06:24:31 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C4B3589;
-        Fri, 18 Aug 2023 03:24:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692354269; x=1723890269;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nAvfgu5XecqrL8CvSz7MeC0n2JryryvBly8wnBIzuFY=;
-  b=LsZOKM5U77s+WdwEwXhr071WpOJT0ZnxguO2L/KEy9wL28RQRZrrnvZe
-   8a++XZL0CJOz+BbJ9hOOBGbTmH49tpeA0dE4IR/UJLrfbK9fTNNC2xydR
-   R5X9Y9EYwqW4rHUel8U3DfFTVWXj8WnXm5LlNO8KRLJfcbMJ9Iy7zDGkQ
-   30bav2YDZ/rRbAG3nnFmdKDHMvqoneh5f1WgZEtqt69JEzA3aKzaDM/jf
-   eN4e2kfAW/4AUV1oiWYnP15zycq82TC9n+j9/FDj44g3JQ0BKH5H7erf1
-   ylUKAONcLMel3bwXJxT56Q1Deoz0zFp8BFPZEOb6gbkLKvz5uUOumA+/S
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="376829228"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="376829228"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 03:24:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
-   d="scan'208";a="878636039"
-Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Aug 2023 03:24:32 -0700
-From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-To:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        andriy.shevchenko@intel.com, alx@kernel.org,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Subject: [PATCH v2 0/2] Add debugfs pm_status for qat driver
-Date:   Fri, 18 Aug 2023 12:23:07 +0200
-Message-ID: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
-X-Mailer: git-send-email 2.41.0
+        Fri, 18 Aug 2023 06:24:41 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 071A92D65
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Aug 2023 03:24:40 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qWweY-005Gcj-95; Fri, 18 Aug 2023 18:24:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 18:24:26 +0800
+Date:   Fri, 18 Aug 2023 18:24:26 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     GUO Zihua <guozihua@huawei.com>
+Cc:     olivia@selenic.com, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH -next v2] hwrng: Remove duplicated include
+Message-ID: <ZN9G2jR6QQFAH5gX@gondor.apana.org.au>
+References: <20230810130043.19216-1-guozihua@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230810130043.19216-1-guozihua@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add debugfs pm_status
+On Thu, Aug 10, 2023 at 09:00:43PM +0800, GUO Zihua wrote:
+> Remove duplicated include of linux/random.h. Resolves checkincludes
+> message. And adjust includes in alphabetical order.
+> 
+> Signed-off-by: GUO Zihua <guozihua@huawei.com>
+> 
+> ---
+> 
+> v2:
+>   Adjust incldues in alphabetical order as well.
+> ---
+>  drivers/char/hw_random/core.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-Expose power management info by providing the "pm_status" file under
-debugfs.
-
----
-v1 -> v2:
-- Add constant ICP_QAT_NUMBER_OF_PM_EVENTS, rather than
-  ARRAY_SIZE_OF_FIELD()
----
-
-Lucas Segarra Fernandez (2):
-  crypto: qat - refactor included headers
-  crypto: qat - add pm_status debugfs file
-
- Documentation/ABI/testing/debugfs-driver-qat  |   9 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
- .../crypto/intel/qat/qat_common/adf_admin.c   |  25 ++
- .../intel/qat/qat_common/adf_common_drv.h     |   1 +
- .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
- .../crypto/intel/qat/qat_common/adf_gen4_pm.c | 261 ++++++++++++++++++
- .../crypto/intel/qat/qat_common/adf_gen4_pm.h |  38 ++-
- .../intel/qat/qat_common/adf_pm_dbgfs.c       |  47 ++++
- .../intel/qat/qat_common/adf_pm_dbgfs.h       |  12 +
- .../qat/qat_common/icp_qat_fw_init_admin.h    |  35 +++
- 11 files changed, 444 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h
-
+Patch applied.  Thanks.
 -- 
-2.41.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
