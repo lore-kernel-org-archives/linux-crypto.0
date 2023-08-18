@@ -2,73 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3E4C71133
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 05:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0BEC71136
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 05:48:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357957AbjHRFaV (ORCPT
+        id S1352328AbjHRFr5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 01:30:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41262 "EHLO
+        Fri, 18 Aug 2023 01:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357651AbjHRF3X (ORCPT
+        with ESMTP id S1357744AbjHRFrX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 01:29:23 -0400
+        Fri, 18 Aug 2023 01:47:23 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732143C34;
-        Thu, 17 Aug 2023 22:28:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D45D272D;
+        Thu, 17 Aug 2023 22:47:21 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qWs2L-005BmE-J9; Fri, 18 Aug 2023 13:28:42 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 13:28:42 +0800
-Date:   Fri, 18 Aug 2023 13:28:42 +0800
+        id 1qWsKJ-005Bwi-6V; Fri, 18 Aug 2023 13:47:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 13:47:15 +0800
+Date:   Fri, 18 Aug 2023 13:47:15 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, andriy.shevchenko@intel.com,
-        alx.manpages@gmail.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>
-Subject: Re: [PATCH 4/4] crypto: qat - add pm_status debugfs file
-Message-ID: <ZN8BipaGe6DOwiVS@gondor.apana.org.au>
-References: <20230817143352.132583-1-lucas.segarra.fernandez@intel.com>
- <20230817143352.132583-5-lucas.segarra.fernandez@intel.com>
+To:     meenakshi.aggarwal@nxp.com
+Cc:     horia.geanta@nxp.com, V.sethi@nxp.com, pankaj.gupta@nxp.com,
+        gaurav.jain@nxp.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        George Cherian <gcherian@marvell.com>,
+        Weili Qian <qianweili@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH] crypto: caam - increase the domain of write memory
+ barrier to full system
+Message-ID: <ZN8F4/qSgjNvjG8h@gondor.apana.org.au>
+References: <20230808105527.1707039-1-meenakshi.aggarwal@nxp.com>
+ <20230808105527.1707039-2-meenakshi.aggarwal@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230817143352.132583-5-lucas.segarra.fernandez@intel.com>
+In-Reply-To: <20230808105527.1707039-2-meenakshi.aggarwal@nxp.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 17, 2023 at 04:33:17PM +0200, Lucas Segarra Fernandez wrote:
->
-> +static struct pm_status_row pm_event_rows[] = {
-> +	PM_INFO_REGSET_ENTRY32(event_log[0], EVENT0),
-> +	PM_INFO_REGSET_ENTRY32(event_log[1], EVENT1),
-> +	PM_INFO_REGSET_ENTRY32(event_log[2], EVENT2),
-> +	PM_INFO_REGSET_ENTRY32(event_log[3], EVENT3),
-> +	PM_INFO_REGSET_ENTRY32(event_log[4], EVENT4),
-> +	PM_INFO_REGSET_ENTRY32(event_log[5], EVENT5),
-> +	PM_INFO_REGSET_ENTRY32(event_log[6], EVENT6),
-> +	PM_INFO_REGSET_ENTRY32(event_log[7], EVENT7),
-> +};
-> +
-> +static_assert(ARRAY_SIZE_OF_FIELD(struct icp_qat_fw_init_admin_pm_info, event_log) ==
-> +	      ARRAY_SIZE(pm_event_rows));
+On Tue, Aug 08, 2023 at 12:55:26PM +0200, meenakshi.aggarwal@nxp.com wrote:
+> From: Iuliana Prodan <iuliana.prodan@nxp.com>
+> 
+> In caam_jr_enqueue, under heavy DDR load, smp_wmb() or dma_wmb()
+> fail to make the input ring be updated before the CAAM starts
+> reading it. So, CAAM will process, again, an old descriptor address
+> and will put it in the output ring. This will make caam_jr_dequeue()
+> to fail, since this old descriptor is not in the software ring.
+> To fix this, use wmb() which works on the full system instead of
+> inner/outer shareable domains.
+> 
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> Signed-off-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+> ---
+>  drivers/crypto/caam/jr.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 
-Was all of that churn just for this one line?
+Indeed, smp_wmb is always wrong for barriers separating DMA writes.
 
-How about simply declaring a macro
+I wonder if these should be changed to:
 
-	#define QAT_NUMBER_OF_PM_EVENTS 8
-
-and then use it for the two arrays:
-
-	static struct pm_status_row pm_event_rows[QAT_NUMBER_OF_PM_EVENTS] = {
-
-	__u32 event_log[QAT_NUMBER_OF_PM_EVENTS];
-
-What am I missing?
+$ git grep smp_wmb drivers/crypto/
+drivers/crypto/caam/jr.c:       smp_wmb();
+drivers/crypto/cavium/cpt/cptvf_reqmanager.c:   smp_wmb();
+drivers/crypto/hisilicon/qm.c:  smp_wmb();
+drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c:     smp_wmb();
+drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c:             smp_wmb();
+drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c:     smp_wmb();
+drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c:             smp_wmb();
+drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c:     smp_wmb();
+drivers/crypto/talitos.c:       smp_wmb();
+drivers/crypto/talitos.c:               smp_wmb();
+$ 
 
 Cheers,
 -- 
