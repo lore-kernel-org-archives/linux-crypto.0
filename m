@@ -2,55 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75ED7C05052
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 10:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EEDC7113D
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 10:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244577AbjHRKYi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 06:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41710 "EHLO
+        id S1358783AbjHRKYj (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Aug 2023 06:24:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358879AbjHRKY2 (ORCPT
+        with ESMTP id S1359005AbjHRKYe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 06:24:28 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6753589;
-        Fri, 18 Aug 2023 03:24:25 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qWweH-005Gcb-Cg; Fri, 18 Aug 2023 18:24:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 18:24:10 +0800
-Date:   Fri, 18 Aug 2023 18:24:10 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Andi Shyti <andi.shyti@kernel.org>
-Subject: Re: [PATCH] crypto: exynos - fix Wvoid-pointer-to-enum-cast warning
-Message-ID: <ZN9Gyv2dLm+kxenq@gondor.apana.org.au>
-References: <20230810100023.123557-1-krzysztof.kozlowski@linaro.org>
+        Fri, 18 Aug 2023 06:24:34 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E07A2D65;
+        Fri, 18 Aug 2023 03:24:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692354273; x=1723890273;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=lQNq0fSdnAUapEIKjaOl0KAeJ1J5RobTmYHnG//ZAd8=;
+  b=NSvaNWC8FwdPi2WA4hYsRq8IDL/RE6BvNNzMvQuRMMC05sklkprunslh
+   fNHW7yz25QM9VqI8azXJoVdUcACKS17txQ+i0t4YcVg/MPJdkffXVEw24
+   yn/hTd1UoLmPiLeWAo8x4JmTUicuFx2Gas48YAnUuhaFf40/CGi/5fJaX
+   2szoNugz3OKcZDtNPbvDVRrRzyzjAtMO1UYUhiy50WWiXQk0kQBzHg59D
+   4mI9TokCsc+Lla5+YpBv6EfhwjhX2UYhcATMcmaPdDJ2GoFRUeOqX3rsd
+   ibTgcGhMeKQUDfFsj3ga648JUfI+N7YXoHgtQVtljX2E1B0xoZYcSxVez
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="376829246"
+X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
+   d="scan'208";a="376829246"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 03:24:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.01,202,1684825200"; 
+   d="scan'208";a="878636045"
+Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
+  by fmsmga001.fm.intel.com with ESMTP; 18 Aug 2023 03:24:35 -0700
+From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+To:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        andriy.shevchenko@intel.com, alx@kernel.org,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: [PATCH v2 1/2] crypto: qat - refactor included headers
+Date:   Fri, 18 Aug 2023 12:23:08 +0200
+Message-ID: <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
+References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230810100023.123557-1-krzysztof.kozlowski@linaro.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 12:00:23PM +0200, Krzysztof Kozlowski wrote:
-> 'type' is an enum, thus cast of pointer on 64-bit compile test with W=1
-> causes:
-> 
->   exynos-rng.c:280:14: error: cast to smaller integer type 'enum exynos_prng_type' from 'const void *' [-Werror,-Wvoid-pointer-to-enum-cast]
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  drivers/crypto/exynos-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Include missing headers for GENMASK(), kstrtobool and types.
 
-Patch applied.  Thanks.
+Add forward declaration for struct adf_accel_dev. Remove unneeded
+include.
+
+This change doesn't introduce any function change.
+
+Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+---
+ drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c | 3 +++
+ drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+index 34c6cd8e27c0..3bde8759c2a2 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+@@ -2,6 +2,9 @@
+ /* Copyright(c) 2022 Intel Corporation */
+ #include <linux/bitfield.h>
+ #include <linux/iopoll.h>
++#include <linux/kstrtox.h>
++#include <linux/types.h>
++
+ #include "adf_accel_devices.h"
+ #include "adf_common_drv.h"
+ #include "adf_gen4_pm.h"
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
+index c2768762cca3..39d37b352b45 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
+@@ -3,7 +3,9 @@
+ #ifndef ADF_GEN4_PM_H
+ #define ADF_GEN4_PM_H
+ 
+-#include "adf_accel_devices.h"
++#include <linux/bits.h>
++
++struct adf_accel_dev;
+ 
+ /* Power management registers */
+ #define ADF_GEN4_PM_HOST_MSG (0x50A01C)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.41.0
+
