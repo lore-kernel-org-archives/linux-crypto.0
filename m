@@ -2,71 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06881C71136
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 10:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09229C001DE
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 10:35:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376334AbjHRK1t (ORCPT
+        id S1358614AbjHRKf1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 06:27:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
+        Fri, 18 Aug 2023 06:35:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359801AbjHRK05 (ORCPT
+        with ESMTP id S1376531AbjHRKef (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 06:26:57 -0400
+        Fri, 18 Aug 2023 06:34:35 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 987814221;
-        Fri, 18 Aug 2023 03:26:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A67E420E;
+        Fri, 18 Aug 2023 03:33:24 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qWwgh-005Gkf-AK; Fri, 18 Aug 2023 18:26:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 18:26:39 +0800
-Date:   Fri, 18 Aug 2023 18:26:39 +0800
+        id 1qWwn6-005H3N-Ju; Fri, 18 Aug 2023 18:33:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Aug 2023 18:33:17 +0800
+Date:   Fri, 18 Aug 2023 18:33:17 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>,
-        Marijn Suijten <marijn.suijten@somainline.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] Introduce PRNG on SM8450
-Message-ID: <ZN9HX3ce01Zwdu3k@gondor.apana.org.au>
-References: <20230811-topic-8450_prng-v1-0-01becceeb1ee@linaro.org>
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     davem@davemloft.net, dhowells@redhat.com, pabeni@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] crypto: fix uninit-value in af_alg_free_resources
+Message-ID: <ZN9I7TYiT0ElRca2@gondor.apana.org.au>
+References: <20230813122344.14142-1-paskripkin@gmail.com>
+ <20230814180341.8621-1-paskripkin@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230811-topic-8450_prng-v1-0-01becceeb1ee@linaro.org>
+In-Reply-To: <20230814180341.8621-1-paskripkin@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 11, 2023 at 10:50:55PM +0200, Konrad Dybcio wrote:
-> SM8450's PRNG seems to be the same good ol' IP, except without a core
-> clock.
+On Mon, Aug 14, 2023 at 09:03:41PM +0300, Pavel Skripkin wrote:
+> Syzbot was able to trigger use of uninitialized memory in
+> af_alg_free_resources.
 > 
-> For a lack of a better idea on how to test it, /proc/crypto reports that
-> the selftest has gone through..
+> Bug is caused by missing initialization of rsgl->sgl.need_unpin before
+> adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
+> is left with uninitialized need_unpin which is read during clean up
 > 
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+> BUG: KMSAN: uninit-value in af_alg_free_sg crypto/af_alg.c:545 [inline]
+> BUG: KMSAN: uninit-value in af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
+> BUG: KMSAN: uninit-value in af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
+>  af_alg_free_sg crypto/af_alg.c:545 [inline]
+>  af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
+>  af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
+>  _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
+> ...
+> 
+> Uninit was created at:
+>  slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+>  slab_alloc_node mm/slub.c:3470 [inline]
+>  __kmem_cache_alloc_node+0x536/0x8d0 mm/slub.c:3509
+>  __do_kmalloc_node mm/slab_common.c:984 [inline]
+>  __kmalloc+0x121/0x3c0 mm/slab_common.c:998
+>  kmalloc include/linux/slab.h:586 [inline]
+>  sock_kmalloc+0x128/0x1c0 net/core/sock.c:2683
+>  af_alg_alloc_areq+0x41/0x2a0 crypto/af_alg.c:1188
+>  _skcipher_recvmsg crypto/algif_skcipher.c:71 [inline]
+> 
+> Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists")
+> Reported-and-tested-by: syzbot+cba21d50095623218389@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=cba21d50095623218389
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
 > ---
-> Konrad Dybcio (3):
->       dt-bindings: crypto: qcom,prng: Add SM8450
->       crypto: qcom-rng: Make the core clock optional regardless of ACPI presence
->       arm64: dts: qcom: sm8450: Add PRNG
 > 
->  .../devicetree/bindings/crypto/qcom,prng.yaml      | 24 +++++++++++++++++-----
->  arch/arm64/boot/dts/qcom/sm8450.dtsi               |  5 +++++
->  drivers/crypto/qcom-rng.c                          | 10 +++------
->  3 files changed, 27 insertions(+), 12 deletions(-)
+> Changes since v1:
+> 	- Move sgl.need_unpin initialization upper instead of
+> 	  pre-initializing it with false as suggested by David
+> 
 > ---
-> base-commit: 21ef7b1e17d039053edaeaf41142423810572741
-> change-id: 20230811-topic-8450_prng-6af00873db4d
+>  crypto/af_alg.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Patches 1-2 applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
