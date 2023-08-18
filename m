@@ -2,108 +2,81 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 843D1C7113C
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 13:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEA4C7EE24
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 16:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358475AbjHRNW0 (ORCPT
+        id S1357413AbjHRQSL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 09:22:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46898 "EHLO
+        Fri, 18 Aug 2023 12:18:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377089AbjHRNWF (ORCPT
+        with ESMTP id S1378614AbjHRQSA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 09:22:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502FB421C
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Aug 2023 06:21:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1692364867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=na/HqEvBUIWFrt2ZYVArJGd9pgLGqwvBv1dWk5WmYf8=;
-        b=gDlYD0bHjX/2JQrphyS9XPHfhXG+t36PNokBWWeGjYHl3ddmH8S6aJJ60wO9lwLw8vABWz
-        IztpYrXWcXAK9N34x+JXK2orZGhcKAYDZRW9Tr+qAZLKB6zVtFXHCIUhSzeY1QXHwhs4hH
-        07QylnRE8m10pfVAdN6ks0u+UgiMpIs=
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-8pUc8EUINfeKrkURKuuygg-1; Fri, 18 Aug 2023 09:21:04 -0400
-X-MC-Unique: 8pUc8EUINfeKrkURKuuygg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 98BB11C07562;
-        Fri, 18 Aug 2023 13:21:02 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EEE2C15BAD;
-        Fri, 18 Aug 2023 13:21:01 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230814180341.8621-1-paskripkin@gmail.com>
-References: <20230814180341.8621-1-paskripkin@gmail.com> <20230813122344.14142-1-paskripkin@gmail.com>
-To:     Pavel Skripkin <paskripkin@gmail.com>
-Cc:     dhowells@redhat.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, pabeni@redhat.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+cba21d50095623218389@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] crypto: fix uninit-value in af_alg_free_resources
+        Fri, 18 Aug 2023 12:18:00 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFCB43C0F;
+        Fri, 18 Aug 2023 09:17:56 -0700 (PDT)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37IEF1nY027431;
+        Fri, 18 Aug 2023 16:17:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=qcppdkim1;
+ bh=j9c1MjBvndUUD0TxkCug1qPVfaYbpXY3IoHMvL5w/sY=;
+ b=WuGYNq+ygsXOuG1Qv4TY2Gp4lNEQPb261Jl9+b0fUcJDaoOBmfzjWxps2wmBW6b5ZnzP
+ V+DFgNcZgVnkdajVGVFox7JINsq8qwQ4Srf7QcfmqJ1cDn4yVMc25A9lYEe/wz90OlTG
+ egiWcRFtRjQytAVpiUFBYYwEicRltfi5wIa1eZouL3ugizqt6kilKUiMC6U6cruWyxyh
+ Mu4Vt/oMjDyK/W/Yw6TA2pMWNg6jUNBYooU/Pu/2IhwmKJKW8bQqd0ZhtrsB0zwjUcL1
+ VVSbUsrsgWqgZ3ENxet0FSsrN6rRv78WSzFO/2aO4p7JYp7gMXqFxmb3DT/7ujZi4Fxo WA== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3she6puu9v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Aug 2023 16:17:41 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37IGHeg8023145
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 18 Aug 2023 16:17:40 GMT
+Received: from hu-omprsing-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.36; Fri, 18 Aug 2023 09:17:36 -0700
+From:   Om Prakash Singh <quic_omprsing@quicinc.com>
+To:     <konrad.dybcio@linaro.org>
+CC:     <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
+        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
+        <robh+dt@kernel.org>, <vkoul@kernel.org>
+Subject: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Add SM8450
+Date:   Fri, 18 Aug 2023 21:47:20 +0530
+Message-ID: <20230818161720.3644424-1-quic_omprsing@quicinc.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
+References: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1890298.1692364860.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 18 Aug 2023 14:21:01 +0100
-Message-ID: <1890301.1692364861@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: P6NqFDmgGxE9u9dndGXxY_OvX-K5PqC0
+X-Proofpoint-ORIG-GUID: P6NqFDmgGxE9u9dndGXxY_OvX-K5PqC0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-18_20,2023-08-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 clxscore=1011 spamscore=0 suspectscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ mlxlogscore=587 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308180149
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pavel Skripkin <paskripkin@gmail.com> wrote:
-
-> Syzbot was able to trigger use of uninitialized memory in
-> af_alg_free_resources.
-> =
-
-> Bug is caused by missing initialization of rsgl->sgl.need_unpin before
-> adding to rsgl_list. Then in case of extract_iter_to_sg() failure, rsgl
-> is left with uninitialized need_unpin which is read during clean up
-> =
-
-> BUG: KMSAN: uninit-value in af_alg_free_sg crypto/af_alg.c:545 [inline]
-> BUG: KMSAN: uninit-value in af_alg_free_areq_sgls crypto/af_alg.c:778 [i=
-nline]
-> BUG: KMSAN: uninit-value in af_alg_free_resources+0x3d1/0xf60 crypto/af_=
-alg.c:1117
->  af_alg_free_sg crypto/af_alg.c:545 [inline]
->  af_alg_free_areq_sgls crypto/af_alg.c:778 [inline]
->  af_alg_free_resources+0x3d1/0xf60 crypto/af_alg.c:1117
->  _skcipher_recvmsg crypto/algif_skcipher.c:144 [inline]
-> ...
-> =
-
-> Uninit was created at:
->  slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
->  slab_alloc_node mm/slub.c:3470 [inline]
->  __kmem_cache_alloc_node+0x536/0x8d0 mm/slub.c:3509
->  __do_kmalloc_node mm/slab_common.c:984 [inline]
->  __kmalloc+0x121/0x3c0 mm/slab_common.c:998
->  kmalloc include/linux/slab.h:586 [inline]
->  sock_kmalloc+0x128/0x1c0 net/core/sock.c:2683
->  af_alg_alloc_areq+0x41/0x2a0 crypto/af_alg.c:1188
->  _skcipher_recvmsg crypto/algif_skcipher.c:71 [inline]
-> =
-
-> Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create=
- scatterlists")
-> Reported-and-tested-by: syzbot+cba21d50095623218389@syzkaller.appspotmai=
-l.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Dcba21d50095623218389
-> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-
-Reviewed-by: David Howells <dhowells@redhat.com>
-
+Instead of having SoC name "qcom,sm8450-prng-ee" we could use "qcom,rng-ee" as
+new IP core is not longer pseudo random number generator. so "prng" can be
+changed to "rng". Clock configuration is not needed on sm8550 as well. So it is
+better to use generic compatible string.
