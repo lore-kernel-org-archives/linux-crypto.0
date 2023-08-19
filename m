@@ -2,146 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4296EEE498F
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Aug 2023 19:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 579DBEE49A2
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Aug 2023 04:13:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379835AbjHRT6F (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Aug 2023 15:58:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
+        id S229603AbjHSEMp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Aug 2023 00:12:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377351AbjHRT5g (ORCPT
+        with ESMTP id S229532AbjHSEMb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Aug 2023 15:57:36 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E891706;
-        Fri, 18 Aug 2023 12:57:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692388655; x=1723924655;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=V4WpW+rF1CDAGv0xoSmYLLBjIk4md8XlrKmIlkSmnMA=;
-  b=eGNXFKWSQHjVQV3IFjctfDLlSXXiELSR9HWz/LYQXAdhmkdNmXFGXZsj
-   k5PMYFsz1yLGVdiAqiAScENeqOLJ81WU86b4mAfXGUwWoNLwlHqD8TINy
-   LtwhdeZUGpJIpZ0RGNLHaVWP2XXJQRDKmX1yCXzqH26OvuzrCrbml69hN
-   CkIjTnPVHz4ZsGliC4KuzK1V7dHsQQCcZTIu7ghY2faT4/mVz9fOhv8dx
-   gCm9RHbcD+l11NQaiH4zj2PEBEkw6g0YvVLD8u7+perknNFfjfQdwjjTc
-   YC1K4wH8YCH1oqhysV0y2r5Kr4TpBq/cPzp28PEkoyB5MVbkIP3u86HVC
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="358161871"
-X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
-   d="scan'208";a="358161871"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 12:57:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10806"; a="825260926"
-X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
-   d="scan'208";a="825260926"
-Received: from ttkhuong-mobl5.amr.corp.intel.com ([10.212.75.44])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Aug 2023 12:56:53 -0700
-Message-ID: <cbdaea86776bae824f34e3f81193a3e0a4d84270.camel@linux.intel.com>
-Subject: Re: [PATCH v9 00/14] crypto: Add Intel Analytics Accelerator (IAA)
- crypto compression driver
-From:   Tom Zanussi <tom.zanussi@linux.intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, fenghua.yu@intel.com, vkoul@kernel.org,
-        dave.jiang@intel.com, tony.luck@intel.com,
-        wajdi.k.feghali@intel.com, james.guilford@intel.com,
-        kanchana.p.sridhar@intel.com, vinodh.gopal@intel.com,
-        giovanni.cabiddu@intel.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
-Date:   Fri, 18 Aug 2023 14:56:43 -0500
-In-Reply-To: <ZN8yujTWN42vd2cF@gondor.apana.org.au>
-References: <20230807203726.1682123-1-tom.zanussi@linux.intel.com>
-         <ZN8yujTWN42vd2cF@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        Sat, 19 Aug 2023 00:12:31 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C96A126AB
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Aug 2023 21:12:27 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qXDJv-005Ymg-4r; Sat, 19 Aug 2023 12:12:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 19 Aug 2023 12:12:15 +0800
+Date:   Sat, 19 Aug 2023 12:12:15 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Weili Qian <qianweili@huawei.com>, Will Deacon <will@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        shenyang39@huawei.com, liulongfang@huawei.com
+Subject: Re: [PATCH v2 1/7] crypto: hisilicon/qm - obtain the mailbox
+ configuration at one time
+Message-ID: <ZOBBH/XS7Fe0yApm@gondor.apana.org.au>
+References: <20230811140749.5202-1-qianweili@huawei.com>
+ <20230811140749.5202-2-qianweili@huawei.com>
+ <ZN8oEpUBq87m+r++@gondor.apana.org.au>
+ <CAMj1kXGNesF91=LScsDSgMx7LwQXOuMjLy7RN5SPLjO3ab7SHA@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGNesF91=LScsDSgMx7LwQXOuMjLy7RN5SPLjO3ab7SHA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Fri, Aug 18, 2023 at 12:21:02PM +0200, Ard Biesheuvel wrote:
+>
+> IIRC there have been other cases (ThunderX?) where 128 bit MMIO
+> accessors were needed for some peripheral, but common arm64 helpers
+> were rejected on the basis that this atomic behavior is not
+> architectural.
+> 
+> Obviously, using inline asm in the driver is not the right way either,
+> so perhaps we should consider introducing some common infrastructure
+> anyway, including some expectation management about their guarantees.
 
-On Fri, 2023-08-18 at 16:58 +0800, Herbert Xu wrote:
-> On Mon, Aug 07, 2023 at 03:37:12PM -0500, Tom Zanussi wrote:
-> > Hi, this is v9 of the IAA crypto driver, incorporating feedback from
-> > v8.
-> >=20
-> > v9 changes:
-> >=20
-> > =C2=A0 - Renamed drv_enable/disable_wq() to idxd_drv_enable/disable_wq(=
-)
-> > =C2=A0=C2=A0=C2=A0 and exported it, changing all existing callers as we=
-ll as the
-> > =C2=A0=C2=A0=C2=A0 iaa_crypto driver.
-> >=20
-> > =C2=A0 - While testing, ran into a use-after-free bug in the irq suppor=
-t
-> > =C2=A0=C2=A0=C2=A0 flagged by KASAN so fixed that up in iaa_compress() =
-(added missing
-> > =C2=A0=C2=A0=C2=A0 disable_async check).
-> >=20
-> > =C2=A0 - Also, while fixing the use-after-free bug, rearranged the out:
-> > =C2=A0=C2=A0=C2=A0 part of iaa_desc_complete() to make it cleaner.
-> >=20
-> > =C2=A0 - Also for the verify cases, reversed the dma mapping by adding =
-and
-> > =C2=A0=C2=A0=C2=A0 calling a new iaa_remap_for_verify() function, since=
- verify
-> > =C2=A0=C2=A0=C2=A0 basically does a decompress after reversing the src =
-and dst
-> > =C2=A0=C2=A0=C2=A0 buffers.
-> >=20
-> > =C2=A0 - Added new Acked-by and Reviewed-by tags.
->=20
-> This adds a bunch of warnings for me:
->=20
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2090:5: warning: no previou=
-s prototype for =E2=80=98wq_stats_show=E2=80=99 [-Wmissing-prototypes]
-> =C2=A02090 | int wq_stats_show(struct seq_file *m, void *v)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2106:5: warning: no previou=
-s prototype for =E2=80=98iaa_crypto_stats_reset=E2=80=99 [-Wmissing-prototy=
-pes]
-> =C2=A02106 | int iaa_crypto_stats_reset(void *data, u64 value)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0 ^~~~~~~~~~~~~~~~=
-~~~~~~
->=20
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:38: warning: incorrect =
-type in argument 1 (different base types)
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:38:=C2=A0=C2=A0=C2=A0 e=
-xpected unsigned long [usertype] size
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:38:=C2=A0=C2=A0=C2=A0 g=
-ot restricted gfp_t
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:58: warning: incorrect =
-type in argument 2 (different base types)
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:58:=C2=A0=C2=A0=C2=A0 e=
-xpected restricted gfp_t [usertype] flags
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:827:58:=C2=A0=C2=A0=C2=A0 g=
-ot unsigned long
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2090:5: warning: symbol 'wq=
-_stats_show' was not declared. Should it be static?
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2106:5: warning: symbol 'ia=
-a_crypto_stats_reset' was not declared. Should it be static?
-> ../drivers/crypto/intel/iaa/iaa_crypto_main.c:2028:13: warning: context i=
-mbalance in 'iaa_crypto_remove' - different lock contexts for basic block
->=20
-> ../drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c:10:11: warning: symbo=
-l 'fixed_ll_sym' was not declared. Should it be static?
-> ../drivers/crypto/intel/iaa/iaa_crypto_comp_fixed.c:49:11: warning: symbo=
-l 'fixed_d_sym' was not declared. Should it be static?
->=20
-> Please fix before resubmitting.
->=20
-> Thanks,
+The ones in
 
-OK, yeah, looks like I needed to do a make W=3D1 C=3D1 at least to catch th=
-ese.
-Will resubmit after doing that...
+	drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
 
-Thanks,
+look better.  So perhaps copy them into hisilicon?
 
-Tom=20
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
