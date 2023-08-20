@@ -2,110 +2,156 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B21EEE49A5
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Aug 2023 14:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7144EE49A5
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Aug 2023 19:52:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233558AbjHSOe2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Aug 2023 10:34:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53156 "EHLO
+        id S231776AbjHTTwk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Aug 2023 15:52:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233527AbjHSOe1 (ORCPT
+        with ESMTP id S231775AbjHTTwk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Aug 2023 10:34:27 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B18B249
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Aug 2023 07:34:25 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99c1d03e124so225424066b.2
-        for <linux-crypto@vger.kernel.org>; Sat, 19 Aug 2023 07:34:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692455664; x=1693060464;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ha1KjyT6V1o5qZr6TeP96iO4FdCTMuqeCrmWHV7Hty4=;
-        b=T6nKXyb3SPnRAQgMVcJtyOkq++PRIN9F2MYLPzZ7i6aXrnuV5ZkO7/roBqiSSm2EJa
-         XuNrMA2OLKK34/zc0qiHpe/3Viah0SHiX8nfdTFNpL31EDlXhy2gbwNc1B8E3ZlVAfNJ
-         fJ2Yr5LwKJV2qgD9xySbgzzqraX2XrNPMY/POPrlD9eDJcFB0gJePCPbsimMUzVv53kP
-         90LaQY4brexucXTo1L4FXzMihfOR6UDlxZmLVYIzNFdOr8UJz+L5Q3pajkKTVnzGN23E
-         s64pGmTjEIea/C9lsG1G+gJlxZxNG4ClPTr1+toCMPT2S1Y4IRiZ7XcJaLy5nQQqhbOK
-         kGnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692455664; x=1693060464;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ha1KjyT6V1o5qZr6TeP96iO4FdCTMuqeCrmWHV7Hty4=;
-        b=gJ3m7XyftRuN4YGlF1Y0dM7FewOMjbXyc/uFaNxXr78PqKS0TP6q/5Ie4JiIbjrTpv
-         JDiuI+pk5MZMIUkWzvxZo9IKb8FL0CJ8ph2WNl1JIioCCxnRUBtbtOk/hDQDmQ4fTrJE
-         hBzAy4WdpwSh5HNkWd85fHS1YQw2poZMLw2FD0QPH58ae+xamnIQ/EzJOtCU9r54pXcV
-         oEyVwwP7RVcPE2aRpBSVlzcu07qwhq7Ag3HyVOYyLJMHUNCjL0UAG16pwb9GLDyUsg27
-         L/WF2qdbVLt/AJRcOGaYJ+3uPGzl/Z+HE00q5QYY5sMj8EKmw5V0Iholq3D/rSuEK1Ke
-         kkKg==
-X-Gm-Message-State: AOJu0Yx4iAZYxLee1ckfbAJ8r5b6BDhRKKXjCEdMrm2HEPz9ojTu42gx
-        z8XJKZC4JYguYmfvAuSKcBg2iw==
-X-Google-Smtp-Source: AGHT+IEGkqcrHrpAGksQSYiS8m/z8KkdErgOQRR/5f21rHWfqDaiJDIuag576zuL8QVsVpeRdHeT7Q==
-X-Received: by 2002:a17:906:310d:b0:992:1233:9c45 with SMTP id 13-20020a170906310d00b0099212339c45mr1257628ejx.69.1692455663844;
-        Sat, 19 Aug 2023 07:34:23 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id k21-20020a1709063fd500b0099bcf1c07c6sm2834891ejj.138.2023.08.19.07.34.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 19 Aug 2023 07:34:23 -0700 (PDT)
-Message-ID: <96033a59-a2ea-c906-a033-84119c5783d7@linaro.org>
-Date:   Sat, 19 Aug 2023 16:34:21 +0200
+        Sun, 20 Aug 2023 15:52:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 988221738;
+        Sun, 20 Aug 2023 12:52:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E4E961003;
+        Sun, 20 Aug 2023 19:52:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D455C433C8;
+        Sun, 20 Aug 2023 19:52:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692561148;
+        bh=ZTkfRlcTFK9Ko+bTjKIObYpHJMT1NgBiP3RZVEAT22E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=V5ZlwmM1gJ/XXIejNG7Zjv+0rfMkHUImsGKBVx6h0LO/F6hPp0LZJH+nmQHGMzZ9P
+         CwIsj46BSY4+SLGusRQpXk5IGnkTkiY8u0SRsb71FYJ5rd2HqBrxXJ3ym2mnYKTK3o
+         ute49ekqA7yarPS4uBe9OXtPNWu/j6V4ARArhIrp1Zeco7iRysdoJ223VgwVPnsqOy
+         R5WVy8EBiJzfMoKDRsYmoiCnLOrxEc/tBGeGEU/NMJ5elej1P7SU9IcsOH/x1N3JB5
+         i92CDMbrqlWJ7sAnDIGQZEkiGHQ+Gt/2iG7mktQJKXuo8hE6v1hTLY2uTd+DEmZnyA
+         9dU/XmEguaOkQ==
+From:   Alejandro Colomar <alx@kernel.org>
+To:     qat-linux@intel.com
+Cc:     Alejandro Colomar <alx@kernel.org>,
+        Alejandro Colomar <alx.manpages@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] linux/container_of.h: Add memberof()
+Date:   Sun, 20 Aug 2023 21:52:22 +0200
+Message-Id: <20230820195222.279069-1-alx@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <ZN8v/2McQboR3dIu@smile.fi.intel.com>
+References: <ZN8v/2McQboR3dIu@smile.fi.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v3 11/50] dt-bindings: crypto: add sam9x7 in Atmel TDES
-Content-Language: en-US
-To:     Tudor Ambarus <tudor.ambarus@linaro.org>,
-        Varshini.Rajendran@microchip.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        Nicolas.Ferre@microchip.com, alexandre.belloni@bootlin.com,
-        claudiu.beznea@microchip.com, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20230728102442.265820-1-varshini.rajendran@microchip.com>
- <09bd1388-02aa-32c7-319e-d7150a0f3e9c@linaro.org>
- <1ec901d0-44c2-1d28-5976-d93abfffee67@microchip.com>
- <37782447-43c7-50f9-b9b4-5fbca94ce8c6@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <37782447-43c7-50f9-b9b4-5fbca94ce8c6@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3319; i=alx@kernel.org; h=from:subject; bh=/d99sq9rLDZ8l/JAmlYozPyQ8wTEgfcIzsGvYn8YdU4=; b=owEBbQKS/ZANAwAKAZ6MGvu+/9syAcsmYgBk4m6hMR8H6+j1zWzeDhUwHCzl18BhHXDxbUPJY XoYavXmI0qJAjMEAAEKAB0WIQTqOofwpOugMORd8kCejBr7vv/bMgUCZOJuoQAKCRCejBr7vv/b MjYGD/4s7i02H7bA09pSfjyYna3uR6nVCQjg52DM1/xxqI4Wi+99ovq9beyoOqiQy1ahflBcyeg qBd/IFcMDpXcg8Tfpbi/4UvS/IHmlRgQu7uPeimtRaWnE47ttQJ4mcQwj5xBcmrKiGMTjpbZCS2 rDEjM+7msoUDB4XsBqn3oqwxkyYgBdxmOx6dh6LBsg00IQqe+bAMwRNzdvM1vhDgJSyTc9nCYAt YVCOBJ0/wkpf630XgFoxXUZdoLEXS8aXwHWoc/Jp85TRtQ1DFth2eN0iY25YY8tvPVdm/ikIc6o Pd2QuQB6CkzlEZoazY2u0KEAqAHjcsFjLIhV2+5N2CbTvlrPzZ44srN0Bbl2ifTWQx6g0K/KQ1m jU94Ym1bU3nhSrZ7WL9S7TdMJKhWozKGCzl88qoX0I2zY8T6o8mPg7pdeh/4Qb0kdddfhu0h/Cf Nk2og+7W9QvkvpOEqfmrOzobRUTqZP+mgkWVh0ViUzI5TDelr1+ed3WlQK8eVY9C4vdzmkB6+8X zdCYdLzU0yISMEwKfpIU1hF2qca67ga9htJPOJ9eDTMF7hTWH6VoRw6HWrYjCM1Cm1BRbcZsfm2 zCIhqXXGYY3q/vF9a7DJr613PSWjlsJisaIsPLMuZcw7PbjYOqzddw3eG7cJileukaF0ZEmFDE1 QUCfYIEch2lqCiQ==
+X-Developer-Key: i=alx@kernel.org; a=openpgp; fpr=A9348594CE31283A826FBDD8D57633D441E25BB5
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 10/08/2023 09:22, Tudor Ambarus wrote:
-> 
-> 
-> On 8/10/23 06:38, Varshini.Rajendran@microchip.com wrote:
->>> On 7/28/23 11:24, Varshini Rajendran wrote:
->>>> Add DT bindings for atmel TDES.
->>> NACK. The atmel crypto drivers check the version at runtime and
->>> fill a capabilities structure based on the version identified.
->>> There's a single compatible regardless of the version of the IP
->>> used until now, why do you want to change it?
+From: Alejandro Colomar <alx.manpages@gmail.com>
+
+Hi!
+
+On 2023-08-18 10:46, Andy Shevchenko wrote:
+> On Fri, Aug 18, 2023 at 01:28:42PM +0800, Herbert Xu wrote:
+>> On Thu, Aug 17, 2023 at 04:33:17PM +0200, Lucas Segarra Fernandez wrote:
 >>>
->> Hi Tudor,
-> 
-> Hi,
-> 
->>
->> I am aware that there is no change in the crypto IP used. This patch is 
->> to add a SoC specific compatible as expected by writing-bindings 
->> guideline. Maybe a bit more explanation in the commit description might 
->> do the trick.
->>
-> 
-> So you add a compatible that will never be used just to comply with
-> the writing bindings guideline?
+>>> +static struct pm_status_row pm_event_rows[] = {
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[0], EVENT0),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[1], EVENT1),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[2], EVENT2),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[3], EVENT3),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[4], EVENT4),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[5], EVENT5),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[6], EVENT6),
+>>> +	PM_INFO_REGSET_ENTRY32(event_log[7], EVENT7),
+>>> +};
+>>> +
+>>> +static_assert(ARRAY_SIZE_OF_FIELD(struct icp_qat_fw_init_admin_pm_info, event_log) ==
+>>> +	      ARRAY_SIZE(pm_event_rows));
 
-How do you know that it is never going to be used? The guideline asks
-for this on purpose, so any future quirks or incompatibilities can be
-easily addressed.
+How about the following?
 
-Best regards,
-Krzysztof
+static_assert(ARRAY_SIZE(pm_event_rows) ==
+    ARRAY_SIZE(memberof(struct icp_qat_fw_init_admin_pm_info, event_log)));
+
+It would only need one macro addition, without significant churn.  It's
+even less typing.  Below is a scissor patch with the addition of
+memberof().
+
+I tried building the kernel, and didn't see any warnings form the patch
+below.
+
+Cheers,
+Alex
+
+>>
+>> Was all of that churn just for this one line?
+>>
+>> How about simply declaring a macro
+>>
+>> 	#define QAT_NUMBER_OF_PM_EVENTS 8
+>>
+>> and then use it for the two arrays:
+>>
+>> 	static struct pm_status_row pm_event_rows[QAT_NUMBER_OF_PM_EVENTS] = {
+>>
+>> 	__u32 event_log[QAT_NUMBER_OF_PM_EVENTS];
+>>
+>> What am I missing?
+> 
+> Splitting ARRAY_SIZE() is very beneficial on its own.
+> The static assert is slightly more robust for the big code then defining
+> something that at some point can be missed or miscalculated. Yet we can
+> survive with a macro if you thinks it's better.
+> 
+
+-----8<------------
+
+Many xxxof_{member,field}() macros make use of the same construction to
+refer to a member of a struct without needing a variable of the
+structure type.
+
+memberof(T, m) simplifies all of those, avoids possible mistakes in
+repetition, adds a meaningful name to the construction, and improves
+readability by avoiding too many parentheses together.
+
+It uses a compound literal, which should optimized out by the compiler.
+It's a bit simpler to read than the dereference of a casted null
+pointer, due to having less parentheses in the implementation.
+
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Alejandro Colomar <alx.manpages@gmail.com>
+---
+ include/linux/container_of.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/container_of.h b/include/linux/container_of.h
+index 713890c867be..5e762025c780 100644
+--- a/include/linux/container_of.h
++++ b/include/linux/container_of.h
+@@ -5,7 +5,9 @@
+ #include <linux/build_bug.h>
+ #include <linux/stddef.h>
+ 
+-#define typeof_member(T, m)	typeof(((T*)0)->m)
++
++#define memberof(T, member)  ((T){}.member)
++#define typeof_member(T, m)  typeof(memberof(T, m))
+ 
+ /**
+  * container_of - cast a member of a structure out to the containing structure
+-- 
+2.40.1
 
