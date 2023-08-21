@@ -2,138 +2,115 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E48EE49A6
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 10:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C81EE4993
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 11:19:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234745AbjHUKd2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Aug 2023 06:33:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42108 "EHLO
+        id S231830AbjHULTB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Aug 2023 07:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234744AbjHUKd1 (ORCPT
+        with ESMTP id S229992AbjHULTB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Aug 2023 06:33:27 -0400
-X-Greylist: delayed 181 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 21 Aug 2023 03:33:22 PDT
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080EFEE;
-        Mon, 21 Aug 2023 03:33:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1692613817; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=I/y2wyBXuPwuR9GEf2qZhDEd4ek5aZ7u5b5dunlJD8l0W4B68b23AJr+YfexW3VWC1
-    Lc8OzBBmiJp5LRaPs3EeHq5vktXda84ZIvSWTeCs5wMP8AogGC3kKg67AAWexQo3+MLk
-    3u3vaGZRft3FTC+jNLe0n2bLF8G7Ie26Pv/Qh73hoBuTEr/2+Gvwbh24nyyk4VzwJmiF
-    3r8HkXA+7O1XCWxflXfPCledQqbHHwFdvh83UDpffc+BUypMPYeFceQaLOpiYI4rv8WV
-    grwJzPNVaN6e1xXuc3v16wrRocggB6aO3V/mvpXzjFeovlef1u7btTJ0b0ber1eQamU5
-    g4Ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1692613817;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=eixnrX7klguE+rc8r2DrzRaeR5puIK4dbhqwJd4P+LA=;
-    b=MDFVuf4b0apXK0GGan5EQKhyIRDTgvx+77igNpfrX3AbseSysVPtC/ejUDsf6EhWgX
-    72htqB/vDdsjSDluG2e9xsgTxY7sxUrph+gC0SvICiEI77/UQu2Zuz3JHyf1jwmZrDcn
-    cXRFveikyPCU3BwYq+ggxuqG+9xjRBaNXXCkCtROaiO1535KXU7s1lRczxSsm4PZqS1Y
-    p/EPQfG5xSIofFewMsJzNJmyXoOf7iNIhShcZJ1S78o2T62dAs4G9ovrklmecP/eaPPW
-    3ziOvclQldtZI2J5iWa/zMaMFo1O0t04+2JjXw6e/hiNyTZQQ28Qhk7+l4zyILn0Iofm
-    YnwA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1692613817;
-    s=strato-dkim-0002; d=thson.de;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=eixnrX7klguE+rc8r2DrzRaeR5puIK4dbhqwJd4P+LA=;
-    b=P7BNu/SqPkV81Z0ZDmVrPqyVg8JoRGsmoYAfWC/gllI5xui+dbJZPBCy+WxH5452dA
-    9HpSFz83/TNCMMOT0MSJJvN5unn8DIgGMKu2LpPMJzO3jAyGAt4HgrsPk+ZRl5QedPSJ
-    QzgSfyN19FCAsNTcRTPAlxHrwAtNFf1iFrMzS/pZcFMtyxTmd4qjp+ka1xpVV3YAqO2a
-    Gd4z8YwU3GRdGzua/m5lObwFgmKkDfsqervl+KEnN9SJCv9FwxNVXTwVCQ3lC2c6dfrR
-    RJHfGbA/A3mmSEiwc5KWZNOBYDQT1koeNuQEcC4O8YYjkX27i9kR+Ry9YiLGbEHVJRin
-    CLJg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1692613817;
-    s=strato-dkim-0003; d=thson.de;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=eixnrX7klguE+rc8r2DrzRaeR5puIK4dbhqwJd4P+LA=;
-    b=B3iX/5oownP18H4gIgvtUZ4p84mTD0EB/goOCS38LNUS0p2RARNQBHIz1mJvpNoVO9
-    HGCGy9Nqv3mWF7uA0iAA==
-X-RZG-AUTH: ":PHkGeUmrW+uCZmxs998QJRUX30nOwJd7j/79t2yVxcUdnYNdU750Z8MLF6guL3bd"
-Received: from [192.168.1.101]
-    by smtp.strato.de (RZmta 49.6.6 DYNA|AUTH)
-    with ESMTPSA id tf602fz7LAUGFtu
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Mon, 21 Aug 2023 12:30:16 +0200 (CEST)
-Message-ID: <03cfdcc9-716f-4690-b400-c8da59ca1ef6@thson.de>
-Date:   Mon, 21 Aug 2023 13:30:15 +0300
+        Mon, 21 Aug 2023 07:19:01 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A488591;
+        Mon, 21 Aug 2023 04:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692616739; x=1724152739;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TSJVDwv/g+tlTKwhFF3bM8Xc0o2Jvs5GHJ3YK6/JVDg=;
+  b=evi3sEKvvU1PJgGRoJueo/YnahjPP7o987rSRY/zrqLeQAQS6h5mcfFw
+   ljQ7ac/m5XTjQN+IDao6+cA84WeL9sfEMVMdD15wvdOVOkt/XqfPaZlBX
+   c8zKw/vgSoPIT+9Wk5VQAKXv8cfmKG7J0LqZ/jxk35f/9sqtrPk4LkB7R
+   SuZBu63GEPCFiccJF+RnfAnz8ehRA61kK27vnheIEa2zy7oR7il28bO8P
+   1ZE8e5RiT9ah9+8KvpNiDnmiKVzsVJOjDrtIxWgM9diybYnuFGpeNTQss
+   mgQO6tLmfx+yc6E9z5FRT89EhSHXfGgcOoPXId8W4uGs532w9GxwfTQfF
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="437485619"
+X-IronPort-AV: E=Sophos;i="6.01,190,1684825200"; 
+   d="scan'208";a="437485619"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2023 04:18:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10808"; a="729389822"
+X-IronPort-AV: E=Sophos;i="6.01,190,1684825200"; 
+   d="scan'208";a="729389822"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP; 21 Aug 2023 04:18:46 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1qY2vl-00BQuX-0K;
+        Mon, 21 Aug 2023 14:18:45 +0300
+Date:   Mon, 21 Aug 2023 14:18:44 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Alejandro Colomar <alx@kernel.org>
+Cc:     qat-linux@intel.com, Alejandro Colomar <alx.manpages@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH] linux/container_of.h: Add memberof()
+Message-ID: <ZONIFMSmLZMeFPOY@smile.fi.intel.com>
+References: <ZN8v/2McQboR3dIu@smile.fi.intel.com>
+ <20230820195222.279069-1-alx@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] X.509: if signature is unsupported skip validation
-To:     Jarkko Sakkinen <jarkko@kernel.org>, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230815112942.392572-1-public@thson.de>
- <CUU9O4ZKMDAV.20Q9VINXK6DI0@suppilovahvero>
-Content-Language: en-US
-From:   Thore Sommer <public@thson.de>
-In-Reply-To: <CUU9O4ZKMDAV.20Q9VINXK6DI0@suppilovahvero>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230820195222.279069-1-alx@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 16.08.23 23:54, Jarkko Sakkinen wrote:
-> On Tue Aug 15, 2023 at 2:29 PM EEST, Thore Sommer wrote:
->> When the hash algorithm for the signature is not available the digest size
->> is 0 and the signature in the certificate is marked as unsupported.
->>
->> When validating a self-signed certificate, this needs to be checked,
->> because otherwise trying to validate the signature will fail with an
->> warning:
->>
->> Loading compiled-in X.509 certificates
->> WARNING: CPU: 0 PID: 1 at crypto/rsa-pkcs1pad.c:537 \
->> pkcs1pad_verify+0x46/0x12c
->> ...
->> Problem loading in-kernel X.509 certificate (-22)
->>
->> Signed-off-by: Thore Sommer <public@thson.de>
->> ---
->>   crypto/asymmetric_keys/x509_public_key.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
->> index 6fdfc82e23a8..7c71db3ac23d 100644
->> --- a/crypto/asymmetric_keys/x509_public_key.c
->> +++ b/crypto/asymmetric_keys/x509_public_key.c
->> @@ -130,6 +130,11 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
->>   			goto out;
->>   	}
->>   
->> +	if (cert->unsupported_sig) {
->> +		ret = 0;
->> +		goto out;
->> +	}
->> +
->>   	ret = public_key_verify_signature(cert->pub, cert->sig);
->>   	if (ret < 0) {
->>   		if (ret == -ENOPKG) {
->> -- 
->> 2.41.0
-> 
-> Should have:
-> 
-> Cc: stable@vger.kernel.org # v4.7+
-> Fixes: 6c2dc5ae4ab7 ("X.509: Extract signature digest and make self-signed cert checks earlier")
-> 
-> BR, Jarkko
+On Sun, Aug 20, 2023 at 09:52:22PM +0200, Alejandro Colomar wrote:
+> On 2023-08-18 10:46, Andy Shevchenko wrote:
+> > On Fri, Aug 18, 2023 at 01:28:42PM +0800, Herbert Xu wrote:
+> >> On Thu, Aug 17, 2023 at 04:33:17PM +0200, Lucas Segarra Fernandez wrote:
 
-Hi Jarkko,
+...
 
-should I resend it with the stable mailing list in CC or will it be 
-added when a maintainer includes the change?
+> Many xxxof_{member,field}() macros make use of the same construction to
+> refer to a member of a struct without needing a variable of the
+> structure type.
+> 
+> memberof(T, m) simplifies all of those, avoids possible mistakes in
+> repetition, adds a meaningful name to the construction, and improves
+> readability by avoiding too many parentheses together.
+> 
+> It uses a compound literal, which should optimized out by the compiler.
+> It's a bit simpler to read than the dereference of a casted null
+> pointer, due to having less parentheses in the implementation.
+> 
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+> Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Signed-off-by: Alejandro Colomar <alx.manpages@gmail.com>
+> ---
+>  include/linux/container_of.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/container_of.h b/include/linux/container_of.h
+> index 713890c867be..5e762025c780 100644
+> --- a/include/linux/container_of.h
+> +++ b/include/linux/container_of.h
+> @@ -5,7 +5,9 @@
+>  #include <linux/build_bug.h>
+>  #include <linux/stddef.h>
+>  
+> -#define typeof_member(T, m)	typeof(((T*)0)->m)
+> +
+> +#define memberof(T, member)  ((T){}.member)
 
-Best regards,
-Thore
+I'm not sure. This seems to me utilization of compound literal, while above
+uses direct struct member pointer calculations.
+
+> +#define typeof_member(T, m)  typeof(memberof(T, m))
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
