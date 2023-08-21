@@ -2,112 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 387DAEE4996
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 00:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFCBEE49AA
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 03:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232221AbjHUAwj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Aug 2023 20:52:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53668 "EHLO
+        id S229947AbjHUDik (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Aug 2023 23:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231135AbjHUAwi (ORCPT
+        with ESMTP id S232585AbjHUDij (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Aug 2023 20:52:38 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFA7A3;
-        Sun, 20 Aug 2023 17:52:37 -0700 (PDT)
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37L0d0on018178;
-        Mon, 21 Aug 2023 00:52:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=0cAXe53tynITfz5RBKpIn/dZnQaVzOOKvHce/rdR030=;
- b=A5qEpc0Wk9lvh55XlCYAE9tJvNshWn1c7SnsRFGPqskC7EKQLCiM8AW1Uz128+ERBQPE
- Cg8Vj2nQUF1vo9Xl6zkYTg/nfp44U37+jy7bV2oya6hXqT2HXsD+L0KUFO/pSKPxwbP/
- vfSIcRBhbNgA0kV8uMLlWvyUhC/eJksawyvq5/katLQHhFI605mp+i6j8mE/WXTc3+Fs
- P1XFyWhvtN/VruIZd+xQ5Xb/gn8FuHt6IxKPR91trn1VSPuf4vuJF3TYqmuDTDMD6Srg
- 3v9KOWSKAMtraZFtWCVVS9m3LWKfxbSGyZUnz7ABjIiPAk5wcj9IIgzvQvXbW61GbDNZ KA== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sjn2rac6d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Aug 2023 00:52:18 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37L0qHwL013652
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Aug 2023 00:52:17 GMT
-Received: from [10.216.58.121] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Sun, 20 Aug
- 2023 17:52:12 -0700
-Message-ID: <1cadb40e-b655-4b9b-9189-dfdb22a2c234@quicinc.com>
-Date:   Mon, 21 Aug 2023 06:22:09 +0530
+        Sun, 20 Aug 2023 23:38:39 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0D394;
+        Sun, 20 Aug 2023 20:38:04 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qXvjb-00610g-Gg; Mon, 21 Aug 2023 11:37:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 21 Aug 2023 11:37:44 +0800
+Date:   Mon, 21 Aug 2023 11:37:44 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.5
+Message-ID: <ZOLcCC523FoBAyv0@gondor.apana.org.au>
+References: <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
+ <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
+ <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
+ <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
+ <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
+ <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+ <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+ <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
+ <ZKtH5zrS4pR22PGT@gondor.apana.org.au>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Add SM8450
-Content-Language: en-US
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        <konrad.dybcio@linaro.org>
-CC:     <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
-        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
-        <robh+dt@kernel.org>, <vkoul@kernel.org>
-References: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
- <20230818161720.3644424-1-quic_omprsing@quicinc.com>
- <2c208796-5ad6-c362-dabc-1228b978ca1d@linaro.org>
-From:   Om Prakash Singh <quic_omprsing@quicinc.com>
-In-Reply-To: <2c208796-5ad6-c362-dabc-1228b978ca1d@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 8gTHG1kh6CWdCEErtRFgcVdUnY8bE_yt
-X-Proofpoint-ORIG-GUID: 8gTHG1kh6CWdCEErtRFgcVdUnY8bE_yt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-20_15,2023-08-18_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1011
- lowpriorityscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
- phishscore=0 suspectscore=0 mlxscore=0 impostorscore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308210005
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZKtH5zrS4pR22PGT@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I meant first one. using "qcom,rng-ee".
+Hi Linus:
 
-I am looking for generic compatible string for all SoCs for which core 
-clock can be optional, same as we have "qcom,prng-ee".
+The following changes since commit 419caed6cc77f19148faefe13515f8685ede219b:
 
-If we are using SoC name in compatible string, for each SoC support we 
-need to update qcom,prng.yaml file.
+  Merge tag 'v6.5-p2' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 (2023-07-10 09:53:11 -0700)
 
-Please suggest approach that we can followed!
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v6.5-p3
+
+for you to fetch changes up to 080aa61e370b9c5cafe71cacadbfe0e72db4d6df:
+
+  crypto: fix uninit-value in af_alg_free_resources (2023-08-18 18:30:09 +0800)
+
+----------------------------------------------------------------
+This push fixes a regression in the caam driver and af_alg.
+----------------------------------------------------------------
+Herbert Xu (1):
+      Revert "crypto: caam - adjust RNG timing to support more devices"
+
+Pavel Skripkin (1):
+      crypto: fix uninit-value in af_alg_free_resources
+
+ crypto/af_alg.c            | 4 ++--
+ drivers/crypto/caam/ctrl.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 Thanks,
-Om
-
-On 8/19/2023 1:15 PM, Krzysztof Kozlowski wrote:
-> On 18/08/2023 18:17, Om Prakash Singh wrote:
->> Instead of having SoC name "qcom,sm8450-prng-ee" we could use "qcom,rng-ee" as
->> new IP core is not longer pseudo random number generator. so "prng" can be
->> changed to "rng". Clock configuration is not needed on sm8550 as well. So it is
->> better to use generic compatible string.
-> 
-> I am not sure if I understand your point. You mean drop "p" in "prng" or
-> drop specific compatible? The first depends in the block - if it is
-> still pseudo. The second - why? That's contradictory to what is in the
-> guidelines and what we have been pushing for very long time. Going
-> against guidelines would require proper justification (and not some
-> usual justification "I don't need it", because we talked about this many
-> many times). One should not bring downstream poor practices to upstream,
-> but the other way. You should fix downstream code.
-> 
-> Best regards,
-> Krzysztof
-> 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
