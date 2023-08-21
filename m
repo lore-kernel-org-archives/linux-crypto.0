@@ -2,148 +2,175 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC676EE4996
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 13:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 627DFEE49A6
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 14:36:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235310AbjHUNNI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Aug 2023 09:13:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59486 "EHLO
+        id S235970AbjHUOgq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Aug 2023 10:36:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235314AbjHUNM7 (ORCPT
+        with ESMTP id S235848AbjHUOgp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Aug 2023 09:12:59 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12DA5102
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 06:12:51 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99c0cb7285fso421330366b.0
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 06:12:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692623569; x=1693228369;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ph4bj2JE9yzl4L+Z7YlL2YAhIXL0uO8/2XI9ntDToVQ=;
-        b=l3oOXCGGKIiNhVVOlEdUewd/pmvcytIseBPXpgOdpkQcQ8thjGggHgxO6SgeTjYdh/
-         Egbmj8KyYS9b0Ml3zehz/FNy2ccVIBDmidw77jIUO3UxVNLyCFPqkg1TU6AVowYNaxbk
-         7Re97yiggHYJLaVWGJtA/5XtTlOV+hOajq9MIpbJP9ouYdXIp2IB6OxybJSacgq70GLv
-         nWXUXx1Lc4T/JOJAR/BZbsrm3K6ZaiyczBZUZC0r0PolzeSZY2pQiIzPJetJYNzYOsKC
-         z5SZ0/NBdGoTFnqRfdv094jDhnmQvIDkn99/TqEE+MfHXSmpDflPXlDVQsbjvSyDwfoZ
-         Qh3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692623569; x=1693228369;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ph4bj2JE9yzl4L+Z7YlL2YAhIXL0uO8/2XI9ntDToVQ=;
-        b=NpPj7Ba7XkcAnMVvQqzhvDzKipzj+eUxY5OBdiJEf0121tw1MmdblSKTeKgZqOrJRr
-         Mz6mC0Y4WYTHnEmzFb1NekZIqg0cOIFWH5oR6+mcxkiDxqaxHjGx+TJhkxnvixnowSbJ
-         u9MNbBlKfl0LeeRh1uIwTEJ3Ft2++zkqPdqYxkX5o6kM63jYqH2TtxJp3Zlx1IxGSNE3
-         YMNc2KFcfSaxCFiahduVz94adyS0gf7WN7MtAcscAyUvp1ASLXQBdEgU294Rv5mAPfjJ
-         GaMTAbixUC/umZ7Nxfc+j7i3bcWxpq2Jl3N9T8PK7+60rsXcxn7dO4LPEmaGQbjM2qnz
-         mcEQ==
-X-Gm-Message-State: AOJu0YzOAu8WtkFVevN4rD1LYH84jSPKmX/DSoxZFhJG64SeKqEm867j
-        oLdY9ZZtU3GzNXGTR+wMQ2JbNg==
-X-Google-Smtp-Source: AGHT+IH+3SmODhee1b7JSmRuMG8rb8itCh0JRCEBqsSoEyQCgOdF9obSTVQzCaITVsL+R6gKVO4F1Q==
-X-Received: by 2002:a17:906:21c:b0:99e:13f6:8a5a with SMTP id 28-20020a170906021c00b0099e13f68a5amr4759565ejd.20.1692623569387;
-        Mon, 21 Aug 2023 06:12:49 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id lw26-20020a170906bcda00b00993a37aebc5sm6438076ejb.50.2023.08.21.06.12.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Aug 2023 06:12:48 -0700 (PDT)
-Message-ID: <342de8f3-852f-9bfa-39c4-4d820f349305@linaro.org>
-Date:   Mon, 21 Aug 2023 15:12:47 +0200
+        Mon, 21 Aug 2023 10:36:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01CF8E2
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 07:36:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 79B8561A17
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 14:36:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE7B6C433C8
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 14:36:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692628602;
+        bh=rhJXoGtKmdSiSlFzUhoJCM+jVNFK1EdabB2iDQghH3s=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=EdtVf/g2X7jdUUagVyWv/LU/h0Og+JGuERVLRZ+/jr9Kv+O/1qUpsrvVSSUf4+UOL
+         YVHibS4gqVI508dpNI2F2jZSdAb9nQFUvsFcrKdPiHC01nXlq1Rh1WYwi3F02rPSdl
+         SsEzV7+OckMH/rFCdqIVMfydv886fEjyM8q4QRbIRcNO1PEaWoncDpfX0HkGMofvf3
+         hzVWMsCrZJx8oySpt8Pv/kty66xy/RgGVirUYyh0KdcWnHtNt3h4z2SQQeWIeVv2OP
+         dCwPOGczC7trjN0mbjiUu6e6wHQ+1YqAKUGHmfiE0fnvHUlu0fWt1DP6KfYloPf76q
+         MBYuwq3AKD6zQ==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-4ff8cf11b90so5203949e87.1
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 07:36:42 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyfQ1QHnw1F99dInGv5sbwhe8lEjSTPsNjxRyRcS7FYWMNZKe9h
+        pczltbGQzhz6Q2WrQDdqtp/epB3VggaCQq6JqOA=
+X-Google-Smtp-Source: AGHT+IFsgUbPE9vPoryh1sd/8gYDg8SHEm7MoPC+fsQI99DHlsC/Mo0CDg4R5ybzwlQP5FGVkHe/cPY5+o2j3sb5jlw=
+X-Received: by 2002:a05:6512:2303:b0:4f8:6a29:b59b with SMTP id
+ o3-20020a056512230300b004f86a29b59bmr5155024lfu.64.1692628600881; Mon, 21 Aug
+ 2023 07:36:40 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH v3 11/50] dt-bindings: crypto: add sam9x7 in Atmel TDES
-Content-Language: en-US
-To:     Tudor Ambarus <tudor.ambarus@linaro.org>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Varshini.Rajendran@microchip.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        alexandre.belloni@bootlin.com, claudiu.beznea@microchip.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20230728102442.265820-1-varshini.rajendran@microchip.com>
- <09bd1388-02aa-32c7-319e-d7150a0f3e9c@linaro.org>
- <1ec901d0-44c2-1d28-5976-d93abfffee67@microchip.com>
- <37782447-43c7-50f9-b9b4-5fbca94ce8c6@linaro.org>
- <96033a59-a2ea-c906-a033-84119c5783d7@linaro.org>
- <adeed0b2-e09b-78cf-ebfd-08d3949ca9ea@microchip.com>
- <57e9a9ff-26ed-62d1-91f8-cd5596f1c308@linaro.org>
- <5235260c-8fd6-2b2a-58b9-703191fff526@linaro.org>
- <697712da-bff9-4621-28ac-9c9f68a76e43@linaro.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <697712da-bff9-4621-28ac-9c9f68a76e43@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230811140749.5202-1-qianweili@huawei.com> <20230811140749.5202-2-qianweili@huawei.com>
+ <ZN8oEpUBq87m+r++@gondor.apana.org.au> <CAMj1kXGNesF91=LScsDSgMx7LwQXOuMjLy7RN5SPLjO3ab7SHA@mail.gmail.com>
+ <ZOBBH/XS7Fe0yApm@gondor.apana.org.au> <CAMj1kXHd6svuQ-JSVmUZK=xUPR4fC4BCoUjMhFKfg2KBZcavrw@mail.gmail.com>
+ <ZOMeKhMOIEe+VKPt@gondor.apana.org.au> <20230821102632.GA19294@willie-the-truck>
+ <9ef5b6c6-64b7-898a-d020-5c6075c6a229@huawei.com>
+In-Reply-To: <9ef5b6c6-64b7-898a-d020-5c6075c6a229@huawei.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 21 Aug 2023 16:36:29 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXH5YWZ1i0=1MVo0kaxSbQWFF6QyGvLUv_K5mqApASzy5w@mail.gmail.com>
+Message-ID: <CAMj1kXH5YWZ1i0=1MVo0kaxSbQWFF6QyGvLUv_K5mqApASzy5w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/7] crypto: hisilicon/qm - obtain the mailbox
+ configuration at one time
+To:     Weili Qian <qianweili@huawei.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        shenyang39@huawei.com, liulongfang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 21/08/2023 15:00, Tudor Ambarus wrote:
-> 
-> 
-> On 8/21/23 13:10, Krzysztof Kozlowski wrote:
->> On 21/08/2023 11:54, Tudor Ambarus wrote:
->>>>>>> I am aware that there is no change in the crypto IP used. This patch is
->>>>
->>>> Actually, recent history showed us that it's not only the IP itself but
->>>> its integration into final product that could have an influence on the
->>>> behavior.
->>>>
->>>>>>> to add a SoC specific compatible as expected by writing-bindings
->>>>>>> guideline. Maybe a bit more explanation in the commit description might
->>>>>>> do the trick.
->>>>>>>
->>>>>>
->>>>>> So you add a compatible that will never be used just to comply with
->>>>>> the writing bindings guideline?
->>>>>
->>>>> How do you know that it is never going to be used? The guideline asks
->>>
->>> See
->>> https://git.kernel.org/pub/scm/linux/kernel/git/at91/linux.git/tree/drivers/crypto/atmel-tdes.c?h=at91-dt#n1120
->>
->> What's there? One compatible? How does it prove that it will not be
->> used? It only proves that currently it is not used... And anyway this is
-> 
-> Correct, as of now the compatible was not used to determine the hw caps,
-> the capabilities were retrieved by checking at runtime a version
-> register. I'm against adding a compatible that will not be used, in this
-> particular case, defining "microchip,sam9x7-tdes" in the driver but
-> still solely relying on the runtime version register interrogation.
-> Unfortunately the commit message does not reveal any intention and from
-> there these emails changed. Maybe it's just a matter of personal
-> preference, so I'll stop commenting on this.
+On Mon, 21 Aug 2023 at 14:45, Weili Qian <qianweili@huawei.com> wrote:
+>
+>
+>
+> On 2023/8/21 18:26, Will Deacon wrote:
+> > On Mon, Aug 21, 2023 at 04:19:54PM +0800, Herbert Xu wrote:
+> >> On Sat, Aug 19, 2023 at 09:33:18AM +0200, Ard Biesheuvel wrote:
+> >>>
+> >>> No, that otx2_write128() routine looks buggy, actually, The ! at the
+> >>> end means writeback, and so the register holding addr will be
+> >>> modified, which is not reflect in the asm constraints. It also lacks a
+> >>> barrier.
+> >>
+> >> OK.  But at least having a helper called write128 looks a lot
+> >> cleaner than just having unexplained assembly in the code.
+> >
+> > I guess we want something similar to how writeq() is handled on 32-bit
+> > architectures (see include/linux/io-64-nonatomic-{hi-lo,lo-hi}.h.
+> >
+> > It's then CPU-dependent on whether you get atomicity.
+> >
+> > Will
+> > .
+> >
+>
+> Thanks for the review.
+>
+> Since the HiSilicon accelerator devices are supported only on the ARM64 platform,
+> the following 128bit read and write interfaces are added to the driver, is this OK?
 
-Hm, thanks for bringing this up, indeed it looks a bit redundant to have
-additional compatible strings if HW can identify itself. In such case,
-pretty often a generic compatible in the driver and DTS could do... but:
+No, this does not belong in the driver. As Will is suggesting, we
+should define some generic helpers for this, and provide an arm64
+implementation if the generic one does not result in the correct
+codegen.
 
-1. Adding specific compatibles for such case would have sense to be able
-to validate differences between DTS (like clocks, resets and power domains).
+>
+> #if defined(CONFIG_ARM64)
+> static void qm_write128(void __iomem *addr, const void *buffer)
+> {
+>         unsigned long tmp0 = 0, tmp1 = 0;
+>
+>         asm volatile("ldp %0, %1, %3\n"
+>                      "stp %0, %1, %2\n"
+>                      "dmb oshst\n"
+>                      : "=&r" (tmp0),
+>                      "=&r" (tmp1),
+>                      "+Q" (*((char __iomem *)addr))
 
-2. Reading HW revision might require enabling clocks which might differ
-per variant, thus driver still might need to match according to some
-compatibles. After that matching, driver can get necessary clocks,
-enable them and read the HW version/revision. There is an example for this:
-Documentation/devicetree/bindings/cache/qcom,llcc.yaml
-drivers/soc/qcom/llcc-qcom.c
-We have there version of the block but clocks and register layout
-differ, thus we must have device-specific compatibles.
+This constraint describes the first byte of addr, which is sloppy but
+probably works fine.
 
-> 
->> just one implementation in one system. How can you possibly know all
->> other possible implementations (other bootloaders/firmwares/systems)?
->> One cannot. The guideline is there for specific reason.
->>
-> 
-> I didn't say the guideline is wrong, I just tried to understand how this
-> particular case is handled.
->>
+>                      : "Q" (*((char *)buffer))
 
-Best regards,
-Krzysztof
+This constraint describes the first byte of buffer, which might cause
+problems because the asm reads the entire buffer not just the first
+byte.
 
+>                      : "memory");
+> }
+>
+> static void qm_read128(void *buffer, const void __iomem *addr)
+> {
+>         unsigned long tmp0 = 0, tmp1 = 0;
+>
+>         asm volatile("ldp %0, %1, %3\n"
+>                      "stp %0, %1, %2\n"
+>                      "dmb oshst\n"
+
+Is this the right barrier for a read?
+
+>                      : "=&r" (tmp0),
+>                        "=&r" (tmp1),
+>                        "+Q" (*((char *)buffer))
+>                      : "Q" (*((char __iomem *)addr))
+>                      : "memory");
+> }
+>
+> #else
+> static void qm_write128(void __iomem *addr, const void *buffer)
+> {
+>
+> }
+>
+> static void qm_read128(void *buffer, const void __iomem *addr)
+> {
+>
+> }
+> #endif
+>
+
+Have you tried using __uint128_t accesses instead?
+
+E.g., something like
+
+static void qm_write128(void __iomem *addr, const void *buffer)
+{
+    volatile __uint128_t *dst = (volatile __uint128_t __force *)addr;
+    const __uint128_t *src __aligned(1) = buffer;
+
+    WRITE_ONCE(*dst, *src);
+    dma_wmb();
+}
+
+should produce the right instruction sequence, and works on all
+architectures that have CONFIG_ARCH_SUPPORTS_INT128=y
+
+This needs a big fat comment describing that the MMIO access needs to
+be atomic, but we could consider it as a fallback if we decide not to
+bother with special MMIO accessors, although I suspect we'll be
+needing them more widely at some point anyway.
