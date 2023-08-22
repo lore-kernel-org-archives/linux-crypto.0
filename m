@@ -2,63 +2,61 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15130EE49A4
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 15:29:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DC3EE49A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 16:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237108AbjHVP3Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Aug 2023 11:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
+        id S237480AbjHVQES (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Aug 2023 12:04:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237112AbjHVP3Z (ORCPT
+        with ESMTP id S234107AbjHVQES (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2023 11:29:25 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AAE10CC
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 08:29:00 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99c1f6f3884so601373666b.0
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 08:29:00 -0700 (PDT)
+        Tue, 22 Aug 2023 12:04:18 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233C6CDA
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 09:04:12 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50079d148aeso4265899e87.3
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 09:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692718138; x=1693322938;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1692720250; x=1693325050;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=riCUTte2KwgQTf0uug7M8nFjfmUWA0ZM7Rw0YBzTJ94=;
-        b=v4O8cGKSnt2n+DNt9sASR+Hx6cTgwCB36bVGmHRtK9MqxG15rhCxKFq/V7hWigYvrs
-         lKkTkSnetHB/St5a4CUQ9GQZS4XE6xZEgHXXBOBFmoXO+OZ/VWkrXxpzDeS7+BlP/Msc
-         tiBwdsbl4rtOHa3bPgJT/JNa/ydLkpuFoM/DUsX2FXr1xEknj701C4+iMt5Yx2TRjl/s
-         oXANLd3ywPqkwGeTjARhhHDCmII+t+cyu7ynkkkNqNrnrr/jCZUH76Sgl6uUlETOBkqF
-         A+ZbN7JamJlaCA8kV9huOa5r1d3bEMlLPZaA2LAyd2s/Tky5X1OMY4G1SXIr+twj9JcG
-         ILfw==
+        bh=UWA94XnCPwc1Vc7JP385yq44AVNqbMwIkEe1X41KkFg=;
+        b=jDnBCB9jctd4R65jLQdKSjHgyuUUZ+scXR02YET0yz7EGdaLhAjLhdmhJojXkkYdlF
+         hgzFlpDk23ot359Rdpe2cGH+vbCRfm3SUOMzWnQaQvKdDVAT1e3uZyyYRlFWX2WnjhBc
+         dksGZsHkRzXDjV2mnJ8AT5XUHVG36vo0sUzB4WH9Cr3RB4WyNbAKLYegvRJvDx8EhJ2I
+         WiFt37NndNF/dbdaAs5E1pWM3ci46KMuLviI17Yt1HQYV7tfe26ZUDnLLbZwixsiKVNZ
+         z1p0LkDqQI+LmAV5Rl2GnIn8WH5eBM+mya2EQuSjbnsnEJ2bFQqb94ltk0VqR62Ke2xR
+         mBVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692718138; x=1693322938;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1692720250; x=1693325050;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=riCUTte2KwgQTf0uug7M8nFjfmUWA0ZM7Rw0YBzTJ94=;
-        b=UcUKJ4/GFbj/VxlhlZUygtuT/fs7dz4gaJetbxFBok9S0vcsLeOoBAZ7QrLj+g3O4d
-         uVny+TNZaPqY24T8QwEITNwYUUMdioCyvCqS+l7/WOiygdZsXuCMkE7PEoSalS288QUE
-         xDiR6/+T+v6nJVhpu7GTYq5OKBGNkYApYiJv/E7IKwgZ/Rchy63ILZty1apYUjgy+H5i
-         6UV+t9Y4D2aImSF6O+T4XrL3LWlqPGeuQr8RbBx0LyyUG8B+M76W07WNZ7Sg8NTMzbUb
-         1frqhZ2neOyXJPt2nCGyhMQ0WsDYl4Nag98Ub0G5OBKKgbQa2Dio4WYcidaUneONSKqF
-         9lWA==
-X-Gm-Message-State: AOJu0Yxibg62e1yShWvn7RHilxCfo+wNSL7/1M9rDqPwP8JvrC264qU4
-        uWLLjj2GX6R8w5tUYSQFJU61RQ==
-X-Google-Smtp-Source: AGHT+IGu8FIe9AS50nTf9oIl5I4jY7m5Jzrz+yG59/b26Lg38Fc6IBWuOUcOD2aQyIFcCaiNvGZdcA==
-X-Received: by 2002:a17:907:770f:b0:9a1:8b23:3c88 with SMTP id kw15-20020a170907770f00b009a18b233c88mr5846641ejc.17.1692718138642;
-        Tue, 22 Aug 2023 08:28:58 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id h6-20020a1709063b4600b00992f2befcbcsm8391884ejf.180.2023.08.22.08.28.57
+        bh=UWA94XnCPwc1Vc7JP385yq44AVNqbMwIkEe1X41KkFg=;
+        b=Ak8f0gnQ5Fk++y9m2hL1MUTs8wHUT32ll3WpX46k4PYJ6pIegEw3kZrI8WVeHbS0C2
+         LIC2vS13A3gTbqCjOL6CTHnJawo5DqcFjalJUY7822VyFLciQDDnIs8jXfvpShu11Lnx
+         2IRswKCB41iBO49MUze3bDr9B7kfiSu+sY5BINd8qWF7aYF4jjLaboC4258aIkWchrpK
+         +zlWs8p3aAJu47xyVWSzV5k+r+snjCI20Aip4ZjcL+lyAnfzf43F862/FS6/q4XwQnJB
+         roZEfx3OETmZp4JiB7X7KECpnBjgpEK+2YPusnRWUdTPwLeT4MBJOpgNax2NkBwlTyLI
+         bM+g==
+X-Gm-Message-State: AOJu0YyyQibQcGz30lJRryu20kK1d+JRZBqQPjxA4KqdOYK31iWZ7Qfs
+        XZpq3z+y4FJ51CeazmCb3n6qXg==
+X-Google-Smtp-Source: AGHT+IFo3NOWmKcgkRqWofYrZBcZg+3Se1na5DdTg4+edqKFCv52fuhaOO1AZKATq9wxwjPr+R4ZtA==
+X-Received: by 2002:a05:6512:3e19:b0:4fb:8435:3efc with SMTP id i25-20020a0565123e1900b004fb84353efcmr9111611lfv.16.1692720250316;
+        Tue, 22 Aug 2023 09:04:10 -0700 (PDT)
+Received: from [192.168.1.101] (abyk189.neoplus.adsl.tpnet.pl. [83.9.30.189])
+        by smtp.gmail.com with ESMTPSA id q27-20020ac2515b000000b005008c11ca6dsm402580lfd.184.2023.08.22.09.04.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 08:28:58 -0700 (PDT)
-Message-ID: <8f2d647b-9972-deb9-e96f-779d2564ceee@linaro.org>
-Date:   Tue, 22 Aug 2023 17:28:56 +0200
+        Tue, 22 Aug 2023 09:04:09 -0700 (PDT)
+Message-ID: <26bae022-c114-4871-8715-73d7e8aeaa52@linaro.org>
+Date:   Tue, 22 Aug 2023 18:04:08 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
 Content-Language: en-US
 To:     Om Prakash Singh <quic_omprsing@quicinc.com>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
         Neil Armstrong <neil.armstrong@linaro.org>,
         Andy Gross <agross@kernel.org>,
         Bjorn Andersson <andersson@kernel.org>,
@@ -74,7 +72,42 @@ References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
  <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
  <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
  <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+From:   Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ xsFNBF9ALYUBEADWAhxdTBWrwAgDQQzc1O/bJ5O7b6cXYxwbBd9xKP7MICh5YA0DcCjJSOum
+ BB/OmIWU6X+LZW6P88ZmHe+KeyABLMP5s1tJNK1j4ntT7mECcWZDzafPWF4F6m4WJOG27kTJ
+ HGWdmtO+RvadOVi6CoUDqALsmfS3MUG5Pj2Ne9+0jRg4hEnB92AyF9rW2G3qisFcwPgvatt7
+ TXD5E38mLyOPOUyXNj9XpDbt1hNwKQfiidmPh5e7VNAWRnW1iCMMoKqzM1Anzq7e5Afyeifz
+ zRcQPLaqrPjnKqZGL2BKQSZDh6NkI5ZLRhhHQf61fkWcUpTp1oDC6jWVfT7hwRVIQLrrNj9G
+ MpPzrlN4YuAqKeIer1FMt8cq64ifgTzxHzXsMcUdclzq2LTk2RXaPl6Jg/IXWqUClJHbamSk
+ t1bfif3SnmhA6TiNvEpDKPiT3IDs42THU6ygslrBxyROQPWLI9IL1y8S6RtEh8H+NZQWZNzm
+ UQ3imZirlPjxZtvz1BtnnBWS06e7x/UEAguj7VHCuymVgpl2Za17d1jj81YN5Rp5L9GXxkV1
+ aUEwONM3eCI3qcYm5JNc5X+JthZOWsbIPSC1Rhxz3JmWIwP1udr5E3oNRe9u2LIEq+wH/toH
+ kpPDhTeMkvt4KfE5m5ercid9+ZXAqoaYLUL4HCEw+HW0DXcKDwARAQABzShLb25yYWQgRHli
+ Y2lvIDxrb25yYWQuZHliY2lvQGxpbmFyby5vcmc+wsGOBBMBCAA4FiEEU24if9oCL2zdAAQV
+ R4cBcg5dfFgFAmQ5bqwCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQR4cBcg5dfFjO
+ BQ//YQV6fkbqQCceYebGg6TiisWCy8LG77zV7DB0VMIWJv7Km7Sz0QQrHQVzhEr3trNenZrf
+ yy+o2tQOF2biICzbLM8oyQPY8B///KJTWI2khoB8IJSJq3kNG68NjPg2vkP6CMltC/X3ohAo
+ xL2UgwN5vj74QnlNneOjc0vGbtA7zURNhTz5P/YuTudCqcAbxJkbqZM4WymjQhe0XgwHLkiH
+ 5LHSZ31MRKp/+4Kqs4DTXMctc7vFhtUdmatAExDKw8oEz5NbskKbW+qHjW1XUcUIrxRr667V
+ GWH6MkVceT9ZBrtLoSzMLYaQXvi3sSAup0qiJiBYszc/VOu3RbIpNLRcXN3KYuxdQAptacTE
+ mA+5+4Y4DfC3rUSun+hWLDeac9z9jjHm5rE998OqZnOU9aztbd6zQG5VL6EKgsVXAZD4D3RP
+ x1NaAjdA3MD06eyvbOWiA5NSzIcC8UIQvgx09xm7dThCuQYJR4Yxjd+9JPJHI6apzNZpDGvQ
+ BBZzvwxV6L1CojUEpnilmMG1ZOTstktWpNzw3G2Gis0XihDUef0MWVsQYJAl0wfiv/0By+XK
+ mm2zRR+l/dnzxnlbgJ5pO0imC2w0TVxLkAp0eo0LHw619finad2u6UPQAkZ4oj++iIGrJkt5
+ Lkn2XgB+IW8ESflz6nDY3b5KQRF8Z6XLP0+IEdLOOARkOW7yEgorBgEEAZdVAQUBAQdAwmUx
+ xrbSCx2ksDxz7rFFGX1KmTkdRtcgC6F3NfuNYkYDAQgHwsF2BBgBCAAgFiEEU24if9oCL2zd
+ AAQVR4cBcg5dfFgFAmQ5bvICGwwACgkQR4cBcg5dfFju1Q//Xta1ShwL0MLSC1KL1lXGXeRM
+ 8arzfyiB5wJ9tb9U/nZvhhdfilEDLe0jKJY0RJErbdRHsalwQCrtq/1ewQpMpsRxXzAjgfRN
+ jc4tgxRWmI+aVTzSRpywNahzZBT695hMz81cVZJoZzaV0KaMTlSnBkrviPz1nIGHYCHJxF9r
+ cIu0GSIyUjZ/7xslxdvjpLth16H27JCWDzDqIQMtg61063gNyEyWgt1qRSaK14JIH/DoYRfn
+ jfFQSC8bffFjat7BQGFz4ZpRavkMUFuDirn5Tf28oc5ebe2cIHp4/kajTx/7JOxWZ80U70mA
+ cBgEeYSrYYnX+UJsSxpzLc/0sT1eRJDEhI4XIQM4ClIzpsCIN5HnVF76UQXh3a9zpwh3dk8i
+ bhN/URmCOTH+LHNJYN/MxY8wuukq877DWB7k86pBs5IDLAXmW8v3gIDWyIcgYqb2v8QO2Mqx
+ YMqL7UZxVLul4/JbllsQB8F/fNI8AfttmAQL9cwo6C8yDTXKdho920W4WUR9k8NT/OBqWSyk
+ bGqMHex48FVZhexNPYOd58EY9/7mL5u0sJmo+jTeb4JBgIbFPJCFyng4HwbniWgQJZ1WqaUC
+ nas9J77uICis2WH7N8Bs9jy0wQYezNzqS+FxoNXmDQg2jetX8en4bO2Di7Pmx0jXA4TOb9TM
+ izWDgYvmBE8=
 In-Reply-To: <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
@@ -82,27 +115,27 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/08/2023 16:54, Om Prakash Singh wrote:
-> PRNG Block on most of newer target from Qualcomm have some configuration 
-> where clock is configured by security firmware.
+On 22.08.2023 16:54, Om Prakash Singh wrote:
+> PRNG Block on most of newer target from Qualcomm have some configuration where clock is configured by security firmware.
 > 
 > Adding separate compatible string for each platform is overhead.
-
-I don't think PRNG is here different than others and for all others we
-expect it. I understand that this is an overhead, like every work is
-overhead.
-
 > 
-> We need to introduce common compatible string that can be used for all 
-> platforms with same configuration.
-
-It is already introduced, isn't it?
-
+> We need to introduce common compatible string that can be used for all platforms with same configuration.
 > 
-> I would suggest to use "qcom,rng-ee" for newer platform, dropping "p" 
-> also signifies it is not a Pseudo Random Number Generator.
-> 
+> I would suggest to use "qcom,rng-ee" for newer platform, dropping "p" also signifies it is not a Pseudo Random Number Generator.
+Please reply inline and don't top-post.
 
-Best regards,
-Krzysztof
 
+Is this what you're trying to say?
+
+1. sort out the clock requirements for designs where Linux manages it
+   vs where the FW does so
+
+2. introduce a new compatible for SoCs implementing a TRNG
+
+3. for SoCs in 2., register the TRNG as a hwrng device
+
+
+?
+
+Konrad
