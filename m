@@ -2,185 +2,118 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73839EE49AF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Aug 2023 20:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B63FCEE4996
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 04:27:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbjHUUrn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Aug 2023 16:47:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38808 "EHLO
+        id S232338AbjHVE1f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Aug 2023 00:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231264AbjHUUrd (ORCPT
+        with ESMTP id S230037AbjHVE1e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Aug 2023 16:47:33 -0400
-Received: from wnew2-smtp.messagingengine.com (wnew2-smtp.messagingengine.com [64.147.123.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADC891
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Aug 2023 13:47:31 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailnew.west.internal (Postfix) with ESMTP id E64682B0011E;
-        Mon, 21 Aug 2023 16:47:27 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Mon, 21 Aug 2023 16:47:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1692650847; x=1692658047; bh=Uc
-        Ca1oJRtOpDbgPcFNAxbzQXgymu8/0CJLfNDhr/y04=; b=CUzwBP29TivIBKLdFV
-        giaIC/MM8O88y28s7pGXEe0qMeO4fhK6J0PZtUqf7NILjTg6v4BiqzAQSq2piW3i
-        mhddTCyFKsmtOIAGoh+I5RCEH/+DycWEOYsnlpCXCcc/vFIoHjur7MhS7iiLMBC/
-        ZUP/7R8+ANIc1gy+ZwXizm6W1cFe/9MX3K+RruZa/a7S+euq9XI1O3b/k71haUKZ
-        JJjrRqgcEtlcYqOMqlUzSpStAUSlubOMNsqu/6S0G6eF2LBHydqTUKOQ+ky+DCzL
-        0b8KqX2plg7Cpg1SYdyY+f7Lpknpb0dhS6jFrGk+RYVBtBIUj/4S0K0ytu7zqGVh
-        saWA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1692650847; x=1692658047; bh=UcCa1oJRtOpDb
-        gPcFNAxbzQXgymu8/0CJLfNDhr/y04=; b=VIEC0KMUu7Al8EZw5ueXB9dV3CbZ/
-        IP4FWdHq+d87gzna+OVs1ykwHVTxlKy88x/xPgrGqJl1+Y/64bDBScC0ccAutGnu
-        qXQib2H0SLQaL03Fb9U7b6I3PK1/Sm4wMoQ8ux+oDLFizIkFC/Kj1mFN9H6KfpNu
-        HuJqzpIz6mJFjlPAjVoAt8S3aXPp4nTFVRbYSK5npfeqPVDQw+bHCBRUqG1Tt9yL
-        XKe6tyHQKVH5HiEI2vx6JkFv61ssgHIqDo26uUAsPg1Go1RokWhixmVmE6B22RCT
-        nqrq7oHfuG2ghARsxl6NenWTtAtDxyoJkkVUWlKCJ+iZfiB7EL0EOEiFw==
-X-ME-Sender: <xms:Xs3jZAFjiNQg2I7dQxeTwERf9__plzelbpQUL_XTg0kuJb-uboy_OA>
-    <xme:Xs3jZJUp53GSbIEoolOfv0UdI1IH3dj9_SqnNnvzzKZvmmfrCynseyouZJMlbaSd-
-    PmsJa_rk8hz2lQqboU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudduledgudehgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
-    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:Xs3jZKLqhLGtPuMYuxYrpzxR5cMZm4wNd4QPCe3ammYlja5LhHnXOA>
-    <xmx:Xs3jZCHfoA5ReDngu5UEAkDBn8NiUKW_WVqspX00ash3ShGfRtZUtA>
-    <xmx:Xs3jZGVrpk-WDnHtVa60a4jZL3LbyGDYP-DualHIU4tTUbOXuatQ-w>
-    <xmx:X83jZEz4hpQuhdMvmDInswAXCl5xJEopzbRfVUhaUsc-e-leSFdN4bgiVWc>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 591E8B60089; Mon, 21 Aug 2023 16:47:26 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-647-g545049cfe6-fm-20230814.001-g545049cf
-Mime-Version: 1.0
-Message-Id: <1373841d-28d4-4dd5-aff5-a6f05d317317@app.fastmail.com>
-In-Reply-To: <9ef5b6c6-64b7-898a-d020-5c6075c6a229@huawei.com>
-References: <20230811140749.5202-1-qianweili@huawei.com>
- <20230811140749.5202-2-qianweili@huawei.com>
- <ZN8oEpUBq87m+r++@gondor.apana.org.au>
- <CAMj1kXGNesF91=LScsDSgMx7LwQXOuMjLy7RN5SPLjO3ab7SHA@mail.gmail.com>
- <ZOBBH/XS7Fe0yApm@gondor.apana.org.au>
- <CAMj1kXHd6svuQ-JSVmUZK=xUPR4fC4BCoUjMhFKfg2KBZcavrw@mail.gmail.com>
- <ZOMeKhMOIEe+VKPt@gondor.apana.org.au>
- <20230821102632.GA19294@willie-the-truck>
- <9ef5b6c6-64b7-898a-d020-5c6075c6a229@huawei.com>
-Date:   Mon, 21 Aug 2023 16:47:06 -0400
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Weili Qian" <qianweili@huawei.com>,
-        "Will Deacon" <will@kernel.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc:     "Ard Biesheuvel" <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-        shenyang39@huawei.com, liulongfang@huawei.com
-Subject: Re: [PATCH v2 1/7] crypto: hisilicon/qm - obtain the mailbox configuration at
- one time
-Content-Type: text/plain
+        Tue, 22 Aug 2023 00:27:34 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C21189;
+        Mon, 21 Aug 2023 21:27:32 -0700 (PDT)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37M1tVfi021558;
+        Tue, 22 Aug 2023 04:27:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=QniPCjLtVSIkZtdAeBysdSVbGht8lRNNImNVXI04g+k=;
+ b=HscGlS3HMzFbB21yhT/HjPziKGfnODraY1PaKY0YSXu+X/TCVo9xlOr4urEPXHUXg5xu
+ fgJK3le6GaqGicYC66xqAYiVILVY2eknqJz61vTVKcZhhoqwavRnluOS+pAGzox2/jTs
+ 4JlHWthE46/NLZTkMKOsgLujIxIL/0I09Jg5iro0Lc5UXgSF2Ut08gQUIvzDbGvgKGNT
+ yp18hKlX4t64yHGrYwQbZ/Iw09ldY/Hw1aVqatZ8Z/Vsq1GAfnUZ8N9nGImIyaGUhAqQ
+ zaHOOXLoGpkleOnIvxzltydaGIBP1sgbNGa8i+BNXuKwceEYuI1HVDEXaXLXOdO3rGDN qQ== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sm6uuhy3u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Aug 2023 04:27:18 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37M4RI9f032596
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 22 Aug 2023 04:27:18 GMT
+Received: from [10.218.47.181] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 21 Aug
+ 2023 21:27:13 -0700
+Message-ID: <d93902ee-c305-42cb-9d0d-1f0971ab3a70@quicinc.com>
+Date:   Tue, 22 Aug 2023 09:57:10 +0530
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: qcom,prng: Add SM8450
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        <konrad.dybcio@linaro.org>
+CC:     <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
+        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
+        <robh+dt@kernel.org>, <vkoul@kernel.org>
+References: <20230811-topic-8450_prng-v1-1-01becceeb1ee@linaro.org>
+ <20230818161720.3644424-1-quic_omprsing@quicinc.com>
+ <2c208796-5ad6-c362-dabc-1228b978ca1d@linaro.org>
+ <1cadb40e-b655-4b9b-9189-dfdb22a2c234@quicinc.com>
+ <1f492c4e-2125-73eb-8523-389e24727516@linaro.org>
+Content-Language: en-US
+From:   Om Prakash Singh <quic_omprsing@quicinc.com>
+In-Reply-To: <1f492c4e-2125-73eb-8523-389e24727516@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Lv2vqt4tLV3CPMy9_UBfTlR6HBNb0ETT
+X-Proofpoint-GUID: Lv2vqt4tLV3CPMy9_UBfTlR6HBNb0ETT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-22_02,2023-08-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ spamscore=0 clxscore=1015 malwarescore=0 adultscore=0 lowpriorityscore=0
+ suspectscore=0 mlxscore=0 priorityscore=1501 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2308220034
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 21, 2023, at 08:45, Weili Qian wrote:
-> On 2023/8/21 18:26, Will Deacon wrote:
->> On Mon, Aug 21, 2023 at 04:19:54PM +0800, Herbert Xu wrote:
 
-> Thanks for the review.
+
+On 8/21/2023 11:37 AM, Krzysztof Kozlowski wrote:
+> On 21/08/2023 02:52, Om Prakash Singh wrote:
+>> I meant first one. using "qcom,rng-ee".
+> 
+> Then please provide some reasons.
+> 
+New IP block available on SM8450 and newer platform is true random 
+number generator with it's entropy source. Also it is NIST SP800 90B 
+compliant.
+By introducing "qcom,rng-ee" I am also planning to add hwrng support in 
+driver.
+
+>>
+>> I am looking for generic compatible string for all SoCs for which core
+>> clock can be optional, same as we have "qcom,prng-ee".
+> 
+> There is a generic compatible already... but anyway, is the clock really
+> optional? Or just configured by firmware?
 >
-> Since the HiSilicon accelerator devices are supported only on the ARM64 
-> platform,
-> the following 128bit read and write interfaces are added to the driver, 
-> is this OK?
->
-> #if defined(CONFIG_ARM64)
-> static void qm_write128(void __iomem *addr, const void *buffer)
-> {
+Clock is configured using security firmware.
 
-The naming makes it specific to the driver, which is not
-appropriate for a global definition. Just follow the
-generic naming. I guess you wouldn't have to do both
-the readl/writel and the ioread32/iowrite32 variants, so
-just start with the ioread/iowrite version. That also
-avoids having to come up with a new letter.
-
-You have the arguments in the wrong order compared to iowrite32(),
-which is very confusing.
-
-Instead of the pointer to the buffer, I'd suggest passing the
-value by value here, to make it behave like the other ones.
-
-This does mean it won't build on targets that don't
-define u128, but I think we can handle that in a Kconfig
-symbol.
-
-> unsigned long tmp0 = 0, tmp1 = 0;
-
-Don't initialize local variable to zero, that is generally
-a bad idea because it hides cases where they are not
-initialized properly.
-
-> 	asm volatile("ldp %0, %1, %3\n"
-> 		     "stp %0, %1, %2\n"
-
-This is missing the endian-swap for big-endian kernels.
-
-> 		     "dmb oshst\n"
-
-You have the barrier at the wrong end of the helper, it
-needs to before the actual store to have the intended
-effect.
-
-Also, you should really use the generic __io_bw() helper
-rather than open-coding it.
-
-> 		     : "=&r" (tmp0),
-> 		     "=&r" (tmp1),
-
-The tmp0/tmp1 registers are technically a clobber, not
-an in/out, though ideally these should be turned
-into inputs.
-
-> 		     "+Q" (*((char __iomem *)addr))
-> 		     : "Q" (*((char *)buffer))
-
-wrong length
-
-> 		     : "memory");
-> }
-
-The memory clobber is usually part of the barrier.
-
-> static void qm_read128(void *buffer, const void __iomem *addr)
-> {
-> 	unsigned long tmp0 = 0, tmp1 = 0;
->
-> 	asm volatile("ldp %0, %1, %3\n"
-> 		     "stp %0, %1, %2\n"
-> 		     "dmb oshst\n"
-> 		     : "=&r" (tmp0),
-> 		       "=&r" (tmp1),
-> 		       "+Q" (*((char *)buffer))
-> 		     : "Q" (*((char __iomem *)addr))
-> 		     : "memory");
-> }
-
-Same thing, but you are missing the control dependency
-from __io_ar() here, rather than just open-coding it.
-
-> #else
-> static void qm_write128(void __iomem *addr, const void *buffer)
-> {
->
-> }
-
-This is missing the entire implementation?
-
-      Arnd
+>>
+>> If we are using SoC name in compatible string, for each SoC support we
+>> need to update qcom,prng.yaml file.
+> 
+> So you were talking about second case from my email? Still not sure what
+> you want to propose, but just in case - please always follow DT bindings
+> guidelines:
+> 
+> https://elixir.bootlin.com/linux/v6.1-rc1/source/Documentation/devicetree/bindings/writing-bindings.rst#L42
+> 
+> Best regards,
+> Krzysztof
+> 
