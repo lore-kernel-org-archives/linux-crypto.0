@@ -2,64 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98709EE4993
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 14:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A57B9EE49AA
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 14:28:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235273AbjHVOQE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Aug 2023 10:16:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
+        id S235431AbjHVO2e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Aug 2023 10:28:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234189AbjHVOQD (ORCPT
+        with ESMTP id S236683AbjHVO2e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2023 10:16:03 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BC9FE69
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 07:15:39 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-986d8332f50so606919766b.0
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 07:15:39 -0700 (PDT)
+        Tue, 22 Aug 2023 10:28:34 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16D41BE
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 07:28:31 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2bbbda48904so52587091fa.2
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 07:28:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692713701; x=1693318501;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=linaro.org; s=google; t=1692714510; x=1693319310;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=D4DLw6XTDNAFhNatfRk3x0GOB+7FFuPg6TdBFTu2R8A=;
-        b=cDXis1/9H6ga7sfX51c8LBRsidPkDZkz1BEcyY8+qJTAK9S3d4wKzr4/c0cy/vz0OK
-         iEznciWJg79AlOYok0rFH+OJGQFoKVgsEnQN3ARU0z20D88z2342aIk1EmlbEW1SwyoN
-         bykzjZHwR4b/pOhGqUpcr4oc6QBqkFg7r5haNdmvKg0Vn/NZBZNa6a1jDyk+a9yUyxzq
-         ULV+8Eb2nvIxVqujpO75IZlmRsEPuBI/3fupDYmyZmnCULz9zcRnLcjyZZ/zwXjTr1GR
-         0sr7nhxBF/5hvEnVdQKSD/2nWm6K12Op6xvTJTIb9vOLD5JXqJYzKhqsG6ApXn913yys
-         VgAQ==
+        bh=Z6m+SzFKTv2Tag263RRMmbLh2Idtb1nYuTKW8/fsxnY=;
+        b=WlRYf2DCVLTkQdC1lBch1z+EHZCAXcHhx9enJ8bAB6PN/2olhZWqE7J6mjKbiKtSgJ
+         iP+GRspXw27AA0640tVnMGVYGJXjwZaXLYCDorAu+l2MdXNuiGEbD59FGDhhF30lkVFX
+         tlMOMqZo3zCiUYm3NpZxiyHli/b6ocWFkbQVu956/Bn3VMQWMgBgT7JLVKjNNmPHnRV6
+         dPQeATTNnGa8ywgLnKoBpHe7+e4D6ocKjfXwqGrxdNKOBT1gtwocohUhencdCdF+LWec
+         s63p1X0+Q6i9+lK8q/CENY+uEJAiQwOK+zcRwdUNhpbGw2JuQhya/LjX0FY6zo1laJoX
+         iNYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692713701; x=1693318501;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1692714510; x=1693319310;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D4DLw6XTDNAFhNatfRk3x0GOB+7FFuPg6TdBFTu2R8A=;
-        b=OTNdLo2yzoi8NEZn8HOK8b843jKTdEdBf4anx9HGLcrcQog7Ykw5mFyNq3LsZRcUpm
-         q0PbQ9lhsemqfFahbo/tAGOP0QwpJgoulAn4joLqkX3MhPYFAx44NTtLzs4JYu7WhtFA
-         JvLgJhevrlAOu6YjiUhSp763l+8/K+K6eZo+w7tDkIIxA8T4N9FvTJ5SMP9f9qStPoCT
-         WQvVOHHE16LscfUWquGnuAVBB+FaS+c0j1KOZztr3yrxgeEkuvnu87Ca+rAa69P34ucY
-         OcmloLWXPQd/0NjmKuMCerNZ4ho7caqm0N8nOarGRvF49U/74dNH9U5Yh2WdQU19MV3i
-         pwbQ==
-X-Gm-Message-State: AOJu0Yxms4mE5PCB5+kbIQZkytp04hb4udNqygqwZGnJnGEYQnccVU5s
-        JqsKVUqKFjgfDn9q2ATKeCK2Vw==
-X-Google-Smtp-Source: AGHT+IFpvCuJdRyZJXLEO9jFQ8C+LPqwdFfkcO2XBT81TVq+cEzqj96fiZjcq1dGZMebinCHVXfnjA==
-X-Received: by 2002:a17:906:8477:b0:993:dcca:9607 with SMTP id hx23-20020a170906847700b00993dcca9607mr7851132ejc.2.1692713700828;
-        Tue, 22 Aug 2023 07:15:00 -0700 (PDT)
-Received: from [192.168.0.22] ([77.252.47.198])
-        by smtp.gmail.com with ESMTPSA id w20-20020a170906b19400b0098f33157e7dsm8246078ejy.82.2023.08.22.07.14.59
+        bh=Z6m+SzFKTv2Tag263RRMmbLh2Idtb1nYuTKW8/fsxnY=;
+        b=UtYZiAaYtodgPQnqvsiMlROT5fywYtH4qLH4ko+TjW8lklUzb2dgT5VvSo+suJ/14s
+         k+YkSUv1crsN+qPGugAT1Q7pyVgH+5N4YMIbTHL2gBZkErPOii1q5ksBnP8tGNP7z0xk
+         Qkwj5k3shFvRLFlG0aFkpAapixkvZ5C00z+aX6HaZkfArwkXE2jL0eJQX5lIsNzXEmfp
+         tKUr4SEkXv5YHCvUmdf5TWYWhuX6ZTFZNbN6RfpFLzEMixL75eFqEJY9BuRYOLwgDDMF
+         t1nz65wsbiiukkjmb8z3Gw0SRknMED+eIdgCGcSjJ9H3LjZdRfgzPAmJS+z+6UTtvzVU
+         MIPQ==
+X-Gm-Message-State: AOJu0YyrEgV/XcVTZFdLbg+v7q+IaCYn2ifHayznKIEsMcFcCPg22U89
+        kURGmQ2M+pmKGeOfN0ahAaxFAA==
+X-Google-Smtp-Source: AGHT+IF8HzY+ZXzIzVjiy4rDPe+iHmMVC5j2WROM7w9f5BSm3VVaVYYvVjzMkLl5xXscXr7Qepurqw==
+X-Received: by 2002:a2e:8053:0:b0:2bc:d7d6:2588 with SMTP id p19-20020a2e8053000000b002bcd7d62588mr276857ljg.17.1692714509901;
+        Tue, 22 Aug 2023 07:28:29 -0700 (PDT)
+Received: from [192.168.1.101] (abyk189.neoplus.adsl.tpnet.pl. [83.9.30.189])
+        by smtp.gmail.com with ESMTPSA id v16-20020a2e9f50000000b002b9fddc6d85sm2690871ljk.62.2023.08.22.07.28.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 07:15:00 -0700 (PDT)
-Message-ID: <96750636-9159-5104-894a-8894a5f70b7a@linaro.org>
-Date:   Tue, 22 Aug 2023 16:14:59 +0200
+        Tue, 22 Aug 2023 07:28:29 -0700 (PDT)
+Message-ID: <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
+Date:   Tue, 22 Aug 2023 16:28:28 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
+Content-Language: en-US
 To:     Neil Armstrong <neil.armstrong@linaro.org>,
         Andy Gross <agross@kernel.org>,
         Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
@@ -67,11 +66,46 @@ To:     Neil Armstrong <neil.armstrong@linaro.org>,
         Conor Dooley <conor+dt@kernel.org>,
         Vinod Koul <vkoul@kernel.org>
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Om Prakash Singh <quic_omprsing@quicinc.com>
 References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
  <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
-Content-Language: en-US
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+From:   Konrad Dybcio <konrad.dybcio@linaro.org>
+Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
+ xsFNBF9ALYUBEADWAhxdTBWrwAgDQQzc1O/bJ5O7b6cXYxwbBd9xKP7MICh5YA0DcCjJSOum
+ BB/OmIWU6X+LZW6P88ZmHe+KeyABLMP5s1tJNK1j4ntT7mECcWZDzafPWF4F6m4WJOG27kTJ
+ HGWdmtO+RvadOVi6CoUDqALsmfS3MUG5Pj2Ne9+0jRg4hEnB92AyF9rW2G3qisFcwPgvatt7
+ TXD5E38mLyOPOUyXNj9XpDbt1hNwKQfiidmPh5e7VNAWRnW1iCMMoKqzM1Anzq7e5Afyeifz
+ zRcQPLaqrPjnKqZGL2BKQSZDh6NkI5ZLRhhHQf61fkWcUpTp1oDC6jWVfT7hwRVIQLrrNj9G
+ MpPzrlN4YuAqKeIer1FMt8cq64ifgTzxHzXsMcUdclzq2LTk2RXaPl6Jg/IXWqUClJHbamSk
+ t1bfif3SnmhA6TiNvEpDKPiT3IDs42THU6ygslrBxyROQPWLI9IL1y8S6RtEh8H+NZQWZNzm
+ UQ3imZirlPjxZtvz1BtnnBWS06e7x/UEAguj7VHCuymVgpl2Za17d1jj81YN5Rp5L9GXxkV1
+ aUEwONM3eCI3qcYm5JNc5X+JthZOWsbIPSC1Rhxz3JmWIwP1udr5E3oNRe9u2LIEq+wH/toH
+ kpPDhTeMkvt4KfE5m5ercid9+ZXAqoaYLUL4HCEw+HW0DXcKDwARAQABzShLb25yYWQgRHli
+ Y2lvIDxrb25yYWQuZHliY2lvQGxpbmFyby5vcmc+wsGOBBMBCAA4FiEEU24if9oCL2zdAAQV
+ R4cBcg5dfFgFAmQ5bqwCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQR4cBcg5dfFjO
+ BQ//YQV6fkbqQCceYebGg6TiisWCy8LG77zV7DB0VMIWJv7Km7Sz0QQrHQVzhEr3trNenZrf
+ yy+o2tQOF2biICzbLM8oyQPY8B///KJTWI2khoB8IJSJq3kNG68NjPg2vkP6CMltC/X3ohAo
+ xL2UgwN5vj74QnlNneOjc0vGbtA7zURNhTz5P/YuTudCqcAbxJkbqZM4WymjQhe0XgwHLkiH
+ 5LHSZ31MRKp/+4Kqs4DTXMctc7vFhtUdmatAExDKw8oEz5NbskKbW+qHjW1XUcUIrxRr667V
+ GWH6MkVceT9ZBrtLoSzMLYaQXvi3sSAup0qiJiBYszc/VOu3RbIpNLRcXN3KYuxdQAptacTE
+ mA+5+4Y4DfC3rUSun+hWLDeac9z9jjHm5rE998OqZnOU9aztbd6zQG5VL6EKgsVXAZD4D3RP
+ x1NaAjdA3MD06eyvbOWiA5NSzIcC8UIQvgx09xm7dThCuQYJR4Yxjd+9JPJHI6apzNZpDGvQ
+ BBZzvwxV6L1CojUEpnilmMG1ZOTstktWpNzw3G2Gis0XihDUef0MWVsQYJAl0wfiv/0By+XK
+ mm2zRR+l/dnzxnlbgJ5pO0imC2w0TVxLkAp0eo0LHw619finad2u6UPQAkZ4oj++iIGrJkt5
+ Lkn2XgB+IW8ESflz6nDY3b5KQRF8Z6XLP0+IEdLOOARkOW7yEgorBgEEAZdVAQUBAQdAwmUx
+ xrbSCx2ksDxz7rFFGX1KmTkdRtcgC6F3NfuNYkYDAQgHwsF2BBgBCAAgFiEEU24if9oCL2zd
+ AAQVR4cBcg5dfFgFAmQ5bvICGwwACgkQR4cBcg5dfFju1Q//Xta1ShwL0MLSC1KL1lXGXeRM
+ 8arzfyiB5wJ9tb9U/nZvhhdfilEDLe0jKJY0RJErbdRHsalwQCrtq/1ewQpMpsRxXzAjgfRN
+ jc4tgxRWmI+aVTzSRpywNahzZBT695hMz81cVZJoZzaV0KaMTlSnBkrviPz1nIGHYCHJxF9r
+ cIu0GSIyUjZ/7xslxdvjpLth16H27JCWDzDqIQMtg61063gNyEyWgt1qRSaK14JIH/DoYRfn
+ jfFQSC8bffFjat7BQGFz4ZpRavkMUFuDirn5Tf28oc5ebe2cIHp4/kajTx/7JOxWZ80U70mA
+ cBgEeYSrYYnX+UJsSxpzLc/0sT1eRJDEhI4XIQM4ClIzpsCIN5HnVF76UQXh3a9zpwh3dk8i
+ bhN/URmCOTH+LHNJYN/MxY8wuukq877DWB7k86pBs5IDLAXmW8v3gIDWyIcgYqb2v8QO2Mqx
+ YMqL7UZxVLul4/JbllsQB8F/fNI8AfttmAQL9cwo6C8yDTXKdho920W4WUR9k8NT/OBqWSyk
+ bGqMHex48FVZhexNPYOd58EY9/7mL5u0sJmo+jTeb4JBgIbFPJCFyng4HwbniWgQJZ1WqaUC
+ nas9J77uICis2WH7N8Bs9jy0wQYezNzqS+FxoNXmDQg2jetX8en4bO2Di7Pmx0jXA4TOb9TM
+ izWDgYvmBE8=
 In-Reply-To: <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
@@ -79,16 +113,18 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/08/2023 16:11, Neil Armstrong wrote:
+On 22.08.2023 16:11, Neil Armstrong wrote:
 > Document SM8550 compatible for Pseudo Random Generator,
 > like SM8450 doesn't require clocks setup done by the secure
 > firmware.
 > 
 > Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 > ---
++ CC Om
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+As mentioned in [1], perhaps we should rethink the compatible as
+it may be a TRNG and not a PRNG?
 
-Best regards,
-Krzysztof
+Konrad
 
+[1] https://lore.kernel.org/linux-arm-msm/d93902ee-c305-42cb-9d0d-1f0971ab3a70@quicinc.com/
