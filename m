@@ -2,140 +2,670 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DC3EE49A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 16:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A96EE49B1
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 22:41:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237480AbjHVQES (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Aug 2023 12:04:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54578 "EHLO
+        id S231331AbjHVWlg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Aug 2023 18:41:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234107AbjHVQES (ORCPT
+        with ESMTP id S231142AbjHVWlg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2023 12:04:18 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233C6CDA
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 09:04:12 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-50079d148aeso4265899e87.3
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 09:04:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692720250; x=1693325050;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UWA94XnCPwc1Vc7JP385yq44AVNqbMwIkEe1X41KkFg=;
-        b=jDnBCB9jctd4R65jLQdKSjHgyuUUZ+scXR02YET0yz7EGdaLhAjLhdmhJojXkkYdlF
-         hgzFlpDk23ot359Rdpe2cGH+vbCRfm3SUOMzWnQaQvKdDVAT1e3uZyyYRlFWX2WnjhBc
-         dksGZsHkRzXDjV2mnJ8AT5XUHVG36vo0sUzB4WH9Cr3RB4WyNbAKLYegvRJvDx8EhJ2I
-         WiFt37NndNF/dbdaAs5E1pWM3ci46KMuLviI17Yt1HQYV7tfe26ZUDnLLbZwixsiKVNZ
-         z1p0LkDqQI+LmAV5Rl2GnIn8WH5eBM+mya2EQuSjbnsnEJ2bFQqb94ltk0VqR62Ke2xR
-         mBVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692720250; x=1693325050;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWA94XnCPwc1Vc7JP385yq44AVNqbMwIkEe1X41KkFg=;
-        b=Ak8f0gnQ5Fk++y9m2hL1MUTs8wHUT32ll3WpX46k4PYJ6pIegEw3kZrI8WVeHbS0C2
-         LIC2vS13A3gTbqCjOL6CTHnJawo5DqcFjalJUY7822VyFLciQDDnIs8jXfvpShu11Lnx
-         2IRswKCB41iBO49MUze3bDr9B7kfiSu+sY5BINd8qWF7aYF4jjLaboC4258aIkWchrpK
-         +zlWs8p3aAJu47xyVWSzV5k+r+snjCI20Aip4ZjcL+lyAnfzf43F862/FS6/q4XwQnJB
-         roZEfx3OETmZp4JiB7X7KECpnBjgpEK+2YPusnRWUdTPwLeT4MBJOpgNax2NkBwlTyLI
-         bM+g==
-X-Gm-Message-State: AOJu0YyyQibQcGz30lJRryu20kK1d+JRZBqQPjxA4KqdOYK31iWZ7Qfs
-        XZpq3z+y4FJ51CeazmCb3n6qXg==
-X-Google-Smtp-Source: AGHT+IFo3NOWmKcgkRqWofYrZBcZg+3Se1na5DdTg4+edqKFCv52fuhaOO1AZKATq9wxwjPr+R4ZtA==
-X-Received: by 2002:a05:6512:3e19:b0:4fb:8435:3efc with SMTP id i25-20020a0565123e1900b004fb84353efcmr9111611lfv.16.1692720250316;
-        Tue, 22 Aug 2023 09:04:10 -0700 (PDT)
-Received: from [192.168.1.101] (abyk189.neoplus.adsl.tpnet.pl. [83.9.30.189])
-        by smtp.gmail.com with ESMTPSA id q27-20020ac2515b000000b005008c11ca6dsm402580lfd.184.2023.08.22.09.04.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Aug 2023 09:04:09 -0700 (PDT)
-Message-ID: <26bae022-c114-4871-8715-73d7e8aeaa52@linaro.org>
-Date:   Tue, 22 Aug 2023 18:04:08 +0200
+        Tue, 22 Aug 2023 18:41:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D7F3CDD;
+        Tue, 22 Aug 2023 15:41:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D5FC66331C;
+        Tue, 22 Aug 2023 22:41:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13D76C433CD;
+        Tue, 22 Aug 2023 22:41:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692744092;
+        bh=j18p9nRczmc7jkTANS/QW/bBrviEnu5HmJXmu3kshTY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=PJaBiV/tywlUkjoY8D1PZlbI3DnskUjUDu0cGmf3xBU5nrpuOHargSXwdUNkcqPOl
+         gQtcGcMBeMlFF0K8uHCTIAfeMbboqmfNTsjsvpFwk9ndkjIPnbexhktwyNrnipJWFT
+         /S701ptCkT9kmjqIK5RWqpnLUlgEDaaoYF1KVsQ4MHAQPK7DLVRTEETP2Xz4FFsefN
+         qYAqbx1yOzgtOKS51IObaNXG+sbfwMEdd2Fd2y+0soVZ2z2LwGaX79iMOmo+d21pEz
+         CIkaLosqOVjNdUx62/Pf6rp0p7dLU88i8azlGZRfp0ATRR1udkWxPHzGVK9ZS+cE0h
+         +3oYItfNwcfRA==
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-317716a4622so4457906f8f.1;
+        Tue, 22 Aug 2023 15:41:31 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyuXfyDsKVg0fIXH1VwW7NzprsWM4W/G3FixJ1j9Yr/otQQQjMt
+        hi4hTzDHo8ioERTHvQHAr/m5dOeAlc+mmVW6Lg==
+X-Google-Smtp-Source: AGHT+IFuaSgpBPM6BkfK+psopXbYzSKQ/OSb6CO/+dRRKedlE2iEfXboaY8/ToZFGc5Vqfi33qhLL69/S6kipJeRmjo=
+X-Received: by 2002:a2e:8612:0:b0:2bc:b54b:c03f with SMTP id
+ a18-20020a2e8612000000b002bcb54bc03fmr6798329lji.5.1692744069129; Tue, 22 Aug
+ 2023 15:41:09 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
-Content-Language: en-US
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
+References: <20230714174421.4054194-1-robh@kernel.org>
+In-Reply-To: <20230714174421.4054194-1-robh@kernel.org>
+From:   Rob Herring <robh@kernel.org>
+Date:   Tue, 22 Aug 2023 17:40:57 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqL_CvroupJEFwrjt8WOq=4WBxvE3sOTMnY8hEuBAMG=1g@mail.gmail.com>
+Message-ID: <CAL_JsqL_CvroupJEFwrjt8WOq=4WBxvE3sOTMnY8hEuBAMG=1g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: Explicitly include correct DT includes
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
- <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
- <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
- <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Neal Liu <neal_liu@aspeedtech.com>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@linaro.org>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Declan Murphy <declan.murphy@intel.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Jia Jie Ho <jiajie.ho@starfivetech.com>,
+        William Qiu <william.qiu@starfivetech.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Michal Simek <michal.simek@amd.com>,
+        Harsha <harsha.harsha@amd.com>
+Cc:     devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-samsung-soc@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22.08.2023 16:54, Om Prakash Singh wrote:
-> PRNG Block on most of newer target from Qualcomm have some configuration where clock is configured by security firmware.
-> 
-> Adding separate compatible string for each platform is overhead.
-> 
-> We need to introduce common compatible string that can be used for all platforms with same configuration.
-> 
-> I would suggest to use "qcom,rng-ee" for newer platform, dropping "p" also signifies it is not a Pseudo Random Number Generator.
-Please reply inline and don't top-post.
+On Fri, Jul 14, 2023 at 12:44=E2=80=AFPM Rob Herring <robh@kernel.org> wrot=
+e:
+>
+> The DT of_device.h and of_platform.h date back to the separate
+> of_platform_bus_type before it as merged into the regular platform bus.
+> As part of that merge prepping Arm DT support 13 years ago, they
+> "temporarily" include each other. They also include platform_device.h
+> and of.h. As a result, there's a pretty much random mix of those include
+> files used throughout the tree. In order to detangle these headers and
+> replace the implicit includes with struct declarations, users need to
+> explicitly include the correct includes.
+>
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+>  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c   | 1 -
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 1 -
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 1 -
+>  drivers/crypto/amlogic/amlogic-gxl-core.c           | 1 -
+>  drivers/crypto/aspeed/aspeed-acry.c                 | 3 ---
+>  drivers/crypto/atmel-aes.c                          | 6 ++----
+>  drivers/crypto/atmel-ecc.c                          | 2 +-
+>  drivers/crypto/atmel-sha.c                          | 6 ++----
+>  drivers/crypto/atmel-tdes.c                         | 6 ++----
+>  drivers/crypto/bcm/cipher.c                         | 3 +--
+>  drivers/crypto/caam/ctrl.c                          | 1 +
+>  drivers/crypto/caam/jr.c                            | 1 +
+>  drivers/crypto/caam/qi.c                            | 1 +
+>  drivers/crypto/ccree/cc_driver.c                    | 1 -
+>  drivers/crypto/exynos-rng.c                         | 2 +-
+>  drivers/crypto/gemini/sl3516-ce-core.c              | 1 -
+>  drivers/crypto/img-hash.c                           | 4 ++--
+>  drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c | 3 ++-
+>  drivers/crypto/n2_core.c                            | 2 +-
+>  drivers/crypto/omap-aes.c                           | 1 -
+>  drivers/crypto/omap-des.c                           | 2 --
+>  drivers/crypto/omap-sham.c                          | 1 -
+>  drivers/crypto/rockchip/rk3288_crypto.c             | 1 -
+>  drivers/crypto/s5p-sss.c                            | 1 -
+>  drivers/crypto/sa2ul.c                              | 3 ++-
+>  drivers/crypto/sahara.c                             | 1 -
+>  drivers/crypto/starfive/jh7110-cryp.c               | 2 +-
+>  drivers/crypto/starfive/jh7110-hash.c               | 1 -
+>  drivers/crypto/stm32/stm32-cryp.c                   | 2 +-
+>  drivers/crypto/stm32/stm32-hash.c                   | 2 +-
+>  drivers/crypto/talitos.c                            | 4 ++--
+>  drivers/crypto/xilinx/zynqmp-aes-gcm.c              | 2 +-
+>  drivers/crypto/xilinx/zynqmp-sha.c                  | 1 -
+>  33 files changed, 25 insertions(+), 45 deletions(-)
 
+Ping!
 
-Is this what you're trying to say?
-
-1. sort out the clock requirements for designs where Linux manages it
-   vs where the FW does so
-
-2. introduce a new compatible for SoCs implementing a TRNG
-
-3. for SoCs in 2., register the TRNG as a hwrng device
-
-
-?
-
-Konrad
+>
+> diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/=
+crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+> index 51a3a7b5b985..3bcfcfc37084 100644
+> --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+> +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+> @@ -14,7 +14,6 @@
+>  #include <linux/io.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <crypto/scatterwalk.h>
+>  #include <linux/scatterlist.h>
+> diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/=
+crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+> index 07ea0cc82b16..258d447765eb 100644
+> --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+> +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+> @@ -18,7 +18,6 @@
+>  #include <linux/irq.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/=
+crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+> index 3dd844b40ff7..77bddd5ebaf0 100644
+> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+> @@ -19,7 +19,6 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/a=
+mlogic/amlogic-gxl-core.c
+> index 937187027ad5..c8fa4a8bfd34 100644
+> --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
+> +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+> @@ -13,7 +13,6 @@
+>  #include <linux/irq.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <crypto/internal/skcipher.h>
+>  #include <linux/dma-mapping.h>
+> diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/=
+aspeed-acry.c
+> index 470122c87fea..d16f570c40d2 100644
+> --- a/drivers/crypto/aspeed/aspeed-acry.c
+> +++ b/drivers/crypto/aspeed/aspeed-acry.c
+> @@ -11,10 +11,7 @@
+>  #include <linux/clk.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/module.h>
+> -#include <linux/of_address.h>
+> -#include <linux/of_irq.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/mfd/syscon.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/count_zeros.h>
+> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+> index 143d33fbb316..21c8c2112c6a 100644
+> --- a/drivers/crypto/atmel-aes.c
+> +++ b/drivers/crypto/atmel-aes.c
+> @@ -28,7 +28,7 @@
+>  #include <linux/irq.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/dma-mapping.h>
+> -#include <linux/of_device.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/delay.h>
+>  #include <linux/crypto.h>
+>  #include <crypto/scatterwalk.h>
+> @@ -2533,13 +2533,11 @@ static void atmel_aes_get_cap(struct atmel_aes_de=
+v *dd)
+>         }
+>  }
+>
+> -#if defined(CONFIG_OF)
+>  static const struct of_device_id atmel_aes_dt_ids[] =3D {
+>         { .compatible =3D "atmel,at91sam9g46-aes" },
+>         { /* sentinel */ }
+>  };
+>  MODULE_DEVICE_TABLE(of, atmel_aes_dt_ids);
+> -#endif
+>
+>  static int atmel_aes_probe(struct platform_device *pdev)
+>  {
+> @@ -2687,7 +2685,7 @@ static struct platform_driver atmel_aes_driver =3D =
+{
+>         .remove         =3D atmel_aes_remove,
+>         .driver         =3D {
+>                 .name   =3D "atmel_aes",
+> -               .of_match_table =3D of_match_ptr(atmel_aes_dt_ids),
+> +               .of_match_table =3D atmel_aes_dt_ids,
+>         },
+>  };
+>
+> diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+> index 432beabd79e6..590ea984c622 100644
+> --- a/drivers/crypto/atmel-ecc.c
+> +++ b/drivers/crypto/atmel-ecc.c
+> @@ -14,7 +14,7 @@
+>  #include <linux/init.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/of.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/slab.h>
+>  #include <linux/workqueue.h>
+> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+> index 6bef634d3c86..b791be63d84b 100644
+> --- a/drivers/crypto/atmel-sha.c
+> +++ b/drivers/crypto/atmel-sha.c
+> @@ -28,7 +28,7 @@
+>  #include <linux/irq.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/dma-mapping.h>
+> -#include <linux/of_device.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/delay.h>
+>  #include <linux/crypto.h>
+>  #include <crypto/scatterwalk.h>
+> @@ -2570,14 +2570,12 @@ static void atmel_sha_get_cap(struct atmel_sha_de=
+v *dd)
+>         }
+>  }
+>
+> -#if defined(CONFIG_OF)
+>  static const struct of_device_id atmel_sha_dt_ids[] =3D {
+>         { .compatible =3D "atmel,at91sam9g46-sha" },
+>         { /* sentinel */ }
+>  };
+>
+>  MODULE_DEVICE_TABLE(of, atmel_sha_dt_ids);
+> -#endif
+>
+>  static int atmel_sha_probe(struct platform_device *pdev)
+>  {
+> @@ -2716,7 +2714,7 @@ static struct platform_driver atmel_sha_driver =3D =
+{
+>         .remove         =3D atmel_sha_remove,
+>         .driver         =3D {
+>                 .name   =3D "atmel_sha",
+> -               .of_match_table =3D of_match_ptr(atmel_sha_dt_ids),
+> +               .of_match_table =3D atmel_sha_dt_ids,
+>         },
+>  };
+>
+> diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+> index c9ded8be9c39..2f152f80f61a 100644
+> --- a/drivers/crypto/atmel-tdes.c
+> +++ b/drivers/crypto/atmel-tdes.c
+> @@ -28,7 +28,7 @@
+>  #include <linux/irq.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/dma-mapping.h>
+> -#include <linux/of_device.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/delay.h>
+>  #include <linux/crypto.h>
+>  #include <crypto/scatterwalk.h>
+> @@ -1139,13 +1139,11 @@ static void atmel_tdes_get_cap(struct atmel_tdes_=
+dev *dd)
+>         }
+>  }
+>
+> -#if defined(CONFIG_OF)
+>  static const struct of_device_id atmel_tdes_dt_ids[] =3D {
+>         { .compatible =3D "atmel,at91sam9g46-tdes" },
+>         { /* sentinel */ }
+>  };
+>  MODULE_DEVICE_TABLE(of, atmel_tdes_dt_ids);
+> -#endif
+>
+>  static int atmel_tdes_probe(struct platform_device *pdev)
+>  {
+> @@ -1282,7 +1280,7 @@ static struct platform_driver atmel_tdes_driver =3D=
+ {
+>         .remove         =3D atmel_tdes_remove,
+>         .driver         =3D {
+>                 .name   =3D "atmel_tdes",
+> -               .of_match_table =3D of_match_ptr(atmel_tdes_dt_ids),
+> +               .of_match_table =3D atmel_tdes_dt_ids,
+>         },
+>  };
+>
+> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+> index 70b911baab26..262c7dbc5e5f 100644
+> --- a/drivers/crypto/bcm/cipher.c
+> +++ b/drivers/crypto/bcm/cipher.c
+> @@ -15,8 +15,7 @@
+>  #include <linux/kthread.h>
+>  #include <linux/rtnetlink.h>
+>  #include <linux/sched.h>
+> -#include <linux/of_address.h>
+> -#include <linux/of_device.h>
+> +#include <linux/of.h>
+>  #include <linux/io.h>
+>  #include <linux/bitops.h>
+>
+> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+> index ff9ddbbca377..74bcd3083881 100644
+> --- a/drivers/crypto/caam/ctrl.c
+> +++ b/drivers/crypto/caam/ctrl.c
+> @@ -9,6 +9,7 @@
+>  #include <linux/device.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_irq.h>
+> +#include <linux/platform_device.h>
+>  #include <linux/sys_soc.h>
+>  #include <linux/fsl/mc.h>
+>
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+> index 96dea5304d22..73b7aa68f21c 100644
+> --- a/drivers/crypto/caam/jr.c
+> +++ b/drivers/crypto/caam/jr.c
+> @@ -9,6 +9,7 @@
+>
+>  #include <linux/of_irq.h>
+>  #include <linux/of_address.h>
+> +#include <linux/platform_device.h>
+>
+>  #include "compat.h"
+>  #include "ctrl.h"
+> diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+> index 2ad2c1035856..46a083849a8e 100644
+> --- a/drivers/crypto/caam/qi.c
+> +++ b/drivers/crypto/caam/qi.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/kthread.h>
+>  #include <linux/netdevice.h>
+> +#include <linux/platform_device.h>
+>  #include <linux/slab.h>
+>  #include <linux/string.h>
+>  #include <soc/fsl/qman.h>
+> diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_d=
+river.c
+> index c57f929805d5..0f0694037dd7 100644
+> --- a/drivers/crypto/ccree/cc_driver.c
+> +++ b/drivers/crypto/ccree/cc_driver.c
+> @@ -14,7 +14,6 @@
+>  #include <linux/of.h>
+>  #include <linux/clk.h>
+>  #include <linux/of_address.h>
+> -#include <linux/of_device.h>
+>  #include <linux/pm_runtime.h>
+>
+>  #include "cc_driver.h"
+> diff --git a/drivers/crypto/exynos-rng.c b/drivers/crypto/exynos-rng.c
+> index cbd8ca6e52ee..773c3238c603 100644
+> --- a/drivers/crypto/exynos-rng.c
+> +++ b/drivers/crypto/exynos-rng.c
+> @@ -15,7 +15,7 @@
+>  #include <linux/io.h>
+>  #include <linux/module.h>
+>  #include <linux/mutex.h>
+> -#include <linux/of_device.h>
+> +#include <linux/of.h>
+>  #include <linux/platform_device.h>
+>
+>  #include <crypto/internal/rng.h>
+> diff --git a/drivers/crypto/gemini/sl3516-ce-core.c b/drivers/crypto/gemi=
+ni/sl3516-ce-core.c
+> index b7524b649068..e9c00d76545b 100644
+> --- a/drivers/crypto/gemini/sl3516-ce-core.c
+> +++ b/drivers/crypto/gemini/sl3516-ce-core.c
+> @@ -16,7 +16,6 @@
+>  #include <linux/irq.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+> index 359aa2b41016..45063693859c 100644
+> --- a/drivers/crypto/img-hash.c
+> +++ b/drivers/crypto/img-hash.c
+> @@ -13,7 +13,7 @@
+>  #include <linux/io.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/scatterlist.h>
+>
+> @@ -1105,7 +1105,7 @@ static struct platform_driver img_hash_driver =3D {
+>         .driver         =3D {
+>                 .name   =3D "img-hash-accelerator",
+>                 .pm     =3D &img_hash_pm_ops,
+> -               .of_match_table =3D of_match_ptr(img_hash_match),
+> +               .of_match_table =3D img_hash_match,
+>         }
+>  };
+>  module_platform_driver(img_hash_driver);
+> diff --git a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c b/driver=
+s/crypto/intel/keembay/keembay-ocs-hcu-core.c
+> index d4bcbed1f546..226654b12779 100644
+> --- a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+> +++ b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+> @@ -10,7 +10,8 @@
+>  #include <linux/dma-mapping.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/mod_devicetable.h>
+> +#include <linux/platform_device.h>
+>
+>  #include <crypto/engine.h>
+>  #include <crypto/scatterwalk.h>
+> diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+> index 4f6ca229ee5e..d5a32d71a3e9 100644
+> --- a/drivers/crypto/n2_core.c
+> +++ b/drivers/crypto/n2_core.c
+> @@ -10,7 +10,7 @@
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+> -#include <linux/of_device.h>
+> +#include <linux/platform_device.h>
+>  #include <linux/cpumask.h>
+>  #include <linux/slab.h>
+>  #include <linux/interrupt.h>
+> diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+> index 67a99c760bc4..71002a12993d 100644
+> --- a/drivers/crypto/omap-aes.c
+> +++ b/drivers/crypto/omap-aes.c
+> @@ -24,7 +24,6 @@
+>  #include <linux/dmaengine.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/of_address.h>
+>  #include <linux/io.h>
+>  #include <linux/crypto.h>
+> diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+> index f783769ea110..82cca34017e4 100644
+> --- a/drivers/crypto/omap-des.c
+> +++ b/drivers/crypto/omap-des.c
+> @@ -27,8 +27,6 @@
+>  #include <linux/dmaengine.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+> -#include <linux/of_address.h>
+>  #include <linux/io.h>
+>  #include <linux/crypto.h>
+>  #include <linux/interrupt.h>
+> diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+> index cbeda59c6b19..4c25fc42044c 100644
+> --- a/drivers/crypto/omap-sham.c
+> +++ b/drivers/crypto/omap-sham.c
+> @@ -28,7 +28,6 @@
+>  #include <linux/dmaengine.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_irq.h>
+>  #include <linux/delay.h>
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/roc=
+kchip/rk3288_crypto.c
+> index 9f6ba770a90a..f3a79bec76a8 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.c
+> @@ -14,7 +14,6 @@
+>  #include <linux/module.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/clk.h>
+>  #include <linux/crypto.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+> index 1c4d5fb05d69..fe8cf9ba8005 100644
+> --- a/drivers/crypto/s5p-sss.c
+> +++ b/drivers/crypto/s5p-sss.c
+> @@ -20,7 +20,6 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/scatterlist.h>
+>
+> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+> index df5f9d675c57..6238d34f8db2 100644
+> --- a/drivers/crypto/sa2ul.c
+> +++ b/drivers/crypto/sa2ul.c
+> @@ -15,7 +15,8 @@
+>  #include <linux/dmapool.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/of.h>
+> +#include <linux/of_platform.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>
+> diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+> index 4c799df3e883..62d93526920f 100644
+> --- a/drivers/crypto/sahara.c
+> +++ b/drivers/crypto/sahara.c
+> @@ -27,7 +27,6 @@
+>  #include <linux/kthread.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/spinlock.h>
+>
+> diff --git a/drivers/crypto/starfive/jh7110-cryp.c b/drivers/crypto/starf=
+ive/jh7110-cryp.c
+> index cc43556b6c80..0f517ea06bcb 100644
+> --- a/drivers/crypto/starfive/jh7110-cryp.c
+> +++ b/drivers/crypto/starfive/jh7110-cryp.c
+> @@ -11,8 +11,8 @@
+>  #include <linux/delay.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/iopoll.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/starfive/jh7110-hash.c b/drivers/crypto/starf=
+ive/jh7110-hash.c
+> index 5064150b8a1c..41c9e40c6551 100644
+> --- a/drivers/crypto/starfive/jh7110-hash.c
+> +++ b/drivers/crypto/starfive/jh7110-hash.c
+> @@ -14,7 +14,6 @@
+>  #include <linux/iopoll.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm=
+32-cryp.c
+> index 6b8d731092a4..ab12c782dec5 100644
+> --- a/drivers/crypto/stm32/stm32-cryp.c
+> +++ b/drivers/crypto/stm32/stm32-cryp.c
+> @@ -10,7 +10,7 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/iopoll.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/of.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm=
+32-hash.c
+> index f0df32382719..cb3ca28fb193 100644
+> --- a/drivers/crypto/stm32/stm32-hash.c
+> +++ b/drivers/crypto/stm32/stm32-hash.c
+> @@ -15,7 +15,7 @@
+>  #include <linux/iopoll.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/of.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/reset.h>
+> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+> index bb27f011cf31..4ca4fbd227bc 100644
+> --- a/drivers/crypto/talitos.c
+> +++ b/drivers/crypto/talitos.c
+> @@ -19,9 +19,9 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/crypto.h>
+>  #include <linux/hw_random.h>
+> -#include <linux/of_address.h>
+> +#include <linux/of.h>
+>  #include <linux/of_irq.h>
+> -#include <linux/of_platform.h>
+> +#include <linux/platform_device.h>
+>  #include <linux/dma-mapping.h>
+>  #include <linux/io.h>
+>  #include <linux/spinlock.h>
+> diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xili=
+nx/zynqmp-aes-gcm.c
+> index bf1f421e05f2..6092ff0646a8 100644
+> --- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+> +++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+> @@ -12,7 +12,7 @@
+>
+>  #include <linux/dma-mapping.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+> +#include <linux/mod_devicetable.h>
+>  #include <linux/platform_device.h>
+>
+>  #include <linux/firmware/xlnx-zynqmp.h>
+> diff --git a/drivers/crypto/xilinx/zynqmp-sha.c b/drivers/crypto/xilinx/z=
+ynqmp-sha.c
+> index 43ff170ff1c2..426bf1a72ba6 100644
+> --- a/drivers/crypto/xilinx/zynqmp-sha.c
+> +++ b/drivers/crypto/xilinx/zynqmp-sha.c
+> @@ -15,7 +15,6 @@
+>  #include <linux/io.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> -#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>
+>  #define ZYNQMP_DMA_BIT_MASK            32U
+> --
+> 2.40.1
+>
