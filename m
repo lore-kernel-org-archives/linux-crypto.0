@@ -2,111 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E757EE49AA
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 14:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE9BEE4993
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Aug 2023 15:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234890AbjHVOzI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Aug 2023 10:55:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58188 "EHLO
+        id S237074AbjHVP2h (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Aug 2023 11:28:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233629AbjHVOzI (ORCPT
+        with ESMTP id S237067AbjHVP2h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2023 10:55:08 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8F2126;
-        Tue, 22 Aug 2023 07:55:04 -0700 (PDT)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37MAttru009628;
-        Tue, 22 Aug 2023 14:54:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=6eMQNrgqHLU00wjLkJ1Kb7ZQimnUmm3q3EnMMewUbqE=;
- b=Q2tTnXajY14lxamm5/0NcWa5C0iGBhyU/5H144PbQkfh68qmse/0C3W0Vh8rnWMQ+nkS
- f5yUMqmlUkhhOMmqFWRM19G/7CII88OPQEWznTQvZR1PQhNwM6jCbvugDbMZwP+rY305
- o2BMBVyGI1BjfgESxlokoigVgT+o/q6AfCSmajU5VnBFSsZjfgJfICC5FXAYG4w0Omsf
- 5Ptz87fGbGlc5MWgpnzquuvTdYxejAQD/qXd5O8DIdXN5//ch5S5TsJREnqs7g0T/AoI
- QjsVFEDaI/nUvXDUTc7UO+UONohPmYxud4tMQ7CYY1OACno8eKXQm8MuEqO2EUVZ4fom Zg== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3smreu0ycr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Aug 2023 14:54:56 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37MEsqqw004750
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 22 Aug 2023 14:54:52 GMT
-Received: from [10.216.6.154] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Tue, 22 Aug
- 2023 07:54:47 -0700
-Message-ID: <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
-Date:   Tue, 22 Aug 2023 20:24:43 +0530
+        Tue, 22 Aug 2023 11:28:37 -0400
+Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37C1CDA;
+        Tue, 22 Aug 2023 08:28:35 -0700 (PDT)
+Received: from pd956d63d.dip0.t-ipconnect.de ([217.86.214.61] helo=martin-debian-2.paytec.ch)
+        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <martin@kaiser.cx>)
+        id 1qYTJ1-0006li-E0; Tue, 22 Aug 2023 17:28:31 +0200
+From:   Martin Kaiser <martin@kaiser.cx>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
+Subject: [PATCH 0/3] hwrng: imx-rngc - use polling instead of interrupt
+Date:   Tue, 22 Aug 2023 17:25:50 +0200
+Message-Id: <20230822152553.190858-1-martin@kaiser.cx>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
-Content-Language: en-US
-To:     Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-CC:     <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
- <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
- <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
-From:   Om Prakash Singh <quic_omprsing@quicinc.com>
-In-Reply-To: <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 5hcqZvyc_Ev1y0_cCYlRb8yVHZ5-cDUg
-X-Proofpoint-ORIG-GUID: 5hcqZvyc_Ev1y0_cCYlRb8yVHZ5-cDUg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-22_13,2023-08-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 bulkscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=972
- impostorscore=0 malwarescore=0 spamscore=0 suspectscore=0 phishscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308220114
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PRNG Block on most of newer target from Qualcomm have some configuration 
-where clock is configured by security firmware.
+Use polling and wait actively for the self test and the initial seeding
+of the rngc to complete. This is much simpler than using an interrupt
+and a completion. Also, there's nothing we can do in parallel while self
+test or initial seeding are running.
 
-Adding separate compatible string for each platform is overhead.
+Martin Kaiser (3):
+  hwrng: imx-rngc - use polling to detect end of self test
+  hwrng: imx-rngc - read status register for error checks
+  hwrng: imx-rngc - use polling to wait for end of seeding
 
-We need to introduce common compatible string that can be used for all 
-platforms with same configuration.
+ drivers/char/hw_random/imx-rngc.c | 96 ++++++-------------------------
+ 1 file changed, 16 insertions(+), 80 deletions(-)
 
-I would suggest to use "qcom,rng-ee" for newer platform, dropping "p" 
-also signifies it is not a Pseudo Random Number Generator.
+-- 
+2.39.2
 
-On 8/22/2023 7:58 PM, Konrad Dybcio wrote:
-> On 22.08.2023 16:11, Neil Armstrong wrote:
->> Document SM8550 compatible for Pseudo Random Generator,
->> like SM8450 doesn't require clocks setup done by the secure
->> firmware.
->>
->> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
->> ---
-> + CC Om
-> 
-> As mentioned in [1], perhaps we should rethink the compatible as
-> it may be a TRNG and not a PRNG?
-> 
-> Konrad
-> 
-> [1] https://lore.kernel.org/linux-arm-msm/d93902ee-c305-42cb-9d0d-1f0971ab3a70@quicinc.com/
