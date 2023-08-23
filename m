@@ -2,234 +2,305 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95036EE4993
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 13:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E743BEE4993
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 15:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232294AbjHWNuG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Aug 2023 09:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52778 "EHLO
+        id S236758AbjHWPd0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Aug 2023 11:33:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236298AbjHWNuF (ORCPT
+        with ESMTP id S229933AbjHWPdZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2023 09:50:05 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46E0E66;
-        Wed, 23 Aug 2023 06:50:00 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NDiAk4001603;
-        Wed, 23 Aug 2023 13:44:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2023-03-30;
- bh=uaFEgrQr5GSKJQ+2doImaX53YaqjbCwCg842DGcb+0w=;
- b=MYYhy9D0pV+vtW6bcMgSqg4TnYtEolb09pUqbvZBZ1JMgNQIuTvMEPPVMUoy0HeysKoT
- uznVzUJHTvmw4LCJEyfDZmcKjGrolKYnqL1HbiWud8AJfMMteqk1LNnmPmdQbsCzoMZk
- X0PSTVT6lmFKLENohpmsBXUoXmE6IBmbYqKzvjZbTtvfuVhNQvP13gVrUrtU2BsqxZV/
- /t6aT6roxLC+ctwqmn0dRzxYVvBW5mVWjgUPOnOofxaEik/nFJnMoDpaFIR7Jyz8fp1Y
- LBod8jmvRy8sXKVqkR1HRevcns1V4/wyOVkvtbJ8k9P8/LckGzyMqCX1Oj4WsgciSBJg 2g== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3sn1yv1urc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Aug 2023 13:44:20 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 37NCqQvX036051;
-        Wed, 23 Aug 2023 13:44:19 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2107.outbound.protection.outlook.com [104.47.70.107])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3sn1yuk9qr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Aug 2023 13:44:19 +0000
+        Wed, 23 Aug 2023 11:33:25 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754AECF1;
+        Wed, 23 Aug 2023 08:33:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1692804803; x=1724340803;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=1X8VwHf1dBNY2O2fwr05k0tcNFpXF867HhQa2pODef4=;
+  b=JQzBIAg+49XaS/J3jNLUSl/EdZS96FLKeYhckDizs3MTG2Khjt821H7h
+   uLC7Ix5U3Erauk7XKwSB7QCDRuCNsD1TaFtgZLOkMAKVG555QfMiW49p8
+   +aZ1eW2GPWBq8aXqlpGFDrP9mYC6I1ZmHPjGYPj5IJbDi29QaBbs+POth
+   2vGX85URNLnWRTKfaRhE0L9i94Vw7/2N0Vz/rcZ9oHKtsABoT0Itusg99
+   CnE0PDhStH07YR9QRuCR4ktXE2WnPLCm5OIuLRdY7CCTj+eBrboZYu2z3
+   v8rhhH9SQBR/SNeUHGYyiDfKFnOj5cq7dt+RPOh6gVmq1SFvpvTuZrmrk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="359180209"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="359180209"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 08:29:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10811"; a="983341998"
+X-IronPort-AV: E=Sophos;i="6.01,195,1684825200"; 
+   d="scan'208";a="983341998"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga006.fm.intel.com with ESMTP; 23 Aug 2023 08:29:50 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 23 Aug 2023 08:29:49 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 23 Aug 2023 08:29:49 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 23 Aug 2023 08:29:49 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BVYQWncCPJReaxsEWzHlyssB9gVHCjQcaF5fXUDw/uEZy8OXhwzVT7Rj91s1ckN7QvENh8S4KeXQfhR9dMR5GuXGZBWFUalg0CXrbAnrI+MlwFhFz8ALFVJtiv0AsFH9f4+ZoQmJTp1aeVlI/fEcJeWsnlU2xAZYp/2PuyfE0lfUDFhkhrHN7Kx8ljnoQL/8iLctWGhomgWc7CHDOQGtaVR9nLo/YG60T5tV4WfmWqT9DulU5TTw86+rhWbtX5LFr7w43GgeTtB2/wax9r18A/87jhKrOflE0vh3aJ86cvinyDaPX9ldRRT32Ot2m+V/PMDYzMa6nVKxXK/LUpKcHA==
+ b=W6eS5vTTYBwRHOpm09WSGSaUw/VK5e+EgR5usB/mf8XQEe3jR0IsUo3VOOfh/TbFzsuI+NfuGJGlrPodzmQ+IhBVDQbvMq38MPxMq++AqNlstjkYARRuMmS2U1WAbTfJ4he2JGn9EZcVFuGcqCOuseJZT0ZMYpJJGJ8MoRAAiSDWARgCXP6Rpq4/pPH+u3V7jaduPjZssPAL94/f081C1qCFtNGwgyHUXzL5b3F463CzvVvOtPVyV3UVURISKb8ea7fPENAZn//AJrvR+6U/7KSnowsUPGUl8+GnQabhY7X1iFY38qgkO986x7WQYXLKST/yowc6SzF+z/cir9guog==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uaFEgrQr5GSKJQ+2doImaX53YaqjbCwCg842DGcb+0w=;
- b=a531EOKf2sokhmCWA5ITtT4Q9a9VVxT+NDq9fFe2aZmU5V25Z160uFD37Kedw3BUevieFB0kPKlnhcr7t2Hss/dt0jk7Ag89NgTv/ZkqS9RdA49UV7qGquieNkl6WbZ+Xz0+tHPpkS3KyIb3+erCY29eGCiXbTeilPmQfpViAU0Jxm3jwDNnJS5D4EnGcRhBqGEiyLMvjCzWa4n+zbXuvD4NFa3YilpR+EIJr753hUkmzP5XTpJ9Q2yr1DkLFdvSrYWNq0n3DpFneivC4bQxaeEHhtSX7ZQIhp/CEUiyQ4ytufzgjMEdoyjHEKkAtZkAn+Dbn197w0pMuU3aAUwohw==
+ bh=xseBlK5q1dSUPSttTx7IVtP1hWtpj8PLZhyVZGYCowA=;
+ b=aER4/VSpr3AqxWoodUb/De4V64umCS1l7TFlMhyjAPkmkWhrHdXg16kK6pAzQ03WT+lHv4gKlYawtqvs4H7sQr9pWHEw0MNZJA3jJ8jN3twUBD7xjS1+Eu/8BUMYdNkpNjyYxh9/Tk4KeN0PV6HZHghs7tWnuKocfg6+RFHu8dfOqOCt+FHNAc5nTlaAWhsF8c67fQmvJ7aq6fAIFg+KAmiA6YrnQGSfeXoO5R0z+0VSQ+5sKt4n3hq7e+tEq/Qx4EcqLgCyQkvRwlBcmYzKEreIitUhX1mqxEof6o7NcjnUogI4zHhgC5sAf66xsrs4JR1qZJa1CYfXzUkC1F7hMQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uaFEgrQr5GSKJQ+2doImaX53YaqjbCwCg842DGcb+0w=;
- b=OWMNNFVQYeKhzhG6tAawY+ARMENZqIYQ+s5CR7HIeVnKMnQW9wRPXkU3VhQtaTH42p/vGT+fXYAkPyc7aS95jaKjTuiRAxWJMQknJoj8zVz1U03evZcgKeN56IM1azhGMKVp93ieT2+5saBX54ftH/stBaHr+b5ma3HfNGAkHR4=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by CO6PR10MB5792.namprd10.prod.outlook.com (2603:10b6:303:14d::12) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com (2603:10b6:5:39e::23)
+ by SA2PR11MB5019.namprd11.prod.outlook.com (2603:10b6:806:f8::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.25; Wed, 23 Aug
- 2023 13:44:16 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::2990:c166:9436:40e]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::2990:c166:9436:40e%6]) with mapi id 15.20.6699.020; Wed, 23 Aug 2023
- 13:44:16 +0000
-Date:   Wed, 23 Aug 2023 09:44:11 -0400
-From:   Chuck Lever <chuck.lever@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Subject: Re: [PATCH 8/12] SUNRPC: Do not include crypto/algapi.h
-Message-ID: <ZOYNK1RflMR9/Akr@tissot.1015granger.net>
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
- <E1qYlA5-006vH0-3U@formenos.hmeau.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1qYlA5-006vH0-3U@formenos.hmeau.com>
-X-ClientProxiedBy: CH2PR12CA0010.namprd12.prod.outlook.com
- (2603:10b6:610:57::20) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Wed, 23 Aug
+ 2023 15:29:47 +0000
+Received: from DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::889e:2c90:67be:2005]) by DM4PR11MB5502.namprd11.prod.outlook.com
+ ([fe80::889e:2c90:67be:2005%4]) with mapi id 15.20.6699.026; Wed, 23 Aug 2023
+ 15:29:47 +0000
+From:   "Zeng, Xin" <xin.zeng@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "Cao, Yahui" <yahui.cao@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: RE: [RFC 5/5] vfio/qat: Add vfio_pci driver for Intel QAT VF devices
+Thread-Topic: [RFC 5/5] vfio/qat: Add vfio_pci driver for Intel QAT VF devices
+Thread-Index: AQHZq1VcBEuBLxaWQUiMZlgj/qpcxK/MmosAgA026DA=
+Date:   Wed, 23 Aug 2023 15:29:47 +0000
+Message-ID: <DM4PR11MB550203FB22F8D6F0EAF8F717881CA@DM4PR11MB5502.namprd11.prod.outlook.com>
+References: <20230630131304.64243-1-xin.zeng@intel.com>
+        <20230630131304.64243-6-xin.zeng@intel.com>
+ <20230726133726.7e2cf1e8.alex.williamson@redhat.com>
+In-Reply-To: <20230726133726.7e2cf1e8.alex.williamson@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB5502:EE_|SA2PR11MB5019:EE_
+x-ms-office365-filtering-correlation-id: e4b54046-60b7-4cd7-b899-08dba3edc907
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZoMciYVQcBqc8eZcBBI8MBG+W3Ul3rEec5rL+HosFvqGdR8Z9/tlIezAkQjOKot56ulGVMwCi61U0O2ytVfbmWSA5fc+F48I2k+GCmtsqZVSB9wODXRbkDn5xkZtZzMJ/TpXY3K0/y/jjgfKCwfqbPxTawB/qt3ChOVtNjDr8di2DXBBcLm16ewrYujQAfE2lJVvqU/Z6g9b/i58/xliMCgbI/DsAnemakQQB+vHrTMP8Xvz0H8XIZmEl+X7ORS9wH2LiB/mNzf21jc6HSBAdVsZOuNlfEjTysOjU5ksdm+SAH1B9TTWGjvww3iHUgH3I37Sq8oQlbGqqh5EKe+Lid7S2FVKMU7KOrgIePfM9a1G2slYmaWw4ATu4cgqKA20uNXJkZvF4indO1O/YjwPnprDG11HjPBS7ZIVkQ0ZON5BlTBUtvVbb8Hcecm5ndodME5OF1+RipJJAz+RSjjWctJgutpdFggUd3yQ3uXWW3qxixS178aRMm7A4xN4odBf4hF7nyFP6/cJaTkOcXmlFRG1FjezxYH2lA36s7tTAc4lJs1pNYheb7tFMnQFjLuhQ5YDV8yoXeVtrBiEGDCKgaf8YJF5E170AhNHu7WA5GNwt6W1aeaZwdXaTZiTOfh+
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5502.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(396003)(376002)(346002)(366004)(186009)(451199024)(1800799009)(6506007)(7696005)(52536014)(316002)(6916009)(53546011)(4326008)(8936002)(8676002)(66946007)(54906003)(66476007)(66556008)(76116006)(64756008)(66446008)(41300700001)(55016003)(9686003)(5660300002)(71200400001)(478600001)(83380400001)(86362001)(82960400001)(2906002)(33656002)(38100700002)(38070700005)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7G2ornb53yI2sBlDR5jwy3OGK68g+catDcTHC7aHHPKfmTTWVUnhyvj2JJzd?=
+ =?us-ascii?Q?bkmjat4AWnFfhdwfqjKxyHoheah7KNqcHyGubTBiQqL8vLkkrAxGjLllihED?=
+ =?us-ascii?Q?kXlpE7ziUhhMfAiyuu3zmy5E3ZfGafnJsq1sI9CfUiAPvA30ZyweNuFnnfwH?=
+ =?us-ascii?Q?mYj6fK8g9SBAWNuBZXingfU1U4jQQwz0M1tlKLOlaqomfm8LlTjT9N7GHdvn?=
+ =?us-ascii?Q?XDBNFmlwxo7gpYoWtt4metIpdUXLr8YPd7wzDW5H2xnUk9wMXoeti/jAvIpr?=
+ =?us-ascii?Q?RXCZfSO+DKFhOVRd+la9rkc46p/C7jQw9ANw37ea+MVcOZUKHYfR9sVnqMD6?=
+ =?us-ascii?Q?dqR62oiQjaUokSrXogOYOvNHBBYaXx2DyAtwZJkxyE9bTva9jG/WP4lhD78e?=
+ =?us-ascii?Q?I0qU9VlzcQUq5Wy/xKVM8pNDi09fxAr+wIdbk+FHOTeWSQssR08NLI8NTJ/e?=
+ =?us-ascii?Q?czsNpZqTmnlDdK1aovPDyQGYnplPdyIzUstoe9U/+94Bc2zm6PcJeNndRltc?=
+ =?us-ascii?Q?7huIf7GPlYv8wTDZl2YKaKkEHM+3g0tCn0SJnnRw/AL3I5kYgXwE0Y+NIVee?=
+ =?us-ascii?Q?idbKcROMF5rRabtrlj6lTu9HcgWeuLqpXllqB0tKYNjIfYoA6HNcOJ1BeoGN?=
+ =?us-ascii?Q?d+eDj+dqA8iJO0pLj48zDJ8xAyJ+3PoXWylQfu9ZwQqZtdcXBpgWwSCX/n1b?=
+ =?us-ascii?Q?4hAjkg6CHzWJYH4Drlw1dwHcsnqRqX2AImHAigQx4td/gbF9T9V6LG9DiPek?=
+ =?us-ascii?Q?bIQxYEJf7a7TqobgkzGSYUjG1e4kxe3qMX4cE+iYJkJ79HQSkywjRLBVHi4i?=
+ =?us-ascii?Q?cgppKm3XGS0DvJ7es2Xkl/aaoD/BWz1/8USmm3CI3hq50MqrFshoRcwrFufW?=
+ =?us-ascii?Q?Azt41EU/cA03LeoX3eGrvc7rJvwHWI0eHoIO7oLwJwP9edv9suYdDMCxIISi?=
+ =?us-ascii?Q?hili4evHTP8NtQDnHbFQm7/PCsYAv3SdeLwConHVYZiB8cv/X5Yl3E6nvV9b?=
+ =?us-ascii?Q?yBME40K8acaM17KmCWpklbFHGi5l1E+o3aNPFo1U7aXd6oOpk6BwRiT4cnA4?=
+ =?us-ascii?Q?Wzv5pg5yene6LTQ66qdtrQia/EbUsxKlWsoBcV3BA5Oss/ZssJnO5CS/JPFP?=
+ =?us-ascii?Q?Owxrxl+AZu0ifrbGPL1pa3LH2aA9pj+U+oA6162+K+heCqVBlQOkDXTvJnDe?=
+ =?us-ascii?Q?K/425Ox3xGGsAgxk1cviDOOaEUvZQtBjbRLe6Ui2jO8FX3VXbKcLH+s2rWJE?=
+ =?us-ascii?Q?pL5a4t0uUdchYIg6y/VnjRpPKh5hb0GNc1DFyFPhmxEZ+ZiFMDGgcj6vRTh0?=
+ =?us-ascii?Q?J0mdxyf3gUa8ylHwOzYBBPKl5bhgFh93tHJKu6VFd6kIBR5NouOb6wPAoSjN?=
+ =?us-ascii?Q?fr+YvJEsQ9U0DcB9h7oA4wq7v0dqW1vr9IKhtHbk7RZ3kDh5us6G2VqkI7kU?=
+ =?us-ascii?Q?ILqV+D0NnkW5muE/fuVlAA/XTsvnh9GpvKbDIvoXb8lMlube60AokQp76U30?=
+ =?us-ascii?Q?MVEdvF+8VxSbrkeKBbq8VX1dvkhbremETzjbfSsuBAaLphm2nXH6QzJGTw?=
+ =?us-ascii?Q?=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|CO6PR10MB5792:EE_
-X-MS-Office365-Filtering-Correlation-Id: aa59ebd9-bc5d-48f7-df46-08dba3df0ab7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aAgP7SMs8ZbEU9HjQNPPjJ9XCH0R5OvmUvAaJADW3KE+dLHfgvZCEagGwWGL2OIyHAj8aeowRGJSbvfZG5IZZQ82tOFHSd+BPefgPhfHgo72Co+NcxmyR6akXjaQZAgRju95a+knb1JHqXnF5nbRvHGOQ5FyQRyKCeoXtJoCSd1V2NA6VOKvXeNgn9wTSDrVGF4+Z2O8+c0fReVB7KKH3vzBvOBD5Jw3WIHu55EMABOSTVJJ64ToDdI5GLbRlvqWfQMJvhUHPiuCzg0dSYNRymnKymQVzDt42ARiMjLjxQHGLkfKwOC6Lo0QFjiRpRzXKTWIOfEH9qVn5QcMCntn1xQKI/2t3Tfp4OPDArkj17m909tVm7lLiDwkHIbKQi7+FXQL/BRAnidXSYaHFj0CtElKVtLkATjooWs6nyQj0cVA3Gm+cSBkaiDzq33NI5Ww2QL11OUAuIhAgr46mQ13vIUJ4KBVBBCOZaLr8ovCeQVrTbEPXCO5XOx17MK9ZcwTq3MUZP3MC0NYZSWdV9h3pEu+PdYL9gL60uEpss2ZgdFvM8CN6Zj3TFK28O2JmzWX
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(39860400002)(136003)(396003)(1800799009)(186009)(451199024)(478600001)(6666004)(6486002)(6506007)(9686003)(6512007)(41300700001)(2906002)(26005)(7416002)(8936002)(4326008)(44832011)(316002)(54906003)(6916009)(5660300002)(8676002)(66946007)(86362001)(66556008)(66476007)(38100700002)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HjfwHAZjBfKE5YOECk52/L4sF1366/9UTqPiRVFPYra2q/5FTyleBf6dWf2t?=
- =?us-ascii?Q?QsN1p3lkLnRZtDQsdl077kNfKMfbmJtvmrZh3T+3maVoC/Hsl4Vh3ErZHosr?=
- =?us-ascii?Q?4hCX8n9Mbx2gDRCreBUlFjSWuIO4teotUdhgl08I2OS6cKtX5yJ5OnqZiHUy?=
- =?us-ascii?Q?45aIJUTx6wBHz8lUi8n+BcFKsQB1Fm4e6ktjfGjXDU7jzUdwAa4oUMr9T1HU?=
- =?us-ascii?Q?1/KaUrFwmd59fGFw0UtCzhm6CM2N0WaCgegVera6uRiS6PG3QGtNyPOam1in?=
- =?us-ascii?Q?a2cQJKASSyVCUxBAAom4dS1fGVMR4qOT1NfsljBa/MULqXpQAB/fHihRHvTN?=
- =?us-ascii?Q?xTixmxz2iRDxnTo+3bagTY0H6hjd+g9QX+oPYe7HIY44+ZatuRvC25hp8ucl?=
- =?us-ascii?Q?uzqJfydXU6LEzSeNNZpTcb/jK7m7AMwiexhAWZ1+NyaSKdhL2qT/MnUbBQxe?=
- =?us-ascii?Q?kpjT+xh6iLAiWzM2GwoSjTyXYbOQenmb3GOVu246Wddy928inAnjouBdgjsC?=
- =?us-ascii?Q?/pA1gYICuziMM1iZbji+FA7GbUDEPNSwx3/QO+kBADdmBn+7vXlIcWTd9eMT?=
- =?us-ascii?Q?fY2AYxCKma4kEv8rA8T0aAa841ZuEGNxO2lba2qOkjsD2enOe+CHmmcGe43m?=
- =?us-ascii?Q?m6D4kQnFIDPwnTBA824UEGm78q01JHHy6Zr2+leIMi+E726QJ3VJw8u1JA9z?=
- =?us-ascii?Q?ybsQOi3oQjIbM/lzAHKNjlOEIy71KSKRgWrSgebPewT7QtLQ2Hv16iMVY99C?=
- =?us-ascii?Q?0yLh0DIFoRBq8xpvI+VZfUDZinsaQdKjxTUlWLsKkDUTQwYNlxPDH5ayzP0a?=
- =?us-ascii?Q?VavhA3HerqH0ZIyGir30jCKI9ficnBkrGR0xQcUksPX+KWxAocfncjEUIFoM?=
- =?us-ascii?Q?94/8Z4VVmFb5sBdoPzeLnadZlRKzBjNl53NOrw1HBSUEJHOFV0PnN8e2JKQq?=
- =?us-ascii?Q?tvJimAk2sRlTCJDu9saPunbEWdc0C9oPFNDo5sR4kZ57ktiEP4W6tRzkx+QP?=
- =?us-ascii?Q?SMW5Cmhkl8I13j+MJYfCHds0b21oNAjX9jUUO3zDq6jUutBoDsFsXdlJaV5Z?=
- =?us-ascii?Q?J3qBjAlGBdw2AFU09vID06T2Ol48XfqQD4dlL8CqeSAZ9wnkD93VaklIGPP5?=
- =?us-ascii?Q?HAJxr05BOrQ+sUMJbR2z/e7Vy7khG1hYRi680YexnTUG/FZgV2t/y9xPgxdv?=
- =?us-ascii?Q?z9inua1NTg88e4FWiKd+u8kQLAIM32NDUmb+Dop86rp4boi1Vp7EEfw6qCmo?=
- =?us-ascii?Q?CRdvvoI7WKGmIr+35/DewRaZu3B3eMtgo6nu5GdP8Yo0oZZfPiX4ssIi/kA1?=
- =?us-ascii?Q?dq08FVQi16knBK2LP2pibgGteAB8IEwhq/I3usS9q2OB4X4vsjKamLgFCwpf?=
- =?us-ascii?Q?PLz7Udr+3Uc1/WPsaOjjSP/ZTacBue0docamFfwklCNlD4FR2uYF8Qq3wIGv?=
- =?us-ascii?Q?pZoZfiKePY+f34oWqIqS5x13OxlQzdJn9agYyjynzYegKMFCDzRxa2FqTVBL?=
- =?us-ascii?Q?VGT7osqP/KX5AkrKfqgxCS0P7mR/T+SzuEkRgCM8/R3D4vlFhW5uA+ZtKxMM?=
- =?us-ascii?Q?8cHE/rT9qFxwlp2CNqlARqOPYL926omv/ex8iZlDzPx5C5cRh785HVhXmNlG?=
- =?us-ascii?Q?FA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?ROEggKKm8GicLh7rc6rtMuV3/eWz4WI3BKHhjDf5X4IvSo9eNFWnu4W3+2zu?=
- =?us-ascii?Q?Zwjt0xpCq/Ihu5xkxruJLQNPKaSUedM5I9McrKU3K48QJ0/7FB748i9J6aH1?=
- =?us-ascii?Q?zSIVMNVXweyPs1DACwDNddtQAkZXlrWbj4GfMovCxd1ZG7FqqnRGsrhkV0ty?=
- =?us-ascii?Q?eQ0H/I+AyLXSzFUi5FgflrxnQ8YqcPpAT4TSa4429yyjgZy296wN1XZe6ILi?=
- =?us-ascii?Q?ptcEVryL5XwXVtn6G5I0SMx50a0Mb49HcIUnjn/wnTeGf10t7kkXP+Upc701?=
- =?us-ascii?Q?NR3+ciIsZC3yv2B7guVuGIIbT/bJpF/5H9UwIxaMqRCVDgvAt0uJ0rQ+Zud1?=
- =?us-ascii?Q?8fJ18EO8PYoPShh9MDQctWW+1rVdehcHQH0CAGQY2ONC9cuHeFRrfPOSabyH?=
- =?us-ascii?Q?Od9ZfxfFENiEVCEO5VAAzjT6PzH+yrUdUFHWw0uwBYsfBlXGsdiRB4osDlyw?=
- =?us-ascii?Q?iPcdPuMeuM86rXnXRMfCNBovjRTzef/sO74Psf/PYmyGnn/MYH/4kU6DUJB1?=
- =?us-ascii?Q?V/LIZNW2S78EKJ1HlXKaldjtY4/+HiFTowSSQ10y6uDgrPFEAZM9swvzZfn6?=
- =?us-ascii?Q?Jpo0N1UGFgCUxi6nZg5yfwaFauyRhamlpXbfqQ6OLr/idFZ1IMkTtcA6Yv0v?=
- =?us-ascii?Q?3cnz/SudPMvbJ15Ue8E1LmY1nN9T8S9J/dMQvQp1vshkFlXdfRpDrwyRco6h?=
- =?us-ascii?Q?nN4wYJ9mZrXOcJxR7xoZTcLAfihWpLkbnRwZtJnNj+uS9YFh4l4d4N4oaxky?=
- =?us-ascii?Q?aaUGGVuyqW4lLqn0rmgj6guyZ1CXgFagOM2Xf8x9OWqf8h2s4QdzttbDoDyo?=
- =?us-ascii?Q?CPJ2fVCJDGVL6v/RdMGyZiSIM3bTaxakrMJ+VrFqnawQbmkZhLJuvIsG1BSA?=
- =?us-ascii?Q?rQLHtMzNTj0Dxtln4zWDXsF+9QrZWKB3CKCd67WWV7XHHXtGH1+bxw2NcozW?=
- =?us-ascii?Q?YN/j+zr78bPZ3WYWrVfB8tceGgZFabCuZHOd8QjNpArmtZkGFLz/ChCLrrPv?=
- =?us-ascii?Q?U3KOuGVdXzzzvWMMUChsh0kw+uQ7KZziMPIXd3rdyIEqFh+hJxLvwRWXrGoR?=
- =?us-ascii?Q?zsSXGHZmMJ3RhXLYcSyzkMCWYdI37W4cdnCGxUGtwGLeOGpxnIVEe9Q/Z73r?=
- =?us-ascii?Q?sKFIkBQsaIv2kmh2tuohZIe/QWSaDNb5H5+8ydhkvS5qyEFDPTatefzL3aKF?=
- =?us-ascii?Q?AfQDK2sqlwP8lzdYoZaSiKxgbjGbgET3PXU5SuyEp5Qq5Jk/fkraS22yV20V?=
- =?us-ascii?Q?MpJKro+0oyFVlqSRgU+iT/3+yrrOCNiebMVlwEfBOTAcTORTpwmOokp8a085?=
- =?us-ascii?Q?FrU=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa59ebd9-bc5d-48f7-df46-08dba3df0ab7
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2023 13:44:15.9759
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5502.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4b54046-60b7-4cd7-b899-08dba3edc907
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2023 15:29:47.8227
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9kW/P/8YTDMg/0LKtoV1eaGbYBN8jfX6kHA6TP3xOnB6jqX2x/fn6tH7VChCxTQenVu3rzGavQicD0AVRkBFEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR10MB5792
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-23_08,2023-08-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
- malwarescore=0 spamscore=0 phishscore=0 mlxlogscore=999 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308230125
-X-Proofpoint-GUID: m009a8EOqSuInTzjm_GTn6ReEqgBFcOe
-X-Proofpoint-ORIG-GUID: m009a8EOqSuInTzjm_GTn6ReEqgBFcOe
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BASmIRNIblHcXNyCPJDKiuyLwidvPS1mW4xI59pb9PPrCR/sqkhoit2d/EByADX7ntgdtDyFt8JdQLZjXJoluA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5019
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 06:32:30PM +0800, Herbert Xu wrote:
-> The header file crypto/algapi.h is for internal use only.  Use the
-> header file crypto/utils.h instead.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Thanks for the comments, Alex.
+On Thursday, July 27, 2023 3:37 AM, Alex Williamson wrote:
+> >  drivers/vfio/pci/Kconfig                 |   2 +
+> >  drivers/vfio/pci/Makefile                |   1 +
+> >  drivers/vfio/pci/qat/Kconfig             |  13 +
+> >  drivers/vfio/pci/qat/Makefile            |   4 +
+> >  drivers/vfio/pci/qat/qat_vfio_pci_main.c | 518
+> +++++++++++++++++++++++
+>=20
+> Rename to main.c.
 
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
+Will do in next version.
 
+>=20
+> >  5 files changed, 538 insertions(+)
+> >  create mode 100644 drivers/vfio/pci/qat/Kconfig
+> >  create mode 100644 drivers/vfio/pci/qat/Makefile
+> >  create mode 100644 drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> >
+> > diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> > index f9d0c908e738..47c9773cf0c7 100644
+> > --- a/drivers/vfio/pci/Kconfig
+> > +++ b/drivers/vfio/pci/Kconfig
+> > @@ -59,4 +59,6 @@ source "drivers/vfio/pci/mlx5/Kconfig"
+> >
+> >  source "drivers/vfio/pci/hisilicon/Kconfig"
+> >
+> > +source "drivers/vfio/pci/qat/Kconfig"
+> > +
+> >  endif
+> > diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> > index 24c524224da5..dcc6366df8fa 100644
+> > --- a/drivers/vfio/pci/Makefile
+> > +++ b/drivers/vfio/pci/Makefile
+> > @@ -11,3 +11,4 @@ obj-$(CONFIG_VFIO_PCI) +=3D vfio-pci.o
+> >  obj-$(CONFIG_MLX5_VFIO_PCI)           +=3D mlx5/
+> >
+> >  obj-$(CONFIG_HISI_ACC_VFIO_PCI) +=3D hisilicon/
+> > +obj-$(CONFIG_QAT_VFIO_PCI) +=3D qat/
+> > diff --git a/drivers/vfio/pci/qat/Kconfig b/drivers/vfio/pci/qat/Kconfi=
+g
+> > new file mode 100644
+> > index 000000000000..38e5b4a0ca9c
+> > --- /dev/null
+> > +++ b/drivers/vfio/pci/qat/Kconfig
+> > @@ -0,0 +1,13 @@
+> > +# SPDX-License-Identifier: GPL-2.0-only
+> > +config QAT_VFIO_PCI
+> > +	tristate "VFIO support for QAT VF PCI devices"
+> > +	depends on X86
+>=20
+> What specific X86 dependency exists here?  CRYPTO_DEV_QAT and the
+> various versions of the QAT driver don't seem to have an explicit arch
+> dependency, therefore this shouldn't either.
 
-> ---
-> 
->  net/sunrpc/auth_gss/gss_krb5_crypto.c |    2 +-
->  net/sunrpc/auth_gss/gss_krb5_unseal.c |    2 --
->  2 files changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> index 9734e1d9f991..d2b02710ab07 100644
-> --- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> +++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-> @@ -34,9 +34,9 @@
->   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
->   */
->  
-> -#include <crypto/algapi.h>
->  #include <crypto/hash.h>
->  #include <crypto/skcipher.h>
-> +#include <crypto/utils.h>
->  #include <linux/err.h>
->  #include <linux/types.h>
->  #include <linux/mm.h>
-> diff --git a/net/sunrpc/auth_gss/gss_krb5_unseal.c b/net/sunrpc/auth_gss/gss_krb5_unseal.c
-> index 7d6d4ae4a3c9..b3ca30544e70 100644
-> --- a/net/sunrpc/auth_gss/gss_krb5_unseal.c
-> +++ b/net/sunrpc/auth_gss/gss_krb5_unseal.c
-> @@ -57,11 +57,9 @@
->   * WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
->   */
->  
-> -#include <crypto/algapi.h>
->  #include <linux/types.h>
->  #include <linux/jiffies.h>
->  #include <linux/sunrpc/gss_krb5.h>
-> -#include <linux/crypto.h>
->  
->  #include "gss_krb5_internal.h"
->  
+You are right. Will remove it.
 
--- 
-Chuck Lever
+>=20
+> > +	depends on VFIO_PCI_CORE
+>=20
+> select VFIO_PCI_CORE, this was updated for all vfio-pci variant drivers
+> for v6.5.
+
+Will update it.
+
+>=20
+> > +
+> > diff --git a/drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> b/drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> > new file mode 100644
+> > index 000000000000..af971fd05fd2
+> > --- /dev/null
+> > +++ b/drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> > @@ -0,0 +1,518 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/* Copyright(c) 2023 Intel Corporation */
+> > +#include <linux/anon_inodes.h>
+> > +#include <linux/container_of.h>
+> > +#include <linux/device.h>
+> > +#include <linux/file.h>
+> > +#include <linux/init.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mutex.h>
+> > +#include <linux/pci.h>
+> > +#include <linux/sizes.h>
+> > +#include <linux/types.h>
+> > +#include <linux/uaccess.h>
+> > +#include <linux/vfio_pci_core.h>
+> > +#include <linux/qat/qat_vf_mig.h>
+> > +
+> > +struct qat_vf_mig_data {
+> > +	u8 state[SZ_4K];
+> > +};
+> > +
+> > +struct qat_vf_migration_file {
+> > +	struct file *filp;
+> > +	struct mutex lock; /* protect migration region context */
+> > +	bool disabled;
+> > +
+> > +	size_t total_length;
+> > +	struct qat_vf_mig_data mig_data;
+> > +};
+> > +
+> > +static void qat_vf_vfio_pci_remove(struct pci_dev *pdev)
+> > +{
+> > +	struct qat_vf_core_device *qat_vdev =3D qat_vf_drvdata(pdev);
+> > +
+> > +	vfio_pci_core_unregister_device(&qat_vdev->core_device);
+> > +	vfio_put_device(&qat_vdev->core_device.vdev);
+> > +}
+> > +
+> > +static const struct pci_device_id qat_vf_vfio_pci_table[] =3D {
+> > +	/* Intel QAT GEN4 4xxx VF device */
+> > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL,
+> 0x4941) },
+>=20
+> Should this driver depend on CRYPTO_DEV_QAT_4XXX if that's the only
+> supported PF driver?
+
+This module has not any dependency to QAT_4XXX module at build time, but it=
+ indeed has implicit
+dependency on QAT_4XXX runtime to enable SRIOV and complete the QAT 4xxx VF=
+ migration,
+do you think we still need to put this dependency explicitly in Kconfig?
+
+>=20
+> > +	{}
+> > +};
+> > +MODULE_DEVICE_TABLE(pci, qat_vf_vfio_pci_table);
+> > +
+> > +static struct pci_driver qat_vf_vfio_pci_driver =3D {
+> > +	.name =3D "qat_vfio_pci",
+> > +	.id_table =3D qat_vf_vfio_pci_table,
+> > +	.probe =3D qat_vf_vfio_pci_probe,
+> > +	.remove =3D qat_vf_vfio_pci_remove,
+> > +	.driver_managed_dma =3D true,
+> > +};
+> > +module_pci_driver(qat_vf_vfio_pci_driver)
+> > +
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_AUTHOR("Intel Corporation");
+> > +MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live
+> migration support for Intel(R) QAT device family");
+>=20
+> Or at least one version of the QAT device family ;)  Thanks,
+
+Will update it.=20
+
+>=20
+> Alex
+
