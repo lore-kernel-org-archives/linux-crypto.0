@@ -2,152 +2,355 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C02EE49AF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 07:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9580AEE49A0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 09:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbjHWHzY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Aug 2023 03:55:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35772 "EHLO
+        id S235157AbjHWJL2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Aug 2023 05:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233626AbjHWHzX (ORCPT
+        with ESMTP id S235376AbjHWJJT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2023 03:55:23 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671CBCE6
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Aug 2023 00:55:21 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fe5c0e587eso49966815e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Aug 2023 00:55:21 -0700 (PDT)
+        Wed, 23 Aug 2023 05:09:19 -0400
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6932698;
+        Wed, 23 Aug 2023 02:02:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692777320; x=1693382120;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :references:cc:to:content-language:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LRneTZRUa8cNy0srxSHuZvRzwItRI2yXoW2UtKvjV84=;
-        b=zMi9Kg6JnKkiOCApN1UHZOgHFh2i6WbZwKiWfNMJhTP0YcLnPhqjYtGoHsa2KL9uCl
-         ll1PppstbMvSt6v+N12uykxm05dWXOvpbJyTeWdZbscJ6r/Yto28AY9VO4WuVDmQFy/g
-         hji+USfZejzfd3XLL4J8I+izrbgywVakeg++lhsfF157OFcA6OExoaoXSQu2nd4BK3LG
-         CkVMSVA0Qa0r1FifISz8+3bi7xcWNIImgvxtjTTvr+MHDHpJykdDs2yskkvi9VnFEduN
-         WF4ib2gwSBm9gL5ba8mPo2KB7yIvhk5uJXyV/k5cdqVJSSixxhd8qom0/WtP6fM3Nf++
-         lmNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692777320; x=1693382120;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :references:cc:to:content-language:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LRneTZRUa8cNy0srxSHuZvRzwItRI2yXoW2UtKvjV84=;
-        b=lrUvgraHXNGS1P+Zh85ksCwUz+I+UMfmomQ5a/otulouZDiLCzUkbGVtjq5+DKgseg
-         6KYYAm3XAkYtHpvCs0zpJK5fP5b3R5nS0fo1orr+DaxSPFB/C/+iT3ZEY/Og+PS3HlTS
-         ipkBCokl8AokUrYGnzd9Xf16DCpyGXXWM99xpNfa1BbgcxbQLREXo35z3B/uJ+cZCe0m
-         xueqnyLT5gnQNZ6vgD7GicAMEjv9jphQnMk11YihOSZBkwgFtEBfQYBnzyzQs7hZLaEh
-         tLUse8PqrwCzCofGjOCAu5WwYgAFnfKAwDA89diS1CcRWcYAtbf60oETNWePUbWF3tp0
-         MYSw==
-X-Gm-Message-State: AOJu0Yy6/vXTi35Rdui59IJ+TANsQ4ev53ABKB0YE6YLwn9fJ+6RpaHV
-        2/1oeUlco6zS5uUzZuU44MFTIg==
-X-Google-Smtp-Source: AGHT+IFzUCxBjFJpacEZ0cCouJ1S4MFuI4b7FnwIj+Snn5zburmfTxe9ZoVlX4tYEuogvDUfQBBXWw==
-X-Received: by 2002:a05:600c:22d4:b0:3fc:f9c:a3ed with SMTP id 20-20020a05600c22d400b003fc0f9ca3edmr9798385wmg.22.1692777319859;
-        Wed, 23 Aug 2023 00:55:19 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:cad:2140:c457:5132:4849:b9d9? ([2a01:e0a:cad:2140:c457:5132:4849:b9d9])
-        by smtp.gmail.com with ESMTPSA id n4-20020a5d4204000000b0031c5dda3aedsm5749631wrq.95.2023.08.23.00.55.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 00:55:19 -0700 (PDT)
-Message-ID: <dd3d28f1-ff5e-49e6-a9f7-0ec9265017cc@linaro.org>
-Date:   Wed, 23 Aug 2023 09:55:17 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From:   Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
-Content-Language: en-US, fr
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1692781350; x=1724317350;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=oI7WaSSzBnMsKCyZ9Y7kcnjkBrkJZzum167IBrJQx+M=;
+  b=GyVF6tvnhEkwbadaDFSnyryOu81K5/akWuXR2VoJo+80jvGwGt0C8zsI
+   86kcYrtsa4ZknQ0YuKGtT8SYAz5o+6D/9DzIu0MSgTlkeYNwYb728GNon
+   dDTLMyNh9l9Vdu7q9jEhAcmiOaK0CSM16IfNyo8MRrynFvmGVhJUZrCfJ
+   c=;
+X-IronPort-AV: E=Sophos;i="6.01,195,1684800000"; 
+   d="scan'208";a="346953253"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-7fa2de02.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 09:01:36 +0000
+Received: from EX19D016EUA004.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2b-m6i4x-7fa2de02.us-west-2.amazon.com (Postfix) with ESMTPS id 81EF740D9C;
+        Wed, 23 Aug 2023 09:01:34 +0000 (UTC)
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX19D016EUA004.ant.amazon.com (10.252.50.4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 23 Aug 2023 09:01:33 +0000
+Received: from f4d4887fdcfb.ant.amazon.com (10.1.212.9) by
+ EX19D037EUB003.ant.amazon.com (10.252.61.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 23 Aug 2023 09:01:27 +0000
+From:   Babis Chalios <bchalios@amazon.es>
+To:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
- <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
- <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
- <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
- <26bae022-c114-4871-8715-73d7e8aeaa52@linaro.org>
- <f61ef601-1561-45d7-8f4a-947458472668@quicinc.com>
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro Developer Services
-In-Reply-To: <f61ef601-1561-45d7-8f4a-947458472668@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Theodore Ts'o <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>
+CC:     <bchalios@amazon.es>, <graf@amazon.de>, <xmarcalx@amazon.co.uk>,
+        <aams@amazon.de>, <dwmw@amazon.co.uk>, <gregkh@linuxfoundation.org>
+Subject: [RFC PATCH 2/2] virtio-rng: implement entropy leak feature
+Date:   Wed, 23 Aug 2023 11:01:06 +0200
+Message-ID: <20230823090107.65749-3-bchalios@amazon.es>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+In-Reply-To: <20230823090107.65749-1-bchalios@amazon.es>
+References: <20230823090107.65749-1-bchalios@amazon.es>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.1.212.9]
+X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Implement the virtio-rng entropy leak feature that allows the guest
+driver to request from the device to perform certain operations in the
+event of an "entropy leak", such as when taking a VM snapshot. The guest
+can request one of two operations: (i) fill a buffer with random bytes,
+or (ii) perform a memory copy between two buffers.
 
-On 23/08/2023 02:10, Om Prakash Singh wrote:
-> 
-> 
-> On 8/22/2023 9:34 PM, Konrad Dybcio wrote:
->> On 22.08.2023 16:54, Om Prakash Singh wrote:
->>> PRNG Block on most of newer target from Qualcomm have some configuration where clock is configured by security firmware.
->>>
->>> Adding separate compatible string for each platform is overhead.
->>>
->>> We need to introduce common compatible string that can be used for all platforms with same configuration.
->>>
->>> I would suggest to use "qcom,rng-ee" for newer platform, dropping "p" also signifies it is not a Pseudo Random Number Generator.
->> Please reply inline and don't top-post.
->>
->>
->> Is this what you're trying to say?
->>
->> 1. sort out the clock requirements for designs where Linux manages it
->>     vs where the FW does so >
->> 2. introduce a new compatible for SoCs implementing a TRNG
->>
->> 3. for SoCs in 2., register the TRNG as a hwrng device
-> 
-> Yes to all
+The feature is similar to Microsoft's Virtual Machine Generation ID and
+it can be used to (1) avoid the race-condition that exists in our
+current VMGENID implementation, between the time vcpus are resumed and
+the ACPI notification is being handled and (2) propagate these events to
+user space through the random.c epoch mechanism.
 
-I can send a proposal, but that means writing a new driver for this compatible in drivers/char/hw_random/ right ?
+This commit implements the protocol between guest and device.
+Moreover, it makes sure that there is always a request from random bytes
+in flight. It uses these bytes as fresh entropy upon a snapshot.
+Finally, it programs the device to bump the random.c epoch when a
+snapshot occurs.
 
-Neil
+Signed-off-by: Babis Chalios <bchalios@amazon.es>
+---
+ drivers/char/hw_random/virtio-rng.c | 189 +++++++++++++++++++++++++++-
+ include/uapi/linux/virtio_rng.h     |   3 +
+ 2 files changed, 187 insertions(+), 5 deletions(-)
 
-> 
->>
->>
->> ?
->>
->> Konrad
-> 
-> Thanks,
-> Om
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index e41a84e6b4b5..469e0c522dbf 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -13,12 +13,29 @@
+ #include <linux/virtio_rng.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
++#include <linux/random.h>
+ 
+ static DEFINE_IDA(rng_index_ida);
+ 
++struct virtrng_leak_queue {
++	/* The underlying virtqueue of this leak queue */
++	struct virtqueue *vq;
++	/* The next epoch value the device should write through this leak queue */
++	struct rand_epoch_data next_epoch;
++};
++
++struct virtrng_leak_queue;
++
+ struct virtrng_info {
+ 	struct hwrng hwrng;
+ 	struct virtqueue *vq;
++
++	/* Leak queues */
++	bool has_leakqs;
++	struct virtrng_leak_queue leakq[2];
++	int active_leakq;
++	struct rng_epoch_notifier epoch_notifier;
++
+ 	char name[25];
+ 	int index;
+ 	bool hwrng_register_done;
+@@ -30,11 +47,118 @@ struct virtrng_info {
+ 	/* minimal size returned by rng_buffer_size() */
+ #if SMP_CACHE_BYTES < 32
+ 	u8 data[32];
++	u8 leak_data[32];
+ #else
+ 	u8 data[SMP_CACHE_BYTES];
++	u8 leak_data[SMP_CACHE_BYTES];
+ #endif
+ };
+ 
++static struct virtrng_leak_queue *vq_to_leakq(struct virtrng_info *vi,
++		struct virtqueue *vq)
++{
++	return &vi->leakq[vq->index - 1];
++}
++
++/*
++ * Swaps the queues and returns the new active leak queue.
++ * It assumes that the leak queues' lock is being held
++ */
++static void swap_leakqs(struct virtrng_info *vi)
++{
++	vi->active_leakq = 1 - vi->active_leakq;
++}
++
++static struct virtrng_leak_queue *get_active_leakq(struct virtrng_info *vi)
++{
++	return &vi->leakq[vi->active_leakq];
++}
++
++/*
++ * Create the next epoch value that we will write through the leak queue.
++ *
++ * Subsequent epoch values will be written through alternate leak queues,
++ * so the next epoch value for each queue will be:
++ *
++ * *-------------*----------------------------------------------*
++ * | notifier_id | (current_epoch + 2) & RNG_EPOCH_COUNTER_MASK |
++ * *-------------*----------------------------------------------*
++ */
++static void prepare_next_epoch(struct virtrng_info *vi, struct virtrng_leak_queue *leakq)
++{
++	leakq->next_epoch.data = ((leakq->next_epoch.data + 2) & RNG_EPOCH_COUNTER_MASK) |
++		 (vi->epoch_notifier.id << RNG_EPOCH_ID_SHIFT);
++}
++
++static int do_fill_on_leak_request(struct virtrng_info *vi, struct virtqueue *vq, void *data,
++				    size_t len)
++{
++	struct scatterlist sg;
++
++	sg_init_one(&sg, data, len);
++	return virtqueue_add_inbuf(vq, &sg, 1, data, GFP_KERNEL);
++}
++
++static int do_copy_on_leak_request(struct virtrng_info *vi, struct virtqueue *vq,
++				   void *to, void *from, size_t len)
++{
++	struct scatterlist out, in, *sgs[2];
++
++	sg_init_one(&out, from, len);
++	sgs[0] = &out;
++	sg_init_one(&in, to, len);
++	sgs[1] = &in;
++
++	return virtqueue_add_sgs(vq, sgs, 1, 1, to, GFP_KERNEL);
++}
++
++static int add_entropy_leak_requests(struct virtrng_info *vi, struct virtrng_leak_queue *leakq)
++{
++	do_fill_on_leak_request(vi, leakq->vq, &vi->leak_data, sizeof(vi->leak_data));
++	/* Make sure the device writes the next valid epoch value */
++	do_copy_on_leak_request(vi, leakq->vq, vi->epoch_notifier.epoch, &leakq->next_epoch,
++			sizeof(u32));
++
++	return 0;
++}
++
++static void entropy_leak_detected(struct virtqueue *vq)
++{
++	struct virtrng_info *vi = vq->vdev->priv;
++	struct virtrng_leak_queue *activeq = get_active_leakq(vi);
++	struct virtrng_leak_queue *leakq = vq_to_leakq(vi, vq);
++	unsigned int len;
++	void *buffer;
++
++	/*
++	 * The first time we see a used buffer in the active leak queue we swap queues
++	 * so that new commands are added in the new active leak queue.
++	 */
++	if (vq == activeq->vq) {
++		pr_info("%s: entropy leak detected!", vi->name);
++		swap_leakqs(vi);
++	}
++
++	/* Drain all the used buffers from the queue */
++	while ((buffer = virtqueue_get_buf(vq, &len)) != NULL) {
++		if (buffer == vi->leak_data) {
++			add_device_randomness(vi->leak_data, sizeof(vi->leak_data));
++
++			/*
++			 * Ensure we always have a pending request for random bytes on entropy
++			 * leak. Do it here, after we have swapped leak queues, so it gets handled
++			 * with the next entropy leak event.
++			 */
++			do_fill_on_leak_request(vi, vq, &vi->leak_data, sizeof(vi->leak_data));
++		} else if (buffer == &vi->epoch_notifier.epoch->data) {
++			/* Also, ensure we always have a pending request for bumping the epoch */
++			prepare_next_epoch(vi, leakq);
++			do_copy_on_leak_request(vi, vq, &vi->epoch_notifier.epoch->data,
++					&leakq->next_epoch, sizeof(leakq->next_epoch));
++		}
++	}
++}
++
+ static void random_recv_done(struct virtqueue *vq)
+ {
+ 	struct virtrng_info *vi = vq->vdev->priv;
+@@ -126,6 +250,51 @@ static void virtio_cleanup(struct hwrng *rng)
+ 	complete(&vi->have_data);
+ }
+ 
++static int init_virtqueues(struct virtrng_info *vi, struct virtio_device *vdev)
++{
++	int ret, vqs_nr = 1;
++	struct virtqueue *vqs[3];
++	const char *names[3];
++	vq_callback_t *callbacks[3];
++
++	callbacks[0] = random_recv_done;
++	names[0] = "input";
++
++	if (vi->has_leakqs) {
++		vqs_nr = 3;
++		vi->active_leakq = 0;
++
++		/* Register with random.c to get epoch info */
++		ret = rng_register_epoch_notifier(&vi->epoch_notifier);
++		if (ret)
++			goto err_register_epoch;
++
++		callbacks[1] = entropy_leak_detected;
++		names[1] = "leakq.1";
++		callbacks[2] = entropy_leak_detected;
++		names[2] = "leakq.2";
++	}
++
++	ret = virtio_find_vqs(vdev, vqs_nr, vqs, callbacks, names, NULL);
++	if (ret)
++		goto err_find_vqs;
++
++	vi->vq = vqs[0];
++	if (vi->has_leakqs) {
++		vi->leakq[0].vq = vqs[1];
++		vi->leakq[0].next_epoch.data = 1;
++		vi->leakq[1].vq = vqs[2];
++		vi->leakq[1].next_epoch.data = 2;
++	}
++
++	return 0;
++
++err_find_vqs:
++	rng_unregister_epoch_notifier(&vi->epoch_notifier);
++err_register_epoch:
++	return ret;
++}
++
+ static int probe_common(struct virtio_device *vdev)
+ {
+ 	int err, index;
+@@ -151,18 +320,22 @@ static int probe_common(struct virtio_device *vdev)
+ 	};
+ 	vdev->priv = vi;
+ 
+-	/* We expect a single virtqueue. */
+-	vi->vq = virtio_find_single_vq(vdev, random_recv_done, "input");
+-	if (IS_ERR(vi->vq)) {
+-		err = PTR_ERR(vi->vq);
++	vi->has_leakqs = virtio_has_feature(vdev, VIRTIO_RNG_F_LEAK);
++	err = init_virtqueues(vi, vdev);
++	if (err)
+ 		goto err_find;
+-	}
+ 
+ 	virtio_device_ready(vdev);
+ 
+ 	/* we always have a pending entropy request */
+ 	request_entropy(vi);
+ 
++	if (vi->has_leakqs) {
++		/* we always have entropy-leak requests pending */
++		add_entropy_leak_requests(vi, &vi->leakq[0]);
++		add_entropy_leak_requests(vi, &vi->leakq[1]);
++	}
++
+ 	return 0;
+ 
+ err_find:
+@@ -245,7 +418,13 @@ static const struct virtio_device_id id_table[] = {
+ 	{ 0 },
+ };
+ 
++static unsigned int features[] = {
++	VIRTIO_RNG_F_LEAK,
++};
++
+ static struct virtio_driver virtio_rng_driver = {
++	.feature_table = features,
++	.feature_table_size = ARRAY_SIZE(features),
+ 	.driver.name =	KBUILD_MODNAME,
+ 	.driver.owner =	THIS_MODULE,
+ 	.id_table =	id_table,
+diff --git a/include/uapi/linux/virtio_rng.h b/include/uapi/linux/virtio_rng.h
+index c4d5de896f0c..d9774951547e 100644
+--- a/include/uapi/linux/virtio_rng.h
++++ b/include/uapi/linux/virtio_rng.h
+@@ -5,4 +5,7 @@
+ #include <linux/virtio_ids.h>
+ #include <linux/virtio_config.h>
+ 
++/* The feature bitmap for virtio entropy device */
++#define VIRTIO_RNG_F_LEAK 0
++
+ #endif /* _LINUX_VIRTIO_RNG_H */
+-- 
+2.40.1
 
