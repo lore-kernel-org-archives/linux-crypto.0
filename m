@@ -2,122 +2,131 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA471EE49AD
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 03:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B400FEE49A3
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 05:23:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjHWDG1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Aug 2023 23:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57572 "EHLO
+        id S232667AbjHWFXh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Aug 2023 01:23:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232403AbjHWDG0 (ORCPT
+        with ESMTP id S232660AbjHWFXh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2023 23:06:26 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C18E4D;
-        Tue, 22 Aug 2023 20:06:17 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qYeB0-006oC8-CQ; Wed, 23 Aug 2023 11:04:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Aug 2023 11:04:59 +0800
-Date:   Wed, 23 Aug 2023 11:04:59 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Rob Herring <robh@kernel.org>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Neal Liu <neal_liu@aspeedtech.com>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@linaro.org>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
-        Declan Murphy <declan.murphy@intel.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Jia Jie Ho <jiajie.ho@starfivetech.com>,
-        William Qiu <william.qiu@starfivetech.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Michal Simek <michal.simek@amd.com>,
-        Harsha <harsha.harsha@amd.com>, devicetree@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-amlogic@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-        linux-samsung-soc@vger.kernel.org,
-        linux-rockchip@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH] crypto: Explicitly include correct DT includes
-Message-ID: <ZOV3Ww1l8Fu6fYim@gondor.apana.org.au>
-References: <20230714174421.4054194-1-robh@kernel.org>
+        Wed, 23 Aug 2023 01:23:37 -0400
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F17E54;
+        Tue, 22 Aug 2023 22:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1692768215; x=1724304215;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Z8gFBF0mu3Kl0VGNPxlN8F2BAekuhDcZB1/KPbYzabM=;
+  b=ENm9iJ34UDYzLNTI8LTOweed5kYoh08WAeDF3lG3t59s2SFG10QV53lp
+   OBEK/QH+Lb9rph9nX+AMD5Dak07p1U5ikM8F7xWBdDhS1pv/KaLyQylRA
+   58okqsh3pFisTOFMTuIX14/zd4uDy1IE16ZGoR5cQolg4r8/bjeLE7hD/
+   C1NORNhNALYR77vEvQhMcFR6ehjSMWAPm2mX1wzeElDJY7t2/geeA+Icv
+   RRno4RLDKeF9IDRQG/ErndasUKY7lD5o/yRhYHd7iRbaQy75/dQlQch8y
+   K9gBtXVDzYqvU0K/Tj2ry0Afa6AbmMZSKTKLeE7wCdtDH6Bc+9ks65tZB
+   A==;
+X-IronPort-AV: E=Sophos;i="6.01,194,1684792800"; 
+   d="scan'208";a="32575038"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 23 Aug 2023 07:23:33 +0200
+Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id E82C3280075;
+        Wed, 23 Aug 2023 07:23:32 +0200 (CEST)
+From:   Alexander Stein <alexander.stein@ew.tq-group.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-arm-kernel@lists.infradead.org
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>,
+        Martin Kaiser <martin@kaiser.cx>
+Subject: Re: [PATCH 1/3] hwrng: imx-rngc - use polling to detect end of self test
+Date:   Wed, 23 Aug 2023 07:23:32 +0200
+Message-ID: <3503619.mvXUDI8C0e@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <20230822152553.190858-2-martin@kaiser.cx>
+References: <20230822152553.190858-1-martin@kaiser.cx> <20230822152553.190858-2-martin@kaiser.cx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230714174421.4054194-1-robh@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 14, 2023 at 11:44:18AM -0600, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
->  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c   | 1 -
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 1 -
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 1 -
->  drivers/crypto/amlogic/amlogic-gxl-core.c           | 1 -
->  drivers/crypto/aspeed/aspeed-acry.c                 | 3 ---
->  drivers/crypto/atmel-aes.c                          | 6 ++----
->  drivers/crypto/atmel-ecc.c                          | 2 +-
->  drivers/crypto/atmel-sha.c                          | 6 ++----
->  drivers/crypto/atmel-tdes.c                         | 6 ++----
->  drivers/crypto/bcm/cipher.c                         | 3 +--
->  drivers/crypto/caam/ctrl.c                          | 1 +
->  drivers/crypto/caam/jr.c                            | 1 +
->  drivers/crypto/caam/qi.c                            | 1 +
->  drivers/crypto/ccree/cc_driver.c                    | 1 -
->  drivers/crypto/exynos-rng.c                         | 2 +-
->  drivers/crypto/gemini/sl3516-ce-core.c              | 1 -
->  drivers/crypto/img-hash.c                           | 4 ++--
->  drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c | 3 ++-
->  drivers/crypto/n2_core.c                            | 2 +-
->  drivers/crypto/omap-aes.c                           | 1 -
->  drivers/crypto/omap-des.c                           | 2 --
->  drivers/crypto/omap-sham.c                          | 1 -
->  drivers/crypto/rockchip/rk3288_crypto.c             | 1 -
->  drivers/crypto/s5p-sss.c                            | 1 -
->  drivers/crypto/sa2ul.c                              | 3 ++-
->  drivers/crypto/sahara.c                             | 1 -
->  drivers/crypto/starfive/jh7110-cryp.c               | 2 +-
->  drivers/crypto/starfive/jh7110-hash.c               | 1 -
->  drivers/crypto/stm32/stm32-cryp.c                   | 2 +-
->  drivers/crypto/stm32/stm32-hash.c                   | 2 +-
->  drivers/crypto/talitos.c                            | 4 ++--
->  drivers/crypto/xilinx/zynqmp-aes-gcm.c              | 2 +-
->  drivers/crypto/xilinx/zynqmp-sha.c                  | 1 -
->  33 files changed, 25 insertions(+), 45 deletions(-)
+Am Dienstag, 22. August 2023, 17:25:51 CEST schrieb Martin Kaiser:
+> Use polling to detect the end of the rngc self test. This is much simpler
+> than using an interrupt and a completion.
+>=20
+> Active waiting is no disadvantage here. The self test is run during
+> probe, there's nothing we could do in parallel at this time.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If this driver is built-in you are stalling the boot process while polling,=
+=20
+no? Unless probe_type =3D PROBE_PREFER_ASYNCHRONOUS is set of course.
+
+Best regards,
+Alexander
+
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> ---
+>  drivers/char/hw_random/imx-rngc.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/char/hw_random/imx-rngc.c
+> b/drivers/char/hw_random/imx-rngc.c index e4b385b01b11..85207535fd12 1006=
+44
+> --- a/drivers/char/hw_random/imx-rngc.c
+> +++ b/drivers/char/hw_random/imx-rngc.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/hw_random.h>
+>  #include <linux/completion.h>
+>  #include <linux/io.h>
+> +#include <linux/iopoll.h>
+>  #include <linux/bitfield.h>
+>=20
+>  #define RNGC_VER_ID			0x0000
+> @@ -101,21 +102,19 @@ static inline void imx_rngc_irq_unmask(struct imx_r=
+ngc
+> *rngc)
+>=20
+>  static int imx_rngc_self_test(struct imx_rngc *rngc)
+>  {
+> -	u32 cmd;
+> +	u32 cmd, status;
+>  	int ret;
+>=20
+> -	imx_rngc_irq_unmask(rngc);
+> -
+>  	/* run self test */
+>  	cmd =3D readl(rngc->base + RNGC_COMMAND);
+>  	writel(cmd | RNGC_CMD_SELF_TEST, rngc->base + RNGC_COMMAND);
+>=20
+> -	ret =3D wait_for_completion_timeout(&rngc->rng_op_done,
+> msecs_to_jiffies(RNGC_TIMEOUT)); -	imx_rngc_irq_mask_clear(rngc);
+> -	if (!ret)
+> -		return -ETIMEDOUT;
+> +	ret =3D readl_poll_timeout(rngc->base + RNGC_STATUS, status,
+> +				 status & RNGC_STATUS_ST_DONE, 1000,=20
+RNGC_TIMEOUT * 1000);
+> +	if (ret < 0)
+> +		return ret;
+>=20
+> -	return rngc->err_reg ? -EIO : 0;
+> +	return readl(rngc->base + RNGC_ERROR) ? -EIO : 0;
+>  }
+>=20
+>  static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool
+> wait)
+
+
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
+
