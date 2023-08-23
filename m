@@ -2,79 +2,130 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C727EE49A5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 02:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4C73EE49B0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 03:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232207AbjHWCS2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Aug 2023 22:18:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
+        id S231363AbjHWDCS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Aug 2023 23:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbjHWCS1 (ORCPT
+        with ESMTP id S231223AbjHWDCR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Aug 2023 22:18:27 -0400
-X-Greylist: delayed 917 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Aug 2023 19:18:25 PDT
-Received: from symantec4.comsats.net.pk (symantec4.comsats.net.pk [203.124.41.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8917185
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Aug 2023 19:18:25 -0700 (PDT)
-X-AuditID: cb7c291e-06dff70000002aeb-c7-64e553f378c9
-Received: from iesco.comsatshosting.com (iesco.comsatshosting.com [210.56.28.11])
-        (using TLS with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        by symantec4.comsats.net.pk (Symantec Messaging Gateway) with SMTP id B7.72.10987.3F355E46; Wed, 23 Aug 2023 05:33:55 +0500 (PKT)
-DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns;
-        d=iesco.com.pk; s=default;
-        h=received:content-type:mime-version:content-transfer-encoding
-          :content-description:subject:to:from:date:reply-to;
-        b=UVCydWsfwbTJXCCdm+C9DWKtARRK342rDtYW/rR+DwzXmguYJcRkaFMlAIhqNtYBe
-          1mwfWC+tKOQp62fYFO7s+ym1WrEeaEf9E9VsLkiZ4T6P6IFzuHL0zi0JvnOy3itI1
-          vjcebOwWf67Wy0ReMrqnpBPoZzO5TA6YLATRvy6GM=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=iesco.com.pk; s=default;
-        h=reply-to:date:from:to:subject:content-description
-          :content-transfer-encoding:mime-version:content-type;
-        bh=GMzYzcyTxDsE6wX/XHG6MHqAdAiHrhqbmmLQ/TZ1QnQ=;
-        b=njPMSTpHFAbhDUqTBLa0Z7PIYdBhoCNZXmun5ajzsnlxRaq0er/4xJETrqy/VI1mY
-          cP1FlIGz0ylLQD89HDHO0MfMCEs3EWnj/FUD9PZaANXGIjz9xDwD/PvPCxkE+hJRN
-          SVM+bnPe9rHmEozDJlY0NSvzqx9vtpmVdOtFjbq8o=
-Received: from [94.156.6.90] (UnknownHost [94.156.6.90]) by iesco.comsatshosting.com with SMTP;
-   Wed, 23 Aug 2023 04:30:59 +0500
-Message-ID: <B7.72.10987.3F355E46@symantec4.comsats.net.pk>
-Content-Type: text/plain; charset="iso-8859-1"
+        Tue, 22 Aug 2023 23:02:17 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E200E47;
+        Tue, 22 Aug 2023 20:02:12 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qYe6H-006o9O-CL; Wed, 23 Aug 2023 11:00:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Aug 2023 11:00:06 +0800
+Date:   Wed, 23 Aug 2023 11:00:06 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Rob Herring <robh@kernel.org>
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Neal Liu <neal_liu@aspeedtech.com>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@linaro.org>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Declan Murphy <declan.murphy@intel.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Jia Jie Ho <jiajie.ho@starfivetech.com>,
+        William Qiu <william.qiu@starfivetech.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Michal Simek <michal.simek@amd.com>,
+        Harsha <harsha.harsha@amd.com>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH] crypto: Explicitly include correct DT includes
+Message-ID: <ZOV2Nn4o8Ldy9P1i@gondor.apana.org.au>
+References: <20230714174421.4054194-1-robh@kernel.org>
+ <CAL_JsqL_CvroupJEFwrjt8WOq=4WBxvE3sOTMnY8hEuBAMG=1g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Re; Interest,
-To:     linux-crypto@vger.kernel.org
-From:   "Chen Yun" <pso.chairmanbod@iesco.com.pk>
-Date:   Tue, 22 Aug 2023 16:31:13 -0700
-Reply-To: chnyne@gmail.com
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNLMWRmVeSWpSXmKPExsVyyUKGW/dz8NMUg2dzpC3u3/vJ5MDo8XmT
-        XABjFJdNSmpOZllqkb5dAlfGknUXWAp2M1e09S9iaWB8zNTFyMEhIWAicW9BVRcjF4eQwB4m
-        ie03bzCCOCwCq5kldhx7wg7hPGSWWH3tFzNEWTOjRM+eNWxdjJwcvALWErvPt7KA2MwCehI3
-        pk6BigtKnJz5BCquLbFs4WtmkHXMAmoSX7tKQMLCAmISn6YtYwcJiwgoSMz7qgMSZhPQl1jx
-        tZkRxGYRUJW4cn0t2BQhASmJjVfWs01g5J+FZNksJMtmIVk2C2HZAkaWVYwSxZW5icBASzbR
-        S87PLU4sKdbLSy3RK8jexAgMwtM1mnI7GJdeSjzEKMDBqMTD+3PdkxQh1sQyoK5DjBIczEoi
-        vNLfH6YI8aYkVlalFuXHF5XmpBYfYpTmYFES57UVepYsJJCeWJKanZpakFoEk2Xi4JRqYJyc
-        EyVZ8u7b3DkHI9/yBh94tSNvuZXY5Jo9WTMClxZ4P+fR8XsXtH3CgUc/m2MbVvvnLNR8vyCm
-        yZj/s2Xrrtxabfnb25VFe/5/bmDM3eq1YNNfLoHfed90a93qfhycyRwZwtQ9PWAPR1/bOvUA
-        Q7c97GtfLdOfJJn292vCFd5dVUdcZOoSeJVYijMSDbWYi4oTAb9TIKg+AgAA
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqL_CvroupJEFwrjt8WOq=4WBxvE3sOTMnY8hEuBAMG=1g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Re; Interest,
+On Tue, Aug 22, 2023 at 05:40:57PM -0500, Rob Herring wrote:
+> On Fri, Jul 14, 2023 at 12:44 PM Rob Herring <robh@kernel.org> wrote:
+> >
+> > The DT of_device.h and of_platform.h date back to the separate
+> > of_platform_bus_type before it as merged into the regular platform bus.
+> > As part of that merge prepping Arm DT support 13 years ago, they
+> > "temporarily" include each other. They also include platform_device.h
+> > and of.h. As a result, there's a pretty much random mix of those include
+> > files used throughout the tree. In order to detangle these headers and
+> > replace the implicit includes with struct declarations, users need to
+> > explicitly include the correct includes.
+> >
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+> > ---
+> >  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c   | 1 -
+> >  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 1 -
+> >  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 1 -
+> >  drivers/crypto/amlogic/amlogic-gxl-core.c           | 1 -
+> >  drivers/crypto/aspeed/aspeed-acry.c                 | 3 ---
+> >  drivers/crypto/atmel-aes.c                          | 6 ++----
+> >  drivers/crypto/atmel-ecc.c                          | 2 +-
+> >  drivers/crypto/atmel-sha.c                          | 6 ++----
+> >  drivers/crypto/atmel-tdes.c                         | 6 ++----
+> >  drivers/crypto/bcm/cipher.c                         | 3 +--
+> >  drivers/crypto/caam/ctrl.c                          | 1 +
+> >  drivers/crypto/caam/jr.c                            | 1 +
+> >  drivers/crypto/caam/qi.c                            | 1 +
+> >  drivers/crypto/ccree/cc_driver.c                    | 1 -
+> >  drivers/crypto/exynos-rng.c                         | 2 +-
+> >  drivers/crypto/gemini/sl3516-ce-core.c              | 1 -
+> >  drivers/crypto/img-hash.c                           | 4 ++--
+> >  drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c | 3 ++-
+> >  drivers/crypto/n2_core.c                            | 2 +-
+> >  drivers/crypto/omap-aes.c                           | 1 -
+> >  drivers/crypto/omap-des.c                           | 2 --
+> >  drivers/crypto/omap-sham.c                          | 1 -
+> >  drivers/crypto/rockchip/rk3288_crypto.c             | 1 -
+> >  drivers/crypto/s5p-sss.c                            | 1 -
+> >  drivers/crypto/sa2ul.c                              | 3 ++-
+> >  drivers/crypto/sahara.c                             | 1 -
+> >  drivers/crypto/starfive/jh7110-cryp.c               | 2 +-
+> >  drivers/crypto/starfive/jh7110-hash.c               | 1 -
+> >  drivers/crypto/stm32/stm32-cryp.c                   | 2 +-
+> >  drivers/crypto/stm32/stm32-hash.c                   | 2 +-
+> >  drivers/crypto/talitos.c                            | 4 ++--
+> >  drivers/crypto/xilinx/zynqmp-aes-gcm.c              | 2 +-
+> >  drivers/crypto/xilinx/zynqmp-sha.c                  | 1 -
+> >  33 files changed, 25 insertions(+), 45 deletions(-)
+> 
+> Ping!
 
-I am interested in discussing the Investment proposal as I explained
-in my previous mail. May you let me know your interest and the
-possibility of a cooperation aimed for mutual interest.
+Sorry, I misfiled this one.  I'll get onto it now.
 
-Looking forward to your mail for further discussion.
-
-Regards
-
-------
-Chen Yun - Chairman of CREC
-China Railway Engineering Corporation - CRECG
-China Railway Plaza, No.69 Fuxing Road, Haidian District, Beijing, P.R.
-China
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
