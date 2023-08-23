@@ -2,105 +2,137 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9DEBEE49B0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 10:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1503DEE4993
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 10:20:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231728AbjHWKHE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Aug 2023 06:07:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34480 "EHLO
+        id S231989AbjHWKUn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Aug 2023 06:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232290AbjHWKGV (ORCPT
+        with ESMTP id S232911AbjHWKUl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2023 06:06:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D53E10B;
-        Wed, 23 Aug 2023 03:06:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A0FAB63327;
-        Wed, 23 Aug 2023 10:06:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 580ABC433C7;
-        Wed, 23 Aug 2023 10:06:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1692785175;
-        bh=S/tRBgvfmFafEY0NNIlhshuLBbudgpjLYxMaO2Jaq5c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nu9W/JEFszyKDZrhMU1WUqqZbhMZUV3YN72hbzQdUX/yNu8joV7FADzoUmI97qOcu
-         CEEoysUvAQXgMyHgpcixsKKh3LaLCpYj5VAJbl4Vmz408A08kaeLG8b9H3+G0R2JaT
-         lzDaE7FW5AoPdjVjFESMP7OwE8frmfu/ALs39bmM=
-Date:   Wed, 23 Aug 2023 12:06:13 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Babis Chalios <bchalios@amazon.es>
-Cc:     Olivia Mackall <olivia@selenic.com>,
+        Wed, 23 Aug 2023 06:20:41 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 254B3CDF;
+        Wed, 23 Aug 2023 03:20:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1692786033; x=1724322033;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LvruqNZa27xH1J/uB+hQyGumvyQYGsP31T4ueurP9jM=;
+  b=VAhayl5QN/rwI0VscfFiAhV1CHaHJkkhyEU6vQDQtiXz3iih/6wlJ7ax
+   sAmPUnevbdEIierrJrlaK+AouKTx0ozYdnfMk6BBvRNtk6fIvgWu0XsNT
+   TiPxAkuab1dFOiXsQgo0RkHu/kyoOu2Bt9oF893zfAJgxCLTpOjLC1ZGk
+   s=;
+X-IronPort-AV: E=Sophos;i="6.01,195,1684800000"; 
+   d="scan'208";a="234169003"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2023 10:20:30 +0000
+Received: from EX19MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com (Postfix) with ESMTPS id F2FCD8060A;
+        Wed, 23 Aug 2023 10:20:24 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 23 Aug 2023 10:20:24 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Wed, 23 Aug
+ 2023 10:20:20 +0000
+Message-ID: <9ea91c30-fda4-4bfa-baf2-82f911994f00@amazon.de>
+Date:   Wed, 23 Aug 2023 12:20:18 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/2] random: emit reseed notifications for PRNGs
+Content-Language: en-GB
+To:     Babis Chalios <bchalios@amazon.es>,
+        Greg KH <gregkh@linuxfoundation.org>
+CC:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Theodore Ts'o <tytso@mit.edu>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>,
         Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, graf@amazon.de,
-        xmarcalx@amazon.co.uk, aams@amazon.de, dwmw@amazon.co.uk
-Subject: Re: [RFC PATCH 1/2] random: emit reseed notifications for PRNGs
-Message-ID: <2023082340-daybreak-lagged-f157@gregkh>
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>,
+        <xmarcalx@amazon.co.uk>, <aams@amazon.de>, <dwmw@amazon.co.uk>
 References: <20230823090107.65749-1-bchalios@amazon.es>
  <20230823090107.65749-2-bchalios@amazon.es>
  <2023082322-semester-heave-e5bc@gregkh>
  <ff6aa77e-4e5c-488e-bd45-319fc09720c3@amazon.es>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff6aa77e-4e5c-488e-bd45-319fc09720c3@amazon.es>
+ <2023082340-daybreak-lagged-f157@gregkh>
+ <89ce1064-e4a3-461f-8a78-88e72e5b6419@amazon.es>
+From:   Alexander Graf <graf@amazon.de>
+In-Reply-To: <89ce1064-e4a3-461f-8a78-88e72e5b6419@amazon.es>
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 11:27:11AM +0200, Babis Chalios wrote:
-> Hi Greg,
-> 
-> On 23/8/23 11:08, Greg KH wrote:
-> > CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> > 
-> > 
-> > 
-> > On Wed, Aug 23, 2023 at 11:01:05AM +0200, Babis Chalios wrote:
-> > > Sometimes, PRNGs need to reseed. For example, on a regular timer
-> > > interval, to ensure nothing consumes a random value for longer than e.g.
-> > > 5 minutes, or when VMs get cloned, to ensure seeds don't leak in to
-> > > clones.
-> > > 
-> > > The notification happens through a 32bit epoch value that changes every
-> > > time cached entropy is no longer valid, hence PRNGs need to reseed. User
-> > > space applications can get hold of a pointer to this value through
-> > > /dev/(u)random. We introduce a new ioctl() that returns an anonymous
-> > > file descriptor. From this file descriptor we can mmap() a single page
-> > > which includes the epoch at offset 0.
-> > > 
-> > > random.c maintains the epoch value in a global shared page. It exposes
-> > > a registration API for kernel subsystems that are able to notify when
-> > > reseeding is needed. Notifiers register with random.c and receive a
-> > > unique 8bit ID and a pointer to the epoch. When they need to report a
-> > > reseeding event they write a new epoch value which includes the
-> > > notifier ID in the first 8 bits and an increasing counter value in the
-> > > remaining 24 bits:
-> > > 
-> > >                RNG epoch
-> > > *-------------*---------------------*
-> > > | notifier id | epoch counter value |
-> > > *-------------*---------------------*
-> > >       8 bits           24 bits
-> > Why not just use 32/32 for a full 64bit value, or better yet, 2
-> > different variables?  Why is 32bits and packing things together here
-> > somehow simpler?
-> 
-> We made it 32 bits so that we can read/write it atomically in all 32bit
-> architectures.
-> Do you think that's not a problem?
+SGV5IEdyZWcsCgpPbiAyMy4wOC4yMyAxMjowOCwgQmFiaXMgQ2hhbGlvcyB3cm90ZToKPgo+Cj4g
+T24gMjMvOC8yMyAxMjowNiwgR3JlZyBLSCB3cm90ZToKPj4KPj4gT24gV2VkLCBBdWcgMjMsIDIw
+MjMgYXQgMTE6Mjc6MTFBTSArMDIwMCwgQmFiaXMgQ2hhbGlvcyB3cm90ZToKPj4+IEhpIEdyZWcs
+Cj4+Pgo+Pj4gT24gMjMvOC8yMyAxMTowOCwgR3JlZyBLSCB3cm90ZToKPj4+Pgo+Pj4+IE9uIFdl
+ZCwgQXVnIDIzLCAyMDIzIGF0IDExOjAxOjA1QU0gKzAyMDAsIEJhYmlzIENoYWxpb3Mgd3JvdGU6
+Cj4+Pj4+IFNvbWV0aW1lcywgUFJOR3MgbmVlZCB0byByZXNlZWQuIEZvciBleGFtcGxlLCBvbiBh
+IHJlZ3VsYXIgdGltZXIKPj4+Pj4gaW50ZXJ2YWwsIHRvIGVuc3VyZSBub3RoaW5nIGNvbnN1bWVz
+IGEgcmFuZG9tIHZhbHVlIGZvciBsb25nZXIgdGhhbiBlLmcuCj4+Pj4+IDUgbWludXRlcywgb3Ig
+d2hlbiBWTXMgZ2V0IGNsb25lZCwgdG8gZW5zdXJlIHNlZWRzIGRvbid0IGxlYWsgaW4gdG8KPj4+
+Pj4gY2xvbmVzLgo+Pj4+Pgo+Pj4+PiBUaGUgbm90aWZpY2F0aW9uIGhhcHBlbnMgdGhyb3VnaCBh
+IDMyYml0IGVwb2NoIHZhbHVlIHRoYXQgY2hhbmdlcyBldmVyeQo+Pj4+PiB0aW1lIGNhY2hlZCBl
+bnRyb3B5IGlzIG5vIGxvbmdlciB2YWxpZCwgaGVuY2UgUFJOR3MgbmVlZCB0byByZXNlZWQuIFVz
+ZXIKPj4+Pj4gc3BhY2UgYXBwbGljYXRpb25zIGNhbiBnZXQgaG9sZCBvZiBhIHBvaW50ZXIgdG8g
+dGhpcyB2YWx1ZSB0aHJvdWdoCj4+Pj4+IC9kZXYvKHUpcmFuZG9tLiBXZSBpbnRyb2R1Y2UgYSBu
+ZXcgaW9jdGwoKSB0aGF0IHJldHVybnMgYW4gYW5vbnltb3VzCj4+Pj4+IGZpbGUgZGVzY3JpcHRv
+ci4gRnJvbSB0aGlzIGZpbGUgZGVzY3JpcHRvciB3ZSBjYW4gbW1hcCgpIGEgc2luZ2xlIHBhZ2UK
+Pj4+Pj4gd2hpY2ggaW5jbHVkZXMgdGhlIGVwb2NoIGF0IG9mZnNldCAwLgo+Pj4+Pgo+Pj4+PiBy
+YW5kb20uYyBtYWludGFpbnMgdGhlIGVwb2NoIHZhbHVlIGluIGEgZ2xvYmFsIHNoYXJlZCBwYWdl
+LiBJdCBleHBvc2VzCj4+Pj4+IGEgcmVnaXN0cmF0aW9uIEFQSSBmb3Iga2VybmVsIHN1YnN5c3Rl
+bXMgdGhhdCBhcmUgYWJsZSB0byBub3RpZnkgd2hlbgo+Pj4+PiByZXNlZWRpbmcgaXMgbmVlZGVk
+LiBOb3RpZmllcnMgcmVnaXN0ZXIgd2l0aCByYW5kb20uYyBhbmQgcmVjZWl2ZSBhCj4+Pj4+IHVu
+aXF1ZSA4Yml0IElEIGFuZCBhIHBvaW50ZXIgdG8gdGhlIGVwb2NoLiBXaGVuIHRoZXkgbmVlZCB0
+byByZXBvcnQgYQo+Pj4+PiByZXNlZWRpbmcgZXZlbnQgdGhleSB3cml0ZSBhIG5ldyBlcG9jaCB2
+YWx1ZSB3aGljaCBpbmNsdWRlcyB0aGUKPj4+Pj4gbm90aWZpZXIgSUQgaW4gdGhlIGZpcnN0IDgg
+Yml0cyBhbmQgYW4gaW5jcmVhc2luZyBjb3VudGVyIHZhbHVlIGluIHRoZQo+Pj4+PiByZW1haW5p
+bmcgMjQgYml0czoKPj4+Pj4KPj4+Pj4gICAgICAgICAgICAgICAgIFJORyBlcG9jaAo+Pj4+PiAq
+LS0tLS0tLS0tLS0tLSotLS0tLS0tLS0tLS0tLS0tLS0tLS0qCj4+Pj4+IHwgbm90aWZpZXIgaWQg
+fCBlcG9jaCBjb3VudGVyIHZhbHVlIHwKPj4+Pj4gKi0tLS0tLS0tLS0tLS0qLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tKgo+Pj4+PiAgICAgICAgOCBiaXRzICAgICAgICAgICAyNCBiaXRzCj4+Pj4gV2h5
+IG5vdCBqdXN0IHVzZSAzMi8zMiBmb3IgYSBmdWxsIDY0Yml0IHZhbHVlLCBvciBiZXR0ZXIgeWV0
+LCAyCj4+Pj4gZGlmZmVyZW50IHZhcmlhYmxlcz8gIFdoeSBpcyAzMmJpdHMgYW5kIHBhY2tpbmcg
+dGhpbmdzIHRvZ2V0aGVyIGhlcmUKPj4+PiBzb21laG93IHNpbXBsZXI/Cj4+PiBXZSBtYWRlIGl0
+IDMyIGJpdHMgc28gdGhhdCB3ZSBjYW4gcmVhZC93cml0ZSBpdCBhdG9taWNhbGx5IGluIGFsbCAz
+MmJpdAo+Pj4gYXJjaGl0ZWN0dXJlcy4KPj4+IERvIHlvdSB0aGluayB0aGF0J3Mgbm90IGEgcHJv
+YmxlbT8KPj4gV2hhdCAzMmJpdCBwbGF0Zm9ybXMgY2FyZSBhYm91dCB0aGlzIHR5cGUgb2YgaW50
+ZXJmYWNlIGF0IGFsbD8KPgo+IEkgdGhpbmssIGFueSAzMmJpdCBwbGF0Zm9ybSB0aGF0IGdldHMg
+cmFuZG9tIGJ5dGVzIGZyb20gdGhlIGtlcm5lbC4KCgpXZSdyZSBidWlsZGluZyBhbiBBQkkgaGVy
+ZSB0aGF0IGdlbmVyaWNhbGx5IHByb3BhZ2F0ZXMgYW4gYXRvbWljIHdheSBmb3IgCnVzZXIgc3Bh
+Y2UgdG8gbGVhcm4gYWJvdXQgYW4gInJuZyBlcG9jaCIuIFNpbmNlIHRoZXJlIGFyZSAzMmJpdCB1
+c2VyIApzcGFjZSBhcHBsaWNhdGlvbnMgb3V0IHRoZXJlIHdob3NlIGV4ZWN1dGluZyBWTXMgY2Fu
+IGJlIGNsb25lZCBvciB0aGF0IAp3YW50IHRvIGxlYXJuIGFib3V0IHJlZ3VsYXIgZXBvY2ggY2hh
+bmdlcyAoaTM4NiwgYXJtMzIsIDMyYml0IHJpc2N2LCAKZXRjKSwgd2UgbmVlZCB0byBtYWtlIHN1
+cmUgd2UgaGF2ZSBhIHZpYWJsZSB3YXkgZm9yIHRoZW0gdG8gY29uc3VtZSB0aGUgCkFCSSBhcyB3
+ZWxsLiBUaGlzIGFwcGxpZXMgdG8gMzJiaXQgdXNlciBzcGFjZSAtIHRoZSBrZXJuZWwgbWF5IGFz
+IHdlbGwgCnJ1biA2NGJpdCBsaWtlIGEgdHlwaWNhbCBhYXJjaDY0IHNldHVwIHRvZGF5LgoKV2Ug
+Y291bGQgb2YgY291cnNlIGJ1aWxkIHRoaXMgQUJJIHdpdGggYSAibG9uZyIgbm90aW9uIGluIG1p
+bmQuIEJ1dCB0aGVuIAp5b3Ugd291bGQgZ2V0IGFuIGlvY3RsIHRvIGEga2VybmVsIGRhdGEgc3Ry
+dWN0dXJlIHRoYXQgaXMgNjRiaXQsIGV2ZW4gCndpdGggQ09ORklHX0NPTVBBVC4gU28gbm93IHdl
+J2QgaGF2ZSB0byBidWlsZCB3cmFwcGVycyBhbmQgbWFpbnRhaW4gMiAKc3RydWN0dXJlcyBmb3Ig
+MzJiaXQgYW5kIDY0Yml0IHVzZXIgc3BhY2UgYW5kIGV2ZXJ5dGhpbmcgd291bGQgYmVjb21lIApz
+dXBlciBjb21wbGljYXRlZC4KClRoZXNlIGV2ZW50cyB3b24ndCBoYXBwZW4gdmVyeSBvZnRlbi4g
+MjRiaXRzIGlzIHZlcnkgbGlrZWx5IGVhc2lseSAKc3VmZmljaWVudCB0byBub3QgZXZlciByYWNl
+IGJldHdlZW4gc29tZW9uZSBzZXR0aW5nIGEgbmV3IGVwb2NoIGFuZCAKc29tZW9uZSByZWFkaW5n
+IHRoZSBlcG9jaCB2YWx1ZS4gU28gYnkga2VlcGluZyBpdCAzMmJpdCwgd2UgbWFrZSBpdCAKZ3Vh
+cmFudGVlZCBhdG9taWMgb24gYWxsIHRhcmdldHMgYW5kIGNvbXBsZXRlbHkgcmVtb3ZlIGFueSBD
+T05GSUdfQ09NUEFUIAp3b2VzLgoKCkFsZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVy
+IEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhy
+dW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBB
+bXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGlu
+ClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
-What 32bit platforms care about this type of interface at all?
-
-thanks,
-
-greg k-h
