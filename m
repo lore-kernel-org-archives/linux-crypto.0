@@ -2,174 +2,152 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D74EE49AB
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 07:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C02EE49AF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 07:55:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233339AbjHWHbq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Aug 2023 03:31:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
+        id S233633AbjHWHzY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Aug 2023 03:55:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233331AbjHWHbp (ORCPT
+        with ESMTP id S233626AbjHWHzX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2023 03:31:45 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68623185
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Aug 2023 00:31:43 -0700 (PDT)
-Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RVyX41FNXzTmcG;
-        Wed, 23 Aug 2023 15:29:24 +0800 (CST)
-Received: from hulk-vt.huawei.com (10.67.174.118) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 23 Aug 2023 15:31:39 +0800
-From:   Lu Jialin <lujialin4@huawei.com>
-To:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     Lu Jialin <lujialin4@huawei.com>, Guo Zihua <guozihua@huawei.com>,
-        <linux-crypto@vger.kernel.org>
-Subject: [PATCH v2] crypto: Fix hungtask for PADATA_RESET
-Date:   Wed, 23 Aug 2023 07:30:47 +0000
-Message-ID: <20230823073047.1515137-1-lujialin4@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 23 Aug 2023 03:55:23 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671CBCE6
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Aug 2023 00:55:21 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3fe5c0e587eso49966815e9.0
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Aug 2023 00:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692777320; x=1693382120;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LRneTZRUa8cNy0srxSHuZvRzwItRI2yXoW2UtKvjV84=;
+        b=zMi9Kg6JnKkiOCApN1UHZOgHFh2i6WbZwKiWfNMJhTP0YcLnPhqjYtGoHsa2KL9uCl
+         ll1PppstbMvSt6v+N12uykxm05dWXOvpbJyTeWdZbscJ6r/Yto28AY9VO4WuVDmQFy/g
+         hji+USfZejzfd3XLL4J8I+izrbgywVakeg++lhsfF157OFcA6OExoaoXSQu2nd4BK3LG
+         CkVMSVA0Qa0r1FifISz8+3bi7xcWNIImgvxtjTTvr+MHDHpJykdDs2yskkvi9VnFEduN
+         WF4ib2gwSBm9gL5ba8mPo2KB7yIvhk5uJXyV/k5cdqVJSSixxhd8qom0/WtP6fM3Nf++
+         lmNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692777320; x=1693382120;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LRneTZRUa8cNy0srxSHuZvRzwItRI2yXoW2UtKvjV84=;
+        b=lrUvgraHXNGS1P+Zh85ksCwUz+I+UMfmomQ5a/otulouZDiLCzUkbGVtjq5+DKgseg
+         6KYYAm3XAkYtHpvCs0zpJK5fP5b3R5nS0fo1orr+DaxSPFB/C/+iT3ZEY/Og+PS3HlTS
+         ipkBCokl8AokUrYGnzd9Xf16DCpyGXXWM99xpNfa1BbgcxbQLREXo35z3B/uJ+cZCe0m
+         xueqnyLT5gnQNZ6vgD7GicAMEjv9jphQnMk11YihOSZBkwgFtEBfQYBnzyzQs7hZLaEh
+         tLUse8PqrwCzCofGjOCAu5WwYgAFnfKAwDA89diS1CcRWcYAtbf60oETNWePUbWF3tp0
+         MYSw==
+X-Gm-Message-State: AOJu0Yy6/vXTi35Rdui59IJ+TANsQ4ev53ABKB0YE6YLwn9fJ+6RpaHV
+        2/1oeUlco6zS5uUzZuU44MFTIg==
+X-Google-Smtp-Source: AGHT+IFzUCxBjFJpacEZ0cCouJ1S4MFuI4b7FnwIj+Snn5zburmfTxe9ZoVlX4tYEuogvDUfQBBXWw==
+X-Received: by 2002:a05:600c:22d4:b0:3fc:f9c:a3ed with SMTP id 20-20020a05600c22d400b003fc0f9ca3edmr9798385wmg.22.1692777319859;
+        Wed, 23 Aug 2023 00:55:19 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:cad:2140:c457:5132:4849:b9d9? ([2a01:e0a:cad:2140:c457:5132:4849:b9d9])
+        by smtp.gmail.com with ESMTPSA id n4-20020a5d4204000000b0031c5dda3aedsm5749631wrq.95.2023.08.23.00.55.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Aug 2023 00:55:19 -0700 (PDT)
+Message-ID: <dd3d28f1-ff5e-49e6-a9f7-0ec9265017cc@linaro.org>
+Date:   Wed, 23 Aug 2023 09:55:17 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.174.118]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600003.china.huawei.com (7.193.23.202)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
+Content-Language: en-US, fr
+To:     Om Prakash Singh <quic_omprsing@quicinc.com>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
+ <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
+ <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
+ <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
+ <26bae022-c114-4871-8715-73d7e8aeaa52@linaro.org>
+ <f61ef601-1561-45d7-8f4a-947458472668@quicinc.com>
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <f61ef601-1561-45d7-8f4a-947458472668@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We found a hungtask bug in test_aead_vec_cfg as follows:
+Hi,
 
-INFO: task cryptomgr_test:391009 blocked for more than 120 seconds.
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-Call trace:
- __switch_to+0x98/0xe0
- __schedule+0x6c4/0xf40
- schedule+0xd8/0x1b4
- schedule_timeout+0x474/0x560
- wait_for_common+0x368/0x4e0
- wait_for_completion+0x20/0x30
- test_aead_vec_cfg+0xab4/0xd50
- test_aead+0x144/0x1f0
- alg_test_aead+0xd8/0x1e0
- alg_test+0x634/0x890
- cryptomgr_test+0x40/0x70
- kthread+0x1e0/0x220
- ret_from_fork+0x10/0x18
- Kernel panic - not syncing: hung_task: blocked tasks
+On 23/08/2023 02:10, Om Prakash Singh wrote:
+> 
+> 
+> On 8/22/2023 9:34 PM, Konrad Dybcio wrote:
+>> On 22.08.2023 16:54, Om Prakash Singh wrote:
+>>> PRNG Block on most of newer target from Qualcomm have some configuration where clock is configured by security firmware.
+>>>
+>>> Adding separate compatible string for each platform is overhead.
+>>>
+>>> We need to introduce common compatible string that can be used for all platforms with same configuration.
+>>>
+>>> I would suggest to use "qcom,rng-ee" for newer platform, dropping "p" also signifies it is not a Pseudo Random Number Generator.
+>> Please reply inline and don't top-post.
+>>
+>>
+>> Is this what you're trying to say?
+>>
+>> 1. sort out the clock requirements for designs where Linux manages it
+>>     vs where the FW does so >
+>> 2. introduce a new compatible for SoCs implementing a TRNG
+>>
+>> 3. for SoCs in 2., register the TRNG as a hwrng device
+> 
+> Yes to all
 
-For padata_do_parallel, when the return err is 0 or -EBUSY, it will call
-wait_for_completion(&wait->completion) in test_aead_vec_cfg. In normal
-case, aead_request_complete() will be called in pcrypt_aead_serial and the
-return err is 0 for padata_do_parallel. But, when pinst->flags is
-PADATA_RESET, the return err is -EBUSY for padata_do_parallel, and it
-won't call aead_request_complete(). Therefore, test_aead_vec_cfg will
-hung at wait_for_completion(&wait->completion), which will cause
-hungtask.
+I can send a proposal, but that means writing a new driver for this compatible in drivers/char/hw_random/ right ?
 
-The problem comes as following:
-(padata_do_parallel)                 |
-    rcu_read_lock_bh();              |
-    err = -EINVAL;                   |   (padata_replace)
-                                     |     pinst->flags |= PADATA_RESET;
-    err = -EBUSY                     |
-    if (pinst->flags & PADATA_RESET) |
-        rcu_read_unlock_bh()         |
-        return err
+Neil
 
-In order to resolve the problem, we retry at most 5 times when
-padata_do_parallel return -EBUSY. For more than 5 times, we replace the
-return err -EBUSY with -EAGAIN, which means parallel_data is changing, and
-the caller should call it again.
-
-v2:
-introduce padata_try_do_parallel() in pcrypt_aead_encrypt and
-pcrypt_aead_decrypt to solve the hungtask
-
-Signed-off-by: Lu Jialin <lujialin4@huawei.com>
-Signed-off-by: Guo Zihua <guozihua@huawei.com>
----
- crypto/pcrypt.c | 33 +++++++++++++++++++++++++++------
- kernel/padata.c |  2 +-
- 2 files changed, 28 insertions(+), 7 deletions(-)
-
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 8c1d0ca41213..9d4470482165 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -74,6 +74,31 @@ static void pcrypt_aead_done(void *data, int err)
- 	padata_do_serial(padata);
- }
- 
-+/*
-+ *  We retry at most 5 times when padata_do_parallel return -EBUSY.
-+ *  For more than 5 times, we replace the return err -EBUSY with -EAGAIN,
-+ *  which means parallel_data is changing, the caller should call it again.
-+ */
-+static int padata_try_do_paralell(struct padata_shell *ps,
-+				  struct padata_priv *padata, int *cb_cpu)
-+{
-+	int err = 0;
-+	int nr_retries = 5;
-+
-+	while (nr_retries--) {
-+		err = padata_do_parallel(ps, padata, cb_cpu);
-+		if (err != -EBUSY)
-+			break;
-+	}
-+
-+	if (err == 0)
-+		err = -EINPROGRESS;
-+	else if (err == -EBUSY)
-+		err = -EAGAIN;
-+
-+	return err;
-+}
-+
- static void pcrypt_aead_enc(struct padata_priv *padata)
- {
- 	struct pcrypt_request *preq = pcrypt_padata_request(padata);
-@@ -114,9 +139,7 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
- 			       req->cryptlen, req->iv);
- 	aead_request_set_ad(creq, req->assoclen);
- 
--	err = padata_do_parallel(ictx->psenc, padata, &ctx->cb_cpu);
--	if (!err)
--		return -EINPROGRESS;
-+	err = padata_try_do_paralell(ictx->psenc, padata, &ctx->cb_cpu);
- 
- 	return err;
- }
-@@ -161,9 +184,7 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
- 			       req->cryptlen, req->iv);
- 	aead_request_set_ad(creq, req->assoclen);
- 
--	err = padata_do_parallel(ictx->psdec, padata, &ctx->cb_cpu);
--	if (!err)
--		return -EINPROGRESS;
-+	err = padata_try_do_paralell(ictx->psenc, padata, &ctx->cb_cpu);
- 
- 	return err;
- }
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 222d60195de6..81c8183f3176 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -202,7 +202,7 @@ int padata_do_parallel(struct padata_shell *ps,
- 		*cb_cpu = cpu;
- 	}
- 
--	err =  -EBUSY;
-+	err = -EBUSY;
- 	if ((pinst->flags & PADATA_RESET))
- 		goto out;
- 
--- 
-2.34.1
+> 
+>>
+>>
+>> ?
+>>
+>> Konrad
+> 
+> Thanks,
+> Om
 
