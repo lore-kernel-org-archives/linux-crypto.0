@@ -2,90 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35838EE4993
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 11:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E71EE49B0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 11:16:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234300AbjHWLIi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Aug 2023 07:08:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39962 "EHLO
+        id S234061AbjHWLQh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Aug 2023 07:16:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234312AbjHWLIh (ORCPT
+        with ESMTP id S231165AbjHWLQg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2023 07:08:37 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6ABC10C7;
-        Wed, 23 Aug 2023 04:08:10 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-317716a4622so4850665f8f.1;
-        Wed, 23 Aug 2023 04:08:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692788889; x=1693393689;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=umv4AuAG3bVQsHLVJR21Xr732gEzM/i84SmQ/8lFvbs=;
-        b=jn3X8XVR0zll0GXEDWuEmfLw9HCNQ9cUWno72c+XRD8kJJ0GPkblFCv8zzlxIXPcMl
-         8S960EcpVXQFtDVAxrj2JlXfMaRzDFE3TkLH/2f6OVadoHWew5IhMmxbVV9NoKIjDvSv
-         +zGD6ZTH/o2r9S8RutvDGyCCQPBeE4TP7nt24FECuxRm/GvxycsbOOeI/TsaB9ZuDKXN
-         YLgmFcODv51olRRrB30V9gw48LHe2Osz/0B1wazBZAvo9Ib0CClGb/5aFBqJKYoeahkB
-         bBgSxKd49/+02o9dzbI0JfdDM7PgJt3JBGSxqlHijPNjGfsKACaUepmqrzlb98cL22cI
-         wJHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692788889; x=1693393689;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=umv4AuAG3bVQsHLVJR21Xr732gEzM/i84SmQ/8lFvbs=;
-        b=SGQRHUL34mlZ/+KHuyabWBDehszcDC/Icb9/CjhtfkRlgJ+/q2zGASPfmHE4aksHuE
-         QfgSVu9EW6RcOwtprckynm6W4W5ad47GBBAt6w4yehn5vfYIhQ2LdX7t75qOgrg0F/xk
-         HpAuiRrhiS125C35pILtiblBJd1MVndsV7reWPDvL46tA2lmQ6DxSGm7k9mjmxLdjVEw
-         0WoCVzeHJYKfV7aX18MCWoBtayH+BJXb3V3bi/yQqHNIjZcB6YYPH7/tfIWQyxvBhiZq
-         CoVnVk5qHx5fSoxnCxOPou+3ThLz8QM2VufEHhUU7vUj65Qdfkh7fcl4LFSGg8VYqdf0
-         JDkA==
-X-Gm-Message-State: AOJu0YytCaL3gkq+2Iqq3OIBco9l65wjN5P34fVRbJ3cK0dyiqShm+fl
-        8P30rEdej1OPJ5o59OwGvGFExJqKERQ=
-X-Google-Smtp-Source: AGHT+IGQtncKca/Nd75Qx8eaP1JiSmQ95Z73vSLMuyWe3lLG/NoNpgEO6RF3brGK6GHLqcncg4pYKw==
-X-Received: by 2002:adf:e946:0:b0:31a:d8be:d6f4 with SMTP id m6-20020adfe946000000b0031ad8bed6f4mr8870159wrn.10.1692788888666;
-        Wed, 23 Aug 2023 04:08:08 -0700 (PDT)
-Received: from localhost.localdomain ([92.85.190.61])
-        by smtp.gmail.com with ESMTPSA id o1-20020a5d62c1000000b0031ad2663ed0sm18426155wrv.66.2023.08.23.04.08.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 04:08:08 -0700 (PDT)
-From:   Andrei Coardos <aboutphysycs@gmail.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     alex@shruggie.ro, herbert@gondor.apana.org.au, olivia@selenic.com,
-        Andrei Coardos <aboutphysycs@gmail.com>
-Subject: [PATCH] char: hw_random: ba431-rng: removed unneeded call to platform_set_drvdata()
-Date:   Wed, 23 Aug 2023 14:07:58 +0300
-Message-Id: <20230823110758.3462-1-aboutphysycs@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 23 Aug 2023 07:16:36 -0400
+Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711BD184;
+        Wed, 23 Aug 2023 04:16:10 -0700 (PDT)
+Received: from martin by viti.kaiser.cx with local (Exim 4.89)
+        (envelope-from <martin@viti.kaiser.cx>)
+        id 1qYlqH-0006gR-QF; Wed, 23 Aug 2023 13:16:05 +0200
+Date:   Wed, 23 Aug 2023 13:16:05 +0200
+From:   Martin Kaiser <martin@kaiser.cx>
+To:     Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] hwrng: imx-rngc - use polling to wait for end of
+ seeding
+Message-ID: <20230823111605.sxtf3kriavv6hzxy@viti.kaiser.cx>
+References: <20230822152553.190858-1-martin@kaiser.cx>
+ <20230822152553.190858-4-martin@kaiser.cx>
+ <5662754.31r3eYUQgx@steina-w>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5662754.31r3eYUQgx@steina-w>
+User-Agent: NeoMutt/20170113 (1.7.2)
+Sender: Martin Kaiser <martin@viti.kaiser.cx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This function call was found to be unnecessary as there is no equivalent
-platform_get_drvdata() call to access the private data of the driver. Also,
-the private data is defined in this driver, so there is no risk of it being
-accessed outside of this driver file.
+Hi Alexander,
 
-Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
----
- drivers/char/hw_random/ba431-rng.c | 2 --
- 1 file changed, 2 deletions(-)
+Alexander Stein (alexander.stein@ew.tq-group.com) wrote:
 
-diff --git a/drivers/char/hw_random/ba431-rng.c b/drivers/char/hw_random/ba431-rng.c
-index 5b7ca0416490..b1518dd52a24 100644
---- a/drivers/char/hw_random/ba431-rng.c
-+++ b/drivers/char/hw_random/ba431-rng.c
-@@ -189,8 +189,6 @@ static int ba431_trng_probe(struct platform_device *pdev)
- 	ba431->rng.cleanup = ba431_trng_cleanup;
- 	ba431->rng.read = ba431_trng_read;
- 
--	platform_set_drvdata(pdev, ba431);
--
- 	ret = devm_hwrng_register(&pdev->dev, &ba431->rng);
- 	if (ret) {
- 		dev_err(&pdev->dev, "BA431 registration failed (%d)\n", ret);
--- 
-2.34.1
+> Am Dienstag, 22. August 2023, 17:25:53 CEST schrieb Martin Kaiser:
+> > Use polling to wait until the imx-rngc is properly seeded.
 
+> What is the benefit of burning CPU cycles while waiting for hardware?
+
+it seems to me that
+
+readl_poll_timeout
+   readx_poll_timeout
+      usleep_range
+         usleep_range_state
+            schedule_hrtimeout_range
+
+will not wait in the foreground and burn CPU cycles.
+
+The comment for schedule_hrtimeout_range says
+
+ * Make the current task sleep until the given expiry time has
+ * elapsed.
+
+> > We do this only in the init function when the imx-rngc becomes active.
+> > Polling is ok at this time, there's nothing else we could do while
+> > we're waiting.
+
+> > We can now remove the code for the interrupt and the completion.
+
+> Please split the change to polling and IRQ removal into two patches.
+
+Good point. Will do this in v2.
+
+> RNGC_STATUS_SEED_DONE, 1000, RNGC_TIMEOUT * 1000);
+> So you want to poll for up to 3s?
+
+According to the manual, "The initial seed takes approximately 2,000,000
+clock cycles." With a 66.5MHz clock, this is approx 30ms. So that should
+be
+
+RNGC_STATUS_SEED_DONE, 20000, 100000);
+
+The comment for readx_poll_timeout suggests <= 20ms for the poll
+interval.
+
+Best regards,
+Martin
