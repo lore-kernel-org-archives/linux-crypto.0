@@ -2,72 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7E5C3DA6F
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 19:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 895ECC6FA8F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 20:00:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243319AbjHXToC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 15:44:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33612 "EHLO
+        id S243373AbjHXUAM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 16:00:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243290AbjHXTnc (ORCPT
+        with ESMTP id S243375AbjHXT7p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 15:43:32 -0400
+        Thu, 24 Aug 2023 15:59:45 -0400
 Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B1A1BE6;
-        Thu, 24 Aug 2023 12:43:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263D119AC;
+        Thu, 24 Aug 2023 12:59:43 -0700 (PDT)
 Received: from dslb-188-097-211-187.188.097.pools.vodafone-ip.de ([188.97.211.187] helo=martin-debian-2.paytec.ch)
         by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <martin@kaiser.cx>)
-        id 1qZGEr-0003HB-MF; Thu, 24 Aug 2023 21:43:29 +0200
+        id 1qZGUX-0003P5-CP; Thu, 24 Aug 2023 21:59:41 +0200
 From:   Martin Kaiser <martin@kaiser.cx>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH 3/3] hwrng: ks-sa - use dev_err_probe
-Date:   Thu, 24 Aug 2023 21:40:37 +0200
-Message-Id: <20230824194037.1575276-4-martin@kaiser.cx>
+Subject: [PATCH] hwrng: nomadik - add MODULE_DESCRIPTION
+Date:   Thu, 24 Aug 2023 21:56:58 +0200
+Message-Id: <20230824195658.1582059-1-martin@kaiser.cx>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230824194037.1575276-1-martin@kaiser.cx>
-References: <20230824194037.1575276-1-martin@kaiser.cx>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace dev_err + return with dev_err_probe.
+Add a MODULE_DESCRIPTION to fix the W=1 warning
+
+WARNING: modpost: missing MODULE_DESCRIPTION() in
+drivers/char/hw_random/nomadik-rng.o
 
 Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 ---
- drivers/char/hw_random/ks-sa-rng.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ drivers/char/hw_random/nomadik-rng.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
-index 70d21bf657ce..dff7b9db7044 100644
---- a/drivers/char/hw_random/ks-sa-rng.c
-+++ b/drivers/char/hw_random/ks-sa-rng.c
-@@ -228,17 +228,14 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
- 		syscon_regmap_lookup_by_phandle(dev->of_node,
- 						"ti,syscon-sa-cfg");
+diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
+index 8c6a40d6ce3d..a2009fc4ad3c 100644
+--- a/drivers/char/hw_random/nomadik-rng.c
++++ b/drivers/char/hw_random/nomadik-rng.c
+@@ -88,4 +88,5 @@ static struct amba_driver nmk_rng_driver = {
  
--	if (IS_ERR(ks_sa_rng->regmap_cfg)) {
--		dev_err(dev, "syscon_node_to_regmap failed\n");
--		return -EINVAL;
--	}
-+	if (IS_ERR(ks_sa_rng->regmap_cfg))
-+		return dev_err_probe(dev, -EINVAL, "syscon_node_to_regmap failed\n");
+ module_amba_driver(nmk_rng_driver);
  
- 	pm_runtime_enable(dev);
- 	ret = pm_runtime_resume_and_get(dev);
- 	if (ret < 0) {
--		dev_err(dev, "Failed to enable SA power-domain\n");
- 		pm_runtime_disable(dev);
--		return ret;
-+		return dev_err_probe(dev, ret, "Failed to enable SA power-domain\n");
- 	}
- 
- 	return devm_hwrng_register(&pdev->dev, &ks_sa_rng->rng);
++MODULE_DESCRIPTION("ST-Ericsson Nomadik Random Number Generator");
+ MODULE_LICENSE("GPL");
 -- 
 2.39.2
 
