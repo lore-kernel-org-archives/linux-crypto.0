@@ -2,112 +2,79 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26CEC3DA6F
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Aug 2023 23:48:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A86C7EE43
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 05:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238870AbjHWXsA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Aug 2023 19:48:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52556 "EHLO
+        id S239667AbjHXFLg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 01:11:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237231AbjHWXre (ORCPT
+        with ESMTP id S239177AbjHXFLJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Aug 2023 19:47:34 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2628D10DB;
-        Wed, 23 Aug 2023 16:47:33 -0700 (PDT)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37NN1NtM006062;
-        Wed, 23 Aug 2023 23:47:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=5+SXoW1Olh8Xle6G1JTgskHQYk8pDE1cm/GzmnJCbX8=;
- b=YjlvpFjZwfXtkq+TUU0jzTWT7wc9hCY/WcJDylMNSZreRB/DEs3xjGwCvwjHDcZHhuxZ
- 1yV3MDhVaXRE7Cj2xsOq53HMoKHXOYz7TEMariUMVxO/dEj0Mueyb4R0mJBcNKtQV0Eu
- 8Gp9A85nRedCd77VqCWX3pRCq9Dusj5o6KnyJXhldr21GgqGj1yO8EcbTXgX7K0kK99J
- DEvGnp2bMbbqz81QKOEZFJ57YNy7QJ4W8FyHJSN+44RBO0/lkBJV4ZKwYfXQkBWeK1gr
- h6hmvAGzQBdmAYjM5PhQ0FCT43oW/KVQ+99CcFVQu4XwkpHQOcwD33LQFb9/5zmZ9ZET Cg== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sn2exu5j1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Aug 2023 23:47:24 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37NNlMfT028975
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Aug 2023 23:47:23 GMT
-Received: from [10.216.6.154] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Wed, 23 Aug
- 2023 16:47:18 -0700
-Message-ID: <f52bfac1-8200-404d-ab33-5130008efebe@quicinc.com>
-Date:   Thu, 24 Aug 2023 05:17:14 +0530
+        Thu, 24 Aug 2023 01:11:09 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBC810F9;
+        Wed, 23 Aug 2023 22:11:06 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qZ2bd-007EU6-EA; Thu, 24 Aug 2023 13:10:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Aug 2023 13:10:06 +0800
+Date:   Thu, 24 Aug 2023 13:10:06 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Johannes Berg <johannes@sipsolutions.net>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y.Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+        linux-mtd@lists.infradead.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+        ceph-devel@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        "Jason A.Donenfeld" <Jason@zx2c4.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Subject: Re: [PATCH 6/12] wifi: mac80211: Do not include crypto/algapi.h
+Message-ID: <ZObmLqztZ4vMFKnI@gondor.apana.org.au>
+References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
+ <E1qYlA0-006vFr-Ts@formenos.hmeau.com>
+ <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: sm8550: Add PRNG
-Content-Language: en-US
-To:     Neil Armstrong <neil.armstrong@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-CC:     <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
- <20230822-topic-sm8550-rng-v1-2-8e10055165d1@linaro.org>
-From:   Om Prakash Singh <quic_omprsing@quicinc.com>
-In-Reply-To: <20230822-topic-sm8550-rng-v1-2-8e10055165d1@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: aR02aBkTipHldSpOQydVM1ziXgYZduq0
-X-Proofpoint-ORIG-GUID: aR02aBkTipHldSpOQydVM1ziXgYZduq0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-23_15,2023-08-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
- mlxscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 suspectscore=0 adultscore=0 phishscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308230211
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 8/22/2023 7:41 PM, Neil Armstrong wrote:
-> Add the Qualcomm Pseudo-Random Number Generator.
+On Wed, Aug 23, 2023 at 12:34:35PM +0200, Johannes Berg wrote:
 > 
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
-Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> No objection, of course, but I don't think it's necessarily clear that
+> it "is for internal use only", it literally says:
+> 
+>  * Cryptographic API for algorithms (i.e., low-level API).
+> 
+> which really isn't the same as "don't use this file".
+> 
+> Might want to clarify that, or even move it into crypto/ from
+> include/crypto/ or something?
 
->   arch/arm64/boot/dts/qcom/sm8550.dtsi | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sm8550.dtsi b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-> index d115960bdeec..643ec80feacc 100644
-> --- a/arch/arm64/boot/dts/qcom/sm8550.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-> @@ -1661,6 +1661,11 @@ mmss_noc: interconnect@1780000 {
->   			qcom,bcm-voters = <&apps_bcm_voter>;
->   		};
->   
-> +		rng: rng@10c3000 {
-> +			compatible = "qcom,sm8550-prng-ee", "qcom,prng-ee";
-> +			reg = <0 0x010c3000 0 0x1000>;
-> +		};
-> +
->   		pcie0: pci@1c00000 {
->   			device_type = "pci";
->   			compatible = "qcom,pcie-sm8550";
-> 
+Yes it should be in include/crypto/internal.  Once the churn gets
+small enough I'll move it there.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
