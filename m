@@ -2,32 +2,32 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 442E0C88CB2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D41EE49A6
 	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 19:24:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243166AbjHXTYI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 15:24:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33598 "EHLO
+        id S243181AbjHXTYJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 15:24:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243158AbjHXTXv (ORCPT
+        with ESMTP id S234088AbjHXTXu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 15:23:51 -0400
+        Thu, 24 Aug 2023 15:23:50 -0400
 Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFBBF1BEC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1951BDF;
         Thu, 24 Aug 2023 12:23:48 -0700 (PDT)
 Received: from dslb-188-097-211-187.188.097.pools.vodafone-ip.de ([188.97.211.187] helo=martin-debian-2.paytec.ch)
         by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <martin@kaiser.cx>)
-        id 1qZFvj-00036P-Ud; Thu, 24 Aug 2023 21:23:44 +0200
+        id 1qZFvl-00036P-Io; Thu, 24 Aug 2023 21:23:45 +0200
 From:   Martin Kaiser <martin@kaiser.cx>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Alexander Stein <alexander.stein@ew.tq-group.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH v2 3/6] hwrng: imx-rngc - use polling to detect end of self test
-Date:   Thu, 24 Aug 2023 21:20:56 +0200
-Message-Id: <20230824192059.1569591-4-martin@kaiser.cx>
+Subject: [PATCH v2 5/6] hwrng: imx-rngc - use polling for initial seed
+Date:   Thu, 24 Aug 2023 21:20:58 +0200
+Message-Id: <20230824192059.1569591-6-martin@kaiser.cx>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230824192059.1569591-1-martin@kaiser.cx>
 References: <20230824192059.1569591-1-martin@kaiser.cx>
@@ -37,61 +37,82 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use polling to detect the end of the rngc self test. This is much simpler
-than using an interrupt and a completion.
+Use polling instead of interrupt + completion to wait until the initial
+seed was calculated. This should take about 30ms.
 
-The selftest should take approx. 450us. Keep the overhead to a minimum
-by polling every 500us. (We've already lowered the timeout to 1.5ms.)
+Call readl_poll_timeout and set the poll interval to the recommended
+maximum of 20ms. readl_poll_timeout uses usleep_range, this is based on
+a hrtimer. The task will we put to sleep while waiting, this does not
+burn CPU cycles by waiting in the foreground.
 
 Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 ---
 v2:
 - use shorter timeout and polling interval
+- readl_poll_timeout does not wait in the foreground
 
- drivers/char/hw_random/imx-rngc.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ drivers/char/hw_random/imx-rngc.c | 27 +++++++++------------------
+ 1 file changed, 9 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-index 8ff3d46674fd..09523936d2af 100644
+index c2582673427d..3a3f0f923bed 100644
 --- a/drivers/char/hw_random/imx-rngc.c
 +++ b/drivers/char/hw_random/imx-rngc.c
-@@ -17,6 +17,7 @@
- #include <linux/hw_random.h>
- #include <linux/completion.h>
- #include <linux/io.h>
-+#include <linux/iopoll.h>
- #include <linux/bitfield.h>
- 
- #define RNGC_VER_ID			0x0000
-@@ -101,22 +102,19 @@ static inline void imx_rngc_irq_unmask(struct imx_rngc *rngc)
- 
- static int imx_rngc_self_test(struct imx_rngc *rngc)
+@@ -166,34 +166,29 @@ static irqreturn_t imx_rngc_irq(int irq, void *priv)
+ static int imx_rngc_init(struct hwrng *rng)
  {
--	u32 cmd;
-+	u32 cmd, status;
+ 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
+-	u32 cmd, ctrl;
++	u32 cmd, ctrl, status, err_reg;
  	int ret;
+ 
+ 	/* clear error */
+ 	cmd = readl(rngc->base + RNGC_COMMAND);
+ 	writel(cmd | RNGC_CMD_CLR_ERR, rngc->base + RNGC_COMMAND);
  
 -	imx_rngc_irq_unmask(rngc);
 -
- 	/* run self test */
- 	cmd = readl(rngc->base + RNGC_COMMAND);
- 	writel(cmd | RNGC_CMD_SELF_TEST, rngc->base + RNGC_COMMAND);
+ 	/* create seed, repeat while there is some statistical error */
+ 	do {
+ 		/* seed creation */
+ 		cmd = readl(rngc->base + RNGC_COMMAND);
+ 		writel(cmd | RNGC_CMD_SEED, rngc->base + RNGC_COMMAND);
  
--	ret = wait_for_completion_timeout(&rngc->rng_op_done,
--					  usecs_to_jiffies(RNGC_SELFTEST_TIMEOUT));
+-		ret = wait_for_completion_timeout(&rngc->rng_op_done,
+-						  usecs_to_jiffies(RNGC_SEED_TIMEOUT));
+-		if (!ret) {
+-			ret = -ETIMEDOUT;
+-			goto err;
+-		}
++		ret = readl_poll_timeout(rngc->base + RNGC_STATUS, status,
++					 status & RNGC_STATUS_SEED_DONE, 20000, RNGC_SEED_TIMEOUT);
++		if (ret < 0)
++			return ret;
+ 
+-	} while (rngc->err_reg == RNGC_ERROR_STATUS_STAT_ERR);
++		err_reg = readl(rngc->base + RNGC_ERROR);
++	} while (err_reg == RNGC_ERROR_STATUS_STAT_ERR);
+ 
+-	if (rngc->err_reg) {
+-		ret = -EIO;
+-		goto err;
+-	}
++	if (err_reg)
++		return -EIO;
+ 
+ 	/*
+ 	 * enable automatic seeding, the rngc creates a new seed automatically
+@@ -209,10 +204,6 @@ static int imx_rngc_init(struct hwrng *rng)
+ 	 * we mask the interrupt ourselves if we return an error
+ 	 */
+ 	return 0;
+-
+-err:
 -	imx_rngc_irq_mask_clear(rngc);
--	if (!ret)
--		return -ETIMEDOUT;
-+	ret = readl_poll_timeout(rngc->base + RNGC_STATUS, status,
-+				 status & RNGC_STATUS_ST_DONE, 500, RNGC_SELFTEST_TIMEOUT);
-+	if (ret < 0)
-+		return ret;
- 
--	return rngc->err_reg ? -EIO : 0;
-+	return readl(rngc->base + RNGC_ERROR) ? -EIO : 0;
+-	return ret;
  }
  
- static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ static void imx_rngc_cleanup(struct hwrng *rng)
 -- 
 2.39.2
 
