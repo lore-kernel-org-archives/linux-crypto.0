@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95638C3DA6F
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 22:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0D5C3DA6F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 22:20:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243806AbjHXWFt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 18:05:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
+        id S241118AbjHXWUC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 18:20:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243842AbjHXWF2 (ORCPT
+        with ESMTP id S243877AbjHXWUB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 18:05:28 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4124A1991;
-        Thu, 24 Aug 2023 15:05:24 -0700 (PDT)
+        Thu, 24 Aug 2023 18:20:01 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2070.outbound.protection.outlook.com [40.107.93.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CC41BE9;
+        Thu, 24 Aug 2023 15:19:59 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FV6eOV/Z0uhmhVAlqH9vqhlDusriQxs1tRv2INZkrHTzUTAqjiFyyaGv0nu3LZ6Ktvm2+izkpnSno48NOX+o1UCmzVNrWtgf11TdOTWA/giabD7bBdz1mKuWZ428641k5IN1+pfW9Z+F+wyrEjNBm5BrVDXQGdwYmOB5cP4s+HmGneo5MX7HnVP0WibkWEbSfdlZSKl3T27YTngrypMUtCpcnNtbmojikuGLCLpZfrNfkd9XbpC9HfLgm8bgaaKXTqL/LwSFueAUMPQnfuxaKbq9B1tZ7j2KYHwDU+p5ZskBJMBv/0FX0pimEV2RbkKfuIaxzNpZxoAWQG/l5lmSZw==
+ b=oFwgPY9EgTZ46ncLdSgDmnb3VQaoWAxV8EfU9oLtJCD2MytnTqAC3fQ1YdHo2/1YPx7CLqq6KG/yVrATCQfnWh29nkSd8q/in46mfXOYdOO5BKDnGb2bgOxmojNSOJhLACZFKZkpc2k4sKf9d7MmYA9kGpbyS6+3qAYPEnNpJQM2WG9XiubdruApuhCY1SfiFhTdYhrjCVCkEAroWAEJ1tMwhDCO1Mwiv2gLulayMLy0zWkQPDz2jI2WgPpJ2p1RMQc2I3E2juVf9ltU0y9c3HL1OHsTTV3BHLG+K/3HNIN1Utlm2K3iy2fkdeysob+EA9uwmU8stykMB0al0ZuszA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qtMRqoJBiUDmuCowvMrIr7z72xwZmjYmsdtLouMXnUc=;
- b=RKAY/6MNZCBR9URcvUu3iBk0aYKC1K8DGeaxUggbdTh0QAhfy6vVNQmnKvGM559CVV2fW/e6jIKMKJGAea4Xac+HDbv+Afk/qqr6VMy1YxQhRcooNJYqog7SryfQck1Y9Q6ylZ+cNs62xLiAq3vk6sn7gnJMLO8XIRSwBcbSDoNDB+hDVL8D7oO6P36qzBde5IX3GJKmEngSj20vTnv35DKWqxmVGLBuOFg4FuqOVwr6tSO5pB0rPjMziUR5XZAw0gKzC2bqBdZUtcwtl8YeolvVAdkPGTiddla9TJcnaOzqSPLoeKmcELNCe63jAokmmyiAu2cyQcvF5Nd19f8Tuw==
+ bh=+KJtETMXXi9N6QnRqMc6+9uYEkEdp6jX/xna7WGUSKU=;
+ b=BcfGUq9sVNNkiqGpdv4fYXS7con+PJc681ocJ+E7MrAxPepfzY5J3LCD4oRogP8kjZ3aqxhkGYaBQGDAnOvlEa3ptyejimOcaY2uVBkg2XaZ0CNMcWDec8DUZArsCr/aaLfOTQFbU5U+jskVHHl38sDuNtfXuhvJuPdEVVVPaTawQ1MoKfjdAVzwQsfbWRfhSBR/yfdhBBNokE9nCLZ9JN9FePM6jTcGd5QEW6epppak2yL/bWGBVcaQ+S4lvSFL8iSRDIK698003w34OxorZT/j+zxcMFJvTTM9LLF/f5aeXuR1v6AHrwQVuPQuT6D0YMwSkdIjfBYYlHphUcgyzg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qtMRqoJBiUDmuCowvMrIr7z72xwZmjYmsdtLouMXnUc=;
- b=t49LrjYYzY5EYAh5KXJO8UdxTKae73OOV+d22/v39/BjHYeIK2ABPzQCwtm3nqssOyfnwFv2KXt1aTwF/+y7FxXpEEhSmMf98ahH8k8c8CzIjRJXrC0nVAn+3VZiv5Ovi5W944waKIQjxn8qWy/TzQ2x37SckA2yei2DKWlr+qs=
-Received: from PH7PR17CA0062.namprd17.prod.outlook.com (2603:10b6:510:325::23)
- by MN2PR12MB4487.namprd12.prod.outlook.com (2603:10b6:208:264::14) with
+ bh=+KJtETMXXi9N6QnRqMc6+9uYEkEdp6jX/xna7WGUSKU=;
+ b=H6K+IA7KhnSHgyQA7x01w+k/jRAjh8hpjByKT8YAbmXQCnT5xpry7eFdfNUEv7jYexRtKrF02NAxwEpqQdgOSdTGBFfG4wTjVz6NL1Qvww2yO+cuVVjdJ8EwXEhjO7hHV2kSDloDiWjwTC2CyofyOLQkbvuRcXi7MOEXtPnefzs=
+Received: from DM6PR06CA0017.namprd06.prod.outlook.com (2603:10b6:5:120::30)
+ by BL3PR12MB6644.namprd12.prod.outlook.com (2603:10b6:208:3b1::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
- 2023 22:05:22 +0000
-Received: from SA2PEPF000015C6.namprd03.prod.outlook.com
- (2603:10b6:510:325:cafe::2f) by PH7PR17CA0062.outlook.office365.com
- (2603:10b6:510:325::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.26; Thu, 24 Aug
+ 2023 22:19:57 +0000
+Received: from CY4PEPF0000EE35.namprd05.prod.outlook.com
+ (2603:10b6:5:120:cafe::51) by DM6PR06CA0017.outlook.office365.com
+ (2603:10b6:5:120::30) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27 via Frontend
- Transport; Thu, 24 Aug 2023 22:05:21 +0000
+ Transport; Thu, 24 Aug 2023 22:19:57 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,24 +47,24 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF000015C6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ CY4PEPF0000EE35.mail.protection.outlook.com (10.167.242.41) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6699.15 via Frontend Transport; Thu, 24 Aug 2023 22:05:21 +0000
+ 15.20.6699.15 via Frontend Transport; Thu, 24 Aug 2023 22:19:56 +0000
 Received: from AUS-P9-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 24 Aug
- 2023 17:05:19 -0500
+ 2023 17:19:54 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>
 CC:     <john.allen@amd.com>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: [PATCH 2/2] crypto: ccp: Get a free page to use while fetching initial nonce
-Date:   Thu, 24 Aug 2023 17:04:59 -0500
-Message-ID: <20230824220459.2723-2-mario.limonciello@amd.com>
+Subject: [PATCH v2 2/2] crypto: ccp: Get a free page to use while fetching initial nonce
+Date:   Thu, 24 Aug 2023 17:19:32 -0500
+Message-ID: <20230824221932.2807-2-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230824220459.2723-1-mario.limonciello@amd.com>
-References: <20230824220459.2723-1-mario.limonciello@amd.com>
+In-Reply-To: <20230824221932.2807-1-mario.limonciello@amd.com>
+References: <20230824221932.2807-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -73,23 +73,23 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015C6:EE_|MN2PR12MB4487:EE_
-X-MS-Office365-Filtering-Correlation-Id: caabad82-f333-4bdc-a32a-08dba4ee35dd
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE35:EE_|BL3PR12MB6644:EE_
+X-MS-Office365-Filtering-Correlation-Id: 41ff0bfa-d0de-4885-e880-08dba4f03f95
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: biR0jKtkMw03SEA3QO8fFWPtZWXaFigczj+ijPXZ84L5XygXQh8O0KVL4bTvpwqRCJKBs4lPgRDsOxIIpIGFDOBoeIUvsPASZTaiFFtS1EnYMC52DhfU4n+bOc9+UC1BgbXpi6pDD6HR8DC4gHHMpgwni9o227GyafKarySauhjMozpOH7O2c5a9T1nba3piqRgLFbDc0kXE2/RmVr5DCmualvJaHJ3ow9O2aE0I+mRDimQoWnrMLiiYuer11bqCn51bIyOlEb5eWN+TkRd4OWbCAoFOO8sEwr8QKYXCjQBHQgwS74Uxx+fg/HiD8ijC9PncXh3GI1ua/dDpGUo7/EqaRjJoTx+8shLKb8vbniRW5pudHrmuN7dvZuM9kMdiNiVJ2Wjc01IMFCfv41MgZXQMGvO+OvllD3dyA89fULwJ3kSPshT1Nz3UZ0CwONsrK907ANG2+FLthVzLCpUhx1T5kZcS6fLnvcMDhWBocrSf3HHmPVViQa6ejbL2Tpzv7MiQATiynDogb+Z0Vm3wAfuRRCj6O9algBK+tksOgsPLsZJduIqgHgnOCyGI0AF1Lq1HgB9fkkpFLxYBpObCL4E/rmx8ODwwVlyGDdrgN8m772ILqDqZcyU4lmHuEEpLQmEfp9webEQR1nbWZIV1ub8/tPvMTrkiiybcnfr83QuCOkjQU441NtPxZWyQjVYcIhwKBAE+FrQR4bR3Itq1vroCW7S36PS0sgZoxgR0Qg10055CgtmypQQCzbUfmMWH3caRGaeTzzqvlY6ZgUG//g==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(396003)(136003)(346002)(186009)(1800799009)(82310400011)(451199024)(40470700004)(36840700001)(46966006)(1076003)(40460700003)(2616005)(5660300002)(8936002)(4326008)(8676002)(336012)(426003)(47076005)(36756003)(4744005)(83380400001)(7696005)(44832011)(36860700001)(26005)(16526019)(40480700001)(82740400003)(356005)(6666004)(81166007)(70206006)(70586007)(54906003)(316002)(110136005)(478600001)(41300700001)(2906002)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: C9xmz1cZ4KPikVLMybtMNMr3ADLxSHkXE9KTQuzQETKW2ycVBlHTgd25svFcbDxOwUUYZhD0OvEmucnvVf6M2IHXD3G1x2LFltsDUPCylSCoAl6EPk9DTr8zAkq1MTeJgbk5T/61t6bFGaVOhqv9hYK1D6ZpjXOP2ROCGmvGEdd0NaWUJq++Vy4SakgLFqCqHxs+Uw03HCsAFMSphovyh7zAwP99A3aQj1V95VCn8Be2xb1NsvTejcRLPAx2hta0pxMhMU/ozL8bk7FroovoHFRhto3ivoL49IhN3KqOdw9dz0vIlLfbQkqgfzw9rFcN+MQf1XKnJaiZ480zTG24QLCcYriPwufwMgNi5iu/8d/lW/TULU7oh/rPjVDf8VsHr7lpiNTEYb/de8Dys6isKXvJrJXJZHekrzdU/9lA7+D4SkeKBNpmw5Is6Y8krd3VL9aD6827n099rotXwTbs+htUL0J6Bh5jOQMCGnvsLn8+dcktpUFrUVSvaTs3KELwD88qs0xjwZiRn5hKPtquWtaG/JnfdP/IYlAEjef0MwxrdcmMcFmBYg8ydAA49Az8KynY9sAZ/6VL3uxdZEqFVud105AyHXpjEvk/qDKDyk4p+L03sV1Rxxcdmj8A4WZO71I++Z2Nnh2yXPr5He+zi6W7QrNOXlZQRWah5VICHk3pWNBjCGYMYc57y8I2aGN72tw9re/TJ52JP3B6gIH7JhjZRgey+dl4gPVbOFSNOXEsEZXzhl2iz6ffyv9w82J+nO1H+lbNQGxXrN0KwCKA0g==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(136003)(376002)(39860400002)(186009)(1800799009)(82310400011)(451199024)(36840700001)(40470700004)(46966006)(82740400003)(356005)(6666004)(40460700003)(81166007)(7696005)(40480700001)(336012)(1076003)(36860700001)(16526019)(26005)(47076005)(36756003)(83380400001)(426003)(2616005)(41300700001)(2906002)(316002)(8676002)(70586007)(70206006)(54906003)(110136005)(44832011)(5660300002)(4326008)(8936002)(86362001)(478600001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 22:05:21.4384
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 22:19:56.8014
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: caabad82-f333-4bdc-a32a-08dba4ee35dd
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41ff0bfa-d0de-4885-e880-08dba4f03f95
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: SA2PEPF000015C6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EE35.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4487
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6644
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -97,11 +97,14 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 dbc_dev_init() gets a free page from `GFP_KERNEL`, but if that page has
 any data in it the first nonce request will fail.
 This prevents dynamic boost control from probing. To fix this, explicitly
-request from `__GFP_ZERO` to ensure first nonce fetch works.
+request a zeroed page with `__GFP_ZERO` to ensure first nonce fetch works.
 
 Fixes: c04cf9e14f10 ("crypto: ccp - Add support for fetching a nonce for dynamic boost control")
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
+v1->v2:
+ * Use GFP_KERNEL | __GFP_ZERO to ensure accounting works properly
+
  drivers/crypto/ccp/dbc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
@@ -114,7 +117,7 @@ index 839ea14b9a85..a99b8f02153a 100644
  
  	BUILD_BUG_ON(sizeof(union dbc_buffer) > PAGE_SIZE);
 -	dbc_dev->mbox = (void *)devm_get_free_pages(dev, GFP_KERNEL, 0);
-+	dbc_dev->mbox = (void *)devm_get_free_pages(dev, __GFP_ZERO, 0);
++	dbc_dev->mbox = (void *)devm_get_free_pages(dev, GFP_KERNEL | __GFP_ZERO, 0);
  	if (!dbc_dev->mbox) {
  		ret = -ENOMEM;
  		goto cleanup_dev;
