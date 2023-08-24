@@ -2,121 +2,219 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8078CC7113B
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 11:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A00C3DA6F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 15:27:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236251AbjHXLuA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 07:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42516 "EHLO
+        id S242112AbjHXP0j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 11:26:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241249AbjHXLtp (ORCPT
+        with ESMTP id S242204AbjHXP0U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 07:49:45 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4EC91BDC
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 04:49:09 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4ff8a1746e0so10251519e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 04:49:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692877747; x=1693482547;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ridaw9maBxtu9SXahhBrJGW7Zr6BoBicKUKqOgvkXus=;
-        b=nd+2mTN7O4iXWaglQ0sQjQ1QAELm0W6MPen/bDdx2hMs6g1PEL1THbj5JQwrpD6hcU
-         MaBLkP9he+bPaDbx17lggEMU38oak3yWZcA+15LZmc2r8lzGfBCgyvh1XlS6yhmP/r3V
-         HfwJIMiL6YRY0c4c/2AsuyMyIqFLE7GoX2g0/PE2xK5DglpGUWxKMvJjEjUh2HdBgsZP
-         AVaIQHzvNTlKN2UQu2SNi07THy6eHgc8gTu2rGSswi5gtbkITOSMCgDGbitIOQv2eLz8
-         G7+1FWfIqdsR/mfffUk3Jv9Bwn0tzSGevFGlPHYcJXl4n3pHTfz9sFe6ylfjLR1ziWPa
-         dGBw==
+        Thu, 24 Aug 2023 11:26:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A0019B0
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 08:25:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1692890731;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I68/GBXzgIeykhJKJ/R9njNTye2zNl+rr739FJ1Wzkc=;
+        b=ZVapn6HNQdcnoItkKpot2H1OAmKxwgXfwWtIQxm9CWCWfAB07YGOFWtkTVgH7p1httMQOY
+        RuIfUj8B/W15cydLZ81/rSO1gv0n5LLSOmoJ+4lch+bVgEZfp3BdCyUvvF03GlUNIGcAHe
+        Oclv2bjwuOc7Th3b3xsWbXse0KXO7n0=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-397-w_sxFcUfM8KljlmPzxUyzQ-1; Thu, 24 Aug 2023 11:25:30 -0400
+X-MC-Unique: w_sxFcUfM8KljlmPzxUyzQ-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-790d561d943so598680639f.1
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 08:25:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692877747; x=1693482547;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ridaw9maBxtu9SXahhBrJGW7Zr6BoBicKUKqOgvkXus=;
-        b=O1iIAKTzyG2dP6ZRghjuN/ST5QVdFAyQzh8hjFEZMnn1r4duMBYACAnyOA8T2p8A9m
-         WViz1dOkNQFjBG5Vfww7R3rVRAMXtfNDQPxnrvzqcusqDqkKTZP/VkeIdH2UJk2tm1K7
-         RSf5eWq2NiFtRMgjldvJHzp5R2SpvlyFaWHLN8idRo1PoUjbYJOD6fbnTAQ6WtQM+fkf
-         mE9dpDrvXUDsIGg4zTf+viMe5adqSltj+p+Pr0x9BvVI4xziiGOyJzvEMH0JOQc4Qh+A
-         uFaItvnbKLLJr6xGfINAQptvTSnQwV5F2Yt+BomCAsqrBiK0x584RfqrHf0R3pJbYswW
-         OHmQ==
-X-Gm-Message-State: AOJu0Yzoa8yIuu2qI4V4i0IN0Lml26uPmPdVJg0aMiy2wQceWW83ahh9
-        Cdcooy6lv8S0CQSVbmHa7HrgCQ==
-X-Google-Smtp-Source: AGHT+IHVJeDTux8vrpUjtkeMQp2Wl1nFzBdHwHppY8h1apFFb36v7NP31GKZ1a62dbzO6sfDNO6v0A==
-X-Received: by 2002:a05:6512:3d1f:b0:500:7dc0:b0b2 with SMTP id d31-20020a0565123d1f00b005007dc0b0b2mr12027642lfv.28.1692877746826;
-        Thu, 24 Aug 2023 04:49:06 -0700 (PDT)
-Received: from [192.168.1.101] (abyl28.neoplus.adsl.tpnet.pl. [83.9.31.28])
-        by smtp.gmail.com with ESMTPSA id ep11-20020a056512484b00b004ff96b0524dsm3134865lfb.119.2023.08.24.04.49.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 04:49:06 -0700 (PDT)
-Message-ID: <5eb0c264-fc23-4f6c-9e1f-c4e00805ac15@linaro.org>
-Date:   Thu, 24 Aug 2023 13:49:05 +0200
+        d=1e100.net; s=20221208; t=1692890730; x=1693495530;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I68/GBXzgIeykhJKJ/R9njNTye2zNl+rr739FJ1Wzkc=;
+        b=IOW/GdrzNGDZG2sfn4TNmWrm9oHVMZo8gzESWkUku+Q89H6g6G2o2jS+476RPiuHMT
+         trs2AniOyL3YYRroPyBtnt/26CFzpGYh52g9sD2caKwbUIA55cLRvu8aLzSN/2dU044H
+         8q58UBXxnbDGOzh4pWaMnlKWWuvhVZsLnBM7QFCUfHcqqkKXz0oaNP1HJJPHkRfQfGan
+         2PfG62cO/3krR0n1SkIo5EYmPb+uG9OBqeIxGtjG/cJbWSp3uyrJ87UKZq4W8wqvUX1N
+         +jojEjgzqOLxkULfA2LzqS+IrnZHAxPfvSXMkheuaANAkOYTicLh24wkuEpByGYjQdwk
+         hbPQ==
+X-Gm-Message-State: AOJu0Yya+G71+qlWATc96/SA0YH/EnwUMBLSHkEAQSHyPONnuVjzHfv/
+        Naf+x2Ns3g4cCqpe3s9zb6Zftz7A/GoNqidhwDWd1A7MsWvvMU1v+95UCIdW55txXJ/jTFyOBmM
+        BLIzRD9GH4rTJAXGbsteCRAOQ
+X-Received: by 2002:a6b:720b:0:b0:787:8d2:e0c with SMTP id n11-20020a6b720b000000b0078708d20e0cmr6671543ioc.12.1692890729769;
+        Thu, 24 Aug 2023 08:25:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEke3AIwUL3voDBxvHAh2VGnvJHrolmd2TOjjUuh6KzxktMdE9vcGe82anmrMXRho36BrIQGg==
+X-Received: by 2002:a6b:720b:0:b0:787:8d2:e0c with SMTP id n11-20020a6b720b000000b0078708d20e0cmr6671520ioc.12.1692890729546;
+        Thu, 24 Aug 2023 08:25:29 -0700 (PDT)
+Received: from redhat.com ([38.15.60.12])
+        by smtp.gmail.com with ESMTPSA id b19-20020a5d8953000000b0079199e52035sm4604093iot.52.2023.08.24.08.25.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 08:25:28 -0700 (PDT)
+Date:   Thu, 24 Aug 2023 09:25:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Zeng, Xin" <xin.zeng@intel.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "Cao, Yahui" <yahui.cao@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RFC 5/5] vfio/qat: Add vfio_pci driver for Intel QAT VF
+ devices
+Message-ID: <20230824092527.143eebbc.alex.williamson@redhat.com>
+In-Reply-To: <DM4PR11MB550203FB22F8D6F0EAF8F717881CA@DM4PR11MB5502.namprd11.prod.outlook.com>
+References: <20230630131304.64243-1-xin.zeng@intel.com>
+        <20230630131304.64243-6-xin.zeng@intel.com>
+        <20230726133726.7e2cf1e8.alex.williamson@redhat.com>
+        <DM4PR11MB550203FB22F8D6F0EAF8F717881CA@DM4PR11MB5502.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] arm64: dts: qcom: sm8550: add TRNG node
-Content-Language: en-US
-To:     Neil Armstrong <neil.armstrong@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230824-topic-sm8550-rng-v2-0-dfcafbb16a3e@linaro.org>
- <20230824-topic-sm8550-rng-v2-6-dfcafbb16a3e@linaro.org>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20230824-topic-sm8550-rng-v2-6-dfcafbb16a3e@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 24.08.2023 13:33, Neil Armstrong wrote:
-> Add the Qualcomm True Random Number Generator node.
-> 
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+On Wed, 23 Aug 2023 15:29:47 +0000
+"Zeng, Xin" <xin.zeng@intel.com> wrote:
 
-Konrad
+> Thanks for the comments, Alex.
+> On Thursday, July 27, 2023 3:37 AM, Alex Williamson wrote:
+> > >  drivers/vfio/pci/Kconfig                 |   2 +
+> > >  drivers/vfio/pci/Makefile                |   1 +
+> > >  drivers/vfio/pci/qat/Kconfig             |  13 +
+> > >  drivers/vfio/pci/qat/Makefile            |   4 +
+> > >  drivers/vfio/pci/qat/qat_vfio_pci_main.c | 518  
+> > +++++++++++++++++++++++
+> > 
+> > Rename to main.c.  
+> 
+> Will do in next version.
+> 
+> >   
+> > >  5 files changed, 538 insertions(+)
+> > >  create mode 100644 drivers/vfio/pci/qat/Kconfig
+> > >  create mode 100644 drivers/vfio/pci/qat/Makefile
+> > >  create mode 100644 drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> > >
+> > > diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
+> > > index f9d0c908e738..47c9773cf0c7 100644
+> > > --- a/drivers/vfio/pci/Kconfig
+> > > +++ b/drivers/vfio/pci/Kconfig
+> > > @@ -59,4 +59,6 @@ source "drivers/vfio/pci/mlx5/Kconfig"
+> > >
+> > >  source "drivers/vfio/pci/hisilicon/Kconfig"
+> > >
+> > > +source "drivers/vfio/pci/qat/Kconfig"
+> > > +
+> > >  endif
+> > > diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> > > index 24c524224da5..dcc6366df8fa 100644
+> > > --- a/drivers/vfio/pci/Makefile
+> > > +++ b/drivers/vfio/pci/Makefile
+> > > @@ -11,3 +11,4 @@ obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+> > >  obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
+> > >
+> > >  obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
+> > > +obj-$(CONFIG_QAT_VFIO_PCI) += qat/
+> > > diff --git a/drivers/vfio/pci/qat/Kconfig b/drivers/vfio/pci/qat/Kconfig
+> > > new file mode 100644
+> > > index 000000000000..38e5b4a0ca9c
+> > > --- /dev/null
+> > > +++ b/drivers/vfio/pci/qat/Kconfig
+> > > @@ -0,0 +1,13 @@
+> > > +# SPDX-License-Identifier: GPL-2.0-only
+> > > +config QAT_VFIO_PCI
+> > > +	tristate "VFIO support for QAT VF PCI devices"
+> > > +	depends on X86  
+> > 
+> > What specific X86 dependency exists here?  CRYPTO_DEV_QAT and the
+> > various versions of the QAT driver don't seem to have an explicit arch
+> > dependency, therefore this shouldn't either.  
+> 
+> You are right. Will remove it.
+> 
+> >   
+> > > +	depends on VFIO_PCI_CORE  
+> > 
+> > select VFIO_PCI_CORE, this was updated for all vfio-pci variant drivers
+> > for v6.5.  
+> 
+> Will update it.
+> 
+> >   
+> > > +
+> > > diff --git a/drivers/vfio/pci/qat/qat_vfio_pci_main.c  
+> > b/drivers/vfio/pci/qat/qat_vfio_pci_main.c  
+> > > new file mode 100644
+> > > index 000000000000..af971fd05fd2
+> > > --- /dev/null
+> > > +++ b/drivers/vfio/pci/qat/qat_vfio_pci_main.c
+> > > @@ -0,0 +1,518 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/* Copyright(c) 2023 Intel Corporation */
+> > > +#include <linux/anon_inodes.h>
+> > > +#include <linux/container_of.h>
+> > > +#include <linux/device.h>
+> > > +#include <linux/file.h>
+> > > +#include <linux/init.h>
+> > > +#include <linux/kernel.h>
+> > > +#include <linux/module.h>
+> > > +#include <linux/mutex.h>
+> > > +#include <linux/pci.h>
+> > > +#include <linux/sizes.h>
+> > > +#include <linux/types.h>
+> > > +#include <linux/uaccess.h>
+> > > +#include <linux/vfio_pci_core.h>
+> > > +#include <linux/qat/qat_vf_mig.h>
+> > > +
+> > > +struct qat_vf_mig_data {
+> > > +	u8 state[SZ_4K];
+> > > +};
+> > > +
+> > > +struct qat_vf_migration_file {
+> > > +	struct file *filp;
+> > > +	struct mutex lock; /* protect migration region context */
+> > > +	bool disabled;
+> > > +
+> > > +	size_t total_length;
+> > > +	struct qat_vf_mig_data mig_data;
+> > > +};
+> > > +
+> > > +static void qat_vf_vfio_pci_remove(struct pci_dev *pdev)
+> > > +{
+> > > +	struct qat_vf_core_device *qat_vdev = qat_vf_drvdata(pdev);
+> > > +
+> > > +	vfio_pci_core_unregister_device(&qat_vdev->core_device);
+> > > +	vfio_put_device(&qat_vdev->core_device.vdev);
+> > > +}
+> > > +
+> > > +static const struct pci_device_id qat_vf_vfio_pci_table[] = {
+> > > +	/* Intel QAT GEN4 4xxx VF device */
+> > > +	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL,  
+> > 0x4941) },
+> > 
+> > Should this driver depend on CRYPTO_DEV_QAT_4XXX if that's the only
+> > supported PF driver?  
+> 
+> This module has not any dependency to QAT_4XXX module at build time, but it indeed has implicit
+> dependency on QAT_4XXX runtime to enable SRIOV and complete the QAT 4xxx VF migration,
+> do you think we still need to put this dependency explicitly in Kconfig?
+
+What benefit does it serve a user to be able to build this module if
+the runtime dependency isn't present in the kernel?  We have
+COMPILE_TEST to support build time regression testing.  Thanks,
+
+Alex
+
