@@ -2,59 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A89F9C71145
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 11:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC7EC6FA8F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 11:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235722AbjHXLt3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 07:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
+        id S236602AbjHXLuB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 07:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241216AbjHXLtD (ORCPT
+        with ESMTP id S241261AbjHXLtx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 07:49:03 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98DC41BC3
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 04:48:31 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4ff93a7f230so956272e87.1
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 04:48:31 -0700 (PDT)
+        Thu, 24 Aug 2023 07:49:53 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 780671BF2
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 04:49:17 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5008d16cc36so4587377e87.2
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 04:49:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1692877702; x=1693482502;
+        d=linaro.org; s=google; t=1692877755; x=1693482555;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=3kBenzGm3rt+Gcu1IhO4mIbiUWaOs9hVgu3PJOGQTpA=;
-        b=Laht95JCHE9OSCBZMNZKRDBV3aGDr1uoR2PejIvqUDGrdRmo7G9aDjebsrn7GgbwvX
-         JHrjsKf1zEJQLMjUGYb2E0e43ayjMwEfXxTckeeudk/LNoMjYkVvV2iZS7zEzDAqUGVg
-         DEiKRLM/zNMwr7NsE+UIfsjuHtS379r/mFr91RyjBrgf3UR6Vguyrhx4azssJCXaZKih
-         Ld7wNpHq3ousHOUNCFWMR/T5Lnq4PDxW+V4m1g1Wya5rfWBbojEEAgtf+ppY2HhVK+sP
-         8eYemLNAiVBWGJVlCK2D9dS2QTeUK0QGHC13REcdmRap3JKw7Ax4k8UuqWg3TLHlfJTO
-         zjGA==
+        bh=11VkKGP09VP4FPS0hePOtWS36VY2vZURrYDBokfUolE=;
+        b=l6fjFmlv2dsntxFSLhMJ75h4BECRMXujcnGpPBZu5m7p0iXlTncqblfrlV4nFgsLT/
+         5rbzRCJeONssmdSap61WXG7hDRgETUDh7T9dnpKLOcvHoDkdU1kvxDYfzRdbfyYs22RZ
+         FurVsPsUwKivJFxu+J5f5VS/HI6WbTvP12rYmQichXuZSg5sERXks2Zcgw1KRRYUcI2+
+         Qcjg0ZYwmNA99dY8aG/Ti+7BIgvEcONvnJlyraOJU7cBgXDy4/5vD25O/FekL4tH1+gI
+         5xOT/du479jGhHb/kT9P5wDs0tcq9imjBTJBrLyubqteENwkQuX03MeNJ8JckD01ksE7
+         UN7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692877702; x=1693482502;
+        d=1e100.net; s=20221208; t=1692877755; x=1693482555;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3kBenzGm3rt+Gcu1IhO4mIbiUWaOs9hVgu3PJOGQTpA=;
-        b=ehFr2dMPZXoaohLbsDGzAQgodEKTdzFvuP5fAP1P4QkVbaGU7EiGskbOzKUlsj6Tq5
-         h+TNEI0PsWYiutkgYv0kANFuQdG1Cwpt4hAV3BOKDP8xHqXfn99ZiE30XQvoX59UqMYS
-         lfOpUTMoZcDoJLquBOALft3S5+Q9hH46MIXqvFZHnC/R6JP5Pd0Zz4DtG8DHZFFugqQT
-         kG1IfK2wsJdpQKVevbWvscsnP+Ms0hLbyRiddEmyk9vbQnFsOz500Sve7X1QKoziLbQD
-         CSgFL4DTuEE/K6iLdMArYn/PzXGpZAmrTadM1vUSGK2SVHwmwka9cpgxCNbiyL3vtOic
-         KuRg==
-X-Gm-Message-State: AOJu0YwZqOnR8rV2SzvEatNsQyBuy6R7ol/VhRn7Q9dPnAqXTwguGqYO
-        4E1++b31D+Z4dGwbeiwlr3DGsg==
-X-Google-Smtp-Source: AGHT+IEooTyrj6vDgfjvUoMQ1DEA9pvCpXsE8uynGrLabNJtb2Ld546Jc2VIapGh+4MGQFfzxdtErQ==
-X-Received: by 2002:a05:6512:ac4:b0:4fe:8c1a:e9b7 with SMTP id n4-20020a0565120ac400b004fe8c1ae9b7mr6244018lfu.34.1692877702399;
-        Thu, 24 Aug 2023 04:48:22 -0700 (PDT)
+        bh=11VkKGP09VP4FPS0hePOtWS36VY2vZURrYDBokfUolE=;
+        b=Gk5/1CJxsmBmo2eMApIFqhFN2B+lyewmNFbitXYSE2M8uzONbEBGkfKIU++SE7BSiK
+         t8/DhNIAaZTgUGK45z4gh0Gfpgqj3XczPKYtlIxfXR5Wg3pfzgOp+KzN5VeKDYZ5pPaO
+         vxpTTulG+zmTd5VpWS81G63mT0mmcAD9xfNN56Td+1ucLUjVI7HX+FkkNmPx52S8FrHS
+         Rove+VFZtg+9JXpvvTyDxJVQVtBwMKJvYBeNbhGpF1etCiccrNgA2JxJuEMANy/Qhtw6
+         ue2F5zr7+8AuZsuCmvCbSjtLnZHdwtv6+HVTi0is3rrBQGNAztAZbqFnz/7AXK5h35rs
+         Bneg==
+X-Gm-Message-State: AOJu0Yyh8hTlccyTeaE1KWc4DCjYNjmIE3laT57qgeGSCyZtjniJ/+yI
+        92KyG1rSYzPTgCYuv6zakq4sBQ==
+X-Google-Smtp-Source: AGHT+IGjnRMX155MyOtK8jpOV+s3zeTY4YmNnsBtxwYVESX2N0HNlUD9ywodwdfvy4hbEH6chacNBg==
+X-Received: by 2002:a05:6512:3c8c:b0:500:828c:4c0a with SMTP id h12-20020a0565123c8c00b00500828c4c0amr9848995lfv.67.1692877754791;
+        Thu, 24 Aug 2023 04:49:14 -0700 (PDT)
 Received: from [192.168.1.101] (abyl28.neoplus.adsl.tpnet.pl. [83.9.31.28])
-        by smtp.gmail.com with ESMTPSA id ep11-20020a056512484b00b004ff96b0524dsm3134865lfb.119.2023.08.24.04.48.20
+        by smtp.gmail.com with ESMTPSA id ep11-20020a056512484b00b004ff96b0524dsm3134865lfb.119.2023.08.24.04.49.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 04:48:22 -0700 (PDT)
-Message-ID: <4bb60e8f-1167-4e4e-b31a-777c572c272b@linaro.org>
-Date:   Thu, 24 Aug 2023 13:48:19 +0200
+        Thu, 24 Aug 2023 04:49:14 -0700 (PDT)
+Message-ID: <d6f04329-b749-44bb-86a4-52149f54d575@linaro.org>
+Date:   Thu, 24 Aug 2023 13:49:13 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/7] Revert "arm64: dts: qcom: sm8450: Add PRNG"
+Subject: Re: [PATCH v2 7/7] arm64: dts: qcom: sm8450: add TRNG node
 Content-Language: en-US
 To:     Neil Armstrong <neil.armstrong@linaro.org>,
         Andy Gross <agross@kernel.org>,
@@ -66,10 +66,9 @@ To:     Neil Armstrong <neil.armstrong@linaro.org>,
         Conor Dooley <conor+dt@kernel.org>,
         Vinod Koul <vkoul@kernel.org>
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?Q?=EF=BF=BCOm_Prakash_Singh?= <quic_omprsing@quicinc.com>
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20230824-topic-sm8550-rng-v2-0-dfcafbb16a3e@linaro.org>
- <20230824-topic-sm8550-rng-v2-2-dfcafbb16a3e@linaro.org>
+ <20230824-topic-sm8550-rng-v2-7-dfcafbb16a3e@linaro.org>
 From:   Konrad Dybcio <konrad.dybcio@linaro.org>
 Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
  xsFNBF9ALYUBEADWAhxdTBWrwAgDQQzc1O/bJ5O7b6cXYxwbBd9xKP7MICh5YA0DcCjJSOum
@@ -106,22 +105,17 @@ Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
  bGqMHex48FVZhexNPYOd58EY9/7mL5u0sJmo+jTeb4JBgIbFPJCFyng4HwbniWgQJZ1WqaUC
  nas9J77uICis2WH7N8Bs9jy0wQYezNzqS+FxoNXmDQg2jetX8en4bO2Di7Pmx0jXA4TOb9TM
  izWDgYvmBE8=
-In-Reply-To: <20230824-topic-sm8550-rng-v2-2-dfcafbb16a3e@linaro.org>
+In-Reply-To: <20230824-topic-sm8550-rng-v2-7-dfcafbb16a3e@linaro.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 24.08.2023 13:33, Neil Armstrong wrote:
-> This reverts commit 76a6dd7bfcbb ("arm64: dts: qcom: sm8450: Add PRNG"),
-> since the RNG HW on the SM8450 SoC is in fact a True Random Number Generator,
-> a more appropriate compatible should be instead as reported at [1].
+> The SM8450 SoC has a True Random Number Generator, add the node with
+> the correct compatible set.
 > 
-> [1] https://lore.kernel.org/all/20230818161720.3644424-1-quic_omprsing@quicinc.com/
-> 
-> Suggested-by: ￼Om Prakash Singh <quic_omprsing@quicinc.com>
-> Suggested-by: ￼Konrad Dybcio <konrad.dybcio@linaro.org>
 > Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 > ---
 Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
