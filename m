@@ -2,78 +2,116 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A86C7EE43
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 05:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820D7C3DA6F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 05:18:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239667AbjHXFLg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 01:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41388 "EHLO
+        id S239248AbjHXFSE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 01:18:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239177AbjHXFLJ (ORCPT
+        with ESMTP id S239934AbjHXFRy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 01:11:09 -0400
+        Thu, 24 Aug 2023 01:17:54 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBC810F9;
-        Wed, 23 Aug 2023 22:11:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0871706
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Aug 2023 22:17:49 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qZ2bd-007EU6-EA; Thu, 24 Aug 2023 13:10:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Aug 2023 13:10:06 +0800
-Date:   Thu, 24 Aug 2023 13:10:06 +0800
+        id 1qZ2j2-007EZF-Po; Thu, 24 Aug 2023 13:17:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Aug 2023 13:17:45 +0800
+Date:   Thu, 24 Aug 2023 13:17:45 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Johannes Berg <johannes@sipsolutions.net>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y.Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        "Jason A.Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Subject: Re: [PATCH 6/12] wifi: mac80211: Do not include crypto/algapi.h
-Message-ID: <ZObmLqztZ4vMFKnI@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [v2 PATCH] wireguard: do not include crypto/algapi.h
+Message-ID: <ZObn+Xmyo47wsLGV@gondor.apana.org.au>
 References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
- <E1qYlA0-006vFr-Ts@formenos.hmeau.com>
- <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
+ <E1qYlAB-006vJI-Cv@formenos.hmeau.com>
+ <CAHmME9qwYhM55he7WyWQZXwSg9Ri6-9K31tHHqaKcMYFEJYxTw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
+In-Reply-To: <CAHmME9qwYhM55he7WyWQZXwSg9Ri6-9K31tHHqaKcMYFEJYxTw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 12:34:35PM +0200, Johannes Berg wrote:
+On Wed, Aug 23, 2023 at 01:48:47PM +0200, Jason A. Donenfeld wrote:
+>
+> Small nit - with the exception of the cookie.c reordering, could you
+> maintain the existing #include ordering of the other files? No need to
+> send a v2 for that if you don't want. And please make the entire
+> commit subject lowercase. With those done,
 > 
-> No objection, of course, but I don't think it's necessarily clear that
-> it "is for internal use only", it literally says:
-> 
->  * Cryptographic API for algorithms (i.e., low-level API).
-> 
-> which really isn't the same as "don't use this file".
-> 
-> Might want to clarify that, or even move it into crypto/ from
-> include/crypto/ or something?
+> Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Yes it should be in include/crypto/internal.  Once the churn gets
-small enough I'll move it there.
+Thanks.  As these patches are independent of each other, I'll just
+repost this one patch and delete it from the original series.
 
-Thanks,
+> As a side note, you may want to eventually do something to make sure
+> people don't add back algapi.h, like move it to internal/ or out of
+> include/ all together. I figure you've already thought about this, and
+> this series is just the first step.
+
+Sure that is the idea.  Although judging from the result of my
+grep, it seems most of the external users are due to the utility
+functions which hopefully won't be an issue anymore because of the
+new crypto/utils.h file.
+
+---8<---
+The header file crypto/algapi.h is for internal use only.  Use the
+header file crypto/utils.h instead.
+
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+
+ drivers/net/wireguard/cookie.c  |    2 +-
+ drivers/net/wireguard/netlink.c |    2 +-
+ drivers/net/wireguard/noise.c   |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireguard/cookie.c b/drivers/net/wireguard/cookie.c
+index 4956f0499c19..f89581b5e8cb 100644
+--- a/drivers/net/wireguard/cookie.c
++++ b/drivers/net/wireguard/cookie.c
+@@ -12,9 +12,9 @@
+ 
+ #include <crypto/blake2s.h>
+ #include <crypto/chacha20poly1305.h>
++#include <crypto/utils.h>
+ 
+ #include <net/ipv6.h>
+-#include <crypto/algapi.h>
+ 
+ void wg_cookie_checker_init(struct cookie_checker *checker,
+ 			    struct wg_device *wg)
+diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+index 6d1bd9f52d02..0a2f225e754a 100644
+--- a/drivers/net/wireguard/netlink.c
++++ b/drivers/net/wireguard/netlink.c
+@@ -15,7 +15,7 @@
+ #include <linux/if.h>
+ #include <net/genetlink.h>
+ #include <net/sock.h>
+-#include <crypto/algapi.h>
++#include <crypto/utils.h>
+ 
+ static struct genl_family genl_family;
+ 
+diff --git a/drivers/net/wireguard/noise.c b/drivers/net/wireguard/noise.c
+index 720952b92e78..202a33af5a72 100644
+--- a/drivers/net/wireguard/noise.c
++++ b/drivers/net/wireguard/noise.c
+@@ -15,7 +15,7 @@
+ #include <linux/bitmap.h>
+ #include <linux/scatterlist.h>
+ #include <linux/highmem.h>
+-#include <crypto/algapi.h>
++#include <crypto/utils.h>
+ 
+ /* This implements Noise_IKpsk2:
+  *
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
