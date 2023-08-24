@@ -2,71 +2,193 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E53C71145
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 08:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5DBC7113B
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 08:48:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240638AbjHXIqq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 04:46:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55850 "EHLO
+        id S231136AbjHXIru (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 04:47:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240665AbjHXIqL (ORCPT
+        with ESMTP id S240583AbjHXIrg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 04:46:11 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BC631BF8;
-        Thu, 24 Aug 2023 01:45:50 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qZ5xc-007Hxa-Bb; Thu, 24 Aug 2023 16:45:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 24 Aug 2023 16:45:01 +0800
-Date:   Thu, 24 Aug 2023 16:45:01 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Johannes Berg <johannes@sipsolutions.net>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y.Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        "Jason A.Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Subject: Re: [PATCH 6/12] wifi: mac80211: Do not include crypto/algapi.h
-Message-ID: <ZOcYjQ1JasrF+L4N@gondor.apana.org.au>
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
- <E1qYlA0-006vFr-Ts@formenos.hmeau.com>
- <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
- <ZObmLqztZ4vMFKnI@gondor.apana.org.au>
- <dbbd230e26245274d5a05c64c553c42574f15d4b.camel@sipsolutions.net>
+        Thu, 24 Aug 2023 04:47:36 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4671BCC
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 01:47:03 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3ff1c397405so13257855e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 01:47:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692866820; x=1693471620;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4W0wShPxj970HM+vO+J4VpqUX1dY6k+EF1YYQxuqvko=;
+        b=ZOtAkIPQipX4ZbkwqQQd3xISKpVJlbetKmrUU95QRB8DRuA7OMKfBuv7zqZ+xT3fqt
+         5aFE6ogPhvfL8BXvsQfnx/J6CCgDwVeVWj6IiTAMCpZyrjCYOdf5JmGMg/b55Dz4HnYB
+         cE039L0bWXoTtlQQBZAkgitDJeb7DuNhq73K/jBPmtxPJbCyhFTi/G+esVYMXZAyGsZa
+         goE/bFRtfSXO2IwBRMqhuCJP3Uuxh6LgZCDONmoTGz94R691tiFx2qKI8it0blQQWELQ
+         VKQ9BQHDupP2G3vCQ33MaIm7km7ex2I3oWGMTG1Mf3G/ywM4nQpnYj9tL6B23o52SHRY
+         vq4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692866820; x=1693471620;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4W0wShPxj970HM+vO+J4VpqUX1dY6k+EF1YYQxuqvko=;
+        b=aa7Z7ivj1WQcDnqT1UI/VAZ7QCn2DXOBisIvOEsapCcN+RVDiUJL5VPRAR3qZWWSgY
+         X17NiPj1qLAGUV0BR8D2gtDJisqOeUMA+RXWTiMvv25+wFa2zdDIyNKBOwDO71p10Tn4
+         kcqHGt7beE6BYQdYzLrW1Hpn4b4eEGZRx/qpJKZeiPM80pneTHSCAwnomTU2DIE0cuOX
+         o3HmYr8Xb/7cED1Zr2k0JU2rednGXPqwmjVPaj7CQ5/CBezkxCiAJfI7GY4bopDivRaC
+         8W5cLNF1rbR3M37pZIKKXP6QzUf9fDHvyqOapYosKCYchIZcSCX2VUYo/E7icMrDaB3Z
+         1FEg==
+X-Gm-Message-State: AOJu0YzATG+cwZ0ZxQSsOQDInG2BWPW6hHOl+TrnQoQ/7gKgrBi6TD5V
+        QGga/9pFtXs+2W1HzY/x/eKiWg==
+X-Google-Smtp-Source: AGHT+IE3cdl3KGPJ6VTg6TUCJ/y3ymati1svSewwlzS6TTay9/VfYjNWVgFG38dB93X3kLM40xlG6Q==
+X-Received: by 2002:a05:600c:3654:b0:3fb:b5dc:dab1 with SMTP id y20-20020a05600c365400b003fbb5dcdab1mr10332470wmq.39.1692866820089;
+        Thu, 24 Aug 2023 01:47:00 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:982:cbb0:e6d5:d4d4:f3a1:e44b? ([2a01:e0a:982:cbb0:e6d5:d4d4:f3a1:e44b])
+        by smtp.gmail.com with ESMTPSA id 6-20020a05600c020600b003fc04d13242sm2016890wmi.0.2023.08.24.01.46.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Aug 2023 01:46:59 -0700 (PDT)
+Message-ID: <08e4a3b2-0943-4e22-957e-37079184b48b@linaro.org>
+Date:   Thu, 24 Aug 2023 10:46:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dbbd230e26245274d5a05c64c553c42574f15d4b.camel@sipsolutions.net>
+User-Agent: Mozilla Thunderbird
+From:   neil.armstrong@linaro.org
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: document SM8550
+Content-Language: en-US, fr
+To:     Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Om Prakash Singh <quic_omprsing@quicinc.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230822-topic-sm8550-rng-v1-0-8e10055165d1@linaro.org>
+ <20230822-topic-sm8550-rng-v1-1-8e10055165d1@linaro.org>
+ <8479869b-9984-41e3-9812-c7f5727cfd2c@linaro.org>
+ <b73106c5-74e4-479d-8733-b99454768c15@quicinc.com>
+ <26bae022-c114-4871-8715-73d7e8aeaa52@linaro.org>
+ <f61ef601-1561-45d7-8f4a-947458472668@quicinc.com>
+ <dd3d28f1-ff5e-49e6-a9f7-0ec9265017cc@linaro.org>
+ <d44be821-228b-4035-aa1e-c4f58db90422@quicinc.com>
+ <6574894d-e7ba-e5cc-a03f-76f97d1403ad@linaro.org>
+ <21b57b63-c927-4d00-8327-c4105ff5e9b2@linaro.org>
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <21b57b63-c927-4d00-8327-c4105ff5e9b2@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 24, 2023 at 08:59:08AM +0200, Johannes Berg wrote:
->
-> I was kind of waiting to see - but now that others have applied some
-> patches to their tree I've done the same.
+On 24/08/2023 10:40, Konrad Dybcio wrote:
+> On 24.08.2023 08:37, Krzysztof Kozlowski wrote:
+>> On 24/08/2023 01:32, Om Prakash Singh wrote:
+>>>
+>>>
+>>> On 8/23/2023 1:25 PM, Neil Armstrong wrote:
+>>>> Hi,
+>>>>
+>>>> On 23/08/2023 02:10, Om Prakash Singh wrote:
+>>>>>
+>>>>>
+>>>>> On 8/22/2023 9:34 PM, Konrad Dybcio wrote:
+>>>>>> On 22.08.2023 16:54, Om Prakash Singh wrote:
+>>>>>>> PRNG Block on most of newer target from Qualcomm have some
+>>>>>>> configuration where clock is configured by security firmware.
+>>>>>>>
+>>>>>>> Adding separate compatible string for each platform is overhead.
+>>>>>>>
+>>>>>>> We need to introduce common compatible string that can be used for
+>>>>>>> all platforms with same configuration.
+>>>>>>>
+>>>>>>> I would suggest to use "qcom,rng-ee" for newer platform, dropping
+>>>>>>> "p" also signifies it is not a Pseudo Random Number Generator.
+>>>>>> Please reply inline and don't top-post.
+>>>>>>
+>>>>>>
+>>>>>> Is this what you're trying to say?
+>>>>>>
+>>>>>> 1. sort out the clock requirements for designs where Linux manages it
+>>>>>>      vs where the FW does so >
+>>>>>> 2. introduce a new compatible for SoCs implementing a TRNG
+>>>>>>
+>>>>>> 3. for SoCs in 2., register the TRNG as a hwrng device
+>>>>>
+>>>>> Yes to all
+>>>>
+>>>> I can send a proposal, but that means writing a new driver for this
+>>>> compatible in drivers/char/hw_random/ right ?
+>>>
+>>> We can add hwrng support in same driver like
+>>> drivers/crypto/hisilicon/trng/trng.c
+>>>
+>>> As Krzysztof is suggesting we need to have platform specific compatible
+>>
+>> That's independent question
+>>
+>>> string, we can go with your change. for hwrng support I will send
+>>> separate patches.
+>>
+>> Any bindings decision should be made now. We don't produce knowingly
+>> incomplete bindings just to change them later. Therefore now you need to
+>> decide whether you call it prng-ee or something else.
+> Herbert already picked up the 8450 compatible last week or so.
+> If we decide quickly, perhaps it can be reverted and substituted
+> with the non-*P*RNG one. It would theoretically be an ABI break,
+> but:
+> 
+> a) it would be very very prompt
+> b) the dts patch hasn't been merged so there are no users
+> 
+> I'd be fine with that, not sure about the rest of you guys.
 
-Noted.  Thanks!
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'm fine for that aswell, this can be done quickly without the
+hwrng part
+
+I can quickly refresh this serie with :
+1) introduce a new "qcom,trng" and move "qcom,sm8450-prng-ee" to "qcom,sm8450-trng"
+2) add qcom,sm8550-prng-ee
+3) add "qcom,trng"  to the driver compatible list
+
+then afterwards, the hwrng part can be added in a separate serie.
+
+Neil
+
+> 
+> Konrad
+
