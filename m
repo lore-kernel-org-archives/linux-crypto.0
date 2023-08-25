@@ -2,140 +2,257 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECC6EE49AD
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Aug 2023 23:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ABBC6FA8F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 03:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240415AbjHXX6t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Aug 2023 19:58:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54496 "EHLO
+        id S230137AbjHYDIk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Aug 2023 23:08:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244093AbjHXX6h (ORCPT
+        with ESMTP id S236556AbjHYDIJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Aug 2023 19:58:37 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76F74212D;
-        Thu, 24 Aug 2023 16:58:05 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37ONtR7Y010594;
-        Thu, 24 Aug 2023 23:57:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : date : in-reply-to : references : content-type : mime-version
- : content-transfer-encoding; s=pp1;
- bh=YnlPHR/hwH5qnykFXHXCdGujskzarfLxFMtXePb+Bp8=;
- b=Mgy77CoYgffelRskx96UqY+AI6UBmjwiA1BtrxmJvh8wJZbL3IqEybxEtmIWU4FLt6vG
- 29u+vjpCF/xP6MeW1/0w7+ZmwV0ws858zh2Z+7k+HgTNOlqSgWy0Q59+iUDExZ4VdqqU
- MV8yDb9G8aM5mCr/RuiOi/O0qDRQzd5mjWz1e2yTzUP+wdkbgIqvR5uKT12c3DpXT7Hr
- ATuOC1qDCzH64PeKnBW0gpsPVwXNY4+pmPEXhY/eXeQfIOwWZ+/3ANTTqolfC37ZqJ87
- UaCvctpDmajTUi0ePgWWeRX9FM8pya8YFuLkNZyebl7tyLjkk4iS1WgKXRdaMU7JD3PR RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sph6r0516-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Aug 2023 23:57:33 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37ONpHmf029212;
-        Thu, 24 Aug 2023 23:57:32 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3sph6r050w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Aug 2023 23:57:32 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-        by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37OLMvBU018270;
-        Thu, 24 Aug 2023 23:57:32 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-        by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3sn21sub5b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Aug 2023 23:57:32 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37ONvVTt7602738
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Aug 2023 23:57:31 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 88D935805A;
-        Thu, 24 Aug 2023 23:57:31 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 28F3158051;
-        Thu, 24 Aug 2023 23:57:30 +0000 (GMT)
-Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.61.163.153])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 24 Aug 2023 23:57:30 +0000 (GMT)
-Message-ID: <1905e842f2f74705aa2f7d407c58171c72686cdf.camel@linux.ibm.com>
-Subject: Re: [PATCH 10/12] KEYS: encrypted: Do not include crypto/algapi.h
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Date:   Thu, 24 Aug 2023 19:57:29 -0400
-In-Reply-To: <E1qYlA9-006vIz-Am@formenos.hmeau.com>
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
-         <E1qYlA9-006vIz-Am@formenos.hmeau.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fAHUKh1opEl8_Dv_I_X3dM8kVdC0roQH
-X-Proofpoint-GUID: Pbj_ah2ai_Uy70mnZVchutrhpFA2Kgd9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-24_18,2023-08-24_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 phishscore=0 impostorscore=0 clxscore=1015 spamscore=0
- mlxscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2308240205
+        Thu, 24 Aug 2023 23:08:09 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C11198E
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 20:08:02 -0700 (PDT)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RX4YP32fQzNmwp;
+        Fri, 25 Aug 2023 11:04:25 +0800 (CST)
+Received: from [10.67.120.153] (10.67.120.153) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 25 Aug 2023 11:08:00 +0800
+Subject: Re: [PATCH v2 1/7] crypto: hisilicon/qm - obtain the mailbox
+ configuration at one time
+To:     Ard Biesheuvel <ardb@kernel.org>
+References: <20230811140749.5202-1-qianweili@huawei.com>
+ <20230811140749.5202-2-qianweili@huawei.com>
+ <ZN8oEpUBq87m+r++@gondor.apana.org.au>
+ <CAMj1kXGNesF91=LScsDSgMx7LwQXOuMjLy7RN5SPLjO3ab7SHA@mail.gmail.com>
+ <ZOBBH/XS7Fe0yApm@gondor.apana.org.au>
+ <CAMj1kXHd6svuQ-JSVmUZK=xUPR4fC4BCoUjMhFKfg2KBZcavrw@mail.gmail.com>
+ <ZOMeKhMOIEe+VKPt@gondor.apana.org.au>
+ <20230821102632.GA19294@willie-the-truck>
+ <9ef5b6c6-64b7-898a-d020-5c6075c6a229@huawei.com>
+ <CAMj1kXH5YWZ1i0=1MVo0kaxSbQWFF6QyGvLUv_K5mqApASzy5w@mail.gmail.com>
+CC:     Will Deacon <will@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>, <linux-crypto@vger.kernel.org>,
+        <shenyang39@huawei.com>, <liulongfang@huawei.com>
+From:   Weili Qian <qianweili@huawei.com>
+Message-ID: <0702ec24-4ca2-817f-0d71-132fb3b67aa0@huawei.com>
+Date:   Fri, 25 Aug 2023 11:07:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
+MIME-Version: 1.0
+In-Reply-To: <CAMj1kXH5YWZ1i0=1MVo0kaxSbQWFF6QyGvLUv_K5mqApASzy5w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.120.153]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2023-08-23 at 18:32 +0800, Herbert Xu wrote:
-> The header file crypto/algapi.h is for internal use only.  Use the
-> header file crypto/utils.h instead.
+
+
+On 2023/8/21 22:36, Ard Biesheuvel wrote:
+> On Mon, 21 Aug 2023 at 14:45, Weili Qian <qianweili@huawei.com> wrote:
+>>
+>>
+>>
+>> On 2023/8/21 18:26, Will Deacon wrote:
+>>> On Mon, Aug 21, 2023 at 04:19:54PM +0800, Herbert Xu wrote:
+>>>> On Sat, Aug 19, 2023 at 09:33:18AM +0200, Ard Biesheuvel wrote:
+>>>>>
+>>>>> No, that otx2_write128() routine looks buggy, actually, The ! at the
+>>>>> end means writeback, and so the register holding addr will be
+>>>>> modified, which is not reflect in the asm constraints. It also lacks a
+>>>>> barrier.
+>>>>
+>>>> OK.  But at least having a helper called write128 looks a lot
+>>>> cleaner than just having unexplained assembly in the code.
+>>>
+>>> I guess we want something similar to how writeq() is handled on 32-bit
+>>> architectures (see include/linux/io-64-nonatomic-{hi-lo,lo-hi}.h.
+>>>
+>>> It's then CPU-dependent on whether you get atomicity.
+>>>
+>>> Will
+>>> .
+>>>
+>>
+>> Thanks for the review.
+>>
+>> Since the HiSilicon accelerator devices are supported only on the ARM64 platform,
+>> the following 128bit read and write interfaces are added to the driver, is this OK?
 > 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Acked-by: Mimi Zohar <zohar@linux.ibm.com>
-
-> ---
+> No, this does not belong in the driver. As Will is suggesting, we
+> should define some generic helpers for this, and provide an arm64
+> implementation if the generic one does not result in the correct
+> codegen.
 > 
->  security/keys/encrypted-keys/encrypted.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry, I misunderstood here.
+
+>>
+>> #if defined(CONFIG_ARM64)
+>> static void qm_write128(void __iomem *addr, const void *buffer)
+>> {
+>>         unsigned long tmp0 = 0, tmp1 = 0;
+>>
+>>         asm volatile("ldp %0, %1, %3\n"
+>>                      "stp %0, %1, %2\n"
+>>                      "dmb oshst\n"
+>>                      : "=&r" (tmp0),
+>>                      "=&r" (tmp1),
+>>                      "+Q" (*((char __iomem *)addr))
 > 
-> diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/encrypted-keys/encrypted.c
-> index 1e313982af02..8af2136069d2 100644
-> --- a/security/keys/encrypted-keys/encrypted.c
-> +++ b/security/keys/encrypted-keys/encrypted.c
-> @@ -27,10 +27,10 @@
->  #include <linux/scatterlist.h>
->  #include <linux/ctype.h>
->  #include <crypto/aes.h>
-> -#include <crypto/algapi.h>
->  #include <crypto/hash.h>
->  #include <crypto/sha2.h>
->  #include <crypto/skcipher.h>
-> +#include <crypto/utils.h>
->  
->  #include "encrypted.h"
->  #include "ecryptfs_format.h"
+> This constraint describes the first byte of addr, which is sloppy but
+> probably works fine.
+> 
+>>                      : "Q" (*((char *)buffer))
+> 
+> This constraint describes the first byte of buffer, which might cause
+> problems because the asm reads the entire buffer not just the first
+> byte.
+I don't understand why constraint describes the first byte of buffer,and the compilation result seems to be ok.
+
+ 1811     1afc:       a9400a61        ldp     x1, x2, [x19]
+ 1812     1b00:       a9000801        stp     x1, x2, [x0]
+ 1813     1b04:       d50332bf        dmb     oshst
+Maybe I'm wrong about 'Q', could you explain it or where can I learn more about this?
+
+> 
+>>                      : "memory");
+>> }
+>>
+>> static void qm_read128(void *buffer, const void __iomem *addr)
+>> {
+>>         unsigned long tmp0 = 0, tmp1 = 0;
+>>
+>>         asm volatile("ldp %0, %1, %3\n"
+>>                      "stp %0, %1, %2\n"
+>>                      "dmb oshst\n"
+> 
+> Is this the right barrier for a read?
+Should be "dmb oshld\n".
+> 
+>>                      : "=&r" (tmp0),
+>>                        "=&r" (tmp1),
+>>                        "+Q" (*((char *)buffer))
+>>                      : "Q" (*((char __iomem *)addr))
+>>                      : "memory");
+>> }
+>>
+>> #else
+>> static void qm_write128(void __iomem *addr, const void *buffer)
+>> {
+>>
+>> }
+>>
+>> static void qm_read128(void *buffer, const void __iomem *addr)
+>> {
+>>
+>> }
+>> #endif
+>>
+> 
+> Have you tried using __uint128_t accesses instead?
+> 
+> E.g., something like
+> 
+> static void qm_write128(void __iomem *addr, const void *buffer)
+> {
+>     volatile __uint128_t *dst = (volatile __uint128_t __force *)addr;
+>     const __uint128_t *src __aligned(1) = buffer;
+> 
+>     WRITE_ONCE(*dst, *src);
+>     dma_wmb();
+> }
+> 
+> should produce the right instruction sequence, and works on all
+> architectures that have CONFIG_ARCH_SUPPORTS_INT128=y
+> 
+
+I tried this, but WRITE_ONCE does not support type __uint128_t.
+->WRITE_ONCE
+ ->compiletime_assert_rwonce_type
+  ->compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),	\
+		"Unsupported access size for {READ,WRITE}_ONCE().")
+
+So can we define generic IO helpers based on patchset
+https://lore.kernel.org/all/20180124090519.6680-4-ynorov@caviumnetworks.com/
+Part of the implementation is as follows：
+
+add writeo() in include/asm-generic/io.h
+
+#ifdef CONFIG_ARCH_SUPPORTS_INT128
+#ifndef writeo
+#define writeo writeo
+static inline void writeo(__uint128_t value, volatile void __iomem *addr)
+{
+	__io_bw();
+	__raw_writeo((__uint128_t __force)__cpu_to_le128(value), addr); //__cpu_to_le128 will implement.
+	__io_aw();
+}
+#endif
+#endif /* CONFIG_ARCH_SUPPORTS_INT128 */
 
 
+#ifdef CONFIG_ARCH_SUPPORTS_INT128
+#ifndef iowrite128
+#define iowrite128 iowrite128
+static inline void iowrite128(__uint128_t value, volatile void __iomem *addr)
+{
+	writeo(value, addr);
+}
+#endif
+#endif /* CONFIG_ARCH_SUPPORTS_INT128  */
+
+in arch/arm64/include/asm/io.h
+
+#ifdef CONFIG_ARCH_SUPPORTS_INT128
+#define __raw_writeo __raw_writeo
+static __always_inline void  __raw_writeo(__uint128_t val, volatile void __iomem *addr)
+{
+	u64 hi, lo;
+
+	lo = (u64)val;
+	hi = (u64)(val >> 64);
+
+	asm volatile ("stp %x0, %x1, [%2]\n" :: "rZ"(lo), "rZ"(hi), "r"(addr));
+}
+#endif /* CONFIG_ARCH_SUPPORTS_INT128 */
+
+And add io{read|write}128bits in include/linux/io-64-nonatomic-{hi-lo,lo-hi}.h.
+static inline void lo_hi_writeo(__uint128_t val, volatile void __iomem *addr)
+{
+	writeq(val, addr);
+	writeq(val >> 64, addr);
+}
+#ifndef writeo
+#define writeo lo_hi_writeo
+#endif
+
+static inline void hi_lo_writeo(__uint128_t val, volatile void __iomem *addr)
+{
+	writeq(val >> 64, addr);
+	writeq(val, addr);
+}
+#ifndef writeo
+#define writeo hi_lo_writeo
+#endif
+
+If this is ok, I'm going to implement reado and writeo, then submit the patchset.
+
+Thanks,
+Weili
+
+> This needs a big fat comment describing that the MMIO access needs to
+> be atomic, but we could consider it as a fallback if we decide not to
+> bother with special MMIO accessors, although I suspect we'll be
+> needing them more widely at some point anyway.
+> .
+> 
