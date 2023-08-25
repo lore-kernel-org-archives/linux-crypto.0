@@ -2,92 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FCAEE49A3
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 12:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C87C3DA66
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 21:15:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244097AbjHYMi7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Aug 2023 08:38:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44532 "EHLO
+        id S231348AbjHYVO2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Aug 2023 17:14:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244907AbjHYMir (ORCPT
+        with ESMTP id S229610AbjHYVN6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Aug 2023 08:38:47 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFCCED3;
-        Fri, 25 Aug 2023 05:38:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692967125; x=1724503125;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xzsv+TPApbcbC97ZdaQexaDo1qTJfnRyaSbczlKPtfM=;
-  b=XlYKVKAhNkMbY3zMpjnmPY/SII/6Ej8k2XQtqBMeb8w68joFyo4tkpYw
-   FH6TU99lWE3VNapnTscxP17frVGLLZnYqAcjQanDfQ1DWZZyohya8cZhQ
-   hokI5AsspNhJLBj9bvmYE2+FDh0lBiopxNkpwueNHUE7OooHMuU65PzX2
-   YftPxfkvkkm9EvLCnLproRar7Bm4A3cB6PJxHEFCAgbkvKc8VyRh7ujmm
-   d8hFrfc+WWxnidErE8piF0LAeXQO08dtY3ppd7FrU8nxid6hQKxM7xXve
-   6FP9+9p7vo3uV6Wqt/nbq8NrtnNXH5D9u7SnF4iW0vtZ8WuutYi/uuTM1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="377443812"
-X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="377443812"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:38:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="861076556"
-X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="861076556"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga004.jf.intel.com with ESMTP; 25 Aug 2023 05:38:43 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@intel.com>)
-        id 1qZW5J-00HW7e-2A;
-        Fri, 25 Aug 2023 15:38:41 +0300
-Date:   Fri, 25 Aug 2023 15:38:41 +0300
-From:   Andy Shevchenko <andriy.shevchenko@intel.com>
+        Fri, 25 Aug 2023 17:13:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4AD211E;
+        Fri, 25 Aug 2023 14:13:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0D28A62FFA;
+        Fri, 25 Aug 2023 21:13:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0ECC433C7;
+        Fri, 25 Aug 2023 21:13:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692998035;
+        bh=uiXkyRVOSV4tA0Dr9xfhgTNwejV2oZiBsqM/hZn5yPg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UgSWvtl49FkDkaRYO3r0z4VzYK/yDU2hQmm5FUy/saN2DaYbzz5vuhxj+oTpq/YEz
+         6iPySb9lNptNeguxiheMPfLw58USp34CyI6yLgGfRUu28v0iNMZb16krVHW1DR7eer
+         X7/UJR9hvVw1WO8f9x3khDGmYa5/plHR8kM491NKMqEuNO4Pw9iZDNRrB6DqgVa63r
+         +IjWV8he6N0kCyEWrQbC5VfgXNT058QGjrBf2pO6OG6y8NaLAaMZTNAT4pmMeyQyKD
+         eh10XcSY2us9pZi/URLX1z5VvUzlXT9gvz7Jlc/CvSoA1f7ssDARtN21vNHvUsEQko
+         AuIIYRR5eP06A==
+Date:   Fri, 25 Aug 2023 14:13:52 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, alx@kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 2/2] crypto: qat - add pm_status debugfs file
-Message-ID: <ZOig0RNTKs+P91V0@smile.fi.intel.com>
-References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
- <20230818102322.142582-3-lucas.segarra.fernandez@intel.com>
- <ZOiE6GMY5Qb2S53A@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+        linux-mtd@lists.infradead.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+        ceph-devel@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-wireless@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Subject: Re: [PATCH 1/12] fscrypt: Do not include crypto/algapi.h
+Message-ID: <20230825211352.GB1366@sol.localdomain>
+References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
+ <E1qYl9q-006vDd-FJ@formenos.hmeau.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZOiE6GMY5Qb2S53A@gondor.apana.org.au>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <E1qYl9q-006vDd-FJ@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 06:39:36PM +0800, Herbert Xu wrote:
-> On Fri, Aug 18, 2023 at 12:23:09PM +0200, Lucas Segarra Fernandez wrote:
-
-> >  #include <linux/bitfield.h>
-> > +#include <linux/bits.h>
+On Wed, Aug 23, 2023 at 06:32:15PM +0800, Herbert Xu wrote:
+> The header file crypto/algapi.h is for internal use only.  Use the
+> header file crypto/utils.h instead.
 > 
-> This is redundant if you include linux/kernel.
-
-Why?!
-Can we avoid using kernel.h, please?
-
-> > +#include <linux/dma-mapping.h>
-> > +#include <linux/fs.h>
-> >  #include <linux/iopoll.h>
-> >  #include <linux/kstrtox.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/stddef.h>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
 > 
-> So is this.
+>  fs/crypto/keysetup_v1.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/crypto/keysetup_v1.c b/fs/crypto/keysetup_v1.c
+> index 75dabd9b27f9..d698ecb9ad44 100644
+> --- a/fs/crypto/keysetup_v1.c
+> +++ b/fs/crypto/keysetup_v1.c
+> @@ -20,8 +20,8 @@
+>   *    managed alongside the master keys in the filesystem-level keyring)
+>   */
+>  
+> -#include <crypto/algapi.h>
+>  #include <crypto/skcipher.h>
+> +#include <crypto/utils.h>
+>  #include <keys/user-type.h>
+>  #include <linux/hashtable.h>
+>  #include <linux/scatterlist.h>
 
-Ditto.
+Acked-by: Eric Biggers <ebiggers@google.com>
 
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+- Eric
