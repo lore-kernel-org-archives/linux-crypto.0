@@ -2,160 +2,145 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F86C3DA66
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 06:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAE7C3DA6F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 07:13:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239101AbjHYGjI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Aug 2023 02:39:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
+        id S237851AbjHYHMw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Aug 2023 03:12:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242246AbjHYGiu (ORCPT
+        with ESMTP id S243363AbjHYHMu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Aug 2023 02:38:50 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 038871FF0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 23:38:46 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-52a06f5f556so852390a12.2
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Aug 2023 23:38:45 -0700 (PDT)
+        Fri, 25 Aug 2023 03:12:50 -0400
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0121B2;
+        Fri, 25 Aug 2023 00:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1692945524; x=1693550324;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1SSRgsqWGE/RACDHj1qc7eoiU1kp65t711DUZ8q0Mxk=;
-        b=EoSOllFIEBw85fBVae2XuxA9YZCxndm5zMLl/wqeYioP+1+19xOWCLJglOyz+w/krA
-         I27be0wi+BoWh19f/mogs6yGFshx3OjRm5z2LUxDpPtPwjpSuzj1iLmkv+ijhZ1sFCUO
-         UnctSiLmJvpTW4DA1/PjLLNff7aKd19zpVFH2jE5xvPKiQ1a1uMfRp/7dKTesao2zhk/
-         jHCnKbia4wPcJXTK92FPZNK0W7EQ29bvWzAIW3d4E6VoewulfEjU9Igasu6Hx73UJhM7
-         xecUcuxlAiquFMhKwVlO1DGOzrbIOrC3v1B1mMIEelGwRYnglxTxdFwxT6OkAMkfe/mp
-         d2Kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692945524; x=1693550324;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1SSRgsqWGE/RACDHj1qc7eoiU1kp65t711DUZ8q0Mxk=;
-        b=AcN4jkXf0cbCKAaxM62HYAWryZWTqZZlwUV4uaI6da/aQZYBMVQGxR9jRaBNBFGElg
-         oWVMMHbD4aGPzq2A0G3YBWhR2NDZD3NuoeMWnHC/VhFb/hUd240RVc2VbmBqmHg0jsaV
-         0gIzg4iYgxofivhaEmAFTvlcCYtPnITlBlLjPS4nSh4xwfMmJHa3GAd1rwdsQTGocqkW
-         Jje0/JuJBrF3taA/MoMmHMomBAgTap1n55W5Qm0eXF3emMwflsMk84JmBsGwX5HNt5Pb
-         2romM8P0KFjkcdIZxz6Z7kNNSl/+OAiFqj+9zzoVBHKrDAeSXEtHhoxoRuvePrE2P+86
-         4GzA==
-X-Gm-Message-State: AOJu0YxjSWXeAUu8i+LTTe4b09fg/yLFd/3e6oppi2vUO/17/Fiw3yb5
-        HUqQik5Iazdpvd7OQCHv7/c2KK/4snWxkhEMWRveiA==
-X-Google-Smtp-Source: AGHT+IGIN+a9Tsuplje7An/26N8i6OFoKx8k6Zzw0oy9lXO91uIOWqYbG5+7wH8oDVAfS7RB4mk50Q==
-X-Received: by 2002:a17:907:78d8:b0:9a1:e941:6f48 with SMTP id kv24-20020a17090778d800b009a1e9416f48mr4943404ejc.13.1692945524404;
-        Thu, 24 Aug 2023 23:38:44 -0700 (PDT)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id x18-20020a170906805200b0097073f1ed84sm603963ejw.4.2023.08.24.23.38.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Aug 2023 23:38:44 -0700 (PDT)
-Mime-Version: 1.0
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1692947567; x=1724483567;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=q2k+Pyt4QngwrczcVgdUO+Ku35iTRGG8ZTnt0DwH5gs=;
+  b=HxMg47VzKzgLue4soPqNn7q2kQsOYFGnldo7DIspFPNgKjaErMFaxMwZ
+   qLaknvfW4HRfvultPljAsbGT+6TmHCQF7Hj8uiuQ4EGzDqDGRcebNKANi
+   sSej+fyFiNpQQYfhnFyGTBMgCnhaYrI4/OeNbcSG2xvS83veIvIIbxCWI
+   GMya3j/XA4MDElt619ujrVQ8iitE64JPZgRzfFMIEGV/uM0y3LzkIXuRq
+   XgzgitLkJOlF+8mK3Y1CF6Bs212AgDAUmPwKQSeaIjTCgYcPSXuOGQAXw
+   9OeZ+1zKO/96xWXJ/6C7n4VEQ20WeMntoOGzPp/0Rj6uhZ+3hZy9HJ5HD
+   g==;
+X-IronPort-AV: E=Sophos;i="6.02,195,1688421600"; 
+   d="scan'208";a="32622174"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 25 Aug 2023 09:12:44 +0200
+Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id A0755280075;
+        Fri, 25 Aug 2023 09:12:44 +0200 (CEST)
+From:   Alexander Stein <alexander.stein@ew.tq-group.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Martin Kaiser <martin@kaiser.cx>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
+Subject: Re: [PATCH v2 3/6] hwrng: imx-rngc - use polling to detect end of self test
+Date:   Fri, 25 Aug 2023 09:12:44 +0200
+Message-ID: <8370215.EvYhyI6sBW@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <20230824192059.1569591-4-martin@kaiser.cx>
+References: <20230824192059.1569591-1-martin@kaiser.cx> <20230824192059.1569591-4-martin@kaiser.cx>
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Fri, 25 Aug 2023 08:38:43 +0200
-Message-Id: <CV1F3OVNEFMI.1DO4SX08EW23S@otso>
-Cc:     "Andy Gross" <agross@kernel.org>,
-        "Bjorn Andersson" <andersson@kernel.org>,
-        "Konrad Dybcio" <konrad.dybcio@linaro.org>,
-        "Alim Akhtar" <alim.akhtar@samsung.com>,
-        "Avri Altman" <avri.altman@wdc.com>,
-        "Bart Van Assche" <bvanassche@acm.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        "Iskren Chernev" <me@iskren.info>,
-        "Manivannan Sadhasivam" <mani@kernel.org>,
-        "Conor Dooley" <conor+dt@kernel.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <~postmarketos/upstreaming@lists.sr.ht>,
-        <phone-devel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>,
-        "Bhupesh Sharma" <bhupesh.sharma@linaro.org>,
-        "Eric Biggers" <ebiggers@google.com>
-Subject: Re: [PATCH v6 0/4] Fix some issues in QCOM UFS bindings
-From:   "Luca Weiss" <luca.weiss@fairphone.com>
-To:     "Rob Herring" <robh@kernel.org>
-X-Mailer: aerc 0.15.2
-References: <20230814-dt-binding-ufs-v6-0-fd94845adeda@fairphone.com>
- <20230824171052.GA1037612-robh@kernel.org>
-In-Reply-To: <20230824171052.GA1037612-robh@kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu Aug 24, 2023 at 7:10 PM CEST, Rob Herring wrote:
-> On Mon, Aug 14, 2023 at 12:14:12PM +0200, Luca Weiss wrote:
-> > This series aims to solve the dtbs_check errors from the qcom ufs
-> > bindings. It has changed in scope a bit since v1, so it may be a bit al=
-l
-> > over the place.
-> >=20
-> > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> > ---
-> > Changes in v6:
-> > - Rebase on linux-next
-> > - Drop applied dts patch
-> > - Pick up tags
-> > - Link to v5: https://lore.kernel.org/r/20221209-dt-binding-ufs-v5-0-c9=
-a58c0a53f5@fairphone.com
-> >=20
-> > Changes in v5:
-> > - Convert sm8450.dtsi to use qcom,ice property, so stop modifying schem=
-a
-> >   for sm8450 and only add qcom,ice property.
-> > - Move reg-names names to top-level with only minItems/maxItems in the
-> >   'if'
-> > - Link to v4: https://lore.kernel.org/r/20221209-dt-binding-ufs-v4-0-14=
-ced60f3d1b@fairphone.com
-> >=20
-> > Changes in v4:
-> > - Pick up tags
-> > - Rebase on linux-next (again)
-> > - Link to v3: https://lore.kernel.org/r/20221209-dt-binding-ufs-v3-0-49=
-9dff23a03c@fairphone.com
-> >=20
-> > Changes in v3:
-> > - Drop applied patch
-> > - Pick up sm6115 patch from v5 https://lore.kernel.org/all/202210300942=
-58.486428-2-iskren.chernev@gmail.com/
-> > - Rebase on linux-next
-> > - Link to v2: https://lore.kernel.org/r/20221209-dt-binding-ufs-v2-0-dc=
-7a04699579@fairphone.com
-> >=20
-> > Changes in v2:
-> > - Add new patch adding reg-names to sm6115 & rebase series on top of sm=
-6115
-> >   addition
-> > - Fix binding example after sm8450 move, split this patch from original=
- patch
-> >   since it became too big
-> > - Move reg-names definition to top-level
-> > - Link to v1: https://lore.kernel.org/r/20221209-dt-binding-ufs-v1-0-8d=
-502f0e18d5@fairphone.com
-> >=20
-> > ---
-> > Iskren Chernev (1):
-> >       dt-bindings: ufs: qcom: Add sm6115 binding
-> >=20
-> > Luca Weiss (3):
-> >       dt-bindings: ufs: qcom: Add reg-names property for ICE
-> >       dt-bindings: ufs: qcom: Add ICE to sm8450 example
-> >       dt-bindings: crypto: ice: Document sm8450 inline crypto engine
-> >=20
-> >  .../bindings/crypto/qcom,inline-crypto-engine.yaml |  1 +
-> >  .../devicetree/bindings/ufs/qcom,ufs.yaml          | 44 ++++++++++++++=
-++++++++
-> >  2 files changed, 45 insertions(+)
->
-> I guess the subsystem maintainers aren't going to pick this up, so I've=
-=20
-> applied it.
+Hi Martin,
 
-Thanks Rob, appreciate it!
+thanks for splitting the series into single patches.
 
->
-> Rob
+Am Donnerstag, 24. August 2023, 21:20:56 CEST schrieb Martin Kaiser:
+> Use polling to detect the end of the rngc self test. This is much simpler
+> than using an interrupt and a completion.
+
+I'm still not convinced that using polling is simpler. By using=20
+readl_poll_timeout() you will also get an interrupt, the timer one. Why=20
+exactly is using polling much (!) simpler?
+
+> The selftest should take approx. 450us. Keep the overhead to a minimum
+> by polling every 500us. (We've already lowered the timeout to 1.5ms.)
+
+I suppose these times only hold true for a specific peripheral clock=20
+frequency. Is it guaranteed that this frequency is fixed?
+=46or using IRQ it's simpler, there is no guessing: you return once the sel=
+f=20
+test finished. The timeout is identical anyway.
+
+Best regards,
+Alexander
+
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+> ---
+> v2:
+> - use shorter timeout and polling interval
+>=20
+>  drivers/char/hw_random/imx-rngc.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/drivers/char/hw_random/imx-rngc.c
+> b/drivers/char/hw_random/imx-rngc.c index 8ff3d46674fd..09523936d2af 1006=
+44
+> --- a/drivers/char/hw_random/imx-rngc.c
+> +++ b/drivers/char/hw_random/imx-rngc.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/hw_random.h>
+>  #include <linux/completion.h>
+>  #include <linux/io.h>
+> +#include <linux/iopoll.h>
+>  #include <linux/bitfield.h>
+>=20
+>  #define RNGC_VER_ID			0x0000
+> @@ -101,22 +102,19 @@ static inline void imx_rngc_irq_unmask(struct imx_r=
+ngc
+> *rngc)
+>=20
+>  static int imx_rngc_self_test(struct imx_rngc *rngc)
+>  {
+> -	u32 cmd;
+> +	u32 cmd, status;
+>  	int ret;
+>=20
+> -	imx_rngc_irq_unmask(rngc);
+> -
+>  	/* run self test */
+>  	cmd =3D readl(rngc->base + RNGC_COMMAND);
+>  	writel(cmd | RNGC_CMD_SELF_TEST, rngc->base + RNGC_COMMAND);
+>=20
+> -	ret =3D wait_for_completion_timeout(&rngc->rng_op_done,
+> -					 =20
+usecs_to_jiffies(RNGC_SELFTEST_TIMEOUT));
+> -	imx_rngc_irq_mask_clear(rngc);
+> -	if (!ret)
+> -		return -ETIMEDOUT;
+> +	ret =3D readl_poll_timeout(rngc->base + RNGC_STATUS, status,
+> +				 status & RNGC_STATUS_ST_DONE, 500,=20
+RNGC_SELFTEST_TIMEOUT);
+> +	if (ret < 0)
+> +		return ret;
+>=20
+> -	return rngc->err_reg ? -EIO : 0;
+> +	return readl(rngc->base + RNGC_ERROR) ? -EIO : 0;
+>  }
+>=20
+>  static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool
+> wait)
+
+
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
 
