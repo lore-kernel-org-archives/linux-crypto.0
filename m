@@ -2,24 +2,24 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20908C88CB2
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 10:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04223C3DA66
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 11:01:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235161AbjHYKl4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Aug 2023 06:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
+        id S238537AbjHYLBC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Aug 2023 07:01:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbjHYKlZ (ORCPT
+        with ESMTP id S237531AbjHYLAb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Aug 2023 06:41:25 -0400
+        Fri, 25 Aug 2023 07:00:31 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3DC10C3;
-        Fri, 25 Aug 2023 03:41:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C13C1BCC;
+        Fri, 25 Aug 2023 04:00:27 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qZUFh-007iKH-Lu; Fri, 25 Aug 2023 18:41:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Aug 2023 18:41:18 +0800
-Date:   Fri, 25 Aug 2023 18:41:18 +0800
+        id 1qZUYA-007iVa-1Z; Fri, 25 Aug 2023 19:00:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Aug 2023 19:00:23 +0800
+Date:   Fri, 25 Aug 2023 19:00:23 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
@@ -27,38 +27,38 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
         Andy Shevchenko <andy.shevchenko@gmail.com>
 Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
-Message-ID: <ZOiFTtsboa2rpSBI@gondor.apana.org.au>
+Message-ID: <ZOiJx0Tbv4j3ZCq1@gondor.apana.org.au>
 References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
  <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
  <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
+ <ZOiFTtsboa2rpSBI@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZOiFTtsboa2rpSBI@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 06:36:12PM +0800, Herbert Xu wrote:
-> On Fri, Aug 18, 2023 at 12:23:08PM +0200, Lucas Segarra Fernandez wrote:
-> >
-> > diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-> > index 34c6cd8e27c0..3bde8759c2a2 100644
-> > --- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-> > +++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-> > @@ -2,6 +2,9 @@
-> >  /* Copyright(c) 2022 Intel Corporation */
-> >  #include <linux/bitfield.h>
-> >  #include <linux/iopoll.h>
-> > +#include <linux/kstrtox.h>
-> > +#include <linux/types.h>
-> 
-> Please include linux/kernel.h instead of these two.
+On Fri, Aug 25, 2023 at 06:41:18PM +0800, Herbert Xu wrote:
+>
+> No need to resubmit.  I will fix this up when I apply these two
+> patches.
 
-No need to resubmit.  I will fix this up when I apply these two
-patches.
+I take that back.  This doesn't even build with CONFIG_DEBUG_FS=n.
 
-Cheers,
+../drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c: In function ‘adf_gen4_init_dev_pm_data’:
+../drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c:403:55: error: ‘adf_gen4_print_pm_status’ undeclared (first use in this function)
+  403 |         accel_dev->power_management.print_pm_status = adf_gen4_print_pm_status;
+      |                                                       ^~~~~~~~~~~~~~~~~~~~~~~~
+../drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c:403:55: note: each undeclared identifier is reported only once for each function it appears in
+make[8]: *** [../scripts/Makefile.build:243: drivers/crypto/intel/qat/qat_common/adf_gen4_pm.o] Error 1
+
+Please resubmit after you fix that and include kernel.h while you're
+at it.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
