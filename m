@@ -2,77 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A18C7EE2C
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 12:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FCAEE49A3
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 12:39:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241112AbjHYMi0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Aug 2023 08:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49272 "EHLO
+        id S244097AbjHYMi7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Aug 2023 08:38:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244797AbjHYMh7 (ORCPT
+        with ESMTP id S244907AbjHYMir (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Aug 2023 08:37:59 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 069FF1BE;
-        Fri, 25 Aug 2023 05:37:58 -0700 (PDT)
+        Fri, 25 Aug 2023 08:38:47 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFCCED3;
+        Fri, 25 Aug 2023 05:38:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692967078; x=1724503078;
+  t=1692967125; x=1724503125;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=X0P8LVyyYV/bBtuIZwJOj8Oxh3A98oYPL5yCf8fQ3JY=;
-  b=GyZHVNukuumCqD7eWC1JXFuCAIAxcfgtmcsXNZeGGzdHVkaXPvgf0Hbe
-   Cld6UKt8DnEecX47GMvMKBtIg6Ft6II6ERCy1JbxL4AGqTwK9cXPYpXgB
-   qNDKx0K4LdCLvnE7fVvZdKDjJUyVU4jSGR0HXkYx0KPqaQ7eYdE4pbQQ1
-   qTmRzjJbkHC+uhH4vCIuvTm6G0Oy/yD8dhLxKOLOUSzMPj7NCq591xrVi
-   C2hR1dvZxrWgxQTZS2L5pNKskQTqxaC9Imgw/UdmKwY1zFGU4Kt7N/To8
-   Iyu3NpAFTxtUIbp0ioqhuNzflvltvjkz1KepkcjB5/f2R+L6DYi385nlk
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="354233284"
+  bh=xzsv+TPApbcbC97ZdaQexaDo1qTJfnRyaSbczlKPtfM=;
+  b=XlYKVKAhNkMbY3zMpjnmPY/SII/6Ej8k2XQtqBMeb8w68joFyo4tkpYw
+   FH6TU99lWE3VNapnTscxP17frVGLLZnYqAcjQanDfQ1DWZZyohya8cZhQ
+   hokI5AsspNhJLBj9bvmYE2+FDh0lBiopxNkpwueNHUE7OooHMuU65PzX2
+   YftPxfkvkkm9EvLCnLproRar7Bm4A3cB6PJxHEFCAgbkvKc8VyRh7ujmm
+   d8hFrfc+WWxnidErE8piF0LAeXQO08dtY3ppd7FrU8nxid6hQKxM7xXve
+   6FP9+9p7vo3uV6Wqt/nbq8NrtnNXH5D9u7SnF4iW0vtZ8WuutYi/uuTM1
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="377443812"
 X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="354233284"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:37:57 -0700
+   d="scan'208";a="377443812"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2023 05:38:45 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="740598066"
+X-IronPort-AV: E=McAfee;i="6600,9927,10813"; a="861076556"
 X-IronPort-AV: E=Sophos;i="6.02,195,1688454000"; 
-   d="scan'208";a="740598066"
+   d="scan'208";a="861076556"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga007.fm.intel.com with ESMTP; 25 Aug 2023 05:37:55 -0700
+  by orsmga004.jf.intel.com with ESMTP; 25 Aug 2023 05:38:43 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.96)
         (envelope-from <andriy.shevchenko@intel.com>)
-        id 1qZW4X-00HUOr-2Z;
-        Fri, 25 Aug 2023 15:37:53 +0300
-Date:   Fri, 25 Aug 2023 15:37:53 +0300
+        id 1qZW5J-00HW7e-2A;
+        Fri, 25 Aug 2023 15:38:41 +0300
+Date:   Fri, 25 Aug 2023 15:38:41 +0300
 From:   Andy Shevchenko <andriy.shevchenko@intel.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         qat-linux@intel.com, alx@kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
-Message-ID: <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
+Subject: Re: [PATCH v2 2/2] crypto: qat - add pm_status debugfs file
+Message-ID: <ZOig0RNTKs+P91V0@smile.fi.intel.com>
 References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
- <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
- <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
+ <20230818102322.142582-3-lucas.segarra.fernandez@intel.com>
+ <ZOiE6GMY5Qb2S53A@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
+In-Reply-To: <ZOiE6GMY5Qb2S53A@gondor.apana.org.au>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 06:36:12PM +0800, Herbert Xu wrote:
-> On Fri, Aug 18, 2023 at 12:23:08PM +0200, Lucas Segarra Fernandez wrote:
+On Fri, Aug 25, 2023 at 06:39:36PM +0800, Herbert Xu wrote:
+> On Fri, Aug 18, 2023 at 12:23:09PM +0200, Lucas Segarra Fernandez wrote:
 
-> > +#include <linux/kstrtox.h>
-> > +#include <linux/types.h>
+> >  #include <linux/bitfield.h>
+> > +#include <linux/bits.h>
 > 
-> Please include linux/kernel.h instead of these two.
+> This is redundant if you include linux/kernel.
 
-Why?
+Why?!
+Can we avoid using kernel.h, please?
+
+> > +#include <linux/dma-mapping.h>
+> > +#include <linux/fs.h>
+> >  #include <linux/iopoll.h>
+> >  #include <linux/kstrtox.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/stddef.h>
+> 
+> So is this.
+
+Ditto.
 
 -- 
 With Best Regards,
