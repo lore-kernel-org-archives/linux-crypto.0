@@ -2,58 +2,59 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AAF8EE49A0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 07:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7618C88CB2
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Aug 2023 10:37:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239379AbjHYHjr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Aug 2023 03:39:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47864 "EHLO
+        id S242774AbjHYKgf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Aug 2023 06:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243181AbjHYHj0 (ORCPT
+        with ESMTP id S244453AbjHYKgX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Aug 2023 03:39:26 -0400
-Received: from mail.profitpathwaygo.com (mail.profitpathwaygo.com [141.94.21.238])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D4F1FE3
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Aug 2023 00:39:24 -0700 (PDT)
-Received: by mail.profitpathwaygo.com (Postfix, from userid 1002)
-        id A03BB4EB8D; Fri, 25 Aug 2023 07:37:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=profitpathwaygo.com;
-        s=mail; t=1692949075;
-        bh=qp3Ofokho6Ql+WtI8ZPVilyHYhskXL7fod7u9CWs8W4=;
-        h=Date:From:To:Subject:From;
-        b=ph9/BSdkPAp6HphTLjiXKBscKMBf4g7M2F2yfSwX5/FRxy1dDPFf9Y2wjrP3QI8Al
-         uk92eItNnk0Z7S6NXVzDajxTRrRsdMQClXwnZTI5UgmTN6bzcKAG6n8bln1akHemRb
-         pgJYqgFOWs4KNiS6AJyK7fM0EkBmbaKRxb8djoAekn2pIBQzb1HJFaYHv52yPrB4YQ
-         G4G0+P2JwlptFZkl8FtSq7VMnVwd6l/fpttupwSOHDLTv9XYFUaMxsIeS1ECjH3vY2
-         K9vOm1nL0TpJ0mQy9K2kHGHvdBG+Cx300lg4om0VGRhfaFjfQ1YbU8BSzppXYQi1On
-         C5mnO/xPNCBtQ==
-Received: by mail.profitpathwaygo.com for <linux-crypto@vger.kernel.org>; Fri, 25 Aug 2023 07:36:10 GMT
-Message-ID: <20230825064500-0.1.1d.cr9e.0.1lu266m032@profitpathwaygo.com>
-Date:   Fri, 25 Aug 2023 07:36:10 GMT
-From:   "Adam Charachuta" <adam.charachuta@profitpathwaygo.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania_?=
-X-Mailer: mail.profitpathwaygo.com
+        Fri, 25 Aug 2023 06:36:23 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ACB810FE;
+        Fri, 25 Aug 2023 03:36:19 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qZUAl-007iDL-A8; Fri, 25 Aug 2023 18:36:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Aug 2023 18:36:12 +0800
+Date:   Fri, 25 Aug 2023 18:36:12 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, andriy.shevchenko@intel.com, alx@kernel.org,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
+Message-ID: <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
+References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
+ <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On Fri, Aug 18, 2023 at 12:23:08PM +0200, Lucas Segarra Fernandez wrote:
+>
+> diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+> index 34c6cd8e27c0..3bde8759c2a2 100644
+> --- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+> +++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
+> @@ -2,6 +2,9 @@
+>  /* Copyright(c) 2022 Intel Corporation */
+>  #include <linux/bitfield.h>
+>  #include <linux/iopoll.h>
+> +#include <linux/kstrtox.h>
+> +#include <linux/types.h>
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+Please include linux/kernel.h instead of these two.
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
-
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
-
-
-Pozdrawiam serdecznie
-Adam Charachuta
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
