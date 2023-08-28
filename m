@@ -2,61 +2,60 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CCFC83F16
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 10:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 112D8C83F18
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 10:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjH1KXt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Aug 2023 06:23:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50108 "EHLO
+        id S231360AbjH1KaQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Aug 2023 06:30:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231235AbjH1KXn (ORCPT
+        with ESMTP id S231434AbjH1KaA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Aug 2023 06:23:43 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F49A7;
-        Mon, 28 Aug 2023 03:23:40 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b9338e4695so45769351fa.2;
-        Mon, 28 Aug 2023 03:23:40 -0700 (PDT)
+        Mon, 28 Aug 2023 06:30:00 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68ED7B9;
+        Mon, 28 Aug 2023 03:29:57 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-31c71898109so2593854f8f.2;
+        Mon, 28 Aug 2023 03:29:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693218218; x=1693823018;
+        d=gmail.com; s=20221208; t=1693218595; x=1693823395;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6OX5Z+xV4iFsNRL3h/ZSBtl2mNUhSgbKrGXyYKt6ueU=;
-        b=ayDOj/0mF11EdHLUUbz5HZq1CEFP2QzyDC8RnZ3/6PaTqTXTXA7n4eNJE07Kuw7x2J
-         OgJbd8DvxQd3YyTDZR47FMQRrKnrsO1QGK7Ifd3upL3aT62NAouNiZ6im/BHUTvEEz1p
-         Jf6Gmy/16o8dmZdqRIQlXJ2lGaGtyHsB1Qz2ykqThuyzeBtOmnPAnNrEuMG2XERtj67v
-         wI2Ne2ZySYiDAVX4I7WlNV3Cy9htHntZ28UYIPi5q2pVq5eSB7RT90R6xuB61ZtlXsKx
-         PZ3o5pQm0x63m+PBHtFtAequeZ2vMUKT3eeuFmgCFe/WOngjkF97YJlPFSlvIxAVE1Sn
-         br1Q==
+        bh=0nfoZacKfC8O6Up1SVSmQB7bbrUKT3oInnw0Jj2eo5s=;
+        b=Dg3wO/WdwRwUD/Rja5Y7xMQgeCbuzhyA+bklSKy5Oe2rAza3+Bi+cGLuDzK3Wj6ShE
+         gT9h7Dy+zEFT//mmpIF/ijdJRSeVOhOd4HPjzcAhxKoLL8cyfZqe2XJLJ7N/kJ2vw03x
+         GD1rd3jcuET0XOvKQwNbYMQd+G/5Rhn0lQU3YcImoBlshwTdBNBiky6epBMZr1Lz5uLv
+         UfitxxJ4Pxo9iCD5DwiZ6W1Syo0CDMteNfI5PzBXFNN2Z7Fjs8qk3pj8PCQ1zoWE54EC
+         PM6RXYnSCJhQUSKMI1whRMGlBcfVg+U3bGkIsNBqwQyyUbLVCfDlaWF3LhA6aoxgJ+rq
+         w5Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693218218; x=1693823018;
+        d=1e100.net; s=20221208; t=1693218595; x=1693823395;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6OX5Z+xV4iFsNRL3h/ZSBtl2mNUhSgbKrGXyYKt6ueU=;
-        b=AKHvjiq1IYy4O+7xN0vC/lNS3H5pVy0aLn/zjWMsIIXcI9+VhtEa1KjbMrlzUjOwYm
-         NCoaKMJg+LEWU8yfsRFaWlIniz3YRAmIqS12YX++viadVBFnYl1B/xoNn7pE4Ru93LLY
-         lW4UA3mpZ1939Ns3Xmv851OAiDINbv5N+EmWO+l7thzHrAnS4LVn6nrBl1R8ON0Bjobi
-         KtPlJ54Wx/GEkH6BCBf75oHIMFsL/S+2ihMU+29gvTlxZRtdkypFRZAX3MeTcGBkvbmB
-         wBhJuqA2W5iAF+3KCXy6Cbm4FcSBmeyKWQwGL16X8tuy34S+XPKL3D2WyAQYpZZaezym
-         a5ng==
-X-Gm-Message-State: AOJu0YybQkKk6W3//YVU/1vlk963MN0YfA5oYaBk1yT5Vd95Qbr/hyWK
-        MhTIe7GHunIOtvF2GTzOaft1E8eYjlQ=
-X-Google-Smtp-Source: AGHT+IFOf26xlqO9SKeldJ6//auUiKP0kI9OV+dzuXDqwO6970hLx61HHz5zNnHcMwDJKxFjrOe7IQ==
-X-Received: by 2002:a05:651c:cd:b0:2bc:f4ee:ca57 with SMTP id 13-20020a05651c00cd00b002bcf4eeca57mr6322219ljr.48.1693218217833;
-        Mon, 28 Aug 2023 03:23:37 -0700 (PDT)
+        bh=0nfoZacKfC8O6Up1SVSmQB7bbrUKT3oInnw0Jj2eo5s=;
+        b=NZyZWkyTZJAVi20kuITsnDzlSBGFR0E0vwWFTlzLWPA+rqaNXKv14yVoO4HSJZSRY7
+         OkSEM3giwbv0G8H9B0DIchmD7CZBsxUNJukT0ZchMj3Bss6yZRAtB7uDE/2L+da2nSid
+         UG2ovRfoeM/aft/3fb7Q9iDmP77qSGOmM8ZNgW6jJXisDQ0SWH7tUshNyYGLDdvm3vNJ
+         8q1OV+NJAu++PAjr7F2LThdjflM5H7pqJ12MVKRWLL46uBZ97dR1/5qDfgRP8yTd+Llt
+         w/vhmp1l89K0rTjRjw48GGgbRA9AxFslTL/irfXTj8bD2c17TrdDj/ODULIaPh+67HpR
+         NZ5A==
+X-Gm-Message-State: AOJu0YzGVUUQd6VDt4lH6hl2LOCJGnSAJfRRQNP+0DhQ651isUMHWA/L
+        R++ueV3JXR045PXr7RJY7M+qb1zBhfc=
+X-Google-Smtp-Source: AGHT+IHAEt5cTKjwh9q8g6xo+HcNSP4aT9W4TVgCnYK3PmD6ec0saGlePeb/k9ELi7HFo/z9wvgsjQ==
+X-Received: by 2002:adf:fd04:0:b0:319:6e43:7f6a with SMTP id e4-20020adffd04000000b003196e437f6amr19619606wrr.30.1693218595553;
+        Mon, 28 Aug 2023 03:29:55 -0700 (PDT)
 Received: from localhost.localdomain ([92.85.190.61])
-        by smtp.gmail.com with ESMTPSA id 21-20020a05600c029500b003fe1a96845bsm13537050wmk.2.2023.08.28.03.23.36
+        by smtp.gmail.com with ESMTPSA id n9-20020a5d6609000000b0030647449730sm10105354wru.74.2023.08.28.03.29.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 03:23:37 -0700 (PDT)
+        Mon, 28 Aug 2023 03:29:55 -0700 (PDT)
 From:   Andrei Coardos <aboutphysycs@gmail.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     yuzhe@nfschina.com, u.kleine-koenig@pengutronix.de,
-        herbert@gondor.apana.org.au, olivia@selenic.com, alex@shruggie.ro,
+Cc:     herbert@gondor.apana.org.au, olivia@selenic.com, alex@shruggie.ro,
         Andrei Coardos <aboutphysycs@gmail.com>
-Subject: [PATCH] char: hw_random: xgene-rng: removed unneeded call to platform_set_drvdata()
-Date:   Mon, 28 Aug 2023 13:23:29 +0300
-Message-Id: <20230828102329.20867-1-aboutphysycs@gmail.com>
+Subject: [PATCH] char: hw_random: xiphera-trng: removed unnneded platform_set_drvdata()
+Date:   Mon, 28 Aug 2023 13:29:43 +0300
+Message-Id: <20230828102943.21097-1-aboutphysycs@gmail.com>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -71,21 +70,22 @@ accessed outside of this driver file.
 
 Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
 ---
- drivers/char/hw_random/xgene-rng.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/char/hw_random/xiphera-trng.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
-index 7c8f3cb7c6af..9d64b5931a27 100644
---- a/drivers/char/hw_random/xgene-rng.c
-+++ b/drivers/char/hw_random/xgene-rng.c
-@@ -321,7 +321,6 @@ static int xgene_rng_probe(struct platform_device *pdev)
- 		return -ENOMEM;
+diff --git a/drivers/char/hw_random/xiphera-trng.c b/drivers/char/hw_random/xiphera-trng.c
+index 2a9fea72b2e0..1fa4b70246f0 100644
+--- a/drivers/char/hw_random/xiphera-trng.c
++++ b/drivers/char/hw_random/xiphera-trng.c
+@@ -122,8 +122,6 @@ static int xiphera_trng_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
  
- 	ctx->dev = &pdev->dev;
--	platform_set_drvdata(pdev, ctx);
+-	platform_set_drvdata(pdev, trng);
+-
+ 	return 0;
+ }
  
- 	ctx->csr_base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(ctx->csr_base))
 -- 
 2.34.1
 
