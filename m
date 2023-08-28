@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58ADDC83F12
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8ECCC83F11
 	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 19:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbjH1TDG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Aug 2023 15:03:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
+        id S233259AbjH1TDH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Aug 2023 15:03:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233286AbjH1TCm (ORCPT
+        with ESMTP id S233300AbjH1TCn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Aug 2023 15:02:42 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3585E0;
-        Mon, 28 Aug 2023 12:02:38 -0700 (PDT)
+        Mon, 28 Aug 2023 15:02:43 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2060a.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8d::60a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F29C102;
+        Mon, 28 Aug 2023 12:02:40 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MSkEN01BaIohLz/N0oxHutYahJAqqZtyXhtfC30OfIk5rhWFa2Z5CnSc9sJtDFDtULpdZPAqUW4k8kOPlUduOONBhOSeqnSRWGJJtkvJ+JG/U+VGTiAUgix8UIq0nycnlqoiJ0KzVZQKn30N6EfbrUFvZ6+trIIJxyNwNmUMUt6py+lR+/VAobaz0Q3syQi56SpUsfFClufOVqBn2OkaAiTK5xfYdTUvQkxIIYhNqwYzuXfIOzVl8ZcJVmWfXrmU3z6rkHtKUXfqYQh50YNDeZDaUn3lbCPPTB2Ywh6A3f5t+KczZXmcqGnE0Ap8OtVXVxB/SlG5TevLxgy8cbXCxw==
+ b=cgwEW1nKCgKSyaJGheqqZBssa+DPo+sNE7poM43e/h3MIvDw4swDLHTC+vVZqYWMTsZzAoQioxXZXpD8y16QEaZ/CfrWbBD7uaG+UbEGYxkHjeKZmi+Z93FyWjCz7FR3hrRj047nvRqJilT48bIJKqL2+Z/miNC9BNwP4KgR2schee0Y3tDYFg5vkE9a1RcE7kuJFTM9f+R5Yo3zVEYj18ZbuHxGuZPk+mL0X6xprGWZf9LcErIavwmn9VeobqX0yCbl4wGde85FsqHzPAy9tokq4O0s7uGD6L4CpwFKh5+965fvhS9CDC0pLVlQcueY8yssakHeLTXO4wJPVawFxw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0xQllGKglFv1LKUOFury9p1WWhzqcRJqzuC6eBDtfvw=;
- b=gWVXIC7fRu2KV3sIPqlWzC0eSFK8NqFJreoyP5/nXrGm/hzG+4nZXRhgTBlcoyRo2lWFe/CiMRfUQIbVm/etWn9tX55w9/eryfvPkDk2Qbcs2zpGGgxm3U75xkJpRTYQfFn5rCV86uuGECs962lKuTRyDCDPFwX4miCAxjnXS+Bc6AFKFYWHCZ3lu/wGsgoFzDiR0yn4C9Q11hLKYYtOlA9n4VQJk32tOMoa9YU92YI+zgzgegrzeE3MsOz9YyFq1CZ3tnSFS9tb8lHVq/iBmPhAwvGjPjKqcQQu0YjQ2crufwusdWqZE7RIasit6RHNnGGP/AC28F1cQX/JyNV3yA==
+ bh=neVk4+DybMx9OiwO6U41dUaX0ObEgjI21xFTmhVQhik=;
+ b=SBxP4CYlhMxW0fdrDCMJK6Nl2x//uQJhVz3u812okTzgDzQQkLcEc5Z/e7LiN6dww4R0lrvrEGbmjPbl34KLbjgoc4OPbUvBpPfD64IDmQQGcwb+uGx5mG3hClwq189aEabMFZCjgQZh9gVYUVBMsqaQcXou0PuX552FgYNLuYrXv5DskzcDE3MiN2iw6yWXR8OGiB+jSZY8Tt3QwzpCje1iU2SWjXUVLCZrFj/8+kax7ApAdPsJr1TGqakAwV/Nyimb4gqVmwyPryV8Qc7JIvIr3yY15HoiXNkEUjqunTkuX02Za253qZUmx3B4jIZGyuGk4vqJNn2Z1fhQP5upWg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0xQllGKglFv1LKUOFury9p1WWhzqcRJqzuC6eBDtfvw=;
- b=aMDzB7LQ/9UEFdzkQf++EW4Q8DwpN77a6Zqwwtg130cIP7oZYJEDayKaLZIxrUAVzPto/drzbJTkTmFp8YjeWc9j2RQj6xmmi5G/hGCDz2nRdE5oFwEmF5JmsTlqzBtB95mCGxX9UCyyF/8xWI/kYxQu/uZhbjvFSQcRrpbTXHQ=
-Received: from CY8PR10CA0037.namprd10.prod.outlook.com (2603:10b6:930:4b::9)
- by PH7PR12MB6905.namprd12.prod.outlook.com (2603:10b6:510:1b7::18) with
+ bh=neVk4+DybMx9OiwO6U41dUaX0ObEgjI21xFTmhVQhik=;
+ b=v8Atz37YAsTyXRbBhQkXRTkofIfiMUQIrZJjt5HmSknPgxpZBve3LDiu/BdqmGrOHXYQr4hHAaCz+HLD1i4v6BGfjhym6ETDM7R1Pvy8oXtITdhfUpeKUot95blel1foGaBcr02g2QjkvA4a2VSMqIRRiUhj2vxuLtVVxTv7oKg=
+Received: from CY8PR10CA0041.namprd10.prod.outlook.com (2603:10b6:930:4b::12)
+ by BY5PR12MB4308.namprd12.prod.outlook.com (2603:10b6:a03:20a::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Mon, 28 Aug
- 2023 19:02:36 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Mon, 28 Aug
+ 2023 19:02:35 +0000
 Received: from CY4PEPF0000E9D8.namprd05.prod.outlook.com
- (2603:10b6:930:4b:cafe::b3) by CY8PR10CA0037.outlook.office365.com
- (2603:10b6:930:4b::9) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:930:4b:cafe::6d) by CY8PR10CA0041.outlook.office365.com
+ (2603:10b6:930:4b::12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35 via Frontend
- Transport; Mon, 28 Aug 2023 19:02:36 +0000
+ Transport; Mon, 28 Aug 2023 19:02:34 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -49,21 +49,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000E9D8.mail.protection.outlook.com (10.167.241.83) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6745.17 via Frontend Transport; Mon, 28 Aug 2023 19:02:36 +0000
+ 15.20.6745.17 via Frontend Transport; Mon, 28 Aug 2023 19:02:34 +0000
 Received: from AUS-P9-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 28 Aug
- 2023 14:02:34 -0500
+ 2023 14:02:32 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: [PATCH 2/3] crypto: ccp: Fix sample application signature passing
-Date:   Mon, 28 Aug 2023 14:01:59 -0500
-Message-ID: <20230828190200.1598-3-mario.limonciello@amd.com>
+Subject: [PATCH 0/3] Fixes for dynamic boost control unit tests
+Date:   Mon, 28 Aug 2023 14:01:57 -0500
+Message-ID: <20230828190200.1598-1-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230828190200.1598-1-mario.limonciello@amd.com>
-References: <20230828190200.1598-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -72,67 +70,50 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|PH7PR12MB6905:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c29dd86-51df-489b-bd0f-08dba7f957b6
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|BY5PR12MB4308:EE_
+X-MS-Office365-Filtering-Correlation-Id: 395e85e1-2914-4587-2dff-08dba7f95664
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ntz6FYR7fZ/XfYmyWKVZFuCxU6QggyfwWYZd+k5PXtJOqgAeugagazQnpqnf3Lk7DTlGMH/qMnpm+mha38QEERn73EWS14YPSlc7rI0qnfc8tR8OwksIF9p3o3J3tZQpXw+Y/oen+/MrDS8O0h5aXA/Y7zlI94uG2NL7UNaBo7jqmQ/W1Ra7MKrphv1U6stbw+kWhFN5Mw5otva7styFxVC0VFzV+MFU4hOUYR4aiyusFAFym2TQe7T2qiILRriNAO8V/oewnvDreVmRJSLUGTDCDr49MyswLnzzSez7+Fi223vKXNGJ+6GczeAidhkwpDUDNp1D4kwguQGhSVKU6wnbwzXDcCWwDuMp0zWd0sIcpegAprS+C77jQQzYD3U3F8oCkxWmOciUHybgva6A7nC1/E9sdDrAQ8A2jsmRsPcfcw0NLk3346c5gOsksj+ackhF+Ph1r5uektpRq5H0nQ5gjgXsX1P/6rWaHrJ4kOrsW1Oud5JWriNNjTKVjLwqaQcncAqgpE8AqS4f7Gp5R65eiWeLYI3/RX01fDfCVQMeDNH1IdWouO4e7EdbiqcygUDkOdghifPUl/QEl/v7SQfgy/+b7lOklQgduw/yt8VWsFRaapiIJ4mT/6SymsKtwBtTEjGQFpzwl6UdF+Wa2i6ptW+Ioq6B0NVbZSzEuqUekLcvZW9/W3HUEMKEiXlotMoYK8khNx3nnu45z4S4hTulsjiW1zNUsT5DoRCwmmjTek97DBl1PeyPkzvmFzjfYv965QdX2OdM2A6eLAw51w==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(346002)(136003)(396003)(376002)(451199024)(82310400011)(1800799009)(186009)(46966006)(40470700004)(36840700001)(8676002)(8936002)(4326008)(2906002)(36756003)(54906003)(110136005)(316002)(5660300002)(70206006)(70586007)(44832011)(41300700001)(40460700003)(7696005)(26005)(16526019)(2616005)(1076003)(336012)(426003)(40480700001)(82740400003)(356005)(81166007)(36860700001)(478600001)(47076005)(83380400001)(6666004)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: dACQuZsu9Z7iC7HrOrlsu1ZFbCnIA60u1QBApX66YhPZbFizrMHNQl+IdH0cmYSYS0QIqmApppqsUeEb4cllxt+9xn0vPGLkeR/6hnZLNRTsMq4oyLEY2S2K9HCjF6wEYaqwt3TzFM1qM7600QQu+m5dLUQS/eMNafdDTaKAG26cwwvRjpF/mRK31s6m4c2Cx046HqfWX7VKpD2KuGwwLDankkfJc2OWKIVKcHSy1Ob/+qZZ7fq4zPIGjgcW545CfwbCCI4JH1TPa0fRAZ8f9Nh10RF/skop/Z/OsaCHp/F2m8v8YQ2zIWKmY6ZR8sZq43VGHK7TN61wSAU0+rtEmVmUNjhsENb/GPTXqT94S8SXSdKsC+GufpBhriJ9Vf7XBLuBOldThNQ1GQIcn+m3NM3PsjWQOnnJuP3bkJZ+JPyuFBRBJ8+MC+rfk2h98+84Tu4kOkHLageJFLICOlEjwvpiD7DsvqtU7gOq7Pzkh3GrgG2/Afs7HJsJtTRXcP+9PvBYKl3dDkMWYxFbBbhjGcg0qFMBY7byFim8jx56Xe0xVhWLaFb2DtaMN9hI7dPWh1kh5mAcXVHK7uZavestPEbIMBHPLR+Vy6AedAiBXJOxjDsQv84BTa7usmOBAVgVmEYBvcH2fpW2mvQQeHeQrBGBCJcTcTIU4vHSk0n9niF3ivRaspjUCNUAPiHR8v25OW7yJpyPMgMObhHkwzqIF7AjFGTzPZGEuJO3GwvJmlo8+bogWZs4m/xvy1yd4Ej18ra9GJQWYXGnROxlCNLOpw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(39860400002)(376002)(136003)(346002)(82310400011)(186009)(1800799009)(451199024)(40470700004)(46966006)(36840700001)(7696005)(6666004)(966005)(83380400001)(478600001)(1076003)(2906002)(336012)(426003)(26005)(16526019)(4744005)(110136005)(2616005)(54906003)(316002)(70206006)(70586007)(41300700001)(44832011)(5660300002)(4326008)(8676002)(8936002)(40460700003)(36756003)(86362001)(40480700001)(356005)(81166007)(36860700001)(47076005)(82740400003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2023 19:02:36.2408
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2023 19:02:34.0064
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c29dd86-51df-489b-bd0f-08dba7f957b6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 395e85e1-2914-4587-2dff-08dba7f95664
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D8.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6905
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4308
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When parameters are sent the PSP returns back it's own signature
-for the application to verify the authenticity of the result.
+Further testing of the code being submitted to 6.6-rc1 against
+additional hardware found some problems with the unit tests and
+sample application.
 
-Display this signature to the caller instead of the one the caller
-sent.
+These patches are produced and tested with the two patches already
+posted [1].
 
-Fixes: f40d42f116cf ("crypto: ccp - Add a sample python script for Dynamic Boost Control")
-Fixes: febe3ed3222f ("crypto: ccp - Add a sample library for ioctl use")
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
----
- tools/crypto/ccp/dbc.c  | 1 +
- tools/crypto/ccp/dbc.py | 5 +++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Link: https://lore.kernel.org/linux-crypto/20230824221932.2807-1-mario.limonciello@amd.com/#t [1]
 
-diff --git a/tools/crypto/ccp/dbc.c b/tools/crypto/ccp/dbc.c
-index 7774e981849f..a807df0f0597 100644
---- a/tools/crypto/ccp/dbc.c
-+++ b/tools/crypto/ccp/dbc.c
-@@ -68,5 +68,6 @@ int process_param(int fd, int msg_index, __u8 *signature, int *data)
- 		return errno;
- 
- 	*data = tmp.param;
-+	memcpy(signature, tmp.signature, sizeof(tmp.signature));
- 	return 0;
- }
-diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
-index 3956efe7537a..2b91415b1940 100644
---- a/tools/crypto/ccp/dbc.py
-+++ b/tools/crypto/ccp/dbc.py
-@@ -57,7 +57,8 @@ def process_param(device, message, signature, data=None):
-     if type(message) != tuple:
-         raise ValueError("Expected message tuple")
-     arg = ctypes.c_int(data if data else 0)
--    ret = lib.process_param(device.fileno(), message[0], signature, ctypes.pointer(arg))
-+    sig = ctypes.create_string_buffer(signature, len(signature))
-+    ret = lib.process_param(device.fileno(), message[0], ctypes.pointer(sig), ctypes.pointer(arg))
-     if ret:
-         handle_error(ret)
--    return arg, signature
-+    return arg.value, sig.value
+Mario Limonciello (3):
+  crypto: ccp: Fix DBC sample application error handling
+  crypto: ccp: Fix sample application signature passing
+  crypto: ccp: Fix some unfused tests
+
+ tools/crypto/ccp/dbc.c       | 17 +++++++++--------
+ tools/crypto/ccp/dbc.py      |  8 ++++----
+ tools/crypto/ccp/test_dbc.py | 22 +++++++++++-----------
+ 3 files changed, 24 insertions(+), 23 deletions(-)
+
+
+base-commit: 85b9bf9a514d991fcecb118d0a8a35e754ff9265
+prerequisite-patch-id: 4bcf7f3ea21472e4e28c2457cc9827f6023ec6ca
+prerequisite-patch-id: 903be53a20306f0188e52015dbfe5196738bb2eb
 -- 
 2.34.1
 
