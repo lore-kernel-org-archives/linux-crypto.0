@@ -2,84 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D20F4C83F11
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 10:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7670C83F11
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 11:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231919AbjH1KrY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Aug 2023 06:47:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44536 "EHLO
+        id S230155AbjH1LEz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Aug 2023 07:04:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232020AbjH1KrH (ORCPT
+        with ESMTP id S230348AbjH1LEY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Aug 2023 06:47:07 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F5E1B5;
-        Mon, 28 Aug 2023 03:46:49 -0700 (PDT)
+        Mon, 28 Aug 2023 07:04:24 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E91FAB;
+        Mon, 28 Aug 2023 04:04:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693219609; x=1724755609;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1693220662; x=1724756662;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=6aIuEePhI+R/WwcV5311+vAEUge039LU9co8xUVBTSw=;
-  b=Yu+Ro7qUj+Wo6vC5ilBLI5Hg7gBxWnvzKfAPhx9O3DcSDFEuAeT4EkMS
-   PTq2uv+hRpumAm8hug5fiWbx9UBc1DT70t7T7ZOGubBSNBKOUo+bsCDTl
-   h67ohtX4+2VjAKpzTd27kOMuGZ0ac57smikVe+KD8k/U/9mfB/GoGGkc6
-   ukcqNe7EBBj4tIjO7xNIAyzLdOm9/6vrrt6lzEUjo21C96P4v+pFxp/H3
-   sdT2tcnmkOXWNBg02nNoOHNQ+AtlUe10UKBdshq7+GRjpdLnTQkzDYSZr
-   f59QZZGw0uZSJx6XybtKtrfxX0+diICNQBRksP/i2y6Hd6JKTgLPpgzQC
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10815"; a="406062240"
+  bh=ri/l6M8mpTkwkRbAXaHeiv8dKUXmvnnn0gDOniLyOtY=;
+  b=hgikfEmXIhbxQd5NLVbqWYFA8SK+JkQ1hKrGFnpFOYZZyRzOhd3MF0tp
+   8a62rxnhZHVTG/D3aUSE/+oKszF8Ns/O3Zj/7UjlSfyfNy7gBgaRG7bNT
+   ejLhMQd30EConlwJ8lvbWJ5YjAy5qvtaqcZCqELxH4i/Ddoo8ZEFPtD5O
+   5TwMKmo2beeQuhUoqB6HqhXnfz8vhzsouI1Tu1bm8JQoMlhLGUvDTEv9H
+   SFhkwebxYrL4fcm3BZqMDITa82ySO2KetjYfOxWXfNB0NVj0ynp6beb/c
+   umDcI3rEjsKjZNkNZptw7vFaon142B3Zlwd1RBGetctzFnhKO02T3pcip
+   g==;
 X-IronPort-AV: E=Sophos;i="6.02,207,1688454000"; 
-   d="scan'208";a="406062240"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2023 03:46:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10815"; a="808239802"
-X-IronPort-AV: E=Sophos;i="6.02,207,1688454000"; 
-   d="scan'208";a="808239802"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga004.fm.intel.com with ESMTP; 28 Aug 2023 03:46:19 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@intel.com>)
-        id 1qaZlC-00EntD-2v;
-        Mon, 28 Aug 2023 13:46:18 +0300
-Date:   Mon, 28 Aug 2023 13:46:18 +0300
-From:   Andy Shevchenko <andriy.shevchenko@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, alx@kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
-Message-ID: <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
-References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
- <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
- <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
- <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
- <ZOx1SOBKbmdIvz+b@gondor.apana.org.au>
+   d="asc'?scan'208";a="232063736"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 28 Aug 2023 04:04:21 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 28 Aug 2023 04:04:11 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Mon, 28 Aug 2023 04:04:10 -0700
+Date:   Mon, 28 Aug 2023 12:03:28 +0100
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Andrei Coardos <aboutphysycs@gmail.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-riscv@lists.infradead.org>, <alex@shruggie.ro>,
+        <herbert@gondor.apana.org.au>, <olivia@selenic.com>,
+        <daire.mcnamara@microchip.com>
+Subject: Re: [PATCH] char: hw_random: mpfs-rng: removed unneeded call to
+ platform_set_drvdata()
+Message-ID: <20230828-citable-superjet-d235f036be99@wendy>
+References: <20230828101757.9724-1-aboutphysycs@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ybobh3J4aOaUG3ga"
 Content-Disposition: inline
-In-Reply-To: <ZOx1SOBKbmdIvz+b@gondor.apana.org.au>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <20230828101757.9724-1-aboutphysycs@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 28, 2023 at 06:22:00PM +0800, Herbert Xu wrote:
-> On Fri, Aug 25, 2023 at 03:37:53PM +0300, Andy Shevchenko wrote:
-> >
-> > Why?
-> 
-> Because we shouldn't be including every single header file that
-> kernel.h includes individually.
+--ybobh3J4aOaUG3ga
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-kernel.h is misleading here. It includes 98% of something which this file is
-not using or going to use. Can you tell _why_ we need that 98% bulk to be
-included here?
+On Mon, Aug 28, 2023 at 01:17:57PM +0300, Andrei Coardos wrote:
+> This function call was found to be unnecessary as there is no equivalent
+> platform_get_drvdata() call to access the private data of the driver. Als=
+o,
+> the private data is defined in this driver, so there is no risk of it bei=
+ng
+> accessed outside of this driver file.
 
--- 
-With Best Regards,
-Andy Shevchenko
+I think Greg previously pointed out to you that is it not sufficient to
+check for platform_get_drvdata() alone, because the information could be
+accessed without going through that helper. That's not the case here,
+but it could be true elsewhere.
 
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
+Thanks,
+Conor.
+
+>=20
+> Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
+> ---
+>  drivers/char/hw_random/mpfs-rng.c | 2 --
+>  1 file changed, 2 deletions(-)
+>=20
+> diff --git a/drivers/char/hw_random/mpfs-rng.c b/drivers/char/hw_random/m=
+pfs-rng.c
+> index c6972734ae62..0994024daa70 100644
+> --- a/drivers/char/hw_random/mpfs-rng.c
+> +++ b/drivers/char/hw_random/mpfs-rng.c
+> @@ -79,8 +79,6 @@ static int mpfs_rng_probe(struct platform_device *pdev)
+>  	rng_priv->rng.read =3D mpfs_rng_read;
+>  	rng_priv->rng.name =3D pdev->name;
+> =20
+> -	platform_set_drvdata(pdev, rng_priv);
+> -
+>  	ret =3D devm_hwrng_register(&pdev->dev, &rng_priv->rng);
+>  	if (ret)
+>  		return dev_err_probe(&pdev->dev, ret, "Failed to register MPFS hwrng\n=
+");
+> --=20
+> 2.34.1
+>=20
+
+--ybobh3J4aOaUG3ga
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZOx/AAAKCRB4tDGHoIJi
+0phKAQCmLUMIMFTcDFBxCWk4kaHBl9Ujv1n4I9MDnQh4EmQD6AEAj4EuDnlW9UJf
+RLVsSRWf8o2NQmLHWByqDCzAnhbTngY=
+=ZYKd
+-----END PGP SIGNATURE-----
+
+--ybobh3J4aOaUG3ga--
