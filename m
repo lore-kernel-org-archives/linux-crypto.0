@@ -2,53 +2,90 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67228C83F12
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 10:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CCFC83F16
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Aug 2023 10:24:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230310AbjH1KWq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Aug 2023 06:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55982 "EHLO
+        id S229552AbjH1KXt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Aug 2023 06:23:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231181AbjH1KWa (ORCPT
+        with ESMTP id S231235AbjH1KXn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Aug 2023 06:22:30 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A97118;
-        Mon, 28 Aug 2023 03:22:05 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qaZNf-008TXq-7d; Mon, 28 Aug 2023 18:22:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 28 Aug 2023 18:22:00 +0800
-Date:   Mon, 28 Aug 2023 18:22:00 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, alx@kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
-Message-ID: <ZOx1SOBKbmdIvz+b@gondor.apana.org.au>
-References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
- <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
- <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
- <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
+        Mon, 28 Aug 2023 06:23:43 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F49A7;
+        Mon, 28 Aug 2023 03:23:40 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b9338e4695so45769351fa.2;
+        Mon, 28 Aug 2023 03:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693218218; x=1693823018;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6OX5Z+xV4iFsNRL3h/ZSBtl2mNUhSgbKrGXyYKt6ueU=;
+        b=ayDOj/0mF11EdHLUUbz5HZq1CEFP2QzyDC8RnZ3/6PaTqTXTXA7n4eNJE07Kuw7x2J
+         OgJbd8DvxQd3YyTDZR47FMQRrKnrsO1QGK7Ifd3upL3aT62NAouNiZ6im/BHUTvEEz1p
+         Jf6Gmy/16o8dmZdqRIQlXJ2lGaGtyHsB1Qz2ykqThuyzeBtOmnPAnNrEuMG2XERtj67v
+         wI2Ne2ZySYiDAVX4I7WlNV3Cy9htHntZ28UYIPi5q2pVq5eSB7RT90R6xuB61ZtlXsKx
+         PZ3o5pQm0x63m+PBHtFtAequeZ2vMUKT3eeuFmgCFe/WOngjkF97YJlPFSlvIxAVE1Sn
+         br1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693218218; x=1693823018;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6OX5Z+xV4iFsNRL3h/ZSBtl2mNUhSgbKrGXyYKt6ueU=;
+        b=AKHvjiq1IYy4O+7xN0vC/lNS3H5pVy0aLn/zjWMsIIXcI9+VhtEa1KjbMrlzUjOwYm
+         NCoaKMJg+LEWU8yfsRFaWlIniz3YRAmIqS12YX++viadVBFnYl1B/xoNn7pE4Ru93LLY
+         lW4UA3mpZ1939Ns3Xmv851OAiDINbv5N+EmWO+l7thzHrAnS4LVn6nrBl1R8ON0Bjobi
+         KtPlJ54Wx/GEkH6BCBf75oHIMFsL/S+2ihMU+29gvTlxZRtdkypFRZAX3MeTcGBkvbmB
+         wBhJuqA2W5iAF+3KCXy6Cbm4FcSBmeyKWQwGL16X8tuy34S+XPKL3D2WyAQYpZZaezym
+         a5ng==
+X-Gm-Message-State: AOJu0YybQkKk6W3//YVU/1vlk963MN0YfA5oYaBk1yT5Vd95Qbr/hyWK
+        MhTIe7GHunIOtvF2GTzOaft1E8eYjlQ=
+X-Google-Smtp-Source: AGHT+IFOf26xlqO9SKeldJ6//auUiKP0kI9OV+dzuXDqwO6970hLx61HHz5zNnHcMwDJKxFjrOe7IQ==
+X-Received: by 2002:a05:651c:cd:b0:2bc:f4ee:ca57 with SMTP id 13-20020a05651c00cd00b002bcf4eeca57mr6322219ljr.48.1693218217833;
+        Mon, 28 Aug 2023 03:23:37 -0700 (PDT)
+Received: from localhost.localdomain ([92.85.190.61])
+        by smtp.gmail.com with ESMTPSA id 21-20020a05600c029500b003fe1a96845bsm13537050wmk.2.2023.08.28.03.23.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Aug 2023 03:23:37 -0700 (PDT)
+From:   Andrei Coardos <aboutphysycs@gmail.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     yuzhe@nfschina.com, u.kleine-koenig@pengutronix.de,
+        herbert@gondor.apana.org.au, olivia@selenic.com, alex@shruggie.ro,
+        Andrei Coardos <aboutphysycs@gmail.com>
+Subject: [PATCH] char: hw_random: xgene-rng: removed unneeded call to platform_set_drvdata()
+Date:   Mon, 28 Aug 2023 13:23:29 +0300
+Message-Id: <20230828102329.20867-1-aboutphysycs@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 25, 2023 at 03:37:53PM +0300, Andy Shevchenko wrote:
->
-> Why?
+This function call was found to be unnecessary as there is no equivalent
+platform_get_drvdata() call to access the private data of the driver. Also,
+the private data is defined in this driver, so there is no risk of it being
+accessed outside of this driver file.
 
-Because we shouldn't be including every single header file that
-kernel.h includes individually.
+Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
+---
+ drivers/char/hw_random/xgene-rng.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Cheers,
+diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
+index 7c8f3cb7c6af..9d64b5931a27 100644
+--- a/drivers/char/hw_random/xgene-rng.c
++++ b/drivers/char/hw_random/xgene-rng.c
+@@ -321,7 +321,6 @@ static int xgene_rng_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	ctx->dev = &pdev->dev;
+-	platform_set_drvdata(pdev, ctx);
+ 
+ 	ctx->csr_base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(ctx->csr_base))
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
