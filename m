@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C45E8C83F1B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B08C83F1A
 	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 17:34:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237911AbjH2ReT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S237816AbjH2ReT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 29 Aug 2023 13:34:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237834AbjH2Rdq (ORCPT
+        with ESMTP id S237826AbjH2Rdq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 29 Aug 2023 13:33:46 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C1E6113;
-        Tue, 29 Aug 2023 10:33:43 -0700 (PDT)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2054.outbound.protection.outlook.com [40.107.96.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A91FD;
+        Tue, 29 Aug 2023 10:33:42 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xq04zIIPY8ognuYg/Ha7KrHcwJ1jU7Ani6IHNwlW2u2eWrkJDxcds2ZeNk+edEU7oPixwY85Yh+kNOg3NvcJVJm8ADkJGMVl+QdCorOR/H5D3lr1LTlqXjYAC7kdGYRY7xLJuTGeA3cQQo6u9RYbb8DbcBFhPGw5S7qUZViRvLUBihbPkXNxsnV0/dZ6sANA52bc/LBQZW7rAhrHoS7MUUZKKeic+rt7LnjkXKJOzrHaN6Bb8vKFXr1VeXfoSvizAgQfqhSIY8wVIIfhL/5odBixNqB+HaRGYDdRnFIHBytywv9DvkzjwmpgMzn5+AQR7Yahkop/0ALqLjJXSYQwaw==
+ b=aOqxKVLLm9/WJ89D66rMIQOFBlRW+b9uOrXGU0ESAkh0Pb09rpKyWmtZVjzNbD3utZcKdya7JDwZRZhZgzni9frfrKjGp3J/W5ez5pHT4yvMx92Wmj5HoLsBxByRQdeHAokxnOf9g+kPALvPU1YJ+ETkKvJp4qSkcX9LlBZ3LfAeMBGSgQnF8SAsZoDWZSve9g5H38Hzv2C/CLQe436wP6kATER4Ez4FSvQ+lzzdNsOEcIbt7JCjKH/cXFrcM7sbmCqXhow0fxRe6nTOssmZ3YuCmKiT3fdfBX3G4gzOKymaBdR3vGpLfaqgyLQ51QfpitwnGeAheclESwB7XtH0iA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=swMK4AS+xNOzeidT5UnOauIodF3UBtnQjuO95XkmML4=;
- b=O2/oaw6RF1o/g31GgOBJCti6b30DFN9Ouzxh4XhKnnDziNZuu0O1Cbd3Rb6IfQn28UzVzi+lAY5gCgo0bt2+ZN8z3S0Q6zyr74TOHgXXskjRAgHefEh58Q9SWgcDSGZk7iuDJkxQcdqpERrcqsFYxztvOTh9PyiN+ytVFv2etgnUYXbe4Tp+NE2mGV70aHW2iF03Ai5r8Ea90CtuoNnOglk2LcraaM2Uw3EuaL6LfSx0tLP5ZdwPmoEWwgt2JNPRA/1NVUNlsc00VF3QjaojD27uBIzpe+BSJ2ICgRvERXrsuI6vi88mLSRqfOjChTyMvWJjo4/uIhb/gN2tcPdI6Q==
+ bh=YI8lHO+7BvVObYlNycuuR5Y81uIHEpIvq8tgjj5vwLo=;
+ b=gaLOCqf4EepmM5HcxkF/b73fIh4YcXv0DyQE57tCC443DdreedoH4SjFw/0DRF3qcvyBXZ2DzQ8Dvf95iQPQVeUEZIkTS67d080Z4TJRwwJ/jf8eDYI8h3M3srj9MMJzha0bB04CL6YXVvTNMmMRsTrFqWsix1yTpBbArt98/G8XVYA02nUbImPZ0sa8r6L5PLwm3hEcMiamQdG5bsW58vbR3Nn1t++LW0sKs1Zpm8yTVXnrXeurvVk22EVFD80V0aS8yd8kmS+ToJxPTqZLVjnE75oRrGL8m9nLaEInyCEK1EZsLugTaAqpJ/Hb1zUfXQWc5tftS8yoR+dQPwQM9g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=swMK4AS+xNOzeidT5UnOauIodF3UBtnQjuO95XkmML4=;
- b=nUf05RF0JcQcN5iZjYZOiOK9zfwIZ7w9ahhil9xx9yxMPLrICm68ccPbp2IhbNHEOv3b2PcP+Pk81hutIrVpjpHNdXt1WDYWMzFukyi+5xBE2p0VkvF4WmFyAsVNyVx+Q0Yp7vBj2BiOVL02Ny4EEOzDmuM2USET4jnWrUt4Bww=
-Received: from DS7PR03CA0057.namprd03.prod.outlook.com (2603:10b6:5:3b5::32)
- by BY5PR12MB4887.namprd12.prod.outlook.com (2603:10b6:a03:1c6::15) with
+ bh=YI8lHO+7BvVObYlNycuuR5Y81uIHEpIvq8tgjj5vwLo=;
+ b=FXlfwCcw2+kc+l9/sttm8KRGM4La1CWuDRwstA6GxfHExK19BcXAMIO+zI54uXbJrcVIDKZgWIYJRGoQGAvjxMQ1uZZNVqEJ7T3bhOsF4RBU5n0G404Ach2zGjakLhMPUWJZQsgTW9eqga3F1iEeFdqssaOcvsOhiCkqUSHpYbA=
+Received: from CY5PR22CA0040.namprd22.prod.outlook.com (2603:10b6:930:1d::16)
+ by CH0PR12MB8508.namprd12.prod.outlook.com (2603:10b6:610:18c::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Tue, 29 Aug
- 2023 17:33:41 +0000
-Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
- (2603:10b6:5:3b5:cafe::cb) by DS7PR03CA0057.outlook.office365.com
- (2603:10b6:5:3b5::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.18 via Frontend
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Tue, 29 Aug
+ 2023 17:33:40 +0000
+Received: from CY4PEPF0000EE33.namprd05.prod.outlook.com
+ (2603:10b6:930:1d:cafe::c7) by CY5PR22CA0040.outlook.office365.com
+ (2603:10b6:930:1d::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34 via Frontend
  Transport; Tue, 29 Aug 2023 17:33:40 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
@@ -47,9 +47,9 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ CY4PEPF0000EE33.mail.protection.outlook.com (10.167.242.39) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6745.16 via Frontend Transport; Tue, 29 Aug 2023 17:33:40 +0000
+ 15.20.6745.17 via Frontend Transport; Tue, 29 Aug 2023 17:33:39 +0000
 Received: from AUS-P9-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 29 Aug
@@ -58,9 +58,9 @@ From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: [PATCH v3 5/5] crypto: ccp: Fix some unfused tests
-Date:   Tue, 29 Aug 2023 10:07:59 -0500
-Message-ID: <20230829150759.156126-6-mario.limonciello@amd.com>
+Subject: [PATCH v3 3/5] crypto: ccp: Fix DBC sample application error handling
+Date:   Tue, 29 Aug 2023 10:07:57 -0500
+Message-ID: <20230829150759.156126-4-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230829150759.156126-1-mario.limonciello@amd.com>
 References: <20230829150759.156126-1-mario.limonciello@amd.com>
@@ -72,121 +72,109 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|BY5PR12MB4887:EE_
-X-MS-Office365-Filtering-Correlation-Id: 08bf8b95-dd42-406e-7057-08dba8b615fa
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE33:EE_|CH0PR12MB8508:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a763936-a0fe-417a-a8ec-08dba8b61508
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R9vDmygP/u8buQ+cNU+m1L5TifdcoT1i2fgniYJ1smA3bDYC1JoGKrpAPH7xWUqQBatOgtOMpMJCMm3RH6T1G0eEG+652wjrHLy8eqKXodWCOqFasR8tW8xf+wS9Ryl9AefBEQl3AJt0EicANTjBcrDRlhW4OHLCD8qWw+zT8EXxqnmSapau2YoWdeYFsxVDjTzyA4dlMUdcigdlhcFyTOeDNyetRfr9JUdsmyGpm5L2lViF3FC+0N7GTYevAOxrI7FHfolKblabsog0wnodJFWgXKtqKJMyQqUp/Z9+J/kI9Uziw0jjsm2BwGs9ktbp3Ey2blYrdF33ioiR2BJ50k15TAD3hvvfL+SBuqyM+OpcMlyxmzosR3Tjyahpt8ixYDom9h1K9h/DRwVwe0LUaui9GBDjagG948Agxw9ZG9mx9E1i72sm2EF5sZ8KWMh5Tl1B7aPior6XJfOyNsPM00CEMD1tc9+uG2F0Y5TiNRB7uijpTaTlDc7GOKvfmy8OWpM9v4vWE+e/Ogy21i9Sjfnl8heAGHssRbRakvQb/k7wC/+2xdBu8LPHmrlxq1sw3aeLoqglxnOcfQaNexB0FpsBLjDjJAUwYxHuK37cvoUSWBPKgsjksXCATb6LffHlaHPaAfqmin5jh9Vjfg2KH1OP3yAzkOTCK7QY8tdGt4Pg1XNswv35cs7YIE2anvWIEWcYLPwAdsMkTTsrSO7pRkRvx2dqGIwZ3Buhc1E+hB2PAnT9SoNrgxhROhP/i+Xz9qvp1pI2rFu/L/yEJ3b3Uw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(376002)(396003)(39860400002)(1800799009)(186009)(82310400011)(451199024)(40470700004)(46966006)(36840700001)(356005)(81166007)(82740400003)(8936002)(6666004)(70206006)(110136005)(70586007)(478600001)(7696005)(54906003)(316002)(41300700001)(40460700003)(16526019)(36756003)(26005)(44832011)(8676002)(1076003)(5660300002)(83380400001)(2906002)(2616005)(47076005)(86362001)(40480700001)(36860700001)(336012)(426003)(4326008)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: RlGAX3whTr0ip1EwcBAJhNXqFE8Ddrqkbc8U6O1UEXCxzX0MkEXdUiDPqtsjeUviFvbpzkDKIl/Xxmh17GAVH0LDyl9LYrEskKp2awTWa2lFII6Vsu2rZIqmt3U67NfYYYvjvAQK4Ko+OkjD0cFr2Bx6N1fM2ZwCETfZdTdfYkGpG5aBJzY3QOTqP5E70URHR5Lvpa0YtLTGHPHwTjxHxwHvO2oT1o88cAkynudip6EhmE76I7SzzoyB2XFcD3asTvjfdjT90rph+jZFnMu19ghKtETcNS22mSlgp9O9lEQDqXCaNfn1l+YbT3mtR9PDRh5NNqth0nagr9H/3BV97qpLGSnupalTWpu7c+PT1ewFF4eH2os4wU6OIAgqwMic94JxDHrZs9AoI+VAEUKOjMrq0Zd0f1gdivr/sdvtvTDTO07ueFQ57AKURU5H/sNgIsItLllJDNEikLjrsVcdxuYekb8m5hgo9z3TdQZKKslqfV4CxlZl5HPg+FC9AtQJaoPsDRZ/49cKL2xSZ0xBg5dhujuVd/9o9lxCm+eJT/srpTliv8mIuvb5QPSASHM+JrdF9H6mDC0VK1Njdcx7MgKmPZOtJ94wyzrEnpQNXUQrwcbLE4ONGkUFjhJ/Lq0osPH6mxQn4Cqj/Vm5oOCbe5fz6GoPrdWfiDMtQqYBB6Dj+sT83hx2tpRol74do07XeXUTzUcNWBB7NUe4Zpxvyv0n4ya+lpy1nyIkGorzx9XsuJR30IqA8iIoL9q6IPcvIl+XAsDLVD+oRNsLFo7IpFNToBvzuqCfr8kPfN9ttLg=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(376002)(346002)(39860400002)(186009)(451199024)(1800799009)(82310400011)(46966006)(36840700001)(40470700004)(40460700003)(41300700001)(336012)(2616005)(82740400003)(81166007)(6666004)(86362001)(47076005)(83380400001)(478600001)(356005)(16526019)(1076003)(26005)(36860700001)(7696005)(426003)(40480700001)(70586007)(70206006)(54906003)(36756003)(110136005)(316002)(2906002)(5660300002)(4326008)(8676002)(8936002)(44832011)(36900700001)(309714004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2023 17:33:40.8211
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2023 17:33:39.2366
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08bf8b95-dd42-406e-7057-08dba8b615fa
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a763936-a0fe-417a-a8ec-08dba8b61508
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EE31.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EE33.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4887
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8508
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some of the tests for unfused parts referenced a named member parameter,
-but when the test suite was switched to call a python ctypes library they
-weren't updated.  Adjust them to refer to the first argument of the
-process_param() call and set the data type of the signature appropriately.
+The sample application was taking values from ioctl() and treating
+those as the error codes to present to a user.
 
-Fixes: 15f8aa7bb3e5 ("crypto: ccp - Add unit tests for dynamic boost control")
+This is incorrect when ret is non-zero, the error is stored to `errno`.
+Use this value instead.
+
+Fixes: f40d42f116cf ("crypto: ccp - Add a sample python script for Dynamic Boost Control")
+Fixes: febe3ed3222f ("crypto: ccp - Add a sample library for ioctl use")
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- tools/crypto/ccp/test_dbc.py | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ tools/crypto/ccp/dbc.c  | 16 ++++++++--------
+ tools/crypto/ccp/dbc.py |  3 +--
+ 2 files changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/tools/crypto/ccp/test_dbc.py b/tools/crypto/ccp/test_dbc.py
-index a28a1f94c1d2..79de3638a01a 100755
---- a/tools/crypto/ccp/test_dbc.py
-+++ b/tools/crypto/ccp/test_dbc.py
-@@ -33,8 +33,8 @@ def system_is_secured() -> bool:
- class DynamicBoostControlTest(unittest.TestCase):
-     def __init__(self, data) -> None:
-         self.d = None
--        self.signature = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
--        self.uid = "1111111111111111"
-+        self.signature = b"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-+        self.uid = b"1111111111111111"
-         super().__init__(data)
+diff --git a/tools/crypto/ccp/dbc.c b/tools/crypto/ccp/dbc.c
+index 37e813175642..7774e981849f 100644
+--- a/tools/crypto/ccp/dbc.c
++++ b/tools/crypto/ccp/dbc.c
+@@ -8,6 +8,7 @@
+  */
  
-     def setUp(self) -> None:
-@@ -192,12 +192,12 @@ class TestUnFusedSystem(DynamicBoostControlTest):
-         # SOC power
-         soc_power_max = process_param(self.d, PARAM_GET_SOC_PWR_MAX, self.signature)
-         soc_power_min = process_param(self.d, PARAM_GET_SOC_PWR_MIN, self.signature)
--        self.assertGreater(soc_power_max.parameter, soc_power_min.parameter)
-+        self.assertGreater(soc_power_max[0], soc_power_min[0])
+ #include <assert.h>
++#include <errno.h>
+ #include <string.h>
+ #include <sys/ioctl.h>
  
-         # fmax
-         fmax_max = process_param(self.d, PARAM_GET_FMAX_MAX, self.signature)
-         fmax_min = process_param(self.d, PARAM_GET_FMAX_MIN, self.signature)
--        self.assertGreater(fmax_max.parameter, fmax_min.parameter)
-+        self.assertGreater(fmax_max[0], fmax_min[0])
+@@ -22,16 +23,14 @@ int get_nonce(int fd, void *nonce_out, void *signature)
+ 	struct dbc_user_nonce tmp = {
+ 		.auth_needed = !!signature,
+ 	};
+-	int ret;
  
-         # cap values
-         keys = {
-@@ -208,7 +208,7 @@ class TestUnFusedSystem(DynamicBoostControlTest):
-         }
-         for k in keys:
-             result = process_param(self.d, keys[k], self.signature)
--            self.assertGreater(result.parameter, 0)
-+            self.assertGreater(result[0], 0)
+ 	assert(nonce_out);
  
-     def test_get_invalid_param(self) -> None:
-         """fetch an invalid parameter"""
-@@ -226,17 +226,17 @@ class TestUnFusedSystem(DynamicBoostControlTest):
-         original = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
+ 	if (signature)
+ 		memcpy(tmp.signature, signature, sizeof(tmp.signature));
  
-         # set the fmax
--        target = original.parameter - 100
-+        target = original[0] - 100
-         process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, target)
-         time.sleep(SET_DELAY)
-         new = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
--        self.assertEqual(new.parameter, target)
-+        self.assertEqual(new[0], target)
+-	ret = ioctl(fd, DBCIOCNONCE, &tmp);
+-	if (ret)
+-		return ret;
++	if (ioctl(fd, DBCIOCNONCE, &tmp))
++		return errno;
+ 	memcpy(nonce_out, tmp.nonce, sizeof(tmp.nonce));
  
-         # revert back to current
--        process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, original.parameter)
-+        process_param(self.d, PARAM_SET_FMAX_CAP, self.signature, original[0])
-         time.sleep(SET_DELAY)
-         cur = process_param(self.d, PARAM_GET_FMAX_CAP, self.signature)
--        self.assertEqual(cur.parameter, original.parameter)
-+        self.assertEqual(cur[0], original[0])
+ 	return 0;
+@@ -47,7 +46,9 @@ int set_uid(int fd, __u8 *uid, __u8 *signature)
+ 	memcpy(tmp.uid, uid, sizeof(tmp.uid));
+ 	memcpy(tmp.signature, signature, sizeof(tmp.signature));
  
-     def test_set_power_cap(self) -> None:
-         """get/set power cap limit"""
-@@ -244,17 +244,17 @@ class TestUnFusedSystem(DynamicBoostControlTest):
-         original = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
+-	return ioctl(fd, DBCIOCUID, &tmp);
++	if (ioctl(fd, DBCIOCUID, &tmp))
++		return errno;
++	return 0;
+ }
  
-         # set the fmax
--        target = original.parameter - 10
-+        target = original[0] - 10
-         process_param(self.d, PARAM_SET_PWR_CAP, self.signature, target)
-         time.sleep(SET_DELAY)
-         new = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
--        self.assertEqual(new.parameter, target)
-+        self.assertEqual(new[0], target)
+ int process_param(int fd, int msg_index, __u8 *signature, int *data)
+@@ -63,9 +64,8 @@ int process_param(int fd, int msg_index, __u8 *signature, int *data)
  
-         # revert back to current
--        process_param(self.d, PARAM_SET_PWR_CAP, self.signature, original.parameter)
-+        process_param(self.d, PARAM_SET_PWR_CAP, self.signature, original[0])
-         time.sleep(SET_DELAY)
-         cur = process_param(self.d, PARAM_GET_PWR_CAP, self.signature)
--        self.assertEqual(cur.parameter, original.parameter)
-+        self.assertEqual(cur[0], original[0])
+ 	memcpy(tmp.signature, signature, sizeof(tmp.signature));
  
-     def test_set_3d_graphics_mode(self) -> None:
-         """set/get 3d graphics mode"""
+-	ret = ioctl(fd, DBCIOCPARAM, &tmp);
+-	if (ret)
+-		return ret;
++	if (ioctl(fd, DBCIOCPARAM, &tmp))
++		return errno;
+ 
+ 	*data = tmp.param;
+ 	return 0;
+diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
+index 3f6a825ffc9e..3956efe7537a 100644
+--- a/tools/crypto/ccp/dbc.py
++++ b/tools/crypto/ccp/dbc.py
+@@ -27,8 +27,7 @@ lib = ctypes.CDLL("./dbc_library.so", mode=ctypes.RTLD_GLOBAL)
+ 
+ 
+ def handle_error(code):
+-    val = code * -1
+-    raise OSError(val, os.strerror(val))
++    raise OSError(code, os.strerror(code))
+ 
+ 
+ def get_nonce(device, signature):
 -- 
 2.34.1
 
