@@ -2,42 +2,43 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2B9C71153
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 17:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7211AC6FA8F
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 17:34:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237823AbjH2ReS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Aug 2023 13:34:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
+        id S237613AbjH2ReR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Aug 2023 13:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237816AbjH2Rdp (ORCPT
+        with ESMTP id S237821AbjH2Rdp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 29 Aug 2023 13:33:45 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFFF91;
-        Tue, 29 Aug 2023 10:33:42 -0700 (PDT)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F12AEC9;
+        Tue, 29 Aug 2023 10:33:41 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dpokTQaNDAiRRyIUTf6Bm3V8IobYb+6/4PAFUcYVTme95lCEH+kqyjVP9i3OHusfJ5jGcPKe2+2JEME2vVziwqADrrZDN1fraoxZyW4H8d673Z9kAXrEZTZU0fzMocGkwRGZRJbZEzF+LPu7sFvJgEXJ6mc6FNXehYK9NZg8yKJl4zpxlHu5c0wUvPJJCvzcEUkhWp9Lmsg2qI2ez4tMRkv0Mr9mDe0pLaZUdhCodKyupZHUBD4b9KQXJ1pZuZHLw+tP36QikDHSR8zxoRawqZLbkCHJ+vhwakaimnMjEkjzr+J5kThZ9oJ4vMjZ0tfq0Y7XseyYNT3wRJTKYrCmtg==
+ b=NJJDejlcpBkKTj4LzOLMgrKMyCUaD8vL7RkPInTwnabH3UMODiXZRWn4YdVtLMOM0jAfL9i5aGnPA395J5XWpixXWO2QJqr5Ct3EceklqoRepAPYQAWKsvj7gQ3Vf9+FKqngz4WKwFE68XueX9G6LTWrHsJqPryfWYHho67lVT78HRIrCXkCLcTsMANmi2WeHzIV1OEu8Gid3DQ4IB9WYmtXFmnDV3a5GBkC4jF0I6Yu1/H+Hq8Zzh4CKp1/NMiUVZ2ZRRKkcP6jSNDOz7BRzDY3mNV3pNkrytoSCFJpGVibCjGtUtTA1mPnOB6BR/R5lLOaPwoRYhlOizCWkkTBvA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0xQllGKglFv1LKUOFury9p1WWhzqcRJqzuC6eBDtfvw=;
- b=COt/DCvMkCx+IjJgD1JPU/cUHQcS+c3+C1szf2gi+i2OV9N4Hlo4GUtVNpaSkBKFNjX1zuX9BElXWjBtyeswms3qEl0KClFEPxBpSoI/wocoMT8/8JcdI+psPKkMG6pz00H7Ndo7dl3nsmI0S8TwxO5QH3JmEKAyznMibgsV8RG7M6Dp4ECgnahtksJnf5egF2S0fKDxbXLvHzXX0GkNZwjLTUl227Fi1Mlch/KVaz7tFPHfJDrvsoIp6YfKicWN9sCcre2pzQiQBX4Htq4YpI1JKnY8WThiOKJC8MJYNwvFvFRYKo9EkjU02n3SwxZZmkYLjGzFplw6ntQrMOiLgQ==
+ bh=U/udfMVaiLkdoezvhE/wsL8Gx9l3vvOCa2PztxMIapI=;
+ b=VSn0nMl5j/77bGUhp5NBxRgXT1RWAtVthcE3XI1nEgozhmrjicsAnBlEBrwubF1AmZ0rhCbVBDGWh6Uo9QDZyTqlDWx8uVUOiXvhGidd6ZCwq9xZ504pS+8mbT+zQeLTa6Ihj6lDWyqmjqOByCbNSPkkDETuPD3fuYeEdtfL02ethWEkWDLhTZfdnorPnW2IDZTgppneQw8F/Z9+iz1d2fPEcccw2jEyCjOH2oFsMil0Qf+hysEchPzipF6KOejEAZlkYoSDYNS0E06qWd4os+3Bs8Q35z1W503dnJQt02iRUX/prIR4aPvsVOy0PgwVqwtmTojz53IC2tRtl4/Fag==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0xQllGKglFv1LKUOFury9p1WWhzqcRJqzuC6eBDtfvw=;
- b=WQgp5LnxuW9of9njgxdi4akxVy6r3DSnDAXCz1iZr0QFU8+90U79v30l6A+H0Lsanx8f9ohQVOLIIdXsjgeZPTrCQ6dcEKjRiBqUdAbQSps0ipL49DiyTzlT83g7pP8JY79ayXqfsxJczSPDbHCtJZKtiMNwL5oZ32PL0BPZjBc=
-Received: from DS7PR03CA0044.namprd03.prod.outlook.com (2603:10b6:5:3b5::19)
- by DS7PR12MB6117.namprd12.prod.outlook.com (2603:10b6:8:9b::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6699.34; Tue, 29 Aug 2023 17:33:39 +0000
+ bh=U/udfMVaiLkdoezvhE/wsL8Gx9l3vvOCa2PztxMIapI=;
+ b=xH04YKIkRCggEKNGXLo+fHYK0qCMOcv0Z/q/Jwoo3CqdwPluF/c4acTJQa9gABajM3uNmrcUxcMw4m3DXQXWpd7p4jdAwu+ix534x6guF9380y8/1lMRL5Gv/NRBMk6FTNYf7t0qByo7cEE8I8T0Tr1TEZGi6Lj0YqBH6kQH+ro=
+Received: from DS7PR03CA0055.namprd03.prod.outlook.com (2603:10b6:5:3b5::30)
+ by DM6PR12MB4337.namprd12.prod.outlook.com (2603:10b6:5:2a9::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Tue, 29 Aug
+ 2023 17:33:39 +0000
 Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
- (2603:10b6:5:3b5:cafe::3f) by DS7PR03CA0044.outlook.office365.com
- (2603:10b6:5:3b5::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35 via Frontend
+ (2603:10b6:5:3b5:cafe::38) by DS7PR03CA0055.outlook.office365.com
+ (2603:10b6:5:3b5::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.18 via Frontend
  Transport; Tue, 29 Aug 2023 17:33:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
@@ -48,18 +49,18 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6745.16 via Frontend Transport; Tue, 29 Aug 2023 17:33:39 +0000
+ 15.20.6745.16 via Frontend Transport; Tue, 29 Aug 2023 17:33:38 +0000
 Received: from AUS-P9-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 29 Aug
- 2023 12:33:35 -0500
+ 2023 12:33:34 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: [PATCH v3 4/5] crypto: ccp: Fix sample application signature passing
-Date:   Tue, 29 Aug 2023 10:07:58 -0500
-Message-ID: <20230829150759.156126-5-mario.limonciello@amd.com>
+Subject: [PATCH v3 2/5] crypto: ccp: Fix ioctl unit tests
+Date:   Tue, 29 Aug 2023 10:07:56 -0500
+Message-ID: <20230829150759.156126-3-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230829150759.156126-1-mario.limonciello@amd.com>
 References: <20230829150759.156126-1-mario.limonciello@amd.com>
@@ -71,67 +72,107 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|DS7PR12MB6117:EE_
-X-MS-Office365-Filtering-Correlation-Id: 02a9f915-0a1c-4582-c73e-08dba8b6154e
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|DM6PR12MB4337:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8af0acf9-95cc-4201-f411-08dba8b614d9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xD053orUs0y8jiUFe7ZRnfsgnJTXqRJ2oxQ+o6guPol7WLWaAMKLXB6Gf0Z9b3l5Xeovmld0OFCERxkWOnnjK7w61ob57ESzDMiOE7diiI2loeMFsVWrWYea/mxgIL3lI43HwdiwTHUMFrh8jIU/dnbD0HKkzAjOvNLz205V0qrjaYDrCziCXGiyYZtpdcHPtbcW/1N8kWNeFs65QNYjh+D0234KAZza1mqwlqeI42Jp8g1PEHrbm7hR74KREVMSPOZ0OduwmeZagJdA2j9VzF+Y1iKIshZBV9GF1aZlwT2IG80ryQFjFgBPGWImc4zkmcqsbG2rQcGv6xJYGDU6EmeU5tL+r6aIy2+kMAV4bR8AH33Bv0POIC8pkDoa6KkjutDGwULljaQiuNuIqCaSZwTeEI+ZByvaxYsYoj/kLWcjMAUmQxO+tL2QQoOY07af0JUtFofVX6kdOURNEv6TdqVZ8fkmr3sHyUpmKov6emTVtX4BP1PWytoYY5FC+8k4oNXk/O98PUQM9wA/+MRHLbmFj+nd4ZcmxSqmLhIrDcerQUEROkTyKrhxThlQTy7VDkpI/2fBYd2ejQwSgj96HYK7rhpxxLs382tAq98xzRgacg3AYLZU/Bp2LM8jyQz1K2n87kkf3hqwfJkZDN0VbD0KbY+czDlJTfct4Gw3K1buliQ19a398HJiO5tN3EWS69PhZzUlOAomt1ONN23cRT8ZRYO7wO/o9afihJdifNvEdPNJaGHcRrV/Q2UCLKIMtBBotXC1Pi+ZDr8MOkP2Gw==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(39860400002)(396003)(186009)(1800799009)(451199024)(82310400011)(46966006)(40470700004)(36840700001)(7696005)(1076003)(2616005)(86362001)(110136005)(6666004)(81166007)(478600001)(83380400001)(47076005)(426003)(336012)(36860700001)(26005)(16526019)(82740400003)(356005)(40460700003)(36756003)(4326008)(8936002)(8676002)(44832011)(5660300002)(316002)(70206006)(54906003)(70586007)(41300700001)(40480700001)(2906002)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: E36LGOVOww/K0FPw9bnhzK0yl4UcKES3aQWLyJcfEayMA8kplQVRIRYilkqJD+BdBoEdyXvBINWOIPCZEtA0RLVWubadnoGfqgk8YGJye9Sw3cWG3bcXLOgieTAbKo3igwaBnloUIhKCNap3HBrnRcK+6kldP8JScD83cd+H44POnGBtmbReR0Hvu0nBeHN/YJPZ9U67XkNFP2xdFCXydNxqBJueZLzgItonAWAW8UMDxs6xMUdRYbxwLlMEYE3rOGjsMycsLbZyrn4U0TVg0RcCYugYeKfB5piDP3hnhOK79mNdFgHQILUbAVuuabjA82nkq9HsQRaOl1iZDdIPUrGHXa2tRjMDfVv6LcBdelmPvlf6QD3YQVoHTrEjw7wne0ULgZ8W2Fmn8LlBzjTR26X9/HxP+ksTYRFonnb4u0X/XbGO/7vASsk3VEzUYyfAidG7j5grk/BDEv80KeGFx0dMU8TFhVPR7r1TqIB6AZRMT/zMV2oolAqMssWJb7rJcawjjpyW8iiWw3sqrUSbSDuLYpBJWJf4IWNKw76+Lqdpjb2sa7chT1+1ukBD48zO5mjwmDhT3S88RXAVgiShzLfc/ih4/+6Kor6s5jZQ+EaB57c5CFEHKaGoERpoNBHBkrW5E7KpXn/eOM8VzyWBZtBnNYnlK9wZj+nT+9o4Y5+okkLFEp3AzRELXoeJ1ST7cZ3lQ12B4HpZlUP/vaIiDBGvnXIn+YmoFJnGm89gXfcFIxHTG1wrUo+B7hctFLbL7qgMYT1w3hbame55JV2nJg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(376002)(396003)(39860400002)(451199024)(82310400011)(186009)(1800799009)(36840700001)(46966006)(40470700004)(82740400003)(6666004)(7696005)(81166007)(36756003)(86362001)(356005)(40480700001)(47076005)(36860700001)(1076003)(478600001)(426003)(110136005)(26005)(16526019)(2906002)(336012)(83380400001)(40460700003)(70586007)(8676002)(4326008)(44832011)(41300700001)(316002)(8936002)(5660300002)(70206006)(2616005)(54906003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2023 17:33:39.6961
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2023 17:33:38.9462
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02a9f915-0a1c-4582-c73e-08dba8b6154e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8af0acf9-95cc-4201-f411-08dba8b614d9
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EE31.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6117
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4337
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When parameters are sent the PSP returns back it's own signature
-for the application to verify the authenticity of the result.
+A local environment change was importing ioctl_opt which is required
+for ioctl tests to pass.  Add the missing import for it.
 
-Display this signature to the caller instead of the one the caller
-sent.
-
-Fixes: f40d42f116cf ("crypto: ccp - Add a sample python script for Dynamic Boost Control")
-Fixes: febe3ed3222f ("crypto: ccp - Add a sample library for ioctl use")
+Fixes: 15f8aa7bb3e5 ("crypto: ccp - Add unit tests for dynamic boost control")
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- tools/crypto/ccp/dbc.c  | 1 +
- tools/crypto/ccp/dbc.py | 5 +++--
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ tools/crypto/ccp/test_dbc.py | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/tools/crypto/ccp/dbc.c b/tools/crypto/ccp/dbc.c
-index 7774e981849f..a807df0f0597 100644
---- a/tools/crypto/ccp/dbc.c
-+++ b/tools/crypto/ccp/dbc.c
-@@ -68,5 +68,6 @@ int process_param(int fd, int msg_index, __u8 *signature, int *data)
- 		return errno;
+diff --git a/tools/crypto/ccp/test_dbc.py b/tools/crypto/ccp/test_dbc.py
+index 998bb3e3cd04..a28a1f94c1d2 100755
+--- a/tools/crypto/ccp/test_dbc.py
++++ b/tools/crypto/ccp/test_dbc.py
+@@ -4,6 +4,12 @@ import unittest
+ import os
+ import time
+ import glob
++import fcntl
++try:
++    import ioctl_opt as ioctl
++except ImportError:
++    ioctl = None
++    pass
+ from dbc import *
  
- 	*data = tmp.param;
-+	memcpy(signature, tmp.signature, sizeof(tmp.signature));
- 	return 0;
- }
-diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
-index 3956efe7537a..2b91415b1940 100644
---- a/tools/crypto/ccp/dbc.py
-+++ b/tools/crypto/ccp/dbc.py
-@@ -57,7 +57,8 @@ def process_param(device, message, signature, data=None):
-     if type(message) != tuple:
-         raise ValueError("Expected message tuple")
-     arg = ctypes.c_int(data if data else 0)
--    ret = lib.process_param(device.fileno(), message[0], signature, ctypes.pointer(arg))
-+    sig = ctypes.create_string_buffer(signature, len(signature))
-+    ret = lib.process_param(device.fileno(), message[0], ctypes.pointer(sig), ctypes.pointer(arg))
-     if ret:
-         handle_error(ret)
--    return arg, signature
-+    return arg.value, sig.value
+ # Artificial delay between set commands
+@@ -64,13 +70,16 @@ class TestInvalidIoctls(DynamicBoostControlTest):
+     def setUp(self) -> None:
+         if not os.path.exists(DEVICE_NODE):
+             self.skipTest("system is unsupported")
++        if not ioctl:
++            self.skipTest("unable to test IOCTLs without ioctl_opt")
++
+         return super().setUp()
+ 
+     def test_invalid_nonce_ioctl(self) -> None:
+         """tries to call get_nonce ioctl with invalid data structures"""
+ 
+         # 0x1 (get nonce), and invalid data
+-        INVALID1 = IOWR(ord("D"), 0x01, invalid_param)
++        INVALID1 = ioctl.IOWR(ord("D"), 0x01, invalid_param)
+         with self.assertRaises(OSError) as error:
+             fcntl.ioctl(self.d, INVALID1, self.data, True)
+         self.assertEqual(error.exception.errno, 22)
+@@ -79,7 +88,7 @@ class TestInvalidIoctls(DynamicBoostControlTest):
+         """tries to call set_uid ioctl with invalid data structures"""
+ 
+         # 0x2 (set uid), and invalid data
+-        INVALID2 = IOW(ord("D"), 0x02, invalid_param)
++        INVALID2 = ioctl.IOW(ord("D"), 0x02, invalid_param)
+         with self.assertRaises(OSError) as error:
+             fcntl.ioctl(self.d, INVALID2, self.data, True)
+         self.assertEqual(error.exception.errno, 22)
+@@ -88,7 +97,7 @@ class TestInvalidIoctls(DynamicBoostControlTest):
+         """tries to call set_uid ioctl with invalid data structures"""
+ 
+         # 0x2 as RW (set uid), and invalid data
+-        INVALID3 = IOWR(ord("D"), 0x02, invalid_param)
++        INVALID3 = ioctl.IOWR(ord("D"), 0x02, invalid_param)
+         with self.assertRaises(OSError) as error:
+             fcntl.ioctl(self.d, INVALID3, self.data, True)
+         self.assertEqual(error.exception.errno, 22)
+@@ -96,7 +105,7 @@ class TestInvalidIoctls(DynamicBoostControlTest):
+     def test_invalid_param_ioctl(self) -> None:
+         """tries to call param ioctl with invalid data structures"""
+         # 0x3 (param), and invalid data
+-        INVALID4 = IOWR(ord("D"), 0x03, invalid_param)
++        INVALID4 = ioctl.IOWR(ord("D"), 0x03, invalid_param)
+         with self.assertRaises(OSError) as error:
+             fcntl.ioctl(self.d, INVALID4, self.data, True)
+         self.assertEqual(error.exception.errno, 22)
+@@ -104,7 +113,7 @@ class TestInvalidIoctls(DynamicBoostControlTest):
+     def test_invalid_call_ioctl(self) -> None:
+         """tries to call the DBC ioctl with invalid data structures"""
+         # 0x4, and invalid data
+-        INVALID5 = IOWR(ord("D"), 0x04, invalid_param)
++        INVALID5 = ioctl.IOWR(ord("D"), 0x04, invalid_param)
+         with self.assertRaises(OSError) as error:
+             fcntl.ioctl(self.d, INVALID5, self.data, True)
+         self.assertEqual(error.exception.errno, 22)
 -- 
 2.34.1
 
