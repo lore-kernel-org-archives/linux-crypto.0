@@ -2,83 +2,136 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F126C83F12
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 16:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2B9C71153
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 17:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235255AbjH2QXI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Aug 2023 12:23:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37878 "EHLO
+        id S237823AbjH2ReS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Aug 2023 13:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233278AbjH2QWj (ORCPT
+        with ESMTP id S237816AbjH2Rdp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Aug 2023 12:22:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10F8A6;
-        Tue, 29 Aug 2023 09:22:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5B0F062788;
-        Tue, 29 Aug 2023 16:22:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FBB8C433C8;
-        Tue, 29 Aug 2023 16:22:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693326155;
-        bh=7bXUJT2kfyzw7wkUfS8lZ78Kd1ZXxCKkRkhvrc8fDl4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EoinLj3oznsPcWf/YylB/LBHyZqdAoZ4eE9Whhs473rhkonSq6wITSiEd3KzWEtsz
-         rzKR14aZk8FUR+QjplaXqxwNEDNNCldABMMjq4IlS6Yhh/pcMlmdMS9lE+f7dhltw7
-         9b+s7IGxT5FK8nt9MNY1feYGaQlE/SNRujNSvQW5wyheGO7OJU+0WgJJNQ/8AxDwAQ
-         CtXGWSiVO3bX2opi6t0VHEmzD76ewDF6ZdqHHsuWLQo0znfWvFipG7xPJ1myR1MVWy
-         qxZON2t4o8cTagDm7ybXJW0zZwocJuA73fxOAP3k4u+1uXYEj4SswnirsfmkafbYy0
-         OdxBA6RNHo8uQ==
-Received: (nullmailer pid 2288009 invoked by uid 1000);
-        Tue, 29 Aug 2023 16:22:33 -0000
-Date:   Tue, 29 Aug 2023 11:22:33 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Om Prakash Singh <quic_omprsing@quicinc.com>
-Subject: Re: [PATCH v3 4/6] dt-bindings: crypto: qcom,prng: document SM8550
-Message-ID: <20230829162233.GA2283052-robh@kernel.org>
-References: <20230828-topic-sm8550-rng-v3-0-7a0678ca7988@linaro.org>
- <20230828-topic-sm8550-rng-v3-4-7a0678ca7988@linaro.org>
- <20230828213610.GA386486-robh@kernel.org>
- <c741c4be-50b4-0bd8-79eb-37895342f5af@linaro.org>
+        Tue, 29 Aug 2023 13:33:45 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFFF91;
+        Tue, 29 Aug 2023 10:33:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dpokTQaNDAiRRyIUTf6Bm3V8IobYb+6/4PAFUcYVTme95lCEH+kqyjVP9i3OHusfJ5jGcPKe2+2JEME2vVziwqADrrZDN1fraoxZyW4H8d673Z9kAXrEZTZU0fzMocGkwRGZRJbZEzF+LPu7sFvJgEXJ6mc6FNXehYK9NZg8yKJl4zpxlHu5c0wUvPJJCvzcEUkhWp9Lmsg2qI2ez4tMRkv0Mr9mDe0pLaZUdhCodKyupZHUBD4b9KQXJ1pZuZHLw+tP36QikDHSR8zxoRawqZLbkCHJ+vhwakaimnMjEkjzr+J5kThZ9oJ4vMjZ0tfq0Y7XseyYNT3wRJTKYrCmtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0xQllGKglFv1LKUOFury9p1WWhzqcRJqzuC6eBDtfvw=;
+ b=COt/DCvMkCx+IjJgD1JPU/cUHQcS+c3+C1szf2gi+i2OV9N4Hlo4GUtVNpaSkBKFNjX1zuX9BElXWjBtyeswms3qEl0KClFEPxBpSoI/wocoMT8/8JcdI+psPKkMG6pz00H7Ndo7dl3nsmI0S8TwxO5QH3JmEKAyznMibgsV8RG7M6Dp4ECgnahtksJnf5egF2S0fKDxbXLvHzXX0GkNZwjLTUl227Fi1Mlch/KVaz7tFPHfJDrvsoIp6YfKicWN9sCcre2pzQiQBX4Htq4YpI1JKnY8WThiOKJC8MJYNwvFvFRYKo9EkjU02n3SwxZZmkYLjGzFplw6ntQrMOiLgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0xQllGKglFv1LKUOFury9p1WWhzqcRJqzuC6eBDtfvw=;
+ b=WQgp5LnxuW9of9njgxdi4akxVy6r3DSnDAXCz1iZr0QFU8+90U79v30l6A+H0Lsanx8f9ohQVOLIIdXsjgeZPTrCQ6dcEKjRiBqUdAbQSps0ipL49DiyTzlT83g7pP8JY79ayXqfsxJczSPDbHCtJZKtiMNwL5oZ32PL0BPZjBc=
+Received: from DS7PR03CA0044.namprd03.prod.outlook.com (2603:10b6:5:3b5::19)
+ by DS7PR12MB6117.namprd12.prod.outlook.com (2603:10b6:8:9b::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6699.34; Tue, 29 Aug 2023 17:33:39 +0000
+Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
+ (2603:10b6:5:3b5:cafe::3f) by DS7PR03CA0044.outlook.office365.com
+ (2603:10b6:5:3b5::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35 via Frontend
+ Transport; Tue, 29 Aug 2023 17:33:39 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6745.16 via Frontend Transport; Tue, 29 Aug 2023 17:33:39 +0000
+Received: from AUS-P9-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 29 Aug
+ 2023 12:33:35 -0500
+From:   Mario Limonciello <mario.limonciello@amd.com>
+To:     <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Mario Limonciello" <mario.limonciello@amd.com>
+Subject: [PATCH v3 4/5] crypto: ccp: Fix sample application signature passing
+Date:   Tue, 29 Aug 2023 10:07:58 -0500
+Message-ID: <20230829150759.156126-5-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230829150759.156126-1-mario.limonciello@amd.com>
+References: <20230829150759.156126-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c741c4be-50b4-0bd8-79eb-37895342f5af@linaro.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|DS7PR12MB6117:EE_
+X-MS-Office365-Filtering-Correlation-Id: 02a9f915-0a1c-4582-c73e-08dba8b6154e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xD053orUs0y8jiUFe7ZRnfsgnJTXqRJ2oxQ+o6guPol7WLWaAMKLXB6Gf0Z9b3l5Xeovmld0OFCERxkWOnnjK7w61ob57ESzDMiOE7diiI2loeMFsVWrWYea/mxgIL3lI43HwdiwTHUMFrh8jIU/dnbD0HKkzAjOvNLz205V0qrjaYDrCziCXGiyYZtpdcHPtbcW/1N8kWNeFs65QNYjh+D0234KAZza1mqwlqeI42Jp8g1PEHrbm7hR74KREVMSPOZ0OduwmeZagJdA2j9VzF+Y1iKIshZBV9GF1aZlwT2IG80ryQFjFgBPGWImc4zkmcqsbG2rQcGv6xJYGDU6EmeU5tL+r6aIy2+kMAV4bR8AH33Bv0POIC8pkDoa6KkjutDGwULljaQiuNuIqCaSZwTeEI+ZByvaxYsYoj/kLWcjMAUmQxO+tL2QQoOY07af0JUtFofVX6kdOURNEv6TdqVZ8fkmr3sHyUpmKov6emTVtX4BP1PWytoYY5FC+8k4oNXk/O98PUQM9wA/+MRHLbmFj+nd4ZcmxSqmLhIrDcerQUEROkTyKrhxThlQTy7VDkpI/2fBYd2ejQwSgj96HYK7rhpxxLs382tAq98xzRgacg3AYLZU/Bp2LM8jyQz1K2n87kkf3hqwfJkZDN0VbD0KbY+czDlJTfct4Gw3K1buliQ19a398HJiO5tN3EWS69PhZzUlOAomt1ONN23cRT8ZRYO7wO/o9afihJdifNvEdPNJaGHcRrV/Q2UCLKIMtBBotXC1Pi+ZDr8MOkP2Gw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(39860400002)(396003)(186009)(1800799009)(451199024)(82310400011)(46966006)(40470700004)(36840700001)(7696005)(1076003)(2616005)(86362001)(110136005)(6666004)(81166007)(478600001)(83380400001)(47076005)(426003)(336012)(36860700001)(26005)(16526019)(82740400003)(356005)(40460700003)(36756003)(4326008)(8936002)(8676002)(44832011)(5660300002)(316002)(70206006)(54906003)(70586007)(41300700001)(40480700001)(2906002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2023 17:33:39.6961
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02a9f915-0a1c-4582-c73e-08dba8b6154e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000EE31.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6117
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 29, 2023 at 08:38:48AM +0200, Krzysztof Kozlowski wrote:
-> On 28/08/2023 23:36, Rob Herring wrote:
-> > On Mon, Aug 28, 2023 at 10:04:39AM +0200, Neil Armstrong wrote:
-> >> Document SM8550 compatible for the True Random Number Generator.
-> >>
-> >> Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
-> >> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> > 
-> > Where's Krzysztof's tag?
-> > 
-> 
-> The patch evolved and Neil mentioned in cover letter changelog that he
-> did not collect Reviews because of that. Seems ok for me.
+When parameters are sent the PSP returns back it's own signature
+for the application to verify the authenticity of the result.
 
-I did go look there and just saw 'Added review tags'. Not too helpful.  
-That's why changelogs for a patch belong in the patch.
+Display this signature to the caller instead of the one the caller
+sent.
 
-Rob
+Fixes: f40d42f116cf ("crypto: ccp - Add a sample python script for Dynamic Boost Control")
+Fixes: febe3ed3222f ("crypto: ccp - Add a sample library for ioctl use")
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+---
+ tools/crypto/ccp/dbc.c  | 1 +
+ tools/crypto/ccp/dbc.py | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tools/crypto/ccp/dbc.c b/tools/crypto/ccp/dbc.c
+index 7774e981849f..a807df0f0597 100644
+--- a/tools/crypto/ccp/dbc.c
++++ b/tools/crypto/ccp/dbc.c
+@@ -68,5 +68,6 @@ int process_param(int fd, int msg_index, __u8 *signature, int *data)
+ 		return errno;
+ 
+ 	*data = tmp.param;
++	memcpy(signature, tmp.signature, sizeof(tmp.signature));
+ 	return 0;
+ }
+diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
+index 3956efe7537a..2b91415b1940 100644
+--- a/tools/crypto/ccp/dbc.py
++++ b/tools/crypto/ccp/dbc.py
+@@ -57,7 +57,8 @@ def process_param(device, message, signature, data=None):
+     if type(message) != tuple:
+         raise ValueError("Expected message tuple")
+     arg = ctypes.c_int(data if data else 0)
+-    ret = lib.process_param(device.fileno(), message[0], signature, ctypes.pointer(arg))
++    sig = ctypes.create_string_buffer(signature, len(signature))
++    ret = lib.process_param(device.fileno(), message[0], ctypes.pointer(sig), ctypes.pointer(arg))
+     if ret:
+         handle_error(ret)
+-    return arg, signature
++    return arg.value, sig.value
+-- 
+2.34.1
+
