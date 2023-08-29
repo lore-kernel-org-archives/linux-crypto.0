@@ -2,77 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 733B6C6FA8F
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 10:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C88C83F16
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 10:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231776AbjH2KO6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Aug 2023 06:14:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32910 "EHLO
+        id S235055AbjH2KSq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Aug 2023 06:18:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235066AbjH2KO3 (ORCPT
+        with ESMTP id S235099AbjH2KSf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Aug 2023 06:14:29 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 677A3184
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Aug 2023 03:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693304058; x=1724840058;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+vSjULPcqSWLzMs9IdN1BqANBLpqQ+T8gpM8m4VaR3A=;
-  b=fUIJBpMmOvloITXwM3e/CWlDXler3EP4HoMkI1rQo/JspnTgMOd691if
-   ZNrCP+tKnAuQCuHDqW9/hb/gwN7nLh3LpdpMpyvTIUM8FAvKdvSASRcHK
-   mdAbe3cSQwG4oONu2tsUUw2QgePS/sgH0eQDNUDMTBqR65E43gXGGfzLt
-   MB2oaSUY265UoaNngzDRt70CRtwEXA99BpaxN3vychpLquCYB4JSK6ZGS
-   zaqiytHxRrY0c/mLuRT8cxwhvslEJ+namzY4ODtlhTtNWzzVeij+LfLGm
-   GJi0mDWzXOxjc5G03KXkxVd4uH9fX3Njegbw7hrC1zlxA1u2Dws9thKGY
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="461692127"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="461692127"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 03:14:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="715478811"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="715478811"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
-  by orsmga006.jf.intel.com with ESMTP; 29 Aug 2023 03:14:15 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Tue, 29 Aug 2023 06:18:35 -0400
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD81191;
+        Tue, 29 Aug 2023 03:18:29 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qavnj-008qMP-7B; Tue, 29 Aug 2023 18:18:24 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 29 Aug 2023 18:18:24 +0800
+Date:   Tue, 29 Aug 2023 18:18:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, alx@kernel.org,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] Documentation: ABI: debugfs-driver-qat: fix fw_counters path
-Date:   Tue, 29 Aug 2023 11:13:57 +0100
-Message-ID: <20230829101410.11859-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.41.0
+Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
+Message-ID: <ZO3F8AgOS/NnVaeU@gondor.apana.org.au>
+References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
+ <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
+ <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
+ <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
+ <ZOx1SOBKbmdIvz+b@gondor.apana.org.au>
+ <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The debugfs description for fw_counters reports an incorrect path
-indicating a qat folder that does not exist. Fix it.
+On Mon, Aug 28, 2023 at 01:46:18PM +0300, Andy Shevchenko wrote:
+>
+> kernel.h is misleading here. It includes 98% of something which this file is
+> not using or going to use. Can you tell _why_ we need that 98% bulk to be
+> included here?
 
-Fixes: 865b50fe6ea8 ("crypto: qat - add fw_counters debugfs file")
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- Documentation/ABI/testing/debugfs-driver-qat | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+For most drivers in drivers/crypto they will need multiple header
+files included by kernel.h.  I'd hate for people to start posting
+patches replacing one inclusion of kernel.h with multiple inclusions.
 
-diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
-index 6731ffacc5f0..3f9b4f708051 100644
---- a/Documentation/ABI/testing/debugfs-driver-qat
-+++ b/Documentation/ABI/testing/debugfs-driver-qat
-@@ -1,4 +1,4 @@
--What:		/sys/kernel/debug/qat_<device>_<BDF>/qat/fw_counters
-+What:		/sys/kernel/debug/qat_<device>_<BDF>/fw_counters
- Date:		November 2023
- KernelVersion:	6.6
- Contact:	qat-linux@intel.com
+They're bound to get it wrong and we'll be forever dealing with
+random build failures because someone changes a random header
+elsewhere which then exposes a missed inclusion.
+
+Cheers,
 -- 
-2.41.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
