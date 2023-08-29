@@ -2,75 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D03E3C6FA8F
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 18:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03203C6FA8F
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Aug 2023 19:01:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238605AbjH2S6w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Aug 2023 14:58:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43350 "EHLO
+        id S238678AbjH2TAa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 29 Aug 2023 15:00:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238598AbjH2S6Y (ORCPT
+        with ESMTP id S238879AbjH2TAR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Aug 2023 14:58:24 -0400
-Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99BAFFC;
-        Tue, 29 Aug 2023 11:58:20 -0700 (PDT)
-Received: from martin by viti.kaiser.cx with local (Exim 4.89)
-        (envelope-from <martin@viti.kaiser.cx>)
-        id 1qb3un-0008OZ-I9; Tue, 29 Aug 2023 20:58:13 +0200
-Date:   Tue, 29 Aug 2023 20:58:13 +0200
-From:   Martin Kaiser <martin@kaiser.cx>
-To:     Alexander Stein <alexander.stein@ew.tq-group.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/6] hwrng: imx-rngc - use polling to detect end of
- self test
-Message-ID: <20230829185813.odjl3zqwshbgki4m@viti.kaiser.cx>
-References: <20230824192059.1569591-1-martin@kaiser.cx>
- <20230824192059.1569591-4-martin@kaiser.cx>
- <8370215.EvYhyI6sBW@steina-w>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8370215.EvYhyI6sBW@steina-w>
-User-Agent: NeoMutt/20170113 (1.7.2)
-Sender: Martin Kaiser <martin@viti.kaiser.cx>
+        Tue, 29 Aug 2023 15:00:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFF0BCDB;
+        Tue, 29 Aug 2023 12:00:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6126E64DAE;
+        Tue, 29 Aug 2023 19:00:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C8E43C433C8;
+        Tue, 29 Aug 2023 19:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693335604;
+        bh=aCgkYGY98g3EKBI0AJ7Uxw1j4MUR/DcCFtg+btnL2Xc=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=IW8TZmS890jMqMNm5Q6/CJKBTazwbi60z3Cwwm3M5OTt2SRJiX2EUvhgIfLKHwUCC
+         /Xkm2RhJx1A6pYn88uE61DwKbkOnFdj+y23s5BWjBt37dFI99AhK9dJSVfEQBrAUek
+         eRmvGO+ttq9ymb4xZ1GZRcslzT0AgffS0CBMEV1aJ0tQwf2Nbt2biSjokTXJebQ2ZE
+         W/ZQhXlj7acfwC1zvDgw16Q0ps+gD6Hycg8qAQ4AklOuLXCueOAD0R9Pdslk7tQhDu
+         ETpglB8932/S9nbh9puxI0kpCXQC56xKdGzkTDdVKSaH962I18p5lCHOFAGLQAVb9F
+         yLer1mCl0Vrpg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0EFEE26D49;
+        Tue, 29 Aug 2023 19:00:04 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 6.6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+References: <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+ <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
+ <Yui+kNeY+Qg4fKVl@gondor.apana.org.au>
+ <Yzv0wXi4Uu2WND37@gondor.apana.org.au>
+ <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
+ <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au> <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.6-p1
+X-PR-Tracked-Commit-Id: 85b9bf9a514d991fcecb118d0a8a35e754ff9265
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 68cf01760bc0891074e813b9bb06d2696cac1c01
+Message-Id: <169333560469.15412.17633919990369937789.pr-tracker-bot@kernel.org>
+Date:   Tue, 29 Aug 2023 19:00:04 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Alexander,
+The pull request you sent on Mon, 28 Aug 2023 17:22:20 +0800:
 
-Alexander Stein (alexander.stein@ew.tq-group.com) wrote:
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.6-p1
 
-> I'm still not convinced that using polling is simpler. By using 
-> readl_poll_timeout() you will also get an interrupt, the timer one. Why 
-> exactly is using polling much (!) simpler?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/68cf01760bc0891074e813b9bb06d2696cac1c01
 
-it requires much less code in the driver.
+Thank you!
 
-> > The selftest should take approx. 450us. Keep the overhead to a minimum
-> > by polling every 500us. (We've already lowered the timeout to 1.5ms.)
-
-> I suppose these times only hold true for a specific peripheral clock 
-> frequency. Is it guaranteed that this frequency is fixed?
-
-Good point. The lowest possible peripheral clock frequency is half of
-what I used for the calculations, i.e. 33.25MHz. That would double the
-durations. Should be ok for the selftest. But for the initial seed, we'd
-get into a region where readl_poll_timeout (usleep_range) does no longer
-make sense.
-
-> For using IRQ it's simpler, there is no guessing: you return once the self 
-> test finished. The timeout is identical anyway.
-
-I've looked at other callers of readl_poll_timeout. It seems that none
-of them is called in a driver's probe function or uses an overall
-timeout of 200ms.
-
-I'll keep the interrupt + completion and resubmit the patches for
-adjusting the timeouts.
-
-Thanks,
-Martin
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
