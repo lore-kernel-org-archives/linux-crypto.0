@@ -2,27 +2,29 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE18C83F1E
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A753C83F17
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240458AbjH3SoT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:44:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42382 "EHLO
+        id S240589AbjH3SoX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:44:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243005AbjH3KFH (ORCPT
+        with ESMTP id S243047AbjH3KJN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Aug 2023 06:05:07 -0400
+        Wed, 30 Aug 2023 06:09:13 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCCE21B0
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 03:05:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5C61B3;
+        Wed, 30 Aug 2023 03:09:10 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qbI3o-009BsR-OF; Wed, 30 Aug 2023 18:04:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Aug 2023 18:04:30 +0800
-Date:   Wed, 30 Aug 2023 18:04:30 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     ardb@kernel.org, kees@kernel.org, enlin.mu@unisoc.com,
+        id 1qbI7x-009Bvo-IM; Wed, 30 Aug 2023 18:08:46 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Aug 2023 18:08:47 +0800
+From:   "Herbert Xu" <herbert@gondor.apana.org.au>
+Date:   Wed, 30 Aug 2023 18:08:47 +0800
+Subject: [PATCH 2/4] crypto: qat - Remove zlib-deflate
+References: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>, ardb@kernel.org,
+        kees@kernel.org, linux-kernel@vger.kernel.org, enlin.mu@unisoc.com,
         ebiggers@google.com, gpiccoli@igalia.com, willy@infradead.org,
         yunlong.xing@unisoc.com, yuxiaozhang@google.com,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
@@ -30,31 +32,178 @@ Cc:     ardb@kernel.org, kees@kernel.org, enlin.mu@unisoc.com,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Yang Shen <shenyang39@huawei.com>,
         Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH 0/4] crypto: Remove zlib-deflate
-Message-ID: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
-References: <CAHk-=wgaY2+_KyqVpRS+MrO6Y7bXQp69odTu7JT3XSpdUsgS=g@mail.gmail.com>
- <ZO8HcBirOZnX9iRs@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZO8HcBirOZnX9iRs@gondor.apana.org.au>
+Message-Id: <E1qbI7x-009Bvo-IM@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 30, 2023 at 05:10:08PM +0800, Herbert Xu wrote:
-> 
-> Later on someone added "zlib-deflate" to the Crypto API which does
-> emit the zlib header/trailer.  It appears to be completely unused
-> and it was only added because certain hardware happened be able to
-> emit the same header/trailer.  We should remove zlib-defalte
-> and all the driver implementations of it from the Crypto API.
+Remove the implementation of zlib-deflate because it is completely
+unused in the kernel.
 
-This patch series removes all implementations of zlib-deflate from
-the Crypto API because they have no users in the kernel.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ drivers/crypto/intel/qat/qat_common/qat_comp_algs.c |  129 --------------------
+ 1 file changed, 1 insertion(+), 128 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
+index b533984906ec..bf8c0ee62917 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
+@@ -109,69 +109,6 @@ static void qat_comp_resubmit(struct work_struct *work)
+ 	acomp_request_complete(areq, ret);
+ }
+ 
+-static int parse_zlib_header(u16 zlib_h)
+-{
+-	int ret = -EINVAL;
+-	__be16 header;
+-	u8 *header_p;
+-	u8 cmf, flg;
+-
+-	header = cpu_to_be16(zlib_h);
+-	header_p = (u8 *)&header;
+-
+-	flg = header_p[0];
+-	cmf = header_p[1];
+-
+-	if (cmf >> QAT_RFC_1950_CM_OFFSET > QAT_RFC_1950_CM_DEFLATE_CINFO_32K)
+-		return ret;
+-
+-	if ((cmf & QAT_RFC_1950_CM_MASK) != QAT_RFC_1950_CM_DEFLATE)
+-		return ret;
+-
+-	if (flg & QAT_RFC_1950_DICT_MASK)
+-		return ret;
+-
+-	return 0;
+-}
+-
+-static int qat_comp_rfc1950_callback(struct qat_compression_req *qat_req,
+-				     void *resp)
+-{
+-	struct acomp_req *areq = qat_req->acompress_req;
+-	enum direction dir = qat_req->dir;
+-	__be32 qat_produced_adler;
+-
+-	qat_produced_adler = cpu_to_be32(qat_comp_get_produced_adler32(resp));
+-
+-	if (dir == COMPRESSION) {
+-		__be16 zlib_header;
+-
+-		zlib_header = cpu_to_be16(QAT_RFC_1950_COMP_HDR);
+-		scatterwalk_map_and_copy(&zlib_header, areq->dst, 0, QAT_RFC_1950_HDR_SIZE, 1);
+-		areq->dlen += QAT_RFC_1950_HDR_SIZE;
+-
+-		scatterwalk_map_and_copy(&qat_produced_adler, areq->dst, areq->dlen,
+-					 QAT_RFC_1950_FOOTER_SIZE, 1);
+-		areq->dlen += QAT_RFC_1950_FOOTER_SIZE;
+-	} else {
+-		__be32 decomp_adler;
+-		int footer_offset;
+-		int consumed;
+-
+-		consumed = qat_comp_get_consumed_ctr(resp);
+-		footer_offset = consumed + QAT_RFC_1950_HDR_SIZE;
+-		if (footer_offset + QAT_RFC_1950_FOOTER_SIZE > areq->slen)
+-			return -EBADMSG;
+-
+-		scatterwalk_map_and_copy(&decomp_adler, areq->src, footer_offset,
+-					 QAT_RFC_1950_FOOTER_SIZE, 0);
+-
+-		if (qat_produced_adler != decomp_adler)
+-			return -EBADMSG;
+-	}
+-	return 0;
+-}
+-
+ static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
+ 				      void *resp)
+ {
+@@ -293,18 +230,6 @@ static void qat_comp_alg_exit_tfm(struct crypto_acomp *acomp_tfm)
+ 	memset(ctx, 0, sizeof(*ctx));
+ }
+ 
+-static int qat_comp_alg_rfc1950_init_tfm(struct crypto_acomp *acomp_tfm)
+-{
+-	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
+-	struct qat_compression_ctx *ctx = crypto_tfm_ctx(tfm);
+-	int ret;
+-
+-	ret = qat_comp_alg_init_tfm(acomp_tfm);
+-	ctx->qat_comp_callback = &qat_comp_rfc1950_callback;
+-
+-	return ret;
+-}
+-
+ static int qat_comp_alg_compress_decompress(struct acomp_req *areq, enum direction dir,
+ 					    unsigned int shdr, unsigned int sftr,
+ 					    unsigned int dhdr, unsigned int dftr)
+@@ -400,43 +325,6 @@ static int qat_comp_alg_decompress(struct acomp_req *req)
+ 	return qat_comp_alg_compress_decompress(req, DECOMPRESSION, 0, 0, 0, 0);
+ }
+ 
+-static int qat_comp_alg_rfc1950_compress(struct acomp_req *req)
+-{
+-	if (!req->dst && req->dlen != 0)
+-		return -EINVAL;
+-
+-	if (req->dst && req->dlen <= QAT_RFC_1950_HDR_SIZE + QAT_RFC_1950_FOOTER_SIZE)
+-		return -EINVAL;
+-
+-	return qat_comp_alg_compress_decompress(req, COMPRESSION, 0, 0,
+-						QAT_RFC_1950_HDR_SIZE,
+-						QAT_RFC_1950_FOOTER_SIZE);
+-}
+-
+-static int qat_comp_alg_rfc1950_decompress(struct acomp_req *req)
+-{
+-	struct crypto_acomp *acomp_tfm = crypto_acomp_reqtfm(req);
+-	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
+-	struct qat_compression_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct adf_accel_dev *accel_dev = ctx->inst->accel_dev;
+-	u16 zlib_header;
+-	int ret;
+-
+-	if (req->slen <= QAT_RFC_1950_HDR_SIZE + QAT_RFC_1950_FOOTER_SIZE)
+-		return -EBADMSG;
+-
+-	scatterwalk_map_and_copy(&zlib_header, req->src, 0, QAT_RFC_1950_HDR_SIZE, 0);
+-
+-	ret = parse_zlib_header(zlib_header);
+-	if (ret) {
+-		dev_dbg(&GET_DEV(accel_dev), "Error parsing zlib header\n");
+-		return ret;
+-	}
+-
+-	return qat_comp_alg_compress_decompress(req, DECOMPRESSION, QAT_RFC_1950_HDR_SIZE,
+-						QAT_RFC_1950_FOOTER_SIZE, 0, 0);
+-}
+-
+ static struct acomp_alg qat_acomp[] = { {
+ 	.base = {
+ 		.cra_name = "deflate",
+@@ -452,22 +340,7 @@ static struct acomp_alg qat_acomp[] = { {
+ 	.decompress = qat_comp_alg_decompress,
+ 	.dst_free = sgl_free,
+ 	.reqsize = sizeof(struct qat_compression_req),
+-}, {
+-	.base = {
+-		.cra_name = "zlib-deflate",
+-		.cra_driver_name = "qat_zlib_deflate",
+-		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC,
+-		.cra_ctxsize = sizeof(struct qat_compression_ctx),
+-		.cra_module = THIS_MODULE,
+-	},
+-	.init = qat_comp_alg_rfc1950_init_tfm,
+-	.exit = qat_comp_alg_exit_tfm,
+-	.compress = qat_comp_alg_rfc1950_compress,
+-	.decompress = qat_comp_alg_rfc1950_decompress,
+-	.dst_free = sgl_free,
+-	.reqsize = sizeof(struct qat_compression_req),
+-} };
++}};
+ 
+ int qat_comp_algs_register(void)
+ {
