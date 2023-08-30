@@ -2,206 +2,163 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80871C83F18
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86901C83F1B
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239942AbjH3SoI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:44:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47666 "EHLO
+        id S240142AbjH3SoL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:44:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243046AbjH3KJN (ORCPT
+        with ESMTP id S244722AbjH3NtZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Aug 2023 06:09:13 -0400
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D71F71B0;
-        Wed, 30 Aug 2023 03:09:09 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qbI7z-009Bvz-Kh; Wed, 30 Aug 2023 18:08:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 30 Aug 2023 18:08:49 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Wed, 30 Aug 2023 18:08:49 +0800
-Subject: [PATCH 3/4] crypto: deflate - Remove zlib-deflate
-References: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>, ardb@kernel.org,
-        kees@kernel.org, linux-kernel@vger.kernel.org, enlin.mu@unisoc.com,
-        ebiggers@google.com, gpiccoli@igalia.com, willy@infradead.org,
-        yunlong.xing@unisoc.com, yuxiaozhang@google.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        qat-linux@intel.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Yang Shen <shenyang39@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-Message-Id: <E1qbI7z-009Bvz-Kh@formenos.hmeau.com>
+        Wed, 30 Aug 2023 09:49:25 -0400
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08A9E8;
+        Wed, 30 Aug 2023 06:49:18 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37UDmsSH069738;
+        Wed, 30 Aug 2023 08:48:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1693403334;
+        bh=k3G+QCd0qq+SmUmXwQ1w+6uf1+2cGUO++sEcK3YjTPM=;
+        h=From:To:CC:Subject:In-Reply-To:References:Date;
+        b=iz8aBw26EMlFJ3f4qOvXvi5WCcONePsIYPOQ75mdUaRjlqzKVcBpjiB17nxzgktvq
+         0+sKBr1nJV3xEyNPx43OCQyCcum61cZeOIvnRjplbzQVdDRgJkLOQI6bKDwFr7n7HU
+         8ojsmayw0NReO5596uAOaoeVnn+vpuX/mtnrIxDg=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37UDmssS019352
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 30 Aug 2023 08:48:54 -0500
+Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
+ Aug 2023 08:48:54 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 30 Aug 2023 08:48:54 -0500
+Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37UDmrha038381;
+        Wed, 30 Aug 2023 08:48:54 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>, <kamlesh@ti.com>
+Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v2 0/6] Add support for
+ Texas Instruments MCRC64 engine
+In-Reply-To: <20230822051710.GC1661@sol.localdomain>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230812030116.GF971@sol.localdomain>
+ <87h6owen39.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <20230822051710.GC1661@sol.localdomain>
+Date:   Wed, 30 Aug 2023 19:18:53 +0530
+Message-ID: <87v8cwd4je.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove the implementation of zlib-deflate because it is completely
-unused in the kernel.
+Eric Biggers <ebiggers@kernel.org> writes:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+> On Fri, Aug 18, 2023 at 02:36:34PM +0530, Kamlesh Gurudasani wrote:
+>> Hi Eric,
+>> 
+>> We are more interested in offload than performance, with splice system
+>> call and DMA mode in driver(will be implemented after this series gets
+>> merged), good amount of cpu cycles will be saved.
+>
+> So it's for power usage, then?  Or freeing up CPU for other tasks?
+>
 
- crypto/deflate.c |   61 +++++++++++++++----------------------------------------
- 1 file changed, 17 insertions(+), 44 deletions(-)
+It's for freeing up CPU for other tasks
 
-diff --git a/crypto/deflate.c b/crypto/deflate.c
-index b2a46f6dc961..6e31e0db0e86 100644
---- a/crypto/deflate.c
-+++ b/crypto/deflate.c
-@@ -39,24 +39,20 @@ struct deflate_ctx {
- 	struct z_stream_s decomp_stream;
- };
- 
--static int deflate_comp_init(struct deflate_ctx *ctx, int format)
-+static int deflate_comp_init(struct deflate_ctx *ctx)
- {
- 	int ret = 0;
- 	struct z_stream_s *stream = &ctx->comp_stream;
- 
- 	stream->workspace = vzalloc(zlib_deflate_workspacesize(
--				    MAX_WBITS, MAX_MEM_LEVEL));
-+				    -DEFLATE_DEF_WINBITS, MAX_MEM_LEVEL));
- 	if (!stream->workspace) {
- 		ret = -ENOMEM;
- 		goto out;
- 	}
--	if (format)
--		ret = zlib_deflateInit(stream, 3);
--	else
--		ret = zlib_deflateInit2(stream, DEFLATE_DEF_LEVEL, Z_DEFLATED,
--					-DEFLATE_DEF_WINBITS,
--					DEFLATE_DEF_MEMLEVEL,
--					Z_DEFAULT_STRATEGY);
-+	ret = zlib_deflateInit2(stream, DEFLATE_DEF_LEVEL, Z_DEFLATED,
-+				-DEFLATE_DEF_WINBITS, DEFLATE_DEF_MEMLEVEL,
-+				Z_DEFAULT_STRATEGY);
- 	if (ret != Z_OK) {
- 		ret = -EINVAL;
- 		goto out_free;
-@@ -68,7 +64,7 @@ static int deflate_comp_init(struct deflate_ctx *ctx, int format)
- 	goto out;
- }
- 
--static int deflate_decomp_init(struct deflate_ctx *ctx, int format)
-+static int deflate_decomp_init(struct deflate_ctx *ctx)
- {
- 	int ret = 0;
- 	struct z_stream_s *stream = &ctx->decomp_stream;
-@@ -78,10 +74,7 @@ static int deflate_decomp_init(struct deflate_ctx *ctx, int format)
- 		ret = -ENOMEM;
- 		goto out;
- 	}
--	if (format)
--		ret = zlib_inflateInit(stream);
--	else
--		ret = zlib_inflateInit2(stream, -DEFLATE_DEF_WINBITS);
-+	ret = zlib_inflateInit2(stream, -DEFLATE_DEF_WINBITS);
- 	if (ret != Z_OK) {
- 		ret = -EINVAL;
- 		goto out_free;
-@@ -105,21 +98,21 @@ static void deflate_decomp_exit(struct deflate_ctx *ctx)
- 	vfree(ctx->decomp_stream.workspace);
- }
- 
--static int __deflate_init(void *ctx, int format)
-+static int __deflate_init(void *ctx)
- {
- 	int ret;
- 
--	ret = deflate_comp_init(ctx, format);
-+	ret = deflate_comp_init(ctx);
- 	if (ret)
- 		goto out;
--	ret = deflate_decomp_init(ctx, format);
-+	ret = deflate_decomp_init(ctx);
- 	if (ret)
- 		deflate_comp_exit(ctx);
- out:
- 	return ret;
- }
- 
--static void *gen_deflate_alloc_ctx(struct crypto_scomp *tfm, int format)
-+static void *deflate_alloc_ctx(struct crypto_scomp *tfm)
- {
- 	struct deflate_ctx *ctx;
- 	int ret;
-@@ -128,7 +121,7 @@ static void *gen_deflate_alloc_ctx(struct crypto_scomp *tfm, int format)
- 	if (!ctx)
- 		return ERR_PTR(-ENOMEM);
- 
--	ret = __deflate_init(ctx, format);
-+	ret = __deflate_init(ctx);
- 	if (ret) {
- 		kfree(ctx);
- 		return ERR_PTR(ret);
-@@ -137,21 +130,11 @@ static void *gen_deflate_alloc_ctx(struct crypto_scomp *tfm, int format)
- 	return ctx;
- }
- 
--static void *deflate_alloc_ctx(struct crypto_scomp *tfm)
--{
--	return gen_deflate_alloc_ctx(tfm, 0);
--}
--
--static void *zlib_deflate_alloc_ctx(struct crypto_scomp *tfm)
--{
--	return gen_deflate_alloc_ctx(tfm, 1);
--}
--
- static int deflate_init(struct crypto_tfm *tfm)
- {
- 	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	return __deflate_init(ctx, 0);
-+	return __deflate_init(ctx);
- }
- 
- static void __deflate_exit(void *ctx)
-@@ -286,7 +269,7 @@ static struct crypto_alg alg = {
- 	.coa_decompress  	= deflate_decompress } }
- };
- 
--static struct scomp_alg scomp[] = { {
-+static struct scomp_alg scomp = {
- 	.alloc_ctx		= deflate_alloc_ctx,
- 	.free_ctx		= deflate_free_ctx,
- 	.compress		= deflate_scompress,
-@@ -296,17 +279,7 @@ static struct scomp_alg scomp[] = { {
- 		.cra_driver_name = "deflate-scomp",
- 		.cra_module	 = THIS_MODULE,
- 	}
--}, {
--	.alloc_ctx		= zlib_deflate_alloc_ctx,
--	.free_ctx		= deflate_free_ctx,
--	.compress		= deflate_scompress,
--	.decompress		= deflate_sdecompress,
--	.base			= {
--		.cra_name	= "zlib-deflate",
--		.cra_driver_name = "zlib-deflate-scomp",
--		.cra_module	 = THIS_MODULE,
--	}
--} };
-+};
- 
- static int __init deflate_mod_init(void)
- {
-@@ -316,7 +289,7 @@ static int __init deflate_mod_init(void)
- 	if (ret)
- 		return ret;
- 
--	ret = crypto_register_scomps(scomp, ARRAY_SIZE(scomp));
-+	ret = crypto_register_scomp(&scomp);
- 	if (ret) {
- 		crypto_unregister_alg(&alg);
- 		return ret;
-@@ -328,7 +301,7 @@ static int __init deflate_mod_init(void)
- static void __exit deflate_mod_fini(void)
- {
- 	crypto_unregister_alg(&alg);
--	crypto_unregister_scomps(scomp, ARRAY_SIZE(scomp));
-+	crypto_unregister_scomp(&scomp);
- }
- 
- subsys_initcall(deflate_mod_init);
+>> There is one more mode(auto mode) in mcrc64 which helps to verify crc64
+>> values against pre calculated crc64, saving the efforts of comparing in
+>> userspace.
+>
+> Is there any path forward to actually support this?
+>
+>> 
+>> Current generic implementation of crc64-iso(part of this series)
+>> gives 173 Mb/s of speed as opposed to mcrc64 which gives speed of 812
+>> Mb/s when tested with tcrypt.
+>
+> This doesn't answer my question, which to reiterate was:
+>
+>     How does performance compare to a properly optimized software CRC
+>     implementation on your platform, i.e. an implementation using carryless
+>     multiplication instructions (e.g. ARMv8 CE) if available on your platform,
+>     otherwise an implementation using the slice-by-8 or slice-by-16 method?
+>
+> The implementation you tested was slice-by-1.  Compared to that, it's common for
+> slice-by-8 to speed up CRCs by about 4 times and for folding with carryless
+> multiplication to speed up CRCs by 10-30 times, sometimes limited only by memory
+> bandwidth.  I don't know what specific results you would get on your specific
+> CPU and for this specific CRC, and you could certainly see something different
+> if you e.g. have some low-end embedded CPU.  But those are the typical results
+> I've seen for other CRCs on different CPUs.  So, a software implementation may
+> be more attractive than you realize.  It could very well be the case that a
+> PMULL based CRC implementation actually ends up with less CPU load than your
+> "hardware offload", when taking into syscall, algif_hash, and driver overhead...
+>
+> - Eric
+
+Hi Eric, thanks for your detailed and valuable inputs.
+
+As per your suggestion, we did some profiling. 
+
+Use case is to calculate crc32/crc64 for file input from user space.
+
+Instead of directly implementing PMULL based CRC64, we made first comparison between 
+Case 1.
+CRC32 (splice() + kernel space SW driver) 
+https://gist.github.com/ti-kamlesh/5be75dbde292e122135ddf795fad9f21
+
+Case 2.
+CRC32(mmap() + userspace armv8 crc32 instruction implementation)
+(tried read() as well to get contents of file, but that lost to mmap() so not mentioning number here)
+https://gist.github.com/ti-kamlesh/002df094dd522422c6cb62069e15c40d
+
+Case 3.
+CRC64 (splice() + MCRC64 HW)
+https://gist.github.com/ti-kamlesh/98b1fc36c9a7c3defcc2dced4136b8a0
+
+
+Overall, overhead of userspace + af_alg + driver in (Case 1) and ( Case 3) is ~0.025s, which is constant for any file size.
+This is calculated using real time to calculate crc  - driver time (time spend inside init() + update() +final()) = overhead ~0.025s    
+
+Here, if we consider similar numbers for crc64 PMULL implementation as crc32 (case 2) , we save good number of cpu cycles using mcrc64
+in case of files bigger than 5-10mb as most of the time is being spent in HW offload.
+
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+|                   |                             |                       |                        |                        |
+| File size         | 120mb(ideal size for us)    | 20mb                  | 15mb                   | 5mb                    |
++===================+=============================+=======================+========================+========================+
+|                   |                             |                       |                        |                        |
+| CRC32 (Case 1)    | Driver time 0.155s          | Driver time 0.0325s   | Driver time 0.019s     | Driver time 0.0062s    |
+|                   |    real time 0.18s          |    real time 0.06s    |    real time 0.04s     |    real time 0.03s     |
+|                   |    overhead 0.025s          |    overhead 0.025s    |    overhead 0.021s     |    overhead ~0.023s    |
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+|                   |                             |                       |                        |                        |
+| CRC32 (Case 2)    | Real time 0.30s             | Real time 0.05s       | Real time 0.04s        | Real time 0.02s        |
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+|                   |                             |                       |                        |                        |
+| CRC64 (Case 3)    | Driver time   0.385s        | Driver time 0.0665s   | Driver time 0.0515s    | Driver time 0.019s     |
+|                   |    real time 0.41s          |    real time 0.09s    |    real time 0.08s     |    real time 0.04s     |
+|                   |    overhead 0.025s          |    overhead 0.025s    |    overhead ~0.025s    |    overhead ~0.021s    |
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
