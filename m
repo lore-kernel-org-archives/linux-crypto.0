@@ -2,138 +2,169 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C5CC83F24
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF31C83F18
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242680AbjH3Sn4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:43:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42208 "EHLO
+        id S242666AbjH3Snw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:43:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243237AbjH3K1z (ORCPT
+        with ESMTP id S243839AbjH3Lv5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Aug 2023 06:27:55 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4087F4;
-        Wed, 30 Aug 2023 03:27:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1693391273; x=1724927273;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=HP9Iur1Q7Nq1MElrF98R8N/vWYvb9inNU3hcETlvDqs=;
-  b=0DEbjVD0Ynwt71Qq4H+p+zLN7MqP6Gw012cGUcOvvvq1GBdBtWoDaTbg
-   mcqZY+scVL8v58hXOQlw0rBnXo4k7nis44ak/7TMCSr2YqaUg2/r3RM0h
-   u0SS9IVogo6981ypkBsiDpZ+kAvMZwOW08e/7cbUJ9Y62HJg5ZtsGq06T
-   JBkqeUM/KzyLUQ8FFle39aBrXp/OkxX+tbOCXtcirKRjxwzP9UqmSueDu
-   ddV9//NzgHjHgjlRIlnkQEfyYvJ/cKTYI/x3osDqJQtfbiOiPz6uOlzhv
-   cm1JSwCQ0s9tiamQ5qQF3gnZWhcAMUnUz9bfKUOFmrALprIMiYUdvH/cE
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
-   d="asc'?scan'208";a="2012796"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Aug 2023 03:27:52 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Wed, 30 Aug 2023 03:27:21 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex02.mchp-main.com (10.10.85.144)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Wed, 30 Aug 2023 03:27:19 -0700
-Date:   Wed, 30 Aug 2023 11:26:37 +0100
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     <jiajie.ho@starfivetech.com>, <huan.feng@starfivetech.com>
-CC:     <herbert@gondor.apana.org.au>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <conor.dooley@microchip.com>,
-        <kernel@esmil.dk>, <linux-riscv@lists.infradead.org>,
-        <davidlt@rivosinc.com>
-Subject: starfive crypto list_add corruption
-Message-ID: <20230830-track-glutinous-39f536b4ced1@wendy>
+        Wed, 30 Aug 2023 07:51:57 -0400
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9D91BB;
+        Wed, 30 Aug 2023 04:51:54 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37UBpTFM070701;
+        Wed, 30 Aug 2023 06:51:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1693396289;
+        bh=gMOLJwOXNOhAvc5RONqLHk+5pNmuIPJLrheBybFhFIM=;
+        h=From:To:CC:Subject:In-Reply-To:References:Date;
+        b=iZqM6Avd9IBWZ1sRwAwnWV7xvEp6l2RFaarlcGUGTGoUuD2R8oD8W1qWYspEBT/8o
+         UMo1JNGZBYTuKp4LTxK/cSBoU+w8HQQNiqvGnjsiZWI9NGrE9owat7bpjmvT/zRSxQ
+         u4eKafROn3/BP2QFwvW6kCqFHJmSQyxdjHqJmYqw=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37UBpTkf050947
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 30 Aug 2023 06:51:29 -0500
+Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
+ Aug 2023 06:51:28 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 30 Aug 2023 06:51:29 -0500
+Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37UBpS8Q000383;
+        Wed, 30 Aug 2023 06:51:28 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>
+Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v2 0/6] Add support for
+ Texas Instruments MCRC64 engine
+In-Reply-To: <20230822051710.GC1661@sol.localdomain>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230812030116.GF971@sol.localdomain>
+ <87h6owen39.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <20230822051710.GC1661@sol.localdomain>
+Date:   Wed, 30 Aug 2023 17:21:27 +0530
+Message-ID: <87zg28d9z4.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="DM+rVJfmyKcOsa+w"
-Content-Disposition: inline
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---DM+rVJfmyKcOsa+w
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Eric Biggers <ebiggers@kernel.org> writes:
 
-Hi,
+> On Fri, Aug 18, 2023 at 02:36:34PM +0530, Kamlesh Gurudasani wrote:
+>> Hi Eric,
+>> 
+>> We are more interested in offload than performance, with splice system
+>> call and DMA mode in driver(will be implemented after this series gets
+>> merged), good amount of cpu cycles will be saved.
+>
+> So it's for power usage, then?  Or freeing up CPU for other tasks?
+It is for freeing CPU for other tasks
 
-There's been a report on the irc fedora-riscv irc of list_add corruption
-with the starfive crypto stuff:
-	list_add corruption. next->prev should be prev (ffffffff02f65320), but was=
- ffffffd8eef15848. (next=3Dffffffd8eef15840).
-	------------[ cut here ]------------
-	kernel BUG at lib/list_debug.c:29!
-	Kernel BUG [#1]
-	Modules linked in: jh7110_crypto spidev pcs_xpcs clk_starfive_jh7110_aon p=
-inctrl_starfive_jh7110_aon clk_starfive_jh7110_stg crypto_engine phylink dw=
-_mmc_starfive dw_mmc_pltfm clk_starfive_jh7110_vout phy_jh7110_pcie spi_
-	pl022 clk_starfive_jh7110_isp dw_mmc phy_jh7110_usb i2c_designware_platfor=
-m pinctrl_starfive_jh7110_sys i2c_designware_core sunrpc ip6_tables ip_tabl=
-es i2c_dev fuse                                                            =
-           =20
-	CPU: 2 PID: 53 Comm: kworker/u8:2 Not tainted 6.5.0-next-20230829 #13
-	Hardware name: StarFive VisionFive 2 v1.3B (DT)
-	Workqueue: events_unbound deferred_probe_work_func
-	epc : __list_add_valid_or_report+0x82/0x96
-	 ra : __list_add_valid_or_report+0x82/0x96
-	epc : ffffffff80640808 ra : ffffffff80640808 sp : ffffffc8002dbb10
-	 gp : ffffffff81f9ea48 tp : ffffffd8c0ac3a00 t0 : ffffffff80c8f5fc
-	 t1 : 0720072007200720 t2 : 206464615f747369 s0 : ffffffc8002dbb20
-	 s1 : ffffffd8ecf11040 a0 : 0000000000000075 a1 : ffffffd8fdd71a48
-	 a2 : ffffffd8fdd7e728 a3 : 0000000000000000 a4 : 0000000000000000
-	 a5 : 0000000000000000 a6 : ffffffff81fc3818 a7 : 0000000000000034
-	 s2 : ffffffd8eef15840 s3 : ffffffff02f65320 s4 : ffffffd8c02a3c10
-	 s5 : ffffffd8ecf11178 s6 : ffffffd8ecf11150 s7 : ffffffff02f65250
-	 s8 : ffffffff823953d8 s9 : ffffffff8109ba08 s10: ffffffd8c0154000
-	 s11: ffffffd8c0b1c540 t3 : ffffffd8c0161f00 t4 : ffffffd8c0161f00
-	 t5 : ffffffd8c0161000 t6 : ffffffc8002db918
-	status: 0000000200000120 badaddr: 0000000000000000 cause: 0000000000000003
-	[<ffffffff80640808>] __list_add_valid_or_report+0x82/0x96
-	[<ffffffff02df646c>] starfive_cryp_probe+0x1e0/0x4bc [jh7110_crypto]
-	[<ffffffff80835062>] platform_probe+0x5e/0xba
-	[<ffffffff8083205c>] really_probe+0xa0/0x35a
-	[<ffffffff80832398>] __driver_probe_device+0x82/0x140
-	[<ffffffff8083248e>] driver_probe_device+0x38/0xb6
-	[<ffffffff8083258e>] __device_attach_driver+0x82/0xe4
-	[<ffffffff8082fe90>] bus_for_each_drv+0x72/0xc8
-	[<ffffffff8083299e>] __device_attach+0x94/0x18a
-	[<ffffffff80832c92>] device_initial_probe+0x1a/0x22
-	[<ffffffff80830e9a>] bus_probe_device+0x96/0x98
-	[<ffffffff80831c6a>] deferred_probe_work_func+0xb2/0x102
-	[<ffffffff800542be>] process_one_work+0x18a/0x32a
-	[<ffffffff80054fe2>] worker_thread+0x2fc/0x44a
-	[<ffffffff8005e3e0>] kthread+0xc4/0xe4
-	[<ffffffff80003c12>] ret_from_fork+0xe/0x20
-	Code: 9002 86be 1517 0157 0513 b685 1097 0065 80e7 92a0 (9002) 1517=20
-	---[ end trace 0000000000000000 ]---
-	Kernel panic - not syncing: Fatal exception in interrupt
-	SMP: stopping secondary CPUs
-	---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+>
+>> There is one more mode(auto mode) in mcrc64 which helps to verify crc64
+>> values against pre calculated crc64, saving the efforts of comparing in
+>> userspace.
+>
+> Is there any path forward to actually support this?
+>
+>> 
+>> Current generic implementation of crc64-iso(part of this series)
+>> gives 173 Mb/s of speed as opposed to mcrc64 which gives speed of 812
+>> Mb/s when tested with tcrypt.
+>
+> This doesn't answer my question, which to reiterate was:
+>
+>     How does performance compare to a properly optimized software CRC
+>     implementation on your platform, i.e. an implementation using carryless
+>     multiplication instructions (e.g. ARMv8 CE) if available on your platform,
+>     otherwise an implementation using the slice-by-8 or slice-by-16 method?
+>
+> The implementation you tested was slice-by-1.  Compared to that, it's common for
+> slice-by-8 to speed up CRCs by about 4 times and for folding with carryless
+> multiplication to speed up CRCs by 10-30 times, sometimes limited only by memory
+> bandwidth.  I don't know what specific results you would get on your specific
+> CPU and for this specific CRC, and you could certainly see something different
+> if you e.g. have some low-end embedded CPU.  But those are the typical results
+> I've seen for other CRCs on different CPUs.  So, a software implementation may
+> be more attractive than you realize.  It could very well be the case that a
+> PMULL based CRC implementation actually ends up with less CPU load than your
+> "hardware offload", when taking into syscall, algif_hash, and driver overhead...
+>
+> - Eric
+Hi Eric, thanks for your detailed and valuable inputs.
 
-I feel like this isn't the first report I saw, but the other might've
-been for the equivalent driver in the vendor tree & I probably didn't
-pay any attention to.
+As per your suggestion, we did some profiling. 
 
-Thanks,
-Conor.
+Use case is to calculate crc32/crc64 for file input from user space.
 
---DM+rVJfmyKcOsa+w
-Content-Type: application/pgp-signature; name="signature.asc"
+Instead of directly implementing PMULL based CRC64, we made first comparison between 
+Case 1.
+CRC32 (splice() + kernel space SW driver) 
+https://gist.github.com/ti-kamlesh/5be75dbde292e122135ddf795fad9f21
 
------BEGIN PGP SIGNATURE-----
+Case 2.
+CRC32(mmap() + userspace armv8 crc32 instruction implementation)
+(tried read() as well to get contents of file, but that lost to mmap() so not mentioning number here)
+https://gist.github.com/ti-kamlesh/002df094dd522422c6cb62069e15c40d
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZO8ZXQAKCRB4tDGHoIJi
-0uWyAQDLG+15QTN5S4Z0wIHbcqLoIoh3iffMQHeyCU0L99Wz3gD/Q11hJJkZxo1b
-DU0aa6xvaC+lmR5QVnU667BbHAtoew8=
-=+fCB
------END PGP SIGNATURE-----
+Case 3.
+CRC64 (splice() + MCRC64 HW)
+https://gist.github.com/ti-kamlesh/98b1fc36c9a7c3defcc2dced4136b8a0
 
---DM+rVJfmyKcOsa+w--
+
+Overall, overhead of userspace + af_alg + driver in (Case 1) and
+( Case 3) is ~0.025s, which is constant for any file size.
+This is calculated using real time to calculate crc  -
+driver time (time spend inside init() + update() +final()) = overhead ~0.025s    
+
+
+
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+|                   |                             |                       |                        |                        |
+| File size         | 120mb(ideal size for us)    | 20mb                  | 15mb                   | 5mb                    |
++===================+=============================+=======================+========================+========================+
+|                   |                             |                       |                        |                        |
+| CRC32 (Case 1)    | Driver time 0.155s          | Driver time 0.0325s   | Driver time 0.019s     | Driver time 0.0062s    |
+|                   |    real time 0.18s          |    real time 0.06s    |    real time 0.04s     |    real time 0.03s     |
+|                   |    overhead 0.025s          |    overhead 0.025s    |    overhead 0.021s     |    overhead ~0.023s    |
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+|                   |                             |                       |                        |                        |
+| CRC32 (Case 2)    | Real time 0.30s             | Real time 0.05s       | Real time 0.04s        | Real time 0.02s        |
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+|                   |                             |                       |                        |                        |
+| CRC64 (Case 3)    | Driver time   0.385s        | Driver time 0.0665s   | Driver time 0.0515s    | Driver time 0.019s     |
+|                   |    real time 0.41s          |    real time 0.09s    |    real time 0.08s     |    real time 0.04s     |
+|                   |    overhead 0.025s          |    overhead 0.025s    |    overhead ~0.025s    |    overhead ~0.021s    |
++-------------------+-----------------------------+-----------------------+------------------------+------------------------+
+
+Here, if we consider similar numbers for crc64 PMULL implementation as
+crc32 (case 2) , we save good number of cpu cycles using mcrc64
+in case of files bigger than 5-10mb as most of the time is being spent in HW offload.
+
+Regards,
+Kamlesh
