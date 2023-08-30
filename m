@@ -2,261 +2,158 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70E2C83F1A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8041C6FA8F
 	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240243AbjH3SoM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:44:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56940 "EHLO
+        id S240246AbjH3SoO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:44:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245138AbjH3Oe5 (ORCPT
+        with ESMTP id S242297AbjH3HzD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Aug 2023 10:34:57 -0400
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A9F193
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 07:34:53 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37UEYqcU068591
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 09:34:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1693406092;
-        bh=vo3Q+oTgAa6Q6IY+dbZSOpBcaz7iWaDf3Tmtz5pko+8=;
-        h=From:To:CC:Subject:In-Reply-To:References:Date;
-        b=OTK3igQOrSfigqI3wr3YFJCzdPqeKNwNNBWSOevvNZGnufpH3Hmj0Y0nG8mKvFciQ
-         eJkgyYDSUs6M4NnV3gyMNzBWEpgQz3QQ+pNKHz6BRlS4RKH/V1tpeotTLRsNyjIVyx
-         gd/l+T8r8g/iY8SojeCaPsaSbJJAvcRigBNOCD3k=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37UEYqWF057437
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL)
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 09:34:52 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
- Aug 2023 09:34:52 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 30 Aug 2023 09:34:52 -0500
-Received: from localhost (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37UEYpx6081510
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 09:34:51 -0500
-From:   Kamlesh Gurudasani <kamlesh@ti.com>
-CC:     <linux-crypto@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v2 0/6] Add support for
- Texas Instruments MCRC64 engine
-In-Reply-To: <20230822051710.GC1661@sol.localdomain>
-References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
- <20230812030116.GF971@sol.localdomain>
- <87h6owen39.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <20230822051710.GC1661@sol.localdomain>
-Date:   Wed, 30 Aug 2023 20:04:51 +0530
-Message-ID: <87sf80d2es.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+        Wed, 30 Aug 2023 03:55:03 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC99193
+        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 00:54:59 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RbGjV64ZnzVkWn;
+        Wed, 30 Aug 2023 15:52:30 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 30 Aug
+ 2023 15:54:56 +0800
+From:   Jinjie Ruan <ruanjinjie@huawei.com>
+To:     <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
+        <damian.muszynski@intel.com>, <andriy.shevchenko@linux.intel.com>,
+        <shashank.gupta@intel.com>, <tom.zanussi@linux.intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+CC:     <ruanjinjie@huawei.com>
+Subject: [PATCH -next] crypto: qat - Use list_for_each_entry() helper
+Date:   Wed, 30 Aug 2023 15:54:51 +0800
+Message-ID: <20230830075451.293379-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-To:     unlisted-recipients:; (no To-header on input)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> writes:
+Convert list_for_each() to list_for_each_entry() so that the list_itr
+list_head pointer and list_entry() call are no longer needed, which
+can reduce a few lines of code. No functional changed.
 
-> On Fri, Aug 18, 2023 at 02:36:34PM +0530, Kamlesh Gurudasani wrote:
->> Hi Eric,
->>=20
->> We are more interested in offload than performance, with splice system
->> call and DMA mode in driver(will be implemented after this series gets
->> merged), good amount of cpu cycles will be saved.
->
-> So it's for power usage, then?  Or freeing up CPU for other tasks?
->
-It's for freeing CPU fpr other tasks
->> There is one more mode(auto mode) in mcrc64 which helps to verify crc64
->> values against pre calculated crc64, saving the efforts of comparing in
->> userspace.
->
-> Is there any path forward to actually support this?
->
->>=20
->> Current generic implementation of crc64-iso(part of this series)
->> gives 173 Mb/s of speed as opposed to mcrc64 which gives speed of 812
->> Mb/s when tested with tcrypt.
->
-> This doesn't answer my question, which to reiterate was:
->
->     How does performance compare to a properly optimized software CRC
->     implementation on your platform, i.e. an implementation using carryle=
-ss
->     multiplication instructions (e.g. ARMv8 CE) if available on your plat=
-form,
->     otherwise an implementation using the slice-by-8 or slice-by-16 metho=
-d?
->
-> The implementation you tested was slice-by-1.  Compared to that, it's com=
-mon for
-> slice-by-8 to speed up CRCs by about 4 times and for folding with carryle=
-ss
-> multiplication to speed up CRCs by 10-30 times, sometimes limited only by=
- memory
-> bandwidth.  I don't know what specific results you would get on your spec=
-ific
-> CPU and for this specific CRC, and you could certainly see something diff=
-erent
-> if you e.g. have some low-end embedded CPU.  But those are the typical re=
-sults
-> I've seen for other CRCs on different CPUs.  So, a software implementatio=
-n may
-> be more attractive than you realize.  It could very well be the case that=
- a
-> PMULL based CRC implementation actually ends up with less CPU load than y=
-our
-> "hardware offload", when taking into syscall, algif_hash, and driver over=
-head...
->
-> - Eric
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+ .../crypto/intel/qat/qat_common/adf_init.c    | 24 +++++--------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-Hi Eric, thanks for your detailed and valuable inputs.
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
+index 89001fe92e76..79a81e25de97 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_init.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
+@@ -61,7 +61,6 @@ int adf_service_unregister(struct service_hndl *service)
+ static int adf_dev_init(struct adf_accel_dev *accel_dev)
+ {
+ 	struct service_hndl *service;
+-	struct list_head *list_itr;
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+ 	int ret;
+ 
+@@ -137,8 +136,7 @@ static int adf_dev_init(struct adf_accel_dev *accel_dev)
+ 	 * This is to facilitate any ordering dependencies between services
+ 	 * prior to starting any of the accelerators.
+ 	 */
+-	list_for_each(list_itr, &service_table) {
+-		service = list_entry(list_itr, struct service_hndl, list);
++	list_for_each_entry(service, &service_table, list) {
+ 		if (service->event_hld(accel_dev, ADF_EVENT_INIT)) {
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"Failed to initialise service %s\n",
+@@ -165,7 +163,6 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
+ {
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+ 	struct service_hndl *service;
+-	struct list_head *list_itr;
+ 	int ret;
+ 
+ 	set_bit(ADF_STATUS_STARTING, &accel_dev->status);
+@@ -209,8 +206,7 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
+ 
+ 	adf_heartbeat_start(accel_dev);
+ 
+-	list_for_each(list_itr, &service_table) {
+-		service = list_entry(list_itr, struct service_hndl, list);
++	list_for_each_entry(service, &service_table, list) {
+ 		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"Failed to start service %s\n",
+@@ -259,7 +255,6 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
+ {
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+ 	struct service_hndl *service;
+-	struct list_head *list_itr;
+ 	bool wait = false;
+ 	int ret;
+ 
+@@ -280,8 +275,7 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
+ 	if (!list_empty(&accel_dev->compression_list))
+ 		qat_comp_algs_unregister();
+ 
+-	list_for_each(list_itr, &service_table) {
+-		service = list_entry(list_itr, struct service_hndl, list);
++	list_for_each_entry(service, &service_table, list) {
+ 		if (!test_bit(accel_dev->accel_id, service->start_status))
+ 			continue;
+ 		ret = service->event_hld(accel_dev, ADF_EVENT_STOP);
+@@ -318,7 +312,6 @@ static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
+ {
+ 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
+ 	struct service_hndl *service;
+-	struct list_head *list_itr;
+ 
+ 	if (!hw_data) {
+ 		dev_err(&GET_DEV(accel_dev),
+@@ -340,8 +333,7 @@ static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
+ 				  &accel_dev->status);
+ 	}
+ 
+-	list_for_each(list_itr, &service_table) {
+-		service = list_entry(list_itr, struct service_hndl, list);
++	list_for_each_entry(service, &service_table, list) {
+ 		if (!test_bit(accel_dev->accel_id, service->init_status))
+ 			continue;
+ 		if (service->event_hld(accel_dev, ADF_EVENT_SHUTDOWN))
+@@ -378,10 +370,8 @@ static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
+ int adf_dev_restarting_notify(struct adf_accel_dev *accel_dev)
+ {
+ 	struct service_hndl *service;
+-	struct list_head *list_itr;
+ 
+-	list_for_each(list_itr, &service_table) {
+-		service = list_entry(list_itr, struct service_hndl, list);
++	list_for_each_entry(service, &service_table, list) {
+ 		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTING))
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"Failed to restart service %s.\n",
+@@ -393,10 +383,8 @@ int adf_dev_restarting_notify(struct adf_accel_dev *accel_dev)
+ int adf_dev_restarted_notify(struct adf_accel_dev *accel_dev)
+ {
+ 	struct service_hndl *service;
+-	struct list_head *list_itr;
+ 
+-	list_for_each(list_itr, &service_table) {
+-		service = list_entry(list_itr, struct service_hndl, list);
++	list_for_each_entry(service, &service_table, list) {
+ 		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTED))
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"Failed to restart service %s.\n",
+-- 
+2.34.1
 
-As per your suggestion, we did some profiling.=20
-
-Use case is to calculate crc32/crc64 for file input from user space.
-
-Instead of directly implementing PMULL based CRC64, we made first compariso=
-n between=20
-Case 1.
-CRC32 (splice() + kernel space SW driver)=20
-https://gist.github.com/ti-kamlesh/5be75dbde292e122135ddf795fad9f21
-
-Case 2.
-CRC32(mmap() + userspace armv8 crc32 instruction implementation)
-(tried read() as well to get contents of file, but that lost to mmap() so n=
-ot mentioning number here)
-https://gist.github.com/ti-kamlesh/002df094dd522422c6cb62069e15c40d
-
-Case 3.
-CRC64 (splice() + MCRC64 HW)
-https://gist.github.com/ti-kamlesh/98b1fc36c9a7c3defcc2dced4136b8a0
-
-
-Overall, overhead of userspace + af_alg + driver in (Case 1) and ( Case 3) =
-is ~0.025s, which is constant for any file size.
-This is calculated using real time to calculate crc  - driver time (time sp=
-end inside init() + update() +final()) =3D overhead ~0.025s=20=20=20=20
-
-Here, if we consider similar numbers for crc64 PMULL implementation as crc3=
-2 (case 2) , we save good number of cpu cycles using mcrc64
-in case of files bigger than 5-10mb as most of the time is being spent
-in HW offload.
-
-=E2=95=94=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A6=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=A6=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A6=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A6=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=97
-=E2=95=91                   =E2=95=91                             =E2=95=91=
-                       =E2=95=91                        =E2=95=91          =
-              =E2=95=91
-=E2=95=91 File size         =E2=95=91 120mb(ideal size for us)    =E2=95=91=
- 20mb                  =E2=95=91 15mb                   =E2=95=91 5mb      =
-              =E2=95=91
-=E2=95=A0=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=AC=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A3
-=E2=95=91                   =E2=95=91                             =E2=95=91=
-                       =E2=95=91                        =E2=95=91          =
-              =E2=95=91
-=E2=95=91 CRC32 (Case 1)    =E2=95=91 Driver time 0.155s          =E2=95=91=
- Driver time 0.0325s   =E2=95=91 Driver time 0.019s     =E2=95=91 Driver ti=
-me 0.0062s    =E2=95=91
-=E2=95=91                   =E2=95=91    real time 0.18s          =E2=95=91=
-    real time 0.06s    =E2=95=91    real time 0.04s     =E2=95=91    real t=
-ime 0.03s     =E2=95=91
-=E2=95=91                   =E2=95=91    overhead 0.025s          =E2=95=91=
-    overhead 0.025s    =E2=95=91    overhead 0.021s     =E2=95=91    overhe=
-ad ~0.023s    =E2=95=91
-=E2=95=A0=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=AC=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A3
-=E2=95=91                   =E2=95=91                             =E2=95=91=
-                       =E2=95=91                        =E2=95=91          =
-              =E2=95=91
-=E2=95=91 CRC32 (Case 2)    =E2=95=91 Real time 0.30s             =E2=95=91=
- Real time 0.05s       =E2=95=91 Real time 0.04s        =E2=95=91 Real time=
- 0.02s        =E2=95=91
-=E2=95=A0=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=AC=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=AC=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A3
-=E2=95=91                   =E2=95=91                             =E2=95=91=
-                       =E2=95=91                        =E2=95=91          =
-              =E2=95=91
-=E2=95=91 CRC64 (Case 3)    =E2=95=91 Driver time   0.385s        =E2=95=91=
- Driver time 0.0665s   =E2=95=91 Driver time 0.0515s    =E2=95=91 Driver ti=
-me 0.019s     =E2=95=91
-=E2=95=91                   =E2=95=91    real time 0.41s          =E2=95=91=
-    real time 0.09s    =E2=95=91    real time 0.08s     =E2=95=91    real t=
-ime 0.04s     =E2=95=91
-=E2=95=91                   =E2=95=91    overhead 0.025s          =E2=95=91=
-    overhead 0.025s    =E2=95=91    overhead ~0.025s    =E2=95=91    overhe=
-ad ~0.021s    =E2=95=91
-=E2=95=9A=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A9=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=
-=E2=95=A9=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A9=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=A9=
-=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=
-=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=
-=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=90=E2=95=9D
