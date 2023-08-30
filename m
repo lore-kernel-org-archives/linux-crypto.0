@@ -2,151 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6072CC83F22
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C5CC83F24
 	for <linux-crypto@archiver.kernel.org>; Wed, 30 Aug 2023 18:46:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234954AbjH3Snz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52614 "EHLO
+        id S242680AbjH3Sn4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 30 Aug 2023 14:43:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243734AbjH3Lhv (ORCPT
+        with ESMTP id S243237AbjH3K1z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Aug 2023 07:37:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2030F4
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 04:37:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3879C61456
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Aug 2023 11:37:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63FA3C433C8;
-        Wed, 30 Aug 2023 11:37:46 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mLRxTAV5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1693395463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L27v8IkqK5qUzSwHUP0sLRyipVjz6POq64H7/1njluk=;
-        b=mLRxTAV5OdX2zQUA3PIfWPhnnCbrmQTaBUo6kZdID659hMyt2luMLN7fpuMiZAVF7IPNYY
-        J2ABzO57hZYRG6NKivnlJh5+MfDgHUPJvrGg9kzyxaw4mizvOiUte0+KNOYe1+M99Ru44n
-        QrK+o4+DjVvWyoGwH4C9iAgXEllqnN0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e0905308 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 30 Aug 2023 11:37:42 +0000 (UTC)
-Date:   Wed, 30 Aug 2023 13:37:39 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Phil Elwell <phil@raspberrypi.com>
-Cc:     Thorsten Leemhuis <regressions@leemhuis.info>,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-crypto@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Andrei Coardos <aboutphysycs@gmail.com>,
-        Martin Kaiser <martin@kaiser.cx>,
-        Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: bcm2835-rng: Performance regression since 96cb9d055445
-Message-ID: <ZO8qAyNSKVkHWfjS@zx2c4.com>
-References: <bc97ece5-44a3-4c4e-77da-2db3eb66b128@gmx.net>
- <ZOiP2H_6pfhKN3fj@zx2c4.com>
- <20e3c73c-7736-b010-516a-6618c88d8dad@gmx.net>
- <2a0fd8ef-8b43-b769-b4aa-c27405ead5e7@leemhuis.info>
- <CAMEGJJ1c8=gxK=2C3pg7d0dFonNQqiBRM2PGRDBoQ_6=QP8uMg@mail.gmail.com>
+        Wed, 30 Aug 2023 06:27:55 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4087F4;
+        Wed, 30 Aug 2023 03:27:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1693391273; x=1724927273;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=HP9Iur1Q7Nq1MElrF98R8N/vWYvb9inNU3hcETlvDqs=;
+  b=0DEbjVD0Ynwt71Qq4H+p+zLN7MqP6Gw012cGUcOvvvq1GBdBtWoDaTbg
+   mcqZY+scVL8v58hXOQlw0rBnXo4k7nis44ak/7TMCSr2YqaUg2/r3RM0h
+   u0SS9IVogo6981ypkBsiDpZ+kAvMZwOW08e/7cbUJ9Y62HJg5ZtsGq06T
+   JBkqeUM/KzyLUQ8FFle39aBrXp/OkxX+tbOCXtcirKRjxwzP9UqmSueDu
+   ddV9//NzgHjHgjlRIlnkQEfyYvJ/cKTYI/x3osDqJQtfbiOiPz6uOlzhv
+   cm1JSwCQ0s9tiamQ5qQF3gnZWhcAMUnUz9bfKUOFmrALprIMiYUdvH/cE
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
+   d="asc'?scan'208";a="2012796"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Aug 2023 03:27:52 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 30 Aug 2023 03:27:21 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex02.mchp-main.com (10.10.85.144)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Wed, 30 Aug 2023 03:27:19 -0700
+Date:   Wed, 30 Aug 2023 11:26:37 +0100
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     <jiajie.ho@starfivetech.com>, <huan.feng@starfivetech.com>
+CC:     <herbert@gondor.apana.org.au>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <conor.dooley@microchip.com>,
+        <kernel@esmil.dk>, <linux-riscv@lists.infradead.org>,
+        <davidlt@rivosinc.com>
+Subject: starfive crypto list_add corruption
+Message-ID: <20230830-track-glutinous-39f536b4ced1@wendy>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="DM+rVJfmyKcOsa+w"
 Content-Disposition: inline
-In-Reply-To: <CAMEGJJ1c8=gxK=2C3pg7d0dFonNQqiBRM2PGRDBoQ_6=QP8uMg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 30, 2023 at 11:44:31AM +0100, Phil Elwell wrote:
-> Hi all,
-> 
-> On Wed, 30 Aug 2023 at 11:38, Thorsten Leemhuis
-> <regressions@leemhuis.info> wrote:
-> >
-> > /me gets the impression he has to chime in here
-> >
-> > On 25.08.23 14:14, Stefan Wahren wrote:
-> > > Am 25.08.23 um 13:26 schrieb Jason A. Donenfeld:
-> > >> On Fri, Aug 25, 2023 at 01:14:55PM +0200, Stefan Wahren wrote:
-> > >
-> > >>> i didn't find the time to fix the performance regression in bcm2835-rng
-> > >>> which affects Raspberry Pi 0 - 3, so report it at least. AFAIK the first
-> > >>> report about this issue was here [1] and identified the offending
-> > >>> commit:
-> > >>>
-> > >>> 96cb9d055445 ("hwrng: bcm2835 - use hwrng_msleep() instead of
-> > >>>    cpu_relax()")
-> > >>>
-> > >>> #regzbot introduced: 96cb9d055445
-> > >>>
-> > >>> I was able to reproduce this issue with a Raspberry Pi 3 B+ on Linux
-> > >>> 6.5-rc6 (arm64/defconfig).
-> > >>>
-> > >>> Before:
-> > >>> time sudo dd if=/dev/hwrng of=/dev/urandom count=1 bs=4096 status=none
-> > >>>
-> > >>> real    3m29,002s
-> > >>> user    0m0,018s
-> > >>> sys    0m0,054s
-> > >> That's not surprising. But also, does it matter? That script has
-> > >> *always* been wrong. Writing to /dev/urandom like that has *never*
-> > >> ensured that those bytes are taken into account immediately after. It's
-> > >> just not how that interface works. So any assumptions based on that are
-> > >> bogus, and that line effectively does nothing.
-> > >>
-> > >> Fortunately, however, the kernel itself incorporates hwrng output into
-> > >> the rng pool, so you don't need to think about doing it yourself.
-> > >>
-> > >> So go ahead and remove that line from your script.
-> > >
-> > > Thanks for your explanation. Unfortunately this isn't my script.
-> >
-> > And I assume it's in the standard install of the RpiOS or similarly
-> > widespread?
-> >
-> > > I'm
-> > > just a former BCM2835 maintainer and interested that more user stick to
-> > > the mainline kernel instead of the vendor ones. I will try to report the
-> > > script owner.
-> >
-> > thx
-> >
-> > >> Now as far as the "regression" goes, we've made an already broken
-> > >> userspace script take 3 minutes longer than usual, but it still does
-> > >> eventually complete, so it's not making boot impossible or something.
-> > >> How this relates to the "don't break userspace" rule might be a matter
-> > >> of opinion.
-> >
-> > Yup, but I'd say it bad enough to qualify as regression. If it would be
-> > something like 10 seconds it might be something different, but 3 minutes
-> > will look like a hang to many people, and I'm pretty sure that's
-> > something Linus doesn't want to see. But let's not involve him for now
-> > and first try to solve this differently.
-> >
-> > >> If you think it does, maybe send a patch to Herbert reducing
-> > >> that sleep from 1000 to 100 and stating why with my background above,
-> > >> and see if he agrees it's worth fixing.
-> >
-> > Stefan, did you try to see how long it would take when the sleep time is
-> > reduced? I guess that might be our best chance to solve this, as
-> > reverting the culprit afaics would lead to regressions for others.
-> >
-> > /me wonders if the sleep time could even be reduced futher that 100
-> 
-> FYI, this is how I tackled it downstream:
-> 
-> https://github.com/raspberrypi/linux/commit/6a825ed68f75bd768e31110ba825b75c5c09cf2d
-> 
-> I can send a patch if it looks appropriate for upstream use.
-> 
-> Phil
+--DM+rVJfmyKcOsa+w
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Upstream discussion: https://lore.kernel.org/all/ZOoe0lOR9zpcAw5I@zx2c4.com/
+Hi,
+
+There's been a report on the irc fedora-riscv irc of list_add corruption
+with the starfive crypto stuff:
+	list_add corruption. next->prev should be prev (ffffffff02f65320), but was=
+ ffffffd8eef15848. (next=3Dffffffd8eef15840).
+	------------[ cut here ]------------
+	kernel BUG at lib/list_debug.c:29!
+	Kernel BUG [#1]
+	Modules linked in: jh7110_crypto spidev pcs_xpcs clk_starfive_jh7110_aon p=
+inctrl_starfive_jh7110_aon clk_starfive_jh7110_stg crypto_engine phylink dw=
+_mmc_starfive dw_mmc_pltfm clk_starfive_jh7110_vout phy_jh7110_pcie spi_
+	pl022 clk_starfive_jh7110_isp dw_mmc phy_jh7110_usb i2c_designware_platfor=
+m pinctrl_starfive_jh7110_sys i2c_designware_core sunrpc ip6_tables ip_tabl=
+es i2c_dev fuse                                                            =
+           =20
+	CPU: 2 PID: 53 Comm: kworker/u8:2 Not tainted 6.5.0-next-20230829 #13
+	Hardware name: StarFive VisionFive 2 v1.3B (DT)
+	Workqueue: events_unbound deferred_probe_work_func
+	epc : __list_add_valid_or_report+0x82/0x96
+	 ra : __list_add_valid_or_report+0x82/0x96
+	epc : ffffffff80640808 ra : ffffffff80640808 sp : ffffffc8002dbb10
+	 gp : ffffffff81f9ea48 tp : ffffffd8c0ac3a00 t0 : ffffffff80c8f5fc
+	 t1 : 0720072007200720 t2 : 206464615f747369 s0 : ffffffc8002dbb20
+	 s1 : ffffffd8ecf11040 a0 : 0000000000000075 a1 : ffffffd8fdd71a48
+	 a2 : ffffffd8fdd7e728 a3 : 0000000000000000 a4 : 0000000000000000
+	 a5 : 0000000000000000 a6 : ffffffff81fc3818 a7 : 0000000000000034
+	 s2 : ffffffd8eef15840 s3 : ffffffff02f65320 s4 : ffffffd8c02a3c10
+	 s5 : ffffffd8ecf11178 s6 : ffffffd8ecf11150 s7 : ffffffff02f65250
+	 s8 : ffffffff823953d8 s9 : ffffffff8109ba08 s10: ffffffd8c0154000
+	 s11: ffffffd8c0b1c540 t3 : ffffffd8c0161f00 t4 : ffffffd8c0161f00
+	 t5 : ffffffd8c0161000 t6 : ffffffc8002db918
+	status: 0000000200000120 badaddr: 0000000000000000 cause: 0000000000000003
+	[<ffffffff80640808>] __list_add_valid_or_report+0x82/0x96
+	[<ffffffff02df646c>] starfive_cryp_probe+0x1e0/0x4bc [jh7110_crypto]
+	[<ffffffff80835062>] platform_probe+0x5e/0xba
+	[<ffffffff8083205c>] really_probe+0xa0/0x35a
+	[<ffffffff80832398>] __driver_probe_device+0x82/0x140
+	[<ffffffff8083248e>] driver_probe_device+0x38/0xb6
+	[<ffffffff8083258e>] __device_attach_driver+0x82/0xe4
+	[<ffffffff8082fe90>] bus_for_each_drv+0x72/0xc8
+	[<ffffffff8083299e>] __device_attach+0x94/0x18a
+	[<ffffffff80832c92>] device_initial_probe+0x1a/0x22
+	[<ffffffff80830e9a>] bus_probe_device+0x96/0x98
+	[<ffffffff80831c6a>] deferred_probe_work_func+0xb2/0x102
+	[<ffffffff800542be>] process_one_work+0x18a/0x32a
+	[<ffffffff80054fe2>] worker_thread+0x2fc/0x44a
+	[<ffffffff8005e3e0>] kthread+0xc4/0xe4
+	[<ffffffff80003c12>] ret_from_fork+0xe/0x20
+	Code: 9002 86be 1517 0157 0513 b685 1097 0065 80e7 92a0 (9002) 1517=20
+	---[ end trace 0000000000000000 ]---
+	Kernel panic - not syncing: Fatal exception in interrupt
+	SMP: stopping secondary CPUs
+	---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
+
+I feel like this isn't the first report I saw, but the other might've
+been for the equivalent driver in the vendor tree & I probably didn't
+pay any attention to.
+
+Thanks,
+Conor.
+
+--DM+rVJfmyKcOsa+w
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZO8ZXQAKCRB4tDGHoIJi
+0uWyAQDLG+15QTN5S4Z0wIHbcqLoIoh3iffMQHeyCU0L99Wz3gD/Q11hJJkZxo1b
+DU0aa6xvaC+lmR5QVnU667BbHAtoew8=
+=+fCB
+-----END PGP SIGNATURE-----
+
+--DM+rVJfmyKcOsa+w--
