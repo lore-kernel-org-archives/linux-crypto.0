@@ -2,101 +2,166 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C943C83F01
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 09:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75894C83F10
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 11:18:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241493AbjHaJjS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Aug 2023 05:39:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
+        id S242665AbjHaLS1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Aug 2023 07:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230428AbjHaJjR (ORCPT
+        with ESMTP id S242946AbjHaLS0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Aug 2023 05:39:17 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D605CCF7;
-        Thu, 31 Aug 2023 02:39:10 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rbwxc2TsyztS9b;
-        Thu, 31 Aug 2023 17:35:16 +0800 (CST)
-Received: from [10.67.121.249] (10.67.121.249) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 31 Aug 2023 17:39:08 +0800
-Message-ID: <aa6c291a-d9f0-1e2a-63df-e53dfcefba53@huawei.com>
-Date:   Thu, 31 Aug 2023 17:39:08 +0800
+        Thu, 31 Aug 2023 07:18:26 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DAD8CFC;
+        Thu, 31 Aug 2023 04:18:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EBF38B82261;
+        Thu, 31 Aug 2023 11:18:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 374C3C433C9;
+        Thu, 31 Aug 2023 11:18:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693480700;
+        bh=7XKjjJur6IISUsZtGWtOGeI27/EKhAdS31tOASxp7Ss=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=nZ9zSFKAnT26GUSPehFD44ATzfOwZSAjSHXrFhHPX2LQhvLD2tjEL+aP6UthSyvNJ
+         7bjbHhpLZUa/PcrUjw7qEqxWtO8rG25C8/kWWqv1sMUySOTSahIeRsEpzkZAvFbfG4
+         dI3kSoZgY/dD4bnEW39s+22ZYwOhSJACR7EVuFUlCnQp3k5zxagURXEhCuM4CPuadP
+         JfJIjJNIBanjRc7s+8pDpEY3iSdpNO8cP/nHUhSWYvrw9HIsQ8BTzNoeh+V8wZkmrC
+         POiCuqMfLjmrLwGJRvq1DdYbW5YrI49DIv3bKJZfXTyEPBwnrvPHivXwXwuCUG97j3
+         28nd67Be4dIGw==
+Message-ID: <88708464-cc1c-c31d-5cb0-171a41dec936@kernel.org>
+Date:   Thu, 31 Aug 2023 13:18:11 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 1/4] crypto: hisilicon/zip - Remove driver
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Linus Torvalds <torvalds@linux-foundation.org>, <ardb@kernel.org>,
-        <kees@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <enlin.mu@unisoc.com>, <ebiggers@google.com>,
-        <gpiccoli@igalia.com>, <willy@infradead.org>,
-        <yunlong.xing@unisoc.com>, <yuxiaozhang@google.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        <qat-linux@intel.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-References: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
- <E1qbI7v-009Bvf-CA@formenos.hmeau.com>
- <8a73f9cb-b1e8-3b54-4b6c-7cfb19244560@huawei.com>
- <ZPAoRvMYbsoNfnLk@gondor.apana.org.au>
-From:   Yang Shen <shenyang39@huawei.com>
-In-Reply-To: <ZPAoRvMYbsoNfnLk@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.121.249]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
+ <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
+ <ZOiEHCsjBCL04Z3x@gondor.apana.org.au> <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
+ <ZOx1SOBKbmdIvz+b@gondor.apana.org.au> <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
+ <ZO3F8AgOS/NnVaeU@gondor.apana.org.au> <ZO375Wg0+nTCgCIJ@smile.fi.intel.com>
+ <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
+From:   Alejandro Colomar <alx@kernel.org>
+Organization: Linux
+In-Reply-To: <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------hD0Xi3oWq1ZQW10n0Qk60FT0"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------hD0Xi3oWq1ZQW10n0Qk60FT0
+Content-Type: multipart/mixed; boundary="------------6kEu0nV6dObclYqq0nOrIm0f";
+ protected-headers="v1"
+From: Alejandro Colomar <alx@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ qat-linux@intel.com, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Message-ID: <88708464-cc1c-c31d-5cb0-171a41dec936@kernel.org>
+Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
+References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
+ <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
+ <ZOiEHCsjBCL04Z3x@gondor.apana.org.au> <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
+ <ZOx1SOBKbmdIvz+b@gondor.apana.org.au> <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
+ <ZO3F8AgOS/NnVaeU@gondor.apana.org.au> <ZO375Wg0+nTCgCIJ@smile.fi.intel.com>
+ <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
+In-Reply-To: <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
 
+--------------6kEu0nV6dObclYqq0nOrIm0f
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-在 2023/8/31 13:42, Herbert Xu 写道:
-> On Thu, Aug 31, 2023 at 10:21:52AM +0800, Yang Shen wrote:
->> It's a pity to see that there is no user in the kernel of zlib-deflate.
->> However, there may still be hidden
->> users in the current kernel who may be using the zlib-deflate algorithm.
->> Such as zswap, it can use
->> user-specified algorithm. So there are still some benefits to be gained from
->> zlib hardware.
-> Perhaps you should try reconstructing the zlib header in your
-> driver so that it becomes capable of handling "deflate" data as
-> is rather than adding the non-standard "zlib-deflate" algorithm?
->
-> There is no way of getting the checksum without decompressing
-> the data first but perhaps your hardware could ignore checksum
-> errors?
+Hi Herbert,
 
+On 2023-08-31 05:55, Herbert Xu wrote:
+> On Tue, Aug 29, 2023 at 05:08:37PM +0300, Andy Shevchenko wrote:
+>>
+>> Do I understand correctly that you want *ideally* to have THE kernel.h=
 
-OK, I'm sorry I got missunderstand about the purpose of the patch. The 
-hardware also
-support the deflate algorithm. I can change the driver to register the 
-deflate interface and
-remove the zlib-deflate. Is this plan acceptable? If yes, please don't 
-remove the hisilicon
-zip driver and I'll send the fix patch as soon as possible. It may take 
-me a week to adapt
-and verify the driver.
+>> as a _single_ header and that's it?
+>=20
+> My rule of thumb for a .c file is that if you need more than two
+> headers directly included by kernel.h then you should just use
+> kernel.h.
+>=20
+>> While I understand your motivation as a maintainer, I hate the idea of=
+ current
+>> kernel.h to be included as a silver bullet to every file because peopl=
+e are not
+>> capable to understand this C language part of design. The usage of the=
+ proper
+>> headers show that developer _thought_ very well about what they are do=
+ing in
+>> the driver. Neglecting this affects the quality of the code in my opin=
+ion.
+>> That's why I strongly recommend to avoid kernel.h inclusion unless it'=
+s indeed
+>> the one that provides something that is used in the driver. Even thoug=
+h, the
+>> rest headers also need to be included (as it wasn't done by kernel.h a=
+t any
+>> circumstances).
+>=20
+> I have no qualms with fixing header files that include kernel.h
+> to include whatever it is that they need directly.  That is a
+> worthy goal and should be enforced for all new header files.
+>=20
+> I just don't share your enthusiasm about doing the same for .c
+> files.
 
-Thanks,
-Yang
+<https://include-what-you-use.org/
 
->
->> What's more, hisilicon zip driver also does other work besides supporting
->> the zlib-deflate:
->> 1.Support gzip algorithm.
-> We don't even have a generic "gzip" implementation so this should
-> never have gone into the kernel.
->
->> 2.Support a user space cdev hisi-zip which can accelerate user space process
->> via uacce subsystem.
-> Feel free to resubmit this as a new driver but it doesn't belong
-> in drivers/crypto.
->
+Maybe this is helpful, if you didn't know about it.  :)
+(I disagree with the forward declarations that are recommended there,
+though.)
+
+Cheers,
+Alex
+
+>=20
 > Cheers,
 
+--=20
+<http://www.alejandro-colomar.es/>
+GPG key fingerprint: A9348594CE31283A826FBDD8D57633D441E25BB5
+
+
+--------------6kEu0nV6dObclYqq0nOrIm0f--
+
+--------------hD0Xi3oWq1ZQW10n0Qk60FT0
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmTwdvMACgkQnowa+77/
+2zKG8RAAqRqG89soMD2RYqIFbyfLvevBTLP/COS/JPw4mrqb23M3KDQAm0OTfYLj
+DO2rdpy4r1GW0ljJUIT/GVSppL/1qxmZDi1ifvJyFdDhHAPSrHWNM04xUaI3yxuR
+HYXwHLkHNbO/Ov8a51ZyEeZplsEPEQ7pPE64+YxiCPMqqhUho9XYVhcp795N8ZDh
+Q/tzLYmKD+kV58WOKpZ9kSir1JfN6eQdInWgLp+Q+5sdNWF/J2SlKeexp2VSAVyU
+kgl6hw9i2nXdh0gxQFKF4+KMntEeMYJ6iTVxkwxXUTE87bL09LkKFEAw7BtAq8jU
+jOdM89dOZJoWSUihQ9uzz2sRyhF1lowm6qjjmfW1XhyFYQc/g/mepIJRsEVhR8id
+JDJJ+PXygRckqohVz/vyhOYLJfifK2ci+2PS3TYyZdGYNX5SXMH6lZTTR8p5Pye2
+E2AuvfIclDhWt6D6U/sVvaNl9bs2VuQ7l6mHh9AjxbJAkJPTLgIyc1Z1RzNd+Pv9
+oMDt0/B1HY6bMEeQbVYIJuDcP1XAlUSr4RGm2+/9OI15biOtb1yjhp0jXeVDB/+E
+P3cjirqRPvbH4ndTgRBVJI/4/8bFe0+SLVb2vdL4P3/vqmBDQxw/UTa9Ds+GHHxp
+YvfnXpUJcYp+oFAT0v3kGagw8o60C6x/YoWekuSTHbQ1d+FfDig=
+=zvhu
+-----END PGP SIGNATURE-----
+
+--------------hD0Xi3oWq1ZQW10n0Qk60FT0--
