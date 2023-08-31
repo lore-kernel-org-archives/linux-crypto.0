@@ -2,74 +2,78 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D24C83F10
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 05:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C91C83F10
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 05:43:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239964AbjHaFQr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Aug 2023 01:16:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52252 "EHLO
+        id S233685AbjHaFn3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Aug 2023 01:43:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbjHaFQq (ORCPT
+        with ESMTP id S229898AbjHaFn2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Aug 2023 01:16:46 -0400
+        Thu, 31 Aug 2023 01:43:28 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4B6D2;
-        Wed, 30 Aug 2023 22:16:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67AD9E8;
+        Wed, 30 Aug 2023 22:43:21 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qba2h-009XYY-Un; Thu, 31 Aug 2023 13:16:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 31 Aug 2023 13:16:33 +0800
-Date:   Thu, 31 Aug 2023 13:16:33 +0800
+        id 1qbaRo-009Xru-Qp; Thu, 31 Aug 2023 13:42:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 31 Aug 2023 13:42:30 +0800
+Date:   Thu, 31 Aug 2023 13:42:30 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.6
-Message-ID: <ZPAiMYaqUslSyZ6+@gondor.apana.org.au>
-References: <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
- <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
- <ZARrt99wJb7IhoY4@gondor.apana.org.au>
- <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
- <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
- <ZKtH5zrS4pR22PGT@gondor.apana.org.au>
- <ZOLcCC523FoBAyv0@gondor.apana.org.au>
+To:     Yang Shen <shenyang39@huawei.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>, ardb@kernel.org,
+        kees@kernel.org, linux-kernel@vger.kernel.org, enlin.mu@unisoc.com,
+        ebiggers@google.com, gpiccoli@igalia.com, willy@infradead.org,
+        yunlong.xing@unisoc.com, yuxiaozhang@google.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        qat-linux@intel.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH 1/4] crypto: hisilicon/zip - Remove driver
+Message-ID: <ZPAoRvMYbsoNfnLk@gondor.apana.org.au>
+References: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
+ <E1qbI7v-009Bvf-CA@formenos.hmeau.com>
+ <8a73f9cb-b1e8-3b54-4b6c-7cfb19244560@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZOLcCC523FoBAyv0@gondor.apana.org.au>
+In-Reply-To: <8a73f9cb-b1e8-3b54-4b6c-7cfb19244560@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Thu, Aug 31, 2023 at 10:21:52AM +0800, Yang Shen wrote:
+> 
+> It's a pity to see that there is no user in the kernel of zlib-deflate.
+> However, there may still be hidden
+> users in the current kernel who may be using the zlib-deflate algorithm.
+> Such as zswap, it can use
+> user-specified algorithm. So there are still some benefits to be gained from
+> zlib hardware.
 
-The following changes since commit 85b9bf9a514d991fcecb118d0a8a35e754ff9265:
+Perhaps you should try reconstructing the zlib header in your
+driver so that it becomes capable of handling "deflate" data as
+is rather than adding the non-standard "zlib-deflate" algorithm?
 
-  Revert "dt-bindings: crypto: qcom,prng: Add SM8450" (2023-08-25 19:01:45 +0800)
+There is no way of getting the checksum without decompressing
+the data first but perhaps your hardware could ignore checksum
+errors?
 
-are available in the Git repository at:
+> What's more, hisilicon zip driver also does other work besides supporting
+> the zlib-deflate:
+> 1.Support gzip algorithm.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.6-p2 
+We don't even have a generic "gzip" implementation so this should
+never have gone into the kernel.
 
-for you to fetch changes up to ba22e81872c1232ea4ba421251d8109a5ed68c52:
+> 2.Support a user space cdev hisi-zip which can accelerate user space process
+> via uacce subsystem.
 
-  crypto: powerpc/chacha20,poly1305-p10 - Add dependency on VSX (2023-08-30 13:48:39 +0800)
+Feel free to resubmit this as a new driver but it doesn't belong
+in drivers/crypto.
 
-----------------------------------------------------------------
-This push fixes a random config build failure on powerpc.
-----------------------------------------------------------------
-
-Herbert Xu (1):
-      crypto: powerpc/chacha20,poly1305-p10 - Add dependency on VSX
-
- arch/powerpc/crypto/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
