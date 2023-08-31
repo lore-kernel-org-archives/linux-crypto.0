@@ -2,106 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CB5C83F01
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 13:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 940ABC83F10
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 13:43:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240496AbjHaN0k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Aug 2023 09:26:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56142 "EHLO
+        id S1346406AbjHaNnU (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Aug 2023 09:43:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjHaN0j (ORCPT
+        with ESMTP id S1346419AbjHaNnJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Aug 2023 09:26:39 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86720CEB;
-        Thu, 31 Aug 2023 06:26:36 -0700 (PDT)
+        Thu, 31 Aug 2023 09:43:09 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781C210E6
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 06:42:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693488396; x=1725024396;
+  t=1693489371; x=1725025371;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=HgeKJLJxLH8yLNJRCPDzLYvby7ECj242FxWkt/dJEFg=;
-  b=K7Mo1Gj7ITuQFrjz/XSrcq1aapUbhtkblpUAmjuhUUiharjv2PQblSRs
-   dQE77b7xi64enbqPh5CL0eqpw1LUvdsxVzJlW084AKducmpIVDTDzuLOD
-   cJLKHuikH6c+vimVDhcOiy+PD7Y/uq3Y29pv/aOg1Eb5p1Hz0gcWSDF6h
-   Sb7c5hoQpeX8gPIY5rWQNBc91b4cdEG0hodLUlr5D78VHg9ElufPR8H+S
-   OadP4Wgftpw81NLOpI09FHO+FhPxcHEsOB4fcOguqD4NVwMFSRqx8JO0W
-   auE5DNCH0dB5PyzDhzfHeiAhcfzqipMmoFidCQE5XbpMOX5IW2Og6OPCy
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="355441464"
+  bh=0ZaryvLmhdMiNgDSnOq7f55JW35/Gpnif0ICL5DYq6o=;
+  b=KheCEBzwN5GCcFSWGgDa8wRQr/JRVT1CRkWOjBvKq5K5YiIMRMVktWqX
+   5bN/2nN/buGxokDN/hI+h0y+cBUxVzOegeAxxDYd80rDY59iNmMLG7WXP
+   Js+ytuLHn9jbR8lruP+iBD0rk1jDl5gUl8OUMQx35HsVHmiW1VPtQXMxK
+   iiSuW4YqTqiKpcK/6XjeQQpl+508piNS3wQuLmFgdJov/L60FSn+A7NUE
+   tZmOgip4wXAS6YSxnimcDmSku7m/O73zjQ421nR95A94WYodA1PBJQpoY
+   hy57ddBg+tx8/4+S40B2LnyThCa5F7Y5NIDEsMeJP4r83ZZ7MgbvkW5yK
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="462316278"
 X-IronPort-AV: E=Sophos;i="6.02,216,1688454000"; 
-   d="scan'208";a="355441464"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 06:26:36 -0700
+   d="scan'208";a="462316278"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 06:42:50 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="742703754"
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="774575966"
 X-IronPort-AV: E=Sophos;i="6.02,216,1688454000"; 
-   d="scan'208";a="742703754"
+   d="scan'208";a="774575966"
 Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 06:26:33 -0700
+  by orsmga001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 06:42:48 -0700
 Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@intel.com>)
-        id 1qbhgt-005Oew-0N;
-        Thu, 31 Aug 2023 16:26:31 +0300
-Date:   Thu, 31 Aug 2023 16:26:30 +0300
-From:   Andy Shevchenko <andriy.shevchenko@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, alx@kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
-Message-ID: <ZPCVBnf9xzUF+8Da@smile.fi.intel.com>
-References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
- <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
- <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
- <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
- <ZOx1SOBKbmdIvz+b@gondor.apana.org.au>
- <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
- <ZO3F8AgOS/NnVaeU@gondor.apana.org.au>
- <ZO375Wg0+nTCgCIJ@smile.fi.intel.com>
- <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1qbhwb-005OqC-05;
+        Thu, 31 Aug 2023 16:42:45 +0300
+Date:   Thu, 31 Aug 2023 16:42:44 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Jinjie Ruan <ruanjinjie@huawei.com>
+Cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        damian.muszynski@intel.com, shashank.gupta@intel.com,
+        tom.zanussi@linux.intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH -next] crypto: qat - Use list_for_each_entry() helper
+Message-ID: <ZPCY1EEFz0opLpvo@smile.fi.intel.com>
+References: <20230830075451.293379-1-ruanjinjie@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
+In-Reply-To: <20230830075451.293379-1-ruanjinjie@huawei.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 31, 2023 at 11:55:52AM +0800, Herbert Xu wrote:
-> On Tue, Aug 29, 2023 at 05:08:37PM +0300, Andy Shevchenko wrote:
-> >
-> > Do I understand correctly that you want *ideally* to have THE kernel.h
-> > as a _single_ header and that's it?
-> 
-> My rule of thumb for a .c file is that if you need more than two
-> headers directly included by kernel.h then you should just use
-> kernel.h.
-> 
-> > While I understand your motivation as a maintainer, I hate the idea of current
-> > kernel.h to be included as a silver bullet to every file because people are not
-> > capable to understand this C language part of design. The usage of the proper
-> > headers show that developer _thought_ very well about what they are doing in
-> > the driver. Neglecting this affects the quality of the code in my opinion.
-> > That's why I strongly recommend to avoid kernel.h inclusion unless it's indeed
-> > the one that provides something that is used in the driver. Even though, the
-> > rest headers also need to be included (as it wasn't done by kernel.h at any
-> > circumstances).
-> 
-> I have no qualms with fixing header files that include kernel.h
-> to include whatever it is that they need directly.  That is a
-> worthy goal and should be enforced for all new header files.
-> 
-> I just don't share your enthusiasm about doing the same for .c
-> files.
+On Wed, Aug 30, 2023 at 03:54:51PM +0800, Jinjie Ruan wrote:
+> Convert list_for_each() to list_for_each_entry() so that the list_itr
+> list_head pointer and list_entry() call are no longer needed, which
+> can reduce a few lines of code. No functional changed.
 
-I see, thanks for clarifying this. While you are right about *.c files that
-it's not so critical for them, the kernel.h use is still a burden everywhere
-in the kernel (at least in the current form). That's why I prefer to exclude
-it from *.c-files as well. This will reduce amount of work in the future in
-case we will be capable to clean up the crap from kernel.h and make it sane.
+Seems correct to me, assumed that this has been tested,
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
 -- 
 With Best Regards,
