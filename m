@@ -2,75 +2,74 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA67C83F2B
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 03:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D24C83F10
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Aug 2023 05:18:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239936AbjHaD4F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Aug 2023 23:56:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53912 "EHLO
+        id S239964AbjHaFQr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Aug 2023 01:16:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241724AbjHaD4E (ORCPT
+        with ESMTP id S229924AbjHaFQq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Aug 2023 23:56:04 -0400
+        Thu, 31 Aug 2023 01:16:46 -0400
 Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EAAFCF4;
-        Wed, 30 Aug 2023 20:55:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4B6D2;
+        Wed, 30 Aug 2023 22:16:41 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qbYmd-009Wqh-8x; Thu, 31 Aug 2023 11:55:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 31 Aug 2023 11:55:52 +0800
-Date:   Thu, 31 Aug 2023 11:55:52 +0800
+        id 1qba2h-009XYY-Un; Thu, 31 Aug 2023 13:16:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 31 Aug 2023 13:16:33 +0800
+Date:   Thu, 31 Aug 2023 13:16:33 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, alx@kernel.org,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH v2 1/2] crypto: qat - refactor included headers
-Message-ID: <ZPAPSOnSTMgYrlV/@gondor.apana.org.au>
-References: <20230818102322.142582-1-lucas.segarra.fernandez@intel.com>
- <20230818102322.142582-2-lucas.segarra.fernandez@intel.com>
- <ZOiEHCsjBCL04Z3x@gondor.apana.org.au>
- <ZOigoVJbjdOx9Wea@smile.fi.intel.com>
- <ZOx1SOBKbmdIvz+b@gondor.apana.org.au>
- <ZOx6+i5HEAY4F4X3@smile.fi.intel.com>
- <ZO3F8AgOS/NnVaeU@gondor.apana.org.au>
- <ZO375Wg0+nTCgCIJ@smile.fi.intel.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.6
+Message-ID: <ZPAiMYaqUslSyZ6+@gondor.apana.org.au>
+References: <Yqw7bf7ln6vtU/VH@gondor.apana.org.au>
+ <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
+ <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
+ <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
+ <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
+ <ZARrt99wJb7IhoY4@gondor.apana.org.au>
+ <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
+ <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
+ <ZKtH5zrS4pR22PGT@gondor.apana.org.au>
+ <ZOLcCC523FoBAyv0@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZO375Wg0+nTCgCIJ@smile.fi.intel.com>
+In-Reply-To: <ZOLcCC523FoBAyv0@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 29, 2023 at 05:08:37PM +0300, Andy Shevchenko wrote:
->
-> Do I understand correctly that you want *ideally* to have THE kernel.h
-> as a _single_ header and that's it?
+Hi Linus:
 
-My rule of thumb for a .c file is that if you need more than two
-headers directly included by kernel.h then you should just use
-kernel.h.
+The following changes since commit 85b9bf9a514d991fcecb118d0a8a35e754ff9265:
 
-> While I understand your motivation as a maintainer, I hate the idea of current
-> kernel.h to be included as a silver bullet to every file because people are not
-> capable to understand this C language part of design. The usage of the proper
-> headers show that developer _thought_ very well about what they are doing in
-> the driver. Neglecting this affects the quality of the code in my opinion.
-> That's why I strongly recommend to avoid kernel.h inclusion unless it's indeed
-> the one that provides something that is used in the driver. Even though, the
-> rest headers also need to be included (as it wasn't done by kernel.h at any
-> circumstances).
+  Revert "dt-bindings: crypto: qcom,prng: Add SM8450" (2023-08-25 19:01:45 +0800)
 
-I have no qualms with fixing header files that include kernel.h
-to include whatever it is that they need directly.  That is a
-worthy goal and should be enforced for all new header files.
+are available in the Git repository at:
 
-I just don't share your enthusiasm about doing the same for .c
-files.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.6-p2 
 
-Cheers,
+for you to fetch changes up to ba22e81872c1232ea4ba421251d8109a5ed68c52:
+
+  crypto: powerpc/chacha20,poly1305-p10 - Add dependency on VSX (2023-08-30 13:48:39 +0800)
+
+----------------------------------------------------------------
+This push fixes a random config build failure on powerpc.
+----------------------------------------------------------------
+
+Herbert Xu (1):
+      crypto: powerpc/chacha20,poly1305-p10 - Add dependency on VSX
+
+ arch/powerpc/crypto/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
