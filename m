@@ -2,114 +2,144 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D35CCA0FE1
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 06:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E90CA0FE1
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 06:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233040AbjIAGKz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Sep 2023 02:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34510 "EHLO
+        id S236325AbjIAG0g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 1 Sep 2023 02:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235363AbjIAGKy (ORCPT
+        with ESMTP id S237766AbjIAG0g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Sep 2023 02:10:54 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB75A1702
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:10:37 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-500bdef7167so3380727e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:10:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shruggie-ro.20230601.gappssmtp.com; s=20230601; t=1693548636; x=1694153436; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RnvPYauBqEhoq6cEWkhu+3J3mdV3Lw0zys/CSbD9y3Y=;
-        b=hDs1CSUDRDSMWFrZAU7WBPq/dzh/msik2KEl9pC0F1i2eDRwiRg6FplxLq0XYMZwoN
-         Vra7OBOm8ptzw5/QcuynABEW/2vjvsGUkSqKmTipZqHdanxO3ZAEIo6xft/U9JeuzG+R
-         PTIMz7Ht9wWDMMZ/7wuXAKtFh/4ckouYrhtvXCHp91T5vkhF791o+USW2tGTKgJQVl9Z
-         r8MZjrT0VjOBbZITAx9Jz6mdeN90XrF92hAGm3Bs84kjze2C7VNR2tHJ20+HeB4lz4C2
-         403slfAZTry3GzEOO6wWuimLh0gss+T8hJXggDtiku5CzJhLkI0oJQ50TIdH4Vsj6s/p
-         C8FQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693548636; x=1694153436;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RnvPYauBqEhoq6cEWkhu+3J3mdV3Lw0zys/CSbD9y3Y=;
-        b=aMoKjhEc5il4R9ZMB4eRE5+6gjGMhSbVSrLtOpfxN/GnorFkCgkZpTelkXfKvzjtKm
-         Ln7NlfS9x0UV8NryGoawN/twCEXwVzlMf9KOO9THUSGQUH1qzCLLp7Y3YfeTAq+aB0lE
-         zxhB8J1p0NWH9mYr621IPfsjgsj//vYE8IfGGoh+3OAAgVaCK/9S0bpRETpoSmy1zE4l
-         6OfIQULf4nQSzd+RddNu0laeJLxQDYjm1tQcNlt1agLmckl4+aE2PJn8c4i2KLb3ZlTJ
-         jN2vKQgcOKfuNRcCcdjlwrlLo92qZJH7o1P8q8aHGgwMwjSSWf+e1i3aTyVaU7prg9s6
-         w8eg==
-X-Gm-Message-State: AOJu0YzosL7rRd0/Xk3Jv0F4v5Lw4iCiLPVi+vNXK9ZtihiixyyHVm0o
-        ywkab8t8uRlfybCrEGB7nyj24pdclV911irzt67E/w==
-X-Google-Smtp-Source: AGHT+IFfpk0jvivYElHU0ScyZpVNHhBz1jFdw6GqRbKwakO/nrfLuO2h+aoNjxmjGGUgwFDEnHv5mD9BffZyvn8UUyw=
-X-Received: by 2002:ac2:482e:0:b0:4f8:5e62:b94b with SMTP id
- 14-20020ac2482e000000b004f85e62b94bmr427790lft.9.1693548636078; Thu, 31 Aug
- 2023 23:10:36 -0700 (PDT)
+        Fri, 1 Sep 2023 02:26:36 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3945510D2;
+        Thu, 31 Aug 2023 23:26:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1693549592; x=1725085592;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aAlPFkFFJ0tKP+R+0ojprm+uUm4swQJFKVrG7PiJNPU=;
+  b=IdBpHMulkSLlWtH/p3pi1F+a2QOkrBPRsMcw2KRMg69peDEWLblxeSDH
+   15Su+QNIAujCKQP6Wgv1mpiS1X5vQXB94z3ErPfABmtrIsXp46q9ajj3d
+   NA1994uexK9Yi8YpVvoL45bWVesrQVmuHrSXJSQ8l/Nj5Fpaw3GK0Ftge
+   Bv9idi+ky0e55v9p/lkK5abtjVKgraNRBQPQdMMQosyMjlh2u13PE+JPo
+   lq/ZsPKz8tTFBcR8fYmWGuqu8kzs/2jwNzFjdt5qtN7ZjNWTqygg4ornh
+   o0NeyeViB0G2OvKTesRRwqujpR2vIMRyD3Lu1boms0pSNrVKLgZZykyGY
+   g==;
+X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
+   d="asc'?scan'208";a="2394248"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 31 Aug 2023 23:26:32 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 31 Aug 2023 23:26:31 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Thu, 31 Aug 2023 23:26:29 -0700
+Date:   Fri, 1 Sep 2023 07:25:47 +0100
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Alexandru Ardelean <alex@shruggie.ro>
+CC:     Andrei Coardos <aboutphysycs@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-riscv@lists.infradead.org>, <herbert@gondor.apana.org.au>,
+        <olivia@selenic.com>, <daire.mcnamara@microchip.com>
+Subject: Re: [PATCH] char: hw_random: mpfs-rng: removed unneeded call to
+ platform_set_drvdata()
+Message-ID: <20230901-upper-reenter-9c2fa8bf7a47@wendy>
+References: <20230828101757.9724-1-aboutphysycs@gmail.com>
+ <20230828-citable-superjet-d235f036be99@wendy>
+ <CAH3L5QreWNPgwogL7bCYZgKSuz_HfZuKLtRVqz+UyRtJ1TB-SA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230828102943.21097-1-aboutphysycs@gmail.com> <CAH3L5Qpg84+Dc0MzfEWtJmfZYsXwdNHD6OZ6bRTfyB8xcr5HdQ@mail.gmail.com>
-In-Reply-To: <CAH3L5Qpg84+Dc0MzfEWtJmfZYsXwdNHD6OZ6bRTfyB8xcr5HdQ@mail.gmail.com>
-From:   Alexandru Ardelean <alex@shruggie.ro>
-Date:   Fri, 1 Sep 2023 09:10:25 +0300
-Message-ID: <CAH3L5QrqFDYw6cQEqR6NZ94XV1bgSTDVx8wGeRQWOWFC5FaJ5w@mail.gmail.com>
-Subject: Re: [PATCH] char: hw_random: xiphera-trng: removed unnneded platform_set_drvdata()
-To:     Andrei Coardos <aboutphysycs@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, olivia@selenic.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="rbkSUiqy942IY70F"
+Content-Disposition: inline
+In-Reply-To: <CAH3L5QreWNPgwogL7bCYZgKSuz_HfZuKLtRVqz+UyRtJ1TB-SA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 1, 2023 at 9:04=E2=80=AFAM Alexandru Ardelean <alex@shruggie.ro=
-> wrote:
->
-> On Mon, Aug 28, 2023 at 1:29=E2=80=AFPM Andrei Coardos <aboutphysycs@gmai=
-l.com> wrote:
-> >
-> > This function call was found to be unnecessary as there is no equivalen=
-t
-> > platform_get_drvdata() call to access the private data of the driver. A=
-lso,
-> > the private data is defined in this driver, so there is no risk of it b=
-eing
-> > accessed outside of this driver file.
-> >
-> > Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
-> > ---
-> >  drivers/char/hw_random/xiphera-trng.c | 2 --
-> >  1 file changed, 2 deletions(-)
-> >
-> > diff --git a/drivers/char/hw_random/xiphera-trng.c b/drivers/char/hw_ra=
-ndom/xiphera-trng.c
-> > index 2a9fea72b2e0..1fa4b70246f0 100644
-> > --- a/drivers/char/hw_random/xiphera-trng.c
-> > +++ b/drivers/char/hw_random/xiphera-trng.c
-> > @@ -122,8 +122,6 @@ static int xiphera_trng_probe(struct platform_devic=
-e *pdev)
-> >                 return ret;
-> >         }
-> >
-> > -       platform_set_drvdata(pdev, trng);
-> > -
-> >         return 0;
->
-> This entire block could become now:
->
->         return devm_hwrng_register(dev, &trng->rng);
->
+--rbkSUiqy942IY70F
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Coming back here.
-I wonder if there is a desire to keep the prints above.
-If yes, then this is fine as-is.
-With that:
-
-Reviewed-by: Alexandru Ardelean <alex@shruggie.ro>
-
-> >  }
+On Fri, Sep 01, 2023 at 09:07:56AM +0300, Alexandru Ardelean wrote:
+> On Mon, Aug 28, 2023 at 2:06=E2=80=AFPM Conor Dooley <conor.dooley@microc=
+hip.com> wrote:
 > >
-> > --
-> > 2.34.1
+> > On Mon, Aug 28, 2023 at 01:17:57PM +0300, Andrei Coardos wrote:
+> > > This function call was found to be unnecessary as there is no equival=
+ent
+> > > platform_get_drvdata() call to access the private data of the driver.=
+ Also,
+> > > the private data is defined in this driver, so there is no risk of it=
+ being
+> > > accessed outside of this driver file.
 > >
+> > I think Greg previously pointed out to you that is it not sufficient to
+> > check for platform_get_drvdata() alone, because the information could be
+> > accessed without going through that helper. That's not the case here,
+> > but it could be true elsewhere.
+> >
+> > Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> >
+> > Thanks,
+> > Conor.
+> >
+> > >
+> > > Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
+> > > ---
+> > >  drivers/char/hw_random/mpfs-rng.c | 2 --
+> > >  1 file changed, 2 deletions(-)
+> > >
+> > > diff --git a/drivers/char/hw_random/mpfs-rng.c b/drivers/char/hw_rand=
+om/mpfs-rng.c
+> > > index c6972734ae62..0994024daa70 100644
+> > > --- a/drivers/char/hw_random/mpfs-rng.c
+> > > +++ b/drivers/char/hw_random/mpfs-rng.c
+> > > @@ -79,8 +79,6 @@ static int mpfs_rng_probe(struct platform_device *p=
+dev)
+> > >       rng_priv->rng.read =3D mpfs_rng_read;
+> > >       rng_priv->rng.name =3D pdev->name;
+> > >
+> > > -     platform_set_drvdata(pdev, rng_priv);
+> > > -
+> > >       ret =3D devm_hwrng_register(&pdev->dev, &rng_priv->rng);
+>=20
+> A question would be if there is a desire to keep the prints below, or
+> would this be sufficient?
+>=20
+>           return devm_hwrng_register(&pdev->dev, &rng_priv->rng);
+>=20
+> If there is the desire to keep the prints, then:
+
+Yeah, I'd like to keep a print in the failing case, thanks.
+
+>=20
+> Reviewed-by: Alexandru Ardelean <alex@shruggie.ro>
+>=20
+> > >       if (ret)
+> > >               return dev_err_probe(&pdev->dev, ret, "Failed to regist=
+er MPFS hwrng\n");
+> > > --
+> > > 2.34.1
+> > >
+
+--rbkSUiqy942IY70F
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZPGD6wAKCRB4tDGHoIJi
+0qUTAQD0ZDiVMxcLtPt0mgxplAh+moC7mid0YSGHBG9Ni1um5QEA/E2z+UWdQSGw
+Yw88TOcd4HWPZN8oMlkVEjAmi8MA4gs=
+=3NaB
+-----END PGP SIGNATURE-----
+
+--rbkSUiqy942IY70F--
