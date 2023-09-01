@@ -2,144 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E90CA0FE1
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 06:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7A9CA0FE1
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 12:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236325AbjIAG0g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Sep 2023 02:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46014 "EHLO
+        id S1349392AbjIAM4h (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 1 Sep 2023 08:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237766AbjIAG0g (ORCPT
+        with ESMTP id S240835AbjIAM4g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Sep 2023 02:26:36 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3945510D2;
-        Thu, 31 Aug 2023 23:26:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1693549592; x=1725085592;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aAlPFkFFJ0tKP+R+0ojprm+uUm4swQJFKVrG7PiJNPU=;
-  b=IdBpHMulkSLlWtH/p3pi1F+a2QOkrBPRsMcw2KRMg69peDEWLblxeSDH
-   15Su+QNIAujCKQP6Wgv1mpiS1X5vQXB94z3ErPfABmtrIsXp46q9ajj3d
-   NA1994uexK9Yi8YpVvoL45bWVesrQVmuHrSXJSQ8l/Nj5Fpaw3GK0Ftge
-   Bv9idi+ky0e55v9p/lkK5abtjVKgraNRBQPQdMMQosyMjlh2u13PE+JPo
-   lq/ZsPKz8tTFBcR8fYmWGuqu8kzs/2jwNzFjdt5qtN7ZjNWTqygg4ornh
-   o0NeyeViB0G2OvKTesRRwqujpR2vIMRyD3Lu1boms0pSNrVKLgZZykyGY
-   g==;
-X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
-   d="asc'?scan'208";a="2394248"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 31 Aug 2023 23:26:32 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 31 Aug 2023 23:26:31 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Thu, 31 Aug 2023 23:26:29 -0700
-Date:   Fri, 1 Sep 2023 07:25:47 +0100
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Alexandru Ardelean <alex@shruggie.ro>
-CC:     Andrei Coardos <aboutphysycs@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-riscv@lists.infradead.org>, <herbert@gondor.apana.org.au>,
-        <olivia@selenic.com>, <daire.mcnamara@microchip.com>
-Subject: Re: [PATCH] char: hw_random: mpfs-rng: removed unneeded call to
- platform_set_drvdata()
-Message-ID: <20230901-upper-reenter-9c2fa8bf7a47@wendy>
-References: <20230828101757.9724-1-aboutphysycs@gmail.com>
- <20230828-citable-superjet-d235f036be99@wendy>
- <CAH3L5QreWNPgwogL7bCYZgKSuz_HfZuKLtRVqz+UyRtJ1TB-SA@mail.gmail.com>
+        Fri, 1 Sep 2023 08:56:36 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A7910FC;
+        Fri,  1 Sep 2023 05:56:21 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3817dnOv027910;
+        Fri, 1 Sep 2023 12:56:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=iQDpE3oUzsQpFX7y4ICrAyxTrW4xNtItubvy27V7X6w=;
+ b=blc+JGa/O/6sU0yVVfkeB7lDoZemDsthXnhOPnR0q2Jg48MTQA1nn13MjIi6YhrAg6LW
+ 0lRK6PsDhcliQMnN6jL8HcgAYwdfdsZktw3BdmPHNN1dQ3sRG4QAArRv25YhBYs2nW/4
+ z1taGlcdSz26vQUDjlmrVMSh5n1GIkmaJDv8g+7e/mmmeJ6OKoRzcAz7gxrXMq6UHsKV
+ OSzF5SFS+OLmrKaCKwyfPnUF8IV/QHmixuuG6fY6qbS4IjNhxzJf+GmIAPsH+cinbhME
+ 0QzFo0BkBvR4d5pvH6C2o1c+hH+3siJ4/7AbU5i2crfdpXM0uwE7uROshVByTu/KT2MG 4A== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sua0brv3p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Sep 2023 12:56:12 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 381CuBhX028522
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 1 Sep 2023 12:56:11 GMT
+Received: from [10.216.45.103] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Fri, 1 Sep
+ 2023 05:56:06 -0700
+Message-ID: <3d09f47f-b0b8-4429-944a-df3de19c7a6c@quicinc.com>
+Date:   Fri, 1 Sep 2023 18:26:03 +0530
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="rbkSUiqy942IY70F"
-Content-Disposition: inline
-In-Reply-To: <CAH3L5QreWNPgwogL7bCYZgKSuz_HfZuKLtRVqz+UyRtJ1TB-SA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/7] crypto: qcom-rng - Add support for trng
+From:   Om Prakash Singh <quic_omprsing@quicinc.com>
+To:     Neil Armstrong <neil.armstrong@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+CC:     <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20230824-topic-sm8550-rng-v2-0-dfcafbb16a3e@linaro.org>
+ <20230824-topic-sm8550-rng-v2-4-dfcafbb16a3e@linaro.org>
+ <29fb1e51-1e18-4e45-be64-190df52e1156@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <29fb1e51-1e18-4e45-be64-190df52e1156@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: HiK5IzspJB4nPNxUEVUqaX2pFvvdu8Ws
+X-Proofpoint-GUID: HiK5IzspJB4nPNxUEVUqaX2pFvvdu8Ws
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-01_10,2023-08-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=786
+ suspectscore=0 clxscore=1015 priorityscore=1501 impostorscore=0 mlxscore=0
+ spamscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309010120
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---rbkSUiqy942IY70F
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I missed to notice. Please correct "-" to ":" in subject line
 
-On Fri, Sep 01, 2023 at 09:07:56AM +0300, Alexandru Ardelean wrote:
-> On Mon, Aug 28, 2023 at 2:06=E2=80=AFPM Conor Dooley <conor.dooley@microc=
-hip.com> wrote:
-> >
-> > On Mon, Aug 28, 2023 at 01:17:57PM +0300, Andrei Coardos wrote:
-> > > This function call was found to be unnecessary as there is no equival=
-ent
-> > > platform_get_drvdata() call to access the private data of the driver.=
- Also,
-> > > the private data is defined in this driver, so there is no risk of it=
- being
-> > > accessed outside of this driver file.
-> >
-> > I think Greg previously pointed out to you that is it not sufficient to
-> > check for platform_get_drvdata() alone, because the information could be
-> > accessed without going through that helper. That's not the case here,
-> > but it could be true elsewhere.
-> >
-> > Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> >
-> > Thanks,
-> > Conor.
-> >
-> > >
-> > > Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
-> > > ---
-> > >  drivers/char/hw_random/mpfs-rng.c | 2 --
-> > >  1 file changed, 2 deletions(-)
-> > >
-> > > diff --git a/drivers/char/hw_random/mpfs-rng.c b/drivers/char/hw_rand=
-om/mpfs-rng.c
-> > > index c6972734ae62..0994024daa70 100644
-> > > --- a/drivers/char/hw_random/mpfs-rng.c
-> > > +++ b/drivers/char/hw_random/mpfs-rng.c
-> > > @@ -79,8 +79,6 @@ static int mpfs_rng_probe(struct platform_device *p=
-dev)
-> > >       rng_priv->rng.read =3D mpfs_rng_read;
-> > >       rng_priv->rng.name =3D pdev->name;
-> > >
-> > > -     platform_set_drvdata(pdev, rng_priv);
-> > > -
-> > >       ret =3D devm_hwrng_register(&pdev->dev, &rng_priv->rng);
->=20
-> A question would be if there is a desire to keep the prints below, or
-> would this be sufficient?
->=20
->           return devm_hwrng_register(&pdev->dev, &rng_priv->rng);
->=20
-> If there is the desire to keep the prints, then:
-
-Yeah, I'd like to keep a print in the failing case, thanks.
-
->=20
-> Reviewed-by: Alexandru Ardelean <alex@shruggie.ro>
->=20
-> > >       if (ret)
-> > >               return dev_err_probe(&pdev->dev, ret, "Failed to regist=
-er MPFS hwrng\n");
-> > > --
-> > > 2.34.1
-> > >
-
---rbkSUiqy942IY70F
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZPGD6wAKCRB4tDGHoIJi
-0qUTAQD0ZDiVMxcLtPt0mgxplAh+moC7mid0YSGHBG9Ni1um5QEA/E2z+UWdQSGw
-Yw88TOcd4HWPZN8oMlkVEjAmi8MA4gs=
-=3NaB
------END PGP SIGNATURE-----
-
---rbkSUiqy942IY70F--
+On 8/28/2023 10:29 AM, Om Prakash Singh wrote:
+> 
+> 
+> On 8/24/2023 5:03 PM, Neil Armstrong wrote:
+>> The SM8450 & later SoCs RNG HW is now a True Random Number Generator
+>> and a new compatible has been introduced to handle the difference.
+>>
+>> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+>> ---
+> Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
