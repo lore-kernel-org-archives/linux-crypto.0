@@ -2,116 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9B3CA0FE2
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 02:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF42CCA0FE6
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 06:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234994AbjIACkB convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Aug 2023 22:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34860 "EHLO
+        id S237280AbjIAGEh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 1 Sep 2023 02:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234928AbjIACj6 (ORCPT
+        with ESMTP id S236823AbjIAGEh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Aug 2023 22:39:58 -0400
-Received: from ex01.ufhost.com (ex01.ufhost.com [61.152.239.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C7D3E7E;
-        Thu, 31 Aug 2023 19:39:54 -0700 (PDT)
-Received: from EXMBX165.cuchost.com (unknown [175.102.18.54])
-        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-        (Client CN "EXMBX165", Issuer "EXMBX165" (not verified))
-        by ex01.ufhost.com (Postfix) with ESMTP id 610D324E281;
-        Fri,  1 Sep 2023 10:39:53 +0800 (CST)
-Received: from EXMBX167.cuchost.com (172.16.6.77) by EXMBX165.cuchost.com
- (172.16.6.75) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 1 Sep
- 2023 10:39:53 +0800
-Received: from EXMBX168.cuchost.com (172.16.6.78) by EXMBX167.cuchost.com
- (172.16.6.77) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Fri, 1 Sep
- 2023 10:39:52 +0800
-Received: from EXMBX168.cuchost.com ([fe80::1869:e641:8a12:96d6]) by
- EXMBX168.cuchost.com ([fe80::1869:e641:8a12:96d6%16]) with mapi id
- 15.00.1497.044; Fri, 1 Sep 2023 10:39:52 +0800
-From:   JiaJie Ho <jiajie.ho@starfivetech.com>
-To:     Aurelien Jarno <aurelien@aurel32.net>,
-        Conor Dooley <conor.dooley@microchip.com>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kernel@esmil.dk" <kernel@esmil.dk>,
-        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-        "davidlt@rivosinc.com" <davidlt@rivosinc.com>
-Subject: RE: starfive crypto list_add corruption
-Thread-Topic: starfive crypto list_add corruption
-Thread-Index: AQHZ2yzjjWDz/x6w9kGlTSbBzWx+s7AEQLcAgAECsiA=
-Date:   Fri, 1 Sep 2023 02:39:52 +0000
-Message-ID: <292c90859f2e4135b40307d61488692c@EXMBX168.cuchost.com>
-References: <20230830-track-glutinous-39f536b4ced1@wendy>
- <ZPDlSLQQkYuIVLYJ@aurel32.net>
-In-Reply-To: <ZPDlSLQQkYuIVLYJ@aurel32.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [161.142.156.69]
-x-yovoleruleagent: yovoleflag
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Fri, 1 Sep 2023 02:04:37 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40ED710D0
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:04:33 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b95d5ee18dso29278861fa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:04:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shruggie-ro.20230601.gappssmtp.com; s=20230601; t=1693548271; x=1694153071; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dfLv56JgUFCXsENsYPIP+yaAFrYcDTTvtusyzWqWSds=;
+        b=slRSakWcK1tP3bqgnANhP+oNGiq/OjkfKASuqdhlqUCMYawWKEtXr6Vf3IWT0SfBA9
+         DMqVUWZyGiUyHzkLCBp+M82gINN1PaQR3frjEdBz6Ew3kb3b+umV+X7zjWp+lHcqyS+S
+         EMuO8rCQtMyOqg87QskFjWpBJOFmN1LeQGWvlMY/eNS2HsH/b0/Gc5tDpV2gJ+SJcQ8+
+         dnPb08TnwowHilPdOYUW4lurWBKqRQIX1Pk82ou2CC2nY9WM5hdcTpGxMn7t/krxsmRI
+         7tYq9kDXf0DSCac4vi2ycfCnBnY4x6sVeQJrKeKXVrp99dt5sW38ti6EYfvsW73k2/Er
+         wheA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693548271; x=1694153071;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dfLv56JgUFCXsENsYPIP+yaAFrYcDTTvtusyzWqWSds=;
+        b=FjDvwK0eIzDFe2lyPzO/m06Zs61HqyQFxxOTyOLAYaTOzcb+d08Y0DxnLc/RF1Jze0
+         kc2IXinCrWZg5M5ToInUTdnW+cpUU9Hhof8AnYbZobgQmlh39l0UDPgONd8kl7LBrLf6
+         A4tkKnl3mGJ52eTxMH2YcM6wzU7G7R8Ef+FZBTU7aCdwnwTFxu8tu9EpQL7FUKpEfc7Q
+         4xlKxO5shhAY2EjxhP8JwmwWyjxo5ZrOjJqjpV0xUmkoTrhsRJR/jN1nkVnQZvjzAy3b
+         +dynkWNhIJ3kTDgpvLOVB5Sn2qPFIUxCFr5RpRJTASjagmMBhcgB9VdKvPWxUbI6EPya
+         8zCQ==
+X-Gm-Message-State: AOJu0YyjjxS/FrhppAiYuKDkkNSWkozuKaDUPymCBQyRwF6FSzFCDh/d
+        Ztzba4LRzgci3PJ6YqRcYexvlKY99eZwB/uvP7ajcA==
+X-Google-Smtp-Source: AGHT+IEgpZQHAs3z6DvwmuZq/nZwOKrD9UgveHCXGqSM66fzWyf44HcZP52Yc4CjR2E4YhagLQL2BpDMpT6jjAl33v8=
+X-Received: by 2002:a19:5e1a:0:b0:4fe:ca9:d9bd with SMTP id
+ s26-20020a195e1a000000b004fe0ca9d9bdmr687655lfb.56.1693548271262; Thu, 31 Aug
+ 2023 23:04:31 -0700 (PDT)
 MIME-Version: 1.0
+References: <20230828102943.21097-1-aboutphysycs@gmail.com>
+In-Reply-To: <20230828102943.21097-1-aboutphysycs@gmail.com>
+From:   Alexandru Ardelean <alex@shruggie.ro>
+Date:   Fri, 1 Sep 2023 09:04:20 +0300
+Message-ID: <CAH3L5Qpg84+Dc0MzfEWtJmfZYsXwdNHD6OZ6bRTfyB8xcr5HdQ@mail.gmail.com>
+Subject: Re: [PATCH] char: hw_random: xiphera-trng: removed unnneded platform_set_drvdata()
+To:     Andrei Coardos <aboutphysycs@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, olivia@selenic.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Aurelian/Conor,
+On Mon, Aug 28, 2023 at 1:29=E2=80=AFPM Andrei Coardos <aboutphysycs@gmail.=
+com> wrote:
+>
+> This function call was found to be unnecessary as there is no equivalent
+> platform_get_drvdata() call to access the private data of the driver. Als=
+o,
+> the private data is defined in this driver, so there is no risk of it bei=
+ng
+> accessed outside of this driver file.
+>
+> Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
+> ---
+>  drivers/char/hw_random/xiphera-trng.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/xiphera-trng.c b/drivers/char/hw_rand=
+om/xiphera-trng.c
+> index 2a9fea72b2e0..1fa4b70246f0 100644
+> --- a/drivers/char/hw_random/xiphera-trng.c
+> +++ b/drivers/char/hw_random/xiphera-trng.c
+> @@ -122,8 +122,6 @@ static int xiphera_trng_probe(struct platform_device =
+*pdev)
+>                 return ret;
+>         }
+>
+> -       platform_set_drvdata(pdev, trng);
+> -
+>         return 0;
 
-Thanks for bringing this up.
+This entire block could become now:
 
-> On 2023-08-30 11:26, Conor Dooley wrote:
-> > Hi,
-> >
-> > There's been a report on the irc fedora-riscv irc of list_add
-> > corruption with the starfive crypto stuff:
-> > 	list_add corruption. next->prev should be prev (ffffffff02f65320), but
-> was ffffffd8eef15848. (next=ffffffd8eef15840).
-> > 	------------[ cut here ]------------
-> > 	kernel BUG at lib/list_debug.c:29!
-> > 	Kernel BUG [#1]
-> 
-> [snip]
-> 
-> > I feel like this isn't the first report I saw, but the other might've
-> > been for the equivalent driver in the vendor tree & I probably didn't
-> > pay any attention to.
-> 
-> I got this issue, if I remember correctly, I fixed it by enabling
-> CONFIG_ARM_AMBA and CONFIG_AMBA_PL08X. It improved things a bit,
+        return devm_hwrng_register(dev, &trng->rng);
 
-Thanks for bringing this up.
-I'll submit a patch to fix the Kconfig dependencies.
-
-> but now the driver is still not functional and instead I get this kind of trace
-> appearing during the self test of the driver:
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 3 PID: 292 at crypto/api.c:176
-> crypto_wait_for_test+0x8e/0x92 Modules linked in: nvme_fabrics ad7418
-> binfmt_misc jh7110_tdm snd_soc_core snd_pcm_dmaengine ofpart spi_nor
-> snd_pcm starfive_wdt mtd watchdog jh7110_crypto(+) snd_timer
-> jh7110_trng crypto_engine rng_core snd soundcore sfctemp cpufreq_dt drm
-> loop fuse drm_panel_orientation_quirks configfs ip_tables x_tables autofs4
-> ext4 crc32c_generic crc16 mbcache jbd2 rtc_ds1307 dm_mod dax nvme
-> xhci_pci nvme_core t10_pi crc64_rocksoft crc64 crc_t10dif crct10dif_generic
-> crct10dif_common xhci_hcd usbcore axp20x_regulator dwmac_starfive
-> stmmac_platform usb_common dw_mmc_starfive dw_mmc_pltfm
-> axp20x_i2c axp20x mfd_core regmap_i2c stmmac dw_mmc pcs_xpcs of_mdio
-> fixed_phy phylink fwnode_mdio mmc_core libphy clk_starfive_jh7110_vout
-> clk_starfive_jh7110_isp clk_starfive_jh7110_aon spi_cadence_quadspi
-> i2c_designware_platform clk_starfive_jh7110_stg phy_jh7110_usb
-> phy_jh7110_pcie i2c_designware_core
-> CPU: 3 PID: 292 Comm: (udev-worker) Not tainted 6.5.0-rc7+ #1 Hardware
-> name: StarFive VisionFive 2 v1.2A (DT) epc : crypto_wait_for_test+0x8e/0x92
-[...]
-
-I'll investigate this error.
-
-Thanks,
-Jia Jie
+>  }
+>
+> --
+> 2.34.1
+>
