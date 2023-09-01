@@ -2,102 +2,123 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF42CCA0FE6
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 06:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA9ACA0FE1
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Sep 2023 06:08:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237280AbjIAGEh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Sep 2023 02:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37150 "EHLO
+        id S234445AbjIAGIN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 1 Sep 2023 02:08:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236823AbjIAGEh (ORCPT
+        with ESMTP id S234395AbjIAGIM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Sep 2023 02:04:37 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40ED710D0
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:04:33 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b95d5ee18dso29278861fa.1
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:04:33 -0700 (PDT)
+        Fri, 1 Sep 2023 02:08:12 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2C612F
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:08:09 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-500b6456c7eso3001351e87.2
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Aug 2023 23:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shruggie-ro.20230601.gappssmtp.com; s=20230601; t=1693548271; x=1694153071; darn=vger.kernel.org;
+        d=shruggie-ro.20230601.gappssmtp.com; s=20230601; t=1693548487; x=1694153287; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dfLv56JgUFCXsENsYPIP+yaAFrYcDTTvtusyzWqWSds=;
-        b=slRSakWcK1tP3bqgnANhP+oNGiq/OjkfKASuqdhlqUCMYawWKEtXr6Vf3IWT0SfBA9
-         DMqVUWZyGiUyHzkLCBp+M82gINN1PaQR3frjEdBz6Ew3kb3b+umV+X7zjWp+lHcqyS+S
-         EMuO8rCQtMyOqg87QskFjWpBJOFmN1LeQGWvlMY/eNS2HsH/b0/Gc5tDpV2gJ+SJcQ8+
-         dnPb08TnwowHilPdOYUW4lurWBKqRQIX1Pk82ou2CC2nY9WM5hdcTpGxMn7t/krxsmRI
-         7tYq9kDXf0DSCac4vi2ycfCnBnY4x6sVeQJrKeKXVrp99dt5sW38ti6EYfvsW73k2/Er
-         wheA==
+        bh=55BxJjKi7DirtlyQXejaP8jWTZ8SZUZhKioXDf5mo/E=;
+        b=QBsNy5Lk56lDMOQcMwG68f1lbiyhE5WE8znDWRToZSssU2pg8TxskDLijhxZM6ymYa
+         3QGHwQzam/NL7HmgdREILF+vc/qLic9CMrWTKgxtAApon4E1rQs35bdzyVflzrWrYezL
+         xdx+QUHHSedrOiOIkgmcu/QjF/gU8NkPuFZaix22ytjIMkNwg4u+x+dnxYsBzvvyz820
+         ODCqGFIJ7IVgEVvMpXzSD9AlTkmM3tDLKaG09SlKIzXbCREWoek3i7c3so2uNw2pKS85
+         pn6pX9oDARO+M2vYu0pSiYunPkNh5cx9YYR/GsTCjNPOjBRmFB1wnZmtnuhgYZia2AYr
+         KFAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693548271; x=1694153071;
+        d=1e100.net; s=20221208; t=1693548487; x=1694153287;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dfLv56JgUFCXsENsYPIP+yaAFrYcDTTvtusyzWqWSds=;
-        b=FjDvwK0eIzDFe2lyPzO/m06Zs61HqyQFxxOTyOLAYaTOzcb+d08Y0DxnLc/RF1Jze0
-         kc2IXinCrWZg5M5ToInUTdnW+cpUU9Hhof8AnYbZobgQmlh39l0UDPgONd8kl7LBrLf6
-         A4tkKnl3mGJ52eTxMH2YcM6wzU7G7R8Ef+FZBTU7aCdwnwTFxu8tu9EpQL7FUKpEfc7Q
-         4xlKxO5shhAY2EjxhP8JwmwWyjxo5ZrOjJqjpV0xUmkoTrhsRJR/jN1nkVnQZvjzAy3b
-         +dynkWNhIJ3kTDgpvLOVB5Sn2qPFIUxCFr5RpRJTASjagmMBhcgB9VdKvPWxUbI6EPya
-         8zCQ==
-X-Gm-Message-State: AOJu0YyjjxS/FrhppAiYuKDkkNSWkozuKaDUPymCBQyRwF6FSzFCDh/d
-        Ztzba4LRzgci3PJ6YqRcYexvlKY99eZwB/uvP7ajcA==
-X-Google-Smtp-Source: AGHT+IEgpZQHAs3z6DvwmuZq/nZwOKrD9UgveHCXGqSM66fzWyf44HcZP52Yc4CjR2E4YhagLQL2BpDMpT6jjAl33v8=
-X-Received: by 2002:a19:5e1a:0:b0:4fe:ca9:d9bd with SMTP id
- s26-20020a195e1a000000b004fe0ca9d9bdmr687655lfb.56.1693548271262; Thu, 31 Aug
- 2023 23:04:31 -0700 (PDT)
+        bh=55BxJjKi7DirtlyQXejaP8jWTZ8SZUZhKioXDf5mo/E=;
+        b=f2nfc56fPHZ6ZQcueUPhuU+sA1C+IzoMqFI2qzZC4UPMNI9lCPLyQQRAFgm0BdwxOn
+         FmDGka2QDnbAkHHPX4dVdOECMYPFpM67hQzZvkI1GRokIjCusATTIRMgS9S5h9GMNMcf
+         MPy6bardIzMrvkmStv3JCRVbqlkmxVQaqVoO+m1NWYKA1BbcCGPwh0TE2p/rlegVAAfE
+         6WXZrAU/LMhLbWE7tgmbZtNsdT7suXZ3ziRbubeaHaeG+SVt8L3Nk84BOMlqB3qTzJs4
+         4IBHVOhHfVDkzBsCc2GTo3yQnFGZNiCJQzxBI2NmhhEhfTiV8jA1uSymtrScbfF09IlG
+         C81w==
+X-Gm-Message-State: AOJu0YwTcLC+hodQBrKorQx0tS546eDXoYVpVSyZnO5s791hFIgJD9kH
+        FsjJTmG1//eFBXK+jo2ph5idLIvxjQWnlwkT839Ehg==
+X-Google-Smtp-Source: AGHT+IHhmP3gDhGomai/9raHqQKs+Q5jpKVGJgJsGk/popt6RSiceb6Vl34UQbx7LN57F4CW4PL97nuoVUvhRY61XQc=
+X-Received: by 2002:ac2:57cb:0:b0:4fe:7e7f:1328 with SMTP id
+ k11-20020ac257cb000000b004fe7e7f1328mr693199lfo.16.1693548487184; Thu, 31 Aug
+ 2023 23:08:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230828102943.21097-1-aboutphysycs@gmail.com>
-In-Reply-To: <20230828102943.21097-1-aboutphysycs@gmail.com>
+References: <20230828101757.9724-1-aboutphysycs@gmail.com> <20230828-citable-superjet-d235f036be99@wendy>
+In-Reply-To: <20230828-citable-superjet-d235f036be99@wendy>
 From:   Alexandru Ardelean <alex@shruggie.ro>
-Date:   Fri, 1 Sep 2023 09:04:20 +0300
-Message-ID: <CAH3L5Qpg84+Dc0MzfEWtJmfZYsXwdNHD6OZ6bRTfyB8xcr5HdQ@mail.gmail.com>
-Subject: Re: [PATCH] char: hw_random: xiphera-trng: removed unnneded platform_set_drvdata()
-To:     Andrei Coardos <aboutphysycs@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, olivia@selenic.com
+Date:   Fri, 1 Sep 2023 09:07:56 +0300
+Message-ID: <CAH3L5QreWNPgwogL7bCYZgKSuz_HfZuKLtRVqz+UyRtJ1TB-SA@mail.gmail.com>
+Subject: Re: [PATCH] char: hw_random: mpfs-rng: removed unneeded call to platform_set_drvdata()
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Andrei Coardos <aboutphysycs@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-riscv@lists.infradead.org, herbert@gondor.apana.org.au,
+        olivia@selenic.com, daire.mcnamara@microchip.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 28, 2023 at 1:29=E2=80=AFPM Andrei Coardos <aboutphysycs@gmail.=
-com> wrote:
+On Mon, Aug 28, 2023 at 2:06=E2=80=AFPM Conor Dooley <conor.dooley@microchi=
+p.com> wrote:
 >
-> This function call was found to be unnecessary as there is no equivalent
-> platform_get_drvdata() call to access the private data of the driver. Als=
-o,
-> the private data is defined in this driver, so there is no risk of it bei=
-ng
-> accessed outside of this driver file.
+> On Mon, Aug 28, 2023 at 01:17:57PM +0300, Andrei Coardos wrote:
+> > This function call was found to be unnecessary as there is no equivalen=
+t
+> > platform_get_drvdata() call to access the private data of the driver. A=
+lso,
+> > the private data is defined in this driver, so there is no risk of it b=
+eing
+> > accessed outside of this driver file.
 >
-> Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
-> ---
->  drivers/char/hw_random/xiphera-trng.c | 2 --
->  1 file changed, 2 deletions(-)
+> I think Greg previously pointed out to you that is it not sufficient to
+> check for platform_get_drvdata() alone, because the information could be
+> accessed without going through that helper. That's not the case here,
+> but it could be true elsewhere.
 >
-> diff --git a/drivers/char/hw_random/xiphera-trng.c b/drivers/char/hw_rand=
-om/xiphera-trng.c
-> index 2a9fea72b2e0..1fa4b70246f0 100644
-> --- a/drivers/char/hw_random/xiphera-trng.c
-> +++ b/drivers/char/hw_random/xiphera-trng.c
-> @@ -122,8 +122,6 @@ static int xiphera_trng_probe(struct platform_device =
-*pdev)
->                 return ret;
->         }
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 >
-> -       platform_set_drvdata(pdev, trng);
-> -
->         return 0;
+> Thanks,
+> Conor.
+>
+> >
+> > Signed-off-by: Andrei Coardos <aboutphysycs@gmail.com>
+> > ---
+> >  drivers/char/hw_random/mpfs-rng.c | 2 --
+> >  1 file changed, 2 deletions(-)
+> >
+> > diff --git a/drivers/char/hw_random/mpfs-rng.c b/drivers/char/hw_random=
+/mpfs-rng.c
+> > index c6972734ae62..0994024daa70 100644
+> > --- a/drivers/char/hw_random/mpfs-rng.c
+> > +++ b/drivers/char/hw_random/mpfs-rng.c
+> > @@ -79,8 +79,6 @@ static int mpfs_rng_probe(struct platform_device *pde=
+v)
+> >       rng_priv->rng.read =3D mpfs_rng_read;
+> >       rng_priv->rng.name =3D pdev->name;
+> >
+> > -     platform_set_drvdata(pdev, rng_priv);
+> > -
+> >       ret =3D devm_hwrng_register(&pdev->dev, &rng_priv->rng);
 
-This entire block could become now:
+A question would be if there is a desire to keep the prints below, or
+would this be sufficient?
 
-        return devm_hwrng_register(dev, &trng->rng);
+          return devm_hwrng_register(&pdev->dev, &rng_priv->rng);
 
->  }
->
-> --
-> 2.34.1
->
+If there is the desire to keep the prints, then:
+
+Reviewed-by: Alexandru Ardelean <alex@shruggie.ro>
+
+> >       if (ret)
+> >               return dev_err_probe(&pdev->dev, ret, "Failed to register=
+ MPFS hwrng\n");
+> > --
+> > 2.34.1
+> >
