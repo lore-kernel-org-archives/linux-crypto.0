@@ -2,91 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47ABEC71153
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Sep 2023 17:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F90CCA0FE3
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 Sep 2023 17:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236491AbjICRda (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 3 Sep 2023 13:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52998 "EHLO
+        id S1345820AbjICRd5 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 3 Sep 2023 13:33:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344767AbjICRda (ORCPT
+        with ESMTP id S1345779AbjICRd4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 3 Sep 2023 13:33:30 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09479FE
-        for <linux-crypto@vger.kernel.org>; Sun,  3 Sep 2023 10:33:27 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so3433551a12.0
-        for <linux-crypto@vger.kernel.org>; Sun, 03 Sep 2023 10:33:26 -0700 (PDT)
+        Sun, 3 Sep 2023 13:33:56 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B24FAF9
+        for <linux-crypto@vger.kernel.org>; Sun,  3 Sep 2023 10:33:52 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso103618666b.1
+        for <linux-crypto@vger.kernel.org>; Sun, 03 Sep 2023 10:33:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693762405; x=1694367205; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1693762431; x=1694367231; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gnbIqa3QLa9uMxTPmoPwXfavhfYZLupOpY21IJJuDrE=;
-        b=smEw1RozG8Fh6qlFDJwaE656nkKjcqlZDa/aXxhbD137rQ2JjOF6bSNSfGF1dV3qOc
-         61QBt29LXyL1CuIzyGhhWJcVShWN0LkdiP2lqXAVmNQodFgd6OLo5eKLCdCJHLGVizct
-         0Q+tOBDE/+p1p8BSmrz7Di6am07A9pKsNgOuv3fAqXfUUMiRFBe5B1Xsb1vSPpCN6FJh
-         lO+8PYQ+7mi1/5oqQUC34AwuDFj4Um0oPeYOV+QVkt8G/DPqghuaA28umxNY2Vl0vA23
-         cHzksLam5QMUqCed77S3oRO6v7JVIiXAW57tBuDr2QmEJs66xhfkhQsdLQosW11BK5jK
-         gwTw==
+        bh=lJlJEDKaMVpuZOQmNMYZZ3OzPFp1RwseEJnA06hFnEc=;
+        b=aRGyh1ls9VmxVJEZAXhrbvZ5TgoToXcQaCMoJJF7dEw4sBHsRaPD4r7DYG7mz0z49r
+         Fn2gXel+hxFsvL/Ratey7oFYgrHSyyxuG+whRxc6v8nD7D9N2VPyghqvWbHdhKG0E9VK
+         sf1xvC8g2JXj3ejP4ZkM4NkVwxvL0Jv/6CYhzm3Dgiy6YOJhCphb2WRsvlUkWu6aApU3
+         6r+FKoc3ve9GeqRugB2ujg+xRA2B+slpaTqd49JqLKIDWQ5OPb4dvVwIMQ6Vtbrnk2k2
+         2bscTOACBnI8mDhwuxZNQeerF7Tv/IAOG/xxBs9BPaYFbGFXmPoiJ/FcJTNkqvO+TCJJ
+         120A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693762405; x=1694367205;
+        d=1e100.net; s=20221208; t=1693762431; x=1694367231;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gnbIqa3QLa9uMxTPmoPwXfavhfYZLupOpY21IJJuDrE=;
-        b=S2KZp0smDPrnm9iITvBP8tzNX6EwuMNNd5wf7b0Nq/oYB1hLvGb7ge95B39V6fvU48
-         9BmQLyYxhajxlyiOuEgxApOiw04xtC9jLSepMA+zs6y3BLWxKzM0Flc5CbvM/69644kk
-         7X6y9kypZEbCM88TH1R+/n7Xuv8NdvaX+u7Y46JX8G9z554w382cLSWAc6Chc+TlLbje
-         HSexYM3jjKa2lYdIJOeFiwbIBo8uHWfqdfWAhuOuhoFj4lwjnOLUMayepPbmgsTa7635
-         UeotK+QHG3BEXU7Wk2Hmf10RHZEVJPv1O5XV23MwdFAGaKvtkxuP4WBThH2nUR7BvzVf
-         x57A==
-X-Gm-Message-State: AOJu0Ywf7Yo8VMhMFPXJGdPosDcjuda2Jie5grUGCjbLFamXcD0BQvou
-        tmpT0yh5GC5EG3HR6BmnSU+J0A==
-X-Google-Smtp-Source: AGHT+IFGB/BXefKvYXzHo/yhCqX2O412qIh3xyABISAk69aKJTwnVi8a9Uu/LOHlUTLSJPmKVOvD4Q==
-X-Received: by 2002:a05:6402:396:b0:521:d2ab:e4df with SMTP id o22-20020a056402039600b00521d2abe4dfmr8939077edv.19.1693762404933;
-        Sun, 03 Sep 2023 10:33:24 -0700 (PDT)
+        bh=lJlJEDKaMVpuZOQmNMYZZ3OzPFp1RwseEJnA06hFnEc=;
+        b=SnhY4vFQ9ZXeJpppspXhDDShjpf9voqJ+PVO6/AckXkcLtjyavArJO5v+iyKsK9z75
+         GRis91bsAshtr7GxUyvOt8KcqxxxiBphdDREfqKDxVZQK8503rvGMjtJvG/Rv5cxjTNV
+         LKjuDhaSdeSi5jPr8ooS/ddgHULA9qOF+Es7RU2nWlstqeZ5wUDcXAcPjY6GGEYiKpzQ
+         1PrCD67JgKMNoK+Y0u/Y5S34ZjLeJS3ZIdZC4VMd78SDbNJ0xU5+UeX4C+oyoZwEtEot
+         wdGPZo8P2toU6xwunz7zx9X6/n4rOC3UWJHamzNbOaWFGYFzT4Sa0kJk+0GJDsxxmU6v
+         R76w==
+X-Gm-Message-State: AOJu0Yw6TB//vGI4r2kmA3LdchaZ2w+KC/ep2zKma9E1cWdl17l7KJrx
+        iQJXm0PIGJ5a4W5r8ndx9M2IHw==
+X-Google-Smtp-Source: AGHT+IFp8PyiuVpsHpKOtE87RrTWgxXMDJl6l6P8L0HRMD/itI6bupjZ7KaLE5yLbm/5Kt8EVTeM8w==
+X-Received: by 2002:a17:906:31d2:b0:9a1:c9c5:5fa1 with SMTP id f18-20020a17090631d200b009a1c9c55fa1mr5729464ejf.4.1693762431275;
+        Sun, 03 Sep 2023 10:33:51 -0700 (PDT)
 Received: from [192.168.0.22] (77-252-46-238.static.ip.netia.com.pl. [77.252.46.238])
-        by smtp.gmail.com with ESMTPSA id t3-20020aa7d4c3000000b0051bed21a635sm4730574edr.74.2023.09.03.10.33.23
+        by smtp.gmail.com with ESMTPSA id s1-20020a170906960100b00992d122af63sm4995441ejx.89.2023.09.03.10.33.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Sep 2023 10:33:24 -0700 (PDT)
-Message-ID: <100bc802-b706-e923-463a-705522650ecb@linaro.org>
-Date:   Sun, 3 Sep 2023 19:33:23 +0200
+        Sun, 03 Sep 2023 10:33:50 -0700 (PDT)
+Message-ID: <79bee2a6-6d6b-9fdd-4e97-cfebf65f81f7@linaro.org>
+Date:   Sun, 3 Sep 2023 19:33:49 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.0
-Subject: Re: [PATCH v2 4/7] crypto: qcom-rng - Add support for trng
+Subject: Re: [PATCH] crypto: qcom-rng: Add hwrng support
 Content-Language: en-US
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230824-topic-sm8550-rng-v2-0-dfcafbb16a3e@linaro.org>
- <20230824-topic-sm8550-rng-v2-4-dfcafbb16a3e@linaro.org>
- <29fb1e51-1e18-4e45-be64-190df52e1156@quicinc.com>
- <3d09f47f-b0b8-4429-944a-df3de19c7a6c@quicinc.com>
+To:     Om Prakash Singh <quic_omprsing@quicinc.com>
+Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
+        agross@kernel.org, andersson@kernel.org, conor+dt@kernel.org,
+        davem@davemloft.net, devicetree@vger.kernel.org,
+        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marijn.suijten@somainline.org,
+        robh+dt@kernel.org, vkoul@kernel.org
+References: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <3d09f47f-b0b8-4429-944a-df3de19c7a6c@quicinc.com>
+In-Reply-To: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 01/09/2023 14:56, Om Prakash Singh wrote:
-> I missed to notice. Please correct "-" to ":" in subject line
+On 01/09/2023 15:15, Om Prakash Singh wrote:
+> This is follow patch on top of [1] to add hwrng support for newer
+> platform with trng capability.
 
-Hm? What do you want to correct? The subject prefix is correct, why do
-you ask to change it?
+Please use subject prefixes matching the subsystem.
 
 Best regards,
 Krzysztof
