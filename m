@@ -2,140 +2,131 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5448C71153
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Sep 2023 13:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E899C71153
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Sep 2023 13:45:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231911AbjIDNej (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Sep 2023 09:34:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48392 "EHLO
+        id S232921AbjIDNpb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Sep 2023 09:45:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347193AbjIDNei (ORCPT
+        with ESMTP id S229476AbjIDNpa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Sep 2023 09:34:38 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74956CE0
-        for <linux-crypto@vger.kernel.org>; Mon,  4 Sep 2023 06:34:34 -0700 (PDT)
-Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RfV0t0MjyzVkFf;
-        Mon,  4 Sep 2023 21:31:58 +0800 (CST)
-Received: from hulk-vt.huawei.com (10.67.174.118) by
- kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 4 Sep 2023 21:34:31 +0800
-From:   Lu Jialin <lujialin4@huawei.com>
-To:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     Lu Jialin <lujialin4@huawei.com>, Guo Zihua <guozihua@huawei.com>,
-        <linux-crypto@vger.kernel.org>
-Subject: [PATCH v3] crypto: Fix hungtask for PADATA_RESET
-Date:   Mon, 4 Sep 2023 13:33:41 +0000
-Message-ID: <20230904133341.2528440-1-lujialin4@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 4 Sep 2023 09:45:30 -0400
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B50CCC;
+        Mon,  4 Sep 2023 06:45:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazon201209;
+  t=1693835107; x=1725371107;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=G+iX3JsAkHreJdbYVOvBTtFDWtAvDZ2THRhTmaGM4t8=;
+  b=qY7l/EX37IPIUpLwWjMXuxQbzDLMLxagcTxx8PLV0rret3vrWanenSE9
+   ehsX8xDZZPgbY8VEJDYKBA1mDxT/mkp3TlnNqaItMYAvu48dUwn85uOgB
+   /WGu5dM168dNOvwP+boOZT43KGNxu0mTyYaZjLipFUQduiBtDV+MDCgk6
+   g=;
+X-IronPort-AV: E=Sophos;i="6.02,226,1688428800"; 
+   d="scan'208";a="349297432"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 13:45:04 +0000
+Received: from EX19D016EUA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1e-m6i4x-6e7a78d7.us-east-1.amazon.com (Postfix) with ESMTPS id 2AD89808FC;
+        Mon,  4 Sep 2023 13:45:00 +0000 (UTC)
+Received: from EX19D037EUB003.ant.amazon.com (10.252.61.119) by
+ EX19D016EUA002.ant.amazon.com (10.252.50.57) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 4 Sep 2023 13:44:58 +0000
+Received: from [192.168.6.232] (10.1.213.8) by EX19D037EUB003.ant.amazon.com
+ (10.252.61.119) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Mon, 4 Sep
+ 2023 13:44:52 +0000
+Message-ID: <32756034-2fd4-4246-830e-c1a0eeab0a55@amazon.es>
+Date:   Mon, 4 Sep 2023 15:44:48 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.174.118]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600003.china.huawei.com (7.193.23.202)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/2] Propagating reseed notifications to user space
+Content-Language: en-US
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Jason Wang" <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <virtualization@lists.linux-foundation.org>
+CC:     <graf@amazon.de>, <xmarcalx@amazon.co.uk>, <aams@amazon.de>,
+        <dwmw@amazon.co.uk>, <gregkh@linuxfoundation.org>,
+        <bchalios@amazon.es>
+References: <20230823090107.65749-1-bchalios@amazon.es>
+From:   Babis Chalios <bchalios@amazon.es>
+Autocrypt: addr=bchalios@amazon.es; keydata=
+ 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
+In-Reply-To: <20230823090107.65749-1-bchalios@amazon.es>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.1.213.8]
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+ EX19D037EUB003.ant.amazon.com (10.252.61.119)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We found a hungtask bug in test_aead_vec_cfg as follows:
+Hello all,
 
-INFO: task cryptomgr_test:391009 blocked for more than 120 seconds.
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-Call trace:
- __switch_to+0x98/0xe0
- __schedule+0x6c4/0xf40
- schedule+0xd8/0x1b4
- schedule_timeout+0x474/0x560
- wait_for_common+0x368/0x4e0
- wait_for_completion+0x20/0x30
- wait_for_completion+0x20/0x30
- test_aead_vec_cfg+0xab4/0xd50
- test_aead+0x144/0x1f0
- alg_test_aead+0xd8/0x1e0
- alg_test+0x634/0x890
- cryptomgr_test+0x40/0x70
- kthread+0x1e0/0x220
- ret_from_fork+0x10/0x18
- Kernel panic - not syncing: hung_task: blocked tasks
+On 23/8/23 11:01, Babis Chalios wrote:
+> This is an RFC, so that we can discuss whether the proposed ABI works.
+> Also, I'd like to hear people's opinion on the internal registration
+> API, 8/24 split etc. If we decide that this approach works, I 'm happy
+> to add documentation for it, with examples on how user space can make
+> use of it.
 
-For padata_do_parallel, when the return err is 0 or -EBUSY, it will call
-wait_for_completion(&wait->completion) in test_aead_vec_cfg. In normal
-case, aead_request_complete() will be called in pcrypt_aead_serial and the
-return err is 0 for padata_do_parallel. But, when pinst->flags is
-PADATA_RESET, the return err is -EBUSY for padata_do_parallel, and it
-won't call aead_request_complete(). Therefore, test_aead_vec_cfg will
-hung at wait_for_completion(&wait->completion), which will cause
-hungtask.
+Some time has passed since I sent this and I haven't received any 
+comments, so I assume people
+are happy with the proposed API. I will work on adding documentation and 
+examples on how
+user space can use this and send a v1.
 
-The problem comes as following:
-(padata_do_parallel)                 |
-    rcu_read_lock_bh();              |
-    err = -EINVAL;                   |   (padata_replace)
-                                     |     pinst->flags |= PADATA_RESET;
-    err = -EBUSY                     |
-    if (pinst->flags & PADATA_RESET) |
-        rcu_read_unlock_bh()         |
-        return err
-
-In order to resolve the problem, we replace the return err -EBUSY with
--EAGAIN, which means parallel_data is changing, and the caller should call
-it again.
-
-v3:
-remove retry and just change the return err.
-v2:
-introduce padata_try_do_parallel() in pcrypt_aead_encrypt and
-pcrypt_aead_decrypt to solve the hungtask.
-
-Signed-off-by: Lu Jialin <lujialin4@huawei.com>
-Signed-off-by: Guo Zihua <guozihua@huawei.com>
----
- crypto/pcrypt.c | 4 ++++
- kernel/padata.c | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 8c1d0ca41213..d0d954fe9d54 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -117,6 +117,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
- 	err = padata_do_parallel(ictx->psenc, padata, &ctx->cb_cpu);
- 	if (!err)
- 		return -EINPROGRESS;
-+	if (err == -EBUSY)
-+		return -EAGAIN;
- 
- 	return err;
- }
-@@ -164,6 +166,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
- 	err = padata_do_parallel(ictx->psdec, padata, &ctx->cb_cpu);
- 	if (!err)
- 		return -EINPROGRESS;
-+	if (err == -EBUSY)
-+		return -EAGAIN;
- 
- 	return err;
- }
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 222d60195de6..81c8183f3176 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -202,7 +202,7 @@ int padata_do_parallel(struct padata_shell *ps,
- 		*cb_cpu = cpu;
- 	}
- 
--	err =  -EBUSY;
-+	err = -EBUSY;
- 	if ((pinst->flags & PADATA_RESET))
- 		goto out;
- 
--- 
-2.34.1
-
+Cheers,
+Babis
