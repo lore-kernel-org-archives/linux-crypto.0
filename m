@@ -2,102 +2,65 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95232CA0FE2
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Sep 2023 16:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F051DC83F2C
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Sep 2023 16:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241390AbjIEQUy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Sep 2023 12:20:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59478 "EHLO
+        id S1343849AbjIEQU5 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Sep 2023 12:20:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351851AbjIEF17 (ORCPT
+        with ESMTP id S1354086AbjIEJfY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2023 01:27:59 -0400
-Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1D7CCB
-        for <linux-crypto@vger.kernel.org>; Mon,  4 Sep 2023 22:27:54 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-        by smtp.orange.fr with ESMTPA
-        id dObLqMhXKyoREdObLqvYW2; Tue, 05 Sep 2023 07:27:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-        s=t20230301; t=1693891673;
-        bh=fc7UsU95zQsQlPFIsQq5CGy7XFtuPx0VRlseRiLjyWk=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=ZTcnkZLbqoSNSU+t4WKF6rZhBLRXayHen8UVP/HiXefCK2r6YV2YaoOmDVbiwhmi/
-         pL6EerMqzvKPsvFYnyE3OEq9EyLixV+EVphMNpQOsnac3otc+xHZNGnbFfxUNhah+3
-         J93Lq8s3m1aUPdyxBe/9y+YKerdABdST93g9BUSI84g4yuPnlBTOYPcCkZRemh8XTA
-         D23SnaLJZwrNquo6rv9ksE/7Lq3vpEiWtOSCr3hgl70d7MsqmOo9+Z+RbVXdEApWNO
-         ip5dyaxPioGlQzSZVOEZgbA+x1Es2Xpul8Ht3Ym5mcN/Yi6qxYpQbVzz+z7PYqaMuU
-         UZECZHO8vvAjg==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 05 Sep 2023 07:27:53 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
-Date:   Tue, 5 Sep 2023 07:27:47 +0200
+        Tue, 5 Sep 2023 05:35:24 -0400
+X-Greylist: delayed 4330 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Sep 2023 02:35:21 PDT
+Received: from mail.equinoxrise.pl (mail.equinoxrise.pl [217.61.112.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181171A7
+        for <linux-crypto@vger.kernel.org>; Tue,  5 Sep 2023 02:35:21 -0700 (PDT)
+Received: by mail.equinoxrise.pl (Postfix, from userid 1002)
+        id EB75C83635; Mon,  4 Sep 2023 09:41:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=equinoxrise.pl;
+        s=mail; t=1693813347;
+        bh=v6OgBfK5dN7P5dQ0wCu59rOfZaiqziJeLNblJ8dOcGI=;
+        h=Date:From:To:Subject:From;
+        b=jxhyIT1/t2R1KFPuo52zfc4ETVEfpnx6VhCEneedazH3dw9MhPn6vvIObDQhyj2Ad
+         aODChG+hboU3GhH16bPvt7Ij/GBUr+fe83nYHUyQkzTKwDX+oGN8boJoGkX6rJjx09
+         ycfcXz3tOcp9ol3liu8jXuA8HVfHM/P0ArJfba2+fX4JtFw1bLzTis1T4smrm3UA1L
+         2Dc123ajSMFdKKDOn5uR19WlB7HLWKzvdxMi0wio0+v34fI3l0knGBZkGLamx3mDaZ
+         Ngp1uMPdo9cz82/7ZShV7v5K54lpQEccK35BmuiSNLavGIXFyBAyCKJ4+T69aoGTUD
+         8yl6l2UfFpchw==
+Received: by mail.equinoxrise.pl for <linux-crypto@vger.kernel.org>; Mon,  4 Sep 2023 07:40:34 GMT
+Message-ID: <20230904084500-0.1.7.rdd.0.oj1noskh07@equinoxrise.pl>
+Date:   Mon,  4 Sep 2023 07:40:34 GMT
+From:   "Mateusz Talaga" <mateusz.talaga@equinoxrise.pl>
+To:     <linux-crypto@vger.kernel.org>
+Subject: Prezentacja
+X-Mailer: mail.equinoxrise.pl
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] crypto: hisilicon/hpre - Fix a erroneous check after
- snprintf()
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Longfang Liu <liulongfang@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <73534cb1713f58228d54ea53a8a137f4ef939bad.1693858632.git.christophe.jaillet@wanadoo.fr>
- <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
-Content-Language: fr, en-US
-From:   Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Dzie=C5=84 dobry!
 
-Le 05/09/2023 à 04:27, Herbert Xu a écrit :
-> On Mon, Sep 04, 2023 at 10:17:29PM +0200, Christophe JAILLET wrote:
->> This error handling looks really strange.
->> Check if the string has been truncated instead.
->>
->> Fixes: 02ab994635eb ("crypto: hisilicon - Fixed some tiny bugs of HPRE")
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->>   drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
->> index 39297ce70f44..db44d889438a 100644
->> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
->> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
->> @@ -1033,7 +1033,7 @@ static int hpre_cluster_debugfs_init(struct hisi_qm *qm)
->>   
->>   	for (i = 0; i < clusters_num; i++) {
->>   		ret = snprintf(buf, HPRE_DBGFS_VAL_MAX_LEN, "cluster%d", i);
->> -		if (ret < 0)
->> +		if (ret >= HPRE_DBGFS_VAL_MAX_LEN)
->>   			return -EINVAL;
->>   		tmp_d = debugfs_create_dir(buf, qm->debug.debug_root);
-> Who is going to free the allocated memory in case of error?
+Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
+=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
+zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
 
-Not sure to understand.
+Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
+=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
+dostaw.
 
-The memory is allocated with devm_kzalloc(), so it will be freed by the 
-framework.
+Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
+nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
+ co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
 
-Some debugfs dir of file way be left around. Is it what your are talking 
-about?
+Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
+=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
+zania w Pa=C5=84stwa firmie.
 
->
-> The other snprintf in the same file also looks suspect.
 
-It looks correct to me.
-
-And HPRE_DBGFS_VAL_MAX_LEN being 20, it doesn't really matter. The 
-string can't be truncated with just a "%u\n".
-
-CJ
-
->
-> Thanks,
+Pozdrawiam
+Mateusz Talaga
