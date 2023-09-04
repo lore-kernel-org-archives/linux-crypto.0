@@ -2,85 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F90CCA0FE3
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Sep 2023 17:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 798FEC71153
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Sep 2023 05:40:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345820AbjICRd5 (ORCPT
+        id S1349072AbjIDFkd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 3 Sep 2023 13:33:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35610 "EHLO
+        Mon, 4 Sep 2023 01:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345779AbjICRd4 (ORCPT
+        with ESMTP id S232830AbjIDFkc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 3 Sep 2023 13:33:56 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B24FAF9
-        for <linux-crypto@vger.kernel.org>; Sun,  3 Sep 2023 10:33:52 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso103618666b.1
-        for <linux-crypto@vger.kernel.org>; Sun, 03 Sep 2023 10:33:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693762431; x=1694367231; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lJlJEDKaMVpuZOQmNMYZZ3OzPFp1RwseEJnA06hFnEc=;
-        b=aRGyh1ls9VmxVJEZAXhrbvZ5TgoToXcQaCMoJJF7dEw4sBHsRaPD4r7DYG7mz0z49r
-         Fn2gXel+hxFsvL/Ratey7oFYgrHSyyxuG+whRxc6v8nD7D9N2VPyghqvWbHdhKG0E9VK
-         sf1xvC8g2JXj3ejP4ZkM4NkVwxvL0Jv/6CYhzm3Dgiy6YOJhCphb2WRsvlUkWu6aApU3
-         6r+FKoc3ve9GeqRugB2ujg+xRA2B+slpaTqd49JqLKIDWQ5OPb4dvVwIMQ6Vtbrnk2k2
-         2bscTOACBnI8mDhwuxZNQeerF7Tv/IAOG/xxBs9BPaYFbGFXmPoiJ/FcJTNkqvO+TCJJ
-         120A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693762431; x=1694367231;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lJlJEDKaMVpuZOQmNMYZZ3OzPFp1RwseEJnA06hFnEc=;
-        b=SnhY4vFQ9ZXeJpppspXhDDShjpf9voqJ+PVO6/AckXkcLtjyavArJO5v+iyKsK9z75
-         GRis91bsAshtr7GxUyvOt8KcqxxxiBphdDREfqKDxVZQK8503rvGMjtJvG/Rv5cxjTNV
-         LKjuDhaSdeSi5jPr8ooS/ddgHULA9qOF+Es7RU2nWlstqeZ5wUDcXAcPjY6GGEYiKpzQ
-         1PrCD67JgKMNoK+Y0u/Y5S34ZjLeJS3ZIdZC4VMd78SDbNJ0xU5+UeX4C+oyoZwEtEot
-         wdGPZo8P2toU6xwunz7zx9X6/n4rOC3UWJHamzNbOaWFGYFzT4Sa0kJk+0GJDsxxmU6v
-         R76w==
-X-Gm-Message-State: AOJu0Yw6TB//vGI4r2kmA3LdchaZ2w+KC/ep2zKma9E1cWdl17l7KJrx
-        iQJXm0PIGJ5a4W5r8ndx9M2IHw==
-X-Google-Smtp-Source: AGHT+IFp8PyiuVpsHpKOtE87RrTWgxXMDJl6l6P8L0HRMD/itI6bupjZ7KaLE5yLbm/5Kt8EVTeM8w==
-X-Received: by 2002:a17:906:31d2:b0:9a1:c9c5:5fa1 with SMTP id f18-20020a17090631d200b009a1c9c55fa1mr5729464ejf.4.1693762431275;
-        Sun, 03 Sep 2023 10:33:51 -0700 (PDT)
-Received: from [192.168.0.22] (77-252-46-238.static.ip.netia.com.pl. [77.252.46.238])
-        by smtp.gmail.com with ESMTPSA id s1-20020a170906960100b00992d122af63sm4995441ejx.89.2023.09.03.10.33.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Sep 2023 10:33:50 -0700 (PDT)
-Message-ID: <79bee2a6-6d6b-9fdd-4e97-cfebf65f81f7@linaro.org>
-Date:   Sun, 3 Sep 2023 19:33:49 +0200
+        Mon, 4 Sep 2023 01:40:32 -0400
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F82B6
+        for <linux-crypto@vger.kernel.org>; Sun,  3 Sep 2023 22:40:29 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id 2742E204B4;
+        Mon,  4 Sep 2023 07:40:27 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id wEgNc1B9oJb9; Mon,  4 Sep 2023 07:40:26 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id 8F11B201D5;
+        Mon,  4 Sep 2023 07:40:26 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+        by mailout2.secunet.com (Postfix) with ESMTP id 8687F80004A;
+        Mon,  4 Sep 2023 07:40:26 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 4 Sep 2023 07:40:26 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 4 Sep
+ 2023 07:40:26 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+        id CCA663182A93; Mon,  4 Sep 2023 07:40:25 +0200 (CEST)
+Date:   Mon, 4 Sep 2023 07:40:25 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     "Guozihua (Scott)" <guozihua@huawei.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Lu Jialin <lujialin4@huawei.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2] crypto: Fix hungtask for PADATA_RESET
+Message-ID: <ZPVtyXevpj4Fiduw@gauss3.secunet.de>
+References: <20230823073047.1515137-1-lujialin4@huawei.com>
+ <ZOXRNntcDBuuJ2yg@gondor.apana.org.au>
+ <c9b91a0c-5663-c351-3d4b-ad4ff74965f2@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH] crypto: qcom-rng: Add hwrng support
-Content-Language: en-US
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>
-Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
-        agross@kernel.org, andersson@kernel.org, conor+dt@kernel.org,
-        davem@davemloft.net, devicetree@vger.kernel.org,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marijn.suijten@somainline.org,
-        robh+dt@kernel.org, vkoul@kernel.org
-References: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <c9b91a0c-5663-c351-3d4b-ad4ff74965f2@huawei.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 01/09/2023 15:15, Om Prakash Singh wrote:
-> This is follow patch on top of [1] to add hwrng support for newer
-> platform with trng capability.
+On Fri, Sep 01, 2023 at 10:28:08AM +0800, Guozihua (Scott) wrote:
+> On 2023/8/23 17:28, Herbert Xu wrote:
+> > On Wed, Aug 23, 2023 at 07:30:47AM +0000, Lu Jialin wrote:
+> >>
+> >> In order to resolve the problem, we retry at most 5 times when
+> >> padata_do_parallel return -EBUSY. For more than 5 times, we replace the
+> >> return err -EBUSY with -EAGAIN, which means parallel_data is changing, and
+> >> the caller should call it again.
+> > 
+> > Steffen, should we retry this at all? Or should it just fail as it
+> > did before?
+> > 
+> > Thanks,
+> 
+> It should be fine if we don't retry and just fail with -EAGAIN and let
+> caller handles it. It should not break the meaning of the error code.
 
-Please use subject prefixes matching the subsystem.
-
-Best regards,
-Krzysztof
-
+Just failing without a retry should be ok.
