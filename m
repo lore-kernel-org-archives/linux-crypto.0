@@ -2,126 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B080CA0FF8
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Sep 2023 16:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95232CA0FE2
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Sep 2023 16:21:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238019AbjIEQUv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Sep 2023 12:20:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50600 "EHLO
+        id S241390AbjIEQUy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Sep 2023 12:20:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353903AbjIEIei (ORCPT
+        with ESMTP id S1351851AbjIEF17 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2023 04:34:38 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99068CDE
-        for <linux-crypto@vger.kernel.org>; Tue,  5 Sep 2023 01:34:34 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9338e4695so33454341fa.2
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Sep 2023 01:34:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693902873; x=1694507673; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CTGH+1pVNhjtiXQkQ7n6lrjl8K9tEbIsrU+0ovPX2qI=;
-        b=cO2zo51X/vfbfhZGuoIZL6YhfT/cnhkmKJDC+K4v5YB0m5RneAeogELj1IY78eoNnn
-         YBApu7v94C5Z3Mo7dJnHb665txYf9AG53A33JfWVKXW3KZYu0CKuPdudSSofwd5ckuWr
-         O5tpmS42luREgmccHFXIXgIT10C63M2csCqEAeyGGV6NzA7/5SEpGEDvXYsLHyKReF4k
-         hJeIycUbJwdrv7OJSMErYcFHRjVbnuvCe7KvgRp+1n9XvtfABaR0ahDDO1Lxmz/h/FTU
-         kxXHJyzCN1hhmwNtQ5lJcvA2O0XAKizt2AOjh2eAxKBOWtgsVwZKr2xSze1kIcyJU/e8
-         NTaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693902873; x=1694507673;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTGH+1pVNhjtiXQkQ7n6lrjl8K9tEbIsrU+0ovPX2qI=;
-        b=Ikt0j8zpNi4Hhzqgtbhxhi7Pe+30fZWtQ3kOaCx3TCZt9tFzWnatOzPk6qMWsjZSdZ
-         O8en2mt4m5N9Fp9yYRTqwmMA5PsYiBShpS7CXw532dRYr/8LessncVphgYZM3SLdlQ9F
-         9Fn07HY5pEEiNv431fduRXbpWdl1TXhBKdsAEIlxYcX0DHNEoZnLH5GrP6JQ/+TjiiZ+
-         syL0OLlp7WZYMARyteqkl7QcrXxCwOFLJrOrXyhdWMZk4oJuOsalub6Rwj0Cr9D/cpP0
-         OKVmaRwqCJtaMHVUFccd0BYi/zCzE4QO610Mhw9Ns7jKsGL7GOTW/y8/Lw1ocq+WKHRB
-         WHEQ==
-X-Gm-Message-State: AOJu0YxXAOXKfTVWE/XhKpyBKHjZ+RWM3KkNz3PMq8fK+mNF70da26d3
-        1dLlflwWB+fx3FTQJ+QwyjLRpA==
-X-Google-Smtp-Source: AGHT+IFiKumTsMVRkq9//4/xK/5aF2y7nOg/3IOpthhey4Xl5TIFMEakn8LlQI5tMrxIync8gexAOw==
-X-Received: by 2002:a2e:b6c5:0:b0:2bb:9781:1a4c with SMTP id m5-20020a2eb6c5000000b002bb97811a4cmr8507865ljo.27.1693902872976;
-        Tue, 05 Sep 2023 01:34:32 -0700 (PDT)
-Received: from [192.168.1.101] (abxj43.neoplus.adsl.tpnet.pl. [83.9.3.43])
-        by smtp.gmail.com with ESMTPSA id z9-20020a2e8849000000b002b9415597d0sm2774957ljj.78.2023.09.05.01.34.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Sep 2023 01:34:32 -0700 (PDT)
-Message-ID: <ad099cf1-1973-4471-a96b-348c4156a13d@linaro.org>
-Date:   Tue, 5 Sep 2023 10:34:31 +0200
+        Tue, 5 Sep 2023 01:27:59 -0400
+Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1D7CCB
+        for <linux-crypto@vger.kernel.org>; Mon,  4 Sep 2023 22:27:54 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+        by smtp.orange.fr with ESMTPA
+        id dObLqMhXKyoREdObLqvYW2; Tue, 05 Sep 2023 07:27:53 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+        s=t20230301; t=1693891673;
+        bh=fc7UsU95zQsQlPFIsQq5CGy7XFtuPx0VRlseRiLjyWk=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To;
+        b=ZTcnkZLbqoSNSU+t4WKF6rZhBLRXayHen8UVP/HiXefCK2r6YV2YaoOmDVbiwhmi/
+         pL6EerMqzvKPsvFYnyE3OEq9EyLixV+EVphMNpQOsnac3otc+xHZNGnbFfxUNhah+3
+         J93Lq8s3m1aUPdyxBe/9y+YKerdABdST93g9BUSI84g4yuPnlBTOYPcCkZRemh8XTA
+         D23SnaLJZwrNquo6rv9ksE/7Lq3vpEiWtOSCr3hgl70d7MsqmOo9+Z+RbVXdEApWNO
+         ip5dyaxPioGlQzSZVOEZgbA+x1Es2Xpul8Ht3Ym5mcN/Yi6qxYpQbVzz+z7PYqaMuU
+         UZECZHO8vvAjg==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 05 Sep 2023 07:27:53 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
+Date:   Tue, 5 Sep 2023 07:27:47 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] crypto: qcom-rng - Add hw_random interface support
-Content-Language: en-US
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>
-Cc:     neil.armstrong@linaro.org, agross@kernel.org, andersson@kernel.org,
-        conor+dt@kernel.org, davem@davemloft.net,
-        devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
-References: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
- <20230905062420.3983268-1-quic_omprsing@quicinc.com>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20230905062420.3983268-1-quic_omprsing@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] crypto: hisilicon/hpre - Fix a erroneous check after
+ snprintf()
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Longfang Liu <liulongfang@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <73534cb1713f58228d54ea53a8a137f4ef939bad.1693858632.git.christophe.jaillet@wanadoo.fr>
+ <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
+Content-Language: fr, en-US
+From:   Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5.09.2023 08:24, Om Prakash Singh wrote:
-> Add hw_random interface support in qcom-rng driver as new IP block
-> in Qualcomm SoC has inbuilt NIST SP800 90B compliant entropic source
-> to generate true random number.
-> 
-> Keeping current rng_alg interface as well for random number generation
-> using Kernel Crypto API.
-> 
-> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
-> ---
-> 
-> Changes in V2:
-> - Address review comment from Bjorn and Krzysztof
-"make changes" is not a valid changelog, please be more specific
-next time around
 
-Konrad
+Le 05/09/2023 à 04:27, Herbert Xu a écrit :
+> On Mon, Sep 04, 2023 at 10:17:29PM +0200, Christophe JAILLET wrote:
+>> This error handling looks really strange.
+>> Check if the string has been truncated instead.
+>>
+>> Fixes: 02ab994635eb ("crypto: hisilicon - Fixed some tiny bugs of HPRE")
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>>   drivers/crypto/hisilicon/hpre/hpre_main.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+>> index 39297ce70f44..db44d889438a 100644
+>> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+>> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+>> @@ -1033,7 +1033,7 @@ static int hpre_cluster_debugfs_init(struct hisi_qm *qm)
+>>   
+>>   	for (i = 0; i < clusters_num; i++) {
+>>   		ret = snprintf(buf, HPRE_DBGFS_VAL_MAX_LEN, "cluster%d", i);
+>> -		if (ret < 0)
+>> +		if (ret >= HPRE_DBGFS_VAL_MAX_LEN)
+>>   			return -EINVAL;
+>>   		tmp_d = debugfs_create_dir(buf, qm->debug.debug_root);
+> Who is going to free the allocated memory in case of error?
+
+Not sure to understand.
+
+The memory is allocated with devm_kzalloc(), so it will be freed by the 
+framework.
+
+Some debugfs dir of file way be left around. Is it what your are talking 
+about?
+
+>
+> The other snprintf in the same file also looks suspect.
+
+It looks correct to me.
+
+And HPRE_DBGFS_VAL_MAX_LEN being 20, it doesn't really matter. The 
+string can't be truncated with just a "%u\n".
+
+CJ
+
+>
+> Thanks,
