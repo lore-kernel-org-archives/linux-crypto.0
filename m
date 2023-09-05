@@ -2,132 +2,145 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C901CCA0FFA
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Sep 2023 17:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1187CCF9E8
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Sep 2023 23:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231602AbjIERzw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Sep 2023 13:55:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S232289AbjIEX2u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Sep 2023 19:28:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234313AbjIERzl (ORCPT
+        with ESMTP id S230081AbjIEX2u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2023 13:55:41 -0400
-Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A2A25F35
-        for <linux-crypto@vger.kernel.org>; Tue,  5 Sep 2023 10:46:35 -0700 (PDT)
-Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3aa0f368130so3524483b6e.2
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Sep 2023 10:46:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693935942; x=1694540742;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JC4emxi/+91e6/de8rNAFQ4RT3D4NiRRQ3Rn+uvpGxs=;
-        b=Ki7cA3wcz1SXxecRIM/Kp+YczA7xu95yJ/D1vqy662w3ZOkyuWTzGM5P4iUpUT9rp0
-         Vir5QiZpkfnIaQBMhFlJkByg5BIz/qASRfh18ahWKopIuKlj3e7stLTvqYthymN9NV7d
-         pWXCYYAoJfeE1FBgm4JiKekQBe7Kww+j6pAVuIGNhjF4XcTwiqLrAtnlBRDi6r4scyP2
-         hKCXj1IN8V1qjuG5LHSn670eUqT5JvsB8Kwssfco8UFkAhUK54egogy0jrOBJ/PXTiMA
-         796IlOZ+Hn0dyacbBZkTBf2M4cmU1B3k9IUu690HkW0xV1SmcAI1ncBTuiGhHFe0eQMC
-         Nzwg==
-X-Gm-Message-State: AOJu0YzHIryexjqr6e1HpAtRU/kNu/YwdyETd5N8XFjQAJYt2S9qxszC
-        90YTd5LPQjHGo3Kp3T0utvPg5jk8sN3UgbYzTQQFE/8SPCvF
-X-Google-Smtp-Source: AGHT+IHVoTWcD6YUsfA9tfQOyJ0G1pEtnNjMqA02rEokMU4PiBHYiHZgMjHt0KwxaTfuqqvt1Y/Tilb/0X/B7+9cJlCiEdn4ZbNA
+        Tue, 5 Sep 2023 19:28:50 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A5C59E
+        for <linux-crypto@vger.kernel.org>; Tue,  5 Sep 2023 16:28:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=s31663417; t=1693956502; x=1694561302; i=wahrenst@gmx.net;
+ bh=GY+cKU9ZqUyJgDRu4Y/gsgI1xUTfX+iEeHDS9Zf7BZk=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+ b=ZqGSu1W6FS9RIsoJ+oa6rHJbQukBFXZomkdTj/gzJgMh7myuxLLl2v+5ncrZgKY6fHtmL5F
+ /uSLOkcjgjzYUKFnY6t9X1eLqXzsGFQ6risU1gZ+hW9bZwVohVdQokupkvvNFG/brZyNOfNLl
+ /rBPU68fTqsal+b29FMa90CLkkUMZM+oBCScmNr8AgXA0bMBBGUvcwkMOW6sMGVxWrZ3BX8/p
+ aRehpiBTg4syOPN5Yw9aZ655EEScKxwGyzKO9vbc190KJrQOSKI4vUNMrTiYF1UbLOp0+/6Ym
+ RrApSXYo7Bb9lIL1rG4i/V7ZTJnrWlyeS5r79ewoYYbUNerqFNhw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MTzf6-1qCkxo2U42-00R2rh; Wed, 06
+ Sep 2023 01:28:22 +0200
+From:   Stefan Wahren <wahrenst@gmx.net>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Florian Fainelli <florian.fainelli@broadcom.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Mark Brown <broonie@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH V2] hwrng: bcm2835: Fix hwrng throughput regression
+Date:   Wed,  6 Sep 2023 01:27:57 +0200
+Message-Id: <20230905232757.36459-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-Received: by 2002:a17:90b:8c:b0:26b:b78:c94f with SMTP id
- bb12-20020a17090b008c00b0026b0b78c94fmr3267961pjb.7.1693935364108; Tue, 05
- Sep 2023 10:36:04 -0700 (PDT)
-Date:   Tue, 05 Sep 2023 10:36:03 -0700
-In-Reply-To: <000000000000273d0105ff97bf56@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a677fc0604a00fef@google.com>
-Subject: Re: [syzbot] [mm?] WARNING in try_grab_page
-From:   syzbot <syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, axboe@kernel.dk, davem@davemloft.net,
-        david@redhat.com, dhowells@redhat.com, edumazet@google.com,
-        gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
-        jlayton@kernel.org, kuba@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        nspmangalore@gmail.com, pabeni@redhat.com, patches@lists.linux.dev,
-        rohiths.msft@gmail.com, sashal@kernel.org, stable@vger.kernel.org,
-        stfrench@microsoft.com, svens@linux.ibm.com,
-        syzkaller-bugs@googlegroups.com, willy@infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:PN+1I8AC+BmOLLuSKVSIMR5owJvnEYSRbHlwT7DLRg+pkbPVCYl
+ 9OQEjbhXHMgVeBFSiIstVfiiFpGkxncyeF+MaHnz5biVmCv3Drcs8Ksn1RROhcYX9mNXVeh
+ aOXUEMbEy0zoIVFn8zxuJrt+O3IzHZ8WLjDUSK94fCaTIQ7G6Bu1tQXedm8SWPZtL7VdMxE
+ BdRIN8JPn21wB5Gu3uqWg==
+UI-OutboundReport: notjunk:1;M01:P0:0DPy7gFzeOo=;CqUeXnEDfQBdqmK8N2x6XvUbPBo
+ TL7TobCWBQPKl/IBZjEWBINdbd5K47cocJ5rjLQmrTjKqGUu811fj8WlMP6KznccwluDo3s+y
+ ovXw7m5QgSA2qaDizUVuknCJMiZKVOSsIfSftHrqcPLbAqYwfyyVkEHXB6qSeENlmE4qUv2gz
+ 6XJgyiTzpTMNL0B0FUYBCn7V0P/hZU10rVOZZ2Zqs3ByDMmlGj62rNnMO5tVLOs4gXerEZr2z
+ UNdapVA32kQIScXBaxARXUPMIqcsGAYFmx+JDkv05p0gujQ0PcrBJoTk/zzhnOByJ8s5lWSht
+ mD7/r4AC1M9DpS9Lr1KlEuqQyzRs4pLqvKm3DBZTblkPytpN66KtV28T6h56/5oUqxvlbtTkV
+ ZaA4ybqG9OjiMiJJLPcY9KJRIQIbmTrHGPaMDj/oowHnfJNmhMRuJQqvVxVlsXyQK39/99EjQ
+ 0P5J0c5k8stWWGijlHhAfJOFf5jKm49+7Dm+Wuaei7v54DOOuPFPzeueRFKJAl+jvXTtigjOX
+ ojIG93sbV+CkA8439gcdM5AyjlYYODM8731499tHfMvROd0v1UOLJHMQIGEGd2rDSXkw1QL2v
+ eHyhJIcKZIrjBFFvNkxc4lrG8rF2+Of+qklbqP6qh6KNgcKprXs48cRpa3aDZDXhYYI0XPG8x
+ gsUEawe65qfxUPZQD1nEUWqtiyj5mAVy8FY/Ovq6k981Np4GINUb0XnqSiCi8ptVaqq6xMbmR
+ gah+ha3EZl2GMhPVVFlCuq2AP3ccF29udrdGH+tRV1sEcS5sU16vUD1Db1pH30wsr8rn5DlQQ
+ s3zRl1fouMwsdJcK5TH/jDIREJWy45RVKmpm6dwP8/CsVX44AkIkBVXnTwVn+w//P2ZPTsB/l
+ 2n6s8DYcPDeDYmyESfi5/WHlAsBLlnqhO4Owz0O2/4GCbdisl+/jwUW1vKPXVizSwbo0YDU+3
+ 7aEX9A==
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+The last RCU stall fix caused a massive throughput regression of the
+hwrng on Raspberry Pi 0 - 3. hwrng_msleep doesn't sleep precisely enough
+and usleep_range doesn't allow scheduling. So try to restore the
+best possible throughput by introducing hwrng_yield which interruptable
+sleeps for one jiffy.
 
-HEAD commit:    3f86ed6ec0b3 Merge tag 'arc-6.6-rc1' of git://git.kernel.o..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=139ce690680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ff0db7a15ba54ead
-dashboard link: https://syzkaller.appspot.com/bug?extid=9b82859567f2e50c123e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b0c620680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=152da4e7a80000
+Some performance measurements on Raspberry Pi 3B+ (arm64/defconfig):
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6f4f710c5033/disk-3f86ed6e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/555548fedbdc/vmlinux-3f86ed6e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c06d7c39bbc0/bzImage-3f86ed6e.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/120cc7b707b8/mount_0.gz
+sudo dd if=3D/dev/hwrng of=3D/dev/null count=3D1 bs=3D10000
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9b82859567f2e50c123e@syzkaller.appspotmail.com
+cpu_relax              ~138025 Bytes / sec
+hwrng_msleep(1000)         ~13 Bytes / sec
+hwrng_yield              ~2510 Bytes / sec
 
-XFS (loop0): Quotacheck needed: Please wait.
-XFS (loop0): Quotacheck: Done.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5030 at mm/gup.c:229 try_grab_page+0x287/0x460
-Modules linked in:
-CPU: 1 PID: 5030 Comm: syz-executor118 Not tainted 6.5.0-syzkaller-11704-g3f86ed6ec0b3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:try_grab_page+0x287/0x460 mm/gup.c:229
-Code: 01 49 8d 7e 60 be 04 00 00 00 e8 54 41 18 00 f0 41 83 46 60 01 42 80 3c 2b 00 0f 85 6a ff ff ff e9 6d ff ff ff e8 b9 55 be ff <0f> 0b bb f4 ff ff ff eb b6 e8 ab 55 be ff 49 ff ce e9 ca fd ff ff
-RSP: 0018:ffffc90003a6ee88 EFLAGS: 00010293
-RAX: ffffffff81cf4377 RBX: 0000000000000000 RCX: ffff888025da0000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000001
-RBP: 000000000000000e R08: ffffffff81cf418c R09: 1ffffd400039097e
-R10: dffffc0000000000 R11: fffff9400039097f R12: ffffea0001c84bf4
-R13: dffffc0000000000 R14: ffffea0001c84bc0 R15: ffffea0001c84bc0
-FS:  0000555555acb380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020008000 CR3: 00000000736e9000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- follow_page_pte+0x560/0x18f0 mm/gup.c:651
- follow_pud_mask mm/gup.c:765 [inline]
- follow_p4d_mask mm/gup.c:782 [inline]
- follow_page_mask+0x7dc/0xe20 mm/gup.c:832
- __get_user_pages+0x643/0x15e0 mm/gup.c:1237
- __get_user_pages_locked mm/gup.c:1504 [inline]
- get_dump_page+0x146/0x2b0 mm/gup.c:2018
- dump_user_range+0x126/0x910 fs/coredump.c:913
- elf_core_dump+0x3b75/0x4490 fs/binfmt_elf.c:2142
- do_coredump+0x1b73/0x2ab0 fs/coredump.c:764
- get_signal+0x145e/0x1840 kernel/signal.c:2878
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:309
- exit_to_user_mode_loop+0x6a/0x100 kernel/entry/common.c:168
- exit_to_user_mode_prepare+0xb1/0x140 kernel/entry/common.c:204
- __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
- syscall_exit_to_user_mode+0x64/0x280 kernel/entry/common.c:296
- do_syscall_64+0x4d/0xc0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fb68edcf0f9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 21 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc8b18d558 EFLAGS: 00000246 ORIG_RAX: 000000000000004d
-RAX: ffffffffffffffe5 RBX: 0000000000000003 RCX: 00007fb68edcf0f9
-RDX: 0000000000000000 RSI: 0000000100000001 RDI: 0000000000000006
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000555500000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000f4240
-R13: 00007ffc8b18d7c8 R14: 0000000000000001 R15: 00007ffc8b18d590
- </TASK>
+Fixes: 96cb9d055445 ("hwrng: bcm2835 - use hwrng_msleep() instead of cpu_r=
+elax()")
+Link: https://lore.kernel.org/linux-arm-kernel/bc97ece5-44a3-4c4e-77da-2db=
+3eb66b128@gmx.net/
+Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
+=2D--
 
+Changes in V2:
+- introduce hwrng_yield and use it
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ drivers/char/hw_random/bcm2835-rng.c | 2 +-
+ drivers/char/hw_random/core.c        | 6 ++++++
+ include/linux/hw_random.h            | 1 +
+ 3 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random=
+/bcm2835-rng.c
+index e98fcac578d6..634eab4776f3 100644
+=2D-- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -71,7 +71,7 @@ static int bcm2835_rng_read(struct hwrng *rng, void *buf=
+, size_t max,
+ 	while ((rng_readl(priv, RNG_STATUS) >> 24) =3D=3D 0) {
+ 		if (!wait)
+ 			return 0;
+-		hwrng_msleep(rng, 1000);
++		hwrng_yield(rng);
+ 	}
+
+ 	num_words =3D rng_readl(priv, RNG_STATUS) >> 24;
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index f34d356fe2c0..599a4bc2c548 100644
+=2D-- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -679,6 +679,12 @@ long hwrng_msleep(struct hwrng *rng, unsigned int mse=
+cs)
+ }
+ EXPORT_SYMBOL_GPL(hwrng_msleep);
+
++long hwrng_yield(struct hwrng *rng)
++{
++	return wait_for_completion_interruptible_timeout(&rng->dying, 1);
++}
++EXPORT_SYMBOL_GPL(hwrng_yield);
++
+ static int __init hwrng_modinit(void)
+ {
+ 	int ret;
+diff --git a/include/linux/hw_random.h b/include/linux/hw_random.h
+index 8a3115516a1b..136e9842120e 100644
+=2D-- a/include/linux/hw_random.h
++++ b/include/linux/hw_random.h
+@@ -63,5 +63,6 @@ extern void hwrng_unregister(struct hwrng *rng);
+ extern void devm_hwrng_unregister(struct device *dve, struct hwrng *rng);
+
+ extern long hwrng_msleep(struct hwrng *rng, unsigned int msecs);
++extern long hwrng_yield(struct hwrng *rng);
+
+ #endif /* LINUX_HWRANDOM_H_ */
+=2D-
+2.34.1
+
