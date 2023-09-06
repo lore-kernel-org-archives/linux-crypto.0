@@ -2,95 +2,124 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3E3EE49BF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Sep 2023 02:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6821EB8FAD
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Sep 2023 02:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236728AbjIFCFJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Sep 2023 22:05:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58042 "EHLO
+        id S235179AbjIFCv4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Sep 2023 22:51:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjIFCFJ (ORCPT
+        with ESMTP id S229525AbjIFCv4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2023 22:05:09 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 447BC1A7;
-        Tue,  5 Sep 2023 19:05:02 -0700 (PDT)
-Received: from kwepemm600005.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RgQbz2ZR6zVkdx;
-        Wed,  6 Sep 2023 10:02:07 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 6 Sep 2023 10:04:43 +0800
-Subject: Re: [PATCH] crypto: hisilicon/hpre - Fix a erroneous check after
- snprintf()
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        Zaibo Xu <xuzaibo@huawei.com>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-References: <73534cb1713f58228d54ea53a8a137f4ef939bad.1693858632.git.christophe.jaillet@wanadoo.fr>
- <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
- <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
- <ZPbkJOPsx4as96D/@gondor.apana.org.au>
-From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <f4379fee-22c2-3b94-1725-70a317cc9baf@huawei.com>
-Date:   Wed, 6 Sep 2023 10:04:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 5 Sep 2023 22:51:56 -0400
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99711E42;
+        Tue,  5 Sep 2023 19:51:20 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VrRzBg5_1693968670;
+Received: from 30.97.49.39(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VrRzBg5_1693968670)
+          by smtp.aliyun-inc.com;
+          Wed, 06 Sep 2023 10:51:12 +0800
+Message-ID: <bc05ff13-97a0-f101-6aad-d9d217648e20@linux.alibaba.com>
+Date:   Wed, 6 Sep 2023 10:51:10 +0800
 MIME-Version: 1.0
-In-Reply-To: <ZPbkJOPsx4as96D/@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.13.0
+Subject: Re: [PATCH 2/4] crypto: qat - Remove zlib-deflate
+To:     dsterba@suse.cz, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Yang Shen <shenyang39@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        ardb@kernel.org, kees@kernel.org, linux-kernel@vger.kernel.org,
+        enlin.mu@unisoc.com, ebiggers@google.com, gpiccoli@igalia.com,
+        willy@infradead.org, yunlong.xing@unisoc.com,
+        yuxiaozhang@google.com, qat-linux@intel.com,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Weigang Li <weigang.li@intel.com>, Chris Mason <clm@meta.com>,
+        Brian Will <brian.will@intel.com>, linux-btrfs@vger.kernel.org
+References: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
+ <E1qbI7x-009Bvo-IM@formenos.hmeau.com>
+ <ZPcqALQ0Ck/3lF0U@gcabiddu-mobl1.ger.corp.intel.com>
+ <20230905162302.GD14420@twin.jikos.cz>
+From:   Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <20230905162302.GD14420@twin.jikos.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.121.110]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600005.china.huawei.com (7.193.23.191)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2023/9/5 16:17, Herbert Xu wrote:
-> On Tue, Sep 05, 2023 at 07:27:47AM +0200, Marion & Christophe JAILLET wrote:
+
+
+On 2023/9/6 00:23, David Sterba wrote:
+> On Tue, Sep 05, 2023 at 02:15:44PM +0100, Giovanni Cabiddu wrote:
+>> Hi Herbert,
 >>
->> Some debugfs dir of file way be left around. Is it what your are talking
->> about?
-> 
-> Yes all allocated resources should be freed on the error path.
-> 
->>> The other snprintf in the same file also looks suspect.
+>> On Wed, Aug 30, 2023 at 06:08:47PM +0800, Herbert Xu wrote:
+>>> Remove the implementation of zlib-deflate because it is completely
+>>> unused in the kernel.
+>> We are working at a new revision of [1] which enables BTRFS to use acomp
+>> for offloading zlib-deflate. We see that there is value in using QAT for
+>> such use case in terms of throughput / CPU utilization / compression ratio
+>> compared to software.
+>> Zlib-deflate is preferred to deflate since BTRFS already uses that
+>> format.
 >>
->> It looks correct to me.
+>> We expect to send this patch for 6.7.
+>> Can we keep zlib-deflate in the kernel?
 >>
->> And HPRE_DBGFS_VAL_MAX_LEN being 20, it doesn't really matter. The string
->> can't be truncated with just a "%u\n".
+>> Thanks,
+>>
+>> [1] https://patchwork.kernel.org/project/linux-btrfs/patch/1467083180-111750-1-git-send-email-weigang.li@intel.com/
 > 
-> Well if you're going to go with that line of reasoning then this
-> case ("cluster%d") can't overflow either, no?
->
+> The patch is from 2016 and zlib though still supported has been
+> superseded by zstd that is from 2017. It would be good to see numbers
+> comparing zlib (cpu), zlib (qat) against relevant zstd levels. The
+> offloading might be an improvement and worth adding the support
+> otherwise I don't see much reason to add it unless there are users.
+> 
+> I can see there's QAT support for zstd too,
+> https://github.com/intel/QAT-ZSTD-Plugin, can't find one for lzo but in
+> case ther's QAT for all 3 algorithms used by btrfs I wouldn't mind
+> keeping the QAT support for zlib for parity.
 
-First, I checked the calling code of the snprintf function in all driver files in
-the hisilicon directory. Only here is the processing of return value judgment.
-This treatment is indeed problematic and needs to be modified.
+Just my personal side note: from my own point of view, QAT actually only
+has DEFLATE and LZ4 format hardware end-to-end (de)compression support [1]
+(IAA actually has DEFLATE-family format only [2]).
 
-Then, I don't quite agree with your modification plan.
-The modification of this solution is not complete.
-As Herbert said, ("cluster%d") may still have overflow problems.
+They partially support compressing Zstd format with their internal
+hardware lz4s + postprocessing pipeline (mostly a LZ77 matchfinder) by
+using hardware (with hw_buffer_sz less than 128KiB. [3][4]) and Zstd
+hardware decompression is currently not supported since there is no
+such hardware format support.
 
-In the end, my proposed modification scheme is this:
-...
-	int ret;
-	u8 i;
+I'm not saying new Zstd algorithm is not amazing.  Yet from the hardware
+perspective, I guess that due to gzip, the original zip, png, pdf, docx,
+https, even pppoe all based on DEFLATE (you could see a lot other OSes
+support DEFLATE-family format), so it's reasonble to resolve such
+de-facto standard with limited hardware first to boost up data center
+use cases.  If they have abundant hardware chip room, I guess they will
+consider Zstd as well.
 
-	for (i = 0; i < clusters_num; i++) {
-		snprintf(buf, HPRE_DBGFS_VAL_MAX_LEN, "cluster%u", i);
-		tmp_d = debugfs_create_dir(buf, qm->debug.debug_root);
-		...
-	}
-...
+As for zlib container format, I don't see zlib Adler-32 checksum is
+useful since almost all hardware accelerator supports raw DEFLATE but
+Adler-32 checksum is uncommon.  If we consider better integrating
+support, we should consider a more common hash (instead Adler-32
+checksum) of or by using merkle tree to build the trust chain.
+
+Actually we're working on EROFS raw deflate to enable IAA accelerator
+support so we also hope IAA patchset could be landed upstream [5] so
+I could upstream my work then.  Therefore, I hope "hisilicon ZIP
+driver" could support raw deflate too (after a quick search, their
+decompression spend is 1530 MB/s compared with the original zlib
+219 MB/s on their platform [6])
+
+[1] https://github.com/intel/QATzip
+[2] https://cdrdv2.intel.com/v1/dl/getContent/721858
+[3] https://github.com/facebook/zstd/issues/455#issuecomment-1397204587
+[4] https://github.com/intel/QATzip/blob/master/utils/qzstd.c#L211
+[5] https://lore.kernel.org/r/20230807203726.1682123-1-tom.zanussi@linux.intel.com
+[6] https://compare-intel-kunpeng.readthedocs.io/zh_CN/latest/accelerator.html
 
 Thanks,
-Longfang.
-
-> Cheers,
-> 
+Gao Xiang
