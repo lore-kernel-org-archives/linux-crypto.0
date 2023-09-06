@@ -2,124 +2,100 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6821EB8FAD
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Sep 2023 02:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 550C9EB8FA5
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Sep 2023 07:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235179AbjIFCv4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Sep 2023 22:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56414 "EHLO
+        id S231781AbjIFHth (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Sep 2023 03:49:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjIFCv4 (ORCPT
+        with ESMTP id S230137AbjIFHth (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Sep 2023 22:51:56 -0400
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99711E42;
-        Tue,  5 Sep 2023 19:51:20 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0VrRzBg5_1693968670;
-Received: from 30.97.49.39(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VrRzBg5_1693968670)
-          by smtp.aliyun-inc.com;
-          Wed, 06 Sep 2023 10:51:12 +0800
-Message-ID: <bc05ff13-97a0-f101-6aad-d9d217648e20@linux.alibaba.com>
-Date:   Wed, 6 Sep 2023 10:51:10 +0800
+        Wed, 6 Sep 2023 03:49:37 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E022C9
+        for <linux-crypto@vger.kernel.org>; Wed,  6 Sep 2023 00:49:33 -0700 (PDT)
+Received: from kwepemm600003.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RgZGl3TlMz1M8yq;
+        Wed,  6 Sep 2023 15:47:43 +0800 (CST)
+Received: from [10.67.109.150] (10.67.109.150) by
+ kwepemm600003.china.huawei.com (7.193.23.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Wed, 6 Sep 2023 15:49:30 +0800
+Message-ID: <f06917ed-a0ba-30f1-4b65-57fe96bbf741@huawei.com>
+Date:   Wed, 6 Sep 2023 15:49:30 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH 2/4] crypto: qat - Remove zlib-deflate
-To:     dsterba@suse.cz, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Yang Shen <shenyang39@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        ardb@kernel.org, kees@kernel.org, linux-kernel@vger.kernel.org,
-        enlin.mu@unisoc.com, ebiggers@google.com, gpiccoli@igalia.com,
-        willy@infradead.org, yunlong.xing@unisoc.com,
-        yuxiaozhang@google.com, qat-linux@intel.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Weigang Li <weigang.li@intel.com>, Chris Mason <clm@meta.com>,
-        Brian Will <brian.will@intel.com>, linux-btrfs@vger.kernel.org
-References: <ZO8ULhlJSrJ0Mcsx@gondor.apana.org.au>
- <E1qbI7x-009Bvo-IM@formenos.hmeau.com>
- <ZPcqALQ0Ck/3lF0U@gcabiddu-mobl1.ger.corp.intel.com>
- <20230905162302.GD14420@twin.jikos.cz>
-From:   Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <20230905162302.GD14420@twin.jikos.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] crypto: Fix hungtask for PADATA_RESET
+Content-Language: en-US
+To:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Guo Zihua <guozihua@huawei.com>, <linux-crypto@vger.kernel.org>
+References: <20230904133341.2528440-1-lujialin4@huawei.com>
+ <ZPb4ovJ+eatyPk1E@gauss3.secunet.de>
+From:   Lu Jialin <lujialin4@huawei.com>
+In-Reply-To: <ZPb4ovJ+eatyPk1E@gauss3.secunet.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.109.150]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600003.china.huawei.com (7.193.23.202)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Steffen,
 
+padata_do_parallel is only called by pcrypt_aead_encrypt/decrypt, 
+therefore, changing in padata_do_parallel and changing in 
+pcrypt_aead_encrypt/decrypt have the same effect. Both should be ok.
 
-On 2023/9/6 00:23, David Sterba wrote:
-> On Tue, Sep 05, 2023 at 02:15:44PM +0100, Giovanni Cabiddu wrote:
->> Hi Herbert,
+Thanks.
+
+Herbert, the two ways look both right. What is your suggestion?
+
+On 2023/9/5 17:45, Steffen Klassert wrote:
+> On Mon, Sep 04, 2023 at 01:33:41PM +0000, Lu Jialin wrote:
+>> ---
+>>   crypto/pcrypt.c | 4 ++++
+>>   kernel/padata.c | 2 +-
+>>   2 files changed, 5 insertions(+), 1 deletion(-)
 >>
->> On Wed, Aug 30, 2023 at 06:08:47PM +0800, Herbert Xu wrote:
->>> Remove the implementation of zlib-deflate because it is completely
->>> unused in the kernel.
->> We are working at a new revision of [1] which enables BTRFS to use acomp
->> for offloading zlib-deflate. We see that there is value in using QAT for
->> such use case in terms of throughput / CPU utilization / compression ratio
->> compared to software.
->> Zlib-deflate is preferred to deflate since BTRFS already uses that
->> format.
->>
->> We expect to send this patch for 6.7.
->> Can we keep zlib-deflate in the kernel?
->>
->> Thanks,
->>
->> [1] https://patchwork.kernel.org/project/linux-btrfs/patch/1467083180-111750-1-git-send-email-weigang.li@intel.com/
-> 
-> The patch is from 2016 and zlib though still supported has been
-> superseded by zstd that is from 2017. It would be good to see numbers
-> comparing zlib (cpu), zlib (qat) against relevant zstd levels. The
-> offloading might be an improvement and worth adding the support
-> otherwise I don't see much reason to add it unless there are users.
-> 
-> I can see there's QAT support for zstd too,
-> https://github.com/intel/QAT-ZSTD-Plugin, can't find one for lzo but in
-> case ther's QAT for all 3 algorithms used by btrfs I wouldn't mind
-> keeping the QAT support for zlib for parity.
-
-Just my personal side note: from my own point of view, QAT actually only
-has DEFLATE and LZ4 format hardware end-to-end (de)compression support [1]
-(IAA actually has DEFLATE-family format only [2]).
-
-They partially support compressing Zstd format with their internal
-hardware lz4s + postprocessing pipeline (mostly a LZ77 matchfinder) by
-using hardware (with hw_buffer_sz less than 128KiB. [3][4]) and Zstd
-hardware decompression is currently not supported since there is no
-such hardware format support.
-
-I'm not saying new Zstd algorithm is not amazing.  Yet from the hardware
-perspective, I guess that due to gzip, the original zip, png, pdf, docx,
-https, even pppoe all based on DEFLATE (you could see a lot other OSes
-support DEFLATE-family format), so it's reasonble to resolve such
-de-facto standard with limited hardware first to boost up data center
-use cases.  If they have abundant hardware chip room, I guess they will
-consider Zstd as well.
-
-As for zlib container format, I don't see zlib Adler-32 checksum is
-useful since almost all hardware accelerator supports raw DEFLATE but
-Adler-32 checksum is uncommon.  If we consider better integrating
-support, we should consider a more common hash (instead Adler-32
-checksum) of or by using merkle tree to build the trust chain.
-
-Actually we're working on EROFS raw deflate to enable IAA accelerator
-support so we also hope IAA patchset could be landed upstream [5] so
-I could upstream my work then.  Therefore, I hope "hisilicon ZIP
-driver" could support raw deflate too (after a quick search, their
-decompression spend is 1530 MB/s compared with the original zlib
-219 MB/s on their platform [6])
-
-[1] https://github.com/intel/QATzip
-[2] https://cdrdv2.intel.com/v1/dl/getContent/721858
-[3] https://github.com/facebook/zstd/issues/455#issuecomment-1397204587
-[4] https://github.com/intel/QATzip/blob/master/utils/qzstd.c#L211
-[5] https://lore.kernel.org/r/20230807203726.1682123-1-tom.zanussi@linux.intel.com
-[6] https://compare-intel-kunpeng.readthedocs.io/zh_CN/latest/accelerator.html
-
-Thanks,
-Gao Xiang
+>> diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+>> index 8c1d0ca41213..d0d954fe9d54 100644
+>> --- a/crypto/pcrypt.c
+>> +++ b/crypto/pcrypt.c
+>> @@ -117,6 +117,8 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
+>>   	err = padata_do_parallel(ictx->psenc, padata, &ctx->cb_cpu);
+>>   	if (!err)
+>>   		return -EINPROGRESS;
+>> +	if (err == -EBUSY)
+>> +		return -EAGAIN;
+>>   
+>>   	return err;
+>>   }
+>> @@ -164,6 +166,8 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+>>   	err = padata_do_parallel(ictx->psdec, padata, &ctx->cb_cpu);
+>>   	if (!err)
+>>   		return -EINPROGRESS;
+>> +	if (err == -EBUSY)
+>> +		return -EAGAIN;
+>>   
+>>   	return err;
+>>   }
+>> diff --git a/kernel/padata.c b/kernel/padata.c
+>> index 222d60195de6..81c8183f3176 100644
+>> --- a/kernel/padata.c
+>> +++ b/kernel/padata.c
+>> @@ -202,7 +202,7 @@ int padata_do_parallel(struct padata_shell *ps,
+>>   		*cb_cpu = cpu;
+>>   	}
+>>   
+>> -	err =  -EBUSY;
+>> +	err = -EBUSY;
+> Why not just returning -EAGAIN here directly?
+>
+>
