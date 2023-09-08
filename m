@@ -2,122 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83BA1EE8015
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 16:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7CACCFA0A
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 16:52:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237010AbjIHQS5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Sep 2023 12:18:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35352 "EHLO
+        id S245192AbjIHQwI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Sep 2023 12:52:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233875AbjIHQS5 (ORCPT
+        with ESMTP id S245181AbjIHQwH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2023 12:18:57 -0400
-X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 08 Sep 2023 09:18:53 PDT
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC833CFA
-        for <linux-crypto@vger.kernel.org>; Fri,  8 Sep 2023 09:18:53 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-        by smtp.orange.fr with ESMTPA
-        id ee4jq6ujawJ7Jee4jqw3bA; Fri, 08 Sep 2023 18:11:21 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-        s=t20230301; t=1694189481;
-        bh=+6AindnLA3kWmbjcoqncg4z08JP7Gi43jNm6msbfoQY=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=tAot1hcjXjpXglcWx3paiok/8diihH91pXTsmoFf7sgUWJhzeZaC5APrenWuK2Mmg
-         yLu4aW8kA12gzpqQ4KpA0ELuzd7rHjPfkKkF2ZcHRDexhrXxgLkFu3s8mZgiY5lTcY
-         LExo1GnajVVNP+dpIXsMvksBogoGkiUx/76aaBfJzVAvzzHMwDGeXTBjEqRKtrbzNW
-         Eo7XwpL6m0agMxiMwATj277M/bMFKie+SyEsSVLVjjPBxJfBum99TdpJfdyF8blivf
-         YsJoOEFkb7EmRj9JoJI2YHZSRcUXYhcdgR6qmYYlGyBqUjyngk53p4cfY4qxpmzPuT
-         MlWyGnqPDD2WA==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 08 Sep 2023 18:11:21 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <492ae2a2-3364-f13c-4d93-0175221483a9@wanadoo.fr>
-Date:   Fri, 8 Sep 2023 18:11:17 +0200
+        Fri, 8 Sep 2023 12:52:07 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 999DE1FE2;
+        Fri,  8 Sep 2023 09:52:02 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 388ENMo1022982;
+        Fri, 8 Sep 2023 18:51:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        from:to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding:content-type; s=selector1; bh=r6Gr5rp
+        kk1VW/S8lUEi+0DFipylC3JBR3dSDFFvyWsM=; b=DXqR1kjzDGez2o1yInWz6mE
+        +f7FN/ooVNI4sPI//vBezx44ZAPwd3WsN1bdFr4IJd71FMWC2/zC1Vgsf4dHW7wp
+        F+axhkwfTjmrJTnq6/YPFtLi78/MlPPB6Bfa85zSSeUOQQZc57ZKRu5+N01v3DUr
+        n8GOn9AJZzmLi0+jS6UYzI+bCtWSW84RRkb6Eg2nnrh2VthYqRlf/6chgE6X5GSp
+        Nx2Ak93t4MZJGD2ImyxMPB+7geJMP3H3W+rto853LjJ3KjVnSV0a7almZAswM/g7
+        IGFuD6NhKAIVbjfrhRWrEbSaOqP7HhmqHpcojGoaxnUlodi1gAUzrMv3LEOZ7Wg=
+        =
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3sxwjp2g4e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 08 Sep 2023 18:51:32 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 487F710004B;
+        Fri,  8 Sep 2023 18:51:28 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 3ED6D209EEB;
+        Fri,  8 Sep 2023 18:51:28 +0200 (CEST)
+Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Fri, 8 Sep
+ 2023 18:51:27 +0200
+From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH 00/10] hwrng: stm32: support STM32MP13x platforms
+Date:   Fri, 8 Sep 2023 18:51:10 +0200
+Message-ID: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] crypto: hisilicon/hpre - Fix a erroneous check after
- snprintf()
-Content-Language: fr, en-US
-To:     liulongfang <liulongfang@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <73534cb1713f58228d54ea53a8a137f4ef939bad.1693858632.git.christophe.jaillet@wanadoo.fr>
- <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
- <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
- <ZPbkJOPsx4as96D/@gondor.apana.org.au>
- <f4379fee-22c2-3b94-1725-70a317cc9baf@huawei.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <f4379fee-22c2-3b94-1725-70a317cc9baf@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-08_12,2023-09-05_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 06/09/2023 à 04:04, liulongfang a écrit :
-> On 2023/9/5 16:17, Herbert Xu wrote:
->> On Tue, Sep 05, 2023 at 07:27:47AM +0200, Marion & Christophe JAILLET wrote:
->>>
->>> Some debugfs dir of file way be left around. Is it what your are talking
->>> about?
->>
->> Yes all allocated resources should be freed on the error path.
->>
->>>> The other snprintf in the same file also looks suspect.
->>>
->>> It looks correct to me.
->>>
->>> And HPRE_DBGFS_VAL_MAX_LEN being 20, it doesn't really matter. The string
->>> can't be truncated with just a "%u\n".
->>
->> Well if you're going to go with that line of reasoning then this
->> case ("cluster%d") can't overflow either, no?
->>
-> 
-> First, I checked the calling code of the snprintf function in all driver files in
-> the hisilicon directory. Only here is the processing of return value judgment.
-> This treatment is indeed problematic and needs to be modified.
-> 
-> Then, I don't quite agree with your modification plan.
-> The modification of this solution is not complete.
-> As Herbert said, ("cluster%d") may still have overflow problems.
+The STM32MP13x platforms have a RNG hardware block that supports
+customization, a conditional reset sequences that allows to
+recover from certain situations and a configuration locking
+mechanism.
 
-Herbert said the contrary, and I agree with him.
+This series adds support for the mentionned features. Note that
+the hardware RNG can and should be managed in the secure world
+for this platform, hence the rng not being default enabled on
+the STM32MP135F-DK board. 
 
-HPRE_DBGFS_VAL_MAX_LEN is 20.
+Gatien Chevallier (10):
+  dt-bindings: rng: introduce new compatible for STM32MP13x
+  hwrng: stm32 - use devm_platform_get_and_ioremap_resource() API
+  hwrng: stm32 - implement STM32MP13x support
+  hwrng: stm32 - implement error concealment
+  hwrng: stm32 - rework error handling in stm32_rng_read()
+  hwrng: stm32 - restrain RNG noise source clock
+  dt-bindings: rng: add st,rng-lock-conf
+  hwrng: stm32 - support RNG configuration locking mechanism
+  hwrng: stm32 - rework power management sequences
+  ARM: dts: stm32: add RNG node for STM32MP13x platforms
 
-cluster%u will be at max:
-	strlen("cluster") + strlen("4294967295") + 1 = 17
+ .../devicetree/bindings/rng/st,stm32-rng.yaml |  18 +-
+ arch/arm/boot/dts/st/stm32mp131.dtsi          |   8 +
+ drivers/char/hw_random/stm32-rng.c            | 509 +++++++++++++++---
+ 3 files changed, 452 insertions(+), 83 deletions(-)
 
-(unless some system have 64 bits int?)
-
-I do agree that it is safe to remove the test after snprintf(), but 
-there is no need from my POV to turn "i" into a u8.
-
-CJ
-
-> 
-> In the end, my proposed modification scheme is this:
-> ...
-> 	int ret;
-> 	u8 i;
-> 
-> 	for (i = 0; i < clusters_num; i++) {
-> 		snprintf(buf, HPRE_DBGFS_VAL_MAX_LEN, "cluster%u", i);
-> 		tmp_d = debugfs_create_dir(buf, qm->debug.debug_root);
-> 		...
-> 	}
-> ...
-> 
-> Thanks,
-> Longfang.
-> 
->> Cheers,
->>
-> 
+-- 
+2.25.1
 
