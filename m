@@ -2,46 +2,46 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CE0CCFA0A
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 16:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D03EE14D8
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 16:54:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237953AbjIHQyt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Sep 2023 12:54:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38430 "EHLO
+        id S244607AbjIHQyv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Sep 2023 12:54:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233770AbjIHQyt (ORCPT
+        with ESMTP id S229713AbjIHQyu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2023 12:54:49 -0400
+        Fri, 8 Sep 2023 12:54:50 -0400
 Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C9F91FE9;
-        Fri,  8 Sep 2023 09:54:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D15A1FEB;
+        Fri,  8 Sep 2023 09:54:18 -0700 (PDT)
 Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 388ALggV012697;
-        Fri, 8 Sep 2023 18:53:55 +0200
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3889gKqJ012559;
+        Fri, 8 Sep 2023 18:53:57 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
         from:to:cc:subject:date:message-id:in-reply-to:references
         :mime-version:content-transfer-encoding:content-type; s=
-        selector1; bh=xyj2BQl7olTOBg/A0hDeZCirfKQ9+9GxABI87xP6lzc=; b=GP
-        UYRHfstKU1L1u6pa/FifcU1NyQqRYg5WiiufxPC7K/NXZU3jwvRLfpjEW8QhoFme
-        +ioGgD22LWH2Ng6vkgqxbvixyf7QmXikGtbwwyPkKEhrG5mdhNld4HSQN5qb6r5p
-        1TzOGRjD3d3DrhayTjzUuTPkgZHE0twNyOgIfKhkDrRmMXnaRhgygVDRQipvJhei
-        9LyMQIxVx6G9TmWQiyYn6+McpZLEK67neu2cV8oyzXeEzhxQeea9u82PLNmFRV6c
-        gVOtyan+yVArydSxSguf3ChdO4W7jYKMY4rAIVNHWTYAz9YHBdEu7tVlVDRYsfTf
-        E1gSRwj9weKciXHwfkSA==
+        selector1; bh=QNEkYKRW+zpzx0P74SNWmpxXLHw8AgBvEDWW0I7ar5k=; b=Fg
+        pBgFUiLEB4xSLY8htZQAWD5DH5x6tNq+GUzw/gG6rE9KkisTs3pMa4ay8tkoIrKG
+        wDvZcF1rOxdK51GZPET0nR50Hq08OAS8tOIA/tRdDghDMDx5FOlu26LoePk2mtpr
+        NWuvXOae7in6ALb8fYjf0Y3ZUftbApCnzmmW7cT/6qcNjQ7toZgWwpDtTF6nACN3
+        O8quJis48x0ysdpGWa0mwk+xyKUVrY1xZi0jNeA9gA14oX7VEd5ecQDg9TtkpEcx
+        yVIOsWwDTD4oegsiSLEGjqRRW59+BsgNttE4Rx7zc54K7w8azgCXig/ToFWLIiWr
+        qANr+JH5G1aMM6s4oeqQ==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3suuxcndp8-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3suuxcndpb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Sep 2023 18:53:55 +0200 (MEST)
+        Fri, 08 Sep 2023 18:53:57 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 1447C100056;
-        Fri,  8 Sep 2023 18:53:55 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id ACF9110004B;
+        Fri,  8 Sep 2023 18:53:56 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 08853209EFD;
-        Fri,  8 Sep 2023 18:53:55 +0200 (CEST)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A3C19209EFC;
+        Fri,  8 Sep 2023 18:53:56 +0200 (CEST)
 Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Fri, 8 Sep
- 2023 18:53:54 +0200
+ 2023 18:53:56 +0200
 From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
 To:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -55,9 +55,9 @@ CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH 08/10] hwrng: stm32 - support RNG configuration locking mechanism
-Date:   Fri, 8 Sep 2023 18:51:18 +0200
-Message-ID: <20230908165120.730867-9-gatien.chevallier@foss.st.com>
+Subject: [PATCH 10/10] ARM: dts: stm32: add RNG node for STM32MP13x platforms
+Date:   Fri, 8 Sep 2023 18:51:20 +0200
+Message-ID: <20230908165120.730867-11-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
 References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
@@ -74,45 +74,36 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If "st,rng-lock-conf" DT binding property is set for a stm32-rng node,
-the RNG configuration will be locked until next hardware block reset
-or platform reset.
+The RNG on STM32MP13 offers upgrades like customization of its
+configuration and the conditional reset.
+
+The hardware RNG should be managed in the secure world for but it
+is supported on Linux. Therefore, is it not default enabled.
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
- drivers/char/hw_random/stm32-rng.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm/boot/dts/st/stm32mp131.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 3b77f1fe6aea..0243b889ac54 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -62,6 +62,7 @@ struct stm32_rng_private {
- 	struct reset_control *rst;
- 	const struct stm32_rng_data *data;
- 	bool ced;
-+	bool lock_conf;
- };
+diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
+index ac90fcbf0c09..39db82b782eb 100644
+--- a/arch/arm/boot/dts/st/stm32mp131.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
+@@ -1220,6 +1220,14 @@ mdma: dma-controller@58000000 {
+ 			dma-requests = <48>;
+ 		};
  
- /*
-@@ -301,6 +302,9 @@ static int stm32_rng_init(struct hwrng *rng)
- 
- 		reg &= ~RNG_CR_CONDRST;
- 		reg |= RNG_CR_RNGEN;
-+		if (priv->lock_conf)
-+			reg |= RNG_CR_CONFLOCK;
++		rng: rng@54004000 {
++			compatible = "st,stm32mp13-rng";
++			reg = <0x54004000 0x400>;
++			clocks = <&rcc RNG1_K>;
++			resets = <&rcc RNG1_R>;
++			status = "disabled";
++		};
 +
- 		writel_relaxed(reg, priv->base + RNG_CR);
- 
- 		err = readl_relaxed_poll_timeout_atomic(priv->base + RNG_CR, reg,
-@@ -439,6 +443,7 @@ static int stm32_rng_probe(struct platform_device *ofdev)
- 	}
- 
- 	priv->ced = of_property_read_bool(np, "clock-error-detect");
-+	priv->lock_conf = of_property_read_bool(np, "st,rng-lock-conf");
- 
- 	priv->data = of_device_get_match_data(dev);
- 	if (!priv->data)
+ 		fmc: memory-controller@58002000 {
+ 			compatible = "st,stm32mp1-fmc2-ebi";
+ 			reg = <0x58002000 0x1000>;
 -- 
 2.25.1
 
