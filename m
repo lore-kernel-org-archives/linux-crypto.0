@@ -2,186 +2,152 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FB2EE57F8
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 11:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 341A7EE57EB
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 11:35:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239991AbjIHLSM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Sep 2023 07:18:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52370 "EHLO
+        id S229596AbjIHLfQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Sep 2023 07:35:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236689AbjIHLSL (ORCPT
+        with ESMTP id S229453AbjIHLfQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2023 07:18:11 -0400
+        Fri, 8 Sep 2023 07:35:16 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08801BF9
-        for <linux-crypto@vger.kernel.org>; Fri,  8 Sep 2023 04:18:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331BF1BE7
+        for <linux-crypto@vger.kernel.org>; Fri,  8 Sep 2023 04:35:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694171885; x=1725707885;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rwLfjN5Jt2icmTQS8OIbJdwRiqRXVIvYPjdaAtSai4o=;
-  b=ZzzjcCJ7bFin1uL+s8ymIj/vu5TmFE7bqDIylpWGD04M89MEKn2KtQit
-   X8q6ytOhinym8+RhmAyuH+uhLmPFE1sLWkPqQqTwwt9IubKDBr+xe2rDs
-   LjGoMEfvViJCQyjuDTX/sw4SZqbnkqJGB8q03j34B4drr1hJRBItcKryl
-   7uYhHkNKvaarIA4YyUpaU0RPpsYDV18U+If7Be/k+2KKCJRtZclbwE8E5
-   ooR2hJYAbA970zE4i3sMxIs2cBn1FZGRVYbyhGSaRpYW6GrNoD/lNSu37
-   DHtvJKwobuR86jjou0Bui4W72Z5iLGvZkeXL9Ff0dpQdbrqWmPfRvDKRl
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="463998524"
-X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
-   d="scan'208";a="463998524"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 04:18:05 -0700
+  t=1694172911; x=1725708911;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WqPYxUT4U3NjGozBPxSuU6fq33mn4UkT9CWkQ3r1Tag=;
+  b=NzbSiANCrO+uuDUiIF8penMA6EDoRclWdG5Rq5KtgxL7RpB+uRn7H9da
+   mEBKyJxvxCoBL1B8+82Ib1ZXIMhbGF5LX5oudxG+6xQn2tnfjEUflKCwe
+   patiHfSmqC9F2/Xh88sbAL2gHM6NhLx237GdPJ/p5dKY79eyiPh6F6Pjf
+   iLMH4D4UBA92LHorLryFSFcyPACV2vUBBYeDwn+D4uGmzKViMlW+6/Z4H
+   /aJ6nPIvKk7Qu+JNazqeZG2LB7WZMdcja2NEZKhzWymbokQapLrcJ09xB
+   YAcHyM2NtIwB64+dHoBsTi/ly+5GF9stlX8IL0ttjZVeJ83ePmlDPenIw
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="464001561"
+X-IronPort-AV: E=Sophos;i="6.02,237,1688454000"; 
+   d="scan'208";a="464001561"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 04:35:03 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="777533262"
-X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
-   d="scan'208";a="777533262"
+X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="885640461"
+X-IronPort-AV: E=Sophos;i="6.02,237,1688454000"; 
+   d="scan'208";a="885640461"
 Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
-  by orsmga001.jf.intel.com with ESMTP; 08 Sep 2023 04:18:04 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 08 Sep 2023 04:34:46 -0700
 From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
         Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v3 2/2] crypto: qat - add pm_status debugfs file
-Date:   Fri,  8 Sep 2023 13:16:07 +0200
-Message-ID: <20230908111625.64762-3-lucas.segarra.fernandez@intel.com>
+Subject: [PATCH] crypto: qat - add cnv_errors debugfs file
+Date:   Fri,  8 Sep 2023 13:33:10 +0200
+Message-ID: <20230908113338.69183-1-lucas.segarra.fernandez@intel.com>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230908111625.64762-1-lucas.segarra.fernandez@intel.com>
-References: <20230908111625.64762-1-lucas.segarra.fernandez@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-QAT devices implement a mechanism that allows them to go autonomously
-to a low power state depending on the load.
+The Compress and Verify (CnV) feature check and ensures data integrity
+in the compression operation. The implementation of CnV keeps a record
+of the CnV errors that have occurred since the driver was loaded.
 
-Expose power management info by providing the "pm_status" file under
-debugfs. This includes PM state, PM event log, PM event counters, PM HW
-CSRs, per-resource type constrain counters and per-domain power gating
-status specific to the QAT device.
-
-This information is retrieved from (1) the FW by means of
-ICP_QAT_FW_PM_INFO command, (2) CSRs and (3) counters collected by the
-device driver.
-
-In addition, add logic to keep track and report power management event
-interrupts and acks/nacks sent to FW to allow/prevent state transitions.
+Expose CnV error stats by providing the "cnv_errors" file under
+debugfs. This includes the number of errors detected up to now and
+the type of the last error. The error count is provided on a per
+Acceleration Engine basis and it is reset every time the driver is loaded.
 
 Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- Documentation/ABI/testing/debugfs-driver-qat  |   9 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   2 +
- .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
- .../crypto/intel/qat/qat_common/adf_admin.c   |  26 ++
+ Documentation/ABI/testing/debugfs-driver-qat  |  13 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   1 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  20 ++
+ .../intel/qat/qat_common/adf_cnv_dbgfs.c      | 296 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_cnv_dbgfs.h      |  11 +
  .../intel/qat/qat_common/adf_common_drv.h     |   1 +
  .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
- .../crypto/intel/qat/qat_common/adf_gen4_pm.c |  24 +-
- .../crypto/intel/qat/qat_common/adf_gen4_pm.h |  46 ++++
- .../qat/qat_common/adf_gen4_pm_debugfs.c      | 255 ++++++++++++++++++
- .../intel/qat/qat_common/adf_pm_dbgfs.c       |  46 ++++
- .../intel/qat/qat_common/adf_pm_dbgfs.h       |  12 +
- .../qat/qat_common/icp_qat_fw_init_admin.h    |  35 +++
- 12 files changed, 467 insertions(+), 5 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |   5 +
+ 9 files changed, 351 insertions(+)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
 
 diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
-index 6731ffacc5f0..b93f8cbae63c 100644
+index b93f8cbae63c..58c228a3786e 100644
 --- a/Documentation/ABI/testing/debugfs-driver-qat
 +++ b/Documentation/ABI/testing/debugfs-driver-qat
-@@ -59,3 +59,12 @@ Description:	(RO) Read returns the device health status.
+@@ -68,3 +68,16 @@ Description:	(RO) Read returns power management information specific to the
+ 		QAT device.
  
- 		The driver does not monitor for Heartbeat. It is left for a user
- 		to poll the status periodically.
+ 		This attribute is only available for qat_4xxx devices.
 +
-+What:		/sys/kernel/debug/qat_<device>_<BDF>/pm_status
++What:		/sys/kernel/debug/qat_<device>_<BDF>/cnv_errors
 +Date:		January 2024
 +KernelVersion:	6.7
 +Contact:	qat-linux@intel.com
-+Description:	(RO) Read returns power management information specific to the
-+		QAT device.
++Description:	(RO) Read returns, for each Acceleration Engine (AE), the number
++		of errors and the type of the last error detected by the device
++		when performing verified compression.
++		Reported counters::
 +
-+		This attribute is only available for qat_4xxx devices.
++			<N>: Number of Compress and Verify (CnV) errors and type
++			     of the last CnV error detected by Acceleration
++			     Engine N.
 diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 43622c7fca71..4ef3cccfeab4 100644
+index 4ef3cccfeab4..47ab764fea4e 100644
 --- a/drivers/crypto/intel/qat/qat_common/Makefile
 +++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -33,6 +33,8 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
+@@ -33,6 +33,7 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
  				adf_fw_counters.o \
  				adf_heartbeat.o \
  				adf_heartbeat_dbgfs.o \
-+				adf_pm_dbgfs.o \
-+				adf_gen4_pm_debugfs.o \
++				adf_cnv_dbgfs.o \
+ 				adf_pm_dbgfs.o \
+ 				adf_gen4_pm_debugfs.o \
  				adf_dbgfs.o
- 
- intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index e57abde66f4f..2551db178b1e 100644
+index 2551db178b1e..3c4ad8cc9f9d 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
 +++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -291,6 +291,18 @@ struct adf_dc_data {
- 	dma_addr_t ovf_buff_p;
- };
- 
-+struct adf_pm {
-+	struct dentry *debugfs_pm_status;
-+	bool present;
-+	int idle_irq_counters;
-+	int throttle_irq_counters;
-+	int fw_irq_counters;
-+	int host_ack_counter;
-+	int host_nack_counter;
-+	ssize_t (*print_pm_status)(struct adf_accel_dev *accel_dev, char __user *buf,
-+				   size_t count, loff_t *pos);
-+};
-+
- struct adf_accel_dev {
- 	struct adf_etr_data *transport;
- 	struct adf_hw_device_data *hw_device;
-@@ -298,6 +310,7 @@ struct adf_accel_dev {
- 	struct adf_fw_loader_data *fw_loader;
- 	struct adf_admin_comms *admin;
- 	struct adf_dc_data *dc_data;
-+	struct adf_pm power_management;
- 	struct list_head crypto_list;
- 	struct list_head compression_list;
- 	unsigned long status;
+@@ -317,6 +317,7 @@ struct adf_accel_dev {
+ 	atomic_t ref_count;
+ 	struct dentry *debugfs_dir;
+ 	struct dentry *fw_cntr_dbgfile;
++	struct dentry *cnv_dbgfile;
+ 	struct list_head list;
+ 	struct module *owner;
+ 	struct adf_accel_pci accel_pci_dev;
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-index ff790823b868..275dadbbd611 100644
+index 275dadbbd611..a85f87f01ffe 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-@@ -348,6 +348,32 @@ int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay)
- 	return adf_send_admin(accel_dev, &req, &resp, ae_mask);
+@@ -374,6 +374,26 @@ int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, si
+ 	return ret;
  }
  
-+int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, size_t buff_size)
++int adf_get_cnv_stats(struct adf_accel_dev *accel_dev, u16 ae, u16 *err_cnt, u16 *latest_err)
 +{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
 +	struct icp_qat_fw_init_admin_req req = { };
 +	struct icp_qat_fw_init_admin_resp resp;
-+	u32 ae_mask = hw_data->admin_ae_mask;
 +	int ret;
 +
-+	/* Query pm info via init/admin cmd */
-+	if (!accel_dev->admin) {
-+		dev_err(&GET_DEV(accel_dev), "adf_admin is not available\n");
-+		return -EFAULT;
-+	}
++	req.cmd_id = ICP_QAT_FW_CNV_STATS_GET;
 +
-+	req.cmd_id = ICP_QAT_FW_PM_INFO;
-+	req.init_cfg_sz = buff_size;
-+	req.init_cfg_ptr = p_state_addr;
-+
-+	ret = adf_send_admin(accel_dev, &req, &resp, ae_mask);
++	ret = adf_put_admin_msg_sync(accel_dev, ae, &req, &resp);
 +	if (ret)
-+		dev_err(&GET_DEV(accel_dev),
-+			"Failed to query power-management info\n");
++		return ret;
++	if (resp.status)
++		return -EPROTONOSUPPORT;
++
++	*err_cnt = resp.error_count;
++	*latest_err = resp.latest_error;
 +
 +	return ret;
 +}
@@ -189,567 +155,390 @@ index ff790823b868..275dadbbd611 100644
  int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
  {
  	struct adf_admin_comms *admin;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
+new file mode 100644
+index 000000000000..693ef3d47369
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
+@@ -0,0 +1,296 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2023 Intel Corporation */
++
++#include <linux/bitfield.h>
++#include <linux/bits.h>
++#include <linux/debugfs.h>
++#include <linux/kernel.h>
++
++#include "adf_accel_devices.h"
++#include "adf_common_drv.h"
++#include "adf_cnv_dbgfs.h"
++#include "qat_compression.h"
++
++#define CNV_DEBUGFS_FILENAME		"cnv_errors"
++#define CNV_MIN_PADDING			16
++
++#define CNV_ERR_INFO_MASK		GENMASK(11, 0)
++#define CNV_ERR_TYPE_MASK		GENMASK(15, 12)
++#define CNV_SLICE_ERR_MASK		GENMASK(7, 0)
++#define CNV_SLICE_ERR_SIGN_BIT_INDEX	7
++#define CNV_DELTA_ERR_SIGN_BIT_INDEX	11
++
++enum cnv_error_type {
++	CNV_ERR_TYPE_NONE,
++	CNV_ERR_TYPE_CHECKSUM,
++	CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH,
++	CNV_ERR_TYPE_DECOMPRESSION,
++	CNV_ERR_TYPE_TRANSLATION,
++	CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH,
++	CNV_ERR_TYPE_UNKNOWN,
++	CNV_ERR_TYPES_COUNT
++};
++
++#define CNV_ERROR_TYPE_GET(latest_err)	\
++	min_t(u16, u16_get_bits(latest_err, CNV_ERR_TYPE_MASK), CNV_ERR_TYPE_UNKNOWN)
++
++#define CNV_GET_DELTA_ERR_INFO(latest_error)	\
++	sign_extend32(latest_error, CNV_DELTA_ERR_SIGN_BIT_INDEX)
++
++#define CNV_GET_SLICE_ERR_INFO(latest_error)	\
++	sign_extend32(latest_error, CNV_SLICE_ERR_SIGN_BIT_INDEX)
++
++#define CNV_GET_DEFAULT_ERR_INFO(latest_error)	\
++	u16_get_bits(latest_error, CNV_ERR_INFO_MASK)
++
++enum cnv_fields {
++	CNV_ERR_COUNT,
++	CNV_LATEST_ERR,
++	CNV_FIELDS_COUNT
++};
++
++static const char * const cnv_field_names[CNV_FIELDS_COUNT] = {
++	[CNV_ERR_COUNT] = "Total Errors",
++	[CNV_LATEST_ERR] = "Last Error",
++};
++
++static const char * const cnv_error_names[CNV_ERR_TYPES_COUNT] = {
++	[CNV_ERR_TYPE_NONE] = "No Error",
++	[CNV_ERR_TYPE_CHECKSUM] = "Checksum Error",
++	[CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH] = "Length Error-P",
++	[CNV_ERR_TYPE_DECOMPRESSION] = "Decomp Error",
++	[CNV_ERR_TYPE_TRANSLATION] = "Xlat Error",
++	[CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH] = "Length Error-C",
++	[CNV_ERR_TYPE_UNKNOWN] = "Unknown Error",
++};
++
++struct ae_cnv_errors {
++	u16 ae;
++	u16 err_cnt;
++	u16 latest_err;
++	bool is_comp_ae;
++};
++
++struct cnv_err_stats {
++	u16 ae_count;
++	struct ae_cnv_errors ae_cnv_errors[];
++};
++
++static s16 get_err_info(u8 error_type, u16 latest)
++{
++	switch (error_type) {
++	case CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH:
++	case CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH:
++		return CNV_GET_DELTA_ERR_INFO(latest);
++	case CNV_ERR_TYPE_DECOMPRESSION:
++	case CNV_ERR_TYPE_TRANSLATION:
++		return CNV_GET_SLICE_ERR_INFO(latest);
++	default:
++		return CNV_GET_DEFAULT_ERR_INFO(latest);
++	}
++}
++
++static void *qat_cnv_errors_seq_start(struct seq_file *sfile, loff_t *pos)
++{
++	struct cnv_err_stats *err_stats = sfile->private;
++
++	if (*pos == 0)
++		return SEQ_START_TOKEN;
++
++	if (*pos > err_stats->ae_count)
++		return NULL;
++
++	return &err_stats->ae_cnv_errors[*pos - 1];
++}
++
++static void *qat_cnv_errors_seq_next(struct seq_file *sfile, void *v, loff_t *pos)
++{
++	struct cnv_err_stats *err_stats = sfile->private;
++
++	(*pos)++;
++
++	if (*pos > err_stats->ae_count)
++		return NULL;
++
++	return &err_stats->ae_cnv_errors[*pos - 1];
++}
++
++static void qat_cnv_errors_seq_stop(struct seq_file *sfile, void *v)
++{
++}
++
++static int qat_cnv_errors_seq_show(struct seq_file *sfile, void *v)
++{
++	struct ae_cnv_errors *ae_errors;
++	unsigned int i;
++	s16 err_info;
++	u8 err_type;
++
++	if (v == SEQ_START_TOKEN) {
++		seq_puts(sfile, "AE ");
++		for (i = 0; i < CNV_FIELDS_COUNT; ++i)
++			seq_printf(sfile, " %*s", CNV_MIN_PADDING, cnv_field_names[i]);
++	} else {
++		ae_errors = v;
++
++		if (!ae_errors->is_comp_ae)
++			return 0;
++
++		err_type = CNV_ERROR_TYPE_GET(ae_errors->latest_err);
++		err_info = get_err_info(err_type, ae_errors->latest_err);
++
++		seq_printf(sfile, "%d:", ae_errors->ae);
++		seq_printf(sfile, " %*d", CNV_MIN_PADDING, ae_errors->err_cnt);
++		seq_printf(sfile, "%*s [%d]", CNV_MIN_PADDING, cnv_error_names[err_type],
++			   err_info);
++	}
++	seq_putc(sfile, '\n');
++
++	return 0;
++}
++
++static const struct seq_operations qat_cnv_errors_sops = {
++	.start = qat_cnv_errors_seq_start,
++	.next = qat_cnv_errors_seq_next,
++	.stop = qat_cnv_errors_seq_stop,
++	.show = qat_cnv_errors_seq_show,
++};
++
++/**
++ * cnv_err_stats_alloc() - Get CNV stats for the provided device.
++ * @accel_dev: Pointer to a QAT acceleration device
++ *
++ * Allocates and populates table of CNV errors statistics for each non-admin AE
++ * available through the supplied acceleration device. The caller becomes the
++ * owner of such memory and is responsible for the deallocation through a call
++ * to kfree().
++ *
++ * Returns: a pointer to a dynamically allocated struct cnv_err_stats on success
++ * or a negative value on error.
++ */
++static struct cnv_err_stats *cnv_err_stats_alloc(struct adf_accel_dev *accel_dev)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	struct cnv_err_stats *err_stats;
++	unsigned long ae_count;
++	unsigned long ae_mask;
++	size_t err_stats_size;
++	unsigned long ae;
++	unsigned int i;
++	u16 latest_err;
++	u16 err_cnt;
++	int ret;
++
++	if (!adf_dev_started(accel_dev)) {
++		dev_err(&GET_DEV(accel_dev), "QAT Device not started\n");
++		return ERR_PTR(-EBUSY);
++	}
++
++	/* Ignore the admin AEs */
++	ae_mask = hw_data->ae_mask & ~hw_data->admin_ae_mask;
++	ae_count = hweight_long(ae_mask);
++	if (unlikely(!ae_count))
++		return ERR_PTR(-EINVAL);
++
++	err_stats_size = struct_size(err_stats, ae_cnv_errors, ae_count);
++	err_stats = kmalloc(err_stats_size, GFP_KERNEL);
++	if (!err_stats)
++		return ERR_PTR(-ENOMEM);
++
++	err_stats->ae_count = ae_count;
++
++	i = 0;
++	for_each_set_bit(ae, &ae_mask, GET_MAX_ACCELENGINES(accel_dev)) {
++		ret = adf_get_cnv_stats(accel_dev, ae, &err_cnt, &latest_err);
++		if (ret) {
++			dev_dbg(&GET_DEV(accel_dev),
++				"Failed to get CNV stats for ae %ld, [%d].\n",
++				ae, ret);
++			err_stats->ae_cnv_errors[i++].is_comp_ae = false;
++			continue;
++		}
++		err_stats->ae_cnv_errors[i].is_comp_ae = true;
++		err_stats->ae_cnv_errors[i].latest_err = latest_err;
++		err_stats->ae_cnv_errors[i].err_cnt = err_cnt;
++		err_stats->ae_cnv_errors[i].ae = ae;
++		i++;
++	}
++
++	return err_stats;
++}
++
++static int qat_cnv_errors_file_open(struct inode *inode, struct file *file)
++{
++	struct adf_accel_dev *accel_dev = inode->i_private;
++	struct seq_file *cnv_errors_seq_file;
++	struct cnv_err_stats *cnv_err_stats;
++	int ret;
++
++	cnv_err_stats = cnv_err_stats_alloc(accel_dev);
++	if (IS_ERR(cnv_err_stats))
++		return PTR_ERR(cnv_err_stats);
++
++	ret = seq_open(file, &qat_cnv_errors_sops);
++	if (unlikely(ret)) {
++		kfree(cnv_err_stats);
++		return ret;
++	}
++
++	cnv_errors_seq_file = file->private_data;
++	cnv_errors_seq_file->private = cnv_err_stats;
++	return ret;
++}
++
++static int qat_cnv_errors_file_release(struct inode *inode, struct file *file)
++{
++	struct seq_file *cnv_errors_seq_file = file->private_data;
++
++	kfree(cnv_errors_seq_file->private);
++	cnv_errors_seq_file->private = NULL;
++
++	return seq_release(inode, file);
++}
++
++static const struct file_operations qat_cnv_fops = {
++	.owner = THIS_MODULE,
++	.open = qat_cnv_errors_file_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = qat_cnv_errors_file_release,
++};
++
++static ssize_t no_comp_file_read(struct file *f, char __user *buf, size_t count, loff_t *pos)
++{
++	char *file_msg = "No engine configured for comp\n";
++
++	return simple_read_from_buffer(buf, count, pos, file_msg, strlen(file_msg));
++}
++
++static const struct file_operations qat_cnv_no_comp_fops = {
++	.owner = THIS_MODULE,
++	.read = no_comp_file_read,
++};
++
++void adf_cnv_dbgfs_add(struct adf_accel_dev *accel_dev)
++{
++	const struct file_operations *fops;
++	void *data;
++
++	if (adf_hw_dev_has_compression(accel_dev)) {
++		fops = &qat_cnv_fops;
++		data = accel_dev;
++	} else {
++		fops = &qat_cnv_no_comp_fops;
++		data = NULL;
++	}
++
++	accel_dev->cnv_dbgfile = debugfs_create_file(CNV_DEBUGFS_FILENAME, 0400,
++						     accel_dev->debugfs_dir,
++						     data, fops);
++}
++
++void adf_cnv_dbgfs_rm(struct adf_accel_dev *accel_dev)
++{
++	debugfs_remove(accel_dev->cnv_dbgfile);
++	accel_dev->cnv_dbgfile = NULL;
++}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
+new file mode 100644
+index 000000000000..b02b0961c433
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2023 Intel Corporation */
++#ifndef ADF_CNV_DBG_H
++#define ADF_CNV_DBG_H
++
++struct adf_accel_dev;
++
++void adf_cnv_dbgfs_add(struct adf_accel_dev *accel_dev);
++void adf_cnv_dbgfs_rm(struct adf_accel_dev *accel_dev);
++
++#endif
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index 673b5044c62a..4f991c7a7b26 100644
+index 4f991c7a7b26..d4c602b4fec7 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
 +++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -93,6 +93,7 @@ int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay);
- int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
+@@ -94,6 +94,7 @@ int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
  int adf_send_admin_hb_timer(struct adf_accel_dev *accel_dev, uint32_t ticks);
  int adf_get_fw_timestamp(struct adf_accel_dev *accel_dev, u64 *timestamp);
-+int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, size_t buff_size);
+ int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, size_t buff_size);
++int adf_get_cnv_stats(struct adf_accel_dev *accel_dev, u16 ae, u16 *err_cnt, u16 *latest_err);
  int adf_init_arb(struct adf_accel_dev *accel_dev);
  void adf_exit_arb(struct adf_accel_dev *accel_dev);
  void adf_update_ring_arb(struct adf_etr_ring_data *ring);
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-index 04845f8d72be..395bb493f20c 100644
+index 395bb493f20c..477efcc81a16 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-@@ -8,6 +8,7 @@
+@@ -5,6 +5,7 @@
+ #include "adf_accel_devices.h"
+ #include "adf_cfg.h"
+ #include "adf_common_drv.h"
++#include "adf_cnv_dbgfs.h"
  #include "adf_dbgfs.h"
  #include "adf_fw_counters.h"
  #include "adf_heartbeat_dbgfs.h"
-+#include "adf_pm_dbgfs.h"
- 
- /**
-  * adf_dbgfs_init() - add persistent debugfs entries
-@@ -62,6 +63,7 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
- 	if (!accel_dev->is_vf) {
+@@ -64,6 +65,7 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
  		adf_fw_counters_dbgfs_add(accel_dev);
  		adf_heartbeat_dbgfs_add(accel_dev);
-+		adf_pm_dbgfs_add(accel_dev);
+ 		adf_pm_dbgfs_add(accel_dev);
++		adf_cnv_dbgfs_add(accel_dev);
  	}
  }
  
-@@ -75,6 +77,7 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
+@@ -77,6 +79,7 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
  		return;
  
  	if (!accel_dev->is_vf) {
-+		adf_pm_dbgfs_rm(accel_dev);
++		adf_cnv_dbgfs_rm(accel_dev);
+ 		adf_pm_dbgfs_rm(accel_dev);
  		adf_heartbeat_dbgfs_rm(accel_dev);
  		adf_fw_counters_dbgfs_rm(accel_dev);
- 	}
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-index 3bde8759c2a2..c44947f8953e 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.c
-@@ -13,11 +13,6 @@
- #include "adf_gen4_hw_data.h"
- #include "adf_cfg.h"
- 
--enum qat_pm_host_msg {
--	PM_NO_CHANGE = 0,
--	PM_SET_MIN,
--};
--
- struct adf_gen4_pm_data {
- 	struct work_struct pm_irq_work;
- 	struct adf_accel_dev *accel_dev;
-@@ -28,6 +23,7 @@ static int send_host_msg(struct adf_accel_dev *accel_dev)
- {
- 	char pm_idle_support_cfg[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {};
- 	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	struct adf_pm *pm = &accel_dev->power_management;
- 	bool pm_idle_support;
- 	u32 msg;
- 	int ret;
-@@ -42,6 +38,11 @@ static int send_host_msg(struct adf_accel_dev *accel_dev)
- 	if (ret)
- 		pm_idle_support = true;
- 
-+	if (pm_idle_support)
-+		pm->host_ack_counter++;
-+	else
-+		pm->host_nack_counter++;
-+
- 	/* Send HOST_MSG */
- 	msg = FIELD_PREP(ADF_GEN4_PM_MSG_PAYLOAD_BIT_MASK,
- 			 pm_idle_support ? PM_SET_MIN : PM_NO_CHANGE);
-@@ -62,17 +63,27 @@ static void pm_bh_handler(struct work_struct *work)
- 		container_of(work, struct adf_gen4_pm_data, pm_irq_work);
- 	struct adf_accel_dev *accel_dev = pm_data->accel_dev;
- 	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	struct adf_pm *pm = &accel_dev->power_management;
- 	u32 pm_int_sts = pm_data->pm_int_sts;
- 	u32 val;
- 
- 	/* PM Idle interrupt */
- 	if (pm_int_sts & ADF_GEN4_PM_IDLE_STS) {
-+		pm->idle_irq_counters++;
- 		/* Issue host message to FW */
- 		if (send_host_msg(accel_dev))
- 			dev_warn_ratelimited(&GET_DEV(accel_dev),
- 					     "Failed to send host msg to FW\n");
- 	}
- 
-+	/* PM throttle interrupt */
-+	if (pm_int_sts & ADF_GEN4_PM_THR_STS)
-+		pm->throttle_irq_counters++;
-+
-+	/* PM fw interrupt */
-+	if (pm_int_sts & ADF_GEN4_PM_FW_INT_STS)
-+		pm->fw_irq_counters++;
-+
- 	/* Clear interrupt status */
- 	ADF_CSR_WR(pmisc, ADF_GEN4_PM_INTERRUPT, pm_int_sts);
- 
-@@ -132,6 +143,9 @@ int adf_gen4_enable_pm(struct adf_accel_dev *accel_dev)
- 	if (ret)
- 		return ret;
- 
-+	/* Initialize PM internal data */
-+	adf_gen4_init_dev_pm_data(accel_dev);
-+
- 	/* Enable default PM interrupts: IDLE, THROTTLE */
- 	val = ADF_CSR_RD(pmisc, ADF_GEN4_PM_INTERRUPT);
- 	val |= ADF_GEN4_PM_INT_EN_DEFAULT;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-index 39d37b352b45..a49352b79a7a 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm.h
-@@ -7,6 +7,11 @@
- 
- struct adf_accel_dev;
- 
-+enum qat_pm_host_msg {
-+	PM_NO_CHANGE = 0,
-+	PM_SET_MIN,
-+};
-+
- /* Power management registers */
- #define ADF_GEN4_PM_HOST_MSG (0x50A01C)
- 
-@@ -41,7 +46,48 @@ struct adf_accel_dev;
- #define ADF_GEN4_PM_MAX_IDLE_FILTER		(0x7)
- #define ADF_GEN4_PM_DEFAULT_IDLE_SUPPORT	(0x1)
- 
-+/* PM CSRs fields masks */
-+#define ADF_GEN4_PM_DOMAIN_POWER_GATED_MASK	GENMASK(15, 0)
-+#define ADF_GEN4_PM_SSM_PM_ENABLE_MASK		GENMASK(15, 0)
-+#define ADF_GEN4_PM_IDLE_FILTER_MASK		GENMASK(5, 3)
-+#define ADF_GEN4_PM_IDLE_ENABLE_MASK		BIT(2)
-+#define ADF_GEN4_PM_ENABLE_PM_MASK		BIT(21)
-+#define ADF_GEN4_PM_ENABLE_PM_IDLE_MASK		BIT(22)
-+#define ADF_GEN4_PM_ENABLE_DEEP_PM_IDLE_MASK	BIT(23)
-+#define ADF_GEN4_PM_CURRENT_WP_MASK		GENMASK(19, 11)
-+#define ADF_GEN4_PM_CPM_PM_STATE_MASK		GENMASK(22, 20)
-+#define ADF_GEN4_PM_PENDING_WP_MASK		GENMASK(31, 23)
-+#define ADF_GEN4_PM_THR_VALUE_MASK		GENMASK(6, 4)
-+#define ADF_GEN4_PM_MIN_PWR_ACK_MASK		BIT(7)
-+#define ADF_GEN4_PM_MIN_PWR_ACK_PENDING_MASK	BIT(17)
-+#define ADF_GEN4_PM_CPR_ACTIVE_COUNT_MASK	BIT(0)
-+#define ADF_GEN4_PM_CPR_MANAGED_COUNT_MASK	BIT(0)
-+#define ADF_GEN4_PM_XLT_ACTIVE_COUNT_MASK	BIT(1)
-+#define ADF_GEN4_PM_XLT_MANAGED_COUNT_MASK	BIT(1)
-+#define ADF_GEN4_PM_DCPR_ACTIVE_COUNT_MASK	GENMASK(3, 2)
-+#define ADF_GEN4_PM_DCPR_MANAGED_COUNT_MASK	GENMASK(3, 2)
-+#define ADF_GEN4_PM_PKE_ACTIVE_COUNT_MASK	GENMASK(8, 4)
-+#define ADF_GEN4_PM_PKE_MANAGED_COUNT_MASK	GENMASK(8, 4)
-+#define ADF_GEN4_PM_WAT_ACTIVE_COUNT_MASK	GENMASK(13, 9)
-+#define ADF_GEN4_PM_WAT_MANAGED_COUNT_MASK	GENMASK(13, 9)
-+#define ADF_GEN4_PM_WCP_ACTIVE_COUNT_MASK	GENMASK(18, 14)
-+#define ADF_GEN4_PM_WCP_MANAGED_COUNT_MASK	GENMASK(18, 14)
-+#define ADF_GEN4_PM_UCS_ACTIVE_COUNT_MASK	GENMASK(20, 19)
-+#define ADF_GEN4_PM_UCS_MANAGED_COUNT_MASK	GENMASK(20, 19)
-+#define ADF_GEN4_PM_CPH_ACTIVE_COUNT_MASK	GENMASK(24, 21)
-+#define ADF_GEN4_PM_CPH_MANAGED_COUNT_MASK	GENMASK(24, 21)
-+#define ADF_GEN4_PM_ATH_ACTIVE_COUNT_MASK	GENMASK(28, 25)
-+#define ADF_GEN4_PM_ATH_MANAGED_COUNT_MASK	GENMASK(28, 25)
-+
- int adf_gen4_enable_pm(struct adf_accel_dev *accel_dev);
- bool adf_gen4_handle_pm_interrupt(struct adf_accel_dev *accel_dev);
- 
-+#ifdef CONFIG_DEBUG_FS
-+void adf_gen4_init_dev_pm_data(struct adf_accel_dev *accel_dev);
-+#else
-+static inline void adf_gen4_init_dev_pm_data(struct adf_accel_dev *accel_dev)
-+{
-+}
-+#endif /* CONFIG_DEBUG_FS */
-+
- #endif
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
-new file mode 100644
-index 000000000000..0f38a63f80fb
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
-@@ -0,0 +1,255 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
-+#include <linux/bits.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/slab.h>
-+#include <linux/stddef.h>
-+#include <linux/string_helpers.h>
-+#include <linux/stringify.h>
-+#include <linux/types.h>
-+
-+#include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
-+#include "adf_gen4_pm.h"
-+#include "icp_qat_fw_init_admin.h"
-+
-+/*
-+ * This is needed because a variable is used to index the mask at
-+ * pm_scnprint_table(), making it not compile time constant, so the compile
-+ * asserts from FIELD_GET() or u32_get_bits() won't be fulfilled.
-+ */
-+#define field_get(_mask, _reg) (((_reg) & (_mask)) >> (ffs(_mask) - 1))
-+
-+#define PM_INFO_MEMBER_OFF(member)	\
-+	(offsetof(struct icp_qat_fw_init_admin_pm_info, member) / sizeof(u32))
-+
-+#define PM_INFO_REGSET_ENTRY_MASK(_reg_, _field_, _mask_)	\
-+{								\
-+	.reg_offset = PM_INFO_MEMBER_OFF(_reg_),		\
-+	.key = __stringify(_field_),				\
-+	.field_mask = _mask_,					\
-+}
-+
-+#define PM_INFO_REGSET_ENTRY32(_reg_, _field_)	\
-+	PM_INFO_REGSET_ENTRY_MASK(_reg_, _field_, GENMASK(31, 0))
-+
-+#define PM_INFO_REGSET_ENTRY(_reg_, _field_)	\
-+	PM_INFO_REGSET_ENTRY_MASK(_reg_, _field_, ADF_GEN4_PM_##_field_##_MASK)
-+
-+#define PM_INFO_MAX_KEY_LEN	21
-+
-+struct pm_status_row {
-+	int reg_offset;
-+	u32 field_mask;
-+	const char *key;
-+};
-+
-+static struct pm_status_row pm_fuse_rows[] = {
-+	PM_INFO_REGSET_ENTRY(fusectl0, ENABLE_PM),
-+	PM_INFO_REGSET_ENTRY(fusectl0, ENABLE_PM_IDLE),
-+	PM_INFO_REGSET_ENTRY(fusectl0, ENABLE_DEEP_PM_IDLE),
-+};
-+
-+static struct pm_status_row pm_info_rows[] = {
-+	PM_INFO_REGSET_ENTRY(pm.status, CPM_PM_STATE),
-+	PM_INFO_REGSET_ENTRY(pm.status, PENDING_WP),
-+	PM_INFO_REGSET_ENTRY(pm.status, CURRENT_WP),
-+	PM_INFO_REGSET_ENTRY(pm.fw_init, IDLE_ENABLE),
-+	PM_INFO_REGSET_ENTRY(pm.fw_init, IDLE_FILTER),
-+	PM_INFO_REGSET_ENTRY(pm.main, MIN_PWR_ACK),
-+	PM_INFO_REGSET_ENTRY(pm.thread, MIN_PWR_ACK_PENDING),
-+	PM_INFO_REGSET_ENTRY(pm.main, THR_VALUE),
-+};
-+
-+static struct pm_status_row pm_ssm_rows[] = {
-+	PM_INFO_REGSET_ENTRY(ssm.pm_enable, SSM_PM_ENABLE),
-+	PM_INFO_REGSET_ENTRY32(ssm.active_constraint, ACTIVE_CONSTRAINT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_domain_status, DOMAIN_POWER_GATED),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, ATH_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, CPH_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, PKE_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, CPR_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, DCPR_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, UCS_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, XLT_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, WAT_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_active_status, WCP_ACTIVE_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, ATH_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, CPH_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, PKE_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, CPR_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, DCPR_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, UCS_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, XLT_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, WAT_MANAGED_COUNT),
-+	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, WCP_MANAGED_COUNT),
-+};
-+
-+static struct pm_status_row pm_log_rows[] = {
-+	PM_INFO_REGSET_ENTRY32(event_counters.host_msg, HOST_MSG_EVENT_COUNT),
-+	PM_INFO_REGSET_ENTRY32(event_counters.sys_pm, SYS_PM_EVENT_COUNT),
-+	PM_INFO_REGSET_ENTRY32(event_counters.local_ssm, SSM_EVENT_COUNT),
-+	PM_INFO_REGSET_ENTRY32(event_counters.timer, TIMER_EVENT_COUNT),
-+	PM_INFO_REGSET_ENTRY32(event_counters.unknown, UNKNOWN_EVENT_COUNT),
-+};
-+
-+static struct pm_status_row pm_event_rows[ICP_QAT_NUMBER_OF_PM_EVENTS] = {
-+	PM_INFO_REGSET_ENTRY32(event_log[0], EVENT0),
-+	PM_INFO_REGSET_ENTRY32(event_log[1], EVENT1),
-+	PM_INFO_REGSET_ENTRY32(event_log[2], EVENT2),
-+	PM_INFO_REGSET_ENTRY32(event_log[3], EVENT3),
-+	PM_INFO_REGSET_ENTRY32(event_log[4], EVENT4),
-+	PM_INFO_REGSET_ENTRY32(event_log[5], EVENT5),
-+	PM_INFO_REGSET_ENTRY32(event_log[6], EVENT6),
-+	PM_INFO_REGSET_ENTRY32(event_log[7], EVENT7),
-+};
-+
-+static struct pm_status_row pm_csrs_rows[] = {
-+	PM_INFO_REGSET_ENTRY32(pm.fw_init, CPM_PM_FW_INIT),
-+	PM_INFO_REGSET_ENTRY32(pm.status, CPM_PM_STATUS),
-+	PM_INFO_REGSET_ENTRY32(pm.main, CPM_PM_MASTER_FW),
-+	PM_INFO_REGSET_ENTRY32(pm.pwrreq, CPM_PM_PWRREQ),
-+};
-+
-+static int pm_scnprint_table(char *buff, struct pm_status_row *table, u32 *pm_info_regs,
-+			     size_t buff_size, int table_len, bool lowercase)
-+{
-+	char key[PM_INFO_MAX_KEY_LEN];
-+	int wr = 0;
-+	int i;
-+
-+	for (i = 0; i < table_len; i++) {
-+		if (lowercase)
-+			string_lower(key, table[i].key);
-+		else
-+			string_upper(key, table[i].key);
-+
-+		wr += scnprintf(&buff[wr], buff_size - wr, "%s: %#x\n", key,
-+				field_get(table[i].field_mask, pm_info_regs[table[i].reg_offset]));
-+	}
-+
-+	return wr;
-+}
-+
-+static int pm_scnprint_table_upper_keys(char *buff, struct pm_status_row *table, u32 *pm_info_regs,
-+					size_t buff_size, int table_len)
-+{
-+	return pm_scnprint_table(buff, table, pm_info_regs, buff_size, table_len, false);
-+}
-+
-+static int pm_scnprint_table_lower_keys(char *buff, struct pm_status_row *table, u32 *pm_info_regs,
-+					size_t buff_size, int table_len)
-+{
-+	return pm_scnprint_table(buff, table, pm_info_regs, buff_size, table_len, true);
-+}
-+
-+static_assert(sizeof(struct icp_qat_fw_init_admin_pm_info) < PAGE_SIZE);
-+
-+static ssize_t adf_gen4_print_pm_status(struct adf_accel_dev *accel_dev, char __user *buf,
-+					size_t count, loff_t *pos)
-+{
-+	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	struct adf_pm *pm = &accel_dev->power_management;
-+	struct icp_qat_fw_init_admin_pm_info *pm_info;
-+	dma_addr_t p_state_addr;
-+	u32 *pm_info_regs;
-+	char *pm_kv;
-+	int len;
-+	u32 val;
-+	int ret;
-+
-+	pm_info = kmalloc(PAGE_SIZE, GFP_KERNEL);
-+	if (!pm_info)
-+		return -ENOMEM;
-+
-+	pm_kv = kmalloc(PAGE_SIZE, GFP_KERNEL);
-+	if (!pm_kv) {
-+		ret = -ENOMEM;
-+		goto out_free;
-+	}
-+
-+	p_state_addr = dma_map_single(&GET_DEV(accel_dev), pm_info, PAGE_SIZE,
-+				      DMA_FROM_DEVICE);
-+	ret = dma_mapping_error(&GET_DEV(accel_dev), p_state_addr);
-+	if (ret)
-+		goto out_free;
-+
-+	/* Query PM info from QAT FW */
-+	ret = adf_get_pm_info(accel_dev, p_state_addr, PAGE_SIZE);
-+	dma_unmap_single(&GET_DEV(accel_dev), p_state_addr, PAGE_SIZE,
-+			 DMA_FROM_DEVICE);
-+	if (ret)
-+		goto out_free;
-+
-+	pm_info_regs = (u32 *)pm_info;
-+
-+	/* Fusectl related */
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "----------- PM Fuse info ---------\n");
-+	len += pm_scnprint_table_lower_keys(&pm_kv[len], pm_fuse_rows, pm_info_regs,
-+					    PAGE_SIZE - len, ARRAY_SIZE(pm_fuse_rows));
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "max_pwrreq: %#x\n",
-+			 pm_info->max_pwrreq);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "min_pwrreq: %#x\n",
-+			 pm_info->min_pwrreq);
-+
-+	/* PM related */
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "------------  PM Info ------------\n");
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "power_level: %s\n",
-+			 pm_info->pwr_state == PM_SET_MIN ? "min" : "max");
-+	len += pm_scnprint_table_lower_keys(&pm_kv[len], pm_info_rows, pm_info_regs,
-+					    PAGE_SIZE - len, ARRAY_SIZE(pm_info_rows));
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "pm_mode: STATIC\n");
-+
-+	/* SSM related */
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "----------- SSM_PM Info ----------\n");
-+	len += pm_scnprint_table_lower_keys(&pm_kv[len], pm_ssm_rows, pm_info_regs, PAGE_SIZE - len,
-+					    ARRAY_SIZE(pm_ssm_rows));
-+
-+	/* Log related */
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "------------- PM Log -------------\n");
-+	len += pm_scnprint_table_lower_keys(&pm_kv[len], pm_log_rows, pm_info_regs, PAGE_SIZE - len,
-+					    ARRAY_SIZE(pm_log_rows));
-+
-+	len += pm_scnprint_table_lower_keys(&pm_kv[len], pm_event_rows, pm_info_regs,
-+					    PAGE_SIZE - len, ARRAY_SIZE(pm_event_rows));
-+
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "idle_irq_count: %#x\n",
-+			 pm->idle_irq_counters);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "fw_irq_count: %#x\n",
-+			 pm->fw_irq_counters);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "throttle_irq_count: %#x\n",
-+			 pm->throttle_irq_counters);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "host_ack_count: %#x\n",
-+			 pm->host_ack_counter);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len, "host_nack_count: %#x\n",
-+			 pm->host_nack_counter);
-+
-+	/* CSRs content */
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "----------- HW PM CSRs -----------\n");
-+	len += pm_scnprint_table_upper_keys(&pm_kv[len], pm_csrs_rows, pm_info_regs,
-+					    PAGE_SIZE - len, ARRAY_SIZE(pm_csrs_rows));
-+
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_PM_HOST_MSG);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "CPM_PM_HOST_MSG: %#x\n", val);
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_PM_INTERRUPT);
-+	len += scnprintf(&pm_kv[len], PAGE_SIZE - len,
-+			 "CPM_PM_INTERRUPT: %#x\n", val);
-+	ret = simple_read_from_buffer(buf, count, pos, pm_kv, len);
-+
-+out_free:
-+	kfree(pm_info);
-+	kfree(pm_kv);
-+	return ret;
-+}
-+
-+void adf_gen4_init_dev_pm_data(struct adf_accel_dev *accel_dev)
-+{
-+	accel_dev->power_management.print_pm_status = adf_gen4_print_pm_status;
-+	accel_dev->power_management.present = true;
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c
-new file mode 100644
-index 000000000000..239f39a5a4b6
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c
-@@ -0,0 +1,46 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
-+#include <linux/debugfs.h>
-+#include <linux/fs.h>
-+#include <linux/types.h>
-+
-+#include "adf_accel_devices.h"
-+#include "adf_pm_dbgfs.h"
-+
-+static ssize_t pm_status_read(struct file *f, char __user *buf, size_t count, loff_t *pos)
-+{
-+	struct adf_accel_dev *accel_dev = file_inode(f)->i_private;
-+	struct adf_pm pm = accel_dev->power_management;
-+
-+	if (pm.print_pm_status)
-+		return pm.print_pm_status(accel_dev, buf, count, pos);
-+
-+	return count;
-+}
-+
-+static const struct file_operations pm_status_fops = {
-+	.owner = THIS_MODULE,
-+	.read = pm_status_read,
-+};
-+
-+void adf_pm_dbgfs_add(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_pm *pm = &accel_dev->power_management;
-+
-+	if (!pm->present || !pm->print_pm_status)
-+		return;
-+
-+	pm->debugfs_pm_status = debugfs_create_file("pm_status", 0400, accel_dev->debugfs_dir,
-+						    accel_dev, &pm_status_fops);
-+}
-+
-+void adf_pm_dbgfs_rm(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_pm *pm = &accel_dev->power_management;
-+
-+	if (!pm->present)
-+		return;
-+
-+	debugfs_remove(pm->debugfs_pm_status);
-+	pm->debugfs_pm_status = NULL;
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h b/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h
-new file mode 100644
-index 000000000000..83632e5aa097
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2023 Intel Corporation */
-+
-+#ifndef ADF_PM_DBGFS_H_
-+#define ADF_PM_DBGFS_H_
-+
-+struct adf_accel_dev;
-+
-+void adf_pm_dbgfs_rm(struct adf_accel_dev *accel_dev);
-+void adf_pm_dbgfs_add(struct adf_accel_dev *accel_dev);
-+
-+#endif /* ADF_PM_DBGFS_H_ */
 diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-index 3e968a4bcc9c..791be0203797 100644
+index 791be0203797..5b2d2987aacf 100644
 --- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
 +++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-@@ -19,6 +19,7 @@ enum icp_qat_fw_init_admin_cmd_id {
+@@ -18,6 +18,7 @@ enum icp_qat_fw_init_admin_cmd_id {
+ 	ICP_QAT_FW_COMP_CAPABILITY_GET = 9,
  	ICP_QAT_FW_HEARTBEAT_TIMER_SET = 13,
  	ICP_QAT_FW_TIMER_GET = 19,
++	ICP_QAT_FW_CNV_STATS_GET = 20,
  	ICP_QAT_FW_PM_STATE_CONFIG = 128,
-+	ICP_QAT_FW_PM_INFO = 129,
+ 	ICP_QAT_FW_PM_INFO = 129,
  };
- 
- enum icp_qat_fw_init_admin_resp_status {
-@@ -107,4 +108,38 @@ struct icp_qat_fw_init_admin_resp {
- 
- #define ICP_QAT_FW_SYNC ICP_QAT_FW_HEARTBEAT_SYNC
- 
-+#define ICP_QAT_NUMBER_OF_PM_EVENTS 8
-+
-+struct icp_qat_fw_init_admin_pm_info {
-+	__u16 max_pwrreq;
-+	__u16 min_pwrreq;
-+	__u16 resvrd1;
-+	__u8 pwr_state;
-+	__u8 resvrd2;
-+	__u32 fusectl0;
-+	struct_group(event_counters,
-+		__u32 sys_pm;
-+		__u32 host_msg;
-+		__u32 unknown;
-+		__u32 local_ssm;
-+		__u32 timer;
-+	);
-+	__u32 event_log[ICP_QAT_NUMBER_OF_PM_EVENTS];
-+	struct_group(pm,
-+		__u32 fw_init;
-+		__u32 pwrreq;
-+		__u32 status;
-+		__u32 main;
-+		__u32 thread;
-+	);
-+	struct_group(ssm,
-+		__u32 pm_enable;
-+		__u32 pm_active_status;
-+		__u32 pm_managed_status;
-+		__u32 pm_domain_status;
-+		__u32 active_constraint;
-+	);
-+	__u32 resvrd3[6];
-+};
-+
- #endif
+@@ -64,6 +65,10 @@ struct icp_qat_fw_init_admin_resp {
+ 			__u16 version_major_num;
+ 		};
+ 		__u32 extended_features;
++		struct {
++			__u16 error_count;
++			__u16 latest_error;
++		};
+ 	};
+ 	__u64 opaque_data;
+ 	union {
+
+base-commit: 2e0e8d4fd99ad5b5898dd4e1f9084fdb197a9dd6
 -- 
 2.41.0
 
