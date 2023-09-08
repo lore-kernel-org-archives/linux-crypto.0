@@ -2,72 +2,95 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D25AEE57E0
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 09:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3703AEE57F8
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Sep 2023 11:17:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241670AbjIHJVf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Sep 2023 05:21:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41232 "EHLO
+        id S236757AbjIHLSA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Sep 2023 07:18:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232182AbjIHJVe (ORCPT
+        with ESMTP id S236689AbjIHLR6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Sep 2023 05:21:34 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8D21FC4
-        for <linux-crypto@vger.kernel.org>; Fri,  8 Sep 2023 02:21:17 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qeXfr-00BxLc-Iz; Fri, 08 Sep 2023 17:21:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Sep 2023 17:21:13 +0800
-Date:   Fri, 8 Sep 2023 17:21:13 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] hwrng: octeon - Fix warnings on 32-bit platforms
-Message-ID: <ZPrniQ4XYatlUqYE@gondor.apana.org.au>
+        Fri, 8 Sep 2023 07:17:58 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8DD31BF6
+        for <linux-crypto@vger.kernel.org>; Fri,  8 Sep 2023 04:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694171874; x=1725707874;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5bIUcpbosUWLKc0n7GvOfvgYyl+2JL09JWwO2vynVhI=;
+  b=R01nB9igepxXwmWrpE8JF5WmjZPo/CbQNAuJN6whwIcfxFAX9L/MowCZ
+   vFrGkUO4RHFwRv9gVokIajKpEMuXhDmwCzlw2C3KH3jU89ylfUYVJvsZM
+   7isw4K9N67SBaDe8K8dJfnAuPEy/zcQBOQ5OucKvVsvcwYpVg/57hS72b
+   4knULDLtA8fS+mAY8PiYznKXIrUgMpqZ+AaI30kkQqJTR7LhGu/VwxLwd
+   O7utdoZLM/W5wpblN7GUaAuQBHBnRwGFlRryR4g8ddwc702XcpLXAkA9k
+   qR6ZHfnXc3Aht/3y7SA8s6VVWm3xlDaaJYox2+8Iq6lGSdkHfGw0BGtDO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="463998476"
+X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
+   d="scan'208";a="463998476"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 04:17:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="777533212"
+X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
+   d="scan'208";a="777533212"
+Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
+  by orsmga001.jf.intel.com with ESMTP; 08 Sep 2023 04:17:53 -0700
+From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Subject: [PATCH v3 0/2] Add debugfs pm_status for qat driver
+Date:   Fri,  8 Sep 2023 13:16:05 +0200
+Message-ID: <20230908111625.64762-1-lucas.segarra.fernandez@intel.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use unsigned long instead of u64 to silence compile warnings on
-32-bit platforms.  Also remove the __force bit which seems no
-longer needed with a current sparse.
+Add debugfs pm_status.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Expose power management info by providing the "pm_status" file under
+debugfs.
 
-diff --git a/drivers/char/hw_random/octeon-rng.c b/drivers/char/hw_random/octeon-rng.c
-index 8561a09b4681..412f54405036 100644
---- a/drivers/char/hw_random/octeon-rng.c
-+++ b/drivers/char/hw_random/octeon-rng.c
-@@ -33,7 +33,7 @@ static int octeon_rng_init(struct hwrng *rng)
- 	ctl.u64 = 0;
- 	ctl.s.ent_en = 1; /* Enable the entropy source.  */
- 	ctl.s.rng_en = 1; /* Enable the RNG hardware.  */
--	cvmx_write_csr((__force u64)p->control_status, ctl.u64);
-+	cvmx_write_csr((unsigned long)p->control_status, ctl.u64);
- 	return 0;
- }
- 
-@@ -44,14 +44,14 @@ static void octeon_rng_cleanup(struct hwrng *rng)
- 
- 	ctl.u64 = 0;
- 	/* Disable everything.  */
--	cvmx_write_csr((__force u64)p->control_status, ctl.u64);
-+	cvmx_write_csr((unsigned long)p->control_status, ctl.u64);
- }
- 
- static int octeon_rng_data_read(struct hwrng *rng, u32 *data)
- {
- 	struct octeon_rng *p = container_of(rng, struct octeon_rng, ops);
- 
--	*data = cvmx_read64_uint32((__force u64)p->result);
-+	*data = cvmx_read64_uint32((unsigned long)p->result);
- 	return sizeof(u32);
- }
- 
+---
+v2 -> v3:
+- Move debugfs Power Management GEN4 specific logic to adf_gen4_pm_debugfs.c,
+this fixes error building with CONFIG_DEBUG_FS=n
+- increase doc's Date and KernelVersion
+---
+v1 -> v2:
+- Add constant ICP_QAT_NUMBER_OF_PM_EVENTS, rather than ARRAY_SIZE_OF_FIELD()
+---
+
+Lucas Segarra Fernandez (2):
+  crypto: qat - refactor included headers
+  crypto: qat - add pm_status debugfs file
+
+ Documentation/ABI/testing/debugfs-driver-qat  |   9 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   2 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |  13 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  26 ++
+ .../intel/qat/qat_common/adf_common_drv.h     |   1 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
+ .../crypto/intel/qat/qat_common/adf_gen4_pm.c |  27 +-
+ .../crypto/intel/qat/qat_common/adf_gen4_pm.h |  50 +++-
+ .../qat/qat_common/adf_gen4_pm_debugfs.c      | 255 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_pm_dbgfs.c       |  46 ++++
+ .../intel/qat/qat_common/adf_pm_dbgfs.h       |  12 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |  35 +++
+ 12 files changed, 473 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_pm_dbgfs.h
+
+
+base-commit: cf5974bfe9f69a06423f914f675ce3354ff8863c
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.41.0
+
