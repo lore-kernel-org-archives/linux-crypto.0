@@ -2,219 +2,178 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3C9CA0ECE
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4122ECA0EC3
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353923AbjIKVve (ORCPT
+        id S1353909AbjIKVvb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
+        Mon, 11 Sep 2023 17:51:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236294AbjIKKLs (ORCPT
+        with ESMTP id S237135AbjIKMDm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2023 06:11:48 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5842FE5F;
-        Mon, 11 Sep 2023 03:11:42 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id 7DA8B12000D;
-        Mon, 11 Sep 2023 13:11:40 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7DA8B12000D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1694427100;
-        bh=/zWi+Ev4PZp5gdRSiHVwOx5T2Q5lYL39HTOGFJdsJM0=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=BNaWyKxWkIYWO101eFaqwtqhf5f0+gkiwjkdbd9X6QdImXqpL3SWZgvsAnH35MWIf
-         uETnLrPKe07AEDkjS+c+tlg8EpiRP/tDSHCZCOAqGcS3VSdqC4cRBhLtinJEqxt3uQ
-         saNAKptatAYWeM7T5EVLHje4NNEwmHRWMy2oyF6TbG19zHlxKxJxlcgljwMxhQS/eU
-         Dsdoy0L4DkJhrAbEnhJ+Tqkl8CKJzCDdsG5ApGpuCGe8qJatB74GB2wgcPVJ6bcOmq
-         q+ftE2rd1wziPZ7tEXOpiflnF0+5vWJjxBdqd1owonruWbfxSQJGTHS7zmML1sOm+T
-         nlCNH6toKqP4w==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Mon, 11 Sep 2023 13:11:40 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Mon, 11 Sep 2023 13:11:38 +0300
-From:   Alexey Romanov <avromanov@salutedevices.com>
-To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
-        <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <conor@kernel.org>, <khilman@baylibre.com>,
-        <jbrunet@baylibre.com>, <martin.blumenstingl@googlemail.com>,
-        <f.fainelli@gmail.com>, <hkallweit1@gmail.com>, <lists@kaiser.cx>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <linux-amlogic@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
-        Alexey Romanov <avromanov@sberdevices.ru>
-Subject: [PATCH v3 1/3] drivers: rng: meson: add support for S4
-Date:   Mon, 11 Sep 2023 13:11:27 +0300
-Message-ID: <20230911101129.10604-2-avromanov@salutedevices.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20230911101129.10604-1-avromanov@salutedevices.com>
-References: <20230911101129.10604-1-avromanov@salutedevices.com>
+        Mon, 11 Sep 2023 08:03:42 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF9BCEB;
+        Mon, 11 Sep 2023 05:03:37 -0700 (PDT)
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38B9Sxvd015386;
+        Mon, 11 Sep 2023 14:03:23 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding:content-type; s=
+        selector1; bh=+tmt8dbtTqSwHcdueUDhtt/63vObb0tlhOMDJTofgcc=; b=h8
+        CwcKHKE7nGCgGUuhhFfVGW3cK9b+H5ADkYr3uXgXPpsE+fyCVYbNdDCkUfmYnSBD
+        h3Mfd5i82DEIx5e8Ko56/kcQx/TerMsO1F9Y1wli1oV25KFaP8zxYWkCZ35NWij8
+        8oxMZEaRCkJYHwN+94kh7TwUDmQ6b/3QzzOAwb0vNBDYsn+C/dazqFygX72nxWVy
+        7p5wZZGoBxTTA72Ryk85okWwegHEYvc2KvLW4tIznnOVvSxyNndjwkXDped0VjQS
+        pFAju4Gf3WEerhGAQhvoQeE+fuzJlBoiJuzf3FL7rKahjuOFVGNiE3Hob/vz3oC0
+        bFUZ2TpaqPfTWvlfAPfg==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t0fkcgpdw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Sep 2023 14:03:23 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id DABB610005A;
+        Mon, 11 Sep 2023 14:03:22 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D27F5237D89;
+        Mon, 11 Sep 2023 14:03:22 +0200 (CEST)
+Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
+ 2023 14:03:22 +0200
+From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH v2 06/10] hwrng: stm32 - restrain RNG noise source clock
+Date:   Mon, 11 Sep 2023 14:01:59 +0200
+Message-ID: <20230911120203.774632-7-gatien.chevallier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
+References: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179766 [Sep 11 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/11 06:02:00 #21866861
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-11_06,2023-09-05_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Alexey Romanov <avromanov@sberdevices.ru>
+For NIST certification the noise source sampling may need to be
+restrained.
 
-For some Amlogic SOC's, mechanism to obtain random number
-has been changed. For example, S4 now uses status bit waiting algo.
+This change implements an algorithm that gets the rate of the RNG
+clock and apply the correct value in CLKDIV field in RNG_CR register
+to force the RNG clock rate to be "max_clock_rate" maximum.
 
-Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+As it is platform-specific, implement it as a compat data.
+
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
- drivers/char/hw_random/meson-rng.c | 80 ++++++++++++++++++++++++++++--
- 1 file changed, 77 insertions(+), 3 deletions(-)
+ drivers/char/hw_random/stm32-rng.c | 34 ++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-index a4eb8e35f13d..5e1dee659866 100644
---- a/drivers/char/hw_random/meson-rng.c
-+++ b/drivers/char/hw_random/meson-rng.c
-@@ -13,12 +13,24 @@
- #include <linux/types.h>
- #include <linux/of.h>
- #include <linux/clk.h>
-+#include <linux/iopoll.h>
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index 9dac177d5286..819f062f454d 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -23,11 +23,13 @@
+ #define RNG_CR_CONFIG1		GENMASK(11, 8)
+ #define RNG_CR_NISTC		BIT(12)
+ #define RNG_CR_CONFIG2		GENMASK(15, 13)
++#define RNG_CR_CLKDIV_SHIFT	16
++#define RNG_CR_CLKDIV		GENMASK(19, 16)
+ #define RNG_CR_CONFIG3		GENMASK(25, 20)
+ #define RNG_CR_CONDRST		BIT(30)
+ #define RNG_CR_CONFLOCK		BIT(31)
+ #define RNG_CR_ENTROPY_SRC_MASK	(RNG_CR_CONFIG1 | RNG_CR_NISTC | RNG_CR_CONFIG2 | RNG_CR_CONFIG3)
+-#define RNG_CR_CONFIG_MASK	(RNG_CR_ENTROPY_SRC_MASK | RNG_CR_CED)
++#define RNG_CR_CONFIG_MASK	(RNG_CR_ENTROPY_SRC_MASK | RNG_CR_CED | RNG_CR_CLKDIV)
  
--#define RNG_DATA 0x00
-+#define RNG_DATA	0x00
-+#define RNG_S4_DATA	0x08
-+#define RNG_S4_CFG	0x00
-+
-+#define RUN_BIT		BIT(0)
-+#define SEED_READY_STS_BIT	BIT(31)
-+
-+struct meson_rng_priv {
-+	int (*read)(struct hwrng *rng, void *buf, size_t max, bool wait);
-+};
+ #define RNG_SR			0x04
+ #define RNG_SR_DRDY		BIT(0)
+@@ -46,6 +48,7 @@
+ #define RNG_NB_RECOVER_TRIES	3
  
- struct meson_rng_data {
- 	void __iomem *base;
- 	struct hwrng rng;
-+	struct device *dev;
-+	const struct meson_rng_priv *priv;
- };
- 
- static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -31,6 +43,47 @@ static int meson_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 	return sizeof(u32);
+ struct stm32_rng_data {
++	uint	max_clock_rate;
+ 	u32	cr;
+ 	u32	nscr;
+ 	u32	htcr;
+@@ -238,6 +241,28 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 	return retval || !wait ? retval : -EIO;
  }
  
-+static int meson_rng_wait_status(void __iomem *cfg_addr, int bit)
++static uint stm32_rng_clock_freq_restrain(struct hwrng *rng)
 +{
-+	u32 status = 0;
-+	int ret;
++	struct stm32_rng_private *priv =
++	    container_of(rng, struct stm32_rng_private, rng);
++	unsigned long clock_rate = 0;
++	uint clock_div = 0;
 +
-+	ret = readl_relaxed_poll_timeout_atomic(cfg_addr,
-+						status, !(status & bit),
-+						10, 10000);
-+	if (ret)
-+		return -EBUSY;
++	clock_rate = clk_get_rate(priv->clk);
 +
-+	return 0;
++	/*
++	 * Get the exponent to apply on the CLKDIV field in RNG_CR register
++	 * No need to handle the case when clock-div > 0xF as it is physically
++	 * impossible
++	 */
++	while ((clock_rate >> clock_div) > priv->data->max_clock_rate)
++		clock_div++;
++
++	pr_debug("RNG clk rate : %lu\n", clk_get_rate(priv->clk) >> clock_div);
++
++	return clock_div;
 +}
 +
-+static int meson_s4_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-+{
-+	struct meson_rng_data *data =
-+			container_of(rng, struct meson_rng_data, rng);
-+
-+	void __iomem *cfg_addr = data->base + RNG_S4_CFG;
-+	int err;
-+
-+	writel_relaxed(readl_relaxed(cfg_addr) | SEED_READY_STS_BIT, cfg_addr);
-+
-+	err = meson_rng_wait_status(cfg_addr, SEED_READY_STS_BIT);
-+	if (err) {
-+		dev_err(data->dev, "Seed isn't ready, try again\n");
-+		return err;
-+	}
-+
-+	err = meson_rng_wait_status(cfg_addr, RUN_BIT);
-+	if (err) {
-+		dev_err(data->dev, "Can't get random number, try again\n");
-+		return err;
-+	}
-+
-+	*(u32 *)buf = readl_relaxed(data->base + RNG_S4_DATA);
-+
-+	return sizeof(u32);
-+}
-+
- static int meson_rng_probe(struct platform_device *pdev)
+ static int stm32_rng_init(struct hwrng *rng)
  {
- 	struct device *dev = &pdev->dev;
-@@ -41,6 +94,10 @@ static int meson_rng_probe(struct platform_device *pdev)
- 	if (!data)
- 		return -ENOMEM;
- 
-+	data->priv = device_get_match_data(&pdev->dev);
-+	if (!data->priv)
-+		return -ENODEV;
+ 	struct stm32_rng_private *priv =
+@@ -259,8 +284,11 @@ static int stm32_rng_init(struct hwrng *rng)
+ 	 * 0 is an invalid value as it disables all entropy sources.
+ 	 */
+ 	if (priv->data->has_cond_reset && priv->data->cr) {
++		uint clock_div = stm32_rng_clock_freq_restrain(rng);
 +
- 	data->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(data->base))
- 		return PTR_ERR(data->base);
-@@ -51,13 +108,30 @@ static int meson_rng_probe(struct platform_device *pdev)
- 				     "Failed to get core clock\n");
+ 		reg &= ~RNG_CR_CONFIG_MASK;
+-		reg |= RNG_CR_CONDRST | (priv->data->cr & RNG_CR_ENTROPY_SRC_MASK);
++		reg |= RNG_CR_CONDRST | (priv->data->cr & RNG_CR_ENTROPY_SRC_MASK) |
++		       (clock_div << RNG_CR_CLKDIV_SHIFT);
+ 		if (priv->ced)
+ 			reg &= ~RNG_CR_CED;
+ 		else
+@@ -360,6 +388,7 @@ static const struct dev_pm_ops stm32_rng_pm_ops = {
  
- 	data->rng.name = pdev->name;
--	data->rng.read = meson_rng_read;
-+	data->rng.read = data->priv->read;
-+
-+	data->dev = &pdev->dev;
+ static const struct stm32_rng_data stm32mp13_rng_data = {
+ 	.has_cond_reset = true,
++	.max_clock_rate = 48000000,
+ 	.cr = 0x00F00D00,
+ 	.nscr = 0x2B5BB,
+ 	.htcr = 0x969D,
+@@ -367,6 +396,7 @@ static const struct stm32_rng_data stm32mp13_rng_data = {
  
- 	return devm_hwrng_register(dev, &data->rng);
- }
- 
-+static const struct meson_rng_priv meson_rng_priv = {
-+	.read = meson_rng_read,
-+};
-+
-+static const struct meson_rng_priv meson_rng_priv_s4 = {
-+	.read = meson_s4_rng_read,
-+};
-+
- static const struct of_device_id meson_rng_of_match[] = {
--	{ .compatible = "amlogic,meson-rng", },
-+	{
-+		.compatible = "amlogic,meson-rng",
-+		.data = (void *)&meson_rng_priv,
-+	},
-+	{
-+		.compatible = "amlogic,meson-s4-rng",
-+		.data = (void *)&meson_rng_priv_s4,
-+	},
- 	{},
+ static const struct stm32_rng_data stm32_rng_data = {
+ 	.has_cond_reset = false,
++	.max_clock_rate = 3000000,
  };
- MODULE_DEVICE_TABLE(of, meson_rng_of_match);
+ 
+ static const struct of_device_id stm32_rng_match[] = {
 -- 
 2.25.1
 
