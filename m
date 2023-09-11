@@ -2,117 +2,113 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF06ACA0ECE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FDFCA0ECD
 	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236332AbjIKVvP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:51:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33278 "EHLO
+        id S1353873AbjIKVvV (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:51:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237141AbjIKMEx (ORCPT
+        with ESMTP id S237663AbjIKNG6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2023 08:04:53 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E97EECDD;
-        Mon, 11 Sep 2023 05:04:48 -0700 (PDT)
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38B9Sw8U029064;
-        Mon, 11 Sep 2023 14:04:35 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding:content-type; s=
-        selector1; bh=Qy502fS11BZGcGDP1IGPY0i0y+SNnsTHJY1/5zxvtm0=; b=2y
-        Lw0QWAUlUyYsG7CJg7AgjewY0S63AgTuDoPvJ4t0mXTqzK+oTOhNe3YxNT3tp5tp
-        jnkTQjx6vh5GkNhMu5ZAdDpitwCF8xkhwRaM19YiTEFnz//Yq+eNqpiXSgO6Clvt
-        VvMlRHLDIrp5WyRp5Hb0K4ylFVLdy2HFhhmZFsmnSLVnqSLeWbuZ/nU+5IbGrJrB
-        5aYwk01OdNk02dbeEys6hKj+SqqyY8TcxJg1pB73KS5s3QF4svWQuW1zouE4SFDL
-        9DaVRGQEZ0LTeVRSozQwqnZwtOhugmGljkRacX7nj2Ryntee/De67b6IwkvZnw3D
-        jFJbc7uZFV+gPAr7SJMQ==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t0e4fr6mm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Sep 2023 14:04:35 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7DD2310005A;
-        Mon, 11 Sep 2023 14:04:34 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 716DA252259;
-        Mon, 11 Sep 2023 14:04:34 +0200 (CEST)
-Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
- 2023 14:04:34 +0200
-From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
-To:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v2 08/10] hwrng: stm32 - support RNG configuration locking mechanism
-Date:   Mon, 11 Sep 2023 14:02:01 +0200
-Message-ID: <20230911120203.774632-9-gatien.chevallier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
-References: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-11_06,2023-09-05_01,2023-05-22_02
+        Mon, 11 Sep 2023 09:06:58 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C413DE6
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 06:06:52 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-68fb71ded6dso860291b3a.0
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 06:06:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1694437612; x=1695042412; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UC0qFPbWeIAnNY2crnDoiyfH4L4DNcPUzmyIOiPmNaw=;
+        b=Nc6pxsYSDhU2XR53fLm2q5bivwl1huFVoTDg52/c4uVC1Q4RiQ9q9g2QPkMnMqN1GQ
+         GEfauhXqPUBDQrQ7zcalT/yhOgzL0HpEKL9zCTmpcfSuu/mP/88A2Y+RUrkrAIJKwBc4
+         NdR2ope/qfoBVlSMEoY1fdLB6yMzojnmYkS6EVoWtMlj3v6aghj8Rz3ZUWCtI/yVuVvi
+         BjkLg7tWsdLgdn/dNFG2F/WTdDXNneYDwtjYBl28sHRtlEGrN+1J/w+dAkLMwUVPOG2W
+         oWFcmsPw0V6g9Jg2VMirRPPxKVtm+ieF5yM5hy9zQB6QQ6quIRxLhND/+xRnaX7QaIJm
+         cPOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694437612; x=1695042412;
+        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UC0qFPbWeIAnNY2crnDoiyfH4L4DNcPUzmyIOiPmNaw=;
+        b=AzDAkWa/WGjKdU5Ih/icBBug4eMW/Lqi54sFNmATSZRDzovJJ1fvtYgXS78LT5J7H6
+         PDOyTOr+QdvWmonUoMoB5rz553CbftoVez3Cqr81sf6GH28hyX1TQLJZ+0fE8qgLesZo
+         CjSY1/9aG+ugmJwN4JQiasb+HqjvXXEZaalL2vOkQ1mz9PZ5AxkV81F9Uu80YxjAEogB
+         aBCseh0g/Q6msGkr8hPovwizFXM5QydZoTxn2kCsPgc3c0qW1r73aV8ubVdIm6HucpyA
+         zBYqHuEW/6vL916pxlRJ7yXw7HgL+vlsKaurFi+6mf6qcIuzyRMQxsW6+C+T4uJYmt37
+         g/fg==
+X-Gm-Message-State: AOJu0Yz2n0qrSN8Lf/4r/3j+FTGPKUuuqLS4ZKMRx0HvpNeXBP4TfN8M
+        jpUclwhgzOIaMPFZ8sZj/FhUHw==
+X-Google-Smtp-Source: AGHT+IHHHsd8mK5/qRvQGb/rxDKfPMV90hFOs3PpoPszjaiqIs9Gy83oAs6eYTFLtxvjaV6gsb9LYA==
+X-Received: by 2002:a05:6a00:22c2:b0:68e:2c3a:8775 with SMTP id f2-20020a056a0022c200b0068e2c3a8775mr9544336pfj.33.1694437612188;
+        Mon, 11 Sep 2023 06:06:52 -0700 (PDT)
+Received: from ?IPv6:2402:7500:4dc:9c7e:4872:7ce3:318e:18f5? ([2402:7500:4dc:9c7e:4872:7ce3:318e:18f5])
+        by smtp.gmail.com with ESMTPSA id s21-20020a62e715000000b0068991abe1desm5787400pfh.176.2023.09.11.06.06.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 11 Sep 2023 06:06:51 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
+Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
+ encryption implementation
+From:   Jerry Shih <jerry.shih@sifive.com>
+In-Reply-To: <20230721054036.GD847@sol.localdomain>
+Date:   Mon, 11 Sep 2023 21:06:47 +0800
+Cc:     Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Reply-To: 20230721054036.GD847@sol.localdomain
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CCA32056-CCE2-4FB5-8CFC-62444CDDA89F@sifive.com>
+References: <20230711153743.1970625-1-heiko@sntech.de>
+ <20230711153743.1970625-11-heiko@sntech.de>
+ <20230721054036.GD847@sol.localdomain>
+To:     Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3445.9.7)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If "st,rng-lock-conf" DT binding property is set for a stm32-rng node,
-the RNG configuration will be locked until next hardware block reset
-or platform reset.
+On Jul 21, 2023, at 13:40, Eric Biggers <ebiggers@kernel.org> wrote:
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
----
- drivers/char/hw_random/stm32-rng.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> I'm looking forward to having direct support for these AES modes, =
+especially the
+> modes needed for storage encryption: XTS, and CBC or CTS!  None of =
+these AES
+> modes is actually implemented in this patch yet, though, so they can't =
+be
+> claimed in the kconfig help text yet.  This patch is just a starting =
+point, as
+> it just adds support for the bare AES block cipher ("aes" in the =
+crypto API).
+>=20
+> (BTW, I'm much more interested in, say, AES-XTS support than SM4 =
+support, which
+> this patchset does include.  SM4 is a "national pride cipher" which is =
+somewhat
+> of a niche thing.  I suppose there are already people pushing it for =
+RISC-V
+> though, as they are everywhere else, so that's to be expected...)
+>=20
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 819f062f454d..4a602d666dad 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -62,6 +62,7 @@ struct stm32_rng_private {
- 	struct reset_control *rst;
- 	const struct stm32_rng_data *data;
- 	bool ced;
-+	bool lock_conf;
- };
- 
- /*
-@@ -301,6 +302,9 @@ static int stm32_rng_init(struct hwrng *rng)
- 
- 		reg &= ~RNG_CR_CONDRST;
- 		reg |= RNG_CR_RNGEN;
-+		if (priv->lock_conf)
-+			reg |= RNG_CR_CONFLOCK;
-+
- 		writel_relaxed(reg, priv->base + RNG_CR);
- 
- 		err = readl_relaxed_poll_timeout_atomic(priv->base + RNG_CR, reg,
-@@ -439,6 +443,7 @@ static int stm32_rng_probe(struct platform_device *ofdev)
- 	}
- 
- 	priv->ced = of_property_read_bool(np, "clock-error-detect");
-+	priv->lock_conf = of_property_read_bool(np, "st,rng-lock-conf");
- 
- 	priv->data = of_device_get_match_data(dev);
- 	if (!priv->data)
--- 
-2.25.1
+We have further optimization for RISC-V platform in OpenSSL PR[1]. It =
+will include
+AES with CBC, CTR, and XTS mode. Comparing to the generic AES =
+implementation,
+the specialized AES-XTS one have about 3X performance improvement using
+OpenSSL benchmark tool. If OpenSSL accepts that PR, we will create the
+corresponding patch for Linux kernel.
 
+[1]
+https://github.com/openssl/openssl/pull/21923
+
+-Jerry
