@@ -2,113 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FDFCA0ECD
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E54CA0EC8
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353873AbjIKVvV (ORCPT
+        id S1353879AbjIKVvV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 11 Sep 2023 17:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237663AbjIKNG6 (ORCPT
+        with ESMTP id S236296AbjIKKLs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2023 09:06:58 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C413DE6
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 06:06:52 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-68fb71ded6dso860291b3a.0
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 06:06:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1694437612; x=1695042412; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UC0qFPbWeIAnNY2crnDoiyfH4L4DNcPUzmyIOiPmNaw=;
-        b=Nc6pxsYSDhU2XR53fLm2q5bivwl1huFVoTDg52/c4uVC1Q4RiQ9q9g2QPkMnMqN1GQ
-         GEfauhXqPUBDQrQ7zcalT/yhOgzL0HpEKL9zCTmpcfSuu/mP/88A2Y+RUrkrAIJKwBc4
-         NdR2ope/qfoBVlSMEoY1fdLB6yMzojnmYkS6EVoWtMlj3v6aghj8Rz3ZUWCtI/yVuVvi
-         BjkLg7tWsdLgdn/dNFG2F/WTdDXNneYDwtjYBl28sHRtlEGrN+1J/w+dAkLMwUVPOG2W
-         oWFcmsPw0V6g9Jg2VMirRPPxKVtm+ieF5yM5hy9zQB6QQ6quIRxLhND/+xRnaX7QaIJm
-         cPOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694437612; x=1695042412;
-        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UC0qFPbWeIAnNY2crnDoiyfH4L4DNcPUzmyIOiPmNaw=;
-        b=AzDAkWa/WGjKdU5Ih/icBBug4eMW/Lqi54sFNmATSZRDzovJJ1fvtYgXS78LT5J7H6
-         PDOyTOr+QdvWmonUoMoB5rz553CbftoVez3Cqr81sf6GH28hyX1TQLJZ+0fE8qgLesZo
-         CjSY1/9aG+ugmJwN4JQiasb+HqjvXXEZaalL2vOkQ1mz9PZ5AxkV81F9Uu80YxjAEogB
-         aBCseh0g/Q6msGkr8hPovwizFXM5QydZoTxn2kCsPgc3c0qW1r73aV8ubVdIm6HucpyA
-         zBYqHuEW/6vL916pxlRJ7yXw7HgL+vlsKaurFi+6mf6qcIuzyRMQxsW6+C+T4uJYmt37
-         g/fg==
-X-Gm-Message-State: AOJu0Yz2n0qrSN8Lf/4r/3j+FTGPKUuuqLS4ZKMRx0HvpNeXBP4TfN8M
-        jpUclwhgzOIaMPFZ8sZj/FhUHw==
-X-Google-Smtp-Source: AGHT+IHHHsd8mK5/qRvQGb/rxDKfPMV90hFOs3PpoPszjaiqIs9Gy83oAs6eYTFLtxvjaV6gsb9LYA==
-X-Received: by 2002:a05:6a00:22c2:b0:68e:2c3a:8775 with SMTP id f2-20020a056a0022c200b0068e2c3a8775mr9544336pfj.33.1694437612188;
-        Mon, 11 Sep 2023 06:06:52 -0700 (PDT)
-Received: from ?IPv6:2402:7500:4dc:9c7e:4872:7ce3:318e:18f5? ([2402:7500:4dc:9c7e:4872:7ce3:318e:18f5])
-        by smtp.gmail.com with ESMTPSA id s21-20020a62e715000000b0068991abe1desm5787400pfh.176.2023.09.11.06.06.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Sep 2023 06:06:51 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
- encryption implementation
-From:   Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <20230721054036.GD847@sol.localdomain>
-Date:   Mon, 11 Sep 2023 21:06:47 +0800
-Cc:     Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Reply-To: 20230721054036.GD847@sol.localdomain
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CCA32056-CCE2-4FB5-8CFC-62444CDDA89F@sifive.com>
-References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230711153743.1970625-11-heiko@sntech.de>
- <20230721054036.GD847@sol.localdomain>
-To:     Eric Biggers <ebiggers@kernel.org>
-X-Mailer: Apple Mail (2.3445.9.7)
+        Mon, 11 Sep 2023 06:11:48 -0400
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B7DAE6B;
+        Mon, 11 Sep 2023 03:11:44 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 89432100011;
+        Mon, 11 Sep 2023 13:11:42 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 89432100011
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+        s=mail; t=1694427102;
+        bh=FgKxXDgE/uNx01ueWhXfT0y9HcY1omQL2iYWSfBMwSs=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=PMuEZYZ/R9REqqord3g0R8+qNfikzRB8HMWU2D717WSdTmHvfUwKgx3czLu+EUN/e
+         SJcYTpsEvHVh6y07ZkKtiH8lyoNvqj38uDFhdOzK8mx/1PWQrkRAu7xSRULatCYstX
+         suVMbdEvexjFVgHwo4JMtLqmvYscypMZVcvBgrwX86hTcNlgbRhnLvYYBlVx8GF/X3
+         zFadnR4sOfFGVikC84soGSq567yAuXrNGXd/Kn1qjNW93EnHxdBngIyq0yqYIxqoO7
+         URYDETIL7+MtGrFdx0DGmq77+RZ789h+JoXShr55qzT3RVmOmjJCxcZ7KV7bo9DxIc
+         BXptNue08+zDg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Mon, 11 Sep 2023 13:11:42 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 11 Sep 2023 13:11:41 +0300
+From:   Alexey Romanov <avromanov@salutedevices.com>
+To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
+        <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <conor@kernel.org>, <khilman@baylibre.com>,
+        <jbrunet@baylibre.com>, <martin.blumenstingl@googlemail.com>,
+        <f.fainelli@gmail.com>, <hkallweit1@gmail.com>, <lists@kaiser.cx>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-amlogic@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
+        Alexey Romanov <avromanov@sberdevices.ru>,
+        Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH v3 2/3] dt-bindings: rng: meson: add meson-rng-s4 compatible
+Date:   Mon, 11 Sep 2023 13:11:28 +0300
+Message-ID: <20230911101129.10604-3-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20230911101129.10604-1-avromanov@salutedevices.com>
+References: <20230911101129.10604-1-avromanov@salutedevices.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179765 [Sep 11 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/11 06:02:00 #21866861
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Jul 21, 2023, at 13:40, Eric Biggers <ebiggers@kernel.org> wrote:
+From: Alexey Romanov <avromanov@sberdevices.ru>
 
-> I'm looking forward to having direct support for these AES modes, =
-especially the
-> modes needed for storage encryption: XTS, and CBC or CTS!  None of =
-these AES
-> modes is actually implemented in this patch yet, though, so they can't =
-be
-> claimed in the kconfig help text yet.  This patch is just a starting =
-point, as
-> it just adds support for the bare AES block cipher ("aes" in the =
-crypto API).
->=20
-> (BTW, I'm much more interested in, say, AES-XTS support than SM4 =
-support, which
-> this patchset does include.  SM4 is a "national pride cipher" which is =
-somewhat
-> of a niche thing.  I suppose there are already people pushing it for =
-RISC-V
-> though, as they are everywhere else, so that's to be expected...)
->=20
+Add compatible for hardware number generator node for
+Amlogic S4-series.
 
-We have further optimization for RISC-V platform in OpenSSL PR[1]. It =
-will include
-AES with CBC, CTR, and XTS mode. Comparing to the generic AES =
-implementation,
-the specialized AES-XTS one have about 3X performance improvement using
-OpenSSL benchmark tool. If OpenSSL accepts that PR, we will create the
-corresponding patch for Linux kernel.
+Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+---
+ Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-[1]
-https://github.com/openssl/openssl/pull/21923
+diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+index 457a6e43d810..afa52af442a7 100644
+--- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+@@ -14,6 +14,7 @@ properties:
+   compatible:
+     enum:
+       - amlogic,meson-rng
++      - amlogic,meson-s4-rng
+ 
+   reg:
+     maxItems: 1
+-- 
+2.25.1
 
--Jerry
