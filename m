@@ -2,47 +2,47 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07496CA0ED2
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4C2CA0ED7
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:56:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353867AbjIKVvS (ORCPT
+        id S1353900AbjIKVvZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:51:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48354 "EHLO
+        Mon, 11 Sep 2023 17:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237126AbjIKMCp (ORCPT
+        with ESMTP id S237142AbjIKMEx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2023 08:02:45 -0400
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014EFCEB;
-        Mon, 11 Sep 2023 05:02:40 -0700 (PDT)
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38B9Stv6005202;
-        Mon, 11 Sep 2023 14:02:11 +0200
+        Mon, 11 Sep 2023 08:04:53 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3C2CEB;
+        Mon, 11 Sep 2023 05:04:49 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38B9Sv7f023324;
+        Mon, 11 Sep 2023 14:04:36 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
         from:to:cc:subject:date:message-id:in-reply-to:references
         :mime-version:content-transfer-encoding:content-type; s=
-        selector1; bh=G8EhQbj3Y2d5kGyFRRSXdWRplKfMjsPAQezvHj9+23E=; b=2m
-        iEx1u1clAJrhC3ZAnfK3jl3Gp5QGqaVMJEMkmqrdvrGjWE8NKaq53cIua+kJgtTV
-        dA9hpHCSAiZYIWFFNxM+PErl8mlfMgKbVvgYvBZLQfXYNzcM+siQPQsqT1R8bGpE
-        MyAgd1qyb+nKv2MtqN5CZmi4eeFG8Hwh8bDGGAFOWP78DBZ9qJJS1AYEDfFA9KTO
-        jHol5zB4hLGq0fc1la2YkcV2HApz8vCcqHjYE8NHXN5iivqKfMjd1aUWS6bFwsL1
-        BzeG5sYEDtYo2mtPNa7HWf9jWCJu7hzN718m7sc2R3Du8ti0VEecnVnbRnzRvSMe
-        Wv2u5H2nPR+EOFERnlnA==
+        selector1; bh=QNEkYKRW+zpzx0P74SNWmpxXLHw8AgBvEDWW0I7ar5k=; b=tc
+        XlTbGRh77bplTRCiH7tozCkD58C5zQggHRoPi7zhQ+f6NzjMX7/UizdwzHXLiswZ
+        Nb+wl7R5LWKo10c5xnsG0j7ezKnIkGR0QWbqRkxUB8RPyoERXMmUeCHTEQgdN5yu
+        a/bNkg0VJgHF8xhZfja8UG/jbPAJHrx60vczMCbiZMNljlKwQveZHeL9OaB/SiCs
+        KBYd/I/nZa0gAWz0Q58BsRM+XAFTo8ckqjpELBLQ0S2NcTHVCiKfVBIR3vBLuu9l
+        Ny0oGZEK0z8/KexsatHY/jufQ2grovpJSjiNH3JCQF4W8H+v2gAn/i0bpbOlwqKM
+        4+ah6DXUyVu+cXr1DYYg==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t13nhdjmh-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t0g21ywgc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Sep 2023 14:02:11 +0200 (MEST)
+        Mon, 11 Sep 2023 14:04:36 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 91F5B100063;
-        Mon, 11 Sep 2023 14:02:09 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 239ED10005A;
+        Mon, 11 Sep 2023 14:04:36 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 873CF25224A;
-        Mon, 11 Sep 2023 14:02:09 +0200 (CEST)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 18F51252259;
+        Mon, 11 Sep 2023 14:04:36 +0200 (CEST)
 Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
- 2023 14:02:09 +0200
+ 2023 14:04:35 +0200
 From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
 To:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -56,9 +56,9 @@ CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v2 02/10] hwrng: stm32 - use devm_platform_get_and_ioremap_resource() API
-Date:   Mon, 11 Sep 2023 14:01:55 +0200
-Message-ID: <20230911120203.774632-3-gatien.chevallier@foss.st.com>
+Subject: [PATCH v2 10/10] ARM: dts: stm32: add RNG node for STM32MP13x platforms
+Date:   Mon, 11 Sep 2023 14:02:03 +0200
+Message-ID: <20230911120203.774632-11-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
 References: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
@@ -75,39 +75,36 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use devm_platform_get_and_ioremap_resource() to get and ioremap a
-resource.
+The RNG on STM32MP13 offers upgrades like customization of its
+configuration and the conditional reset.
+
+The hardware RNG should be managed in the secure world for but it
+is supported on Linux. Therefore, is it not default enabled.
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
- drivers/char/hw_random/stm32-rng.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ arch/arm/boot/dts/st/stm32mp131.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index efb6a9f9a11b..d64d25d0fee8 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -118,18 +118,13 @@ static int stm32_rng_probe(struct platform_device *ofdev)
- 	struct device *dev = &ofdev->dev;
- 	struct device_node *np = ofdev->dev.of_node;
- 	struct stm32_rng_private *priv;
--	struct resource res;
--	int err;
-+	struct resource *res;
+diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
+index ac90fcbf0c09..39db82b782eb 100644
+--- a/arch/arm/boot/dts/st/stm32mp131.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
+@@ -1220,6 +1220,14 @@ mdma: dma-controller@58000000 {
+ 			dma-requests = <48>;
+ 		};
  
- 	priv = devm_kzalloc(dev, sizeof(struct stm32_rng_private), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
- 
--	err = of_address_to_resource(np, 0, &res);
--	if (err)
--		return err;
--
--	priv->base = devm_ioremap_resource(dev, &res);
-+	priv->base = devm_platform_get_and_ioremap_resource(ofdev, 0, &res);
- 	if (IS_ERR(priv->base))
- 		return PTR_ERR(priv->base);
- 
++		rng: rng@54004000 {
++			compatible = "st,stm32mp13-rng";
++			reg = <0x54004000 0x400>;
++			clocks = <&rcc RNG1_K>;
++			resets = <&rcc RNG1_R>;
++			status = "disabled";
++		};
++
+ 		fmc: memory-controller@58002000 {
+ 			compatible = "st,stm32mp1-fmc2-ebi";
+ 			reg = <0x58002000 0x1000>;
 -- 
 2.25.1
 
