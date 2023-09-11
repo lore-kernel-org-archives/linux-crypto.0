@@ -2,253 +2,138 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 474F3CA0ECD
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E65BCA0EC7
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Sep 2023 21:50:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240553AbjIKVus (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:50:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
+        id S1353621AbjIKVuw (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Sep 2023 17:50:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237146AbjIKME4 (ORCPT
+        with ESMTP id S238486AbjIKN5h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2023 08:04:56 -0400
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50317CDD;
-        Mon, 11 Sep 2023 05:04:51 -0700 (PDT)
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38B9TRMx011593;
-        Mon, 11 Sep 2023 14:04:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding:content-type; s=
-        selector1; bh=hSxqmUlk2hJj59CbsgqPB1VmndAOfkviEoiZW/4IWcA=; b=OM
-        n0FZmynnq73MTeo789qq1K+B94wVluknLaszXaAR4ln0c/CQeQnloeFAvKDWHNpH
-        NmOOldCyb0xOThm+UUthEqS949B/E5UU5cwatOPaB8xKMvv6DN/cZiNdgfgR3mad
-        OJdnz7MAt62vQIh4FAA56ZwY+JFKsFvPD4yXuRPDJ4PSANMpoqaqRFQjlJ/3bLb6
-        lcfRGnlWyQ2iD0+oVN42L/jL6fWC3BkVwF89DJtSK0pTg9JiZCa8uV7FD1ZtJ6Bi
-        O5XQNcMV9Guwm57Mcff7xlDeRcjsdY2RrMTyFY5KWcs6PYjoDo4HfriU1ixWJ20v
-        g8kZmS4pxBQFBeb5bJiw==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t0du5100r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Sep 2023 14:04:36 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 50BB4100061;
-        Mon, 11 Sep 2023 14:04:35 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 454D5252259;
-        Mon, 11 Sep 2023 14:04:35 +0200 (CEST)
-Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
- 2023 14:04:34 +0200
-From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
-To:     Olivia Mackall <olivia@selenic.com>,
+        Mon, 11 Sep 2023 09:57:37 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A569FCD7;
+        Mon, 11 Sep 2023 06:57:33 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3DCBC433C7;
+        Mon, 11 Sep 2023 13:57:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1694440653;
+        bh=CU1g8Lrs6EaUNCYAPQHJ7zHQs/cwzFvskhy2PCvPc98=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=R1YVtmnarCG1NzXEslc0QO12B4eWDiAycYzExvbrbPxKyFvPCCAgDkzl19UqGyjTZ
+         ioVI+/Q03ulHEgj5lZm9pLsIsD1nRv6cYBQPB07OFx8uR6KdPYVDBXIr9tgDskC3nS
+         77p3jjpI5betd/rMrMr4de6hAKZuPQ7GDclEBTm8=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev,
+        =?UTF-8?q?Ondrej=20Mosn=C3=A1=C4=8Dek?= <omosnacek@gmail.com>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v2 09/10] hwrng: stm32 - rework power management sequences
-Date:   Mon, 11 Sep 2023 14:02:02 +0200
-Message-ID: <20230911120203.774632-10-gatien.chevallier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
-References: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
+        Sven Schnelle <svens@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.vnet.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Abeni <pabeni@redhat.com>, linux-crypto@vger.kernel.org,
+        linux-s390@vger.kernel.org, regressions@lists.linux.dev,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.5 110/739] crypto: af_alg - Fix missing initialisation affecting gcm-aes-s390
+Date:   Mon, 11 Sep 2023 15:38:29 +0200
+Message-ID: <20230911134654.173764504@linuxfoundation.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20230911134650.921299741@linuxfoundation.org>
+References: <20230911134650.921299741@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-11_06,2023-09-05_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Implement stm32_rng_suspend()/stm32_rng_resume() low-power APIs
-called when the hardware block context will be lost.
+6.5-stable review patch.  If anyone has any objections, please let me know.
 
-There is no need to save the RNG_CR register in
-stm32_rng_runtime_suspend() as the context is not lost. Therefore,
-only enable/disable the RNG in the runtime sequences.
+------------------
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit 6a4b8aa0a916b39a39175584c07222434fa6c6ef ]
+
+Fix af_alg_alloc_areq() to initialise areq->first_rsgl.sgl.sgt.sgl to point
+to the scatterlist array in areq->first_rsgl.sgl.sgl.
+
+Without this, the gcm-aes-s390 driver will oops when it tries to do
+gcm_walk_start() on req->dst because req->dst is set to the value of
+areq->first_rsgl.sgl.sgl by _aead_recvmsg() calling
+aead_request_set_crypt().
+
+The problem comes if an empty ciphertext is passed: the loop in
+af_alg_get_rsgl() just passes straight out and doesn't set areq->first_rsgl
+up.
+
+This isn't a problem on x86_64 using gcmaes_crypt_by_sg() because, as far
+as I can tell, that ignores req->dst and only uses req->src[*].
+
+[*] Is this a bug in aesni-intel_glue.c?
+
+The s390x oops looks something like:
+
+ Unable to handle kernel pointer dereference in virtual kernel address space
+ Failing address: 0000000a00000000 TEID: 0000000a00000803
+ Fault in home space mode while using kernel ASCE.
+ AS:00000000a43a0007 R3:0000000000000024
+ Oops: 003b ilc:2 [#1] SMP
+ ...
+ Call Trace:
+  [<000003ff7fc3d47e>] gcm_walk_start+0x16/0x28 [aes_s390]
+  [<00000000a2a342f2>] crypto_aead_decrypt+0x9a/0xb8
+  [<00000000a2a60888>] aead_recvmsg+0x478/0x698
+  [<00000000a2e519a0>] sock_recvmsg+0x70/0xb0
+  [<00000000a2e51a56>] sock_read_iter+0x76/0xa0
+  [<00000000a273e066>] vfs_read+0x26e/0x2a8
+  [<00000000a273e8c4>] ksys_read+0xbc/0x100
+  [<00000000a311d808>] __do_syscall+0x1d0/0x1f8
+  [<00000000a312ff30>] system_call+0x70/0x98
+ Last Breaking-Event-Address:
+  [<000003ff7fc3e6b4>] gcm_aes_crypt+0x104/0xa68 [aes_s390]
+
+Fixes: c1abe6f570af ("crypto: af_alg: Use extract_iter_to_sg() to create scatterlists")
+Reported-by: Ondrej Mosnáček <omosnacek@gmail.com>
+Link: https://lore.kernel.org/r/CAAUqJDuRkHE8fPgZJGaKjUjd3QfGwzfumuJBmStPqBhubxyk_A@mail.gmail.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Herbert Xu <herbert@gondor.apana.org.au>
+cc: Sven Schnelle <svens@linux.ibm.com>
+cc: Harald Freudenberger <freude@linux.vnet.ibm.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-crypto@vger.kernel.org
+cc: linux-s390@vger.kernel.org
+cc: regressions@lists.linux.dev
+Tested-by: Sven Schnelle <svens@linux.ibm.com>
+Tested-by: Ondrej Mosnáček <omosnacek@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
+ crypto/af_alg.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Changes in V2:
-	- Use pm_ptr() and add __maybe_unused to the pm API
-
- drivers/char/hw_random/stm32-rng.c | 108 ++++++++++++++++++++++++++---
- 1 file changed, 97 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 4a602d666dad..01198a2e32c6 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -55,11 +55,25 @@ struct stm32_rng_data {
- 	bool	has_cond_reset;
- };
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 10efb56d8b481..ad02ca0a8cdde 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1192,6 +1192,7 @@ struct af_alg_async_req *af_alg_alloc_areq(struct sock *sk,
  
-+/**
-+ * struct stm32_rng_config - RNG configuration data
-+ *
-+ * @cr:			RNG configuration. 0 means default hardware RNG configuration
-+ * @nscr:		Noise sources control configuration.
-+ * @htcr:		Health tests configuration.
-+ */
-+struct stm32_rng_config {
-+	u32 cr;
-+	u32 nscr;
-+	u32 htcr;
-+};
-+
- struct stm32_rng_private {
- 	struct hwrng rng;
- 	void __iomem *base;
- 	struct clk *clk;
- 	struct reset_control *rst;
-+	struct stm32_rng_config pm_conf;
- 	const struct stm32_rng_data *data;
- 	bool ced;
- 	bool lock_conf;
-@@ -355,11 +369,10 @@ static int stm32_rng_remove(struct platform_device *ofdev)
- 	return 0;
- }
- 
--#ifdef CONFIG_PM
--static int stm32_rng_runtime_suspend(struct device *dev)
-+static int __maybe_unused stm32_rng_runtime_suspend(struct device *dev)
- {
--	u32 reg;
- 	struct stm32_rng_private *priv = dev_get_drvdata(dev);
-+	u32 reg;
- 
- 	reg = readl_relaxed(priv->base + RNG_CR);
- 	reg &= ~RNG_CR_RNGEN;
-@@ -369,25 +382,98 @@ static int stm32_rng_runtime_suspend(struct device *dev)
- 	return 0;
- }
- 
--static int stm32_rng_runtime_resume(struct device *dev)
-+static int __maybe_unused stm32_rng_suspend(struct device *dev)
-+{
-+	struct stm32_rng_private *priv = dev_get_drvdata(dev);
-+
-+	if (priv->data->has_cond_reset) {
-+		priv->pm_conf.nscr = readl_relaxed(priv->base + RNG_NSCR);
-+		priv->pm_conf.htcr = readl_relaxed(priv->base + RNG_HTCR);
-+	}
-+
-+	/* Do not save that RNG is enabled as it will be handled at resume */
-+	priv->pm_conf.cr = readl_relaxed(priv->base + RNG_CR) & ~RNG_CR_RNGEN;
-+
-+	writel_relaxed(priv->pm_conf.cr, priv->base + RNG_CR);
-+
-+	clk_disable_unprepare(priv->clk);
-+
-+	return 0;
-+}
-+
-+static int __maybe_unused stm32_rng_runtime_resume(struct device *dev)
- {
--	u32 reg;
- 	struct stm32_rng_private *priv = dev_get_drvdata(dev);
-+	int err;
-+	u32 reg;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return err;
-+
-+	/* Clean error indications */
-+	writel_relaxed(0, priv->base + RNG_SR);
- 
--	clk_prepare_enable(priv->clk);
- 	reg = readl_relaxed(priv->base + RNG_CR);
- 	reg |= RNG_CR_RNGEN;
- 	writel_relaxed(reg, priv->base + RNG_CR);
- 
- 	return 0;
- }
--#endif
- 
--static const struct dev_pm_ops stm32_rng_pm_ops = {
-+static int __maybe_unused stm32_rng_resume(struct device *dev)
-+{
-+	struct stm32_rng_private *priv = dev_get_drvdata(dev);
-+	int err;
-+	u32 reg;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return err;
-+
-+	/* Clean error indications */
-+	writel_relaxed(0, priv->base + RNG_SR);
-+
-+	if (priv->data->has_cond_reset) {
-+		/*
-+		 * Correct configuration in bits [29:4] must be set in the same
-+		 * access that set RNG_CR_CONDRST bit. Else config setting is
-+		 * not taken into account. CONFIGLOCK bit must also be unset but
-+		 * it is not handled at the moment.
-+		 */
-+		writel_relaxed(priv->pm_conf.cr | RNG_CR_CONDRST, priv->base + RNG_CR);
-+
-+		writel_relaxed(priv->pm_conf.nscr, priv->base + RNG_NSCR);
-+		writel_relaxed(priv->pm_conf.htcr, priv->base + RNG_HTCR);
-+
-+		reg = readl_relaxed(priv->base + RNG_CR);
-+		reg |= RNG_CR_RNGEN;
-+		reg &= ~RNG_CR_CONDRST;
-+		writel_relaxed(reg, priv->base + RNG_CR);
-+
-+		err = readl_relaxed_poll_timeout_atomic(priv->base + RNG_CR, reg,
-+							reg & ~RNG_CR_CONDRST, 10, 100000);
-+
-+		if (err) {
-+			clk_disable_unprepare(priv->clk);
-+			dev_err((struct device *)priv->rng.priv,
-+				"%s: timeout:%x CR: %x!\n", __func__, err, reg);
-+			return -EINVAL;
-+		}
-+	} else {
-+		reg = priv->pm_conf.cr;
-+		reg |= RNG_CR_RNGEN;
-+		writel_relaxed(reg, priv->base + RNG_CR);
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct __maybe_unused dev_pm_ops stm32_rng_pm_ops = {
- 	SET_RUNTIME_PM_OPS(stm32_rng_runtime_suspend,
- 			   stm32_rng_runtime_resume, NULL)
--	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
--				pm_runtime_force_resume)
-+	SET_SYSTEM_SLEEP_PM_OPS(stm32_rng_suspend,
-+				stm32_rng_resume)
- };
- 
- static const struct stm32_rng_data stm32mp13_rng_data = {
-@@ -467,7 +553,7 @@ static int stm32_rng_probe(struct platform_device *ofdev)
- static struct platform_driver stm32_rng_driver = {
- 	.driver = {
- 		.name = "stm32-rng",
--		.pm = &stm32_rng_pm_ops,
-+		.pm = pm_ptr(&stm32_rng_pm_ops),
- 		.of_match_table = stm32_rng_match,
- 	},
- 	.probe = stm32_rng_probe,
+ 	areq->areqlen = areqlen;
+ 	areq->sk = sk;
++	areq->first_rsgl.sgl.sgt.sgl = areq->first_rsgl.sgl.sgl;
+ 	areq->last_rsgl = NULL;
+ 	INIT_LIST_HEAD(&areq->rsgl_list);
+ 	areq->tsgl = NULL;
 -- 
-2.25.1
+2.40.1
+
+
 
