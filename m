@@ -2,83 +2,87 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90588CA0ECE
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 06:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBDECA0EC3
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 07:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230148AbjILGj2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Sep 2023 02:39:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35686 "EHLO
+        id S230514AbjILHFR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Sep 2023 03:05:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230124AbjILGj2 (ORCPT
+        with ESMTP id S231308AbjILHFK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Sep 2023 02:39:28 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28205E76
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 23:39:24 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-31dcf18f9e2so5244006f8f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 23:39:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694500762; x=1695105562; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6qcwi6kxTJhR+/TgoB8rdjDl1NyuqB+Mgf6FMTnsLTE=;
-        b=McFwbZ6LbZY2cROgViHN1XZLBGDPdJfvBc5t61ZUo+kGevhvk+ulunSxQ5TsPvpHsp
-         GZ9/3kZv6YXMxGf8S/GCq3OzLMvPzUHZ2mHU2OJYwdwy/CJBvehv0YhYwlloYe5DL+sb
-         RLI4RuMfbSm3Q0RKRFZC0gC+RHHA6iRnG9p8yKaCiF6DwhcpUwBbVwKCFHKLOG/xloN6
-         lpuTqXs/Si7aNwuvDxVyenmP7p1Ms+PmiI02zVQlv6yR/JwOaJsXUwkYeDnFqMIpQ+eX
-         zDmdLMbrwwCzdyTi/sLZA+6b7RdN7ofSg+fg62xUKcqhqrPbpKo4TOBZFMk/UsMNUgCy
-         dHyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694500762; x=1695105562;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6qcwi6kxTJhR+/TgoB8rdjDl1NyuqB+Mgf6FMTnsLTE=;
-        b=ZhEKN3EY7/8OUZzCjF1aoM8yApG20guQ7oGaN2wAlSyPtAeFEEgNCjopiT59ymvfYY
-         Ns2+bByfKJT58REAdU7phOj2Ffrufw1nadvzbtEar4kXonJAHHItuww6funNXbAOmF57
-         ktfVP50nQFuQdiciDShQR0tvL3yKd3MxUqoH+EI9d+c6W5ZYU4FxGt7PcwDAS/zN+Iz7
-         h3QAEKBu8bdcvpWOp9sPwAnKnW9Kp3oVbNXSYnPYM2k7y5q1rcRJf5ZLAX1Lh/UyQkZs
-         5N9OCHu6mNhAtHCa5gUM6aK874QXDCXt7dvnkZIVFx245SgsY1R8g0HTvtHv+IDIGz8w
-         QSEA==
-X-Gm-Message-State: AOJu0YxElwSVmkLZqr8JQk06NGFJ/RQUvz0Ctdn7hTTAPZz23hZXSOQo
-        HihBu9PzCSBX/GAeAQ7Zpr6s1g==
-X-Google-Smtp-Source: AGHT+IE9EhgxWYP9IQXI+O9vQP40R2keaJWtbd2zvD66D6jJq/9krmYKNdmeNyJU92c9kWwVldWlDw==
-X-Received: by 2002:a5d:6510:0:b0:317:ec04:ee0c with SMTP id x16-20020a5d6510000000b00317ec04ee0cmr9809162wru.47.1694500762566;
-        Mon, 11 Sep 2023 23:39:22 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id a16-20020a5d4570000000b00317f70240afsm11965035wrc.27.2023.09.11.23.39.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 23:39:22 -0700 (PDT)
-Date:   Tue, 12 Sep 2023 09:39:18 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Longfang Liu <liulongfang@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon/hpre - Fix a erroneous check after
- snprintf()
-Message-ID: <909a0cff-ed2c-4728-81ee-57a5d786f450@moroto.mountain>
-References: <73534cb1713f58228d54ea53a8a137f4ef939bad.1693858632.git.christophe.jaillet@wanadoo.fr>
- <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
- <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
+        Tue, 12 Sep 2023 03:05:10 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1404E7F;
+        Tue, 12 Sep 2023 00:05:05 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CBFBC433CD;
+        Tue, 12 Sep 2023 07:05:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694502305;
+        bh=rdbAnWDmqOY+gzQ808fleTCy7T0WdyZbioJ9M88erQU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=P6prl/wEd//9SPT1qY531EGJqgOTlVEuToz0Mba3enuHKZdwa0Zn14U1WyxDlbewb
+         xRYsvNK0wwYNtjbh+TENHqzl00MaFXcMnYnUhyYsasFuiRnB20xh4Xg7sAojnRMEdR
+         dkAaN6ajP1N0jqDy1cxDvM7GCR2d44tvjbu1RfucNguC7f+YjEAyx/uHlL+WWW+sf0
+         ayHULCrsxopO5VAf/LbmDLfgtLWAtMpjNH8nnrLaxMFhxUCNiDYCUQXhs0e6k5sTkw
+         ZQ0TVGUXd9Ogp02cOsb0N9K8XQP093EMEOGwAeL0O+t+teE1s4D3PedDnXbT5WBExy
+         0it5naf4/Go8w==
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2bccda76fb1so89617691fa.2;
+        Tue, 12 Sep 2023 00:05:05 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyUHms7jwNIzzwMsC0HglZ2WT98APCK2kL3SgmqTcUtnYoVtk1I
+        AOpJJhamt8NX6ULDbxfpVHERvX4pmi/+GfvYCas=
+X-Google-Smtp-Source: AGHT+IHM2Q2GsUNR0wFWv4DEN2NdeYOxUGS5UgSXcN6uPWiGfeXVUbGdMGi/1xpRAr+xFot6bo4EPLs1rpqpexJAWUI=
+X-Received: by 2002:a2e:9197:0:b0:2bc:c11c:4471 with SMTP id
+ f23-20020a2e9197000000b002bcc11c4471mr10402795ljg.21.1694502303650; Tue, 12
+ Sep 2023 00:05:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
+References: <20230711153743.1970625-1-heiko@sntech.de> <20230711153743.1970625-11-heiko@sntech.de>
+ <20230721054036.GD847@sol.localdomain> <CCA32056-CCE2-4FB5-8CFC-62444CDDA89F@sifive.com>
+In-Reply-To: <CCA32056-CCE2-4FB5-8CFC-62444CDDA89F@sifive.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 12 Sep 2023 09:04:52 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com>
+Message-ID: <CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com>
+Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
+ encryption implementation
+To:     Jerry Shih <jerry.shih@sifive.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 05, 2023 at 07:27:47AM +0200, Marion & Christophe JAILLET wrote:
-> 
-> Some debugfs dir of file way be left around. Is it what your are talking
-> about?
-> 
+On Tue, 12 Sept 2023 at 00:50, Jerry Shih <jerry.shih@sifive.com> wrote:
+>
+> On Jul 21, 2023, at 13:40, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> > I'm looking forward to having direct support for these AES modes, especially the
+> > modes needed for storage encryption: XTS, and CBC or CTS!  None of these AES
+> > modes is actually implemented in this patch yet, though, so they can't be
+> > claimed in the kconfig help text yet.  This patch is just a starting point, as
+> > it just adds support for the bare AES block cipher ("aes" in the crypto API).
+> >
+> > (BTW, I'm much more interested in, say, AES-XTS support than SM4 support, which
+> > this patchset does include.  SM4 is a "national pride cipher" which is somewhat
+> > of a niche thing.  I suppose there are already people pushing it for RISC-V
+> > though, as they are everywhere else, so that's to be expected...)
+> >
+>
+> We have further optimization for RISC-V platform in OpenSSL PR[1]. It will include
+> AES with CBC, CTR, and XTS mode. Comparing to the generic AES implementation,
+> the specialized AES-XTS one have about 3X performance improvement using
+> OpenSSL benchmark tool. If OpenSSL accepts that PR, we will create the
+> corresponding patch for Linux kernel.
+>
+> [1]
+> https://github.com/openssl/openssl/pull/21923
+>
 
-No debugfs files are left.  There is a remove recursive in
-hpre_debugfs_init().
-
-regards,
-dan carpenter
+This pull request doesn't appear to contain any XTS code at all, only CBC.
