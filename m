@@ -2,60 +2,58 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0329ACA0EC3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 02:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD94CCA0ECA
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 04:02:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237104AbjILCW4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Sep 2023 22:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43142 "EHLO
+        id S235795AbjILECs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Sep 2023 00:02:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237215AbjILCWn (ORCPT
+        with ESMTP id S237703AbjILECm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Sep 2023 22:22:43 -0400
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id 81628171A36;
-        Mon, 11 Sep 2023 18:46:11 -0700 (PDT)
-Received: from localhost.localdomain (unknown [219.141.250.2])
-        by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 8ADAD6059D7E7;
-        Tue, 12 Sep 2023 09:46:07 +0800 (CST)
-X-MD-Sfrom: zeming@nfschina.com
-X-MD-SrcIP: 219.141.250.2
-From:   Li zeming <zeming@nfschina.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Li zeming <zeming@nfschina.com>
-Subject: [PATCH] =?UTF-8?q?crypto/api:=20Remove=20unnecessary=20=E2=80=98N?= =?UTF-8?q?ULL=E2=80=99=20values=20from=20tfm?=
-Date:   Thu, 14 Sep 2023 02:17:27 +0800
-Message-Id: <20230913181727.4004-1-zeming@nfschina.com>
-X-Mailer: git-send-email 2.18.2
+        Tue, 12 Sep 2023 00:02:42 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D6661704
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Sep 2023 21:02:38 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qfubI-00DAFY-QH; Tue, 12 Sep 2023 12:02:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 12 Sep 2023 12:02:11 +0800
+Date:   Tue, 12 Sep 2023 12:02:11 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc:     Olivia Mackall <olivia@selenic.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/10] hwrng: stm32 - rework error handling in
+ stm32_rng_read()
+Message-ID: <ZP/iw6jvHrlBavdK@gondor.apana.org.au>
+References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
+ <20230908165120.730867-6-gatien.chevallier@foss.st.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230908165120.730867-6-gatien.chevallier@foss.st.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-tfm is assigned first, so it does not need to initialize
-the　assignment.
+On Fri, Sep 08, 2023 at 06:51:15PM +0200, Gatien Chevallier wrote:
+>
+> +			if (WARN_ON(sr & RNG_SR_CEIS), "RNG clock too slow - %x\n", sr)
 
-Signed-off-by: Li zeming <zeming@nfschina.com>
----
- crypto/api.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Introducing an unconditional WARN_ON is not acceptable.  If you
+really need it, make it WARN_ON_ONCE.  But why does this need
+to be a WARN instead of dev_err?
 
-diff --git a/crypto/api.c b/crypto/api.c
-index b9cc0c906efe..7f402107f0cc 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -389,7 +389,7 @@ EXPORT_SYMBOL_GPL(crypto_shoot_alg);
- struct crypto_tfm *__crypto_alloc_tfmgfp(struct crypto_alg *alg, u32 type,
- 					 u32 mask, gfp_t gfp)
- {
--	struct crypto_tfm *tfm = NULL;
-+	struct crypto_tfm *tfm;
- 	unsigned int tfm_size;
- 	int err = -ENOMEM;
- 
+Cheers,
 -- 
-2.18.2
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
