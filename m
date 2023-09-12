@@ -2,139 +2,55 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D854CA0EC3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 07:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD7E1CA0ECA
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 10:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbjILHjk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Sep 2023 03:39:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
+        id S233256AbjILKGt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Sep 2023 06:06:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbjILHjj (ORCPT
+        with ESMTP id S233892AbjILKGf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Sep 2023 03:39:39 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB2F2E7C;
-        Tue, 12 Sep 2023 00:39:35 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38C3N8bC006265;
-        Tue, 12 Sep 2023 09:39:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:subject:to:cc:references:from
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=W6ZFSny7x5hTX7VHE3RAqqRXrh5zcFFP1oA9ZYe1TR0=; b=O6
-        sEC3DWDxvkpK0fP1ZfbdNaRLyz8DljJOJRxQLP6ZnPjlk1F3sauZHJU4q5Nau8Oh
-        pyPoKMerndpDvj4If+UI6pm5XzLqujorcuntOJvNCgQ7TgWxDFa4rmfDrBRNhvgY
-        DHc1ad/Wgev9ePRbu/lF/7CNHM0pXZreVgsft2F8eicATDeTNEfuuu1bjWdxDvuo
-        MhYyoNLjI0gDrO/5M0d0a2aKg4NPuePM0TjSKkMnUsl5AZSJF5AsOXwtYBTca5Ak
-        8CcDovAp5Dok02K27+Cg3Qak3+5NlHjZ0eACKoX9h0v52B6PpIc0bcn57Cdsr7Vh
-        sb637vw6RgiuHv0MT3xw==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t2g1hryc7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Sep 2023 09:39:15 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 6D0C0100058;
-        Tue, 12 Sep 2023 09:39:14 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 548FF21ED3A;
-        Tue, 12 Sep 2023 09:39:14 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 12 Sep
- 2023 09:39:13 +0200
-Message-ID: <3c138ce6-7766-87a7-1447-22f597863ab3@foss.st.com>
-Date:   Tue, 12 Sep 2023 09:39:13 +0200
+        Tue, 12 Sep 2023 06:06:35 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E103919BF;
+        Tue, 12 Sep 2023 03:05:58 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qg0H4-00DIYF-N6; Tue, 12 Sep 2023 18:05:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 12 Sep 2023 18:05:41 +0800
+Date:   Tue, 12 Sep 2023 18:05:41 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Dan Carpenter <dan.carpenter@linaro.org>
+Cc:     Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Longfang Liu <liulongfang@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: hisilicon/hpre - Fix a erroneous check after
+ snprintf()
+Message-ID: <ZQA39QVl/Py/m7A4@gondor.apana.org.au>
+References: <73534cb1713f58228d54ea53a8a137f4ef939bad.1693858632.git.christophe.jaillet@wanadoo.fr>
+ <ZPaSCOX1F9b36rxV@gondor.apana.org.au>
+ <00bdcfec-6cc1-e521-ceaa-d16d6341ca16@wanadoo.fr>
+ <909a0cff-ed2c-4728-81ee-57a5d786f450@moroto.mountain>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH 07/10] dt-bindings: rng: add st,rng-lock-conf
-Content-Language: en-US
-To:     Rob Herring <robh@kernel.org>
-CC:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
- <20230908165120.730867-8-gatien.chevallier@foss.st.com>
- <20230911150958.GA1255978-robh@kernel.org>
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20230911150958.GA1255978-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-12_04,2023-09-05_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <909a0cff-ed2c-4728-81ee-57a5d786f450@moroto.mountain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Rob,
-
-On 9/11/23 17:09, Rob Herring wrote:
-> On Fri, Sep 08, 2023 at 06:51:17PM +0200, Gatien Chevallier wrote:
->> If st,rng-lock-conf is set, the RNG configuration in RNG_CR, RNG_HTCR
->> and RNG_NSCR will be locked. It is supported starting from the RNG
->> version present in the STM32MP13
+On Tue, Sep 12, 2023 at 09:39:18AM +0300, Dan Carpenter wrote:
 > 
-> This should be squashed into the prior binding patch.
-> 
+> No debugfs files are left.  There is a remove recursive in
+> hpre_debugfs_init().
 
-Ok, I will squash both for V3.
+Good catch.  I'll move the patch back onto the queue.
 
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>   .../devicetree/bindings/rng/st,stm32-rng.yaml      | 14 ++++++++++++++
->>   1 file changed, 14 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
->> index 59abdc85a9fb..0055f14a8e3f 100644
->> --- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
->> +++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
->> @@ -37,6 +37,20 @@ required:
->>     - reg
->>     - clocks
->>   
->> +allOf:
->> +  - if:
->> +      properties:
->> +        compatible:
->> +          contains:
->> +            enum:
->> +              - st,stm32mp13-rng
->> +    then:
->> +      properties:
->> +        st,rng-lock-conf:
->> +          type: boolean
->> +          description: If set, the RNG configuration in RNG_CR, RNG_HTCR and
->> +                       RNG_NSCR will be locked.
-> 
-> Define the property at the top-level and then restrict its presence in
-> a if/then schema.
-> 
-
-Ok, will change in V3. Thanks for your input
-
->> +
->>   additionalProperties: false
-> 
-> Did you test this property is allowed? No, because additionalProperties
-> won't work with properties defined in if/then schemas.
-> 
->>   
->>   examples:
->> -- 
->> 2.25.1
->>
-
-Best regards,
-Gatien
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
