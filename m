@@ -2,104 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DFCCA0EC3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 07:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A54CCA0ECA
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 07:37:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbjILHPl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Sep 2023 03:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40086 "EHLO
+        id S231681AbjILHhl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Sep 2023 03:37:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231450AbjILHPk (ORCPT
+        with ESMTP id S231747AbjILHhf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Sep 2023 03:15:40 -0400
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E990DE73
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Sep 2023 00:15:36 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id 46e09a7af769-6c0c675cb03so2790172a34.1
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Sep 2023 00:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1694502936; x=1695107736; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YWNdyPVUhTz83dozDzHZ2crOn6mqNkmosICyn2Ni38s=;
-        b=i66c3lbgbghqJGC7PB+4j/Rqd7vq20QsbY3EvvQ+wB8fzgStQgLHyIdYnEDhprQ9Wa
-         vWi676/nkiblofRZLiBcGJhYljWDj7bcFkRRpSbsjvc8KP+U3Dp5UN1U219qixaG8Y1V
-         4dmkilGn1a6VNUjHUP8rRMrmVTpWpueyuDPqJd8cx075dQ+RpH04Jspaw3LCjHl3XatO
-         8aRFUH0sd5qkwM/ApVE2G0r+7dQ1bZcpwzMqWD+aibQn51/UfPhsT9QSQ68PxO+Fwr2Z
-         4TwBA6/7MbHNOifvF7ITtas5ySzEXme893OswmGg+79qNEEZLeoEOVX9Kw2hOPouLiyX
-         Tg1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694502936; x=1695107736;
-        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YWNdyPVUhTz83dozDzHZ2crOn6mqNkmosICyn2Ni38s=;
-        b=bvVeoz+G1Lwf7IveKP/9t0FjYIeugAwxuUNp4MHz3a7RMBGAdlGse3YlNBIuF0umsY
-         euwx7pGxuhOBowH8lxQiHjsocJEEyNt0IDy7pZuA7Ze/FU4ezUpcj3+FS0TX/3Kvn+eq
-         J2HI/hb59lA2NAYBXIB/Ui5sKLLPot8WTHqXDRPyMbcP8SgTuIAgyc634CiE1HqA00Yg
-         HmKHBBPVmHG9+5uyONdHhd45mdW+D9lL0Bb56BzsJ7uI6mqrJHYDii9Ua821P5phkOa7
-         btO+VYQ+tLk0eiyBJF7YoTrHP35Dc15FCa7YPRacCflRfYTYIGpMYibhtiRiL6HcUUS2
-         nMlw==
-X-Gm-Message-State: AOJu0YycbdjK2YbUPIMiLuCH/YQqWF8k6mK4ljPmQFaZz0yft/kNC1Oa
-        pz9bMVku7mSJczu7cvKVFSW/zA==
-X-Google-Smtp-Source: AGHT+IE7BxX2OK/dGjEsVl/1nUADEVB1Xh2UIPWp4SnQmZuKPv8XSDoqNWuJTTw59mIrzcsHuontdA==
-X-Received: by 2002:a9d:7c8d:0:b0:6bc:b2a2:7b02 with SMTP id q13-20020a9d7c8d000000b006bcb2a27b02mr11581966otn.7.1694502936238;
-        Tue, 12 Sep 2023 00:15:36 -0700 (PDT)
-Received: from ?IPv6:2402:7500:4dc:9c7e:c46c:519:8d4b:654f? ([2402:7500:4dc:9c7e:c46c:519:8d4b:654f])
-        by smtp.gmail.com with ESMTPSA id bk17-20020aa78311000000b0068fc9025a08sm2742425pfb.151.2023.09.12.00.15.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Sep 2023 00:15:35 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
- encryption implementation
-From:   Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com>
-Date:   Tue, 12 Sep 2023 15:15:31 +0800
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Reply-To: CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1BB805D3-FF47-4A58-8507-CCA72A27DD82@sifive.com>
-References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230711153743.1970625-11-heiko@sntech.de>
- <20230721054036.GD847@sol.localdomain>
- <CCA32056-CCE2-4FB5-8CFC-62444CDDA89F@sifive.com>
- <CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-X-Mailer: Apple Mail (2.3445.9.7)
+        Tue, 12 Sep 2023 03:37:35 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7DC10CA;
+        Tue, 12 Sep 2023 00:37:31 -0700 (PDT)
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38C3LwsM015420;
+        Tue, 12 Sep 2023 09:37:03 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=HqbaF5o1SFYteMShhADVnqO2ykmpSHq+NUsm7vDvMjw=; b=UA
+        VWktBUSVoWOMkewhc/t2KW0oyNHSGb1NjrqChWrmoejwoivtrnMHIGVlEe/3RJdz
+        qXv+2mJj9xYLCALx5shCbNnSZjAULf8Nt7KLgxE0JosCuDfB6auAkHKnLjyhZgdN
+        0W/8pj+1u8Hoh1ga+gVF9nap5TMw1hWlN9Szf93mec8aczvIe5RnX63l3hasyHNi
+        diYZTtKWNh9sS9WePf/3mzUzKlq6UbzB2EXt6CMLePwfMY3LBNxvuz4fI28EUlq1
+        4np1BGVN6x2TVVdJ0SUMKVGlZcSN2MbFi3MOKaZk3Z3khnOjJezAzzB3iEuMq8rn
+        1aOTGFGJqsik3ZTQwNPQ==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t0fkcmfh9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Sep 2023 09:37:03 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id D0472100058;
+        Tue, 12 Sep 2023 09:37:01 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C6C4721ED32;
+        Tue, 12 Sep 2023 09:37:01 +0200 (CEST)
+Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 12 Sep
+ 2023 09:37:01 +0200
+Message-ID: <f8445beb-52a0-bcb8-f4fa-3decdfde09fc@foss.st.com>
+Date:   Tue, 12 Sep 2023 09:36:55 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH 05/10] hwrng: stm32 - rework error handling in
+ stm32_rng_read()
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Olivia Mackall <olivia@selenic.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
+ <20230908165120.730867-6-gatien.chevallier@foss.st.com>
+ <ZP/iw6jvHrlBavdK@gondor.apana.org.au>
+Content-Language: en-US
+From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <ZP/iw6jvHrlBavdK@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-12_04,2023-09-05_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sep 12, 2023, at 15:04, Ard Biesheuvel <ardb@kernel.org> wrote:
+Hello Herbert,
 
->> We have further optimization for RISC-V platform in OpenSSL PR[1]. It =
-will include
->> AES with CBC, CTR, and XTS mode. Comparing to the generic AES =
-implementation,
->> the specialized AES-XTS one have about 3X performance improvement =
-using
->> OpenSSL benchmark tool. If OpenSSL accepts that PR, we will create =
-the
->> corresponding patch for Linux kernel.
->>=20
->> [1]
->> https://github.com/openssl/openssl/pull/21923
->>=20
->=20
-> This pull request doesn't appear to contain any XTS code at all, only =
-CBC.
+On 9/12/23 06:02, Herbert Xu wrote:
+> On Fri, Sep 08, 2023 at 06:51:15PM +0200, Gatien Chevallier wrote:
+>>
+>> +			if (WARN_ON(sr & RNG_SR_CEIS), "RNG clock too slow - %x\n", sr)
+> 
+> Introducing an unconditional WARN_ON is not acceptable.  If you
+> really need it, make it WARN_ON_ONCE.  But why does this need
+> to be a WARN instead of dev_err?
+> 
+> Cheers,
 
-We have some license issues for upstream. We will append the specialized
-AES modes soon.
+It was my mistake and not my intention to change the WARN_ON_ONCE to a
+WARN_ON. I've already sent a V2 correcting this.
 
--Jerry=
+It was already a WARN_ON_ONCE on the first implementation of the driver.
+This is not an unrecoverable error as it doesn't affect the quality of
+the entropy delivered by the RNG. The output is just too slow. It's here
+to warn the developer of an incorrect clock source setting.
+
+Best regards,
+Gatien
