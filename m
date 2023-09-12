@@ -2,69 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C30ECA0EED
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 14:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD8A4CA0EEB
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Sep 2023 14:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235901AbjILO3W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Sep 2023 10:29:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33498 "EHLO
+        id S236030AbjILOer (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Sep 2023 10:34:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235596AbjILO3W (ORCPT
+        with ESMTP id S236034AbjILOeq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Sep 2023 10:29:22 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C09115;
-        Tue, 12 Sep 2023 07:29:18 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5E40C433C8;
-        Tue, 12 Sep 2023 14:29:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694528957;
-        bh=51edGkZ7783Z2mPfwBbVsUX+4b8Z6WBJFR6Cg5U+Xxk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GK9lxXw/TAmm75A28OnnkW7VWKbpRnzn2B76mkVGvKGMXNMDlfIX/DaY4oqqpqb6j
-         H0/h84rL2u9gApx0u8WIfgnpIoVeHtagWO1zGs4+nzdCsnwnlg0jf0OD/NuK+mjXVG
-         Y7cJ9D/JzIkvgjn3tyUBlbqMJf491VO7JapS44BHl2LJwzsvwb4lHP7ChT2kCIAMxu
-         2OMBlzzIUIin3MaZqLnRoZ/s1bhBYXc5jJ8dsYpwnbh5y8BGSk400XMFy1wnNj3tBI
-         E3nA9a7KZYYchzvg1W269CK6yYaFl4yDfNx1hVYgMdlw1OFbOKjMC+RaGPMVePUAo2
-         YAhQdiU8oIhMQ==
-Received: (nullmailer pid 751949 invoked by uid 1000);
-        Tue, 12 Sep 2023 14:29:15 -0000
-Date:   Tue, 12 Sep 2023 09:29:15 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc:     Rob Herring <robh+dt@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Olivia Mackall <olivia@selenic.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-Subject: Re: [PATCH v2 01/10] dt-bindings: rng: introduce new compatible for
- STM32MP13x
-Message-ID: <169452894267.751273.3176397821021102917.robh@kernel.org>
-References: <20230911120203.774632-1-gatien.chevallier@foss.st.com>
- <20230911120203.774632-2-gatien.chevallier@foss.st.com>
+        Tue, 12 Sep 2023 10:34:46 -0400
+Received: from viti.kaiser.cx (viti.kaiser.cx [IPv6:2a01:238:43fe:e600:cd0c:bd4a:7a3:8e9f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7600CC7;
+        Tue, 12 Sep 2023 07:34:42 -0700 (PDT)
+Received: from dslb-178-004-201-190.178.004.pools.vodafone-ip.de ([178.4.201.190] helo=martin-debian-2.paytec.ch)
+        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <martin@kaiser.cx>)
+        id 1qg4TO-0005wr-RF; Tue, 12 Sep 2023 16:34:38 +0200
+From:   Martin Kaiser <martin@kaiser.cx>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Martin Kaiser <martin@kaiser.cx>
+Subject: [PATCH 0/2] hwrng: imx-rngc - adjust the timeouts
+Date:   Tue, 12 Sep 2023 16:31:16 +0200
+Message-Id: <20230912143117.55965-1-martin@kaiser.cx>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230911120203.774632-2-gatien.chevallier@foss.st.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Set the timeouts for selftest and initial seed to approx. three times the
+maximum possible duration.
 
-On Mon, 11 Sep 2023 14:01:54 +0200, Gatien Chevallier wrote:
-> Introduce st,stm32mp13-rng compatible.
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
->  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+This replaces the series "hwrng: imx-rngc - use polling instead of interrupt".
 
-Acked-by: Rob Herring <robh@kernel.org>
+Martin Kaiser (2):
+  hwrng: imx-rngc - reasonable timeout for selftest
+  hwrng: imx-rngc - reasonable timeout for initial seed
+
+ drivers/char/hw_random/imx-rngc.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+-- 
+2.39.2
 
