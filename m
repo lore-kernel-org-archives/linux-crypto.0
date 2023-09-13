@@ -2,53 +2,54 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AEFEDEC7D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0117EEDEC7C
 	for <linux-crypto@archiver.kernel.org>; Wed, 13 Sep 2023 15:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbjIMPfo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S229706AbjIMPfo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 13 Sep 2023 11:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54690 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbjIMPfm (ORCPT
+        with ESMTP id S229684AbjIMPfn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Sep 2023 11:35:42 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B4093
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Sep 2023 08:35:37 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-401b3ea0656so73679745e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Sep 2023 08:35:37 -0700 (PDT)
+        Wed, 13 Sep 2023 11:35:43 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256D019A0
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Sep 2023 08:35:39 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40061928e5aso78701695e9.3
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Sep 2023 08:35:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694619336; x=1695224136; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IqhDGN0q1K8XUZqE/r9ClfBnQGg9OFu7r8WfZswLLwk=;
-        b=Nd/ji+w6Uejw67NqZe1tD+fMWa/1Fke6CRX5J0j01X0fAKZO0MT188A3QvSWlYAoiN
-         Bcms5g/W4xnYinPUZs246Gb4qPt8c1ybmmen90fQF/ojCJ2T+m67OfqCFUfy6/BHWFXM
-         Iqc02xiQHMYQ+nXYxKM3p2DOA+dGx3OfsJzXmbhtR1hEl+muEuXwy+azHqj4UNjtegVl
-         /ECKbs1GNQ2pN8YkG6agczIqwtAhWHnTL1pQBrmVGiteskyNUjy93Y5JgAn4fimfm5Ro
-         NzHPCJXhFxLmnXho2xilvDchj/nJaZQl5WhwExrV58kzemWfrYscn4Ub1Fk4kXVxZN0h
-         HWTA==
+        d=linaro.org; s=google; t=1694619337; x=1695224137; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DmUa/uK3zl9ZI3WJsapz8xqeCXA+AubzrG5QzcNVHCg=;
+        b=wlxVSvPLL2Al4Xt3sgtM9pAz0KjRiAenleq4Ow693DM9XyAGoCR5MCsEBSOjoP3nU2
+         BAg/ETWIQjB0NHy46XnFfW0JTdfDwWyvKGHOqQv12/nTuFlJi+fa3o/nCgU0KyxkBctU
+         Bg0ZXZE6u3z8xYa8Jv1F86UJTRJsFrGK8T0ejZ3+Jrz/bX2cGU9zskL3iLa2pZFl+FbV
+         VDpfRPRbD2QEVlomXwnhmrIerIa5rYT1rKhG57rT5xyJAna2+LEKRAp+IVqyAT+L6WdK
+         ryyDQbkfTYT2meCP+t9f2ChaKNAftbKk8Q7R05xAExgW3FNomJ/7iF4LgbGNUCjT4Jv6
+         rETA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694619336; x=1695224136;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IqhDGN0q1K8XUZqE/r9ClfBnQGg9OFu7r8WfZswLLwk=;
-        b=sMhiP1fd+Layj+jIwjoCwitVUIrOZUkoVLjL/a77ycAOxKywtfT8cPhhTgGgN2u2Oc
-         PQEOI9ZbDwMkU3GEXmmDY4sP87YFy/K7gFfvH6lg/t4mTDBg/FL1BGR+CnvaX3bL+/j+
-         6zfE6RVOFJr8bhLDzMbE1u4kuoK6jdnYkAxYA2U7C83qv00lYuZdE0Mas4BzxNW/MYHx
-         e0wOcSsbHR79Uy7zGPyNWwSkGtD6mC8VD1D91yxMvb+prRqdXLak23site2O1RPB4tqD
-         4OQKeK5QV2A4FVXPA1G1vhgWw9wqCDS74joNPMVveo/IKe857lDg6fgtjAC9ull7i16q
-         uDHw==
-X-Gm-Message-State: AOJu0Yy/mmKOzi55z1HTSkgux8FO4g9DgewZrQnawD9vSOfgzeZQJEXF
-        IZAA6xfkHeokV3Qn94J+idEiBw==
-X-Google-Smtp-Source: AGHT+IEcxLrH+tnCBz0k0JsdV60yzkYS5v2M+TY2eCeNR9XmfWCK8lMQcqp+jXnOF22JfEoEY3riwA==
-X-Received: by 2002:adf:f8cb:0:b0:314:3b1f:8ea2 with SMTP id f11-20020adff8cb000000b003143b1f8ea2mr2526999wrq.6.1694619336162;
-        Wed, 13 Sep 2023 08:35:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694619337; x=1695224137;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DmUa/uK3zl9ZI3WJsapz8xqeCXA+AubzrG5QzcNVHCg=;
+        b=JgLIzuHj2ER4lAcwb1gJkPXoaPp1J0tNyLT82Mg8FShBjxtwC/jFpJPIosLf860+Xf
+         0Xekne508dtI3NpM82lQRjgMX+289szAvz67hHzKuAICD0sFq7VZ99nwvR/zaAwT5rUz
+         GOf8ejsZBxcb2B92d+yn/CTYVYlFF5opCjMQdDbIt3NBaDsBdWUO5SpTGOX0vE5CUIiz
+         gVJlcDn5zdqPYfyZUxd9wJsqgQpZ8gfNDjdw4VY5ea60p0/cvlO71AaM8676WyQjDid7
+         Um/m+C8oM0MEXlHs/PwhS62/1f3b5gxuUzKIxw/FvMMk5BzJ74n8+JCS5hKmASiRCFwK
+         lgdQ==
+X-Gm-Message-State: AOJu0YzFOiT9wkTt28NDbixj01yc0HE92N0SfxD0PrtBPsQHAH/em/nr
+        BRCcHiD2Lp6zEZIZJ3GTFhp8Ow==
+X-Google-Smtp-Source: AGHT+IGovylkDo6wyDm6xVXmImMBKxNJpRan8u+7VsotkLE1xj+Aoiq8pqQoC8Lo5nr1Gki/S/RP2A==
+X-Received: by 2002:adf:ee8f:0:b0:314:4db:e0b2 with SMTP id b15-20020adfee8f000000b0031404dbe0b2mr2554098wro.15.1694619337374;
+        Wed, 13 Sep 2023 08:35:37 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:3b50:bca5:a754:7463])
-        by smtp.gmail.com with ESMTPSA id e11-20020adffc4b000000b0031f65cdd271sm15750315wrs.100.2023.09.13.08.35.35
+        by smtp.gmail.com with ESMTPSA id e11-20020adffc4b000000b0031f65cdd271sm15750315wrs.100.2023.09.13.08.35.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 08:35:35 -0700 (PDT)
+        Wed, 13 Sep 2023 08:35:36 -0700 (PDT)
 From:   Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 To:     Andy Gross <agross@kernel.org>,
         Bjorn Andersson <andersson@kernel.org>,
@@ -61,35 +62,52 @@ To:     Andy Gross <agross@kernel.org>,
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH 1/2] dt-bindings: crypto: ice: document the sa8775p inline crypto engine
-Date:   Wed, 13 Sep 2023 17:35:28 +0200
-Message-Id: <20230913153529.32777-1-bartosz.golaszewski@linaro.org>
+Subject: [PATCH 2/2] arm64: dts: qcom: sa8775p: enable the inline crypto engine
+Date:   Wed, 13 Sep 2023 17:35:29 +0200
+Message-Id: <20230913153529.32777-2-bartosz.golaszewski@linaro.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230913153529.32777-1-bartosz.golaszewski@linaro.org>
+References: <20230913153529.32777-1-bartosz.golaszewski@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the compatible string for QCom ICE on sa8775p SoCs.
+Add an ICE node to sa8775p SoC description and enable it by adding a
+phandle to the UFS node.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml    | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/qcom/sa8775p.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-index 7da9aa82d837..ca4f7d1cefaa 100644
---- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-@@ -13,6 +13,7 @@ properties:
-   compatible:
-     items:
-       - enum:
-+          - qcom,sa8775p-inline-crypto-engine
-           - qcom,sm8450-inline-crypto-engine
-           - qcom,sm8550-inline-crypto-engine
-       - const: qcom,inline-crypto-engine
+diff --git a/arch/arm64/boot/dts/qcom/sa8775p.dtsi b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
+index 9f4f58e831a4..b6a93b11cbbd 100644
+--- a/arch/arm64/boot/dts/qcom/sa8775p.dtsi
++++ b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
+@@ -1525,6 +1525,7 @@ ufs_mem_hc: ufs@1d84000 {
+ 					<0 0>,
+ 					<0 0>,
+ 					<0 0>;
++			qcom,ice = <&ice>;
+ 			status = "disabled";
+ 		};
+ 
+@@ -1546,6 +1547,13 @@ ufs_mem_phy: phy@1d87000 {
+ 			status = "disabled";
+ 		};
+ 
++		ice: crypto@1d88000 {
++			compatible = "qcom,sa8775p-inline-crypto-engine",
++				     "qcom,inline-crypto-engine";
++			reg = <0x0 0x01d88000 0x0 0x8000>;
++			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
++		};
++
+ 		usb_0_hsphy: phy@88e4000 {
+ 			compatible = "qcom,sa8775p-usb-hs-phy",
+ 				     "qcom,usb-snps-hs-5nm-phy";
 -- 
 2.39.2
 
