@@ -2,67 +2,68 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4A4EE3F3F
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Sep 2023 00:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AD1EE49A4
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Sep 2023 00:51:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232115AbjIMAch (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Sep 2023 20:32:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
+        id S237580AbjIMAvK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Sep 2023 20:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231166AbjIMAcg (ORCPT
+        with ESMTP id S229680AbjIMAvK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Sep 2023 20:32:36 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7719610F2
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Sep 2023 17:32:32 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59224c40275so69147387b3.3
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Sep 2023 17:32:32 -0700 (PDT)
+        Tue, 12 Sep 2023 20:51:10 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F90E125
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Sep 2023 17:51:06 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-cf4cb742715so5997116276.2
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Sep 2023 17:51:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694565151; x=1695169951; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694566265; x=1695171065; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=cQl22gfvlENoqC9ZXlr6AUA6g9l8rOoYr5Ou8EedNjo=;
-        b=TOXMPhmVpM30/v3Ym1W6cdGCRVibsfIJLOLJuMfjfT6sEFT//4WtFgtG0UXWa2OCLk
-         LsRtjpUG44wbUYYb32scmeJuItVfmjfQ5tKIfYEas9kLtcT6UT9QYUxZJsYj/xR7+PZp
-         ELZcwn/CSvBcmo577/p3DQs6bXyZaB5WzETWa9Bt0/C0hQn4s74CTxQol/z8jkew+5t0
-         6mCxABgWwFN1QvGhaqa/Sj+N7WheRzwJG0cDjoq1/bG8oWdVRnDOGsxpijrD4P0dJYhV
-         EHNogQoppCtbXx1YyfUruvexHA5ML5DUoEVwM9e5RkF2ZLF+VEI9QMpMaZQhqDc9RlG4
-         /raQ==
+        bh=DtPnDCTduCEq3Qr2ITLJnxh4c9FOD2gvVINJPxBbxIM=;
+        b=M9HE9gpSilLT/CYs0oWeMyB+mCD6/NQUz3ojVhqmGa3sHNL3qeDpQxnTxGrPn3HXVl
+         7wTZAFRNlH2BH65QvceQl7KpX8bC/u6SuqX9qlRWCLMXj13EAa1KuPHCalL2BOoeULLm
+         kplnbB7z3Dq0+7lOZP7ctvBjuuFEq2JrSnP3mlfoFFlMVZ2+sqFQYmQvpGT+Juf3M227
+         SuN14b6S6wjEUi0UlnYMZLXuG8WJoCixjsM0zRH7hpWglM7pW3aNkZL5t0iq0aTsJdxc
+         b98Gm4LsMdIXMBMdfJPFXXqYBy8lnPS6YG+R+0UMtqnx9V38ZEyDtL98BrivaH6R2nHM
+         wZqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694565151; x=1695169951;
+        d=1e100.net; s=20230601; t=1694566265; x=1695171065;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=cQl22gfvlENoqC9ZXlr6AUA6g9l8rOoYr5Ou8EedNjo=;
-        b=Ob17gBC7dXS0WBSMs0ZPpV3EToNkyrWL8E8SLxBzgIBJ2a9Lbf3xT4T0uOzjpvbZAx
-         9m2/ap1yCTEYSn8Uvm67hhv2Xlki/xT93XNtCEDY+FaKxC7KjtFZBLV2+LBH3CPkXZqz
-         mizniwqOvwgoAa7+Xe+j+FwvJ5DoLgOaJbSecpApD2xsusOZeQU8G3Elk5WaZijOjk9Y
-         NyLnc8iw94qOjVQjKQ222fQ1kooa93a2Oq5dGznxL1KAVoDacMKXd1XyndpumLc8SjRk
-         3Tn4L/KsxqiFr154Gz2Ixx8+LchVyuwQr5RcHTR8xEYvCSvuha4+c+y3gzRPG3tuaer0
-         yNBg==
-X-Gm-Message-State: AOJu0Yzykw91Texl5wRdLtdWTf90/S2gNQ/91cHlliuyG57Vfz0IQpqG
-        5i6ZIRs4UaHY99Ios8vRjSe48xuBd/QrR/H9fg==
-X-Google-Smtp-Source: AGHT+IHoVWkYS1QIi63uxbOLxBnLNCBYs5NDQ+6C3gkVkJrVL7u/DLT38IB8YsEgrz4fMCxjhNeLFvbuEF8Pyu7LvA==
+        bh=DtPnDCTduCEq3Qr2ITLJnxh4c9FOD2gvVINJPxBbxIM=;
+        b=turg05QBBddf4yCFn6V+1+Y6pRDOpcCX2pVZY6G0OeUUdDxmivwXlp4dVWaogxTnkJ
+         2LTf1mQV/GVKm2X/CskgwjrmknABR8QDkamC4kDVY6ZvKsOARP8LX4k8eLVFnzEB0PVO
+         IPssEzW+J7YQanPBida6osJKKdHkEGiVhL3+u24cqy4cNY2EXvHLoxmXnCnTLpShOwLV
+         l5eoMLP7Um97A+zVXjGDsvXgF9wkTeJaU1PAOdT1P3R8ndTV3oyBQfdM1FVNSjGKVXYq
+         pDOrZEmtp4/VcF7LnCb+cNMx3hAU1J3eArg6oA9KcpXr22qyVbZGyhAyrlXBV3OeEUrP
+         AD+A==
+X-Gm-Message-State: AOJu0Yy1ZdRzm+yP4kHH3w18hM7phMflwtP5bS55SYKsgbQKz5ASUICI
+        TTCHQy3oZXn5FHqjquaiSot5ZVKQ8p5x6KQ7NA==
+X-Google-Smtp-Source: AGHT+IGsb3nv5OgzhkeL2GMJhAKdH/BPRBmT4a0/zqlpEa886WBsZj6ujoMsQkCL/Ix4d4IOUqxjtfJBlGBs9hHgqQ==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:f824:0:b0:d07:7001:495b with SMTP
- id u36-20020a25f824000000b00d077001495bmr23740ybd.11.1694565151782; Tue, 12
- Sep 2023 17:32:31 -0700 (PDT)
-Date:   Wed, 13 Sep 2023 00:32:31 +0000
+ (user=justinstitt job=sendgmr) by 2002:a25:80cf:0:b0:d7a:8e37:6d4b with SMTP
+ id c15-20020a2580cf000000b00d7a8e376d4bmr24345ybm.3.1694566265616; Tue, 12
+ Sep 2023 17:51:05 -0700 (PDT)
+Date:   Wed, 13 Sep 2023 00:51:05 +0000
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAB4DAWUC/y2NQQrCMBAAv1L27ELaiqV+RaTE7cYuaBI2MbSU/
- t0gnoa5zOyQWIUTXJsdlIskCb5Ke2qAFuufjDJXh850vRnbHlNWT3HDWaWwJiTdYg5ItsjnjV6 yhvWPabEvJHQXGgcarDOPM9RuVHay/p63+3F8ARydvrWDAAAA
+X-B4-Tracking: v=1; b=H4sIAHgHAWUC/x2NQQ6CMBBFr0Jm7SQtVSNexRiDw1QngRamlUgId
+ 7eyeMl/m/9WSKzCCa7VCsqzJImhiD1UQO82vBilKw61qZ1prMOUNdC4YKcysyYkXcYcUULmHqc 2/3lQHIYY9vmhPiKh8cenPV+c8acGyvmo7OW7h2/3bfsBsFNY4YgAAAA=
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1694565150; l=1681;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1694566264; l=1599;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=bOgFzN8SV0Qi4vEgDu2BIfI1a2yF4o5ibhxUCjl2z5s=; b=WToZdgDM5Ly/+mHpiu1w7j8NAZvAWbO/Dnsor3phmGalGk7ChrcEfY8n208HdrWqz2DC/h2HV
- 5U4mxlaEIuxD9LgvsFARKZ9O2ZBhpeaKhEsFEFYxbz+EAERaz0Gnbto
+ bh=HFa7caLHh4Y4K31X6bYgfzu3rT5WKQkHKQH1LYS4bEc=; b=+lu5hyujktY6X9/cBe5+BmqWrHRCKzqDZdz0TNVSMtMZRhiU9xGmyaYaMN9EBmB1I+nNLMEz7
+ 9VTSzTgoBnkDFy9+1xv8Sosc5rYEZRxUPDH1+VCngkJ7eL9yey6Slg7
 X-Mailer: b4 0.12.3
-Message-ID: <20230913-strncpy-drivers-crypto-cavium-nitrox-nitrox_hal-c-v1-1-937411a7bc7d@google.com>
-Subject: [PATCH] crypto: cavium/nitrox - refactor deprecated strncpy
+Message-ID: <20230913-strncpy-drivers-crypto-intel-qat-qat_common-qat_uclo-c-v1-1-88a6c07fc924@google.com>
+Subject: [PATCH] crypto: qat - refactor deprecated strncpy
 From:   Justin Stitt <justinstitt@google.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org,
+Cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
         Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -71,14 +72,13 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 `strncpy` is deprecated for use on NUL-terminated destination strings [1].
 
-We know `hw.partname` is supposed to be NUL-terminated by its later use with seq_printf:
-| nitrox_debugfs.c +25
-|      seq_printf(s, "  Part Name: %s\n", ndev->hw.partname);
+We should prefer more robust and less ambiguous string interfaces.
 
-Let's prefer a more robust and less ambiguous string interface.
+`buf` is expected to be NUL-terminated for its eventual use in
+`kstrtoul()` and NUL-padding is not required.
 
-A suitable replacement is `strscpy` [2] due to the fact that it guarantees
-NUL-termination on the destination buffer.
+Due to the above, a suitable replacement is `strscpy` [2] due to the
+fact that it guarantees NUL-termination on the destination buffer.
 
 Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
 Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
@@ -88,26 +88,26 @@ Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
 Note: build-tested only.
 ---
- drivers/crypto/cavium/nitrox/nitrox_hal.c | 2 +-
+ drivers/crypto/intel/qat/qat_common/qat_uclo.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_hal.c b/drivers/crypto/cavium/nitrox/nitrox_hal.c
-index 13b137410b75..1b5abdb6cc5e 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_hal.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_hal.c
-@@ -647,7 +647,7 @@ void nitrox_get_hwinfo(struct nitrox_device *ndev)
- 		 ndev->hw.revision_id);
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+index ce837bcc1cab..e2f82128043e 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
+@@ -200,7 +200,7 @@ static int qat_uclo_parse_num(char *str, unsigned int *num)
+ 	unsigned long ae = 0;
+ 	int i;
  
- 	/* copy partname */
--	strncpy(ndev->hw.partname, name, sizeof(ndev->hw.partname));
-+	strscpy(ndev->hw.partname, name, sizeof(ndev->hw.partname));
- }
- 
- void enable_pf2vf_mbox_interrupts(struct nitrox_device *ndev)
+-	strncpy(buf, str, 15);
++	strscpy(buf, str, sizeof(buf));
+ 	for (i = 0; i < 16; i++) {
+ 		if (!isdigit(buf[i])) {
+ 			buf[i] = '\0';
 
 ---
 base-commit: 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
-change-id: 20230913-strncpy-drivers-crypto-cavium-nitrox-nitrox_hal-c-f6c97c7af0b4
+change-id: 20230913-strncpy-drivers-crypto-intel-qat-qat_common-qat_uclo-c-0f4b16830f59
 
 Best regards,
 --
