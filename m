@@ -2,126 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A448EE01FD
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Sep 2023 18:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E03EE0212
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 00:11:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjIMSF0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Sep 2023 14:05:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50834 "EHLO
+        id S233228AbjINALv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Sep 2023 20:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbjIMSFY (ORCPT
+        with ESMTP id S232828AbjINALv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Sep 2023 14:05:24 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82B419AF
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Sep 2023 11:05:20 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51a52a7d859so2729698a12.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Sep 2023 11:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694628319; x=1695233119; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EA+rhaOJb0CMGu7EIM3OJMimctfMG2s/Yf58LoBvEr8=;
-        b=Rx3I9RFDGCbyFKvsxLe5lY3inC6G/UVb1Tp5pwGyEL9MXZHNfdpR6BxUTgpah0uK/Q
-         81Opbq+50gMgXDGhj8LYF9cjjZlZbCm/9nEBWX8LCfY/LfdI1kQPLpESnO8tVnOvLUTt
-         T5HO6kf0qUIxvboaJlzd6ZmP73ho5Fvt7zFQjrPQ0MtALPF4VYRWNLEgnw2dMMXfUU57
-         frnnG+5CrfO6X2uDHp7IgqdREKAr462gqrBDh4LMQ7qCk6RBPWMbVB6wD0dzoURosAFZ
-         QC8o4EbP8xYpH1Vlo3k7aDv1v2WY6HL5n+vv/Bd9vQC99aquxCxXTAeIrLA98kJz0Et9
-         QrMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694628319; x=1695233119;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EA+rhaOJb0CMGu7EIM3OJMimctfMG2s/Yf58LoBvEr8=;
-        b=vCuH0HTeFrQNlQXBUIsXbei/7QKu54OTmOusB+RszoErIMuLSb+qve77PThCEQBTqi
-         VtmytYLUGd/8fYb0dAZZnV/QqOjqwSMn6zJ9FSOBLi99x/g0CQ30P3vG+7bLFXWspLW2
-         HqINjItP2Auo9KuAxP7RVeVwucCoyqlpb4fJxdCR8XCfe1R3UR/vzZ7w/lMaVUPd46qQ
-         5Zm1dBg7sFzCLB+jg9zbdHzzI296C1byr5XLCCOe39hoXH3P6Y1AyAjH+kwxLoFftF5n
-         qUJGPCrSfR59C4QZLfccsK8ScBkfHfUxR1TWgMZWqimx5WOQ14XAabuXOk2qYE92P0vS
-         0OIg==
-X-Gm-Message-State: AOJu0Yw+YMWyCLM6PGaLpCfAUqpnVYYVHKjOYWIV1lp4yBlGd2cl6BSR
-        PM1W1KevJDxvhDbZnan26ANL6Q==
-X-Google-Smtp-Source: AGHT+IE6LRy4QiQj7s2KglzqfydLIrqvv+25l+GZ5+5U6g45Mb5TaSZqKrfnEizhaQ4ROgtQfM8BmA==
-X-Received: by 2002:aa7:d782:0:b0:522:3149:159b with SMTP id s2-20020aa7d782000000b005223149159bmr4704053edq.2.1694628319116;
-        Wed, 13 Sep 2023 11:05:19 -0700 (PDT)
-Received: from [192.168.37.232] (178235177172.dynamic-4-waw-k-1-1-0.vectranet.pl. [178.235.177.172])
-        by smtp.gmail.com with ESMTPSA id cn27-20020a0564020cbb00b0052718577668sm1453733edb.11.2023.09.13.11.05.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 11:05:18 -0700 (PDT)
-Message-ID: <e4a40052-8e16-449a-92c0-f7c822aa49ad@linaro.org>
-Date:   Wed, 13 Sep 2023 20:05:16 +0200
+        Wed, 13 Sep 2023 20:11:51 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D632E170B;
+        Wed, 13 Sep 2023 17:11:46 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24C0EC433C8;
+        Thu, 14 Sep 2023 00:11:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694650306;
+        bh=Q33a+2wWr7dpJ3gAuG87/40VlteSBLIbhhTUJrzO1p4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=plTcQBaw9+qFIJyZ3nYgpJcQc1IqLi5pV6NFEvC0Jefi81qUcXvBV8xRPTUkXVKCE
+         poPupPhVF3c11ThThzdvEbk/4bFSy26ic/RhIqwWb6fBaoBAw/WDqaVg09hG3lB4Av
+         N8/Shpsg5BbPV4FgnnDQ2jtOJn5Sj4a2KQd0q5IJzaBwkxxppyQ/GZrL4yj2MNeM9s
+         yR/Mde3Mex0YexAjnmd9NIeBJ748VeEThqZGNnBPa4nzVZg1ia+EnLfciUnNvcD/V8
+         yEwd+mRaibHbAc7bf4s0wXgPqE1vsnBwUug2PPyBXCZeEv4eYA0bp4PYYFkWg6TDL0
+         XQ4GgV0GEZ3ug==
+Date:   Wed, 13 Sep 2023 17:11:44 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Heiko Stuebner <heiko@sntech.de>
+Cc:     palmer@dabbelt.com, paul.walmsley@sifive.com,
+        aou@eecs.berkeley.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, conor.dooley@microchip.com,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
+Message-ID: <20230914001144.GA924@sol.localdomain>
+References: <20230711153743.1970625-1-heiko@sntech.de>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: sa8775p: enable the inline crypto
- engine
-Content-Language: en-US
-To:     Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>
-Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230913153529.32777-1-bartosz.golaszewski@linaro.org>
- <20230913153529.32777-2-bartosz.golaszewski@linaro.org>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20230913153529.32777-2-bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230711153743.1970625-1-heiko@sntech.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 13.09.2023 17:35, Bartosz Golaszewski wrote:
-> Add an ICE node to sa8775p SoC description and enable it by adding a
-> phandle to the UFS node.
+On Tue, Jul 11, 2023 at 05:37:31PM +0200, Heiko Stuebner wrote:
+> From: Heiko Stuebner <heiko.stuebner@vrull.eu>
 > 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
-I don't have any sources backing this up, but 8350 seems to
-have the exact same register ranges for this block, so I'm
-inclined to believe it's ok
+> This series provides cryptographic implementations using the vector
+> crypto extensions.
+> 
+> v13 of the vector patchset dropped the patches for in-kernel usage of
+> vector instructions, I picked the ones from v12 over into this series
+> for now.
+> 
+> My basic goal was to not re-invent cryptographic code, so the heavy
+> lifting is done by those perl-asm scripts used in openssl and the perl
+> code used here-in stems from code that is targetted at openssl [0] and is
+> unmodified from there to limit needed review effort.
+> 
+> With a matching qemu (there are patches for vector-crypto flying around)
+> the in-kernel crypto-selftests (also the extended ones) are very happy
+> so far.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+Hi Heiko!  Are you still working on this patchset?  And which of its
+prerequisites still haven't been merged upstream?
 
-Konrad
+- Eric
