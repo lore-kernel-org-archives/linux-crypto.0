@@ -2,103 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C58EDE98A
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 07:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F63EDE990
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 08:28:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232090AbjINH3t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 03:29:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49066 "EHLO
+        id S236567AbjINI2n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 04:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231670AbjINH3t (ORCPT
+        with ESMTP id S236418AbjINI2d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 03:29:49 -0400
-X-Greylist: delayed 64 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 14 Sep 2023 00:29:43 PDT
-Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E28CE5;
-        Thu, 14 Sep 2023 00:29:43 -0700 (PDT)
-Received: from unicom146.biz-email.net
-        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id JGQ00132;
-        Thu, 14 Sep 2023 15:28:32 +0800
-Received: from localhost.localdomain (10.94.11.175) by
- jtjnmail201621.home.langchao.com (10.100.2.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 15:28:32 +0800
-From:   Bo Liu <liubo03@inspur.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Bo Liu <liubo03@inspur.com>
-Subject: [PATCH] crypto: x86 - Fix double word in comments
-Date:   Thu, 14 Sep 2023 03:27:50 -0400
-Message-ID: <20230914072750.2426-1-liubo03@inspur.com>
-X-Mailer: git-send-email 2.18.2
+        Thu, 14 Sep 2023 04:28:33 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818791FC2
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:29 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-2747b49cac4so124578a91.0
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694680109; x=1695284909; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=vNYD+fBOqLIjCnYaCF24bvaAM7+rA3DL+RIob1Ylwrs=;
+        b=Ue9ulvsFcvx0Ss+kGIb/7ncVhJI2alaEOwrBvyP6pIEzuCfyVdKHxsz22nkn8sFnaU
+         FtMsjRU+GrKcm2Nx1/dBe40nJi81icbQRpCChx5adUNR4N4PJ4OQXi6Q50zK2wTIENfJ
+         MBFKiJRdXwd3HBAbW2ITal0c8LfSY6tCW5lhIh1CiaX5Py/7IvN1yeAEsRR0vJgbJJUn
+         D8R4MrSbyADUFH6QclGM+VfCc4nXVUzhUfdUwRhzBvZML5uQW1e9e/p0mLuCdKksWB9x
+         eetcuMvxqHWnRUeAyy8oZYKR/B8kvDZWZsuHJ6WH/Yo8v0FdyWGkbYtAGZxOt+8Hap2o
+         3pAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694680109; x=1695284909;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vNYD+fBOqLIjCnYaCF24bvaAM7+rA3DL+RIob1Ylwrs=;
+        b=NnWV3n+qFfPKcH830k6qIIu5kA/QqUAIQwVJ32utFe983uEvi0fIyxAkSx11k8xe3J
+         TBzW09lvovJRtogGgxw8Kl1JXxymFhv5nnjH3x2DT8OMuzqw7h7LZLDF28mmK6IFcX/B
+         JnezoL5qRkS9R9nc5Tq2VgKUDk1yDcewC/SP+JfLiJkZuMW08DS2+Ws3O/jXdSZkzSpi
+         jfP2jYy3/sAS1G2wWilP80e8piwmBGYJcROX+BMYLuu1hkeBwrwuUozYfVIHessw+hRD
+         XOFu/29kjNiqSsFEznO5apFJg9fIhvurDW6ryRtgHWGGdlQ2Z/boT/JQIR7vU0kcpJBK
+         q29g==
+X-Gm-Message-State: AOJu0Yz80/aHtuhLtzi9BuNjDTgZWM0T7Cjh+0S3Fuq+EJh29psT31Z+
+        x2IYmevq00IGyvcWELApkOuXW+MZnHw=
+X-Google-Smtp-Source: AGHT+IEtExITCsFWtlUsxFi17bgXOhtn60h513OB7c/7RwFAzCVVu+UaqFuNfG8B9a6d0jWFsQLeGA==
+X-Received: by 2002:a17:90a:df15:b0:26d:20b8:445d with SMTP id gp21-20020a17090adf1500b0026d20b8445dmr4463777pjb.9.1694680108723;
+        Thu, 14 Sep 2023 01:28:28 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
+        by smtp.gmail.com with ESMTPSA id b13-20020a170902d50d00b001bba3a4888bsm976242plg.102.2023.09.14.01.28.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 01:28:28 -0700 (PDT)
+Sender: Herbert Xu <herbertx@gmail.com>
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 0/8] crypto: Add lskcipher API type
+Date:   Thu, 14 Sep 2023 16:28:20 +0800
+Message-Id: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.94.11.175]
-X-ClientProxiedBy: Jtjnmail201618.home.langchao.com (10.100.2.18) To
- jtjnmail201621.home.langchao.com (10.100.2.21)
-tUid:   2023914152832db66f52ddc26738ae8a1ee476315cdcc
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove the repeated word "if" in comments.
+This series introduces the lskcipher API type.  Its relationship
+to skcipher is the same as that between shash and ahash.
 
-Signed-off-by: Bo Liu <liubo03@inspur.com>
----
- arch/x86/crypto/aesni-intel_asm.S        | 4 ++--
- arch/x86/crypto/aesni-intel_avx-x86_64.S | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+This series only converts ecb and cbc to the new algorithm type.
+Once all templates have been moved over, we can then convert the
+cipher implementations such as aes-generic.
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index 3ac7487ecad2..187f913cc239 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -672,7 +672,7 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	add	%r13, %r10
- 	# Set r10 to be the amount of data left in CYPH_PLAIN_IN after filling
- 	sub	$16, %r10
--	# Determine if if partial block is not being filled and
-+	# Determine if partial block is not being filled and
- 	# shift mask accordingly
- 	jge	.L_no_extra_mask_1_\@
- 	sub	%r10, %r12
-@@ -708,7 +708,7 @@ ALL_F:      .octa 0xffffffffffffffffffffffffffffffff
- 	add	%r13, %r10
- 	# Set r10 to be the amount of data left in CYPH_PLAIN_IN after filling
- 	sub	$16, %r10
--	# Determine if if partial block is not being filled and
-+	# Determine if partial block is not being filled and
- 	# shift mask accordingly
- 	jge	.L_no_extra_mask_2_\@
- 	sub	%r10, %r12
-diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-index 46cddd78857b..74dd230973cf 100644
---- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
-+++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-@@ -753,7 +753,7 @@ VARIABLE_OFFSET = 16*8
-         add	%r13, %r10
-         # Set r10 to be the amount of data left in CYPH_PLAIN_IN after filling
-         sub	$16, %r10
--        # Determine if if partial block is not being filled and
-+        # Determine if partial block is not being filled and
-         # shift mask accordingly
-         jge	.L_no_extra_mask_1_\@
-         sub	%r10, %r12
-@@ -789,7 +789,7 @@ VARIABLE_OFFSET = 16*8
-         add	%r13, %r10
-         # Set r10 to be the amount of data left in CYPH_PLAIN_IN after filling
-         sub	$16, %r10
--        # Determine if if partial block is not being filled and
-+        # Determine if partial block is not being filled and
-         # shift mask accordingly
-         jge	.L_no_extra_mask_2_\@
-         sub	%r10, %r12
--- 
-2.27.0
+Ard, if you have some spare cycles you can help with either the
+templates or the cipher algorithm conversions.  The latter will
+be applied once the templates have been completely moved over.
 
+Just let me know which ones you'd like to do so I won't touch
+them.
+
+Cheers,
+--
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
