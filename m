@@ -2,224 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCAF6EDE99E
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 09:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B471EDE99E
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 09:18:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237298AbjINJKN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 05:10:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41482 "EHLO
+        id S231925AbjINJSS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 05:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236571AbjINJJp (ORCPT
+        with ESMTP id S230515AbjINJSR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 05:09:45 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782931FE8;
-        Thu, 14 Sep 2023 02:09:12 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RmWcG1yL6ztSdc;
-        Thu, 14 Sep 2023 17:05:02 +0800 (CST)
-Received: from localhost.huawei.com (10.50.163.32) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 14 Sep 2023 17:09:09 +0800
-From:   Yang Shen <shenyang39@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>
-Subject: [PATCH 1/2] crypto: hisilicon/zip - support deflate algorithm
-Date:   Thu, 14 Sep 2023 17:09:07 +0800
-Message-ID: <20230914090908.3849318-2-shenyang39@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20230914090908.3849318-1-shenyang39@huawei.com>
-References: <20230914090908.3849318-1-shenyang39@huawei.com>
+        Thu, 14 Sep 2023 05:18:17 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6412D9E
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 02:18:13 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 067C1C433C8
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 09:18:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694683093;
+        bh=vEkCdkTgriwJjDyyvjt+W9IgitpS32SWKcTtoyv/NC8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=VvtSjmX3Xs+rXl0jien8983nDAfpfg//3UhDz1X85WcPAm1jvH1J6S9h9p3Ai8/ML
+         R2oKbVq9G+cAlXLyll2ZaFUy+rESxqr/tq3ukwJBFuqW5OhqzEvKlscOiEMyCplxhr
+         Ldz+MBt5/gkD78y4tav2RzKvct5uuFIx3VNRXicpRgsKUgS+9OdcmWpwkakKzM6/e6
+         ogdyDz5W3qXZmqKIZTiI2Md7lNoLl3dJXOF/nR0RDW8SvhsOI+sb/5u2+OTah1EX/I
+         Vd9CZNNZqxeDkRfBN0QaaabzlS+MlSP2FyQmFm9mavgIB4U2KnCnNl8qWPuGJT5CBa
+         jI89Q348lt8HA==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2b962c226ceso10572931fa.3
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 02:18:12 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyzDGMMESRWn2pVg0klM+/ZgdoqIEDAA3KbUh35SDm/OoREPkDA
+        UUdI5u9Fg+BwFN0M+INBLdKATKEAxKjqzXDCkv0=
+X-Google-Smtp-Source: AGHT+IHPLGyb6YtBaqIP8eJRmk6Fqk7Cb6RW3qMAY2eCUoGQYusu7HJoSZbdXl+ThqwMF6eZLTXxXm71yCH084SneO8=
+X-Received: by 2002:a2e:910d:0:b0:2bc:bc70:263f with SMTP id
+ m13-20020a2e910d000000b002bcbc70263fmr4339963ljg.0.1694683091129; Thu, 14 Sep
+ 2023 02:18:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.50.163.32]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+ <CAMj1kXHLZ8kZWL3npQRavdzjRtv_uiRKmKDeXaQhhy3m4LvK+w@mail.gmail.com> <ZQLK0injXi7K3X1b@gondor.apana.org.au>
+In-Reply-To: <ZQLK0injXi7K3X1b@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 14 Sep 2023 11:18:00 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHvhrUyShdSNCJeOh8WVXFqPPu+KLh16V6fJJdQKhPv1A@mail.gmail.com>
+Message-ID: <CAMj1kXHvhrUyShdSNCJeOh8WVXFqPPu+KLh16V6fJJdQKhPv1A@mail.gmail.com>
+Subject: Re: [PATCH 0/8] crypto: Add lskcipher API type
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the deflate algorithm support for hisilicon zip hardware.
+On Thu, 14 Sept 2023 at 10:56, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Thu, Sep 14, 2023 at 10:51:21AM +0200, Ard Biesheuvel wrote:
+> >
+> > So the intent is for lskcipher to ultimately supplant the current
+> > cipher entirely, right? And lskcipher can be used directly by clients
+> > of the crypto API, in which case kernel VAs may be used directly, but
+> > no async support is available, while skcipher API clients will gain
+> > access to lskciphers via a generic wrapper (if needed?)
+> >
+> > That makes sense but it would help to spell this out.
+>
+> Yes that's the idea.  It is pretty much exactly the same as how
+> shash and ahash are handled and used.
+>
+> Because of the way I structured the ecb transition code (it will
+> take an old cipher and repackage it as an lskcipher), we need to
+> convert the templates first and then do the cipher => lskcipher
+> conversion.
+>
+> > I'd be happy to help out here but I'll be off on vacation for ~3 weeks
+> > after this week so i won't get around to it before mid October. What I
+> > will do (if it helps) is rebase my recent RISC-V scalar AES cipher
+> > patches onto this, and implement ecb(aes) instead (which is the idea
+> > IIUC?)
+>
+> That sounds good.  In fact let me attach the aes-generic proof-
+> of-concept conversion (it can only be applied after all templates
+> have been converted, so if you test it now everything but ecb/cbc
+> will be broken).
+>
 
-Signed-off-by: Yang Shen <shenyang39@huawei.com>
----
- drivers/crypto/hisilicon/zip/zip_crypto.c | 86 ++++++++++++++++++-----
- drivers/crypto/hisilicon/zip/zip_main.c   |  4 +-
- 2 files changed, 72 insertions(+), 18 deletions(-)
+That helps, thanks.
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 6608971d10cd..09f60f786779 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -16,6 +16,7 @@
- #define HZIP_OUT_SGE_DATA_OFFSET_M		GENMASK(23, 0)
- /* hisi_zip_sqe dw9 */
- #define HZIP_REQ_TYPE_M				GENMASK(7, 0)
-+#define HZIP_ALG_TYPE_DEFLATE			0x01
- #define HZIP_ALG_TYPE_ZLIB			0x02
- #define HZIP_ALG_TYPE_GZIP			0x03
- #define HZIP_BUF_TYPE_M				GENMASK(11, 8)
-@@ -41,6 +42,7 @@
- 
- #define HZIP_ALG_ZLIB				GENMASK(1, 0)
- #define HZIP_ALG_GZIP				GENMASK(3, 2)
-+#define HZIP_ALG_DEFLATE			GENMASK(5, 4)
- 
- static const u8 zlib_head[HZIP_ZLIB_HEAD_SIZE] = {0x78, 0x9c};
- static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {
-@@ -59,8 +61,9 @@ enum {
- };
- 
- #define COMP_NAME_TO_TYPE(alg_name)					\
-+	(!strcmp((alg_name), "deflate") ? HZIP_ALG_TYPE_DEFLATE :	\
- 	(!strcmp((alg_name), "zlib-deflate") ? HZIP_ALG_TYPE_ZLIB :	\
--	 !strcmp((alg_name), "gzip") ? HZIP_ALG_TYPE_GZIP : 0)		\
-+	 !strcmp((alg_name), "gzip") ? HZIP_ALG_TYPE_GZIP : 0))		\
- 
- #define TO_HEAD_SIZE(req_type)						\
- 	(((req_type) == HZIP_ALG_TYPE_ZLIB) ? sizeof(zlib_head) :	\
-@@ -447,15 +450,17 @@ static int hisi_zip_acompress(struct acomp_req *acomp_req)
- 	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_COMP];
- 	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
- 	struct hisi_zip_req *req;
--	int head_size;
-+	int head_size = 0;
- 	int ret;
- 
- 	/* let's output compression head now */
--	head_size = add_comp_head(acomp_req->dst, qp_ctx->qp->req_type);
--	if (unlikely(head_size < 0)) {
--		dev_err_ratelimited(dev, "failed to add comp head (%d)!\n",
--				    head_size);
--		return head_size;
-+	if (qp_ctx->qp->req_type != HZIP_ALG_TYPE_DEFLATE) {
-+		head_size = add_comp_head(acomp_req->dst, qp_ctx->qp->req_type);
-+		if (unlikely(head_size < 0)) {
-+			dev_err_ratelimited(dev, "failed to add comp head (%d)!\n",
-+					head_size);
-+			return head_size;
-+		}
- 	}
- 
- 	req = hisi_zip_create_req(acomp_req, qp_ctx, head_size, true);
-@@ -477,13 +482,15 @@ static int hisi_zip_adecompress(struct acomp_req *acomp_req)
- 	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_DECOMP];
- 	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
- 	struct hisi_zip_req *req;
--	int head_size, ret;
--
--	head_size = get_comp_head_size(acomp_req, qp_ctx->qp->req_type);
--	if (unlikely(head_size < 0)) {
--		dev_err_ratelimited(dev, "failed to get comp head size (%d)!\n",
--				    head_size);
--		return head_size;
-+	int head_size = 0, ret;
-+
-+	if (qp_ctx->qp->req_type != HZIP_ALG_TYPE_DEFLATE) {
-+		head_size = get_comp_head_size(acomp_req, qp_ctx->qp->req_type);
-+		if (unlikely(head_size < 0)) {
-+			dev_err_ratelimited(dev, "failed to get comp head size (%d)!\n",
-+					head_size);
-+			return head_size;
-+		}
- 	}
- 
- 	req = hisi_zip_create_req(acomp_req, qp_ctx, head_size, false);
-@@ -745,6 +752,42 @@ static void hisi_zip_acomp_exit(struct crypto_acomp *tfm)
- 	hisi_zip_ctx_exit(ctx);
- }
- 
-+static struct acomp_alg hisi_zip_acomp_deflate = {
-+	.init			= hisi_zip_acomp_init,
-+	.exit			= hisi_zip_acomp_exit,
-+	.compress		= hisi_zip_acompress,
-+	.decompress		= hisi_zip_adecompress,
-+	.base			= {
-+		.cra_name		= "deflate",
-+		.cra_driver_name	= "hisi-deflate-acomp",
-+		.cra_module		= THIS_MODULE,
-+		.cra_priority		= HZIP_ALG_PRIORITY,
-+		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
-+	}
-+};
-+
-+static int hisi_zip_register_deflate(struct hisi_qm *qm)
-+{
-+	int ret;
-+
-+	if (!hisi_zip_alg_support(qm, HZIP_ALG_DEFLATE))
-+		return 0;
-+
-+	ret = crypto_register_acomp(&hisi_zip_acomp_deflate);
-+	if (ret)
-+		dev_err(&qm->pdev->dev, "failed to register to deflate (%d)!\n", ret);
-+
-+	return ret;
-+}
-+
-+static void hisi_zip_unregister_deflate(struct hisi_qm *qm)
-+{
-+	if (!hisi_zip_alg_support(qm, HZIP_ALG_DEFLATE))
-+		return;
-+
-+	crypto_unregister_acomp(&hisi_zip_acomp_deflate);
-+}
-+
- static struct acomp_alg hisi_zip_acomp_zlib = {
- 	.init			= hisi_zip_acomp_init,
- 	.exit			= hisi_zip_acomp_exit,
-@@ -821,19 +864,30 @@ int hisi_zip_register_to_crypto(struct hisi_qm *qm)
- {
- 	int ret = 0;
- 
--	ret = hisi_zip_register_zlib(qm);
-+	ret = hisi_zip_register_deflate(qm);
- 	if (ret)
- 		return ret;
- 
-+	ret = hisi_zip_register_zlib(qm);
-+	if (ret)
-+		goto err_unreg_deflate;
-+
- 	ret = hisi_zip_register_gzip(qm);
- 	if (ret)
--		hisi_zip_unregister_zlib(qm);
-+		goto err_unreg_zlib;
-+
-+	return 0;
- 
-+err_unreg_zlib:
-+	hisi_zip_unregister_zlib(qm);
-+err_unreg_deflate:
-+	hisi_zip_unregister_deflate(qm);
- 	return ret;
- }
- 
- void hisi_zip_unregister_from_crypto(struct hisi_qm *qm)
- {
-+	hisi_zip_unregister_deflate(qm);
- 	hisi_zip_unregister_zlib(qm);
- 	hisi_zip_unregister_gzip(qm);
- }
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index f3ce34198775..da7a23c0e594 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -236,8 +236,8 @@ static struct hisi_qm_cap_info zip_basic_cap_info[] = {
- 	{ZIP_CLUSTER_DECOMP_NUM_CAP, 0x313C, 0, GENMASK(7, 0), 0x6, 0x6, 0x3},
- 	{ZIP_DECOMP_ENABLE_BITMAP, 0x3140, 16, GENMASK(15, 0), 0xFC, 0xFC, 0x1C},
- 	{ZIP_COMP_ENABLE_BITMAP, 0x3140, 0, GENMASK(15, 0), 0x3, 0x3, 0x3},
--	{ZIP_DRV_ALG_BITMAP, 0x3144, 0, GENMASK(31, 0), 0xF, 0xF, 0xF},
--	{ZIP_DEV_ALG_BITMAP, 0x3148, 0, GENMASK(31, 0), 0xF, 0xF, 0xFF},
-+	{ZIP_DRV_ALG_BITMAP, 0x3144, 0, GENMASK(31, 0), 0xF, 0xF, 0x3F},
-+	{ZIP_DEV_ALG_BITMAP, 0x3148, 0, GENMASK(31, 0), 0xF, 0xF, 0x3F},
- 	{ZIP_CORE1_ALG_BITMAP, 0x314C, 0, GENMASK(31, 0), 0x5, 0x5, 0xD5},
- 	{ZIP_CORE2_ALG_BITMAP, 0x3150, 0, GENMASK(31, 0), 0x5, 0x5, 0xD5},
- 	{ZIP_CORE3_ALG_BITMAP, 0x3154, 0, GENMASK(31, 0), 0xA, 0xA, 0x2A},
--- 
-2.33.0
+...
+> +static struct lskcipher_alg aes_alg = {
+> +       .co = {
+> +               .base.cra_name          =       "aes",
 
+So this means that the base name will be aes, not ecb(aes), right?
+What about cbc and ctr? It makes sense for a single lskcipher to
+implement all three of those at least, so that algorithms like XTS and
+GCM can be implemented cheaply using generic templates, without the
+need to call into the lskcipher for each block of input.
