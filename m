@@ -2,83 +2,121 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F63EDE990
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 08:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E361EDE995
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 08:28:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236567AbjINI2n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 04:28:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
+        id S236361AbjINI2o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 04:28:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236418AbjINI2d (ORCPT
+        with ESMTP id S236441AbjINI2e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 04:28:33 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818791FC2
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:29 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-2747b49cac4so124578a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:29 -0700 (PDT)
+        Thu, 14 Sep 2023 04:28:34 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C400C1FF9
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:30 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bf1935f6c2so5467605ad.1
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694680109; x=1695284909; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=vNYD+fBOqLIjCnYaCF24bvaAM7+rA3DL+RIob1Ylwrs=;
-        b=Ue9ulvsFcvx0Ss+kGIb/7ncVhJI2alaEOwrBvyP6pIEzuCfyVdKHxsz22nkn8sFnaU
-         FtMsjRU+GrKcm2Nx1/dBe40nJi81icbQRpCChx5adUNR4N4PJ4OQXi6Q50zK2wTIENfJ
-         MBFKiJRdXwd3HBAbW2ITal0c8LfSY6tCW5lhIh1CiaX5Py/7IvN1yeAEsRR0vJgbJJUn
-         D8R4MrSbyADUFH6QclGM+VfCc4nXVUzhUfdUwRhzBvZML5uQW1e9e/p0mLuCdKksWB9x
-         eetcuMvxqHWnRUeAyy8oZYKR/B8kvDZWZsuHJ6WH/Yo8v0FdyWGkbYtAGZxOt+8Hap2o
-         3pAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694680109; x=1695284909;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1694680110; x=1695284910; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vNYD+fBOqLIjCnYaCF24bvaAM7+rA3DL+RIob1Ylwrs=;
-        b=NnWV3n+qFfPKcH830k6qIIu5kA/QqUAIQwVJ32utFe983uEvi0fIyxAkSx11k8xe3J
-         TBzW09lvovJRtogGgxw8Kl1JXxymFhv5nnjH3x2DT8OMuzqw7h7LZLDF28mmK6IFcX/B
-         JnezoL5qRkS9R9nc5Tq2VgKUDk1yDcewC/SP+JfLiJkZuMW08DS2+Ws3O/jXdSZkzSpi
-         jfP2jYy3/sAS1G2wWilP80e8piwmBGYJcROX+BMYLuu1hkeBwrwuUozYfVIHessw+hRD
-         XOFu/29kjNiqSsFEznO5apFJg9fIhvurDW6ryRtgHWGGdlQ2Z/boT/JQIR7vU0kcpJBK
-         q29g==
-X-Gm-Message-State: AOJu0Yz80/aHtuhLtzi9BuNjDTgZWM0T7Cjh+0S3Fuq+EJh29psT31Z+
-        x2IYmevq00IGyvcWELApkOuXW+MZnHw=
-X-Google-Smtp-Source: AGHT+IEtExITCsFWtlUsxFi17bgXOhtn60h513OB7c/7RwFAzCVVu+UaqFuNfG8B9a6d0jWFsQLeGA==
-X-Received: by 2002:a17:90a:df15:b0:26d:20b8:445d with SMTP id gp21-20020a17090adf1500b0026d20b8445dmr4463777pjb.9.1694680108723;
-        Thu, 14 Sep 2023 01:28:28 -0700 (PDT)
+        bh=r/EigJm6/HUiXf1GCjkqew1cMCZsb5UD7SJBMzmN1lY=;
+        b=HrseTqmVbQHnGFiT7quB71kwp1p7PPgraeEMf3kxPHOvxUgIO3l88p27l8VuuJbQG4
+         yMWEvU9g25eUKqGbhMKdEUK8sg4AHSGmUPzu6lWzAIy6zjeEiHY09DFXPA08PwB6fs56
+         Ia7RpHFzbau+g8E+DAJRP6bYm3Tq60uDZow/tNzEIRqoxbwFQzvZgFnbhq3aPVXyzW0X
+         bXyZnc14LFxX/y5UPRBYBvx0qPdYGY5TjiCJgS6sgaOipFoo4a61TIcB10jk7wEYIpQy
+         2Mnv8uM70+t+qWvd0CsyfqmxfNQQ6eMsRcjROVKCuWnJ1iUjnsFOkZKsw/SDt/qfSQv4
+         22bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694680110; x=1695284910;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=r/EigJm6/HUiXf1GCjkqew1cMCZsb5UD7SJBMzmN1lY=;
+        b=QANEtdpcB+nk6tccNtiXTyEwYUXA2zsV9+8RhZtVDZpUxFSwCxKAiojzKxm5EMbiOP
+         LESbK/TC0Rhqm3TwbpPvJ9yCusyPbYRjeKrKXiOx/8E/NtyqzkN7j+sTr2uPNjyuySVJ
+         pWpPbo1T9DhX7OCbMmhUL1z/TKpk/n4pHFReOojQqgvpz9P1acN7cv6RlTiDFn3Om1SU
+         /ASODwa0pBVTqZh6FvP++ZXLoSibzcYkti+9hoR8ikOqkmZsaQ52SJyYiv3SLGVxdlOr
+         QOunz9AOp1nlTaQwb9oXCH3zMoh6mj9n9fqH5ZeZe8aFZ+g8PK7joHF2wIoCKUq5kejS
+         tS0Q==
+X-Gm-Message-State: AOJu0Yy64dEXyeajpObaHAvo/O+rK5eovmM2JO1XBE7MzNLbutugIGaA
+        vp/CoRvOTP5bjILVIVGEfLGL5WNjW9Q=
+X-Google-Smtp-Source: AGHT+IFyHhYLeJfqNlcn8bdoSa4hpzEfVWNxCyGQB0ESH8GwX7U0jqD1h1fHbKcVfJzIABOeoF6Azw==
+X-Received: by 2002:a17:902:ec88:b0:1c3:22a9:8643 with SMTP id x8-20020a170902ec8800b001c322a98643mr1479822plg.31.1694680109964;
+        Thu, 14 Sep 2023 01:28:29 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
-        by smtp.gmail.com with ESMTPSA id b13-20020a170902d50d00b001bba3a4888bsm976242plg.102.2023.09.14.01.28.27
+        by smtp.gmail.com with ESMTPSA id b13-20020a170902d50d00b001bba3a4888bsm976242plg.102.2023.09.14.01.28.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 01:28:28 -0700 (PDT)
+        Thu, 14 Sep 2023 01:28:29 -0700 (PDT)
 Sender: Herbert Xu <herbertx@gmail.com>
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc:     Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 0/8] crypto: Add lskcipher API type
-Date:   Thu, 14 Sep 2023 16:28:20 +0800
-Message-Id: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+Subject: [PATCH 1/8] crypto: aead - Add crypto_has_aead
+Date:   Thu, 14 Sep 2023 16:28:21 +0800
+Message-Id: <20230914082828.895403-2-herbert@gondor.apana.org.au>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series introduces the lskcipher API type.  Its relationship
-to skcipher is the same as that between shash and ahash.
+Add the helper crypto_has_aead.  This is meant to replace the
+existing use of crypto_has_alg to locate AEAD algorithms.
 
-This series only converts ecb and cbc to the new algorithm type.
-Once all templates have been moved over, we can then convert the
-cipher implementations such as aes-generic.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/aead.c         |  6 ++++++
+ include/crypto/aead.h | 12 ++++++++++++
+ 2 files changed, 18 insertions(+)
 
-Ard, if you have some spare cycles you can help with either the
-templates or the cipher algorithm conversions.  The latter will
-be applied once the templates have been completely moved over.
-
-Just let me know which ones you'd like to do so I won't touch
-them.
-
-Cheers,
---
+diff --git a/crypto/aead.c b/crypto/aead.c
+index d5ba204ebdbf..54906633566a 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -269,6 +269,12 @@ struct crypto_aead *crypto_alloc_aead(const char *alg_name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_aead);
+ 
++int crypto_has_aead(const char *alg_name, u32 type, u32 mask)
++{
++	return crypto_type_has_alg(alg_name, &crypto_aead_type, type, mask);
++}
++EXPORT_SYMBOL_GPL(crypto_has_aead);
++
+ static int aead_prepare_alg(struct aead_alg *alg)
+ {
+ 	struct crypto_istat_aead *istat = aead_get_stat(alg);
+diff --git a/include/crypto/aead.h b/include/crypto/aead.h
+index 35e45b854a6f..51382befbe37 100644
+--- a/include/crypto/aead.h
++++ b/include/crypto/aead.h
+@@ -217,6 +217,18 @@ static inline void crypto_free_aead(struct crypto_aead *tfm)
+ 	crypto_destroy_tfm(tfm, crypto_aead_tfm(tfm));
+ }
+ 
++/**
++ * crypto_has_aead() - Search for the availability of an aead.
++ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
++ *	      aead
++ * @type: specifies the type of the aead
++ * @mask: specifies the mask for the aead
++ *
++ * Return: true when the aead is known to the kernel crypto API; false
++ *	   otherwise
++ */
++int crypto_has_aead(const char *alg_name, u32 type, u32 mask);
++
+ static inline const char *crypto_aead_driver_name(struct crypto_aead *tfm)
+ {
+ 	return crypto_tfm_alg_driver_name(crypto_aead_tfm(tfm));
+-- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
 PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
