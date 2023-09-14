@@ -2,335 +2,177 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71612EDE995
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 08:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCD8EDE995
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 08:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236398AbjINI3M (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 04:29:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40076 "EHLO
+        id S232128AbjINIil (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 04:38:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236391AbjINI2o (ORCPT
+        with ESMTP id S231404AbjINIik (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 04:28:44 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8ABF1FC2
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:39 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c364fb8a4cso5973425ad.1
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 01:28:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694680119; x=1695284919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YOqdX3+nXUyUV8mHKNyJgOZWEIR1SpCUVEK0tW5/qpI=;
-        b=Lcvxbm9CsbIjhjsEBUk3yS8wH9PHUVX617x3YjFlGEcr0+RqJKB9k2uouSPItegl+J
-         NazYnPfUqfNJpHr0SZ7oBx3wmLI7H78zBkWiqDQKgqNMj+AF9e2C1TiAqUwiQTSmrcLx
-         NtZUDYH0bVACXDFvjB8m4tmDcLRT7oDoWxeGzDCyZVTNm9OPG/dJVj92l+JaQez/eub+
-         ldaYRIw6/vLhGBx2zdDiJOpXbEGvsUKvkXi1Pw3NEJ4Z1XniZzXgbI7ZuBXCp09ciNzv
-         hAV1Uw22LqvArVuUgCJtTCiXkKL6015Ji6orZ0uTbVSddmWo8uMHmolGqcN1va6egFTO
-         lOzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694680119; x=1695284919;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YOqdX3+nXUyUV8mHKNyJgOZWEIR1SpCUVEK0tW5/qpI=;
-        b=pcf8SW3OWaolWkCIXuVpvBDkrRiAnkWvUAo7zNsQM8UqgcbAEScfdAwr9uqqCO5xc0
-         mVxnRP/Pzh/VnoLqAiFGF8RQCeKjl5mk4tcOH88cy7gDHaM7rdNaryX9SaZZGZxNZdAs
-         ZjD3M193kbHkgxAWAk8sfZZAa/FldsL8xxaZoT5uEdkf9ifVKMDmQE9uA5/w92zQ6ArK
-         of+ESMxRTKwl2CFv8tH4yuzy1oK8phihWigIWN+evqsnqD1YVgRZ93fksyFoXUJcwmRj
-         G5l5r2lxFTTtraNCFcTo2I71UlGA0ae36kLZBGMXW7kKZFeEo3tv3axNTG4ygmXD8xqi
-         NZQA==
-X-Gm-Message-State: AOJu0YxDZmqTuGai8BSDxENHBIRwj6haSx5aInmn1c8sJpy+p7rWKR7a
-        wbw74MXPpjqJz2Zyp80z20rX4GUdWRE=
-X-Google-Smtp-Source: AGHT+IEL7T9O1XL36VjJ9mUivYOlkw0boAV7umveE0r1MQ5fuIY87lSl43P3gsdXnuymz8F0JTSY3g==
-X-Received: by 2002:a17:902:da86:b0:1c1:e258:7447 with SMTP id j6-20020a170902da8600b001c1e2587447mr5678825plx.22.1694680118985;
-        Thu, 14 Sep 2023 01:28:38 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
-        by smtp.gmail.com with ESMTPSA id b13-20020a170902d50d00b001bba3a4888bsm976242plg.102.2023.09.14.01.28.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 01:28:38 -0700 (PDT)
-Sender: Herbert Xu <herbertx@gmail.com>
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 8/8] crypto: cbc - Convert from skcipher to lskcipher
-Date:   Thu, 14 Sep 2023 16:28:28 +0800
-Message-Id: <20230914082828.895403-9-herbert@gondor.apana.org.au>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230914082828.895403-1-herbert@gondor.apana.org.au>
-References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
-MIME-Version: 1.0
+        Thu, 14 Sep 2023 04:38:40 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2079.outbound.protection.outlook.com [40.107.92.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B1D1FC4;
+        Thu, 14 Sep 2023 01:38:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B1wL28qs8wNv9ZUvI9nZQSLi25+1O9ZkCvVBEj8H0vfWpkn2b6OgrcbZARKhoB/1v10bILU1KyCo6BhBuxFS3PI+hn7RxvaQNBKnThMHaTpW+i1DBBuo7euIrTB/ZoVC5j7H04e53kAIAbNEdERzZP0p3adxowwKd0lJxJLbkoHATxrYqND3Nh2DOtwZrdGUJTTNI3O1CkfLq8zUvEbae3SQYhZi3sil7R0kX3DdDSW0XLeyqW1ccEr1IkuH9Wh9ulccrMamgmNCNEZZoeegzp6Nxa0y/lsLrFwmbsB6xLa6dj4pXRpuHqJPXFCMNENtrx6A176+SQkVtWmcZba5NQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YERWMJ30B91l/sSfp9V6W9satlDcewaEx3lnE3+EPJw=;
+ b=ZNwo7ejB9/7opFhpo0qNfmqce+C7SpHRDvguxENC/ELLQcRnzTshBdzWRM/SOhcwhs8sCOwVi4WZFiQ6sFhavlhHtwOxA3vAE7BP0LqafRU9GZE8spkuPk/A8B0O9XhadHjSqTpKWl15ctBW35/Kcoioc8n8a6dAYBs7t8sSKyxLVB0WU4lc/2br8a+TwyLHau1E4+WYPxnIB8Qmn9p72s6bj+iKcUe51hf3fDu2zPtn56E7GVyLDb2RfRvnpMHdPS+p+Ky0RgWDYM223fATn+ugs0mukxCR5MLx/fBTEqFzI6DEx/+RCJA5RoY4bAjxQqIey5/rfpBLAIa7E3CWdg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YERWMJ30B91l/sSfp9V6W9satlDcewaEx3lnE3+EPJw=;
+ b=n20O/7WJmxEIXu9uttFxEkBnLn9lkvqk9Qgw5RjvJcIBQCxxlnDCXxYu+FhQzfaUgTdha9jh969KbqLy4GeA7Axm8tsbRQpzaUmLbNw9zOnyLRI5EemhyrZcAxLHGU6hMGMeEmPfard4FDT3UOfqV8zKzY8mtT+vqk+rYZ2dSn4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH0PR12MB5346.namprd12.prod.outlook.com (2603:10b6:610:d5::24)
+ by PH7PR12MB5760.namprd12.prod.outlook.com (2603:10b6:510:1d3::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.19; Thu, 14 Sep
+ 2023 08:38:33 +0000
+Received: from CH0PR12MB5346.namprd12.prod.outlook.com
+ ([fe80::b009:6291:f87a:33b6]) by CH0PR12MB5346.namprd12.prod.outlook.com
+ ([fe80::b009:6291:f87a:33b6%4]) with mapi id 15.20.6792.020; Thu, 14 Sep 2023
+ 08:38:33 +0000
+Message-ID: <9d4e175b-b8ed-85df-31a2-6bfb4a3616d9@amd.com>
+Date:   Thu, 14 Sep 2023 14:08:19 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH 0/5] Add new platform support for DBC
+Content-Language: en-US
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     john.allen@amd.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230907184846.47598-1-mario.limonciello@amd.com>
+ <5d9af84b-59e8-385e-5dff-0f12651fab52@amd.com>
+From:   Rijo Thomas <Rijo-john.Thomas@amd.com>
+In-Reply-To: <5d9af84b-59e8-385e-5dff-0f12651fab52@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BM1P287CA0011.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:b00:40::15) To CH0PR12MB5346.namprd12.prod.outlook.com
+ (2603:10b6:610:d5::24)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5346:EE_|PH7PR12MB5760:EE_
+X-MS-Office365-Filtering-Correlation-Id: 993a939c-7444-4b4c-6adc-08dbb4fdfacf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: P5pue92VosRRRm+5S0MRLcx1RzCnPukgn88uZxLEQPcgYwgTkE7oTqrZTbiiuaMLAAGXsw+NpKKqbyVSa5r+hbKjkfHdge+G1E+4DrZhFQh03HOeNnf35VBfl/p6qu/ktTyMQ9F/ZjYUKT5f+sJEd3u7tRnr7RSaI5Ne32sJa9YFFEOSGrTM3ac+a4WvW82UTytGydCzyhSOyUe/n0feArtaFkPXFpsH0LJ5B2jqauBqy7p3YxSvit9M+7I9cQ7Bt7SjobfE7r6M3PR5ZwdPT9pzpH1wH/ekGtV1K5BFLsBUe9NpilxfSb2EjCezrENt+fj+FmHI63XV9PTCa4wG/M9kt4H+NokTE7vgbfMw2W46YMeyYuMwTCTJFmY8t0FIieSKstI6O0MV3B9h8s2/jvx6CO8oSHg7wb+v6hG7WziLDRzVwt+UhCWHsFqAfsCY9k8BCEPM47Km0vNifWRpq4VNjKLtYEZbtxqEw22QwdD6xAyyY5MGAdITB7nWUAsc8Ca4ZcHb3wvw8yYLsBEiFefHG5ajL76kjsHxxwD0QhB6XZTuqapaLYnaWZ0Inx3kQGMM7f7CDnQ4+UiZTge7mzS74ErplC/okUPvtkDQ/WE7Sxj+t83pOfUP94kwzLaH9vHSI5MXoFzruTMZCGtA+g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR12MB5346.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(39860400002)(346002)(366004)(396003)(186009)(1800799009)(451199024)(41300700001)(83380400001)(316002)(6666004)(53546011)(6486002)(966005)(478600001)(6506007)(66476007)(66556008)(26005)(2616005)(66946007)(110136005)(6512007)(2906002)(31696002)(38100700002)(5660300002)(8936002)(86362001)(8676002)(4326008)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SW80Rnp0YTJvaG8rMHFYL1gxTm5nOGd4RXY4UUFJM2F6b3dHU2JINXBHNzI1?=
+ =?utf-8?B?MDkvU3BUWHEzekpaOHFTbE9QUW1YZzVZd3Q3T0h4TDlKWENYTUQxMjROd2s0?=
+ =?utf-8?B?WW02Ynhzd3NzUXVjZlBLZGkzY0pZSHZUckdacDhHeTF0Zkl0UnhiSjFaMFl4?=
+ =?utf-8?B?VEkxMDlLZWV1OW5DOGNZVitGMTBBRGI4d3RmVEQ2cHo2QUhOWnJlZkJKMW0w?=
+ =?utf-8?B?U1BxN1JoN3gvamxCZ1NTUEk3bHdPa2xOUXdSc00zRUpsSi9NUi8yMzQwOExK?=
+ =?utf-8?B?TENKRGp4VWNmT3U0NHFJa25OVzNjSmRrT0x6M2ZkbHFJTTdDVnVhbzd4L2RQ?=
+ =?utf-8?B?WmQ5REpRL1BJaUd4TDJ5WlFDNEptNXRZWWVsdWpDWklWMlo4dkJLZndaLzV6?=
+ =?utf-8?B?S2Q4QVV2ejE1UC9NZ0dVb1diQ1pEWEF4cjNXRXVBeDJTSFFrc2NQWEwweEl5?=
+ =?utf-8?B?dzNhS2MzRkFXT0xZejVFWStQbk81aUZEMnlaQUlHQ1F3ZFA3cjRXZ0oyWnVj?=
+ =?utf-8?B?aEpmTjNDL0tPNVE5WXEvcjZ5V3M4QmtHbXJjMENueHVVN2FQNysrbnlxVUlJ?=
+ =?utf-8?B?RGtnSlFUOEJSWHFiQUhQOTNWSFpQK1NjRWcvQmwralo2bkJNV1QrUldHMzJ3?=
+ =?utf-8?B?K0hObnNUeFhjTE9WMmlrNVRsblhCY3hNMWozbDUxM0hoNzJDbDhnckhYMmN6?=
+ =?utf-8?B?Rm1OeGxKT0RJbnVUWnk0SlFHMjNVd0ZIOG45ZWNNNXJPOGdlQ2VkNTIwTHZS?=
+ =?utf-8?B?UkVsRXBrdlZpRE5GYVFLVEtUQWVmYVBFUzRPcmMyMDVSODFmVGxKS2hxYUN3?=
+ =?utf-8?B?STFQSjRvd1c0M2cvMW1HK3RNdWdob2FwOGhDR3FGY3lPMzdHcHcyOTNCQXY0?=
+ =?utf-8?B?OElJWW9ObW5JVlFjL0xSRUkvRDBiTGkzWE9ROG1ZNHJHV1ZxOFpiQlNUUTZr?=
+ =?utf-8?B?bzQ1RndKdEl0RU9oTkp5KzRSMlJ1cVppWjdNM2hVOTVQRlZaMWtDRWdpT1hj?=
+ =?utf-8?B?SGJuTCtRclNmQ2l5MFhxYmxTRlFrZ1hKeWhYR2plOFFzQmJKaGZvL1Rsd2ta?=
+ =?utf-8?B?c1JkbTJxR0dEQ2NZSG1KOVRXeDhvcGhyK0NES3FGNXBYTGEyR3RHc21yVTEz?=
+ =?utf-8?B?a0ZkcDV2YUtGT3F1aHgxd1B2NzljT1pQbnI5MjZFdkdPZXF0dElCNXhZeDdS?=
+ =?utf-8?B?YXJDcGYrZFBDWGJreEt0NlcrQ1E2R0VEWnJlY3VEMXgxR0VsalhRUS9TZW5W?=
+ =?utf-8?B?MFBURlVGZnlnT05lRll4VW10alJRU2ZkOXBEbHZraUFXUGZRSUxCVXl5dFBB?=
+ =?utf-8?B?RW9Ec050dklqdWE2SFIvRG01amxlemRic09HVzdubVlCS3ZBdHR0THUwQUVI?=
+ =?utf-8?B?MEZtakZMbis4RU1OUUVkRnA2ZmpKZm1CTVRhTmhtTmtwRm56aVVDdW5haU1O?=
+ =?utf-8?B?SW45TWVxR0ZGTXBteGF1Z3FhY1hJT2lZcGRWT2cwVmpwNlJYa2wvWHdrSUxJ?=
+ =?utf-8?B?enhFeGdWQ2wya3I1eWI3SjRqOTVBQnNCUFNyOE9TdWFsbkxGRjBhNVUyZUZK?=
+ =?utf-8?B?U2hxSURkdXIvRXg1VUZtdEVmRTBoNFZjU0FPS1VtaWtmTXAyanVMamxIOHJv?=
+ =?utf-8?B?MlR6R3hybko1WFc1eUFMVThuZVgvWHpld1dUd0c5WFgxVmwrSlJPRVBEcnQw?=
+ =?utf-8?B?MEI5b2FEVjBsUVZvaXlyaTMxZi9vaXlrTGNKSzQ2eWNrNDJ4bVBYKzhXQ2d0?=
+ =?utf-8?B?UlNjcitKWjFGVEcvcTF3VGNCQmV1V1lqTG54TjZ6c0pzaEhpaWJvb01jbkJY?=
+ =?utf-8?B?UkFvd0V4RHpReVBRMzNjNFQ2S3h4M3dLTFlOaWxnckZHSmVnZFBRcnpUbTRv?=
+ =?utf-8?B?ZytQR1BkODY1WHpqZ08yeU9oOU9Rc3dvM1NTQ01LWEFucmNqYThVNFA3NldW?=
+ =?utf-8?B?MkhPQ3dXQ3pIY1I5Z002Y1YxbThQSldhcDNnUkNrRVp6TDlZbTdDVWE3YlJs?=
+ =?utf-8?B?ZGRFMXdRZDEvZVFLcHR5d0ZJcXg1RVFaWW0zb0VRUElUUFNURWRRR0dyeG90?=
+ =?utf-8?B?UDR4K2IveGhNbGxOdnFDNHQrZWt3RStzTFVtTTB4MUdMY2pCQVFDcmxMOXB4?=
+ =?utf-8?Q?mQvkqeOaUd5OGnWGFIv/noxjg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 993a939c-7444-4b4c-6adc-08dbb4fdfacf
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR12MB5346.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 08:38:33.4612
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iLAUI686uB35LCnnTuCAPuFkI2ydR4agnUET+xzp+bag9OUwtxo60HCGpeXUV0RNiOItmcxkTqvfWGOTjYg24Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5760
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace the existing skcipher CBC template with an lskcipher version.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/cbc.c | 159 +++++++++++++++++++--------------------------------
- 1 file changed, 59 insertions(+), 100 deletions(-)
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index 6c03e96b945f..28345b8d921c 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -5,8 +5,6 @@
-  * Copyright (c) 2006-2016 Herbert Xu <herbert@gondor.apana.org.au>
-  */
- 
--#include <crypto/algapi.h>
--#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-@@ -14,99 +12,71 @@
- #include <linux/log2.h>
- #include <linux/module.h>
- 
--static int crypto_cbc_encrypt_segment(struct skcipher_walk *walk,
--				      struct crypto_skcipher *skcipher)
-+static int crypto_cbc_encrypt_segment(struct crypto_lskcipher *tfm,
-+				      const u8 *src, u8 *dst, unsigned nbytes,
-+				      u8 *iv)
- {
--	unsigned int bsize = crypto_skcipher_blocksize(skcipher);
--	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	struct crypto_cipher *cipher;
--	struct crypto_tfm *tfm;
--	u8 *iv = walk->iv;
-+	unsigned int bsize = crypto_lskcipher_blocksize(tfm);
- 
--	cipher = skcipher_cipher_simple(skcipher);
--	tfm = crypto_cipher_tfm(cipher);
--	fn = crypto_cipher_alg(cipher)->cia_encrypt;
--
--	do {
-+	for (; nbytes >= bsize; src += bsize, dst += bsize, nbytes -= bsize) {
- 		crypto_xor(iv, src, bsize);
--		fn(tfm, dst, iv);
-+		crypto_lskcipher_encrypt(tfm, iv, dst, bsize, NULL);
- 		memcpy(iv, dst, bsize);
--
--		src += bsize;
--		dst += bsize;
--	} while ((nbytes -= bsize) >= bsize);
-+	}
- 
- 	return nbytes;
- }
- 
--static int crypto_cbc_encrypt_inplace(struct skcipher_walk *walk,
--				      struct crypto_skcipher *skcipher)
-+static int crypto_cbc_encrypt_inplace(struct crypto_lskcipher *tfm,
-+				      u8 *src, unsigned nbytes, u8 *oiv)
- {
--	unsigned int bsize = crypto_skcipher_blocksize(skcipher);
--	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	struct crypto_cipher *cipher;
--	struct crypto_tfm *tfm;
--	u8 *iv = walk->iv;
-+	unsigned int bsize = crypto_lskcipher_blocksize(tfm);
-+	u8 *iv = oiv;
- 
--	cipher = skcipher_cipher_simple(skcipher);
--	tfm = crypto_cipher_tfm(cipher);
--	fn = crypto_cipher_alg(cipher)->cia_encrypt;
-+	if (nbytes < bsize)
-+		goto out;
- 
- 	do {
- 		crypto_xor(src, iv, bsize);
--		fn(tfm, src, src);
-+		crypto_lskcipher_encrypt(tfm, src, src, bsize, NULL);
- 		iv = src;
- 
- 		src += bsize;
- 	} while ((nbytes -= bsize) >= bsize);
- 
--	memcpy(walk->iv, iv, bsize);
-+	memcpy(oiv, iv, bsize);
- 
-+out:
- 	return nbytes;
- }
- 
--static int crypto_cbc_encrypt(struct skcipher_request *req)
-+static int crypto_cbc_encrypt(struct crypto_lskcipher *tfm, const u8 *src,
-+			      u8 *dst, unsigned len, u8 *iv, bool final)
- {
--	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
--	struct skcipher_walk walk;
--	int err;
-+	struct crypto_lskcipher **ctx = crypto_lskcipher_ctx(tfm);
-+	struct crypto_lskcipher *cipher = *ctx;
-+	int rem;
- 
--	err = skcipher_walk_virt(&walk, req, false);
-+	if (src == dst)
-+		rem = crypto_cbc_encrypt_inplace(cipher, dst, len, iv);
-+	else
-+		rem = crypto_cbc_encrypt_segment(cipher, src, dst, len, iv);
- 
--	while (walk.nbytes) {
--		if (walk.src.virt.addr == walk.dst.virt.addr)
--			err = crypto_cbc_encrypt_inplace(&walk, skcipher);
--		else
--			err = crypto_cbc_encrypt_segment(&walk, skcipher);
--		err = skcipher_walk_done(&walk, err);
--	}
--
--	return err;
-+	return rem && final ? -EINVAL : rem;
- }
- 
--static int crypto_cbc_decrypt_segment(struct skcipher_walk *walk,
--				      struct crypto_skcipher *skcipher)
-+static int crypto_cbc_decrypt_segment(struct crypto_lskcipher *tfm,
-+				      const u8 *src, u8 *dst, unsigned nbytes,
-+				      u8 *oiv)
- {
--	unsigned int bsize = crypto_skcipher_blocksize(skcipher);
--	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	struct crypto_cipher *cipher;
--	struct crypto_tfm *tfm;
--	u8 *iv = walk->iv;
-+	unsigned int bsize = crypto_lskcipher_blocksize(tfm);
-+	const u8 *iv = oiv;
- 
--	cipher = skcipher_cipher_simple(skcipher);
--	tfm = crypto_cipher_tfm(cipher);
--	fn = crypto_cipher_alg(cipher)->cia_decrypt;
-+	if (nbytes < bsize)
-+		goto out;
- 
- 	do {
--		fn(tfm, dst, src);
-+		crypto_lskcipher_decrypt(tfm, src, dst, bsize, NULL);
- 		crypto_xor(dst, iv, bsize);
- 		iv = src;
- 
-@@ -114,83 +84,72 @@ static int crypto_cbc_decrypt_segment(struct skcipher_walk *walk,
- 		dst += bsize;
- 	} while ((nbytes -= bsize) >= bsize);
- 
--	memcpy(walk->iv, iv, bsize);
-+	memcpy(oiv, iv, bsize);
- 
-+out:
- 	return nbytes;
- }
- 
--static int crypto_cbc_decrypt_inplace(struct skcipher_walk *walk,
--				      struct crypto_skcipher *skcipher)
-+static int crypto_cbc_decrypt_inplace(struct crypto_lskcipher *tfm,
-+				      u8 *src, unsigned nbytes, u8 *iv)
- {
--	unsigned int bsize = crypto_skcipher_blocksize(skcipher);
--	void (*fn)(struct crypto_tfm *, u8 *, const u8 *);
--	unsigned int nbytes = walk->nbytes;
--	u8 *src = walk->src.virt.addr;
-+	unsigned int bsize = crypto_lskcipher_blocksize(tfm);
- 	u8 last_iv[MAX_CIPHER_BLOCKSIZE];
--	struct crypto_cipher *cipher;
--	struct crypto_tfm *tfm;
- 
--	cipher = skcipher_cipher_simple(skcipher);
--	tfm = crypto_cipher_tfm(cipher);
--	fn = crypto_cipher_alg(cipher)->cia_decrypt;
-+	if (nbytes < bsize)
-+		goto out;
- 
- 	/* Start of the last block. */
- 	src += nbytes - (nbytes & (bsize - 1)) - bsize;
- 	memcpy(last_iv, src, bsize);
- 
- 	for (;;) {
--		fn(tfm, src, src);
-+		crypto_lskcipher_decrypt(tfm, src, src, bsize, NULL);
- 		if ((nbytes -= bsize) < bsize)
- 			break;
- 		crypto_xor(src, src - bsize, bsize);
- 		src -= bsize;
- 	}
- 
--	crypto_xor(src, walk->iv, bsize);
--	memcpy(walk->iv, last_iv, bsize);
-+	crypto_xor(src, iv, bsize);
-+	memcpy(iv, last_iv, bsize);
- 
-+out:
- 	return nbytes;
- }
- 
--static int crypto_cbc_decrypt(struct skcipher_request *req)
-+static int crypto_cbc_decrypt(struct crypto_lskcipher *tfm, const u8 *src,
-+			      u8 *dst, unsigned len, u8 *iv, bool final)
- {
--	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
--	struct skcipher_walk walk;
--	int err;
-+	struct crypto_lskcipher **ctx = crypto_lskcipher_ctx(tfm);
-+	struct crypto_lskcipher *cipher = *ctx;
-+	int rem;
- 
--	err = skcipher_walk_virt(&walk, req, false);
-+	if (src == dst)
-+		rem = crypto_cbc_decrypt_inplace(cipher, dst, len, iv);
-+	else
-+		rem = crypto_cbc_decrypt_segment(cipher, src, dst, len, iv);
- 
--	while (walk.nbytes) {
--		if (walk.src.virt.addr == walk.dst.virt.addr)
--			err = crypto_cbc_decrypt_inplace(&walk, skcipher);
--		else
--			err = crypto_cbc_decrypt_segment(&walk, skcipher);
--		err = skcipher_walk_done(&walk, err);
--	}
--
--	return err;
-+	return rem && final ? -EINVAL : rem;
- }
- 
- static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
--	struct skcipher_instance *inst;
--	struct crypto_alg *alg;
-+	struct lskcipher_instance *inst;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb);
-+	inst = lskcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
--	alg = skcipher_ialg_simple(inst);
--
- 	err = -EINVAL;
--	if (!is_power_of_2(alg->cra_blocksize))
-+	if (!is_power_of_2(inst->alg.co.base.cra_blocksize))
- 		goto out_free_inst;
- 
- 	inst->alg.encrypt = crypto_cbc_encrypt;
- 	inst->alg.decrypt = crypto_cbc_decrypt;
- 
--	err = skcipher_register_instance(tmpl, inst);
-+	err = lskcipher_register_instance(tmpl, inst);
- 	if (err) {
- out_free_inst:
- 		inst->free(inst);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 9/8/2023 2:58 AM, Tom Lendacky wrote:
+> On 9/7/23 13:48, Mario Limonciello wrote:
+>> Some platforms that support dynamic boost control (DBC) support it via
+>> a different mailbox than the platform access mailbox.
+>>
+>> This series adds support for those platforms.
+>>
+>> It is tested on top of the fixes series. The prerequisite patches refer
+>> to that series.
+>> Link: https://lore.kernel.org/linux-crypto/20230829150759.156126-1-mario.limonciello@amd.com/T/#m47782729377f6fe5d62130cc701dae7f15306726
+>>
+>> Mario Limonciello (4):
+>>    crypto: ccp: Add support for extended PSP mailbox commands
+>>    crypto: ccp: Add a communication path abstraction for DBC
+>>    crypto: ccp: Add a macro to check capabilities register
+>>    crypto: ccp: Add support for DBC over PSP mailbox
+>>
+>> Tom Lendacky (1):
+>>    crypto: ccp: Move direct access to some PSP registers out of TEE
+>>
+>>   drivers/crypto/ccp/dbc.c     |  72 ++++++++++++++-------
+>>   drivers/crypto/ccp/dbc.h     |  29 +++------
+>>   drivers/crypto/ccp/psp-dev.c | 122 ++++++++++++++++++++++++++++-------
+>>   drivers/crypto/ccp/psp-dev.h |  55 ++++++++++++++++
+>>   drivers/crypto/ccp/sp-dev.h  |   4 ++
+>>   drivers/crypto/ccp/sp-pci.c  |  22 ++++---
+>>   drivers/crypto/ccp/tee-dev.c |  48 +++-----------
+>>   drivers/crypto/ccp/tee-dev.h |  15 +----
+>>   8 files changed, 241 insertions(+), 126 deletions(-)
+>>
+> 
+> Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> But I would like to see a Reviewed-by: or Tested-by: from Rijo-john for the TEE changes.
+> 
 
+Done.
+
+Acked-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
+
+Thanks,
+Rijo
+
+> Thanks,
+> Tom
+> 
+>>
+>> base-commit: 7ba2090ca64ea1aa435744884124387db1fac70f
+>> prerequisite-patch-id: 4bcf7f3ea21472e4e28c2457cc9827f6023ec6ca
+>> prerequisite-patch-id: 903be53a20306f0188e52015dbfe5196738bb2eb
+>> prerequisite-patch-id: af396bafb6acaa9c203c1a2c5f4665171cb45e4f
+>> prerequisite-patch-id: abe450d4bf1de4a5664a41dbf84e72b1d4bfdae7
+>> prerequisite-patch-id: b0b9cf55fcb73a11de6f3da73412fb090562857a
