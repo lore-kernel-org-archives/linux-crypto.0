@@ -2,128 +2,82 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 726C5EEAA40
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 14:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66305EEAA50
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Sep 2023 15:04:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233954AbjINOZQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 10:25:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39356 "EHLO
+        id S233654AbjINPE0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 11:04:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239857AbjINOZP (ORCPT
+        with ESMTP id S231339AbjINPEZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 10:25:15 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7613115
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 07:25:10 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-501bef6e0d3so1723276e87.1
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 07:25:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1694701509; x=1695306309; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HsrwoDLjRwnaUZYSy5S/KIF4yMwSVKMWZIEdp6t3G5c=;
-        b=I9XekOl9Ud1KpV86uwCBAIDZrgJoTvDFVWUYZfRvmYr9BaqhWiq85cK7nGOG442iED
-         +M18iqa//ZbsN8XStk2NXvTa/SN8+GHFAILZgq1M772EPnCBF2chqjgIswTqZS2x3rsv
-         6ANKPWaYh7ccdsqXBn3lSAHQx6AaKcljeDsNa4VQIrN8A5zLLLRanjeNiE2coKCdRM0T
-         HGvQGliQg8UZQthvlw40bUllQZ/Nfz7gR/MW/KnyWbD7NJZIb1Eg0Cj0jifpahOkcd3T
-         ygHZEZh6glZPxtBruw3Rx2T8gkNwVNxu/tvylCF9Cu7EWs9kpngOhdU235O4QDzHEMfj
-         620A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694701509; x=1695306309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HsrwoDLjRwnaUZYSy5S/KIF4yMwSVKMWZIEdp6t3G5c=;
-        b=gCD62MSJ3FuZwFE7vohXy9YW4pLf/TbVfQ6XgvemgoAS7KSWDs3Bc0igFivtdf9bSO
-         EPrRRNz6JTyNSb8wKRx7YRQKmfPcrZEEIxbULxVNxWBAuA3gyvDHGeC2eMrV6mpHdnxL
-         xHEhd0i87RCfyIZezwm3XwS75rVO1CAZi7jaOeihfHaB0sin0WtW0rS2IGofuOqSkDb1
-         WhKEdqGou4qyNFALliN8KN6Oo7jTgmdjaXQWvOVHZfrAAR57WmV1bqE2xWaLLJj7VDB/
-         iaqRFfoh7z2YTryUwgxOGqPdnBqbGG8Lt6fipkyoBYA2IdAsTFVUyepqelyhdTztA1Xh
-         nV9Q==
-X-Gm-Message-State: AOJu0YzD0praE8aW8Gf+ecq0H4nxl6akqPRK5ifZlufZaTNPOQ4DKNmL
-        zYETDHlOvH8uF5/jp1yzMI6jGjR5uIrM2cYlohOQzHovr1ZbCHUG
-X-Google-Smtp-Source: AGHT+IFyq+HOt9ZCbHlcgwJ92zFW7w8JnSXnuczSf+sy7/bCSbqTHrj1vp8l9l0tUJyltYlfynCBiC2Z1KNZnnePLY0=
-X-Received: by 2002:a05:6512:3988:b0:4f8:7124:6803 with SMTP id
- j8-20020a056512398800b004f871246803mr5641252lfu.35.1694701509009; Thu, 14 Sep
- 2023 07:25:09 -0700 (PDT)
+        Thu, 14 Sep 2023 11:04:25 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74884A8
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 08:04:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694703861; x=1726239861;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=d3b+C/s+RnudP39Pmx4QBFz10hc7w8wC3jmwFuFaDvE=;
+  b=VIaO/4zlE1ODUa6XK1Eh8Ss5bG+5hDIdfT05tw8MvYXYLaeTHPGb4KA1
+   CYT66dXcZmTahU7RARnBcwtkYkJInqlTBrzYksOo8hj8HEY5wsW8Q0vf1
+   iBXxFFuf4D85RZbeNJqf+bA5wcNnt3yL/7L1fYpki4V0ihOqYq/xKuCwh
+   EffEHTGYK89mSpJwpQ6ChIGuNHUehwJx+LEyutPrFheqLKsDd6g7NtoRY
+   9wBUNu7DBTuP7zL1kfiAW9YM/wVXnBIWSzyjyDZU8dDaAfRKCH9OFx2/7
+   qJXUqmwGHxGKHhm8hyNu8lk3R+BwMrt9Rmen/NlZNmYYbto22XhKKqpit
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="381679542"
+X-IronPort-AV: E=Sophos;i="6.02,146,1688454000"; 
+   d="scan'208";a="381679542"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 07:34:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="810089372"
+X-IronPort-AV: E=Sophos;i="6.02,146,1688454000"; 
+   d="scan'208";a="810089372"
+Received: from silpixa00400295.ir.intel.com ([10.237.213.194])
+  by fmsmga008.fm.intel.com with ESMTP; 14 Sep 2023 07:34:52 -0700
+From:   Adam Guerin <adam.guerin@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Adam Guerin <adam.guerin@intel.com>
+Subject: [PATCH 0/2] enable dc chaining service
+Date:   Thu, 14 Sep 2023 15:14:11 +0100
+Message-Id: <20230914141413.466155-1-adam.guerin@intel.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-References: <20230912115728.172982-1-bjorn@kernel.org> <20230914-roaming-plunging-948c78d9831c@wendy>
- <87pm2kap1p.fsf@all.your.base.are.belong.to.us> <20230914-float-uneven-7cd1a18b3978@wendy>
- <87zg1o3kpd.fsf@all.your.base.are.belong.to.us> <20230914-squad-ripping-e8c98e2d336b@spud>
-In-Reply-To: <20230914-squad-ripping-e8c98e2d336b@spud>
-From:   Andy Chiu <andy.chiu@sifive.com>
-Date:   Thu, 14 Sep 2023 22:24:57 +0800
-Message-ID: <CABgGipW6NhfOstpe-P7RZeaF-w72GLqiE2sxLsZVzJx1AC6kqA@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/6] RISC-V BLAKE2s Vector implementation
-To:     Conor Dooley <conor@kernel.org>
-Cc:     =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-riscv@lists.infradead.org,
-        Greentime Hu <greentime.hu@sifive.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Organisation: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare, Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 10:18=E2=80=AFPM Conor Dooley <conor@kernel.org> wr=
-ote:
->
-> On Thu, Sep 14, 2023 at 04:15:10PM +0200, Bj=C3=B6rn T=C3=B6pel wrote:
-> > Conor Dooley <conor.dooley@microchip.com> writes:
-> >
-> > > On Thu, Sep 14, 2023 at 02:59:30PM +0200, Bj=C3=B6rn T=C3=B6pel wrote=
-:
-> > >> Conor Dooley <conor.dooley@microchip.com> writes:
-> > >>
-> > >> > On Tue, Sep 12, 2023 at 01:57:22PM +0200, Bj=C3=B6rn T=C3=B6pel wr=
-ote:
-> > >> >> From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
-> > >> >>
-> > >> >> Hi,
-> > >> >>
-> > >> >> This is Andy's kernel mode vector V2 series [1], with my BLAKE2s
-> > >> >> AVX-512-to-RISC-V translation patch appended.
-> > >> >>
-> > >> >> I've tagged it as RFC, since Andy's series is still not in-tree y=
-et.
-> > >> >>
-> > >> >> It's a first step towards a Vector aided Wireguard! ;-)
-> > >> >
-> > >> > This has the same problems as Andy's stuff & doesn't build properl=
-y for the
-> > >> > automation. What is the plan between yourself and Andy for submitt=
-ing a
-> > >> > version of the in-kernel vector support that passes build testing?
-> > >>
-> > >> I'll synch up with Andy! I'm not even sure the blake2s patch should =
-part
-> > >> of the "in-kernel vector" series at all.
+This set adds a new configuration option for QAT GEN4 devices allowing the
+device to now be configured for chained compression operations in userspace.
+Refactoring data structures relating to device configuration to avoid
+duplication.
 
-Hi, yes, I have a plan to fix it recently. Please expect a respin of
-the kernel-mode vector in 1~2 weeks, if this doesn't seem too long to
-you.
+Adam Guerin (1):
+  crypto: qat - enable dc chaining service
 
-> > >
-> > > The in-kernel vector stuff should come with a user, otherwise it's de=
-ad
-> > > code :)
-> >
-> > Sure, just so we're on the same page; Patch 3 (Vector XOR) is a user
-> > from my perspective, no?
->
-> D'oh
+Giovanni Cabiddu (1):
+  crypto: qat - consolidate services structure
 
-Thanks,
-Andy
+ Documentation/ABI/testing/sysfs-driver-qat    |  2 +
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     | 56 ++++++++++---------
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   | 34 ++---------
+ .../crypto/intel/qat/qat_common/adf_admin.c   | 39 +++++++++++--
+ .../intel/qat/qat_common/adf_cfg_services.h   | 34 +++++++++++
+ .../intel/qat/qat_common/adf_cfg_strings.h    |  1 +
+ .../crypto/intel/qat/qat_common/adf_sysfs.c   | 17 +-----
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |  1 +
+ 8 files changed, 113 insertions(+), 71 deletions(-)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cfg_services.h
+
+
+base-commit: ed12943d6c00be183e876059089792b94f9d3790
+-- 
+2.40.1
+
