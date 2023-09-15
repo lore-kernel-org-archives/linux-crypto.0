@@ -2,98 +2,83 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06320EE6456
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12973EE6457
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 11:18:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232404AbjIOKqm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 06:46:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
+        id S230153AbjIOLSy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 07:18:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjIOKql (ORCPT
+        with ESMTP id S232147AbjIOLSx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 06:46:41 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5964F106;
-        Fri, 15 Sep 2023 03:46:36 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c43fe0c0bfso1615775ad.1;
-        Fri, 15 Sep 2023 03:46:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694774796; x=1695379596; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sSl/jwqe6RV3E0AIS7y6p1IAA1dCImMj5GR2Th+oWW0=;
-        b=ak3BdVRpa26zD/0oraNbY05qLIu8OvJr+Pts6hVR7s3Tz4eRDERd2H2LQRA0nMBJKe
-         J8jvFs7jfishtD0aGPQq6dKN/G1rzs1JleCc0BcwU82qFwv7nrRhl319tHNZBR1rK/2C
-         ByR359MbA74ogLuS7lH3UAMc+1g33gWstoiF8pjZRroxHasEpDAmE0NAkEAI2GZIKksG
-         7b8WCCcyp3l+ACjv4KPuM1lVHKgZwFlGfdxFGJHjRSpd1sO/srzITO9/isgzUkg4rJSh
-         e9t0o1EWF759Rl4Qf2v/ec+7IXDrB9GZlUFrm4Q3IDvlndw6W/kKyNTYDuVYD7lUSKZd
-         eBeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694774796; x=1695379596;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sSl/jwqe6RV3E0AIS7y6p1IAA1dCImMj5GR2Th+oWW0=;
-        b=OqLtWLoaxgHK7nXXVWaIxky5LFGOE2Xjzk51TO63ypuarslM993gtLtkmcDHtfqggK
-         Htn+YlZi2d0IqeB7uPlIiBTKfpzgSPDnLPNzIxEejSQa0AcIz+R8SAjcGEuIfo2Us94z
-         2OyaMTLVALUD9Zf0XVNIVq1bavsY0bi5Nfo/Nd0tRQAJWhxtOQ/uBLxuimTEzgOW6lxn
-         VSCPCM6I9iZXrhOK5vF+8Nye6xzldZUnlFacOZe/uXFTccqekTSd0loEvG6+U9tyoTpu
-         RSPZ0HCV8W+1Oyo4oOAW/RkFN7nDwHt/jUaMfqDhW9GiF2R+P8YOoC+wMBtbsglFw61V
-         ju7A==
-X-Gm-Message-State: AOJu0Yyj1D3Rz+1PdqQArS9qfcEayKYU8ZnyTigmDk8VAOxiWQNTCQS9
-        nKqzLTmXxpla0MSDcKHyvf4=
-X-Google-Smtp-Source: AGHT+IEzXBmfXb/LKt9bJszwrWMGs2Jy9iUH3YJ3pOjhoVSFEReOW/GFXDqdF1jBJyVcUSgJGjiHsg==
-X-Received: by 2002:a17:902:f814:b0:1c4:3e6a:7ad4 with SMTP id ix20-20020a170902f81400b001c43e6a7ad4mr474188plb.13.1694774795719;
-        Fri, 15 Sep 2023 03:46:35 -0700 (PDT)
-Received: from gondor.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
-        by smtp.gmail.com with ESMTPSA id m2-20020a170902768200b001acae9734c0sm3161284pll.266.2023.09.15.03.46.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 03:46:35 -0700 (PDT)
-Sender: Herbert Xu <herbertx@gmail.com>
-Date:   Fri, 15 Sep 2023 18:46:34 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jonas Gorski <jonas.gorski@gmail.com>
-Cc:     Andres Salomon <dilinger@queued.net>,
-        Olivia Mackall <olivia@selenic.com>,
-        Xiongfeng Wang <wangxiongfeng2@huawei.com>,
-        "Timur I . Davletshin" <timur.davletshin@gmail.com>,
-        Jo-Philipp Wich <jo@mein.io>, linux-geode@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: geode: fix accessing registers
-Message-ID: <ZQQ2Cv1uL/YVxNBb@gondor.apana.org.au>
-References: <20230910083418.8990-1-jonas.gorski@gmail.com>
+        Fri, 15 Sep 2023 07:18:53 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E46A7101
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 04:18:46 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R941e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---0Vs7-ZUD_1694776723;
+Received: from 30.240.107.178(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Vs7-ZUD_1694776723)
+          by smtp.aliyun-inc.com;
+          Fri, 15 Sep 2023 19:18:44 +0800
+Message-ID: <6f11a61f-1575-2886-0198-1f5947f9f835@linux.alibaba.com>
+Date:   Fri, 15 Sep 2023 19:18:42 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230910083418.8990-1-jonas.gorski@gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [bug report] lib/mpi: Extend the MPI library
+Content-Language: en-US
+To:     Dan Carpenter <dan.carpenter@linaro.org>
+Cc:     linux-crypto@vger.kernel.org
+References: <800d9813-af24-4b4a-ba0f-45a37515902c@moroto.mountain>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <800d9813-af24-4b4a-ba0f-45a37515902c@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Sep 10, 2023 at 10:34:17AM +0200, Jonas Gorski wrote:
-> When the membase and pci_dev pointer were moved to a new struct in priv,
-> the actual membase users were left untouched, and they started reading
-> out arbitrary memory behind the struct instead of registers. This
-> unfortunately turned the RNG into a constant number generator, depending
-> on the content of what was at that offset.
-> 
-> To fix this, update geode_rng_data_{read,present}() to also get the
-> membase via amd_geode_priv, and properly read from the right addresses
-> again.
-> 
-> Fixes: 9f6ec8dc574e ("hwrng: geode - Fix PCI device refcount leak")
-> Reported-by: Timur I. Davletshin <timur.davletshin@gmail.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217882
-> Tested-by: Timur I. Davletshin <timur.davletshin@gmail.com>
-> Suggested-by: Jo-Philipp Wich <jo@mein.io>
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> ---
->  drivers/char/hw_random/geode-rng.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+Hi, Dan Carpenter,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 9/15/23 3:21 PM, Dan Carpenter wrote:
+> Hello Tianjia Zhang,
+> 
+> The patch a8ea8bdd9df9: "lib/mpi: Extend the MPI library" from Sep
+> 21, 2020 (linux-next), leads to the following Smatch static checker
+> warning:
+> 
+> lib/crypto/mpi/mpiutil.c:202 mpi_copy() error: potential null dereference 'b'.  (mpi_alloc returns null)
+> lib/crypto/mpi/mpiutil.c:224 mpi_alloc_like() error: potential null dereference 'b'.  (mpi_alloc returns null)
+> lib/crypto/mpi/mpiutil.c:258 mpi_set() error: potential null dereference 'w'.  (<unknown> returns null)
+> lib/crypto/mpi/mpiutil.c:277 mpi_set_ui() error: potential null dereference 'w'.  (<unknown> returns null)
+> lib/crypto/mpi/mpiutil.c:289 mpi_alloc_set_ui() error: potential null dereference 'w'.  (mpi_alloc returns null)
+> 
+> lib/crypto/mpi/mpiutil.c
+>      195 MPI mpi_copy(MPI a)
+>      196 {
+>      197         int i;
+>      198         MPI b;
+>      199
+>      200         if (a) {
+>      201                 b = mpi_alloc(a->nlimbs);
+> 
+> Allocations can fail.
+> 
+> --> 202                 b->nlimbs = a->nlimbs;
+>      203                 b->sign = a->sign;
+>      204                 b->flags = a->flags;
+>      205                 b->flags &= ~(16|32); /* Reset the immutable and constant flags. */
+>      206                 for (i = 0; i < b->nlimbs; i++)
+>      207                         b->d[i] = a->d[i];
+>      208         } else
+>      209                 b = NULL;
+>      210         return b;
+>      211 }
+> 
+> regards,
+> dan carpenter
+
+Thanks for reminding me, these are some remaining issues that needs more
+modifications. I will take the time to fix them.
+
+Cheers,
+Tianjia
