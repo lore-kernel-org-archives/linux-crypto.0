@@ -2,174 +2,149 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 380D9EE6452
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4C6EE6456
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234095AbjIOKZz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 06:25:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36528 "EHLO
+        id S232797AbjIOKde (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 06:33:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234273AbjIOKZx (ORCPT
+        with ESMTP id S229527AbjIOKdd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 06:25:53 -0400
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E4A33A90
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:23:31 -0700 (PDT)
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 4D8CC3F04B
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 10:23:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1694773407;
-        bh=z7JHAgWlYbo6190D8eD4+RynEQye8I21JfDjXnFF0Ck=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-        b=pAWESwKbofXfirKQ+cu2GippwrcotREwgJ54a47CcWzLElpmUEpadEShek2P8Ob+g
-         TQ0mG/8px4AIq/RjsyDUITFlluo2Aed8XeaM8zSZK0IlSSLDtgglyRp9I/gfmjto6t
-         bMVv6SzWDLqe1bjsnTOMw/0SULcybFd6vgEoHboleE/dlj+LG/5tuf7NEgT1sTZ4TY
-         DWHyO+xoHHGgzLqahCt2BH/KCXiv7YhPOXMUc5j6OWjIEw+jiOEXz+f8+6BCx8qTh8
-         IBs89jqDa7XQw297bvsgrwUsH1TYmz2G8f31rmxQEo2BJ2MYg2Es9QdvI0/+VisMjt
-         l+iDkDjGMLrww==
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99bcb13d8ddso142593966b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:23:27 -0700 (PDT)
+        Fri, 15 Sep 2023 06:33:33 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A3EA8
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:33:27 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99c136ee106so259895466b.1
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694774006; x=1695378806; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AHNXmBxDw1apCLxAkHOvDRkSwOFlN5lNz8sn0ic2gIM=;
+        b=VPsVL5xRkvbuvEgWP0ER5qiuhLMWxCjPNEeFcFdGl/JkhtMlJaYfpRkkzH6Di2OMNm
+         aByN0vvnplJuNI9Ezt322xJasx7pkndsOn1z1DaLi3XC2O38SC3CR/GS0vj2NgG5l5Vw
+         gyuVJhFFDBQbP0+COl2imyqZF1HW6D2ZCm2jx8zKl+jSLTKywCrBFC49t70UPkhVpMZI
+         AhfTbClL6fjWnptS/eDw0WD3vviUrWcg7PEdavIBlK5txrIjWL5oG2ER9AKPp0/MZA5y
+         Jvul2gadtuS+FNmfkwZsCD7oqlPoAKdJJy4gPkS6Fwy3/UTKOOJBcKrSsNhlIwHgUbQ+
+         0HPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694773406; x=1695378206;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z7JHAgWlYbo6190D8eD4+RynEQye8I21JfDjXnFF0Ck=;
-        b=k2r+5NrhpvrJdTqnl7j3pe1aMvuok77NKmvnvCUk9G9WQGgxrPIXdvUZ/ZZNqMyXN4
-         6pW4cCWVe5MXoWJ+r/XThCBqGe0y37GFdChLc3KbhHdt866h6iXZI2vLDDpnAqRXEqoa
-         EJ8KVFjlmdEWyOChDrFlObBlNSgRAh6LJfotm11Y1ozgUc/ELRbn3FcB3uWJHm+Appjm
-         uJJoST0eQ55SUUyA8M8TYNmYsBZWWGtu1u4a5vWmL8hxCSRsW0d6oXGw4ATHGrw701Fz
-         S9B2xqDuzMX4TH05veSRh/xX4leJ6e67vBCStv/Nvmu/feR8F7ekLFrqxAFXNBmsZznp
-         uYLw==
-X-Gm-Message-State: AOJu0YzUr41BuO4OE5gU7/lfYdUn0sGBxecciXNuEMR57Xd9EVt3MxLq
-        dXIPqWoKYW32oHVhhWMGmiVF7UpvuNkzFttWdrvZrjFbqRzzewzXyY8dTmIlngba0LsTJJbP6TD
-        uFVPZXS91bpfN9pIyy4xArKgmltqrSb8uPzDK7l7Fsg==
-X-Received: by 2002:a17:907:784f:b0:9a2:2635:daa8 with SMTP id lb15-20020a170907784f00b009a22635daa8mr941248ejc.56.1694773406593;
-        Fri, 15 Sep 2023 03:23:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG+FiyghSmdvhT78+MTXJZGFKg/xOgd32F1+tb9mlsD409KTBDcb1ilWTv89DV9DYE//HViLA==
-X-Received: by 2002:a17:907:784f:b0:9a2:2635:daa8 with SMTP id lb15-20020a170907784f00b009a22635daa8mr941235ejc.56.1694773406299;
-        Fri, 15 Sep 2023 03:23:26 -0700 (PDT)
-Received: from work.lan (77-169-125-32.fixed.kpn.net. [77.169.125.32])
-        by smtp.gmail.com with ESMTPSA id o9-20020a170906600900b0099bcd1fa5b0sm2189818ejj.192.2023.09.15.03.23.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 03:23:25 -0700 (PDT)
-From:   Roxana Nicolescu <roxana.nicolescu@canonical.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com
-Cc:     x86@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: x86 - load optimized sha1/sha256 modules based on CPU features
-Date:   Fri, 15 Sep 2023 12:23:25 +0200
-Message-Id: <20230915102325.35189-1-roxana.nicolescu@canonical.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1694774006; x=1695378806;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AHNXmBxDw1apCLxAkHOvDRkSwOFlN5lNz8sn0ic2gIM=;
+        b=B3TyoNhOKuifNpn66fEALDfOTSL04zRp9rybYLU55TKFQcOwibcGofYC9uD+1lCGCz
+         2cFsCoPQ45lBLRj9/ZKr8zV+SVKzYN9WZoO5SqisQ9xLhhpbP0+R8fiiWRT4ybgLLg1/
+         vlwIjjwgG5auwJhCl4anSp4ixKHMAS5RayCGZC7H0CHmJPStg+dvjrUplEOcDET9xwW5
+         MSZUGxd540Gy309V6VBte4xw3r4zG1dU+m50I/x7WnLpJqQFJHEJuSc7U8NIJPafBAmT
+         7Qcqfb3IPa3gPVXs7JO0CRbZQbdJg0JrCPUMfscb3kWcDX8GEq2m9bidbUErOgJ+jjrH
+         qYGQ==
+X-Gm-Message-State: AOJu0YzDTwETbxI0zrM81PRQuohv5zcn6g7qa318wdxXiffWTNEoMeLO
+        09VUq9Agn6b/k5Wu5qbttQZ9Dw==
+X-Google-Smtp-Source: AGHT+IHJvOEsaBTHM8g8l1b4WaIw/WLvZKGU9znyrRyylohvQ/GtYWnnh3DUhsMGba8RbxKv1HP+iw==
+X-Received: by 2002:a17:906:18aa:b0:9a5:d657:47e1 with SMTP id c10-20020a17090618aa00b009a5d65747e1mr1032731ejf.43.1694774006100;
+        Fri, 15 Sep 2023 03:33:26 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.214.188])
+        by smtp.gmail.com with ESMTPSA id n4-20020a170906088400b009928b4e3b9fsm2232224eje.114.2023.09.15.03.33.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Sep 2023 03:33:25 -0700 (PDT)
+Message-ID: <726e7f51-ce2c-5ac1-5347-21d6cf40c8c8@linaro.org>
+Date:   Fri, 15 Sep 2023 12:33:23 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH 07/10] dt-bindings: rng: add st,rng-lock-conf
+Content-Language: en-US
+To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
+        Rob Herring <robh@kernel.org>
+Cc:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
+ <20230908165120.730867-8-gatien.chevallier@foss.st.com>
+ <20230911150958.GA1255978-robh@kernel.org>
+ <4819d89b-c2a4-0c75-27e1-d8122827ceca@foss.st.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <4819d89b-c2a4-0c75-27e1-d8122827ceca@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-x86 optimized crypto modules are built as modules rather than build-in and
-they are not loaded when the crypto API is initialized, resulting in the
-generic builtin module (sha1-generic) being used instead.
+On 15/09/2023 11:28, Gatien CHEVALLIER wrote:
+> Hello Rob,
+> 
+> On 9/11/23 17:09, Rob Herring wrote:
+>> On Fri, Sep 08, 2023 at 06:51:17PM +0200, Gatien Chevallier wrote:
+>>> If st,rng-lock-conf is set, the RNG configuration in RNG_CR, RNG_HTCR
+>>> and RNG_NSCR will be locked. It is supported starting from the RNG
+>>> version present in the STM32MP13
+>>
+>> This should be squashed into the prior binding patch.
+>>
+>>>
+>>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>>> ---
+>>>   .../devicetree/bindings/rng/st,stm32-rng.yaml      | 14 ++++++++++++++
+>>>   1 file changed, 14 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+>>> index 59abdc85a9fb..0055f14a8e3f 100644
+>>> --- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+>>> +++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+>>> @@ -37,6 +37,20 @@ required:
+>>>     - reg
+>>>     - clocks
+>>>   
+>>> +allOf:
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            enum:
+>>> +              - st,stm32mp13-rng
+>>> +    then:
+>>> +      properties:
+>>> +        st,rng-lock-conf:
+>>> +          type: boolean
+>>> +          description: If set, the RNG configuration in RNG_CR, RNG_HTCR and
+>>> +                       RNG_NSCR will be locked.
+>>
+>> Define the property at the top-level and then restrict its presence in
+>> a if/then schema.
+>>
+> 
+> Can you please point me to an example of such case. I can't find a way
+> to define at the top-level the property then restrict it to specific
+> compatibles.
 
-It was discovered when creating a sha1/sha256 checksum of a 2Gb file by
-using kcapi-tools because it would take significantly longer than creating
-a sha512 checksum of the same file. trace-cmd showed that for sha1/256 the
-generic module was used, whereas for sha512 the optimized module was used
-instead.
+You can check my slides from the talks about not reaching 10 iterations
+of bindings patches.
 
-Add module aliases() for these x86 optimized crypto modules based on CPU
-feature bits so udev gets a chance to load them later in the boot
-process. This resulted in ~3x decrease in the real-time execution of
-kcapi-dsg.
+Or open example-schema (this should be your starting point):
+https://elixir.bootlin.com/linux/v5.19/source/Documentation/devicetree/bindings/example-schema.yaml#L212
 
-Fix is inspired from commit
-aa031b8f702e ("crypto: x86/sha512 - load based on CPU features")
-where a similar fix was done for sha512.
 
-Cc: stable@vger.kernel.org # 5.15+
-Suggested-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Suggested-by: Julian Andres Klode <julian.klode@canonical.com>
-Signed-off-by: Roxana Nicolescu <roxana.nicolescu@canonical.com>
----
- arch/x86/crypto/sha1_ssse3_glue.c   | 12 ++++++++++++
- arch/x86/crypto/sha256_ssse3_glue.c | 12 ++++++++++++
- 2 files changed, 24 insertions(+)
+Also:
+https://elixir.bootlin.com/linux/v6.4-rc7/source/Documentation/devicetree/bindings/net/qcom,ipa.yaml#L174
+> 
+> Else I'd change
+> additionalProperties :false to
+> unevaluatedProperties: false
+> 
+> so the definition of the property is seen.
 
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index 44340a1139e0..959afa705e95 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -24,8 +24,17 @@
- #include <linux/types.h>
- #include <crypto/sha1.h>
- #include <crypto/sha1_base.h>
-+#include <asm/cpu_device_id.h>
- #include <asm/simd.h>
- 
-+static const struct x86_cpu_id module_cpu_ids[] = {
-+	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
-+	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
-+	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
-+	{}
-+};
-+MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
-+
- static int sha1_update(struct shash_desc *desc, const u8 *data,
- 			     unsigned int len, sha1_block_fn *sha1_xform)
- {
-@@ -301,6 +310,9 @@ static inline void unregister_sha1_ni(void) { }
- 
- static int __init sha1_ssse3_mod_init(void)
- {
-+	if (!x86_match_cpu(module_cpu_ids))
-+		return -ENODEV;
-+
- 	if (register_sha1_ssse3())
- 		goto fail;
- 
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 3a5f6be7dbba..d25235f0ccaf 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -38,11 +38,20 @@
- #include <crypto/sha2.h>
- #include <crypto/sha256_base.h>
- #include <linux/string.h>
-+#include <asm/cpu_device_id.h>
- #include <asm/simd.h>
- 
- asmlinkage void sha256_transform_ssse3(struct sha256_state *state,
- 				       const u8 *data, int blocks);
- 
-+static const struct x86_cpu_id module_cpu_ids[] = {
-+	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
-+	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
-+	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
-+	{}
-+};
-+MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
-+
- static int _sha256_update(struct shash_desc *desc, const u8 *data,
- 			  unsigned int len, sha256_block_fn *sha256_xform)
- {
-@@ -366,6 +375,9 @@ static inline void unregister_sha256_ni(void) { }
- 
- static int __init sha256_ssse3_mod_init(void)
- {
-+	if (!x86_match_cpu(module_cpu_ids))
-+		return -ENODEV;
-+
- 	if (register_sha256_ssse3())
- 		goto fail;
- 
+No, why? Definition is there when you move it to the top as asked.
 
-base-commit: aed8aee11130a954356200afa3f1b8753e8a9482
--- 
-2.34.1
+Best regards,
+Krzysztof
 
