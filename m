@@ -2,112 +2,97 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A2EEE6455
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06320EE6456
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:46:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbjIOKpr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 06:45:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51690 "EHLO
+        id S232404AbjIOKqm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 06:46:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjIOKpr (ORCPT
+        with ESMTP id S229646AbjIOKql (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 06:45:47 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AF7FB;
-        Fri, 15 Sep 2023 03:45:39 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c4194f7635so10293495ad.0;
-        Fri, 15 Sep 2023 03:45:39 -0700 (PDT)
+        Fri, 15 Sep 2023 06:46:41 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5964F106;
+        Fri, 15 Sep 2023 03:46:36 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c43fe0c0bfso1615775ad.1;
+        Fri, 15 Sep 2023 03:46:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694774739; x=1695379539; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1694774796; x=1695379596; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KASKuJDoY+n+ROnGW2/fJ2gTET1kK/7EqBy0BEtei40=;
-        b=mpafJNvIQS6rNhXGOawwDm/hSpSvo+I143u7PoTKvEg8L6dnuH8etqF/E+5y8yutlF
-         i0Eb9a6+MSr9hTy4dMwgs2JPPlpHECbpvt0OvxtwGNWfW6FIhLyxRqO6el26+Bw1D8U2
-         XkLKraOENebbJzfQYBt2hVODUPeNJet+lUzloV9jpFhTQDZqXZEtMcE8+18b+9rET8aI
-         PQ4UPbaB+MuYxlHXkP+0pLpNWi/k8vW4PtbUqEHwqBTvVwzDdaFrt+bOptAKs3XLTOQu
-         eBlZjC67MWupDYJeb/e2tNmXmQ3QPUKG96fJWiP8Xtn6HAQ1ElY9apX6MlSj1JqnHGJY
-         agWA==
+        bh=sSl/jwqe6RV3E0AIS7y6p1IAA1dCImMj5GR2Th+oWW0=;
+        b=ak3BdVRpa26zD/0oraNbY05qLIu8OvJr+Pts6hVR7s3Tz4eRDERd2H2LQRA0nMBJKe
+         J8jvFs7jfishtD0aGPQq6dKN/G1rzs1JleCc0BcwU82qFwv7nrRhl319tHNZBR1rK/2C
+         ByR359MbA74ogLuS7lH3UAMc+1g33gWstoiF8pjZRroxHasEpDAmE0NAkEAI2GZIKksG
+         7b8WCCcyp3l+ACjv4KPuM1lVHKgZwFlGfdxFGJHjRSpd1sO/srzITO9/isgzUkg4rJSh
+         e9t0o1EWF759Rl4Qf2v/ec+7IXDrB9GZlUFrm4Q3IDvlndw6W/kKyNTYDuVYD7lUSKZd
+         eBeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694774739; x=1695379539;
+        d=1e100.net; s=20230601; t=1694774796; x=1695379596;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KASKuJDoY+n+ROnGW2/fJ2gTET1kK/7EqBy0BEtei40=;
-        b=xTnhgRWiUGNSeHEpdAP0Lk3lu+h1wlC5glGG9LKnKYB9tdIDc9cQSVk3PgQmO7uN1x
-         lnvJV4IGTSzAYdhQgABA1nmOv0cbaoiUNNzSJkoyqZyhor3QTzaNnPdHo6RKfAHQlJf+
-         ZJQ1y86kVkKKfs2B1TcWmxnWkDJtWQ3SSAPKcEqKVXvqpYrvtEZv4ghv+HX4+QOTW5Kl
-         g3HjH3kKDvm92uEBtmoVKsyc9iatBRdyk/KCRhE78mTzoBSZrUQDVyL5+GFv7UHEDDq4
-         FKUwfETtePDu/jfFgzTP2GZeIxVMhj7QcbxCjfouib9Dg0/AtbGoZI3KgZFaHApd/siH
-         eYQA==
-X-Gm-Message-State: AOJu0Yx//FuDyfNyI3V+jUsgfcmh5f/ILVocx64EiuVBwWlm+MXVSKDu
-        wGl97/PX2Sxo40BjQWvIHS8=
-X-Google-Smtp-Source: AGHT+IFMwC7iceoHmBQe230+YM6MJUKW272TFAgwKdGFQCXM/3kUvuMw4LgdPRZ4VlCCPuC2SPZuMw==
-X-Received: by 2002:a17:902:e5c8:b0:1c3:868f:5958 with SMTP id u8-20020a170902e5c800b001c3868f5958mr6183252plf.20.1694774738621;
-        Fri, 15 Sep 2023 03:45:38 -0700 (PDT)
+        bh=sSl/jwqe6RV3E0AIS7y6p1IAA1dCImMj5GR2Th+oWW0=;
+        b=OqLtWLoaxgHK7nXXVWaIxky5LFGOE2Xjzk51TO63ypuarslM993gtLtkmcDHtfqggK
+         Htn+YlZi2d0IqeB7uPlIiBTKfpzgSPDnLPNzIxEejSQa0AcIz+R8SAjcGEuIfo2Us94z
+         2OyaMTLVALUD9Zf0XVNIVq1bavsY0bi5Nfo/Nd0tRQAJWhxtOQ/uBLxuimTEzgOW6lxn
+         VSCPCM6I9iZXrhOK5vF+8Nye6xzldZUnlFacOZe/uXFTccqekTSd0loEvG6+U9tyoTpu
+         RSPZ0HCV8W+1Oyo4oOAW/RkFN7nDwHt/jUaMfqDhW9GiF2R+P8YOoC+wMBtbsglFw61V
+         ju7A==
+X-Gm-Message-State: AOJu0Yyj1D3Rz+1PdqQArS9qfcEayKYU8ZnyTigmDk8VAOxiWQNTCQS9
+        nKqzLTmXxpla0MSDcKHyvf4=
+X-Google-Smtp-Source: AGHT+IEzXBmfXb/LKt9bJszwrWMGs2Jy9iUH3YJ3pOjhoVSFEReOW/GFXDqdF1jBJyVcUSgJGjiHsg==
+X-Received: by 2002:a17:902:f814:b0:1c4:3e6a:7ad4 with SMTP id ix20-20020a170902f81400b001c43e6a7ad4mr474188plb.13.1694774795719;
+        Fri, 15 Sep 2023 03:46:35 -0700 (PDT)
 Received: from gondor.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
-        by smtp.gmail.com with ESMTPSA id l5-20020a170903244500b001ae0152d280sm3156374pls.193.2023.09.15.03.45.36
+        by smtp.gmail.com with ESMTPSA id m2-20020a170902768200b001acae9734c0sm3161284pll.266.2023.09.15.03.46.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 03:45:38 -0700 (PDT)
+        Fri, 15 Sep 2023 03:46:35 -0700 (PDT)
 Sender: Herbert Xu <herbertx@gmail.com>
-Date:   Fri, 15 Sep 2023 18:45:37 +0800
+Date:   Fri, 15 Sep 2023 18:46:34 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Mario Limonciello <mario.limonciello@amd.com>
-Cc:     davem@davemloft.net, thomas.lendacky@amd.com, john.allen@amd.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rijo-john.Thomas@amd.com
-Subject: Re: [PATCH 0/5] Add new platform support for DBC
-Message-ID: <ZQQ10QeAA6hSMBuo@gondor.apana.org.au>
-References: <20230907184846.47598-1-mario.limonciello@amd.com>
+To:     Jonas Gorski <jonas.gorski@gmail.com>
+Cc:     Andres Salomon <dilinger@queued.net>,
+        Olivia Mackall <olivia@selenic.com>,
+        Xiongfeng Wang <wangxiongfeng2@huawei.com>,
+        "Timur I . Davletshin" <timur.davletshin@gmail.com>,
+        Jo-Philipp Wich <jo@mein.io>, linux-geode@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: geode: fix accessing registers
+Message-ID: <ZQQ2Cv1uL/YVxNBb@gondor.apana.org.au>
+References: <20230910083418.8990-1-jonas.gorski@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230907184846.47598-1-mario.limonciello@amd.com>
+In-Reply-To: <20230910083418.8990-1-jonas.gorski@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 07, 2023 at 01:48:41PM -0500, Mario Limonciello wrote:
-> Some platforms that support dynamic boost control (DBC) support it via
-> a different mailbox than the platform access mailbox.
+On Sun, Sep 10, 2023 at 10:34:17AM +0200, Jonas Gorski wrote:
+> When the membase and pci_dev pointer were moved to a new struct in priv,
+> the actual membase users were left untouched, and they started reading
+> out arbitrary memory behind the struct instead of registers. This
+> unfortunately turned the RNG into a constant number generator, depending
+> on the content of what was at that offset.
 > 
-> This series adds support for those platforms.
+> To fix this, update geode_rng_data_{read,present}() to also get the
+> membase via amd_geode_priv, and properly read from the right addresses
+> again.
 > 
-> It is tested on top of the fixes series. The prerequisite patches refer
-> to that series.
-> Link: https://lore.kernel.org/linux-crypto/20230829150759.156126-1-mario.limonciello@amd.com/T/#m47782729377f6fe5d62130cc701dae7f15306726
-> 
-> Mario Limonciello (4):
->   crypto: ccp: Add support for extended PSP mailbox commands
->   crypto: ccp: Add a communication path abstraction for DBC
->   crypto: ccp: Add a macro to check capabilities register
->   crypto: ccp: Add support for DBC over PSP mailbox
-> 
-> Tom Lendacky (1):
->   crypto: ccp: Move direct access to some PSP registers out of TEE
-> 
->  drivers/crypto/ccp/dbc.c     |  72 ++++++++++++++-------
->  drivers/crypto/ccp/dbc.h     |  29 +++------
->  drivers/crypto/ccp/psp-dev.c | 122 ++++++++++++++++++++++++++++-------
->  drivers/crypto/ccp/psp-dev.h |  55 ++++++++++++++++
->  drivers/crypto/ccp/sp-dev.h  |   4 ++
->  drivers/crypto/ccp/sp-pci.c  |  22 ++++---
->  drivers/crypto/ccp/tee-dev.c |  48 +++-----------
->  drivers/crypto/ccp/tee-dev.h |  15 +----
->  8 files changed, 241 insertions(+), 126 deletions(-)
-> 
-> 
-> base-commit: 7ba2090ca64ea1aa435744884124387db1fac70f
-> prerequisite-patch-id: 4bcf7f3ea21472e4e28c2457cc9827f6023ec6ca
-> prerequisite-patch-id: 903be53a20306f0188e52015dbfe5196738bb2eb
-> prerequisite-patch-id: af396bafb6acaa9c203c1a2c5f4665171cb45e4f
-> prerequisite-patch-id: abe450d4bf1de4a5664a41dbf84e72b1d4bfdae7
-> prerequisite-patch-id: b0b9cf55fcb73a11de6f3da73412fb090562857a
-> -- 
-> 2.34.1
+> Fixes: 9f6ec8dc574e ("hwrng: geode - Fix PCI device refcount leak")
+> Reported-by: Timur I. Davletshin <timur.davletshin@gmail.com>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217882
+> Tested-by: Timur I. Davletshin <timur.davletshin@gmail.com>
+> Suggested-by: Jo-Philipp Wich <jo@mein.io>
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
+>  drivers/char/hw_random/geode-rng.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
