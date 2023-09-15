@@ -2,65 +2,144 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0888EE6447
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 09:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F852EE6447
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 09:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233434AbjIOJQv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 05:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52340 "EHLO
+        id S233656AbjIOJ3U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 05:29:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233351AbjIOJQu (ORCPT
+        with ESMTP id S233371AbjIOJ3T (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 05:16:50 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A996A9B;
-        Fri, 15 Sep 2023 02:16:45 -0700 (PDT)
-Received: from kwepemm600018.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rn7mz3K74zrSlD;
-        Fri, 15 Sep 2023 17:14:43 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- kwepemm600018.china.huawei.com (7.193.23.140) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 15 Sep 2023 17:16:43 +0800
-From:   Wenkai Lin <linwenkai6@hisilicon.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/sec - fix for sgl unmmap problem
-Date:   Fri, 15 Sep 2023 17:13:29 +0800
-Message-ID: <20230915091329.31708-1-linwenkai6@hisilicon.com>
-X-Mailer: git-send-email 2.33.0
+        Fri, 15 Sep 2023 05:29:19 -0400
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B24C326B8;
+        Fri, 15 Sep 2023 02:28:44 -0700 (PDT)
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38F7ElsG002919;
+        Fri, 15 Sep 2023 11:28:15 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=1Of1fldvAc+SLebPZyCDhNTzbbsU2y5odJdWE5qVCiI=; b=Hd
+        igeR1KLEPtrblw5zVOznhSk5Z5Ik6TJeBslqk+yXH6I94o9HKk3wLwtx4hCvmN3e
+        OjjIz1M/dxfG7kuiq+78CqUM+5wA2HLpIgbbV27J7okGOUcTUBXzjp3/YOtCymF/
+        r3YH4Nxi/d0p+eqODAPAnR9ofyKn6Yto+wgh1dahea8i6pdyfc3u15IENXnMNTri
+        SU3snXuOCA8wVsI57kBnXC5hGFdsXNYgOGPudLW4fkTIdxUO+UiSBvs5KOY+1gjg
+        DFZxQzOFkU/JAuDvT+UNmWSSd4iyURz2hNzWvjV0UJj7AzPhYZcEooJfb0VojLEh
+        3Y+wRvbO3tvSq3xdE+/g==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t434d3xsf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Sep 2023 11:28:15 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id C4149100040;
+        Fri, 15 Sep 2023 11:28:13 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id BA41521ADDB;
+        Fri, 15 Sep 2023 11:28:13 +0200 (CEST)
+Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 15 Sep
+ 2023 11:28:13 +0200
+Message-ID: <4819d89b-c2a4-0c75-27e1-d8122827ceca@foss.st.com>
+Date:   Fri, 15 Sep 2023 11:28:06 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600018.china.huawei.com (7.193.23.140)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH 07/10] dt-bindings: rng: add st,rng-lock-conf
+To:     Rob Herring <robh@kernel.org>
+CC:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
+ <20230908165120.730867-8-gatien.chevallier@foss.st.com>
+ <20230911150958.GA1255978-robh@kernel.org>
+Content-Language: en-US
+From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20230911150958.GA1255978-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-15_06,2023-09-14_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When sec_aead_mac_init returns an error code, sec_cipher_map
-will exit abnormally, the hardware sgl should be unmmaped.
+Hello Rob,
 
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
----
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 1 +
- 1 file changed, 1 insertion(+)
+On 9/11/23 17:09, Rob Herring wrote:
+> On Fri, Sep 08, 2023 at 06:51:17PM +0200, Gatien Chevallier wrote:
+>> If st,rng-lock-conf is set, the RNG configuration in RNG_CR, RNG_HTCR
+>> and RNG_NSCR will be locked. It is supported starting from the RNG
+>> version present in the STM32MP13
+> 
+> This should be squashed into the prior binding patch.
+> 
+>>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>> ---
+>>   .../devicetree/bindings/rng/st,stm32-rng.yaml      | 14 ++++++++++++++
+>>   1 file changed, 14 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+>> index 59abdc85a9fb..0055f14a8e3f 100644
+>> --- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+>> +++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+>> @@ -37,6 +37,20 @@ required:
+>>     - reg
+>>     - clocks
+>>   
+>> +allOf:
+>> +  - if:
+>> +      properties:
+>> +        compatible:
+>> +          contains:
+>> +            enum:
+>> +              - st,stm32mp13-rng
+>> +    then:
+>> +      properties:
+>> +        st,rng-lock-conf:
+>> +          type: boolean
+>> +          description: If set, the RNG configuration in RNG_CR, RNG_HTCR and
+>> +                       RNG_NSCR will be locked.
+> 
+> Define the property at the top-level and then restrict its presence in
+> a if/then schema.
+> 
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 074e50ef5..ed77711e8 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -1011,6 +1011,7 @@ static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
- 		ret = sec_aead_mac_init(a_req);
- 		if (unlikely(ret)) {
- 			dev_err(dev, "fail to init mac data for ICV!\n");
-+			hisi_acc_sg_buf_unmap(dev, src, req->in);
- 			return ret;
- 		}
- 	}
--- 
-2.30.0
+Can you please point me to an example of such case. I can't find a way
+to define at the top-level the property then restrict it to specific
+compatibles.
 
+Else I'd change
+additionalProperties :false to
+unevaluatedProperties: false
+
+so the definition of the property is seen.
+
+Best regards,
+Gatien
+
+>> +
+>>   additionalProperties: false
+> 
+> Did you test this property is allowed? No, because additionalProperties
+> won't work with properties defined in if/then schemas.
+> 
+>>   
+>>   examples:
+>> -- 
+>> 2.25.1
+>>
