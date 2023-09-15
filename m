@@ -2,84 +2,174 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E992EE6454
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 380D9EE6452
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234160AbjIOKTM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 06:19:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37824 "EHLO
+        id S234095AbjIOKZz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 06:25:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231341AbjIOKTM (ORCPT
+        with ESMTP id S234273AbjIOKZx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 06:19:12 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFE5E9;
-        Fri, 15 Sep 2023 03:19:04 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a9b41ffe12so1218028b6e.3;
-        Fri, 15 Sep 2023 03:19:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694773143; x=1695377943; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gBRNgKBo9636s47BGwWVB4QKKZP3PNOVrB6JUSp8VSU=;
-        b=H1AWv2Jiti17w/RFTWf9ZLidaYhZCE+eFFSuzPZ+mK/LyQyfZ8ZHEwlLT9mkRiWG4F
-         8grW/t4Gw/gxMm2X24JLtEswLrsWu99B7NFAgs/sTmM/RSLW7BSSEAZ2yalr1HQLeIXg
-         7TceqEQ8uypJ7F3BGwdVlI9JpYrUBcuYe0IXmY4iFlS0b2wO/l0RZ2e+mwN34wtjJbKe
-         G86QVNMQB1ygBYghA/smfNu6cnlOsG8bBcYgBdhm08hIWw2by+mhTBaOqgQjF8PZn+XH
-         iZUfeAYpPWOo2eA2o3pwLrEjTU6atltMe/D6f9DLPKdiZhrP0Z0d4WpHK1QoCP0XX4mw
-         h0/g==
+        Fri, 15 Sep 2023 06:25:53 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E4A33A90
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:23:31 -0700 (PDT)
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 4D8CC3F04B
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 10:23:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1694773407;
+        bh=z7JHAgWlYbo6190D8eD4+RynEQye8I21JfDjXnFF0Ck=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=pAWESwKbofXfirKQ+cu2GippwrcotREwgJ54a47CcWzLElpmUEpadEShek2P8Ob+g
+         TQ0mG/8px4AIq/RjsyDUITFlluo2Aed8XeaM8zSZK0IlSSLDtgglyRp9I/gfmjto6t
+         bMVv6SzWDLqe1bjsnTOMw/0SULcybFd6vgEoHboleE/dlj+LG/5tuf7NEgT1sTZ4TY
+         DWHyO+xoHHGgzLqahCt2BH/KCXiv7YhPOXMUc5j6OWjIEw+jiOEXz+f8+6BCx8qTh8
+         IBs89jqDa7XQw297bvsgrwUsH1TYmz2G8f31rmxQEo2BJ2MYg2Es9QdvI0/+VisMjt
+         l+iDkDjGMLrww==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99bcb13d8ddso142593966b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:23:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694773143; x=1695377943;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gBRNgKBo9636s47BGwWVB4QKKZP3PNOVrB6JUSp8VSU=;
-        b=FeyAH+XKQxwAe/jA2J3w5fNjZiyA5GtKs/DF4aYXsRyIptD3bET99no0FyMhoJNtg1
-         qVXPm5mW3plHVyLWjkCUK8PZIsvNUQRkYKLtmSkrJwB+0xu7UIXxBZ89GQCNwWIrNw8i
-         5xmO7WdD5INlvQAo+iGMOV+b7jmuzaCllHipxYlIhbGKJ49wQVKmyO68zPxoplEMtJl0
-         +eWgcPI4d7EDc+WH+2hPA7dg8TM+k8EWfkC4N2wXvbo+ISTMSOSOyaS8xuaksmEqflid
-         1XyKrJPKHznFP+9Su4apEYJHp2G6bjxArygFK5WHDT9XvZQmi3csR7XZLG+uoYiZ9puo
-         J7bw==
-X-Gm-Message-State: AOJu0YwvQ1XXHeQ4vmnQwNQW3dRcmL3WVirv61nWH8cDvlVXDIsTKsUA
-        0rgPsnrVJD4JD8bqodHKhKo=
-X-Google-Smtp-Source: AGHT+IEvlosv0SIRPQNAginM3ohzzNzp4Xqh9vNKnbfKPM+wAw9tG7sja/ozbim3kIXbRMVW4vCoKw==
-X-Received: by 2002:a05:6870:5488:b0:1d5:4fb0:102 with SMTP id f8-20020a056870548800b001d54fb00102mr1339662oan.31.1694773143468;
-        Fri, 15 Sep 2023 03:19:03 -0700 (PDT)
-Received: from gondor.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
-        by smtp.gmail.com with ESMTPSA id q7-20020a63ae07000000b005634343cd9esm2491347pgf.44.2023.09.15.03.19.00
+        d=1e100.net; s=20230601; t=1694773406; x=1695378206;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z7JHAgWlYbo6190D8eD4+RynEQye8I21JfDjXnFF0Ck=;
+        b=k2r+5NrhpvrJdTqnl7j3pe1aMvuok77NKmvnvCUk9G9WQGgxrPIXdvUZ/ZZNqMyXN4
+         6pW4cCWVe5MXoWJ+r/XThCBqGe0y37GFdChLc3KbhHdt866h6iXZI2vLDDpnAqRXEqoa
+         EJ8KVFjlmdEWyOChDrFlObBlNSgRAh6LJfotm11Y1ozgUc/ELRbn3FcB3uWJHm+Appjm
+         uJJoST0eQ55SUUyA8M8TYNmYsBZWWGtu1u4a5vWmL8hxCSRsW0d6oXGw4ATHGrw701Fz
+         S9B2xqDuzMX4TH05veSRh/xX4leJ6e67vBCStv/Nvmu/feR8F7ekLFrqxAFXNBmsZznp
+         uYLw==
+X-Gm-Message-State: AOJu0YzUr41BuO4OE5gU7/lfYdUn0sGBxecciXNuEMR57Xd9EVt3MxLq
+        dXIPqWoKYW32oHVhhWMGmiVF7UpvuNkzFttWdrvZrjFbqRzzewzXyY8dTmIlngba0LsTJJbP6TD
+        uFVPZXS91bpfN9pIyy4xArKgmltqrSb8uPzDK7l7Fsg==
+X-Received: by 2002:a17:907:784f:b0:9a2:2635:daa8 with SMTP id lb15-20020a170907784f00b009a22635daa8mr941248ejc.56.1694773406593;
+        Fri, 15 Sep 2023 03:23:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+FiyghSmdvhT78+MTXJZGFKg/xOgd32F1+tb9mlsD409KTBDcb1ilWTv89DV9DYE//HViLA==
+X-Received: by 2002:a17:907:784f:b0:9a2:2635:daa8 with SMTP id lb15-20020a170907784f00b009a22635daa8mr941235ejc.56.1694773406299;
+        Fri, 15 Sep 2023 03:23:26 -0700 (PDT)
+Received: from work.lan (77-169-125-32.fixed.kpn.net. [77.169.125.32])
+        by smtp.gmail.com with ESMTPSA id o9-20020a170906600900b0099bcd1fa5b0sm2189818ejj.192.2023.09.15.03.23.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 03:19:02 -0700 (PDT)
-Sender: Herbert Xu <herbertx@gmail.com>
-Date:   Fri, 15 Sep 2023 18:19:01 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>
-Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
-        agross@kernel.org, andersson@kernel.org, conor+dt@kernel.org,
-        davem@davemloft.net, devicetree@vger.kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
-Subject: Re: [PATCH] crypto: qcom-rng: Add hwrng support
-Message-ID: <ZQQvlXvGy8p01uJS@gondor.apana.org.au>
-References: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
+        Fri, 15 Sep 2023 03:23:25 -0700 (PDT)
+From:   Roxana Nicolescu <roxana.nicolescu@canonical.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com
+Cc:     x86@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: x86 - load optimized sha1/sha256 modules based on CPU features
+Date:   Fri, 15 Sep 2023 12:23:25 +0200
+Message-Id: <20230915102325.35189-1-roxana.nicolescu@canonical.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 01, 2023 at 06:45:02PM +0530, Om Prakash Singh wrote:
->
-> +	qrng = (struct qcom_rng *)rng->priv;
+x86 optimized crypto modules are built as modules rather than build-in and
+they are not loaded when the crypto API is initialized, resulting in the
+generic builtin module (sha1-generic) being used instead.
 
-Please stop using rng->priv, it is obsolete.  Instead embed the
-rng object inside qcom_rng.
+It was discovered when creating a sha1/sha256 checksum of a 2Gb file by
+using kcapi-tools because it would take significantly longer than creating
+a sha512 checksum of the same file. trace-cmd showed that for sha1/256 the
+generic module was used, whereas for sha512 the optimized module was used
+instead.
 
-Cheers,
+Add module aliases() for these x86 optimized crypto modules based on CPU
+feature bits so udev gets a chance to load them later in the boot
+process. This resulted in ~3x decrease in the real-time execution of
+kcapi-dsg.
+
+Fix is inspired from commit
+aa031b8f702e ("crypto: x86/sha512 - load based on CPU features")
+where a similar fix was done for sha512.
+
+Cc: stable@vger.kernel.org # 5.15+
+Suggested-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Suggested-by: Julian Andres Klode <julian.klode@canonical.com>
+Signed-off-by: Roxana Nicolescu <roxana.nicolescu@canonical.com>
+---
+ arch/x86/crypto/sha1_ssse3_glue.c   | 12 ++++++++++++
+ arch/x86/crypto/sha256_ssse3_glue.c | 12 ++++++++++++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index 44340a1139e0..959afa705e95 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -24,8 +24,17 @@
+ #include <linux/types.h>
+ #include <crypto/sha1.h>
+ #include <crypto/sha1_base.h>
++#include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
+ 
++static const struct x86_cpu_id module_cpu_ids[] = {
++	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
++
+ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len, sha1_block_fn *sha1_xform)
+ {
+@@ -301,6 +310,9 @@ static inline void unregister_sha1_ni(void) { }
+ 
+ static int __init sha1_ssse3_mod_init(void)
+ {
++	if (!x86_match_cpu(module_cpu_ids))
++		return -ENODEV;
++
+ 	if (register_sha1_ssse3())
+ 		goto fail;
+ 
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index 3a5f6be7dbba..d25235f0ccaf 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -38,11 +38,20 @@
+ #include <crypto/sha2.h>
+ #include <crypto/sha256_base.h>
+ #include <linux/string.h>
++#include <asm/cpu_device_id.h>
+ #include <asm/simd.h>
+ 
+ asmlinkage void sha256_transform_ssse3(struct sha256_state *state,
+ 				       const u8 *data, int blocks);
+ 
++static const struct x86_cpu_id module_cpu_ids[] = {
++	X86_MATCH_FEATURE(X86_FEATURE_AVX2, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
++	X86_MATCH_FEATURE(X86_FEATURE_SSSE3, NULL),
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, module_cpu_ids);
++
+ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+ 			  unsigned int len, sha256_block_fn *sha256_xform)
+ {
+@@ -366,6 +375,9 @@ static inline void unregister_sha256_ni(void) { }
+ 
+ static int __init sha256_ssse3_mod_init(void)
+ {
++	if (!x86_match_cpu(module_cpu_ids))
++		return -ENODEV;
++
+ 	if (register_sha256_ssse3())
+ 		goto fail;
+ 
+
+base-commit: aed8aee11130a954356200afa3f1b8753e8a9482
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
