@@ -2,106 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA2FEE6456
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A2EEE6455
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231367AbjIOKpR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 06:45:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43280 "EHLO
+        id S231841AbjIOKpr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 06:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjIOKpR (ORCPT
+        with ESMTP id S229646AbjIOKpr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 06:45:17 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8939DA1
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:45:12 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-59c26aa19b7so423017b3.2
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 03:45:12 -0700 (PDT)
+        Fri, 15 Sep 2023 06:45:47 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AF7FB;
+        Fri, 15 Sep 2023 03:45:39 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c4194f7635so10293495ad.0;
+        Fri, 15 Sep 2023 03:45:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694774711; x=1695379511; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1694774739; x=1695379539; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J4u4XYCgTvBFoGtqFUvIv4FTJYL4gt5M/WcSROwbSvU=;
-        b=Atb/mMOfapPkdqr7LCRR+tUfF39KczwmLyRJMXoHs0v6jJWkNIrR/+R+HgInIL/f9y
-         sEUCXDnSPHzr3y8GsponWiz6cG26cN3N2TWENt9uLSTVJveTdLAhvRQ2YJ0yIrbiCtmE
-         JbAKTrumDLo5LuPxS6wbID7JVDNBzJvBIYO7ORKGW8tG5n6Pe92KOoIG3geiLvmEZ1B7
-         E9MDNGOEJWXkgElztlB6N2QRpVhEKnc9ybjdlBC/DBZO6FoPbXgrwsAcbs8yZ3Qrvx7m
-         Ke0x357uPRMghH/03pohgi1AuAvVlLKJAlcOcCF6x1PAZrWQsileWy+v8xV/DM75UhNq
-         Xl+A==
+        bh=KASKuJDoY+n+ROnGW2/fJ2gTET1kK/7EqBy0BEtei40=;
+        b=mpafJNvIQS6rNhXGOawwDm/hSpSvo+I143u7PoTKvEg8L6dnuH8etqF/E+5y8yutlF
+         i0Eb9a6+MSr9hTy4dMwgs2JPPlpHECbpvt0OvxtwGNWfW6FIhLyxRqO6el26+Bw1D8U2
+         XkLKraOENebbJzfQYBt2hVODUPeNJet+lUzloV9jpFhTQDZqXZEtMcE8+18b+9rET8aI
+         PQ4UPbaB+MuYxlHXkP+0pLpNWi/k8vW4PtbUqEHwqBTvVwzDdaFrt+bOptAKs3XLTOQu
+         eBlZjC67MWupDYJeb/e2tNmXmQ3QPUKG96fJWiP8Xtn6HAQ1ElY9apX6MlSj1JqnHGJY
+         agWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694774712; x=1695379512;
+        d=1e100.net; s=20230601; t=1694774739; x=1695379539;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J4u4XYCgTvBFoGtqFUvIv4FTJYL4gt5M/WcSROwbSvU=;
-        b=uu49sL76FZ7gy0v9256iK1H3d2DXY6zef+1FDiRxCWOnHXAGwGueTlAe+jUXZAH9aK
-         6aXrHPlrOGoEVQL9xEfjQPqQ8zo9KjZusIfW507A/SU6YIp7RRRjwetCFQ4iSZ5rqenF
-         YEsN3DZigiZMz2G2Kn67wU8004l307MsvpPDK7JBG9z8FKL5+22S3L2a1gFHy3nuQZhy
-         gwbAMdy1X7223EZ2A2z+gJEhqgd4GCWcZqK344OS+ihj+fZJ7RwfKg5P7MOBdhu+byav
-         cy6n6wmajOafITS+j5Bj1M+hXnWRdMLr4/whA/BRgJnLgNlMdJqYPj1z94pDgWGUnTAu
-         yA/Q==
-X-Gm-Message-State: AOJu0YzSF9d/hNOdLgoZi0tawC0Gn1qqEwj3x6Za6EYb5XkqPQ+/0f/J
-        EtnxddPDw8wJ7ZoEL79VyGU=
-X-Google-Smtp-Source: AGHT+IEwe/s1/zpZj+nNuo0haZZBOT++TTQgYSOpkXHByc61qcZbJdSYif1STCODvO7FWiAbUcYxbw==
-X-Received: by 2002:a81:ac5f:0:b0:59c:1880:18e0 with SMTP id z31-20020a81ac5f000000b0059c188018e0mr681288ywj.21.1694774711631;
-        Fri, 15 Sep 2023 03:45:11 -0700 (PDT)
+        bh=KASKuJDoY+n+ROnGW2/fJ2gTET1kK/7EqBy0BEtei40=;
+        b=xTnhgRWiUGNSeHEpdAP0Lk3lu+h1wlC5glGG9LKnKYB9tdIDc9cQSVk3PgQmO7uN1x
+         lnvJV4IGTSzAYdhQgABA1nmOv0cbaoiUNNzSJkoyqZyhor3QTzaNnPdHo6RKfAHQlJf+
+         ZJQ1y86kVkKKfs2B1TcWmxnWkDJtWQ3SSAPKcEqKVXvqpYrvtEZv4ghv+HX4+QOTW5Kl
+         g3HjH3kKDvm92uEBtmoVKsyc9iatBRdyk/KCRhE78mTzoBSZrUQDVyL5+GFv7UHEDDq4
+         FKUwfETtePDu/jfFgzTP2GZeIxVMhj7QcbxCjfouib9Dg0/AtbGoZI3KgZFaHApd/siH
+         eYQA==
+X-Gm-Message-State: AOJu0Yx//FuDyfNyI3V+jUsgfcmh5f/ILVocx64EiuVBwWlm+MXVSKDu
+        wGl97/PX2Sxo40BjQWvIHS8=
+X-Google-Smtp-Source: AGHT+IFMwC7iceoHmBQe230+YM6MJUKW272TFAgwKdGFQCXM/3kUvuMw4LgdPRZ4VlCCPuC2SPZuMw==
+X-Received: by 2002:a17:902:e5c8:b0:1c3:868f:5958 with SMTP id u8-20020a170902e5c800b001c3868f5958mr6183252plf.20.1694774738621;
+        Fri, 15 Sep 2023 03:45:38 -0700 (PDT)
 Received: from gondor.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
-        by smtp.gmail.com with ESMTPSA id k22-20020aa790d6000000b0068fdb59e9d6sm2722627pfk.78.2023.09.15.03.45.09
+        by smtp.gmail.com with ESMTPSA id l5-20020a170903244500b001ae0152d280sm3156374pls.193.2023.09.15.03.45.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 03:45:11 -0700 (PDT)
+        Fri, 15 Sep 2023 03:45:38 -0700 (PDT)
 Sender: Herbert Xu <herbertx@gmail.com>
-Date:   Fri, 15 Sep 2023 18:45:10 +0800
+Date:   Fri, 15 Sep 2023 18:45:37 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stefan Wahren <wahrenst@gmx.net>
-Cc:     Olivia Mackall <olivia@selenic.com>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Mark Brown <broonie@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        bcm-kernel-feedback-list@broadcom.com
-Subject: Re: [PATCH V2] hwrng: bcm2835: Fix hwrng throughput regression
-Message-ID: <ZQQ1tgDEGGXwfu/4@gondor.apana.org.au>
-References: <20230905232757.36459-1-wahrenst@gmx.net>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     davem@davemloft.net, thomas.lendacky@amd.com, john.allen@amd.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rijo-john.Thomas@amd.com
+Subject: Re: [PATCH 0/5] Add new platform support for DBC
+Message-ID: <ZQQ10QeAA6hSMBuo@gondor.apana.org.au>
+References: <20230907184846.47598-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230905232757.36459-1-wahrenst@gmx.net>
+In-Reply-To: <20230907184846.47598-1-mario.limonciello@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 06, 2023 at 01:27:57AM +0200, Stefan Wahren wrote:
-> The last RCU stall fix caused a massive throughput regression of the
-> hwrng on Raspberry Pi 0 - 3. hwrng_msleep doesn't sleep precisely enough
-> and usleep_range doesn't allow scheduling. So try to restore the
-> best possible throughput by introducing hwrng_yield which interruptable
-> sleeps for one jiffy.
+On Thu, Sep 07, 2023 at 01:48:41PM -0500, Mario Limonciello wrote:
+> Some platforms that support dynamic boost control (DBC) support it via
+> a different mailbox than the platform access mailbox.
 > 
-> Some performance measurements on Raspberry Pi 3B+ (arm64/defconfig):
+> This series adds support for those platforms.
 > 
-> sudo dd if=/dev/hwrng of=/dev/null count=1 bs=10000
+> It is tested on top of the fixes series. The prerequisite patches refer
+> to that series.
+> Link: https://lore.kernel.org/linux-crypto/20230829150759.156126-1-mario.limonciello@amd.com/T/#m47782729377f6fe5d62130cc701dae7f15306726
 > 
-> cpu_relax              ~138025 Bytes / sec
-> hwrng_msleep(1000)         ~13 Bytes / sec
-> hwrng_yield              ~2510 Bytes / sec
+> Mario Limonciello (4):
+>   crypto: ccp: Add support for extended PSP mailbox commands
+>   crypto: ccp: Add a communication path abstraction for DBC
+>   crypto: ccp: Add a macro to check capabilities register
+>   crypto: ccp: Add support for DBC over PSP mailbox
 > 
-> Fixes: 96cb9d055445 ("hwrng: bcm2835 - use hwrng_msleep() instead of cpu_relax()")
-> Link: https://lore.kernel.org/linux-arm-kernel/bc97ece5-44a3-4c4e-77da-2db3eb66b128@gmx.net/
-> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-> ---
+> Tom Lendacky (1):
+>   crypto: ccp: Move direct access to some PSP registers out of TEE
 > 
-> Changes in V2:
-> - introduce hwrng_yield and use it
+>  drivers/crypto/ccp/dbc.c     |  72 ++++++++++++++-------
+>  drivers/crypto/ccp/dbc.h     |  29 +++------
+>  drivers/crypto/ccp/psp-dev.c | 122 ++++++++++++++++++++++++++++-------
+>  drivers/crypto/ccp/psp-dev.h |  55 ++++++++++++++++
+>  drivers/crypto/ccp/sp-dev.h  |   4 ++
+>  drivers/crypto/ccp/sp-pci.c  |  22 ++++---
+>  drivers/crypto/ccp/tee-dev.c |  48 +++-----------
+>  drivers/crypto/ccp/tee-dev.h |  15 +----
+>  8 files changed, 241 insertions(+), 126 deletions(-)
 > 
->  drivers/char/hw_random/bcm2835-rng.c | 2 +-
->  drivers/char/hw_random/core.c        | 6 ++++++
->  include/linux/hw_random.h            | 1 +
->  3 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> base-commit: 7ba2090ca64ea1aa435744884124387db1fac70f
+> prerequisite-patch-id: 4bcf7f3ea21472e4e28c2457cc9827f6023ec6ca
+> prerequisite-patch-id: 903be53a20306f0188e52015dbfe5196738bb2eb
+> prerequisite-patch-id: af396bafb6acaa9c203c1a2c5f4665171cb45e4f
+> prerequisite-patch-id: abe450d4bf1de4a5664a41dbf84e72b1d4bfdae7
+> prerequisite-patch-id: b0b9cf55fcb73a11de6f3da73412fb090562857a
+> -- 
+> 2.34.1
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
