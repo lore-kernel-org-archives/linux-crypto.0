@@ -2,172 +2,526 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DFCEE021D
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 05:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 511AAEE6421
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 06:53:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbjIOFza (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 01:55:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34858 "EHLO
+        id S232452AbjIOGxz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 02:53:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjIOFz3 (ORCPT
+        with ESMTP id S230109AbjIOGxz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 01:55:29 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0961BC7;
-        Thu, 14 Sep 2023 22:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694757324; x=1726293324;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=qchAMYZNQPXK7Ecv2VEkTgAdQJ/Z4ff3JboIgSfuXeY=;
-  b=SQ573i3k5rzHk8qL+CUimc+tKAzcfxO7+KvlsOZLl0UlzrC1ODvv9BLb
-   mefMOzHgcY2mxzRetcGygaZbDeFcrHfVKDimJtQrp93ekpJ83l9vljIxQ
-   xjgYLS8isk39rOcs3ZO7OhdcHpBkCJqGAjgJwXKVpkPb0ZbC7ZswA/9v/
-   8f0QQZXUuzInlLHcitRgvRK2HYczLjqzfuVduI2pxz/uqVGLeFKrFYNxG
-   StwO7gpmLw4e4iBTOnv1ZZKgbgkZ8boz0E2lMh36cMadmIkx7jd/mCemQ
-   9LwlxLKK0PlcWrAccfio55WnNAsHf4MUkOHlXnkOkHsHZVHB8LT/VWeTa
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="465529913"
-X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="465529913"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 22:55:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="860029118"
-X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="860029118"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 22:55:24 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+        Fri, 15 Sep 2023 02:53:55 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6302722;
+        Thu, 14 Sep 2023 23:53:37 -0700 (PDT)
+Received: from kwepemm600005.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rn4bq5s69zrS3S;
+        Fri, 15 Sep 2023 14:51:35 +0800 (CST)
+Received: from [10.67.121.110] (10.67.121.110) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 22:55:23 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 22:55:23 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 14 Sep 2023 22:55:22 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FhYsG0BQrbTf3G/d//oRcxLNl/ExpIw6lI+B4pUTra02/MZQlC4iz5OY6jmsRwpN2Z0adccYrZiNOESe2YVyv+XHh63r5Aa3pjJkv2bNRCFcPHjb/SKU0avDbaIKmeOoUt37mfjfM/qZ1CpgI3ad2CgW5hhMw83iH3jNqRkZhsBTWcjuYAC9O74aZke6taUG6KVy1q9JDNd2XPcEq6CIMb7cHAtf+TsvqqxglIOgJxaiFL/JyJSSPnr6oB8T/1VDbyeFcpuao3jgPT6RQPw+1QsuNGMDUzt/t0jPKUmJdHL8Bb4IKw7girYLEgXAEmj0m5FucKlZqOax4Ukv72rRlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dNjUKDwaKswr+ylWJMM7V/+CMj5TmcIsXCegaJx81co=;
- b=SFRxg8zhWRsIyfcPGwMFOjgmE/pAOVgYb2tN0UQ9/GI2b6vEKCSLqRyMvgPDtcN2fqn22seXhLT49fKTtsfniQP2rP2lO/9FCCHHilUFkWwW42boDdgZrjXUcbLHH6ww4N4t8UncqNdjcJAMNvRMthjNmE0rH73zoWcpSXyegWii8KKNtIjQH4Gx8Or5OB4jnq0BcBpEOTHMtLr3OWNjkd11IvszSW5hq3kScpUCeSz9EfhaWYdsCYWQNtdJJXYjtjprxVbV75pAWi5TtXwxGn+76TwSWe+qq3hfnt+TGxEv4uPpRDgn05qbtt1dsXxFQYXto2LcA5NdA93PPg+9eg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by DM4PR11MB5280.namprd11.prod.outlook.com (2603:10b6:5:38b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21; Fri, 15 Sep
- 2023 05:55:15 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::f8a8:855c:2d19:9ac1]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::f8a8:855c:2d19:9ac1%6]) with mapi id 15.20.6792.020; Fri, 15 Sep 2023
- 05:55:15 +0000
-Date:   Fri, 15 Sep 2023 06:55:05 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Kyle Sanderson <kyle.leet@gmail.com>
-CC:     Linux-Kernal <linux-kernel@vger.kernel.org>, <qat-linux@intel.com>,
-        "Greg KH" <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: Linux 6.1.52 regression: Intel QAT kernel panic (memory
- corruption)
-Message-ID: <ZQPxuZ2tifa9bQKJ@gcabiddu-mobl1.ger.corp.intel.com>
-References: <CACsaVZ+LkHwTKO4XE_FFM62SbF3gGD4DZyse-9Y1UbJUgrhvfA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CACsaVZ+LkHwTKO4XE_FFM62SbF3gGD4DZyse-9Y1UbJUgrhvfA@mail.gmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DUZPR01CA0257.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b5::29) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+ 15.1.2507.31; Fri, 15 Sep 2023 14:53:35 +0800
+Subject: Re: [PATCH 2/2] crypto: hisilicon/zip - remove zlib and gzip
+To:     Yang Shen <shenyang39@huawei.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>
+References: <20230914090908.3849318-1-shenyang39@huawei.com>
+ <20230914090908.3849318-3-shenyang39@huawei.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <d40b6209-8059-4dc9-7e9a-05cd51817afd@huawei.com>
+Date:   Fri, 15 Sep 2023 14:53:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|DM4PR11MB5280:EE_
-X-MS-Office365-Filtering-Correlation-Id: d8a4380c-c920-42a1-a9a2-08dbb5b05504
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dqh9kQo2WVC2JvsxRcnfg+Kok6WQDu9LpBlIUF3j/0tZNGChet/sl2ybtzLeyolFmoIJWzHRhDPkKsR4+lcqcE+xdyjFeWywpnUnwCrDZ2fHUcpyFXKUIrnoXbJwsPQasyWBmFEykznjrSBu1F/SQa95kKCzOI1+aptHIKSDeQA1g/sNEf679VCgvwRKIYXuy4WMXDt9pnHSBhYTuxS6ynnutEFus7yHBVy/oVGHMd5ZjESOuhXNV/BKk+myqR36oI2nMCQerOfwgU3mhAl/bMy0EV9M69qB3y/eOZ4W5Fl+XYtgYI7poX21X7bxadebiNrO2RsZ/kyWcOz8BELVyB5uSoE4//KxM+9pKY+oBQ0QgJvFKmCYPCum9Uf33efQTjBzUIXulWuaWXUhHzLh4o++xyki97CWODESuaGK98Wk5+Vm1KlR5GYXOE8/Vy28sCII86byce1JR+H4tyyv40g74PvVe1ozDnRb4a+uubt2EHe0rvtCjNgkX1EiXB0Z1fdT7byWbbjxHUdaz0tyM/ZoIZqfGg/TL/452suO/OU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(346002)(376002)(136003)(396003)(451199024)(1800799009)(186009)(44832011)(8936002)(8676002)(5660300002)(4326008)(6512007)(6666004)(6486002)(26005)(83380400001)(6506007)(36916002)(478600001)(86362001)(41300700001)(316002)(6916009)(54906003)(66556008)(66476007)(66946007)(2906002)(966005)(38100700002)(82960400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WYA6Hoc+OLxR/riseT5vR+i329oX0Gp+1Fxwe3rVDs07yAyLIVvYYKkZODFx?=
- =?us-ascii?Q?CHhpvK0sHqeBfC57wS+tsshV0qq0E/6YQkaW2MT4g17VPu7sv78Sbt+wiJUd?=
- =?us-ascii?Q?oePTfFOPnLnSh42LfHgzpgI12EAhh1ZB7Y9xBkR1yRRYUqB2ik2u4o91/V4M?=
- =?us-ascii?Q?6sCy+tvf2c8gizZ+8oWD6m1pOqtmc1TrCsWxGq2C1lEggOzqfls1Pbin0cGq?=
- =?us-ascii?Q?gEmmeZh6zJB/S0Tv+60WvZg0gMQ/pbzCRC74Aaj4ulHZ+JO8+7bV/PpBRl/V?=
- =?us-ascii?Q?Rt7uy4aRcWgFRu3VuAb+Oy1GPRDQbk5vUvYPwkkFuzI5LTdEViKr5gu/5zG9?=
- =?us-ascii?Q?64N0HVg/aR1EV6pxMki5/5aXnA5NY/Gc3x3Kv9UHXLuuzeaAxEkm9g4WcuQd?=
- =?us-ascii?Q?b76F99RRG8qiawklWdvsiS5igddLakdXwureUMz9b0VdLIDfFqqoDnxIROW9?=
- =?us-ascii?Q?e6Gm0r0oFiXUOT+gpzFM8HdHWahVO/PmKNCEFvIggbv1lm7shG5/uiP0Wy7m?=
- =?us-ascii?Q?dtZD0nnkUXS8v6AelLbSMEioI51CtXiW4JGFGd7pBGPvWwNwSymPYr1CSCod?=
- =?us-ascii?Q?m/W1477+Rr5rt8BQNRrqyy8Avq5pUYvjFPIPlAAi+kdGytK+AY2VBcEKX3mr?=
- =?us-ascii?Q?ZhhoG/OeAmwe8jdBRVv0665gEfrJrIQyP8XcZy6+tubegJvkyNayzsf/IWAp?=
- =?us-ascii?Q?seR3vDdmZGzKdgxgTyumUSd10HWDFT5U1Z6me4fZkcH0mnbSMOYyRU2SioSL?=
- =?us-ascii?Q?+dQhJ0QkuORdzxCnAjJuXAe5I0Ja8GALsKBFhtSweQlrUkeV+AeOrEYnB0YI?=
- =?us-ascii?Q?sB42nDO6vTuFfW89sm2j2bl60NrZhFoT2wVWZKzU1edxqb03NCiiVuuUA6wy?=
- =?us-ascii?Q?5GowG32ohqudS+F6nze2PUs1oaf1fpMa1SzjgGliFy66M0jOzu7ldDMooPOf?=
- =?us-ascii?Q?ZGv6e364RsBQsMS/ZbEmEERto2l/nUzNbbUCjEYNdByDf1/tAoi35YgT3Z4q?=
- =?us-ascii?Q?f9wRqEYJOa3bfL9Er7u0ixkJOhxNCk1KCAH1cnktf30uV2MeUIR3OI6ngW7U?=
- =?us-ascii?Q?ZNc8Rb23w/u8FACmuD4Ha+pfRwGCRI1dttgyNQ64DwhDYGTjMwtnqXWdDlBZ?=
- =?us-ascii?Q?ACM7sr4PeCeLXM4ygDi1q1zWgK/g8+bT3wnNRWyW7pPRK7wXIbGIirVlPdjv?=
- =?us-ascii?Q?RyBhuT47OlmhkwKl0Yv6cPAm/lvouazXIv456eMMzPvf+oHEiqnAUobWqrk3?=
- =?us-ascii?Q?/BStUng7SwlM76zwg7BJLmfzVbC2QpKja8Qw5Xg7tZq9Lx8I6xFaaZDDcO31?=
- =?us-ascii?Q?0K7rWZKaXT2VY1K/XY8oUqoaZLyaaccapSXdtqtuyHcZj+uFtnt/50BKLwx2?=
- =?us-ascii?Q?6I4oCOe2yFUPWpmsOTG+xuNnw0X/satpzHAF7RWW/8EEERf7TMAKCwEMHi1m?=
- =?us-ascii?Q?25V9K5ArGz2xQarMWaEFK0rvbailKmSsxOuymrnoPwZxLPvczXkqhMiZUq2l?=
- =?us-ascii?Q?ULS2Nd2bdOpfF+ymXshPQLLVPZHDeLpHQOt5ve1v2F7bKBHKL+jtVLD7yf4W?=
- =?us-ascii?Q?ZIEtp1yv68nWry6XQAB2tYCL/TwHnBP4X7j86QhcB2ixGC9uweDszBR3+srl?=
- =?us-ascii?Q?fQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8a4380c-c920-42a1-a9a2-08dbb5b05504
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 05:55:14.9575
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j6CqHv7Ug2nctigSasw/GB/14J9RrNSGLIm4ZFM0Q3IE4avafr+05OaGFRSbQLXFgIgTa8ZNDy4hd6YZXjhs+T712AKqHlue59OkR7cbjqI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5280
-X-OriginatorOrg: intel.com
+In-Reply-To: <20230914090908.3849318-3-shenyang39@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.121.110]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 10:27:22PM -0700, Kyle Sanderson wrote:
-> Hello Intel QAT Maintainers,
+On 2023/9/14 17:09, Yang Shen wrote:
+> Remove the support of zlib-deflate and gzip.
 > 
-> It looks like QAT has regressed again. The present symptom is just
-> straight up memory corruption. I was running Canonical 6.1.0-1017-oem
-> and it doesn't happen, with 6.1.0-1020-oem and 6.1.0-1021-oem it does.
-> I don't know what these map to upstream, however with NixOS installed
-> the same corruption failure occurs on 6.1.52. The stack traces give
-> illegal instructions and all kinds of badness across all modules when
-> the device is simply present on the system, resulting in a hung
-> system, or a multitude of processes crashing and the system failing to
-> start. Disabling the device in the system BIOS results in a working
-> system, and no extreme corruption. kmem_cache_alloc_node is the common
-> fixture in the traces (I don't have a serial line), but I suspect
-> that's not where the problem is. The corruption this time happens
-> without block crypto being involved, and simply booting the installer
-> from a USB stick.
-This is probably be related to [1].
-Versions from 6.1.39 to 6.1.52 are affected. Fixed in v6.1.53.
+> Signed-off-by: Yang Shen <shenyang39@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/zip/zip_crypto.c | 308 ++--------------------
+>  drivers/crypto/hisilicon/zip/zip_main.c   |   2 +-
+>  2 files changed, 22 insertions(+), 288 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+> index 09f60f786779..636ac794ebb7 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+> @@ -17,38 +17,14 @@
+>  /* hisi_zip_sqe dw9 */
+>  #define HZIP_REQ_TYPE_M				GENMASK(7, 0)
+>  #define HZIP_ALG_TYPE_DEFLATE			0x01
+> -#define HZIP_ALG_TYPE_ZLIB			0x02
+> -#define HZIP_ALG_TYPE_GZIP			0x03
+>  #define HZIP_BUF_TYPE_M				GENMASK(11, 8)
+> -#define HZIP_PBUFFER				0x0
+>  #define HZIP_SGL				0x1
+>  
+> -#define HZIP_ZLIB_HEAD_SIZE			2
+> -#define HZIP_GZIP_HEAD_SIZE			10
+> -
+> -#define GZIP_HEAD_FHCRC_BIT			BIT(1)
+> -#define GZIP_HEAD_FEXTRA_BIT			BIT(2)
+> -#define GZIP_HEAD_FNAME_BIT			BIT(3)
+> -#define GZIP_HEAD_FCOMMENT_BIT			BIT(4)
+> -
+> -#define GZIP_HEAD_FLG_SHIFT			3
+> -#define GZIP_HEAD_FEXTRA_SHIFT			10
+> -#define GZIP_HEAD_FEXTRA_XLEN			2UL
+> -#define GZIP_HEAD_FHCRC_SIZE			2
+> -
+> -#define HZIP_GZIP_HEAD_BUF			256
+>  #define HZIP_ALG_PRIORITY			300
+>  #define HZIP_SGL_SGE_NR				10
+>  
+> -#define HZIP_ALG_ZLIB				GENMASK(1, 0)
+> -#define HZIP_ALG_GZIP				GENMASK(3, 2)
+>  #define HZIP_ALG_DEFLATE			GENMASK(5, 4)
+>  
+> -static const u8 zlib_head[HZIP_ZLIB_HEAD_SIZE] = {0x78, 0x9c};
+> -static const u8 gzip_head[HZIP_GZIP_HEAD_SIZE] = {
+> -	0x1f, 0x8b, 0x08, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x03
+> -};
+> -
+>  enum hisi_zip_alg_type {
+>  	HZIP_ALG_TYPE_COMP = 0,
+>  	HZIP_ALG_TYPE_DECOMP = 1,
+> @@ -61,22 +37,10 @@ enum {
+>  };
+>  
+>  #define COMP_NAME_TO_TYPE(alg_name)					\
+> -	(!strcmp((alg_name), "deflate") ? HZIP_ALG_TYPE_DEFLATE :	\
+> -	(!strcmp((alg_name), "zlib-deflate") ? HZIP_ALG_TYPE_ZLIB :	\
+> -	 !strcmp((alg_name), "gzip") ? HZIP_ALG_TYPE_GZIP : 0))		\
+> -
+> -#define TO_HEAD_SIZE(req_type)						\
+> -	(((req_type) == HZIP_ALG_TYPE_ZLIB) ? sizeof(zlib_head) :	\
+> -	 ((req_type) == HZIP_ALG_TYPE_GZIP) ? sizeof(gzip_head) : 0)	\
+> -
+> -#define TO_HEAD(req_type)						\
+> -	(((req_type) == HZIP_ALG_TYPE_ZLIB) ? zlib_head :		\
+> -	 ((req_type) == HZIP_ALG_TYPE_GZIP) ? gzip_head : NULL)		\
+> +	(!strcmp((alg_name), "deflate") ? HZIP_ALG_TYPE_DEFLATE : 0)
+>  
+>  struct hisi_zip_req {
+>  	struct acomp_req *req;
+> -	u32 sskip;
+> -	u32 dskip;
+>  	struct hisi_acc_hw_sgl *hw_src;
+>  	struct hisi_acc_hw_sgl *hw_dst;
+>  	dma_addr_t dma_src;
+> @@ -141,85 +105,8 @@ static u16 sgl_sge_nr = HZIP_SGL_SGE_NR;
+>  module_param_cb(sgl_sge_nr, &sgl_sge_nr_ops, &sgl_sge_nr, 0444);
+>  MODULE_PARM_DESC(sgl_sge_nr, "Number of sge in sgl(1-255)");
+>  
+> -static u32 get_extra_field_size(const u8 *start)
+> -{
+> -	return *((u16 *)start) + GZIP_HEAD_FEXTRA_XLEN;
+> -}
+> -
+> -static u32 get_name_field_size(const u8 *start)
+> -{
+> -	return strlen(start) + 1;
+> -}
+> -
+> -static u32 get_comment_field_size(const u8 *start)
+> -{
+> -	return strlen(start) + 1;
+> -}
+> -
+> -static u32 __get_gzip_head_size(const u8 *src)
+> -{
+> -	u8 head_flg = *(src + GZIP_HEAD_FLG_SHIFT);
+> -	u32 size = GZIP_HEAD_FEXTRA_SHIFT;
+> -
+> -	if (head_flg & GZIP_HEAD_FEXTRA_BIT)
+> -		size += get_extra_field_size(src + size);
+> -	if (head_flg & GZIP_HEAD_FNAME_BIT)
+> -		size += get_name_field_size(src + size);
+> -	if (head_flg & GZIP_HEAD_FCOMMENT_BIT)
+> -		size += get_comment_field_size(src + size);
+> -	if (head_flg & GZIP_HEAD_FHCRC_BIT)
+> -		size += GZIP_HEAD_FHCRC_SIZE;
+> -
+> -	return size;
+> -}
+> -
+> -static u32 __maybe_unused get_gzip_head_size(struct scatterlist *sgl)
+> -{
+> -	char buf[HZIP_GZIP_HEAD_BUF];
+> -
+> -	sg_copy_to_buffer(sgl, sg_nents(sgl), buf, sizeof(buf));
+> -
+> -	return __get_gzip_head_size(buf);
+> -}
+> -
+> -static int add_comp_head(struct scatterlist *dst, u8 req_type)
+> -{
+> -	int head_size = TO_HEAD_SIZE(req_type);
+> -	const u8 *head = TO_HEAD(req_type);
+> -	int ret;
+> -
+> -	ret = sg_copy_from_buffer(dst, sg_nents(dst), head, head_size);
+> -	if (unlikely(ret != head_size)) {
+> -		pr_err("the head size of buffer is wrong (%d)!\n", ret);
+> -		return -ENOMEM;
+> -	}
+> -
+> -	return head_size;
+> -}
+> -
+> -static int get_comp_head_size(struct acomp_req *acomp_req, u8 req_type)
+> -{
+> -	if (unlikely(!acomp_req->src || !acomp_req->slen))
+> -		return -EINVAL;
+> -
+> -	if (unlikely(req_type == HZIP_ALG_TYPE_GZIP &&
+> -		     acomp_req->slen < GZIP_HEAD_FEXTRA_SHIFT))
+> -		return -EINVAL;
+> -
+> -	switch (req_type) {
+> -	case HZIP_ALG_TYPE_ZLIB:
+> -		return TO_HEAD_SIZE(HZIP_ALG_TYPE_ZLIB);
+> -	case HZIP_ALG_TYPE_GZIP:
+> -		return TO_HEAD_SIZE(HZIP_ALG_TYPE_GZIP);
+> -	default:
+> -		pr_err("request type does not support!\n");
+> -		return -EINVAL;
+> -	}
+> -}
+> -
+> -static struct hisi_zip_req *hisi_zip_create_req(struct acomp_req *req,
+> -						struct hisi_zip_qp_ctx *qp_ctx,
+> -						size_t head_size, bool is_comp)
+> +static struct hisi_zip_req *hisi_zip_create_req(struct hisi_zip_qp_ctx *qp_ctx,
+> +						struct acomp_req *req)
+>  {
+>  	struct hisi_zip_req_q *req_q = &qp_ctx->req_q;
+>  	struct hisi_zip_req *q = req_q->q;
+> @@ -242,14 +129,6 @@ static struct hisi_zip_req *hisi_zip_create_req(struct acomp_req *req,
+>  	req_cache->req_id = req_id;
+>  	req_cache->req = req;
+>  
+> -	if (is_comp) {
+> -		req_cache->sskip = 0;
+> -		req_cache->dskip = head_size;
+> -	} else {
+> -		req_cache->sskip = head_size;
+> -		req_cache->dskip = 0;
+> -	}
+> -
+>  	return req_cache;
+>  }
+>  
+> @@ -275,10 +154,8 @@ static void hisi_zip_fill_buf_size(struct hisi_zip_sqe *sqe, struct hisi_zip_req
+>  {
+>  	struct acomp_req *a_req = req->req;
+>  
+> -	sqe->input_data_length = a_req->slen - req->sskip;
+> -	sqe->dest_avail_out = a_req->dlen - req->dskip;
+> -	sqe->dw7 = FIELD_PREP(HZIP_IN_SGE_DATA_OFFSET_M, req->sskip);
+> -	sqe->dw8 = FIELD_PREP(HZIP_OUT_SGE_DATA_OFFSET_M, req->dskip);
+> +	sqe->input_data_length = a_req->slen;
+> +	sqe->dest_avail_out = a_req->dlen;
+>  }
+>  
+>  static void hisi_zip_fill_buf_type(struct hisi_zip_sqe *sqe, u8 buf_type)
+> @@ -299,12 +176,7 @@ static void hisi_zip_fill_req_type(struct hisi_zip_sqe *sqe, u8 req_type)
+>  	sqe->dw9 = val;
+>  }
+>  
+> -static void hisi_zip_fill_tag_v1(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
+> -{
+> -	sqe->dw13 = req->req_id;
+> -}
+> -
+> -static void hisi_zip_fill_tag_v2(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
+> +static void hisi_zip_fill_tag(struct hisi_zip_sqe *sqe, struct hisi_zip_req *req)
+>  {
+>  	sqe->dw26 = req->req_id;
+>  }
+> @@ -333,8 +205,8 @@ static void hisi_zip_fill_sqe(struct hisi_zip_ctx *ctx, struct hisi_zip_sqe *sqe
+>  	ops->fill_sqe_type(sqe, ops->sqe_type);
+>  }
+>  
+> -static int hisi_zip_do_work(struct hisi_zip_req *req,
+> -			    struct hisi_zip_qp_ctx *qp_ctx)
+> +static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
+> +			    struct hisi_zip_req *req)
+>  {
+>  	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
+>  	struct hisi_zip_dfx *dfx = &qp_ctx->zip_dev->dfx;
+> @@ -386,12 +258,7 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
+>  	return ret;
+>  }
+>  
+> -static u32 hisi_zip_get_tag_v1(struct hisi_zip_sqe *sqe)
+> -{
+> -	return sqe->dw13;
+> -}
+> -
+> -static u32 hisi_zip_get_tag_v2(struct hisi_zip_sqe *sqe)
+> +static u32 hisi_zip_get_tag(struct hisi_zip_sqe *sqe)
+>  {
+>  	return sqe->dw26;
+>  }
+> @@ -417,8 +284,8 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
+>  	u32 tag = ops->get_tag(sqe);
+>  	struct hisi_zip_req *req = req_q->q + tag;
+>  	struct acomp_req *acomp_req = req->req;
+> -	u32 status, dlen, head_size;
+>  	int err = 0;
+> +	u32 status;
+>  
+>  	atomic64_inc(&dfx->recv_cnt);
+>  	status = ops->get_status(sqe);
+> @@ -430,13 +297,10 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
+>  		err = -EIO;
+>  	}
+>  
+> -	dlen = ops->get_dstlen(sqe);
+> -
+>  	hisi_acc_sg_buf_unmap(dev, acomp_req->src, req->hw_src);
+>  	hisi_acc_sg_buf_unmap(dev, acomp_req->dst, req->hw_dst);
+>  
+> -	head_size = (qp->alg_type == 0) ? TO_HEAD_SIZE(qp->req_type) : 0;
+> -	acomp_req->dlen = dlen + head_size;
+> +	acomp_req->dlen = ops->get_dstlen(sqe);
+>  
+>  	if (acomp_req->base.complete)
+>  		acomp_request_complete(acomp_req, err);
+> @@ -450,24 +314,13 @@ static int hisi_zip_acompress(struct acomp_req *acomp_req)
+>  	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_COMP];
+>  	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
+>  	struct hisi_zip_req *req;
+> -	int head_size = 0;
+>  	int ret;
+>  
+> -	/* let's output compression head now */
+> -	if (qp_ctx->qp->req_type != HZIP_ALG_TYPE_DEFLATE) {
+> -		head_size = add_comp_head(acomp_req->dst, qp_ctx->qp->req_type);
+> -		if (unlikely(head_size < 0)) {
+> -			dev_err_ratelimited(dev, "failed to add comp head (%d)!\n",
+> -					head_size);
+> -			return head_size;
+> -		}
+> -	}
+> -
+> -	req = hisi_zip_create_req(acomp_req, qp_ctx, head_size, true);
+> +	req = hisi_zip_create_req(qp_ctx, acomp_req);
+>  	if (IS_ERR(req))
+>  		return PTR_ERR(req);
+>  
+> -	ret = hisi_zip_do_work(req, qp_ctx);
+> +	ret = hisi_zip_do_work(qp_ctx, req);
+>  	if (unlikely(ret != -EINPROGRESS)) {
+>  		dev_info_ratelimited(dev, "failed to do compress (%d)!\n", ret);
+>  		hisi_zip_remove_req(qp_ctx, req);
+> @@ -482,22 +335,13 @@ static int hisi_zip_adecompress(struct acomp_req *acomp_req)
+>  	struct hisi_zip_qp_ctx *qp_ctx = &ctx->qp_ctx[HZIP_QPC_DECOMP];
+>  	struct device *dev = &qp_ctx->qp->qm->pdev->dev;
+>  	struct hisi_zip_req *req;
+> -	int head_size = 0, ret;
+> -
+> -	if (qp_ctx->qp->req_type != HZIP_ALG_TYPE_DEFLATE) {
+> -		head_size = get_comp_head_size(acomp_req, qp_ctx->qp->req_type);
+> -		if (unlikely(head_size < 0)) {
+> -			dev_err_ratelimited(dev, "failed to get comp head size (%d)!\n",
+> -					head_size);
+> -			return head_size;
+> -		}
+> -	}
+> +	int ret;
+>  
+> -	req = hisi_zip_create_req(acomp_req, qp_ctx, head_size, false);
+> +	req = hisi_zip_create_req(qp_ctx, acomp_req);
+>  	if (IS_ERR(req))
+>  		return PTR_ERR(req);
+>  
+> -	ret = hisi_zip_do_work(req, qp_ctx);
+> +	ret = hisi_zip_do_work(qp_ctx, req);
+>  	if (unlikely(ret != -EINPROGRESS)) {
+>  		dev_info_ratelimited(dev, "failed to do decompress (%d)!\n",
+>  				     ret);
+> @@ -534,28 +378,15 @@ static void hisi_zip_release_qp(struct hisi_zip_qp_ctx *qp_ctx)
+>  	hisi_qm_free_qps(&qp_ctx->qp, 1);
+>  }
+>  
+> -static const struct hisi_zip_sqe_ops hisi_zip_ops_v1 = {
+> -	.sqe_type		= 0,
+> -	.fill_addr		= hisi_zip_fill_addr,
+> -	.fill_buf_size		= hisi_zip_fill_buf_size,
+> -	.fill_buf_type		= hisi_zip_fill_buf_type,
+> -	.fill_req_type		= hisi_zip_fill_req_type,
+> -	.fill_tag		= hisi_zip_fill_tag_v1,
+> -	.fill_sqe_type		= hisi_zip_fill_sqe_type,
+> -	.get_tag		= hisi_zip_get_tag_v1,
+> -	.get_status		= hisi_zip_get_status,
+> -	.get_dstlen		= hisi_zip_get_dstlen,
+> -};
+> -
+> -static const struct hisi_zip_sqe_ops hisi_zip_ops_v2 = {
+> +static const struct hisi_zip_sqe_ops hisi_zip_ops = {
+>  	.sqe_type		= 0x3,
+>  	.fill_addr		= hisi_zip_fill_addr,
+>  	.fill_buf_size		= hisi_zip_fill_buf_size,
+>  	.fill_buf_type		= hisi_zip_fill_buf_type,
+>  	.fill_req_type		= hisi_zip_fill_req_type,
+> -	.fill_tag		= hisi_zip_fill_tag_v2,
+> +	.fill_tag		= hisi_zip_fill_tag,
+>  	.fill_sqe_type		= hisi_zip_fill_sqe_type,
+> -	.get_tag		= hisi_zip_get_tag_v2,
+> +	.get_tag		= hisi_zip_get_tag,
+>  	.get_status		= hisi_zip_get_status,
+>  	.get_dstlen		= hisi_zip_get_dstlen,
+>  };
+> @@ -591,10 +422,7 @@ static int hisi_zip_ctx_init(struct hisi_zip_ctx *hisi_zip_ctx, u8 req_type, int
+>  		qp_ctx->zip_dev = hisi_zip;
+>  	}
+>  
+> -	if (hisi_zip->qm.ver < QM_HW_V3)
+> -		hisi_zip_ctx->ops = &hisi_zip_ops_v1;
+> -	else
+> -		hisi_zip_ctx->ops = &hisi_zip_ops_v2;
+> +	hisi_zip_ctx->ops = &hisi_zip_ops;
+>  
+>  	return 0;
+>  }
+> @@ -788,106 +616,12 @@ static void hisi_zip_unregister_deflate(struct hisi_qm *qm)
+>  	crypto_unregister_acomp(&hisi_zip_acomp_deflate);
+>  }
+>  
+> -static struct acomp_alg hisi_zip_acomp_zlib = {
+> -	.init			= hisi_zip_acomp_init,
+> -	.exit			= hisi_zip_acomp_exit,
+> -	.compress		= hisi_zip_acompress,
+> -	.decompress		= hisi_zip_adecompress,
+> -	.base			= {
+> -		.cra_name		= "zlib-deflate",
+> -		.cra_driver_name	= "hisi-zlib-acomp",
+> -		.cra_module		= THIS_MODULE,
+> -		.cra_priority           = HZIP_ALG_PRIORITY,
+> -		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
+> -	}
+> -};
+> -
+> -static int hisi_zip_register_zlib(struct hisi_qm *qm)
+> -{
+> -	int ret;
+> -
+> -	if (!hisi_zip_alg_support(qm, HZIP_ALG_ZLIB))
+> -		return 0;
+> -
+> -	ret = crypto_register_acomp(&hisi_zip_acomp_zlib);
+> -	if (ret)
+> -		dev_err(&qm->pdev->dev, "failed to register to zlib (%d)!\n", ret);
+> -
+> -	return ret;
+> -}
+> -
+> -static void hisi_zip_unregister_zlib(struct hisi_qm *qm)
+> -{
+> -	if (!hisi_zip_alg_support(qm, HZIP_ALG_ZLIB))
+> -		return;
+> -
+> -	crypto_unregister_acomp(&hisi_zip_acomp_zlib);
+> -}
+> -
+> -static struct acomp_alg hisi_zip_acomp_gzip = {
+> -	.init			= hisi_zip_acomp_init,
+> -	.exit			= hisi_zip_acomp_exit,
+> -	.compress		= hisi_zip_acompress,
+> -	.decompress		= hisi_zip_adecompress,
+> -	.base			= {
+> -		.cra_name		= "gzip",
+> -		.cra_driver_name	= "hisi-gzip-acomp",
+> -		.cra_module		= THIS_MODULE,
+> -		.cra_priority           = HZIP_ALG_PRIORITY,
+> -		.cra_ctxsize		= sizeof(struct hisi_zip_ctx),
+> -	}
+> -};
+> -
+> -static int hisi_zip_register_gzip(struct hisi_qm *qm)
+> -{
+> -	int ret;
+> -
+> -	if (!hisi_zip_alg_support(qm, HZIP_ALG_GZIP))
+> -		return 0;
+> -
+> -	ret = crypto_register_acomp(&hisi_zip_acomp_gzip);
+> -	if (ret)
+> -		dev_err(&qm->pdev->dev, "failed to register to gzip (%d)!\n", ret);
+> -
+> -	return ret;
+> -}
+> -
+> -static void hisi_zip_unregister_gzip(struct hisi_qm *qm)
+> -{
+> -	if (!hisi_zip_alg_support(qm, HZIP_ALG_GZIP))
+> -		return;
+> -
+> -	crypto_unregister_acomp(&hisi_zip_acomp_gzip);
+> -}
+> -
+>  int hisi_zip_register_to_crypto(struct hisi_qm *qm)
+>  {
+> -	int ret = 0;
+> -
+> -	ret = hisi_zip_register_deflate(qm);
+> -	if (ret)
+> -		return ret;
+> -
+> -	ret = hisi_zip_register_zlib(qm);
+> -	if (ret)
+> -		goto err_unreg_deflate;
+> -
+> -	ret = hisi_zip_register_gzip(qm);
+> -	if (ret)
+> -		goto err_unreg_zlib;
+> -
+> -	return 0;
+> -
+> -err_unreg_zlib:
+> -	hisi_zip_unregister_zlib(qm);
+> -err_unreg_deflate:
+> -	hisi_zip_unregister_deflate(qm);
+> -	return ret;
+> +	return hisi_zip_register_deflate(qm);
+>  }
+>  
+>  void hisi_zip_unregister_from_crypto(struct hisi_qm *qm)
+>  {
+>  	hisi_zip_unregister_deflate(qm);
+> -	hisi_zip_unregister_zlib(qm);
+> -	hisi_zip_unregister_gzip(qm);
+>  }
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index da7a23c0e594..0d5d1ee363e4 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -236,7 +236,7 @@ static struct hisi_qm_cap_info zip_basic_cap_info[] = {
+>  	{ZIP_CLUSTER_DECOMP_NUM_CAP, 0x313C, 0, GENMASK(7, 0), 0x6, 0x6, 0x3},
+>  	{ZIP_DECOMP_ENABLE_BITMAP, 0x3140, 16, GENMASK(15, 0), 0xFC, 0xFC, 0x1C},
+>  	{ZIP_COMP_ENABLE_BITMAP, 0x3140, 0, GENMASK(15, 0), 0x3, 0x3, 0x3},
+> -	{ZIP_DRV_ALG_BITMAP, 0x3144, 0, GENMASK(31, 0), 0xF, 0xF, 0x3F},
+> +	{ZIP_DRV_ALG_BITMAP, 0x3144, 0, GENMASK(31, 0), 0x0, 0x0, 0x30},
+>  	{ZIP_DEV_ALG_BITMAP, 0x3148, 0, GENMASK(31, 0), 0xF, 0xF, 0x3F},
+>  	{ZIP_CORE1_ALG_BITMAP, 0x314C, 0, GENMASK(31, 0), 0x5, 0x5, 0xD5},
+>  	{ZIP_CORE2_ALG_BITMAP, 0x3150, 0, GENMASK(31, 0), 0x5, 0x5, 0xD5},
+> 
+Reviewed-by: Longfang Liu <liulongfang@huawei.com>
 
-[1] https://www.spinics.net/lists/stable/msg678947.html
-
-Regards,
-
--- 
-Giovanni
+Thanks.
+Longfang.
