@@ -2,64 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF33EE645C
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 13:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2396EE0214
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 14:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235229AbjION3w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 09:29:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38358 "EHLO
+        id S235654AbjIOO3l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 10:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235281AbjION3w (ORCPT
+        with ESMTP id S235671AbjIOO3l (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 09:29:52 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1038718D;
-        Fri, 15 Sep 2023 06:29:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-        s=201909; t=1694784578;
-        bh=lXjvd3TJSQ6cqva6/5eqdL2+87WjyD9vjXEISda8nlY=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=qScOy0tOOQA6fnha+GtlosxQosWFpa5yzcf4gN/iBxpHFGLtceVHASAO5f8N/A246
-         EJF4P1xx5SfWr9sFNEVugnBpmH8/r7dVMPze1lFIHaFYTwADXAG6BpX4iyvYoYSkRG
-         oZMXwT0cTcFYnEbbINP7WafKHzB482xLt+zmv2tfk2iAKrPxFogFcN4AwbCFslCS2/
-         4iMwrYwffQ/6DzrxZjr5O/AGw4rv7/U7CFa9b4/od9odeGx9ZIkZgf2Hxu1W1YA7Y5
-         ry7p9r+oQ8Bl14KOojwwKhVIFYfcyqeyTAbDSM/dOP8psV7P3y8qw5vy2CKuo85pyR
-         w3eIK9le5FNyA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4RnFR62VCtz4wxd;
-        Fri, 15 Sep 2023 23:29:38 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org
+        Fri, 15 Sep 2023 10:29:41 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B78DF2708;
+        Fri, 15 Sep 2023 07:29:19 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38FEGNph012977;
+        Fri, 15 Sep 2023 14:28:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=L1JdvrFXRMAq+NwN/x/5/Pebd2+L1Pp1g6La/uh1FLc=;
+ b=ruej39xRmhdWDO9p3/uC/K2DcA5UDk0JUoaxbYkAtpEjTIVA9chEP+Hyz0nngf13/OSU
+ O+2Q6twUffQgK/ifzuTT8rE9HhUQqL8dmN7y+ffoBMbBBr8p3sT/plOClwNStX5pGKEU
+ caI2MXKNMeSOsTpM93xXPl3U5spJJL9pMDOVTGqM5OZ2BnznYHui6YuGFFtkKbg2yHvw
+ b6QXsk+FEkyGvljdpReDnxGC3SJmL4AEyKijU5efa4n68GlWdW9RdgBqm2DqdDtB75CU
+ 5aV4sOTTGNFsyEm839gQDOB+ortZbHsEIPy/RX3M9h+asv8p4IqlY9i7eZrftvuSBOsv aw== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t4r9b1b13-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Sep 2023 14:28:56 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38FCgYrZ011942;
+        Fri, 15 Sep 2023 14:28:55 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+        by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t15r2kvub-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Sep 2023 14:28:55 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38FESswU31064346
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Sep 2023 14:28:55 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F0E558052;
+        Fri, 15 Sep 2023 14:28:54 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 36B9358045;
+        Fri, 15 Sep 2023 14:28:53 +0000 (GMT)
+Received: from [9.67.12.83] (unknown [9.67.12.83])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 15 Sep 2023 14:28:53 +0000 (GMT)
+Message-ID: <ccb1ade9-5a5b-99dc-f26f-2637059249ef@linux.ibm.com>
+Date:   Fri, 15 Sep 2023 09:28:52 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH v2] crypto: vmx: Improved AES/XTS performance of 6-way
+ unrolling for ppc.
+Content-Language: en-US
+To:     Michael Ellerman <mpe@ellerman.id.au>, linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, leitao@debian.org,
         nayna@linux.ibm.com, appro@cryptogams.org,
         linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
-        Danny Tsen <dtsen@linux.ibm.com>
-Subject: Re: [PATCH v2] crypto: vmx: Improved AES/XTS performance of 6-way
- unrolling for ppc.
-In-Reply-To: <20230830134911.179765-1-dtsen@linux.ibm.com>
+        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
 References: <20230830134911.179765-1-dtsen@linux.ibm.com>
-Date:   Fri, 15 Sep 2023 23:29:33 +1000
-Message-ID: <8734zf7ef6.fsf@mail.lhotse>
+ <8734zf7ef6.fsf@mail.lhotse>
+From:   Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <8734zf7ef6.fsf@mail.lhotse>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aBeT9aIEofoOYbXD872lv7cLLktXoLIo
+X-Proofpoint-ORIG-GUID: aBeT9aIEofoOYbXD872lv7cLLktXoLIo
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 2 URL's were un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-15_11,2023-09-14_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0
+ adultscore=0 mlxscore=0 impostorscore=0 mlxlogscore=551 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309150126
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Danny Tsen <dtsen@linux.ibm.com> writes:
-> Improve AES/XTS performance of 6-way unrolling for PowerPC up
-> to 17% with tcrypt.  This is done by using one instruction,
-> vpermxor, to replace xor and vsldoi.
+Still waiting for the CCLA to send to Openssl.
+
+Thanks.
+
+-Danny
+
+On 9/15/23 8:29 AM, Michael Ellerman wrote:
+> Danny Tsen <dtsen@linux.ibm.com> writes:
+>> Improve AES/XTS performance of 6-way unrolling for PowerPC up
+>> to 17% with tcrypt.  This is done by using one instruction,
+>> vpermxor, to replace xor and vsldoi.
+>>
+>> The same changes were applied to OpenSSL code and a pull request was
+>> submitted.
+> https://github.com/openssl/openssl/pull/21812
 >
-> The same changes were applied to OpenSSL code and a pull request was
-> submitted.
-
-https://github.com/openssl/openssl/pull/21812
-
-Still unmerged as of today.
-
-cheers
+> Still unmerged as of today.
+>
+> cheers
