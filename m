@@ -2,104 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6ACEDE989
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 03:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 912AAEEAA42
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 03:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbjIODVj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 23:21:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60264 "EHLO
+        id S231523AbjIODie (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 23:38:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231882AbjIODVi (ORCPT
+        with ESMTP id S231438AbjIODid (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 23:21:38 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562B92711
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 20:21:34 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-68fdd6011f2so1365776b3a.3
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 20:21:34 -0700 (PDT)
+        Thu, 14 Sep 2023 23:38:33 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EFC270C
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 20:38:28 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bc0d39b52cso14578525ad.2
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 20:38:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1694748094; x=1695352894; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PTDOQBJsYSyw8b1H54D8BUhY8rLLu4LSSYhPNnbLvfE=;
-        b=PFnpFcY0wrEoXHkYC8yKgsuXZjuJJfr6F7aJFTj2pAHEUilg9m7Xllo/sYNrpxYmVJ
-         JiQBYCQH3GEvZgm3XoWO8m83BGIlx3anRva3VdG2tLDhIdpuy9WL9Ag4bSobu3GJzHL4
-         zRNCNW9HrNlBfLz/zaacNS/tBP7rvb6f4F+1ahGzjfkZK1NAa3XoDNLgq2Ad/AW5sKqv
-         Jhjty4wTQAbPQ+nqWqHPW3G2o5i0GRO+hbmO3uUHxSkTIlsHCYwUH/yhaV06QRtsvbX8
-         TfhoEfTPPBC/pR/TMAAffiraWrt4UxODb4kggdqng8dM5zNFp5+3GYhKDDvHxhy8CBpU
-         qXjQ==
+        d=chromium.org; s=google; t=1694749108; x=1695353908; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v9bsEeGJhGQLCD2Cb52vXww1fF+hyPOxNnrIsUJnCkg=;
+        b=R0IL86eVQXwSGyu12W5/gdVhaQEJu4JIoV70x5Gd6s8N/v+rj9abipjn8LNivzKdQa
+         l1S7iGcVKRnRj1ogL/q/YW7NdK77ExM8uX2E1gw6ZekIAXp3smaVgjZqaaK5JTj/AlHJ
+         BJnyM2Y94lJdntH938iQ9uF92bUxHhgiHi4qA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694748094; x=1695352894;
-        h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PTDOQBJsYSyw8b1H54D8BUhY8rLLu4LSSYhPNnbLvfE=;
-        b=mGvxR8m2ue0euRzAHpXelQ0Dtxlx770RX9zeQpQ55UgQr4tn+tbC36MOZbRkvNlr1g
-         70CeRpfZN9uH/q3mK0CqTC4Xk4S9gxfE+HsGuzw24CM4KW56FRRryAIn0vO352+eXA2r
-         q8ffZgzOJu1SeBk/Icx4gj2kvkuFr5tHm+cqm4wqoe0+r62HCUanwxJGopmRAyU51KH+
-         kIwni4uz5RygSif+tvACJftC8C0xnwbAkdmPAu3NJ/l+VQQ/FIIvihMNGPlO2EhwPzwE
-         K2z5OKyhw1CGBNnWO2ojCaZURzSxIFgjzpFhY1VlL/nslWYq8ovYP4x4A5jUGc8IZpgc
-         UqbA==
-X-Gm-Message-State: AOJu0YxNOrbeEaUwYKa1ckatZsVd/G24WW4JQli5J+V+aSL64qDLXah5
-        czVSZmBchH8vmJHP+ZDriP4MPA==
-X-Google-Smtp-Source: AGHT+IEuvHA6qyozCTrAZcaIDeut+4ZIhEGVI11IyUpSTAA3tAcSzOB2bHYHNQ0B0UVKXCDJxrKPYw==
-X-Received: by 2002:a05:6a00:17a3:b0:68b:ff3b:e140 with SMTP id s35-20020a056a0017a300b0068bff3be140mr563288pfg.8.1694748093778;
-        Thu, 14 Sep 2023 20:21:33 -0700 (PDT)
-Received: from ?IPv6:2402:7500:5ce:c546:b4c4:4f04:b63a:c241? ([2402:7500:5ce:c546:b4c4:4f04:b63a:c241])
-        by smtp.gmail.com with ESMTPSA id m1-20020a056a00164100b00690397fdd9bsm1350856pfc.190.2023.09.14.20.21.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 14 Sep 2023 20:21:33 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
-From:   Jerry Shih <jerry.shih@sifive.com>
-In-Reply-To: <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
-Date:   Fri, 15 Sep 2023 11:21:28 +0800
-Cc:     Charlie Jenkins <charlie@rivosinc.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Reply-To: 3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <DD3113B1-AB9F-4D6D-BD6E-8F75A83DA45D@sifive.com>
-References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230914001144.GA924@sol.localdomain> <ZQJdnCwf99Glggin@ghost>
- <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
-To:     He-Jie Shih <bignose1007@gmail.com>
-X-Mailer: Apple Mail (2.3445.9.7)
+        d=1e100.net; s=20230601; t=1694749108; x=1695353908;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v9bsEeGJhGQLCD2Cb52vXww1fF+hyPOxNnrIsUJnCkg=;
+        b=amSVkl16OWg7gzR4lNfEL8pZJtJut1Ju9cUt5Ps+S9mpskTj88UeatfA0qxS1yJnPB
+         SHB5LLcB9ppChJlJBdyHLFw/KPLMOGIGd70iu9Az7h+mPDNgtMp8MOZMQokY7yDuqg6U
+         0LcBYnvTPI3h3MJwQznV1ovC12RBxg3uOiuW15Rb5puahz6u7PkAtn9WiPd9NpXAdFE9
+         QEYmprcdUA+Hr183BAnxnrX2tHlM1F7RhC9K8ASMMsPL43+/rXNvdUQHHwlmVsIJLK1x
+         cGj/3RLiG7ggULDaAK+WZW9Bwu9w0/5bI3tZ5yxfIfcA01uiPc818W3r2O/UqqDpmUrK
+         JApQ==
+X-Gm-Message-State: AOJu0Yyaz/VIflXiulKtQkXeVOeoIeHod52Sb9iL9EI3f67XF9ZmduYu
+        75lCFB2qOOz/blr7trOtVUzT1jvcuJuDEVDwy4A=
+X-Google-Smtp-Source: AGHT+IERNqEJym7j7zmwKFthi95ngAK1oA/fJ85WrRMxD/dztnczJ8CSvvkTC2fIU+1XhUu9RNqxrA==
+X-Received: by 2002:a17:902:cec4:b0:1c4:21f3:4be9 with SMTP id d4-20020a170902cec400b001c421f34be9mr471656plg.62.1694749108396;
+        Thu, 14 Sep 2023 20:38:28 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id j8-20020a17090276c800b001b890b3bbb1sm2332311plt.211.2023.09.14.20.38.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 20:38:27 -0700 (PDT)
+Date:   Thu, 14 Sep 2023 20:38:27 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Justin Stitt <justinstitt@google.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] crypto: cavium/nitrox - refactor deprecated strncpy
+Message-ID: <202309142038.696D180@keescook>
+References: <20230913-strncpy-drivers-crypto-cavium-nitrox-nitrox_hal-c-v1-1-937411a7bc7d@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230913-strncpy-drivers-crypto-cavium-nitrox-nitrox_hal-c-v1-1-937411a7bc7d@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sep 15, 2023, at 09:48, He-Jie Shih <bignose1007@gmail.com> wrote:
-
-> On Sep 14, 2023, at 09:10, Charlie Jenkins <charlie@rivosinc.com> wrote:
+On Wed, Sep 13, 2023 at 12:32:31AM +0000, Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings [1].
 > 
->> On Wed, Sep 13, 2023 at 05:11:44PM -0700, Eric Biggers wrote:
->>> On Tue, Jul 11, 2023 at 05:37:31PM +0200, Heiko Stuebner wrote:
->>> 
->>> Hi Heiko!  Are you still working on this patchset?  And which of its
->>> prerequisites still haven't been merged upstream?
->>> 
->>> - Eric
->> It is my understanding that Heiko is taking a break from development, I
->> don't think he will be working on this soon.
+> We know `hw.partname` is supposed to be NUL-terminated by its later use with seq_printf:
+> | nitrox_debugfs.c +25
+> |      seq_printf(s, "  Part Name: %s\n", ndev->hw.partname);
 > 
-> We would like to take over these RISC-V vector crypto implementations.
-> Our proposed implementations is under reviewing in OpenSSL pr.
-> And I will check the gluing parts between Linux kernel and OpenSSL.
+> Let's prefer a more robust and less ambiguous string interface.
+> 
+> A suitable replacement is `strscpy` [2] due to the fact that it guarantees
+> NUL-termination on the destination buffer.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-The OpenSSL PR is at [1].
-And we are from SiFive.
+Looks correct to me.
 
--Jerry
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-[1]
-https://github.com/openssl/openssl/pull/21923
+-- 
+Kees Cook
