@@ -2,124 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7B4EEAA42
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 03:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF76CEE021D
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 05:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230292AbjIODk0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 23:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60954 "EHLO
+        id S232062AbjIOF1o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 01:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230519AbjIODkZ (ORCPT
+        with ESMTP id S229554AbjIOF1m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 23:40:25 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D371BF4
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 20:40:21 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-27489f78e52so665834a91.1
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Sep 2023 20:40:21 -0700 (PDT)
+        Fri, 15 Sep 2023 01:27:42 -0400
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6564A271B;
+        Thu, 14 Sep 2023 22:27:36 -0700 (PDT)
+Received: by mail-ua1-x92c.google.com with SMTP id a1e0cc1a2514c-791b8525b59so738337241.1;
+        Thu, 14 Sep 2023 22:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1694749221; x=1695354021; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=emL8gA7NYvcjlfqjFCfssMU1Dd1/VuC6P+GxTP1jKsg=;
-        b=MyP9D0dSZY+fWf4QeF4UdYcx2K6f4ifR/RvqMLfDWZFAoiEbVe40OpTeNjLZBffFvt
-         PXF/RkkUs9nETu7y8+Ew2+kq2I6i7L2qBiiw/Tsg8kKwUXGfZrPFJEg7v8STx/lEsbl1
-         jbYqFT/1Z6Db4eklu8RuKWI9x3rSEhtPtA+qc=
+        d=gmail.com; s=20230601; t=1694755654; x=1695360454; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7ix/M53sUnRrSKn9dKsE33ijrUivOY5j8IoNGsWwLLY=;
+        b=TEFi5u5g8RXU294s7/LF8MX27YPhlC5ysEgWDdnQ6tZeyioMbi0G5n9Oixnqr3v/fK
+         U9k8+9m9BjObcHITlQ2mgDc351z+TJJVhlo4jgrRqA+xz+CnOMVhFtXpKUb/zPJeyPQO
+         7qd3bxPvcg6lA6d5XdCg5Y0Rm/LO9Ys2kVHWG9fCPLAfbvpGEZs3m64p2Eeyzrtv1xxu
+         E0b0mPc9o6/EdawYvTkRAxRhsIiq9msHgMGchLZma9D/XRWmEevxTVkNSUAUHmuXnq2y
+         3KP8jJq7F5Syk3Xdsvyxj45B4ioNH0T1ODtVHzH9gE5YoCJp4gp64PVSsxCP0jdDiIEs
+         LQgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694749221; x=1695354021;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=emL8gA7NYvcjlfqjFCfssMU1Dd1/VuC6P+GxTP1jKsg=;
-        b=nOUzJkM7r/Qe0SSAJrkGpos93FhLjLojDJpMsqNPZqzmLMNcuL1H5ZLF85QNZeNZuf
-         dvP6LOXv1ryM0b+eBmXhSrwhhVh1dJyj0j+pUMVpLUzKoDZn7YscuagsdtShYlSm5sZF
-         1zclScO56FIs8/GuB1OecU/0TgycKG/qpwhBMwmlNRstJfJo0G2mD6WePk9LEXonIECO
-         KXOzVy8EWJ3eKiXI0a5n/R6R8xqsNlgRNM+xe60ZWjj7TESKasGuv3pH90Oqe2CCXpX+
-         hS4VQTziYJAx/3NCHRpDrZ64Cgk3QL2eHVYgqfb3jYh5T3uKrGq/Q+9zGFxAHXWeraFM
-         9FZA==
-X-Gm-Message-State: AOJu0Yw7YGv7GQShHIBKHaq9w+IB6yK/mEeXoW8Y/Uv4agCLRTEgJxnz
-        6Xst8L9K5Tl3RckXV0yHxlQ73A==
-X-Google-Smtp-Source: AGHT+IHrCMHvgrUBjySOfb5emjIZgc6gpCkZ0ynmYN2q5pu+0IiNfABJI4OWAU5wgyM1LCCux4SH3A==
-X-Received: by 2002:a17:90b:3583:b0:268:7be6:29a5 with SMTP id mm3-20020a17090b358300b002687be629a5mr373511pjb.9.1694749221378;
-        Thu, 14 Sep 2023 20:40:21 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id h12-20020a170902748c00b001b246dcffb7sm2330294pll.300.2023.09.14.20.40.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 20:40:20 -0700 (PDT)
-Date:   Thu, 14 Sep 2023 20:40:20 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Justin Stitt <justinstitt@google.com>
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - refactor deprecated strncpy
-Message-ID: <202309142039.F903B1C@keescook>
-References: <20230913-strncpy-drivers-crypto-intel-qat-qat_common-qat_uclo-c-v1-1-88a6c07fc924@google.com>
+        d=1e100.net; s=20230601; t=1694755654; x=1695360454;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7ix/M53sUnRrSKn9dKsE33ijrUivOY5j8IoNGsWwLLY=;
+        b=Z7QGD+lncPAoHY/+3CVm57Wky0WUrxvonZsJDO4Uy4hcyryzx+Kmd4PCap27yCXRrQ
+         Swtr7CGCq8eTKI36PdzGOwwBWJNvOSfF1XnYZtsoTKWENgeDKIVPgjvd2dZKIKOcnoOF
+         dAV5rWEQIbFcSSX1/Cdne8LOMmyUSGcxx/mHZB8B0NsKHlzUHdphdmOs95CrgZ/aJgDY
+         RWuiPo5oXVQAUtzvEJzCQC+9lfmUktBNyt0PEu/D4r59bHcS984k/jQ4ObHpSqwKed6/
+         B9UKa6JO0UKwZvuT5HhGIXrJBM601TqfIBJ4V0pe3oF2mAMjGz4fBqkj4P8ODWKaRmd8
+         8YDQ==
+X-Gm-Message-State: AOJu0YxDL/bnGAokDHcpsxva94/LKq/hQuHSmjho+NqcsMfKni20P/os
+        ww/vigbDYcJwqbmMkxI7XAejREb1pKUOCriCz+OA+dVvr6E=
+X-Google-Smtp-Source: AGHT+IGKmVhyUn+vsHoF4VECMDL1zQcWfxE84Z3naWLFEm7QjOTkP3CBJqIlGS4zsvfxvvtZZGCMhG1fuJeW0drOqKQ=
+X-Received: by 2002:a1f:e082:0:b0:495:cace:d59c with SMTP id
+ x124-20020a1fe082000000b00495caced59cmr747710vkg.0.1694755654556; Thu, 14 Sep
+ 2023 22:27:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230913-strncpy-drivers-crypto-intel-qat-qat_common-qat_uclo-c-v1-1-88a6c07fc924@google.com>
+From:   Kyle Sanderson <kyle.leet@gmail.com>
+Date:   Thu, 14 Sep 2023 22:27:22 -0700
+Message-ID: <CACsaVZ+LkHwTKO4XE_FFM62SbF3gGD4DZyse-9Y1UbJUgrhvfA@mail.gmail.com>
+Subject: Linux 6.1.52 regression: Intel QAT kernel panic (memory corruption)
+To:     Linux-Kernal <linux-kernel@vger.kernel.org>, qat-linux@intel.com
+Cc:     Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 12:51:05AM +0000, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings [1].
-> 
-> We should prefer more robust and less ambiguous string interfaces.
-> 
-> `buf` is expected to be NUL-terminated for its eventual use in
-> `kstrtoul()` and NUL-padding is not required.
-> 
-> Due to the above, a suitable replacement is `strscpy` [2] due to the
-> fact that it guarantees NUL-termination on the destination buffer.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> ---
-> Note: build-tested only.
-> ---
->  drivers/crypto/intel/qat/qat_common/qat_uclo.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-> index ce837bcc1cab..e2f82128043e 100644
-> --- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-> +++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-> @@ -200,7 +200,7 @@ static int qat_uclo_parse_num(char *str, unsigned int *num)
->  	unsigned long ae = 0;
->  	int i;
->  
-> -	strncpy(buf, str, 15);
-> +	strscpy(buf, str, sizeof(buf));
->  	for (i = 0; i < 16; i++) {
->  		if (!isdigit(buf[i])) {
+Hello Intel QAT Maintainers,
 
-I was initially worried when I saw this walking the entire contents, but
-I see it is explicitly zeroed on the stack first, so this is fine:
+It looks like QAT has regressed again. The present symptom is just
+straight up memory corruption. I was running Canonical 6.1.0-1017-oem
+and it doesn't happen, with 6.1.0-1020-oem and 6.1.0-1021-oem it does.
+I don't know what these map to upstream, however with NixOS installed
+the same corruption failure occurs on 6.1.52. The stack traces give
+illegal instructions and all kinds of badness across all modules when
+the device is simply present on the system, resulting in a hung
+system, or a multitude of processes crashing and the system failing to
+start. Disabling the device in the system BIOS results in a working
+system, and no extreme corruption. kmem_cache_alloc_node is the common
+fixture in the traces (I don't have a serial line), but I suspect
+that's not where the problem is. The corruption this time happens
+without block crypto being involved, and simply booting the installer
+from a USB stick.
 
-        char buf[16] = {0};
+I genuinely do not understand how this keeps breaking in these
+critical contexts completely hosing the machine. I was under the
+impression it was disabled on this box the entire time since the last
+run-in with this, but it must have gotten flipped back on when I did a
+firmware update back in December 2022.
 
-
-Reviewed-by: Kees Cook <keescook@chromium.org>
-
--Kees
-
->  			buf[i] = '\0';
-> 
-> ---
-> base-commit: 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
-> change-id: 20230913-strncpy-drivers-crypto-intel-qat-qat_common-qat_uclo-c-0f4b16830f59
-> 
-> Best regards,
-> --
-> Justin Stitt <justinstitt@google.com>
-> 
-
--- 
-Kees Cook
+Kyle.
