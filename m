@@ -2,144 +2,84 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F852EE6447
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 09:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E992EE6454
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 10:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233656AbjIOJ3U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 05:29:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42022 "EHLO
+        id S234160AbjIOKTM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Sep 2023 06:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233371AbjIOJ3T (ORCPT
+        with ESMTP id S231341AbjIOKTM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 05:29:19 -0400
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B24C326B8;
-        Fri, 15 Sep 2023 02:28:44 -0700 (PDT)
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38F7ElsG002919;
-        Fri, 15 Sep 2023 11:28:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:subject:to:cc:references:from
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=1Of1fldvAc+SLebPZyCDhNTzbbsU2y5odJdWE5qVCiI=; b=Hd
-        igeR1KLEPtrblw5zVOznhSk5Z5Ik6TJeBslqk+yXH6I94o9HKk3wLwtx4hCvmN3e
-        OjjIz1M/dxfG7kuiq+78CqUM+5wA2HLpIgbbV27J7okGOUcTUBXzjp3/YOtCymF/
-        r3YH4Nxi/d0p+eqODAPAnR9ofyKn6Yto+wgh1dahea8i6pdyfc3u15IENXnMNTri
-        SU3snXuOCA8wVsI57kBnXC5hGFdsXNYgOGPudLW4fkTIdxUO+UiSBvs5KOY+1gjg
-        DFZxQzOFkU/JAuDvT+UNmWSSd4iyURz2hNzWvjV0UJj7AzPhYZcEooJfb0VojLEh
-        3Y+wRvbO3tvSq3xdE+/g==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t434d3xsf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Sep 2023 11:28:15 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id C4149100040;
-        Fri, 15 Sep 2023 11:28:13 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id BA41521ADDB;
-        Fri, 15 Sep 2023 11:28:13 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 15 Sep
- 2023 11:28:13 +0200
-Message-ID: <4819d89b-c2a4-0c75-27e1-d8122827ceca@foss.st.com>
-Date:   Fri, 15 Sep 2023 11:28:06 +0200
+        Fri, 15 Sep 2023 06:19:12 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFE5E9;
+        Fri, 15 Sep 2023 03:19:04 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a9b41ffe12so1218028b6e.3;
+        Fri, 15 Sep 2023 03:19:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694773143; x=1695377943; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gBRNgKBo9636s47BGwWVB4QKKZP3PNOVrB6JUSp8VSU=;
+        b=H1AWv2Jiti17w/RFTWf9ZLidaYhZCE+eFFSuzPZ+mK/LyQyfZ8ZHEwlLT9mkRiWG4F
+         8grW/t4Gw/gxMm2X24JLtEswLrsWu99B7NFAgs/sTmM/RSLW7BSSEAZ2yalr1HQLeIXg
+         7TceqEQ8uypJ7F3BGwdVlI9JpYrUBcuYe0IXmY4iFlS0b2wO/l0RZ2e+mwN34wtjJbKe
+         G86QVNMQB1ygBYghA/smfNu6cnlOsG8bBcYgBdhm08hIWw2by+mhTBaOqgQjF8PZn+XH
+         iZUfeAYpPWOo2eA2o3pwLrEjTU6atltMe/D6f9DLPKdiZhrP0Z0d4WpHK1QoCP0XX4mw
+         h0/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694773143; x=1695377943;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gBRNgKBo9636s47BGwWVB4QKKZP3PNOVrB6JUSp8VSU=;
+        b=FeyAH+XKQxwAe/jA2J3w5fNjZiyA5GtKs/DF4aYXsRyIptD3bET99no0FyMhoJNtg1
+         qVXPm5mW3plHVyLWjkCUK8PZIsvNUQRkYKLtmSkrJwB+0xu7UIXxBZ89GQCNwWIrNw8i
+         5xmO7WdD5INlvQAo+iGMOV+b7jmuzaCllHipxYlIhbGKJ49wQVKmyO68zPxoplEMtJl0
+         +eWgcPI4d7EDc+WH+2hPA7dg8TM+k8EWfkC4N2wXvbo+ISTMSOSOyaS8xuaksmEqflid
+         1XyKrJPKHznFP+9Su4apEYJHp2G6bjxArygFK5WHDT9XvZQmi3csR7XZLG+uoYiZ9puo
+         J7bw==
+X-Gm-Message-State: AOJu0YwvQ1XXHeQ4vmnQwNQW3dRcmL3WVirv61nWH8cDvlVXDIsTKsUA
+        0rgPsnrVJD4JD8bqodHKhKo=
+X-Google-Smtp-Source: AGHT+IEvlosv0SIRPQNAginM3ohzzNzp4Xqh9vNKnbfKPM+wAw9tG7sja/ozbim3kIXbRMVW4vCoKw==
+X-Received: by 2002:a05:6870:5488:b0:1d5:4fb0:102 with SMTP id f8-20020a056870548800b001d54fb00102mr1339662oan.31.1694773143468;
+        Fri, 15 Sep 2023 03:19:03 -0700 (PDT)
+Received: from gondor.apana.org.au ([2404:c804:1b2a:5507:c00a:8aff:fe00:b003])
+        by smtp.gmail.com with ESMTPSA id q7-20020a63ae07000000b005634343cd9esm2491347pgf.44.2023.09.15.03.19.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 03:19:02 -0700 (PDT)
+Sender: Herbert Xu <herbertx@gmail.com>
+Date:   Fri, 15 Sep 2023 18:19:01 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Om Prakash Singh <quic_omprsing@quicinc.com>
+Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
+        agross@kernel.org, andersson@kernel.org, conor+dt@kernel.org,
+        davem@davemloft.net, devicetree@vger.kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
+Subject: Re: [PATCH] crypto: qcom-rng: Add hwrng support
+Message-ID: <ZQQvlXvGy8p01uJS@gondor.apana.org.au>
+References: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH 07/10] dt-bindings: rng: add st,rng-lock-conf
-To:     Rob Herring <robh@kernel.org>
-CC:     Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230908165120.730867-1-gatien.chevallier@foss.st.com>
- <20230908165120.730867-8-gatien.chevallier@foss.st.com>
- <20230911150958.GA1255978-robh@kernel.org>
-Content-Language: en-US
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20230911150958.GA1255978-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-15_06,2023-09-14_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230901131502.1549809-1-quic_omprsing@quicinc.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Rob,
+On Fri, Sep 01, 2023 at 06:45:02PM +0530, Om Prakash Singh wrote:
+>
+> +	qrng = (struct qcom_rng *)rng->priv;
 
-On 9/11/23 17:09, Rob Herring wrote:
-> On Fri, Sep 08, 2023 at 06:51:17PM +0200, Gatien Chevallier wrote:
->> If st,rng-lock-conf is set, the RNG configuration in RNG_CR, RNG_HTCR
->> and RNG_NSCR will be locked. It is supported starting from the RNG
->> version present in the STM32MP13
-> 
-> This should be squashed into the prior binding patch.
-> 
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>   .../devicetree/bindings/rng/st,stm32-rng.yaml      | 14 ++++++++++++++
->>   1 file changed, 14 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
->> index 59abdc85a9fb..0055f14a8e3f 100644
->> --- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
->> +++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
->> @@ -37,6 +37,20 @@ required:
->>     - reg
->>     - clocks
->>   
->> +allOf:
->> +  - if:
->> +      properties:
->> +        compatible:
->> +          contains:
->> +            enum:
->> +              - st,stm32mp13-rng
->> +    then:
->> +      properties:
->> +        st,rng-lock-conf:
->> +          type: boolean
->> +          description: If set, the RNG configuration in RNG_CR, RNG_HTCR and
->> +                       RNG_NSCR will be locked.
-> 
-> Define the property at the top-level and then restrict its presence in
-> a if/then schema.
-> 
+Please stop using rng->priv, it is obsolete.  Instead embed the
+rng object inside qcom_rng.
 
-Can you please point me to an example of such case. I can't find a way
-to define at the top-level the property then restrict it to specific
-compatibles.
-
-Else I'd change
-additionalProperties :false to
-unevaluatedProperties: false
-
-so the definition of the property is seen.
-
-Best regards,
-Gatien
-
->> +
->>   additionalProperties: false
-> 
-> Did you test this property is allowed? No, because additionalProperties
-> won't work with properties defined in if/then schemas.
-> 
->>   
->>   examples:
->> -- 
->> 2.25.1
->>
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
