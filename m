@@ -2,64 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BA6EDE989
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 01:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 972F2EDE989
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 01:48:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231289AbjIOB27 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Sep 2023 21:28:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47712 "EHLO
+        id S230519AbjIOBsM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Sep 2023 21:48:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231265AbjIOB27 (ORCPT
+        with ESMTP id S230193AbjIOBsL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Sep 2023 21:28:59 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFCFA2100;
-        Thu, 14 Sep 2023 18:28:54 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bc0d39b52cso13957675ad.2;
-        Thu, 14 Sep 2023 18:28:54 -0700 (PDT)
+        Thu, 14 Sep 2023 21:48:11 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 357F726B8;
+        Thu, 14 Sep 2023 18:48:07 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3aa139a0ab2so957135b6e.2;
+        Thu, 14 Sep 2023 18:48:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694741334; x=1695346134; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1694742486; x=1695347286; darn=vger.kernel.org;
         h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Njb5nxfBOiRZsqkfkDCdtMn4zV0CHNcc0b53FSbSvDk=;
-        b=M1nRHYil2PdhrNp79H50VoXnhIm44DCeOO2CK3FIwgPI4hNHQwKcyQPwWvc5u4agoV
-         U1/aqJs0BlRXE70lbpkiZaqvK4dpTYyQOkVk8DOZCfyFi82Xj9JXvpo/5M5oUb9hV8w9
-         IWXHj8z0hrHf7sw0DAyq11xPVhBH3+ooR1+Vxf38jIvmwlwAucwm1eLUcfyTR3jESoRe
-         YIooab+Mqnkbye0Y1M1/LPdAJsPNb2qFW9ZRkNRxyshN75wMez/S4TgfdF7KEoez1OsC
-         LZEVytzZQ4itiC8FdFC3sx5WUdSva5s2oYDTqSBclVt21CroRphWZ5WkUBg/KWTxEEDw
-         ULoA==
+        bh=E0FFekWGyUIP+/QpzRxD5C04IppzIdAo52JFOT6ol0w=;
+        b=FE6mzKsEr7W+O8D4CeWuPo/5lhUdydC2rsnIMpgHCNtcS/bwe0XUecvOQnop8HQkR5
+         nVWGorokr11TwQchZ8cyueObhL7tl8HtHC0PBUiVjYt/oYJrV4ob980Gb5kIqts+6rUl
+         ELgKzKJHi8UnvKy7SS5gTA0POs7R9YFnmwDpp4BMuHANMAudPt4302QqjZgG/rtxzNqy
+         ExklNOaBALOGISIxSENIT2STZTaRfJJD8CA3RGBrYfhEpBEHSCRO36nVtvtv4vlCgJWV
+         5nTMB10vMAxaeZx1WcbTbgkIKsNmPQsvHXPQnDzhPsiWWfhl9f1L3dKdpcym8GmPrchH
+         X7vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694741334; x=1695346134;
+        d=1e100.net; s=20230601; t=1694742486; x=1695347286;
         h=to:references:message-id:content-transfer-encoding:reply-to:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Njb5nxfBOiRZsqkfkDCdtMn4zV0CHNcc0b53FSbSvDk=;
-        b=Xw3EjkZgzPwScXurxLf50mvgDeuiutB51m+0AZl7gnUNb9sAvM0hOtWz34KzfrA15Y
-         hy8Qei/6OdzKyU4GQOTSZppKMygmXjHx5PAXob2+DyFSJRILwzw1uyE/zlCLvEQRGiAq
-         Vl4951ibPvX50JJDFHJqLe3GNnpZlrNQjUFcpqerPuxxILWSiiUu4ksNIWuXXEe/1TBm
-         dewuOm2gf4vg44Dz3LooOl4YcLhaZC9UKKJt+aXbt/Zb2aTcZ4W2OlD+36Jq/rwVHIKR
-         54Da+25In9w8L4pzNruIzTw51W1RR7idGUwi6DXvtADoOR3SbUePflCRLd9LiFR0PK5R
-         yAlQ==
-X-Gm-Message-State: AOJu0YzSwMcMtjaKZytkWGgvJhJOcMDnbLzyUClAPVZd3heYSOBZ2Lq4
-        XA0hVlcV5Y/z384+yRtiLjE=
-X-Google-Smtp-Source: AGHT+IHIoKHpNVoOGVVa41JrXrpya9Ksz+fxttZexrHmiutl1tkYeMKrQQqAHf/kcxk0JTqnZKL8qg==
-X-Received: by 2002:a17:902:f80d:b0:1bc:382b:6897 with SMTP id ix13-20020a170902f80d00b001bc382b6897mr294837plb.13.1694741334104;
-        Thu, 14 Sep 2023 18:28:54 -0700 (PDT)
+        bh=E0FFekWGyUIP+/QpzRxD5C04IppzIdAo52JFOT6ol0w=;
+        b=P0zs4AbjNfknUIl6Ad5b9TInkEz0l82rXvVZnc/2GGOniWosDYdkOtkts7f4y2fw/R
+         8yK0pkt7Hnt8r9upTzdK+rvUquWijjY7c4ATURbuKncfAY3eSiUhiQXoBvG7IdLMSNuo
+         ezGxRuC//18OB/6QdnUu3VdxwEdwi9fc6sJrAdyLXysj92NXoD33vPBoiokixUSNKXAs
+         lcCzCjdl+Nel14K7Xi4JeqahhzU7d4p+j1jIZr4DwLLowrGAX2NHnhenbeOovda6n7FF
+         8IjdeR0fHCDlHmK1FetIAuHNZEvkYsGuhWBKIPZ0pRGEFi2Tr/Q0USfyDNoKnEwAMkkJ
+         2hOg==
+X-Gm-Message-State: AOJu0YwJNf8+CuNFW5z2iqG83oXcH/8udDK3uC9xcIn2cD8eGKFPfxeh
+        4nxk0uub8zBp+9enpRJn0fM=
+X-Google-Smtp-Source: AGHT+IHMBTg3s39w5nzKGtWCSn3FgFj4ijDZgoj1j8XZ4FGFvetP6Mq79S/qKyPMIn9/Up2tlE9QEA==
+X-Received: by 2002:aca:2218:0:b0:3a8:5ff0:6b52 with SMTP id b24-20020aca2218000000b003a85ff06b52mr341083oic.15.1694742486434;
+        Thu, 14 Sep 2023 18:48:06 -0700 (PDT)
 Received: from ?IPv6:2402:7500:5ce:c546:8426:5e14:d5b7:9128? ([2402:7500:5ce:c546:8426:5e14:d5b7:9128])
-        by smtp.gmail.com with ESMTPSA id w16-20020a1709027b9000b001c3a8b135ebsm2192536pll.282.2023.09.14.18.28.50
+        by smtp.gmail.com with ESMTPSA id m21-20020aa79015000000b0068a6972ca0esm1905533pfo.106.2023.09.14.18.48.03
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 14 Sep 2023 18:28:53 -0700 (PDT)
+        Thu, 14 Sep 2023 18:48:05 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.7\))
-Subject: Re: [PATCH v4 10/12] RISC-V: crypto: add Zvkned accelerated AES
- encryption implementation
+Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
 From:   He-Jie Shih <bignose1007@gmail.com>
-In-Reply-To: <1BB805D3-FF47-4A58-8507-CCA72A27DD82@sifive.com>
-Date:   Fri, 15 Sep 2023 09:28:49 +0800
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
+In-Reply-To: <ZQJdnCwf99Glggin@ghost>
+Date:   Fri, 15 Sep 2023 09:48:01 +0800
+Cc:     Eric Biggers <ebiggers@kernel.org>,
         Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
         paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
         herbert@gondor.apana.org.au, davem@davemloft.net,
@@ -67,38 +65,31 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         christoph.muellner@vrull.eu,
         Heiko Stuebner <heiko.stuebner@vrull.eu>
-Reply-To: 1BB805D3-FF47-4A58-8507-CCA72A27DD82@sifive.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <481D910C-8D83-4A6D-9D22-3D3A7C4723E6@gmail.com>
+Reply-To: ZQJdnCwf99Glggin@ghost
+Content-Transfer-Encoding: 7bit
+Message-Id: <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
 References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230711153743.1970625-11-heiko@sntech.de>
- <20230721054036.GD847@sol.localdomain>
- <CCA32056-CCE2-4FB5-8CFC-62444CDDA89F@sifive.com>
- <CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com>
- <1BB805D3-FF47-4A58-8507-CCA72A27DD82@sifive.com>
-To:     CAMj1kXEGnZC6nge42WeBML9Vx6K6Lezt8Cc1faP+3gN=TzFgvA@mail.gmail.com
+ <20230914001144.GA924@sol.localdomain> <ZQJdnCwf99Glggin@ghost>
+To:     Charlie Jenkins <charlie@rivosinc.com>
 X-Mailer: Apple Mail (2.3445.9.7)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sep 12, 2023, at 15:15, Jerry Shih <jerry.shih@sifive.com> wrote:
+On Sep 14, 2023, at 09:10, Charlie Jenkins <charlie@rivosinc.com> wrote:
 
->> This pull request doesn't appear to contain any XTS code at all, only =
-CBC.
->=20
-> We have some license issues for upstream. We will append the =
-specialized
-> AES modes soon.
+> On Wed, Sep 13, 2023 at 05:11:44PM -0700, Eric Biggers wrote:
+>> On Tue, Jul 11, 2023 at 05:37:31PM +0200, Heiko Stuebner wrote:
+>> 
+>> Hi Heiko!  Are you still working on this patchset?  And which of its
+>> prerequisites still haven't been merged upstream?
+>> 
+>> - Eric
+> It is my understanding that Heiko is taking a break from development, I
+> don't think he will be working on this soon.
 
-We have the XTS and other specialized AES modes in OpenSSL PR[1] now.
-The specialized implementations all perform better than generic =
-implementation
-on FPGA.
-We will try to make that implementations happen in kernel.
+We would like to take over these RISC-V vector crypto implementations.
+Our proposed implementations is under reviewing in OpenSSL pr.
+And I will check the gluing parts between Linux kernel and OpenSSL.
 
 -Jerry
-
-[1]
-https://github.com/openssl/openssl/pull/21923
-
