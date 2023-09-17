@@ -2,419 +2,128 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84117EED61E
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Sep 2023 18:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7157CD37B3
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Sep 2023 13:43:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234978AbjIOS3q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Sep 2023 14:29:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52158 "EHLO
+        id S234556AbjIQNmt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 17 Sep 2023 09:42:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236571AbjIOS3e (ORCPT
+        with ESMTP id S234604AbjIQNm1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Sep 2023 14:29:34 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CACA269D
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 11:29:20 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-68fbbb953cfso2118636b3a.2
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Sep 2023 11:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1694802559; x=1695407359; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/nmIdsonQN3As2T1chhFUGzsAAH6aCPTvliuI7z4jzM=;
-        b=fNAQtxcydiY5Boq1myGW+9ZfYVebZouzsYo2lIORhncx/WsBnctof1ESBRfCb8WQ0J
-         3PMaYOwvFuAysqGF2rCQxC3Q6qC4aBdMFlGrkmRNhY6hpIk85gHIUkmgud7G/v/qyJ85
-         fJCIGApthE7zEdbNVuu1kyxNjpdcqEkUEyA6G9DaNcg4P/uY/jxR2hM4kzhOK/3zgNDT
-         8a7AS/+MbsAcSwPuYWAWQ8MsgAIEa0cuBaVcEQzy0NIafv36pUIDF0BmwXlJQVRI4t3J
-         BbqAiHfk4kXtswOOJkRVzy86txMiOZt1EXfZcl/HcnJaD3K74wD3Sg5imf0lqSfHj2zt
-         FJRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694802560; x=1695407360;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/nmIdsonQN3As2T1chhFUGzsAAH6aCPTvliuI7z4jzM=;
-        b=fJAhAbBRAttUwgGC1T1bEqbfSjIp48/vVgtsmrCBqxz8dpPzGbdcUVVc1lGfYIMj/V
-         7/iZT16qvLH3i/VborX67gqA9IB/80mQNJw+Emfwn2usnuim9UkLouXPX/GtKu9f9luU
-         GQYIg4BfGq+fNWAuAB6TrCRp8Co5bea4F/ZW5DdEw67aC/LYAAf8q6vNmXc1TLiv/d2N
-         3RwGnFXqeYPqXavFEusq9fvwalh637TFgZTvbNgpsKEffglL+BY08f/HSffwIWN1e+oQ
-         nfcVwSfHC9WXHwDWJrtL710iRqqN0qnol7mRcpZ4HjhEONl2DMqzH0u5m/CmA71y7B4C
-         mU5g==
-X-Gm-Message-State: AOJu0Yzo+ZHXkRl9oPyFgGzbfojGVrUD4E0lP9poaUzcuBDYptFXu2fH
-        WtpennDNbKVrJ4WMvKkBbGga5Q==
-X-Google-Smtp-Source: AGHT+IGhtlUWFNzUzQjWie/iIVxGfAgAr89kBqzDBd+JOcOwZoW49FJqc6vRcQS11GEXu2cPvAcM4A==
-X-Received: by 2002:a05:6a00:2d90:b0:68f:c7c5:a73a with SMTP id fb16-20020a056a002d9000b0068fc7c5a73amr2811298pfb.16.1694802559608;
-        Fri, 15 Sep 2023 11:29:19 -0700 (PDT)
-Received: from ghost ([50.168.177.76])
-        by smtp.gmail.com with ESMTPSA id ey4-20020a056a0038c400b0064d74808738sm3270085pfb.214.2023.09.15.11.29.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 11:29:19 -0700 (PDT)
-Date:   Fri, 15 Sep 2023 14:29:14 -0400
-From:   Charlie Jenkins <charlie@rivosinc.com>
-To:     =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-riscv@lists.infradead.org, Andy Chiu <andy.chiu@sifive.com>,
-        Greentime Hu <greentime.hu@sifive.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@rivosinc.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 6/6] riscv: Add BLAKE2s V implementation
-Message-ID: <ZQSieofQfDY5mTlI@ghost>
-References: <20230912115728.172982-1-bjorn@kernel.org>
- <20230912115728.172982-7-bjorn@kernel.org>
+        Sun, 17 Sep 2023 09:42:27 -0400
+X-Greylist: delayed 482 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 17 Sep 2023 06:42:18 PDT
+Received: from smtp-out3.octopuce.fr (smtp-out3.octopuce.fr [91.194.60.164])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E5B131;
+        Sun, 17 Sep 2023 06:42:18 -0700 (PDT)
+Received: from smtp.ouvaton.coop (smtp.ouvaton.coop [194.36.166.20])
+        by smtp-out3.octopuce.fr (Postfix) with ESMTPS id 75E804062E;
+        Sun, 17 Sep 2023 15:34:12 +0200 (CEST)
+Received: from [192.168.0.30] (189.89.89.92.rev.sfr.net [92.89.89.189])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by ouvalternc.octopuce.fr (Postfix) with ESMTPSA id EB3D53FDC8;
+        Sun, 17 Sep 2023 15:34:10 +0200 (CEST)
+Message-ID: <564c9bb6-1e7d-43c3-8dfc-5282ea82305a@droneaud.fr>
+Date:   Sun, 17 Sep 2023 15:34:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/2] Propagating reseed notifications to user space
+To:     Babis Chalios <bchalios@amazon.es>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     graf@amazon.de, xmarcalx@amazon.co.uk, aams@amazon.de,
+        dwmw@amazon.co.uk, gregkh@linuxfoundation.org
+References: <20230823090107.65749-1-bchalios@amazon.es>
+Content-Language: fr-FR, en-US, en-GB
+From:   Yann Droneaud <yann@droneaud.fr>
+In-Reply-To: <20230823090107.65749-1-bchalios@amazon.es>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230912115728.172982-7-bjorn@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 12, 2023 at 01:57:28PM +0200, Björn Töpel wrote:
-> From: Björn Töpel <bjorn@rivosinc.com>
-> 
-> BLAKE2s is used in various places, most notably in Wireguard, and as
-> of v5.17 in drivers/char/random.
-> 
-> Add a BLAKE2s implementation using the V-extension. This is a
-> translation of the x86-64 AVX512 variant
-> (arch/x86/crypto/blake2s-core.S) to the RISC-V V-extension.
-> 
-> The AVX512 variant requires registers >= 256b (ymm*), and hence this
-> implementation requires a VLEN of >=256.
-> 
-> The implementation passes the kernel BLAKE2s selftest, and has been
-> tested on spike and qemu.
-> 
-> Instruction-wise, the V-variant uses 60% less instructions than the
-> generic, C-based, implementation.
-> 
-> Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
-> ---
->  arch/riscv/Kbuild                |   2 +-
->  arch/riscv/crypto/Kconfig        |  16 +++
->  arch/riscv/crypto/Makefile       |   6 ++
->  arch/riscv/crypto/blake2s-glue.c |  39 ++++++++
->  arch/riscv/crypto/blake2s-v.S    | 164 +++++++++++++++++++++++++++++++
->  crypto/Kconfig                   |   3 +
->  drivers/net/Kconfig              |   1 +
->  7 files changed, 230 insertions(+), 1 deletion(-)
->  create mode 100644 arch/riscv/crypto/Kconfig
->  create mode 100644 arch/riscv/crypto/Makefile
->  create mode 100644 arch/riscv/crypto/blake2s-glue.c
->  create mode 100644 arch/riscv/crypto/blake2s-v.S
-> 
-> diff --git a/arch/riscv/Kbuild b/arch/riscv/Kbuild
-> index d25ad1c19f88..1a5d89a18920 100644
-> --- a/arch/riscv/Kbuild
-> +++ b/arch/riscv/Kbuild
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  
-> -obj-y += kernel/ mm/ net/
-> +obj-y += kernel/ mm/ net/ crypto/
->  obj-$(CONFIG_BUILTIN_DTB) += boot/dts/
->  obj-y += errata/
->  obj-$(CONFIG_KVM) += kvm/
-> diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
-> new file mode 100644
-> index 000000000000..e072400eb456
-> --- /dev/null
-> +++ b/arch/riscv/crypto/Kconfig
-> @@ -0,0 +1,16 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +menu "Accelerated Cryptographic Algorithms for CPU (RISC-V)"
-> +
-> +config CRYPTO_BLAKE2S_RISCV
-> +	bool "Hash functions: BLAKE2s (V)"
-> +	depends on 64BIT && MMU && RISCV_ISA_V
-> +	select CRYPTO_LIB_BLAKE2S_GENERIC
-> +	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> +	help
-> +	  BLAKE2s cryptographic hash function (RFC 7693)
-> +
-> +	  Architecture: riscv64 using:
-> +	  - V extension (VLEN >= 256)
-> +
-> +endmenu
-> diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
-> new file mode 100644
-> index 000000000000..1768025c13ae
-> --- /dev/null
-> +++ b/arch/riscv/crypto/Makefile
-> @@ -0,0 +1,6 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# RISC-V crypto algorithms
-> +
-> +obj-$(CONFIG_CRYPTO_BLAKE2S_RISCV) += libblake2s-riscv.o
-> +libblake2s-riscv-y := blake2s-v.o blake2s-glue.o
-> diff --git a/arch/riscv/crypto/blake2s-glue.c b/arch/riscv/crypto/blake2s-glue.c
-> new file mode 100644
-> index 000000000000..d3de0e8e5872
-> --- /dev/null
-> +++ b/arch/riscv/crypto/blake2s-glue.c
-> @@ -0,0 +1,39 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR MIT
-> +/*
-> + * Copyright (C) 2022 Rivos, Inc. All Rights Reserved.
-> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + */
-> +
-> +#include <crypto/internal/blake2s.h>
-> +
-> +#include <linux/types.h>
-> +#include <linux/minmax.h>
-> +#include <linux/sizes.h>
-> +
-> +#include <linux/sched.h>
-> +#include <linux/sched/task_stack.h>
-> +#include <asm/simd.h>
-> +#include <asm/vector.h>
-> +
-> +asmlinkage void blake2s_compress_vector(struct blake2s_state *state, const u8 *block,
-> +					const size_t nblocks, const u32 inc);
-> +
-> +void blake2s_compress(struct blake2s_state *state, const u8 *block, size_t nblocks, const u32 inc)
-> +{
-> +	if (!(has_vector() && riscv_v_vsize >= 256 * 32 / 8) || !may_use_simd()) {
-> +		blake2s_compress_generic(state, block, nblocks, inc);
-> +		return;
-> +	}
-> +
-> +	do {
-> +		const size_t blocks = min_t(size_t, nblocks, SZ_4K / BLAKE2S_BLOCK_SIZE);
-> +
-> +		kernel_vector_begin();
-> +		blake2s_compress_vector(state, block, blocks, inc);
-> +		kernel_vector_end();
-> +
-> +		nblocks -= blocks;
-> +		block += blocks * BLAKE2S_BLOCK_SIZE;
-> +	} while (nblocks);
-> +}
-> +EXPORT_SYMBOL(blake2s_compress);
-> diff --git a/arch/riscv/crypto/blake2s-v.S b/arch/riscv/crypto/blake2s-v.S
-> new file mode 100644
-> index 000000000000..9653b7a19127
-> --- /dev/null
-> +++ b/arch/riscv/crypto/blake2s-v.S
-> @@ -0,0 +1,164 @@
-> +/* SPDX-License-Identifier: GPL-2.0 OR MIT */
-> +/*
-> + * BLAKE2s RISC-V V implementation
-> + *
-> + * Copyright (C) 2022 Rivos, Inc. All Rights Reserved.
-> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + * Copyright (C) 2017-2019 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
-> + */
-> +
-> +#include <linux/linkage.h>
-> +#include <asm/asm.h>
-> +
-> +.section .rodata, "a", @progbits
-> +
-> +.align 8
-> +IV:
-> +.octa 0xA54FF53A3C6EF372BB67AE856A09E667
-> +.octa 0x5BE0CD191F83D9AB9B05688C510E527F
-> +
-> +.align 8
-> +SIGMA2:
-> +.long  0,  2,  4,  6,  1,  3,  5,  7, 14,  8, 10, 12, 15,  9, 11, 13
-> +.long  8,  2, 13, 15, 10,  9, 12,  3,  6,  4,  0, 14,  5, 11,  1,  7
-> +.long 11, 13,  8,  6,  5, 10, 14,  3,  2,  4, 12, 15,  1,  0,  7,  9
-> +.long 11, 10,  7,  0,  8, 15,  1, 13,  3,  6,  2, 12,  4, 14,  9,  5
-> +.long  4, 10,  9, 14, 15,  0, 11,  8,  1,  7,  3, 13,  2,  5,  6, 12
-> +.long  2, 11,  4, 15, 14,  3, 10,  8, 13,  6,  5,  7,  0, 12,  1,  9
-> +.long  4,  8, 15,  9, 14, 11, 13,  5,  3,  2,  1, 12,  6, 10,  7,  0
-> +.long  6, 13,  0, 14, 12,  2,  1, 11, 15,  4,  5,  8,  7,  9,  3, 10
-> +.long 15,  5,  4, 13, 10,  7,  3, 11, 12,  2,  0,  6,  9,  8,  1, 14
-> +.long  8,  7, 14, 11, 13, 15,  0, 12, 10,  4,  5,  6,  3,  2,  1,  9
-> +
-> +.align 8
-> +GATHER_DIAG1:
-> +.long  3, 0, 1, 2
-> +.align 8
-> +GATHER_DIAG2:
-> +.long  2, 3, 0, 1
-> +.align 8
-> +GATHER_DIAG3:
-> +.long  1, 2, 3, 0
-> +
-> +.section .text
-> +
-> +.macro VROR REG BITS TMPREG
-> +	vmv.v.v		\TMPREG, \REG
-> +	vsrl.vi		\REG, \REG, \BITS
-> +	vsll.vi		\TMPREG, \TMPREG, 32-\BITS
-> +	vor.vv		\REG, \REG, \TMPREG
-> +.endm
+Hi,
 
-This seems like it would be a good candidate to use the Zvkb extension
-that has vector rotate [1]. It would be a pain to use because you need
-two versions of the roundloop, but you could get away with 1 extra
-branch/nop and save 3 instructions per VROR which looks like it happens
-8*10 times, so 239 fewer instructions.
+Le 23/08/2023 Ã  11:01, Babis Chalios a Ã©critÂ :
+> User space often implements PRNGs that use /dev/random as entropy
+> source. We can not expect that this randomness sources stay completely
+> unknown forever. For various reasons, the originating PRNG seed may
+> become known at which point the PRNG becomes insecure for further random
+> number generation. Events that can lead to that are for example fast
+> computers reversing the PRNG function using a number of inputs or
+> Virtual Machine clones which carry seed values into their clones.
+>
+> During LPC 2022 Jason, Alex, Michael and me brainstormed on how to
+> atomically expose a notification to user space that it should reseed.
+> Atomicity is key for the VM clone case. This patchset implements a
+> potential path to do so.
+>
+> This patchset introduces an epoch value as the means of communicating to
+> the guest the need to reseed. The epoch is a 32bit value with the
+> following form:
+>
+>                RNG epoch
+> *-------------*---------------------*
+> | notifier id | epoch counter value |
+> *-------------*---------------------*
+>       8 bits           24 bits
+>
+> Changes in this value signal moments in time that PRNGs need to be
+> re-seeded. As a result, the intended use of the epoch from user space
+> PRNGs is to cache the epoch value every time they reseed using kernel
+> entropy, then control that its value hasn't changed before giving out
+> random numbers. If the value has changed the PRNG needs to reseed before
+> producing any more random bits.
+>
+> The API for getting hold of this value is offered through
+> /dev/(u)random. We introduce a new ioctl for these devices, which
+> creates an anonymous file descriptor. User processes can call the
+> ioctl() to get the anon fd and then mmap it to a single page. That page
+> contains the value of the epoch at offset 0.
+>
+> Naturally, random.c is the component that maintains the RNG epoch.
+> During initialization it allocates a single global page which holds the
+> epoch value. Moreover, it exposes an API to kernel subsystems
+> (notifiers) which can report events that require PRNG reseeding.
+> Notifiers register with random.c and receive an 8-bit notifier id (up to
+> 256 subscribers should be enough) and a pointer to the epoch. Notifying,
+> then, is equivalent to writing in the epoch address a new epoch value.
+>
+> Notifiers write epoch values that include the notifier ID on the higher
+> 8 bits and increasing counter values on the 24 remaining bits. This
+> guarantees that two notifiers cannot ever write the same epoch value,
+> since notificator IDs are unique.
+>
+> The first patch of this series implements the epoch mechanism. It adds
+> the logic in the random.c to maintain the epoch page and expose the
+> user space facing API. It also adds the internal API that allows kernel
+> systems to register as notifiers.
 
-[1] https://github.com/riscv/riscv-crypto/releases
+ From userspace point of view, having to open /dev/random, ioctl, and mmap()
+is a no-go for a (CS)PRNG embedded in libc for arc4random().
 
-- Charlie
+I'm biased, as I proposedÂ to expose such seed epoch value to userspace through
+getrandom() directly, relying on vDSO for reasonable performances, because
+current's glibc arc4random() is somewhat to slow to be a general replacement
+rand().
 
-> +
-> +/*
-> + * void blake2s_compress_vector(struct blake2s_state *state,
-> + *        const u8 *block, size_t nblocks, const u32 inc)
-> + *
-> + * blake2s_compress_vector is a translation of the AVX512 variant
-> + * (arch/x86/blake2s-core.S) to RISC-V V. The implementation requires
-> + * VLEN>=256b.
-> + *
-> + */
-> +SYM_FUNC_START(blake2s_compress_vector)
-> +	vsetivli	t0, 1, e32, m1, ta, ma
-> +	vmv.v.x		v5, a3
-> +	vsetivli	t0, 4, e32, m1, ta, ma
-> +	vle32.v		v0, (a0)
-> +	addi		t0, a0, 0x10
-> +	vle32.v		v1, (t0)
-> +	addi		t0, t0, 0x10
-> +	vle32.v		v4, (t0)
-> +	la		t0, IV
-> +	vle32.v		v14, (t0)
-> +	la		t0, IV+16
-> +	vle32.v		v15, (t0)
-> +	la		t0, GATHER_DIAG1
-> +	vle32.v		v16, (t0)
-> +	la		t0, GATHER_DIAG2
-> +	vle32.v		v18, (t0)
-> +	la		t0, GATHER_DIAG3
-> +	vle32.v		v19, (t0)
-> +.Lblake2s_compress_vector_mainloop:
-> +	vmv.v.v		v10, v0
-> +	vmv.v.v		v11, v1
-> +	vadd.vv		v4, v5, v4
-> +	vmv.v.v		v2, v14
-> +	vxor.vv		v3, v15, v4
-> +	vsetivli	t0, 8, e32, m1, ta, ma
-> +	vle32.v		v6, (a1)
-> +	addi		a1, a1, 0x20
-> +	vle32.v		v7, (a1)
-> +	addi		a1, a1, 0x20
-> +	la		t1, SIGMA2
-> +	li		t2, 0xa
-> +.Lblake2s_compress_vector_roundloop:
-> +	vsetivli	t0, 8, e32, m1, ta, ma
-> +	vle32.v		v12, (t1)
-> +	addi		t1, t1, 0x20
-> +	vle32.v		v13, (t1)
-> +	addi		t1, t1, 0x20
-> +	vsetivli	t0, 16, e32, m2, ta, ma
-> +	vrgather.vv	v8, v6, v12
-> +	vmv.v.v		v6, v8
-> +	vsetivli	t0, 4, e32, m1, ta, ma
-> +	vadd.vv		v0, v8, v0
-> +	vadd.vv		v0, v1, v0
-> +	vxor.vv		v3, v0, v3
-> +	VROR		v3 16 v17
-> +	vadd.vv		v2, v3, v2
-> +	vxor.vv		v1, v2, v1
-> +	VROR		v1 12 v17
-> +	vsetivli	t0, 8, e32, m1, ta, ma
-> +	vslidedown.vi	v8, v8, 4
-> +	vsetivli	t0, 4, e32, m1, ta, ma
-> +	vadd.vv		v0, v8, v0
-> +	vadd.vv		v0, v1, v0
-> +	vxor.vv		v3, v0, v3
-> +	VROR		v3 8 v17
-> +	vadd.vv		v2, v3, v2
-> +	vxor.vv		v1, v2, v1
-> +	VROR		v1, 7, v17
-> +	vmv.v.v		v17, v0
-> +	vrgather.vv	v0, v17, v16
-> +	vmv.v.v		v17, v3
-> +	vrgather.vv	v3, v17, v18
-> +	vmv.v.v		v17, v2
-> +	vrgather.vv	v2, v17, v19
-> +	vadd.vv		v0, v9, v0
-> +	vadd.vv		v0, v1, v0
-> +	vxor.vv		v3, v0, v3
-> +	VROR		v3 16 v17
-> +	vadd.vv		v2, v3, v2
-> +	vxor.vv		v1, v2, v1
-> +	VROR		v1 12 v17
-> +	vsetivli	t0, 8, e32, m1, ta, ma
-> +	vslidedown.vi	v9, v9, 4
-> +	vsetivli	t0, 4, e32, m1, ta, ma
-> +	vadd.vv		v0, v9, v0
-> +	vadd.vv		v0, v1, v0
-> +	vxor.vv		v3, v0, v3
-> +	VROR		v3, 8, v17
-> +	vadd.vv		v2, v3, v2
-> +	vxor.vv		v1, v2, v1
-> +	VROR		v1 7 v17
-> +	vmv.v.v		v17, v0
-> +	vrgather.vv	v0, v17, v19
-> +	vmv.v.v		v17, v3
-> +	vrgather.vv	v3, v17, v18
-> +	vmv.v.v		v17, v2
-> +	vrgather.vv	v2, v17, v16
-> +	addi		t2, t2, -1
-> +	bne		t2, x0, .Lblake2s_compress_vector_roundloop
-> +	vxor.vv		v0, v10, v0
-> +	vxor.vv		v1, v11, v1
-> +	vxor.vv		v0, v2, v0
-> +	vxor.vv		v1, v3, v1
-> +	addi		a2, a2, -1
-> +	bne		a2, x0, .Lblake2s_compress_vector_mainloop
-> +	vse32.v		v0, (a0)
-> +	addi		a0, a0, 0x10
-> +	vse32.v		v1, (a0)
-> +	addi		a0, a0, 0x10
-> +	vse32.v		v4, (a0)
-> +	ret
-> +SYM_FUNC_END(blake2s_compress_vector)
-> +
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 650b1b3620d8..c7b23d2c58e4 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1436,6 +1436,9 @@ endif
->  if PPC
->  source "arch/powerpc/crypto/Kconfig"
->  endif
-> +if RISCV
-> +source "arch/riscv/crypto/Kconfig"
-> +endif
->  if S390
->  source "arch/s390/crypto/Kconfig"
->  endif
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index 44eeb5d61ba9..f7fb168a3944 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -94,6 +94,7 @@ config WIREGUARD
->  	select CRYPTO_CHACHA_MIPS if CPU_MIPS32_R2
->  	select CRYPTO_POLY1305_MIPS if MIPS
->  	select CRYPTO_CHACHA_S390 if S390
-> +	select CRYPTO_BLAKE2S_RISCV if RISCV && 64BIT
->  	help
->  	  WireGuard is a secure, fast, and easy to use replacement for IPSec
->  	  that uses modern cryptography and clever networking tricks. It's
-> -- 
-> 2.39.2
-> 
-> 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+See
+https://lore.kernel.org/all/cover.1673539719.git.ydroneaud@opteya.com/
+https://lore.kernel.org/all/ae35afa5b824dc76c5ded98efcabc117e6dd3d70@opteya.com/
+
+Reards.
+
+-- 
+Yann Droneaud
+
+
