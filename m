@@ -2,128 +2,73 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7157CD37B3
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 Sep 2023 13:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9273CD37B4
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Sep 2023 16:25:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234556AbjIQNmt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 17 Sep 2023 09:42:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
+        id S231593AbjIQQY4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 17 Sep 2023 12:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234604AbjIQNm1 (ORCPT
+        with ESMTP id S233059AbjIQQYu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 17 Sep 2023 09:42:27 -0400
-X-Greylist: delayed 482 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 17 Sep 2023 06:42:18 PDT
-Received: from smtp-out3.octopuce.fr (smtp-out3.octopuce.fr [91.194.60.164])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E5B131;
-        Sun, 17 Sep 2023 06:42:18 -0700 (PDT)
-Received: from smtp.ouvaton.coop (smtp.ouvaton.coop [194.36.166.20])
-        by smtp-out3.octopuce.fr (Postfix) with ESMTPS id 75E804062E;
-        Sun, 17 Sep 2023 15:34:12 +0200 (CEST)
-Received: from [192.168.0.30] (189.89.89.92.rev.sfr.net [92.89.89.189])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by ouvalternc.octopuce.fr (Postfix) with ESMTPSA id EB3D53FDC8;
-        Sun, 17 Sep 2023 15:34:10 +0200 (CEST)
-Message-ID: <564c9bb6-1e7d-43c3-8dfc-5282ea82305a@droneaud.fr>
-Date:   Sun, 17 Sep 2023 15:34:09 +0200
+        Sun, 17 Sep 2023 12:24:50 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B43012F
+        for <linux-crypto@vger.kernel.org>; Sun, 17 Sep 2023 09:24:45 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4775DC433C7
+        for <linux-crypto@vger.kernel.org>; Sun, 17 Sep 2023 16:24:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694967885;
+        bh=+sl2lkrSu8NUZnETvkyZq5s3zUwNoDvzf/p0Y2y28sg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=I8RGdQ0hBFICjZbal7eh6GYhM83ouDw4saZ2q7AuMAueKyG1GlT+z3IPb4+k6ZA6M
+         0f0yJoOV/jdX4RnpEO+Xny6RC89hMfz+KXijA/ampBRDlJTbQ0a4YLrLLsXMP5DqVg
+         5rhnGveeF7b7/kAnKkDbCLJ7GeoDxaZxRMVEv3lrKnwH8OtvvgNPm1wr8zSmGIm8tO
+         DzV1WRfGVSQzgNaQiHnkxTFtnHtefDgBjELY5yhFmzPW6NRD3h+V08ZmdXS4pKP0hL
+         w/XZZPVoYsGoUbJyjBd9HtdVL5foCs0StQB5NuBFQWHQOjgaBXP0wFBye9E+wiOHAd
+         C+S9UE9gAHzsw==
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-502fd1e1dd8so2307394e87.1
+        for <linux-crypto@vger.kernel.org>; Sun, 17 Sep 2023 09:24:45 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yx8w27XFJPEueMi9yy/S/NltyAdK9PXJL9aRvE2SO/StM8C2bM6
+        OhULGAgbvXZ9amLIvFX571C5qa8Sb62RsLh5s44=
+X-Google-Smtp-Source: AGHT+IHQ6Ld9WWXgxOWQzXce7JMm8OeSMCovx2MUWKHRzdOKGNVpm/jZYB/gxR58Lr6EV8Swt0zYt1rHh+8KCM/GwdU=
+X-Received: by 2002:a05:6512:788:b0:4f8:7772:3dfd with SMTP id
+ x8-20020a056512078800b004f877723dfdmr5818356lfr.11.1694967883460; Sun, 17 Sep
+ 2023 09:24:43 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/2] Propagating reseed notifications to user space
-To:     Babis Chalios <bchalios@amazon.es>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     graf@amazon.de, xmarcalx@amazon.co.uk, aams@amazon.de,
-        dwmw@amazon.co.uk, gregkh@linuxfoundation.org
-References: <20230823090107.65749-1-bchalios@amazon.es>
-Content-Language: fr-FR, en-US, en-GB
-From:   Yann Droneaud <yann@droneaud.fr>
-In-Reply-To: <20230823090107.65749-1-bchalios@amazon.es>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+ <CAMj1kXHLZ8kZWL3npQRavdzjRtv_uiRKmKDeXaQhhy3m4LvK+w@mail.gmail.com>
+ <ZQLK0injXi7K3X1b@gondor.apana.org.au> <CAMj1kXHvhrUyShdSNCJeOh8WVXFqPPu+KLh16V6fJJdQKhPv1A@mail.gmail.com>
+ <ZQLSlqJs///qoGCY@gondor.apana.org.au> <CAMj1kXE6mo2F7KgGmpygEs5cHf=mvUs2k3TT-xJ1wKP_YNGzFg@mail.gmail.com>
+ <ZQLTl26H8TLFEP7r@gondor.apana.org.au>
+In-Reply-To: <ZQLTl26H8TLFEP7r@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sun, 17 Sep 2023 18:24:32 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFnZKABMdBntS3=ARJz-8BV7oG1VHnO7iiSj=5BbpJPDg@mail.gmail.com>
+Message-ID: <CAMj1kXFnZKABMdBntS3=ARJz-8BV7oG1VHnO7iiSj=5BbpJPDg@mail.gmail.com>
+Subject: Re: [PATCH 0/8] crypto: Add lskcipher API type
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-Le 23/08/2023 à 11:01, Babis Chalios a écrit :
-> User space often implements PRNGs that use /dev/random as entropy
-> source. We can not expect that this randomness sources stay completely
-> unknown forever. For various reasons, the originating PRNG seed may
-> become known at which point the PRNG becomes insecure for further random
-> number generation. Events that can lead to that are for example fast
-> computers reversing the PRNG function using a number of inputs or
-> Virtual Machine clones which carry seed values into their clones.
+On Thu, 14 Sept 2023 at 11:34, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> During LPC 2022 Jason, Alex, Michael and me brainstormed on how to
-> atomically expose a notification to user space that it should reseed.
-> Atomicity is key for the VM clone case. This patchset implements a
-> potential path to do so.
+> On Thu, Sep 14, 2023 at 11:31:14AM +0200, Ard Biesheuvel wrote:
+> >
+> > ecb(aes)
 >
-> This patchset introduces an epoch value as the means of communicating to
-> the guest the need to reseed. The epoch is a 32bit value with the
-> following form:
+> This is unnecessary as the generic template will construct an
+> algorithm that's almost exactly the same as the underlying
+> algorithm.  But you could register it if you want to.  The
+> template instantiation is a one-off event.
 >
->                RNG epoch
-> *-------------*---------------------*
-> | notifier id | epoch counter value |
-> *-------------*---------------------*
->       8 bits           24 bits
->
-> Changes in this value signal moments in time that PRNGs need to be
-> re-seeded. As a result, the intended use of the epoch from user space
-> PRNGs is to cache the epoch value every time they reseed using kernel
-> entropy, then control that its value hasn't changed before giving out
-> random numbers. If the value has changed the PRNG needs to reseed before
-> producing any more random bits.
->
-> The API for getting hold of this value is offered through
-> /dev/(u)random. We introduce a new ioctl for these devices, which
-> creates an anonymous file descriptor. User processes can call the
-> ioctl() to get the anon fd and then mmap it to a single page. That page
-> contains the value of the epoch at offset 0.
->
-> Naturally, random.c is the component that maintains the RNG epoch.
-> During initialization it allocates a single global page which holds the
-> epoch value. Moreover, it exposes an API to kernel subsystems
-> (notifiers) which can report events that require PRNG reseeding.
-> Notifiers register with random.c and receive an 8-bit notifier id (up to
-> 256 subscribers should be enough) and a pointer to the epoch. Notifying,
-> then, is equivalent to writing in the epoch address a new epoch value.
->
-> Notifiers write epoch values that include the notifier ID on the higher
-> 8 bits and increasing counter values on the 24 remaining bits. This
-> guarantees that two notifiers cannot ever write the same epoch value,
-> since notificator IDs are unique.
->
-> The first patch of this series implements the epoch mechanism. It adds
-> the logic in the random.c to maintain the epoch page and expose the
-> user space facing API. It also adds the internal API that allows kernel
-> systems to register as notifiers.
 
- From userspace point of view, having to open /dev/random, ioctl, and mmap()
-is a no-go for a (CS)PRNG embedded in libc for arc4random().
+Ported my RISC-V AES implementation here:
+https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=riscv-scalar-aes
 
-I'm biased, as I proposed to expose such seed epoch value to userspace through
-getrandom() directly, relying on vDSO for reasonable performances, because
-current's glibc arc4random() is somewhat to slow to be a general replacement
-rand().
+I will get back to this after mu holidays, early October.
 
-See
-https://lore.kernel.org/all/cover.1673539719.git.ydroneaud@opteya.com/
-https://lore.kernel.org/all/ae35afa5b824dc76c5ded98efcabc117e6dd3d70@opteya.com/
-
-Reards.
-
--- 
-Yann Droneaud
-
-
+Thanks,
