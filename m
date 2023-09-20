@@ -2,117 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB29C04AB8
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Sep 2023 17:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB02C04FE8
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Sep 2023 18:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235122AbjITRMs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Sep 2023 13:12:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40510 "EHLO
+        id S229532AbjITSsy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Sep 2023 14:48:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235272AbjITRMi (ORCPT
+        with ESMTP id S229699AbjITSsx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2023 13:12:38 -0400
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 810C2CE0
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 10:12:15 -0700 (PDT)
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 47E673F63E
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 17:12:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1695229932;
-        bh=aMSN2b6FPtP71Yuy3aOolSBsWw71Z7rbqelM6LCeABc=;
-        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-         MIME-Version;
-        b=PZFOUyvNwKjZhnPdq4P8h+4KERFN5u61gDjdQFNQ4NMOHtfBVk8mUta9GrhlqkP5G
-         VoaAe5H8p+nNQOht+I5MRvogffessdq8vO8aXiTyBvi+5I3odyviUOeZE30V/mawRc
-         j90kvAPgdUaOBq+NQO0TIgRnBsbnTv5fwzYEzM0YRidPkhzGC/h0XaPGW1Hniut+Zt
-         giYusWHv0mKjFH5nj+Xmg3BinQzhvR0iT8VTg/yy3F8xpwf+84TNery7EwIGsP+5hG
-         9G9A07tNoyXjM+UNbb7CXBCy5Bf2jrxPsJ1UgcFgzfFaeI6Ag76pv2n4dyn+CRbnvR
-         gsVAjAIhvUBVg==
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-402cba95486so423835e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 10:12:12 -0700 (PDT)
+        Wed, 20 Sep 2023 14:48:53 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C88C6
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 11:48:47 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-5033918c09eso288880e87.2
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 11:48:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1695235725; x=1695840525; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=X1hFrP0vWNBME7dDNcg/fEbps60Tl05diwzAP59+3sw=;
+        b=AXQsgJaTWvfLszH1nhmige5zIrolkGN5tWGUxIw594N1LopPbLxoF0j0ViApTvCNuY
+         keo4+edsKUcrkrlobuH2zC/yx6NOiZIyjZ3ACCvlz1LuWC5bdy1EhXcwv6t4xe9ZTD9p
+         dliCbhUkn6qj8aV3SfMYY+lz3i3ajWTOPpXFs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695229932; x=1695834732;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aMSN2b6FPtP71Yuy3aOolSBsWw71Z7rbqelM6LCeABc=;
-        b=ntgYI0DtoFJAg/JxGC1CABjHkZglkZsGd8DuCKo6FrBndHD8V0UkYnUvJdp8Ew+89h
-         2zuNt2EtMqRmVVpuO6RDwz6VjVnSb8+AYWjne7yMvXuj1LtYWxY7RUeaLaYyqfzepPSs
-         uBKGxXlNxrhDbzfFk0amZT9/h03szEl4+M60hDSX3ZG6YRKcbVqz4ogaXf2HyNv7cY7m
-         qlY9t0TZCyZjGbNh/HR5tQxzVBvqFB1qSWnaG4guNzkrNksnR5Zwo36CGZ7nYJc9Qnzg
-         tDbnvqTa02mNGnCF0u2pcNQNF9/OlQLBXvEkAQjcfXneVITYgMq1uQwh3G10ickKHRNq
-         yccQ==
-X-Gm-Message-State: AOJu0Yx7eQjaUnD3mXhr4FftIeonlBztNdhL7uTnxiOyvrf95A9U2AwZ
-        zRX1yxKnhLm7O2XUM5Mx5GxoQojpEXfUaavqUA37Fgpeoq0XJLKALWBtotGRfhsGJ2pKHI3gkMX
-        iO+kDgsFOKWaHdcfc1LzVPjXBTRJKZD5DSuYqSXeCXg==
-X-Received: by 2002:a1c:f204:0:b0:401:c944:a4d6 with SMTP id s4-20020a1cf204000000b00401c944a4d6mr2601712wmc.28.1695229931798;
-        Wed, 20 Sep 2023 10:12:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFtIk2rtiYUS9ShClNXvyZriX2xgTDxVioqlVjWWDSc5z5AFzcfx8XmtDp+shKbfv5XjqgSpg==
-X-Received: by 2002:a1c:f204:0:b0:401:c944:a4d6 with SMTP id s4-20020a1cf204000000b00401c944a4d6mr2601692wmc.28.1695229931401;
-        Wed, 20 Sep 2023 10:12:11 -0700 (PDT)
-Received: from localhost ([2a01:4b00:85fd:d700:6aa5:dc9f:c265:61f4])
-        by smtp.gmail.com with ESMTPSA id c26-20020a05600c0ada00b00400268671c6sm2484584wmr.13.2023.09.20.10.12.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 10:12:11 -0700 (PDT)
-From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, dhowells@redhat.com, jarkko@kernel.org,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, tianjia.zhang@linux.alibaba.com,
-        varad.gautam@suse.com, vt@altlinux.org
-Subject: Re: [PATCH v3 13/18] crypto: rsa-psspad: Get signature parameters from a given signature
-Date:   Wed, 20 Sep 2023 18:12:06 +0100
-Message-Id: <20230920171206.504360-1-dimitri.ledkov@canonical.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20210514104535.q4zjtshxroruvoz3@gondor.apana.org.au>
-References: <20210514104535.q4zjtshxroruvoz3@gondor.apana.org.au>
+        d=1e100.net; s=20230601; t=1695235725; x=1695840525;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X1hFrP0vWNBME7dDNcg/fEbps60Tl05diwzAP59+3sw=;
+        b=egy5u/Kpcl3XKjVmlOQnMYRICZb3JtSU+awtrx+mYA0qaq4o3/gLH59Ov5eB92kSoq
+         HsOF3wIfAPTMQ/oxZcwz+3N2HVnnCJMwreh2eKTpOZ4xncRIFN09iKjmvZtVvUxzI0NZ
+         31SClCqnWKAt5JO5F5Q85WVzFrPTKPeVxTjywxrSthdoe+x9ff3KSqZJJu9bW+gjVoeX
+         XiqBTLTucVKMc4LHPyxPmkT9/0y4n1T/dnui/GwMasGFUNfg7TUVB8K+oK7dWhm8KNtq
+         cED1g2t2XlW0fLJqwljrfY4m5zq91K+hAEr4ah/3VzsCci/ojY3Is1wKCNQYhi4L/FPM
+         CZYQ==
+X-Gm-Message-State: AOJu0YwiSEE4CHo/u/jcL3/fO+CMZwp5gQrOLHo4QkzOfoke0Jvp6YH4
+        zXv7Z0hhxGzzOpuH15CJuaO4ukoU7EwCRZf7fJeVog==
+X-Google-Smtp-Source: AGHT+IE+GsZW9a0WmXEfwl1kO/OMICI4nChXdV5umGwpZSoghgBYZQysxVSoVA1BTKPdxn329YfYJQ==
+X-Received: by 2002:a05:6512:3b12:b0:503:3808:389a with SMTP id f18-20020a0565123b1200b005033808389amr3834620lfv.11.1695235725299;
+        Wed, 20 Sep 2023 11:48:45 -0700 (PDT)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com. [209.85.167.43])
+        by smtp.gmail.com with ESMTPSA id c11-20020a056512324b00b00503134e23b6sm1561654lfr.141.2023.09.20.11.48.44
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Sep 2023 11:48:44 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-502153ae36cso289835e87.3
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 11:48:44 -0700 (PDT)
+X-Received: by 2002:a05:6512:b1c:b0:503:6b8:a84a with SMTP id
+ w28-20020a0565120b1c00b0050306b8a84amr3636614lfu.54.1695235724132; Wed, 20
+ Sep 2023 11:48:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230920060615.GA2739@sol.localdomain>
+In-Reply-To: <20230920060615.GA2739@sol.localdomain>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 20 Sep 2023 11:48:26 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
+Message-ID: <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
+Subject: Re: [RFC] Should writes to /dev/urandom immediately affect reads?
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-> On Tue, Apr 20, 2021 at 01:41:18PM +0200, Varad Gautam wrote:
->>
->> +static int psspad_set_sig_params(struct crypto_akcipher *tfm,
->> +				 const void *sig,
->> +				 unsigned int siglen)
->> +{
->> +	struct akcipher_instance *inst = akcipher_alg_instance(tfm);
->> +	struct rsapad_inst_ctx *ictx = akcipher_instance_ctx(inst);
->> +	const struct public_key_signature *s = sig;
->> +
->> +	if (!sig)
->> +		return -EINVAL;
->> +
->> +	ictx->salt_len = s->salt_length;
->> +	ictx->mgf_hash_algo = s->mgf_hash_algo;
+On Tue, 19 Sept 2023 at 23:06, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> Is there any reason why this couldn't be embedded into the key
-> instead?
->
+> This would be the potential change, BTW:
 
-Whilst is is correct that the same key can be used to verify either
-types of signatures, it is best practice to use separate and new keys
-in such situations. This prevents compromising key due to any
-weaknesses in the one or the other signature types.
+Entirely regardless of your fundamental question, no, that's not the
+potential change.
 
-Thus imho it does make sense to embed sal_len & hash_algo into the key
-instead, and thus only allow PSS signature verification with such a
-key. This is common for x509 certs too as used in TLS. (at least this
-is my understanding of all of this).
+That causes a crng_reseed() even if the write fails completely and
+returns -EFAULT.
 
-But this is a minor point which can fix now or later.
+So at a *minimum*, I'd expect the patch to be be something like
 
-BTW, this patch series overall look very good to me and I want to use
-PSS signatures in my kernel builds. What is the status of merging this
-patch series?
+        memzero_explicit(block, sizeof(block));
+-       return ret ? ret : -EFAULT;
++       if (!ret)
++               return -EFAULT;
++       crng_reseed(NULL);
++       return ret;
 
-Regards,
+but even then I'd ask
 
-Dimitri.
+ - wouldn't we want some kind of minimum check?
+
+ - do we really trust writes to add any actual entropy at all and at what point?
+
+which are admittedly likely the same question just in different guises.
+
+Also, are there any relevant architectures where
+"try_to_generate_entropy()" doesn't work? IOW, why do you even care?
+
+                Linus
