@@ -2,48 +2,50 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51CF2C0031C
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Sep 2023 17:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80851C04ABA
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Sep 2023 17:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234330AbjITRKN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Sep 2023 13:10:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45326 "EHLO
+        id S235173AbjITRKg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Sep 2023 13:10:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbjITRKM (ORCPT
+        with ESMTP id S235410AbjITRKY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2023 13:10:12 -0400
+        Wed, 20 Sep 2023 13:10:24 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B2AAA3;
-        Wed, 20 Sep 2023 10:10:07 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2144BC433C8;
-        Wed, 20 Sep 2023 17:10:06 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE546114;
+        Wed, 20 Sep 2023 10:10:18 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8439DC433CD;
+        Wed, 20 Sep 2023 17:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695229807;
-        bh=4/QpFdXXat5YYWLWJXquh/jNvMlFGIeOXDZXtyrqkL0=;
+        s=k20201202; t=1695229818;
+        bh=8VWkm0TdywfC0jIWQS11HiuH5wZyMz1Bz0shb7h8EI8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FNXtXmMEtJ33lUPlF8cl/BbOYVSD5+rxt7WgqlwIDrVGwixMgEXspGeBc3Mnr33IO
-         u7A1bjSASIYByr+Egg8GcA4fNFpNinYK5nJTPVNqJocdKevxQcJe05xMR7TZsHT/IW
-         xL2SrHt/d6nyNx0LJt60N8yZJnGvhJzWiXJMWJ1OLvHDGPcj4ie3qArha+xSotz+3a
-         0/w74WSiubSuA/LhhVpfEcQzNsaGhEGleoO6hUXc3MznIl5D9sehkBTJF6Ru/J5nWi
-         hjz74eSVWuguXSAHuvtTLYTToQWH+Oj6eHZUO3xJzkEaMNhKWhqYSnocDS5vs+HEay
-         8f4ahemZqTqBQ==
+        b=LEG8NKuSLe7lSF+Zh2Qc65LBBlq3O3/DHBSHK8A9MY7dwT6CTLkejprzAuP+fBTI/
+         3PTFDw29UOCBHjlZn+d9aJFIMvj3kGGoT8t4J2p/1KS0jiXWwOoIU041/cuPQ3Mbov
+         t9bzzPnaLE60Yx0CJHJ6Yqaca4mPxzf0K6N44wPrZqCNR70ofiMkSqwf6u79NvDh4L
+         J6hs/vGW2rvlNxNlG37HdwlQPdoifOADunm7XtxsWG2afyKnqmRdATOZmoyfwXV1aU
+         29UPU7QjLLZnKAVaPaAHUWISsa4qBsF/+pbc9dvMDyuyDxAfYozYJ35O5aCool8jkY
+         nGm5Kp0YZsyJQ==
 From:   Bjorn Andersson <andersson@kernel.org>
 To:     Andy Gross <agross@kernel.org>,
         Konrad Dybcio <konrad.dybcio@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
+        "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Conor Dooley <conor+dt@kernel.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+        Vinod Koul <vkoul@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>
 Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: (subset) [PATCH 1/2] dt-bindings: crypto: ice: document the sa8775p inline crypto engine
-Date:   Wed, 20 Sep 2023 10:13:55 -0700
-Message-ID: <169523004971.2665018.5457570667421710137.b4-ty@kernel.org>
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Om Prakash Singh <quic_omprsing@quicinc.com>
+Subject: Re: (subset) [PATCH v3 0/6] arm64: qcom: sm8550: enable RNG
+Date:   Wed, 20 Sep 2023 10:14:05 -0700
+Message-ID: <169523004964.2665018.13328603087200481888.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20230913153529.32777-1-bartosz.golaszewski@linaro.org>
-References: <20230913153529.32777-1-bartosz.golaszewski@linaro.org>
+In-Reply-To: <20230828-topic-sm8550-rng-v3-0-7a0678ca7988@linaro.org>
+References: <20230828-topic-sm8550-rng-v3-0-7a0678ca7988@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -52,15 +54,16 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-On Wed, 13 Sep 2023 17:35:28 +0200, Bartosz Golaszewski wrote:
-> Add the compatible string for QCom ICE on sa8775p SoCs.
+On Mon, 28 Aug 2023 10:04:35 +0200, Neil Armstrong wrote:
+> Enable RNG on SM8550 by reverting the PRNG bindings & DT
+> for SM8450 and correctly document it as a True Random Number Generator.
 > 
 > 
 
 Applied, thanks!
 
-[2/2] arm64: dts: qcom: sa8775p: enable the inline crypto engine
-      commit: 96272ba7103d4518e2d0f17daf6fe0008fc6e12c
+[1/6] Revert "arm64: dts: qcom: sm8450: Add PRNG"
+      commit: e735eab705cd0a9b3b98ffd746055c2c49e1572b
 
 Best regards,
 -- 
