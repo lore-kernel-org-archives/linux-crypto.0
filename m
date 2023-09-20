@@ -2,100 +2,96 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BD4C04FEE
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Sep 2023 19:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCF1C04FEE
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Sep 2023 19:43:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbjITTcx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Sep 2023 15:32:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42828 "EHLO
+        id S229682AbjITTnV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 20 Sep 2023 15:43:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbjITTcu (ORCPT
+        with ESMTP id S229456AbjITTnU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2023 15:32:50 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B8141B4;
-        Wed, 20 Sep 2023 12:32:15 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05091C433AD;
-        Wed, 20 Sep 2023 19:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695238325;
-        bh=bcP72m9EhmjsOzjFU5Em8mvcDsCEuWWFRjHnralHl2s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OC1ZMnQiXtxcKFL3Cj3sqwJdmfq4v5O2Asja5tvU1SeCJUZPzH/pK4gaJYnHyPTgY
-         abWhQpwerZ44NlDpaEIK1x+H9IOTbNAPLXiMkLMCSO7ri85yks004apzex0V2HHbx6
-         UeC5RwBV+YwrfT/hd7PMuAgP4gn7OpjnXEHQUw9xqAvqc3Z4dj+AUK31hETnaS34gE
-         TCqskU9N+1fiySWy822kzYIh/PLHAGRkWPpoWGiihAzbT512i3sMV1Gjuy7LLoSkSM
-         zvoqP9J58veqwNNchMhyNEj6opXTbCCKkGijfYhJcpXeJuaH6a9n1GXs0926935X0+
-         rNENwAmVDy/4g==
-Date:   Wed, 20 Sep 2023 12:32:03 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        Wed, 20 Sep 2023 15:43:20 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6256CA3
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 12:43:14 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99c136ee106so15399566b.1
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 12:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1695238992; x=1695843792; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=piPcn5jP84Mk94uBsWZooyBKmFjEME+EXsVwt6XYvDs=;
+        b=ZtJa7m2J/ldGdabNdtcRaSb6em6ywDNYiNo2JFffeuMsXmV5pslFiH/wIzqqR4AY1a
+         cXo8TtylSEXLnfftt1soRjlgew6lJVAjurpqgQ0vZfftehkAKoCgcVbyKuZVyvVgHhLY
+         UGDnvvLTyPeuarDdiBOt5obScW27eldYOEWTQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695238992; x=1695843792;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=piPcn5jP84Mk94uBsWZooyBKmFjEME+EXsVwt6XYvDs=;
+        b=K8X6IzIr0yt9cvVfvOxZvuTmofygRp6FnasSZ01OttO9OxpJz9wasiOIdTOTbrSblt
+         kUB293R4iuZN/Jq0fSr4sHcC4lCyh1jwl/WRs+KbT2VA4z866JSHioe+M9/1/2xkcdc/
+         /ityIt6S7tvtTTqrzNZAzm3PCsajjt40WXxnMMlxzBiJ84CSKUeDsNE6Q+IcHiGU2NRc
+         Mh0XISfEB8gJD/qtyZ+XdaHg4bTLkuF6loiyKRVTDE40CTGZ5UkYJHEmMXDJ4+DHQAs4
+         t2xmAFQnHTNqZtfWZRd4/XTlc1SY1/SC7IcWF5l/m05Y//OzEhaXes6O9BWyoleXBWpp
+         HGzQ==
+X-Gm-Message-State: AOJu0YwISgSSTvrzmElWN13TIFR+PvvzuG3eTNqE12a6SlZjWJHgL+5x
+        IYxtnz+PYhVAntwbXcSHENfP6qC5dih1VLRgMeSlx006
+X-Google-Smtp-Source: AGHT+IEeeqeU4dZyH4z8XxzDOMY+Da9eoa1Fu1jQ3D3xeLnuQ43P0fPKO1NVLoJwSPy8D1TtXEmfJw==
+X-Received: by 2002:a17:906:92:b0:9a1:c0e9:58ff with SMTP id 18-20020a170906009200b009a1c0e958ffmr2885402ejc.11.1695238992615;
+        Wed, 20 Sep 2023 12:43:12 -0700 (PDT)
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com. [209.85.208.49])
+        by smtp.gmail.com with ESMTPSA id e10-20020a170906248a00b00993928e4d1bsm9722919ejb.24.2023.09.20.12.43.11
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Sep 2023 12:43:11 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-52889bc61b6so126043a12.0
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 12:43:11 -0700 (PDT)
+X-Received: by 2002:a05:6402:184e:b0:523:3fff:5ce2 with SMTP id
+ v14-20020a056402184e00b005233fff5ce2mr3044193edy.41.1695238991470; Wed, 20
+ Sep 2023 12:43:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230920060615.GA2739@sol.localdomain> <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
+ <20230920193203.GA914@sol.localdomain>
+In-Reply-To: <20230920193203.GA914@sol.localdomain>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 20 Sep 2023 12:42:54 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wicaC9BhbgufM_Ym6bkjrRcB7ZXSK00fYEmiAcFmwN3Kg@mail.gmail.com>
+Message-ID: <CAHk-=wicaC9BhbgufM_Ym6bkjrRcB7ZXSK00fYEmiAcFmwN3Kg@mail.gmail.com>
+Subject: Re: [RFC] Should writes to /dev/urandom immediately affect reads?
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Jann Horn <jannh@google.com>
-Subject: Re: [RFC] Should writes to /dev/urandom immediately affect reads?
-Message-ID: <20230920193203.GA914@sol.localdomain>
-References: <20230920060615.GA2739@sol.localdomain>
- <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus,
-
-On Wed, Sep 20, 2023 at 11:48:26AM -0700, Linus Torvalds wrote:
-> On Tue, 19 Sept 2023 at 23:06, Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, 20 Sept 2023 at 12:32, Eric Biggers <ebiggers@kernel.org> wrote:
+>
 > >
-> > This would be the potential change, BTW:
-> 
-> Entirely regardless of your fundamental question, no, that's not the
-> potential change.
-> 
-> That causes a crng_reseed() even if the write fails completely and
-> returns -EFAULT.
-> 
-> So at a *minimum*, I'd expect the patch to be be something like
-> 
->         memzero_explicit(block, sizeof(block));
-> -       return ret ? ret : -EFAULT;
-> +       if (!ret)
-> +               return -EFAULT;
-> +       crng_reseed(NULL);
-> +       return ret;
-> 
-> but even then I'd ask
-> 
->  - wouldn't we want some kind of minimum check?
-> 
->  - do we really trust writes to add any actual entropy at all and at what point?
-> 
-> which are admittedly likely the same question just in different guises.
+> > Also, are there any relevant architectures where
+> > "try_to_generate_entropy()" doesn't work? IOW, why do you even care?
+> >
+>
+> There are, as shown by the fact that the full unification of /dev/urandom and
+> /dev/random failed yet again.
 
-Whether to credit entropy for writes to /dev/{u,}random is an unrelated topic,
-and the answer is clearly "no, we must not, and we never have" (as I mentioned
-in the second paragraph of my email).  I understand the last discussion
-https://lore.kernel.org/lkml/20220322191436.110963-1-Jason@zx2c4.com/T/#u
-diverged into both topics, but they're not directly related.  Reseeding the CRNG
-just makes it up to date with the entropy pool; nothing more than that.
+No, no. That only showed that such architectures exist. It didn't show
+that any *relevant* architectures exist.
 
-Yes, obviously there's no point in reseeding if nothing actually got added, so
-we could skip the reseed in that case if we want to.
+The ones reported on were 32-bit arm, m68k, microblaze, sparc32,
+xtensa.. Maybe others.
 
-> 
-> Also, are there any relevant architectures where
-> "try_to_generate_entropy()" doesn't work? IOW, why do you even care?
-> 
+> But similarly, that's unrelated.
 
-There are, as shown by the fact that the full unification of /dev/urandom and
-/dev/random failed yet again.  But similarly, that's unrelated.  The actual
-question, which I'm attempting to start a discussion about without getting
-sidetracked into questions that may seem related but actually aren't, is simply
-whether writes to /dev/{u,}random should immediately affect reads.
+They are related in the sense fo "why do you actually *care*?"
 
-- Eric
+Because I don't see why any of this actually matters.
+
+               Linus
