@@ -2,67 +2,105 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 008C9CD493A
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 01:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A12E7109A
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 16:59:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjIUBIr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Sep 2023 21:08:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50908 "EHLO
+        id S229646AbjIUQ7L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 12:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjIUBIr (ORCPT
+        with ESMTP id S229716AbjIUQ67 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Sep 2023 21:08:47 -0400
-X-Greylist: delayed 1092 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 20 Sep 2023 18:08:38 PDT
-Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2AFDD
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Sep 2023 18:08:38 -0700 (PDT)
-Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
-        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4RrcFw1fPGz9xkGb;
-        Thu, 21 Sep 2023 08:48:20 +0800 (CST)
-Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
- (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 21 Sep
- 2023 08:50:18 +0800
-Date:   Thu, 21 Sep 2023 08:50:17 +0800
-From:   Wang Jinchao <wangjinchao@xfusion.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-CC:     Steffen Klassert <steffen.klassert@secunet.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nstange@suse.de>, <tangqingmei@xfusion.com>,
-        <stone.xulei@xfusion.com>
-Subject: Re: Issue: padata: UAF in padata_serial_worker reproduce
-Message-ID: <ZQuTSeIskyDjkiMg@fedora>
-References: <ZQft1jGSMSTRlxfi@fedora>
- <lq67pqfz4ucmrpbwmor7h23x2iafsnyh4yuz3mfrfaxrsqbyxz@wqp5rih7grwp>
+        Thu, 21 Sep 2023 12:58:59 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9618F1FD6
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 09:58:17 -0700 (PDT)
+Received: from letrec.thunk.org (c-73-8-226-230.hsd1.il.comcast.net [73.8.226.230])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 38LDUd3N002197
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Sep 2023 09:30:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1695303042; bh=+fubNItGMi3oNUPA7yH/IACt2nk/RkasGX86cZmJsJg=;
+        h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+        b=YyZ1ZhLgEOUZxK6QlhDrqHdh84oveJlq+86w5zpiCsCKuDaVztlQM9apfRvVa/rnu
+         St0dYrJWO8wpt3Zx9d2Wth7vYbcOVIUpA6KznBvzWx4OW7pi0iD6OvZ2q9rVd9HNs2
+         UgptpPOfLzcjDMNX7myTklC/qr9LrgC2L7U2Uuw5ANaf81pL1la09HzKe5QvczYi8V
+         y9fmTzAKu04qfSQLNBHrURNpExaNew9U7HoU2Blt1IpI2CmfrLnSuEAvxvbLZoA4c1
+         tfp3EzPd17QDVry4+sy4uZe//4dr1voWcuF5Hmb6gKS3i/1KuIZAfR1z76vmXoLeuN
+         b4X7CdL7gClAA==
+Received: by letrec.thunk.org (Postfix, from userid 15806)
+        id 6C9A08C02C7; Thu, 21 Sep 2023 09:30:39 -0400 (EDT)
+Date:   Thu, 21 Sep 2023 09:30:39 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>
+Subject: Re: [RFC] Should writes to /dev/urandom immediately affect reads?
+Message-ID: <ZQxFfwsr726KlHP6@mit.edu>
+References: <20230920060615.GA2739@sol.localdomain>
+ <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
+ <20230920193203.GA914@sol.localdomain>
+ <CAHk-=wicaC9BhbgufM_Ym6bkjrRcB7ZXSK00fYEmiAcFmwN3Kg@mail.gmail.com>
+ <20230920202126.GC914@sol.localdomain>
+ <CAHk-=wgu4a=ckih8+JgfwYPZcp-uvc1Nh2LTGBSzSVKMYRk+-w@mail.gmail.com>
+ <20230920204524.GD914@sol.localdomain>
+ <CAHk-=wjx__9L2Ej0DBWGgyjxEKkdKJW=zDvjEhLTBsBgd8MdOA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <lq67pqfz4ucmrpbwmor7h23x2iafsnyh4yuz3mfrfaxrsqbyxz@wqp5rih7grwp>
-X-Originating-IP: [10.82.147.3]
-X-ClientProxiedBy: wuxshcsitd00600.xfusion.com (10.32.133.213) To
- wuxshcsitd00600.xfusion.com (10.32.133.213)
+In-Reply-To: <CAHk-=wjx__9L2Ej0DBWGgyjxEKkdKJW=zDvjEhLTBsBgd8MdOA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 18, 2023 at 09:21:59AM -0400, Daniel Jordan wrote:
-> Hi,
+On Wed, Sep 20, 2023 at 01:48:55PM -0700, Linus Torvalds wrote:
+> On Wed, 20 Sept 2023 at 13:45, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > See my first email where I explained the problems with the current behavior.
+> > Especially the third paragraph.
 > 
-> On Mon, Sep 18, 2023 at 02:27:34PM +0800, Wang Jinchao wrote:
-> > Hello, I have reproduced the issue mentioned by Nicolai Stange on an arm64 server.
-> > After applying Nicolai Stange's patch, the issue did not reoccur even after running for two days.
-> > The test tools used were ltp20220121 and stress-ng-0.15.06.tar.gz.
-> > 
-> > refurl: https://lore.kernel.org/all/20221028160401.cccypv4euxikusiq@parnassus.localdomain/T/#u
-> 
-> Yeah, this series seems close to being finished, just hasn't made it
-> over the finish line quite yet.  I wonder if Nicolai has plans to
-> ressurect or whether someone else should take it over.
+> I really don't think that's the obvious way at all. Anybody who treats
+> a seed file that way just doesn't care, and whipped up a (bad) shell
+> script randomly.
 
-Hello, I'd like to inquire about something:
+The shell script (and documentation in the kernel man pages suggesting
+the shell script) is basically historical, and obsolete.  It was
+needed back when we weren't as aggressively seeding the RNG at boot
+time, before we unified /dev/urandom and /dev/random.  These days, I
+really don't think it matters all that much.
 
-Since users of padata_free_shell need to ensure that all tasks in padata_shell have completed, 
-how can they confirm this when they are uncertain? Would it be better if Padata provided a mechanism, 
-such as padata_shell_status(), to maintain statistics like the number of tasks?
+The main threat we've historically been concerned is badly designed
+IOT devices (remember, the 'S' in IOT stands for security) which
+generates a long-term cryptographic key within milliseconds of the
+initial power-on, which led to such hillarious results as all HP
+Printers publically on the Internet having one of 256 possible private
+keys.  In those sorts of situations, there *was* no seed file, and
+even if there were, it would be identical across all of the IOT's
+initially imaged root file system.
 
-Thanks
+I do have one slight concern about unconditionally reseeding whenever
+there is a write to /dev/[u]random, whih is in the purely hypothetical
+scenario mostly of interest to academics writing crypto papers, where
+we assume the attacker has stolen the full internal state of the RNG,
+if the attacker is constantly writing a small amount of known data to
+/dev/random, and monitoring its output, it would be disabling the
+"catastrophic reseed" part of the design, and so it might make it
+easier for the attacker to maintain accurate knowledge of the internal
+state of the RNG over long period of time.  So a perfectionist would
+probably put a timeout where writing to /dev/urandom would result in a
+reseed every N minutes or some such.
+
+But honestly?  I'm not convinced it's worth it; devices/systems where
+this matter are probably not getting security updates *anyway*, so the
+much simpler way the NSA/KGB/MSS would attack the device is paying a
+few thousand dollars for a zero-day, and breaking kernel security
+that way.
+
+Cheers,
+
+						- Ted
