@@ -2,137 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A263FE7D0AB
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 21:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB5EE7D0AF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 22:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbjIUVYV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 17:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56260 "EHLO
+        id S230427AbjIUWBM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 18:01:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230290AbjIUVYH (ORCPT
+        with ESMTP id S230317AbjIUWA4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 17:24:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A2CE098
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 13:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695329639;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=fGPKZrXt//Yq5gMCYOETARqtGaAshsB1GXsDehnSEAY=;
-        b=EHHWXfeeO2+0YUNZNT78QSTuauDeVA+OukoL2i+9doDEkdc0U292SkzGbB8iwkDdtTRTSS
-        3xDNzWLs8ikCFjS5kSF4RuLskxeuhSpH1ebAn4V67xUbptPg7Kw2cwAq6cSb9ISBX/AyYd
-        BDCtRKXG6IJ2hMmM+4zDMqPtRqhd88A=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-508-vIAPiOWSOGmX5UhEXrpHjw-1; Thu, 21 Sep 2023 16:53:56 -0400
-X-MC-Unique: vIAPiOWSOGmX5UhEXrpHjw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0A54D3814591;
-        Thu, 21 Sep 2023 20:53:56 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 610872156701;
-        Thu, 21 Sep 2023 20:53:55 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-        id 4926030C1C0A; Thu, 21 Sep 2023 20:53:55 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 406CF3FB77;
-        Thu, 21 Sep 2023 22:53:55 +0200 (CEST)
-Date:   Thu, 21 Sep 2023 22:53:55 +0200 (CEST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Michael Hrivnak <mhrivnak@redhat.com>,
-        Eric Garver <egarver@redhat.com>
-cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH] qat: fix deadlock in backlog processing
-Message-ID: <af9581e2-58f9-cc19-428f-6f18f1f83d54@redhat.com>
+        Thu, 21 Sep 2023 18:00:56 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE4A2691
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 14:57:45 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-144-9yHIHy7UMl2pr0pfl-TvIA-1; Thu, 21 Sep 2023 22:57:27 +0100
+X-MC-Unique: 9yHIHy7UMl2pr0pfl-TvIA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 21 Sep
+ 2023 22:57:26 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 21 Sep 2023 22:57:26 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers@kernel.org>
+CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Dominik Brodowski" <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>
+Subject: RE: [RFC] Should writes to /dev/urandom immediately affect reads?
+Thread-Topic: [RFC] Should writes to /dev/urandom immediately affect reads?
+Thread-Index: AQHZ6/MdHsl+KD+hzUOipRl6ZArMFbAkCZmAgAADCACAAArEAIAAAxeAgAACfICAAbU2kA==
+Date:   Thu, 21 Sep 2023 21:57:26 +0000
+Message-ID: <4c5a6cd876d7499fa382ba74cd23cc08@AcuMS.aculab.com>
+References: <20230920060615.GA2739@sol.localdomain>
+ <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
+ <20230920193203.GA914@sol.localdomain>
+ <CAHk-=wicaC9BhbgufM_Ym6bkjrRcB7ZXSK00fYEmiAcFmwN3Kg@mail.gmail.com>
+ <20230920202126.GC914@sol.localdomain>
+ <CAHk-=wgu4a=ckih8+JgfwYPZcp-uvc1Nh2LTGBSzSVKMYRk+-w@mail.gmail.com>
+ <CAHk-=wh+nAmcXV=Xz6fkDpazne+n+iFfGsnS=p9PjVLiEjiSvQ@mail.gmail.com>
+In-Reply-To: <CAHk-=wh+nAmcXV=Xz6fkDpazne+n+iFfGsnS=p9PjVLiEjiSvQ@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
-
-I was evaluating whether it is feasible to use QAT with dm-crypt (the 
-answer is that it is not - QAT is slower than AES-NI for this type of 
-workload; QAT starts to be benefical for encryption requests longer than 
-64k). And I got some deadlocks.
-
-The reason for the deadlocks is this: suppose that one of the "if"
-conditions in "qat_alg_send_message_maybacklog" is true and we jump to the
-"enqueue" label. At this point, an interrupt comes in and clears all
-pending messages. Now, the interrupt returns, we grab backlog->lock, add
-the message to the backlog, drop backlog->lock - and there is no one to
-remove the backlogged message out of the list and submit it.
-
-I fixed it with this patch - with this patch, the test passes and there
-are no longer any deadlocks. I didn't want to add a spinlock to the hot
-path, so I take it only if some of the condition suggests that queuing may
-be required.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org
-
----
- drivers/crypto/intel/qat/qat_common/qat_algs_send.c |   31 ++++++++++++--------
- 1 file changed, 20 insertions(+), 11 deletions(-)
-
-Index: linux-2.6/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
-===================================================================
---- linux-2.6.orig/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
-+++ linux-2.6/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
-@@ -40,16 +40,6 @@ void qat_alg_send_backlog(struct qat_ins
- 	spin_unlock_bh(&backlog->lock);
- }
- 
--static void qat_alg_backlog_req(struct qat_alg_req *req,
--				struct qat_instance_backlog *backlog)
--{
--	INIT_LIST_HEAD(&req->list);
--
--	spin_lock_bh(&backlog->lock);
--	list_add_tail(&req->list, &backlog->list);
--	spin_unlock_bh(&backlog->lock);
--}
--
- static int qat_alg_send_message_maybacklog(struct qat_alg_req *req)
- {
- 	struct qat_instance_backlog *backlog = req->backlog;
-@@ -71,8 +61,27 @@ static int qat_alg_send_message_maybackl
- 	return -EINPROGRESS;
- 
- enqueue:
--	qat_alg_backlog_req(req, backlog);
-+	spin_lock_bh(&backlog->lock);
-+
-+	/* If any request is already backlogged, then add to backlog list */
-+	if (!list_empty(&backlog->list))
-+		goto enqueue2;
- 
-+	/* If ring is nearly full, then add to backlog list */
-+	if (adf_ring_nearly_full(tx_ring))
-+		goto enqueue2;
-+
-+	/* If adding request to HW ring fails, then add to backlog list */
-+	if (adf_send_message(tx_ring, fw_req))
-+		goto enqueue2;
-+
-+	spin_unlock_bh(&backlog->lock);
-+	return -EINPROGRESS;
-+
-+enqueue2:
-+	list_add_tail(&req->list, &backlog->list);
-+
-+	spin_unlock_bh(&backlog->lock);
- 	return -EBUSY;
- }
- 
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjAgU2VwdGVtYmVyIDIwMjMgMjE6NDENCj4g
+DQo+IE9uIFdlZCwgMjAgU2VwdCAyMDIzIGF0IDEzOjMyLCBMaW51cyBUb3J2YWxkcw0KPiA8dG9y
+dmFsZHNAbGludXgtZm91bmRhdGlvbi5vcmc+IHdyb3RlOg0KPiA+DQo+ID4gSXQgd2FzIHdoeSBJ
+IGFsc28gYXNrZWQgYWJvdXQgZW50cm9weS4gQmVjYXVzZSAqaWYqIHlvdSBhcmd1ZSB0aGF0IHRo
+ZQ0KPiA+IHVzZXItc3BhY2Ugd3JpdGUgY29udGFpbnMgZW50cm9weSwgdGhlbiB0aGF0IHdvdWxk
+IGJlIGEgcmVhc29uLg0KPiANCj4gVG8gY2xhcmlmeSAtIHRoZSBqaXR0ZXIgZW50cm9weSBxdWVz
+dGlvbiB3YXMgcmVsYXRlZCB0byB0aGF0IHNhbWUNCj4gYmFzaWMgaXNzdWU6IGlmIHRoaXMgd2Fz
+IG1lYW50IHRvIGJlIGEgd2F5IHRvIG1pdGlnYXRlIHRoZSBsYWNrIG9mDQo+IGppdHRlciBlbnRy
+b3B5IG9uIHNvbWUgcGxhdGZvcm0geW91IGNhcmUgYWJvdXQsIHRoYXQgd291bGQgYWdhaW4NCj4g
+cG9zc2libHkgYmUgYSByZWFzb24gdG8gY2FyZS4NCj4gDQo+IENvbnNpZGVyaW5nIHRoYXQgd2Ug
+YXBwYXJlbnRseSBoYXZlbid0IGNhcmVkIGZvciB0aGUgbGFzdCA3IHllYXJzLCBJJ20NCj4gc3Rp
+bGwgYSBiaXQgc3VycHJpc2VkLCBidXQgd2hhdGV2ZXIuDQo+IA0KPiBXaGF0IEkgKmRvbid0KiB3
+YW50IGlzIGp1c3QgbW9yZSB2b29kb28gZGlzY3Vzc2lvbnMgYWJvdXQgL2Rldi8qcmFuZG9tDQo+
+IGJlaGF2aW9yIHRoYXQgZG9lc24ndCBoYXZlIGEgdGVjaG5pY2FsIHJlYXNvbiBmb3IgaXQuDQoN
+ClRoaXMgbWlnaHQgYWxsIGJlIHJlbGF0ZWQgdG8gYW4gb25nb2luZyByZXBlYXQgb2YgdGhlICdo
+b3cgdG8gaW5pdGlhbGlzZQ0KL2Rldi91cmFuZG9tJyBvbiB0aGUgYnVzeWJveCBsaXN0Lg0KDQpT
+dWNoIHN5c3RlbXMgYXJlIG11Y2ggbW9yZSBsaWtlbHkgdG8gYmUgcnVubmluZyBjb21wbGV0ZWx5
+IGppdHRlci1mcmVlDQpjcHUgdGhhdCBib290IGZyb20gZW1iZWRkZWQgc2VyaWFsIGZsYXNoIHdp
+dGggYWJzb2x1dGVseSBjb25zdGFudA0KYWNjZXNzIHRpbWVzLg0KVGhlIG9ubHkgd2F5IHlvdSBh
+cmUgZ29pbmcgdG8gZ2V0IGFueSBlbnRyb3B5IGVhcmx5IG9uIGlzIHRvIGhhdmUNCnNhdmVkIGl0
+IGZyb20gdGhlIHByZXZpb3VzIGJvb3QuDQpJIGRvbid0IHRoaW5rIGl0IG1ha2VzIGFueSByZWFs
+IHNlbnNlIHNvIHNhdmUgaXQgdG9vIGVhcmx5IC0geW91IGp1c3QNCmVuZCB1cCB3aXRoIGFuIGVu
+Y29kZWQgJ2NvdW50IG9mIHRoZSBudW1iZXIgb2YgYm9vdHMnLg0KDQpBdCB0aGUgbW9tZW50IGl0
+IGlzIHByZXR0eSBoYXJkIHRvIGFkZCB0aGUgc2F2ZWQgZW50cm9weS4NCkFuZCB5b3UgZG8gd2Fu
+dCBpdCB0byBiZSB1c2VkIGltbWVkaWF0ZWx5IC0gYmVjYXVzZSB3aGF0IHRoZQ0Ka2VybmVsIGhh
+cyBpdCBsaWtlbHkgdG8gYmUgcHJldHR5IGxpbWl0ZWQuDQoNCk5vdywgb25jZSB0aGUgc3RhcnR1
+cCBzY3JpcHRzIGhhdmUgcnVuIHlvdSBtaWdodCBkZWNpZGUgdGhhdCBhbg0KaW1tZWRpYXRlIHJl
+aGFzaCBpc24ndCBuZWVkZWQuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFr
+ZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwg
+VUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
