@@ -2,70 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 285EEE7D0A2
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 19:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75517E7D0A7
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 19:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230249AbjIUTCr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 15:02:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42532 "EHLO
+        id S230303AbjIUThA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 15:37:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbjIUTCP (ORCPT
+        with ESMTP id S229596AbjIUTgz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 15:02:15 -0400
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.164])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD3D5B425
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 10:50:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1695297007; cv=none;
+        Thu, 21 Sep 2023 15:36:55 -0400
+X-Greylist: delayed 1802 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 21 Sep 2023 10:50:02 PDT
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [81.169.146.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2237F19E
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 10:50:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1695297001; cv=none;
     d=strato.com; s=strato-dkim-0002;
-    b=oQr4UuGd8BWqie7aw+GNiHbred43iPOwCGt6lC3y+Uv6pekcKnCHtN3gai5ngtkmB1
-    k7VinWdJ2S+nMQYUd0hXefffhBnR1xc1IFPgHAsrNKPqwWpTmGhgcFjwDABh1oURFPEK
-    QEHvJWLUCkYyoc5aVYjE7mckpQm+JTQhj92ZerxxMnVvIjzJxLICzWzpTk3/fSibM2so
-    s7gr8TRJ+ZJeszb0/PUNhkXHe/g0T545lTE6ndcm7PzwyqOpgOkQ+mZ0AytbQ6YXHEc9
-    wtYivvXUEtBGnJOHQfPV7N/fCjoEnB/sKvF3AqbcrqQi5MVwqBbwAaRKEVLCknnjIH2h
-    uIjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1695297007;
+    b=HH2ruYx/F1XOu46RT8HDbmtZ9DLevbRu8TKU94VKhTVGhI7N1Th0keq/fjKtUSEfRL
+    21DW7c6kXkfU6dvweuJ5jtLCueWaZn+mA+SdQe3qIL30h/0vJY+JP4n2rcpu5eUeo5DB
+    AH3YnVwPcFI1l7p28N2IvUWVpP0BENIRnW7tc1IxHcCqInyJ3wD03Dq11DW8Biv09hdq
+    RhKG5CefF5exT+8c5d93naZl5dVyJ17lGdg78kwEyYV4XuIZtUNupeFHVcf/yJ5OIUfh
+    iZ/GJmyruH/qrteQJt1e9hFlae7baO1kNy35/PUlw7UdhgRi98bjfLixkp5IvIKPYREj
+    JScQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1695297001;
     s=strato-dkim-0002; d=strato.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Y7oc1e7VzpHy9j44QZCh3LbJh161ylUkNpGdYaBapss=;
-    b=AUUVAP0Ji6Wmk36qO49B6ZWzE2Y7w3ifY3U09c6L3XAg00xQbeVnRm/jAnhg6WWnd/
-    7ypeBfsHIrF9/a3Njt+jsqjgxuBYF9EnErgJ5zzXGPg30VDQTW/WmhY+7nX1YXvlBbvC
-    n9CnSedP+YMLCyt/DkzYu0SthUdPyJV70yYjeQZkkXdl90pAKZGpsoBHjYHAp4RiSpOq
-    C3c/LrzigseRWVdfFzodcHgpdKRoV1lKFEVYMPsMFYC4/X44RKucknttTo9w8m/t0PLc
-    sqoDaMCgfjJaKA82gvKNHGsMU6uHeLC6Slx/QUl7rT4UHCnJOfvcdwwQ6H5i461Bk8eC
-    lPcg==
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=Wb1IkiuunxnKdYRf5sz+mfS89nVHpibtJttOQxxeHqo=;
+    b=oBT7lz8QTx57SyClU1hZNUgoC5+NafuWGZtHnyja9UsQhSKrTH3HfGqr2Lb7eCnJUv
+    CwU+SAzNxWkPB0xoov25i0soY3muucZpvqIiEVLnfmESINcoUGS4CWuJYbk9WK7eZGsQ
+    vED2DicHp0w7lzjsT/kx5hQDv8NFZYVXoy2JEoiJV8M1hg1rYMHTSbSX5Q8V12cds+5J
+    BNNsBiHsT9WQVQqNOFPpYrZTu0MaHrepKOky/t1PZtaUkWX21eSu/iWd6HnaFLpReSOI
+    CRvI5Ze/JEJOh3t93zD3LhWCFLva9QRg3XSDfgaoKFUBp2JUNxpME6BK7sR17n/L1dmw
+    v/XQ==
 ARC-Authentication-Results: i=1; strato.com;
     arc=none;
     dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1695297007;
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1695297001;
     s=strato-dkim-0002; d=chronox.de;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Y7oc1e7VzpHy9j44QZCh3LbJh161ylUkNpGdYaBapss=;
-    b=aZO01IRqzXib+u2Nn0p9e4A/CquGMGFm/XQ/jM2YNjyU9YUnlZISGdP+VkfywHEVTa
-    BM6FG4r1+ZIxNU1TJ/BvD+671/DynQoCpEGc60dNhFUyuEW8JefyjBpJiUQLJPEqwUSZ
-    Xzbc/txS8XCu/6+lHD4ADfuj4Jqgi2mMX/9YdSlsb31+fBZGQWWf5XCubLzIaoJVod2B
-    OHwxtA2hKdYEOEo3Sg1hNAqHIieYjlc5qXHVUjdsG9hao3SKHi2oPE5bxOXrf1nfpMGW
-    uPtVVVNJZJV+MCn40YrwMtopgqQ7n8RQ56ie47JeOxDcIZajqNWEDTfbVzLuizqTXni6
-    Sc7Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1695297007;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=Wb1IkiuunxnKdYRf5sz+mfS89nVHpibtJttOQxxeHqo=;
+    b=D5L3C+q2kWtOHzngyOYEsqrrNRv/qqhg8/5TMGtRzSOAJPXYM/VSWmXq1RXb1C+8Ec
+    4XOwRd1WxRU9K3/j7arF6R1cyiDlm+rc5/zxe5gmig0v4VoEIYqeE0DtnLni09/no1uL
+    4EBCV1srTvvMrQel3eRxxDewjYIIWGT8D3D0nthNbc0y87bCzwM7LKCyKwMLXjXW/4nd
+    2OLcEZvpKvqwgyN8Y/fJ9a4t99T+GrXbNKCyusTITwh7uGzT1Kf7BTK8rMhgrIisU+Ee
+    7i+YJdIYUeM1jzbV2g2Oo/3UmdjwVPZRP2FlXKw8+C9RP0gd2AXcCYw9UZir+jldNrq9
+    6kow==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1695297001;
     s=strato-dkim-0003; d=chronox.de;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Y7oc1e7VzpHy9j44QZCh3LbJh161ylUkNpGdYaBapss=;
-    b=eEYRuey8CZxpxBjICEPezGtRxXlqxdOUQDoWLc27yotnaRqC9pKWo/PcjOwZQiqJ4a
-    PtZ8Ly823xV7bm29WGBA==
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=Wb1IkiuunxnKdYRf5sz+mfS89nVHpibtJttOQxxeHqo=;
+    b=MXhvPF49MGlJm3EGXArf7Tcp0HY6nLBEhy8O0KKdzOf1uK0WYW6FTqMtPol4fSUVwl
+    jVUNNjrEHq68WCz3UhDg==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9yGwdNoa/n6V4wJnv+Q=="
 Received: from positron.chronox.de
     by smtp.strato.de (RZmta 49.8.2 AUTH)
-    with ESMTPSA id u045efz8LBo68te
+    with ESMTPSA id u045efz8LBnv8tW
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-    Thu, 21 Sep 2023 13:50:06 +0200 (CEST)
+    Thu, 21 Sep 2023 13:49:57 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, "Ospan, Abylay" <aospan@amazon.com>
-Subject: [PATCH 0/3] crypto: jitter - Offer compile-time options
-Date:   Thu, 21 Sep 2023 13:47:32 +0200
-Message-ID: <2700818.mvXUDI8C0e@positron.chronox.de>
+Subject: [PATCH 3/3] crypto: jitter - Allow configuration of oversampling rate
+Date:   Thu, 21 Sep 2023 13:48:59 +0200
+Message-ID: <4835498.GXAFRqVoOG@positron.chronox.de>
+In-Reply-To: <2700818.mvXUDI8C0e@positron.chronox.de>
+References: <2700818.mvXUDI8C0e@positron.chronox.de>
 MIME-Version: 1.0
 Autocrypt: addr=smueller@chronox.de;
  keydata=
@@ -121,35 +127,79 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+The oversampling rate used by the Jitter RNG allows the configuration of
+the heuristically implied entropy in one timing measurement. This
+entropy rate is (1 / OSR) bits of entropy per time stamp.
 
-the following patchset offers a set of compile-time options to
-accommodate different hardware with different entropy rates implied
-in their timers. This allows configuring the Jitter RNG in systems
-which exhibits insufficient entropy with the default parameters. The
-default parameters defined by the patches, however, are identical to
-the existing code and thus do not alter the Jitter RNG behavior.
+Considering that the Jitter RNG now support APT/RCT health tests for
+different OSRs, allow this value to be configured at compile time to
+support systems with limited amount of entropy in their timer.
 
-The first patch sets the state by allowing the configuration of
-different oversampling rates. The second patch allows the configuration
-of different memory sizes and the third allows the configuration
-of differnet oversampling rates.
+The allowed range of OSR values complies with the APT/RCT cutoff health
+test values which range from 1 through 15.
 
-The update of the power up test with the first patch also addresses
-reports that the Jitter RNG did not initialize due to it detected
-insufficient entropy.
+The default value of the OSR selection support is left at 1 which is the
+current default. Thus, the addition of the configuration support does
+not alter the default Jitter RNG behavior.
 
-Stephan Mueller (3):
-  crypto: jitter - add RCT/APT support for different OSRs
-  crypto: jitter - Allow configuration of memory size
-  crypto: jitter - Allow configuration of oversampling rate
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/Kconfig               | 17 +++++++++++++++++
+ crypto/jitterentropy-kcapi.c |  6 ++++--
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
- crypto/Kconfig               |  60 +++++++++
- crypto/jitterentropy-kcapi.c |  17 ++-
- crypto/jitterentropy.c       | 249 ++++++++++++++++++-----------------
- crypto/jitterentropy.h       |   5 +-
- 4 files changed, 207 insertions(+), 124 deletions(-)
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 00c827d9f0d2..ed931ddea644 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1339,6 +1339,23 @@ config CRYPTO_JITTERENTROPY_MEMORY_BLOCKSIZE
+ 	default 1024 if CRYPTO_JITTERENTROPY_MEMSIZE_1024
+ 	default 2048 if CRYPTO_JITTERENTROPY_MEMSIZE_8192
+ 
++config CRYPTO_JITTERENTROPY_OSR
++	int "CPU Jitter RNG Oversampling Rate"
++	range 1 15
++	default 1
++	depends on CRYPTO_JITTERENTROPY
++	help
++	  The Jitter RNG allows the specification of an oversampling rate (OSR).
++	  The Jitter RNG operation requires a fixed amount of timing
++	  measurements to produce one output block of random numbers. The
++	  OSR value is multiplied with the amount of timing measurements to
++	  generate one output block. Thus, the timing measurement is oversampled
++	  by the OSR factor. The oversampling allows the Jitter RNG to operate
++	  on hardware whose timers deliver limited amount of entropy (e.g.
++	  the timer is coarse) by setting the OSR to a higher value. The
++	  trade-off, however, is that the Jitter RNG now requires more time
++	  to generate random numbers.
++
+ config CRYPTO_JITTERENTROPY_TESTINTERFACE
+ 	bool "CPU Jitter RNG Test Interface"
+ 	depends on CRYPTO_JITTERENTROPY
+diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
+index a8e7bbd28c6e..0c6752221451 100644
+--- a/crypto/jitterentropy-kcapi.c
++++ b/crypto/jitterentropy-kcapi.c
+@@ -256,7 +256,9 @@ static int jent_kcapi_init(struct crypto_tfm *tfm)
+ 	crypto_shash_init(sdesc);
+ 	rng->sdesc = sdesc;
+ 
+-	rng->entropy_collector = jent_entropy_collector_alloc(0, 0, sdesc);
++	rng->entropy_collector =
++		jent_entropy_collector_alloc(CONFIG_CRYPTO_JITTERENTROPY_OSR, 0,
++					     sdesc);
+ 	if (!rng->entropy_collector) {
+ 		ret = -ENOMEM;
+ 		goto err;
+@@ -345,7 +347,7 @@ static int __init jent_mod_init(void)
+ 
+ 	desc->tfm = tfm;
+ 	crypto_shash_init(desc);
+-	ret = jent_entropy_init(0, 0, desc);
++	ret = jent_entropy_init(CONFIG_CRYPTO_JITTERENTROPY_OSR, 0, desc);
+ 	shash_desc_zero(desc);
+ 	crypto_free_shash(tfm);
+ 	if (ret) {
 -- 
 2.42.0
 
