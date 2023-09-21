@@ -2,188 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0758FE7D0AF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 20:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A10E7D0AD
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 21:02:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231827AbjIUUgJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 16:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52900 "EHLO
+        id S232506AbjIUVDB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 17:03:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232759AbjIUUfo (ORCPT
+        with ESMTP id S230221AbjIUVCo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 16:35:44 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0981897CA;
-        Thu, 21 Sep 2023 10:39:55 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38L4wDok003244;
-        Thu, 21 Sep 2023 10:04:23 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding:content-type; s=
-        selector1; bh=DHZkvrsPbLKzcjpy5QIekMLzqwjqX3hQlQ5u65J1ZwU=; b=Ik
-        g2/FyoE5S5MEoPdNYpIF5+vmkH15Wdb3gtypBiinkrzSiBkDWvX7BxnONn2BPMbM
-        mqWmn2wo/AvPB70B7Iec6tRF5UYZgXKylJXKOC3v/a4hJqQZkzqNR2eiCP7DnE2m
-        1Xfa2yEOi0nlvEd7RwDH5srHh8p/pG3TqZbOUZ/TtH5URbfVPH+u/V6TuPKm/Vlp
-        tjW1NTD2VCE+6t7xhmsa8jW/4vSEqHkols1FX8+Oj6dXl8U8gPYne7yeju9ekHxp
-        WvjaWzgxZHzrbRoRPxoU8NYJ0E5h1bWJ2bvGzeTRP2H4S22C7jW2L0ks93iZ9SyR
-        SzsqOYJsnh3Zl+ZBnXcw==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t5nx0sbap-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Sep 2023 10:04:23 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 40D86100058;
-        Thu, 21 Sep 2023 10:04:22 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 37D8C21863D;
-        Thu, 21 Sep 2023 10:04:22 +0200 (CEST)
-Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 21 Sep
- 2023 10:04:21 +0200
-From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
-To:     Olivia Mackall <olivia@selenic.com>,
+        Thu, 21 Sep 2023 17:02:44 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A636D7B975;
+        Thu, 21 Sep 2023 10:37:04 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA92FC433CC;
+        Thu, 21 Sep 2023 05:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695275878;
+        bh=MLsGcIRXfwZgXJfU4dYy4+L26UPkpm/1q79i2tEWiLM=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=EB5CjlF/ICc3opR6zVvYCocFCSZN3miKYZKyOf7tbgYF9ef8NMm2Ay3yTw5JcEGgZ
+         Zwcp4wH4x7VgPjuTyiIi+Jk7o9DoTc4KEBav3LIku1p6lTb7JS2xKqNaXvyHZDGkjh
+         Y+bidq13Xm6DjQvYj12G1p+32CWlfVyi4ouhLeRrdZo9qgB/T1rws5VsAHxwABFlCU
+         T0DlbhZBfCjfNZxueqrPQ4NGHuIq6C0hYPrJP+Wio/8KEBMwmFIQSPsBgEdeG9pLyP
+         aPhX530k1r1ZTESvuEM99k6K3TPHmUpqoYAS0pRqYZ/EYGwLT3B9rrHDokUdfDVO5U
+         WweMzZztMfNvw==
+From:   =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To:     Charlie Jenkins <charlie@rivosinc.com>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-riscv@lists.infradead.org, Andy Chiu <andy.chiu@sifive.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        =?utf-8?B?QmrDtnJu?= =?utf-8?B?IFTDtnBlbA==?= 
+        <bjorn@rivosinc.com>, Heiko Stuebner <heiko@sntech.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v3 5/9] hwrng: stm32 - rework error handling in stm32_rng_read()
-Date:   Thu, 21 Sep 2023 10:02:57 +0200
-Message-ID: <20230921080301.253563-6-gatien.chevallier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
-References: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 6/6] riscv: Add BLAKE2s V implementation
+In-Reply-To: <ZQSieofQfDY5mTlI@ghost>
+References: <20230912115728.172982-1-bjorn@kernel.org>
+ <20230912115728.172982-7-bjorn@kernel.org> <ZQSieofQfDY5mTlI@ghost>
+Date:   Thu, 21 Sep 2023 07:57:55 +0200
+Message-ID: <87v8c4gja4.fsf@all.your.base.are.belong.to.us>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-21_06,2023-09-20_01,2023-05-22_02
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Try to conceal seed errors when possible. If, despite the error
-concealing tries, a seed error is still present, then return an error.
+Charlie Jenkins <charlie@rivosinc.com> writes:
 
-A clock error does not compromise the hardware block and data can
-still be read from RNG_DR. Just warn that the RNG clock is too slow
-and clear RNG_SR.
+>> +.macro VROR REG BITS TMPREG
+>> +	vmv.v.v		\TMPREG, \REG
+>> +	vsrl.vi		\REG, \REG, \BITS
+>> +	vsll.vi		\TMPREG, \TMPREG, 32-\BITS
+>> +	vor.vv		\REG, \REG, \TMPREG
+>> +.endm
+>
+> This seems like it would be a good candidate to use the Zvkb extension
+> that has vector rotate [1]. It would be a pain to use because you need
+> two versions of the roundloop, but you could get away with 1 extra
+> branch/nop and save 3 instructions per VROR which looks like it happens
+> 8*10 times, so 239 fewer instructions.
+>
+> [1] https://github.com/riscv/riscv-crypto/releases
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
----
+Indeed! Thanks!
 
-Changes in V2:
-	- Use WARN_ONCE instead of WARN_ON as it was buggy
 
- drivers/char/hw_random/stm32-rng.c | 53 +++++++++++++++++++++++-------
- 1 file changed, 41 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index adefe8edfd07..9dac177d5286 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -43,6 +43,8 @@
- 
- #define RNG_HTCR		0x10
- 
-+#define RNG_NB_RECOVER_TRIES	3
-+
- struct stm32_rng_data {
- 	u32	cr;
- 	u32	nscr;
-@@ -162,10 +164,10 @@ static int stm32_rng_conceal_seed_error(struct hwrng *rng)
- 
- static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- {
--	struct stm32_rng_private *priv =
--	    container_of(rng, struct stm32_rng_private, rng);
-+	struct stm32_rng_private *priv = container_of(rng, struct stm32_rng_private, rng);
-+	unsigned int i = 0;
-+	int retval = 0, err = 0;
- 	u32 sr;
--	int retval = 0;
- 
- 	pm_runtime_get_sync((struct device *) priv->rng.priv);
- 
-@@ -174,30 +176,57 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 
- 	while (max >= sizeof(u32)) {
- 		sr = readl_relaxed(priv->base + RNG_SR);
--		/* Manage timeout which is based on timer and take */
--		/* care of initial delay time when enabling rng	*/
-+		/*
-+		 * Manage timeout which is based on timer and take
-+		 * care of initial delay time when enabling the RNG.
-+		 */
- 		if (!sr && wait) {
--			int err;
--
- 			err = readl_relaxed_poll_timeout_atomic(priv->base
- 								   + RNG_SR,
- 								   sr, sr,
- 								   10, 50000);
--			if (err)
-+			if (err) {
- 				dev_err((struct device *)priv->rng.priv,
- 					"%s: timeout %x!\n", __func__, sr);
-+				break;
-+			}
-+		} else if (!sr) {
-+			/* The FIFO is being filled up */
-+			break;
- 		}
- 
--		/* If error detected or data not ready... */
- 		if (sr != RNG_SR_DRDY) {
--			if (WARN_ONCE(sr & (RNG_SR_SEIS | RNG_SR_CEIS),
--					"bad RNG status - %x\n", sr))
-+			if (sr & RNG_SR_SEIS) {
-+				err = stm32_rng_conceal_seed_error(rng);
-+				i++;
-+				if (err && i > RNG_NB_RECOVER_TRIES) {
-+					dev_err((struct device *)priv->rng.priv,
-+						"Couldn't recover from seed error\n");
-+					return -ENOTRECOVERABLE;
-+				}
-+
-+				continue;
-+			}
-+
-+			if (WARN_ONCE((sr & RNG_SR_CEIS), "RNG clock too slow - %x\n", sr))
- 				writel_relaxed(0, priv->base + RNG_SR);
--			break;
- 		}
- 
-+		/* Late seed error case: DR being 0 is an error status */
- 		*(u32 *)data = readl_relaxed(priv->base + RNG_DR);
-+		if (!*(u32 *)data) {
-+			err = stm32_rng_conceal_seed_error(rng);
-+			i++;
-+			if (err && i > RNG_NB_RECOVER_TRIES) {
-+				dev_err((struct device *)priv->rng.priv,
-+					"Couldn't recover from seed error");
-+				return -ENOTRECOVERABLE;
-+			}
-+
-+			continue;
-+		}
- 
-+		i = 0;
- 		retval += sizeof(u32);
- 		data += sizeof(u32);
- 		max -= sizeof(u32);
--- 
-2.25.1
-
+Bj=C3=B6rn
