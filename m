@@ -2,141 +2,177 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D262C88CB9
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 17:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C34E7D0A2
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 17:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbjIURFb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 13:05:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58322 "EHLO
+        id S230193AbjIUR1p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 13:27:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230469AbjIURFM (ORCPT
+        with ESMTP id S230030AbjIUR1K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 13:05:12 -0400
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2083.outbound.protection.outlook.com [40.107.105.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4DC1FFB;
-        Thu, 21 Sep 2023 10:02:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aTaXL4iqlcf7LZgyYWl9I/V9skEqbsXkhJroRBQAdkbYvCstfuMxTLm9/uKvYqieTfJlv1uHgfehhliWrFi1/81JSNhri1UsVId0mD7gVIcD5BYywc7S1+3/ItGv1mggZ0JghT3Hn15mG2AtVa7jtI7FTtN9phslgBs3gHOmtwzkUKwn0k3mjiSvCsNPel4jnedUGQpJX1n8Whizr5LlSD6dJeGxQI1xeB7Hg2JZNm95lQdagpG8UjtpEvVQpXpVAWatgJEJezJaiHXy1p1lq4p8WQB3VR6LX0HEyzTLhZ3qsr2XfoY8Kq4j6ZDUKhUyrNo4rYz74ln9Cd+HU1VZNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+rFqxgYrESLMeHsTvx4azW3yc8+GfCVIG3LrNSMbg/0=;
- b=hymhXPnwdHXqZOoQs2vhMrsoJfsoiWP3BvhbSrxJ63oAusjH/WjKztHI0HB62vq7NY2lnFLdVPgZs+aRJsbnrDui8+UvUnibHyrf8gICR2dummEF14vNiOV1vePSTyQl3riapWYsIPXhY99vjPCYiAeGyZOxnfM50HjLkw8cgtppcPQlinYEqEu6a6ZDub5DShPVSJIDkdh9wypc7ohK6PcP8WRHMAfwFB41x4ptL/ZjY5gAMcM+uOXle2u0aj4oYqnkKkPzFWZqLEROfgnIQMdx2R4Ecl+7IAmzaTegboq94BQ0HrfnwO/36+j72io/qUQrp5fuGDa3ufZ+Ny0dXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+rFqxgYrESLMeHsTvx4azW3yc8+GfCVIG3LrNSMbg/0=;
- b=HTbTbvpOmakMKzyaszNVJzuZAVJ/mQsHhAO2yDvQ8k3n1WPT4SEgU3ijJ374oUHsodE0qdD55Wl13lKIqnaOztAroqVSbXcypPljIMire/fN5f0D29p2FAiKdRf0F8Qll5Lbjbqo87TViL8WWbUKMRnxQzCfARLcsA9eu6pAiLQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
- by DU2PR04MB8967.eurprd04.prod.outlook.com (2603:10a6:10:2e2::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Thu, 21 Sep
- 2023 09:45:11 +0000
-Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::86b7:e0cc:dd24:12c0]) by AM0PR04MB6004.eurprd04.prod.outlook.com
- ([fe80::86b7:e0cc:dd24:12c0%7]) with mapi id 15.20.6813.017; Thu, 21 Sep 2023
- 09:45:11 +0000
-From:   Gaurav Jain <gaurav.jain@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+        Thu, 21 Sep 2023 13:27:10 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A217CD0;
+        Thu, 21 Sep 2023 10:01:13 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38L5uxXN026704;
+        Thu, 21 Sep 2023 10:04:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding:content-type; s=
+        selector1; bh=+tmt8dbtTqSwHcdueUDhtt/63vObb0tlhOMDJTofgcc=; b=7E
+        sWR96nRMkwANBcO+iU4lBtxq8/NLnlYlLForqxgsbQ6FkLvmThjvAl4yAkDQNYPu
+        XBNUH2bYOsiEqL6pGp0IzGlOxPY8w3TbyE3h1kxZ00cqrqh3ccd2IdUkhF5Fyufw
+        ABlgUz/gfX/mrNt4ZfH7uzlqjcQ3OhN4OTwoviIqHYBI7TwW1JDPjLQU+bRWXldU
+        HoKxejVVJXGynNESISv5EnajSGcXqtQ7m2D4xjDol7t+j/iN0ix4grITf4coM0/T
+        RTvYQXFfn04LoE/K4ePKpX9cZpx0r+4++2eUILsLieNHflkRIYvxUe89ag6y+fhF
+        PpPllhTDE81p20RjX6VA==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t53px31mr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Sep 2023 10:04:24 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 13BEA100057;
+        Thu, 21 Sep 2023 10:04:23 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0BC4C21863D;
+        Thu, 21 Sep 2023 10:04:23 +0200 (CEST)
+Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 21 Sep
+ 2023 10:04:22 +0200
+From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
+To:     Olivia Mackall <olivia@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Aisheng Dong <aisheng.dong@nxp.com>
-Cc:     Silvano Di Ninno <silvano.dininno@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx@nxp.com, Gaurav Jain <gaurav.jain@nxp.com>
-Subject: [PATCH] crypto: caam/qi2 - fix Chacha20 + Poly1305 self test failure
-Date:   Thu, 21 Sep 2023 15:14:44 +0530
-Message-Id: <20230921094444.2121891-1-gaurav.jain@nxp.com>
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH v3 6/9] hwrng: stm32 - restrain RNG noise source clock
+Date:   Thu, 21 Sep 2023 10:02:58 +0200
+Message-ID: <20230921080301.253563-7-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
+References: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SI2P153CA0024.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::13) To AM0PR04MB6004.eurprd04.prod.outlook.com
- (2603:10a6:208:11a::11)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6004:EE_|DU2PR04MB8967:EE_
-X-MS-Office365-Filtering-Correlation-Id: f3656c8c-07f8-4024-242e-08dbba8772b9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0OllQldvw+ZZznn8BjY89DRkYTDASm8ml5VvCdv2Nacp3MKcFrM/ANJFhfxlDrHV56DCEeFFTYui+vG8PdSCYbFUg1014ffPm1A6BuJPCWNphiAEIYqveFK1lPkY1swTVdStgPuPmJZ/ffGlvcGsl/vk21gF5bOdySIKm9YSD31qF4YduBANe+bq4bMWWdrZ3zn3ejuLwteX1KZNFutQM5G8qBy0xHf75lNaqea0RRJD7ORbtwjeluy8O/kKmVeD8huSnvl7BF4qSvlsxwU4U7qZ6FjNAL7Ud0ovx2SnhdZsAB+FJAAuVLRdMaPkf7MyPIctTTHMNJ5zhetbozqROPGR9tbtSDL+m7dFh0y7tbWLvVvSKI17pvQt80XWFXw7tyj84/rfcgEeajuAvvyAUrI0QEjNqZiFva8UcYU0QUXVZLdzhUw2wE3fR8gGA7yRg26q0GKj9LZZr4NRnHroWoXyP+pwcZHPMDV+4/zweoFJO++X9rbg6SVnvqBjVVLUDL8sbZuwzJGxZ1EwM+PosCODPDuPF+zJS8VNaKmxKowrdlNP4h8Bm7Qi9gYKULocDvaPGYuPCwLzqo/jSh6tdjgltm4aNFMVGCYkuGBMoYbWa43EJ1L4XKa5VoGG851b
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(376002)(39860400002)(1800799009)(186009)(451199024)(2616005)(1076003)(26005)(52116002)(38100700002)(6506007)(6512007)(6486002)(6666004)(83380400001)(38350700002)(478600001)(36756003)(86362001)(41300700001)(54906003)(316002)(6636002)(110136005)(66946007)(66476007)(66556008)(4744005)(2906002)(4326008)(8676002)(44832011)(8936002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wWmELYLpMCLddA49veZMXHgR9O05HdTu4NYzejEa3nZwSr1C4KKqI7rEv+ot?=
- =?us-ascii?Q?WhhgRhh5dlM2OalmoGVd/0PUEJHV6mJD+7IMoc6dKVossz7Yh95xr4QY2XtS?=
- =?us-ascii?Q?u3KgD3poUX1X6w4j4/iyYL9eX+HJ/OmiJZKvIYntAFyCzSLsYe1+VONp6e7L?=
- =?us-ascii?Q?jfxFugibRewVpAFez6TYqOniyNsOafcHh+qnu+JGq5IH35byCZ2ON+/9TmtI?=
- =?us-ascii?Q?oo4fwpb2w6wqoxhVqZ6TvaBNPxvf0xcWZmLoHcjIyp3mfR/DvXRmAwMjs/cC?=
- =?us-ascii?Q?wvz/r2sktCeSCPIXl+p/XVbvTsvKDm/zcXxYeOSD84cfncXP4dKSFGmA6P+s?=
- =?us-ascii?Q?JQxSULTLX3l7uUnJfj9c5ZYFmk8ffCsvxfttoLp1v+gKTgOc1cuZZ7aIikuo?=
- =?us-ascii?Q?Ql/wHAWrD5K0d1fXuQ9QnLYi3WXwokcOke+K0yu/SLu5PYKW0/VlC0XdeN6v?=
- =?us-ascii?Q?S1vqlaZyZHYnxgDkQEXIxT6AcVayr8uLhROLvxLMSiLtR3Q8KjFfXjIp1T1L?=
- =?us-ascii?Q?lMrYb0p3xM70ffowbDqHEnSKpKfKTZ1Y86s9zvrLdUmmaXP+RUv7BAnXM773?=
- =?us-ascii?Q?7NfZiGMaoZYCni24hsv3EVc8lnygbygHmMrGVYw4w4xt4MeZCLCXbgYSF6Rl?=
- =?us-ascii?Q?fak88lo0wPVdUb1dRnNSCveKCnElGbcn/046f+G5I28BqX6L6A/PXxkw2GwF?=
- =?us-ascii?Q?+SXBAH4knlgXojIiaZLrZh254XJn61NZEtAnbz1MSi79f07Mp4zr8S7oTICn?=
- =?us-ascii?Q?Evz7vuB4CNEPD5RLqR0YxTLxYytBbScWGCJZ81n5yNgHSvWwu+QGCtywQZH7?=
- =?us-ascii?Q?x82WwPEjWe1Pk58WVMa2p+AiGxtll8XZlcrm87d8gYebxLhes9HxkYcTpsrD?=
- =?us-ascii?Q?cxSyZaGyPrxyXELM063z4CR8rKUoyFjndeqUZEM3ubVLlf0IO6+2ITkSDxvt?=
- =?us-ascii?Q?b1PJSZxcgKYp78/DSDw/TOjwXhjc6ENgzdXo/fculZ0Sdee+lM2JJ+MqKAq0?=
- =?us-ascii?Q?mxbAboX9X09OF4/ZUxgfIXQVXz0NR8lVIOGjuWRdU86DVAZoP9JLm8UoeqxD?=
- =?us-ascii?Q?LKbdog4Bb70u5feE3IjB/NDZT+6sXnr7H7YUZMmQLYdb/0+TAtTPQVznvQRA?=
- =?us-ascii?Q?ufd5ALf7+mUSAhcWG0h+aa8dIiehiy/jjPkAdGw+7sqh6v7jx7vIGq42N2T0?=
- =?us-ascii?Q?crWlXPFeE1XPYBOG9sKvoV70WPoTd+Ex7tlZj9e7kNzI4wGHDL2qkjTVUXC5?=
- =?us-ascii?Q?HUCPJ5dEdXWM5ca+udEwbq0vQUa76DHiqxGgJcDID9AEza6AJV0xl2mCU9Gl?=
- =?us-ascii?Q?xLgIl01Kz54HjmwBR6csNwLp2rW+cQ+FDRV3PsOJSA4cz3SODr9UV/KCcKP0?=
- =?us-ascii?Q?FoDLW8bfSXKUKMNidH2AofTNZe9RDzLWnZiE88p9BfbIcRuDJGMiZcjpljap?=
- =?us-ascii?Q?Qd8YmpK66y5v+z1xfkOUd5RpaWNJcy7PbzPNaxLCKJflwtjPERalUx61ipAN?=
- =?us-ascii?Q?vE1LSfmexyPE53jaVoQhNKLPFxNr+BwFC0g+iCp7udPEKhLgwOuVKBa+1OBS?=
- =?us-ascii?Q?D5VVz4zMNAZU1Qe0RoGOrW1gGA/WAYyLLIY4hgI4?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f3656c8c-07f8-4024-242e-08dbba8772b9
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 09:45:11.4569
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y+rPh7EA8udp/Y/+TpXqghSwYs8uUdvIPEJ7tHiENpA/V6uCN7ToeWOhryhIZT/DjQ/PKJt/U9g/pXxEVe9lnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8967
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-21_06,2023-09-20_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-key buffer is not copied in chachapoly_setkey function,
-results in wrong output for encryption/decryption operation.
+For NIST certification the noise source sampling may need to be
+restrained.
 
-fix this by memcpy the key in caam_ctx key arrary
+This change implements an algorithm that gets the rate of the RNG
+clock and apply the correct value in CLKDIV field in RNG_CR register
+to force the RNG clock rate to be "max_clock_rate" maximum.
 
-Fixes: c10a53367901 ("crypto: caam/qi2 - add support for Chacha20 + Poly1305")
-Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
+As it is platform-specific, implement it as a compat data.
+
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
- drivers/crypto/caam/caamalg_qi2.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/char/hw_random/stm32-rng.c | 34 ++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 9156bbe038b7..a148ff1f0872 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -641,7 +641,8 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
- 	if (keylen != CHACHA_KEY_SIZE + saltlen)
- 		return -EINVAL;
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index 9dac177d5286..819f062f454d 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -23,11 +23,13 @@
+ #define RNG_CR_CONFIG1		GENMASK(11, 8)
+ #define RNG_CR_NISTC		BIT(12)
+ #define RNG_CR_CONFIG2		GENMASK(15, 13)
++#define RNG_CR_CLKDIV_SHIFT	16
++#define RNG_CR_CLKDIV		GENMASK(19, 16)
+ #define RNG_CR_CONFIG3		GENMASK(25, 20)
+ #define RNG_CR_CONDRST		BIT(30)
+ #define RNG_CR_CONFLOCK		BIT(31)
+ #define RNG_CR_ENTROPY_SRC_MASK	(RNG_CR_CONFIG1 | RNG_CR_NISTC | RNG_CR_CONFIG2 | RNG_CR_CONFIG3)
+-#define RNG_CR_CONFIG_MASK	(RNG_CR_ENTROPY_SRC_MASK | RNG_CR_CED)
++#define RNG_CR_CONFIG_MASK	(RNG_CR_ENTROPY_SRC_MASK | RNG_CR_CED | RNG_CR_CLKDIV)
  
--	ctx->cdata.key_virt = key;
-+	memcpy(ctx->key, key, keylen);
-+	ctx->cdata.key_virt = ctx->key;
- 	ctx->cdata.keylen = keylen - saltlen;
+ #define RNG_SR			0x04
+ #define RNG_SR_DRDY		BIT(0)
+@@ -46,6 +48,7 @@
+ #define RNG_NB_RECOVER_TRIES	3
  
- 	return chachapoly_set_sh_desc(aead);
+ struct stm32_rng_data {
++	uint	max_clock_rate;
+ 	u32	cr;
+ 	u32	nscr;
+ 	u32	htcr;
+@@ -238,6 +241,28 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 	return retval || !wait ? retval : -EIO;
+ }
+ 
++static uint stm32_rng_clock_freq_restrain(struct hwrng *rng)
++{
++	struct stm32_rng_private *priv =
++	    container_of(rng, struct stm32_rng_private, rng);
++	unsigned long clock_rate = 0;
++	uint clock_div = 0;
++
++	clock_rate = clk_get_rate(priv->clk);
++
++	/*
++	 * Get the exponent to apply on the CLKDIV field in RNG_CR register
++	 * No need to handle the case when clock-div > 0xF as it is physically
++	 * impossible
++	 */
++	while ((clock_rate >> clock_div) > priv->data->max_clock_rate)
++		clock_div++;
++
++	pr_debug("RNG clk rate : %lu\n", clk_get_rate(priv->clk) >> clock_div);
++
++	return clock_div;
++}
++
+ static int stm32_rng_init(struct hwrng *rng)
+ {
+ 	struct stm32_rng_private *priv =
+@@ -259,8 +284,11 @@ static int stm32_rng_init(struct hwrng *rng)
+ 	 * 0 is an invalid value as it disables all entropy sources.
+ 	 */
+ 	if (priv->data->has_cond_reset && priv->data->cr) {
++		uint clock_div = stm32_rng_clock_freq_restrain(rng);
++
+ 		reg &= ~RNG_CR_CONFIG_MASK;
+-		reg |= RNG_CR_CONDRST | (priv->data->cr & RNG_CR_ENTROPY_SRC_MASK);
++		reg |= RNG_CR_CONDRST | (priv->data->cr & RNG_CR_ENTROPY_SRC_MASK) |
++		       (clock_div << RNG_CR_CLKDIV_SHIFT);
+ 		if (priv->ced)
+ 			reg &= ~RNG_CR_CED;
+ 		else
+@@ -360,6 +388,7 @@ static const struct dev_pm_ops stm32_rng_pm_ops = {
+ 
+ static const struct stm32_rng_data stm32mp13_rng_data = {
+ 	.has_cond_reset = true,
++	.max_clock_rate = 48000000,
+ 	.cr = 0x00F00D00,
+ 	.nscr = 0x2B5BB,
+ 	.htcr = 0x969D,
+@@ -367,6 +396,7 @@ static const struct stm32_rng_data stm32mp13_rng_data = {
+ 
+ static const struct stm32_rng_data stm32_rng_data = {
+ 	.has_cond_reset = false,
++	.max_clock_rate = 3000000,
+ };
+ 
+ static const struct of_device_id stm32_rng_match[] = {
 -- 
 2.25.1
 
