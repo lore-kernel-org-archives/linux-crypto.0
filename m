@@ -2,105 +2,141 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A12E7109A
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 16:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D262C88CB9
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 17:05:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbjIUQ7L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 12:59:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44148 "EHLO
+        id S230047AbjIURFb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 13:05:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjIUQ67 (ORCPT
+        with ESMTP id S230469AbjIURFM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 12:58:59 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9618F1FD6
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 09:58:17 -0700 (PDT)
-Received: from letrec.thunk.org (c-73-8-226-230.hsd1.il.comcast.net [73.8.226.230])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 38LDUd3N002197
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Sep 2023 09:30:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1695303042; bh=+fubNItGMi3oNUPA7yH/IACt2nk/RkasGX86cZmJsJg=;
-        h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-        b=YyZ1ZhLgEOUZxK6QlhDrqHdh84oveJlq+86w5zpiCsCKuDaVztlQM9apfRvVa/rnu
-         St0dYrJWO8wpt3Zx9d2Wth7vYbcOVIUpA6KznBvzWx4OW7pi0iD6OvZ2q9rVd9HNs2
-         UgptpPOfLzcjDMNX7myTklC/qr9LrgC2L7U2Uuw5ANaf81pL1la09HzKe5QvczYi8V
-         y9fmTzAKu04qfSQLNBHrURNpExaNew9U7HoU2Blt1IpI2CmfrLnSuEAvxvbLZoA4c1
-         tfp3EzPd17QDVry4+sy4uZe//4dr1voWcuF5Hmb6gKS3i/1KuIZAfR1z76vmXoLeuN
-         b4X7CdL7gClAA==
-Received: by letrec.thunk.org (Postfix, from userid 15806)
-        id 6C9A08C02C7; Thu, 21 Sep 2023 09:30:39 -0400 (EDT)
-Date:   Thu, 21 Sep 2023 09:30:39 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>
-Subject: Re: [RFC] Should writes to /dev/urandom immediately affect reads?
-Message-ID: <ZQxFfwsr726KlHP6@mit.edu>
-References: <20230920060615.GA2739@sol.localdomain>
- <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
- <20230920193203.GA914@sol.localdomain>
- <CAHk-=wicaC9BhbgufM_Ym6bkjrRcB7ZXSK00fYEmiAcFmwN3Kg@mail.gmail.com>
- <20230920202126.GC914@sol.localdomain>
- <CAHk-=wgu4a=ckih8+JgfwYPZcp-uvc1Nh2LTGBSzSVKMYRk+-w@mail.gmail.com>
- <20230920204524.GD914@sol.localdomain>
- <CAHk-=wjx__9L2Ej0DBWGgyjxEKkdKJW=zDvjEhLTBsBgd8MdOA@mail.gmail.com>
+        Thu, 21 Sep 2023 13:05:12 -0400
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2083.outbound.protection.outlook.com [40.107.105.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4DC1FFB;
+        Thu, 21 Sep 2023 10:02:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aTaXL4iqlcf7LZgyYWl9I/V9skEqbsXkhJroRBQAdkbYvCstfuMxTLm9/uKvYqieTfJlv1uHgfehhliWrFi1/81JSNhri1UsVId0mD7gVIcD5BYywc7S1+3/ItGv1mggZ0JghT3Hn15mG2AtVa7jtI7FTtN9phslgBs3gHOmtwzkUKwn0k3mjiSvCsNPel4jnedUGQpJX1n8Whizr5LlSD6dJeGxQI1xeB7Hg2JZNm95lQdagpG8UjtpEvVQpXpVAWatgJEJezJaiHXy1p1lq4p8WQB3VR6LX0HEyzTLhZ3qsr2XfoY8Kq4j6ZDUKhUyrNo4rYz74ln9Cd+HU1VZNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+rFqxgYrESLMeHsTvx4azW3yc8+GfCVIG3LrNSMbg/0=;
+ b=hymhXPnwdHXqZOoQs2vhMrsoJfsoiWP3BvhbSrxJ63oAusjH/WjKztHI0HB62vq7NY2lnFLdVPgZs+aRJsbnrDui8+UvUnibHyrf8gICR2dummEF14vNiOV1vePSTyQl3riapWYsIPXhY99vjPCYiAeGyZOxnfM50HjLkw8cgtppcPQlinYEqEu6a6ZDub5DShPVSJIDkdh9wypc7ohK6PcP8WRHMAfwFB41x4ptL/ZjY5gAMcM+uOXle2u0aj4oYqnkKkPzFWZqLEROfgnIQMdx2R4Ecl+7IAmzaTegboq94BQ0HrfnwO/36+j72io/qUQrp5fuGDa3ufZ+Ny0dXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+rFqxgYrESLMeHsTvx4azW3yc8+GfCVIG3LrNSMbg/0=;
+ b=HTbTbvpOmakMKzyaszNVJzuZAVJ/mQsHhAO2yDvQ8k3n1WPT4SEgU3ijJ374oUHsodE0qdD55Wl13lKIqnaOztAroqVSbXcypPljIMire/fN5f0D29p2FAiKdRf0F8Qll5Lbjbqo87TViL8WWbUKMRnxQzCfARLcsA9eu6pAiLQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6004.eurprd04.prod.outlook.com (2603:10a6:208:11a::11)
+ by DU2PR04MB8967.eurprd04.prod.outlook.com (2603:10a6:10:2e2::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Thu, 21 Sep
+ 2023 09:45:11 +0000
+Received: from AM0PR04MB6004.eurprd04.prod.outlook.com
+ ([fe80::86b7:e0cc:dd24:12c0]) by AM0PR04MB6004.eurprd04.prod.outlook.com
+ ([fe80::86b7:e0cc:dd24:12c0%7]) with mapi id 15.20.6813.017; Thu, 21 Sep 2023
+ 09:45:11 +0000
+From:   Gaurav Jain <gaurav.jain@nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>,
+        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Aisheng Dong <aisheng.dong@nxp.com>
+Cc:     Silvano Di Ninno <silvano.dininno@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx@nxp.com, Gaurav Jain <gaurav.jain@nxp.com>
+Subject: [PATCH] crypto: caam/qi2 - fix Chacha20 + Poly1305 self test failure
+Date:   Thu, 21 Sep 2023 15:14:44 +0530
+Message-Id: <20230921094444.2121891-1-gaurav.jain@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2P153CA0024.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::13) To AM0PR04MB6004.eurprd04.prod.outlook.com
+ (2603:10a6:208:11a::11)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjx__9L2Ej0DBWGgyjxEKkdKJW=zDvjEhLTBsBgd8MdOA@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6004:EE_|DU2PR04MB8967:EE_
+X-MS-Office365-Filtering-Correlation-Id: f3656c8c-07f8-4024-242e-08dbba8772b9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0OllQldvw+ZZznn8BjY89DRkYTDASm8ml5VvCdv2Nacp3MKcFrM/ANJFhfxlDrHV56DCEeFFTYui+vG8PdSCYbFUg1014ffPm1A6BuJPCWNphiAEIYqveFK1lPkY1swTVdStgPuPmJZ/ffGlvcGsl/vk21gF5bOdySIKm9YSD31qF4YduBANe+bq4bMWWdrZ3zn3ejuLwteX1KZNFutQM5G8qBy0xHf75lNaqea0RRJD7ORbtwjeluy8O/kKmVeD8huSnvl7BF4qSvlsxwU4U7qZ6FjNAL7Ud0ovx2SnhdZsAB+FJAAuVLRdMaPkf7MyPIctTTHMNJ5zhetbozqROPGR9tbtSDL+m7dFh0y7tbWLvVvSKI17pvQt80XWFXw7tyj84/rfcgEeajuAvvyAUrI0QEjNqZiFva8UcYU0QUXVZLdzhUw2wE3fR8gGA7yRg26q0GKj9LZZr4NRnHroWoXyP+pwcZHPMDV+4/zweoFJO++X9rbg6SVnvqBjVVLUDL8sbZuwzJGxZ1EwM+PosCODPDuPF+zJS8VNaKmxKowrdlNP4h8Bm7Qi9gYKULocDvaPGYuPCwLzqo/jSh6tdjgltm4aNFMVGCYkuGBMoYbWa43EJ1L4XKa5VoGG851b
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6004.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(376002)(39860400002)(1800799009)(186009)(451199024)(2616005)(1076003)(26005)(52116002)(38100700002)(6506007)(6512007)(6486002)(6666004)(83380400001)(38350700002)(478600001)(36756003)(86362001)(41300700001)(54906003)(316002)(6636002)(110136005)(66946007)(66476007)(66556008)(4744005)(2906002)(4326008)(8676002)(44832011)(8936002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?wWmELYLpMCLddA49veZMXHgR9O05HdTu4NYzejEa3nZwSr1C4KKqI7rEv+ot?=
+ =?us-ascii?Q?WhhgRhh5dlM2OalmoGVd/0PUEJHV6mJD+7IMoc6dKVossz7Yh95xr4QY2XtS?=
+ =?us-ascii?Q?u3KgD3poUX1X6w4j4/iyYL9eX+HJ/OmiJZKvIYntAFyCzSLsYe1+VONp6e7L?=
+ =?us-ascii?Q?jfxFugibRewVpAFez6TYqOniyNsOafcHh+qnu+JGq5IH35byCZ2ON+/9TmtI?=
+ =?us-ascii?Q?oo4fwpb2w6wqoxhVqZ6TvaBNPxvf0xcWZmLoHcjIyp3mfR/DvXRmAwMjs/cC?=
+ =?us-ascii?Q?wvz/r2sktCeSCPIXl+p/XVbvTsvKDm/zcXxYeOSD84cfncXP4dKSFGmA6P+s?=
+ =?us-ascii?Q?JQxSULTLX3l7uUnJfj9c5ZYFmk8ffCsvxfttoLp1v+gKTgOc1cuZZ7aIikuo?=
+ =?us-ascii?Q?Ql/wHAWrD5K0d1fXuQ9QnLYi3WXwokcOke+K0yu/SLu5PYKW0/VlC0XdeN6v?=
+ =?us-ascii?Q?S1vqlaZyZHYnxgDkQEXIxT6AcVayr8uLhROLvxLMSiLtR3Q8KjFfXjIp1T1L?=
+ =?us-ascii?Q?lMrYb0p3xM70ffowbDqHEnSKpKfKTZ1Y86s9zvrLdUmmaXP+RUv7BAnXM773?=
+ =?us-ascii?Q?7NfZiGMaoZYCni24hsv3EVc8lnygbygHmMrGVYw4w4xt4MeZCLCXbgYSF6Rl?=
+ =?us-ascii?Q?fak88lo0wPVdUb1dRnNSCveKCnElGbcn/046f+G5I28BqX6L6A/PXxkw2GwF?=
+ =?us-ascii?Q?+SXBAH4knlgXojIiaZLrZh254XJn61NZEtAnbz1MSi79f07Mp4zr8S7oTICn?=
+ =?us-ascii?Q?Evz7vuB4CNEPD5RLqR0YxTLxYytBbScWGCJZ81n5yNgHSvWwu+QGCtywQZH7?=
+ =?us-ascii?Q?x82WwPEjWe1Pk58WVMa2p+AiGxtll8XZlcrm87d8gYebxLhes9HxkYcTpsrD?=
+ =?us-ascii?Q?cxSyZaGyPrxyXELM063z4CR8rKUoyFjndeqUZEM3ubVLlf0IO6+2ITkSDxvt?=
+ =?us-ascii?Q?b1PJSZxcgKYp78/DSDw/TOjwXhjc6ENgzdXo/fculZ0Sdee+lM2JJ+MqKAq0?=
+ =?us-ascii?Q?mxbAboX9X09OF4/ZUxgfIXQVXz0NR8lVIOGjuWRdU86DVAZoP9JLm8UoeqxD?=
+ =?us-ascii?Q?LKbdog4Bb70u5feE3IjB/NDZT+6sXnr7H7YUZMmQLYdb/0+TAtTPQVznvQRA?=
+ =?us-ascii?Q?ufd5ALf7+mUSAhcWG0h+aa8dIiehiy/jjPkAdGw+7sqh6v7jx7vIGq42N2T0?=
+ =?us-ascii?Q?crWlXPFeE1XPYBOG9sKvoV70WPoTd+Ex7tlZj9e7kNzI4wGHDL2qkjTVUXC5?=
+ =?us-ascii?Q?HUCPJ5dEdXWM5ca+udEwbq0vQUa76DHiqxGgJcDID9AEza6AJV0xl2mCU9Gl?=
+ =?us-ascii?Q?xLgIl01Kz54HjmwBR6csNwLp2rW+cQ+FDRV3PsOJSA4cz3SODr9UV/KCcKP0?=
+ =?us-ascii?Q?FoDLW8bfSXKUKMNidH2AofTNZe9RDzLWnZiE88p9BfbIcRuDJGMiZcjpljap?=
+ =?us-ascii?Q?Qd8YmpK66y5v+z1xfkOUd5RpaWNJcy7PbzPNaxLCKJflwtjPERalUx61ipAN?=
+ =?us-ascii?Q?vE1LSfmexyPE53jaVoQhNKLPFxNr+BwFC0g+iCp7udPEKhLgwOuVKBa+1OBS?=
+ =?us-ascii?Q?D5VVz4zMNAZU1Qe0RoGOrW1gGA/WAYyLLIY4hgI4?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3656c8c-07f8-4024-242e-08dbba8772b9
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6004.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 09:45:11.4569
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: y+rPh7EA8udp/Y/+TpXqghSwYs8uUdvIPEJ7tHiENpA/V6uCN7ToeWOhryhIZT/DjQ/PKJt/U9g/pXxEVe9lnA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8967
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 20, 2023 at 01:48:55PM -0700, Linus Torvalds wrote:
-> On Wed, 20 Sept 2023 at 13:45, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > See my first email where I explained the problems with the current behavior.
-> > Especially the third paragraph.
-> 
-> I really don't think that's the obvious way at all. Anybody who treats
-> a seed file that way just doesn't care, and whipped up a (bad) shell
-> script randomly.
+key buffer is not copied in chachapoly_setkey function,
+results in wrong output for encryption/decryption operation.
 
-The shell script (and documentation in the kernel man pages suggesting
-the shell script) is basically historical, and obsolete.  It was
-needed back when we weren't as aggressively seeding the RNG at boot
-time, before we unified /dev/urandom and /dev/random.  These days, I
-really don't think it matters all that much.
+fix this by memcpy the key in caam_ctx key arrary
 
-The main threat we've historically been concerned is badly designed
-IOT devices (remember, the 'S' in IOT stands for security) which
-generates a long-term cryptographic key within milliseconds of the
-initial power-on, which led to such hillarious results as all HP
-Printers publically on the Internet having one of 256 possible private
-keys.  In those sorts of situations, there *was* no seed file, and
-even if there were, it would be identical across all of the IOT's
-initially imaged root file system.
+Fixes: c10a53367901 ("crypto: caam/qi2 - add support for Chacha20 + Poly1305")
+Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
+---
+ drivers/crypto/caam/caamalg_qi2.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-I do have one slight concern about unconditionally reseeding whenever
-there is a write to /dev/[u]random, whih is in the purely hypothetical
-scenario mostly of interest to academics writing crypto papers, where
-we assume the attacker has stolen the full internal state of the RNG,
-if the attacker is constantly writing a small amount of known data to
-/dev/random, and monitoring its output, it would be disabling the
-"catastrophic reseed" part of the design, and so it might make it
-easier for the attacker to maintain accurate knowledge of the internal
-state of the RNG over long period of time.  So a perfectionist would
-probably put a timeout where writing to /dev/urandom would result in a
-reseed every N minutes or some such.
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 9156bbe038b7..a148ff1f0872 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -641,7 +641,8 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
+ 	if (keylen != CHACHA_KEY_SIZE + saltlen)
+ 		return -EINVAL;
+ 
+-	ctx->cdata.key_virt = key;
++	memcpy(ctx->key, key, keylen);
++	ctx->cdata.key_virt = ctx->key;
+ 	ctx->cdata.keylen = keylen - saltlen;
+ 
+ 	return chachapoly_set_sh_desc(aead);
+-- 
+2.25.1
 
-But honestly?  I'm not convinced it's worth it; devices/systems where
-this matter are probably not getting security updates *anyway*, so the
-much simpler way the NSA/KGB/MSS would attack the device is paying a
-few thousand dollars for a zero-day, and breaking kernel security
-that way.
-
-Cheers,
-
-						- Ted
