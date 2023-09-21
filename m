@@ -2,94 +2,139 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB5EE7D0AF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 22:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3996AE7D0AB
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Sep 2023 22:25:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230427AbjIUWBM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 18:01:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
+        id S233171AbjIUWZl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 18:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230317AbjIUWA4 (ORCPT
+        with ESMTP id S231905AbjIUWZ2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 18:00:56 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE4A2691
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 14:57:45 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-144-9yHIHy7UMl2pr0pfl-TvIA-1; Thu, 21 Sep 2023 22:57:27 +0100
-X-MC-Unique: 9yHIHy7UMl2pr0pfl-TvIA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 21 Sep
- 2023 22:57:26 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 21 Sep 2023 22:57:26 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Dominik Brodowski" <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>
-Subject: RE: [RFC] Should writes to /dev/urandom immediately affect reads?
-Thread-Topic: [RFC] Should writes to /dev/urandom immediately affect reads?
-Thread-Index: AQHZ6/MdHsl+KD+hzUOipRl6ZArMFbAkCZmAgAADCACAAArEAIAAAxeAgAACfICAAbU2kA==
-Date:   Thu, 21 Sep 2023 21:57:26 +0000
-Message-ID: <4c5a6cd876d7499fa382ba74cd23cc08@AcuMS.aculab.com>
-References: <20230920060615.GA2739@sol.localdomain>
- <CAHk-=wja26UmHQCu48n_HN5t5w3fa6ocm5d_VrJe6-RhCU_x9A@mail.gmail.com>
- <20230920193203.GA914@sol.localdomain>
- <CAHk-=wicaC9BhbgufM_Ym6bkjrRcB7ZXSK00fYEmiAcFmwN3Kg@mail.gmail.com>
- <20230920202126.GC914@sol.localdomain>
- <CAHk-=wgu4a=ckih8+JgfwYPZcp-uvc1Nh2LTGBSzSVKMYRk+-w@mail.gmail.com>
- <CAHk-=wh+nAmcXV=Xz6fkDpazne+n+iFfGsnS=p9PjVLiEjiSvQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wh+nAmcXV=Xz6fkDpazne+n+iFfGsnS=p9PjVLiEjiSvQ@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 21 Sep 2023 18:25:28 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9522A7D92;
+        Thu, 21 Sep 2023 10:05:26 -0700 (PDT)
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38L515tv001809;
+        Thu, 21 Sep 2023 10:03:12 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding:content-type; s=
+        selector1; bh=RHf2NhhC5DGUUvcRPpqOUIJnJSzscldTFHRSIoHliKE=; b=rc
+        HJQ9t9Orer1bLYljsg5WzNXISB+Y6R4qv2dL71k5JASJ/RX2MqbJsV6bDhLsuifn
+        b2gFKNLJJKvTUIuYIexonG7aFRqYQmjN7Y8wabLbCb4+9iG1PTrxfhv5mraPRKDs
+        sXwgU5ogMDv42k/VBr+xQojKLUNaTLFXOPpxG2PE7eKIEfLpm8ioybZNkHXDfL11
+        /d1TKLNEz1GqyTRXBda/0K8xdAC7hnS5oxjhfGn09MqvhHB3dxxCYOBZYR5Jz90O
+        FvVdMvkRGFHL5yXqrozHqX5PiiD/WlWP4Z7KwEsEbJ3/awD6Dc+xUd/+C4f7jR3Q
+        gicRpynVA2vn8UVt69ZA==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t5nx0sb5h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Sep 2023 10:03:11 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id BC633100064;
+        Thu, 21 Sep 2023 10:03:08 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id B43DD2115F0;
+        Thu, 21 Sep 2023 10:03:08 +0200 (CEST)
+Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 21 Sep
+ 2023 10:03:08 +0200
+From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
+To:     Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+Subject: [PATCH v3 1/9] dt-bindings: rng: introduce new compatible for STM32MP13x
+Date:   Thu, 21 Sep 2023 10:02:53 +0200
+Message-ID: <20230921080301.253563-2-gatien.chevallier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
+References: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-21_06,2023-09-20_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjAgU2VwdGVtYmVyIDIwMjMgMjE6NDENCj4g
-DQo+IE9uIFdlZCwgMjAgU2VwdCAyMDIzIGF0IDEzOjMyLCBMaW51cyBUb3J2YWxkcw0KPiA8dG9y
-dmFsZHNAbGludXgtZm91bmRhdGlvbi5vcmc+IHdyb3RlOg0KPiA+DQo+ID4gSXQgd2FzIHdoeSBJ
-IGFsc28gYXNrZWQgYWJvdXQgZW50cm9weS4gQmVjYXVzZSAqaWYqIHlvdSBhcmd1ZSB0aGF0IHRo
-ZQ0KPiA+IHVzZXItc3BhY2Ugd3JpdGUgY29udGFpbnMgZW50cm9weSwgdGhlbiB0aGF0IHdvdWxk
-IGJlIGEgcmVhc29uLg0KPiANCj4gVG8gY2xhcmlmeSAtIHRoZSBqaXR0ZXIgZW50cm9weSBxdWVz
-dGlvbiB3YXMgcmVsYXRlZCB0byB0aGF0IHNhbWUNCj4gYmFzaWMgaXNzdWU6IGlmIHRoaXMgd2Fz
-IG1lYW50IHRvIGJlIGEgd2F5IHRvIG1pdGlnYXRlIHRoZSBsYWNrIG9mDQo+IGppdHRlciBlbnRy
-b3B5IG9uIHNvbWUgcGxhdGZvcm0geW91IGNhcmUgYWJvdXQsIHRoYXQgd291bGQgYWdhaW4NCj4g
-cG9zc2libHkgYmUgYSByZWFzb24gdG8gY2FyZS4NCj4gDQo+IENvbnNpZGVyaW5nIHRoYXQgd2Ug
-YXBwYXJlbnRseSBoYXZlbid0IGNhcmVkIGZvciB0aGUgbGFzdCA3IHllYXJzLCBJJ20NCj4gc3Rp
-bGwgYSBiaXQgc3VycHJpc2VkLCBidXQgd2hhdGV2ZXIuDQo+IA0KPiBXaGF0IEkgKmRvbid0KiB3
-YW50IGlzIGp1c3QgbW9yZSB2b29kb28gZGlzY3Vzc2lvbnMgYWJvdXQgL2Rldi8qcmFuZG9tDQo+
-IGJlaGF2aW9yIHRoYXQgZG9lc24ndCBoYXZlIGEgdGVjaG5pY2FsIHJlYXNvbiBmb3IgaXQuDQoN
-ClRoaXMgbWlnaHQgYWxsIGJlIHJlbGF0ZWQgdG8gYW4gb25nb2luZyByZXBlYXQgb2YgdGhlICdo
-b3cgdG8gaW5pdGlhbGlzZQ0KL2Rldi91cmFuZG9tJyBvbiB0aGUgYnVzeWJveCBsaXN0Lg0KDQpT
-dWNoIHN5c3RlbXMgYXJlIG11Y2ggbW9yZSBsaWtlbHkgdG8gYmUgcnVubmluZyBjb21wbGV0ZWx5
-IGppdHRlci1mcmVlDQpjcHUgdGhhdCBib290IGZyb20gZW1iZWRkZWQgc2VyaWFsIGZsYXNoIHdp
-dGggYWJzb2x1dGVseSBjb25zdGFudA0KYWNjZXNzIHRpbWVzLg0KVGhlIG9ubHkgd2F5IHlvdSBh
-cmUgZ29pbmcgdG8gZ2V0IGFueSBlbnRyb3B5IGVhcmx5IG9uIGlzIHRvIGhhdmUNCnNhdmVkIGl0
-IGZyb20gdGhlIHByZXZpb3VzIGJvb3QuDQpJIGRvbid0IHRoaW5rIGl0IG1ha2VzIGFueSByZWFs
-IHNlbnNlIHNvIHNhdmUgaXQgdG9vIGVhcmx5IC0geW91IGp1c3QNCmVuZCB1cCB3aXRoIGFuIGVu
-Y29kZWQgJ2NvdW50IG9mIHRoZSBudW1iZXIgb2YgYm9vdHMnLg0KDQpBdCB0aGUgbW9tZW50IGl0
-IGlzIHByZXR0eSBoYXJkIHRvIGFkZCB0aGUgc2F2ZWQgZW50cm9weS4NCkFuZCB5b3UgZG8gd2Fu
-dCBpdCB0byBiZSB1c2VkIGltbWVkaWF0ZWx5IC0gYmVjYXVzZSB3aGF0IHRoZQ0Ka2VybmVsIGhh
-cyBpdCBsaWtlbHkgdG8gYmUgcHJldHR5IGxpbWl0ZWQuDQoNCk5vdywgb25jZSB0aGUgc3RhcnR1
-cCBzY3JpcHRzIGhhdmUgcnVuIHlvdSBtaWdodCBkZWNpZGUgdGhhdCBhbg0KaW1tZWRpYXRlIHJl
-aGFzaCBpc24ndCBuZWVkZWQuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFr
-ZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwg
-VUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
+Introduce st,stm32mp13-rng compatible and add st,rng-lock-conf.
+
+If st,rng-lock-conf is set, the RNG configuration in RNG_CR, RNG_HTCR
+and RNG_NSCR will be locked. It is supported starting from the RNG
+version present in the STM32MP13
+
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+---
+
+Changes in V3:
+	- Squashed with: patch [V2 07/10]
+	- Declare st,rng-lock-conf at top level and restrain its uses
+	  depending on the compatible. I discarded Rob's tag as for
+	  the modifications.	
+
+ .../devicetree/bindings/rng/st,stm32-rng.yaml | 20 ++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+index 187b172d0cca..717f6b321f88 100644
+--- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+@@ -15,7 +15,9 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    const: st,stm32-rng
++    enum:
++      - st,stm32-rng
++      - st,stm32mp13-rng
+ 
+   reg:
+     maxItems: 1
+@@ -30,11 +32,27 @@ properties:
+     type: boolean
+     description: If set enable the clock detection management
+ 
++  st,rng-lock-conf:
++    type: boolean
++    description: If set, the RNG configuration in RNG_CR, RNG_HTCR and
++                  RNG_NSCR will be locked.
++
+ required:
+   - compatible
+   - reg
+   - clocks
+ 
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - st,stm32-rng
++    then:
++      properties:
++        st,rng-lock-conf: false
++
+ additionalProperties: false
+ 
+ examples:
+-- 
+2.25.1
 
