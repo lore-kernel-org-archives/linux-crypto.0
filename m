@@ -2,197 +2,548 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53300E6FE2F
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 13:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C4CE6FE3D
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 14:37:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234146AbjIVNqP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Sep 2023 09:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41982 "EHLO
+        id S230085AbjIVOh0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Sep 2023 10:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234181AbjIVNqO (ORCPT
+        with ESMTP id S230043AbjIVOh0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Sep 2023 09:46:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0152197;
-        Fri, 22 Sep 2023 06:46:07 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38MDVXlG019814;
-        Fri, 22 Sep 2023 13:45:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : mime-version : content-type :
- content-transfer-encoding; s=pp1;
- bh=/cFj3W06N2pNUMxCX8cWjPL6+pS+obFp5SdEEoeM+VY=;
- b=aCpALoxv4OuXFh4X6IEjT3BGoixMoLd1fpbHCEkSEt331Jpg8QQKYgTT39viBjiiAylI
- jiDFfnuMBgMHhfm0W5cGvNzMOwHe04jghIBuHp0muG8VSVoQprdM/FpZDX+/MyD16DhE
- /gffERa+PB+s1GElKsla3dv26AXQzZEI2uv1JtSKtne9YoCVbA7G27WrgItvZgX+ThTM
- ujzPhxkOUOM44WpF52+301AMtxqAWV0wz7Z7s4urlRzvHhb0Cy+BVpx96kBHa3GOb8Ap
- i6bChYAucAM9IjZuukPh4uBWCFNcWWW/vDu4dFF7WjK9tTPVILkCS+X6Stt2l+7X9yfn QA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t9bvp0x16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Sep 2023 13:45:54 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38MDVWUl019807;
-        Fri, 22 Sep 2023 13:45:54 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t9bvp0x0v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Sep 2023 13:45:53 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-        by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38MDLcne018848;
-        Fri, 22 Sep 2023 13:45:52 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t8tsp2w7f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Sep 2023 13:45:52 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38MDjn8a24314604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Sep 2023 13:45:49 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D0872004D;
-        Fri, 22 Sep 2023 13:45:49 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C320120043;
-        Fri, 22 Sep 2023 13:45:48 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.56.45])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Fri, 22 Sep 2023 13:45:48 +0000 (GMT)
-Date:   Fri, 22 Sep 2023 15:45:46 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Gonglei <arei.gonglei@huawei.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: BUG: virtcrypto_dataq_callback calls crypto_finalize_request() from
- irq context
-Message-ID: <20230922154546.4f7447ce.pasic@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        Fri, 22 Sep 2023 10:37:26 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB815100
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Sep 2023 07:37:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695393439; x=1726929439;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=49WOHsn1WqsUz7QJy+NP6H3+Vx00HgV8fwJp3tNkqNA=;
+  b=MkhTp9fm4KGRVzwhSs89Z/TYvVZv9Bl5veJBHYeyw3lkvXD4ZgaxPx2o
+   AfHD9WD6dnO4k0wYHDRPtzwuURdHdSI0D6fkZeRBHvAnWme5iOBWak6AI
+   iOfEQZUj0ht1OwSMxS+OIdd23Abw/vTK6iiG7Q7piTUh+cGCmugJWXUS/
+   v0D4kY0aVAN536NYNw/6aJqG0F29tFoUPcip13lxwfEKrpCJQKa5XVUux
+   ANwg8BCPKgKhdr88yRAc6d+WlUOLGCWQ6SnDG7B0noTVW+DUZM2gwzs00
+   7k/G8vWE+k4h1WZGzMHvX0R1pPY/1qXSJKGYmpdDQ6Xt3OH5WE7CH1hK6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="444938880"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="444938880"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 07:37:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="890826184"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="890826184"
+Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Sep 2023 07:36:24 -0700
+From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v3] crypto: qat - add cnv_errors debugfs file
+Date:   Fri, 22 Sep 2023 16:34:57 +0200
+Message-ID: <20230922143547.258058-1-lucas.segarra.fernandez@intel.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XhgLx4Gz-amqRwPr8OtvkgDQhkHIrwXB
-X-Proofpoint-ORIG-GUID: RnWSzCDN7QZQFgzoKepqGUiNisNbR2jH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-22_11,2023-09-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 mlxscore=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 malwarescore=0 suspectscore=0
- clxscore=1011 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309220116
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Gonglei!
+The Compress and Verify (CnV) feature check and ensures data integrity
+in the compression operation. The implementation of CnV keeps a record
+of the CnV errors that have occurred since the driver was loaded.
 
-Our CI has found that virtio-crypto does not honor the requirement of 
-crypto_finalize_request() being called in softirq context which is
-asserted in that function via lockdep_assert_in_softirq() since commit
-4058cf08945c ("crypto: engine - check if BH is disabled during
-completion").
+Expose CnV error stats by providing the "cnv_errors" file under
+debugfs. This includes the number of errors detected up to now and
+the type of the last error. The error count is provided on a per
+Acceleration Engine basis and it is reset every time the driver is loaded.
 
-The problem was originally found on s390x but Marc Hartmayer was so kind
-to reproduce it on amd64. Please find the corresponding kernel messages
-at the end of this email.
+Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+v2 -> v3:
+- remove unneeded header inclussion
+---
+v1 -> v2:
+- Rebase on top of latest version (v4) of crypto: qat - add pm_status debugfs file
+---
+ Documentation/ABI/testing/debugfs-driver-qat  |  13 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   1 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |  20 ++
+ .../intel/qat/qat_common/adf_cnv_dbgfs.c      | 295 ++++++++++++++++++
+ .../intel/qat/qat_common/adf_cnv_dbgfs.h      |  11 +
+ .../intel/qat/qat_common/adf_common_drv.h     |   1 +
+ .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |   5 +
+ 9 files changed, 350 insertions(+)
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
 
-The call chain looks like this. 
-interrupt handler for queue notification
- --> virtcrypto_dataq_callback()
- --> via vc_req->alg_cb either virtio_crypto_skcipher_finalize_req()
-     or virtio_crypto_akcipher_finalize_req()
- --> crypto_finalize_skcipher_request()
-     or crypto_finalize_akcipher_request()
- --> crypto_finalize_request()
+diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
+index 0656f27d1042..b2db010d851e 100644
+--- a/Documentation/ABI/testing/debugfs-driver-qat
++++ b/Documentation/ABI/testing/debugfs-driver-qat
+@@ -68,3 +68,16 @@ Description:	(RO) Read returns power management information specific to the
+ 		QAT device.
+ 
+ 		This attribute is only available for qat_4xxx devices.
++
++What:		/sys/kernel/debug/qat_<device>_<BDF>/cnv_errors
++Date:		January 2024
++KernelVersion:	6.7
++Contact:	qat-linux@intel.com
++Description:	(RO) Read returns, for each Acceleration Engine (AE), the number
++		of errors and the type of the last error detected by the device
++		when performing verified compression.
++		Reported counters::
++
++			<N>: Number of Compress and Verify (CnV) errors and type
++			     of the last CnV error detected by Acceleration
++			     Engine N.
+diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
+index 4ef3cccfeab4..47ab764fea4e 100644
+--- a/drivers/crypto/intel/qat/qat_common/Makefile
++++ b/drivers/crypto/intel/qat/qat_common/Makefile
+@@ -33,6 +33,7 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
+ 				adf_fw_counters.o \
+ 				adf_heartbeat.o \
+ 				adf_heartbeat_dbgfs.o \
++				adf_cnv_dbgfs.o \
+ 				adf_pm_dbgfs.o \
+ 				adf_gen4_pm_debugfs.o \
+ 				adf_dbgfs.o
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index 374528da4933..041f7c168fb1 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -317,6 +317,7 @@ struct adf_accel_dev {
+ 	atomic_t ref_count;
+ 	struct dentry *debugfs_dir;
+ 	struct dentry *fw_cntr_dbgfile;
++	struct dentry *cnv_dbgfile;
+ 	struct list_head list;
+ 	struct module *owner;
+ 	struct adf_accel_pci accel_pci_dev;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
+index 63eb8498d3fd..556007218df7 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
+@@ -405,6 +405,26 @@ int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, si
+ 	return ret;
+ }
+ 
++int adf_get_cnv_stats(struct adf_accel_dev *accel_dev, u16 ae, u16 *err_cnt, u16 *latest_err)
++{
++	struct icp_qat_fw_init_admin_req req = { };
++	struct icp_qat_fw_init_admin_resp resp;
++	int ret;
++
++	req.cmd_id = ICP_QAT_FW_CNV_STATS_GET;
++
++	ret = adf_put_admin_msg_sync(accel_dev, ae, &req, &resp);
++	if (ret)
++		return ret;
++	if (resp.status)
++		return -EPROTONOSUPPORT;
++
++	*err_cnt = resp.error_count;
++	*latest_err = resp.latest_error;
++
++	return ret;
++}
++
+ int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
+ {
+ 	struct adf_admin_comms *admin;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
+new file mode 100644
+index 000000000000..0545787c17a4
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
+@@ -0,0 +1,295 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright(c) 2023 Intel Corporation */
++
++#include <linux/bitfield.h>
++#include <linux/debugfs.h>
++#include <linux/kernel.h>
++
++#include "adf_accel_devices.h"
++#include "adf_common_drv.h"
++#include "adf_cnv_dbgfs.h"
++#include "qat_compression.h"
++
++#define CNV_DEBUGFS_FILENAME		"cnv_errors"
++#define CNV_MIN_PADDING			16
++
++#define CNV_ERR_INFO_MASK		GENMASK(11, 0)
++#define CNV_ERR_TYPE_MASK		GENMASK(15, 12)
++#define CNV_SLICE_ERR_MASK		GENMASK(7, 0)
++#define CNV_SLICE_ERR_SIGN_BIT_INDEX	7
++#define CNV_DELTA_ERR_SIGN_BIT_INDEX	11
++
++enum cnv_error_type {
++	CNV_ERR_TYPE_NONE,
++	CNV_ERR_TYPE_CHECKSUM,
++	CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH,
++	CNV_ERR_TYPE_DECOMPRESSION,
++	CNV_ERR_TYPE_TRANSLATION,
++	CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH,
++	CNV_ERR_TYPE_UNKNOWN,
++	CNV_ERR_TYPES_COUNT
++};
++
++#define CNV_ERROR_TYPE_GET(latest_err)	\
++	min_t(u16, u16_get_bits(latest_err, CNV_ERR_TYPE_MASK), CNV_ERR_TYPE_UNKNOWN)
++
++#define CNV_GET_DELTA_ERR_INFO(latest_error)	\
++	sign_extend32(latest_error, CNV_DELTA_ERR_SIGN_BIT_INDEX)
++
++#define CNV_GET_SLICE_ERR_INFO(latest_error)	\
++	sign_extend32(latest_error, CNV_SLICE_ERR_SIGN_BIT_INDEX)
++
++#define CNV_GET_DEFAULT_ERR_INFO(latest_error)	\
++	u16_get_bits(latest_error, CNV_ERR_INFO_MASK)
++
++enum cnv_fields {
++	CNV_ERR_COUNT,
++	CNV_LATEST_ERR,
++	CNV_FIELDS_COUNT
++};
++
++static const char * const cnv_field_names[CNV_FIELDS_COUNT] = {
++	[CNV_ERR_COUNT] = "Total Errors",
++	[CNV_LATEST_ERR] = "Last Error",
++};
++
++static const char * const cnv_error_names[CNV_ERR_TYPES_COUNT] = {
++	[CNV_ERR_TYPE_NONE] = "No Error",
++	[CNV_ERR_TYPE_CHECKSUM] = "Checksum Error",
++	[CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH] = "Length Error-P",
++	[CNV_ERR_TYPE_DECOMPRESSION] = "Decomp Error",
++	[CNV_ERR_TYPE_TRANSLATION] = "Xlat Error",
++	[CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH] = "Length Error-C",
++	[CNV_ERR_TYPE_UNKNOWN] = "Unknown Error",
++};
++
++struct ae_cnv_errors {
++	u16 ae;
++	u16 err_cnt;
++	u16 latest_err;
++	bool is_comp_ae;
++};
++
++struct cnv_err_stats {
++	u16 ae_count;
++	struct ae_cnv_errors ae_cnv_errors[];
++};
++
++static s16 get_err_info(u8 error_type, u16 latest)
++{
++	switch (error_type) {
++	case CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH:
++	case CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH:
++		return CNV_GET_DELTA_ERR_INFO(latest);
++	case CNV_ERR_TYPE_DECOMPRESSION:
++	case CNV_ERR_TYPE_TRANSLATION:
++		return CNV_GET_SLICE_ERR_INFO(latest);
++	default:
++		return CNV_GET_DEFAULT_ERR_INFO(latest);
++	}
++}
++
++static void *qat_cnv_errors_seq_start(struct seq_file *sfile, loff_t *pos)
++{
++	struct cnv_err_stats *err_stats = sfile->private;
++
++	if (*pos == 0)
++		return SEQ_START_TOKEN;
++
++	if (*pos > err_stats->ae_count)
++		return NULL;
++
++	return &err_stats->ae_cnv_errors[*pos - 1];
++}
++
++static void *qat_cnv_errors_seq_next(struct seq_file *sfile, void *v, loff_t *pos)
++{
++	struct cnv_err_stats *err_stats = sfile->private;
++
++	(*pos)++;
++
++	if (*pos > err_stats->ae_count)
++		return NULL;
++
++	return &err_stats->ae_cnv_errors[*pos - 1];
++}
++
++static void qat_cnv_errors_seq_stop(struct seq_file *sfile, void *v)
++{
++}
++
++static int qat_cnv_errors_seq_show(struct seq_file *sfile, void *v)
++{
++	struct ae_cnv_errors *ae_errors;
++	unsigned int i;
++	s16 err_info;
++	u8 err_type;
++
++	if (v == SEQ_START_TOKEN) {
++		seq_puts(sfile, "AE ");
++		for (i = 0; i < CNV_FIELDS_COUNT; ++i)
++			seq_printf(sfile, " %*s", CNV_MIN_PADDING, cnv_field_names[i]);
++	} else {
++		ae_errors = v;
++
++		if (!ae_errors->is_comp_ae)
++			return 0;
++
++		err_type = CNV_ERROR_TYPE_GET(ae_errors->latest_err);
++		err_info = get_err_info(err_type, ae_errors->latest_err);
++
++		seq_printf(sfile, "%d:", ae_errors->ae);
++		seq_printf(sfile, " %*d", CNV_MIN_PADDING, ae_errors->err_cnt);
++		seq_printf(sfile, "%*s [%d]", CNV_MIN_PADDING, cnv_error_names[err_type],
++			   err_info);
++	}
++	seq_putc(sfile, '\n');
++
++	return 0;
++}
++
++static const struct seq_operations qat_cnv_errors_sops = {
++	.start = qat_cnv_errors_seq_start,
++	.next = qat_cnv_errors_seq_next,
++	.stop = qat_cnv_errors_seq_stop,
++	.show = qat_cnv_errors_seq_show,
++};
++
++/**
++ * cnv_err_stats_alloc() - Get CNV stats for the provided device.
++ * @accel_dev: Pointer to a QAT acceleration device
++ *
++ * Allocates and populates table of CNV errors statistics for each non-admin AE
++ * available through the supplied acceleration device. The caller becomes the
++ * owner of such memory and is responsible for the deallocation through a call
++ * to kfree().
++ *
++ * Returns: a pointer to a dynamically allocated struct cnv_err_stats on success
++ * or a negative value on error.
++ */
++static struct cnv_err_stats *cnv_err_stats_alloc(struct adf_accel_dev *accel_dev)
++{
++	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
++	struct cnv_err_stats *err_stats;
++	unsigned long ae_count;
++	unsigned long ae_mask;
++	size_t err_stats_size;
++	unsigned long ae;
++	unsigned int i;
++	u16 latest_err;
++	u16 err_cnt;
++	int ret;
++
++	if (!adf_dev_started(accel_dev)) {
++		dev_err(&GET_DEV(accel_dev), "QAT Device not started\n");
++		return ERR_PTR(-EBUSY);
++	}
++
++	/* Ignore the admin AEs */
++	ae_mask = hw_data->ae_mask & ~hw_data->admin_ae_mask;
++	ae_count = hweight_long(ae_mask);
++	if (unlikely(!ae_count))
++		return ERR_PTR(-EINVAL);
++
++	err_stats_size = struct_size(err_stats, ae_cnv_errors, ae_count);
++	err_stats = kmalloc(err_stats_size, GFP_KERNEL);
++	if (!err_stats)
++		return ERR_PTR(-ENOMEM);
++
++	err_stats->ae_count = ae_count;
++
++	i = 0;
++	for_each_set_bit(ae, &ae_mask, GET_MAX_ACCELENGINES(accel_dev)) {
++		ret = adf_get_cnv_stats(accel_dev, ae, &err_cnt, &latest_err);
++		if (ret) {
++			dev_dbg(&GET_DEV(accel_dev),
++				"Failed to get CNV stats for ae %ld, [%d].\n",
++				ae, ret);
++			err_stats->ae_cnv_errors[i++].is_comp_ae = false;
++			continue;
++		}
++		err_stats->ae_cnv_errors[i].is_comp_ae = true;
++		err_stats->ae_cnv_errors[i].latest_err = latest_err;
++		err_stats->ae_cnv_errors[i].err_cnt = err_cnt;
++		err_stats->ae_cnv_errors[i].ae = ae;
++		i++;
++	}
++
++	return err_stats;
++}
++
++static int qat_cnv_errors_file_open(struct inode *inode, struct file *file)
++{
++	struct adf_accel_dev *accel_dev = inode->i_private;
++	struct seq_file *cnv_errors_seq_file;
++	struct cnv_err_stats *cnv_err_stats;
++	int ret;
++
++	cnv_err_stats = cnv_err_stats_alloc(accel_dev);
++	if (IS_ERR(cnv_err_stats))
++		return PTR_ERR(cnv_err_stats);
++
++	ret = seq_open(file, &qat_cnv_errors_sops);
++	if (unlikely(ret)) {
++		kfree(cnv_err_stats);
++		return ret;
++	}
++
++	cnv_errors_seq_file = file->private_data;
++	cnv_errors_seq_file->private = cnv_err_stats;
++	return ret;
++}
++
++static int qat_cnv_errors_file_release(struct inode *inode, struct file *file)
++{
++	struct seq_file *cnv_errors_seq_file = file->private_data;
++
++	kfree(cnv_errors_seq_file->private);
++	cnv_errors_seq_file->private = NULL;
++
++	return seq_release(inode, file);
++}
++
++static const struct file_operations qat_cnv_fops = {
++	.owner = THIS_MODULE,
++	.open = qat_cnv_errors_file_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = qat_cnv_errors_file_release,
++};
++
++static ssize_t no_comp_file_read(struct file *f, char __user *buf, size_t count, loff_t *pos)
++{
++	char *file_msg = "No engine configured for comp\n";
++
++	return simple_read_from_buffer(buf, count, pos, file_msg, strlen(file_msg));
++}
++
++static const struct file_operations qat_cnv_no_comp_fops = {
++	.owner = THIS_MODULE,
++	.read = no_comp_file_read,
++};
++
++void adf_cnv_dbgfs_add(struct adf_accel_dev *accel_dev)
++{
++	const struct file_operations *fops;
++	void *data;
++
++	if (adf_hw_dev_has_compression(accel_dev)) {
++		fops = &qat_cnv_fops;
++		data = accel_dev;
++	} else {
++		fops = &qat_cnv_no_comp_fops;
++		data = NULL;
++	}
++
++	accel_dev->cnv_dbgfile = debugfs_create_file(CNV_DEBUGFS_FILENAME, 0400,
++						     accel_dev->debugfs_dir,
++						     data, fops);
++}
++
++void adf_cnv_dbgfs_rm(struct adf_accel_dev *accel_dev)
++{
++	debugfs_remove(accel_dev->cnv_dbgfile);
++	accel_dev->cnv_dbgfile = NULL;
++}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
+new file mode 100644
+index 000000000000..b02b0961c433
+--- /dev/null
++++ b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright(c) 2023 Intel Corporation */
++#ifndef ADF_CNV_DBG_H
++#define ADF_CNV_DBG_H
++
++struct adf_accel_dev;
++
++void adf_cnv_dbgfs_add(struct adf_accel_dev *accel_dev);
++void adf_cnv_dbgfs_rm(struct adf_accel_dev *accel_dev);
++
++#endif
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
+index 46dd81074166..18a382508542 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
+@@ -96,6 +96,7 @@ int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
+ int adf_send_admin_hb_timer(struct adf_accel_dev *accel_dev, uint32_t ticks);
+ int adf_get_fw_timestamp(struct adf_accel_dev *accel_dev, u64 *timestamp);
+ int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, size_t buff_size);
++int adf_get_cnv_stats(struct adf_accel_dev *accel_dev, u16 ae, u16 *err_cnt, u16 *latest_err);
+ int adf_init_arb(struct adf_accel_dev *accel_dev);
+ void adf_exit_arb(struct adf_accel_dev *accel_dev);
+ void adf_update_ring_arb(struct adf_etr_ring_data *ring);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+index 395bb493f20c..477efcc81a16 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+@@ -5,6 +5,7 @@
+ #include "adf_accel_devices.h"
+ #include "adf_cfg.h"
+ #include "adf_common_drv.h"
++#include "adf_cnv_dbgfs.h"
+ #include "adf_dbgfs.h"
+ #include "adf_fw_counters.h"
+ #include "adf_heartbeat_dbgfs.h"
+@@ -64,6 +65,7 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
+ 		adf_fw_counters_dbgfs_add(accel_dev);
+ 		adf_heartbeat_dbgfs_add(accel_dev);
+ 		adf_pm_dbgfs_add(accel_dev);
++		adf_cnv_dbgfs_add(accel_dev);
+ 	}
+ }
+ 
+@@ -77,6 +79,7 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
+ 		return;
+ 
+ 	if (!accel_dev->is_vf) {
++		adf_cnv_dbgfs_rm(accel_dev);
+ 		adf_pm_dbgfs_rm(accel_dev);
+ 		adf_heartbeat_dbgfs_rm(accel_dev);
+ 		adf_fw_counters_dbgfs_rm(accel_dev);
+diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
+index 2ebbec75d778..9e5ce419d875 100644
+--- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
++++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
+@@ -19,6 +19,7 @@ enum icp_qat_fw_init_admin_cmd_id {
+ 	ICP_QAT_FW_DC_CHAIN_INIT = 11,
+ 	ICP_QAT_FW_HEARTBEAT_TIMER_SET = 13,
+ 	ICP_QAT_FW_TIMER_GET = 19,
++	ICP_QAT_FW_CNV_STATS_GET = 20,
+ 	ICP_QAT_FW_PM_STATE_CONFIG = 128,
+ 	ICP_QAT_FW_PM_INFO = 129,
+ };
+@@ -65,6 +66,10 @@ struct icp_qat_fw_init_admin_resp {
+ 			__u16 version_major_num;
+ 		};
+ 		__u32 extended_features;
++		struct {
++			__u16 error_count;
++			__u16 latest_error;
++		};
+ 	};
+ 	__u64 opaque_data;
+ 	union {
 
-Everything above is happening in the interrupt handler (and in "hard" irq
-context).
+base-commit: af891c938a00638282c373813f5d1b765f458dd7
+-- 
+2.41.0
 
-I'm not really familiar with the implementation of virtio_crypto or with
-the crypto_engine interfaces. I assume the problem is on the side of
-virtio-crypto so I would like to kindly ask you as the maintainer of
-virtio-crypt to have a look at it. But if you think it is rather in the
-crypto_engine, please clarify that with Herbert. I have no strong opinion
-on this issue.
-
-Regards,
-Halil
-
-[ 31.033415][ C0] WARNING: CPU: 0 PID: 136 at crypto/crypto_engine.c:58 crypto_finalize_request (crypto/crypto_engine.c:58 (discriminator 23)) crypto_engine
-[   31.034131][    C0] Modules linked in: virtio_crypto(+) vmw_vsock_virtio_transport_common(+) crypto_engine vsock
-[   31.035326][    C0] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
-[ 31.035917][ C0] RIP: 0010:crypto_finalize_request (crypto/crypto_engine.c:58 (discriminator 23)) crypto_engine
-[ 31.036398][ C0] Code: 08 5b 5d 41 5c 41 5d e9 bf 88 1c c1 65 8b 05 b0 36 01 40 f6 c4 ff 74 12 a9 00 00 0f 00 75 0b a9 00 00 f0 00 0f 84 54 ff ff ff <0f> 0b e9 4d ff ff ff 4c 8d 6b 38 4c 89 ef e8 8e 47 1b c4 48 8d bb
-All code
-========
-   0:	08 5b 5d             	or     %bl,0x5d(%rbx)
-   3:	41 5c                	pop    %r12
-   5:	41 5d                	pop    %r13
-   7:	e9 bf 88 1c c1       	jmp    0xffffffffc11c88cb
-   c:	65 8b 05 b0 36 01 40 	mov    %gs:0x400136b0(%rip),%eax        # 0x400136c3
-  13:	f6 c4 ff             	test   $0xff,%ah
-  16:	74 12                	je     0x2a
-  18:	a9 00 00 0f 00       	test   $0xf0000,%eax
-  1d:	75 0b                	jne    0x2a
-  1f:	a9 00 00 f0 00       	test   $0xf00000,%eax
-  24:	0f 84 54 ff ff ff    	je     0xffffffffffffff7e
-  2a:*	0f 0b                	ud2		<-- trapping instruction
-  2c:	e9 4d ff ff ff       	jmp    0xffffffffffffff7e
-  31:	4c 8d 6b 38          	lea    0x38(%rbx),%r13
-  35:	4c 89 ef             	mov    %r13,%rdi
-  38:	e8 8e 47 1b c4       	call   0xffffffffc41b47cb
-  3d:	48                   	rex.W
-  3e:	8d                   	.byte 0x8d
-  3f:	bb                   	.byte 0xbb
-
-Code starting with the faulting instruction
-===========================================
-   0:	0f 0b                	ud2
-   2:	e9 4d ff ff ff       	jmp    0xffffffffffffff54
-   7:	4c 8d 6b 38          	lea    0x38(%rbx),%r13
-   b:	4c 89 ef             	mov    %r13,%rdi
-   e:	e8 8e 47 1b c4       	call   0xffffffffc41b47a1
-  13:	48                   	rex.W
-  14:	8d                   	.byte 0x8d
-  15:	bb                   	.byte 0xbb
-[   31.037591][    C0] RSP: 0018:ffffc90000007da0 EFLAGS: 00010046
-[   31.037976][    C0] RAX: 0000000080010002 RBX: ffff888006c87428 RCX: 1ffffffff0c0e523
-[   31.038471][    C0] RDX: 0000000000000000 RSI: ffff88810d0819e8 RDI: ffff888006c87449
-[   31.038967][    C0] RBP: ffff88810d0819e8 R08: 0000000000000000 R09: fffffbfff0b04f04
-[   31.039463][    C0] R10: ffffffff85827823 R11: ffffffff842013e6 R12: 0000000000000000
-[   31.039963][    C0] R13: 0000000000000001 R14: ffff88810d081a18 R15: dffffc0000000000
-[   31.040475][    C0] FS:  00007f80c0cc6800(0000) GS:ffff88811ae00000(0000) knlGS:0000000000000000
-[   31.041058][    C0] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   31.041473][    C0] CR2: 00007f22ad455270 CR3: 0000000106b22000 CR4: 00000000000006f0
-[   31.042024][    C0] Call Trace:
-[   31.042250][    C0]  <IRQ>
-[ 31.042433][ C0] ? __warn (kernel/panic.c:673) 
-[ 31.042710][ C0] ? crypto_finalize_request (crypto/crypto_engine.c:58 (discriminator 23)) crypto_engine
-[ 31.043161][ C0] ? report_bug (lib/bug.c:180 lib/bug.c:219) 
-[ 31.043451][ C0] ? handle_bug (arch/x86/kernel/traps.c:237 (discriminator 1)) 
-[ 31.043728][ C0] ? exc_invalid_op (arch/x86/kernel/traps.c:258 (discriminator 1)) 
-[ 31.044039][ C0] ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:568) 
-[ 31.044385][ C0] ? asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636) 
-[ 31.044746][ C0] ? crypto_finalize_request (crypto/crypto_engine.c:58 (discriminator 23)) crypto_engine
-[ 31.045202][ C0] virtcrypto_dataq_callback (drivers/crypto/virtio/virtio_crypto_core.c:91) virtio_crypto
-[ 31.045661][ C0] ? __pfx_virtcrypto_dataq_callback (drivers/crypto/virtio/virtio_crypto_core.c:76) virtio_crypto
-[ 31.046148][ C0] ? __pfx_do_raw_spin_lock (kernel/locking/spinlock_debug.c:113) 
-[ 31.046499][ C0] vring_interrupt (drivers/virtio/virtio_ring.c:2598) 
-[ 31.046806][ C0] vp_vring_interrupt (drivers/virtio/virtio_pci_common.c:67 (discriminator 2)) 
-[ 31.047125][ C0] ? __pfx_vp_vring_interrupt (drivers/virtio/virtio_pci_common.c:60) 
-[ 31.047477][ C0] __handle_irq_event_percpu (kernel/irq/handle.c:158) 
-[ 31.047845][ C0] handle_irq_event (kernel/irq/handle.c:195 kernel/irq/handle.c:210) 
-[ 31.048147][ C0] handle_edge_irq (kernel/irq/chip.c:833) 
-[ 31.048454][ C0] __common_interrupt (arch/x86/kernel/irq.c:271) 
-[ 31.048767][ C0] common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 47)) 
-[   31.049071][    C0]  </IRQ>
-[   31.049273][    C0]  <TASK>
-[ 31.049468][ C0] asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636) 
-[ 31.049805][ C0] RIP: 0010:unwind_next_frame (arch/x86/kernel/unwind_orc.c:494)
