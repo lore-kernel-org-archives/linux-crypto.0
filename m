@@ -2,75 +2,85 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 671DFE7D0BC
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 02:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB30E7D0BB
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 02:41:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbjIVCLN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 22:11:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57708 "EHLO
+        id S230160AbjIVClK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 22:41:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbjIVCLM (ORCPT
+        with ESMTP id S230162AbjIVClJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 22:11:12 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8A8F1;
-        Thu, 21 Sep 2023 19:11:03 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qjVd2-00GxCV-E2; Fri, 22 Sep 2023 10:10:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Sep 2023 10:10:51 +0800
-Date:   Fri, 22 Sep 2023 10:10:51 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 6.6
-Message-ID: <ZQz3qxwwAjDaqi5V@gondor.apana.org.au>
-References: <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
- <Y0zcWCmNmdXnX8RP@gondor.apana.org.au>
- <Y1thZ/+Gh/ONyf7x@gondor.apana.org.au>
- <Y7fmtJHWT1Zx+A1j@gondor.apana.org.au>
- <ZARrt99wJb7IhoY4@gondor.apana.org.au>
- <ZFeldCJcieIlXKJ8@gondor.apana.org.au>
- <ZHQe9A8CC93iCFMG@gondor.apana.org.au>
- <ZKtH5zrS4pR22PGT@gondor.apana.org.au>
- <ZOLcCC523FoBAyv0@gondor.apana.org.au>
- <ZPAiMYaqUslSyZ6+@gondor.apana.org.au>
+        Thu, 21 Sep 2023 22:41:09 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3977B1A2;
+        Thu, 21 Sep 2023 19:41:03 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D097C433C7;
+        Fri, 22 Sep 2023 02:41:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695350462;
+        bh=XhildR46aXcqKC9XbhSD2gq87OCF6FJdshNIl98rDAI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l3PefqkGLuAaVdYgWFLjyomMX35Vmckz8mc3nwg4FRyBl3bSvU+v3xdVlnJ8APBW5
+         A6Ziy46T33PNVCL5WJIPB1Sljs42W2ANni4sTi3kGlI3kbWPgZg5V2zGuwfTYPbbdr
+         SVoWbgHjjMRKYO36he0yQI51w6Ygt9FpwpBbze4UMa4WZ5WZgQpaRegAq0IWps0G9S
+         2EodQ22WUye6Z/VrcXw4RU6PGcOsY4nFT5GoGeS5t5mMhDxqNnePp6g+uTwBe0cqxs
+         rQCGGb0UIO5akxq4l+/hfHRZbXGr/1uuklsjqTw+QXcFvmXknRKnP4KccbJZmIj5M6
+         AKrwthOqZaf4A==
+Date:   Thu, 21 Sep 2023 19:41:00 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gaurav Jain <gaurav.jain@nxp.com>
+Cc:     Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>,
+        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Aisheng Dong <aisheng.dong@nxp.com>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx@nxp.com
+Subject: Re: [PATCH] crypto: caam/jr - fix Chacha20 + Poly1305 self test
+ failure
+Message-ID: <20230922024100.GA935@sol.localdomain>
+References: <20230921124237.2364827-1-gaurav.jain@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZPAiMYaqUslSyZ6+@gondor.apana.org.au>
+In-Reply-To: <20230921124237.2364827-1-gaurav.jain@nxp.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Thu, Sep 21, 2023 at 06:12:37PM +0530, Gaurav Jain wrote:
+> key buffer is not copied in chachapoly_setkey function,
+> results in wrong output for encryption/decryption operation.
+> 
+> fix this by memcpy the key in caam_ctx key arrary
+> 
+> Fixes: d6bbd4eea243 ("crypto: caam/jr - add support for Chacha20 + Poly1305")
+> Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
+> ---
+>  drivers/crypto/caam/caamalg.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+> index eba2d750c3b0..066f08a3a040 100644
+> --- a/drivers/crypto/caam/caamalg.c
+> +++ b/drivers/crypto/caam/caamalg.c
+> @@ -575,7 +575,8 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
+>  	if (keylen != CHACHA_KEY_SIZE + saltlen)
+>  		return -EINVAL;
+>  
+> -	ctx->cdata.key_virt = key;
+> +	memcpy(ctx->key, key, keylen);
+> +	ctx->cdata.key_virt = ctx->key;
+>  	ctx->cdata.keylen = keylen - saltlen;
+>  
 
-The following changes since commit 0bb80ecc33a8fb5a682236443c1e740d5c917d1d:
+Huh, so this driver just ignored the key?  Is anyone using the ChaCha20Poly1305
+support in this driver?  Based on this bug existing, that seems unlikely.  If
+that's the case, wouldn't it be better just to remove the ChaCha20Poly1305
+support from this driver so that the code doesn't need to be maintained?
 
-  Linux 6.6-rc1 (2023-09-10 16:28:41 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.6-p3 
-
-for you to fetch changes up to 21155620fbf2edbb071144894ff9d67ba9a1faa0:
-
-  crypto: sm2 - Fix crash caused by uninitialized context (2023-09-20 13:10:10 +0800)
-
-----------------------------------------------------------------
-This push fixes a regression in sm2.
-----------------------------------------------------------------
-
-Tianjia Zhang (1):
-      crypto: sm2 - Fix crash caused by uninitialized context
-
- crypto/sm2.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
