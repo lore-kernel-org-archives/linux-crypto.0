@@ -2,85 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB30E7D0BB
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 02:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F204AE7D0C2
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 03:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbjIVClK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Sep 2023 22:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47324 "EHLO
+        id S229497AbjIVDKj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Sep 2023 23:10:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230162AbjIVClJ (ORCPT
+        with ESMTP id S229476AbjIVDKj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Sep 2023 22:41:09 -0400
+        Thu, 21 Sep 2023 23:10:39 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3977B1A2;
-        Thu, 21 Sep 2023 19:41:03 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D097C433C7;
-        Fri, 22 Sep 2023 02:41:02 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D3C102
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Sep 2023 20:10:32 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B7CC433C8;
+        Fri, 22 Sep 2023 03:10:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695350462;
-        bh=XhildR46aXcqKC9XbhSD2gq87OCF6FJdshNIl98rDAI=;
+        s=k20201202; t=1695352232;
+        bh=PIaW8pwRk5aS2qNBtO7eK5Mrj5VdfA8PDu73RiKF6wA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l3PefqkGLuAaVdYgWFLjyomMX35Vmckz8mc3nwg4FRyBl3bSvU+v3xdVlnJ8APBW5
-         A6Ziy46T33PNVCL5WJIPB1Sljs42W2ANni4sTi3kGlI3kbWPgZg5V2zGuwfTYPbbdr
-         SVoWbgHjjMRKYO36he0yQI51w6Ygt9FpwpBbze4UMa4WZ5WZgQpaRegAq0IWps0G9S
-         2EodQ22WUye6Z/VrcXw4RU6PGcOsY4nFT5GoGeS5t5mMhDxqNnePp6g+uTwBe0cqxs
-         rQCGGb0UIO5akxq4l+/hfHRZbXGr/1uuklsjqTw+QXcFvmXknRKnP4KccbJZmIj5M6
-         AKrwthOqZaf4A==
-Date:   Thu, 21 Sep 2023 19:41:00 -0700
+        b=jI7/qcOl4n/ZGN2TMG9hoA2TY40d1N4fqRAWpgHRiL1r51eaFDxIi/4LEwtv0ELr9
+         H+24XPwdHhbKWGD3xGL3N1vNT91tWhkbHANLH/HB8Cjsy+vHM2wjuY2qJFdvrf/+mh
+         mXXilD0ORqq9ENEXpwK2fV+1+5tCQ7j46wUODrTfk0bHfTNlpJ24Ec3g2v5JbOd895
+         U/mUfmhkcCvP2UzDMBLsj614rlS4125ZzujmDqu2iLzvsbgaet4d2m+ypf7HhaPHFq
+         MaSz2wQpGnLiVlykmxbHOMJt+prTswUs9TDVeu42WuBOX2rm4uK29g9QCaeR6DjR2L
+         7iLUHklEHqNwA==
+Date:   Thu, 21 Sep 2023 20:10:30 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gaurav Jain <gaurav.jain@nxp.com>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Aisheng Dong <aisheng.dong@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx@nxp.com
-Subject: Re: [PATCH] crypto: caam/jr - fix Chacha20 + Poly1305 self test
- failure
-Message-ID: <20230922024100.GA935@sol.localdomain>
-References: <20230921124237.2364827-1-gaurav.jain@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 4/8] crypto: skcipher - Add lskcipher
+Message-ID: <20230922031030.GB935@sol.localdomain>
+References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+ <20230914082828.895403-5-herbert@gondor.apana.org.au>
+ <20230920062551.GB2739@sol.localdomain>
+ <ZQvHUc9rd4ud2NCB@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230921124237.2364827-1-gaurav.jain@nxp.com>
+In-Reply-To: <ZQvHUc9rd4ud2NCB@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 21, 2023 at 06:12:37PM +0530, Gaurav Jain wrote:
-> key buffer is not copied in chachapoly_setkey function,
-> results in wrong output for encryption/decryption operation.
+On Thu, Sep 21, 2023 at 12:32:17PM +0800, Herbert Xu wrote:
+> On Tue, Sep 19, 2023 at 11:25:51PM -0700, Eric Biggers wrote:
+> >
+> > Is lskcipher only for algorithms that can be computed incrementally?  That would
+> > exclude the wide-block modes, and maybe others too.  And if so, what is the
 > 
-> fix this by memcpy the key in caam_ctx key arrary
-> 
-> Fixes: d6bbd4eea243 ("crypto: caam/jr - add support for Chacha20 + Poly1305")
-> Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
-> ---
->  drivers/crypto/caam/caamalg.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-> index eba2d750c3b0..066f08a3a040 100644
-> --- a/drivers/crypto/caam/caamalg.c
-> +++ b/drivers/crypto/caam/caamalg.c
-> @@ -575,7 +575,8 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
->  	if (keylen != CHACHA_KEY_SIZE + saltlen)
->  		return -EINVAL;
->  
-> -	ctx->cdata.key_virt = key;
-> +	memcpy(ctx->key, key, keylen);
-> +	ctx->cdata.key_virt = ctx->key;
->  	ctx->cdata.keylen = keylen - saltlen;
->  
+> You mean things like adiantum? 
 
-Huh, so this driver just ignored the key?  Is anyone using the ChaCha20Poly1305
-support in this driver?  Based on this bug existing, that seems unlikely.  If
-that's the case, wouldn't it be better just to remove the ChaCha20Poly1305
-support from this driver so that the code doesn't need to be maintained?
+Yes, wide-block modes such as Adiantum and HCTR2 require multiple passes over
+the data.  As do SIV modes such as AES-GCM-SIV (though AES-GCM-SIV isn't yet
+supported by the kernel, and it would be an "aead", not an "skcipher").
+
+> We could add a flag for that so
+> the skcipher wrapper linearises the input before calling lskcipher.
+
+That makes sense, but I suppose this would mean adding code that allocates huge
+scratch buffers, like what the infamous crypto/scompress.c does?  I hope that we
+can ensure that these buffers are only allocated when they are actually needed.
+
+> 
+> > model for incremental computation?  Based on crypto_lskcipher_crypt_sg(), all
+> > the state is assumed to be carried forward in the "IV".  Does that work for all
+> > algorithms?  Note that shash has an arbitrary state struct (shash_desc) instead.
+> 
+> Is there any practical difference? You could always represent
+> one as the other, no?
+> 
+> The only case where it would matter is if an algorithm had both
+> an IV as well as additional state that should not be passed along
+> as part of the IV, do you have anything in mind?
+
+Well, IV is *initialization vector*: a value that the algorithm uses as input.
+It shouldn't be overloaded to represent some internal intermediate state.  We
+already made this mistake with the iv vs. iv_out thing, which only ever got
+implemented by CBC and CTR, and people repeatedly get confused by.  So we know
+it technically works for those two algorithms, but not anything else.
+
+With ChaCha, for example, it makes more sense to use 16-word state matrix as the
+intermediate state instead of the 4-word "IV".  (See chacha_crypt().)
+Especially for XChaCha, so that the HChaCha step doesn't need to be repeated.
 
 - Eric
