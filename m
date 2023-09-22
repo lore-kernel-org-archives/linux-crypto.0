@@ -2,548 +2,254 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C4CE6FE3D
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 14:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB92E6FE41
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Sep 2023 15:14:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbjIVOh0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Sep 2023 10:37:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57074 "EHLO
+        id S232334AbjIVPOE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Sep 2023 11:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230043AbjIVOh0 (ORCPT
+        with ESMTP id S232494AbjIVPOD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Sep 2023 10:37:26 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB815100
-        for <linux-crypto@vger.kernel.org>; Fri, 22 Sep 2023 07:37:19 -0700 (PDT)
+        Fri, 22 Sep 2023 11:14:03 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E758196
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Sep 2023 08:13:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695393439; x=1726929439;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=49WOHsn1WqsUz7QJy+NP6H3+Vx00HgV8fwJp3tNkqNA=;
-  b=MkhTp9fm4KGRVzwhSs89Z/TYvVZv9Bl5veJBHYeyw3lkvXD4ZgaxPx2o
-   AfHD9WD6dnO4k0wYHDRPtzwuURdHdSI0D6fkZeRBHvAnWme5iOBWak6AI
-   iOfEQZUj0ht1OwSMxS+OIdd23Abw/vTK6iiG7Q7piTUh+cGCmugJWXUS/
-   v0D4kY0aVAN536NYNw/6aJqG0F29tFoUPcip13lxwfEKrpCJQKa5XVUux
-   ANwg8BCPKgKhdr88yRAc6d+WlUOLGCWQ6SnDG7B0noTVW+DUZM2gwzs00
-   7k/G8vWE+k4h1WZGzMHvX0R1pPY/1qXSJKGYmpdDQ6Xt3OH5WE7CH1hK6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="444938880"
+  t=1695395638; x=1726931638;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=tHsEDCH8Rkbnrkz4qWBLnVVWQjaN3A0I96U7fHRtabA=;
+  b=AxIEAVqrDflueRN3iFXzz331Tw4D5AXwZ/24eisaYq3bxX7meNqt+UaZ
+   NxvymkUBQfnFS6UuSS283fa4HbgZL7IKK7pkxaY5pq/bRDpzDavfmpIPT
+   h1tkeB++O+JBGesAexu0WqSsakKaEQpGwj+yVkn7jYBSK1tFpAUkMMa43
+   YDWG0ueXiHra9CTwKTDpHA9DQIvWpsfqnxi/mj6zD7qg80hPoA2BIapBc
+   +mz5yTECElJGBDasjfv10FR6Y79hFOFfLyvMZczHleX2wbV08DIJ1+yzp
+   74aWNsayy1oSW01w8D/v0F4TIYeH/tK9hFXY/oP8avIp2FPw/Gnm/2fpE
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="383601169"
 X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
-   d="scan'208";a="444938880"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 07:37:19 -0700
+   d="scan'208";a="383601169"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 08:13:57 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="890826184"
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="750873091"
 X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
-   d="scan'208";a="890826184"
-Received: from r007s007_zp31l10c01.deacluster.intel.com (HELO fedora.deacluster.intel.com) ([10.219.171.169])
-  by fmsmga001.fm.intel.com with ESMTP; 22 Sep 2023 07:36:24 -0700
-From:   Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v3] crypto: qat - add cnv_errors debugfs file
-Date:   Fri, 22 Sep 2023 16:34:57 +0200
-Message-ID: <20230922143547.258058-1-lucas.segarra.fernandez@intel.com>
-X-Mailer: git-send-email 2.41.0
+   d="scan'208";a="750873091"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Sep 2023 08:13:57 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 22 Sep 2023 08:13:56 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 22 Sep 2023 08:13:56 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 22 Sep 2023 08:13:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iXEKojTn8wpLuUTac9N+Jclf2wuAygJQa2LsQiF1JDJ4H1ER6VSdD02X9yNDjvGUh2NAjkVj4qZaTVEm6lyY5rb9p8qmgpfl8077uBWA0TfO9zGFg9z/xalZ+NyhKEvqm+nDpeOxycZWm7lOr8A7dFLWpicHKvMcrp2LLKjGZx3jqysDQRxalQYcNCiSjLOq9r8MovUP0J+9pv6FDrWQ6kXBaaqvY0HnoNy+11txm5NCOB6Rxbr3DWoHPkmJwCwaRb4Qk3uuLEChMEUf7JE3TACRgNP/LwbfSjrJzq8NRhQxPoqnzlpoiERjqaXbV6YHIVLTnMVxEQXKUzgjQmR6tA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=71XKdsnqtCBP7do/c90R7k2U0RZaWTe+XPuXusDAQK8=;
+ b=nu1+zjL8MnVQlmTpDKcO4HgD6N9z184jBC9LbG3HrffOyoRWGkrWKfLPvLUzwbXoS9G1aqSoX9/UHagfHe+xI+JQZVb/InCtkGpmjzG+A7JZRGebusLAo7AMYcEdw5Yra/x1geqO10feQX+0NJG3vVxMNZfG6HvPwK/vzaFumjOfOwqewZnujsCncpEoAlK7oiN5hyfz0IrLcMKA7bqpF3kpqQrToILPzY6z8t92EEYD/6JcSzxL7iMNfaFTUPQHmYOg/LEo+fSlUW4SomHBiAs7mXHYkPNo1q6AxDPQ5BDlxhPZtewwoi58QrTjTfjnGLnhpRlt/1mUl8Ueykgk6Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by CY5PR11MB6282.namprd11.prod.outlook.com (2603:10b6:930:22::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.24; Fri, 22 Sep
+ 2023 15:13:53 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::4c02:d735:4942:ad0c]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::4c02:d735:4942:ad0c%4]) with mapi id 15.20.6813.017; Fri, 22 Sep 2023
+ 15:13:53 +0000
+Date:   Fri, 22 Sep 2023 16:13:40 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Michael Hrivnak <mhrivnak@redhat.com>,
+        Eric Garver <egarver@redhat.com>, <qat-linux@intel.com>,
+        <linux-crypto@vger.kernel.org>, <dm-devel@redhat.com>
+Subject: Re: [PATCH] qat: fix deadlock in backlog processing
+Message-ID: <ZQ2vJNs/7ZzY44z1@gcabiddu-mobl1.ger.corp.intel.com>
+References: <af9581e2-58f9-cc19-428f-6f18f1f83d54@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <af9581e2-58f9-cc19-428f-6f18f1f83d54@redhat.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DU2P251CA0010.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:10:230::25) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|CY5PR11MB6282:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0c124889-06dc-47ea-9763-08dbbb7e8882
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zJETZFPiMHpQM7tP1gKzyt3X8DcMbwJ8i2ogHcO2oL/DN+bgU2r1fRyA8BKhpX4soxBxOFaPUUuzFbQZ8APowiOz3N+GgCKIasfgWmEL+IHGMfN58eARegkyjpcOPS+6OV2R9kpIcHhDEKVoumFWoC1bFo0pzkUKQFb9+0ziFFqTtVipcVux47XktwBJ4l2aCIAabKzmyY+f1rwFVzJPFsvs92Zf1qb0quSjHInFBCYvHyOLb9pXhG/8DMNIE/YrdxZPR3tBA2Ler/4Dbchm1n83NXOZlNrBxKmXZW1Iocl7l8tq/7djvEo2ABCtBJ0ikHk9nkGdGgsri/DiiHIQ6jWOclXX1GV0pUOxbgO/41nGfPAinjOGt//R7vevXoq0E/3yveMEzX+o9sumhzZ4siSmII4jZ0ZLdVW+r9iy24v1w+K4dzt5xkRIUKl97PGmtQCdElzEtlOU5vivKXy9cSKvTClGo9dAFc0q6AkZxuFgGC92CSozfWDKKr+dIJJmfVHCnRnV59icVysopcGP6bj5waJvoQO+Bwgv3bNnoYySeEx331pi/tmMFLoLEPfGDSKiak1bD6NKS4mTr9Eg6A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(136003)(366004)(396003)(451199024)(186009)(1800799009)(966005)(6486002)(86362001)(5660300002)(44832011)(36916002)(6506007)(38100700002)(66476007)(66556008)(6512007)(54906003)(41300700001)(66946007)(6666004)(478600001)(316002)(84970400001)(6916009)(8936002)(82960400001)(8676002)(26005)(2906002)(4326008)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Kdv7ou9WzeFoQbPoy3Ov5PA8VrAkIBjHNiLhlaz3zYy9gt/fWmOCij+cQ8bB?=
+ =?us-ascii?Q?gEtIWca180e9nowvjfVcWmvc5nYTYSwIr2+/kP035DQqGQGMBdwC1K9uSavW?=
+ =?us-ascii?Q?TqXPj19YBKG1ETn44b15ZBbHQE0IqgmGwgeR1kcQRck2m1WBfCOkvNH5Rb6+?=
+ =?us-ascii?Q?q6zJ1rU6iTQRLC53S4q40j6XxuqNMnOCS31+YGra6OnskXa1DvSKhP/YHF8T?=
+ =?us-ascii?Q?66sMm9+7nRLDjQ6oJapNEl6cxXshNGTg6ItdKDw5n/2IIbYZfoeCK/LY/GrV?=
+ =?us-ascii?Q?+5kIiJnb5//onf23Wo7sLQ2R657ZgAGyTtv46cUAJA6TfGdwjE/mty7rBnVM?=
+ =?us-ascii?Q?Rn/mIo9Kh5oBxoeQLgHlH/Shguv+mn26MOfggRt4LTWcaro08aYT6yXHsoQy?=
+ =?us-ascii?Q?Fe8PvSPMoGMV6gJASIN7h8STpjAhtYDd9dxBXchMaPdt0ke5ARGPsKdUz/cY?=
+ =?us-ascii?Q?Lo5IFD1XfqscjaC32w2/3gcxA+Z70rcFc9fYF0QnwO7cOZhiT8y6MDSmbMze?=
+ =?us-ascii?Q?qI0R5pZq8GWx47cw/81SggMGzSnbCfRYRGXppNE1EmEgVcKWCKCTU9sRpmRs?=
+ =?us-ascii?Q?hELqW80Y+0wCJpt8mT6YnfCINmQerk7K2thfxp5lHNZNVa35erEien122JWQ?=
+ =?us-ascii?Q?OmXUlh/+RatuQrKKhhhHp/ZobvIJnXDcuvLyBhUrwbLCipuf0d9ISJfcAVvJ?=
+ =?us-ascii?Q?239fJnhVZXWhOrkXiKuTKpMAE4Es+zpsGYmrE7M+04kjh9yztXdTJeJm6OPJ?=
+ =?us-ascii?Q?/JKumxu8DHb6TI+/mVDRSAORO+YtE/HrCxMyyVciSmGfODwBxxpmbpC9FMLZ?=
+ =?us-ascii?Q?jNpAwL/kXBlLEDlWI4lTAtxUMveOSN8BqkxyvjRFpQevj4t6DTRTPetreMB1?=
+ =?us-ascii?Q?RDqsz5erxvZWfqyB1cRYedxpw/kS+eWLjvNw80w6emdNo4eOUZflnsNY/J8+?=
+ =?us-ascii?Q?pJIeZ0IlaxNkucw3xHfYPlBVvxGgfM4BimYDSTOqI0KXGAw6D3qJbqoWTP30?=
+ =?us-ascii?Q?PA3gt626f/HBYrliEUvgaiwpGPUekYnc5TfoF+I8QpJHG++EaPUjV1/k93R6?=
+ =?us-ascii?Q?9RNDdACVs7exLLS5x8ysybj88NN0Meo2V1tiCNmolPz0YcE/T9APRQJMD4k/?=
+ =?us-ascii?Q?z15vYxWQt7b2rIQiM71GeWSafjF0lORAA/yvdR0rc2Q6PFHW173UakxnfNgM?=
+ =?us-ascii?Q?J5RHjK2YKDxGIjdnk4aLHS1W0O8wnN5cjUx25zPSgmYyaxIM33WcIfOD4qbj?=
+ =?us-ascii?Q?0zFvCDJvg+VZP84+SHEQIL/VJxrhmxxvhv4altwPDarjMOfSozPz97FSRVoY?=
+ =?us-ascii?Q?qq0p2575UxX90jr+vI+eKmQCwbhX1wviwhiBq23I1EsJhhV0Ajz/T7LaF0Cz?=
+ =?us-ascii?Q?ADJP+1FTRBHKV5Wos9Oj8wBK1GIdfRQ2ZDdVtUukJVPY5y+/fY17E0rwOPWp?=
+ =?us-ascii?Q?qou69GbqZShJ/L+X5kJv5+OtjslW7eYS3bKw4aryUAMP/1FvM4JN3HJIB9rA?=
+ =?us-ascii?Q?SLQ5zPIc+OSmBYLmeelS58xtU0t8A/JP2pppxnUwENfJ6ZJr/f1Z3NPByso0?=
+ =?us-ascii?Q?AnJT8c77vmVCqBiofb5oy1DjyqORrN/tHwtsyiNjYJd2QVgNO+UloSiDS3Gs?=
+ =?us-ascii?Q?1Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c124889-06dc-47ea-9763-08dbbb7e8882
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 15:13:53.6204
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WyTw61UEIyyDowd/LNbwgI1kKAn61dOH+TKeAF/+rVmz9/UdMXtMmGog6rpjN3iz0xLNmHh7jjmCr/6fMo/m878XGfXnmWYC5knG2jGxoP0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6282
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Compress and Verify (CnV) feature check and ensures data integrity
-in the compression operation. The implementation of CnV keeps a record
-of the CnV errors that have occurred since the driver was loaded.
+Hi Mikulas,
 
-Expose CnV error stats by providing the "cnv_errors" file under
-debugfs. This includes the number of errors detected up to now and
-the type of the last error. The error count is provided on a per
-Acceleration Engine basis and it is reset every time the driver is loaded.
+many thanks for reporting this issue and finding a solution.
 
-Signed-off-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
-v2 -> v3:
-- remove unneeded header inclussion
----
-v1 -> v2:
-- Rebase on top of latest version (v4) of crypto: qat - add pm_status debugfs file
----
- Documentation/ABI/testing/debugfs-driver-qat  |  13 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |   1 +
- .../crypto/intel/qat/qat_common/adf_admin.c   |  20 ++
- .../intel/qat/qat_common/adf_cnv_dbgfs.c      | 295 ++++++++++++++++++
- .../intel/qat/qat_common/adf_cnv_dbgfs.h      |  11 +
- .../intel/qat/qat_common/adf_common_drv.h     |   1 +
- .../crypto/intel/qat/qat_common/adf_dbgfs.c   |   3 +
- .../qat/qat_common/icp_qat_fw_init_admin.h    |   5 +
- 9 files changed, 350 insertions(+)
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
+On Thu, Sep 21, 2023 at 10:53:55PM +0200, Mikulas Patocka wrote:
+> I was evaluating whether it is feasible to use QAT with dm-crypt (the 
+> answer is that it is not - QAT is slower than AES-NI for this type of 
+> workload; QAT starts to be benefical for encryption requests longer than 
+> 64k).
+Correct. Is there anything that we can do to batch requests in a single
+call?
 
-diff --git a/Documentation/ABI/testing/debugfs-driver-qat b/Documentation/ABI/testing/debugfs-driver-qat
-index 0656f27d1042..b2db010d851e 100644
---- a/Documentation/ABI/testing/debugfs-driver-qat
-+++ b/Documentation/ABI/testing/debugfs-driver-qat
-@@ -68,3 +68,16 @@ Description:	(RO) Read returns power management information specific to the
- 		QAT device.
- 
- 		This attribute is only available for qat_4xxx devices.
-+
-+What:		/sys/kernel/debug/qat_<device>_<BDF>/cnv_errors
-+Date:		January 2024
-+KernelVersion:	6.7
-+Contact:	qat-linux@intel.com
-+Description:	(RO) Read returns, for each Acceleration Engine (AE), the number
-+		of errors and the type of the last error detected by the device
-+		when performing verified compression.
-+		Reported counters::
-+
-+			<N>: Number of Compress and Verify (CnV) errors and type
-+			     of the last CnV error detected by Acceleration
-+			     Engine N.
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 4ef3cccfeab4..47ab764fea4e 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -33,6 +33,7 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
- 				adf_fw_counters.o \
- 				adf_heartbeat.o \
- 				adf_heartbeat_dbgfs.o \
-+				adf_cnv_dbgfs.o \
- 				adf_pm_dbgfs.o \
- 				adf_gen4_pm_debugfs.o \
- 				adf_dbgfs.o
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index 374528da4933..041f7c168fb1 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -317,6 +317,7 @@ struct adf_accel_dev {
- 	atomic_t ref_count;
- 	struct dentry *debugfs_dir;
- 	struct dentry *fw_cntr_dbgfile;
-+	struct dentry *cnv_dbgfile;
- 	struct list_head list;
- 	struct module *owner;
- 	struct adf_accel_pci accel_pci_dev;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_admin.c b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-index 63eb8498d3fd..556007218df7 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_admin.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_admin.c
-@@ -405,6 +405,26 @@ int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, si
- 	return ret;
- }
- 
-+int adf_get_cnv_stats(struct adf_accel_dev *accel_dev, u16 ae, u16 *err_cnt, u16 *latest_err)
-+{
-+	struct icp_qat_fw_init_admin_req req = { };
-+	struct icp_qat_fw_init_admin_resp resp;
-+	int ret;
-+
-+	req.cmd_id = ICP_QAT_FW_CNV_STATS_GET;
-+
-+	ret = adf_put_admin_msg_sync(accel_dev, ae, &req, &resp);
-+	if (ret)
-+		return ret;
-+	if (resp.status)
-+		return -EPROTONOSUPPORT;
-+
-+	*err_cnt = resp.error_count;
-+	*latest_err = resp.latest_error;
-+
-+	return ret;
-+}
-+
- int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_admin_comms *admin;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
-new file mode 100644
-index 000000000000..0545787c17a4
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.c
-@@ -0,0 +1,295 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2023 Intel Corporation */
-+
-+#include <linux/bitfield.h>
-+#include <linux/debugfs.h>
-+#include <linux/kernel.h>
-+
-+#include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
-+#include "adf_cnv_dbgfs.h"
-+#include "qat_compression.h"
-+
-+#define CNV_DEBUGFS_FILENAME		"cnv_errors"
-+#define CNV_MIN_PADDING			16
-+
-+#define CNV_ERR_INFO_MASK		GENMASK(11, 0)
-+#define CNV_ERR_TYPE_MASK		GENMASK(15, 12)
-+#define CNV_SLICE_ERR_MASK		GENMASK(7, 0)
-+#define CNV_SLICE_ERR_SIGN_BIT_INDEX	7
-+#define CNV_DELTA_ERR_SIGN_BIT_INDEX	11
-+
-+enum cnv_error_type {
-+	CNV_ERR_TYPE_NONE,
-+	CNV_ERR_TYPE_CHECKSUM,
-+	CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH,
-+	CNV_ERR_TYPE_DECOMPRESSION,
-+	CNV_ERR_TYPE_TRANSLATION,
-+	CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH,
-+	CNV_ERR_TYPE_UNKNOWN,
-+	CNV_ERR_TYPES_COUNT
-+};
-+
-+#define CNV_ERROR_TYPE_GET(latest_err)	\
-+	min_t(u16, u16_get_bits(latest_err, CNV_ERR_TYPE_MASK), CNV_ERR_TYPE_UNKNOWN)
-+
-+#define CNV_GET_DELTA_ERR_INFO(latest_error)	\
-+	sign_extend32(latest_error, CNV_DELTA_ERR_SIGN_BIT_INDEX)
-+
-+#define CNV_GET_SLICE_ERR_INFO(latest_error)	\
-+	sign_extend32(latest_error, CNV_SLICE_ERR_SIGN_BIT_INDEX)
-+
-+#define CNV_GET_DEFAULT_ERR_INFO(latest_error)	\
-+	u16_get_bits(latest_error, CNV_ERR_INFO_MASK)
-+
-+enum cnv_fields {
-+	CNV_ERR_COUNT,
-+	CNV_LATEST_ERR,
-+	CNV_FIELDS_COUNT
-+};
-+
-+static const char * const cnv_field_names[CNV_FIELDS_COUNT] = {
-+	[CNV_ERR_COUNT] = "Total Errors",
-+	[CNV_LATEST_ERR] = "Last Error",
-+};
-+
-+static const char * const cnv_error_names[CNV_ERR_TYPES_COUNT] = {
-+	[CNV_ERR_TYPE_NONE] = "No Error",
-+	[CNV_ERR_TYPE_CHECKSUM] = "Checksum Error",
-+	[CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH] = "Length Error-P",
-+	[CNV_ERR_TYPE_DECOMPRESSION] = "Decomp Error",
-+	[CNV_ERR_TYPE_TRANSLATION] = "Xlat Error",
-+	[CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH] = "Length Error-C",
-+	[CNV_ERR_TYPE_UNKNOWN] = "Unknown Error",
-+};
-+
-+struct ae_cnv_errors {
-+	u16 ae;
-+	u16 err_cnt;
-+	u16 latest_err;
-+	bool is_comp_ae;
-+};
-+
-+struct cnv_err_stats {
-+	u16 ae_count;
-+	struct ae_cnv_errors ae_cnv_errors[];
-+};
-+
-+static s16 get_err_info(u8 error_type, u16 latest)
-+{
-+	switch (error_type) {
-+	case CNV_ERR_TYPE_DECOMP_PRODUCED_LENGTH:
-+	case CNV_ERR_TYPE_DECOMP_CONSUMED_LENGTH:
-+		return CNV_GET_DELTA_ERR_INFO(latest);
-+	case CNV_ERR_TYPE_DECOMPRESSION:
-+	case CNV_ERR_TYPE_TRANSLATION:
-+		return CNV_GET_SLICE_ERR_INFO(latest);
-+	default:
-+		return CNV_GET_DEFAULT_ERR_INFO(latest);
-+	}
-+}
-+
-+static void *qat_cnv_errors_seq_start(struct seq_file *sfile, loff_t *pos)
-+{
-+	struct cnv_err_stats *err_stats = sfile->private;
-+
-+	if (*pos == 0)
-+		return SEQ_START_TOKEN;
-+
-+	if (*pos > err_stats->ae_count)
-+		return NULL;
-+
-+	return &err_stats->ae_cnv_errors[*pos - 1];
-+}
-+
-+static void *qat_cnv_errors_seq_next(struct seq_file *sfile, void *v, loff_t *pos)
-+{
-+	struct cnv_err_stats *err_stats = sfile->private;
-+
-+	(*pos)++;
-+
-+	if (*pos > err_stats->ae_count)
-+		return NULL;
-+
-+	return &err_stats->ae_cnv_errors[*pos - 1];
-+}
-+
-+static void qat_cnv_errors_seq_stop(struct seq_file *sfile, void *v)
-+{
-+}
-+
-+static int qat_cnv_errors_seq_show(struct seq_file *sfile, void *v)
-+{
-+	struct ae_cnv_errors *ae_errors;
-+	unsigned int i;
-+	s16 err_info;
-+	u8 err_type;
-+
-+	if (v == SEQ_START_TOKEN) {
-+		seq_puts(sfile, "AE ");
-+		for (i = 0; i < CNV_FIELDS_COUNT; ++i)
-+			seq_printf(sfile, " %*s", CNV_MIN_PADDING, cnv_field_names[i]);
-+	} else {
-+		ae_errors = v;
-+
-+		if (!ae_errors->is_comp_ae)
-+			return 0;
-+
-+		err_type = CNV_ERROR_TYPE_GET(ae_errors->latest_err);
-+		err_info = get_err_info(err_type, ae_errors->latest_err);
-+
-+		seq_printf(sfile, "%d:", ae_errors->ae);
-+		seq_printf(sfile, " %*d", CNV_MIN_PADDING, ae_errors->err_cnt);
-+		seq_printf(sfile, "%*s [%d]", CNV_MIN_PADDING, cnv_error_names[err_type],
-+			   err_info);
-+	}
-+	seq_putc(sfile, '\n');
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations qat_cnv_errors_sops = {
-+	.start = qat_cnv_errors_seq_start,
-+	.next = qat_cnv_errors_seq_next,
-+	.stop = qat_cnv_errors_seq_stop,
-+	.show = qat_cnv_errors_seq_show,
-+};
-+
-+/**
-+ * cnv_err_stats_alloc() - Get CNV stats for the provided device.
-+ * @accel_dev: Pointer to a QAT acceleration device
-+ *
-+ * Allocates and populates table of CNV errors statistics for each non-admin AE
-+ * available through the supplied acceleration device. The caller becomes the
-+ * owner of such memory and is responsible for the deallocation through a call
-+ * to kfree().
-+ *
-+ * Returns: a pointer to a dynamically allocated struct cnv_err_stats on success
-+ * or a negative value on error.
-+ */
-+static struct cnv_err_stats *cnv_err_stats_alloc(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_data = GET_HW_DATA(accel_dev);
-+	struct cnv_err_stats *err_stats;
-+	unsigned long ae_count;
-+	unsigned long ae_mask;
-+	size_t err_stats_size;
-+	unsigned long ae;
-+	unsigned int i;
-+	u16 latest_err;
-+	u16 err_cnt;
-+	int ret;
-+
-+	if (!adf_dev_started(accel_dev)) {
-+		dev_err(&GET_DEV(accel_dev), "QAT Device not started\n");
-+		return ERR_PTR(-EBUSY);
-+	}
-+
-+	/* Ignore the admin AEs */
-+	ae_mask = hw_data->ae_mask & ~hw_data->admin_ae_mask;
-+	ae_count = hweight_long(ae_mask);
-+	if (unlikely(!ae_count))
-+		return ERR_PTR(-EINVAL);
-+
-+	err_stats_size = struct_size(err_stats, ae_cnv_errors, ae_count);
-+	err_stats = kmalloc(err_stats_size, GFP_KERNEL);
-+	if (!err_stats)
-+		return ERR_PTR(-ENOMEM);
-+
-+	err_stats->ae_count = ae_count;
-+
-+	i = 0;
-+	for_each_set_bit(ae, &ae_mask, GET_MAX_ACCELENGINES(accel_dev)) {
-+		ret = adf_get_cnv_stats(accel_dev, ae, &err_cnt, &latest_err);
-+		if (ret) {
-+			dev_dbg(&GET_DEV(accel_dev),
-+				"Failed to get CNV stats for ae %ld, [%d].\n",
-+				ae, ret);
-+			err_stats->ae_cnv_errors[i++].is_comp_ae = false;
-+			continue;
-+		}
-+		err_stats->ae_cnv_errors[i].is_comp_ae = true;
-+		err_stats->ae_cnv_errors[i].latest_err = latest_err;
-+		err_stats->ae_cnv_errors[i].err_cnt = err_cnt;
-+		err_stats->ae_cnv_errors[i].ae = ae;
-+		i++;
-+	}
-+
-+	return err_stats;
-+}
-+
-+static int qat_cnv_errors_file_open(struct inode *inode, struct file *file)
-+{
-+	struct adf_accel_dev *accel_dev = inode->i_private;
-+	struct seq_file *cnv_errors_seq_file;
-+	struct cnv_err_stats *cnv_err_stats;
-+	int ret;
-+
-+	cnv_err_stats = cnv_err_stats_alloc(accel_dev);
-+	if (IS_ERR(cnv_err_stats))
-+		return PTR_ERR(cnv_err_stats);
-+
-+	ret = seq_open(file, &qat_cnv_errors_sops);
-+	if (unlikely(ret)) {
-+		kfree(cnv_err_stats);
-+		return ret;
-+	}
-+
-+	cnv_errors_seq_file = file->private_data;
-+	cnv_errors_seq_file->private = cnv_err_stats;
-+	return ret;
-+}
-+
-+static int qat_cnv_errors_file_release(struct inode *inode, struct file *file)
-+{
-+	struct seq_file *cnv_errors_seq_file = file->private_data;
-+
-+	kfree(cnv_errors_seq_file->private);
-+	cnv_errors_seq_file->private = NULL;
-+
-+	return seq_release(inode, file);
-+}
-+
-+static const struct file_operations qat_cnv_fops = {
-+	.owner = THIS_MODULE,
-+	.open = qat_cnv_errors_file_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = qat_cnv_errors_file_release,
-+};
-+
-+static ssize_t no_comp_file_read(struct file *f, char __user *buf, size_t count, loff_t *pos)
-+{
-+	char *file_msg = "No engine configured for comp\n";
-+
-+	return simple_read_from_buffer(buf, count, pos, file_msg, strlen(file_msg));
-+}
-+
-+static const struct file_operations qat_cnv_no_comp_fops = {
-+	.owner = THIS_MODULE,
-+	.read = no_comp_file_read,
-+};
-+
-+void adf_cnv_dbgfs_add(struct adf_accel_dev *accel_dev)
-+{
-+	const struct file_operations *fops;
-+	void *data;
-+
-+	if (adf_hw_dev_has_compression(accel_dev)) {
-+		fops = &qat_cnv_fops;
-+		data = accel_dev;
-+	} else {
-+		fops = &qat_cnv_no_comp_fops;
-+		data = NULL;
-+	}
-+
-+	accel_dev->cnv_dbgfile = debugfs_create_file(CNV_DEBUGFS_FILENAME, 0400,
-+						     accel_dev->debugfs_dir,
-+						     data, fops);
-+}
-+
-+void adf_cnv_dbgfs_rm(struct adf_accel_dev *accel_dev)
-+{
-+	debugfs_remove(accel_dev->cnv_dbgfile);
-+	accel_dev->cnv_dbgfile = NULL;
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
-new file mode 100644
-index 000000000000..b02b0961c433
---- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/adf_cnv_dbgfs.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2023 Intel Corporation */
-+#ifndef ADF_CNV_DBG_H
-+#define ADF_CNV_DBG_H
-+
-+struct adf_accel_dev;
-+
-+void adf_cnv_dbgfs_add(struct adf_accel_dev *accel_dev);
-+void adf_cnv_dbgfs_rm(struct adf_accel_dev *accel_dev);
-+
-+#endif
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index 46dd81074166..18a382508542 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -96,6 +96,7 @@ int adf_send_admin_tim_sync(struct adf_accel_dev *accel_dev, u32 cnt);
- int adf_send_admin_hb_timer(struct adf_accel_dev *accel_dev, uint32_t ticks);
- int adf_get_fw_timestamp(struct adf_accel_dev *accel_dev, u64 *timestamp);
- int adf_get_pm_info(struct adf_accel_dev *accel_dev, dma_addr_t p_state_addr, size_t buff_size);
-+int adf_get_cnv_stats(struct adf_accel_dev *accel_dev, u16 ae, u16 *err_cnt, u16 *latest_err);
- int adf_init_arb(struct adf_accel_dev *accel_dev);
- void adf_exit_arb(struct adf_accel_dev *accel_dev);
- void adf_update_ring_arb(struct adf_etr_ring_data *ring);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-index 395bb493f20c..477efcc81a16 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
-@@ -5,6 +5,7 @@
- #include "adf_accel_devices.h"
- #include "adf_cfg.h"
- #include "adf_common_drv.h"
-+#include "adf_cnv_dbgfs.h"
- #include "adf_dbgfs.h"
- #include "adf_fw_counters.h"
- #include "adf_heartbeat_dbgfs.h"
-@@ -64,6 +65,7 @@ void adf_dbgfs_add(struct adf_accel_dev *accel_dev)
- 		adf_fw_counters_dbgfs_add(accel_dev);
- 		adf_heartbeat_dbgfs_add(accel_dev);
- 		adf_pm_dbgfs_add(accel_dev);
-+		adf_cnv_dbgfs_add(accel_dev);
- 	}
- }
- 
-@@ -77,6 +79,7 @@ void adf_dbgfs_rm(struct adf_accel_dev *accel_dev)
- 		return;
- 
- 	if (!accel_dev->is_vf) {
-+		adf_cnv_dbgfs_rm(accel_dev);
- 		adf_pm_dbgfs_rm(accel_dev);
- 		adf_heartbeat_dbgfs_rm(accel_dev);
- 		adf_fw_counters_dbgfs_rm(accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-index 2ebbec75d778..9e5ce419d875 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_init_admin.h
-@@ -19,6 +19,7 @@ enum icp_qat_fw_init_admin_cmd_id {
- 	ICP_QAT_FW_DC_CHAIN_INIT = 11,
- 	ICP_QAT_FW_HEARTBEAT_TIMER_SET = 13,
- 	ICP_QAT_FW_TIMER_GET = 19,
-+	ICP_QAT_FW_CNV_STATS_GET = 20,
- 	ICP_QAT_FW_PM_STATE_CONFIG = 128,
- 	ICP_QAT_FW_PM_INFO = 129,
- };
-@@ -65,6 +66,10 @@ struct icp_qat_fw_init_admin_resp {
- 			__u16 version_major_num;
- 		};
- 		__u32 extended_features;
-+		struct {
-+			__u16 error_count;
-+			__u16 latest_error;
-+		};
- 	};
- 	__u64 opaque_data;
- 	union {
+Sometime ago there was some work done to build a geniv template cipher
+and optimize dm-crypt to encrypt larger block sizes in a single call,
+see [1][2]. Don't know if that work was completed.
 
-base-commit: af891c938a00638282c373813f5d1b765f458dd7
+>And I got some deadlocks.
+Ouch!
+
+> The reason for the deadlocks is this: suppose that one of the "if"
+> conditions in "qat_alg_send_message_maybacklog" is true and we jump to the
+> "enqueue" label. At this point, an interrupt comes in and clears all
+> pending messages. Now, the interrupt returns, we grab backlog->lock, add
+> the message to the backlog, drop backlog->lock - and there is no one to
+> remove the backlogged message out of the list and submit it.
+Makes sense. In my testing I wasn't able to reproduce this condition.
+
+> I fixed it with this patch - with this patch, the test passes and there
+> are no longer any deadlocks. I didn't want to add a spinlock to the hot
+> path, so I take it only if some of the condition suggests that queuing may
+> be required.
+> 
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> Cc: stable@vger.kernel.org
+The commit message requires a bit of rework to describe the change.
+Also, deserves a fixes tag.
+
+> 
+> ---
+>  drivers/crypto/intel/qat/qat_common/qat_algs_send.c |   31 ++++++++++++--------
+>  1 file changed, 20 insertions(+), 11 deletions(-)
+> 
+> Index: linux-2.6/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
+> ===================================================================
+> --- linux-2.6.orig/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
+> +++ linux-2.6/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
+> @@ -40,16 +40,6 @@ void qat_alg_send_backlog(struct qat_ins
+>  	spin_unlock_bh(&backlog->lock);
+>  }
+>  
+> -static void qat_alg_backlog_req(struct qat_alg_req *req,
+> -				struct qat_instance_backlog *backlog)
+> -{
+> -	INIT_LIST_HEAD(&req->list);
+Is the initialization of an element no longer needed?
+
+> -
+> -	spin_lock_bh(&backlog->lock);
+> -	list_add_tail(&req->list, &backlog->list);
+> -	spin_unlock_bh(&backlog->lock);
+> -}
+> -
+>  static int qat_alg_send_message_maybacklog(struct qat_alg_req *req)
+>  {
+>  	struct qat_instance_backlog *backlog = req->backlog;
+> @@ -71,8 +61,27 @@ static int qat_alg_send_message_maybackl
+>  	return -EINPROGRESS;
+>  
+>  enqueue:
+> -	qat_alg_backlog_req(req, backlog);
+> +	spin_lock_bh(&backlog->lock);
+> +
+> +	/* If any request is already backlogged, then add to backlog list */
+> +	if (!list_empty(&backlog->list))
+> +		goto enqueue2;
+>  
+> +	/* If ring is nearly full, then add to backlog list */
+> +	if (adf_ring_nearly_full(tx_ring))
+> +		goto enqueue2;
+> +
+> +	/* If adding request to HW ring fails, then add to backlog list */
+> +	if (adf_send_message(tx_ring, fw_req))
+> +		goto enqueue2;
+In a nutshell, you are re-doing the same steps taking the backlog lock.
+
+It should be possible to re-write it so that there is a function that
+attempts enqueuing and if it fails, then the same is called again taking
+the lock.
+If you want I can rework it and resubmit.
+
+> +
+> +	spin_unlock_bh(&backlog->lock);
+> +	return -EINPROGRESS;
+> +
+> +enqueue2:
+> +	list_add_tail(&req->list, &backlog->list);
+> +
+> +	spin_unlock_bh(&backlog->lock);
+>  	return -EBUSY;
+>  }
+
+[1] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1276510.html
+[2] https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1428293.html
+
+Regards,
+
 -- 
-2.41.0
-
+Giovanni
