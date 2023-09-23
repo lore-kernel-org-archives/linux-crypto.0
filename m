@@ -2,106 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A1ECE7A89
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Sep 2023 08:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5075ACE7A88
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Sep 2023 10:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230385AbjIWI4U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Sep 2023 04:56:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
+        id S230426AbjIWKIc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 23 Sep 2023 06:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230204AbjIWI4T (ORCPT
+        with ESMTP id S230299AbjIWKIb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Sep 2023 04:56:19 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87423136;
-        Sat, 23 Sep 2023 01:56:13 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61B6FC433C7;
-        Sat, 23 Sep 2023 08:56:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695459373;
-        bh=0U26ntWWWFIg9iV7YhYP9NzZfC/c3SeOSlemUAkII4I=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KN0LThsonm6ev8X5HK1VCOu9PghLnTEGQACvsLC9BLA6ODKw56fxftZeBu6OAJ/Vy
-         bQ53dAApTT1MCt7uAHY4ZLtjyX4HSKoT1SD3BcO8cB91zRSZ+TbguIVoxOj5L6qdnW
-         NIikI0eJCmxwt3RCGH49+DPOb/xYJDMU7KN9ZdIUhyBabdoeKtLalUZKAsIQEem8QV
-         OKRuHwz4t+QUTD3ceDxPl2YSL2AnAxll2cSYOHB/C5X/kYo+bxPDVdpBRXB6WLN9Bj
-         bjTA8s5hvWXN8COr9p/7jSCUlmP62NlVQjXkmspA6eFTc6fkkKa0wqsFNIjWvpRCkJ
-         QEU69h62MHCEA==
-Date:   Sat, 23 Sep 2023 10:57:14 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, Adam Guerin <adam.guerin@intel.com>,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat: Annotate struct adf_fw_counters with
- __counted_by
-Message-ID: <ZQ8Y6hGl1xiP9I69@work>
-References: <20230922175432.work.709-kees@kernel.org>
+        Sat, 23 Sep 2023 06:08:31 -0400
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33FD2199
+        for <linux-crypto@vger.kernel.org>; Sat, 23 Sep 2023 03:08:22 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qjzYe-0001ja-NX; Sat, 23 Sep 2023 12:08:16 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qjzYc-008NfE-74; Sat, 23 Sep 2023 12:08:14 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1qjzYb-0047zd-R5; Sat, 23 Sep 2023 12:08:13 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, kernel@pengutronix.de
+Subject: [PATCH 2/2] crypto: Make crypto_engine_exit() return void
+Date:   Sat, 23 Sep 2023 12:08:06 +0200
+Message-Id: <20230923100806.1762943-3-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230923100806.1762943-1-u.kleine-koenig@pengutronix.de>
+References: <20230923100806.1762943-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922175432.work.709-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1804; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=oGx/T9R7JDurOdYPHegJL1iwZNpx/77lykGWyxyua/k=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlDrkClrT0fOZUDH0IoLSiJBh7iUBet33jQ9wCR hWJPlhlKtyJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQ65AgAKCRCPgPtYfRL+ Tr34B/41OVw/FLj/PeGxTwGskAfoT1Pf7Ziot5aGnHoB4z6S7ho/AGKPR7uhIZ0+9P/Zai7c8pR /4WwKh9T+ffAFVGv9G46uOUEcXMldphHSL4YaMcGeiFMbFjQdX45rkH4360DnEf6l8ggE+dNNay eYtJxhKvG/ODzGQ/tN56ckh4ECiW4uraeNPXMs6+b4NIgPcGbHKfqSICM1tZ/FtlN+pob0OahC9 3iFUanuvResYPJVtthrdeRbvG12upDwv+VyTOex/BDuqR6tZWUKPY8RxW2PDiYnWkc2TPwci9Aa RCsOMNy6V89Y0fRVTEjsv6s5WrBLsWOo8+ZIyBAufCMF4/9z
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 10:54:33AM -0700, Kees Cook wrote:
-> Prepare for the coming implementation by GCC and Clang of the __counted_by
-> attribute. Flexible array members annotated with __counted_by can have
-> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> functions).
-> 
-> As found with Coccinelle[1], add __counted_by for struct adf_fw_counters.
-> 
-> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
-> 
-> Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Nathan Chancellor <nathan@kernel.org>
-> Cc: Nick Desaulniers <ndesaulniers@google.com>
-> Cc: Tom Rix <trix@redhat.com>
-> Cc: Adam Guerin <adam.guerin@intel.com>
-> Cc: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Cc: qat-linux@intel.com
-> Cc: linux-crypto@vger.kernel.org
-> Cc: llvm@lists.linux.dev
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+All callers ignore the return value, so simplify by not providing one.
 
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Note that crypto_engine_exit() is typically called in a device driver's
+remove path (or the error path in probe), where errors cannot be handled
+anyhow.
 
-Thanks
---
-Gustavo
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ crypto/crypto_engine.c  | 8 ++------
+ include/crypto/engine.h | 2 +-
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-> ---
->  drivers/crypto/intel/qat/qat_common/adf_fw_counters.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
-> index cb6e09ef5c9f..6abe4736eab8 100644
-> --- a/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
-> +++ b/drivers/crypto/intel/qat/qat_common/adf_fw_counters.c
-> @@ -34,7 +34,7 @@ struct adf_ae_counters {
->  
->  struct adf_fw_counters {
->  	u16 ae_count;
-> -	struct adf_ae_counters ae_counters[];
-> +	struct adf_ae_counters ae_counters[] __counted_by(ae_count);
->  };
->  
->  static void adf_fw_counters_parse_ae_values(struct adf_ae_counters *ae_counters, u32 ae,
-> -- 
-> 2.34.1
-> 
-> 
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 108d9d55c509..e60a0eb628e8 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -552,20 +552,16 @@ EXPORT_SYMBOL_GPL(crypto_engine_alloc_init);
+ /**
+  * crypto_engine_exit - free the resources of hardware engine when exit
+  * @engine: the hardware engine need to be freed
+- *
+- * Return 0 for success.
+  */
+-int crypto_engine_exit(struct crypto_engine *engine)
++void crypto_engine_exit(struct crypto_engine *engine)
+ {
+ 	int ret;
+ 
+ 	ret = crypto_engine_stop(engine);
+ 	if (ret)
+-		return ret;
++		return;
+ 
+ 	kthread_destroy_worker(engine->kworker);
+-
+-	return 0;
+ }
+ EXPORT_SYMBOL_GPL(crypto_engine_exit);
+ 
+diff --git a/include/crypto/engine.h b/include/crypto/engine.h
+index 2835069c5997..545dbefe3e13 100644
+--- a/include/crypto/engine.h
++++ b/include/crypto/engine.h
+@@ -78,7 +78,7 @@ struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
+ 						       bool retry_support,
+ 						       int (*cbk_do_batch)(struct crypto_engine *engine),
+ 						       bool rt, int qlen);
+-int crypto_engine_exit(struct crypto_engine *engine);
++void crypto_engine_exit(struct crypto_engine *engine);
+ 
+ int crypto_engine_register_aead(struct aead_engine_alg *alg);
+ void crypto_engine_unregister_aead(struct aead_engine_alg *alg);
+-- 
+2.40.1
+
