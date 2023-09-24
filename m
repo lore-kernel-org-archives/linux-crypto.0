@@ -2,206 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B574FCE7A8B
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Sep 2023 11:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6836ECE7A8C
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Sep 2023 17:40:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229449AbjIXL4j convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Sep 2023 07:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35504 "EHLO
+        id S230205AbjIXRkK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 24 Sep 2023 13:40:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjIXL4i (ORCPT
+        with ESMTP id S229710AbjIXRkK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Sep 2023 07:56:38 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7647A101;
-        Sun, 24 Sep 2023 04:56:30 -0700 (PDT)
-Received: from kwepemd500002.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rtkst1MMZzVk2K;
-        Sun, 24 Sep 2023 19:53:22 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- kwepemd500002.china.huawei.com (7.221.188.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.23; Sun, 24 Sep 2023 19:56:26 +0800
-Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
- dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2507.031;
- Sun, 24 Sep 2023 19:56:25 +0800
-From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 24 Sep 2023 13:40:10 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635BAFC;
+        Sun, 24 Sep 2023 10:40:01 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38OGehq2006698;
+        Sun, 24 Sep 2023 17:39:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=a2ctV+9L4kKCcLREiZQedto4qlgkJw8bUeFgjqbh5As=;
+ b=Rhz+Gc8BTaoyzxlAeAH0FGE9+e9Kqa3pXNo6DwyLFoHRHTNKdM2ZTrhbapgsVuIlHzk7
+ dgGnP2WqFB6N7bIkIrF9WiSHOKmtQbvpKZsBK1L+c+npfC3vunTw89c8KMlc6DrWLTt2
+ IFbDpsChFjf8CIGpkY5P3U1oQpmny0h/xu4MNyfqo9/7h1NejWsW+/Gzt0x0nyUVPJLE
+ WdPEmPUdXCP474I50K8kg2NWxoOKuWsz1Vx2QMJ+CWz/lHsjkRw2qc/rTDyrq5g/qR50
+ uCICtyTff+gVgp+UOesRNcg7Mvx0ukKIs0dBWYiIwucg5j6eNAFeFsJ820is37qC4cLu aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ta5hb0bmq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 24 Sep 2023 17:39:47 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38OHdlkB003823;
+        Sun, 24 Sep 2023 17:39:47 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ta5hb0bmk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 24 Sep 2023 17:39:47 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38OFaLvj030753;
+        Sun, 24 Sep 2023 17:39:46 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjc3n5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 24 Sep 2023 17:39:46 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38OHdhVc27394696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 24 Sep 2023 17:39:43 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AE5C92004B;
+        Sun, 24 Sep 2023 17:39:43 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C618B20040;
+        Sun, 24 Sep 2023 17:39:42 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.29.239])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+        Sun, 24 Sep 2023 17:39:42 +0000 (GMT)
+Date:   Sun, 24 Sep 2023 19:39:41 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-Subject: RE: virtcrypto_dataq_callback calls crypto_finalize_request() from
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: virtcrypto_dataq_callback calls crypto_finalize_request() from
  irq context
-Thread-Topic: virtcrypto_dataq_callback calls crypto_finalize_request() from
- irq context
-Thread-Index: AQHZ7VsjRTMxo/hUEkmU1GjtoDjS1rAp3v1A
-Date:   Sun, 24 Sep 2023 11:56:25 +0000
-Message-ID: <ed47fb73ad634ca395bd6c8e979dda8e@huawei.com>
+Message-ID: <20230924193941.6a02237f.pasic@linux.ibm.com>
+In-Reply-To: <ed47fb73ad634ca395bd6c8e979dda8e@huawei.com>
 References: <20230922154546.4f7447ce.pasic@linux.ibm.com>
-In-Reply-To: <20230922154546.4f7447ce.pasic@linux.ibm.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.11]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        <ed47fb73ad634ca395bd6c8e979dda8e@huawei.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OAd7c8O-FiD8N90yvnR-OhbKEtCwd40N
+X-Proofpoint-ORIG-GUID: D7Y4RHuy_ajhhRgET4pDTmKzK3fghQZR
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-24_15,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ priorityscore=1501 spamscore=0 clxscore=1015 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 mlxlogscore=951 adultscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2309240154
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Halil,
+On Sun, 24 Sep 2023 11:56:25 +0000
+"Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
 
-Commit 4058cf08945 introduced a check for detecting crypto completion function 
-called with enable BH, and indeed the virtio-crypto driver didn't disable BH, which needs
-a patch to fix it.
-
-P.S.: https://lore.kernel.org/lkml/20220221120833.2618733-5-clabbe@baylibre.com/T/
-
-Regards,
--Gonglei
-
-> -----Original Message-----
-> From: Halil Pasic [mailto:pasic@linux.ibm.com]
-> Sent: Friday, September 22, 2023 9:46 PM
-> To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>; Herbert Xu
-> <herbert@gondor.apana.org.au>; Michael S. Tsirkin <mst@redhat.com>;
-> Jason Wang <jasowang@redhat.com>;
-> virtualization@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; Marc Hartmayer <mhartmay@linux.ibm.com>
-> Subject: BUG: virtcrypto_dataq_callback calls crypto_finalize_request() from irq
-> context
+> Hi Halil,
 > 
-> Hi Gonglei!
+> Commit 4058cf08945 introduced a check for detecting crypto completion function 
+> called with enable BH, and indeed the virtio-crypto driver didn't disable BH, which needs
+> a patch to fix it.
 > 
-> Our CI has found that virtio-crypto does not honor the requirement of
-> crypto_finalize_request() being called in softirq context which is asserted in
-> that function via lockdep_assert_in_softirq() since commit 4058cf08945c
-> ("crypto: engine - check if BH is disabled during completion").
-> 
-> The problem was originally found on s390x but Marc Hartmayer was so kind to
-> reproduce it on amd64. Please find the corresponding kernel messages at the
-> end of this email.
-> 
-> The call chain looks like this.
-> interrupt handler for queue notification  --> virtcrypto_dataq_callback()  -->
-> via vc_req->alg_cb either virtio_crypto_skcipher_finalize_req()
->      or virtio_crypto_akcipher_finalize_req()
->  --> crypto_finalize_skcipher_request()
->      or crypto_finalize_akcipher_request()
->  --> crypto_finalize_request()
-> 
-> Everything above is happening in the interrupt handler (and in "hard" irq
-> context).
-> 
-> I'm not really familiar with the implementation of virtio_crypto or with the
-> crypto_engine interfaces. I assume the problem is on the side of virtio-crypto
-> so I would like to kindly ask you as the maintainer of virtio-crypt to have a look
-> at it. But if you think it is rather in the crypto_engine, please clarify that with
-> Herbert. I have no strong opinion on this issue.
+> P.S.: https://lore.kernel.org/lkml/20220221120833.2618733-5-clabbe@baylibre.com/T/
 > 
 > Regards,
-> Halil
-> 
-> [ 31.033415][ C0] WARNING: CPU: 0 PID: 136 at crypto/crypto_engine.c:58
-> crypto_finalize_request (crypto/crypto_engine.c:58 (discriminator 23))
-> crypto_engine
-> [   31.034131][    C0] Modules linked in: virtio_crypto(+)
-> vmw_vsock_virtio_transport_common(+) crypto_engine vsock
-> [   31.035326][    C0] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> 1996), BIOS 1.16.2-1.fc38 04/01/2014
-> [ 31.035917][ C0] RIP: 0010:crypto_finalize_request (crypto/crypto_engine.c:58
-> (discriminator 23)) crypto_engine [ 31.036398][ C0] Code: 08 5b 5d 41 5c 41 5d
-> e9 bf 88 1c c1 65 8b 05 b0 36 01 40 f6 c4 ff 74 12 a9 00 00 0f 00 75 0b a9 00 00
-> f0 00 0f 84 54 ff ff ff <0f> 0b e9 4d ff ff ff 4c 8d 6b 38 4c 89 ef e8 8e 47 1b c4 48
-> 8d bb All code ========
->    0:	08 5b 5d             	or     %bl,0x5d(%rbx)
->    3:	41 5c                	pop    %r12
->    5:	41 5d                	pop    %r13
->    7:	e9 bf 88 1c c1       	jmp    0xffffffffc11c88cb
->    c:	65 8b 05 b0 36 01 40 	mov    %gs:0x400136b0(%rip),%eax
-> # 0x400136c3
->   13:	f6 c4 ff             	test   $0xff,%ah
->   16:	74 12                	je     0x2a
->   18:	a9 00 00 0f 00       	test   $0xf0000,%eax
->   1d:	75 0b                	jne    0x2a
->   1f:	a9 00 00 f0 00       	test   $0xf00000,%eax
->   24:	0f 84 54 ff ff ff    	je     0xffffffffffffff7e
->   2a:*	0f 0b                	ud2		<-- trapping instruction
->   2c:	e9 4d ff ff ff       	jmp    0xffffffffffffff7e
->   31:	4c 8d 6b 38          	lea    0x38(%rbx),%r13
->   35:	4c 89 ef             	mov    %r13,%rdi
->   38:	e8 8e 47 1b c4       	call   0xffffffffc41b47cb
->   3d:	48                   	rex.W
->   3e:	8d                   	.byte 0x8d
->   3f:	bb                   	.byte 0xbb
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	0f 0b                	ud2
->    2:	e9 4d ff ff ff       	jmp    0xffffffffffffff54
->    7:	4c 8d 6b 38          	lea    0x38(%rbx),%r13
->    b:	4c 89 ef             	mov    %r13,%rdi
->    e:	e8 8e 47 1b c4       	call   0xffffffffc41b47a1
->   13:	48                   	rex.W
->   14:	8d                   	.byte 0x8d
->   15:	bb                   	.byte 0xbb
-> [   31.037591][    C0] RSP: 0018:ffffc90000007da0 EFLAGS: 00010046
-> [   31.037976][    C0] RAX: 0000000080010002 RBX: ffff888006c87428 RCX:
-> 1ffffffff0c0e523
-> [   31.038471][    C0] RDX: 0000000000000000 RSI: ffff88810d0819e8 RDI:
-> ffff888006c87449
-> [   31.038967][    C0] RBP: ffff88810d0819e8 R08: 0000000000000000 R09:
-> fffffbfff0b04f04
-> [   31.039463][    C0] R10: ffffffff85827823 R11: ffffffff842013e6 R12:
-> 0000000000000000
-> [   31.039963][    C0] R13: 0000000000000001 R14: ffff88810d081a18 R15:
-> dffffc0000000000
-> [   31.040475][    C0] FS:  00007f80c0cc6800(0000)
-> GS:ffff88811ae00000(0000) knlGS:0000000000000000
-> [   31.041058][    C0] CS:  0010 DS: 0000 ES: 0000 CR0:
-> 0000000080050033
-> [   31.041473][    C0] CR2: 00007f22ad455270 CR3: 0000000106b22000
-> CR4: 00000000000006f0
-> [   31.042024][    C0] Call Trace:
-> [   31.042250][    C0]  <IRQ>
-> [ 31.042433][ C0] ? __warn (kernel/panic.c:673) [ 31.042710][ C0] ?
-> crypto_finalize_request (crypto/crypto_engine.c:58 (discriminator 23))
-> crypto_engine [ 31.043161][ C0] ? report_bug (lib/bug.c:180 lib/bug.c:219)
-> [ 31.043451][ C0] ? handle_bug (arch/x86/kernel/traps.c:237 (discriminator 1))
-> [ 31.043728][ C0] ? exc_invalid_op (arch/x86/kernel/traps.c:258 (discriminator
-> 1)) [ 31.044039][ C0] ? asm_exc_invalid_op
-> (./arch/x86/include/asm/idtentry.h:568)
-> [ 31.044385][ C0] ? asm_common_interrupt
-> (./arch/x86/include/asm/idtentry.h:636)
-> [ 31.044746][ C0] ? crypto_finalize_request (crypto/crypto_engine.c:58
-> (discriminator 23)) crypto_engine [ 31.045202][ C0] virtcrypto_dataq_callback
-> (drivers/crypto/virtio/virtio_crypto_core.c:91) virtio_crypto [ 31.045661][ C0] ?
-> __pfx_virtcrypto_dataq_callback (drivers/crypto/virtio/virtio_crypto_core.c:76)
-> virtio_crypto [ 31.046148][ C0] ? __pfx_do_raw_spin_lock
-> (kernel/locking/spinlock_debug.c:113)
-> [ 31.046499][ C0] vring_interrupt (drivers/virtio/virtio_ring.c:2598)
-> [ 31.046806][ C0] vp_vring_interrupt (drivers/virtio/virtio_pci_common.c:67
-> (discriminator 2)) [ 31.047125][ C0] ? __pfx_vp_vring_interrupt
-> (drivers/virtio/virtio_pci_common.c:60)
-> [ 31.047477][ C0] __handle_irq_event_percpu (kernel/irq/handle.c:158)
-> [ 31.047845][ C0] handle_irq_event (kernel/irq/handle.c:195
-> kernel/irq/handle.c:210) [ 31.048147][ C0] handle_edge_irq
-> (kernel/irq/chip.c:833) [ 31.048454][ C0] __common_interrupt
-> (arch/x86/kernel/irq.c:271) [ 31.048767][ C0] common_interrupt
-> (arch/x86/kernel/irq.c:247 (discriminator 47))
-> [   31.049071][    C0]  </IRQ>
-> [   31.049273][    C0]  <TASK>
-> [ 31.049468][ C0] asm_common_interrupt
-> (./arch/x86/include/asm/idtentry.h:636)
-> [ 31.049805][ C0] RIP: 0010:unwind_next_frame
-> (arch/x86/kernel/unwind_orc.c:494)
+> -Gonglei
+
+Thanks Gonglei!
+
+Thanks! I would be glad to test that fix on s390x. Are you about to send
+one?
+
+Regards,
+Halil
