@@ -2,124 +2,225 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4934CE7A89
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 09:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206FCCE7A95
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 11:11:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233182AbjIYJcl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Sep 2023 05:32:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58290 "EHLO
+        id S229595AbjIYLLM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Sep 2023 07:11:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbjIYJcj (ORCPT
+        with ESMTP id S229556AbjIYLLL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2023 05:32:39 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FB8E3;
-        Mon, 25 Sep 2023 02:32:32 -0700 (PDT)
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38P5uba5003009;
-        Mon, 25 Sep 2023 11:32:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:subject:to:cc:references:from
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=L9Mnpa4+g7dTSm97b0VFVROey4sO9ITBMYDsUb3JsoQ=; b=uQ
-        BeX3r2oK6VRXJjfwWadu2QotZlQNii8Gwrx2fcJDHF/6O/DMrWwZ5u2xP7CgggHQ
-        1MZPtvm+u3XRo5dBoIiWaeHdwjx9IAE10eJj7vv3OOboCVWsWDCRjKgaciuwZyL+
-        CxL6RHw1iYqyJVBAXvdUcWACyDQ/hXB+NH7pNl57Z7szvmlSG7Ve4LQrsvTcBtB8
-        GNo5CdK0mEnnK6zj2+92RvDpNPoqsD7EojxPpyrzL5N+jti3a6+AC7PQv1+ISptX
-        BZNG2USai80ICO3rQJgYHi3emwBowkmRnVF9Naxsd5z89fiEweSTyXASrk6LNXxr
-        Ib7mVYQRwrOsZlPKyVXA==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t9nefetsu-1
+        Mon, 25 Sep 2023 07:11:11 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F048DC0;
+        Mon, 25 Sep 2023 04:11:03 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PAKPEo022153;
+        Mon, 25 Sep 2023 11:10:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=06zw0yftt1QZ42hSHAqdLVM1z5Q8BG0w8ufCiqKGdcM=;
+ b=QtIoFWY8bljQFpkLh18jJUcUWITU1jb1T3krDgtLpugOk56JLO/S8B0qpeW3Xbe9pneR
+ UpVKtwnif5sEsxmoB98Ymi/gjgvFEtA73bhTsxN7wS1swrQ4k77imKDGHamgBw3FdqIS
+ gbOb/LpmziCx2FJLWlhACPcLY8sXd/2KbwuumUtfL9iz3ChN4r20h18+vp/H4Vs+OvdN
+ HwtmVq0ObyPWPRntbWDH4UlBmrvnviX27czEeXyeitnL+OcN0nHLKx3o8tYIW6HB216u
+ 6fNETDWB29PikQOmrifDtb0vvO70IiFdEImgAdHo/A1RYVSkyr9nL+74AjDgWgRRQPQ0 hQ== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t9safbvfb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Sep 2023 11:32:00 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id D981B10005C;
-        Mon, 25 Sep 2023 11:31:54 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D0F3421ED4C;
-        Mon, 25 Sep 2023 11:31:54 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 25 Sep
- 2023 11:31:54 +0200
-Message-ID: <9b81c8aa-e43d-18db-bc0c-4ae05c4d22bb@foss.st.com>
-Date:   Mon, 25 Sep 2023 11:31:49 +0200
+        Mon, 25 Sep 2023 11:10:50 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38PBAoU2023655
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Sep 2023 11:10:50 GMT
+Received: from [10.218.47.181] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 25 Sep
+ 2023 04:10:44 -0700
+Message-ID: <f6a1d8f0-6af3-4e58-8c1b-7d41d46b7ce0@quicinc.com>
+Date:   Mon, 25 Sep 2023 16:40:41 +0530
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [EXTERNAL] [PATCH v3 9/9] ARM: dts: stm32: add RNG node for
- STM32MP13x platforms
-To:     Kamlesh Gurudasani <kamlesh@ti.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
- <20230921080301.253563-10-gatien.chevallier@foss.st.com>
- <8734z6hb5i.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] crypto: qcom-rng - Add hw_random interface support
+To:     Bjorn Andersson <quic_bjorande@quicinc.com>
+CC:     <neil.armstrong@linaro.org>, <konrad.dybcio@linaro.org>,
+        <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
+        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
+        <robh+dt@kernel.org>, <vkoul@kernel.org>
+References: <20230905062420.3983268-1-quic_omprsing@quicinc.com>
+ <20230920030408.3181394-1-quic_omprsing@quicinc.com>
+ <20230922151651.GA437346@hu-bjorande-lv.qualcomm.com>
 Content-Language: en-US
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <8734z6hb5i.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+From:   Om Prakash Singh <quic_omprsing@quicinc.com>
+In-Reply-To: <20230922151651.GA437346@hu-bjorande-lv.qualcomm.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: E1QCyqpvPv60va_rb2m7NC2b_qLs6i5i
+X-Proofpoint-GUID: E1QCyqpvPv60va_rb2m7NC2b_qLs6i5i
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-25_04,2023-09-21_01,2023-05-22_02
+ definitions=2023-09-25_08,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ mlxscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 malwarescore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2309250083
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Kamlesh,
 
-On 9/22/23 10:20, Kamlesh Gurudasani wrote:
-> Gatien Chevallier <gatien.chevallier@foss.st.com> writes:
-> 
->> The RNG on STM32MP13 offers upgrades like customization of its
->> configuration and the conditional reset.
+
+On 9/22/2023 8:46 PM, Bjorn Andersson wrote:
+> On Wed, Sep 20, 2023 at 08:34:08AM +0530, Om Prakash Singh wrote:
+>> Add hw_random interface support in qcom-rng driver as new IP block
+>> in Qualcomm SoC has inbuilt NIST SP800 90B compliant entropic source
+>> to generate true random number.
 >>
->> The hardware RNG should be managed in the secure world for but it
->> is supported on Linux. Therefore, is it not default enabled.
-> Just curious, will there be concurrent access? If yes, how do you manage
-> the entropy in that case?
+>> Keeping current rng_alg interface as well for random number generation
+>> using Kernel Crypto API.
+>>
+>> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+>> ---
+>>
+>> Changes in V2:
+>> - Updated patch to fix the return value from qcom_rng_generate() to be
+>>    consistent with current implementation
 > 
-
-Any read on the data register leads to its refreshment. There can be
-only one access at a time at the bus level. The rest (FIFO is empty
-after request, etc...) is managed by the code in this patchset.
-
-> If you allow access to RNG from normal world, can attacker change the
-> setting to generate more predicatable numbers leading this to secure
-> world as well.
+> As far as I can tell you didn't change this, see below.
 > 
-> I understand that you're leaving the enablement part to customer but
-> you still have to allow RNG access to normal world for that.
+>> - Updated patch to make it more concise
+>> - Removed unnecessary use local variable and it's initialization
+>> - Updated patch to use devm_hwrng_register() instead of hwrng_register()
+>> - Updated subject line of the patch
+>>
+>> This patch is depends on [1]
+>> [1] https://lore.kernel.org/lkml/20230824-topic-sm8550-rng-v2-4-dfcafbb16a3e@linaro.org/
+>>
+>>   drivers/crypto/qcom-rng.c | 65 ++++++++++++++++++++++++++++++++++-----
+>>   1 file changed, 58 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
+>> index fb54b8cfc35f..e5a574a3cc59 100644
+>> --- a/drivers/crypto/qcom-rng.c
+>> +++ b/drivers/crypto/qcom-rng.c
+>> @@ -7,6 +7,7 @@
+>>   #include <linux/acpi.h>
+>>   #include <linux/clk.h>
+>>   #include <linux/crypto.h>
+>> +#include <linux/hw_random.h>
+>>   #include <linux/io.h>
+>>   #include <linux/iopoll.h>
+>>   #include <linux/kernel.h>
+>> @@ -32,13 +33,18 @@ struct qcom_rng {
+>>   	struct mutex lock;
+>>   	void __iomem *base;
+>>   	struct clk *clk;
+>> -	unsigned int skip_init;
+>> +	struct qcom_rng_of_data *of_data;
+>>   };
+>>   
+>>   struct qcom_rng_ctx {
+>>   	struct qcom_rng *rng;
+>>   };
+>>   
+>> +struct qcom_rng_of_data {
+>> +	bool skip_init;
+>> +	bool hwrng_support;
+>> +};
+>> +
+>>   static struct qcom_rng *qcom_rng_dev;
+>>   
+>>   static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
+>> @@ -70,7 +76,7 @@ static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
+>>   		}
+>>   	} while (currsize < max);
+>>   
+>> -	return 0;
+>> +	return currsize;
 > 
-> -Kamlesh
+> As I pointed out in my previous review, if the qcom_rng_read() is
+> requested to read a number of bytes (max) that is not evenly divisible
+> with 4 (WORD_SZ) the loop will exit without accounting for the last
+> bytes copied...
 
-If RNG is secure, then it should be managed by the secure world and
-accessed via some interface. Ours is OP-TEE RNG PTA. The secure level
-of the peripheral is managed by the ETZPC, which manages the security
-configuration of the board's peripherals.
+I will update implementation to account currsize for accounting 
+remaining bytes
 
-If the RNG is assigned to the non-secure world, then yes, the non-secure
-world can access the RNG configuration. Now, your question is: what
-happens to the secure world in such case? The answer is that it should
-run on a pseudo-random software RNG seeded at boot by the hardware RNG.
-So there's no link anymore if non-secure world deteriorates the
-hardware RNG configuration.
+>>   }
+>>   
+>>   static int qcom_rng_generate(struct crypto_rng *tfm,
+>> @@ -92,6 +98,9 @@ static int qcom_rng_generate(struct crypto_rng *tfm,
+>>   	mutex_unlock(&rng->lock);
+>>   	clk_disable_unprepare(rng->clk);
+>>   
+>> +	if (ret == dlen)
+> 
+> ...this means that if dlen % 4, you're changing the return value of this
+> function from 0 to dlen.
 
-Of course, if such choice is made, it's up to the customer to see the
-whole picture.
+I will Update logic for success case return value.
 
-Best regards,
-Gatien
+> 
+>> +		ret = 0;
+>> +
+>>   	return ret;
+>>   }
+>>   
+>> @@ -101,6 +110,13 @@ static int qcom_rng_seed(struct crypto_rng *tfm, const u8 *seed,
+>>   	return 0;
+>>   }
+>>   
+>> +static int qcom_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
+>> +{
+>> +	struct qcom_rng *qrng = (struct qcom_rng *)rng->priv;
+> 
+> You missed Herbert's request in [1], which I presume implies that
+> qcom_hwrng should be moved into struct qcom_rng, which would mean that
+> you can get the qrng by container_of().
+> 
+> [1] https://lore.kernel.org/lkml/ZQQvlXvGy8p01uJS@gondor.apana.org.au/
+
+I will address this comment is my next patch set V3.
+
+
+>> +
+>> +	return qcom_rng_read(qrng, data, max);
+>> +}
+>> +
+>>   static int qcom_rng_enable(struct qcom_rng *rng)
+>>   {
+>>   	u32 val;
+>> @@ -136,7 +152,7 @@ static int qcom_rng_init(struct crypto_tfm *tfm)
+>>   
+>>   	ctx->rng = qcom_rng_dev;
+>>   
+>> -	if (!ctx->rng->skip_init)
+>> +	if (!ctx->rng->of_data->skip_init)
+>>   		return qcom_rng_enable(ctx->rng);
+>>   
+>>   	return 0;
+>> @@ -157,6 +173,12 @@ static struct rng_alg qcom_rng_alg = {
+>>   	}
+>>   };
+>>   
+>> +static struct hwrng qcom_hwrng = {
+>> +	.name = "qcom-hwrng",
+>> +	.read = qcom_hwrng_read,
+>> +	.quality = 1024,
+>> +};
+> 
+> Which would mean not adding this static global variable...
+> 
+> Regards,
+> Bjorn
