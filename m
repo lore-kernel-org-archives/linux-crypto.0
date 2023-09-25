@@ -2,94 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78F1CE7A8C
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 06:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95674CE7A8C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 07:36:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232320AbjIYG7b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Sep 2023 02:59:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48102 "EHLO
+        id S229475AbjIYHgU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Sep 2023 03:36:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232297AbjIYG73 (ORCPT
+        with ESMTP id S229709AbjIYHgT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2023 02:59:29 -0400
-Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C90A3
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Sep 2023 23:59:23 -0700 (PDT)
-Received: by mail-vk1-xa2b.google.com with SMTP id 71dfb90a1353d-495d687b138so1755192e0c.3
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Sep 2023 23:59:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1695625162; x=1696229962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z8qEI90LoSzHC7OVIZurF0tjd1Yq1runGQ/mYc0XDOc=;
-        b=Vqzbn/Q+sAS971Sf0mtq97YG9LJ8YmaSizP0uS6xzRCripmVmtSEmkJa03caIZC65m
-         PtnNizla3o9UyzYEKADbYk8WtA/5nhjFIKZHs7bZ+WXfyhiRfw2LreUR0pLqyTNpoAdo
-         XjlaBU1tQ7wsIQR5YtkLL1SOwQz1e8W+ykzZX0cuHSJ3ZPRZuaeyKFed5MxfYHjTLFZ+
-         /TWETr6LSTyembbEvq+eqP3hgT614ird0hhcooQqi5n6BvipuCGm9tLTiiEC8PFvBXYV
-         xDBr+XN3Y3dW0s2EN62R2ym0/gRfWR10MRSsu/g2GBNSqBUlz79LHlAKC440S0ExoVA+
-         gXWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695625162; x=1696229962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z8qEI90LoSzHC7OVIZurF0tjd1Yq1runGQ/mYc0XDOc=;
-        b=Y29BljnfbSqueJWesPDWjSUo8ZoxUQrPDP6njsO1TgGhFSOk0C4sSSGg1sNBn+Wucm
-         dOf1/BuLn4IO8J5NXTPPnqERVykdwNLkp4MgPmIGfvzAJ7kzDQ6FU6FasCtAWW3DHNXL
-         9rB2tvTs5Tu5VhJoWoEzyhuiDofuwaAHPvjYBViMU/wUrC0/qS1cE38PW13JvDDKZQBg
-         SHtewznkEIA8Glwbc8hFB0IJyYxHCmZTQh6AmfjUvqIhC4ZRsn980EzuKi7Y/j8Prp95
-         pXdC45Y3fI3qpci29ZTmXCwwc/bnQPfUuHTuT5xeyD2lgkQuE5zMF7xGrouYSMnP6O4M
-         ApKQ==
-X-Gm-Message-State: AOJu0YwKlb2AxWkjkt7o2ytp0iCk7J98wPPI2Rz9iulH2jhL0NC5zSFK
-        7rTERT6FzdaXmgR3Y5T/sfqB3UQf+QhF3/Jch8FJ9g==
-X-Google-Smtp-Source: AGHT+IF/Zg1NsknbtSQpgBwTNUOHG3qhF9RP3mNCyeEXfaFEh7vh3SlLepbzoDFv12Fu/M9ql+IpvbyggHe6hJYXuQw=
-X-Received: by 2002:a1f:d546:0:b0:48d:3b80:fba9 with SMTP id
- m67-20020a1fd546000000b0048d3b80fba9mr1691006vkg.11.1695625162450; Sun, 24
- Sep 2023 23:59:22 -0700 (PDT)
+        Mon, 25 Sep 2023 03:36:19 -0400
+Received: from wxsgout04.xfusion.com (wxsgout03.xfusion.com [36.139.52.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B42DA;
+        Mon, 25 Sep 2023 00:36:10 -0700 (PDT)
+Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
+        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4RvF492VnMz9xk16;
+        Mon, 25 Sep 2023 15:34:01 +0800 (CST)
+Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
+ (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Mon, 25 Sep
+ 2023 15:35:59 +0800
+Date:   Mon, 25 Sep 2023 15:35:58 +0800
+From:   Wang Jinchao <wangjinchao@xfusion.com>
+To:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <stone.xulei@xfusion.com>
+Subject: [PATCH] padata: Fix the UAF issue related to parallel_data
+Message-ID: <ZRE4XvOOhz4HSOgR@fedora>
 MIME-Version: 1.0
-References: <20230913153529.32777-1-bartosz.golaszewski@linaro.org> <c574c47e-9ceb-ef83-cc92-cdc6cd4982e5@linaro.org>
-In-Reply-To: <c574c47e-9ceb-ef83-cc92-cdc6cd4982e5@linaro.org>
-From:   Bartosz Golaszewski <brgl@bgdev.pl>
-Date:   Mon, 25 Sep 2023 08:59:11 +0200
-Message-ID: <CAMRc=Md1x1ZVj1pfyGZf+=KULd+eujRnGQ0JM43-jd=cB4mPng@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dt-bindings: crypto: ice: document the sa8775p inline
- crypto engine
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-Originating-IP: [10.82.147.3]
+X-ClientProxiedBy: wuxshcsitd00601.xfusion.com (10.32.135.241) To
+ wuxshcsitd00600.xfusion.com (10.32.133.213)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 13, 2023 at 5:56=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 13/09/2023 17:35, Bartosz Golaszewski wrote:
-> > Add the compatible string for QCom ICE on sa8775p SoCs.
-> >
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
->
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->
-> Best regards,
-> Krzysztof
->
+In a high-load arm64 environment, the pcrypt_aead01 test in LTP can lead to
+system UAF (Use-After-Free) issues. Due to the lengthy analysis of the
+pcrypt_aead01 function call, I'll describe the problem scenario using a
+simplified model:
 
-Herbert,
+Suppose there's a user of padata named `user_function` that adheres to
+the padata requirement of calling `padata_free_shell` after `serial()`
+has been invoked, as demonstrated in the following code:
 
-Gentle ping for the binding as Bjorn already picked up the dts part.
+```c
+struct request {
+    struct padata_priv padata;
+    struct completion *done;
+};
 
-Bart
+void parallel(struct padata_priv *padata) {
+    do_something();
+}
+
+void serial(struct padata_priv *padata) {
+    struct request *request = container_of(padata, struct request, padata);
+    complete(request->done);
+}
+
+void user_function() {
+    DECLARE_COMPLETION(done)
+    padata->parallel = parallel()
+    padata_do_parallel();
+    wait_for_completion(&done);
+    padata_free_shell();
+}
+```
+
+In the corresponding padata.c file, there's the following code:
+
+```c
+static void padata_serial_worker(struct work_struct *serial_work) {
+    ...
+    cnt = 0;
+
+    while (!list_empty(&local_list)) {
+        ...
+        padata->serial(padata);
+        cnt++;
+    }
+
+    local_bh_enable();
+
+    if (refcount_sub_and_test(cnt, &pd->refcnt))
+        padata_free_pd(pd);
+}
+```
+
+Because of the high system load and the accumulation of unexecuted
+softirq at this moment, `local_bh_enable()` in padata takes longer
+to execute than usual. Subsequently, when accessing `pd->refcnt`,
+`pd` has already been released by `padata_free_shell()`, resulting
+in a UAF issue with `pd->refcnt`.
+
+The fix is straightforward: add `refcount_dec_and_test` before calling
+`padata_free_pd` in `padata_free_shell`.
+
+Signed-off-by: Wang Jinchao <wangjinchao@xfusion.com>
+---
+ kernel/padata.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 222d60195de6..15dbcf7ce623 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -1107,7 +1107,8 @@ void padata_free_shell(struct padata_shell *ps)
+ 
+ 	mutex_lock(&ps->pinst->lock);
+ 	list_del(&ps->list);
+-	padata_free_pd(rcu_dereference_protected(ps->pd, 1));
++	if (refcount_dec_and_test(&ps->pd->refcnt))
++		padata_free_pd(rcu_dereference_protected(ps->pd, 1));
+ 	mutex_unlock(&ps->pinst->lock);
+ 
+ 	kfree(ps);
+-- 
+2.40.0
+
