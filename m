@@ -2,225 +2,106 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 206FCCE7A95
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 11:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54550CE7A81
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 11:12:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229595AbjIYLLM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Sep 2023 07:11:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52014 "EHLO
+        id S230484AbjIYLMy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Sep 2023 07:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjIYLLL (ORCPT
+        with ESMTP id S230438AbjIYLMx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2023 07:11:11 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F048DC0;
-        Mon, 25 Sep 2023 04:11:03 -0700 (PDT)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PAKPEo022153;
-        Mon, 25 Sep 2023 11:10:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=06zw0yftt1QZ42hSHAqdLVM1z5Q8BG0w8ufCiqKGdcM=;
- b=QtIoFWY8bljQFpkLh18jJUcUWITU1jb1T3krDgtLpugOk56JLO/S8B0qpeW3Xbe9pneR
- UpVKtwnif5sEsxmoB98Ymi/gjgvFEtA73bhTsxN7wS1swrQ4k77imKDGHamgBw3FdqIS
- gbOb/LpmziCx2FJLWlhACPcLY8sXd/2KbwuumUtfL9iz3ChN4r20h18+vp/H4Vs+OvdN
- HwtmVq0ObyPWPRntbWDH4UlBmrvnviX27czEeXyeitnL+OcN0nHLKx3o8tYIW6HB216u
- 6fNETDWB29PikQOmrifDtb0vvO70IiFdEImgAdHo/A1RYVSkyr9nL+74AjDgWgRRQPQ0 hQ== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t9safbvfb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Sep 2023 11:10:50 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38PBAoU2023655
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Sep 2023 11:10:50 GMT
-Received: from [10.218.47.181] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 25 Sep
- 2023 04:10:44 -0700
-Message-ID: <f6a1d8f0-6af3-4e58-8c1b-7d41d46b7ce0@quicinc.com>
-Date:   Mon, 25 Sep 2023 16:40:41 +0530
+        Mon, 25 Sep 2023 07:12:53 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6350C0;
+        Mon, 25 Sep 2023 04:12:43 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6927528c01dso965159b3a.0;
+        Mon, 25 Sep 2023 04:12:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695640363; x=1696245163; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uq4NPhSzxqypY2uN0jYUqe7Hvuv2Db/rhjFJPE8U29M=;
+        b=M42mMMBdEpLrdIQIcrEmKxbcmoSY3gAKhpI8SCr8J0ludBbpM/bVDpMf70kr34T0Y9
+         PeC5sPWuU5aLpf0uGt6qg8/9mpNcInFdb3aIm2QqXBW4fbqIAFI7d3kJQtdte1pNtAsP
+         M+H0egXVO833PLrYNVM9iueKW2Vsyf2X/de61gCZ8XUEkZ8ftlwyn24wY30RpcnuuxHg
+         Kp/igCPZAmGk4T1NR1Gg6Y37lxzdmQD46cSUg9RTlfffmJzIn9lV/hNF5FKkYFADdkX+
+         xKHV430kKs83amyqKv4l6vkkTx6mgxvTsygGY2Mi+vQpYoo5mFuUtBok+WrhvHHjDpJP
+         fKgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695640363; x=1696245163;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Uq4NPhSzxqypY2uN0jYUqe7Hvuv2Db/rhjFJPE8U29M=;
+        b=aMv2i+sS1k+zpkdEWNehaldpFA9vbcvz6Albaj5zJtGXA5tO/aavEyjBDRhRdYVUFG
+         61bC5V3I4Bu4zjYuTd0UlbXfpFBRx+ict/Vxn9Iupf2p/4tdNWoSyz9jOMHYVid0u5LN
+         bsnpPpRkB69hDO0JiyjbUiLnl4r2Foquos5Eq7xvGBqRuekpAt6LAAlCbWyJunfgvg4o
+         eAUp9JGq/y342BqqKema7z/3Fx/kYGMip8pJXrXgsbabRGvp8qqY0B+9xNr9iOnhvluh
+         a1xLxr098p/E3KQRE01vVsX9Yogk+yi65vEEtMMs9VW6w7thZnC7pMwlAP0J6ar/ZklY
+         633A==
+X-Gm-Message-State: AOJu0YwRTMXyARQAhFeck853JMOyGEXjpyBav5pYXKtF9fKB1srOXJD1
+        kM4Uzhs1MOHjj/xC2HRIppw=
+X-Google-Smtp-Source: AGHT+IEQXmRz8MMHegXa6LToyXN0/clS+jq/kPQf5mZ09Gu5T9cXw4V+pF7fqgUsi7HaZJQHV0bS0g==
+X-Received: by 2002:a05:6a00:2f4d:b0:68f:c9f6:f366 with SMTP id ff13-20020a056a002f4d00b0068fc9f6f366mr7621167pfb.0.1695640363052;
+        Mon, 25 Sep 2023 04:12:43 -0700 (PDT)
+Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:fbad:220b:bad3:838c])
+        by smtp.gmail.com with ESMTPSA id 131-20020a630289000000b00528db73ed70sm7832772pgc.3.2023.09.25.04.12.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 04:12:42 -0700 (PDT)
+From:   Fabio Estevam <festevam@gmail.com>
+To:     herbert@gondor.apana.org.au
+Cc:     robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, Fabio Estevam <festevam@denx.de>
+Subject: [PATCH v2 1/3] dt-bindings: crypto: fsl-imx-sahara: Shorten the title
+Date:   Mon, 25 Sep 2023 08:12:18 -0300
+Message-Id: <20230925111220.924090-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] crypto: qcom-rng - Add hw_random interface support
-To:     Bjorn Andersson <quic_bjorande@quicinc.com>
-CC:     <neil.armstrong@linaro.org>, <konrad.dybcio@linaro.org>,
-        <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
-        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
-        <robh+dt@kernel.org>, <vkoul@kernel.org>
-References: <20230905062420.3983268-1-quic_omprsing@quicinc.com>
- <20230920030408.3181394-1-quic_omprsing@quicinc.com>
- <20230922151651.GA437346@hu-bjorande-lv.qualcomm.com>
-Content-Language: en-US
-From:   Om Prakash Singh <quic_omprsing@quicinc.com>
-In-Reply-To: <20230922151651.GA437346@hu-bjorande-lv.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: E1QCyqpvPv60va_rb2m7NC2b_qLs6i5i
-X-Proofpoint-GUID: E1QCyqpvPv60va_rb2m7NC2b_qLs6i5i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-25_08,2023-09-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- mlxscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
- phishscore=0 malwarescore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2309250083
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Fabio Estevam <festevam@denx.de>
 
+In the title, there is no need to mention "included in some i.MX chips"
+as it is too vague.
 
-On 9/22/2023 8:46 PM, Bjorn Andersson wrote:
-> On Wed, Sep 20, 2023 at 08:34:08AM +0530, Om Prakash Singh wrote:
->> Add hw_random interface support in qcom-rng driver as new IP block
->> in Qualcomm SoC has inbuilt NIST SP800 90B compliant entropic source
->> to generate true random number.
->>
->> Keeping current rng_alg interface as well for random number generation
->> using Kernel Crypto API.
->>
->> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
->> ---
->>
->> Changes in V2:
->> - Updated patch to fix the return value from qcom_rng_generate() to be
->>    consistent with current implementation
-> 
-> As far as I can tell you didn't change this, see below.
-> 
->> - Updated patch to make it more concise
->> - Removed unnecessary use local variable and it's initialization
->> - Updated patch to use devm_hwrng_register() instead of hwrng_register()
->> - Updated subject line of the patch
->>
->> This patch is depends on [1]
->> [1] https://lore.kernel.org/lkml/20230824-topic-sm8550-rng-v2-4-dfcafbb16a3e@linaro.org/
->>
->>   drivers/crypto/qcom-rng.c | 65 ++++++++++++++++++++++++++++++++++-----
->>   1 file changed, 58 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
->> index fb54b8cfc35f..e5a574a3cc59 100644
->> --- a/drivers/crypto/qcom-rng.c
->> +++ b/drivers/crypto/qcom-rng.c
->> @@ -7,6 +7,7 @@
->>   #include <linux/acpi.h>
->>   #include <linux/clk.h>
->>   #include <linux/crypto.h>
->> +#include <linux/hw_random.h>
->>   #include <linux/io.h>
->>   #include <linux/iopoll.h>
->>   #include <linux/kernel.h>
->> @@ -32,13 +33,18 @@ struct qcom_rng {
->>   	struct mutex lock;
->>   	void __iomem *base;
->>   	struct clk *clk;
->> -	unsigned int skip_init;
->> +	struct qcom_rng_of_data *of_data;
->>   };
->>   
->>   struct qcom_rng_ctx {
->>   	struct qcom_rng *rng;
->>   };
->>   
->> +struct qcom_rng_of_data {
->> +	bool skip_init;
->> +	bool hwrng_support;
->> +};
->> +
->>   static struct qcom_rng *qcom_rng_dev;
->>   
->>   static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
->> @@ -70,7 +76,7 @@ static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
->>   		}
->>   	} while (currsize < max);
->>   
->> -	return 0;
->> +	return currsize;
-> 
-> As I pointed out in my previous review, if the qcom_rng_read() is
-> requested to read a number of bytes (max) that is not evenly divisible
-> with 4 (WORD_SZ) the loop will exit without accounting for the last
-> bytes copied...
+Remove it to make it simpler.
 
-I will update implementation to account currsize for accounting 
-remaining bytes
+While at it, also remove the extra space in the first reg entry.
 
->>   }
->>   
->>   static int qcom_rng_generate(struct crypto_rng *tfm,
->> @@ -92,6 +98,9 @@ static int qcom_rng_generate(struct crypto_rng *tfm,
->>   	mutex_unlock(&rng->lock);
->>   	clk_disable_unprepare(rng->clk);
->>   
->> +	if (ret == dlen)
-> 
-> ...this means that if dlen % 4, you're changing the return value of this
-> function from 0 to dlen.
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+---
+Changes since v1:
+- Squash the removal of leading space. (Krzysztof)
 
-I will Update logic for success case return value.
+ Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> 
->> +		ret = 0;
->> +
->>   	return ret;
->>   }
->>   
->> @@ -101,6 +110,13 @@ static int qcom_rng_seed(struct crypto_rng *tfm, const u8 *seed,
->>   	return 0;
->>   }
->>   
->> +static int qcom_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
->> +{
->> +	struct qcom_rng *qrng = (struct qcom_rng *)rng->priv;
-> 
-> You missed Herbert's request in [1], which I presume implies that
-> qcom_hwrng should be moved into struct qcom_rng, which would mean that
-> you can get the qrng by container_of().
-> 
-> [1] https://lore.kernel.org/lkml/ZQQvlXvGy8p01uJS@gondor.apana.org.au/
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+index d531f3af3ea4..bad82491cd6a 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
++++ b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+@@ -4,7 +4,7 @@
+ $id: http://devicetree.org/schemas/crypto/fsl-imx-sahara.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+-title: Freescale SAHARA Cryptographic Accelerator included in some i.MX chips
++title: Freescale SAHARA Cryptographic Accelerator
+ 
+ maintainers:
+   - Steffen Trumtrar <s.trumtrar@pengutronix.de>
+@@ -32,6 +32,6 @@ examples:
+   - |
+     crypto@10025000 {
+         compatible = "fsl,imx27-sahara";
+-        reg = < 0x10025000 0x800>;
++        reg = <0x10025000 0x800>;
+         interrupts = <75>;
+     };
+-- 
+2.34.1
 
-I will address this comment is my next patch set V3.
-
-
->> +
->> +	return qcom_rng_read(qrng, data, max);
->> +}
->> +
->>   static int qcom_rng_enable(struct qcom_rng *rng)
->>   {
->>   	u32 val;
->> @@ -136,7 +152,7 @@ static int qcom_rng_init(struct crypto_tfm *tfm)
->>   
->>   	ctx->rng = qcom_rng_dev;
->>   
->> -	if (!ctx->rng->skip_init)
->> +	if (!ctx->rng->of_data->skip_init)
->>   		return qcom_rng_enable(ctx->rng);
->>   
->>   	return 0;
->> @@ -157,6 +173,12 @@ static struct rng_alg qcom_rng_alg = {
->>   	}
->>   };
->>   
->> +static struct hwrng qcom_hwrng = {
->> +	.name = "qcom-hwrng",
->> +	.read = qcom_hwrng_read,
->> +	.quality = 1024,
->> +};
-> 
-> Which would mean not adding this static global variable...
-> 
-> Regards,
-> Bjorn
