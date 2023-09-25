@@ -2,67 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00569CE7A81
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 06:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD4ECE7A81
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 06:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232348AbjIYG4d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Sep 2023 02:56:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39290 "EHLO
+        id S229619AbjIYG47 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Sep 2023 02:56:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232186AbjIYG4R (ORCPT
+        with ESMTP id S232173AbjIYG46 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2023 02:56:17 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85BE9A3
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Sep 2023 23:56:10 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9a648f9d8e3so755496866b.1
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Sep 2023 23:56:10 -0700 (PDT)
+        Mon, 25 Sep 2023 02:56:58 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55D7BF
+        for <linux-crypto@vger.kernel.org>; Sun, 24 Sep 2023 23:56:50 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9a65f9147ccso700810966b.1
+        for <linux-crypto@vger.kernel.org>; Sun, 24 Sep 2023 23:56:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695624969; x=1696229769; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1695625009; x=1696229809; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=qEZbrl9SIs9a0XW0Xx0utzWhv2bO+1IK7txISbkkhkc=;
-        b=lhFsmZueXfZ8BOJzF8EhfTqtQKi4L8XY7sXWe6VlXYSsSXlNbUUummrOk+L6b+nQRK
-         E1cwfc7S1rN5q3RXdtL8K8UqhOEmatfPjO8f/Wm+XgenJ/iq2QIO9a4ohYnHOnpK6Y8w
-         21iPOqkc6i5dVDaNiU4MG6K8qyXivNbsDNqTpuv2nHHpSTDisn4HQF+cwcts/ZBon+9J
-         vpJjVtQ8+35EpCpIyT8uJMadWB5PwZ9/8h/ob09hJVJMrHkIJFGoolfyWyRNiC5mcgCx
-         i7iyBRZiK9NOsXu+1i72DYAu3dbLxDejagIr54FbGc99nguoYqoTx8wPSpfnPW8rsdRj
-         q3yQ==
+        bh=L7WPHi+cU40K0cpq2z6xjT+pYbikoqD2eOCtsPV145c=;
+        b=KLbiz+eutL0NrzJ10K1QldzNXoSc4ofF5FMGLcVuoHcuFPckAAZA/nMq2qKYfgNreP
+         9Hwu5sFeX5rtF4v1IrIwBxgoURdUqvheNqc9Cgz9wZhAXYgu08jbSFGihCMGXGAGxHhf
+         l9BDYGRGzlTn/UQDOoF483LY8nY50xyCa7CXavroVJqq8wn+xFRiysx9BJboHn9QabF0
+         BS1sWNCEHau/aR7NYpOkBZie+oEonhtfOOfchS2+hEevGCcu4oYJeklYDGO3dXEJOB3C
+         ZgwzV3lPUA+ypUVoEx44kzb9snvjPhhdsh4u8OMu384a9JGfG7NBxZ1E3kOdZuKHLCa+
+         oC8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695624969; x=1696229769;
+        d=1e100.net; s=20230601; t=1695625009; x=1696229809;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qEZbrl9SIs9a0XW0Xx0utzWhv2bO+1IK7txISbkkhkc=;
-        b=KgF8f3SJ3POEV0+Syj6GcU0qviVN7TeQ8Vl7wggHWMC2yyuEQnNmAcjrrAziMz08QU
-         1yrBM0WthjMz4RVNrIcJBLTLk5dOrcctqxheZTMEB4GL6kWB349bFq37I/j0jxM7NZMy
-         4jY8q7K29F2Yb1BcbxFQ+mcDhHmeQvlGv4nuV1+JGB7/hxYX5E+aAg7aNuvrKiHAbmdb
-         pAdU8QkJ2NFVBv1Vtc7169Nq9gbNHH1NS9kPMlHCTRsAdRUJ2/8tS4WdfupsySXXhizx
-         Fbt6CUPk/XXQl4xcX7fzsqUrfa9MA7yine2izE/jjZtV837pMXEUihG2sMBOn2xq9AGy
-         1CHg==
-X-Gm-Message-State: AOJu0YyV4nUgKZ58ywcr2Km8PTf3UQyf0pCuctt6Bgwhk3MbJq29KFBD
-        VuhzOUzbNdT8CpuMjOusBiU/Uw==
-X-Google-Smtp-Source: AGHT+IEAT613GfYim95ogwinzmxiDQUza6TUO8J5dgmA83wo7uF6hKpwkDHOjwZh4CRKHud+pkTHZg==
-X-Received: by 2002:a17:906:5308:b0:9ae:69b8:322b with SMTP id h8-20020a170906530800b009ae69b8322bmr5289335ejo.60.1695624969061;
-        Sun, 24 Sep 2023 23:56:09 -0700 (PDT)
+        bh=L7WPHi+cU40K0cpq2z6xjT+pYbikoqD2eOCtsPV145c=;
+        b=ipqr/F1/ZaBkE687D4ElV0xIP624tNPwAPQNzWW5Z2P9X4jZJQN93+2jNlgaMVwufR
+         oQ/7rJOmFTFE0Qo0Z8lR2YbRAJZe2tguDDIkH/wj0IUMcYzm8Zt06vNvopA5aBF/rAVg
+         zhEONbPInhGtbaX7gMO6K1JUauRlXSJQxPVq6TIT1b9YcM4RWH3MrqqcpP8NMhZyZ/w8
+         tLA1issyhSVvezNJ4t+zGpEbgKyIJrCftBRzE/fN9Z4gU9jBD/8NdnlDJfDwpjfFJozk
+         bxYiAMxTS/s+k7jWbv6V/Mv3kIVKdi29eja3dcztxtqacS/oy4BEDz9j2o0scIx4uaxC
+         zlfw==
+X-Gm-Message-State: AOJu0YxZUWPzy4j2KfFeiOueiVJBX/e+vA/KxewtKIBAlGv9J3XWW8Gq
+        R5GB/uy2+G9lDZ/FKgoSygcZvA==
+X-Google-Smtp-Source: AGHT+IEKMwoW0elwx2fK4G2iKfyxbK5pK6eha13vKmmsNaUrxPXz5brsCWXqrRU8lEak95SeH0I7ew==
+X-Received: by 2002:a17:907:272a:b0:9a5:d74a:8b0a with SMTP id d10-20020a170907272a00b009a5d74a8b0amr5195178ejl.12.1695625009489;
+        Sun, 24 Sep 2023 23:56:49 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.219.100])
-        by smtp.gmail.com with ESMTPSA id g27-20020a170906349b00b0099bc0daf3d7sm5843290ejb.182.2023.09.24.23.56.07
+        by smtp.gmail.com with ESMTPSA id g27-20020a170906349b00b0099bc0daf3d7sm5843290ejb.182.2023.09.24.23.56.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Sep 2023 23:56:08 -0700 (PDT)
-Message-ID: <e00aa564-faf1-4ce3-8b56-595c7dd089b1@linaro.org>
-Date:   Mon, 25 Sep 2023 08:56:07 +0200
+        Sun, 24 Sep 2023 23:56:48 -0700 (PDT)
+Message-ID: <97009cf9-4c90-408d-8c6b-f07ce3dd9263@linaro.org>
+Date:   Mon, 25 Sep 2023 08:56:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] dt-bindings: crypto: fsl-imx-sahara: Document the
- clocks
+Subject: Re: [PATCH 4/4] dt-bindings: crypto: fsl-imx-sahara: Fix the number
+ of irqs
 Content-Language: en-US
 To:     Fabio Estevam <festevam@gmail.com>, herbert@gondor.apana.org.au
 Cc:     robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
         conor+dt@kernel.org, linux-crypto@vger.kernel.org,
         devicetree@vger.kernel.org, Fabio Estevam <festevam@denx.de>
 References: <20230924223104.862169-1-festevam@gmail.com>
- <20230924223104.862169-3-festevam@gmail.com>
+ <20230924223104.862169-4-festevam@gmail.com>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -108,7 +108,7 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20230924223104.862169-3-festevam@gmail.com>
+In-Reply-To: <20230924223104.862169-4-festevam@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -118,15 +118,60 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 On 25/09/2023 00:31, Fabio Estevam wrote:
 > From: Fabio Estevam <festevam@denx.de>
 > 
-> The Sahara block needs to clocks (ipg and ahb) to operate.
+> i.MX27 has only one Sahara interrupt. i.MX53 has two.
 > 
-> Describe them.
+> Describe this difference.
+> 
+> Signed-off-by: Fabio Estevam <festevam@denx.de>
+> ---
+>  .../bindings/crypto/fsl-imx-sahara.yaml       | 23 ++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+> index 9dbfc15510a8..9d1d9c8f0955 100644
+> --- a/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/fsl-imx-sahara.yaml
+> @@ -19,7 +19,10 @@ properties:
+>      maxItems: 1
+>  
+>    interrupts:
+> -    maxItems: 1
+> +    items:
+> +      - description: SAHARA Interrupt for Host 0
+> +      - description: SAHARA Interrupt for Host 1
+> +    minItems: 1
+>  
+>    clocks:
+>      items:
+> @@ -40,6 +43,24 @@ required:
+>  
+>  additionalProperties: false
+>  
+> +allOf:
 
-"Describe the clocks (ipg and ahb) needed by Sahara block to operate".
-One line, instead of three.
+This goes before additionalProperties:.
+
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - fsl,imx53-sahara
+> +    then:
+> +      properties:
+> +        interrupts:
+> +          minItems: 2
+> +          maxItems: 2
+> +    else:
+> +      properties:
+> +        interrupts:
+> +          minItems: 1
+
+maxItems is enough.
 
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
 
 Best regards,
 Krzysztof
