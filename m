@@ -2,232 +2,278 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C261CE7A96
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 15:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98276CE7A8C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Sep 2023 15:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjIYPgj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Sep 2023 11:36:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56644 "EHLO
+        id S230026AbjIYPk3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Sep 2023 11:40:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjIYPgi (ORCPT
+        with ESMTP id S229874AbjIYPk2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2023 11:36:38 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CEB95;
-        Mon, 25 Sep 2023 08:36:32 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16B32C433C7;
-        Mon, 25 Sep 2023 15:36:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695656191;
-        bh=EBwf2O6prBWO7RrYIfhatYa7cjkeNvHSSNARmccxmg4=;
-        h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-        b=OBSbeMULFI+93NhBngoPsVJT2c9uI4undw5PGiPcd6vTKq5Mg7pn0+UCWU0jD195q
-         rtOGbOzNpVvsiO9J9tRPojjrtIKHnh8PA3MNPHXrN4f4FEaQmwho9ycioWLvalDiMb
-         nkvqq2Li2/neaPDc8pjJA5SIimrlBxqkmvL0atnc8YUEnj77cSTLg5eXhgi2OlDVLF
-         JI0kV07+P+D6CQCqqhHq8cQhl9r2nSfj6qzeHeZbDeibrHhX5XPTej3iwinTa8/zGa
-         u6ByFNFpQk0w4gTsXb/sd5KuFBLaRMYb3pJyd61kcreUQuG8uhPiM0x/yeXc+b8VNg
-         JO6YFGeoA+owQ==
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Mon, 25 Sep 2023 18:36:22 +0300
-Message-Id: <CVS3Y8LWVFMR.1W6LHHUUSHWB6@suppilovahvero>
-Cc:     "Shawn Guo" <shawnguo@kernel.org>,
-        "Jonathan Corbet" <corbet@lwn.net>,
-        "Sascha Hauer" <s.hauer@pengutronix.de>,
-        "Pengutronix Kernel Team" <kernel@pengutronix.de>,
-        "Fabio Estevam" <festevam@gmail.com>,
-        "NXP Linux Team" <linux-imx@nxp.com>,
-        "Ahmad Fatoum" <a.fatoum@pengutronix.de>,
-        "sigma star Kernel Team" <upstream+dcp@sigma-star.at>,
-        "David Howells" <dhowells@redhat.com>,
-        "Li Yang" <leoyang.li@nxp.com>, "Paul Moore" <paul@paul-moore.com>,
-        "James Morris" <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        "Randy Dunlap" <rdunlap@infradead.org>,
-        "Catalin Marinas" <catalin.marinas@arm.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        "Tejun Heo" <tj@kernel.org>,
-        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>,
+        Mon, 25 Sep 2023 11:40:28 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC43FF;
+        Mon, 25 Sep 2023 08:40:20 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38PB8uT6014707;
+        Mon, 25 Sep 2023 17:39:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=mGHKtScuDGvlKtHxb7FEML0faIVvgVUaxKEFd7mNV8E=; b=4q
+        Kcoqc3zgo9sJUre04DyZDGbklDpC/KeHLYhQUqjGRISItW8tgxD1HfsY5C4dvmqU
+        ypND1/tw6xNpNdiaI9cj+0DWwB+AO0jLWS/wje1xIs8ahvEonwIRLgsKfwpyGxPj
+        WrbsnrDRuDGY9paZF0VD3ToFCcy5ZYDaUcatISItUInwnHoiND9VP6eDGTO9iYXo
+        ZEP5o7P/ZBL2FD+txkgb4ZEpwSXXmY28sPofNNkoXeBmhTKN4+cuSPwfop+Qz5FQ
+        7qyGBbMEzJI/xgZpubfLrOe/BKmIRB3aBHd5cxl6QkR5912kToqhArv0Ruzk8VDm
+        KERn0jfP42AQsJ6JQr2A==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t9qbwr14m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Sep 2023 17:39:35 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 16D6610005C;
+        Mon, 25 Sep 2023 17:39:15 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D8052245514;
+        Mon, 25 Sep 2023 17:39:15 +0200 (CEST)
+Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 25 Sep
+ 2023 17:39:13 +0200
+Message-ID: <4eb771d5-1f22-c708-0390-0111e8d1a9a0@foss.st.com>
+Date:   Mon, 25 Sep 2023 17:39:13 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v3 00/11] Introduce STM32 Firewall framework
+Content-Language: en-US
+To:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
+        <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>
+CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>,
-        <linuxppc-dev@lists.ozlabs.org>,
-        <linux-security-module@vger.kernel.org>,
-        "Richard Weinberger" <richard@nod.at>,
-        "David Oberhollenzer" <david.oberhollenzer@sigma-star.at>
-Subject: Re: [PATCH v3 3/3] doc: trusted-encrypted: add DCP as new trust
- source
-From:   "Jarkko Sakkinen" <jarkko@kernel.org>
-To:     "David Gstir" <david@sigma-star.at>,
-        "Mimi Zohar" <zohar@linux.ibm.com>,
-        "James Bottomley" <jejb@linux.ibm.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-X-Mailer: aerc 0.14.0
-References: <20230918141826.8139-1-david@sigma-star.at>
- <20230918141826.8139-4-david@sigma-star.at>
-In-Reply-To: <20230918141826.8139-4-david@sigma-star.at>
+        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
+References: <20230726083810.232100-1-gatien.chevallier@foss.st.com>
+From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20230726083810.232100-1-gatien.chevallier@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_13,2023-09-25_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon Sep 18, 2023 at 5:18 PM EEST, David Gstir wrote:
-> Update the documentation for trusted and encrypted KEYS with DCP as new
-> trust source:
->
-> - Describe security properties of DCP trust source
-> - Describe key usage
-> - Document blob format
->
-> Co-developed-by: Richard Weinberger <richard@nod.at>
-> Signed-off-by: Richard Weinberger <richard@nod.at>
-> Co-developed-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-> Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-> Signed-off-by: David Gstir <david@sigma-star.at>
-> ---
->  .../security/keys/trusted-encrypted.rst       | 85 +++++++++++++++++++
->  1 file changed, 85 insertions(+)
->
-> diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Document=
-ation/security/keys/trusted-encrypted.rst
-> index 9bc9db8ec651..4452070afbe9 100644
-> --- a/Documentation/security/keys/trusted-encrypted.rst
-> +++ b/Documentation/security/keys/trusted-encrypted.rst
-> @@ -42,6 +42,14 @@ safe.
->           randomly generated and fused into each SoC at manufacturing tim=
-e.
->           Otherwise, a common fixed test key is used instead.
-> =20
-> +     (4) DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs=
-)
-> +
-> +         Rooted to a one-time programmable key (OTP) that is generally b=
-urnt
-> +         in the on-chip fuses and is accessible to the DCP encryption en=
-gine only.
-> +         DCP provides two keys that can be used as root of trust: the OT=
-P key
-> +         and the UNIQUE key. Default is to use the UNIQUE key, but selec=
-ting
-> +         the OTP key can be done via a module parameter (dcp_use_otp_key=
-).
-> +
->    *  Execution isolation
-> =20
->       (1) TPM
-> @@ -57,6 +65,12 @@ safe.
-> =20
->           Fixed set of operations running in isolated execution environme=
-nt.
-> =20
-> +     (4) DCP
-> +
-> +         Fixed set of cryptographic operations running in isolated execu=
-tion
-> +         environment. Only basic blob key encryption is executed there.
-> +         The actual key sealing/unsealing is done on main processor/kern=
-el space.
-> +
->    * Optional binding to platform integrity state
-> =20
->       (1) TPM
-> @@ -79,6 +93,11 @@ safe.
->           Relies on the High Assurance Boot (HAB) mechanism of NXP SoCs
->           for platform integrity.
-> =20
-> +     (4) DCP
-> +
-> +         Relies on Secure/Trusted boot process (called HAB by vendor) fo=
-r
-> +         platform integrity.
-> +
->    *  Interfaces and APIs
-> =20
->       (1) TPM
-> @@ -94,6 +113,11 @@ safe.
-> =20
->           Interface is specific to silicon vendor.
-> =20
-> +     (4) DCP
-> +
-> +         Vendor-specific API that is implemented as part of the DCP cryp=
-to driver in
-> +         ``drivers/crypto/mxs-dcp.c``.
-> +
->    *  Threat model
-> =20
->       The strength and appropriateness of a particular trust source for a=
- given
-> @@ -129,6 +153,13 @@ selected trust source:
->       CAAM HWRNG, enable CRYPTO_DEV_FSL_CAAM_RNG_API and ensure the devic=
-e
->       is probed.
-> =20
-> +  *  DCP (Data Co-Processor: crypto accelerator of various i.MX SoCs)
-> +
-> +     The DCP hardware device itself does not provide a dedicated RNG int=
-erface,
-> +     so the kernel default RNG is used. SoCs with DCP like the i.MX6ULL =
-do have
-> +     a dedicated hardware RNG that is independent from DCP which can be =
-enabled
-> +     to back the kernel RNG.
-> +
->  Users may override this by specifying ``trusted.rng=3Dkernel`` on the ke=
-rnel
->  command-line to override the used RNG with the kernel's random number po=
-ol.
-> =20
-> @@ -231,6 +262,19 @@ Usage::
->  CAAM-specific format.  The key length for new keys is always in bytes.
->  Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
-> =20
-> +Trusted Keys usage: DCP
-> +-----------------------
-> +
-> +Usage::
-> +
-> +    keyctl add trusted name "new keylen" ring
-> +    keyctl add trusted name "load hex_blob" ring
-> +    keyctl print keyid
-> +
-> +"keyctl print" returns an ASCII hex copy of the sealed key, which is in =
-format
-> +specific to this DCP key-blob implementation.  The key length for new ke=
-ys is
-> +always in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
-> +
->  Encrypted Keys usage
->  --------------------
-> =20
-> @@ -426,3 +470,44 @@ string length.
->  privkey is the binary representation of TPM2B_PUBLIC excluding the
->  initial TPM2B header which can be reconstructed from the ASN.1 octed
->  string length.
-> +
-> +DCP Blob Format
-> +---------------
-> +
-> +The Data Co-Processor (DCP) provides hardware-bound AES keys using its
-> +AES encryption engine only. It does not provide direct key sealing/unsea=
-ling.
-> +To make DCP hardware encryption keys usable as trust source, we define
-> +our own custom format that uses a hardware-bound key to secure the seali=
-ng
-> +key stored in the key blob.
-> +
-> +Whenever a new trusted key using DCP is generated, we generate a random =
-128-bit
-> +blob encryption key (BEK) and 128-bit nonce. The BEK and nonce are used =
-to
-> +encrypt the trusted key payload using AES-128-GCM.
+Hello all,
 
-"When a new trusted key using DCP is created, a random 128-bit
-blob encryption key (BEK) and 128-bit nonce are generated."
+Since the "feature-domains" bindings lacks precision (maybe some
+renaming for better clarity on its purpose), I will send v4 with a
+vendor binding so the generic one better discussed and enriched with
+other contributor examples.
 
-... or along the lines.
+This will avoid mixing several patch set.
 
-BR, Jarkko
+Best regards,
+Gatien
+
+On 7/26/23 10:37, Gatien Chevallier wrote:
+> Introduce STM32 Firewall framework for STM32MP1x and STM32MP2x
+> platforms. STM32MP1x(ETZPC) and STM32MP2x(RIFSC) Firewall controllers
+> register to the framework to offer firewall services such as access
+> granting.
+> 
+> This series of patches is a new approach on the previous STM32 system
+> bus, history is available here:
+> https://lore.kernel.org/lkml/20230127164040.1047583/
+> 
+> The need for such framework arises from the fact that there are now
+> multiple hardware firewalls implemented across multiple products.
+> Drivers are shared between different products, using the same code.
+> When it comes to firewalls, the purpose mostly stays the same: Protect
+> hardware resources. But the implementation differs, and there are
+> multiple types of firewalls: peripheral, memory, ...
+> 
+> Some hardware firewall controllers such as the RIFSC implemented on
+> STM32MP2x platforms may require to take ownership of a resource before
+> being able to use it, hence the requirement for firewall services to
+> take/release the ownership of such resources.
+> 
+> On the other hand, hardware firewall configurations are becoming
+> more and more complex. These mecanisms prevent platform crashes
+> or other firewall-related incoveniences by denying access to some
+> resources.
+> 
+> The stm32 firewall framework offers an API that is defined in
+> firewall controllers drivers to best fit the specificity of each
+> firewall.
+> 
+> For every peripherals protected by either the ETZPC or the RIFSC, the
+> firewall framework checks the firewall controlelr registers to see if
+> the peripheral's access is granted to the Linux kernel. If not, the
+> peripheral is configured as secure, the node is marked populated,
+> so that the driver is not probed for that device.
+> 
+> The firewall framework relies on the feature-domain-controller device
+> tree bindings: https://lore.kernel.org/lkml/0c0a82bb-18ae-d057-562b.
+> It is used by peripherals to reference a domain controller, in this
+> case a firewall feature domain. The bus uses the ID referenced by
+> the feature-domains property to know where to look in the firewall
+> to get the security configuration for the peripheral. This allows
+> a device tree description rather than a hardcoded peripheral table
+> in the bus driver.
+> 
+> The STM32 ETZPC device is responsible for filtering accesses based on
+> security level, or co-processor isolation for any resource connected
+> to it.
+> 
+> The RIFSC is responsible for filtering accesses based on Compartment
+> ID / security level / privilege level for any resource connected to
+> it.
+> 
+> STM32MP13/15/25 SoC device tree files are updated in this series to
+> implement this mecanism.
+> 
+> Changes in V2:
+> 
+> 	generic:
+> 		- Add fw_devlink dependency for "feature-domains"
+> 		  property.
+> 
+> 	bindings:
+> 		- Corrected YAMLS errors highlighted by Rob's robot
+> 		- Firewall controllers YAMLs no longer define the
+> 		  maxItems for the "feature-domains" property
+> 		- Renamed st,stm32-rifsc.yaml to
+> 		  st,stm32mp25-rifsc.yaml
+> 		- Fix examples in YAML files
+> 		- Change feature-domains maxItems to 2 in firewall
+> 		  consumer files as there should not be more than
+> 		  2 entries for now
+> 		- Declare "feature-domain-names" as an optional
+> 		  property for firewall controllers child nodes.
+> 		- Add missing "feature-domains" property declaration
+> 		  in bosch,m_can.yaml and st,stm32-cryp.yaml files
+> 
+> 	firewall framework:
+> 		- Support multiple entries for "feature-domains"
+> 		  property
+> 		- Better handle the device-tree parsing using
+> 		  phandle+args APIs
+> 		- Remove "resource firewall" type
+> 		- Add a field for the name of the firewall entry
+> 		- Fix licenses
+> 	
+> 	RIFSC:
+> 		- Add controller name
+> 		- Driver is now a module_platform_driver
+> 		- Fix license
+> 
+> 	ETZPC:
+> 		- Add controller name
+> 		- Driver is now a module_platform_driver
+> 		- Fix license
+> 
+> 	Device trees:
+> 		- Fix rifsc node name
+> 		- Move the "ranges" property under the
+> 		  "feature-domains" one
+> 
+> Changes in V3:
+> 
+> 	Change incorrect ordering for bindings commits leading
+> 	to an error while running
+> 	"make DT_CHECKER_FLAGS=-m dt_binding_check"
+> 
+> Oleksii Moisieiev (1):
+>    dt-bindings: Document common device controller bindings
+> 
+> Gatien Chevallier (10):
+>    dt-bindings: treewide: add feature-domains description
+>    dt-bindings: bus: document RIFSC
+>    dt-bindings: bus: document ETZPC
+>    firewall: introduce stm32_firewall framework
+>    of: property: fw_devlink: Add support for "feature-domains"
+>    bus: rifsc: introduce RIFSC firewall controller driver
+>    arm64: dts: st: add RIFSC as a domain controller for STM32MP25x boards
+>    bus: etzpc: introduce ETZPC firewall controller driver
+>    ARM: dts: stm32: add ETZPC as a system bus for STM32MP15x boards
+>    ARM: dts: stm32: add ETZPC as a system bus for STM32MP13x boards
+> 
+>   .../bindings/bus/st,stm32-etzpc.yaml          |   96 +
+>   .../bindings/bus/st,stm32mp25-rifsc.yaml      |  105 +
+>   .../bindings/crypto/st,stm32-cryp.yaml        |    4 +
+>   .../bindings/crypto/st,stm32-hash.yaml        |    4 +
+>   .../devicetree/bindings/dma/st,stm32-dma.yaml |    4 +
+>   .../bindings/dma/st,stm32-dmamux.yaml         |    4 +
+>   .../feature-domain-controller.yaml            |   84 +
+>   .../devicetree/bindings/i2c/st,stm32-i2c.yaml |    4 +
+>   .../bindings/iio/adc/st,stm32-adc.yaml        |    4 +
+>   .../bindings/iio/adc/st,stm32-dfsdm-adc.yaml  |    4 +
+>   .../bindings/iio/dac/st,stm32-dac.yaml        |    4 +
+>   .../bindings/media/cec/st,stm32-cec.yaml      |    4 +
+>   .../bindings/media/st,stm32-dcmi.yaml         |    4 +
+>   .../memory-controllers/st,stm32-fmc2-ebi.yaml |    4 +
+>   .../bindings/mfd/st,stm32-lptimer.yaml        |    4 +
+>   .../bindings/mfd/st,stm32-timers.yaml         |    5 +
+>   .../devicetree/bindings/mmc/arm,pl18x.yaml    |    4 +
+>   .../bindings/net/can/bosch,m_can.yaml         |    4 +
+>   .../devicetree/bindings/net/stm32-dwmac.yaml  |    4 +
+>   .../bindings/phy/phy-stm32-usbphyc.yaml       |    4 +
+>   .../bindings/regulator/st,stm32-vrefbuf.yaml  |    4 +
+>   .../devicetree/bindings/rng/st,stm32-rng.yaml |    4 +
+>   .../bindings/serial/st,stm32-uart.yaml        |    4 +
+>   .../bindings/sound/st,stm32-i2s.yaml          |    4 +
+>   .../bindings/sound/st,stm32-sai.yaml          |    4 +
+>   .../bindings/sound/st,stm32-spdifrx.yaml      |    4 +
+>   .../bindings/spi/st,stm32-qspi.yaml           |    4 +
+>   .../devicetree/bindings/spi/st,stm32-spi.yaml |    4 +
+>   .../devicetree/bindings/usb/dwc2.yaml         |    4 +
+>   MAINTAINERS                                   |    7 +
+>   arch/arm/boot/dts/st/stm32mp131.dtsi          | 1027 +++---
+>   arch/arm/boot/dts/st/stm32mp133.dtsi          |   51 +-
+>   arch/arm/boot/dts/st/stm32mp13xc.dtsi         |   19 +-
+>   arch/arm/boot/dts/st/stm32mp13xf.dtsi         |   19 +-
+>   arch/arm/boot/dts/st/stm32mp151.dtsi          | 2757 +++++++++--------
+>   arch/arm/boot/dts/st/stm32mp153.dtsi          |   52 +-
+>   arch/arm/boot/dts/st/stm32mp15xc.dtsi         |   19 +-
+>   arch/arm64/Kconfig.platforms                  |    1 +
+>   arch/arm64/boot/dts/st/stm32mp251.dtsi        |    7 +-
+>   drivers/bus/Kconfig                           |    9 +
+>   drivers/bus/Makefile                          |    1 +
+>   drivers/bus/stm32_etzpc.c                     |  141 +
+>   drivers/bus/stm32_firewall.c                  |  288 ++
+>   drivers/bus/stm32_firewall.h                  |   83 +
+>   drivers/bus/stm32_rifsc.c                     |  252 ++
+>   drivers/of/property.c                         |    2 +
+>   include/linux/bus/stm32_firewall_device.h     |  140 +
+>   47 files changed, 3346 insertions(+), 1919 deletions(-)
+>   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
+>   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
+>   create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
+>   create mode 100644 drivers/bus/stm32_etzpc.c
+>   create mode 100644 drivers/bus/stm32_firewall.c
+>   create mode 100644 drivers/bus/stm32_firewall.h
+>   create mode 100644 drivers/bus/stm32_rifsc.c
+>   create mode 100644 include/linux/bus/stm32_firewall_device.h
+> 
