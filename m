@@ -2,133 +2,265 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC95FE7D273
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 09:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE4BE7D279
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 10:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbjIZJzP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Sep 2023 05:55:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41580 "EHLO
+        id S233201AbjIZKUv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Sep 2023 06:20:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230037AbjIZJzM (ORCPT
+        with ESMTP id S231182AbjIZKUu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Sep 2023 05:55:12 -0400
-X-Greylist: delayed 501 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 26 Sep 2023 02:55:05 PDT
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E486B3;
-        Tue, 26 Sep 2023 02:55:05 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 7A6762800BBE7;
-        Tue, 26 Sep 2023 11:46:40 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 688211F230; Tue, 26 Sep 2023 11:46:40 +0200 (CEST)
-Message-Id: <be8ab09429d55c6cfc52ee0e43bf021ffb384152.1695720715.git.lukas@wunner.de>
-From:   Lukas Wunner <lukas@wunner.de>
-Date:   Tue, 26 Sep 2023 11:46:41 +0200
-Subject: [PATCH] X.509: Add missing IMPLICIT annotations to AKID ASN.1 module
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Vivek Goyal <vgoyal@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
+        Tue, 26 Sep 2023 06:20:50 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5582EB3;
+        Tue, 26 Sep 2023 03:20:40 -0700 (PDT)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q8xw6X005613;
+        Tue, 26 Sep 2023 10:20:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=SoO76paamv0PioszEiN3AVES7Unte5nzNg2ivgsCr64=;
+ b=UG9/fOY+tX3tq1GkQmr/3r0yGvQCVDJDA91Bzn0eIs0hmQOUaRPCkZFY2lHzmfRPtwWg
+ hr3FUy8udPWbx0adbSAieLtDjADpRaKgLocipNDvU1GZ8OCba29FZ3DonsBi7ji8cjlo
+ v4o5iv/Snbm1ZZJWNpOORNJajFUALiSuz2ITc99b9rG2q4GX4SldaYZoW+t4jILqNpG+
+ OpWdT+cvpLlrSpmX9RN3q79zuC6oHf7OoD1qNZnucR+F8ePenRWcnw1NyCVyd0RkGFDT
+ gpVZon00FUlUFQrn18GHwoiEfaOKJYJpFTa8N1fvzwiOfps8klME9OKALuFFPs4qps3d 5w== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tbmwws2ns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Sep 2023 10:20:26 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38QAKPXl031276
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Sep 2023 10:20:25 GMT
+Received: from hu-omprsing-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.36; Tue, 26 Sep 2023 03:20:20 -0700
+From:   Om Prakash Singh <quic_omprsing@quicinc.com>
+To:     <quic_omprsing@quicinc.com>
+CC:     <neil.armstrong@linaro.org>, <konrad.dybcio@linaro.org>,
+        <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
+        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
+        <robh+dt@kernel.org>, <vkoul@kernel.org>
+Subject: [PATCH V4] crypto: qcom-rng - Add hw_random interface support
+Date:   Tue, 26 Sep 2023 15:50:05 +0530
+Message-ID: <20230926102005.3277045-1-quic_omprsing@quicinc.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: CVvXhIafNzcgd_uXEkF23H0mV34gnzl2
+X-Proofpoint-ORIG-GUID: CVvXhIafNzcgd_uXEkF23H0mV34gnzl2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-26_07,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ bulkscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0
+ mlxlogscore=999 spamscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2309260090
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The ASN.1 module in RFC 5280 appendix A.1 uses EXPLICIT TAGS whereas the
-one in appendix A.2 uses IMPLICIT TAGS.
+Add hw_random interface support in qcom-rng driver as new IP block
+in Qualcomm SoC has inbuilt NIST SP800 90B compliant entropic source
+to generate true random number.
 
-The kernel's simplified asn1_compiler.c always uses EXPLICIT TAGS, hence
-definitions from appendix A.2 need to be annotated as IMPLICIT for the
-compiler to generate RFC-compliant code.
+Keeping current rng_alg interface as well for random number generation
+using Kernel Crypto API.
 
-In particular, GeneralName is defined in appendix A.2:
-
-GeneralName ::= CHOICE {
-        otherName                       [0] OtherName,
-        ...
-        dNSName                         [2] IA5String,
-        x400Address                     [3] ORAddress,
-        directoryName                   [4] Name,
-        ...
-        }
-
-Because appendix A.2 uses IMPLICIT TAGS, the IA5String tag (0x16) of a
-dNSName is not rendered.  Instead, the string directly succeeds the
-[2] tag (0x82).
-
-Likewise, the SEQUENCE tag (0x30) of an OtherName is not rendered.
-Instead, only the constituents of the SEQUENCE are rendered:  An OID tag
-(0x06), a [0] tag (0xa0) and an ANY tag.  That's three consecutive tags
-instead of a single encompassing tag.
-
-The situation is different for x400Address and directoryName choices:
-They reference ORAddress and Name, which are defined in appendix A.1,
-therefore use EXPLICIT TAGS.
-
-The AKID ASN.1 module is missing several IMPLICIT annotations, hence
-isn't RFC-compliant.  In the unlikely event that an AKID contains other
-elements beside a directoryName, users may see parse errors.
-
-Add the missing annotations but do not tag this commit for stable as I
-am not aware of any issue reports.  Fixes are only eligible for stable
-if they're "obviously correct" and with ASN.1 there's no such thing.
-
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
 ---
-Found this while bringing up PCI device authentication, which involves
-validating the Subject Alternative Name in certificates.
 
-I double-checked all ASN.1 modules in the tree and this seems to be
-the only one affected by the issue.
+Changes in V4:
+- Fixed email address of author
+- Removed extra space added in qcom_hwrng_read()
 
- crypto/asymmetric_keys/x509_akid.asn1 | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+Changes in V3:
+- Fix qcom_rng_read() implementation to account for remaining bytes read
+- Update qcom_rng_generate() return condition for success case
+- Added hwrng structure as part of qcom_rng structure
 
-diff --git a/crypto/asymmetric_keys/x509_akid.asn1 b/crypto/asymmetric_keys/x509_akid.asn1
-index 1a33231..c7818ff 100644
---- a/crypto/asymmetric_keys/x509_akid.asn1
-+++ b/crypto/asymmetric_keys/x509_akid.asn1
-@@ -14,15 +14,15 @@ CertificateSerialNumber ::= INTEGER ({ x509_akid_note_serial })
- GeneralNames ::= SEQUENCE OF GeneralName
+Changes in V2:
+- Updated patch to fix the return value from qcom_rng_generate() to be
+  consistent with current implementation
+- Updated patch to make it more concise
+- Removed unnecessary use local variable and it's initialization
+- Updated patch to use devm_hwrng_register() instead of hwrng_register()
+- Updated subject line of the patch
+
+This patch is depends on [1]
+[1] https://lore.kernel.org/lkml/20230824-topic-sm8550-rng-v2-4-dfcafbb16a3e@linaro.org/
+
+ drivers/crypto/qcom-rng.c | 66 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 58 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
+index fb54b8cfc35f..8b506abb934c 100644
+--- a/drivers/crypto/qcom-rng.c
++++ b/drivers/crypto/qcom-rng.c
+@@ -7,6 +7,7 @@
+ #include <linux/acpi.h>
+ #include <linux/clk.h>
+ #include <linux/crypto.h>
++#include <linux/hw_random.h>
+ #include <linux/io.h>
+ #include <linux/iopoll.h>
+ #include <linux/kernel.h>
+@@ -28,17 +29,25 @@
  
- GeneralName ::= CHOICE {
--	otherName			[0] ANY,
--	rfc822Name			[1] IA5String,
--	dNSName				[2] IA5String,
-+	otherName			[0] IMPLICIT OtherName,
-+	rfc822Name			[1] IMPLICIT IA5String,
-+	dNSName				[2] IMPLICIT IA5String,
- 	x400Address			[3] ANY,
- 	directoryName			[4] Name ({ x509_akid_note_name }),
--	ediPartyName			[5] ANY,
--	uniformResourceIdentifier	[6] IA5String,
--	iPAddress			[7] OCTET STRING,
--	registeredID			[8] OBJECT IDENTIFIER
-+	ediPartyName			[5] IMPLICIT EDIPartyName,
-+	uniformResourceIdentifier	[6] IMPLICIT IA5String,
-+	iPAddress			[7] IMPLICIT OCTET STRING,
-+	registeredID			[8] IMPLICIT OBJECT IDENTIFIER
- 	}
+ #define WORD_SZ			4
  
- Name ::= SEQUENCE OF RelativeDistinguishedName
-@@ -33,3 +33,13 @@ AttributeValueAssertion ::= SEQUENCE {
- 	attributeType		OBJECT IDENTIFIER ({ x509_note_OID }),
- 	attributeValue		ANY ({ x509_extract_name_segment })
- 	}
++#define QCOM_TRNG_QUALITY	1024
 +
-+OtherName ::= SEQUENCE {
-+	type-id			OBJECT IDENTIFIER,
-+	value			[0] ANY
+ struct qcom_rng {
+ 	struct mutex lock;
+ 	void __iomem *base;
+ 	struct clk *clk;
+-	unsigned int skip_init;
++	struct hwrng hwrng;
++	struct qcom_rng_of_data *of_data;
+ };
+ 
+ struct qcom_rng_ctx {
+ 	struct qcom_rng *rng;
+ };
+ 
++struct qcom_rng_of_data {
++	bool skip_init;
++	bool hwrng_support;
++};
++
+ static struct qcom_rng *qcom_rng_dev;
+ 
+ static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
+@@ -66,11 +75,11 @@ static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
+ 		} else {
+ 			/* copy only remaining bytes */
+ 			memcpy(data, &val, max - currsize);
+-			break;
++			currsize = max;
+ 		}
+ 	} while (currsize < max);
+ 
+-	return 0;
++	return currsize;
+ }
+ 
+ static int qcom_rng_generate(struct crypto_rng *tfm,
+@@ -92,6 +101,9 @@ static int qcom_rng_generate(struct crypto_rng *tfm,
+ 	mutex_unlock(&rng->lock);
+ 	clk_disable_unprepare(rng->clk);
+ 
++	if (ret >= 0)
++		ret = 0;
++
+ 	return ret;
+ }
+ 
+@@ -101,6 +113,13 @@ static int qcom_rng_seed(struct crypto_rng *tfm, const u8 *seed,
+ 	return 0;
+ }
+ 
++static int qcom_hwrng_read(struct hwrng *hwrng, void *data, size_t max, bool wait)
++{
++	struct qcom_rng *qrng = container_of(hwrng, struct qcom_rng, hwrng);
++
++	return qcom_rng_read(qrng, data, max);
++}
++
+ static int qcom_rng_enable(struct qcom_rng *rng)
+ {
+ 	u32 val;
+@@ -136,7 +155,7 @@ static int qcom_rng_init(struct crypto_tfm *tfm)
+ 
+ 	ctx->rng = qcom_rng_dev;
+ 
+-	if (!ctx->rng->skip_init)
++	if (!ctx->rng->of_data->skip_init)
+ 		return qcom_rng_enable(ctx->rng);
+ 
+ 	return 0;
+@@ -177,15 +196,31 @@ static int qcom_rng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(rng->clk))
+ 		return PTR_ERR(rng->clk);
+ 
+-	rng->skip_init = (unsigned long)device_get_match_data(&pdev->dev);
++	rng->of_data = (struct qcom_rng_of_data *)of_device_get_match_data(&pdev->dev);
+ 
+ 	qcom_rng_dev = rng;
+ 	ret = crypto_register_rng(&qcom_rng_alg);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Register crypto rng failed: %d\n", ret);
+ 		qcom_rng_dev = NULL;
++		return ret;
 +	}
 +
-+EDIPartyName ::= SEQUENCE {
-+	nameAssigner		[0] ANY OPTIONAL,
-+	partyName		[1] ANY
-+	}
++	if (rng->of_data->hwrng_support) {
++		rng->hwrng.name = "qcom_hwrng";
++		rng->hwrng.read = qcom_hwrng_read;
++		rng->hwrng.quality = QCOM_TRNG_QUALITY;
++		ret = devm_hwrng_register(&pdev->dev, &rng->hwrng);
++		if (ret) {
++			dev_err(&pdev->dev, "Register hwrng failed: %d\n", ret);
++			qcom_rng_dev = NULL;
++			goto fail;
++		}
+ 	}
+ 
++	return ret;
++fail:
++	crypto_unregister_rng(&qcom_rng_alg);
+ 	return ret;
+ }
+ 
+@@ -198,6 +233,21 @@ static int qcom_rng_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++struct qcom_rng_of_data qcom_prng_of_data = {
++	.skip_init = false,
++	.hwrng_support = false,
++};
++
++struct qcom_rng_of_data qcom_prng_ee_of_data = {
++	.skip_init = true,
++	.hwrng_support = false,
++};
++
++struct qcom_rng_of_data qcom_trng_of_data = {
++	.skip_init = true,
++	.hwrng_support = true,
++};
++
+ static const struct acpi_device_id __maybe_unused qcom_rng_acpi_match[] = {
+ 	{ .id = "QCOM8160", .driver_data = 1 },
+ 	{}
+@@ -205,9 +255,9 @@ static const struct acpi_device_id __maybe_unused qcom_rng_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, qcom_rng_acpi_match);
+ 
+ static const struct of_device_id __maybe_unused qcom_rng_of_match[] = {
+-	{ .compatible = "qcom,prng", .data = (void *)0},
+-	{ .compatible = "qcom,prng-ee", .data = (void *)1},
+-	{ .compatible = "qcom,trng", .data = (void *)1},
++	{ .compatible = "qcom,prng", .data = &qcom_prng_of_data },
++	{ .compatible = "qcom,prng-ee", .data = &qcom_prng_ee_of_data },
++	{ .compatible = "qcom,trng", .data = &qcom_trng_of_data },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(of, qcom_rng_of_match);
 -- 
-2.40.1
+2.25.1
 
