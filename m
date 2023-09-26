@@ -2,74 +2,117 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE08E81815
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 03:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE7CE8181B
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 05:06:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbjIZDQI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Sep 2023 23:16:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32992 "EHLO
+        id S229611AbjIZFGx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Sep 2023 01:06:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbjIZDQI (ORCPT
+        with ESMTP id S229516AbjIZFGx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Sep 2023 23:16:08 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6F0A3;
-        Mon, 25 Sep 2023 20:16:00 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qkyXf-000cC3-99; Tue, 26 Sep 2023 11:15:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 26 Sep 2023 11:15:22 +0800
-Date:   Tue, 26 Sep 2023 11:15:22 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Alexey Romanov <avromanov@salutedevices.com>
-Cc:     "narmstrong@baylibre.com" <narmstrong@baylibre.com>,
-        "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-        "olivia@selenic.com" <olivia@selenic.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "conor+dt@kernel.org" <conor+dt@kernel.org>,
-        "conor@kernel.org" <conor@kernel.org>,
-        "khilman@baylibre.com" <khilman@baylibre.com>,
-        "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-        "martin.blumenstingl@googlemail.com" 
-        <martin.blumenstingl@googlemail.com>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-        "lists@kaiser.cx" <lists@kaiser.cx>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-amlogic@lists.infradead.org" 
-        <linux-amlogic@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v3 1/3] drivers: rng: meson: add support for S4
-Message-ID: <ZRJMynUI0W/jqeYt@gondor.apana.org.au>
-References: <20230911101129.10604-1-avromanov@salutedevices.com>
- <20230911101129.10604-2-avromanov@salutedevices.com>
- <ZQp7Rf3qzoN6c2Le@gondor.apana.org.au>
- <20230922081514.p7patdvkp4mujk6k@cab-wsm-0029881.sigma.sbrf.ru>
+        Tue, 26 Sep 2023 01:06:53 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 258EDDC;
+        Mon, 25 Sep 2023 22:06:46 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C8E6C433C8;
+        Tue, 26 Sep 2023 05:06:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695704805;
+        bh=04dKfnOt6jEKPxwkniGL3P38q9oto41OSV6p0OgWBIE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZldrbfxNPKu8jueRKGLY1eqPhp0ykF13KaryWKWN/pEIfaa3C++YV9AZUyEAI24Vo
+         NsxEf+/LYSfsuppRdivywQq4TsHpsBvh/QY3jKTWZ88P08Joyega0mNtImbPaVTndP
+         8t8ko1JTFu80b9LZk1Y6yo1QgOlmIu/7mMorE6o51LAJL7VB/mgeADtOK5U8PiihiN
+         q0hiOXWfQehWhd83Tu7EPo4fv2dnoz70z3eQrb8IkXoRa1XcRwDdtoCFZThAMvn4+U
+         PPz6xc/5S/uqoTOo6XaXaDTfbAxgpgG1WpMFI5WPk/u6BnY86fiYKSpD3tq+JA5TFy
+         MaO2TDQh1onQg==
+Date:   Mon, 25 Sep 2023 22:06:43 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Chang S. Bae" <chang.seok.bae@intel.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net, x86@kernel.org
+Subject: Re: [PATCH 1/3] crypto: x86/aesni - Refactor the common address
+ alignment code
+Message-ID: <20230926050643.GB3118@sol.localdomain>
+References: <20230925151752.162449-1-chang.seok.bae@intel.com>
+ <20230925151752.162449-2-chang.seok.bae@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230922081514.p7patdvkp4mujk6k@cab-wsm-0029881.sigma.sbrf.ru>
+In-Reply-To: <20230925151752.162449-2-chang.seok.bae@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 22, 2023 at 08:15:27AM +0000, Alexey Romanov wrote:
->
-> Are you suggesting remove meson_rng_priv and putting a pointer to read
-> function in meson_rng_data?
+On Mon, Sep 25, 2023 at 08:17:50AM -0700, Chang S. Bae wrote:
+> The address alignment code has been duplicated for each mode. Instead
+> of duplicating the same code, refactor the alignment code and simplify
+> the alignment helpers.
+> 
+> Suggested-by: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: x86@kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Link: https://lore.kernel.org/all/20230526065414.GB875@sol.localdomain/
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c | 26 ++++++++++----------------
+>  1 file changed, 10 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index 39d6a62ac627..241d38ae1ed9 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -80,6 +80,13 @@ struct gcm_context_data {
+>  	u8 hash_keys[GCM_BLOCK_LEN * 16];
+>  };
+>  
+> +static inline void *aes_align_addr(void *addr)
+> +{
+> +	if (crypto_tfm_ctx_alignment() >= AESNI_ALIGN)
+> +		return addr;
+> +	return PTR_ALIGN(addr, AESNI_ALIGN);
+> +}
+> +
+>  asmlinkage int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
+>  			     unsigned int key_len);
+>  asmlinkage void aesni_enc(const void *ctx, u8 *out, const u8 *in);
+> @@ -201,32 +208,19 @@ static __ro_after_init DEFINE_STATIC_KEY_FALSE(gcm_use_avx2);
+>  static inline struct
+>  aesni_rfc4106_gcm_ctx *aesni_rfc4106_gcm_ctx_get(struct crypto_aead *tfm)
+>  {
+> -	unsigned long align = AESNI_ALIGN;
+> -
+> -	if (align <= crypto_tfm_ctx_alignment())
+> -		align = 1;
+> -	return PTR_ALIGN(crypto_aead_ctx(tfm), align);
+> +	return (struct aesni_rfc4106_gcm_ctx *)aes_align_addr(crypto_aead_ctx(tfm));
+>  }
+>  
+>  static inline struct
+>  generic_gcmaes_ctx *generic_gcmaes_ctx_get(struct crypto_aead *tfm)
+>  {
+> -	unsigned long align = AESNI_ALIGN;
+> -
+> -	if (align <= crypto_tfm_ctx_alignment())
+> -		align = 1;
+> -	return PTR_ALIGN(crypto_aead_ctx(tfm), align);
+> +	return (struct generic_gcmaes_ctx *)aes_align_addr(crypto_aead_ctx(tfm));
+>  }
+>  #endif
+>  
+>  static inline struct crypto_aes_ctx *aes_ctx(void *raw_ctx)
+>  {
+> -	unsigned long addr = (unsigned long)raw_ctx;
+> -	unsigned long align = AESNI_ALIGN;
+> -
+> -	if (align <= crypto_tfm_ctx_alignment())
+> -		align = 1;
+> -	return (struct crypto_aes_ctx *)ALIGN(addr, align);
+> +	return (struct crypto_aes_ctx *)aes_align_addr(raw_ctx);
+>  }
 
-I just thought it was weird that you assign meson_rng_data->priv
-and then never use it anywhere else in the driver.  Did I miss
-something?
+The casts can be dropped, since aes_align_addr() returns 'void *'.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
