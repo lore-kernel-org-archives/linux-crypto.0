@@ -2,65 +2,110 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993C4E8181D
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 05:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBE9E7D267
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 08:49:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233645AbjIZFVZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Sep 2023 01:21:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39732 "EHLO
+        id S233956AbjIZItx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Sep 2023 04:49:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232066AbjIZFVN (ORCPT
+        with ESMTP id S229684AbjIZItv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Sep 2023 01:21:13 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869621B3;
-        Mon, 25 Sep 2023 22:21:01 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D771BC433C9;
-        Tue, 26 Sep 2023 05:21:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695705661;
-        bh=IkHjnktKldZibBZypBimCY9b32eN5qfQ3sPlP4a4HjA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ctQ3HMDIAhsOfmFDdVBGNnXBdrsroQ74YczJIgr5ZJFlyk0uHq4iVid9mOT5/h55C
-         tIIYI2rSmtEOoUsQXnQbfTcKAWUYaI4lcJNB+tt4EaVZuFhc6ygXwc07uPgOKY8K+i
-         65oWvjVKTEkoJLilcp6hVsA4jmOx544l+Yj6czrDml+9wyd7zhSr7x1M7Mx841FH12
-         AMioTBYOFyGn/aQY/YxSjsn2K9tXk+4MsC3xYOqSh2MmIY4RuF/q/fP/QRTIKJswUm
-         m6arh5krW6HJE6EaZmbovq7eFfNkY6Osl9rjOXpg94hgB3cYXdPB47QdHNziwWFu32
-         a2aSE5VH7oIeQ==
-Date:   Mon, 25 Sep 2023 22:20:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net, x86@kernel.org
-Subject: Re: [PATCH 2/3] crypto: x86/aesni - Correct the data type in struct
- aesni_xts_ctx
-Message-ID: <20230926052059.GC3118@sol.localdomain>
-References: <20230925151752.162449-1-chang.seok.bae@intel.com>
- <20230925151752.162449-3-chang.seok.bae@intel.com>
+        Tue, 26 Sep 2023 04:49:51 -0400
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9552E5;
+        Tue, 26 Sep 2023 01:49:44 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+        by mx1.sberdevices.ru (Postfix) with ESMTP id 4CB5A12000E;
+        Tue, 26 Sep 2023 11:49:43 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4CB5A12000E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+        s=mail; t=1695718183;
+        bh=FgKxXDgE/uNx01ueWhXfT0y9HcY1omQL2iYWSfBMwSs=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+        b=CaxKAcPO/txolsXTD4DokZBBGVXELARDSdBMAyC6a3LbLOdXJhSbGgJ1LnzPeLmS8
+         SGMumxzbD7Pydl6hc8L+Z+X6MyW77vyXTT8K77dHs+F+Pf2+YUkBrCRDXiPNQIXpTi
+         kj5+YQi7Ga6YfxaZlZWItS+pqEiWcW25uXg5G1pK+D+W8V20YfqxLDyrqorH4M8gJR
+         fRFITh0mU62ywiBt8DVo9AuhFuzQYH8tXg3Z+NuBZXdJFy5D4XJTb8mJ4T+dyC3DTt
+         pOwBKAIwnl7eKKPAoLRvq9a+LcDB40JfUjzeJnfKtvTsA8/GGllD+SKq9HJ4kqMwQd
+         WGxMj0tla0crQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.sberdevices.ru (Postfix) with ESMTPS;
+        Tue, 26 Sep 2023 11:49:43 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 26 Sep 2023 11:49:42 +0300
+From:   Alexey Romanov <avromanov@salutedevices.com>
+To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
+        <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <conor@kernel.org>, <khilman@baylibre.com>,
+        <jbrunet@baylibre.com>, <martin.blumenstingl@googlemail.com>,
+        <f.fainelli@gmail.com>, <hkallweit1@gmail.com>, <lists@kaiser.cx>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-amlogic@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
+        Alexey Romanov <avromanov@sberdevices.ru>,
+        Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH v4 2/3] dt-bindings: rng: meson: add meson-rng-s4 compatible
+Date:   Tue, 26 Sep 2023 11:49:25 +0300
+Message-ID: <20230926084932.65126-3-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230926084932.65126-1-avromanov@salutedevices.com>
+References: <20230926084932.65126-1-avromanov@salutedevices.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230925151752.162449-3-chang.seok.bae@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180127 [Sep 26 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 534 534 808c2ea49f7195c68d40844e073217da4fa0d1e3, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/26 05:53:00 #21984147
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 25, 2023 at 08:17:51AM -0700, Chang S. Bae wrote:
-> Currently, every field in struct aesni_xts_ctx is defined as a byte
-> array of the same size as struct crypto_aes_ctx. This data type
-> is obscure and the choice lacks justification.
-> 
-> To rectify this, update the field type in struct aesni_xts_ctx to
-> match its actual structure.
-> 
-> Suggested-by: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: x86@kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Link: https://lore.kernel.org/all/ZFWQ4sZEVu%2FLHq+Q@gmail.com/
+From: Alexey Romanov <avromanov@sberdevices.ru>
 
-Please put the "Link" directly after the Suggested-by to make it clear that the
-link is for the suggestion.  Thanks!
+Add compatible for hardware number generator node for
+Amlogic S4-series.
 
-- Eric
+Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+---
+ Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+index 457a6e43d810..afa52af442a7 100644
+--- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+@@ -14,6 +14,7 @@ properties:
+   compatible:
+     enum:
+       - amlogic,meson-rng
++      - amlogic,meson-s4-rng
+ 
+   reg:
+     maxItems: 1
+-- 
+2.25.1
+
