@@ -2,61 +2,142 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2B8E810A7
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Sep 2023 08:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53B8E810B1
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Sep 2023 09:18:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbjI0Ibd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Sep 2023 04:31:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
+        id S229685AbjI0JSA convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Sep 2023 05:18:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbjI0Iba (ORCPT
+        with ESMTP id S229583AbjI0JR7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Sep 2023 04:31:30 -0400
-Received: from mail.socialglobal.pl (mail.socialglobal.pl [51.195.90.253])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3749F
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 01:31:29 -0700 (PDT)
-Received: by mail.socialglobal.pl (Postfix, from userid 1002)
-        id 31DE1222E5; Wed, 27 Sep 2023 08:31:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=socialglobal.pl;
-        s=mail; t=1695803488;
-        bh=XwhyqI/moZPDJ7KCfcA6Gip8fA7ZKcg5SWsKuF/26zk=;
-        h=Date:From:To:Subject:From;
-        b=PEMXO9B7O/gpi4ryXpCbrTZC3AypH8HtqlMbwt3TG2TkTPWjGYARl1xovwyx+fQly
-         7XLeaUQjTSYkvkfl5AzX0oy/9JJmwxjXjZ/xyKwSL6LEHFrTFcPViM91UjjEllsMjK
-         V1h9qe6cuW30MSc5TT4JdUFbbgHbRJ3qm1MnIW7yqqv99KmuW+kYeujnzw9+Zkkx7y
-         abW2lkM5BuThEfEp6tqpv2MB18E5OOWai1HWzzrs2XlaK8mRY2vZgU9l5QOMHvQWW3
-         mDsx7G5QpfdTBDShz2zqt6sZQNkZOuGMlyonCdSPzYUP4ibj1r1+LT4roVFFUVoLR6
-         63cTRPbkW05Ig==
-Received: by mail.socialglobal.pl for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 08:30:56 GMT
-Message-ID: <20230927075535-0.1.8p.2yrsf.0.hemqm106n3@socialglobal.pl>
-Date:   Wed, 27 Sep 2023 08:30:56 GMT
-From:   "Dominik Perkowski" <dominik.perkowski@socialglobal.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Pozycjonowanie- informacja
-X-Mailer: mail.socialglobal.pl
+        Wed, 27 Sep 2023 05:17:59 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D9992;
+        Wed, 27 Sep 2023 02:17:57 -0700 (PDT)
+Received: from kwepemd200001.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RwWB52zCmztSVv;
+        Wed, 27 Sep 2023 17:13:33 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ kwepemd200001.china.huawei.com (7.221.188.2) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.23; Wed, 27 Sep 2023 17:17:55 +0800
+Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
+ dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2507.031;
+ Wed, 27 Sep 2023 17:17:54 +0800
+From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: RE: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
+Thread-Topic: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
+Thread-Index: AdnvwZyqMOU4LXJLQHSIVFGYJFXR5QAk7LIAADLTkZA=
+Date:   Wed, 27 Sep 2023 09:17:54 +0000
+Message-ID: <3253800b49c04b3abfdd54ac7f5e13a5@huawei.com>
+References: <1914739e2de14ed396e5674aa2d4766c@huawei.com>
+ <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
+In-Reply-To: <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.11]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
-
-jaki=C5=9B czas temu zg=C5=82osi=C5=82a si=C4=99 do nas firma, kt=C3=B3re=
-j strona internetowa nie pozycjonowa=C5=82a si=C4=99 wysoko w wyszukiwarc=
-e Google.=20
-
-Na podstawie wykonanego przez nas audytu SEO zoptymalizowali=C5=9Bmy tre=C5=
-=9Bci na stronie pod k=C4=85tem wcze=C5=9Bniej opracowanych s=C5=82=C3=B3=
-w kluczowych. Nasz wewn=C4=99trzny system codziennie analizuje prawid=C5=82=
-owe dzia=C5=82anie witryny.  Dzi=C4=99ki indywidualnej strategii, firma z=
-dobywa coraz wi=C4=99cej Klient=C3=B3w. =20
-
-Czy chcieliby Pa=C5=84stwo zwi=C4=99kszy=C4=87 liczb=C4=99 os=C3=B3b odwi=
-edzaj=C4=85cych stron=C4=99 internetow=C4=85 firmy? M=C3=B3g=C5=82bym prz=
-edstawi=C4=87 ofert=C4=99?=20
 
 
-Pozdrawiam serdecznie,
-Dominik Perkowski
+> -----Original Message-----
+> From: Halil Pasic [mailto:pasic@linux.ibm.com]
+> Sent: Wednesday, September 27, 2023 12:42 AM
+> To: Gonglei (Arei) <arei.gonglei@huawei.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>; linux-crypto@vger.kernel.org;
+> Marc Hartmayer <mhartmay@linux.ibm.com>; Michael S. Tsirkin
+> <mst@redhat.com>; Jason Wang <jasowang@redhat.com>;
+> virtualization@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> pizhenwei@bytedance.com; Halil Pasic <pasic@linux.ibm.com>; Cornelia Huck
+> <cohuck@redhat.com>
+> Subject: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
+> 
+> [..]
+> > --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> > +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> > @@ -61,8 +61,9 @@ static void virtio_crypto_akcipher_finalize_req(
+> >  	vc_akcipher_req->src_buf = NULL;
+> >  	vc_akcipher_req->dst_buf = NULL;
+> >  	virtcrypto_clear_request(&vc_akcipher_req->base);
+> > -
+> > +	local_bh_disable();
+> >
+> > crypto_finalize_akcipher_request(vc_akcipher_req->base.dataq->engine,
+> > req, err);
+> > +	local_bh_enable();
+> 
+> Thanks Gonglei!
+> 
+> I did this a quick spin, and it does not seem to be sufficient on s390x.
+> Which does not come as a surprise to me, because
+> 
+> #define lockdep_assert_in_softirq()
+> \
+> do
+> {
+>      \
+>         WARN_ON_ONCE(__lockdep_enabled                  &&
+> \
+>                      (!in_softirq() || in_irq() || in_nmi()));          \
+> } while (0)
+> 
+> will still warn because  in_irq() still evaluates to true (your patch addresses
+> the !in_softirq() part).
+> 
+You are right.
+
+So I think the core of this question is: Can we call crypto_finalize_request() in the upper half of the interrupt? 
+If so, maybe we should introduce a new function, such as lockdep_assert_in_interrupt().
+
+#define lockdep_assert_in_interrupt()                               \
+do {                                                           \
+       WARN_ON_ONCE(__lockdep_enabled && !in_interrupt());        \
+} while (0)
+
+If not, why? 
+
+Herbert, do you have any suggestions? Thanks.
+
+
+Regards,
+-Gonglei
+
+> I don't have any results on x86 yet. My current understanding is that the
+> virtio-pci transport code disables interrupts locally somewhere in the call chain
+> (actually in vp_vring_interrupt() via spin_lock_irqsave()) and then x86 would be
+> fine. But I will get that verified.
+> 
+> On the other hand virtio_airq_handler() calls vring_interrupt() with interrupts
+> enabled. (While vring_interrupt() is called in a (read) critical section in
+> virtio_airq_handler() we use read_lock() and not read_lock_irqsave() to grab
+> the lock. Whether that is correct in it self (i.e. disregarding the crypto problem)
+> or not I'm not sure right now. Will think some more about it tomorrow.) If the
+> way to go forward is disabling interrupts in virtio-ccw before vring_interrupt() is
+> called, I would be glad to spin a patch for that.
+> 
+> Copying Conny, as she may have an opinion on this (if I'm not wrong she
+> authored that code).
+> 
+> Regards,
+> Halil
