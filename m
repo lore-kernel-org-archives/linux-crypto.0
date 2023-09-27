@@ -2,45 +2,67 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24C7E810B9
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Sep 2023 10:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF63EE810D2
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Sep 2023 11:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230303AbjI0KKL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Sep 2023 06:10:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42866 "EHLO
+        id S231587AbjI0L0q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Sep 2023 07:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231222AbjI0KJ7 (ORCPT
+        with ESMTP id S231627AbjI0L00 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Sep 2023 06:09:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B86C1170F
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 03:08:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695809329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iuruE1nulZgndw+cQHO0vj1TexCC3+sKU/XFHVoq3fQ=;
-        b=bbbAi4MZTEGmpfStSCmsegtoVKFjJm6d738RTx52LcyREL8AgUjLRrab79oump1tbfYYya
-        cxsM52sJZtLCxoMCEg1+yUkP8TmGHXCCc3AFSdo4brX+3sG5bXMzki2roLbS0Bk/d8g9Kr
-        +VvsesakLsbbZuyfuvZDsxZGVlujpps=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-H03athJJOsSVs1ir8KZCwg-1; Wed, 27 Sep 2023 06:08:46 -0400
-X-MC-Unique: H03athJJOsSVs1ir8KZCwg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 761551C06E14;
-        Wed, 27 Sep 2023 10:08:45 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7773214026F7;
-        Wed, 27 Sep 2023 10:08:44 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 27 Sep 2023 07:26:26 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B881A8;
+        Wed, 27 Sep 2023 04:26:06 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38RBCJXj019581;
+        Wed, 27 Sep 2023 11:25:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zaDKg/sOthAqsAeV4KNI4nrJjy4oAfJBx/xwQotlLbM=;
+ b=Yct5r7glFMPtIALEPCD0KFgfcmvNIS92ZihPDC1qRBk7r6dht1B2n7CkAuUI3ekZnKIh
+ tTChVqM70tPe5rCNi35gVaqlEp4hMNxJv4JeXAB4mU03EJEsczcBjwwgnn1AzMhzVXAr
+ bDeNRHSKgUs6fn+ebf5s4HN2SnDzhCJfdYKY/Pi8p2miqF8CAuZ7Tc3XY7Kz9hlIdvOS
+ dofxDvqaX9OaTyJS5YbjuSyOWkYE6mbH2xpYdnr98LpEb3PVoeQg4qFE1R9X/ymlmiBS
+ 0zexhca3cirbSgPDsLqHWm/YvwWUNg5Jf/Smjrvnj/rbbaTSGDqxHQK68X9vdIZ0Uda2 ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tckag89rf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Sep 2023 11:25:43 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38RBD8Jm022055;
+        Wed, 27 Sep 2023 11:25:42 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tckag89r2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Sep 2023 11:25:42 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+        by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38R9qQ1j030746;
+        Wed, 27 Sep 2023 11:25:41 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjk2nd6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Sep 2023 11:25:41 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38RBPcsx22610616
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Sep 2023 11:25:38 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5DC1520040;
+        Wed, 27 Sep 2023 11:25:38 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2027920049;
+        Wed, 27 Sep 2023 11:25:38 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Sep 2023 11:25:38 +0000 (GMT)
+Date:   Wed, 27 Sep 2023 13:25:36 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Marc Hartmayer <mhartmay@linux.ibm.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -51,78 +73,79 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>,
         Halil Pasic <pasic@linux.ibm.com>
 Subject: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
-In-Reply-To: <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
+Message-ID: <20230927132536.4b19ab2f.pasic@linux.ibm.com>
+In-Reply-To: <877coc2aj8.fsf@redhat.com>
 References: <1914739e2de14ed396e5674aa2d4766c@huawei.com>
- <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 27 Sep 2023 12:08:43 +0200
-Message-ID: <877coc2aj8.fsf@redhat.com>
+        <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
+        <877coc2aj8.fsf@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: p8YYw4faLgXLXLhjv7-7jONu4hPNxosP
+X-Proofpoint-GUID: yb10tZ8FN2SVPf-XJEXl-ThNzyYU-cf2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-27_06,2023-09-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ priorityscore=1501 impostorscore=0 mlxscore=0 adultscore=0 suspectscore=0
+ mlxlogscore=625 clxscore=1015 phishscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309270092
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 26 2023, Halil Pasic <pasic@linux.ibm.com> wrote:
+On Wed, 27 Sep 2023 12:08:43 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> [..]
->> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> @@ -61,8 +61,9 @@ static void virtio_crypto_akcipher_finalize_req(
->>  	vc_akcipher_req->src_buf = NULL;
->>  	vc_akcipher_req->dst_buf = NULL;
->>  	virtcrypto_clear_request(&vc_akcipher_req->base);
->> -
->> +	local_bh_disable();
->>  	crypto_finalize_akcipher_request(vc_akcipher_req->base.dataq->engine, req, err);
->> +	local_bh_enable();
->
-> Thanks Gonglei!
->
-> I did this a quick spin, and it does not seem to be sufficient on s390x.
-> Which does not come as a surprise to me, because 
->
-> #define lockdep_assert_in_softirq()                                     \
-> do {                                                                    \
->         WARN_ON_ONCE(__lockdep_enabled                  &&              \
->                      (!in_softirq() || in_irq() || in_nmi()));          \
-> } while (0)
->
-> will still warn because  in_irq() still evaluates to true (your patch
-> addresses the !in_softirq() part).
->
-> I don't have any results on x86 yet. My current understanding is that the
-> virtio-pci transport code disables interrupts locally somewhere in the
-> call chain (actually in vp_vring_interrupt() via spin_lock_irqsave())
-> and then x86 would be fine. But I will get that verified.
->
-> On the other hand virtio_airq_handler() calls vring_interrupt() with
-> interrupts enabled. (While vring_interrupt() is called in a (read)
-> critical section in virtio_airq_handler() we use read_lock() and
-> not read_lock_irqsave() to grab the lock. Whether that is correct in
-> it self (i.e. disregarding the crypto problem) or not I'm not sure right
-> now. Will think some more about it tomorrow.) If the way to go forward
-> is disabling interrupts in virtio-ccw before vring_interrupt() is
-> called, I would be glad to spin a patch for that.
+> > On the other hand virtio_airq_handler() calls vring_interrupt() with
+> > interrupts enabled. (While vring_interrupt() is called in a (read)
+> > critical section in virtio_airq_handler() we use read_lock() and
+> > not read_lock_irqsave() to grab the lock. Whether that is correct in
+> > it self (i.e. disregarding the crypto problem) or not I'm not sure right
+> > now. Will think some more about it tomorrow.) If the way to go forward
+> > is disabling interrupts in virtio-ccw before vring_interrupt() is
+> > called, I would be glad to spin a patch for that.  
+> 
+> virtio_airq_handler() is supposed to be an interrupt handler for an
+> adapter interrupt -- as such I would expect it to always run with
+> interrupts disabled (and I'd expect vring_interrupt() to be called
+> with interrupts disabled as well; if that's not the case, I think it
+> would need to run asynchronously.) At least that was my understanding at
+> the time I wrote the code.
 
-virtio_airq_handler() is supposed to be an interrupt handler for an
-adapter interrupt -- as such I would expect it to always run with
-interrupts disabled (and I'd expect vring_interrupt() to be called
-with interrupts disabled as well; if that's not the case, I think it
-would need to run asynchronously.) At least that was my understanding at
-the time I wrote the code.
+Thanks Connie! I don't quite understand what do you mean by "run with
+interrupts disabled" in this context.
 
->
-> Copying Conny, as she may have an opinion on this (if I'm not wrong she
-> authored that code).
->
-> Regards,
-> Halil
+Do you mean that if I were to add the following warning:
+
+diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+index ac67576301bf..2a9c73f5964f 100644
+--- a/drivers/s390/virtio/virtio_ccw.c
++++ b/drivers/s390/virtio/virtio_ccw.c
+@@ -211,6 +211,8 @@ static void virtio_airq_handler(struct airq_struct *airq,
+        struct airq_info *info = container_of(airq, struct airq_info, airq);
+        unsigned long ai;
+ 
++       WARN_ONCE(in_irq(), "irqs are ought to be disabled but are not\n");
++
+        inc_irq_stat(IRQIO_VAI);
+
+it would/should never trigger, or do you mean something different?
+
+If yes, does that mean that you would expect the common airq code (i.e. something
+like do_airq_interrupt()) to disable interrupts, or call virtio_airq_handler()?
+asynchronously sort of as a bottom half (my understanding of bottom halves is currently
+not complete).
+
+If no what do you actually mean?
+
+Regards,
+Halil
+
+Regards,
+Halil
 
