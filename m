@@ -2,89 +2,116 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 104A5E7E65A
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Sep 2023 18:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D93E7F152
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Sep 2023 01:38:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235449AbjIZSl3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Sep 2023 14:41:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46724 "EHLO
+        id S233631AbjI0BiV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Sep 2023 21:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235484AbjIZSl2 (ORCPT
+        with ESMTP id S233614AbjI0BgQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Sep 2023 14:41:28 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D64DB11F;
-        Tue, 26 Sep 2023 11:41:21 -0700 (PDT)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QIcToP029667;
-        Tue, 26 Sep 2023 18:41:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=date : from : to :
- cc : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=qcppdkim1; bh=sKtbeylSWVLyUui5BBAROIGKpDpCi31kNkcoiTxLpkQ=;
- b=UWzYF4aKvk1pUCcb3enJmISVnJqRXvsp4P+7d7NlY+K/dMJNKNmYc1BJyszmMdYEfnon
- anZCDQAXXd+ySzOwew3a7XP645CY43VM0N2h0ML1Ri93k/NpcVeuplGkYohN8b20s99q
- rUOTAB5xYaww90xkGA9thfXnUmP4/czuGK1os+/ok1NExr8+5S8LTTScC8a1nopomAZ3
- Cw71cJnkue8OUeacY9DJQyR51uZk1JzqYuBGEEo0jpOli6EeaMNysftcv0vEzJbxcj9F
- spQs6yQL2tM21ZQlI4+cxUqiZN5OkqPx8pwuGtBucwLrTYSJBG9jE6TWN7QfTxuOLu+6 yA== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tbmwwtcmp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Sep 2023 18:41:08 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-        by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38QIf755013574
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Sep 2023 18:41:07 GMT
-Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 26 Sep 2023 11:41:07 -0700
-Date:   Tue, 26 Sep 2023 11:41:05 -0700
-From:   Bjorn Andersson <quic_bjorande@quicinc.com>
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>
-CC:     <neil.armstrong@linaro.org>, <konrad.dybcio@linaro.org>,
-        <agross@kernel.org>, <andersson@kernel.org>, <conor+dt@kernel.org>,
-        <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <krzysztof.kozlowski+dt@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <marijn.suijten@somainline.org>,
-        <robh+dt@kernel.org>, <vkoul@kernel.org>
-Subject: Re: [PATCH V4] crypto: qcom-rng - Add hw_random interface support
-Message-ID: <20230926184105.GD437346@hu-bjorande-lv.qualcomm.com>
-References: <20230926102005.3277045-1-quic_omprsing@quicinc.com>
+        Tue, 26 Sep 2023 21:36:16 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2E93C0B;
+        Tue, 26 Sep 2023 17:42:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695775371; x=1727311371;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=F6Bz04HLwZKmU4V8T935YAaMvZWHmnq0XOLucZBerfg=;
+  b=hc3ydvzwzOlirctt9MDlS7J1Z1rXAkU2bz7LLcfDcHV6OVfCOarv+cbm
+   qNg8NJ/T09jD9hn4kuzb0cSNtKECribCOjdW6CP7eNwLQTey+5Gza/TFd
+   Sh1FjHak7bRx9IYbH7ztKkxpVcCPvqpLXfvINmNREsFuJ8x9gwCy1E/25
+   hEvKUkf76jcT1Nx1HCAY2s/mHdDEIAfFD0nwb07mDmvMXyQ5yf+bh20mZ
+   fPD6MMZ7VzdIRLd5XHvXVKHY63m6NTgMoYyaMv+4OwdsvQxKhMWe45hrH
+   vKgiG/k2XZZaW3MONuEPSh0xfNvh8ok7iovzXeTUgcAOlpz+XenlDXpbD
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="361081154"
+X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
+   d="scan'208";a="361081154"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 17:42:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
+   d="scan'208";a="346492"
+Received: from lkp-server02.sh.intel.com (HELO 32c80313467c) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 26 Sep 2023 17:42:49 -0700
+Received: from kbuild by 32c80313467c with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qlIda-0003Xj-23;
+        Wed, 27 Sep 2023 00:42:46 +0000
+Date:   Wed, 27 Sep 2023 08:42:22 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Wang Jinchao <wangjinchao@xfusion.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, stone.xulei@xfusion.com
+Subject: Re: [PATCH] padata: Fix the UAF issue related to parallel_data
+Message-ID: <202309270829.xHgTOMKw-lkp@intel.com>
+References: <ZRE4XvOOhz4HSOgR@fedora>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230926102005.3277045-1-quic_omprsing@quicinc.com>
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: lxWp1M1oY6HIRf5IaiW51npEmjeIBPGU
-X-Proofpoint-ORIG-GUID: lxWp1M1oY6HIRf5IaiW51npEmjeIBPGU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-26_13,2023-09-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 phishscore=0
- mlxlogscore=758 spamscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2309260162
+In-Reply-To: <ZRE4XvOOhz4HSOgR@fedora>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 26, 2023 at 03:50:05PM +0530, Om Prakash Singh wrote:
-> Add hw_random interface support in qcom-rng driver as new IP block
-> in Qualcomm SoC has inbuilt NIST SP800 90B compliant entropic source
-> to generate true random number.
-> 
-> Keeping current rng_alg interface as well for random number generation
-> using Kernel Crypto API.
-> 
-> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+Hi Wang,
 
-Reviewed-by: Bjorn Andersson <quic_bjorande@quicinc.com>
+kernel test robot noticed the following build warnings:
 
-Regards,
-Bjorn
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.6-rc3 next-20230926]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Wang-Jinchao/padata-Fix-the-UAF-issue-related-to-parallel_data/20230925-153852
+base:   linus/master
+patch link:    https://lore.kernel.org/r/ZRE4XvOOhz4HSOgR%40fedora
+patch subject: [PATCH] padata: Fix the UAF issue related to parallel_data
+config: i386-randconfig-062-20230925 (https://download.01.org/0day-ci/archive/20230927/202309270829.xHgTOMKw-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230927/202309270829.xHgTOMKw-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309270829.xHgTOMKw-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> kernel/padata.c:1110:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected struct refcount_struct [usertype] *r @@     got struct refcount_struct [noderef] __rcu * @@
+   kernel/padata.c:1110:38: sparse:     expected struct refcount_struct [usertype] *r
+   kernel/padata.c:1110:38: sparse:     got struct refcount_struct [noderef] __rcu *
+
+vim +1110 kernel/padata.c
+
+  1097	
+  1098	/**
+  1099	 * padata_free_shell - free a padata shell
+  1100	 *
+  1101	 * @ps: padata shell to free
+  1102	 */
+  1103	void padata_free_shell(struct padata_shell *ps)
+  1104	{
+  1105		if (!ps)
+  1106			return;
+  1107	
+  1108		mutex_lock(&ps->pinst->lock);
+  1109		list_del(&ps->list);
+> 1110		if (refcount_dec_and_test(&ps->pd->refcnt))
+  1111			padata_free_pd(rcu_dereference_protected(ps->pd, 1));
+  1112		mutex_unlock(&ps->pinst->lock);
+  1113	
+  1114		kfree(ps);
+  1115	}
+  1116	EXPORT_SYMBOL(padata_free_shell);
+  1117	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
