@@ -2,133 +2,112 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52F3E82CBC
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 00:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE2EE82CBC
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 01:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229539AbjI1AjH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Sep 2023 20:39:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58886 "EHLO
+        id S229437AbjI1B2r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Sep 2023 21:28:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjI1AjH (ORCPT
+        with ESMTP id S229848AbjI1B2q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Sep 2023 20:39:07 -0400
-Received: from wxsgout04.xfusion.com (wxsgout03.xfusion.com [36.139.52.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DE8F5;
-        Wed, 27 Sep 2023 17:39:04 -0700 (PDT)
-Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
-        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4RwvgT1zx1z9y75B;
-        Thu, 28 Sep 2023 08:36:53 +0800 (CST)
-Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
- (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 28 Sep
- 2023 08:38:54 +0800
-Date:   Thu, 28 Sep 2023 08:38:53 +0800
-From:   Wang Jinchao <wangjinchao@xfusion.com>
-To:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] padata: Fix the UAF issue related to parallel_data
-Message-ID: <ZRTLHY5A+VqIKhA2@fedora>
+        Wed, 27 Sep 2023 21:28:46 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29BDBAC
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 18:28:45 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-584a761b301so4231966a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 18:28:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1695864524; x=1696469324; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MQKk85Afi4z+yWQXqNio3WhLlSbvtWaq2r8uxo++06Q=;
+        b=U4El6lVWUu2AeTz6mjX5N07iDhZeN9yKkwvLy8st/ocScdELsaGBzA6YU2dV4N3HH9
+         MIcQckOu1odgx+ZJgHuQzsF+PD2tF0Ppy3Y7kR6iCCdRFmzwbf1hGZ/5Vw1sQIgZWQMO
+         dg2fyLrIpJsM1sBIWL4HcTlavxafuVB8Y98Ar5iiuK8Yvt6n27WpDGC63XdltA0XnNOM
+         McQNb2q5sMcEm9wD0XBtIY9VMoTlC0oMVGQsV0OgHHONF71h9r/5rH3a3WoEQZcVCx8G
+         ym8GelJPmK6BBU4VEuQVd/HdBEsxqD8bcI9vS2L50LMU0zQefLGMJgnK9tH2Tl++uCOW
+         QiQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695864524; x=1696469324;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MQKk85Afi4z+yWQXqNio3WhLlSbvtWaq2r8uxo++06Q=;
+        b=bdY9jNYtsQuY2XyWraSAQVfQW5uK5vvD3fQyeI1aeVUH3qOtFPf8mqLW5SNyGb9wzd
+         kGVJ9zeF+Fgr+3CM66vyotfjNVZRjBD+tS6fUCTPCkid2RPk0ekvvIBzi7UtBhvdZC8/
+         mPfg7H6Gfz+laMKouG3HCini3Kue6E73cMhfKIQgy7G7pknPHRYpG/Dap4p+4rw3brXT
+         b6gx/+Bmjfs33lN1DJsFkuPhiiofMFDj6KoCT31RbAMMxqwFj4CQM/HIghN7bTd1AB/0
+         gFapPlA/DtPJ3LrhASUjmgpYmqr6c8ZuWFAP5i9d7JiwrBxuHcxMj0cMUkZ/4u37bivQ
+         Skwg==
+X-Gm-Message-State: AOJu0YyqarJB+EWT9/5ujCcpINk03X7dhJ1PNd58CWYuYmSuAciGBE3L
+        qEpXGUJoZvFIxb/iVqlY5k12lQ==
+X-Google-Smtp-Source: AGHT+IEb77pxF1A4zuog0Pubtnz/Y+v7YIq8Yjvf89gpA0u8AEh8k4dTpPQZEdA3uoZ+glEhfmQuZA==
+X-Received: by 2002:a05:6a21:7988:b0:14c:7e3:149b with SMTP id bh8-20020a056a21798800b0014c07e3149bmr2971085pzc.62.1695864524647;
+        Wed, 27 Sep 2023 18:28:44 -0700 (PDT)
+Received: from [10.3.43.196] ([61.213.176.12])
+        by smtp.gmail.com with ESMTPSA id v7-20020a170902b7c700b001c61073b064sm7916471plz.69.2023.09.27.18.28.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Sep 2023 18:28:44 -0700 (PDT)
+Message-ID: <829bc434-89e6-b17e-b832-d0d83480c80f@bytedance.com>
+Date:   Thu, 28 Sep 2023 09:24:29 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-Originating-IP: [10.82.147.3]
-X-ClientProxiedBy: wuxshcsitd00600.xfusion.com (10.32.133.213) To
- wuxshcsitd00600.xfusion.com (10.32.133.213)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
+Content-Language: en-US
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <1914739e2de14ed396e5674aa2d4766c@huawei.com>
+ <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
+ <20230926130521-mutt-send-email-mst@kernel.org>
+ <9564c220c8344939880bb805c5b3cac9@huawei.com>
+ <20230927152531.061600f0.pasic@linux.ibm.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+In-Reply-To: <20230927152531.061600f0.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In a high-load arm64 environment, the pcrypt_aead01 test in LTP can lead to
-system UAF (Use-After-Free) issues. Due to the lengthy analysis of the
-pcrypt_aead01 function call, I'll describe the problem scenario using a
-simplified model:
+Hi Michael & Lei,
 
-Suppose there's a user of padata named `user_function` that adheres to
-the padata requirement of calling `padata_free_shell` after `serial()`
-has been invoked, as demonstrated in the following code:
+I volunteer to fix this by workqueue.
 
-```c
-struct request {
-    struct padata_priv padata;
-    struct completion *done;
-};
+I also notice that device drivers use workqueue to handle config-changed 
+again and again, what about re-implement __virtio_config_changed() by 
+kicking workqueue instead?
 
-void parallel(struct padata_priv *padata) {
-    do_something();
-}
+By the way, balloon dirvers uses 
+spin_lock_irqsave/spin_unlock_irqrestore in config-changed callback, do 
+it handle correctly?
 
-void serial(struct padata_priv *padata) {
-    struct request *request = container_of(padata, struct request, padata);
-    complete(request->done);
-}
+On 9/27/23 21:25, Halil Pasic wrote:
+> On Wed, 27 Sep 2023 09:24:09 +0000
+> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
+> 
+>>> On a related note, config change callback is also handled incorrectly in this
+>>> driver, it takes a mutex from interrupt context.
+>>
+>> Good catch. Will fix it.
+> 
+> Thanks Gonglei! Sorry I first misunderstood this as a problem within the
+> virtio-ccw driver, but it is actually about virtio-crypto. Thanks for
+> fixing this!
+> 
+> Regards,
+> Halil
 
-void user_function() {
-    DECLARE_COMPLETION(done)
-    padata->parallel = parallel;
-    padata->serial = serial;
-    padata_do_parallel();
-    wait_for_completion(&done);
-    padata_free_shell();
-}
-```
-
-In the corresponding padata.c file, there's the following code:
-
-```c
-static void padata_serial_worker(struct work_struct *serial_work) {
-    ...
-    cnt = 0;
-
-    while (!list_empty(&local_list)) {
-        ...
-        padata->serial(padata);
-        cnt++;
-    }
-
-    local_bh_enable();
-
-    if (refcount_sub_and_test(cnt, &pd->refcnt))
-        padata_free_pd(pd);
-}
-```
-
-Because of the high system load and the accumulation of unexecuted
-softirq at this moment, `local_bh_enable()` in padata takes longer
-to execute than usual. Subsequently, when accessing `pd->refcnt`,
-`pd` has already been released by `padata_free_shell()`, resulting
-in a UAF issue with `pd->refcnt`.
-
-The fix is straightforward: add `refcount_dec_and_test` before calling
-`padata_free_pd` in `padata_free_shell`.
-
-Signed-off-by: Wang Jinchao <wangjinchao@xfusion.com>
----
-V2:
-    To satisfy Sparse, use rcu_dereference_protected.
-    Reported-by: kernel test robot <lkp@intel.com>
-    Closes: https://lore.kernel.org/oe-kbuild-all/202309270829.xHgTOMKw-lkp@intel.com/
-
-V1: https://lore.kernel.org/all/ZRE4XvOOhz4HSOgR@fedora/
-
- kernel/padata.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 222d60195de6..acef1e703a8b 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -1107,7 +1107,9 @@ void padata_free_shell(struct padata_shell *ps)
- 
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
--	padata_free_pd(rcu_dereference_protected(ps->pd, 1));
-+	struct parallel_data *pd = rcu_dereference_protected(ps->pd, 1);
-+	if (refcount_dec_and_test(&pd->refcnt))
-+		padata_free_pd(pd);
- 	mutex_unlock(&ps->pinst->lock);
- 
- 	kfree(ps);
 -- 
-2.40.0
-
+zhenwei pi
