@@ -2,41 +2,39 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6234CE7B08
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 17:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70889E732FD
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 17:48:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbjI1RqR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Sep 2023 13:46:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
+        id S232106AbjI1Rsn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Sep 2023 13:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjI1RqQ (ORCPT
+        with ESMTP id S232107AbjI1Rsm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Sep 2023 13:46:16 -0400
-X-Greylist: delayed 721 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 28 Sep 2023 10:46:13 PDT
-Received: from mailout3.hostsharing.net (mailout3.hostsharing.net [176.9.242.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1B5319D;
-        Thu, 28 Sep 2023 10:46:13 -0700 (PDT)
+        Thu, 28 Sep 2023 13:48:42 -0400
+Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816371BE;
+        Thu, 28 Sep 2023 10:48:39 -0700 (PDT)
 Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
          client-signature RSA-PSS (4096 bits) client-digest SHA256)
         (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by mailout3.hostsharing.net (Postfix) with ESMTPS id 7914310029AE0;
-        Thu, 28 Sep 2023 19:46:11 +0200 (CEST)
+        by mailout2.hostsharing.net (Postfix) with ESMTPS id E7CA51018978B;
+        Thu, 28 Sep 2023 19:48:34 +0200 (CEST)
 Received: from localhost (unknown [89.246.108.87])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by h08.hostsharing.net (Postfix) with ESMTPSA id EFDC160E0037;
-        Thu, 28 Sep 2023 19:46:10 +0200 (CEST)
-X-Mailbox-Line: From 16c06528d13b2c0081229a45cacd4b1b9cdff738 Mon Sep 17 00:00:00 2001
-Message-Id: <16c06528d13b2c0081229a45cacd4b1b9cdff738.1695921657.git.lukas@wunner.de>
+        by h08.hostsharing.net (Postfix) with ESMTPSA id C05E860E0037;
+        Thu, 28 Sep 2023 19:48:34 +0200 (CEST)
+X-Mailbox-Line: From 3db7a8856833dfcbc4b122301f233828379d67db Mon Sep 17 00:00:00 2001
+Message-Id: <3db7a8856833dfcbc4b122301f233828379d67db.1695921657.git.lukas@wunner.de>
 In-Reply-To: <cover.1695921656.git.lukas@wunner.de>
 References: <cover.1695921656.git.lukas@wunner.de>
 From:   Lukas Wunner <lukas@wunner.de>
 Date:   Thu, 28 Sep 2023 19:32:32 +0200
-Subject: [PATCH 03/12] X.509: Move certificate length retrieval into new
- helper
+Subject: [PATCH 04/12] certs: Create blacklist keyring earlier
 To:     Bjorn Helgaas <helgaas@kernel.org>,
         David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -61,93 +59,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The upcoming in-kernel SPDM library (Security Protocol and Data Model,
-https://www.dmtf.org/dsp/DSP0274) needs to retrieve the length from
-ASN.1 DER-encoded X.509 certificates.
+The upcoming support for PCI device authentication with CMA-SPDM
+(PCIe r6.1 sec 6.31) requires parsing X.509 certificates upon
+device enumeration, which happens in a subsys_initcall().
 
-Such code already exists in x509_load_certificate_list(), so move it
-into a new helper for reuse by SPDM.
+Parsing X.509 certificates accesses the blacklist keyring:
+x509_cert_parse()
+  x509_get_sig_params()
+    is_hash_blacklisted()
+      keyring_search()
 
-No functional change intended.
+So far the keyring is created much later in a device_initcall().  Avoid
+a NULL pointer dereference on access to the keyring by creating it one
+initcall level earlier than PCI device enumeration, i.e. in an
+arch_initcall().
 
 Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- crypto/asymmetric_keys/x509_loader.c | 38 +++++++++++++++++++---------
- include/keys/asymmetric-type.h       |  2 ++
- 2 files changed, 28 insertions(+), 12 deletions(-)
+ certs/blacklist.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/x509_loader.c b/crypto/asymmetric_keys/x509_loader.c
-index a41741326998..121460a0de46 100644
---- a/crypto/asymmetric_keys/x509_loader.c
-+++ b/crypto/asymmetric_keys/x509_loader.c
-@@ -4,28 +4,42 @@
- #include <linux/key.h>
- #include <keys/asymmetric-type.h>
+diff --git a/certs/blacklist.c b/certs/blacklist.c
+index 675dd7a8f07a..34185415d451 100644
+--- a/certs/blacklist.c
++++ b/certs/blacklist.c
+@@ -311,7 +311,7 @@ static int restrict_link_for_blacklist(struct key *dest_keyring,
+  * Initialise the blacklist
+  *
+  * The blacklist_init() function is registered as an initcall via
+- * device_initcall().  As a result if the blacklist_init() function fails for
++ * arch_initcall().  As a result if the blacklist_init() function fails for
+  * any reason the kernel continues to execute.  While cleanly returning -ENODEV
+  * could be acceptable for some non-critical kernel parts, if the blacklist
+  * keyring fails to load it defeats the certificate/key based deny list for
+@@ -356,7 +356,7 @@ static int __init blacklist_init(void)
+ /*
+  * Must be initialised before we try and load the keys into the keyring.
+  */
+-device_initcall(blacklist_init);
++arch_initcall(blacklist_init);
  
-+int x509_get_certificate_length(const u8 *p, unsigned long buflen)
-+{
-+	int plen;
-+
-+	/* Each cert begins with an ASN.1 SEQUENCE tag and must be more
-+	 * than 256 bytes in size.
-+	 */
-+	if (buflen < 4)
-+		return -EINVAL;
-+
-+	if (p[0] != 0x30 &&
-+	    p[1] != 0x82)
-+		return -EINVAL;
-+
-+	plen = (p[2] << 8) | p[3];
-+	plen += 4;
-+	if (plen > buflen)
-+		return -EINVAL;
-+
-+	return plen;
-+}
-+EXPORT_SYMBOL_GPL(x509_get_certificate_length);
-+
- int x509_load_certificate_list(const u8 cert_list[],
- 			       const unsigned long list_size,
- 			       const struct key *keyring)
- {
- 	key_ref_t key;
- 	const u8 *p, *end;
--	size_t plen;
-+	int plen;
- 
- 	p = cert_list;
- 	end = p + list_size;
- 	while (p < end) {
--		/* Each cert begins with an ASN.1 SEQUENCE tag and must be more
--		 * than 256 bytes in size.
--		 */
--		if (end - p < 4)
--			goto dodgy_cert;
--		if (p[0] != 0x30 &&
--		    p[1] != 0x82)
--			goto dodgy_cert;
--		plen = (p[2] << 8) | p[3];
--		plen += 4;
--		if (plen > end - p)
-+		plen = x509_get_certificate_length(p, end - p);
-+		if (plen < 0)
- 			goto dodgy_cert;
- 
- 		key = key_create_or_update(make_key_ref(keyring, 1),
-diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
-index 69a13e1e5b2e..6705cfde25b9 100644
---- a/include/keys/asymmetric-type.h
-+++ b/include/keys/asymmetric-type.h
-@@ -84,6 +84,8 @@ extern struct key *find_asymmetric_key(struct key *keyring,
- 				       const struct asymmetric_key_id *id_2,
- 				       bool partial);
- 
-+int x509_get_certificate_length(const u8 *p, unsigned long buflen);
-+
- int x509_load_certificate_list(const u8 cert_list[], const unsigned long list_size,
- 			       const struct key *keyring);
- 
+ #ifdef CONFIG_SYSTEM_REVOCATION_LIST
+ /*
 -- 
 2.40.1
 
