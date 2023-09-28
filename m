@@ -2,97 +2,102 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E33E810D5
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 02:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F8ACE7B09
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 07:39:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbjI1CDY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Sep 2023 22:03:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
+        id S230250AbjI1HjB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Sep 2023 03:39:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbjI1CDX (ORCPT
+        with ESMTP id S230295AbjI1HjA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Sep 2023 22:03:23 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4CAC1;
-        Wed, 27 Sep 2023 19:03:21 -0700 (PDT)
-Received: from kwepemd500002.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RwxVn50XczNnmP;
-        Thu, 28 Sep 2023 09:59:29 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- kwepemd500002.china.huawei.com (7.221.188.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.23; Thu, 28 Sep 2023 10:03:19 +0800
-Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
- dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2507.031;
- Thu, 28 Sep 2023 10:03:19 +0800
-From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-CC:     Halil Pasic <pasic@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: RE: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
-Thread-Topic: Re: [PATCH] crypto: virtio-crypto: call finalize with bh
- disabled
-Thread-Index: AdnvwZyqMOU4LXJLQHSIVFGYJFXR5QAk7LIAAAEdD4AAMnHjIP//vvqAgADI4ID//3VFcA==
-Date:   Thu, 28 Sep 2023 02:03:18 +0000
-Message-ID: <53d400c057564aa28930bbf3d76ddeff@huawei.com>
-References: <1914739e2de14ed396e5674aa2d4766c@huawei.com>
-        <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
-        <20230926130521-mutt-send-email-mst@kernel.org>
-        <9564c220c8344939880bb805c5b3cac9@huawei.com>
-        <20230927152531.061600f0.pasic@linux.ibm.com>
- <829bc434-89e6-b17e-b832-d0d83480c80f@bytedance.com>
-In-Reply-To: <829bc434-89e6-b17e-b832-d0d83480c80f@bytedance.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.11]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Thu, 28 Sep 2023 03:39:00 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B413AC;
+        Thu, 28 Sep 2023 00:38:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695886739; x=1727422739;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=40nXyAPgocdeKIF3kA25jghB0Z6YVlYWl0z9fcbH7IA=;
+  b=J1a9FlampS2PPq+hvytNIZ96u+ToAmAyTNZTQG6c9F6Qw1ejwR/eCrbQ
+   Rx0GSZdG8zPHUixnh8D99G1Up4OlDHOYP+8/1WBg9//ix18J0jQfxvhcI
+   qc2O1hPVVbTJCbCi5JQKGpaH7WjZRqI7athbWNgwrAxPkuIW1B0Z3/v1s
+   FKhnZ5z2Z5w5Dn+MvuwZ2IpXegWi2l4DRQ5CiSmVUzLWZ/oe++VgO3Bn3
+   Aucj3LeKkmvJJIuhMCPVNG3PdCvdwsL6CLXuRiTRyPqbqIJ4iH3/hNfx1
+   boaom9OTITLCJm3KageGpMnDtkMQoS4X3iLkT1TZ0OGG3hLB5aJTxFnHQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="367064857"
+X-IronPort-AV: E=Sophos;i="6.03,183,1694761200"; 
+   d="scan'208";a="367064857"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2023 00:38:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="742990418"
+X-IronPort-AV: E=Sophos;i="6.03,183,1694761200"; 
+   d="scan'208";a="742990418"
+Received: from chang-linux-3.sc.intel.com ([172.25.66.173])
+  by orsmga007.jf.intel.com with ESMTP; 28 Sep 2023 00:38:57 -0700
+From:   "Chang S. Bae" <chang.seok.bae@intel.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        ebiggers@kernel.org, x86@kernel.org, chang.seok.bae@intel.com
+Subject: [PATCH v2 0/3] crypto: x86/aesni - Improve XTS data type
+Date:   Thu, 28 Sep 2023 00:25:05 -0700
+Message-Id: <20230928072508.218368-1-chang.seok.bae@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230925151752.162449-1-chang.seok.bae@intel.com>
+References: <20230925151752.162449-1-chang.seok.bae@intel.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogemhlbndlaSBwaSBbbWFp
-bHRvOnBpemhlbndlaUBieXRlZGFuY2UuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgU2VwdGVtYmVy
-IDI4LCAyMDIzIDk6MjQgQU0NCj4gVG86IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5j
-b20+OyBHb25nbGVpIChBcmVpKQ0KPiA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+IENjOiBI
-YWxpbCBQYXNpYyA8cGFzaWNAbGludXguaWJtLmNvbT47IEhlcmJlcnQgWHUNCj4gPGhlcmJlcnRA
-Z29uZG9yLmFwYW5hLm9yZy5hdT47IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IE1hcmMN
-Cj4gSGFydG1heWVyIDxtaGFydG1heUBsaW51eC5pYm0uY29tPjsgSmFzb24gV2FuZw0KPiA8amFz
-b3dhbmdAcmVkaGF0LmNvbT47IHZpcnR1YWxpemF0aW9uQGxpc3RzLmxpbnV4LWZvdW5kYXRpb24u
-b3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBDb3JuZWxpYSBIdWNrIDxjb2h1
-Y2tAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFJlOiBbUEFUQ0hdIGNyeXB0bzogdmlydGlv
-LWNyeXB0bzogY2FsbCBmaW5hbGl6ZSB3aXRoIGJoIGRpc2FibGVkDQo+IA0KPiBIaSBNaWNoYWVs
-ICYgTGVpLA0KPiANCj4gSSB2b2x1bnRlZXIgdG8gZml4IHRoaXMgYnkgd29ya3F1ZXVlLg0KPiAN
-ClRoYW5rcywgcGF0Y2hlcyBhcmUgYWx3YXlzIHdlbGNvbWUuDQoNCj4gSSBhbHNvIG5vdGljZSB0
-aGF0IGRldmljZSBkcml2ZXJzIHVzZSB3b3JrcXVldWUgdG8gaGFuZGxlIGNvbmZpZy1jaGFuZ2Vk
-IGFnYWluDQo+IGFuZCBhZ2Fpbiwgd2hhdCBhYm91dCByZS1pbXBsZW1lbnQgX192aXJ0aW9fY29u
-ZmlnX2NoYW5nZWQoKSBieSBraWNraW5nDQo+IHdvcmtxdWV1ZSBpbnN0ZWFkPw0KPiANClBlcnNv
-bmFsbHksIEkgcHJlZmVyIHRvIGltcGxlbWVudCBpdCBpbiB0aGUgZGV2aWNlIGRyaXZlciBjYXNl
-IGJ5IGNhc2UuIHNvbWUgZGV2aWNlcyANCndhbnQgdG8gd29yayBpbiB0aGUgdXBwZXIgaGFsZiBv
-ZiB0aGUgaW50ZXJydXB0IGNvbnRleHQsIHN1Y2ggYXMgdmlydGlvLW1lbS4NCg0KPiBCeSB0aGUg
-d2F5LCBiYWxsb29uIGRpcnZlcnMgdXNlcw0KPiBzcGluX2xvY2tfaXJxc2F2ZS9zcGluX3VubG9j
-a19pcnFyZXN0b3JlIGluIGNvbmZpZy1jaGFuZ2VkIGNhbGxiYWNrLCBkbyBpdA0KPiBoYW5kbGUg
-Y29ycmVjdGx5Pw0KPiANCkl0J3Mgb2suIFRoZSBjcml0aWNhbCByZXNvdXJjZSBwcm90ZWN0ZWQg
-aXMgZ2xvYmFsIHN5c3RlbV9mcmVlemFibGVfd3EuDQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0KDQo+
-IE9uIDkvMjcvMjMgMjE6MjUsIEhhbGlsIFBhc2ljIHdyb3RlOg0KPiA+IE9uIFdlZCwgMjcgU2Vw
-IDIwMjMgMDk6MjQ6MDkgKzAwMDANCj4gPiAiR29uZ2xlaSAoQXJlaSkiIDxhcmVpLmdvbmdsZWlA
-aHVhd2VpLmNvbT4gd3JvdGU6DQo+ID4NCj4gPj4+IE9uIGEgcmVsYXRlZCBub3RlLCBjb25maWcg
-Y2hhbmdlIGNhbGxiYWNrIGlzIGFsc28gaGFuZGxlZA0KPiA+Pj4gaW5jb3JyZWN0bHkgaW4gdGhp
-cyBkcml2ZXIsIGl0IHRha2VzIGEgbXV0ZXggZnJvbSBpbnRlcnJ1cHQgY29udGV4dC4NCj4gPj4N
-Cj4gPj4gR29vZCBjYXRjaC4gV2lsbCBmaXggaXQuDQo+ID4NCj4gPiBUaGFua3MgR29uZ2xlaSEg
-U29ycnkgSSBmaXJzdCBtaXN1bmRlcnN0b29kIHRoaXMgYXMgYSBwcm9ibGVtIHdpdGhpbg0KPiA+
-IHRoZSB2aXJ0aW8tY2N3IGRyaXZlciwgYnV0IGl0IGlzIGFjdHVhbGx5IGFib3V0IHZpcnRpby1j
-cnlwdG8uIFRoYW5rcw0KPiA+IGZvciBmaXhpbmcgdGhpcyENCj4gPg0KPiA+IFJlZ2FyZHMsDQo+
-ID4gSGFsaWwNCj4gDQo+IC0tDQo+IHpoZW53ZWkgcGkNCg0K
+V1->V2:
+* Drop the unnecessary casts (Eric).
+* Put the 'Link:' tag right after 'Suggested-by' (Eric).
+
+---
+
+The field within the struct aesni_xts_ctx is currently defined as a
+byte array, sized to match the struct crypto_aes_ctx. However, it
+actually represents the struct data type.
+
+To accurately redefine the data type, some adjustments have to be made
+to the address alignment code. It involved refactoring the common
+alignment code initially, followed by updating the structure's
+definition. Finally, the XTS alignment is now performed early in the
+process, rather than at every access point.
+
+This change was suggested during Eric's review of another series
+intended to enable an alternative AES implementation [1][2]. I viewed
+it as an enhancement to the mainline, independent of the series.
+
+I have divided these changes into incremental pieces, making them
+considerably more reviewable and maintainable.
+
+The series is based on the cryptodev's master branch:
+
+    git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+
+Thanks,
+Chang
+
+[1] https://lore.kernel.org/all/ZFWQ4sZEVu%2FLHq+Q@gmail.com/
+[2] https://lore.kernel.org/all/20230526065414.GB875@sol.localdomain/
+
+Chang S. Bae (3):
+  crypto: x86/aesni - Refactor the common address alignment code
+  crypto: x86/aesni - Correct the data type in struct aesni_xts_ctx
+  crypto: x86/aesni - Perform address alignment early for XTS mode
+
+ arch/x86/crypto/aesni-intel_glue.c | 52 ++++++++++++++----------------
+ 1 file changed, 25 insertions(+), 27 deletions(-)
+
+
+base-commit: 1c43c0f1f84aa59dfc98ce66f0a67b2922aa7f9d
+-- 
+2.34.1
+
