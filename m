@@ -2,64 +2,33 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE2EE82CBC
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 01:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E33E810D5
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Sep 2023 02:03:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229437AbjI1B2r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Sep 2023 21:28:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41652 "EHLO
+        id S229437AbjI1CDY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Sep 2023 22:03:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjI1B2q (ORCPT
+        with ESMTP id S229719AbjI1CDX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Sep 2023 21:28:46 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29BDBAC
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 18:28:45 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-584a761b301so4231966a12.3
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Sep 2023 18:28:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1695864524; x=1696469324; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MQKk85Afi4z+yWQXqNio3WhLlSbvtWaq2r8uxo++06Q=;
-        b=U4El6lVWUu2AeTz6mjX5N07iDhZeN9yKkwvLy8st/ocScdELsaGBzA6YU2dV4N3HH9
-         MIcQckOu1odgx+ZJgHuQzsF+PD2tF0Ppy3Y7kR6iCCdRFmzwbf1hGZ/5Vw1sQIgZWQMO
-         dg2fyLrIpJsM1sBIWL4HcTlavxafuVB8Y98Ar5iiuK8Yvt6n27WpDGC63XdltA0XnNOM
-         McQNb2q5sMcEm9wD0XBtIY9VMoTlC0oMVGQsV0OgHHONF71h9r/5rH3a3WoEQZcVCx8G
-         ym8GelJPmK6BBU4VEuQVd/HdBEsxqD8bcI9vS2L50LMU0zQefLGMJgnK9tH2Tl++uCOW
-         QiQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695864524; x=1696469324;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MQKk85Afi4z+yWQXqNio3WhLlSbvtWaq2r8uxo++06Q=;
-        b=bdY9jNYtsQuY2XyWraSAQVfQW5uK5vvD3fQyeI1aeVUH3qOtFPf8mqLW5SNyGb9wzd
-         kGVJ9zeF+Fgr+3CM66vyotfjNVZRjBD+tS6fUCTPCkid2RPk0ekvvIBzi7UtBhvdZC8/
-         mPfg7H6Gfz+laMKouG3HCini3Kue6E73cMhfKIQgy7G7pknPHRYpG/Dap4p+4rw3brXT
-         b6gx/+Bmjfs33lN1DJsFkuPhiiofMFDj6KoCT31RbAMMxqwFj4CQM/HIghN7bTd1AB/0
-         gFapPlA/DtPJ3LrhASUjmgpYmqr6c8ZuWFAP5i9d7JiwrBxuHcxMj0cMUkZ/4u37bivQ
-         Skwg==
-X-Gm-Message-State: AOJu0YyqarJB+EWT9/5ujCcpINk03X7dhJ1PNd58CWYuYmSuAciGBE3L
-        qEpXGUJoZvFIxb/iVqlY5k12lQ==
-X-Google-Smtp-Source: AGHT+IEb77pxF1A4zuog0Pubtnz/Y+v7YIq8Yjvf89gpA0u8AEh8k4dTpPQZEdA3uoZ+glEhfmQuZA==
-X-Received: by 2002:a05:6a21:7988:b0:14c:7e3:149b with SMTP id bh8-20020a056a21798800b0014c07e3149bmr2971085pzc.62.1695864524647;
-        Wed, 27 Sep 2023 18:28:44 -0700 (PDT)
-Received: from [10.3.43.196] ([61.213.176.12])
-        by smtp.gmail.com with ESMTPSA id v7-20020a170902b7c700b001c61073b064sm7916471plz.69.2023.09.27.18.28.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Sep 2023 18:28:44 -0700 (PDT)
-Message-ID: <829bc434-89e6-b17e-b832-d0d83480c80f@bytedance.com>
-Date:   Thu, 28 Sep 2023 09:24:29 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Wed, 27 Sep 2023 22:03:23 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4CAC1;
+        Wed, 27 Sep 2023 19:03:21 -0700 (PDT)
+Received: from kwepemd500002.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RwxVn50XczNnmP;
+        Thu, 28 Sep 2023 09:59:29 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ kwepemd500002.china.huawei.com (7.221.188.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.23; Thu, 28 Sep 2023 10:03:19 +0800
+Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
+ dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2507.031;
+ Thu, 28 Sep 2023 10:03:19 +0800
+From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+CC:     Halil Pasic <pasic@linux.ibm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Marc Hartmayer <mhartmay@linux.ibm.com>,
@@ -68,46 +37,62 @@ Cc:     Halil Pasic <pasic@linux.ibm.com>,
         <virtualization@lists.linux-foundation.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Cornelia Huck <cohuck@redhat.com>
+Subject: RE: Re: [PATCH] crypto: virtio-crypto: call finalize with bh disabled
+Thread-Topic: Re: [PATCH] crypto: virtio-crypto: call finalize with bh
+ disabled
+Thread-Index: AdnvwZyqMOU4LXJLQHSIVFGYJFXR5QAk7LIAAAEdD4AAMnHjIP//vvqAgADI4ID//3VFcA==
+Date:   Thu, 28 Sep 2023 02:03:18 +0000
+Message-ID: <53d400c057564aa28930bbf3d76ddeff@huawei.com>
 References: <1914739e2de14ed396e5674aa2d4766c@huawei.com>
- <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
- <20230926130521-mutt-send-email-mst@kernel.org>
- <9564c220c8344939880bb805c5b3cac9@huawei.com>
- <20230927152531.061600f0.pasic@linux.ibm.com>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <20230927152531.061600f0.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        <20230926184158.4ca2c0c3.pasic@linux.ibm.com>
+        <20230926130521-mutt-send-email-mst@kernel.org>
+        <9564c220c8344939880bb805c5b3cac9@huawei.com>
+        <20230927152531.061600f0.pasic@linux.ibm.com>
+ <829bc434-89e6-b17e-b832-d0d83480c80f@bytedance.com>
+In-Reply-To: <829bc434-89e6-b17e-b832-d0d83480c80f@bytedance.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.11]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Michael & Lei,
-
-I volunteer to fix this by workqueue.
-
-I also notice that device drivers use workqueue to handle config-changed 
-again and again, what about re-implement __virtio_config_changed() by 
-kicking workqueue instead?
-
-By the way, balloon dirvers uses 
-spin_lock_irqsave/spin_unlock_irqrestore in config-changed callback, do 
-it handle correctly?
-
-On 9/27/23 21:25, Halil Pasic wrote:
-> On Wed, 27 Sep 2023 09:24:09 +0000
-> "Gonglei (Arei)" <arei.gonglei@huawei.com> wrote:
-> 
->>> On a related note, config change callback is also handled incorrectly in this
->>> driver, it takes a mutex from interrupt context.
->>
->> Good catch. Will fix it.
-> 
-> Thanks Gonglei! Sorry I first misunderstood this as a problem within the
-> virtio-ccw driver, but it is actually about virtio-crypto. Thanks for
-> fixing this!
-> 
-> Regards,
-> Halil
-
--- 
-zhenwei pi
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogemhlbndlaSBwaSBbbWFp
+bHRvOnBpemhlbndlaUBieXRlZGFuY2UuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgU2VwdGVtYmVy
+IDI4LCAyMDIzIDk6MjQgQU0NCj4gVG86IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5j
+b20+OyBHb25nbGVpIChBcmVpKQ0KPiA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+IENjOiBI
+YWxpbCBQYXNpYyA8cGFzaWNAbGludXguaWJtLmNvbT47IEhlcmJlcnQgWHUNCj4gPGhlcmJlcnRA
+Z29uZG9yLmFwYW5hLm9yZy5hdT47IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IE1hcmMN
+Cj4gSGFydG1heWVyIDxtaGFydG1heUBsaW51eC5pYm0uY29tPjsgSmFzb24gV2FuZw0KPiA8amFz
+b3dhbmdAcmVkaGF0LmNvbT47IHZpcnR1YWxpemF0aW9uQGxpc3RzLmxpbnV4LWZvdW5kYXRpb24u
+b3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBDb3JuZWxpYSBIdWNrIDxjb2h1
+Y2tAcmVkaGF0LmNvbT4NCj4gU3ViamVjdDogUmU6IFJlOiBbUEFUQ0hdIGNyeXB0bzogdmlydGlv
+LWNyeXB0bzogY2FsbCBmaW5hbGl6ZSB3aXRoIGJoIGRpc2FibGVkDQo+IA0KPiBIaSBNaWNoYWVs
+ICYgTGVpLA0KPiANCj4gSSB2b2x1bnRlZXIgdG8gZml4IHRoaXMgYnkgd29ya3F1ZXVlLg0KPiAN
+ClRoYW5rcywgcGF0Y2hlcyBhcmUgYWx3YXlzIHdlbGNvbWUuDQoNCj4gSSBhbHNvIG5vdGljZSB0
+aGF0IGRldmljZSBkcml2ZXJzIHVzZSB3b3JrcXVldWUgdG8gaGFuZGxlIGNvbmZpZy1jaGFuZ2Vk
+IGFnYWluDQo+IGFuZCBhZ2Fpbiwgd2hhdCBhYm91dCByZS1pbXBsZW1lbnQgX192aXJ0aW9fY29u
+ZmlnX2NoYW5nZWQoKSBieSBraWNraW5nDQo+IHdvcmtxdWV1ZSBpbnN0ZWFkPw0KPiANClBlcnNv
+bmFsbHksIEkgcHJlZmVyIHRvIGltcGxlbWVudCBpdCBpbiB0aGUgZGV2aWNlIGRyaXZlciBjYXNl
+IGJ5IGNhc2UuIHNvbWUgZGV2aWNlcyANCndhbnQgdG8gd29yayBpbiB0aGUgdXBwZXIgaGFsZiBv
+ZiB0aGUgaW50ZXJydXB0IGNvbnRleHQsIHN1Y2ggYXMgdmlydGlvLW1lbS4NCg0KPiBCeSB0aGUg
+d2F5LCBiYWxsb29uIGRpcnZlcnMgdXNlcw0KPiBzcGluX2xvY2tfaXJxc2F2ZS9zcGluX3VubG9j
+a19pcnFyZXN0b3JlIGluIGNvbmZpZy1jaGFuZ2VkIGNhbGxiYWNrLCBkbyBpdA0KPiBoYW5kbGUg
+Y29ycmVjdGx5Pw0KPiANCkl0J3Mgb2suIFRoZSBjcml0aWNhbCByZXNvdXJjZSBwcm90ZWN0ZWQg
+aXMgZ2xvYmFsIHN5c3RlbV9mcmVlemFibGVfd3EuDQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0KDQo+
+IE9uIDkvMjcvMjMgMjE6MjUsIEhhbGlsIFBhc2ljIHdyb3RlOg0KPiA+IE9uIFdlZCwgMjcgU2Vw
+IDIwMjMgMDk6MjQ6MDkgKzAwMDANCj4gPiAiR29uZ2xlaSAoQXJlaSkiIDxhcmVpLmdvbmdsZWlA
+aHVhd2VpLmNvbT4gd3JvdGU6DQo+ID4NCj4gPj4+IE9uIGEgcmVsYXRlZCBub3RlLCBjb25maWcg
+Y2hhbmdlIGNhbGxiYWNrIGlzIGFsc28gaGFuZGxlZA0KPiA+Pj4gaW5jb3JyZWN0bHkgaW4gdGhp
+cyBkcml2ZXIsIGl0IHRha2VzIGEgbXV0ZXggZnJvbSBpbnRlcnJ1cHQgY29udGV4dC4NCj4gPj4N
+Cj4gPj4gR29vZCBjYXRjaC4gV2lsbCBmaXggaXQuDQo+ID4NCj4gPiBUaGFua3MgR29uZ2xlaSEg
+U29ycnkgSSBmaXJzdCBtaXN1bmRlcnN0b29kIHRoaXMgYXMgYSBwcm9ibGVtIHdpdGhpbg0KPiA+
+IHRoZSB2aXJ0aW8tY2N3IGRyaXZlciwgYnV0IGl0IGlzIGFjdHVhbGx5IGFib3V0IHZpcnRpby1j
+cnlwdG8uIFRoYW5rcw0KPiA+IGZvciBmaXhpbmcgdGhpcyENCj4gPg0KPiA+IFJlZ2FyZHMsDQo+
+ID4gSGFsaWwNCj4gDQo+IC0tDQo+IHpoZW53ZWkgcGkNCg0K
