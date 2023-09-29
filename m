@@ -2,110 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDEAE7F153
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 10:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F08E7F153
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 10:45:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233193AbjI2Kbe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Sep 2023 06:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42610 "EHLO
+        id S233003AbjI2KpQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Sep 2023 06:45:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233160AbjI2KbB (ORCPT
+        with ESMTP id S232833AbjI2KpP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Sep 2023 06:31:01 -0400
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674131BCA;
-        Fri, 29 Sep 2023 03:29:54 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-        by mx1.sberdevices.ru (Postfix) with ESMTP id BDE3912000F;
-        Fri, 29 Sep 2023 13:29:52 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru BDE3912000F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-        s=mail; t=1695983392;
-        bh=FgKxXDgE/uNx01ueWhXfT0y9HcY1omQL2iYWSfBMwSs=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-        b=vQv732HclpwMEw6YQWa/0tPyfXhUeDwEEDOBKinaeQgtqupz6RYFPwoVMMrnJKYlN
-         qbfpQFQKr6lS0ZTpNrE8QIiyCJEVe4H7hGpza22h7mzMvRSz0zcJsMhqVnmeOWjljS
-         fUmB4hicra5Uaq3L3N9oNCcDgo5lqTcZzgjNsMb/l4O4Fx0A2KIrav9Df94Jzu399r
-         lZfbYc3K8whx0VfZNgYcTqoWZQfRs5hfQ4QUgYg3dGxw2X+jwxfkcdZ3ah3njWPHeP
-         m5F5w3bXr0asC6eBvY56xLZKfY4SJePta7aDEKz/VIt4spZMbG9OQrEKSXd4yc5rNB
-         gOOFgdr1C4FxA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.sberdevices.ru (Postfix) with ESMTPS;
-        Fri, 29 Sep 2023 13:29:52 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+        Fri, 29 Sep 2023 06:45:15 -0400
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98313F9;
+        Fri, 29 Sep 2023 03:45:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1695984311; x=1727520311;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FY4+uwILG++fulADx59B41wzoeVUtcBbdGx5sYnpP9w=;
+  b=iwpbPczeietjjPs24iFrMwDRjW648EhBBCuddVQh1J3rtXyYRu81Pihx
+   k1+zrQYD2QRzvHH3xyK5FmkFo+6bSL1dWI7U4W04+KvHzp30gI/8ixsLV
+   eNB+YgFps9ijdUjsNi1g07JIY3bL6ZTZ9yuP36ioTUF2v1DxZqB6QRs8e
+   M=;
+X-IronPort-AV: E=Sophos;i="6.03,187,1694736000"; 
+   d="scan'208";a="586353328"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2023 10:45:09 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-iad-1a-m6i4x-366646a6.us-east-1.amazon.com (Postfix) with ESMTPS id 69F83A526F;
+        Fri, 29 Sep 2023 10:45:05 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 29 Sep 2023 13:29:52 +0300
-From:   Alexey Romanov <avromanov@salutedevices.com>
-To:     <narmstrong@baylibre.com>, <neil.armstrong@linaro.org>,
-        <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <conor@kernel.org>, <khilman@baylibre.com>,
-        <jbrunet@baylibre.com>, <martin.blumenstingl@googlemail.com>,
-        <f.fainelli@gmail.com>, <hkallweit1@gmail.com>, <lists@kaiser.cx>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <linux-amlogic@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kernel@sberdevices.ru>,
-        Alexey Romanov <avromanov@sberdevices.ru>,
-        Conor Dooley <conor.dooley@microchip.com>
-Subject: [PATCH v5 2/3] dt-bindings: rng: meson: add meson-rng-s4 compatible
-Date:   Fri, 29 Sep 2023 13:29:37 +0300
-Message-ID: <20230929102942.67985-3-avromanov@salutedevices.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230929102942.67985-1-avromanov@salutedevices.com>
-References: <20230929102942.67985-1-avromanov@salutedevices.com>
+ 15.2.1118.37; Fri, 29 Sep 2023 10:44:54 +0000
+Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
+ (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Fri, 29 Sep
+ 2023 10:44:51 +0000
+Message-ID: <2ef7c657-eb7e-499e-9265-56fa57ccd86f@amazon.com>
+Date:   Fri, 29 Sep 2023 12:44:48 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 180231 [Sep 29 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/29 07:52:00 #22006267
-X-KSMG-AntiVirus-Status: Clean, skipped
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] misc: Add Nitro Secure Module driver
+Content-Language: en-GB
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Arnd Bergmann" <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Olivia Mackall" <olivia@selenic.com>,
+        Petre Eftime <petre.eftime@gmail.com>,
+        "Erdem Meydanlli" <meydanli@amazon.nl>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <20230928224645.19768-1-graf@amazon.com>
+ <20230928224645.19768-2-graf@amazon.com>
+ <2023092906-strangle-pawing-16e2@gregkh>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <2023092906-strangle-pawing-16e2@gregkh>
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D033UWA004.ant.amazon.com (10.13.139.85) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Alexey Romanov <avromanov@sberdevices.ru>
-
-Add compatible for hardware number generator node for
-Amlogic S4-series.
-
-Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
----
- Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
-index 457a6e43d810..afa52af442a7 100644
---- a/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
-@@ -14,6 +14,7 @@ properties:
-   compatible:
-     enum:
-       - amlogic,meson-rng
-+      - amlogic,meson-s4-rng
- 
-   reg:
-     maxItems: 1
--- 
-2.25.1
+SGV5IEdyZWcsCgpPbiAyOS4wOS4yMyAwNzo0NCwgR3JlZyBLcm9haC1IYXJ0bWFuIHdyb3RlOgo+
+Cj4gT24gVGh1LCBTZXAgMjgsIDIwMjMgYXQgMTA6NDY6NDRQTSArMDAwMCwgQWxleGFuZGVyIEdy
+YWYgd3JvdGU6Cj4+IFdoZW4gcnVubmluZyBMaW51eCBpbnNpZGUgYSBOaXRybyBFbmNsYXZlLCB0
+aGUgaHlwZXJ2aXNvciBwcm92aWRlcyBhCj4+IHNwZWNpYWwgdmlydGlvIGRldmljZSBjYWxsZWQg
+Ik5TTSIuIFRoaXMgZGV2aWNlIGhhcyAyIG1haW4gZnVuY3Rpb25zOgo+Pgo+PiAgICAxKSBQcm92
+aWRlIGF0dGVzdGF0aW9uIHJlcG9ydHMKPj4gICAgMikgTW9kaWZ5IFBDUiBzdGF0ZQo+PiAgICAz
+KSBQcm92aWRlIGVudHJvcHkKPj4KPj4gVGhpcyBwYXRjaCBhZGRzIHRoZSBjb3JlIE5TTSBkcml2
+ZXIgdGhhdCBleHBvc2VzIGEgL2Rldi9uc20gZGV2aWNlIG5vZGUKPj4gd2hpY2ggdXNlciBzcGFj
+ZSBjYW4gdXNlIHRvIHJlcXVlc3QgYXR0ZXN0YXRpb24gZG9jdW1lbnRzIGFuZCBpbmZsdWVuY2UK
+Pj4gUENSIHN0YXRlcy4gQSBmb2xsb3cgdXAgcGF0Y2ggd2lsbCBhZGQgYSBod3JuZyBkcml2ZXIg
+dG8gZmVlZCBpdHMgZW50cm9weQo+PiBpbnRvIHRoZSBrZXJuZWwuCj4+Cj4+IE9yaWdpbmFsbHkt
+Ynk6IFBldHJlIEVmdGltZSA8cGV0cmUuZWZ0aW1lQGdtYWlsLmNvbT4KPiBIYXNuJ3QgdGhpcyBi
+ZWVuIHN1Ym1pdHRlZCBhIGxvbmcgdGltZSBhZ28/ICBXaGF0IGNoYW5nZWQgZnJvbSB0aGF0Cj4g
+c3VibWlzc2lvbj8gIE9yIGFtIEkgbWlzLXJlbWVtYmVyaW5nIHRoaW5ncz8KCgpXaXRoIE5pdHJv
+IEVuY2xhdmVzLCB0aGVyZSBhcmUgMiBwYXJ0aWVzOiBQYXJlbnQgYW5kIEVuY2xhdmUuCgpUaGUg
+cGFyZW50IGxhdW5jaGVzIHRoZSBFbmNsYXZlLiBUbyBkbyBzbywgaXQgY3JlYXRlcyBhIHNpYmxp
+bmcgVk0gdXNpbmcgCmEgc3BlY2lhbCBFbmNsYXZlcyBQQ0kgZGV2aWNlLiBUaGUgZHJpdmVyIGZv
+ciB0aGF0IGlzIGluIApkcml2ZXJzL3ZpcnQvbml0cm9fZW5jbGF2ZXMgYW5kIHlvdSBoZWxwZWQg
+dG8gdXBzdHJlYW0gdGhhdCBiYWNrIHRoZW4uCgpUaGUgZW5jbGF2ZSBpcyB3aGF0IGlzIHJ1bm5p
+bmcgaW5zaWRlIHRoZSBzaWJsaW5nIFZNLiBJdCBzZWVzIGEgCkZpcmVjcmFja2VyIGxpa2UgZGV2
+aWNlIG1vZGVsIHdpdGggdmlydGlvLXZzb2NrIHRvIGNvbW11bmljYXRlIHRvIHRoZSAKcGFyZW50
+IGFzIHdlbGwgYXMgYSBzcGVjaWFsIHZpcnRpby1tbWlvIGRldmljZSBjYWxsZWQgIk5TTSIgdG8g
+CmNvbW11bmljYXRlIHRvIHRoZSBoeXBlcnZpc29yLiBUaGlzIGRyaXZlciBpcyBmb3IgdGhlIGxh
+dHRlci4KCkknbSBub3cgYXdhcmUgb2YgcHJldmlvdXMgYXR0ZW1wdHMgdG8gdXBzdHJlYW0gaXQu
+CgoKPgo+PiAtLS0gL2Rldi9udWxsCj4+ICsrKyBiL2RyaXZlcnMvbWlzYy9uc20uYwo+PiBAQCAt
+MCwwICsxLDQ3MCBAQAo+PiArLy8gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAKPj4g
+Ky8qCj4+ICsgKiBBbWF6b24gTml0cm8gU2VjdXJlIE1vZHVsZSBkcml2ZXIuCj4+ICsgKgo+PiAr
+ICogQ29weXJpZ2h0IEFtYXpvbi5jb20sIEluYy4gb3IgaXRzIGFmZmlsaWF0ZXMuIEFsbCBSaWdo
+dHMgUmVzZXJ2ZWQuCj4+ICsgKgo+PiArICogVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7
+IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkgaXQKPj4gKyAqIHVuZGVyIHRo
+ZSB0ZXJtcyBhbmQgY29uZGl0aW9ucyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2Us
+Cj4+ICsgKiB2ZXJzaW9uIDIsIGFzIHB1Ymxpc2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3Vu
+ZGF0aW9uLgo+PiArICoKPj4gKyAqIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUg
+aG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLAo+PiArICogYnV0IFdJVEhPVVQgQU5ZIFdBUlJB
+TlRZOyB3aXRob3V0IGV2ZW4gdGhlIGltcGxpZWQgd2FycmFudHkgb2YKPj4gKyAqIE1FUkNIQU5U
+QUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4gU2VlIHRoZQo+PiAr
+ICogR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWlscy4KPj4gKyAqCj4+
+ICsgKiBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQ
+dWJsaWMgTGljZW5zZQo+PiArICogYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwgc2Vl
+IDxodHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4KPiBQbGVhc2UgZHJvcCB0aGUgbGljZW5z
+ZSAiYm9pbGVyLXBsYXRlIiB0ZXh0LCB0aGUgU1BEWCBsaW5lIGlzCj4gc3VmZmljaWVudC4KCgpT
+dXJlLCBoYXBweSB0byEgOikKCgpBbGV4CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdl
+cm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5n
+OiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRz
+Z2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVz
+dC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
