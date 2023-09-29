@@ -2,269 +2,182 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86997E728CA
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 17:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E935CE728CF
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 19:00:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233439AbjI2R3c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Sep 2023 13:29:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45970 "EHLO
+        id S233833AbjI2TAD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Sep 2023 15:00:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233472AbjI2R3V (ORCPT
+        with ESMTP id S233058AbjI2TAC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Sep 2023 13:29:21 -0400
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA1F1720;
-        Fri, 29 Sep 2023 10:29:01 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailout.west.internal (Postfix) with ESMTP id 23ACD320092E;
-        Fri, 29 Sep 2023 13:29:00 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Fri, 29 Sep 2023 13:29:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1696008539; x=1696094939; bh=eh
-        ieEWBFWNEtqLISekzJUElBV+gYQ+pS/wzD/+8Hv8g=; b=SwAEQRVqXdKNYYzKIK
-        nAu8o0rU2I8QgsVWLi96yIZudeda6AMsuZytEw7q9duQNSnhyhGI1clxPZilgE38
-        MyoRO4Xs184RsaoHsVCUbSkGGd4wyIUt3pEJujwW7OjqZuPnM7GpxTccJO/HGGL+
-        0Xd7UdjDsK+XBZioaJTaSZwAVYDjLH5WicB3plLPllwQXdc1/+qJVWh5CvCnLDRC
-        aa8SmqEM4xZcZiS47fyXZ23SeACevUEGQ8xJkLwyq4KjRRAP+i8QaBbpcROiRh9g
-        bixlco8FHudPKzLiOHI6z9veiF0mc/oCLg2mPyo0Dsp0nV696uLgwtf11Ay92JGT
-        5VUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1696008539; x=1696094939; bh=ehieEWBFWNEtq
-        LISekzJUElBV+gYQ+pS/wzD/+8Hv8g=; b=hg4nIFQcIDu1ILxhUsY+EmR04XZO7
-        b86mKeP/y9ZaeXwrtOXAN9aErJB7VqeT9x8vfHru1tosRIJHqmZpRORPXyW5n0EF
-        +aVq9LpCZSkJwh9r5fafg3FOqxXw6O649jP2JlNZbVer7TrByDXoXqB85GoZ4k9e
-        gDdg66DUN9IYcHZ+O9lFmdvQKi7QbninXL+Cp1M35VTjzcEoYm0QzFOB5xfte3Do
-        MOzC2qN5+1JgO1Sn65ymb/eOZdMW4gynwr0EbREpbhivOpsUrdvHMksu2XGRIICt
-        rqbQ36qS9FK5texZHjizBuf6oF2s/6WgQNK4N4gn8SjL2Qwm4fiNrsWWQ==
-X-ME-Sender: <xms:WQkXZUN3CaelKMM8nCq55tDE1iw53RrLMwqzdwZiqd2wi1rmPCVu9A>
-    <xme:WQkXZa8V6PNVpOiQDz3028MN8gSgBLV4mRv5-KdoJ9LGcc8zapA5RfkhhhNRUw7GG
-    CUnLGtuZKIPQ0rHMHs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrtddvgdduuddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:WQkXZbTNABQD2pJZ4oeFeN_HgFeeG5kGrO9XKou276D0rm72FBVkMA>
-    <xmx:WQkXZcu5-jtl51EYO3dPiB0AN33ViisFM2H1myTw4N6u0RPbM4eWnw>
-    <xmx:WQkXZcdBFVqIhmzum_0EwoOOy4N-3xP4QLVd_eFGX-oxxdbG55x3nw>
-    <xmx:WwkXZdXTewiVL15vJIwXRdbOmdhgOlFjNHJm_MbWmDo7WOUxKuQ_ng>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id ADB23B60089; Fri, 29 Sep 2023 13:28:57 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
+        Fri, 29 Sep 2023 15:00:02 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CDD4193;
+        Fri, 29 Sep 2023 12:00:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696014000; x=1727550000;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=2WtDhCBadBqwFoq4j9aqohW+Y++3WRTyEbJwXuDuDnQ=;
+  b=LWKh4OBhgqJn4U0AiPum5mCB1CnJid17qkDNHbscEA6SgmIf6OWSpl/I
+   Bc8u8JOKzhsvP3Yqiq9MGn5ivNiyLr1sZP+UTjaeL7fQtqQe+FKIH1YqA
+   Vz9h5r/h89JqUw2a+oCp3sVOFf5a1zfoHlp1eTVWWw070oqQQAom1NCn1
+   sfxVBVjlV5U/vZigfrbhbHAmJFBznEjbxEn5MLwMF9dvKL3/d+NqsdbAL
+   RS+pasYW43TvkEf1MGQfWqNfiMiqMJi5du+wqkY7/wlY2PD3T1BJJQtkC
+   YdUQYSHX1LbEPBZhIJ2jthcI2Jo7CqtwJ4lVv0EoY12i54xFdNdhYK6Qh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10848"; a="385170846"
+X-IronPort-AV: E=Sophos;i="6.03,188,1694761200"; 
+   d="scan'208";a="385170846"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2023 10:38:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10848"; a="893488501"
+X-IronPort-AV: E=Sophos;i="6.03,188,1694761200"; 
+   d="scan'208";a="893488501"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Sep 2023 10:37:07 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 29 Sep 2023 10:38:19 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 29 Sep 2023 10:38:19 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 29 Sep 2023 10:38:19 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.47) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 29 Sep 2023 10:38:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IjWONi6CNEPOkQPZO2knNFoNy8/wpsAGP2ooKpLZnY8BQO/xPxIyCIZsDrE0DN6p86qxjPY9oLJvMOwvBCnRGqN+QUCkJ4TY9ieLKyLr5OtdseGKHrBOTMKOv/x6WIo6VZ/lELUa8pHzCQkw4CXLFgKGvlHuvZ+lHgtjhCWwsXO7zE2hNZUWLx8b8FZbjA32ji5v2qKJ0rxmZSnx+CQLGlfutmFUFHuyYwnUSLTC2z7WlhrG24WTC4Q1wmsK/Q9rssJbLQhGVAdWvynz+E0vV4JzL9nGV/KePOEoJfbd9QKV2vWlFbgbmliu7TabFds5/BumSWWNQsj4PulWNpPP7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XFKDlCJPlNGVxwKvLrLqsuW7wDnMDMbQ4pElzHmEn04=;
+ b=WIzdK+/VXWUtZrPMmUdJ1Yw4sVuLiqXGib8WGDEeRMpmx72T3cWapbC4L3nk73shp6HWIxWrqim8u0ZmzKh8/jyr8xM/x6SROeQOjfrcilX57uWg+DgOjeSZTN33Em7LhpzQvq5wAcxT18q348KNV0VFwGcfOt2hiKDW+7y6kHNb+8QshaeUI8IkhuH3WULoyIHkwDpuIqg6Coftt+4Yji4r3mkvFx5F2NdVSgGc9/2y7K+8HXfKSWSfRZDe6DFpkGhepBlrWrsvxBbmc1S1Q5bxgRwxWI4kR7yPfWfQEDxfVdkSVNBEpT6zz4djEFjRBf+14vo81Ols3CjZDHcs9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by IA1PR11MB7824.namprd11.prod.outlook.com (2603:10b6:208:3f9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.39; Fri, 29 Sep
+ 2023 17:38:11 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::4c02:d735:4942:ad0c]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::4c02:d735:4942:ad0c%4]) with mapi id 15.20.6813.017; Fri, 29 Sep 2023
+ 17:38:11 +0000
+Date:   Fri, 29 Sep 2023 18:38:05 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Kees Cook <keescook@chromium.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        "Nick Desaulniers" <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>,
+        "Adam Guerin" <adam.guerin@intel.com>,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
+        <llvm@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <linux-hardening@vger.kernel.org>
+Subject: Re: [PATCH] crypto: qat: Annotate struct adf_fw_counters with
+ __counted_by
+Message-ID: <ZRcLfYW0prCLXlJ4@gcabiddu-mobl1.ger.corp.intel.com>
+References: <20230922175432.work.709-kees@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230922175432.work.709-kees@kernel.org>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DB8PR06CA0020.eurprd06.prod.outlook.com
+ (2603:10a6:10:100::33) To CY5PR11MB6366.namprd11.prod.outlook.com
+ (2603:10b6:930:3a::8)
 MIME-Version: 1.0
-Message-Id: <74b2d869-0d96-46f9-a180-b405992e6c51@app.fastmail.com>
-In-Reply-To: <20230929133320.74848-2-graf@amazon.com>
-References: <20230929133320.74848-1-graf@amazon.com>
- <20230929133320.74848-2-graf@amazon.com>
-Date:   Fri, 29 Sep 2023 13:28:37 -0400
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Alexander Graf" <graf@amazon.com>, linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Olivia Mackall" <olivia@selenic.com>,
-        "Petre Eftime" <petre.eftime@gmail.com>,
-        "Erdem Meydanlli" <meydanli@amazon.nl>,
-        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        "Xuan Zhuo" <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v2 1/2] misc: Add Nitro Secure Module driver
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|IA1PR11MB7824:EE_
+X-MS-Office365-Filtering-Correlation-Id: aa665a1c-4a0e-43fd-a841-08dbc112da17
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LSo//h/gjowzRGLleeOwsf3PK05vWEmKdMif+LdZZzlLUs8KQokK+7H57bAQOKzIK7rrhfLWAgkvbhcriD181UHmLjr5zlemiUBVgtUnLvWzAfw8TB3h7xgJz1R/1QWBA12CkXN/H9rujBNCNhYxAPNbndNnIArdJXy2OnNnpdZyFnItoAOtNxaih/T80aO+Aqdkj0niulFdHCWc2f2IBOP+uhZVxLbgHH3dIss2gr9gpNzxUhtZC1Wbb81z7p8WC3TdL0EMbwuClF2pWm1pX/Dv7xKtVOYygdvw302xf13lEqymfCszaDcjkcqPBeMBXip/NKFzEwRmknspUZOtJmSAM5pqftD4ajM2qzs1RqUiApOWAz8uukh8M6L55ea6UGUGq/7+Wd11Rwgk/oa9yz1yO+xGqsTMWw/up2ZAI4Tx895Bd3tT5azA2spHn+I2/W6dhi+dgK2QnB5bLhSXKIWqUoR8kjfG+5CuSC/TaYj6vILRTK8tgi8LPBzQe0FhXcR9UN1DFgh0R4uezkAhyzS9gJY6VBxqO5cptI+i860=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(396003)(39860400002)(376002)(136003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(86362001)(6916009)(66476007)(66556008)(66946007)(54906003)(2906002)(38100700002)(6666004)(966005)(478600001)(5660300002)(44832011)(316002)(41300700001)(4326008)(8676002)(8936002)(7416002)(26005)(83380400001)(36916002)(6506007)(6486002)(6512007)(82960400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tEjEKMN3fQSuH04PGRxEjTdnC2liT109wPAnqqxJXKYRKJf3IDl2br6kBgIW?=
+ =?us-ascii?Q?RxUNIvDGorA89ibzHDusutby65Dc4oWlBEHS02cosz2vHJBnCelawOXBprLD?=
+ =?us-ascii?Q?HKUKANa3AbrgqpLdhpX73IXeZiJRW5HteLPZM58z65x+8QjsurnwzBoMbxrt?=
+ =?us-ascii?Q?+eR1JDjur6Ou101twpHd6AR0Ve0/r5cNdr2UMrOhzEsgFNqEgC5wYis2bXz7?=
+ =?us-ascii?Q?l+GRnww2IW9g5lxdLNSILcLSoZUJoHxuAbwLp0BPQjul6Dsvu11f1MPjER9Q?=
+ =?us-ascii?Q?vOHjfaAjSuGFQ1YLJsBvoVo47lcT7pFlemo50IjkVE3diU/ghXBMxDH7BRL/?=
+ =?us-ascii?Q?nLSOw/zelP3jV6fMkS0AQl1qPHNfkrRwq4qJuH+EfW8Hxnad25+Z75jpxxLq?=
+ =?us-ascii?Q?ike5eIwpRA1x6j8WzVRFS6fWsbEowk/EGIugajyAKLwCtnDu+YdOiAUTIGij?=
+ =?us-ascii?Q?8GF08aZ7SmpcXF2b34kSEnzrcfo4rMyXLvUBWXcwzYnlKYNV9xdveu4ITptS?=
+ =?us-ascii?Q?8Fr17r6Vo5AvrgNXEOFPNsLamaiBBuUXfL2JohrNt4nK6QNI6PaFemBbpXo8?=
+ =?us-ascii?Q?Al8H1d27DZ7/sQ4Zn2BLKn1xTu3tb5i4pg+PsKaHot2UU7Q7WAvz5g1eAn4M?=
+ =?us-ascii?Q?kMxGPQ9ihK8M6T2q6mBRmLG8INgd0XVOcy+rfAA3wU7lZwlcgHNMrR4jCtFS?=
+ =?us-ascii?Q?5/doPevLbvqzPgVkQUzI1Fn6TC4nlI355/T4d+xRPeA3oiv9cOHKLfQbUwAL?=
+ =?us-ascii?Q?KYrXTj9m/T5WAUtTnEOvN1iLJFq6VmFeZDU/4uYVhpXf6Mo07tK/hBs40g70?=
+ =?us-ascii?Q?71AJ/51vag+9D8QG+jEmqu6pyB1wSDkxfS6pi2wYtvro+y3CNeh6JkjluoDT?=
+ =?us-ascii?Q?MBKnwHUmzHR9/hPDWJXpEUPRfoKB8LK3E/uAxwQO4ZXjuKkUoJ+p/pMDI2Ge?=
+ =?us-ascii?Q?Tqfw+eqe0HN607aFyUmAJkmE0mKWUcy/z5ihsczHtdKlEV9YZoSnI1+9lkrn?=
+ =?us-ascii?Q?SohsgDHZcQ6rG9R3vh2ww2wf855uIb6V4I2JwujGNfsOSB47MUkAkZ99HguS?=
+ =?us-ascii?Q?lquyXztDWwyti+1pwv+udQT8XA2wV8x5doipVdzmH131VucYXp3TAIEctZhP?=
+ =?us-ascii?Q?psgKDdM2TUTHmueW2Fy6u7Q9/k9IX859B5sC4GqxFKThRxTE9R39AhxQrGDn?=
+ =?us-ascii?Q?899m8YWTMQc3qjAW9lYvP+M/WZB2vx3VacAxYvk++LNc0dcLmJdYdJqtFZMX?=
+ =?us-ascii?Q?vrHO4dGIZEidh3GPCMQwOwvM3M8OU2lmyO/N/N9w+1J/bnJ1qg8648cV/ICl?=
+ =?us-ascii?Q?eZfGJdW6qQwyYiAHbaHo8dvVwisLxodyhtKsZyNDC5RZT6LviyRosNgCApQg?=
+ =?us-ascii?Q?5z0vBG9q//etOKslJFrTv8PGMvkSBwrW0y2IA+vjqRn/ABpUJ6EO2O9vgCUW?=
+ =?us-ascii?Q?fqn3QTeShftV5J3CmyaDhz+9jBQHP4iIXC4CL9Z2k880FHFpiKSYc4Y6PTU/?=
+ =?us-ascii?Q?8s8hBjdCOtBFBl86FYQjQpnIDa6S4VlT0zZoIFVn1oWIqfi2Rm93zQgPG2hs?=
+ =?us-ascii?Q?P3sVSo9ps7sLDxaA6mmA1DcFvp8u1WjS/kyI64n79xqsZtCQQqrmxdzbpfcm?=
+ =?us-ascii?Q?OA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa665a1c-4a0e-43fd-a841-08dbc112da17
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2023 17:38:11.7931
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: us9aKAuBbJRzXZdJJoaF1ufap40MZx8LU1HpkvKyyyzOKn6e+2MnU/pRRojsnkxilxJgLEAWuQCpt8lk/n9hhy7L/eXqkZ2ACZCmPampQwk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7824
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 29, 2023, at 09:33, Alexander Graf wrote:
-> When running Linux inside a Nitro Enclave, the hypervisor provides a
-> special virtio device called "NSM". This device has 2 main functions:
->
->   1) Provide attestation reports
->   2) Modify PCR state
->   3) Provide entropy
->
-> This patch adds the core NSM driver that exposes a /dev/nsm device node
-> which user space can use to request attestation documents and influence
-> PCR states. A follow up patch will add a hwrng driver to feed its entropy
-> into the kernel.
->
-> Originally-by: Petre Eftime <petre.eftime@gmail.com>
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-
-Hi Alex,
-
-I've taken a first look at this driver and have some minor comments.
-The main point here is that I think we need to look at possible
-alternatives for the user space interface, and (if possible) change
-to a set of higher-level ioctl commands from the simple passthrough. 
-
-> +/* Virtio MMIO device definition */
-> +struct virtio_mmio_device {
-> +	struct virtio_device vdev;
-> +	struct platform_device *pdev;
-> +
-> +	void __iomem *base;
-> +	unsigned long version;
-> +
-> +	/* a list of queues so we can dispatch IRQs */
-> +	spinlock_t lock;
-> +	struct list_head virtqueues;
-> +};
-> +
-> +/* Virtqueue list entry */
-> +struct virtio_mmio_vq_info {
-> +	/* The actual virtqueue */
-> +	struct virtqueue *vq;
-> +
-> +	/* The list node for the virtqueues list */
-> +	struct list_head node;
-> +};
-
-
-It looks like you are duplicating these structures from the
-virtio_mmio.c file, which seems like a bad idea for a number
-of reasons. What is it that you actually need that the
-virtio subsystem does not provide? Can you add interfaces
-to the common code instead?
-
-> +static struct virtio_device *nsm_vdev;
-> +static struct nsm_hwrng *nsm_hwrng;
-> +static struct mutex nsm_lock;
-> +static wait_queue_head_t nsm_waitqueue;
-> +static bool nsm_device_notified;
-
-Instead of global structures, these should ideally all be
-part of a per-device structure, even if you are sure that
-there is only ever one of these devices.
-
-> +/* Copy an entire message from user-space to kernel-space */
-> +static int message_memdup_from_user(struct nsm_kernel_message *dst,
-> +	struct nsm_message *src)
-> +{
-> +	struct nsm_message shallow_copy;
-> +
-> +	if (!src || !dst)
-> +		return -EINVAL;
-> +
-> +	/* The destination's request and response buffers should be NULL. */
-> +	if (dst->request.iov_base || dst->response.iov_base)
-> +		return -EINVAL;
-> +
-> +	/* First, make a shallow copy to be able to read the inner pointers */
-> +	if (copy_from_user(&shallow_copy, src, sizeof(shallow_copy)) != 0)
-> +		return -EINVAL;
-> +
-> +	/* Verify the user input size. */
-> +	if (shallow_copy.request.iov_len > NSM_REQUEST_MAX_SIZE)
-> +		return -EMSGSIZE;
-> +
-> +	/* Allocate kernel memory for the user request */
-> +	dst->request.iov_len = shallow_copy.request.iov_len;
-> +	dst->request.iov_base = kmalloc(dst->request.iov_len, GFP_KERNEL);
-> +	if (!dst->request.iov_base)
-> +		return -ENOMEM;
-> +
-> +	/* Copy the request content */
-> +	if (copy_from_user(dst->request.iov_base,
-> +		shallow_copy.request.iov_base, dst->request.iov_len) != 0) {
-> +		kfree(dst->request.iov_base);
-> +		return -EFAULT;
-> +	}
-
-It looks like the ioctl interface just provides an interface
-for passing through raw messages, which is often not the best
-idea. Are you able to enumerate the possible request types and
-provide a separate ioctl for each one?
-
-> +/* Supported driver operations */
-> +static const struct file_operations nsm_dev_fops = {
-> +	.open = nsm_dev_file_open,
-> +	.release = nsm_dev_file_close,
-> +	.unlocked_ioctl = nsm_dev_ioctl,
-> +};
-
-This breaks on 32-bit userspace, which would need a separate .compat_ioctl
-handler with the current command definition. It's often better to define
-the ioctl interface to be the same on 32-bit and 64-bit userspace
-and then use the trivial compat_ptr_ioctl wrapper.
-
-> +/* Driver configuration */
-> +static struct miscdevice nsm_driver_miscdevice = {
-> +	.minor	= MISC_DYNAMIC_MINOR,
-> +	.name	= NSM_DEV_NAME,
-> +	.fops	= &nsm_dev_fops,
-> +	.mode	= 0666
-> +};
-
-I would suggest expanding NSM_DEV_NAME here, it's much easier to
-grep for the actual string if a user wants to know which driver
-is responsible. Probably even less code.
-
-> +	if (nsm_hwrng)
-> +		nsm_hwrng->probe(vdev);
-> +
-> +	pr_debug("NSM device has been probed.\n");
-> +	return 0;
-> +}
-
-The debug statements can probably get removed, especially
-the whitespace damaged ones.
-
-> +int nsm_register_hwrng(struct nsm_hwrng *_nsm_hwrng)
-> +{
-> +	if (nsm_hwrng)
-> +		return -EEXIST;
-> +
-> +	nsm_hwrng = _nsm_hwrng;
-> +	if (nsm_vdev)
-> +		nsm_hwrng->probe(nsm_vdev);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(nsm_register_hwrng);
-
-This should get easier of you reverse the dependency between
-the two drivers and just call into the nsm_hwrng_probe()
-function from the main driver's probe.
-
-> +	mutex_init(&nsm_lock);
-> +	init_waitqueue_head(&nsm_waitqueue);
-
-You can simply use DEFINE_MUTEX() and DECLARE_WAIT_QUEUE_HEAD()
-if you still need the global objects (rather than making them 
-per device).
-
-> +
-> +	rc = register_virtio_driver(&virtio_nsm_driver);
-> +	if (rc)
-> +		pr_err("NSM driver initialization error: %d.\n", rc);
-> +
-> +	return rc;
-> +}
-> +
-> +static void __exit nsm_driver_exit(void)
-> +{
-> +	unregister_virtio_driver(&virtio_nsm_driver);
-> +	mutex_destroy(&nsm_lock);
-> +	pr_debug("NSM driver exited.\n");
-> +}
-> +
-> +module_init(nsm_driver_init);
-> +module_exit(nsm_driver_exit);
-
-Then this can use module_virtio_driver()
-
-      Arnd
+On Fri, Sep 22, 2023 at 10:54:33AM -0700, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct adf_fw_counters.
+> 
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> 
+> Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Nathan Chancellor <nathan@kernel.org>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Tom Rix <trix@redhat.com>
+> Cc: Adam Guerin <adam.guerin@intel.com>
+> Cc: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Cc: qat-linux@intel.com
+> Cc: linux-crypto@vger.kernel.org
+> Cc: llvm@lists.linux.dev
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
