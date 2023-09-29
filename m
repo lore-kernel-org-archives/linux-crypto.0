@@ -2,46 +2,46 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40250E71D4E
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 14:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330CDE71D40
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 14:31:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233478AbjI2ObQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Sep 2023 10:31:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52748 "EHLO
+        id S233502AbjI2Obb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Sep 2023 10:31:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233449AbjI2ObO (ORCPT
+        with ESMTP id S233446AbjI2ObV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Sep 2023 10:31:14 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFC31B1;
-        Fri, 29 Sep 2023 07:31:11 -0700 (PDT)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38TADgu8015718;
-        Fri, 29 Sep 2023 16:30:36 +0200
+        Fri, 29 Sep 2023 10:31:21 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C18A1AE;
+        Fri, 29 Sep 2023 07:31:18 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38TATqi4029805;
+        Fri, 29 Sep 2023 16:30:38 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding:content-type; s=selector1; bh=hYwTDtC
-        Zh1H/z/TlkRBSOYHWh+TCR2sItpKqNC62VaE=; b=6zyhpw8WVZEvMMJDQeHz4RT
-        0uZAiQj3Uuw7AgbSMXkmcc8KSbKnjesfzoQUYuH57bHpcwiW4Zb2Z7Lyzk27IF4U
-        itxICPcv6g2fdyqKvs4SqC5qCalx37GiayMKSxiczPeH9tkMnLm6RJ82PnbCR77A
-        VTugngKCZmuzkS5AO3P/XStF0vtEg8NBcsnatifU5CkvYtlwBIhjJM6Cnf3P9MgN
-        S3JUq1szpA1aW+CaavJXgognjuYwoZM4g5/PnD8zK6KbtAA+TCcFHKa/LEzmkpDP
-        jDssKhMHigao/Bm66txRN9oog/m3TtfB6JamhdjbL+M7IJ6O1UbdGJkuFMsmDGg=
-        =
+        from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding:content-type; s=
+        selector1; bh=WpHnGZEPjkA8pCPTOt8EGauEpCnanOA8eKhZUu2oK08=; b=Do
+        qaWG4yL0stjibP6OYzD81kWKzvjDw6sMRzMre4VluJj0nsnCEwge1BfGAPdEsAIy
+        SB57gw90fTZvIHAJPucSGD2BSmhK4bUVjR5IlskMLRwjoDTvKHGF2JSC0xxYSlpG
+        +kIzCDHysEX5ajTQ8qT2hW18bg0Rm5WMsJX9wMrWAZ8aw0/UOaCK9yMfdzcWcIJA
+        gU6IA6B+LOw3XLyBAMOk9yldMJA3O5gmBjvS8q8dGEsJgUPowpunXJhW4jHFbrVc
+        Pqol12OM33zSqI87Af3TY6xCYe2OwyIHaXpGWNxSWP8TdW08RfvPO6YcdNA0/5gs
+        pAHf11d+D4AWzwMMqWGQ==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t9qbxbecf-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tcq63h6m6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Sep 2023 16:30:36 +0200 (MEST)
+        Fri, 29 Sep 2023 16:30:38 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 27369100057;
-        Fri, 29 Sep 2023 16:30:34 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 5E502100057;
+        Fri, 29 Sep 2023 16:30:37 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id BDFF625AF10;
-        Fri, 29 Sep 2023 16:30:34 +0200 (CEST)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 51D6E25AF10;
+        Fri, 29 Sep 2023 16:30:37 +0200 (CEST)
 Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 29 Sep
- 2023 16:30:34 +0200
+ 2023 16:30:36 +0200
 From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
 To:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -66,10 +66,12 @@ CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
         <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
         Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v5 00/11] Introduce STM32 Firewall framework
-Date:   Fri, 29 Sep 2023 16:28:41 +0200
-Message-ID: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
+Subject: [PATCH v5 03/11] dt-bindings: bus: document RIFSC
+Date:   Fri, 29 Sep 2023 16:28:44 +0200
+Message-ID: <20230929142852.578394-4-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
+References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -83,204 +85,139 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Introduce STM32 Firewall framework for STM32MP1x and STM32MP2x
-platforms. STM32MP1x(ETZPC) and STM32MP2x(RIFSC) Firewall controllers
-register to the framework to offer firewall services such as access
-granting.
+Document RIFSC (RIF security controller). RIFSC is a firewall controller
+composed of different kinds of hardware resources.
 
-This series of patches is a new approach on the previous STM32 system
-bus, history is available here:
-https://lore.kernel.org/lkml/20230127164040.1047583/
-
-The need for such framework arises from the fact that there are now
-multiple hardware firewalls implemented across multiple products.
-Drivers are shared between different products, using the same code.
-When it comes to firewalls, the purpose mostly stays the same: Protect
-hardware resources. But the implementation differs, and there are
-multiple types of firewalls: peripheral, memory, ... 
-
-Some hardware firewall controllers such as the RIFSC implemented on
-STM32MP2x platforms may require to take ownership of a resource before
-being able to use it, hence the requirement for firewall services to
-take/release the ownership of such resources.
-
-On the other hand, hardware firewall configurations are becoming
-more and more complex. These mecanisms prevent platform crashes
-or other firewall-related incoveniences by denying access to some
-resources.
-
-The stm32 firewall framework offers an API that is defined in
-firewall controllers drivers to best fit the specificity of each
-firewall.
-
-For every peripherals protected by either the ETZPC or the RIFSC, the
-firewall framework checks the firewall controlelr registers to see if
-the peripheral's access is granted to the Linux kernel. If not, the
-peripheral is configured as secure, the node is marked populated,
-so that the driver is not probed for that device.
-
-The firewall framework relies on the access-controller device tree
-binding. It is used by peripherals to reference a domain access
-controller. In this case a firewall controller. The bus uses the ID
-referenced by the access-controller property to know where to look
-in the firewall to get the security configuration for the peripheral.
-This allows a device tree description rather than a hardcoded peripheral
-table in the bus driver.
-
-The STM32 ETZPC device is responsible for filtering accesses based on
-security level, or co-processor isolation for any resource connected
-to it.
-
-The RIFSC is responsible for filtering accesses based on Compartment
-ID / security level / privilege level for any resource connected to
-it.
-
-STM32MP13/15/25 SoC device tree files are updated in this series to
-implement this mecanism.
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+---
 
 Changes in V5:
-	- Integrate and rework the "feature-domains" binding patch in
-	  this patchset. The binding is renamed to "access-controller"
-	- Rename every feature-domain* reference to access-control*
-	  ones
-	- Correct loop bug and missing select STM32_FIREWALL in 32-bit
-	  platform Kconfig
-	
-
-Changes in V4:
-	- Fix typo in commit message and YAML check errors in
-	  "dt-bindings: Document common device controller bindings"
-	  Note: This patch should be ignored as stated in the cover
-	  letter. I've done this to avoid errors on this series of
-	  patch
-	- Correct code syntax/style issues reported by Simon Horman
-	- Added Jonathan's tag for IIO on the treewide patch
-
-Changes in V3:
-
-	Change incorrect ordering for bindings commits leading
-	to an error while running
-	"make DT_CHECKER_FLAGS=-m dt_binding_check"
+	- Renamed feature-domain* to access-control*
 
 Changes in V2:
+	- Corrected errors highlighted by Rob's robot
+	- No longer define the maxItems for the "feature-domains"
+	  property
+	- Fix example (node name, status)
+	- Declare "feature-domain-names" as an optional
+	  property for child nodes
+	- Fix description of "feature-domains" property
 
-	generic:
-		- Add fw_devlink dependency for "feature-domains"
-		  property.
-
-	bindings:
-		- Corrected YAMLS errors highlighted by Rob's robot
-		- Firewall controllers YAMLs no longer define the
-		  maxItems for the "feature-domains" property
-		- Renamed st,stm32-rifsc.yaml to
-		  st,stm32mp25-rifsc.yaml
-		- Fix examples in YAML files
-		- Change feature-domains maxItems to 2 in firewall
-		  consumer files as there should not be more than
-		  2 entries for now
-		- Declare "feature-domain-names" as an optional
-		  property for firewall controllers child nodes.
-		- Add missing "feature-domains" property declaration
-		  in bosch,m_can.yaml and st,stm32-cryp.yaml files
-
-	firewall framework:
-		- Support multiple entries for "feature-domains"
-		  property
-		- Better handle the device-tree parsing using
-		  phandle+args APIs
-		- Remove "resource firewall" type
-		- Add a field for the name of the firewall entry
-		- Fix licenses
-	
-	RIFSC:
-		- Add controller name
-		- Driver is now a module_platform_driver
-		- Fix license
-
-	ETZPC:
-		- Add controller name
-		- Driver is now a module_platform_driver
-		- Fix license
-
-	Device trees:
-		- Fix rifsc node name
-		- Move the "ranges" property under the
-		  "feature-domains" one
-
-Gatien Chevallier (10):
-  dt-bindings: treewide: add access-controller description
-  dt-bindings: bus: document RIFSC
-  dt-bindings: bus: document ETZPC
-  firewall: introduce stm32_firewall framework
-  of: property: fw_devlink: Add support for "access-controller"
-  bus: rifsc: introduce RIFSC firewall controller driver
-  arm64: dts: st: add RIFSC as an access controller for STM32MP25x
-    boards
-  bus: etzpc: introduce ETZPC firewall controller driver
-  ARM: dts: stm32: add ETZPC as a system bus for STM32MP15x boards
-  ARM: dts: stm32: add ETZPC as a system bus for STM32MP13x boards
-
-Oleksii Moisieiev (1):
-  dt-bindings: document generic access controller
-
- .../access-controllers/access-controller.yaml |   90 +
- .../bindings/bus/st,stm32-etzpc.yaml          |   96 +
- .../bindings/bus/st,stm32mp25-rifsc.yaml      |  105 +
- .../bindings/crypto/st,stm32-cryp.yaml        |    4 +
- .../bindings/crypto/st,stm32-hash.yaml        |    4 +
- .../devicetree/bindings/dma/st,stm32-dma.yaml |    4 +
- .../bindings/dma/st,stm32-dmamux.yaml         |    4 +
- .../devicetree/bindings/i2c/st,stm32-i2c.yaml |    4 +
- .../bindings/iio/adc/st,stm32-adc.yaml        |    4 +
- .../bindings/iio/adc/st,stm32-dfsdm-adc.yaml  |    4 +
- .../bindings/iio/dac/st,stm32-dac.yaml        |    4 +
- .../bindings/media/cec/st,stm32-cec.yaml      |    4 +
- .../bindings/media/st,stm32-dcmi.yaml         |    4 +
- .../memory-controllers/st,stm32-fmc2-ebi.yaml |    4 +
- .../bindings/mfd/st,stm32-lptimer.yaml        |    4 +
- .../bindings/mfd/st,stm32-timers.yaml         |    4 +
- .../devicetree/bindings/mmc/arm,pl18x.yaml    |    4 +
- .../bindings/net/can/bosch,m_can.yaml         |    4 +
- .../devicetree/bindings/net/stm32-dwmac.yaml  |    4 +
- .../bindings/phy/phy-stm32-usbphyc.yaml       |    4 +
- .../bindings/regulator/st,stm32-vrefbuf.yaml  |    4 +
- .../devicetree/bindings/rng/st,stm32-rng.yaml |    4 +
- .../bindings/serial/st,stm32-uart.yaml        |    4 +
- .../bindings/sound/st,stm32-i2s.yaml          |    4 +
- .../bindings/sound/st,stm32-sai.yaml          |    4 +
- .../bindings/sound/st,stm32-spdifrx.yaml      |    4 +
- .../bindings/spi/st,stm32-qspi.yaml           |    4 +
- .../devicetree/bindings/spi/st,stm32-spi.yaml |    4 +
- .../devicetree/bindings/usb/dwc2.yaml         |    4 +
- MAINTAINERS                                   |    7 +
- arch/arm/boot/dts/st/stm32mp131.dtsi          | 1026 +++---
- arch/arm/boot/dts/st/stm32mp133.dtsi          |   51 +-
- arch/arm/boot/dts/st/stm32mp13xc.dtsi         |   19 +-
- arch/arm/boot/dts/st/stm32mp13xf.dtsi         |   19 +-
- arch/arm/boot/dts/st/stm32mp151.dtsi          | 2757 +++++++++--------
- arch/arm/boot/dts/st/stm32mp153.dtsi          |   52 +-
- arch/arm/boot/dts/st/stm32mp15xc.dtsi         |   19 +-
- arch/arm/mach-stm32/Kconfig                   |    1 +
- arch/arm64/Kconfig.platforms                  |    1 +
- arch/arm64/boot/dts/st/stm32mp251.dtsi        |    7 +-
- drivers/bus/Kconfig                           |    9 +
- drivers/bus/Makefile                          |    1 +
- drivers/bus/stm32_etzpc.c                     |  141 +
- drivers/bus/stm32_firewall.c                  |  294 ++
- drivers/bus/stm32_firewall.h                  |   83 +
- drivers/bus/stm32_rifsc.c                     |  252 ++
- drivers/of/property.c                         |    2 +
- include/linux/bus/stm32_firewall_device.h     |  141 +
- 48 files changed, 3358 insertions(+), 1919 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controller.yaml
- create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
+ .../bindings/bus/st,stm32mp25-rifsc.yaml      | 105 ++++++++++++++++++
+ 1 file changed, 105 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
- create mode 100644 drivers/bus/stm32_etzpc.c
- create mode 100644 drivers/bus/stm32_firewall.c
- create mode 100644 drivers/bus/stm32_firewall.h
- create mode 100644 drivers/bus/stm32_rifsc.c
- create mode 100644 include/linux/bus/stm32_firewall_device.h
 
+diff --git a/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
+new file mode 100644
+index 000000000000..c28fceff3036
+--- /dev/null
++++ b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
+@@ -0,0 +1,105 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/bus/st,stm32mp25-rifsc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: STM32 Resource isolation framework security controller
++
++maintainers:
++  - Gatien Chevallier <gatien.chevallier@foss.st.com>
++
++description: |
++  Resource isolation framework (RIF) is a comprehensive set of hardware blocks
++  designed to enforce and manage isolation of STM32 hardware resources like
++  memory and peripherals.
++
++  The RIFSC (RIF security controller) is composed of three sets of registers,
++  each managing a specific set of hardware resources:
++    - RISC registers associated with RISUP logic (resource isolation device unit
++      for peripherals), assign all non-RIF aware peripherals to zero, one or
++      any security domains (secure, privilege, compartment).
++    - RIMC registers: associated with RIMU logic (resource isolation master
++      unit), assign all non RIF-aware bus master to one security domain by
++      setting secure, privileged and compartment information on the system bus.
++      Alternatively, the RISUP logic controlling the device port access to a
++      peripheral can assign target bus attributes to this peripheral master port
++      (supported attribute: CID).
++    - RISC registers associated with RISAL logic (resource isolation device unit
++      for address space - Lite version), assign address space subregions to one
++      security domains (secure, privilege, compartment).
++
++properties:
++  compatible:
++    contains:
++      const: st,stm32mp25-rifsc
++
++  reg:
++    maxItems: 1
++
++  "#address-cells":
++    const: 1
++
++  "#size-cells":
++    const: 1
++
++  ranges: true
++
++  "#access-controller-cells":
++    const: 1
++
++  access-control-provider: true
++
++patternProperties:
++  "^.*@[0-9a-f]+$":
++    description: Peripherals
++    type: object
++    properties:
++      access-controller:
++        minItems: 1
++        description:
++          The phandle of the firewall controller of the peripheral and the
++          platform-specific firewall ID of the peripheral.
++
++      access-controller-names:
++        minItems: 1
++
++    required:
++      - access-controller
++
++required:
++  - compatible
++  - reg
++  - "#address-cells"
++  - "#size-cells"
++  - access-control-provider
++  - "#access-controller-cells"
++  - ranges
++
++additionalProperties: false
++
++examples:
++  - |
++    // In this example, the usart2 device refers to rifsc as its domain
++    // controller.
++    // Access rights are verified before creating devices.
++
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++
++    rifsc: bus@42080000 {
++        compatible = "st,stm32mp25-rifsc";
++        reg = <0x42080000 0x1000>;
++        #address-cells = <1>;
++        #size-cells = <1>;
++        access-control-provider;
++        #access-controller-cells = <1>;
++        ranges;
++
++        usart2: serial@400e0000 {
++              compatible = "st,stm32h7-uart";
++              reg = <0x400e0000 0x400>;
++              interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
++              clocks = <&ck_flexgen_08>;
++              access-controller = <&rifsc 32>;
++        };
++    };
 -- 
 2.25.1
 
