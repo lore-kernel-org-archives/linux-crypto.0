@@ -2,46 +2,46 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D450E71D43
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 14:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B276AE71D42
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 14:32:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbjI2Oca (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Sep 2023 10:32:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59160 "EHLO
+        id S233532AbjI2Ocw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Sep 2023 10:32:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233637AbjI2OcU (ORCPT
+        with ESMTP id S233674AbjI2OcZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Sep 2023 10:32:20 -0400
+        Fri, 29 Sep 2023 10:32:25 -0400
 Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D96CCEB;
-        Fri, 29 Sep 2023 07:32:15 -0700 (PDT)
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38T9xPiN015169;
-        Fri, 29 Sep 2023 16:31:49 +0200
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E12210F2;
+        Fri, 29 Sep 2023 07:32:20 -0700 (PDT)
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38T99x38004761;
+        Fri, 29 Sep 2023 16:31:50 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
         from:to:cc:subject:date:message-id:in-reply-to:references
         :mime-version:content-transfer-encoding:content-type; s=
-        selector1; bh=i13NBK7EHeEtuU2Mw6kBlnENPxeQHsB+gjMLZrz/aRc=; b=7w
-        MNE5kCbxFCk+fNn390H5EPKukh6ZAHA5dlTR/jO05R/LsNWWLuobYojdjPN1R+Fq
-        NSadl8t7GXgMDjVeClDZZgQJJoVPPSoZWlB7p24rTBWQ4wemznMG6YNhHGXlUn2Y
-        qNguQPXYbut7tZ1etY1ZUmgccm1Ycpx7+V/htCtJ+e6VKeaTzxc8AXcEorzGxfsV
-        1vAjGiAMxBg4M/qgaxYFuOLqRT2xwhdtzjqRrinlh4l59CnpPTDwStg58TzBJCyw
-        FOd/swNx/in82HO+McgnJp210Gc7Mif1IbksLFsdY5lKi+m/bLPiFYq8qhGKCtRu
-        52vlQF/tnO71k5nsTS9A==
+        selector1; bh=8sWR6aJr5sYt7C3RQ6oQ2MgPutfj/Sp5VOkTkBQPOm0=; b=qW
+        SQ4k0FOHgKeIMQ1X8BYvZ6teg37qgUEulF9YrP47IlrFDuu+5JX20QG6+Aa5iCJj
+        QSpBxjiklQXcta+m/h1PY72JcMcz8VN219XZxgy7Y5rcfouGaJ8fzZFtJVXLf+dv
+        miePeCow3QDDH5Z2HNMYXzgp9fqP1b4CzEcLcC5tZqIgH3Ea9S1EKwtmspFun7JN
+        cb/RxdmL/t2feXbwPcKHeIK82/DAaf0iKAIX0QglouiihFpQ2QsOUPRRDfkCd2ky
+        xnubuGSkq6O5k/WgW/t+jzrxyU55TbpoGlA5mudyAok9FyZUQ3Btjhul0OevGxPK
+        YDGsQE8c59zv2Q/hVggw==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3t9neg3ss9-1
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ta9k0s9jw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 29 Sep 2023 16:31:48 +0200 (MEST)
+        Fri, 29 Sep 2023 16:31:50 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 3C8AA100057;
-        Fri, 29 Sep 2023 16:31:48 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id DF5D8100057;
+        Fri, 29 Sep 2023 16:31:49 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2FEE6282C5F;
-        Fri, 29 Sep 2023 16:31:48 +0200 (CEST)
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id D4D6A282C5F;
+        Fri, 29 Sep 2023 16:31:49 +0200 (CEST)
 Received: from localhost (10.201.20.32) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 29 Sep
- 2023 16:31:47 +0200
+ 2023 16:31:49 +0200
 From:   Gatien Chevallier <gatien.chevallier@foss.st.com>
 To:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
         <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -66,9 +66,9 @@ CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-phy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
         <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
         Gatien Chevallier <gatien.chevallier@foss.st.com>
-Subject: [PATCH v5 04/11] dt-bindings: bus: document ETZPC
-Date:   Fri, 29 Sep 2023 16:28:45 +0200
-Message-ID: <20230929142852.578394-5-gatien.chevallier@foss.st.com>
+Subject: [PATCH v5 06/11] of: property: fw_devlink: Add support for "access-controller"
+Date:   Fri, 29 Sep 2023 16:28:47 +0200
+Message-ID: <20230929142852.578394-7-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
 References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
@@ -85,132 +85,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Document ETZPC (Extended TrustZone protection controller). ETZPC is a
-firewall controller.
+Allows tracking dependencies between devices and their access
+controller.
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
 
 Changes in V5:
-	- Renamed feature-domain* to access-control*
+	- Rename feature-domain* to access-control*
 
-Changes in V2:
-	- Corrected errors highlighted by Rob's robot
-	- No longer define the maxItems for the "feature-domains"
-	  property
-	- Fix example (node name, status)
-	- Declare "feature-domain-names" as an optional
-	  property for child nodes
-	- Fix description of "feature-domains" property
-	- Reordered the properties so it matches ETZPC
-	- Add missing "feature-domain-controller" property
+Patch not present in V1
 
- .../bindings/bus/st,stm32-etzpc.yaml          | 96 +++++++++++++++++++
- 1 file changed, 96 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
+ drivers/of/property.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml b/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
-new file mode 100644
-index 000000000000..ddc54286ab4c
---- /dev/null
-+++ b/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
-@@ -0,0 +1,96 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/bus/st,stm32-etzpc.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: STM32 Extended TrustZone protection controller
-+
-+description: |
-+  The ETZPC configures TrustZone security in a SoC having bus masters and
-+  devices with programmable-security attributes (securable resources).
-+
-+maintainers:
-+  - Gatien Chevallier <gatien.chevallier@foss.st.com>
-+
-+properties:
-+  compatible:
-+    contains:
-+      const: st,stm32-etzpc
-+
-+  reg:
-+    maxItems: 1
-+
-+  "#address-cells":
-+    const: 1
-+
-+  "#size-cells":
-+    const: 1
-+
-+  ranges: true
-+
-+  "#access-controller-cells":
-+    const: 1
-+
-+  access-control-provider: true
-+
-+patternProperties:
-+  "^.*@[0-9a-f]+$":
-+    description: Peripherals
-+    type: object
-+    properties:
-+      access-controller:
-+        minItems: 1
-+        description:
-+          The phandle of the firewall controller of the peripheral and the
-+          platform-specific firewall ID of the peripheral.
-+
-+      access-controller-names:
-+        minItems: 1
-+
-+    required:
-+      - access-controller
-+
-+required:
-+  - compatible
-+  - reg
-+  - "#address-cells"
-+  - "#size-cells"
-+  - access-control-provider
-+  - "#access-controller-cells"
-+  - ranges
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    // In this example, the usart2 device refers to rifsc as its access
-+    // controller.
-+    // Access rights are verified before creating devices.
-+
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/stm32mp13-clks.h>
-+    #include <dt-bindings/reset/stm32mp13-resets.h>
-+
-+    etzpc: bus@5c007000 {
-+        compatible = "st,stm32-etzpc";
-+        reg = <0x5c007000 0x400>;
-+        #address-cells = <1>;
-+        #size-cells = <1>;
-+        access-control-provider;
-+        #access-controller-cells = <1>;
-+        ranges;
-+
-+        usart2: serial@4c001000 {
-+            compatible = "st,stm32h7-uart";
-+            reg = <0x4c001000 0x400>;
-+            interrupts-extended = <&exti 27 IRQ_TYPE_LEVEL_HIGH>;
-+            clocks = <&rcc USART2_K>;
-+            resets = <&rcc USART2_R>;
-+            wakeup-source;
-+            dmas = <&dmamux1 43 0x400 0x5>,
-+                    <&dmamux1 44 0x400 0x1>;
-+            dma-names = "rx", "tx";
-+            access-controller = <&etzpc 17>;
-+        };
-+    };
+diff --git a/drivers/of/property.c b/drivers/of/property.c
+index cf8dacf3e3b8..c86521fac06d 100644
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@ -1267,6 +1267,7 @@ DEFINE_SIMPLE_PROP(resets, "resets", "#reset-cells")
+ DEFINE_SIMPLE_PROP(leds, "leds", NULL)
+ DEFINE_SIMPLE_PROP(backlight, "backlight", NULL)
+ DEFINE_SIMPLE_PROP(panel, "panel", NULL)
++DEFINE_SIMPLE_PROP(access_controller, "access-controller", "#access-controller-cells")
+ DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+ DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
+ 
+@@ -1361,6 +1362,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
+ 	{ .parse_prop = parse_regulators, },
+ 	{ .parse_prop = parse_gpio, },
+ 	{ .parse_prop = parse_gpios, },
++	{ .parse_prop = parse_access_controller, },
+ 	{}
+ };
+ 
 -- 
 2.25.1
 
