@@ -2,120 +2,133 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F70E71D5C
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 21:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70EDAE71D58
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 21:37:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232748AbjI2VRt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Sep 2023 17:17:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43460 "EHLO
+        id S233427AbjI2Vhx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Sep 2023 17:37:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjI2VRt (ORCPT
+        with ESMTP id S229508AbjI2Vhw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Sep 2023 17:17:49 -0400
-X-Greylist: delayed 527 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 29 Sep 2023 14:17:46 PDT
-Received: from mail.cyberchaos.dev (mail.cyberchaos.dev [IPv6:2a01:4f8:c012:7295::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 258A51A7
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Sep 2023 14:17:46 -0700 (PDT)
-Message-ID: <53f57de2-ef58-4855-bb3c-f0d54472dc4d@yuka.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yuka.dev; s=mail;
-        t=1696021736; bh=XV5Y16Sh8E+QCHNMyp4Lgqfg/vvxKHsouALRr9hLWMI=;
-        h=Date:Cc:From:To:Subject;
-        b=aKyw//Ump1xtGivSUOOIkvVtpybcwhTDIYGEhyyxyN3CpfDUFrx3s4ZC65EEMdq7f
-         7ZUBhQhP4uRNvdcYfGr/sORZE0iNrh1Gw9RpzYa+WBwUgjq91Qm+TYv5NDVo9izWF5
-         iiiMXdINxZSYX8LoB8lwRYdrzAjmT+WM5tLz8jD8=
-Date:   Fri, 29 Sep 2023 23:08:55 +0200
+        Fri, 29 Sep 2023 17:37:52 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EBE1AB;
+        Fri, 29 Sep 2023 14:37:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1696023470; x=1727559470;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bJX4+NvWQ10hWHqKptnLbxIXX7JEo+TcPfEzhgBXIv4=;
+  b=kiIcO146FQGSEckIpvoMzbxYZVyX/igvT5pO6GzGdtkVk9y/JuX6lQUF
+   AaNO6ySPzwO4R+ZUoq+VcVgI6S3WBPpw65jdpHoJmH0ghDsSg9feSan/4
+   8XBgW1/6TMw0/cQYYooAiN/lrN5sHUS6Y9voZi0UEaQdUgT8OO1j4v9Dl
+   w=;
+X-IronPort-AV: E=Sophos;i="6.03,188,1694736000"; 
+   d="scan'208";a="242028653"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2023 21:37:47 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-d2040ec1.us-west-2.amazon.com (Postfix) with ESMTPS id 6089140D91;
+        Fri, 29 Sep 2023 21:37:47 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Fri, 29 Sep 2023 21:37:42 +0000
+Received: from dev-dsk-graf-1a-5ce218e4.eu-west-1.amazon.com (10.253.83.51) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Fri, 29 Sep 2023 21:37:40 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <linux-crypto@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Olivia Mackall <olivia@selenic.com>,
+        "Petre Eftime" <petre.eftime@gmail.com>,
+        Erdem Meydanlli <meydanli@amazon.nl>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH v3 0/2] Add Nitro Secure Module support
+Date:   Fri, 29 Sep 2023 21:37:37 +0000
+Message-ID: <20230929213739.68494-1-graf@amazon.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Language: en-US
-Cc:     ebiggers@google.com, ebiggers@kernel.org,
-        regressions@lists.linux.dev
-From:   Yureka <yuka@yuka.dev>
-To:     linux-crypto@vger.kernel.org
-Subject: [REGRESSION] dm_crypt essiv ciphers do not use async driver
- mv-aes-cbc anymore
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D043UWA002.ant.amazon.com (10.13.139.53) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-#regzbot introduced: 7bcb2c99f8ed
+We already have support for the Nitro Enclave kernel module in upstream
+Linux, which is needed to control a Nitro Enclave's lifecycle.
 
-I am running the NixOS distribution cross-compiled from x86_64 to a Marvell Armada 388 armv7 SoC.
+However, users typically want to run Linux inside the Enclave as well. To
+do that well, they need the ability to communicate to the Nitro Secure
+Module: A virtio based PV device that provides access to PCRs, an attestation
+document as well as access to entropy.
 
-I am not getting expected speeds when reading/writing on my encrypted hard drive with 6.5.5, while it is fast on 5.4.257. Volume is formatted like this: `cryptsetup luksFormat -c aes-cbc-essiv:sha256 /dev/sda`.
-
-Specifically, I tracked this down to the changes to crypto/essiv.c from 7bcb2c99f8ed mentioned above. Reverting those changes on top of a 6.5.5 kernel provides working (see applicable diff further below).
-
-I'm *guessing* that this is related to the mv-aes-cbc crypto driver (from the marvell-cesa module) being registered as async (according to /proc/crypto), and I *suspect* that async drivers are not being used anymore by essiv or dm_crypt. Going by the commit description, which sounds more like a refactor, this does not seem intentional.
-
-Would appreciate a lot if someone more experienced with the crypto subsystem can have a look at this.
-
-
-Greetings,
-
-Yureka
+These patches add driver support for NSM. With them in place, upstream Linux
+has everything that's needed to run as a Nitro Enclave kernel.
 
 
----
-Some more detailed information
+Alex
+
+v1 -> v2:
+
+   - Remove boilerplate
+   - Add uapi header
+
+v2 -> v3:
+
+   - Move globals to device struct
+   - Add compat handling
+   - Simplify some naming
+   - Remove debug prints
+   - Use module_virtio_driver
+   - Ensure remove only happens on target device
+   - Drop use of uio.h
+
+Alexander Graf (2):
+  misc: Add Nitro Secure Module driver
+  hwrng: Add support for Nitro Secure Module
+
+ MAINTAINERS                      |  11 +
+ drivers/char/hw_random/Kconfig   |  12 +
+ drivers/char/hw_random/Makefile  |   1 +
+ drivers/char/hw_random/nsm-rng.c | 275 ++++++++++++++++++++
+ drivers/misc/Kconfig             |  11 +
+ drivers/misc/Makefile            |   1 +
+ drivers/misc/nsm.c               | 423 +++++++++++++++++++++++++++++++
+ include/linux/nsm.h              |  35 +++
+ include/uapi/linux/nsm.h         |  30 +++
+ 9 files changed, 799 insertions(+)
+ create mode 100644 drivers/char/hw_random/nsm-rng.c
+ create mode 100644 drivers/misc/nsm.c
+ create mode 100644 include/linux/nsm.h
+ create mode 100644 include/uapi/linux/nsm.h
+
+-- 
+2.40.1
 
 
-Excerpt from /proc/crypto in 5.4.257:
-
-name         : essiv(cbc(aes),sha256)
-driver       : essiv(mv-cbc-aes,sha256-generic)
-async        : yes
-
-speeds of 130MB/s can be observed
-
-In 5.10.197 (the first branch that has this issue and is still receiving updates):
-
-name         : essiv(cbc(aes),sha256)
-driver       : essiv(cbc(aes-arm),sha256-generic)
-async        : no
-
-speeds are less than half, 55MB/s
-the other listings in /proc/crypto seem to be unchanged. mv-cbc-aes is still the highest priority driver providing cbc(aes)
 
 
-diff that restores the working state on recent kernels (tested with 6.5.5):
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
 
-
-diff --git a/crypto/essiv.c b/crypto/essiv.c
-index 85bb624e32b9..8d57245add54 100644
---- a/crypto/essiv.c
-+++ b/crypto/essiv.c
-@@ -471,7 +471,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
-                return PTR_ERR(shash_name);
- 
-        type = algt->type & algt->mask;
--       mask = crypto_algt_inherited_mask(algt);
-+       mask = (algt->type ^ CRYPTO_ALG_ASYNC) & algt->mask & CRYPTO_ALG_ASYNC;
- 
-        switch (type) {
-        case CRYPTO_ALG_TYPE_SKCIPHER:
-@@ -530,7 +530,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
-        /* Synchronous hash, e.g., "sha256" */
-        _hash_alg = crypto_alg_mod_lookup(shash_name,
-                                          CRYPTO_ALG_TYPE_SHASH,
--                                         CRYPTO_ALG_TYPE_MASK | mask);
-+                                         CRYPTO_ALG_TYPE_MASK);
-        if (IS_ERR(_hash_alg)) {
-                err = PTR_ERR(_hash_alg);
-                goto out_drop_skcipher;
-@@ -562,12 +562,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
-                     hash_alg->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
-                goto out_free_hash;
- 
--       /*
--        * hash_alg wasn't gotten via crypto_grab*(), so we need to inherit its
--        * flags manually.
--        */
--       base->cra_flags        |= (hash_alg->base.cra_flags &
--                                  CRYPTO_ALG_INHERITED_FLAGS);
-+       base->cra_flags         = block_base->cra_flags & CRYPTO_ALG_ASYNC;
-        base->cra_blocksize     = block_base->cra_blocksize;
-        base->cra_ctxsize       = sizeof(struct essiv_tfm_ctx);
-        base->cra_alignmask     = block_base->cra_alignmask;
 
 
