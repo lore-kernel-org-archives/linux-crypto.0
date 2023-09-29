@@ -2,63 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E87E743ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 05:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 211E3E743ED
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Sep 2023 05:47:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232604AbjI2FqQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Sep 2023 01:46:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45162 "EHLO
+        id S232625AbjI2Fra (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Sep 2023 01:47:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232678AbjI2Fp4 (ORCPT
+        with ESMTP id S232717AbjI2Fr1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Sep 2023 01:45:56 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339E91BE1;
-        Thu, 28 Sep 2023 22:45:07 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C260C433C7;
-        Fri, 29 Sep 2023 05:45:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1695966306;
-        bh=/vumVkPq8i6Y4/EDQkA1BHMVdr9OA0iL0EbIdZlpzes=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Zz7u3/SgIDEKIWKUsBEhfKrJWFigoQxGAc7v8WNwNQCyFbCcSIi1yX/NpjsyYVLDT
-         ow1h5RE/Eb4wBUSu25Ogie8nUO1ZMyKMlorJGLlbStie2sM8Z/r1jl1sp3FtM/eFPH
-         0B4TqdizH/y3H2iZEaPhxHpr2iCuhsVb6rKqwy5c=
-Date:   Fri, 29 Sep 2023 07:45:02 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Olivia Mackall <olivia@selenic.com>,
-        Petre Eftime <petre.eftime@gmail.com>,
-        Erdem Meydanlli <meydanli@amazon.nl>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH 1/2] misc: Add Nitro Secure Module driver
-Message-ID: <2023092918-sulfide-stonework-f6b7@gregkh>
-References: <20230928224645.19768-1-graf@amazon.com>
- <20230928224645.19768-2-graf@amazon.com>
+        Fri, 29 Sep 2023 01:47:27 -0400
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A782B1A2;
+        Thu, 28 Sep 2023 22:47:25 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id 82BE5207D1;
+        Fri, 29 Sep 2023 07:47:23 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id UNCmGaEfzaaJ; Fri, 29 Sep 2023 07:47:23 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id 1D493207BB;
+        Fri, 29 Sep 2023 07:47:23 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+        by mailout2.secunet.com (Postfix) with ESMTP id 169E780004A;
+        Fri, 29 Sep 2023 07:47:23 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 29 Sep 2023 07:47:22 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Fri, 29 Sep
+ 2023 07:47:22 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+        id 58C093182B50; Fri, 29 Sep 2023 07:47:22 +0200 (CEST)
+Date:   Fri, 29 Sep 2023 07:47:22 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Wang Jinchao <wangjinchao@xfusion.com>
+CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stone.xulei@xfusion.com>
+Subject: Re: [RFC/REFACT] Refactoring and significantly reducing code
+ complexity
+Message-ID: <ZRZk6tC6j1FtW3uY@gauss3.secunet.de>
+References: <ZRU/EjubEH/5QLlG@fedora>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20230928224645.19768-2-graf@amazon.com>
+In-Reply-To: <ZRU/EjubEH/5QLlG@fedora>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 28, 2023 at 10:46:44PM +0000, Alexander Graf wrote:
-> +/* Register this as a misc driver */
-> +#define NSM_DEV_NAME          "nsm"
-> +#define NSM_IOCTL_MAGIC       0x0A
-> +#define NSM_IO_REQUEST        _IOWR(NSM_IOCTL_MAGIC, 0, struct nsm_message)
+On Thu, Sep 28, 2023 at 04:53:38PM +0800, Wang Jinchao wrote:
+> This is a refactored version with the following main changes:
+> 
+> - The parallel workqueue no longer uses the WQ_UNBOUND attribute
+> - Removal of CPU-related logic, sysfs-related interfaces
+> - removal of structures like padata_cpumask, and deletion of parallel_data
+> - Using completion to maintain sequencing
+> - no longer using lists
+> - removing structures like padata_list and padata_serial_queue
+> - Removal of padata_do_serial()
 
-You have an ioctl for this driver, yet no include/uapi/ file for it?
-How is userspace supposed to know about this and use it?
-
-thanks,
-
-greg k-h
+This removes all the logic that is needed to ensure that
+the parallelized objects return in the same order as
+they were before the parallelization. This change makes
+padata unusable for networking.
