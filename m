@@ -2,117 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0323E7735A
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Sep 2023 06:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A77E748E6
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Oct 2023 00:00:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbjI3GUz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 30 Sep 2023 02:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50400 "EHLO
+        id S234080AbjJAAAt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 30 Sep 2023 20:00:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjI3GUy (ORCPT
+        with ESMTP id S229928AbjJAAAs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 30 Sep 2023 02:20:54 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7410E1A7;
-        Fri, 29 Sep 2023 23:20:52 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73349C433C7;
-        Sat, 30 Sep 2023 06:20:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1696054852;
-        bh=YegthhuJUQjE8I3ZgOwiTP7mRlYp60Jw2QVs8hlYzb0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lPbui3hSWp5RMgU5g80OtG2U83WWfinhOHJMZyekdTalYgai3RnAAFyR6b6/Mijah
-         lOdVqUphEVdsJMxohsqY94PKCFcObB1+Wm6j8DO9rquehs2Pnc/tK767E3PIHlQFws
-         NduXwqhO6AWS/nyXhCGiFWbnZ8hY7zTtJC7JDXg0=
-Date:   Sat, 30 Sep 2023 08:20:49 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        Sat, 30 Sep 2023 20:00:48 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B17D3;
+        Sat, 30 Sep 2023 17:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=zHKNQBD4HfXptN+HoK19706SzP8TcfFl8M1EmRCT3vU=; b=aomI3NV3QMZDzNfeXmEa7vnIpO
+        A/YSsjxGaXJ+qlDbdrQNvGVidWrnoAzYAvzL4EPzaOs3bX7RpPC23rRPGPZ+Yfb6YCaqKGec9kA8D
+        cfaQUoguCkw98+yr6dwX9zqMzG6hrZHpGIHnZzinuAIgdAzye7nYDSWOulhIJrWMKaJ2HnFdJHW+x
+        Bdds9XYfO9r8wx00wIkTrR7zbbKmzcibGZsTfET36efbb1jAnf9I8kd49PjSRuZy8QZ4zGbQUeiwB
+        b5hfotDlb7zsM8G72b++B+YLh0j1LUF66RoyxUz57uFgMaXernE5nfZCD6Zpn1WbqSDir7K7NoSRG
+        aS12BB9A==;
+Received: from [50.53.46.231] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qmjt7-00AFNK-18;
+        Sun, 01 Oct 2023 00:00:45 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Olivia Mackall <olivia@selenic.com>,
-        Petre Eftime <petre.eftime@gmail.com>,
-        Erdem Meydanlli <meydanli@amazon.nl>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v2 1/2] misc: Add Nitro Secure Module driver
-Message-ID: <2023093054-swimming-whoopee-7ef8@gregkh>
-References: <20230929133320.74848-1-graf@amazon.com>
- <20230929133320.74848-2-graf@amazon.com>
- <74b2d869-0d96-46f9-a180-b405992e6c51@app.fastmail.com>
- <a44a2df0-beb9-4a43-ade4-267ad819729e@amazon.com>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: akcipher - fix kernel-doc typos
+Date:   Sat, 30 Sep 2023 17:00:43 -0700
+Message-ID: <20231001000044.26680-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.42.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a44a2df0-beb9-4a43-ade4-267ad819729e@amazon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 29, 2023 at 09:26:16PM +0200, Alexander Graf wrote:
-> Hi Arnd!
-> 
-> On 29.09.23 19:28, Arnd Bergmann wrote:
-> > On Fri, Sep 29, 2023, at 09:33, Alexander Graf wrote:
-> > > When running Linux inside a Nitro Enclave, the hypervisor provides a
-> > > special virtio device called "NSM". This device has 2 main functions:
-> > > 
-> > >    1) Provide attestation reports
-> > >    2) Modify PCR state
-> > >    3) Provide entropy
-> > > 
-> > > This patch adds the core NSM driver that exposes a /dev/nsm device node
-> > > which user space can use to request attestation documents and influence
-> > > PCR states. A follow up patch will add a hwrng driver to feed its entropy
-> > > into the kernel.
-> > > 
-> > > Originally-by: Petre Eftime <petre.eftime@gmail.com>
-> > > Signed-off-by: Alexander Graf <graf@amazon.com>
-> > Hi Alex,
-> > 
-> > I've taken a first look at this driver and have some minor comments.
-> 
-> 
-> Thanks a bunch!
-> 
-> 
-> > The main point here is that I think we need to look at possible
-> > alternatives for the user space interface, and (if possible) change
-> > to a set of higher-level ioctl commands from the simple passthrough.
-> 
-> 
-> I'm slightly torn on that bit. I think in hindsight the NSM device probably
-> should have been a reserved vsock CID and the hwrng one should have just
-> been virtio-rng.
-> 
-> The problem is that Nitro Enclaves were launched in 2020 and since an
-> ecosystem developed in multiple languages to support building code inside:
-> 
-> https://github.com/aws/aws-nitro-enclaves-nsm-api/blob/main/src/driver/mod.rs#L66
-> https://github.com/donkersgoed/aws-nsm-interface/blob/main/aws_nsm_interface/__init__.py#L264-L274
->   https://github.com/hf/nsm/blob/main/nsm.go#L99-L129
-> 
-> 
-> All of these use the (downstream) ioctl that this patch also implements. We
-> could change it, but instead of making it easier for user space to adapt the
-> device node, it would probably hurt more.
-> 
-> I agree that this is not a great place to be in. This driver absolutely
-> should have been upstreamed 3 years ago. But I can't turn back time (yet)
-> :).
+Correct typos of "destination".
 
-As you know, this is no excuse to put an api in the kernel that isn't
-correct or good for the long-term.  Just because people do foolish
-things outside of the kernel tree never means we have to accept them in
-our tree.  Instead we can ask them to fix them properly as part of us
-taking the code.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ include/crypto/akcipher.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-So please, work on doing this right.
-
-thanks,
-
-greg k-h
+diff -- a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -382,7 +382,7 @@ static inline int crypto_akcipher_decryp
+  * @tfm:	AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
+  * @src:	source buffer
+  * @slen:	source length
+- * @dst:	destinatino obuffer
++ * @dst:	destination obuffer
+  * @dlen:	destination length
+  *
+  * Return: zero on success; error code in case of error
+@@ -400,7 +400,7 @@ int crypto_akcipher_sync_encrypt(struct
+  * @tfm:	AKCIPHER tfm handle allocated with crypto_alloc_akcipher()
+  * @src:	source buffer
+  * @slen:	source length
+- * @dst:	destinatino obuffer
++ * @dst:	destination obuffer
+  * @dlen:	destination length
+  *
+  * Return: Output length on success; error code in case of error
