@@ -2,70 +2,62 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE8C3E748F1
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 Oct 2023 00:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59049E748ED
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Oct 2023 08:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234173AbjJAAAt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 30 Sep 2023 20:00:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44928 "EHLO
+        id S234438AbjJAISz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 Oct 2023 04:18:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234114AbjJAAAt (ORCPT
+        with ESMTP id S234402AbjJAISz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 30 Sep 2023 20:00:49 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7210DD;
-        Sat, 30 Sep 2023 17:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=FHz62bZmLGVfdFXgVnp174SibFAS68vm8vO+h0fNe1Q=; b=LXXhgajBN3x3gDJJPX0IuQ3eMS
-        PBhtHbdoQuagvGQfDiUt8EvjAE4z5PSoiGQuby3gpVhFA5HFA1IN4xN10KBJl/LBhScQWylZDaj24
-        7dcFEsliW7B4tQuEsu7pAm1lpSB9+5I0VvnDdGBpcePi0fjC8ywedJx4h9gtxs7mbDm7xKIf4Usd2
-        lTBVSdOvaBS+3g3UKtx9v93lljhF/nbnxnK9lGjEFXZjvE6fNGWl6ce/0UAdrHTi9PspGAVy9A9NV
-        6Sfj/ncr8Wj8mIluVtsCCVmoTwrdVhH/cFWS9ufyLGkcgl9TRhA65EYlhRQJbvtedh1p1x1Ch8Dt5
-        lJw+Yqzw==;
-Received: from [50.53.46.231] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qmjt7-00AFNK-1v;
-        Sun, 01 Oct 2023 00:00:45 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: sig - fix kernel-doc typo
-Date:   Sat, 30 Sep 2023 17:00:44 -0700
-Message-ID: <20231001000044.26680-2-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231001000044.26680-1-rdunlap@infradead.org>
-References: <20231001000044.26680-1-rdunlap@infradead.org>
+        Sun, 1 Oct 2023 04:18:55 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5209DC6
+        for <linux-crypto@vger.kernel.org>; Sun,  1 Oct 2023 01:18:51 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qmrf4-002P9t-77; Sun, 01 Oct 2023 16:18:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 01 Oct 2023 16:18:50 +0800
+Date:   Sun, 1 Oct 2023 16:18:50 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH v5 2/2] crypto: qat - add pm_status debugfs file
+Message-ID: <ZRkrasH0zjj2m+GQ@gondor.apana.org.au>
+References: <20230922101541.19408-1-lucas.segarra.fernandez@intel.com>
+ <20230922101541.19408-3-lucas.segarra.fernandez@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922101541.19408-3-lucas.segarra.fernandez@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Correct typo of "destination".
+On Fri, Sep 22, 2023 at 12:15:27PM +0200, Lucas Segarra Fernandez wrote:
+>
+> diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
+> new file mode 100644
+> index 000000000000..55db62a46497
+> --- /dev/null
+> +++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
+> @@ -0,0 +1,255 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright(c) 2023 Intel Corporation */
+> +#include <linux/bits.h>
+> +#include <linux/dma-mapping.h>
+> +#include <linux/slab.h>
+> +#include <linux/stddef.h>
+> +#include <linux/string_helpers.h>
+> +#include <linux/stringify.h>
+> +#include <linux/types.h>
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
- include/crypto/sig.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The kernel.h comment applies to this patch too.
 
-diff -- a/include/crypto/sig.h b/include/crypto/sig.h
---- a/include/crypto/sig.h
-+++ b/include/crypto/sig.h
-@@ -79,7 +79,7 @@ int crypto_sig_maxsize(struct crypto_sig
-  * @tfm:	signature tfm handle allocated with crypto_alloc_sig()
-  * @src:	source buffer
-  * @slen:	source length
-- * @dst:	destinatino obuffer
-+ * @dst:	destination obuffer
-  * @dlen:	destination length
-  *
-  * Return: zero on success; error code in case of error
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
