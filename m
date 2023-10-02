@@ -2,155 +2,203 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 285EEE7849A
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 08:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE831E784B5
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 09:11:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235857AbjJBIv4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 04:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41784 "EHLO
+        id S235972AbjJBJLF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Oct 2023 05:11:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229762AbjJBIvz (ORCPT
+        with ESMTP id S235965AbjJBJLE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 04:51:55 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E885CD3
-        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 01:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696236711; x=1727772711;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=F8CoDhxr/CrbyoLPmMRdZStTLo+fdGZNk+b4JEYaORA=;
-  b=aXdqhJCXE8cQAD4DONeqnWC/O6aeJxhQ0GMfqBLSV6SJb5XJzso8IE8e
-   Ag3L2KZ8o1L1k8aJLfW+B/cPPpfKVAeq9BTpdYXZRXdqBtrTmesEBRZ6u
-   TlwB4EYCIe0ZV93OgmJo3uHLNI0nY6Y2FVR0djgvS66V90k7Pbce9nDJx
-   KhIs6FdJS/FlKk65dMvfVyj2FFCJn+nqvyshc1Hz+zU09+tk0kkS7NXQ6
-   tFE+FBlM259p5Pu5r6URE/8x8ly5j7Zmm8C4ERdr1++icXyGGIgadHYGn
-   nq9bNIPRTUb/AVrugd1fsYe6HQxv0CHhSZ+8iDCvkKcame+N7XoXhLZLm
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10850"; a="446759775"
-X-IronPort-AV: E=Sophos;i="6.03,193,1694761200"; 
-   d="scan'208";a="446759775"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 01:51:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10850"; a="744059144"
-X-IronPort-AV: E=Sophos;i="6.03,193,1694761200"; 
-   d="scan'208";a="744059144"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
-  by orsmga007.jf.intel.com with ESMTP; 02 Oct 2023 01:51:49 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Subject: [PATCH] crypto: qat - add namespace to driver
-Date:   Mon,  2 Oct 2023 09:51:09 +0100
-Message-ID: <20231002085126.11127-2-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 2 Oct 2023 05:11:04 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7192C83;
+        Mon,  2 Oct 2023 02:11:00 -0700 (PDT)
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3928E3qR022118;
+        Mon, 2 Oct 2023 11:10:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=E01OcOCHWhP/6+N5KY2PJxe8Vqf5B2GZBRHXsK7b/ZI=; b=aA
+        egtRg/HZV5z61BlbQRmw/xhKB5/NOvXNbEABAWfThJ4zPTHndz302pa5QVjGM+sM
+        3J8B5ueo8i4iRhw3Pi7HwaWlrkqWsy58TBUitGYwlxhFctZH+p7nxHxKyjmiDHP0
+        gunyUnqWwhUVh8dpDShiYuX54yeB8rEzvnWdNJYWKBCqzgkrTC+zGteyX1b5Pb5j
+        Rf6xRjDsxe+C3FBAdS36hxq9MRrXNisC3EZbZEbT4TzCJ6MY1lbLR6cryXr1bkaw
+        d59gty15vIlgDcfiUoAb0YziosPbln43LGmK99GlHY0DfgQb6OF9EUVre9tgoPIq
+        Z+Sxdr7e5cMYwyIcmVVA==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tew80bymt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 02 Oct 2023 11:10:14 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B9C5F100059;
+        Mon,  2 Oct 2023 11:10:12 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6252F211F22;
+        Mon,  2 Oct 2023 11:10:12 +0200 (CEST)
+Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 2 Oct
+ 2023 11:10:10 +0200
+Message-ID: <f3dbcd84-1320-9efb-f715-71b6bb4c7bdb@foss.st.com>
+Date:   Mon, 2 Oct 2023 11:10:05 +0200
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v5 01/11] dt-bindings: document generic access controller
+To:     Rob Herring <robh@kernel.org>
+CC:     <arnd@kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-mmc@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <robh+dt@kernel.org>, <jic23@kernel.org>, <davem@davemloft.net>,
+        <kuba@kernel.org>, <pabeni@redhat.com>,
+        <linux-spi@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <olivier.moysan@foss.st.com>, <linux-media@vger.kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>,
+        Oleksii Moisieiev <oleksii_moisieiev@epam.com>,
+        <edumazet@google.com>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <ulf.hansson@linaro.org>, <richardcochran@gmail.com>,
+        <will@kernel.org>, <linux-crypto@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <arnaud.pouliquen@foss.st.com>, <linux-serial@vger.kernel.org>,
+        <alexandre.torgue@foss.st.com>,
+        Frank Rowand <frowand.list@gmail.com>, <andi.shyti@kernel.org>,
+        <linux-usb@vger.kernel.org>, <peng.fan@oss.nxp.com>,
+        <lee@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <conor+dt@kernel.org>, <herbert@gondor.apana.org.au>,
+        <linux-arm-kernel@lists.infradead.org>, <catalin.marinas@arm.com>,
+        <al.sa-devel@alsa-project.org>, <hugues.fruchet@foss.st.com>,
+        <devicetree@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <mchehab@kernel.org>, <vkoul@kernel.org>,
+        <gregkh@linuxfoundation.org>
+References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
+ <20230929142852.578394-2-gatien.chevallier@foss.st.com>
+ <169600172184.3601218.2121908606358610119.robh@kernel.org>
+Content-Language: en-US
+From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <169600172184.3601218.2121908606358610119.robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-02_03,2023-09-28_03,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Create CRYPTO_QAT namespace for symbols exported by the qat_common
-module and import those in the QAT drivers. It will reduce the global
-namespace crowdedness and potential misuse or the API.
 
-This does not introduce any functional change.
 
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/crypto/intel/qat/qat_4xxx/adf_drv.c       | 1 +
- drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c      | 1 +
- drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c    | 1 +
- drivers/crypto/intel/qat/qat_c62x/adf_drv.c       | 1 +
- drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c     | 1 +
- drivers/crypto/intel/qat/qat_common/Makefile      | 1 +
- drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c   | 1 +
- drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c | 1 +
- 8 files changed, 8 insertions(+)
+On 9/29/23 17:35, Rob Herring wrote:
+> 
+> On Fri, 29 Sep 2023 16:28:42 +0200, Gatien Chevallier wrote:
+>> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+>>
+>> Introducing of the generic access controller bindings for the
+>> access controller provider and consumer devices. Those bindings are
+>> intended to allow a better handling of accesses to resources in a
+>> hardware architecture supporting several compartments.
+>>
+>> This patch is based on [1]. It is integrated in this patchset as it
+>> provides a use-case for it.
+>>
+>> Diffs with [1]:
+>> 	- Rename feature-domain* properties to access-control* to narrow
+>> 	  down the scope of the binding
+>> 	- YAML errors and typos corrected.
+>> 	- Example updated
+>> 	- Some rephrasing in the binding description
+>>
+>> [1]: https://lore.kernel.org/lkml/0c0a82bb-18ae-d057-562b
+>>
+>> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>>
+>> ---
+>> Changes in V5:
+>> 	- Diffs with [1]
+>> 	- Discarded the [IGNORE] tag as the patch is now part of the
+>> 	  patchset
+>>
+>>   .../access-controllers/access-controller.yaml | 90 +++++++++++++++++++
+>>   1 file changed, 90 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+>>
+> 
+> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+> on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> 
+> yamllint warnings/errors:
+> 
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/access-controllers/access-controller.yaml: access-control-provider: missing type definition
+> 
+> doc reference errors (make refcheckdocs):
+> 
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230929142852.578394-2-gatien.chevallier@foss.st.com
+> 
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+> 
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+> 
+> pip3 install dtschema --upgrade
+> 
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
+> 
 
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
-index 90f5c1ca7b8d..2ccd1223f1ef 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
-@@ -467,3 +467,4 @@ MODULE_FIRMWARE(ADF_4XXX_MMP);
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
- MODULE_SOFTDEP("pre: crypto-intel_qat");
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c
-index 468c9102093f..956a4c85609a 100644
---- a/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c
-@@ -252,3 +252,4 @@ MODULE_FIRMWARE(ADF_C3XXX_FW);
- MODULE_FIRMWARE(ADF_C3XXX_MMP);
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-diff --git a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c
-index d5a0ecca9d0b..a8de9cd09c05 100644
---- a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c
-@@ -226,3 +226,4 @@ MODULE_LICENSE("Dual BSD/GPL");
- MODULE_AUTHOR("Intel");
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_drv.c b/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
-index 0186921be936..ad0ca4384998 100644
---- a/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
-@@ -252,3 +252,4 @@ MODULE_FIRMWARE(ADF_C62X_FW);
- MODULE_FIRMWARE(ADF_C62X_MMP);
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-diff --git a/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c
-index c9ae6c0d0dca..53b8ddb63364 100644
---- a/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c
-@@ -226,3 +226,4 @@ MODULE_LICENSE("Dual BSD/GPL");
- MODULE_AUTHOR("Intel");
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 43622c7fca71..0f7c12397fa2 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_CRYPTO_DEV_QAT) += intel_qat.o
-+ccflags-y += -DDEFAULT_SYMBOL_NAMESPACE=CRYPTO_QAT
- intel_qat-objs := adf_cfg.o \
- 	adf_isr.o \
- 	adf_ctl_drv.o \
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
-index 1e748e8ce12d..40b456b8035b 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
-@@ -252,3 +252,4 @@ MODULE_FIRMWARE(ADF_DH895XCC_FW);
- MODULE_FIRMWARE(ADF_DH895XCC_MMP);
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-diff --git a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c
-index fefb85ceaeb9..d59cb1ba2ad5 100644
---- a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c
-@@ -226,3 +226,4 @@ MODULE_LICENSE("Dual BSD/GPL");
- MODULE_AUTHOR("Intel");
- MODULE_DESCRIPTION("Intel(R) QuickAssist Technology");
- MODULE_VERSION(ADF_DRV_VERSION);
-+MODULE_IMPORT_NS(CRYPTO_QAT);
--- 
-2.41.0
+Hi Rob,
 
+Running:
+1- make dt_binding_check | grep access-control
+2- make dt_binding_check 
+DT_SCHEMA_FILES=Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+from Krzysztof's slideset
+
+with
+
+pip3 show dtschema
+Name: dtschema
+Version: 2023.9
+
+and
+
+pip3 show yamllint
+Name: yamllint
+Version: 1.32.0
+
+I don't see any of the errors reported by the robot. I have to clone
+your repository to reproduce it.
+
+Should I resubmit with a clean dt-check using the latest dtschema?
+
+***********
+However, I get:
+warning: ignoring duplicate '$id' value 
+'http://devicetree.org/schemas/reserved-memory/framebuffer.yaml#
+warning: ignoring duplicate '$id' value 
+'http://devicetree.org/schemas/reserved-memory/memory-region.yaml#
+warning: ignoring duplicate '$id' value 
+'http://devicetree.org/schemas/reserved-memory/shared-dma-pool.yaml#
+warning: ignoring duplicate '$id' value 
+'http://devicetree.org/schemas/reserved-memory/reserved-memory.yaml
+
+Above warnings disappears when switching to:
+pip3 show dtschema
+Name: dtschema
+Version: 2023.7
+
+The above YAMLs seem to be duplicated in dtschema's latest version.
+I guess it's a synchro that needs to be done since:
+https://lore.kernel.org/all/20230830231758.2561402-2-sjg@chromium.org/
+***********
+
+Best regards,
+Gatien
