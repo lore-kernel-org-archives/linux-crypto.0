@@ -2,203 +2,170 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE831E784B5
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 09:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B05EE7849A
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 09:16:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235972AbjJBJLF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 05:11:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49798 "EHLO
+        id S236032AbjJBJQP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Oct 2023 05:16:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235965AbjJBJLE (ORCPT
+        with ESMTP id S236036AbjJBJQO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 05:11:04 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7192C83;
-        Mon,  2 Oct 2023 02:11:00 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3928E3qR022118;
-        Mon, 2 Oct 2023 11:10:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:subject:to:cc:references:from
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=E01OcOCHWhP/6+N5KY2PJxe8Vqf5B2GZBRHXsK7b/ZI=; b=aA
-        egtRg/HZV5z61BlbQRmw/xhKB5/NOvXNbEABAWfThJ4zPTHndz302pa5QVjGM+sM
-        3J8B5ueo8i4iRhw3Pi7HwaWlrkqWsy58TBUitGYwlxhFctZH+p7nxHxKyjmiDHP0
-        gunyUnqWwhUVh8dpDShiYuX54yeB8rEzvnWdNJYWKBCqzgkrTC+zGteyX1b5Pb5j
-        Rf6xRjDsxe+C3FBAdS36hxq9MRrXNisC3EZbZEbT4TzCJ6MY1lbLR6cryXr1bkaw
-        d59gty15vIlgDcfiUoAb0YziosPbln43LGmK99GlHY0DfgQb6OF9EUVre9tgoPIq
-        Z+Sxdr7e5cMYwyIcmVVA==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tew80bymt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 02 Oct 2023 11:10:14 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B9C5F100059;
-        Mon,  2 Oct 2023 11:10:12 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6252F211F22;
-        Mon,  2 Oct 2023 11:10:12 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 2 Oct
- 2023 11:10:10 +0200
-Message-ID: <f3dbcd84-1320-9efb-f715-71b6bb4c7bdb@foss.st.com>
-Date:   Mon, 2 Oct 2023 11:10:05 +0200
+        Mon, 2 Oct 2023 05:16:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69A39E
+        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 02:15:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696238126;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XeICUbMfmTh7beF2Sq022ow9UPF6kDmSYo3jFc/ZOTU=;
+        b=ZfCcEE3WGuvYx9h/2Q/9R/QZXUvd32zB7LGRew/bsRfquNwjhSGXESKAK4zsT5vVJ0Keot
+        rYaM/hAq/0seDmCLlTcDb2Vlt0ATZNCV40M8oOJhHqcjdwsSWxbqtb4t3OTavGe2KXlQEC
+        sCksEwvv55zm/aiiAQmczotZ38pIzk4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-84-R-LOw29FM_GH4bd9fkwt_Q-1; Mon, 02 Oct 2023 05:15:05 -0400
+X-MC-Unique: R-LOw29FM_GH4bd9fkwt_Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4EEAE1C09A46;
+        Mon,  2 Oct 2023 09:15:05 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2949F40107B;
+        Mon,  2 Oct 2023 09:15:05 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+        id 1E38130C0500; Mon,  2 Oct 2023 09:15:05 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+        by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 1D4CC3FD54;
+        Mon,  2 Oct 2023 11:15:05 +0200 (CEST)
+Date:   Mon, 2 Oct 2023 11:15:05 +0200 (CEST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Michael Hrivnak <mhrivnak@redhat.com>,
+        Eric Garver <egarver@redhat.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: [PATCH v2] qat: fix deadlock in backlog processing
+In-Reply-To: <ZRc75XGd92MgaVko@gcabiddu-mobl1.ger.corp.intel.com>
+Message-ID: <6b5cb6f-e4bb-8328-a718-f21b2575b8@redhat.com>
+References: <af9581e2-58f9-cc19-428f-6f18f1f83d54@redhat.com> <ZQ2vJNs/7ZzY44z1@gcabiddu-mobl1.ger.corp.intel.com> <ed935382-98ee-6f5d-2f-7c6badfd3abb@redhat.com> <ZRc75XGd92MgaVko@gcabiddu-mobl1.ger.corp.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v5 01/11] dt-bindings: document generic access controller
-To:     Rob Herring <robh@kernel.org>
-CC:     <arnd@kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-mmc@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <robh+dt@kernel.org>, <jic23@kernel.org>, <davem@davemloft.net>,
-        <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-spi@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <olivier.moysan@foss.st.com>, <linux-media@vger.kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>,
-        Oleksii Moisieiev <oleksii_moisieiev@epam.com>,
-        <edumazet@google.com>, <linux-stm32@st-md-mailman.stormreply.com>,
-        <ulf.hansson@linaro.org>, <richardcochran@gmail.com>,
-        <will@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <arnaud.pouliquen@foss.st.com>, <linux-serial@vger.kernel.org>,
-        <alexandre.torgue@foss.st.com>,
-        Frank Rowand <frowand.list@gmail.com>, <andi.shyti@kernel.org>,
-        <linux-usb@vger.kernel.org>, <peng.fan@oss.nxp.com>,
-        <lee@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <conor+dt@kernel.org>, <herbert@gondor.apana.org.au>,
-        <linux-arm-kernel@lists.infradead.org>, <catalin.marinas@arm.com>,
-        <al.sa-devel@alsa-project.org>, <hugues.fruchet@foss.st.com>,
-        <devicetree@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <mchehab@kernel.org>, <vkoul@kernel.org>,
-        <gregkh@linuxfoundation.org>
-References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
- <20230929142852.578394-2-gatien.chevallier@foss.st.com>
- <169600172184.3601218.2121908606358610119.robh@kernel.org>
-Content-Language: en-US
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <169600172184.3601218.2121908606358610119.robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-02_03,2023-09-28_03,2023-05-22_02
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 9/29/23 17:35, Rob Herring wrote:
+On Fri, 29 Sep 2023, Giovanni Cabiddu wrote:
+
+> On Fri, Sep 22, 2023 at 06:34:16PM +0200, Mikulas Patocka wrote:
+> >
+> > > Also, deserves a fixes tag.
+> > 
+> > "Fixes" tag is for something that worked and that was broken in some 
+> > previous commit.
+> That's right.
 > 
-> On Fri, 29 Sep 2023 16:28:42 +0200, Gatien Chevallier wrote:
->> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
->>
->> Introducing of the generic access controller bindings for the
->> access controller provider and consumer devices. Those bindings are
->> intended to allow a better handling of accesses to resources in a
->> hardware architecture supporting several compartments.
->>
->> This patch is based on [1]. It is integrated in this patchset as it
->> provides a use-case for it.
->>
->> Diffs with [1]:
->> 	- Rename feature-domain* properties to access-control* to narrow
->> 	  down the scope of the binding
->> 	- YAML errors and typos corrected.
->> 	- Example updated
->> 	- Some rephrasing in the binding description
->>
->> [1]: https://lore.kernel.org/lkml/0c0a82bb-18ae-d057-562b
->>
->> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>
->> ---
->> Changes in V5:
->> 	- Diffs with [1]
->> 	- Discarded the [IGNORE] tag as the patch is now part of the
->> 	  patchset
->>
->>   .../access-controllers/access-controller.yaml | 90 +++++++++++++++++++
->>   1 file changed, 90 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controller.yaml
->>
+> > A quick search through git shows that QAT backlogging was 
+> > broken since the introduction of QAT.
+> The driver was moved from drivers/crypto/qat to drivers/crypto/intel/qat
+> that's why you see a single patch.
+> This fixes 386823839732 ("crypto: qat - add backlog mechanism")
+
+But before 386823839732 it also didn't work - it returned -EBUSY without 
+queuing the request and deadlocked.
+
+> Thanks - when I proposed the rework I was thinking at a solution without
+> gotos. Here is a draft:
+
+Yes - it is possible to fix it this way.
+
+
+
+> ------------8<----------------
+>  .../intel/qat/qat_common/qat_algs_send.c      | 40 ++++++++++---------
+>  1 file changed, 22 insertions(+), 18 deletions(-)
 > 
-> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-> on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/access-controllers/access-controller.yaml: access-control-provider: missing type definition
-> 
-> doc reference errors (make refcheckdocs):
-> 
-> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230929142852.578394-2-gatien.chevallier@foss.st.com
-> 
-> The base for the series is generally the latest rc1. A different dependency
-> should be noted in *this* patch.
-> 
-> If you already ran 'make dt_binding_check' and didn't see the above
-> error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> date:
-> 
-> pip3 install dtschema --upgrade
-> 
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your schema.
-> 
+> diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs_send.c b/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
+> index bb80455b3e81..18c6a233ab96 100644
+> --- a/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
+> +++ b/drivers/crypto/intel/qat/qat_common/qat_algs_send.c
+> @@ -40,17 +40,7 @@ void qat_alg_send_backlog(struct qat_instance_backlog *backlog)
+>  	spin_unlock_bh(&backlog->lock);
+>  }
+>  
+> -static void qat_alg_backlog_req(struct qat_alg_req *req,
+> -				struct qat_instance_backlog *backlog)
+> -{
+> -	INIT_LIST_HEAD(&req->list);
+> -
+> -	spin_lock_bh(&backlog->lock);
+> -	list_add_tail(&req->list, &backlog->list);
+> -	spin_unlock_bh(&backlog->lock);
+> -}
+> -
+> -static int qat_alg_send_message_maybacklog(struct qat_alg_req *req)
+> +static bool qat_alg_try_enqueue(struct qat_alg_req *req)
+>  {
+>  	struct qat_instance_backlog *backlog = req->backlog;
+>  	struct adf_etr_ring_data *tx_ring = req->tx_ring;
+> @@ -58,22 +48,36 @@ static int qat_alg_send_message_maybacklog(struct qat_alg_req *req)
+>  
+>  	/* If any request is already backlogged, then add to backlog list */
+>  	if (!list_empty(&backlog->list))
+> -		goto enqueue;
+> +		return false;
+>  
+>  	/* If ring is nearly full, then add to backlog list */
+>  	if (adf_ring_nearly_full(tx_ring))
+> -		goto enqueue;
+> +		return false;
+>  
+>  	/* If adding request to HW ring fails, then add to backlog list */
+>  	if (adf_send_message(tx_ring, fw_req))
+> -		goto enqueue;
+> +		return false;
+>  
+> -	return -EINPROGRESS;
+> +	return true;
+> +}
+>  
+> -enqueue:
+> -	qat_alg_backlog_req(req, backlog);
+>  
+> -	return -EBUSY;
+> +static int qat_alg_send_message_maybacklog(struct qat_alg_req *req)
+> +{
+> +	struct qat_instance_backlog *backlog = req->backlog;
+> +	int ret = -EINPROGRESS;
+> +
+> +	if (qat_alg_try_enqueue(req))
+> +		return ret;
+> +
+> +	spin_lock_bh(&backlog->lock);
+> +	if (!qat_alg_try_enqueue(req)) {
+> +		list_add_tail(&req->list, &backlog->list);
+> +		ret = -EBUSY;
+> +	}
+> +	spin_unlock_bh(&backlog->lock);
+> +
+> +	return ret;
+>  }
+>  
+>  int qat_alg_send_message(struct qat_alg_req *req)
+> -- 
+> 2.41.0
 
-Hi Rob,
 
-Running:
-1- make dt_binding_check | grep access-control
-2- make dt_binding_check 
-DT_SCHEMA_FILES=Documentation/devicetree/bindings/access-controllers/access-controller.yaml
-from Krzysztof's slideset
+Reviwed-by: Mikulas Patocka <mpatocka@redhat.com>
 
-with
+Mikulas
 
-pip3 show dtschema
-Name: dtschema
-Version: 2023.9
 
-and
-
-pip3 show yamllint
-Name: yamllint
-Version: 1.32.0
-
-I don't see any of the errors reported by the robot. I have to clone
-your repository to reproduce it.
-
-Should I resubmit with a clean dt-check using the latest dtschema?
-
-***********
-However, I get:
-warning: ignoring duplicate '$id' value 
-'http://devicetree.org/schemas/reserved-memory/framebuffer.yaml#
-warning: ignoring duplicate '$id' value 
-'http://devicetree.org/schemas/reserved-memory/memory-region.yaml#
-warning: ignoring duplicate '$id' value 
-'http://devicetree.org/schemas/reserved-memory/shared-dma-pool.yaml#
-warning: ignoring duplicate '$id' value 
-'http://devicetree.org/schemas/reserved-memory/reserved-memory.yaml
-
-Above warnings disappears when switching to:
-pip3 show dtschema
-Name: dtschema
-Version: 2023.7
-
-The above YAMLs seem to be duplicated in dtschema's latest version.
-I guess it's a synchro that needs to be done since:
-https://lore.kernel.org/all/20230830231758.2561402-2-sjg@chromium.org/
-***********
-
-Best regards,
-Gatien
