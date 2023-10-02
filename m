@@ -2,144 +2,202 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDAEE7849A
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 12:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1C5E784AC
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 13:26:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237013AbjJBM2m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 08:28:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58388 "EHLO
+        id S237249AbjJBN0F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Oct 2023 09:26:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237052AbjJBM2m (ORCPT
+        with ESMTP id S236201AbjJBN0E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 08:28:42 -0400
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB8EFA;
-        Mon,  2 Oct 2023 05:28:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696249715; x=1727785715;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=XHudESUk0+r+xywgpWNySwL1BLzsNkPXOyp2CaffniM=;
-  b=i/TjFXX2Nq5Cd1ocx1Oft69WP57R1C+0MldBrZ+j6QqTeHHfjquhK/Mu
-   bfEhm3R0AEVKX9KBk5xFBPiQXhQwYuvj3zZ2RGCMw7lsKZ5rxuetcWxAW
-   x3UW93nU2D2BwUNcWY9kx9wUNuMYV9fe1pk87Ak42Cg3058HrWXHLpJj5
-   I=;
-X-IronPort-AV: E=Sophos;i="6.03,194,1694736000"; 
-   d="scan'208";a="354387822"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 12:28:31 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com (Postfix) with ESMTPS id E053DA09B9;
-        Mon,  2 Oct 2023 12:28:29 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 2 Oct 2023 12:28:29 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Mon, 2 Oct
- 2023 12:28:26 +0000
-Message-ID: <8fee7a04-cee2-4b99-8ec5-63af940c3198@amazon.com>
-Date:   Mon, 2 Oct 2023 14:28:23 +0200
+        Mon, 2 Oct 2023 09:26:04 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2041.outbound.protection.outlook.com [40.107.93.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC90B3;
+        Mon,  2 Oct 2023 06:26:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ap0Q0cHeNEjfd/KVcFBmq4JPbU/59FkTSAHRlepRhvxFmf6TWGjjVL7hptdGT9GzAG+FBptsWzsuRJF0KVphLQPheT6gY+D7d64MD9TR0QGZ0JDzti+NUTZI/27S6dCo46Dfv4AQh5WLvyXh50LQjNol11cWUPnObnXYPXn5fwXPtmnN6sVUdi7qTOXE8WpdyAT0sfc7YWXEyADBTgikRGjiGG4Mj+cWWOS9Ge1WP4mHPW8CLtEuQduMkZRTWuzi1m3JBp2urhV+AbqF0sZEktTaIOYkh3A16r/6+UqmdlbPk793YwX5T6AcniN3x+YTEszVB5G9uV3NKI1VSAabNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HYSVcLuRXvZXTQ+HePQditm8rYKwTAOH2ZY/zcUAV5k=;
+ b=GiZI7aUhgxS8vcMlq3xkZGqKNPUPpYumwGncy4eOh8SQRWfG6oIEl0Cpe2SmpnUSZm0o2H2UyAFy6McZPU6i+/IdEMVz3+PB60uowPX30oG66BH8GnG9/gaWF1HMmhhAPgwiPdXSqyVeKckSZxrmYfeOSmPKgGLaE/tBUNlkkquKghvwnU06SmnRAwwGPgmZsCsHP0CGijaVztyCcufDfFcdd2MA7bJonp2/59TbPDiyaWllBORNHp3O4fV0s9mP1UmmrTUuEajFhGsVHV3mQylhZ1Qjmxe8YDthVxjFdpNFk2S+1IBA0e2D5lJPUc3QGiBx/yn7MFglGnv5n7vjxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HYSVcLuRXvZXTQ+HePQditm8rYKwTAOH2ZY/zcUAV5k=;
+ b=fRkVpAB5j8gpNtFO6PkAJYJXVe1iuVvB2ItkmyTW5tF+DHydmYh/xzqqF7asr1FYnkISUO63hrTjv/832F/THzfQm6MxJVgpTs2B/LsIXcDl8NaVfj9RYbW6MgiJt3WKFuMaCXryYUfO/AbRQUzqkfkmY2/334MZO0VxOxvgHgk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by SA1PR12MB7149.namprd12.prod.outlook.com (2603:10b6:806:29c::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Mon, 2 Oct
+ 2023 13:25:58 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::2b54:7ddf:9e2e:751c]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::2b54:7ddf:9e2e:751c%3]) with mapi id 15.20.6813.027; Mon, 2 Oct 2023
+ 13:25:58 +0000
+Message-ID: <ce28c892-adeb-96dc-bb3c-f1244ab1ea25@amd.com>
+Date:   Mon, 2 Oct 2023 08:25:56 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] crypto: Move akcipher_request_cast helper to crypto
+ header
+Content-Language: en-US
+To:     Corentin Labbe <clabbe@baylibre.com>, andrew@aj.id.au,
+        davem@davemloft.net, herbert@gondor.apana.org.au, joel@jms.id.au,
+        john.allen@amd.com, neal_liu@aspeedtech.com
+Cc:     linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20231001201357.2052949-1-clabbe@baylibre.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20231001201357.2052949-1-clabbe@baylibre.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DS7PR03CA0159.namprd03.prod.outlook.com
+ (2603:10b6:5:3b2::14) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] misc: Add Nitro Secure Module driver
-Content-Language: en-GB
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC:     Arnd Bergmann <arnd@arndb.de>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Olivia Mackall <olivia@selenic.com>,
-        Petre Eftime <petre.eftime@gmail.com>,
-        Erdem Meydanlli <meydanli@amazon.nl>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <20230929133320.74848-1-graf@amazon.com>
- <20230929133320.74848-2-graf@amazon.com>
- <74b2d869-0d96-46f9-a180-b405992e6c51@app.fastmail.com>
- <a44a2df0-beb9-4a43-ade4-267ad819729e@amazon.com>
- <2023093054-swimming-whoopee-7ef8@gregkh>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <2023093054-swimming-whoopee-7ef8@gregkh>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|SA1PR12MB7149:EE_
+X-MS-Office365-Filtering-Correlation-Id: 75c38483-03e9-4fd1-a51f-08dbc34b1cf3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7GqQczUB8rdOMmxwbl8/MnoLmfXmizgIGv++7jhmw88OgokPCe3x1Zx9WF5w7f31WtEnlMZxjjb8GzPgNJY/CD5sozgDMoNB1/Jqx6ILWnzXFcEtBWNlQ4wEir9nqKkZGJYcbytmCSg6KrFWBTW0EIkBuwK2+B2EkORDyQkFZWPBcBzNchroE1rrW7QJ2Tf+c8d3r2aOM+onNoOQPt1OLlcbwleZiq16PiVwNjqTb9rXBsWRaslM+5hcefX5++JSV3Gwda/jddkXFxIF01p/+rOGZpji7uwexhBFNgAGioRUk5ev0iHfWerUo5qnbZ/ulY67Sag+TV/CXCRuskiIAhTkZYdgY7gFBX+Z3BXgcAIYfDI48BcuirlNYRNUfZym1CWCGEyMNkLf6VBx5Y2KthM7CNlPA3n5o9avj6JkCpXDi59RP0LoS2hlyaXIYs8lbdLUqzGQa3lksxGNtsQtIscMAJJVRsR+CH/binwyMti6PjmgAUc/Ys2H1v9CMq3eiWC/YKZLS17l+mhBepXAEYcoOsEmKl2zbxV23sQqeZkdzVw0MPiEsL+NZtKLmAEj3iGdShZWZQVZFPZ3Cae3zm34IQhwEgXRGvl5GodpuM52ndYyr2hLyjlnSZLPoWQDzY+z4ug+JRKzONTcf7Ld6A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(136003)(396003)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(38100700002)(53546011)(26005)(2616005)(6512007)(86362001)(31686004)(478600001)(6486002)(83380400001)(6506007)(66946007)(66476007)(316002)(66556008)(41300700001)(4326008)(7416002)(5660300002)(2906002)(36756003)(31696002)(8936002)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Ulg3VjFjNzV2Vkl3ZnJVZDdPMEdwUk9JRDlBQXhXOVhiNE5BamJxY1VHSHVp?=
+ =?utf-8?B?dmpsY0dhamVvUjB3cEpMdFJHb2Y5NnZzRkFqUmp3UHh0UG9jWlo0RDJxeXV6?=
+ =?utf-8?B?ZG14aHdUV3pMekFIVnp6anRhY2F0cXg1TlNsSFBZMzRkc0FwWTZMa1VBY01Z?=
+ =?utf-8?B?NFpkUFhPM2xIMmU3NzdSeTZxMUxNZ0ZEaXZtZ3BEbC94ZURud2REaVpMdW1l?=
+ =?utf-8?B?d2J1anRVRE1tdHJ1ZHBBQ0FycmRZRmp0Y09YQVFVWkpjK0tkQmRvT2tkSnNJ?=
+ =?utf-8?B?U3h6K294VmlNVWIxdnpLRXNGQ1FlWlpPUVowUnR0enpXL3YvcU4ySld6bkhL?=
+ =?utf-8?B?dUVTY0ROTnA0VTdtSDRzVENVQjE4a0JoY0dUSHVtWGljUFN4SVJJbjVpTUs2?=
+ =?utf-8?B?cFZaT0t0UHBpSDAya0l0T3htWnA0OWNhdXNiWjNEcmJjREszUzhvTW1Ja3F0?=
+ =?utf-8?B?RlJXdVlQZUxNOFdCTlZhYWNGbjhpQXpNT0pDSVo1WXVMVzFtSXNGeUtBbTRG?=
+ =?utf-8?B?QU9yaC9td1pxVGo5eUJqcCtPL0FKemx6cVU2NTJsUitiejlQaG1Nak9IRkNo?=
+ =?utf-8?B?MWpDMW9qSEhiT3hQajQveFRsM1NwUEp6UHhETjdHVTJKR1RnMSt3UUk3SEow?=
+ =?utf-8?B?ZWpaY1JERk84RmVWYk9zanhKNWk5RlJGNStRQ2tmQkJlR1hXM3NuWG5iQmx1?=
+ =?utf-8?B?YlNyVm1RNXpDYmFjU2xvSVVpWDdqUFVQU2R1a1ZMVFprbURiN3NZc0o5NFVj?=
+ =?utf-8?B?ZFVJZEtUbWJWK1RyZVA5REJDREtST1I0U2o5U0wwQmFvb2lWR3BhTVJWcXpw?=
+ =?utf-8?B?UEhFTzJ1QVFvS2RFeGo4eHFWdEpyQTJKT0FralpuNmxsQjA3eGZIUWZyZmtt?=
+ =?utf-8?B?MkRWMDFqRDRnTmxFb2drNTdPTy9vTGxsTFRlVzhkNVU4dDl1cCtFR1AvVXRq?=
+ =?utf-8?B?anRzWVZFblZ6UVZCMi84bzM0eGZzZVlLNVRmMTJhaHBnSmo2QlA0Rk5aSklF?=
+ =?utf-8?B?RVErMGI1MzFvZ0dwMWlFcDFyWkVseC9LWjc4dVdZWHBGWFQrMVp3eHhndHlN?=
+ =?utf-8?B?aE1DWXFJc05hK1YvaW54NzZXc0FNbENpanpxUjVWMmN4YmZzSHY3OFhhN3pJ?=
+ =?utf-8?B?NHFMM3VSWXdHdW5XSzNVbHlBRTZXbExGU011VDBzLzk0dXlGNzkzYlY4V2hI?=
+ =?utf-8?B?bE4wYzVnakZhYVFCM2g3YXBEbzhYalNUY2diNnZCclg3QVZZaUI2c0kxTVdK?=
+ =?utf-8?B?WlFmWno4SThodVhMbE4wdVJaRk50dlRsVTRMRDdYSVFWaUZvRFhBNmNLem5R?=
+ =?utf-8?B?di9pV0Q3QWpGOHl4dE01VzJrNVNjZzY3MDcwNUhXM2w2TzZTNG1VOUhpM3Q2?=
+ =?utf-8?B?VDZ0bXdvNTZRY05RYmxlSnJlbVhlazh2RDI0SW1rNnB2NTNPV2RlM1JLUGVM?=
+ =?utf-8?B?YXNiWFJPR3UrN0hoWGFmT1V6WUZCci9PZG9QTDA2TUtnZ1RqRkJXcTQzTkhY?=
+ =?utf-8?B?MU0rbDk5QjJFbklXTHZ6Y1hsWFNoTFJIdDMrVUtxY0lGOC9odkJ3QjhxUVdH?=
+ =?utf-8?B?bDRqZjFzM2UrdlQ1Wmk3b0t0Qm5TUERUSndIRlZWRC9WTWFWdHhINDFBTlVF?=
+ =?utf-8?B?d3hUWi9nSUJrcG9DclJzQjlkOENraEovVG8vdWw4RTVHc1J6bVZBMTZ3VGlG?=
+ =?utf-8?B?UFdWRGlpTk5Vd0NRbFhlNk1RK2hMWmc5eUw0WElpR1g2YkRLWGRwMkZRS1BF?=
+ =?utf-8?B?RThkUUUrdEU3QzhzN2hveFIzUXphRHc3ZHlkR1lFZEZTNzlaVUxYQnoyUFNB?=
+ =?utf-8?B?UUUyYkNKVDl4M1BQTjZzQmU5dWxBc2ozeUVqdnprVUdXRXJVU1B0elh5SWVz?=
+ =?utf-8?B?cDluTjRteWFsMHBHMEpQWnh1QnA2aDl3eVZCTnBIYndpYmVORkZJUk11QVg0?=
+ =?utf-8?B?QlgrUngxRysxc1Fkdis5QllnYnMyeml5eEFmSkcvK3RubllJTE9HSjNhOHhm?=
+ =?utf-8?B?MmVoS3g1S0dVYXhrZGpJTVVXaTdaSVhtWFRTRDhDYnhPM0xZdnlvZGFacUFU?=
+ =?utf-8?B?ZU5NVXg4TURnNWV2Z3pTakN4UlVteENkSkpCNm42eFZPZFFXWFEwWWxqWG45?=
+ =?utf-8?Q?8JMcX+6WabeILhsfRp38gYrQW?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75c38483-03e9-4fd1-a51f-08dbc34b1cf3
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 13:25:57.9671
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oc5nxvX2QotJjGpXp83bv4QHen5jOO4QyQMxX8LeE7MatXXKUZ1hHT9E8XTp3/XXGjF4TPIRbIB3VwsbytrlyA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7149
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGV5IEdyZWcsCgpPbiAzMC4wOS4yMyAwODoyMCwgR3JlZyBLcm9haC1IYXJ0bWFuIHdyb3RlOgo+
-IE9uIEZyaSwgU2VwIDI5LCAyMDIzIGF0IDA5OjI2OjE2UE0gKzAyMDAsIEFsZXhhbmRlciBHcmFm
-IHdyb3RlOgo+PiBIaSBBcm5kIQo+Pgo+PiBPbiAyOS4wOS4yMyAxOToyOCwgQXJuZCBCZXJnbWFu
-biB3cm90ZToKPj4+IE9uIEZyaSwgU2VwIDI5LCAyMDIzLCBhdCAwOTozMywgQWxleGFuZGVyIEdy
-YWYgd3JvdGU6Cj4+Pj4gV2hlbiBydW5uaW5nIExpbnV4IGluc2lkZSBhIE5pdHJvIEVuY2xhdmUs
-IHRoZSBoeXBlcnZpc29yIHByb3ZpZGVzIGEKPj4+PiBzcGVjaWFsIHZpcnRpbyBkZXZpY2UgY2Fs
-bGVkICJOU00iLiBUaGlzIGRldmljZSBoYXMgMiBtYWluIGZ1bmN0aW9uczoKPj4+Pgo+Pj4+ICAg
-ICAxKSBQcm92aWRlIGF0dGVzdGF0aW9uIHJlcG9ydHMKPj4+PiAgICAgMikgTW9kaWZ5IFBDUiBz
-dGF0ZQo+Pj4+ICAgICAzKSBQcm92aWRlIGVudHJvcHkKPj4+Pgo+Pj4+IFRoaXMgcGF0Y2ggYWRk
-cyB0aGUgY29yZSBOU00gZHJpdmVyIHRoYXQgZXhwb3NlcyBhIC9kZXYvbnNtIGRldmljZSBub2Rl
-Cj4+Pj4gd2hpY2ggdXNlciBzcGFjZSBjYW4gdXNlIHRvIHJlcXVlc3QgYXR0ZXN0YXRpb24gZG9j
-dW1lbnRzIGFuZCBpbmZsdWVuY2UKPj4+PiBQQ1Igc3RhdGVzLiBBIGZvbGxvdyB1cCBwYXRjaCB3
-aWxsIGFkZCBhIGh3cm5nIGRyaXZlciB0byBmZWVkIGl0cyBlbnRyb3B5Cj4+Pj4gaW50byB0aGUg
-a2VybmVsLgo+Pj4+Cj4+Pj4gT3JpZ2luYWxseS1ieTogUGV0cmUgRWZ0aW1lIDxwZXRyZS5lZnRp
-bWVAZ21haWwuY29tPgo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRlciBHcmFmIDxncmFmQGFt
-YXpvbi5jb20+Cj4+PiBIaSBBbGV4LAo+Pj4KPj4+IEkndmUgdGFrZW4gYSBmaXJzdCBsb29rIGF0
-IHRoaXMgZHJpdmVyIGFuZCBoYXZlIHNvbWUgbWlub3IgY29tbWVudHMuCj4+Cj4+IFRoYW5rcyBh
-IGJ1bmNoIQo+Pgo+Pgo+Pj4gVGhlIG1haW4gcG9pbnQgaGVyZSBpcyB0aGF0IEkgdGhpbmsgd2Ug
-bmVlZCB0byBsb29rIGF0IHBvc3NpYmxlCj4+PiBhbHRlcm5hdGl2ZXMgZm9yIHRoZSB1c2VyIHNw
-YWNlIGludGVyZmFjZSwgYW5kIChpZiBwb3NzaWJsZSkgY2hhbmdlCj4+PiB0byBhIHNldCBvZiBo
-aWdoZXItbGV2ZWwgaW9jdGwgY29tbWFuZHMgZnJvbSB0aGUgc2ltcGxlIHBhc3N0aHJvdWdoLgo+
-Pgo+PiBJJ20gc2xpZ2h0bHkgdG9ybiBvbiB0aGF0IGJpdC4gSSB0aGluayBpbiBoaW5kc2lnaHQg
-dGhlIE5TTSBkZXZpY2UgcHJvYmFibHkKPj4gc2hvdWxkIGhhdmUgYmVlbiBhIHJlc2VydmVkIHZz
-b2NrIENJRCBhbmQgdGhlIGh3cm5nIG9uZSBzaG91bGQgaGF2ZSBqdXN0Cj4+IGJlZW4gdmlydGlv
-LXJuZy4KPj4KPj4gVGhlIHByb2JsZW0gaXMgdGhhdCBOaXRybyBFbmNsYXZlcyB3ZXJlIGxhdW5j
-aGVkIGluIDIwMjAgYW5kIHNpbmNlIGFuCj4+IGVjb3N5c3RlbSBkZXZlbG9wZWQgaW4gbXVsdGlw
-bGUgbGFuZ3VhZ2VzIHRvIHN1cHBvcnQgYnVpbGRpbmcgY29kZSBpbnNpZGU6Cj4+Cj4+IGh0dHBz
-Oi8vZ2l0aHViLmNvbS9hd3MvYXdzLW5pdHJvLWVuY2xhdmVzLW5zbS1hcGkvYmxvYi9tYWluL3Ny
-Yy9kcml2ZXIvbW9kLnJzI0w2Ngo+PiBodHRwczovL2dpdGh1Yi5jb20vZG9ua2Vyc2dvZWQvYXdz
-LW5zbS1pbnRlcmZhY2UvYmxvYi9tYWluL2F3c19uc21faW50ZXJmYWNlL19faW5pdF9fLnB5I0wy
-NjQtTDI3NAo+PiAgICBodHRwczovL2dpdGh1Yi5jb20vaGYvbnNtL2Jsb2IvbWFpbi9uc20uZ28j
-TDk5LUwxMjkKPj4KPj4KPj4gQWxsIG9mIHRoZXNlIHVzZSB0aGUgKGRvd25zdHJlYW0pIGlvY3Rs
-IHRoYXQgdGhpcyBwYXRjaCBhbHNvIGltcGxlbWVudHMuIFdlCj4+IGNvdWxkIGNoYW5nZSBpdCwg
-YnV0IGluc3RlYWQgb2YgbWFraW5nIGl0IGVhc2llciBmb3IgdXNlciBzcGFjZSB0byBhZGFwdCB0
-aGUKPj4gZGV2aWNlIG5vZGUsIGl0IHdvdWxkIHByb2JhYmx5IGh1cnQgbW9yZS4KPj4KPj4gSSBh
-Z3JlZSB0aGF0IHRoaXMgaXMgbm90IGEgZ3JlYXQgcGxhY2UgdG8gYmUgaW4uIFRoaXMgZHJpdmVy
-IGFic29sdXRlbHkKPj4gc2hvdWxkIGhhdmUgYmVlbiB1cHN0cmVhbWVkIDMgeWVhcnMgYWdvLiBC
-dXQgSSBjYW4ndCB0dXJuIGJhY2sgdGltZSAoeWV0KQo+PiA6KS4KPiBBcyB5b3Uga25vdywgdGhp
-cyBpcyBubyBleGN1c2UgdG8gcHV0IGFuIGFwaSBpbiB0aGUga2VybmVsIHRoYXQgaXNuJ3QKPiBj
-b3JyZWN0IG9yIGdvb2QgZm9yIHRoZSBsb25nLXRlcm0uICBKdXN0IGJlY2F1c2UgcGVvcGxlIGRv
-IGZvb2xpc2gKPiB0aGluZ3Mgb3V0c2lkZSBvZiB0aGUga2VybmVsIHRyZWUgbmV2ZXIgbWVhbnMg
-d2UgaGF2ZSB0byBhY2NlcHQgdGhlbSBpbgo+IG91ciB0cmVlLiAgSW5zdGVhZCB3ZSBjYW4gYXNr
-IHRoZW0gdG8gZml4IHRoZW0gcHJvcGVybHkgYXMgcGFydCBvZiB1cwo+IHRha2luZyB0aGUgY29k
-ZS4KPgo+IFNvIHBsZWFzZSwgd29yayBvbiBkb2luZyB0aGlzIHJpZ2h0LgoKClNvcnJ5IGlmIG15
-IG1lc3NhZ2UgYWJvdmUgY2FtZSBvdmVyIGFzIGEgcHVzaCB0byBwdXQgYW4gImluY29ycmVjdCBh
-cGkiIAppbnRvIHRoZSBrZXJuZWwuCgpJbiBzaXR1YXRpb25zIGxpa2UgdGhpcyB3aGVyZSB5b3Ug
-Y2FuIGVpdGhlciBnaXZlIHVzZXIgc3BhY2UgZnVsbCBhY2Nlc3MgCnRvIHRoZSBkZXZpY2UncyBj
-b21tYW5kIHNwYWNlIHRocm91Z2ggYSBnZW5lcmljIEFQSSBvciB5b3UgY2FuIGNyZWF0ZSAKY29t
-bWFuZCBhd2FyZW5lc3MgaW4gdGhlIGtlcm5lbCBhbmQgbWFrZSBpdCB0aGUga2VybmVsJ3MgdGFz
-ayB0byBsZWFybiAKYWJvdXQgZWFjaCBjb21tYW5kLCBJTUhPIGl0J3MgbmV2ZXIgYSBjbGVhciBj
-dXQgb24gd2hpY2ggb25lIGlzIGJldHRlci4gCkVzcGVjaWFsbHkgaW4gdmlydHVhbCBlbnZpcm9u
-bWVudHMgd2hlcmUgdGhlIHNldCBvZiBjb21tYW5kcyBjYW4gY2hhbmdlIApxdWlja2x5IG92ZXIg
-dGltZS4KClNvIHdoYXQgSSB3YXMgdHJ5aW5nIHRvIHNheSBhYm92ZSBpcyB0aGF0ICppZiogd2Ug
-Y29uc2lkZXIgYm90aCBwYXRocyAKZXF1YWxseSB2aWFibGUsIEknZCBlcnIgb24gdGhlIG9uZSB0
-aGF0IGVuYWJsZXMgdGhlIGV4aXN0aW5nIGVjb3N5c3RlbS4gCkhvd2V2ZXIgaWYgdGhlcmUgYXJl
-IGdvb2QgcmVhc29ucyB0byBub3QgZG8gY29tbWFuZCBwYXNzLXRocm91Z2gsIEknbSAKYWxsIGZv
-ciBhYnN0cmFjdGluZyBpdCBhd2F5IDopCgpMb29raW5nIGF0IHByaW9yIGFydCwgdGhlIG1vc3Qg
-c2ltaWxhciBpbXBsZW1lbnRhdGlvbnMgdG8gdGhpcyBhcmUgVFBNcyAKYW5kIHZpcnRpby12c29j
-ay4gV2l0aCB2aXJ0aW8tdnNvY2ssIGtlcm5lbCBzcGFjZSBoYXMgbm8gaWRlYSB3aGF0IGl0IAp0
-YWxrcyB0byBvbiB0aGUgb3RoZXIgaGFuZCBhbmQgbWFrZXMgaXQgMTAwJSB1c2VyIHNwYWNlJ3Mg
-cHJvYmxlbS4gV2l0aCAKVFBNcywgeW91IHR5cGljYWxseSB1c2UgL2Rldi90cG0wIHRvIGdhaW4g
-cmF3IGNvbW1hbmQgYWNjZXNzIHRvIHRoZSAKdGFyZ2V0IGRldmljZS4gU28gd2hpbGUgd2UgY291
-bGQgZW5naW5lZXIgc29tZXRoaW5nIHNtYXJ0ZXIgaGVyZSwgSSdtIApub3QgY29udmluY2VkIHll
-dCBpdCdzIGEgbmV0IHdpbi4KCgpBbGV4CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdl
-cm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5n
-OiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRz
-Z2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVz
-dC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+On 10/1/23 15:13, Corentin Labbe wrote:
+> There is already 2 driver implementing their own akcipher_request_cast.
+> In the future there will be also rockchip and allwinner driver that will
+> need this.
+> This is sufficient to move it in crypto headers.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+
+Minor style question below...
+
+> ---
+>   drivers/crypto/aspeed/aspeed-acry.c | 6 ------
+>   drivers/crypto/ccp/ccp-crypto-rsa.c | 6 ------
+>   include/crypto/akcipher.h           | 7 +++++++
+>   3 files changed, 7 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/crypto/aspeed/aspeed-acry.c b/drivers/crypto/aspeed/aspeed-acry.c
+> index 247c568aa8df..ecb6e984367b 100644
+> --- a/drivers/crypto/aspeed/aspeed-acry.c
+> +++ b/drivers/crypto/aspeed/aspeed-acry.c
+> @@ -137,12 +137,6 @@ enum aspeed_rsa_key_mode {
+>   	ASPEED_RSA_DATA_MODE,
+>   };
+>   
+> -static inline struct akcipher_request *
+> -	akcipher_request_cast(struct crypto_async_request *req)
+> -{
+> -	return container_of(req, struct akcipher_request, base);
+> -}
+> -
+>   static int aspeed_acry_do_fallback(struct akcipher_request *req)
+>   {
+>   	struct crypto_akcipher *cipher = crypto_akcipher_reqtfm(req);
+> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> index a14f85512cf4..32c9f524f3d5 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-rsa.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> @@ -19,12 +19,6 @@
+>   
+>   #include "ccp-crypto.h"
+>   
+> -static inline struct akcipher_request *akcipher_request_cast(
+> -	struct crypto_async_request *req)
+> -{
+> -	return container_of(req, struct akcipher_request, base);
+> -}
+> -
+>   static inline int ccp_copy_and_save_keypart(u8 **kpbuf, unsigned int *kplen,
+>   					    const u8 *buf, size_t sz)
+>   {
+> diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+> index 670508f1dca1..4b6e610db18d 100644
+> --- a/include/crypto/akcipher.h
+> +++ b/include/crypto/akcipher.h
+> @@ -498,4 +498,11 @@ static inline int crypto_akcipher_set_priv_key(struct crypto_akcipher *tfm,
+>   
+>   	return alg->set_priv_key(tfm, key, keylen);
+>   }
+> +
+> +static inline struct akcipher_request *
+> +	akcipher_request_cast(struct crypto_async_request *req)
+
+Should this really be indented since it is the function name? I would 
+think it should look like:
+
+static inline struct akcipher_request *
+akcipher_request_cast(struct crypto_async_request *req)
+{
+
+Thanks,
+Tom
+
+> +{
+> +	return container_of(req, struct akcipher_request, base);
+> +}
+> +
+>   #endif
