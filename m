@@ -2,346 +2,197 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1EFE748FC
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 16:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDF8E7490C
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Oct 2023 20:25:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238559AbjJBQ76 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 12:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45902 "EHLO
+        id S235575AbjJBUZc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Oct 2023 16:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238453AbjJBQ76 (ORCPT
+        with ESMTP id S229497AbjJBUZ2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 12:59:58 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88681D7;
-        Mon,  2 Oct 2023 09:59:53 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RznDn3tWYz67V3m;
-        Tue,  3 Oct 2023 00:57:13 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 2 Oct
- 2023 17:59:50 +0100
-Date:   Mon, 2 Oct 2023 17:59:50 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Lukas Wunner <lukas@wunner.de>
-CC:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 05/12] crypto: akcipher - Support more than one
- signature encoding
-Message-ID: <20231002175950.0000541d@Huawei.com>
-In-Reply-To: <f4a63091203d09e275c3df983692b630ffca4bca.1695921657.git.lukas@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <f4a63091203d09e275c3df983692b630ffca4bca.1695921657.git.lukas@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Mon, 2 Oct 2023 16:25:28 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF7B6B8
+        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 13:25:24 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A08C433C8;
+        Mon,  2 Oct 2023 20:25:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696278324;
+        bh=p0G49h7uQbvTfmyK7WVWJxxpd20F/G8wt70WhkQu8cI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fyzqN0vD1K4jCiQYaq5vK5qWW8UMVzsD4OepcaCfshtffuuvbsfjkxcCBJhhrJTpn
+         vQtjwOMMSx/9O4PwwClu6nZsjBGvDeVWuyG6BpA49JKCOHIMrTsddR9IiyG23Y+SNH
+         Nfbc+7YXB14Bf57YuK5DMRROLbTXSc259Wto2kEeq39N/pSFzl3RLj6h5dgIA1wmx6
+         //ScpxihIzdYREDOmTy9JVs7exNedewN8nqMDrreR8mJTzvOul8AvqqV/223/QLOVj
+         g28UcAB2zfXYloMEKuA3+eKIlyUsI0ZOaAaVs1eFLR9RGDcfkj8iXSZ3vfk/Y86VIa
+         SIeoPo5jg6grA==
+Date:   Mon, 2 Oct 2023 13:25:22 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 8/8] crypto: cbc - Convert from skcipher to lskcipher
+Message-ID: <20231002202522.GA4130583@dev-arch.thelio-3990X>
+References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
+ <20230914082828.895403-9-herbert@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914082828.895403-9-herbert@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 28 Sep 2023 19:32:35 +0200
-Lukas Wunner <lukas@wunner.de> wrote:
+Hi Herbert,
 
-> Currently only a single default signature encoding is supported per
-> akcipher.
+On Thu, Sep 14, 2023 at 04:28:28PM +0800, Herbert Xu wrote:
+> Replace the existing skcipher CBC template with an lskcipher version.
 > 
-> A subsequent commit will allow a second encoding for ecdsa, namely P1363
-> alternatively to X9.62.
-> 
-> To accommodate for that, amend struct akcipher_request and struct
-> crypto_akcipher_sync_data to store the desired signature encoding for
-> verify and sign ops.
-> 
-> Amend akcipher_request_set_crypt(), crypto_sig_verify() and
-> crypto_sig_sign() with an additional parameter which specifies the
-> desired signature encoding.  Adjust all callers.
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+I am noticing a failure to get to user space when booting OpenSUSE's
+armv7hl configuration [1] in QEMU after this change as commit
+705b52fef3c7 ("crypto: cbc - Convert from skcipher to lskcipher"). I can
+reproduce it with GCC 13.2.0 from kernel.org [2] and QEMU 8.1.1, in case
+either of those versions matter.  The rootfs is available at [3] in case
+it is relevant.
 
-> ---
->  crypto/akcipher.c                   |  2 +-
->  crypto/asymmetric_keys/public_key.c |  4 ++--
->  crypto/internal.h                   |  1 +
->  crypto/rsa-pkcs1pad.c               | 11 +++++++----
->  crypto/sig.c                        |  6 ++++--
->  crypto/testmgr.c                    |  8 +++++---
->  crypto/testmgr.h                    |  1 +
->  include/crypto/akcipher.h           | 10 +++++++++-
->  include/crypto/sig.h                |  6 ++++--
->  9 files changed, 34 insertions(+), 15 deletions(-)
-> 
-> diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-> index 52813f0b19e4..88501c0886d2 100644
-> --- a/crypto/akcipher.c
-> +++ b/crypto/akcipher.c
-> @@ -221,7 +221,7 @@ int crypto_akcipher_sync_prep(struct crypto_akcipher_sync_data *data)
->  	sg = &data->sg;
->  	sg_init_one(sg, buf, mlen);
->  	akcipher_request_set_crypt(req, sg, data->dst ? sg : NULL,
-> -				   data->slen, data->dlen);
-> +				   data->slen, data->dlen, data->enc);
->  
->  	crypto_init_wait(&data->cwait);
->  	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP,
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index abeecb8329b3..7f96e8e501db 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -354,7 +354,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
->  		if (!issig)
->  			break;
->  		ret = crypto_sig_sign(sig, in, params->in_len,
-> -				      out, params->out_len);
-> +				      out, params->out_len, params->encoding);
->  		break;
->  	default:
->  		BUG();
-> @@ -438,7 +438,7 @@ int public_key_verify_signature(const struct public_key *pkey,
->  		goto error_free_key;
->  
->  	ret = crypto_sig_verify(tfm, sig->s, sig->s_size,
-> -				sig->digest, sig->digest_size);
-> +				sig->digest, sig->digest_size, sig->encoding);
->  
->  error_free_key:
->  	kfree_sensitive(key);
-> diff --git a/crypto/internal.h b/crypto/internal.h
-> index 63e59240d5fb..268315b13ccd 100644
-> --- a/crypto/internal.h
-> +++ b/crypto/internal.h
-> @@ -41,6 +41,7 @@ struct crypto_akcipher_sync_data {
->  	void *dst;
->  	unsigned int slen;
->  	unsigned int dlen;
-> +	const char *enc;
->  
->  	struct akcipher_request *req;
->  	struct crypto_wait cwait;
-> diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-> index d2e5e104f8cf..5f9313a3b01e 100644
-> --- a/crypto/rsa-pkcs1pad.c
-> +++ b/crypto/rsa-pkcs1pad.c
-> @@ -262,7 +262,8 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
->  
->  	/* Reuse output buffer */
->  	akcipher_request_set_crypt(&req_ctx->child_req, req_ctx->in_sg,
-> -				   req->dst, ctx->key_size - 1, req->dst_len);
-> +				   req->dst, ctx->key_size - 1, req->dst_len,
-> +				   NULL);
->  
->  	err = crypto_akcipher_encrypt(&req_ctx->child_req);
->  	if (err != -EINPROGRESS && err != -EBUSY)
-> @@ -362,7 +363,7 @@ static int pkcs1pad_decrypt(struct akcipher_request *req)
->  	/* Reuse input buffer, output to a new buffer */
->  	akcipher_request_set_crypt(&req_ctx->child_req, req->src,
->  				   req_ctx->out_sg, req->src_len,
-> -				   ctx->key_size);
-> +				   ctx->key_size, NULL);
->  
->  	err = crypto_akcipher_decrypt(&req_ctx->child_req);
->  	if (err != -EINPROGRESS && err != -EBUSY)
-> @@ -419,7 +420,8 @@ static int pkcs1pad_sign(struct akcipher_request *req)
->  
->  	/* Reuse output buffer */
->  	akcipher_request_set_crypt(&req_ctx->child_req, req_ctx->in_sg,
-> -				   req->dst, ctx->key_size - 1, req->dst_len);
-> +				   req->dst, ctx->key_size - 1, req->dst_len,
-> +				   req->enc);
->  
->  	err = crypto_akcipher_decrypt(&req_ctx->child_req);
->  	if (err != -EINPROGRESS && err != -EBUSY)
-> @@ -551,7 +553,8 @@ static int pkcs1pad_verify(struct akcipher_request *req)
->  
->  	/* Reuse input buffer, output to a new buffer */
->  	akcipher_request_set_crypt(&req_ctx->child_req, req->src,
-> -				   req_ctx->out_sg, sig_size, ctx->key_size);
-> +				   req_ctx->out_sg, sig_size, ctx->key_size,
-> +				   req->enc);
->  
->  	err = crypto_akcipher_encrypt(&req_ctx->child_req);
->  	if (err != -EINPROGRESS && err != -EBUSY)
-> diff --git a/crypto/sig.c b/crypto/sig.c
-> index 224c47019297..4fc1a8f865e4 100644
-> --- a/crypto/sig.c
-> +++ b/crypto/sig.c
-> @@ -89,7 +89,7 @@ EXPORT_SYMBOL_GPL(crypto_sig_maxsize);
->  
->  int crypto_sig_sign(struct crypto_sig *tfm,
->  		    const void *src, unsigned int slen,
-> -		    void *dst, unsigned int dlen)
-> +		    void *dst, unsigned int dlen, const char *enc)
->  {
->  	struct crypto_akcipher **ctx = crypto_sig_ctx(tfm);
->  	struct crypto_akcipher_sync_data data = {
-> @@ -98,6 +98,7 @@ int crypto_sig_sign(struct crypto_sig *tfm,
->  		.dst = dst,
->  		.slen = slen,
->  		.dlen = dlen,
-> +		.enc = enc,
->  	};
->  
->  	return crypto_akcipher_sync_prep(&data) ?:
-> @@ -108,7 +109,7 @@ EXPORT_SYMBOL_GPL(crypto_sig_sign);
->  
->  int crypto_sig_verify(struct crypto_sig *tfm,
->  		      const void *src, unsigned int slen,
-> -		      const void *digest, unsigned int dlen)
-> +		      const void *digest, unsigned int dlen, const char *enc)
->  {
->  	struct crypto_akcipher **ctx = crypto_sig_ctx(tfm);
->  	struct crypto_akcipher_sync_data data = {
-> @@ -116,6 +117,7 @@ int crypto_sig_verify(struct crypto_sig *tfm,
->  		.src = src,
->  		.slen = slen,
->  		.dlen = dlen,
-> +		.enc = enc,
->  	};
->  	int err;
->  
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 216878c8bc3d..d5dd715673dd 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -4154,11 +4154,12 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
->  			goto free_all;
->  		memcpy(xbuf[1], c, c_size);
->  		sg_set_buf(&src_tab[2], xbuf[1], c_size);
-> -		akcipher_request_set_crypt(req, src_tab, NULL, m_size, c_size);
-> +		akcipher_request_set_crypt(req, src_tab, NULL, m_size, c_size,
-> +					   vecs->enc);
->  	} else {
->  		sg_init_one(&dst, outbuf_enc, out_len_max);
->  		akcipher_request_set_crypt(req, src_tab, &dst, m_size,
-> -					   out_len_max);
-> +					   out_len_max, NULL);
->  	}
->  	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
->  				      crypto_req_done, &wait);
-> @@ -4217,7 +4218,8 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
->  	sg_init_one(&src, xbuf[0], c_size);
->  	sg_init_one(&dst, outbuf_dec, out_len_max);
->  	crypto_init_wait(&wait);
-> -	akcipher_request_set_crypt(req, &src, &dst, c_size, out_len_max);
-> +	akcipher_request_set_crypt(req, &src, &dst, c_size, out_len_max,
-> +				   vecs->enc);
->  
->  	err = crypto_wait_req(vecs->siggen_sigver_test ?
->  			      /* Run asymmetric signature generation */
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index 5ca7a412508f..ad57e7af2e14 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -153,6 +153,7 @@ struct akcipher_testvec {
->  	const unsigned char *params;
->  	const unsigned char *m;
->  	const unsigned char *c;
-> +	const char *enc;
->  	unsigned int key_len;
->  	unsigned int param_len;
->  	unsigned int m_size;
-> diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
-> index 670508f1dca1..00bbec69af3b 100644
-> --- a/include/crypto/akcipher.h
-> +++ b/include/crypto/akcipher.h
-> @@ -30,6 +30,8 @@
->   *		In case of error where the dst sgl size was insufficient,
->   *		it will be updated to the size required for the operation.
->   *		For verify op this is size of digest part in @src.
-> + * @enc:	For verify op it's the encoding of the signature part of @src.
-> + *		For sign op it's the encoding of the signature in @dst.
->   * @__ctx:	Start of private context data
->   */
->  struct akcipher_request {
-> @@ -38,6 +40,7 @@ struct akcipher_request {
->  	struct scatterlist *dst;
->  	unsigned int src_len;
->  	unsigned int dst_len;
-> +	const char *enc;
->  	void *__ctx[] CRYPTO_MINALIGN_ATTR;
->  };
->  
-> @@ -272,17 +275,22 @@ static inline void akcipher_request_set_callback(struct akcipher_request *req,
->   * @src_len:	size of the src input scatter list to be processed
->   * @dst_len:	size of the dst output scatter list or size of signature
->   *		portion in @src for verify op
-> + * @enc:	encoding of signature portion in @src for verify op,
-> + *		encoding of signature in @dst for sign op,
-> + *		NULL for encrypt and decrypt op
->   */
->  static inline void akcipher_request_set_crypt(struct akcipher_request *req,
->  					      struct scatterlist *src,
->  					      struct scatterlist *dst,
->  					      unsigned int src_len,
-> -					      unsigned int dst_len)
-> +					      unsigned int dst_len,
-> +					      const char *enc)
->  {
->  	req->src = src;
->  	req->dst = dst;
->  	req->src_len = src_len;
->  	req->dst_len = dst_len;
-> +	req->enc = enc;
->  }
->  
->  /**
-> diff --git a/include/crypto/sig.h b/include/crypto/sig.h
-> index 641b4714c448..1df18005c854 100644
-> --- a/include/crypto/sig.h
-> +++ b/include/crypto/sig.h
-> @@ -81,12 +81,13 @@ int crypto_sig_maxsize(struct crypto_sig *tfm);
->   * @slen:	source length
->   * @dst:	destinatino obuffer
->   * @dlen:	destination length
-> + * @enc:	signature encoding
->   *
->   * Return: zero on success; error code in case of error
->   */
->  int crypto_sig_sign(struct crypto_sig *tfm,
->  		    const void *src, unsigned int slen,
-> -		    void *dst, unsigned int dlen);
-> +		    void *dst, unsigned int dlen, const char *enc);
->  
->  /**
->   * crypto_sig_verify() - Invoke signature verification
-> @@ -99,12 +100,13 @@ int crypto_sig_sign(struct crypto_sig *tfm,
->   * @slen:	source length
->   * @digest:	digest
->   * @dlen:	digest length
-> + * @enc:	signature encoding
->   *
->   * Return: zero on verification success; error code in case of error.
->   */
->  int crypto_sig_verify(struct crypto_sig *tfm,
->  		      const void *src, unsigned int slen,
-> -		      const void *digest, unsigned int dlen);
-> +		      const void *digest, unsigned int dlen, const char *enc);
->  
->  /**
->   * crypto_sig_set_pubkey() - Invoke set public key operation
+$ curl -LSso .config https://github.com/openSUSE/kernel-source/raw/master/config/armv7hl/default
 
+$ make -skj"$(nproc)" ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- olddefconfig bzImage
+
+$ qemu-system-arm \
+    -display none \
+    -nodefaults \
+    -no-reboot \
+    -machine virt \
+    -append 'console=ttyAMA0 earlycon' \
+    -kernel arch/arm/boot/zImage \
+    -initrd arm-rootfs.cpio \
+    -m 512m \
+    -serial mon:stdio
+...
+[    0.000000][    T0] Linux version 6.6.0-rc1-default+ (nathan@dev-arch.thelio-3990X) (arm-linux-gnueabi-gcc (GCC) 13.2.0, GNU ld (GNU Binutils) 2.41) #1 SMP Mon Oct  2 13:12:40 MST 2023
+...
+[    0.743773][    T1] ------------[ cut here ]------------
+[    0.743980][    T1] WARNING: CPU: 0 PID: 1 at crypto/algapi.c:506 crypto_unregister_alg+0x124/0x12c
+[    0.744693][    T1] Modules linked in:
+[    0.745078][    T1] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.6.0-rc1-default+ #1 906712a81ca49f79575cf3062af84575f391802d
+[    0.745453][    T1] Hardware name: Generic DT based system
+[    0.745700][    T1] Backtrace:
+[    0.745901][    T1]  dump_backtrace from show_stack+0x20/0x24
+[    0.746181][    T1]  r7:c077851c r6:00000009 r5:00000053 r4:c1595a60
+[    0.746373][    T1]  show_stack from dump_stack_lvl+0x48/0x54
+[    0.746530][    T1]  dump_stack_lvl from dump_stack+0x18/0x1c
+[    0.746703][    T1]  r5:000001fa r4:c1589f2c
+[    0.746811][    T1]  dump_stack from __warn+0x88/0x120
+[    0.746954][    T1]  __warn from warn_slowpath_fmt+0xb8/0x188
+[    0.747115][    T1]  r8:0000012a r7:c077851c r6:c1589f2c r5:00000000 r4:c1e825f0
+[    0.747288][    T1]  warn_slowpath_fmt from crypto_unregister_alg+0x124/0x12c
+[    0.747475][    T1]  r7:c214e414 r6:00000001 r5:c214e428 r4:c2d590c0
+[    0.747628][    T1]  crypto_unregister_alg from crypto_unregister_skcipher+0x1c/0x20
+[    0.747824][    T1]  r4:c2d59000
+[    0.747911][    T1]  crypto_unregister_skcipher from simd_skcipher_free+0x20/0x2c
+[    0.748100][    T1]  simd_skcipher_free from aes_exit+0x30/0x4c
+[    0.748264][    T1]  r5:c214e428 r4:c214e418
+[    0.748375][    T1]  aes_exit from aes_init+0x88/0xa8
+[    0.748521][    T1]  r5:fffffffe r4:c1f12740
+[    0.748637][    T1]  aes_init from do_one_initcall+0x44/0x25c
+[    0.748803][    T1]  r9:c1dd3d5c r8:c1689880 r7:00000000 r6:c2570000 r5:00000019 r4:c1d0c618
+[    0.749008][    T1]  do_one_initcall from kernel_init_freeable+0x23c/0x298
+[    0.749187][    T1]  r8:c1689880 r7:00000007 r6:c1dd3d38 r5:00000019 r4:c25f0640
+[    0.749364][    T1]  kernel_init_freeable from kernel_init+0x28/0x14c
+[    0.749540][    T1]  r10:00000000 r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:c0fae978
+[    0.749744][    T1]  r4:c1f0b040
+[    0.749832][    T1]  kernel_init from ret_from_fork+0x14/0x30
+[    0.750033][    T1] Exception stack(0xe080dfb0 to 0xe080dff8)
+[    0.750315][    T1] dfa0:                                     00000000 00000000 00000000 00000000
+[    0.750546][    T1] dfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[    0.750760][    T1] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[    0.750967][    T1]  r5:c0fae978 r4:00000000
+[    0.751214][    T1] ---[ end trace 0000000000000000 ]---
+[    0.751519][    T1] ------------[ cut here ]------------
+[    0.751650][    T1] WARNING: CPU: 0 PID: 1 at crypto/algapi.c:506 crypto_unregister_alg+0x124/0x12c
+[    0.751873][    T1] Modules linked in:
+[    0.752037][    T1] CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.6.0-rc1-default+ #1 906712a81ca49f79575cf3062af84575f391802d
+[    0.752331][    T1] Hardware name: Generic DT based system
+[    0.752464][    T1] Backtrace:
+[    0.752551][    T1]  dump_backtrace from show_stack+0x20/0x24
+[    0.752702][    T1]  r7:c077851c r6:00000009 r5:00000053 r4:c1595a60
+[    0.752853][    T1]  show_stack from dump_stack_lvl+0x48/0x54
+[    0.753001][    T1]  dump_stack_lvl from dump_stack+0x18/0x1c
+[    0.753151][    T1]  r5:000001fa r4:c1589f2c
+[    0.753258][    T1]  dump_stack from __warn+0x88/0x120
+[    0.753417][    T1]  __warn from warn_slowpath_fmt+0xb8/0x188
+[    0.753572][    T1]  r8:0000012a r7:c077851c r6:c1589f2c r5:00000000 r4:c1e825f0
+[    0.753750][    T1]  warn_slowpath_fmt from crypto_unregister_alg+0x124/0x12c
+[    0.753938][    T1]  r7:c214e414 r6:00000001 r5:00000002 r4:c1f12bc0
+[    0.754096][    T1]  crypto_unregister_alg from crypto_unregister_skciphers+0x30/0x40
+[    0.754291][    T1]  r4:c1f12bc0
+[    0.754378][    T1]  crypto_unregister_skciphers from aes_exit+0x48/0x4c
+[    0.754556][    T1]  r5:c214e428 r4:c214e428
+[    0.754666][    T1]  aes_exit from aes_init+0x88/0xa8
+[    0.754804][    T1]  r5:fffffffe r4:c1f12740
+[    0.754913][    T1]  aes_init from do_one_initcall+0x44/0x25c
+[    0.755070][    T1]  r9:c1dd3d5c r8:c1689880 r7:00000000 r6:c2570000 r5:00000019 r4:c1d0c618
+[    0.755274][    T1]  do_one_initcall from kernel_init_freeable+0x23c/0x298
+[    0.755462][    T1]  r8:c1689880 r7:00000007 r6:c1dd3d38 r5:00000019 r4:c25f0640
+[    0.755636][    T1]  kernel_init_freeable from kernel_init+0x28/0x14c
+[    0.755807][    T1]  r10:00000000 r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:c0fae978
+[    0.756007][    T1]  r4:c1f0b040
+[    0.756095][    T1]  kernel_init from ret_from_fork+0x14/0x30
+[    0.756243][    T1] Exception stack(0xe080dfb0 to 0xe080dff8)
+[    0.756390][    T1] dfa0:                                     00000000 00000000 00000000 00000000
+[    0.756610][    T1] dfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[    0.756828][    T1] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[    0.757001][    T1]  r5:c0fae978 r4:00000000
+[    0.757178][    T1] ---[ end trace 0000000000000000 ]---
+...
+[    0.982740][    T1] trusted_key: encrypted_key: failed to alloc_cipher (-2)
+...
+[    0.993923][   T80] alg: No test for  ()
+[    0.994049][   T80] alg: Unexpected test result for : 0
+
+If there is any additional information I can provide or patches I can
+test, I am more than happy to do so.
+
+[1]: https://github.com/openSUSE/kernel-source/raw/master/config/armv7hl/default
+[2]: https://mirrors.edge.kernel.org/pub/tools/crosstool/
+[3]: https://github.com/ClangBuiltLinux/boot-utils/releases
+
+Cheers,
+Nathan
+
+# bad: [df964ce9ef9fea10cf131bf6bad8658fde7956f6] Add linux-next specific files for 20230929
+# good: [9ed22ae6be817d7a3f5c15ca22cbc9d3963b481d] Merge tag 'spi-fix-v6.6-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi
+git bisect start 'df964ce9ef9fea10cf131bf6bad8658fde7956f6' '9ed22ae6be817d7a3f5c15ca22cbc9d3963b481d'
+# good: [2afef4020a647c2034c72a5ab765ad06338024c1] Merge branch 'for-next' of git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux.git
+git bisect good 2afef4020a647c2034c72a5ab765ad06338024c1
+# bad: [621abed2c5eb145b5c8f25aa08f4eaac3a4880df] Merge branch 'drm-next' of https://gitlab.freedesktop.org/agd5f/linux
+git bisect bad 621abed2c5eb145b5c8f25aa08f4eaac3a4880df
+# good: [fcdecb00fb04c2db761851b194547d291ba532c5] Merge branch 'main' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+git bisect good fcdecb00fb04c2db761851b194547d291ba532c5
+# bad: [62edfd0bd4ac7b7c6b5eff0ea290261ff5ab6d1c] Merge branch 'drm-next' of git://git.freedesktop.org/git/drm/drm.git
+git bisect bad 62edfd0bd4ac7b7c6b5eff0ea290261ff5ab6d1c
+# good: [9896f0608f9fe0b49badd2fd6ae76ec761c70624] Merge ath-next from git://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath.git
+git bisect good 9896f0608f9fe0b49badd2fd6ae76ec761c70624
+# good: [d856c84b8cbc2f5bc6e906deebf3fa912bb6c1c3] Merge branch 'spi-nor/next' of git://git.kernel.org/pub/scm/linux/kernel/git/mtd/linux.git
+git bisect good d856c84b8cbc2f5bc6e906deebf3fa912bb6c1c3
+# good: [39e0b96d61b6f5ad880d9953dc2b4c5b3ee145b3] drm/bridge/analogix/anx78xx: Drop ID table
+git bisect good 39e0b96d61b6f5ad880d9953dc2b4c5b3ee145b3
+# good: [3102bbcdcd3c945ef0bcea498d3a0c6384536d6c] crypto: qat - refactor deprecated strncpy
+git bisect good 3102bbcdcd3c945ef0bcea498d3a0c6384536d6c
+# bad: [bb4277c7e617e8b271eb7ad75d5bdb6b8a249613] Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+git bisect bad bb4277c7e617e8b271eb7ad75d5bdb6b8a249613
+# bad: [aa3f80500382ca864b7cfcff4e5ca2fa6a0e977d] crypto: hisilicon/zip - support deflate algorithm
+git bisect bad aa3f80500382ca864b7cfcff4e5ca2fa6a0e977d
+# good: [b64d143b752932ef483d0ed8d00958f1832dd6bc] crypto: hash - Hide CRYPTO_ALG_TYPE_AHASH_MASK
+git bisect good b64d143b752932ef483d0ed8d00958f1832dd6bc
+# good: [3dfe8786b11a4a3f9ced2eb89c6c5d73eba84700] crypto: testmgr - Add support for lskcipher algorithms
+git bisect good 3dfe8786b11a4a3f9ced2eb89c6c5d73eba84700
+# bad: [705b52fef3c73655701d9c8868e744f1fa03e942] crypto: cbc - Convert from skcipher to lskcipher
+git bisect bad 705b52fef3c73655701d9c8868e744f1fa03e942
+# good: [32a8dc4afcfb098ef4e8b465c90db17d22d90107] crypto: ecb - Convert from skcipher to lskcipher
+git bisect good 32a8dc4afcfb098ef4e8b465c90db17d22d90107
+# first bad commit: [705b52fef3c73655701d9c8868e744f1fa03e942] crypto: cbc - Convert from skcipher to lskcipher
