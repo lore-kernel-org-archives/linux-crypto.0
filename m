@@ -2,124 +2,103 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1706EE7542B
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 17:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEFBEE8FDB0
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 19:41:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232057AbjJCRtX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Oct 2023 13:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47544 "EHLO
+        id S240933AbjJCTlR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Oct 2023 15:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbjJCRtW (ORCPT
+        with ESMTP id S232069AbjJCTlR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2023 13:49:22 -0400
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766E7B0;
-        Tue,  3 Oct 2023 10:49:19 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id 529C43200BC6;
-        Tue,  3 Oct 2023 13:49:15 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 03 Oct 2023 13:49:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1696355354; x=1696441754; bh=Kh
-        U8FZX6a94VRpVV3R0AIWZs9L8DDC+rTN+A4Q9Ni2M=; b=CBfxHyn0Y0n9/4Q2m0
-        MpJk3DC3pCD8MWcskDr0l74B8xiGE5HNXTbs9ncC1w3h98ajRJchHcoj2J5SYVGu
-        j1UsKrTn3oi+RdUour70e0ruEFBs/rdw0uUkvP3fmw4wVjUXDkN6VaMXK37laAsb
-        Ose7IOGBlrvMni9YyLCgqQ+7cXAtGJtT3UBizYotBVpgJsEEQbGLij2VoYgTOCf6
-        eIPL6jYFqC7IPvs7MD23e2GM31h8CrI9hTnoB8i1Hd6KFLheP008egM0RtLUYA2s
-        f5WuP3ZAG6OOzfYqcCo3teV1KCQak79rhO4gPYK5Cuz0GXK/B18rElNIQxRAfSN1
-        zjEQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1696355354; x=1696441754; bh=KhU8FZX6a94VR
-        pVV3R0AIWZs9L8DDC+rTN+A4Q9Ni2M=; b=rrz9e7KCXn6jsF6jZjL4416+o2cWf
-        ieDGeEw+2wO1MX0vVKh7WdCYZn0wr4GuAOTJXsMNi0iJn6Sk5cs7YTzKknJQzMcZ
-        kZ0AweTGnn4uxNPpMLHtA0S/PqMNVQcKYJTU2HHkryKz1pf5ATgq2i7bLCcrV73+
-        2V6Pfuxq4vw8QBgm1fhY16pOuy2RaeND2l50Cw3HE5DbsvToaIUvofEwj3dn31WR
-        JhLj3ffLlmCaCy4cgFRH05J4QBoJE8xhZqU9CuDhY0qiuevDGc8BVKrMbRxthT90
-        nwBmn0VK0tbx9IHPXv2TEYuzpICIVLfQEepeliaUsONTuaFBE9JTq1Dfw==
-X-ME-Sender: <xms:GVQcZWEKZeG_IktCqKf1oR-ZojFC6PVfs64FKCHD4kGtVB0ov1ClfQ>
-    <xme:GVQcZXWtura6beOzvtgult2aya8K46TplvlpVepqV2aVPnSQzJB2X_By1dH-G5PKa
-    NH-CLWOyCl537FPHIY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrfeejgddviecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:GVQcZQJRj9rxA1cvNKnxJqbR-Am0dgzoVvWdE3IP3dw_oxmKY6cASA>
-    <xmx:GVQcZQG2iIADelu8gLhg0Jg-c5On6cAtWInY0bQsiHBjXeUHLQPIng>
-    <xmx:GVQcZcUo6nB8R6RSN35NDaRM2VIZFLzS7PxurL2Y_ddCsjUOoA-Org>
-    <xmx:GlQcZVN2cGmuJanyzr49r4NPHE91JaEUXrGHl3AAnJFG9JBt5qyZkg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 106C8B6008F; Tue,  3 Oct 2023 13:49:12 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
+        Tue, 3 Oct 2023 15:41:17 -0400
+X-Greylist: delayed 613 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 03 Oct 2023 12:41:13 PDT
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD25293;
+        Tue,  3 Oct 2023 12:41:13 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout3.hostsharing.net (Postfix) with ESMTPS id 820FB100D9414;
+        Tue,  3 Oct 2023 21:30:58 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 2DF8042A4F9; Tue,  3 Oct 2023 21:30:58 +0200 (CEST)
+Date:   Tue, 3 Oct 2023 21:30:58 +0200
+From:   Lukas Wunner <lukas@wunner.de>
+To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
+ authentication
+Message-ID: <20231003193058.GA16417@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
+ <20231003164048.0000148c@Huawei.com>
 MIME-Version: 1.0
-Message-Id: <527e3b5d-2bed-4cd9-b722-7b468ad4e477@app.fastmail.com>
-In-Reply-To: <a44a2df0-beb9-4a43-ade4-267ad819729e@amazon.com>
-References: <20230929133320.74848-1-graf@amazon.com>
- <20230929133320.74848-2-graf@amazon.com>
- <74b2d869-0d96-46f9-a180-b405992e6c51@app.fastmail.com>
- <a44a2df0-beb9-4a43-ade4-267ad819729e@amazon.com>
-Date:   Tue, 03 Oct 2023 19:48:52 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Alexander Graf" <graf@amazon.com>, linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Olivia Mackall" <olivia@selenic.com>,
-        "Petre Eftime" <petre.eftime@gmail.com>,
-        "Erdem Meydanlli" <meydanli@amazon.nl>,
-        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        "Xuan Zhuo" <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v2 1/2] misc: Add Nitro Secure Module driver
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003164048.0000148c@Huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 29, 2023, at 21:26, Alexander Graf wrote:
-> On 29.09.23 19:28, Arnd Bergmann wrote:
->> On Fri, Sep 29, 2023, at 09:33, Alexander Graf wrote:
+On Tue, Oct 03, 2023 at 04:40:48PM +0100, Jonathan Cameron wrote:
+> On Thu, 28 Sep 2023 19:32:42 +0200 Lukas Wunner <lukas@wunner.de> wrote:
+> > At any given time, only a single entity in a physical system may have
+> > an SPDM connection to a device.  That's because the GET_VERSION request
+> > (which begins an authentication sequence) resets "the connection and all
+> > context associated with that connection" (SPDM 1.3.0 margin no 158).
+> > 
+> > Thus, when a device is passed through to a guest and the guest has
+> > authenticated it, a subsequent authentication by the host would reset
+> > the device's CMA-SPDM session behind the guest's back.
+> > 
+> > Prevent by letting the guest claim exclusive CMA ownership of the device
+> > during passthrough.  Refuse CMA reauthentication on the host as long.
+> > After passthrough has concluded, reauthenticate the device on the host.
+> 
+> Is there anything stopping a PF presenting multiple CMA capable DOE
+> instances?  I'd expect them to have their own contexts if they do..
 
->>
->>> +int nsm_register_hwrng(struct nsm_hwrng *_nsm_hwrng)
->>> +{
->>> +     if (nsm_hwrng)
->>> +             return -EEXIST;
->>> +
->>> +     nsm_hwrng = _nsm_hwrng;
->>> +     if (nsm_vdev)
->>> +             nsm_hwrng->probe(nsm_vdev);
->>> +
->>> +     return 0;
->>> +}
->>> +EXPORT_SYMBOL_GPL(nsm_register_hwrng);
->> This should get easier of you reverse the dependency between
->> the two drivers and just call into the nsm_hwrng_probe()
->> function from the main driver's probe.
->
->
-> I don't understand what you mean by reversing the dependency. Nsm_rng is 
-> a downstream of Nsm, because Nsm is the virtio device that owns the channel.
+The spec does not seem to *explicitly* forbid a PF having multiple
+CMA-capable DOE instances, but PCIe r6.1 sec 6.31.3 says:
+"The instance of DOE used for CMA-SPDM must support ..."
 
-To clarify: I don't really consider Nsm_rng as a downstream driver,
-since the main driver does not have a bus model or device detection
-below it that would allow probing any function specific drivers.
+Note the singular ("The instance").  It seems to suggest that the
+spec authors assumed there's only a single DOE instance for CMA-SPDM.
 
-I would remove the dynamic registration entirely and just merge both
-parts into a single file that happens to expose an rng interface.
+Could you (as an English native speaker) comment on the clarity of the
+two sentences "Prevent ... as long." above, as Ilpo objected to them?
 
-     Arnd
+The antecedent of "Prevent" is the undesirable behaviour in the preceding
+sentence (host resets guest's SPDM connection).
+
+The antecedent of "as long" is "during passthrough" in the preceding
+sentence.
+
+Is that clear and understandable for an English native speaker or
+should I rephrase?
+
+Thanks,
+
+Lukas
