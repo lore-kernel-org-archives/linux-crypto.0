@@ -2,263 +2,179 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA0DE75433
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 07:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67538E75437
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 08:31:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231349AbjJCH6L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Oct 2023 03:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56368 "EHLO
+        id S230425AbjJCIbl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Oct 2023 04:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231264AbjJCH6K (ORCPT
+        with ESMTP id S239298AbjJCIbj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2023 03:58:10 -0400
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF7890;
-        Tue,  3 Oct 2023 00:58:06 -0700 (PDT)
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39354RYX021850;
-        Tue, 3 Oct 2023 09:57:28 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:subject:to:cc:references:from
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=2y5VWljP34AhFxfwuXFEGUJY8eirMnibqQLHOoorPbE=; b=fa
-        R320QQYh6hKcFinrg870rQe7h0GoXbzAPslv70ug5D/eA+R8ih3Xs94oiISEkK6B
-        +lVN0Nk0RWDanLNzOlVYVNXoVC3ylH/TR6SkGucS1gcPw7FozvY41TLJnEVq1maw
-        Jl6Eziv6CXtKt7MA3JP2LjxAGGwZhycpeAquJPFY02PW+RyneA8UuzdwjLuc2TLb
-        C9VlpRVVgHLOWIyRNtcpjQgKBqCrRy6rnZcMMhIH05RrLAiA3z+B1mGpbD7TMDLg
-        lm/a6IQSsoxIMoQfUPRokZlwPSqQ1ylCSIFMXzh4BEOWLA7H9P1siSHgVyaetmgZ
-        OCu6sQeMWTJ6KW6XuqMg==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3texmj0e7j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 03 Oct 2023 09:57:28 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 9D9B9100057;
-        Tue,  3 Oct 2023 09:57:27 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 88D7222D164;
-        Tue,  3 Oct 2023 09:57:27 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 3 Oct
- 2023 09:57:25 +0200
-Message-ID: <1d33a7ee-3966-5c2e-5a6c-08a6e56d0f75@foss.st.com>
-Date:   Tue, 3 Oct 2023 09:57:24 +0200
+        Tue, 3 Oct 2023 04:31:39 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CB6AD;
+        Tue,  3 Oct 2023 01:31:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696321891; x=1727857891;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=xvRTEJgiLM4R8J7f3Dw6MhEmiMJyQfp7liKkGIGPBHQ=;
+  b=T6uvfCTCZvES4Eaz0/0jVBpbBZaJ/m8GAvwFHXlZ+TWNPCo1PI0D9Rw0
+   2vzKUfccromOazCcTIHb1c1JswynfKwYP6yozSiDWYvbOeJCiIJr91IPm
+   oOoacJaSmsZY9+r1CBp+3xbUYKkGLzy10BZT0CmzInWnMthVDzUxqRrTJ
+   /XPpnFb9TNRe7n6Db/KgAyDvA6fzIpL2jjYTlFMQvMb18YNcbmGlvLN9c
+   SY6YNqdLKLYR51p7dLWMYs87QMnTjimDLRz14x9yhGA4f0zRQVGBdnRtq
+   c1W2YoNZZZccixaOvPlBWkfugDR8L3QFOKE9L63NAgPjVt6MUEWuWLAtm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1413573"
+X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
+   d="scan'208";a="1413573"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:31:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="874639937"
+X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
+   d="scan'208";a="874639937"
+Received: from tciutacu-mobl.ger.corp.intel.com (HELO rrabie-mobl.amr.corp.intel.com) ([10.252.40.114])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:31:22 -0700
+Date:   Tue, 3 Oct 2023 11:31:20 +0300 (EEST)
+From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     Lukas Wunner <lukas@wunner.de>
+cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 03/12] X.509: Move certificate length retrieval into new
+ helper
+In-Reply-To: <16c06528d13b2c0081229a45cacd4b1b9cdff738.1695921657.git.lukas@wunner.de>
+Message-ID: <76259143-d07e-e042-73a1-677094211361@linux.intel.com>
+References: <cover.1695921656.git.lukas@wunner.de> <16c06528d13b2c0081229a45cacd4b1b9cdff738.1695921657.git.lukas@wunner.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v5 03/11] dt-bindings: bus: document RIFSC
-Content-Language: en-US
-To:     Rob Herring <robh@kernel.org>
-CC:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
-        <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>,
-        <lee@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
-        <arnd@kernel.org>, <richardcochran@gmail.com>,
-        Frank Rowand <frowand.list@gmail.com>, <peng.fan@oss.nxp.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-p.hy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
- <20230929142852.578394-4-gatien.chevallier@foss.st.com>
- <20231002183041.GA2062984-robh@kernel.org>
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231002183041.GA2062984-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-03_05,2023-10-02_01,2023-05-22_02
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Thu, 28 Sep 2023, Lukas Wunner wrote:
 
-
-On 10/2/23 20:30, Rob Herring wrote:
-> On Fri, Sep 29, 2023 at 04:28:44PM +0200, Gatien Chevallier wrote:
->> Document RIFSC (RIF security controller). RIFSC is a firewall controller
->> composed of different kinds of hardware resources.
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>
->> Changes in V5:
->> 	- Renamed feature-domain* to access-control*
->>
->> Changes in V2:
->> 	- Corrected errors highlighted by Rob's robot
->> 	- No longer define the maxItems for the "feature-domains"
->> 	  property
->> 	- Fix example (node name, status)
->> 	- Declare "feature-domain-names" as an optional
->> 	  property for child nodes
->> 	- Fix description of "feature-domains" property
->>
->>   .../bindings/bus/st,stm32mp25-rifsc.yaml      | 105 ++++++++++++++++++
->>   1 file changed, 105 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->> new file mode 100644
->> index 000000000000..c28fceff3036
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->> @@ -0,0 +1,105 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/bus/st,stm32mp25-rifsc.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: STM32 Resource isolation framework security controller
->> +
->> +maintainers:
->> +  - Gatien Chevallier <gatien.chevallier@foss.st.com>
->> +
->> +description: |
->> +  Resource isolation framework (RIF) is a comprehensive set of hardware blocks
->> +  designed to enforce and manage isolation of STM32 hardware resources like
->> +  memory and peripherals.
->> +
->> +  The RIFSC (RIF security controller) is composed of three sets of registers,
->> +  each managing a specific set of hardware resources:
->> +    - RISC registers associated with RISUP logic (resource isolation device unit
->> +      for peripherals), assign all non-RIF aware peripherals to zero, one or
->> +      any security domains (secure, privilege, compartment).
->> +    - RIMC registers: associated with RIMU logic (resource isolation master
->> +      unit), assign all non RIF-aware bus master to one security domain by
->> +      setting secure, privileged and compartment information on the system bus.
->> +      Alternatively, the RISUP logic controlling the device port access to a
->> +      peripheral can assign target bus attributes to this peripheral master port
->> +      (supported attribute: CID).
->> +    - RISC registers associated with RISAL logic (resource isolation device unit
->> +      for address space - Lite version), assign address space subregions to one
->> +      security domains (secure, privilege, compartment).
->> +
->> +properties:
->> +  compatible:
->> +    contains:
->> +      const: st,stm32mp25-rifsc
->> +
->> +  reg:
->> +    maxItems: 1
->> +
->> +  "#address-cells":
->> +    const: 1
->> +
->> +  "#size-cells":
->> +    const: 1
->> +
->> +  ranges: true
->> +
->> +  "#access-controller-cells":
->> +    const: 1
+> The upcoming in-kernel SPDM library (Security Protocol and Data Model,
+> https://www.dmtf.org/dsp/DSP0274) needs to retrieve the length from
+> ASN.1 DER-encoded X.509 certificates.
 > 
-> You should define what the cells contain here.
+> Such code already exists in x509_load_certificate_list(), so move it
+> into a new helper for reuse by SPDM.
 > 
-
-Ok, I'll do this as well for the ETZPC binding
-
->> +
->> +  access-control-provider: true
->> +
-
-Will be dropped, ditto for ETZPC.
-
->> +patternProperties:
->> +  "^.*@[0-9a-f]+$":
->> +    description: Peripherals
->> +    type: object
+> No functional change intended.
 > 
->         additionalProperties: true
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+>  crypto/asymmetric_keys/x509_loader.c | 38 +++++++++++++++++++---------
+>  include/keys/asymmetric-type.h       |  2 ++
+>  2 files changed, 28 insertions(+), 12 deletions(-)
 > 
->> +    properties:
->> +      access-controller:
->> +        minItems: 1
->> +        description:
->> +          The phandle of the firewall controller of the peripheral and the
->> +          platform-specific firewall ID of the peripheral.
->> +
->> +      access-controller-names:
->> +        minItems: 1
+> diff --git a/crypto/asymmetric_keys/x509_loader.c b/crypto/asymmetric_keys/x509_loader.c
+> index a41741326998..121460a0de46 100644
+> --- a/crypto/asymmetric_keys/x509_loader.c
+> +++ b/crypto/asymmetric_keys/x509_loader.c
+> @@ -4,28 +4,42 @@
+>  #include <linux/key.h>
+>  #include <keys/asymmetric-type.h>
+>  
+> +int x509_get_certificate_length(const u8 *p, unsigned long buflen)
+
+Make the return type ssize_t.
+
+unsigned long -> size_t buflen (or perhaps ssize_t if you want to compare 
+below to have the same signedness).
+
+> +{
+> +	int plen;
+
+ssize_t
+
+> +
+> +	/* Each cert begins with an ASN.1 SEQUENCE tag and must be more
+> +	 * than 256 bytes in size.
+> +	 */
+> +	if (buflen < 4)
+> +		return -EINVAL;
+> +
+> +	if (p[0] != 0x30 &&
+> +	    p[1] != 0x82)
+> +		return -EINVAL;
+> +
+> +	plen = (p[2] << 8) | p[3];
+> +	plen += 4;
+> +	if (plen > buflen)
+> +		return -EINVAL;
+> +
+> +	return plen;
+> +}
+> +EXPORT_SYMBOL_GPL(x509_get_certificate_length);
+> +
+>  int x509_load_certificate_list(const u8 cert_list[],
+>  			       const unsigned long list_size,
+>  			       const struct key *keyring)
+>  {
+>  	key_ref_t key;
+>  	const u8 *p, *end;
+> -	size_t plen;
+> +	int plen;
+
+ssize_t plen.
+
+-- 
+ i.
+
+>  
+>  	p = cert_list;
+>  	end = p + list_size;
+>  	while (p < end) {
+> -		/* Each cert begins with an ASN.1 SEQUENCE tag and must be more
+> -		 * than 256 bytes in size.
+> -		 */
+> -		if (end - p < 4)
+> -			goto dodgy_cert;
+> -		if (p[0] != 0x30 &&
+> -		    p[1] != 0x82)
+> -			goto dodgy_cert;
+> -		plen = (p[2] << 8) | p[3];
+> -		plen += 4;
+> -		if (plen > end - p)
+> +		plen = x509_get_certificate_length(p, end - p);
+> +		if (plen < 0)
+>  			goto dodgy_cert;
+>  
+>  		key = key_create_or_update(make_key_ref(keyring, 1),
+> diff --git a/include/keys/asymmetric-type.h b/include/keys/asymmetric-type.h
+> index 69a13e1e5b2e..6705cfde25b9 100644
+> --- a/include/keys/asymmetric-type.h
+> +++ b/include/keys/asymmetric-type.h
+> @@ -84,6 +84,8 @@ extern struct key *find_asymmetric_key(struct key *keyring,
+>  				       const struct asymmetric_key_id *id_2,
+>  				       bool partial);
+>  
+> +int x509_get_certificate_length(const u8 *p, unsigned long buflen);
+> +
+>  int x509_load_certificate_list(const u8 cert_list[], const unsigned long list_size,
+>  			       const struct key *keyring);
+>  
 > 
-> Drop all this. You have to define these in the specific device schemas
-> anyways.
-> 
-
-I guess that:
-
-patternProperties:
-   "^.*@[0-9a-f]+$":
-     description: Peripherals
-     type: object
-
-     required:
-       - access-controller
-
-is sufficient if I describe what the content of the cells will be in the
-"#access-controller-cells" above. It avoids redundant information. I'll
-make the change for V6, thank you.
-
-Best regards,
-Gatien
-
->> +
->> +    required:
->> +      - access-controller
->> +
->> +required:
->> +  - compatible
->> +  - reg
->> +  - "#address-cells"
->> +  - "#size-cells"
->> +  - access-control-provider
->> +  - "#access-controller-cells"
->> +  - ranges
->> +
->> +additionalProperties: false
->> +
->> +examples:
->> +  - |
->> +    // In this example, the usart2 device refers to rifsc as its domain
->> +    // controller.
->> +    // Access rights are verified before creating devices.
->> +
->> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
->> +
->> +    rifsc: bus@42080000 {
->> +        compatible = "st,stm32mp25-rifsc";
->> +        reg = <0x42080000 0x1000>;
->> +        #address-cells = <1>;
->> +        #size-cells = <1>;
->> +        access-control-provider;
->> +        #access-controller-cells = <1>;
->> +        ranges;
->> +
->> +        usart2: serial@400e0000 {
->> +              compatible = "st,stm32h7-uart";
->> +              reg = <0x400e0000 0x400>;
->> +              interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
->> +              clocks = <&ck_flexgen_08>;
->> +              access-controller = <&rifsc 32>;
->> +        };
->> +    };
->> -- 
->> 2.25.1
->>
