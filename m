@@ -2,98 +2,265 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E339DE7AD6E
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 15:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E14E7AD72
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 15:28:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232387AbjJCPZj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Oct 2023 11:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41616 "EHLO
+        id S231748AbjJCP2k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Oct 2023 11:28:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230238AbjJCPZh (ORCPT
+        with ESMTP id S231559AbjJCP2k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2023 11:25:37 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F60A6
-        for <linux-crypto@vger.kernel.org>; Tue,  3 Oct 2023 08:25:33 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C62C433C7;
-        Tue,  3 Oct 2023 15:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696346732;
-        bh=g1iuKh4ZfWiEBpKOvmDQZDYCbhUMEMf3u1k/K1yDYEY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sby3rdr09kzWbvgX6INPUuJD+Bm73azs/bryQFZs8FY/jfNqK44nM4exYvEh3vNly
-         2fkwBlKIKzFfSKJ0Mb9f0QaziFRr9LeOLWg0ukM39e9AzDbsvsFUYtzyBYZQwmOpuc
-         VkWNXVZNGKUGwNiNyxEYLXwkSjGVXaP+f0qpecJ1kIxENoQYmEx0j0mjR8Z8j4z7zK
-         zY6WLlGFyrjE321Wn6W0aDKADmALcdJFl0gFllGD82durArQdSRKnsGorie7jdRX46
-         K/CyZ5+28UkCCDiQGQBKjlugiMMC07/SM5TtNPSjzY8UlFn9/9kwS3ae2+i5p1ykIw
-         yOxijHmRuv4kw==
-Date:   Tue, 3 Oct 2023 08:25:30 -0700
-From:   Nathan Chancellor <nathan@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] crypto: skcipher - Add dependency on ecb
-Message-ID: <20231003152530.GA63187@dev-arch.thelio-3990X>
-References: <20230914082828.895403-1-herbert@gondor.apana.org.au>
- <20230914082828.895403-9-herbert@gondor.apana.org.au>
- <20231002202522.GA4130583@dev-arch.thelio-3990X>
- <ZRuLK6SIuq9qYqpB@gondor.apana.org.au>
+        Tue, 3 Oct 2023 11:28:40 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88DF6AB;
+        Tue,  3 Oct 2023 08:28:36 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S0MCr5zS7z67Nc8;
+        Tue,  3 Oct 2023 23:28:24 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 3 Oct
+ 2023 16:28:33 +0100
+Date:   Tue, 3 Oct 2023 16:28:32 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Lukas Wunner <lukas@wunner.de>
+CC:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 11/12] PCI/CMA: Expose in sysfs whether devices are
+ authenticated
+Message-ID: <20231003162832.0000317c@Huawei.com>
+In-Reply-To: <821682573e57e0384162f365652171e5ee1e6611.1695921657.git.lukas@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+        <821682573e57e0384162f365652171e5ee1e6611.1695921657.git.lukas@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZRuLK6SIuq9qYqpB@gondor.apana.org.au>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 03, 2023 at 11:31:55AM +0800, Herbert Xu wrote:
-> On Mon, Oct 02, 2023 at 01:25:22PM -0700, Nathan Chancellor wrote:
-> >
-> > I am noticing a failure to get to user space when booting OpenSUSE's
-> > armv7hl configuration [1] in QEMU after this change as commit
-> > 705b52fef3c7 ("crypto: cbc - Convert from skcipher to lskcipher"). I can
-> > reproduce it with GCC 13.2.0 from kernel.org [2] and QEMU 8.1.1, in case
-> > either of those versions matter.  The rootfs is available at [3] in case
-> > it is relevant.
-> 
-> Thanks for the report.  This is caused by a missing dependency
-> on ECB.  Please try this patch:
-> 
-> ---8<---
-> As lskcipher requires the ecb wrapper for the transition add an
-> explicit dependency on it so that it is always present.  This can
-> be removed once all simple ciphers have been converted to lskcipher.
-> 
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Fixes: 705b52fef3c7 ("crypto: cbc - Convert from skcipher to lskcipher")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On Thu, 28 Sep 2023 19:32:41 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
 
-Tested-by: Nathan Chancellor <nathan@kernel.org>
+> The PCI core has just been amended to authenticate CMA-capable devices
+> on enumeration and store the result in an "authenticated" bit in struct
+> pci_dev->spdm_state.
+> 
+> Expose the bit to user space through an eponymous sysfs attribute.
+> 
+> Allow user space to trigger reauthentication (e.g. after it has updated
+> the CMA keyring) by writing to the sysfs attribute.
 
-Thanks for the quick fix!
+Ah.  That answers the question I asked in previous patch review ;)
+Maybe add a comment to the cma_init code to say that's why it fails with
+side effects (leaves the spdm_state around).
 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index ed931ddea644..bbf51d55724e 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -85,6 +85,7 @@ config CRYPTO_SKCIPHER
->  	tristate
->  	select CRYPTO_SKCIPHER2
->  	select CRYPTO_ALGAPI
-> +	select CRYPTO_ECB
+> 
+> Subject to further discussion, a future commit might add a user-defined
+> policy to forbid driver binding to devices which failed authentication,
+> similar to the "authorized" attribute for USB.
+> 
+> Alternatively, authentication success might be signaled to user space
+> through a uevent, whereupon it may bind a (blacklisted) driver.
+> A uevent signaling authentication failure might similarly cause user
+> space to unbind or outright remove the potentially malicious device.
+> 
+> Traffic from devices which failed authentication could also be filtered
+> through ACS I/O Request Blocking Enable (PCIe r6.1 sec 7.7.11.3) or
+> through Link Disable (PCIe r6.1 sec 7.5.3.7).  Unlike an IOMMU, that
+> will not only protect the host, but also prevent malicious peer-to-peer
+> traffic to other devices.
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Seems good to me, though I agree with Ilpo that it would be good to mention
+the DOE init fail in the patch description as that's a bit subtle.
+
+One trivial comment inline.
+
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+ 
+> ---
+>  Documentation/ABI/testing/sysfs-bus-pci | 27 +++++++++
+>  drivers/pci/Kconfig                     |  3 +
+>  drivers/pci/Makefile                    |  1 +
+>  drivers/pci/cma-sysfs.c                 | 73 +++++++++++++++++++++++++
+>  drivers/pci/cma.c                       |  2 +
+>  drivers/pci/doe.c                       |  2 +
+>  drivers/pci/pci-sysfs.c                 |  3 +
+>  drivers/pci/pci.h                       |  1 +
+>  include/linux/pci.h                     |  2 +
+>  9 files changed, 114 insertions(+)
+>  create mode 100644 drivers/pci/cma-sysfs.c
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+> index ecf47559f495..2ea9b8deffcc 100644
+> --- a/Documentation/ABI/testing/sysfs-bus-pci
+> +++ b/Documentation/ABI/testing/sysfs-bus-pci
+> @@ -500,3 +500,30 @@ Description:
+>  		console drivers from the device.  Raw users of pci-sysfs
+>  		resourceN attributes must be terminated prior to resizing.
+>  		Success of the resizing operation is not guaranteed.
+> +
+> +What:		/sys/bus/pci/devices/.../authenticated
+> +Date:		September 2023
+> +Contact:	Lukas Wunner <lukas@wunner.de>
+> +Description:
+> +		This file contains 1 if the device authenticated successfully
+> +		with CMA-SPDM (PCIe r6.1 sec 6.31).  It contains 0 if the
+> +		device failed authentication (and may thus be malicious).
+> +
+> +		Writing anything to this file causes reauthentication.
+> +		That may be opportune after updating the .cma keyring.
+> +
+> +		The file is not visible if authentication is unsupported
+> +		by the device.
+> +
+> +		If the kernel could not determine whether authentication is
+> +		supported because memory was low or DOE communication with
+> +		the device was not working, the file is visible but accessing
+> +		it fails with error code ENOTTY.
+> +
+> +		This prevents downgrade attacks where an attacker consumes
+> +		memory or disturbs DOE communication in order to create the
+> +		appearance that a device does not support authentication.
+> +
+> +		The reason why authentication support could not be determined
+> +		is apparent from "dmesg".  To probe for authentication support
+> +		again, exercise the "remove" and "rescan" attributes.
+> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+> index c9aa5253ac1f..51df3be3438e 100644
+> --- a/drivers/pci/Kconfig
+> +++ b/drivers/pci/Kconfig
+> @@ -129,6 +129,9 @@ config PCI_CMA
+>  	  A PCI DOE mailbox is used as transport for DMTF SPDM based
+>  	  attestation, measurement and secure channel establishment.
 >  
->  config CRYPTO_SKCIPHER2
->  	tristate
-> @@ -689,7 +690,7 @@ config CRYPTO_CTS
+> +config PCI_CMA_SYSFS
+> +	def_bool PCI_CMA && SYSFS
+> +
+>  config PCI_DOE
+>  	bool
 >  
->  config CRYPTO_ECB
->  	tristate "ECB (Electronic Codebook)"
-> -	select CRYPTO_SKCIPHER
-> +	select CRYPTO_SKCIPHER2
->  	select CRYPTO_MANAGER
->  	help
->  	  ECB (Electronic Codebook) mode (NIST SP800-38A)
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> diff --git a/drivers/pci/Makefile b/drivers/pci/Makefile
+> index a18812b8832b..612ae724cd2d 100644
+> --- a/drivers/pci/Makefile
+> +++ b/drivers/pci/Makefile
+> @@ -35,6 +35,7 @@ obj-$(CONFIG_PCI_DOE)		+= doe.o
+>  obj-$(CONFIG_PCI_DYNAMIC_OF_NODES) += of_property.o
+>  
+>  obj-$(CONFIG_PCI_CMA)		+= cma.o cma-x509.o cma.asn1.o
+> +obj-$(CONFIG_PCI_CMA_SYSFS)	+= cma-sysfs.o
+>  $(obj)/cma-x509.o:		$(obj)/cma.asn1.h
+>  $(obj)/cma.asn1.o:		$(obj)/cma.asn1.c $(obj)/cma.asn1.h
+>  
+> diff --git a/drivers/pci/cma-sysfs.c b/drivers/pci/cma-sysfs.c
+> new file mode 100644
+> index 000000000000..b2d45f96601a
+> --- /dev/null
+> +++ b/drivers/pci/cma-sysfs.c
+> @@ -0,0 +1,73 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Component Measurement and Authentication (CMA-SPDM, PCIe r6.1 sec 6.31)
+> + *
+> + * Copyright (C) 2023 Intel Corporation
+> + */
+> +
+> +#include <linux/pci.h>
+> +#include <linux/spdm.h>
+> +#include <linux/sysfs.h>
+> +
+> +#include "pci.h"
+> +
+> +static ssize_t authenticated_store(struct device *dev,
+> +				   struct device_attribute *attr,
+> +				   const char *buf, size_t count)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	ssize_t rc;
+> +
+> +	if (!pdev->cma_capable &&
+> +	    (pdev->cma_init_failed || pdev->doe_init_failed))
+> +		return -ENOTTY;
+> +
+> +	rc = pci_cma_reauthenticate(pdev);
+> +	if (rc)
+> +		return rc;
+
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t authenticated_show(struct device *dev,
+> +				  struct device_attribute *attr, char *buf)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +
+> +	if (!pdev->cma_capable &&
+> +	    (pdev->cma_init_failed || pdev->doe_init_failed))
+> +		return -ENOTTY;
+> +
+> +	return sysfs_emit(buf, "%u\n", spdm_authenticated(pdev->spdm_state));
+> +}
+> +static DEVICE_ATTR_RW(authenticated);
+> +
+> +static struct attribute *pci_cma_attrs[] = {
+> +	&dev_attr_authenticated.attr,
+> +	NULL
+> +};
+> +
+> +static umode_t pci_cma_attrs_are_visible(struct kobject *kobj,
+> +					 struct attribute *a, int n)
+> +{
+> +	struct device *dev = kobj_to_dev(kobj);
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +
+> +	/*
+> +	 * If CMA or DOE initialization failed, CMA attributes must be visible
+> +	 * and return an error on access.  This prevents downgrade attacks
+> +	 * where an attacker disturbs memory allocation or DOE communication
+> +	 * in order to create the appearance that CMA is unsupported.
+> +	 * The attacker may achieve that by simply hogging memory.
+> +	 */
+> +	if (!pdev->cma_capable &&
+> +	    !pdev->cma_init_failed && !pdev->doe_init_failed)
+> +		return 0;
+> +
+> +	return a->mode;
+> +}
+> +
+> +const struct attribute_group pci_cma_attr_group = {
+> +	.attrs  = pci_cma_attrs,
+
+I'd go with a single space here as the double doesn't make
+it any more readable.
+
+
+> +	.is_visible = pci_cma_attrs_are_visible,
+> +};
+
+
