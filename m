@@ -2,88 +2,107 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5B7E784A8
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 03:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DBBE7542B
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 06:08:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230099AbjJCDsZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 23:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58584 "EHLO
+        id S230213AbjJCGIK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Oct 2023 02:08:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230144AbjJCDos (ORCPT
+        with ESMTP id S229547AbjJCGIK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 23:44:48 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E8ABF
-        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 20:44:45 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qnWKu-002wRu-Jm; Tue, 03 Oct 2023 11:44:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Oct 2023 11:44:44 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 09/16] crypto: chacha20poly1305 - Only access common skcipher fields on spawn
-Date:   Tue,  3 Oct 2023 11:43:26 +0800
-Message-Id: <20231003034333.1441826-10-herbert@gondor.apana.org.au>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231003034333.1441826-1-herbert@gondor.apana.org.au>
-References: <20231003034333.1441826-1-herbert@gondor.apana.org.au>
+        Tue, 3 Oct 2023 02:08:10 -0400
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520ABB7;
+        Mon,  2 Oct 2023 23:08:07 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39367fQY111012;
+        Tue, 3 Oct 2023 01:07:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1696313261;
+        bh=8nHXIz83JEIbMHbNl4Btub6SQ0/ni/ZIwsC2FHxJX6Q=;
+        h=From:To:CC:Subject:In-Reply-To:References:Date;
+        b=KPmkj9WCNcya62CDRzjUVxY4xqNJavEtHWYOmAYryzGsYCRtBEcaIsgec20Th59y8
+         29iId9xbdoEKqS7a0WxpijUilcfV/NLexAYsizKm+gzspJjKwqcyI66sRpWY9W5W9Z
+         QnQtI30rjGiL6z+9O/FAkIJt1Y/Iy+4cr/WlynKI=
+Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39367fmU010004
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 3 Oct 2023 01:07:41 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 3
+ Oct 2023 01:07:41 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 3 Oct 2023 01:07:41 -0500
+Received: from localhost (ileaxei01-snat.itg.ti.com [10.180.69.5])
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39367epB042204;
+        Tue, 3 Oct 2023 01:07:41 -0500
+From:   Kamlesh Gurudasani <kamlesh@ti.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>
+Subject: Re: [EXTERNAL] Re: [EXTERNAL] Re: [PATCH v2 0/6] Add support for
+ Texas Instruments MCRC64 engine
+In-Reply-To: <87a5thgwt6.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+References: <20230719-mcrc-upstream-v2-0-4152b987e4c2@ti.com>
+ <20230812030116.GF971@sol.localdomain>
+ <87h6owen39.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <20230822051710.GC1661@sol.localdomain>
+ <87zg28d9z4.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <87a5thgwt6.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+Date:   Tue, 3 Oct 2023 11:37:40 +0530
+Message-ID: <87wmw4fdcj.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As skcipher spawns may be of the type lskcipher, only the common
-fields may be accessed.  This was already the case but use the
-correct helpers to make this more obvious.
+Kamlesh Gurudasani <kamlesh@ti.com> writes:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/chacha20poly1305.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> Here, if we consider similar numbers for crc64 PMULL implementation as
+>> crc32 (case 2) , we save good number of cpu cycles using mcrc64
+>> in case of files bigger than 5-10mb as most of the time is being spent in HW offload.
+>>
+>> Regards,
+>> Kamlesh
+>
+> Hi Eric,
+>
+> Please let me know if above numbers make sense to you and I should send
+> next revision.
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index 3a905c5d8f53..0e2e208d98f9 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -558,7 +558,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	u32 mask;
- 	struct aead_instance *inst;
- 	struct chachapoly_instance_ctx *ctx;
--	struct skcipher_alg *chacha;
-+	struct skcipher_alg_common *chacha;
- 	struct hash_alg_common *poly;
- 	int err;
- 
-@@ -579,7 +579,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 				   crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
--	chacha = crypto_spawn_skcipher_alg(&ctx->chacha);
-+	chacha = crypto_spawn_skcipher_alg_common(&ctx->chacha);
- 
- 	err = crypto_grab_ahash(&ctx->poly, aead_crypto_instance(inst),
- 				crypto_attr_alg_name(tb[2]), 0, mask);
-@@ -591,7 +591,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (poly->digestsize != POLY1305_DIGEST_SIZE)
- 		goto err_free_inst;
- 	/* Need 16-byte IV size, including Initial Block Counter value */
--	if (crypto_skcipher_alg_ivsize(chacha) != CHACHA_IV_SIZE)
-+	if (chacha->ivsize != CHACHA_IV_SIZE)
- 		goto err_free_inst;
- 	/* Not a stream cipher? */
- 	if (chacha->base.cra_blocksize != 1)
-@@ -615,7 +615,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	inst->alg.base.cra_ctxsize = sizeof(struct chachapoly_ctx) +
- 				     ctx->saltlen;
- 	inst->alg.ivsize = ivsize;
--	inst->alg.chunksize = crypto_skcipher_alg_chunksize(chacha);
-+	inst->alg.chunksize = chacha->chunksize;
- 	inst->alg.maxauthsize = POLY1305_DIGEST_SIZE;
- 	inst->alg.init = chachapoly_init;
- 	inst->alg.exit = chachapoly_exit;
--- 
-2.39.2
+Hi Eric,
 
+I understand that there is no in-kernel user for crc64-iso3309 and this
+is new algorithm that we are trying to add in linux kernel.
+
+As per your suggestion we did the calculations and it turns out to be we
+are saving good number of cpu cycles with HW offload.
+
+Also, there are some automotive customers who have a safety
+requirement to offload any parameters that are in Linux to ensure FFI.
+
+Let me know if you are willing to accept this driver, so that I can put
+efforts to send next revision.
+
+Regards,
+Kamlesh
