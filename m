@@ -2,285 +2,144 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 102AAE7543A
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 09:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72261E7543A
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 09:13:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239515AbjJCJNP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Oct 2023 05:13:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53892 "EHLO
+        id S231503AbjJCJOA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 Oct 2023 05:14:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239601AbjJCJNG (ORCPT
+        with ESMTP id S231486AbjJCJN6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Oct 2023 05:13:06 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4319BB;
-        Tue,  3 Oct 2023 02:12:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696324371; x=1727860371;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=lCXreDDaQlIfmi5598SMGDo0c2nFpIo2njqzrc8NFU0=;
-  b=dW4nBQOnbbAo8kFLBlxrXY5BG63yyXYZ264ZJnTeKyL389km68+iYfBu
-   KtzsHwUqCtO1vaO9/fLyazJF7kLBKRRxQp8R4E0EMbS68t3aIVVfKW/2K
-   GHQpqyTA8ivEvNEXYC1PiwXDbWa2Zt6gt0QUlQfum8a7+UCvV7gPzt2W/
-   +nuXWMgUknB9s4zek4Tg73YZWsV7tqPFfWy2TOWphI896mGUfZ1l+8CpM
-   LhEhK3OXajQz14mfOJ4CHTOpEJGU1j8z4gcVwfszzXpnIaWNKBaUy4YFy
-   pspSJmFSWJwHAz8r3fERT+cB8Z247R21U31lfKZggMcZXTSyuIRImjztB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="367877673"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="367877673"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 02:12:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="780235331"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="780235331"
-Received: from tciutacu-mobl.ger.corp.intel.com ([10.252.40.114])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 02:12:43 -0700
-Date:   Tue, 3 Oct 2023 12:12:40 +0300 (EEST)
-From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     Lukas Wunner <lukas@wunner.de>
-cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Tue, 3 Oct 2023 05:13:58 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96313D3
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Oct 2023 02:13:53 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9ad8bf9bfabso117515266b.3
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Oct 2023 02:13:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696324431; x=1696929231; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wy+qYX85walSXmmdwQsV/A/vhQrgoI8zrA9EtruEg4w=;
+        b=h8irs/DZYaR/m8ZJeo3ppMJ2Hpzkmrpob53sva71UwD+15AinOviPeuNHxoquPmegT
+         gi+RzXJvFqpsyVoF2WuRjbujU9dnkpgJooT/PydUzIv+0KMEmSu2gmhLpMI+x3WfvYuj
+         4XF+4x0Mg5/qwhci3/ER8vhp807S0sHMZghy8BxnINczoEsOM0/N5bT8yHvilAuji7mB
+         +YHkxq/Sb08MwS9hdgM6hLZDSgQNuiH4es+cSuwhZ8ufVP7hL2n8y1ycmZ6DlzJYz+Ro
+         Zv6S8qCjP4YV6++lLToRUKENvjbiCuZlfdmNulluKI9BxJKhK99kXiRRFddq6+8Jghv1
+         7PJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696324431; x=1696929231;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wy+qYX85walSXmmdwQsV/A/vhQrgoI8zrA9EtruEg4w=;
+        b=LcHoahvIgfAUta5BzwOIM8MggqAfu1ZmunOd06xRF1+39D+0ih7A4IJgmz0O2vRQbM
+         FFn7F8xVO7B9JigDD9nj7RLr36a5jtEoh8x6xUi7LynEZFW3Bis2r0OUQh6V63X2FefA
+         l4wFaCDDYjG0fsrh1wSNfCPcrjKrQ3WTAuiT3gE8ZJsLy0uiJevzU2ym5u41N2Xqewc1
+         RLDpuEx6UXTWthbOeJqAoUIokgdNQat2FdAWeq+SqG4TmWSH5UBj8PbD5n6akuOO0oXa
+         sNyyVTVu9oqE2XCZEYafXJnosnfH90QHDd5K6F555PEQA+QJArIzlqw2476xIhNBRu4t
+         TR9A==
+X-Gm-Message-State: AOJu0YxydZsw4Az8q0HB54Q9HKJgrMWjMt+mLtKWZ2DgF0vxxXX0rPSw
+        MjSfhkDCOB5BGZ8GiKgmRXPlKQ==
+X-Google-Smtp-Source: AGHT+IGbCPuR1XPUtWX3X/T9TqQTZb/GhbgV2D+KJNOAJLA727OZY6doasClCa06FovLV+tf7J12WQ==
+X-Received: by 2002:a17:907:b11:b0:9a2:225a:8d01 with SMTP id h17-20020a1709070b1100b009a2225a8d01mr10397507ejl.7.1696324431573;
+        Tue, 03 Oct 2023 02:13:51 -0700 (PDT)
+Received: from [192.168.1.197] (5-157-101-10.dyn.eolo.it. [5.157.101.10])
+        by smtp.gmail.com with ESMTPSA id pj7-20020a170906d78700b00977eec7b7e8sm731939ejb.68.2023.10.03.02.13.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 02:13:51 -0700 (PDT)
+Message-ID: <35c6c36d-c6a7-4ed3-8a56-db4a82809da6@linaro.org>
+Date:   Tue, 3 Oct 2023 11:13:49 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/5] dt-bindings: crypto: qcom,prng: document that RNG
+ on SM8450 is a TRNG
+Content-Language: en-US
+To:     Neil Armstrong <neil.armstrong@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-In-Reply-To: <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
-Message-ID: <d517dad-95eb-17c2-de47-2dd2bc7070c9@linux.intel.com>
-References: <cover.1695921656.git.lukas@wunner.de> <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Om Prakash Singh <quic_omprsing@quicinc.com>
+References: <20231003-topic-sm8550-rng-v4-0-255e4d0ba08e@linaro.org>
+ <20231003-topic-sm8550-rng-v4-1-255e4d0ba08e@linaro.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20231003-topic-sm8550-rng-v4-1-255e4d0ba08e@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 28 Sep 2023, Lukas Wunner wrote:
-
-> At any given time, only a single entity in a physical system may have
-> an SPDM connection to a device.  That's because the GET_VERSION request
-> (which begins an authentication sequence) resets "the connection and all
-> context associated with that connection" (SPDM 1.3.0 margin no 158).
+On 03/10/2023 09:10, Neil Armstrong wrote:
+> It has been reported at [1] the RNG HW on SM8450 is in fact a True Random
+> Number Generator and no more Pseudo, document this by adding
+> a new qcom,trng and the corresponding SoC specific sm8450 compatible.
 > 
-> Thus, when a device is passed through to a guest and the guest has
-> authenticated it, a subsequent authentication by the host would reset
-> the device's CMA-SPDM session behind the guest's back.
+> [1] https://lore.kernel.org/all/20230818161720.3644424-1-quic_omprsing@quicinc.com/
 > 
-> Prevent by letting the guest claim exclusive CMA ownership of the device
-> during passthrough.  Refuse CMA reauthentication on the host as long.
-
-Is something missing after "as long" ? Perhaps "as long as the device is 
-passed through"?
-
-Also "Prevent by" feels incomplete grammarwise, it begs a question prevent 
-what? Perhaps it's enough to start just with "Let the guest ..." as the 
-next sentence covers the prevent part anyway.
-
--- 
- i.
-
-
-> After passthrough has concluded, reauthenticate the device on the host.
-> 
-> Store the flag indicating guest ownership in struct pci_dev's priv_flags
-> to avoid the concurrency issues observed by commit 44bda4b7d26e ("PCI:
-> Fix is_added/is_busmaster race condition").
-> 
-> Side note:  The Data Object Exchange r1.1 ECN (published Oct 11 2022)
-> retrofits DOE with Connection IDs.  In theory these allow simultaneous
-> CMA-SPDM connections by multiple entities to the same device.  But the
-> first hardware generation capable of CMA-SPDM only supports DOE r1.0.
-> The specification also neglects to reserve unique Connection IDs for
-> hosts and guests, which further limits its usefulness.
-> 
-> In general, forcing the transport to compensate for SPDM's lack of a
-> connection identifier feels like a questionable layering violation.
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Suggested-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> Suggested-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+> Reviewed-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 > ---
->  drivers/pci/cma.c                | 41 ++++++++++++++++++++++++++++++++
->  drivers/pci/pci.h                |  1 +
->  drivers/vfio/pci/vfio_pci_core.c |  9 +++++--
->  include/linux/pci.h              |  8 +++++++
->  include/linux/spdm.h             |  2 ++
->  lib/spdm_requester.c             | 11 +++++++++
->  6 files changed, 70 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/pci/cma.c b/drivers/pci/cma.c
-> index c539ad85a28f..b3eee137ffe2 100644
-> --- a/drivers/pci/cma.c
-> +++ b/drivers/pci/cma.c
-> @@ -82,9 +82,50 @@ int pci_cma_reauthenticate(struct pci_dev *pdev)
->  	if (!pdev->cma_capable)
->  		return -ENOTTY;
->  
-> +	if (test_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags))
-> +		return -EPERM;
-> +
->  	return spdm_authenticate(pdev->spdm_state);
->  }
->  
-> +#if IS_ENABLED(CONFIG_VFIO_PCI_CORE)
-> +/**
-> + * pci_cma_claim_ownership() - Claim exclusive CMA-SPDM control for guest VM
-> + * @pdev: PCI device
-> + *
-> + * Claim exclusive CMA-SPDM control for a guest virtual machine before
-> + * passthrough of @pdev.  The host refrains from performing CMA-SPDM
-> + * authentication of the device until passthrough has concluded.
-> + *
-> + * Necessary because the GET_VERSION request resets the SPDM connection
-> + * and DOE r1.0 allows only a single SPDM connection for the entire system.
-> + * So the host could reset the guest's SPDM connection behind the guest's back.
-> + */
-> +void pci_cma_claim_ownership(struct pci_dev *pdev)
-> +{
-> +	set_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags);
-> +
-> +	if (pdev->cma_capable)
-> +		spdm_await(pdev->spdm_state);
-> +}
-> +EXPORT_SYMBOL(pci_cma_claim_ownership);
-> +
-> +/**
-> + * pci_cma_return_ownership() - Relinquish CMA-SPDM control to the host
-> + * @pdev: PCI device
-> + *
-> + * Relinquish CMA-SPDM control to the host after passthrough of @pdev to a
-> + * guest virtual machine has concluded.
-> + */
-> +void pci_cma_return_ownership(struct pci_dev *pdev)
-> +{
-> +	clear_bit(PCI_CMA_OWNED_BY_GUEST, &pdev->priv_flags);
-> +
-> +	pci_cma_reauthenticate(pdev);
-> +}
-> +EXPORT_SYMBOL(pci_cma_return_ownership);
-> +#endif
-> +
->  void pci_cma_destroy(struct pci_dev *pdev)
->  {
->  	if (pdev->spdm_state)
-> diff --git a/drivers/pci/pci.h b/drivers/pci/pci.h
-> index d80cc06be0cc..05ae6359b152 100644
-> --- a/drivers/pci/pci.h
-> +++ b/drivers/pci/pci.h
-> @@ -388,6 +388,7 @@ static inline bool pci_dev_is_disconnected(const struct pci_dev *dev)
->  #define PCI_DEV_ADDED 0
->  #define PCI_DPC_RECOVERED 1
->  #define PCI_DPC_RECOVERING 2
-> +#define PCI_CMA_OWNED_BY_GUEST 3
->  
->  static inline void pci_dev_assign_added(struct pci_dev *dev, bool added)
->  {
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 1929103ee59a..6f300664a342 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -487,10 +487,12 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  	if (ret)
->  		goto out_power;
->  
-> +	pci_cma_claim_ownership(pdev);
-> +
->  	/* If reset fails because of the device lock, fail this path entirely */
->  	ret = pci_try_reset_function(pdev);
->  	if (ret == -EAGAIN)
-> -		goto out_disable_device;
-> +		goto out_cma_return;
->  
->  	vdev->reset_works = !ret;
->  	pci_save_state(pdev);
-> @@ -549,7 +551,8 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
->  out_free_state:
->  	kfree(vdev->pci_saved_state);
->  	vdev->pci_saved_state = NULL;
-> -out_disable_device:
-> +out_cma_return:
-> +	pci_cma_return_ownership(pdev);
->  	pci_disable_device(pdev);
->  out_power:
->  	if (!disable_idle_d3)
-> @@ -678,6 +681,8 @@ void vfio_pci_core_disable(struct vfio_pci_core_device *vdev)
->  
->  	vfio_pci_dev_set_try_reset(vdev->vdev.dev_set);
->  
-> +	pci_cma_return_ownership(pdev);
-> +
->  	/* Put the pm-runtime usage counter acquired during enable */
->  	if (!disable_idle_d3)
->  		pm_runtime_put(&pdev->dev);
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 2c5fde81bb85..c14ea0e74fc4 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -2386,6 +2386,14 @@ static inline resource_size_t pci_iov_resource_size(struct pci_dev *dev, int res
->  static inline void pci_vf_drivers_autoprobe(struct pci_dev *dev, bool probe) { }
->  #endif
->  
-> +#ifdef CONFIG_PCI_CMA
-> +void pci_cma_claim_ownership(struct pci_dev *pdev);
-> +void pci_cma_return_ownership(struct pci_dev *pdev);
-> +#else
-> +static inline void pci_cma_claim_ownership(struct pci_dev *pdev) { }
-> +static inline void pci_cma_return_ownership(struct pci_dev *pdev) { }
-> +#endif
-> +
->  #if defined(CONFIG_HOTPLUG_PCI) || defined(CONFIG_HOTPLUG_PCI_MODULE)
->  void pci_hp_create_module_link(struct pci_slot *pci_slot);
->  void pci_hp_remove_module_link(struct pci_slot *pci_slot);
-> diff --git a/include/linux/spdm.h b/include/linux/spdm.h
-> index 69a83bc2eb41..d796127fbe9a 100644
-> --- a/include/linux/spdm.h
-> +++ b/include/linux/spdm.h
-> @@ -34,6 +34,8 @@ int spdm_authenticate(struct spdm_state *spdm_state);
->  
->  bool spdm_authenticated(struct spdm_state *spdm_state);
->  
-> +void spdm_await(struct spdm_state *spdm_state);
-> +
->  void spdm_destroy(struct spdm_state *spdm_state);
->  
->  #endif
-> diff --git a/lib/spdm_requester.c b/lib/spdm_requester.c
-> index b2af2074ba6f..99424d6aebf5 100644
-> --- a/lib/spdm_requester.c
-> +++ b/lib/spdm_requester.c
-> @@ -1483,6 +1483,17 @@ struct spdm_state *spdm_create(struct device *dev, spdm_transport *transport,
->  }
->  EXPORT_SYMBOL_GPL(spdm_create);
->  
-> +/**
-> + * spdm_await() - Wait for ongoing spdm_authenticate() to finish
-> + *
-> + * @spdm_state: SPDM session state
-> + */
-> +void spdm_await(struct spdm_state *spdm_state)
-> +{
-> +	mutex_lock(&spdm_state->lock);
-> +	mutex_unlock(&spdm_state->lock);
-> +}
-> +
->  /**
->   * spdm_destroy() - Destroy SPDM session
->   *
-> 
+
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
+
