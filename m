@@ -2,30 +2,30 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26835E776F4
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 03:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD93BE784AA
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 03:48:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230132AbjJCDpL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 23:45:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58788 "EHLO
+        id S229437AbjJCDsY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Oct 2023 23:48:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbjJCDo5 (ORCPT
+        with ESMTP id S239026AbjJCDos (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 23:44:57 -0400
+        Mon, 2 Oct 2023 23:44:48 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DDB8DA
-        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 20:44:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30507C4
+        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 20:44:44 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qnWL2-002wUd-BJ; Tue, 03 Oct 2023 11:44:49 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Oct 2023 11:44:52 +0800
+        id 1qnWKt-002wRa-Fl; Tue, 03 Oct 2023 11:44:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Oct 2023 11:44:43 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 16/16] crypto: skcipher - Remove obsolete skcipher_alg helpers
-Date:   Tue,  3 Oct 2023 11:43:33 +0800
-Message-Id: <20231003034333.1441826-17-herbert@gondor.apana.org.au>
+Subject: [PATCH 08/16] crypto: ccm - Only access common skcipher fields on spawn
+Date:   Tue,  3 Oct 2023 11:43:25 +0800
+Message-Id: <20231003034333.1441826-9-herbert@gondor.apana.org.au>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231003034333.1441826-1-herbert@gondor.apana.org.au>
 References: <20231003034333.1441826-1-herbert@gondor.apana.org.au>
@@ -35,132 +35,56 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As skcipher spawn users can no longer assume the spawn is of type
-struct skcipher_alg, these helpers are no longer used.  Remove them.
+As skcipher spawns may be of the type lskcipher, only the common
+fields may be accessed.  This was already the case but use the
+correct helpers to make this more obvious.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- include/crypto/internal/skcipher.h | 42 ------------------------------
- include/crypto/skcipher.h          | 25 +-----------------
- 2 files changed, 1 insertion(+), 66 deletions(-)
+ crypto/ccm.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index c767b5cfbd9c..7ae42afdcf3e 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -148,12 +148,6 @@ static inline void crypto_drop_lskcipher(struct crypto_lskcipher_spawn *spawn)
- 	crypto_drop_spawn(&spawn->base);
- }
- 
--static inline struct skcipher_alg *crypto_skcipher_spawn_alg(
--	struct crypto_skcipher_spawn *spawn)
--{
--	return container_of(spawn->base.alg, struct skcipher_alg, base);
--}
--
- static inline struct lskcipher_alg *crypto_lskcipher_spawn_alg(
- 	struct crypto_lskcipher_spawn *spawn)
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index a9453129c51c..7af89a5b745c 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -447,10 +447,10 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 				    const char *ctr_name,
+ 				    const char *mac_name)
  {
-@@ -166,12 +160,6 @@ static inline struct skcipher_alg_common *crypto_spawn_skcipher_alg_common(
- 	return container_of(spawn->base.alg, struct skcipher_alg_common, base);
- }
++	struct skcipher_alg_common *ctr;
+ 	u32 mask;
+ 	struct aead_instance *inst;
+ 	struct ccm_instance_ctx *ictx;
+-	struct skcipher_alg *ctr;
+ 	struct hash_alg_common *mac;
+ 	int err;
  
--static inline struct skcipher_alg *crypto_spawn_skcipher_alg(
--	struct crypto_skcipher_spawn *spawn)
--{
--	return crypto_skcipher_spawn_alg(spawn);
--}
--
- static inline struct lskcipher_alg *crypto_spawn_lskcipher_alg(
- 	struct crypto_lskcipher_spawn *spawn)
- {
-@@ -269,36 +257,6 @@ static inline u32 skcipher_request_flags(struct skcipher_request *req)
- 	return req->base.flags;
- }
+@@ -478,13 +478,12 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 				   ctr_name, 0, mask);
+ 	if (err)
+ 		goto err_free_inst;
+-	ctr = crypto_spawn_skcipher_alg(&ictx->ctr);
++	ctr = crypto_spawn_skcipher_alg_common(&ictx->ctr);
  
--static inline unsigned int crypto_skcipher_alg_min_keysize(
--	struct skcipher_alg *alg)
--{
--	return alg->min_keysize;
--}
--
--static inline unsigned int crypto_skcipher_alg_max_keysize(
--	struct skcipher_alg *alg)
--{
--	return alg->max_keysize;
--}
--
--static inline unsigned int crypto_skcipher_alg_walksize(
--	struct skcipher_alg *alg)
--{
--	return alg->walksize;
--}
--
--static inline unsigned int crypto_lskcipher_alg_min_keysize(
--	struct lskcipher_alg *alg)
--{
--	return alg->co.min_keysize;
--}
--
--static inline unsigned int crypto_lskcipher_alg_max_keysize(
--	struct lskcipher_alg *alg)
--{
--	return alg->co.max_keysize;
--}
--
- /* Helpers for simple block cipher modes of operation */
- struct skcipher_ctx_simple {
- 	struct crypto_cipher *cipher;	/* underlying block cipher */
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index a648ef5ce897..ea18af48346b 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -395,17 +395,6 @@ static inline struct lskcipher_alg *crypto_lskcipher_alg(
- 			    struct lskcipher_alg, co.base);
- }
+ 	/* The skcipher algorithm must be CTR mode, using 16-byte blocks. */
+ 	err = -EINVAL;
+ 	if (strncmp(ctr->base.cra_name, "ctr(", 4) != 0 ||
+-	    crypto_skcipher_alg_ivsize(ctr) != 16 ||
+-	    ctr->base.cra_blocksize != 1)
++	    ctr->ivsize != 16 || ctr->base.cra_blocksize != 1)
+ 		goto err_free_inst;
  
--static inline unsigned int crypto_skcipher_alg_ivsize(struct skcipher_alg *alg)
--{
--	return alg->ivsize;
--}
--
--static inline unsigned int crypto_lskcipher_alg_ivsize(
--	struct lskcipher_alg *alg)
--{
--	return alg->co.ivsize;
--}
--
- /**
-  * crypto_skcipher_ivsize() - obtain IV size
-  * @tfm: cipher handle
-@@ -473,18 +462,6 @@ static inline unsigned int crypto_lskcipher_blocksize(
- 	return crypto_tfm_alg_blocksize(crypto_lskcipher_tfm(tfm));
- }
- 
--static inline unsigned int crypto_skcipher_alg_chunksize(
--	struct skcipher_alg *alg)
--{
--	return alg->chunksize;
--}
--
--static inline unsigned int crypto_lskcipher_alg_chunksize(
--	struct lskcipher_alg *alg)
--{
--	return alg->co.chunksize;
--}
--
- /**
-  * crypto_skcipher_chunksize() - obtain chunk size
-  * @tfm: cipher handle
-@@ -516,7 +493,7 @@ static inline unsigned int crypto_skcipher_chunksize(
- static inline unsigned int crypto_lskcipher_chunksize(
- 	struct crypto_lskcipher *tfm)
- {
--	return crypto_lskcipher_alg_chunksize(crypto_lskcipher_alg(tfm));
-+	return crypto_lskcipher_alg(tfm)->co.chunksize;
- }
- 
- static inline unsigned int crypto_sync_skcipher_blocksize(
+ 	/* ctr and cbcmac must use the same underlying block cipher. */
+@@ -507,7 +506,7 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 	inst->alg.base.cra_alignmask = mac->base.cra_alignmask |
+ 				       ctr->base.cra_alignmask;
+ 	inst->alg.ivsize = 16;
+-	inst->alg.chunksize = crypto_skcipher_alg_chunksize(ctr);
++	inst->alg.chunksize = ctr->chunksize;
+ 	inst->alg.maxauthsize = 16;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct crypto_ccm_ctx);
+ 	inst->alg.init = crypto_ccm_init_tfm;
 -- 
 2.39.2
 
