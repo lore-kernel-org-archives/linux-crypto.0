@@ -2,30 +2,30 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF49E776F4
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 03:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F735E776F8
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Oct 2023 03:44:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230099AbjJCDok (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Oct 2023 23:44:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49878 "EHLO
+        id S229437AbjJCDom (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 Oct 2023 23:44:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjJCDok (ORCPT
+        with ESMTP id S230093AbjJCDol (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Oct 2023 23:44:40 -0400
+        Mon, 2 Oct 2023 23:44:41 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B25B8
-        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 20:44:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD0C1B8
+        for <linux-crypto@vger.kernel.org>; Mon,  2 Oct 2023 20:44:38 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qnWKl-002wQR-QN; Tue, 03 Oct 2023 11:44:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Oct 2023 11:44:35 +0800
+        id 1qnWKo-002wQf-0r; Tue, 03 Oct 2023 11:44:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Oct 2023 11:44:38 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 01/16] crypto: arc4 - Convert from skcipher to lskcipher
-Date:   Tue,  3 Oct 2023 11:43:18 +0800
-Message-Id: <20231003034333.1441826-2-herbert@gondor.apana.org.au>
+Subject: [PATCH 03/16] crypto: essiv - Handle lskcipher spawns
+Date:   Tue,  3 Oct 2023 11:43:20 +0800
+Message-Id: <20231003034333.1441826-4-herbert@gondor.apana.org.au>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231003034333.1441826-1-herbert@gondor.apana.org.au>
 References: <20231003034333.1441826-1-herbert@gondor.apana.org.au>
@@ -35,130 +35,89 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace skcipher implementation with lskcipher.
+Add code to handle an underlying lskcihper object when grabbing
+an skcipher spawn.
 
+Fixes: 31865c4c4db2 ("crypto: skcipher - Add lskcipher")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/arc4.c    | 60 +++++++++++++++++++-----------------------------
- crypto/testmgr.c |  2 +-
- 2 files changed, 24 insertions(+), 38 deletions(-)
+ crypto/essiv.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/arc4.c b/crypto/arc4.c
-index 3254dcc34368..eb3590dc9282 100644
---- a/crypto/arc4.c
-+++ b/crypto/arc4.c
-@@ -7,7 +7,6 @@
-  * Jon Oberheide <jon@oberheide.org>
-  */
+diff --git a/crypto/essiv.c b/crypto/essiv.c
+index f7d4ef4837e5..e63fc6442e32 100644
+--- a/crypto/essiv.c
++++ b/crypto/essiv.c
+@@ -442,6 +442,7 @@ static bool essiv_supported_algorithms(const char *essiv_cipher_name,
  
--#include <crypto/algapi.h>
- #include <crypto/arc4.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/init.h>
-@@ -15,33 +14,24 @@
- #include <linux/module.h>
- #include <linux/sched.h>
- 
--static int crypto_arc4_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
-+static int crypto_arc4_setkey(struct crypto_lskcipher *tfm, const u8 *in_key,
- 			      unsigned int key_len)
+ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
  {
--	struct arc4_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct arc4_ctx *ctx = crypto_lskcipher_ctx(tfm);
++	struct skcipher_alg_common *skcipher_alg = NULL;
+ 	struct crypto_attr_type *algt;
+ 	const char *inner_cipher_name;
+ 	const char *shash_name;
+@@ -450,7 +451,6 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	struct crypto_instance *inst;
+ 	struct crypto_alg *base, *block_base;
+ 	struct essiv_instance_ctx *ictx;
+-	struct skcipher_alg *skcipher_alg = NULL;
+ 	struct aead_alg *aead_alg = NULL;
+ 	struct crypto_alg *_hash_alg;
+ 	struct shash_alg *hash_alg;
+@@ -475,7 +475,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	mask = crypto_algt_inherited_mask(algt);
  
- 	return arc4_setkey(ctx, in_key, key_len);
- }
+ 	switch (type) {
+-	case CRYPTO_ALG_TYPE_SKCIPHER:
++	case CRYPTO_ALG_TYPE_LSKCIPHER:
+ 		skcipher_inst = kzalloc(sizeof(*skcipher_inst) +
+ 					sizeof(*ictx), GFP_KERNEL);
+ 		if (!skcipher_inst)
+@@ -489,9 +489,10 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 					   inner_cipher_name, 0, mask);
+ 		if (err)
+ 			goto out_free_inst;
+-		skcipher_alg = crypto_spawn_skcipher_alg(&ictx->u.skcipher_spawn);
++		skcipher_alg = crypto_spawn_skcipher_alg_common(
++			&ictx->u.skcipher_spawn);
+ 		block_base = &skcipher_alg->base;
+-		ivsize = crypto_skcipher_alg_ivsize(skcipher_alg);
++		ivsize = skcipher_alg->ivsize;
+ 		break;
  
--static int crypto_arc4_crypt(struct skcipher_request *req)
-+static int crypto_arc4_crypt(struct crypto_lskcipher *tfm, const u8 *src,
-+			     u8 *dst, unsigned nbytes, u8 *iv, bool final)
- {
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct arc4_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	int err;
-+	struct arc4_ctx *ctx = crypto_lskcipher_ctx(tfm);
+ 	case CRYPTO_ALG_TYPE_AEAD:
+@@ -574,18 +575,17 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	base->cra_alignmask	= block_base->cra_alignmask;
+ 	base->cra_priority	= block_base->cra_priority;
  
--	err = skcipher_walk_virt(&walk, req, false);
--
--	while (walk.nbytes > 0) {
--		arc4_crypt(ctx, walk.dst.virt.addr, walk.src.virt.addr,
--			   walk.nbytes);
--		err = skcipher_walk_done(&walk, 0);
--	}
--
--	return err;
-+	arc4_crypt(ctx, dst, src, nbytes);
-+	return 0;
- }
+-	if (type == CRYPTO_ALG_TYPE_SKCIPHER) {
++	if (type == CRYPTO_ALG_TYPE_LSKCIPHER) {
+ 		skcipher_inst->alg.setkey	= essiv_skcipher_setkey;
+ 		skcipher_inst->alg.encrypt	= essiv_skcipher_encrypt;
+ 		skcipher_inst->alg.decrypt	= essiv_skcipher_decrypt;
+ 		skcipher_inst->alg.init		= essiv_skcipher_init_tfm;
+ 		skcipher_inst->alg.exit		= essiv_skcipher_exit_tfm;
  
--static int crypto_arc4_init(struct crypto_skcipher *tfm)
-+static int crypto_arc4_init(struct crypto_lskcipher *tfm)
- {
- 	pr_warn_ratelimited("\"%s\" (%ld) uses obsolete ecb(arc4) skcipher\n",
- 			    current->comm, (unsigned long)current->pid);
-@@ -49,33 +39,29 @@ static int crypto_arc4_init(struct crypto_skcipher *tfm)
- 	return 0;
- }
+-		skcipher_inst->alg.min_keysize	= crypto_skcipher_alg_min_keysize(skcipher_alg);
+-		skcipher_inst->alg.max_keysize	= crypto_skcipher_alg_max_keysize(skcipher_alg);
++		skcipher_inst->alg.min_keysize	= skcipher_alg->min_keysize;
++		skcipher_inst->alg.max_keysize	= skcipher_alg->max_keysize;
+ 		skcipher_inst->alg.ivsize	= ivsize;
+-		skcipher_inst->alg.chunksize	= crypto_skcipher_alg_chunksize(skcipher_alg);
+-		skcipher_inst->alg.walksize	= crypto_skcipher_alg_walksize(skcipher_alg);
++		skcipher_inst->alg.chunksize	= skcipher_alg->chunksize;
  
--static struct skcipher_alg arc4_alg = {
--	/*
--	 * For legacy reasons, this is named "ecb(arc4)", not "arc4".
--	 * Nevertheless it's actually a stream cipher, not a block cipher.
--	 */
--	.base.cra_name		=	"ecb(arc4)",
--	.base.cra_driver_name	=	"ecb(arc4)-generic",
--	.base.cra_priority	=	100,
--	.base.cra_blocksize	=	ARC4_BLOCK_SIZE,
--	.base.cra_ctxsize	=	sizeof(struct arc4_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	ARC4_MIN_KEY_SIZE,
--	.max_keysize		=	ARC4_MAX_KEY_SIZE,
--	.setkey			=	crypto_arc4_setkey,
--	.encrypt		=	crypto_arc4_crypt,
--	.decrypt		=	crypto_arc4_crypt,
--	.init			=	crypto_arc4_init,
-+static struct lskcipher_alg arc4_alg = {
-+	.co.base.cra_name		=	"arc4",
-+	.co.base.cra_driver_name	=	"arc4-generic",
-+	.co.base.cra_priority		=	100,
-+	.co.base.cra_blocksize		=	ARC4_BLOCK_SIZE,
-+	.co.base.cra_ctxsize		=	sizeof(struct arc4_ctx),
-+	.co.base.cra_module		=	THIS_MODULE,
-+	.co.min_keysize			=	ARC4_MIN_KEY_SIZE,
-+	.co.max_keysize			=	ARC4_MAX_KEY_SIZE,
-+	.setkey				=	crypto_arc4_setkey,
-+	.encrypt			=	crypto_arc4_crypt,
-+	.decrypt			=	crypto_arc4_crypt,
-+	.init				=	crypto_arc4_init,
- };
+ 		skcipher_inst->free		= essiv_skcipher_free_instance;
  
- static int __init arc4_init(void)
- {
--	return crypto_register_skcipher(&arc4_alg);
-+	return crypto_register_lskcipher(&arc4_alg);
- }
- 
- static void __exit arc4_exit(void)
- {
--	crypto_unregister_skcipher(&arc4_alg);
-+	crypto_unregister_lskcipher(&arc4_alg);
- }
- 
- subsys_initcall(arc4_init);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index aed4a6bf47ad..5d5aee597eeb 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4963,7 +4963,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "ecb(arc4)",
--		.generic_driver = "ecb(arc4)-generic",
-+		.generic_driver = "arc4-generic",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(arc4_tv_template)
+@@ -616,7 +616,7 @@ static int essiv_create(struct crypto_template *tmpl, struct rtattr **tb)
+ out_free_hash:
+ 	crypto_mod_put(_hash_alg);
+ out_drop_skcipher:
+-	if (type == CRYPTO_ALG_TYPE_SKCIPHER)
++	if (type == CRYPTO_ALG_TYPE_LSKCIPHER)
+ 		crypto_drop_skcipher(&ictx->u.skcipher_spawn);
+ 	else
+ 		crypto_drop_aead(&ictx->u.aead_spawn);
 -- 
 2.39.2
 
