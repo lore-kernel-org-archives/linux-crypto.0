@@ -2,122 +2,125 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A8E92703
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Oct 2023 13:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FB8E92720
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Oct 2023 15:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbjJEN7y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Oct 2023 09:59:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39478 "EHLO
+        id S236198AbjJEP6C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Oct 2023 11:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229581AbjJEN5x (ORCPT
+        with ESMTP id S234417AbjJEP4q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Oct 2023 09:57:53 -0400
-Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346F71BF5;
-        Wed,  4 Oct 2023 20:55:47 -0700 (PDT)
-Received: by mail-ua1-x929.google.com with SMTP id a1e0cc1a2514c-7b07548b085so215384241.2;
-        Wed, 04 Oct 2023 20:55:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696478146; x=1697082946; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lA6+xMHo1V0jyHxa3B2EhwgcTn/GiHjuNP/IimGuAGY=;
-        b=lSSKUsH6kUaZ71cGYKmxXa1PTFl6zXqTT8y7mWegBA4WslgxEpZCvx9AhmYr79iMjH
-         47ma2Z0+uCd3jG7j9nCzhwNUcSOEgInEc2uh0dXXA84bR8WpL9Yk3KGk/kbgy/6MvzKB
-         g28BUGTYjdegL/YhP7i6MFTBKx2K9YEseE5/rYh/0OQQTgZw9STFwMVoKM2snFzN0Ve9
-         +GnB+miKYgP/uo+I+8s0tLyLDUQPCts9eAvw6nH2a4oiIh4nUSW4fywp37pD1mzOzIKs
-         MNr5rUYddExHHoBJw3Zo4awJfjdyUQUHLuEQrdqxgzoLGCQJqrGSveXne6cxQtcRY1/s
-         cEEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696478146; x=1697082946;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lA6+xMHo1V0jyHxa3B2EhwgcTn/GiHjuNP/IimGuAGY=;
-        b=Bz5Vn/xZGaD140JWgTQ9ChRgYY6czdnU6UpzIHp4cY4XVKLXKWjM4Uc4z5lq+Wgftv
-         xNnTEmHep3ttld/75bTfeQ7dkGzYrV+Wu1Hwd4levGjxD+SYGKoxC90MKv4bDmraOQf6
-         2a2muzPB5ioGt5uU66eKfU83g1KnqP3uEo6ez/zAvtvojvVw1K1qgYAW9OlGcQDjYDCc
-         GZE8QH6vEKqWPIe+uS9A3XH0cutC7SWjxsOpTr+R1dUXacygegu5EVg75Xwy8LtXk8k0
-         Lsdlcqw0cjcK6nwQEEGwxSx0lLc/4hRvhR+X7GHQXMSoEbloP8tRf/FrY5Sw8HREN4w7
-         CWjA==
-X-Gm-Message-State: AOJu0YxeYDTytnjwxHB7MBgMq2PIuljvNHPFUDhDqBgWYVOJwuFWNRHb
-        dzHyQxihaxRPE/fLLahBVMii2/Hfmz2jfT/1J3E=
-X-Google-Smtp-Source: AGHT+IGhutk41Atirdz72BPO6mypjapbxNvc/HY4PfmO7Owm2/7cVPrCtcBwal6aAUk8eOP9WsgTpAJvtiDPFJqJ2v4=
-X-Received: by 2002:a67:f7cf:0:b0:452:c3a4:1f99 with SMTP id
- a15-20020a67f7cf000000b00452c3a41f99mr3820165vsp.4.1696478146227; Wed, 04 Oct
- 2023 20:55:46 -0700 (PDT)
+        Thu, 5 Oct 2023 11:56:46 -0400
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5782E9ED4;
+        Thu,  5 Oct 2023 07:04:49 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 7B1A62800BBF3;
+        Thu,  5 Oct 2023 16:04:47 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 662DD4DD3BE; Thu,  5 Oct 2023 16:04:47 +0200 (CEST)
+Date:   Thu, 5 Oct 2023 16:04:47 +0200
+From:   Lukas Wunner <lukas@wunner.de>
+To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+Cc:     Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 09/12] PCI/CMA: Validate Subject Alternative Name in
+ certificates
+Message-ID: <20231005140447.GA23472@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <bc1efd945f5d76587787f8351199e1ea45eaf2ef.1695921657.git.lukas@wunner.de>
+ <20231003160455.00001a4f@Huawei.com>
 MIME-Version: 1.0
-References: <CACsaVZ+LkHwTKO4XE_FFM62SbF3gGD4DZyse-9Y1UbJUgrhvfA@mail.gmail.com>
- <ZQPxuZ2tifa9bQKJ@gcabiddu-mobl1.ger.corp.intel.com>
-In-Reply-To: <ZQPxuZ2tifa9bQKJ@gcabiddu-mobl1.ger.corp.intel.com>
-From:   Kyle Sanderson <kyle.leet@gmail.com>
-Date:   Wed, 4 Oct 2023 20:55:34 -0700
-Message-ID: <CACsaVZJYcGv26gM=Kcm2R3-A7Yqc9Jc1cd8TchA0POpxx1NHow@mail.gmail.com>
-Subject: Re: Linux 6.1.52 regression: Intel QAT kernel panic (memory corruption)
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Linux-Kernal <linux-kernel@vger.kernel.org>, qat-linux@intel.com,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003160455.00001a4f@Huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 10:55=E2=80=AFPM Giovanni Cabiddu
-<giovanni.cabiddu@intel.com> wrote:
->
-> On Thu, Sep 14, 2023 at 10:27:22PM -0700, Kyle Sanderson wrote:
-> > Hello Intel QAT Maintainers,
-> >
-> > It looks like QAT has regressed again. The present symptom is just
-> > straight up memory corruption. I was running Canonical 6.1.0-1017-oem
-> > and it doesn't happen, with 6.1.0-1020-oem and 6.1.0-1021-oem it does.
-> > I don't know what these map to upstream, however with NixOS installed
-> > the same corruption failure occurs on 6.1.52.
-> This is probably be related to [1].
-> Versions from 6.1.39 to 6.1.52 are affected. Fixed in v6.1.53.
->
-> [1] https://www.spinics.net/lists/stable/msg678947.html
->
-> Regards,
->
-> --
-> Giovanni
+On Tue, Oct 03, 2023 at 04:04:55PM +0100, Jonathan Cameron wrote:
+> On Thu, 28 Sep 2023 19:32:39 +0200 Lukas Wunner <lukas@wunner.de> wrote:
+> > PCIe r6.1 sec 6.31.3 stipulates requirements for X.509 Leaf Certificates
+> > presented by devices, in particular the presence of a Subject Alternative
+> > Name extension with a name that encodes the Vendor ID, Device ID, Device
+> > Serial Number, etc.
+> 
+> Lets you do any of
+> * What you have here
+> * Reference Integrity Manifest, e.g. see Trusted Computing Group
+> * A pointer to a location where such a Reference Integrity Manifest can be
+>   obtained.
+> 
+> So this text feels a little strong though I'm fine with only support the
+> Subject Alternative Name bit for now. Whoever has one of the other options
+> can add that support :)
 
-Thank you Giovanni - that appears to have been it. Ubuntu
-6.1.0-1023-oem (v6.1.53) no longer reproduces the issue.
+I intend to amend the commit message as follows.  If anyone believes
+this is inaccurate, please let me know:
 
-K.
+    Side note:  Instead of a Subject Alternative Name, Leaf Certificates may
+    include "a Reference Integrity Manifest, e.g., see Trusted Computing
+    Group" or "a pointer to a location where such a Reference Integrity
+    Manifest can be obtained" (PCIe r6.1 sec 6.31.3).
 
-On Thu, Sep 14, 2023 at 10:55=E2=80=AFPM Giovanni Cabiddu
-<giovanni.cabiddu@intel.com> wrote:
->
-> On Thu, Sep 14, 2023 at 10:27:22PM -0700, Kyle Sanderson wrote:
-> > Hello Intel QAT Maintainers,
-> >
-> > It looks like QAT has regressed again. The present symptom is just
-> > straight up memory corruption. I was running Canonical 6.1.0-1017-oem
-> > and it doesn't happen, with 6.1.0-1020-oem and 6.1.0-1021-oem it does.
-> > I don't know what these map to upstream, however with NixOS installed
-> > the same corruption failure occurs on 6.1.52. The stack traces give
-> > illegal instructions and all kinds of badness across all modules when
-> > the device is simply present on the system, resulting in a hung
-> > system, or a multitude of processes crashing and the system failing to
-> > start. Disabling the device in the system BIOS results in a working
-> > system, and no extreme corruption. kmem_cache_alloc_node is the common
-> > fixture in the traces (I don't have a serial line), but I suspect
-> > that's not where the problem is. The corruption this time happens
-> > without block crypto being involved, and simply booting the installer
-> > from a USB stick.
-> This is probably be related to [1].
-> Versions from 6.1.39 to 6.1.52 are affected. Fixed in v6.1.53.
->
-> [1] https://www.spinics.net/lists/stable/msg678947.html
->
-> Regards,
->
-> --
-> Giovanni
+    A Reference Integrity Manifest contains "golden" measurements which can
+    be compared to actual measurements retrieved from a device.  It serves a
+    different purpose than the Subject Alternative Name, hence it is unclear
+    why the spec says only either of them is necessary.  It is also unclear
+    how a Reference Integrity Manifest shall be encoded into a certificate.
+
+    Ignore the Reference Integrity Manifest requirement until this confusion
+    is resolved by a spec update.
+
+
+> I haven't looked asn.1 recently enough to have any confidence on
+> a review of that bit...
+> So, for everything except the asn.1
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+In case it raises the confidence in that portion of the patch,
+I have tested it successfully not just with certificates containing
+a single CMA otherName, but also:
+
+- a single otherName with a different OID
+- multiple otherNames with a mix of CMA and other OIDs
+- multiple otherNames plus additional unrelated dNSNames
+- no Subject Alternative Name
+
+Getting the IMPLICIT annotations right was a bit nontrivial.
+It turned out that the existing crypto/asymmetric_keys/x509_akid.asn1
+got that wrong as well, so I fixed it up as a byproduct of this series:
+
+https://git.kernel.org/herbert/cryptodev-2.6/c/a1e452026e6d
+
+The debug experience made me appreciate the kernel's ASN.1 compiler
+and parser though:  Their code is surprisingly small, the generated
+output of the compiler is quite readable and the split architecture
+with a compiler+parser feels much safer than what openssl does.
+
+Thanks,
+
+Lukas
