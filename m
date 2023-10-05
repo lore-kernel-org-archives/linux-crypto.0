@@ -2,125 +2,52 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FB8E92720
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Oct 2023 15:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A03E9271B
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Oct 2023 17:29:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236198AbjJEP6C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Oct 2023 11:58:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
+        id S231406AbjJER3r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Oct 2023 13:29:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234417AbjJEP4q (ORCPT
+        with ESMTP id S231789AbjJER3W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Oct 2023 11:56:46 -0400
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5782E9ED4;
-        Thu,  5 Oct 2023 07:04:49 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 7B1A62800BBF3;
-        Thu,  5 Oct 2023 16:04:47 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 662DD4DD3BE; Thu,  5 Oct 2023 16:04:47 +0200 (CEST)
-Date:   Thu, 5 Oct 2023 16:04:47 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 09/12] PCI/CMA: Validate Subject Alternative Name in
- certificates
-Message-ID: <20231005140447.GA23472@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <bc1efd945f5d76587787f8351199e1ea45eaf2ef.1695921657.git.lukas@wunner.de>
- <20231003160455.00001a4f@Huawei.com>
+        Thu, 5 Oct 2023 13:29:22 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0792686;
+        Thu,  5 Oct 2023 10:26:49 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qoLYo-003l8O-IY; Thu, 05 Oct 2023 18:26:27 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 05 Oct 2023 18:26:30 +0800
+Date:   Thu, 5 Oct 2023 18:26:30 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Weili Qian <qianweili@huawei.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liulongfang@huawei.com
+Subject: Re: [PATCH] crypto: hisilicon/qm - fix the type value of aeq
+Message-ID: <ZR6PVvW3P0TSWgik@gondor.apana.org.au>
+References: <20230928092103.49587-1-qianweili@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231003160455.00001a4f@Huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20230928092103.49587-1-qianweili@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 03, 2023 at 04:04:55PM +0100, Jonathan Cameron wrote:
-> On Thu, 28 Sep 2023 19:32:39 +0200 Lukas Wunner <lukas@wunner.de> wrote:
-> > PCIe r6.1 sec 6.31.3 stipulates requirements for X.509 Leaf Certificates
-> > presented by devices, in particular the presence of a Subject Alternative
-> > Name extension with a name that encodes the Vendor ID, Device ID, Device
-> > Serial Number, etc.
+On Thu, Sep 28, 2023 at 05:21:03PM +0800, Weili Qian wrote:
+> The type of aeq has only 4bits in dw0 17 to 20bits, but 15bits(17 to
+> 31bits) are read in function qm_aeq_thread(). The remaining 11bits(21
+> to 31bits) are reserved for aeq, but may not be 0. To avoid getting
+> incorrect value of type, other bits are cleared.
 > 
-> Lets you do any of
-> * What you have here
-> * Reference Integrity Manifest, e.g. see Trusted Computing Group
-> * A pointer to a location where such a Reference Integrity Manifest can be
->   obtained.
-> 
-> So this text feels a little strong though I'm fine with only support the
-> Subject Alternative Name bit for now. Whoever has one of the other options
-> can add that support :)
+> Signed-off-by: Weili Qian <qianweili@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/qm.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-I intend to amend the commit message as follows.  If anyone believes
-this is inaccurate, please let me know:
-
-    Side note:  Instead of a Subject Alternative Name, Leaf Certificates may
-    include "a Reference Integrity Manifest, e.g., see Trusted Computing
-    Group" or "a pointer to a location where such a Reference Integrity
-    Manifest can be obtained" (PCIe r6.1 sec 6.31.3).
-
-    A Reference Integrity Manifest contains "golden" measurements which can
-    be compared to actual measurements retrieved from a device.  It serves a
-    different purpose than the Subject Alternative Name, hence it is unclear
-    why the spec says only either of them is necessary.  It is also unclear
-    how a Reference Integrity Manifest shall be encoded into a certificate.
-
-    Ignore the Reference Integrity Manifest requirement until this confusion
-    is resolved by a spec update.
-
-
-> I haven't looked asn.1 recently enough to have any confidence on
-> a review of that bit...
-> So, for everything except the asn.1
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-
-In case it raises the confidence in that portion of the patch,
-I have tested it successfully not just with certificates containing
-a single CMA otherName, but also:
-
-- a single otherName with a different OID
-- multiple otherNames with a mix of CMA and other OIDs
-- multiple otherNames plus additional unrelated dNSNames
-- no Subject Alternative Name
-
-Getting the IMPLICIT annotations right was a bit nontrivial.
-It turned out that the existing crypto/asymmetric_keys/x509_akid.asn1
-got that wrong as well, so I fixed it up as a byproduct of this series:
-
-https://git.kernel.org/herbert/cryptodev-2.6/c/a1e452026e6d
-
-The debug experience made me appreciate the kernel's ASN.1 compiler
-and parser though:  Their code is surprisingly small, the generated
-output of the compiler is quite readable and the split architecture
-with a compiler+parser feels much safer than what openssl does.
-
-Thanks,
-
-Lukas
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
