@@ -2,134 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1225AE92FFB
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Oct 2023 09:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FA3E936F8
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Oct 2023 11:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbjJFJa3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Oct 2023 05:30:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54214 "EHLO
+        id S231939AbjJFLDp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Oct 2023 07:03:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231373AbjJFJa1 (ORCPT
+        with ESMTP id S231958AbjJFLDo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Oct 2023 05:30:27 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 614CDC6;
-        Fri,  6 Oct 2023 02:30:25 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S23462Dsgz6HJbf;
-        Fri,  6 Oct 2023 17:27:34 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 6 Oct
- 2023 10:30:22 +0100
-Date:   Fri, 6 Oct 2023 10:30:20 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Lukas Wunner <lukas@wunner.de>
-CC:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-Message-ID: <20231006103020.0000174f@Huawei.com>
-In-Reply-To: <20231003193058.GA16417@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
-        <20231003164048.0000148c@Huawei.com>
-        <20231003193058.GA16417@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Fri, 6 Oct 2023 07:03:44 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9931F4;
+        Fri,  6 Oct 2023 04:03:38 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c00e1d4c08so25079471fa.3;
+        Fri, 06 Oct 2023 04:03:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696590217; x=1697195017; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language:subject
+         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z+TRwFSu5xqtCS4GBmrR7m1FXCNdXTVhpoe8UmPcZTw=;
+        b=fEMy6+Mg87KjdAke8wWQ9Ng83cC6weYDRG24sBLa/Aud5O7dLi2HXfs/3YLOD04dDB
+         TNuwFIZuieZQ86uFjXEc3z0DLTxQk+d4nfru+k3/wt7thCfU0HVHKHM0z985CmLCRu75
+         tIwg2WmiJRL/cVfaUF2IjQ/zXhdw5rKuHYXJ0IizY8If+R9zsdJBaJRIggV5q6w6uGme
+         48/U/zqYBIOTBNTMLMg5RscLkRFMGWtsZcC7jKsDN0tvb9w94aCTtt/D6SZasusNqqhz
+         1cWIhLBIZv7pUUVnOqWg9TrA9YaRPv6Q5EfTc6Yg2XiGGV4nPGrfvt6RvTAhzI/LxuUo
+         MsaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696590217; x=1697195017;
+        h=content-transfer-encoding:in-reply-to:from:content-language:subject
+         :references:cc:to:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z+TRwFSu5xqtCS4GBmrR7m1FXCNdXTVhpoe8UmPcZTw=;
+        b=lvzojYqv47VK+pNPJ8ANv4t187R9EV0zSGQxxhufKuaDJFKaGQEe1E/OJd/QH7ifKZ
+         K3ZBznNE7/c60zS7GMfanAw8uSCsU5+SWIvyhqjl1yLPbsadkblTV7rlSMbFySvt10Aq
+         ZVlPzoms4kKNnQWKi6UqKENWHdLJV83rbz42xce2oIgcT2s1+GuRo7LKcFYGt+ANUMPA
+         k6JBx9XoremhUfzjixPlZyc/xp6SyQCKc8HNiCqquScGzB+t5Kmi3qLzwpR4+8JeCjMA
+         IaWdZUGdsGgYgDIt/qoYCtKzo9od0LQPnk30XXOQXG5HnbrnyGALpMC1X6mokJJIJWJf
+         zvLw==
+X-Gm-Message-State: AOJu0YxftroErFa0MsR0aaQQnp8DqupZis5EzcILvv5NYNFAHWE+YVpf
+        E+BwanErd5EkvoN6YVmkPN+lVOUucWQKng==
+X-Google-Smtp-Source: AGHT+IHbJIkrY2O3p6RlIgFAJE8d2tiwnAaepkLjqi+oST9E8RjdFvBeCrjedWjwJRAvUsWAv5tVTQ==
+X-Received: by 2002:ac2:5de2:0:b0:4f8:ff52:93b7 with SMTP id z2-20020ac25de2000000b004f8ff5293b7mr6840655lfq.30.1696590216741;
+        Fri, 06 Oct 2023 04:03:36 -0700 (PDT)
+Received: from [192.168.0.9] (88-114-1-11.elisa-laajakaista.fi. [88.114.1.11])
+        by smtp.gmail.com with ESMTPSA id u7-20020a056512040700b00501ce0cacb6sm259934lfk.188.2023.10.06.04.03.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Oct 2023 04:03:36 -0700 (PDT)
+Message-ID: <48b3624d-ef0c-96e7-ff3d-9f34eb1caad8@gmail.com>
+Date:   Fri, 6 Oct 2023 14:03:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+To:     herbert@gondor.apana.org.au
+Cc:     agk@redhat.com, bagasdotme@gmail.com, dm-devel@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        regressions@lists.linux.dev, snitzer@kernel.org
+References: <ZR9l446ndB4n1Xl4@gondor.apana.org.au>
+Subject: Re: [PATCH] dm crypt: Fix reqsize in crypt_iv_eboiv_gen
+Content-Language: en-US
+From:   =?UTF-8?Q?Tatu_Heikkil=c3=a4?= <tatu.heikkila@gmail.com>
+In-Reply-To: <ZR9l446ndB4n1Xl4@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 3 Oct 2023 21:30:58 +0200
-Lukas Wunner <lukas@wunner.de> wrote:
-
-> On Tue, Oct 03, 2023 at 04:40:48PM +0100, Jonathan Cameron wrote:
-> > On Thu, 28 Sep 2023 19:32:42 +0200 Lukas Wunner <lukas@wunner.de> wrote:  
-> > > At any given time, only a single entity in a physical system may have
-> > > an SPDM connection to a device.  That's because the GET_VERSION request
-> > > (which begins an authentication sequence) resets "the connection and all
-> > > context associated with that connection" (SPDM 1.3.0 margin no 158).
+On Fri, Oct 06, 2023 at 09:41:55 +0800, Herbert Xu wrote:
+>
+> On Fri, Oct 06, 2023 at 08:04:18AM +0700, Bagas Sanjaya wrote:
+> >
+> > > Git bisect lead me to:
+> > > # first bad commit: [e3023094dffb41540330fb0c74cd3a019cd525c2] dm crypt:
+> > > Avoid using MAX_CIPHER_BLOCKSIZE
 > > > 
-> > > Thus, when a device is passed through to a guest and the guest has
-> > > authenticated it, a subsequent authentication by the host would reset
-> > > the device's CMA-SPDM session behind the guest's back.
-> > > 
-> > > Prevent by letting the guest claim exclusive CMA ownership of the device
-> > > during passthrough.  Refuse CMA reauthentication on the host as long.
-> > > After passthrough has concluded, reauthenticate the device on the host.  
-> > 
-> > Is there anything stopping a PF presenting multiple CMA capable DOE
-> > instances?  I'd expect them to have their own contexts if they do..  
+> > > If I git revert e3023094dffb41540330fb0c74cd3a019cd525c2 on current Linus'
+> > > git master, the issue goes away. So I'm personally not all that affected
+> > > anymore (if I'm ready to compile my kernels from now on), and I understand
+> > > that you have no clear way to reproduce this as it seems strongly bound to
+> > > hardware, but seems like this could point to a potentially serious security
+> > > issue since it involves both crypto and undefined behaviour.
 > 
-> The spec does not seem to *explicitly* forbid a PF having multiple
-> CMA-capable DOE instances, but PCIe r6.1 sec 6.31.3 says:
-> "The instance of DOE used for CMA-SPDM must support ..."
-> 
-> Note the singular ("The instance").  It seems to suggest that the
-> spec authors assumed there's only a single DOE instance for CMA-SPDM.
+> Thanks for the report.  Sorry this is indeed my fault.  The allocated
+> buffer is too small as it's missing the size for the request object
+> itself.
 
-It's a little messy and a bit of American vs British English I think.
-If it said
-"The instance of DOE used for a specific CMA-SPDM must support..." 
-then it would clearly allow multiple instances.  However, conversely,
-I don't read that sentence as blocking multiple instances (even though
-I suspect you are right and the author was thinking of there being one).
-
-> 
-> Could you (as an English native speaker) comment on the clarity of the
-> two sentences "Prevent ... as long." above, as Ilpo objected to them?
-> 
-> The antecedent of "Prevent" is the undesirable behaviour in the preceding
-> sentence (host resets guest's SPDM connection).
-> 
-> The antecedent of "as long" is "during passthrough" in the preceding
-> sentence.
-> 
-> Is that clear and understandable for an English native speaker or
-> should I rephrase?
-
-Not clear enough to me as it stands.  That "as long" definitely feels
-like there is more to follow it as Ilpo noted.
-
-Maybe reword as something like 
-
-Prevent this by letting the guest claim exclusive ownership of the device
-during passthrough ensuring problematic CMA reauthentication by the host
-is blocked.
-
-Also combine this with previous paragraph to make the 'this' more obvious
-refer to the problem described in that paragraph.
-
-Jonathan
-
-> 
-> Thanks,
-> 
-> Lukas
-> 
+Thank you for your prompt fix, I can access the volume without issue now. :-)
+-Tatu
 
