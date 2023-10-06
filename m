@@ -2,93 +2,98 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FA3E936F8
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Oct 2023 11:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1BCE81DE0
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Oct 2023 11:34:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231939AbjJFLDp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Oct 2023 07:03:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51486 "EHLO
+        id S231955AbjJFLeS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 Oct 2023 07:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231958AbjJFLDo (ORCPT
+        with ESMTP id S231444AbjJFLeR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Oct 2023 07:03:44 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9931F4;
-        Fri,  6 Oct 2023 04:03:38 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2c00e1d4c08so25079471fa.3;
-        Fri, 06 Oct 2023 04:03:38 -0700 (PDT)
+        Fri, 6 Oct 2023 07:34:17 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 945F283;
+        Fri,  6 Oct 2023 04:34:16 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3af8b4a557dso1295382b6e.0;
+        Fri, 06 Oct 2023 04:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696590217; x=1697195017; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z+TRwFSu5xqtCS4GBmrR7m1FXCNdXTVhpoe8UmPcZTw=;
-        b=fEMy6+Mg87KjdAke8wWQ9Ng83cC6weYDRG24sBLa/Aud5O7dLi2HXfs/3YLOD04dDB
-         TNuwFIZuieZQ86uFjXEc3z0DLTxQk+d4nfru+k3/wt7thCfU0HVHKHM0z985CmLCRu75
-         tIwg2WmiJRL/cVfaUF2IjQ/zXhdw5rKuHYXJ0IizY8If+R9zsdJBaJRIggV5q6w6uGme
-         48/U/zqYBIOTBNTMLMg5RscLkRFMGWtsZcC7jKsDN0tvb9w94aCTtt/D6SZasusNqqhz
-         1cWIhLBIZv7pUUVnOqWg9TrA9YaRPv6Q5EfTc6Yg2XiGGV4nPGrfvt6RvTAhzI/LxuUo
-         MsaA==
+        d=gmail.com; s=20230601; t=1696592056; x=1697196856; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dJsxnKbNCk5+leHeFY97ByEqS+w0KsvjXISdSLAodbo=;
+        b=OhAg2G9Kjkzn/G8ndHZMWchsbx9UHVwQAbNFCbdUNU6he9Y55E+f2Zk0r8yCeQPAGR
+         OuWryjEIO3PUCKxnFbbNrqRh/zPvrVVLqERw01pO7C7lLfULPJh/dGM/pmDzLRV1VWw2
+         GAjyvWs0XiJ4A5mkmt0Xi+z8qJc/jBwzVHQL/dIXT6bexKk+uZRTJLSJ8bdIh5uVxO9x
+         LRtFyitVPSVMGbKp56pfuigJfLE4+EjQh4IyFi2SckYAM3ESVZEP9L0lGwJLCyjqDpwG
+         zT3/mvu41+XMK2qaAIDlw4bAorsBDDl1SY0EnPLYyTGYLEbyMvyKOCF2YbDDEMmHhsSR
+         kv/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696590217; x=1697195017;
-        h=content-transfer-encoding:in-reply-to:from:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z+TRwFSu5xqtCS4GBmrR7m1FXCNdXTVhpoe8UmPcZTw=;
-        b=lvzojYqv47VK+pNPJ8ANv4t187R9EV0zSGQxxhufKuaDJFKaGQEe1E/OJd/QH7ifKZ
-         K3ZBznNE7/c60zS7GMfanAw8uSCsU5+SWIvyhqjl1yLPbsadkblTV7rlSMbFySvt10Aq
-         ZVlPzoms4kKNnQWKi6UqKENWHdLJV83rbz42xce2oIgcT2s1+GuRo7LKcFYGt+ANUMPA
-         k6JBx9XoremhUfzjixPlZyc/xp6SyQCKc8HNiCqquScGzB+t5Kmi3qLzwpR4+8JeCjMA
-         IaWdZUGdsGgYgDIt/qoYCtKzo9od0LQPnk30XXOQXG5HnbrnyGALpMC1X6mokJJIJWJf
-         zvLw==
-X-Gm-Message-State: AOJu0YxftroErFa0MsR0aaQQnp8DqupZis5EzcILvv5NYNFAHWE+YVpf
-        E+BwanErd5EkvoN6YVmkPN+lVOUucWQKng==
-X-Google-Smtp-Source: AGHT+IHbJIkrY2O3p6RlIgFAJE8d2tiwnAaepkLjqi+oST9E8RjdFvBeCrjedWjwJRAvUsWAv5tVTQ==
-X-Received: by 2002:ac2:5de2:0:b0:4f8:ff52:93b7 with SMTP id z2-20020ac25de2000000b004f8ff5293b7mr6840655lfq.30.1696590216741;
-        Fri, 06 Oct 2023 04:03:36 -0700 (PDT)
-Received: from [192.168.0.9] (88-114-1-11.elisa-laajakaista.fi. [88.114.1.11])
-        by smtp.gmail.com with ESMTPSA id u7-20020a056512040700b00501ce0cacb6sm259934lfk.188.2023.10.06.04.03.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Oct 2023 04:03:36 -0700 (PDT)
-Message-ID: <48b3624d-ef0c-96e7-ff3d-9f34eb1caad8@gmail.com>
-Date:   Fri, 6 Oct 2023 14:03:35 +0300
+        d=1e100.net; s=20230601; t=1696592056; x=1697196856;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dJsxnKbNCk5+leHeFY97ByEqS+w0KsvjXISdSLAodbo=;
+        b=Ym5m1XkXM+isBC2RTXl1A29CzYnmjdrlFRlggAtAvPOnFIKP/pq+uyF7gXAWusaQBa
+         oEiDsuh8BWmSy2Gb5fTWiPfeFtpncgWcUt9BiJtm1h0HgxuMpBWocitC7YEmtR1RWV32
+         GXqIhCHOqH1ZzjpB76wDFT6c2QtOVEYhSdGjY78wkMAUN2VGwYBtywADDCqyy26lcdrX
+         xaj8IVF6+RQ06dku4O1g1dzQ+aNENjWUSbERageTISqlJ4RS4kVF0RIMMvlvcD+2Z+g2
+         cT7ai/Ki3t+mAswzcacoG+IqRx4cVGN6tY3GuzNOjt6e/MhPxaBkHyqxglUhrfPu2T2+
+         9z/g==
+X-Gm-Message-State: AOJu0YxbVm0Bl2S7fN21BwGTa1LAOGQy/8caqF5ktwjx4kPUlUQCWZ8J
+        ZIcV1Y23RL1kQMekNoH3LBI1xOhvHxMGkaCM7+I=
+X-Google-Smtp-Source: AGHT+IGAJ3BibdIq1ke5w9ifC5KyliflY6aMcg/KldPfF0vwK+o2On/uXzQwQnujdp9hfWZnytiJ+ut6KHsEX9eTBsE=
+X-Received: by 2002:a05:6358:618c:b0:145:6e16:fa86 with SMTP id
+ w12-20020a056358618c00b001456e16fa86mr9433411rww.22.1696592055772; Fri, 06
+ Oct 2023 04:34:15 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-To:     herbert@gondor.apana.org.au
-Cc:     agk@redhat.com, bagasdotme@gmail.com, dm-devel@redhat.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        regressions@lists.linux.dev, snitzer@kernel.org
-References: <ZR9l446ndB4n1Xl4@gondor.apana.org.au>
-Subject: Re: [PATCH] dm crypt: Fix reqsize in crypt_iv_eboiv_gen
-Content-Language: en-US
-From:   =?UTF-8?Q?Tatu_Heikkil=c3=a4?= <tatu.heikkila@gmail.com>
-In-Reply-To: <ZR9l446ndB4n1Xl4@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230910083418.8990-1-jonas.gorski@gmail.com> <ZQQ2Cv1uL/YVxNBb@gondor.apana.org.au>
+In-Reply-To: <ZQQ2Cv1uL/YVxNBb@gondor.apana.org.au>
+From:   Jonas Gorski <jonas.gorski@gmail.com>
+Date:   Fri, 6 Oct 2023 13:34:04 +0200
+Message-ID: <CAOiHx=nCfU22yd9-KommKMEnKq+VpQROOfKwyb9kbRWzY3azhg@mail.gmail.com>
+Subject: Re: [PATCH] hwrng: geode: fix accessing registers
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Andres Salomon <dilinger@queued.net>,
+        Olivia Mackall <olivia@selenic.com>,
+        Xiongfeng Wang <wangxiongfeng2@huawei.com>,
+        "Timur I . Davletshin" <timur.davletshin@gmail.com>,
+        Jo-Philipp Wich <jo@mein.io>, linux-geode@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 06, 2023 at 09:41:55 +0800, Herbert Xu wrote:
+Hi Herbert,
+
+On Fri, 15 Sept 2023 at 12:46, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> On Fri, Oct 06, 2023 at 08:04:18AM +0700, Bagas Sanjaya wrote:
+> On Sun, Sep 10, 2023 at 10:34:17AM +0200, Jonas Gorski wrote:
+> > When the membase and pci_dev pointer were moved to a new struct in priv,
+> > the actual membase users were left untouched, and they started reading
+> > out arbitrary memory behind the struct instead of registers. This
+> > unfortunately turned the RNG into a constant number generator, depending
+> > on the content of what was at that offset.
 > >
-> > > Git bisect lead me to:
-> > > # first bad commit: [e3023094dffb41540330fb0c74cd3a019cd525c2] dm crypt:
-> > > Avoid using MAX_CIPHER_BLOCKSIZE
-> > > 
-> > > If I git revert e3023094dffb41540330fb0c74cd3a019cd525c2 on current Linus'
-> > > git master, the issue goes away. So I'm personally not all that affected
-> > > anymore (if I'm ready to compile my kernels from now on), and I understand
-> > > that you have no clear way to reproduce this as it seems strongly bound to
-> > > hardware, but seems like this could point to a potentially serious security
-> > > issue since it involves both crypto and undefined behaviour.
-> 
-> Thanks for the report.  Sorry this is indeed my fault.  The allocated
-> buffer is too small as it's missing the size for the request object
-> itself.
+> > To fix this, update geode_rng_data_{read,present}() to also get the
+> > membase via amd_geode_priv, and properly read from the right addresses
+> > again.
+> >
+> > Fixes: 9f6ec8dc574e ("hwrng: geode - Fix PCI device refcount leak")
+> > Reported-by: Timur I. Davletshin <timur.davletshin@gmail.com>
+> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217882
+> > Tested-by: Timur I. Davletshin <timur.davletshin@gmail.com>
+> > Suggested-by: Jo-Philipp Wich <jo@mein.io>
+> > Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> > ---
+> >  drivers/char/hw_random/geode-rng.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> Patch applied.  Thanks.
 
-Thank you for your prompt fix, I can access the volume without issue now. :-)
--Tatu
+Where was it applied? I don't see it neither in linus' tree nor in
+char-misc. Wondering if it got stuck somewhere.
 
+Best Regards,
+Jonas
