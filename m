@@ -2,99 +2,94 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 264C4E93713
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Oct 2023 20:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40848E92FD6
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Oct 2023 01:42:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbjJEUeq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Oct 2023 16:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36608 "EHLO
+        id S229657AbjJFBmA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 Oct 2023 21:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbjJEUep (ORCPT
+        with ESMTP id S229666AbjJFBl6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Oct 2023 16:34:45 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA48793;
-        Thu,  5 Oct 2023 13:34:44 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2C61C433C8;
-        Thu,  5 Oct 2023 20:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696538084;
-        bh=32IWGcl/GhLZ3tegbGVzkBqng/XbsFXjV2W9sDN1IaY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=YxLYOc8GFP90I4Qy7piJ2uW3Mydkjmt+GKzOfIJP1dMkj9hSr6to2W9muxd7RukI/
-         wdHdVqAG61HQqdffBx/9Oz3g4NJDpzaLH63to74WjxZLPEOfo5HrLH3nYB2DviFL49
-         n7JcH3a9NerZVzzBZCNX2LtR/kMHhAzwXqwcmw3QFC39pNzy07rp7NlhuwT9cUQ0iZ
-         U1UhM3GGv+Oh1hCmfMrIDCK3dvC4nEz3iT5cxpulGSRle9wzR0q/yTMnSQUWi8LQLS
-         YYLQe2P3wp5k482GvCK6BW7PqkWC5nMaBdMVm9EVXC9PGyD+IRRpTiSiWVUlaQKQjZ
-         XEy4QwveN7JyQ==
-Date:   Thu, 5 Oct 2023 15:34:42 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Lukas Wunner <lukas@wunner.de>
-Cc:     Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-Message-ID: <20231005203442.GA790578@bhelgaas>
+        Thu, 5 Oct 2023 21:41:58 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3785BE7;
+        Thu,  5 Oct 2023 18:41:57 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qoZqh-0043of-2s; Fri, 06 Oct 2023 09:41:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Oct 2023 09:41:55 +0800
+Date:   Fri, 6 Oct 2023 09:41:55 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     Tatu =?iso-8859-1?Q?Heikkil=E4?= <tatu.heikkila@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Device Mapper <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Linux Regressions <regressions@lists.linux.dev>
+Subject: [PATCH] dm crypt: Fix reqsize in crypt_iv_eboiv_gen
+Message-ID: <ZR9l446ndB4n1Xl4@gondor.apana.org.au>
+References: <f1b8d8f5-2079-537e-9d0f-d58da166fe50@gmail.com>
+ <ZR9dEiXhQv-wBVA2@debian.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231003193058.GA16417@wunner.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZR9dEiXhQv-wBVA2@debian.me>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 03, 2023 at 09:30:58PM +0200, Lukas Wunner wrote:
-> On Tue, Oct 03, 2023 at 04:40:48PM +0100, Jonathan Cameron wrote:
-> > On Thu, 28 Sep 2023 19:32:42 +0200 Lukas Wunner <lukas@wunner.de> wrote:
-> > > At any given time, only a single entity in a physical system may have
-> > > an SPDM connection to a device.  That's because the GET_VERSION request
-> > > (which begins an authentication sequence) resets "the connection and all
-> > > context associated with that connection" (SPDM 1.3.0 margin no 158).
-> > > 
-> > > Thus, when a device is passed through to a guest and the guest has
-> > > authenticated it, a subsequent authentication by the host would reset
-> > > the device's CMA-SPDM session behind the guest's back.
-> > > 
-> > > Prevent by letting the guest claim exclusive CMA ownership of the device
-> > > during passthrough.  Refuse CMA reauthentication on the host as long.
-> > > After passthrough has concluded, reauthenticate the device on the host.
+On Fri, Oct 06, 2023 at 08:04:18AM +0700, Bagas Sanjaya wrote:
+>
+> > Git bisect lead me to:
+> > # first bad commit: [e3023094dffb41540330fb0c74cd3a019cd525c2] dm crypt:
+> > Avoid using MAX_CIPHER_BLOCKSIZE
+> > 
+> > If I git revert e3023094dffb41540330fb0c74cd3a019cd525c2 on current Linus'
+> > git master, the issue goes away. So I'm personally not all that affected
+> > anymore (if I'm ready to compile my kernels from now on), and I understand
+> > that you have no clear way to reproduce this as it seems strongly bound to
+> > hardware, but seems like this could point to a potentially serious security
+> > issue since it involves both crypto and undefined behaviour.
 
-> Could you (as an English native speaker) comment on the clarity of the
-> two sentences "Prevent ... as long." above, as Ilpo objected to them?
-> 
-> The antecedent of "Prevent" is the undesirable behaviour in the preceding
-> sentence (host resets guest's SPDM connection).
+Thanks for the report.  Sorry this is indeed my fault.  The allocated
+buffer is too small as it's missing the size for the request object
+itself.
 
-I think this means "prevent a reauthentication by the host behind the
-guest's back" (which seems to match the first diff hunk), but I agree
-it would be helpful to make the connection clearer, e.g.,
+Mike, would you be OK with me picking this fix up and pushing it to
+Linus?
 
-  When passing a device through to a guest, mark it as "CMA owned
-  exclusively by the guest" for the duration of the passthrough to
-  prevent the host from reauthenticating and resetting the device's
-  CMA-SPDM session.
+Cheers,
 
-> The antecedent of "as long" is "during passthrough" in the preceding
-> sentence.
+---8<---
+A skcipher_request object is made up of struct skcipher_request
+followed by a variable-sized trailer.  The allocation of the
+skcipher_request and IV in crypt_iv_eboiv_gen is missing the
+memory for struct skcipher_request.  Fix it by adding it to
+reqsize.
 
-"as long" definitely needs something to connect it with the
-passthrough.
+Fixes: e3023094dffb ("dm crypt: Avoid using MAX_CIPHER_BLOCKSIZE")
+Reported-by: Tatu Heikkil� <tatu.heikkila@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Bjorn
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index f2662c21a6df..5315fd261c23 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -753,7 +753,8 @@ static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
+ 	int err;
+ 	u8 *buf;
+ 
+-	reqsize = ALIGN(crypto_skcipher_reqsize(tfm), __alignof__(__le64));
++	reqsize = sizeof(*req) + crypto_skcipher_reqsize(tfm);
++	reqsize = ALIGN(reqsize, __alignof__(__le64));
+ 
+ 	req = kmalloc(reqsize + cc->iv_size, GFP_NOIO);
+ 	if (!req)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
