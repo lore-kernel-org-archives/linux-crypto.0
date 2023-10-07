@@ -2,29 +2,29 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF205E95A61
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Oct 2023 10:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E074FE95A68
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Oct 2023 14:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234187AbjJGKEl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 Oct 2023 06:04:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
+        id S233967AbjJGOql (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 7 Oct 2023 10:46:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234148AbjJGKEk (ORCPT
+        with ESMTP id S229824AbjJGOql (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 Oct 2023 06:04:40 -0400
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BED6CE;
-        Sat,  7 Oct 2023 03:04:39 -0700 (PDT)
+        Sat, 7 Oct 2023 10:46:41 -0400
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [IPv6:2a01:37:1000::53df:5f64:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAEABD;
+        Sat,  7 Oct 2023 07:46:39 -0700 (PDT)
 Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
          client-signature RSA-PSS (4096 bits) client-digest SHA256)
         (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout3.hostsharing.net (Postfix) with ESMTPS id 593B6100D587B;
-        Sat,  7 Oct 2023 12:04:33 +0200 (CEST)
+        by bmailout1.hostsharing.net (Postfix) with ESMTPS id 1E54D30008A16;
+        Sat,  7 Oct 2023 16:46:37 +0200 (CEST)
 Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 22C151C0227; Sat,  7 Oct 2023 12:04:33 +0200 (CEST)
-Date:   Sat, 7 Oct 2023 12:04:33 +0200
+        id 0FB56323E8; Sat,  7 Oct 2023 16:46:37 +0200 (CEST)
+Date:   Sat, 7 Oct 2023 16:46:37 +0200
 From:   Lukas Wunner <lukas@wunner.de>
 To:     Dan Williams <dan.j.williams@intel.com>
 Cc:     Bjorn Helgaas <helgaas@kernel.org>,
@@ -46,47 +46,48 @@ Cc:     Bjorn Helgaas <helgaas@kernel.org>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Sean Christopherson <seanjc@google.com>,
         Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 00/12] PCI device authentication
-Message-ID: <20231007100433.GA7596@wunner.de>
+Subject: Re: [PATCH 05/12] crypto: akcipher - Support more than one signature
+ encoding
+Message-ID: <20231007144637.GA11302@wunner.de>
 References: <cover.1695921656.git.lukas@wunner.de>
- <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+ <f4a63091203d09e275c3df983692b630ffca4bca.1695921657.git.lukas@wunner.de>
+ <65205ecfaf11a_ae7e729414@dwillia2-xfh.jf.intel.com.notmuch>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <65205ecfaf11a_ae7e729414@dwillia2-xfh.jf.intel.com.notmuch>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 06, 2023 at 09:06:13AM -0700, Dan Williams wrote:
+On Fri, Oct 06, 2023 at 12:23:59PM -0700, Dan Williams wrote:
 > Lukas Wunner wrote:
-> > The root of trust is initially an in-kernel key ring of certificates.
-> > We can discuss linking the system key ring into it, thereby allowing
-> > EFI to pass trusted certificates to the kernel for CMA.  Alternatively,
-> > a bundle of trusted certificates could be loaded from the initrd.
-> > I envision that we'll add TPMs or remote attestation services such as
-> > https://keylime.dev/ to create an ecosystem of various trust sources.
+> > Currently only a single default signature encoding is supported per
+> > akcipher.
+> > 
+> > A subsequent commit will allow a second encoding for ecdsa, namely P1363
+> > alternatively to X9.62.
+> > 
+> > To accommodate for that, amend struct akcipher_request and struct
+> > crypto_akcipher_sync_data to store the desired signature encoding for
+> > verify and sign ops.
+> > 
+> > Amend akcipher_request_set_crypt(), crypto_sig_verify() and
+> > crypto_sig_sign() with an additional parameter which specifies the
+> > desired signature encoding.  Adjust all callers.
 > 
-> Linux also has an interest in accommodating opt-in to using platform
-> managed keys, so the design requires that key management and session
-> ownership is a system owner policy choice.
+> I can only review this in generic terms, I just wonder why this decided to
+> pass a string rather than an enum?
 
-You're pointing out a gap in the specification:
+The keyctl user space interface passes strings and crypto/algapi.c
+likewise uses strings to identify algorithms.  It appears to be the
+commonly used style in the crypto and keys subsystems.  In particular,
+security/keys/keyctl_pkey.c already uses strings for the signature
+encoding.
 
-There's an existing mechanism to negotiate which PCI features are
-handled natively by the OS and which by platform firmware and that's
-the _OSC Control Field (PCI Firmware Spec r3.3 table 4-5 and 4-6).
-
-There are currently 10 features whose ownership is negotiated with _OSC,
-examples are Hotplug control and DPC configuration control.
-
-I propose adding an 11th bit to negotiate ownership of the CMA-SPDM
-session.
-
-Once that's added to the PCI Firmware Spec, amending the implementation
-to honor it is trivial:  Just check for platform ownership at the top
-of pci_cma_init() and return.
+I just tried to blend in with the existing code.
+Happy to make adjustments if Herbert or David say so.
 
 Thanks,
 
