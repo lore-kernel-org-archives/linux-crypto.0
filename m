@@ -2,93 +2,65 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E074FE95A68
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Oct 2023 14:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E57E95A6A
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Oct 2023 21:34:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233967AbjJGOql (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 Oct 2023 10:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38924 "EHLO
+        id S1344164AbjJGVaa (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 7 Oct 2023 17:30:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbjJGOql (ORCPT
+        with ESMTP id S1344151AbjJGVa3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 Oct 2023 10:46:41 -0400
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [IPv6:2a01:37:1000::53df:5f64:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAEABD;
-        Sat,  7 Oct 2023 07:46:39 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout1.hostsharing.net (Postfix) with ESMTPS id 1E54D30008A16;
-        Sat,  7 Oct 2023 16:46:37 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 0FB56323E8; Sat,  7 Oct 2023 16:46:37 +0200 (CEST)
-Date:   Sat, 7 Oct 2023 16:46:37 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 05/12] crypto: akcipher - Support more than one signature
- encoding
-Message-ID: <20231007144637.GA11302@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <f4a63091203d09e275c3df983692b630ffca4bca.1695921657.git.lukas@wunner.de>
- <65205ecfaf11a_ae7e729414@dwillia2-xfh.jf.intel.com.notmuch>
+        Sat, 7 Oct 2023 17:30:29 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEB393;
+        Sat,  7 Oct 2023 14:30:28 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8909BC433C7;
+        Sat,  7 Oct 2023 21:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696714226;
+        bh=Asz0kAidCXdNyyjv78EuXEU55dPMW7DudgwPSZhas6E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HwD0qETWEV32uLd4myrJ5IuHQOxSxdlVbVAZFGkf/rc4k32PZ+RIsXJvFVsj36EDd
+         vjtq9t4jCqIDAKZdQbSCkQJze33sKcrTtUBqTcLJV4oivoEJFtZnHQ+o5P8vsbLzbW
+         bHjwP7XGKXEk8CzQIJYtpPnNAxfFDNbVqwwh7/AlbhhTvlOMyhleZHeQ+9mB/SXedl
+         KXGNBdAkdp80l9X7BDsdyszpoYALJerhjrZHNRFhGXEKmYHLC+vH27r5Mk9/VTCFoi
+         PcRPf1Iy/Cd+zp77R+W7UiHm9zArFB1JoAddHzobd7LhhXeRGZspOO3ibPs66h8aKX
+         pMl3gz0i6ILEg==
+Date:   Sat, 7 Oct 2023 14:30:23 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     He-Jie Shih <bignose1007@gmail.com>
+Cc:     Charlie Jenkins <charlie@rivosinc.com>,
+        Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        christoph.muellner@vrull.eu,
+        Heiko Stuebner <heiko.stuebner@vrull.eu>
+Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
+Message-ID: <20231007213023.GB174883@sol.localdomain>
+References: <20230711153743.1970625-1-heiko@sntech.de>
+ <20230914001144.GA924@sol.localdomain>
+ <ZQJdnCwf99Glggin@ghost>
+ <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
+ <DD3113B1-AB9F-4D6D-BD6E-8F75A83DA45D@sifive.com>
+ <20231006194741.GA68531@google.com>
+ <7BC51820-61BC-422C-A2F7-B68CE679972C@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <65205ecfaf11a_ae7e729414@dwillia2-xfh.jf.intel.com.notmuch>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <7BC51820-61BC-422C-A2F7-B68CE679972C@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 06, 2023 at 12:23:59PM -0700, Dan Williams wrote:
-> Lukas Wunner wrote:
-> > Currently only a single default signature encoding is supported per
-> > akcipher.
-> > 
-> > A subsequent commit will allow a second encoding for ecdsa, namely P1363
-> > alternatively to X9.62.
-> > 
-> > To accommodate for that, amend struct akcipher_request and struct
-> > crypto_akcipher_sync_data to store the desired signature encoding for
-> > verify and sign ops.
-> > 
-> > Amend akcipher_request_set_crypt(), crypto_sig_verify() and
-> > crypto_sig_sign() with an additional parameter which specifies the
-> > desired signature encoding.  Adjust all callers.
-> 
-> I can only review this in generic terms, I just wonder why this decided to
-> pass a string rather than an enum?
+On Sat, Oct 07, 2023 at 05:01:45AM +0800, He-Jie Shih wrote:
+> Reply-To: 20231006194741.GA68531@google.com
+> X-Mailer: Apple Mail (2.3445.9.7)
 
-The keyctl user space interface passes strings and crypto/algapi.c
-likewise uses strings to identify algorithms.  It appears to be the
-commonly used style in the crypto and keys subsystems.  In particular,
-security/keys/keyctl_pkey.c already uses strings for the signature
-encoding.
+Can you please fix your email client configuration?  Your emails have a bogus
+Reply-To header, which makes replies not be sent to you by default.
 
-I just tried to blend in with the existing code.
-Happy to make adjustments if Herbert or David say so.
-
-Thanks,
-
-Lukas
+- Eric
