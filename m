@@ -2,191 +2,524 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7BFE95A6B
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Oct 2023 22:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F93CE95A8F
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 Oct 2023 04:03:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344168AbjJGWQM (ORCPT
+        id S1344342AbjJHEDF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 Oct 2023 18:16:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56864 "EHLO
+        Sun, 8 Oct 2023 00:03:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344151AbjJGWQL (ORCPT
+        with ESMTP id S1344309AbjJHEDE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 Oct 2023 18:16:11 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E14D9F;
-        Sat,  7 Oct 2023 15:16:10 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFD9C433C7;
-        Sat,  7 Oct 2023 22:16:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696716969;
-        bh=jxeYH0Vp6GKZ73eOXD963bZzBieH2C5SDVp050HzZ60=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=j/xlcuRxhAtsMxnJF5JD8IFMDXb548B+dLuG4Gu43b+0o6HqV/Efv4JhtbjBUkZD+
-         T5slG3ZwFc+vnbZj7lZfWgl26mIfVnFXDN2iNnFokUZAXLJGp0BtMfq8MMfInqEbur
-         3ZeNjNILTAuPfDX4VlLdPw4JEyIyvuiy2kXM4uDa6e5Ls0P3snLsDZvNWjm4X8LOmP
-         EF0KsAyFJnUMc/dEWlB0ZFakwzfAjscVsVPq6gBhc79gsnUebWWbA1es9OZkHfVJL+
-         a4vhq1AbUQ38bFD/91YRyqZJAlqtaJwI2vsFTN8xDP6xERbY+Z0k2gd5t64Ny10w28
-         4hoOehSjGIjGA==
-Date:   Sat, 7 Oct 2023 15:16:07 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     He-Jie Shih <bignose1007@gmail.com>,
-        Charlie Jenkins <charlie@rivosinc.com>,
-        Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, aou@eecs.berkeley.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        conor.dooley@microchip.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        christoph.muellner@vrull.eu,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v4 00/12] RISC-V: support some cryptography accelerations
-Message-ID: <20231007221607.GC174883@sol.localdomain>
-References: <20230711153743.1970625-1-heiko@sntech.de>
- <20230914001144.GA924@sol.localdomain>
- <ZQJdnCwf99Glggin@ghost>
- <3A0F6A71-C521-44A5-A56C-076AF3E13897@gmail.com>
- <DD3113B1-AB9F-4D6D-BD6E-8F75A83DA45D@sifive.com>
- <20231006194741.GA68531@google.com>
- <7BC51820-61BC-422C-A2F7-B68CE679972C@gmail.com>
- <CAMj1kXF-m3pYs6u=Xhf5F-Kgmuu8Az1Q6WP86vWqFnVphVSmkg@mail.gmail.com>
+        Sun, 8 Oct 2023 00:03:04 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620F0B9
+        for <linux-crypto@vger.kernel.org>; Sat,  7 Oct 2023 21:03:00 -0700 (PDT)
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 385EC3F637
+        for <linux-crypto@vger.kernel.org>; Sun,  8 Oct 2023 04:02:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1696737779;
+        bh=KNUhb7JfPoH/ZWd2y0jzmFcfaGuuwfFJNUXkv3vQhWQ=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=UT01icadwSleJUL8VbuJfHg+F4TNj3qQY7y1Xw6mXpOHWzfHrCleFu6OPHlPZMbaw
+         kNzZpDwsH6ZfHOHAeVJPcvcbYAq5XjsdX1HfwctoqtPeco73FoYLUhEtrjdmoRoBwZ
+         yd9uP5xvchbdkYqeRBaJqx1lek//bjHGEPaaJGMHtmuqdtLqkso/TgvNIxnqON2eFw
+         s5fI5HWvRaH58s95oLVYZIxEn6aOsuAoktYFuQUgkTGMVHrxj9qNYhGumQoo1oc1sP
+         Wr6ybBadGVkP0G53PG+InifTpXwBr2xvryRug4lIolBuYHBVdfiPF8/V/9jSttMvEN
+         Sb3gdyG7Tg3Ww==
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-402cd372b8bso25138425e9.2
+        for <linux-crypto@vger.kernel.org>; Sat, 07 Oct 2023 21:02:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696737778; x=1697342578;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KNUhb7JfPoH/ZWd2y0jzmFcfaGuuwfFJNUXkv3vQhWQ=;
+        b=dRPA+k3b/KM0ozRTucnY+tdFuiSmDLuiyedwWKwBkKg0UgsYygzGmmFKAGbac8/gTs
+         TlcahF9gE0wGx7qtMn9dzbY+kNKuDnyo+7fhkj3Kk8i75ylh9aVG1ZZ79FKxCqq5crKe
+         uz0Vv/1D252YdK9DFmIQvUKPHrk9ZPMp1zME6hrHDuymCsx4aBivfS8n3Jlorem9cUFj
+         johWrHJ8QD2nGuA0Q2BPPNYh1ihTDom7Mq9MC7T4kSGTiLh49g2C/5EpGSISRIPuNMLZ
+         RClbZCaMfkn0zTGyFxgt7r9k5T17jkKShsNrrIGEa0R2Z55AwZmsfnAW+HcTHOIhszUr
+         j5LA==
+X-Gm-Message-State: AOJu0YwRHXKns2WxLIDe6YbQDrXUUaWRxHnYUAIyjDyE9TS+M7mDzDJq
+        seTfSZ753By2gdlFOCfSypiBKxA8yfPUx3owbjC0A5p/IiN/r85gOP6vQdTw5420vVrT7uj7aMJ
+        XxdC4XI4RIvUqZyKN5E8i7YVCrfzH8ducud2NQANHYw==
+X-Received: by 2002:a1c:7705:0:b0:401:d947:c8a3 with SMTP id t5-20020a1c7705000000b00401d947c8a3mr10648512wmi.32.1696737778131;
+        Sat, 07 Oct 2023 21:02:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFSvtG29oiLOEwKEsBKoW5UzWmZ7ubq/JEAeObxG3cARx+kUXH4sJxWlAl/2jQLCpv3nwdJfQ==
+X-Received: by 2002:a1c:7705:0:b0:401:d947:c8a3 with SMTP id t5-20020a1c7705000000b00401d947c8a3mr10648499wmi.32.1696737777512;
+        Sat, 07 Oct 2023 21:02:57 -0700 (PDT)
+Received: from localhost ([2001:67c:1560:8007::aac:c15c])
+        by smtp.gmail.com with ESMTPSA id h9-20020a5d5489000000b003179d5aee67sm5756839wrv.94.2023.10.07.21.02.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Oct 2023 21:02:57 -0700 (PDT)
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] crypto: remove md4 driver
+Date:   Sun,  8 Oct 2023 05:01:39 +0100
+Message-Id: <20231008040140.1647892-1-dimitri.ledkov@canonical.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXF-m3pYs6u=Xhf5F-Kgmuu8Az1Q6WP86vWqFnVphVSmkg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 07, 2023 at 01:33:48AM +0200, Ard Biesheuvel wrote:
-> On Fri, 6 Oct 2023 at 23:01, He-Jie Shih <bignose1007@gmail.com> wrote:
-> >
-> > On Oct 7, 2023, at 03:47, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > On Fri, Sep 15, 2023 at 11:21:28AM +0800, Jerry Shih wrote:
-> > >> On Sep 15, 2023, at 09:48, He-Jie Shih <bignose1007@gmail.com> wrote:
-> > >> The OpenSSL PR is at [1].
-> > >> And we are from SiFive.
-> > >>
-> > >> -Jerry
-> > >>
-> > >> [1]
-> > >> https://github.com/openssl/openssl/pull/21923
-> > >
-> > > Hi Jerry, I'm wondering if you have an update on this?  Do you need any help?
-> >
-> > We have specialized aes-cbc/ecb/ctr patch locally and pass the `testmgr` test
-> > cases. But the test patterns in `testmgr` are quite simple, I think it doesn't test the
-> > corner case(e.g. aes-xts with tail element).
-> >
-> 
-> There should be test cases for that.
+No internal users left and cryptographically insecure. Users should
+upgrade to something else, e.g. sha256 blake3.
 
-Yes, non-block-aligned AES-XTS test vectors should be added to crypto/testmgr.h.
-Though, that case should be already covered by the randomized tests enabled by
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y, which I very strongly recommend enabling
-during development.
+Some drivers have their own full or partial md4 implementation without
+using crypto/md4.
 
-> 
-> > For aes-xts, I'm trying to update the implementation from OpenSSL. The design
-> > philosophy is different between OpenSSL and linux. In linux crypto, the data will
-> > be split into `scatterlist`. I need to preserve the aes-xts's iv for each scatterlist
-> > entry call.
-> 
-> Yes, this applies to all block ciphers that take an IV.
-> 
-> > And I'm thinking about how to handle the tail data in a simple way.
-> 
-> The RISC-V vector ISA is quite advanced, so there may be a better
-> trick using predicates etc but otherwise, I suppose you could reuse
-> the same trick that other asm implementations use, which is to use
-> unaligned loads and stores for the final blocks, and to use a vector
-> permute with a permute table to shift the bytes in the registers. But
-> this is not performance critical, given that existing in-kernel users
-> use sector or page size inputs only.
-> 
-> > By the way, the `xts(aes)` implementation for arm and x86 are using
-> > `cra_blocksize= AES_BLOCK_SIZE`. I don't know why we need to handle the tail
-> > element. I think we will hit `EINVAL` error in `skcipher_walk_next()` if the data size
-> > it not be a multiple of block size.
-> >
-> 
-> No, both XTS and CBC-CTS permit inputs that are not a multiple of the
-> block size, and will use some form of ciphertext stealing for the
-> final tail. There is a generic CTS template that wraps CBC but
-> combining them in the same way (e.g., using vector permute) will speed
-> up things substantially. *However*, I'm not sure how relevant CBC-CTS
-> is in the kernel, given that only fscrypt uses it IIRC but actually
-> prefers something else so for new systems perhaps you shouldn't
-> bother.
-> 
-> > Overall, we will have
-> > 1) aes cipher
-> > 2) aes with cbc/ecb/ctr/xts mode
-> > 3) sha256/512 for `vlen>=128` platform
-> > 4) sm3 for `vlen>=128` platform
-> > 5) sm4
-> > 6) ghash
-> > 7) `chacha20` stream cipher
-> >
-> > The vector crypto pr in OpenSSL is under reviewing, we are still updating the
-> > perl file into linux.
-> >
-> > The most complicated `gcm(aes)` mode will be in our next plan.
-> >
-> > > I'm also wondering about riscv.pm and the choice of generating the crypto
-> > > instructions from .words instead of using the assembler.  It makes it
-> > > significantly harder to review the code, IMO.  Can we depend on assembler
-> > > support for these instructions, or is that just not ready yet?
-> >
-> > I have asked the same question before[1]. The reason is that Openssl could use
-> > very old compiler for compiling. Thus, the assembler might not know the standard
-> > rvv 1.0[2] and other vector crypto[3] instructions. That's why we use opcode for all
-> > vector instructions. IMO, I would prefer to use opcode for `vector crypto` only. The
-> > gcc-12 and clang-14 are already supporting rvv 1.0. Actually, I just read the `perl`
-> > file instead of the actually generated opcode for OpenSSL pr reviewing. And it's
-> > not hard to read the perl code.
-> >
-> 
-> I understand the desire to reuse code, and OpenSSL already relies on
-> so-called perlasm for this, but I think this is not a great choice,
-> and I actually think this was a mistake for RISC-V. OpenSSL relies on
-> perlasm for things like emittting different function pro-/epilogues
-> depending on the calling convention (SysV versus MS on x86_64, for
-> instance), but RISC-V does not have that much variety, and already
-> supports the insn_r / insn_i pseudo instructions to emit arbitrary
-> opcodes while still supporting named registers as usual. [Maybe my
-> experience does not quite extrapolate to the vector ISA, but I managed
-> to implement scalar AES [0] using the insn_r and insn_i pseudo
-> instructions (which are generally provided by the assembler but Linux
-> has fallback CPP macros for them as well), and this results on much
-> more maintainable code IMO.[
-> 
-> We are using some of the OpenSSL perlasm in the kernel already (and
-> some of it was introduced by me) but I don't think we should blindly
-> reuse all of the RISC-V code if  some of it can straight-forwardly be
-> written as normal .S files.
-> 
-> [0] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=riscv-scalar-aes
+Userspace code search indicates a few copies of hash_info.h
+https://codesearch.debian.net/search?q=HASH_ALGO_MD4&literal=1 without
+need for MD4.
 
-I'm not a huge fan of perlasm either.  Normal .S files can be much easier to
-understand, and they do still support basic features like macros.  (Of course,
-this only works if the .S file is the real source code.  If the real source code
-is the perlasm, dumping it to a .S file doesn't make it more readable.)
+Preserve uapi hash algorithm indexes and array length, but rename the
+MD4 enum.
 
-Ultimately, it needs to decided on an algorithm-by-algorithm basis whether it
-makes sense to use the .pl file directly from OpenSSL or write a normal .S file.
-Sharing code can save time, but it can also waste time if/when things don't
-match up and need to be changed for the kernel anyway.  If you look at the other
-architectures, sharing the OpenSSL .pl file is most common for Poly1305 and
-SHA-2.  It's rarer for AES modes.
+Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+---
+ crypto/Kconfig                 |   6 -
+ crypto/Makefile                |   1 -
+ crypto/hash_info.c             |   4 +-
+ crypto/md4.c                   | 241 ---------------------------------
+ crypto/tcrypt.c                |  12 --
+ crypto/testmgr.c               |   6 -
+ crypto/testmgr.h               |  42 ------
+ include/uapi/linux/hash_info.h |   2 +-
+ 8 files changed, 3 insertions(+), 311 deletions(-)
+ delete mode 100644 crypto/md4.c
 
-In any case, regardless of .pl or .S, it would be nice to rely on the assembler
-for the mapping from readable instruction to 32-bit words.  Yes, I understand
-that the algorithm code reads mostly the some either way, but it introduces
-nonstandard notation (e.g. due to having to avoid the period character) and a
-possibility for error.  It's not the 1940s anymore; we should be able to have an
-assembler.  Why not make OpenSSL and Linux only enable this code when the
-assembler supports it?  Note that Linux already does this for many of the x86
-extensions, so there is precedent for this; see arch/x86/Kconfig.assembler.
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 650b1b3620..7d293a1ae8 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -946,12 +946,6 @@ config CRYPTO_HMAC
+ 
+ 	  This is required for IPsec AH (XFRM_AH) and IPsec ESP (XFRM_ESP).
+ 
+-config CRYPTO_MD4
+-	tristate "MD4"
+-	select CRYPTO_HASH
+-	help
+-	  MD4 message digest algorithm (RFC1320)
+-
+ config CRYPTO_MD5
+ 	tristate "MD5"
+ 	select CRYPTO_HASH
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 953a7e105e..67473c6fd1 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -72,7 +72,6 @@ obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+ obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
+ obj-$(CONFIG_CRYPTO_XCBC) += xcbc.o
+ obj-$(CONFIG_CRYPTO_NULL2) += crypto_null.o
+-obj-$(CONFIG_CRYPTO_MD4) += md4.o
+ obj-$(CONFIG_CRYPTO_MD5) += md5.o
+ obj-$(CONFIG_CRYPTO_RMD160) += rmd160.o
+ obj-$(CONFIG_CRYPTO_SHA1) += sha1_generic.o
+diff --git a/crypto/hash_info.c b/crypto/hash_info.c
+index a49ff96bde..7591ab8d48 100644
+--- a/crypto/hash_info.c
++++ b/crypto/hash_info.c
+@@ -9,7 +9,7 @@
+ #include <crypto/hash_info.h>
+ 
+ const char *const hash_algo_name[HASH_ALGO__LAST] = {
+-	[HASH_ALGO_MD4]		= "md4",
++	[__REMOVED_HASH_ALGO_MD4] = "",
+ 	[HASH_ALGO_MD5]		= "md5",
+ 	[HASH_ALGO_SHA1]	= "sha1",
+ 	[HASH_ALGO_RIPE_MD_160]	= "rmd160",
+@@ -33,7 +33,7 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
+ EXPORT_SYMBOL_GPL(hash_algo_name);
+ 
+ const int hash_digest_size[HASH_ALGO__LAST] = {
+-	[HASH_ALGO_MD4]		= MD5_DIGEST_SIZE,
++	[__REMOVED_HASH_ALGO_MD4] = 0,
+ 	[HASH_ALGO_MD5]		= MD5_DIGEST_SIZE,
+ 	[HASH_ALGO_SHA1]	= SHA1_DIGEST_SIZE,
+ 	[HASH_ALGO_RIPE_MD_160]	= RMD160_DIGEST_SIZE,
+diff --git a/crypto/md4.c b/crypto/md4.c
+deleted file mode 100644
+index 2e7f2f319f..0000000000
+--- a/crypto/md4.c
++++ /dev/null
+@@ -1,241 +0,0 @@
+-/* 
+- * Cryptographic API.
+- *
+- * MD4 Message Digest Algorithm (RFC1320).
+- *
+- * Implementation derived from Andrew Tridgell and Steve French's
+- * CIFS MD4 implementation, and the cryptoapi implementation
+- * originally based on the public domain implementation written
+- * by Colin Plumb in 1993.
+- *
+- * Copyright (c) Andrew Tridgell 1997-1998.
+- * Modified by Steve French (sfrench@us.ibm.com) 2002
+- * Copyright (c) Cryptoapi developers.
+- * Copyright (c) 2002 David S. Miller (davem@redhat.com)
+- * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- */
+-#include <crypto/internal/hash.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/string.h>
+-#include <linux/types.h>
+-#include <asm/byteorder.h>
+-
+-#define MD4_DIGEST_SIZE		16
+-#define MD4_HMAC_BLOCK_SIZE	64
+-#define MD4_BLOCK_WORDS		16
+-#define MD4_HASH_WORDS		4
+-
+-struct md4_ctx {
+-	u32 hash[MD4_HASH_WORDS];
+-	u32 block[MD4_BLOCK_WORDS];
+-	u64 byte_count;
+-};
+-
+-static inline u32 lshift(u32 x, unsigned int s)
+-{
+-	x &= 0xFFFFFFFF;
+-	return ((x << s) & 0xFFFFFFFF) | (x >> (32 - s));
+-}
+-
+-static inline u32 F(u32 x, u32 y, u32 z)
+-{
+-	return (x & y) | ((~x) & z);
+-}
+-
+-static inline u32 G(u32 x, u32 y, u32 z)
+-{
+-	return (x & y) | (x & z) | (y & z);
+-}
+-
+-static inline u32 H(u32 x, u32 y, u32 z)
+-{
+-	return x ^ y ^ z;
+-}
+-
+-#define ROUND1(a,b,c,d,k,s) (a = lshift(a + F(b,c,d) + k, s))
+-#define ROUND2(a,b,c,d,k,s) (a = lshift(a + G(b,c,d) + k + (u32)0x5A827999,s))
+-#define ROUND3(a,b,c,d,k,s) (a = lshift(a + H(b,c,d) + k + (u32)0x6ED9EBA1,s))
+-
+-static void md4_transform(u32 *hash, u32 const *in)
+-{
+-	u32 a, b, c, d;
+-
+-	a = hash[0];
+-	b = hash[1];
+-	c = hash[2];
+-	d = hash[3];
+-
+-	ROUND1(a, b, c, d, in[0], 3);
+-	ROUND1(d, a, b, c, in[1], 7);
+-	ROUND1(c, d, a, b, in[2], 11);
+-	ROUND1(b, c, d, a, in[3], 19);
+-	ROUND1(a, b, c, d, in[4], 3);
+-	ROUND1(d, a, b, c, in[5], 7);
+-	ROUND1(c, d, a, b, in[6], 11);
+-	ROUND1(b, c, d, a, in[7], 19);
+-	ROUND1(a, b, c, d, in[8], 3);
+-	ROUND1(d, a, b, c, in[9], 7);
+-	ROUND1(c, d, a, b, in[10], 11);
+-	ROUND1(b, c, d, a, in[11], 19);
+-	ROUND1(a, b, c, d, in[12], 3);
+-	ROUND1(d, a, b, c, in[13], 7);
+-	ROUND1(c, d, a, b, in[14], 11);
+-	ROUND1(b, c, d, a, in[15], 19);
+-
+-	ROUND2(a, b, c, d,in[ 0], 3);
+-	ROUND2(d, a, b, c, in[4], 5);
+-	ROUND2(c, d, a, b, in[8], 9);
+-	ROUND2(b, c, d, a, in[12], 13);
+-	ROUND2(a, b, c, d, in[1], 3);
+-	ROUND2(d, a, b, c, in[5], 5);
+-	ROUND2(c, d, a, b, in[9], 9);
+-	ROUND2(b, c, d, a, in[13], 13);
+-	ROUND2(a, b, c, d, in[2], 3);
+-	ROUND2(d, a, b, c, in[6], 5);
+-	ROUND2(c, d, a, b, in[10], 9);
+-	ROUND2(b, c, d, a, in[14], 13);
+-	ROUND2(a, b, c, d, in[3], 3);
+-	ROUND2(d, a, b, c, in[7], 5);
+-	ROUND2(c, d, a, b, in[11], 9);
+-	ROUND2(b, c, d, a, in[15], 13);
+-
+-	ROUND3(a, b, c, d,in[ 0], 3);
+-	ROUND3(d, a, b, c, in[8], 9);
+-	ROUND3(c, d, a, b, in[4], 11);
+-	ROUND3(b, c, d, a, in[12], 15);
+-	ROUND3(a, b, c, d, in[2], 3);
+-	ROUND3(d, a, b, c, in[10], 9);
+-	ROUND3(c, d, a, b, in[6], 11);
+-	ROUND3(b, c, d, a, in[14], 15);
+-	ROUND3(a, b, c, d, in[1], 3);
+-	ROUND3(d, a, b, c, in[9], 9);
+-	ROUND3(c, d, a, b, in[5], 11);
+-	ROUND3(b, c, d, a, in[13], 15);
+-	ROUND3(a, b, c, d, in[3], 3);
+-	ROUND3(d, a, b, c, in[11], 9);
+-	ROUND3(c, d, a, b, in[7], 11);
+-	ROUND3(b, c, d, a, in[15], 15);
+-
+-	hash[0] += a;
+-	hash[1] += b;
+-	hash[2] += c;
+-	hash[3] += d;
+-}
+-
+-static inline void md4_transform_helper(struct md4_ctx *ctx)
+-{
+-	le32_to_cpu_array(ctx->block, ARRAY_SIZE(ctx->block));
+-	md4_transform(ctx->hash, ctx->block);
+-}
+-
+-static int md4_init(struct shash_desc *desc)
+-{
+-	struct md4_ctx *mctx = shash_desc_ctx(desc);
+-
+-	mctx->hash[0] = 0x67452301;
+-	mctx->hash[1] = 0xefcdab89;
+-	mctx->hash[2] = 0x98badcfe;
+-	mctx->hash[3] = 0x10325476;
+-	mctx->byte_count = 0;
+-
+-	return 0;
+-}
+-
+-static int md4_update(struct shash_desc *desc, const u8 *data, unsigned int len)
+-{
+-	struct md4_ctx *mctx = shash_desc_ctx(desc);
+-	const u32 avail = sizeof(mctx->block) - (mctx->byte_count & 0x3f);
+-
+-	mctx->byte_count += len;
+-
+-	if (avail > len) {
+-		memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
+-		       data, len);
+-		return 0;
+-	}
+-
+-	memcpy((char *)mctx->block + (sizeof(mctx->block) - avail),
+-	       data, avail);
+-
+-	md4_transform_helper(mctx);
+-	data += avail;
+-	len -= avail;
+-
+-	while (len >= sizeof(mctx->block)) {
+-		memcpy(mctx->block, data, sizeof(mctx->block));
+-		md4_transform_helper(mctx);
+-		data += sizeof(mctx->block);
+-		len -= sizeof(mctx->block);
+-	}
+-
+-	memcpy(mctx->block, data, len);
+-
+-	return 0;
+-}
+-
+-static int md4_final(struct shash_desc *desc, u8 *out)
+-{
+-	struct md4_ctx *mctx = shash_desc_ctx(desc);
+-	const unsigned int offset = mctx->byte_count & 0x3f;
+-	char *p = (char *)mctx->block + offset;
+-	int padding = 56 - (offset + 1);
+-
+-	*p++ = 0x80;
+-	if (padding < 0) {
+-		memset(p, 0x00, padding + sizeof (u64));
+-		md4_transform_helper(mctx);
+-		p = (char *)mctx->block;
+-		padding = 56;
+-	}
+-
+-	memset(p, 0, padding);
+-	mctx->block[14] = mctx->byte_count << 3;
+-	mctx->block[15] = mctx->byte_count >> 29;
+-	le32_to_cpu_array(mctx->block, (sizeof(mctx->block) -
+-	                  sizeof(u64)) / sizeof(u32));
+-	md4_transform(mctx->hash, mctx->block);
+-	cpu_to_le32_array(mctx->hash, ARRAY_SIZE(mctx->hash));
+-	memcpy(out, mctx->hash, sizeof(mctx->hash));
+-	memset(mctx, 0, sizeof(*mctx));
+-
+-	return 0;
+-}
+-
+-static struct shash_alg alg = {
+-	.digestsize	=	MD4_DIGEST_SIZE,
+-	.init		=	md4_init,
+-	.update		=	md4_update,
+-	.final		=	md4_final,
+-	.descsize	=	sizeof(struct md4_ctx),
+-	.base		=	{
+-		.cra_name	 =	"md4",
+-		.cra_driver_name =	"md4-generic",
+-		.cra_blocksize	 =	MD4_HMAC_BLOCK_SIZE,
+-		.cra_module	 =	THIS_MODULE,
+-	}
+-};
+-
+-static int __init md4_mod_init(void)
+-{
+-	return crypto_register_shash(&alg);
+-}
+-
+-static void __exit md4_mod_fini(void)
+-{
+-	crypto_unregister_shash(&alg);
+-}
+-
+-subsys_initcall(md4_mod_init);
+-module_exit(md4_mod_fini);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("MD4 Message Digest Algorithm");
+-MODULE_ALIAS_CRYPTO("md4");
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 202ca1a310..22fde782d4 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1487,10 +1487,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		ret = min(ret, tcrypt_test("ctr(des3_ede)"));
+ 		break;
+ 
+-	case 5:
+-		ret = min(ret, tcrypt_test("md4"));
+-		break;
+-
+ 	case 6:
+ 		ret = min(ret, tcrypt_test("sha256"));
+ 		break;
+@@ -2228,10 +2224,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 			break;
+ 		}
+ 		fallthrough;
+-	case 301:
+-		test_hash_speed("md4", sec, generic_hash_speed_template);
+-		if (mode > 300 && mode < 400) break;
+-		fallthrough;
+ 	case 302:
+ 		test_hash_speed("md5", sec, generic_hash_speed_template);
+ 		if (mode > 300 && mode < 400) break;
+@@ -2336,10 +2328,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 			break;
+ 		}
+ 		fallthrough;
+-	case 401:
+-		test_ahash_speed("md4", sec, generic_hash_speed_template);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+ 	case 402:
+ 		test_ahash_speed("md5", sec, generic_hash_speed_template);
+ 		if (mode > 400 && mode < 500) break;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 216878c8bc..7b1e4cf0fb 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5399,12 +5399,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 				.decomp = __VECS(lzorle_decomp_tv_template)
+ 			}
+ 		}
+-	}, {
+-		.alg = "md4",
+-		.test = alg_test_hash,
+-		.suite = {
+-			.hash = __VECS(md4_tv_template)
+-		}
+ 	}, {
+ 		.alg = "md5",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 5ca7a41250..3cfe91e2d1 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -4402,48 +4402,6 @@ static const struct kpp_testvec ecdh_p384_tv_template[] = {
+ 	}
+ };
+ 
+-/*
+- * MD4 test vectors from RFC1320
+- */
+-static const struct hash_testvec md4_tv_template[] = {
+-	{
+-		.plaintext = "",
+-		.digest	= "\x31\xd6\xcf\xe0\xd1\x6a\xe9\x31"
+-			  "\xb7\x3c\x59\xd7\xe0\xc0\x89\xc0",
+-	}, {
+-		.plaintext = "a",
+-		.psize	= 1,
+-		.digest	= "\xbd\xe5\x2c\xb3\x1d\xe3\x3e\x46"
+-			  "\x24\x5e\x05\xfb\xdb\xd6\xfb\x24",
+-	}, {
+-		.plaintext = "abc",
+-		.psize	= 3,
+-		.digest	= "\xa4\x48\x01\x7a\xaf\x21\xd8\x52"
+-			  "\x5f\xc1\x0a\xe8\x7a\xa6\x72\x9d",
+-	}, {
+-		.plaintext = "message digest",
+-		.psize	= 14,
+-		.digest	= "\xd9\x13\x0a\x81\x64\x54\x9f\xe8"
+-			"\x18\x87\x48\x06\xe1\xc7\x01\x4b",
+-	}, {
+-		.plaintext = "abcdefghijklmnopqrstuvwxyz",
+-		.psize	= 26,
+-		.digest	= "\xd7\x9e\x1c\x30\x8a\xa5\xbb\xcd"
+-			  "\xee\xa8\xed\x63\xdf\x41\x2d\xa9",
+-	}, {
+-		.plaintext = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+-		.psize	= 62,
+-		.digest	= "\x04\x3f\x85\x82\xf2\x41\xdb\x35"
+-			  "\x1c\xe6\x27\xe1\x53\xe7\xf0\xe4",
+-	}, {
+-		.plaintext = "123456789012345678901234567890123456789012345678901234567890123"
+-			   "45678901234567890",
+-		.psize	= 80,
+-		.digest	= "\xe3\x3b\x4d\xdc\x9c\x38\xf2\x19"
+-			  "\x9c\x3e\x7b\x16\x4f\xcc\x05\x36",
+-	},
+-};
+-
+ static const struct hash_testvec sha3_224_tv_template[] = {
+ 	{
+ 		.plaintext = "",
+diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
+index 74a8609fcb..c8500e9c88 100644
+--- a/include/uapi/linux/hash_info.h
++++ b/include/uapi/linux/hash_info.h
+@@ -15,7 +15,7 @@
+ #define _UAPI_LINUX_HASH_INFO_H
+ 
+ enum hash_algo {
+-	HASH_ALGO_MD4,
++	__REMOVED_HASH_ALGO_MD4, /* deprecated and removed */
+ 	HASH_ALGO_MD5,
+ 	HASH_ALGO_SHA1,
+ 	HASH_ALGO_RIPE_MD_160,
+-- 
+2.34.1
 
-- Eric 
