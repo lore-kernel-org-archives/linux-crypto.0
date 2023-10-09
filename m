@@ -2,116 +2,93 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3869E95A96
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 07:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E39E95A91
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 07:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345414AbjJIHc7 (ORCPT
+        id S1345393AbjJIHjg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Oct 2023 03:32:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56878 "EHLO
+        Mon, 9 Oct 2023 03:39:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345374AbjJIHc6 (ORCPT
+        with ESMTP id S1345391AbjJIHje (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Oct 2023 03:32:58 -0400
+        Mon, 9 Oct 2023 03:39:34 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B123C5
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 00:32:57 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB434C433CA
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 07:32:56 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFF9B8F
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 00:39:33 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14D9CC433C8
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 07:39:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696836776;
-        bh=kEoFp/FJCQU3tv7T+Sz+gSZdAkoL7AjRu/2pmjuhGNY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=F+aamyx8PvoAbfxAiwJozZjCVHt7zRjUzjzpQjDrrAKsZcFzSBm6DI0RTR4jkhwNG
-         lreLIL9rec0xeKZnfrvuxKP0EPGcij4pV6R+2E8HUyhQ0OnueQKCqb3a6gTCbGRclF
-         Pvx4uWJIUp+Ek3jRdoq5Z+otwO8jcarz52oSTw28TLuYPMS7vjr9BWoEOXrlHb6svj
-         dewmj63AmqsEJAK30DlEA6kULF8sjpiJQccTFEqag+3ofRV/e8DRvW7KNyAhb0v3KM
-         UVkCg0yE1O7gQRW8PWjH2qKt0YKgC8HggxDgSNWJ2Qu5bRAljrMX3DKRdHYqX/dHI1
-         UcI3MrAm6ig1w==
+        s=k20201202; t=1696837173;
+        bh=6gmkf3r8EIroqh78FvTO1bF3f2O0oPmF3+XjE3OaQ74=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=I7NbGhT00L0mXH4pnAyx+5uwKuLb7+2qVlRNsp3k6M/6zJtI0rAZPUbQ2jtIcXIXN
+         kycejeCnstWnuvQYI8MbMcvoglzWb5Rkdqfmhp8/3mGY9G2mg0nf06hfdn1Pz8HXw0
+         aUWblnvsSIpdlpaU4b29gRWzN6lDG3Ndqr5Ll70RbOTDeprqgY1Be6ZKY1i5kKSK7u
+         ZJctqFxEl2CQO0/BLNEw/jYDzAg+MS6E62n5I83UDo7LDFJbsBXdFJhqmz9i/byiqx
+         Y0pxTqY2z9PcI1yo17/To9CJsSvlu2oJBZ4y7gRnuuWkRqLsRM6oDIrCuV19S17ckl
+         4DpUYAZbD28rQ==
+Date:   Mon, 9 Oct 2023 00:39:31 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 2/2] crypto: shash - fold shash_digest_unaligned() into crypto_shash_digest()
-Date:   Mon,  9 Oct 2023 00:32:14 -0700
-Message-ID: <20231009073214.423279-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231009073214.423279-1-ebiggers@kernel.org>
-References: <20231009073214.423279-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] crypto: xts - use 'spawn' for underlying single-block
+ cipher
+Message-ID: <20231009073931.GB279961@sol.localdomain>
+References: <20231009023116.266210-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009023116.266210-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Sun, Oct 08, 2023 at 07:31:16PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Since commit adad556efcdd ("crypto: api - Fix built-in testing
+> dependency failures"), the following warning appears when booting an
+> x86_64 kernel that is configured with
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y and CONFIG_CRYPTO_AES_NI_INTEL=y,
+> even when CONFIG_CRYPTO_XTS=y and CONFIG_CRYPTO_AES=y:
+> 
+>     alg: skcipher: skipping comparison tests for xts-aes-aesni because xts(ecb(aes-generic)) is unavailable
+> 
+> This is caused by an issue in the xts template where it allocates an
+> "aes" single-block cipher without declaring a dependency on it via the
+> crypto_spawn mechanism.  This issue was exposed by the above commit
+> because it reversed the order that the algorithms are tested in.
+> 
+> Specifically, when "xts(ecb(aes-generic))" is instantiated and tested
+> during the comparison tests for "xts-aes-aesni", the "xts" template
+> allocates an "aes" crypto_cipher for encrypting tweaks.  This resolves
+> to "aes-aesni".  (Getting "aes-aesni" instead of "aes-generic" here is a
+> bit weird, but it's apparently intended.)  Due to the above-mentioned
+> commit, the testing of "aes-aesni", and the finalization of its
+> registration, now happens at this point instead of before.  At the end
+> of that, crypto_remove_spawns() unregisters all algorithm instances that
+> depend on a lower-priority "aes" implementation such as "aes-generic"
+> but that do not depend on "aes-aesni".  However, because "xts" does not
+> use the crypto_spawn mechanism for its "aes", its dependency on
+> "aes-aesni" is not recognized by crypto_remove_spawns().  Thus,
+> crypto_remove_spawns() unexpectedly unregisters "xts(ecb(aes-generic))".
+> 
+> Fix this issue by making the "xts" template use the crypto_spawn
+> mechanism for its "aes" dependency, like what other templates do.
+> 
+> Note, this fix could be applied as far back as commit f1c131b45410
+> ("crypto: xts - Convert to skcipher").  However, the issue only got
+> exposed by the much more recent changes to how the crypto API runs the
+> self-tests, so there should be no need to backport this to very old
+> kernels.  Also, an alternative fix would be to flip the list iteration
+> order in crypto_start_tests() to restore the original testing order.
+> I'm thinking we should do that too, since the original order seems more
+> natural, but it shouldn't be relied on for correctness.
+> 
+> Fixes: adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Fold shash_digest_unaligned() into its only remaining caller.  Also,
-avoid a redundant check of CRYPTO_TFM_NEED_KEY by replacing the call to
-crypto_shash_init() with shash->init(desc).  Finally, replace
-shash_update_unaligned() + shash_final_unaligned() with
-shash_finup_unaligned() which does exactly that.
+BTW, I noticed that the essiv template has this problem too.  It shows up when
+essiv-cbc-aes-sha256-ce is tested on arm64.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/shash.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
-
-diff --git a/crypto/shash.c b/crypto/shash.c
-index d99dc2f94c65f..15fee57cca8ef 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -218,28 +218,20 @@ int crypto_shash_finup(struct shash_desc *desc, const u8 *data,
- 	if (((unsigned long)data | (unsigned long)out) & alignmask)
- 		err = shash_finup_unaligned(desc, data, len, out);
- 	else
- 		err = shash->finup(desc, data, len, out);
- 
- 
- 	return crypto_shash_errstat(shash, err);
- }
- EXPORT_SYMBOL_GPL(crypto_shash_finup);
- 
--static int shash_digest_unaligned(struct shash_desc *desc, const u8 *data,
--				  unsigned int len, u8 *out)
--{
--	return crypto_shash_init(desc) ?:
--	       shash_update_unaligned(desc, data, len) ?:
--	       shash_final_unaligned(desc, out);
--}
--
- static int shash_default_digest(struct shash_desc *desc, const u8 *data,
- 				unsigned int len, u8 *out)
- {
- 	struct shash_alg *shash = crypto_shash_alg(desc->tfm);
- 
- 	return shash->init(desc) ?:
- 	       shash->finup(desc, data, len, out);
- }
- 
- int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
-@@ -253,21 +245,22 @@ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
- 	if (IS_ENABLED(CONFIG_CRYPTO_STATS)) {
- 		struct crypto_istat_hash *istat = shash_get_stat(shash);
- 
- 		atomic64_inc(&istat->hash_cnt);
- 		atomic64_add(len, &istat->hash_tlen);
- 	}
- 
- 	if (crypto_shash_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		err = -ENOKEY;
- 	else if (((unsigned long)data | (unsigned long)out) & alignmask)
--		err = shash_digest_unaligned(desc, data, len, out);
-+		err = shash->init(desc) ?:
-+		      shash_finup_unaligned(desc, data, len, out);
- 	else
- 		err = shash->digest(desc, data, len, out);
- 
- 	return crypto_shash_errstat(shash, err);
- }
- EXPORT_SYMBOL_GPL(crypto_shash_digest);
- 
- int crypto_shash_tfm_digest(struct crypto_shash *tfm, const u8 *data,
- 			    unsigned int len, u8 *out)
- {
--- 
-2.42.0
-
+- Eric
