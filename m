@@ -2,38 +2,40 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 213B2E95A8D
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 03:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E10C2E95A8E
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 07:33:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344903AbjJIDiL (ORCPT
+        id S1345410AbjJIHc7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Oct 2023 23:38:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45166 "EHLO
+        Mon, 9 Oct 2023 03:32:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344883AbjJIDiK (ORCPT
+        with ESMTP id S1345404AbjJIHc6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Oct 2023 23:38:10 -0400
+        Mon, 9 Oct 2023 03:32:58 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5002A6
-        for <linux-crypto@vger.kernel.org>; Sun,  8 Oct 2023 20:38:08 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37565C433C7
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 03:38:08 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131C9AB
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 00:32:57 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A88DBC433C9
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 07:32:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696822688;
-        bh=ssIT4Vm/KGYqFgJZJ1yWO0WqF3j4d8xmTaeaMKMJaXA=;
-        h=From:To:Subject:Date:From;
-        b=XBlQ9vqeED7qU6NxsEbkpKcZRVe7NXzzOrPmyvRh54qH+9KNn6XjZI5rc/mA+T8qV
-         dIkb2y8BW/KqINdnJ/5FjaSzEZGfj1iB3sUn+03DV0jfFaP64Mg0fxDYCvkcsCsAYX
-         ayyl9VXvjwgAIA23Xwv1ih2M9XXPaTlBkwu3zSFcRf55fG5fJKoZN+ZdYV8L7VC3nd
-         X+eHKnlfsP7XFwewk/barvwbE6paoPHrurLlAsmBI+9lC8FHgrCCHC7LaO4ugb/g1Q
-         SoCV7wA9Yka0RKij8+e5UDO9BGfgzBe6+YQin353rPoAT6Kn+yp1WIKou2/v6S+ap3
-         4KPSWlg+Xyu2w==
+        s=k20201202; t=1696836776;
+        bh=366zidm3mI4N6QjzW8Mm0yy828Fc1fuBFssIf3ZfewI=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=GSkrcuvI9bJINX0ihHArxm0wOswmAmVMJF2P28wMo0KO/rSn06i+tx/828uF3t5lS
+         AcxyTbT79CiqlOYBgoRnwrTR0EXqZ8svpayCdQ2kxJjx8kFHbaZPc1VNv0fDWejs6o
+         HziMwwKhPz4jc1RevYIHtgXQmj53hQBFmdqeMy7TFF2YawVLyY9GwheBZ+G23fggXn
+         /Fz1AmE55w7pCKR/B8XNZShuUKJeEeJwT2vimp6L/wFTG8gqn+EEmwZg/CSxodW2GC
+         tvr33COZaxhNrwb1iaQBlfBCGT4Ltz6AdAKBR6rTLza/Y1wi+eJZZGYbGdUBilFgAq
+         7MjKhetJ3/0Gw==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: skcipher - fix weak key check for lskciphers
-Date:   Sun,  8 Oct 2023 20:37:50 -0700
-Message-ID: <20231009033750.279307-1-ebiggers@kernel.org>
+Subject: [PATCH 1/2] crypto: shash - optimize the default digest and finup
+Date:   Mon,  9 Oct 2023 00:32:13 -0700
+Message-ID: <20231009073214.423279-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231009073214.423279-1-ebiggers@kernel.org>
+References: <20231009073214.423279-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -42,87 +44,117 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-When an algorithm of the new "lskcipher" type is exposed through the
-"skcipher" API, calls to crypto_skcipher_setkey() don't pass on the
-CRYPTO_TFM_REQ_FORBID_WEAK_KEYS flag to the lskcipher.  This causes
-self-test failures for ecb(des), as weak keys are not rejected anymore.
-Fix this.
+For an shash algorithm that doesn't implement ->digest, currently
+crypto_shash_digest() with aligned input makes 5 indirect calls: 1 to
+shash_digest_unaligned(), 1 to ->init, 2 to ->update ('alignmask + 1'
+bytes, then the rest), then 1 to ->final.  This is true even if the
+algorithm implements ->finup.  This is caused by an unnecessary fallback
+to code meant to handle unaligned inputs.  In fact,
+crypto_shash_digest() already does the needed alignment check earlier.
+Therefore, optimize the number of indirect calls for aligned inputs to 3
+when the algorithm implements ->finup.  It remains at 5 when the
+algorithm implements neither ->finup nor ->digest.
 
-Fixes: 31865c4c4db2 ("crypto: skcipher - Add lskcipher")
+Similarly, for an shash algorithm that doesn't implement ->finup,
+currently crypto_shash_finup() with aligned input makes 4 indirect
+calls: 1 to shash_finup_unaligned(), 2 to ->update, and
+1 to ->final.  Optimize this to 3 calls.
+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/lskcipher.c | 8 --------
- crypto/skcipher.c  | 8 +++++++-
- 2 files changed, 7 insertions(+), 9 deletions(-)
+ crypto/shash.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
-index 9be3c04bc62a3..6e11badaa1035 100644
---- a/crypto/lskcipher.c
-+++ b/crypto/lskcipher.c
-@@ -187,28 +187,20 @@ int crypto_lskcipher_decrypt(struct crypto_lskcipher *tfm, const u8 *src,
- 		struct crypto_istat_cipher *istat = lskcipher_get_stat(alg);
- 
- 		atomic64_inc(&istat->decrypt_cnt);
- 		atomic64_add(len, &istat->decrypt_tlen);
- 	}
- 
- 	return crypto_lskcipher_crypt(tfm, src, dst, len, iv, alg->decrypt);
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 1fadb6b59bdcc..d99dc2f94c65f 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -184,20 +184,29 @@ int crypto_shash_final(struct shash_desc *desc, u8 *out)
  }
- EXPORT_SYMBOL_GPL(crypto_lskcipher_decrypt);
+ EXPORT_SYMBOL_GPL(crypto_shash_final);
  
--int crypto_lskcipher_setkey_sg(struct crypto_skcipher *tfm, const u8 *key,
--			       unsigned int keylen)
--{
--	struct crypto_lskcipher **ctx = crypto_skcipher_ctx(tfm);
--
--	return crypto_lskcipher_setkey(*ctx, key, keylen);
--}
--
- static int crypto_lskcipher_crypt_sg(struct skcipher_request *req,
- 				     int (*crypt)(struct crypto_lskcipher *tfm,
- 						  const u8 *src, u8 *dst,
- 						  unsigned len, u8 *iv,
- 						  bool final))
+ static int shash_finup_unaligned(struct shash_desc *desc, const u8 *data,
+ 				 unsigned int len, u8 *out)
  {
- 	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
- 	struct crypto_lskcipher **ctx = crypto_skcipher_ctx(skcipher);
- 	struct crypto_lskcipher *tfm = *ctx;
- 	struct skcipher_walk walk;
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index b9496dc8a609f..ac8b8c0426542 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -614,21 +614,27 @@ static int skcipher_setkey_unaligned(struct crypto_skcipher *tfm,
+ 	return shash_update_unaligned(desc, data, len) ?:
+ 	       shash_final_unaligned(desc, out);
  }
  
- int crypto_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			   unsigned int keylen)
++static int shash_default_finup(struct shash_desc *desc, const u8 *data,
++			       unsigned int len, u8 *out)
++{
++	struct shash_alg *shash = crypto_shash_alg(desc->tfm);
++
++	return shash->update(desc, data, len) ?:
++	       shash->final(desc, out);
++}
++
+ int crypto_shash_finup(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len, u8 *out)
  {
- 	struct skcipher_alg *cipher = crypto_skcipher_alg(tfm);
- 	unsigned long alignmask = crypto_skcipher_alignmask(tfm);
+ 	struct crypto_shash *tfm = desc->tfm;
+ 	struct shash_alg *shash = crypto_shash_alg(tfm);
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
  	int err;
  
- 	if (cipher->co.base.cra_type != &crypto_skcipher_type) {
--		err = crypto_lskcipher_setkey_sg(tfm, key, keylen);
-+		struct crypto_lskcipher **ctx = crypto_skcipher_ctx(tfm);
-+
-+		crypto_lskcipher_clear_flags(*ctx, CRYPTO_TFM_REQ_MASK);
-+		crypto_lskcipher_set_flags(*ctx,
-+					   crypto_skcipher_get_flags(tfm) &
-+					   CRYPTO_TFM_REQ_MASK);
-+		err = crypto_lskcipher_setkey(*ctx, key, keylen);
- 		goto out;
- 	}
+ 	if (IS_ENABLED(CONFIG_CRYPTO_STATS)) {
+ 		struct crypto_istat_hash *istat = shash_get_stat(shash);
+@@ -217,20 +226,29 @@ int crypto_shash_finup(struct shash_desc *desc, const u8 *data,
+ EXPORT_SYMBOL_GPL(crypto_shash_finup);
  
- 	if (keylen < cipher->min_keysize || keylen > cipher->max_keysize)
+ static int shash_digest_unaligned(struct shash_desc *desc, const u8 *data,
+ 				  unsigned int len, u8 *out)
+ {
+ 	return crypto_shash_init(desc) ?:
+ 	       shash_update_unaligned(desc, data, len) ?:
+ 	       shash_final_unaligned(desc, out);
+ }
+ 
++static int shash_default_digest(struct shash_desc *desc, const u8 *data,
++				unsigned int len, u8 *out)
++{
++	struct shash_alg *shash = crypto_shash_alg(desc->tfm);
++
++	return shash->init(desc) ?:
++	       shash->finup(desc, data, len, out);
++}
++
+ int crypto_shash_digest(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len, u8 *out)
+ {
+ 	struct crypto_shash *tfm = desc->tfm;
+ 	struct shash_alg *shash = crypto_shash_alg(tfm);
+ 	unsigned long alignmask = crypto_shash_alignmask(tfm);
+ 	int err;
+ 
+ 	if (IS_ENABLED(CONFIG_CRYPTO_STATS)) {
+ 		struct crypto_istat_hash *istat = shash_get_stat(shash);
+@@ -649,23 +667,23 @@ static int shash_prepare_alg(struct shash_alg *alg)
  		return -EINVAL;
  
- 	if ((unsigned long)key & alignmask)
- 		err = skcipher_setkey_unaligned(tfm, key, keylen);
- 	else
- 		err = cipher->setkey(tfm, key, keylen);
-
-base-commit: 8468516f9f93a41dc65158b6428a1a1039c68f20
+ 	err = hash_prepare_alg(&alg->halg);
+ 	if (err)
+ 		return err;
+ 
+ 	base->cra_type = &crypto_shash_type;
+ 	base->cra_flags |= CRYPTO_ALG_TYPE_SHASH;
+ 
+ 	if (!alg->finup)
+-		alg->finup = shash_finup_unaligned;
++		alg->finup = shash_default_finup;
+ 	if (!alg->digest)
+-		alg->digest = shash_digest_unaligned;
++		alg->digest = shash_default_digest;
+ 	if (!alg->export) {
+ 		alg->export = shash_default_export;
+ 		alg->import = shash_default_import;
+ 		alg->halg.statesize = alg->descsize;
+ 	}
+ 	if (!alg->setkey)
+ 		alg->setkey = shash_no_setkey;
+ 
+ 	return 0;
+ }
 -- 
 2.42.0
 
