@@ -2,130 +2,120 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1717E95A91
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 11:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A227EE95A8E
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 12:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346308AbjJILdm (ORCPT
+        id S1346412AbjJIMCm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Oct 2023 07:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42000 "EHLO
+        Mon, 9 Oct 2023 08:02:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346227AbjJILdl (ORCPT
+        with ESMTP id S1346349AbjJIMCk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Oct 2023 07:33:41 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4848594;
-        Mon,  9 Oct 2023 04:33:40 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S3xjq4l38z6K918;
-        Mon,  9 Oct 2023 19:33:19 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 9 Oct
- 2023 12:33:36 +0100
-Date:   Mon, 9 Oct 2023 12:33:35 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Lukas Wunner <lukas@wunner.de>
-CC:     Dan Williams <dan.j.williams@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Alexey Kardashevskiy <aik@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 00/12] PCI device authentication
-Message-ID: <20231009123335.00006d3d@Huawei.com>
-In-Reply-To: <20231007100433.GA7596@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
-        <20231007100433.GA7596@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Mon, 9 Oct 2023 08:02:40 -0400
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E6F94;
+        Mon,  9 Oct 2023 05:02:38 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3997geT5019817;
+        Mon, 9 Oct 2023 14:02:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=Ooh4/yFf2JrfwSnSbYFLoguRGY36sVafq2HkIA5SYLU=; b=AJ
+        2z5BLPOcyLWbr1PZ/gTxyvfnaYiryLmKpeGdAx/avu12n162KReV1M+NCElLCssi
+        LGCMcQNb0vkumr0vnFQwbaBRpIxUrhrP52PSMKVBJC2IGXkkYKsLHsHWMprHpDoW
+        PkbtGQG4jujNBM7PvL5n+Jjb6hCo1BHr/7r0jMcZon/UK6qNDjaHecSIs7wr932H
+        kW8LfByqRARtPG4BMAqBsmFGd2rSEPyXM1a4R1i+IC4M5mRODRcFIvYkWi0YsWGP
+        IZ5KAKPW8dZUgkW0/58ywmdFlA9I3pQHBfnHHM48QwjyExmtUomOKew4UCtFbCmp
+        cliaoWKvGQICaNMfW4Sg==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tkhfdw1n8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Oct 2023 14:02:14 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B85D610005E;
+        Mon,  9 Oct 2023 14:02:11 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id AF5B5233C9B;
+        Mon,  9 Oct 2023 14:02:11 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 9 Oct
+ 2023 14:02:10 +0200
+Message-ID: <5bd1a669-9eab-717f-6f58-0ecb4587cf22@foss.st.com>
+Date:   Mon, 9 Oct 2023 14:02:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 0/9] hwrng: stm32: support STM32MP13x platforms
+Content-Language: en-US
+To:     Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>
+CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
+From:   Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-09_11,2023-10-09_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 7 Oct 2023 12:04:33 +0200
-Lukas Wunner <lukas@wunner.de> wrote:
+Hi
 
-> On Fri, Oct 06, 2023 at 09:06:13AM -0700, Dan Williams wrote:
-> > Lukas Wunner wrote:  
-> > > The root of trust is initially an in-kernel key ring of certificates.
-> > > We can discuss linking the system key ring into it, thereby allowing
-> > > EFI to pass trusted certificates to the kernel for CMA.  Alternatively,
-> > > a bundle of trusted certificates could be loaded from the initrd.
-> > > I envision that we'll add TPMs or remote attestation services such as
-> > > https://keylime.dev/ to create an ecosystem of various trust sources.  
-> > 
-> > Linux also has an interest in accommodating opt-in to using platform
-> > managed keys, so the design requires that key management and session
-> > ownership is a system owner policy choice.  
+On 9/21/23 10:02, Gatien Chevallier wrote:
+> The STM32MP13x platforms have a RNG hardware block that supports
+> customization, a conditional reset sequences that allows to
+> recover from certain situations and a configuration locking
+> mechanism.
 > 
-> You're pointing out a gap in the specification:
+> This series adds support for the mentionned features. Note that
+> the hardware RNG can and should be managed in the secure world
+> for this platform, hence the rng not being default enabled on
+> the STM32MP135F-DK board.
 > 
-> There's an existing mechanism to negotiate which PCI features are
-> handled natively by the OS and which by platform firmware and that's
-> the _OSC Control Field (PCI Firmware Spec r3.3 table 4-5 and 4-6).
+> Changes in V2:
+> 	- Use pm_ptr() and add __maybe_unused on PM API
+> 	- Correct bug using WARN_ON
 > 
-> There are currently 10 features whose ownership is negotiated with _OSC,
-> examples are Hotplug control and DPC configuration control.
+> Changes in V3:
+> 	- Squash of bindings patches
+> 	- st,rng-lock-conf property declaration rework
+> 	- Fix stm32_rng_pm_ops declaration in patch [5/9]
 > 
-> I propose adding an 11th bit to negotiate ownership of the CMA-SPDM
-> session.
+> Gatien Chevallier (9):
+>    dt-bindings: rng: introduce new compatible for STM32MP13x
+>    hwrng: stm32 - use devm_platform_get_and_ioremap_resource() API
+>    hwrng: stm32 - implement STM32MP13x support
+>    hwrng: stm32 - implement error concealment
+>    hwrng: stm32 - rework error handling in stm32_rng_read()
+>    hwrng: stm32 - restrain RNG noise source clock
+>    hwrng: stm32 - support RNG configuration locking mechanism
+>    hwrng: stm32 - rework power management sequences
+>    ARM: dts: stm32: add RNG node for STM32MP13x platforms
 > 
-> Once that's added to the PCI Firmware Spec, amending the implementation
-> to honor it is trivial:  Just check for platform ownership at the top
-> of pci_cma_init() and return.
-
-This might want to be a control over the specific DOE instance instead
-of a general purpose CMA control (or maybe we want both).
-
-There is no safe way to access a DOE to find out if it supports CMA
-that doesn't potentially break another entity using the mailbox.
-Given the DOE instances might be for something entirely different we
-can't just decide not to use them at all based on a global control.
-
-Any such control becomes messy when hotplug is taken into account.
-I suppose we could do a _DSM based on BDF / path to device (to remain
-stable across reenumeration) and config space offset to allow the OS
-to say 'Hi other entity / firmware are you using this DOE instance?"
-Kind of an OSC with parameters.  Also includes the other way around that
-the question tells the firmware that if it says "no you can't" the OS
-will leave it alone until a reboot or similar - that potentially avoids
-the problem that we access DOE instances already without taking care
-about this (I dropped ball on this having raised it way back near start
-of us adding DOE support.)
-
-If we do want to do any of these, which spec is appropriate?  Link it to PCI
-and propose a PCI firmware spec update? (not sure they have a code
-first process available) or make it somewhat generic and propose an
-ACPI Code first change?
-
-Jonathan
-
-> 
-> Thanks,
-> 
-> Lukas
-> 
+>   .../devicetree/bindings/rng/st,stm32-rng.yaml |  20 +-
+>   arch/arm/boot/dts/st/stm32mp131.dtsi          |   8 +
+>   drivers/char/hw_random/stm32-rng.c            | 511 +++++++++++++++---
+>   3 files changed, 455 insertions(+), 84 deletions(-)
 > 
 
+Patch[9] applied on stm32-next.
+
+thanks
+alex
