@@ -2,120 +2,89 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A227EE95A8E
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 12:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D81B2E95A91
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 12:27:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346412AbjJIMCm (ORCPT
+        id S1346437AbjJIM1f (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Oct 2023 08:02:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43122 "EHLO
+        Mon, 9 Oct 2023 08:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346349AbjJIMCk (ORCPT
+        with ESMTP id S1346402AbjJIM1e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Oct 2023 08:02:40 -0400
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E6F94;
-        Mon,  9 Oct 2023 05:02:38 -0700 (PDT)
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3997geT5019817;
-        Mon, 9 Oct 2023 14:02:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:subject:to:cc:references:from
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=Ooh4/yFf2JrfwSnSbYFLoguRGY36sVafq2HkIA5SYLU=; b=AJ
-        2z5BLPOcyLWbr1PZ/gTxyvfnaYiryLmKpeGdAx/avu12n162KReV1M+NCElLCssi
-        LGCMcQNb0vkumr0vnFQwbaBRpIxUrhrP52PSMKVBJC2IGXkkYKsLHsHWMprHpDoW
-        PkbtGQG4jujNBM7PvL5n+Jjb6hCo1BHr/7r0jMcZon/UK6qNDjaHecSIs7wr932H
-        kW8LfByqRARtPG4BMAqBsmFGd2rSEPyXM1a4R1i+IC4M5mRODRcFIvYkWi0YsWGP
-        IZ5KAKPW8dZUgkW0/58ywmdFlA9I3pQHBfnHHM48QwjyExmtUomOKew4UCtFbCmp
-        cliaoWKvGQICaNMfW4Sg==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tkhfdw1n8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Oct 2023 14:02:14 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B85D610005E;
-        Mon,  9 Oct 2023 14:02:11 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id AF5B5233C9B;
-        Mon,  9 Oct 2023 14:02:11 +0200 (CEST)
-Received: from [10.201.21.122] (10.201.21.122) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 9 Oct
- 2023 14:02:10 +0200
-Message-ID: <5bd1a669-9eab-717f-6f58-0ecb4587cf22@foss.st.com>
-Date:   Mon, 9 Oct 2023 14:02:10 +0200
+        Mon, 9 Oct 2023 08:27:34 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7888E
+        for <linux-crypto@vger.kernel.org>; Mon,  9 Oct 2023 05:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696854452; x=1728390452;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=C1oWo43CK5r4gdmmcsGi90GjGWOFeME/hJfkXElOKys=;
+  b=V139Re5KgKH0qNVuHIR3T/+AvwitgjZUyYwWNVFKF6PVcUNeldm3oZPb
+   RCcRoheEeATl/dvXLqM6whNLGF3hPsFYjwpIIOwqHBPqRXEgCtyFv8Xvb
+   fs8yKeFFrM+rAsNS97A07dTKYdozXfo1RMdR/2eukpB+92xe5SUb2A98b
+   ylJ8uk6F59IB7INHF2ynNO36PLkIXZwdBoLVAYujHbqAEdLMZ1cvI5ptl
+   ja8pU01UCPF0SvlwPfdqoboEnMG020f2Ct6eH7Wz0aRuUMTqlbRQZnJGo
+   3DT6SPxtmLECrSequq1mGeKJ5EIGUxzFNPmfOCIhL29yISPt4j23XvWNa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="450628895"
+X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
+   d="scan'208";a="450628895"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 05:27:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="823317447"
+X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
+   d="scan'208";a="823317447"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
+  by fmsmga004.fm.intel.com with ESMTP; 09 Oct 2023 05:27:29 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix double free during reset
+Date:   Mon,  9 Oct 2023 13:27:19 +0100
+Message-ID: <20231009122723.35136-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v3 0/9] hwrng: stm32: support STM32MP13x platforms
-Content-Language: en-US
-To:     Gatien Chevallier <gatien.chevallier@foss.st.com>,
-        Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>
-CC:     Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
-From:   Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20230921080301.253563-1-gatien.chevallier@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.122]
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-09_11,2023-10-09_01,2023-05-22_02
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+From: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
 
-On 9/21/23 10:02, Gatien Chevallier wrote:
-> The STM32MP13x platforms have a RNG hardware block that supports
-> customization, a conditional reset sequences that allows to
-> recover from certain situations and a configuration locking
-> mechanism.
-> 
-> This series adds support for the mentionned features. Note that
-> the hardware RNG can and should be managed in the secure world
-> for this platform, hence the rng not being default enabled on
-> the STM32MP135F-DK board.
-> 
-> Changes in V2:
-> 	- Use pm_ptr() and add __maybe_unused on PM API
-> 	- Correct bug using WARN_ON
-> 
-> Changes in V3:
-> 	- Squash of bindings patches
-> 	- st,rng-lock-conf property declaration rework
-> 	- Fix stm32_rng_pm_ops declaration in patch [5/9]
-> 
-> Gatien Chevallier (9):
->    dt-bindings: rng: introduce new compatible for STM32MP13x
->    hwrng: stm32 - use devm_platform_get_and_ioremap_resource() API
->    hwrng: stm32 - implement STM32MP13x support
->    hwrng: stm32 - implement error concealment
->    hwrng: stm32 - rework error handling in stm32_rng_read()
->    hwrng: stm32 - restrain RNG noise source clock
->    hwrng: stm32 - support RNG configuration locking mechanism
->    hwrng: stm32 - rework power management sequences
->    ARM: dts: stm32: add RNG node for STM32MP13x platforms
-> 
->   .../devicetree/bindings/rng/st,stm32-rng.yaml |  20 +-
->   arch/arm/boot/dts/st/stm32mp131.dtsi          |   8 +
->   drivers/char/hw_random/stm32-rng.c            | 511 +++++++++++++++---
->   3 files changed, 455 insertions(+), 84 deletions(-)
-> 
+There is no need to free the reset_data structure if the recovery is
+unsuccessful and the reset is synchronous. The function
+adf_dev_aer_schedule_reset() handles the cleanup properly. Only
+asynchronous resets require such structure to be freed inside the reset
+worker.
 
-Patch[9] applied on stm32-next.
+Fixes: d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
+Signed-off-by: Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-thanks
-alex
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+index 04af32a2811c..a39e70bd4b21 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+@@ -92,7 +92,8 @@ static void adf_device_reset_worker(struct work_struct *work)
+ 	if (adf_dev_restart(accel_dev)) {
+ 		/* The device hanged and we can't restart it so stop here */
+ 		dev_err(&GET_DEV(accel_dev), "Restart device failed\n");
+-		kfree(reset_data);
++		if (reset_data->mode == ADF_DEV_RESET_ASYNC)
++			kfree(reset_data);
+ 		WARN(1, "QAT: device restart failed. Device is unusable\n");
+ 		return;
+ 	}
+-- 
+2.41.0
+
