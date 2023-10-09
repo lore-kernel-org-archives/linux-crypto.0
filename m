@@ -2,106 +2,174 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2FF9E95A91
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 14:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D8CCD6139
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Oct 2023 21:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377569AbjJIOCk (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Oct 2023 10:02:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39818 "EHLO
+        id S234685AbjJIVW2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 Oct 2023 17:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376693AbjJIOCj (ORCPT
+        with ESMTP id S1378870AbjJIVWI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Oct 2023 10:02:39 -0400
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A53369D;
-        Mon,  9 Oct 2023 07:02:37 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout3.hostsharing.net (Postfix) with ESMTPS id E4D27100D943F;
-        Mon,  9 Oct 2023 16:02:33 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id B2D8A30D471; Mon,  9 Oct 2023 16:02:33 +0200 (CEST)
-Date:   Mon, 9 Oct 2023 16:02:33 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Mon, 9 Oct 2023 17:22:08 -0400
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB2E170C;
+        Mon,  9 Oct 2023 14:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1696886474; x=1728422474;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Z8585nc3M3phCESzSv++FBQLoJuagdeKBNwW1jecD54=;
+  b=OXzwWONqJyOXPl7NZ2jnV/w6hL7ViSzmSfuZtQzWLedxApeLI9+CfWCV
+   X0lFpk/WBpMOS9W+T4xBmfzp3F1B4qjYapk7kOuzrPLgADHHJrp9AAk+u
+   Tm2fc4T7styhoHDAIH8PeW7iRgFL82GeqbgjjubOSv00VJvKVE/mK8G8R
+   M=;
+X-IronPort-AV: E=Sophos;i="6.03,211,1694736000"; 
+   d="scan'208";a="368774903"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d8e96288.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 21:21:06 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-iad-1d-m6i4x-d8e96288.us-east-1.amazon.com (Postfix) with ESMTPS id 0458184B9F;
+        Mon,  9 Oct 2023 21:21:02 +0000 (UTC)
+Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 9 Oct 2023 21:20:57 +0000
+Received: from dev-dsk-graf-1a-5ce218e4.eu-west-1.amazon.com (10.253.83.51) by
+ EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 9 Oct 2023 21:20:55 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <linux-kernel@vger.kernel.org>
+CC:     <linux-crypto@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 12/12] PCI/CMA: Grant guests exclusive control of
- authentication
-Message-ID: <20231009140233.GB7097@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <467bff0c4bab93067b1e353e5b8a92f1de353a3f.1695921657.git.lukas@wunner.de>
- <de5450a7-1395-490c-9767-7feee43e156a@amd.com>
+        Olivia Mackall <olivia@selenic.com>,
+        "Petre Eftime" <petre.eftime@gmail.com>,
+        Erdem Meydanlli <meydanli@amazon.nl>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Kyunghwan Kwon <k@mononn.com>
+Subject: [PATCH v4 0/2] Add Nitro Secure Module support
+Date:   Mon, 9 Oct 2023 21:20:51 +0000
+Message-ID: <20231009212053.2007-1-graf@amazon.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de5450a7-1395-490c-9767-7feee43e156a@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Originating-IP: [10.253.83.51]
+X-ClientProxiedBy: EX19D035UWB002.ant.amazon.com (10.13.138.97) To
+ EX19D020UWC004.ant.amazon.com (10.13.138.149)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 09, 2023 at 09:52:00PM +1100, Alexey Kardashevskiy wrote:
-> On 29/9/23 03:32, Lukas Wunner wrote:
-> > At any given time, only a single entity in a physical system may have
-> > an SPDM connection to a device.  That's because the GET_VERSION request
-> > (which begins an authentication sequence) resets "the connection and all
-> > context associated with that connection" (SPDM 1.3.0 margin no 158).
-> > 
-> > Thus, when a device is passed through to a guest and the guest has
-> > authenticated it, a subsequent authentication by the host would reset
-> > the device's CMA-SPDM session behind the guest's back.
-> > 
-> > Prevent by letting the guest claim exclusive CMA ownership of the device
-> > during passthrough.  Refuse CMA reauthentication on the host as long.
-> > After passthrough has concluded, reauthenticate the device on the host.
-[...]
-> > --- a/drivers/pci/pci.h
-> > +++ b/drivers/pci/pci.h
-> > @@ -388,6 +388,7 @@ static inline bool pci_dev_is_disconnected(const struct pci_dev *dev)
-> >   #define PCI_DEV_ADDED 0
-> >   #define PCI_DPC_RECOVERED 1
-> >   #define PCI_DPC_RECOVERING 2
-> > +#define PCI_CMA_OWNED_BY_GUEST 3
-> 
-> In AMD SEV TIO, the PSP firmware creates an SPDM connection. What is the
-> expected way of managing such ownership, a new priv_flags bit + api for it?
+Nitro Enclaves run Linux inside as well as outside the Enclave. Outside
+the Enclave, we already have the nitro_enclaves driver in upstream Linux
+which controls a Nitro Enclave's lifecycle.
 
-Right, I understand.  See this ongoing discussion in reply to the
-cover letter:
+Inside the Enclave, the environment looks like a typical Firecracker
+microvm. In addition to standard virtio devices, an Enclave also has an
+additional "Nitro Secure Module" (NSM) virtio device which so far was
+missing an upstream Linux driver. The NSM provides access to PCRs, an
+attestation document as well as entropy.
 
-https://lore.kernel.org/all/652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch/
+To support the NSM communication protocol, Linux needs to learn to
+generate and parse the Concise Binary Object Representation (CBOR)
+format. The first patch adds support for a CBOR library. The second adds
+the actual NSM driver.
 
-In short, we need a spec amendment to negotiate between platform and
-OS which of the two controls the DOE instance supporting CMA-SPDM.
+With these patches in place, upstream Linux has everything that's needed
+to run inside a Nitro Enclave.
 
-I think the OS is free to access any Extended Capabilities in
-Config Space unless the platform doesn't grant it control over
-them through _OSC.  Because the _OSC definition in the PCI
-Firmware Spec was not amended for CMA-SPDM, it is legal for the
-OS to assume control of CMA-SPDM, which is what this patch does.
 
-Thanks,
+Alex
 
-Lukas
+v1 -> v2:
+
+  - Remove boilerplate
+  - Add uapi header
+
+v2 -> v3:
+
+  - Move globals to device struct
+  - Add compat handling
+  - Simplify some naming
+  - Remove debug prints
+  - Use module_virtio_driver
+  - Ensure remove only happens on target device
+  - Drop use of uio.h
+
+v3 -> v4:
+
+  - Add CBOR library
+  - Merge hwrng into the misc driver
+  - Add dependency on CBOR library
+  - Add internal and ioctl logic for all current NSM actions
+  - Use in-struct arrays instead of kvecs
+  - Add sysfs entries for NSM metadata
+  - Use dev_ print and devm_ allocation helpers
+
+Alexander Graf (2):
+  Import CBOR library
+  misc: Add Nitro Secure Module driver
+
+ MAINTAINERS                  |   17 +
+ drivers/misc/Kconfig         |   13 +
+ drivers/misc/Makefile        |    1 +
+ drivers/misc/nsm.c           | 1466 ++++++++++++++++++++++++++++++++++
+ include/linux/cbor/base.h    |   94 +++
+ include/linux/cbor/cbor.h    |   22 +
+ include/linux/cbor/decoder.h |   42 +
+ include/linux/cbor/encoder.h |   48 ++
+ include/linux/cbor/helper.h  |   41 +
+ include/linux/cbor/ieee754.h |   52 ++
+ include/linux/cbor/parser.h  |   32 +
+ include/uapi/linux/nsm.h     |  188 +++++
+ lib/Kconfig                  |    3 +
+ lib/Makefile                 |    2 +
+ lib/cbor/Makefile            |   12 +
+ lib/cbor/common.c            |  105 +++
+ lib/cbor/decoder.c           |  170 ++++
+ lib/cbor/encoder.c           |  218 +++++
+ lib/cbor/helper.c            |  175 ++++
+ lib/cbor/ieee754.c           |  205 +++++
+ lib/cbor/parser.c            |  243 ++++++
+ 21 files changed, 3149 insertions(+)
+ create mode 100644 drivers/misc/nsm.c
+ create mode 100644 include/linux/cbor/base.h
+ create mode 100644 include/linux/cbor/cbor.h
+ create mode 100644 include/linux/cbor/decoder.h
+ create mode 100644 include/linux/cbor/encoder.h
+ create mode 100644 include/linux/cbor/helper.h
+ create mode 100644 include/linux/cbor/ieee754.h
+ create mode 100644 include/linux/cbor/parser.h
+ create mode 100644 include/uapi/linux/nsm.h
+ create mode 100644 lib/cbor/Makefile
+ create mode 100644 lib/cbor/common.c
+ create mode 100644 lib/cbor/decoder.c
+ create mode 100644 lib/cbor/encoder.c
+ create mode 100644 lib/cbor/helper.c
+ create mode 100644 lib/cbor/ieee754.c
+ create mode 100644 lib/cbor/parser.c
+
+-- 
+2.40.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
