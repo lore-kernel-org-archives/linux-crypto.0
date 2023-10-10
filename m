@@ -2,113 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A8FCD68F9
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Oct 2023 07:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E78CD68FA
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Oct 2023 08:03:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442525AbjJJHzy (ORCPT
+        id S1442613AbjJJIDa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Oct 2023 03:55:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33410 "EHLO
+        Tue, 10 Oct 2023 04:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442618AbjJJHzw (ORCPT
+        with ESMTP id S1442525AbjJJID3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Oct 2023 03:55:52 -0400
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 624C591;
-        Tue, 10 Oct 2023 00:55:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696924552; x=1728460552;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=F6F/G68dUG0sq4xFhDhcfq0nzHUZbmeO6Snxsvlc640=;
-  b=JjbX4SUqy58hT1TYA3nZYMe17I0YLX7UNFnwNqq5oZSUtv8lZE6TDfFq
-   CtEpH3lOtO5en+QYLVWdihRRbRe9wA4tpMKO8xYjKukdZ77jWZSHm9Xa5
-   hWe2tumSrfCc5vb+Gpui9oqB2KBXJqCG1NB0Cl2fP/ulbmkbuwir0qw7w
-   4=;
-X-IronPort-AV: E=Sophos;i="6.03,212,1694736000"; 
-   d="scan'208";a="612559776"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 07:55:49 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com (Postfix) with ESMTPS id F3CBD8069A;
-        Tue, 10 Oct 2023 07:55:45 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 07:55:41 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Tue, 10 Oct
- 2023 07:55:36 +0000
-Message-ID: <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
-Date:   Tue, 10 Oct 2023 09:55:25 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] Import CBOR library
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        "Arnd Bergmann" <arnd@arndb.de>,
+        Tue, 10 Oct 2023 04:03:29 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F3E97;
+        Tue, 10 Oct 2023 01:03:28 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D8F3C433C8;
+        Tue, 10 Oct 2023 08:03:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1696925007;
+        bh=TMDEK/WmDL+z/eBbCTgn+47DOA7g0CKzr8YciDEyuNE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nDHBkFuY1RbOqWqykAYVdGAfDW7e2ynU/l5+/Dpek8x+rxpdWDlBwtBqgxPpz5rAG
+         XZRTlkBHJ42xELJ9f8G8SoUagNX//yQNxnB8A5PIGC+VAK2WDbb34NJac1k6LmbtmB
+         kt1gV7e1GDLEkzcXMzSDImSt1f6bzawFlzpkcebw=
+Date:   Tue, 10 Oct 2023 10:03:24 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Olivia Mackall" <olivia@selenic.com>,
+        Olivia Mackall <olivia@selenic.com>,
         Petre Eftime <petre.eftime@gmail.com>,
-        "Erdem Meydanlli" <meydanli@amazon.nl>,
+        Erdem Meydanlli <meydanli@amazon.nl>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
         David Woodhouse <dwmw@amazon.co.uk>,
         "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
         Kyunghwan Kwon <k@mononn.com>
+Subject: Re: [PATCH v4 1/2] Import CBOR library
+Message-ID: <2023101009-accustom-manifesto-8bdb@gregkh>
 References: <20231009212053.2007-1-graf@amazon.com>
  <20231009212053.2007-2-graf@amazon.com>
  <2023101010-overwrite-parakeet-91d5@gregkh>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <2023101010-overwrite-parakeet-91d5@gregkh>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+ <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGV5IEdyZWcsCgpPbiAxMC4xMC4yMyAwODoxMywgR3JlZyBLcm9haC1IYXJ0bWFuIHdyb3RlOgo+
-IE9uIE1vbiwgT2N0IDA5LCAyMDIzIGF0IDA5OjIwOjUyUE0gKzAwMDAsIEFsZXhhbmRlciBHcmFm
-IHdyb3RlOgo+PiBUbyBmdWxseSBzdXBwb3J0IHRoZSBOaXRybyBTZWN1cmUgTW9kdWxlIGNvbW11
-bmljYXRpb24gcHJvdG9jb2wsIHdlIG5lZWQKPj4gdG8gZW5jb2RlIGFuZCBkZWNvZGUgQ0JPUiBi
-aW5hcnkgZGF0YS4gSW1wb3J0IGFuIE1JVCBsaWNlbnNlZCBsaWJyYXJ5Cj4+IGZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL2xpYm1jdS9jYm9yIChjb21taXQgZjNkMTY5NmY4ODYpIHNvIHRoYXQgd2Ug
-Y2FuCj4+IGVhc2lseSBjb25zdW1lIENCT1IgZGF0YS4KPiBXaGF0IGlzICJDQk9SIj8gIEkgZG9u
-J3Qgc2VlIGEgZGVzY3JpcHRpb24gb2YgaXQgaGVyZS4KCgpDQk9SIGlzIHRoZSAiQ29uY2lzZSBC
-aW5hcnkgT2JqZWN0IFJlcHJlc2VudGF0aW9uIiAKKGh0dHBzOi8vZW4ud2lraXBlZGlhLm9yZy93
-aWtpL0NCT1IpIGJpbmFyeSBmb3JtYXQuCgoKPgo+IEFuZCBJIGd1ZXNzIHlvdSBhcmUgZ29pbmcg
-dG8ga2VlcCB0aGlzIGluIHN5bmMgd2l0aCB1cHN0cmVhbT8gIE9yIGRvIHlvdQo+IHJlYWxseSBu
-ZWVkIHRoZSBmdWxsIGxpYnJhcnkgaGVyZSAoeW91ICNpZmRlZiB0aGUgZmxvYXQgc3R1ZmYgb3V0
-KSwgZG9lcwo+IHlvdXIgbW9kdWxlIHJlYWxseSBuZWVkIGFsbCBvZiB0aGUgZnVuY3Rpb25hbGl0
-eSBhbmQgY29tcGxleGl0eSBvZiB0aGlzCj4gbGlicmFyeSwgb3IgY2FuIGl0IHVzZSBqdXN0IGEg
-bXVjaCBzbWFsbGVyIG9uZSBpbnN0ZWFkPwoKCkNCT1Iga25vd3MgYSB0b3RhbCBvZiA5IGRhdGEg
-dHlwZXM6CgogwqAgLSBVbnNpZ25lZCBpbnRlZ2VycwogwqAgLSBTaWduZWQgaW50ZWdlcnMKIMKg
-IC0gQmluYXJ5IHN0cmluZwogwqAgLSBVVEYtOCBzdHJpbmcKIMKgIC0gQXJyYXlzCiDCoCAtIE1h
-cHMgKGxpa2UgYSBweXRob24gZGljdGlvbmFyeSkKIMKgIC0gU2VtYW50aWMgdGFnCiDCoCAtIEJv
-b2xzCiDCoCAtIEZsb2F0cwoKT3V0IG9mIHRoZXNlLCB0aGUgTlNNIGNvbW11bmljYXRpb24gcHJv
-dG9jb2wgdXNlcyBhbGwgZXhjZXB0IFNlbWFudGljIAp0YWdzIGFuZCBGbG9hdHMuIFRoZSBDQk9S
-IGxpYnJhcnkgdGhhdCB0aGlzIHBhdGNoIGltcG9ydHMgZG9lcyBub3QgaGF2ZSAKc3BlY2lhbCBo
-YW5kbGluZyBmb3IgU2VtYW50aWMgdGFncywgd2hpY2ggbGVhdmVzIG9ubHkgZmxvYXRzIHdoaWNo
-IGFyZSAKYWxyZWFkeSAjaWZkZWYnZWQgb3V0LiBUaGF0IG1lYW5zIHRoZXJlIGlzIG5vdCBtdWNo
-IHRvIHRyaW0uCgpXaGF0IHlvdSBzZWUgaGVyZSBpcyB3aGF0J3MgbmVlZGVkIHRvIHBhcnNlIENC
-T1IgaW4ga2VybmVsIC0gaWYgdGhhdCdzIAp3aGF0IHdlIHdhbnQgdG8gZG8uIEknbSBoYXBweSB0
-byByaXAgaXQgb3V0IGFnYWluIGFuZCBtYWtlIGl0IGEgcHVyZSAKdXNlciBzcGFjZSBwcm9ibGVt
-IHRvIGRvIENCT1IgOikuCgoKPgo+PiBPbiB0b3Agb2YgdGhlIHVwc3RyZWFtIGNvZGUgYmFzZSwg
-SSBhZGRlZCBrZXJuZWwgbW9kdWxlIGFzIHdlbGwgYXMKPj4ga2VybmVsIGhlYWRlciBwYXRoIGF3
-YXJlbmVzcyBhbmQgbWFkZSBjaGVja3BhdGNoIGhhcHB5Lgo+IElmIG9ubHkgdGhlIG9uZSBtb2R1
-bGUgbmVlZHMgdGhpcywgd2h5IG5vdCBwdXQgaXQgaW4gdGhlIGRpcmVjdG9yeSBmb3IKPiB0aGUg
-bW9kdWxlIGl0c2VsZiwgYW5kIHRoZW4gd2hlbi9pZiBhbnlvbmUgZWxzZSBuZWVkcyBpdCwgaXQg
-Y291bGQgYmUKPiBtb3ZlZD8KCgpUaGF0IHNvdW5kcyBsaWtlIGEgZ3JlYXQgaWRlYSEgTGV0IG1l
-IGRvIHRoYXQgOikKCgpBbGV4CgoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55
-IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hy
-aXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmlj
-aHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6
-IERFIDI4OSAyMzcgODc5CgoK
+On Tue, Oct 10, 2023 at 09:55:25AM +0200, Alexander Graf wrote:
+> Hey Greg,
+> 
+> On 10.10.23 08:13, Greg Kroah-Hartman wrote:
+> > On Mon, Oct 09, 2023 at 09:20:52PM +0000, Alexander Graf wrote:
+> > > To fully support the Nitro Secure Module communication protocol, we need
+> > > to encode and decode CBOR binary data. Import an MIT licensed library
+> > > from https://github.com/libmcu/cbor (commit f3d1696f886) so that we can
+> > > easily consume CBOR data.
+> > What is "CBOR"?  I don't see a description of it here.
+> 
+> 
+> CBOR is the "Concise Binary Object Representation"
+> (https://en.wikipedia.org/wiki/CBOR) binary format.
+> 
+> 
+> > 
+> > And I guess you are going to keep this in sync with upstream?  Or do you
+> > really need the full library here (you #ifdef the float stuff out), does
+> > your module really need all of the functionality and complexity of this
+> > library, or can it use just a much smaller one instead?
+> 
+> 
+> CBOR knows a total of 9 data types:
+> 
+>   - Unsigned integers
+>   - Signed integers
+>   - Binary string
+>   - UTF-8 string
+>   - Arrays
+>   - Maps (like a python dictionary)
+>   - Semantic tag
+>   - Bools
+>   - Floats
+> 
+> Out of these, the NSM communication protocol uses all except Semantic tags
+> and Floats. The CBOR library that this patch imports does not have special
+> handling for Semantic tags, which leaves only floats which are already
+> #ifdef'ed out. That means there is not much to trim.
+> 
+> What you see here is what's needed to parse CBOR in kernel - if that's what
+> we want to do. I'm happy to rip it out again and make it a pure user space
+> problem to do CBOR :).
 
+Yes, why are we parsing this in the kernel?  What could go wrong with
+adding yet-another-parser in privileged context?  :)
+
+Why does this have to be in the kernel, the data sent/recieved is over
+virtio, so why does the kernel have to parse it?  I couldn't figure that
+out from the driver, yet the driver seems to have a lot of hard-coded
+parsing logic in it to assume specific message formats?
+
+thanks,
+
+greg k-h
