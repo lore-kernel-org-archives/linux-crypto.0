@@ -2,127 +2,119 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C20ECD68FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Oct 2023 08:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 962A3CD6907
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Oct 2023 08:19:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234646AbjJJIJd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Oct 2023 04:09:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45346 "EHLO
+        id S1442640AbjJJITR (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 Oct 2023 04:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234706AbjJJIJb (ORCPT
+        with ESMTP id S1379439AbjJJITQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:09:31 -0400
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F17E0;
-        Tue, 10 Oct 2023 01:09:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696925367; x=1728461367;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4EmhsOwP69F//6433Xn4ERWpOgRb07iso5k41/IoZyU=;
-  b=lbzyHFXL72Vh3/lW0FsQBpOFc8noynr9mM4kEt+4P+RjNiO+qv6vemtN
-   IDFzjRznPQdMOsXipq7g3RhVfMrSeeuxo+4jkKRdejDMUPv3XI9E9iqPY
-   rlG3PK62W95tsNV5KElbi7PXCuHRXNlmKKsJoTwbaJiHDusDm1ihUAph1
-   M=;
-X-IronPort-AV: E=Sophos;i="6.03,212,1694736000"; 
-   d="scan'208";a="676722895"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 08:09:22 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com (Postfix) with ESMTPS id 07D3960ACE;
-        Tue, 10 Oct 2023 08:09:20 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 08:09:20 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.37; Tue, 10 Oct
- 2023 08:09:16 +0000
-Message-ID: <b3a8c722-c0e2-4c8c-aef0-29af0a93572d@amazon.com>
-Date:   Tue, 10 Oct 2023 10:08:43 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] Import CBOR library
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        "Arnd Bergmann" <arnd@arndb.de>,
+        Tue, 10 Oct 2023 04:19:16 -0400
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A0C97;
+        Tue, 10 Oct 2023 01:19:14 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 3F1AE2800A273;
+        Tue, 10 Oct 2023 10:19:13 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 3176D58BE4D; Tue, 10 Oct 2023 10:19:13 +0200 (CEST)
+Date:   Tue, 10 Oct 2023 10:19:13 +0200
+From:   Lukas Wunner <lukas@wunner.de>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "Olivia Mackall" <olivia@selenic.com>,
-        Petre Eftime <petre.eftime@gmail.com>,
-        "Erdem Meydanlli" <meydanli@amazon.nl>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        Kyunghwan Kwon <k@mononn.com>
-References: <20231009212053.2007-1-graf@amazon.com>
- <20231009212053.2007-2-graf@amazon.com>
- <2023101010-overwrite-parakeet-91d5@gregkh>
- <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
- <2023101009-accustom-manifesto-8bdb@gregkh>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <2023101009-accustom-manifesto-8bdb@gregkh>
-X-Originating-IP: [10.253.83.51]
-X-ClientProxiedBy: EX19D032UWA001.ant.amazon.com (10.13.139.62) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 00/12] PCI device authentication
+Message-ID: <20231010081913.GA24050@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+ <20231007100433.GA7596@wunner.de>
+ <20231009123335.00006d3d@Huawei.com>
+ <20231009134950.GA7097@wunner.de>
+ <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ck9uIDEwLjEwLjIzIDEwOjAzLCBHcmVnIEtyb2FoLUhhcnRtYW4gd3JvdGU6Cj4KPiBPbiBUdWUs
-IE9jdCAxMCwgMjAyMyBhdCAwOTo1NToyNUFNICswMjAwLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToK
-Pj4gSGV5IEdyZWcsCj4+Cj4+IE9uIDEwLjEwLjIzIDA4OjEzLCBHcmVnIEtyb2FoLUhhcnRtYW4g
-d3JvdGU6Cj4+PiBPbiBNb24sIE9jdCAwOSwgMjAyMyBhdCAwOToyMDo1MlBNICswMDAwLCBBbGV4
-YW5kZXIgR3JhZiB3cm90ZToKPj4+PiBUbyBmdWxseSBzdXBwb3J0IHRoZSBOaXRybyBTZWN1cmUg
-TW9kdWxlIGNvbW11bmljYXRpb24gcHJvdG9jb2wsIHdlIG5lZWQKPj4+PiB0byBlbmNvZGUgYW5k
-IGRlY29kZSBDQk9SIGJpbmFyeSBkYXRhLiBJbXBvcnQgYW4gTUlUIGxpY2Vuc2VkIGxpYnJhcnkK
-Pj4+PiBmcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9saWJtY3UvY2JvciAoY29tbWl0IGYzZDE2OTZm
-ODg2KSBzbyB0aGF0IHdlIGNhbgo+Pj4+IGVhc2lseSBjb25zdW1lIENCT1IgZGF0YS4KPj4+IFdo
-YXQgaXMgIkNCT1IiPyAgSSBkb24ndCBzZWUgYSBkZXNjcmlwdGlvbiBvZiBpdCBoZXJlLgo+Pgo+
-PiBDQk9SIGlzIHRoZSAiQ29uY2lzZSBCaW5hcnkgT2JqZWN0IFJlcHJlc2VudGF0aW9uIgo+PiAo
-aHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvQ0JPUikgYmluYXJ5IGZvcm1hdC4KPj4KPj4K
-Pj4+IEFuZCBJIGd1ZXNzIHlvdSBhcmUgZ29pbmcgdG8ga2VlcCB0aGlzIGluIHN5bmMgd2l0aCB1
-cHN0cmVhbT8gIE9yIGRvIHlvdQo+Pj4gcmVhbGx5IG5lZWQgdGhlIGZ1bGwgbGlicmFyeSBoZXJl
-ICh5b3UgI2lmZGVmIHRoZSBmbG9hdCBzdHVmZiBvdXQpLCBkb2VzCj4+PiB5b3VyIG1vZHVsZSBy
-ZWFsbHkgbmVlZCBhbGwgb2YgdGhlIGZ1bmN0aW9uYWxpdHkgYW5kIGNvbXBsZXhpdHkgb2YgdGhp
-cwo+Pj4gbGlicmFyeSwgb3IgY2FuIGl0IHVzZSBqdXN0IGEgbXVjaCBzbWFsbGVyIG9uZSBpbnN0
-ZWFkPwo+Pgo+PiBDQk9SIGtub3dzIGEgdG90YWwgb2YgOSBkYXRhIHR5cGVzOgo+Pgo+PiAgICAt
-IFVuc2lnbmVkIGludGVnZXJzCj4+ICAgIC0gU2lnbmVkIGludGVnZXJzCj4+ICAgIC0gQmluYXJ5
-IHN0cmluZwo+PiAgICAtIFVURi04IHN0cmluZwo+PiAgICAtIEFycmF5cwo+PiAgICAtIE1hcHMg
-KGxpa2UgYSBweXRob24gZGljdGlvbmFyeSkKPj4gICAgLSBTZW1hbnRpYyB0YWcKPj4gICAgLSBC
-b29scwo+PiAgICAtIEZsb2F0cwo+Pgo+PiBPdXQgb2YgdGhlc2UsIHRoZSBOU00gY29tbXVuaWNh
-dGlvbiBwcm90b2NvbCB1c2VzIGFsbCBleGNlcHQgU2VtYW50aWMgdGFncwo+PiBhbmQgRmxvYXRz
-LiBUaGUgQ0JPUiBsaWJyYXJ5IHRoYXQgdGhpcyBwYXRjaCBpbXBvcnRzIGRvZXMgbm90IGhhdmUg
-c3BlY2lhbAo+PiBoYW5kbGluZyBmb3IgU2VtYW50aWMgdGFncywgd2hpY2ggbGVhdmVzIG9ubHkg
-ZmxvYXRzIHdoaWNoIGFyZSBhbHJlYWR5Cj4+ICNpZmRlZidlZCBvdXQuIFRoYXQgbWVhbnMgdGhl
-cmUgaXMgbm90IG11Y2ggdG8gdHJpbS4KPj4KPj4gV2hhdCB5b3Ugc2VlIGhlcmUgaXMgd2hhdCdz
-IG5lZWRlZCB0byBwYXJzZSBDQk9SIGluIGtlcm5lbCAtIGlmIHRoYXQncyB3aGF0Cj4+IHdlIHdh
-bnQgdG8gZG8uIEknbSBoYXBweSB0byByaXAgaXQgb3V0IGFnYWluIGFuZCBtYWtlIGl0IGEgcHVy
-ZSB1c2VyIHNwYWNlCj4+IHByb2JsZW0gdG8gZG8gQ0JPUiA6KS4KPiBZZXMsIHdoeSBhcmUgd2Ug
-cGFyc2luZyB0aGlzIGluIHRoZSBrZXJuZWw/ICBXaGF0IGNvdWxkIGdvIHdyb25nIHdpdGgKPiBh
-ZGRpbmcgeWV0LWFub3RoZXItcGFyc2VyIGluIHByaXZpbGVnZWQgY29udGV4dD8gIDopCj4KPiBX
-aHkgZG9lcyB0aGlzIGhhdmUgdG8gYmUgaW4gdGhlIGtlcm5lbCwgdGhlIGRhdGEgc2VudC9yZWNp
-ZXZlZCBpcyBvdmVyCj4gdmlydGlvLCBzbyB3aHkgZG9lcyB0aGUga2VybmVsIGhhdmUgdG8gcGFy
-c2UgaXQ/ICBJIGNvdWxkbid0IGZpZ3VyZSB0aGF0Cj4gb3V0IGZyb20gdGhlIGRyaXZlciwgeWV0
-IHRoZSBkcml2ZXIgc2VlbXMgdG8gaGF2ZSBhIGxvdCBvZiBoYXJkLWNvZGVkCj4gcGFyc2luZyBs
-b2dpYyBpbiBpdCB0byBhc3N1bWUgc3BlY2lmaWMgbWVzc2FnZSBmb3JtYXRzPwoKClRoZSBwYXJz
-aW5nIGRvZXNuJ3QgaGF2ZSB0byBiZSBpbiBrZXJuZWwgYW5kIGl0IHByb2JhYmx5IHNob3VsZG4n
-dCBiZSAKZWl0aGVyLiBWMyBvZiB0aGUgcGF0Y2ggd2FzIHB1bnRpbmcgYWxsIHRoZSBwYXJzaW5n
-IHRvIHVzZXIgc3BhY2UsIGF0IAp3aGljaCBwb2ludCB5b3UgYW5kIEFybmQgc2FpZCBJIHNob3Vs
-ZCBnaXZlIGl0IGEgdHJ5IHRvIGRvIHRoZSBwcm90b2NvbCAKcGFyc2luZyBpbiBrZXJuZWwgc3Bh
-Y2UgaW5zdGVhZC4gVGhhdCdzIHdoeSB0aGUgcGFyc2VyIGlzIGhlcmUuCgpJZiB3ZSBjb25jbHVk
-ZSB0aGF0IGFsbCB0aGlzIGluLWtlcm5lbCBwYXJzaW5nIGlzIG5vdCB3b3J0aCBpdCwgSSdtIHZl
-cnkgCmhhcHB5IHRvIGp1c3QgZ28gYmFjayB0byB0aGUgdGhlIHYzIGlvY3RsIGludGVyZmFjZSBh
-bmQgcG9zdCB2NSB3aXRoIApod3JuZyBtZXJnZWQgaW50byBtaXNjLCBidXQgcmVtb3ZlIGFsbCBD
-Qk9SIGxvZ2ljIGFnYWluIDopCgoKQWxleAoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBH
-ZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVu
-ZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10
-c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpV
-c3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
+> On 10/10/23 00:49, Lukas Wunner wrote:
+> > PCI Firmware Spec would seem to be appropriate.  However this can't
+> > be solved by the kernel community.
+> 
+> How so? It is up to the user to decide whether it is SPDM/CMA in the kernel
+> or   the firmware + coco, both are quite possible (it is IDE which is not
+> possible without the firmware on AMD but we are not there yet).
 
+The user can control ownership of CMA-SPDM e.g. through a BIOS knob.
+And that BIOS knob then influences the outcome of the _OSC negotiation
+between platform and OS.
+
+
+> But the way SPDM is done now is that if the user (as myself) wants to let
+> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
+> as CMA is not a (un)loadable module or built-in (with some "blacklist"
+> parameters), and does not provide a sysfs knob to control its tentacles.
+
+The problem is every single vendor thinks they can come up with
+their own idea of who owns the SPDM session:
+
+I've looked at the Nvidia driver and they've hacked libspdm into it,
+so their idea is that the device driver owns the SPDM session.
+
+AMD wants the host to proxy DOE but not own the SPDM session.
+
+We have *standards* for a reason.  So that products are interoperable.
+
+If the kernel tries to accommodate to every vendor's idea of SPDM ownership
+we'll end up with an unmaintainable mess of quirks, plus sysfs knobs
+which were once intended as a stopgap but can never be removed because
+they're userspace ABI.
+
+This needs to be solved in the *specification*.
+
+And the existing solution for who owns a particular PCI feature is _OSC.
+Hence this needs to be taken up with the Firmware Working Group at the
+PCISIG.
+
+
+> Note, this PSP firmware is not BIOS (which runs on the same core and has
+> same access to PCI as the host OS), it is a separate platform processor
+> which only programs IDE keys to the PCI RC (via some some internal bus
+> mechanism) but does not do anything on the bus itself and relies on the host
+> OS proxying DOE, and there is no APCI between the core and the psp.
+
+Somewhat tangentially, would it be possible in your architecture
+that the host or guest asks PSP to program IDE keys into the Root Port?
+Or alternatively, access the key registers directly without PSP involvement?
+
+Thanks,
+
+Lukas
