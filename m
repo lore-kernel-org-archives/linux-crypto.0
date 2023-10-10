@@ -2,119 +2,135 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 962A3CD6907
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Oct 2023 08:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B858CCD690A
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Oct 2023 08:27:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442640AbjJJITR (ORCPT
+        id S1442868AbjJJI1U (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Oct 2023 04:19:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34496 "EHLO
+        Tue, 10 Oct 2023 04:27:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379439AbjJJITQ (ORCPT
+        with ESMTP id S1442875AbjJJI1P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Oct 2023 04:19:16 -0400
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A0C97;
-        Tue, 10 Oct 2023 01:19:14 -0700 (PDT)
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-         client-signature RSA-PSS (4096 bits) client-digest SHA256)
-        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
-        by bmailout2.hostsharing.net (Postfix) with ESMTPS id 3F1AE2800A273;
-        Tue, 10 Oct 2023 10:19:13 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id 3176D58BE4D; Tue, 10 Oct 2023 10:19:13 +0200 (CEST)
-Date:   Tue, 10 Oct 2023 10:19:13 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Tue, 10 Oct 2023 04:27:15 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B11ED;
+        Tue, 10 Oct 2023 01:27:13 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 272FFC433C9;
+        Tue, 10 Oct 2023 08:27:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1696926432;
+        bh=IsEPIRqztj/gpHEaupHz40fvwhnyENE4HA0MBVHyF6Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dlsVzCFGq7uR0uj6Kew58xuH6g26clrrWJwJB6t9itWIufmYLQ3avQd8H3In3eN+6
+         pSq0L8cRtw+u37RyNZGOAM/zd7YW3RIzYgd8N6w0Cj9dAYnQpPUXW449yzYO0JXTd9
+         Cv9FVLnsMoDdIahr2iXnaDfLGzictWZdZtpV0aRE=
+Date:   Tue, 10 Oct 2023 10:27:11 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 00/12] PCI device authentication
-Message-ID: <20231010081913.GA24050@wunner.de>
-References: <cover.1695921656.git.lukas@wunner.de>
- <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
- <20231007100433.GA7596@wunner.de>
- <20231009123335.00006d3d@Huawei.com>
- <20231009134950.GA7097@wunner.de>
- <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+        Olivia Mackall <olivia@selenic.com>,
+        Petre Eftime <petre.eftime@gmail.com>,
+        Erdem Meydanlli <meydanli@amazon.nl>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Kyunghwan Kwon <k@mononn.com>
+Subject: Re: [PATCH v4 1/2] Import CBOR library
+Message-ID: <2023101001-ocelot-veteran-10db@gregkh>
+References: <20231009212053.2007-1-graf@amazon.com>
+ <20231009212053.2007-2-graf@amazon.com>
+ <2023101010-overwrite-parakeet-91d5@gregkh>
+ <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
+ <2023101009-accustom-manifesto-8bdb@gregkh>
+ <b3a8c722-c0e2-4c8c-aef0-29af0a93572d@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <b3a8c722-c0e2-4c8c-aef0-29af0a93572d@amazon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
-> On 10/10/23 00:49, Lukas Wunner wrote:
-> > PCI Firmware Spec would seem to be appropriate.  However this can't
-> > be solved by the kernel community.
+On Tue, Oct 10, 2023 at 10:08:43AM +0200, Alexander Graf wrote:
 > 
-> How so? It is up to the user to decide whether it is SPDM/CMA in the kernel
-> or   the firmware + coco, both are quite possible (it is IDE which is not
-> possible without the firmware on AMD but we are not there yet).
+> On 10.10.23 10:03, Greg Kroah-Hartman wrote:
+> > 
+> > On Tue, Oct 10, 2023 at 09:55:25AM +0200, Alexander Graf wrote:
+> > > Hey Greg,
+> > > 
+> > > On 10.10.23 08:13, Greg Kroah-Hartman wrote:
+> > > > On Mon, Oct 09, 2023 at 09:20:52PM +0000, Alexander Graf wrote:
+> > > > > To fully support the Nitro Secure Module communication protocol, we need
+> > > > > to encode and decode CBOR binary data. Import an MIT licensed library
+> > > > > from https://github.com/libmcu/cbor (commit f3d1696f886) so that we can
+> > > > > easily consume CBOR data.
+> > > > What is "CBOR"?  I don't see a description of it here.
+> > > 
+> > > CBOR is the "Concise Binary Object Representation"
+> > > (https://en.wikipedia.org/wiki/CBOR) binary format.
+> > > 
+> > > 
+> > > > And I guess you are going to keep this in sync with upstream?  Or do you
+> > > > really need the full library here (you #ifdef the float stuff out), does
+> > > > your module really need all of the functionality and complexity of this
+> > > > library, or can it use just a much smaller one instead?
+> > > 
+> > > CBOR knows a total of 9 data types:
+> > > 
+> > >    - Unsigned integers
+> > >    - Signed integers
+> > >    - Binary string
+> > >    - UTF-8 string
+> > >    - Arrays
+> > >    - Maps (like a python dictionary)
+> > >    - Semantic tag
+> > >    - Bools
+> > >    - Floats
+> > > 
+> > > Out of these, the NSM communication protocol uses all except Semantic tags
+> > > and Floats. The CBOR library that this patch imports does not have special
+> > > handling for Semantic tags, which leaves only floats which are already
+> > > #ifdef'ed out. That means there is not much to trim.
+> > > 
+> > > What you see here is what's needed to parse CBOR in kernel - if that's what
+> > > we want to do. I'm happy to rip it out again and make it a pure user space
+> > > problem to do CBOR :).
+> > Yes, why are we parsing this in the kernel?  What could go wrong with
+> > adding yet-another-parser in privileged context?  :)
+> > 
+> > Why does this have to be in the kernel, the data sent/recieved is over
+> > virtio, so why does the kernel have to parse it?  I couldn't figure that
+> > out from the driver, yet the driver seems to have a lot of hard-coded
+> > parsing logic in it to assume specific message formats?
+> 
+> 
+> The parsing doesn't have to be in kernel and it probably shouldn't be
+> either. V3 of the patch was punting all the parsing to user space, at which
+> point you and Arnd said I should give it a try to do the protocol parsing in
+> kernel space instead. That's why the parser is here.
 
-The user can control ownership of CMA-SPDM e.g. through a BIOS knob.
-And that BIOS knob then influences the outcome of the _OSC negotiation
-between platform and OS.
+Arnd said that, not me :)
 
+> If we conclude that all this in-kernel parsing is not worth it, I'm very
+> happy to just go back to the the v3 ioctl interface and post v5 with hwrng
+> merged into misc, but remove all CBOR logic again :)
 
-> But the way SPDM is done now is that if the user (as myself) wants to let
-> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
-> as CMA is not a (un)loadable module or built-in (with some "blacklist"
-> parameters), and does not provide a sysfs knob to control its tentacles.
+I think the less parsers we have in the kernel, the safer we are for
+obvious reasons.  Unless you have a parser for this in rust?  :)
 
-The problem is every single vendor thinks they can come up with
-their own idea of who owns the SPDM session:
+I don't really know, having a generic interface is good, but at the
+expense of this api is probably not good.  individual ioctls might be
+better if there are not going to be any other drivers for this type of
+thing?
 
-I've looked at the Nvidia driver and they've hacked libspdm into it,
-so their idea is that the device driver owns the SPDM session.
+it's a tough call, let's see what a unified driver, no parser, looks
+like, that should be pretty simple and small so maybe stick with that?
 
-AMD wants the host to proxy DOE but not own the SPDM session.
+thanks,
 
-We have *standards* for a reason.  So that products are interoperable.
-
-If the kernel tries to accommodate to every vendor's idea of SPDM ownership
-we'll end up with an unmaintainable mess of quirks, plus sysfs knobs
-which were once intended as a stopgap but can never be removed because
-they're userspace ABI.
-
-This needs to be solved in the *specification*.
-
-And the existing solution for who owns a particular PCI feature is _OSC.
-Hence this needs to be taken up with the Firmware Working Group at the
-PCISIG.
-
-
-> Note, this PSP firmware is not BIOS (which runs on the same core and has
-> same access to PCI as the host OS), it is a separate platform processor
-> which only programs IDE keys to the PCI RC (via some some internal bus
-> mechanism) but does not do anything on the bus itself and relies on the host
-> OS proxying DOE, and there is no APCI between the core and the psp.
-
-Somewhat tangentially, would it be possible in your architecture
-that the host or guest asks PSP to program IDE keys into the Root Port?
-Or alternatively, access the key registers directly without PSP involvement?
-
-Thanks,
-
-Lukas
+greg k-h
