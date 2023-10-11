@@ -2,146 +2,130 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2330DCD6E5D
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Oct 2023 12:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B44C1CD6E63
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Oct 2023 12:36:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234836AbjJKMZ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Oct 2023 08:25:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
+        id S232105AbjJKMgE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Oct 2023 08:36:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235117AbjJKMZq (ORCPT
+        with ESMTP id S231860AbjJKMgD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2023 08:25:46 -0400
-Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6AB114;
-        Wed, 11 Oct 2023 05:25:12 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id BAD4C3200AB2;
-        Wed, 11 Oct 2023 08:25:10 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 11 Oct 2023 08:25:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1697027110; x=1697113510; bh=Pd
-        51UpbLBT1+psPf2hnTIMJii3++EO4IjWT1009ZizA=; b=ej8XsMTNC0PzZr0SLt
-        Vxa8LG+z1KAY34ZtDIIgqluCZbO8g7xLh/cPaOaGM0fFh/piB7NQVz+et6hYqsdl
-        4iWTa1AKKbTDe01R7M8Kypyp0+6mSsCxwuoUQJPlpmfEWVKD83fpArYYgcAP3QCf
-        K8EvCp37GG8ObTHtjPXXrI5ie7XtSX+zdUQ+kzstQ+ECrRPHadQa3FpZ+snhyQkQ
-        HhhHzIHRevNtIOR+1ufeHTNEPJReDdw58m75O4RZGNHB/rfR/uK0rIQOiRYjmoOL
-        1CvrXi8rLBewAYr+5Wwzndwv9HYIqkhvztkp5klwTm4B1DAgVjN6XZyqk9EssiZT
-        dpXA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1697027110; x=1697113510; bh=Pd51UpbLBT1+p
-        sPf2hnTIMJii3++EO4IjWT1009ZizA=; b=rFhfZzkPaTpgzosrMFMaXjj6yP0Xp
-        gz1X7dE7GSFTfIKHP6yg89i0A/UBCVx1T8Xa+aQXBn3qKbhRKcV18VAqy0uEqWzr
-        35rma5PX6e437BWoUD3xHEF3arcEAWtLG0Nk92DWqEqLwoTNiyWTTISXxEwwEUoy
-        /4O8vfF+lhBio/GYIcOYQ+qrcUy9OP5b0qFJu+qWizNgDUngNwBlxy/ZJjrNU/ay
-        wSEameGH5UgHcwevlY3nLUgtbCmhEwgezEE/UQG0bxbgKbXZ90etB0H9d/Yx7dgl
-        9+aYUuBbxqBF0X7DWiZymjbaOl6jcSAVgUfMjmIlX/onu4xX/fjNHKsSw==
-X-ME-Sender: <xms:JZQmZbww_AU8iViRbjSlI9CQXj0z2Fkiov0K5SQutqwSCwLdHV88lA>
-    <xme:JZQmZTTEb12Nwen7gNUd7wm58Yr2zMPw5ipSntCUldo8KIyRnTmcI-bPq9h9gZqAd
-    BKsQhAKwdRxzeFLf4Y>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdeglecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:JZQmZVWaLSLvCDgX_0mdA2y4083oXu9QtuLYfHkucaoMvbmfoRAR8Q>
-    <xmx:JZQmZViAUseJdxTh9_3yzxIwWwZG3VdQ-18HlJr_wxCUHaJVYdGJrw>
-    <xmx:JZQmZdB509oyX1gMGWaE2gKlIx_jvMAhGt_46MMHrEiGtzxYizKA4w>
-    <xmx:JpQmZSKpal6eQjoZbmJkF0D7vZl5-dmDm-7wlopeqNpVivZtOuYndA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 8CE30B6008F; Wed, 11 Oct 2023 08:25:09 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1019-ged83ad8595-fm-20231002.001-ged83ad85
+        Wed, 11 Oct 2023 08:36:03 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FAAC91
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Oct 2023 05:36:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697027761; x=1728563761;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m17LJAMyehFHIPf3/6Mgus+HYyeus7wd+kt7HUS2AXs=;
+  b=aQAgSvCePr2pVRp0fktj4ftIK7efmMK0FhMCTQOpyLlGXN54mdDiCSX/
+   dIU5jgRDKOEnjsl+Tk+nizT3dcZxxhTvNUFo/G8EbQy8fUdogY55ycLts
+   4r1UsW5WmWE8Kyq10gGyVbx6yImJdxS8OQrmY/dp8DVm5PfwzQolJNl2o
+   cfnMRc/t4Mgg2PsUCNCzaRLTHDzZDskjb9xguFnGUria77Rmivmdb755e
+   KoSLmJhbTZygyJIBSG06dRZQY791alyagb79FKidTYYbqrGP3ZE0Tqaws
+   fqTLqQUQ5vCdBgGuDdlnASrQZddntDLnS1H7YuTJ/yvq0eDOBgQv13p0D
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="374992807"
+X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
+   d="scan'208";a="374992807"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 05:36:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="870124619"
+X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
+   d="scan'208";a="870124619"
+Received: from r031s002_zp31l10c01.deacluster.intel.com (HELO localhost.localdomain) ([10.219.171.29])
+  by fmsmga002.fm.intel.com with ESMTP; 11 Oct 2023 05:35:59 -0700
+From:   Damian Muszynski <damian.muszynski@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Damian Muszynski <damian.muszynski@intel.com>
+Subject: [PATCH 00/11] crypto: qat - add rate limiting feature to qat_4xxx
+Date:   Wed, 11 Oct 2023 14:14:58 +0200
+Message-ID: <20231011121934.45255-1-damian.muszynski@intel.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Message-Id: <2339287b-8b17-413b-aa86-f618ea7fc3fa@app.fastmail.com>
-In-Reply-To: <2023101001-ocelot-veteran-10db@gregkh>
-References: <20231009212053.2007-1-graf@amazon.com>
- <20231009212053.2007-2-graf@amazon.com>
- <2023101010-overwrite-parakeet-91d5@gregkh>
- <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
- <2023101009-accustom-manifesto-8bdb@gregkh>
- <b3a8c722-c0e2-4c8c-aef0-29af0a93572d@amazon.com>
- <2023101001-ocelot-veteran-10db@gregkh>
-Date:   Wed, 11 Oct 2023 14:24:48 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        "Alexander Graf" <graf@amazon.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Olivia Mackall" <olivia@selenic.com>,
-        "Petre Eftime" <petre.eftime@gmail.com>,
-        "Erdem Meydanlli" <meydanli@amazon.nl>,
-        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
-        "David Woodhouse" <dwmw@amazon.co.uk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Jason Wang" <jasowang@redhat.com>,
-        "Xuan Zhuo" <xuanzhuo@linux.alibaba.com>,
-        "Kyunghwan Kwon" <k@mononn.com>
-Subject: Re: [PATCH v4 1/2] Import CBOR library
-Content-Type: text/plain
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 10, 2023, at 10:27, Greg Kroah-Hartman wrote:
-> On Tue, Oct 10, 2023 at 10:08:43AM +0200, Alexander Graf wrote:
->> On 10.10.23 10:03, Greg Kroah-Hartman wrote:
->>
->> > > Out of these, the NSM communication protocol uses all except Semantic tags
->> > > and Floats. The CBOR library that this patch imports does not have special
->> > > handling for Semantic tags, which leaves only floats which are already
->> > > #ifdef'ed out. That means there is not much to trim.
->> > > 
->> > > What you see here is what's needed to parse CBOR in kernel - if that's what
->> > > we want to do. I'm happy to rip it out again and make it a pure user space
->> > > problem to do CBOR :).
->> > Yes, why are we parsing this in the kernel?  What could go wrong with
->> > adding yet-another-parser in privileged context?  :)
->> > 
->> > Why does this have to be in the kernel, the data sent/recieved is over
->> > virtio, so why does the kernel have to parse it?  I couldn't figure that
->> > out from the driver, yet the driver seems to have a lot of hard-coded
->> > parsing logic in it to assume specific message formats?
->> 
->> 
->> The parsing doesn't have to be in kernel and it probably shouldn't be
->> either. V3 of the patch was punting all the parsing to user space, at which
->> point you and Arnd said I should give it a try to do the protocol parsing in
->> kernel space instead. That's why the parser is here.
->
-> Arnd said that, not me :)
->
->> If we conclude that all this in-kernel parsing is not worth it, I'm very
->> happy to just go back to the the v3 ioctl interface and post v5 with hwrng
->> merged into misc, but remove all CBOR logic again :)
->
-> I think the less parsers we have in the kernel, the safer we are for
-> obvious reasons.  Unless you have a parser for this in rust?  :)
->
-> I don't really know, having a generic interface is good, but at the
-> expense of this api is probably not good.  individual ioctls might be
-> better if there are not going to be any other drivers for this type of
-> thing?
+This set introduces the rate limiting feature to the Intel QAT accelerator.
+The Rate Limiting allows control of the rate of the requests that can be
+submitted on a ring pair (RP). This allows sharing a QAT device among
+multiple users while ensuring a guaranteed throughput.
 
-I was definitely expecting something simpler than what was possible
-in the v4 patch. I had another look now, and it's clear that the
-ioctl interface is still not great because the variable data structures
-shine through for some of the calls, and even to get to this point,
-a whole lot of complexity is required underneath.
+The first six commits address minor reworks and additions necessary
+for the feature's implementation.
+The subsequent patch introduces a mechanism for retrieving firmware
+feature capabilities.
+Patch nr 8 implements the core of the rate limiting.
+The final three commits add the required sysfs interface
+for configuring this newly introduced feature.
 
-To get anything better, one would probably have to redesign the entire
-interface stack (hypervisor, kernel and userland) to use regular
-fixed data structures, and this seems unlikely to happen.
+Ciunas Bennett (3):
+  crypto: qat - add rate limiting sysfs interface
+  crypto: qat - add rp2svc sysfs attribute
+  crypto: qat - add num_rps sysfs attribute
 
-     Arnd
+Damian Muszynski (4):
+  units: Add BYTES_PER_*BIT
+  crypto: qat - add bits.h to icp_qat_hw.h
+  crypto: qat - add retrieval of fw capabilities
+  crypto: qat - add rate limiting feature to qat_4xxx
+
+Giovanni Cabiddu (4):
+  crypto: qat - refactor fw config related functions
+  crypto: qat - use masks for AE groups
+  crypto: qat - fix ring to service map for QAT GEN4
+  crypto: qat - move admin api
+
+ Documentation/ABI/testing/sysfs-driver-qat    |   46 +
+ Documentation/ABI/testing/sysfs-driver-qat_rl |  227 ++++
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  190 ++-
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.h     |   13 +-
+ .../intel/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |    1 +
+ .../intel/qat/qat_c62x/adf_c62x_hw_data.c     |    1 +
+ drivers/crypto/intel/qat/qat_common/Makefile  |    3 +
+ .../intel/qat/qat_common/adf_accel_devices.h  |   11 +
+ .../crypto/intel/qat/qat_common/adf_admin.c   |   73 +
+ .../crypto/intel/qat/qat_common/adf_admin.h   |   27 +
+ .../crypto/intel/qat/qat_common/adf_clock.c   |    1 +
+ .../intel/qat/qat_common/adf_cnv_dbgfs.c      |    1 +
+ .../intel/qat/qat_common/adf_common_drv.h     |   10 -
+ .../intel/qat/qat_common/adf_fw_counters.c    |    1 +
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |    7 +
+ .../crypto/intel/qat/qat_common/adf_gen4_pm.c |    1 +
+ .../qat/qat_common/adf_gen4_pm_debugfs.c      |    1 +
+ .../intel/qat/qat_common/adf_gen4_timer.c     |    1 +
+ .../intel/qat/qat_common/adf_heartbeat.c      |    1 +
+ .../qat/qat_common/adf_heartbeat_dbgfs.c      |    1 +
+ .../crypto/intel/qat/qat_common/adf_init.c    |   12 +
+ drivers/crypto/intel/qat/qat_common/adf_rl.c  | 1186 +++++++++++++++++
+ drivers/crypto/intel/qat/qat_common/adf_rl.h  |  176 +++
+ .../intel/qat/qat_common/adf_rl_admin.c       |   98 ++
+ .../intel/qat/qat_common/adf_rl_admin.h       |   18 +
+ .../crypto/intel/qat/qat_common/adf_sysfs.c   |   80 ++
+ .../intel/qat/qat_common/adf_sysfs_rl.c       |  451 +++++++
+ .../intel/qat/qat_common/adf_sysfs_rl.h       |   11 +
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |   41 +
+ .../crypto/intel/qat/qat_common/icp_qat_hw.h  |    2 +
+ .../qat/qat_dh895xcc/adf_dh895xcc_hw_data.c   |    1 +
+ include/linux/units.h                         |    4 +
+ 32 files changed, 2624 insertions(+), 73 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-driver-qat_rl
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_admin.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl_admin.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_rl_admin.h
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_rl.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_rl.h
+
+-- 
+2.41.0
+
