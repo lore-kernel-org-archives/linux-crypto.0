@@ -2,52 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EDDCD6E60
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Oct 2023 12:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2330DCD6E5D
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Oct 2023 12:26:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346207AbjJKMP0 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Oct 2023 08:15:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47438 "EHLO
+        id S234836AbjJKMZ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Oct 2023 08:25:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234945AbjJKMPN (ORCPT
+        with ESMTP id S235117AbjJKMZq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2023 08:15:13 -0400
+        Wed, 11 Oct 2023 08:25:46 -0400
 Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 845565256;
-        Wed, 11 Oct 2023 05:14:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6AB114;
+        Wed, 11 Oct 2023 05:25:12 -0700 (PDT)
 Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id 8391932009F9;
-        Wed, 11 Oct 2023 08:12:58 -0400 (EDT)
+        by mailout.west.internal (Postfix) with ESMTP id BAD4C3200AB2;
+        Wed, 11 Oct 2023 08:25:10 -0400 (EDT)
 Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 11 Oct 2023 08:12:59 -0400
+  by compute5.internal (MEProxy); Wed, 11 Oct 2023 08:25:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
         :cc:content-type:content-type:date:date:from:from:in-reply-to
         :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1697026378; x=1697112778; bh=RM
-        gJN57kN3GhsZBL75M3QGGQOq+DMKk5oTpXvzw/avU=; b=VfCUeyfiXfj5EkKkhH
-        AMqqLCLe2/A7V3TE8d1EVlU15ekS4/l8TYV2BceoWP4ffSt72NweGXPCim4G4BC0
-        Ar8VJ+ZjCXjkeYqwVf7Dv6NUeaU3pGd/LLmZd58Z3cIeJZfNhqveMDcjt4yTBvLk
-        ZqEC8sjT1MkcW/hy9ofqagRNewL4xZf1Fp4c3AmjPDg2Uxk/CcXzDFOuRHy9TN27
-        4vLLHw0D+r/ab0Buehk50cablqiLLcAZopCVDE+C3cm2///A77Qcu1gEfRyJ4RwB
-        dgmZtcHYJs8RGbxkj3UO9arjkxHE2i6Gr2yKN6q/i03PKo/+Vp4vTezkmPlVKWBk
-        GquQ==
+        :subject:subject:to:to; s=fm2; t=1697027110; x=1697113510; bh=Pd
+        51UpbLBT1+psPf2hnTIMJii3++EO4IjWT1009ZizA=; b=ej8XsMTNC0PzZr0SLt
+        Vxa8LG+z1KAY34ZtDIIgqluCZbO8g7xLh/cPaOaGM0fFh/piB7NQVz+et6hYqsdl
+        4iWTa1AKKbTDe01R7M8Kypyp0+6mSsCxwuoUQJPlpmfEWVKD83fpArYYgcAP3QCf
+        K8EvCp37GG8ObTHtjPXXrI5ie7XtSX+zdUQ+kzstQ+ECrRPHadQa3FpZ+snhyQkQ
+        HhhHzIHRevNtIOR+1ufeHTNEPJReDdw58m75O4RZGNHB/rfR/uK0rIQOiRYjmoOL
+        1CvrXi8rLBewAYr+5Wwzndwv9HYIqkhvztkp5klwTm4B1DAgVjN6XZyqk9EssiZT
+        dpXA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-type:content-type:date:date
         :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
         :message-id:mime-version:references:reply-to:sender:subject
         :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1697026378; x=1697112778; bh=RMgJN57kN3Ghs
-        ZBL75M3QGGQOq+DMKk5oTpXvzw/avU=; b=nzWM+L3JNCPexk2qqO8p6bv2qA90m
-        xV63FwH6T/7kI3d7HKmQ2S6oKd/z9hT3oDkCJqxcCKR8C+aUstSTIRzKGk2Jr+Vd
-        Bc5BzItXiLoxdmU4ghNvdKhVtSt40+uqwbdLI8QQ92XFnkym56cg7T+j+nfQphHP
-        rDa8syLnpnTwa79/X20hWrutsAE1FLycDUAWG83LKcTyWnPwG9szdBFjaGcSGb1K
-        pOPqwZBSsObRGPuqQibePPWxH414dFOoZOdAUEg9ANfvTdT3kGR7M3gPzczrRArO
-        KAVje4Co0NGYXXQEURIK+/rOH2ZuDCS+p9eJzzCQy0ux411JKjml9zHuw==
-X-ME-Sender: <xms:SJEmZdlxqhGkqQYayD1v4S4BnehdhZShScc_fwO1JJOAK7OUv8u96A>
-    <xme:SJEmZY2L3REWvQMKMxd7XM09x0_4pmc-cOrWxWbLYZi40OUqGtWnB-uIUcvr1yn0H
-    XrKVmFiYqv63xnydz0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdegjecutefuodetggdotefrodftvf
+        :x-sasl-enc; s=fm2; t=1697027110; x=1697113510; bh=Pd51UpbLBT1+p
+        sPf2hnTIMJii3++EO4IjWT1009ZizA=; b=rFhfZzkPaTpgzosrMFMaXjj6yP0Xp
+        gz1X7dE7GSFTfIKHP6yg89i0A/UBCVx1T8Xa+aQXBn3qKbhRKcV18VAqy0uEqWzr
+        35rma5PX6e437BWoUD3xHEF3arcEAWtLG0Nk92DWqEqLwoTNiyWTTISXxEwwEUoy
+        /4O8vfF+lhBio/GYIcOYQ+qrcUy9OP5b0qFJu+qWizNgDUngNwBlxy/ZJjrNU/ay
+        wSEameGH5UgHcwevlY3nLUgtbCmhEwgezEE/UQG0bxbgKbXZ90etB0H9d/Yx7dgl
+        9+aYUuBbxqBF0X7DWiZymjbaOl6jcSAVgUfMjmIlX/onu4xX/fjNHKsSw==
+X-ME-Sender: <xms:JZQmZbww_AU8iViRbjSlI9CQXj0z2Fkiov0K5SQutqwSCwLdHV88lA>
+    <xme:JZQmZTTEb12Nwen7gNUd7wm58Yr2zMPw5ipSntCUldo8KIyRnTmcI-bPq9h9gZqAd
+    BKsQhAKwdRxzeFLf4Y>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdeglecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
     uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
     fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
@@ -55,25 +54,30 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdegjecutefuodetggdote
     gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
     ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
     hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:SZEmZTpxEYpQK3aVjCurn2HV0LFNlE3bwL7D8hDC13Qc9ytogoP1QA>
-    <xmx:SZEmZdm9gmf4cyAiwaLrDf9v_gLsZrQGisVPQPQAW0N2QYeeOgg7bA>
-    <xmx:SZEmZb2Pi_cTh8jIj0VLK0y8cRG3NEY9wkGQdMHAv6WezlD0uIKIEg>
-    <xmx:SpEmZUu5J6M3uPJOXqgJwAj2_dTmCDIcL-2COR4LOOWybd3Di2MwAw>
+X-ME-Proxy: <xmx:JZQmZVWaLSLvCDgX_0mdA2y4083oXu9QtuLYfHkucaoMvbmfoRAR8Q>
+    <xmx:JZQmZViAUseJdxTh9_3yzxIwWwZG3VdQ-18HlJr_wxCUHaJVYdGJrw>
+    <xmx:JZQmZdB509oyX1gMGWaE2gKlIx_jvMAhGt_46MMHrEiGtzxYizKA4w>
+    <xmx:JpQmZSKpal6eQjoZbmJkF0D7vZl5-dmDm-7wlopeqNpVivZtOuYndA>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id E1BF3B60089; Wed, 11 Oct 2023 08:12:56 -0400 (EDT)
+        id 8CE30B6008F; Wed, 11 Oct 2023 08:25:09 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 User-Agent: Cyrus-JMAP/3.9.0-alpha0-1019-ged83ad8595-fm-20231002.001-ged83ad85
 MIME-Version: 1.0
-Message-Id: <939cf309-b7e4-461a-93e6-dd6212887d08@app.fastmail.com>
-In-Reply-To: <fd43fb0d-5d52-423d-bb1d-bc10e64ea3ee@app.fastmail.com>
-References: <20231010213420.93725-1-graf@amazon.com>
- <fd43fb0d-5d52-423d-bb1d-bc10e64ea3ee@app.fastmail.com>
-Date:   Wed, 11 Oct 2023 14:12:36 +0200
+Message-Id: <2339287b-8b17-413b-aa86-f618ea7fc3fa@app.fastmail.com>
+In-Reply-To: <2023101001-ocelot-veteran-10db@gregkh>
+References: <20231009212053.2007-1-graf@amazon.com>
+ <20231009212053.2007-2-graf@amazon.com>
+ <2023101010-overwrite-parakeet-91d5@gregkh>
+ <0ee221bc-ea99-4724-9ebd-436e91417e4b@amazon.com>
+ <2023101009-accustom-manifesto-8bdb@gregkh>
+ <b3a8c722-c0e2-4c8c-aef0-29af0a93572d@amazon.com>
+ <2023101001-ocelot-veteran-10db@gregkh>
+Date:   Wed, 11 Oct 2023 14:24:48 +0200
 From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Alexander Graf" <graf@amazon.com>, linux-kernel@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+To:     "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Alexander Graf" <graf@amazon.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         "Herbert Xu" <herbert@gondor.apana.org.au>,
         "Olivia Mackall" <olivia@selenic.com>,
         "Petre Eftime" <petre.eftime@gmail.com>,
@@ -83,29 +87,61 @@ Cc:     linux-crypto@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
         "Jason Wang" <jasowang@redhat.com>,
         "Xuan Zhuo" <xuanzhuo@linux.alibaba.com>,
-        "Christophe JAILLET" <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH v6] misc: Add Nitro Secure Module driver
+        "Kyunghwan Kwon" <k@mononn.com>
+Subject: Re: [PATCH v4 1/2] Import CBOR library
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 11, 2023, at 13:31, Arnd Bergmann wrote:
-
->> +/* Maximum length output data */
->> +struct nsm_data_resp {
->> +	__u32 len;
->> +	__u8  data[NSM_RESPONSE_MAX_SIZE];
->> +};
+On Tue, Oct 10, 2023, at 10:27, Greg Kroah-Hartman wrote:
+> On Tue, Oct 10, 2023 at 10:08:43AM +0200, Alexander Graf wrote:
+>> On 10.10.23 10:03, Greg Kroah-Hartman wrote:
+>>
+>> > > Out of these, the NSM communication protocol uses all except Semantic tags
+>> > > and Floats. The CBOR library that this patch imports does not have special
+>> > > handling for Semantic tags, which leaves only floats which are already
+>> > > #ifdef'ed out. That means there is not much to trim.
+>> > > 
+>> > > What you see here is what's needed to parse CBOR in kernel - if that's what
+>> > > we want to do. I'm happy to rip it out again and make it a pure user space
+>> > > problem to do CBOR :).
+>> > Yes, why are we parsing this in the kernel?  What could go wrong with
+>> > adding yet-another-parser in privileged context?  :)
+>> > 
+>> > Why does this have to be in the kernel, the data sent/recieved is over
+>> > virtio, so why does the kernel have to parse it?  I couldn't figure that
+>> > out from the driver, yet the driver seems to have a lot of hard-coded
+>> > parsing logic in it to assume specific message formats?
+>> 
+>> 
+>> The parsing doesn't have to be in kernel and it probably shouldn't be
+>> either. V3 of the patch was punting all the parsing to user space, at which
+>> point you and Arnd said I should give it a try to do the protocol parsing in
+>> kernel space instead. That's why the parser is here.
 >
-> You have endian-conversion for some of the data fields
-> but not the 'len field here, I guess these should be
-> __le32 instead of __u32, with the appropriate le32_to_cpu()
-> and cpu_to_le32() conversion when passing the native
-> u32 word from userspace.
+> Arnd said that, not me :)
+>
+>> If we conclude that all this in-kernel parsing is not worth it, I'm very
+>> happy to just go back to the the v3 ioctl interface and post v5 with hwrng
+>> merged into misc, but remove all CBOR logic again :)
+>
+> I think the less parsers we have in the kernel, the safer we are for
+> obvious reasons.  Unless you have a parser for this in rust?  :)
+>
+> I don't really know, having a generic interface is good, but at the
+> expense of this api is probably not good.  individual ioctls might be
+> better if there are not going to be any other drivers for this type of
+> thing?
 
-Ignore this one, I misread how the length field is used, this
-is obviously not fixed endian as it is only used for
-communicating with the kernel's virtio code, not the device.
+I was definitely expecting something simpler than what was possible
+in the v4 patch. I had another look now, and it's clear that the
+ioctl interface is still not great because the variable data structures
+shine through for some of the calls, and even to get to this point,
+a whole lot of complexity is required underneath.
+
+To get anything better, one would probably have to redesign the entire
+interface stack (hypervisor, kernel and userland) to use regular
+fixed data structures, and this seems unlikely to happen.
 
      Arnd
