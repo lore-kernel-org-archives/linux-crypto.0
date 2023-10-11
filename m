@@ -2,121 +2,143 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EFACD8C9F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Oct 2023 08:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EF3CD6E42
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Oct 2023 08:51:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbjJKIme (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Oct 2023 04:42:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42040 "EHLO
+        id S230392AbjJKIvJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Oct 2023 04:51:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbjJKImd (ORCPT
+        with ESMTP id S230382AbjJKIvI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2023 04:42:33 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D124B93;
-        Wed, 11 Oct 2023 01:42:31 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61AE1C433C9;
-        Wed, 11 Oct 2023 08:42:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697013751;
-        bh=/qnCsWhvwJGmydL5cFopunMWv+54w3gBRXtRDqkm3Mo=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Db5h7oG7HRhT0j2ZKdp8Krg7SPnXjuNjx2Sjo1zzsZZVC6a4g2b0i7l7W1Rtee219
-         QHEqRS0aSTOl/B93iRJcePiEzxMD9X9QaXPtoTUJJIbpdfYGg1WZkGL/upySXZOOmi
-         Bb4/LgU0qiUuaEsdpkaB02sCp9KGfk2nLsCpPJwYhyrqkXIZnUcQJX2lOMFz9p/fCP
-         apVub3lK2vbP6MNxKheZCxdXRYPrRJWYdlK8BuSCWSwg9qlP1VGTmaqOUstwp8s6aq
-         QjWC99i4o0m+7Du3ofOKBi0Llc0Ih9ek7oq8e05Y4JFZZEUN2R5/AIA6qbSMwx0m6b
-         1c6x2zZESjT/g==
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50567477b29so8563817e87.3;
-        Wed, 11 Oct 2023 01:42:31 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzqW+XAxku8vsXyPbaPu+RogsW/LxiaDHSLWS61EfqIrnoQEuPT
-        GMCoK1Vnm3zid+R00PPZl5JbYOOdj1394nyXb5w=
-X-Google-Smtp-Source: AGHT+IEQ8N+hxnKlsY3kdHlMUmD2dB5AsGDgukW+xZ9lNPz+9WLrpyVRancG44N14b/uhYsTkc7NkZszxEOW8nSO8M4=
-X-Received: by 2002:a05:6512:2527:b0:4fe:279b:7603 with SMTP id
- be39-20020a056512252700b004fe279b7603mr18296412lfb.14.1697013749583; Wed, 11
- Oct 2023 01:42:29 -0700 (PDT)
+        Wed, 11 Oct 2023 04:51:08 -0400
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A75798;
+        Wed, 11 Oct 2023 01:51:05 -0700 (PDT)
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39B5xlfO011115;
+        Wed, 11 Oct 2023 10:50:08 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+        message-id:date:mime-version:subject:to:cc:references:from
+        :in-reply-to:content-type:content-transfer-encoding; s=
+        selector1; bh=8gYo5goS4DqeD1ldn/WMNS5pR/ViIwg7IylwRkFLbCQ=; b=Za
+        TlXAtbPx+MB2v0D8AaSOiCRr0QWaExzh07Zo/oJZvuCeapBUJIlchy/0wVkKmKEn
+        wF4z0gNW2gVgYd+nm+OoUH3zQARoNUOh9jLOsqhjQPZQakZgQ8UQum8NC5lIu53G
+        J9/i4D9RVwogLLkVq45t8JbhccX58FoBHOkPFG54l4Myu31cTN8/lVAO4VwO3iQ/
+        QVK9wmSpmZQtWB32TwY8Jbg0FQFxf0GPdf5ZAKxNUqJf8bLx+7v473H+0cTRORLN
+        +6OGQsijOBEGjRMLIhQfjAvoAYEoRWr3fmVZBKuazCBrw1XmeMdLs2GuCUkIAx4t
+        D2E7cjGWOwhthrlESwYw==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tnp24gtuh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Oct 2023 10:50:08 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 21883100064;
+        Wed, 11 Oct 2023 10:50:05 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id B630822FA2E;
+        Wed, 11 Oct 2023 10:50:05 +0200 (CEST)
+Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 11 Oct
+ 2023 10:50:03 +0200
+Message-ID: <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
+Date:   Wed, 11 Oct 2023 10:49:58 +0200
 MIME-Version: 1.0
-References: <20231010212530.63470-1-dimitri.ledkov@canonical.com>
-In-Reply-To: <20231010212530.63470-1-dimitri.ledkov@canonical.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 11 Oct 2023 10:42:18 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFVPnowdREEjVREy=KKY12nZUp58qL2b_u97=bOTz0wgA@mail.gmail.com>
-Message-ID: <CAMj1kXFVPnowdREEjVREy=KKY12nZUp58qL2b_u97=bOTz0wgA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: mscode_parser: remove sha224 authenticode support
-To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
+ STM32MP15x boards
+To:     Rob Herring <robh@kernel.org>
+CC:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
+        <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
+        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
+        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
+        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>,
+        <lee@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
+        <arnd@kernel.org>, <richardcochran@gmail.com>,
+        Frank Rowand <frowand.list@gmail.com>, <peng.fan@oss.nxp.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-p.hy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
+        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
+References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
+ <20231010125719.784627-11-gatien.chevallier@foss.st.com>
+ <20231010184212.GA1221641-robh@kernel.org>
+Content-Language: en-US
+From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20231010184212.GA1221641-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-11_06,2023-10-10_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 10 Oct 2023 at 23:25, Dimitri John Ledkov
-<dimitri.ledkov@canonical.com> wrote:
->
-> It is possible to stand up own certificates and sign PE-COFF binaries
-> using SHA-224. However it never became popular or needed since it has
-> similar costs as SHA-256. Windows Authenticode infrastructure never
-> had support for SHA-224, and all secureboot keys used fro linux
+Hi Rob,
 
-fro
+On 10/10/23 20:42, Rob Herring wrote:
+> On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
+>> ETZPC is a firewall controller. Put all peripherals filtered by the
+>> ETZPC as ETZPC subnodes and reference ETZPC as an
+>> access-control-provider.
+>>
+>> For more information on which peripheral is securable or supports MCU
+>> isolation, please read the STM32MP15 reference manual.
+>>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>> ---
+>>
+>> Changes in V6:
+>>      	- Renamed access-controller to access-controllers
+>>      	- Removal of access-control-provider property
+>>
+>> Changes in V5:
+>>      	- Renamed feature-domain* to access-control*
+>>
+>>   arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
+>>   arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
+>>   arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
+>>   3 files changed, 1450 insertions(+), 1377 deletions(-)
+> 
+> This is not reviewable. Change the indentation and any non-functional
+> change in one patch and then actual changes in another.
 
-> vmlinuz have always been using at least SHA-256.
->
-> Given the point of mscode_parser is to support interoperatiblity with
+Ok, I'll make it easier to read.
 
-interoperatibility
+> 
+> This is also an ABI break. Though I'm not sure it's avoidable. All the
+> devices below the ETZPC node won't probe on existing kernel. A
+> simple-bus fallback for ETZPC node should solve that.
+> 
 
-> typical de-facto hashes, remove support for SHA-224 to avoid
-> posibility
+I had one issue when trying with a simple-bus fallback that was the
+drivers were probing even though the access rights aren't correct.
+Hence the removal of the simple-bus compatible in the STM32MP25 patch.
 
-the possibility
+Even though a node is tagged with the OF_POPULATED flag when checking
+the access rights with the firewall controller, it seems that when
+simple-bus is probing, there's no check of this flag.
 
-> of creating interoperatibility
+of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
+Maybe that is my error and the firewall bus populate should set
+OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
 
-interoperability
+Best regards,
+Gatien
 
-> issues with rhboot/shim,
-> grub, and non-linux systems trying to sign or verify vmlinux.
->
-> SHA-224 itself is not removed from the kernel, as it is truncated
-> SHA-256. If requested I can write patches to remove SHA-224 support
-> across all of the drivers.
->
-
-We can stop using it but we cannot remove it.
-
-As you say, it is just SHA-256 with a different initial state and a
-truncated hash, so removing support entirely achieves very little. And
-there are plenty of other algorithms we'd be happy to remove first if
-we were only sure that nobody was relying on them. (Note that AF_ALG
-supports AEAD so someone somewhere could be using the kernel's sha224
-from user space)
-
-> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
-> ---
->  crypto/asymmetric_keys/mscode_parser.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/mscode_parser.c b/crypto/asymmetric_keys/mscode_parser.c
-> index 6416bded0e..855cbc46a9 100644
-> --- a/crypto/asymmetric_keys/mscode_parser.c
-> +++ b/crypto/asymmetric_keys/mscode_parser.c
-> @@ -84,9 +84,6 @@ int mscode_note_digest_algo(void *context, size_t hdrlen,
->         case OID_sha512:
->                 ctx->digest_algo = "sha512";
->                 break;
-> -       case OID_sha224:
-> -               ctx->digest_algo = "sha224";
-> -               break;
->
->         case OID__NR:
->                 sprint_oid(value, vlen, buffer, sizeof(buffer));
-> --
-> 2.34.1
->
+> Rob
