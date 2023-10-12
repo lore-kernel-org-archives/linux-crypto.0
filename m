@@ -2,112 +2,111 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF75CDB47E
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 15:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E97CC46CA1
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 15:09:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbjJLPIw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Oct 2023 11:08:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38362 "EHLO
+        id S1347050AbjJLPJk (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Oct 2023 11:09:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343837AbjJLPIv (ORCPT
+        with ESMTP id S1346441AbjJLPJj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2023 11:08:51 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 631B6BE
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2023 08:08:49 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6c4c594c0eeso680128a34.0
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2023 08:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697123328; x=1697728128; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nhlvftp0Eau1YECdWUl7w/Gsq1ga8TMsCPoziQqIGXE=;
-        b=H6bMbyJh2L07s3Diu87rgDUCafghipta7SZpKMhrBGkNGQ1GaOxa5NuKAQGrs0jQWw
-         1f3c2w/fFQJ13moJvEFr49ym3pxRsiQStisUR3mGr/pQnVPS3arTLFO/ix5eR7rALrtV
-         jk8HD9gHK4P+zorYYkSYE559XVEshdFaIZq9du9DqbjEQWjDfT5hmauQTWsqUofuv9iT
-         Q+Fi4+kRQhVPyikabPKrgNclB1hCfMKzjKWS4klDzjzsvy/hJcbPgK6fbD96DSUZegMz
-         DDbhVKix2qpo45U+XFIz4ygGPsuDIijdIijLjOO5u1tHiOTP3tgPyfv2KYJGXw/jfIWD
-         +BTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697123328; x=1697728128;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nhlvftp0Eau1YECdWUl7w/Gsq1ga8TMsCPoziQqIGXE=;
-        b=oMqs5cjmGd2N5VQihcYtcrPY6/y9oY/9B1rpz8RkvcxronpxYCFl1mZRu1phmIvTun
-         1au+wbvw2HnPdLjBp05WAiK9WralI0teC4lja0K9jETMTd7hhXctes4mVWvDOSMibjTQ
-         YcVfBzBJJWL4fQmiUvfwCw895BrsMwtOZTJf5KjWKvJ55v3EF6BBREdkt91zwKFep2Nq
-         cagHmpqpyg+ZrGQyghFRaSaXm7JpEswnj738N6GitrepZe2uVe0RkkQUITc5BP8J/nbd
-         r3D6pOiXNK3LoJo+pV6kXBMKlcsmkbWTJn/U9A8hkzDg8u3zpJlNRz792XTUL83dhlkE
-         kGGQ==
-X-Gm-Message-State: AOJu0YxbBykJvy+F9fEh1bGU6TtARK0FbDF4cx444ssAJUCadh8I0Gy2
-        0yuvpzIp4TilmdLPUE9DngU=
-X-Google-Smtp-Source: AGHT+IEk5cwYFBt4bB2R7DiehtAuPsNbgCjCkt2iwNbyWEw3o0mo3Ck9fNpODw8QNGXlQ1oyMJgeRQ==
-X-Received: by 2002:a05:6830:118f:b0:6bc:cd0d:427e with SMTP id u15-20020a056830118f00b006bccd0d427emr22136498otq.38.1697123328619;
-        Thu, 12 Oct 2023 08:08:48 -0700 (PDT)
-Received: from [172.16.49.130] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id f9-20020a9d5e89000000b006c4ecbbcfa7sm330146otl.34.2023.10.12.08.08.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Oct 2023 08:08:48 -0700 (PDT)
-Message-ID: <c917020d-0cb0-4289-a2e3-d9a0fa28151a@gmail.com>
-Date:   Thu, 12 Oct 2023 10:08:46 -0500
+        Thu, 12 Oct 2023 11:09:39 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E150FC0;
+        Thu, 12 Oct 2023 08:09:36 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5tMX1WhJz67n0t;
+        Thu, 12 Oct 2023 23:09:12 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 12 Oct
+ 2023 16:09:34 +0100
+Date:   Thu, 12 Oct 2023 16:09:33 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Lukas Wunner <lukas@wunner.de>
+CC:     Alistair Francis <Alistair.Francis@wdc.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        "graf@amazon.com" <graf@amazon.com>,
+        "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "ming4.li@intel.com" <ming4.li@intel.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "helgaas@kernel.org" <helgaas@kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "dave.jiang@intel.com" <dave.jiang@intel.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "aik@amd.com" <aik@amd.com>,
+        "david.e.box@intel.com" <david.e.box@intel.com>,
+        "linuxarm@huawei.com" <linuxarm@huawei.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>
+Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
+Message-ID: <20231012160933.00007c3d@Huawei.com>
+In-Reply-To: <20231012071629.GA6305@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+        <89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
+        <20231003153937.000034ca@Huawei.com>
+        <caf11c28d21382cc1a81d84a23cbca9e70805a87.camel@wdc.com>
+        <20231012071629.GA6305@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Linux 6.5 broke iwd
-Content-Language: en-US
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        James Prestwood <prestwoj@gmail.com>
-References: <ab4d8025-a4cc-48c6-a6f0-1139e942e1db@gmail.com>
- <ZSc/9nUuF/d24iO6@gondor.apana.org.au> <ZSda3l7asdCr06kA@gondor.apana.org.au>
- <be96d2e7-592e-467e-9ad2-3f69a69cf844@gmail.com>
- <ZSdn29PDrs6hzjV9@gondor.apana.org.au>
- <1d22cd18-bc2a-4273-8087-e74030fbf373@gmail.com>
- <ZSgChGwi1r9CILPI@gondor.apana.org.au>
-From:   Denis Kenzior <denkenz@gmail.com>
-In-Reply-To: <ZSgChGwi1r9CILPI@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Thu, 12 Oct 2023 09:16:29 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
 
-> OK, we need to take a step back.  The commits that you're testing
-> are all known to be buggy.
+> On Thu, Oct 12, 2023 at 03:26:44AM +0000, Alistair Francis wrote:
+> > On Tue, 2023-10-03 at 15:39 +0100, Jonathan Cameron wrote:  
+> > > On Thu, 28 Sep 2023 19:32:37 +0200 Lukas Wunner <lukas@wunner.de> wrote:  
+> > > > This implementation supports SPDM 1.0 through 1.3 (the latest
+> > > > version).  
+> > > 
+> > > I've no strong objection in allowing 1.0, but I think we do need
+> > > to control min version accepted somehow as I'm not that keen to get
+> > > security folk analyzing old version...  
+> > 
+> > Agreed. I'm not sure we even need to support 1.0  
 > 
-> So please tell me what exactly is the problem with the latest kernel
-> and then we can work it back from there.
-
-Looks like something took out the ability to run sign/verify without a hash on 
-asymmetric keys.
-
+> According to PCIe r6.1 page 115 ("Reference Documents"):
 > 
-> If you have a reproducer that works on the latest kernel that would
-> be great.
+>    "CMA requires SPDM Version 1.0 or above.  IDE requires SPDM Version 1.1
+>     or above.  TDISP requires version 1.2 or above."
+> 
+> This could be interpreted as SPDM 1.0 support being mandatory to be
+> spec-compliant.  Even if we drop support for 1.0 from the initial
+> bringup patches, someone could later come along and propose a patch
+> to re-add it on the grounds of the above-quoted spec section.
+> So I think we can't avoid it.
+
+I checked with some of our security folk and they didn't provide a
+reason to avoid 1.0.  It's not feature complete, but for what it does
+it's fine.  So given the PCI spec line you quote keep it for now.
+We should be careful to require the newer versions for the additional
+features though. Can address that when it's relevant.
+
+Jonathan
+> 
+> Thanks,
+> 
+> Lukas
 > 
 
-Easiest is to run the ell unit test:
-
-[denkenz@archdev tmp]$ git clone git://git.kernel.org/pub/scm/libs/ell/ell.git
-[denkenz@archdev tmp]$ cd ell
-[denkenz@archdev ell]$ ./bootstrap-configure
-[denkenz@archdev ell]$ make -j16
-[denkenz@archdev ell]$ unit/test-key
-TEST: unsupported
-TEST: user key
-TEST: Diffie-Hellman 1
-TEST: Diffie-Hellman 2
-TEST: Diffie-Hellman 3
-TEST: simple keyring
-TEST: trusted keyring
-TEST: trust chain
-TEST: key crypto
-test-key: unit/test-key.c:624: test_key_crypto: Assertion `len == 
-sizeof(ciphertext)' failed.
-
-Regards,
--Denis
