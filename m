@@ -2,68 +2,99 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B20C41513
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 08:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFA8CDB46E
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 09:16:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235329AbjJLIOA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Oct 2023 04:14:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56602 "EHLO
+        id S235518AbjJLJQU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Oct 2023 05:16:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347187AbjJLHua (ORCPT
+        with ESMTP id S234133AbjJLJP7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2023 03:50:30 -0400
-Received: from mail.venturelinkbiz.com (mail.venturelinkbiz.com [51.195.119.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0477AC0
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2023 00:50:29 -0700 (PDT)
-Received: by mail.venturelinkbiz.com (Postfix, from userid 1002)
-        id BBD0446CB0; Thu, 12 Oct 2023 07:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=venturelinkbiz.com;
-        s=mail; t=1697097027;
-        bh=JBV4b8UUo1MSngn/QBoedt1Dv52bT8rWeq4R22MtJMs=;
-        h=Date:From:To:Subject:From;
-        b=V/HJK0qv0x4ojFsl+ML6eXabrPVA0h3ulL1hDA1aBKFLl7RRvPMVQoxuhJWk7d+uz
-         Wm1c7t4eHiyKNaIabI7Fx/WA4UajTK+X03H0ebykc4+dHCuilH3iZrHFl4UFt0owG/
-         4fAP/ATEHOZSRxljnJlkog4jC4hVlaNKBq3JEUwnhxkQSubs14NpF+moed8JrbucmH
-         I1N0WoyoztlvV9s49yILspE5ct0a87s7xoMGR86mrnUqTe/Lh+fR1wehqSnvHTucSZ
-         6RAo12UHa6Bbygpi4a24Ud9EGQc0bYxbmw5gQwXf7jeauNNexEM8BEbwMCWxqSxuXQ
-         fq1zJlIFZttIg==
-Received: by mail.venturelinkbiz.com for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2023 07:50:18 GMT
-Message-ID: <20231012064500-0.1.2y.86mi.0.1tlgd4d8z3@venturelinkbiz.com>
-Date:   Thu, 12 Oct 2023 07:50:18 GMT
-From:   "Michal Rmoutil" <michal.rmoutil@venturelinkbiz.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?Efektivn=C3=AD_sledov=C3=A1n=C3=AD_a_optimalizace_v=C3=BDroby_pro_va=C5=A1i_spole=C4=8Dnost?=
-X-Mailer: mail.venturelinkbiz.com
+        Thu, 12 Oct 2023 05:15:59 -0400
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [IPv6:2a01:4f8:150:2161:1:b009:f23e:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C274ED;
+        Thu, 12 Oct 2023 02:15:45 -0700 (PDT)
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+         client-signature RSA-PSS (4096 bits) client-digest SHA256)
+        (Client CN "*.hostsharing.net", Issuer "RapidSSL Global TLS RSA4096 SHA256 2022 CA1" (verified OK))
+        by bmailout3.hostsharing.net (Postfix) with ESMTPS id DACAF100DCEF1;
+        Thu, 12 Oct 2023 11:15:42 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+        id 8BED2224D1; Thu, 12 Oct 2023 11:15:42 +0200 (CEST)
+Date:   Thu, 12 Oct 2023 11:15:42 +0200
+From:   Lukas Wunner <lukas@wunner.de>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
+        linuxarm@huawei.com, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 00/12] PCI device authentication
+Message-ID: <20231012091542.GA22596@wunner.de>
+References: <cover.1695921656.git.lukas@wunner.de>
+ <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+ <20231007100433.GA7596@wunner.de>
+ <20231009123335.00006d3d@Huawei.com>
+ <20231009134950.GA7097@wunner.de>
+ <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dobr=C3=A9 r=C3=A1no,
+On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
+> But the way SPDM is done now is that if the user (as myself) wants to let
+> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
+> as CMA is not a (un)loadable module or built-in (with some "blacklist"
+> parameters), and does not provide a sysfs knob to control its tentacles.
+> Kinda harsh.
 
-m=C3=A1te mo=C5=BEnost sledovat stav ka=C5=BEd=C3=A9ho stroje a v=C3=BDro=
-bn=C3=ADho procesu z kancel=C3=A1=C5=99e, konferen=C4=8Dn=C3=AD m=C3=ADst=
-nosti nebo dokonce z domova =C4=8Di na cest=C3=A1ch =E2=80=93 na va=C5=A1=
-em telefonu?
+On AMD SEV-TIO, does the PSP perform SPDM exchanges with a device
+*before* it is passed through to a guest?  If so, why does it do that?
 
-Poskytujeme rychle implementovateln=C3=BD a snadno pou=C5=BEiteln=C3=BD n=
-=C3=A1stroj, kter=C3=BD zachyt=C3=AD i n=C4=9Bkolikasekundov=C3=BD mikrop=
-rostoj a okam=C5=BEit=C4=9B p=C5=99epo=C4=8D=C3=ADt=C3=A1 vyu=C5=BEit=C3=AD=
- stroje v kontextu dan=C3=A9 v=C3=BDrobn=C3=AD zak=C3=A1zky.
+Dan and I discussed this off-list and Dan is arguing for lazy attestation,
+i.e. the TSM should only have the need to perform SPDM exchanges with
+the device when it is passed through.
 
-Kdykoli vid=C3=ADte stav objedn=C3=A1vky a jste informov=C3=A1ni o p=C5=99=
-=C3=ADpadn=C3=A9m sn=C3=AD=C5=BEen=C3=AD efektivity. Syst=C3=A9m s=C3=A1m=
- analyzuje data a p=C5=99ipravuje cenn=C3=A9 reporty, co=C5=BE oper=C3=A1=
-tor=C5=AFm umo=C5=BE=C5=88uje soust=C5=99edit se na v=C3=BDrobn=C3=AD c=C3=
-=ADl.
+So the host enumerates the DOE protocols and authenticates the device.
+When the device is passed through, patch 12/12 ensures that the host
+keeps its hands off of the device, thus affording the TSM exclusive
+SPDM control.
 
-C=C3=ADl je jednoduch=C3=BD: jeden pohled =E2=80=93 cel=C3=A1 tov=C3=A1rn=
-a. =C4=8Cek=C3=A1m na odpov=C4=9B=C4=8F, jestli vid=C3=ADte mo=C5=BEnost =
-vyu=C5=BEit=C3=AD takov=C3=A9ho n=C3=A1stroje ve va=C5=A1=C3=AD firm=C4=9B=
-=2E
+I agree that the commit message of 12/12 is utterly misleading in that
+it says "the guest" is granted exclusive control.  It should say "the TSM"
+instead.  (There might be implementations where the guest itself has
+the role of the TSM and authenticates the device on its own behalf,
+but PCIe r6.1 sec 11 uses the term "TSM" so that's what the commit
+message needs to use.)
 
+However apart from the necessary rewrite of the commit message and
+perhaps a rename of the PCI_CMA_OWNED_BY_GUEST flag, I think patch 12/12
+should already be doing exactly what you need -- provided that the
+PSP doesn't perform SPDM exchanges before passthrough.  If it already
+performs them, say, on boot, I'd like to understand the reason.
 
-Pozdravy
-Michal Rmoutil
+Thanks,
+
+Lukas
