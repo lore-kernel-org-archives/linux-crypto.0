@@ -2,175 +2,131 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D79C46CA1
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 15:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE75CDB47E
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 15:30:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379245AbjJLPZN (ORCPT
+        id S1379448AbjJLPaT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Oct 2023 11:25:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45128 "EHLO
+        Thu, 12 Oct 2023 11:30:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347301AbjJLPZL (ORCPT
+        with ESMTP id S1379229AbjJLPaS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2023 11:25:11 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909EEDC;
-        Thu, 12 Oct 2023 08:25:08 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5tfJ0vH6z67mY4;
-        Thu, 12 Oct 2023 23:22:00 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 12 Oct
- 2023 16:25:05 +0100
-Date:   Thu, 12 Oct 2023 16:25:04 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-CC:     Lukas Wunner <lukas@wunner.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH 00/12] PCI device authentication
-Message-ID: <20231012162504.00004bee@Huawei.com>
-In-Reply-To: <78322d17-1fe7-4bfd-8073-64a7f0a1b0a2@amd.com>
-References: <cover.1695921656.git.lukas@wunner.de>
-        <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
-        <20231007100433.GA7596@wunner.de>
-        <20231009123335.00006d3d@Huawei.com>
-        <20231009134950.GA7097@wunner.de>
-        <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
-        <20231012091542.GA22596@wunner.de>
-        <78322d17-1fe7-4bfd-8073-64a7f0a1b0a2@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Thu, 12 Oct 2023 11:30:18 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA29C0;
+        Thu, 12 Oct 2023 08:30:17 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F77C433C8;
+        Thu, 12 Oct 2023 15:30:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697124617;
+        bh=ZtcSIbjB2WpeZfQRyCvdpc+0MAvoSIsAVFQJFGWoAZY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sNlqy8imXhwlW5ogqsGatXLJh6x3ULy2dxsaSxs56ggFVkTV6XlGelwtvmknbj7Xu
+         ShUCZ/8OXslZolbuuvyrBlxLrcJ01GSlmz7CSJEaxf3rAcgbPMbnfuFHufU09E90RW
+         5ApYEGyJHTTls7cFvAibnKaw6QYJ/MgybICMj+V6qAR0vsGzNnF3N6loiEvhXeakbo
+         Tc8RBxaMuLt9cw9IyN5cmf2yVbPk/7zrWOf/NIL+18Z146Hj24oQ+EZR236LNiKgxH
+         rW8s1EpB9lyTQA3S/nGP0hy8u95XFa9UJYnNgK7IXnZV4NIWHKMv5YsKgXN/Jehq6j
+         lkrAiKBqcY2gw==
+Received: (nullmailer pid 821925 invoked by uid 1000);
+        Thu, 12 Oct 2023 15:30:12 -0000
+Date:   Thu, 12 Oct 2023 10:30:12 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
+        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
+        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
+        andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
+        lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+        arnd@kernel.org, richardcochran@gmail.com,
+        Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+        netdev@vger.kernel.org, linux-p.hy@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-usb@vger.kernel.org
+Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
+ STM32MP15x boards
+Message-ID: <20231012153012.GA698406-robh@kernel.org>
+References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
+ <20231010125719.784627-11-gatien.chevallier@foss.st.com>
+ <20231010184212.GA1221641-robh@kernel.org>
+ <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 12 Oct 2023 22:18:27 +1100
-Alexey Kardashevskiy <aik@amd.com> wrote:
-
-> On 12/10/23 20:15, Lukas Wunner wrote:
-> > On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:  
-> >> But the way SPDM is done now is that if the user (as myself) wants to let
-> >> the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
-> >> as CMA is not a (un)loadable module or built-in (with some "blacklist"
-> >> parameters), and does not provide a sysfs knob to control its tentacles.
-> >> Kinda harsh.  
+On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
+> Hi Rob,
+> 
+> On 10/10/23 20:42, Rob Herring wrote:
+> > On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
+> > > ETZPC is a firewall controller. Put all peripherals filtered by the
+> > > ETZPC as ETZPC subnodes and reference ETZPC as an
+> > > access-control-provider.
+> > > 
+> > > For more information on which peripheral is securable or supports MCU
+> > > isolation, please read the STM32MP15 reference manual.
+> > > 
+> > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> > > ---
+> > > 
+> > > Changes in V6:
+> > >      	- Renamed access-controller to access-controllers
+> > >      	- Removal of access-control-provider property
+> > > 
+> > > Changes in V5:
+> > >      	- Renamed feature-domain* to access-control*
+> > > 
+> > >   arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
+> > >   arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
+> > >   arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
+> > >   3 files changed, 1450 insertions(+), 1377 deletions(-)
 > > 
-> > On AMD SEV-TIO, does the PSP perform SPDM exchanges with a device
-> > *before* it is passed through to a guest?  If so, why does it do that?  
+> > This is not reviewable. Change the indentation and any non-functional
+> > change in one patch and then actual changes in another.
 > 
-> Yes, to set up IDE. SEV TIO is designed in a way that there is one 
-> stream == set of keys per the PF's traffic class.
-> 
-> It is like this - imagine a TDISP+SRIOV device with hundreds VFs passed 
-> through to hundreds VMs. The host still owns the PF, provides DOE for 
-> the PSP, the PSP owns a handful of keys (one will do really, I have not 
-> fully grasped the idea when one would want traffic classes but ok, up to 
-> 8), and hundreds VFs work using this few (or one) keys, and the PF works 
-> as well, just cannot know the IDE key (==cannot spy on VFs via something 
-> like PCI bridge/retimer or logic analyzer). It is different than what 
-> you are doing, DOE is the only common thing so far (or ever?).
-> 
-> btw the PSP is not able to initiate SPDM traffic by itself, when the 
-> host decides it wants to setup IDE (via a PSP in SEV TIO), it talks to 
-> the PSP which can return "I want to talk to the device, here are 
-> req/resp buffers", in a loop, until the PSP returns something else.
-> 
-> > Dan and I discussed this off-list and Dan is arguing for lazy attestation,
-> > i.e. the TSM should only have the need to perform SPDM exchanges with
-> > the device when it is passed through.  
-> 
-> Well, I'd expect that in most cases VF is going to be passed through and 
-> IDE setup is done via PF which won't be passed through in such cases as 
-> it has to manage VFs.
-> 
-> > So the host enumerates the DOE protocols  
-> 
-> Yes.
-> 
-> > and authenticates the device.  
-> 
-> No objection here. But PSP will need to rerun this, but still via the 
-> host's DOE.
-> 
-> > When the device is passed through, patch 12/12 ensures that the host
-> > keeps its hands off of the device, thus affording the TSM exclusive
-> > SPDM control.  
-> 
-> If a PF is passed through - I guess yes we could use that, but how is 
-> this going to work for a VF?
-> 
-> > I agree that the commit message of 12/12 is utterly misleading in that
-> > it says "the guest" is granted exclusive control.  It should say "the TSM"
-> > instead.  (There might be implementations where the guest itself has
-> > the role of the TSM and authenticates the device on its own behalf,
-> > but PCIe r6.1 sec 11 uses the term "TSM" so that's what the commit
-> > message needs to use.)  
-> 
-> This should work as long as DOE is still available (as of today).
-> 
-> > However apart from the necessary rewrite of the commit message and
-> > perhaps a rename of the PCI_CMA_OWNED_BY_GUEST flag, I think patch 12/12
-> > should already be doing exactly what you need -- provided that the
-> > PSP doesn't perform SPDM exchanges before passthrough.  If it already
-> > performs them, say, on boot, I'd like to understand the reason.  
-> 
-> In out design this does not have to happen on the host's boot. But I 
-> wonder if some PF host driver authenticated some device and then we 
-> create a bunch of VFs and pass the SPDM ownership of the PF to the PSP 
-> to reauthentificate it again - the already running PF host driver may 
-> become upset, may it? 12/12 assumes the host driver is VFIO-PCI but it 
-> won't be, VFs will be bound to VFIO-PCI. Hope this all makes sense. Thanks,
-
-Without some experiments with real drivers, will be hard to be sure, but
-I'd expect it to be fine as the host driver bound after attestation (or
-what's the point?)
-In this patch set attestation only happens again on a reset or kicking it
-because of new certs.  For reset, your PSP should be doing it all over again
-anyway so that can happen after the host driver has dealt with the reset.
-For the manual poking to retry attestation, if the model is we don't
-load the driver until the attestation succeeds then that should be fine
-(as driver not loaded).
-
-The lock out needed for PF pass through doesn't apply given we are poking
-it from the PSP via the host.
-
-So I think patch 12 is irrelevant to your usecase rather than a problem.
-
-May well be dragons in the corner cases.  If we need a lockout for
-after the PSP gets involved, then fair enough.
-
-Jonathan
-
-> 
+> Ok, I'll make it easier to read.
 > 
 > > 
-> > Thanks,
+> > This is also an ABI break. Though I'm not sure it's avoidable. All the
+> > devices below the ETZPC node won't probe on existing kernel. A
+> > simple-bus fallback for ETZPC node should solve that.
 > > 
-> > Lukas  
 > 
+> I had one issue when trying with a simple-bus fallback that was the
+> drivers were probing even though the access rights aren't correct.
+> Hence the removal of the simple-bus compatible in the STM32MP25 patch.
 
+But it worked before, right? So the difference is you have either added 
+new devices which need setup or your firmware changed how devices are 
+setup (or not setup). Certainly can't fix the latter case. You just need 
+to be explicit about what you are doing to users.
+
+
+> Even though a node is tagged with the OF_POPULATED flag when checking
+> the access rights with the firewall controller, it seems that when
+> simple-bus is probing, there's no check of this flag.
+
+It shouldn't. Those flags are for creating the devices (or not) and 
+removing only devices of_platform_populate() created.
+
+> of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
+> Maybe that is my error and the firewall bus populate should set
+> OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
+
+Shrug. Off hand, I'd say probably not, but am not certain.
+
+Rob
