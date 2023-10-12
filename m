@@ -2,151 +2,71 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9F0CDB482
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 04:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A0BCDB46E
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 05:11:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234091AbjJLEhp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Oct 2023 00:37:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33006 "EHLO
+        id S1376937AbjJLFLb (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 Oct 2023 01:11:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232842AbjJLEho (ORCPT
+        with ESMTP id S1376867AbjJLFLa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2023 00:37:44 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53B12A9;
-        Wed, 11 Oct 2023 21:37:41 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC85C433C8;
-        Thu, 12 Oct 2023 04:37:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697085460;
-        bh=WKRKh0vu+lvGkILyFkc21Gg7NJFJdo31kGHt149b6Yw=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=O2ZXpXd3qxrWT/U+L5Vg2+ZMY020MyCEIEfTRnWCs10Q47+Edcf1eUfbKNceFn18X
-         GXn9+C1E3xDY9eSK8PirTh2Sh8AEdkDHUgt4D1X23uyPuxUAo3E0PbawhXUnKa8afZ
-         wWFGRyqfZ3b0jXoDyJSAb/YoTB4QxXTIUok7R6dQqISYXGUarEehor/V6vSTIYExa/
-         OkRBbIjSvxucQ1DBgn2gsGiQRy8MxHp9cnyhWuKur1R8VZ7MZdLKlIUiJeZHq41gdg
-         zS+kLzAgEWw2O+K8k09av3yyOllgdil5akGob/T7C2x7G2U2dxg7+i/Nz/21BV51Ln
-         nKJq7hBNkqfvw==
-Message-ID: <0340908d-8d23-4553-be46-50bab7fe053a@kernel.org>
-Date:   Thu, 12 Oct 2023 13:37:36 +0900
+        Thu, 12 Oct 2023 01:11:30 -0400
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC2690
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Oct 2023 22:11:27 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1qqnyj-006FFt-6s; Thu, 12 Oct 2023 13:11:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Oct 2023 13:11:25 +0800
+Date:   Thu, 12 Oct 2023 13:11:25 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Dan Carpenter <dan.carpenter@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     oe-kbuild@lists.linux.dev, lkp@intel.com,
+        oe-kbuild-all@lists.linux.dev
+Subject: [PATCH] crypto: lskcipher - Return EINVAL when ecb_name fails sanity
+ checks
+Message-ID: <ZSd//fA00pk/XqBC@gondor.apana.org.au>
+References: <f9ae1fe1-5a78-442f-a3fb-3c01e6273d3f@kadam.mountain>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/12] spdm: Introduce library to authenticate devices
-Content-Language: en-US
-To:     Alistair Francis <Alistair.Francis@wdc.com>,
-        "Jonathan.Cameron@Huawei.com" <Jonathan.Cameron@Huawei.com>,
-        "lukas@wunner.de" <lukas@wunner.de>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-        "graf@amazon.com" <graf@amazon.com>,
-        "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "ming4.li@intel.com" <ming4.li@intel.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "helgaas@kernel.org" <helgaas@kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "zhi.a.wang@intel.com" <zhi.a.wang@intel.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "dave.jiang@intel.com" <dave.jiang@intel.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "aik@amd.com" <aik@amd.com>,
-        "david.e.box@intel.com" <david.e.box@intel.com>,
-        "linuxarm@huawei.com" <linuxarm@huawei.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>
-References: <cover.1695921656.git.lukas@wunner.de>
- <89a83f42ae3c411f46efd968007e9b2afd839e74.1695921657.git.lukas@wunner.de>
- <20231003153937.000034ca@Huawei.com>
- <caf11c28d21382cc1a81d84a23cbca9e70805a87.camel@wdc.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <caf11c28d21382cc1a81d84a23cbca9e70805a87.camel@wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9ae1fe1-5a78-442f-a3fb-3c01e6273d3f@kadam.mountain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 10/12/23 12:26, Alistair Francis wrote:
-> On Tue, 2023-10-03 at 15:39 +0100, Jonathan Cameron wrote:
->> On Thu, 28 Sep 2023 19:32:37 +0200
->> Lukas Wunner <lukas@wunner.de> wrote:
->>
->>> From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->>>
->>> The Security Protocol and Data Model (SPDM) allows for
->>> authentication,
->>> measurement, key exchange and encrypted sessions with devices.
->>>
->>> A commonly used term for authentication and measurement is
->>> attestation.
->>>
->>> SPDM was conceived by the Distributed Management Task Force (DMTF).
->>> Its specification defines a request/response protocol spoken
->>> between
->>> host and attached devices over a variety of transports:
->>>
->>>   https://www.dmtf.org/dsp/DSP0274
->>>
->>> This implementation supports SPDM 1.0 through 1.3 (the latest
->>> version).
->>
->> I've no strong objection in allowing 1.0, but I think we do need
->> to control min version accepted somehow as I'm not that keen to get
->> security folk analyzing old version...
-> 
-> Agreed. I'm not sure we even need to support 1.0
-> 
->>
->>> It is designed to be transport-agnostic as the kernel already
->>> supports
->>> two different SPDM-capable transports:
->>>
->>> * PCIe Data Object Exchange (PCIe r6.1 sec 6.30, drivers/pci/doe.c)
->>> * Management Component Transport Protocol (MCTP,
->>>   Documentation/networking/mctp.rst)
->>
->> The MCTP side of things is going to be interesting because mostly you
->> need to jump through a bunch of hoops (address assignment, routing
->> setup
->> etc) before you can actually talk to a device.   That all involves
->> a userspace agent.  So I'm not 100% sure how this will all turn out.
->> However still makes sense to have a transport agnostic implementation
->> as if nothing else it makes it easier to review as keeps us within
->> one specification.
-> 
-> This list will probably expand in the future though
-> 
->>>
->>> Use cases for SPDM include, but are not limited to:
->>>
->>> * PCIe Component Measurement and Authentication (PCIe r6.1 sec
->>> 6.31)
->>> * Compute Express Link (CXL r3.0 sec 14.11.6)
->>> * Open Compute Project (Attestation of System Components r1.0)
->>>  
->>> https://www.opencompute.org/documents/attestation-v1-0-20201104-pdf
->>
->> Alastair, would it make sense to also call out some of the storage
->> use cases you are interested in?
-> 
-> I don't really have anything to add at the moment. I think PCIe CMA
-> covers the current DOE work
+On Wed, Oct 11, 2023 at 10:19:31AM +0300, Dan Carpenter wrote:
+>
+> smatch warnings:
+> crypto/lskcipher.c:639 lskcipher_alloc_instance_simple() warn: passing zero to 'ERR_PTR'
 
-Specifications for SPDM encapsulation in SCSI and ATA commands (SECURITY
-PROTOCOL IN/OUT and TRUSTED SNED/RECEIVE) is being worked on now but that is
-still in early phases of definition. So that support can come later. I suspect
-the API may need some modification to accommodate that use case, but we need
-more complete specification first to clearly see what is needed (if anything at
-all).
+Thanks for the report.  This patch should fix the problem:
 
+---8<---
+Set the error value to -EINVAL instead of zero when the underlying
+name (within "ecb()") fails basic sanity checks.
 
+Fixes: 8aee5d4ebd11 ("crypto: lskcipher - Add compatibility wrapper around ECB")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/r/202310111323.ZjK7bzjw-lkp@intel.com/
+
+diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
+index 9be3c04bc62a..cb6170ebcaa3 100644
+--- a/crypto/lskcipher.c
++++ b/crypto/lskcipher.c
+@@ -583,6 +583,7 @@ struct lskcipher_instance *lskcipher_alloc_instance_simple(
+ 	if (ecb_name[0]) {
+ 		int len;
+ 
++		err = -EINVAL;
+ 		len = strscpy(ecb_name, &cipher_alg->co.base.cra_name[4],
+ 			      sizeof(ecb_name));
+ 		if (len < 2)
 -- 
-Damien Le Moal
-Western Digital Research
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
