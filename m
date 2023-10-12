@@ -2,131 +2,137 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE75CDB47E
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 15:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0A9ACDB482
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 15:32:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379448AbjJLPaT (ORCPT
+        id S1347295AbjJLPc3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Oct 2023 11:30:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50872 "EHLO
+        Thu, 12 Oct 2023 11:32:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379229AbjJLPaS (ORCPT
+        with ESMTP id S1347298AbjJLPc2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Oct 2023 11:30:18 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA29C0;
-        Thu, 12 Oct 2023 08:30:17 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F77C433C8;
-        Thu, 12 Oct 2023 15:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697124617;
-        bh=ZtcSIbjB2WpeZfQRyCvdpc+0MAvoSIsAVFQJFGWoAZY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sNlqy8imXhwlW5ogqsGatXLJh6x3ULy2dxsaSxs56ggFVkTV6XlGelwtvmknbj7Xu
-         ShUCZ/8OXslZolbuuvyrBlxLrcJ01GSlmz7CSJEaxf3rAcgbPMbnfuFHufU09E90RW
-         5ApYEGyJHTTls7cFvAibnKaw6QYJ/MgybICMj+V6qAR0vsGzNnF3N6loiEvhXeakbo
-         Tc8RBxaMuLt9cw9IyN5cmf2yVbPk/7zrWOf/NIL+18Z146Hj24oQ+EZR236LNiKgxH
-         rW8s1EpB9lyTQA3S/nGP0hy8u95XFa9UJYnNgK7IXnZV4NIWHKMv5YsKgXN/Jehq6j
-         lkrAiKBqcY2gw==
-Received: (nullmailer pid 821925 invoked by uid 1000);
-        Thu, 12 Oct 2023 15:30:12 -0000
-Date:   Thu, 12 Oct 2023 10:30:12 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc:     Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
-        olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
-        mchehab@kernel.org, fabrice.gasnier@foss.st.com,
-        andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
-        lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
-        arnd@kernel.org, richardcochran@gmail.com,
-        Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-        netdev@vger.kernel.org, linux-p.hy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-        linux-usb@vger.kernel.org
-Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
- STM32MP15x boards
-Message-ID: <20231012153012.GA698406-robh@kernel.org>
-References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
- <20231010125719.784627-11-gatien.chevallier@foss.st.com>
- <20231010184212.GA1221641-robh@kernel.org>
- <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
+        Thu, 12 Oct 2023 11:32:28 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7769ED3;
+        Thu, 12 Oct 2023 08:32:25 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5tqt2GDkz6K5yD;
+        Thu, 12 Oct 2023 23:30:18 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 12 Oct
+ 2023 16:32:22 +0100
+Date:   Thu, 12 Oct 2023 16:32:21 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Samuel Ortiz <sameo@rivosinc.com>
+CC:     Lukas Wunner <lukas@wunner.de>, Alexey Kardashevskiy <aik@amd.com>,
+        "Dan Williams" <dan.j.williams@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        <linux-pci@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linuxarm@huawei.com>, David Box <david.e.box@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Li, Ming" <ming4.li@intel.com>, Zhi Wang <zhi.a.wang@intel.com>,
+        "Alistair Francis" <alistair.francis@wdc.com>,
+        Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Sean Christopherson" <seanjc@google.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH 00/12] PCI device authentication
+Message-ID: <20231012163221.000064af@Huawei.com>
+In-Reply-To: <ZSfw+xswgOSaYxgW@vermeer>
+References: <cover.1695921656.git.lukas@wunner.de>
+        <652030759e42d_ae7e72946@dwillia2-xfh.jf.intel.com.notmuch>
+        <20231007100433.GA7596@wunner.de>
+        <20231009123335.00006d3d@Huawei.com>
+        <20231009134950.GA7097@wunner.de>
+        <b003c0ca-b5c7-4082-a391-aeb04ccc33ca@amd.com>
+        <20231012091542.GA22596@wunner.de>
+        <ZSfw+xswgOSaYxgW@vermeer>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
-> Hi Rob,
-> 
-> On 10/10/23 20:42, Rob Herring wrote:
-> > On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
-> > > ETZPC is a firewall controller. Put all peripherals filtered by the
-> > > ETZPC as ETZPC subnodes and reference ETZPC as an
-> > > access-control-provider.
-> > > 
-> > > For more information on which peripheral is securable or supports MCU
-> > > isolation, please read the STM32MP15 reference manual.
-> > > 
-> > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> > > ---
-> > > 
-> > > Changes in V6:
-> > >      	- Renamed access-controller to access-controllers
-> > >      	- Removal of access-control-provider property
-> > > 
-> > > Changes in V5:
-> > >      	- Renamed feature-domain* to access-control*
-> > > 
-> > >   arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
-> > >   arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
-> > >   arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
-> > >   3 files changed, 1450 insertions(+), 1377 deletions(-)
+On Thu, 12 Oct 2023 15:13:31 +0200
+Samuel Ortiz <sameo@rivosinc.com> wrote:
+
+> On Thu, Oct 12, 2023 at 11:15:42AM +0200, Lukas Wunner wrote:
+> > On Tue, Oct 10, 2023 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:  
+> > > But the way SPDM is done now is that if the user (as myself) wants to let
+> > > the firmware run SPDM - the only choice is disabling CONFIG_CMA completely
+> > > as CMA is not a (un)loadable module or built-in (with some "blacklist"
+> > > parameters), and does not provide a sysfs knob to control its tentacles.
+> > > Kinda harsh.  
 > > 
-> > This is not reviewable. Change the indentation and any non-functional
-> > change in one patch and then actual changes in another.
+> > On AMD SEV-TIO, does the PSP perform SPDM exchanges with a device
+> > *before* it is passed through to a guest?  If so, why does it do that?  
 > 
-> Ok, I'll make it easier to read.
+> SPDM exchanges would be done with the DSM, i.e. through the PF, which is
+> typically *not* passed through to guests. VFs are.
 > 
+> The RISC-V CoVE-IO [1] spec follows similar flows as SEV-TIO (and to
+> some extend TDX-Connect) and expects the host to explicitly request the
+> TSM to establish an SPDM connection with the DSM (PF) before passing one
+> VF through a TSM managed guest. VFs would be vfio bound, not the PF, so
+> I think patch #12 does not solve our problem here. 
+> 
+> > Dan and I discussed this off-list and Dan is arguing for lazy attestation,
+> > i.e. the TSM should only have the need to perform SPDM exchanges with
+> > the device when it is passed through.
 > > 
-> > This is also an ABI break. Though I'm not sure it's avoidable. All the
-> > devices below the ETZPC node won't probe on existing kernel. A
-> > simple-bus fallback for ETZPC node should solve that.
-> > 
+> > So the host enumerates the DOE protocols and authenticates the device.
+> > When the device is passed through, patch 12/12 ensures that the host
+> > keeps its hands off of the device, thus affording the TSM exclusive
+> > SPDM control.  
 > 
-> I had one issue when trying with a simple-bus fallback that was the
-> drivers were probing even though the access rights aren't correct.
-> Hence the removal of the simple-bus compatible in the STM32MP25 patch.
+> Just to re-iterate: The TSM does not talk SPDM with the passed
+> through device(s), but with the corresponding PF. If the host kernel
+> owns the SPDM connection when the TSM initiates the SPDM connection with
+> the DSM (For IDE key setup), the connection establishment will fail.
+> Both CoVE-IO and SEV-TIO (Alexey, please correct me if I'm wrong)
+> expect the host to explicitly ask the TSM to establish that SPDM
+> connection. That request should somehow come from KVM, which then would
+> have to destroy the existing CMA/SPDM connection in order to give the
+> TSM a chance to successfully establish the SPDM link.
 
-But it worked before, right? So the difference is you have either added 
-new devices which need setup or your firmware changed how devices are 
-setup (or not setup). Certainly can't fix the latter case. You just need 
-to be explicit about what you are doing to users.
+Agreed - I don't see a problem with throwing away the initial connection.
+In these cases you are passing that role on to another entity - the
+job of this patch set is done.
 
+I'm not clear yet if we need an explicit lock out similar to the VFIO
+one for PF pass through or if everything will happen in a 'safe' order
+anyway. I suspect a lockout on the ability to re attest is necessary
+if the PF driver is loaded.
 
-> Even though a node is tagged with the OF_POPULATED flag when checking
-> the access rights with the firewall controller, it seems that when
-> simple-bus is probing, there's no check of this flag.
+Perhaps just dropping the
++#if IS_ENABLED(CONFIG_VFIO_PCI_CORE)
+and letting other PF drivers or another bit of core kernel code
+(I'm not sure where the proxy resides for the models being discussed)
+claim ownership is enough?
 
-It shouldn't. Those flags are for creating the devices (or not) and 
-removing only devices of_platform_populate() created.
+Jonathan
 
-> of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
-> Maybe that is my error and the firewall bus populate should set
-> OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
+> 
+> Cheers,
+> Samuel.
+> 
+> [1] https://github.com/riscv-non-isa/riscv-ap-tee-io/blob/main/specification/07-theory_operations.adoc
+> >   
+> 
 
-Shrug. Off hand, I'd say probably not, but am not certain.
-
-Rob
