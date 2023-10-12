@@ -2,76 +2,108 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0DBCDB465
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 00:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA673C41513
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Oct 2023 02:10:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233947AbjJLAiW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Oct 2023 20:38:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52392 "EHLO
+        id S233797AbjJLCGu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 Oct 2023 22:06:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233886AbjJLAiW (ORCPT
+        with ESMTP id S233794AbjJLCGu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Oct 2023 20:38:22 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84CE598
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Oct 2023 17:38:19 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qqjiL-006C8R-Q5; Thu, 12 Oct 2023 08:38:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Oct 2023 08:38:14 +0800
-Date:   Thu, 12 Oct 2023 08:38:14 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Denis Kenzior <denkenz@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        James Prestwood <prestwoj@gmail.com>
-Subject: Re: Linux 6.5 broke iwd
-Message-ID: <ZSc/9nUuF/d24iO6@gondor.apana.org.au>
-References: <ab4d8025-a4cc-48c6-a6f0-1139e942e1db@gmail.com>
+        Wed, 11 Oct 2023 22:06:50 -0400
+Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C441F98;
+        Wed, 11 Oct 2023 19:06:46 -0700 (PDT)
+Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
+        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4S5Xxw36Vvz9y7xl;
+        Thu, 12 Oct 2023 10:04:20 +0800 (CST)
+Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
+ (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 12 Oct
+ 2023 10:06:40 +0800
+Date:   Thu, 12 Oct 2023 10:06:40 +0800
+From:   Wang Jinchao <wangjinchao@xfusion.com>
+To:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <stone.xulei@xfusion.com>
+Subject: [RFC v2] padata: Simplify sysfs cpumask and sequencing logic
+Message-ID: <202310121006-wangjinchao@xfusion.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ab4d8025-a4cc-48c6-a6f0-1139e942e1db@gmail.com>
+X-Originating-IP: [10.82.147.3]
+X-ClientProxiedBy: wuxshcsitd00603.xfusion.com (10.32.134.231) To
+ wuxshcsitd00600.xfusion.com (10.32.133.213)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 11, 2023 at 12:11:57PM -0500, Denis Kenzior wrote:
-> Hi Herbert,
-> 
-> Looks like something in Linux 6.5 broke ell TLS unit tests (and thus likely
-> WPA-Enterprise support).  I tried a git bisect and could narrow it down to a
-> general area.  The last good commit was:
-> 
-> commit 6cb8815f41a966b217c0d9826c592254d72dcc31
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Thu Jun 15 18:28:48 2023 +0800
-> 
->     crypto: sig - Add interface for sign/verify
-> 
->     Split out the sign/verify functionality from the existing akcipher
->     interface.  Most algorithms in akcipher either support encryption
->     and decryption, or signing and verify.  Only one supports both.
-> 
->     As a signature algorithm may not support encryption at all, these
->     two should be spearated.
-> 
->     For now sig is simply a wrapper around akcipher as all algorithms
->     remain unchanged.  This is a first step and allows users to start
->     allocating sig instead of akcipher.
-> 
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> Narrowing down further didn't work due to:
-> /usr/bin/ld: crypto/asymmetric_keys/x509_public_key.o: in function
-> `x509_get_sig_params':
-> x509_public_key.c:(.text+0x363): undefined reference to `sm2_compute_z_digest'
-> collect2: error: ld returned 1 exit status
+Hi, 
 
-This looks like a Kconfig issue.  Please send me your .config file.
+I've identified several potential optimizations for padata.
+I'd appreciate it if you could take a look at my ideas to
+see if they are feasible.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Utilizing the WQ_SYSFS from workqueue to support sysfs
+======================================================
+
+Padata relies on workqueue, and since workqueue has already implemented
+support for cpumask through WQ_SYSFS, we can reuse this functionality
+and avoid redundant implementation.
+Link: https://docs.kernel.org/core-api/workqueue.html#affinity-scopes
+
+Using completion to ensure the sequencing of the 'serial()'
+===========================================================
+
+In the current implementation, to ensure the sequencing of 'serial()',
+we've used seq_nr, reorder_list, padata_serial_queue, reorder_work...
+which has made the logic quite complex. These operations can be
+simplified by using 'completion'. Specifically:
+    1. in padata_do_parallel()
+       1. init_completion(parallel_done) **before** queue_work
+       2. queue_work(serial_work)
+    2. in padata_parallel_worker
+       1. complete(parallel_done) **after** parallel(padata)
+    3. in padata_serial_worker
+       1. wait_for_completion(parallel_done) **before** serial(padata)
+
+Here's a simplified code snippet:
+
+```c
+struct padata_priv {
+	struct completion parallel_done;
+	struct work_struct	parallel_work;
+	struct work_struct	serial_work;
+	void   (*parallel)(struct padata_priv *padata);
+	void   (*serial)(struct padata_priv *padata);
+}
+
+void padata_do_parallel(struct padata_priv *padata)
+{
+    ...
+    init_completion(&padata->parallel_done);
+	queue_work(pinst->serial_wq, &padata->serial_work);
+	queue_work(pinst->parallel_wq, &padata->parallel_work);
+    ...
+}
+
+static void padata_parallel_worker(struct work_struct *parallel_work)
+{
+	struct padata_priv *padata =
+		container_of(parallel_work, struct padata_priv, parallel_work);
+	padata->parallel(padata);
+	// notify serial_worker to do serial()
+	complete(&padata->parallel_done);
+}
+
+static void padata_serial_worker(struct work_struct *serial_work)
+{
+	struct padata_priv *padata =
+		container_of(serial_work, struct padata_priv, serial_work);
+	wait_for_completion(&padata->parallel_done);
+	padata->serial(padata);
+}
+```
+
