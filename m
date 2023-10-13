@@ -2,67 +2,51 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE0BCDB47E
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 09:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41765CDB47E
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 10:13:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231320AbjJMJ56 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Oct 2023 05:57:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43214 "EHLO
+        id S230380AbjJMKNX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Oct 2023 06:13:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231189AbjJMJ55 (ORCPT
+        with ESMTP id S230179AbjJMKNW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Oct 2023 05:57:57 -0400
+        Fri, 13 Oct 2023 06:13:22 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B515CCA;
-        Fri, 13 Oct 2023 02:57:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A71A9
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Oct 2023 03:13:19 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qrEvK-006ijp-3e; Fri, 13 Oct 2023 17:57:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Oct 2023 17:57:42 +0800
-Date:   Fri, 13 Oct 2023 17:57:42 +0800
+        id 1qrFAQ-006iwe-L0; Fri, 13 Oct 2023 18:13:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Oct 2023 18:13:19 +0800
+Date:   Fri, 13 Oct 2023 18:13:19 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Wang Jinchao <wangjinchao@xfusion.com>
-Cc:     steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stone.xulei@xfusion.com
-Subject: Re: [PATCH v3] Fixes: 07928d9bfc81 ("padata: Remove broken queue
- flushing")
-Message-ID: <ZSkUlkp214AROxpG@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: xts - use 'spawn' for underlying single-block
+ cipher
+Message-ID: <ZSkYPxtzbdcinLGx@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZSDWAcUxXcwD4YUZ@fedora>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20231009023116.266210-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Wang Jinchao <wangjinchao@xfusion.com> wrote:
+Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 222d60195de6..79d04a97ded6 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -1102,12 +1102,16 @@ EXPORT_SYMBOL(padata_alloc_shell);
->  */
-> void padata_free_shell(struct padata_shell *ps)
+> static int xts_create(struct crypto_template *tmpl, struct rtattr **tb)
 > {
-> +       struct parallel_data *pd;
-> +
->        if (!ps)
->                return;
-> 
->        mutex_lock(&ps->pinst->lock);
->        list_del(&ps->list);
-> -       padata_free_pd(rcu_dereference_protected(ps->pd, 1));
-> +       pd = rcu_dereference_protected(ps->pd, 1);
-> +       if (refcount_dec_and_test(&pd->refcnt))
-> +               padata_free_pd(rcu_dereference_protected(ps->pd, 1));
+>        struct skcipher_instance *inst;
+>        struct xts_instance_ctx *ctx;
+>        struct skcipher_alg *alg;
+>        const char *cipher_name;
+> +       char name[CRYPTO_MAX_ALG_NAME];
 
-Why is this dereferencing ps->pd again after the refcount_dec_and_test?
-
-If this is necessary please explain it in the code because it is not
-at all obvious.
+Please keep the line sorting from longest to shortest.  I'll
+fix this one by hand so this is just for future reference.
 
 Thanks,
 -- 
