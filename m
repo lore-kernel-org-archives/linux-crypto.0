@@ -2,57 +2,76 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E10E0CDB482
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 10:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1E5CDB483
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 10:32:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbjJMKVQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Oct 2023 06:21:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60476 "EHLO
+        id S230247AbjJMKcc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Oct 2023 06:32:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbjJMKVO (ORCPT
+        with ESMTP id S230255AbjJMKc3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Oct 2023 06:21:14 -0400
+        Fri, 13 Oct 2023 06:32:29 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9631DB7;
-        Fri, 13 Oct 2023 03:21:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE000DC;
+        Fri, 13 Oct 2023 03:32:26 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qrFI1-006j3w-Po; Fri, 13 Oct 2023 18:21:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Oct 2023 18:21:10 +0800
-Date:   Fri, 13 Oct 2023 18:21:10 +0800
+        id 1qrFSq-006jMM-Ou; Fri, 13 Oct 2023 18:32:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Oct 2023 18:32:21 +0800
+Date:   Fri, 13 Oct 2023 18:32:21 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ingyu Jang <ingyujang25@unist.ac.kr>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ysjeon@unist.ac.kr,
-        ingyujang25@unist.ac.kr
-Subject: Re: [PATCH] crypto: authencesn - Fix incorrect setauthsize function
-Message-ID: <ZSkaFmV4tfxjV3Kt@gondor.apana.org.au>
+To:     neil.armstrong@linaro.org
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Om Prakash Singh <quic_omprsing@quicinc.com>,
+        Bjorn Andersson <quic_bjorande@quicinc.com>
+Subject: Re: [PATCH v4 3/5] crypto: qcom-rng - Add hw_random interface support
+Message-ID: <ZSkctT6Fcm+FDDw5@gondor.apana.org.au>
+References: <20231003-topic-sm8550-rng-v4-0-255e4d0ba08e@linaro.org>
+ <20231003-topic-sm8550-rng-v4-3-255e4d0ba08e@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231013095523.184497-1-ingyujang25@unist.ac.kr>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20231003-topic-sm8550-rng-v4-3-255e4d0ba08e@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ingyu Jang <ingyujang25@unist.ac.kr> wrote:
+On Tue, Oct 03, 2023 at 09:10:21AM +0200, neil.armstrong@linaro.org wrote:
 >
-> diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-> index 91424e791d5c..c1346d5b7950 100644
-> --- a/crypto/authencesn.c
-> +++ b/crypto/authencesn.c
-> @@ -52,6 +52,8 @@ static int crypto_authenc_esn_setauthsize(struct crypto_aead *authenc_esn,
->        if (authsize > 0 && authsize < 4)
->                return -EINVAL;
-> 
-> +       authenc_esn->authsize = authsize;
+> @@ -198,6 +233,21 @@ static int qcom_rng_remove(struct platform_device *pdev)
+>  	return 0;
+>  }
+>  
+> +struct qcom_rng_of_data qcom_prng_of_data = {
+> +	.skip_init = false,
+> +	.hwrng_support = false,
+> +};
+> +
+> +struct qcom_rng_of_data qcom_prng_ee_of_data = {
+> +	.skip_init = true,
+> +	.hwrng_support = false,
+> +};
+> +
+> +struct qcom_rng_of_data qcom_trng_of_data = {
+> +	.skip_init = true,
+> +	.hwrng_support = true,
+> +};
 > +
 
-The premise of this patch is incorrect.  Please check the code for
-setauthsize in crypto/aead.c.
+I've added static to these three.  Please build your patches
+with C=1 W=1 in future.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
