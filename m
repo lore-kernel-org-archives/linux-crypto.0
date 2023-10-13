@@ -2,55 +2,80 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2127CDB47E
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 05:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127E3CDB47E
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 08:49:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbjJMF5x (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Oct 2023 01:57:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58074 "EHLO
+        id S230327AbjJMItv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Oct 2023 04:49:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbjJMF5w (ORCPT
+        with ESMTP id S230215AbjJMItr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Oct 2023 01:57:52 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD72CB7
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Oct 2023 22:57:50 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 645F2C433CC
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Oct 2023 05:57:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697176670;
-        bh=gmdsrlwg1urFkxOOlkg+HR32FfjE4y2eewFEIvf6e/s=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=eaq3rzvxDkp58Y1PMfGIFN+2Cs1odRcm0VteKyIEZDW0xhDh68dwOcXeguOWR9uzw
-         3WTP/HsQiIh+AoDIn1L4FWdA57JrGAbeSVhWZ6iUKn/xJb1wFNsn7z391PcMPBMoEK
-         HqcRqkUax4XEntCFJeATzgGEZBXxVVNRc9+BflJ+BSDteWUO6TgVooTSbL+3FfvPrv
-         vOkc3OWnvIvf0P+NT8AHK8OqvS2qFRiCmUdwvjJhEfBkq1fkFrY+knIFkslaVrho3a
-         xiNmDwErik1PAf1HRwnrREu5QS5HNN5zQTc8QNufaLBcsLtcU74/p2ur7eK/uM9zTp
-         vnqMj+Cf2W9oA==
-Date:   Thu, 12 Oct 2023 22:57:48 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: skcipher - fix weak key check for lskciphers
-Message-ID: <20231013055748.GA52471@sol.localdomain>
-References: <20231009033750.279307-1-ebiggers@kernel.org>
+        Fri, 13 Oct 2023 04:49:47 -0400
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5985EEA
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Oct 2023 01:49:42 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-388-sTSYr53zPc6DLKLlrA2nDg-1; Fri, 13 Oct 2023 04:49:37 -0400
+X-MC-Unique: sTSYr53zPc6DLKLlrA2nDg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D00F8185A7B3;
+        Fri, 13 Oct 2023 08:49:36 +0000 (UTC)
+Received: from hog (unknown [10.45.224.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 21D5540C6F79;
+        Fri, 13 Oct 2023 08:49:32 +0000 (UTC)
+Date:   Fri, 13 Oct 2023 10:49:31 +0200
+From:   Sabrina Dubroca <sd@queasysnail.net>
+To:     syzbot <syzbot+66e3ea42c4b176748b9c@syzkaller.appspotmail.com>
+Cc:     aviadye@mellanox.com, borisp@mellanox.com, bp@alien8.de,
+        daniel@iogearbox.net, davem@davemloft.net, ebiggers@kernel.org,
+        herbert@gondor.apana.org.au, hpa@zytor.com,
+        john.fastabend@gmail.com, kuba@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liujian56@huawei.com, mingo@redhat.com, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vfedorenko@novek.ru, x86@kernel.org
+Subject: Re: [syzbot] [net] [crypto] general protection fault in
+ scatterwalk_copychunks (4)
+Message-ID: <ZSkEm99MvaKOc_Ju@hog>
+References: <00000000000006e7be05bda1c084@google.com>
+ <0000000000004b2b3d06078b94b0@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231009033750.279307-1-ebiggers@kernel.org>
+In-Reply-To: <0000000000004b2b3d06078b94b0@google.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Oct 08, 2023 at 08:37:50PM -0700, Eric Biggers wrote:
-> -int crypto_lskcipher_setkey_sg(struct crypto_skcipher *tfm, const u8 *key,
-> -			       unsigned int keylen)
-> -{
-> -	struct crypto_lskcipher **ctx = crypto_skcipher_ctx(tfm);
-> -
-> -	return crypto_lskcipher_setkey(*ctx, key, keylen);
-> -}
+2023-10-12, 14:25:30 -0700, syzbot wrote:
+> syzbot suspects this issue was fixed by commit:
+> 
+> commit cfaa80c91f6f99b9342b6557f0f0e1143e434066
+> Author: Liu Jian <liujian56@huawei.com>
+> Date:   Sat Sep 9 08:14:34 2023 +0000
+> 
+>     net/tls: do not free tls_rec on async operation in bpf_exec_tx_verdict()
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17338965680000
+> start commit:   bd6c11bc43c4 Merge tag 'net-next-6.6' of git://git.kernel...
+> git tree:       net-next
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
+> dashboard link: https://syzkaller.appspot.com/bug?extid=66e3ea42c4b176748b9c
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10160198680000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15feabc0680000
 
-Forgot to remove the prototype for crypto_lskcipher_setkey_sg().  Just sent out
-v2 with this.
+Yes, looks like it.
 
-- Eric
+> If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: net/tls: do not free tls_rec on async operation in bpf_exec_tx_verdict()
+
+-- 
+Sabrina
+
