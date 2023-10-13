@@ -2,76 +2,63 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1E5CDB483
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 10:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E377CDB47E
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Oct 2023 10:36:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230247AbjJMKcc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Oct 2023 06:32:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
+        id S230051AbjJMKgF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 Oct 2023 06:36:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbjJMKc3 (ORCPT
+        with ESMTP id S229903AbjJMKgF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Oct 2023 06:32:29 -0400
+        Fri, 13 Oct 2023 06:36:05 -0400
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE000DC;
-        Fri, 13 Oct 2023 03:32:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 729E7BB
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Oct 2023 03:36:02 -0700 (PDT)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qrFSq-006jMM-Ou; Fri, 13 Oct 2023 18:32:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Oct 2023 18:32:21 +0800
-Date:   Fri, 13 Oct 2023 18:32:21 +0800
+        id 1qrFWO-006jWk-Pm; Fri, 13 Oct 2023 18:35:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Oct 2023 18:36:01 +0800
+Date:   Fri, 13 Oct 2023 18:36:01 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     neil.armstrong@linaro.org
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Vinod Koul <vkoul@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Om Prakash Singh <quic_omprsing@quicinc.com>,
-        Bjorn Andersson <quic_bjorande@quicinc.com>
-Subject: Re: [PATCH v4 3/5] crypto: qcom-rng - Add hw_random interface support
-Message-ID: <ZSkctT6Fcm+FDDw5@gondor.apana.org.au>
-References: <20231003-topic-sm8550-rng-v4-0-255e4d0ba08e@linaro.org>
- <20231003-topic-sm8550-rng-v4-3-255e4d0ba08e@linaro.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+Subject: Re: [PATCH] crypto: qat - add namespace to driver
+Message-ID: <ZSkdkagAaZJRVz4U@gondor.apana.org.au>
+References: <20231002085126.11127-2-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231003-topic-sm8550-rng-v4-3-255e4d0ba08e@linaro.org>
+In-Reply-To: <20231002085126.11127-2-giovanni.cabiddu@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 03, 2023 at 09:10:21AM +0200, neil.armstrong@linaro.org wrote:
->
-> @@ -198,6 +233,21 @@ static int qcom_rng_remove(struct platform_device *pdev)
->  	return 0;
->  }
->  
-> +struct qcom_rng_of_data qcom_prng_of_data = {
-> +	.skip_init = false,
-> +	.hwrng_support = false,
-> +};
-> +
-> +struct qcom_rng_of_data qcom_prng_ee_of_data = {
-> +	.skip_init = true,
-> +	.hwrng_support = false,
-> +};
-> +
-> +struct qcom_rng_of_data qcom_trng_of_data = {
-> +	.skip_init = true,
-> +	.hwrng_support = true,
-> +};
-> +
+On Mon, Oct 02, 2023 at 09:51:09AM +0100, Giovanni Cabiddu wrote:
+> Create CRYPTO_QAT namespace for symbols exported by the qat_common
+> module and import those in the QAT drivers. It will reduce the global
+> namespace crowdedness and potential misuse or the API.
+> 
+> This does not introduce any functional change.
+> 
+> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  drivers/crypto/intel/qat/qat_4xxx/adf_drv.c       | 1 +
+>  drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c      | 1 +
+>  drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c    | 1 +
+>  drivers/crypto/intel/qat/qat_c62x/adf_drv.c       | 1 +
+>  drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c     | 1 +
+>  drivers/crypto/intel/qat/qat_common/Makefile      | 1 +
+>  drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c   | 1 +
+>  drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c | 1 +
+>  8 files changed, 8 insertions(+)
 
-I've added static to these three.  Please build your patches
-with C=1 W=1 in future.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
