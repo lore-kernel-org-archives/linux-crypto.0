@@ -2,344 +2,149 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFDBCDB474
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Oct 2023 07:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B35CDB465
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 Oct 2023 23:03:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbjJNHgQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Oct 2023 03:36:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38034 "EHLO
+        id S229872AbjJNXDO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 14 Oct 2023 19:03:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjJNHgP (ORCPT
+        with ESMTP id S229735AbjJNXDN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Oct 2023 03:36:15 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DB0BF;
-        Sat, 14 Oct 2023 00:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697268974; x=1728804974;
-  h=date:from:to:cc:subject:message-id;
-  bh=LcwfZEcYEf/f4tUcGzyWriVFV01q/faDVa9sxT4TF3Q=;
-  b=RAZVSNDp7McP8Frnn4DyGKk4WXcenU4hKRpLMK3Ai1nVS8c+59q0SErr
-   KTlo1qarck4YFtP5wo76Vrn4zxuifyGH4V+uTRtiRAx0W3aUY5M8o0chy
-   QNsn3YkjDWs9FvNIGs0nTVK6lj9WnOFAGG6pxWMTYvd0O1QZmCc9g8zu2
-   R0LyZOKJ6K0Uz36fxMhE7bwghfGXZfZf4RUfCePq1uW8l0e3OSsWEkC09
-   3JzSY6y9bpcQRzzuikfD+Ydky4YD5aP2FR1BXn6BssW9aVt8wp+Bnq/4W
-   xd6hMcxLklUaR25XaRtmZEfVRX/Fw5E2+fsYgK+O+FcY5rQDtqUCxcula
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="471540301"
-X-IronPort-AV: E=Sophos;i="6.03,224,1694761200"; 
-   d="scan'208";a="471540301"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2023 00:36:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="748618440"
-X-IronPort-AV: E=Sophos;i="6.03,224,1694761200"; 
-   d="scan'208";a="748618440"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 14 Oct 2023 00:36:10 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qrZBv-0005pD-1M;
-        Sat, 14 Oct 2023 07:36:07 +0000
-Date:   Sat, 14 Oct 2023 15:35:44 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Linux Memory Management List <linux-mm@kvack.org>,
-        amd-gfx@lists.freedesktop.org, bpf@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, linux-crypto@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-staging@lists.linux.dev, ntfs3@lists.linux.dev
-Subject: [linux-next:master] BUILD REGRESSION
- e3b18f7200f45d66f7141136c25554ac1e82009b
-Message-ID: <202310141529.B09neLqf-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Sat, 14 Oct 2023 19:03:13 -0400
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E156B7
+        for <linux-crypto@vger.kernel.org>; Sat, 14 Oct 2023 16:03:10 -0700 (PDT)
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id A5D393F546
+        for <linux-crypto@vger.kernel.org>; Sat, 14 Oct 2023 23:03:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1697324588;
+        bh=g4FZTSl0d4ZJADlSvm57nChfceUNZzU0dP0RCDb94EA=;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+         To:Cc:Content-Type;
+        b=g6IRxgfbQK3zPzzy8ZM4tHFvebXOwaBBDqrCHAP8FETXV8N5PYtQnfnUnd73aglwL
+         TWqJQdwOTz/GxjVnyhDLFzdzb1xzHsCRf6Xl7ditzx8UtVUodBqrc8+T4tEzoLv4Hk
+         Ws222R8dpFMHhuwYg5F/YUIkK79LVkHIUu4qrexu3la1tBia9q6MpWTXS6mrN8HnRr
+         9whh4Ejmic4GTBd8aUeabjzSv5skocfNijJUebWkDlHpWJW91rVV12T3oMMpecgm2e
+         L5deCUhkzrGSCPw1odN9ECRzVmxemqw89iBScgnizuylz3Mv9opmTIkBjwPMwQ3GsK
+         HPEsLKx39u5Ow==
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32da47641b5so480104f8f.0
+        for <linux-crypto@vger.kernel.org>; Sat, 14 Oct 2023 16:03:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697324588; x=1697929388;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g4FZTSl0d4ZJADlSvm57nChfceUNZzU0dP0RCDb94EA=;
+        b=XGzN0dKOU0jsbLCI2X01GOBN2Y8qOpvWThFPkqYXPM3Uw/z1rULwTMTN/XViQOnMDh
+         wkbBiPnAkBp24JFZduKIvFV3CIZny3gLN9m2222Yhsgh+Z+bTgxW6KRBkGKMh07pFa9r
+         2lEuEykQgHLFZItuNKFVDKo4ToadXTsUj2qNXsRHZRQLZHSPexXMZiC5dlqYc1My0swt
+         +aengFNx+ZeqDIqvMsBmq6taMYqHSCTm8IP2bahsxWzw16Y4NhALN1jfxlREpZfkNm9/
+         P0XhTIJSYj7FZYwqlV7S8d/xkZa2KTSiilp6zLu9zD35qIGBUD99Exs5tYKTkrV0STFa
+         gvXw==
+X-Gm-Message-State: AOJu0Yzwn4uyGkdM9tnJIsMnO8HuzihqLL6gkBLcnqc01YplHLsvGK2L
+        aRRQoO0o1QWTfrcuhtBVDU12sP4R2jo1sexjSWDO0ba0LUOxm0B7hrbaJBzwXbzfSvjIGi3gMYb
+        RLhf0nwAOXZIvGcBdV4EKyO/XJq8pv0NXhWtJ1Rg5Kj9fM1WR2tPJya0/6g==
+X-Received: by 2002:a05:6000:1b07:b0:321:6450:62ea with SMTP id f7-20020a0560001b0700b00321645062eamr26180425wrz.36.1697324588153;
+        Sat, 14 Oct 2023 16:03:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJOb0XCESRaZNsKxGDIHX5HswxMXGFvre7WUTS/9leErz6A4oyrNkphQTIFfBH43Pd5OvGYb6ogvO9KIDWmeU=
+X-Received: by 2002:a05:6000:1b07:b0:321:6450:62ea with SMTP id
+ f7-20020a0560001b0700b00321645062eamr26180409wrz.36.1697324587746; Sat, 14
+ Oct 2023 16:03:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20231008040140.1647892-1-dimitri.ledkov@canonical.com>
+ <ZSkeWHdOAOfjtpwJ@gondor.apana.org.au> <2e52c8b4-e70a-453f-853a-1962c8167dfa@gmail.com>
+In-Reply-To: <2e52c8b4-e70a-453f-853a-1962c8167dfa@gmail.com>
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Date:   Sun, 15 Oct 2023 00:02:32 +0100
+Message-ID: <CADWks+ZV=BNzEUUgw4YuE_1cr7O7puunBy5FJf-_jyWJyPz=sg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: remove md4 driver
+To:     Denis Kenzior <denkenz@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        James Prestwood <prestwoj@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: e3b18f7200f45d66f7141136c25554ac1e82009b  Add linux-next specific files for 20231013
+On Fri, 13 Oct 2023 at 15:37, Denis Kenzior <denkenz@gmail.com> wrote:
+>
+> Hi Herbert,
+>
+> On 10/13/23 05:39, Herbert Xu wrote:
+> > On Sun, Oct 08, 2023 at 05:01:39AM +0100, Dimitri John Ledkov wrote:
+> >> No internal users left and cryptographically insecure. Users should
+> >> upgrade to something else, e.g. sha256 blake3.
+> >>
+> >> Some drivers have their own full or partial md4 implementation without
+> >> using crypto/md4.
+> >>
+> >> Userspace code search indicates a few copies of hash_info.h
+> >> https://codesearch.debian.net/search?q=HASH_ALGO_MD4&literal=1 without
+> >> need for MD4.
+> >>
+> >> Preserve uapi hash algorithm indexes and array length, but rename the
+> >> MD4 enum.
+> >>
+> >> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> >> ---
+> >>   crypto/Kconfig                 |   6 -
+> >>   crypto/Makefile                |   1 -
+> >>   crypto/hash_info.c             |   4 +-
+> >>   crypto/md4.c                   | 241 ---------------------------------
+> >>   crypto/tcrypt.c                |  12 --
+> >>   crypto/testmgr.c               |   6 -
+> >>   crypto/testmgr.h               |  42 ------
+> >>   include/uapi/linux/hash_info.h |   2 +-
+> >>   8 files changed, 3 insertions(+), 311 deletions(-)
+> >>   delete mode 100644 crypto/md4.c
+> >
+> > Patch applied.  Thanks.
+>
+> Does this patch break userspace?
+>
+> Here's a thread regarding MD4 the last time its removal was attempted:
+> https://lore.kernel.org/linux-crypto/20210818144617.110061-1-ardb@kernel.org/
+>
+> Please note that iwd does use MD4 hashes here:
+> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/checksum.c#n63
+>
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/eap-mschapv2.c#n165
+>
 
-Error/Warning reports:
+Thank you for this reference. The WiFI eap mschapv2 based
+authentication indeed relies on MD4. The IWD code uses kernel as a
+basically impromptu userspace library to gain access to MD4, which
+sounds like a poor way of doing this. In comparison NetworkManager
+uses userspace crypto libraries to compute that.
 
-https://lore.kernel.org/oe-kbuild-all/202309212121.cul1pTRa-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202309212339.hxhBu2F1-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310051547.40nm4Sif-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310052201.AnVbpgPr-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310100409.LrBAYpmk-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310132104.O9S9Fdpn-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310132128.grw00tS2-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202310140301.H2JW530r-lkp@intel.com
+Note that iwd has an alternative code path of using md4 hashed
+password, meaning it does still work on kernels without MD4.
 
-Error/Warning: (recently discovered and may have been fixed)
+It worries me a lot that this is still in active use.
 
-drivers/fpga/altera-ps-spi.c:74:34: warning: unused variable 'of_ef_match' [-Wunused-const-variable]
-drivers/gpu/drm/amd/amdgpu/../display/dc/dcn35/dcn35_hwseq.c:159 dcn35_init_hw() warn: variable dereferenced before check 'res_pool->dccg' (see line 150)
-drivers/gpu/drm/amd/amdgpu/../display/dc/dcn35/dcn35_hwseq.c:206 dcn35_init_hw() error: we previously assumed 'res_pool->hubbub' could be null (see line 159)
-drivers/gpu/drm/amd/amdgpu/../display/dc/dcn35/dcn35_hwseq.c:285 dcn35_init_hw() error: we previously assumed 'dc->clk_mgr' could be null (see line 136)
-drivers/gpu/drm/amd/amdgpu/../display/dc/dcn35/dcn35_hwseq.c:977 dcn35_calc_blocks_to_gate() error: we previously assumed 'pipe_ctx->plane_res.hubp' could be null (see line 973)
-drivers/gpu/drm/amd/amdgpu/amdgpu_gmc.c:274: warning: Function parameter or member 'gart_placement' not described in 'amdgpu_gmc_gart_location'
-fs/bcachefs/extents.h:603:17: warning: writing 8 bytes into a region of size 0 [-Wstringop-overflow=]
-kernel/bpf/helpers.c:1909:19: warning: no previous declaration for 'bpf_percpu_obj_new_impl' [-Wmissing-declarations]
-kernel/bpf/helpers.c:1945:18: warning: no previous declaration for 'bpf_percpu_obj_drop_impl' [-Wmissing-declarations]
-kernel/bpf/helpers.c:2480:18: warning: no previous declaration for 'bpf_throw' [-Wmissing-declarations]
-
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-crypto/lskcipher.c:639 lskcipher_alloc_instance_simple() warn: passing zero to 'ERR_PTR'
-drivers/staging/octeon/ethernet.c:204:37: error: storage size of 'rx_status' isn't known
-drivers/staging/octeon/ethernet.c:205:37: error: storage size of 'tx_status' isn't known
-drivers/staging/octeon/ethernet.c:801:49: error: storage size of 'imode' isn't known
-drivers/staging/octeon/ethernet.c:802:21: error: variable 'imode' has initializer but incomplete type
-fs/ntfs3/bitmap.c:663 wnd_init() warn: Please consider using kvcalloc instead of kvmalloc_array
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arc-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arc-randconfig-002-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm64-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm64-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- arm64-randconfig-004-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- csky-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- csky-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-randconfig-003-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- i386-randconfig-141-20230905
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_hwseq.c-dcn35_calc_blocks_to_gate()-error:we-previously-assumed-pipe_ctx-plane_res.hubp-could-be-null-(see-line-)
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_hwseq.c-dcn35_calc_blocks_to_gate()-warn:always-true-condition-(pipe_ctx-plane_res.mpcc_inst-)-(-)
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_hwseq.c-dcn35_init_hw()-error:we-previously-assumed-dc-clk_mgr-could-be-null-(see-line-)
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_hwseq.c-dcn35_init_hw()-error:we-previously-assumed-res_pool-hubbub-could-be-null-(see-line-)
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_hwseq.c-dcn35_init_hw()-warn:inconsistent-indenting
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_hwseq.c-dcn35_init_hw()-warn:variable-dereferenced-before-check-res_pool-dccg-(see-line-)
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn35-dcn35_resource.c-dcn35_resource_construct()-warn:inconsistent-indenting
-|-- loongarch-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-defconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-loongson3_defconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-randconfig-001-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- loongarch-randconfig-002-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- microblaze-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- microblaze-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- mips-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- mips-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- mips-cavium_octeon_defconfig
-|   |-- drivers-staging-octeon-ethernet.c:error:storage-size-of-imode-isn-t-known
-|   |-- drivers-staging-octeon-ethernet.c:error:storage-size-of-rx_status-isn-t-known
-|   |-- drivers-staging-octeon-ethernet.c:error:storage-size-of-tx_status-isn-t-known
-|   `-- drivers-staging-octeon-ethernet.c:error:variable-imode-has-initializer-but-incomplete-type
-|-- openrisc-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- openrisc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- parisc-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- parisc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc-randconfig-001-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc-randconfig-002-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc64-randconfig-001-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc64-randconfig-001-20231014
-|   `-- fs-bcachefs-extents.h:warning:writing-bytes-into-a-region-of-size
-|-- powerpc64-randconfig-002-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- powerpc64-randconfig-003-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- riscv-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- s390-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- s390-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- s390-randconfig-002-20231013
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- sparc-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- sparc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- sparc64-allmodconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- sparc64-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- x86_64-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-|-- x86_64-randconfig-001-20231013
-|   |-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_percpu_obj_drop_impl
-|   |-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_percpu_obj_new_impl
-|   `-- kernel-bpf-helpers.c:warning:no-previous-declaration-for-bpf_throw
-|-- x86_64-randconfig-161-20231013
-|   |-- crypto-lskcipher.c-lskcipher_alloc_instance_simple()-warn:passing-zero-to-ERR_PTR
-|   |-- drivers-gpu-drm-i915-display-intel_dsb.c-_intel_dsb_commit()-warn:always-true-condition-(dewake_scanline-)-(-u32max-)
-|   |-- fs-ntfs3-bitmap.c-wnd_init()-warn:Please-consider-using-kvcalloc-instead-of-kvmalloc_array
-|   `-- mm-gup.c-pin_user_pages_fd()-warn:unsigned-start-is-never-less-than-zero.
-`-- xtensa-randconfig-001-20231013
-    `-- drivers-gpu-drm-amd-amdgpu-amdgpu_gmc.c:warning:Function-parameter-or-member-gart_placement-not-described-in-amdgpu_gmc_gart_location
-clang_recent_errors
-`-- hexagon-randconfig-r011-20211004
-    `-- drivers-fpga-altera-ps-spi.c:warning:unused-variable-of_ef_match
-
-elapsed time: 1460m
-
-configs tested: 118
-configs skipped: 2
-
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20231013   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                          gemini_defconfig   gcc  
-arm                         nhk8815_defconfig   gcc  
-arm                   randconfig-001-20231013   gcc  
-arm                         vf610m4_defconfig   gcc  
-arm64                            allmodconfig   gcc  
-arm64                             allnoconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                  randconfig-001-20231013   gcc  
-i386                  randconfig-002-20231013   gcc  
-i386                  randconfig-003-20231013   gcc  
-i386                  randconfig-004-20231013   gcc  
-i386                  randconfig-005-20231013   gcc  
-i386                  randconfig-006-20231013   gcc  
-loongarch                        alldefconfig   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                        allyesconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch                 loongson3_defconfig   gcc  
-loongarch             randconfig-001-20231013   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                            q40_defconfig   gcc  
-m68k                          sun3x_defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                           ip22_defconfig   clang
-mips                      pic32mzda_defconfig   clang
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-openrisc                         allmodconfig   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   gcc  
-powerpc                  mpc885_ads_defconfig   clang
-powerpc                      ppc64e_defconfig   clang
-powerpc                     tqm8548_defconfig   gcc  
-powerpc                     tqm8560_defconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                 randconfig-001-20231013   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                              allnoconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                  randconfig-001-20231013   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                           se7750_defconfig   gcc  
-sh                        sh7785lcr_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                 randconfig-001-20231013   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20231013   gcc  
-x86_64                randconfig-002-20231013   gcc  
-x86_64                randconfig-003-20231013   gcc  
-x86_64                randconfig-004-20231013   gcc  
-x86_64                randconfig-005-20231013   gcc  
-x86_64                randconfig-006-20231013   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
+MS-CHAPv2 has been completely broken since 2012 with a cloud service
+at the time offered to automatically crack any communication. It is
+insecure, does not provide any confidentiality, and worse off allows
+to steal & reuse credentials to later impersonate the original user.
+It is worse than unencrypted WiFi in that sense. Even Windows 11 since
+at least 22H2 release prohibits such connections.  I will propose
+patches to IWD to stop using the md5 crypto kernel interface. As much
+as it is convenient, users of insecure & obsolete cryptography must
+not hold up removal of such methods from the kernel.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+okurrr,
+
+Dimitri
