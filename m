@@ -2,78 +2,87 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF82CDB465
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 17:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6435DC41513
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 18:24:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231675AbjJPRtu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Oct 2023 13:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39140 "EHLO
+        id S232936AbjJPSYN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Oct 2023 14:24:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231611AbjJPRtu (ORCPT
+        with ESMTP id S234116AbjJPSYM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2023 13:49:50 -0400
-X-Greylist: delayed 195 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 16 Oct 2023 10:49:48 PDT
-Received: from smtprelay04.ispgateway.de (smtprelay04.ispgateway.de [80.67.31.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB639F
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2023 10:49:48 -0700 (PDT)
-Received: from [92.206.139.21] (helo=note-book.lan)
-        by smtprelay04.ispgateway.de with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.96.1)
-        (envelope-from <git@apitzsch.eu>)
-        id 1qsRfi-0005Km-0e;
-        Mon, 16 Oct 2023 19:46:30 +0200
-From:   =?utf-8?q?Andr=C3=A9_Apitzsch?= <git@apitzsch.eu>
-Date:   Mon, 16 Oct 2023 19:45:53 +0200
-Subject: [PATCH] crypto: qcom-rng - Add missing dependency on hw_random
+        Mon, 16 Oct 2023 14:24:12 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10CA2F1;
+        Mon, 16 Oct 2023 11:24:09 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96BC8C433C7;
+        Mon, 16 Oct 2023 18:24:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697480648;
+        bh=GBLmmoSGCW+tXYLIivo4TbRnr1P9ngnwrM2YJKL/bTg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NY/8pAvpcvypSxypkIyxpEKPZ2SjHbhFGQ7w8hgRGa6P7HMv4guIeH3axU4oXf32l
+         d8/Y4VDpRmoSxbEOwlETjLdRsI4p19cYlw5bkkdz8Znp8B7YZ4/2SDvaTaEvfeQVyM
+         IbJz56sAcc5WwG6WSwpAvdWiZM5OEY5NQztADQAwjiCOh3F3PvAVB9aqNH4kycx2fS
+         sH0ZlX6VXq7PkCm9SJWkAEaVEmT+NaBSNHiGr6V6wV5jUtysv3vt0GQkQJjiqsJpt+
+         bcIj7Mp3upbMBI8s7K/b25pGompYe/FBdN03b4M22Er6sLHlmkWBgD1uq1Dd5bbGYS
+         H6lOV1MRqhn0g==
+Date:   Mon, 16 Oct 2023 11:27:55 -0700
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Om Prakash Singh <quic_omprsing@quicinc.com>
+Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
+        agross@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+        devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
+Subject: Re: [PATCH V2] dt-bindings: crypto: qcom,prng: document SA8775P and
+ SC7280
+Message-ID: <gud3cwxig4plnayez3guchyx27thi722gcl6bvdzvv23p3y3av@37kyt5nmx6sg>
+References: <20231016143428.2992168-1-quic_omprsing@quicinc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20231016-qcom_rng-v1-1-1a7d7856651e@apitzsch.eu>
-X-B4-Tracking: v=1; b=H4sIANB2LWUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI2NDA0Mz3cLk/Nz4orx03VQTs2SLRAszI4ukJCWg8oKi1LTMCrBR0bG1tQB
- CBxdjWgAAAA==
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?utf-8?q?Andr=C3=A9_Apitzsch?= <git@apitzsch.eu>
-X-Mailer: b4 0.12.3
-X-Df-Sender: YW5kcmVAYXBpdHpzY2guZXU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231016143428.2992168-1-quic_omprsing@quicinc.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This should fix the undefined reference:
+On Mon, Oct 16, 2023 at 08:04:28PM +0530, Om Prakash Singh wrote:
+> Document SA8775P and SC7280 compatible for the True Random Number
+> Generator.
+> 
+> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
 
-> /usr/bin/aarch64-alpine-linux-musl-ld: Unexpected GOT/PLT entries detected!
-> /usr/bin/aarch64-alpine-linux-musl-ld: Unexpected run-time procedure linkages detected!
-> /usr/bin/aarch64-alpine-linux-musl-ld: drivers/crypto/qcom-rng.o: in function `qcom_rng_probe':
-> qcom-rng.c:(.text+0x130): undefined reference to `devm_hwrng_register'
+Thanks for the quick update, Om.
 
-Fixes: f29cd5bb64c2 ("crypto: qcom-rng - Add hw_random interface support")
-Signed-off-by: André Apitzsch <git@apitzsch.eu>
----
- drivers/crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Bjorn Andersson <andersson@kernel.org>
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index c761952f0dc6..79c3bb9c99c3 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -601,6 +601,7 @@ config CRYPTO_DEV_QCE_SW_MAX_LEN
- config CRYPTO_DEV_QCOM_RNG
- 	tristate "Qualcomm Random Number Generator Driver"
- 	depends on ARCH_QCOM || COMPILE_TEST
-+	depends on HW_RANDOM
- 	select CRYPTO_RNG
- 	help
- 	  This driver provides support for the Random Number
+Regards,
+Bjorn
 
----
-base-commit: 4d0515b235dec789578d135a5db586b25c5870cb
-change-id: 20231016-qcom_rng-e46c8a8628bb
-
-Best regards,
--- 
-André Apitzsch <git@apitzsch.eu>
-
+> ---
+> 
+> Changes in V2:
+>   - Squashed two separate patches for SA8775P and SC7280 in one.
+>   - Sort entries in alphabetic order.
+> 
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> index 633993f801c6..13070db0f70c 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> @@ -17,6 +17,8 @@ properties:
+>            - qcom,prng-ee  # 8996 and later using EE
+>        - items:
+>            - enum:
+> +              - qcom,sa8775p-trng
+> +              - qcom,sc7280-trng
+>                - qcom,sm8450-trng
+>                - qcom,sm8550-trng
+>            - const: qcom,trng
+> -- 
+> 2.25.1
+> 
