@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AEECDB465
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 10:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4664DCDB465
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 10:47:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229666AbjJPK2P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Oct 2023 06:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
+        id S232591AbjJPKrh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Oct 2023 06:47:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231389AbjJPK2N (ORCPT
+        with ESMTP id S232630AbjJPKrf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2023 06:28:13 -0400
+        Mon, 16 Oct 2023 06:47:35 -0400
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2D2AC;
-        Mon, 16 Oct 2023 03:28:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CDEB4;
+        Mon, 16 Oct 2023 03:47:33 -0700 (PDT)
 Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id AA723207B0;
-        Mon, 16 Oct 2023 12:28:09 +0200 (CEST)
+        by a.mx.secunet.com (Postfix) with ESMTP id 712DF207BB;
+        Mon, 16 Oct 2023 12:47:31 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
         by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id KMRYe7fo4lTH; Mon, 16 Oct 2023 12:28:08 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+        with ESMTP id XuE_aQheVAQ2; Mon, 16 Oct 2023 12:47:30 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id DA4F8205DD;
-        Mon, 16 Oct 2023 12:28:08 +0200 (CEST)
+        by a.mx.secunet.com (Postfix) with ESMTPS id E660620728;
+        Mon, 16 Oct 2023 12:47:30 +0200 (CEST)
 Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-        by mailout2.secunet.com (Postfix) with ESMTP id D658480004A;
-        Mon, 16 Oct 2023 12:28:08 +0200 (CEST)
+        by mailout1.secunet.com (Postfix) with ESMTP id DF4DB80004A;
+        Mon, 16 Oct 2023 12:47:30 +0200 (CEST)
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 16 Oct 2023 12:28:08 +0200
+ 15.1.2507.32; Mon, 16 Oct 2023 12:47:30 +0200
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 16 Oct
- 2023 12:28:08 +0200
+ 2023 12:47:30 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-        id CCD7F3182C75; Mon, 16 Oct 2023 12:28:07 +0200 (CEST)
-Date:   Mon, 16 Oct 2023 12:28:07 +0200
+        id D28A23182C75; Mon, 16 Oct 2023 12:47:29 +0200 (CEST)
+Date:   Mon, 16 Oct 2023 12:47:29 +0200
 From:   Steffen Klassert <steffen.klassert@secunet.com>
 To:     Wang Jinchao <wangjinchao@xfusion.com>
 CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
@@ -48,14 +48,12 @@ CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
         <stone.xulei@xfusion.com>
 Subject: Re: [RFC/REFACT] Refactoring and significantly reducing code
  complexity
-Message-ID: <ZS0QNxbtXPgPH1j2@gauss3.secunet.de>
+Message-ID: <ZS0UwakMZpKLbsbZ@gauss3.secunet.de>
 References: <ZRU/EjubEH/5QLlG@fedora>
- <ZRZk6tC6j1FtW3uY@gauss3.secunet.de>
- <ZSCxxxMKoby6XWsg@fedora>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ZSCxxxMKoby6XWsg@fedora>
+In-Reply-To: <ZRU/EjubEH/5QLlG@fedora>
 X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
@@ -63,93 +61,73 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 07, 2023 at 09:17:59AM +0800, Wang Jinchao wrote:
-> On Fri, Sep 29, 2023 at 07:47:22AM +0200, Steffen Klassert wrote:
-> > On Thu, Sep 28, 2023 at 04:53:38PM +0800, Wang Jinchao wrote:
-> > > This is a refactored version with the following main changes:
-> > > 
-> > > - The parallel workqueue no longer uses the WQ_UNBOUND attribute
-> > > - Removal of CPU-related logic, sysfs-related interfaces
-> > > - removal of structures like padata_cpumask, and deletion of parallel_data
-> > > - Using completion to maintain sequencing
-> > > - no longer using lists
-> > > - removing structures like padata_list and padata_serial_queue
-> > > - Removal of padata_do_serial()
-> > 
-> > This removes all the logic that is needed to ensure that
-> > the parallelized objects return in the same order as
-> > they were before the parallelization. This change makes
-> > padata unusable for networking.
+Hi,
+
+On Thu, Sep 28, 2023 at 04:53:38PM +0800, Wang Jinchao wrote:
+> This is a refactored version with the following main changes:
 > 
-> The RFC use the following three to ensure serial timing sequence:
+> - The parallel workqueue no longer uses the WQ_UNBOUND attribute
+> - Removal of CPU-related logic, sysfs-related interfaces
+> - removal of structures like padata_cpumask, and deletion of parallel_data
+> - Using completion to maintain sequencing
+> - no longer using lists
+> - removing structures like padata_list and padata_serial_queue
+> - Removal of padata_do_serial()
+> - padata automatically ensures the calling sequence.
 > 
-> 1.  Use alloc_ordered_workqueue() to create a serial worker queue where 
->     serial() function runs. This ensures that serial() function executes
->     as serial work was enqueued using queue_work().
-> 2.  Queue the serial work before enqueueing parallel work in padata_do_parallel().
->     This ensures the serial work follows the same order as the padata_do_parallel().
-> 3.  The serial work wait for completion of parallel_done, which will be 
->     complete()ed after the parallel() function within the parallel work.
+> Testing was conducted using ltp's pcrypt_aead01, and the execution time
+> comparison between the old and new versions is as follows:
+> 
+> Old Version:
+> real 0m27.451s
+> user 0m0.031s
+> sys 0m0.260s
+> 
+> New Version:
+> real 0m21.351s
+> user 0m0.023s
+> sys 0m0.260s
+> 
+> Signed-off-by: Wang Jinchao <wangjinchao@xfusion.com>
+> ---
+>  crypto/pcrypt.c        |  34 +-
+>  include/linux/padata.h |  95 +----
+>  kernel/padata.c        | 815 ++---------------------------------------
+>  3 files changed, 43 insertions(+), 901 deletions(-)
 
-I had a closer look to the padata codebase now. The logic to
-parallelize/serialize changed quite a bit since I wrote padata
-initially. I don't understand the new logic completely,
-so we need to rely on Daniels review for this.
+...
 
-> This is just a design idea, because I am not familiar with IPsec, I haven't 
-> tested it in a real network environment yet. 
-> Could you give me some clues on how to use pcrypt in an IPsec scenario?
+>  
+> -static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
+> -{
+> -	int ret;
+> -
+> -	pinst->kobj.kset = pcrypt_kset;
+> -	ret = kobject_add(&pinst->kobj, NULL, "%s", name);
+> -	if (!ret)
+> -		kobject_uevent(&pinst->kobj, KOBJ_ADD);
+> -
+> -	return ret;
+> -}
 
-pcrypt has performance gains if the cost of the crypto
-oreration is higher than the cost of moving the crypto
-request to another cpu. That was the case back in the
-days, but the situation changed since then. We now have
-hardware support for crypto, like aes-ni etc.
-So for hardware supported algorithms, pcrypt will not
-help much. But it is still interesting for crypto
-algorithms that are implemented in software only.
+Users might rely on the existence of that sysfs files,
+so removing this might be dangerous.
 
-Here is how you can instantiate a pcrypted
-algorithm:
+>  static void padata_serial_worker(struct work_struct *serial_work)
+>  {
+> -	struct padata_serial_queue *squeue;
+> -	struct parallel_data *pd;
+> -	LIST_HEAD(local_list);
+> -	int cnt;
+> -
+> -	local_bh_disable();
 
-----------------------------------------------------
-You need to instantiate pcrypt before you can use it.
+Note that the networking RX path must run with BHs off.
+The call to padata_do_parallel might come with BHs off
+and the serialization callback should also called with
+BHs off.
 
-You need either crconf or the tcrypt module to instantiate pcrypt.
+Please make sure that the networking usecase continues
+to work with that refactorization.
 
-With crconf:
-
-You can get crconf from https://sourceforge.net/projects/crconf/
-After installing crconf do e.g.
-
-crconf add driver "pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))" type 3
-
-
-With tcrypt:
-
-modprobe tcrypt alg="pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))" type=3
-
-The modprobe will return with an error, don't worry about it, that's ok.
-
-
-
-Once you've did one of the above, your /proc/crypto should show
-something like:
-
-name         : authenc(hmac(sha1),cbc(aes))
-driver       : pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))
-module       : pcrypt
-priority     : 2100
-refcnt       : 1
-selftest     : passed
-type         : aead
-async        : yes
-blocksize    : 16
-ivsize       : 16
-maxauthsize  : 20
-geniv        : <built-in>
-
-
-Now pcrypt is instantiated, e.g. all new IPsec states (that do
-hmac-sha1, cbc-aes) will use it.
-
+Thanks!
