@@ -2,87 +2,154 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 557DBC46CA1
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 08:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AEECDB465
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 10:28:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbjJPIfv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Oct 2023 04:35:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52748 "EHLO
+        id S229666AbjJPK2P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Oct 2023 06:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230105AbjJPIfu (ORCPT
+        with ESMTP id S231389AbjJPK2N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2023 04:35:50 -0400
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C669A1;
-        Mon, 16 Oct 2023 01:35:47 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1qsJ4V-007Sey-0T; Mon, 16 Oct 2023 16:35:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 16 Oct 2023 16:35:36 +0800
-Date:   Mon, 16 Oct 2023 16:35:36 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Denis Kenzior <denkenz@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        James Prestwood <prestwoj@gmail.com>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Subject: [PATCH] KEYS: asymmetric: Fix sign/verify on pkcs1pad without a hash
-Message-ID: <ZSz12KHsfJmZGjKz@gondor.apana.org.au>
-References: <ab4d8025-a4cc-48c6-a6f0-1139e942e1db@gmail.com>
- <ZSc/9nUuF/d24iO6@gondor.apana.org.au>
- <ZSda3l7asdCr06kA@gondor.apana.org.au>
- <be96d2e7-592e-467e-9ad2-3f69a69cf844@gmail.com>
- <ZSdn29PDrs6hzjV9@gondor.apana.org.au>
- <1d22cd18-bc2a-4273-8087-e74030fbf373@gmail.com>
- <ZSgChGwi1r9CILPI@gondor.apana.org.au>
- <c917020d-0cb0-4289-a2e3-d9a0fa28151a@gmail.com>
+        Mon, 16 Oct 2023 06:28:13 -0400
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2D2AC;
+        Mon, 16 Oct 2023 03:28:11 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id AA723207B0;
+        Mon, 16 Oct 2023 12:28:09 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id KMRYe7fo4lTH; Mon, 16 Oct 2023 12:28:08 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id DA4F8205DD;
+        Mon, 16 Oct 2023 12:28:08 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+        by mailout2.secunet.com (Postfix) with ESMTP id D658480004A;
+        Mon, 16 Oct 2023 12:28:08 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 16 Oct 2023 12:28:08 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 16 Oct
+ 2023 12:28:08 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+        id CCD7F3182C75; Mon, 16 Oct 2023 12:28:07 +0200 (CEST)
+Date:   Mon, 16 Oct 2023 12:28:07 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Wang Jinchao <wangjinchao@xfusion.com>
+CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stone.xulei@xfusion.com>
+Subject: Re: [RFC/REFACT] Refactoring and significantly reducing code
+ complexity
+Message-ID: <ZS0QNxbtXPgPH1j2@gauss3.secunet.de>
+References: <ZRU/EjubEH/5QLlG@fedora>
+ <ZRZk6tC6j1FtW3uY@gauss3.secunet.de>
+ <ZSCxxxMKoby6XWsg@fedora>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <c917020d-0cb0-4289-a2e3-d9a0fa28151a@gmail.com>
+In-Reply-To: <ZSCxxxMKoby6XWsg@fedora>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 12, 2023 at 10:08:46AM -0500, Denis Kenzior wrote:
->
-> Looks like something took out the ability to run sign/verify without a hash
-> on asymmetric keys.
+On Sat, Oct 07, 2023 at 09:17:59AM +0800, Wang Jinchao wrote:
+> On Fri, Sep 29, 2023 at 07:47:22AM +0200, Steffen Klassert wrote:
+> > On Thu, Sep 28, 2023 at 04:53:38PM +0800, Wang Jinchao wrote:
+> > > This is a refactored version with the following main changes:
+> > > 
+> > > - The parallel workqueue no longer uses the WQ_UNBOUND attribute
+> > > - Removal of CPU-related logic, sysfs-related interfaces
+> > > - removal of structures like padata_cpumask, and deletion of parallel_data
+> > > - Using completion to maintain sequencing
+> > > - no longer using lists
+> > > - removing structures like padata_list and padata_serial_queue
+> > > - Removal of padata_do_serial()
+> > 
+> > This removes all the logic that is needed to ensure that
+> > the parallelized objects return in the same order as
+> > they were before the parallelization. This change makes
+> > padata unusable for networking.
+> 
+> The RFC use the following three to ensure serial timing sequence:
+> 
+> 1.  Use alloc_ordered_workqueue() to create a serial worker queue where 
+>     serial() function runs. This ensures that serial() function executes
+>     as serial work was enqueued using queue_work().
+> 2.  Queue the serial work before enqueueing parallel work in padata_do_parallel().
+>     This ensures the serial work follows the same order as the padata_do_parallel().
+> 3.  The serial work wait for completion of parallel_done, which will be 
+>     complete()ed after the parallel() function within the parallel work.
 
-Indeed this is what it was.  Please try this patch.  Thanks!
+I had a closer look to the padata codebase now. The logic to
+parallelize/serialize changed quite a bit since I wrote padata
+initially. I don't understand the new logic completely,
+so we need to rely on Daniels review for this.
 
----8<---
-The new sign/verify code broke the case of pkcs1pad without a
-hash algorithm.  Fix it by setting issig correctly for this case.
+> This is just a design idea, because I am not familiar with IPsec, I haven't 
+> tested it in a real network environment yet. 
+> Could you give me some clues on how to use pcrypt in an IPsec scenario?
 
-Fixes: 63ba4d67594a ("KEYS: asymmetric: Use new crypto interface without scatterlists")
-Cc: stable@vger.kernel.org # v6.5
-Reported-by: Denis Kenzior <denkenz@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+pcrypt has performance gains if the cost of the crypto
+oreration is higher than the cost of moving the crypto
+request to another cpu. That was the case back in the
+days, but the situation changed since then. We now have
+hardware support for crypto, like aes-ni etc.
+So for hardware supported algorithms, pcrypt will not
+help much. But it is still interesting for crypto
+algorithms that are implemented in software only.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index abeecb8329b3..2f9181c4cd59 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -81,14 +81,13 @@ software_key_determine_akcipher(const struct public_key *pkey,
- 		 * RSA signatures usually use EMSA-PKCS1-1_5 [RFC3447 sec 8.2].
- 		 */
- 		if (strcmp(encoding, "pkcs1") == 0) {
-+			*sig = op == kernel_pkey_sign ||
-+			       op == kernel_pkey_verify;
- 			if (!hash_algo) {
--				*sig = false;
- 				n = snprintf(alg_name, CRYPTO_MAX_ALG_NAME,
- 					     "pkcs1pad(%s)",
- 					     pkey->pkey_algo);
- 			} else {
--				*sig = op == kernel_pkey_sign ||
--				       op == kernel_pkey_verify;
- 				n = snprintf(alg_name, CRYPTO_MAX_ALG_NAME,
- 					     "pkcs1pad(%s,%s)",
- 					     pkey->pkey_algo, hash_algo);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Here is how you can instantiate a pcrypted
+algorithm:
+
+----------------------------------------------------
+You need to instantiate pcrypt before you can use it.
+
+You need either crconf or the tcrypt module to instantiate pcrypt.
+
+With crconf:
+
+You can get crconf from https://sourceforge.net/projects/crconf/
+After installing crconf do e.g.
+
+crconf add driver "pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))" type 3
+
+
+With tcrypt:
+
+modprobe tcrypt alg="pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))" type=3
+
+The modprobe will return with an error, don't worry about it, that's ok.
+
+
+
+Once you've did one of the above, your /proc/crypto should show
+something like:
+
+name         : authenc(hmac(sha1),cbc(aes))
+driver       : pcrypt(authenc(hmac(sha1-generic),cbc(aes-asm)))
+module       : pcrypt
+priority     : 2100
+refcnt       : 1
+selftest     : passed
+type         : aead
+async        : yes
+blocksize    : 16
+ivsize       : 16
+maxauthsize  : 20
+geniv        : <built-in>
+
+
+Now pcrypt is instantiated, e.g. all new IPsec states (that do
+hmac-sha1, cbc-aes) will use it.
+
