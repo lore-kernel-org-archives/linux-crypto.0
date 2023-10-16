@@ -2,181 +2,170 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF21C41513
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 12:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19891CDB465
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 13:29:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbjJPMDd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Oct 2023 08:03:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44062 "EHLO
+        id S233438AbjJPN3N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Oct 2023 09:29:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjJPMDc (ORCPT
+        with ESMTP id S232143AbjJPN3N (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2023 08:03:32 -0400
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C840AE6;
-        Mon, 16 Oct 2023 05:03:29 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39G7h1Um007323;
-        Mon, 16 Oct 2023 14:02:47 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-        message-id:date:mime-version:from:subject:to:cc:references
-        :in-reply-to:content-type:content-transfer-encoding; s=
-        selector1; bh=GEtT1vGNrN2L3qXSsS6BjSB5ruMmKsplVyDRLRyeo9Y=; b=1J
-        98O2DjQg2zsjt4f510btLN/TCgkmPUp32hr+x1F3zVIG6OoZLfC3Cbyjc01lX9nZ
-        VSS73Gn48GLdu2Pj2PdtzQCh6rQpYFXh63DE6xW8H+rsFN1zzvxxEYZ+i7yOrOVy
-        1ybut4hcc4ZKwAQt8fVMxknPbllcUus7znWDRJmPQvi1rHJqIrPWzqu6PICGgi4T
-        lPhNG+AgOBhZOVBNR4OCi7G99qM+FbpiuaYRVCuRKuOTObDyKtkIfcpdvYv/o3Zu
-        vwBRb1d9cJyQS7368vGtITam91qeWebiryaExexOXLeN9hsY/CpxbuHNjAGKdma9
-        ZC1Ob39vbFcYhfvYRXtg==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tr4hyn1db-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Oct 2023 14:02:47 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 3AB9A10005B;
-        Mon, 16 Oct 2023 14:02:45 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A384A22F7D3;
-        Mon, 16 Oct 2023 14:02:45 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+        Mon, 16 Oct 2023 09:29:13 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAB19ED;
+        Mon, 16 Oct 2023 06:29:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E2W7CrFhrZM45yHzRepEirhaFjhqOaAl1HHHlFoZB/SfsGUCFcT9oYVd9iWRlX7/1aNPDiPX0v0LbXn7ciwLVcdFWNtF3/flsT2phwu/bwGxABOpx8lB3fVwB6uk1rHAwSVZ9xyU+HVRoKVyiHsBUUKb1XcVwI52FAGclAIFPLut/XXm9XhHCEl4cAmfDYLUn8fS5Ys+MZ9GSWRHC0+zdnJohZeIEFX55Rm4DhZ3Z7vJq7AoursWxjmMG72zO8+ljrigeh8J6imWiDBm+6SPDb4qVwiKytpGpwsfUG3R38p1d/qdnEQipBOu/OuwEStGTNTD3Y5Ku8D1aDzKi/qbvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sxkTby7lFTzFsWFAMnJrm3V9qcqFNOGCwHnaQwzNcgE=;
+ b=atebdNL17GJlrRhAUoRr9rCmS8bDduyEAkIjnFezUkAOqkAqM5sVOg7wh5iflgffZwSV8Nm+pLNEZ2w2RoGKxyP5Ol4fhB14PJfjim8DHP7bAr2QqFbAavVN4nb+/SevFp9Lb8qgj5rojketL69hEcUgnnskAmH8EsrIDzFQeev1E9iHxbhP71oe+hcjPBzunZHwrUysMSD4aq4+V3wQWRa+DqknLzFL/GmpKMpPQZkyPjTpM0a5JS+QOZHuGce/WQJPc9CbXQu63s89ZSmVKQzXGWIFNTTPnRPfEWoA7bKi4yz/Odng/74W/Jt22QR4ZUwbrTf9OI10ggH9nYw27w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sxkTby7lFTzFsWFAMnJrm3V9qcqFNOGCwHnaQwzNcgE=;
+ b=j1LUaar81RoDxEoEbPcjQPwktefhABhKc8NY4SeaKSdIV8d7B5UT8iKGz3fz/zjgdE7tkPbZdhaK0Yhsf/M+sRT3PfyfJwia7SPB1Fh7/z6Cf9r63Huw4aAuoJZhzR3NN5VvRXHUcmZX/GNWRchQMJYVY21TB1fVb3S6I/PhoMY=
+Received: from DM6PR11CA0042.namprd11.prod.outlook.com (2603:10b6:5:14c::19)
+ by CY5PR12MB6431.namprd12.prod.outlook.com (2603:10b6:930:39::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34; Mon, 16 Oct
+ 2023 13:29:07 +0000
+Received: from CY4PEPF0000E9D6.namprd05.prod.outlook.com
+ (2603:10b6:5:14c:cafe::f5) by DM6PR11CA0042.outlook.office365.com
+ (2603:10b6:5:14c::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.35 via Frontend
+ Transport; Mon, 16 Oct 2023 13:29:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D6.mail.protection.outlook.com (10.167.241.80) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:29:06 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 14:02:43 +0200
-Message-ID: <b16ed06f-66fd-457b-9610-a67ad07deb60@foss.st.com>
-Date:   Mon, 16 Oct 2023 14:02:39 +0200
+ 2023 08:29:06 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     <kvm@vger.kernel.org>
+CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
+        <seanjc@google.com>, <vkuznets@redhat.com>, <jmattson@google.com>,
+        <luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
+        <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Subject: [PATCH v10 09/50] x86/traps: Define RMP violation #PF error code
+Date:   Mon, 16 Oct 2023 08:27:38 -0500
+Message-ID: <20231016132819.1002933-10-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231016132819.1002933-1-michael.roth@amd.com>
+References: <20231016132819.1002933-1-michael.roth@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From:   Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
- STM32MP15x boards
-To:     Rob Herring <robh@kernel.org>
-CC:     <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>,
-        <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>,
-        <lee@kernel.org>, <will@kernel.org>, <catalin.marinas@arm.com>,
-        <arnd@kernel.org>, <richardcochran@gmail.com>,
-        Frank Rowand <frowand.list@gmail.com>, <peng.fan@oss.nxp.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <linux-i2c@vger.kernel.org>, <linux-iio@vger.kernel.org>,
-        <alsa-devel@alsa-project.org>, <linux-media@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-p.hy@lists.infradead.org>, <linux-serial@vger.kernel.org>,
-        <linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>
-References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
- <20231010125719.784627-11-gatien.chevallier@foss.st.com>
- <20231010184212.GA1221641-robh@kernel.org>
- <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
- <20231012153012.GA698406-robh@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20231012153012.GA698406-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-16_05,2023-10-12_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D6:EE_|CY5PR12MB6431:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03a75589-b38e-49a8-8f50-08dbce4bdf68
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vdi0/kGZRy0P4FRirFxTF5xYWfdMAuOY/FLUYc+kjt0UPtXQE34Dxvz2U7AcCNqi0qK0Q2qTOVtwrjOPcdCURuJ4bnRdkynES6rll9EOVDpEvK7ftk9cRSNX0NNevK31APjCgtWH6eyudIjo2Ei7FqgGNfErMRU3+B4MEO0NLRSx1oX1TDfO2WMf42sKWay0XPaS1k4i0zuqiuABxQib+evTeJkRSp/UxnDKbTUlbR/LMVVFbeYZuA8SNXtajgL4+AgmG+trap0ArnJIOlw0lliq7eIoFNGf9/nDBS+Jepw7WJKwzH8dWGp2PXwYLYibDEq1lq58BtpN6po+HntPohC6DzVYjSYSgF48pEgVW90eCy7XKlQ93wYxFwg3crysfOAQ6nNsi9lWa3KXLde2WCoWiAE1j77CcnNfEz0Tq4X6f9QOWekTXqscKBxSu/1eCwzO2jrl3m+CCTbQ3M0zXAWALSTQapsMXydPC10pPnc1AttawKgGtrAYTzyoEoIVO08MekS7dcGQNzc6ITWpiAjQm3zy6ieHsikfS8UKNnV4J3Aw+hRbVhw8M+siLbdK4XVgd+edtL4hgWPA4E03YPpfINDEDiNNqeoDDjiN2+tBTUTEedgIYAdlGtw/x6hPzxBPvcuRHM1ZtrWgPEEVxBj1frvYm5YbMQDwJChBTX35OfA/gL78x8xEXoE3oGun1Y6fYXLDAzLKOy+Mk5z5gSgNSwL0qGB0ZvDxqZD2ApukHMHIZ3d+8aBQf0NijOSQiYbEPNmSCWZPZJFh1GuQjw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(186009)(1800799009)(82310400011)(451199024)(64100799003)(40470700004)(46966006)(36840700001)(40460700003)(40480700001)(478600001)(70586007)(70206006)(54906003)(6916009)(6666004)(47076005)(36860700001)(83380400001)(86362001)(356005)(82740400003)(316002)(336012)(16526019)(26005)(1076003)(2616005)(426003)(41300700001)(44832011)(36756003)(81166007)(7416002)(4326008)(7406005)(8936002)(5660300002)(8676002)(2906002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:29:06.8004
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03a75589-b38e-49a8-8f50-08dbce4bdf68
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000E9D6.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6431
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rob,
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-On 10/12/23 17:30, Rob Herring wrote:
-> On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
->> Hi Rob,
->>
->> On 10/10/23 20:42, Rob Herring wrote:
->>> On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
->>>> ETZPC is a firewall controller. Put all peripherals filtered by the
->>>> ETZPC as ETZPC subnodes and reference ETZPC as an
->>>> access-control-provider.
->>>>
->>>> For more information on which peripheral is securable or supports MCU
->>>> isolation, please read the STM32MP15 reference manual.
->>>>
->>>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>>> ---
->>>>
->>>> Changes in V6:
->>>>       	- Renamed access-controller to access-controllers
->>>>       	- Removal of access-control-provider property
->>>>
->>>> Changes in V5:
->>>>       	- Renamed feature-domain* to access-control*
->>>>
->>>>    arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
->>>>    arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
->>>>    arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
->>>>    3 files changed, 1450 insertions(+), 1377 deletions(-)
->>>
->>> This is not reviewable. Change the indentation and any non-functional
->>> change in one patch and then actual changes in another.
->>
->> Ok, I'll make it easier to read.
->>
->>>
->>> This is also an ABI break. Though I'm not sure it's avoidable. All the
->>> devices below the ETZPC node won't probe on existing kernel. A
->>> simple-bus fallback for ETZPC node should solve that.
->>>
->>
->> I had one issue when trying with a simple-bus fallback that was the
->> drivers were probing even though the access rights aren't correct.
->> Hence the removal of the simple-bus compatible in the STM32MP25 patch.
-> 
-> But it worked before, right? So the difference is you have either added
-> new devices which need setup or your firmware changed how devices are
-> setup (or not setup). Certainly can't fix the latter case. You just need
-> to be explicit about what you are doing to users.
-> 
+Bit 31 in the page fault-error bit will be set when processor encounters
+an RMP violation.
 
-I should've specified it was during a test where I deliberately set
-incorrect rights on a peripheral and enabled its node to see if the
-firewall would allow the creation of the device.
+While at it, use the BIT() macro.
 
-> 
->> Even though a node is tagged with the OF_POPULATED flag when checking
->> the access rights with the firewall controller, it seems that when
->> simple-bus is probing, there's no check of this flag.
-> 
-> It shouldn't. Those flags are for creating the devices (or not) and
-> removing only devices of_platform_populate() created.
-> 
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
+Acked-by: Dave Hansen <dave.hansen@intel.com>
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ arch/x86/include/asm/trap_pf.h | 4 ++++
+ arch/x86/mm/fault.c            | 1 +
+ 2 files changed, 5 insertions(+)
 
-About the "simple-bus" being a fallback, I think I understood why I saw
-that the devices were created.
+diff --git a/arch/x86/include/asm/trap_pf.h b/arch/x86/include/asm/trap_pf.h
+index afa524325e55..136707d7a961 100644
+--- a/arch/x86/include/asm/trap_pf.h
++++ b/arch/x86/include/asm/trap_pf.h
+@@ -2,6 +2,8 @@
+ #ifndef _ASM_X86_TRAP_PF_H
+ #define _ASM_X86_TRAP_PF_H
+ 
++#include <linux/bits.h>  /* BIT() macro */
++
+ /*
+  * Page fault error code bits:
+  *
+@@ -13,6 +15,7 @@
+  *   bit 5 ==				1: protection keys block access
+  *   bit 6 ==				1: shadow stack access fault
+  *   bit 15 ==				1: SGX MMU page-fault
++ *   bit 31 ==				1: fault was due to RMP violation
+  */
+ enum x86_pf_error_code {
+ 	X86_PF_PROT	=		1 << 0,
+@@ -23,6 +26,7 @@ enum x86_pf_error_code {
+ 	X86_PF_PK	=		1 << 5,
+ 	X86_PF_SHSTK	=		1 << 6,
+ 	X86_PF_SGX	=		1 << 15,
++	X86_PF_RMP	=		1 << 31,
+ };
+ 
+ #endif /* _ASM_X86_TRAP_PF_H */
+diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+index ab778eac1952..7858b9515d4a 100644
+--- a/arch/x86/mm/fault.c
++++ b/arch/x86/mm/fault.c
+@@ -547,6 +547,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+ 		 !(error_code & X86_PF_PROT) ? "not-present page" :
+ 		 (error_code & X86_PF_RSVD)  ? "reserved bit violation" :
+ 		 (error_code & X86_PF_PK)    ? "protection keys violation" :
++		 (error_code & X86_PF_RMP)   ? "RMP violation" :
+ 					       "permissions violation");
+ 
+ 	if (!(error_code & X86_PF_USER) && user_mode(regs)) {
+-- 
+2.25.1
 
-All devices under a node whose compatible is "simple-bus" are created
-in of_platform_device_create_pdata(), called by
-of_platform_default_populate_init() at arch_initcall level. This
-before the firewall-controller has a chance to populate it's bus.
-
-Therefore, when I flag nodes when populating the firewall-bus, the
-devices are already created. The "simple-bus" mechanism is not a
-fallback here as it precedes the driver probe.
-
-Is there a safe way to safely remove/disable a device created this way?
-Devices that are under the firewall controller (simple-bus) node
-should not be probed before it as they're child of it.
-
-Best regards,
-Gatien
-
->> of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
->> Maybe that is my error and the firewall bus populate should set
->> OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
-> 
-> Shrug. Off hand, I'd say probably not, but am not certain.
-> 
-> Rob
