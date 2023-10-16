@@ -2,88 +2,77 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CF5CDB483
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 02:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54C54CDB465
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 03:28:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231135AbjJPCiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Oct 2023 22:38:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53810 "EHLO
+        id S231445AbjJPD20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 15 Oct 2023 23:28:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbjJPCiL (ORCPT
+        with ESMTP id S229600AbjJPD2Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Oct 2023 22:38:11 -0400
+        Sun, 15 Oct 2023 23:28:25 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302F6AB;
-        Sun, 15 Oct 2023 19:38:10 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAD4EC433C8;
-        Mon, 16 Oct 2023 02:38:08 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA6DC5;
+        Sun, 15 Oct 2023 20:28:23 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0543FC433C7;
+        Mon, 16 Oct 2023 03:28:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697423889;
-        bh=T5WnSXdJB4MfvIyXC6DMczWEEeOsQwjAqV+LW90t/N0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dtn3KESJWI9dONtkVY8FlFqQ4tdVJUCm+gflh+pExFPd/eVSqVo6wf9rJlDxftjm9
-         DHGVv4e5rBdK7FK+5dbQTMiJ0If/VqefgwPvsok1xbtLJuunQf2fN8t+zhFzkCd731
-         kg4WcM9iVPw5+6QVaryHWu7R/iiFi7BUG5tia14c1dCHsaX1ds7+FBUPHeuWdvulMq
-         nBWmdju1cV8PbKxDBrdSLpYCUA2AICJnyVrtjHYcQ3puuLd2Sr1urw4RM5U+9/uP4S
-         JG46vNM4YLBY8qIHeXs4vOdiIa/oI6zSMp1Lgi337sVXTiqmL6/SdAE8S9y1kG67Mt
-         cM6662M0URl9A==
-Date:   Sun, 15 Oct 2023 19:41:57 -0700
+        s=k20201202; t=1697426903;
+        bh=oMOPLQgD3iWGapH/3B59TLY7Lv23EB8oNxoTvl8H7yg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=CltrR/13sdu+pWcti8uaSC/at59R+e7GsQ/lf8kDOJCjZXr6TcwdrGuYzH2r/2CIq
+         tLWVgZBBmPCzgfcwRKuUCitxxFxW9EST0j0YNqWtmbcBH0WrSpEpnFyBcT/W27smTu
+         phztd2Dnind37defHBfMi+iPbgKqY6aumsiiyvuhgR4m8F2pgMSD73CoAd5joqSxtx
+         Yn8Et2AV8gvY6fcmLEdY5ym/AUOwXODqA+fCSrAJueu8R4dYarO3cqf4OTvZgKHMkl
+         3WC/c4yB3dFsEAi4LkUxltJxwswmgdFo8nd3m2gyo0NQWh+Mxc3LckrvN7+yRxcmZJ
+         YpHm4Jj8pz8iw==
 From:   Bjorn Andersson <andersson@kernel.org>
-To:     Om Prakash Singh <quic_omprsing@quicinc.com>
-Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
-        agross@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
-        devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
-Subject: Re: [PATCH V1 1/4] dt-bindings: crypto: qcom,prng: document SA8775P
-Message-ID: <hgtbdvbhoxwib4ywkd6pdxpcywgudb2b23tvlmaxaggeqgsghg@s6qetpw755rw>
-References: <20231015193901.2344590-1-quic_omprsing@quicinc.com>
- <20231015193901.2344590-2-quic_omprsing@quicinc.com>
+To:     Andy Gross <agross@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>
+Cc:     linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Om Prakash Singh <quic_omprsing@quicinc.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bjorn Andersson <quic_bjorande@quicinc.com>
+Subject: Re: (subset) [PATCH v4 0/5] arm64: qcom: sm8x50: enable RNG
+Date:   Sun, 15 Oct 2023 20:32:08 -0700
+Message-ID: <169742712187.930433.14209128354915292443.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231003-topic-sm8550-rng-v4-0-255e4d0ba08e@linaro.org>
+References: <20231003-topic-sm8550-rng-v4-0-255e4d0ba08e@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231015193901.2344590-2-quic_omprsing@quicinc.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 16, 2023 at 01:08:58AM +0530, Om Prakash Singh wrote:
-> Document SA8775P compatible for the True Random Number Generator.
+
+On Tue, 03 Oct 2023 09:10:18 +0200, Neil Armstrong wrote:
+> Enable RNG on SM8550 & SM8450 by reverting the PRNG bindings & DT
+> for SM8450 and correctly document it as a True Random Number Generator.
 > 
-> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
-> ---
->  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
->  1 file changed, 1 insertion(+)
+> - SM8550 QRD test run:
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> index 633993f801c6..85e6b1c199f5 100644
-> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
-> @@ -19,6 +19,7 @@ properties:
->            - enum:
->                - qcom,sm8450-trng
->                - qcom,sm8550-trng
-> +              - qcom,sa8775p-trng
-
-Please maintain the alphabetical sort order of entries like this.
-
-
-On the two DeviceTree patches, we keep nodes sorted by address, followed
-by node name, and then label. And we keep the address padded to 8 digits
-to make it easier to keep them sorted. I've corrected that and picked
-the 2 (i.e. all 4) DeviceTree patches.
-
-So please fix above, and resubmit the two binding updates from this
-series (and you can submit that as one change, no need to keep as
-separate patches).
-
-Regards,
-Bjorn
-
->            - const: qcom,trng
->  
->    reg:
-> -- 
-> 2.25.1
+> smccc_trng qcom_hwrng
 > 
+> [...]
+
+Applied, thanks!
+
+[4/5] arm64: dts: qcom: sm8550: add TRNG node
+      commit: 3b3ba999046e246cfd570e5399adea2f82df9312
+[5/5] arm64: dts: qcom: sm8450: add TRNG node
+      commit: c2c9fa136253daf6b3e25c3ea4952d9f2c4da8cf
+
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
