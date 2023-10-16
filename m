@@ -2,121 +2,88 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B4ACCDB47E
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 01:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CF5CDB483
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 02:38:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbjJPB0Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Oct 2023 21:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58334 "EHLO
+        id S231135AbjJPCiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 15 Oct 2023 22:38:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjJPB0Z (ORCPT
+        with ESMTP id S229611AbjJPCiL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Oct 2023 21:26:25 -0400
-Received: from wxsgout04.xfusion.com (wxsgout03.xfusion.com [36.139.52.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E490A9;
-        Sun, 15 Oct 2023 18:26:20 -0700 (PDT)
-Received: from wuxshcsitd00600.xfusion.com (unknown [10.32.133.213])
-        by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4S7zs85ws4z9xg13;
-        Mon, 16 Oct 2023 09:23:40 +0800 (CST)
-Received: from localhost (10.82.147.3) by wuxshcsitd00600.xfusion.com
- (10.32.133.213) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Mon, 16 Oct
- 2023 09:25:59 +0800
-Date:   Mon, 16 Oct 2023 09:25:59 +0800
-From:   Wang Jinchao <wangjinchao@xfusion.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-CC:     Steffen Klassert <steffen.klassert@secunet.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stone.xulei@xfusion.com>
-Subject: Re: [PATCH v3] Fixes: 07928d9bfc81 ("padata: Remove broken queue
- flushing")
-Message-ID: <ZSyRJx/5b8PufWwA@fedora>
-References: <ZSDWAcUxXcwD4YUZ@fedora>
- <tgveetqzkm4if3kkq5mzhgfetbm4nqe5coegphdtyye3xul6r4@5cr6uvfrinow>
+        Sun, 15 Oct 2023 22:38:11 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 302F6AB;
+        Sun, 15 Oct 2023 19:38:10 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAD4EC433C8;
+        Mon, 16 Oct 2023 02:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697423889;
+        bh=T5WnSXdJB4MfvIyXC6DMczWEEeOsQwjAqV+LW90t/N0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dtn3KESJWI9dONtkVY8FlFqQ4tdVJUCm+gflh+pExFPd/eVSqVo6wf9rJlDxftjm9
+         DHGVv4e5rBdK7FK+5dbQTMiJ0If/VqefgwPvsok1xbtLJuunQf2fN8t+zhFzkCd731
+         kg4WcM9iVPw5+6QVaryHWu7R/iiFi7BUG5tia14c1dCHsaX1ds7+FBUPHeuWdvulMq
+         nBWmdju1cV8PbKxDBrdSLpYCUA2AICJnyVrtjHYcQ3puuLd2Sr1urw4RM5U+9/uP4S
+         JG46vNM4YLBY8qIHeXs4vOdiIa/oI6zSMp1Lgi337sVXTiqmL6/SdAE8S9y1kG67Mt
+         cM6662M0URl9A==
+Date:   Sun, 15 Oct 2023 19:41:57 -0700
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Om Prakash Singh <quic_omprsing@quicinc.com>
+Cc:     neil.armstrong@linaro.org, konrad.dybcio@linaro.org,
+        agross@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+        devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marijn.suijten@somainline.org, robh+dt@kernel.org, vkoul@kernel.org
+Subject: Re: [PATCH V1 1/4] dt-bindings: crypto: qcom,prng: document SA8775P
+Message-ID: <hgtbdvbhoxwib4ywkd6pdxpcywgudb2b23tvlmaxaggeqgsghg@s6qetpw755rw>
+References: <20231015193901.2344590-1-quic_omprsing@quicinc.com>
+ <20231015193901.2344590-2-quic_omprsing@quicinc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <tgveetqzkm4if3kkq5mzhgfetbm4nqe5coegphdtyye3xul6r4@5cr6uvfrinow>
-X-Originating-IP: [10.82.147.3]
-X-ClientProxiedBy: wuxshcsitd00600.xfusion.com (10.32.133.213) To
- wuxshcsitd00600.xfusion.com (10.32.133.213)
+In-Reply-To: <20231015193901.2344590-2-quic_omprsing@quicinc.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 13, 2023 at 11:22:03AM -0400, Daniel Jordan wrote:
-> Hi,
+On Mon, Oct 16, 2023 at 01:08:58AM +0530, Om Prakash Singh wrote:
+> Document SA8775P compatible for the True Random Number Generator.
 > 
-> On Sat, Oct 07, 2023 at 11:52:33AM +0800, Wang Jinchao wrote:
-> > Signed-off-by: Wang Jinchao <wangjinchao@xfusion.com>
+> Signed-off-by: Om Prakash Singh <quic_omprsing@quicinc.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> The Fixes: tag should be near your Signed-off-by:, and the subject of
-> the patch should be something descriptive like
-> 
->     padata: Fix refcnt handling in padata_free_shell()
-> 
-> Here's some documentation about this:
-> 
->     https://docs.kernel.org/process/5.Posting.html#patch-formatting-and-changelogs
-> 
-Updated in patch v4.
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> index 633993f801c6..85e6b1c199f5 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> @@ -19,6 +19,7 @@ properties:
+>            - enum:
+>                - qcom,sm8450-trng
+>                - qcom,sm8550-trng
+> +              - qcom,sa8775p-trng
 
-> > Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-> > ---
-> > V3: 
-> >     Include Daniel's ack
-> >
-> > V2: https://lore.kernel.org/all/ZRTLHY5A+VqIKhA2@fedora/
-> >     To satisfy Sparse, use rcu_dereference_protected.
-> >     Reported-by: kernel test robot <lkp@intel.com>
-> >     Closes: https://lore.kernel.org/oe-kbuild-all/202309270829.xHgTOMKw-lkp@intel.com/
-> 
-> These two tags can also go near your SoB.
-> 
-From intel kernel test robot:
-    If you fix the issue in a separate patch/commit (i.e. not just a new version of
-    the same patch/commit), kindly add following tags
-    | Reported-by: kernel test robot <lkp@intel.com>
-    | Closes: https://lore.kernel.org/oe-kbuild-all/202309270829.xHgTOMKw-lkp@intel.com/
-So I updated the patch without these tags.
+Please maintain the alphabetical sort order of entries like this.
 
-> > V1: https://lore.kernel.org/all/ZRE4XvOOhz4HSOgR@fedora/
-> > 
-> >  kernel/padata.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/kernel/padata.c b/kernel/padata.c
-> > index 222d60195de6..79d04a97ded6 100644
-> > --- a/kernel/padata.c
-> > +++ b/kernel/padata.c
-> > @@ -1102,12 +1102,16 @@ EXPORT_SYMBOL(padata_alloc_shell);
-> >   */
-> >  void padata_free_shell(struct padata_shell *ps)
-> >  {
-> > +	struct parallel_data *pd;
-> > +
-> >  	if (!ps)
-> >  		return;
-> >  
-> >  	mutex_lock(&ps->pinst->lock);
-> >  	list_del(&ps->list);
-> > -	padata_free_pd(rcu_dereference_protected(ps->pd, 1));
-> > +	pd = rcu_dereference_protected(ps->pd, 1);
-> > +	if (refcount_dec_and_test(&pd->refcnt))
-> > +		padata_free_pd(rcu_dereference_protected(ps->pd, 1));
-> 
-> As Herbert points out, this version changes the code by
-> rcu-dereferencing pd twice.  Usually previous acks are dropped when
-> introducing new changes, but you can have it back by only
-> rcu-dereferencing once and addressing the other comments above.
-Thanks for your and Herbert's acks, which were included in patch v4.
 
-I know Herbert has acked my patch from your email; however, I have 
-not received Herbert's acknowledgment email, and I do not know why.
+On the two DeviceTree patches, we keep nodes sorted by address, followed
+by node name, and then label. And we keep the address padded to 8 digits
+to make it easier to keep them sorted. I've corrected that and picked
+the 2 (i.e. all 4) DeviceTree patches.
+
+So please fix above, and resubmit the two binding updates from this
+series (and you can submit that as one change, no need to keep as
+separate patches).
+
+Regards,
+Bjorn
+
+>            - const: qcom,trng
+>  
+>    reg:
+> -- 
+> 2.25.1
 > 
-> >  	mutex_unlock(&ps->pinst->lock);
-> >  
-> >  	kfree(ps);
-> > -- 
-> > 2.40.0
-> > 
