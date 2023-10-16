@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6577CCDB483
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 13:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2ED6CDB465
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Oct 2023 13:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233853AbjJPNjP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Oct 2023 09:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41262 "EHLO
+        id S233739AbjJPNjg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 Oct 2023 09:39:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234134AbjJPNjB (ORCPT
+        with ESMTP id S233860AbjJPNjP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Oct 2023 09:39:01 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2081.outbound.protection.outlook.com [40.107.237.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CDB310D1;
-        Mon, 16 Oct 2023 06:38:52 -0700 (PDT)
+        Mon, 16 Oct 2023 09:39:15 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2077.outbound.protection.outlook.com [40.107.212.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3FD19F;
+        Mon, 16 Oct 2023 06:39:12 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gVjpHvDWmjA0HcM2uQdLqwoE8nzyj56JRn+dmb21yRX7ReqxRWBT2Bpp+s/2e3wQdyVCwyPjXtVgMYFO47MSV7IN8TyKdiDLzx3c7K0BbC3jPpfTuofCIBe4QJpI96X0WZBjE18vs/4inyZjqGLBJRdCyvFTlxh7WRISUX925i46bhsrbuUdbb4p7tJK+79nMBTlIfdFiEkcNy3frDnqKOrGWvyt6X8fDk6iPwB2gFfQMbanciS7E10XvwbfEgOCzBfOVsBPn3UFEMlx6bI7acEyxHS/+FNx9haz9rW4vHcaDOsogg7xU8Ot/Bs/0qwsAXk4ZfYPaHrHVqDPB24qrw==
+ b=O6naHw8Glf/9Mfz807f1+/mj1U+fSJbDQxzkD5lGqXzzPYlgUrZcEqtCiDjJoJD/0w+xtPJkQLA97e9CL/8PWi07VqTHfsybASZ1vLWTza/0b0089fg+Ga0UcvdjCGUL4hmhCSxB/qmWq4oo6e5bWESV2uNurxDwOsUSz668eW2iBJxHDvi+76JaV0MrDfPG2plTd0XkW0gDRftYZg6xZNM3W/4D2Prt6dZTKXplLW/F5pmKt/yX0j9YMT2QCF9Unwph3AhJHqJjIH8ESZ+4e5B4U97zdfbl6tK7a1dtWt7RN5cSLwnXV/Ro/rfFLARfwAuaexPYu8sAQMA2bftWLQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pjxZBnS5MLOuqlm9DTDulyqxa8tan8YR6IJ+af5tIDk=;
- b=QKYvzHJRvPw9wAg9dxU1D6+Nrf20/kuBYCWWrJ6g/tqI4xYQLMbBUVjlDyjuIqBJ6bADvp4cVeMA57QTigXf0hEvLVr5NlUeXo/LbTYyUzphKw+unLR5XMV/SwPujQ0Gh1Ct3KPOIYUKlcz2iVB7VPHWrLaKweDYhkKTrWuI7HThT/xr9YLTPNzHmskfi1hu+HMsGA2rdoggIg1UfgUdw6sGms0BPkd8oqjVFI1yitw29HiPtT7hAZXh00ZV1IPZ495uHK3LTOOI15XXqo0XtQMTe/mcDEV4m0jrrFOTaeR2I+5lDBiZvFdPJTgKUZEC0LfQ9PAsttSx3DSnT/ilQQ==
+ bh=SHw1h6ViRdUzmCcT0hkWmDqDj8ovX0I1Wzl+XULPlrc=;
+ b=aFqpyCTFYimWf3TdiWMy9O/ytMcPb9kxXU99HonjF3dPESfIu1s/Hig9xHYM2Zo2WLc/IUBRdvCjgo7RIO/HPqZaq0vp7Pl/Vn/K1xdo2az+YYaO+ZUdnjbffMZLQ+DIq+m7O0b85axpaIBVivD3hva6DEOpNLlH4pZ4bbw6pIB1VvQjrK+mKRrb+4zUdCReD3NrlDhEqvnqeILa5DLpEv+NiAcp0Ig08uxLiq2eBHC+D68s6FnRkz3EzLs6OvwTXB/Onz4EaVZ1RoVKIBsgLIe5ymWX2VDwN+9Jd0kSHlGE+wB8nRfD4CpcXaeDBkhWFh+q+F5GKa8igoSZ3g+kIw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pjxZBnS5MLOuqlm9DTDulyqxa8tan8YR6IJ+af5tIDk=;
- b=p+DY4fhlXA++l9ULcECxduJ5lxvKayHFtcuBeoRuhx5VAvsF9KCE7bctpV14+RkL9I26P6nt//c09PxBySW10jezRVNTAO3nnGtcFSwollGz0+Gmk5Kz9nHETosX09vvVPxwH7eNz22fL7BAmYIqRsO+XWK1Dy+QcnlitcDDxVM=
-Received: from MN2PR22CA0019.namprd22.prod.outlook.com (2603:10b6:208:238::24)
- by PH8PR12MB7254.namprd12.prod.outlook.com (2603:10b6:510:225::18) with
+ bh=SHw1h6ViRdUzmCcT0hkWmDqDj8ovX0I1Wzl+XULPlrc=;
+ b=ykQlUkyCiW4TZAXfGUrxrO76sDgzTRw13322D9BnUUqMM3QtEj/sV6URDnF93+vXqgyMIFEKBUcwlgMIfT4YiuWxitJrTyuTxFJQpUmylpvBpwSAYdL2Kuz+0Xvs6xJf0Wby+kECwrukDWn0drpxBIpJEAyibeqJBK6fbuqqoqs=
+Received: from MN2PR19CA0022.namprd19.prod.outlook.com (2603:10b6:208:178::35)
+ by SJ0PR12MB6832.namprd12.prod.outlook.com (2603:10b6:a03:47e::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.45; Mon, 16 Oct
- 2023 13:38:49 +0000
-Received: from BL02EPF0001A0FD.namprd03.prod.outlook.com
- (2603:10b6:208:238:cafe::97) by MN2PR22CA0019.outlook.office365.com
- (2603:10b6:208:238::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.36 via Frontend
- Transport; Mon, 16 Oct 2023 13:38:49 +0000
+ 2023 13:39:10 +0000
+Received: from BL02EPF0001A0FF.namprd03.prod.outlook.com
+ (2603:10b6:208:178:cafe::c5) by MN2PR19CA0022.outlook.office365.com
+ (2603:10b6:208:178::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6886.34 via Frontend
+ Transport; Mon, 16 Oct 2023 13:39:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -47,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0001A0FD.mail.protection.outlook.com (10.167.242.104) with Microsoft
+ BL02EPF0001A0FF.mail.protection.outlook.com (10.167.242.106) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:38:48 +0000
+ 15.20.6838.22 via Frontend Transport; Mon, 16 Oct 2023 13:39:09 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 16 Oct
- 2023 08:38:48 -0500
+ 2023 08:39:09 -0500
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,11 +71,10 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <jarkko@kernel.org>, <ashish.kalra@amd.com>,
         <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>,
-        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>,
-        <stable@vger.kernel.org>
-Subject: [PATCH v10 02/50] KVM: SVM: Fix TSC_AUX virtualization setup
-Date:   Mon, 16 Oct 2023 08:27:31 -0500
-Message-ID: <20231016132819.1002933-3-michael.roth@amd.com>
+        <liam.merwick@oracle.com>, <zhi.a.wang@intel.com>
+Subject: [PATCH v10 31/50] KVM: SEV: Add KVM_EXIT_VMGEXIT
+Date:   Mon, 16 Oct 2023 08:28:00 -0500
+Message-ID: <20231016132819.1002933-32-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231016132819.1002933-1-michael.roth@amd.com>
 References: <20231016132819.1002933-1-michael.roth@amd.com>
@@ -87,151 +86,107 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FD:EE_|PH8PR12MB7254:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b2be24d-3e98-4789-0ab6-08dbce4d3a64
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FF:EE_|SJ0PR12MB6832:EE_
+X-MS-Office365-Filtering-Correlation-Id: eb41732a-1e0d-4e80-e6c9-08dbce4d46bc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XCpATVppVTG8UeklejD8+NnQx3KrdH1Eyw+EpUEkdvZEzwsxLxmBRW0B0gSWDqTCnmrbUCMs1/wXVP1XbhaJaJ34tXJedo75s/oFdXumTNIf5jH4ps3JI0WYSJodsDtXMCChnY9LlHn7tc5OOczogWmkusxXQWazDWaAERsPqgHSV29IzmbGnGaNjrqTXQVrwnTF7VsmzfgHyQ1dOVXvAQA/dXNUSmEELyeIUV170jI73kBQ4Gc6DSHfYC1sOtOqMR3Kvqyk5DIH18lIxJFrcD6H/vtd2CdpI3fhXbjGrOq43Co8T8Nv7I9CLqmxcQrZ3BGALScNeX5XEnYF/llfYXdfmwMCwuFQY2fOsaAgbrctEHJ4vyDR9nTaN5c3ck89tPMGfNlPrcOLP1dTgxAEK7E4pz41N/XgKApgIoOVB8yZF+hGuiHZ5hzb8i1vYxy+7ekHrzRnhcWwG+RenU9PbmCx5VJO7ZE9xbsy78tJyTKdoepo+CJiJIzIHi+1XgjbLhZZ1IeWfqnabO5eAkGZSCRpWpgQjCNbxZqJu6ccUprvZYFS4ZfsaOdVmXG1aArJqaNOE5M6eJj7bfamYSGgvlJxtN8e+lxcwT9axFBrNt1mxTVMKA4seYjQsVplSmgblKG9r0HSRl0PtCpC9eWEvmvZJjjre2Ijuq7K3G3nvoTzqZgSkXEbY6OAeA9PBCW3EmhgAA8Hkh8zI9XpYRZBtEV37VEtayzUkXnmbqCSQYA/KKulyD5T2FTVohHSn5SkkhHytdjt4FyWevHNNQe0yI1n7DrSPYG0v/Cuewl39vI=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(376002)(136003)(346002)(230922051799003)(451199024)(82310400011)(186009)(1800799009)(64100799003)(36840700001)(40470700004)(46966006)(47076005)(44832011)(8936002)(8676002)(4326008)(41300700001)(40460700003)(5660300002)(83380400001)(7416002)(2906002)(36756003)(356005)(81166007)(36860700001)(7406005)(1076003)(26005)(426003)(40480700001)(336012)(2616005)(316002)(16526019)(6916009)(82740400003)(478600001)(86362001)(70586007)(70206006)(54906003)(6666004)(36900700001)(309714004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: a3XoBNJ1O9oUpJ2xHQKDpcTNENU3Pqlc4IbGKyHfPNwv/vABvz6kQAbY3vjiTYmYw5qn2O1nWtU4DNdUV0iKmYI1nyQaTvGmuOPzZD4HEM/QQhNLMddF6M5P/1E6kccH6gUk+3MwAgKpzIspBrfxp6jayRwJbn83s5YL5jIRShuu6mwxx1JobiavVTMXVp0IRqrB1Y6x98tPGhnh31T65JKZKfe3tmD1aCPlA5U3fkfVMKxgHTPNGnOcHkElVamF40P/VeFHj7nQTLvs8Wllvbo6lSPEntKhX+2nMzt0sI1j8t0hzjQ6uZc8KCI8zDJywjUsfzWOduSiHlYa5qVTefQqMsfrAjyNm1EZb82XPLNmmGMP+H+DuIFPyOz0EEgyoPSJKn3xGE7oScLUzn+tZYDMx32cVhj30lQ/sx5ICeXGrJJO0xhVFD74+UVgmvr+5lltoK+gxusbosIlv058v/jMJ71qYJJbiVqQm9aGbf+hXZuPGYlJ10K4LuTA39gvPjPCs59AgZ9JTiSqDPAxWsyDNLrYsL7mpwDyrPKQTyNQ9fc6QckXVYuAtm49O7DpNmGp45gbbF1jioat0YO3SgFqNU7HcLTMrxRs9QfiNNXva0/p6YubyWvSznM8oD1pYVjkmV2DaWT6MW+8NI6HqEO5CpfWNauEYAegT9q/12UXQrK3qXbz1l2S3sa5sM45P0Vxg+o7ExJ/d6U9bDoQZb3bzq/p+rMiVz0y1mmWCJ9Xylt+yJAoKiU7hIf7vZej/viSOI8HW4+O6YkUi7p8hg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(451199024)(82310400011)(64100799003)(1800799009)(186009)(46966006)(40470700004)(36840700001)(40480700001)(26005)(16526019)(81166007)(336012)(40460700003)(426003)(2616005)(8676002)(82740400003)(8936002)(356005)(4326008)(5660300002)(44832011)(86362001)(7416002)(2906002)(6666004)(6916009)(70206006)(70586007)(7406005)(41300700001)(1076003)(316002)(54906003)(36756003)(478600001)(36860700001)(47076005)(83380400001)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:38:48.9870
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2023 13:39:09.4676
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b2be24d-3e98-4789-0ab6-08dbce4d3a64
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb41732a-1e0d-4e80-e6c9-08dbce4d46bc
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BL02EPF0001A0FD.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF0001A0FF.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7254
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6832
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+For private memslots, GHCB page state change requests will be forwarded
+to userspace for processing. Define a new KVM_EXIT_VMGEXIT for exits of
+this type, as well as other potential userspace handling for VMGEXITs in
+the future.
 
-The checks for virtualizing TSC_AUX occur during the vCPU reset processing
-path. However, at the time of initial vCPU reset processing, when the vCPU
-is first created, not all of the guest CPUID information has been set. In
-this case the RDTSCP and RDPID feature support for the guest is not in
-place and so TSC_AUX virtualization is not established.
-
-This continues for each vCPU created for the guest. On the first boot of
-an AP, vCPU reset processing is executed as a result of an APIC INIT
-event, this time with all of the guest CPUID information set, resulting
-in TSC_AUX virtualization being enabled, but only for the APs. The BSP
-always sees a TSC_AUX value of 0 which probably went unnoticed because,
-at least for Linux, the BSP TSC_AUX value is 0.
-
-Move the TSC_AUX virtualization enablement out of the init_vmcb() path and
-into the vcpu_after_set_cpuid() path to allow for proper initialization of
-the support after the guest CPUID information has been set.
-
-With the TSC_AUX virtualization support now in the vcpu_set_after_cpuid()
-path, the intercepts must be either cleared or set based on the guest
-CPUID input.
-
-Fixes: 296d5a17e793 ("KVM: SEV-ES: Use V_TSC_AUX if available instead of RDTSC/MSR_TSC_AUX intercepts")
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-Message-Id: <4137fbcb9008951ab5f0befa74a0399d2cce809a.1694811272.git.thomas.lendacky@amd.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit e0096d01c4fcb8c96c05643cfc2c20ab78eae4da)
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 31 ++++++++++++++++++++++++++-----
- arch/x86/kvm/svm/svm.c |  9 ++-------
- arch/x86/kvm/svm/svm.h |  1 +
- 3 files changed, 29 insertions(+), 12 deletions(-)
+ Documentation/virt/kvm/api.rst | 34 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h       |  6 ++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index fa1fb81323b5..4900c078045a 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2962,6 +2962,32 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
- 				    count, in);
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 5e08f2a157ef..e84c62423ab7 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6847,6 +6847,40 @@ Please note that the kernel is allowed to use the kvm_run structure as the
+ primary storage for certain register types. Therefore, the kernel may use the
+ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
  
-+static void sev_es_vcpu_after_set_cpuid(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
++::
 +
-+	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX)) {
-+		bool v_tsc_aux = guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP) ||
-+				 guest_cpuid_has(vcpu, X86_FEATURE_RDPID);
++		/* KVM_EXIT_VMGEXIT */
++		struct {
++			__u64 ghcb_msr; /* GHCB MSR contents */
++			__u64 ret;      /* user -> kernel return value */
++		} memory;
 +
-+		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, v_tsc_aux, v_tsc_aux);
-+	}
-+}
++If exit reason is KVM_EXIT_VMGEXIT then it indicates that an SEV-SNP guest has
++issued a VMGEXIT instruction (as documented by the AMD Architecture
++Programmer's Manual (APM)) to the hypervisor that needs to be serviced by
++userspace. This is generally handled via the Guest-Hypervisor Communication
++Block (GHCB) specification. The value of 'ghcb_msr' will be the contents of
++the GHCB MSR register at the time of the VMGEXIT, which can either be the GPA
++of the GHCB page for page-based GHCB requests, or an encoding of an MSR-based
++GHCB request. The mechanism to distinguish between these two and determine the
++type of request is the same as what is documented in the GHCB specification.
 +
-+void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm)
-+{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm_cpuid_entry2 *best;
++Not all VMGEXITs or GHCB requests will be forwarded to userspace. Currently
++this will only be the case for "SNP Page State Change" requests (PSCs), and
++only for the subset of these which involve actual shared <-> private
++transition. Userspace is expected to process these requests in accordance
++with the GHCB specification and issue KVM_SET_MEMORY_ATTRIBUTE ioctls to
++perform the shared/private transitions.
 +
-+	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
-+	best = kvm_find_cpuid_entry(vcpu, 0x8000001F);
-+	if (best)
-+		vcpu->arch.reserved_gpa_bits &= ~(1UL << (best->ebx & 0x3f));
++GHCB page-based PSC requests require returning a 64-bit return value to the
++guest via the SW_EXITINFO2 field of the vCPU's VMCB structure, as documented
++in the GHCB. Userspace must set 'ret' to what the GHCB specification documents
++the SW_EXITINFO2 VMCB field should be set to after processing a PSC request.
 +
-+	if (sev_es_guest(svm->vcpu.kvm))
-+		sev_es_vcpu_after_set_cpuid(svm);
-+}
++For MSR-based PSC requests, userspace must set the value of 'ghcb_msr' to be
++the same as what the GHCB specification documents the actual GHCB MSR register
++should be set to after processing a PSC request.
 +
- static void sev_es_init_vmcb(struct vcpu_svm *svm)
- {
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
-@@ -3024,11 +3050,6 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
- 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTBRANCHTOIP, 1, 1);
- 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTFROMIP, 1, 1);
- 	set_msr_interception(vcpu, svm->msrpm, MSR_IA32_LASTINTTOIP, 1, 1);
--
--	if (boot_cpu_has(X86_FEATURE_V_TSC_AUX) &&
--	    (guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDTSCP) ||
--	     guest_cpuid_has(&svm->vcpu, X86_FEATURE_RDPID)))
--		set_msr_interception(vcpu, svm->msrpm, MSR_TSC_AUX, 1, 1);
- }
  
- void sev_init_vmcb(struct vcpu_svm *svm)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f283eb47f6ac..aef1ddf0b705 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4284,7 +4284,6 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
--	struct kvm_cpuid_entry2 *best;
+ 6. Capabilities that can be enabled on vCPUs
+ ============================================
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 6f7b44b32497..3af546adb962 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -279,6 +279,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_RISCV_CSR        36
+ #define KVM_EXIT_NOTIFY           37
+ #define KVM_EXIT_MEMORY_FAULT     38
++#define KVM_EXIT_VMGEXIT          50
  
- 	/*
- 	 * SVM doesn't provide a way to disable just XSAVES in the guest, KVM
-@@ -4328,12 +4327,8 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		set_msr_interception(vcpu, svm->msrpm, MSR_IA32_FLUSH_CMD, 0,
- 				     !!guest_cpuid_has(vcpu, X86_FEATURE_FLUSH_L1D));
- 
--	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
--	if (sev_guest(vcpu->kvm)) {
--		best = kvm_find_cpuid_entry(vcpu, 0x8000001F);
--		if (best)
--			vcpu->arch.reserved_gpa_bits &= ~(1UL << (best->ebx & 0x3f));
--	}
-+	if (sev_guest(vcpu->kvm))
-+		sev_vcpu_after_set_cpuid(svm);
- 
- 	init_vmcb_after_set_cpuid(vcpu);
- }
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index f41253958357..be67ab7fdd10 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -684,6 +684,7 @@ void __init sev_hardware_setup(void);
- void sev_hardware_unsetup(void);
- int sev_cpu_init(struct svm_cpu_data *sd);
- void sev_init_vmcb(struct vcpu_svm *svm);
-+void sev_vcpu_after_set_cpuid(struct vcpu_svm *svm);
- void sev_free_vcpu(struct kvm_vcpu *vcpu);
- int sev_handle_vmgexit(struct kvm_vcpu *vcpu);
- int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in);
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -525,6 +526,11 @@ struct kvm_run {
+ #define KVM_NOTIFY_CONTEXT_INVALID	(1 << 0)
+ 			__u32 flags;
+ 		} notify;
++		/* KVM_EXIT_VMGEXIT */
++		struct {
++			__u64 ghcb_msr; /* GHCB MSR contents */
++			__u64 ret; /* user -> kernel */
++		} vmgexit;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
 -- 
 2.25.1
 
