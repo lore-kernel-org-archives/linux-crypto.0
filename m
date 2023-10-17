@@ -2,70 +2,72 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7452ECDB474
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Oct 2023 07:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8658BCDB474
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Oct 2023 07:13:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234507AbjJQHMT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Oct 2023 03:12:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39658 "EHLO
+        id S234586AbjJQHNi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Oct 2023 03:13:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbjJQHMT (ORCPT
+        with ESMTP id S234695AbjJQHNh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Oct 2023 03:12:19 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C4C2AB
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 00:12:17 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-4079ed65471so2233265e9.1
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 00:12:17 -0700 (PDT)
+        Tue, 17 Oct 2023 03:13:37 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C348F9
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 00:13:33 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5079f3f3d7aso4830696e87.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 00:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697526735; x=1698131535; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:reply-to:user-agent
+        d=linaro.org; s=google; t=1697526812; x=1698131612; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BgSQoLdF5vHLUnEeliiJIRAgjnOj/aWprHJjgNjEMgM=;
-        b=cOrsYIR6RdJQRJ88NHyQPyqepuaXnbBNpz6Hp7PwdK+sRFnM1+aAvHNziEPGqKyw2k
-         KRMSb+XVBS2i+Pq5ubqe6i+joSa3M0kOKkgi+kWnNXZOEmc95JcT9uZMK279QrQrrzlV
-         rDaq/YhoYfG2REki2SSL3t+PNRL/mttik3vRZSYwYsbY0LWXqD7+mF2FeYsfwsC96G+9
-         VZJk2wAbdgCXytKJwrOz8TN0qZC6iXCMJqWouuGhe0kZ9T1MuahKQ6ZXsrHfkF908gfz
-         rjN4jHbS2plAoygPesa74yGBgGNuqSzYJzsuDw3tT0cVFn0f2HqkIopM4z02urVs3G+T
-         vO4A==
+        bh=jrizillEfaAgp0SRrsU3iFgwZ8wya1sI3h5VbmShlHs=;
+        b=nckTyamFq2pRfLQUb3Lak2OEigBXpLVg780tvr/AwMiE1rVluu0oS9Wm2IpCQTbs07
+         eAlpLaTRHpd42bwZ2V/al2iDFxSG4i5s2/Fd3K76tY+o2Lu5v+4MMatXRVkmD0xdo0Mn
+         DgyCGDkTtjXoXrQvY/2trHTDd0RrsH6Bm+A384X0eCNpNyXmQukfng8iffZ6xGoxdjWN
+         nEE/Vruf+dyEvP722wx9UBXIfrhNlQrFTU2IReEoV8AoEyVhJnytVBIDcSZd6Li12LpA
+         r1poX7kQfCgdVGae81ouRWC8VkoUU6yF/t/vfy0Ae5FM1fQBonwKgmNk1wu7JTMARl92
+         xLEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697526735; x=1698131535;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :references:cc:to:content-language:subject:reply-to:user-agent
+        d=1e100.net; s=20230601; t=1697526812; x=1698131612;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=BgSQoLdF5vHLUnEeliiJIRAgjnOj/aWprHJjgNjEMgM=;
-        b=gXWgC0U08yFjnM738vFIPIlEHwDxOt94tXJkvN0pzghAbxLkdeYvBYM6ytAy9I5tj6
-         ONi9qLtN6X7rGNGi6AuJ0yGbL+MvSBIde/qk75h5BYuAeNsUgBVG/kd/jDEmqX6zPCmp
-         AdfqKByQo3wwewy/btvkN56j2Z8fDUA6vTmqwfIlLy+xNbjP5n1KY7G/Tsa6kn6fbKow
-         R+nmhyaNL9bbwbAmrKn+jc9+0Z40l0r+gESjZJVQyuvNf6rapz2cPaL0KFTtKvtU6CQe
-         B8qVwFqZV///AiuOXSfapjobK8/0RlGb0lJJ/wqY1LY1CuuBf18DbiFod7TQOKdKvvSa
-         dWCw==
-X-Gm-Message-State: AOJu0Yx7KDnH2iJ4obZa+5s0tMULvCT4s9bLx8O1eMzDz73y1wmTPsik
-        2EoSRSv6ND6vAgiq8T/Yy3ZRKw==
-X-Google-Smtp-Source: AGHT+IGu0Yed9EDUQrOpnA8mAZUfLeXThufJ1bWnI1CVAHVcm4oaAVaTAznPnQG9bg/DA8n/FYnLBw==
-X-Received: by 2002:a05:600c:470a:b0:401:b53e:6c40 with SMTP id v10-20020a05600c470a00b00401b53e6c40mr960171wmo.10.1697526735408;
-        Tue, 17 Oct 2023 00:12:15 -0700 (PDT)
+        bh=jrizillEfaAgp0SRrsU3iFgwZ8wya1sI3h5VbmShlHs=;
+        b=dIfMXEFMX636Y2Va1RT6HlPb/LLmlL4Oiel/3sz/GhD3md5SMyObI1IbZexaBNQ3NP
+         V7FLteJqHG8sbGrw0oCevRZi/Q06kElXzdsR52v1U19MuV7cJjHwJQa6y+ZaiI+LyxL7
+         JiiPlMqfAI5EqxuGpVRMxLFYSckRNAFTrxZNeeI9fcl4Dx+De/0Kn0QsO26hbX+JqvL+
+         /ww+bYjOBLw1YAtZTGEzeHxNcV5n2dGtUhMQKQHfuNLEw4unZ/0N1Ny+eNXX15uDc/CP
+         KIEvT8O37pbC4sMbHpcIsxEYHVbcb6ND7Z4pn8J3FqB+9O0UQBJMBDBAJm0adH26DhQ1
+         kvgg==
+X-Gm-Message-State: AOJu0YyH8nCcie9OpU2axfz3mPRFFa+uqDg5HynRCi0tCU1SrUH0xhvr
+        KMD6HmJh6N8Wf8qY8ZXWaKUV3bbDgI1zkC7TkSTyKzpc
+X-Google-Smtp-Source: AGHT+IELn2HMk+X2+I7J5BIVYNU6Z4AP7odyWZ/M4gv6njV1yvgA0XpKY4zh23tyX0Z7YvoKR5HHlw==
+X-Received: by 2002:a05:6512:b96:b0:504:2d54:b4d0 with SMTP id b22-20020a0565120b9600b005042d54b4d0mr1482003lfv.19.1697526811804;
+        Tue, 17 Oct 2023 00:13:31 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:982:cbb0:97ef:6513:8029:4596? ([2a01:e0a:982:cbb0:97ef:6513:8029:4596])
-        by smtp.gmail.com with ESMTPSA id n7-20020a05600c4f8700b00406408dc788sm9180427wmq.44.2023.10.17.00.12.14
+        by smtp.gmail.com with ESMTPSA id n7-20020a05600c4f8700b00406408dc788sm9180427wmq.44.2023.10.17.00.13.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Oct 2023 00:12:14 -0700 (PDT)
-Message-ID: <0bfe799f-6eef-455a-b9c6-96660bf5df9e@linaro.org>
-Date:   Tue, 17 Oct 2023 09:12:13 +0200
+        Tue, 17 Oct 2023 00:13:31 -0700 (PDT)
+Message-ID: <6118cb58-cdfa-458d-a034-d0422d79ae45@linaro.org>
+Date:   Tue, 17 Oct 2023 09:13:30 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH] crypto: qcom-rng - Add missing dependency on hw_random
-Content-Language: en-US, fr
-To:     =?UTF-8?Q?Andr=C3=A9_Apitzsch?= <git@apitzsch.eu>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20231016-qcom_rng-v1-1-1a7d7856651e@apitzsch.eu>
 From:   Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH] crypto: qcom: add HW_RANDOM dependency
+Content-Language: en-US, fr
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Om Prakash Singh <quic_omprsing@quicinc.com>,
+        Bjorn Andersson <quic_bjorande@quicinc.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20231016200324.757455-1-arnd@kernel.org>
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
  GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
@@ -91,29 +93,35 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro Developer Services
-In-Reply-To: <20231016-qcom_rng-v1-1-1a7d7856651e@apitzsch.eu>
+In-Reply-To: <20231016200324.757455-1-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 16/10/2023 19:45, André Apitzsch wrote:
-> This should fix the undefined reference:
+On 16/10/2023 22:02, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
->> /usr/bin/aarch64-alpine-linux-musl-ld: Unexpected GOT/PLT entries detected!
->> /usr/bin/aarch64-alpine-linux-musl-ld: Unexpected run-time procedure linkages detected!
->> /usr/bin/aarch64-alpine-linux-musl-ld: drivers/crypto/qcom-rng.o: in function `qcom_rng_probe':
->> qcom-rng.c:(.text+0x130): undefined reference to `devm_hwrng_register'
+> The driver now calls into the hwrng subsystem and causes a link failure if that
+> is not reachable:
 > 
-> Fixes: f29cd5bb64c2 ("crypto: qcom-rng - Add hw_random interface support")
-> Signed-off-by: André Apitzsch <git@apitzsch.eu>
+> x86_64-linux-ld: vmlinux.o: in function `qcom_rng_probe':
+> qcom-rng.c:(.text+0xfefc7e): undefined reference to `devm_hwrng_register'
+> 
+> Add a Kconfig dependency as we have for the pure hw_random drivers. I see
+> that there are some other crypto drivers that instead use 'select HW_RANDOM',
+> but those seem to be mistakes as that may lead to circular dependencies,
+> and a simple driver should not force-enable an entire subsytem.
+> 
+> Fixes: f29cd5bb64c25 ("crypto: qcom-rng - Add hw_random interface support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
 >   drivers/crypto/Kconfig | 1 +
 >   1 file changed, 1 insertion(+)
 > 
 > diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index c761952f0dc6..79c3bb9c99c3 100644
+> index c761952f0dc6d..79c3bb9c99c3b 100644
 > --- a/drivers/crypto/Kconfig
 > +++ b/drivers/crypto/Kconfig
 > @@ -601,6 +601,7 @@ config CRYPTO_DEV_QCE_SW_MAX_LEN
@@ -124,11 +132,5 @@ On 16/10/2023 19:45, André Apitzsch wrote:
 >   	select CRYPTO_RNG
 >   	help
 >   	  This driver provides support for the Random Number
-> 
-> ---
-> base-commit: 4d0515b235dec789578d135a5db586b25c5870cb
-> change-id: 20231016-qcom_rng-e46c8a8628bb
-> 
-> Best regards,
 
 Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
