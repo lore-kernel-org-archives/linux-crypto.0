@@ -2,129 +2,133 @@ Return-Path: <linux-crypto-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B2C3CDB474
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Oct 2023 06:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7452ECDB474
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Oct 2023 07:12:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234032AbjJQGnp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Oct 2023 02:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44364 "EHLO
+        id S234507AbjJQHMT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 Oct 2023 03:12:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbjJQGnp (ORCPT
+        with ESMTP id S229666AbjJQHMT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Oct 2023 02:43:45 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E9595
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2023 23:43:43 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76B35C433CA
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 06:43:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697525023;
-        bh=F8JeGIf5fTjeDtn0mUwOr+jYS5d6XeOTNY/HUJJf2yw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=CtZxMROGhxdmOhrZYL29MudLcCSM3Mgd1CAsvuBE9gENODEAhCORdXTrs+O6mBUl5
-         IpESHo3FPx+Iwyl5VoqcklH6Cx7OQChvwXhvWStsnDFngMyWF1Z6aXjuL88UQQMpJq
-         QbI2XKWuVIM84/z1XIjD3wvN0lRi4l3dd+LbjsSP64dXtbrqY0HyzAVwAj4Xn8/wnY
-         pxaoLJ7nav6UtBPrQm7dpsvnYifSHelrtvSxerCED5aorHQ6pqhAa3zOh5rUBvsey8
-         /2wmIx2ZD7w5hgq3/9Vf1JAl4Hh4Rc5I+BEzp002nNvWpMUx2fYdWFf7fLyK2v6cOL
-         uvcKXrY0pYFaw==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2c51682fddeso29248591fa.1
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Oct 2023 23:43:43 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzjPo8nMVyRZCzenlDsX2sF7iJ53a0lcFOZ4JNkudBqkk4OHnxG
-        Tud5E1dyfigHaYc3TMORxxQTMqW9aCbAZwQEPvQ=
-X-Google-Smtp-Source: AGHT+IGp+B9GxjFmRnRMebJKwwMveFs/A1UjFAxuLyyyKs9MjeF1EO9nZ0m29C6P0KyTfZx/i5KuVSsBi0mx9B55dc0=
-X-Received: by 2002:a2e:9594:0:b0:2c5:d0c:237e with SMTP id
- w20-20020a2e9594000000b002c50d0c237emr427190ljh.17.1697525021653; Mon, 16 Oct
- 2023 23:43:41 -0700 (PDT)
+        Tue, 17 Oct 2023 03:12:19 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C4C2AB
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 00:12:17 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-4079ed65471so2233265e9.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Oct 2023 00:12:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697526735; x=1698131535; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:reply-to:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BgSQoLdF5vHLUnEeliiJIRAgjnOj/aWprHJjgNjEMgM=;
+        b=cOrsYIR6RdJQRJ88NHyQPyqepuaXnbBNpz6Hp7PwdK+sRFnM1+aAvHNziEPGqKyw2k
+         KRMSb+XVBS2i+Pq5ubqe6i+joSa3M0kOKkgi+kWnNXZOEmc95JcT9uZMK279QrQrrzlV
+         rDaq/YhoYfG2REki2SSL3t+PNRL/mttik3vRZSYwYsbY0LWXqD7+mF2FeYsfwsC96G+9
+         VZJk2wAbdgCXytKJwrOz8TN0qZC6iXCMJqWouuGhe0kZ9T1MuahKQ6ZXsrHfkF908gfz
+         rjN4jHbS2plAoygPesa74yGBgGNuqSzYJzsuDw3tT0cVFn0f2HqkIopM4z02urVs3G+T
+         vO4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697526735; x=1698131535;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BgSQoLdF5vHLUnEeliiJIRAgjnOj/aWprHJjgNjEMgM=;
+        b=gXWgC0U08yFjnM738vFIPIlEHwDxOt94tXJkvN0pzghAbxLkdeYvBYM6ytAy9I5tj6
+         ONi9qLtN6X7rGNGi6AuJ0yGbL+MvSBIde/qk75h5BYuAeNsUgBVG/kd/jDEmqX6zPCmp
+         AdfqKByQo3wwewy/btvkN56j2Z8fDUA6vTmqwfIlLy+xNbjP5n1KY7G/Tsa6kn6fbKow
+         R+nmhyaNL9bbwbAmrKn+jc9+0Z40l0r+gESjZJVQyuvNf6rapz2cPaL0KFTtKvtU6CQe
+         B8qVwFqZV///AiuOXSfapjobK8/0RlGb0lJJ/wqY1LY1CuuBf18DbiFod7TQOKdKvvSa
+         dWCw==
+X-Gm-Message-State: AOJu0Yx7KDnH2iJ4obZa+5s0tMULvCT4s9bLx8O1eMzDz73y1wmTPsik
+        2EoSRSv6ND6vAgiq8T/Yy3ZRKw==
+X-Google-Smtp-Source: AGHT+IGu0Yed9EDUQrOpnA8mAZUfLeXThufJ1bWnI1CVAHVcm4oaAVaTAznPnQG9bg/DA8n/FYnLBw==
+X-Received: by 2002:a05:600c:470a:b0:401:b53e:6c40 with SMTP id v10-20020a05600c470a00b00401b53e6c40mr960171wmo.10.1697526735408;
+        Tue, 17 Oct 2023 00:12:15 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:982:cbb0:97ef:6513:8029:4596? ([2a01:e0a:982:cbb0:97ef:6513:8029:4596])
+        by smtp.gmail.com with ESMTPSA id n7-20020a05600c4f8700b00406408dc788sm9180427wmq.44.2023.10.17.00.12.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 17 Oct 2023 00:12:14 -0700 (PDT)
+Message-ID: <0bfe799f-6eef-455a-b9c6-96660bf5df9e@linaro.org>
+Date:   Tue, 17 Oct 2023 09:12:13 +0200
 MIME-Version: 1.0
-References: <20201210121627.GB28441@gondor.apana.org.au> <CAMj1kXE-+35tfO87024xB274ZVOu7HTHqDa8o-hjoxDasd8p7g@mail.gmail.com>
- <CAMj1kXH5LPib2vPgLkdzHX4gSawDSE=ij451s106_xTuT19YmA@mail.gmail.com>
- <20201215091902.GA21455@gondor.apana.org.au> <062a2258-fad4-2c6f-0054-b0f41786ff85@candelatech.com>
- <Y2sj84u/w/nOgKwx@gondor.apana.org.au> <CAMj1kXG3id6ABX=5D4H0XLmVnijHCY6whp09U5pLQr0Ftf5Gzw@mail.gmail.com>
- <6e20b593-393c-9fa1-76aa-b78951b1f2f3@candelatech.com> <CAMj1kXEqcPvb-uLvGLhue=6eME-6WhuPgoG+HgLH0EoZLE9aZA@mail.gmail.com>
- <32a44a29-c5f4-f5fa-496f-a9dc98d8209d@candelatech.com> <20231017031603.GB1907@sol.localdomain>
-In-Reply-To: <20231017031603.GB1907@sol.localdomain>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 17 Oct 2023 08:43:29 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFRpbGJ_nkomb88o3F5Eg9ghh+xTZgGgeD7wfC3uwSk0g@mail.gmail.com>
-Message-ID: <CAMj1kXFRpbGJ_nkomb88o3F5Eg9ghh+xTZgGgeD7wfC3uwSk0g@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: aesni - add ccm(aes) algorithm implementation
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ben Greear <greearb@candelatech.com>,
+User-Agent: Mozilla Thunderbird
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH] crypto: qcom-rng - Add missing dependency on hw_random
+Content-Language: en-US, fr
+To:     =?UTF-8?Q?Andr=C3=A9_Apitzsch?= <git@apitzsch.eu>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20231016-qcom_rng-v1-1-1a7d7856651e@apitzsch.eu>
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <20231016-qcom_rng-v1-1-1a7d7856651e@apitzsch.eu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 17 Oct 2023 at 05:16, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Mon, Oct 16, 2023 at 01:50:05PM -0700, Ben Greear wrote:
-> > On 11/12/22 06:59, Ard Biesheuvel wrote:
-> > > On Fri, 11 Nov 2022 at 23:29, Ben Greear <greearb@candelatech.com> wrote:
-> > > >
-> > > > On 11/9/22 2:05 AM, Ard Biesheuvel wrote:
-> > > > > On Wed, 9 Nov 2022 at 04:52, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > > > > >
-> > > > > > On Tue, Nov 08, 2022 at 10:50:48AM -0800, Ben Greear wrote:
-> > > > > > >
-> > > > > > > While rebasing my patches onto 6.1-rc4, I noticed my aesni for ccm(aes) patch didn't apply cleanly,
-> > > > > > > and I found this patch described below is applied now.  Does this upstream patch mean that aesni is already
-> > > > > > > supported upstream now?  Or is it specific to whatever xctr is?  If so,
-> > > > > > > any chance the patch is wanted upstream now?
-> > > > > >
-> > > > > > AFAICS the xctr patch has nothing to do with what you were trying
-> > > > > > to achieve with wireless.  My objection still stands with regards
-> > > > > > to wireless, we should patch wireless to use the async crypto
-> > > > > > interface and not hack around it in the Crypto API.
-> > > > > >
-> > > > >
-> > > > > Indeed. Those are just add/add conflicts because both patches
-> > > > > introduce new code into the same set of files. The resolution is
-> > > > > generally to keep both sides.
-> > > > >
-> > > > > As for Herbert's objection: I will note here that in the meantime,
-> > > > > arm64 now has gotten rid of the scalar fallbacks entirely in AEAD and
-> > > > > skipcher implementations, because those are only callable in task or
-> > > > > softirq context, and the arm64 SIMD wrappers now disable softirq
-> > > > > processing. This means that the condition that results in the fallback
-> > > > > being needed can no longer occur, making the SIMD helper dead code on
-> > > > > arm64.
-> > > > >
-> > > > > I suppose we might do the same thing on x86, but since the kernel mode
-> > > > > SIMD handling is highly arch specific, you'd really need to raise this
-> > > > > with the x86 maintainers.
-> > > > >
-> > > >
-> > > > Hello Ard,
-> > > >
-> > > > Could you please review the attached patch to make sure I merged it properly?  My concern
-> > > > is the cleanup section and/or some problems I might have introduced related to the similarly
-> > > > named code that was added upstream.
-> > > >
-> > >
-> > > I don't think the logic is quite right, although it rarely matter.
-> > >
-> > > I've pushed my version here - it invokes the static call for CTR so it
-> > > will use the faster AVX version if the CPU supports it.
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=aesni-ccm-v6.1
-> >
-> > Hello Ard,
-> >
-> > It looks like something changed again in the intel-aesni logic for 6.6 kernel.  I was able to do a small
-> > change to the patch to get it to compile, but the kernel crashes when I bring up a wlan port in
-> > 6.6.  When I remove the aesni patch, the station comes up without crashing.  The aesni patch worked
-> > fine in 6.5 as far as I can tell.
-> >
-> > I'm attaching my slightly modified version of the patch you sent previous.  If you have time to
-> > investigate this it would be much appreciated.
-> >
-> > Thanks,
-> > Ben
->
-> If this patch is useful, shouldn't it be upstreamed?
->
+On 16/10/2023 19:45, André Apitzsch wrote:
+> This should fix the undefined reference:
+> 
+>> /usr/bin/aarch64-alpine-linux-musl-ld: Unexpected GOT/PLT entries detected!
+>> /usr/bin/aarch64-alpine-linux-musl-ld: Unexpected run-time procedure linkages detected!
+>> /usr/bin/aarch64-alpine-linux-musl-ld: drivers/crypto/qcom-rng.o: in function `qcom_rng_probe':
+>> qcom-rng.c:(.text+0x130): undefined reference to `devm_hwrng_register'
+> 
+> Fixes: f29cd5bb64c2 ("crypto: qcom-rng - Add hw_random interface support")
+> Signed-off-by: André Apitzsch <git@apitzsch.eu>
+> ---
+>   drivers/crypto/Kconfig | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index c761952f0dc6..79c3bb9c99c3 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -601,6 +601,7 @@ config CRYPTO_DEV_QCE_SW_MAX_LEN
+>   config CRYPTO_DEV_QCOM_RNG
+>   	tristate "Qualcomm Random Number Generator Driver"
+>   	depends on ARCH_QCOM || COMPILE_TEST
+> +	depends on HW_RANDOM
+>   	select CRYPTO_RNG
+>   	help
+>   	  This driver provides support for the Random Number
+> 
+> ---
+> base-commit: 4d0515b235dec789578d135a5db586b25c5870cb
+> change-id: 20231016-qcom_rng-e46c8a8628bb
+> 
+> Best regards,
 
-It was rejected by Herbert on the basis that the wireless stack should
-be converted to use the async API instead.
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
